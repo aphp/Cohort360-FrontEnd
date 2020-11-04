@@ -28,7 +28,7 @@ This third endpoint can be a FHIR API for example. This is the case for the firs
 
 ### Running the front-end
 
-1. First copy the `.env.example` file to `.env` and edit this file to match your ocnfiguration.
+1. First copy the `.env.example` file to `.env` and edit this file to match your configuration.
 2. Run `npm install`
 3. Run `npm audit fix`
 4. Run `npm run build`
