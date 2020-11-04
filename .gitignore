@@ -27,3 +27,4 @@ yarn-error.log*
 
 # Cohort360 specific
 .env
+.mp4
