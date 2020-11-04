@@ -1,3 +1,8 @@
+<div align="center" style="display:flex;flex-direction:column;">
+  <img src="./public/logo_c360.png" alt="Cohort360 logo" />
+  <h3>A web application to find patients, build cohorts and visualize data.</h3>
+</div>
+
 # Cohort360
 
 Cohort360 is a web application for knowledge discovery in clinical data warehouses. It provides tools for clinicians and researchers to find patients, build cohorts and visualize data. Cohort360 has been initiated by Greater Paris University Hospital (AP-HP) and it is now an open-source project being developed collaboratively by a community of contributors and partners, working together to unleash research on clinical data.
@@ -81,6 +86,10 @@ A contributing guide will be published soon.
 * AP-HP Clinical Data Warehouse
 * Arkhn : arkhn.org
 * Akimed : akimed.io
+
+## Contributors
+
+Coming soon...
 
 ## License
 Cohort360 is licensed under Apache License 2.
