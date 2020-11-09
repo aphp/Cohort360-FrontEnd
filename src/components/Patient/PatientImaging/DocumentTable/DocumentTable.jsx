@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
@@ -16,32 +16,20 @@ import { ReactComponent as PdfIcon } from '../../../../assets/icones/file-pdf.sv
 import { ReactComponent as CheckIcon } from '../../../../assets/icones/check.svg'
 import { ReactComponent as CancelIcon } from '../../../../assets/icones/times.svg'
 
-import useStyles from './style'
+import useStyles from './styles'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
 const DocumentRow = ({ row }) => {
   const classes = useStyles()
 
-  const [documentDialogOpen, setDocumentDialogOpen] = React.useState(false)
+  const [documentDialogOpen, setDocumentDialogOpen] = useState(false)
 
   const getStatusShip = (type) => {
     if (type === 'final') {
-      return (
-        <Chip
-          className={classes.validChip}
-          icon={<CheckIcon height="15px" fill="#FFF" />}
-          label={type}
-        />
-      )
+      return <Chip className={classes.validChip} icon={<CheckIcon height="15px" fill="#FFF" />} label={type} />
     } else {
-      return (
-        <Chip
-          className={classes.cancelledChip}
-          icon={<CancelIcon height="15px" fill="#FFF" />}
-          label={type}
-        />
-      )
+      return <Chip className={classes.cancelledChip} icon={<CancelIcon height="15px" fill="#FFF" />} label={type} />
     }
   }
 
@@ -52,11 +40,7 @@ const DocumentRow = ({ row }) => {
       <TableCell align="left" className={classes.description}>
         {row.description}
       </TableCell>
-      <TableCell align="center">
-        {row.securityLabel?.coding
-          ? row.securityLabel?.coding[0].code
-          : 'unknown'}
-      </TableCell>
+      <TableCell align="center">{row.securityLabel?.coding ? row.securityLabel?.coding[0].code : 'unknown'}</TableCell>
       <TableCell align="center">{getStatusShip(row.docStatus)}</TableCell>
       <TableCell align="center">
         <IconButton
@@ -64,10 +48,7 @@ const DocumentRow = ({ row }) => {
           disabled={row.type !== 'report' && row.type !== 'prescription'}
         >
           <PdfIcon height="25px" fill="#ED6D91" />
-          <Dialog
-            open={documentDialogOpen}
-            onClose={() => setDocumentDialogOpen(false)}
-          >
+          <Dialog open={documentDialogOpen} onClose={() => setDocumentDialogOpen(false)}>
             <Document
               file={{
                 url: `https://demo.arkhn.com/files/${row.content[0].attachment.url}`,
@@ -88,21 +69,9 @@ const DocumentTable = (props) => {
 
   const getStatusShip = (type) => {
     if (type === 'final') {
-      return (
-        <Chip
-          className={classes.validChip}
-          icon={<CheckIcon height="15px" fill="#FFF" />}
-          label={type}
-        />
-      )
+      return <Chip className={classes.validChip} icon={<CheckIcon height="15px" fill="#FFF" />} label={type} />
     } else {
-      return (
-        <Chip
-          className={classes.cancelledChip}
-          icon={<CancelIcon height="15px" fill="#FFF" />}
-          label={type}
-        />
-      )
+      return <Chip className={classes.cancelledChip} icon={<CancelIcon height="15px" fill="#FFF" />} label={type} />
     }
   }
 
@@ -133,10 +102,7 @@ const DocumentTable = (props) => {
         </TableHead>
         <TableBody>
           {props.documents
-            .slice(
-              (props.page - 1) * props.documentLines,
-              props.page * props.documentLines
-            )
+            .slice((props.page - 1) * props.documentLines, props.page * props.documentLines)
             .map((row) => (
               <DocumentRow row={row} />
             ))}

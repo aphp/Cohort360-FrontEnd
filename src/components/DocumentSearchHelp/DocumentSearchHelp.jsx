@@ -1,37 +1,35 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
-import Button from '@material-ui/core/Button'
-import Dialog from '@material-ui/core/Dialog'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogActions from '@material-ui/core/DialogActions'
-import TableContainer from '@material-ui/core/TableContainer'
-import Paper from '@material-ui/core/Paper'
-import Table from '@material-ui/core/Table'
-import TableHead from '@material-ui/core/TableHead'
-import TableRow from '@material-ui/core/TableRow'
-import TableCell from '@material-ui/core/TableCell'
-import TableBody from '@material-ui/core/TableBody'
-import Link from '@material-ui/core/Link'
 
-import useStyles from './style'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  Link,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
+} from '@material-ui/core'
 
-const DocumentFilters = ({ open, onClose }) => {
+import useStyles from './styles.js'
+
+const DocumentSearchHelp = ({ open, onClose }) => {
   const classes = useStyles()
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle className={classes.title}>
-        Aide à la recherche textuelle
-      </DialogTitle>
+      <DialogTitle className={classes.title}>Aide à la recherche textuelle</DialogTitle>
       <DialogContent className={classes.dialog}>
         <Grid container direction="column">
-          <Typography>
-            Les opérateurs ci-dessous vont aideront à affiner la recherche
-            textuelle.
-          </Typography>
+          <Typography>Les opérateurs ci-dessous vont aideront à affiner la recherche textuelle.</Typography>
           <Typography variant="button" className={classes.subtitle}>
             Recherche textuelle basique :
           </Typography>
@@ -57,16 +55,13 @@ const DocumentFilters = ({ open, onClose }) => {
                   </TableCell>
                   <TableCell align="center">
                     <Typography align="justify">
-                      Recherche si dans un document, les mots, ou groupe de mots
-                      (encadrés de parenthèse pour ce dernier) sont présents. La
-                      recherche se base sur la racine des mots. Par exemple pour
-                      le mot embolie, la recherche peut retourner embolisation.
+                      Recherche si dans un document, les mots, ou groupe de mots (encadrés de parenthèse pour ce
+                      dernier) sont présents. La recherche se base sur la racine des mots. Par exemple pour le mot
+                      embolie, la recherche peut retourner embolisation.
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Typography className={classes.bold}>
-                      Mot1 AND Mot2 () AND ()
-                    </Typography>
+                    <Typography className={classes.bold}>Mot1 AND Mot2 () AND ()</Typography>
                   </TableCell>
                 </TableRow>
                 <TableRow className={classes.tableBodyRows} hover>
@@ -74,24 +69,17 @@ const DocumentFilters = ({ open, onClose }) => {
                     <Typography className={classes.bold}>OR</Typography>
                     <Typography className={classes.bold}>|</Typography>
                     <Typography className={classes.bold}>||</Typography>
-                    <Typography className={classes.bold}>
-                      Espace entre deux mots
-                    </Typography>
+                    <Typography className={classes.bold}>Espace entre deux mots</Typography>
                   </TableCell>
                   <TableCell align="center">
                     <Typography align="justify">
-                      Recherche dans les documents si au moins un des mots est
-                      présent.
+                      Recherche dans les documents si au moins un des mots est présent.
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Typography className={classes.bold}>
-                      Mot1 OR Mot2
-                    </Typography>
+                    <Typography className={classes.bold}>Mot1 OR Mot2</Typography>
                     <Typography className={classes.bold}>Mot1 |Mot2</Typography>
-                    <Typography className={classes.bold}>
-                      Mot1 || Mot2
-                    </Typography>
+                    <Typography className={classes.bold}>Mot1 || Mot2</Typography>
                     <Typography className={classes.bold}>Mot1 Mot2</Typography>
                   </TableCell>
                 </TableRow>
@@ -102,17 +90,12 @@ const DocumentFilters = ({ open, onClose }) => {
                   </TableCell>
                   <TableCell align="center">
                     <Typography align="justify">
-                      Exprime la négation. La recherche exclut le terme qui suit
-                      NOT ou bien !
+                      Exprime la négation. La recherche exclut le terme qui suit NOT ou bien !
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Typography className={classes.bold}>
-                      Mot1 NOT Mot2
-                    </Typography>
-                    <Typography className={classes.bold}>
-                      Mot1 ! Mot2
-                    </Typography>
+                    <Typography className={classes.bold}>Mot1 NOT Mot2</Typography>
+                    <Typography className={classes.bold}>Mot1 ! Mot2</Typography>
                   </TableCell>
                 </TableRow>
                 <TableRow className={classes.tableBodyRows} hover>
@@ -120,14 +103,10 @@ const DocumentFilters = ({ open, onClose }) => {
                     <Typography className={classes.bold}>()</Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Typography align="justify">
-                      Les parenthèses permettent de faire un groupe de mots.
-                    </Typography>
+                    <Typography align="justify">Les parenthèses permettent de faire un groupe de mots.</Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Typography className={classes.bold}>
-                      (Mot1 Mot2)
-                    </Typography>
+                    <Typography className={classes.bold}>(Mot1 Mot2)</Typography>
                   </TableCell>
                 </TableRow>
                 <TableRow className={classes.tableBodyRows} hover>
@@ -136,14 +115,11 @@ const DocumentFilters = ({ open, onClose }) => {
                   </TableCell>
                   <TableCell align="center">
                     <Typography align="justify">
-                      Recherche dans les documents si au moins un des groupes de
-                      mots est présent.
+                      Recherche dans les documents si au moins un des groupes de mots est présent.
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Typography className={classes.bold}>
-                      (Mot1 Mot2)(Mot3 Mot4)
-                    </Typography>
+                    <Typography className={classes.bold}>(Mot1 Mot2)(Mot3 Mot4)</Typography>
                   </TableCell>
                 </TableRow>
                 <TableRow className={classes.tableBodyRows} hover>
@@ -152,18 +128,15 @@ const DocumentFilters = ({ open, onClose }) => {
                   </TableCell>
                   <TableCell align="center">
                     <Typography align="justify">
-                      Lorsque * est placé à la fin du mot, la recherche
-                      s&apos;effectue sur tous les mots pouvant correspondre à
-                      la fin du mot souhaité. Par exemple pour embol*, les
-                      résultats peuvent être embolisation, embolie, ...
+                      Lorsque * est placé à la fin du mot, la recherche s&apos;effectue sur tous les mots pouvant
+                      correspondre à la fin du mot souhaité. Par exemple pour embol*, les résultats peuvent être
+                      embolisation, embolie, ...
                     </Typography>
                     <Typography align="justify">
-                      Dans le cas où * est placé à l&apos;intérieur d&apos;une
-                      chaine de caractères, la recherche s&apos;effectue sur
-                      tous les mots pouvant correspondre au mot souhaité,
-                      quelque soit le nombre de caractères inconnus. Par
-                      exemple, pour te*t, les résultats peuvent être testés,
-                      texte, tenant, test, ...
+                      Dans le cas où * est placé à l&apos;intérieur d&apos;une chaine de caractères, la recherche
+                      s&apos;effectue sur tous les mots pouvant correspondre au mot souhaité, quelque soit le nombre de
+                      caractères inconnus. Par exemple, pour te*t, les résultats peuvent être testés, texte, tenant,
+                      test, ...
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -177,11 +150,9 @@ const DocumentFilters = ({ open, onClose }) => {
                   </TableCell>
                   <TableCell align="center">
                     <Typography align="justify">
-                      Dans le cas où ? est placé à l&apos;intérieur d&apos;une
-                      chaine de caractères, la recherche s&apos;effectue sur
-                      tous les mots pouvant correspondre au mot souhaité, avec
-                      le caractère inconnu. Par exemple pour te?t, les résultats
-                      peuvent être testés, texte, test, ...
+                      Dans le cas où ? est placé à l&apos;intérieur d&apos;une chaine de caractères, la recherche
+                      s&apos;effectue sur tous les mots pouvant correspondre au mot souhaité, avec le caractère inconnu.
+                      Par exemple pour te?t, les résultats peuvent être testés, texte, test, ...
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -194,9 +165,8 @@ const DocumentFilters = ({ open, onClose }) => {
                   </TableCell>
                   <TableCell align="center">
                     <Typography align="justify">
-                      Recherche de mots similaires. Par exemple pour hormone~,
-                      les résultats peuvent être hormonede (considéré comme
-                      faute de frappe), hormono,...
+                      Recherche de mots similaires. Par exemple pour hormone~, les résultats peuvent être hormonede
+                      (considéré comme faute de frappe), hormono,...
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -209,11 +179,9 @@ const DocumentFilters = ({ open, onClose }) => {
                   </TableCell>
                   <TableCell align="center">
                     <Typography align="justify">
-                      Le terme qui suit + doit forcément être présent dans les
-                      résultats de la recherche. Par exemple pour
-                      embolie+myocarde, la recherche doit forcément trouver le
-                      terme myocarde, même si dans le même docupment le terme
-                      embolie &apos;est pas présent.
+                      Le terme qui suit + doit forcément être présent dans les résultats de la recherche. Par exemple
+                      pour embolie+myocarde, la recherche doit forcément trouver le terme myocarde, même si dans le même
+                      docupment le terme embolie &apos;est pas présent.
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -225,9 +193,7 @@ const DocumentFilters = ({ open, onClose }) => {
                     <Typography className={classes.bold}>-</Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Typography align="justify">
-                      Le terme qui suit - est exclu de la recherche.
-                    </Typography>
+                    <Typography align="justify">Le terme qui suit - est exclu de la recherche.</Typography>
                   </TableCell>
                   <TableCell align="center">
                     <Typography className={classes.bold}>- Mot</Typography>
@@ -255,29 +221,21 @@ const DocumentFilters = ({ open, onClose }) => {
               <TableBody>
                 <TableRow className={classes.tableBodyRows} hover>
                   <TableCell align="center">
-                    <Typography className={classes.bold}>
-                      &quot;mot1 mot2&quot;
-                    </Typography>
+                    <Typography className={classes.bold}>&quot;mot1 mot2&quot;</Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Typography align="justify">
-                      Recherche des deux termes côte à côte.
-                    </Typography>
+                    <Typography align="justify">Recherche des deux termes côte à côte.</Typography>
                   </TableCell>
                 </TableRow>
                 <TableRow className={classes.tableBodyRows} hover>
                   <TableCell align="center">
-                    <Typography className={classes.bold}>
-                      &quot;mot1 mot2&quot;~nombre de mots
-                    </Typography>
+                    <Typography className={classes.bold}>&quot;mot1 mot2&quot;~nombre de mots</Typography>
                   </TableCell>
                   <TableCell align="center">
                     <Typography align="justify">
-                      Recherche des deux termes avec une distance de mots entre
-                      les deux. Par exemple pour « embolie infarctus »~10, la
-                      recherche s’effectue dans les documents ayant les deux
-                      termes avec une distance de 10 mots maximum entre les
-                      deux.
+                      Recherche des deux termes avec une distance de mots entre les deux. Par exemple pour « embolie
+                      infarctus »~10, la recherche s’effectue dans les documents ayant les deux termes avec une distance
+                      de 10 mots maximum entre les deux.
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -287,21 +245,16 @@ const DocumentFilters = ({ open, onClose }) => {
                   </TableCell>
                   <TableCell align="center">
                     <Typography align="justify">
-                      Permet de rechercher un terme ou un groupe de mots en
-                      renforçant sa valeur en lui accordant un facteur. Par
-                      exemple, la requête embolie pulmonaire^4 recherche tous
-                      les documents ayant les termes embolie et pulmonaire mais
-                      avec le terme pulmonaire le plus
-                      recherché/efficace/important.
+                      Permet de rechercher un terme ou un groupe de mots en renforçant sa valeur en lui accordant un
+                      facteur. Par exemple, la requête embolie pulmonaire^4 recherche tous les documents ayant les
+                      termes embolie et pulmonaire mais avec le terme pulmonaire le plus recherché/efficace/important.
                     </Typography>
                     <Typography align="justify">
-                      Ceci est possible avec des groupes de mots également, par
-                      exemple &quot;infarctus du myocarde&quot;^3 &quot;embolie
-                      pulmonaire&quot;.
+                      Ceci est possible avec des groupes de mots également, par exemple &quot;infarctus du
+                      myocarde&quot;^3 &quot;embolie pulmonaire&quot;.
                     </Typography>
                     <Typography align="justify">
-                      Le facteur est à 1 par défaut, il peut aussi être
-                      inférieur à 1 (par exemple à 0.2).
+                      Le facteur est à 1 par défaut, il peut aussi être inférieur à 1 (par exemple à 0.2).
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -310,8 +263,7 @@ const DocumentFilters = ({ open, onClose }) => {
           </TableContainer>
 
           <Typography className={classes.subtitle}>
-            Pour plus de fonctionnalités dans la recherche textuelle, vous
-            pouvez consulter le lien suivant :
+            Pour plus de fonctionnalités dans la recherche textuelle, vous pouvez consulter le lien suivant :
             <Link href="https://lucene.apache.org/solr/guide/8_1/the-standard-query-parser.html#fuzzy-searches">
               https://lucene.apache.org/solr/guide/8_1/the-standard-query-parser.html#fuzzy-searches.
             </Link>
@@ -327,9 +279,9 @@ const DocumentFilters = ({ open, onClose }) => {
   )
 }
 
-DocumentFilters.propTypes = {
+DocumentSearchHelp.propTypes = {
   open: PropTypes.bool,
   onClose: PropTypes.func
 }
 
-export default DocumentFilters
+export default DocumentSearchHelp

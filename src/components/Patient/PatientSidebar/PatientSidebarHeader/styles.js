@@ -23,5 +23,11 @@ export default makeStyles((theme) => ({
     color: '#FFF',
     borderRadius: '25px',
     marginRight: 16
+  },
+  margin: {
+    margin: '8px 0'
+  },
+  lockIcon: {
+    marginRight: 8
   }
 }))

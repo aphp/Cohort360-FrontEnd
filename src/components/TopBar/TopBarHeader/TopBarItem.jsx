@@ -9,10 +9,7 @@ const TopBarItem = (props) => {
 
   return (
     <Grid item>
-      <Typography
-        className={classes.text}
-        variant={props.header ? 'h6' : 'subtitle2'}
-      >
+      <Typography className={classes.text} variant={props.header ? 'h6' : 'subtitle2'}>
         {props.text}
       </Typography>
     </Grid>

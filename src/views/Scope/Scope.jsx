@@ -1,38 +1,51 @@
-import React from 'react'
-import useStyles from './styles'
+import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import clsx from 'clsx'
 import { useSelector } from 'react-redux'
+import clsx from 'clsx'
 
+import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
+import Paper from '@material-ui/core/Paper'
+import Typography from '@material-ui/core/Typography'
 
 import ScopeTree from '../../components/ScopeTree/ScopeTree'
-import { Typography } from '@material-ui/core'
+
+import useStyles from './styles'
 
 const Scope = () => {
   const classes = useStyles()
   const history = useHistory()
 
+  const [selectedItems, onChangeSelectedItem] = useState([])
   const open = useSelector((state) => state.drawer)
 
-  const trimItems = (selectedItems) => {
-    const onlyParents = new Set()
-    selectedItems.forEach((element) => {
-      let found
-      for (const e of selectedItems) {
-        if (e.id === element.parentId) {
-          found = true
+  const trimItems = () => {
+    let onlyParents = []
+    let _selectedItems = selectedItems ? selectedItems : []
+
+    for (const element of _selectedItems) {
+      if (onlyParents.find((onlyParent) => onlyParent?.subItems?.find(({ id }) => id === element.id))) continue
+
+      if (element && element.subItems && element.subItems.length > 0 && element.subItems[0].id !== 'loading') {
+        const filteredItems = element.subItems.filter((subItem) =>
+          _selectedItems.some(({ id }) => subItem && subItem.id === id)
+        )
+
+        if (element.subItems.length === filteredItems?.length) {
+          onlyParents = [...onlyParents, element]
+        } else {
+          onlyParents = [...onlyParents, ...filteredItems]
         }
+      } else {
+        onlyParents = [...onlyParents, element]
       }
+    }
 
-      if (!element.parentId || !found) {
-        onlyParents.add(element)
-      }
-    })
-
-    history.push(
-      `/perimetres?${[...onlyParents].map((selected) => selected.id)}`
+    onlyParents = onlyParents.filter(
+      (onlyParent, index) => onlyParents.indexOf(onlyParent) === index && onlyParent?.id !== 'loading'
     )
+
+    history.push(`/perimetres?${onlyParents.map((selected) => selected.id)}`)
   }
 
   return (
@@ -49,7 +62,30 @@ const Scope = () => {
           <Typography variant="h1" color="primary" className={classes.title}>
             Explorer un perimètre
           </Typography>
-          <ScopeTree valid={trimItems} />
+          <Paper className={classes.paper}>
+            <ScopeTree defaultSelectedItems={selectedItems} onChangeSelectedItem={onChangeSelectedItem} />
+
+            <div className={classes.buttons}>
+              <Button
+                variant="contained"
+                disableElevation
+                onClick={() => onChangeSelectedItem([])}
+                disabled={!selectedItems.length}
+                className={classes.cancelButton}
+              >
+                Annuler
+              </Button>
+              <Button
+                variant="contained"
+                disableElevation
+                disabled={!selectedItems.length}
+                onClick={trimItems}
+                className={classes.validateButton}
+              >
+                Valider
+              </Button>
+            </div>
+          </Paper>
         </Grid>
       </Grid>
     </Grid>

@@ -3,7 +3,7 @@ import PatientTitle from './PatientTitle'
 import { fireEvent, render, screen } from '@testing-library/react'
 
 describe('PatientTitle', () => {
-  beforeEach(() => render(<PatientTitle firstName="John" lastName="Smith"/>))
+  beforeEach(() => render(<PatientTitle firstName="John" lastName="Smith" />))
 
   it('should display first name and last name', () => {
     expect(screen.getByText('John Smith')).toBeTruthy()
@@ -20,6 +20,6 @@ describe('PatientTitle', () => {
     expect(screen.getByRole('menu')).toBeTruthy()
     expect(screen.getAllByRole('menuitem')).toHaveLength(2)
     expect(screen.getByRole('menuitem', { name: 'Inclure dans une cohorte' })).toBeTruthy()
-    expect(screen.getByRole('menuitem', { name: 'Exclure d\'une cohorte' })).toBeTruthy()
+    expect(screen.getByRole('menuitem', { name: "Exclure d'une cohorte" })).toBeTruthy()
   })
 })

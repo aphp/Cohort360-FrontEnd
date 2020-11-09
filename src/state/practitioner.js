@@ -20,6 +20,10 @@ const practitioner = (state = initialState, action) => {
       return action.payload
     }
 
+    case 'LOGOUT': {
+      return initialState
+    }
+
     default:
       return state
   }

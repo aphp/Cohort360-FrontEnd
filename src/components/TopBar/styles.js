@@ -1,7 +1,7 @@
 import { makeStyles } from '@material-ui/core/styles'
-import { smallDrawerWidth, largeDrawerWidth } from '../LeftSideBar/LeftSideBar'
+// import { smallDrawerWidth, largeDrawerWidth } from '../LeftSideBar/LeftSideBar'
 
-export default makeStyles((theme) => ({
+export default makeStyles(() => ({
   root: {
     height: '72px',
     display: 'flex',

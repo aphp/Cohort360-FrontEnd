@@ -1,9 +1,0 @@
-export const {
-  REACT_APP_BACK_API_URL: BACK_API_URL,
-  REACT_APP_FHIR_API_URL: FHIR_API_URL,
-  REACT_APP_AUTH_API_URL: AUTH_API_URL,
-  REACT_APP_FILES_URL: FILES_URL,
-  REACT_APP_CONTEXT: CONTEXT
-} = process.env
-export const ACCES_TOKEN = 'access'
-export const REFRESH_TOKEN = 'refresh'

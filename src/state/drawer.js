@@ -2,13 +2,13 @@ const initialState = true
 
 export const open = () => {
   return {
-    type: 'OPEN',
+    type: 'OPEN'
   }
 }
 
 export const close = () => {
   return {
-    type: 'CLOSE',
+    type: 'CLOSE'
   }
 }
 
@@ -20,6 +20,10 @@ const drawer = (state = initialState, action) => {
 
     case 'CLOSE': {
       return false
+    }
+
+    case 'LOGOUT': {
+      return initialState
     }
 
     default:
