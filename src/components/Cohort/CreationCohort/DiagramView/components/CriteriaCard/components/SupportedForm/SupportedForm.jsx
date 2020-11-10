@@ -15,6 +15,8 @@ import {
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
+import fetchAdmissionModes from '../../../../../../../../data/Requeteur/VISITE/admissionMode'
+
 import useStyles from './styles'
 
 const ERROR_TITLE = 'error_title'
@@ -49,17 +51,20 @@ const SupportedForm = (props) => {
   const [entryModeData, setEntryModeData] = useState(criteria?.data.entryMode)
   const [exitModeData, setExitModeData] = useState(criteria?.data.exitMode)
 
-  useEffect(() => {
-    const _searchValue = searchValue
-    const filteredAdmissionModeData = criteria?.data?.admissionMode?.filter(
-      (admissionMode) =>
-        admissionMode['admissionModeCode'].startsWith(_searchValue) ||
-        admissionMode['label'].startsWith(_searchValue) ||
-        `${admissionMode['admissionModeCode']} - ${admissionMode['label']}`.startsWith(_searchValue)
-    )
-    setAdmissionModeData(filteredAdmissionModeData)
-  }, [searchValue]) // eslint-disable-line
+  useEffect(async () => {
+    // const _searchValue = searchValue
+    // const filteredAdmissionModeData = criteria?.data?.admissionMode?.filter(
+    //  (admissionMode) =>
+    //    admissionMode['admissionModeCode'].startsWith(_searchValue) ||
+    //    admissionMode['label'].startsWith(_searchValue) ||
+    //    `${admissionMode['admissionModeCode']} - ${admissionMode['label']}`.startsWith(_searchValue)
+    //)
+    const admissionModes = await fetchAdmissionModes()
+    setAdmissionModeData(admissionModes)
+    // setAdmissionModeData(filteredAdmissionModeData)
+  }, []) // eslint-disable-line
 
+  console.log(admissionModeData)
   useEffect(() => {
     const _searchValue = searchValue
 
@@ -87,7 +92,7 @@ const SupportedForm = (props) => {
   const _onChangeCriteriaValue = (key, value) => {
     if (error) setError(null)
 
-    let savedCriteria = { ..._selectedCriteria }
+    const savedCriteria = { ..._selectedCriteria }
     savedCriteria[key] = value
     onChangeCriteria(savedCriteria)
   }
