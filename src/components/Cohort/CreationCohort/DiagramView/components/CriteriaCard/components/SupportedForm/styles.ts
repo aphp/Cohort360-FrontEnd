@@ -21,10 +21,10 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    padding: "1em",
+    padding: '1em'
   },
   formControl: {
-    margin: "1em"
+    margin: '1em'
   },
   inputText: {
     border: '1px solid #D7DAE3',
@@ -32,26 +32,26 @@ const useStyles = makeStyles((theme) => ({
     padding: '0.5em'
   },
   inputTextError: {
-    borderColor: "#c61137",
-    color: "#fc1847",
+    borderColor: '#c61137',
+    color: '#fc1847'
   },
   yearInputContainer: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-around",
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around'
   },
   criteriaActionContainer: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexWrap: "wrap",
-    borderTop: "1px solid grey",
-    "& > button": {
-      margin: "12px 8px"
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    borderTop: '1px solid grey',
+    '& > button': {
+      margin: '12px 8px'
     }
   },
   selectGridContainer: {
-    justifyContent: "space-between"
+    justifyContent: 'space-between'
   }
 }))
 

@@ -87,7 +87,7 @@ const SupportedForm = (props) => {
   const _onChangeCriteriaValue = (key, value) => {
     if (error) setError(null)
 
-    let savedCriteria = { ..._selectedCriteria }
+    const savedCriteria = { ..._selectedCriteria }
     savedCriteria[key] = value
     onChangeCriteria(savedCriteria)
   }

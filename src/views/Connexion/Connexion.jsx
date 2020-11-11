@@ -84,6 +84,18 @@ const Login = () => {
   const [errorLogin, setErrorLogin] = useState(false)
   const [open, setOpen] = useState(false)
 
+  const getPractitionerData = async () => {
+    const practitioner = await fetchPractitioner(username)
+    const deidentifiedBoolean = await fetchDeidentified()
+
+    if (practitioner) {
+      dispatch(loginAction({ ...practitioner, deidentified: deidentifiedBoolean }))
+      history.push('/accueil')
+    } else {
+      setErrorLogin(true)
+    }
+  }
+
   const login = async () => {
     try {
       if (!username || !password) return setErrorLogin(true)
@@ -101,18 +113,6 @@ const Login = () => {
         setErrorLogin(true)
       }
     } catch (err) {
-      setErrorLogin(true)
-    }
-  }
-
-  const getPractitionerData = async () => {
-    const practitioner = await fetchPractitioner(username)
-    const deidentifiedBoolean = await fetchDeidentified()
-
-    if (practitioner) {
-      dispatch(loginAction({ ...practitioner, deidentified: deidentifiedBoolean }))
-      history.push('/accueil')
-    } else {
       setErrorLogin(true)
     }
   }

@@ -8,8 +8,6 @@ export default makeStyles((theme) => ({
     flexDirection: 'column',
     overflow: 'auto'
   },
-  mainRow: {
-  },
-  secondRow: {
-  },
+  mainRow: {},
+  secondRow: {}
 }))

@@ -67,14 +67,6 @@ const DocumentRow = ({ row }) => {
 const DocumentTable = (props) => {
   const classes = useStyles()
 
-  const getStatusShip = (type) => {
-    if (type === 'final') {
-      return <Chip className={classes.validChip} icon={<CheckIcon height="15px" fill="#FFF" />} label={type} />
-    } else {
-      return <Chip className={classes.cancelledChip} icon={<CancelIcon height="15px" fill="#FFF" />} label={type} />
-    }
-  }
-
   return (
     <TableContainer component={Paper}>
       <Table className={classes.table} aria-label="simple table">
@@ -103,8 +95,8 @@ const DocumentTable = (props) => {
         <TableBody>
           {props.documents
             .slice((props.page - 1) * props.documentLines, props.page * props.documentLines)
-            .map((row) => (
-              <DocumentRow row={row} />
+            .map((row, i) => (
+              <DocumentRow row={row} key={i} />
             ))}
         </TableBody>
       </Table>
