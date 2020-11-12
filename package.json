@@ -10,6 +10,7 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.53",
     "@material-ui/styles": "^4.9.10",
+    "@reduxjs/toolkit": "^1.4.0",
     "@types/classnames": "^2.2.10",
     "@types/redux-logger": "^3.0.8",
     "apollo-boost": "^0.4.9",

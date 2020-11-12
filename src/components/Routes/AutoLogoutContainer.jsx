@@ -10,7 +10,7 @@ import { DialogContentText } from '@material-ui/core'
 import axios from 'axios'
 
 import { ACCES_TOKEN, REFRESH_TOKEN, CONTEXT } from '../../constants'
-import { logout as logoutAction } from '../../state/store'
+import { logout as logoutAction } from '../../state/me'
 import useStyles from './styles'
 
 const AutoLogoutContainer = () => {
