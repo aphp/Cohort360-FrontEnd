@@ -15,7 +15,7 @@ import {
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import fetchAdmissionModes from '../../../../../../../../data/Requeteur/VISITE/admissionMode'
+import { fetchAdmissionModes } from '../../../../../../../../data/Requeteur/VISITE/admissionMode'
 
 import useStyles from './styles'
 
@@ -51,20 +51,26 @@ const SupportedForm = (props) => {
   const [entryModeData, setEntryModeData] = useState(criteria?.data.entryMode)
   const [exitModeData, setExitModeData] = useState(criteria?.data.exitMode)
 
-  useEffect(async () => {
-    // const _searchValue = searchValue
-    // const filteredAdmissionModeData = criteria?.data?.admissionMode?.filter(
-    //  (admissionMode) =>
-    //    admissionMode['admissionModeCode'].startsWith(_searchValue) ||
-    //    admissionMode['label'].startsWith(_searchValue) ||
-    //    `${admissionMode['admissionModeCode']} - ${admissionMode['label']}`.startsWith(_searchValue)
-    //)
-    const admissionModes = await fetchAdmissionModes()
-    setAdmissionModeData(admissionModes)
-    // setAdmissionModeData(filteredAdmissionModeData)
-  }, []) // eslint-disable-line
+  // useEffect(() => {
+  //   const _searchValue = searchValue
+  //   const filteredAdmissionModeData = criteria?.data?.admissionMode?.filter(
+  //     (admissionMode) =>
+  //       admissionMode['admissionModeCode'].startsWith(_searchValue) ||
+  //       admissionMode['label'].startsWith(_searchValue) ||
+  //       `${admissionMode['admissionModeCode']} - ${admissionMode['label']}`.startsWith(_searchValue)
+  //   )
+  //   setAdmissionModeData(filteredAdmissionModeData)
+  // }, []) // eslint-disable-line
+
+  useEffect(() => {
+    ;(async () => {
+      const admissionModes = await fetchAdmissionModes()
+      setAdmissionModeData(admissionModes)
+    })()
+  }, [])
 
   console.log(admissionModeData)
+
   useEffect(() => {
     const _searchValue = searchValue
 
@@ -157,7 +163,7 @@ const SupportedForm = (props) => {
           <Autocomplete
             defaultValue={isEdition ? _selectedCriteria.admissionMode : null}
             options={admissionModeData}
-            getOptionLabel={(option) => `${option['admissionModeCode']} - ${option['label']}`}
+            getOptionLabel={(option) => `${option['code']} - ${option['display']}`}
             renderInput={(params) => (
               <TextField
                 {...params}

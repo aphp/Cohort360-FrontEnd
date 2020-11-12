@@ -8,7 +8,7 @@ import GhmForm from './DiagramView/components/CriteriaCard/components/GhmForm/Gh
 
 // Data
 import cimData from '../../../data/Requeteur/CIM10/cim9_data'
-import admissionMode from '../../../data/Requeteur/VISITE/admissionMode'
+import { fetchAdmissionModes } from '../../../data/Requeteur/VISITE/admissionMode'
 import entryMode from '../../../data/Requeteur/VISITE/entryMode'
 import exitMode from '../../../data/Requeteur/VISITE/exitMode'
 import ccamData from '../../../data/ccam_data'
@@ -48,7 +48,7 @@ const criteriaList = [
     title: 'Visites',
     color: '#0063AF',
     components: SupportedForm,
-    data: { admissionMode, entryMode, exitMode }
+    data: { fetchAdmissionModes, entryMode, exitMode }
   },
   {
     id: 'documents_cliniques',
