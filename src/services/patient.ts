@@ -16,7 +16,7 @@ import {
 import { getApiResponseResources } from 'utils/apiHelpers'
 
 export const fetchPatientsCount = async (): Promise<number | undefined> => {
-  const response = await api.get<FHIR_API_Response<IPatient>>('Patient?_summary=count')
+  const response = await api.get<FHIR_API_Response<IPatient>>('Patient?size=0')
 
   if (response?.data?.resourceType === 'OperationOutcome') return undefined
 
@@ -42,7 +42,9 @@ export const fillNDAAndServiceProviderDocs = async (deidentifiedBoolean?: boolea
     return docs
   }
 
-  const encounters = await api.get<FHIR_API_Response<IEncounter>>(`/Encounter?_id=${noDuplicatesList.join()}`)
+  const encounters = await api.get<FHIR_API_Response<IEncounter>>(
+    `/Encounter?_id=${noDuplicatesList.join()}&type=VISIT`
+  )
   if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
     return []
   }
@@ -103,7 +105,7 @@ export async function fillNDAAndServiceProvider<T extends IProcedure | IConditio
     return pmsiEntries
   }
 
-  const encounters = await api.get<FHIR_API_Response<IEncounter>>(`/Encounter?_id=${noDuplicatesList}`)
+  const encounters = await api.get<FHIR_API_Response<IEncounter>>(`/Encounter?_id=${noDuplicatesList}&type=VISIT`)
 
   if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
     return []
