@@ -8,7 +8,7 @@ import CircularProgress from '@material-ui/core/CircularProgress'
 import api from '../../../services/api'
 
 const fetchPatientNumber = async () => {
-  const response = await api.get('Patient?_summary=count')
+  const response = await api.get('Patient?size=0')
   return response.data.total
 }
 
