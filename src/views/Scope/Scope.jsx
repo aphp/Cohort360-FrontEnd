@@ -21,7 +21,7 @@ const Scope = () => {
 
   const trimItems = () => {
     let onlyParents = []
-    let _selectedItems = selectedItems ? selectedItems : []
+    const _selectedItems = selectedItems ? selectedItems : []
 
     for (const element of _selectedItems) {
       if (onlyParents.find((onlyParent) => onlyParent?.subItems?.find(({ id }) => id === element.id))) continue

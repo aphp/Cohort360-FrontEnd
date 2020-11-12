@@ -58,7 +58,7 @@ export default makeStyles((theme) => ({
     marginBottom: '40px'
   },
   paper: {
-    height: "calc(100vh - 250px)"
+    height: 'calc(100vh - 250px)'
   },
   buttons: {
     marginTop: theme.spacing(3),
@@ -81,5 +81,5 @@ export default makeStyles((theme) => ({
     '&:hover': {
       backgroundColor: '#499cbf'
     }
-  },
+  }
 }))

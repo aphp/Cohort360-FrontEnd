@@ -22,6 +22,15 @@ const AutoLogoutContainer = () => {
   const inactifTimerRef = useRef(null)
   const sessionInactifTimerRef = useRef(null)
 
+  const logout = () => {
+    setDialogIsOpen(false)
+    history.push('/')
+    // console.log('User a été déconnecté')
+    localStorage.clear()
+    dispatch(logoutAction())
+    clearTimeout(sessionInactifTimerRef.current)
+  }
+
   const onIdle = () => {
     setDialogIsOpen(true)
     // console.log('User inactif depuis 10 secondes')
@@ -41,15 +50,6 @@ const AutoLogoutContainer = () => {
       })
     setDialogIsOpen(false)
     // console.log('User est resté connecté')
-    clearTimeout(sessionInactifTimerRef.current)
-  }
-
-  const logout = () => {
-    setDialogIsOpen(false)
-    history.push('/')
-    // console.log('User a été déconnecté')
-    localStorage.clear()
-    dispatch(logoutAction())
     clearTimeout(sessionInactifTimerRef.current)
   }
 

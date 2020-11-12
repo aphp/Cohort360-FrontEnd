@@ -1,7 +1,9 @@
 {
   "env": {
+    "node": true,
     "es6": true,
-    "browser": true
+    "browser": true,
+    "jest/globals": true
   },
   "extends": [
     "eslint:recommended",
@@ -10,7 +12,7 @@
     "prettier/@typescript-eslint",
     "plugin:prettier/recommended"
   ],
-  "plugins": ["react", "@typescript-eslint", "prettier"],
+  "plugins": ["react", "@typescript-eslint", "prettier", "jest"],
   "rules": {
     "prettier/prettier": [
       "error",
