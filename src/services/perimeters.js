@@ -10,7 +10,7 @@ export const fetchPerimetersInfos = async (perimetersIds) => {
         `/Patient?facet=gender&pivotFacet=age_gender,deceased_gender&_list=${perimetersIds}&size=20`
       ),
       api.get(
-        `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${perimetersIds}&size=0`
+        `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${perimetersIds}&size=0&type=VISIT`
       ),
       api.get(
         `/Composition?_list=${perimetersIds}&size=20&_sort=-date`

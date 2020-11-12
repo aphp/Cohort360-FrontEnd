@@ -125,7 +125,7 @@ export const fillNDAAndServiceProviderDocs = async (docs) => {
 
   let itemsProcessed = 0
 
-  const encounters = await api.get(`/Encounter?_id=${noDuplicatesList}`)
+  const encounters = await api.get(`/Encounter?_id=${noDuplicatesList}&type=VISIT`)
   if (!encounters.data.entry) {
     return
   }
@@ -183,7 +183,7 @@ export const fillNDAAndServiceProvider = async (pmsi) => {
 
   let itemsProcessed = 0
 
-  const encounters = await api.get(`/Encounter?_id=${noDuplicatesList}`)
+  const encounters = await api.get(`/Encounter?_id=${noDuplicatesList}&type=VISIT`)
 
   if (!encounters.data.entry) {
     return

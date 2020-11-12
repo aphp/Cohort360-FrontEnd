@@ -10,7 +10,7 @@ export const fetchCohort = async (cohortId) => {
         `/Patient?facet=gender&pivotFacet=age_gender,deceased_gender&_list=${cohortId}&size=20`
       ),
       api.get(
-        `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${cohortId}&size=0`
+        `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${cohortId}&size=0&type=VISIT`
       ),
       api.get(
         `/Composition?_list=${cohortId}&size=20&_sort=-date`

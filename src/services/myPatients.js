@@ -8,7 +8,7 @@ export const fetchMyPatients = async () => {
         '/Patient?facet=gender&pivotFacet=age_gender,deceased_gender&size=20'
       ),
       api.get(
-        '/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&size=0'
+        '/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&type=VISIT&size=0'
       ),
       api.get(
         '/Composition?size=20&_sort=-date'
@@ -51,7 +51,7 @@ export const getLastEncounter = async (patients) => {
   const encounters = await Promise.all(
     cohortPatients.map((patient) =>
       api.get(
-        `/Encounter?patient=${patient.id}&_sort=-start-date&size=1&_elements=subject,serviceProvider`
+        `/Encounter?patient=${patient.id}&_sort=-start-date&size=0&_elements=subject,serviceProvider&type=VISIT`
       )
     )
   )
@@ -98,7 +98,7 @@ const getEncounterInfos = async (documents) => {
 
   let itemsProcessed = 0
 
-  const encounters = await api.get(`/Encounter?_id=${listeEncounterIds}`)
+  const encounters = await api.get(`/Encounter?_id=${listeEncounterIds}&type=VISIT`)
 
   if (!encounters.data.entry) {
     return
