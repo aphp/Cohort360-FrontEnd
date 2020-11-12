@@ -329,6 +329,7 @@ export const fetchDocuments = async (
     let docTypesFilter = ''
     let ndaFilter = ''
     let dateFilter = ''
+    let elements = ''
 
     if (searchInput) {
       search = `&_text=${searchInput}`
@@ -350,6 +351,10 @@ export const fetchDocuments = async (
       } else if (endDate) {
         dateFilter = `&date=le${endDate}`
       }
+    }
+
+    if (!search) {
+      elements = '&_elements=status,type,encounter,date,title'
     }
 
     const docsList = await api.get(
