@@ -73,7 +73,9 @@ export const searchPatient = async (input: string, searchBy: SearchByTypes, grou
 
     return [...patientSet]
   } else if (CONTEXT === 'aphp') {
-    const patientList = await api.get<FHIR_API_Response<IPatient>>(`/Patient?${searchBy}=${input}`)
+    const patientList = await api.get<FHIR_API_Response<IPatient>>(
+      `/Patient?${searchBy}=${input}&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension`
+    )
 
     if (patientList.data.resourceType === 'OperationOutcome') return
 

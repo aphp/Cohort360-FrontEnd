@@ -43,7 +43,7 @@ export const fillNDAAndServiceProviderDocs = async (deidentifiedBoolean?: boolea
   }
 
   const encounters = await api.get<FHIR_API_Response<IEncounter>>(
-    `/Encounter?_id=${noDuplicatesList.join()}&type=VISIT`
+    `/Encounter?_id=${noDuplicatesList.join()}&type=VISIT&_elements=status,serviceProvider,identifier`
   )
   if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
     return []
@@ -105,7 +105,9 @@ export async function fillNDAAndServiceProvider<T extends IProcedure | IConditio
     return pmsiEntries
   }
 
-  const encounters = await api.get<FHIR_API_Response<IEncounter>>(`/Encounter?_id=${noDuplicatesList}&type=VISIT`)
+  const encounters = await api.get<FHIR_API_Response<IEncounter>>(
+    `/Encounter?_id=${noDuplicatesList}&type=VISIT&_elements=serviceProvider,identifier`
+  )
 
   if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
     return []
@@ -360,7 +362,7 @@ export const fetchDocuments = async (
     const docsList = await api.get(
       `/Composition?patient=${patientId}&_sort=-date&size=20&offset=${
         page ? (page - 1) * 20 : 0
-      }${search}${docTypesFilter}${ndaFilter}${dateFilter}`
+      }${elements}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
     )
 
     if (!docsList.data.total) {
@@ -541,7 +543,9 @@ export const fetchPatient = async (patientId: string): Promise<PatientData | und
       ),
       api.get<FHIR_API_Response<ICondition>>(`/Condition?patient=${patientId}&_sort=-recorded-date&size=20`),
       api.get<FHIR_API_Response<IClaim>>(`/Claim?patient=${patientId}&_sort=-created&size=20`),
-      api.get<FHIR_API_Response<IComposition>>(`/Composition?patient=${patientId}&size=20&_sort=-date`)
+      api.get<FHIR_API_Response<IComposition>>(
+        `/Composition?patient=${patientId}&size=20&_sort=-date&_elements=status,type,encounter,date,title`
+      )
     ])
 
     const deidentifiedBoolean = patientResponse.data

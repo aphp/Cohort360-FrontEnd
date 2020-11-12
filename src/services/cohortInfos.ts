@@ -30,7 +30,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     const [cohortResp, patientsResp, encountersResp] = await Promise.all([
       api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${cohortId}`),
       api.get<FHIR_API_Response<IPatient>>(
-        `/Patient?pivotFacet=age_gender,deceased_gender&_list=${cohortId}&size=20&_sort=given`
+        `/Patient?pivotFacet=age_gender,deceased_gender&_list=${cohortId}&size=20&_sort=given&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension`
       ),
       api.get<FHIR_API_Response<IEncounter>>(
         `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${cohortId}&size=0&type=VISIT`
@@ -242,7 +242,7 @@ const fetchPatientList = async (
     const patientsResp = await api.get<FHIR_API_Response<IPatient>>(
       `/Patient?${facets}size=20&offset=${
         page ? (page - 1) * 20 : 0
-      }${searchByGroup}${search}${genderFilter}${vitalStatusFilter}${ageFilter}`
+      }&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension${searchByGroup}${search}${genderFilter}${vitalStatusFilter}${ageFilter}`
     )
 
     const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
