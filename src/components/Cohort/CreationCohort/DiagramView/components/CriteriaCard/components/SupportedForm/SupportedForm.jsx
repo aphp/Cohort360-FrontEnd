@@ -15,7 +15,12 @@ import {
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import { fetchAdmissionModes } from '../../../../../../../../data/Requeteur/VISITE/admissionMode'
+import {
+  fetchAdmissionModes,
+  fetchEntryModes,
+  fetchExitModes,
+  fetchFileStatus
+} from '../../../../../../../../data/Requeteur/VISITE/admissionMode'
 
 import useStyles from './styles'
 
@@ -47,9 +52,10 @@ const SupportedForm = (props) => {
   const [error, setError] = useState(null)
 
   const [searchValue, setSearchValue] = useState('')
-  const [admissionModeData, setAdmissionModeData] = useState(criteria?.data.admissionMode)
-  const [entryModeData, setEntryModeData] = useState(criteria?.data.entryMode)
-  const [exitModeData, setExitModeData] = useState(criteria?.data.exitMode)
+  const [admissionModeData, setAdmissionModeData] = useState('')
+  const [entryModeData, setEntryModeData] = useState('')
+  const [exitModeData, setExitModeData] = useState('')
+  const [fileStatusData, setFileStatusData] = useState('')
 
   // useEffect(() => {
   //   const _searchValue = searchValue
@@ -69,31 +75,58 @@ const SupportedForm = (props) => {
     })()
   }, [])
 
-  console.log(admissionModeData)
+  console.log('admissionModeData', admissionModeData)
+
+  // useEffect(async () => {
+  //   const _searchValue = searchValue
+
+  //   const filteredEntryModeData = await criteria?.data?.entryMode?.res?.filter(
+  //     (entryMode) =>
+  //       entryMode['code'].startsWith(_searchValue) ||
+  //       entryMode['display'].startsWith(_searchValue) ||
+  //       `${entryMode['code']} - ${entryMode['display']}`.startsWith(_searchValue)
+  //   )
+  //   setEntryModeData(filteredEntryModeData)
+  // }, [searchValue]) // eslint-disable-line
 
   useEffect(() => {
-    const _searchValue = searchValue
+    ;(async () => {
+      const entryModes = await fetchEntryModes()
+      setEntryModeData(entryModes)
+    })()
+  }, [])
 
-    const filteredEntryModeData = criteria?.data?.entryMode?.filter(
-      (entryMode) =>
-        entryMode['entryModeCode'].startsWith(_searchValue) ||
-        entryMode['label'].startsWith(_searchValue) ||
-        `${entryMode['entryModeCode']} - ${entryMode['label']}`.startsWith(_searchValue)
-    )
-    setEntryModeData(filteredEntryModeData)
-  }, [searchValue]) // eslint-disable-line
+  console.log('entryModeData', entryModeData)
+
+  // useEffect(() => {
+  //   const _searchValue = searchValue
+
+  //   const filteredExitModeData = criteria?.data?.exitMode?.filter(
+  //     (exitMode) =>
+  //       exitMode['exitModeCode'].startsWith(_searchValue) ||
+  //       exitMode['label'].startsWith(_searchValue) ||
+  //       `${exitMode['exitModeCode']} - ${exitMode['label']}`.startsWith(_searchValue)
+  //   )
+  //   setExitModeData(filteredExitModeData)
+  // }, [searchValue]) // eslint-disable-line
 
   useEffect(() => {
-    const _searchValue = searchValue
+    ;(async () => {
+      const exitModes = await fetchExitModes()
+      setExitModeData(exitModes)
+    })()
+  }, [])
 
-    const filteredExitModeData = criteria?.data?.exitMode?.filter(
-      (exitMode) =>
-        exitMode['exitModeCode'].startsWith(_searchValue) ||
-        exitMode['label'].startsWith(_searchValue) ||
-        `${exitMode['exitModeCode']} - ${exitMode['label']}`.startsWith(_searchValue)
-    )
-    setExitModeData(filteredExitModeData)
-  }, [searchValue]) // eslint-disable-line
+  console.log('exitModeData', exitModeData)
+
+  useEffect(() => {
+    ;(async () => {
+      const filesStatus = await fetchFileStatus()
+      setFileStatusData(filesStatus)
+    })()
+  }, [])
+
+  console.log('fileStatusData', fileStatusData)
 
   const _onChangeCriteriaValue = (key, value) => {
     if (error) setError(null)
@@ -182,7 +215,7 @@ const SupportedForm = (props) => {
           <Autocomplete
             defaultValue={isEdition ? _selectedCriteria.entryMode : null}
             options={entryModeData}
-            getOptionLabel={(option) => `${option['entryModeCode']} - ${option['label']}`}
+            getOptionLabel={(option) => `${option['code']} - ${option['display']}`}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -201,7 +234,7 @@ const SupportedForm = (props) => {
           <Autocomplete
             defaultValue={isEdition ? _selectedCriteria.exitMode : null}
             options={exitModeData}
-            getOptionLabel={(option) => `${option['exitModeCode']} - ${option['label']}`}
+            getOptionLabel={(option) => `${option['code']} - ${option['display']}`}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -216,7 +249,7 @@ const SupportedForm = (props) => {
           />
         </FormControl>
 
-        <FormControl className={classes.formControl}>
+        {/* <FormControl className={classes.formControl}>
           <Grid container className={classes.selectGridContainer}>
             <Grid item>
               <Typography variant="h6">Motif d'admission</Typography>
@@ -234,9 +267,9 @@ const SupportedForm = (props) => {
               </Select>
             </Grid>
           </Grid>
-        </FormControl>
+        </FormControl> */}
 
-        <FormControl className={classes.formControl}>
+        {/* <FormControl className={classes.formControl}>
           <Grid container className={classes.selectGridContainer}>
             <Grid item>
               <Typography variant="h6">Type d'admission</Typography>
@@ -254,9 +287,9 @@ const SupportedForm = (props) => {
               </Select>
             </Grid>
           </Grid>
-        </FormControl>
+        </FormControl> */}
 
-        <FormControl className={classes.formControl}>
+        {/* <FormControl className={classes.formControl}>
           <Grid container className={classes.selectGridContainer}>
             <Grid item>
               <Typography variant="h6">Provenance</Typography>
@@ -274,29 +307,28 @@ const SupportedForm = (props) => {
               </Select>
             </Grid>
           </Grid>
-        </FormControl>
+        </FormControl> */}
 
         <FormControl className={classes.formControl}>
-          <Grid container className={classes.selectGridContainer}>
-            <Grid item>
-              <Typography variant="h6">Status dossier</Typography>
-            </Grid>
-
-            <Grid item>
-              <Select
-                id="status dossier"
-                value={_selectedCriteria.fileStatus}
-                onChange={(e) => _onChangeCriteriaValue('fileStatus', e.target.value)}
-              >
-                <MenuItem value={1}>Status dossier A</MenuItem>
-                <MenuItem value={2}>Status dossier B</MenuItem>
-                <MenuItem value={3}>Status dossier C</MenuItem>
-              </Select>
-            </Grid>
-          </Grid>
+          <Autocomplete
+            defaultValue={isEdition ? _selectedCriteria.fileStatus : null}
+            options={fileStatusData}
+            getOptionLabel={(option) => `${option['code']} - ${option['display']}`}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                placeholder="Status Dossier"
+                classes={{ error: classes.inputTextError }}
+                error={error === ERROR_CODE}
+              />
+            )}
+            onChange={(e, value) => _onChangeCriteriaValue('fileStatus', value)}
+            onInputChange={(event, value) => setSearchValue(value)}
+          />
         </FormControl>
 
-        <FormControl className={classes.formControl}>
+        {/* <FormControl className={classes.formControl}>
           <Grid container className={classes.selectGridContainer}>
             <Grid item>
               <Typography variant="h6">Type de prise en charge</Typography>
@@ -356,7 +388,7 @@ const SupportedForm = (props) => {
               </Select>
             </Grid>
           </Grid>
-        </FormControl>
+        </FormControl> */}
 
         <Grid className={classes.criteriaActionContainer}>
           <Button onClick={goBack} color="primary" variant="outlined">
