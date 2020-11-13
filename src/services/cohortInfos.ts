@@ -30,10 +30,10 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     const [cohortResp, patientsResp, encountersResp] = await Promise.all([
       api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${cohortId}`),
       api.get<FHIR_API_Response<IPatient>>(
-        `/Patient?pivotFacet=age_gender,deceased_gender&_list=${cohortId}&size=20&_sort=given`
+        `/Patient?pivotFacet=age_gender,deceased_gender&_list=${cohortId}&size=20&_sort=given&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension`
       ),
       api.get<FHIR_API_Response<IEncounter>>(
-        `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${cohortId}&size=1`
+        `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${cohortId}&size=0&type=VISIT`
       )
     ])
 
@@ -242,7 +242,7 @@ const fetchPatientList = async (
     const patientsResp = await api.get<FHIR_API_Response<IPatient>>(
       `/Patient?${facets}size=20&offset=${
         page ? (page - 1) * 20 : 0
-      }${searchByGroup}${search}${genderFilter}${vitalStatusFilter}${ageFilter}`
+      }&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension${searchByGroup}${search}${genderFilter}${vitalStatusFilter}${ageFilter}`
     )
 
     const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
@@ -289,6 +289,7 @@ const fetchDocuments = async (
     const docTypesFilter = !selectedDocTypes.includes('all') ? `&type=${selectedDocTypes.join()}` : ''
     const ndaFilter = nda ? `&encounter.identifier=${nda}` : ''
     let dateFilter = ''
+    let elements = ''
 
     if (startDate || endDate) {
       if (startDate && endDate) {
@@ -300,11 +301,15 @@ const fetchDocuments = async (
       }
     }
 
+    if (!search) {
+      elements = '&_elements=status,type,subject,encounter,date,title'
+    }
+
     const [docsList, allDocsList] = await Promise.all([
       api.get<FHIR_API_Response<IComposition>>(
         `/Composition?size=20&_sort=-date&offset=${
           page ? (page - 1) * 20 : 0
-        }${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
+        }${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
       ),
       search
         ? api.get<FHIR_API_Response<IComposition>>(
