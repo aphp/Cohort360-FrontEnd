@@ -5,13 +5,13 @@ export const fetchMyPatients = async () => {
   if (CONTEXT === 'aphp') {
     const [myPatientsResp, myPatientsEncounters, docsResp] = await Promise.all([
       api.get(
-        '/Patient?facet=gender&pivotFacet=age_gender,deceased_gender&size=20'
+        '/Patient?facet=gender&pivotFacet=age_gender,deceased_gender&size=20&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension'
       ),
       api.get(
         '/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&type=VISIT&size=0'
       ),
       api.get(
-        '/Composition?size=20&_sort=-date'
+        '/Composition?size=20&_sort=-date&_elements=status,type,subject,encounter,date,title'
       )
     ])
 
@@ -19,8 +19,8 @@ export const fetchMyPatients = async () => {
       patientsTotal: myPatientsResp.data.total,
       patientsList: myPatientsResp.data.entry
         ? await getLastEncounter(
-          myPatientsResp.data.entry.map((e) => e.resource)
-        )
+            myPatientsResp.data.entry.map((e) => e.resource)
+          )
         : 0,
       patientsFacets: myPatientsResp.data.meta.extension,
       encountersFacets: myPatientsEncounters.data.meta.extension,
@@ -51,7 +51,7 @@ export const getLastEncounter = async (patients) => {
   const encounters = await Promise.all(
     cohortPatients.map((patient) =>
       api.get(
-        `/Encounter?patient=${patient.id}&_sort=-start-date&size=0&_elements=subject,serviceProvider&type=VISIT`
+        `/Encounter?patient=${patient.id}&_sort=-start-date&size=1&_elements=subject,serviceProvider&type=VISIT`
       )
     )
   )
@@ -79,13 +79,17 @@ export const getLastEncounter = async (patients) => {
 }
 
 function getApiResponseResources(response) {
-  if (!response || !(response && response.data) || response.data.resourceType === 'OperationOutcome') return undefined
+  if (
+    !response ||
+    !(response && response.data) ||
+    response.data.resourceType === 'OperationOutcome'
+  )
+    return undefined
 
-  return response.data.entry ? (
-    response.data.entry.map((r) => r.resource).filter((r) => undefined !== r)
-  ) : []
+  return response.data.entry
+    ? response.data.entry.map((r) => r.resource).filter((r) => undefined !== r)
+    : []
 }
-
 
 const getEncounterInfos = async (documents) => {
   if (!documents) {
@@ -98,7 +102,9 @@ const getEncounterInfos = async (documents) => {
 
   let itemsProcessed = 0
 
-  const encounters = await api.get(`/Encounter?_id=${listeEncounterIds}&type=VISIT`)
+  const encounters = await api.get(
+    `/Encounter?_id=${listeEncounterIds}&type=VISIT&_elements=status,serviceProvider,identifier`
+  )
 
   if (!encounters.data.entry) {
     return

@@ -70,7 +70,7 @@ export const fetchPatient = async (patientId) => {
       `/Claim?patient=${patientId}&_sort=-created&size=20`
     )
     const documentsResponse = await api.get(
-      `/Composition?patient=${patientId}&size=20&_sort=-date`
+      `/Composition?patient=${patientId}&size=20&_sort=-date&_elements=status,type,encounter,date,title`
     )
 
     return {
@@ -125,7 +125,9 @@ export const fillNDAAndServiceProviderDocs = async (docs) => {
 
   let itemsProcessed = 0
 
-  const encounters = await api.get(`/Encounter?_id=${noDuplicatesList}&type=VISIT`)
+  const encounters = await api.get(
+    `/Encounter?_id=${noDuplicatesList}&type=VISIT&_elements=status,serviceProvider,identifier`
+  )
   if (!encounters.data.entry) {
     return
   }
@@ -183,7 +185,9 @@ export const fillNDAAndServiceProvider = async (pmsi) => {
 
   let itemsProcessed = 0
 
-  const encounters = await api.get(`/Encounter?_id=${noDuplicatesList}&type=VISIT`)
+  const encounters = await api.get(
+    `/Encounter?_id=${noDuplicatesList}&type=VISIT&_elements=serviceProvider,identifier`
+  )
 
   if (!encounters.data.entry) {
     return
@@ -306,9 +310,12 @@ export const fetchDocuments = async (
     let search = ''
     let docTypesFilter = ''
     let ndaFilter = ''
+    let elements = ''
 
     if (searchInput) {
       search = `&_text=${searchInput}`
+    } else {
+      elements = '&_elements=status,type,encounter,date,title'
     }
 
     if (!selectedDocTypes.includes('all')) {
@@ -322,7 +329,7 @@ export const fetchDocuments = async (
     const docsList = await api.get(
       `/Composition?patient=${patientId}&_sort=-date&size=20&offset=${
         page ? (page - 1) * 20 : 0
-      }${search}${docTypesFilter}${ndaFilter}`
+      }${elements}${search}${docTypesFilter}${ndaFilter}`
     )
 
     if (!docsList.data.total) {
