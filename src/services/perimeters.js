@@ -4,16 +4,21 @@ import { CONTEXT } from '../constants'
 
 export const fetchPerimetersInfos = async (perimetersIds) => {
   if (CONTEXT === 'aphp') {
-    const [perimetersResp, patientsResp, encountersResp, docsResp] = await Promise.all([
+    const [
+      perimetersResp,
+      patientsResp,
+      encountersResp,
+      docsResp
+    ] = await Promise.all([
       api.get(`/Group?_id=${perimetersIds}`),
       api.get(
-        `/Patient?facet=gender&pivotFacet=age_gender,deceased_gender&_list=${perimetersIds}&size=20`
+        `/Patient?facet=gender&pivotFacet=age_gender,deceased_gender&_list=${perimetersIds}&size=20&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension`
       ),
       api.get(
         `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${perimetersIds}&size=0&type=VISIT`
       ),
       api.get(
-        `/Composition?_list=${perimetersIds}&size=20&_sort=-date`
+        `/Composition?_list=${perimetersIds}&size=20&_sort=-date&_elements=status,type,subject,encounter,date,title`
       )
     ])
 

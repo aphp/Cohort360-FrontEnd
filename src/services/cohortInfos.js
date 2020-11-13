@@ -4,16 +4,21 @@ import { CONTEXT } from '../constants'
 
 export const fetchCohort = async (cohortId) => {
   if (CONTEXT === 'aphp') {
-    const [cohortResp, patientsResp, encountersResp, docsResp] = await Promise.all([
+    const [
+      cohortResp,
+      patientsResp,
+      encountersResp,
+      docsResp
+    ] = await Promise.all([
       api.get(`/Group?_id=${cohortId}`),
       api.get(
-        `/Patient?facet=gender&pivotFacet=age_gender,deceased_gender&_list=${cohortId}&size=20`
+        `/Patient?facet=gender&pivotFacet=age_gender,deceased_gender&_list=${cohortId}&size=20&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension`
       ),
       api.get(
         `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${cohortId}&size=0&type=VISIT`
       ),
       api.get(
-        `/Composition?_list=${cohortId}&size=20&_sort=-date`
+        `/Composition?_list=${cohortId}&size=20&_sort=-date&_elements=status,type,subject,encounter,date,title`
       )
     ])
 
@@ -101,8 +106,9 @@ export const fetchPatientList = async (
     }
 
     const patientsResp = await api.get(
-      `/Patient?${facets}size=20&offset=${page ? (page - 1) * 20 : 0
-      }${searchByGroup}${search}${genderFilter}${vitalStatusFilter}${ageFilter}`
+      `/Patient?${facets}size=20&offset=${
+        page ? (page - 1) * 20 : 0
+      }&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension${searchByGroup}${search}${genderFilter}${vitalStatusFilter}${ageFilter}`
     )
 
     return {
@@ -127,6 +133,7 @@ export const fetchDocuments = async (
     let search = ''
     let docTypesFilter = ''
     let ndaFilter = ''
+    let elements = ''
 
     if (groupId) {
       searchByGroup = `&_list=${groupId}`
@@ -134,6 +141,8 @@ export const fetchDocuments = async (
 
     if (searchInput) {
       search = `&_text=${searchInput}`
+    } else {
+      elements = '&_elements=status,type,subject,encounter,date,title'
     }
 
     if (!selectedDocTypes.includes('all')) {
@@ -145,8 +154,9 @@ export const fetchDocuments = async (
     }
 
     const docsList = await api.get(
-      `/Composition?size=20&_sort=-date&offset=${page ? (page - 1) * 20 : 0
-      }${searchByGroup}${search}${docTypesFilter}${ndaFilter}`
+      `/Composition?size=20&_sort=-date&offset=${
+        page ? (page - 1) * 20 : 0
+      }${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}`
     )
 
     if (!docsList.data.total) {

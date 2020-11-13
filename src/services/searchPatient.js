@@ -23,7 +23,9 @@ export const searchPatient = async (input, searchBy) => {
 
     return [...patientSet].filter(Boolean)
   } else if (CONTEXT === 'aphp') {
-    const patientList = await api.get(`/Patient?${searchBy}=${input}`)
+    const patientList = await api.get(
+      `/Patient?${searchBy}=${input}&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension`
+    )
     if (!patientList.data.total) {
       return 0
     } else {
