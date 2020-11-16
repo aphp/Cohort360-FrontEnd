@@ -28,8 +28,18 @@ const Requeteur = () => {
     if (!practitioner) return
 
     const _criteria = await constructCriteriaList()
+
+    if (_criteria && _criteria[2] && _criteria[2].fetch) {
+      _criteria[2].data.admissionModes = await _criteria[2].fetch.fetchAdmissionModes()
+      _criteria[2].data.entryModes = await _criteria[2].fetch.fetchEntryModes()
+      _criteria[2].data.exitModes = await _criteria[2].fetch.fetchExitModes()
+      _criteria[2].data.fileStatus = await _criteria[2].fetch.fetchFileStatus()
+    }
+
     onChangeCriteria(_criteria)
   }
+
+  console.log('criteria', criteria)
 
   useEffect(() => {
     const _init = async () => {

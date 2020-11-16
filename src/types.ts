@@ -204,6 +204,7 @@ export type CriteriaItemType = {
   disabled?: boolean
   data: any
   components: any
+  fetch: any
   subItems?: CriteriaItemType[]
 }
 

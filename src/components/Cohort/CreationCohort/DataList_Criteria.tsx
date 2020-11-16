@@ -14,6 +14,14 @@ import cimData from '../../../data/Requeteur/CIM10/cim9_data'
 import ccamData from '../../../data/ccam_data'
 import ghmData from '../../../data/ghm_data'
 
+// Fetcher
+import {
+  fetchAdmissionModes,
+  fetchEntryModes,
+  fetchExitModes,
+  fetchFileStatus
+} from '../../../data/Requeteur/VISITE/admissionMode'
+
 // ├── Mes variables
 // ├── Patients
 // ├── Visites
@@ -47,7 +55,9 @@ const criteriaList = [
     id: 'visites',
     title: 'Visites',
     color: '#0063AF',
-    components: SupportedForm
+    components: SupportedForm,
+    data: { admissionModes: 'loading', entryModes: 'loading', exitModes: 'loading', fileStatus: 'loading' },
+    fetch: { fetchAdmissionModes, fetchEntryModes, fetchExitModes, fetchFileStatus }
   },
   {
     id: 'documents_cliniques',
@@ -119,8 +129,6 @@ const criteriaList = [
   }
 ]
 
-const constructCriteriaList = async () => {
-  return criteriaList
-}
+const constructCriteriaList = async () => criteriaList
 
 export default constructCriteriaList
