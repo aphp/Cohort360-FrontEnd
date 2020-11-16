@@ -17,12 +17,15 @@ const Requeteur = () => {
   const classes = useStyles()
 
   const [loading, setLoading] = useState<boolean>(true)
-  const [seletedTab, onChangeTab] = useState<'diagramme' | 'JSON'>('diagramme')
+  const [seletedTab, onChangeTab] = useState<'diagramme' | 'json'>('diagramme')
   const [criteria, onChangeCriteria] = useState<any[]>([])
 
   // Pour le moment, sans forme de JSON...
   const [selectedPopulation, onChangeSelectedPopulation] = useState<ScopeTreeRow[] | null>(null)
   const [selectedCriteria, onChangeSelectedCriteria] = useState<SelectedCriteriaType[]>([])
+
+  const [json, onChangeJson] = useState<string>('')
+  const [cursorError, onChangeCursorError] = useState<number>(0)
 
   const _fetchCriteria = async () => {
     if (!practitioner) return
@@ -40,6 +43,24 @@ const Requeteur = () => {
 
     _init()
   }, []) // eslint-disable-line
+
+  useEffect(() => {
+    if (seletedTab === 'json') {
+      console.log("Transfert d'Object to JSON", selectedPopulation, selectedCriteria)
+    } else {
+      try {
+        if (json) console.log('Parse =>', JSON.parse(json))
+      } catch (error) {
+        onChangeTab('json')
+        console.log('error', error)
+        const _cursorError = parseInt(error.toString().split('\n')[0].replace(/\D/gm, ''))
+        console.log('_cursorError', _cursorError)
+        if (_cursorError > 0) {
+          onChangeCursorError(_cursorError)
+        }
+      }
+    }
+  }, [seletedTab]) // eslint-disable-line
 
   if (loading) return <CircularProgress />
 
@@ -75,7 +96,7 @@ const Requeteur = () => {
           onChangeSelectedCriteria={onChangeSelectedCriteria}
         />
       ) : (
-        <JsonView />
+        <JsonView defaultJson={json} onChangeJson={onChangeJson} cursorStart={cursorError} />
       )}
 
       {/* Main Pannel */}
