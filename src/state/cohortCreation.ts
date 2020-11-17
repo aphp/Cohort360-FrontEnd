@@ -1,83 +1,31 @@
-import { LogoutActionType } from './me'
+import { logout } from './me'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-const initialState = {
+type CohortCreationState = {
+  //TODO: PopulationSources typing
+  populationSources: any[]
+  //TODO: Criteria typing
+  inclusionCriterias: any[]
+  cohortName: string
+}
+
+const initialState: CohortCreationState = {
   populationSources: [],
   inclusionCriterias: [],
   cohortName: ''
 }
 
-type CohortActions =
-  | setPopulationSourceAction
-  | addInclusionCriteriaAction
-  | removeInclusionCriteriaAction
-  | setCohortNameAction
-  | resetCohortCreationAction
-  | LogoutActionType
-
-export type setPopulationSourceAction = {
-  type: 'SET_POPULATION_SOURCE'
-  payload: any[]
-}
-export const setPopulationSource = (populationSources: any[]): setPopulationSourceAction => {
-  return {
-    type: 'SET_POPULATION_SOURCE',
-    payload: populationSources
-  }
-}
-
-export type addInclusionCriteriaAction = {
-  type: 'ADD_INCLUSION_CRITERIA'
-  payload: { inclusionCriteria: any; index: number }
-}
-
-export const addInclusionCriteria = (inclusionCriteria: any, index: number): addInclusionCriteriaAction => {
-  return {
-    type: 'ADD_INCLUSION_CRITERIA',
-    payload: { inclusionCriteria: inclusionCriteria, index: index }
-  }
-}
-export type removeInclusionCriteriaAction = {
-  type: 'REMOVE_INCLUSION_CRITERIA'
-  payload: number
-}
-
-export const removeInclusionCriteria = (index: number): removeInclusionCriteriaAction => {
-  return {
-    type: 'REMOVE_INCLUSION_CRITERIA',
-    payload: index
-  }
-}
-export type setCohortNameAction = {
-  type: 'SET_COHORT_NAME'
-  payload: string
-}
-
-export const setCohortName = (name: string): setCohortNameAction => {
-  return {
-    type: 'SET_COHORT_NAME',
-    payload: name
-  }
-}
-
-export type resetCohortCreationAction = {
-  type: 'RESET_STATE'
-}
-
-export const resetCohortCreation = (): resetCohortCreationAction => {
-  return {
-    type: 'RESET_STATE'
-  }
-}
-
-const cohortCreation = (state = initialState, action: CohortActions) => {
-  switch (action.type) {
-    case 'SET_POPULATION_SOURCE':
-      return {
-        ...state,
-        populationSources: action.payload
-      }
-
-    case 'ADD_INCLUSION_CRITERIA': {
+const cohortCreationSlice = createSlice({
+  name: 'cohortCreation',
+  initialState,
+  reducers: {
+    setPopulationSource: (state: CohortCreationState, action: PayloadAction<any[]>) => {
+      state.populationSources = action.payload
+    },
+    addInclusionCriteria: (
+      state: CohortCreationState,
+      action: PayloadAction<{ inclusionCriteria: any; index: number }>
+    ) => {
       const { inclusionCriteria, index } = action.payload
       const inclusionCriterias = [...state.inclusionCriterias]
       const newCriterias =
@@ -86,32 +34,31 @@ const cohortCreation = (state = initialState, action: CohortActions) => {
               return i === index ? inclusionCriteria : criteria
             })
           : [...state.inclusionCriterias, inclusionCriteria]
-      return {
-        ...state,
-        inclusionCriterias: newCriterias
-      }
-    }
-    case 'REMOVE_INCLUSION_CRITERIA':
-      return {
-        ...state,
-        inclusionCriterias: state.inclusionCriterias.filter((criteria, index) => index !== action.payload)
-      }
 
-    case 'SET_COHORT_NAME': {
-      return {
-        ...state,
-        cohortName: action.payload
-      }
-    }
-
-    case 'LOGOUT':
-    case 'RESET_STATE': {
+      state.inclusionCriterias = newCriterias
+    },
+    removeInclusionCriteria: (state: CohortCreationState, action: PayloadAction<number>) => {
+      state.inclusionCriterias = state.inclusionCriterias.filter((criteria, index) => index !== action.payload)
+    },
+    setCohortName: (state: CohortCreationState, action: PayloadAction<string>) => {
+      state.cohortName = action.payload
+    },
+    resetCohortCreation: () => {
       return initialState
     }
-
-    default:
-      return state
+  },
+  extraReducers: (builder) => {
+    builder.addCase(logout, () => {
+      return initialState
+    })
   }
-}
+})
 
-export default cohortCreation
+export default cohortCreationSlice.reducer
+export const {
+  addInclusionCriteria,
+  removeInclusionCriteria,
+  resetCohortCreation,
+  setCohortName,
+  setPopulationSource
+} = cohortCreationSlice.actions
