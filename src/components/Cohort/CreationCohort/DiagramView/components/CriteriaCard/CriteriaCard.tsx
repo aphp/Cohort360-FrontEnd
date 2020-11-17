@@ -126,6 +126,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         )
         break
       case 'Patient': {
+        console.log('_selectedCriteria', _selectedCriteria)
         content = (
           <>
             <Typography>
@@ -133,6 +134,10 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             </Typography>
             <Typography>Genre sélectionné :</Typography>
             {_selectedCriteria.gender?.map(({ display }) => (
+              <Typography>{display}</Typography>
+            ))}
+            <Typography>Status vital :</Typography>
+            {_selectedCriteria.vitalStatus?.map(({ display }) => (
               <Typography>{display}</Typography>
             ))}
             <Typography>

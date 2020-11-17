@@ -100,11 +100,11 @@ const DemographicFrom = (props) => {
         <FormControl className={classes.formControl}>
           <Autocomplete
             multiple
-            defaultValue={isEdition ? _selectedCriteria.deceased : []}
+            defaultValue={isEdition ? _selectedCriteria.vitalStatus : []}
             options={criteria.data.deceased}
             getOptionLabel={(option) => option['display']}
             renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Status vital" />}
-            onChange={(e, value) => _onChangeCriteriaValue('gender', value)}
+            onChange={(e, value) => _onChangeCriteriaValue('vitalStatus', value)}
           />
         </FormControl>
 
