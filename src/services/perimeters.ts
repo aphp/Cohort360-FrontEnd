@@ -76,7 +76,7 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
       api.get<FHIR_API_Response<IEncounter>>(
         `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${perimetersId}&size=0&type=VISIT`
       ),
-      api.get<FHIR_API_Response<IComposition>>(`/Composition?_list=${perimetersId}&size=20&_sort=-date`)
+      api.get<FHIR_API_Response<IComposition>>(`/Composition?_list=${perimetersId}&size=20&_sort=-date&status=final`)
     ])
 
     const cohort = getApiResponseResources(perimetersResp)

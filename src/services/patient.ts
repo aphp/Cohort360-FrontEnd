@@ -362,7 +362,7 @@ export const fetchDocuments = async (
     const docsList = await api.get(
       `/Composition?patient=${patientId}&_sort=-date&size=20&offset=${
         page ? (page - 1) * 20 : 0
-      }${elements}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
+      }&status=final${elements}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
     )
 
     if (!docsList.data.total) {
@@ -544,7 +544,7 @@ export const fetchPatient = async (patientId: string): Promise<PatientData | und
       api.get<FHIR_API_Response<ICondition>>(`/Condition?patient=${patientId}&_sort=-recorded-date&size=20`),
       api.get<FHIR_API_Response<IClaim>>(`/Claim?patient=${patientId}&_sort=-created&size=20`),
       api.get<FHIR_API_Response<IComposition>>(
-        `/Composition?patient=${patientId}&size=20&_sort=-date&_elements=status,type,encounter,date,title`
+        `/Composition?patient=${patientId}&size=20&_sort=-date&status=final&_elements=status,type,encounter,date,title`
       )
     ])
 
