@@ -9,7 +9,6 @@ import TableContainer from '@material-ui/core/TableContainer'
 import TablePagination from '@material-ui/core/TablePagination'
 import TableRow from '@material-ui/core/TableRow'
 
-import EnhancedTableToolbar from './components/Toolbar'
 import EnhancedTableHead from './components/TableHead'
 
 function descendingComparator(a, b, orderBy) {
@@ -48,8 +47,12 @@ const useStyles = makeStyles(() => ({
   root: {
     width: '100%'
   },
-  tableHeadLabel: {
-    color: 'black'
+  head: {
+    background: 'rgb(209, 226, 244)',
+    color: 'rgb(0, 99, 175)',
+    fontSize: 11,
+    fontWeight: 'bold',
+    textTransform: 'uppercase'
   },
   visuallyHidden: {
     border: 0,
@@ -122,7 +125,6 @@ export default function EnhancedTable(props) {
 
   return (
     <div className={classes.root}>
-      <EnhancedTableToolbar headTitle={props.headTitle} headAction={props.headAction} numSelected={selected.length} />
       <TableContainer>
         <Table className={classes.table} aria-labelledby="tableTitle" size={'medium'} aria-label="enhanced table">
           <EnhancedTableHead

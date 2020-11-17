@@ -206,6 +206,21 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                       root: level === 0 ? classes.mainRow : classes.secondRow
                     }}
                   >
+                    <TableCell align="center">
+                      {_row.subItems && _row.subItems.length > 0 && (
+                        <IconButton
+                          onClick={() => _clickToDeploy(_row.id)}
+                          style={{ marginLeft: level * 30, padding: 0 }}
+                        >
+                          {openPopulation.find((id) => _row.id === id) ? (
+                            <KeyboardArrowDownIcon />
+                          ) : (
+                            <KeyboardArrowRightIcon />
+                          )}
+                        </IconButton>
+                      )}
+                    </TableCell>
+
                     <TableCell align="center" padding="checkbox">
                       <Checkbox
                         color="primary"
@@ -215,20 +230,11 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                         inputProps={{ 'aria-labelledby': labelId }}
                       />
                     </TableCell>
-                    <TableCell align="center">
-                      {_row.subItems && _row.subItems.length > 0 && (
-                        <IconButton onClick={() => _clickToDeploy(_row.id)} style={{ marginLeft: level * 30 }}>
-                          {openPopulation.find((id) => _row.id === id) ? (
-                            <KeyboardArrowDownIcon />
-                          ) : (
-                            <KeyboardArrowRightIcon />
-                          )}
-                        </IconButton>
-                      )}
-                    </TableCell>
+
                     <TableCell>
                       <Typography>{_row.name}</Typography>
                     </TableCell>
+
                     <TableCell>
                       <Typography>{_row.quantity}</Typography>
                     </TableCell>
