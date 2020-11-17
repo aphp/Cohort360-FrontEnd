@@ -63,7 +63,7 @@ export const getLastEncounter = async (patients?: IPatient[]) => {
   const encounters = await Promise.all(
     cohortPatients.map((patient) =>
       api.get<FHIR_API_Response<IEncounter>>(
-        `/Encounter?patient=${patient.id}&_sort=-start-date&size=1&_elements=subject,serviceProvider`
+        `/Encounter?patient=${patient.id}&_sort=-start-date&size=1&_elements=subject,serviceProvider&type=VISIT`
       )
     )
   )
@@ -89,9 +89,11 @@ export const getLastEncounter = async (patients?: IPatient[]) => {
 export const fetchMyPatients = async (): Promise<CohortData | undefined> => {
   if (CONTEXT === 'aphp') {
     const [myPatientsResp, myPatientsEncounters] = await Promise.all([
-      api.get<FHIR_API_Response<IPatient>>('/Patient?pivotFacet=age_gender,deceased_gender&size=20'),
+      api.get<FHIR_API_Response<IPatient>>(
+        '/Patient?pivotFacet=age_gender,deceased_gender&size=20&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension'
+      ),
       api.get<FHIR_API_Response<IEncounter>>(
-        '/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&size=1'
+        '/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&size=0&type=VISIT'
       )
     ])
 
@@ -178,7 +180,9 @@ const getEncounterInfos = async (deidentifiedBoolean: boolean, documents?: IComp
   const cohortDocuments = documents as CohortComposition[]
   const listeEncounterIds = cohortDocuments.map((e) => e.encounter?.display?.substring(10)).join()
 
-  const encounters = await api.get<FHIR_API_Response<IEncounter>>(`/Encounter?_id=${listeEncounterIds}`)
+  const encounters = await api.get<FHIR_API_Response<IEncounter>>(
+    `/Encounter?_id=${listeEncounterIds}&type=VISIT&_elements=status,serviceProvider,identifier`
+  )
 
   if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
     return []
