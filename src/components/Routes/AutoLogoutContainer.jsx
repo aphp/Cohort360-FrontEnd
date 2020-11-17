@@ -10,7 +10,7 @@ import { DialogContentText } from '@material-ui/core'
 import axios from 'axios'
 
 import { ACCES_TOKEN, REFRESH_TOKEN, CONTEXT } from '../../constants'
-import { logout as logoutAction } from '../../state/store'
+import { logout as logoutAction } from '../../state/me'
 import useStyles from './styles'
 
 const AutoLogoutContainer = () => {
@@ -21,6 +21,15 @@ const AutoLogoutContainer = () => {
   const history = useHistory()
   const inactifTimerRef = useRef(null)
   const sessionInactifTimerRef = useRef(null)
+
+  const logout = () => {
+    setDialogIsOpen(false)
+    history.push('/')
+    // console.log('User a été déconnecté')
+    localStorage.clear()
+    dispatch(logoutAction())
+    clearTimeout(sessionInactifTimerRef.current)
+  }
 
   const onIdle = () => {
     setDialogIsOpen(true)
@@ -41,15 +50,6 @@ const AutoLogoutContainer = () => {
       })
     setDialogIsOpen(false)
     // console.log('User est resté connecté')
-    clearTimeout(sessionInactifTimerRef.current)
-  }
-
-  const logout = () => {
-    setDialogIsOpen(false)
-    history.push('/')
-    // console.log('User a été déconnecté')
-    localStorage.clear()
-    dispatch(logoutAction())
     clearTimeout(sessionInactifTimerRef.current)
   }
 
