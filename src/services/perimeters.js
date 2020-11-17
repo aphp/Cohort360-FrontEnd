@@ -18,7 +18,7 @@ export const fetchPerimetersInfos = async (perimetersIds) => {
         `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${perimetersIds}&size=0&type=VISIT`
       ),
       api.get(
-        `/Composition?_list=${perimetersIds}&size=20&_sort=-date&_elements=status,type,subject,encounter,date,title`
+        `/Composition?_list=${perimetersIds}&size=20&_sort=-date&status=final&_elements=status,type,subject,encounter,date,title`
       )
     ])
 
