@@ -29,7 +29,7 @@ import { ReactComponent as PatientIcon } from '../../assets/icones/user.svg'
 import { ReactComponent as ResearchIcon } from '../../assets/icones/chart-bar.svg'
 
 import { useAppSelector } from 'state'
-import { logout as logoutAction } from '../../state/store'
+import { logout as logoutAction } from '../../state/me'
 import { open as openAction, close as closeAction } from '../../state/drawer'
 
 import AutoLogoutContainer from '../Routes/AutoLogoutContainer'

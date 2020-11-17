@@ -1,51 +1,33 @@
-// import { AnyAction } from 'redux'
+import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-export type MeState = {
+export type MeState = null | {
   id: string
   userName: string
   displayName: string
   firstName: string
   lastName: string
   deidentified: boolean
-} | null
+}
 
 const initialState: MeState = null
 
-type LoginActionType = {
-  type: 'LOGIN'
-  payload: MeState
-}
-export const login = (payload: MeState): LoginActionType => {
-  return {
-    type: 'LOGIN',
-    payload
-  }
-}
+// Logout action is defined outside of the meSlice because it is being used by all reducers
+export const logout = createAction('LOGOUT')
 
-export type LogoutActionType = {
-  type: 'LOGOUT'
-}
-export const logout = () => {
-  return {
-    type: 'LOGOUT'
-  }
-}
-
-type MeActions = LoginActionType | LogoutActionType
-
-const me = (state: MeState = initialState, action: MeActions): MeState => {
-  switch (action.type) {
-    case 'LOGIN': {
+const meSlice = createSlice({
+  name: 'me',
+  initialState: initialState as MeState,
+  reducers: {
+    login: (state: MeState, action: PayloadAction<MeState>) => {
       return action.payload
     }
-
-    case 'LOGOUT': {
+  },
+  extraReducers: (builder) => {
+    builder.addCase(logout, () => {
       return initialState
-    }
-
-    default:
-      return state
+    })
   }
-}
+})
 
-export default me
+export default meSlice.reducer
+export const { login } = meSlice.actions
