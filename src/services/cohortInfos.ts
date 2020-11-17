@@ -309,11 +309,11 @@ const fetchDocuments = async (
       api.get<FHIR_API_Response<IComposition>>(
         `/Composition?size=20&_sort=-date&offset=${
           page ? (page - 1) * 20 : 0
-        }${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
+        }&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
       ),
       search
         ? api.get<FHIR_API_Response<IComposition>>(
-            `/Composition?_sort=-date${searchByGroup}${docTypesFilter}${ndaFilter}${dateFilter}&size=0`
+            `/Composition?_sort=-date&status=final${searchByGroup}${docTypesFilter}${ndaFilter}${dateFilter}&size=0`
           )
         : null
     ])
