@@ -11,7 +11,7 @@ export const fetchMyPatients = async () => {
         '/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&type=VISIT&size=0'
       ),
       api.get(
-        '/Composition?size=20&_sort=-date&_elements=status,type,subject,encounter,date,title'
+        '/Composition?size=20&_sort=-date&status=final&_elements=status,type,subject,encounter,date,title'
       )
     ])
 

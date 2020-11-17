@@ -70,7 +70,7 @@ export const fetchPatient = async (patientId) => {
       `/Claim?patient=${patientId}&_sort=-created&size=20`
     )
     const documentsResponse = await api.get(
-      `/Composition?patient=${patientId}&size=20&_sort=-date&_elements=status,type,encounter,date,title`
+      `/Composition?patient=${patientId}&size=20&_sort=-date&status=final&_elements=status,type,encounter,date,title`
     )
 
     return {
@@ -329,7 +329,7 @@ export const fetchDocuments = async (
     const docsList = await api.get(
       `/Composition?patient=${patientId}&_sort=-date&size=20&offset=${
         page ? (page - 1) * 20 : 0
-      }${elements}${search}${docTypesFilter}${ndaFilter}`
+      }&status=final${elements}${search}${docTypesFilter}${ndaFilter}`
     )
 
     if (!docsList.data.total) {

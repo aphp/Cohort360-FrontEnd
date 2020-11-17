@@ -18,7 +18,7 @@ export const fetchCohort = async (cohortId) => {
         `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${cohortId}&size=0&type=VISIT`
       ),
       api.get(
-        `/Composition?_list=${cohortId}&size=20&_sort=-date&_elements=status,type,subject,encounter,date,title`
+        `/Composition?_list=${cohortId}&size=20&_sort=-date&status=final&_elements=status,type,subject,encounter,date,title`
       )
     ])
 
@@ -156,7 +156,7 @@ export const fetchDocuments = async (
     const docsList = await api.get(
       `/Composition?size=20&_sort=-date&offset=${
         page ? (page - 1) * 20 : 0
-      }${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}`
+      }&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}`
     )
 
     if (!docsList.data.total) {
