@@ -31,7 +31,7 @@ const defaultSupported = {
   supportedType: '',
   supportedStatus: '',
   patientType: '',
-  type: 'visites'
+  type: 'Encounter'
 }
 
 const SupportedForm = (props) => {
@@ -106,8 +106,6 @@ const SupportedForm = (props) => {
             <InputBase placeholder="Mois" className={classes.inputText} />
             <InputBase placeholder="Jour" className={classes.inputText} />
           </Grid>
-
-          <Typography></Typography>
         </FormControl>
 
         <FormControl className={classes.formControl}>
@@ -313,15 +311,14 @@ const SupportedForm = (props) => {
             </Grid>
           </Grid>
         </FormControl> */}
-
-        <Grid className={classes.criteriaActionContainer}>
-          <Button onClick={goBack} color="primary" variant="outlined">
-            Annuler
-          </Button>
-          <Button onClick={_onSubmit} color="primary" variant="contained">
-            Confirmer
-          </Button>
-        </Grid>
+      </Grid>
+      <Grid className={classes.criteriaActionContainer}>
+        <Button onClick={goBack} color="primary" variant="outlined">
+          Annuler
+        </Button>
+        <Button onClick={_onSubmit} color="primary" variant="contained">
+          Confirmer
+        </Button>
       </Grid>
     </Grid>
   )
