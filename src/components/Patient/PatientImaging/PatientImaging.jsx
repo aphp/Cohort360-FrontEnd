@@ -13,7 +13,7 @@ import DocumentTable from './DocumentTable/DocumentTable'
 
 import useStyles from './styles'
 
-const PatientDocs = ({ patientId, documents }) => {
+const PatientDocs = ({ documents }) => {
   const classes = useStyles()
   const [page, setPage] = useState(1)
 

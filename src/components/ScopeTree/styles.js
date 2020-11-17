@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles'
 
-export default makeStyles((theme) => ({
+export default makeStyles(() => ({
   container: {
     height: 'calc(100% - 84px)',
     display: 'flex',
@@ -8,8 +8,6 @@ export default makeStyles((theme) => ({
     flexDirection: 'column',
     overflow: 'auto'
   },
-  mainRow: {
-  },
-  secondRow: {
-  },
+  mainRow: {},
+  secondRow: {}
 }))

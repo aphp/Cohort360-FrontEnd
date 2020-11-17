@@ -46,7 +46,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "lint": "eslint ./src/**/*.{ts,tsx,js,jsx}",
+    "lint": "eslint --ext .jsx,.js,.ts,.tsx src/",
     "test": "react-scripts test --coverage --watchAll --env=jest-environment-jsdom-sixteen",
     "start:aphp": "env $(cat .env.aphp) react-scripts start",
     "start:arkhn": "env $(cat .env.arkhn) react-scripts start",

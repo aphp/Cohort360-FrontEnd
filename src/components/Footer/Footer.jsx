@@ -5,7 +5,7 @@ import logoAPHP from '../../assets/images/logo-aphp.png'
 
 import useStyles from './styles'
 
-const Footer = (props) => {
+const Footer = () => {
   const classes = useStyles()
 
   return (

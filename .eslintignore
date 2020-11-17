@@ -1,0 +1,7 @@
+
+src/data
+
+src/**/*.test.ts
+src/**/*.test.js
+src/**/*.test.tsx
+src/**/*.test.jsx
