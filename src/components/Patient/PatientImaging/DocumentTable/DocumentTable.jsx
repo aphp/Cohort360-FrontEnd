@@ -95,8 +95,8 @@ const DocumentTable = (props) => {
         <TableBody>
           {props.documents
             .slice((props.page - 1) * props.documentLines, props.page * props.documentLines)
-            .map((row, i) => (
-              <DocumentRow row={row} key={i} />
+            .map((row, index) => (
+              <DocumentRow key={index} row={row} />
             ))}
         </TableBody>
       </Table>

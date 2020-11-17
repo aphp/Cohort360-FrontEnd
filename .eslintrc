@@ -44,5 +44,8 @@
     },
     "ecmaVersion": 2018,
     "sourceType": "module"
+  },
+  "globals": {
+    "process": true
   }
 }

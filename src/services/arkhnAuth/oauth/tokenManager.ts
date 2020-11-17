@@ -67,7 +67,7 @@ export const revokeToken = async () => {
     }
   }
   try {
-    const revokeResponse = await axios.post(REVOKE_URL!, bodyFormData, conf)
+    const revokeResponse = await axios.post(REVOKE_URL!, bodyFormData, conf) // eslint-disable-line
     if (revokeResponse.status !== 200) console.error(revokeResponse.data)
   } catch (err) {
     console.error(err.response)

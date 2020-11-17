@@ -66,8 +66,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         content = (
           <>
             <Typography>
-              {' '}
-              Dans <span className={classes.criteriaType}>GHM</span>,{' '}
+              Dans <span className={classes.criteriaType}>GHM</span>,
             </Typography>
             <Typography>
               {startDate
@@ -79,8 +78,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 : ''}
             </Typography>
             <Typography>
-              {' '}
-              GHM sélectionné :{' '}
+              GHM sélectionné :
               {_selectedCriteria.code
                 ? `"${_selectedCriteria.code['GHM CODE']} - ${_selectedCriteria.code['LONG DESCRIPTION']}"`
                 : '""'}
@@ -92,8 +90,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         content = (
           <>
             <Typography>
-              {' '}
-              Dans <span className={classes.criteriaType}>Actes CCAM</span>,{' '}
+              Dans <span className={classes.criteriaType}>Actes CCAM</span>,
             </Typography>
             <Typography>
               {startDate
@@ -105,8 +102,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 : ''}
             </Typography>
             <Typography>
-              {' '}
-              Acte CCAM sélectionné :{' '}
+              Acte CCAM sélectionné :
               {_selectedCriteria.code
                 ? `"${_selectedCriteria.code['CCAM CODE']} - ${_selectedCriteria.code['LONG DESCRIPTION']}"`
                 : '""'}
@@ -118,12 +114,10 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         content = (
           <>
             <Typography>
-              {' '}
-              Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,{' '}
+              Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,
             </Typography>
             <Typography>
-              {' '}
-              Diagnostic CIM sélectionné :{' '}
+              Diagnostic CIM sélectionné :
               {_selectedCriteria.code
                 ? `"${_selectedCriteria.code['DIAGNOSIS CODE']} - ${_selectedCriteria.code['LONG DESCRIPTION']}"`
                 : '""'}
@@ -131,15 +125,21 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
           </>
         )
         break
-      case 'patients': {
-        const gender = ['Homme', 'Femme', 'Autre', 'Tous']
+      case 'Patient': {
+        console.log('_selectedCriteria', _selectedCriteria)
         content = (
           <>
             <Typography>
-              {' '}
-              Dans <span className={classes.criteriaType}>Démographie Patient</span>,{' '}
+              Dans <span className={classes.criteriaType}>Démographie Patient</span>,
             </Typography>
-            <Typography> Genre sélectionné : "{gender[_selectedCriteria.gender ?? 2]}"</Typography>
+            <Typography>Genre sélectionné :</Typography>
+            {_selectedCriteria.gender?.map(({ display }) => (
+              <Typography key={display}>{display}</Typography>
+            ))}
+            <Typography>Status vital :</Typography>
+            {_selectedCriteria.vitalStatus?.map(({ display }) => (
+              <Typography key={display}>{display}</Typography>
+            ))}
             <Typography>
               {_selectedCriteria.years && _selectedCriteria.years[0] !== _selectedCriteria.years[1]
                 ? `Fourchette d'âge comprise entre ${_selectedCriteria.years[0]} et ${_selectedCriteria.years[1]} ans ${
@@ -162,11 +162,9 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         content = (
           <>
             <Typography>
-              {' '}
-              Dans <span className={classes.criteriaType}>Document médical</span>,{' '}
+              Dans <span className={classes.criteriaType}>Document médical</span>,
             </Typography>
             <Typography>
-              {' '}
               Recherche textuelle "{_selectedCriteria.search}" dans {docTypes[_selectedCriteria.doc ?? '55188-7']}
             </Typography>
           </>

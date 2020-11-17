@@ -198,12 +198,13 @@ export type PatientData = {
 }
 
 export type CriteriaItemType = {
-  title: string
   id: string
+  title: string
   color: string
-  disabled?: boolean
-  data: any
   components: any
+  disabled?: boolean
+  data?: any
+  fetch?: any
   subItems?: CriteriaItemType[]
 }
 
@@ -211,7 +212,8 @@ export type SelectedCriteriaType = {
   type: string
   title: string
   code?: any
-  gender?: number
+  gender?: [{ code: string; display: string }]
+  vitalStatus?: [{ code: string; display: string }]
   years?: [number, number]
   search?: string
   doc?: '55188-7' | '11336-5' | '57833-6'

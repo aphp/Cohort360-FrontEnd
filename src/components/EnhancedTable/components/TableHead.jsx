@@ -24,7 +24,7 @@ function EnhancedTableHead(props) {
   }
 
   return (
-    <TableHead>
+    <TableHead className={classes.head}>
       <TableRow>
         {!props.noCheckbox && (
           <TableCell align="center" padding="checkbox">
@@ -47,7 +47,7 @@ function EnhancedTableHead(props) {
           >
             <TableSortLabel
               hideSortIcon={headCell.disableOrderBy}
-              classes={{ root: classes.tableHeadLabel, active: classes.tableHeadActiveLabel }}
+              classes={{ root: classes.head, active: classes.tableHeadActiveLabel }}
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'desc'}
               onClick={headCell.disableOrderBy ? null : createSortHandler(headCell.id)}

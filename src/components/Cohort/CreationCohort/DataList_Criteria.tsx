@@ -1,3 +1,5 @@
+import { CriteriaItemType } from 'types'
+
 // Components
 import DemographicFrom from './DiagramView/components/CriteriaCard/components/DemographicFrom/DemographicFrom'
 import DocumentsForm from './DiagramView/components/CriteriaCard/components/DocumentsForm/DocumentsForm'
@@ -8,11 +10,20 @@ import GhmForm from './DiagramView/components/CriteriaCard/components/GhmForm/Gh
 
 // Data
 import cimData from '../../../data/Requeteur/CIM10/cim9_data'
-import admissionMode from '../../../data/Requeteur/VISITE/admissionMode'
-import entryMode from '../../../data/Requeteur/VISITE/entryMode'
-import exitMode from '../../../data/Requeteur/VISITE/exitMode'
+// import admissionMode from '../../../data/Requeteur/VISITE/admissionMode'
+// import entryMode from '../../../data/Requeteur/VISITE/entryMode'
+// import exitMode from '../../../data/Requeteur/VISITE/exitMode'
 import ccamData from '../../../data/ccam_data'
 import ghmData from '../../../data/ghm_data'
+
+// Fetcher
+import {
+  fetchAdmissionModes,
+  fetchEntryModes,
+  fetchExitModes,
+  fetchFileStatus
+} from '../../../data/Requeteur/encounter'
+import { fetchGender, fetchStatus } from '../../../data/Requeteur/patient'
 
 // ├── Mes variables
 // ├── Patients
@@ -29,26 +40,30 @@ import ghmData from '../../../data/ghm_data'
 // ├── Médicaments
 // │   ├── Prescription - Dispension - Administration
 
-const criteriaList = [
+const criteriaList: CriteriaItemType[] = [
   {
     id: 'mes_variables',
     title: 'Mes variables',
     color: '#5BC5F2',
     disabled: true,
-    data: null
+    data: null,
+    components: null
   },
   {
-    id: 'patients',
+    id: 'Patient',
     title: 'Patients',
     color: '#0063AF',
-    components: DemographicFrom
+    components: DemographicFrom,
+    data: { gender: 'loading', deceased: 'loading' },
+    fetch: { fetchGender, fetchStatus }
   },
   {
-    id: 'visites',
+    id: 'Encounter',
     title: 'Visites',
     color: '#0063AF',
     components: SupportedForm,
-    data: { admissionMode, entryMode, exitMode }
+    data: { admissionModes: 'loading', entryModes: 'loading', exitModes: 'loading', fileStatus: 'loading' },
+    fetch: { fetchAdmissionModes, fetchEntryModes, fetchExitModes, fetchFileStatus }
   },
   {
     id: 'documents_cliniques',
@@ -60,13 +75,15 @@ const criteriaList = [
     id: 'pmsi',
     title: 'PMSI',
     color: '#0063AF',
+    components: null,
     subItems: [
       {
         id: 'diagnostics',
         title: 'Diagnostics',
         color: '#0063AF',
         components: Cim10Form,
-        data: cimData
+        data: cimData,
+        fetch: {}
       },
       {
         id: 'actes',
@@ -88,15 +105,18 @@ const criteriaList = [
     id: 'biologie_microbiologie',
     title: 'Biologie/Microbiologie',
     color: '#0063AF',
+    components: null,
     subItems: [
       {
         id: 'biologie',
         title: 'Biologie',
+        components: null,
         color: '#0063AF'
       },
       {
         id: 'microbiologie',
         title: 'Microbiologie',
+        components: null,
         color: '#0063AF'
       }
     ]
@@ -104,24 +124,25 @@ const criteriaList = [
   {
     id: 'physiologie',
     title: 'Physiologie',
-    color: '#0063AF'
+    color: '#0063AF',
+    components: null
   },
   {
     id: 'médicaments',
     title: 'Médicaments',
     color: '#0063AF',
+    components: null,
     subItems: [
       {
         id: 'prescription_dispension_administration',
         title: 'Prescription - Dispension - Administration',
+        components: null,
         color: '#0063AF'
       }
     ]
   }
 ]
 
-const constructCriteriaList = async () => {
-  return criteriaList
-}
+const constructCriteriaList: () => CriteriaItemType[] = () => criteriaList
 
 export default constructCriteriaList

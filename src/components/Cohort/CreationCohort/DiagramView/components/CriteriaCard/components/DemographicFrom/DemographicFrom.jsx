@@ -1,19 +1,19 @@
 import React, { useState } from 'react'
+import clsx from 'clsx'
 
 import {
   Button,
   Divider,
   FormControl,
   FormLabel,
-  FormControlLabel,
   Grid,
   IconButton,
   InputBase,
-  RadioGroup,
-  Radio,
   Slider,
+  TextField,
   Typography
 } from '@material-ui/core'
+import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
@@ -23,13 +23,14 @@ const ERROR_TITLE = 'error_title'
 
 const defaultDemographic = {
   title: 'Critère démographique',
-  gender: 0,
+  vitalStatus: [],
+  gender: [],
   years: [0, 100],
-  type: 'patients'
+  type: 'Patient'
 }
 
 const DemographicFrom = (props) => {
-  const { selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const classes = useStyles()
 
@@ -49,6 +50,10 @@ const DemographicFrom = (props) => {
     if (!_selectedCriteria.title) return setError(ERROR_TITLE)
 
     onChangeSelectedCriteria(_selectedCriteria)
+  }
+
+  if (criteria.data.gender === 'loading') {
+    return <></>
   }
 
   return (
@@ -73,28 +78,53 @@ const DemographicFrom = (props) => {
         <FormControl component="fieldset" className={classes.formControl}>
           <InputBase
             placeholder="Nom du critère"
-            classes={{
-              root: classes.inputText,
-              error: classes.inputTextError
-            }}
-            error={error === ERROR_TITLE}
+            className={clsx(classes.inputText, {
+              [classes.inputTextError]: error === ERROR_TITLE
+            })}
             value={_selectedCriteria.title}
             onChange={(e) => _onChangeCriteriaValue('title', e.target.value)}
           />
         </FormControl>
 
-        <FormControl component="fieldset" className={classes.formControl}>
-          <FormLabel component="legend">Genre</FormLabel>
-          <RadioGroup
-            value={_selectedCriteria.gender}
-            onChange={(e) => _onChangeCriteriaValue('gender', +e.target.value)}
-          >
-            <FormControlLabel value={0} control={<Radio />} label="Homme" />
-            <FormControlLabel value={1} control={<Radio />} label="Femme" />
-            <FormControlLabel value={2} control={<Radio />} label="Autre" />
-            <FormControlLabel value={3} control={<Radio />} label="Tous" />
-          </RadioGroup>
+        <FormControl className={classes.formControl}>
+          <Autocomplete
+            multiple
+            defaultValue={isEdition ? _selectedCriteria.gender : []}
+            options={criteria.data.gender}
+            getOptionLabel={(option) => option['display']}
+            renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Genre" />}
+            onChange={(e, value) => _onChangeCriteriaValue('gender', value)}
+          />
         </FormControl>
+
+        <FormControl className={classes.formControl}>
+          <Autocomplete
+            multiple
+            defaultValue={isEdition ? _selectedCriteria.vitalStatus : []}
+            options={criteria.data.deceased}
+            getOptionLabel={(option) => option['display']}
+            renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Status vital" />}
+            onChange={(e, value) => _onChangeCriteriaValue('vitalStatus', value)}
+          />
+        </FormControl>
+
+        {/* <FormControl className={classes.formControl}>
+          <Autocomplete
+            multiple
+            defaultValue={isEdition ? _selectedCriteria.gender : []}
+            options={criteria.data.gender}
+            getOptionLabel={(option) => option['value']}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                placeholder="Genre"
+                classes={{ error: classes.inputTextError }}
+              />
+            )}
+            onChange={(e, value) => _onChangeCriteriaValue('gender', value)}
+          />
+        </FormControl> */}
 
         <FormControl component="fieldset" className={classes.formControl}>
           <FormLabel component="legend">Fourchette d'âge</FormLabel>

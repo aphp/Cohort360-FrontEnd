@@ -27,7 +27,22 @@ const Requeteur = () => {
   const _fetchCriteria = async () => {
     if (!practitioner) return
 
-    const _criteria = await constructCriteriaList()
+    const _criteria = constructCriteriaList()
+
+    // Fetch Patient Data
+    if (_criteria && _criteria[1] && _criteria[1].fetch) {
+      _criteria[1].data.gender = await _criteria[1].fetch.fetchGender()
+      _criteria[1].data.deceased = await _criteria[1].fetch.fetchStatus()
+    }
+
+    // Fetch Encouters Data
+    if (_criteria && _criteria[2] && _criteria[2].fetch) {
+      _criteria[2].data.admissionModes = await _criteria[2].fetch.fetchAdmissionModes()
+      _criteria[2].data.entryModes = await _criteria[2].fetch.fetchEntryModes()
+      _criteria[2].data.exitModes = await _criteria[2].fetch.fetchExitModes()
+      _criteria[2].data.fileStatus = await _criteria[2].fetch.fetchFileStatus()
+    }
+
     onChangeCriteria(_criteria)
   }
 

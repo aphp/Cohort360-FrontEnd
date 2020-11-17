@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 
 import {
   Button,
@@ -6,11 +6,10 @@ import {
   FormControl,
   Grid,
   IconButton,
-  MenuItem,
-  Select,
   Typography,
   InputBase,
-  TextField
+  TextField,
+  CircularProgress
 } from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
@@ -32,7 +31,7 @@ const defaultSupported = {
   supportedType: '',
   supportedStatus: '',
   patientType: '',
-  type: 'visites'
+  type: 'Encounter'
 }
 
 const SupportedForm = (props) => {
@@ -43,46 +42,6 @@ const SupportedForm = (props) => {
   const isEdition = selectedCriteria !== null ? true : false
   const [_selectedCriteria, onChangeCriteria] = useState(selectedCriteria ?? defaultSupported)
   const [error, setError] = useState(null)
-
-  const [searchValue, setSearchValue] = useState('')
-  const [admissionModeData, setAdmissionModeData] = useState(criteria?.data.admissionMode)
-  const [entryModeData, setEntryModeData] = useState(criteria?.data.entryMode)
-  const [exitModeData, setExitModeData] = useState(criteria?.data.exitMode)
-
-  useEffect(() => {
-    const _searchValue = searchValue
-    const filteredAdmissionModeData = criteria?.data?.admissionMode?.filter(
-      (admissionMode) =>
-        admissionMode['admissionModeCode'].startsWith(_searchValue) ||
-        admissionMode['label'].startsWith(_searchValue) ||
-        `${admissionMode['admissionModeCode']} - ${admissionMode['label']}`.startsWith(_searchValue)
-    )
-    setAdmissionModeData(filteredAdmissionModeData)
-  }, [searchValue]) // eslint-disable-line
-
-  useEffect(() => {
-    const _searchValue = searchValue
-
-    const filteredEntryModeData = criteria?.data?.entryMode?.filter(
-      (entryMode) =>
-        entryMode['entryModeCode'].startsWith(_searchValue) ||
-        entryMode['label'].startsWith(_searchValue) ||
-        `${entryMode['entryModeCode']} - ${entryMode['label']}`.startsWith(_searchValue)
-    )
-    setEntryModeData(filteredEntryModeData)
-  }, [searchValue]) // eslint-disable-line
-
-  useEffect(() => {
-    const _searchValue = searchValue
-
-    const filteredExitModeData = criteria?.data?.exitMode?.filter(
-      (exitMode) =>
-        exitMode['exitModeCode'].startsWith(_searchValue) ||
-        exitMode['label'].startsWith(_searchValue) ||
-        `${exitMode['exitModeCode']} - ${exitMode['label']}`.startsWith(_searchValue)
-    )
-    setExitModeData(filteredExitModeData)
-  }, [searchValue]) // eslint-disable-line
 
   const _onChangeCriteriaValue = (key, value) => {
     if (error) setError(null)
@@ -96,6 +55,19 @@ const SupportedForm = (props) => {
     if (!_selectedCriteria.title) return setError(ERROR_TITLE)
 
     onChangeSelectedCriteria(_selectedCriteria)
+  }
+
+  if (
+    criteria.data.admissionModes === 'loading' ||
+    criteria.data.entryModes === 'loading' ||
+    criteria.data.exitModes === 'loading' ||
+    criteria.data.fileStatus === 'loading'
+  ) {
+    return (
+      <Grid className={classes.root}>
+        <CircularProgress />
+      </Grid>
+    )
   }
 
   return (
@@ -134,8 +106,6 @@ const SupportedForm = (props) => {
             <InputBase placeholder="Mois" className={classes.inputText} />
             <InputBase placeholder="Jour" className={classes.inputText} />
           </Grid>
-
-          <Typography></Typography>
         </FormControl>
 
         <FormControl className={classes.formControl}>
@@ -151,8 +121,8 @@ const SupportedForm = (props) => {
         <FormControl className={classes.formControl}>
           <Autocomplete
             defaultValue={isEdition ? _selectedCriteria.admissionMode : null}
-            options={admissionModeData}
-            getOptionLabel={(option) => `${option['admissionModeCode']} - ${option['label']}`}
+            options={criteria.data.admissionModes}
+            getOptionLabel={(option) => `${option['code']} - ${option['display']}`}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -163,15 +133,14 @@ const SupportedForm = (props) => {
               />
             )}
             onChange={(e, value) => _onChangeCriteriaValue('admissionMode', value)}
-            onInputChange={(event, value) => setSearchValue(value)}
           />
         </FormControl>
 
         <FormControl className={classes.formControl}>
           <Autocomplete
             defaultValue={isEdition ? _selectedCriteria.entryMode : null}
-            options={entryModeData}
-            getOptionLabel={(option) => `${option['entryModeCode']} - ${option['label']}`}
+            options={criteria.data.entryModes}
+            getOptionLabel={(option) => `${option['code']} - ${option['display']}`}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -182,15 +151,14 @@ const SupportedForm = (props) => {
               />
             )}
             onChange={(e, value) => _onChangeCriteriaValue('entryMode', value)}
-            onInputChange={(event, value) => setSearchValue(value)}
           />
         </FormControl>
 
         <FormControl className={classes.formControl}>
           <Autocomplete
             defaultValue={isEdition ? _selectedCriteria.exitMode : null}
-            options={exitModeData}
-            getOptionLabel={(option) => `${option['exitModeCode']} - ${option['label']}`}
+            options={criteria.data.exitModes}
+            getOptionLabel={(option) => `${option['code']} - ${option['display']}`}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -201,11 +169,10 @@ const SupportedForm = (props) => {
               />
             )}
             onChange={(e, value) => _onChangeCriteriaValue('exitMode', value)}
-            onInputChange={(event, value) => setSearchValue(value)}
           />
         </FormControl>
 
-        <FormControl className={classes.formControl}>
+        {/* <FormControl className={classes.formControl}>
           <Grid container className={classes.selectGridContainer}>
             <Grid item>
               <Typography variant="h6">Motif d'admission</Typography>
@@ -223,9 +190,9 @@ const SupportedForm = (props) => {
               </Select>
             </Grid>
           </Grid>
-        </FormControl>
+        </FormControl> */}
 
-        <FormControl className={classes.formControl}>
+        {/* <FormControl className={classes.formControl}>
           <Grid container className={classes.selectGridContainer}>
             <Grid item>
               <Typography variant="h6">Type d'admission</Typography>
@@ -243,9 +210,9 @@ const SupportedForm = (props) => {
               </Select>
             </Grid>
           </Grid>
-        </FormControl>
+        </FormControl> */}
 
-        <FormControl className={classes.formControl}>
+        {/* <FormControl className={classes.formControl}>
           <Grid container className={classes.selectGridContainer}>
             <Grid item>
               <Typography variant="h6">Provenance</Typography>
@@ -263,29 +230,27 @@ const SupportedForm = (props) => {
               </Select>
             </Grid>
           </Grid>
-        </FormControl>
+        </FormControl> */}
 
         <FormControl className={classes.formControl}>
-          <Grid container className={classes.selectGridContainer}>
-            <Grid item>
-              <Typography variant="h6">Status dossier</Typography>
-            </Grid>
-
-            <Grid item>
-              <Select
-                id="status dossier"
-                value={_selectedCriteria.fileStatus}
-                onChange={(e) => _onChangeCriteriaValue('fileStatus', e.target.value)}
-              >
-                <MenuItem value={1}>Status dossier A</MenuItem>
-                <MenuItem value={2}>Status dossier B</MenuItem>
-                <MenuItem value={3}>Status dossier C</MenuItem>
-              </Select>
-            </Grid>
-          </Grid>
+          <Autocomplete
+            defaultValue={isEdition ? _selectedCriteria.fileStatus : null}
+            options={criteria.data.fileStatus}
+            getOptionLabel={(option) => `${option['code']} - ${option['display']}`}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                placeholder="Status Dossier"
+                classes={{ error: classes.inputTextError }}
+                error={error === ERROR_CODE}
+              />
+            )}
+            onChange={(e, value) => _onChangeCriteriaValue('fileStatus', value)}
+          />
         </FormControl>
 
-        <FormControl className={classes.formControl}>
+        {/* <FormControl className={classes.formControl}>
           <Grid container className={classes.selectGridContainer}>
             <Grid item>
               <Typography variant="h6">Type de prise en charge</Typography>
@@ -345,16 +310,15 @@ const SupportedForm = (props) => {
               </Select>
             </Grid>
           </Grid>
-        </FormControl>
-
-        <Grid className={classes.criteriaActionContainer}>
-          <Button onClick={goBack} color="primary" variant="outlined">
-            Annuler
-          </Button>
-          <Button onClick={_onSubmit} color="primary" variant="contained">
-            Confirmer
-          </Button>
-        </Grid>
+        </FormControl> */}
+      </Grid>
+      <Grid className={classes.criteriaActionContainer}>
+        <Button onClick={goBack} color="primary" variant="outlined">
+          Annuler
+        </Button>
+        <Button onClick={_onSubmit} color="primary" variant="contained">
+          Confirmer
+        </Button>
       </Grid>
     </Grid>
   )
