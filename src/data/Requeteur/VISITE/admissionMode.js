@@ -1,5 +1,7 @@
 import apiRequest from '../apiRequest'
 
+//Completer les requetes manquantes
+
 export const fetchAdmissionModes = async () => {
   const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit_type`)
   return res.data.entry[0].resource.compose.include[0].concept
