@@ -136,6 +136,8 @@ const fetchPatientList = async (
   gender: PatientGenderKind,
   age: [number, number],
   vitalStatus: VitalStatus,
+  sortBy: string,
+  sortDirection: string,
   groupId?: string,
   includeFacets?: boolean
 ): Promise<
@@ -185,6 +187,7 @@ const fetchPatientList = async (
 
   if (CONTEXT === 'aphp') {
     const searchByGroup = groupId ? `&_list=${groupId}` : ''
+    const _sortDirection = sortDirection === 'desc' ? '-' : ''
     let search = ''
     let genderFilter = ''
     let ageFilter = ''
@@ -242,7 +245,7 @@ const fetchPatientList = async (
     const patientsResp = await api.get<FHIR_API_Response<IPatient>>(
       `/Patient?${facets}size=20&offset=${
         page ? (page - 1) * 20 : 0
-      }&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension${searchByGroup}${search}${genderFilter}${vitalStatusFilter}${ageFilter}`
+      }&_sort=${_sortDirection}${sortBy}&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension${searchByGroup}${search}${genderFilter}${vitalStatusFilter}${ageFilter}`
     )
 
     const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
