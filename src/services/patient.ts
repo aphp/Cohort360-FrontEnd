@@ -278,6 +278,8 @@ export const fetchPMSI = async (
 
     if (sortBy === 'date') {
       _sortBy = dateName
+    } else if (sortBy === 'code') {
+      _sortBy = codeName
     }
 
     if (searchInput) {

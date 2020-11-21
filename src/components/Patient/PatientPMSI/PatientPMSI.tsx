@@ -114,13 +114,37 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
     setSortDirection(newDirection)
     setSortBy(property)
     setPage(1)
-    _fetchPMSI(deidentifiedBoolean, 1, patientId, selectedTab, searchInput, nda, code, property, newDirection)
+    _fetchPMSI(
+      deidentifiedBoolean,
+      1,
+      patientId,
+      selectedTab,
+      searchInput,
+      nda,
+      code,
+      property,
+      newDirection,
+      startDate,
+      endDate
+    )
   }
 
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
     setPage(value ? value : 1)
     setLoadingStatus(true)
-    _fetchPMSI(true, value ? value : 1, patientId, selectedTab, searchInput, nda, code, _sortBy, _sortDirection)
+    _fetchPMSI(
+      true,
+      value ? value : 1,
+      patientId,
+      selectedTab,
+      searchInput,
+      nda,
+      code,
+      _sortBy,
+      _sortDirection,
+      startDate,
+      endDate
+    )
   }
 
   const handleOpenDialog = () => {
