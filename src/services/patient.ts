@@ -183,6 +183,8 @@ export const fetchPMSI = async (
   searchInput: string,
   nda: string,
   code: string,
+  sortBy: string,
+  sortDirection: string,
   startDate?: string,
   endDate?: string
 ): Promise<{
@@ -248,6 +250,8 @@ export const fetchPMSI = async (
     let ndaFilter = ''
     let codeName = ''
     let codeFilter = ''
+    let _sortBy = sortBy
+    const _sortDirection = sortDirection === 'desc' ? '-' : ''
     let dateFilter = ''
 
     switch (selectedTab) {
@@ -270,6 +274,10 @@ export const fetchPMSI = async (
         resource = '/Condition'
         dateName = 'recorded-date'
         codeName = 'code'
+    }
+
+    if (sortBy === 'date') {
+      _sortBy = dateName
     }
 
     if (searchInput) {
@@ -295,7 +303,7 @@ export const fetchPMSI = async (
     }
 
     const pmsiResp = await api.get<FHIR_API_Response<IClaim | IProcedure | ICondition>>(
-      `${resource}?patient=${patientId}&_sort=-${dateName}&size=20&offset=${
+      `${resource}?patient=${patientId}&_sort=${_sortDirection}${_sortBy}&size=20&offset=${
         (page - 1) * 20
       }${search}${ndaFilter}${codeFilter}${dateFilter}`
     )

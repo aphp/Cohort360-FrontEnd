@@ -14,6 +14,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   Tabs,
   Typography
 } from '@material-ui/core'
@@ -38,6 +39,8 @@ type PatientPMSITypes = {
   ghm?: PMSIEntry<IClaim>[]
   ghmTotal: number
   deidentifiedBoolean: boolean
+  sortBy: string
+  sortDirection: 'asc' | 'desc'
 }
 const PatientPMSI: React.FC<PatientPMSITypes> = ({
   patientId,
@@ -47,7 +50,9 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
   ccamTotal,
   ghm,
   ghmTotal,
-  deidentifiedBoolean
+  deidentifiedBoolean,
+  sortBy,
+  sortDirection
 }) => {
   const classes = useStyles()
   const [selectedTab, selectTab] = useState<'CIM10' | 'CCAM' | 'GHM'>('CIM10')
@@ -62,19 +67,60 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
   const [code, setCode] = useState('')
   const [startDate, setStartDate] = useState<string | undefined>(undefined)
   const [endDate, setEndDate] = useState<string | undefined>(undefined)
+  const [_sortBy, setSortBy] = useState(sortBy)
+  const [_sortDirection, setSortDirection] = useState(sortDirection)
 
   const documentLines = 20 // Number of desired lines in the document array
 
-  const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
-    setPage(value ? value : 1)
+  const _fetchPMSI = (
+    deidentified: boolean,
+    page: number,
+    patientId: string,
+    selectedTab: 'CIM10' | 'CCAM' | 'GHM',
+    searchInput: string,
+    nda: string,
+    code: string,
+    sortBy: string,
+    sortDirection: string,
+    startDate?: string,
+    endDate?: string
+  ) => {
     setLoadingStatus(true)
-    fetchPMSI(true, value ? value : 1, patientId, selectedTab, searchInput, nda, code)
+    fetchPMSI(
+      deidentified,
+      page,
+      patientId,
+      selectedTab,
+      searchInput,
+      nda,
+      code,
+      sortBy,
+      sortDirection,
+      startDate,
+      endDate
+    )
       .then((pmsiResp) => {
         setData(pmsiResp?.pmsiData ?? [])
         setTotal(pmsiResp?.pmsiTotal ?? 0)
       })
       .catch((error) => console.log(error))
       .then(() => setLoadingStatus(false))
+  }
+
+  const handleSort = (property: any) => (event: React.MouseEvent<unknown> /*eslint-disable-line*/) => {
+    const isAsc: boolean = _sortBy === property && _sortDirection === 'asc'
+    const newDirection = isAsc ? 'desc' : 'asc'
+
+    setSortDirection(newDirection)
+    setSortBy(property)
+    setPage(1)
+    _fetchPMSI(deidentifiedBoolean, 1, patientId, selectedTab, searchInput, nda, code, property, newDirection)
+  }
+
+  const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
+    setPage(value ? value : 1)
+    setLoadingStatus(true)
+    _fetchPMSI(true, value ? value : 1, patientId, selectedTab, searchInput, nda, code, _sortBy, _sortDirection)
   }
 
   const handleOpenDialog = () => {
@@ -201,11 +247,31 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
                 <TableCell align="left" className={classes.tableHeadCell}>
                   {deidentifiedBoolean ? 'ID Technique Visite' : 'NDA'}
                 </TableCell>
-                <TableCell align="left" className={classes.tableHeadCell}>
-                  Codage le
+                <TableCell
+                  sortDirection={_sortBy === 'date' ? _sortDirection : false}
+                  align="left"
+                  className={classes.tableHeadCell}
+                >
+                  <TableSortLabel
+                    active={_sortBy === 'date'}
+                    direction={_sortBy === 'date' ? _sortDirection : 'asc'}
+                    onClick={handleSort('date')}
+                  >
+                    Codage le
+                  </TableSortLabel>
                 </TableCell>
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  Code
+                <TableCell
+                  sortDirection={_sortBy === 'code' ? _sortDirection : false}
+                  align="center"
+                  className={classes.tableHeadCell}
+                >
+                  <TableSortLabel
+                    active={_sortBy === 'code'}
+                    direction={_sortBy === 'code' ? _sortDirection : 'asc'}
+                    onClick={handleSort('code')}
+                  >
+                    Code
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="center" className={classes.tableHeadCell}>
                   Libellé

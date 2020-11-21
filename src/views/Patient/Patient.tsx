@@ -183,6 +183,8 @@ const Patient = () => {
               ghm={ghm}
               ghmTotal={ghmTotal}
               deidentifiedBoolean={deidentifiedBoolean}
+              sortBy={'date'}
+              sortDirection={'desc'}
             />
           )}
         </Grid>
