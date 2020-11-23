@@ -171,6 +171,8 @@ const Patient = () => {
               documents={documents}
               total={documentsTotal}
               deidentifiedBoolean={deidentifiedBoolean}
+              sortBy={'date'}
+              sortDirection={'desc'}
             />
           )}
           {selectedTab === 'pmsi' && (

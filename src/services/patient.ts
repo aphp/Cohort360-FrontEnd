@@ -328,6 +328,8 @@ export const fetchPMSI = async (
 
 export const fetchDocuments = async (
   deidentified: boolean,
+  sortBy: string,
+  sortDirection: string,
   page: number,
   patientId: string,
   searchInput: string,
@@ -337,6 +339,7 @@ export const fetchDocuments = async (
   endDate?: string
 ) => {
   if (CONTEXT === 'aphp') {
+    const _sortDirection = sortDirection === 'desc' ? '-' : ''
     let search = ''
     let docTypesFilter = ''
     let ndaFilter = ''
@@ -370,7 +373,7 @@ export const fetchDocuments = async (
     }
 
     const docsList = await api.get(
-      `/Composition?patient=${patientId}&_sort=-date&size=20&offset=${
+      `/Composition?patient=${patientId}&_sort=${_sortDirection}${sortBy}&size=20&offset=${
         page ? (page - 1) * 20 : 0
       }&status=final${elements}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
     )
