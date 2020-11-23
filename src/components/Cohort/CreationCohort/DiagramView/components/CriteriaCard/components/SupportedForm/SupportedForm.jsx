@@ -172,66 +172,6 @@ const SupportedForm = (props) => {
           />
         </FormControl>
 
-        {/* <FormControl className={classes.formControl}>
-          <Grid container className={classes.selectGridContainer}>
-            <Grid item>
-              <Typography variant="h6">Motif d'admission</Typography>
-            </Grid>
-
-            <Grid item>
-              <Select
-                id="motif-d'admission"
-                value={_selectedCriteria.admissionPattern}
-                onChange={(e) => _onChangeCriteriaValue('admissionPattern', e.target.value)}
-              >
-                <MenuItem value={1}>Motif d'admission A</MenuItem>
-                <MenuItem value={2}>Motif d'admission B</MenuItem>
-                <MenuItem value={3}>Motif d'admission C</MenuItem>
-              </Select>
-            </Grid>
-          </Grid>
-        </FormControl> */}
-
-        {/* <FormControl className={classes.formControl}>
-          <Grid container className={classes.selectGridContainer}>
-            <Grid item>
-              <Typography variant="h6">Type d'admission</Typography>
-            </Grid>
-
-            <Grid item>
-              <Select
-                id="type-d'admission"
-                value={_selectedCriteria.admissionType}
-                onChange={(e) => _onChangeCriteriaValue('admissionType', e.target.value)}
-              >
-                <MenuItem value={1}>Type d'admission A</MenuItem>
-                <MenuItem value={2}>Type d'admission B</MenuItem>
-                <MenuItem value={3}>Type d'admission C</MenuItem>
-              </Select>
-            </Grid>
-          </Grid>
-        </FormControl> */}
-
-        {/* <FormControl className={classes.formControl}>
-          <Grid container className={classes.selectGridContainer}>
-            <Grid item>
-              <Typography variant="h6">Provenance</Typography>
-            </Grid>
-
-            <Grid item>
-              <Select
-                id="provenance"
-                value={_selectedCriteria.origin}
-                onChange={(e) => _onChangeCriteriaValue('origin', e.target.value)}
-              >
-                <MenuItem value={1}>Provenance A</MenuItem>
-                <MenuItem value={2}>Provenance B</MenuItem>
-                <MenuItem value={3}>Provenance C</MenuItem>
-              </Select>
-            </Grid>
-          </Grid>
-        </FormControl> */}
-
         <FormControl className={classes.formControl}>
           <Autocomplete
             defaultValue={isEdition ? _selectedCriteria.fileStatus : null}
@@ -249,68 +189,6 @@ const SupportedForm = (props) => {
             onChange={(e, value) => _onChangeCriteriaValue('fileStatus', value)}
           />
         </FormControl>
-
-        {/* <FormControl className={classes.formControl}>
-          <Grid container className={classes.selectGridContainer}>
-            <Grid item>
-              <Typography variant="h6">Type de prise en charge</Typography>
-            </Grid>
-
-            <Grid item>
-              <Select
-                id="type-de-prise-en-charge"
-                value={_selectedCriteria.supportedType}
-                onChange={(e) => _onChangeCriteriaValue('supportedType', e.target.value)}
-              >
-                <MenuItem value={1}>Type de prise en charge A</MenuItem>
-                <MenuItem value={2}>Type de prise en charge B</MenuItem>
-                <MenuItem value={3}>Type de prise en charge C</MenuItem>
-              </Select>
-            </Grid>
-          </Grid>
-        </FormControl>
-
-        <FormControl className={classes.formControl}>
-          <Grid container className={classes.selectGridContainer}>
-            <Grid item>
-              <Typography variant="h6">Status vital au moment de la prise en charge</Typography>
-            </Grid>
-
-            <Grid item>
-              <Select
-                id="type-de-prise-en-charge"
-                value={_selectedCriteria.supportedStatus}
-                onChange={(e) => _onChangeCriteriaValue('supportedStatus', e.target.value)}
-              >
-                <MenuItem value={1}>Vivant</MenuItem>
-                <MenuItem value={2}>Décédé.e</MenuItem>
-                <MenuItem value={3}>Non renseigné</MenuItem>
-                <MenuItem value={4}>Inconnu</MenuItem>
-              </Select>
-            </Grid>
-          </Grid>
-        </FormControl>
-
-        <FormControl className={classes.formControl}>
-          <Grid container className={classes.selectGridContainer}>
-            <Grid item>
-              <Typography variant="h6">Status vital au moment de la prise en charge</Typography>
-            </Grid>
-
-            <Grid item>
-              <Select
-                id="type-de-prise-en-charge"
-                value={_selectedCriteria.supportedType}
-                onChange={(e) => _onChangeCriteriaValue('supportedType', e.target.value)}
-              >
-                <MenuItem value={1}>Vivant</MenuItem>
-                <MenuItem value={2}>Décédé.e</MenuItem>
-                <MenuItem value={3}>Non renseigné</MenuItem>
-                <MenuItem value={4}>Inconnu</MenuItem>
-              </Select>
-            </Grid>
-          </Grid>
-        </FormControl> */}
       </Grid>
       <Grid className={classes.criteriaActionContainer}>
         <Button onClick={goBack} color="primary" variant="outlined">
