@@ -151,7 +151,7 @@ const fetchPatientList = async (
 > => {
   if (CONTEXT === 'arkhn') {
     //TODO: Improve api request (we filter after getting all the patients)
-    const patients = await searchPatient(searchInput, searchBy, groupId)
+    const patients = await searchPatient('given', 'asc', searchInput, searchBy, groupId)
 
     if (patients) {
       const filteredPatients: IPatient[] = patients.filter((patient) => {
