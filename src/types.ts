@@ -209,14 +209,23 @@ export type CriteriaItemType = {
 }
 
 export type SelectedCriteriaType = {
-  type: string
+  type: 'Patient' | 'Encounter' | 'documents_cliniques' | 'ghm' | 'ccam' | 'cim10'
   title: string
-  code?: any
+  code?: { id: string; label: string }
+  label?: undefined
+  startOccurrence?: Date
+  endOccurrence?: Date
   gender?: { id: string; label: string }
   vitalStatus?: { id: string; label: string }
   years?: [number, number]
   search?: string
-  doc?: '55188-7' | '11336-5' | '57833-6'
-  start_occurrence: string
-  end_occurrence: string
+  docType?: '55188-7' | '11336-5' | '57833-6'
+  occurence?: number
+  ageType?: string
+  age?: [number, number]
+  duration?: [number, number]
+  admissionMode?: { id: string; label: string }
+  entryMode?: { id: string; label: string }
+  exitMode?: { id: string; label: string }
+  fileStatus?: { id: string; label: string }
 }

@@ -9,8 +9,8 @@ import useStyles from './styles'
 
 type FormData = {
   title: string
-  gender: string
-  vitalStatus: string
+  gender: { id: string; label: string }
+  vitalStatus: { id: string; label: string }
   years: [number, number]
 }
 

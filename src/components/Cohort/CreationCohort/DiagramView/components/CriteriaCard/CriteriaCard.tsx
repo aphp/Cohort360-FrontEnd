@@ -52,17 +52,17 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
   }
 
   const _displayCardContent = (_selectedCriteria: SelectedCriteriaType) => {
-    if (!_selectedCriteria || !_selectedCriteria.years) return <></>
+    if (!_selectedCriteria) return <></>
     let content = <></>
-    const startDate = _selectedCriteria.start_occurrence
-      ? moment(_selectedCriteria.start_occurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
+    const startDate = _selectedCriteria.startOccurrence
+      ? moment(_selectedCriteria.startOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
       : ''
-    const endDate = _selectedCriteria.end_occurrence
-      ? moment(_selectedCriteria.end_occurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
+    const endDate = _selectedCriteria.endOccurrence
+      ? moment(_selectedCriteria.endOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
       : ''
 
     switch (_selectedCriteria.type) {
-      case 'ghm':
+      case 'ghm': {
         content = (
           <>
             <Typography>
@@ -78,14 +78,12 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 : ''}
             </Typography>
             <Typography>
-              GHM sélectionné :
-              {_selectedCriteria.code
-                ? `"${_selectedCriteria.code['GHM CODE']} - ${_selectedCriteria.code['LONG DESCRIPTION']}"`
-                : '""'}
+              GHM sélectionné :{_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}
             </Typography>
           </>
         )
         break
+      }
       case 'ccam':
         content = (
           <>
@@ -102,25 +100,19 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 : ''}
             </Typography>
             <Typography>
-              Acte CCAM sélectionné :
-              {_selectedCriteria.code
-                ? `"${_selectedCriteria.code['CCAM CODE']} - ${_selectedCriteria.code['LONG DESCRIPTION']}"`
-                : '""'}
+              Acte CCAM sélectionné :{_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}
             </Typography>
           </>
         )
         break
-      case 'diagnostics':
+      case 'cim10':
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,
             </Typography>
             <Typography>
-              Diagnostic CIM sélectionné :
-              {_selectedCriteria.code
-                ? `"${_selectedCriteria.code['DIAGNOSIS CODE']} - ${_selectedCriteria.code['LONG DESCRIPTION']}"`
-                : '""'}
+              Diagnostic CIM sélectionné :{_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}
             </Typography>
           </>
         )
@@ -144,8 +136,8 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 ? `Fourchette d'âge comprise entre ${_selectedCriteria.years[0]} et ${_selectedCriteria.years[1]} ans ${
                     _selectedCriteria.years[1] === 100 ? 'ou plus.' : '.'
                   }`
-                : `Age sélectionné: ${_selectedCriteria.years[0]} ans ${
-                    _selectedCriteria.years[0] === 100 ? 'ou plus.' : '.'
+                : `Age sélectionné: ${_selectedCriteria.years?.[0]} ans ${
+                    _selectedCriteria.years?.[0] === 100 ? 'ou plus.' : '.'
                   }`}
             </Typography>
           </>
@@ -153,6 +145,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         break
       }
       case 'documents_cliniques': {
+        console.log('_selectedCriteria', _selectedCriteria)
         const docTypes = {
           '55188-7': 'Tout type de documents',
           '11336-5': "Comptes rendus d'hospitalisation",
@@ -164,7 +157,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
               Dans <span className={classes.criteriaType}>Document médical</span>,
             </Typography>
             <Typography>
-              Recherche textuelle "{_selectedCriteria.search}" dans {docTypes[_selectedCriteria.doc ?? '55188-7']}
+              Recherche textuelle "{_selectedCriteria.search}" dans {docTypes[_selectedCriteria.docType ?? '55188-7']}
             </Typography>
           </>
         )

@@ -10,10 +10,6 @@ import useStyles from './styles'
 type FormData = {
   title: string
   code: { id: string; label: string }[]
-  occurence: number
-  label: undefined
-  startOccurrence: Date
-  endOccurrence: Date
 }
 
 type Cim10FormProps = {
@@ -42,7 +38,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     onChangeSelectedCriteria({
       title: data.title,
       code: data.code,
-      type: 'diagnostics'
+      type: 'cim10'
     })
   }
 

@@ -78,7 +78,7 @@ const criteriaList: CriteriaItemType[] = [
     components: null,
     subItems: [
       {
-        id: 'diagnostics',
+        id: 'cim10',
         title: 'Diagnostics',
         color: '#0063AF',
         components: Cim10Form,
@@ -86,7 +86,7 @@ const criteriaList: CriteriaItemType[] = [
         fetch: {}
       },
       {
-        id: 'actes',
+        id: 'ccam',
         title: 'Actes',
         color: '#0063AF',
         components: CCAMForm,
