@@ -221,8 +221,7 @@ export type SelectedCriteriaType = {
   search?: string
   docType?: '55188-7' | '11336-5' | '57833-6'
   occurence?: number
-  ageType?: string
-  age?: [number, number]
+  ageType?: { id: string; label: string }
   duration?: [number, number]
   admissionMode?: { id: string; label: string }
   entryMode?: { id: string; label: string }

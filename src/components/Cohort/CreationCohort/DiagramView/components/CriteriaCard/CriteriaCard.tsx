@@ -84,6 +84,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         )
         break
       }
+
       case 'ccam':
         content = (
           <>
@@ -105,6 +106,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
           </>
         )
         break
+
       case 'cim10':
         content = (
           <>
@@ -117,6 +119,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
           </>
         )
         break
+
       case 'Patient': {
         content = (
           <>
@@ -144,8 +147,8 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         )
         break
       }
+
       case 'documents_cliniques': {
-        console.log('_selectedCriteria', _selectedCriteria)
         const docTypes = {
           '55188-7': 'Tout type de documents',
           '11336-5': "Comptes rendus d'hospitalisation",
@@ -159,6 +162,50 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             <Typography>
               Recherche textuelle "{_selectedCriteria.search}" dans {docTypes[_selectedCriteria.docType ?? '55188-7']}
             </Typography>
+          </>
+        )
+        break
+      }
+
+      case 'Encounter': {
+        const ageType: any = _selectedCriteria.ageType ? _selectedCriteria.ageType.id : 'year'
+        let ageUnit = 'an(s)'
+        if (ageType === 'month') ageUnit = 'mois'
+        else if (ageType === 'day') ageUnit = 'jour(s)'
+
+        content = (
+          <>
+            <Typography>
+              Dans <span className={classes.criteriaType}>Prise en charge</span>,
+            </Typography>
+            <Typography>
+              Age au moment de la prise en charge:
+              {_selectedCriteria.years && _selectedCriteria.years[0] !== _selectedCriteria.years[1]
+                ? `entre ${_selectedCriteria.years[0]} et ${_selectedCriteria.years[1]} ${ageUnit} ${
+                    _selectedCriteria.years[1] === 100 ? 'ou plus.' : '.'
+                  }`
+                : `${_selectedCriteria.years?.[0]} ${ageUnit} ${
+                    _selectedCriteria.years?.[0] === 100 ? 'ou plus.' : '.'
+                  }`}
+            </Typography>
+            <Typography>
+              Durée de la prise en charge:
+              {_selectedCriteria.duration && _selectedCriteria.duration[0] !== _selectedCriteria.duration[1]
+                ? `entre ${_selectedCriteria.duration[0]} et ${_selectedCriteria.duration[1]} jour(s) ${
+                    _selectedCriteria.duration[1] === 100 ? 'ou plus.' : '.'
+                  }`
+                : `${_selectedCriteria.duration?.[0]} jour(s) ${
+                    _selectedCriteria.duration?.[0] === 100 ? 'ou plus.' : '.'
+                  }`}
+            </Typography>
+            {_selectedCriteria.admissionMode && (
+              <Typography>Mode d'admission: {_selectedCriteria.admissionMode.label}</Typography>
+            )}
+            {_selectedCriteria.entryMode && <Typography>Mode d'entré: {_selectedCriteria.entryMode.label}</Typography>}
+            {_selectedCriteria.exitMode && <Typography>Mode de sortie: {_selectedCriteria.exitMode.label}</Typography>}
+            {_selectedCriteria.fileStatus && (
+              <Typography>Status Dossier: {_selectedCriteria.fileStatus.label}</Typography>
+            )}
           </>
         )
         break

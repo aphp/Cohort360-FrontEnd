@@ -11,7 +11,7 @@ type FormData = {
   label: undefined
   title: string
   ageType: string
-  age: [number, number]
+  years: [number, number]
   duration: [number, number]
   admissionMode: []
   entryMode: []
@@ -30,7 +30,7 @@ const defaultDemographic = {
   title: 'Critère de prise en charge',
   label: '',
   ageType: { id: 'year', label: 'En années' },
-  age: [0, 100],
+  years: [0, 100],
   duration: [0, 100],
   admissionMode: [],
   entryMode: [],
@@ -114,7 +114,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
             ]
           },
           {
-            name: 'age',
+            name: 'years',
             type: 'slider',
             minValue: 0,
             maxValue: 100
