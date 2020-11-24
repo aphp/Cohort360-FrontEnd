@@ -82,7 +82,7 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Diagnostics',
         color: '#0063AF',
         components: Cim10Form,
-        data: cimData,
+        data: { cimData },
         fetch: {}
       },
       {
@@ -90,14 +90,14 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Actes',
         color: '#0063AF',
         components: CCAMForm,
-        data: ccamData
+        data: { ccamData }
       },
       {
         id: 'ghm',
         title: 'GHM',
         color: '#0063AF',
         components: GhmForm,
-        data: ghmData
+        data: { ghmData }
       }
     ]
   },
@@ -110,14 +110,18 @@ const criteriaList: CriteriaItemType[] = [
       {
         id: 'biologie',
         title: 'Biologie',
-        components: null,
-        color: '#0063AF'
+        color: '#0063AF',
+        disabled: true,
+        data: null,
+        components: null
       },
       {
         id: 'microbiologie',
         title: 'Microbiologie',
         components: null,
-        color: '#0063AF'
+        color: '#0063AF',
+        disabled: true,
+        data: null
       }
     ]
   },
@@ -125,6 +129,8 @@ const criteriaList: CriteriaItemType[] = [
     id: 'physiologie',
     title: 'Physiologie',
     color: '#0063AF',
+    disabled: true,
+    data: null,
     components: null
   },
   {
@@ -137,7 +143,9 @@ const criteriaList: CriteriaItemType[] = [
         id: 'prescription_dispension_administration',
         title: 'Prescription - Dispension - Administration',
         components: null,
-        color: '#0063AF'
+        color: '#0063AF',
+        disabled: true,
+        data: null
       }
     ]
   }

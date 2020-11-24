@@ -126,20 +126,19 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         )
         break
       case 'Patient': {
-        console.log('_selectedCriteria', _selectedCriteria)
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Démographie Patient</span>,
             </Typography>
             <Typography>Genre sélectionné :</Typography>
-            {_selectedCriteria.gender?.map(({ display }) => (
-              <Typography key={display}>{display}</Typography>
-            ))}
+            {_selectedCriteria.gender && (
+              <Typography key={_selectedCriteria?.gender?.label}>{_selectedCriteria.gender.label}</Typography>
+            )}
             <Typography>Status vital :</Typography>
-            {_selectedCriteria.vitalStatus?.map(({ display }) => (
-              <Typography key={display}>{display}</Typography>
-            ))}
+            {_selectedCriteria.vitalStatus && (
+              <Typography key={_selectedCriteria?.vitalStatus?.label}>{_selectedCriteria.vitalStatus.label}</Typography>
+            )}
             <Typography>
               {_selectedCriteria.years && _selectedCriteria.years[0] !== _selectedCriteria.years[1]
                 ? `Fourchette d'âge comprise entre ${_selectedCriteria.years[0]} et ${_selectedCriteria.years[1]} ans ${

@@ -212,8 +212,8 @@ export type SelectedCriteriaType = {
   type: string
   title: string
   code?: any
-  gender?: [{ code: string; display: string }]
-  vitalStatus?: [{ code: string; display: string }]
+  gender?: { id: string; label: string }
+  vitalStatus?: { id: string; label: string }
   years?: [number, number]
   search?: string
   doc?: '55188-7' | '11336-5' | '57833-6'
