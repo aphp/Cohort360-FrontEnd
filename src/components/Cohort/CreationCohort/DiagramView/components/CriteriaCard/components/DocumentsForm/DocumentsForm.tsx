@@ -3,15 +3,11 @@ import React from 'react'
 import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import Form from '../../../../../../../FormBuilder/FormBuilder'
+import { FormBuilder } from '@arkhn/ui'
 
 import useStyles from './styles'
 
-type FormData = {
-  title: string
-  search: string
-  docType: string
-}
+import { DocumentDataType } from 'types'
 
 type TestGeneratedFormProps = {
   criteria: any
@@ -23,7 +19,7 @@ type TestGeneratedFormProps = {
 const defaultDemographic = {
   title: 'Critère de document',
   search: '',
-  docType: '55188-7'
+  docType: { id: '55188-7', label: 'Tout type de documents' }
 }
 
 const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
@@ -59,7 +55,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
         )}
       </Grid>
 
-      <Form<FormData>
+      <FormBuilder<DocumentDataType>
         defaultValues={defaultValues}
         title={'Documents médicaux'}
         properties={[
@@ -68,7 +64,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
             placeholder: 'Nom du critère',
             type: 'text',
             variant: 'outlined',
-            options: {
+            validationRules: {
               required: 'Merci de renseigné un titre'
             }
           },
@@ -91,19 +87,19 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
         ]}
         submit={_onSubmit}
         formId="documents-form"
-        noSubmitButton
+        formFooter={
+          <Grid className={classes.criteriaActionContainer}>
+            {!isEdition && (
+              <Button onClick={goBack} color="primary" variant="outlined">
+                Annuler
+              </Button>
+            )}
+            <Button type="submit" form="document-form" color="primary" variant="contained">
+              Confirmer
+            </Button>
+          </Grid>
+        }
       />
-
-      <Grid className={classes.criteriaActionContainer}>
-        {!isEdition && (
-          <Button onClick={goBack} color="primary" variant="outlined">
-            Annuler
-          </Button>
-        )}
-        <Button type="submit" form="documents-form" color="primary" variant="contained">
-          Confirmer
-        </Button>
-      </Grid>
     </Grid>
   )
 }

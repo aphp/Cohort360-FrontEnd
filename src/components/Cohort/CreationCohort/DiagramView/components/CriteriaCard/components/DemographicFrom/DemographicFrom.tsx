@@ -3,17 +3,11 @@ import React from 'react'
 import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import Form from '../../../../../../../FormBuilder/FormBuilder'
+import { FormBuilder } from '@arkhn/ui'
 
 import useStyles from './styles'
 
-type FormData = {
-  title: string
-  gender: { id: string; label: string }
-  vitalStatus: { id: string; label: string }
-  years: [number, number]
-}
-
+import { DemographicDataType } from 'types'
 type DemographicFormProps = {
   criteria: any
   selectedCriteria: any
@@ -23,8 +17,8 @@ type DemographicFormProps = {
 
 const defaultDemographic = {
   title: 'Critère démographique',
-  vitalStatus: [],
-  gender: [],
+  vitalStatus: null,
+  gender: null,
   years: [0, 100]
 }
 
@@ -66,7 +60,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
         )}
       </Grid>
 
-      <Form<FormData>
+      <FormBuilder<DemographicDataType>
         defaultValues={defaultValues}
         title={'Démographie patient'}
         properties={[
@@ -75,7 +69,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             placeholder: 'Nom du critère',
             type: 'text',
             variant: 'outlined',
-            options: {
+            validationRules: {
               required: 'Merci de renseigné un titre'
             }
           },
@@ -103,25 +97,25 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             name: 'years',
             label: "Fourchette d'âge",
             type: 'slider',
-            minValue: 0,
-            maxValue: 100
+            min: 0,
+            max: 100
           }
         ]}
         submit={_onSubmit}
         formId="demographic-form"
-        noSubmitButton
+        formFooter={
+          <Grid className={classes.criteriaActionContainer}>
+            {!isEdition && (
+              <Button onClick={goBack} color="primary" variant="outlined">
+                Annuler
+              </Button>
+            )}
+            <Button type="submit" form="demographic-form" color="primary" variant="contained">
+              Confirmer
+            </Button>
+          </Grid>
+        }
       />
-
-      <Grid className={classes.criteriaActionContainer}>
-        {!isEdition && (
-          <Button onClick={goBack} color="primary" variant="outlined">
-            Annuler
-          </Button>
-        )}
-        <Button type="submit" form="demographic-form" color="primary" variant="contained">
-          Confirmer
-        </Button>
-      </Grid>
     </Grid>
   )
 }

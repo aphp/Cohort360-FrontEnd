@@ -3,14 +3,11 @@ import React from 'react'
 import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import Form from '../../../../../../../FormBuilder/FormBuilder'
+import { FormBuilder } from '@arkhn/ui'
 
 import useStyles from './styles'
 
-type FormData = {
-  title: string
-  code: { id: string; label: string }[]
-}
+import { Cim10DataType } from 'types'
 
 type Cim10FormProps = {
   criteria: any
@@ -58,7 +55,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
         )}
       </Grid>
 
-      <Form<FormData>
+      <FormBuilder<Cim10DataType>
         defaultValues={defaultValues}
         title="Diagnostic"
         properties={[
@@ -67,7 +64,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             placeholder: 'Nom du critère',
             type: 'text',
             variant: 'outlined',
-            options: {
+            validationRules: {
               required: 'Merci de renseigné un titre'
             }
           },
@@ -85,19 +82,19 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
         ]}
         submit={_onSubmit}
         formId="cim10-form"
-        noSubmitButton
+        formFooter={
+          <Grid className={classes.criteriaActionContainer}>
+            {!isEdition && (
+              <Button onClick={goBack} color="primary" variant="outlined">
+                Annuler
+              </Button>
+            )}
+            <Button type="submit" form="cim10-form" color="primary" variant="contained">
+              Confirmer
+            </Button>
+          </Grid>
+        }
       />
-
-      <Grid className={classes.criteriaActionContainer}>
-        {!isEdition && (
-          <Button onClick={goBack} color="primary" variant="outlined">
-            Annuler
-          </Button>
-        )}
-        <Button type="submit" form="cim10-form" color="primary" variant="contained">
-          Confirmer
-        </Button>
-      </Grid>
     </Grid>
   )
 }

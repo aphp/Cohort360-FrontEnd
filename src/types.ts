@@ -228,3 +228,50 @@ export type SelectedCriteriaType = {
   exitMode?: { id: string; label: string }
   fileStatus?: { id: string; label: string }
 }
+
+export type CcamDataType = {
+  title: string
+  code: { id: string; label: string } | null
+  label: undefined
+  startOccurrence: Date
+  endOccurrence: Date
+}
+
+export type Cim10DataType = {
+  title: string
+  code: { id: string; label: string } | null
+}
+
+export type DemographicDataType = {
+  title: string
+  gender: { id: string; label: string } | null
+  vitalStatus: { id: string; label: string } | null
+  years: [number, number]
+}
+
+export type DocumentDataType = {
+  title: string
+  search: string
+  docType: { id: string; label: string } | null
+}
+
+export type GhmDataType = {
+  title: string
+  code: { id: string; label: string } | null
+  occurence: number
+  label: undefined
+  startOccurrence: Date
+  endOccurrence: Date
+}
+
+export type EncounterDataType = {
+  label: undefined
+  title: string
+  ageType: string
+  years: [number, number]
+  duration: [number, number]
+  admissionMode: { id: string; label: string } | null
+  entryMode: { id: string; label: string } | null
+  exitMode: { id: string; label: string } | null
+  fileStatus: { id: string; label: string } | null
+}

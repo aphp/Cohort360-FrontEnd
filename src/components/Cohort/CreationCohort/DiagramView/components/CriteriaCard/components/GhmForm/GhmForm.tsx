@@ -1,20 +1,13 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import Form from '../../../../../../../FormBuilder/FormBuilder'
+import { FormBuilder } from '@arkhn/ui'
 
 import useStyles from './styles'
 
-type FormData = {
-  title: string
-  code: { id: string; label: string }[]
-  occurence: number
-  label: undefined
-  startOccurrence: Date
-  endOccurrence: Date
-}
+import { GhmDataType } from 'types'
 
 type TestGeneratedFormProps = {
   criteria: any
@@ -65,7 +58,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
         )}
       </Grid>
 
-      <Form<FormData>
+      <FormBuilder<GhmDataType>
         defaultValues={defaultValues}
         title="Diagnostic"
         properties={[
@@ -74,7 +67,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
             placeholder: 'Nom du critère',
             type: 'text',
             variant: 'outlined',
-            options: {
+            validationRules: {
               required: 'Merci de renseigné un titre'
             }
           },
@@ -95,9 +88,9 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
             type: 'number'
           },
           {
+            type: 'custom',
             name: 'label',
-            label: "Date d'occurrence :",
-            type: 'label'
+            renderInput: () => <FormLabel component="legend">Date d'occurrence :</FormLabel>
           },
           {
             name: 'startOccurrence',
@@ -112,19 +105,19 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
         ]}
         submit={_onSubmit}
         formId="ghm-form"
-        noSubmitButton
+        formFooter={
+          <Grid className={classes.criteriaActionContainer}>
+            {!isEdition && (
+              <Button onClick={goBack} color="primary" variant="outlined">
+                Annuler
+              </Button>
+            )}
+            <Button type="submit" form="ghm-form" color="primary" variant="contained">
+              Confirmer
+            </Button>
+          </Grid>
+        }
       />
-
-      <Grid className={classes.criteriaActionContainer}>
-        {!isEdition && (
-          <Button onClick={goBack} color="primary" variant="outlined">
-            Annuler
-          </Button>
-        )}
-        <Button type="submit" form="ghm-form" color="primary" variant="contained">
-          Confirmer
-        </Button>
-      </Grid>
     </Grid>
   )
 }

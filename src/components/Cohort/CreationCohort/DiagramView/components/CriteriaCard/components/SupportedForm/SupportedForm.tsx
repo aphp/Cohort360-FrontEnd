@@ -1,23 +1,13 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import Form from '../../../../../../../FormBuilder/FormBuilder'
+import { FormBuilder } from '@arkhn/ui'
 
 import useStyles from './styles'
 
-type FormData = {
-  label: undefined
-  title: string
-  ageType: string
-  years: [number, number]
-  duration: [number, number]
-  admissionMode: []
-  entryMode: []
-  exitMode: []
-  fileStatus: []
-}
+import { EncounterDataType } from 'types'
 
 type SupportedFormFormProps = {
   criteria: any
@@ -32,10 +22,10 @@ const defaultDemographic = {
   ageType: { id: 'year', label: 'En années' },
   years: [0, 100],
   duration: [0, 100],
-  admissionMode: [],
-  entryMode: [],
-  exitMode: [],
-  fileStatus: []
+  admissionMode: null,
+  entryMode: null,
+  exitMode: null,
+  fileStatus: null
 }
 
 const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
@@ -50,7 +40,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
     onChangeSelectedCriteria({
       title: data.title,
       ageType: data.ageType,
-      age: data.age,
+      years: data.years,
       duration: data.duration,
       admissionMode: data.admissionMode,
       entryMode: data.entryMode,
@@ -85,7 +75,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
         )}
       </Grid>
 
-      <Form<FormData>
+      <FormBuilder<EncounterDataType>
         defaultValues={defaultValues}
         title="Prise en charge"
         properties={[
@@ -94,14 +84,14 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
             placeholder: 'Nom du critère',
             type: 'text',
             variant: 'outlined',
-            options: {
+            validationRules: {
               required: 'Merci de renseigné un titre'
             }
           },
           {
+            type: 'custom',
             name: 'label',
-            type: 'label',
-            label: 'Age au moment de la prise en charge'
+            renderInput: () => <FormLabel component="legend">Age au moment de la prise en charge :</FormLabel>
           },
           {
             name: 'ageType',
@@ -116,15 +106,15 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
           {
             name: 'years',
             type: 'slider',
-            minValue: 0,
-            maxValue: 100
+            min: 0,
+            max: 100
           },
           {
             label: 'Durée de la prise en charge',
             name: 'duration',
             type: 'slider',
-            minValue: 0,
-            maxValue: 100
+            min: 0,
+            max: 100
           },
           {
             name: 'admissionMode',
@@ -169,19 +159,19 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
         ]}
         submit={_onSubmit}
         formId="supported-form"
-        noSubmitButton
+        formFooter={
+          <Grid className={classes.criteriaActionContainer}>
+            {!isEdition && (
+              <Button onClick={goBack} color="primary" variant="outlined">
+                Annuler
+              </Button>
+            )}
+            <Button type="submit" form="supported-form" color="primary" variant="contained">
+              Confirmer
+            </Button>
+          </Grid>
+        }
       />
-
-      <Grid className={classes.criteriaActionContainer}>
-        {!isEdition && (
-          <Button onClick={goBack} color="primary" variant="outlined">
-            Annuler
-          </Button>
-        )}
-        <Button type="submit" form="supported-form" color="primary" variant="contained">
-          Confirmer
-        </Button>
-      </Grid>
     </Grid>
   )
 }
