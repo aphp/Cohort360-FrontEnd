@@ -183,6 +183,8 @@ export const fetchPMSI = async (
   searchInput: string,
   nda: string,
   code: string,
+  sortBy: string,
+  sortDirection: string,
   startDate?: string,
   endDate?: string
 ): Promise<{
@@ -248,6 +250,8 @@ export const fetchPMSI = async (
     let ndaFilter = ''
     let codeName = ''
     let codeFilter = ''
+    let _sortBy = sortBy
+    const _sortDirection = sortDirection === 'desc' ? '-' : ''
     let dateFilter = ''
 
     switch (selectedTab) {
@@ -270,6 +274,12 @@ export const fetchPMSI = async (
         resource = '/Condition'
         dateName = 'recorded-date'
         codeName = 'code'
+    }
+
+    if (sortBy === 'date') {
+      _sortBy = dateName
+    } else if (sortBy === 'code') {
+      _sortBy = codeName
     }
 
     if (searchInput) {
@@ -295,7 +305,7 @@ export const fetchPMSI = async (
     }
 
     const pmsiResp = await api.get<FHIR_API_Response<IClaim | IProcedure | ICondition>>(
-      `${resource}?patient=${patientId}&_sort=-${dateName}&size=20&offset=${
+      `${resource}?patient=${patientId}&_sort=${_sortDirection}${_sortBy}&size=20&offset=${
         (page - 1) * 20
       }${search}${ndaFilter}${codeFilter}${dateFilter}`
     )
@@ -318,6 +328,8 @@ export const fetchPMSI = async (
 
 export const fetchDocuments = async (
   deidentified: boolean,
+  sortBy: string,
+  sortDirection: string,
   page: number,
   patientId: string,
   searchInput: string,
@@ -327,6 +339,7 @@ export const fetchDocuments = async (
   endDate?: string
 ) => {
   if (CONTEXT === 'aphp') {
+    const _sortDirection = sortDirection === 'desc' ? '-' : ''
     let search = ''
     let docTypesFilter = ''
     let ndaFilter = ''
@@ -360,7 +373,7 @@ export const fetchDocuments = async (
     }
 
     const docsList = await api.get(
-      `/Composition?patient=${patientId}&_sort=-date&size=20&offset=${
+      `/Composition?patient=${patientId}&_sort=${_sortDirection}${sortBy}&size=20&offset=${
         page ? (page - 1) * 20 : 0
       }&status=final${elements}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
     )

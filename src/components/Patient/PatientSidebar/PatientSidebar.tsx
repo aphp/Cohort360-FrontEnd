@@ -36,6 +36,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   const [page, setPage] = useState(1)
   const [totalPatients, setTotalPatients] = useState(total)
   const [patientsList, setPatientsList] = useState(patients)
+
   const [open, setOpen] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [searchBy, setSearchBy] = useState(SearchByTypes.text)
@@ -44,11 +45,15 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   const [age, setAge] = useState<[number, number]>([0, 130])
   const [vitalStatus, setVitalStatus] = useState(VitalStatus.all)
 
+  const [openSort, setOpenSort] = useState(false)
+  const [sortBy, setSortBy] = useState('given')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+
   const numberOfRows = 20 // Number of desired lines in the document array
 
-  const onSearchPatient = (value = 1) => {
+  const onSearchPatient = (newSortBy: string, newSortDirection: 'asc' | 'desc', value = 1) => {
     setLoadingStatus(true)
-    fetchPatientList(value, searchBy, searchInput, gender, age, vitalStatus, groupId)
+    fetchPatientList(value, searchBy, searchInput, gender, age, vitalStatus, newSortBy, newSortDirection, groupId)
       .then((patientsResp) => {
         setPatientsList(patientsResp?.originalPatients ?? [])
         setTotalPatients(patientsResp?.totalPatients ?? 0)
@@ -67,13 +72,13 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   const onKeyDown = (e: { keyCode: number; preventDefault: () => void }) => {
     if (e.keyCode === 13) {
       e.preventDefault()
-      onSearchPatient()
+      onSearchPatient(sortBy, sortDirection)
     }
   }
 
   const handleChangePage = (event: React.ChangeEvent<unknown>, page: number) => {
     if (patientsList && patientsList.length < totalPatients) {
-      onSearchPatient(page)
+      onSearchPatient(sortBy, sortDirection, page)
     } else {
       setPage(page)
     }
@@ -81,7 +86,12 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
-    submit && onSearchPatient()
+    submit && onSearchPatient(sortBy, sortDirection)
+  }
+
+  const handleCloseSortDialog = (submitSort: boolean) => () => {
+    setOpenSort(false)
+    submitSort && onSearchPatient(sortBy, sortDirection)
   }
 
   const patientsToDisplay =
@@ -104,7 +114,8 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
         onKeyDownSearchInput={onKeyDown}
         searchBy={searchBy}
         onChangeSelect={setSearchBy}
-        onSearchPatient={onSearchPatient}
+        onSearchPatient={() => onSearchPatient(sortBy, sortDirection)}
+        // filter dialog props
         onClickFilterButton={() => setOpen(true)}
         open={open}
         onCloseFilterDialog={handleCloseDialog(false)}
@@ -115,6 +126,15 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
         onChangeAge={setAge}
         vitalStatus={vitalStatus}
         onChangeVitalStatus={setVitalStatus}
+        // sort dialog props
+        onClickSortButton={() => setOpenSort(true)}
+        openSort={openSort}
+        onCloseSort={handleCloseSortDialog(false)}
+        onSubmitSort={handleCloseSortDialog(true)}
+        sortBy={sortBy}
+        onChangeSortBy={setSortBy}
+        sortDirection={sortDirection}
+        onChangeSortDirection={setSortDirection}
       />
       <Divider />
       <List className={classes.patientList} disablePadding>

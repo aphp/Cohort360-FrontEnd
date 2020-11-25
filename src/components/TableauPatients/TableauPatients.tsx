@@ -65,6 +65,7 @@ type TableauPatientsProps = {
   totalPatientCount: number
   sortBy: string
   sortDirection: 'asc' | 'desc'
+  onRequestSort: any
 }
 const TableauPatients: React.FC<TableauPatientsProps> = memo(
   ({
@@ -76,7 +77,8 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
     totalPatientCount,
     rowsPerPage = 20,
     sortBy,
-    sortDirection
+    sortDirection,
+    onRequestSort
   }) => {
     const history = useHistory()
     const classes = useStyles()
@@ -86,6 +88,10 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
         ? patients.slice((page - 1) * rowsPerPage, (page - 1) * rowsPerPage + rowsPerPage)
         : patients
 
+    const createSortHandler = (property: any) => (event: React.MouseEvent<unknown>) => {
+      onRequestSort(event, property)
+    }
+
     return loading ? (
       <CircularProgress className={classes.loadingSpinner} size={50} />
     ) : (
@@ -94,35 +100,64 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
           <Table className={classes.table} aria-label="customized table">
             <TableHead>
               <TableRow className={classes.tableHead}>
-                <TableCell align="center" className={classes.tableHeadCell}>
+                <TableCell
+                  sortDirection={sortBy === 'gender' ? sortDirection : false}
+                  align="center"
+                  className={classes.tableHeadCell}
+                >
                   <TableSortLabel
-                    // direction={orderBy === headCell.id ? order : 'asc'}
-                    // onClick={createSortHandler(headCell.id)}
                     active={sortBy === 'gender'}
-                    direction={sortDirection}
+                    direction={sortBy === 'gender' ? sortDirection : 'asc'}
+                    onClick={createSortHandler('gender')}
                   >
                     Sexe
                   </TableSortLabel>
                 </TableCell>
-                <TableCell className={classes.tableHeadCell}>
-                  <TableSortLabel
-                    active={sortBy === 'given'}
-                    direction={sortDirection}
-                    onClick={(e) => console.log(e.target)}
-                  >
-                    Prénom
-                  </TableSortLabel>
+                <TableCell sortDirection={sortBy === 'given' ? sortDirection : false} className={classes.tableHeadCell}>
+                  {deidentified ? (
+                    'Prénom'
+                  ) : (
+                    <TableSortLabel
+                      active={sortBy === 'given'}
+                      direction={sortBy === 'given' ? sortDirection : 'asc'}
+                      onClick={createSortHandler('given')}
+                    >
+                      Prénom
+                    </TableSortLabel>
+                  )}
                 </TableCell>
-                <TableCell className={classes.tableHeadCell}>
-                  <TableSortLabel active={sortBy === 'family'} direction={sortDirection}>
-                    Nom
-                  </TableSortLabel>
+                <TableCell
+                  sortDirection={sortBy === 'family' ? sortDirection : false}
+                  className={classes.tableHeadCell}
+                >
+                  {deidentified ? (
+                    'Nom'
+                  ) : (
+                    <TableSortLabel
+                      active={sortBy === 'family'}
+                      direction={sortBy === 'family' ? sortDirection : 'asc'}
+                      onClick={createSortHandler('family')}
+                    >
+                      Nom
+                    </TableSortLabel>
+                  )}
                 </TableCell>
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  {deidentified ? 'Âge' : 'Date de naissance'}
-                  <TableSortLabel active={sortBy === 'birthdate'} direction={sortDirection}>
-                    Date de naissance
-                  </TableSortLabel>
+                <TableCell
+                  sortDirection={sortBy === 'birthdate' ? sortDirection : false}
+                  align="center"
+                  className={classes.tableHeadCell}
+                >
+                  {deidentified ? (
+                    'Âge'
+                  ) : (
+                    <TableSortLabel
+                      active={sortBy === 'birthdate'}
+                      direction={sortBy === 'birthdate' ? sortDirection : 'asc'}
+                      onClick={createSortHandler('birthdate')}
+                    >
+                      Date de naissance
+                    </TableSortLabel>
+                  )}
                 </TableCell>
                 <TableCell className={classes.tableHeadCell}>Dernier lieu de prise en charge</TableCell>
                 <TableCell className={classes.tableHeadCell}>Statut vital</TableCell>

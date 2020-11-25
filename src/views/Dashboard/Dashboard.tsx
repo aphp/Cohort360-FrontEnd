@@ -251,7 +251,12 @@ const Dashboard: React.FC<{
               />
             )}
             {selectedTab === 'documents' && (
-              <CohortDocuments groupId={cohortId || perimetreIds} deidentifiedBoolean={deidentifiedBoolean} />
+              <CohortDocuments
+                groupId={cohortId || perimetreIds}
+                deidentifiedBoolean={deidentifiedBoolean}
+                sortBy={'date'}
+                sortDirection={'desc'}
+              />
             )}
             {CONTEXT === 'arkhn' && selectedTab === 'inclusion-exclusion' && (
               <InclusionExclusionPatientsPanel cohort={dashboard} loading={false} />

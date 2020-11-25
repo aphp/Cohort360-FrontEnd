@@ -1,6 +1,16 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 
-import { Button, Divider, FormControl, Grid, IconButton, InputBase, TextField, Typography } from '@material-ui/core'
+import {
+  Button,
+  Divider,
+  FormControl,
+  Grid,
+  IconButton,
+  InputBase,
+  TextField,
+  Typography,
+  CircularProgress
+} from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
@@ -13,6 +23,8 @@ const ERROR_CODE = 'error_code'
 const defaultDocuments = {
   title: 'Critère de diagnostic',
   code: '',
+  kind: '',
+  status: '',
   type: 'diagnostics'
 }
 
@@ -25,23 +37,6 @@ const Cim10Form = (props) => {
   const [_selectedCriteria, onChangeCriteria] = useState(selectedCriteria ?? defaultDocuments)
   const [error, setError] = useState(null)
 
-  const [searchValue, setSearchValue] = useState('')
-  const [CIMData, setCIMData] = useState(criteria?.data)
-
-  useEffect(() => {
-    const _searchValue = searchValue ? searchValue.toLowerCase() : ''
-
-    const filteredCimData = criteria?.data
-      .filter(
-        (data) =>
-          data['DIAGNOSIS CODE'].toLowerCase().startsWith(_searchValue) ||
-          data['LONG DESCRIPTION'].toLowerCase().startsWith(_searchValue) ||
-          `${data['DIAGNOSIS CODE']} - ${data['LONG DESCRIPTION']}`.toLowerCase().startsWith(_searchValue)
-      )
-      .slice(0, 200)
-    setCIMData(filteredCimData)
-  }, [searchValue]); // eslint-disable-line
-
   const _onChangeCriteriaValue = (key, value) => {
     if (error) setError(null)
 
@@ -52,9 +47,20 @@ const Cim10Form = (props) => {
 
   const _onSubmit = () => {
     if (!_selectedCriteria.title) return setError(ERROR_TITLE)
-    if (!_selectedCriteria.code) return setError(ERROR_CODE)
 
     onChangeSelectedCriteria(_selectedCriteria)
+  }
+
+  if (
+    criteria.data.cim10Diagnostic === 'loading' ||
+    criteria.data.kindDiagnostic === 'loading' ||
+    criteria.data.statusDiagnostic === 'loading'
+  ) {
+    return (
+      <Grid className={classes.root}>
+        <CircularProgress />
+      </Grid>
+    )
   }
 
   return (
@@ -92,7 +98,7 @@ const Cim10Form = (props) => {
         <FormControl className={classes.formControl}>
           <Autocomplete
             defaultValue={isEdition ? _selectedCriteria.code : null}
-            options={CIMData}
+            options={criteria.data.cim10Diagnostic}
             getOptionLabel={(option) => `${option['DIAGNOSIS CODE']} - ${option['LONG DESCRIPTION']}`}
             renderInput={(params) => (
               <TextField
@@ -104,7 +110,40 @@ const Cim10Form = (props) => {
               />
             )}
             onChange={(e, value) => _onChangeCriteriaValue('code', value)}
-            onInputChange={(event, value) => setSearchValue(value)}
+          />
+        </FormControl>
+
+        <FormControl className={classes.formControl}>
+          <Autocomplete
+            defaultValue={isEdition ? _selectedCriteria.kind : null}
+            options={criteria.data.kindDiagnostic}
+            getOptionLabel={(option) => `${option['code']} - ${option['display']}`}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                placeholder="Type de diagnostique"
+                classes={{ error: classes.inputTextError }}
+                error={error === ERROR_CODE}
+              />
+            )}
+          />
+        </FormControl>
+
+        <FormControl className={classes.formControl}>
+          <Autocomplete
+            defaultValue={isEdition ? _selectedCriteria.status : null}
+            options={criteria.data.statusDiagnostic}
+            getOptionLabel={(option) => `${option['code']} - ${option['display']}`}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                placeholder="Status du diagnostique"
+                classes={{ error: classes.inputTextError }}
+                error={error === ERROR_CODE}
+              />
+            )}
           />
         </FormControl>
       </Grid>

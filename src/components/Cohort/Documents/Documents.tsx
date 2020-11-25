@@ -3,10 +3,14 @@ import React, { useState, useEffect } from 'react'
 import {
   Button,
   CssBaseline,
+  FormControlLabel,
   Grid,
   IconButton,
   InputBase,
   // Paper,
+  Radio,
+  RadioGroup,
+  TextField,
   Typography
 } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
@@ -29,13 +33,16 @@ import {
 
 import useStyles from './styles'
 import { useAppSelector } from 'state'
+import { Autocomplete } from '@material-ui/lab'
 
 type DocumentsProps = {
   groupId?: string
   deidentifiedBoolean: boolean
+  sortBy: string
+  sortDirection: 'asc' | 'desc'
 }
 
-const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) => {
+const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sortBy, sortDirection }) => {
   const classes = useStyles()
   const encounters = useAppSelector((state) => state.exploredCohort.encounters)
   const [page, setPage] = useState(1)
@@ -52,10 +59,17 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   const [selectedDocTypes, setSelectedDocTypes] = useState(['all'])
   const [startDate, setStartDate] = useState<string | undefined>(undefined)
   const [endDate, setEndDate] = useState<string | undefined>(undefined)
+  const [_sortBy, setSortBy] = useState(sortBy)
+  const [_sortDirection, setSortDirection] = useState(sortDirection)
 
   const documentLines = 20
 
-  const onSearchDocument = (page = 1) => {
+  const sortByNames = [
+    { label: 'Date', code: 'date' },
+    { label: 'Type de document', code: 'type' }
+  ]
+
+  const onSearchDocument = (sortBy: string, sortDirection: 'asc' | 'desc', page = 1) => {
     if (searchInput !== '') {
       setSearchMode(true)
     } else {
@@ -64,6 +78,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     setLoadingStatus(true)
     fetchDocuments(
       deidentifiedBoolean,
+      sortBy,
+      sortDirection,
       page,
       searchInput,
       selectedDocTypes,
@@ -102,7 +118,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
-    submit && onSearchDocument()
+    submit && onSearchDocument(_sortBy, _sortDirection)
   }
 
   const handleChangeInput = (event: any) => {
@@ -112,12 +128,32 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   const onKeyDown = async (e: any) => {
     if (e.keyCode === 13) {
       e.preventDefault()
-      onSearchDocument()
+      onSearchDocument(_sortBy, _sortDirection)
+    }
+  }
+
+  const onChangeSortBy = (
+    event: React.ChangeEvent<{}>,
+    value: {
+      label: string
+      code: string
+    } | null
+  ) => {
+    if (value) {
+      setSortBy(value.code)
+      onSearchDocument(value.code, _sortDirection)
+    }
+  }
+
+  const onChangeSortDirection = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
+    if (value === 'asc' || value === 'desc') {
+      setSortDirection(value)
+      onSearchDocument(_sortBy, value)
     }
   }
 
   useEffect(() => {
-    onSearchDocument()
+    onSearchDocument(_sortBy, _sortDirection)
   }, []) // eslint-disable-line
 
   const documentsToDisplay =
@@ -151,33 +187,56 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
             <Typography variant="button">
               {documentsNumber} / {allDocumentsNumber} document(s)
             </Typography>
-            <div className={classes.documentButtons}>
-              <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
-                <InputBase
-                  placeholder="Rechercher"
-                  className={classes.input}
-                  value={searchInput}
-                  onChange={handleChangeInput}
-                  onKeyDown={onKeyDown}
-                />
-                <IconButton type="submit" aria-label="search" onClick={() => onSearchDocument()}>
-                  <SearchIcon fill="#ED6D91" height="15px" />
+            <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
+              <div className={classes.documentButtons}>
+                <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
+                  <InputBase
+                    placeholder="Rechercher"
+                    className={classes.input}
+                    value={searchInput}
+                    onChange={handleChangeInput}
+                    onKeyDown={onKeyDown}
+                  />
+                  <IconButton
+                    type="submit"
+                    aria-label="search"
+                    onClick={() => onSearchDocument(_sortBy, _sortDirection)}
+                  >
+                    <SearchIcon fill="#ED6D91" height="15px" />
+                  </IconButton>
+                </Grid>
+                <IconButton type="submit" onClick={() => setHelpOpen(true)}>
+                  <InfoIcon />
                 </IconButton>
-              </Grid>
-              <IconButton type="submit" onClick={() => setHelpOpen(true)}>
-                <InfoIcon />
-              </IconButton>
-              <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
-              <Button
-                variant="contained"
-                disableElevation
-                onClick={handleOpenDialog}
-                startIcon={<FilterList height="15px" fill="#FFF" />}
-                className={classes.searchButton}
+                <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+                <Button
+                  variant="contained"
+                  disableElevation
+                  onClick={handleOpenDialog}
+                  startIcon={<FilterList height="15px" fill="#FFF" />}
+                  className={classes.searchButton}
+                >
+                  Filtrer
+                </Button>
+              </div>
+              <Autocomplete
+                options={sortByNames}
+                getOptionLabel={(option) => option.label}
+                value={sortByNames.find((value) => value.code === _sortBy)}
+                renderInput={(params) => <TextField {...params} label="Trier par :" variant="outlined" />}
+                onChange={onChangeSortBy}
+                className={classes.autocomplete}
+              />
+              <Typography variant="button">Ordre :</Typography>
+              <RadioGroup
+                value={_sortDirection}
+                onChange={onChangeSortDirection}
+                classes={{ root: classes.radioGroup }}
               >
-                Filtrer
-              </Button>
-            </div>
+                <FormControlLabel value="asc" control={<Radio />} label="Croissant" />
+                <FormControlLabel value="desc" control={<Radio />} label="Décroissant" />
+              </RadioGroup>
+            </Grid>
           </Grid>
           <DocumentList
             loading={loadingStatus ?? false}
@@ -193,7 +252,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
             shape="rounded"
             onChange={(event, page) => {
               if (documents.length <= documentLines) {
-                onSearchDocument(page)
+                onSearchDocument(_sortBy, _sortDirection, page)
               } else {
                 setPage(page)
               }

@@ -62,9 +62,20 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
     setOpen(true)
   }
 
-  const fetchPatients = (pageValue = 1) => {
+  const fetchPatients = (sortBy: string, sortDirection: string, pageValue = 1) => {
     setLoadingStatus(true)
-    fetchPatientList(pageValue, searchBy, searchInput, gender, age, vitalStatus, groupId, includeFacets)
+    fetchPatientList(
+      pageValue,
+      searchBy,
+      searchInput,
+      gender,
+      age,
+      vitalStatus,
+      sortBy,
+      sortDirection,
+      groupId,
+      includeFacets
+    )
       .then((result) => {
         if (result) {
           const { totalPatients, originalPatients, genderRepartitionMap, agePyramidData } = result
@@ -80,9 +91,9 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
       })
   }
 
-  const onSearchPatient = () => {
+  const onSearchPatient = (sortBy = 'given', sortDirection = 'asc') => {
     setPage(1)
-    fetchPatients()
+    fetchPatients(sortBy, sortDirection)
   }
 
   const handleCloseDialog = (submit: boolean) => () => {
@@ -107,7 +118,7 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
     setPage(value)
     //We only fetch patients if we don't already have them
     if (totalPatients > patients.length) {
-      fetchPatients(value)
+      fetchPatients(sortBy, sortDirection, value)
     }
   }
 
@@ -116,6 +127,15 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
       e.preventDefault()
       onSearchPatient()
     }
+  }
+
+  const handleRequestSort = (event: React.MouseEvent<unknown>, property: any) => {
+    const isAsc: boolean = sortBy === property && sortDirection === 'asc'
+    const _sortDirection = isAsc ? 'desc' : 'asc'
+
+    setSortDirection(_sortDirection)
+    setSortBy(property)
+    onSearchPatient(property, _sortDirection)
   }
 
   return (
@@ -184,7 +204,11 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
                       onChange={handleChangeInput}
                       onKeyDown={onKeyDown}
                     />
-                    <IconButton type="submit" aria-label="search" onClick={onSearchPatient}>
+                    <IconButton
+                      type="submit"
+                      aria-label="search"
+                      onClick={() => onSearchPatient(sortBy, sortDirection)}
+                    >
                       <SearchIcon fill="#ED6D91" height="15px" />
                     </IconButton>
                   </Grid>
@@ -220,7 +244,8 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
             page={page}
             totalPatientCount={totalPatients}
             sortBy={sortBy}
-            sortDirection={'asc'}
+            sortDirection={sortDirection}
+            onRequestSort={handleRequestSort}
           />
         </Grid>
       </Grid>

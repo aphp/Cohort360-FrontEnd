@@ -6,7 +6,13 @@ import { FHIR_API_Response, SearchByTypes } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import { getServices } from './perimeters'
 
-export const searchPatient = async (input: string, searchBy: SearchByTypes, groupId?: string) => {
+export const searchPatient = async (
+  sortBy: string,
+  sortDirection: string,
+  input: string,
+  searchBy: SearchByTypes,
+  groupId?: string
+) => {
   const patientSet: Set<IPatient> = new Set()
 
   if (CONTEXT === 'arkhn') {
@@ -73,8 +79,10 @@ export const searchPatient = async (input: string, searchBy: SearchByTypes, grou
 
     return [...patientSet]
   } else if (CONTEXT === 'aphp') {
+    const _sortDirection = sortDirection === 'desc' ? '-' : ''
+
     const patientList = await api.get<FHIR_API_Response<IPatient>>(
-      `/Patient?${searchBy}=${input}&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension`
+      `/Patient?_sort=${_sortDirection}${sortBy}&${searchBy}=${input}&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension`
     )
 
     if (patientList.data.resourceType === 'OperationOutcome') return

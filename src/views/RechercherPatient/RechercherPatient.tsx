@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
+import { useAppSelector } from 'state'
 import { useDispatch } from 'react-redux'
-import TableauPatients from '../../components/TableauPatients/TableauPatients'
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
-import CircularProgress from '@material-ui/core/CircularProgress'
 import { withRouter, useParams } from 'react-router'
 
+import { CircularProgress, Grid, Typography } from '@material-ui/core'
+
 import PatientSearchBar from '../../components/PatientSearchBar/PatientSearchBar'
+import TableauPatients from '../../components/TableauPatients/TableauPatients'
+
 import { searchPatient } from '../../services/searchPatient'
+import { setExploredCohort } from '../../state/exploredCohort'
+
+import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { SearchByTypes } from 'types'
 
 import useStyles from './styles'
-import { setExploredCohort } from '../../state/exploredCohort'
-import { useAppSelector } from 'state'
-import { SearchByTypes } from 'types'
-import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 const RechercherPatient: React.FC<{}> = () => {
   const classes = useStyles()
@@ -24,13 +25,14 @@ const RechercherPatient: React.FC<{}> = () => {
   const [showTable, setShowTable] = useState(false)
   const [patientResults, setPatientResults] = useState<IPatient[]>([])
   const [loading, setLoading] = useState(false)
-  const [sortBy, setSortBy] = useState('given') // eslint-disable-line
-  // const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+  const [sortBy, setSortBy] = useState('given')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [page, setPage] = useState(1)
+  const [searchInput, setSearchInput] = useState(search ?? '')
 
-  const performQueries = (input: string, searchBy = SearchByTypes.text) => {
+  const performQueries = (sortBy: string, sortDirection: string, input: string, searchBy = SearchByTypes.text) => {
     setLoading(true)
-    searchPatient(input, searchBy).then((results) => {
+    searchPatient(sortBy, sortDirection, input, searchBy).then((results) => {
       if (Array.isArray(results)) {
         setPatientResults(results)
         setShowTable(true)
@@ -43,15 +45,24 @@ const RechercherPatient: React.FC<{}> = () => {
     setPage(page)
   }
 
+  const handleRequestSort = (event: React.MouseEvent<unknown>, property: any) => {
+    const isAsc: boolean = sortBy === property && sortDirection === 'asc'
+    const _sortDirection = isAsc ? 'desc' : 'asc'
+
+    setSortDirection(_sortDirection)
+    setSortBy(property)
+    performQueries(property, _sortDirection, searchInput)
+  }
+
   useEffect(() => {
     dispatch(setExploredCohort())
   }, []) // eslint-disable-line
 
   useEffect(() => {
     if (search) {
-      performQueries(search)
+      performQueries(sortBy, sortDirection, search)
     }
-  }, [search])
+  }, [search]) // eslint-disable-line
 
   const open = useAppSelector((state) => state.drawer)
 
@@ -68,7 +79,12 @@ const RechercherPatient: React.FC<{}> = () => {
           <Typography variant="h1" color="primary" className={classes.title}>
             Rechercher un patient
           </Typography>
-          <PatientSearchBar performQueries={performQueries} showSelect={true} />
+          <PatientSearchBar
+            performQueries={performQueries}
+            showSelect={true}
+            searchInput={searchInput}
+            onChangeInput={setSearchInput}
+          />
           {loading && (
             <Grid container item justify="center">
               <CircularProgress />
@@ -82,6 +98,7 @@ const RechercherPatient: React.FC<{}> = () => {
               totalPatientCount={patientResults.length}
               sortBy={sortBy}
               sortDirection={'asc'}
+              onRequestSort={handleRequestSort}
             />
           )}
         </Grid>

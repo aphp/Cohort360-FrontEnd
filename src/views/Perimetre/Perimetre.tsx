@@ -168,7 +168,12 @@ const Perimetre: React.FC<{}> = () => {
               />
             )}
             {selectedTab === 'documents' && (
-              <PerimetersDocuments groupId={perimetreIds} deidentifiedBoolean={deidentifiedBoolean} />
+              <PerimetersDocuments
+                groupId={perimetreIds}
+                deidentifiedBoolean={deidentifiedBoolean}
+                sortBy={'date'}
+                sortDirection={'desc'}
+              />
             )}
           </>
         )}
