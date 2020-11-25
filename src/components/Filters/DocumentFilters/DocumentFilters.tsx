@@ -56,14 +56,16 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
 
   const _onChangeSelectedDocTypes = (
     event: React.ChangeEvent<{}>,
-    value: {
-      type: string
-      label: string
-      code: string
-    }[]
+    value:
+      | {
+          type: string
+          label: string
+          code: string
+        }[]
+      | null
     // reason: AutocompleteChangeReason
   ) => {
-    onChangeSelectedDocTypes(value.map((value) => value.code))
+    if (value) onChangeSelectedDocTypes(value.map((value) => value.code))
   }
 
   // const _onChangeSelectedDocTypes = (
