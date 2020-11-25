@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles'
 export default makeStyles((theme) => ({
   root: {
     display: 'flex',
-    paddingLeft: theme.spacing(2),
+    padding: '0 8px',
     flexDirection: 'column'
   },
   searchBar: {
@@ -17,12 +17,15 @@ export default makeStyles((theme) => ({
     marginLeft: theme.spacing(1),
     flex: 1
   },
-  searchButton: {
-    width: '100px',
+  autocomplete: {
+    width: '120px'
+  },
+  buttons: {
+    width: 'calc(50% - 16px)',
     backgroundColor: '#5BC5F2',
     color: '#FFF',
     borderRadius: '25px',
-    marginRight: 16
+    margin: '4px 0'
   },
   margin: {
     margin: '8px 0'

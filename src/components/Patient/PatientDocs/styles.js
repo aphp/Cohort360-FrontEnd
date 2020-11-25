@@ -28,6 +28,17 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: '0px 1px 16px #0000000A',
     borderRadius: '20px'
   },
+  autocomplete: {
+    width: 200,
+    margin: '0 16px'
+  },
+  filterAndSort: {
+    width: 'auto'
+  },
+  radioGroup: {
+    flexDirection: 'row',
+    margin: '6px 6px 0 6px'
+  },
   input: {
     marginLeft: theme.spacing(1),
     flex: 1

@@ -167,7 +167,12 @@ const Cohort: React.FC<{}> = () => {
               />
             )} */}
             {selectedTab === 'documents' && (
-              <CohortDocuments groupId={cohortId} deidentifiedBoolean={deidentifiedBoolean} />
+              <CohortDocuments
+                groupId={cohortId}
+                deidentifiedBoolean={deidentifiedBoolean}
+                sortBy={'date'}
+                sortDirection={'desc'}
+              />
             )}
             {/* {CONTEXT === 'arkhn' && selectedTab === 'inclusion-exclusion' && (
               <InclusionExclusionPatientsPanel cohort={cohort} />

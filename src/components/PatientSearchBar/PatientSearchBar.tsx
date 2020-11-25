@@ -1,29 +1,34 @@
 import React, { useState } from 'react'
-
-import Grid from '@material-ui/core/Grid'
-import IconButton from '@material-ui/core/IconButton'
-import InputBase from '@material-ui/core/InputBase'
-import Select from '@material-ui/core/Select'
-import MenuItem from '@material-ui/core/MenuItem'
-import useStyles from './styles'
 import { useHistory, useLocation, useParams } from 'react-router-dom'
 
+import { Grid, IconButton, InputBase, MenuItem, Select } from '@material-ui/core'
+
 import { ReactComponent as SearchIcon } from '../../assets/icones/search.svg'
+
 import { SearchByTypes } from 'types'
 
+import useStyles from './styles'
+
 type PatientSearchBarProps = {
-  performQueries?: (searchInput: string, searchBy: SearchByTypes) => void
+  performQueries?: (sortBy: string, sortDirection: string, searchInput: string, searchBy: SearchByTypes) => void
   showSelect?: boolean
+  searchInput?: string
+  onChangeInput?: (input: string) => void
 }
 
-const PatientSearchBar: React.FC<PatientSearchBarProps> = ({ performQueries, showSelect }) => {
+const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
+  performQueries,
+  showSelect,
+  searchInput,
+  onChangeInput
+}) => {
   const classes = useStyles()
   const history = useHistory()
   const location = useLocation()
   const { search } = useParams()
 
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
-  const [searchInput, setSearchInput] = useState(search ?? '')
+  const [_searchInput, setSearchInput] = useState(search ?? searchInput)
 
   const handleChangeSelect = (
     event: React.ChangeEvent<{
@@ -36,24 +41,27 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({ performQueries, sho
 
   const handleChangeInput = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setSearchInput(event.target.value)
+    if (onChangeInput) {
+      onChangeInput(event.target.value)
+    }
   }
 
   const onKeyDown = async (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     if (event.keyCode === 13) {
       event.preventDefault()
       if (location.pathname === '/accueil') {
-        history.push(`/rechercher_patient/${searchInput}`)
+        history.push(`/rechercher_patient/${_searchInput}`)
       } else {
-        performQueries && performQueries(searchInput, searchBy)
+        performQueries && performQueries('given', 'asc', _searchInput, searchBy)
       }
     }
   }
 
   const onSearchPatient = async () => {
     if (location.pathname === '/accueil') {
-      history.push(`/rechercher_patient/${searchInput}`)
+      history.push(`/rechercher_patient/${_searchInput}`)
     } else {
-      performQueries && performQueries(searchInput, searchBy)
+      performQueries && performQueries('given', 'asc', _searchInput, searchBy)
     }
   }
 
@@ -73,7 +81,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({ performQueries, sho
         <InputBase
           placeholder="Rechercher les données d'un patient: IPP, Nom ou Prénom"
           className={classes.input}
-          value={searchInput}
+          value={_searchInput}
           onChange={handleChangeInput}
           onKeyDown={onKeyDown}
         />

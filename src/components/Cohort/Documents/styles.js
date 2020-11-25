@@ -45,6 +45,17 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: '25px',
     marginLeft: 20
   },
+  autocomplete: {
+    width: 200,
+    margin: '0 16px'
+  },
+  filterAndSort: {
+    width: 'auto'
+  },
+  radioGroup: {
+    flexDirection: 'row',
+    margin: '6px 6px 0 6px'
+  },
   pagination: {
     margin: '10px 0',
     float: 'right',

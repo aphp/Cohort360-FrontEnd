@@ -138,7 +138,9 @@ const MyPatients: React.FC<{}> = () => {
             genderRepartitionMap={myPatients.genderRepartitionMap}
           />
         )}
-        {selectedTab === 'documents' && <CohortDocuments deidentifiedBoolean={deidentifiedBoolean} />}
+        {selectedTab === 'documents' && (
+          <CohortDocuments deidentifiedBoolean={deidentifiedBoolean} sortBy={'date'} sortDirection={'desc'} />
+        )}
       </div>
     </Grid>
   ) : (
