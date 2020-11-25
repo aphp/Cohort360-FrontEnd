@@ -171,6 +171,8 @@ const Patient = () => {
               documents={documents}
               total={documentsTotal}
               deidentifiedBoolean={deidentifiedBoolean}
+              sortBy={'date'}
+              sortDirection={'desc'}
             />
           )}
           {selectedTab === 'pmsi' && (
@@ -183,6 +185,8 @@ const Patient = () => {
               ghm={ghm}
               ghmTotal={ghmTotal}
               deidentifiedBoolean={deidentifiedBoolean}
+              sortBy={'date'}
+              sortDirection={'desc'}
             />
           )}
         </Grid>
