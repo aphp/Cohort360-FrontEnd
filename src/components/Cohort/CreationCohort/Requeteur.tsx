@@ -45,6 +45,18 @@ const Requeteur = () => {
       _criteria[2].data.fileStatus = await _criteria[2].fetch.fetchFileStatus()
     }
 
+    // Fetch DiagnosticCim10 Data
+    if (
+      _criteria &&
+      _criteria[4] &&
+      _criteria[4].subItems &&
+      _criteria[4].subItems[0] &&
+      _criteria[4].subItems[0].fetch
+    ) {
+      _criteria[4].subItems[0].data.statusDiagnostic = await _criteria[4].subItems[0].fetch.fetchStatusDiagnostic()
+      _criteria[4].subItems[0].data.kindDiagnostic = await _criteria[4].subItems[0].fetch.fetchKindDiagnostic()
+      _criteria[4].subItems[0].data.cim10Diagnostic = await _criteria[4].subItems[0].fetch.fetchCim10Diagnostic()
+    }
     onChangeCriteria(_criteria)
   }
 

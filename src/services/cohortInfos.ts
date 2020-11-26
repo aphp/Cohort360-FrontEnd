@@ -136,6 +136,8 @@ const fetchPatientList = async (
   gender: PatientGenderKind,
   age: [number, number],
   vitalStatus: VitalStatus,
+  sortBy: string,
+  sortDirection: string,
   groupId?: string,
   includeFacets?: boolean
 ): Promise<
@@ -149,7 +151,7 @@ const fetchPatientList = async (
 > => {
   if (CONTEXT === 'arkhn') {
     //TODO: Improve api request (we filter after getting all the patients)
-    const patients = await searchPatient(searchInput, searchBy, groupId)
+    const patients = await searchPatient('given', 'asc', searchInput, searchBy, groupId)
 
     if (patients) {
       const filteredPatients: IPatient[] = patients.filter((patient) => {
@@ -185,6 +187,7 @@ const fetchPatientList = async (
 
   if (CONTEXT === 'aphp') {
     const searchByGroup = groupId ? `&_list=${groupId}` : ''
+    const _sortDirection = sortDirection === 'desc' ? '-' : ''
     let search = ''
     let genderFilter = ''
     let ageFilter = ''
@@ -242,7 +245,7 @@ const fetchPatientList = async (
     const patientsResp = await api.get<FHIR_API_Response<IPatient>>(
       `/Patient?${facets}size=20&offset=${
         page ? (page - 1) * 20 : 0
-      }&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension${searchByGroup}${search}${genderFilter}${vitalStatusFilter}${ageFilter}`
+      }&_sort=${_sortDirection}${sortBy}&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension${searchByGroup}${search}${genderFilter}${vitalStatusFilter}${ageFilter}`
     )
 
     const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
@@ -274,6 +277,8 @@ const fetchPatientList = async (
 
 const fetchDocuments = async (
   deidentifiedBoolean: boolean,
+  sortBy: string,
+  sortDirection: string,
   page: number,
   searchInput: string,
   selectedDocTypes: string[],
@@ -288,6 +293,7 @@ const fetchDocuments = async (
     const search = searchInput ? `&_text=${searchInput}` : ''
     const docTypesFilter = !selectedDocTypes.includes('all') ? `&type=${selectedDocTypes.join()}` : ''
     const ndaFilter = nda ? `&encounter.identifier=${nda}` : ''
+    const _sortDirection = sortDirection === 'desc' ? '-' : ''
     let dateFilter = ''
     let elements = ''
 
@@ -307,13 +313,13 @@ const fetchDocuments = async (
 
     const [docsList, allDocsList] = await Promise.all([
       api.get<FHIR_API_Response<IComposition>>(
-        `/Composition?size=20&_sort=-date&offset=${
+        `/Composition?size=20&_sort=${_sortDirection}${sortBy}&offset=${
           page ? (page - 1) * 20 : 0
         }&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
       ),
       search
         ? api.get<FHIR_API_Response<IComposition>>(
-            `/Composition?_sort=-date&status=final${searchByGroup}${docTypesFilter}${ndaFilter}${dateFilter}&size=0`
+            `/Composition?_sort=${_sortDirection}${sortBy}&status=final${searchByGroup}${docTypesFilter}${ndaFilter}${dateFilter}&size=0`
           )
         : null
     ])

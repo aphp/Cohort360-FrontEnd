@@ -9,10 +9,6 @@ import Cim10Form from './DiagramView/components/CriteriaCard/components/Cim10For
 import GhmForm from './DiagramView/components/CriteriaCard/components/GhmForm/GhmForm'
 
 // Data
-import cimData from '../../../data/Requeteur/CIM10/cim9_data'
-// import admissionMode from '../../../data/Requeteur/VISITE/admissionMode'
-// import entryMode from '../../../data/Requeteur/VISITE/entryMode'
-// import exitMode from '../../../data/Requeteur/VISITE/exitMode'
 import ccamData from '../../../data/ccam_data'
 import ghmData from '../../../data/ghm_data'
 
@@ -24,6 +20,11 @@ import {
   fetchFileStatus
 } from '../../../data/Requeteur/encounter'
 import { fetchGender, fetchStatus } from '../../../data/Requeteur/patient'
+import {
+  fetchStatusDiagnostic,
+  fetchKindDiagnostic,
+  fetchCim10Diagnostic
+} from '../../../data/Requeteur/diagnoaticCim10'
 
 // ├── Mes variables
 // ├── Patients
@@ -82,8 +83,8 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Diagnostics',
         color: '#0063AF',
         components: Cim10Form,
-        data: { cimData },
-        fetch: {}
+        data: { statusDiagnostic: 'loading', kindDiagnostic: 'loading', cim10Diagnostic: 'loading' },
+        fetch: { fetchStatusDiagnostic, fetchKindDiagnostic, fetchCim10Diagnostic }
       },
       {
         id: 'Procedure',
