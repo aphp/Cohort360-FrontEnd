@@ -2,7 +2,7 @@ import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(() => ({
   dialog: {
-    width: '400px'
+    width: '600px'
   },
   title: {
     ' & h2': {
@@ -15,6 +15,9 @@ const useStyles = makeStyles(() => ({
   },
   filter: {
     marginBottom: '24px'
+  },
+  autocomplete: {
+    marginTop: '16px'
   }
 }))
 

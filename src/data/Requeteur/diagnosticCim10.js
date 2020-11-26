@@ -1,5 +1,7 @@
 // import apiRequest from './apiRequest'
 
+import apiRequest from './apiRequest'
+
 export const fetchStatusDiagnostic = async () => {
   const res = [
     {
@@ -14,26 +16,13 @@ export const fetchStatusDiagnostic = async () => {
   return res
 }
 
-export const fetchKindDiagnostic = async () => {
-  const res = [
-    {
-      code: 'dp',
-      display: 'Diagnostic principale'
-    },
-    {
-      code: 'das',
-      display: 'Diagnostic associé'
-    },
-    {
-      code: 'dr',
-      display: 'Diagnostic rempli'
-    },
-    {
-      code: 'dad',
-      display: 'Diagnostic à demi rempli'
-    }
-  ]
-  return res
+export const fetchDiagnosticTypes = async () => {
+  const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-condition_status`)
+
+  const diagnosticKinds =
+    res.data.resourceType === 'Bundle' ? res.data.entry[0].resource.compose.include[0].concept : []
+
+  return diagnosticKinds
 }
 
 export const fetchCim10Diagnostic = async () => {

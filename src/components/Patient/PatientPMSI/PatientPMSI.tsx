@@ -65,6 +65,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
   const [open, setOpen] = useState(false)
   const [nda, setNda] = useState('')
   const [code, setCode] = useState('')
+  const [selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<string[]>([])
   const [startDate, setStartDate] = useState<string | undefined>(undefined)
   const [endDate, setEndDate] = useState<string | undefined>(undefined)
   const [_sortBy, setSortBy] = useState(sortBy)
@@ -80,6 +81,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
     searchInput: string,
     nda: string,
     code: string,
+    diagnosticTypes: string[],
     sortBy: string,
     sortDirection: string,
     startDate?: string,
@@ -94,6 +96,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       searchInput,
       nda,
       code,
+      diagnosticTypes,
       sortBy,
       sortDirection,
       startDate,
@@ -103,7 +106,11 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
         setData(pmsiResp?.pmsiData ?? [])
         setTotal(pmsiResp?.pmsiTotal ?? 0)
       })
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        setData([])
+        setTotal(0)
+        console.log(error)
+      })
       .then(() => setLoadingStatus(false))
   }
 
@@ -122,6 +129,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       searchInput,
       nda,
       code,
+      selectedDiagnosticTypes,
       property,
       newDirection,
       startDate,
@@ -140,6 +148,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       searchInput,
       nda,
       code,
+      selectedDiagnosticTypes,
       _sortBy,
       _sortDirection,
       startDate,
@@ -256,6 +265,9 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
             endDate={endDate}
             onChangeEndDate={setEndDate}
             deidentified={deidentifiedBoolean}
+            showDiagnosticTypes={selectedTab === 'CIM10'}
+            selectedDiagnosticTypes={selectedDiagnosticTypes}
+            onChangeSelectedDiagnosticTypes={setSelectedDiagnosticTypes}
           />
         </div>
       </Grid>

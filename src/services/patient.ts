@@ -183,6 +183,7 @@ export const fetchPMSI = async (
   searchInput: string,
   nda: string,
   code: string,
+  diagnosticTypes: string[],
   sortBy: string,
   sortDirection: string,
   startDate?: string,
@@ -250,6 +251,7 @@ export const fetchPMSI = async (
     let ndaFilter = ''
     let codeName = ''
     let codeFilter = ''
+    let diagnosticTypesFilter = ''
     let _sortBy = sortBy
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
     let dateFilter = ''
@@ -294,6 +296,10 @@ export const fetchPMSI = async (
       codeFilter = `&${codeName}=${code}`
     }
 
+    if (selectedTab === 'CIM10' && diagnosticTypes.length > 0) {
+      diagnosticTypesFilter = `&type=${diagnosticTypes.join()}`
+    }
+
     if (startDate || endDate) {
       if (startDate && endDate) {
         dateFilter = `&${dateName}=ge${startDate},le${endDate}`
@@ -307,7 +313,7 @@ export const fetchPMSI = async (
     const pmsiResp = await api.get<FHIR_API_Response<IClaim | IProcedure | ICondition>>(
       `${resource}?patient=${patientId}&_sort=${_sortDirection}${_sortBy}&size=20&offset=${
         (page - 1) * 20
-      }${search}${ndaFilter}${codeFilter}${dateFilter}`
+      }${search}${ndaFilter}${codeFilter}${diagnosticTypesFilter}${dateFilter}`
     )
 
     const pmsiData =
