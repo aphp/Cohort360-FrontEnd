@@ -31,11 +31,12 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = (data: any) => {
+    console.log('data', data)
     onChangeSelectedCriteria({
       title: data.title,
       search: data.search,
       docType: data.docType,
-      type: 'documents_cliniques'
+      type: 'Composition'
     })
   }
 
@@ -94,7 +95,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
                 Annuler
               </Button>
             )}
-            <Button type="submit" form="document-form" color="primary" variant="contained">
+            <Button type="submit" form="documents-form" color="primary" variant="contained">
               Confirmer
             </Button>
           </Grid>

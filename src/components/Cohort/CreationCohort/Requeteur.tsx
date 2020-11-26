@@ -12,6 +12,8 @@ import constructCriteriaList from './DataList_Criteria'
 
 import useStyles from './styles'
 
+import buildRequest from '../../../utils/buildRequest'
+
 const Requeteur = () => {
   const practitioner = useAppSelector((state) => state.me)
   const classes = useStyles()
@@ -55,6 +57,12 @@ const Requeteur = () => {
 
     _init()
   }, []) // eslint-disable-line
+
+  useEffect(() => {
+    console.log('selectedCriteria', selectedCriteria)
+    const requeteurJson = buildRequest(selectedCriteria)
+    console.log('requeteurJson', requeteurJson)
+  }, [selectedCriteria])
 
   if (loading) return <CircularProgress />
 

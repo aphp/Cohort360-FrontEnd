@@ -79,7 +79,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             variant: 'outlined',
             type: 'autocomplete',
             autocompleteOptions: criteria?.data?.gender?.map((gender: any) => ({
-              id: gender.value,
+              id: gender.code,
               label: gender.display
             }))
           },
@@ -89,7 +89,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             label: 'Status vital',
             type: 'autocomplete',
             autocompleteOptions: criteria?.data?.deceased?.map((deceased: any) => ({
-              id: deceased.code,
+              id: deceased.value,
               label: deceased.display
             }))
           },
@@ -97,6 +97,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             name: 'years',
             label: "Fourchette d'âge",
             type: 'slider',
+            valueLabelDisplay: 'auto',
             min: 0,
             max: 100
           }

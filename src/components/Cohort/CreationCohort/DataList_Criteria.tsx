@@ -66,7 +66,7 @@ const criteriaList: CriteriaItemType[] = [
     fetch: { fetchAdmissionModes, fetchEntryModes, fetchExitModes, fetchFileStatus }
   },
   {
-    id: 'documents_cliniques',
+    id: 'Composition',
     title: 'Documents cliniques',
     color: '#0063AF',
     components: DocumentsForm
@@ -78,7 +78,7 @@ const criteriaList: CriteriaItemType[] = [
     components: null,
     subItems: [
       {
-        id: 'cim10',
+        id: 'Condition',
         title: 'Diagnostics',
         color: '#0063AF',
         components: Cim10Form,
@@ -86,14 +86,14 @@ const criteriaList: CriteriaItemType[] = [
         fetch: {}
       },
       {
-        id: 'ccam',
+        id: 'Procedure',
         title: 'Actes',
         color: '#0063AF',
         components: CCAMForm,
         data: { ccamData }
       },
       {
-        id: 'ghm',
+        id: 'Claim',
         title: 'GHM',
         color: '#0063AF',
         components: GhmForm,

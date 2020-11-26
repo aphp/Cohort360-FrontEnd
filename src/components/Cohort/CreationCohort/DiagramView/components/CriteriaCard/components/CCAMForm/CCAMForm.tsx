@@ -37,7 +37,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
       code: data.code,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
-      type: 'ccam'
+      type: 'Procedure'
     })
   }
 

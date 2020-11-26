@@ -38,7 +38,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
       occurence: data.occurence,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
-      type: 'ghm'
+      type: 'Claim'
     })
   }
 

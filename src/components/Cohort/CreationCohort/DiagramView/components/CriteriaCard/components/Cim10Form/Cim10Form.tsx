@@ -35,7 +35,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     onChangeSelectedCriteria({
       title: data.title,
       code: data.code,
-      type: 'cim10'
+      type: 'Condition'
     })
   }
 

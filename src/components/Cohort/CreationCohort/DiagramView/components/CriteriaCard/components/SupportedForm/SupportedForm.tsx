@@ -106,6 +106,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
           {
             name: 'years',
             type: 'slider',
+            valueLabelDisplay: 'auto',
             min: 0,
             max: 100
           },
@@ -113,6 +114,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
             label: 'Durée de la prise en charge',
             name: 'duration',
             type: 'slider',
+            valueLabelDisplay: 'auto',
             min: 0,
             max: 100
           },

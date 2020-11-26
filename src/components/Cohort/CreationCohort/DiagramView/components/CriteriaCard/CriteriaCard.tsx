@@ -62,7 +62,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
       : ''
 
     switch (_selectedCriteria.type) {
-      case 'ghm': {
+      case 'Claim': {
         content = (
           <>
             <Typography>
@@ -85,7 +85,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         break
       }
 
-      case 'ccam':
+      case 'Procedure':
         content = (
           <>
             <Typography>
@@ -107,7 +107,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         )
         break
 
-      case 'cim10':
+      case 'Condition':
         content = (
           <>
             <Typography>
@@ -148,7 +148,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         break
       }
 
-      case 'documents_cliniques': {
+      case 'Composition': {
         const docTypes = {
           '55188-7': 'Tout type de documents',
           '11336-5': "Comptes rendus d'hospitalisation",

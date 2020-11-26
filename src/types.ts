@@ -209,7 +209,7 @@ export type CriteriaItemType = {
 }
 
 export type SelectedCriteriaType = {
-  type: 'Patient' | 'Encounter' | 'documents_cliniques' | 'ghm' | 'ccam' | 'cim10'
+  type: 'Patient' | 'Encounter' | 'Claim' | 'Procedure' | 'Condition' | 'Composition'
   title: string
   code?: { id: string; label: string }
   label?: undefined
