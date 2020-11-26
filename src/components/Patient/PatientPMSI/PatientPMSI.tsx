@@ -56,7 +56,6 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
 }) => {
   const classes = useStyles()
   const [selectedTab, selectTab] = useState<'CIM10' | 'CCAM' | 'GHM'>('CIM10')
-  // TODO aphp: changed any to something more detailed
   const [data, setData] = useState<PMSIEntry<IClaim | ICondition | IProcedure>[] | undefined>([])
   const [loadingStatus, setLoadingStatus] = useState(false)
   const [total, setTotal] = useState(0)
