@@ -186,13 +186,13 @@ const fetchPatientList = async (
   }
 
   if (CONTEXT === 'aphp') {
+    const facets = includeFacets ? 'pivotFacet=age_gender,deceased_gender&' : ''
+    const genderFilter = gender !== PatientGenderKind._unknown ? `&gender=${gender}` : ''
     const searchByGroup = groupId ? `&_list=${groupId}` : ''
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
-    let search = ''
-    let genderFilter = ''
     let ageFilter = ''
+    let search = ''
     let vitalStatusFilter = ''
-    let facets = ''
 
     if (searchInput) {
       if (searchBy) {
@@ -200,10 +200,6 @@ const fetchPatientList = async (
       } else {
         search = `&_text=${searchInput}`
       }
-    }
-
-    if (gender !== PatientGenderKind._unknown) {
-      genderFilter = `&gender=${gender}`
     }
 
     if (age !== [0, 130]) {
@@ -236,10 +232,6 @@ const fetchPatientList = async (
       } else if (vitalStatus === VitalStatus.alive) {
         vitalStatusFilter = '&deceased=false'
       }
-    }
-
-    if (includeFacets) {
-      facets = 'pivotFacet=age_gender,deceased_gender&'
     }
 
     const patientsResp = await api.get<FHIR_API_Response<IPatient>>(

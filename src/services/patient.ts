@@ -347,18 +347,10 @@ export const fetchDocuments = async (
   if (CONTEXT === 'aphp') {
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
     const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : []
-    let search = ''
-    let ndaFilter = ''
+    const search = searchInput ? `&_text=${searchInput}` : ''
+    const ndaFilter = nda ? `&encounter.identifier=${nda}` : ''
     let dateFilter = ''
     let elements = ''
-
-    if (searchInput) {
-      search = `&_text=${searchInput}`
-    }
-
-    if (nda) {
-      ndaFilter = `&encounter.identifier=${nda}`
-    }
 
     if (startDate || endDate) {
       if (startDate && endDate) {
