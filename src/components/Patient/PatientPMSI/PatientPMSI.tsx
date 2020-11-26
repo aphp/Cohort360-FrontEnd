@@ -352,7 +352,9 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
                               row.class?.code || row.code?.coding?.[0].display}
                         </TableCell>
                         {selectedTab === 'CIM10' && (
-                          <TableCell align="center">{row.extension ? row.extension[0].valueString : '-'}</TableCell>
+                          <TableCell align="center">
+                            {row.extension ? row.extension[0].valueString?.toUpperCase() : '-'}
+                          </TableCell>
                         )}
                         <TableCell align="center">{row.serviceProvider ?? 'Non renseigné'}</TableCell>
                       </TableRow>
