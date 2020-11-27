@@ -1,6 +1,6 @@
-
+# Don't check data folder
 src/data
-
+# Don't check test (for the moment)
 src/**/*.test.ts
 src/**/*.test.js
 src/**/*.test.tsx

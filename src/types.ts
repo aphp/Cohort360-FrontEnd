@@ -209,14 +209,69 @@ export type CriteriaItemType = {
 }
 
 export type SelectedCriteriaType = {
-  type: string
+  type: 'Patient' | 'Encounter' | 'Claim' | 'Procedure' | 'Condition' | 'Composition'
   title: string
-  code?: any
-  gender?: [{ code: string; display: string }]
-  vitalStatus?: [{ code: string; display: string }]
+  code?: { id: string; label: string }
+  label?: undefined
+  startOccurrence?: Date
+  endOccurrence?: Date
+  gender?: { id: string; label: string }
+  vitalStatus?: { id: string; label: string }
   years?: [number, number]
   search?: string
-  doc?: '55188-7' | '11336-5' | '57833-6'
-  start_occurrence: string
-  end_occurrence: string
+  docType?: '55188-7' | '11336-5' | '57833-6'
+  occurence?: number
+  ageType?: { id: string; label: string }
+  duration?: [number, number]
+  admissionMode?: { id: string; label: string }
+  entryMode?: { id: string; label: string }
+  exitMode?: { id: string; label: string }
+  fileStatus?: { id: string; label: string }
+}
+
+export type CcamDataType = {
+  title: string
+  code: { id: string; label: string } | null
+  label: undefined
+  startOccurrence: Date
+  endOccurrence: Date
+}
+
+export type Cim10DataType = {
+  title: string
+  code: { id: string; label: string } | null
+}
+
+export type DemographicDataType = {
+  title: string
+  gender: { id: string; label: string } | null
+  vitalStatus: { id: string; label: string } | null
+  years: [number, number]
+}
+
+export type DocumentDataType = {
+  title: string
+  search: string
+  docType: { id: string; label: string } | null
+}
+
+export type GhmDataType = {
+  title: string
+  code: { id: string; label: string } | null
+  occurence: number
+  label: undefined
+  startOccurrence: Date
+  endOccurrence: Date
+}
+
+export type EncounterDataType = {
+  label: undefined
+  title: string
+  ageType: string
+  years: [number, number]
+  duration: [number, number]
+  admissionMode: { id: string; label: string } | null
+  entryMode: { id: string; label: string } | null
+  exitMode: { id: string; label: string } | null
+  fileStatus: { id: string; label: string } | null
 }

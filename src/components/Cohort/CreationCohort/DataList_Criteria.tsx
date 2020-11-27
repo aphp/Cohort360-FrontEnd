@@ -67,7 +67,7 @@ const criteriaList: CriteriaItemType[] = [
     fetch: { fetchAdmissionModes, fetchEntryModes, fetchExitModes, fetchFileStatus }
   },
   {
-    id: 'documents_cliniques',
+    id: 'Composition',
     title: 'Documents cliniques',
     color: '#0063AF',
     components: DocumentsForm
@@ -79,7 +79,7 @@ const criteriaList: CriteriaItemType[] = [
     components: null,
     subItems: [
       {
-        id: 'diagnostics',
+        id: 'Condition',
         title: 'Diagnostics',
         color: '#0063AF',
         components: Cim10Form,
@@ -87,18 +87,18 @@ const criteriaList: CriteriaItemType[] = [
         fetch: { fetchStatusDiagnostic, fetchKindDiagnostic, fetchCim10Diagnostic }
       },
       {
-        id: 'actes',
+        id: 'Procedure',
         title: 'Actes',
         color: '#0063AF',
         components: CCAMForm,
-        data: ccamData
+        data: { ccamData }
       },
       {
-        id: 'ghm',
+        id: 'Claim',
         title: 'GHM',
         color: '#0063AF',
         components: GhmForm,
-        data: ghmData
+        data: { ghmData }
       }
     ]
   },
@@ -111,14 +111,18 @@ const criteriaList: CriteriaItemType[] = [
       {
         id: 'biologie',
         title: 'Biologie',
-        components: null,
-        color: '#0063AF'
+        color: '#0063AF',
+        disabled: true,
+        data: null,
+        components: null
       },
       {
         id: 'microbiologie',
         title: 'Microbiologie',
         components: null,
-        color: '#0063AF'
+        color: '#0063AF',
+        disabled: true,
+        data: null
       }
     ]
   },
@@ -126,6 +130,8 @@ const criteriaList: CriteriaItemType[] = [
     id: 'physiologie',
     title: 'Physiologie',
     color: '#0063AF',
+    disabled: true,
+    data: null,
     components: null
   },
   {
@@ -138,7 +144,9 @@ const criteriaList: CriteriaItemType[] = [
         id: 'prescription_dispension_administration',
         title: 'Prescription - Dispension - Administration',
         components: null,
-        color: '#0063AF'
+        color: '#0063AF',
+        disabled: true,
+        data: null
       }
     ]
   }
