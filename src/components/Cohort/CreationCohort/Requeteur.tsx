@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { CircularProgress, Tabs, Tab } from '@material-ui/core'
+import { useHistory } from 'react-router-dom'
 
 import ControlPanel from './ControlPanel/ControlPanel'
 import DiagramView from './DiagramView/DiagramView'
@@ -13,11 +14,12 @@ import constructCriteriaList from './DataList_Criteria'
 import useStyles from './styles'
 
 import buildRequest from '../../../utils/buildRequest'
-import { countCohort } from '../../../services/cohortCreation'
+import { countCohort, createCohort } from '../../../services/cohortCreation'
 
 const Requeteur = () => {
   const practitioner = useAppSelector((state) => state.me)
   const classes = useStyles()
+  const history = useHistory()
 
   const [loading, setLoading] = useState<boolean>(true)
   const [count, setCount] = useState<CohortCreationCounterType>({})
@@ -27,6 +29,8 @@ const Requeteur = () => {
   // Pour le moment, sans forme de JSON...
   const [selectedPopulation, onChangeSelectedPopulation] = useState<ScopeTreeRow[] | null>(null)
   const [selectedCriteria, onChangeSelectedCriteria] = useState<SelectedCriteriaType[]>([])
+
+  const [json, onChangeJson] = useState<string>('')
 
   const _fetchCriteria = async () => {
     if (!practitioner) return
@@ -75,6 +79,11 @@ const Requeteur = () => {
   useEffect(() => {
     if (!selectedPopulation && !selectedCriteria) return
 
+    const _json = buildRequest(selectedPopulation, selectedCriteria)
+    onChangeJson(_json)
+  }, [selectedPopulation, selectedCriteria])
+
+  useEffect(() => {
     const _countCohort = async (requeteurJson: string) => {
       let _count: CohortCreationCounterType = {
         includePatient: 'loading',
@@ -98,11 +107,23 @@ const Requeteur = () => {
       setCount(_count)
     }
 
-    const requeteurJson = buildRequest(selectedPopulation, selectedCriteria)
-    _countCohort(requeteurJson)
-  }, [selectedPopulation, selectedCriteria])
+    _countCohort(json)
+  }, [json])
 
-  const _onExecute = () => {}
+  const _onExecute = () => {
+    setLoading(true)
+    const _createCohort = async () => {
+      if (!json) return
+
+      const newCohortResult = await createCohort(json)
+      const cohortId = newCohortResult?.['group.id']
+      if (!cohortId) return
+      console.log('cohortId', cohortId)
+
+      history.push(`/cohort/${cohortId}`)
+    }
+    _createCohort()
+  }
 
   if (loading) return <CircularProgress />
 
@@ -138,7 +159,7 @@ const Requeteur = () => {
           onChangeSelectedCriteria={onChangeSelectedCriteria}
         />
       ) : (
-        <JsonView />
+        <JsonView defaultJson={json} onChangeJson={onChangeJson} />
       )}
 
       {/* Main Pannel */}
