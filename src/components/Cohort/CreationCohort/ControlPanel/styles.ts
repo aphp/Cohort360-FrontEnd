@@ -26,6 +26,12 @@ const useStyles = makeStyles(() =>
         backgroundColor: '#499cbf'
       }
     },
+    actionButton: {
+      width: '100%',
+      '& > span': {
+        position: 'relative'
+      }
+    },
     boldText: {
       fontWeight: 700
     },
@@ -33,7 +39,9 @@ const useStyles = makeStyles(() =>
       color: '#5BC5F2'
     },
     iconBorder: {
-      marginRight: '10px'
+      position: 'absolute',
+      top: 0,
+      left: 10
     },
     patientTypo: {
       margin: '10px'

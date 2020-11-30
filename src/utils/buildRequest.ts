@@ -1,17 +1,27 @@
 import moment from 'moment'
 
-export default (selectedCriteria: any) => {
+export default (selectedPopulation: any, selectedCriteria: any) => {
   type RequeteurSearchType = { _type: string; resourceType: string; fhirFilter: string }
-  let newJson: RequeteurSearchType[] = []
+  if (!selectedPopulation) return ''
+
+  const filterReducer = (accumulator: any, currentValue: any) =>
+    accumulator ? `${accumulator}&${currentValue}` : currentValue
+  // Preparation du multi requete, par ex: gender = m + f + other
+  const searchReducer = (accumulator: any, currentValue: any) =>
+    accumulator ? `${accumulator},${currentValue}` : currentValue
+
+  let newJson: RequeteurSearchType[] = [
+    {
+      _type: 'resource',
+      resourceType: 'Patient',
+      fhirFilter: `_list=${selectedPopulation
+        .map((selectedPopulation: any) => selectedPopulation.id)
+        .reduce(searchReducer)}`
+    }
+  ]
 
   for (const selectedCriterion of selectedCriteria) {
     let fhirFilter = ''
-
-    const filterReducer = (accumulator: any, currentValue: any) =>
-      accumulator ? `${accumulator}&${currentValue}` : currentValue
-    // Preparation du multi requete, par ex: gender = m + f + other
-    const searchReducer = (accumulator: any, currentValue: any) =>
-      accumulator ? `${accumulator},${currentValue}` : currentValue
 
     switch (selectedCriterion.type) {
       case 'Patient': {
@@ -112,6 +122,7 @@ export default (selectedCriteria: any) => {
       }
     ]
   }
+
   const newJsonReducer = (accumulator: any, currentValue: any) =>
     accumulator
       ? {

@@ -6,19 +6,21 @@ import DiagramView from './DiagramView/DiagramView'
 import JsonView from './JsonView/JsonView'
 
 import { useAppSelector } from 'state'
-import { ScopeTreeRow, SelectedCriteriaType } from 'types'
+import { ScopeTreeRow, SelectedCriteriaType, CohortCreationCounterType } from 'types'
 
 import constructCriteriaList from './DataList_Criteria'
 
 import useStyles from './styles'
 
 import buildRequest from '../../../utils/buildRequest'
+import { countCohort } from '../../../services/cohortCreation'
 
 const Requeteur = () => {
   const practitioner = useAppSelector((state) => state.me)
   const classes = useStyles()
 
   const [loading, setLoading] = useState<boolean>(true)
+  const [count, setCount] = useState<CohortCreationCounterType>({})
   const [seletedTab, onChangeTab] = useState<'diagramme' | 'JSON'>('diagramme')
   const [criteria, onChangeCriteria] = useState<any[]>([])
 
@@ -71,10 +73,36 @@ const Requeteur = () => {
   }, []) // eslint-disable-line
 
   useEffect(() => {
-    console.log('selectedCriteria', selectedCriteria)
-    const requeteurJson = buildRequest(selectedCriteria)
-    console.log('requeteurJson', requeteurJson)
-  }, [selectedCriteria])
+    if (!selectedPopulation && !selectedCriteria) return
+
+    const _countCohort = async (requeteurJson: string) => {
+      let _count: CohortCreationCounterType = {
+        includePatient: 'loading',
+        byrequest: 'loading',
+        alive: 'loading',
+        deceased: 'loading',
+        female: 'loading',
+        male: 'loading'
+      }
+      await setCount(_count)
+      const countResult = await countCohort(requeteurJson)
+      _count = {
+        includePatient: countResult?.count ?? 0,
+        // TODO: CHANGE IT
+        byrequest: 0,
+        alive: 0,
+        deceased: 0,
+        female: 0,
+        male: 0
+      }
+      setCount(_count)
+    }
+
+    const requeteurJson = buildRequest(selectedPopulation, selectedCriteria)
+    _countCohort(requeteurJson)
+  }, [selectedPopulation, selectedCriteria])
+
+  const _onExecute = () => {}
 
   if (loading) return <CircularProgress />
 
@@ -114,7 +142,15 @@ const Requeteur = () => {
       )}
 
       {/* Main Pannel */}
-      <ControlPanel />
+      <ControlPanel
+        includePatient={count.includePatient}
+        byrequest={count.byrequest}
+        alive={count.alive}
+        deceased={count.deceased}
+        female={count.female}
+        male={count.male}
+        onExecute={_onExecute}
+      />
     </>
   )
 }
