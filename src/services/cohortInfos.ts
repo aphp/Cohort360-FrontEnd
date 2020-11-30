@@ -151,10 +151,10 @@ const fetchPatientList = async (
 > => {
   if (CONTEXT === 'arkhn') {
     //TODO: Improve api request (we filter after getting all the patients)
-    const patients = await searchPatient('given', 'asc', searchInput, searchBy, groupId)
+    const patientsResp = await searchPatient(page, sortBy, sortDirection, searchInput, searchBy, groupId)
 
-    if (patients) {
-      const filteredPatients: IPatient[] = patients.filter((patient) => {
+    if (patientsResp) {
+      const filteredPatients: IPatient[] = patientsResp.patientList.filter((patient) => {
         const agePatient = parseInt(getAge(patient))
         const genderPatient = patient.gender
         const vitalStatusPatient = patient.deceasedDateTime ? VitalStatus.deceased : VitalStatus.alive
