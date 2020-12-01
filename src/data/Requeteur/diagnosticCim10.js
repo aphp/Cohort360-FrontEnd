@@ -1,6 +1,5 @@
-// import apiRequest from './apiRequest'
-
 import apiRequest from './apiRequest'
+import diagnosticTypes from '../diagnosticTypes'
 
 export const fetchStatusDiagnostic = async () => {
   const res = [
@@ -18,11 +17,14 @@ export const fetchStatusDiagnostic = async () => {
 
 export const fetchDiagnosticTypes = async () => {
   const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-condition_status`)
+  const diagnosticKinds = []
 
-  const diagnosticKinds =
-    res.data.resourceType === 'Bundle' ? res.data.entry[0].resource.compose.include[0].concept : []
+  if (res) {
+    diagnosticKinds =
+      res.data.resourceType === 'Bundle' ? res.data.entry[0].resource.compose.include[0].concept : diagnosticTypes
+  }
 
-  return diagnosticKinds
+  return res ? diagnosticKinds : diagnosticTypes
 }
 
 export const fetchCim10Diagnostic = async () => {
