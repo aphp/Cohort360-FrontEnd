@@ -2,17 +2,37 @@ import { logout } from './me'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 type CohortCreationState = {
-  //TODO: PopulationSources typing
+  // //TODO: PopulationSources typing
   populationSources: any[]
-  //TODO: Criteria typing
+  // //TODO: Criteria typing
   inclusionCriterias: any[]
+
   cohortName: string
+  totalPatients: 0
+  agePyramidData: any[]
+  excludedPatients: any[]
+  genderRepartitionMap: any[]
+  importedPatients: any[]
+  includedPatients: any[]
+  monthlyVisitData: any[]
+  originalPatients: any[]
+  visitTypeRepartitionData: []
 }
 
 const initialState: CohortCreationState = {
   populationSources: [],
   inclusionCriterias: [],
-  cohortName: ''
+
+  cohortName: '',
+  totalPatients: 0,
+  agePyramidData: [],
+  excludedPatients: [],
+  genderRepartitionMap: [],
+  importedPatients: [],
+  includedPatients: [],
+  monthlyVisitData: [],
+  originalPatients: [],
+  visitTypeRepartitionData: []
 }
 
 const cohortCreationSlice = createSlice({

@@ -166,6 +166,7 @@ export type SimpleChartDataType = {
   label: string
   value: number
   color: string
+  size?: number
 }
 export type ComplexChartDataType<T, V = { [key: string]: number }> = Map<T, V>
 

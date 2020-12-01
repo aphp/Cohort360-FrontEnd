@@ -27,13 +27,23 @@ import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import { ComplexChartDataType, SimpleChartDataType, Month } from 'types'
 
 type RepartitionTableProps = {
-  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
+  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind> | 'loading'
 }
 
 const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMap }) => {
   const classes = useStyles()
   let femaleAlive, maleAlive, femaleDeceased, maleDeceased
-  if (genderRepartitionMap) {
+  if (genderRepartitionMap === 'loading') {
+    return (
+      <Paper className={classes.repartitionTable}>
+        <Grid className={classes.progressContainer}>
+          <CircularProgress />
+        </Grid>
+      </Paper>
+    )
+  }
+
+  if (genderRepartitionMap && genderRepartitionMap.size > 0) {
     const femaleValues = genderRepartitionMap.get(PatientGenderKind._female)
     const maleValues = genderRepartitionMap.get(PatientGenderKind._male)
 
@@ -86,10 +96,10 @@ type PreviewProps = {
     perimeters?: string[]
   }
   loading?: boolean
-  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
-  visitTypeRepartitionData?: SimpleChartDataType[]
-  monthlyVisitData?: ComplexChartDataType<Month>
-  agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
+  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind> | 'loading'
+  visitTypeRepartitionData?: SimpleChartDataType[] | 'loading'
+  monthlyVisitData?: ComplexChartDataType<Month> | 'loading'
+  agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }> | 'loading'
 }
 const Preview: React.FC<PreviewProps> = ({
   total,
@@ -102,11 +112,19 @@ const Preview: React.FC<PreviewProps> = ({
 }) => {
   const classes = useStyles()
   const title = group.name
-  const { vitalStatusData, genderData } = getGenderRepartitionSimpleData(genderRepartitionMap)
 
-  return loading ? (
-    <CircularProgress className={classes.loadingSpinner} size={50} />
-  ) : (
+  const genderRepartitionSimpleData =
+    genderRepartitionMap === 'loading' ? null : getGenderRepartitionSimpleData(genderRepartitionMap)
+
+  const vitalStatusData: SimpleChartDataType[] | 'loading' = genderRepartitionSimpleData
+    ? genderRepartitionSimpleData.vitalStatusData
+    : 'loading'
+
+  const genderData: SimpleChartDataType[] | 'loading' = genderRepartitionSimpleData
+    ? genderRepartitionSimpleData.genderData
+    : 'loading'
+
+  return (
     <Grid container direction="column" alignItems="center" className={classes.root}>
       <CssBaseline />
 
@@ -159,7 +177,13 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              <PieChart data={vitalStatusData} />
+              {vitalStatusData === 'loading' ? (
+                <Grid className={classes.progressContainer}>
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <PieChart data={vitalStatusData} />
+              )}
             </Paper>
           </Grid>
 
@@ -171,7 +195,13 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              <DonutChart data={visitTypeRepartitionData} />
+              {visitTypeRepartitionData === 'loading' ? (
+                <Grid className={classes.progressContainer}>
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <DonutChart data={visitTypeRepartitionData} />
+              )}
             </Paper>
           </Grid>
 
@@ -183,7 +213,13 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              <BarChart data={genderData} />
+              {genderData === 'loading' ? (
+                <Grid className={classes.progressContainer}>
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <BarChart data={genderData} />
+              )}
             </Paper>
           </Grid>
 
@@ -195,7 +231,13 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              <PyramidChart data={agePyramidData} />
+              {agePyramidData === 'loading' ? (
+                <Grid className={classes.progressContainer}>
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <PyramidChart data={agePyramidData} />
+              )}
             </Paper>
           </Grid>
 
@@ -207,7 +249,13 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              <GroupedBarChart data={monthlyVisitData} />
+              {monthlyVisitData === 'loading' ? (
+                <Grid className={classes.progressContainer}>
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <GroupedBarChart data={monthlyVisitData} />
+              )}
             </Paper>
           </Grid>
         </Grid>

@@ -22,8 +22,7 @@ import {
   FormControlLabel,
   Button,
   Menu,
-  MenuItem,
-  CircularProgress
+  MenuItem
 } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 import OtherGenderIcon from '@material-ui/icons/Wc'
@@ -419,7 +418,7 @@ InclusionExclusionContent.propType = {
   include: PropTypes.bool.isRequired
 }
 
-const InclusionExclusionPatientsPanel = ({ cohort, loading }) => {
+const InclusionExclusionPatientsPanel = ({ cohort }) => {
   const classes = useStyles()
   const history = useHistory()
   const dispatch = useDispatch()
@@ -434,9 +433,7 @@ const InclusionExclusionPatientsPanel = ({ cohort, loading }) => {
     history.push(`/cohort/${cohort.cohort.id}/apercu`)
   })
 
-  return loading ? (
-    <CircularProgress className={classes.loadingSpinner} size={50} />
-  ) : (
+  return (
     <>
       <Dialog
         fullWidth={true}
@@ -470,8 +467,7 @@ const InclusionExclusionPatientsPanel = ({ cohort, loading }) => {
 }
 
 InclusionExclusionContainer.propType = {
-  cohort: PropTypes.object,
-  loading: PropTypes.bool
+  cohort: PropTypes.object
 }
 
 export default InclusionExclusionPatientsPanel

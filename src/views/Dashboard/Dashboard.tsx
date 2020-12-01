@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import { CONTEXT } from '../../constants'
 import { useDispatch } from 'react-redux'
 import { Link, useParams, useLocation } from 'react-router-dom'
-import { Grid, Tabs, Tab, CircularProgress } from '@material-ui/core'
+import { Grid, Tabs, Tab } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
 
 import InclusionExclusionPatientsPanel from '../../components/Cohort/InclusionExclusionPatients/InclusionExclusionPatients'
@@ -43,7 +43,6 @@ const Dashboard: React.FC<{
   const [selectedTab, selectTab] = useState(tabName || 'apercu')
   const [tabs, setTabs] = useState<Tabs[]>([])
   const [status, setStatus] = useState('')
-  const [loading, setLoading] = useState(true)
   const [deidentifiedBoolean, setDeidentifiedBoolean] = useState<boolean>(true)
   const [openRedcapDialog, setOpenRedcapDialog] = useState(false)
 
@@ -66,23 +65,17 @@ const Dashboard: React.FC<{
       }
     ] = originalPatients[0].extension
 
-    if (!extension) return setLoading(false)
     const deidentified = extension.find((data) => data.url === 'deidentified')
-
-    if (!deidentified) return setLoading(false)
-    const valueBoolean = deidentified.valueBoolean ?? true
+    const valueBoolean = deidentified ? deidentified.valueBoolean : true
 
     setDeidentifiedBoolean(valueBoolean)
   }
 
   const _fetchCohort = async () => {
-    if (!cohortId) return setLoading(false)
-
     const cohortResp = await fetchCohort(cohortId)
     if (cohortResp) {
       _saveDashboardElement(cohortResp)
     }
-    setLoading(false)
   }
 
   const _fetchMyPatients = async () => {
@@ -90,17 +83,13 @@ const Dashboard: React.FC<{
     if (cohortResp) {
       _saveDashboardElement(cohortResp)
     }
-    setLoading(false)
   }
 
   const _fetchPerimeters = async () => {
-    if (!perimetreIds) return setLoading(false)
-
     const cohortResp = await fetchPerimetersInfos(perimetreIds)
     if (cohortResp) {
       _saveDashboardElement(cohortResp)
     }
-    setLoading(false)
   }
 
   useEffect(() => {
@@ -133,7 +122,6 @@ const Dashboard: React.FC<{
           { label: 'Patients', value: 'patients', to: `/cohort/new/patients`, disabled: true },
           { label: 'Documents', value: 'documents', to: `/cohort/new/documents`, disabled: true }
         ])
-        setLoading(false)
         break
       case 'perimeters':
         _fetchPerimeters()
@@ -166,7 +154,7 @@ const Dashboard: React.FC<{
     selectTab(newTab)
   }
 
-  if (loading) return <CircularProgress className={classes.loading} size={50} />
+  // if (loading) return <CircularProgress className={classes.loading} size={50} />
 
   if (context === 'new_cohort') {
     return <CohortCreation />
@@ -234,10 +222,22 @@ const Dashboard: React.FC<{
               <CohortPreview
                 total={dashboard.totalPatients ?? 0}
                 group={{ name: dashboard.name ?? '-' }}
-                agePyramidData={dashboard.agePyramidData}
-                genderRepartitionMap={dashboard.genderRepartitionMap}
-                monthlyVisitData={dashboard.monthlyVisitData}
-                visitTypeRepartitionData={dashboard.visitTypeRepartitionData}
+                agePyramidData={
+                  dashboard.agePyramidData && dashboard.agePyramidData.size > 0 ? dashboard.agePyramidData : 'loading'
+                }
+                genderRepartitionMap={
+                  dashboard.genderRepartitionMap && dashboard.genderRepartitionMap.size > 0
+                    ? dashboard.genderRepartitionMap
+                    : 'loading'
+                }
+                monthlyVisitData={
+                  dashboard.monthlyVisitData && dashboard.monthlyVisitData.size > 0
+                    ? dashboard.monthlyVisitData
+                    : 'loading'
+                }
+                visitTypeRepartitionData={
+                  dashboard.visitTypeRepartitionData ? dashboard.visitTypeRepartitionData : 'loading'
+                }
               />
             )}
             {selectedTab === 'patients' && (
@@ -259,7 +259,7 @@ const Dashboard: React.FC<{
               />
             )}
             {CONTEXT === 'arkhn' && selectedTab === 'inclusion-exclusion' && (
-              <InclusionExclusionPatientsPanel cohort={dashboard} loading={false} />
+              <InclusionExclusionPatientsPanel cohort={dashboard} />
             )}
           </>
         )}
