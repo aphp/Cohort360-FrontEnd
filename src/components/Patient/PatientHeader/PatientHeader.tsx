@@ -21,9 +21,8 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({ patient, deidentified }) 
   const age = getAge(patient)
   const firstName = deidentified ? 'Prénom' : patient.name?.[0].given?.[0]
   const lastName = deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ')
-  // TODO aphp: review diagnosis function and type in diagnosis
   const diagnosis = patient.mainDiagnosis
-    ? patient.mainDiagnosis.slice(0, 3).map((diag) => diag.code?.coding?.[0].display)
+    ? [...new Set(patient.mainDiagnosis.map((diag) => diag.code?.coding?.[0].display))].slice(0, 3)
     : undefined
   const ipp = deidentified
     ? `ID Technique: ${patient.id}`
