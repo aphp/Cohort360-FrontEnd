@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import { useHistory } from 'react-router-dom'
+import moment from 'moment'
 
 import {
   CircularProgress,
@@ -183,7 +184,9 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                         <TableCell>{deidentified ? 'Prénom' : patient.name?.[0].given?.[0]}</TableCell>
                         <TableCell>{deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ')}</TableCell>
                         <TableCell align="center">
-                          {deidentified ? getAge(patient) : `${patient.birthDate} (${getAge(patient)})`}
+                          {deidentified
+                            ? getAge(patient)
+                            : `${moment(patient.birthDate).format('DD/MM/YYYY')} (${getAge(patient)})`}
                         </TableCell>
                         <TableCell>{patient.lastEncounterName}</TableCell>
                         <TableCell>
