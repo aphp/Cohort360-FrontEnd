@@ -58,7 +58,7 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
       code: string
     }[]
   ) => {
-    onChangeSelectedDocTypes(value.map((value) => value.code))
+    if (value) onChangeSelectedDocTypes(value.map((value) => value.code))
   }
 
   const _onChangeNda = (event: React.ChangeEvent<HTMLInputElement>) => {
