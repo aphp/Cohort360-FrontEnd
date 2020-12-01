@@ -14,7 +14,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
   const node = useRef<SVGSVGElement | null>(null)
 
   useEffect(() => {
-    if (!data) {
+    if (!data || (data && !data.size)) {
       return
     }
     const customData = [

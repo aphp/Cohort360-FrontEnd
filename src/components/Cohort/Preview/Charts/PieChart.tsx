@@ -4,7 +4,7 @@ import { SimpleChartDataType } from 'types'
 import * as d3 from 'd3'
 
 type PieChartProps = {
-  data: SimpleChartDataType[]
+  data: SimpleChartDataType[] | 'loading'
   height?: number
   width?: number
 }
