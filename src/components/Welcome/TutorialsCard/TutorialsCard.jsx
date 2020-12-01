@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
-import Carousel from 'react-bootstrap/Carousel'
+import React from 'react'
+// import React, { useState } from 'react'
+// import Carousel from 'react-bootstrap/Carousel'
 import Divider from '@material-ui/core/Divider'
-import VideoPlayer from 'react-player'
+import Typography from '@material-ui/core/Typography'
+// import VideoPlayer from 'react-player'
 
 import Title from '../../Title'
 
@@ -9,35 +11,36 @@ import useStyles from './styles'
 
 const TutorialsCard = () => {
   const classes = useStyles()
-  const [carouselInterval, setCarouselInterval] = useState(5000)
-  const handlePlay = () => {
-    setCarouselInterval(null)
-  }
+  // const [carouselInterval, setCarouselInterval] = useState(5000)
+  // const handlePlay = () => {
+  //   setCarouselInterval(null)
+  // }
 
-  const medias = [
-    {
-      url: './assets/videos/demo_cohort_360.mp4',
-      poster: './assets/videos/demo_cohort_360_poster.jpg'
-    },
-    {
-      url: './assets/videos/constitution_cohorte.mp4',
-      poster: './assets/videos/constitution_cohorte_poster.jpg'
-    },
-    {
-      url: './assets/videos/parcours_patient.mp4',
-      poster: './assets/videos/parcours_patient_poster.jpg'
-    },
-    {
-      url: './assets/videos/export_dataset.mp4',
-      poster: './assets/videos/export_dataset_poster.jpg'
-    }
-  ]
+  // const medias = [
+  //   {
+  //     url: './assets/videos/demo_cohort_360.mp4',
+  //     poster: './assets/videos/demo_cohort_360_poster.jpg'
+  //   },
+  //   {
+  //     url: './assets/videos/constitution_cohorte.mp4',
+  //     poster: './assets/videos/constitution_cohorte_poster.jpg'
+  //   },
+  //   {
+  //     url: './assets/videos/parcours_patient.mp4',
+  //     poster: './assets/videos/parcours_patient_poster.jpg'
+  //   },
+  //   {
+  //     url: './assets/videos/export_dataset.mp4',
+  //     poster: './assets/videos/export_dataset_poster.jpg'
+  //   }
+  // ]
 
   return (
     <>
       <Title>Tutoriels</Title>
       <Divider className={classes.divider} />
-      <Carousel interval={carouselInterval}>
+      <Typography color="textSecondary">Nouvelle fonctionnalité à venir !</Typography>
+      {/* <Carousel interval={carouselInterval}>
         {medias.map((m, i) => (
           <Carousel.Item key={i}>
             <VideoPlayer
@@ -56,7 +59,7 @@ const TutorialsCard = () => {
             />
           </Carousel.Item>
         ))}
-      </Carousel>
+      </Carousel>{' '} */}
     </>
   )
 }
