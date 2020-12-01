@@ -69,7 +69,7 @@ export const getGenderRepartitionMapAphp = (facet?: IExtension[]): ComplexChartD
 
   repartitionMap.set('female', { deceased: 0, alive: 0 })
   repartitionMap.set('male', { deceased: 0, alive: 0 })
-  repartitionMap.set('unknown', { deceased: 0, alive: 0 })
+  repartitionMap.set('other', { deceased: 0, alive: 0 })
 
   facet?.forEach((extension) => {
     const isDeceased = extension.extension?.filter((extension) => {
@@ -90,7 +90,7 @@ export const getGenderRepartitionMapAphp = (facet?: IExtension[]): ComplexChartD
             repartitionMap.get('male').deceased = gender.valueDecimal
             break
           default:
-            repartitionMap.get('unknown').deceased = gender?.valueDecimal
+            repartitionMap.get('other').deceased = gender?.valueDecimal
         }
       })
     } else if (isDeceased === 'false') {
@@ -103,7 +103,7 @@ export const getGenderRepartitionMapAphp = (facet?: IExtension[]): ComplexChartD
             repartitionMap.get('male').alive = gender.valueDecimal
             break
           default:
-            repartitionMap.get('unknown').alive = gender?.valueDecimal
+            repartitionMap.get('other').alive = gender?.valueDecimal
         }
       })
     }
