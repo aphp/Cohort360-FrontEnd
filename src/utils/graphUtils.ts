@@ -316,10 +316,10 @@ export const getGenderRepartitionSimpleData = (
   vitalStatusData: SimpleChartDataType[]
   genderData: SimpleChartDataType[]
 } => {
-  const vitalStatusData: SimpleChartDataType[] = []
-  const genderData: SimpleChartDataType[] = []
+  const vitalStatusData: SimpleChartDataType[] | 'loading' = []
+  const genderData: SimpleChartDataType[] | 'loading' = []
 
-  if (genderRepartitionMap) {
+  if (genderRepartitionMap && genderRepartitionMap.size > 0) {
     let aliveCount = 0
     let deceasedCount = 0
     let maleCount = 0

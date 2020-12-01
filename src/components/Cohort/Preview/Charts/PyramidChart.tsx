@@ -12,7 +12,7 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
   const node = useRef<SVGSVGElement | null>(null)
 
   useEffect(() => {
-    if (!data) {
+    if (!data || (data && !data.size)) {
       return
     }
     let valueMax = 0
