@@ -90,7 +90,7 @@ export const fetchMyPatients = async (): Promise<CohortData | undefined> => {
   if (CONTEXT === 'aphp') {
     const [myPatientsResp, myPatientsEncounters] = await Promise.all([
       api.get<FHIR_API_Response<IPatient>>(
-        '/Patient?pivotFacet=age_gender,deceased_gender&size=20&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension'
+        '/Patient?pivotFacet=age_gender,deceased_gender&size=20&_elements=gender,name,birthDate,deceased,identifier,extension'
       ),
       api.get<FHIR_API_Response<IEncounter>>(
         '/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&size=0&type=VISIT'

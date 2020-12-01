@@ -30,7 +30,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     const [cohortResp, patientsResp, encountersResp] = await Promise.all([
       api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${cohortId}`),
       api.get<FHIR_API_Response<IPatient>>(
-        `/Patient?pivotFacet=age_gender,deceased_gender&_list=${cohortId}&size=20&_sort=given&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension`
+        `/Patient?pivotFacet=age_gender,deceased_gender&_list=${cohortId}&size=20&_sort=given&_elements=gender,name,birthDate,deceased,identifier,extension`
       ),
       api.get<FHIR_API_Response<IEncounter>>(
         `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${cohortId}&size=0&type=VISIT`
@@ -151,10 +151,10 @@ const fetchPatientList = async (
 > => {
   if (CONTEXT === 'arkhn') {
     //TODO: Improve api request (we filter after getting all the patients)
-    const patients = await searchPatient('given', 'asc', searchInput, searchBy, groupId)
+    const patientsResp = await searchPatient(page, sortBy, sortDirection, searchInput, searchBy, groupId)
 
-    if (patients) {
-      const filteredPatients: IPatient[] = patients.filter((patient) => {
+    if (patientsResp) {
+      const filteredPatients: IPatient[] = patientsResp.patientList.filter((patient) => {
         const agePatient = parseInt(getAge(patient))
         const genderPatient = patient.gender
         const vitalStatusPatient = patient.deceasedDateTime ? VitalStatus.deceased : VitalStatus.alive
@@ -186,13 +186,13 @@ const fetchPatientList = async (
   }
 
   if (CONTEXT === 'aphp') {
+    const facets = includeFacets ? 'pivotFacet=age_gender,deceased_gender&' : ''
+    const genderFilter = gender !== PatientGenderKind._unknown ? `&gender=${gender}` : ''
     const searchByGroup = groupId ? `&_list=${groupId}` : ''
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
-    let search = ''
-    let genderFilter = ''
     let ageFilter = ''
+    let search = ''
     let vitalStatusFilter = ''
-    let facets = ''
 
     if (searchInput) {
       if (searchBy) {
@@ -200,10 +200,6 @@ const fetchPatientList = async (
       } else {
         search = `&_text=${searchInput}`
       }
-    }
-
-    if (gender !== PatientGenderKind._unknown) {
-      genderFilter = `&gender=${gender}`
     }
 
     if (age !== [0, 130]) {
@@ -238,14 +234,10 @@ const fetchPatientList = async (
       }
     }
 
-    if (includeFacets) {
-      facets = 'pivotFacet=age_gender,deceased_gender&'
-    }
-
     const patientsResp = await api.get<FHIR_API_Response<IPatient>>(
       `/Patient?${facets}size=20&offset=${
         page ? (page - 1) * 20 : 0
-      }&_sort=${_sortDirection}${sortBy}&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension${searchByGroup}${search}${genderFilter}${vitalStatusFilter}${ageFilter}`
+      }&_sort=${_sortDirection}${sortBy}&_elements=gender,name,birthDate,deceasedBoolean,deceasedDateTime,identifier,extension${searchByGroup}${search}${genderFilter}${vitalStatusFilter}${ageFilter}`
     )
 
     const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
@@ -291,7 +283,7 @@ const fetchDocuments = async (
   if (CONTEXT === 'aphp') {
     const searchByGroup = groupId ? `&_list=${groupId}` : ''
     const search = searchInput ? `&_text=${searchInput}` : ''
-    const docTypesFilter = !selectedDocTypes.includes('all') ? `&type=${selectedDocTypes.join()}` : ''
+    const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : ''
     const ndaFilter = nda ? `&encounter.identifier=${nda}` : ''
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
     let dateFilter = ''

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import {
   Button,
@@ -10,8 +10,12 @@ import {
   TextField,
   Typography
 } from '@material-ui/core'
+import { Autocomplete } from '@material-ui/lab'
 
 import InputDate from 'components/Inputs/InputDate/InputDate'
+
+import { fetchDiagnosticTypes } from 'data/Requeteur/diagnosticCim10'
+import { capitalizeFirstLetter } from '../../../utils/capitalize'
 
 import useStyles from './styles'
 
@@ -28,6 +32,9 @@ type PMSIFiltersProps = {
   endDate?: string
   onChangeEndDate: (endDate: string | undefined) => void
   deidentified: boolean
+  selectedDiagnosticTypes: string[]
+  onChangeSelectedDiagnosticTypes: (selectedDiagnosticTypes: string[]) => void
+  showDiagnosticTypes: boolean
 }
 const PMSIFilters: React.FC<PMSIFiltersProps> = ({
   open,
@@ -41,9 +48,13 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
   onChangeStartDate,
   endDate,
   onChangeEndDate,
-  deidentified
+  deidentified,
+  selectedDiagnosticTypes,
+  onChangeSelectedDiagnosticTypes,
+  showDiagnosticTypes
 }) => {
   const classes = useStyles()
+  const [diagnosticTypes, setDiagnosticTypes] = useState<any[]>(selectedDiagnosticTypes)
 
   const _onChangeNda = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChangeNda(event.target.value)
@@ -52,6 +63,16 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
   const _onChangeCode = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChangeCode(event.target.value)
   }
+
+  const _onChangeSelectedDiagnosticTypes = (event: React.ChangeEvent<{}>, value: any[]) => {
+    onChangeSelectedDiagnosticTypes(value.map((value) => value.code))
+  }
+
+  useEffect(() => {
+    fetchDiagnosticTypes().then((diagnosticTypes) => {
+      setDiagnosticTypes(diagnosticTypes)
+    })
+  }, [])
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -85,6 +106,34 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
             onChange={_onChangeCode}
           />
         </Grid>
+        {showDiagnosticTypes && (
+          <Grid container direction="column" className={classes.filter}>
+            <Typography variant="h3">Type de diagnostics :</Typography>
+            <Autocomplete
+              multiple
+              onChange={_onChangeSelectedDiagnosticTypes}
+              options={diagnosticTypes}
+              value={diagnosticTypes.filter((value) => selectedDiagnosticTypes.includes(value.code))}
+              disableCloseOnSelect
+              getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.display)}
+              renderOption={(diagnosticType: any) => (
+                <React.Fragment>
+                  {diagnosticType.code.toUpperCase()} - {capitalizeFirstLetter(diagnosticType.display)}
+                </React.Fragment>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Types de diagnostics"
+                  placeholder="Sélectionner type(s) de diagnostics"
+                />
+              )}
+              className={classes.autocomplete}
+            />
+          </Grid>
+        )}
+
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Date :</Typography>
           <InputDate
