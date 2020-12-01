@@ -10,25 +10,38 @@ import { SearchByTypes } from 'types'
 import useStyles from './styles'
 
 type PatientSearchBarProps = {
-  performQueries?: (sortBy: string, sortDirection: string, searchInput: string, searchBy: SearchByTypes) => void
+  performQueries?: (
+    page: number,
+    sortBy: string,
+    sortDirection: string,
+    searchInput: string,
+    searchBy: SearchByTypes
+  ) => void
   showSelect?: boolean
   searchInput?: string
   onChangeInput?: (input: string) => void
+  searchBy?: SearchByTypes
+  onChangeSearchBy?: (searchBy: SearchByTypes) => void
 }
 
 const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   performQueries,
   showSelect,
   searchInput,
-  onChangeInput
+  onChangeInput,
+  searchBy = SearchByTypes.text,
+  onChangeSearchBy
 }) => {
   const classes = useStyles()
   const history = useHistory()
   const location = useLocation()
   const { search } = useParams()
 
-  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
   const [_searchInput, setSearchInput] = useState(search ?? searchInput)
+
+  const page = 1
+  const sortBy = 'given'
+  const sortDirection = 'asc'
 
   const handleChangeSelect = (
     event: React.ChangeEvent<{
@@ -36,7 +49,9 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
       value: unknown
     }>
   ) => {
-    setSearchBy(event.target.value as SearchByTypes)
+    if (onChangeSearchBy) {
+      onChangeSearchBy(event.target.value as SearchByTypes)
+    }
   }
 
   const handleChangeInput = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -52,7 +67,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
       if (location.pathname === '/accueil') {
         history.push(`/rechercher_patient/${_searchInput}`)
       } else {
-        performQueries && performQueries('given', 'asc', _searchInput, searchBy)
+        performQueries && performQueries(page, sortBy, sortDirection, _searchInput, searchBy)
       }
     }
   }
@@ -61,7 +76,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
     if (location.pathname === '/accueil') {
       history.push(`/rechercher_patient/${_searchInput}`)
     } else {
-      performQueries && performQueries('given', 'asc', _searchInput, searchBy)
+      performQueries && performQueries(page, sortBy, sortDirection, _searchInput, searchBy)
     }
   }
 

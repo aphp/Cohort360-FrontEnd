@@ -1,9 +1,5 @@
 {
-    "docTypes": [{
-        "type": "Tous",
-        "label": "Tous",
-        "code": "all"
-    },
+    "docTypes": [
     {
         "type": "Bilan Médical Initial (BMI)",
         "label": "Bilan Médical Initial (BMI)",

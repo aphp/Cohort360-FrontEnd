@@ -10,7 +10,7 @@ import useStyles from './styles'
 import api from '../../services/api'
 
 const fetchPatientNumber = async () => {
-  const response = await api.get('Patient?_summary=count')
+  const response = await api.get('Patient?size=0')
   if (!response) return 0
 
   return response.data ? response.data.total : 0

@@ -93,6 +93,8 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
 
   const onSearchPatient = (sortBy = 'given', sortDirection = 'asc') => {
     setPage(1)
+    setSortBy(sortBy)
+    setSortDirection(sortDirection as 'asc' | 'desc')
     fetchPatients(sortBy, sortDirection)
   }
 

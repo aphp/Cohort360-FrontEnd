@@ -1,15 +1,8 @@
 import api from './api'
-import { getInfos, getLastEncounter } from './myPatients'
+import { getLastEncounter } from './myPatients'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import { FHIR_API_Response, CohortData } from 'types'
-import {
-  IOrganization,
-  IHealthcareService,
-  IEncounter,
-  IPatient,
-  IGroup,
-  IComposition
-} from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IOrganization, IHealthcareService, IEncounter, IPatient, IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   getGenderRepartitionMapAphp,
   getAgeRepartitionMapAphp,
@@ -68,32 +61,21 @@ const getPatientsAndEncountersFromServiceId = async (serviceId: string) => {
 
 export const fetchPerimetersInfos = async (perimetersId: string): Promise<CohortData | undefined> => {
   if (CONTEXT === 'aphp') {
-    const [perimetersResp, patientsResp, encountersResp, docsResp] = await Promise.all([
+    const [perimetersResp, patientsResp, encountersResp] = await Promise.all([
       api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${perimetersId}`),
       api.get<FHIR_API_Response<IPatient>>(
-        `/Patient?pivotFacet=age_gender,deceased_gender&_list=${perimetersId}&size=20&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension`
+        `/Patient?pivotFacet=age_gender,deceased_gender&_list=${perimetersId}&size=20&_elements=gender,name,birthDate,deceased,identifier,extension`
       ),
       api.get<FHIR_API_Response<IEncounter>>(
         `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${perimetersId}&size=0&type=VISIT`
-      ),
-      api.get<FHIR_API_Response<IComposition>>(`/Composition?_list=${perimetersId}&size=20&_sort=-date&status=final`)
+      )
     ])
 
     const cohort = getApiResponseResources(perimetersResp)
 
-    const deidentifiedBoolean =
-      patientsResp?.data?.resourceType === 'Bundle'
-        ? patientsResp?.data?.entry?.[0].resource?.extension?.find((extension) => extension.url === 'deidentified')
-            ?.valueBoolean ?? true
-        : true
-
     const totalPatients = patientsResp?.data?.resourceType === 'Bundle' ? patientsResp.data.total : 0
 
     const originalPatients = await getLastEncounter(getApiResponseResources(patientsResp))
-
-    const totalDocs = docsResp.data.resourceType === 'Bundle' ? docsResp.data.total : 0
-
-    const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsResp))
 
     // const wordcloudData =
     //   docsResp.data.resourceType === 'Bundle'
@@ -134,8 +116,6 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
       cohort,
       totalPatients,
       originalPatients,
-      totalDocs,
-      documentsList,
       // wordcloudData,
       genderRepartitionMap,
       visitTypeRepartitionData,

@@ -7,6 +7,7 @@ import { getApiResponseResources } from 'utils/apiHelpers'
 import { getServices } from './perimeters'
 
 export const searchPatient = async (
+  page: number,
   sortBy: string,
   sortDirection: string,
   input: string,
@@ -77,26 +78,23 @@ export const searchPatient = async (
       patients && patients.forEach((patient) => patientSet.add(patient))
     }
 
-    return [...patientSet]
+    return { patientList: [...patientSet], totalPatients: [...patientSet].length }
   } else if (CONTEXT === 'aphp') {
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
 
-    const patientList = await api.get<FHIR_API_Response<IPatient>>(
-      `/Patient?_sort=${_sortDirection}${sortBy}&${searchBy}=${input}&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension`
+    const patientResp = await api.get<FHIR_API_Response<IPatient>>(
+      `/Patient?size=20&offset=${
+        page ? (page - 1) * 20 : 0
+      }&_sort=${_sortDirection}${sortBy}&${searchBy}=${input}&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension`
     )
 
-    if (patientList.data.resourceType === 'OperationOutcome') return
+    const patientList = await getLastEncounter(getApiResponseResources(patientResp))
 
-    if (!patientList.data.total) {
-      return []
-    } else {
-      if (patientList.data.entry) {
-        patientList.data.entry.forEach((item) => item.resource && patientSet.add(item.resource))
-      } else {
-        return []
-      }
+    const totalPatients = patientResp.data.resourceType === 'Bundle' ? patientResp.data.total : 0
+
+    return {
+      patientList,
+      totalPatients: totalPatients ?? 0
     }
-
-    return await getLastEncounter([...patientSet].filter(Boolean))
   }
 }

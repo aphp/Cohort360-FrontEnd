@@ -12,6 +12,8 @@ import constructCriteriaList from './DataList_Criteria'
 
 import useStyles from './styles'
 
+import buildRequest from '../../../utils/buildRequest'
+
 const Requeteur = () => {
   const practitioner = useAppSelector((state) => state.me)
   const classes = useStyles()
@@ -52,7 +54,7 @@ const Requeteur = () => {
       _criteria[4].subItems[0].fetch
     ) {
       _criteria[4].subItems[0].data.statusDiagnostic = await _criteria[4].subItems[0].fetch.fetchStatusDiagnostic()
-      _criteria[4].subItems[0].data.kindDiagnostic = await _criteria[4].subItems[0].fetch.fetchKindDiagnostic()
+      _criteria[4].subItems[0].data.kindDiagnostic = await _criteria[4].subItems[0].fetch.fetchDiagnosticTypes()
       _criteria[4].subItems[0].data.cim10Diagnostic = await _criteria[4].subItems[0].fetch.fetchCim10Diagnostic()
     }
     onChangeCriteria(_criteria)
@@ -67,6 +69,12 @@ const Requeteur = () => {
 
     _init()
   }, []) // eslint-disable-line
+
+  useEffect(() => {
+    console.log('selectedCriteria', selectedCriteria)
+    const requeteurJson = buildRequest(selectedCriteria)
+    console.log('requeteurJson', requeteurJson)
+  }, [selectedCriteria])
 
   if (loading) return <CircularProgress />
 

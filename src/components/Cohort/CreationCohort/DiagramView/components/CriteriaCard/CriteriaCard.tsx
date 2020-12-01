@@ -52,17 +52,17 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
   }
 
   const _displayCardContent = (_selectedCriteria: SelectedCriteriaType) => {
-    if (!_selectedCriteria || !_selectedCriteria.years) return <></>
+    if (!_selectedCriteria) return <></>
     let content = <></>
-    const startDate = _selectedCriteria.start_occurrence
-      ? moment(_selectedCriteria.start_occurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
+    const startDate = _selectedCriteria.startOccurrence
+      ? moment(_selectedCriteria.startOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
       : ''
-    const endDate = _selectedCriteria.end_occurrence
-      ? moment(_selectedCriteria.end_occurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
+    const endDate = _selectedCriteria.endOccurrence
+      ? moment(_selectedCriteria.endOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
       : ''
 
     switch (_selectedCriteria.type) {
-      case 'ghm':
+      case 'Claim': {
         content = (
           <>
             <Typography>
@@ -78,15 +78,14 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 : ''}
             </Typography>
             <Typography>
-              GHM sélectionné :
-              {_selectedCriteria.code
-                ? `"${_selectedCriteria.code['GHM CODE']} - ${_selectedCriteria.code['LONG DESCRIPTION']}"`
-                : '""'}
+              GHM sélectionné :{_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}
             </Typography>
           </>
         )
         break
-      case 'ccam':
+      }
+
+      case 'Procedure':
         content = (
           <>
             <Typography>
@@ -102,58 +101,54 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 : ''}
             </Typography>
             <Typography>
-              Acte CCAM sélectionné :
-              {_selectedCriteria.code
-                ? `"${_selectedCriteria.code['CCAM CODE']} - ${_selectedCriteria.code['LONG DESCRIPTION']}"`
-                : '""'}
+              Acte CCAM sélectionné :{_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}
             </Typography>
           </>
         )
         break
-      case 'diagnostics':
+
+      case 'Condition':
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,
             </Typography>
             <Typography>
-              Diagnostic CIM sélectionné :
-              {_selectedCriteria.code
-                ? `"${_selectedCriteria.code['DIAGNOSIS CODE']} - ${_selectedCriteria.code['LONG DESCRIPTION']}"`
-                : '""'}
+              Diagnostic CIM sélectionné :{_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}
             </Typography>
           </>
         )
         break
+
       case 'Patient': {
-        console.log('_selectedCriteria', _selectedCriteria)
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Démographie Patient</span>,
             </Typography>
             <Typography>Genre sélectionné :</Typography>
-            {_selectedCriteria.gender?.map(({ display }) => (
-              <Typography key={display}>{display}</Typography>
-            ))}
+            {_selectedCriteria.gender && (
+              <Typography key={_selectedCriteria?.gender?.label}>{_selectedCriteria.gender.label}</Typography>
+            )}
             <Typography>Status vital :</Typography>
-            {_selectedCriteria.vitalStatus?.map(({ display }) => (
-              <Typography key={display}>{display}</Typography>
-            ))}
+            {_selectedCriteria.vitalStatus && (
+              <Typography key={_selectedCriteria?.vitalStatus?.label}>{_selectedCriteria.vitalStatus.label}</Typography>
+            )}
             <Typography>
               {_selectedCriteria.years && _selectedCriteria.years[0] !== _selectedCriteria.years[1]
                 ? `Fourchette d'âge comprise entre ${_selectedCriteria.years[0]} et ${_selectedCriteria.years[1]} ans ${
                     _selectedCriteria.years[1] === 100 ? 'ou plus.' : '.'
                   }`
-                : `Age sélectionné: ${_selectedCriteria.years[0]} ans ${
-                    _selectedCriteria.years[0] === 100 ? 'ou plus.' : '.'
+                : `Age sélectionné: ${_selectedCriteria.years?.[0]} ans ${
+                    _selectedCriteria.years?.[0] === 100 ? 'ou plus.' : '.'
                   }`}
             </Typography>
           </>
         )
         break
       }
-      case 'documents_cliniques': {
+
+      case 'Composition': {
         const docTypes = {
           '55188-7': 'Tout type de documents',
           '11336-5': "Comptes rendus d'hospitalisation",
@@ -165,8 +160,52 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
               Dans <span className={classes.criteriaType}>Document médical</span>,
             </Typography>
             <Typography>
-              Recherche textuelle "{_selectedCriteria.search}" dans {docTypes[_selectedCriteria.doc ?? '55188-7']}
+              Recherche textuelle "{_selectedCriteria.search}" dans {docTypes[_selectedCriteria.docType ?? '55188-7']}
             </Typography>
+          </>
+        )
+        break
+      }
+
+      case 'Encounter': {
+        const ageType: any = _selectedCriteria.ageType ? _selectedCriteria.ageType.id : 'year'
+        let ageUnit = 'an(s)'
+        if (ageType === 'month') ageUnit = 'mois'
+        else if (ageType === 'day') ageUnit = 'jour(s)'
+
+        content = (
+          <>
+            <Typography>
+              Dans <span className={classes.criteriaType}>Prise en charge</span>,
+            </Typography>
+            <Typography>
+              Age au moment de la prise en charge:
+              {_selectedCriteria.years && _selectedCriteria.years[0] !== _selectedCriteria.years[1]
+                ? `entre ${_selectedCriteria.years[0]} et ${_selectedCriteria.years[1]} ${ageUnit} ${
+                    _selectedCriteria.years[1] === 100 ? 'ou plus.' : '.'
+                  }`
+                : `${_selectedCriteria.years?.[0]} ${ageUnit} ${
+                    _selectedCriteria.years?.[0] === 100 ? 'ou plus.' : '.'
+                  }`}
+            </Typography>
+            <Typography>
+              Durée de la prise en charge:
+              {_selectedCriteria.duration && _selectedCriteria.duration[0] !== _selectedCriteria.duration[1]
+                ? `entre ${_selectedCriteria.duration[0]} et ${_selectedCriteria.duration[1]} jour(s) ${
+                    _selectedCriteria.duration[1] === 100 ? 'ou plus.' : '.'
+                  }`
+                : `${_selectedCriteria.duration?.[0]} jour(s) ${
+                    _selectedCriteria.duration?.[0] === 100 ? 'ou plus.' : '.'
+                  }`}
+            </Typography>
+            {_selectedCriteria.admissionMode && (
+              <Typography>Mode d'admission: {_selectedCriteria.admissionMode.label}</Typography>
+            )}
+            {_selectedCriteria.entryMode && <Typography>Mode d'entré: {_selectedCriteria.entryMode.label}</Typography>}
+            {_selectedCriteria.exitMode && <Typography>Mode de sortie: {_selectedCriteria.exitMode.label}</Typography>}
+            {_selectedCriteria.fileStatus && (
+              <Typography>Status Dossier: {_selectedCriteria.fileStatus.label}</Typography>
+            )}
           </>
         )
         break

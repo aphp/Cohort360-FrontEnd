@@ -29,13 +29,7 @@ const useStyles = makeStyles(() => ({
   inputText: {
     border: '1px solid #D7DAE3',
     borderRadius: '5px',
-    padding: '0.5em',
-    '& > input[type=number]::-webkit-inner-spin-button': {
-      '-webkit-appearance': 'none'
-    },
-    '& > input[type=number]::-webkit-outer-spin-button': {
-      '-webkit-appearance': 'none'
-    }
+    padding: '0.5em'
   },
   inputTextError: {
     borderColor: '#c61137',
@@ -47,6 +41,10 @@ const useStyles = makeStyles(() => ({
     justifyContent: 'center',
     flexWrap: 'wrap',
     borderTop: '1px solid grey',
+    position: 'absolute',
+    width: '100%',
+    bottom: 0,
+    left: 0,
     '& > button': {
       margin: '12px 8px'
     }

@@ -2,7 +2,6 @@ import React from 'react'
 
 import {
   Button,
-  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
@@ -12,9 +11,6 @@ import {
   Typography
 } from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
-
-import CheckBoxIcon from '@material-ui/icons/CheckBox'
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank'
 
 import InputDate from 'components/Inputs/InputDate/InputDate'
 
@@ -42,7 +38,7 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
   onSubmit,
   nda,
   onChangeNda,
-  // selectedDocTypes,
+  selectedDocTypes,
   onChangeSelectedDocTypes,
   startDate,
   onChangeStartDate,
@@ -56,34 +52,18 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
 
   const _onChangeSelectedDocTypes = (
     event: React.ChangeEvent<{}>,
-    value:
-      | {
-          type: string
-          label: string
-          code: string
-        }[]
-      | null
-    // reason: AutocompleteChangeReason
+    value: {
+      type: string
+      label: string
+      code: string
+    }[]
   ) => {
     if (value) onChangeSelectedDocTypes(value.map((value) => value.code))
   }
 
-  // const _onChangeSelectedDocTypes = (
-  //   event: React.ChangeEvent<{
-  //     name?: string | undefined
-  //     value: any
-  //   }>,
-  //   child: React.ReactNode
-  // ) => {
-  //   onChangeSelectedDocTypes(event.target.value)
-  // }
-
   const _onChangeNda = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChangeNda(event.target.value)
   }
-
-  const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
-  const checkedIcon = <CheckBoxIcon fontSize="small" />
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -96,14 +76,10 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
             onChange={_onChangeSelectedDocTypes}
             groupBy={(doctype) => doctype.type}
             options={docTypesList}
+            value={docTypesList.filter((value) => selectedDocTypes.includes(value.code))}
             disableCloseOnSelect
             getOptionLabel={(docType: any) => docType.label}
-            renderOption={(docType: any, { selected }) => (
-              <React.Fragment>
-                <Checkbox icon={icon} checkedIcon={checkedIcon} style={{ marginRight: 8 }} checked={selected} />
-                {docType.label}
-              </React.Fragment>
-            )}
+            renderOption={(docType: any) => <React.Fragment>{docType.label}</React.Fragment>}
             renderInput={(params) => (
               <TextField {...params} variant="outlined" label="Types de documents" placeholder="Types de documents" />
             )}
