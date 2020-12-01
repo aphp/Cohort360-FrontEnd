@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Grid from '@material-ui/core/Grid'
 import Pagination from '@material-ui/lab/Pagination'
 import InputBase from '@material-ui/core/InputBase'
@@ -11,11 +11,11 @@ import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
 
 import DocumentTable from './DocumentTable/DocumentTable'
 
-import useStyles from './style'
+import useStyles from './styles'
 
-const PatientDocs = ({ patientId, documents }) => {
+const PatientDocs = ({ documents }) => {
   const classes = useStyles()
-  const [page, setPage] = React.useState(1)
+  const [page, setPage] = useState(1)
 
   const documentLines = 4 // Number of desired lines in the document array
 
@@ -23,28 +23,12 @@ const PatientDocs = ({ patientId, documents }) => {
     setPage(value)
   }
   return (
-    <Grid
-      container
-      item
-      xs={11}
-      justify="flex-end"
-      className={classes.documentTable}
-    >
+    <Grid container item xs={11} justify="flex-end" className={classes.documentTable}>
       <div className={classes.documentButtons}>
-        <Grid
-          item
-          container
-          xs={10}
-          alignItems="center"
-          className={classes.searchBar}
-        >
+        <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
           <InputBase placeholder="Rechercher" className={classes.input} />
           <IconButton type="submit" aria-label="search">
-            <SearchIcon
-              className={classes.searchIcon}
-              fill="#ED6D91"
-              height="15px"
-            />
+            <SearchIcon className={classes.searchIcon} fill="#ED6D91" height="15px" />
           </IconButton>
         </Grid>
         <Button
@@ -56,11 +40,7 @@ const PatientDocs = ({ patientId, documents }) => {
           Filtrer
         </Button>
       </div>
-      <DocumentTable
-        documentLines={documentLines}
-        documents={documents}
-        page={page}
-      />
+      <DocumentTable documentLines={documentLines} documents={documents} page={page} />
       <Pagination
         className={classes.pagination}
         count={Math.ceil(documents.length / documentLines)}

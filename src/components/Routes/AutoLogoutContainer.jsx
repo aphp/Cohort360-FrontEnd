@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import IdleTimer from 'react-idle-timer'
@@ -10,10 +10,10 @@ import { DialogContentText } from '@material-ui/core'
 import axios from 'axios'
 
 import { ACCES_TOKEN, REFRESH_TOKEN, CONTEXT } from '../../constants'
-import { logout as logoutAction } from '../../state/store'
-import useStyles from './style'
+import { logout as logoutAction } from '../../state/me'
+import useStyles from './styles'
 
-function AutoLogoutContainer() {
+const AutoLogoutContainer = () => {
   const classes = useStyles()
 
   const [dialogIsOpen, setDialogIsOpen] = useState(false)
@@ -22,14 +22,23 @@ function AutoLogoutContainer() {
   const inactifTimerRef = useRef(null)
   const sessionInactifTimerRef = useRef(null)
 
+  const logout = () => {
+    setDialogIsOpen(false)
+    history.push('/')
+    // console.log('User a été déconnecté')
+    localStorage.clear()
+    dispatch(logoutAction())
+    clearTimeout(sessionInactifTimerRef.current)
+  }
+
   const onIdle = () => {
     setDialogIsOpen(true)
     // console.log('User inactif depuis 10 secondes')
     sessionInactifTimerRef.current = setTimeout(logout, 60 * 1000)
   }
 
-  const stayActive = async () => {
-    await axios
+  const stayActive = () => {
+    axios
       .post('/api/jwt/refresh/', {
         refresh: localStorage.getItem(REFRESH_TOKEN)
       })
@@ -44,40 +53,36 @@ function AutoLogoutContainer() {
     clearTimeout(sessionInactifTimerRef.current)
   }
 
-  const logout = () => {
-    setDialogIsOpen(false)
-    history.push('/')
-    // console.log('User a été déconnecté')
-    localStorage.clear()
-    dispatch(logoutAction())
-    clearTimeout(sessionInactifTimerRef.current)
-  }
-
-  const refreshToken = () => {
-    setInterval(async () => {
-      // console.log('refresh still actif')
-      if(CONTEXT === ('aphp' || 'arkhn')) {
-        await axios.post('/api/jwt/refresh/', {
+  const refreshToken = async () => {
+    // console.log('refresh still actif')
+    if (CONTEXT === ('aphp' || 'arkhn')) {
+      await axios
+        .post('/api/jwt/refresh/', {
           refresh: localStorage.getItem(REFRESH_TOKEN)
-        }).then((res) => {
-          if(res.status === 200) {
+        })
+        .then((res) => {
+          if (res.status === 200) {
             localStorage.setItem(ACCES_TOKEN, res.data.access)
             localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
           }
         })
-      }
-    }, 13 * 60 * 1000);
+    }
   }
 
-  refreshToken()
+  useEffect(() => {
+    refreshToken()
+
+    setInterval(() => {
+      refreshToken()
+    }, 13 * 60 * 1000)
+  }, [])
 
   return (
     <div>
       <Dialog open={dialogIsOpen}>
         <DialogContent>
           <DialogContentText variant="button" className={classes.title}>
-            Vous allez être déconnecté car vous avez été inactif pendant 14
-            minutes.
+            Vous allez être déconnecté car vous avez été inactif pendant 14 minutes.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

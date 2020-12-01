@@ -1,8 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles'
-import {
-  smallDrawerWidth,
-  largeDrawerWidth
-} from '../../components/LeftSideBar/LeftSideBar'
+import { smallDrawerWidth, largeDrawerWidth } from '../../components/LeftSideBar/LeftSideBar'
 
 export const itemStyles = {
   group: {
@@ -60,12 +57,29 @@ export default makeStyles((theme) => ({
     paddingBottom: '20px',
     marginBottom: '40px'
   },
+  paper: {
+    height: 'calc(100vh - 250px)'
+  },
   buttons: {
     marginTop: theme.spacing(3),
+    marginBottom: theme.spacing(3),
+    marginRight: theme.spacing(1),
     display: 'flex',
     justifyContent: 'flex-end'
   },
+  cancelButton: {
+    width: '125px',
+    backgroundColor: '#D0D7D8',
+    borderRadius: '25px'
+  },
   validateButton: {
-    marginLeft: theme.spacing(2)
+    width: '125px',
+    backgroundColor: '#5BC5F2',
+    color: '#FFF',
+    borderRadius: '25px',
+    marginLeft: theme.spacing(2),
+    '&:hover': {
+      backgroundColor: '#499cbf'
+    }
   }
 }))

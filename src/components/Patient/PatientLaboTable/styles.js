@@ -12,7 +12,8 @@ export default makeStyles((theme) => ({
   },
   labButtons: {
     display: 'flex',
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
+    marginBottom: 5
   },
   searchBar: {
     width: '180px',

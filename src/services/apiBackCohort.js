@@ -14,9 +14,10 @@ apiBackCohort.interceptors.request.use((config) => {
   return config
 })
 
-apiBackCohort.interceptors.response.use((response) => {
-  return response
-},
+apiBackCohort.interceptors.response.use(
+  (response) => {
+    return response
+  },
   function (error) {
     if ((401 || 400) === error.response.status) {
       localStorage.clear()

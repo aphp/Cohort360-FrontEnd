@@ -4,7 +4,7 @@ export const getInclusionCriteriaUrl = (inclusionCriteria, index) => {
       return `/cohort/new/inclusionDiagram/addAction/addInclusionCriteria/medicalDoc/${index}`
     case 'Démographie patient':
       return `/cohort/new/inclusionDiagram/addAction/addInclusionCriteria/patientDemography/${index}`
-    case 'Diagnostiques CIM':
+    case 'Diagnostic CIM':
       return `/cohort/new/inclusionDiagram/addAction/addInclusionCriteria/cimDiagnostic/${index}`
     default:
       return ''

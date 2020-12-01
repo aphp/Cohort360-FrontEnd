@@ -13,6 +13,7 @@
 # IDEs and editors
 /.idea
 /.vscode
+!/.vscode/settings.json
 
 # misc
 .DS_Store
@@ -26,5 +27,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # Cohort360 specific
-.env
+.env*
+!.env.example
 .mp4

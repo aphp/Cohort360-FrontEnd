@@ -6,13 +6,7 @@ export default function Title(props) {
   const marginTopPx = props.marginTopPx
 
   return (
-    <Typography
-      style={{ marginTop: marginTopPx }}
-      component="h2"
-      variant="h2"
-      color="primary"
-      gutterBottom
-    >
+    <Typography style={{ marginTop: marginTopPx }} component="h2" variant="h2" color="primary" gutterBottom>
       {props.children}
     </Typography>
   )
