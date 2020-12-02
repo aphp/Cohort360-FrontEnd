@@ -237,7 +237,7 @@ const fetchPatientList = async (
     const patientsResp = await api.get<FHIR_API_Response<IPatient>>(
       `/Patient?${facets}size=20&offset=${
         page ? (page - 1) * 20 : 0
-      }&_sort=${_sortDirection}${sortBy}&_elements=gender,name,birthDate,deceasedBoolean,deceasedDateTime,identifier,extension${searchByGroup}${search}${genderFilter}${vitalStatusFilter}${ageFilter}`
+      }&_sort=${_sortDirection}${sortBy}&_elements=gender,name,birthDate,deceased,identifier,extension${searchByGroup}${search}${genderFilter}${vitalStatusFilter}${ageFilter}`
     )
 
     const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0

@@ -85,7 +85,7 @@ export const searchPatient = async (
     const patientResp = await api.get<FHIR_API_Response<IPatient>>(
       `/Patient?size=20&offset=${
         page ? (page - 1) * 20 : 0
-      }&_sort=${_sortDirection}${sortBy}&${searchBy}=${input}&_elements=gender,name,birthDate,deceasedBoolean,identifier,extension`
+      }&_sort=${_sortDirection}${sortBy}&${searchBy}=${input}&_elements=gender,name,birthDate,deceased,identifier,extension`
     )
 
     const patientList = await getLastEncounter(getApiResponseResources(patientResp))
