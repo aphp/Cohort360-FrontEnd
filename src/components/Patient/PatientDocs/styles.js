@@ -44,11 +44,11 @@ const useStyles = makeStyles((theme) => ({
     flex: 1
   },
   searchButton: {
-    width: '125px',
+    width: '150px',
     backgroundColor: '#5BC5F2',
     color: '#FFF',
     borderRadius: '25px',
-    marginLeft: 20
+    margin: '0 4px'
   }
 }))
 

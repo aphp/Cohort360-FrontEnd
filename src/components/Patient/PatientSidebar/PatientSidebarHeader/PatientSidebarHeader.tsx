@@ -97,6 +97,13 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
     { label: 'IPP', code: SearchByTypes.identifier }
   ]
 
+  const sortOptions = [
+    { label: 'Sexe', code: 'gender' },
+    { label: 'Prénom', code: 'given' },
+    { label: 'Nom', code: 'family' },
+    { label: 'Date de Naissance', code: 'birthdate' }
+  ]
+
   return (
     <div className={classes.root}>
       <Typography variant="button">Rechercher par :</Typography>
@@ -157,6 +164,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
           onClose={props.onCloseSort}
           onSubmit={props.onSubmitSort}
           sortBy={props.sortBy}
+          sortOptions={sortOptions}
           onChangeSortBy={props.onChangeSortBy}
           sortDirection={props.sortDirection}
           onChangeSortDirection={props.onChangeSortDirection}
