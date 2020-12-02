@@ -22,6 +22,7 @@ type SortDialogProps = {
   onClose: () => void
   onSubmit: () => void
   sortBy: string
+  sortOptions: { label: string; code: string }[]
   onChangeSortBy: any
   sortDirection: 'asc' | 'desc'
   onChangeSortDirection: any
@@ -31,6 +32,7 @@ const SortDialog: React.FC<SortDialogProps> = ({
   onClose,
   onSubmit,
   sortBy,
+  sortOptions,
   onChangeSortBy,
   sortDirection,
   onChangeSortDirection
@@ -51,22 +53,15 @@ const SortDialog: React.FC<SortDialogProps> = ({
     onChangeSortDirection(value)
   }
 
-  const sortByNames = [
-    { label: 'Sexe', code: 'gender' },
-    { label: 'Prénom', code: 'given' },
-    { label: 'Nom', code: 'family' },
-    { label: 'Date de Naissance', code: 'birthdate' }
-  ]
-
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle className={classes.title}>Trier par :</DialogTitle>
       <DialogContent className={classes.dialog}>
         <Grid container direction="row" justify="space-between">
           <Autocomplete
-            options={sortByNames}
+            options={sortOptions}
             getOptionLabel={(option) => option.label}
-            value={sortByNames.find((value) => value.code === sortBy)}
+            value={sortOptions.find((value) => value.code === sortBy)}
             renderInput={(params) => <TextField {...params} label="Trier par :" variant="outlined" />}
             onChange={_onChangeSortBy}
             className={classes.autocomplete}
