@@ -12,7 +12,7 @@ import constructCriteriaList from './DataList_Criteria'
 
 import useStyles from './styles'
 
-import buildRequest from '../../../utils/buildRequest'
+// import buildRequest from '../../../utils/buildRequest'
 
 const Requeteur = () => {
   const practitioner = useAppSelector((state) => state.me)
