@@ -70,9 +70,9 @@ const Requeteur = () => {
     _init()
   }, []) // eslint-disable-line
 
-  useEffect(() => {
-    const requeteurJson = buildRequest(selectedCriteria)
-  }, [selectedCriteria])
+  // useEffect(() => {
+  // const requeteurJson = buildRequest(selectedCriteria)
+  // }, [selectedCriteria])
 
   if (loading) return <CircularProgress />
 
