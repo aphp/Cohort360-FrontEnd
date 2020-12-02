@@ -93,9 +93,7 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
       onRequestSort(event, property)
     }
 
-    return loading ? (
-      <CircularProgress className={classes.loadingSpinner} size={50} />
-    ) : (
+    return (
       <>
         <TableContainer component={Paper} className={classes.tableContainer}>
           <Table className={classes.table} aria-label="customized table">
@@ -168,7 +166,17 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
               </TableRow>
             </TableHead>
             <TableBody>
-              {patients && patients.length > 0 ? (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <div className={classes.loadingSpinnerContainer}>
+                      <CircularProgress size={50} />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : patients && patients.length === 0 ? (
+                <TableRow> Aucun résultat à afficher </TableRow>
+              ) : (
                 patientsToShow.map((patient) => {
                   return (
                     patient && (
@@ -205,8 +213,6 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                     )
                   )
                 })
-              ) : (
-                <TableRow> Aucun résultat à afficher </TableRow>
               )}
             </TableBody>
           </Table>

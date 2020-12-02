@@ -55,10 +55,10 @@ const useStyles = makeStyles(() =>
       color: '#FFF',
       fontWeight: 'bold'
     },
-    loadingSpinner: {
-      position: 'absolute',
-      top: '50%',
-      right: '50%'
+    loadingSpinnerContainer: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
     },
     tableContainer: {},
     pagination: {
