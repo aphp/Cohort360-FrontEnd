@@ -68,7 +68,6 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 240, width = 20
       )
       .call((text) =>
         text
-          .filter((d) => d.endAngle - d.startAngle > 0.25)
           .append('tspan')
           .attr('x', 0)
           .attr('y', '0.7em')
