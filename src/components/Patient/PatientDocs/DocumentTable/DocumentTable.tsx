@@ -121,7 +121,7 @@ const DocumentTable: React.FC<DocumentTableTypes> = ({ documents, page, document
   const classes = useStyles()
   return (
     <>
-      {documents ? (
+      {documents && documents.length > 0 ? (
         <TableContainer component={Paper}>
           <Table className={classes.table} aria-label="simple table">
             <TableHead className={classes.tableHead}>

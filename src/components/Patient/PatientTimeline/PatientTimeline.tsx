@@ -4,6 +4,7 @@ import moment from 'moment'
 
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 import TimelineItemRight from './TimelineItemRight'
 import TimelineItemLeft from './TimelineItemLeft'
@@ -102,6 +103,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ hospits, consults }) 
   const timelineData = generateTimelineFormattedData(hospits, consults)
   const [openHospitDialog, setOpenHospitDialog] = useState(false)
   const [dialogDocuments, setDialogDocuments] = useState<(CohortComposition | IDocumentReference)[]>([])
+  const [loading, setLoading] = useState(false)
   const yearComponentSize: { [year: number]: number } = {}
 
   let yearList: number[] = Object.keys(timelineData)
@@ -121,11 +123,14 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ hospits, consults }) 
   }
 
   const handleClickOpenHospitDialog = (hospitOrConsult?: IEncounter | IProcedure) => {
-    hospitOrConsult &&
+    if (hospitOrConsult) {
+      setLoading(true)
       getEncounterOrProcedureDocs(hospitOrConsult).then((docs) => {
         setDialogDocuments(docs)
+        setLoading(false)
+        setOpenHospitDialog(true)
       })
-    setOpenHospitDialog(true)
+    }
   }
 
   const handleClose = () => {
@@ -237,6 +242,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ hospits, consults }) 
         </Grid>
       ) : (
         <>
+          {loading && <CircularProgress className={classes.loader} size={70} />}
           <HospitDialog open={openHospitDialog} onClose={handleClose} documents={dialogDocuments} />
           <div className={classes.centeredTimeline}>
             <div className={classes.verticalBar} />
