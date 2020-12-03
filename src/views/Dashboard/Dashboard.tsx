@@ -92,7 +92,7 @@ const Dashboard: React.FC<{
         _fetchMyPatients()
         setStatus('Exploration de population')
         setTabs([
-          { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: false },
+          { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu', value: 'apercu', to: '/mes_patients/apercu', disabled: false },
           { label: 'Patients', value: 'patients', to: '/mes_patients/patients', disabled: false },
           { label: 'Documents', value: 'documents', to: '/mes_patients/documents', disabled: false }
@@ -121,7 +121,7 @@ const Dashboard: React.FC<{
         _fetchPerimeters()
         setStatus('Exploration de périmètres')
         setTabs([
-          { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: false },
+          { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu', value: 'apercu', to: `/perimetres/apercu${location.search}`, disabled: false },
           { label: 'Patients', value: 'patients', to: `/perimetres/patients${location.search}`, disabled: false },
           { label: 'Documents', value: 'documents', to: `/perimetres/documents${location.search}`, disabled: false }
