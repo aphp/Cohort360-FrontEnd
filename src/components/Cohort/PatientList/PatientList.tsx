@@ -285,7 +285,7 @@ const PatientList: React.FC<PatientListProps> = ({
           <TableauPatient
             deidentified={deidentified}
             patients={patientsList ?? []}
-            loading={patientsList === undefined ?? loadingStatus}
+            loading={patientsList === undefined ? true : loadingStatus}
             onChangePage={handleChangePage}
             page={page}
             totalPatientCount={totalPatients}
