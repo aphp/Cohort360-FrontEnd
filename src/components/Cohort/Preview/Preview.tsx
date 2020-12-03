@@ -104,7 +104,6 @@ type PreviewProps = {
 const Preview: React.FC<PreviewProps> = ({
   total,
   group,
-  loading,
   genderRepartitionMap,
   visitTypeRepartitionData,
   monthlyVisitData,

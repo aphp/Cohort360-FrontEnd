@@ -31,7 +31,6 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = (data: any) => {
-    console.log('data', data)
     onChangeSelectedCriteria({
       title: data.title,
       search: data.search,

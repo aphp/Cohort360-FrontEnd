@@ -223,7 +223,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
 
                     <TableCell align="center" padding="checkbox">
                       <Checkbox
-                        color="primary"
+                        color="secondary"
                         onClick={() => _clickToSelect(_row)}
                         indeterminate={_checkIfIndeterminated(_row)}
                         checked={selectedItems.some(({ id }) => id === _row.id) ? true : false}

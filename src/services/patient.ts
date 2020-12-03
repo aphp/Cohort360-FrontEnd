@@ -477,6 +477,17 @@ export const getEncounterOrProcedureDocs = async (
     }
   }
 
+  if (CONTEXT === 'aphp') {
+    console.log(data)
+    const encounterId = data.id
+
+    const documentsResp = await api.get<FHIR_API_Response<IComposition>>(`/Composition?encounter=${encounterId}`)
+
+    //TO DO when deidentified data are fixed: change true to real value
+    const documentsList = await fillNDAAndServiceProviderDocs(true, getApiResponseResources(documentsResp))
+
+    if (documentsList) return documentsList
+  }
   return []
 }
 
@@ -544,7 +555,7 @@ export const fetchPatient = async (patientId: string): Promise<PatientData | und
       documentsResponse
     ] = await Promise.all([
       api.get<IPatient>(`/Patient/${patientId}`),
-      api.get<FHIR_API_Response<IProcedure>>(`/Procedure?patient=${patientId}&_sort=-date&size=20`),
+      api.get<FHIR_API_Response<IProcedure>>(`/Procedure?patient=${patientId}&_sort=-date&status=completed&size=20`),
       api.get<FHIR_API_Response<IEncounter>>(
         `/Encounter?patient=${patientId}&type=VISIT&status=arrived,triaged,in-progress,onleave,finished,unknown&_sort=-start-date`
       ),
