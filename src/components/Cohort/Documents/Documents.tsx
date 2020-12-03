@@ -32,6 +32,8 @@ import {
 import useStyles from './styles'
 import { useAppSelector } from 'state'
 
+import displayDigit from 'utils/displayDigit'
+
 type DocumentsProps = {
   groupId?: string
   deidentifiedBoolean: boolean
@@ -172,7 +174,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
         <Grid container item justify="flex-end" className={classes.tableGrid}>
           <Grid container justify="space-between" alignItems="center">
             <Typography variant="button">
-              {documentsNumber} / {allDocumentsNumber} document(s)
+              {displayDigit(documentsNumber ?? 0)} / {displayDigit(allDocumentsNumber ?? 0)} document(s)
             </Typography>
             <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
               <div className={classes.documentButtons}>
