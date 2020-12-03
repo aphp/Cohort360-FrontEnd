@@ -4,7 +4,6 @@ import moment from 'moment'
 
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
-import CircularProgress from '@material-ui/core/CircularProgress'
 
 import TimelineItemRight from './TimelineItemRight'
 import TimelineItemLeft from './TimelineItemLeft'
@@ -125,10 +124,10 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ hospits, consults }) 
   const handleClickOpenHospitDialog = (hospitOrConsult?: IEncounter | IProcedure) => {
     if (hospitOrConsult) {
       setLoading(true)
+      setOpenHospitDialog(true)
       getEncounterOrProcedureDocs(hospitOrConsult).then((docs) => {
-        setDialogDocuments(docs)
         setLoading(false)
-        setOpenHospitDialog(true)
+        setDialogDocuments(docs)
       })
     }
   }
@@ -242,8 +241,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ hospits, consults }) 
         </Grid>
       ) : (
         <>
-          {loading && <CircularProgress className={classes.loader} size={70} />}
-          <HospitDialog open={openHospitDialog} onClose={handleClose} documents={dialogDocuments} />
+          <HospitDialog open={openHospitDialog} onClose={handleClose} loading={loading} documents={dialogDocuments} />
           <div className={classes.centeredTimeline}>
             <div className={classes.verticalBar} />
             {yearList.map((year) => (

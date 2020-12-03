@@ -220,12 +220,6 @@ const useStyles = makeStyles({
   }),
   emptyYear: {
     height: emptyYearHeight
-  },
-  loader: {
-    position: 'fixed',
-    top: '50%',
-    left: '50%',
-    zIndex: '20'
   }
 })
 export default useStyles

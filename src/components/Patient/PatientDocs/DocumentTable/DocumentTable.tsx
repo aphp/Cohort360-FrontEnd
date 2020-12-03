@@ -7,6 +7,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  Grid,
   IconButton,
   Paper,
   Table,
@@ -157,7 +158,9 @@ const DocumentTable: React.FC<DocumentTableTypes> = ({ documents, page, document
           </Table>
         </TableContainer>
       ) : (
-        <Typography> Aucun document à afficher </Typography>
+        <Grid container justify="center">
+          <Typography variant="button"> Aucun document à afficher </Typography>
+        </Grid>
       )}
     </>
   )
