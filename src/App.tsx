@@ -2,6 +2,7 @@ import React from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { ApolloProvider } from '@apollo/react-hooks'
+import { enableMapSet } from 'immer'
 import ApolloClient from 'apollo-boost'
 import moment from 'moment'
 
@@ -32,6 +33,7 @@ const authClient = new ApolloClient({
   uri: AUTH_API_URL
 })
 
+enableMapSet()
 moment.locale('fr')
 
 const App = () => (

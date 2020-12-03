@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import {
   Button,
+  CircularProgress,
   CssBaseline,
   Grid,
   IconButton,
@@ -25,7 +26,7 @@ import LockIcon from '@material-ui/icons/Lock'
 
 import { fetchPatientList } from '../../../services/cohortInfos'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { CohortPatient, ComplexChartDataType, SearchByTypes, VitalStatus } from 'types'
+import { CohortPatient, SimpleChartDataType, ComplexChartDataType, SearchByTypes, VitalStatus } from 'types'
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 
 import useStyles from './styles'
@@ -34,22 +35,33 @@ type PatientListProps = {
   total: number
   groupId?: string
   deidentified?: boolean
-  patients: CohortPatient[]
+  patients?: CohortPatient[]
   loading?: boolean
   agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
   genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
 }
 
-const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified, patients, loading, ...props }) => {
+const PatientList: React.FC<PatientListProps> = ({
+  groupId,
+  total,
+  deidentified,
+  patients,
+  agePyramidData,
+  genderRepartitionMap
+}) => {
   const classes = useStyles()
   const [page, setPage] = useState(1)
   const [totalPatients, setTotalPatients] = useState(total)
   const [patientsList, setPatientsList] = useState(patients)
-  const [loadingStatus, setLoadingStatus] = useState(loading)
+  const [loadingStatus, setLoadingStatus] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
-  const [agePyramid, setAgePyramid] = useState(props.agePyramidData)
-  const [patientData, setPatientData] = useState(getGenderRepartitionSimpleData(props.genderRepartitionMap))
+  const [agePyramid, setAgePyramid] = useState<
+    ComplexChartDataType<number, { male: number; female: number; other?: number }> | undefined
+  >(undefined)
+  const [patientData, setPatientData] = useState<
+    { vitalStatusData: SimpleChartDataType[]; genderData: SimpleChartDataType[] } | undefined
+  >(undefined)
   const [open, setOpen] = useState(false)
   const [gender, setGender] = useState<PatientGenderKind>(PatientGenderKind._unknown)
   const [age, setAge] = useState<[number, number]>([0, 130])
@@ -57,6 +69,18 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
   const [sortBy, setSortBy] = useState('given') // eslint-disable-line
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc') // eslint-disable-line
   const includeFacets = true
+
+  useEffect(() => {
+    setAgePyramid(agePyramidData)
+  }, [agePyramidData])
+
+  useEffect(() => {
+    setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
+  }, [genderRepartitionMap])
+
+  useEffect(() => {
+    setPatientsList(patients)
+  }, [patients])
 
   const handleOpenDialog = () => {
     setOpen(true)
@@ -119,7 +143,7 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value = 1) => {
     setPage(value)
     //We only fetch patients if we don't already have them
-    if (totalPatients > patients.length) {
+    if (patients && patients.length < totalPatients) {
       fetchPatients(sortBy, sortDirection, value)
     }
   }
@@ -155,7 +179,14 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
                   Répartition par genre
                 </Typography>
               </Grid>
-              <BarChart data={patientData.genderData} />
+              {patientData === undefined ||
+              (patientData && patientData.genderData && patientData.genderData.length === 0) ? (
+                <Grid container justify="center" alignItems="center">
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <BarChart data={patientData.genderData} />
+              )}
             </Paper>
           </Grid>
           <Grid container item xs={12} sm={6} lg={4} justify="center">
@@ -165,7 +196,14 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
                   Répartition par statut vital
                 </Typography>
               </Grid>
-              <PieChart data={patientData.vitalStatusData} />
+              {patientData === undefined ||
+              (patientData && patientData.vitalStatusData && patientData.vitalStatusData.length === 0) ? (
+                <Grid container justify="center" alignItems="center">
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <PieChart data={patientData.vitalStatusData} />
+              )}
             </Paper>
           </Grid>
           <Grid container item xs={12} sm={6} lg={4} justify="center">
@@ -175,7 +213,13 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
                   Pyramide des âges
                 </Typography>
               </Grid>
-              <PyramidChart data={agePyramid} width={300} />
+              {agePyramid === undefined ? (
+                <Grid container justify="center" alignItems="center">
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <PyramidChart data={agePyramid} width={300} />
+              )}
             </Paper>
           </Grid>
         </Grid>
@@ -240,8 +284,8 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
           </Grid>
           <TableauPatient
             deidentified={deidentified}
-            patients={patientsList}
-            loading={loadingStatus}
+            patients={patientsList ?? []}
+            loading={patientsList === undefined ?? loadingStatus}
             onChangePage={handleChangePage}
             page={page}
             totalPatientCount={totalPatients}
