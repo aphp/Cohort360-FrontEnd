@@ -236,7 +236,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ hospits, consults }) 
 
   return (
     <>
-      {!hospits && !consults ? (
+      {hospits && consults && hospits.length === 0 && consults.length === 0 ? (
         <Grid container justify="center">
           <Typography variant="button">Le patient n'a pas de visites à afficher.</Typography>
         </Grid>
