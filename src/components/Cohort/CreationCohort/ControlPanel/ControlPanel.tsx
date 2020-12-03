@@ -15,8 +15,10 @@ import { CohortCreationCounterType } from 'types'
 const ControlPanel: React.FC<
   {
     onExecute: () => void
+    onUndo?: () => void
+    onRedo?: () => void
   } & CohortCreationCounterType
-> = ({ includePatient, byrequest, alive, deceased, female, male, onExecute }) => {
+> = ({ includePatient, byrequest, alive, deceased, female, male, onExecute, onUndo, onRedo }) => {
   const classes = useStyle()
 
   return (
@@ -32,6 +34,8 @@ const ControlPanel: React.FC<
 
         <Button
           className={classes.actionButton}
+          onClick={onUndo}
+          disabled={typeof onUndo !== 'function'}
           startIcon={<ArrowBackIcon color="action" className={classes.iconBorder} />}
         >
           <Typography className={classes.boldText}>Annuler</Typography>
@@ -41,6 +45,8 @@ const ControlPanel: React.FC<
 
         <Button
           className={classes.actionButton}
+          onClick={onRedo}
+          disabled={typeof onRedo !== 'function'}
           startIcon={<ArrowForwardIcon color="action" className={classes.iconBorder} />}
         >
           <Typography className={classes.boldText}>Rétablir</Typography>

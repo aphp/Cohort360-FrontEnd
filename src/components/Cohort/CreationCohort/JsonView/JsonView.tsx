@@ -14,7 +14,7 @@ type JsonViewProps = {
 const JsonView: React.FC<JsonViewProps> = (props) => {
   const classes = useStyles()
 
-  const { defaultJson, onChangeJson } = props
+  const { defaultJson } = props
 
   return (
     <AceEditor

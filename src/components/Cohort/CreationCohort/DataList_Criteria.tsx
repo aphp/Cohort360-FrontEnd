@@ -55,7 +55,7 @@ const criteriaList: CriteriaItemType[] = [
     title: 'Patients',
     color: '#0063AF',
     components: DemographicFrom,
-    data: { gender: 'loading', deceased: 'loading' },
+    data: { gender: 'loading', status: 'loading' },
     fetch: { fetchGender, fetchStatus }
   },
   {

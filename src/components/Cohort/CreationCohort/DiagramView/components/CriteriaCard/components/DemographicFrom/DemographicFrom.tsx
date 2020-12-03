@@ -40,7 +40,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
     })
   }
 
-  if (criteria.data.gender === 'loading') {
+  if (criteria.data.gender === 'loading' || criteria.data.status === 'loading') {
     return <></>
   }
 
@@ -88,7 +88,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             variant: 'outlined',
             label: 'Status vital',
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.deceased?.map((deceased: any) => ({
+            autocompleteOptions: criteria?.data?.status?.map((deceased: any) => ({
               id: deceased.value,
               label: deceased.display
             }))
