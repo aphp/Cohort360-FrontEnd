@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 import { Link, useParams, useLocation } from 'react-router-dom'
 import { Grid, Tabs, Tab } from '@material-ui/core'
 import { IExtension } from '@ahryman40k/ts-fhir-types/lib/R4'
-// import Alert from '@material-ui/lab/Alert'
+import Alert from '@material-ui/lab/Alert'
 
 import InclusionExclusionPatientsPanel from '../../components/Cohort/InclusionExclusionPatients/InclusionExclusionPatients'
 import RedcapExport from '../../components/RedcapExport/RedcapExport'
@@ -78,7 +78,7 @@ const Dashboard: React.FC<{
       setExploredCohort({
         cohort: undefined,
         name: '',
-        totalPatients: 0,
+        totalPatients: undefined,
         agePyramidData: undefined,
         genderRepartitionMap: undefined,
         monthlyVisitData: undefined,
@@ -195,13 +195,13 @@ const Dashboard: React.FC<{
     return <CohortCreation />
   }
 
-  // if (!dashboard.cohort && context !== 'patients') {
-  //   return (
-  //     <Alert severity="error" className={classes.alert}>
-  //       Les données ne sont pas encore disponibles, veuillez réessayer ultérieurement.
-  //     </Alert>
-  //   )
-  // }
+  if (dashboard.totalPatients === 0) {
+    return (
+      <Alert severity="error" className={classes.alert}>
+        Les données ne sont pas encore disponibles, veuillez réessayer ultérieurement.
+      </Alert>
+    )
+  }
 
   return (
     <Grid
@@ -253,7 +253,7 @@ const Dashboard: React.FC<{
       <div>
         {selectedTab === 'apercu' && (
           <CohortPreview
-            total={dashboard.totalPatients ?? 0}
+            total={dashboard.totalPatients}
             group={_displayGroupName()}
             agePyramidData={dashboard.agePyramidData ?? 'loading'}
             genderRepartitionMap={dashboard.genderRepartitionMap ?? 'loading'}
