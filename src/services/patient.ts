@@ -478,8 +478,12 @@ export const getEncounterOrProcedureDocs = async (
   }
 
   if (CONTEXT === 'aphp') {
-    console.log(data)
-    const encounterId = data.id
+    let encounterId
+    if (data.resourceType === 'Encounter') {
+      encounterId = data.id
+    } else if (data.resourceType === 'Procedure') {
+      encounterId = data.encounter?.reference
+    }
 
     const documentsResp = await api.get<FHIR_API_Response<IComposition>>(`/Composition?encounter=${encounterId}`)
 

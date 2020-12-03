@@ -60,7 +60,6 @@ const useStyles = makeStyles(() =>
       alignItems: 'center',
       justifyContent: 'center'
     },
-    tableContainer: {},
     pagination: {
       margin: '10px 0',
       float: 'right',
