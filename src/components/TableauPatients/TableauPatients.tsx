@@ -21,9 +21,11 @@ import { ReactComponent as MaleIcon } from '../../assets/icones/mars.svg'
 import { ReactComponent as UnknownIcon } from '../../assets/icones/autre-inconnu.svg'
 
 import { getAge } from 'utils/age'
-import useStyles from './styles'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortPatient } from 'types'
+import { capitalizeFirstLetter } from 'utils/capitalize'
+
+import useStyles from './styles'
 
 type PatientGenderProps = {
   gender: PatientGenderKind
@@ -95,7 +97,7 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
 
     return (
       <>
-        <TableContainer component={Paper} className={classes.tableContainer}>
+        <TableContainer component={Paper}>
           <Table className={classes.table} aria-label="customized table">
             <TableHead>
               <TableRow className={classes.tableHead}>
@@ -189,7 +191,9 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                         <TableCell align="center">
                           {patient.gender && <PatientGender gender={patient.gender} className={classes.genderIcon} />}
                         </TableCell>
-                        <TableCell>{deidentified ? 'Prénom' : patient.name?.[0].given?.[0]}</TableCell>
+                        <TableCell>
+                          {deidentified ? 'Prénom' : capitalizeFirstLetter(patient.name?.[0].given?.[0])}
+                        </TableCell>
                         <TableCell>{deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ')}</TableCell>
                         <TableCell align="center">
                           {deidentified
