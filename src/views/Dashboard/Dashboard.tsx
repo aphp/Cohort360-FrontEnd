@@ -263,7 +263,7 @@ const Dashboard: React.FC<{
         )}
         {selectedTab === 'patients' && (
           <PatientList
-            groupId={cohortId}
+            groupId={cohortId || perimetreIds}
             total={dashboard.totalPatients || 0}
             deidentified={deidentifiedBoolean}
             patients={dashboard.originalPatients}
