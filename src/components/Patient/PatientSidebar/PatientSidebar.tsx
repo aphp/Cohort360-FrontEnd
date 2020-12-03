@@ -83,7 +83,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       setPage(page)
     }
   }
-  console.log('page', page)
+
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
     submit && onSearchPatient(sortBy, sortDirection)
