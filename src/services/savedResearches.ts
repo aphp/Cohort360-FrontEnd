@@ -58,7 +58,7 @@ export const fetchCohorts = async (
       `/cohorts/?ordering=-favorite&type=IMPORT_I2B2${searchByText}&limit=20${offset}`
     )
 
-    const results = cohortResp.data.results
+    const results = cohortResp?.data?.results
       ? cohortResp.data.results
           .map((cohort) => ({
             researchId: cohort.uuid ?? '',
@@ -84,7 +84,7 @@ export const fetchFavoriteCohorts = async (): Promise<Back_API_Response<Formatte
   if (CONTEXT === 'aphp') {
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>('/cohorts/?favorite=true&type=IMPORT_I2B2')
 
-    const results = cohortResp.data.results
+    const results = cohortResp?.data?.results
       ? cohortResp.data.results
           .map((cohort: Cohort) => {
             return {
@@ -113,7 +113,7 @@ export const fetchLastCohorts = async (): Promise<Back_API_Response<FormattedCoh
       '/cohorts/?limit=5&type=IMPORT_I2B2&ordering=-created_at'
     )
 
-    const results = cohortResp.data.results
+    const results = cohortResp?.data?.results
       ? cohortResp.data.results
           .map((cohort) => ({
             researchId: cohort.uuid ?? '',
