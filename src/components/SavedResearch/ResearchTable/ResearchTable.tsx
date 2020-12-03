@@ -26,6 +26,8 @@ import { ReactComponent as StarFull } from '../../../assets/icones/star full.svg
 import { onRemoveCohort } from '../../../services/savedResearches'
 import { FormattedCohort } from 'types'
 
+import displayDigit from 'utils/displayDigit'
+
 import useStyles from './styles'
 
 type FavStarProps = {
@@ -149,7 +151,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       {row.status}
                     </TableCell>
                     <TableCell align="center">{row.perimeter}</TableCell>
-                    <TableCell align="center">{row.nPatients}</TableCell>
+                    <TableCell align="center">{displayDigit(row.nPatients ?? 0)}</TableCell>
                     <TableCell align="center">
                       {row.date && (
                         <>

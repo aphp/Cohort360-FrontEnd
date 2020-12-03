@@ -29,6 +29,8 @@ import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortPatient, SimpleChartDataType, ComplexChartDataType, SearchByTypes, VitalStatus } from 'types'
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 
+import displayDigit from 'utils/displayDigit'
+
 import useStyles from './styles'
 
 type PatientListProps = {
@@ -226,7 +228,7 @@ const PatientList: React.FC<PatientListProps> = ({
         <Grid container item justify="flex-end" className={classes.tableGrid}>
           <Grid container justify="space-between" alignItems="center">
             <Typography variant="button">
-              {totalPatients} / {total} patient(s)
+              {displayDigit(totalPatients)} / {displayDigit(total)} patient(s)
             </Typography>
             <div className={classes.tableButtons}>
               {deidentified ? (
