@@ -7,6 +7,7 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  Grid,
   IconButton,
   Paper,
   Table,
@@ -121,7 +122,7 @@ const DocumentTable: React.FC<DocumentTableTypes> = ({ documents, page, document
   const classes = useStyles()
   return (
     <>
-      {documents ? (
+      {documents && documents.length > 0 ? (
         <TableContainer component={Paper}>
           <Table className={classes.table} aria-label="simple table">
             <TableHead className={classes.tableHead}>
@@ -157,7 +158,9 @@ const DocumentTable: React.FC<DocumentTableTypes> = ({ documents, page, document
           </Table>
         </TableContainer>
       ) : (
-        <Typography> Aucun document à afficher </Typography>
+        <Grid container justify="center">
+          <Typography variant="button"> Aucun document à afficher </Typography>
+        </Grid>
       )}
     </>
   )

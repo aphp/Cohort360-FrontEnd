@@ -8,6 +8,7 @@ import { ReactComponent as MaleIcon } from '../../../../assets/icones/mars.svg'
 import { ReactComponent as UnknownIcon } from '../../../../assets/icones/autre-inconnu.svg'
 
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { capitalizeFirstLetter } from '../../../../utils/capitalize'
 
 import useStyles from './styles'
 
@@ -65,7 +66,7 @@ const PatientSidebarItem: React.FC<PatientSidebarItemTypes> = ({
       <ListItemIcon className={classes.genderIconContainer}>
         <GenderIcon gender={gender} />
       </ListItemIcon>
-      <ListItemText primary={`${firstName} ${lastName}`} secondary={`${age} - ${ipp}`} />
+      <ListItemText primary={`${capitalizeFirstLetter(firstName)} ${lastName}`} secondary={`${age} - ${ipp}`} />
       <VitalStatusChip deceased={deceased} />
     </ListItem>
   )
