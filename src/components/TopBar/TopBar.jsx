@@ -9,6 +9,8 @@ import IconButton from '@material-ui/core/IconButton'
 import { ReactComponent as SaveIcon } from '../../assets/icones/save.svg'
 import { ReactComponent as Star } from '../../assets/icones/star.svg'
 
+import displayDigit from 'utils/displayDigit'
+
 const TopBar = (props) => {
   const classes = useStyles()
 
@@ -26,7 +28,7 @@ const TopBar = (props) => {
           </Grid>
           <Grid item xs={3} direction="column" container>
             <TopBarItem header text="Nombre de patients" />
-            <TopBarItem text={props.patientsNb} />
+            <TopBarItem text={displayDigit(props.patientsNb)} />
           </Grid>
           <Grid item xs={3} direction="column" container>
             <TopBarItem header text="Accès" />

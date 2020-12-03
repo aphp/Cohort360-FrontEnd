@@ -18,6 +18,8 @@ import { getScopePerimeters, getScopeSubItems } from '../../services/scopeServic
 import { ScopeTreeRow } from 'types'
 import { useAppSelector } from 'state'
 
+import displayDigit from 'utils/displayDigit'
+
 import useStyles from './styles'
 
 type ScopeTreeProps = {
@@ -236,7 +238,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                     </TableCell>
 
                     <TableCell>
-                      <Typography>{_row.quantity}</Typography>
+                      <Typography>{displayDigit(_row.quantity)}</Typography>
                     </TableCell>
                   </TableRow>
                 )}

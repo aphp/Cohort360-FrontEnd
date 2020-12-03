@@ -58,7 +58,8 @@ export default makeStyles((theme) => ({
     marginBottom: '40px'
   },
   paper: {
-    height: 'calc(100vh - 250px)'
+    background: 'transparent',
+    boxShadow: 'none'
   },
   buttons: {
     marginTop: theme.spacing(3),

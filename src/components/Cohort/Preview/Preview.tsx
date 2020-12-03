@@ -24,6 +24,8 @@ import useStyles from './styles'
 
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
+import displayDigit from 'utils/displayDigit'
+
 import { ComplexChartDataType, SimpleChartDataType, Month } from 'types'
 
 type RepartitionTableProps = {
@@ -72,15 +74,15 @@ const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMa
             <TableCell component="th" scope="row" className={classes.tableHeadCell}>
               Femmes
             </TableCell>
-            <TableCell align="center">{femaleAlive}</TableCell>
-            <TableCell align="center">{femaleDeceased}</TableCell>
+            <TableCell align="center">{displayDigit(femaleAlive ?? 0)}</TableCell>
+            <TableCell align="center">{displayDigit(femaleDeceased ?? 0)}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell component="th" scope="row" className={classes.tableHeadCell}>
               Hommes
             </TableCell>
-            <TableCell align="center">{maleAlive}</TableCell>
-            <TableCell align="center">{maleDeceased}</TableCell>
+            <TableCell align="center">{displayDigit(maleAlive ?? 0)}</TableCell>
+            <TableCell align="center">{displayDigit(maleDeceased ?? 0)}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -89,7 +91,7 @@ const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMa
 }
 
 type PreviewProps = {
-  total: number
+  total?: number
   group: {
     name: string
     description?: string
@@ -157,9 +159,15 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              <Typography variant="h4" className={classes.nbPatients}>
-                {total} patients
-              </Typography>
+              {total === undefined ? (
+                <Grid className={classes.progressContainer}>
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <Typography variant="h4" className={classes.nbPatients}>
+                  {displayDigit(total)} patients
+                </Typography>
+              )}
             </Paper>
           </Grid>
           <Grid item xs={12} sm={6} md={8}>
