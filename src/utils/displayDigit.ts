@@ -1,7 +1,7 @@
 export default function (number: number) {
-  const _number: string = number.toString().split('').reverse().join('')
+  const _number: string = number?.toString().split('').reverse().join('')
   let result = ''
-  for (let i = _number.length - 1; i >= 0; i--) {
+  for (let i = _number?.length - 1; i >= 0; i--) {
     if (i !== 0 && i % 3 === 0) {
       result += _number[i] + ' '
     } else {

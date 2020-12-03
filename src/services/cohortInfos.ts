@@ -202,7 +202,7 @@ const fetchPatientList = async (
       }
     }
 
-    if (age !== [0, 130]) {
+    if (age[0] !== 0 || age[1] !== 130) {
       const today = new Date()
 
       const month = today.getMonth() + 1

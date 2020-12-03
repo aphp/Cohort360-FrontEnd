@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { Dialog, DialogActions, DialogTitle } from '@material-ui/core'
+import { CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
 import DocumentTable from '../../PatientDocs/DocumentTable/DocumentTable'
 
 import Pagination from '@material-ui/lab/Pagination'
@@ -17,8 +17,9 @@ type HospitDialogTypes = {
   open: boolean
   onClose: () => void
   documents?: (CohortComposition | IDocumentReference)[]
+  loading: boolean
 }
-const HospitDialog: React.FC<HospitDialogTypes> = ({ open, onClose, documents }) => {
+const HospitDialog: React.FC<HospitDialogTypes> = ({ open, onClose, documents, loading }) => {
   const classes = useStyles()
   const documentLines = 4 // Number of desired lines in the document array
   const [page, setPage] = useState(1)
@@ -32,9 +33,21 @@ const HospitDialog: React.FC<HospitDialogTypes> = ({ open, onClose, documents })
   }, [open])
 
   return (
-    <Dialog onClose={onClose} aria-labelledby="simple-dialog-title" open={open} maxWidth={'lg'}>
-      <DialogTitle id="simple-dialog-title">Hospitalisation</DialogTitle>
-      {documents && <DocumentTable documentLines={documentLines} documents={documents} page={page} />}
+    <Dialog
+      onClose={onClose}
+      aria-labelledby="simple-dialog-title"
+      open={open}
+      maxWidth={'lg'}
+      className={classes.dialogContent}
+    >
+      <DialogTitle id="simple-dialog-title">Documents</DialogTitle>
+      <DialogContent className={classes.dialogContent}>
+        {loading ? (
+          <CircularProgress className={classes.loading} />
+        ) : (
+          <>{documents && <DocumentTable documentLines={documentLines} documents={documents} page={page} />}</>
+        )}
+      </DialogContent>
       <DialogActions>
         <Pagination
           className={classes.pagination}

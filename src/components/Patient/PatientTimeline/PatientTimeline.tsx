@@ -102,6 +102,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ hospits, consults }) 
   const timelineData = generateTimelineFormattedData(hospits, consults)
   const [openHospitDialog, setOpenHospitDialog] = useState(false)
   const [dialogDocuments, setDialogDocuments] = useState<(CohortComposition | IDocumentReference)[]>([])
+  const [loading, setLoading] = useState(false)
   const yearComponentSize: { [year: number]: number } = {}
 
   let yearList: number[] = Object.keys(timelineData)
@@ -121,11 +122,14 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ hospits, consults }) 
   }
 
   const handleClickOpenHospitDialog = (hospitOrConsult?: IEncounter | IProcedure) => {
-    hospitOrConsult &&
+    if (hospitOrConsult) {
+      setLoading(true)
+      setOpenHospitDialog(true)
       getEncounterOrProcedureDocs(hospitOrConsult).then((docs) => {
+        setLoading(false)
         setDialogDocuments(docs)
       })
-    setOpenHospitDialog(true)
+    }
   }
 
   const handleClose = () => {
@@ -231,13 +235,13 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ hospits, consults }) 
 
   return (
     <>
-      {!hospits && !consults ? (
+      {hospits && consults && hospits.length === 0 && consults.length === 0 ? (
         <Grid container justify="center">
           <Typography variant="button">Le patient n'a pas de visites à afficher.</Typography>
         </Grid>
       ) : (
         <>
-          <HospitDialog open={openHospitDialog} onClose={handleClose} documents={dialogDocuments} />
+          <HospitDialog open={openHospitDialog} onClose={handleClose} loading={loading} documents={dialogDocuments} />
           <div className={classes.centeredTimeline}>
             <div className={classes.verticalBar} />
             {yearList.map((year) => (
