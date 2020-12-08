@@ -12,7 +12,7 @@ export const getAgeArkhn = (birthDate: Date, deathOrTodayDate = new Date()) => {
 }
 
 export const getAgeAphp = (ageObj: any) => {
-  if (ageObj.valueInteger) {
+  if (ageObj.valueString) {
     let ageUnit = ''
     if (ageObj.url.includes('Years')) {
       ageUnit = 'ans'
@@ -24,7 +24,7 @@ export const getAgeAphp = (ageObj: any) => {
       return 'Âge inconnu'
     }
 
-    return `${ageObj.valueInteger} ${ageUnit}`
+    return `${ageObj.valueString.slice(0, ageObj.valueString.indexOf('.'))} ${ageUnit}`
   } else {
     return 'Âge inconnu'
   }

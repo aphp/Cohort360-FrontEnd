@@ -187,12 +187,16 @@ const fetchPatientList = async (
 
   if (CONTEXT === 'aphp') {
     const facets = includeFacets ? 'pivotFacet=age_gender,deceased_gender&' : ''
-    const genderFilter = gender !== PatientGenderKind._unknown ? `&gender=${gender}` : ''
     const searchByGroup = groupId ? `&_list=${groupId}` : ''
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
     let ageFilter = ''
+    let genderFilter = ''
     let search = ''
     let vitalStatusFilter = ''
+
+    if (gender !== PatientGenderKind._unknown) {
+      genderFilter = gender === PatientGenderKind._other ? `&gender=other,unknown` : `&gender=${gender}`
+    }
 
     if (searchInput) {
       if (searchBy) {
