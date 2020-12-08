@@ -313,11 +313,13 @@ export const getVisitRepartitionMap = (patients: IPatient[], encounters: IEncoun
 export const getGenderRepartitionSimpleData = (
   genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
 ): {
-  vitalStatusData: SimpleChartDataType[]
-  genderData: SimpleChartDataType[]
+  vitalStatusData: SimpleChartDataType[] | undefined
+  genderData: SimpleChartDataType[] | undefined
 } => {
   const vitalStatusData: SimpleChartDataType[] | 'loading' = []
   const genderData: SimpleChartDataType[] | 'loading' = []
+
+  if (genderRepartitionMap === undefined) return { vitalStatusData: undefined, genderData: undefined }
 
   if (genderRepartitionMap && genderRepartitionMap.size > 0) {
     let aliveCount = 0
