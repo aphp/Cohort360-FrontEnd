@@ -29,7 +29,7 @@ const DocumentSearchHelp = ({ open, onClose }) => {
       <DialogTitle className={classes.title}>Aide à la recherche textuelle</DialogTitle>
       <DialogContent className={classes.dialog}>
         <Grid container direction="column">
-          <Typography>Les opérateurs ci-dessous vont aideront à affiner la recherche textuelle.</Typography>
+          <Typography>Les opérateurs ci-dessous vous aideront à affiner la recherche textuelle.</Typography>
           <Typography variant="button" className={classes.subtitle}>
             Recherche textuelle basique :
           </Typography>

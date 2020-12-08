@@ -5,6 +5,7 @@ import {
   CssBaseline,
   Grid,
   IconButton,
+  InputAdornment,
   InputBase,
   // Paper,
   Typography
@@ -18,6 +19,7 @@ import SortDialog from '../../Filters/SortDialog/SortDialog'
 import DocumentSearchHelp from '../../DocumentSearchHelp/DocumentSearchHelp'
 import { fetchDocuments } from '../../../services/cohortInfos'
 
+import ClearIcon from '@material-ui/icons/Clear'
 import InfoIcon from '@material-ui/icons/Info'
 import SortIcon from '@material-ui/icons/Sort'
 import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
@@ -69,8 +71,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     { label: 'Type de document', code: 'type' }
   ]
 
-  const onSearchDocument = (sortBy: string, sortDirection: 'asc' | 'desc', page = 1) => {
-    if (searchInput !== '') {
+  const onSearchDocument = (sortBy: string, sortDirection: 'asc' | 'desc', input = searchInput, page = 1) => {
+    if (input !== '') {
       setSearchMode(true)
     } else {
       setSearchMode(false)
@@ -81,7 +83,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
       sortBy,
       sortDirection,
       page,
-      searchInput,
+      input,
       selectedDocTypes,
       nda,
       startDate,
@@ -110,6 +112,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
       .then(() => {
         setLoadingStatus(false)
       })
+  }
+
+  const handleClearInput = () => {
+    setSearchInput('')
+    onSearchDocument(_sortBy, _sortDirection, '')
   }
 
   const handleOpenDialog = () => {
@@ -185,6 +192,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                     value={searchInput}
                     onChange={handleChangeInput}
                     onKeyDown={onKeyDown}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                      </InputAdornment>
+                    }
                   />
                   <IconButton
                     type="submit"
@@ -243,7 +255,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
             shape="rounded"
             onChange={(event, page) => {
               if (documents.length <= documentLines) {
-                onSearchDocument(_sortBy, _sortDirection, page)
+                onSearchDocument(_sortBy, _sortDirection, searchInput, page)
               } else {
                 setPage(page)
               }
