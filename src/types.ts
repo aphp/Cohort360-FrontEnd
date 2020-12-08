@@ -232,6 +232,7 @@ export type SelectedCriteriaType = {
 
 export type CcamDataType = {
   title: string
+  hierarchy: undefined
   code: { id: string; label: string } | null
   label: undefined
   startOccurrence: Date
