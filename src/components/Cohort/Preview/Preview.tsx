@@ -98,10 +98,13 @@ type PreviewProps = {
     perimeters?: string[]
   }
   loading?: boolean
-  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind> | 'loading'
-  visitTypeRepartitionData?: SimpleChartDataType[] | 'loading'
-  monthlyVisitData?: ComplexChartDataType<Month> | 'loading'
-  agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }> | 'loading'
+  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind> | 'loading' | undefined
+  visitTypeRepartitionData?: SimpleChartDataType[] | 'loading' | undefined
+  monthlyVisitData?: ComplexChartDataType<Month> | 'loading' | undefined
+  agePyramidData?:
+    | ComplexChartDataType<number, { male: number; female: number; other?: number }>
+    | 'loading'
+    | undefined
 }
 const Preview: React.FC<PreviewProps> = ({
   total,
@@ -117,11 +120,11 @@ const Preview: React.FC<PreviewProps> = ({
   const genderRepartitionSimpleData =
     genderRepartitionMap === 'loading' ? null : getGenderRepartitionSimpleData(genderRepartitionMap)
 
-  const vitalStatusData: SimpleChartDataType[] | 'loading' = genderRepartitionSimpleData
+  const vitalStatusData: SimpleChartDataType[] | 'loading' | undefined = genderRepartitionSimpleData
     ? genderRepartitionSimpleData.vitalStatusData
     : 'loading'
 
-  const genderData: SimpleChartDataType[] | 'loading' = genderRepartitionSimpleData
+  const genderData: SimpleChartDataType[] | 'loading' | undefined = genderRepartitionSimpleData
     ? genderRepartitionSimpleData.genderData
     : 'loading'
 
@@ -184,12 +187,12 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              {vitalStatusData === 'loading' ? (
+              {vitalStatusData === 'loading' || vitalStatusData === undefined ? (
                 <Grid className={classes.progressContainer}>
                   <CircularProgress />
                 </Grid>
               ) : (
-                <PieChart data={vitalStatusData} />
+                <PieChart data={vitalStatusData ?? []} />
               )}
             </Paper>
           </Grid>

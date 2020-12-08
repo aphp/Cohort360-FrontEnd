@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 
-import { Button, Grid, IconButton, InputBase, Typography } from '@material-ui/core'
+import { Button, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
 import { Pagination } from '@material-ui/lab'
 
 import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
 import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
+import ClearIcon from '@material-ui/icons/Clear'
 import InfoIcon from '@material-ui/icons/Info'
 import SortIcon from '@material-ui/icons/Sort'
 
@@ -59,7 +60,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
     { label: 'Type de document', code: 'type' }
   ]
 
-  const fetchDocumentsList = (newSortBy: string, newSortDirection: string, page = 1) => {
+  const fetchDocumentsList = (newSortBy: string, newSortDirection: string, input = searchInput, page = 1) => {
     setLoadingStatus(true)
     fetchDocuments(
       deidentifiedBoolean,
@@ -67,7 +68,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
       newSortDirection,
       page,
       patientId,
-      searchInput,
+      input,
       selectedDocTypes,
       nda,
       startDate,
@@ -81,6 +82,11 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
       .then(() => setLoadingStatus(false))
   }
 
+  const handleClearInput = () => {
+    setSearchInput('')
+    fetchDocumentsList(_sortBy, _sortDirection, '')
+  }
+
   const handleOpenDialog = () => {
     setOpen(true)
   }
@@ -92,7 +98,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
     setPage(value || 1)
     setLoadingStatus(true)
-    fetchDocumentsList(_sortBy, _sortDirection, value || 1)
+    fetchDocumentsList(_sortBy, _sortDirection, searchInput, value || 1)
   }
 
   const handleCloseDialog = () => {
@@ -140,6 +146,11 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
                 value={searchInput}
                 onChange={handleChangeInput}
                 onKeyDown={onKeyDown}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                  </InputAdornment>
+                }
               />
               <IconButton type="submit" aria-label="search" onClick={onSearchDocument}>
                 <SearchIcon fill="#ED6D91" height="15px" />
