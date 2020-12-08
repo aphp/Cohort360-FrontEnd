@@ -5,6 +5,7 @@ import {
   CircularProgress,
   Grid,
   IconButton,
+  InputAdornment,
   InputBase,
   Paper,
   Tab,
@@ -21,6 +22,8 @@ import {
 import Pagination from '@material-ui/lab/Pagination'
 
 import PMSIFilters from '../../Filters/PMSIFilters/PMSIFilters'
+
+import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
 import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
 
@@ -111,6 +114,25 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
         console.log(error)
       })
       .then(() => setLoadingStatus(false))
+  }
+
+  const handleClearInput = () => {
+    setSearchInput('')
+    setPage(1)
+    _fetchPMSI(
+      deidentifiedBoolean,
+      1,
+      patientId,
+      selectedTab,
+      '',
+      nda,
+      code,
+      selectedDiagnosticTypes,
+      _sortBy,
+      _sortDirection,
+      startDate,
+      endDate
+    )
   }
 
   const handleSort = (property: any) => (event: React.MouseEvent<unknown> /*eslint-disable-line*/) => {
@@ -237,6 +259,11 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
               value={searchInput}
               onChange={handleChangeSearchInput}
               onKeyDown={onKeyDown}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                </InputAdornment>
+              }
             />
             <IconButton type="submit" aria-label="search" onClick={onSearchPMSI}>
               <SearchIcon fill="#ED6D91" height="15px" />
