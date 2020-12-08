@@ -8,6 +8,7 @@ import { ScopeTreeRow, CriteriaItemType, SelectedCriteriaType } from 'types'
 import useStyles from './styles'
 
 type DiagramViewProps = {
+  actionLoading: boolean
   criteria: CriteriaItemType[]
   selectedPopulation: ScopeTreeRow[] | null
   selectedCriteria: SelectedCriteriaType[]
@@ -16,7 +17,14 @@ type DiagramViewProps = {
 }
 
 const DiagramView: React.FC<DiagramViewProps> = (props) => {
-  const { criteria, selectedPopulation, selectedCriteria, onChangeSelectedPopulation, onChangeSelectedCriteria } = props
+  const {
+    actionLoading,
+    criteria,
+    selectedPopulation,
+    selectedCriteria,
+    onChangeSelectedPopulation,
+    onChangeSelectedCriteria
+  } = props
 
   const classes = useStyles()
 
@@ -25,6 +33,7 @@ const DiagramView: React.FC<DiagramViewProps> = (props) => {
       <PopulationCard selectedPopulation={selectedPopulation} onChangeSelectedPopulation={onChangeSelectedPopulation} />
       {selectedPopulation && selectedPopulation.length > 0 ? (
         <CriteriaCard
+          actionLoading={actionLoading}
           criteria={criteria}
           selectedCriteria={selectedCriteria}
           onChangeSelectedCriteria={onChangeSelectedCriteria}

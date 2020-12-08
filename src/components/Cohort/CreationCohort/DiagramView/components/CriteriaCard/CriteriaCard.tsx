@@ -13,13 +13,14 @@ import { CriteriaItemType, SelectedCriteriaType } from 'types'
 import useStyles from './styles'
 
 type CriteriaCardProps = {
+  actionLoading: boolean
   criteria: CriteriaItemType[]
   selectedCriteria: SelectedCriteriaType[]
   onChangeSelectedCriteria: (item: SelectedCriteriaType[]) => void
 }
 
 const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria } = props
+  const { actionLoading, criteria, selectedCriteria, onChangeSelectedCriteria } = props
 
   const classes = useStyles()
   const [indexCriteria, onChangeIndexCriteria] = useState<number | null>(null)
@@ -251,7 +252,13 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         ))}
 
       <div className={classes.root}>
-        <Button className={classes.addButton} onClick={_addSelectedCriteria} variant="contained" color="primary">
+        <Button
+          disabled={actionLoading}
+          className={classes.addButton}
+          onClick={_addSelectedCriteria}
+          variant="contained"
+          color="primary"
+        >
           <AddIcon />
         </Button>
       </div>

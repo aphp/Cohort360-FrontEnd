@@ -24,7 +24,7 @@ export const fetchCohorts = async (
     }
 
     // return {
-    //   formattedCohort: cohortResp.data.entry
+    //   formattedCohort: cohortResp?.data?.entry
     //     .map((group) => {
     //       if (group.resource.error) {
     //         return null
@@ -75,7 +75,7 @@ export const fetchCohorts = async (
 
     return {
       results: results,
-      count: cohortResp.data.count ?? 0
+      count: cohortResp?.data?.count ?? 0
     }
   }
 }

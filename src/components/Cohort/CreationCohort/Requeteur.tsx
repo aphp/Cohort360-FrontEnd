@@ -16,17 +16,24 @@ import useStyles from './styles'
 import buildRequest from '../../../utils/buildRequest'
 import { countCohort, createCohort, createRequest, createSnapshot } from '../../../services/cohortCreation'
 
+type SnapshotType = {
+  uuid: string
+  json: string
+  date: string
+}
+
 const Requeteur = () => {
   const practitioner = useAppSelector((state) => state.me)
   const classes = useStyles()
   // const history = useHistory()
 
   const [loading, setLoading] = useState<boolean>(true)
+  const [actionLoading, setActionLoading] = useState<boolean[]>([])
   const [count, setCount] = useState<CohortCreationCounterType>({})
   const [seletedTab, onChangeTab] = useState<'diagramme' | 'JSON'>('diagramme')
   const [criteria, onChangeCriteria] = useState<any[]>([])
   const [currentSnapshot, onChangeCurrentSnapshot] = useState<string | undefined>(undefined)
-  const [snapshotsHistory, onChangeSnapshotsHistory] = useState<string[]>([])
+  const [snapshotsHistory, onChangeSnapshotsHistory] = useState<SnapshotType[]>([])
   const [requestId, onChangeRequestId] = useState<string>('')
 
   // Pour le moment, sans forme de JSON...
@@ -68,6 +75,7 @@ const Requeteur = () => {
    * Just after, get new count and save it
    */
   const _countCohort = async (_json: string, _snapshotId: string, _requestId: string) => {
+    setActionLoading([...actionLoading, true])
     if (!_json || !_snapshotId || !_requestId) return
 
     let _count: CohortCreationCounterType = {
@@ -91,11 +99,12 @@ const Requeteur = () => {
       male: 0
     }
     setCount(_count)
+    setActionLoading(actionLoading.slice(0, actionLoading.length - 2 > 0 ? actionLoading.length - 2 : 0))
   }
 
-  const _onSaveJson = async (newJson: string) => {
+  const _onSaveNewJson = async (newJson: string) => {
+    setActionLoading([...actionLoading, true])
     let _requestId = requestId ? requestId : null
-    let newSnapshotId = null
 
     if (snapshotsHistory && snapshotsHistory.length === 0) {
       // Create request + first snapshot
@@ -105,20 +114,29 @@ const Requeteur = () => {
         onChangeRequestId(_requestId)
 
         const newSnapshot = await createSnapshot(_requestId, newJson, true)
-        newSnapshotId = newSnapshot ? newSnapshot.uuid : null
-        if (newSnapshotId) {
-          onChangeCurrentSnapshot(newSnapshotId)
-          onChangeSnapshotsHistory([newSnapshotId])
+        if (newSnapshot) {
+          const uuid = newSnapshot.uuid
+          const json = newSnapshot.serialized_query
+          const date = newSnapshot.created_at
+          onChangeCurrentSnapshot(uuid)
+          onChangeSnapshotsHistory([{ uuid, json, date }])
+          _countCohort(newJson, uuid, _requestId)
+          setActionLoading(actionLoading.slice(0, actionLoading.length - 2 > 0 ? actionLoading.length - 2 : 0))
         }
       }
     } else if (currentSnapshot) {
       // Update snapshots list
       const newSnapshot = await createSnapshot(currentSnapshot, newJson, false)
-      newSnapshotId = newSnapshot ? newSnapshot.uuid : null
-      onChangeCurrentSnapshot(newSnapshotId)
-      onChangeSnapshotsHistory([...snapshotsHistory, newSnapshotId])
+      if (newSnapshot) {
+        const uuid = newSnapshot.uuid
+        const json = newSnapshot.serialized_query
+        const date = newSnapshot.created_at
+        onChangeCurrentSnapshot(uuid)
+        onChangeSnapshotsHistory([...snapshotsHistory, { uuid, json, date }])
+        _countCohort(newJson, uuid, _requestId ?? '')
+      }
     }
-    _countCohort(newJson, newSnapshotId, _requestId ?? '')
+    setActionLoading(actionLoading.slice(0, actionLoading.length - 2 > 0 ? actionLoading.length - 2 : 0))
   }
 
   /**
@@ -127,7 +145,7 @@ const Requeteur = () => {
    *  - Link fhir result with the back end, call /cohorts/
    */
   const _onExecute = () => {
-    setLoading(true)
+    setActionLoading([...actionLoading, true])
     const _createCohort = async () => {
       if (!json) return
 
@@ -138,20 +156,40 @@ const Requeteur = () => {
       // history.push(`/cohort/${cohortId}`)
     }
     _createCohort()
+    setActionLoading(actionLoading.slice(0, actionLoading.length - 2 > 0 ? actionLoading.length - 2 : 0))
   }
 
   const _onUndo = () => {
-    const index = snapshotsHistory && currentSnapshot && snapshotsHistory.indexOf(currentSnapshot)
-    if (index === undefined || index === '' || index === -1) return
-    const newSnapshotId = snapshotsHistory[index - 1 >= 0 ? index - 1 : 0]
-    onChangeCurrentSnapshot(newSnapshotId)
+    const foundItem = snapshotsHistory.find(({ uuid }) => uuid === currentSnapshot)
+    const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
+    if (index !== -1) {
+      const newCurrentSnapshot = snapshotsHistory[index - 1 > 0 ? index - 1 : 0]
+      onChangeCurrentSnapshot(newCurrentSnapshot.uuid)
+      onChangeJson(newCurrentSnapshot.json)
+    }
   }
 
   const _onRedo = () => {
-    const index = snapshotsHistory && currentSnapshot && snapshotsHistory.indexOf(currentSnapshot)
-    if (index === undefined || index === '' || index === -1) return
-    const newSnapshotId = snapshotsHistory[index <= snapshotsHistory.length ? index + 1 : snapshotsHistory.length - 1]
-    onChangeCurrentSnapshot(newSnapshotId)
+    const foundItem = snapshotsHistory.find(({ uuid }) => uuid === currentSnapshot)
+    const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
+    if (index !== -1) {
+      const newCurrentSnapshot =
+        snapshotsHistory[index <= snapshotsHistory.length ? index + 1 : snapshotsHistory.length - 1]
+      onChangeCurrentSnapshot(newCurrentSnapshot.uuid)
+      onChangeJson(newCurrentSnapshot.json)
+    }
+  }
+
+  const _canUndo: () => boolean = () => {
+    const foundItem = snapshotsHistory ? snapshotsHistory.find(({ uuid }) => uuid === currentSnapshot) : null
+    const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
+    return index !== 0 && index !== -1
+  }
+
+  const _canRedo: () => boolean = () => {
+    const foundItem = snapshotsHistory.find(({ uuid }) => uuid === currentSnapshot)
+    const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
+    return index !== snapshotsHistory.length - 1 && index !== -1
   }
 
   // Initial useEffect
@@ -173,16 +211,8 @@ const Requeteur = () => {
 
     const _json = buildRequest(selectedPopulation, selectedCriteria)
     onChangeJson(_json)
+    _onSaveNewJson(_json)
   }, [selectedPopulation, selectedCriteria]) // eslint-disable-line
-
-  /**
-   * For each json change:
-   *  - save it => /request-query-snapshots/
-   *  - count => /count
-   */
-  useEffect(() => {
-    if (json) _onSaveJson(json)
-  }, [json]) // eslint-disable-line
 
   if (loading) return <CircularProgress />
 
@@ -216,6 +246,7 @@ const Requeteur = () => {
           criteria={criteria}
           selectedCriteria={selectedCriteria}
           onChangeSelectedCriteria={onChangeSelectedCriteria}
+          actionLoading={actionLoading.length > 0}
         />
       ) : (
         <JsonView defaultJson={json} onChangeJson={onChangeJson} />
@@ -229,23 +260,10 @@ const Requeteur = () => {
         deceased={count.deceased}
         female={count.female}
         male={count.male}
+        executeLoading={actionLoading.length > 0}
         onExecute={_onExecute}
-        onUndo={
-          snapshotsHistory &&
-          currentSnapshot &&
-          snapshotsHistory.indexOf(currentSnapshot) !== 0 &&
-          snapshotsHistory.indexOf(currentSnapshot) !== -1
-            ? _onUndo
-            : undefined
-        }
-        onRedo={
-          snapshotsHistory &&
-          currentSnapshot &&
-          snapshotsHistory.indexOf(currentSnapshot) !== snapshotsHistory.length - 1 &&
-          snapshotsHistory.indexOf(currentSnapshot) !== -1
-            ? _onRedo
-            : undefined
-        }
+        onUndo={_canUndo() ? _onUndo : undefined}
+        onRedo={_canRedo() ? _onRedo : undefined}
       />
     </>
   )

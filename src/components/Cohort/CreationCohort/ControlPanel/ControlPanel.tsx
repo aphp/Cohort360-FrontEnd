@@ -1,7 +1,7 @@
 import React from 'react'
 import clsx from 'clsx'
 
-import { Button, Divider, Grid, Typography } from '@material-ui/core'
+import { Button, CircularProgress, Divider, Grid, Typography } from '@material-ui/core'
 import { Skeleton } from '@material-ui/lab'
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack'
@@ -14,19 +14,27 @@ import { CohortCreationCounterType } from 'types'
 
 const ControlPanel: React.FC<
   {
+    executeLoading?: boolean
     onExecute: () => void
     onUndo?: () => void
     onRedo?: () => void
   } & CohortCreationCounterType
-> = ({ includePatient, byrequest, alive, deceased, female, male, onExecute, onUndo, onRedo }) => {
+> = ({ includePatient, byrequest, alive, deceased, female, male, executeLoading, onExecute, onUndo, onRedo }) => {
   const classes = useStyle()
 
   return (
     <Grid className={classes.rightPanelContainerStyle}>
       <Grid>
         <Grid container justify="center" className={classes.requestAction}>
-          <Button onClick={onExecute} className={classes.requestExecution}>
-            Exécuter la requête
+          <Button disabled={executeLoading} onClick={onExecute} className={classes.requestExecution}>
+            {executeLoading ? (
+              <>
+                Veuillez passtienter
+                <CircularProgress size={20} />
+              </>
+            ) : (
+              'Exécuter la requête'
+            )}
           </Button>
         </Grid>
 
