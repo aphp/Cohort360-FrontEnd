@@ -148,10 +148,6 @@ const Dashboard: React.FC<{
     checkDeindentifiedStatus()
   }, [dashboard]) //eslint-disable-line
 
-  useEffect(() => {
-    selectTab(tabName || 'apercu')
-  }, [tabName])
-
   const handleOpenRedcapDialog = () => {
     setOpenRedcapDialog(true)
   }
