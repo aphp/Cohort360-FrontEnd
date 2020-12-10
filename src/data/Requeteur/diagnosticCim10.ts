@@ -26,11 +26,10 @@ export const fetchDiagnosticTypes = async () => {
   return res ? diagnosticKinds : diagnosticTypes
 }
 
+// todo: check if the data syntax is correct when available
 export const fetchCim10Diagnostic = async (searchValue?: string) => {
   if (searchValue) {
-    const res = await apiRequest.get(
-      `/ValueSet?_text=${searchValue}&url=https://terminology.eds.aphp.fr/aphp-orbis-ccam`
-    )
+    const res = await apiRequest.get(`/ValueSet?_text=${searchValue}&url=hhttps://terminology.eds.aphp.fr/aphp-cim10`)
 
     const cim10List =
       res && res.data && res.data.entry && res.data.resourceType === 'Bundle'

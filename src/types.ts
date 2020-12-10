@@ -213,6 +213,7 @@ export type SelectedCriteriaType = {
   type: 'Patient' | 'Encounter' | 'Claim' | 'Procedure' | 'Condition' | 'Composition'
   title: string
   code?: { id: string; label: string }
+  diagnosticType?: { id: string; label: string }
   label?: undefined
   startOccurrence?: Date
   endOccurrence?: Date
@@ -241,6 +242,7 @@ export type CcamDataType = {
 export type Cim10DataType = {
   title: string
   code: { id: string; label: string } | null
+  diagnosticType: { id: string; label: string } | null
 }
 
 export type DemographicDataType = {

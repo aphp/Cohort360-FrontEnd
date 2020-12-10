@@ -17,16 +17,17 @@ type Cim10FormProps = {
   onChangeSelectedCriteria: (data: any) => void
 }
 
-const defaultDemographic = {
+const defaultCondition = {
   title: 'Critère de diagnostic',
   code: [],
+  diagnosticType: '',
   startOccurrence: '',
   endOccurrence: ''
 }
 
 const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const defaultValues = selectedCriteria || defaultDemographic
+  const defaultValues = selectedCriteria || defaultCondition
 
   const classes = useStyles()
 
@@ -36,6 +37,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     onChangeSelectedCriteria({
       title: data.title,
       code: data.code,
+      diagnosticType: data.diagnosticType,
       type: 'Condition'
     })
   }
@@ -103,7 +105,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             getAutocompleteOptions: getDiagOptions
           },
           {
-            name: 'code',
+            name: 'diagnosticType',
             label: 'Type de diagnostic',
             variant: 'outlined',
             type: 'autocomplete',

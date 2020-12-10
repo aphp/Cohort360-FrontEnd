@@ -61,8 +61,6 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
       ? moment(_selectedCriteria.endOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
       : ''
 
-    console.log('_selectedCriteria', _selectedCriteria)
-
     switch (_selectedCriteria.type) {
       case 'Claim': {
         content = (
@@ -115,9 +113,15 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             <Typography>
               Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,
             </Typography>
-            <Typography>
-              Diagnostic CIM sélectionné : {_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}
+            <Typography align="center">
+              Diagnostic CIM sélectionné : {_selectedCriteria.code ? `"${_selectedCriteria.code.label}".` : '""'}
             </Typography>
+            {_selectedCriteria.diagnosticType && (
+              <Typography align="center">
+                Type de diagnostic recherché :{' '}
+                {_selectedCriteria.diagnosticType ? `"${_selectedCriteria.diagnosticType.label}".` : '""'}
+              </Typography>
+            )}
           </>
         )
         break
