@@ -73,7 +73,10 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
       }
 
       case 'Condition': {
-        fhirFilter = `${selectedCriterion.code ? `code=${selectedCriterion.code.id}` : ''}`
+        fhirFilter = [
+          `${selectedCriterion.code ? `code=${selectedCriterion.code.id}` : ''}`,
+          `${selectedCriterion.diagnosticType ? `type=${selectedCriterion.diagnosticType.id}` : ''}`
+        ].reduce(filterReducer)
         break
       }
 

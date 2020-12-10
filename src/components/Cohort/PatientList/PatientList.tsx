@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import {
   Button,
+  CircularProgress,
   CssBaseline,
   Grid,
   IconButton,
+  InputAdornment,
   InputBase,
   MenuItem,
   Paper,
@@ -22,11 +24,14 @@ import PyramidChart from '../Preview/Charts/PyramidChart'
 import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
 import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
 import LockIcon from '@material-ui/icons/Lock'
+import ClearIcon from '@material-ui/icons/Clear'
 
 import { fetchPatientList } from '../../../services/cohortInfos'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { CohortPatient, ComplexChartDataType, SearchByTypes, VitalStatus } from 'types'
+import { CohortPatient, SimpleChartDataType, ComplexChartDataType, SearchByTypes, VitalStatus } from 'types'
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
+
+import displayDigit from 'utils/displayDigit'
 
 import useStyles from './styles'
 
@@ -34,22 +39,33 @@ type PatientListProps = {
   total: number
   groupId?: string
   deidentified?: boolean
-  patients: CohortPatient[]
+  patients?: CohortPatient[]
   loading?: boolean
   agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
   genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
 }
 
-const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified, patients, loading, ...props }) => {
+const PatientList: React.FC<PatientListProps> = ({
+  groupId,
+  total,
+  deidentified,
+  patients,
+  agePyramidData,
+  genderRepartitionMap
+}) => {
   const classes = useStyles()
   const [page, setPage] = useState(1)
   const [totalPatients, setTotalPatients] = useState(total)
   const [patientsList, setPatientsList] = useState(patients)
-  const [loadingStatus, setLoadingStatus] = useState(loading)
+  const [loadingStatus, setLoadingStatus] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
-  const [agePyramid, setAgePyramid] = useState(props.agePyramidData)
-  const [patientData, setPatientData] = useState(getGenderRepartitionSimpleData(props.genderRepartitionMap))
+  const [agePyramid, setAgePyramid] = useState<
+    ComplexChartDataType<number, { male: number; female: number; other?: number }> | undefined
+  >(undefined)
+  const [patientData, setPatientData] = useState<
+    { vitalStatusData: SimpleChartDataType[] | undefined; genderData: SimpleChartDataType[] | undefined } | undefined
+  >(undefined)
   const [open, setOpen] = useState(false)
   const [gender, setGender] = useState<PatientGenderKind>(PatientGenderKind._unknown)
   const [age, setAge] = useState<[number, number]>([0, 130])
@@ -58,16 +74,31 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc') // eslint-disable-line
   const includeFacets = true
 
+  useEffect(() => {
+    setAgePyramid(agePyramidData)
+  }, [agePyramidData])
+
+  useEffect(() => {
+    setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
+  }, [genderRepartitionMap])
+
+  useEffect(() => {
+    setPatientsList(patients)
+  }, [patients])
+
   const handleOpenDialog = () => {
     setOpen(true)
   }
 
-  const fetchPatients = (sortBy: string, sortDirection: string, pageValue = 1) => {
+  const fetchPatients = (sortBy: string, sortDirection: string, input = searchInput, pageValue = 1) => {
     setLoadingStatus(true)
+    // Set loader on chart
+    setPatientData(undefined)
+    setAgePyramid(undefined)
     fetchPatientList(
       pageValue,
       searchBy,
-      searchInput,
+      input,
       gender,
       age,
       vitalStatus,
@@ -91,9 +122,11 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
       })
   }
 
-  const onSearchPatient = (sortBy = 'given', sortDirection = 'asc') => {
+  const onSearchPatient = (sortBy = 'given', sortDirection = 'asc', input = searchInput) => {
     setPage(1)
-    fetchPatients(sortBy, sortDirection)
+    setSortBy(sortBy)
+    setSortDirection(sortDirection as 'asc' | 'desc')
+    fetchPatients(sortBy, sortDirection, input)
   }
 
   const handleCloseDialog = (submit: boolean) => () => {
@@ -117,9 +150,14 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value = 1) => {
     setPage(value)
     //We only fetch patients if we don't already have them
-    if (totalPatients > patients.length) {
-      fetchPatients(sortBy, sortDirection, value)
+    if (patients && patients.length < totalPatients) {
+      fetchPatients(sortBy, sortDirection, searchInput, value)
     }
+  }
+
+  const handleClearInput = () => {
+    setSearchInput('')
+    onSearchPatient(sortBy, sortDirection, '')
   }
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -153,7 +191,15 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
                   Répartition par genre
                 </Typography>
               </Grid>
-              <BarChart data={patientData.genderData} />
+              {patientData === undefined || (patientData && patientData.genderData === undefined) ? (
+                <Grid container justify="center" alignItems="center">
+                  <CircularProgress />
+                </Grid>
+              ) : patientData.genderData && patientData.genderData.length > 0 ? (
+                <BarChart data={patientData.genderData ?? []} />
+              ) : (
+                <Typography>Aucune patient</Typography>
+              )}
             </Paper>
           </Grid>
           <Grid container item xs={12} sm={6} lg={4} justify="center">
@@ -163,7 +209,16 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
                   Répartition par statut vital
                 </Typography>
               </Grid>
-              <PieChart data={patientData.vitalStatusData} />
+              {patientData === undefined || (patientData && patientData.vitalStatusData === undefined) ? (
+                <Grid container justify="center" alignItems="center">
+                  <CircularProgress />
+                </Grid>
+              ) : patientData.vitalStatusData &&
+                patientData.vitalStatusData.find(({ value }) => value !== 0) !== undefined ? (
+                <PieChart data={patientData.vitalStatusData ?? []} />
+              ) : (
+                <Typography>Aucune patient</Typography>
+              )}
             </Paper>
           </Grid>
           <Grid container item xs={12} sm={6} lg={4} justify="center">
@@ -173,14 +228,22 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
                   Pyramide des âges
                 </Typography>
               </Grid>
-              <PyramidChart data={agePyramid} width={300} />
+              {agePyramid === undefined ? (
+                <Grid container justify="center" alignItems="center">
+                  <CircularProgress />
+                </Grid>
+              ) : agePyramid && agePyramid.size > 0 ? (
+                <PyramidChart data={agePyramid} width={300} />
+              ) : (
+                <Typography>Aucune patient</Typography>
+              )}
             </Paper>
           </Grid>
         </Grid>
         <Grid container item justify="flex-end" className={classes.tableGrid}>
           <Grid container justify="space-between" alignItems="center">
             <Typography variant="button">
-              {totalPatients} / {total} patient(s)
+              {displayDigit(totalPatients)} / {displayDigit(total)} patient(s)
             </Typography>
             <div className={classes.tableButtons}>
               {deidentified ? (
@@ -203,6 +266,11 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
                       value={searchInput}
                       onChange={handleChangeInput}
                       onKeyDown={onKeyDown}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                        </InputAdornment>
+                      }
                     />
                     <IconButton
                       type="submit"
@@ -238,8 +306,8 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified,
           </Grid>
           <TableauPatient
             deidentified={deidentified}
-            patients={patientsList}
-            loading={loadingStatus}
+            patients={patientsList ?? []}
+            loading={patientsList === undefined ? true : loadingStatus}
             onChangePage={handleChangePage}
             page={page}
             totalPatientCount={totalPatients}

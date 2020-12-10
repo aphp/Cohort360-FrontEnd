@@ -22,9 +22,9 @@ import {
 import { fetchGender, fetchStatus } from '../../../data/Requeteur/patient'
 import {
   fetchStatusDiagnostic,
-  fetchKindDiagnostic,
+  fetchDiagnosticTypes,
   fetchCim10Diagnostic
-} from '../../../data/Requeteur/diagnoaticCim10'
+} from '../../../data/Requeteur/diagnosticCim10'
 
 // ├── Mes variables
 // ├── Patients
@@ -83,8 +83,8 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Diagnostics',
         color: '#0063AF',
         components: Cim10Form,
-        data: { statusDiagnostic: 'loading', kindDiagnostic: 'loading', cim10Diagnostic: 'loading' },
-        fetch: { fetchStatusDiagnostic, fetchKindDiagnostic, fetchCim10Diagnostic }
+        data: { statusDiagnostic: 'loading', diagnosticTypes: 'loading', cim10Diagnostic: 'loading' },
+        fetch: { fetchStatusDiagnostic, fetchDiagnosticTypes, fetchCim10Diagnostic }
       },
       {
         id: 'Procedure',

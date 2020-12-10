@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import { useHistory } from 'react-router-dom'
+import moment from 'moment'
 
 import {
   CircularProgress,
@@ -20,9 +21,11 @@ import { ReactComponent as MaleIcon } from '../../assets/icones/mars.svg'
 import { ReactComponent as UnknownIcon } from '../../assets/icones/autre-inconnu.svg'
 
 import { getAge } from 'utils/age'
-import useStyles from './styles'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortPatient } from 'types'
+import { capitalizeFirstLetter } from 'utils/capitalize'
+
+import useStyles from './styles'
 
 type PatientGenderProps = {
   gender: PatientGenderKind
@@ -92,11 +95,9 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
       onRequestSort(event, property)
     }
 
-    return loading ? (
-      <CircularProgress className={classes.loadingSpinner} size={50} />
-    ) : (
+    return (
       <>
-        <TableContainer component={Paper} className={classes.tableContainer}>
+        <TableContainer component={Paper}>
           <Table className={classes.table} aria-label="customized table">
             <TableHead>
               <TableRow className={classes.tableHead}>
@@ -167,7 +168,17 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
               </TableRow>
             </TableHead>
             <TableBody>
-              {patients && patients.length > 0 ? (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <div className={classes.loadingSpinnerContainer}>
+                      <CircularProgress size={50} />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : patients && patients.length === 0 ? (
+                <TableRow> Aucun résultat à afficher </TableRow>
+              ) : (
                 patientsToShow.map((patient) => {
                   return (
                     patient && (
@@ -180,10 +191,14 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                         <TableCell align="center">
                           {patient.gender && <PatientGender gender={patient.gender} className={classes.genderIcon} />}
                         </TableCell>
-                        <TableCell>{deidentified ? 'Prénom' : patient.name?.[0].given?.[0]}</TableCell>
+                        <TableCell>
+                          {deidentified ? 'Prénom' : capitalizeFirstLetter(patient.name?.[0].given?.[0])}
+                        </TableCell>
                         <TableCell>{deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ')}</TableCell>
                         <TableCell align="center">
-                          {deidentified ? getAge(patient) : `${patient.birthDate} (${getAge(patient)})`}
+                          {deidentified
+                            ? getAge(patient)
+                            : `${moment(patient.birthDate).format('DD/MM/YYYY')} (${getAge(patient)})`}
                         </TableCell>
                         <TableCell>{patient.lastEncounterName}</TableCell>
                         <TableCell>
@@ -202,8 +217,6 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                     )
                   )
                 })
-              ) : (
-                <TableRow> Aucun résultat à afficher </TableRow>
               )}
             </TableBody>
           </Table>

@@ -12,9 +12,15 @@ const useStyles = makeStyles((theme) => ({
     height: '100px',
     overflowY: 'scroll'
   },
+  progressContainer: {
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   repartitionTable: {
     margin: theme.spacing(2),
-    height: '80%',
+    height: 150,
     width: '97%',
     borderRadius: '8px'
   },

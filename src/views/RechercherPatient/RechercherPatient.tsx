@@ -28,13 +28,22 @@ const RechercherPatient: React.FC<{}> = () => {
   const [sortBy, setSortBy] = useState('given')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [page, setPage] = useState(1)
+  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
   const [searchInput, setSearchInput] = useState(search ?? '')
+  const [total, setTotal] = useState(0)
 
-  const performQueries = (sortBy: string, sortDirection: string, input: string, searchBy = SearchByTypes.text) => {
+  const performQueries = (
+    page: number,
+    sortBy: string,
+    sortDirection: string,
+    input: string,
+    searchBy = SearchByTypes.text
+  ) => {
     setLoading(true)
-    searchPatient(sortBy, sortDirection, input, searchBy).then((results) => {
-      if (Array.isArray(results)) {
-        setPatientResults(results)
+    searchPatient(page, sortBy, sortDirection, input, searchBy).then((results) => {
+      if (results) {
+        setPatientResults(results.patientList)
+        setTotal(results.totalPatients ?? 0)
         setShowTable(true)
       }
       setLoading(false)
@@ -43,6 +52,9 @@ const RechercherPatient: React.FC<{}> = () => {
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
     setPage(page)
+    if (total > patientResults.length) {
+      performQueries(page, sortBy, sortDirection, searchInput, searchBy)
+    }
   }
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: any) => {
@@ -51,7 +63,7 @@ const RechercherPatient: React.FC<{}> = () => {
 
     setSortDirection(_sortDirection)
     setSortBy(property)
-    performQueries(property, _sortDirection, searchInput)
+    performQueries(page, property, _sortDirection, searchInput, searchBy)
   }
 
   useEffect(() => {
@@ -60,7 +72,7 @@ const RechercherPatient: React.FC<{}> = () => {
 
   useEffect(() => {
     if (search) {
-      performQueries(sortBy, sortDirection, search)
+      performQueries(page, sortBy, sortDirection, search, searchBy)
     }
   }, [search]) // eslint-disable-line
 
@@ -84,6 +96,8 @@ const RechercherPatient: React.FC<{}> = () => {
             showSelect={true}
             searchInput={searchInput}
             onChangeInput={setSearchInput}
+            searchBy={searchBy}
+            onChangeSearchBy={setSearchBy}
           />
           {loading && (
             <Grid container item justify="center">
@@ -95,7 +109,7 @@ const RechercherPatient: React.FC<{}> = () => {
               patients={patientResults}
               onChangePage={handlePageChange}
               page={page}
-              totalPatientCount={patientResults.length}
+              totalPatientCount={total}
               sortBy={sortBy}
               sortDirection={'asc'}
               onRequestSort={handleRequestSort}

@@ -1,25 +1,18 @@
 import React, { useState } from 'react'
 
-import {
-  Button,
-  FormControlLabel,
-  Grid,
-  IconButton,
-  InputBase,
-  Radio,
-  RadioGroup,
-  TextField,
-  Typography
-} from '@material-ui/core'
-import { Autocomplete, Pagination } from '@material-ui/lab'
+import { Button, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
+import { Pagination } from '@material-ui/lab'
 
 import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
 import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
+import ClearIcon from '@material-ui/icons/Clear'
 import InfoIcon from '@material-ui/icons/Info'
+import SortIcon from '@material-ui/icons/Sort'
 
 import DocumentSearchHelp from '../../DocumentSearchHelp/DocumentSearchHelp'
 import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
 import DocumentList from '../../Cohort/Documents/DocumentList/DocumentList'
+import SortDialog from '../../Filters/SortDialog/SortDialog'
 
 import { fetchDocuments } from '../../../services/patient'
 import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
@@ -51,9 +44,10 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
   const [searchInput, setSearchInput] = useState('')
   const [searchMode, setSearchMode] = useState(false)
   const [open, setOpen] = useState(false)
+  const [openSort, setOpenSort] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
   const [nda, setNda] = useState('')
-  const [selectedDocTypes, setSelectedDocTypes] = useState(['all'])
+  const [selectedDocTypes, setSelectedDocTypes] = useState<string[]>([])
   const [startDate, setStartDate] = useState<string | undefined>(undefined)
   const [endDate, setEndDate] = useState<string | undefined>(undefined)
   const [_sortBy, setSortBy] = useState(sortBy)
@@ -61,12 +55,12 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
 
   const documentLines = 20 // Number of desired lines in the document array
 
-  const sortByNames = [
+  const sortOptions = [
     { label: 'Date', code: 'date' },
     { label: 'Type de document', code: 'type' }
   ]
 
-  const fetchDocumentsList = (newSortBy: string, newSortDirection: string, page = 1) => {
+  const fetchDocumentsList = (newSortBy: string, newSortDirection: string, input = searchInput, page = 1) => {
     setLoadingStatus(true)
     fetchDocuments(
       deidentifiedBoolean,
@@ -74,7 +68,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
       newSortDirection,
       page,
       patientId,
-      searchInput,
+      input,
       selectedDocTypes,
       nda,
       startDate,
@@ -88,14 +82,23 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
       .then(() => setLoadingStatus(false))
   }
 
+  const handleClearInput = () => {
+    setSearchInput('')
+    fetchDocumentsList(_sortBy, _sortDirection, '')
+  }
+
   const handleOpenDialog = () => {
     setOpen(true)
+  }
+
+  const handleOpenSortDialog = () => {
+    setOpenSort(true)
   }
 
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
     setPage(value || 1)
     setLoadingStatus(true)
-    fetchDocumentsList(_sortBy, _sortDirection, value || 1)
+    fetchDocumentsList(_sortBy, _sortDirection, searchInput, value || 1)
   }
 
   const handleCloseDialog = () => {
@@ -123,26 +126,9 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
     }
   }
 
-  const onChangeSortBy = (
-    event: React.ChangeEvent<{}>,
-    value: {
-      label: string
-      code: string
-    } | null
-  ) => {
-    if (value) {
-      setSortBy(value.code)
-      setPage(1)
-      fetchDocumentsList(value.code, _sortDirection)
-    }
-  }
-
-  const onChangeSortDirection = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    if (value === 'asc' || value === 'desc') {
-      setSortDirection(value)
-      setPage(1)
-      fetchDocumentsList(_sortBy, value)
-    }
+  const handleCloseSortDialog = (submitSort: boolean) => {
+    setOpenSort(false)
+    submitSort && onSearchDocument()
   }
 
   return (
@@ -160,6 +146,11 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
                 value={searchInput}
                 onChange={handleChangeInput}
                 onKeyDown={onKeyDown}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                  </InputAdornment>
+                }
               />
               <IconButton type="submit" aria-label="search" onClick={onSearchDocument}>
                 <SearchIcon fill="#ED6D91" height="15px" />
@@ -178,20 +169,26 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
             >
               Filtrer
             </Button>
+            <Button
+              variant="contained"
+              disableElevation
+              onClick={handleOpenSortDialog}
+              startIcon={<SortIcon height="15px" fill="#FFF" />}
+              className={classes.searchButton}
+            >
+              Trier
+            </Button>
+            <SortDialog
+              open={openSort}
+              onClose={() => handleCloseSortDialog(false)}
+              onSubmit={() => handleCloseSortDialog(true)}
+              sortOptions={sortOptions}
+              sortBy={_sortBy}
+              onChangeSortBy={setSortBy}
+              sortDirection={_sortDirection}
+              onChangeSortDirection={setSortDirection}
+            />
           </div>
-          <Autocomplete
-            options={sortByNames}
-            getOptionLabel={(option) => option.label}
-            value={sortByNames.find((value) => value.code === _sortBy)}
-            renderInput={(params) => <TextField {...params} label="Trier par :" variant="outlined" />}
-            onChange={onChangeSortBy}
-            className={classes.autocomplete}
-          />
-          <Typography variant="button">Ordre :</Typography>
-          <RadioGroup value={_sortDirection} onChange={onChangeSortDirection} classes={{ root: classes.radioGroup }}>
-            <FormControlLabel value="asc" control={<Radio />} label="Croissant" />
-            <FormControlLabel value="desc" control={<Radio />} label="Décroissant" />
-          </RadioGroup>
         </Grid>
       </Grid>
       <DocumentList

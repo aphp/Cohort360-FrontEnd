@@ -6,6 +6,8 @@ import Title from '../../Title'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import { fetchPatientsCount } from 'services/patient'
 
+import displayDigit from 'utils/displayDigit'
+
 const PatientSearchCard = () => {
   const [patientNb, setPatientNb] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -20,7 +22,7 @@ const PatientSearchCard = () => {
 
   return (
     <>
-      <Title>{loading ? <CircularProgress size={20} /> : patientNb} patients pris en charge</Title>
+      <Title>{loading ? <CircularProgress size={20} /> : displayDigit(patientNb)} patients pris en charge</Title>
       <Button href="/mes_patients" variant="contained" disableElevation className={classes.button}>
         Explorer tous les patients
       </Button>

@@ -24,16 +24,28 @@ import useStyles from './styles'
 
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
+import displayDigit from 'utils/displayDigit'
+
 import { ComplexChartDataType, SimpleChartDataType, Month } from 'types'
 
 type RepartitionTableProps = {
-  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
+  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind> | 'loading'
 }
 
 const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMap }) => {
   const classes = useStyles()
   let femaleAlive, maleAlive, femaleDeceased, maleDeceased
-  if (genderRepartitionMap) {
+  if (genderRepartitionMap === 'loading') {
+    return (
+      <Paper className={classes.repartitionTable}>
+        <Grid className={classes.progressContainer}>
+          <CircularProgress />
+        </Grid>
+      </Paper>
+    )
+  }
+
+  if (genderRepartitionMap && genderRepartitionMap.size > 0) {
     const femaleValues = genderRepartitionMap.get(PatientGenderKind._female)
     const maleValues = genderRepartitionMap.get(PatientGenderKind._male)
 
@@ -62,15 +74,15 @@ const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMa
             <TableCell component="th" scope="row" className={classes.tableHeadCell}>
               Femmes
             </TableCell>
-            <TableCell align="center">{femaleAlive}</TableCell>
-            <TableCell align="center">{femaleDeceased}</TableCell>
+            <TableCell align="center">{displayDigit(femaleAlive ?? 0)}</TableCell>
+            <TableCell align="center">{displayDigit(femaleDeceased ?? 0)}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell component="th" scope="row" className={classes.tableHeadCell}>
               Hommes
             </TableCell>
-            <TableCell align="center">{maleAlive}</TableCell>
-            <TableCell align="center">{maleDeceased}</TableCell>
+            <TableCell align="center">{displayDigit(maleAlive ?? 0)}</TableCell>
+            <TableCell align="center">{displayDigit(maleDeceased ?? 0)}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -79,22 +91,24 @@ const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMa
 }
 
 type PreviewProps = {
-  total: number
+  total?: number
   group: {
     name: string
     description?: string
     perimeters?: string[]
   }
   loading?: boolean
-  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
-  visitTypeRepartitionData?: SimpleChartDataType[]
-  monthlyVisitData?: ComplexChartDataType<Month>
-  agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
+  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind> | 'loading' | undefined
+  visitTypeRepartitionData?: SimpleChartDataType[] | 'loading' | undefined
+  monthlyVisitData?: ComplexChartDataType<Month> | 'loading' | undefined
+  agePyramidData?:
+    | ComplexChartDataType<number, { male: number; female: number; other?: number }>
+    | 'loading'
+    | undefined
 }
 const Preview: React.FC<PreviewProps> = ({
   total,
   group,
-  loading,
   genderRepartitionMap,
   visitTypeRepartitionData,
   monthlyVisitData,
@@ -102,11 +116,19 @@ const Preview: React.FC<PreviewProps> = ({
 }) => {
   const classes = useStyles()
   const title = group.name
-  const { vitalStatusData, genderData } = getGenderRepartitionSimpleData(genderRepartitionMap)
 
-  return loading ? (
-    <CircularProgress className={classes.loadingSpinner} size={50} />
-  ) : (
+  const genderRepartitionSimpleData =
+    genderRepartitionMap === 'loading' ? null : getGenderRepartitionSimpleData(genderRepartitionMap)
+
+  const vitalStatusData: SimpleChartDataType[] | 'loading' | undefined = genderRepartitionSimpleData
+    ? genderRepartitionSimpleData.vitalStatusData
+    : 'loading'
+
+  const genderData: SimpleChartDataType[] | 'loading' | undefined = genderRepartitionSimpleData
+    ? genderRepartitionSimpleData.genderData
+    : 'loading'
+
+  return (
     <Grid container direction="column" alignItems="center" className={classes.root}>
       <CssBaseline />
 
@@ -140,9 +162,15 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              <Typography variant="h4" className={classes.nbPatients}>
-                {total} patients
-              </Typography>
+              {total === undefined ? (
+                <Grid className={classes.progressContainer}>
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <Typography variant="h4" className={classes.nbPatients}>
+                  {displayDigit(total)} patients
+                </Typography>
+              )}
             </Paper>
           </Grid>
           <Grid item xs={12} sm={6} md={8}>
@@ -159,7 +187,13 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              <PieChart data={vitalStatusData} />
+              {vitalStatusData === 'loading' || vitalStatusData === undefined ? (
+                <Grid className={classes.progressContainer}>
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <PieChart data={vitalStatusData ?? []} />
+              )}
             </Paper>
           </Grid>
 
@@ -171,7 +205,13 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              <DonutChart data={visitTypeRepartitionData} />
+              {visitTypeRepartitionData === 'loading' ? (
+                <Grid className={classes.progressContainer}>
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <DonutChart data={visitTypeRepartitionData} />
+              )}
             </Paper>
           </Grid>
 
@@ -183,7 +223,13 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              <BarChart data={genderData} />
+              {genderData === 'loading' ? (
+                <Grid className={classes.progressContainer}>
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <BarChart data={genderData} />
+              )}
             </Paper>
           </Grid>
 
@@ -195,7 +241,13 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              <PyramidChart data={agePyramidData} />
+              {agePyramidData === 'loading' ? (
+                <Grid className={classes.progressContainer}>
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <PyramidChart data={agePyramidData} />
+              )}
             </Paper>
           </Grid>
 
@@ -207,7 +259,13 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              <GroupedBarChart data={monthlyVisitData} />
+              {monthlyVisitData === 'loading' ? (
+                <Grid className={classes.progressContainer}>
+                  <CircularProgress />
+                </Grid>
+              ) : (
+                <GroupedBarChart data={monthlyVisitData} />
+              )}
             </Paper>
           </Grid>
         </Grid>

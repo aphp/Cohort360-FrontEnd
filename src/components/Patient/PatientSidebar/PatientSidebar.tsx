@@ -51,9 +51,9 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const numberOfRows = 20 // Number of desired lines in the document array
 
-  const onSearchPatient = (newSortBy: string, newSortDirection: 'asc' | 'desc', value = 1) => {
+  const onSearchPatient = (newSortBy: string, newSortDirection: 'asc' | 'desc', page = 1) => {
     setLoadingStatus(true)
-    fetchPatientList(value, searchBy, searchInput, gender, age, vitalStatus, newSortBy, newSortDirection, groupId)
+    fetchPatientList(page, searchBy, searchInput, gender, age, vitalStatus, newSortBy, newSortDirection, groupId)
       .then((patientsResp) => {
         setPatientsList(patientsResp?.originalPatients ?? [])
         setTotalPatients(patientsResp?.totalPatients ?? 0)

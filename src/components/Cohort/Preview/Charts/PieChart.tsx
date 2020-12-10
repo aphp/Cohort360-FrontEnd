@@ -3,8 +3,10 @@ import React, { useRef, useEffect, memo } from 'react'
 import { SimpleChartDataType } from 'types'
 import * as d3 from 'd3'
 
+import displayDigit from 'utils/displayDigit'
+
 type PieChartProps = {
-  data: SimpleChartDataType[]
+  data: SimpleChartDataType[] | 'loading'
   height?: number
   width?: number
 }
@@ -48,7 +50,7 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 240, width = 20
       .attr('fill', (d) => color(d.data.label))
       .attr('d', arc)
       .append('title')
-      .text((d) => `${d.data.label}: ${d.data.value.toString()}`)
+      .text((d) => `${d.data.label}: ${displayDigit(d.data.value)}`)
 
     svg
       .append('g')
@@ -68,12 +70,11 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 240, width = 20
       )
       .call((text) =>
         text
-          .filter((d) => d.endAngle - d.startAngle > 0.25)
           .append('tspan')
           .attr('x', 0)
           .attr('y', '0.7em')
           .attr('fill-opacity', 0.7)
-          .text((d) => d.data.value.toString())
+          .text((d) => displayDigit(d.data.value))
       )
   }, [node, data, height, width])
 

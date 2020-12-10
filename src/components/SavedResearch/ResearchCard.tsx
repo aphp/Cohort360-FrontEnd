@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 
-import { CircularProgress, Grid, IconButton, InputBase } from '@material-ui/core'
+import { CircularProgress, Grid, IconButton, InputAdornment, InputBase } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
 
+import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from '../../assets/icones/search.svg'
 
 import ResearchTable from './ResearchTable/ResearchTable'
@@ -78,6 +79,25 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
     handleChangePage()
   }
 
+  const handleClearInput = () => {
+    setSearchInput('')
+    setLoadingStatus(true)
+    fetchCohorts()
+      .then((cohortsResp) => {
+        if (filteredIds) {
+          setResearches(
+            cohortsResp ? cohortsResp?.results?.filter((r) => !filteredIds.includes(r.researchId)) : undefined
+          )
+        } else {
+          setResearches(cohortsResp?.results ?? undefined)
+        }
+        setTotal(cohortsResp?.count ?? 0)
+      })
+      .then(() => {
+        setLoadingStatus(false)
+      })
+  }
+
   const onKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     if (e.keyCode === 13) {
       e.preventDefault()
@@ -95,6 +115,11 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
             value={searchInput}
             onChange={handleChangeInput}
             onKeyDown={onKeyDown}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+              </InputAdornment>
+            }
           />
           <IconButton type="submit" aria-label="search" onClick={onSearchCohort}>
             <SearchIcon fill="#ED6D91" height="15px" />

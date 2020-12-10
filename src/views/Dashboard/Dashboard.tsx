@@ -3,7 +3,8 @@ import clsx from 'clsx'
 import { CONTEXT } from '../../constants'
 import { useDispatch } from 'react-redux'
 import { Link, useParams, useLocation } from 'react-router-dom'
-import { Grid, Tabs, Tab, CircularProgress } from '@material-ui/core'
+import { Grid, Tabs, Tab } from '@material-ui/core'
+import { IExtension } from '@ahryman40k/ts-fhir-types/lib/R4'
 import Alert from '@material-ui/lab/Alert'
 
 import InclusionExclusionPatientsPanel from '../../components/Cohort/InclusionExclusionPatients/InclusionExclusionPatients'
@@ -43,7 +44,6 @@ const Dashboard: React.FC<{
   const [selectedTab, selectTab] = useState(tabName || 'apercu')
   const [tabs, setTabs] = useState<Tabs[]>([])
   const [status, setStatus] = useState('')
-  const [loading, setLoading] = useState(true)
   const [deidentifiedBoolean, setDeidentifiedBoolean] = useState<boolean>(true)
   const [openRedcapDialog, setOpenRedcapDialog] = useState(false)
 
@@ -52,58 +52,41 @@ const Dashboard: React.FC<{
     dashboard: state.exploredCohort
   }))
 
-  const _saveDashboardElement = (cohortResp: any) => {
-    // Save dashboard element
-    dispatch(setExploredCohort(cohortResp))
-
-    // Check if access == 'Pseudonymisé' || 'Nominatif'
-    const { originalPatients } = cohortResp
-    if (!originalPatients || (originalPatients && !originalPatients[0])) return
-    const extension: [
-      {
-        url: string
-        valueBoolean: boolean
-      }
-    ] = originalPatients[0].extension
-
-    if (!extension) return setLoading(false)
-    const deidentified = extension.find((data) => data.url === 'deidentified')
-
-    if (!deidentified) return setLoading(false)
-    const valueBoolean = deidentified.valueBoolean ?? true
-
-    setDeidentifiedBoolean(valueBoolean)
-  }
-
   const _fetchCohort = async () => {
-    if (!cohortId) return setLoading(false)
-
     const cohortResp = await fetchCohort(cohortId)
     if (cohortResp) {
-      _saveDashboardElement(cohortResp)
+      dispatch(setExploredCohort(cohortResp))
     }
-    setLoading(false)
   }
 
   const _fetchMyPatients = async () => {
     const cohortResp = await fetchMyPatients()
     if (cohortResp) {
-      _saveDashboardElement(cohortResp)
+      dispatch(setExploredCohort(cohortResp))
     }
-    setLoading(false)
   }
 
   const _fetchPerimeters = async () => {
-    if (!perimetreIds) return setLoading(false)
-
     const cohortResp = await fetchPerimetersInfos(perimetreIds)
     if (cohortResp) {
-      _saveDashboardElement(cohortResp)
+      dispatch(setExploredCohort(cohortResp))
     }
-    setLoading(false)
   }
 
   useEffect(() => {
+    dispatch(
+      setExploredCohort({
+        cohort: undefined,
+        name: '',
+        totalPatients: undefined,
+        agePyramidData: undefined,
+        genderRepartitionMap: undefined,
+        monthlyVisitData: undefined,
+        visitTypeRepartitionData: undefined,
+        originalPatients: undefined
+      })
+    )
+
     switch (context) {
       case 'patients':
         _fetchMyPatients()
@@ -128,12 +111,11 @@ const Dashboard: React.FC<{
       case 'new_cohort':
         setStatus("Création d'un cohorte")
         setTabs([
-          { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: false },
+          { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu cohorte', value: 'apercu', to: `/cohort/new/apercu`, disabled: true },
           { label: 'Patients', value: 'patients', to: `/cohort/new/patients`, disabled: true },
           { label: 'Documents', value: 'documents', to: `/cohort/new/documents`, disabled: true }
         ])
-        setLoading(false)
         break
       case 'perimeters':
         _fetchPerimeters()
@@ -149,6 +131,22 @@ const Dashboard: React.FC<{
         break
     }
   }, []) //eslint-disable-line
+
+  const checkDeindentifiedStatus = () => {
+    // Check if access == 'Pseudonymisé' || 'Nominatif'
+    const { originalPatients } = dashboard
+    if (!originalPatients || (originalPatients && !originalPatients[0])) return
+    const extension: IExtension[] | undefined = originalPatients[0].extension
+
+    const deidentified = extension?.find((data) => data.url === 'deidentified')
+    const valueBoolean = deidentified ? deidentified.valueBoolean : true
+
+    setDeidentifiedBoolean(!!valueBoolean)
+  }
+
+  useEffect(() => {
+    checkDeindentifiedStatus()
+  }, [dashboard]) //eslint-disable-line
 
   useEffect(() => {
     selectTab(tabName || 'apercu')
@@ -166,13 +164,38 @@ const Dashboard: React.FC<{
     selectTab(newTab)
   }
 
-  if (loading) return <CircularProgress className={classes.loading} size={50} />
+  const _displayGroupName = () => {
+    let group: {
+      name: string
+      perimeters?: string[]
+    } = { name: '-', perimeters: [] }
+    switch (context) {
+      case 'patients':
+        group = { name: 'Mes patients' }
+        break
+      case 'cohort':
+        group = { name: dashboard.name ?? '-' }
+        break
+      case 'perimeters':
+        group = {
+          name: 'Exploration de périmètres',
+          perimeters:
+            dashboard.cohort && Array.isArray(dashboard.cohort)
+              ? dashboard.cohort.map((p: any) => p.name.replace('Patients passés par: ', ''))
+              : []
+        }
+        break
+      default:
+        break
+    }
+    return group
+  }
 
   if (context === 'new_cohort') {
     return <CohortCreation />
   }
 
-  if (!dashboard.cohort && context !== 'patients') {
+  if (dashboard.totalPatients === 0) {
     return (
       <Alert severity="error" className={classes.alert}>
         Les données ne sont pas encore disponibles, veuillez réessayer ultérieurement.
@@ -228,40 +251,36 @@ const Dashboard: React.FC<{
         </Grid>
       </Grid>
       <div>
-        {dashboard.originalPatients && (
-          <>
-            {selectedTab === 'apercu' && (
-              <CohortPreview
-                total={dashboard.totalPatients ?? 0}
-                group={{ name: dashboard.name ?? '-' }}
-                agePyramidData={dashboard.agePyramidData}
-                genderRepartitionMap={dashboard.genderRepartitionMap}
-                monthlyVisitData={dashboard.monthlyVisitData}
-                visitTypeRepartitionData={dashboard.visitTypeRepartitionData}
-              />
-            )}
-            {selectedTab === 'patients' && (
-              <PatientList
-                groupId={cohortId}
-                total={dashboard.totalPatients || 0}
-                deidentified={deidentifiedBoolean}
-                patients={dashboard.originalPatients}
-                agePyramidData={dashboard.agePyramidData}
-                genderRepartitionMap={dashboard.genderRepartitionMap}
-              />
-            )}
-            {selectedTab === 'documents' && (
-              <CohortDocuments
-                groupId={cohortId || perimetreIds}
-                deidentifiedBoolean={deidentifiedBoolean}
-                sortBy={'date'}
-                sortDirection={'desc'}
-              />
-            )}
-            {CONTEXT === 'arkhn' && selectedTab === 'inclusion-exclusion' && (
-              <InclusionExclusionPatientsPanel cohort={dashboard} loading={false} />
-            )}
-          </>
+        {selectedTab === 'apercu' && (
+          <CohortPreview
+            total={dashboard.totalPatients}
+            group={_displayGroupName()}
+            agePyramidData={dashboard.agePyramidData ?? 'loading'}
+            genderRepartitionMap={dashboard.genderRepartitionMap ?? 'loading'}
+            monthlyVisitData={dashboard.monthlyVisitData ?? 'loading'}
+            visitTypeRepartitionData={dashboard.visitTypeRepartitionData ?? 'loading'}
+          />
+        )}
+        {selectedTab === 'patients' && (
+          <PatientList
+            groupId={cohortId || perimetreIds}
+            total={dashboard.totalPatients || 0}
+            deidentified={deidentifiedBoolean}
+            patients={dashboard.originalPatients}
+            agePyramidData={dashboard.agePyramidData}
+            genderRepartitionMap={dashboard.genderRepartitionMap}
+          />
+        )}
+        {selectedTab === 'documents' && (
+          <CohortDocuments
+            groupId={cohortId || perimetreIds}
+            deidentifiedBoolean={deidentifiedBoolean}
+            sortBy={'date'}
+            sortDirection={'desc'}
+          />
+        )}
+        {CONTEXT === 'arkhn' && selectedTab === 'inclusion-exclusion' && (
+          <InclusionExclusionPatientsPanel cohort={dashboard} />
         )}
       </div>
     </Grid>

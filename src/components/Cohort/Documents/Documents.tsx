@@ -1,39 +1,28 @@
 import React, { useState, useEffect } from 'react'
 
-import {
-  Button,
-  CssBaseline,
-  FormControlLabel,
-  Grid,
-  IconButton,
-  InputBase,
-  // Paper,
-  Radio,
-  RadioGroup,
-  TextField,
-  Typography
-} from '@material-ui/core'
+import { Button, CssBaseline, Grid, IconButton, InputAdornment, InputBase, Paper, Typography } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
 
 import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
 import DocumentList from './DocumentList/DocumentList'
-// import WordCloud from '../Preview/Charts/WordCloud'
+import WordCloud from '../Preview/Charts/WordCloud'
+import SortDialog from '../../Filters/SortDialog/SortDialog'
 import DocumentSearchHelp from '../../DocumentSearchHelp/DocumentSearchHelp'
 import { fetchDocuments } from '../../../services/cohortInfos'
 
+import ClearIcon from '@material-ui/icons/Clear'
 import InfoIcon from '@material-ui/icons/Info'
+import SortIcon from '@material-ui/icons/Sort'
 import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
 import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
 
 import { CohortComposition } from 'types'
-import {
-  // IExtension,
-  IDocumentReference
-} from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IExtension, IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import useStyles from './styles'
 import { useAppSelector } from 'state'
-import { Autocomplete } from '@material-ui/lab'
+
+import displayDigit from 'utils/displayDigit'
 
 type DocumentsProps = {
   groupId?: string
@@ -52,11 +41,12 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   const [loadingStatus, setLoadingStatus] = useState(true)
   const [searchInput, setSearchInput] = useState('')
   const [searchMode, setSearchMode] = useState(false)
-  // const [wordcloudData, setWordcloudData] = useState<IExtension[] | undefined>()
+  const [wordcloudData, setWordcloudData] = useState<IExtension[] | undefined>()
   const [open, setOpen] = useState(false)
+  const [openSort, setOpenSort] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
   const [nda, setNda] = useState('')
-  const [selectedDocTypes, setSelectedDocTypes] = useState(['all'])
+  const [selectedDocTypes, setSelectedDocTypes] = useState<string[]>([])
   const [startDate, setStartDate] = useState<string | undefined>(undefined)
   const [endDate, setEndDate] = useState<string | undefined>(undefined)
   const [_sortBy, setSortBy] = useState(sortBy)
@@ -64,13 +54,13 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
 
   const documentLines = 20
 
-  const sortByNames = [
+  const sortOptions = [
     { label: 'Date', code: 'date' },
     { label: 'Type de document', code: 'type' }
   ]
 
-  const onSearchDocument = (sortBy: string, sortDirection: 'asc' | 'desc', page = 1) => {
-    if (searchInput !== '') {
+  const onSearchDocument = (sortBy: string, sortDirection: 'asc' | 'desc', input = searchInput, page = 1) => {
+    if (input !== '') {
       setSearchMode(true)
     } else {
       setSearchMode(false)
@@ -81,7 +71,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
       sortBy,
       sortDirection,
       page,
-      searchInput,
+      input,
       selectedDocTypes,
       nda,
       startDate,
@@ -91,16 +81,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     )
       .then((result) => {
         if (result) {
-          const {
-            totalDocs,
-            totalAllDocs,
-            documentsList
-            // wordcloudData
-          } = result
+          const { totalDocs, totalAllDocs, documentsList, wordcloudData } = result
           setDocuments(documentsList)
-          // if (wordcloudData) {
-          //   setWordcloudData(wordcloudData)
-          // }
+          if (wordcloudData) {
+            setWordcloudData(wordcloudData)
+          }
           setDocumentsNumber(totalDocs)
           setAllDocumentsNumber(totalAllDocs)
           setPage(page)
@@ -112,8 +97,17 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
       })
   }
 
+  const handleClearInput = () => {
+    setSearchInput('')
+    onSearchDocument(_sortBy, _sortDirection, '')
+  }
+
   const handleOpenDialog = () => {
     setOpen(true)
+  }
+
+  const handleOpenSortDialog = () => {
+    setOpenSort(true)
   }
 
   const handleCloseDialog = (submit: boolean) => () => {
@@ -132,24 +126,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     }
   }
 
-  const onChangeSortBy = (
-    event: React.ChangeEvent<{}>,
-    value: {
-      label: string
-      code: string
-    } | null
-  ) => {
-    if (value) {
-      setSortBy(value.code)
-      onSearchDocument(value.code, _sortDirection)
-    }
-  }
-
-  const onChangeSortDirection = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    if (value === 'asc' || value === 'desc') {
-      setSortDirection(value)
-      onSearchDocument(_sortBy, value)
-    }
+  const handleCloseSortDialog = (submitSort: boolean) => {
+    setOpenSort(false)
+    submitSort && onSearchDocument(_sortBy, _sortDirection)
   }
 
   useEffect(() => {
@@ -167,7 +146,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
           Documents cliniques
         </Typography>
 
-        {/* <Grid container spacing={3}>
+        <Grid container spacing={3}>
           <Grid item xs={12}>
             {wordcloudData && (
               <Paper className={classes.chartOverlay}>
@@ -176,16 +155,17 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                     Mots les plus fréquents
                   </Typography>
                 </Grid>
-                <WordCloud wordcloudData={wordcloudData?.[0]?.extension} />
+                {/* @ts-ignore */}
+                <WordCloud wordcloudData={wordcloudData} />
               </Paper>
             )}
-          </Grid> 
-        </Grid>*/}
+          </Grid>
+        </Grid>
 
         <Grid container item justify="flex-end" className={classes.tableGrid}>
           <Grid container justify="space-between" alignItems="center">
             <Typography variant="button">
-              {documentsNumber} / {allDocumentsNumber} document(s)
+              {displayDigit(documentsNumber ?? 0)} / {displayDigit(allDocumentsNumber ?? 0)} document(s)
             </Typography>
             <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
               <div className={classes.documentButtons}>
@@ -196,6 +176,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                     value={searchInput}
                     onChange={handleChangeInput}
                     onKeyDown={onKeyDown}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                      </InputAdornment>
+                    }
                   />
                   <IconButton
                     type="submit"
@@ -218,24 +203,26 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                 >
                   Filtrer
                 </Button>
+                <Button
+                  variant="contained"
+                  disableElevation
+                  onClick={handleOpenSortDialog}
+                  startIcon={<SortIcon height="15px" fill="#FFF" />}
+                  className={classes.searchButton}
+                >
+                  Trier
+                </Button>
+                <SortDialog
+                  open={openSort}
+                  onClose={() => handleCloseSortDialog(false)}
+                  onSubmit={() => handleCloseSortDialog(true)}
+                  sortOptions={sortOptions}
+                  sortBy={_sortBy}
+                  onChangeSortBy={setSortBy}
+                  sortDirection={_sortDirection}
+                  onChangeSortDirection={setSortDirection}
+                />
               </div>
-              <Autocomplete
-                options={sortByNames}
-                getOptionLabel={(option) => option.label}
-                value={sortByNames.find((value) => value.code === _sortBy)}
-                renderInput={(params) => <TextField {...params} label="Trier par :" variant="outlined" />}
-                onChange={onChangeSortBy}
-                className={classes.autocomplete}
-              />
-              <Typography variant="button">Ordre :</Typography>
-              <RadioGroup
-                value={_sortDirection}
-                onChange={onChangeSortDirection}
-                classes={{ root: classes.radioGroup }}
-              >
-                <FormControlLabel value="asc" control={<Radio />} label="Croissant" />
-                <FormControlLabel value="desc" control={<Radio />} label="Décroissant" />
-              </RadioGroup>
             </Grid>
           </Grid>
           <DocumentList
@@ -252,7 +239,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
             shape="rounded"
             onChange={(event, page) => {
               if (documents.length <= documentLines) {
-                onSearchDocument(_sortBy, _sortDirection, page)
+                onSearchDocument(_sortBy, _sortDirection, searchInput, page)
               } else {
                 setPage(page)
               }

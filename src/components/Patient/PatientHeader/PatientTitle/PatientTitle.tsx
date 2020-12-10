@@ -8,6 +8,8 @@ import { IconButton, Grid, Menu, MenuItem, Typography } from '@material-ui/core'
 import ArrowBackIcon from '@material-ui/icons/ArrowBack'
 import { ReactComponent as MoreIcon } from '../../../../assets/icones/ellipsis-v.svg'
 
+import { capitalizeFirstLetter } from 'utils/capitalize'
+
 import useStyles from './styles'
 
 type PatientTitleProps = {
@@ -28,10 +30,10 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
 
   const goBacktoCohort = () => {
     const path = Array.isArray(cohort.cohort)
-      ? `/perimetres?${cohort.cohort.map((e) => e.id).join()}`
+      ? `/perimetres/patients?${cohort.cohort.map((e) => e.id).join()}`
       : cohort.cohort?.id
-      ? `/cohort/${cohort.cohort?.id}`
-      : '/mes_patients'
+      ? `/cohort/${cohort.cohort?.id}/patients`
+      : '/mes_patients/patients'
 
     history.push(path)
   }
@@ -42,7 +44,7 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
         <ArrowBackIcon className={classes.iconButtons} />
       </IconButton>
       <Typography variant="h2" color="primary" className={classes.patientName}>
-        {firstName ?? ''} {lastName ?? ''}
+        {capitalizeFirstLetter(firstName) ?? ''} {lastName ?? ''}
       </Typography>
       {CONTEXT === 'arkhn' && (
         <IconButton onClick={handleMenuOpen}>

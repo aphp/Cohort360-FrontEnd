@@ -69,7 +69,7 @@ export const getGenderRepartitionMapAphp = (facet?: IExtension[]): ComplexChartD
 
   repartitionMap.set('female', { deceased: 0, alive: 0 })
   repartitionMap.set('male', { deceased: 0, alive: 0 })
-  repartitionMap.set('unknown', { deceased: 0, alive: 0 })
+  repartitionMap.set('other', { deceased: 0, alive: 0 })
 
   facet?.forEach((extension) => {
     const isDeceased = extension.extension?.filter((extension) => {
@@ -90,7 +90,7 @@ export const getGenderRepartitionMapAphp = (facet?: IExtension[]): ComplexChartD
             repartitionMap.get('male').deceased = gender.valueDecimal
             break
           default:
-            repartitionMap.get('unknown').deceased = gender?.valueDecimal
+            repartitionMap.get('other').deceased = gender?.valueDecimal
         }
       })
     } else if (isDeceased === 'false') {
@@ -103,7 +103,7 @@ export const getGenderRepartitionMapAphp = (facet?: IExtension[]): ComplexChartD
             repartitionMap.get('male').alive = gender.valueDecimal
             break
           default:
-            repartitionMap.get('unknown').alive = gender?.valueDecimal
+            repartitionMap.get('other').alive = gender?.valueDecimal
         }
       })
     }
@@ -313,13 +313,15 @@ export const getVisitRepartitionMap = (patients: IPatient[], encounters: IEncoun
 export const getGenderRepartitionSimpleData = (
   genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
 ): {
-  vitalStatusData: SimpleChartDataType[]
-  genderData: SimpleChartDataType[]
+  vitalStatusData: SimpleChartDataType[] | undefined
+  genderData: SimpleChartDataType[] | undefined
 } => {
-  const vitalStatusData: SimpleChartDataType[] = []
-  const genderData: SimpleChartDataType[] = []
+  const vitalStatusData: SimpleChartDataType[] | 'loading' = []
+  const genderData: SimpleChartDataType[] | 'loading' = []
 
-  if (genderRepartitionMap) {
+  if (genderRepartitionMap === undefined) return { vitalStatusData: undefined, genderData: undefined }
+
+  if (genderRepartitionMap && genderRepartitionMap.size > 0) {
     let aliveCount = 0
     let deceasedCount = 0
     let maleCount = 0

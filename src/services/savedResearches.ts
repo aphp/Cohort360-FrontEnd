@@ -91,10 +91,10 @@ export const fetchFavoriteCohorts = async (): Promise<Back_API_Response<Formatte
               researchId: cohort.uuid ?? '',
               fhir_groups_ids: cohort.fhir_groups_ids,
               name: cohort.name,
-              statut: 'Cohorte i2b2',
+              status: 'Cohorte i2b2',
               nPatients: cohort.result_size,
               date: cohort.created_at,
-              perimetre: '-',
+              perimeter: '-',
               favorite: cohort.favorite
             }
           })

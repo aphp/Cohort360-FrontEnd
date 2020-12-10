@@ -183,6 +183,7 @@ export const fetchPMSI = async (
   searchInput: string,
   nda: string,
   code: string,
+  diagnosticTypes: string[],
   sortBy: string,
   sortDirection: string,
   startDate?: string,
@@ -250,6 +251,7 @@ export const fetchPMSI = async (
     let ndaFilter = ''
     let codeName = ''
     let codeFilter = ''
+    let diagnosticTypesFilter = ''
     let _sortBy = sortBy
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
     let dateFilter = ''
@@ -294,6 +296,10 @@ export const fetchPMSI = async (
       codeFilter = `&${codeName}=${code}`
     }
 
+    if (selectedTab === 'CIM10' && diagnosticTypes.length > 0) {
+      diagnosticTypesFilter = `&type=${diagnosticTypes.join()}`
+    }
+
     if (startDate || endDate) {
       if (startDate && endDate) {
         dateFilter = `&${dateName}=ge${startDate},le${endDate}`
@@ -307,7 +313,7 @@ export const fetchPMSI = async (
     const pmsiResp = await api.get<FHIR_API_Response<IClaim | IProcedure | ICondition>>(
       `${resource}?patient=${patientId}&_sort=${_sortDirection}${_sortBy}&size=20&offset=${
         (page - 1) * 20
-      }${search}${ndaFilter}${codeFilter}${dateFilter}`
+      }${search}${ndaFilter}${codeFilter}${diagnosticTypesFilter}${dateFilter}`
     )
 
     const pmsiData =
@@ -340,23 +346,11 @@ export const fetchDocuments = async (
 ) => {
   if (CONTEXT === 'aphp') {
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
-    let search = ''
-    let docTypesFilter = ''
-    let ndaFilter = ''
+    const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : []
+    const search = searchInput ? `&_text=${searchInput}` : ''
+    const ndaFilter = nda ? `&encounter.identifier=${nda}` : ''
     let dateFilter = ''
     let elements = ''
-
-    if (searchInput) {
-      search = `&_text=${searchInput}`
-    }
-
-    if (!selectedDocTypes.includes('all')) {
-      docTypesFilter = `&type=${selectedDocTypes.join()}`
-    }
-
-    if (nda) {
-      ndaFilter = `&encounter.identifier=${nda}`
-    }
 
     if (startDate || endDate) {
       if (startDate && endDate) {
@@ -483,6 +477,21 @@ export const getEncounterOrProcedureDocs = async (
     }
   }
 
+  if (CONTEXT === 'aphp') {
+    let encounterId
+    if (data.resourceType === 'Encounter') {
+      encounterId = data.id
+    } else if (data.resourceType === 'Procedure') {
+      encounterId = data.encounter?.reference
+    }
+
+    const documentsResp = await api.get<FHIR_API_Response<IComposition>>(`/Composition?encounter=${encounterId}`)
+
+    //TO DO when deidentified data are fixed: change true to real value
+    const documentsList = await fillNDAAndServiceProviderDocs(true, getApiResponseResources(documentsResp))
+
+    if (documentsList) return documentsList
+  }
   return []
 }
 
@@ -550,7 +559,7 @@ export const fetchPatient = async (patientId: string): Promise<PatientData | und
       documentsResponse
     ] = await Promise.all([
       api.get<IPatient>(`/Patient/${patientId}`),
-      api.get<FHIR_API_Response<IProcedure>>(`/Procedure?patient=${patientId}&_sort=-date&size=20`),
+      api.get<FHIR_API_Response<IProcedure>>(`/Procedure?patient=${patientId}&_sort=-date&status=completed&size=20`),
       api.get<FHIR_API_Response<IEncounter>>(
         `/Encounter?patient=${patientId}&type=VISIT&status=arrived,triaged,in-progress,onleave,finished,unknown&_sort=-start-date`
       ),

@@ -5,6 +5,7 @@ import {
   CircularProgress,
   Grid,
   IconButton,
+  InputAdornment,
   InputBase,
   Paper,
   Tab,
@@ -21,6 +22,8 @@ import {
 import Pagination from '@material-ui/lab/Pagination'
 
 import PMSIFilters from '../../Filters/PMSIFilters/PMSIFilters'
+
+import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
 import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
 
@@ -56,7 +59,6 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
 }) => {
   const classes = useStyles()
   const [selectedTab, selectTab] = useState<'CIM10' | 'CCAM' | 'GHM'>('CIM10')
-  // TODO aphp: changed any to something more detailed
   const [data, setData] = useState<PMSIEntry<IClaim | ICondition | IProcedure>[] | undefined>([])
   const [loadingStatus, setLoadingStatus] = useState(false)
   const [total, setTotal] = useState(0)
@@ -65,6 +67,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
   const [open, setOpen] = useState(false)
   const [nda, setNda] = useState('')
   const [code, setCode] = useState('')
+  const [selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<string[]>([])
   const [startDate, setStartDate] = useState<string | undefined>(undefined)
   const [endDate, setEndDate] = useState<string | undefined>(undefined)
   const [_sortBy, setSortBy] = useState(sortBy)
@@ -80,6 +83,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
     searchInput: string,
     nda: string,
     code: string,
+    diagnosticTypes: string[],
     sortBy: string,
     sortDirection: string,
     startDate?: string,
@@ -94,6 +98,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       searchInput,
       nda,
       code,
+      diagnosticTypes,
       sortBy,
       sortDirection,
       startDate,
@@ -103,8 +108,31 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
         setData(pmsiResp?.pmsiData ?? [])
         setTotal(pmsiResp?.pmsiTotal ?? 0)
       })
-      .catch((error) => console.log(error))
+      .catch((error) => {
+        setData([])
+        setTotal(0)
+        console.log(error)
+      })
       .then(() => setLoadingStatus(false))
+  }
+
+  const handleClearInput = () => {
+    setSearchInput('')
+    setPage(1)
+    _fetchPMSI(
+      deidentifiedBoolean,
+      1,
+      patientId,
+      selectedTab,
+      '',
+      nda,
+      code,
+      selectedDiagnosticTypes,
+      _sortBy,
+      _sortDirection,
+      startDate,
+      endDate
+    )
   }
 
   const handleSort = (property: any) => (event: React.MouseEvent<unknown> /*eslint-disable-line*/) => {
@@ -122,6 +150,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       searchInput,
       nda,
       code,
+      selectedDiagnosticTypes,
       property,
       newDirection,
       startDate,
@@ -140,6 +169,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       searchInput,
       nda,
       code,
+      selectedDiagnosticTypes,
       _sortBy,
       _sortDirection,
       startDate,
@@ -229,6 +259,11 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
               value={searchInput}
               onChange={handleChangeSearchInput}
               onKeyDown={onKeyDown}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                </InputAdornment>
+              }
             />
             <IconButton type="submit" aria-label="search" onClick={onSearchPMSI}>
               <SearchIcon fill="#ED6D91" height="15px" />
@@ -256,6 +291,9 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
             endDate={endDate}
             onChangeEndDate={setEndDate}
             deidentified={deidentifiedBoolean}
+            showDiagnosticTypes={selectedTab === 'CIM10'}
+            selectedDiagnosticTypes={selectedDiagnosticTypes}
+            onChangeSelectedDiagnosticTypes={setSelectedDiagnosticTypes}
           />
         </div>
       </Grid>
@@ -341,7 +379,9 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
                               row.class?.code || row.code?.coding?.[0].display}
                         </TableCell>
                         {selectedTab === 'CIM10' && (
-                          <TableCell align="center">{row.extension ? row.extension[0].valueString : '-'}</TableCell>
+                          <TableCell align="center">
+                            {row.extension ? row.extension[0].valueString?.toUpperCase() : '-'}
+                          </TableCell>
                         )}
                         <TableCell align="center">{row.serviceProvider ?? 'Non renseigné'}</TableCell>
                       </TableRow>
