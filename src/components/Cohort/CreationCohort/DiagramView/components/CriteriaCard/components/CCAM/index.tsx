@@ -1,7 +1,13 @@
 import React from 'react'
 
-const index = () => {
-  return <p>Index of CCAM formulaire and hierarchy</p>
+import { Grid, Tabs, Tab } from '@material-ui/core'
+
+type Tabs = { label: string; value: string; to: string } | undefined
+
+const index: React.FC = () => {
+  const [tabs, setTabs] = useState(tabName || 'form')
+
+  return <Grid></Grid>
 }
 
 export default index
