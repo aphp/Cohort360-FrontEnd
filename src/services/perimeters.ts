@@ -77,11 +77,6 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
 
     const originalPatients = await getLastEncounter(getApiResponseResources(patientsResp))
 
-    // const wordcloudData =
-    //   docsResp.data.resourceType === 'Bundle'
-    //     ? docsResp.data.meta?.extension
-    //     : []
-
     const agePyramidData =
       patientsResp?.data?.resourceType === 'Bundle'
         ? getAgeRepartitionMapAphp(
@@ -116,7 +111,6 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
       cohort,
       totalPatients,
       originalPatients,
-      // wordcloudData,
       genderRepartitionMap,
       visitTypeRepartitionData,
       agePyramidData,

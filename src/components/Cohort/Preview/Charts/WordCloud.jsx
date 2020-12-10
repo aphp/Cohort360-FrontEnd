@@ -22,9 +22,9 @@ const WordCloud = memo(({ wordcloudData }) => {
     // Calcul de la frequence
     const xMax = data[0].extension[0].valueDecimal
 
-    for (let i = 0; i < data.length; i++) {
-      const freq = (data[i].extension[0].valueDecimal * 100) / xMax
-      data[i].extension[0].valueDecimal = Math.round(freq * 10) / 10 // <- pour arrondir les décimales
+    for (const word of data) {
+      const freq = (word.extension[0].valueDecimal * 100) / xMax
+      word.extension[0].valueDecimal = Math.round(freq * 10) / 10 // <- pour arrondir les décimales
     }
   }
 
