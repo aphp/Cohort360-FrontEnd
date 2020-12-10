@@ -50,12 +50,6 @@ export const createCohort = async (
     const { data } = fihrResult
     const fhir_group_id = data && data.result && data.result[0] ? data.result[0]['group.id'] : ''
 
-    console.log('requeteurJson', requeteurJson)
-    console.log('datedMeasureId', datedMeasureId)
-    console.log('snapshotId', snapshotId)
-    console.log('requestId', requestId)
-    console.log('fhir_group_id', fhir_group_id)
-
     const cohortResult = await apiBack.post('/explorations/cohorts/', {
       dated_measure_id: datedMeasureId,
       request_query_snapshot_id: snapshotId,

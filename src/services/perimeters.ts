@@ -1,7 +1,7 @@
 import api from './api'
 import { getInfos, getLastEncounter } from './myPatients'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
-import { FHIR_API_Response, CohortData } from 'types'
+import { FHIR_API_Response, CohortData, ScopeTreeRow } from 'types'
 import {
   IOrganization,
   IHealthcareService,
@@ -162,4 +162,20 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
       }
     }
   }
+}
+
+export const fetchPerimeterInfoForRequeteur = async (perimetersId: string): Promise<ScopeTreeRow[] | null> => {
+  if (!perimetersId) return null
+
+  const groupsResults = await api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${perimetersId}`)
+  const groups = getApiResponseResources(groupsResults)
+  const scopeRows: ScopeTreeRow[] = groups
+    ? groups?.map<ScopeTreeRow>((group) => ({
+        ...group,
+        id: group.id ?? '0',
+        name: group.name?.replace(/^Patients passés par: /, '') ?? '',
+        quantity: group.quantity ?? 0
+      }))
+    : []
+  return scopeRows
 }

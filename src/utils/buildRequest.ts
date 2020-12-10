@@ -1,7 +1,15 @@
 import moment from 'moment'
 
-export default (selectedPopulation: any, selectedCriteria: any) => {
-  type RequeteurSearchType = { _type: string; resourceType: string; fhirFilter: string }
+import { fetchPerimeterInfoForRequeteur as fetchPopulation } from '../services/perimeters'
+import { ScopeTreeRow, SelectedCriteriaType } from 'types'
+
+type RequeteurSearchType = {
+  _type: string
+  resourceType: 'Patient' | 'Encounter' | 'Claim' | 'Procedure' | 'Condition' | 'Composition'
+  fhirFilter: string
+}
+
+export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
   if (!selectedPopulation) return ''
 
   const filterReducer = (accumulator: any, currentValue: any) =>
@@ -135,4 +143,80 @@ export default (selectedPopulation: any, selectedCriteria: any) => {
     | RequeteurSearchType
     | null = newJson && newJson.length > 0 ? newJson.reduce(newJsonReducer) : null
   return JSON.stringify(requeteurJson)
+}
+
+export async function unbuildRequest(json: string) {
+  let population: ScopeTreeRow[] | null = null
+  let criteria: SelectedCriteriaType[] = []
+
+  const _retrieveInformationFromJson = async (element: RequeteurSearchType) => {
+    const currentCriterion = {
+      type: element.resourceType,
+      title: '',
+      fhirFilter: ''
+    }
+    switch (element.resourceType) {
+      case 'Patient': {
+        if (element.fhirFilter) {
+          const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
+          for (const filter of filters) {
+            const key = filter ? filter[0] : null
+            const value = filter ? filter[1] : null
+
+            if (key === '_list') {
+              population = await fetchPopulation(value ?? '')
+              return
+            } else {
+            }
+          }
+        }
+        break
+      }
+      case 'Encounter': {
+        break
+      }
+      case 'Condition': {
+        break
+      }
+      case 'Procedure': {
+        break
+      }
+      case 'Claim': {
+        break
+      }
+      default:
+        break
+    }
+    return currentCriterion
+  }
+
+  const _browseJson = async (currentJson: any) => {
+    if (currentJson && Array.isArray(currentJson) === true) {
+      for (const currentJsonElement of currentJson) {
+        if (currentJsonElement.child) {
+          await _browseJson(currentJsonElement.child)
+        }
+        if (currentJsonElement._type !== 'InnerJoin') {
+          const currentCriterion = await _retrieveInformationFromJson(currentJsonElement)
+          if (currentCriterion) criteria = [...criteria, currentCriterion]
+        }
+      }
+    } else {
+      if (currentJson.child) {
+        await _browseJson(currentJson.child)
+      }
+      if (currentJson._type !== 'InnerJoin') {
+        const currentCriterion = await _retrieveInformationFromJson(currentJson)
+        if (currentCriterion) criteria = [...criteria, currentCriterion]
+      }
+    }
+  }
+
+  const _json = json ? JSON.parse(json) : {}
+  await _browseJson(_json)
+
+  return {
+    population,
+    criteria
+  }
 }

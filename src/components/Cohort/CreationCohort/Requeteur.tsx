@@ -13,7 +13,7 @@ import constructCriteriaList from './DataList_Criteria'
 
 import useStyles from './styles'
 
-import buildRequest from '../../../utils/buildRequest'
+import { buildRequest, unbuildRequest } from '../../../utils/buildRequest'
 import { countCohort, createCohort, createRequest, createSnapshot } from '../../../services/cohortCreation'
 
 type SnapshotType = {
@@ -29,12 +29,15 @@ const Requeteur = () => {
 
   const [loading, setLoading] = useState<boolean>(true)
   const [actionLoading, setActionLoading] = useState<boolean[]>([])
-  const [count, setCount] = useState<CohortCreationCounterType>({})
   const [seletedTab, onChangeTab] = useState<'diagramme' | 'JSON'>('diagramme')
+
   const [criteria, onChangeCriteria] = useState<any[]>([])
+
+  const [requestId, onChangeRequestId] = useState<string>('')
   const [currentSnapshot, onChangeCurrentSnapshot] = useState<string | undefined>(undefined)
   const [snapshotsHistory, onChangeSnapshotsHistory] = useState<SnapshotType[]>([])
-  const [requestId, onChangeRequestId] = useState<string>('')
+
+  const [count, setCount] = useState<CohortCreationCounterType>({})
 
   // Pour le moment, sans forme de JSON...
   const [selectedPopulation, onChangeSelectedPopulation] = useState<ScopeTreeRow[] | null>(null)
@@ -75,8 +78,8 @@ const Requeteur = () => {
    * Just after, get new count and save it
    */
   const _countCohort = async (_json: string, _snapshotId: string, _requestId: string) => {
-    setActionLoading([...actionLoading, true])
     if (!_json || !_snapshotId || !_requestId) return
+    setActionLoading([...actionLoading, true])
 
     let _count: CohortCreationCounterType = {
       includePatient: 'loading',
@@ -120,23 +123,50 @@ const Requeteur = () => {
           const date = newSnapshot.created_at
           onChangeCurrentSnapshot(uuid)
           onChangeSnapshotsHistory([{ uuid, json, date }])
-          _countCohort(newJson, uuid, _requestId)
-          setActionLoading(actionLoading.slice(0, actionLoading.length - 2 > 0 ? actionLoading.length - 2 : 0))
+          _countCohort(newJson, uuid, _requestId ?? '')
         }
       }
     } else if (currentSnapshot) {
       // Update snapshots list
       const newSnapshot = await createSnapshot(currentSnapshot, newJson, false)
+
       if (newSnapshot) {
+        const foundItem = snapshotsHistory.find(({ uuid }) => uuid === currentSnapshot)
+        const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
+
         const uuid = newSnapshot.uuid
         const json = newSnapshot.serialized_query
         const date = newSnapshot.created_at
+
+        const _snapshotsHistory =
+          index === snapshotsHistory.length - 1 ? snapshotsHistory : snapshotsHistory.splice(0, index + 1)
+
         onChangeCurrentSnapshot(uuid)
-        onChangeSnapshotsHistory([...snapshotsHistory, { uuid, json, date }])
+        onChangeSnapshotsHistory([..._snapshotsHistory, { uuid, json, date }])
         _countCohort(newJson, uuid, _requestId ?? '')
       }
     }
     setActionLoading(actionLoading.slice(0, actionLoading.length - 2 > 0 ? actionLoading.length - 2 : 0))
+  }
+
+  const _buildRequest = async (
+    _selectedPopulation: ScopeTreeRow[] | null,
+    _selectedCriteria: SelectedCriteriaType[]
+  ) => {
+    onChangeSelectedPopulation(_selectedPopulation)
+    onChangeSelectedCriteria(_selectedCriteria)
+    if (!_selectedPopulation && _selectedCriteria && _selectedCriteria.length === 0) return
+
+    const _json = buildRequest(_selectedPopulation, _selectedCriteria)
+    onChangeJson(_json)
+    _onSaveNewJson(_json)
+  }
+
+  const _unbuildRequest = async (newCurrentSnapshot: SnapshotType) => {
+    const { population, criteria } = await unbuildRequest(newCurrentSnapshot.json)
+    onChangeSelectedPopulation(population)
+    onChangeSelectedCriteria(criteria)
+    _countCohort(newCurrentSnapshot.json, newCurrentSnapshot.uuid, requestId)
   }
 
   /**
@@ -146,6 +176,7 @@ const Requeteur = () => {
    */
   const _onExecute = () => {
     setActionLoading([...actionLoading, true])
+
     const _createCohort = async () => {
       if (!json) return
 
@@ -155,6 +186,7 @@ const Requeteur = () => {
 
       // history.push(`/cohort/${cohortId}`)
     }
+
     _createCohort()
     setActionLoading(actionLoading.slice(0, actionLoading.length - 2 > 0 ? actionLoading.length - 2 : 0))
   }
@@ -166,6 +198,7 @@ const Requeteur = () => {
       const newCurrentSnapshot = snapshotsHistory[index - 1 > 0 ? index - 1 : 0]
       onChangeCurrentSnapshot(newCurrentSnapshot.uuid)
       onChangeJson(newCurrentSnapshot.json)
+      _unbuildRequest(newCurrentSnapshot)
     }
   }
 
@@ -177,6 +210,7 @@ const Requeteur = () => {
         snapshotsHistory[index <= snapshotsHistory.length ? index + 1 : snapshotsHistory.length - 1]
       onChangeCurrentSnapshot(newCurrentSnapshot.uuid)
       onChangeJson(newCurrentSnapshot.json)
+      _unbuildRequest(newCurrentSnapshot)
     }
   }
 
@@ -202,17 +236,6 @@ const Requeteur = () => {
 
     _init()
   }, []) // eslint-disable-line
-
-  /**
-   * Construct json based on population + criteria cards
-   */
-  useEffect(() => {
-    if (!selectedPopulation && selectedCriteria && selectedCriteria.length === 0) return
-
-    const _json = buildRequest(selectedPopulation, selectedCriteria)
-    onChangeJson(_json)
-    _onSaveNewJson(_json)
-  }, [selectedPopulation, selectedCriteria]) // eslint-disable-line
 
   if (loading) return <CircularProgress />
 
@@ -242,10 +265,14 @@ const Requeteur = () => {
       {seletedTab === 'diagramme' ? (
         <DiagramView
           selectedPopulation={selectedPopulation}
-          onChangeSelectedPopulation={onChangeSelectedPopulation}
+          onChangeSelectedPopulation={(_selectedPopulation: ScopeTreeRow[] | null) =>
+            _buildRequest(_selectedPopulation, selectedCriteria || [])
+          }
           criteria={criteria}
           selectedCriteria={selectedCriteria}
-          onChangeSelectedCriteria={onChangeSelectedCriteria}
+          onChangeSelectedCriteria={(_selectedCriteria: SelectedCriteriaType[]) =>
+            _buildRequest(selectedPopulation, _selectedCriteria)
+          }
           actionLoading={actionLoading.length > 0}
         />
       ) : (
