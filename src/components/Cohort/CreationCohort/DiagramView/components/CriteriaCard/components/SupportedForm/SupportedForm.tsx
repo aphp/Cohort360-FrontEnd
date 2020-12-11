@@ -8,6 +8,7 @@ import { FormBuilder } from '@arkhn/ui'
 import useStyles from './styles'
 
 import { EncounterDataType } from 'types'
+import { capitalizeFirstLetter } from 'utils/capitalize'
 
 type SupportedFormFormProps = {
   criteria: any
@@ -91,7 +92,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
           {
             type: 'custom',
             name: 'label',
-            renderInput: () => <FormLabel component="legend">Age au moment de la prise en charge :</FormLabel>
+            renderInput: () => <FormLabel component="legend">Âge au moment de la prise en charge :</FormLabel>
           },
           {
             name: 'ageType',
@@ -125,17 +126,17 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
             type: 'autocomplete',
             autocompleteOptions: criteria?.data?.admissionModes?.map((admissionModes: any) => ({
               id: admissionModes.code,
-              label: admissionModes.display
+              label: capitalizeFirstLetter(admissionModes.display)
             }))
           },
           {
             name: 'entryMode',
             variant: 'outlined',
-            label: "Mode d'entré",
+            label: "Mode d'entrée",
             type: 'autocomplete',
             autocompleteOptions: criteria?.data?.entryModes?.map((entryModes: any) => ({
               id: entryModes.code,
-              label: entryModes.display
+              label: capitalizeFirstLetter(entryModes.display)
             }))
           },
           {
@@ -145,17 +146,17 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
             type: 'autocomplete',
             autocompleteOptions: criteria?.data?.exitModes?.map((exitModes: any) => ({
               id: exitModes.code,
-              label: exitModes.display
+              label: capitalizeFirstLetter(exitModes.display)
             }))
           },
           {
             name: 'fileStatus',
             variant: 'outlined',
-            label: 'Status Dossier',
+            label: 'Statut Dossier',
             type: 'autocomplete',
             autocompleteOptions: criteria?.data?.fileStatus?.map((fileStatus: any) => ({
               id: fileStatus.code,
-              label: fileStatus.display
+              label: capitalizeFirstLetter(fileStatus.display)
             }))
           }
         ]}

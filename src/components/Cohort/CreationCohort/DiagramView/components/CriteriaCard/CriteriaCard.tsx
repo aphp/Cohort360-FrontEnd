@@ -194,33 +194,64 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             <Typography>
               Dans <span className={classes.criteriaType}>Prise en charge</span>,
             </Typography>
-            <Typography>
-              Age au moment de la prise en charge:
-              {_selectedCriteria.years && _selectedCriteria.years[0] !== _selectedCriteria.years[1]
-                ? `entre ${_selectedCriteria.years[0]} et ${_selectedCriteria.years[1]} ${ageUnit} ${
-                    _selectedCriteria.years[1] === 100 ? 'ou plus.' : '.'
-                  }`
-                : `${_selectedCriteria.years?.[0]} ${ageUnit} ${
-                    _selectedCriteria.years?.[0] === 100 ? 'ou plus.' : '.'
-                  }`}
-            </Typography>
-            <Typography>
-              Durée de la prise en charge:
-              {_selectedCriteria.duration && _selectedCriteria.duration[0] !== _selectedCriteria.duration[1]
-                ? `entre ${_selectedCriteria.duration[0]} et ${_selectedCriteria.duration[1]} jour(s) ${
-                    _selectedCriteria.duration[1] === 100 ? 'ou plus.' : '.'
-                  }`
-                : `${_selectedCriteria.duration?.[0]} jour(s) ${
-                    _selectedCriteria.duration?.[0] === 100 ? 'ou plus.' : '.'
-                  }`}
-            </Typography>
-            {_selectedCriteria.admissionMode && (
-              <Typography>Mode d'admission: {_selectedCriteria.admissionMode.label}</Typography>
+            {_selectedCriteria.years && _selectedCriteria.years[0] === _selectedCriteria.years[1] && (
+              <Typography>
+                Âge au moment de la prise en charge :{' '}
+                <span className={classes.criteriaType}>
+                  {_selectedCriteria.years?.[0]} {ageUnit}
+                </span>
+                {_selectedCriteria.years?.[0] === 100 ? ' ou plus.' : '.'}
+              </Typography>
             )}
-            {_selectedCriteria.entryMode && <Typography>Mode d'entré: {_selectedCriteria.entryMode.label}</Typography>}
-            {_selectedCriteria.exitMode && <Typography>Mode de sortie: {_selectedCriteria.exitMode.label}</Typography>}
+            {_selectedCriteria.years &&
+              _selectedCriteria.years[0] !== _selectedCriteria.years[1] &&
+              (_selectedCriteria.years[0] !== 0 || _selectedCriteria.years[1] !== 100) && (
+                <Typography>
+                  Âge au moment de la prise en charge : entre{' '}
+                  <span className={classes.criteriaType}>
+                    {_selectedCriteria.years[0]} et {_selectedCriteria.years[1]} {ageUnit}
+                  </span>
+                  {_selectedCriteria.years[1] === 100 ? ' ou plus.' : '.'}
+                </Typography>
+              )}
+            {_selectedCriteria.duration && _selectedCriteria.duration[0] === _selectedCriteria.duration[1] && (
+              <Typography>
+                Durée de la prise en charge :{' '}
+                <span className={classes.criteriaType}>{_selectedCriteria.duration?.[0]} jour(s)</span>
+                {_selectedCriteria.duration?.[0] === 100 ? ' ou plus.' : '.'}
+              </Typography>
+            )}
+            {_selectedCriteria.duration &&
+              _selectedCriteria.duration[0] !== _selectedCriteria.duration[1] &&
+              (_selectedCriteria.duration[0] !== 0 || _selectedCriteria.duration[1] !== 100) && (
+                <Typography>
+                  Durée de la prise en charge :{' '}
+                  <span className={classes.criteriaType}>
+                    {_selectedCriteria.duration[0]} et {_selectedCriteria.duration[1]} jour(s)
+                  </span>
+                  {_selectedCriteria.duration[1] === 100 ? ' ou plus.' : '.'}
+                </Typography>
+              )}
+            {_selectedCriteria.admissionMode && (
+              <Typography>
+                Mode d'admission :{' '}
+                <span className={classes.criteriaType}>{_selectedCriteria.admissionMode.label}.</span>
+              </Typography>
+            )}
+            {_selectedCriteria.entryMode && (
+              <Typography align="center">
+                Mode d'entrée : <span className={classes.criteriaType}>{_selectedCriteria.entryMode.label}.</span>
+              </Typography>
+            )}
+            {_selectedCriteria.exitMode && (
+              <Typography align="center">
+                Mode de sortie : <span className={classes.criteriaType}>{_selectedCriteria.exitMode.label}.</span>
+              </Typography>
+            )}
             {_selectedCriteria.fileStatus && (
-              <Typography>Status Dossier: {_selectedCriteria.fileStatus.label}</Typography>
+              <Typography>
+                Statut dossier : <span className={classes.criteriaType}>{_selectedCriteria.fileStatus.label}.</span>
+              </Typography>
             )}
           </>
         )
