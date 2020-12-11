@@ -418,7 +418,7 @@ InclusionExclusionContent.propType = {
   include: PropTypes.bool.isRequired
 }
 
-const InclusionExclusionPatientsPanel = ({ cohort }) => {
+const InclusionExclusionPatientsPanel = () => {
   const classes = useStyles()
   // const history = useHistory()
   // const dispatch = useDispatch()

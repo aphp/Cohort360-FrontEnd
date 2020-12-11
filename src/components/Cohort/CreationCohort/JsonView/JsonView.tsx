@@ -21,7 +21,7 @@ const JsonView: React.FC<JsonViewProps> = (props) => {
       className={classes.root}
       mode="json"
       theme="xcode"
-      onChange={() => {}}
+      onChange={() => null}
       showPrintMargin
       showGutter
       highlightActiveLine
