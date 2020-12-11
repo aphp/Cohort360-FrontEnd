@@ -132,23 +132,33 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             <Typography>
               Dans <span className={classes.criteriaType}>Démographie Patient</span>,
             </Typography>
-            <Typography>Genre sélectionné :</Typography>
             {_selectedCriteria.gender && (
-              <Typography key={_selectedCriteria?.gender?.label}>{_selectedCriteria.gender.label}</Typography>
+              <Typography>
+                Genre sélectionné : <span className={classes.criteriaType}>{_selectedCriteria.gender.label}</span>.
+              </Typography>
             )}
-            <Typography>Status vital :</Typography>
             {_selectedCriteria.vitalStatus && (
-              <Typography key={_selectedCriteria?.vitalStatus?.label}>{_selectedCriteria.vitalStatus.label}</Typography>
+              <Typography>
+                Statut vital : <span className={classes.criteriaType}>{_selectedCriteria.vitalStatus.label}</span>.
+              </Typography>
             )}
-            <Typography>
-              {_selectedCriteria.years && _selectedCriteria.years[0] !== _selectedCriteria.years[1]
-                ? `Fourchette d'âge comprise entre ${_selectedCriteria.years[0]} et ${_selectedCriteria.years[1]} ans ${
-                    _selectedCriteria.years[1] === 100 ? 'ou plus.' : '.'
-                  }`
-                : `Age sélectionné: ${_selectedCriteria.years?.[0]} ans ${
-                    _selectedCriteria.years?.[0] === 100 ? 'ou plus.' : '.'
-                  }`}
-            </Typography>
+            {_selectedCriteria.years && _selectedCriteria.years[0] === _selectedCriteria.years[1] && (
+              <Typography>
+                Âge sélectionné: <span className={classes.criteriaType}>{_selectedCriteria.years?.[0]} ans</span>
+                {_selectedCriteria.years?.[0] === 100 ? ' ou plus.' : '.'}
+              </Typography>
+            )}
+            {_selectedCriteria.years &&
+              _selectedCriteria.years[0] !== _selectedCriteria.years[1] &&
+              (_selectedCriteria.years[0] !== 0 || _selectedCriteria.years[1] !== 100) && (
+                <Typography>
+                  Fourchette d'âge comprise entre{' '}
+                  <span className={classes.criteriaType}>
+                    {_selectedCriteria.years[0]} et {_selectedCriteria.years[1]} ans
+                  </span>
+                  {_selectedCriteria.years[1] === 100 ? ' ou plus.' : '.'}
+                </Typography>
+              )}
           </>
         )
         break
