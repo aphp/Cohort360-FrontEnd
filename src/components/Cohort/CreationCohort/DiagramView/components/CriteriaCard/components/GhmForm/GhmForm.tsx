@@ -42,6 +42,16 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
     })
   }
 
+  const getGhmOptions = async (searchValue: string) => {
+    const ghmOptions = await criteria.fetch.fetchGhmData(searchValue)
+
+    return (
+      ghmOptions.map((ghmData: any) => ({
+        id: ghmData.display,
+        label: `${ghmData.code} - ${ghmData.display}`
+      })) || []
+    )
+  }
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
@@ -78,9 +88,10 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
             type: 'autocomplete',
             autocompleteOptions:
               criteria?.data?.ghmData?.map((ghmData: any) => ({
-                id: ghmData['GHM CODE'],
-                label: `${ghmData['GHM CODE']} - ${ghmData['LONG DESCRIPTION']}`
-              })) || []
+                id: ghmData.display,
+                label: `${ghmData.code} - ${ghmData.display}`
+              })) || [],
+            getAutocompleteOptions: getGhmOptions
           },
           {
             name: 'occurence',

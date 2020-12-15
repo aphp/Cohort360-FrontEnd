@@ -26,6 +26,7 @@ import {
   fetchCim10Diagnostic
 } from '../../../data/Requeteur/diagnosticCim10'
 import { fetchCcamData } from '../../../data/Requeteur/procedureCCAM'
+import { fetchGhmData } from '../../../data/Requeteur/ghm'
 
 // ├── Mes variables
 // ├── Patients
@@ -100,7 +101,8 @@ const criteriaList: CriteriaItemType[] = [
         title: 'GHM',
         color: '#0063AF',
         components: GhmForm,
-        data: { ghmData }
+        data: { ghmData },
+        fetch: { fetchGhmData }
       }
     ]
   },
