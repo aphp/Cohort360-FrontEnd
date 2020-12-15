@@ -30,6 +30,15 @@ export type Back_API_Response<T> = {
   count?: number
 }
 
+export type Cohort_Creation_API_Response = {
+  status: number
+  data: {
+    jobId: string
+    result: { _type: 'count'; 'group.id': number; 'group.count': number; source: 'from-cache' | 'from-cache' }[]
+  }
+  count?: number
+}
+
 export type CohortComposition = IComposition & {
   deidentified?: boolean
   idPatient?: string
@@ -213,6 +222,7 @@ export type SelectedCriteriaType = {
   type: 'Patient' | 'Encounter' | 'Claim' | 'Procedure' | 'Condition' | 'Composition'
   title: string
   code?: { id: string; label: string }
+  diagnosticType?: { id: string; label: string }
   label?: undefined
   startOccurrence?: Date
   endOccurrence?: Date
@@ -242,6 +252,7 @@ export type CcamDataType = {
 export type Cim10DataType = {
   title: string
   code: { id: string; label: string } | null
+  diagnosticType: { id: string; label: string } | null
 }
 
 export type DemographicDataType = {
@@ -276,4 +287,14 @@ export type EncounterDataType = {
   entryMode: { id: string; label: string } | null
   exitMode: { id: string; label: string } | null
   fileStatus: { id: string; label: string } | null
+}
+
+export type CohortCreationCounterType = {
+  uuid?: string
+  includePatient?: number | 'loading'
+  byrequest?: number | 'loading'
+  alive?: number | 'loading'
+  deceased?: number | 'loading'
+  female?: number | 'loading'
+  male?: number | 'loading'
 }

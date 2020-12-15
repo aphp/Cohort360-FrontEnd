@@ -8,6 +8,7 @@ import { FormBuilder } from '@arkhn/ui'
 import useStyles from './styles'
 
 import { Cim10DataType } from 'types'
+import { capitalizeFirstLetter } from 'utils/capitalize'
 
 type Cim10FormProps = {
   criteria: any
@@ -16,16 +17,17 @@ type Cim10FormProps = {
   onChangeSelectedCriteria: (data: any) => void
 }
 
-const defaultDemographic = {
+const defaultCondition = {
   title: 'Critère de diagnostic',
   code: [],
+  diagnosticType: '',
   startOccurrence: '',
   endOccurrence: ''
 }
 
 const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const defaultValues = selectedCriteria || defaultDemographic
+  const defaultValues = selectedCriteria || defaultCondition
 
   const classes = useStyles()
 
@@ -35,8 +37,30 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     onChangeSelectedCriteria({
       title: data.title,
       code: data.code,
+      diagnosticType: data.diagnosticType,
       type: 'Condition'
     })
+  }
+
+  const getDiagOptions = async (searchValue: string) => {
+    const diagOptions = await criteria.fetch.fetchCim10Diagnostic(searchValue)
+
+    return (
+      diagOptions.map((cimData: any) => ({
+        id: cimData.display,
+        label: `${cimData.code} - ${cimData.display}`
+      })) || []
+    )
+  }
+
+  if (
+    criteria &&
+    criteria.data &&
+    (criteria.data.diagnosticTypes === 'loading' ||
+      criteria.data.statusDiagnostic === 'loading' ||
+      criteria.data.cim10Diagnostic === 'loading')
+  ) {
+    return <> </>
   }
 
   return (
@@ -74,9 +98,21 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             variant: 'outlined',
             type: 'autocomplete',
             autocompleteOptions:
-              criteria?.data?.cimData?.map((cimData: any) => ({
-                id: cimData['DIAGNOSIS CODE'],
-                label: `${cimData['DIAGNOSIS CODE']} - ${cimData['LONG DESCRIPTION']}`
+              criteria?.data?.cim10Diagnostic?.map((cimData: any) => ({
+                id: cimData.display,
+                label: `${cimData.code} - ${cimData.display}`
+              })) || [],
+            getAutocompleteOptions: getDiagOptions
+          },
+          {
+            name: 'diagnosticType',
+            label: 'Type de diagnostic',
+            variant: 'outlined',
+            type: 'autocomplete',
+            autocompleteOptions:
+              criteria?.data?.diagnosticTypes?.map((diagType: any) => ({
+                id: diagType.code,
+                label: capitalizeFirstLetter(diagType.display)
               })) || []
           }
         ]}

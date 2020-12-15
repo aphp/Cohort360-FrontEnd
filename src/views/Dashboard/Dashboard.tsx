@@ -275,9 +275,7 @@ const Dashboard: React.FC<{
             sortDirection={'desc'}
           />
         )}
-        {CONTEXT === 'arkhn' && selectedTab === 'inclusion-exclusion' && (
-          <InclusionExclusionPatientsPanel cohort={dashboard} />
-        )}
+        {CONTEXT === 'arkhn' && selectedTab === 'inclusion-exclusion' && <InclusionExclusionPatientsPanel />}
       </div>
     </Grid>
   )

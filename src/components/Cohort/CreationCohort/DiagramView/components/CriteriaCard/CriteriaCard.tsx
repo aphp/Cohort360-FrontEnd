@@ -13,13 +13,14 @@ import { CriteriaItemType, SelectedCriteriaType } from 'types'
 import useStyles from './styles'
 
 type CriteriaCardProps = {
+  actionLoading: boolean
   criteria: CriteriaItemType[]
   selectedCriteria: SelectedCriteriaType[]
   onChangeSelectedCriteria: (item: SelectedCriteriaType[]) => void
 }
 
 const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria } = props
+  const { actionLoading, criteria, selectedCriteria, onChangeSelectedCriteria } = props
 
   const classes = useStyles()
   const [indexCriteria, onChangeIndexCriteria] = useState<number | null>(null)
@@ -100,8 +101,8 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 ? `Avant le ${endDate},`
                 : ''}
             </Typography>
-            <Typography>
-              Acte CCAM sélectionné :{_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}
+            <Typography align="center">
+              Acte CCAM sélectionné : {_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}.
             </Typography>
           </>
         )
@@ -113,9 +114,14 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             <Typography>
               Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,
             </Typography>
-            <Typography>
-              Diagnostic CIM sélectionné :{_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}
+            <Typography align="center">
+              Diagnostic CIM sélectionné : {_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}.
             </Typography>
+            {_selectedCriteria.diagnosticType && (
+              <Typography align="center">
+                Type de diagnostic recherché : {_selectedCriteria.diagnosticType.label}.
+              </Typography>
+            )}
           </>
         )
         break
@@ -126,23 +132,24 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             <Typography>
               Dans <span className={classes.criteriaType}>Démographie Patient</span>,
             </Typography>
-            <Typography>Genre sélectionné :</Typography>
-            {_selectedCriteria.gender && (
-              <Typography key={_selectedCriteria?.gender?.label}>{_selectedCriteria.gender.label}</Typography>
-            )}
-            <Typography>Status vital :</Typography>
+            {_selectedCriteria.gender && <Typography>Genre sélectionné : {_selectedCriteria.gender.label}.</Typography>}
             {_selectedCriteria.vitalStatus && (
-              <Typography key={_selectedCriteria?.vitalStatus?.label}>{_selectedCriteria.vitalStatus.label}</Typography>
+              <Typography>Statut vital : {_selectedCriteria.vitalStatus.label}.</Typography>
             )}
-            <Typography>
-              {_selectedCriteria.years && _selectedCriteria.years[0] !== _selectedCriteria.years[1]
-                ? `Fourchette d'âge comprise entre ${_selectedCriteria.years[0]} et ${_selectedCriteria.years[1]} ans ${
-                    _selectedCriteria.years[1] === 100 ? 'ou plus.' : '.'
-                  }`
-                : `Age sélectionné: ${_selectedCriteria.years?.[0]} ans ${
-                    _selectedCriteria.years?.[0] === 100 ? 'ou plus.' : '.'
-                  }`}
-            </Typography>
+            {_selectedCriteria.years && _selectedCriteria.years[0] === _selectedCriteria.years[1] && (
+              <Typography>
+                Âge sélectionné: {_selectedCriteria.years?.[0]} ans
+                {_selectedCriteria.years?.[0] === 100 ? ' ou plus.' : '.'}
+              </Typography>
+            )}
+            {_selectedCriteria.years &&
+              _selectedCriteria.years[0] !== _selectedCriteria.years[1] &&
+              (_selectedCriteria.years[0] !== 0 || _selectedCriteria.years[1] !== 100) && (
+                <Typography>
+                  Fourchette d'âge comprise entre {_selectedCriteria.years[0]} et {_selectedCriteria.years[1]} ans
+                  {_selectedCriteria.years[1] === 100 ? ' ou plus.' : '.'}
+                </Typography>
+              )}
           </>
         )
         break
@@ -160,7 +167,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
               Dans <span className={classes.criteriaType}>Document médical</span>,
             </Typography>
             <Typography>
-              Recherche textuelle "{_selectedCriteria.search}" dans {docTypes[_selectedCriteria.docType ?? '55188-7']}
+              Recherche textuelle "{_selectedCriteria.search}" {docTypes[_selectedCriteria.docType ?? '55188-7']}.
             </Typography>
           </>
         )
@@ -178,33 +185,47 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             <Typography>
               Dans <span className={classes.criteriaType}>Prise en charge</span>,
             </Typography>
-            <Typography>
-              Age au moment de la prise en charge:
-              {_selectedCriteria.years && _selectedCriteria.years[0] !== _selectedCriteria.years[1]
-                ? `entre ${_selectedCriteria.years[0]} et ${_selectedCriteria.years[1]} ${ageUnit} ${
-                    _selectedCriteria.years[1] === 100 ? 'ou plus.' : '.'
-                  }`
-                : `${_selectedCriteria.years?.[0]} ${ageUnit} ${
-                    _selectedCriteria.years?.[0] === 100 ? 'ou plus.' : '.'
-                  }`}
-            </Typography>
-            <Typography>
-              Durée de la prise en charge:
-              {_selectedCriteria.duration && _selectedCriteria.duration[0] !== _selectedCriteria.duration[1]
-                ? `entre ${_selectedCriteria.duration[0]} et ${_selectedCriteria.duration[1]} jour(s) ${
-                    _selectedCriteria.duration[1] === 100 ? 'ou plus.' : '.'
-                  }`
-                : `${_selectedCriteria.duration?.[0]} jour(s) ${
-                    _selectedCriteria.duration?.[0] === 100 ? 'ou plus.' : '.'
-                  }`}
-            </Typography>
-            {_selectedCriteria.admissionMode && (
-              <Typography>Mode d'admission: {_selectedCriteria.admissionMode.label}</Typography>
+            {_selectedCriteria.years && _selectedCriteria.years[0] === _selectedCriteria.years[1] && (
+              <Typography>
+                Âge au moment de la prise en charge : {_selectedCriteria.years?.[0]} {ageUnit}
+                {_selectedCriteria.years?.[0] === 100 ? ' ou plus.' : '.'}
+              </Typography>
             )}
-            {_selectedCriteria.entryMode && <Typography>Mode d'entré: {_selectedCriteria.entryMode.label}</Typography>}
-            {_selectedCriteria.exitMode && <Typography>Mode de sortie: {_selectedCriteria.exitMode.label}</Typography>}
+            {_selectedCriteria.years &&
+              _selectedCriteria.years[0] !== _selectedCriteria.years[1] &&
+              (_selectedCriteria.years[0] !== 0 || _selectedCriteria.years[1] !== 100) && (
+                <Typography>
+                  Âge au moment de la prise en charge : entre {_selectedCriteria.years[0]} et{' '}
+                  {_selectedCriteria.years[1]} {ageUnit}
+                  {_selectedCriteria.years[1] === 100 ? ' ou plus.' : '.'}
+                </Typography>
+              )}
+            {_selectedCriteria.duration && _selectedCriteria.duration[0] === _selectedCriteria.duration[1] && (
+              <Typography>
+                Durée de la prise en charge : {_selectedCriteria.duration?.[0]} jour(s)
+                {_selectedCriteria.duration?.[0] === 100 ? ' ou plus.' : '.'}
+              </Typography>
+            )}
+            {_selectedCriteria.duration &&
+              _selectedCriteria.duration[0] !== _selectedCriteria.duration[1] &&
+              (_selectedCriteria.duration[0] !== 0 || _selectedCriteria.duration[1] !== 100) && (
+                <Typography>
+                  Durée de la prise en charge : {_selectedCriteria.duration[0]} et {_selectedCriteria.duration[1]}{' '}
+                  jour(s)
+                  {_selectedCriteria.duration[1] === 100 ? ' ou plus.' : '.'}
+                </Typography>
+              )}
+            {_selectedCriteria.admissionMode && (
+              <Typography>Mode d'admission : {_selectedCriteria.admissionMode.label}.</Typography>
+            )}
+            {_selectedCriteria.entryMode && (
+              <Typography align="center">Mode d'entrée : {_selectedCriteria.entryMode.label}.</Typography>
+            )}
+            {_selectedCriteria.exitMode && (
+              <Typography align="center">Mode de sortie : {_selectedCriteria.exitMode.label}.</Typography>
+            )}
             {_selectedCriteria.fileStatus && (
-              <Typography>Status Dossier: {_selectedCriteria.fileStatus.label}</Typography>
+              <Typography>Statut dossier : {_selectedCriteria.fileStatus.label}.</Typography>
             )}
           </>
         )
@@ -251,7 +272,13 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         ))}
 
       <div className={classes.root}>
-        <Button className={classes.addButton} onClick={_addSelectedCriteria} variant="contained" color="primary">
+        <Button
+          disabled={actionLoading}
+          className={classes.addButton}
+          onClick={_addSelectedCriteria}
+          variant="contained"
+          color="primary"
+        >
           <AddIcon />
         </Button>
       </div>

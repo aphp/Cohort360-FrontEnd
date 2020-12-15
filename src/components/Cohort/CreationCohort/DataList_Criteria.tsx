@@ -25,6 +25,7 @@ import {
   fetchDiagnosticTypes,
   fetchCim10Diagnostic
 } from '../../../data/Requeteur/diagnosticCim10'
+import { fetchCcamData } from '../../../data/Requeteur/procedureCCAM'
 
 // ├── Mes variables
 // ├── Patients
@@ -55,7 +56,7 @@ const criteriaList: CriteriaItemType[] = [
     title: 'Patients',
     color: '#0063AF',
     components: DemographicFrom,
-    data: { gender: 'loading', deceased: 'loading' },
+    data: { gender: 'loading', status: 'loading' },
     fetch: { fetchGender, fetchStatus }
   },
   {
@@ -83,7 +84,7 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Diagnostics',
         color: '#0063AF',
         components: Cim10Form,
-        data: { statusDiagnostic: 'loading', kindDiagnostic: 'loading', cim10Diagnostic: 'loading' },
+        data: { statusDiagnostic: 'loading', diagnosticTypes: 'loading', cim10Diagnostic: 'loading' },
         fetch: { fetchStatusDiagnostic, fetchDiagnosticTypes, fetchCim10Diagnostic }
       },
       {
@@ -91,7 +92,8 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Actes',
         color: '#0063AF',
         components: CCAMForm,
-        data: { ccamData }
+        data: { ccamData },
+        fetch: { fetchCcamData }
       },
       {
         id: 'Claim',

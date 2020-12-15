@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { useHistory, useLocation, useParams } from 'react-router-dom'
 
-import { Grid, IconButton, InputBase, MenuItem, Select } from '@material-ui/core'
+import { Grid, IconButton, InputAdornment, InputBase, MenuItem, Select } from '@material-ui/core'
 
+import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from '../../assets/icones/search.svg'
 
 import { SearchByTypes } from 'types'
@@ -61,6 +62,10 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
     }
   }
 
+  const handleClearInput = () => {
+    setSearchInput('')
+  }
+
   const onKeyDown = async (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     if (event.keyCode === 13) {
       event.preventDefault()
@@ -99,6 +104,11 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
           value={_searchInput}
           onChange={handleChangeInput}
           onKeyDown={onKeyDown}
+          endAdornment={
+            <InputAdornment position="end">
+              <IconButton onClick={handleClearInput}>{_searchInput && <ClearIcon />}</IconButton>
+            </InputAdornment>
+          }
         />
         <IconButton type="submit" aria-label="search" onClick={onSearchPatient}>
           <SearchIcon fill="#ED6D91" height="15px" />
