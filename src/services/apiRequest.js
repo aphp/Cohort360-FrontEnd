@@ -1,10 +1,11 @@
 import axios from 'axios'
-import { ACCES_TOKEN, REQUEST_API_URL } from '../../constants'
+import { ACCES_TOKEN, REQUEST_API_URL } from '../constants'
 
 const apiRequest = axios.create({
   baseURL: REQUEST_API_URL,
   headers: {
-    Accept: 'application/json'
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
   }
 })
 

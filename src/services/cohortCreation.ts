@@ -1,146 +1,106 @@
-import api from './api'
+import moment from 'moment'
+
+import api from './apiRequest'
+import apiBack from './apiBackCohort'
 import { CONTEXT } from '../constants'
-import {
-  IGroup,
-  IPatient,
-  IPractitioner,
-  IGroup_Characteristic,
-  IOperationOutcome,
-  IGroup_Member
-} from '@ahryman40k/ts-fhir-types/lib/R4'
-import {
-  InclusionCriteria,
-  InclusionCriteriaTypes,
-  PatientDemographyInclusionCriteria,
-  MedicalDocumentInclusionCriteria,
-  CIMDiagnosticInclusionCriteria,
-  FHIR_API_Response
-} from 'types'
-import { getApiResponseResources } from 'utils/apiHelpers'
-import {
-  demographicCriterionToQuery,
-  diagnosticsCriterionToQuery,
-  filterWithDocumentSearch,
-  criterionToCharacteristics
-} from 'utils/fhirGroup'
 
-export const buildFhirCohort = async (
-  practitioner: IPractitioner,
-  inclusionCriteria: InclusionCriteria[],
-  populationSources: IGroup[],
-  cohortName?: string
+import { Cohort_Creation_API_Response } from 'types'
+
+export const countCohort = async (
+  requeteurJson: string | undefined,
+  snapshotId: string | undefined,
+  requestId: string | undefined
 ) => {
+  if (!requeteurJson || !snapshotId || !requestId) return null
+
   if (CONTEXT === 'arkhn') {
-    const demographicCriteria = inclusionCriteria.filter(
-      (criterion): criterion is PatientDemographyInclusionCriteria =>
-        criterion.type === InclusionCriteriaTypes.patientDemography
-    )
-    const documentCriteria = inclusionCriteria.filter(
-      (criterion): criterion is MedicalDocumentInclusionCriteria =>
-        criterion.type === InclusionCriteriaTypes.medicalDocument
-    )
-    const diagnosticsCriteria = inclusionCriteria.filter(
-      (criterion): criterion is CIMDiagnosticInclusionCriteria =>
-        criterion.type === InclusionCriteriaTypes.CIMDiagnostic
-    )
+    // const request: Cohort_Count_API_Response = await api.post('QueryServer/api/count', requeteurJson)
+    // const { data } = request
+    return null
+  } else {
+    const countResult = (await api.post('QueryServer/api/count', requeteurJson)) || {}
+    const { data } = countResult
+    const measure = data && data.result && data.result[0] ? data.result && data.result[0].count : null
 
-    // Find patients in source populations
-    // TODO make only 1 query for source and some of the criteria when API has more features
-    const sourcePopulation = await Promise.all(
-      populationSources.map((service) =>
-        api.get<FHIR_API_Response<IPatient>>(
-          `/Patient?_has:Encounter:subject:serviceProvider.reference=HealthcareService/${service.id}&_count=10000`
-        )
-      )
-    )
+    const measureResult = await apiBack.post('/explorations/dated-measures/', {
+      request_query_snapshot_id: snapshotId,
+      request_id: requestId,
+      fhir_datetime: moment().format('YYYY-MM-DD[T]HH:mm:ss'),
+      measure
+    })
 
-    let memberIds = sourcePopulation
-      .reduce((acc: IPatient[], populationResponse) => {
-        const population = getApiResponseResources(populationResponse)
-        return population ? [...acc, ...population] : acc
-      }, [])
-      .map((entry) => entry.id ?? '')
-      .filter((id) => '' !== id)
-
-    // Use demographic and diagnostic criteria
-    const queryDemographic = demographicCriteria.map(demographicCriterionToQuery)
-    const queryDiagnostics = diagnosticsCriteria.map(diagnosticsCriterionToQuery)
-    const queryResponse = await api.get<FHIR_API_Response<IPatient>>(
-      `/Patient?${[...queryDemographic, ...queryDiagnostics].join('&')}&_count=10000`
-    )
-
-    const queryPatients = getApiResponseResources(queryResponse)
-    memberIds = queryPatients
-      ? queryPatients
-          .filter((member) => (member.id ? memberIds.includes(member.id) : false))
-          .map((patient) => patient.id ?? '')
-          .filter((id) => '' !== id)
-      : []
-
-    // Use document search criteria to filter out some patients
-    for (const criterion of documentCriteria) {
-      memberIds = await filterWithDocumentSearch(criterion, memberIds)
-    }
-
-    // FIXME we won't want random dates after the demo
-    const randomDate = () => {
-      const start = new Date(2012, 0, 1)
-      const end = new Date()
-      return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))
-    }
-
-    const members = memberIds.map((memberId) => ({
-      entity: { reference: `Patient/${memberId}` },
-      period: { start: randomDate().toISOString().split('T')[0] }
-    }))
-
-    const cohort: IGroup = {
-      resourceType: 'Group',
-      meta: {
-        lastUpdated: new Date().toISOString()
-      },
-      name: cohortName
-        ? cohortName
-        : `Cohorte de ${practitioner.name?.[0].given?.[0]} ${
-            practitioner.name?.[0].family
-          } du ${new Date().toLocaleDateString('fr-FR')}`,
-      managingEntity: {
-        reference: `Practitioner/${practitioner.id}`
-      },
-      characteristic: inclusionCriteria.reduce(
-        (acc: IGroup_Characteristic[], criterion) => [...acc, ...criterionToCharacteristics(criterion)],
-        []
-      ),
-      ...(members && { member: members })
-    }
-    // Post group to api
-    const groupResp = await api.post<IOperationOutcome | IGroup>('/Group', cohort)
-    return groupResp.data
+    return { count: measure, uuid: measureResult && measureResult.data ? measureResult.data.uuid : null }
   }
 }
 
-export const patchCohortMembers = async (params: {
-  includedPatients: IGroup_Member[]
-  excludedPatients: IGroup_Member[]
-  cohort: IGroup
-}): Promise<IGroup_Member[]> => {
-  const { includedPatients, excludedPatients, cohort } = params
-  let newMembers = [...cohort.member]
+export const createCohort = async (
+  requeteurJson: string | undefined,
+  datedMeasureId: string | undefined,
+  snapshotId: string | undefined,
+  requestId: string | undefined
+) => {
+  if (!requeteurJson || !datedMeasureId || !snapshotId || !requestId) return null
 
-  const excludedReferences = excludedPatients.map((p) => `Patient/${p.id}`)
-  newMembers = newMembers.filter((member) =>
-    member.entity.reference ? !excludedReferences.includes(member.entity.reference) : false
-  )
+  if (CONTEXT === 'arkhn') {
+    // const request: Cohort_Creation_API_Response = await api.post('QueryServer/api/count', requeteurJson)
+    // const { data } = request
+    return null
+  } else {
+    const fihrResult: Cohort_Creation_API_Response = (await api.post('QueryServer/api/create', requeteurJson)) || {}
+    const { data } = fihrResult
+    const fhir_group_id = data && data.result && data.result[0] ? data.result[0]['group.id'] : ''
 
-  // For Group resource
-  newMembers = [
-    ...newMembers,
-    ...includedPatients.map((p) => ({
-      entity: { reference: `Patient/${p.id}` },
-      period: { start: new Date().toISOString().split('T')[0] }
-    }))
-  ]
+    const cohortResult = await apiBack.post('/explorations/cohorts/', {
+      dated_measure_id: datedMeasureId,
+      request_query_snapshot_id: snapshotId,
+      request_id: requestId,
+      fhir_group_id,
+      name: 'Création de cohorte par vmariot',
+      description: 'Ceci est la première cohorte créer via Cohort360'
+    })
 
-  await api.patch(`/Group/${cohort.id}`, { member: newMembers })
-  return newMembers
+    return cohortResult && cohortResult.data && cohortResult.data.result ? cohortResult.data.result[0] : null
+  }
+}
+
+type CreatedRequestType = {
+  created_at: string
+  data_type_of_query: string
+  description: string
+  favorite: boolean
+  modified_at: string
+  name: string
+  owner_id: string
+  uuid: string
+}
+
+export const createRequest = async () => {
+  if (CONTEXT === 'arkhn') {
+    return null
+  } else {
+    const request =
+      (await apiBack.post('/explorations/requests/', {
+        // owner_id: 'string',
+        name: 'Création de cohorte',
+        description: 'Cohorte créer depuis le front Cohort360',
+        favorite: false,
+        data_type_of_query: 'PATIENT'
+      })) || {}
+    return request && request.data ? request.data : null
+  }
+}
+
+export const createSnapshot = async (id: string, json: string, firstTime?: boolean) => {
+  if (!id || !json) return null
+
+  if (CONTEXT === 'arkhn') {
+    return null
+  } else {
+    const data = {
+      [firstTime ? 'request_id' : 'previous_snapshot_id']: id,
+      serialized_query: json
+    }
+    const request = (await apiBack.post('/explorations/request-query-snapshots/', data)) || {}
+    return request && request.data ? request.data : null
+  }
 }

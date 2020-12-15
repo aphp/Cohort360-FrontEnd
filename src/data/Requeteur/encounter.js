@@ -1,4 +1,4 @@
-import apiRequest from './apiRequest'
+import apiRequest from '../../services/apiRequest'
 
 export const fetchAdmissionModes = async () => {
   try {

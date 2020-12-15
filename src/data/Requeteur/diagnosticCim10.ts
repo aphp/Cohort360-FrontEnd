@@ -1,4 +1,4 @@
-import apiRequest from './apiRequest'
+import apiRequest from '../../services/apiRequest'
 import diagnosticTypes from '../diagnosticTypes'
 
 export const fetchStatusDiagnostic = async () => {

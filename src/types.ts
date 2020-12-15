@@ -30,6 +30,15 @@ export type Back_API_Response<T> = {
   count?: number
 }
 
+export type Cohort_Creation_API_Response = {
+  status: number
+  data: {
+    jobId: string
+    result: { _type: 'count'; 'group.id': number; 'group.count': number; source: 'from-cache' | 'from-cache' }[]
+  }
+  count?: number
+}
+
 export type CohortComposition = IComposition & {
   deidentified?: boolean
   idPatient?: string
@@ -277,4 +286,14 @@ export type EncounterDataType = {
   entryMode: { id: string; label: string } | null
   exitMode: { id: string; label: string } | null
   fileStatus: { id: string; label: string } | null
+}
+
+export type CohortCreationCounterType = {
+  uuid?: string
+  includePatient?: number | 'loading'
+  byrequest?: number | 'loading'
+  alive?: number | 'loading'
+  deceased?: number | 'loading'
+  female?: number | 'loading'
+  male?: number | 'loading'
 }
