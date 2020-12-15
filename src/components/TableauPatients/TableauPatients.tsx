@@ -106,13 +106,7 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                   align="center"
                   className={classes.tableHeadCell}
                 >
-                  <TableSortLabel
-                    active={sortBy === 'gender'}
-                    direction={sortBy === 'gender' ? sortDirection : 'asc'}
-                    onClick={createSortHandler('gender')}
-                  >
-                    Sexe
-                  </TableSortLabel>
+                  Sexe
                 </TableCell>
                 <TableCell sortDirection={sortBy === 'given' ? sortDirection : false} className={classes.tableHeadCell}>
                   {deidentified ? (

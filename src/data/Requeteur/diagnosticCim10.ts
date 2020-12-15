@@ -29,7 +29,9 @@ export const fetchDiagnosticTypes = async () => {
 // todo: check if the data syntax is correct when available
 export const fetchCim10Diagnostic = async (searchValue?: string) => {
   if (searchValue) {
-    const res = await apiRequest.get(`/ValueSet?_text=${searchValue}&url=https://terminology.eds.aphp.fr/aphp-cim10`)
+    const res = await apiRequest.get(
+      `/ValueSet?_text=${searchValue}&url=https://terminology.eds.aphp.fr/aphp-orbis-cim`
+    )
 
     const cim10List =
       res && res.data && res.data.entry && res.data.resourceType === 'Bundle'
