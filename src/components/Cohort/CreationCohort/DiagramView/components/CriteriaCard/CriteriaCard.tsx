@@ -114,12 +114,16 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
               Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,
             </Typography>
             <Typography align="center">
-              Diagnostic CIM sélectionné : {_selectedCriteria.code ? `"${_selectedCriteria.code.label}".` : '""'}
+              Diagnostic CIM sélectionné :{' '}
+              <span className={classes.criteriaType}>
+                {_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}
+              </span>
+              .
             </Typography>
             {_selectedCriteria.diagnosticType && (
               <Typography align="center">
                 Type de diagnostic recherché :{' '}
-                {_selectedCriteria.diagnosticType ? `"${_selectedCriteria.diagnosticType.label}".` : '""'}
+                <span className={classes.criteriaType}>{_selectedCriteria.diagnosticType.label}</span>.
               </Typography>
             )}
           </>
@@ -176,7 +180,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
               Dans <span className={classes.criteriaType}>Document médical</span>,
             </Typography>
             <Typography>
-              Recherche textuelle "{_selectedCriteria.search}" dans {docTypes[_selectedCriteria.docType ?? '55188-7']}
+              Recherche textuelle "{_selectedCriteria.search}" {docTypes[_selectedCriteria.docType ?? '55188-7']}.
             </Typography>
           </>
         )
