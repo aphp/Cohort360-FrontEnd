@@ -72,7 +72,6 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 260
       )
       .call((text) =>
         text
-          .filter((d) => d.endAngle - d.startAngle > 0.25)
           .append('tspan')
           .attr('x', 0)
           .attr('y', '0.7em')
