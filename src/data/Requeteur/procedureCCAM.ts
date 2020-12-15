@@ -1,4 +1,4 @@
-import apiRequest from './apiRequest'
+import apiRequest from '../../services/apiRequest'
 import { alphabeticalSort } from '../../utils/alphabeticalSort'
 
 export const fetchCcamData = async (searchValue?: string) => {
