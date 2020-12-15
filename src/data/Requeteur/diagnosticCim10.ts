@@ -1,5 +1,6 @@
 import apiRequest from './apiRequest'
 import diagnosticTypes from '../diagnosticTypes'
+import { alphabeticalSort } from 'utils/alphabeticalSort'
 
 export const fetchStatusDiagnostic = async () => {
   const res = [
@@ -38,7 +39,7 @@ export const fetchCim10Diagnostic = async (searchValue?: string) => {
         ? res.data.entry[0].resource.compose.include[0].concept
         : []
 
-    return cim10List
+    return cim10List.sort(alphabeticalSort)
   }
 
   return []
