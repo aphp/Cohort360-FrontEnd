@@ -100,8 +100,8 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 ? `Avant le ${endDate},`
                 : ''}
             </Typography>
-            <Typography>
-              Acte CCAM sélectionné :{_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}
+            <Typography align="center">
+              Acte CCAM sélectionné : {_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}.
             </Typography>
           </>
         )

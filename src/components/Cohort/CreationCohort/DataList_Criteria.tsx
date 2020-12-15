@@ -25,6 +25,7 @@ import {
   fetchDiagnosticTypes,
   fetchCim10Diagnostic
 } from '../../../data/Requeteur/diagnosticCim10'
+import { fetchCcamData } from '../../../data/Requeteur/procedureCCAM'
 
 // ├── Mes variables
 // ├── Patients
@@ -91,7 +92,8 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Actes',
         color: '#0063AF',
         components: CCAMForm,
-        data: { ccamData }
+        data: { ccamData },
+        fetch: { fetchCcamData }
       },
       {
         id: 'Claim',

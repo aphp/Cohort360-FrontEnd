@@ -99,8 +99,8 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             type: 'autocomplete',
             autocompleteOptions:
               criteria?.data?.cim10Diagnostic?.map((cimData: any) => ({
-                id: cimData['DIAGNOSIS CODE'],
-                label: `${cimData['DIAGNOSIS CODE']} - ${cimData['LONG DESCRIPTION']}`
+                id: cimData.display,
+                label: `${cimData.code} - ${cimData.display}`
               })) || [],
             getAutocompleteOptions: getDiagOptions
           },

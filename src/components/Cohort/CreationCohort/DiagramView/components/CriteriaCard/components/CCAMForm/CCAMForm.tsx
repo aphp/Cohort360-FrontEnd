@@ -41,6 +41,17 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
     })
   }
 
+  const getCCAMOptions = async (searchValue: string) => {
+    const ccamOptions = await criteria.fetch.fetchCcamData(searchValue)
+
+    return (
+      ccamOptions.map((ccamData: any) => ({
+        id: ccamData.display,
+        label: `${ccamData.code} - ${ccamData.display}`
+      })) || []
+    )
+  }
+
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
@@ -76,9 +87,10 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             variant: 'outlined',
             type: 'autocomplete',
             autocompleteOptions: criteria?.data?.ccamData?.map((ccamData: any) => ({
-              id: ccamData['CCAM CODE'],
-              label: `${ccamData['CCAM CODE']} - ${ccamData['LONG DESCRIPTION']}`
-            }))
+              id: ccamData.display,
+              label: `${ccamData.code} - ${ccamData.display}`
+            })),
+            getAutocompleteOptions: getCCAMOptions
           },
           {
             type: 'custom',
