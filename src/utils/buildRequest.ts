@@ -314,6 +314,7 @@ export async function unbuildRequest(json: string) {
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
+            console.log('value: ', value)
             switch (key) {
               default:
                 break
@@ -328,6 +329,7 @@ export async function unbuildRequest(json: string) {
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
+            console.log('value: ', value)
             switch (key) {
               default:
                 break
