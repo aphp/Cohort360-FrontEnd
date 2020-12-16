@@ -1,30 +1,33 @@
 import React, { useState } from 'react'
-import { Grid, Tabs, Tab } from '@material-ui/core'
+import { Tabs, Tab } from '@material-ui/core'
 
 import CCAMForm from './components/Form/CCAMForm'
 import CCAMHierarchy from './components/Hierarchy/CCAMHierarchy'
 
-const index: React.FC = () => {
-  const [selectedTab, onChangeTab] = useState<'form' | 'hierarchy'>('form')
+const Index = (props: any) => {
+  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>('form')
 
   return (
-    <Grid>
-      <Tabs value={selectedTab} onchange={(e, tab) => onChangeTab(tab)}>
-        <Tab label="form" value="form" />
-        <Tab label="hierarchy" value="hierarchy" />
-      </Tabs>
-      {selectedTab === 'form' ? (
+    <>
+      <div>
+        <Tabs value={seletedTab} onChange={(e, tab) => onChangeTab(tab)}>
+          <Tab label="Form" value="form" />
+          <Tab label="Hierarchy" value="hierarchy" />
+        </Tabs>
+      </div>
+
+      {seletedTab === 'form' ? (
         <CCAMForm
           criteria={criteria}
           selectedCriteria={selectedCriteria}
-          goBack={goBack}
           onChangeSelectedCriteria={onChangeSelectedCriteria}
+          goBack={goBack}
         />
       ) : (
         <CCAMHierarchy />
       )}
-    </Grid>
+    </>
   )
 }
-
-export default index
+export default Index
