@@ -44,12 +44,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
   const getCCAMOptions = async (searchValue: string) => {
     const ccamOptions = await criteria.fetch.fetchCcamData(searchValue)
 
-    return (
-      ccamOptions.map((ccamData: any) => ({
-        id: ccamData.code,
-        label: `${ccamData.code} - ${ccamData.display}`
-      })) || []
-    )
+    return ccamOptions && ccamOptions.length > 0 ? ccamOptions : []
   }
 
   return (
@@ -86,10 +81,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             label: "Codes d'actes CCAM",
             variant: 'outlined',
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.ccamData?.map((ccamData: any) => ({
-              id: ccamData.display,
-              label: `${ccamData.code} - ${ccamData.display}`
-            })),
+            autocompleteOptions: criteria?.data?.ccamData || [],
             getAutocompleteOptions: getCCAMOptions
           },
           {

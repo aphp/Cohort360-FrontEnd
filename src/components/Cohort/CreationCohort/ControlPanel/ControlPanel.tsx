@@ -29,7 +29,7 @@ const ControlPanel: React.FC<
           <Button disabled={executeLoading} onClick={onExecute} className={classes.requestExecution}>
             {executeLoading ? (
               <>
-                Veuillez passtienter
+                Veuillez patienter
                 <CircularProgress size={20} />
               </>
             ) : (

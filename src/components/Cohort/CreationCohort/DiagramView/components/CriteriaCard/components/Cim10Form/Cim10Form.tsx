@@ -8,7 +8,6 @@ import { FormBuilder } from '@arkhn/ui'
 import useStyles from './styles'
 
 import { Cim10DataType } from 'types'
-import { capitalizeFirstLetter } from 'utils/capitalize'
 
 type Cim10FormProps = {
   criteria: any
@@ -42,16 +41,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     })
   }
 
-  const getDiagOptions = async (searchValue: string) => {
-    const diagOptions = await criteria.fetch.fetchCim10Diagnostic(searchValue)
-
-    return (
-      diagOptions.map((cimData: any) => ({
-        id: cimData.display,
-        label: `${cimData.code} - ${cimData.display}`
-      })) || []
-    )
-  }
+  const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue)
 
   if (
     criteria &&
@@ -97,11 +87,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             label: 'CIM 10 Diag Code',
             variant: 'outlined',
             type: 'autocomplete',
-            autocompleteOptions:
-              criteria?.data?.cim10Diagnostic?.map((cimData: any) => ({
-                id: cimData.display,
-                label: `${cimData.code} - ${cimData.display}`
-              })) || [],
+            autocompleteOptions: criteria?.data?.cim10Diagnostic || [],
             getAutocompleteOptions: getDiagOptions
           },
           {
@@ -109,11 +95,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             label: 'Type de diagnostic',
             variant: 'outlined',
             type: 'autocomplete',
-            autocompleteOptions:
-              criteria?.data?.diagnosticTypes?.map((diagType: any) => ({
-                id: diagType.code,
-                label: capitalizeFirstLetter(diagType.display)
-              })) || []
+            autocompleteOptions: criteria?.data?.diagnosticTypes || []
           }
         ]}
         submit={_onSubmit}

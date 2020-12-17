@@ -107,7 +107,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
 
       case 'Procedure': {
         const selectedccamData = data?.ccamData
-          ? data.ccamData.find((ccamElement: any) => ccamElement && ccamElement.code === _selectedCriteria?.code?.id)
+          ? data.ccamData.find((ccamElement: any) => ccamElement && ccamElement.id === _selectedCriteria?.code?.id)
           : null
 
         content = (
@@ -124,9 +124,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 ? `Avant le ${endDate},`
                 : ''}
             </Typography>
-            <Typography>
-              {selectedccamData ? `Acte CCAM sélectionné : "${selectedccamData.display}"` : '""'}.
-            </Typography>
+            <Typography>{selectedccamData ? `Acte CCAM sélectionné : "${selectedccamData.label}"` : '""'}.</Typography>
           </>
         )
         break
@@ -135,12 +133,12 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
       case 'Condition': {
         const selectedCode = data?.cim10Diagnostic
           ? data.cim10Diagnostic.find(
-              (cim10Diagnostic: any) => cim10Diagnostic && cim10Diagnostic.code === _selectedCriteria?.code?.id
+              (cim10Diagnostic: any) => cim10Diagnostic && cim10Diagnostic.id === _selectedCriteria?.code?.id
             )
           : null
         const selectedDiagnostic = data?.diagnosticTypes
           ? data.diagnosticTypes.find(
-              (diagnosticType: any) => diagnosticType && diagnosticType.code === _selectedCriteria?.diagnosticType?.id
+              (diagnosticType: any) => diagnosticType && diagnosticType.id === _selectedCriteria?.diagnosticType?.id
             )
           : null
 
@@ -160,10 +158,10 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
 
       case 'Patient': {
         const selectedGender = data?.gender
-          ? data.gender.find((gender: any) => gender && gender.code === _selectedCriteria?.gender?.id)
+          ? data.gender.find((gender: any) => gender && gender.id === _selectedCriteria?.gender?.id)
           : null
         const selectedVitalStatus = data?.status
-          ? data.status.find((status: any) => status && status.value === _selectedCriteria?.vitalStatus?.id)
+          ? data.status.find((status: any) => status && status.id === _selectedCriteria?.vitalStatus?.id)
           : null
 
         content = (
@@ -171,8 +169,8 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             <Typography>
               Dans <span className={classes.criteriaType}>Démographie Patient</span>,
             </Typography>
-            {selectedGender && <Typography>Genre sélectionné : {selectedGender.display}.</Typography>}
-            {selectedVitalStatus && <Typography>Statut vital : {selectedVitalStatus.display}.</Typography>}
+            {selectedGender && <Typography>Genre sélectionné : {selectedGender.label}.</Typography>}
+            {selectedVitalStatus && <Typography>Statut vital : {selectedVitalStatus.label}.</Typography>}
 
             {!!_selectedCriteria.years && _selectedCriteria.years[0] === _selectedCriteria.years[1] && (
               <Typography>
@@ -220,22 +218,17 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         if (ageType === 'month') ageUnit = 'mois'
         else if (ageType === 'day') ageUnit = 'jour(s)'
 
-        console.log('data', data)
-        console.log('_selectedCriteria', _selectedCriteria)
-
         const selectedAdmissionMode = data.admissionModes
-          ? data.admissionModes.find(
-              (admissionMode: any) => admissionMode.code === _selectedCriteria?.admissionMode?.id
-            )
+          ? data.admissionModes.find((admissionMode: any) => admissionMode.id === _selectedCriteria?.admissionMode?.id)
           : null
         const selectedEntryMode = data.entryModes
-          ? data.entryModes.find((entryMode: any) => entryMode.code === _selectedCriteria?.entryMode?.id)
+          ? data.entryModes.find((entryMode: any) => entryMode.id === _selectedCriteria?.entryMode?.id)
           : null
         const selectedExitMode = data.exitModes
-          ? data.exitModes.find((exitMode: any) => exitMode.code === _selectedCriteria?.exitMode?.id)
+          ? data.exitModes.find((exitMode: any) => exitMode.id === _selectedCriteria?.exitMode?.id)
           : null
         const selectedFileStatus = data.fileStatus
-          ? data.fileStatus.find((fileStatus: any) => fileStatus.code === _selectedCriteria?.fileStatus?.id)
+          ? data.fileStatus.find((fileStatus: any) => fileStatus.id === _selectedCriteria?.fileStatus?.id)
           : null
 
         content = (
@@ -273,10 +266,10 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                   {_selectedCriteria.duration[1] === 100 ? ' ou plus.' : '.'}
                 </Typography>
               )}
-            {selectedAdmissionMode && <Typography>Mode d'admission : {selectedAdmissionMode.display}.</Typography>}
-            {selectedEntryMode && <Typography>Mode d'entrée : {selectedEntryMode.display}.</Typography>}
-            {selectedExitMode && <Typography>Mode de sortie : {selectedExitMode.display}.</Typography>}
-            {selectedFileStatus && <Typography>Statut dossier : {selectedFileStatus.display}.</Typography>}
+            {selectedAdmissionMode && <Typography>Mode d'admission : {selectedAdmissionMode.label}.</Typography>}
+            {selectedEntryMode && <Typography>Mode d'entrée : {selectedEntryMode.label}.</Typography>}
+            {selectedExitMode && <Typography>Mode de sortie : {selectedExitMode.label}.</Typography>}
+            {selectedFileStatus && <Typography>Statut dossier : {selectedFileStatus.label}.</Typography>}
           </>
         )
         break
@@ -292,33 +285,46 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
       {selectedCriteria &&
         selectedCriteria.length > 0 &&
         selectedCriteria.map((_selectedCriteria, index) => (
-          <div className={classes.root} key={`C${index}`}>
-            <Card className={classes.card}>
-              <CardHeader
-                className={classes.cardHeader}
-                action={
-                  <>
-                    <IconButton
-                      size="small"
-                      onClick={() => _deleteSelectedCriteria(index)}
-                      style={{ color: 'currentcolor' }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => _editSelectedCriteria(index)}
-                      style={{ color: 'currentcolor' }}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </>
-                }
-                title={`C${index + 1} - ${_selectedCriteria.title}`}
-              />
-              <CardContent className={classes.cardContent}>{_displayCardContent(_selectedCriteria)}</CardContent>
-            </Card>
-          </div>
+          <>
+            {/* <div className={classes.root}>
+              <Button
+                disabled={actionLoading}
+                className={classes.addButton}
+                onClick={_addSelectedCriteria}
+                variant="contained"
+                color="primary"
+              >
+                <AddIcon />
+              </Button>
+            </div> */}
+            <div className={classes.root} key={`C${index}`}>
+              <Card className={classes.card}>
+                <CardHeader
+                  className={classes.cardHeader}
+                  action={
+                    <>
+                      <IconButton
+                        size="small"
+                        onClick={() => _deleteSelectedCriteria(index)}
+                        style={{ color: 'currentcolor' }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => _editSelectedCriteria(index)}
+                        style={{ color: 'currentcolor' }}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </>
+                  }
+                  title={`C${index + 1} - ${_selectedCriteria.title}`}
+                />
+                <CardContent className={classes.cardContent}>{_displayCardContent(_selectedCriteria)}</CardContent>
+              </Card>
+            </div>
+          </>
         ))}
 
       <div className={classes.root}>

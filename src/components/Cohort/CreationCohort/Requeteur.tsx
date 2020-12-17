@@ -266,7 +266,7 @@ const Requeteur = () => {
         <DiagramView
           selectedPopulation={selectedPopulation}
           onChangeSelectedPopulation={(_selectedPopulation: ScopeTreeRow[] | null) =>
-            _buildRequest(_selectedPopulation, selectedCriteria || [])
+            _buildRequest(_selectedPopulation, _selectedPopulation ? selectedCriteria || [] : [])
           }
           criteria={criteria}
           selectedCriteria={selectedCriteria}

@@ -13,19 +13,23 @@ import ccamData from '../../../data/ccam_data'
 import ghmData from '../../../data/ghm_data'
 
 // Fetcher
+// done
 import {
   fetchAdmissionModes,
   fetchEntryModes,
   fetchExitModes,
   fetchFileStatus
-} from '../../../data/Requeteur/encounter'
-import { fetchGender, fetchStatus } from '../../../data/Requeteur/patient'
+} from '../../../services/cohortCreation/fetchEncounter'
+// done
+import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetchDemographic'
+// done
 import {
   fetchStatusDiagnostic,
   fetchDiagnosticTypes,
   fetchCim10Diagnostic
-} from '../../../data/Requeteur/diagnosticCim10'
-import { fetchCcamData } from '../../../data/Requeteur/procedureCCAM'
+} from '../../../services/cohortCreation/fetchCondition'
+import { fetchCcamData } from '../../../services/cohortCreation/fetchProcedure'
+import { fetchGhmData } from '../../../services/cohortCreation/fetchClaim'
 
 // ├── Mes variables
 // ├── Patients
@@ -92,7 +96,7 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Actes',
         color: '#0063AF',
         components: CCAMForm,
-        data: { ccamData },
+        data: { ccamData: 'loading' },
         fetch: { fetchCcamData }
       },
       {
@@ -100,7 +104,8 @@ const criteriaList: CriteriaItemType[] = [
         title: 'GHM',
         color: '#0063AF',
         components: GhmForm,
-        data: { ghmData }
+        data: { ghmData: 'loading' },
+        fetch: { fetchGhmData }
       }
     ]
   },

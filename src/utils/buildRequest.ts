@@ -10,6 +10,7 @@ const PATIENT_DECEASED = 'deceased'
 
 const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
 const ENCOUNTER_LENGTH = 'length'
+const ENCOUNTER_BIRTHDATE = 'birthdate'
 const ENCOUNTER_ADMISSIONMODE = 'admissionMode'
 const ENCOUNTER_ENTRYMODE = 'entryMode'
 const ENCOUNTER_EXITMODE = 'exitMode'
@@ -47,10 +48,10 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
   if (!selectedPopulation) return ''
 
   const filterReducer = (accumulator: any, currentValue: any) =>
-    accumulator ? `${accumulator}&${currentValue}` : currentValue
+    accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
   // Preparation du multi requete, par ex: gender = m + f + other
   const searchReducer = (accumulator: any, currentValue: any) =>
-    accumulator ? `${accumulator},${currentValue}` : currentValue
+    accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 
   let newJson: RequeteurSearchType[] = [
     {
@@ -73,6 +74,7 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
           const date2 = moment().subtract(selectedCriterion.years[0], 'years').format('YYYY-MM-DD')
           ageFilter = `${PATIENT_BIRTHDATE}=ge${date1},le${date2}`
         }
+
         fhirFilter = [
           `${selectedCriterion.gender ? `${PATIENT_GENDER}=${selectedCriterion.gender.id}` : ''}`,
           `${selectedCriterion.vitalStatus ? `${PATIENT_DECEASED}=${selectedCriterion.vitalStatus.id}` : ''}`,
@@ -87,6 +89,17 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
           lengthFilter = `${ENCOUNTER_LENGTH}=ge${selectedCriterion.duration[0]},le${selectedCriterion.duration[1]}`
         }
 
+        let ageFilter = ''
+        if (selectedCriterion.years && selectedCriterion.years !== [0, 100]) {
+          const date1 = moment()
+            .subtract(selectedCriterion.years[1], selectedCriterion?.ageType?.id)
+            .format('YYYY-MM-DD')
+          const date2 = moment()
+            .subtract(selectedCriterion.years[0], selectedCriterion?.ageType?.id)
+            .format('YYYY-MM-DD')
+          ageFilter = `${ENCOUNTER_BIRTHDATE}=ge${date1},le${date2}`
+        }
+
         fhirFilter = [
           `${
             selectedCriterion.admissionMode ? `${ENCOUNTER_ADMISSIONMODE}=${selectedCriterion.admissionMode.id}` : ''
@@ -94,7 +107,8 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
           `${selectedCriterion.entryMode ? `${ENCOUNTER_ENTRYMODE}=${selectedCriterion.entryMode.id}` : ''}`,
           `${selectedCriterion.exitMode ? `${ENCOUNTER_EXITMODE}=${selectedCriterion.exitMode.id}` : ''}`,
           `${selectedCriterion.fileStatus ? `${ENCOUNTER_FILESTATUS}=${selectedCriterion.fileStatus.id}` : ''}`,
-          `${lengthFilter ? `${lengthFilter}` : ''}`
+          `${lengthFilter ? `${lengthFilter}` : ''}`,
+          `${ageFilter ? `${ageFilter}` : ''}`
         ].reduce(filterReducer)
         break
       }
@@ -210,8 +224,8 @@ export async function unbuildRequest(json: string) {
               switch (key) {
                 case PATIENT_BIRTHDATE: {
                   const dateValues = value?.split(',')
-                  const date2 = dateValues ? moment(dateValues[0].replace('le', ''), 'YYYY-MM-DD') : null
-                  const date1 = dateValues ? moment(dateValues[1].replace('ge', ''), 'YYYY-MM-DD') : null
+                  const date2 = dateValues ? moment(dateValues[0].replace(/[le|ge]/, ''), 'YYYY-MM-DD') : null
+                  const date1 = dateValues ? moment(dateValues[1].replace(/[ge|le]/, ''), 'YYYY-MM-DD') : null
                   currentCriterion.years = [
                     date1 ? moment().diff(date1, 'years') : 0,
                     date2 ? moment().diff(date2, 'years') : 100
@@ -222,7 +236,7 @@ export async function unbuildRequest(json: string) {
                   currentCriterion.gender = { id: value }
                   break
                 case PATIENT_DECEASED:
-                  currentCriterion.vitalStatus = { id: value }
+                  currentCriterion.vitalStatus = { id: !!value }
                   break
                 default:
                   break
@@ -250,8 +264,8 @@ export async function unbuildRequest(json: string) {
               case ENCOUNTER_LENGTH: {
                 const lengthValues = value?.split(',')
                 currentCriterion.duration = [
-                  lengthValues ? lengthValues[0].replace('le', '') : 0,
-                  lengthValues ? lengthValues[1].replace('ge', '') : 0
+                  lengthValues ? lengthValues[0].replace(/[le|ge]/, '') : 0,
+                  lengthValues ? lengthValues[1].replace(/[ge|le]/, '') : 0
                 ]
                 break
               }
@@ -336,9 +350,19 @@ export async function unbuildRequest(json: string) {
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
-            console.log('key: ', key)
-            console.log('value: ', value)
             switch (key) {
+              case PROCEDURE_CODE:
+                currentCriterion.code = { id: value }
+                break
+              case PROCEDURE_DATE: {
+                const dates = value?.split(',')
+                const startOccurrence = dates ? moment(dates[0].replace(/[le|ge]/, ''), 'YYYY-MM-DD') : null
+                const endOccurrence = dates ? moment(dates[1].replace(/[ge|le]/, ''), 'YYYY-MM-DD') : null
+
+                currentCriterion.startOccurrence = startOccurrence
+                currentCriterion.endOccurrence = endOccurrence
+                break
+              }
               default:
                 break
             }
@@ -350,16 +374,27 @@ export async function unbuildRequest(json: string) {
         if (element.fhirFilter) {
           const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
 
-          currentCriterion.title = "Critères d'actes CCAM"
+          currentCriterion.title = 'Critère de GHM'
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
-          currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : null
+          currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
+          currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
 
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
-            console.log('key: ', key)
-            console.log('value: ', value)
             switch (key) {
+              case CLAIM_CODE:
+                currentCriterion.code = { id: value }
+                break
+              case CLAIM_CREATED: {
+                const dates = value?.split(',')
+                const startOccurrence = dates ? moment(dates[0].replace(/[le|ge]/, ''), 'YYYY-MM-DD') : null
+                const endOccurrence = dates ? moment(dates[1].replace(/[ge|le]/, ''), 'YYYY-MM-DD') : null
+
+                currentCriterion.startOccurrence = startOccurrence
+                currentCriterion.endOccurrence = endOccurrence
+                break
+              }
               default:
                 break
             }
