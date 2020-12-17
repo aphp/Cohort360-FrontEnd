@@ -258,7 +258,7 @@ export const getVisitRepartitionMapAphp = (facet?: IExtension[]): ComplexChartDa
           })
         }
 
-        const genderData = data[i + 1].extension
+        const genderData = data[i + 1] ? data[i + 1].extension : []
 
         genderData?.forEach((gender) => {
           switch (gender.url) {

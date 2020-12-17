@@ -34,7 +34,7 @@ export type Cohort_Creation_API_Response = {
   status: number
   data: {
     jobId: string
-    result: { _type: 'count'; 'group.id': number; 'group.count': number; source: 'from-cache' | 'from-cache' }[]
+    result: { _type: 'count'; 'group.id': string; 'group.count': number; source: 'from-cache' | 'from-cache' }[]
   }
   count?: number
 }
@@ -230,7 +230,7 @@ export type SelectedCriteriaType = {
   vitalStatus?: { id: string; label: string }
   years?: [number, number]
   search?: string
-  docType?: '55188-7' | '11336-5' | '57833-6'
+  docType?: { id: '55188-7' | '11336-5' | '57833-6'; label: string }
   occurence?: number
   ageType?: { id: string; label: string }
   duration?: [number, number]
