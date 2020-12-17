@@ -8,21 +8,14 @@ import CCAMForm from './DiagramView/components/CriteriaCard/components/CCAMForm/
 import Cim10Form from './DiagramView/components/CriteriaCard/components/Cim10Form/Cim10Form'
 import GhmForm from './DiagramView/components/CriteriaCard/components/GhmForm/GhmForm'
 
-// Data
-import ccamData from '../../../data/ccam_data'
-import ghmData from '../../../data/ghm_data'
-
 // Fetcher
-// done
 import {
   fetchAdmissionModes,
   fetchEntryModes,
   fetchExitModes,
   fetchFileStatus
 } from '../../../services/cohortCreation/fetchEncounter'
-// done
 import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetchDemographic'
-// done
 import {
   fetchStatusDiagnostic,
   fetchDiagnosticTypes,
