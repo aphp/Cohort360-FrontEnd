@@ -40,9 +40,9 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
       title: data.title,
-      ageType: data.ageType,
-      years: data.years,
-      duration: data.duration,
+      ageType: data.years && data.years[0] === 0 && data.years[1] === 100 ? null : data.ageType,
+      years: data.years && data.years[0] === 0 && data.years[1] === 100 ? null : data.years,
+      duration: data.duration && data.duration[0] === 0 && data.duration[1] === 100 ? null : data.duration,
       admissionMode: data.admissionMode,
       entryMode: data.entryMode,
       exitMode: data.exitMode,

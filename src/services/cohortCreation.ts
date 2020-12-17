@@ -59,7 +59,10 @@ export const createCohort = async (
       description: 'Ceci est la première cohorte créer via Cohort360'
     })
 
-    return cohortResult && cohortResult.data && cohortResult.data.result ? cohortResult.data.result[0] : null
+    return {
+      ...cohortResult,
+      fhir_group_id
+    }
   }
 }
 

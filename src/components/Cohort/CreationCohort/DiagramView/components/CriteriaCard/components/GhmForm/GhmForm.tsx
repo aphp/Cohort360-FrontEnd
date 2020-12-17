@@ -90,7 +90,11 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
           {
             type: 'custom',
             name: 'label',
-            renderInput: () => <FormLabel component="legend">Date d'occurrence :</FormLabel>
+            renderInput: () => (
+              <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+                Date d'occurrence :
+              </FormLabel>
+            )
           },
           {
             name: 'startOccurrence',

@@ -196,7 +196,6 @@ export async function unbuildRequest(json: string) {
       case RESSOURCE_TYPE_PATIENT: {
         if (element.fhirFilter) {
           const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
-          console.log('filters', filters)
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
@@ -236,6 +235,14 @@ export async function unbuildRequest(json: string) {
       case RESSOURCE_TYPE_ENCOUNTER: {
         if (element.fhirFilter) {
           const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
+
+          currentCriterion.title = 'Critère de prise en charge'
+          currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : null
+          currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : null
+          currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : null
+          currentCriterion.exitMode = currentCriterion.exitMode ? currentCriterion.exitMode : null
+          currentCriterion.fileStatus = currentCriterion.fileStatus ? currentCriterion.fileStatus : null
+
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
@@ -271,6 +278,11 @@ export async function unbuildRequest(json: string) {
       case RESSOURCE_TYPE_COMPOSITION: {
         if (element.fhirFilter) {
           const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
+
+          currentCriterion.title = 'Critère de document'
+          currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
+          currentCriterion.docType = currentCriterion.docType ? currentCriterion.docType : null
+
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
@@ -291,6 +303,11 @@ export async function unbuildRequest(json: string) {
       case RESSOURCE_TYPE_CONDITION: {
         if (element.fhirFilter) {
           const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
+
+          currentCriterion.title = 'Critère de diagnostic'
+          currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
+          currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : null
+
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
@@ -311,9 +328,15 @@ export async function unbuildRequest(json: string) {
       case RESSOURCE_TYPE_PROCEDURE: {
         if (element.fhirFilter) {
           const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
+
+          currentCriterion.title = "Critères d'actes CCAM"
+          currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
+          currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : null
+
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
+            console.log('key: ', key)
             console.log('value: ', value)
             switch (key) {
               default:
@@ -326,9 +349,15 @@ export async function unbuildRequest(json: string) {
       case RESSOURCE_TYPE_CLAIM: {
         if (element.fhirFilter) {
           const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
+
+          currentCriterion.title = "Critères d'actes CCAM"
+          currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
+          currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : null
+
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
+            console.log('key: ', key)
             console.log('value: ', value)
             switch (key) {
               default:

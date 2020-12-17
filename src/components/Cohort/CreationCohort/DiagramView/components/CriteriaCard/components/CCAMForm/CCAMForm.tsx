@@ -46,7 +46,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
 
     return (
       ccamOptions.map((ccamData: any) => ({
-        id: ccamData.display,
+        id: ccamData.code,
         label: `${ccamData.code} - ${ccamData.display}`
       })) || []
     )
@@ -95,7 +95,11 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
           {
             type: 'custom',
             name: 'label',
-            renderInput: () => <FormLabel component="legend">Date d'occurrence :</FormLabel>
+            renderInput: () => (
+              <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+                Date d'occurrence :
+              </FormLabel>
+            )
           },
           {
             name: 'startOccurrence',

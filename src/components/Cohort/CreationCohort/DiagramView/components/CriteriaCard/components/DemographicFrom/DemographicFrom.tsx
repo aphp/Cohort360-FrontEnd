@@ -37,7 +37,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
       title: data.title,
       vitalStatus: data.vitalStatus,
       gender: data.gender,
-      years: data.years,
+      years: data.years && data.years[0] === 0 && data.years[1] === 100 ? null : data.years,
       type: 'Patient'
     })
   }

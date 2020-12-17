@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { CircularProgress, Tabs, Tab } from '@material-ui/core'
-// import { useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 import ControlPanel from './ControlPanel/ControlPanel'
 import DiagramView from './DiagramView/DiagramView'
@@ -25,7 +25,7 @@ type SnapshotType = {
 const Requeteur = () => {
   const practitioner = useAppSelector((state) => state.me)
   const classes = useStyles()
-  // const history = useHistory()
+  const history = useHistory()
 
   const [loading, setLoading] = useState<boolean>(true)
   const [actionLoading, setActionLoading] = useState<boolean[]>([])
@@ -181,10 +181,10 @@ const Requeteur = () => {
       if (!json) return
 
       const newCohortResult = await createCohort(json, count?.uuid, currentSnapshot, requestId)
-      const cohortId = newCohortResult?.['group.id']
+      const cohortId = newCohortResult ? newCohortResult['fhir_group_id'] : ''
       if (!cohortId) return
 
-      // history.push(`/cohort/${cohortId}`)
+      history.push(`/cohort/${cohortId}`)
     }
 
     _createCohort()
