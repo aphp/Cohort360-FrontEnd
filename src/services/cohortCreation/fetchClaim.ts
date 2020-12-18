@@ -3,6 +3,9 @@ import { alphabeticalSort } from '../../utils/alphabeticalSort'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
 
 export const fetchGhmData = async (searchValue?: string) => {
+  if (!searchValue) {
+    return []
+  }
   const _searchValue = searchValue ? `&_text=${searchValue}` : ''
   const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-ghm${_searchValue}`)
 
