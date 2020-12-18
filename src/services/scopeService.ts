@@ -5,7 +5,8 @@ import {
   IPractitionerRole,
   IOrganization,
   IHealthcareService,
-  IPatient
+  IPatient,
+  IExtension
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { FHIR_API_Response, ScopeTreeRow } from '../types'
 import { getApiResponseResources } from 'utils/apiHelpers'
@@ -41,7 +42,7 @@ const getOrganizationServices = async (
 export const getPerimeters = async (practitionerId: string) => {
   if (CONTEXT === 'aphp') {
     const practitionerRole = await api.get<FHIR_API_Response<IPractitionerRole>>(
-      `/PractitionerRole?practitioner=${practitionerId}&_elements=organization`
+      `/PractitionerRole?practitioner=${practitionerId}&_elements=organization,extension`
     )
     if (!practitionerRole) return undefined
 
@@ -59,21 +60,59 @@ export const getPerimeters = async (practitionerId: string) => {
     )
 
     const perimetersResult = getApiResponseResources(perimeters)
-    return perimetersResult
+
+    return perimetersResult && perimetersResult.length > 0
+      ? perimetersResult.map((perimeter) => {
+          const organizationId = perimeter?.managingEntity?.display || null
+          if (!organizationId) return perimeter
+          const foundItem = practitionerRoleData?.find(
+            (practitionerRole) => practitionerRole?.organization?.reference === organizationId
+          )
+          return {
+            ...perimeter,
+            extension: foundItem ? foundItem.extension : undefined
+          }
+        })
+      : []
   }
 }
+
+const getAccessName = (extension?: IExtension[]) => {
+  if (!extension || !extension.find((extension) => extension.url === 'access level')) {
+    return ''
+  }
+
+  const accessExtension = extension.find((extension) => extension.url === 'access level')
+
+  const access = accessExtension?.valueString
+
+  switch (access) {
+    case 'READ_DATA_NOMINATIVE':
+      return 'Nominatif'
+    case 'READ_DATA_PSEUDOANONYMISED':
+      return 'Pseudonymisé'
+    case 'ADMIN_USERS':
+      return 'Nominatif'
+    default:
+      return ''
+  }
+}
+
 export const getScopePerimeters = async (practitionerId: string): Promise<ScopeTreeRow[]> => {
   if (CONTEXT === 'aphp') {
     const perimetersResults = await getPerimeters(practitionerId)
+
     const scopeRows: ScopeTreeRow[] = perimetersResults
       ? perimetersResults?.map<ScopeTreeRow>((perimeterResult) => ({
           ...perimeterResult,
           id: perimeterResult.id ?? '0',
           name: perimeterResult.name?.replace(/^Patients passés par: /, '') ?? '',
           quantity: perimeterResult.quantity ?? 0,
+          access: getAccessName(perimeterResult.extension),
           subItems: [loadingItem]
         }))
       : []
+
     return scopeRows
   }
 
