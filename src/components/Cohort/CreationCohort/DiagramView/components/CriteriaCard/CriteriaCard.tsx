@@ -55,6 +55,21 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
   const _displayCardContent = (_selectedCriteria: SelectedCriteriaType) => {
     if (!_selectedCriteria) return <></>
     let content = <></>
+
+    let _data: any = null
+    const _searchDataFromCriteria = (_criteria: any[], type: string) => {
+      for (const _criterion of _criteria) {
+        if (_criterion.id === type) {
+          _data = _criterion.data
+        } else if (_criterion.subItems) {
+          _data = _data ? _data : _searchDataFromCriteria(_criterion.subItems, type)
+        }
+      }
+      return _data
+    }
+
+    const data: any = _searchDataFromCriteria(criteria, _selectedCriteria.type)
+
     const startDate = _selectedCriteria.startOccurrence
       ? moment(_selectedCriteria.startOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
       : ''
@@ -64,6 +79,10 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
 
     switch (_selectedCriteria.type) {
       case 'Claim': {
+        const selectedGhmData = data?.ghmData
+          ? data.ghmData.find((ghmElement: any) => ghmElement && ghmElement['GHM CODE'] === _selectedCriteria.code?.id)
+          : null
+
         content = (
           <>
             <Typography>
@@ -79,14 +98,18 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 : ''}
             </Typography>
             <Typography>
-              GHM sélectionné :{_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}
+              {selectedGhmData ? `GHM sélectionné : "${selectedGhmData['LONG DESCRIPTION']}"` : '""'}
             </Typography>
           </>
         )
         break
       }
 
-      case 'Procedure':
+      case 'Procedure': {
+        const selectedccamData = data?.ccamData
+          ? data.ccamData.find((ccamElement: any) => ccamElement && ccamElement.id === _selectedCriteria?.code?.id)
+          : null
+
         content = (
           <>
             <Typography>
@@ -101,48 +124,61 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 ? `Avant le ${endDate},`
                 : ''}
             </Typography>
-            <Typography align="center">
-              Acte CCAM sélectionné : {_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}.
-            </Typography>
+            <Typography>{selectedccamData ? `Acte CCAM sélectionné : "${selectedccamData.label}"` : '""'}.</Typography>
           </>
         )
         break
+      }
 
-      case 'Condition':
+      case 'Condition': {
+        const selectedCode = data?.cim10Diagnostic
+          ? data.cim10Diagnostic.find(
+              (cim10Diagnostic: any) => cim10Diagnostic && cim10Diagnostic.id === _selectedCriteria?.code?.id
+            )
+          : null
+        const selectedDiagnostic = data?.diagnosticTypes
+          ? data.diagnosticTypes.find(
+              (diagnosticType: any) => diagnosticType && diagnosticType.id === _selectedCriteria?.diagnosticType?.id
+            )
+          : null
+
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,
             </Typography>
-            <Typography align="center">
-              Diagnostic CIM sélectionné : {_selectedCriteria.code ? `"${_selectedCriteria.code.label}"` : '""'}.
+            <Typography>{selectedCode ? `Diagnostic CIM sélectionné : "${selectedCode.label}"` : ''}.</Typography>
+            <Typography>
+              {selectedDiagnostic && `Type de diagnostic recherché : "${selectedDiagnostic.label}."`}
             </Typography>
-            {_selectedCriteria.diagnosticType && (
-              <Typography align="center">
-                Type de diagnostic recherché : {_selectedCriteria.diagnosticType.label}.
-              </Typography>
-            )}
           </>
         )
         break
+      }
 
       case 'Patient': {
+        const selectedGender = data?.gender
+          ? data.gender.find((gender: any) => gender && gender.id === _selectedCriteria?.gender?.id)
+          : null
+        const selectedVitalStatus = data?.status
+          ? data.status.find((status: any) => status && status.id === _selectedCriteria?.vitalStatus?.id)
+          : null
+
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Démographie Patient</span>,
             </Typography>
-            {_selectedCriteria.gender && <Typography>Genre sélectionné : {_selectedCriteria.gender.label}.</Typography>}
-            {_selectedCriteria.vitalStatus && (
-              <Typography>Statut vital : {_selectedCriteria.vitalStatus.label}.</Typography>
-            )}
-            {_selectedCriteria.years && _selectedCriteria.years[0] === _selectedCriteria.years[1] && (
+            {selectedGender && <Typography>Genre sélectionné : {selectedGender.label}.</Typography>}
+            {selectedVitalStatus && <Typography>Statut vital : {selectedVitalStatus.label}.</Typography>}
+
+            {!!_selectedCriteria.years && _selectedCriteria.years[0] === _selectedCriteria.years[1] && (
               <Typography>
                 Âge sélectionné: {_selectedCriteria.years?.[0]} ans
                 {_selectedCriteria.years?.[0] === 100 ? ' ou plus.' : '.'}
               </Typography>
             )}
-            {_selectedCriteria.years &&
+            {!!_selectedCriteria.years &&
               _selectedCriteria.years[0] !== _selectedCriteria.years[1] &&
               (_selectedCriteria.years[0] !== 0 || _selectedCriteria.years[1] !== 100) && (
                 <Typography>
@@ -161,14 +197,16 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
           '11336-5': "Comptes rendus d'hospitalisation",
           '57833-6': 'Ordonnances'
         }
+        const selectedDocType =
+          docTypes[_selectedCriteria && _selectedCriteria.docType ? _selectedCriteria.docType.id : '55188-7']
+
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Document médical</span>,
             </Typography>
-            <Typography>
-              Recherche textuelle "{_selectedCriteria.search}" {docTypes[_selectedCriteria.docType ?? '55188-7']}.
-            </Typography>
+            <Typography>Recherche textuelle "{_selectedCriteria.search}"</Typography>
+            <Typography>Dans {selectedDocType}.</Typography>
           </>
         )
         break
@@ -179,6 +217,19 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         let ageUnit = 'an(s)'
         if (ageType === 'month') ageUnit = 'mois'
         else if (ageType === 'day') ageUnit = 'jour(s)'
+
+        const selectedAdmissionMode = data.admissionModes
+          ? data.admissionModes.find((admissionMode: any) => admissionMode.id === _selectedCriteria?.admissionMode?.id)
+          : null
+        const selectedEntryMode = data.entryModes
+          ? data.entryModes.find((entryMode: any) => entryMode.id === _selectedCriteria?.entryMode?.id)
+          : null
+        const selectedExitMode = data.exitModes
+          ? data.exitModes.find((exitMode: any) => exitMode.id === _selectedCriteria?.exitMode?.id)
+          : null
+        const selectedFileStatus = data.fileStatus
+          ? data.fileStatus.find((fileStatus: any) => fileStatus.id === _selectedCriteria?.fileStatus?.id)
+          : null
 
         content = (
           <>
@@ -215,18 +266,10 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                   {_selectedCriteria.duration[1] === 100 ? ' ou plus.' : '.'}
                 </Typography>
               )}
-            {_selectedCriteria.admissionMode && (
-              <Typography>Mode d'admission : {_selectedCriteria.admissionMode.label}.</Typography>
-            )}
-            {_selectedCriteria.entryMode && (
-              <Typography align="center">Mode d'entrée : {_selectedCriteria.entryMode.label}.</Typography>
-            )}
-            {_selectedCriteria.exitMode && (
-              <Typography align="center">Mode de sortie : {_selectedCriteria.exitMode.label}.</Typography>
-            )}
-            {_selectedCriteria.fileStatus && (
-              <Typography>Statut dossier : {_selectedCriteria.fileStatus.label}.</Typography>
-            )}
+            {selectedAdmissionMode && <Typography>Mode d'admission : {selectedAdmissionMode.label}.</Typography>}
+            {selectedEntryMode && <Typography>Mode d'entrée : {selectedEntryMode.label}.</Typography>}
+            {selectedExitMode && <Typography>Mode de sortie : {selectedExitMode.label}.</Typography>}
+            {selectedFileStatus && <Typography>Statut dossier : {selectedFileStatus.label}.</Typography>}
           </>
         )
         break
@@ -242,33 +285,46 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
       {selectedCriteria &&
         selectedCriteria.length > 0 &&
         selectedCriteria.map((_selectedCriteria, index) => (
-          <div className={classes.root} key={`C${index}`}>
-            <Card className={classes.card}>
-              <CardHeader
-                className={classes.cardHeader}
-                action={
-                  <>
-                    <IconButton
-                      size="small"
-                      onClick={() => _deleteSelectedCriteria(index)}
-                      style={{ color: 'currentcolor' }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => _editSelectedCriteria(index)}
-                      style={{ color: 'currentcolor' }}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </>
-                }
-                title={`C${index + 1} - ${_selectedCriteria.title}`}
-              />
-              <CardContent className={classes.cardContent}>{_displayCardContent(_selectedCriteria)}</CardContent>
-            </Card>
-          </div>
+          <>
+            {/* <div className={classes.root}>
+              <Button
+                disabled={actionLoading}
+                className={classes.addButton}
+                onClick={_addSelectedCriteria}
+                variant="contained"
+                color="primary"
+              >
+                <AddIcon />
+              </Button>
+            </div> */}
+            <div className={classes.root} key={`C${index}`}>
+              <Card className={classes.card}>
+                <CardHeader
+                  className={classes.cardHeader}
+                  action={
+                    <>
+                      <IconButton
+                        size="small"
+                        onClick={() => _deleteSelectedCriteria(index)}
+                        style={{ color: 'currentcolor' }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => _editSelectedCriteria(index)}
+                        style={{ color: 'currentcolor' }}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </>
+                  }
+                  title={`C${index + 1} - ${_selectedCriteria.title}`}
+                />
+                <CardContent className={classes.cardContent}>{_displayCardContent(_selectedCriteria)}</CardContent>
+              </Card>
+            </div>
+          </>
         ))}
 
       <div className={classes.root}>

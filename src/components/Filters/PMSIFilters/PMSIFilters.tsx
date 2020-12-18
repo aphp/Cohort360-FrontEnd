@@ -14,7 +14,7 @@ import { Autocomplete } from '@material-ui/lab'
 
 import InputDate from 'components/Inputs/InputDate/InputDate'
 
-import { fetchDiagnosticTypes } from 'data/Requeteur/diagnosticCim10'
+import { fetchDiagnosticTypes } from '../../../services/cohortCreation/fetchCondition'
 import { capitalizeFirstLetter } from '../../../utils/capitalize'
 
 import useStyles from './styles'

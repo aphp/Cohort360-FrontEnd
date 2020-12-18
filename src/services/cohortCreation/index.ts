@@ -1,8 +1,8 @@
 import moment from 'moment'
 
-import api from './apiRequest'
-import apiBack from './apiBackCohort'
-import { CONTEXT } from '../constants'
+import api from '../apiRequest'
+import apiBack from '../apiBackCohort'
+import { CONTEXT } from '../../constants'
 
 import { Cohort_Creation_API_Response } from 'types'
 
@@ -20,16 +20,19 @@ export const countCohort = async (
   } else {
     const countResult = (await api.post('QueryServer/api/count', requeteurJson)) || {}
     const { data } = countResult
-    const measure = data && data.result && data.result[0] ? data.result && data.result[0].count : null
+    const count = data && data.result && data.result[0] ? data.result && data.result[0].count : null
 
     const measureResult = await apiBack.post('/explorations/dated-measures/', {
       request_query_snapshot_id: snapshotId,
       request_id: requestId,
       fhir_datetime: moment().format('YYYY-MM-DD[T]HH:mm:ss'),
-      measure
+      measure: count
     })
 
-    return { count: measure, uuid: measureResult && measureResult.data ? measureResult.data.uuid : null }
+    return {
+      count,
+      uuid: measureResult && measureResult.data ? measureResult.data.uuid : null
+    }
   }
 }
 
@@ -55,23 +58,15 @@ export const createCohort = async (
       request_query_snapshot_id: snapshotId,
       request_id: requestId,
       fhir_group_id,
-      name: 'Création de cohorte par vmariot',
-      description: 'Ceci est la première cohorte créer via Cohort360'
+      name: 'Nouvelle Cohorte',
+      description: 'Cohorte créée depuis le front Cohort360'
     })
 
-    return cohortResult && cohortResult.data && cohortResult.data.result ? cohortResult.data.result[0] : null
+    return {
+      ...cohortResult,
+      fhir_group_id
+    }
   }
-}
-
-type CreatedRequestType = {
-  created_at: string
-  data_type_of_query: string
-  description: string
-  favorite: boolean
-  modified_at: string
-  name: string
-  owner_id: string
-  uuid: string
 }
 
 export const createRequest = async () => {
@@ -80,9 +75,8 @@ export const createRequest = async () => {
   } else {
     const request =
       (await apiBack.post('/explorations/requests/', {
-        // owner_id: 'string',
-        name: 'Création de cohorte',
-        description: 'Cohorte créer depuis le front Cohort360',
+        name: 'Nouvelle requête',
+        description: 'Requête créée depuis le front Cohort360',
         favorite: false,
         data_type_of_query: 'PATIENT'
       })) || {}

@@ -8,7 +8,6 @@ import { FormBuilder } from '@arkhn/ui'
 import useStyles from './styles'
 
 import { DemographicDataType } from 'types'
-import { capitalizeFirstLetter } from 'utils/capitalize'
 
 type DemographicFormProps = {
   criteria: any
@@ -80,20 +79,14 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             label: 'Genre',
             variant: 'outlined',
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.gender?.map((gender: any) => ({
-              id: gender.code,
-              label: capitalizeFirstLetter(gender.display)
-            }))
+            autocompleteOptions: criteria?.data?.gender || []
           },
           {
             name: 'vitalStatus',
             variant: 'outlined',
             label: 'Status vital',
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.status?.map((deceased: any) => ({
-              id: deceased.value,
-              label: deceased.display
-            }))
+            autocompleteOptions: criteria?.data?.status || []
           },
           {
             name: 'years',

@@ -8,7 +8,6 @@ import { FormBuilder } from '@arkhn/ui'
 import useStyles from './styles'
 
 import { EncounterDataType } from 'types'
-import { capitalizeFirstLetter } from 'utils/capitalize'
 
 type SupportedFormFormProps = {
   criteria: any
@@ -124,40 +123,28 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
             variant: 'outlined',
             label: "Mode d'admission",
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.admissionModes?.map((admissionModes: any) => ({
-              id: admissionModes.code,
-              label: capitalizeFirstLetter(admissionModes.display)
-            }))
+            autocompleteOptions: criteria?.data?.admissionModes
           },
           {
             name: 'entryMode',
             variant: 'outlined',
             label: "Mode d'entrée",
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.entryModes?.map((entryModes: any) => ({
-              id: entryModes.code,
-              label: capitalizeFirstLetter(entryModes.display)
-            }))
+            autocompleteOptions: criteria?.data?.entryModes
           },
           {
             name: 'exitMode',
             variant: 'outlined',
             label: 'Mode de sortie',
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.exitModes?.map((exitModes: any) => ({
-              id: exitModes.code,
-              label: capitalizeFirstLetter(exitModes.display)
-            }))
+            autocompleteOptions: criteria?.data?.exitModes
           },
           {
             name: 'fileStatus',
             variant: 'outlined',
             label: 'Statut Dossier',
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.fileStatus?.map((fileStatus: any) => ({
-              id: fileStatus.code,
-              label: capitalizeFirstLetter(fileStatus.display)
-            }))
+            autocompleteOptions: criteria?.data?.fileStatus
           }
         ]}
         submit={_onSubmit}
