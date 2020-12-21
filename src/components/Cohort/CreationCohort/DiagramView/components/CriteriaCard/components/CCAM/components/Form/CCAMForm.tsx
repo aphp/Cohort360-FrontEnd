@@ -84,6 +84,15 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             autocompleteOptions: criteria?.data?.ccamData || [],
             getAutocompleteOptions: getCCAMOptions
           },
+          // {
+          //   name: 'hierarchy',
+          //   type: 'custom',
+          //   renderInput: () => (
+          //     <Button className={classes.linkTable} href="/accueil">
+          //       retour sur le home
+          //     </Button>
+          //   )
+          // },
           {
             type: 'custom',
             name: 'label',
