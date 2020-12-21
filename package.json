@@ -36,7 +36,6 @@
     "react-ace": "^9.2.1",
     "react-bootstrap": "^1.0.1",
     "react-dom": "^16.13.1",
-    "react-hook-form": "^6.11.3",
     "react-idle-timer": "^4.3.6",
     "react-modal": "^3.11.2",
     "react-pdf": "^5.0.0-beta.4",

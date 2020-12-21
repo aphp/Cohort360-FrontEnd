@@ -80,7 +80,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
     switch (_selectedCriteria.type) {
       case 'Claim': {
         const selectedGhmData = data?.ghmData
-          ? data.ghmData.find((ghmElement: any) => ghmElement && ghmElement['GHM CODE'] === _selectedCriteria.code?.id)
+          ? data.ghmData.find((ghmElement: any) => ghmElement && ghmElement.id === _selectedCriteria.code?.id)
           : null
 
         content = (
@@ -97,9 +97,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 ? `Avant le ${endDate},`
                 : ''}
             </Typography>
-            <Typography>
-              {selectedGhmData ? `GHM sélectionné : "${selectedGhmData['LONG DESCRIPTION']}"` : '""'}
-            </Typography>
+            <Typography>{selectedGhmData ? `GHM sélectionné : "${selectedGhmData.label}"` : ''}</Typography>
           </>
         )
         break
@@ -124,7 +122,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 ? `Avant le ${endDate},`
                 : ''}
             </Typography>
-            <Typography>{selectedccamData ? `Acte CCAM sélectionné : "${selectedccamData.label}"` : '""'}.</Typography>
+            <Typography>{selectedccamData ? `Acte CCAM sélectionné : "${selectedccamData.label}"` : ''}.</Typography>
           </>
         )
         break
@@ -147,7 +145,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             <Typography>
               Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,
             </Typography>
-            <Typography>{selectedCode ? `Diagnostic CIM sélectionné : "${selectedCode.label}"` : ''}.</Typography>
+            <Typography>{selectedCode ? `Diagnostic CIM sélectionné : "${selectedCode.label}."` : ''}</Typography>
             <Typography>
               {selectedDiagnostic && `Type de diagnostic recherché : "${selectedDiagnostic.label}."`}
             </Typography>
