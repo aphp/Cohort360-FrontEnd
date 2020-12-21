@@ -326,10 +326,10 @@ export async function unbuildRequest(json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
-              case COMPOSITION_TEXT:
+              case CONDITION_CODE:
                 currentCriterion.code = { id: value }
                 break
-              case COMPOSITION_TYPE:
+              case CONDITION_TYPE:
                 currentCriterion.diagnosticType = { id: value }
                 break
               default:
@@ -337,6 +337,7 @@ export async function unbuildRequest(json: string) {
             }
           }
         }
+        console.log('currentCriterion', currentCriterion)
         break
       }
       case RESSOURCE_TYPE_PROCEDURE: {

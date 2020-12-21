@@ -64,6 +64,9 @@ export const fetchDiagnosticTypes = async () => {
 
 // todo: check if the data syntax is correct when available
 export const fetchCim10Diagnostic = async (searchValue?: string) => {
+  if (!searchValue) {
+    return []
+  }
   const _searchValue = searchValue ? `&_text=${searchValue}` : ''
   const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-cim${_searchValue}`)
 
