@@ -69,10 +69,16 @@ const Requeteur = () => {
                 if (_criterion.data[dataKey] === 'loading') _criterion.data[dataKey] = []
 
                 if (currentSelectedCriterion) {
-                  _criterion.data[dataKey] = [
-                    ..._criterion.data[dataKey],
-                    ...(await _criterion.fetch[fetchKey](currentSelectedCriterion.code?.id))
-                  ]
+                  const allreadyHere = _criterion.data[dataKey]
+                    ? _criterion.data[dataKey].find((data: any) => data.id === currentSelectedCriterion.code?.id)
+                    : undefined
+
+                  if (!allreadyHere) {
+                    _criterion.data[dataKey] = [
+                      ..._criterion.data[dataKey],
+                      ...(await _criterion.fetch[fetchKey](currentSelectedCriterion.code?.id))
+                    ]
+                  }
                 }
                 break
               default:
@@ -262,12 +268,12 @@ const Requeteur = () => {
 
   // Re-fetch criteria after update population or criteria
   useEffect(() => {
-    const _init = async () => {
+    const _reload = async () => {
       await _fetchCriteria()
     }
 
-    _init()
-  }, [selectedPopulation, selectedCriteria]) // eslint-disable-line
+    _reload()
+  }, [selectedCriteria]) // eslint-disable-line
 
   if (loading) return <CircularProgress />
 
