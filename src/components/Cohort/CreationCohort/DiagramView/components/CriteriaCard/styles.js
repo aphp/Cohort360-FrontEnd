@@ -34,7 +34,7 @@ const useStyles = makeStyles(() => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    testAlign: 'center'
+    textAlign: 'center'
   },
   criteriaType: {
     color: '#5BC5F2',

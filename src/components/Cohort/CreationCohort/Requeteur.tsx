@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { CircularProgress, Tabs, Tab } from '@material-ui/core'
-// import { useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 import ControlPanel from './ControlPanel/ControlPanel'
 import DiagramView from './DiagramView/DiagramView'
@@ -25,7 +25,7 @@ type SnapshotType = {
 const Requeteur = () => {
   const practitioner = useAppSelector((state) => state.me)
   const classes = useStyles()
-  // const history = useHistory()
+  const history = useHistory()
 
   const [loading, setLoading] = useState<boolean>(true)
   const [actionLoading, setActionLoading] = useState<boolean[]>([])
@@ -49,16 +49,38 @@ const Requeteur = () => {
    * Fetch all criteria to display list + retrieve all data from fetcher
    */
   const _fetchCriteria = async () => {
+    setLoading(true)
     if (!practitioner) return
 
     const getDataFromFetch = async (_criteria: any) => {
       for (const _criterion of _criteria) {
         if (_criterion.fetch) {
-          _criterion.data = {}
+          if (!_criterion.data) _criterion.data = {}
           const fetchKeys = Object.keys(_criterion.fetch)
           for (const fetchKey of fetchKeys) {
             const dataKey = fetchKey.replace('fetch', '').replace(/(\b[A-Z])(?![A-Z])/g, ($1) => $1.toLowerCase())
-            _criterion.data[dataKey] = await _criterion.fetch[fetchKey]()
+            const currentSelectedCriterion = selectedCriteria.find(
+              (selectedCriterion: SelectedCriteriaType) => selectedCriterion.type === _criterion.id
+            )
+            switch (dataKey) {
+              case 'ghmData':
+              case 'ccamData':
+              case 'cim10Diagnostic':
+                if (_criterion.data[dataKey] === 'loading') _criterion.data[dataKey] = []
+
+                if (currentSelectedCriterion) {
+                  _criterion.data[dataKey] = [
+                    ..._criterion.data[dataKey],
+                    ...(await _criterion.fetch[fetchKey](currentSelectedCriterion.code?.id))
+                  ]
+                }
+                break
+              default:
+                if (_criterion.data[dataKey] === 'loading') {
+                  _criterion.data[dataKey] = await _criterion.fetch[fetchKey]()
+                }
+                break
+            }
           }
         }
         _criterion.subItems =
@@ -71,6 +93,7 @@ const Requeteur = () => {
     _criteria = await getDataFromFetch(_criteria)
 
     onChangeCriteria(_criteria)
+    setLoading(false)
   }
 
   /**
@@ -108,6 +131,7 @@ const Requeteur = () => {
   const _onSaveNewJson = async (newJson: string) => {
     setActionLoading([...actionLoading, true])
     let _requestId = requestId ? requestId : null
+    let uuid = ''
 
     if (snapshotsHistory && snapshotsHistory.length === 0) {
       // Create request + first snapshot
@@ -118,12 +142,11 @@ const Requeteur = () => {
 
         const newSnapshot = await createSnapshot(_requestId, newJson, true)
         if (newSnapshot) {
-          const uuid = newSnapshot.uuid
+          uuid = newSnapshot.uuid
           const json = newSnapshot.serialized_query
           const date = newSnapshot.created_at
           onChangeCurrentSnapshot(uuid)
           onChangeSnapshotsHistory([{ uuid, json, date }])
-          _countCohort(newJson, uuid, _requestId ?? '')
         }
       }
     } else if (currentSnapshot) {
@@ -134,7 +157,7 @@ const Requeteur = () => {
         const foundItem = snapshotsHistory.find(({ uuid }) => uuid === currentSnapshot)
         const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
 
-        const uuid = newSnapshot.uuid
+        uuid = newSnapshot.uuid
         const json = newSnapshot.serialized_query
         const date = newSnapshot.created_at
 
@@ -143,10 +166,10 @@ const Requeteur = () => {
 
         onChangeCurrentSnapshot(uuid)
         onChangeSnapshotsHistory([..._snapshotsHistory, { uuid, json, date }])
-        _countCohort(newJson, uuid, _requestId ?? '')
       }
     }
     setActionLoading(actionLoading.slice(0, actionLoading.length - 2 > 0 ? actionLoading.length - 2 : 0))
+    _countCohort(newJson, uuid, _requestId ?? '')
   }
 
   const _buildRequest = async (
@@ -157,9 +180,9 @@ const Requeteur = () => {
     onChangeSelectedCriteria(_selectedCriteria)
     if (!_selectedPopulation && _selectedCriteria && _selectedCriteria.length === 0) return
 
-    const _json = buildRequest(_selectedPopulation, _selectedCriteria)
+    const _json = await buildRequest(_selectedPopulation, _selectedCriteria)
     onChangeJson(_json)
-    _onSaveNewJson(_json)
+    await _onSaveNewJson(_json)
   }
 
   const _unbuildRequest = async (newCurrentSnapshot: SnapshotType) => {
@@ -181,28 +204,29 @@ const Requeteur = () => {
       if (!json) return
 
       const newCohortResult = await createCohort(json, count?.uuid, currentSnapshot, requestId)
-      const cohortId = newCohortResult?.['group.id']
+      const cohortId = newCohortResult ? newCohortResult['fhir_group_id'] : ''
       if (!cohortId) return
 
-      // history.push(`/cohort/${cohortId}`)
+      history.push(`/cohort/${cohortId}`)
     }
 
     _createCohort()
     setActionLoading(actionLoading.slice(0, actionLoading.length - 2 > 0 ? actionLoading.length - 2 : 0))
   }
 
-  const _onUndo = () => {
+  const _onUndo = async () => {
     const foundItem = snapshotsHistory.find(({ uuid }) => uuid === currentSnapshot)
     const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
     if (index !== -1) {
       const newCurrentSnapshot = snapshotsHistory[index - 1 > 0 ? index - 1 : 0]
       onChangeCurrentSnapshot(newCurrentSnapshot.uuid)
       onChangeJson(newCurrentSnapshot.json)
-      _unbuildRequest(newCurrentSnapshot)
+      await _unbuildRequest(newCurrentSnapshot)
+      await _fetchCriteria()
     }
   }
 
-  const _onRedo = () => {
+  const _onRedo = async () => {
     const foundItem = snapshotsHistory.find(({ uuid }) => uuid === currentSnapshot)
     const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
     if (index !== -1) {
@@ -210,7 +234,8 @@ const Requeteur = () => {
         snapshotsHistory[index <= snapshotsHistory.length ? index + 1 : snapshotsHistory.length - 1]
       onChangeCurrentSnapshot(newCurrentSnapshot.uuid)
       onChangeJson(newCurrentSnapshot.json)
-      _unbuildRequest(newCurrentSnapshot)
+      await _unbuildRequest(newCurrentSnapshot)
+      await _fetchCriteria()
     }
   }
 
@@ -229,13 +254,20 @@ const Requeteur = () => {
   // Initial useEffect
   useEffect(() => {
     const _init = async () => {
-      setLoading(true)
       await _fetchCriteria()
-      setLoading(false)
     }
 
     _init()
   }, []) // eslint-disable-line
+
+  // Re-fetch criteria after update population or criteria
+  useEffect(() => {
+    const _init = async () => {
+      await _fetchCriteria()
+    }
+
+    _init()
+  }, [selectedPopulation, selectedCriteria]) // eslint-disable-line
 
   if (loading) return <CircularProgress />
 
@@ -265,14 +297,14 @@ const Requeteur = () => {
       {seletedTab === 'diagramme' ? (
         <DiagramView
           selectedPopulation={selectedPopulation}
-          onChangeSelectedPopulation={(_selectedPopulation: ScopeTreeRow[] | null) =>
-            _buildRequest(_selectedPopulation, selectedCriteria || [])
-          }
+          onChangeSelectedPopulation={(_selectedPopulation: ScopeTreeRow[] | null) => {
+            _buildRequest(_selectedPopulation, _selectedPopulation ? selectedCriteria || [] : [])
+          }}
           criteria={criteria}
           selectedCriteria={selectedCriteria}
-          onChangeSelectedCriteria={(_selectedCriteria: SelectedCriteriaType[]) =>
+          onChangeSelectedCriteria={async (_selectedCriteria: SelectedCriteriaType[]) => {
             _buildRequest(selectedPopulation, _selectedCriteria)
-          }
+          }}
           actionLoading={actionLoading.length > 0}
         />
       ) : (

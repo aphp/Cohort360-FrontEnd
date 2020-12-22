@@ -4,13 +4,9 @@ import { CriteriaItemType } from 'types'
 import DemographicFrom from './DiagramView/components/CriteriaCard/components/DemographicFrom/DemographicFrom'
 import DocumentsForm from './DiagramView/components/CriteriaCard/components/DocumentsForm/DocumentsForm'
 import SupportedForm from './DiagramView/components/CriteriaCard/components/SupportedForm/SupportedForm'
-import CCAMForm from './DiagramView/components/CriteriaCard/components/CCAMForm/CCAMForm'
+import CCAMForm from './DiagramView/components/CriteriaCard/components/CCAM/index'
 import Cim10Form from './DiagramView/components/CriteriaCard/components/Cim10Form/Cim10Form'
 import GhmForm from './DiagramView/components/CriteriaCard/components/GhmForm/GhmForm'
-
-// Data
-import ccamData from '../../../data/ccam_data'
-import ghmData from '../../../data/ghm_data'
 
 // Fetcher
 import {
@@ -18,14 +14,15 @@ import {
   fetchEntryModes,
   fetchExitModes,
   fetchFileStatus
-} from '../../../data/Requeteur/encounter'
-import { fetchGender, fetchStatus } from '../../../data/Requeteur/patient'
+} from '../../../services/cohortCreation/fetchEncounter'
+import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetchDemographic'
 import {
   fetchStatusDiagnostic,
   fetchDiagnosticTypes,
   fetchCim10Diagnostic
-} from '../../../data/Requeteur/diagnosticCim10'
-import { fetchCcamData } from '../../../data/Requeteur/procedureCCAM'
+} from '../../../services/cohortCreation/fetchCondition'
+import { fetchCcamData } from '../../../services/cohortCreation/fetchProcedure'
+import { fetchGhmData } from '../../../services/cohortCreation/fetchClaim'
 
 // ├── Mes variables
 // ├── Patients
@@ -92,7 +89,7 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Actes',
         color: '#0063AF',
         components: CCAMForm,
-        data: { ccamData },
+        data: { ccamData: 'loading' },
         fetch: { fetchCcamData }
       },
       {
@@ -100,7 +97,8 @@ const criteriaList: CriteriaItemType[] = [
         title: 'GHM',
         color: '#0063AF',
         components: GhmForm,
-        data: { ghmData }
+        data: { ghmData: 'loading' },
+        fetch: { fetchGhmData }
       }
     ]
   },

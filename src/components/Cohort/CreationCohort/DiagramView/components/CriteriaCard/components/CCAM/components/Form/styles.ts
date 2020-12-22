@@ -35,6 +35,11 @@ const useStyles = makeStyles(() => ({
     borderColor: '#c61137',
     color: '#fc1847'
   },
+  linkTable: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end'
+  },
   criteriaActionContainer: {
     display: 'flex',
     alignItems: 'center',
