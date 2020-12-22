@@ -14,7 +14,7 @@ import {
   getVisitRepartitionMapAphp
 } from 'utils/graphUtils'
 
-const getPatientInfos = async (deidentifiedBoolean: boolean, documents?: IComposition[]) => {
+const getPatientInfos = async (deidentifiedBoolean: boolean, documents?: IComposition[], groupId?: string) => {
   if (!documents) {
     return []
   }
@@ -22,8 +22,9 @@ const getPatientInfos = async (deidentifiedBoolean: boolean, documents?: ICompos
 
   const listePatientsIds = cohortDocuments.map((e) => e.subject?.display?.substring(8)).join()
 
+  const groupFilter = groupId ? `&_list=${groupId}` : ''
   const patients = await api.get<FHIR_API_Response<IPatient>>(
-    `/Patient?_id=${listePatientsIds}&_elements=extension,id,identifier`
+    `/Patient?_id=${listePatientsIds}&_elements=extension,id,identifier${groupFilter}`
   )
 
   let listePatients = []
@@ -172,7 +173,7 @@ export const fetchMyPatients = async (): Promise<CohortData | undefined> => {
   }
 }
 
-const getEncounterInfos = async (deidentifiedBoolean: boolean, documents?: IComposition[]) => {
+const getEncounterInfos = async (deidentifiedBoolean: boolean, documents?: IComposition[], groupId?: string) => {
   if (!documents) {
     return []
   }
@@ -180,8 +181,10 @@ const getEncounterInfos = async (deidentifiedBoolean: boolean, documents?: IComp
   const cohortDocuments = documents as CohortComposition[]
   const listeEncounterIds = cohortDocuments.map((e) => e.encounter?.display?.substring(10)).join()
 
+  const groupFilter = groupId ? `&_list=${groupId}` : ''
+
   const encounters = await api.get<FHIR_API_Response<IEncounter>>(
-    `/Encounter?_id=${listeEncounterIds}&type=VISIT&_elements=status,serviceProvider,identifier`
+    `/Encounter?_id=${listeEncounterIds}&type=VISIT&_elements=status,serviceProvider,identifier${groupFilter}`
   )
 
   if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
@@ -218,9 +221,9 @@ const getEncounterInfos = async (deidentifiedBoolean: boolean, documents?: IComp
   return cohortDocuments
 }
 
-export const getInfos = async (deidentifiedBoolean: boolean, documents?: IComposition[]) => {
-  const docsComplets = await getPatientInfos(deidentifiedBoolean, documents).then(
-    async (docs) => await getEncounterInfos(deidentifiedBoolean, docs)
+export const getInfos = async (deidentifiedBoolean: boolean, documents?: IComposition[], groupId?: string) => {
+  const docsComplets = await getPatientInfos(deidentifiedBoolean, documents, groupId).then(
+    async (docs) => await getEncounterInfos(deidentifiedBoolean, docs, groupId)
   )
 
   return docsComplets

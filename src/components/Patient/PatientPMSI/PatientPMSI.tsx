@@ -34,6 +34,7 @@ import { PMSIEntry } from 'types'
 import { IClaim, ICondition, IProcedure } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 type PatientPMSITypes = {
+  groupId?: string
   patientId: string
   diagnostic?: PMSIEntry<ICondition>[]
   diagnosticTotal: number
@@ -46,6 +47,7 @@ type PatientPMSITypes = {
   sortDirection: 'asc' | 'desc'
 }
 const PatientPMSI: React.FC<PatientPMSITypes> = ({
+  groupId,
   patientId,
   diagnostic,
   diagnosticTotal,
@@ -101,6 +103,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       diagnosticTypes,
       sortBy,
       sortDirection,
+      groupId,
       startDate,
       endDate
     )
