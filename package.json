@@ -50,8 +50,8 @@
     "serve": "^11.3.1"
   },
   "scripts": {
-    "start": "react-scripts --max_old_space_size=4096 start",
-    "build": "react-scripts --max_old_space_size=4096 build",
+    "start": "react-scripts start",
+    "build": "react-scripts --max-old-space-size=7168 build",
     "lint": "eslint --ext .jsx,.js,.ts,.tsx src/",
     "test": "react-scripts test --coverage --watchAll --env=jest-environment-jsdom-sixteen",
     "start:aphp": "env $(cat .env.aphp) react-scripts start",
