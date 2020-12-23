@@ -34,8 +34,11 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
 
   const _onExpand = async (cimCode: string) => {
     setOpen(!open)
-    const _subItems = await fetchHierarchy(cimCode)
-    setSubItems(_subItems)
+    console.log('subItems', subItems)
+    if (subItems && subItems[0] === 'loading') {
+      const _subItems = await fetchHierarchy(cimCode)
+      setSubItems(_subItems)
+    }
   }
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
