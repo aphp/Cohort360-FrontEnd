@@ -16,7 +16,7 @@ type CcamFormProps = {
   onChangeSelectedCriteria: (data: any) => void
 }
 
-const defaultDemographic = {
+const defaultProcedure = {
   title: "Critères d'actes CCAM",
   code: [],
   encounter: 0,
@@ -26,7 +26,7 @@ const defaultDemographic = {
 
 const CcamForm: React.FC<CcamFormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const defaultValues = selectedCriteria || defaultDemographic
+  const defaultValues = selectedCriteria || defaultProcedure
 
   const classes = useStyles()
 
