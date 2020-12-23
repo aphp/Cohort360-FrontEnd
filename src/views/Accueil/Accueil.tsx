@@ -33,7 +33,7 @@ const Accueil: React.FC = () => {
           Bienvenue {practitioner.displayName}
         </Typography>
       </Container>
-      <Container maxWidth="lg" className={classes.container}>
+      <Container maxWidth="lg" className={classes.container} style={{ minHeight: 'calc(100vh - 70px)' }}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={6}>
             <Grid item>
