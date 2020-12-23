@@ -4,13 +4,9 @@ import { CriteriaItemType } from 'types'
 import DemographicFrom from './DiagramView/components/CriteriaCard/components/DemographicFrom/DemographicFrom'
 import DocumentsForm from './DiagramView/components/CriteriaCard/components/DocumentsForm/DocumentsForm'
 import SupportedForm from './DiagramView/components/CriteriaCard/components/SupportedForm/SupportedForm'
-import CCAMForm from './DiagramView/components/CriteriaCard/components/CCAMForm/CCAMForm'
-import Cim10Form from './DiagramView/components/CriteriaCard/components/Cim10Form/Cim10Form'
+import CCAMForm from './DiagramView/components/CriteriaCard/components/CCAM'
+import Cim10Form from './DiagramView/components/CriteriaCard/components/Cim10Form'
 import GhmForm from './DiagramView/components/CriteriaCard/components/GhmForm/GhmForm'
-
-// Data
-import ccamData from '../../../data/ccam_data'
-import ghmData from '../../../data/ghm_data'
 
 // Fetcher
 import {
@@ -18,13 +14,16 @@ import {
   fetchEntryModes,
   fetchExitModes,
   fetchFileStatus
-} from '../../../data/Requeteur/encounter'
-import { fetchGender, fetchStatus } from '../../../data/Requeteur/patient'
+} from '../../../services/cohortCreation/fetchEncounter'
+import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetchDemographic'
 import {
   fetchStatusDiagnostic,
   fetchDiagnosticTypes,
-  fetchCim10Diagnostic
-} from '../../../data/Requeteur/diagnosticCim10'
+  fetchCim10Diagnostic,
+  fetchCim10Hierarchy
+} from '../../../services/cohortCreation/fetchCondition'
+import { fetchCcamData, fetchCcamHierarchy } from '../../../services/cohortCreation/fetchProcedure'
+import { fetchGhmData } from '../../../services/cohortCreation/fetchClaim'
 
 // ├── Mes variables
 // ├── Patients
@@ -55,7 +54,7 @@ const criteriaList: CriteriaItemType[] = [
     title: 'Patients',
     color: '#0063AF',
     components: DemographicFrom,
-    data: { gender: 'loading', deceased: 'loading' },
+    data: { gender: 'loading', status: 'loading' },
     fetch: { fetchGender, fetchStatus }
   },
   {
@@ -83,22 +82,24 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Diagnostics',
         color: '#0063AF',
         components: Cim10Form,
-        data: { statusDiagnostic: 'loading', kindDiagnostic: 'loading', cim10Diagnostic: 'loading' },
-        fetch: { fetchStatusDiagnostic, fetchDiagnosticTypes, fetchCim10Diagnostic }
+        data: { statusDiagnostic: 'loading', diagnosticTypes: 'loading', cim10Diagnostic: 'loading' },
+        fetch: { fetchStatusDiagnostic, fetchDiagnosticTypes, fetchCim10Diagnostic, fetchCim10Hierarchy }
       },
       {
         id: 'Procedure',
         title: 'Actes',
         color: '#0063AF',
         components: CCAMForm,
-        data: { ccamData }
+        data: { ccamData: 'loading' },
+        fetch: { fetchCcamData, fetchCcamHierarchy }
       },
       {
         id: 'Claim',
         title: 'GHM',
         color: '#0063AF',
         components: GhmForm,
-        data: { ghmData }
+        data: { ghmData: 'loading' },
+        fetch: { fetchGhmData }
       }
     ]
   },

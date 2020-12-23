@@ -59,6 +59,7 @@ const StatusShip: React.FC<StatusShipProps> = ({ type }) => {
 }
 
 type TableauPatientsProps = {
+  groupId?: any
   deidentified?: boolean
   patients: CohortPatient[]
   loading?: boolean
@@ -72,6 +73,7 @@ type TableauPatientsProps = {
 }
 const TableauPatients: React.FC<TableauPatientsProps> = memo(
   ({
+    groupId,
     deidentified,
     patients,
     loading,
@@ -106,13 +108,7 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                   align="center"
                   className={classes.tableHeadCell}
                 >
-                  <TableSortLabel
-                    active={sortBy === 'gender'}
-                    direction={sortBy === 'gender' ? sortDirection : 'asc'}
-                    onClick={createSortHandler('gender')}
-                  >
-                    Sexe
-                  </TableSortLabel>
+                  Sexe
                 </TableCell>
                 <TableCell sortDirection={sortBy === 'given' ? sortDirection : false} className={classes.tableHeadCell}>
                   {deidentified ? (
@@ -186,7 +182,7 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                         key={patient.id}
                         className={classes.tableBodyRows}
                         hover
-                        onClick={() => history.push(`/patients/${patient.id}`)}
+                        onClick={() => history.push(`/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}`)}
                       >
                         <TableCell align="center">
                           {patient.gender && <PatientGender gender={patient.gender} className={classes.genderIcon} />}

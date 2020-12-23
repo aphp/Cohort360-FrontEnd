@@ -8,6 +8,7 @@ import { FormBuilder } from '@arkhn/ui'
 import useStyles from './styles'
 
 import { DemographicDataType } from 'types'
+
 type DemographicFormProps = {
   criteria: any
   selectedCriteria: any
@@ -40,7 +41,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
     })
   }
 
-  if (criteria.data.gender === 'loading') {
+  if (criteria.data.gender === 'loading' || criteria.data.status === 'loading') {
     return <></>
   }
 
@@ -78,20 +79,14 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             label: 'Genre',
             variant: 'outlined',
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.gender?.map((gender: any) => ({
-              id: gender.code,
-              label: gender.display
-            }))
+            autocompleteOptions: criteria?.data?.gender || []
           },
           {
             name: 'vitalStatus',
             variant: 'outlined',
             label: 'Status vital',
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.deceased?.map((deceased: any) => ({
-              id: deceased.value,
-              label: deceased.display
-            }))
+            autocompleteOptions: criteria?.data?.status || []
           },
           {
             name: 'years',

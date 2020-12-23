@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router'
+// import { useHistory } from 'react-router'
 import {
   Grid,
   Paper,
@@ -36,15 +36,15 @@ import {
   excludePatients,
   includePatients,
   removeImportedPatients,
-  removeExcludedPatients,
-  updateCohort
+  removeExcludedPatients
+  // updateCohort
 } from '../../../state/exploredCohort'
 import { getAgeArkhn } from '../../../utils/age'
 import { ReactComponent as FemaleIcon } from '../../../assets/icones/venus.svg'
 import { ReactComponent as MaleIcon } from '../../../assets/icones/mars.svg'
 
 import { getPatientsFromPerimeter, getPatientsFromCohortId } from 'services/patient'
-import { patchCohortMembers } from 'services/cohortCreation'
+// import { patchCohortMembers } from 'services/cohortCreation'
 
 const PatientRow = ({ patient, selected, fromCohort, onClickCheckbox }) => {
   const classes = useStyles()
@@ -418,19 +418,19 @@ InclusionExclusionContent.propType = {
   include: PropTypes.bool.isRequired
 }
 
-const InclusionExclusionPatientsPanel = ({ cohort }) => {
+const InclusionExclusionPatientsPanel = () => {
   const classes = useStyles()
-  const history = useHistory()
-  const dispatch = useDispatch()
+  // const history = useHistory()
+  // const dispatch = useDispatch()
 
   const [openModal, setOpenModal] = useState(false)
   const [modalContent, setModalContent] = useState(null)
 
   //eslint-disable-next-line
   const onSave = useCallback(async () => {
-    const newMembers = patchCohortMembers(cohort)
-    dispatch(updateCohort(newMembers))
-    history.push(`/cohort/${cohort.cohort.id}/apercu`)
+    // const newMembers = patchCohortMembers(cohort)
+    // dispatch(updateCohort(newMembers))
+    // history.push(`/cohort/${cohort.cohort.id}/apercu`)
   })
 
   return (

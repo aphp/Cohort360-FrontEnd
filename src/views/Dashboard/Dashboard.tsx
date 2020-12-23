@@ -148,10 +148,6 @@ const Dashboard: React.FC<{
     checkDeindentifiedStatus()
   }, [dashboard]) //eslint-disable-line
 
-  useEffect(() => {
-    selectTab(tabName || 'apercu')
-  }, [tabName])
-
   const handleOpenRedcapDialog = () => {
     setOpenRedcapDialog(true)
   }
@@ -279,9 +275,7 @@ const Dashboard: React.FC<{
             sortDirection={'desc'}
           />
         )}
-        {CONTEXT === 'arkhn' && selectedTab === 'inclusion-exclusion' && (
-          <InclusionExclusionPatientsPanel cohort={dashboard} />
-        )}
+        {CONTEXT === 'arkhn' && selectedTab === 'inclusion-exclusion' && <InclusionExclusionPatientsPanel />}
       </div>
     </Grid>
   )

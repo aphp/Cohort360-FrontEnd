@@ -1,7 +1,7 @@
 import api from './api'
 import { getLastEncounter } from './myPatients'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
-import { FHIR_API_Response, CohortData } from 'types'
+import { FHIR_API_Response, CohortData, ScopeTreeRow } from 'types'
 import { IOrganization, IHealthcareService, IEncounter, IPatient, IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   getGenderRepartitionMapAphp,
@@ -77,11 +77,6 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
 
     const originalPatients = await getLastEncounter(getApiResponseResources(patientsResp))
 
-    // const wordcloudData =
-    //   docsResp.data.resourceType === 'Bundle'
-    //     ? docsResp.data.meta?.extension
-    //     : []
-
     const agePyramidData =
       patientsResp?.data?.resourceType === 'Bundle'
         ? getAgeRepartitionMapAphp(
@@ -116,7 +111,6 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
       cohort,
       totalPatients,
       originalPatients,
-      // wordcloudData,
       genderRepartitionMap,
       visitTypeRepartitionData,
       agePyramidData,
@@ -142,4 +136,20 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
       }
     }
   }
+}
+
+export const fetchPerimeterInfoForRequeteur = async (perimetersId: string): Promise<ScopeTreeRow[] | null> => {
+  if (!perimetersId) return null
+
+  const groupsResults = await api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${perimetersId}`)
+  const groups = getApiResponseResources(groupsResults)
+  const scopeRows: ScopeTreeRow[] = groups
+    ? groups?.map<ScopeTreeRow>((group) => ({
+        ...group,
+        id: group.id ?? '0',
+        name: group.name?.replace(/^Patients passés par: /, '') ?? '',
+        quantity: group.quantity ?? 0
+      }))
+    : []
+  return scopeRows
 }

@@ -7,6 +7,7 @@ import { getApiResponseResources } from 'utils/apiHelpers'
 import { getServices } from './perimeters'
 
 export const searchPatient = async (
+  nominativeGroupsIds: string[] | undefined,
   page: number,
   sortBy: string,
   sortDirection: string,
@@ -83,7 +84,7 @@ export const searchPatient = async (
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
 
     const patientResp = await api.get<FHIR_API_Response<IPatient>>(
-      `/Patient?size=20&offset=${
+      `/Patient?_list=${nominativeGroupsIds}&size=20&offset=${
         page ? (page - 1) * 20 : 0
       }&_sort=${_sortDirection}${sortBy}&${searchBy}=${input}&_elements=gender,name,birthDate,deceased,identifier,extension`
     )

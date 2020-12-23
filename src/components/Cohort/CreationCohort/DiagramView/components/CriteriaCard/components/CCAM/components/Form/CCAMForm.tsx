@@ -16,16 +16,17 @@ type CcamFormProps = {
   onChangeSelectedCriteria: (data: any) => void
 }
 
-const defaultDemographic = {
+const defaultProcedure = {
   title: "Critères d'actes CCAM",
   code: [],
+  encounter: 0,
   startOccurrence: '',
   endOccurrence: ''
 }
 
 const CcamForm: React.FC<CcamFormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const defaultValues = selectedCriteria || defaultDemographic
+  const defaultValues = selectedCriteria || defaultProcedure
 
   const classes = useStyles()
 
@@ -35,10 +36,17 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
     onChangeSelectedCriteria({
       title: data.title,
       code: data.code,
+      encounter: data.encounter,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Procedure'
     })
+  }
+
+  const getCCAMOptions = async (searchValue: string) => {
+    const ccamOptions = await criteria.fetch.fetchCcamData(searchValue)
+
+    return ccamOptions && ccamOptions.length > 0 ? ccamOptions : []
   }
 
   return (
@@ -75,15 +83,32 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             label: "Codes d'actes CCAM",
             variant: 'outlined',
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.ccamData?.map((ccamData: any) => ({
-              id: ccamData['CCAM CODE'],
-              label: `${ccamData['CCAM CODE']} - ${ccamData['LONG DESCRIPTION']}`
-            }))
+            autocompleteOptions: criteria?.data?.ccamData || [],
+            getAutocompleteOptions: getCCAMOptions
+          },
+          // {
+          //   name: 'hierarchy',
+          //   type: 'custom',
+          //   renderInput: () => (
+          //     <Button className={classes.linkTable} href="/accueil">
+          //       retour sur le home
+          //     </Button>
+          //   )
+          // },
+          {
+            name: 'encounter',
+            label: "Nombre d'occurence",
+            variant: 'outlined',
+            type: 'number'
           },
           {
             type: 'custom',
             name: 'label',
-            renderInput: () => <FormLabel component="legend">Date d'occurrence :</FormLabel>
+            renderInput: () => (
+              <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+                Date d'occurrence :
+              </FormLabel>
+            )
           },
           {
             name: 'startOccurrence',

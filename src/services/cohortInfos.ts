@@ -151,7 +151,17 @@ const fetchPatientList = async (
 > => {
   if (CONTEXT === 'arkhn') {
     //TODO: Improve api request (we filter after getting all the patients)
-    const patientsResp = await searchPatient(page, sortBy, sortDirection, searchInput, searchBy, groupId)
+    const nominativeGroupsIds: any[] = []
+
+    const patientsResp = await searchPatient(
+      nominativeGroupsIds,
+      page,
+      sortBy,
+      sortDirection,
+      searchInput,
+      searchBy,
+      groupId
+    )
 
     if (patientsResp) {
       const filteredPatients: IPatient[] = patientsResp.patientList.filter((patient) => {
@@ -307,7 +317,10 @@ const fetchDocuments = async (
       elements = '&_elements=status,type,subject,encounter,date,title'
     }
 
-    const [docsList, allDocsList] = await Promise.all([
+    const [wordCloudRequest, docsList, allDocsList] = await Promise.all([
+      api.get<FHIR_API_Response<IComposition>>(
+        `/Composition?facet=cloud&size=0&_sort=${_sortDirection}${sortBy}&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
+      ),
       api.get<FHIR_API_Response<IComposition>>(
         `/Composition?size=20&_sort=${_sortDirection}${sortBy}&offset=${
           page ? (page - 1) * 20 : 0
@@ -327,12 +340,12 @@ const fetchDocuments = async (
         : 0
       : totalDocs
 
-    const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsList))
+    const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
 
-    // const wordcloudData =
-    //   docsList.data.resourceType === 'Bundle'
-    //     ? docsList.data.meta?.extension
-    //     : []
+    const wordcloudData =
+      wordCloudRequest.data.resourceType === 'Bundle'
+        ? wordCloudRequest.data.meta?.extension?.find((facet: any) => facet.url === 'facet-cloud')?.extension
+        : []
 
     if (totalDocs === 0) {
       return null
@@ -340,8 +353,8 @@ const fetchDocuments = async (
       return {
         totalDocs,
         totalAllDocs,
-        documentsList
-        // wordcloudData
+        documentsList,
+        wordcloudData
       }
     }
   }

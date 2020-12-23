@@ -91,7 +91,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
           {
             type: 'custom',
             name: 'label',
-            renderInput: () => <FormLabel component="legend">Age au moment de la prise en charge :</FormLabel>
+            renderInput: () => <FormLabel component="legend">Âge au moment de la prise en charge :</FormLabel>
           },
           {
             name: 'ageType',
@@ -123,40 +123,28 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
             variant: 'outlined',
             label: "Mode d'admission",
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.admissionModes?.map((admissionModes: any) => ({
-              id: admissionModes.code,
-              label: admissionModes.display
-            }))
+            autocompleteOptions: criteria?.data?.admissionModes
           },
           {
             name: 'entryMode',
             variant: 'outlined',
-            label: "Mode d'entré",
+            label: "Mode d'entrée",
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.entryModes?.map((entryModes: any) => ({
-              id: entryModes.code,
-              label: entryModes.display
-            }))
+            autocompleteOptions: criteria?.data?.entryModes
           },
           {
             name: 'exitMode',
             variant: 'outlined',
             label: 'Mode de sortie',
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.exitModes?.map((exitModes: any) => ({
-              id: exitModes.code,
-              label: exitModes.display
-            }))
+            autocompleteOptions: criteria?.data?.exitModes
           },
           {
             name: 'fileStatus',
             variant: 'outlined',
-            label: 'Status Dossier',
+            label: 'Statut Dossier',
             type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.fileStatus?.map((fileStatus: any) => ({
-              id: fileStatus.code,
-              label: fileStatus.display
-            }))
+            autocompleteOptions: criteria?.data?.fileStatus
           }
         ]}
         submit={_onSubmit}

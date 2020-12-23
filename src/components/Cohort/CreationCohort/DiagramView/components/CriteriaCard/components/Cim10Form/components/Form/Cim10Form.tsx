@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -16,16 +16,18 @@ type Cim10FormProps = {
   onChangeSelectedCriteria: (data: any) => void
 }
 
-const defaultDemographic = {
+const defaultCondition = {
   title: 'Critère de diagnostic',
   code: [],
+  diagnosticType: '',
+  encounter: 0,
   startOccurrence: '',
   endOccurrence: ''
 }
 
 const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const defaultValues = selectedCriteria || defaultDemographic
+  const defaultValues = selectedCriteria || defaultCondition
 
   const classes = useStyles()
 
@@ -35,8 +37,24 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     onChangeSelectedCriteria({
       title: data.title,
       code: data.code,
+      diagnosticType: data.diagnosticType,
+      encounter: data.encounter,
+      startOccurrence: data.startOccurrence,
+      endOccurrence: data.endOccurrence,
       type: 'Condition'
     })
+  }
+
+  const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue)
+
+  if (
+    criteria &&
+    criteria.data &&
+    (criteria.data.diagnosticTypes === 'loading' ||
+      criteria.data.statusDiagnostic === 'loading' ||
+      criteria.data.cim10Diagnostic === 'loading')
+  ) {
+    return <> </>
   }
 
   return (
@@ -73,11 +91,40 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             label: 'CIM 10 Diag Code',
             variant: 'outlined',
             type: 'autocomplete',
-            autocompleteOptions:
-              criteria?.data?.cimData?.map((cimData: any) => ({
-                id: cimData['DIAGNOSIS CODE'],
-                label: `${cimData['DIAGNOSIS CODE']} - ${cimData['LONG DESCRIPTION']}`
-              })) || []
+            autocompleteOptions: criteria?.data?.cim10Diagnostic || [],
+            getAutocompleteOptions: getDiagOptions
+          },
+          {
+            name: 'diagnosticType',
+            label: 'Type de diagnostic',
+            variant: 'outlined',
+            type: 'autocomplete',
+            autocompleteOptions: criteria?.data?.diagnosticTypes || []
+          },
+          {
+            name: 'encounter',
+            label: "Nombre d'occurence",
+            variant: 'outlined',
+            type: 'number'
+          },
+          {
+            type: 'custom',
+            name: 'label',
+            renderInput: () => (
+              <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+                Date d'occurrence :
+              </FormLabel>
+            )
+          },
+          {
+            name: 'startOccurrence',
+            label: 'Avant le',
+            type: 'date'
+          },
+          {
+            name: 'endOccurrence',
+            label: 'Après le',
+            type: 'date'
           }
         ]}
         submit={_onSubmit}

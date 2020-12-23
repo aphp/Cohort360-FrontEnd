@@ -19,6 +19,7 @@ type TestGeneratedFormProps = {
 const defaultDemographic = {
   title: 'Critère de GHM',
   code: [],
+  encounter: 0,
   startOccurrence: '',
   endOccurrence: ''
 }
@@ -36,11 +37,14 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
       title: data.title,
       code: data.code,
       occurence: data.occurence,
+      encounter: data.encounter,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Claim'
     })
   }
+
+  const getGhmOptions = async (searchValue: string) => await criteria.fetch.fetchGhmData(searchValue)
 
   return (
     <Grid className={classes.root}>
@@ -68,7 +72,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
             type: 'text',
             variant: 'outlined',
             validationRules: {
-              required: 'Merci de renseigné un titre'
+              required: 'Merci de renseigner un titre'
             }
           },
           {
@@ -76,21 +80,23 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
             label: 'GHM 10 Diag Code',
             variant: 'outlined',
             type: 'autocomplete',
-            autocompleteOptions:
-              criteria?.data?.ghmData?.map((ghmData: any) => ({
-                id: ghmData['GHM CODE'],
-                label: `${ghmData['GHM CODE']} - ${ghmData['LONG DESCRIPTION']}`
-              })) || []
+            autocompleteOptions: criteria?.data?.ghmData || [],
+            getAutocompleteOptions: getGhmOptions
           },
           {
-            name: 'occurence',
-            label: 'Nombre d’occurrences :',
+            name: 'encounter',
+            label: "Nombre d'occurence",
+            variant: 'outlined',
             type: 'number'
           },
           {
             type: 'custom',
             name: 'label',
-            renderInput: () => <FormLabel component="legend">Date d'occurrence :</FormLabel>
+            renderInput: () => (
+              <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+                Date d'occurrence :
+              </FormLabel>
+            )
           },
           {
             name: 'startOccurrence',
