@@ -23,3 +23,56 @@ export const fetchCcamData = async (searchValue?: string) => {
     })) || []
   )
 }
+
+export const fetchCcamHierarchy = async (ccamParent: string) => {
+  if (!ccamParent) {
+    const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-ccam`)
+
+    let CCAMList =
+      res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+        ? res.data.entry[0].resource.compose.include[0].concept
+        : []
+
+    CCAMList =
+      CCAMList && CCAMList.length > 0
+        ? CCAMList.sort(alphabeticalSort).map((ccamData: any) => ({
+            id: ccamData.code,
+            label: `${ccamData.code} - ${ccamData.display}`
+          }))
+        : []
+    return CCAMList
+  } else {
+    const json = {
+      resourceType: 'ValueSet',
+      url: 'https://terminology.eds.aphp.fr/aphp-orbis-ccam',
+      compose: {
+        include: [
+          {
+            filter: [
+              {
+                op: 'is-a',
+                value: ccamParent ?? ''
+              }
+            ]
+          }
+        ]
+      }
+    }
+
+    const res = await apiRequest.post(`/ValueSet/$expand`, JSON.stringify(json))
+
+    let CCAMList =
+      res && res.data && res.data.expansion && res.data.expansion.contains && res.data.resourceType === 'ValueSet'
+        ? res.data.expansion.contains
+        : []
+
+    CCAMList =
+      CCAMList && CCAMList.length > 0
+        ? CCAMList.sort(alphabeticalSort).map((ccamData: any) => ({
+            id: ccamData.code,
+            label: `${ccamData.code} - ${ccamData.display}`
+          }))
+        : []
+    return CCAMList
+  }
+}

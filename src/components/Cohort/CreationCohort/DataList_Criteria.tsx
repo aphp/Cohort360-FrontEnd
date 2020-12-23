@@ -4,7 +4,7 @@ import { CriteriaItemType } from 'types'
 import DemographicFrom from './DiagramView/components/CriteriaCard/components/DemographicFrom/DemographicFrom'
 import DocumentsForm from './DiagramView/components/CriteriaCard/components/DocumentsForm/DocumentsForm'
 import SupportedForm from './DiagramView/components/CriteriaCard/components/SupportedForm/SupportedForm'
-import CCAMForm from './DiagramView/components/CriteriaCard/components/CCAM/index'
+import CCAMForm from './DiagramView/components/CriteriaCard/components/CCAM'
 import Cim10Form from './DiagramView/components/CriteriaCard/components/Cim10Form'
 import GhmForm from './DiagramView/components/CriteriaCard/components/GhmForm/GhmForm'
 
@@ -22,7 +22,7 @@ import {
   fetchCim10Diagnostic,
   fetchCim10Hierarchy
 } from '../../../services/cohortCreation/fetchCondition'
-import { fetchCcamData } from '../../../services/cohortCreation/fetchProcedure'
+import { fetchCcamData, fetchCcamHierarchy } from '../../../services/cohortCreation/fetchProcedure'
 import { fetchGhmData } from '../../../services/cohortCreation/fetchClaim'
 
 // ├── Mes variables
@@ -91,7 +91,7 @@ const criteriaList: CriteriaItemType[] = [
         color: '#0063AF',
         components: CCAMForm,
         data: { ccamData: 'loading' },
-        fetch: { fetchCcamData }
+        fetch: { fetchCcamData, fetchCcamHierarchy }
       },
       {
         id: 'Claim',
