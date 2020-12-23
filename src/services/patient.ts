@@ -23,7 +23,11 @@ export const fetchPatientsCount = async (): Promise<number | undefined> => {
   return response.data.total
 }
 
-export const fillNDAAndServiceProviderDocs = async (deidentifiedBoolean?: boolean, docs?: CohortComposition[]) => {
+export const fillNDAAndServiceProviderDocs = async (
+  deidentifiedBoolean?: boolean,
+  docs?: CohortComposition[],
+  groupId?: string
+) => {
   if (!docs) {
     return undefined
   }
@@ -42,8 +46,10 @@ export const fillNDAAndServiceProviderDocs = async (deidentifiedBoolean?: boolea
     return docs
   }
 
+  const groupFilter = groupId ? `&_list=${groupId}` : ''
+
   const encounters = await api.get<FHIR_API_Response<IEncounter>>(
-    `/Encounter?_id=${noDuplicatesList.join()}&type=VISIT&_elements=status,serviceProvider,identifier`
+    `/Encounter?_id=${noDuplicatesList.join()}&type=VISIT&_elements=status,serviceProvider,identifier${groupFilter}`
   )
   if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
     return []
@@ -77,7 +83,8 @@ export const fillNDAAndServiceProviderDocs = async (deidentifiedBoolean?: boolea
 
 export async function fillNDAAndServiceProvider<T extends IProcedure | ICondition | IClaim>(
   deidentifiedBoolean?: boolean,
-  pmsi?: T[]
+  pmsi?: T[],
+  groupId?: string
 ): Promise<PMSIEntry<T>[] | undefined> {
   if (!pmsi) {
     return undefined
@@ -105,8 +112,10 @@ export async function fillNDAAndServiceProvider<T extends IProcedure | IConditio
     return pmsiEntries
   }
 
+  const groupFilter = groupId ? `&_list=${groupId}` : ''
+
   const encounters = await api.get<FHIR_API_Response<IEncounter>>(
-    `/Encounter?_id=${noDuplicatesList}&type=VISIT&_elements=serviceProvider,identifier`
+    `/Encounter?_id=${noDuplicatesList}&type=VISIT&_elements=serviceProvider,identifier${groupFilter}`
   )
 
   if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
@@ -186,6 +195,7 @@ export const fetchPMSI = async (
   diagnosticTypes: string[],
   sortBy: string,
   sortDirection: string,
+  groupId?: string,
   startDate?: string,
   endDate?: string
 ): Promise<{
@@ -255,6 +265,7 @@ export const fetchPMSI = async (
     let _sortBy = sortBy
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
     let dateFilter = ''
+    const groupFilter = groupId ? `&_list=${groupId}` : ''
 
     switch (selectedTab) {
       case 'CIM10':
@@ -313,12 +324,12 @@ export const fetchPMSI = async (
     const pmsiResp = await api.get<FHIR_API_Response<IClaim | IProcedure | ICondition>>(
       `${resource}?patient=${patientId}&_sort=${_sortDirection}${_sortBy}&size=20&offset=${
         (page - 1) * 20
-      }${search}${ndaFilter}${codeFilter}${diagnosticTypesFilter}${dateFilter}`
+      }${search}${ndaFilter}${codeFilter}${diagnosticTypesFilter}${dateFilter}${groupFilter}`
     )
 
     const pmsiData =
       pmsiResp.data.resourceType === 'Bundle'
-        ? await fillNDAAndServiceProvider(deidentified, getApiResponseResources(pmsiResp))
+        ? await fillNDAAndServiceProvider(deidentified, getApiResponseResources(pmsiResp), groupId)
         : undefined
 
     const pmsiTotal = pmsiResp.data.resourceType === 'Bundle' ? pmsiResp.data.total : 0
@@ -342,13 +353,15 @@ export const fetchDocuments = async (
   selectedDocTypes: string[],
   nda: string,
   startDate?: string,
-  endDate?: string
+  endDate?: string,
+  groupId?: string
 ) => {
   if (CONTEXT === 'aphp') {
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
     const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : []
     const search = searchInput ? `&_text=${searchInput}` : ''
     const ndaFilter = nda ? `&encounter.identifier=${nda}` : ''
+    const groupFilter = groupId ? `&_list=${groupId}` : ''
     let dateFilter = ''
     let elements = ''
 
@@ -369,7 +382,7 @@ export const fetchDocuments = async (
     const docsList = await api.get(
       `/Composition?patient=${patientId}&_sort=${_sortDirection}${sortBy}&size=20&offset=${
         page ? (page - 1) * 20 : 0
-      }&status=final${elements}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
+      }&status=final${elements}${search}${docTypesFilter}${ndaFilter}${dateFilter}${groupFilter}`
     )
 
     if (!docsList.data.total) {
@@ -377,7 +390,7 @@ export const fetchDocuments = async (
     } else {
       return {
         docsTotal: docsList.data.total,
-        docsList: await fillNDAAndServiceProviderDocs(deidentified, getApiResponseResources(docsList))
+        docsList: await fillNDAAndServiceProviderDocs(deidentified, getApiResponseResources(docsList), groupId)
       }
     }
   }
@@ -495,7 +508,7 @@ export const getEncounterOrProcedureDocs = async (
   return []
 }
 
-export const fetchPatient = async (patientId: string): Promise<PatientData | undefined> => {
+export const fetchPatient = async (patientId: string, groupId?: string): Promise<PatientData | undefined> => {
   if (CONTEXT === 'arkhn') {
     const [
       patientResponse,
@@ -550,6 +563,8 @@ export const fetchPatient = async (patientId: string): Promise<PatientData | und
       hospit
     }
   } else if (CONTEXT === 'aphp') {
+    const groupFilter = groupId ? `&_list=${groupId}` : ''
+
     const [
       patientResponse,
       procedureResponse,
@@ -558,55 +573,61 @@ export const fetchPatient = async (patientId: string): Promise<PatientData | und
       ghmResponse,
       documentsResponse
     ] = await Promise.all([
-      api.get<IPatient>(`/Patient/${patientId}`),
-      api.get<FHIR_API_Response<IProcedure>>(`/Procedure?patient=${patientId}&_sort=-date&status=completed&size=20`),
-      api.get<FHIR_API_Response<IEncounter>>(
-        `/Encounter?patient=${patientId}&type=VISIT&status=arrived,triaged,in-progress,onleave,finished,unknown&_sort=-start-date`
+      api.get<FHIR_API_Response<IPatient>>(`/Patient?_id=${patientId}${groupFilter}`),
+      api.get<FHIR_API_Response<IProcedure>>(
+        `/Procedure?patient=${patientId}&_sort=-date&status=completed&size=20${groupFilter}`
       ),
-      api.get<FHIR_API_Response<ICondition>>(`/Condition?patient=${patientId}&_sort=-recorded-date&size=20`),
-      api.get<FHIR_API_Response<IClaim>>(`/Claim?patient=${patientId}&_sort=-created&size=20`),
+      api.get<FHIR_API_Response<IEncounter>>(
+        `/Encounter?patient=${patientId}&type=VISIT&status=arrived,triaged,in-progress,onleave,finished,unknown&_sort=-start-date${groupFilter}`
+      ),
+      api.get<FHIR_API_Response<ICondition>>(
+        `/Condition?patient=${patientId}&_sort=-recorded-date&size=20${groupFilter}`
+      ),
+      api.get<FHIR_API_Response<IClaim>>(`/Claim?patient=${patientId}&_sort=-created&size=20${groupFilter}`),
       api.get<FHIR_API_Response<IComposition>>(
-        `/Composition?patient=${patientId}&size=20&_sort=-date&status=final&_elements=status,type,encounter,date,title`
+        `/Composition?patient=${patientId}&size=20&_sort=-date&status=final&_elements=status,type,encounter,date,title${groupFilter}`
       )
     ])
 
-    const deidentifiedBoolean = patientResponse.data
-      ? patientResponse.data.extension?.find((extension) => extension.url === 'deidentified')?.valueBoolean
+    const patientData = getApiResponseResources(patientResponse)
+
+    const deidentifiedBoolean = patientData
+      ? patientData[0].extension?.find((extension) => extension.url === 'deidentified')?.valueBoolean
       : true
 
     const hospit = getApiResponseResources(encounterResponse)
 
     const documents =
       documentsResponse.data.resourceType === 'Bundle'
-        ? await fillNDAAndServiceProviderDocs(deidentifiedBoolean, getApiResponseResources(documentsResponse))
+        ? await fillNDAAndServiceProviderDocs(deidentifiedBoolean, getApiResponseResources(documentsResponse), groupId)
         : undefined
 
     const documentsTotal = documentsResponse.data.resourceType === 'Bundle' ? documentsResponse.data.total : 0
 
     const consult =
       procedureResponse.data.resourceType === 'Bundle'
-        ? await fillNDAAndServiceProvider(deidentifiedBoolean, getApiResponseResources(procedureResponse))
+        ? await fillNDAAndServiceProvider(deidentifiedBoolean, getApiResponseResources(procedureResponse), groupId)
         : undefined
 
     const consultTotal = procedureResponse.data.resourceType === 'Bundle' ? procedureResponse.data.total : 0
 
     const diagnostic =
       diagnosticResponse.data.resourceType === 'Bundle'
-        ? await fillNDAAndServiceProvider(deidentifiedBoolean, getApiResponseResources(diagnosticResponse))
+        ? await fillNDAAndServiceProvider(deidentifiedBoolean, getApiResponseResources(diagnosticResponse), groupId)
         : undefined
 
     const diagnosticTotal = diagnosticResponse.data.resourceType === 'Bundle' ? diagnosticResponse.data.total : 0
 
     const ghm =
       ghmResponse.data.resourceType === 'Bundle'
-        ? await fillNDAAndServiceProvider(deidentifiedBoolean, getApiResponseResources(ghmResponse))
+        ? await fillNDAAndServiceProvider(deidentifiedBoolean, getApiResponseResources(ghmResponse), groupId)
         : undefined
 
     const ghmTotal = ghmResponse.data.resourceType === 'Bundle' ? ghmResponse.data.total : 0
 
     const patient = patientResponse.data
       ? ({
-          ...patientResponse.data,
+          ...patientData?.[0],
           lastEncounter: hospit?.[0],
           lastProcedure: consult?.[0],
           lastGhm: ghm?.[0],

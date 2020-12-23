@@ -305,6 +305,7 @@ const PatientList: React.FC<PatientListProps> = ({
             </div>
           </Grid>
           <TableauPatient
+            groupId={groupId}
             deidentified={deidentified}
             patients={patientsList ?? []}
             loading={patientsList === undefined ? true : loadingStatus}

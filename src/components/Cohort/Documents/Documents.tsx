@@ -226,6 +226,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
             </Grid>
           </Grid>
           <DocumentList
+            groupId={groupId}
             loading={loadingStatus ?? false}
             documents={documentsToDisplay}
             searchMode={searchMode}
