@@ -19,6 +19,7 @@ type TestGeneratedFormProps = {
 const defaultDemographic = {
   title: 'Critère de GHM',
   code: [],
+  encounter: 0,
   startOccurrence: '',
   endOccurrence: ''
 }
@@ -36,6 +37,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
       title: data.title,
       code: data.code,
       occurence: data.occurence,
+      encounter: data.encounter,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Claim'
@@ -82,8 +84,9 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
             getAutocompleteOptions: getGhmOptions
           },
           {
-            name: 'occurence',
-            label: 'Nombre d’occurrences :',
+            name: 'encounter',
+            label: "Nombre d'occurence",
+            variant: 'outlined',
             type: 'number'
           },
           {

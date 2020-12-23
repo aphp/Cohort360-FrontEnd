@@ -103,7 +103,6 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
         : []
     return cim10List
   } else {
-    cim10Parent = 'A00-B99'
     const json = {
       resourceType: 'ValueSet',
       url: 'https://terminology.eds.aphp.fr/aphp-orbis-cim-',
@@ -125,8 +124,6 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
       params: JSON.stringify(json)
       // paramsSerializer: () => JSON.stringify(json)
     })
-
-    console.log('res', res)
 
     let cim10List =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'

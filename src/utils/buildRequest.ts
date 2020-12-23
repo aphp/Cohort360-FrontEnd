@@ -18,19 +18,25 @@ const ENCOUNTER_FILESTATUS = 'fileStatus'
 
 const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
 const CLAIM_CODE = 'code'
-const CLAIM_CREATED = 'created'
+const CLAIM_DATE = 'date'
+const CLAIM_ENCOUNTER = 'encounter'
 
 const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
 const PROCEDURE_CODE = 'code'
 const PROCEDURE_DATE = 'date'
+const PROCEDURE_ENCOUNTER = 'encounter'
 
 const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition'
 const CONDITION_CODE = 'code'
 const CONDITION_TYPE = 'type'
+const CONDITION_DATE = 'date'
+const CONDITION_ENCOUNTER = 'encounter'
 
 const RESSOURCE_TYPE_COMPOSITION: 'Composition' = 'Composition'
 const COMPOSITION_TEXT = 'text'
 const COMPOSITION_TYPE = 'type'
+const COMPOSITION_DATE = 'date'
+const COMPOSITION_ENCOUNTER = 'encounter'
 
 type RequeteurSearchType = {
   _type: string
@@ -79,7 +85,9 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
           `${selectedCriterion.gender ? `${PATIENT_GENDER}=${selectedCriterion.gender.id}` : ''}`,
           `${selectedCriterion.vitalStatus ? `${PATIENT_DECEASED}=${selectedCriterion.vitalStatus.id}` : ''}`,
           `${ageFilter ? `${ageFilter}` : ''}`
-        ].reduce(filterReducer)
+        ]
+          .filter((elem) => elem)
+          .reduce(filterReducer)
         break
       }
 
@@ -109,23 +117,53 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
           `${selectedCriterion.fileStatus ? `${ENCOUNTER_FILESTATUS}=${selectedCriterion.fileStatus.id}` : ''}`,
           `${lengthFilter ? `${lengthFilter}` : ''}`,
           `${ageFilter ? `${ageFilter}` : ''}`
-        ].reduce(filterReducer)
+        ]
+          .filter((elem) => elem)
+          .reduce(filterReducer)
         break
       }
 
       case RESSOURCE_TYPE_COMPOSITION: {
+        let dateFilter = ''
+        if (selectedCriterion.startOccurrence || selectedCriterion.endOccurrence) {
+          dateFilter = [
+            selectedCriterion.startOccurrence
+              ? `ge${moment(selectedCriterion.startOccurrence).format('YYYY-MM-DD')}`
+              : '',
+            selectedCriterion.endOccurrence ? `le${moment(selectedCriterion.endOccurrence).format('YYYY-MM-DD')}` : ''
+          ].reduce(searchReducer)
+        }
+
         fhirFilter = [
           `${selectedCriterion.search ? `${COMPOSITION_TEXT}=${selectedCriterion.search}` : ''}`,
-          `${selectedCriterion.docType ? `${COMPOSITION_TYPE}=${selectedCriterion.docType.id}` : ''}`
-        ].reduce(filterReducer)
+          `${selectedCriterion.docType ? `${COMPOSITION_TYPE}=${selectedCriterion.docType.id}` : ''}`,
+          `${selectedCriterion.encounter ? `${COMPOSITION_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
+          `${dateFilter ? `${COMPOSITION_DATE}=${dateFilter}` : ''}`
+        ]
+          .filter((elem) => elem)
+          .reduce(filterReducer)
         break
       }
 
       case RESSOURCE_TYPE_CONDITION: {
+        let dateFilter = ''
+        if (selectedCriterion.startOccurrence || selectedCriterion.endOccurrence) {
+          dateFilter = [
+            selectedCriterion.startOccurrence
+              ? `ge${moment(selectedCriterion.startOccurrence).format('YYYY-MM-DD')}`
+              : '',
+            selectedCriterion.endOccurrence ? `le${moment(selectedCriterion.endOccurrence).format('YYYY-MM-DD')}` : ''
+          ].reduce(searchReducer)
+        }
+
         fhirFilter = [
           `${selectedCriterion.code ? `${CONDITION_CODE}=${selectedCriterion.code.id}` : ''}`,
-          `${selectedCriterion.diagnosticType ? `${CONDITION_TYPE}=${selectedCriterion.diagnosticType.id}` : ''}`
-        ].reduce(filterReducer)
+          `${selectedCriterion.diagnosticType ? `${CONDITION_TYPE}=${selectedCriterion.diagnosticType.id}` : ''}`,
+          `${selectedCriterion.encounter ? `${CONDITION_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
+          `${dateFilter ? `${CONDITION_DATE}=${dateFilter}` : ''}`
+        ]
+          .filter((elem) => elem)
+          .reduce(filterReducer)
         break
       }
 
@@ -142,8 +180,11 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
 
         fhirFilter = [
           `${selectedCriterion.code ? `${PROCEDURE_CODE}=${selectedCriterion.code.id}` : ''}`,
+          `${selectedCriterion.encounter ? `${PROCEDURE_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
           `${dateFilter ? `${PROCEDURE_DATE}=${dateFilter}` : ''}`
-        ].reduce(filterReducer)
+        ]
+          .filter((elem) => elem)
+          .reduce(filterReducer)
         break
       }
 
@@ -164,8 +205,11 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
 
         fhirFilter = [
           `${selectedCriterion.code ? `${CLAIM_CODE}=${selectedCriterion.code.id}` : ''}`,
-          `${dateFilter ? `${CLAIM_CREATED}=${dateFilter}` : ''}`
-        ].reduce(filterReducer)
+          `${selectedCriterion.encounter ? `${CLAIM_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
+          `${dateFilter ? `${CLAIM_DATE}=${dateFilter}` : ''}`
+        ]
+          .filter((elem) => elem)
+          .reduce(filterReducer)
         break
       }
 
@@ -296,6 +340,9 @@ export async function unbuildRequest(json: string) {
           currentCriterion.title = 'Critère de document'
           currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
           currentCriterion.docType = currentCriterion.docType ? currentCriterion.docType : null
+          currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
+          currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
+          currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
 
           for (const filter of filters) {
             const key = filter ? filter[0] : null
@@ -307,6 +354,18 @@ export async function unbuildRequest(json: string) {
               case COMPOSITION_TYPE:
                 currentCriterion.docType = { id: value }
                 break
+              case COMPOSITION_ENCOUNTER:
+                currentCriterion.encounter = value
+                break
+              case COMPOSITION_DATE: {
+                const dates = value?.split(',')
+                const startOccurrence = dates ? moment(dates[0].replace(/[le|ge]/, ''), 'YYYY-MM-DD') : null
+                const endOccurrence = dates ? moment(dates[1].replace(/[ge|le]/, ''), 'YYYY-MM-DD') : null
+
+                currentCriterion.startOccurrence = startOccurrence
+                currentCriterion.endOccurrence = endOccurrence
+                break
+              }
               default:
                 break
             }
@@ -321,6 +380,9 @@ export async function unbuildRequest(json: string) {
           currentCriterion.title = 'Critère de diagnostic'
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
           currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : null
+          currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
+          currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
+          currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
 
           for (const filter of filters) {
             const key = filter ? filter[0] : null
@@ -332,12 +394,23 @@ export async function unbuildRequest(json: string) {
               case CONDITION_TYPE:
                 currentCriterion.diagnosticType = { id: value }
                 break
+              case CONDITION_ENCOUNTER:
+                currentCriterion.encounter = value
+                break
+              case CONDITION_DATE: {
+                const dates = value?.split(',')
+                const startOccurrence = dates ? moment(dates[0].replace(/[le|ge]/, ''), 'YYYY-MM-DD') : null
+                const endOccurrence = dates ? moment(dates[1].replace(/[ge|le]/, ''), 'YYYY-MM-DD') : null
+
+                currentCriterion.startOccurrence = startOccurrence
+                currentCriterion.endOccurrence = endOccurrence
+                break
+              }
               default:
                 break
             }
           }
         }
-        console.log('currentCriterion', currentCriterion)
         break
       }
       case RESSOURCE_TYPE_PROCEDURE: {
@@ -347,6 +420,9 @@ export async function unbuildRequest(json: string) {
           currentCriterion.title = "Critères d'actes CCAM"
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
           currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : null
+          currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
+          currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
+          currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
 
           for (const filter of filters) {
             const key = filter ? filter[0] : null
@@ -354,6 +430,9 @@ export async function unbuildRequest(json: string) {
             switch (key) {
               case PROCEDURE_CODE:
                 currentCriterion.code = { id: value }
+                break
+              case PROCEDURE_ENCOUNTER:
+                currentCriterion.encounter = value
                 break
               case PROCEDURE_DATE: {
                 const dates = value?.split(',')
@@ -377,6 +456,7 @@ export async function unbuildRequest(json: string) {
 
           currentCriterion.title = 'Critère de GHM'
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
+          currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
 
@@ -387,7 +467,10 @@ export async function unbuildRequest(json: string) {
               case CLAIM_CODE:
                 currentCriterion.code = { id: value }
                 break
-              case CLAIM_CREATED: {
+              case CLAIM_ENCOUNTER:
+                currentCriterion.encounter = value
+                break
+              case CLAIM_DATE: {
                 const dates = value?.split(',')
                 const startOccurrence = dates ? moment(dates[0].replace(/[le|ge]/, ''), 'YYYY-MM-DD') : null
                 const endOccurrence = dates ? moment(dates[1].replace(/[ge|le]/, ''), 'YYYY-MM-DD') : null

@@ -223,9 +223,10 @@ export type SelectedCriteriaType = {
   title: string
   code?: { id: string; label: string }
   diagnosticType?: { id: string; label: string }
-  label?: undefined
-  startOccurrence?: Date
-  endOccurrence?: Date
+  encounter: number
+  label: undefined
+  startOccurrence: Date
+  endOccurrence: Date
   gender?: { id: string; label: string }
   vitalStatus?: { id: string; label: string }
   years?: [number, number]
@@ -244,6 +245,7 @@ export type CcamDataType = {
   title: string
   hierarchy: undefined
   code: { id: string; label: string } | null
+  encounter: number
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
@@ -253,6 +255,10 @@ export type Cim10DataType = {
   title: string
   code: { id: string; label: string } | null
   diagnosticType: { id: string; label: string } | null
+  encounter: number
+  label: undefined
+  startOccurrence: Date
+  endOccurrence: Date
 }
 
 export type DemographicDataType = {
@@ -266,12 +272,16 @@ export type DocumentDataType = {
   title: string
   search: string
   docType: { id: string; label: string } | null
+  encounter: number
+  label: undefined
+  startOccurrence: Date
+  endOccurrence: Date
 }
 
 export type GhmDataType = {
   title: string
   code: { id: string; label: string } | null
-  occurence: number
+  encounter: number
   label: undefined
   startOccurrence: Date
   endOccurrence: Date

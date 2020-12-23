@@ -34,9 +34,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
 
   const _onExpand = async (cimCode: string) => {
     setOpen(!open)
-    console.log('cimCode', cimCode)
     const _subItems = await fetchHierarchy(cimCode)
-    console.log('_subItems', _subItems)
     setSubItems(_subItems)
   }
 
@@ -91,20 +89,22 @@ type Cim10HierarchyProps = {
   onChangeSelectedCriteria: (data: any) => void
 }
 
-const defaultCondition = {
-  title: 'Critère de diagnostic',
-  code: [],
-  diagnosticType: '',
-  startOccurrence: '',
-  endOccurrence: ''
-}
+// const defaultCondition = {
+//   title: 'Critère de diagnostic',
+//   code: [],
+//   diagnosticType: '',
+//   startOccurrence: '',
+//   endOccurrence: ''
+// }
 
 const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const defaultValues = selectedCriteria || defaultCondition
+  const { criteria, selectedCriteria, goBack } = props
+  // const defaultValues = selectedCriteria || defaultCondition
 
   const [cimHierarchy, onSetCimHieerarchy] = useState([])
   const [selectedHierarchy, onChangeSelectedHierarchy] = useState(null)
+
+  console.log('selectedHierarchy', selectedHierarchy)
 
   // Init
   useEffect(() => {
