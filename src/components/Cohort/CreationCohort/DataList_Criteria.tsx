@@ -5,7 +5,7 @@ import DemographicFrom from './DiagramView/components/CriteriaCard/components/De
 import DocumentsForm from './DiagramView/components/CriteriaCard/components/DocumentsForm/DocumentsForm'
 import SupportedForm from './DiagramView/components/CriteriaCard/components/SupportedForm/SupportedForm'
 import CCAMForm from './DiagramView/components/CriteriaCard/components/CCAM/index'
-import Cim10Form from './DiagramView/components/CriteriaCard/components/Cim10Form/Cim10Form'
+import Cim10Form from './DiagramView/components/CriteriaCard/components/Cim10Form'
 import GhmForm from './DiagramView/components/CriteriaCard/components/GhmForm/GhmForm'
 
 // Fetcher
@@ -19,7 +19,8 @@ import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetch
 import {
   fetchStatusDiagnostic,
   fetchDiagnosticTypes,
-  fetchCim10Diagnostic
+  fetchCim10Diagnostic,
+  fetchCim10Hierarchy
 } from '../../../services/cohortCreation/fetchCondition'
 import { fetchCcamData } from '../../../services/cohortCreation/fetchProcedure'
 import { fetchGhmData } from '../../../services/cohortCreation/fetchClaim'
@@ -82,7 +83,7 @@ const criteriaList: CriteriaItemType[] = [
         color: '#0063AF',
         components: Cim10Form,
         data: { statusDiagnostic: 'loading', diagnosticTypes: 'loading', cim10Diagnostic: 'loading' },
-        fetch: { fetchStatusDiagnostic, fetchDiagnosticTypes, fetchCim10Diagnostic }
+        fetch: { fetchStatusDiagnostic, fetchDiagnosticTypes, fetchCim10Diagnostic, fetchCim10Hierarchy }
       },
       {
         id: 'Procedure',

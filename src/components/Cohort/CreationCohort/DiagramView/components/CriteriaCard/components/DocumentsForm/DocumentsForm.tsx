@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -19,7 +19,10 @@ type TestGeneratedFormProps = {
 const defaultDemographic = {
   title: 'Critère de document',
   search: '',
-  docType: { id: '55188-7', label: 'Tout type de documents' }
+  docType: { id: '55188-7', label: 'Tout type de documents' },
+  encounter: 0,
+  startOccurrence: '',
+  endOccurrence: ''
 }
 
 const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
@@ -35,6 +38,9 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
       title: data.title,
       search: data.search,
       docType: data.docType,
+      encounter: data.encounter,
+      startOccurrence: data.startOccurrence,
+      endOccurrence: data.endOccurrence,
       type: 'Composition'
     })
   }
@@ -83,6 +89,31 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               { id: '11336-5', label: "Comptes rendus d'hospitalisation" },
               { id: '57833-6', label: 'Ordonnances' }
             ]
+          },
+          {
+            name: 'encounter',
+            label: "Nombre d'occurence",
+            variant: 'outlined',
+            type: 'number'
+          },
+          {
+            type: 'custom',
+            name: 'label',
+            renderInput: () => (
+              <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+                Date d'occurrence :
+              </FormLabel>
+            )
+          },
+          {
+            name: 'startOccurrence',
+            label: 'Avant le',
+            type: 'date'
+          },
+          {
+            name: 'endOccurrence',
+            label: 'Après le',
+            type: 'date'
           }
         ]}
         submit={_onSubmit}

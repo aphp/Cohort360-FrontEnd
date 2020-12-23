@@ -19,6 +19,7 @@ type CcamFormProps = {
 const defaultDemographic = {
   title: "Critères d'actes CCAM",
   code: [],
+  encounter: 0,
   startOccurrence: '',
   endOccurrence: ''
 }
@@ -35,6 +36,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
     onChangeSelectedCriteria({
       title: data.title,
       code: data.code,
+      encounter: data.encounter,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Procedure'
@@ -93,6 +95,12 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
           //     </Button>
           //   )
           // },
+          {
+            name: 'encounter',
+            label: "Nombre d'occurence",
+            variant: 'outlined',
+            type: 'number'
+          },
           {
             type: 'custom',
             name: 'label',

@@ -88,6 +88,8 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             <Typography>
               Dans <span className={classes.criteriaType}>GHM</span>,
             </Typography>
+            <Typography>{selectedGhmData ? `GHM sélectionné : "${selectedGhmData.label}"` : ''}</Typography>
+            <Typography>{_selectedCriteria ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}</Typography>
             <Typography>
               {startDate
                 ? endDate
@@ -97,7 +99,6 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 ? `Avant le ${endDate},`
                 : ''}
             </Typography>
-            <Typography>{selectedGhmData ? `GHM sélectionné : "${selectedGhmData.label}"` : ''}</Typography>
           </>
         )
         break
@@ -113,6 +114,8 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             <Typography>
               Dans <span className={classes.criteriaType}>Actes CCAM</span>,
             </Typography>
+            <Typography>{selectedccamData ? `Acte CCAM sélectionné : "${selectedccamData.label}"` : ''}.</Typography>
+            <Typography>{_selectedCriteria ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}</Typography>
             <Typography>
               {startDate
                 ? endDate
@@ -122,7 +125,6 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 ? `Avant le ${endDate},`
                 : ''}
             </Typography>
-            <Typography>{selectedccamData ? `Acte CCAM sélectionné : "${selectedccamData.label}"` : ''}.</Typography>
           </>
         )
         break
@@ -148,6 +150,16 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             <Typography>{selectedCode ? `Diagnostic CIM sélectionné : "${selectedCode.label}."` : ''}</Typography>
             <Typography>
               {selectedDiagnostic && `Type de diagnostic recherché : "${selectedDiagnostic.label}."`}
+            </Typography>
+            <Typography>{_selectedCriteria ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}</Typography>
+            <Typography>
+              {startDate
+                ? endDate
+                  ? `Entre le ${startDate} et le ${endDate},`
+                  : `Après le ${startDate},`
+                : endDate
+                ? `Avant le ${endDate},`
+                : ''}
             </Typography>
           </>
         )
@@ -205,6 +217,16 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             </Typography>
             <Typography>Recherche textuelle "{_selectedCriteria.search}"</Typography>
             <Typography>Dans {selectedDocType}.</Typography>
+            <Typography>{_selectedCriteria ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}</Typography>
+            <Typography>
+              {startDate
+                ? endDate
+                  ? `Entre le ${startDate} et le ${endDate},`
+                  : `Après le ${startDate},`
+                : endDate
+                ? `Avant le ${endDate},`
+                : ''}
+            </Typography>
           </>
         )
         break

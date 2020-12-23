@@ -84,3 +84,59 @@ export const fetchCim10Diagnostic = async (searchValue?: string) => {
       : []
   return cim10List
 }
+
+export const fetchCim10Hierarchy = async (cim10Parent: string) => {
+  if (!cim10Parent) {
+    const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-cim`)
+
+    let cim10List =
+      res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+        ? res.data.entry[0].resource.compose.include[0].concept
+        : []
+
+    cim10List =
+      cim10List && cim10List.length > 0
+        ? cim10List.sort(alphabeticalSort).map((cimData: any) => ({
+            id: cimData.code,
+            label: `${cimData.code} - ${cimData.display}`
+          }))
+        : []
+    return cim10List
+  } else {
+    const json = {
+      resourceType: 'ValueSet',
+      url: 'https://terminology.eds.aphp.fr/aphp-orbis-cim-',
+      compose: {
+        include: [
+          {
+            filter: [
+              {
+                op: 'is-a',
+                value: cim10Parent ?? ''
+              }
+            ]
+          }
+        ]
+      }
+    }
+
+    const res = await apiRequest.get(`/ValueSet/$expand`, {
+      params: JSON.stringify(json)
+      // paramsSerializer: () => JSON.stringify(json)
+    })
+
+    let cim10List =
+      res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+        ? res.data.entry[0].resource.compose.include[0].concept
+        : []
+
+    cim10List =
+      cim10List && cim10List.length > 0
+        ? cim10List.sort(alphabeticalSort).map((cimData: any) => ({
+            id: cimData.code,
+            label: `${cimData.code} - ${cimData.display}`
+          }))
+        : []
+    return cim10List
+  }
+}

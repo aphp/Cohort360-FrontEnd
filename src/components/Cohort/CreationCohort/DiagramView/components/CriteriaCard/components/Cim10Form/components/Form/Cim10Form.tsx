@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -20,6 +20,7 @@ const defaultCondition = {
   title: 'Critère de diagnostic',
   code: [],
   diagnosticType: '',
+  encounter: 0,
   startOccurrence: '',
   endOccurrence: ''
 }
@@ -37,6 +38,9 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       title: data.title,
       code: data.code,
       diagnosticType: data.diagnosticType,
+      encounter: data.encounter,
+      startOccurrence: data.startOccurrence,
+      endOccurrence: data.endOccurrence,
       type: 'Condition'
     })
   }
@@ -96,6 +100,31 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             variant: 'outlined',
             type: 'autocomplete',
             autocompleteOptions: criteria?.data?.diagnosticTypes || []
+          },
+          {
+            name: 'encounter',
+            label: "Nombre d'occurence",
+            variant: 'outlined',
+            type: 'number'
+          },
+          {
+            type: 'custom',
+            name: 'label',
+            renderInput: () => (
+              <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+                Date d'occurrence :
+              </FormLabel>
+            )
+          },
+          {
+            name: 'startOccurrence',
+            label: 'Avant le',
+            type: 'date'
+          },
+          {
+            name: 'endOccurrence',
+            label: 'Après le',
+            type: 'date'
           }
         ]}
         submit={_onSubmit}
