@@ -120,14 +120,11 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
       }
     }
 
-    const res = await apiRequest.get(`/ValueSet/$expand`, {
-      params: JSON.stringify(json)
-      // paramsSerializer: () => JSON.stringify(json)
-    })
+    const res = await apiRequest.post(`/ValueSet/$expand`, JSON.stringify(json))
 
     let cim10List =
-      res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
-        ? res.data.entry[0].resource.compose.include[0].concept
+      res && res.data && res.data.expansion && res.data.expansion.contains && res.data.resourceType === 'ValueSet'
+        ? res.data.expansion.contains
         : []
 
     cim10List =
