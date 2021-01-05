@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 import {
   Button,
+  Chip,
   CircularProgress,
   CssBaseline,
   Grid,
@@ -72,6 +73,7 @@ const PatientList: React.FC<PatientListProps> = ({
   const [vitalStatus, setVitalStatus] = useState<VitalStatus>(VitalStatus.all)
   const [sortBy, setSortBy] = useState('given') // eslint-disable-line
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc') // eslint-disable-line
+  const [showFilterChip, setShowFilterChip] = useState(false)
   const includeFacets = true
 
   useEffect(() => {
@@ -129,8 +131,13 @@ const PatientList: React.FC<PatientListProps> = ({
     fetchPatients(sortBy, sortDirection, input)
   }
 
+  useEffect(() => {
+    onSearchPatient()
+  }, [gender, age, vitalStatus]) // eslint-disable-line
+
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
+    submit && setShowFilterChip(true)
     submit && onSearchPatient()
   }
 
@@ -160,6 +167,20 @@ const PatientList: React.FC<PatientListProps> = ({
     onSearchPatient(sortBy, sortDirection, '')
   }
 
+  const handleDeleteChip = (filterName: string) => {
+    switch (filterName) {
+      case 'gender':
+        setGender(PatientGenderKind._unknown)
+        break
+      case 'age':
+        setAge([0, 130])
+        break
+      case 'vitalStatus':
+        setVitalStatus(VitalStatus.all)
+        break
+    }
+  }
+
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     if (e.keyCode === 13) {
       e.preventDefault()
@@ -174,6 +195,26 @@ const PatientList: React.FC<PatientListProps> = ({
     setSortDirection(_sortDirection)
     setSortBy(property)
     onSearchPatient(property, _sortDirection)
+  }
+
+  const genderName = () => {
+    switch (gender) {
+      case PatientGenderKind._female:
+        return 'Genre: Femmes'
+      case PatientGenderKind._male:
+        return 'Genre: Hommes'
+      case PatientGenderKind._other:
+        return 'Genre: Autre'
+    }
+  }
+
+  const vitalStatusName = () => {
+    switch (vitalStatus) {
+      case VitalStatus.alive:
+        return 'Patients vivants'
+      case VitalStatus.deceased:
+        return 'Patients décédés'
+    }
   }
 
   return (
@@ -303,6 +344,35 @@ const PatientList: React.FC<PatientListProps> = ({
                 onChangeVitalStatus={setVitalStatus}
               />
             </div>
+          </Grid>
+          <Grid>
+            {showFilterChip && gender !== PatientGenderKind._unknown && (
+              <Chip
+                className={classes.chips}
+                label={genderName()}
+                onDelete={() => handleDeleteChip('gender')}
+                color="primary"
+                variant="outlined"
+              />
+            )}
+            {showFilterChip && (age[0] !== 0 || age[1] !== 130) && (
+              <Chip
+                className={classes.chips}
+                label={`Âge entre ${age[0]} et ${age[1]} ans`}
+                onDelete={() => handleDeleteChip('age')}
+                color="primary"
+                variant="outlined"
+              />
+            )}
+            {showFilterChip && vitalStatus !== VitalStatus.all && (
+              <Chip
+                className={classes.chips}
+                label={vitalStatusName()}
+                onDelete={() => handleDeleteChip('vitalStatus')}
+                color="primary"
+                variant="outlined"
+              />
+            )}
           </Grid>
           <TableauPatient
             groupId={groupId}
