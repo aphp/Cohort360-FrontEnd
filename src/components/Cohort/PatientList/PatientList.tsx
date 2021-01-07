@@ -138,7 +138,6 @@ const PatientList: React.FC<PatientListProps> = ({
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
     submit && setShowFilterChip(true)
-    submit && onSearchPatient()
   }
 
   const handleChangeSelect = (
