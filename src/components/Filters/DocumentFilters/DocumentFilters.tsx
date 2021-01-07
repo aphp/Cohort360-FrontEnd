@@ -95,7 +95,7 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
               fullWidth
               label="NDA"
               autoFocus
-              placeholder='Exemple: "6601289264,141740347"'
+              placeholder="Exemple: 6601289264,141740347"
               value={nda}
               onChange={_onChangeNda}
             />

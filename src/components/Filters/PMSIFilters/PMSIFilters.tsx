@@ -87,7 +87,7 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
               fullWidth
               label="NDA"
               autoFocus
-              placeholder='Exemple: "6601289264,141740347"'
+              placeholder="Exemple: 6601289264,141740347"
               value={nda}
               onChange={_onChangeNda}
             />
@@ -101,7 +101,7 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
             fullWidth
             label="Code"
             autoFocus
-            placeholder='Exemple: "G629,R2630,F310"'
+            placeholder="Exemple: G629,R2630,F310"
             value={code}
             onChange={_onChangeCode}
           />
