@@ -128,7 +128,6 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
     submit && setShowFilterChip(true)
-    submit && onSearchDocument(_sortBy, _sortDirection)
   }
 
   const handleChangeInput = (event: any) => {
