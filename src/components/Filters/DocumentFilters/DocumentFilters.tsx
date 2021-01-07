@@ -102,9 +102,7 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
             disableCloseOnSelect
             getOptionLabel={(docType: any) => docType.label}
             renderOption={(docType: any) => <React.Fragment>{docType.label}</React.Fragment>}
-            renderInput={(params) => (
-              <TextField {...params} variant="outlined" label="Types de documents" placeholder="Types de documents" />
-            )}
+            renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Types de documents" />}
             className={classes.autocomplete}
           />
         </Grid>
