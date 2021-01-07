@@ -70,12 +70,10 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
       code: string
     }[]
   ) => {
-    // if (value) onChangeSelectedDocTypes(value.map((value) => value.code))
     if (value) setSelectedDocTypes(value.map((value) => value.code))
   }
 
   const _onChangeNda = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // onChangeNda(event.target.value)
     setNda(event.target.value)
   }
 
@@ -126,15 +124,9 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
           <InputDate
             label={'Après le :'}
             value={_startDate}
-            // onChange={(startDate: string) => onChangeStartDate(startDate)}
             onChange={(startDate: string) => setStartDate(startDate)}
           />
-          <InputDate
-            label={'Avant le :'}
-            value={_endDate}
-            // onChange={(endDate: string) => onChangeEndDate(endDate)}
-            onChange={(endDate: string) => setEndDate(endDate)}
-          />
+          <InputDate label={'Avant le :'} value={_endDate} onChange={(endDate: string) => setEndDate(endDate)} />
         </Grid>
       </DialogContent>
       <DialogActions>
