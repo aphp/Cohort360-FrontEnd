@@ -238,7 +238,7 @@ const PatientList: React.FC<PatientListProps> = ({
               ) : patientData.genderData && patientData.genderData.length > 0 ? (
                 <BarChart data={patientData.genderData ?? []} />
               ) : (
-                <Typography>Aucune patient</Typography>
+                <Typography>Aucun patient</Typography>
               )}
             </Paper>
           </Grid>
@@ -257,7 +257,7 @@ const PatientList: React.FC<PatientListProps> = ({
                 patientData.vitalStatusData.find(({ value }) => value !== 0) !== undefined ? (
                 <PieChart data={patientData.vitalStatusData ?? []} />
               ) : (
-                <Typography>Aucune patient</Typography>
+                <Typography>Aucun patient</Typography>
               )}
             </Paper>
           </Grid>
@@ -275,7 +275,7 @@ const PatientList: React.FC<PatientListProps> = ({
               ) : agePyramid && agePyramid.size > 0 ? (
                 <PyramidChart data={agePyramid} width={300} />
               ) : (
-                <Typography>Aucune patient</Typography>
+                <Typography>Aucun patient</Typography>
               )}
             </Paper>
           </Grid>
