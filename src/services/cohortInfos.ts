@@ -347,15 +347,11 @@ const fetchDocuments = async (
         ? wordCloudRequest.data.meta?.extension?.find((facet: any) => facet.url === 'facet-cloud')?.extension
         : []
 
-    if (totalDocs === 0) {
-      return null
-    } else {
-      return {
-        totalDocs,
-        totalAllDocs,
-        documentsList,
-        wordcloudData
-      }
+    return {
+      totalDocs: totalDocs ?? 0,
+      totalAllDocs,
+      documentsList,
+      wordcloudData
     }
   }
 
