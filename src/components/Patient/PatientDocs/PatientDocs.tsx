@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
-import { Button, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
+import { Button, Chip, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
 import { Pagination } from '@material-ui/lab'
 
 import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
@@ -54,6 +54,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
   const [endDate, setEndDate] = useState<string | undefined>(undefined)
   const [_sortBy, setSortBy] = useState(sortBy)
   const [_sortDirection, setSortDirection] = useState(sortDirection)
+  const [showFilterChip, setShowFilterChip] = useState(false)
 
   const documentLines = 20 // Number of desired lines in the document array
 
@@ -104,9 +105,15 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
     fetchDocumentsList(_sortBy, _sortDirection, searchInput, value || 1)
   }
 
-  const handleCloseDialog = () => {
-    setOpen(false)
+  useEffect(() => {
     handleChangePage()
+  }, [nda, selectedDocTypes, startDate, endDate]) // eslint-disable-line
+
+  const handleCloseDialog = (submit: boolean) => () => {
+    setOpen(false)
+    if (submit) {
+      setShowFilterChip(true)
+    }
   }
 
   const handleChangeInput = (event: { target: { value: React.SetStateAction<string> } }) => {
@@ -132,6 +139,29 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
   const handleCloseSortDialog = (submitSort: boolean) => {
     setOpenSort(false)
     submitSort && onSearchDocument()
+  }
+
+  const handleDeleteChip = (filterName: string, value?: string) => {
+    switch (filterName) {
+      case 'nda':
+        value &&
+          setNda(
+            nda
+              .split(',')
+              .filter((item) => item !== value)
+              .join()
+          )
+        break
+      case 'selectedDocTypes':
+        value && setSelectedDocTypes(selectedDocTypes.filter((item) => item !== value))
+        break
+      case 'startDate':
+        setStartDate(undefined)
+        break
+      case 'endDate':
+        setEndDate(undefined)
+        break
+    }
   }
 
   return (
@@ -194,6 +224,52 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
           </div>
         </Grid>
       </Grid>
+      <Grid>
+        {showFilterChip &&
+          nda !== '' &&
+          nda
+            .split(',')
+            .map((value) => (
+              <Chip
+                className={classes.chips}
+                key={value}
+                label={value}
+                onDelete={() => handleDeleteChip('nda', value)}
+                color="primary"
+                variant="outlined"
+              />
+            ))}
+        {showFilterChip &&
+          selectedDocTypes.length > 0 &&
+          selectedDocTypes.map((docType) => (
+            <Chip
+              className={classes.chips}
+              key={docType}
+              label={docType}
+              onDelete={() => handleDeleteChip('selectedDocTypes', docType)}
+              color="primary"
+              variant="outlined"
+            />
+          ))}
+        {showFilterChip && startDate && (
+          <Chip
+            className={classes.chips}
+            label={`Après le : ${startDate}`}
+            onDelete={() => handleDeleteChip('startDate')}
+            color="primary"
+            variant="outlined"
+          />
+        )}
+        {showFilterChip && endDate && (
+          <Chip
+            className={classes.chips}
+            label={`Avant le : ${endDate}`}
+            onDelete={() => handleDeleteChip('endDate')}
+            color="primary"
+            variant="outlined"
+          />
+        )}
+      </Grid>
       <DocumentList
         loading={loadingStatus}
         documents={docs}
@@ -210,8 +286,8 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
       />
       <DocumentFilters
         open={open}
-        onClose={() => setOpen(false)}
-        onSubmit={handleCloseDialog}
+        onClose={handleCloseDialog(false)}
+        onSubmit={handleCloseDialog(true)}
         nda={nda}
         onChangeNda={setNda}
         selectedDocTypes={selectedDocTypes}
