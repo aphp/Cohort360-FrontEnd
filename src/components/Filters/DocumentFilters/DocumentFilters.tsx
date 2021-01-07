@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import {
   Button,
@@ -48,7 +48,19 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
 }) => {
   const classes = useStyles()
 
+  const [_nda, setNda] = useState<string>(nda)
+  const [_selectedDocTypes, setSelectedDocTypes] = useState<string[]>(selectedDocTypes)
+  const [_startDate, setStartDate] = useState<string | undefined>(startDate)
+  const [_endDate, setEndDate] = useState<string | undefined>(endDate)
+
   const docTypesList = docTypes
+
+  useEffect(() => {
+    setNda(nda)
+    setSelectedDocTypes(selectedDocTypes)
+    setStartDate(startDate)
+    setEndDate(endDate)
+  }, [open]) //eslint-disable-line
 
   const _onChangeSelectedDocTypes = (
     event: React.ChangeEvent<{}>,
@@ -58,11 +70,21 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
       code: string
     }[]
   ) => {
-    if (value) onChangeSelectedDocTypes(value.map((value) => value.code))
+    // if (value) onChangeSelectedDocTypes(value.map((value) => value.code))
+    if (value) setSelectedDocTypes(value.map((value) => value.code))
   }
 
   const _onChangeNda = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onChangeNda(event.target.value)
+    // onChangeNda(event.target.value)
+    setNda(event.target.value)
+  }
+
+  const _onSubmit = () => {
+    onChangeSelectedDocTypes(_selectedDocTypes)
+    onChangeNda(_nda)
+    onChangeStartDate(_startDate)
+    onChangeEndDate(_endDate)
+    onSubmit()
   }
 
   return (
@@ -76,7 +98,7 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
             onChange={_onChangeSelectedDocTypes}
             groupBy={(doctype) => doctype.type}
             options={docTypesList}
-            value={docTypesList.filter((value) => selectedDocTypes.includes(value.code))}
+            value={docTypesList.filter((value) => _selectedDocTypes.includes(value.code))}
             disableCloseOnSelect
             getOptionLabel={(docType: any) => docType.label}
             renderOption={(docType: any) => <React.Fragment>{docType.label}</React.Fragment>}
@@ -96,7 +118,7 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
               label="NDA"
               autoFocus
               placeholder="Exemple: 6601289264,141740347"
-              value={nda}
+              value={_nda}
               onChange={_onChangeNda}
             />
           </Grid>
@@ -105,17 +127,23 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
           <Typography variant="h3">Date :</Typography>
           <InputDate
             label={'Après le :'}
-            value={startDate}
-            onChange={(startDate: string) => onChangeStartDate(startDate)}
+            value={_startDate}
+            // onChange={(startDate: string) => onChangeStartDate(startDate)}
+            onChange={(startDate: string) => setStartDate(startDate)}
           />
-          <InputDate label={'Avant le :'} value={endDate} onChange={(endDate: string) => onChangeEndDate(endDate)} />
+          <InputDate
+            label={'Avant le :'}
+            value={_endDate}
+            // onChange={(endDate: string) => onChangeEndDate(endDate)}
+            onChange={(endDate: string) => setEndDate(endDate)}
+          />
         </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">
           Annuler
         </Button>
-        <Button onClick={onSubmit} color="primary">
+        <Button onClick={_onSubmit} color="primary">
           Valider
         </Button>
       </DialogActions>
