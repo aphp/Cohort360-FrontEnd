@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Tabs, Tab } from '@material-ui/core'
 
 import GHMForm from './components/Form/GhmForm'
-import GHMHierarchy from './components/Hierarchy/'
+import GHMHierarchy from './components/Hierarchy/GhmHierarchy'
 
 import useStyles from './styles'
 
@@ -27,9 +27,9 @@ const Index = (props: any) => {
           selectedCriteria={selectedCriteria}
           onChangeSelectedCriteria={onChangeSelectedCriteria}
           goBack={goBack}
-        />S
+        />
       ) : (
-        <GHMierarchy
+        <GHMHierarchy
           criteria={criteria}
           selectedCriteria={selectedCriteria}
           onChangeSelectedCriteria={onChangeSelectedCriteria}

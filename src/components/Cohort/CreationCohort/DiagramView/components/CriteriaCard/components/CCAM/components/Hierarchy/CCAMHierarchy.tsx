@@ -10,7 +10,8 @@ import {
   ListItemIcon,
   ListItemText,
   Collapse,
-  List
+  List,
+  Tooltip
 } from '@material-ui/core'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
@@ -20,47 +21,71 @@ import useStyles from './styles'
 
 type CcamListItemProps = {
   ccamItem: any
+  selectedItem?: any
   handleClick: (ccamItem: any) => void
   fetchHierarchy: (ccamCode: string) => any
 }
 
 const CcamListItem: React.FC<CcamListItemProps> = (props) => {
-  const { ccamItem, handleClick, fetchHierarchy } = props
+  // const { ccamItem, handleClick, fetchHierarchy } = props
+  const { ccamItem, selectedItem, handleClick, fetchHierarchy } = props
   const { id, color, label } = ccamItem
 
   const classes = useStyles()
   const [open, setOpen] = useState(false)
   const [subItems, setSubItems] = useState<any>(['loading'])
 
+  const isSelected = selectedItem ? ccamItem.id === selectedItem.id : false
+
   const _onExpand = async (ccamCode: string) => {
     setOpen(!open)
-    console.log('subItems', subItems)
+    // console.log('subItems', subItems)
     if (subItems && subItems[0] === 'loading') {
       const _subItems = await fetchHierarchy(ccamCode)
       setSubItems(_subItems)
     }
   }
 
-  console.log('subItems', subItems)
+  // console.log('subItems', subItems)
+
+  useEffect(() => {
+    const _init = async () => {
+      const _subItems = await fetchHierarchy(id)
+      setSubItems(_subItems)
+    }
+
+    _init()
+  }, []) //eslint-disable-line
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
     return (
-      <ListItem onClick={() => handleClick(ccamItem)} className={classes.ccamItem}>
+      <ListItem className={classes.ccamItem}>
         <ListItemIcon>
-          <div className={classes.indicator} style={{ color }} />
+          <div
+            className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`}
+            style={{ color: '#0063af' }}
+          />
         </ListItemIcon>
-        <ListItemText style={{ cursor: 'pointer' }} primary={label} />
+        <Tooltip title={label} enterDelay={2500}>
+          <ListItemText
+            className={classes.label}
+            primary={label}
+            onClick={() => handleClick(isSelected ? null : ccamItem)}
+          />
+        </Tooltip>
       </ListItem>
     )
   }
 
   return (
     <>
-      <ListItem onClick={() => handleClick(ccamItem)} className={classes.ccamItem}>
+      <ListItem className={classes.ccamItem}>
         <ListItemIcon>
-          <div className={classes.indicator} style={{ color }} />
+          <div className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`} style={{ color }} />
         </ListItemIcon>
-        <ListItemText style={{ cursor: 'pointer' }} primary={label} />
+        <Tooltip title={label} enterDelay={2500}>
+          <ListItemText onClick={() => setOpen(!open)} className={classes.label} primary={label} />
+        </Tooltip>
         {open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => _onExpand(id)} />}
       </ListItem>
       <Collapse in={open} timeout="auto" unmountOnExit>
@@ -75,7 +100,8 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
                   <div className={classes.subItemsIndicator} />
                   <CcamListItem
                     ccamItem={ccamHierarchySubItem}
-                    handleClick={() => handleClick(ccamHierarchySubItem)}
+                    selectedItem={selectedItem}
+                    handleClick={handleClick}
                     fetchHierarchy={fetchHierarchy}
                   />
                 </Fragment>
@@ -91,7 +117,8 @@ type CcamHierarchyProps = {
   criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
+  onChangeSelectedHierarchy: (data: any) => void
+  isEdition?: boolean
 }
 
 // const defaultProcedure = {
@@ -103,13 +130,18 @@ type CcamHierarchyProps = {
 //   }
 
 const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
-  const { criteria, selectedCriteria, goBack } = props
+  // const { criteria, selectedCriteria, goBack } = props
   // const defaultValues = selectedCriteria || defaultCondition
+  const { criteria, selectedCriteria, goBack, onChangeSelectedHierarchy, isEdition } = props
 
   const [ccamHierarchy, onSetCcamHierarchy] = useState([])
-  const [selectedHierarchy, onChangeSelectedHierarchy] = useState(null)
+  // const [selectedHierarchy, onChangeSelectedHierarchy] = useState(null)
 
-  console.log('selectedHierarchy', selectedHierarchy)
+  // console.log('selectedHierarchy', selectedHierarchy)
+
+  const [selectedHierarchy, onSetSelectedHierarchy] = useState(isEdition ? selectedCriteria.code : null)
+
+  const classes = useStyles()
 
   // Init
   useEffect(() => {
@@ -121,9 +153,6 @@ const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
     _init()
   }, []) // eslint-disable-line
 
-  const classes = useStyles()
-
-  const isEdition = selectedCriteria !== null ? true : false
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
@@ -145,7 +174,8 @@ const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
           <CcamListItem
             key={index}
             ccamItem={ccamItem}
-            handleClick={onChangeSelectedHierarchy}
+            handleClick={onSetSelectedHierarchy}
+            selectedItem={selectedHierarchy}
             fetchHierarchy={criteria?.fetch?.fetchCcamHierarchy}
           />
         ))}
@@ -157,7 +187,13 @@ const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
             Annuler
           </Button>
         )}
-        <Button type="submit" form="ccam-form" color="primary" variant="contained">
+        <Button
+          onClick={() => onChangeSelectedHierarchy(selectedHierarchy)}
+          type="submit"
+          form="ccam-form"
+          color="primary"
+          variant="contained"
+        >
           Confirmer
         </Button>
       </Grid>

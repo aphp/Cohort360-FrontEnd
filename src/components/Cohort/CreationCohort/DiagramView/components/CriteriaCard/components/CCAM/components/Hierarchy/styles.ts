@@ -36,9 +36,25 @@ const useStyles = makeStyles(() => ({
   ccamItem: {
     padding: '2px 16px'
   },
+  label: {
+    '& > span': {
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      cursor: 'pointer'
+    }
+  },
   indicator: {
     width: 20,
     height: 20,
+    border: '2px solid currentColor',
+    borderRadius: 10
+  },
+  selectedIndicator: {
+    width: 20,
+    height: 20,
+    backgroundColor: 'currentColor',
+    boxShadow: 'inset 0 0 0 2px white',
     border: '2px solid currentColor',
     borderRadius: 10
   },

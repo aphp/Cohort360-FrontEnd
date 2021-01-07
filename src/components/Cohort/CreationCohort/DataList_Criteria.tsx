@@ -23,7 +23,7 @@ import {
   fetchCim10Hierarchy
 } from '../../../services/cohortCreation/fetchCondition'
 import { fetchCcamData, fetchCcamHierarchy } from '../../../services/cohortCreation/fetchProcedure'
-import { fetchGhmData } from '../../../services/cohortCreation/fetchClaim'
+import { fetchGhmData, fetchGhmHierarchy } from '../../../services/cohortCreation/fetchClaim'
 
 // ├── Mes variables
 // ├── Patients
@@ -99,7 +99,7 @@ const criteriaList: CriteriaItemType[] = [
         color: '#0063AF',
         components: GhmForm,
         data: { ghmData: 'loading' },
-        fetch: { fetchGhmData }
+        fetch: { fetchGhmData, fetchGhmHierarchy }
       }
     ]
   },
