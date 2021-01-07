@@ -151,7 +151,17 @@ const fetchPatientList = async (
 > => {
   if (CONTEXT === 'arkhn') {
     //TODO: Improve api request (we filter after getting all the patients)
-    const patientsResp = await searchPatient(page, sortBy, sortDirection, searchInput, searchBy, groupId)
+    const nominativeGroupsIds: any[] = []
+
+    const patientsResp = await searchPatient(
+      nominativeGroupsIds,
+      page,
+      sortBy,
+      sortDirection,
+      searchInput,
+      searchBy,
+      groupId
+    )
 
     if (patientsResp) {
       const filteredPatients: IPatient[] = patientsResp.patientList.filter((patient) => {
@@ -330,7 +340,7 @@ const fetchDocuments = async (
         : 0
       : totalDocs
 
-    const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsList))
+    const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
 
     const wordcloudData =
       wordCloudRequest.data.resourceType === 'Bundle'

@@ -21,6 +21,7 @@ import { CohortComposition } from 'types'
 import useStyles from './styles'
 
 type PatientDocsTypes = {
+  groupId?: string
   patientId: string
   documents?: (CohortComposition | IDocumentReference)[]
   total: number
@@ -29,6 +30,7 @@ type PatientDocsTypes = {
   sortDirection: 'asc' | 'desc'
 }
 const PatientDocs: React.FC<PatientDocsTypes> = ({
+  groupId,
   patientId,
   documents,
   total,
@@ -72,7 +74,8 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
       selectedDocTypes,
       nda,
       startDate,
-      endDate
+      endDate,
+      groupId
     )
       .then((docResp) => {
         setDocs(docResp?.docsList ?? [])

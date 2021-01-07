@@ -86,10 +86,17 @@ const Login = () => {
 
   const getPractitionerData = async () => {
     const practitioner = await fetchPractitioner(username)
-    const deidentifiedBoolean = await fetchDeidentified()
 
     if (practitioner) {
-      dispatch(loginAction({ ...practitioner, deidentified: deidentifiedBoolean }))
+      const deidentifiedInfos = await fetchDeidentified(practitioner.id)
+
+      dispatch(
+        loginAction({
+          ...practitioner,
+          deidentified: deidentifiedInfos.deidentification,
+          nominativeGroupsIds: deidentifiedInfos.nominativeGroupsIds
+        })
+      )
       history.push('/accueil')
     } else {
       setErrorLogin(true)

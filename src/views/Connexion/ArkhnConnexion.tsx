@@ -95,7 +95,7 @@ const ArkhnConnexion = () => {
                 dispatch(
                   loginAction({
                     ...practitioner,
-                    deidentified: deidentifiedBoolean ?? false
+                    deidentified: deidentifiedBoolean?.deidentification ?? false
                   })
                 )
                 history.push('/accueil')

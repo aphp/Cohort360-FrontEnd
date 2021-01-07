@@ -175,7 +175,8 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     { id: '', align: 'left', disablePadding: true, disableOrderBy: true, label: '' },
     { id: '', align: 'left', disablePadding: true, disableOrderBy: true, label: '' },
     { id: 'name', align: 'left', disablePadding: false, disableOrderBy: true, label: 'Nom' },
-    { id: 'quantity', align: 'left', disablePadding: false, disableOrderBy: true, label: 'Nombre de patients' }
+    { id: 'quantity', align: 'center', disablePadding: false, disableOrderBy: true, label: 'Nombre de patients' },
+    { id: 'deidentified', align: 'center', disablePadding: false, disableOrderBy: true, label: 'Accès' }
   ]
 
   return (
@@ -237,8 +238,12 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                       <Typography>{_row.name}</Typography>
                     </TableCell>
 
-                    <TableCell>
+                    <TableCell align="center">
                       <Typography>{displayDigit(_row.quantity)}</Typography>
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Typography>{_row.access}</Typography>
                     </TableCell>
                   </TableRow>
                 )}
