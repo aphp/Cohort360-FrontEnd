@@ -10,7 +10,8 @@ import {
   ListItemIcon,
   ListItemText,
   Collapse,
-  List
+  List,
+  Tooltip
 } from '@material-ui/core'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
@@ -20,45 +21,67 @@ import useStyles from './styles'
 
 type CimListItemProps = {
   cimItem: any
+  selectedItem?: any
   handleClick: (cimItem: any) => void
   fetchHierarchy: (cimCode: string) => any
 }
 
 const CimListItem: React.FC<CimListItemProps> = (props) => {
-  const { cimItem, handleClick, fetchHierarchy } = props
+  const { cimItem, selectedItem, handleClick, fetchHierarchy } = props
   const { id, color, label } = cimItem
 
   const classes = useStyles()
   const [open, setOpen] = useState(false)
   const [subItems, setSubItems] = useState<any>(['loading'])
 
+  const isSelected = selectedItem ? cimItem.id === selectedItem.id : false
+
   const _onExpand = async (cimCode: string) => {
     setOpen(!open)
-    console.log('subItems', subItems)
     if (subItems && subItems[0] === 'loading') {
       const _subItems = await fetchHierarchy(cimCode)
       setSubItems(_subItems)
     }
   }
 
+  useEffect(() => {
+    const _init = async () => {
+      const _subItems = await fetchHierarchy(id)
+      setSubItems(_subItems)
+    }
+
+    _init()
+  }, []) // eslint-disable-line
+
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
     return (
-      <ListItem onClick={() => handleClick(cimItem)} className={classes.cimItem}>
+      <ListItem className={classes.cimItem}>
         <ListItemIcon>
-          <div className={classes.indicator} style={{ color }} />
+          <div
+            className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`}
+            style={{ color: '#0063af' }}
+          />
         </ListItemIcon>
-        <ListItemText style={{ cursor: 'pointer' }} primary={label} />
+        <Tooltip title={label} enterDelay={2500}>
+          <ListItemText
+            className={classes.label}
+            primary={label}
+            onClick={() => handleClick(isSelected ? null : cimItem)}
+          />
+        </Tooltip>
       </ListItem>
     )
   }
 
   return (
     <>
-      <ListItem onClick={() => handleClick(cimItem)} className={classes.cimItem}>
+      <ListItem className={classes.cimItem}>
         <ListItemIcon>
-          <div className={classes.indicator} style={{ color }} />
+          <div className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`} style={{ color }} />
         </ListItemIcon>
-        <ListItemText style={{ cursor: 'pointer' }} primary={label} />
+        <Tooltip title={label} enterDelay={2500}>
+          <ListItemText onClick={() => setOpen(!open)} className={classes.label} primary={label} />
+        </Tooltip>
         {open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => _onExpand(id)} />}
       </ListItem>
       <Collapse in={open} timeout="auto" unmountOnExit>
@@ -73,7 +96,8 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
                   <div className={classes.subItemsIndicator} />
                   <CimListItem
                     cimItem={cimHierarchySubItem}
-                    handleClick={() => handleClick(cimHierarchySubItem)}
+                    selectedItem={selectedItem}
+                    handleClick={handleClick}
                     fetchHierarchy={fetchHierarchy}
                   />
                 </Fragment>
@@ -89,25 +113,16 @@ type Cim10HierarchyProps = {
   criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
+  onChangeSelectedHierarchy: (data: any) => void
+  isEdition?: boolean
 }
 
-// const defaultCondition = {
-//   title: 'Critère de diagnostic',
-//   code: [],
-//   diagnosticType: '',
-//   startOccurrence: '',
-//   endOccurrence: ''
-// }
-
 const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
-  const { criteria, selectedCriteria, goBack } = props
-  // const defaultValues = selectedCriteria || defaultCondition
+  const { criteria, selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
 
+  const classes = useStyles()
   const [cimHierarchy, onSetCimHieerarchy] = useState([])
-  const [selectedHierarchy, onChangeSelectedHierarchy] = useState(null)
-
-  console.log('selectedHierarchy', selectedHierarchy)
+  const [selectedHierarchy, onSetSelectedHierarchy] = useState(isEdition ? selectedCriteria.code : null)
 
   // Init
   useEffect(() => {
@@ -119,9 +134,6 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
     _init()
   }, []) // eslint-disable-line
 
-  const classes = useStyles()
-
-  const isEdition = selectedCriteria !== null ? true : false
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
@@ -143,7 +155,8 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
           <CimListItem
             key={index}
             cimItem={cimItem}
-            handleClick={onChangeSelectedHierarchy}
+            selectedItem={selectedHierarchy}
+            handleClick={onSetSelectedHierarchy}
             fetchHierarchy={criteria?.fetch?.fetchCim10Hierarchy}
           />
         ))}
@@ -155,7 +168,13 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
             Annuler
           </Button>
         )}
-        <Button type="submit" form="cim10-form" color="primary" variant="contained">
+        <Button
+          onClick={() => onChangeSelectedHierarchy(selectedHierarchy)}
+          type="submit"
+          form="cim10-form"
+          color="primary"
+          variant="contained"
+        >
           Confirmer
         </Button>
       </Grid>

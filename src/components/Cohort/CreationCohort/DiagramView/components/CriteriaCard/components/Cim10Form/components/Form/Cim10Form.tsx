@@ -10,28 +10,17 @@ import useStyles from './styles'
 import { Cim10DataType } from 'types'
 
 type Cim10FormProps = {
+  isEdition?: boolean
   criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
 }
 
-const defaultCondition = {
-  title: 'Critère de diagnostic',
-  code: [],
-  diagnosticType: '',
-  encounter: 0,
-  startOccurrence: '',
-  endOccurrence: ''
-}
-
 const Cim10Form: React.FC<Cim10FormProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const defaultValues = selectedCriteria || defaultCondition
+  const { isEdition, criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const classes = useStyles()
-
-  const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
@@ -48,11 +37,9 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue)
 
   if (
-    criteria &&
-    criteria.data &&
-    (criteria.data.diagnosticTypes === 'loading' ||
-      criteria.data.statusDiagnostic === 'loading' ||
-      criteria.data.cim10Diagnostic === 'loading')
+    criteria?.data?.diagnosticTypes === 'loading' ||
+    criteria?.data?.statusDiagnostic === 'loading' ||
+    criteria?.data?.cim10Diagnostic === 'loading'
   ) {
     return <> </>
   }
@@ -74,7 +61,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       </Grid>
 
       <FormBuilder<Cim10DataType>
-        defaultValues={defaultValues}
+        defaultValues={selectedCriteria}
         title="Diagnostic"
         properties={[
           {
