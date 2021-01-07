@@ -65,7 +65,7 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
   }
 
   const _onChangeSelectedDiagnosticTypes = (event: React.ChangeEvent<{}>, value: any[]) => {
-    onChangeSelectedDiagnosticTypes(value.map((value) => value.code))
+    onChangeSelectedDiagnosticTypes(value.map((value) => value.id))
   }
 
   useEffect(() => {
@@ -113,13 +113,11 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
               multiple
               onChange={_onChangeSelectedDiagnosticTypes}
               options={diagnosticTypes}
-              value={diagnosticTypes.filter((value) => selectedDiagnosticTypes.includes(value.code))}
+              value={diagnosticTypes.filter((value) => selectedDiagnosticTypes.includes(value.id))}
               disableCloseOnSelect
-              getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.display)}
+              getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.label)}
               renderOption={(diagnosticType: any) => (
-                <React.Fragment>
-                  {diagnosticType.code.toUpperCase()} - {capitalizeFirstLetter(diagnosticType.display)}
-                </React.Fragment>
+                <React.Fragment>{capitalizeFirstLetter(diagnosticType.label)}</React.Fragment>
               )}
               renderInput={(params) => (
                 <TextField
