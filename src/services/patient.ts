@@ -498,7 +498,9 @@ export const getEncounterOrProcedureDocs = async (
       encounterId = data.encounter?.reference
     }
 
-    const documentsResp = await api.get<FHIR_API_Response<IComposition>>(`/Composition?encounter=${encounterId}`)
+    const documentsResp = await api.get<FHIR_API_Response<IComposition>>(
+      `/Composition?encounter=${encounterId}&_elements=encounter,date,type,title,status`
+    )
 
     //TO DO when deidentified data are fixed: change true to real value
     const documentsList = await fillNDAAndServiceProviderDocs(true, getApiResponseResources(documentsResp))

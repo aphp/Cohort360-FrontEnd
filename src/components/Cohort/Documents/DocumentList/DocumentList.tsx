@@ -131,7 +131,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
     <Grid container item direction="column" className={classes.row}>
       <Grid container item>
         <Grid container item direction="column" justify="center" xs={4}>
-          <Typography variant="button">{row.title}</Typography>
+          <Typography variant="button">{row.title ?? 'Document sans titre'}</Typography>
           <Typography>
             {date} {hour}
           </Typography>

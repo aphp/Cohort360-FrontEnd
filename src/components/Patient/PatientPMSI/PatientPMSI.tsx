@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
+import moment from 'moment'
 
 import {
   Button,
+  Chip,
   CircularProgress,
   Grid,
   IconButton,
@@ -32,6 +34,7 @@ import { fetchPMSI } from '../../../services/patient'
 import useStyles from './styles'
 import { PMSIEntry } from 'types'
 import { IClaim, ICondition, IProcedure } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { capitalizeFirstLetter } from 'utils/capitalize'
 
 type PatientPMSITypes = {
   groupId?: string
@@ -69,11 +72,12 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
   const [open, setOpen] = useState(false)
   const [nda, setNda] = useState('')
   const [code, setCode] = useState('')
-  const [selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<string[]>([])
+  const [selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>([])
   const [startDate, setStartDate] = useState<string | undefined>(undefined)
   const [endDate, setEndDate] = useState<string | undefined>(undefined)
   const [_sortBy, setSortBy] = useState(sortBy)
   const [_sortDirection, setSortDirection] = useState(sortDirection)
+  const [showFilterChip, setShowFilterChip] = useState(false)
 
   const documentLines = 20 // Number of desired lines in the document array
 
@@ -92,6 +96,9 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
     endDate?: string
   ) => {
     setLoadingStatus(true)
+
+    const selectedDiagnosticTypesCodes = selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
+
     fetchPMSI(
       deidentified,
       page,
@@ -100,7 +107,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       searchInput,
       nda,
       code,
-      diagnosticTypes,
+      selectedDiagnosticTypesCodes,
       sortBy,
       sortDirection,
       groupId,
@@ -186,11 +193,43 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
 
   const handleCloseDialog = () => {
     setOpen(false)
-    handleChangePage()
+    setShowFilterChip(true)
   }
 
   const handleChangeSearchInput = (event: { target: { value: React.SetStateAction<string> } }) => {
     setSearchInput(event.target.value)
+  }
+
+  const handleDeleteChip = (filterName: string, value?: string) => {
+    switch (filterName) {
+      case 'nda':
+        value &&
+          setNda(
+            nda
+              .split(',')
+              .filter((item) => item !== value)
+              .join()
+          )
+        break
+      case 'code':
+        value &&
+          setCode(
+            code
+              .split(',')
+              .filter((item) => item !== value)
+              .join()
+          )
+        break
+      case 'startDate':
+        setStartDate(undefined)
+        break
+      case 'endDate':
+        setEndDate(undefined)
+        break
+      case 'selectedDiagnosticTypes':
+        value && setSelectedDiagnosticTypes(selectedDiagnosticTypes.filter((item) => item !== value))
+        break
+    }
   }
 
   const onSearchPMSI = async () => {
@@ -205,20 +244,39 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
   }
 
   useEffect(() => {
+    handleChangePage()
+  }, [nda, code, startDate, endDate, selectedDiagnosticTypes]) // eslint-disable-line
+
+  useEffect(() => {
     setPage(1)
     setSearchInput('')
     switch (selectedTab) {
       case 'CIM10':
         setData(diagnostic ?? [])
         setTotal(diagnosticTotal ?? 0)
+        setNda('')
+        setCode('')
+        setSelectedDiagnosticTypes([])
+        setStartDate(undefined)
+        setEndDate(undefined)
         break
       case 'CCAM':
         setData(ccam ?? [])
         setTotal(ccamTotal ?? 0)
+        setNda('')
+        setCode('')
+        setSelectedDiagnosticTypes([])
+        setStartDate(undefined)
+        setEndDate(undefined)
         break
       case 'GHM':
         setData(ghm ?? [])
         setTotal(ghmTotal ?? 0)
+        setNda('')
+        setCode('')
+        setSelectedDiagnosticTypes([])
+        setStartDate(undefined)
+        setEndDate(undefined)
         break
       default:
         setData([])
@@ -299,6 +357,66 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
             onChangeSelectedDiagnosticTypes={setSelectedDiagnosticTypes}
           />
         </div>
+      </Grid>
+      <Grid>
+        {showFilterChip &&
+          nda !== '' &&
+          nda
+            .split(',')
+            .map((value) => (
+              <Chip
+                className={classes.chips}
+                key={value}
+                label={`NDA: ${value.toUpperCase()}`}
+                onDelete={() => handleDeleteChip('nda', value)}
+                color="primary"
+                variant="outlined"
+              />
+            ))}
+        {showFilterChip &&
+          code !== '' &&
+          code
+            .split(',')
+            .map((value) => (
+              <Chip
+                className={classes.chips}
+                key={value}
+                label={`Code: ${value.toUpperCase()}`}
+                onDelete={() => handleDeleteChip('code', value)}
+                color="primary"
+                variant="outlined"
+              />
+            ))}
+        {showFilterChip && startDate && (
+          <Chip
+            className={classes.chips}
+            label={`Après le : ${moment(startDate).format('DD/MM/YYYY')}`}
+            onDelete={() => handleDeleteChip('startDate')}
+            color="primary"
+            variant="outlined"
+          />
+        )}
+        {showFilterChip && endDate && (
+          <Chip
+            className={classes.chips}
+            label={`Avant le : ${moment(endDate).format('DD/MM/YYYY')}`}
+            onDelete={() => handleDeleteChip('endDate')}
+            color="primary"
+            variant="outlined"
+          />
+        )}
+        {showFilterChip &&
+          selectedDiagnosticTypes.length > 0 &&
+          selectedDiagnosticTypes.map((diagnosticType) => (
+            <Chip
+              className={classes.chips}
+              key={diagnosticType.id}
+              label={capitalizeFirstLetter(diagnosticType.label)}
+              onDelete={() => handleDeleteChip('selectedDiagnosticTypes', diagnosticType)}
+              color="primary"
+              variant="outlined"
+            />
+          ))}
       </Grid>
       {loadingStatus ? (
         <Grid container justify="center">
