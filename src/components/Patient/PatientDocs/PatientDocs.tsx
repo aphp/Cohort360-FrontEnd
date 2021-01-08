@@ -49,7 +49,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
   const [openSort, setOpenSort] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
   const [nda, setNda] = useState('')
-  const [selectedDocTypes, setSelectedDocTypes] = useState<string[]>([])
+  const [selectedDocTypes, setSelectedDocTypes] = useState<any[]>([])
   const [startDate, setStartDate] = useState<string | undefined>(undefined)
   const [endDate, setEndDate] = useState<string | undefined>(undefined)
   const [_sortBy, setSortBy] = useState(sortBy)
@@ -65,6 +65,9 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
 
   const fetchDocumentsList = (newSortBy: string, newSortDirection: string, input = searchInput, page = 1) => {
     setLoadingStatus(true)
+
+    const selectedDocTypesCodes = selectedDocTypes.map((docType) => docType.code)
+
     fetchDocuments(
       deidentifiedBoolean,
       newSortBy,
@@ -72,7 +75,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
       page,
       patientId,
       input,
-      selectedDocTypes,
+      selectedDocTypesCodes,
       nda,
       startDate,
       endDate,
@@ -244,8 +247,8 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
           selectedDocTypes.map((docType) => (
             <Chip
               className={classes.chips}
-              key={docType}
-              label={docType}
+              key={docType.code}
+              label={docType.label}
               onDelete={() => handleDeleteChip('selectedDocTypes', docType)}
               color="primary"
               variant="outlined"

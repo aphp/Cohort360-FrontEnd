@@ -49,7 +49,7 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
   const classes = useStyles()
 
   const [_nda, setNda] = useState<string>(nda)
-  const [_selectedDocTypes, setSelectedDocTypes] = useState<string[]>(selectedDocTypes)
+  const [_selectedDocTypes, setSelectedDocTypes] = useState<any[]>(selectedDocTypes)
   const [_startDate, setStartDate] = useState<string | undefined>(startDate)
   const [_endDate, setEndDate] = useState<string | undefined>(endDate)
 
@@ -70,7 +70,7 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
       code: string
     }[]
   ) => {
-    if (value) setSelectedDocTypes(value.map((value) => value.code))
+    if (value) setSelectedDocTypes(value)
   }
 
   const _onChangeNda = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,7 +96,7 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
             onChange={_onChangeSelectedDocTypes}
             groupBy={(doctype) => doctype.type}
             options={docTypesList}
-            value={docTypesList.filter((value) => _selectedDocTypes.includes(value.code))}
+            value={_selectedDocTypes}
             disableCloseOnSelect
             getOptionLabel={(docType: any) => docType.label}
             renderOption={(docType: any) => <React.Fragment>{docType.label}</React.Fragment>}
