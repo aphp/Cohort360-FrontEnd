@@ -317,10 +317,14 @@ const fetchDocuments = async (
       elements = '&_elements=status,type,subject,encounter,date,title'
     }
 
-    const [wordCloudRequest, docsList, allDocsList] = await Promise.all([
-      api.get<FHIR_API_Response<IComposition>>(
-        `/Composition?facet=cloud&size=0&_sort=${_sortDirection}${sortBy}&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
-      ),
+    const [
+      // wordCloudRequest,
+      docsList,
+      allDocsList
+    ] = await Promise.all([
+      // api.get<FHIR_API_Response<IComposition>>(
+      //   `/Composition?facet=cloud&size=0&_sort=${_sortDirection}${sortBy}&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
+      // ),
       api.get<FHIR_API_Response<IComposition>>(
         `/Composition?size=20&_sort=${_sortDirection}${sortBy}&offset=${
           page ? (page - 1) * 20 : 0
@@ -342,16 +346,16 @@ const fetchDocuments = async (
 
     const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
 
-    const wordcloudData =
-      wordCloudRequest.data.resourceType === 'Bundle'
-        ? wordCloudRequest.data.meta?.extension?.find((facet: any) => facet.url === 'facet-cloud')?.extension
-        : []
+    // const wordcloudData =
+    //   wordCloudRequest.data.resourceType === 'Bundle'
+    //     ? wordCloudRequest.data.meta?.extension?.find((facet: any) => facet.url === 'facet-cloud')?.extension
+    //     : []
 
     return {
       totalDocs: totalDocs ?? 0,
       totalAllDocs,
-      documentsList,
-      wordcloudData
+      documentsList
+      // wordcloudData
     }
   }
 

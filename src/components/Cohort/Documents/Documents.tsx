@@ -8,14 +8,14 @@ import {
   IconButton,
   InputAdornment,
   InputBase,
-  Paper,
+  // Paper,
   Typography
 } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
 
 import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
 import DocumentList from './DocumentList/DocumentList'
-import WordCloud from '../Preview/Charts/WordCloud'
+// import WordCloud from '../Preview/Charts/WordCloud'
 import SortDialog from '../../Filters/SortDialog/SortDialog'
 import DocumentSearchHelp from '../../DocumentSearchHelp/DocumentSearchHelp'
 import { fetchDocuments } from '../../../services/cohortInfos'
@@ -27,7 +27,10 @@ import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
 import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
 
 import { CohortComposition } from 'types'
-import { IExtension, IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
+import {
+  // IExtension,
+  IDocumentReference
+} from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import useStyles from './styles'
 import { useAppSelector } from 'state'
@@ -51,7 +54,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   const [loadingStatus, setLoadingStatus] = useState(true)
   const [searchInput, setSearchInput] = useState('')
   const [searchMode, setSearchMode] = useState(false)
-  const [wordcloudData, setWordcloudData] = useState<IExtension[] | undefined>()
+  // const [wordcloudData, setWordcloudData] = useState<IExtension[] | undefined>()
   const [open, setOpen] = useState(false)
   const [openSort, setOpenSort] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
@@ -92,11 +95,16 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     )
       .then((result) => {
         if (result) {
-          const { totalDocs, totalAllDocs, documentsList, wordcloudData } = result
+          const {
+            totalDocs,
+            totalAllDocs,
+            documentsList
+            // wordcloudData
+          } = result
           setDocuments(documentsList)
-          if (wordcloudData) {
-            setWordcloudData(wordcloudData)
-          }
+          // if (wordcloudData) {
+          //   setWordcloudData(wordcloudData)
+          // }
           setDocumentsNumber(totalDocs)
           setAllDocumentsNumber(totalAllDocs)
           setPage(page)
@@ -184,7 +192,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
           Documents cliniques
         </Typography>
 
-        <Grid container spacing={3}>
+        {/* <Grid container spacing={3}>
           <Grid item xs={12}>
             {wordcloudData && (
               <Paper className={classes.chartOverlay}>
@@ -192,13 +200,13 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                   <Typography variant="h3" color="primary">
                     Mots les plus fréquents
                   </Typography>
-                </Grid>
-                {/* @ts-ignore */}
-                <WordCloud wordcloudData={wordcloudData} />
+                </Grid> */}
+        {/* @ts-ignore */}
+        {/* <WordCloud wordcloudData={wordcloudData} />
               </Paper>
             )}
           </Grid>
-        </Grid>
+        </Grid> */}
 
         <Grid container item justify="flex-end" className={classes.tableGrid}>
           <Grid container justify="space-between" alignItems="center">
