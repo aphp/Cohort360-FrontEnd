@@ -174,7 +174,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
           <div className={classes.documentButtons}>
             <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
               <InputBase
-                placeholder="Rechercher"
+                placeholder="Rechercher dans les documents"
                 className={classes.input}
                 value={searchInput}
                 onChange={handleChangeInput}
