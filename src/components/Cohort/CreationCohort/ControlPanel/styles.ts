@@ -24,6 +24,9 @@ const useStyles = makeStyles(() =>
       color: '#FFF',
       '&:hover': {
         backgroundColor: '#499cbf'
+      },
+      '&:disabled': {
+        opacity: 0.7
       }
     },
     actionButton: {

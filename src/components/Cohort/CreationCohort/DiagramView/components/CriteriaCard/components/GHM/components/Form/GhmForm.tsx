@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography, FormLabel } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -9,28 +9,31 @@ import useStyles from './styles'
 
 import { GhmDataType } from 'types'
 
-type TestGeneratedFormProps = {
+type GHMFormProps = {
+  isEdition: boolean
   criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
 }
 
-const defaultDemographic = {
-  title: 'Critère de GHM',
-  code: [],
-  encounter: 0,
-  startOccurrence: '',
-  endOccurrence: ''
-}
+// const defaultDemographic = {
+//   title: 'Critère de GHM',
+//   code: [],
+//   encounter: 0,
+//   startOccurrence: '',
+//   endOccurrence: ''
+// }
 
-const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const defaultValues = selectedCriteria || defaultDemographic
+const GhmForm: React.FC<GHMFormProps> = (props) => {
+  // const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  // const defaultValues = selectedCriteria || defaultDemographic
+
+  const { isEdition, criteria, selectedCriteria, goBack, onChangeSelectedCriteria } = props
 
   const classes = useStyles()
 
-  const isEdition = selectedCriteria !== null ? true : false
+  // const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
@@ -63,7 +66,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
       </Grid>
 
       <FormBuilder<GhmDataType>
-        defaultValues={defaultValues}
+        defaultValues={selectedCriteria}
         title="Diagnostic"
         properties={[
           {
@@ -88,26 +91,26 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
             label: "Nombre d'occurence",
             variant: 'outlined',
             type: 'number'
-          },
-          {
-            type: 'custom',
-            name: 'label',
-            renderInput: () => (
-              <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
-                Date d'occurrence :
-              </FormLabel>
-            )
-          },
-          {
-            name: 'startOccurrence',
-            label: 'Avant le',
-            type: 'date'
-          },
-          {
-            name: 'endOccurrence',
-            label: 'Après le',
-            type: 'date'
           }
+          // {
+          //   type: 'custom',
+          //   name: 'label',
+          //   renderInput: () => (
+          //     <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+          //       Date d'occurrence :
+          //     </FormLabel>
+          //   )
+          // },
+          // {
+          //   name: 'startOccurrence',
+          //   label: 'Avant le',
+          //   type: 'date'
+          // },
+          // {
+          //   name: 'endOccurrence',
+          //   label: 'Après le',
+          //   type: 'date'
+          // }
         ]}
         submit={_onSubmit}
         formId="ghm-form"
@@ -128,4 +131,4 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
   )
 }
 
-export default TestGeneratedForm
+export default GhmForm

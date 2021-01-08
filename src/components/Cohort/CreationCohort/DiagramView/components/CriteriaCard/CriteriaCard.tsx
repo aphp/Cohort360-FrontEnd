@@ -89,7 +89,9 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
               Dans <span className={classes.criteriaType}>GHM</span>,
             </Typography>
             <Typography>{selectedGhmData ? `GHM sélectionné : "${selectedGhmData.label}"` : ''}</Typography>
-            <Typography>{_selectedCriteria ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}</Typography>
+            <Typography>
+              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}
+            </Typography>
             <Typography>
               {startDate
                 ? endDate
@@ -115,7 +117,9 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
               Dans <span className={classes.criteriaType}>Actes CCAM</span>,
             </Typography>
             <Typography>{selectedccamData ? `Acte CCAM sélectionné : "${selectedccamData.label}"` : ''}.</Typography>
-            <Typography>{_selectedCriteria ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}</Typography>
+            <Typography>
+              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}
+            </Typography>
             <Typography>
               {startDate
                 ? endDate
@@ -151,7 +155,9 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             <Typography>
               {selectedDiagnostic && `Type de diagnostic recherché : "${selectedDiagnostic.label}."`}
             </Typography>
-            <Typography>{_selectedCriteria ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}</Typography>
+            <Typography>
+              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}
+            </Typography>
             <Typography>
               {startDate
                 ? endDate
@@ -217,7 +223,9 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             </Typography>
             <Typography>Recherche textuelle "{_selectedCriteria.search}"</Typography>
             <Typography>Dans {selectedDocType}.</Typography>
-            <Typography>{_selectedCriteria ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}</Typography>
+            <Typography>
+              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}
+            </Typography>
             <Typography>
               {startDate
                 ? endDate
