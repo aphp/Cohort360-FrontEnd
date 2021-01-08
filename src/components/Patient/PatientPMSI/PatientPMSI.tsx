@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import moment from 'moment'
 
 import {
   Button,
@@ -389,7 +390,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
         {showFilterChip && startDate && (
           <Chip
             className={classes.chips}
-            label={`Après le : ${startDate}`}
+            label={`Après le : ${moment(startDate).format('DD/MM/YYYY')}`}
             onDelete={() => handleDeleteChip('startDate')}
             color="primary"
             variant="outlined"
@@ -398,7 +399,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
         {showFilterChip && endDate && (
           <Chip
             className={classes.chips}
-            label={`Avant le : ${endDate}`}
+            label={`Avant le : ${moment(endDate).format('DD/MM/YYYY')}`}
             onDelete={() => handleDeleteChip('endDate')}
             color="primary"
             variant="outlined"

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import moment from 'moment'
 
 import { Button, Chip, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
 import { Pagination } from '@material-ui/lab'
@@ -257,7 +258,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
         {showFilterChip && startDate && (
           <Chip
             className={classes.chips}
-            label={`Après le : ${startDate}`}
+            label={`Après le : ${moment(startDate).format('DD/MM/YYYY')}`}
             onDelete={() => handleDeleteChip('startDate')}
             color="primary"
             variant="outlined"
@@ -266,7 +267,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
         {showFilterChip && endDate && (
           <Chip
             className={classes.chips}
-            label={`Avant le : ${endDate}`}
+            label={`Avant le : ${moment(endDate).format('DD/MM/YYYY')}`}
             onDelete={() => handleDeleteChip('endDate')}
             color="primary"
             variant="outlined"
