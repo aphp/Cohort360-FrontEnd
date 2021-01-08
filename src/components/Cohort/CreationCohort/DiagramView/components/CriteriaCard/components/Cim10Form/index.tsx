@@ -5,6 +5,7 @@ import Cim10Form from './components/Form/Cim10Form'
 import Cim10Hierarchy from './components/Hierarchy/Cim10Hierarchy'
 
 import useStyles from './styles'
+
 const defaultCondition = {
   title: 'Critère de diagnostic',
   code: [],

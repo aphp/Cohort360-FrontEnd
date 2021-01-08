@@ -12,7 +12,9 @@ const useStyles = makeStyles(() => ({
     height: 72,
     padding: 20,
     backgroundColor: '#317EAA',
-    color: 'white'
+    color: 'white',
+    //not default
+    marginBottom: 48
   },
   backButton: { color: 'white' },
   divider: { background: 'white' },

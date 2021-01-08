@@ -19,34 +19,31 @@ import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import useStyles from './styles'
 
-type CcamListItemProps = {
-  ccamItem: any
-  selectedItem?: any
-  handleClick: (ccamItem: any) => void
-  fetchHierarchy: (ccamCode: string) => any
+type GhmListItemProps = {
+  ghmItem: any
+  selectedItem: any
+  handleClick: (ghmItem: any) => void
+  fetchHierarchy: (ghmCode: string) => any
 }
 
-const CcamListItem: React.FC<CcamListItemProps> = (props) => {
-  // const { ccamItem, handleClick, fetchHierarchy } = props
-  const { ccamItem, selectedItem, handleClick, fetchHierarchy } = props
-  const { id, color, label } = ccamItem
+const GhmListItem: React.FC<GhmListItemProps> = (props) => {
+  const { ghmItem, selectedItem, handleClick, fetchHierarchy } = props
+  const { id, color, label } = ghmItem
 
   const classes = useStyles()
   const [open, setOpen] = useState(false)
   const [subItems, setSubItems] = useState<any>(['loading'])
 
-  const isSelected = selectedItem ? ccamItem.id === selectedItem.id : false
+  const isSelected = selectedItem ? ghmItem.id === selectedItem.id : false
 
-  const _onExpand = async (ccamCode: string) => {
+  const _onExpand = async (ghmCode: string) => {
     setOpen(!open)
     // console.log('subItems', subItems)
     if (subItems && subItems[0] === 'loading') {
-      const _subItems = await fetchHierarchy(ccamCode)
+      const _subItems = await fetchHierarchy(ghmCode)
       setSubItems(_subItems)
     }
   }
-
-  // console.log('subItems', subItems)
 
   useEffect(() => {
     const _init = async () => {
@@ -55,11 +52,11 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
     }
 
     _init()
-  }, []) //eslint-disable-line
+  }, []) // eslint-disable-line
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
     return (
-      <ListItem className={classes.ccamItem}>
+      <ListItem className={classes.ghmItem}>
         <ListItemIcon>
           <div
             className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`}
@@ -70,7 +67,7 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
           <ListItemText
             className={classes.label}
             primary={label}
-            onClick={() => handleClick(isSelected ? null : ccamItem)}
+            onClick={() => handleClick(isSelected ? null : ghmItem)}
           />
         </Tooltip>
       </ListItem>
@@ -79,7 +76,7 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
 
   return (
     <>
-      <ListItem className={classes.ccamItem}>
+      <ListItem className={classes.ghmItem}>
         <ListItemIcon>
           <div className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`} style={{ color }} />
         </ListItemIcon>
@@ -92,15 +89,15 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((ccamHierarchySubItem: any, index: number) =>
-              ccamHierarchySubItem === 'loading' ? (
+            subItems.map((ghmHierarchySubItem: any, index: number) =>
+              ghmHierarchySubItem === 'loading' ? (
                 <></>
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
-                  <CcamListItem
-                    ccamItem={ccamHierarchySubItem}
+                  <GhmListItem
                     selectedItem={selectedItem}
+                    ghmItem={ghmHierarchySubItem}
                     handleClick={handleClick}
                     fetchHierarchy={fetchHierarchy}
                   />
@@ -113,45 +110,31 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
   )
 }
 
-type CcamHierarchyProps = {
+type GhmHierarchyProps = {
+  isEdition: boolean
   criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
   onChangeSelectedHierarchy: (data: any) => void
-  isEdition?: boolean
 }
 
-// const defaultProcedure = {
-//     title: "Critères d'actes CCAM",
-//     code: [],
-//     encounter: 0,
-//     startOccurrence: '',
-//     endOccurrence: ''
-//   }
+const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
+  const { isEdition, criteria, selectedCriteria, goBack, onChangeSelectedHierarchy } = props
 
-const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
-  // const { criteria, selectedCriteria, goBack } = props
-  // const defaultValues = selectedCriteria || defaultCondition
-  const { criteria, selectedCriteria, goBack, onChangeSelectedHierarchy, isEdition } = props
-
-  const [ccamHierarchy, onSetCcamHierarchy] = useState([])
-  // const [selectedHierarchy, onChangeSelectedHierarchy] = useState(null)
-
-  // console.log('selectedHierarchy', selectedHierarchy)
-
+  const [ghmHierarchy, onSetGhmHierarchy] = useState([])
   const [selectedHierarchy, onSetSelectedHierarchy] = useState(isEdition ? selectedCriteria.code : null)
-
-  const classes = useStyles()
 
   // Init
   useEffect(() => {
     const _init = async () => {
-      const newCriteriaTree = await criteria.fetch.fetchCcamHierarchy()
-      onSetCcamHierarchy(newCriteriaTree)
+      const newCriteriaTree = await criteria.fetch.fetchGhmHierarchy()
+      onSetGhmHierarchy(newCriteriaTree)
     }
 
     _init()
   }, []) // eslint-disable-line
+
+  const classes = useStyles()
 
   return (
     <Grid className={classes.root}>
@@ -170,18 +153,18 @@ const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
       </Grid>
 
       <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-        {ccamHierarchy.map((ccamItem, index) => (
-          <CcamListItem
-            key={index}
-            ccamItem={ccamItem}
-            handleClick={onSetSelectedHierarchy}
+        {ghmHierarchy.map((ghmItem, index) => (
+          <GhmListItem
             selectedItem={selectedHierarchy}
-            fetchHierarchy={criteria?.fetch?.fetchCcamHierarchy}
+            key={index}
+            ghmItem={ghmItem}
+            handleClick={onSetSelectedHierarchy}
+            fetchHierarchy={criteria?.fetch?.fetchGhmHierarchy}
           />
         ))}
       </List>
 
-      <Grid className={classes.ccamHierarchyActionContainer}>
+      <Grid className={classes.ghmHierarchyActionContainer}>
         {!isEdition && (
           <Button onClick={goBack} color="primary" variant="outlined">
             Annuler
@@ -190,7 +173,7 @@ const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
         <Button
           onClick={() => onChangeSelectedHierarchy(selectedHierarchy)}
           type="submit"
-          form="ccam-form"
+          form="ghm-form"
           color="primary"
           variant="contained"
         >
@@ -201,4 +184,4 @@ const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
   )
 }
 
-export default CcamHierarchy
+export default GhmHierarchy

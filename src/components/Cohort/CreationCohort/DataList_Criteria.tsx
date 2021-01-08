@@ -6,7 +6,7 @@ import DocumentsForm from './DiagramView/components/CriteriaCard/components/Docu
 import SupportedForm from './DiagramView/components/CriteriaCard/components/SupportedForm/SupportedForm'
 import CCAMForm from './DiagramView/components/CriteriaCard/components/CCAM'
 import Cim10Form from './DiagramView/components/CriteriaCard/components/Cim10Form'
-import GhmForm from './DiagramView/components/CriteriaCard/components/GhmForm/GhmForm'
+import GhmForm from './DiagramView/components/CriteriaCard/components/GHM'
 
 // Fetcher
 import {
@@ -23,7 +23,7 @@ import {
   fetchCim10Hierarchy
 } from '../../../services/cohortCreation/fetchCondition'
 import { fetchCcamData, fetchCcamHierarchy } from '../../../services/cohortCreation/fetchProcedure'
-import { fetchGhmData } from '../../../services/cohortCreation/fetchClaim'
+import { fetchGhmData, fetchGhmHierarchy } from '../../../services/cohortCreation/fetchClaim'
 
 // ├── Mes variables
 // ├── Patients
@@ -99,7 +99,7 @@ const criteriaList: CriteriaItemType[] = [
         color: '#0063AF',
         components: GhmForm,
         data: { ghmData: 'loading' },
-        fetch: { fetchGhmData }
+        fetch: { fetchGhmData, fetchGhmHierarchy }
       }
     ]
   },
