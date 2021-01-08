@@ -6,6 +6,9 @@ export default makeStyles((theme) => ({
     padding: '0 8px',
     flexDirection: 'column'
   },
+  filterChipsGrid: {
+    maxWidth: 325
+  },
   searchBar: {
     width: '180px',
     backgroundColor: '#FFF',
@@ -32,5 +35,11 @@ export default makeStyles((theme) => ({
   },
   lockIcon: {
     marginRight: 8
+  },
+  chips: {
+    margin: '6px',
+    '&:last-child': {
+      marginRight: 0
+    }
   }
 }))
