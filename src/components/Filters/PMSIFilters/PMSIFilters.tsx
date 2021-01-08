@@ -54,25 +54,49 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
   showDiagnosticTypes
 }) => {
   const classes = useStyles()
-  const [diagnosticTypes, setDiagnosticTypes] = useState<any[]>(selectedDiagnosticTypes)
+
+  const [_nda, setNda] = useState<string>(nda)
+  const [_code, setCode] = useState<string>(code)
+  const [_startDate, setStartDate] = useState<string | undefined>(startDate)
+  const [_endDate, setEndDate] = useState<string | undefined>(endDate)
+  const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>(selectedDiagnosticTypes)
+
+  const [diagnosticTypesList, setDiagnosticTypesList] = useState<any[]>([])
 
   const _onChangeNda = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onChangeNda(event.target.value)
+    setNda(event.target.value)
   }
 
   const _onChangeCode = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onChangeCode(event.target.value)
+    setCode(event.target.value)
   }
 
   const _onChangeSelectedDiagnosticTypes = (event: React.ChangeEvent<{}>, value: any[]) => {
-    onChangeSelectedDiagnosticTypes(value.map((value) => value.id))
+    setSelectedDiagnosticTypes(value.map((value) => value.id))
+  }
+
+  const _onSubmit = () => {
+    onChangeNda(_nda)
+    onChangeCode(_code)
+    onChangeStartDate(_startDate)
+    onChangeEndDate(_endDate)
+    onChangeSelectedDiagnosticTypes(_selectedDiagnosticTypes)
+    onSubmit()
   }
 
   useEffect(() => {
     fetchDiagnosticTypes().then((diagnosticTypes) => {
-      setDiagnosticTypes(diagnosticTypes)
+      setDiagnosticTypesList(diagnosticTypes)
     })
   }, [])
+
+  useEffect(() => {
+    setNda(nda)
+    setCode(code)
+    setStartDate(startDate)
+    setEndDate(endDate)
+    setSelectedDiagnosticTypes(selectedDiagnosticTypes)
+  }, [open]) // eslint-disable-line
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -88,7 +112,7 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
               label="NDA"
               autoFocus
               placeholder="Exemple: 6601289264,141740347"
-              value={nda}
+              value={_nda}
               onChange={_onChangeNda}
             />
           </Grid>
@@ -102,7 +126,7 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
             label="Code"
             autoFocus
             placeholder="Exemple: G629,R2630,F310"
-            value={code}
+            value={_code}
             onChange={_onChangeCode}
           />
         </Grid>
@@ -112,8 +136,8 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
             <Autocomplete
               multiple
               onChange={_onChangeSelectedDiagnosticTypes}
-              options={diagnosticTypes}
-              value={diagnosticTypes.filter((value) => selectedDiagnosticTypes.includes(value.id))}
+              options={diagnosticTypesList}
+              value={diagnosticTypesList.filter((value) => _selectedDiagnosticTypes.includes(value.id))}
               disableCloseOnSelect
               getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.label)}
               renderOption={(diagnosticType: any) => (
@@ -136,17 +160,17 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
           <Typography variant="h3">Date :</Typography>
           <InputDate
             label={'Après le :'}
-            value={startDate}
-            onChange={(startDate: string) => onChangeStartDate(startDate)}
+            value={_startDate}
+            onChange={(startDate: string) => setStartDate(startDate)}
           />
-          <InputDate label={'Avant le :'} value={endDate} onChange={(endDate: string) => onChangeEndDate(endDate)} />
+          <InputDate label={'Avant le :'} value={_endDate} onChange={(endDate: string) => setEndDate(endDate)} />
         </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">
           Annuler
         </Button>
-        <Button onClick={onSubmit} color="primary">
+        <Button onClick={_onSubmit} color="primary">
           Valider
         </Button>
       </DialogActions>
