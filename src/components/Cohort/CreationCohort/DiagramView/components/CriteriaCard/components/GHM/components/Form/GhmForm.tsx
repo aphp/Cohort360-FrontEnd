@@ -9,28 +9,31 @@ import useStyles from './styles'
 
 import { GhmDataType } from 'types'
 
-type TestGeneratedFormProps = {
+type GHMFormProps = {
+  isEdition: boolean
   criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
 }
 
-const defaultDemographic = {
-  title: 'Critère de GHM',
-  code: [],
-  encounter: 0,
-  startOccurrence: '',
-  endOccurrence: ''
-}
+// const defaultDemographic = {
+//   title: 'Critère de GHM',
+//   code: [],
+//   encounter: 0,
+//   startOccurrence: '',
+//   endOccurrence: ''
+// }
 
-const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const defaultValues = selectedCriteria || defaultDemographic
+const GhmForm: React.FC<GHMFormProps> = (props) => {
+  // const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  // const defaultValues = selectedCriteria || defaultDemographic
+
+  const { isEdition, criteria, selectedCriteria, goBack, onChangeSelectedCriteria } = props
 
   const classes = useStyles()
 
-  const isEdition = selectedCriteria !== null ? true : false
+  // const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
@@ -63,7 +66,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
       </Grid>
 
       <FormBuilder<GhmDataType>
-        defaultValues={defaultValues}
+        defaultValues={selectedCriteria}
         title="Diagnostic"
         properties={[
           {
@@ -128,4 +131,4 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
   )
 }
 
-export default TestGeneratedForm
+export default GhmForm

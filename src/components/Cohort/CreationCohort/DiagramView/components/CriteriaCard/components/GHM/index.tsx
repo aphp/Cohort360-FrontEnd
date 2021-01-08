@@ -6,11 +6,30 @@ import GHMHierarchy from './components/Hierarchy/GhmHierarchy'
 
 import useStyles from './styles'
 
-const Index = (props: any) => {
-  const classes = useStyles()
+const defaultDemographic = {
+  title: 'Critères GHM',
+  code: [],
+  encounter: 0,
+  startOccurrence: '',
+  endOccurrence: ''
+}
 
+const Index = (props: any) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>('form')
+  const [defaultValues, onChangeDefaultValues] = useState(selectedCriteria || defaultDemographic)
+
+  const isEdition = selectedCriteria !== null ? true : false
+
+  const _onChangeSelectedHierarchy = (code: any) => {
+    onChangeDefaultValues({
+      ...defaultValues,
+      code
+    })
+    onChangeTab('form')
+  }
+
+  const classes = useStyles()
 
   return (
     <>
@@ -23,16 +42,18 @@ const Index = (props: any) => {
 
       {seletedTab === 'form' ? (
         <GHMForm
+          isEdition={isEdition}
           criteria={criteria}
-          selectedCriteria={selectedCriteria}
+          selectedCriteria={defaultValues}
           onChangeSelectedCriteria={onChangeSelectedCriteria}
           goBack={goBack}
         />
       ) : (
         <GHMHierarchy
+          isEdition={isEdition}
           criteria={criteria}
           selectedCriteria={selectedCriteria}
-          onChangeSelectedCriteria={onChangeSelectedCriteria}
+          onChangeSelectedHierarchy={_onChangeSelectedHierarchy}
           goBack={goBack}
         />
       )}

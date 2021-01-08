@@ -10,7 +10,8 @@ import {
   ListItemIcon,
   ListItemText,
   Collapse,
-  List
+  List,
+  Tooltip
 } from '@material-ui/core'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
@@ -20,47 +21,68 @@ import useStyles from './styles'
 
 type GhmListItemProps = {
   ghmItem: any
+  selectedItem: any
   handleClick: (ghmItem: any) => void
   fetchHierarchy: (ghmCode: string) => any
 }
 
 const GhmListItem: React.FC<GhmListItemProps> = (props) => {
-  const { ghmItem, handleClick, fetchHierarchy } = props
+  const { ghmItem, selectedItem, handleClick, fetchHierarchy } = props
   const { id, color, label } = ghmItem
 
   const classes = useStyles()
   const [open, setOpen] = useState(false)
   const [subItems, setSubItems] = useState<any>(['loading'])
 
+  const isSelected = selectedItem ? ghmItem.id === selectedItem.id : false
+
   const _onExpand = async (ghmCode: string) => {
     setOpen(!open)
-    console.log('subItems', subItems)
+    // console.log('subItems', subItems)
     if (subItems && subItems[0] === 'loading') {
       const _subItems = await fetchHierarchy(ghmCode)
       setSubItems(_subItems)
     }
   }
 
-  console.log('subItems', subItems)
+  useEffect(() => {
+    const _init = async () => {
+      const _subItems = await fetchHierarchy(id)
+      setSubItems(_subItems)
+    }
+
+    _init()
+  }, []) // eslint-disable-line
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
     return (
-      <ListItem onClick={() => handleClick(ghmItem)} className={classes.ghmItem}>
+      <ListItem className={classes.ghmItem}>
         <ListItemIcon>
-          <div className={classes.indicator} style={{ color }} />
+          <div
+            className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`}
+            style={{ color: '#0063af' }}
+          />
         </ListItemIcon>
-        <ListItemText style={{ cursor: 'pointer' }} primary={label} />
+        <Tooltip title={label} enterDelay={2500}>
+          <ListItemText
+            className={classes.label}
+            primary={label}
+            onClick={() => handleClick(isSelected ? null : ghmItem)}
+          />
+        </Tooltip>
       </ListItem>
     )
   }
 
   return (
     <>
-      <ListItem onClick={() => handleClick(ghmItem)} className={classes.ghmItem}>
+      <ListItem className={classes.ghmItem}>
         <ListItemIcon>
-          <div className={classes.indicator} style={{ color }} />
+          <div className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`} style={{ color }} />
         </ListItemIcon>
-        <ListItemText style={{ cursor: 'pointer' }} primary={label} />
+        <Tooltip title={label} enterDelay={2500}>
+          <ListItemText onClick={() => setOpen(!open)} className={classes.label} primary={label} />
+        </Tooltip>
         {open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => _onExpand(id)} />}
       </ListItem>
       <Collapse in={open} timeout="auto" unmountOnExit>
@@ -74,8 +96,9 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
                   <GhmListItem
+                    selectedItem={selectedItem}
                     ghmItem={ghmHierarchySubItem}
-                    handleClick={() => handleClick(ghmHierarchySubItem)}
+                    handleClick={handleClick}
                     fetchHierarchy={fetchHierarchy}
                   />
                 </Fragment>
@@ -88,28 +111,18 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
 }
 
 type GhmHierarchyProps = {
+  isEdition: boolean
   criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
-  onChangeSelectedCriteria: (data: any) => void
+  onChangeSelectedHierarchy: (data: any) => void
 }
 
-// const defaultProcedure = {
-//     title: "Critères GHM",
-//     code: [],
-//     encounter: 0,
-//     startOccurrence: '',
-//     endOccurrence: ''
-//   }
-
 const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
-  const { criteria, selectedCriteria, goBack } = props
-  // const defaultValues = selectedCriteria || defaultCondition
+  const { isEdition, criteria, selectedCriteria, goBack, onChangeSelectedHierarchy } = props
 
   const [ghmHierarchy, onSetGhmHierarchy] = useState([])
-  const [selectedHierarchy, onChangeSelectedHierarchy] = useState(null)
-
-  console.log('selectedHierarchy', selectedHierarchy)
+  const [selectedHierarchy, onSetSelectedHierarchy] = useState(isEdition ? selectedCriteria.code : null)
 
   // Init
   useEffect(() => {
@@ -123,7 +136,6 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
 
   const classes = useStyles()
 
-  const isEdition = selectedCriteria !== null ? true : false
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
@@ -143,9 +155,10 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
       <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
         {ghmHierarchy.map((ghmItem, index) => (
           <GhmListItem
+            selectedItem={selectedHierarchy}
             key={index}
             ghmItem={ghmItem}
-            handleClick={onChangeSelectedHierarchy}
+            handleClick={onSetSelectedHierarchy}
             fetchHierarchy={criteria?.fetch?.fetchGhmHierarchy}
           />
         ))}
@@ -157,7 +170,13 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
             Annuler
           </Button>
         )}
-        <Button type="submit" form="ghm-form" color="primary" variant="contained">
+        <Button
+          onClick={() => onChangeSelectedHierarchy(selectedHierarchy)}
+          type="submit"
+          form="ghm-form"
+          color="primary"
+          variant="contained"
+        >
           Confirmer
         </Button>
       </Grid>

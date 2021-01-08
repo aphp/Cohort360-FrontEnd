@@ -39,6 +39,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
     onChangeSelectedCriteria({
       title: data.title,
       code: data.code,
+      occurence: data.occurence,
       encounter: data.encounter,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
@@ -89,15 +90,6 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             autocompleteOptions: criteria?.data?.ccamData || [],
             getAutocompleteOptions: getCCAMOptions
           },
-          // {
-          //   name: 'hierarchy',
-          //   type: 'custom',
-          //   renderInput: () => (
-          //     <Button className={classes.linkTable} href="/accueil">
-          //       retour sur le home
-          //     </Button>
-          //   )
-          // },
           {
             name: 'encounter',
             label: "Nombre d'occurence",
