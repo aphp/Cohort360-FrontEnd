@@ -72,7 +72,7 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
   }
 
   const _onChangeSelectedDiagnosticTypes = (event: React.ChangeEvent<{}>, value: any[]) => {
-    setSelectedDiagnosticTypes(value.map((value) => value.id))
+    setSelectedDiagnosticTypes(value)
   }
 
   const _onSubmit = () => {
@@ -135,7 +135,7 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
               multiple
               onChange={_onChangeSelectedDiagnosticTypes}
               options={diagnosticTypesList}
-              value={diagnosticTypesList.filter((value) => _selectedDiagnosticTypes.includes(value.id))}
+              value={_selectedDiagnosticTypes}
               disableCloseOnSelect
               getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.label)}
               renderOption={(diagnosticType: any) => (

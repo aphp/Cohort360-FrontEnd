@@ -33,6 +33,7 @@ import { fetchPMSI } from '../../../services/patient'
 import useStyles from './styles'
 import { PMSIEntry } from 'types'
 import { IClaim, ICondition, IProcedure } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { capitalizeFirstLetter } from 'utils/capitalize'
 
 type PatientPMSITypes = {
   groupId?: string
@@ -70,7 +71,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
   const [open, setOpen] = useState(false)
   const [nda, setNda] = useState('')
   const [code, setCode] = useState('')
-  const [selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<string[]>([])
+  const [selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>([])
   const [startDate, setStartDate] = useState<string | undefined>(undefined)
   const [endDate, setEndDate] = useState<string | undefined>(undefined)
   const [_sortBy, setSortBy] = useState(sortBy)
@@ -94,6 +95,9 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
     endDate?: string
   ) => {
     setLoadingStatus(true)
+
+    const selectedDiagnosticTypesCodes = selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
+
     fetchPMSI(
       deidentified,
       page,
@@ -102,7 +106,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       searchInput,
       nda,
       code,
-      diagnosticTypes,
+      selectedDiagnosticTypesCodes,
       sortBy,
       sortDirection,
       groupId,
@@ -405,8 +409,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
           selectedDiagnosticTypes.map((diagnosticType) => (
             <Chip
               className={classes.chips}
-              key={diagnosticType}
-              label={diagnosticType}
+              key={diagnosticType.id}
+              label={capitalizeFirstLetter(diagnosticType.label)}
               onDelete={() => handleDeleteChip('selectedDiagnosticTypes', diagnosticType)}
               color="primary"
               variant="outlined"
