@@ -109,7 +109,6 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
               variant="outlined"
               margin="normal"
               fullWidth
-              label="NDA"
               autoFocus
               placeholder="Exemple: 6601289264,141740347"
               value={_nda}
@@ -123,7 +122,6 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
             variant="outlined"
             margin="normal"
             fullWidth
-            label="Code"
             autoFocus
             placeholder="Exemple: G629,R2630,F310"
             value={_code}
