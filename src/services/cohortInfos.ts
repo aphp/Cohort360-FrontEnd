@@ -319,7 +319,7 @@ const fetchDocuments = async (
 ) => {
   if (CONTEXT === 'aphp') {
     const searchByGroup = groupId ? `&_list=${groupId}` : ''
-    const search = searchInput ? `&_text=${searchInput}` : ''
+    const search = searchInput ? `&_text-solr=${searchInput}` : ''
     const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : ''
     const ndaFilter = nda ? `&encounter.identifier=${nda}` : ''
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
