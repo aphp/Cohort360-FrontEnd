@@ -130,7 +130,7 @@ const Dashboard: React.FC<{
       default:
         break
     }
-  }, []) //eslint-disable-line
+  }, [context, cohortId]) //eslint-disable-line
 
   const checkDeindentifiedStatus = () => {
     // Check if access == 'Pseudonymisé' || 'Nominatif'

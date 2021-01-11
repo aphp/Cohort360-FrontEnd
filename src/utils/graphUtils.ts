@@ -134,11 +134,15 @@ export const getEncounterRepartitionMapAphp = (extension?: IExtension[]): Simple
   const data: SimpleChartDataType[] = []
 
   extension?.forEach((visitType) => {
-    data.push({
-      label: getVisitTypeName(visitType.extension?.[0].url),
-      value: visitType.extension?.[0].valueDecimal ?? 0,
-      color: getVisitTypeColor(visitType.extension?.[0].url)
-    })
+    const visitTypeUrl = visitType.extension?.[0].url
+
+    if (visitTypeUrl === 'ext' || visitTypeUrl === 'hosp' || visitTypeUrl === 'incomp' || visitTypeUrl === 'urg') {
+      data.push({
+        label: getVisitTypeName(visitTypeUrl),
+        value: visitType.extension?.[0].valueDecimal ?? 0,
+        color: getVisitTypeColor(visitTypeUrl)
+      })
+    }
   })
 
   return data

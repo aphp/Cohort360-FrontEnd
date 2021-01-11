@@ -13,13 +13,31 @@ const useStyles = makeStyles(() => ({
     padding: 20,
     backgroundColor: '#317EAA',
     color: 'white',
-    // Not default
+    //not default
     marginBottom: 48
   },
   backButton: { color: 'white' },
   divider: { background: 'white' },
   titleLabel: { marginLeft: '1em' },
-  cimHierarchyActionContainer: {
+  formContainer: {
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '1em'
+  },
+  formControl: {
+    margin: '1em'
+  },
+  inputText: {
+    border: '1px solid #D7DAE3',
+    borderRadius: '5px',
+    padding: '0.5em'
+  },
+  inputTextError: {
+    borderColor: '#c61137',
+    color: '#fc1847'
+  },
+  criteriaActionContainer: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -32,43 +50,6 @@ const useStyles = makeStyles(() => ({
     '& > button': {
       margin: '12px 8px'
     }
-  },
-  cimItem: {
-    padding: '2px 16px'
-  },
-  indicator: {
-    width: 20,
-    height: 20,
-    border: '2px solid currentColor',
-    borderRadius: 10
-  },
-  drawerContentContainer: {
-    height: 'calc(100vh - 200px)',
-    overflow: 'auto',
-    margin: 12
-  },
-  cimHierarchyItem: {
-    padding: '2px 16px'
-  },
-  subItemsContainer: {
-    position: 'relative',
-    marginLeft: 25
-  },
-  subItemsContainerIndicator: {
-    content: '""',
-    position: 'absolute',
-    width: 2,
-    height: 'calc(100% + -10px)',
-    bottom: 15,
-    background: '#D0D7D8'
-  },
-  subItemsIndicator: {
-    content: '""',
-    position: 'absolute',
-    width: 17,
-    height: 2,
-    marginTop: 14.5,
-    background: '#D0D7D8'
   }
 }))
 

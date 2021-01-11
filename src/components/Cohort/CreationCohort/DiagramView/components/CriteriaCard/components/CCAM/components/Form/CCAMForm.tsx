@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography, FormLabel } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -10,32 +10,36 @@ import useStyles from './styles'
 import { CcamDataType } from 'types'
 
 type CcamFormProps = {
+  isEdition: boolean
   criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
 }
 
-const defaultProcedure = {
-  title: "Critères d'actes CCAM",
-  code: [],
-  encounter: 0,
-  startOccurrence: '',
-  endOccurrence: ''
-}
+// const defaultProcedure = {
+//   title: "Critères d'actes CCAM",
+//   code: [],
+//   encounter: 0,
+//   startOccurrence: '',
+//   endOccurrence: ''
+// }
 
 const CcamForm: React.FC<CcamFormProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const defaultValues = selectedCriteria || defaultProcedure
+  // const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  // const defaultValues = selectedCriteria || defaultProcedure
+
+  const { isEdition, criteria, selectedCriteria, goBack, onChangeSelectedCriteria } = props
 
   const classes = useStyles()
 
-  const isEdition = selectedCriteria !== null ? true : false
+  // const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
       title: data.title,
       code: data.code,
+      occurence: data.occurence,
       encounter: data.encounter,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
@@ -66,7 +70,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
       </Grid>
 
       <FormBuilder<CcamDataType>
-        defaultValues={defaultValues}
+        defaultValues={selectedCriteria}
         title="Actes CCAM"
         properties={[
           {
@@ -86,40 +90,31 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             autocompleteOptions: criteria?.data?.ccamData || [],
             getAutocompleteOptions: getCCAMOptions
           },
-          // {
-          //   name: 'hierarchy',
-          //   type: 'custom',
-          //   renderInput: () => (
-          //     <Button className={classes.linkTable} href="/accueil">
-          //       retour sur le home
-          //     </Button>
-          //   )
-          // },
           {
             name: 'encounter',
             label: "Nombre d'occurence",
             variant: 'outlined',
             type: 'number'
-          },
-          {
-            type: 'custom',
-            name: 'label',
-            renderInput: () => (
-              <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
-                Date d'occurrence :
-              </FormLabel>
-            )
-          },
-          {
-            name: 'startOccurrence',
-            label: 'Avant le',
-            type: 'date'
-          },
-          {
-            name: 'endOccurrence',
-            label: 'Après le',
-            type: 'date'
           }
+          // {
+          //   type: 'custom',
+          //   name: 'label',
+          //   renderInput: () => (
+          //     <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+          //       Date d'occurrence :
+          //     </FormLabel>
+          //   )
+          // },
+          // {
+          //   name: 'startOccurrence',
+          //   label: 'Avant le',
+          //   type: 'date'
+          // },
+          // {
+          //   name: 'endOccurrence',
+          //   label: 'Après le',
+          //   type: 'date'
+          // }
         ]}
         submit={_onSubmit}
         formId="ccam-form"

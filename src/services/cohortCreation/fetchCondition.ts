@@ -56,7 +56,7 @@ export const fetchDiagnosticTypes = async () => {
 
   return diagnosticKinds && diagnosticKinds.length > 0
     ? diagnosticKinds.sort(alphabeticalSort).map((cimType: any) => ({
-        id: cimType.display,
+        id: cimType.code,
         label: `${cimType.code} - ${cimType.display}`
       }))
     : []

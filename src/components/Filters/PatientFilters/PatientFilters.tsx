@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import {
   Button,
@@ -43,18 +43,35 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
 }) => {
   const classes = useStyles()
 
+  const [_gender, setGender] = useState<PatientGenderKind>(gender)
+  const [_age, setAge] = useState<[number, number]>(age)
+  const [_vitalStatus, setVitalStatus] = useState<VitalStatus>(vitalStatus)
+
+  useEffect(() => {
+    setGender(gender)
+    setAge(age)
+    setVitalStatus(vitalStatus)
+  }, [open]) // eslint-disable-line
+
   const _onChangeGender = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    onChangeGender(value as PatientGenderKind)
+    setGender(value as PatientGenderKind)
   }
 
   const _onChangeAge = (event: React.ChangeEvent<{}>, value: number | number[]) => {
     if (Array.isArray(value) && value.length === 2) {
-      onChangeAge([value[0], value[1]])
+      setAge([value[0], value[1]])
     }
   }
 
   const _onChangeVitalStatus = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    onChangeVitalStatus(value as VitalStatus)
+    setVitalStatus(value as VitalStatus)
+  }
+
+  const _onSubmit = () => {
+    onChangeGender(_gender)
+    onChangeAge(_age)
+    onChangeVitalStatus(_vitalStatus)
+    onSubmit()
   }
 
   return (
@@ -63,7 +80,7 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
       <DialogContent className={classes.dialog}>
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Genre :</Typography>
-          <RadioGroup name="Gender" value={gender} onChange={_onChangeGender} row={true}>
+          <RadioGroup name="Gender" value={_gender} onChange={_onChangeGender} row={true}>
             <FormControlLabel value={PatientGenderKind._male} control={<Radio />} label="Hommes" />
             <FormControlLabel value={PatientGenderKind._female} control={<Radio />} label="Femmes" />
             <FormControlLabel value={PatientGenderKind._other} control={<Radio />} label="Autres" />
@@ -72,11 +89,11 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
         </Grid>
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Âge :</Typography>
-          <Slider value={age} onChange={_onChangeAge} valueLabelDisplay="on" max={130} className={classes.slider} />
+          <Slider value={_age} onChange={_onChangeAge} valueLabelDisplay="on" max={130} className={classes.slider} />
         </Grid>
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Statut vital :</Typography>
-          <RadioGroup name="VitalStatus" value={vitalStatus} onChange={_onChangeVitalStatus} row={true}>
+          <RadioGroup name="VitalStatus" value={_vitalStatus} onChange={_onChangeVitalStatus} row={true}>
             <FormControlLabel value="alive" control={<Radio />} label="Patients vivants" />
             <FormControlLabel value="deceased" control={<Radio />} label="Patients décédés" />
             <FormControlLabel value="all" control={<Radio />} label="Tous les patients" />
@@ -87,7 +104,7 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
         <Button onClick={onClose} color="primary">
           Annuler
         </Button>
-        <Button onClick={onSubmit} color="primary">
+        <Button onClick={_onSubmit} color="primary">
           Valider
         </Button>
       </DialogActions>

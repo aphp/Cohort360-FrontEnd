@@ -67,6 +67,12 @@ const useStyles = makeStyles((theme) => ({
       color: '#0063AF',
       backgroundColor: '#FFF'
     }
+  },
+  chips: {
+    margin: '12px 6px',
+    '&:last-child': {
+      marginRight: 0
+    }
   }
 }))
 

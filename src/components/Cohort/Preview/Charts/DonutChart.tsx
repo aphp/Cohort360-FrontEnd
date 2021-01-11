@@ -12,7 +12,7 @@ type DonutChartProps = {
   width?: number
 }
 
-const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 260 }) => {
+const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 320 }) => {
   const node = useRef<SVGSVGElement | null>(null)
 
   useEffect(() => {

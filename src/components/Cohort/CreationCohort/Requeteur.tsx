@@ -158,7 +158,6 @@ const Requeteur = () => {
     } else if (currentSnapshot) {
       // Update snapshots list
       const newSnapshot = await createSnapshot(currentSnapshot, newJson, false)
-
       if (newSnapshot) {
         const foundItem = snapshotsHistory.find(({ uuid }) => uuid === currentSnapshot)
         const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
@@ -184,7 +183,6 @@ const Requeteur = () => {
   ) => {
     onChangeSelectedPopulation(_selectedPopulation)
     onChangeSelectedCriteria(_selectedCriteria)
-    if (!_selectedPopulation && _selectedCriteria && _selectedCriteria.length === 0) return
 
     const _json = await buildRequest(_selectedPopulation, _selectedCriteria)
     onChangeJson(_json)
@@ -203,17 +201,22 @@ const Requeteur = () => {
    *  - Create it with `createCohort`
    *  - Link fhir result with the back end, call /cohorts/
    */
-  const _onExecute = () => {
+  const _onExecute = (cohortName: string, cohortDescription: string) => {
     setActionLoading([...actionLoading, true])
 
     const _createCohort = async () => {
       if (!json) return
 
-      const newCohortResult = await createCohort(json, count?.uuid, currentSnapshot, requestId)
-      const cohortId = newCohortResult ? newCohortResult['fhir_group_id'] : ''
-      if (!cohortId) return
+      const newCohortResult = await createCohort(
+        json,
+        count?.uuid,
+        currentSnapshot,
+        requestId,
+        cohortName,
+        cohortDescription
+      )
 
-      history.push(`/cohort/${cohortId}`)
+      history.push(`/cohort/${newCohortResult?.['fhir_group_id']}`)
     }
 
     _createCohort()
@@ -255,6 +258,13 @@ const Requeteur = () => {
     const foundItem = snapshotsHistory.find(({ uuid }) => uuid === currentSnapshot)
     const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
     return index !== snapshotsHistory.length - 1 && index !== -1
+  }
+
+  const _canExecute: () => boolean = () => {
+    if (!json || !count?.uuid || !currentSnapshot || !requestId) {
+      return false
+    }
+    return true
   }
 
   // Initial useEffect
@@ -326,7 +336,7 @@ const Requeteur = () => {
         female={count.female}
         male={count.male}
         executeLoading={actionLoading.length > 0}
-        onExecute={_onExecute}
+        onExecute={_canExecute() ? _onExecute : undefined}
         onUndo={_canUndo() ? _onUndo : undefined}
         onRedo={_canRedo() ? _onRedo : undefined}
       />

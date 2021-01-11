@@ -144,7 +144,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                     className={classes.pointerHover}
                     hover
                     key={row.researchId}
-                    onClick={onClickRow ? () => onClickRow(row) : () => history.push(`/cohort/${row.fhir_groups_ids}`)}
+                    onClick={onClickRow ? () => onClickRow(row) : () => history.push(`/cohort/${row.fhir_group_id}`)}
                   >
                     <TableCell>{row.name}</TableCell>
                     <TableCell className={classes.status} align="center">
