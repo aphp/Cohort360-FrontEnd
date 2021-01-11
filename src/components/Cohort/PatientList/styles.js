@@ -61,6 +61,12 @@ const useStyles = makeStyles((theme) => ({
   },
   select: {
     marginRight: '4px'
+  },
+  chips: {
+    margin: '12px 6px',
+    '&:last-child': {
+      marginRight: 0
+    }
   }
 }))
 

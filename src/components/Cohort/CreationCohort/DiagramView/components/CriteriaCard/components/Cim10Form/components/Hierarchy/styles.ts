@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
   backButton: { color: 'white' },
   divider: { background: 'white' },
   titleLabel: { marginLeft: '1em' },
-  ccamHierarchyActionContainer: {
+  cimHierarchyActionContainer: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -33,7 +33,7 @@ const useStyles = makeStyles(() => ({
       margin: '12px 8px'
     }
   },
-  ccamItem: {
+  cimItem: {
     padding: '2px 16px'
   },
   label: {
@@ -63,7 +63,7 @@ const useStyles = makeStyles(() => ({
     overflow: 'auto',
     margin: 12
   },
-  ccamHierarchyItem: {
+  cimHierarchyItem: {
     padding: '2px 16px'
   },
   subItemsContainer: {

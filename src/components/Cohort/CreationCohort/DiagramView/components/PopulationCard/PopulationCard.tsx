@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 
 import { Button, Card, CardHeader, CardContent, IconButton, Typography } from '@material-ui/core'
 
-import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 
 import PopulationRightPanel from './components/PopulationRightPanel'
@@ -34,18 +33,9 @@ const PopulationCard: React.FC<PopulationCardProps> = (props) => {
           className={classes.cardHeader}
           action={
             selectedPopulation !== null && (
-              <>
-                <IconButton
-                  size="small"
-                  onClick={() => onChangeSelectedPopulation(null)}
-                  style={{ color: 'currentcolor' }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-                <IconButton size="small" onClick={() => onChangeOpenDrawer(true)} style={{ color: 'currentcolor' }}>
-                  <EditIcon />
-                </IconButton>
-              </>
+              <IconButton size="small" onClick={() => onChangeOpenDrawer(true)} style={{ color: 'currentcolor' }}>
+                <EditIcon />
+              </IconButton>
             )
           }
           title="Population source"

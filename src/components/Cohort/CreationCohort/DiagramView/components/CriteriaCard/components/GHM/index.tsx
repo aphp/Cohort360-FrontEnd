@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import { Tabs, Tab } from '@material-ui/core'
 
+import GHMForm from './components/Form/GhmForm'
+import GHMHierarchy from './components/Hierarchy/GhmHierarchy'
+
 import useStyles from './styles'
 
-import CcamForm from './components/Form/CCAMForm'
-import CcamHierarchy from './components/Hierarchy/CCAMHierarchy'
-
-const defaultProcedure = {
-  title: "Critères d'actes CCAM",
+const defaultDemographic = {
+  title: 'Critères GHM',
   code: [],
   encounter: 0,
   startOccurrence: '',
@@ -17,7 +17,7 @@ const defaultProcedure = {
 const Index = (props: any) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>('form')
-  const [defaultValues, onChangeDefaultValues] = useState(selectedCriteria || defaultProcedure)
+  const [defaultValues, onChangeDefaultValues] = useState(selectedCriteria || defaultDemographic)
 
   const isEdition = selectedCriteria !== null ? true : false
 
@@ -41,7 +41,7 @@ const Index = (props: any) => {
       </div>
 
       {seletedTab === 'form' ? (
-        <CcamForm
+        <GHMForm
           isEdition={isEdition}
           criteria={criteria}
           selectedCriteria={defaultValues}
@@ -49,7 +49,7 @@ const Index = (props: any) => {
           goBack={goBack}
         />
       ) : (
-        <CcamHierarchy
+        <GHMHierarchy
           isEdition={isEdition}
           criteria={criteria}
           selectedCriteria={selectedCriteria}

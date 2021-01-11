@@ -19,27 +19,28 @@ import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import useStyles from './styles'
 
-type CimListItemProps = {
-  cimItem: any
-  selectedItem?: any
-  handleClick: (cimItem: any) => void
-  fetchHierarchy: (cimCode: string) => any
+type GhmListItemProps = {
+  ghmItem: any
+  selectedItem: any
+  handleClick: (ghmItem: any) => void
+  fetchHierarchy: (ghmCode: string) => any
 }
 
-const CimListItem: React.FC<CimListItemProps> = (props) => {
-  const { cimItem, selectedItem, handleClick, fetchHierarchy } = props
-  const { id, color, label } = cimItem
+const GhmListItem: React.FC<GhmListItemProps> = (props) => {
+  const { ghmItem, selectedItem, handleClick, fetchHierarchy } = props
+  const { id, color, label } = ghmItem
 
   const classes = useStyles()
   const [open, setOpen] = useState(false)
   const [subItems, setSubItems] = useState<any>(['loading'])
 
-  const isSelected = selectedItem ? cimItem.id === selectedItem.id : false
+  const isSelected = selectedItem ? ghmItem.id === selectedItem.id : false
 
-  const _onExpand = async (cimCode: string) => {
+  const _onExpand = async (ghmCode: string) => {
     setOpen(!open)
+    // console.log('subItems', subItems)
     if (subItems && subItems[0] === 'loading') {
-      const _subItems = await fetchHierarchy(cimCode)
+      const _subItems = await fetchHierarchy(ghmCode)
       setSubItems(_subItems)
     }
   }
@@ -55,7 +56,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
     return (
-      <ListItem className={classes.cimItem}>
+      <ListItem className={classes.ghmItem}>
         <ListItemIcon>
           <div
             className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`}
@@ -66,7 +67,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
           <ListItemText
             className={classes.label}
             primary={label}
-            onClick={() => handleClick(isSelected ? null : cimItem)}
+            onClick={() => handleClick(isSelected ? null : ghmItem)}
           />
         </Tooltip>
       </ListItem>
@@ -75,7 +76,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
 
   return (
     <>
-      <ListItem className={classes.cimItem}>
+      <ListItem className={classes.ghmItem}>
         <ListItemIcon>
           <div className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`} style={{ color }} />
         </ListItemIcon>
@@ -88,15 +89,15 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((cimHierarchySubItem: any, index: number) =>
-              cimHierarchySubItem === 'loading' ? (
+            subItems.map((ghmHierarchySubItem: any, index: number) =>
+              ghmHierarchySubItem === 'loading' ? (
                 <></>
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
-                  <CimListItem
-                    cimItem={cimHierarchySubItem}
+                  <GhmListItem
                     selectedItem={selectedItem}
+                    ghmItem={ghmHierarchySubItem}
                     handleClick={handleClick}
                     fetchHierarchy={fetchHierarchy}
                   />
@@ -109,30 +110,31 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
   )
 }
 
-type Cim10HierarchyProps = {
+type GhmHierarchyProps = {
+  isEdition: boolean
   criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
   onChangeSelectedHierarchy: (data: any) => void
-  isEdition?: boolean
 }
 
-const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
+const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
+  const { isEdition, criteria, selectedCriteria, goBack, onChangeSelectedHierarchy } = props
 
-  const classes = useStyles()
-  const [cimHierarchy, onSetCimHieerarchy] = useState([])
+  const [ghmHierarchy, onSetGhmHierarchy] = useState([])
   const [selectedHierarchy, onSetSelectedHierarchy] = useState(isEdition ? selectedCriteria.code : null)
 
   // Init
   useEffect(() => {
     const _init = async () => {
-      const newCriteriaTree = await criteria.fetch.fetchCim10Hierarchy()
-      onSetCimHieerarchy(newCriteriaTree)
+      const newCriteriaTree = await criteria.fetch.fetchGhmHierarchy()
+      onSetGhmHierarchy(newCriteriaTree)
     }
 
     _init()
   }, []) // eslint-disable-line
+
+  const classes = useStyles()
 
   return (
     <Grid className={classes.root}>
@@ -151,18 +153,18 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
       </Grid>
 
       <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-        {cimHierarchy.map((cimItem, index) => (
-          <CimListItem
-            key={index}
-            cimItem={cimItem}
+        {ghmHierarchy.map((ghmItem, index) => (
+          <GhmListItem
             selectedItem={selectedHierarchy}
+            key={index}
+            ghmItem={ghmItem}
             handleClick={onSetSelectedHierarchy}
-            fetchHierarchy={criteria?.fetch?.fetchCim10Hierarchy}
+            fetchHierarchy={criteria?.fetch?.fetchGhmHierarchy}
           />
         ))}
       </List>
 
-      <Grid className={classes.cimHierarchyActionContainer}>
+      <Grid className={classes.ghmHierarchyActionContainer}>
         {!isEdition && (
           <Button onClick={goBack} color="primary" variant="outlined">
             Annuler
@@ -171,7 +173,7 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
         <Button
           onClick={() => onChangeSelectedHierarchy(selectedHierarchy)}
           type="submit"
-          form="cim10-form"
+          form="ghm-form"
           color="primary"
           variant="contained"
         >
@@ -182,4 +184,4 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
   )
 }
 
-export default Cim10Hierarchy
+export default GhmHierarchy

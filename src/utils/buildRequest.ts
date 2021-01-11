@@ -10,14 +10,14 @@ const PATIENT_DECEASED = 'deceased'
 
 const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
 const ENCOUNTER_LENGTH = 'length'
-const ENCOUNTER_BIRTHDATE = 'birthdate'
+const ENCOUNTER_BIRTHDATE = 'patient.birthdate'
 const ENCOUNTER_ADMISSIONMODE = 'admissionMode'
 const ENCOUNTER_ENTRYMODE = 'entryMode'
 const ENCOUNTER_EXITMODE = 'exitMode'
 const ENCOUNTER_FILESTATUS = 'fileStatus'
 
 const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
-const CLAIM_CODE = 'code'
+const CLAIM_CODE = 'diagnosis'
 const CLAIM_DATE = 'date'
 const CLAIM_ENCOUNTER = 'encounter'
 

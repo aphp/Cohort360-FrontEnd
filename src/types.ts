@@ -67,17 +67,19 @@ export type PMSIEntry<T extends IProcedure | ICondition | IClaim> = T & {
 
 export type Cohort = {
   uuid?: string
-  fhir_groups_ids?: string
+  fhir_group_id?: string
   name?: string
   result_size?: number
   created_at?: string
   modified_at?: string
   favorite?: boolean
+  type?: string
+  request_id?: string
 }
 
 export type FormattedCohort = {
   researchId: string
-  fhir_groups_ids?: string
+  fhir_group_id?: string
   name?: string
   status?: string
   nPatients?: number
@@ -192,6 +194,7 @@ export type CohortData = {
   visitTypeRepartitionData?: SimpleChartDataType[]
   monthlyVisitData?: ComplexChartDataType<Month>
   agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
+  requestId?: string
 }
 
 export type PatientData = {

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography, FormLabel } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Typography /*, FormLabel */ } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -95,26 +95,26 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
             label: "Nombre d'occurence",
             variant: 'outlined',
             type: 'number'
-          },
-          {
-            type: 'custom',
-            name: 'label',
-            renderInput: () => (
-              <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
-                Date d'occurrence :
-              </FormLabel>
-            )
-          },
-          {
-            name: 'startOccurrence',
-            label: 'Avant le',
-            type: 'date'
-          },
-          {
-            name: 'endOccurrence',
-            label: 'Après le',
-            type: 'date'
           }
+          // {
+          //   type: 'custom',
+          //   name: 'label',
+          //   renderInput: () => (
+          //     <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+          //       Date d'occurrence :
+          //     </FormLabel>
+          //   )
+          // },
+          // {
+          //   name: 'startOccurrence',
+          //   label: 'Avant le',
+          //   type: 'date'
+          // },
+          // {
+          //   name: 'endOccurrence',
+          //   label: 'Après le',
+          //   type: 'date'
+          // }
         ]}
         submit={_onSubmit}
         formId="documents-form"

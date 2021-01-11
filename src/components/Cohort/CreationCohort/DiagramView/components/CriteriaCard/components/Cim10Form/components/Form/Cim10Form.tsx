@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography, FormLabel } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -10,28 +10,17 @@ import useStyles from './styles'
 import { Cim10DataType } from 'types'
 
 type Cim10FormProps = {
+  isEdition?: boolean
   criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
 }
 
-const defaultCondition = {
-  title: 'Critère de diagnostic',
-  code: [],
-  diagnosticType: '',
-  encounter: 0,
-  startOccurrence: '',
-  endOccurrence: ''
-}
-
 const Cim10Form: React.FC<Cim10FormProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const defaultValues = selectedCriteria || defaultCondition
+  const { isEdition, criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const classes = useStyles()
-
-  const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
@@ -48,11 +37,9 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue)
 
   if (
-    criteria &&
-    criteria.data &&
-    (criteria.data.diagnosticTypes === 'loading' ||
-      criteria.data.statusDiagnostic === 'loading' ||
-      criteria.data.cim10Diagnostic === 'loading')
+    criteria?.data?.diagnosticTypes === 'loading' ||
+    criteria?.data?.statusDiagnostic === 'loading' ||
+    criteria?.data?.cim10Diagnostic === 'loading'
   ) {
     return <> </>
   }
@@ -74,7 +61,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       </Grid>
 
       <FormBuilder<Cim10DataType>
-        defaultValues={defaultValues}
+        defaultValues={selectedCriteria}
         title="Diagnostic"
         properties={[
           {
@@ -106,26 +93,26 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             label: "Nombre d'occurence",
             variant: 'outlined',
             type: 'number'
-          },
-          {
-            type: 'custom',
-            name: 'label',
-            renderInput: () => (
-              <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
-                Date d'occurrence :
-              </FormLabel>
-            )
-          },
-          {
-            name: 'startOccurrence',
-            label: 'Avant le',
-            type: 'date'
-          },
-          {
-            name: 'endOccurrence',
-            label: 'Après le',
-            type: 'date'
           }
+          // {
+          //   type: 'custom',
+          //   name: 'label',
+          //   renderInput: () => (
+          //     <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+          //       Date d'occurrence :
+          //     </FormLabel>
+          //   )
+          // },
+          // {
+          //   name: 'startOccurrence',
+          //   label: 'Avant le',
+          //   type: 'date'
+          // },
+          // {
+          //   name: 'endOccurrence',
+          //   label: 'Après le',
+          //   type: 'date'
+          // }
         ]}
         submit={_onSubmit}
         formId="cim10-form"

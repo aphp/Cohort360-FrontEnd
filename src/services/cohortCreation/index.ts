@@ -40,7 +40,9 @@ export const createCohort = async (
   requeteurJson: string | undefined,
   datedMeasureId: string | undefined,
   snapshotId: string | undefined,
-  requestId: string | undefined
+  requestId: string | undefined,
+  cohortName: string | undefined,
+  cohortDescription: string | undefined
 ) => {
   if (!requeteurJson || !datedMeasureId || !snapshotId || !requestId) return null
 
@@ -58,8 +60,8 @@ export const createCohort = async (
       request_query_snapshot_id: snapshotId,
       request_id: requestId,
       fhir_group_id,
-      name: 'Nouvelle Cohorte',
-      description: 'Cohorte créée depuis le front Cohort360'
+      name: cohortName,
+      description: cohortDescription
     })
 
     return {
@@ -85,8 +87,6 @@ export const createRequest = async () => {
 }
 
 export const createSnapshot = async (id: string, json: string, firstTime?: boolean) => {
-  if (!id || !json) return null
-
   if (CONTEXT === 'arkhn') {
     return null
   } else {

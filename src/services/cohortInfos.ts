@@ -1,7 +1,16 @@
 import api from './api'
+import apiBackCohort from './apiBackCohort'
 import { getInfos, getLastEncounter } from './myPatients'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
-import { FHIR_API_Response, CohortData, ComplexChartDataType, SearchByTypes, VitalStatus } from 'types'
+import {
+  FHIR_API_Response,
+  CohortData,
+  ComplexChartDataType,
+  SearchByTypes,
+  VitalStatus,
+  Back_API_Response,
+  Cohort
+} from 'types'
 import {
   IGroup,
   IPatient,
@@ -27,7 +36,8 @@ import { getAge } from 'utils/age'
 
 const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | undefined> => {
   if (CONTEXT === 'aphp') {
-    const [cohortResp, patientsResp, encountersResp] = await Promise.all([
+    const [cohortInfo, cohortResp, patientsResp, encountersResp] = await Promise.all([
+      apiBackCohort.get<Back_API_Response<Cohort>>(`/explorations/cohorts/?fhir_group_id=${cohortId}`),
       api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${cohortId}`),
       api.get<FHIR_API_Response<IPatient>>(
         `/Patient?pivotFacet=age_gender,deceased_gender&_list=${cohortId}&size=20&_sort=given&_elements=gender,name,birthDate,deceased,identifier,extension`
@@ -37,7 +47,19 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       )
     ])
 
-    const name = cohortResp.data.resourceType === 'Bundle' ? cohortResp.data.entry?.[0].resource?.name : '-'
+    console.log('cohortInfo', cohortInfo)
+
+    let name = ''
+    let requestId = ''
+
+    if (cohortInfo.data.results && cohortInfo.data.results.length === 1) {
+      name = cohortInfo.data.results[0].name ?? ''
+      requestId = cohortInfo.data.results[0].request_id ?? ''
+    }
+
+    if (!name) {
+      name = cohortResp.data.resourceType === 'Bundle' ? cohortResp.data.entry?.[0].resource?.name ?? '-' : '-'
+    }
 
     const cohort = cohortResp.data.resourceType === 'Bundle' ? cohortResp.data.entry?.[0].resource : undefined
 
@@ -81,7 +103,8 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       genderRepartitionMap,
       visitTypeRepartitionData,
       agePyramidData,
-      monthlyVisitData
+      monthlyVisitData,
+      requestId
     }
   }
 
@@ -317,10 +340,14 @@ const fetchDocuments = async (
       elements = '&_elements=status,type,subject,encounter,date,title'
     }
 
-    const [wordCloudRequest, docsList, allDocsList] = await Promise.all([
-      api.get<FHIR_API_Response<IComposition>>(
-        `/Composition?facet=cloud&size=0&_sort=${_sortDirection}${sortBy}&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
-      ),
+    const [
+      // wordCloudRequest,
+      docsList,
+      allDocsList
+    ] = await Promise.all([
+      // api.get<FHIR_API_Response<IComposition>>(
+      //   `/Composition?facet=cloud&size=0&_sort=${_sortDirection}${sortBy}&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
+      // ),
       api.get<FHIR_API_Response<IComposition>>(
         `/Composition?size=20&_sort=${_sortDirection}${sortBy}&offset=${
           page ? (page - 1) * 20 : 0
@@ -342,20 +369,16 @@ const fetchDocuments = async (
 
     const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
 
-    const wordcloudData =
-      wordCloudRequest.data.resourceType === 'Bundle'
-        ? wordCloudRequest.data.meta?.extension?.find((facet: any) => facet.url === 'facet-cloud')?.extension
-        : []
+    // const wordcloudData =
+    //   wordCloudRequest.data.resourceType === 'Bundle'
+    //     ? wordCloudRequest.data.meta?.extension?.find((facet: any) => facet.url === 'facet-cloud')?.extension
+    //     : []
 
-    if (totalDocs === 0) {
-      return null
-    } else {
-      return {
-        totalDocs,
-        totalAllDocs,
-        documentsList,
-        wordcloudData
-      }
+    return {
+      totalDocs: totalDocs ?? 0,
+      totalAllDocs,
+      documentsList
+      // wordcloudData
     }
   }
 
