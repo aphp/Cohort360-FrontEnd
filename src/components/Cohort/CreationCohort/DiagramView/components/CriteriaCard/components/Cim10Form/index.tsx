@@ -10,6 +10,8 @@ const defaultCondition = {
   title: 'Critère de diagnostic',
   code: [],
   diagnosticType: '',
+  encounter: 0,
+  comparator: { id: 'e', label: '=' },
   startOccurrence: '',
   endOccurrence: '',
   type: 'Condition'

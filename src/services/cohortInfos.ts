@@ -47,8 +47,6 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       )
     ])
 
-    console.log('cohortInfo', cohortInfo)
-
     let name = ''
     let requestId = ''
 

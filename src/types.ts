@@ -227,6 +227,7 @@ export type SelectedCriteriaType = {
   code?: { id: string; label: string }
   diagnosticType?: { id: string; label: string }
   encounter: number
+  comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
@@ -249,6 +250,7 @@ export type CcamDataType = {
   hierarchy: undefined
   code: { id: string; label: string } | null
   encounter: number
+  comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
@@ -259,6 +261,7 @@ export type Cim10DataType = {
   code: { id: string; label: string } | null
   diagnosticType: { id: string; label: string } | null
   encounter: number
+  comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
@@ -276,6 +279,7 @@ export type DocumentDataType = {
   search: string
   docType: { id: string; label: string } | null
   encounter: number
+  comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
@@ -285,6 +289,7 @@ export type GhmDataType = {
   title: string
   code: { id: string; label: string } | null
   encounter: number
+  comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
   startOccurrence: Date
   endOccurrence: Date

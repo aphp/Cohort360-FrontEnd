@@ -8,6 +8,7 @@ export type MeState = null | {
   lastName: string
   deidentified: boolean
   nominativeGroupsIds?: any[]
+  lastConnection?: string
 }
 
 const initialState: MeState = null
