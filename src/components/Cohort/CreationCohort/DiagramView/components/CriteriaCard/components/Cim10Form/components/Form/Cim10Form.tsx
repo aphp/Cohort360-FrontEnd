@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -28,6 +28,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       code: data.code,
       diagnosticType: data.diagnosticType,
       encounter: data.encounter,
+      comparator: data.comparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Condition'
@@ -89,10 +90,39 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             autocompleteOptions: criteria?.data?.diagnosticTypes || []
           },
           {
-            name: 'encounter',
-            label: "Nombre d'occurence",
-            variant: 'outlined',
-            type: 'number'
+            type: 'custom',
+            name: 'label',
+            renderInput: () => (
+              <FormLabel style={{ padding: '0 1em' }} component="legend">
+                Nombre d'occurence :
+              </FormLabel>
+            )
+          },
+          {
+            type: 'section',
+            title: '',
+            name: '',
+            containerStyle: { display: 'grid', gridTemplateColumns: '100px 1fr' },
+            properties: [
+              {
+                name: 'comparator',
+                variant: 'outlined',
+                type: 'select',
+                selectOptions: [
+                  { id: 'le', label: '<=' },
+                  { id: 'e', label: '=' },
+                  { id: 'ge', label: '>=' }
+                ]
+              },
+              {
+                name: 'encounter',
+                variant: 'outlined',
+                type: 'number',
+                validationRules: {
+                  min: 0
+                }
+              }
+            ]
           }
           // {
           //   type: 'custom',
