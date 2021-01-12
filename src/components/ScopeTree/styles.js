@@ -5,5 +5,7 @@ export default makeStyles(() => ({
     background: 'white'
   },
   mainRow: {},
-  secondRow: {}
+  secondRow: {
+    background: '#f3f5f9'
+  }
 }))
