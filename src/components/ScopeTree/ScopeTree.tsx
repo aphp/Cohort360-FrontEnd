@@ -261,7 +261,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
 
             return (
               <React.Fragment key={Math.random()}>
-                {_displayLine(row, 0)}
+                {_displayLine(row, 0, row.access)}
                 {openPopulation.find((id) => row.id === id) &&
                   row.subItems &&
                   row.subItems.map((subItem: any) => _displayChildren(subItem, 1, row.access))}
