@@ -91,7 +91,11 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
           {
             type: 'custom',
             name: 'label',
-            renderInput: () => <FormLabel component="legend">Âge au moment de la prise en charge :</FormLabel>
+            renderInput: () => (
+              <FormLabel style={{ padding: '0 1em' }} component="legend">
+                Âge au moment de la prise en charge :
+              </FormLabel>
+            )
           },
           {
             name: 'ageType',

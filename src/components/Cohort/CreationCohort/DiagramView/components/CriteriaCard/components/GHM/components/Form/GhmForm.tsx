@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -17,23 +17,10 @@ type GHMFormProps = {
   onChangeSelectedCriteria: (data: any) => void
 }
 
-// const defaultDemographic = {
-//   title: 'Critère de GHM',
-//   code: [],
-//   encounter: 0,
-//   startOccurrence: '',
-//   endOccurrence: ''
-// }
-
 const GhmForm: React.FC<GHMFormProps> = (props) => {
-  // const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  // const defaultValues = selectedCriteria || defaultDemographic
-
   const { isEdition, criteria, selectedCriteria, goBack, onChangeSelectedCriteria } = props
 
   const classes = useStyles()
-
-  // const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
@@ -87,10 +74,39 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             getAutocompleteOptions: getGhmOptions
           },
           {
-            name: 'encounter',
-            label: "Nombre d'occurence",
-            variant: 'outlined',
-            type: 'number'
+            type: 'custom',
+            name: 'label',
+            renderInput: () => (
+              <FormLabel style={{ padding: '0 1em' }} component="legend">
+                Nombre d'occurence :
+              </FormLabel>
+            )
+          },
+          {
+            type: 'section',
+            title: '',
+            name: '',
+            containerStyle: { display: 'grid', gridTemplateColumns: '100px 1fr' },
+            properties: [
+              {
+                name: 'comparator',
+                variant: 'outlined',
+                type: 'select',
+                selectOptions: [
+                  { id: 'le', label: '<=' },
+                  { id: 'e', label: '=' },
+                  { id: 'ge', label: '>=' }
+                ]
+              },
+              {
+                name: 'encounter',
+                variant: 'outlined',
+                type: 'number',
+                validationRules: {
+                  min: 0
+                }
+              }
+            ]
           }
           // {
           //   type: 'custom',
