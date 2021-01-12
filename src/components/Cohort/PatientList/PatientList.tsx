@@ -39,7 +39,7 @@ import useStyles from './styles'
 type PatientListProps = {
   total: number
   groupId?: string
-  deidentified?: boolean
+  deidentified?: boolean | null
   patients?: CohortPatient[]
   loading?: boolean
   agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
