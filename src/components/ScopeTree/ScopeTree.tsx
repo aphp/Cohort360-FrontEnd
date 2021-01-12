@@ -191,11 +191,11 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
             if (!row) return <></>
             const labelId = `enhanced-table-checkbox-${index}`
 
-            const _displayLine = (_row: any, level: number) => (
+            const _displayLine = (_row: any, level: number, parentAccess: string) => (
               <>
                 {_row.id === 'loading' ? (
                   <TableRow hover key={Math.random()}>
-                    <TableCell colSpan={4}>
+                    <TableCell colSpan={5}>
                       <Skeleton animation="wave" />
                     </TableCell>
                   </TableRow>
@@ -241,20 +241,20 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                     </TableCell>
 
                     <TableCell align="center">
-                      <Typography>{_row.access}</Typography>
+                      <Typography>{_row.access ?? parentAccess}</Typography>
                     </TableCell>
                   </TableRow>
                 )}
               </>
             )
 
-            const _displayChildren = (_row: any, level: number) => {
+            const _displayChildren = (_row: any, level: number, parentAccess: string) => {
               return (
                 <React.Fragment key={Math.random()}>
-                  {_displayLine(_row, level)}
+                  {_displayLine(_row, level, parentAccess)}
                   {openPopulation.find((id) => _row.id === id) &&
                     _row.subItems &&
-                    _row.subItems.map((subItem: any) => _displayChildren(subItem, level + 1))}
+                    _row.subItems.map((subItem: any) => _displayChildren(subItem, level + 1, parentAccess))}
                 </React.Fragment>
               )
             }
@@ -264,7 +264,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                 {_displayLine(row, 0)}
                 {openPopulation.find((id) => row.id === id) &&
                   row.subItems &&
-                  row.subItems.map((subItem: any) => _displayChildren(subItem, 1))}
+                  row.subItems.map((subItem: any) => _displayChildren(subItem, 1, row.access))}
               </React.Fragment>
             )
           }}
