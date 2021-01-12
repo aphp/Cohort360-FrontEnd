@@ -44,7 +44,7 @@ const Dashboard: React.FC<{
   const [selectedTab, selectTab] = useState(tabName || 'apercu')
   const [tabs, setTabs] = useState<Tabs[]>([])
   const [status, setStatus] = useState('')
-  const [deidentifiedBoolean, setDeidentifiedBoolean] = useState<boolean>(true)
+  const [deidentifiedBoolean, setDeidentifiedBoolean] = useState<boolean | null>(null)
   const [openRedcapDialog, setOpenRedcapDialog] = useState(false)
 
   const { open, dashboard } = useAppSelector((state) => ({
@@ -52,10 +52,23 @@ const Dashboard: React.FC<{
     dashboard: state.exploredCohort
   }))
 
+  const checkDeindentifiedStatus = (_dashboard: any) => {
+    // Check if access == 'Pseudonymisé' || 'Nominatif'
+    const { originalPatients } = _dashboard
+    if (!originalPatients || (originalPatients && !originalPatients[0])) return
+    const extension: IExtension[] | undefined = originalPatients[0].extension
+
+    const deidentified = extension?.find((data) => data.url === 'deidentified')
+    const valueBoolean = deidentified ? deidentified.valueBoolean : true
+
+    setDeidentifiedBoolean(!!valueBoolean)
+  }
+
   const _fetchCohort = async () => {
     const cohortResp = await fetchCohort(cohortId)
     if (cohortResp) {
       dispatch(setExploredCohort(cohortResp))
+      checkDeindentifiedStatus(cohortResp)
     }
   }
 
@@ -63,6 +76,7 @@ const Dashboard: React.FC<{
     const cohortResp = await fetchMyPatients()
     if (cohortResp) {
       dispatch(setExploredCohort(cohortResp))
+      checkDeindentifiedStatus(cohortResp)
     }
   }
 
@@ -70,6 +84,7 @@ const Dashboard: React.FC<{
     const cohortResp = await fetchPerimetersInfos(perimetreIds)
     if (cohortResp) {
       dispatch(setExploredCohort(cohortResp))
+      checkDeindentifiedStatus(cohortResp)
     }
   }
 
@@ -131,22 +146,6 @@ const Dashboard: React.FC<{
         break
     }
   }, [context, cohortId]) //eslint-disable-line
-
-  const checkDeindentifiedStatus = () => {
-    // Check if access == 'Pseudonymisé' || 'Nominatif'
-    const { originalPatients } = dashboard
-    if (!originalPatients || (originalPatients && !originalPatients[0])) return
-    const extension: IExtension[] | undefined = originalPatients[0].extension
-
-    const deidentified = extension?.find((data) => data.url === 'deidentified')
-    const valueBoolean = deidentified ? deidentified.valueBoolean : true
-
-    setDeidentifiedBoolean(!!valueBoolean)
-  }
-
-  useEffect(() => {
-    checkDeindentifiedStatus()
-  }, [dashboard]) //eslint-disable-line
 
   const handleOpenRedcapDialog = () => {
     setOpenRedcapDialog(true)
@@ -220,7 +219,7 @@ const Dashboard: React.FC<{
         title={dashboard.name}
         status={status}
         patientsNb={dashboard.totalPatients || 0}
-        access={deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
+        access={deidentifiedBoolean === null ? '-' : deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
         openRedcapDialog={handleOpenRedcapDialog}
         fav
       />
