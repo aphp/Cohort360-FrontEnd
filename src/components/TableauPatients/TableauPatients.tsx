@@ -60,7 +60,7 @@ const StatusShip: React.FC<StatusShipProps> = ({ type }) => {
 
 type TableauPatientsProps = {
   groupId?: any
-  deidentified?: boolean
+  deidentified?: boolean | null
   patients: CohortPatient[]
   loading?: boolean
   onChangePage: (event: React.ChangeEvent<unknown>, page: number) => void

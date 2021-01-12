@@ -194,7 +194,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
             const _displayLine = (_row: any, level: number) => (
               <>
                 {_row.id === 'loading' ? (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={Math.random()}>
+                  <TableRow hover key={Math.random()}>
                     <TableCell colSpan={4}>
                       <Skeleton animation="wave" />
                     </TableCell>
@@ -202,18 +202,16 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                 ) : (
                   <TableRow
                     hover
-                    role="checkbox"
-                    tabIndex={-1}
-                    key={Math.random()}
+                    key={_row.id}
                     classes={{
-                      root: level === 0 ? classes.mainRow : classes.secondRow
+                      root: level % 2 !== 0 ? classes.mainRow : classes.secondRow
                     }}
                   >
-                    <TableCell align="center">
+                    <TableCell>
                       {_row.subItems && _row.subItems.length > 0 && (
                         <IconButton
                           onClick={() => _clickToDeploy(_row.id)}
-                          style={{ marginLeft: level * 30, padding: 0 }}
+                          style={{ marginLeft: level * 35, padding: 0 }}
                         >
                           {openPopulation.find((id) => _row.id === id) ? (
                             <KeyboardArrowDownIcon />
