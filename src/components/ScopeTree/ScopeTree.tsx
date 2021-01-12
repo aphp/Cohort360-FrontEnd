@@ -204,14 +204,14 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                     hover
                     key={_row.id}
                     classes={{
-                      root: level % 2 !== 0 ? classes.mainRow : classes.secondRow
+                      root: level % 2 === 0 ? classes.mainRow : classes.secondRow
                     }}
                   >
                     <TableCell>
                       {_row.subItems && _row.subItems.length > 0 && (
                         <IconButton
                           onClick={() => _clickToDeploy(_row.id)}
-                          style={{ marginLeft: level * 35, padding: 0 }}
+                          style={{ marginLeft: level * 35, padding: 0, marginRight: -50 }}
                         >
                           {openPopulation.find((id) => _row.id === id) ? (
                             <KeyboardArrowDownIcon />
