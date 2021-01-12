@@ -70,6 +70,23 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
 
     const data: any = _searchDataFromCriteria(criteria, _selectedCriteria.type)
 
+    let comparator = ''
+    if (_selectedCriteria.comparator) {
+      switch (_selectedCriteria.comparator.id) {
+        case 'le':
+          comparator = '<='
+          break
+        case 'ge':
+          comparator = '>='
+          break
+        case 'e':
+          comparator = '='
+          break
+        default:
+          break
+      }
+    }
+
     const startDate = _selectedCriteria.startOccurrence
       ? moment(_selectedCriteria.startOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
       : ''
@@ -90,7 +107,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             </Typography>
             <Typography>{selectedGhmData ? `GHM sélectionné : "${selectedGhmData.label}"` : ''}</Typography>
             <Typography>
-              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}
+              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
             </Typography>
             <Typography>
               {startDate
@@ -118,7 +135,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             </Typography>
             <Typography>{selectedccamData ? `Acte CCAM sélectionné : "${selectedccamData.label}"` : ''}.</Typography>
             <Typography>
-              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}
+              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
             </Typography>
             <Typography>
               {startDate
@@ -156,7 +173,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
               {selectedDiagnostic && `Type de diagnostic recherché : "${selectedDiagnostic.label}."`}
             </Typography>
             <Typography>
-              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}
+              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
             </Typography>
             <Typography>
               {startDate
@@ -224,7 +241,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             <Typography>Recherche textuelle "{_selectedCriteria.search}"</Typography>
             <Typography>Dans {selectedDocType}.</Typography>
             <Typography>
-              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${_selectedCriteria.encounter}` : ''}
+              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
             </Typography>
             <Typography>
               {startDate
