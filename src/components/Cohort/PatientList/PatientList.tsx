@@ -74,7 +74,6 @@ const PatientList: React.FC<PatientListProps> = ({
   const [sortBy, setSortBy] = useState('given') // eslint-disable-line
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc') // eslint-disable-line
   const [showFilterChip, setShowFilterChip] = useState(false)
-  const includeFacets = true
 
   useEffect(() => {
     setAgePyramid(agePyramidData)
@@ -92,11 +91,19 @@ const PatientList: React.FC<PatientListProps> = ({
     setOpen(true)
   }
 
-  const fetchPatients = (sortBy: string, sortDirection: string, input = searchInput, pageValue = 1) => {
+  const fetchPatients = (
+    sortBy: string,
+    sortDirection: string,
+    input = searchInput,
+    pageValue = 1,
+    includeFacets: boolean
+  ) => {
     setLoadingStatus(true)
     // Set loader on chart
-    setPatientData(undefined)
-    setAgePyramid(undefined)
+    if (includeFacets) {
+      setPatientData(undefined)
+      setAgePyramid(undefined)
+    }
     fetchPatientList(
       pageValue,
       searchBy,
@@ -113,8 +120,10 @@ const PatientList: React.FC<PatientListProps> = ({
         if (result) {
           const { totalPatients, originalPatients, genderRepartitionMap, agePyramidData } = result
           setPatientsList(originalPatients)
-          setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
-          setAgePyramid(agePyramidData)
+          if (includeFacets) {
+            setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
+            setAgePyramid(agePyramidData)
+          }
           setTotalPatients(totalPatients)
         }
       })
@@ -128,7 +137,7 @@ const PatientList: React.FC<PatientListProps> = ({
     setPage(1)
     setSortBy(sortBy)
     setSortDirection(sortDirection as 'asc' | 'desc')
-    fetchPatients(sortBy, sortDirection, input)
+    fetchPatients(sortBy, sortDirection, input, 1, true)
   }
 
   useEffect(() => {
@@ -157,7 +166,7 @@ const PatientList: React.FC<PatientListProps> = ({
     setPage(value)
     //We only fetch patients if we don't already have them
     if (patients && patients.length < totalPatients) {
-      fetchPatients(sortBy, sortDirection, searchInput, value)
+      fetchPatients(sortBy, sortDirection, searchInput, value, false)
     }
   }
 
