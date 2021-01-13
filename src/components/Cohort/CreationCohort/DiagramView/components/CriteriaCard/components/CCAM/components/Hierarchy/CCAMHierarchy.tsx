@@ -27,7 +27,6 @@ type CcamListItemProps = {
 }
 
 const CcamListItem: React.FC<CcamListItemProps> = (props) => {
-  // const { ccamItem, handleClick, fetchHierarchy } = props
   const { ccamItem, selectedItem, handleClick, fetchHierarchy } = props
   const { id, color, label } = ccamItem
 
@@ -39,14 +38,11 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
 
   const _onExpand = async (ccamCode: string) => {
     setOpen(!open)
-    // console.log('subItems', subItems)
     if (subItems && subItems[0] === 'loading') {
       const _subItems = await fetchHierarchy(ccamCode)
       setSubItems(_subItems)
     }
   }
-
-  // console.log('subItems', subItems)
 
   useEffect(() => {
     const _init = async () => {
@@ -121,24 +117,10 @@ type CcamHierarchyProps = {
   isEdition?: boolean
 }
 
-// const defaultProcedure = {
-//     title: "Critères d'actes CCAM",
-//     code: [],
-//     encounter: 0,
-//     startOccurrence: '',
-//     endOccurrence: ''
-//   }
-
 const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
-  // const { criteria, selectedCriteria, goBack } = props
-  // const defaultValues = selectedCriteria || defaultCondition
   const { criteria, selectedCriteria, goBack, onChangeSelectedHierarchy, isEdition } = props
 
   const [ccamHierarchy, onSetCcamHierarchy] = useState([])
-  // const [selectedHierarchy, onChangeSelectedHierarchy] = useState(null)
-
-  // console.log('selectedHierarchy', selectedHierarchy)
-
   const [selectedHierarchy, onSetSelectedHierarchy] = useState(isEdition ? selectedCriteria.code : null)
 
   const classes = useStyles()

@@ -83,10 +83,23 @@ export const searchPatient = async (
   } else if (CONTEXT === 'aphp') {
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
 
+    let search = ''
+    if (input.trim() !== '') {
+      const searches = input
+        .trim() // Remove space before/after search
+        .split(' ') // Split by space (= ['mot1', 'mot2' ...])
+        .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
+
+      for (const _search of searches) {
+        search = search ? `${search} AND "${_search}"` : `"${_search}"`
+      }
+      console.log('search :>> ', search)
+    }
+
     const patientResp = await api.get<FHIR_API_Response<IPatient>>(
       `/Patient?_list=${nominativeGroupsIds}&size=20&offset=${
         page ? (page - 1) * 20 : 0
-      }&_sort=${_sortDirection}${sortBy}&${searchBy}=${input}&_elements=gender,name,birthDate,deceased,identifier,extension`
+      }&_sort=${_sortDirection}${sortBy}&${searchBy}=${search}&_elements=gender,name,birthDate,deceased,identifier,extension`
     )
 
     const patientList = await getLastEncounter(getApiResponseResources(patientResp))
