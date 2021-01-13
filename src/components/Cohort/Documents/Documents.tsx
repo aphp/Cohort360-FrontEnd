@@ -40,7 +40,7 @@ import displayDigit from 'utils/displayDigit'
 
 type DocumentsProps = {
   groupId?: string
-  deidentifiedBoolean: boolean
+  deidentifiedBoolean: boolean | null
   sortBy: string
   sortDirection: 'asc' | 'desc'
 }
@@ -85,7 +85,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     const selectedDocTypesCodes = selectedDocTypes.map((docType) => docType.code)
 
     fetchDocuments(
-      deidentifiedBoolean,
+      !!deidentifiedBoolean,
       sortBy,
       sortDirection,
       page,

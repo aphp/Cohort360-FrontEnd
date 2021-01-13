@@ -102,7 +102,7 @@ export const getScopePerimeters = async (practitionerId: string): Promise<ScopeT
   if (CONTEXT === 'aphp') {
     const perimetersResults = await getPerimeters(practitionerId)
 
-    const scopeRows: ScopeTreeRow[] = perimetersResults
+    let scopeRows: ScopeTreeRow[] = perimetersResults
       ? perimetersResults?.map<ScopeTreeRow>((perimeterResult) => ({
           ...perimeterResult,
           id: perimeterResult.id ?? '0',
@@ -112,6 +112,25 @@ export const getScopePerimeters = async (practitionerId: string): Promise<ScopeT
           subItems: [loadingItem]
         }))
       : []
+
+    // Sort by name
+    scopeRows = scopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
+      if (a.quantity > b.quantity) {
+        return 1
+      } else if (a.quantity < b.quantity) {
+        return -1
+      }
+      return 0
+    })
+    scopeRows = scopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
+      if (b.quantity === 0) return -1
+      if (a.name > b.name) {
+        return 1
+      } else if (a.name < b.name) {
+        return -1
+      }
+      return 0
+    })
 
     return scopeRows
   }
@@ -222,7 +241,7 @@ export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<
     ({ managingEntity }) => managingEntity?.display?.replace(/^Organization\//, '') !== perimeterGroupId
   )
 
-  const _subItemsData = subItemsData
+  let _subItemsData = subItemsData
     ? subItemsData?.map<ScopeTreeRow>((subItemData) => ({
         ...subItemData,
         id: subItemData.id ?? '0',
@@ -231,5 +250,24 @@ export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<
         subItems: [loadingItem]
       }))
     : []
+
+  // Sort by name
+  _subItemsData = _subItemsData.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
+    if (a.quantity > b.quantity) {
+      return 1
+    } else if (a.quantity < b.quantity) {
+      return -1
+    }
+    return 0
+  })
+  _subItemsData = _subItemsData.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
+    if (b.quantity === 0) return -1
+    if (a.name > b.name) {
+      return 1
+    } else if (a.name < b.name) {
+      return -1
+    }
+    return 0
+  })
   return _subItemsData
 }

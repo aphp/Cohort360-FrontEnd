@@ -44,7 +44,7 @@ type DocumentRowTypes = {
   documentEncounter?: IEncounter
   showText: boolean
   showIpp: boolean
-  deidentified: boolean
+  deidentified: boolean | null
 }
 const DocumentRow: React.FC<DocumentRowTypes> = ({
   groupId,
@@ -235,7 +235,7 @@ type DocumentTableTypes = {
   encounters?: IEncounter[]
   searchMode: boolean
   showIpp: boolean
-  deidentified: boolean
+  deidentified: boolean | null
 }
 const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
   ({ groupId, loading, documents, searchMode, showIpp, encounters, deidentified }) => {

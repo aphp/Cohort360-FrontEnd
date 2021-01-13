@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@apollo/react-hooks": "^3.1.5",
-    "@arkhn/ui": "^1.9.2",
+    "@arkhn/ui": "^1.9.7",
     "@date-io/date-fns": "1.x",
     "@date-io/moment": "^1.3.13",
     "@material-ui/core": "^4.9.11",
