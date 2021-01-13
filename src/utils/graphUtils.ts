@@ -35,7 +35,7 @@ const getVisitTypeName = (visitType?: string) => {
       name = 'Hospitalisation'
       break
     default:
-      name = 'Autre visite'
+      name = 'Autres visites'
   }
 
   return name
@@ -132,6 +132,7 @@ export const getGenderRepartitionMap = (
 
 export const getEncounterRepartitionMapAphp = (extension?: IExtension[]): SimpleChartDataType[] => {
   const data: SimpleChartDataType[] = []
+  let otherVisits = 0
 
   extension?.forEach((visitType) => {
     const visitTypeUrl = visitType.extension?.[0].url
@@ -142,7 +143,15 @@ export const getEncounterRepartitionMapAphp = (extension?: IExtension[]): Simple
         value: visitType.extension?.[0].valueDecimal ?? 0,
         color: getVisitTypeColor(visitTypeUrl)
       })
+    } else {
+      otherVisits += visitType.extension?.[0].valueDecimal ?? 0
     }
+  })
+
+  data.push({
+    label: getVisitTypeName('other'),
+    value: otherVisits,
+    color: getVisitTypeColor('other')
   })
 
   return data
