@@ -7,7 +7,7 @@ import TopBarItem from './TopBarHeader/TopBarItem'
 import IconButton from '@material-ui/core/IconButton'
 
 import { ReactComponent as SaveIcon } from '../../assets/icones/save.svg'
-import { ReactComponent as Star } from '../../assets/icones/star.svg'
+// import { ReactComponent as Star } from '../../assets/icones/star.svg'
 
 import displayDigit from 'utils/displayDigit'
 
@@ -41,11 +41,11 @@ const TopBar = (props) => {
               <SaveIcon height="25px" fill="#5BC5F2" />
             </IconButton>
           )}
-          {props.fav && (
+          {/* {props.fav && (
             <IconButton>
               <Star height="15px" fill="#ED6D91" />
             </IconButton>
-          )}
+          )} */}
         </Grid>
       </Grid>
     </Paper>
