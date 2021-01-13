@@ -73,8 +73,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
   const [nda, setNda] = useState('')
   const [code, setCode] = useState('')
   const [selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>([])
-  const [startDate, setStartDate] = useState<string | undefined>(undefined)
-  const [endDate, setEndDate] = useState<string | undefined>(undefined)
+  const [startDate, setStartDate] = useState<string | null>(null)
+  const [endDate, setEndDate] = useState<string | null>(null)
   const [_sortBy, setSortBy] = useState(sortBy)
   const [_sortDirection, setSortDirection] = useState(sortDirection)
   const [showFilterChip, setShowFilterChip] = useState(false)
@@ -92,8 +92,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
     diagnosticTypes: string[],
     sortBy: string,
     sortDirection: string,
-    startDate?: string,
-    endDate?: string
+    startDate?: string | null,
+    endDate?: string | null
   ) => {
     setLoadingStatus(true)
 
@@ -221,10 +221,10 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
           )
         break
       case 'startDate':
-        setStartDate(undefined)
+        setStartDate(null)
         break
       case 'endDate':
-        setEndDate(undefined)
+        setEndDate(null)
         break
       case 'selectedDiagnosticTypes':
         value && setSelectedDiagnosticTypes(selectedDiagnosticTypes.filter((item) => item !== value))
@@ -257,8 +257,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
         setNda('')
         setCode('')
         setSelectedDiagnosticTypes([])
-        setStartDate(undefined)
-        setEndDate(undefined)
+        setStartDate(null)
+        setEndDate(null)
         break
       case 'CCAM':
         setData(ccam ?? [])
@@ -266,8 +266,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
         setNda('')
         setCode('')
         setSelectedDiagnosticTypes([])
-        setStartDate(undefined)
-        setEndDate(undefined)
+        setStartDate(null)
+        setEndDate(null)
         break
       case 'GHM':
         setData(ghm ?? [])
@@ -275,8 +275,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
         setNda('')
         setCode('')
         setSelectedDiagnosticTypes([])
-        setStartDate(undefined)
-        setEndDate(undefined)
+        setStartDate(null)
+        setEndDate(null)
         break
       default:
         setData([])
