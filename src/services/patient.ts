@@ -359,7 +359,7 @@ export const fetchDocuments = async (
   if (CONTEXT === 'aphp') {
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
     const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : []
-    const search = searchInput ? `&_text_solr=${searchInput}` : ''
+    const search = searchInput ? `&_text=${searchInput}` : ''
     const ndaFilter = nda ? `&encounter.identifier=${nda}` : ''
     const groupFilter = groupId ? `&_list=${groupId}` : ''
     let dateFilter = ''
