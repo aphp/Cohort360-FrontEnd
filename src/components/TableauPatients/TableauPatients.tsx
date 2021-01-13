@@ -11,6 +11,7 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
+  Typography,
   Paper,
   Chip
 } from '@material-ui/core'
@@ -173,7 +174,11 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                   </TableCell>
                 </TableRow>
               ) : patients && patients.length === 0 ? (
-                <TableRow> Aucun résultat à afficher </TableRow>
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <Typography className={classes.loadingSpinnerContainer}>Aucun résultat à afficher</Typography>
+                  </TableCell>
+                </TableRow>
               ) : (
                 patientsToShow.map((patient) => {
                   return (
