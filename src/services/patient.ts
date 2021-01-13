@@ -196,8 +196,8 @@ export const fetchPMSI = async (
   sortBy: string,
   sortDirection: string,
   groupId?: string,
-  startDate?: string,
-  endDate?: string
+  startDate?: string | null,
+  endDate?: string | null
 ): Promise<{
   pmsiData?: PMSIEntry<IClaim | ICondition | IProcedure>[]
   pmsiTotal?: number
@@ -313,7 +313,7 @@ export const fetchPMSI = async (
 
     if (startDate || endDate) {
       if (startDate && endDate) {
-        dateFilter = `&${dateName}=ge${startDate},le${endDate}`
+        dateFilter = `&${dateName}=ge${startDate}&${dateName}=le${endDate}`
       } else if (startDate) {
         dateFilter = `&${dateName}=ge${startDate}`
       } else if (endDate) {
@@ -352,8 +352,8 @@ export const fetchDocuments = async (
   searchInput: string,
   selectedDocTypes: string[],
   nda: string,
-  startDate?: string,
-  endDate?: string,
+  startDate?: string | null,
+  endDate?: string | null,
   groupId?: string
 ) => {
   if (CONTEXT === 'aphp') {
@@ -367,7 +367,7 @@ export const fetchDocuments = async (
 
     if (startDate || endDate) {
       if (startDate && endDate) {
-        dateFilter = `&date=ge${startDate},le${endDate}`
+        dateFilter = `&date=ge${startDate}&date=le${endDate}`
       } else if (startDate) {
         dateFilter = `&date=ge${startDate}`
       } else if (endDate) {

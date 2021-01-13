@@ -51,8 +51,8 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
   const [helpOpen, setHelpOpen] = useState(false)
   const [nda, setNda] = useState('')
   const [selectedDocTypes, setSelectedDocTypes] = useState<any[]>([])
-  const [startDate, setStartDate] = useState<string | undefined>(undefined)
-  const [endDate, setEndDate] = useState<string | undefined>(undefined)
+  const [startDate, setStartDate] = useState<string | null>(null)
+  const [endDate, setEndDate] = useState<string | null>(null)
   const [_sortBy, setSortBy] = useState(sortBy)
   const [_sortDirection, setSortDirection] = useState(sortDirection)
   const [showFilterChip, setShowFilterChip] = useState(false)
@@ -160,10 +160,10 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
         value && setSelectedDocTypes(selectedDocTypes.filter((item) => item !== value))
         break
       case 'startDate':
-        setStartDate(undefined)
+        setStartDate(null)
         break
       case 'endDate':
-        setEndDate(undefined)
+        setEndDate(null)
         break
     }
   }
