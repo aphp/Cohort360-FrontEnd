@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from 'react'
+import moment from 'moment'
+
+import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
+import MomentUtils from '@date-io/moment'
 
 import {
   Button,
@@ -6,13 +10,15 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormLabel,
   Grid,
+  IconButton,
   TextField,
   Typography
 } from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
-import InputDate from 'components/Inputs/InputDate/InputDate'
+import ClearIcon from '@material-ui/icons/Clear'
 
 import { docTypes } from '../../../assets/docTypes.json'
 
@@ -26,10 +32,10 @@ type DocumentFiltersProps = {
   onChangeNda: (nda: string) => void
   selectedDocTypes: string[]
   onChangeSelectedDocTypes: (selectedDocTypes: string[]) => void
-  startDate?: string
-  onChangeStartDate: (startDate: string | undefined) => void
-  endDate?: string
-  onChangeEndDate: (endDate: string | undefined) => void
+  startDate?: string | null
+  onChangeStartDate: (startDate: string | null) => void
+  endDate?: string | null
+  onChangeEndDate: (endDate: string | null) => void
   deidentified: boolean
 }
 const DocumentFilters: React.FC<DocumentFiltersProps> = ({
@@ -50,8 +56,9 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
 
   const [_nda, setNda] = useState<string>(nda)
   const [_selectedDocTypes, setSelectedDocTypes] = useState<any[]>(selectedDocTypes)
-  const [_startDate, setStartDate] = useState<string | undefined>(startDate)
-  const [_endDate, setEndDate] = useState<string | undefined>(endDate)
+  const [_startDate, setStartDate] = useState<any>(startDate)
+  const [_endDate, setEndDate] = useState<any>(endDate)
+  const [dateError, setDateError] = useState(false)
 
   const docTypesList = docTypes
 
@@ -61,6 +68,14 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
     setStartDate(startDate)
     setEndDate(endDate)
   }, [open]) //eslint-disable-line
+
+  useEffect(() => {
+    if (moment(_startDate).isAfter(_endDate)) {
+      setDateError(true)
+    } else {
+      setDateError(false)
+    }
+  }, [_startDate, _endDate])
 
   const _onChangeSelectedDocTypes = (
     event: React.ChangeEvent<{}>,
@@ -78,10 +93,13 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
   }
 
   const _onSubmit = () => {
+    const newStartDate = moment(_startDate).isValid() ? moment(_startDate).format('YYYY-MM-DD') : null
+    const newEndDate = moment(_endDate).isValid() ? moment(_endDate).format('YYYY-MM-DD') : null
+
     onChangeSelectedDocTypes(_selectedDocTypes)
     onChangeNda(_nda)
-    onChangeStartDate(_startDate)
-    onChangeEndDate(_endDate)
+    onChangeStartDate(newStartDate)
+    onChangeEndDate(newEndDate)
     onSubmit()
   }
 
@@ -121,19 +139,65 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
         )}
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Date :</Typography>
-          <InputDate
-            label={'Après le :'}
-            value={_startDate}
-            onChange={(startDate: string) => setStartDate(startDate)}
-          />
-          <InputDate label={'Avant le :'} value={_endDate} onChange={(endDate: string) => setEndDate(endDate)} />
+          <MuiPickersUtilsProvider utils={MomentUtils}>
+            <Grid container alignItems="baseline" className={classes.datePickers}>
+              <FormLabel component="legend" className={classes.dateLabel}>
+                Après le :
+              </FormLabel>
+              <KeyboardDatePicker
+                clearable
+                error={dateError}
+                invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
+                format="DD/MM/YYYY"
+                onChange={(date) => setStartDate(date ?? null)}
+                value={_startDate}
+              />
+              {_startDate !== null && (
+                <IconButton
+                  classes={{ root: classes.clearDate, label: classes.buttonLabel }}
+                  color="primary"
+                  onClick={() => setStartDate(null)}
+                >
+                  <ClearIcon />
+                </IconButton>
+              )}
+            </Grid>
+
+            <Grid container alignItems="baseline" className={classes.datePickers}>
+              <FormLabel component="legend" className={classes.dateLabel}>
+                Avant le :
+              </FormLabel>
+              <KeyboardDatePicker
+                clearable
+                error={dateError}
+                invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
+                format="DD/MM/YYYY"
+                onChange={setEndDate}
+                value={_endDate}
+              />
+              {_endDate !== null && (
+                <IconButton
+                  classes={{ root: classes.clearDate, label: classes.buttonLabel }}
+                  color="primary"
+                  onClick={() => setEndDate(null)}
+                >
+                  <ClearIcon />
+                </IconButton>
+              )}
+            </Grid>
+            {dateError && (
+              <Typography className={classes.dateError}>
+                Vous ne pouvez pas sélectionner de date de début supérieure à la date de fin.
+              </Typography>
+            )}
+          </MuiPickersUtilsProvider>
         </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">
           Annuler
         </Button>
-        <Button onClick={_onSubmit} color="primary">
+        <Button onClick={_onSubmit} color="primary" disabled={dateError}>
           Valider
         </Button>
       </DialogActions>

@@ -47,8 +47,6 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       )
     ])
 
-    console.log('cohortInfo', cohortInfo)
-
     let name = ''
     let requestId = ''
 
@@ -312,8 +310,8 @@ const fetchDocuments = async (
   searchInput: string,
   selectedDocTypes: string[],
   nda: string,
-  startDate?: string,
-  endDate?: string,
+  startDate?: string | null,
+  endDate?: string | null,
   groupId?: string,
   encounterIds?: string[]
 ) => {
@@ -328,7 +326,7 @@ const fetchDocuments = async (
 
     if (startDate || endDate) {
       if (startDate && endDate) {
-        dateFilter = `&date=ge${startDate},le${endDate}`
+        dateFilter = `&date=ge${startDate}&date=le${endDate}`
       } else if (startDate) {
         dateFilter = `&date=ge${startDate}`
       } else if (endDate) {

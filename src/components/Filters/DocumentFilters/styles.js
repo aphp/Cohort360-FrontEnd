@@ -21,6 +21,22 @@ const useStyles = makeStyles(() => ({
   },
   select: {
     marginTop: '16px'
+  },
+  datePickers: {
+    margin: '1em 0 1em 1em'
+  },
+  dateLabel: {
+    width: 'auto',
+    marginRight: 8
+  },
+  dateError: {
+    color: '#f44336'
+  },
+  clearDate: {
+    padding: 0
+  },
+  buttonLabel: {
+    display: 'inline'
   }
 }))
 
