@@ -153,6 +153,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
           patientsToDisplay.map((patient) => (
             <PatientSidebarItem
               key={patient.id}
+              groupId={groupId}
               firstName={deidentifiedBoolean ? 'Prénom' : patient.name?.[0].given?.[0] ?? ''}
               lastName={deidentifiedBoolean ? 'Nom' : patient.name?.map((e) => e.family).join(' ') ?? ''}
               age={getAge(patient)}
