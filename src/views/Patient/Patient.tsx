@@ -79,7 +79,9 @@ const Patient = () => {
         setGhm(patientResp?.ghm)
         setGhmTotal(patientResp?.ghmTotal ?? 0)
         setPatient(patientResp?.patient)
-        setDeidentifiedBoolean(patientResp?.patient?.extension?.[0].valueBoolean ?? true)
+        setDeidentifiedBoolean(
+          patientResp?.patient?.extension?.find((extension) => extension.url === 'deidentified')?.valueBoolean ?? true
+        )
       })
       .then(() => setLoading(false))
   }, [patientId, groupId])
