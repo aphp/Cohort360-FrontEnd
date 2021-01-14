@@ -26,7 +26,7 @@ const defaultDemographic = {
 }
 
 const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
-  const { selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const defaultValues = selectedCriteria || defaultDemographic
 
   const classes = useStyles()
@@ -38,7 +38,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
       title: data.title,
       search: data.search,
       docType: data.docType,
-      encounter: data.encounter,
+      // encounter: data.encounter,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Composition'
@@ -82,21 +82,18 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               variant: 'outlined'
             },
             {
-              label: 'Rechercher dans :',
               name: 'docType',
-              type: 'select',
-              selectOptions: [
-                { id: '55188-7', label: 'Tout type de documents' },
-                { id: '11336-5', label: "Comptes rendus d'hospitalisation" },
-                { id: '57833-6', label: 'Ordonnances' }
-              ]
-            },
-            {
-              name: 'encounter',
-              label: "Nombre d'occurence",
               variant: 'outlined',
-              type: 'number'
+              label: 'Rechercher dans',
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.docTypes || []
             }
+            // {
+            //   name: 'encounter',
+            //   label: "Nombre d'occurence",
+            //   variant: 'outlined',
+            //   type: 'number'
+            // }
             // {
             //   type: 'custom',
             //   name: 'label',
