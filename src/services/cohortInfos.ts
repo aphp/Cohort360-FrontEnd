@@ -32,6 +32,7 @@ import {
 } from 'utils/graphUtils'
 import { searchPatient } from './searchPatient'
 import { getAge } from 'utils/age'
+import moment from 'moment'
 // import { fetchPerimetersInfos } from './perimeters'
 
 const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | undefined> => {
@@ -229,35 +230,30 @@ const fetchPatientList = async (
       genderFilter = gender === PatientGenderKind._other ? `&gender=other,unknown` : `&gender=${gender}`
     }
 
-    if (searchInput) {
-      if (searchBy) {
-        search = `&${searchBy}=${searchInput}`
+    if (searchInput.trim() !== '') {
+      let _searchInput = ''
+
+      if (searchBy !== '_text') {
+        search = `&${searchBy}=${searchInput.trim()}`
       } else {
-        search = `&_text=${searchInput}`
+        const searches = searchInput
+          .trim() // Remove space before/after search
+          .split(' ') // Split by space (= ['mot1', 'mot2' ...])
+          .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
+
+        for (const _search of searches) {
+          _searchInput = _searchInput ? `${_searchInput} AND "${_search}"` : `"${_search}"`
+        }
+        search = `&_text=${_searchInput}`
       }
     }
 
     if (age[0] !== 0 || age[1] !== 130) {
-      const today = new Date()
-
-      const month = today.getMonth() + 1
-      let monthStr = ''
-      if (month < 10) {
-        monthStr = '0' + month.toString()
-      } else {
-        monthStr = month.toString()
-      }
-
-      const day = today.getDate()
-      let dayStr = ''
-      if (day < 10) {
-        dayStr = '0' + day.toString()
-      } else {
-        dayStr = day.toString()
-      }
-
-      const date1 = `${today.getFullYear() - age[1]}-${monthStr}-${dayStr}`
-      const date2 = `${today.getFullYear() - age[0]}-${monthStr}-${dayStr}`
+      const date1 = moment()
+        .subtract(age[1] + 1, 'years')
+        .add(1, 'days')
+        .format('YYYY-MM-DD') //`${today.getFullYear() - age[1]}-${monthStr}-${dayStr}`
+      const date2 = moment().subtract(age[0], 'years').format('YYYY-MM-DD') //`${today.getFullYear() - age[0]}-${monthStr}-${dayStr}`
       ageFilter = `&birthdate=ge${date1}&birthdate=le${date2}`
     }
 

@@ -33,7 +33,10 @@ const useStyles = makeStyles(() => ({
     color: '#f44336'
   },
   clearDate: {
-    padding: 0
+    padding: 0,
+    minWidth: 34,
+    width: 34,
+    maxWidth: 34
   },
   buttonLabel: {
     display: 'inline'

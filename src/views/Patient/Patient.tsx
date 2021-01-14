@@ -79,7 +79,9 @@ const Patient = () => {
         setGhm(patientResp?.ghm)
         setGhmTotal(patientResp?.ghmTotal ?? 0)
         setPatient(patientResp?.patient)
-        setDeidentifiedBoolean(patientResp?.patient?.extension?.[0].valueBoolean ?? true)
+        setDeidentifiedBoolean(
+          patientResp?.patient?.extension?.find((extension) => extension.url === 'deidentified')?.valueBoolean ?? true
+        )
       })
       .then(() => setLoading(false))
   }, [patientId, groupId])
@@ -168,7 +170,14 @@ const Patient = () => {
         </Grid>
         <Grid className={classes.tabContainer}>
           {selectedTab === 'apercu' && <PatientPreview patient={patient} deidentified={deidentifiedBoolean} />}
-          {selectedTab === 'parcours' && <PatientTimeline documents={documents} hospits={hospit} consults={consult} />}
+          {selectedTab === 'parcours' && (
+            <PatientTimeline
+              documents={documents}
+              hospits={hospit}
+              consults={consult}
+              deidentified={deidentifiedBoolean}
+            />
+          )}
           {selectedTab === 'documents-cliniques' && (
             <PatientDocs
               groupId={groupId}

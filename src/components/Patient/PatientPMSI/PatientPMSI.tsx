@@ -172,7 +172,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
     setPage(value ? value : 1)
     setLoadingStatus(true)
     _fetchPMSI(
-      true,
+      deidentifiedBoolean,
       value ? value : 1,
       patientId,
       selectedTab,

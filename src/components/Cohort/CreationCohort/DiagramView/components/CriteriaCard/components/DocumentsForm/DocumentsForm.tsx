@@ -89,13 +89,13 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               { id: '11336-5', label: "Comptes rendus d'hospitalisation" },
               { id: '57833-6', label: 'Ordonnances' }
             ]
-          },
-          {
-            name: 'encounter',
-            label: "Nombre d'occurence",
-            variant: 'outlined',
-            type: 'number'
           }
+          // {
+          //   name: 'encounter',
+          //   label: "Nombre d'occurence",
+          //   variant: 'outlined',
+          //   type: 'number'
+          // }
           // {
           //   type: 'custom',
           //   name: 'label',
