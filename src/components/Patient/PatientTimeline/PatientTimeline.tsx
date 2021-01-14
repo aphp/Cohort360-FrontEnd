@@ -93,11 +93,12 @@ const generateTimelineFormattedData = (hospits?: IEncounter[], consults?: PMSIEn
  */
 
 type PatientTimelineTypes = {
+  deidentified: boolean
   documents?: (CohortComposition | IDocumentReference)[]
   hospits?: IEncounter[]
   consults?: PMSIEntry<IProcedure>[]
 }
-const PatientTimeline: React.FC<PatientTimelineTypes> = ({ hospits, consults }) => {
+const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits, consults }) => {
   const classes = useStyles()
   const timelineData = generateTimelineFormattedData(hospits, consults)
   const [openHospitDialog, setOpenHospitDialog] = useState(false)
@@ -241,7 +242,13 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ hospits, consults }) 
         </Grid>
       ) : (
         <>
-          <HospitDialog open={openHospitDialog} onClose={handleClose} loading={loading} documents={dialogDocuments} />
+          <HospitDialog
+            open={openHospitDialog}
+            onClose={handleClose}
+            loading={loading}
+            documents={dialogDocuments}
+            deidentified={deidentified}
+          />
           <div className={classes.centeredTimeline}>
             <div className={classes.verticalBar} />
             {yearList.map((year) => (

@@ -32,11 +32,29 @@ import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
 type DocumentRowTypes = {
+  deidentified: boolean
   document: CohortComposition | IDocumentReference
 }
-const DocumentRow: React.FC<DocumentRowTypes> = ({ document }) => {
+const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => {
   const classes = useStyles()
   const [documentDialogOpen, setDocumentDialogOpen] = useState(false)
+  const [noPdfDialogOpen, setNoPdfDialogOpen] = useState(false)
+
+  const openPdfDialog = () => {
+    if (deidentified) {
+      setNoPdfDialogOpen(true)
+    } else {
+      setDocumentDialogOpen(true)
+    }
+  }
+
+  const handleClosePdfDialog = () => {
+    if (deidentified) {
+      setNoPdfDialogOpen(false)
+    } else {
+      setDocumentDialogOpen(false)
+    }
+  }
 
   const row = {
     ...document,
@@ -47,13 +65,6 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ document }) => {
     title: document.resourceType === 'Composition' ? document.title ?? '-' : document.description ?? '-',
     serviceProvider: document.resourceType === 'Composition' ? document.serviceProvider : '-',
     type: document.type?.coding?.[0].display ?? document.type?.coding?.[0].code ?? '-'
-  }
-  const handleOpenPdf = () => {
-    setDocumentDialogOpen(true)
-  }
-
-  const handleClosePdf = () => {
-    setDocumentDialogOpen(false)
   }
 
   const getStatusShip = (type?: string) => {
@@ -78,11 +89,19 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ document }) => {
         <TableCell align="center">{row.serviceProvider}</TableCell>
         <TableCell align="center">{getStatusShip(row.status)}</TableCell>
         <TableCell align="center">
-          <IconButton onClick={() => handleOpenPdf()}>
+          <IconButton onClick={() => openPdfDialog()}>
             <PdfIcon height="30px" fill="#ED6D91" />
           </IconButton>
         </TableCell>
       </TableRow>
+
+      <Dialog open={noPdfDialogOpen} onClose={() => handleClosePdfDialog()}>
+        <DialogContent>Fonctionnalité désactivée en mode pseudonymisé.</DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleClosePdfDialog()}>OK</Button>
+        </DialogActions>
+      </Dialog>
+
       <Dialog open={documentDialogOpen} onClose={() => setDocumentDialogOpen(false)} maxWidth="lg">
         <DialogContent>
           <Document
@@ -101,7 +120,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ document }) => {
           <Button
             onClick={(e) => {
               e.stopPropagation()
-              handleClosePdf()
+              handleClosePdfDialog()
             }}
             color="primary"
           >
@@ -114,11 +133,12 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ document }) => {
 }
 
 type DocumentTableTypes = {
+  deidentified: boolean
   documents?: (CohortComposition | IDocumentReference)[]
   page: number
   documentLines: number
 }
-const DocumentTable: React.FC<DocumentTableTypes> = ({ documents, page, documentLines }) => {
+const DocumentTable: React.FC<DocumentTableTypes> = ({ deidentified, documents, page, documentLines }) => {
   const classes = useStyles()
   return (
     <>
@@ -152,7 +172,7 @@ const DocumentTable: React.FC<DocumentTableTypes> = ({ documents, page, document
             </TableHead>
             <TableBody>
               {documents.slice((page - 1) * documentLines, page * documentLines).map((document, index) => (
-                <DocumentRow key={`docRow ${index}`} document={document} />
+                <DocumentRow key={`docRow ${index}`} document={document} deidentified={deidentified} />
               ))}
             </TableBody>
           </Table>

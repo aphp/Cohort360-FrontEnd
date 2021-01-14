@@ -14,12 +14,13 @@ import { CohortComposition } from 'types'
 import useStyles from './styles'
 
 type HospitDialogTypes = {
+  deidentified: boolean
   open: boolean
   onClose: () => void
   documents?: (CohortComposition | IDocumentReference)[]
   loading: boolean
 }
-const HospitDialog: React.FC<HospitDialogTypes> = ({ open, onClose, documents, loading }) => {
+const HospitDialog: React.FC<HospitDialogTypes> = ({ deidentified, open, onClose, documents, loading }) => {
   const classes = useStyles()
   const documentLines = 4 // Number of desired lines in the document array
   const [page, setPage] = useState(1)
@@ -45,7 +46,16 @@ const HospitDialog: React.FC<HospitDialogTypes> = ({ open, onClose, documents, l
         {loading ? (
           <CircularProgress className={classes.loading} />
         ) : (
-          <>{documents && <DocumentTable documentLines={documentLines} documents={documents} page={page} />}</>
+          <>
+            {documents && (
+              <DocumentTable
+                documentLines={documentLines}
+                documents={documents}
+                page={page}
+                deidentified={deidentified}
+              />
+            )}
+          </>
         )}
       </DialogContent>
       <DialogActions>

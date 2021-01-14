@@ -67,7 +67,6 @@ const PatientSidebarItem: React.FC<PatientSidebarItemTypes> = ({
     <ListItem
       divider
       onClick={() => history.push(`/patients/${id}${groupId ? `?groupId=${groupId}` : ''}`)}
-      // onClick={() => history.push(`/patients/${id}`)}
       className={classes.listItem}
     >
       <ListItemIcon className={classes.genderIconContainer}>
