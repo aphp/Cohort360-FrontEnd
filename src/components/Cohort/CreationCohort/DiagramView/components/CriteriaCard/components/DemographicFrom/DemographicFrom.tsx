@@ -61,57 +61,59 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
         )}
       </Grid>
 
-      <FormBuilder<DemographicDataType>
-        defaultValues={defaultValues}
-        title={'Démographie patient'}
-        properties={[
-          {
-            name: 'title',
-            placeholder: 'Nom du critère',
-            type: 'text',
-            variant: 'outlined',
-            validationRules: {
-              required: 'Merci de renseigné un titre'
+      <Grid className={classes.formContainer}>
+        <FormBuilder<DemographicDataType>
+          defaultValues={defaultValues}
+          title={'Démographie patient'}
+          properties={[
+            {
+              name: 'title',
+              placeholder: 'Nom du critère',
+              type: 'text',
+              variant: 'outlined',
+              validationRules: {
+                required: 'Merci de renseigné un titre'
+              }
+            },
+            {
+              name: 'gender',
+              label: 'Genre',
+              variant: 'outlined',
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.gender || []
+            },
+            {
+              name: 'vitalStatus',
+              variant: 'outlined',
+              label: 'Status vital',
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.status || []
+            },
+            {
+              name: 'years',
+              label: "Fourchette d'âge",
+              type: 'slider',
+              valueLabelDisplay: 'auto',
+              min: 0,
+              max: 100
             }
-          },
-          {
-            name: 'gender',
-            label: 'Genre',
-            variant: 'outlined',
-            type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.gender || []
-          },
-          {
-            name: 'vitalStatus',
-            variant: 'outlined',
-            label: 'Status vital',
-            type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.status || []
-          },
-          {
-            name: 'years',
-            label: "Fourchette d'âge",
-            type: 'slider',
-            valueLabelDisplay: 'auto',
-            min: 0,
-            max: 100
-          }
-        ]}
-        submit={_onSubmit}
-        formId="demographic-form"
-        formFooter={
-          <Grid className={classes.criteriaActionContainer}>
-            {!isEdition && (
-              <Button onClick={goBack} color="primary" variant="outlined">
-                Annuler
+          ]}
+          submit={_onSubmit}
+          formId="demographic-form"
+          formFooter={
+            <Grid className={classes.criteriaActionContainer}>
+              {!isEdition && (
+                <Button onClick={goBack} color="primary" variant="outlined">
+                  Annuler
+                </Button>
+              )}
+              <Button type="submit" form="demographic-form" color="primary" variant="contained">
+                Confirmer
               </Button>
-            )}
-            <Button type="submit" form="demographic-form" color="primary" variant="contained">
-              Confirmer
-            </Button>
-          </Grid>
-        }
-      />
+            </Grid>
+          }
+        />
+      </Grid>
     </Grid>
   )
 }
