@@ -24,6 +24,7 @@ import {
 } from '../../../services/cohortCreation/fetchCondition'
 import { fetchCcamData, fetchCcamHierarchy } from '../../../services/cohortCreation/fetchProcedure'
 import { fetchGhmData, fetchGhmHierarchy } from '../../../services/cohortCreation/fetchClaim'
+import { fetchDocTypes } from '../../../services/cohortCreation/fetchComposition'
 
 // ├── Mes variables
 // ├── Patients
@@ -69,7 +70,9 @@ const criteriaList: CriteriaItemType[] = [
     id: 'Composition',
     title: 'Documents cliniques',
     color: '#0063AF',
-    components: DocumentsForm
+    components: DocumentsForm,
+    data: { docTypes: 'loading' },
+    fetch: { fetchDocTypes }
   },
   {
     id: 'pmsi',

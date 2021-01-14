@@ -59,7 +59,7 @@ const useStyles = makeStyles(() => ({
     borderRadius: 10
   },
   drawerContentContainer: {
-    height: 'calc(100vh - 200px)',
+    height: 'calc(100vh - 207px)',
     overflow: 'auto',
     margin: 12
   },

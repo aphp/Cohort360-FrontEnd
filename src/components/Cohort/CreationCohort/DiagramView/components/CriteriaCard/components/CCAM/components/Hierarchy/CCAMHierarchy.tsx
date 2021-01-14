@@ -144,10 +144,10 @@ const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
               <KeyboardBackspaceIcon />
             </IconButton>
             <Divider className={classes.divider} orientation="vertical" flexItem />
-            <Typography className={classes.titleLabel}>Ajouter un critère de diagnostic</Typography>
+            <Typography className={classes.titleLabel}>Ajouter un critère d'acte CCAM</Typography>
           </>
         ) : (
-          <Typography className={classes.titleLabel}>Modifier un critère de diagnostic</Typography>
+          <Typography className={classes.titleLabel}>Modifier un critère d'acte CCAM</Typography>
         )}
       </Grid>
 

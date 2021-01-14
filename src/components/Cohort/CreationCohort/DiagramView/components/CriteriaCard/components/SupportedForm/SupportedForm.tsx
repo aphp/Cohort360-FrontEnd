@@ -75,97 +75,99 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
         )}
       </Grid>
 
-      <FormBuilder<EncounterDataType>
-        defaultValues={defaultValues}
-        title="Prise en charge"
-        properties={[
-          {
-            name: 'title',
-            placeholder: 'Nom du critère',
-            type: 'text',
-            variant: 'outlined',
-            validationRules: {
-              required: 'Merci de renseigné un titre'
+      <Grid className={classes.formContainer}>
+        <FormBuilder<EncounterDataType>
+          defaultValues={defaultValues}
+          title="Prise en charge"
+          properties={[
+            {
+              name: 'title',
+              placeholder: 'Nom du critère',
+              type: 'text',
+              variant: 'outlined',
+              validationRules: {
+                required: 'Merci de renseigné un titre'
+              }
+            },
+            {
+              type: 'custom',
+              name: 'label',
+              renderInput: () => (
+                <FormLabel style={{ padding: '0 1em' }} component="legend">
+                  Âge au moment de la prise en charge :
+                </FormLabel>
+              )
+            },
+            {
+              name: 'ageType',
+              variant: 'outlined',
+              type: 'autocomplete',
+              autocompleteOptions: [
+                { id: 'year', label: 'En années' },
+                { id: 'month', label: 'En mois' },
+                { id: 'day', label: 'En jours' }
+              ]
+            },
+            {
+              name: 'years',
+              type: 'slider',
+              valueLabelDisplay: 'auto',
+              min: 0,
+              max: 100
+            },
+            {
+              label: 'Durée de la prise en charge',
+              name: 'duration',
+              type: 'slider',
+              valueLabelDisplay: 'auto',
+              min: 0,
+              max: 100
+            },
+            {
+              name: 'admissionMode',
+              variant: 'outlined',
+              label: "Mode d'admission",
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.admissionModes
+            },
+            {
+              name: 'entryMode',
+              variant: 'outlined',
+              label: "Mode d'entrée",
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.entryModes
+            },
+            {
+              name: 'exitMode',
+              variant: 'outlined',
+              label: 'Mode de sortie',
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.exitModes
+            },
+            {
+              name: 'fileStatus',
+              variant: 'outlined',
+              label: 'Statut Dossier',
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.fileStatus
             }
-          },
-          {
-            type: 'custom',
-            name: 'label',
-            renderInput: () => (
-              <FormLabel style={{ padding: '0 1em' }} component="legend">
-                Âge au moment de la prise en charge :
-              </FormLabel>
-            )
-          },
-          {
-            name: 'ageType',
-            variant: 'outlined',
-            type: 'autocomplete',
-            autocompleteOptions: [
-              { id: 'year', label: 'En années' },
-              { id: 'month', label: 'En mois' },
-              { id: 'day', label: 'En jours' }
-            ]
-          },
-          {
-            name: 'years',
-            type: 'slider',
-            valueLabelDisplay: 'auto',
-            min: 0,
-            max: 100
-          },
-          {
-            label: 'Durée de la prise en charge',
-            name: 'duration',
-            type: 'slider',
-            valueLabelDisplay: 'auto',
-            min: 0,
-            max: 100
-          },
-          {
-            name: 'admissionMode',
-            variant: 'outlined',
-            label: "Mode d'admission",
-            type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.admissionModes
-          },
-          {
-            name: 'entryMode',
-            variant: 'outlined',
-            label: "Mode d'entrée",
-            type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.entryModes
-          },
-          {
-            name: 'exitMode',
-            variant: 'outlined',
-            label: 'Mode de sortie',
-            type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.exitModes
-          },
-          {
-            name: 'fileStatus',
-            variant: 'outlined',
-            label: 'Statut Dossier',
-            type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.fileStatus
-          }
-        ]}
-        submit={_onSubmit}
-        formId="supported-form"
-        formFooter={
-          <Grid className={classes.criteriaActionContainer}>
-            {!isEdition && (
-              <Button onClick={goBack} color="primary" variant="outlined">
-                Annuler
+          ]}
+          submit={_onSubmit}
+          formId="supported-form"
+          formFooter={
+            <Grid className={classes.criteriaActionContainer}>
+              {!isEdition && (
+                <Button onClick={goBack} color="primary" variant="outlined">
+                  Annuler
+                </Button>
+              )}
+              <Button type="submit" form="supported-form" color="primary" variant="contained">
+                Confirmer
               </Button>
-            )}
-            <Button type="submit" form="supported-form" color="primary" variant="contained">
-              Confirmer
-            </Button>
-          </Grid>
-        }
-      />
+            </Grid>
+          }
+        />
+      </Grid>
     </Grid>
   )
 }
