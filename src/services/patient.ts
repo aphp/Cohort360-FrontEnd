@@ -499,7 +499,7 @@ export const getEncounterOrProcedureDocs = async (
     }
 
     const documentsResp = await api.get<FHIR_API_Response<IComposition>>(
-      `/Composition?encounter=${encounterId}&_elements=encounter,date,type,title,status`
+      `/Composition?encounter=${encounterId}&status=final&_elements=encounter,date,type,title,status`
     )
 
     //TO DO when deidentified data are fixed: change true to real value

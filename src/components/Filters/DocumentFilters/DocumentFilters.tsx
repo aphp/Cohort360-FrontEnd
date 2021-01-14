@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers'
-import MomentUtils from '@date-io/moment'
+import { KeyboardDatePicker } from '@material-ui/pickers'
 
 import {
   Button,
@@ -139,58 +138,58 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
         )}
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Date :</Typography>
-          <MuiPickersUtilsProvider utils={MomentUtils}>
-            <Grid container alignItems="baseline" className={classes.datePickers}>
-              <FormLabel component="legend" className={classes.dateLabel}>
-                Après le :
-              </FormLabel>
-              <KeyboardDatePicker
-                clearable
-                error={dateError}
-                invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
-                format="DD/MM/YYYY"
-                onChange={(date) => setStartDate(date ?? null)}
-                value={_startDate}
-              />
-              {_startDate !== null && (
-                <IconButton
-                  classes={{ root: classes.clearDate, label: classes.buttonLabel }}
-                  color="primary"
-                  onClick={() => setStartDate(null)}
-                >
-                  <ClearIcon />
-                </IconButton>
-              )}
-            </Grid>
-
-            <Grid container alignItems="baseline" className={classes.datePickers}>
-              <FormLabel component="legend" className={classes.dateLabel}>
-                Avant le :
-              </FormLabel>
-              <KeyboardDatePicker
-                clearable
-                error={dateError}
-                invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
-                format="DD/MM/YYYY"
-                onChange={setEndDate}
-                value={_endDate}
-              />
-              {_endDate !== null && (
-                <IconButton
-                  classes={{ root: classes.clearDate, label: classes.buttonLabel }}
-                  color="primary"
-                  onClick={() => setEndDate(null)}
-                >
-                  <ClearIcon />
-                </IconButton>
-              )}
-            </Grid>
-            {dateError && (
-              <Typography className={classes.dateError}>
-                Vous ne pouvez pas sélectionner de date de début supérieure à la date de fin.
-              </Typography>
+          <Grid container alignItems="baseline" className={classes.datePickers}>
+            <FormLabel component="legend" className={classes.dateLabel}>
+              Après le :
+            </FormLabel>
+            <KeyboardDatePicker
+              clearable
+              error={dateError}
+              style={{ width: 'calc(100% - 120px)' }}
+              invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
+              format="DD/MM/YYYY"
+              onChange={(date) => setStartDate(date ?? null)}
+              value={_startDate}
+            />
+            {_startDate !== null && (
+              <IconButton
+                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
+                color="primary"
+                onClick={() => setStartDate(null)}
+              >
+                <ClearIcon />
+              </IconButton>
             )}
-          </MuiPickersUtilsProvider>
+          </Grid>
+
+          <Grid container alignItems="baseline" className={classes.datePickers}>
+            <FormLabel component="legend" className={classes.dateLabel}>
+              Avant le :
+            </FormLabel>
+            <KeyboardDatePicker
+              clearable
+              error={dateError}
+              style={{ width: 'calc(100% - 120px)' }}
+              invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
+              format="DD/MM/YYYY"
+              onChange={setEndDate}
+              value={_endDate}
+            />
+            {_endDate !== null && (
+              <IconButton
+                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
+                color="primary"
+                onClick={() => setEndDate(null)}
+              >
+                <ClearIcon />
+              </IconButton>
+            )}
+          </Grid>
+          {dateError && (
+            <Typography className={classes.dateError}>
+              Vous ne pouvez pas sélectionner de date de début supérieure à la date de fin.
+            </Typography>
+          )}
         </Grid>
       </DialogContent>
       <DialogActions>

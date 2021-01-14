@@ -38,7 +38,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
       title: data.title,
       search: data.search,
       docType: data.docType,
-      encounter: data.encounter,
+      // encounter: data.encounter,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Composition'
@@ -61,73 +61,75 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
         )}
       </Grid>
 
-      <FormBuilder<DocumentDataType>
-        defaultValues={defaultValues}
-        title={'Documents médicaux'}
-        properties={[
-          {
-            name: 'title',
-            placeholder: 'Nom du critère',
-            type: 'text',
-            variant: 'outlined',
-            validationRules: {
-              required: 'Merci de renseigné un titre'
+      <Grid className={classes.formContainer}>
+        <FormBuilder<DocumentDataType>
+          defaultValues={defaultValues}
+          title={'Documents médicaux'}
+          properties={[
+            {
+              name: 'title',
+              placeholder: 'Nom du critère',
+              type: 'text',
+              variant: 'outlined',
+              validationRules: {
+                required: 'Merci de renseigné un titre'
+              }
+            },
+            {
+              name: 'search',
+              placeholder: 'Recherche',
+              type: 'text',
+              variant: 'outlined'
+            },
+            {
+              name: 'docType',
+              variant: 'outlined',
+              label: 'Rechercher dans',
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.docTypes || []
             }
-          },
-          {
-            name: 'search',
-            placeholder: 'Recherche',
-            type: 'text',
-            variant: 'outlined'
-          },
-          {
-            name: 'docType',
-            variant: 'outlined',
-            label: 'Rechercher dans',
-            type: 'autocomplete',
-            autocompleteOptions: criteria?.data?.docTypes || []
-          },
-          {
-            name: 'encounter',
-            label: "Nombre d'occurence",
-            variant: 'outlined',
-            type: 'number'
-          }
-          // {
-          //   type: 'custom',
-          //   name: 'label',
-          //   renderInput: () => (
-          //     <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
-          //       Date d'occurrence :
-          //     </FormLabel>
-          //   )
-          // },
-          // {
-          //   name: 'startOccurrence',
-          //   label: 'Avant le',
-          //   type: 'date'
-          // },
-          // {
-          //   name: 'endOccurrence',
-          //   label: 'Après le',
-          //   type: 'date'
-          // }
-        ]}
-        submit={_onSubmit}
-        formId="documents-form"
-        formFooter={
-          <Grid className={classes.criteriaActionContainer}>
-            {!isEdition && (
-              <Button onClick={goBack} color="primary" variant="outlined">
-                Annuler
+            // {
+            //   name: 'encounter',
+            //   label: "Nombre d'occurence",
+            //   variant: 'outlined',
+            //   type: 'number'
+            // }
+            // {
+            //   type: 'custom',
+            //   name: 'label',
+            //   renderInput: () => (
+            //     <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+            //       Date d'occurrence :
+            //     </FormLabel>
+            //   )
+            // },
+            // {
+            //   name: 'startOccurrence',
+            //   label: 'Avant le',
+            //   type: 'date'
+            // },
+            // {
+            //   name: 'endOccurrence',
+            //   label: 'Après le',
+            //   type: 'date'
+            // }
+          ]}
+          submit={_onSubmit}
+          formId="documents-form"
+          formFooter={
+            <Grid className={classes.criteriaActionContainer}>
+              {!isEdition && (
+                <Button onClick={goBack} color="primary" variant="outlined">
+                  Annuler
+                </Button>
+              )}
+              <Button type="submit" form="documents-form" color="primary" variant="contained">
+                Confirmer
               </Button>
-            )}
-            <Button type="submit" form="documents-form" color="primary" variant="contained">
-              Confirmer
-            </Button>
-          </Grid>
-        }
-      />
+            </Grid>
+          }
+        />
+      </Grid>
     </Grid>
   )
 }

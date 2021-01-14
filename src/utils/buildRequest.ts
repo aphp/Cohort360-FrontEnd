@@ -4,40 +4,39 @@ import { fetchPerimeterInfoForRequeteur as fetchPopulation } from '../services/p
 import { ScopeTreeRow, SelectedCriteriaType } from 'types'
 
 const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
-const PATIENT_GENDER = 'gender'
-const PATIENT_BIRTHDATE = 'birthdate'
-const PATIENT_DECEASED = 'deceased'
+const PATIENT_GENDER = 'gender' // ok
+const PATIENT_BIRTHDATE = 'birthdate' // ok
+const PATIENT_DECEASED = 'deceased' // ok
 
 const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
-const ENCOUNTER_LENGTH = 'length'
-const ENCOUNTER_BIRTHDATE = 'patient.birthdate'
-const ENCOUNTER_ADMISSIONMODE = 'admissionMode'
-const ENCOUNTER_ENTRYMODE = 'entryMode'
-const ENCOUNTER_EXITMODE = 'exitMode'
-const ENCOUNTER_FILESTATUS = 'fileStatus'
+const ENCOUNTER_LENGTH = 'length' // ok
+const ENCOUNTER_BIRTHDATE = 'patient.birthdate' // ok
+const ENCOUNTER_ADMISSIONMODE = 'admissionMode' // on verra
+const ENCOUNTER_ENTRYMODE = 'entryMode' // on verra
+const ENCOUNTER_EXITMODE = 'exitMode' // on verra
+const ENCOUNTER_FILESTATUS = 'fileStatus' // on verra
 
 const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
-const CLAIM_CODE = 'diagnosis'
-const CLAIM_DATE = 'date'
-const CLAIM_ENCOUNTER = 'encounter'
+const CLAIM_CODE = 'diagnosis' // ok
+const CLAIM_DATE = 'created' // ok
+const CLAIM_ENCOUNTER = 'encounter' // on verra
 
 const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
-const PROCEDURE_CODE = 'code'
-const PROCEDURE_DATE = 'date'
-const PROCEDURE_ENCOUNTER = 'encounter'
+const PROCEDURE_CODE = 'code' // ok
+const PROCEDURE_DATE = 'date' // ok
+const PROCEDURE_ENCOUNTER = 'encounter' // on verra
 
-const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition'
-const CONDITION_CODE = 'code'
-const CONDITION_TYPE = 'type'
-const CONDITION_DATE = 'date'
-const CONDITION_ENCOUNTER = 'encounter'
+const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition' // ok
+const CONDITION_CODE = 'code' // ok
+const CONDITION_TYPE = 'type' // ok
+const CONDITION_DATE = 'recorded-date' // ok
+const CONDITION_ENCOUNTER = 'encounter' // on verra
 
 const RESSOURCE_TYPE_COMPOSITION: 'Composition' = 'Composition'
-const COMPOSITION_TEXT = 'text'
-const COMPOSITION_TYPE = 'type'
-const COMPOSITION_DATE = 'date'
-const COMPOSITION_ENCOUNTER = 'encounter'
-
+const COMPOSITION_TEXT = '_text' // ok
+const COMPOSITION_TYPE = 'type' // ok
+const COMPOSITION_DATE = 'date' // ok
+const COMPOSITION_ENCOUNTER = 'encounter' // on verra
 type RequeteurSearchType = {
   _type: string
   resourceType:

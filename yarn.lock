@@ -1177,11 +1177,6 @@
   "resolved" "https://registry.npmjs.org/@date-io/core/-/core-1.3.13.tgz"
   "version" "1.3.13"
 
-"@date-io/core@^2.10.6":
-  "integrity" "sha512-MGYt4GEB/4ZMdSbj6FS7/gPBvuhHUwnn5O6t8PlkSqGF1310qxypVyK4CZg5RQgev25L3R5eLVdNTyYrJOL8Rw=="
-  "resolved" "https://registry.npmjs.org/@date-io/core/-/core-2.10.6.tgz"
-  "version" "2.10.6"
-
 "@date-io/date-fns@1.1.0":
   "integrity" "sha512-FMRhYWfoGiIXdN4xWAArpkdEbqsg2Fr+6Yda7Np2eVWCNx6gSMYsHIM51IIcI+3762ajYbhoEYjHYXVFNZIk1g=="
   "resolved" "https://registry.npmjs.org/@date-io/date-fns/-/date-fns-1.1.0.tgz"
@@ -1196,12 +1191,12 @@
   dependencies:
     "@date-io/core" "^1.3.13"
 
-"@date-io/moment@^2.10.6":
-  "integrity" "sha512-oIo24tW/l5kFxYV2B3Hc0joYKh59p7X7S36u0/inmf+Rk0Z8B4nU9jxuAgx5gbkFY2NVLwo1kr4l0CO2POtkYA=="
-  "resolved" "https://registry.npmjs.org/@date-io/moment/-/moment-2.10.6.tgz"
-  "version" "2.10.6"
+"@date-io/moment@^1.3.13":
+  "integrity" "sha512-3kJYusJtQuOIxq6byZlzAHoW/18iExJer9qfRF5DyyzdAk074seTuJfdofjz4RFfTd/Idk8WylOQpWtERqvFuQ=="
+  "resolved" "https://registry.npmjs.org/@date-io/moment/-/moment-1.3.13.tgz"
+  "version" "1.3.13"
   dependencies:
-    "@date-io/core" "^2.10.6"
+    "@date-io/core" "^1.3.13"
 
 "@emotion/hash@^0.8.0":
   "integrity" "sha512-kBJtf7PH6aWwZ6fka3zQ0p6SBYzx4fl1LoZXE2RrnYST9Xljm7WfKJrU4g/Xr3Beg72MLrp1AWNUmuYJTL7Cow=="
