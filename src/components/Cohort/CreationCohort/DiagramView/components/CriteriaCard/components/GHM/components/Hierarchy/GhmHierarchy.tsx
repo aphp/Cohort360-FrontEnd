@@ -145,10 +145,10 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
               <KeyboardBackspaceIcon />
             </IconButton>
             <Divider className={classes.divider} orientation="vertical" flexItem />
-            <Typography className={classes.titleLabel}>Ajouter un critère de diagnostic</Typography>
+            <Typography className={classes.titleLabel}>Ajouter un critère de GHM</Typography>
           </>
         ) : (
-          <Typography className={classes.titleLabel}>Modifier un critère de diagnostic</Typography>
+          <Typography className={classes.titleLabel}>Modifier un critère de GHM</Typography>
         )}
       </Grid>
 
