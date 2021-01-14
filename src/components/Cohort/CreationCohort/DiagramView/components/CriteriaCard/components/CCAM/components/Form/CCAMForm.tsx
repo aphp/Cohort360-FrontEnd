@@ -33,9 +33,8 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
     onChangeSelectedCriteria({
       title: data.title,
       code: data.code,
-      // occurence: data.occurence,
-      encounter: data.encounter,
-      comparator: data.comparator,
+      // encounter: data.encounter,
+      // comparator: data.comparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Procedure'

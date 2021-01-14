@@ -33,8 +33,8 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
     onChangeSelectedCriteria({
       title: data.title,
       code: data.code,
-      // occurence: data.occurence,
-      encounter: data.encounter,
+      // encounter: data.encounter,
+      // comparator: data.comparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Claim'
