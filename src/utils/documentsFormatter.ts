@@ -37,3 +37,22 @@ export const getEncounterStatus = (status?: EncounterStatusKind): string => {
       return 'statut inconnu'
   }
 }
+
+export const getProcedureStatus = (status?: string): string => {
+  switch (status) {
+    case 'preparation':
+      return 'En préparation'
+    case 'in-progress':
+      return 'Ouverte'
+    case 'on-hold':
+      return 'En attente'
+    case 'stopped':
+      return 'Annulé'
+    case 'completed':
+      return 'Terminé'
+    case 'entered-in-error':
+      return 'Entré par erreur'
+    default:
+      return 'Statut inconnu'
+  }
+}

@@ -27,7 +27,12 @@ import { FHIR_API_URL } from '../../../../constants'
 
 import useStyles from './styles'
 import { CohortComposition } from 'types'
-import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
+import {
+  CompositionStatusKind,
+  DocumentReferenceStatusKind,
+  IDocumentReference
+} from '@ahryman40k/ts-fhir-types/lib/R4'
+import { getDocumentStatus } from 'utils/documentsFormatter'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
@@ -39,6 +44,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
   const classes = useStyles()
   const [documentDialogOpen, setDocumentDialogOpen] = useState(false)
   const [noPdfDialogOpen, setNoPdfDialogOpen] = useState(false)
+  const [numPages, setNumPages] = useState<number>()
 
   const openPdfDialog = () => {
     if (deidentified) {
@@ -67,11 +73,23 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
     type: document.type?.coding?.[0].display ?? document.type?.coding?.[0].code ?? '-'
   }
 
-  const getStatusShip = (type?: string) => {
+  const getStatusShip = (type?: CompositionStatusKind | DocumentReferenceStatusKind) => {
     if (type === 'final' || type === 'current') {
-      return <Chip className={classes.validChip} icon={<CheckIcon height="15px" fill="#FFF" />} label={type} />
+      return (
+        <Chip
+          className={classes.validChip}
+          icon={<CheckIcon height="15px" fill="#FFF" />}
+          label={getDocumentStatus(type)}
+        />
+      )
     } else {
-      return <Chip className={classes.cancelledChip} icon={<CancelIcon height="15px" fill="#FFF" />} label={type} />
+      return (
+        <Chip
+          className={classes.cancelledChip}
+          icon={<CancelIcon height="15px" fill="#FFF" />}
+          label={getDocumentStatus(type)}
+        />
+      )
     }
   }
 
@@ -105,6 +123,8 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
       <Dialog open={documentDialogOpen} onClose={() => setDocumentDialogOpen(false)} maxWidth="lg">
         <DialogContent>
           <Document
+            error={'Le document est introuvable.'}
+            loading={'PDF en cours de chargement...'}
             file={{
               url: `${FHIR_API_URL}/Binary/${row.id}`,
               httpHeaders: {
@@ -112,8 +132,11 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
                 Authorization: `Bearer ${localStorage.getItem('access')}`
               }
             }}
+            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
           >
-            <Page pageNumber={1} />
+            {Array.from(new Array(numPages), (el, index) => (
+              <Page key={`page_${index + 1}`} pageNumber={index + 1} loading={'Pages en cours de chargement...'} />
+            ))}
           </Document>
         </DialogContent>
         <DialogActions>
