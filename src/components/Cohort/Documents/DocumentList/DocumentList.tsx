@@ -190,6 +190,8 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
             <Dialog open={pdfDialogOpen} onClose={() => handleClosePdfDialog()} maxWidth="md">
               <DialogContent>
                 <Document
+                  error={'Le document est introuvable.'}
+                  loading={'PDF en cours de chargement...'}
                   file={{
                     url: `${FHIR_API_URL}/Binary/${row.id}`,
                     httpHeaders: {
@@ -200,7 +202,11 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
                   onLoadSuccess={({ numPages }) => setNumPages(numPages)}
                 >
                   {Array.from(new Array(numPages), (el, index) => (
-                    <Page key={`page_${index + 1}`} pageNumber={index + 1} />
+                    <Page
+                      key={`page_${index + 1}`}
+                      pageNumber={index + 1}
+                      loading={'Pages en cours de chargement...'}
+                    />
                   ))}
                 </Document>
               </DialogContent>

@@ -45,7 +45,7 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'mes_variables',
     title: 'Mes variables',
-    color: '#5BC5F2',
+    color: '	#808080',
     disabled: true,
     data: null,
     components: null
@@ -109,13 +109,13 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'biologie_microbiologie',
     title: 'Biologie/Microbiologie',
-    color: '#0063AF',
+    color: '	#808080',
     components: null,
     subItems: [
       {
         id: 'biologie',
         title: 'Biologie',
-        color: '#0063AF',
+        color: '	#808080',
         disabled: true,
         data: null,
         components: null
@@ -124,7 +124,7 @@ const criteriaList: CriteriaItemType[] = [
         id: 'microbiologie',
         title: 'Microbiologie',
         components: null,
-        color: '#0063AF',
+        color: '	#808080',
         disabled: true,
         data: null
       }
@@ -133,7 +133,7 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'physiologie',
     title: 'Physiologie',
-    color: '#0063AF',
+    color: '	#808080',
     disabled: true,
     data: null,
     components: null
@@ -141,14 +141,14 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'médicaments',
     title: 'Médicaments',
-    color: '#0063AF',
+    color: '	#808080',
     components: null,
     subItems: [
       {
         id: 'prescription_dispension_administration',
         title: 'Prescription - Dispension - Administration',
         components: null,
-        color: '#0063AF',
+        color: '	#808080',
         disabled: true,
         data: null
       }
