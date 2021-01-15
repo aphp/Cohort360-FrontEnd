@@ -19,8 +19,8 @@ type SupportedFormFormProps = {
 const defaultDemographic = {
   title: 'Critère de prise en charge',
   label: '',
-  ageType: { id: 'year', label: 'En années' },
-  years: [0, 100],
+  ageType: { id: 'year', label: 'années' },
+  years: [0, 130],
   duration: [0, 100],
   admissionMode: null,
   entryMode: null,
@@ -68,10 +68,10 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
               <KeyboardBackspaceIcon />
             </IconButton>
             <Divider className={classes.divider} orientation="vertical" flexItem />
-            <Typography className={classes.titleLabel}>Ajouter un critère démographique</Typography>
+            <Typography className={classes.titleLabel}>Ajouter un critère prise en charge</Typography>
           </>
         ) : (
-          <Typography className={classes.titleLabel}>Modifier un critère démographique</Typography>
+          <Typography className={classes.titleLabel}>Modifier un critère prise en charge</Typography>
         )}
       </Grid>
 
@@ -99,21 +99,29 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
               )
             },
             {
-              name: 'ageType',
-              variant: 'outlined',
-              type: 'autocomplete',
-              autocompleteOptions: [
-                { id: 'year', label: 'En années' },
-                { id: 'month', label: 'En mois' },
-                { id: 'day', label: 'En jours' }
+              type: 'section',
+              title: '',
+              name: '',
+              containerStyle: { display: 'grid', gridTemplateColumns: '1fr 180px' },
+              properties: [
+                {
+                  name: 'years',
+                  type: 'slider',
+                  valueLabelDisplay: 'auto',
+                  min: 0,
+                  max: 130
+                },
+                {
+                  name: 'ageType',
+                  variant: 'outlined',
+                  type: 'autocomplete',
+                  autocompleteOptions: [
+                    { id: 'year', label: 'années' },
+                    { id: 'month', label: 'mois' },
+                    { id: 'day', label: 'jours' }
+                  ]
+                }
               ]
-            },
-            {
-              name: 'years',
-              type: 'slider',
-              valueLabelDisplay: 'auto',
-              min: 0,
-              max: 100
             },
             {
               label: 'Durée de la prise en charge',
