@@ -77,14 +77,14 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
             },
             {
               name: 'search',
-              placeholder: 'Recherche',
+              placeholder: 'Recherche dans les documents',
               type: 'text',
               variant: 'outlined'
             },
             {
               name: 'docType',
               variant: 'outlined',
-              label: 'Rechercher dans',
+              label: 'Type de document',
               type: 'autocomplete',
               autocompleteOptions: criteria?.data?.docTypes || []
             }
