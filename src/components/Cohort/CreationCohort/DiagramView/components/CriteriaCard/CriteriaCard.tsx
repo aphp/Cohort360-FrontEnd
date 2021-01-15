@@ -225,13 +225,11 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
       }
 
       case 'Composition': {
-        const docTypes = {
-          '55188-7': 'Tout type de documents',
-          '11336-5': "Comptes rendus d'hospitalisation",
-          '57833-6': 'Ordonnances'
-        }
-        const selectedDocType =
-          docTypes[_selectedCriteria && _selectedCriteria.docType ? _selectedCriteria.docType.id : '55188-7']
+        const selectedDocType = data?.docTypes
+          ? data?.docTypes.find(
+              (docTypes: any) => docTypes && docTypes.id === (_selectedCriteria?.docType?.id || '55188-7')
+            )
+          : {}
 
         content = (
           <>
@@ -239,7 +237,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
               Dans <span className={classes.criteriaType}>Document médical</span>,
             </Typography>
             <Typography>Recherche textuelle "{_selectedCriteria.search}"</Typography>
-            <Typography>Dans {selectedDocType}.</Typography>
+            <Typography>Dans {selectedDocType.label}.</Typography>
             {/* <Typography>
               {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
             </Typography> */}
