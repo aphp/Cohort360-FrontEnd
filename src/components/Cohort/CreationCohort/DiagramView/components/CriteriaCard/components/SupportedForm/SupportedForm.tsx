@@ -130,35 +130,35 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
               valueLabelDisplay: 'auto',
               min: 0,
               max: 100
-            },
-            {
-              name: 'admissionMode',
-              variant: 'outlined',
-              label: "Mode d'admission",
-              type: 'autocomplete',
-              autocompleteOptions: criteria?.data?.admissionModes
-            },
-            {
-              name: 'entryMode',
-              variant: 'outlined',
-              label: "Mode d'entrée",
-              type: 'autocomplete',
-              autocompleteOptions: criteria?.data?.entryModes
-            },
-            {
-              name: 'exitMode',
-              variant: 'outlined',
-              label: 'Mode de sortie',
-              type: 'autocomplete',
-              autocompleteOptions: criteria?.data?.exitModes
-            },
-            {
-              name: 'fileStatus',
-              variant: 'outlined',
-              label: 'Statut Dossier',
-              type: 'autocomplete',
-              autocompleteOptions: criteria?.data?.fileStatus
             }
+            // {
+            //   name: 'admissionMode',
+            //   variant: 'outlined',
+            //   label: "Mode d'admission",
+            //   type: 'autocomplete',
+            //   autocompleteOptions: criteria?.data?.admissionModes
+            // },
+            // {
+            //   name: 'entryMode',
+            //   variant: 'outlined',
+            //   label: "Mode d'entrée",
+            //   type: 'autocomplete',
+            //   autocompleteOptions: criteria?.data?.entryModes
+            // },
+            // {
+            //   name: 'exitMode',
+            //   variant: 'outlined',
+            //   label: 'Mode de sortie',
+            //   type: 'autocomplete',
+            //   autocompleteOptions: criteria?.data?.exitModes
+            // },
+            // {
+            //   name: 'fileStatus',
+            //   variant: 'outlined',
+            //   label: 'Statut Dossier',
+            //   type: 'autocomplete',
+            //   autocompleteOptions: criteria?.data?.fileStatus
+            // }
           ]}
           submit={_onSubmit}
           formId="supported-form"
