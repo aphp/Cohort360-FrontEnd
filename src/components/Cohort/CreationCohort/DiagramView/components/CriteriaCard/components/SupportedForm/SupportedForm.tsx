@@ -19,7 +19,7 @@ type SupportedFormFormProps = {
 const defaultDemographic = {
   title: 'Critère de prise en charge',
   label: '',
-  ageType: { id: 'year', label: 'En années' },
+  ageType: { id: 'year', label: 'années' },
   years: [0, 130],
   duration: [0, 100],
   admissionMode: null,
