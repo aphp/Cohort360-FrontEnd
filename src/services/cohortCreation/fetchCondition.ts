@@ -3,32 +3,32 @@ import { alphabeticalSort } from 'utils/alphabeticalSort'
 
 const DEFAULT_DIAGNOSTIC_TYPES = [
   {
-    id: 'mp',
-    label: 'manifestation morbide principale'
+    code: 'mp',
+    display: 'manifestation morbide principale'
   },
   {
-    id: 'fp',
-    label: 'finalité principale de prise en charge'
+    code: 'fp',
+    display: 'finalité principale de prise en charge'
   },
   {
-    id: 'dp',
-    label: 'diagnostic principal'
+    code: 'dp',
+    display: 'diagnostic principal'
   },
   {
-    id: 'das',
-    label: 'diagnostic associé significatif'
+    code: 'das',
+    display: 'diagnostic associé significatif'
   },
   {
-    id: 'dr',
-    label: 'diagnostic relié'
+    code: 'dr',
+    display: 'diagnostic relié'
   },
   {
-    id: 'ae',
-    label: 'affection étiologique'
+    code: 'ae',
+    display: 'affection étiologique'
   },
   {
-    id: 'dad',
-    label: 'donnée à visée documentaire'
+    code: 'dad',
+    display: 'donnée à visée documentaire'
   }
 ]
 
