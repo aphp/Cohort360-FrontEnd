@@ -317,6 +317,49 @@ export async function unbuildRequest(json: string) {
                 }
                 break
               }
+              case ENCOUNTER_BIRTHDATE: {
+                currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
+                currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
+                const ageType = [
+                  { id: 'year', label: 'années' },
+                  { id: 'month', label: 'mois' },
+                  { id: 'day', label: 'jours' }
+                ]
+
+                if (value?.search('ge') === 0) {
+                  const date = value?.replace('ge', '') ? moment(value?.replace('ge', ''), 'YYYY-MM-DD') : null
+                  const diff = date ? moment().diff(date, 'days') : 0
+
+                  let currentAgeType: 'year' | 'month' | 'day' = 'year'
+                  if (diff >= 130 && diff <= 3000) {
+                    currentAgeType = 'month'
+                  } else if (diff <= 130) {
+                    currentAgeType = 'day'
+                  }
+
+                  const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
+                  currentCriterion.ageType = foundAgeType
+                  if (date) currentCriterion.years[1] = moment().diff(date, currentAgeType) || 130
+                } else if (value?.search('le') === 0) {
+                  const date = value?.replace('le', '') ? moment(value?.replace('le', ''), 'YYYY-MM-DD') : null
+                  const diff = date ? moment().diff(date, 'days') : 0
+
+                  let currentAgeType: 'year' | 'month' | 'day' = 'year'
+                  if (currentCriterion.ageType) {
+                    currentAgeType = currentCriterion.ageType.id
+                  } else {
+                    if (diff >= 130 && diff <= 3000) {
+                      currentAgeType = 'month'
+                    } else if (diff <= 130) {
+                      currentAgeType = 'day'
+                    }
+                    const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
+                    currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : foundAgeType
+                  }
+                  currentCriterion.years[0] = moment().diff(date, currentAgeType) || 0
+                }
+                break
+              }
               case ENCOUNTER_ADMISSIONMODE:
                 currentCriterion.admissionMode = { id: value }
                 break
