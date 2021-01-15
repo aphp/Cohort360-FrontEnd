@@ -19,7 +19,7 @@ type TestGeneratedFormProps = {
 const defaultDemographic = {
   title: 'Critère de document',
   search: '',
-  docType: { id: '55188-7', label: 'Tout type de documents' },
+  docType: null,
   encounter: 0,
   startOccurrence: '',
   endOccurrence: ''

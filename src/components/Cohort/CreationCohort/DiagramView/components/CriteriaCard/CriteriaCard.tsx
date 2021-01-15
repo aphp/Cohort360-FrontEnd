@@ -208,15 +208,15 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             {!!_selectedCriteria.years && _selectedCriteria.years[0] === _selectedCriteria.years[1] && (
               <Typography>
                 Âge sélectionné: {_selectedCriteria.years?.[0]} ans
-                {_selectedCriteria.years?.[0] === 100 ? ' ou plus.' : '.'}
+                {_selectedCriteria.years?.[0] === 130 ? ' ou plus.' : '.'}
               </Typography>
             )}
             {!!_selectedCriteria.years &&
               _selectedCriteria.years[0] !== _selectedCriteria.years[1] &&
-              (_selectedCriteria.years[0] !== 0 || _selectedCriteria.years[1] !== 100) && (
+              (_selectedCriteria.years[0] !== 0 || _selectedCriteria.years[1] !== 130) && (
                 <Typography>
                   Fourchette d'âge comprise entre {_selectedCriteria.years[0]} et {_selectedCriteria.years[1]} ans
-                  {_selectedCriteria.years[1] === 100 ? ' ou plus.' : '.'}
+                  {_selectedCriteria.years[1] === 130 ? ' ou plus.' : '.'}
                 </Typography>
               )}
           </>
@@ -226,9 +226,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
 
       case 'Composition': {
         const selectedDocType = data?.docTypes
-          ? data?.docTypes.find(
-              (docTypes: any) => docTypes && docTypes.id === (_selectedCriteria?.docType?.id || '55188-7')
-            )
+          ? data?.docTypes.find((docTypes: any) => docTypes && docTypes.id === _selectedCriteria?.docType?.id)
           : {}
 
         content = (
@@ -237,7 +235,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
               Dans <span className={classes.criteriaType}>Document médical</span>,
             </Typography>
             <Typography>Recherche textuelle "{_selectedCriteria.search}"</Typography>
-            <Typography>Dans {selectedDocType.label}.</Typography>
+            {selectedDocType && <Typography>Dans {selectedDocType.label}.</Typography>}
             {/* <Typography>
               {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
             </Typography> */}
@@ -282,16 +280,16 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
             {_selectedCriteria.years && _selectedCriteria.years[0] === _selectedCriteria.years[1] && (
               <Typography>
                 Âge au moment de la prise en charge : {_selectedCriteria.years?.[0]} {ageUnit}
-                {_selectedCriteria.years?.[0] === 100 ? ' ou plus.' : '.'}
+                {_selectedCriteria.years?.[0] === 130 ? ' ou plus.' : '.'}
               </Typography>
             )}
             {_selectedCriteria.years &&
               _selectedCriteria.years[0] !== _selectedCriteria.years[1] &&
-              (_selectedCriteria.years[0] !== 0 || _selectedCriteria.years[1] !== 100) && (
+              (_selectedCriteria.years[0] !== 0 || _selectedCriteria.years[1] !== 130) && (
                 <Typography>
                   Âge au moment de la prise en charge : entre {_selectedCriteria.years[0]} et{' '}
                   {_selectedCriteria.years[1]} {ageUnit}
-                  {_selectedCriteria.years[1] === 100 ? ' ou plus.' : '.'}
+                  {_selectedCriteria.years[1] === 130 ? ' ou plus.' : '.'}
                 </Typography>
               )}
             {_selectedCriteria.duration && _selectedCriteria.duration[0] === _selectedCriteria.duration[1] && (
