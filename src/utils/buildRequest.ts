@@ -74,10 +74,13 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
     switch (selectedCriterion.type) {
       case RESSOURCE_TYPE_PATIENT: {
         let ageFilter = ''
-        if (selectedCriterion.years && selectedCriterion.years !== [0, 100]) {
-          const date1 = moment().subtract(selectedCriterion.years[1], 'years').format('YYYY-MM-DD')
+        if (selectedCriterion.years && selectedCriterion.years !== [0, 130]) {
+          const date1 = moment()
+            .subtract(selectedCriterion.years[1] + 1, 'years')
+            .add(1, 'days')
+            .format('YYYY-MM-DD')
           const date2 = moment().subtract(selectedCriterion.years[0], 'years').format('YYYY-MM-DD')
-          ageFilter = `${PATIENT_BIRTHDATE}=ge${date1},le${date2}`
+          ageFilter = `${PATIENT_BIRTHDATE}=ge${date1}&${PATIENT_BIRTHDATE}=le${date2}`
         }
 
         fhirFilter = [
@@ -93,18 +96,18 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
       case RESSOURCE_TYPE_ENCOUNTER: {
         let lengthFilter = ''
         if (selectedCriterion.duration && selectedCriterion.duration !== [0, 100]) {
-          lengthFilter = `${ENCOUNTER_LENGTH}=ge${selectedCriterion.duration[0]},le${selectedCriterion.duration[1]}`
+          lengthFilter = `${ENCOUNTER_LENGTH}=ge${selectedCriterion.duration[0]}&${ENCOUNTER_LENGTH}=le${selectedCriterion.duration[1]}`
         }
 
         let ageFilter = ''
-        if (selectedCriterion.years && selectedCriterion.years !== [0, 100]) {
+        if (selectedCriterion.years && selectedCriterion.years !== [0, 130]) {
           const date1 = moment()
-            .subtract(selectedCriterion.years[1], selectedCriterion?.ageType?.id)
+            .subtract(selectedCriterion.years[1], selectedCriterion?.ageType?.id || 'years')
             .format('YYYY-MM-DD')
           const date2 = moment()
-            .subtract(selectedCriterion.years[0], selectedCriterion?.ageType?.id)
+            .subtract(selectedCriterion.years[0], selectedCriterion?.ageType?.id || 'years')
             .format('YYYY-MM-DD')
-          ageFilter = `${ENCOUNTER_BIRTHDATE}=ge${date1},le${date2}`
+          ageFilter = `${ENCOUNTER_BIRTHDATE}=ge${date1}&${ENCOUNTER_BIRTHDATE}=le${date2}`
         }
 
         fhirFilter = [
@@ -125,19 +128,20 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
       case RESSOURCE_TYPE_COMPOSITION: {
         let dateFilter = ''
         if (selectedCriterion.startOccurrence || selectedCriterion.endOccurrence) {
-          dateFilter = [
-            selectedCriterion.startOccurrence
-              ? `ge${moment(selectedCriterion.startOccurrence).format('YYYY-MM-DD')}`
-              : '',
-            selectedCriterion.endOccurrence ? `le${moment(selectedCriterion.endOccurrence).format('YYYY-MM-DD')}` : ''
-          ].reduce(searchReducer)
+          const dateFilter1 = selectedCriterion.startOccurrence
+            ? `${COMPOSITION_DATE}=ge${moment(selectedCriterion.startOccurrence).format('YYYY-MM-DD')}`
+            : ''
+          const dateFilter2 = selectedCriterion.endOccurrence
+            ? `${COMPOSITION_DATE}=le${moment(selectedCriterion.endOccurrence).format('YYYY-MM-DD')}`
+            : ''
+          dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
         }
 
         fhirFilter = [
           `${selectedCriterion.search ? `${COMPOSITION_TEXT}=${selectedCriterion.search}` : ''}`,
           `${selectedCriterion.docType ? `${COMPOSITION_TYPE}=${selectedCriterion.docType.id}` : ''}`,
           `${selectedCriterion.encounter ? `${COMPOSITION_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
-          `${dateFilter ? `${COMPOSITION_DATE}=${dateFilter}` : ''}`
+          `${dateFilter ? `${dateFilter}` : ''}`
         ]
           .filter((elem) => elem)
           .reduce(filterReducer)
@@ -147,19 +151,20 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
       case RESSOURCE_TYPE_CONDITION: {
         let dateFilter = ''
         if (selectedCriterion.startOccurrence || selectedCriterion.endOccurrence) {
-          dateFilter = [
-            selectedCriterion.startOccurrence
-              ? `ge${moment(selectedCriterion.startOccurrence).format('YYYY-MM-DD')}`
-              : '',
-            selectedCriterion.endOccurrence ? `le${moment(selectedCriterion.endOccurrence).format('YYYY-MM-DD')}` : ''
-          ].reduce(searchReducer)
+          const dateFilter1 = selectedCriterion.startOccurrence
+            ? `${CONDITION_DATE}=ge${moment(selectedCriterion.startOccurrence).format('YYYY-MM-DD')}`
+            : ''
+          const dateFilter2 = selectedCriterion.endOccurrence
+            ? `${CONDITION_DATE}=le${moment(selectedCriterion.endOccurrence).format('YYYY-MM-DD')}`
+            : ''
+          dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
         }
 
         fhirFilter = [
           `${selectedCriterion.code ? `${CONDITION_CODE}=${selectedCriterion.code.id}` : ''}`,
           `${selectedCriterion.diagnosticType ? `${CONDITION_TYPE}=${selectedCriterion.diagnosticType.id}` : ''}`,
           `${selectedCriterion.encounter ? `${CONDITION_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
-          `${dateFilter ? `${CONDITION_DATE}=${dateFilter}` : ''}`
+          `${dateFilter ? `${dateFilter}` : ''}`
         ]
           .filter((elem) => elem)
           .reduce(filterReducer)
@@ -169,18 +174,19 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
       case RESSOURCE_TYPE_PROCEDURE: {
         let dateFilter = ''
         if (selectedCriterion.startOccurrence || selectedCriterion.endOccurrence) {
-          dateFilter = [
-            selectedCriterion.startOccurrence
-              ? `ge${moment(selectedCriterion.startOccurrence).format('YYYY-MM-DD')}`
-              : '',
-            selectedCriterion.endOccurrence ? `le${moment(selectedCriterion.endOccurrence).format('YYYY-MM-DD')}` : ''
-          ].reduce(searchReducer)
+          const dateFilter1 = selectedCriterion.startOccurrence
+            ? `${PROCEDURE_DATE}=ge${moment(selectedCriterion.startOccurrence).format('YYYY-MM-DD')}`
+            : ''
+          const dateFilter2 = selectedCriterion.endOccurrence
+            ? `${PROCEDURE_DATE}=le${moment(selectedCriterion.endOccurrence).format('YYYY-MM-DD')}`
+            : ''
+          dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
         }
 
         fhirFilter = [
           `${selectedCriterion.code ? `${PROCEDURE_CODE}=${selectedCriterion.code.id}` : ''}`,
           `${selectedCriterion.encounter ? `${PROCEDURE_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
-          `${dateFilter ? `${PROCEDURE_DATE}=${dateFilter}` : ''}`
+          `${dateFilter ? `${dateFilter}` : ''}`
         ]
           .filter((elem) => elem)
           .reduce(filterReducer)
@@ -190,16 +196,13 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
       case RESSOURCE_TYPE_CLAIM: {
         let dateFilter = ''
         if (selectedCriterion.startOccurrence || selectedCriterion.endOccurrence) {
-          dateFilter = [
-            `${
-              selectedCriterion.startOccurrence
-                ? `ge${moment(selectedCriterion.startOccurrence).format('YYYY-MM-DD')}`
-                : ''
-            }`,
-            `${
-              selectedCriterion.endOccurrence ? `le${moment(selectedCriterion.endOccurrence).format('YYYY-MM-DD')}` : ''
-            }`
-          ].reduce(searchReducer)
+          const dateFilter1 = selectedCriterion.startOccurrence
+            ? `${CLAIM_DATE}=ge${moment(selectedCriterion.startOccurrence).format('YYYY-MM-DD')}`
+            : ''
+          const dateFilter2 = selectedCriterion.endOccurrence
+            ? `${CLAIM_DATE}=le${moment(selectedCriterion.endOccurrence).format('YYYY-MM-DD')}`
+            : ''
+          dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
         }
 
         fhirFilter = [
@@ -266,13 +269,14 @@ export async function unbuildRequest(json: string) {
               currentCriterion.vitalStatus = currentCriterion.vitalStatus ? currentCriterion.vitalStatus : null
               switch (key) {
                 case PATIENT_BIRTHDATE: {
-                  const dateValues = value?.split(',')
-                  const date2 = dateValues ? moment(dateValues[0].replace(/[le|ge]/, ''), 'YYYY-MM-DD') : null
-                  const date1 = dateValues ? moment(dateValues[1].replace(/[ge|le]/, ''), 'YYYY-MM-DD') : null
-                  currentCriterion.years = [
-                    date1 ? moment().diff(date1, 'years') : 0,
-                    date2 ? moment().diff(date2, 'years') : 100
-                  ]
+                  currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
+                  if (value?.search('ge') === 0) {
+                    const date = value?.replace('ge', '') ? moment(value?.replace('ge', ''), 'YYYY-MM-DD') : null
+                    currentCriterion.years[1] = date ? moment().diff(date, 'years') : 0
+                  } else if (value?.search('le') === 0) {
+                    const date = value?.replace('le', '') ? moment(value?.replace('le', ''), 'YYYY-MM-DD') : null
+                    currentCriterion.years[0] = date ? moment().diff(date, 'years') : 130
+                  }
                   break
                 }
                 case PATIENT_GENDER:
@@ -305,11 +309,12 @@ export async function unbuildRequest(json: string) {
             const value = filter ? filter[1] : null
             switch (key) {
               case ENCOUNTER_LENGTH: {
-                const lengthValues = value?.split(',')
-                currentCriterion.duration = [
-                  lengthValues ? lengthValues[0].replace(/[le|ge]/, '') : 0,
-                  lengthValues ? lengthValues[1].replace(/[ge|le]/, '') : 0
-                ]
+                currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [0, 130]
+                if (value?.search('ge') === 0) {
+                  currentCriterion.duration[0] = value?.replace('ge', '') || 0
+                } else if (value?.search('le') === 0) {
+                  currentCriterion.duration[1] = value?.replace('le', '') || 130
+                }
                 break
               }
               case ENCOUNTER_ADMISSIONMODE:
@@ -357,12 +362,11 @@ export async function unbuildRequest(json: string) {
                 currentCriterion.encounter = value
                 break
               case COMPOSITION_DATE: {
-                const dates = value?.split(',')
-                const startOccurrence = dates ? moment(dates[0].replace(/[le|ge]/, ''), 'YYYY-MM-DD') : null
-                const endOccurrence = dates ? moment(dates[1].replace(/[ge|le]/, ''), 'YYYY-MM-DD') : null
-
-                currentCriterion.startOccurrence = startOccurrence
-                currentCriterion.endOccurrence = endOccurrence
+                if (value?.search('ge') === 0) {
+                  currentCriterion.startOccurrence = value?.replace('ge', '')
+                } else if (value?.search('le') === 0) {
+                  currentCriterion.endOccurrence = value?.replace('le', '')
+                }
                 break
               }
               default:
@@ -397,12 +401,11 @@ export async function unbuildRequest(json: string) {
                 currentCriterion.encounter = value
                 break
               case CONDITION_DATE: {
-                const dates = value?.split(',')
-                const startOccurrence = dates ? moment(dates[0].replace(/[le|ge]/, ''), 'YYYY-MM-DD') : null
-                const endOccurrence = dates ? moment(dates[1].replace(/[ge|le]/, ''), 'YYYY-MM-DD') : null
-
-                currentCriterion.startOccurrence = startOccurrence
-                currentCriterion.endOccurrence = endOccurrence
+                if (value?.search('ge') === 0) {
+                  currentCriterion.startOccurrence = value?.replace('ge', '')
+                } else if (value?.search('le') === 0) {
+                  currentCriterion.endOccurrence = value?.replace('le', '')
+                }
                 break
               }
               default:
@@ -434,12 +437,11 @@ export async function unbuildRequest(json: string) {
                 currentCriterion.encounter = value
                 break
               case PROCEDURE_DATE: {
-                const dates = value?.split(',')
-                const startOccurrence = dates ? moment(dates[0].replace(/[le|ge]/, ''), 'YYYY-MM-DD') : null
-                const endOccurrence = dates ? moment(dates[1].replace(/[ge|le]/, ''), 'YYYY-MM-DD') : null
-
-                currentCriterion.startOccurrence = startOccurrence
-                currentCriterion.endOccurrence = endOccurrence
+                if (value?.search('ge') === 0) {
+                  currentCriterion.startOccurrence = value?.replace('ge', '')
+                } else if (value?.search('le') === 0) {
+                  currentCriterion.endOccurrence = value?.replace('le', '')
+                }
                 break
               }
               default:
@@ -470,12 +472,11 @@ export async function unbuildRequest(json: string) {
                 currentCriterion.encounter = value
                 break
               case CLAIM_DATE: {
-                const dates = value?.split(',')
-                const startOccurrence = dates ? moment(dates[0].replace(/[le|ge]/, ''), 'YYYY-MM-DD') : null
-                const endOccurrence = dates ? moment(dates[1].replace(/[ge|le]/, ''), 'YYYY-MM-DD') : null
-
-                currentCriterion.startOccurrence = startOccurrence
-                currentCriterion.endOccurrence = endOccurrence
+                if (value?.search('ge') === 0) {
+                  currentCriterion.startOccurrence = value?.replace('ge', '')
+                } else if (value?.search('le') === 0) {
+                  currentCriterion.endOccurrence = value?.replace('le', '')
+                }
                 break
               }
               default:
