@@ -2,7 +2,6 @@ import docTypes from '../../assets/docTypes.json'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
 
 export const fetchDocTypes = () => {
-  console.log('docTypes', docTypes)
   return docTypes && docTypes.docTypes.length > 0
     ? docTypes.docTypes.map((_docType: { code: string; label: string }) => ({
         id: _docType.code,
