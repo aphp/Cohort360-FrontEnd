@@ -20,7 +20,7 @@ const defaultDemographic = {
   title: 'Critère démographique',
   vitalStatus: null,
   gender: null,
-  years: [0, 100]
+  years: [0, 130]
 }
 
 const DemographicForm: React.FC<DemographicFormProps> = (props) => {
@@ -95,7 +95,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
               type: 'slider',
               valueLabelDisplay: 'auto',
               min: 0,
-              max: 100
+              max: 130
             }
           ]}
           submit={_onSubmit}
