@@ -84,12 +84,20 @@ const Login = () => {
   const [errorLogin, setErrorLogin] = useState(false)
   const [open, setOpen] = useState(false)
 
-  const getPractitionerData = async () => {
+  const getPractitionerData = async (lastConnection) => {
     const practitioner = await fetchPractitioner(username)
-    const deidentifiedBoolean = await fetchDeidentified()
 
     if (practitioner) {
-      dispatch(loginAction({ ...practitioner, deidentified: deidentifiedBoolean }))
+      const deidentifiedInfos = await fetchDeidentified(practitioner.id)
+
+      dispatch(
+        loginAction({
+          ...practitioner,
+          deidentified: deidentifiedInfos.deidentification,
+          nominativeGroupsIds: deidentifiedInfos.nominativeGroupsIds,
+          lastConnection
+        })
+      )
       history.push('/accueil')
     } else {
       setErrorLogin(true)
@@ -108,7 +116,9 @@ const Login = () => {
       if (status === 200) {
         localStorage.setItem(ACCES_TOKEN, data.access)
         localStorage.setItem(REFRESH_TOKEN, data.refresh)
-        getPractitionerData()
+
+        const lastConnection = data.last_connection ? data.last_connection.modified_at : undefined
+        getPractitionerData(lastConnection)
       } else {
         setErrorLogin(true)
       }

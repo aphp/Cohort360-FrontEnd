@@ -5,7 +5,8 @@ import {
   IPractitionerRole,
   IOrganization,
   IHealthcareService,
-  IPatient
+  IPatient,
+  IExtension
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { FHIR_API_Response, ScopeTreeRow } from '../types'
 import { getApiResponseResources } from 'utils/apiHelpers'
@@ -41,7 +42,7 @@ const getOrganizationServices = async (
 export const getPerimeters = async (practitionerId: string) => {
   if (CONTEXT === 'aphp') {
     const practitionerRole = await api.get<FHIR_API_Response<IPractitionerRole>>(
-      `/PractitionerRole?practitioner=${practitionerId}&_elements=organization`
+      `/PractitionerRole?practitioner=${practitionerId}&_elements=organization,extension`
     )
     if (!practitionerRole) return undefined
 
@@ -59,21 +60,78 @@ export const getPerimeters = async (practitionerId: string) => {
     )
 
     const perimetersResult = getApiResponseResources(perimeters)
-    return perimetersResult
+
+    return perimetersResult && perimetersResult.length > 0
+      ? perimetersResult.map((perimeter) => {
+          const organizationId = perimeter?.managingEntity?.display || null
+          if (!organizationId) return perimeter
+          const foundItem = practitionerRoleData?.find(
+            (practitionerRole) => practitionerRole?.organization?.reference === organizationId
+          )
+          return {
+            ...perimeter,
+            extension: foundItem ? foundItem.extension : undefined
+          }
+        })
+      : []
   }
 }
+
+const getAccessName = (extension?: IExtension[]) => {
+  if (!extension || !extension.find((extension) => extension.url === 'access level')) {
+    return ''
+  }
+
+  const accessExtension = extension.find((extension) => extension.url === 'access level')
+
+  const access = accessExtension?.valueString
+
+  switch (access) {
+    case 'READ_DATA_NOMINATIVE':
+      return 'Nominatif'
+    case 'READ_DATA_PSEUDOANONYMISED':
+      return 'Pseudonymisé'
+    case 'ADMIN_USERS':
+      return 'Nominatif'
+    default:
+      return ''
+  }
+}
+
 export const getScopePerimeters = async (practitionerId: string): Promise<ScopeTreeRow[]> => {
   if (CONTEXT === 'aphp') {
     const perimetersResults = await getPerimeters(practitionerId)
-    const scopeRows: ScopeTreeRow[] = perimetersResults
+
+    let scopeRows: ScopeTreeRow[] = perimetersResults
       ? perimetersResults?.map<ScopeTreeRow>((perimeterResult) => ({
           ...perimeterResult,
           id: perimeterResult.id ?? '0',
           name: perimeterResult.name?.replace(/^Patients passés par: /, '') ?? '',
           quantity: perimeterResult.quantity ?? 0,
+          access: getAccessName(perimeterResult.extension),
           subItems: [loadingItem]
         }))
       : []
+
+    // Sort by name
+    scopeRows = scopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
+      if (a.quantity > b.quantity) {
+        return 1
+      } else if (a.quantity < b.quantity) {
+        return -1
+      }
+      return 0
+    })
+    scopeRows = scopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
+      if (b.quantity === 0) return -1
+      if (a.name > b.name) {
+        return 1
+      } else if (a.name < b.name) {
+        return -1
+      }
+      return 0
+    })
+
     return scopeRows
   }
 
@@ -183,7 +241,7 @@ export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<
     ({ managingEntity }) => managingEntity?.display?.replace(/^Organization\//, '') !== perimeterGroupId
   )
 
-  const _subItemsData = subItemsData
+  let _subItemsData = subItemsData
     ? subItemsData?.map<ScopeTreeRow>((subItemData) => ({
         ...subItemData,
         id: subItemData.id ?? '0',
@@ -192,5 +250,24 @@ export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<
         subItems: [loadingItem]
       }))
     : []
+
+  // Sort by name
+  _subItemsData = _subItemsData.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
+    if (a.quantity > b.quantity) {
+      return 1
+    } else if (a.quantity < b.quantity) {
+      return -1
+    }
+    return 0
+  })
+  _subItemsData = _subItemsData.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
+    if (b.quantity === 0) return -1
+    if (a.name > b.name) {
+      return 1
+    } else if (a.name < b.name) {
+      return -1
+    }
+    return 0
+  })
   return _subItemsData
 }

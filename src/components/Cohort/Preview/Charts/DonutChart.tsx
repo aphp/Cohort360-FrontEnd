@@ -12,7 +12,7 @@ type DonutChartProps = {
   width?: number
 }
 
-const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 260 }) => {
+const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 320 }) => {
   const node = useRef<SVGSVGElement | null>(null)
 
   useEffect(() => {
@@ -72,7 +72,6 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 260
       )
       .call((text) =>
         text
-          .filter((d) => d.endAngle - d.startAngle > 0.25)
           .append('tspan')
           .attr('x', 0)
           .attr('y', '0.7em')

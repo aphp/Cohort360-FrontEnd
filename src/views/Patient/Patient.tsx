@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { useAppSelector } from 'state'
 
 import { IconButton, Grid, Tabs, Tab, CircularProgress } from '@material-ui/core'
@@ -58,12 +58,16 @@ const Patient = () => {
     cohort: state.exploredCohort
   }))
 
+  const location = useLocation()
+  const search = new URLSearchParams(location.search)
+  const groupId = search.get('groupId') ?? undefined
+
   useEffect(() => {
     selectTab(tabName || 'apercu')
   }, [tabName])
 
   useEffect(() => {
-    fetchPatient(patientId)
+    fetchPatient(patientId, groupId)
       .then((patientResp) => {
         setHospit(patientResp?.hospit ?? undefined)
         setDocuments(patientResp?.documents ?? undefined)
@@ -75,10 +79,12 @@ const Patient = () => {
         setGhm(patientResp?.ghm)
         setGhmTotal(patientResp?.ghmTotal ?? 0)
         setPatient(patientResp?.patient)
-        setDeidentifiedBoolean(patientResp?.patient?.extension?.[0].valueBoolean ?? true)
+        setDeidentifiedBoolean(
+          patientResp?.patient?.extension?.find((extension) => extension.url === 'deidentified')?.valueBoolean ?? true
+        )
       })
       .then(() => setLoading(false))
-  }, [patientId])
+  }, [patientId, groupId])
 
   const title = Array.isArray(cohort.cohort) || cohort?.cohort?.name === '-' ? '-' : cohort?.cohort?.name
 
@@ -137,36 +143,44 @@ const Patient = () => {
               label="Aperçu patient"
               value="apercu"
               component={Link}
-              to={`/patients/${patientId}/apercu`}
+              to={`/patients/${patientId}/apercu${groupId ? `?groupId=${groupId}` : ''}`}
             />
             <Tab
               className={classes.tabTitle}
               label="Parcours patient"
               value="parcours"
               component={Link}
-              to={`/patients/${patientId}/parcours`}
+              to={`/patients/${patientId}/parcours${groupId ? `?groupId=${groupId}` : ''}`}
             />
             <Tab
               className={classes.tabTitle}
               label="Documents cliniques"
               value="documents-cliniques"
               component={Link}
-              to={`/patients/${patientId}/documents-cliniques`}
+              to={`/patients/${patientId}/documents-cliniques${groupId ? `?groupId=${groupId}` : ''}`}
             />
             <Tab
               className={classes.tabTitle}
               label="PMSI"
               value="pmsi"
               component={Link}
-              to={`/patients/${patientId}/pmsi`}
+              to={`/patients/${patientId}/pmsi${groupId ? `?groupId=${groupId}` : ''}`}
             />
           </Tabs>
         </Grid>
         <Grid className={classes.tabContainer}>
           {selectedTab === 'apercu' && <PatientPreview patient={patient} deidentified={deidentifiedBoolean} />}
-          {selectedTab === 'parcours' && <PatientTimeline documents={documents} hospits={hospit} consults={consult} />}
+          {selectedTab === 'parcours' && (
+            <PatientTimeline
+              documents={documents}
+              hospits={hospit}
+              consults={consult}
+              deidentified={deidentifiedBoolean}
+            />
+          )}
           {selectedTab === 'documents-cliniques' && (
             <PatientDocs
+              groupId={groupId}
               patientId={patientId}
               documents={documents}
               total={documentsTotal}
@@ -177,6 +191,7 @@ const Patient = () => {
           )}
           {selectedTab === 'pmsi' && (
             <PatientPMSI
+              groupId={groupId}
               patientId={patientId}
               diagnostic={diagnostic}
               diagnosticTotal={diagnosticTotal}

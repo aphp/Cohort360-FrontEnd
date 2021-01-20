@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { CircularProgress, Divider, Drawer, Grid, IconButton, List, Typography } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
@@ -49,6 +49,8 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   const [sortBy, setSortBy] = useState('given')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
+  const [showFilterChip, setShowFilterChip] = useState(false)
+
   const numberOfRows = 20 // Number of desired lines in the document array
 
   const onSearchPatient = (newSortBy: string, newSortDirection: 'asc' | 'desc', page = 1) => {
@@ -86,13 +88,17 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
-    submit && onSearchPatient(sortBy, sortDirection)
+    submit && setShowFilterChip(true)
   }
 
   const handleCloseSortDialog = (submitSort: boolean) => () => {
     setOpenSort(false)
     submitSort && onSearchPatient(sortBy, sortDirection)
   }
+
+  useEffect(() => {
+    onSearchPatient(sortBy, sortDirection)
+  }, [gender, age, vitalStatus]) // eslint-disable-line
 
   const patientsToDisplay =
     patientsList?.length === totalPatients
@@ -115,6 +121,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
         searchBy={searchBy}
         onChangeSelect={setSearchBy}
         onSearchPatient={() => onSearchPatient(sortBy, sortDirection)}
+        showFilterChip={showFilterChip}
         // filter dialog props
         onClickFilterButton={() => setOpen(true)}
         open={open}
@@ -146,6 +153,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
           patientsToDisplay.map((patient) => (
             <PatientSidebarItem
               key={patient.id}
+              groupId={groupId}
               firstName={deidentifiedBoolean ? 'Prénom' : patient.name?.[0].given?.[0] ?? ''}
               lastName={deidentifiedBoolean ? 'Nom' : patient.name?.map((e) => e.family).join(' ') ?? ''}
               age={getAge(patient)}

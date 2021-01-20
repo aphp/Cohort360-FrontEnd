@@ -28,7 +28,7 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
         <ListItemIcon>
           <div className={classes.indicator} style={{ color }} />
         </ListItemIcon>
-        <ListItemText style={{ cursor }} primary={title} />
+        <ListItemText style={{ cursor, color }} primary={title} />
       </ListItem>
     )
   }
@@ -39,7 +39,7 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
         <ListItemIcon>
           <div className={classes.indicator} style={{ color }} />
         </ListItemIcon>
-        <ListItemText style={{ cursor }} primary={title} />
+        <ListItemText style={{ cursor, color }} primary={title} />
         {open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => setOpen(!open)} />}
       </ListItem>
       <Collapse in={open} timeout="auto" unmountOnExit>

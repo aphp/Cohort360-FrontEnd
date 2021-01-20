@@ -30,6 +30,15 @@ export type Back_API_Response<T> = {
   count?: number
 }
 
+export type Cohort_Creation_API_Response = {
+  status: number
+  data: {
+    jobId: string
+    result: { _type: 'count'; 'group.id': string; 'group.count': number; source: 'from-cache' | 'from-cache' }[]
+  }
+  count?: number
+}
+
 export type CohortComposition = IComposition & {
   deidentified?: boolean
   idPatient?: string
@@ -58,17 +67,19 @@ export type PMSIEntry<T extends IProcedure | ICondition | IClaim> = T & {
 
 export type Cohort = {
   uuid?: string
-  fhir_groups_ids?: string
+  fhir_group_id?: string
   name?: string
   result_size?: number
   created_at?: string
   modified_at?: string
   favorite?: boolean
+  type?: string
+  request_id?: string
 }
 
 export type FormattedCohort = {
   researchId: string
-  fhir_groups_ids?: string
+  fhir_group_id?: string
   name?: string
   status?: string
   nPatients?: number
@@ -183,6 +194,7 @@ export type CohortData = {
   visitTypeRepartitionData?: SimpleChartDataType[]
   monthlyVisitData?: ComplexChartDataType<Month>
   agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
+  requestId?: string
 }
 
 export type PatientData = {
@@ -213,14 +225,17 @@ export type SelectedCriteriaType = {
   type: 'Patient' | 'Encounter' | 'Claim' | 'Procedure' | 'Condition' | 'Composition'
   title: string
   code?: { id: string; label: string }
-  label?: undefined
-  startOccurrence?: Date
-  endOccurrence?: Date
+  diagnosticType?: { id: string; label: string }
+  encounter: number
+  comparator: { id: 'le' | 'e' | 'ge'; label: string }
+  label: undefined
+  startOccurrence: Date
+  endOccurrence: Date
   gender?: { id: string; label: string }
   vitalStatus?: { id: string; label: string }
   years?: [number, number]
   search?: string
-  docType?: '55188-7' | '11336-5' | '57833-6'
+  docType?: { id: '55188-7' | '11336-5' | '57833-6'; label: string }
   occurence?: number
   ageType?: { id: string; label: string }
   duration?: [number, number]
@@ -232,7 +247,10 @@ export type SelectedCriteriaType = {
 
 export type CcamDataType = {
   title: string
+  hierarchy: undefined
   code: { id: string; label: string } | null
+  encounter: number
+  comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
@@ -241,6 +259,12 @@ export type CcamDataType = {
 export type Cim10DataType = {
   title: string
   code: { id: string; label: string } | null
+  diagnosticType: { id: string; label: string } | null
+  encounter: number
+  comparator: { id: 'le' | 'e' | 'ge'; label: string }
+  label: undefined
+  startOccurrence: Date
+  endOccurrence: Date
 }
 
 export type DemographicDataType = {
@@ -254,12 +278,18 @@ export type DocumentDataType = {
   title: string
   search: string
   docType: { id: string; label: string } | null
+  encounter: number
+  comparator: { id: 'le' | 'e' | 'ge'; label: string }
+  label: undefined
+  startOccurrence: Date
+  endOccurrence: Date
 }
 
 export type GhmDataType = {
   title: string
   code: { id: string; label: string } | null
-  occurence: number
+  encounter: number
+  comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
@@ -275,4 +305,14 @@ export type EncounterDataType = {
   entryMode: { id: string; label: string } | null
   exitMode: { id: string; label: string } | null
   fileStatus: { id: string; label: string } | null
+}
+
+export type CohortCreationCounterType = {
+  uuid?: string
+  includePatient?: number | 'loading'
+  byrequest?: number | 'loading'
+  alive?: number | 'loading'
+  deceased?: number | 'loading'
+  female?: number | 'loading'
+  male?: number | 'loading'
 }

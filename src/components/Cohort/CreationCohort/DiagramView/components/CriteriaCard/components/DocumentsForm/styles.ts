@@ -18,10 +18,8 @@ const useStyles = makeStyles(() => ({
   divider: { background: 'white' },
   titleLabel: { marginLeft: '1em' },
   formContainer: {
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '1em'
+    overflow: 'auto',
+    maxHeight: 'calc(100vh - 135px)'
   },
   formControl: {
     margin: '1em'

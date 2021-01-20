@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Typography /*, FormLabel */ } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -19,11 +19,14 @@ type TestGeneratedFormProps = {
 const defaultDemographic = {
   title: 'Critère de document',
   search: '',
-  docType: { id: '55188-7', label: 'Tout type de documents' }
+  docType: null,
+  encounter: 0,
+  startOccurrence: '',
+  endOccurrence: ''
 }
 
 const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
-  const { selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const defaultValues = selectedCriteria || defaultDemographic
 
   const classes = useStyles()
@@ -35,6 +38,9 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
       title: data.title,
       search: data.search,
       docType: data.docType,
+      // encounter: data.encounter,
+      startOccurrence: data.startOccurrence,
+      endOccurrence: data.endOccurrence,
       type: 'Composition'
     })
   }
@@ -55,51 +61,75 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
         )}
       </Grid>
 
-      <FormBuilder<DocumentDataType>
-        defaultValues={defaultValues}
-        title={'Documents médicaux'}
-        properties={[
-          {
-            name: 'title',
-            placeholder: 'Nom du critère',
-            type: 'text',
-            variant: 'outlined',
-            validationRules: {
-              required: 'Merci de renseigné un titre'
+      <Grid className={classes.formContainer}>
+        <FormBuilder<DocumentDataType>
+          defaultValues={defaultValues}
+          title={'Documents médicaux'}
+          properties={[
+            {
+              name: 'title',
+              placeholder: 'Nom du critère',
+              type: 'text',
+              variant: 'outlined',
+              validationRules: {
+                required: 'Merci de renseigné un titre'
+              }
+            },
+            {
+              name: 'search',
+              placeholder: 'Recherche dans les documents',
+              type: 'text',
+              variant: 'outlined'
+            },
+            {
+              name: 'docType',
+              variant: 'outlined',
+              label: 'Type de document',
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.docTypes || []
             }
-          },
-          {
-            name: 'search',
-            placeholder: 'Recherche',
-            type: 'text',
-            variant: 'outlined'
-          },
-          {
-            label: 'Rechercher dans :',
-            name: 'docType',
-            type: 'select',
-            selectOptions: [
-              { id: '55188-7', label: 'Tout type de documents' },
-              { id: '11336-5', label: "Comptes rendus d'hospitalisation" },
-              { id: '57833-6', label: 'Ordonnances' }
-            ]
-          }
-        ]}
-        submit={_onSubmit}
-        formId="documents-form"
-        formFooter={
-          <Grid className={classes.criteriaActionContainer}>
-            {!isEdition && (
-              <Button onClick={goBack} color="primary" variant="outlined">
-                Annuler
+            // {
+            //   name: 'encounter',
+            //   label: "Nombre d'occurence",
+            //   variant: 'outlined',
+            //   type: 'number'
+            // }
+            // {
+            //   type: 'custom',
+            //   name: 'label',
+            //   renderInput: () => (
+            //     <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+            //       Date d'occurrence :
+            //     </FormLabel>
+            //   )
+            // },
+            // {
+            //   name: 'startOccurrence',
+            //   label: 'Avant le',
+            //   type: 'date'
+            // },
+            // {
+            //   name: 'endOccurrence',
+            //   label: 'Après le',
+            //   type: 'date'
+            // }
+          ]}
+          submit={_onSubmit}
+          formId="documents-form"
+          formFooter={
+            <Grid className={classes.criteriaActionContainer}>
+              {!isEdition && (
+                <Button onClick={goBack} color="primary" variant="outlined">
+                  Annuler
+                </Button>
+              )}
+              <Button type="submit" form="documents-form" color="primary" variant="contained">
+                Confirmer
               </Button>
-            )}
-            <Button type="submit" form="documents-form" color="primary" variant="contained">
-              Confirmer
-            </Button>
-          </Grid>
-        }
-      />
+            </Grid>
+          }
+        />
+      </Grid>
     </Grid>
   )
 }

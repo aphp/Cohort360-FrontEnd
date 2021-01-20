@@ -35,7 +35,7 @@ const getVisitTypeName = (visitType?: string) => {
       name = 'Hospitalisation'
       break
     default:
-      name = 'Autre visite'
+      name = 'Autres visites'
   }
 
   return name
@@ -132,13 +132,26 @@ export const getGenderRepartitionMap = (
 
 export const getEncounterRepartitionMapAphp = (extension?: IExtension[]): SimpleChartDataType[] => {
   const data: SimpleChartDataType[] = []
+  let otherVisits = 0
 
   extension?.forEach((visitType) => {
-    data.push({
-      label: getVisitTypeName(visitType.extension?.[0].url),
-      value: visitType.extension?.[0].valueDecimal ?? 0,
-      color: getVisitTypeColor(visitType.extension?.[0].url)
-    })
+    const visitTypeUrl = visitType.extension?.[0].url
+
+    if (visitTypeUrl === 'ext' || visitTypeUrl === 'hosp' || visitTypeUrl === 'incomp' || visitTypeUrl === 'urg') {
+      data.push({
+        label: getVisitTypeName(visitTypeUrl),
+        value: visitType.extension?.[0].valueDecimal ?? 0,
+        color: getVisitTypeColor(visitTypeUrl)
+      })
+    } else {
+      otherVisits += visitType.extension?.[0].valueDecimal ?? 0
+    }
+  })
+
+  data.push({
+    label: getVisitTypeName('other'),
+    value: otherVisits,
+    color: getVisitTypeColor('other')
   })
 
   return data
@@ -258,7 +271,7 @@ export const getVisitRepartitionMapAphp = (facet?: IExtension[]): ComplexChartDa
           })
         }
 
-        const genderData = data[i + 1].extension
+        const genderData = data[i + 1] ? data[i + 1].extension : []
 
         genderData?.forEach((gender) => {
           switch (gender.url) {

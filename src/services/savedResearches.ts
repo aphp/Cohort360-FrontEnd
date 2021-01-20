@@ -24,7 +24,7 @@ export const fetchCohorts = async (
     }
 
     // return {
-    //   formattedCohort: cohortResp.data.entry
+    //   formattedCohort: cohortResp?.data?.entry
     //     .map((group) => {
     //       if (group.resource.error) {
     //         return null
@@ -55,16 +55,16 @@ export const fetchCohorts = async (
     }
 
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
-      `/cohorts/?ordering=-favorite&type=IMPORT_I2B2${searchByText}&limit=20${offset}`
+      `/explorations/cohorts/?ordering=-favorite${searchByText}&limit=20${offset}`
     )
 
-    const results = cohortResp.data.results
+    const results = cohortResp?.data?.results
       ? cohortResp.data.results
           .map((cohort) => ({
             researchId: cohort.uuid ?? '',
-            fhir_groups_ids: cohort.fhir_groups_ids,
+            fhir_group_id: cohort.fhir_group_id,
             name: cohort.name,
-            status: 'Cohorte i2b2',
+            status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
             nPatients: cohort.result_size,
             date: cohort.created_at,
             perimeter: '-',
@@ -75,23 +75,23 @@ export const fetchCohorts = async (
 
     return {
       results: results,
-      count: cohortResp.data.count ?? 0
+      count: cohortResp?.data?.count ?? 0
     }
   }
 }
 
 export const fetchFavoriteCohorts = async (): Promise<Back_API_Response<FormattedCohort> | undefined> => {
   if (CONTEXT === 'aphp') {
-    const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>('/cohorts/?favorite=true&type=IMPORT_I2B2')
+    const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>('/explorations/cohorts/?favorite=true')
 
-    const results = cohortResp.data.results
+    const results = cohortResp?.data?.results
       ? cohortResp.data.results
           .map((cohort: Cohort) => {
             return {
               researchId: cohort.uuid ?? '',
-              fhir_groups_ids: cohort.fhir_groups_ids,
+              fhir_group_id: cohort.fhir_group_id,
               name: cohort.name,
-              status: 'Cohorte i2b2',
+              status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
               nPatients: cohort.result_size,
               date: cohort.created_at,
               perimeter: '-',
@@ -110,16 +110,16 @@ export const fetchFavoriteCohorts = async (): Promise<Back_API_Response<Formatte
 export const fetchLastCohorts = async (): Promise<Back_API_Response<FormattedCohort> | undefined> => {
   if (CONTEXT === 'aphp') {
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
-      '/cohorts/?limit=5&type=IMPORT_I2B2&ordering=-created_at'
+      '/explorations/cohorts/?limit=5&ordering=-created_at'
     )
 
-    const results = cohortResp.data.results
+    const results = cohortResp?.data?.results
       ? cohortResp.data.results
           .map((cohort) => ({
             researchId: cohort.uuid ?? '',
-            fhir_groups_ids: cohort.fhir_groups_ids,
+            fhir_group_id: cohort.fhir_group_id,
             name: cohort.name,
-            status: 'Cohorte i2b2',
+            status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
             nPatients: cohort.result_size,
             date: cohort.created_at,
             perimeter: '-',
@@ -136,7 +136,7 @@ export const fetchLastCohorts = async (): Promise<Back_API_Response<FormattedCoh
 
 export const setFavorite = async (cohortId: string, favStatus: boolean) => {
   if (CONTEXT === 'aphp') {
-    await apiBackCohort.patch(`/cohorts/${cohortId}/`, { favorite: !favStatus })
+    await apiBackCohort.patch(`/explorations/cohorts/${cohortId}/`, { favorite: !favStatus })
   }
 }
 
@@ -144,6 +144,6 @@ export const onRemoveCohort = async (selectedCohort?: string) => {
   if (CONTEXT === 'arkhn') {
     await api.delete(`/Group/${selectedCohort}`)
   } else if (CONTEXT === 'aphp') {
-    await apiBackCohort.delete(`/cohorts/${selectedCohort}/`)
+    await apiBackCohort.delete(`/explorations/cohorts/${selectedCohort}/`)
   }
 }

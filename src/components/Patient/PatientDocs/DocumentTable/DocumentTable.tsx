@@ -27,16 +27,40 @@ import { FHIR_API_URL } from '../../../../constants'
 
 import useStyles from './styles'
 import { CohortComposition } from 'types'
-import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
+import {
+  CompositionStatusKind,
+  DocumentReferenceStatusKind,
+  IDocumentReference
+} from '@ahryman40k/ts-fhir-types/lib/R4'
+import { getDocumentStatus } from 'utils/documentsFormatter'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
 type DocumentRowTypes = {
+  deidentified: boolean
   document: CohortComposition | IDocumentReference
 }
-const DocumentRow: React.FC<DocumentRowTypes> = ({ document }) => {
+const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => {
   const classes = useStyles()
   const [documentDialogOpen, setDocumentDialogOpen] = useState(false)
+  const [noPdfDialogOpen, setNoPdfDialogOpen] = useState(false)
+  const [numPages, setNumPages] = useState<number>()
+
+  const openPdfDialog = () => {
+    if (deidentified) {
+      setNoPdfDialogOpen(true)
+    } else {
+      setDocumentDialogOpen(true)
+    }
+  }
+
+  const handleClosePdfDialog = () => {
+    if (deidentified) {
+      setNoPdfDialogOpen(false)
+    } else {
+      setDocumentDialogOpen(false)
+    }
+  }
 
   const row = {
     ...document,
@@ -48,19 +72,24 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ document }) => {
     serviceProvider: document.resourceType === 'Composition' ? document.serviceProvider : '-',
     type: document.type?.coding?.[0].display ?? document.type?.coding?.[0].code ?? '-'
   }
-  const handleOpenPdf = () => {
-    setDocumentDialogOpen(true)
-  }
 
-  const handleClosePdf = () => {
-    setDocumentDialogOpen(false)
-  }
-
-  const getStatusShip = (type?: string) => {
+  const getStatusShip = (type?: CompositionStatusKind | DocumentReferenceStatusKind) => {
     if (type === 'final' || type === 'current') {
-      return <Chip className={classes.validChip} icon={<CheckIcon height="15px" fill="#FFF" />} label={type} />
+      return (
+        <Chip
+          className={classes.validChip}
+          icon={<CheckIcon height="15px" fill="#FFF" />}
+          label={getDocumentStatus(type)}
+        />
+      )
     } else {
-      return <Chip className={classes.cancelledChip} icon={<CancelIcon height="15px" fill="#FFF" />} label={type} />
+      return (
+        <Chip
+          className={classes.cancelledChip}
+          icon={<CancelIcon height="15px" fill="#FFF" />}
+          label={getDocumentStatus(type)}
+        />
+      )
     }
   }
 
@@ -78,14 +107,24 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ document }) => {
         <TableCell align="center">{row.serviceProvider}</TableCell>
         <TableCell align="center">{getStatusShip(row.status)}</TableCell>
         <TableCell align="center">
-          <IconButton onClick={() => handleOpenPdf()}>
+          <IconButton onClick={() => openPdfDialog()}>
             <PdfIcon height="30px" fill="#ED6D91" />
           </IconButton>
         </TableCell>
       </TableRow>
+
+      <Dialog open={noPdfDialogOpen} onClose={() => handleClosePdfDialog()}>
+        <DialogContent>Fonctionnalité désactivée en mode pseudonymisé.</DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleClosePdfDialog()}>OK</Button>
+        </DialogActions>
+      </Dialog>
+
       <Dialog open={documentDialogOpen} onClose={() => setDocumentDialogOpen(false)} maxWidth="lg">
         <DialogContent>
           <Document
+            error={'Le document est introuvable.'}
+            loading={'PDF en cours de chargement...'}
             file={{
               url: `${FHIR_API_URL}/Binary/${row.id}`,
               httpHeaders: {
@@ -93,15 +132,18 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ document }) => {
                 Authorization: `Bearer ${localStorage.getItem('access')}`
               }
             }}
+            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
           >
-            <Page pageNumber={1} />
+            {Array.from(new Array(numPages), (el, index) => (
+              <Page key={`page_${index + 1}`} pageNumber={index + 1} loading={'Pages en cours de chargement...'} />
+            ))}
           </Document>
         </DialogContent>
         <DialogActions>
           <Button
             onClick={(e) => {
               e.stopPropagation()
-              handleClosePdf()
+              handleClosePdfDialog()
             }}
             color="primary"
           >
@@ -114,11 +156,12 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ document }) => {
 }
 
 type DocumentTableTypes = {
+  deidentified: boolean
   documents?: (CohortComposition | IDocumentReference)[]
   page: number
   documentLines: number
 }
-const DocumentTable: React.FC<DocumentTableTypes> = ({ documents, page, documentLines }) => {
+const DocumentTable: React.FC<DocumentTableTypes> = ({ deidentified, documents, page, documentLines }) => {
   const classes = useStyles()
   return (
     <>
@@ -152,7 +195,7 @@ const DocumentTable: React.FC<DocumentTableTypes> = ({ documents, page, document
             </TableHead>
             <TableBody>
               {documents.slice((page - 1) * documentLines, page * documentLines).map((document, index) => (
-                <DocumentRow key={`docRow ${index}`} document={document} />
+                <DocumentRow key={`docRow ${index}`} document={document} deidentified={deidentified} />
               ))}
             </TableBody>
           </Table>

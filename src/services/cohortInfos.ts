@@ -1,7 +1,16 @@
 import api from './api'
+import apiBackCohort from './apiBackCohort'
 import { getInfos, getLastEncounter } from './myPatients'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
-import { FHIR_API_Response, CohortData, ComplexChartDataType, SearchByTypes, VitalStatus } from 'types'
+import {
+  FHIR_API_Response,
+  CohortData,
+  ComplexChartDataType,
+  SearchByTypes,
+  VitalStatus,
+  Back_API_Response,
+  Cohort
+} from 'types'
 import {
   IGroup,
   IPatient,
@@ -23,11 +32,13 @@ import {
 } from 'utils/graphUtils'
 import { searchPatient } from './searchPatient'
 import { getAge } from 'utils/age'
+import moment from 'moment'
 // import { fetchPerimetersInfos } from './perimeters'
 
 const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | undefined> => {
   if (CONTEXT === 'aphp') {
-    const [cohortResp, patientsResp, encountersResp] = await Promise.all([
+    const [cohortInfo, cohortResp, patientsResp, encountersResp] = await Promise.all([
+      apiBackCohort.get<Back_API_Response<Cohort>>(`/explorations/cohorts/?fhir_group_id=${cohortId}`),
       api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${cohortId}`),
       api.get<FHIR_API_Response<IPatient>>(
         `/Patient?pivotFacet=age_gender,deceased_gender&_list=${cohortId}&size=20&_sort=given&_elements=gender,name,birthDate,deceased,identifier,extension`
@@ -37,7 +48,17 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       )
     ])
 
-    const name = cohortResp.data.resourceType === 'Bundle' ? cohortResp.data.entry?.[0].resource?.name : '-'
+    let name = ''
+    let requestId = ''
+
+    if (cohortInfo.data.results && cohortInfo.data.results.length === 1) {
+      name = cohortInfo.data.results[0].name ?? ''
+      requestId = cohortInfo.data.results[0].request_id ?? ''
+    }
+
+    if (!name) {
+      name = cohortResp.data.resourceType === 'Bundle' ? cohortResp.data.entry?.[0].resource?.name ?? '-' : '-'
+    }
 
     const cohort = cohortResp.data.resourceType === 'Bundle' ? cohortResp.data.entry?.[0].resource : undefined
 
@@ -81,7 +102,8 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       genderRepartitionMap,
       visitTypeRepartitionData,
       agePyramidData,
-      monthlyVisitData
+      monthlyVisitData,
+      requestId
     }
   }
 
@@ -151,7 +173,17 @@ const fetchPatientList = async (
 > => {
   if (CONTEXT === 'arkhn') {
     //TODO: Improve api request (we filter after getting all the patients)
-    const patientsResp = await searchPatient(page, sortBy, sortDirection, searchInput, searchBy, groupId)
+    const nominativeGroupsIds: any[] = []
+
+    const patientsResp = await searchPatient(
+      nominativeGroupsIds,
+      page,
+      sortBy,
+      sortDirection,
+      searchInput,
+      searchBy,
+      groupId
+    )
 
     if (patientsResp) {
       const filteredPatients: IPatient[] = patientsResp.patientList.filter((patient) => {
@@ -198,35 +230,30 @@ const fetchPatientList = async (
       genderFilter = gender === PatientGenderKind._other ? `&gender=other,unknown` : `&gender=${gender}`
     }
 
-    if (searchInput) {
-      if (searchBy) {
-        search = `&${searchBy}=${searchInput}`
+    if (searchInput.trim() !== '') {
+      let _searchInput = ''
+
+      if (searchBy !== '_text') {
+        search = `&${searchBy}=${searchInput.trim()}`
       } else {
-        search = `&_text=${searchInput}`
+        const searches = searchInput
+          .trim() // Remove space before/after search
+          .split(' ') // Split by space (= ['mot1', 'mot2' ...])
+          .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
+
+        for (const _search of searches) {
+          _searchInput = _searchInput ? `${_searchInput} AND "${_search}"` : `"${_search}"`
+        }
+        search = `&_text=${_searchInput}`
       }
     }
 
     if (age[0] !== 0 || age[1] !== 130) {
-      const today = new Date()
-
-      const month = today.getMonth() + 1
-      let monthStr = ''
-      if (month < 10) {
-        monthStr = '0' + month.toString()
-      } else {
-        monthStr = month.toString()
-      }
-
-      const day = today.getDate()
-      let dayStr = ''
-      if (day < 10) {
-        dayStr = '0' + day.toString()
-      } else {
-        dayStr = day.toString()
-      }
-
-      const date1 = `${today.getFullYear() - age[1]}-${monthStr}-${dayStr}`
-      const date2 = `${today.getFullYear() - age[0]}-${monthStr}-${dayStr}`
+      const date1 = moment()
+        .subtract(age[1] + 1, 'years')
+        .add(1, 'days')
+        .format('YYYY-MM-DD') //`${today.getFullYear() - age[1]}-${monthStr}-${dayStr}`
+      const date2 = moment().subtract(age[0], 'years').format('YYYY-MM-DD') //`${today.getFullYear() - age[0]}-${monthStr}-${dayStr}`
       ageFilter = `&birthdate=ge${date1}&birthdate=le${date2}`
     }
 
@@ -279,8 +306,8 @@ const fetchDocuments = async (
   searchInput: string,
   selectedDocTypes: string[],
   nda: string,
-  startDate?: string,
-  endDate?: string,
+  startDate?: string | null,
+  endDate?: string | null,
   groupId?: string,
   encounterIds?: string[]
 ) => {
@@ -295,7 +322,7 @@ const fetchDocuments = async (
 
     if (startDate || endDate) {
       if (startDate && endDate) {
-        dateFilter = `&date=ge${startDate},le${endDate}`
+        dateFilter = `&date=ge${startDate}&date=le${endDate}`
       } else if (startDate) {
         dateFilter = `&date=ge${startDate}`
       } else if (endDate) {
@@ -307,7 +334,14 @@ const fetchDocuments = async (
       elements = '&_elements=status,type,subject,encounter,date,title'
     }
 
-    const [docsList, allDocsList] = await Promise.all([
+    const [
+      // wordCloudRequest,
+      docsList,
+      allDocsList
+    ] = await Promise.all([
+      // api.get<FHIR_API_Response<IComposition>>(
+      //   `/Composition?facet=cloud&size=0&_sort=${_sortDirection}${sortBy}&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
+      // ),
       api.get<FHIR_API_Response<IComposition>>(
         `/Composition?size=20&_sort=${_sortDirection}${sortBy}&offset=${
           page ? (page - 1) * 20 : 0
@@ -327,22 +361,18 @@ const fetchDocuments = async (
         : 0
       : totalDocs
 
-    const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsList))
+    const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
 
     // const wordcloudData =
-    //   docsList.data.resourceType === 'Bundle'
-    //     ? docsList.data.meta?.extension
+    //   wordCloudRequest.data.resourceType === 'Bundle'
+    //     ? wordCloudRequest.data.meta?.extension?.find((facet: any) => facet.url === 'facet-cloud')?.extension
     //     : []
 
-    if (totalDocs === 0) {
-      return null
-    } else {
-      return {
-        totalDocs,
-        totalAllDocs,
-        documentsList
-        // wordcloudData
-      }
+    return {
+      totalDocs: totalDocs ?? 0,
+      totalAllDocs,
+      documentsList
+      // wordcloudData
     }
   }
 

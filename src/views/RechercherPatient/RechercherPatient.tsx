@@ -21,6 +21,7 @@ const RechercherPatient: React.FC<{}> = () => {
   const classes = useStyles()
   const { search } = useParams()
   const dispatch = useDispatch()
+  const practitioner = useAppSelector((state) => state.me)
 
   const [showTable, setShowTable] = useState(false)
   const [patientResults, setPatientResults] = useState<IPatient[]>([])
@@ -39,8 +40,9 @@ const RechercherPatient: React.FC<{}> = () => {
     input: string,
     searchBy = SearchByTypes.text
   ) => {
+    const nominativeGroupsIds = practitioner ? practitioner.nominativeGroupsIds : []
     setLoading(true)
-    searchPatient(page, sortBy, sortDirection, input, searchBy).then((results) => {
+    searchPatient(nominativeGroupsIds, page, sortBy, sortDirection, input, searchBy).then((results) => {
       if (results) {
         setPatientResults(results.patientList)
         setTotal(results.totalPatients ?? 0)
@@ -106,6 +108,7 @@ const RechercherPatient: React.FC<{}> = () => {
           )}
           {!loading && showTable && (
             <TableauPatients
+              groupId={practitioner?.nominativeGroupsIds}
               patients={patientResults}
               onChangePage={handlePageChange}
               page={page}

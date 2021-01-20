@@ -39,13 +39,21 @@ import { getDocumentStatus, getEncounterStatus } from 'utils/documentsFormatter'
 import useStyles from './styles'
 
 type DocumentRowTypes = {
+  groupId?: string
   document: CohortComposition | IDocumentReference
   documentEncounter?: IEncounter
   showText: boolean
   showIpp: boolean
-  deidentified: boolean
+  deidentified: boolean | null
 }
-const DocumentRow: React.FC<DocumentRowTypes> = ({ document, documentEncounter, showText, showIpp, deidentified }) => {
+const DocumentRow: React.FC<DocumentRowTypes> = ({
+  groupId,
+  document,
+  documentEncounter,
+  showText,
+  showIpp,
+  deidentified
+}) => {
   const history = useHistory()
   const classes = useStyles()
   const [pdfDialogOpen, setDocumentDialogOpen] = useState(false)
@@ -123,7 +131,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ document, documentEncounter, 
     <Grid container item direction="column" className={classes.row}>
       <Grid container item>
         <Grid container item direction="column" justify="center" xs={4}>
-          <Typography variant="button">{row.title}</Typography>
+          <Typography variant="button">{row.title ?? 'Document sans titre'}</Typography>
           <Typography>
             {date} {hour}
           </Typography>
@@ -137,7 +145,10 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ document, documentEncounter, 
                 <Typography variant="button">{deidentified ? 'ID Patient' : 'IPP'}</Typography>
                 <Grid container item alignItems="center">
                   <Typography>{row.IPP}</Typography>
-                  <IconButton onClick={() => history.push(`/patients/${row.idPatient}`)} className={classes.searchIcon}>
+                  <IconButton
+                    onClick={() => history.push(`/patients/${row.idPatient}${groupId ? `?groupId=${groupId}` : ''}`)}
+                    className={classes.searchIcon}
+                  >
                     <SearchIcon height="15px" fill="#ED6D91" />
                   </IconButton>
                 </Grid>
@@ -179,6 +190,8 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ document, documentEncounter, 
             <Dialog open={pdfDialogOpen} onClose={() => handleClosePdfDialog()} maxWidth="md">
               <DialogContent>
                 <Document
+                  error={'Le document est introuvable.'}
+                  loading={'PDF en cours de chargement...'}
                   file={{
                     url: `${FHIR_API_URL}/Binary/${row.id}`,
                     httpHeaders: {
@@ -189,7 +202,11 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ document, documentEncounter, 
                   onLoadSuccess={({ numPages }) => setNumPages(numPages)}
                 >
                   {Array.from(new Array(numPages), (el, index) => (
-                    <Page key={`page_${index + 1}`} pageNumber={index + 1} />
+                    <Page
+                      key={`page_${index + 1}`}
+                      pageNumber={index + 1}
+                      loading={'Pages en cours de chargement...'}
+                    />
                   ))}
                 </Document>
               </DialogContent>
@@ -218,15 +235,16 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ document, documentEncounter, 
 }
 
 type DocumentTableTypes = {
+  groupId?: string
   loading: boolean
   documents?: (CohortComposition | IDocumentReference)[]
   encounters?: IEncounter[]
   searchMode: boolean
   showIpp: boolean
-  deidentified: boolean
+  deidentified: boolean | null
 }
 const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
-  ({ loading, documents, searchMode, showIpp, encounters, deidentified }) => {
+  ({ groupId, loading, documents, searchMode, showIpp, encounters, deidentified }) => {
     const classes = useStyles()
     return loading ? (
       <CircularProgress className={classes.loadingSpinner} size={50} />
@@ -245,6 +263,7 @@ const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
               }
               return (
                 <DocumentRow
+                  groupId={groupId}
                   key={row.id}
                   document={row}
                   showText={searchMode}

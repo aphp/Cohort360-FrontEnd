@@ -5,9 +5,11 @@ const useStyles = makeStyles(() => ({
     position: 'fixed',
     bottom: 50,
     right: 240,
+    zIndex: 1,
     '& span': { backgroundColor: 'transparent !important' }
   },
   tabItem: {
+    opacity: 1,
     background: '#D1E2F4',
     color: '#fff',
     outline: 'none',

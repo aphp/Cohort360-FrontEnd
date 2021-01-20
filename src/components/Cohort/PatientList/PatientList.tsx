@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 import {
   Button,
+  Chip,
   CircularProgress,
   CssBaseline,
   Grid,
@@ -38,7 +39,7 @@ import useStyles from './styles'
 type PatientListProps = {
   total: number
   groupId?: string
-  deidentified?: boolean
+  deidentified?: boolean | null
   patients?: CohortPatient[]
   loading?: boolean
   agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
@@ -72,7 +73,7 @@ const PatientList: React.FC<PatientListProps> = ({
   const [vitalStatus, setVitalStatus] = useState<VitalStatus>(VitalStatus.all)
   const [sortBy, setSortBy] = useState('given') // eslint-disable-line
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc') // eslint-disable-line
-  const includeFacets = true
+  const [showFilterChip, setShowFilterChip] = useState(false)
 
   useEffect(() => {
     setAgePyramid(agePyramidData)
@@ -90,11 +91,19 @@ const PatientList: React.FC<PatientListProps> = ({
     setOpen(true)
   }
 
-  const fetchPatients = (sortBy: string, sortDirection: string, input = searchInput, pageValue = 1) => {
+  const fetchPatients = (
+    sortBy: string,
+    sortDirection: string,
+    input = searchInput,
+    pageValue = 1,
+    includeFacets: boolean
+  ) => {
     setLoadingStatus(true)
     // Set loader on chart
-    setPatientData(undefined)
-    setAgePyramid(undefined)
+    if (includeFacets) {
+      setPatientData(undefined)
+      setAgePyramid(undefined)
+    }
     fetchPatientList(
       pageValue,
       searchBy,
@@ -111,8 +120,10 @@ const PatientList: React.FC<PatientListProps> = ({
         if (result) {
           const { totalPatients, originalPatients, genderRepartitionMap, agePyramidData } = result
           setPatientsList(originalPatients)
-          setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
-          setAgePyramid(agePyramidData)
+          if (includeFacets) {
+            setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
+            setAgePyramid(agePyramidData)
+          }
           setTotalPatients(totalPatients)
         }
       })
@@ -126,12 +137,16 @@ const PatientList: React.FC<PatientListProps> = ({
     setPage(1)
     setSortBy(sortBy)
     setSortDirection(sortDirection as 'asc' | 'desc')
-    fetchPatients(sortBy, sortDirection, input)
+    fetchPatients(sortBy, sortDirection, input, 1, true)
   }
+
+  useEffect(() => {
+    onSearchPatient()
+  }, [gender, age, vitalStatus]) // eslint-disable-line
 
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
-    submit && onSearchPatient()
+    submit && setShowFilterChip(true)
   }
 
   const handleChangeSelect = (
@@ -151,13 +166,27 @@ const PatientList: React.FC<PatientListProps> = ({
     setPage(value)
     //We only fetch patients if we don't already have them
     if (patients && patients.length < totalPatients) {
-      fetchPatients(sortBy, sortDirection, searchInput, value)
+      fetchPatients(sortBy, sortDirection, searchInput, value, false)
     }
   }
 
   const handleClearInput = () => {
     setSearchInput('')
     onSearchPatient(sortBy, sortDirection, '')
+  }
+
+  const handleDeleteChip = (filterName: string) => {
+    switch (filterName) {
+      case 'gender':
+        setGender(PatientGenderKind._unknown)
+        break
+      case 'age':
+        setAge([0, 130])
+        break
+      case 'vitalStatus':
+        setVitalStatus(VitalStatus.all)
+        break
+    }
   }
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -174,6 +203,26 @@ const PatientList: React.FC<PatientListProps> = ({
     setSortDirection(_sortDirection)
     setSortBy(property)
     onSearchPatient(property, _sortDirection)
+  }
+
+  const genderName = () => {
+    switch (gender) {
+      case PatientGenderKind._female:
+        return 'Genre: Femmes'
+      case PatientGenderKind._male:
+        return 'Genre: Hommes'
+      case PatientGenderKind._other:
+        return 'Genre: Autre'
+    }
+  }
+
+  const vitalStatusName = () => {
+    switch (vitalStatus) {
+      case VitalStatus.alive:
+        return 'Patients vivants'
+      case VitalStatus.deceased:
+        return 'Patients décédés'
+    }
   }
 
   return (
@@ -198,7 +247,7 @@ const PatientList: React.FC<PatientListProps> = ({
               ) : patientData.genderData && patientData.genderData.length > 0 ? (
                 <BarChart data={patientData.genderData ?? []} />
               ) : (
-                <Typography>Aucune patient</Typography>
+                <Typography>Aucun patient</Typography>
               )}
             </Paper>
           </Grid>
@@ -217,7 +266,7 @@ const PatientList: React.FC<PatientListProps> = ({
                 patientData.vitalStatusData.find(({ value }) => value !== 0) !== undefined ? (
                 <PieChart data={patientData.vitalStatusData ?? []} />
               ) : (
-                <Typography>Aucune patient</Typography>
+                <Typography>Aucun patient</Typography>
               )}
             </Paper>
           </Grid>
@@ -235,7 +284,7 @@ const PatientList: React.FC<PatientListProps> = ({
               ) : agePyramid && agePyramid.size > 0 ? (
                 <PyramidChart data={agePyramid} width={300} />
               ) : (
-                <Typography>Aucune patient</Typography>
+                <Typography>Aucun patient</Typography>
               )}
             </Paper>
           </Grid>
@@ -304,7 +353,37 @@ const PatientList: React.FC<PatientListProps> = ({
               />
             </div>
           </Grid>
+          <Grid>
+            {showFilterChip && gender !== PatientGenderKind._unknown && (
+              <Chip
+                className={classes.chips}
+                label={genderName()}
+                onDelete={() => handleDeleteChip('gender')}
+                color="primary"
+                variant="outlined"
+              />
+            )}
+            {showFilterChip && (age[0] !== 0 || age[1] !== 130) && (
+              <Chip
+                className={classes.chips}
+                label={`Âge entre ${age[0]} et ${age[1]} ans`}
+                onDelete={() => handleDeleteChip('age')}
+                color="primary"
+                variant="outlined"
+              />
+            )}
+            {showFilterChip && vitalStatus !== VitalStatus.all && (
+              <Chip
+                className={classes.chips}
+                label={vitalStatusName()}
+                onDelete={() => handleDeleteChip('vitalStatus')}
+                color="primary"
+                variant="outlined"
+              />
+            )}
+          </Grid>
           <TableauPatient
+            groupId={groupId}
             deidentified={deidentified}
             patients={patientsList ?? []}
             loading={patientsList === undefined ? true : loadingStatus}

@@ -24,6 +24,15 @@ const useStyles = makeStyles(() =>
       color: '#FFF',
       '&:hover': {
         backgroundColor: '#499cbf'
+      },
+      '&:disabled': {
+        opacity: 0.7
+      }
+    },
+    actionButton: {
+      width: '100%',
+      '& > span': {
+        position: 'relative'
       }
     },
     boldText: {
@@ -33,7 +42,9 @@ const useStyles = makeStyles(() =>
       color: '#5BC5F2'
     },
     iconBorder: {
-      marginRight: '10px'
+      position: 'absolute',
+      top: 0,
+      left: 10
     },
     patientTypo: {
       margin: '10px'

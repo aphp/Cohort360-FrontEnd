@@ -4,13 +4,9 @@ import { CriteriaItemType } from 'types'
 import DemographicFrom from './DiagramView/components/CriteriaCard/components/DemographicFrom/DemographicFrom'
 import DocumentsForm from './DiagramView/components/CriteriaCard/components/DocumentsForm/DocumentsForm'
 import SupportedForm from './DiagramView/components/CriteriaCard/components/SupportedForm/SupportedForm'
-import CCAMForm from './DiagramView/components/CriteriaCard/components/CCAMForm/CCAMForm'
-import Cim10Form from './DiagramView/components/CriteriaCard/components/Cim10Form/Cim10Form'
-import GhmForm from './DiagramView/components/CriteriaCard/components/GhmForm/GhmForm'
-
-// Data
-import ccamData from '../../../data/ccam_data'
-import ghmData from '../../../data/ghm_data'
+import CCAMForm from './DiagramView/components/CriteriaCard/components/CCAM'
+import Cim10Form from './DiagramView/components/CriteriaCard/components/Cim10Form'
+import GhmForm from './DiagramView/components/CriteriaCard/components/GHM'
 
 // Fetcher
 import {
@@ -18,13 +14,17 @@ import {
   fetchEntryModes,
   fetchExitModes,
   fetchFileStatus
-} from '../../../data/Requeteur/encounter'
-import { fetchGender, fetchStatus } from '../../../data/Requeteur/patient'
+} from '../../../services/cohortCreation/fetchEncounter'
+import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetchDemographic'
 import {
   fetchStatusDiagnostic,
   fetchDiagnosticTypes,
-  fetchCim10Diagnostic
-} from '../../../data/Requeteur/diagnosticCim10'
+  fetchCim10Diagnostic,
+  fetchCim10Hierarchy
+} from '../../../services/cohortCreation/fetchCondition'
+import { fetchCcamData, fetchCcamHierarchy } from '../../../services/cohortCreation/fetchProcedure'
+import { fetchGhmData, fetchGhmHierarchy } from '../../../services/cohortCreation/fetchClaim'
+import { fetchDocTypes } from '../../../services/cohortCreation/fetchComposition'
 
 // ├── Mes variables
 // ├── Patients
@@ -45,7 +45,7 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'mes_variables',
     title: 'Mes variables',
-    color: '#5BC5F2',
+    color: '	#808080',
     disabled: true,
     data: null,
     components: null
@@ -55,7 +55,7 @@ const criteriaList: CriteriaItemType[] = [
     title: 'Patients',
     color: '#0063AF',
     components: DemographicFrom,
-    data: { gender: 'loading', deceased: 'loading' },
+    data: { gender: 'loading', status: 'loading' },
     fetch: { fetchGender, fetchStatus }
   },
   {
@@ -70,7 +70,9 @@ const criteriaList: CriteriaItemType[] = [
     id: 'Composition',
     title: 'Documents cliniques',
     color: '#0063AF',
-    components: DocumentsForm
+    components: DocumentsForm,
+    data: { docTypes: 'loading' },
+    fetch: { fetchDocTypes }
   },
   {
     id: 'pmsi',
@@ -83,35 +85,37 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Diagnostics',
         color: '#0063AF',
         components: Cim10Form,
-        data: { statusDiagnostic: 'loading', kindDiagnostic: 'loading', cim10Diagnostic: 'loading' },
-        fetch: { fetchStatusDiagnostic, fetchDiagnosticTypes, fetchCim10Diagnostic }
+        data: { statusDiagnostic: 'loading', diagnosticTypes: 'loading', cim10Diagnostic: 'loading' },
+        fetch: { fetchStatusDiagnostic, fetchDiagnosticTypes, fetchCim10Diagnostic, fetchCim10Hierarchy }
       },
       {
         id: 'Procedure',
         title: 'Actes',
         color: '#0063AF',
         components: CCAMForm,
-        data: { ccamData }
+        data: { ccamData: 'loading' },
+        fetch: { fetchCcamData, fetchCcamHierarchy }
       },
       {
         id: 'Claim',
         title: 'GHM',
         color: '#0063AF',
         components: GhmForm,
-        data: { ghmData }
+        data: { ghmData: 'loading' },
+        fetch: { fetchGhmData, fetchGhmHierarchy }
       }
     ]
   },
   {
     id: 'biologie_microbiologie',
     title: 'Biologie/Microbiologie',
-    color: '#0063AF',
+    color: '	#808080',
     components: null,
     subItems: [
       {
         id: 'biologie',
         title: 'Biologie',
-        color: '#0063AF',
+        color: '	#808080',
         disabled: true,
         data: null,
         components: null
@@ -120,7 +124,7 @@ const criteriaList: CriteriaItemType[] = [
         id: 'microbiologie',
         title: 'Microbiologie',
         components: null,
-        color: '#0063AF',
+        color: '	#808080',
         disabled: true,
         data: null
       }
@@ -129,7 +133,7 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'physiologie',
     title: 'Physiologie',
-    color: '#0063AF',
+    color: '	#808080',
     disabled: true,
     data: null,
     components: null
@@ -137,14 +141,14 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'médicaments',
     title: 'Médicaments',
-    color: '#0063AF',
+    color: '	#808080',
     components: null,
     subItems: [
       {
         id: 'prescription_dispension_administration',
         title: 'Prescription - Dispension - Administration',
         components: null,
-        color: '#0063AF',
+        color: '	#808080',
         disabled: true,
         data: null
       }

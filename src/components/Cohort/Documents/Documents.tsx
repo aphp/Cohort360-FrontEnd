@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
+import moment from 'moment'
 
 import {
   Button,
+  Chip,
   CssBaseline,
   Grid,
   IconButton,
@@ -38,7 +40,7 @@ import displayDigit from 'utils/displayDigit'
 
 type DocumentsProps = {
   groupId?: string
-  deidentifiedBoolean: boolean
+  deidentifiedBoolean: boolean | null
   sortBy: string
   sortDirection: 'asc' | 'desc'
 }
@@ -58,11 +60,12 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   const [openSort, setOpenSort] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
   const [nda, setNda] = useState('')
-  const [selectedDocTypes, setSelectedDocTypes] = useState<string[]>([])
-  const [startDate, setStartDate] = useState<string | undefined>(undefined)
-  const [endDate, setEndDate] = useState<string | undefined>(undefined)
+  const [selectedDocTypes, setSelectedDocTypes] = useState<any[]>([])
+  const [startDate, setStartDate] = useState<string | null>(null)
+  const [endDate, setEndDate] = useState<string | null>(null)
   const [_sortBy, setSortBy] = useState(sortBy)
   const [_sortDirection, setSortDirection] = useState(sortDirection)
+  const [showFilterChip, setShowFilterChip] = useState(false)
 
   const documentLines = 20
 
@@ -78,13 +81,16 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
       setSearchMode(false)
     }
     setLoadingStatus(true)
+
+    const selectedDocTypesCodes = selectedDocTypes.map((docType) => docType.code)
+
     fetchDocuments(
-      deidentifiedBoolean,
+      !!deidentifiedBoolean,
       sortBy,
       sortDirection,
       page,
       input,
-      selectedDocTypes,
+      selectedDocTypesCodes,
       nda,
       startDate,
       endDate,
@@ -114,6 +120,10 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
       })
   }
 
+  useEffect(() => {
+    onSearchDocument(_sortBy, _sortDirection)
+  }, [selectedDocTypes, nda, startDate, endDate]) // eslint-disable-line
+
   const handleClearInput = () => {
     setSearchInput('')
     onSearchDocument(_sortBy, _sortDirection, '')
@@ -129,7 +139,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
 
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
-    submit && onSearchDocument(_sortBy, _sortDirection)
+    submit && setShowFilterChip(true)
   }
 
   const handleChangeInput = (event: any) => {
@@ -146,6 +156,29 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   const handleCloseSortDialog = (submitSort: boolean) => {
     setOpenSort(false)
     submitSort && onSearchDocument(_sortBy, _sortDirection)
+  }
+
+  const handleDeleteChip = (filterName: string, value?: string) => {
+    switch (filterName) {
+      case 'nda':
+        value &&
+          setNda(
+            nda
+              .split(',')
+              .filter((item) => item !== value)
+              .join()
+          )
+        break
+      case 'selectedDocTypes':
+        value && setSelectedDocTypes(selectedDocTypes.filter((item) => item !== value))
+        break
+      case 'startDate':
+        setStartDate(null)
+        break
+      case 'endDate':
+        setEndDate(null)
+        break
+    }
   }
 
   useEffect(() => {
@@ -171,12 +204,13 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                   <Typography variant="h3" color="primary">
                     Mots les plus fréquents
                   </Typography>
-                </Grid>
-                <WordCloud wordcloudData={wordcloudData?.[0]?.extension} />
+                </Grid> */}
+        {/* @ts-ignore */}
+        {/* <WordCloud wordcloudData={wordcloudData} />
               </Paper>
             )}
-          </Grid> 
-        </Grid>*/}
+          </Grid>
+        </Grid> */}
 
         <Grid container item justify="flex-end" className={classes.tableGrid}>
           <Grid container justify="space-between" alignItems="center">
@@ -187,7 +221,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
               <div className={classes.documentButtons}>
                 <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
                   <InputBase
-                    placeholder="Rechercher"
+                    placeholder="Rechercher dans les documents"
                     className={classes.input}
                     value={searchInput}
                     onChange={handleChangeInput}
@@ -241,7 +275,54 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
               </div>
             </Grid>
           </Grid>
+          <Grid>
+            {showFilterChip &&
+              nda !== '' &&
+              nda
+                .split(',')
+                .map((value) => (
+                  <Chip
+                    className={classes.chips}
+                    key={value}
+                    label={value}
+                    onDelete={() => handleDeleteChip('nda', value)}
+                    color="primary"
+                    variant="outlined"
+                  />
+                ))}
+            {showFilterChip &&
+              selectedDocTypes.length > 0 &&
+              selectedDocTypes.map((docType) => (
+                <Chip
+                  className={classes.chips}
+                  key={docType.code}
+                  label={docType.label}
+                  onDelete={() => handleDeleteChip('selectedDocTypes', docType)}
+                  color="primary"
+                  variant="outlined"
+                />
+              ))}
+            {showFilterChip && startDate && (
+              <Chip
+                className={classes.chips}
+                label={`Après le : ${moment(startDate).format('DD/MM/YYYY')}`}
+                onDelete={() => handleDeleteChip('startDate')}
+                color="primary"
+                variant="outlined"
+              />
+            )}
+            {showFilterChip && endDate && (
+              <Chip
+                className={classes.chips}
+                label={`Avant le : ${moment(endDate).format('DD/MM/YYYY')}`}
+                onDelete={() => handleDeleteChip('endDate')}
+                color="primary"
+                variant="outlined"
+              />
+            )}
+          </Grid>
           <DocumentList
+            groupId={groupId}
             loading={loadingStatus ?? false}
             documents={documentsToDisplay}
             searchMode={searchMode}

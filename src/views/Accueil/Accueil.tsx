@@ -1,4 +1,5 @@
 import React from 'react'
+import moment from 'moment'
 import { useAppSelector } from 'state'
 
 import { Grid, Paper, Container, Typography } from '@material-ui/core'
@@ -21,6 +22,10 @@ const Accueil: React.FC = () => {
     open: state.drawer
   }))
 
+  const lastConnection = practitioner?.lastConnection
+    ? moment(practitioner.lastConnection).format('[Dernière connexion: ]ddd DD MMMM YYYY[, à ]HH:mm')
+    : ''
+
   return practitioner ? (
     <Grid
       container
@@ -32,8 +37,11 @@ const Accueil: React.FC = () => {
         <Typography component="h1" variant="h1" color="inherit" noWrap className={classes.title}>
           Bienvenue {practitioner.displayName}
         </Typography>
+        <Typography component="h6" variant="h6" color="inherit" noWrap className={classes.title}>
+          {lastConnection}
+        </Typography>
       </Container>
-      <Container maxWidth="lg" className={classes.container}>
+      <Container maxWidth="lg" className={classes.container} style={{ minHeight: 'calc(100vh - 70px)' }}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={6}>
             <Grid item>

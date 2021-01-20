@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react'
+import moment from 'moment'
+
+import { KeyboardDatePicker } from '@material-ui/pickers'
 
 import {
   Button,
@@ -6,15 +9,17 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormLabel,
   Grid,
+  IconButton,
   TextField,
   Typography
 } from '@material-ui/core'
 import { Autocomplete } from '@material-ui/lab'
 
-import InputDate from 'components/Inputs/InputDate/InputDate'
+import ClearIcon from '@material-ui/icons/Clear'
 
-import { fetchDiagnosticTypes } from 'data/Requeteur/diagnosticCim10'
+import { fetchDiagnosticTypes } from '../../../services/cohortCreation/fetchCondition'
 import { capitalizeFirstLetter } from '../../../utils/capitalize'
 
 import useStyles from './styles'
@@ -27,10 +32,10 @@ type PMSIFiltersProps = {
   onChangeNda: (nda: string) => void
   code: string
   onChangeCode: (code: string) => void
-  startDate?: string
-  onChangeStartDate: (startDate: string | undefined) => void
-  endDate?: string
-  onChangeEndDate: (endDate: string | undefined) => void
+  startDate?: string | null
+  onChangeStartDate: (startDate: string | null) => void
+  endDate?: string | null
+  onChangeEndDate: (endDate: string | null) => void
   deidentified: boolean
   selectedDiagnosticTypes: string[]
   onChangeSelectedDiagnosticTypes: (selectedDiagnosticTypes: string[]) => void
@@ -54,25 +59,61 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
   showDiagnosticTypes
 }) => {
   const classes = useStyles()
-  const [diagnosticTypes, setDiagnosticTypes] = useState<any[]>(selectedDiagnosticTypes)
+
+  const [_nda, setNda] = useState<string>(nda)
+  const [_code, setCode] = useState<string>(code)
+  const [_startDate, setStartDate] = useState<any>(startDate)
+  const [_endDate, setEndDate] = useState<any>(endDate)
+  const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>(selectedDiagnosticTypes)
+  const [dateError, setDateError] = useState(false)
+
+  const [diagnosticTypesList, setDiagnosticTypesList] = useState<any[]>([])
 
   const _onChangeNda = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onChangeNda(event.target.value)
+    setNda(event.target.value)
   }
 
   const _onChangeCode = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onChangeCode(event.target.value)
+    setCode(event.target.value)
   }
 
   const _onChangeSelectedDiagnosticTypes = (event: React.ChangeEvent<{}>, value: any[]) => {
-    onChangeSelectedDiagnosticTypes(value.map((value) => value.code))
+    setSelectedDiagnosticTypes(value)
+  }
+
+  const _onSubmit = () => {
+    const newStartDate = moment(_startDate).isValid() ? moment(_startDate).format('YYYY-MM-DD') : null
+    const newEndDate = moment(_endDate).isValid() ? moment(_endDate).format('YYYY-MM-DD') : null
+
+    onChangeNda(_nda)
+    onChangeCode(_code)
+    onChangeStartDate(newStartDate)
+    onChangeEndDate(newEndDate)
+    onChangeSelectedDiagnosticTypes(_selectedDiagnosticTypes)
+    onSubmit()
   }
 
   useEffect(() => {
     fetchDiagnosticTypes().then((diagnosticTypes) => {
-      setDiagnosticTypes(diagnosticTypes)
+      setDiagnosticTypesList(diagnosticTypes)
     })
   }, [])
+
+  useEffect(() => {
+    setNda(nda)
+    setCode(code)
+    setStartDate(startDate)
+    setEndDate(endDate)
+    setSelectedDiagnosticTypes(selectedDiagnosticTypes)
+  }, [open]) // eslint-disable-line
+
+  useEffect(() => {
+    if (moment(_startDate).isAfter(_endDate)) {
+      setDateError(true)
+    } else {
+      setDateError(false)
+    }
+  }, [_startDate, _endDate])
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -85,10 +126,9 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
               variant="outlined"
               margin="normal"
               fullWidth
-              label="NDA"
               autoFocus
-              placeholder='Exemple: "6601289264,141740347"'
-              value={nda}
+              placeholder="Exemple: 6601289264,141740347"
+              value={_nda}
               onChange={_onChangeNda}
             />
           </Grid>
@@ -99,10 +139,9 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
             variant="outlined"
             margin="normal"
             fullWidth
-            label="Code"
             autoFocus
-            placeholder='Exemple: "G629,R2630,F310"'
-            value={code}
+            placeholder="Exemple: G629,R2630,F310"
+            value={_code}
             onChange={_onChangeCode}
           />
         </Grid>
@@ -112,14 +151,12 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
             <Autocomplete
               multiple
               onChange={_onChangeSelectedDiagnosticTypes}
-              options={diagnosticTypes}
-              value={diagnosticTypes.filter((value) => selectedDiagnosticTypes.includes(value.code))}
+              options={diagnosticTypesList}
+              value={_selectedDiagnosticTypes}
               disableCloseOnSelect
-              getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.display)}
+              getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.label)}
               renderOption={(diagnosticType: any) => (
-                <React.Fragment>
-                  {diagnosticType.code.toUpperCase()} - {capitalizeFirstLetter(diagnosticType.display)}
-                </React.Fragment>
+                <React.Fragment>{capitalizeFirstLetter(diagnosticType.label)}</React.Fragment>
               )}
               renderInput={(params) => (
                 <TextField
@@ -136,19 +173,65 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
 
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Date :</Typography>
-          <InputDate
-            label={'Après le :'}
-            value={startDate}
-            onChange={(startDate: string) => onChangeStartDate(startDate)}
-          />
-          <InputDate label={'Avant le :'} value={endDate} onChange={(endDate: string) => onChangeEndDate(endDate)} />
+          <Grid container alignItems="baseline" className={classes.datePickers}>
+            <FormLabel component="legend" className={classes.dateLabel}>
+              Après le :
+            </FormLabel>
+            <KeyboardDatePicker
+              clearable
+              error={dateError}
+              style={{ width: 'calc(100% - 120px)' }}
+              invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
+              format="DD/MM/YYYY"
+              onChange={(date) => setStartDate(date ?? null)}
+              value={_startDate}
+            />
+            {_startDate !== null && (
+              <IconButton
+                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
+                color="primary"
+                onClick={() => setStartDate(null)}
+              >
+                <ClearIcon />
+              </IconButton>
+            )}
+          </Grid>
+
+          <Grid container alignItems="baseline" className={classes.datePickers}>
+            <FormLabel component="legend" className={classes.dateLabel}>
+              Avant le :
+            </FormLabel>
+            <KeyboardDatePicker
+              clearable
+              error={dateError}
+              style={{ width: 'calc(100% - 120px)' }}
+              invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
+              format="DD/MM/YYYY"
+              onChange={setEndDate}
+              value={_endDate}
+            />
+            {_endDate !== null && (
+              <IconButton
+                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
+                color="primary"
+                onClick={() => setEndDate(null)}
+              >
+                <ClearIcon />
+              </IconButton>
+            )}
+          </Grid>
+          {dateError && (
+            <Typography className={classes.dateError}>
+              Vous ne pouvez pas sélectionner de date de début supérieure à la date de fin.
+            </Typography>
+          )}
         </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">
           Annuler
         </Button>
-        <Button onClick={onSubmit} color="primary">
+        <Button onClick={_onSubmit} color="primary" disabled={dateError}>
           Valider
         </Button>
       </DialogActions>
