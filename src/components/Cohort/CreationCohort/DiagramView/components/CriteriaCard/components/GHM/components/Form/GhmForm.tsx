@@ -75,11 +75,12 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             },
             {
               name: 'code',
-              label: 'GHM 10 Diag Code',
+              label: 'Code GHM',
               variant: 'outlined',
               type: 'autocomplete',
               autocompleteOptions: criteria?.data?.ghmData || [],
-              getAutocompleteOptions: getGhmOptions
+              getAutocompleteOptions: getGhmOptions,
+              noOptionsText: 'Veuillez entrer un code ou un critère GHM'
             }
             // {
             //   type: 'custom',
