@@ -29,10 +29,10 @@
     "ts-invariant" "^0.4.4"
     "tslib" "^1.10.0"
 
-"@arkhn/ui@^1.9.7":
-  "integrity" "sha512-qk8KvkQrtl3+x/QnRPFvqdTN3aQ6AgsEpjMLEGAb7vIzT7VpSDN26JzZq1Kv7Vo5WggVU5rwuUD66FBZ+iI2Kw=="
-  "resolved" "https://registry.npmjs.org/@arkhn/ui/-/ui-1.9.7.tgz"
-  "version" "1.9.7"
+"@arkhn/ui@^1.9.10":
+  "integrity" "sha512-isrYUx4sWN6kYyejIXH3naJCj9GAK3HXzismDw0anLGP7svDqtDU6Mnipd74Kxzz2K+eZ0rkvLUc1jAPLWNzxA=="
+  "resolved" "https://registry.npmjs.org/@arkhn/ui/-/ui-1.9.10.tgz"
+  "version" "1.9.10"
   dependencies:
     "@date-io/date-fns" "1.x"
     "@material-ui/core" "^4.11.0"
@@ -9012,7 +9012,7 @@
   dependencies:
     "minimist" "^1.2.5"
 
-"moment@^2.24.0", "moment@^2.29.1":
+"moment@^2.29.1":
   "integrity" "sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ=="
   "resolved" "https://registry.npmjs.org/moment/-/moment-2.29.1.tgz"
   "version" "2.29.1"
