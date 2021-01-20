@@ -83,7 +83,8 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
               variant: 'outlined',
               type: 'autocomplete',
               autocompleteOptions: criteria?.data?.ccamData || [],
-              getAutocompleteOptions: getCCAMOptions
+              getAutocompleteOptions: getCCAMOptions,
+              noOptionsText: 'Veuillez entrer un code ou un acte CCAM'
             }
             // {
             //   type: 'custom',
