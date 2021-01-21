@@ -207,7 +207,7 @@ const Patient = () => {
         </Grid>
         <PatientSidebar
           openDrawer={isSidebarOpened}
-          groupId={Array.isArray(cohort.cohort) ? cohort.cohort.map((e) => e.id).join() : cohort.cohort?.id}
+          groupId={Array.isArray(cohort.cohort) ? cohort.cohort.map((e: any) => e.id).join() : cohort.cohort?.id}
           patients={cohort.originalPatients}
           total={cohort.totalPatients ?? 0}
           onClose={() => setSidebarOpened(false)}

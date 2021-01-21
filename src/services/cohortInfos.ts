@@ -94,18 +94,6 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
           )
         : undefined
 
-    console.log('cohortInfo', {
-      name,
-      cohort,
-      totalPatients,
-      originalPatients,
-      genderRepartitionMap,
-      visitTypeRepartitionData,
-      agePyramidData,
-      monthlyVisitData,
-      requestId
-    })
-
     return {
       name,
       cohort,

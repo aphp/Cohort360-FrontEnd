@@ -56,8 +56,7 @@ export const fetchDashboardInfo = createAsyncThunk<
 
   const prevState = thunkAPI.getState()
   const prevExploredCohort = prevState.exploredCohort
-  console.log('prevExploredCohort :>> ', prevExploredCohort)
-  // if (prevExploredCohort?.cohort?.id === cohortId) return prevExploredCohort
+  if (prevExploredCohort?.cohort?.id === cohortId) return prevExploredCohort
 
   let cohortInfo = initialState
   switch (context) {
@@ -77,7 +76,6 @@ export const fetchDashboardInfo = createAsyncThunk<
     default:
       break
   }
-  console.log('cohortInfo :>> ', cohortInfo)
   return cohortInfo
 })
 
@@ -103,16 +101,16 @@ const exploredCohortSlice = createSlice({
     builder.addCase(logout, () => {
       return initialState
     })
-    builder.addCase(fetchDashboardInfo.pending, (state, action) => {
-      return {
-        ...state,
-        agePyramidData: undefined,
-        genderRepartitionMap: undefined,
-        monthlyVisitData: undefined,
-        visitTypeRepartitionData: undefined,
-        originalPatients: undefined
-      }
-    })
+    // builder.addCase(fetchDashboardInfo.pending, (state, action) => {
+    //   return {
+    //     ...state,
+    //     agePyramidData: undefined,
+    //     genderRepartitionMap: undefined,
+    //     monthlyVisitData: undefined,
+    //     visitTypeRepartitionData: undefined,
+    //     originalPatients: undefined
+    //   }
+    // })
     builder.addCase(fetchDashboardInfo.fulfilled, (state, action) => {
       return action.payload
     })
