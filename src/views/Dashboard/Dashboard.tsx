@@ -7,7 +7,7 @@ import { Grid, Tabs, Tab } from '@material-ui/core'
 import { IExtension } from '@ahryman40k/ts-fhir-types/lib/R4'
 import Alert from '@material-ui/lab/Alert'
 
-import InclusionExclusionPatientsPanel from '../../components/Cohort/InclusionExclusionPatients/InclusionExclusionPatients'
+// import InclusionExclusionPatientsPanel from '../../components/Cohort/InclusionExclusionPatients/InclusionExclusionPatients'
 import RedcapExport from '../../components/RedcapExport/RedcapExport'
 import CohortPreview from '../../components/Cohort/Preview/Preview'
 import PatientList from '../../components/Cohort/PatientList/PatientList'
@@ -15,11 +15,7 @@ import CohortDocuments from '../../components/Cohort/Documents/Documents'
 import TopBar from '../../components/TopBar/TopBar'
 import CohortCreation from '../../views/CohortCreation/CohortCreation'
 
-import { fetchCohort } from '../../services/cohortInfos'
-import { fetchMyPatients } from '../../services/myPatients'
-import { fetchPerimetersInfos } from '../../services/perimeters'
-
-import { setExploredCohort } from '../../state/exploredCohort'
+import { fetchDashboardInfo } from '../../state/exploredCohort'
 
 import useStyles from './styles'
 
@@ -64,47 +60,11 @@ const Dashboard: React.FC<{
     setDeidentifiedBoolean(!!valueBoolean)
   }
 
-  const _fetchCohort = async () => {
-    const cohortResp = await fetchCohort(cohortId)
-    if (cohortResp) {
-      dispatch(setExploredCohort(cohortResp))
-      checkDeindentifiedStatus(cohortResp)
-    }
-  }
-
-  const _fetchMyPatients = async () => {
-    const cohortResp = await fetchMyPatients()
-    if (cohortResp) {
-      dispatch(setExploredCohort(cohortResp))
-      checkDeindentifiedStatus(cohortResp)
-    }
-  }
-
-  const _fetchPerimeters = async () => {
-    const cohortResp = await fetchPerimetersInfos(perimetreIds)
-    if (cohortResp) {
-      dispatch(setExploredCohort(cohortResp))
-      checkDeindentifiedStatus(cohortResp)
-    }
-  }
-
   useEffect(() => {
-    dispatch(
-      setExploredCohort({
-        cohort: undefined,
-        name: '',
-        totalPatients: undefined,
-        agePyramidData: undefined,
-        genderRepartitionMap: undefined,
-        monthlyVisitData: undefined,
-        visitTypeRepartitionData: undefined,
-        originalPatients: undefined
-      })
-    )
+    dispatch(fetchDashboardInfo({ context, cohortId }))
 
     switch (context) {
       case 'patients':
-        _fetchMyPatients()
         setStatus('Exploration de population')
         setTabs([
           { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: false },
@@ -114,7 +74,6 @@ const Dashboard: React.FC<{
         ])
         break
       case 'cohort':
-        _fetchCohort()
         setStatus('Exploration de cohorte')
         setTabs([
           { label: 'Édition cohorte', value: 'creation', to: `/cohort/${cohortId}/edition`, disabled: true },
@@ -133,7 +92,6 @@ const Dashboard: React.FC<{
         ])
         break
       case 'perimeters':
-        _fetchPerimeters()
         setStatus('Exploration de périmètres')
         setTabs([
           { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: false },
@@ -274,7 +232,7 @@ const Dashboard: React.FC<{
             sortDirection={'desc'}
           />
         )}
-        {CONTEXT === 'arkhn' && selectedTab === 'inclusion-exclusion' && <InclusionExclusionPatientsPanel />}
+        {/* {CONTEXT === 'arkhn' && selectedTab === 'inclusion-exclusion' && <InclusionExclusionPatientsPanel />} */}
       </div>
     </Grid>
   )

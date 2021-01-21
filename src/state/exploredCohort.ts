@@ -1,19 +1,85 @@
+import { RootState } from './index'
 import { CohortData } from 'types'
 import { IGroup_Member } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { logout } from './me'
 
+import { fetchCohort } from '../services/cohortInfos'
+import { fetchMyPatients } from '../services/myPatients'
+import { fetchPerimetersInfos } from '../services/perimeters'
+
 type ExploredCohortState = {
-  importedPatients: any[]
-  includedPatients: any[]
-  excludedPatients: any[]
+  importedPatients?: any[]
+  includedPatients?: any[]
+  excludedPatients?: any[]
 } & CohortData
 
-const initialState: ExploredCohortState = {
+const initialState: ExploredCohortState & CohortData = {
+  // CohortData
+  name: '',
+  cohort: [],
+  totalPatients: 0,
+  originalPatients: [],
+  totalDocs: 0,
+  documentsList: [],
+  wordcloudData: [],
+  encounters: [],
+  genderRepartitionMap: undefined,
+  visitTypeRepartitionData: undefined,
+  monthlyVisitData: undefined,
+  agePyramidData: undefined,
+  requestId: '',
+  // ExploredCohortState
   importedPatients: [],
   includedPatients: [],
   excludedPatients: []
 }
+
+const _fetchCohort = async (cohortId: string) => {
+  return (await fetchCohort(cohortId)) ?? initialState
+}
+
+const _fetchMyPatients = async () => {
+  return (await fetchMyPatients()) ?? initialState
+}
+
+const _fetchPerimeters = async (perimetreIds: string) => {
+  return (await fetchPerimetersInfos(perimetreIds)) ?? initialState
+}
+
+export const fetchDashboardInfo = createAsyncThunk<
+  CohortData,
+  { context: string; cohortId?: string },
+  { state: RootState }
+>('cohort/fetchInfo', async (dashboardInfo, thunkAPI) => {
+  const { context, cohortId } = dashboardInfo
+
+  const prevState = thunkAPI.getState()
+  const prevExploredCohort = prevState.exploredCohort
+  console.log('prevExploredCohort :>> ', prevExploredCohort)
+  // if (prevExploredCohort?.cohort?.id === cohortId) return prevExploredCohort
+
+  let cohortInfo = initialState
+  switch (context) {
+    case 'patients':
+      cohortInfo = await _fetchMyPatients()
+      break
+    case 'cohort':
+      if (!cohortId) return initialState
+
+      cohortInfo = await _fetchCohort(cohortId)
+      break
+    case 'perimeters':
+      if (!cohortId) return initialState
+
+      cohortInfo = await _fetchPerimeters(cohortId)
+      break
+    default:
+      break
+  }
+  console.log('cohortInfo :>> ', cohortInfo)
+  return cohortInfo
+})
 
 const exploredCohortSlice = createSlice({
   name: 'exploredCohort',
@@ -21,58 +87,6 @@ const exploredCohortSlice = createSlice({
   reducers: {
     setExploredCohort: (state: ExploredCohortState, action: PayloadAction<CohortData | undefined>) => {
       return action.payload ? { ...state, ...action.payload } : initialState
-    },
-    addImportedPatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
-      const importedPatients = [...state.importedPatients, ...action.payload]
-      state.importedPatients = importedPatients.filter(
-        (patient, index, self) =>
-          index === self.findIndex((t) => t.id === patient.id) &&
-          !state.originalPatients?.map((p) => p.id).includes(patient.id) &&
-          !state.excludedPatients.map((p) => p.id).includes(patient.id)
-      )
-    },
-    removeImportedPatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
-      const listId = action.payload.map((patient) => patient.id)
-      state.importedPatients = state.importedPatients.filter((patient) => !listId.includes(patient.id))
-    },
-    includePatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
-      const includedPatients = [...state.includedPatients, ...action.payload]
-      const importedPatients = state.importedPatients.filter(
-        (patient) => !action.payload.map((p) => p.id).includes(patient.id)
-      )
-      state.importedPatients = importedPatients
-      state.includedPatients = includedPatients
-    },
-    excludePatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
-      const toExcluded = state.originalPatients?.filter((patient) =>
-        action.payload.map((p) => p.id).includes(patient.id)
-      )
-      const toImported = state.includedPatients.filter((patient) =>
-        action.payload.map((p) => p.id).includes(patient.id)
-      )
-      const allExcludedPatients = [...state.excludedPatients, ...toExcluded]
-      const allImportedPatients = [...state.importedPatients, ...toImported]
-      return {
-        ...state,
-        includedPatients: state.includedPatients.filter(
-          (patient) => !action.payload.map((p) => p.id).includes(patient.id)
-        ),
-        originalPatients: state.originalPatients?.filter(
-          (patient) => !action.payload.map((p) => p.id).includes(patient.id)
-        ),
-        excludedPatients: allExcludedPatients.filter(
-          (patient, index, self) => index === self.findIndex((t) => t.id === patient.id)
-        ),
-        importedPatients: allImportedPatients
-      }
-    },
-    removeExcludedPatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
-      const originalPatients = [...state.originalPatients, ...action.payload]
-      const excludedPatients = state.excludedPatients.filter(
-        (patient) => !action.payload.map((p) => p.id).includes(patient.id)
-      )
-      state.originalPatients = originalPatients
-      state.excludedPatients = excludedPatients
     },
     updateCohort: (state: ExploredCohortState, action: PayloadAction<IGroup_Member[]>) => {
       return {
@@ -89,16 +103,21 @@ const exploredCohortSlice = createSlice({
     builder.addCase(logout, () => {
       return initialState
     })
+    builder.addCase(fetchDashboardInfo.pending, (state, action) => {
+      return {
+        ...state,
+        agePyramidData: undefined,
+        genderRepartitionMap: undefined,
+        monthlyVisitData: undefined,
+        visitTypeRepartitionData: undefined,
+        originalPatients: undefined
+      }
+    })
+    builder.addCase(fetchDashboardInfo.fulfilled, (state, action) => {
+      return action.payload
+    })
   }
 })
 
 export default exploredCohortSlice.reducer
-export const {
-  addImportedPatients,
-  excludePatients,
-  setExploredCohort,
-  removeImportedPatients,
-  includePatients,
-  removeExcludedPatients,
-  updateCohort
-} = exploredCohortSlice.actions
+export const { setExploredCohort, updateCohort } = exploredCohortSlice.actions
