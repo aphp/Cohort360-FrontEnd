@@ -38,7 +38,7 @@ const ControlPanel: React.FC<
               {executeLoading ? (
                 <>
                   Veuillez patienter
-                  <CircularProgress size={20} />
+                  <CircularProgress size={30} />
                 </>
               ) : (
                 'Exécuter la requête'

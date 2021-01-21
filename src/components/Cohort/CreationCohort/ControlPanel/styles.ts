@@ -4,7 +4,7 @@ const useStyles = makeStyles(() =>
   createStyles({
     rightPanelContainerStyle: {
       position: 'fixed',
-      width: 220,
+      width: 300,
       height: 'calc(100% - 72px)',
       bottom: '0px',
       right: '0px',
