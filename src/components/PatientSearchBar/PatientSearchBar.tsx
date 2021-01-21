@@ -69,6 +69,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   const onKeyDown = async (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     if (event.keyCode === 13) {
       event.preventDefault()
+      if (!_searchInput) return
       if (location.pathname === '/accueil') {
         history.push(`/rechercher_patient/${_searchInput}`)
       } else {
@@ -78,6 +79,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   }
 
   const onSearchPatient = async () => {
+    if (!_searchInput) return
     if (location.pathname === '/accueil') {
       history.push(`/rechercher_patient/${_searchInput}`)
     } else {

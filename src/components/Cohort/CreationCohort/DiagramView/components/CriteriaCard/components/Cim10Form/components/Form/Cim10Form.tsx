@@ -84,11 +84,12 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             },
             {
               name: 'code',
-              label: 'CIM 10 Diag Code',
+              label: 'Code CIM10',
               variant: 'outlined',
               type: 'autocomplete',
               autocompleteOptions: criteria?.data?.cim10Diagnostic || [],
-              getAutocompleteOptions: getDiagOptions
+              getAutocompleteOptions: getDiagOptions,
+              noOptionsText: 'Veuillez entrer un code ou un diagnostique CIM10'
             },
             {
               name: 'diagnosticType',
