@@ -135,7 +135,12 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
             onLoadSuccess={({ numPages }) => setNumPages(numPages)}
           >
             {Array.from(new Array(numPages), (el, index) => (
-              <Page key={`page_${index + 1}`} pageNumber={index + 1} loading={'Pages en cours de chargement...'} />
+              <Page
+                width={window.innerWidth * 0.9}
+                key={`page_${index + 1}`}
+                pageNumber={index + 1}
+                loading={'Pages en cours de chargement...'}
+              />
             ))}
           </Document>
         </DialogContent>
