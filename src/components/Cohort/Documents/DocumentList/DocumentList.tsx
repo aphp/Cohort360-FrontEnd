@@ -218,6 +218,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
                   >
                     {Array.from(new Array(numPages), (el, index) => (
                       <Page
+                        width={window.innerWidth * 0.9}
                         key={`page_${index + 1}`}
                         pageNumber={index + 1}
                         loading={'Pages en cours de chargement...'}
