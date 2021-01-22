@@ -34,6 +34,7 @@ import {
   IEncounter,
   IDocumentReference
 } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { fetchDocumentContent } from 'services/cohortInfos'
 import { getDocumentStatus, getEncounterStatus } from 'utils/documentsFormatter'
 
 import useStyles from './styles'
@@ -57,22 +58,23 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
   const history = useHistory()
   const classes = useStyles()
   const [pdfDialogOpen, setDocumentDialogOpen] = useState(false)
-  const [noPdfDialogOpen, setNoPdfDocumentDialogOpen] = useState(false)
   const [numPages, setNumPages] = useState<number>()
+  const [loading, setLoading] = useState(false)
+  const [documentContent, setDocumentContent] = useState<any>([])
 
-  const openPdfDialog = () => {
-    if (deidentified) {
-      setNoPdfDocumentDialogOpen(true)
-    } else {
-      setDocumentDialogOpen(true)
-    }
-  }
-
-  const handleClosePdfDialog = () => {
-    if (deidentified) {
-      setNoPdfDocumentDialogOpen(false)
-    } else {
-      setDocumentDialogOpen(false)
+  const openPdfDialog = (documentId?: string) => {
+    setDocumentDialogOpen(true)
+    if (deidentified && documentId) {
+      setLoading(true)
+      fetchDocumentContent(documentId)
+        .then((doc) => {
+          setLoading(false)
+          setDocumentContent(doc)
+        })
+        .catch(() => {
+          setLoading(false)
+          setDocumentContent(null)
+        })
     }
   }
 
@@ -177,41 +179,55 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
             </Grid>
           </Grid>
           <Grid container item xs={1} justify="center">
-            <IconButton onClick={openPdfDialog}>
+            <IconButton onClick={() => openPdfDialog(row.id)}>
               <PdfIcon height="30px" fill="#ED6D91" />
             </IconButton>
-            <Dialog open={noPdfDialogOpen} onClose={() => handleClosePdfDialog()}>
-              <DialogContent>Fonctionnalité désactivée en mode pseudonymisé.</DialogContent>
-              <DialogActions>
-                <Button onClick={() => handleClosePdfDialog()}>OK</Button>
-              </DialogActions>
-            </Dialog>
 
-            <Dialog open={pdfDialogOpen} onClose={() => handleClosePdfDialog()} maxWidth="md">
-              <DialogContent>
-                <Document
-                  error={'Le document est introuvable.'}
-                  loading={'PDF en cours de chargement...'}
-                  file={{
-                    url: `${FHIR_API_URL}/Binary/${row.id}`,
-                    httpHeaders: {
-                      Accept: 'application/pdf',
-                      Authorization: `Bearer ${localStorage.getItem('access')}`
-                    }
-                  }}
-                  onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                >
-                  {Array.from(new Array(numPages), (el, index) => (
-                    <Page
-                      key={`page_${index + 1}`}
-                      pageNumber={index + 1}
-                      loading={'Pages en cours de chargement...'}
-                    />
+            <Dialog open={pdfDialogOpen} onClose={() => setDocumentDialogOpen(false)} maxWidth="xl">
+              <DialogContent className={classes.dialogContent}>
+                {deidentified &&
+                  (loading ? (
+                    <CircularProgress className={classes.loadingDialog} />
+                  ) : (
+                    <>
+                      {documentContent &&
+                        documentContent.map((section: any) => (
+                          <>
+                            <Typography variant="h6">{section.title}</Typography>
+                            <Typography
+                              key={section.title}
+                              dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }}
+                            />
+                          </>
+                        ))}
+                      {!documentContent && <Typography>Le contenu du document est introuvable.</Typography>}
+                    </>
                   ))}
-                </Document>
+                {!deidentified && (
+                  <Document
+                    error={'Le document est introuvable.'}
+                    loading={'PDF en cours de chargement...'}
+                    file={{
+                      url: `${FHIR_API_URL}/Binary/${row.id}`,
+                      httpHeaders: {
+                        Accept: 'application/pdf',
+                        Authorization: `Bearer ${localStorage.getItem('access')}`
+                      }
+                    }}
+                    onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                  >
+                    {Array.from(new Array(numPages), (el, index) => (
+                      <Page
+                        key={`page_${index + 1}`}
+                        pageNumber={index + 1}
+                        loading={'Pages en cours de chargement...'}
+                      />
+                    ))}
+                  </Document>
+                )}
               </DialogContent>
               <DialogActions>
-                <Button onClick={() => handleClosePdfDialog()} color="primary">
+                <Button color="primary" onClick={() => setDocumentDialogOpen(false)}>
                   Fermer
                 </Button>
               </DialogActions>

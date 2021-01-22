@@ -38,6 +38,14 @@ const useStyles = makeStyles(() => ({
     position: 'absolute',
     top: '50%',
     right: '50%'
+  },
+  loadingDialog: {
+    position: 'absolute',
+    left: '50%'
+  },
+  dialogContent: {
+    minWidth: 650,
+    minHeight: 45
   }
 }))
 
