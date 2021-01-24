@@ -98,13 +98,10 @@ type PreviewProps = {
     perimeters?: string[]
   }
   loading?: boolean
-  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind> | 'loading' | undefined
-  visitTypeRepartitionData?: SimpleChartDataType[] | 'loading' | undefined
-  monthlyVisitData?: ComplexChartDataType<Month> | 'loading' | undefined
-  agePyramidData?:
-    | ComplexChartDataType<number, { male: number; female: number; other?: number }>
-    | 'loading'
-    | undefined
+  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
+  visitTypeRepartitionData?: SimpleChartDataType[]
+  monthlyVisitData?: ComplexChartDataType<Month>
+  agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
 }
 const Preview: React.FC<PreviewProps> = ({
   total,
@@ -112,21 +109,13 @@ const Preview: React.FC<PreviewProps> = ({
   genderRepartitionMap,
   visitTypeRepartitionData,
   monthlyVisitData,
-  agePyramidData
+  agePyramidData,
+  loading
 }) => {
   const classes = useStyles()
   const title = group.name
 
-  const genderRepartitionSimpleData =
-    genderRepartitionMap === 'loading' ? null : getGenderRepartitionSimpleData(genderRepartitionMap)
-
-  const vitalStatusData: SimpleChartDataType[] | 'loading' | undefined = genderRepartitionSimpleData
-    ? genderRepartitionSimpleData.vitalStatusData
-    : 'loading'
-
-  const genderData: SimpleChartDataType[] | 'loading' | undefined = genderRepartitionSimpleData
-    ? genderRepartitionSimpleData.genderData
-    : 'loading'
+  const { vitalStatusData, genderData } = getGenderRepartitionSimpleData(genderRepartitionMap)
 
   return (
     <Grid container direction="column" alignItems="center" className={classes.root}>
@@ -187,7 +176,7 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              {vitalStatusData === 'loading' || vitalStatusData === undefined ? (
+              {loading || !vitalStatusData ? (
                 <Grid className={classes.progressContainer}>
                   <CircularProgress />
                 </Grid>
@@ -205,7 +194,7 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              {visitTypeRepartitionData === 'loading' ? (
+              {loading ? (
                 <Grid className={classes.progressContainer}>
                   <CircularProgress />
                 </Grid>
@@ -223,7 +212,7 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              {genderData === 'loading' ? (
+              {loading ? (
                 <Grid className={classes.progressContainer}>
                   <CircularProgress />
                 </Grid>
@@ -241,7 +230,7 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              {agePyramidData === 'loading' ? (
+              {loading ? (
                 <Grid className={classes.progressContainer}>
                   <CircularProgress />
                 </Grid>
@@ -259,7 +248,7 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              {monthlyVisitData === 'loading' ? (
+              {loading ? (
                 <Grid className={classes.progressContainer}>
                   <CircularProgress />
                 </Grid>

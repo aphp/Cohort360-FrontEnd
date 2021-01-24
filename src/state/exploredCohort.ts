@@ -11,12 +11,15 @@ type ExploredCohortState = {
   importedPatients: any[]
   includedPatients: any[]
   excludedPatients: any[]
+  loading: boolean
+  requestId?: string
 } & CohortData
 
 const initialState: ExploredCohortState = {
   importedPatients: [],
   includedPatients: [],
-  excludedPatients: []
+  excludedPatients: [],
+  loading: false
 }
 
 const fetchExploredCohort = createAsyncThunk<
@@ -155,7 +158,12 @@ const exploredCohortSlice = createSlice({
     builder.addCase(logout, () => {
       return initialState
     })
-    builder.addCase(fetchExploredCohort.fulfilled, (state, { payload }) => {
+    builder.addCase(fetchExploredCohort.pending, (state, { meta }) => {
+      state.loading = true
+      state.requestId = meta.requestId
+    })
+    builder.addCase(fetchExploredCohort.fulfilled, (state, { payload, meta }) => {
+      state.loading = state.requestId !== meta.requestId
       return { ...state, ...payload }
     })
   }

@@ -214,10 +214,11 @@ const Dashboard: React.FC<{
           <CohortPreview
             total={dashboard.totalPatients}
             group={_displayGroupName()}
-            agePyramidData={dashboard.agePyramidData ?? 'loading'}
-            genderRepartitionMap={dashboard.genderRepartitionMap ?? 'loading'}
-            monthlyVisitData={dashboard.monthlyVisitData ?? 'loading'}
-            visitTypeRepartitionData={dashboard.visitTypeRepartitionData ?? 'loading'}
+            agePyramidData={dashboard.agePyramidData}
+            genderRepartitionMap={dashboard.genderRepartitionMap}
+            monthlyVisitData={dashboard.monthlyVisitData}
+            visitTypeRepartitionData={dashboard.visitTypeRepartitionData}
+            loading={dashboard.loading}
           />
         )}
         {selectedTab === 'patients' && (
