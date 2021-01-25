@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import clsx from 'clsx'
 
 import { Button, CircularProgress, Divider, Grid, Typography } from '@material-ui/core'
-import { Skeleton } from '@material-ui/lab'
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack'
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
@@ -38,7 +37,7 @@ const ControlPanel: React.FC<
               {executeLoading ? (
                 <>
                   Veuillez patienter
-                  <CircularProgress size={20} />
+                  <CircularProgress style={{ marginLeft: '15px' }} size={30} />
                 </>
               ) : (
                 'Exécuter la requête'
@@ -82,11 +81,7 @@ const ControlPanel: React.FC<
           <Grid container justify="space-between">
             <Typography className={clsx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS</Typography>
             <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
-              {includePatient === 'loading' ? (
-                <Skeleton variant="rect" width={50} height={19} />
-              ) : (
-                includePatient ?? '-'
-              )}
+              {includePatient === 'loading' ? <CircularProgress size={30} /> : includePatient ?? '-'}
             </Typography>
           </Grid>
           {/* <Grid container justify="space-between">

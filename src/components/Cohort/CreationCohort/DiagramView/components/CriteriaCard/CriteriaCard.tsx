@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import moment from 'moment'
 
-import { Button, Card, CardHeader, CardContent, IconButton, Typography } from '@material-ui/core'
+import { Button, Card, CardHeader, CardContent, IconButton, Typography, CircularProgress } from '@material-ui/core'
 
 import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
@@ -376,7 +376,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
           variant="contained"
           color="primary"
         >
-          <AddIcon />
+          {actionLoading ? <CircularProgress className={classes.loading} /> : <AddIcon />}
         </Button>
       </div>
 

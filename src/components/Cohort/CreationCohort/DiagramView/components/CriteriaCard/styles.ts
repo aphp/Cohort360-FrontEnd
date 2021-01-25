@@ -52,6 +52,16 @@ const useStyles = makeStyles(() => ({
     minHeight: 42,
     maxHeight: 42,
     borderRadius: 42
+  },
+  loading: {
+    background: 'white',
+    width: 42,
+    height: 42,
+    minWidth: 42,
+    maxWidth: 42,
+    minHeight: 42,
+    maxHeight: 42,
+    borderRadius: 42
   }
 }))
 
