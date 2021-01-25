@@ -186,6 +186,7 @@ const Dashboard: React.FC<{
         access={deidentifiedBoolean === null ? '-' : deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
         openRedcapDialog={handleOpenRedcapDialog}
         fav
+        loading={dashboard.loading}
       />
 
       <Grid container justify="center" className={classes.tabs}>

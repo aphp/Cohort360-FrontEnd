@@ -27,15 +27,17 @@ import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import displayDigit from 'utils/displayDigit'
 
 import { ComplexChartDataType, SimpleChartDataType, Month } from 'types'
+import { Skeleton } from '@material-ui/lab'
 
 type RepartitionTableProps = {
-  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind> | 'loading'
+  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
+  loading?: boolean
 }
 
-const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMap }) => {
+const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMap, loading }) => {
   const classes = useStyles()
   let femaleAlive, maleAlive, femaleDeceased, maleDeceased
-  if (genderRepartitionMap === 'loading') {
+  if (loading) {
     return (
       <Paper className={classes.repartitionTable}>
         <Grid className={classes.progressContainer}>
@@ -125,16 +127,22 @@ const Preview: React.FC<PreviewProps> = ({
         <Grid container item alignItems="center" md={11}>
           <Grid container item direction="column">
             <Typography variant="h2" color="primary">
-              {title}
+              {loading ? <Skeleton width={200} height={40} /> : title}
             </Typography>
 
             {group.perimeters && (
               <ul className={classes.perimetersChipsDiv}>
-                {group.perimeters.map((perimeter) => (
-                  <li key={perimeter} className={classes.item}>
-                    <Chip className={classes.perimetersChip} label={perimeter} />
+                {loading ? (
+                  <li>
+                    <Skeleton width={100} />
                   </li>
-                ))}
+                ) : (
+                  group.perimeters.map((perimeter) => (
+                    <li key={perimeter} className={classes.item}>
+                      <Chip className={classes.perimetersChip} label={perimeter} />
+                    </li>
+                  ))
+                )}
               </ul>
             )}
           </Grid>
@@ -151,7 +159,7 @@ const Preview: React.FC<PreviewProps> = ({
                 </Typography>
               </Grid>
 
-              {total === undefined ? (
+              {loading || !total ? (
                 <Grid className={classes.progressContainer}>
                   <CircularProgress />
                 </Grid>
@@ -163,7 +171,7 @@ const Preview: React.FC<PreviewProps> = ({
             </Paper>
           </Grid>
           <Grid item xs={12} sm={6} md={8}>
-            <RepartitionTable genderRepartitionMap={genderRepartitionMap} />
+            <RepartitionTable genderRepartitionMap={genderRepartitionMap} loading={loading} />
           </Grid>
         </Grid>
 

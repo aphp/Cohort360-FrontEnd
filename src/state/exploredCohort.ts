@@ -50,9 +50,10 @@ const fetchExploredCohort = createAsyncThunk<
         statePerimeterIds.some((id) => !perimeterIds.includes(id))
       break
     }
-    case 'patients':
-      // TODO: Determine conditions to refresh all patients
+    case 'patients': {
+      shouldRefreshData = stateCohort !== undefined && state.exploredCohort.originalPatients !== undefined
       break
+    }
 
     default:
       break
