@@ -163,8 +163,7 @@ const exploredCohortSlice = createSlice({
       state.requestId = meta.requestId
     })
     builder.addCase(fetchExploredCohort.fulfilled, (state, { payload, meta }) => {
-      state.loading = state.requestId !== meta.requestId
-      return { ...state, ...payload }
+      return { ...state, ...payload, loading: state.requestId !== meta.requestId }
     })
   }
 })
