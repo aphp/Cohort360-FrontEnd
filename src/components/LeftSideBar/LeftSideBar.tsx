@@ -4,12 +4,12 @@ import { useHistory } from 'react-router-dom'
 import clsx from 'clsx'
 
 import {
-  // Button,
+  Button,
   Collapse,
   Divider,
   Drawer,
   Grid,
-  // Icon,
+  Icon,
   IconButton,
   Link,
   List,
@@ -160,7 +160,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
           </List>
           <Divider />
           <List>
-            {/* <ListItem>
+            <ListItem>
               <ListItemIcon
                 className={clsx(classes.button, {
                   [classes.hide]: open
@@ -181,7 +181,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
               >
                 <Typography variant="h5">Nouvelle Cohorte</Typography>
               </Button>
-            </ListItem> */}
+            </ListItem>
             <Link href="/accueil" underline="none">
               <ListItem button>
                 <ListItemIcon className={classes.listIcon}>

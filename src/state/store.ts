@@ -5,6 +5,7 @@ import { createLogger } from 'redux-logger'
 import storage from 'redux-persist/lib/storage' // defaults to localStorage for web
 
 import cohortCreation from './cohortCreation'
+import criteria from './criteria'
 import exploredCohort from './exploredCohort'
 import me from './me'
 import drawer from './drawer'
@@ -39,12 +40,18 @@ const MapTransform = createTransform(
 const persistConfig = {
   key: 'root',
   storage,
+  // blacklist: ['criteria'],
   transforms: [MapTransform]
 }
 
+const cohortCreationReducer = combineReducers({
+  criteria,
+  request: cohortCreation
+})
+
 const rootReducer = combineReducers({
   me,
-  cohortCreation,
+  cohortCreation: cohortCreationReducer,
   exploredCohort,
   drawer
 })

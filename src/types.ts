@@ -316,3 +316,9 @@ export type CohortCreationCounterType = {
   female?: number | 'loading'
   male?: number | 'loading'
 }
+
+export type CohortCreationSnapshotType = {
+  uuid: string
+  json: string
+  date: string
+}

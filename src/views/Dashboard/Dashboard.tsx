@@ -61,7 +61,9 @@ const Dashboard: React.FC<{
   }
 
   useEffect(() => {
-    dispatch(fetchDashboardInfo({ context, cohortId }))
+    if (context !== 'new_cohort') {
+      dispatch(fetchDashboardInfo({ context, cohortId: cohortId || perimetreIds }))
+    }
 
     switch (context) {
       case 'patients':

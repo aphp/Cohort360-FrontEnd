@@ -6,16 +6,18 @@ import EditIcon from '@material-ui/icons/Edit'
 
 import PopulationRightPanel from './components/PopulationRightPanel'
 
+import { useAppSelector } from 'state'
+
 import { ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
 
 type PopulationCardProps = {
-  selectedPopulation: ScopeTreeRow[] | null
   onChangeSelectedPopulation: (selectedPopulation: ScopeTreeRow[] | null) => void
 }
 const PopulationCard: React.FC<PopulationCardProps> = (props) => {
-  const { selectedPopulation, onChangeSelectedPopulation } = props
+  const { selectedPopulation = [] } = useAppSelector((state) => state.cohortCreation.request || {})
+  const { onChangeSelectedPopulation } = props
 
   const classes = useStyles()
 
@@ -75,12 +77,7 @@ const PopulationCard: React.FC<PopulationCardProps> = (props) => {
         </CardContent>
       </Card>
 
-      <PopulationRightPanel
-        open={openDrawer}
-        onConfirm={submitPopulation}
-        onClose={() => onChangeOpenDrawer(false)}
-        selectedPopulation={selectedPopulation}
-      />
+      <PopulationRightPanel open={openDrawer} onConfirm={submitPopulation} onClose={() => onChangeOpenDrawer(false)} />
     </>
   )
 }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
 import { Button, CircularProgress, Divider, Grid, Typography } from '@material-ui/core'
@@ -10,20 +11,23 @@ import UpdateSharpIcon from '@material-ui/icons/UpdateSharp'
 
 import ModalCohortTitle from './components/ModalCohortTitle/ModalCohortTitle'
 
+import { useAppSelector } from 'state'
+import { resetCohortCreation } from 'state/cohortCreation'
+
 import useStyle from './styles'
 
-import { CohortCreationCounterType } from 'types'
-
-const ControlPanel: React.FC<
-  {
-    executeLoading?: boolean
-    onExecute?: (cohortName: string, cohortDescription: string) => void
-    onUndo?: () => void
-    onRedo?: () => void
-  } & CohortCreationCounterType
-> = ({ includePatient, byrequest, alive, deceased, female, male, executeLoading, onExecute, onUndo, onRedo }) => {
+const ControlPanel: React.FC<{
+  onExecute?: (cohortName: string, cohortDescription: string) => void
+  onUndo?: () => void
+  onRedo?: () => void
+}> = ({ onExecute, onUndo, onRedo }) => {
   const classes = useStyle()
+  const dispatch = useDispatch()
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
+
+  const {
+    count: { loading = false, includePatient /*, byrequest, alive, deceased, female, male*/ }
+  } = useAppSelector((state) => state.cohortCreation.request || {})
 
   return (
     <>
@@ -31,11 +35,11 @@ const ControlPanel: React.FC<
         <Grid>
           <Grid container justify="center" className={classes.requestAction}>
             <Button
-              disabled={executeLoading || !onExecute}
+              disabled={typeof onExecute !== 'function'}
               onClick={() => onSetOpenModal('executeCohortConfirmation')}
               className={classes.requestExecution}
             >
-              {executeLoading ? (
+              {loading ? (
                 <>
                   Veuillez patienter
                   <CircularProgress size={20} />
@@ -71,6 +75,7 @@ const ControlPanel: React.FC<
           <Divider />
 
           <Button
+            onClick={() => dispatch(resetCohortCreation())}
             className={classes.actionButton}
             startIcon={<UpdateSharpIcon color="action" className={classes.iconBorder} />}
           >
