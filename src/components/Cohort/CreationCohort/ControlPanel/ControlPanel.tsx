@@ -25,7 +25,8 @@ const ControlPanel: React.FC<{
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
 
   const {
-    count: { loading = false, includePatient /*, byrequest, alive, deceased, female, male*/ }
+    loading = false,
+    count: { includePatient /*, byrequest, alive, deceased, female, male*/ }
   } = useAppSelector((state) => state.cohortCreation.request || {})
 
   return (
@@ -86,37 +87,37 @@ const ControlPanel: React.FC<{
           <Grid container justify="space-between">
             <Typography className={clsx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS</Typography>
             <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
-              {includePatient === 'loading' ? <CircularProgress size={30} /> : includePatient ?? '-'}
+              {loading ? <CircularProgress size={30} /> : includePatient ?? '-'}
             </Typography>
           </Grid>
           {/* <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Par requête</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {byrequest === 'loading' ? <Skeleton variant="rect" width={50} height={19} /> : byrequest ?? '-'}
+              {loading ? <Skeleton variant="rect" width={50} height={19} /> : byrequest ?? '-'}
             </Typography>
           </Grid> */}
           {/* <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Patients vivants</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {alive === 'loading' ? <Skeleton variant="rect" width={50} height={19} /> : alive ?? '-'}
+              {loading ? <Skeleton variant="rect" width={50} height={19} /> : alive ?? '-'}
             </Typography>
           </Grid> */}
           {/* <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Patients décédés</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {deceased === 'loading' ? <Skeleton variant="rect" width={50} height={19} /> : deceased ?? '-'}
+              {loading ? <Skeleton variant="rect" width={50} height={19} /> : deceased ?? '-'}
             </Typography>
           </Grid> */}
           {/* <Grid container justify="space-between">
             <Typography className={clsx(classes.sidesMargin)}>Nombre de femmes</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {female === 'loading' ? <Skeleton variant="rect" width={50} height={19} /> : female ?? '-'}
+              {loading ? <Skeleton variant="rect" width={50} height={19} /> : female ?? '-'}
             </Typography> */}
           {/* </Grid>
           <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Nombre d'hommes</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {male === 'loading' ? <Skeleton variant="rect" width={50} height={19} /> : male ?? '-'}
+              {loading ? <Skeleton variant="rect" width={50} height={19} /> : male ?? '-'}
             </Typography>
           </Grid> */}
         </Grid>

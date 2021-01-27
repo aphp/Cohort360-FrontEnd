@@ -379,7 +379,7 @@ const CriteriaCard: React.FC = () => {
           variant="contained"
           color="primary"
         >
-          {actionLoading ? <CircularProgress className={classes.loading} /> : <AddIcon />}
+          {loading ? <CircularProgress className={classes.loading} /> : <AddIcon />}
         </Button>
       </div>
 
