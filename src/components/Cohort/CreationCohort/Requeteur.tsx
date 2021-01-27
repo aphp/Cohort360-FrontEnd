@@ -9,8 +9,8 @@ import JsonView from './JsonView/JsonView'
 
 import { useAppSelector } from 'state'
 import { setCriteriaList } from 'state/criteria'
-import { buildCreationCohort, unbuildCreationCohort, resetCohortCreation } from 'state/cohortCreation'
-import { ScopeTreeRow, SelectedCriteriaType, CohortCreationSnapshotType } from 'types'
+import { unbuildCreationCohort, resetCohortCreation } from 'state/cohortCreation'
+import { CohortCreationSnapshotType } from 'types'
 
 import constructCriteriaList from './DataList_Criteria'
 
@@ -26,7 +26,6 @@ const Requeteur = () => {
     currentSnapshot = '',
     snapshotsHistory = [],
     count = {},
-    selectedPopulation = [],
     selectedCriteria = [],
     json = ''
   } = useAppSelector((state) => state.cohortCreation.request || {})
@@ -50,13 +49,6 @@ const Requeteur = () => {
     dispatch(setCriteriaList(_criteria))
     setLoading(false)
   }, [dispatch, practitioner, selectedCriteria])
-
-  const _buildRequest = async (
-    _selectedPopulation: ScopeTreeRow[] | null,
-    _selectedCriteria: SelectedCriteriaType[]
-  ) => {
-    dispatch(buildCreationCohort({ selectedPopulation: _selectedPopulation, selectedCriteria: _selectedCriteria }))
-  }
 
   const _unbuildRequest = async (newCurrentSnapshot: CohortCreationSnapshotType) => {
     dispatch(unbuildCreationCohort({ newCurrentSnapshot }))
@@ -165,18 +157,7 @@ const Requeteur = () => {
       </div>
 
       {/* Display View (Diagramme + JSON) */}
-      {seletedTab === 'diagramme' ? (
-        <DiagramView
-          onChangeSelectedPopulation={(_selectedPopulation: ScopeTreeRow[] | null) => {
-            _buildRequest(_selectedPopulation, _selectedPopulation ? selectedCriteria || [] : [])
-          }}
-          onChangeSelectedCriteria={async (_selectedCriteria: SelectedCriteriaType[]) => {
-            _buildRequest(selectedPopulation, _selectedCriteria)
-          }}
-        />
-      ) : (
-        <JsonView defaultJson={json} onChangeJson={() => null} />
-      )}
+      {seletedTab === 'diagramme' ? <DiagramView /> : <JsonView defaultJson={json} onChangeJson={() => null} />}
 
       {/* Main Pannel */}
       <ControlPanel

@@ -95,12 +95,15 @@ const _onSaveNewJson = async (cohortCreation: CohortCreationState, newJson: stri
 
 const buildCreationCohort = createAsyncThunk<
   CohortCreationState,
-  { selectedPopulation: ScopeTreeRow[] | null; selectedCriteria: SelectedCriteriaType[] },
+  { selectedPopulation?: ScopeTreeRow[] | null; selectedCriteria?: SelectedCriteriaType[] },
   { state: RootState }
 >('cohortCreation/build', async ({ selectedPopulation, selectedCriteria }, { getState }) => {
   const state = getState()
 
-  const json = await buildRequest(selectedPopulation, selectedCriteria)
+  const _selectedPopulation = selectedPopulation ? selectedPopulation : state.cohortCreation.request.selectedPopulation
+  const _selectedCriteria = selectedCriteria ? selectedCriteria : state.cohortCreation.request.selectedCriteria
+
+  const json = await buildRequest(_selectedPopulation, _selectedCriteria)
   const { requestId, snapshotsHistory, currentSnapshot, count } = await _onSaveNewJson(
     state.cohortCreation.request,
     json
@@ -113,8 +116,8 @@ const buildCreationCohort = createAsyncThunk<
     currentSnapshot,
     json,
     count,
-    selectedPopulation,
-    selectedCriteria
+    selectedPopulation: _selectedPopulation,
+    selectedCriteria: _selectedCriteria
   }
 })
 

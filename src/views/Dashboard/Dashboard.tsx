@@ -15,7 +15,7 @@ import CohortDocuments from '../../components/Cohort/Documents/Documents'
 import TopBar from '../../components/TopBar/TopBar'
 import CohortCreation from '../../views/CohortCreation/CohortCreation'
 
-import { fetchExploredCohort } from '../../state/exploredCohort'
+import { fetchExploredCohort } from 'state/exploredCohort'
 
 import useStyles from './styles'
 
@@ -107,7 +107,7 @@ const Dashboard: React.FC<{
       default:
         break
     }
-  }, [context, cohortId])
+  }, [context, cohortId]) // eslint-disable-line
 
   useEffect(() => {
     checkDeindentifiedStatus(dashboard)

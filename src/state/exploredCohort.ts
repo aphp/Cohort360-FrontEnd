@@ -133,4 +133,5 @@ const exploredCohortSlice = createSlice({
 })
 
 export default exploredCohortSlice.reducer
+export { fetchExploredCohort }
 export const { setExploredCohort, updateCohort } = exploredCohortSlice.actions
