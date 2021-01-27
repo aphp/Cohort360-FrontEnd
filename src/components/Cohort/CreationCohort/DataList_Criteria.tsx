@@ -85,7 +85,12 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Diagnostics',
         color: '#0063AF',
         components: Cim10Form,
-        data: { statusDiagnostic: 'loading', diagnosticTypes: 'loading', cim10Diagnostic: 'loading' },
+        data: {
+          statusDiagnostic: 'loading',
+          diagnosticTypes: 'loading',
+          cim10Diagnostic: 'loading',
+          cim10Hierarchy: 'loading'
+        },
         fetch: { fetchStatusDiagnostic, fetchDiagnosticTypes, fetchCim10Diagnostic, fetchCim10Hierarchy }
       },
       {
@@ -93,7 +98,7 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Actes',
         color: '#0063AF',
         components: CCAMForm,
-        data: { ccamData: 'loading' },
+        data: { ccamData: 'loading', ccamHierarchy: 'loading' },
         fetch: { fetchCcamData, fetchCcamHierarchy }
       },
       {
@@ -101,7 +106,7 @@ const criteriaList: CriteriaItemType[] = [
         title: 'GHM',
         color: '#0063AF',
         components: GhmForm,
-        data: { ghmData: 'loading' },
+        data: { ghmData: 'loading', ghmHierarchy: 'loading' },
         fetch: { fetchGhmData, fetchGhmHierarchy }
       }
     ]

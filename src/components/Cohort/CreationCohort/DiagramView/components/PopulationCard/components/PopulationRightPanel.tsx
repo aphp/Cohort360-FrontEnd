@@ -7,20 +7,22 @@ import Typography from '@material-ui/core/Typography'
 import ScopeTree from '../../../../../../ScopeTree/ScopeTree'
 import { ScopeTreeRow } from 'types'
 
+import { useAppSelector } from 'state'
+
 import useStyles from './styles'
 
 type PopulationRightPanelProps = {
   open: boolean
   onConfirm: (selectedPopulation: ScopeTreeRow[] | null) => void
   onClose: () => void
-  selectedPopulation: ScopeTreeRow[] | null
 }
 
 const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
-  const { open, onConfirm, onClose, selectedPopulation } = props
+  const { open, onConfirm, onClose } = props
 
   const classes = useStyles()
 
+  const { selectedPopulation = [] } = useAppSelector((state) => state.cohortCreation.request || {})
   const [_selectedPopulation, onChangeSelectedPopulation] = useState<ScopeTreeRow[]>([])
 
   useEffect(() => {

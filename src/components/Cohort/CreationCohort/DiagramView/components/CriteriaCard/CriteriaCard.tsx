@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, Fragment } from 'react'
 import moment from 'moment'
+import { useDispatch } from 'react-redux'
 
 import { Button, Card, CardHeader, CardContent, IconButton, Typography, CircularProgress } from '@material-ui/core'
 
@@ -9,20 +10,22 @@ import EditIcon from '@material-ui/icons/Edit'
 
 import CriteriaRightPanel from './components/CriteriaRightPanel'
 
-import { CriteriaItemType, SelectedCriteriaType } from 'types'
+import { useAppSelector } from 'state'
+import { buildCreationCohort } from 'state/cohortCreation'
+import { SelectedCriteriaType } from 'types'
+
 import useStyles from './styles'
 
-type CriteriaCardProps = {
-  actionLoading: boolean
-  criteria: CriteriaItemType[]
-  selectedCriteria: SelectedCriteriaType[]
-  onChangeSelectedCriteria: (item: SelectedCriteriaType[]) => void
-}
-
-const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
-  const { actionLoading, criteria, selectedCriteria, onChangeSelectedCriteria } = props
-
+const CriteriaCard: React.FC = () => {
   const classes = useStyles()
+  const dispatch = useDispatch()
+
+  const criteria = useAppSelector((state) => state.cohortCreation.criteria)
+  const { loading = false, selectedCriteria = [] } = useAppSelector<{
+    loading: boolean
+    selectedCriteria: SelectedCriteriaType[]
+  }>((state) => state.cohortCreation.request || {})
+
   const [indexCriteria, onChangeIndexCriteria] = useState<number | null>(null)
   const [openCriteriaDrawer, onChangeOpenCriteriaDrawer] = useState<boolean>(false)
 
@@ -39,7 +42,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
   const _deleteSelectedCriteria = (index: number) => {
     const savedSelectedCriteria = [...selectedCriteria]
     savedSelectedCriteria.splice(index, 1)
-    onChangeSelectedCriteria(savedSelectedCriteria)
+    dispatch(buildCreationCohort({ selectedCriteria: savedSelectedCriteria }))
   }
 
   const _onChangeSelectedCriteria = (newSelectedCriteria: SelectedCriteriaType) => {
@@ -49,7 +52,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
     } else {
       savedSelectedCriteria = [...savedSelectedCriteria, newSelectedCriteria]
     }
-    onChangeSelectedCriteria(savedSelectedCriteria)
+    dispatch(buildCreationCohort({ selectedCriteria: savedSelectedCriteria }))
   }
 
   const _displayCardContent = (_selectedCriteria: SelectedCriteriaType) => {
@@ -326,10 +329,10 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
       {selectedCriteria &&
         selectedCriteria.length > 0 &&
         selectedCriteria.map((_selectedCriteria, index) => (
-          <>
+          <Fragment key={`C${index}`}>
             {/* <div className={classes.root}>
               <Button
-                disabled={actionLoading}
+                disabled={loading}
                 className={classes.addButton}
                 onClick={_addSelectedCriteria}
                 variant="contained"
@@ -338,7 +341,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 <AddIcon />
               </Button>
             </div> */}
-            <div className={classes.root} key={`C${index}`}>
+            <div className={classes.root}>
               <Card className={classes.card}>
                 <CardHeader
                   className={classes.cardHeader}
@@ -365,12 +368,12 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 <CardContent className={classes.cardContent}>{_displayCardContent(_selectedCriteria)}</CardContent>
               </Card>
             </div>
-          </>
+          </Fragment>
         ))}
 
       <div className={classes.root}>
         <Button
-          disabled={actionLoading}
+          disabled={loading}
           className={classes.addButton}
           onClick={_addSelectedCriteria}
           variant="contained"
