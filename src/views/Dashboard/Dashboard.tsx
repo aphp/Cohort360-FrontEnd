@@ -15,7 +15,7 @@ import CohortDocuments from '../../components/Cohort/Documents/Documents'
 import TopBar from '../../components/TopBar/TopBar'
 import CohortCreation from '../../views/CohortCreation/CohortCreation'
 
-import { fetchDashboardInfo } from '../../state/exploredCohort'
+import { fetchExploredCohort } from '../../state/exploredCohort'
 
 import useStyles from './styles'
 
@@ -61,8 +61,10 @@ const Dashboard: React.FC<{
   }
 
   useEffect(() => {
+    const id = context === 'cohort' ? cohortId : context === 'perimeters' ? perimetreIds : undefined
+
     if (context !== 'new_cohort') {
-      dispatch(fetchDashboardInfo({ context, cohortId: cohortId || perimetreIds }))
+      dispatch(fetchExploredCohort({ context, id }))
     }
 
     switch (context) {
@@ -105,7 +107,11 @@ const Dashboard: React.FC<{
       default:
         break
     }
-  }, [context, cohortId]) //eslint-disable-line
+  }, [context, cohortId])
+
+  useEffect(() => {
+    checkDeindentifiedStatus(dashboard)
+  }, [dashboard])
 
   const handleOpenRedcapDialog = () => {
     setOpenRedcapDialog(true)
@@ -182,6 +188,7 @@ const Dashboard: React.FC<{
         access={deidentifiedBoolean === null ? '-' : deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
         openRedcapDialog={handleOpenRedcapDialog}
         fav
+        loading={dashboard.loading}
       />
 
       <Grid container justify="center" className={classes.tabs}>
@@ -210,10 +217,11 @@ const Dashboard: React.FC<{
           <CohortPreview
             total={dashboard.totalPatients}
             group={_displayGroupName()}
-            agePyramidData={dashboard.agePyramidData ?? 'loading'}
-            genderRepartitionMap={dashboard.genderRepartitionMap ?? 'loading'}
-            monthlyVisitData={dashboard.monthlyVisitData ?? 'loading'}
-            visitTypeRepartitionData={dashboard.visitTypeRepartitionData ?? 'loading'}
+            agePyramidData={dashboard.agePyramidData}
+            genderRepartitionMap={dashboard.genderRepartitionMap}
+            monthlyVisitData={dashboard.monthlyVisitData}
+            visitTypeRepartitionData={dashboard.visitTypeRepartitionData}
+            loading={dashboard.loading}
           />
         )}
         {selectedTab === 'patients' && (

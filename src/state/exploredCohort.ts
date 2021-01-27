@@ -3,15 +3,16 @@ import { CohortData } from 'types'
 import { IGroup_Member } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { logout } from './me'
-
-import { fetchCohort } from '../services/cohortInfos'
-import { fetchMyPatients } from '../services/myPatients'
-import { fetchPerimetersInfos } from '../services/perimeters'
+import { fetchCohort } from 'services/cohortInfos'
+import { fetchMyPatients } from 'services/myPatients'
+import { fetchPerimetersInfos } from 'services/perimeters'
 
 type ExploredCohortState = {
-  importedPatients?: any[]
-  includedPatients?: any[]
-  excludedPatients?: any[]
+  importedPatients: any[]
+  includedPatients: any[]
+  excludedPatients: any[]
+  loading: boolean
+  requestId?: string
 } & CohortData
 
 const initialState: ExploredCohortState & CohortData = {
@@ -32,51 +33,71 @@ const initialState: ExploredCohortState & CohortData = {
   // ExploredCohortState
   importedPatients: [],
   includedPatients: [],
-  excludedPatients: []
+  excludedPatients: [],
+  loading: false
 }
 
-const _fetchCohort = async (cohortId: string) => {
-  return (await fetchCohort(cohortId)) ?? initialState
-}
-
-const _fetchMyPatients = async () => {
-  return (await fetchMyPatients()) ?? initialState
-}
-
-const _fetchPerimeters = async (perimetreIds: string) => {
-  return (await fetchPerimetersInfos(perimetreIds)) ?? initialState
-}
-
-export const fetchDashboardInfo = createAsyncThunk<
+const fetchExploredCohort = createAsyncThunk<
   CohortData,
-  { context: string; cohortId?: string },
+  { context: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'; id?: string },
   { state: RootState }
->('cohort/fetchInfo', async (dashboardInfo, thunkAPI) => {
-  const { context, cohortId } = dashboardInfo
-
-  const prevState = thunkAPI.getState()
-  const prevExploredCohort = prevState.exploredCohort
-  if (prevExploredCohort?.cohort?.id === cohortId) return prevExploredCohort
-
-  let cohortInfo = initialState
+>('exploredCohort/fetchExploredCohort', async ({ context, id }, { getState }) => {
+  const state = getState()
+  const stateCohort = state.exploredCohort.cohort
+  let shouldRefreshData = true
   switch (context) {
-    case 'patients':
-      cohortInfo = await _fetchMyPatients()
-      break
     case 'cohort':
-      if (!cohortId) return initialState
-
-      cohortInfo = await _fetchCohort(cohortId)
+      shouldRefreshData = !stateCohort || Array.isArray(stateCohort) || stateCohort.id !== id
       break
-    case 'perimeters':
-      if (!cohortId) return initialState
+    case 'perimeters': {
+      if (!id) {
+        throw new Error('No given perimeter ids')
+      }
+      const perimeterIds = id.split(',')
+      const statePerimeterIds =
+        stateCohort &&
+        Array.isArray(stateCohort) &&
+        (stateCohort.map((group) => group.id).filter((id) => id !== undefined) as string[])
 
-      cohortInfo = await _fetchPerimeters(cohortId)
+      shouldRefreshData =
+        !statePerimeterIds ||
+        statePerimeterIds.length !== perimeterIds.length ||
+        statePerimeterIds.some((id: any) => !perimeterIds.includes(id))
       break
+    }
+    case 'patients': {
+      shouldRefreshData = stateCohort !== undefined && state.exploredCohort.originalPatients !== undefined
+      break
+    }
+
     default:
       break
   }
-  return cohortInfo
+  let cohort
+  if (shouldRefreshData) {
+    switch (context) {
+      case 'cohort': {
+        if (id) {
+          cohort = await fetchCohort(id)
+        }
+        break
+      }
+      case 'patients': {
+        cohort = await fetchMyPatients()
+        break
+      }
+      case 'perimeters': {
+        if (id) {
+          cohort = await fetchPerimetersInfos(id)
+        }
+        break
+      }
+
+      default:
+        break
+    }
+  }
+  return cohort ?? initialState
 })
 
 const exploredCohortSlice = createSlice({
@@ -101,18 +122,12 @@ const exploredCohortSlice = createSlice({
     builder.addCase(logout, () => {
       return initialState
     })
-    // builder.addCase(fetchDashboardInfo.pending, (state, action) => {
-    //   return {
-    //     ...state,
-    //     agePyramidData: undefined,
-    //     genderRepartitionMap: undefined,
-    //     monthlyVisitData: undefined,
-    //     visitTypeRepartitionData: undefined,
-    //     originalPatients: undefined
-    //   }
-    // })
-    builder.addCase(fetchDashboardInfo.fulfilled, (state, action) => {
-      return action.payload
+    builder.addCase(fetchExploredCohort.pending, (state, { meta }) => {
+      state.loading = true
+      state.requestId = meta.requestId
+    })
+    builder.addCase(fetchExploredCohort.fulfilled, (state, { payload, meta }) => {
+      return { ...state, ...payload, loading: state.requestId !== meta.requestId }
     })
   }
 })
