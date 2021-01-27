@@ -7,7 +7,7 @@ import { Grid, Tabs, Tab } from '@material-ui/core'
 import { IExtension } from '@ahryman40k/ts-fhir-types/lib/R4'
 import Alert from '@material-ui/lab/Alert'
 
-// import InclusionExclusionPatientsPanel from '../../components/Cohort/InclusionExclusionPatients/InclusionExclusionPatients'
+import InclusionExclusionPatientsPanel from '../../components/Cohort/InclusionExclusionPatients/InclusionExclusionPatients'
 import RedcapExport from '../../components/RedcapExport/RedcapExport'
 import CohortPreview from '../../components/Cohort/Preview/Preview'
 import PatientList from '../../components/Cohort/PatientList/PatientList'
@@ -15,7 +15,7 @@ import CohortDocuments from '../../components/Cohort/Documents/Documents'
 import TopBar from '../../components/TopBar/TopBar'
 import CohortCreation from '../../views/CohortCreation/CohortCreation'
 
-import { fetchExploredCohort } from 'state/exploredCohort'
+import { fetchExploredCohort } from '../../state/exploredCohort'
 
 import useStyles from './styles'
 
@@ -156,7 +156,7 @@ const Dashboard: React.FC<{
     return <CohortCreation />
   }
 
-  if (dashboard.totalPatients === 0) {
+  if (dashboard.loading === false && dashboard.totalPatients === 0) {
     return (
       <Alert severity="error" className={classes.alert}>
         Les données ne sont pas encore disponibles, veuillez réessayer ultérieurement.
@@ -206,6 +206,7 @@ const Dashboard: React.FC<{
                       value={tab.value}
                       component={Link}
                       to={tab.to}
+                      key={tab.value}
                     />
                   )
               )}
@@ -242,7 +243,7 @@ const Dashboard: React.FC<{
             sortDirection={'desc'}
           />
         )}
-        {/* {CONTEXT === 'arkhn' && selectedTab === 'inclusion-exclusion' && <InclusionExclusionPatientsPanel />} */}
+        {CONTEXT === 'arkhn' && selectedTab === 'inclusion-exclusion' && <InclusionExclusionPatientsPanel />}
       </div>
     </Grid>
   )
