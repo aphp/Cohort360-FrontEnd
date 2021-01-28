@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { Button, Card, CardHeader, CardContent, IconButton, Typography } from '@material-ui/core'
+import { Button, Card, CardHeader, CardContent, CircularProgress, IconButton, Typography } from '@material-ui/core'
 
 import EditIcon from '@material-ui/icons/Edit'
 
@@ -15,7 +15,7 @@ import { ScopeTreeRow } from 'types'
 import useStyles from './styles'
 
 const PopulationCard: React.FC = () => {
-  const { selectedPopulation = [] } = useAppSelector((state) => state.cohortCreation.request || {})
+  const { selectedPopulation = [], loading = false } = useAppSelector((state) => state.cohortCreation.request || {})
 
   const classes = useStyles()
   const dispatch = useDispatch()
@@ -42,7 +42,9 @@ const PopulationCard: React.FC = () => {
           title="Population source"
         />
         <CardContent className={classes.cardContent}>
-          {selectedPopulation !== null ? (
+          {selectedPopulation === null && loading === true ? (
+            <CircularProgress />
+          ) : selectedPopulation !== null ? (
             <>
               <Typography align="center">Patients ayant été pris en charge à :</Typography>
               {selectedPopulation &&
@@ -68,7 +70,7 @@ const PopulationCard: React.FC = () => {
                   color="primary"
                   className={classes.actionButton}
                 >
-                  Structure hospitalière
+                  <Typography variant="h5">Structure hospitalière</Typography>
                 </Button>
               </div>
             </>
