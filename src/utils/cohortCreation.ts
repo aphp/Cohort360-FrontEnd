@@ -584,15 +584,23 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
 
             if (currentSelectedCriteria) {
               for (const currentSelectedCriterion of currentSelectedCriteria) {
-                const allreadyHere = _criterion.data[dataKey]
-                  ? _criterion.data[dataKey].find((data: any) => data.id === currentSelectedCriterion.code?.id)
-                  : undefined
+                if (
+                  currentSelectedCriterion &&
+                  currentSelectedCriterion.code &&
+                  currentSelectedCriterion.code.length > 0
+                ) {
+                  for (const code of currentSelectedCriterion.code) {
+                    const allreadyHere = _criterion.data[dataKey]
+                      ? _criterion.data[dataKey].find((data: any) => data.id === code?.id)
+                      : undefined
 
-                if (!allreadyHere) {
-                  _criterion.data[dataKey] = [
-                    ..._criterion.data[dataKey],
-                    ...(await _criterion.fetch[fetchKey](currentSelectedCriterion.code?.id))
-                  ]
+                    if (!allreadyHere) {
+                      _criterion.data[dataKey] = [
+                        ..._criterion.data[dataKey],
+                        ...(await _criterion.fetch[fetchKey](code?.id))
+                      ]
+                    }
+                  }
                 }
               }
             }
