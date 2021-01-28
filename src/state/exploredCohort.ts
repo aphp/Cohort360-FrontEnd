@@ -16,6 +16,21 @@ type ExploredCohortState = {
 } & CohortData
 
 const initialState: ExploredCohortState = {
+  // CohortData
+  name: '',
+  cohort: [],
+  totalPatients: 0,
+  originalPatients: [],
+  totalDocs: 0,
+  documentsList: [],
+  wordcloudData: [],
+  encounters: [],
+  genderRepartitionMap: undefined,
+  visitTypeRepartitionData: undefined,
+  monthlyVisitData: undefined,
+  agePyramidData: undefined,
+  requestId: '',
+  // ExploredCohortState
   importedPatients: [],
   includedPatients: [],
   excludedPatients: [],
@@ -82,7 +97,7 @@ const fetchExploredCohort = createAsyncThunk<
         break
     }
   }
-  return cohort ?? initialState
+  return cohort ?? state.exploredCohort
 })
 
 const exploredCohortSlice = createSlice({
