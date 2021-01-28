@@ -134,6 +134,7 @@ export const fetchMyPatients = async (): Promise<CohortData | undefined> => {
         : undefined
 
     return {
+      cohort: undefined,
       totalPatients,
       originalPatients,
       genderRepartitionMap,

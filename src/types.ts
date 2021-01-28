@@ -224,7 +224,7 @@ export type CriteriaItemType = {
 export type SelectedCriteriaType = {
   type: 'Patient' | 'Encounter' | 'Claim' | 'Procedure' | 'Condition' | 'Composition'
   title: string
-  code?: { id: string; label: string }
+  code?: { id: string; label: string }[]
   diagnosticType?: { id: string; label: string }
   encounter: number
   comparator: { id: 'le' | 'e' | 'ge'; label: string }
@@ -248,7 +248,7 @@ export type SelectedCriteriaType = {
 export type CcamDataType = {
   title: string
   hierarchy: undefined
-  code: { id: string; label: string } | null
+  code: { id: string; label: string }[] | null
   encounter: number
   comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
@@ -258,7 +258,7 @@ export type CcamDataType = {
 
 export type Cim10DataType = {
   title: string
-  code: { id: string; label: string } | null
+  code: { id: string; label: string }[] | null
   diagnosticType: { id: string; label: string } | null
   encounter: number
   comparator: { id: 'le' | 'e' | 'ge'; label: string }
@@ -287,7 +287,7 @@ export type DocumentDataType = {
 
 export type GhmDataType = {
   title: string
-  code: { id: string; label: string } | null
+  code: { id: string; label: string }[] | null
   encounter: number
   comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
@@ -309,10 +309,16 @@ export type EncounterDataType = {
 
 export type CohortCreationCounterType = {
   uuid?: string
-  includePatient?: number | 'loading'
-  byrequest?: number | 'loading'
-  alive?: number | 'loading'
-  deceased?: number | 'loading'
-  female?: number | 'loading'
-  male?: number | 'loading'
+  includePatient?: number
+  byrequest?: number
+  alive?: number
+  deceased?: number
+  female?: number
+  male?: number
+}
+
+export type CohortCreationSnapshotType = {
+  uuid: string
+  json: string
+  date: string
 }

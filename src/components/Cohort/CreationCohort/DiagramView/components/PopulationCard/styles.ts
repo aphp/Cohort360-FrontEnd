@@ -14,6 +14,7 @@ const useStyles = makeStyles(() => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
+    alignItems: 'center',
     height: 'calc(100% - 53px)'
   },
   populationLabel: {
@@ -28,7 +29,6 @@ const useStyles = makeStyles(() => ({
     marginTop: 12
   },
   actionButton: {
-    width: '50%',
     margin: 4,
     outline: 'none'
   }

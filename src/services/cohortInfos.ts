@@ -298,6 +298,12 @@ const fetchPatientList = async (
   }
 }
 
+export const fetchDocumentContent = async (compositionId: string) => {
+  const documentResp = await api.get<IComposition>(`/Composition/${compositionId}`)
+
+  return documentResp.data.section ?? []
+}
+
 const fetchDocuments = async (
   deidentifiedBoolean: boolean,
   sortBy: string,

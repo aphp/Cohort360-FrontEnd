@@ -565,3 +565,58 @@ export async function unbuildRequest(json: string) {
     criteria
   }
 }
+
+export const getDataFromFetch = async (_criteria: any, selectedCriteria: SelectedCriteriaType[]) => {
+  for (const _criterion of _criteria) {
+    if (_criterion.fetch) {
+      if (!_criterion.data) _criterion.data = {}
+      const fetchKeys = Object.keys(_criterion.fetch)
+      for (const fetchKey of fetchKeys) {
+        const dataKey = fetchKey.replace('fetch', '').replace(/(\b[A-Z])(?![A-Z])/g, ($1) => $1.toLowerCase())
+        const currentSelectedCriteria = selectedCriteria.filter(
+          (selectedCriterion: SelectedCriteriaType) => selectedCriterion.type === _criterion.id
+        )
+        switch (dataKey) {
+          case 'ghmData':
+          case 'ccamData':
+          case 'cim10Diagnostic':
+            if (_criterion.data[dataKey] === 'loading') _criterion.data[dataKey] = []
+
+            if (currentSelectedCriteria) {
+              for (const currentSelectedCriterion of currentSelectedCriteria) {
+                if (
+                  currentSelectedCriterion &&
+                  currentSelectedCriterion.code &&
+                  currentSelectedCriterion.code.length > 0
+                ) {
+                  for (const code of currentSelectedCriterion.code) {
+                    const allreadyHere = _criterion.data[dataKey]
+                      ? _criterion.data[dataKey].find((data: any) => data.id === code?.id)
+                      : undefined
+
+                    if (!allreadyHere) {
+                      _criterion.data[dataKey] = [
+                        ..._criterion.data[dataKey],
+                        ...(await _criterion.fetch[fetchKey](code?.id))
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+            break
+          default:
+            if (_criterion.data[dataKey] === 'loading') {
+              _criterion.data[dataKey] = await _criterion.fetch[fetchKey]()
+            }
+            break
+        }
+      }
+    }
+    _criterion.subItems =
+      _criterion.subItems && _criterion.subItems.length > 0
+        ? await getDataFromFetch(_criterion.subItems, selectedCriteria)
+        : []
+  }
+  return _criteria
+}
