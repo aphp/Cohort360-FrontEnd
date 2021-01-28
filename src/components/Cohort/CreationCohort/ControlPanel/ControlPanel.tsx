@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
 import { Button, CircularProgress, Divider, Grid, Typography } from '@material-ui/core'
@@ -9,20 +10,24 @@ import UpdateSharpIcon from '@material-ui/icons/UpdateSharp'
 
 import ModalCohortTitle from './components/ModalCohortTitle/ModalCohortTitle'
 
+import { useAppSelector } from 'state'
+import { resetCohortCreation } from 'state/cohortCreation'
+
 import useStyle from './styles'
 
-import { CohortCreationCounterType } from 'types'
-
-const ControlPanel: React.FC<
-  {
-    executeLoading?: boolean
-    onExecute?: (cohortName: string, cohortDescription: string) => void
-    onUndo?: () => void
-    onRedo?: () => void
-  } & CohortCreationCounterType
-> = ({ includePatient, byrequest, alive, deceased, female, male, executeLoading, onExecute, onUndo, onRedo }) => {
+const ControlPanel: React.FC<{
+  onExecute?: (cohortName: string, cohortDescription: string) => void
+  onUndo?: () => void
+  onRedo?: () => void
+}> = ({ onExecute, onUndo, onRedo }) => {
   const classes = useStyle()
+  const dispatch = useDispatch()
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
+
+  const {
+    loading = false,
+    count: { includePatient /*, byrequest, alive, deceased, female, male*/ }
+  } = useAppSelector((state) => state.cohortCreation.request || {})
 
   return (
     <>
@@ -30,11 +35,11 @@ const ControlPanel: React.FC<
         <Grid>
           <Grid container justify="center" className={classes.requestAction}>
             <Button
-              disabled={executeLoading || !onExecute}
+              disabled={typeof onExecute !== 'function'}
               onClick={() => onSetOpenModal('executeCohortConfirmation')}
               className={classes.requestExecution}
             >
-              {executeLoading ? (
+              {loading ? (
                 <>
                   Veuillez patienter
                   <CircularProgress style={{ marginLeft: '15px' }} size={30} />
@@ -70,6 +75,7 @@ const ControlPanel: React.FC<
           <Divider />
 
           <Button
+            onClick={() => dispatch(resetCohortCreation())}
             className={classes.actionButton}
             startIcon={<UpdateSharpIcon color="action" className={classes.iconBorder} />}
           >
@@ -81,37 +87,37 @@ const ControlPanel: React.FC<
           <Grid container justify="space-between">
             <Typography className={clsx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS</Typography>
             <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
-              {includePatient === 'loading' ? <CircularProgress size={30} /> : includePatient ?? '-'}
+              {loading ? <CircularProgress size={30} /> : includePatient ?? '-'}
             </Typography>
           </Grid>
           {/* <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Par requête</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {byrequest === 'loading' ? <Skeleton variant="rect" width={50} height={19} /> : byrequest ?? '-'}
+              {loading ? <Skeleton variant="rect" width={50} height={19} /> : byrequest ?? '-'}
             </Typography>
           </Grid> */}
           {/* <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Patients vivants</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {alive === 'loading' ? <Skeleton variant="rect" width={50} height={19} /> : alive ?? '-'}
+              {loading ? <Skeleton variant="rect" width={50} height={19} /> : alive ?? '-'}
             </Typography>
           </Grid> */}
           {/* <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Patients décédés</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {deceased === 'loading' ? <Skeleton variant="rect" width={50} height={19} /> : deceased ?? '-'}
+              {loading ? <Skeleton variant="rect" width={50} height={19} /> : deceased ?? '-'}
             </Typography>
           </Grid> */}
           {/* <Grid container justify="space-between">
             <Typography className={clsx(classes.sidesMargin)}>Nombre de femmes</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {female === 'loading' ? <Skeleton variant="rect" width={50} height={19} /> : female ?? '-'}
+              {loading ? <Skeleton variant="rect" width={50} height={19} /> : female ?? '-'}
             </Typography> */}
           {/* </Grid>
           <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Nombre d'hommes</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {male === 'loading' ? <Skeleton variant="rect" width={50} height={19} /> : male ?? '-'}
+              {loading ? <Skeleton variant="rect" width={50} height={19} /> : male ?? '-'}
             </Typography>
           </Grid> */}
         </Grid>

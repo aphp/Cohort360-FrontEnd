@@ -128,7 +128,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
           <List>
             <ListItem>
               <Grid container justify="space-between" alignItems="center" wrap="nowrap">
-                <Grid container wrap="nowrap" xs={10} alignItems="center">
+                <Grid container wrap="nowrap" xs={10} alignItems="center" item>
                   <ListItemIcon className={classes.listIcon}>
                     <div className={classes.avatar}>
                       {practitioner && `${practitioner.firstName[0]}${practitioner.lastName[0]}`}

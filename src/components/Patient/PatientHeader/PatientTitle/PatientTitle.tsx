@@ -30,7 +30,7 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
 
   const goBacktoCohort = () => {
     const path = Array.isArray(cohort.cohort)
-      ? `/perimetres/patients?${cohort.cohort.map((e) => e.id).join()}`
+      ? `/perimetres/patients?${cohort.cohort.map((e: any) => e.id).join()}`
       : cohort.cohort?.id
       ? `/cohort/${cohort.cohort?.id}/patients`
       : '/mes_patients/patients'
