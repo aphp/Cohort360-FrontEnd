@@ -99,16 +99,27 @@ const CriteriaCard: React.FC = () => {
 
     switch (_selectedCriteria.type) {
       case 'Claim': {
-        const selectedGhmData = data?.ghmData
-          ? data.ghmData.find((ghmElement: any) => ghmElement && ghmElement.id === _selectedCriteria.code?.id)
-          : null
+        const displaySelectedGHM = (currentGHM: { id: string; label: string }) => {
+          const selectedGhmData =
+            data?.ghmData && data?.ghmData !== 'loading'
+              ? data.ghmData.find((ghmElement: any) => ghmElement && ghmElement.id === currentGHM.id)
+              : null
+          return <Typography>{selectedGhmData ? selectedGhmData.label : ''}</Typography>
+        }
 
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>GHM</span>,
             </Typography>
-            <Typography>{selectedGhmData ? `GHM sélectionné : "${selectedGhmData.label}"` : ''}</Typography>
+            {_selectedCriteria && _selectedCriteria?.code ? (
+              <>
+                <Typography>GHM sélectionné : </Typography>
+                {_selectedCriteria?.code?.map((code) => displaySelectedGHM(code))}
+              </>
+            ) : (
+              <></>
+            )}
             {/* <Typography>
               {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
             </Typography> */}
@@ -127,16 +138,27 @@ const CriteriaCard: React.FC = () => {
       }
 
       case 'Procedure': {
-        const selectedccamData = data?.ccamData
-          ? data.ccamData.find((ccamElement: any) => ccamElement && ccamElement.id === _selectedCriteria?.code?.id)
-          : null
+        const displaySelectedCCAM = (currentCCAM: { id: string; label: string }) => {
+          const selectedCcamData =
+            data?.ccamData && data?.ccamData !== 'loading'
+              ? data.ccamData.find((ccamElement: any) => ccamElement && ccamElement.id === currentCCAM.id)
+              : null
+          return <Typography>{selectedCcamData ? selectedCcamData.label : ''}.</Typography>
+        }
 
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Actes CCAM</span>,
             </Typography>
-            <Typography>{selectedccamData ? `Acte CCAM sélectionné : "${selectedccamData.label}"` : ''}.</Typography>
+            {_selectedCriteria && _selectedCriteria?.code ? (
+              <>
+                <Typography>Acte CCAM sélectionné :</Typography>
+                {_selectedCriteria?.code?.map((code) => displaySelectedCCAM(code))}
+              </>
+            ) : (
+              <></>
+            )}
             {/* <Typography>
               {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
             </Typography> */}
@@ -155,11 +177,14 @@ const CriteriaCard: React.FC = () => {
       }
 
       case 'Condition': {
-        const selectedCode = data?.cim10Diagnostic
-          ? data.cim10Diagnostic.find(
-              (cim10Diagnostic: any) => cim10Diagnostic && cim10Diagnostic.id === _selectedCriteria?.code?.id
-            )
-          : null
+        const displaySelectedCIM10 = (currentCIM10: { id: string; label: string }) => {
+          const selectedCimData =
+            data?.cim10Diagnostic && data?.cim10Diagnostic !== 'loading'
+              ? data.cim10Diagnostic.find((ghmElement: any) => ghmElement && ghmElement.id === currentCIM10.id)
+              : null
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        }
+
         const selectedDiagnostic = data?.diagnosticTypes
           ? data.diagnosticTypes.find(
               (diagnosticType: any) => diagnosticType && diagnosticType.id === _selectedCriteria?.diagnosticType?.id
@@ -171,7 +196,14 @@ const CriteriaCard: React.FC = () => {
             <Typography>
               Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,
             </Typography>
-            <Typography>{selectedCode ? `Diagnostic CIM sélectionné : "${selectedCode.label}."` : ''}</Typography>
+            {_selectedCriteria && _selectedCriteria?.code ? (
+              <>
+                <Typography>Diagnostic CIM sélectionné :</Typography>
+                {_selectedCriteria?.code?.map((code) => displaySelectedCIM10(code))}
+              </>
+            ) : (
+              <></>
+            )}
             <Typography>
               {selectedDiagnostic && `Type de diagnostic recherché : "${selectedDiagnostic.label}."`}
             </Typography>

@@ -21,8 +21,8 @@ import useStyles from './styles'
 
 type CimListItemProps = {
   cimItem: any
-  selectedItem?: any
-  handleClick: (cimItem: any) => void
+  selectedItem?: { id: string; label: string }[] | null
+  handleClick: (cimItem: { id: string; label: string }[] | null) => void
   fetchHierarchy: (cimCode: string) => any
 }
 
@@ -34,7 +34,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
   const [open, setOpen] = useState(false)
   const [subItems, setSubItems] = useState<any>(['loading'])
 
-  const isSelected = selectedItem ? cimItem.id === selectedItem.id : false
+  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === cimItem.id) : false
 
   const _onExpand = async (cimCode: string) => {
     setOpen(!open)
@@ -53,6 +53,19 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
     _init()
   }, []) // eslint-disable-line
 
+  const handleClickOnHierarchy = (cimItem: { id: string; label: string }) => {
+    let _selectedItem = selectedItem ? [...selectedItem] : []
+    const foundItem = _selectedItem ? _selectedItem.find(({ id }) => id === cimItem.id) : undefined
+    const index = foundItem !== undefined ? _selectedItem.indexOf(foundItem) : -1
+
+    if (index !== -1) {
+      _selectedItem?.splice(index, 1)
+    } else {
+      _selectedItem = [..._selectedItem, cimItem]
+    }
+    handleClick(_selectedItem)
+  }
+
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
     return (
       <ListItem className={classes.cimItem}>
@@ -63,11 +76,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
           />
         </ListItemIcon>
         <Tooltip title={label} enterDelay={2500}>
-          <ListItemText
-            className={classes.label}
-            primary={label}
-            onClick={() => handleClick(isSelected ? null : cimItem)}
-          />
+          <ListItemText className={classes.label} primary={label} onClick={() => handleClickOnHierarchy(cimItem)} />
         </Tooltip>
       </ListItem>
     )
@@ -122,7 +131,9 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
 
   const classes = useStyles()
   const [cimHierarchy, onSetCimHieerarchy] = useState([])
-  const [selectedHierarchy, onSetSelectedHierarchy] = useState(isEdition ? selectedCriteria.code : null)
+  const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
+    isEdition ? selectedCriteria.code : null
+  )
 
   // Init
   useEffect(() => {

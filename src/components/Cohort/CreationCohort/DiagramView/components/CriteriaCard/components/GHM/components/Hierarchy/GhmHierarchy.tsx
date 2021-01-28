@@ -21,7 +21,7 @@ import useStyles from './styles'
 
 type GhmListItemProps = {
   ghmItem: any
-  selectedItem: any
+  selectedItem?: { id: string; label: string }[] | null
   handleClick: (ghmItem: any) => void
   fetchHierarchy: (ghmCode: string) => any
 }
@@ -34,7 +34,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
   const [open, setOpen] = useState(false)
   const [subItems, setSubItems] = useState<any>(['loading'])
 
-  const isSelected = selectedItem ? ghmItem.id === selectedItem.id : false
+  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === ghmItem.id) : false
 
   const _onExpand = async (ghmCode: string) => {
     setOpen(!open)
@@ -54,6 +54,19 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
     _init()
   }, []) // eslint-disable-line
 
+  const handleClickOnHierarchy = (ghmItem: { id: string; label: string }) => {
+    let _selectedItem = selectedItem ? [...selectedItem] : []
+    const foundItem = _selectedItem ? _selectedItem.find(({ id }) => id === ghmItem.id) : undefined
+    const index = foundItem !== undefined ? _selectedItem.indexOf(foundItem) : -1
+
+    if (index !== -1) {
+      _selectedItem?.splice(index, 1)
+    } else {
+      _selectedItem = [..._selectedItem, ghmItem]
+    }
+    handleClick(_selectedItem)
+  }
+
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
     return (
       <ListItem className={classes.ghmItem}>
@@ -64,11 +77,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
           />
         </ListItemIcon>
         <Tooltip title={label} enterDelay={2500}>
-          <ListItemText
-            className={classes.label}
-            primary={label}
-            onClick={() => handleClick(isSelected ? null : ghmItem)}
-          />
+          <ListItemText className={classes.label} primary={label} onClick={() => handleClickOnHierarchy(ghmItem)} />
         </Tooltip>
       </ListItem>
     )
@@ -121,8 +130,11 @@ type GhmHierarchyProps = {
 const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
   const { isEdition, criteria, selectedCriteria, goBack, onChangeSelectedHierarchy } = props
 
+  const classes = useStyles()
   const [ghmHierarchy, onSetGhmHierarchy] = useState([])
-  const [selectedHierarchy, onSetSelectedHierarchy] = useState(isEdition ? selectedCriteria.code : null)
+  const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
+    isEdition ? selectedCriteria.code : null
+  )
 
   // Init
   useEffect(() => {
@@ -133,8 +145,6 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
 
     _init()
   }, []) // eslint-disable-line
-
-  const classes = useStyles()
 
   return (
     <Grid className={classes.root}>
