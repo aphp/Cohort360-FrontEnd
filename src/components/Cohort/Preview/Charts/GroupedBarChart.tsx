@@ -1,6 +1,7 @@
 //@ts-nocheck
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import * as d3 from 'd3'
+import legend from './Legend'
 
 import { ComplexChartDataType, Month } from 'types'
 
@@ -12,6 +13,7 @@ type GroupedBarChartProps = {
 
 const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, width = 450 }) => {
   const node = useRef<SVGSVGElement | null>(null)
+  const [legendHtml, setLegend] = useState()
 
   useEffect(() => {
     if (!data || (data && !data.size)) {
@@ -45,8 +47,6 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
       }
     }
 
-    const color = d3.scaleOrdinal().range(['#78D4FA', '#FC568F', '#8446E4'])
-
     const svg = d3.select(node.current)
     svg.selectAll('*').remove()
     svg.attr('height', height).attr('width', width)
@@ -56,26 +56,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
     const groupKey = 'Mois'
 
     const keys = ['Hommes', 'Femmes']
-
-    const legend = (svg) => {
-      const g = svg
-        .attr('transform', `translate(${width},0)`)
-        .attr('text-anchor', 'end')
-        .attr('font-family', 'sans-serif')
-        .attr('font-size', 10)
-        .selectAll('g')
-        .data(color.domain().slice().reverse())
-        .join('g')
-        .attr('transform', (d, i) => `translate(0,${i * 15})`)
-
-      g.append('rect').attr('x', -19).attr('width', 10).attr('height', 10).attr('fill', color)
-
-      g.append('text')
-        .attr('x', -24)
-        .attr('y', 5)
-        .attr('dy', '0.35em')
-        .text((d) => d)
-    }
+    const color = d3.scaleOrdinal().domain(keys).range(['#78D4FA', '#FC568F', '#8446E4'])
 
     const x0 = d3
       .scaleBand()
@@ -132,10 +113,20 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
 
     svg.append('g').call(yAxis)
 
-    svg.append('g').call(legend)
+    setLegend(
+      legend({
+        color: color,
+        columns: '70px'
+      })
+    )
   }, [node, data, height, width])
 
-  return <svg ref={node}></svg>
+  return (
+    <div style={{ display: 'flex' }}>
+      <svg ref={node}></svg>
+      <div style={{ display: 'flex' }} dangerouslySetInnerHTML={{ __html: legendHtml }} />
+    </div>
+  )
 }
 
 export default GroupedBarChart
