@@ -44,12 +44,22 @@ const userCohortsSlice = createSlice({
   reducers: {
     setFavoriteCohorts: (state, { payload }: PayloadAction<FormattedCohort[] | undefined>) => {
       state.favoriteCohorts = payload
+
+      const { lastCohorts } = state
+
+      if (payload && lastCohorts) {
+        for (const favCohort of payload) {
+          const lastCohortIndex = lastCohorts.findIndex((cohort) => cohort.researchId === favCohort.researchId)
+          if (lastCohortIndex >= 0) {
+            lastCohorts[lastCohortIndex].favorite = true
+          }
+        }
+      }
     }
   },
   extraReducers: (builder) => {
     builder.addCase(initUserCohortsThunk.fulfilled, (state, { payload }) => {
       return payload
-      
     })
   }
 })
