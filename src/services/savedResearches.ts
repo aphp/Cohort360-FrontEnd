@@ -143,7 +143,7 @@ export const onRemoveCohort = async (selectedCohort?: string): Promise<boolean> 
     await api.delete(`/Group/${selectedCohort}`)
   } else if (CONTEXT === 'aphp') {
     const deleteRequest = await apiBackCohort.delete(`/explorations/cohorts/${selectedCohort}/`)
-    return deleteRequest.status === 200
+    return [200, 204].includes(deleteRequest.status)
   }
   return false
 }
