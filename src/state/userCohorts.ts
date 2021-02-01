@@ -39,7 +39,7 @@ const setFavoriteCohortThunk = createAsyncThunk<void, { cohortId: string }, { st
 )
 
 const deleteUserCohortThunk = createAsyncThunk<void, { cohortId: string }, { state: RootState }>(
-  'userCohorts/setFavoriteCohortThunk',
+  'userCohorts/deleteUserCohortThunk',
   async ({ cohortId }, { dispatch }) => {
     if (await onRemoveCohort(cohortId)) {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
