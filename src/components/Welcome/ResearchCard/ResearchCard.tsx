@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react'
-
+import React, { useState } from 'react'
 import { Grid, Link } from '@material-ui/core'
 
 import Title from '../../Title'
 import ResearchTable from '../../SavedResearch/ResearchTable/ResearchTable'
 
-import { setFavorite } from '../../../services/savedResearches'
-import { Back_API_Response, FormattedCohort } from 'types'
+import { setFavoriteCohortThunk } from 'state/userCohorts'
+import { FormattedCohort } from 'types'
+import { useAppDispatch } from 'state'
 
 import useStyles from './styles'
 
@@ -14,34 +14,22 @@ type ResearchCardProps = {
   simplified?: boolean
   onClickRow?: (props: any) => void
   title?: string
-  fetchCohort: () => Promise<Back_API_Response<FormattedCohort> | undefined>
+  cohorts?: FormattedCohort[]
 }
 
-const ResearchCard: React.FC<ResearchCardProps> = ({ onClickRow, simplified, title, fetchCohort }) => {
+const ResearchCard: React.FC<ResearchCardProps> = ({ onClickRow, simplified, title, cohorts }) => {
   const classes = useStyles()
+  const dispatch = useAppDispatch()
   const [researches, setResearches] = useState<FormattedCohort[] | undefined>()
 
   const onDeleteCohort = async (cohortId: string) => {
+    //TODO: What does deleteCohort actually do ?
     setResearches(researches?.filter((r) => r.researchId !== cohortId))
   }
 
-  const onSetCohortFavorite = async (cohortId: string, favStatus: boolean) => {
-    setFavorite(cohortId, favStatus)
-      .then(() => fetchCohort())
-      .then((cohortsResp) => {
-        if (cohortsResp) {
-          setResearches(cohortsResp.results)
-        }
-      })
+  const onSetCohortFavorite = (cohortId: string) => {
+    dispatch(setFavoriteCohortThunk({ cohortId }))
   }
-
-  useEffect(() => {
-    fetchCohort().then((cohortsResp) => {
-      if (cohortsResp) {
-        setResearches(cohortsResp.results)
-      }
-    })
-  }, []) // eslint-disable-line
 
   return (
     <>
@@ -58,7 +46,7 @@ const ResearchCard: React.FC<ResearchCardProps> = ({ onClickRow, simplified, tit
       <Grid item xs={12} className={classes.tableContainer}>
         <ResearchTable
           simplified={simplified}
-          researchData={researches}
+          researchData={cohorts}
           onDeleteCohort={onDeleteCohort}
           onSetCohortFavorite={onSetCohortFavorite}
           onClickRow={onClickRow}

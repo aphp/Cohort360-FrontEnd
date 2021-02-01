@@ -7,7 +7,7 @@ import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
 
 import { createRequest, createSnapshot, countCohort } from 'services/cohortCreation'
 
-type CohortCreationState = {
+export type CohortCreationState = {
   loading: boolean
   requestId: string
   cohortName: string

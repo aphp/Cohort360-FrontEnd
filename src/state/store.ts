@@ -1,13 +1,14 @@
-import { combineReducers } from 'redux'
+import { combineReducers, CombinedState } from 'redux'
 import { configureStore } from '@reduxjs/toolkit'
 import { persistStore, persistReducer, createTransform } from 'redux-persist'
 import { createLogger } from 'redux-logger'
 import storage from 'redux-persist/lib/storage' // defaults to localStorage for web
 
-import cohortCreation from './cohortCreation'
-import criteria from './criteria'
-import exploredCohort from './exploredCohort'
-import me from './me'
+import cohortCreation, { CohortCreationState } from './cohortCreation'
+import criteria, { CriteriaState } from './criteria'
+import exploredCohort, { ExploredCohortState } from './exploredCohort'
+import userCohorts, { UserCohortsState } from './userCohorts'
+import me, { MeState } from './me'
 import drawer from './drawer'
 
 const MapTransform = createTransform(
@@ -53,10 +54,22 @@ const rootReducer = combineReducers({
   me,
   cohortCreation: cohortCreationReducer,
   exploredCohort,
+  userCohorts,
   drawer
 })
 
-const persistedReducer = persistReducer(persistConfig, rootReducer)
+type RootReducerState = CombinedState<{
+  me: MeState
+  cohortCreation: CombinedState<{
+    criteria: CriteriaState
+    request: CohortCreationState
+  }>
+  exploredCohort: ExploredCohortState
+  userCohorts: UserCohortsState
+  drawer: boolean
+}>
+
+const persistedReducer = persistReducer<RootReducerState>(persistConfig, rootReducer)
 
 export const store = configureStore({
   reducer: persistedReducer,
