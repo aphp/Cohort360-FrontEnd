@@ -15,30 +15,44 @@ const useStyles = makeStyles(() => ({
     width: 450
   },
   cardHeader: {
-    background: '#D1E2F4',
+    display: 'flex',
+    alignItems: 'center',
+    background: '#DAF0BF',
     color: '#45505B'
   },
   cardContent: {
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
     alignItems: 'center',
-    height: 'calc(100% - 53px)'
+    justifyContent: 'center',
+    textAlign: 'center'
   },
-  populationLabel: {
+  criteriaType: {
     color: '#5BC5F2',
     textDecoration: 'underline',
     fontWeight: 'bold'
   },
-  actionButtonContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 12
+  label: {
+    fontWeight: 'bold'
   },
-  actionButton: {
-    margin: 4,
-    outline: 'none'
+  addButton: {
+    width: 42,
+    height: 42,
+    minWidth: 42,
+    maxWidth: 42,
+    minHeight: 42,
+    maxHeight: 42,
+    borderRadius: 42
+  },
+  loading: {
+    background: 'white',
+    width: 42,
+    height: 42,
+    minWidth: 42,
+    maxWidth: 42,
+    minHeight: 42,
+    maxHeight: 42,
+    borderRadius: 42
   }
 }))
 

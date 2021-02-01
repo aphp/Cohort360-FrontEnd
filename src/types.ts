@@ -210,6 +210,12 @@ export type PatientData = {
   ghmTotal?: number
 }
 
+export type CriteriaGroupType = {
+  id: number
+  title: string
+  criteriaIds: number[] // = [SelectedCriteriaType.id, ...]
+}
+
 export type CriteriaItemType = {
   id: string
   title: string
@@ -222,31 +228,12 @@ export type CriteriaItemType = {
 }
 
 export type SelectedCriteriaType = {
-  type: 'Patient' | 'Encounter' | 'Claim' | 'Procedure' | 'Condition' | 'Composition'
-  title: string
-  code?: { id: string; label: string }[]
-  diagnosticType?: { id: string; label: string }
-  encounter: number
-  comparator: { id: 'le' | 'e' | 'ge'; label: string }
-  label: undefined
-  startOccurrence: Date
-  endOccurrence: Date
-  gender?: { id: string; label: string }
-  vitalStatus?: { id: string; label: string }
-  years?: [number, number]
-  search?: string
-  docType?: { id: '55188-7' | '11336-5' | '57833-6'; label: string }
-  occurence?: number
-  ageType?: { id: string; label: string }
-  duration?: [number, number]
-  admissionMode?: { id: string; label: string }
-  entryMode?: { id: string; label: string }
-  exitMode?: { id: string; label: string }
-  fileStatus?: { id: string; label: string }
-}
+  id: string
+} & (CcamDataType | Cim10DataType | DemographicDataType | GhmDataType | EncounterDataType | DocumentDataType)
 
 export type CcamDataType = {
   title: string
+  type: 'Procedure'
   hierarchy: undefined
   code: { id: string; label: string }[] | null
   encounter: number
@@ -258,6 +245,7 @@ export type CcamDataType = {
 
 export type Cim10DataType = {
   title: string
+  type: 'Condition'
   code: { id: string; label: string }[] | null
   diagnosticType: { id: string; label: string } | null
   encounter: number
@@ -269,6 +257,7 @@ export type Cim10DataType = {
 
 export type DemographicDataType = {
   title: string
+  type: 'Patient'
   gender: { id: string; label: string } | null
   vitalStatus: { id: string; label: string } | null
   years: [number, number]
@@ -276,6 +265,7 @@ export type DemographicDataType = {
 
 export type DocumentDataType = {
   title: string
+  type: 'Composition'
   search: string
   docType: { id: string; label: string } | null
   encounter: number
@@ -287,6 +277,7 @@ export type DocumentDataType = {
 
 export type GhmDataType = {
   title: string
+  type: 'Claim'
   code: { id: string; label: string }[] | null
   encounter: number
   comparator: { id: 'le' | 'e' | 'ge'; label: string }
@@ -297,8 +288,9 @@ export type GhmDataType = {
 
 export type EncounterDataType = {
   label: undefined
+  type: 'Encounter'
   title: string
-  ageType: string
+  ageType: { id: string; label: string } | null
   years: [number, number]
   duration: [number, number]
   admissionMode: { id: string; label: string } | null

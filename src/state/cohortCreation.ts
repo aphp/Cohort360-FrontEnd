@@ -1,7 +1,13 @@
 import { logout } from './me'
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
-import { CohortCreationCounterType, CohortCreationSnapshotType, ScopeTreeRow, SelectedCriteriaType } from 'types'
+import {
+  CohortCreationCounterType,
+  CohortCreationSnapshotType,
+  ScopeTreeRow,
+  SelectedCriteriaType,
+  CriteriaGroupType
+} from 'types'
 
 import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
 
@@ -17,18 +23,20 @@ type CohortCreationState = {
   count: CohortCreationCounterType
   selectedPopulation: ScopeTreeRow[] | null
   selectedCriteria: SelectedCriteriaType[]
+  criteriaGroup: CriteriaGroupType[]
 }
 
 const initialState: CohortCreationState = {
   loading: false,
   requestId: '',
   cohortName: '',
+  json: '',
   currentSnapshot: '',
   snapshotsHistory: [],
   count: {},
   selectedPopulation: null,
   selectedCriteria: [],
-  json: ''
+  criteriaGroup: []
 }
 
 /**
@@ -95,15 +103,20 @@ const _onSaveNewJson = async (cohortCreation: CohortCreationState, newJson: stri
 
 const buildCreationCohort = createAsyncThunk<
   CohortCreationState,
-  { selectedPopulation?: ScopeTreeRow[] | null; selectedCriteria?: SelectedCriteriaType[] },
+  {
+    selectedPopulation?: ScopeTreeRow[] | null
+    selectedCriteria?: SelectedCriteriaType[]
+    criteriaGroup?: CriteriaGroupType[]
+  },
   { state: RootState }
->('cohortCreation/build', async ({ selectedPopulation, selectedCriteria }, { getState }) => {
+>('cohortCreation/build', async ({ selectedPopulation, selectedCriteria, criteriaGroup }, { getState }) => {
   const state = getState()
 
   const _selectedPopulation = selectedPopulation ? selectedPopulation : state.cohortCreation.request.selectedPopulation
   const _selectedCriteria = selectedCriteria ? selectedCriteria : state.cohortCreation.request.selectedCriteria
+  const _criteriaGroup = criteriaGroup ? criteriaGroup : state.cohortCreation.request.criteriaGroup
 
-  const json = await buildRequest(_selectedPopulation, _selectedCriteria)
+  const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup)
   const { requestId, snapshotsHistory, currentSnapshot, count } = await _onSaveNewJson(
     state.cohortCreation.request,
     json
