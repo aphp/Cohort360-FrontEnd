@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Grid, Link } from '@material-ui/core'
 
 import Title from '../../Title'
 import ResearchTable from '../../SavedResearch/ResearchTable/ResearchTable'
 
-import { setFavoriteCohortThunk } from 'state/userCohorts'
+import { setFavoriteCohortThunk, deleteUserCohortThunk } from 'state/userCohorts'
 import { FormattedCohort } from 'types'
 import { useAppDispatch } from 'state'
 
@@ -20,11 +20,9 @@ type ResearchCardProps = {
 const ResearchCard: React.FC<ResearchCardProps> = ({ onClickRow, simplified, title, cohorts }) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
-  const [researches, setResearches] = useState<FormattedCohort[] | undefined>()
 
   const onDeleteCohort = async (cohortId: string) => {
-    //TODO: What does deleteCohort actually do ?
-    setResearches(researches?.filter((r) => r.researchId !== cohortId))
+    dispatch(deleteUserCohortThunk({ cohortId }))
   }
 
   const onSetCohortFavorite = (cohortId: string) => {

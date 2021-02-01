@@ -12,7 +12,7 @@ import { fetchCohorts } from '../../services/savedResearches'
 import useStyles from './styles'
 import { FormattedCohort } from 'types'
 
-import { setFavoriteCohortThunk } from 'state/userCohorts'
+import { setFavoriteCohortThunk, deleteUserCohortThunk } from 'state/userCohorts'
 import { useAppDispatch } from 'state'
 
 type ResearchProps = {
@@ -50,6 +50,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
 
   const onDeleteCohort = async (cohortId: string) => {
     setResearches(researches?.filter((r) => r.researchId !== cohortId))
+    dispatch(deleteUserCohortThunk({ cohortId }))
   }
 
   const onSetCohortFavorite = async (cohortId: string) => {

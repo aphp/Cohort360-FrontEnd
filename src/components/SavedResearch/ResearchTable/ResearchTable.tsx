@@ -23,7 +23,6 @@ import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
 import { ReactComponent as Star } from '../../../assets/icones/star.svg'
 import { ReactComponent as StarFull } from '../../../assets/icones/star full.svg'
 
-import { onRemoveCohort } from '../../../services/savedResearches'
 import { FormattedCohort } from 'types'
 
 import displayDigit from 'utils/displayDigit'
@@ -61,7 +60,6 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   const history = useHistory()
 
   const removeCohort = () => {
-    onRemoveCohort(selectedCohort)
     onDeleteCohort(selectedCohort)
   }
 

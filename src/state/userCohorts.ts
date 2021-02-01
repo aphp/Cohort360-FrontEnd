@@ -1,7 +1,7 @@
 import { FormattedCohort } from 'types'
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
-import { fetchFavoriteCohorts, fetchLastCohorts, setFavorite } from 'services/savedResearches'
+import { fetchFavoriteCohorts, fetchLastCohorts, setFavorite, onRemoveCohort } from 'services/savedResearches'
 
 export type UserCohortsState = {
   lastCohorts?: FormattedCohort[]
@@ -38,10 +38,24 @@ const setFavoriteCohortThunk = createAsyncThunk<void, { cohortId: string }, { st
   }
 )
 
+const deleteUserCohortThunk = createAsyncThunk<void, { cohortId: string }, { state: RootState }>(
+  'userCohorts/setFavoriteCohortThunk',
+  async ({ cohortId }, { dispatch }) => {
+    if (await onRemoveCohort(cohortId)) {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      dispatch(userCohortsSlice.actions.deleteCohort(cohortId))
+    }
+  }
+)
+
 const userCohortsSlice = createSlice({
   name: 'userCohorts',
   initialState,
   reducers: {
+    deleteCohort: (state, { payload }: PayloadAction<string>) => {
+      state.favoriteCohorts = state.favoriteCohorts?.filter((cohort) => cohort.researchId !== payload)
+      state.lastCohorts = state.lastCohorts?.filter((cohort) => cohort.researchId !== payload)
+    },
     setFavoriteCohorts: (state, { payload }: PayloadAction<FormattedCohort[] | undefined>) => {
       state.favoriteCohorts = payload
       const { lastCohorts } = state
@@ -62,4 +76,4 @@ const userCohortsSlice = createSlice({
 })
 
 export default userCohortsSlice.reducer
-export { initUserCohortsThunk, setFavoriteCohortThunk }
+export { initUserCohortsThunk, setFavoriteCohortThunk, deleteUserCohortThunk }

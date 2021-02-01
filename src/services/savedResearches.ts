@@ -138,10 +138,12 @@ export const setFavorite = async (cohortId: string, favStatus: boolean): Promise
   return false
 }
 
-export const onRemoveCohort = async (selectedCohort?: string) => {
+export const onRemoveCohort = async (selectedCohort?: string): Promise<boolean> => {
   if (CONTEXT === 'arkhn') {
     await api.delete(`/Group/${selectedCohort}`)
   } else if (CONTEXT === 'aphp') {
-    await apiBackCohort.delete(`/explorations/cohorts/${selectedCohort}/`)
+    const deleteRequest = await apiBackCohort.delete(`/explorations/cohorts/${selectedCohort}/`)
+    return deleteRequest.status === 200
   }
+  return false
 }
