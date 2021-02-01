@@ -48,7 +48,8 @@ const userCohortsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(initUserCohortsThunk.fulfilled, (state, { payload }) => {
-      state = payload
+      return payload
+      
     })
   }
 })
