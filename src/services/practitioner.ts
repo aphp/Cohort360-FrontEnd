@@ -9,6 +9,22 @@ import {
 import { getApiResponseResources } from 'utils/apiHelpers'
 
 export const fetchPractitioner = async (username: string) => {
+  if (CONTEXT === 'fakedata') {
+    console.log('tu rentres ici')
+    const id = 12
+    const userName = 707070
+    const firstName = 'John'
+    const lastName = 'Snow'
+    const displayName = `${lastName} ${firstName}`
+
+    return {
+      id,
+      userName,
+      displayName,
+      firstName,
+      lastName
+    }
+  }
   if (CONTEXT === 'aphp') {
     const practitioner = await api.get(`/Practitioner?identifier=${username}`)
     if (
@@ -19,6 +35,7 @@ export const fetchPractitioner = async (username: string) => {
       return
 
     const { resource } = practitioner.data.entry[0]
+    console.log('resource', resource)
     const id = resource.id
     const userName = resource.identifier[0].value
     const firstName = resource.name[0].given.join(' ')
