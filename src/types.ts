@@ -213,7 +213,8 @@ export type PatientData = {
 export type CriteriaGroupType = {
   id: number
   title: string
-  criteriaIds: number[] // = [SelectedCriteriaType.id, ...]
+  type: 'andGroup' | 'orGroup' | 'NamongM'
+  criteriaIds: number[] // = [SelectedCriteriaType.id | CriteriaGroupType.id, ...]
 }
 
 export type CriteriaItemType = {
@@ -228,7 +229,7 @@ export type CriteriaItemType = {
 }
 
 export type SelectedCriteriaType = {
-  id: string
+  id?: number
 } & (CcamDataType | Cim10DataType | DemographicDataType | GhmDataType | EncounterDataType | DocumentDataType)
 
 export type CcamDataType = {

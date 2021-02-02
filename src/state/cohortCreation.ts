@@ -13,7 +13,7 @@ import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
 
 import { createRequest, createSnapshot, countCohort } from 'services/cohortCreation'
 
-type CohortCreationState = {
+export type CohortCreationState = {
   loading: boolean
   requestId: string
   cohortName: string
@@ -24,6 +24,8 @@ type CohortCreationState = {
   selectedPopulation: ScopeTreeRow[] | null
   selectedCriteria: SelectedCriteriaType[]
   criteriaGroup: CriteriaGroupType[]
+  nextCriteriaId: number
+  nextGroupId: number
 }
 
 const initialState: CohortCreationState = {
@@ -36,7 +38,9 @@ const initialState: CohortCreationState = {
   count: {},
   selectedPopulation: null,
   selectedCriteria: [],
-  criteriaGroup: []
+  criteriaGroup: [],
+  nextCriteriaId: 1,
+  nextGroupId: -1
 }
 
 /**
@@ -170,6 +174,15 @@ const cohortCreationSlice = createSlice({
     },
     setSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType[]>) => {
       state.selectedCriteria = action.payload
+      // Warning state.nextCriteriaId is not re-set
+    },
+    addNewSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
+      state.selectedCriteria = [...state.selectedCriteria, action.payload]
+      state.nextCriteriaId++
+    },
+    addNewCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroupType>) => {
+      state.criteriaGroup = [...state.criteriaGroup, action.payload]
+      state.nextGroupId--
     },
     resetCohortCreation: () => initialState
   },
@@ -184,4 +197,10 @@ const cohortCreationSlice = createSlice({
 
 export default cohortCreationSlice.reducer
 export { buildCreationCohort, unbuildCreationCohort }
-export const { resetCohortCreation, setCohortName, setPopulationSource } = cohortCreationSlice.actions
+export const {
+  resetCohortCreation,
+  setCohortName,
+  setPopulationSource,
+  setSelectedCriteria,
+  addNewSelectedCriteria
+} = cohortCreationSlice.actions

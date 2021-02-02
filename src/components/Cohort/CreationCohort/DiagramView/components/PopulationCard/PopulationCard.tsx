@@ -29,7 +29,7 @@ const PopulationCard: React.FC = () => {
 
   return (
     <>
-      <div className={classes.root}>
+      <div className={selectedPopulation !== null ? classes.root : ''}>
         <Card className={classes.card}>
           <CardHeader
             className={classes.cardHeader}
