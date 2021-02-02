@@ -7,7 +7,7 @@ import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
 
 import { createRequest, createSnapshot, countCohort } from 'services/cohortCreation'
 
-type CohortCreationState = {
+export type CohortCreationState = {
   loading: boolean
   requestId: string
   cohortName: string
@@ -36,7 +36,7 @@ const initialState: CohortCreationState = {
  * Just after, get new count and save it
  */
 const _countCohort = async (_json: string, _snapshotId: string, _requestId: string) => {
-  if (!_json || !_snapshotId || !_requestId) return
+  if (!_json || !_snapshotId || !_requestId) return {}
 
   const countResult = await countCohort(_json, _snapshotId, _requestId)
   if (!countResult) return {}

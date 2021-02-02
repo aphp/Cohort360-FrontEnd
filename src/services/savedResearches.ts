@@ -80,7 +80,7 @@ export const fetchCohorts = async (
   }
 }
 
-export const fetchFavoriteCohorts = async (): Promise<Back_API_Response<FormattedCohort> | undefined> => {
+export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefined> => {
   if (CONTEXT === 'aphp') {
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>('/explorations/cohorts/?favorite=true')
 
@@ -101,13 +101,11 @@ export const fetchFavoriteCohorts = async (): Promise<Back_API_Response<Formatte
           .filter(Boolean)
       : undefined
 
-    return {
-      results: results
-    }
+    return results
   }
 }
 
-export const fetchLastCohorts = async (): Promise<Back_API_Response<FormattedCohort> | undefined> => {
+export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined> => {
   if (CONTEXT === 'aphp') {
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
       '/explorations/cohorts/?limit=5&ordering=-created_at'
@@ -128,22 +126,24 @@ export const fetchLastCohorts = async (): Promise<Back_API_Response<FormattedCoh
           .filter(Boolean)
       : undefined
 
-    return {
-      results: results
-    }
+    return results
   }
 }
 
-export const setFavorite = async (cohortId: string, favStatus: boolean) => {
+export const setFavorite = async (cohortId: string, favStatus: boolean): Promise<boolean> => {
   if (CONTEXT === 'aphp') {
-    await apiBackCohort.patch(`/explorations/cohorts/${cohortId}/`, { favorite: !favStatus })
+    const response = await apiBackCohort.patch(`/explorations/cohorts/${cohortId}/`, { favorite: !favStatus })
+    return response.status === 200
   }
+  return false
 }
 
-export const onRemoveCohort = async (selectedCohort?: string) => {
+export const onRemoveCohort = async (selectedCohort?: string): Promise<boolean> => {
   if (CONTEXT === 'arkhn') {
     await api.delete(`/Group/${selectedCohort}`)
   } else if (CONTEXT === 'aphp') {
-    await apiBackCohort.delete(`/explorations/cohorts/${selectedCohort}/`)
+    const deleteRequest = await apiBackCohort.delete(`/explorations/cohorts/${selectedCohort}/`)
+    return [200, 204].includes(deleteRequest.status)
   }
+  return false
 }

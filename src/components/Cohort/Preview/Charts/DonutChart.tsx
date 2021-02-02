@@ -1,7 +1,9 @@
 //@ts-nocheck
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import * as d3 from 'd3'
+import legend from './Legend'
 
+import useStyles from './styles'
 import { SimpleChartDataType } from 'types'
 
 import displayDigit from 'utils/displayDigit'
@@ -12,8 +14,11 @@ type DonutChartProps = {
   width?: number
 }
 
-const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 320 }) => {
+const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 250 }) => {
+  const classes = useStyles()
+
   const node = useRef<SVGSVGElement | null>(null)
+  const [legendHtml, setLegend] = useState()
 
   useEffect(() => {
     if (!data) {
@@ -45,42 +50,45 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 320
       .innerRadius(radius * 0.8)
       .outerRadius(radius - 1)
 
+    const div = d3.select('#tooltip').style('opacity', 0)
+
     svg
       .selectAll('path')
       .data(arcs)
       .join('path')
       .attr('fill', (d) => color(d.data.label))
       .attr('d', arc)
-      .append('title')
-      .text((d) => `${d.data.label}: ${displayDigit(d.data.value)}`)
+      .on('mouseover', function (d) {
+        d3.select(this).transition().duration('50').attr('opacity', '.5')
+        div.transition().duration(50).style('opacity', 1)
+        div
+          .html(d.value)
+          .style('left', d3.event.pageX + 10 + 'px')
+          .style('top', d3.event.pageY - 15 + 'px')
+      })
+      .on('mouseout', function () {
+        d3.select(this).transition().duration('50').attr('opacity', '1')
+        div.transition().duration(50).style('opacity', 0)
+      })
 
-    svg
-      .append('g')
-      .attr('font-family', 'sans-serif')
-      .attr('font-size', 10)
-      .attr('text-anchor', 'middle')
-      .selectAll('text')
-      .data(arcs)
-      .join('text')
-      .attr('transform', (d) => `translate(${arc.centroid(d)})`)
-      .call((text) =>
-        text
-          .append('tspan')
-          .attr('y', '-0.4em')
-          .attr('font-weight', 'bold')
-          .text((d) => d.data.label)
-      )
-      .call((text) =>
-        text
-          .append('tspan')
-          .attr('x', 0)
-          .attr('y', '0.7em')
-          .attr('fill-opacity', 0.7)
-          .text((d) => displayDigit(d.data.value))
-      )
+    setLegend(
+      legend({
+        color: color,
+        columns: '250px',
+        dataValues: data.map((entry) => displayDigit(entry.value))
+      })
+    )
   }, [node, data, height, width])
 
-  return <svg ref={node}></svg>
+  return (
+    <>
+      <div style={{ display: 'flex' }}>
+        <svg ref={node}></svg>
+        <div style={{ display: 'flex' }} dangerouslySetInnerHTML={{ __html: legendHtml }} />
+      </div>
+      <div id="tooltip" className={classes.tooltip} />
+    </>
+  )
 }
 
 export default DonutChart
