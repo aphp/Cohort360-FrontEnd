@@ -33,9 +33,47 @@ import {
 import { searchPatient } from './searchPatient'
 import { getAge } from 'utils/age'
 import moment from 'moment'
+
+import fakeGroup from '../data/fakeData/group'
+import fakeFacetDeceased from '../data/fakeData/facet-deceased'
+import fakeFacetAgeMonth from '../data/fakeData/facet-age-month'
+import fakeFacetClassSimple from '../data/fakeData/facet-class-simple'
+import fakeFacetStartDateFacet from '../data/fakeData/facet-start-date-facet'
+import fakePatients from '../data/fakeData/patients'
 // import { fetchPerimetersInfos } from './perimeters'
 
 const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | undefined> => {
+  if (CONTEXT === 'fakedata') {
+    const name = 'Fausse cohorte'
+    const requestId = '123456789'
+    const totalPatients = 3
+
+    // const originalPatients = await getLastEncounter(getApiResponseResources(patientsResp))
+
+    const cohort = fakeGroup as IGroup
+
+    const originalPatients = fakePatients as IPatient[]
+
+    const agePyramidData = getAgeRepartitionMapAphp(fakeFacetAgeMonth)
+
+    const genderRepartitionMap = getGenderRepartitionMapAphp(fakeFacetDeceased)
+
+    const monthlyVisitData = getVisitRepartitionMapAphp(fakeFacetStartDateFacet)
+
+    const visitTypeRepartitionData = getEncounterRepartitionMapAphp(fakeFacetClassSimple)
+
+    return {
+      name,
+      cohort,
+      totalPatients,
+      originalPatients,
+      genderRepartitionMap,
+      visitTypeRepartitionData,
+      agePyramidData,
+      monthlyVisitData,
+      requestId
+    }
+  }
   if (CONTEXT === 'aphp') {
     const [cohortInfo, cohortResp, patientsResp, encountersResp] = await Promise.all([
       apiBackCohort.get<Back_API_Response<Cohort>>(`/explorations/cohorts/?fhir_group_id=${cohortId}`),
