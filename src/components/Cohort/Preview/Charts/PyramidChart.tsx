@@ -1,6 +1,7 @@
 //@ts-nocheck
-import React, { useRef, useEffect, memo } from 'react'
+import React, { useRef, useEffect, memo, useState } from 'react'
 import * as d3 from 'd3'
+import legend from './Legend'
 
 type PyramidProps = {
   data?: Map<number, { male: number; female: number }>
@@ -10,6 +11,7 @@ type PyramidProps = {
 
 const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height = 250 }) => {
   const node = useRef<SVGSVGElement | null>(null)
+  const [legendHtml, setLegend] = useState()
 
   useEffect(() => {
     if (!data || (data && !data.size)) {
@@ -115,31 +117,19 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
 
     svg.append('g').call(yAxis)
 
-    svg.append('rect').attr('x', 315).attr('y', 10).attr('width', 10).attr('height', 10).attr('fill', '#FC568F')
-
-    svg
-      .attr('text-anchor', 'end')
-      .attr('font-family', 'sans-serif')
-      .attr('font-size', 10)
-      .append('text')
-      .attr('x', 370)
-      .attr('y', 15)
-      .attr('dy', '0.35em')
-      .text('Femmes')
-
-    svg.append('rect').attr('x', 315).attr('y', 25).attr('width', 10).attr('height', 10).attr('fill', '#78D4FA')
-
-    svg
-      .attr('text-anchor', 'end')
-      .attr('font-family', 'sans-serif')
-      .attr('font-size', 10)
-      .append('text')
-      .attr('x', 372)
-      .attr('y', 30)
-      .attr('dy', '0.35em')
-      .text('Hommes')
+    setLegend(
+      legend({
+        color: d3.scaleOrdinal().domain(['Hommes', 'Femmes']).range(['#78D4FA', '#FC568F']),
+        columns: '70px'
+      })
+    )
   }, [node, data, height, width])
 
-  return <svg ref={node}></svg>
+  return (
+    <div style={{ display: 'flex' }}>
+      <svg ref={node}></svg>
+      <div style={{ display: 'flex' }} dangerouslySetInnerHTML={{ __html: legendHtml }} />
+    </div>
+  )
 })
 export default PyramidChart
