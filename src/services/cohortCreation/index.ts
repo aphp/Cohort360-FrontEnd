@@ -17,6 +17,8 @@ export const countCohort = async (
     // const request: Cohort_Count_API_Response = await api.post('QueryServer/api/count', requeteurJson)
     // const { data } = request
     return null
+  } else if (CONTEXT === 'fakedata') {
+    return null
   } else {
     const countResult = (await api.post('QueryServer/api/count', requeteurJson)) || {}
     const { data } = countResult
@@ -50,6 +52,8 @@ export const createCohort = async (
     // const request: Cohort_Creation_API_Response = await api.post('QueryServer/api/count', requeteurJson)
     // const { data } = request
     return null
+  } else if (CONTEXT === 'fakedata') {
+    return null
   } else {
     const fihrResult: Cohort_Creation_API_Response = (await api.post('QueryServer/api/create', requeteurJson)) || {}
     const { data } = fihrResult
@@ -74,6 +78,8 @@ export const createCohort = async (
 export const createRequest = async () => {
   if (CONTEXT === 'arkhn') {
     return null
+  } else if (CONTEXT === 'fakedata') {
+    return null
   } else {
     const request =
       (await apiBack.post('/explorations/requests/', {
@@ -88,6 +94,8 @@ export const createRequest = async () => {
 
 export const createSnapshot = async (id: string, json: string, firstTime?: boolean) => {
   if (CONTEXT === 'arkhn') {
+    return null
+  } else if (CONTEXT === 'fakedata') {
     return null
   } else {
     const data = {
