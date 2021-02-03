@@ -1,12 +1,23 @@
 import { CONTEXT } from '../../constants'
 import apiRequest from '../apiRequest'
+import {
+  fakeAdmissionModes,
+  fakeEntryModes,
+  fakeExitModes,
+  fakeFileStatus
+} from '.././../data/fakeData/cohortCreation/encounter'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
 
 export const fetchAdmissionModes = async () => {
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
-    return null
+    return fakeAdmissionModes && fakeAdmissionModes.length > 0
+      ? fakeAdmissionModes.map((_fakeAdmissionModes: { code: string; display: string }) => ({
+          id: _fakeAdmissionModes.code,
+          label: capitalizeFirstLetter(_fakeAdmissionModes.display)
+        }))
+      : []
   } else {
     try {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit_type`)
@@ -27,7 +38,12 @@ export const fetchEntryModes = async () => {
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
-    return null
+    return fakeEntryModes && fakeEntryModes.length > 0
+      ? fakeEntryModes.map((_fakeEntryModes: { code: string; display: string }) => ({
+          id: _fakeEntryModes.code,
+          label: capitalizeFirstLetter(_fakeEntryModes.display)
+        }))
+      : []
   } else {
     try {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit_mode entree`)
@@ -48,7 +64,12 @@ export const fetchExitModes = async () => {
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
-    return null
+    return fakeExitModes && fakeExitModes.length > 0
+      ? fakeExitModes.map((_fakeExitModes: { code: string; display: string }) => ({
+          id: _fakeExitModes.code,
+          label: capitalizeFirstLetter(_fakeExitModes.display)
+        }))
+      : []
   } else {
     try {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit_mode sortie`)
@@ -69,7 +90,12 @@ export const fetchFileStatus = async () => {
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
-    return null
+    return fakeFileStatus && fakeFileStatus.length > 0
+      ? fakeFileStatus.map((_fakeFileStatus: { code: string; display: string }) => ({
+          id: _fakeFileStatus.code,
+          label: capitalizeFirstLetter(_fakeFileStatus.display)
+        }))
+      : []
   } else {
     try {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visite-status`)

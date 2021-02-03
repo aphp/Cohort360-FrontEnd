@@ -6,7 +6,25 @@ export const fetchGender = async () => {
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
-    return null
+    const res = [
+      {
+        id: 'm',
+        label: 'Homme'
+      },
+      {
+        id: 'f',
+        label: 'Femme'
+      },
+      {
+        id: 'o',
+        label: 'Autre'
+      },
+      {
+        id: 'i',
+        label: 'Indeterminé.e'
+      }
+    ]
+    return res
   } else {
     try {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-gender`)

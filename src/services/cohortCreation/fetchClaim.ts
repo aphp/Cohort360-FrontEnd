@@ -1,6 +1,6 @@
 import { CONTEXT } from '../../constants'
 import apiRequest from '../../services/apiRequest'
-import { fakeValueSetGHM, fakeHierarchyGHM } from '../../data/fakeData/cohortCreation/claim'
+import { fakeValueSetGHM /*fakeHierarchyGHM*/ } from '../../data/fakeData/cohortCreation/claim'
 import { alphabeticalSort } from '../../utils/alphabeticalSort'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
 

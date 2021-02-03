@@ -1,5 +1,11 @@
 import { CONTEXT } from '../../constants'
 import apiRequest from '../../services/apiRequest'
+import { capitalizeFirstLetter } from '../../utils/capitalize'
+import {
+  fakeValueSetDiagnosticType,
+  fakeValueSetCIM10
+  // fakeHierarchyCIM10
+} from '../../data/fakeData/cohortCreation/condition'
 import { alphabeticalSort } from 'utils/alphabeticalSort'
 
 const DEFAULT_DIAGNOSTIC_TYPES = [
@@ -37,7 +43,17 @@ export const fetchStatusDiagnostic = async () => {
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
-    return null
+    const res = [
+      {
+        id: 'actif',
+        label: 'Actif'
+      },
+      {
+        id: 'supp',
+        label: 'Supprimé'
+      }
+    ]
+    return res
   } else {
     const res = [
       {
@@ -57,7 +73,12 @@ export const fetchDiagnosticTypes = async () => {
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
-    return null
+    return fakeValueSetDiagnosticType && fakeValueSetDiagnosticType.length > 0
+      ? fakeValueSetDiagnosticType.map((_fakeValueSetDiagnosticType: { code: string; display: string }) => ({
+          id: _fakeValueSetDiagnosticType.code,
+          label: capitalizeFirstLetter(_fakeValueSetDiagnosticType.display)
+        }))
+      : []
   } else {
     const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-condition_status`)
 
@@ -80,7 +101,12 @@ export const fetchCim10Diagnostic = async (searchValue?: string) => {
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
-    return null
+    return fakeValueSetCIM10 && fakeValueSetCIM10.length > 0
+      ? fakeValueSetCIM10.map((_fakeValueSetCIM10: { code: string; display: string }) => ({
+          id: _fakeValueSetCIM10.code,
+          label: capitalizeFirstLetter(_fakeValueSetCIM10.display)
+        }))
+      : []
   } else {
     if (!searchValue) {
       return []
