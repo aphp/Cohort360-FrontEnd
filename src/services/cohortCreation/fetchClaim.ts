@@ -1,5 +1,6 @@
 import { CONTEXT } from '../../constants'
 import apiRequest from '../../services/apiRequest'
+import { fakeValueSetGHM, fakeHierarchyGHM } from '../../data/fakeData/cohortCreation/claim'
 import { alphabeticalSort } from '../../utils/alphabeticalSort'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
 
@@ -7,7 +8,12 @@ export const fetchGhmData = async (searchValue?: string) => {
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
-    return null
+    return fakeValueSetGHM && fakeValueSetGHM.length > 0
+      ? fakeValueSetGHM.map((_fakeValueSetGHM: { code: string; display: string }) => ({
+          id: _fakeValueSetGHM.code,
+          label: capitalizeFirstLetter(_fakeValueSetGHM.display)
+        }))
+      : []
   } else {
     if (!searchValue) {
       return []
