@@ -49,7 +49,7 @@ type RequeteurSearchType = {
   fhirFilter: string
 }
 
-export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
+export function buildRequest(selectedPopulation: any, selectedCriteria: any, criteriaGroup: any) {
   if (!selectedPopulation) return ''
 
   const filterReducer = (accumulator: any, currentValue: any) =>
@@ -573,19 +573,24 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
       const fetchKeys = Object.keys(_criterion.fetch)
       for (const fetchKey of fetchKeys) {
         const dataKey = fetchKey.replace('fetch', '').replace(/(\b[A-Z])(?![A-Z])/g, ($1) => $1.toLowerCase())
-        const currentSelectedCriteria = selectedCriteria.filter(
-          (selectedCriterion: SelectedCriteriaType) => selectedCriterion.type === _criterion.id
-        )
         switch (dataKey) {
           case 'ghmData':
           case 'ccamData':
-          case 'cim10Diagnostic':
+          case 'cim10Diagnostic': {
             if (_criterion.data[dataKey] === 'loading') _criterion.data[dataKey] = []
+            const currentSelectedCriteria = selectedCriteria.filter(
+              (selectedCriterion: SelectedCriteriaType) => selectedCriterion.type === _criterion.id
+            )
 
             if (currentSelectedCriteria) {
               for (const currentSelectedCriterion of currentSelectedCriteria) {
                 if (
                   currentSelectedCriterion &&
+                  !(
+                    currentSelectedCriterion.type === 'Patient' ||
+                    currentSelectedCriterion.type === 'Composition' ||
+                    currentSelectedCriterion.type === 'Encounter'
+                  ) &&
                   currentSelectedCriterion.code &&
                   currentSelectedCriterion.code.length > 0
                 ) {
@@ -605,6 +610,7 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
               }
             }
             break
+          }
           default:
             if (_criterion.data[dataKey] === 'loading') {
               _criterion.data[dataKey] = await _criterion.fetch[fetchKey]()
