@@ -2,14 +2,6 @@ import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(() => ({
   root: {
-    '&::before': {
-      content: '""',
-      width: 2,
-      height: 36,
-      background: '#D0D7D8',
-      display: 'block',
-      margin: '0 auto'
-    },
     '&::after': {
       content: '""',
       width: 2,
@@ -20,8 +12,7 @@ const useStyles = makeStyles(() => ({
     }
   },
   card: {
-    width: 450,
-    height: 'fit-content'
+    width: 450
   },
   cardHeader: {
     display: 'flex',

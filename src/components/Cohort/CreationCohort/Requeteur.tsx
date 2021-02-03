@@ -24,9 +24,9 @@ const Requeteur = () => {
   const {
     requestId = '',
     currentSnapshot = '',
+    selectedCriteria = [],
     snapshotsHistory = [],
     count = {},
-    selectedCriteria = [],
     json = ''
   } = useAppSelector((state) => state.cohortCreation.request || {})
 
@@ -48,7 +48,7 @@ const Requeteur = () => {
     _criteria = await getDataFromFetch(Object.freeze(_criteria), selectedCriteria)
     dispatch(setCriteriaList(_criteria))
     setLoading(false)
-  }, [dispatch, practitioner, selectedCriteria])
+  }, []) // eslint-disable-line
 
   const _unbuildRequest = async (newCurrentSnapshot: CohortCreationSnapshotType) => {
     dispatch(unbuildCreationCohort({ newCurrentSnapshot }))

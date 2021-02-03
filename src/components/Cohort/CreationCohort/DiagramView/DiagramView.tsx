@@ -1,7 +1,7 @@
 import React from 'react'
 
 import PopulationCard from './components/PopulationCard/PopulationCard'
-import CriteriaCard from './components/CriteriaCard/CriteriaCard'
+import GroupCard from './components/GroupCard/GroupCard'
 
 import { useAppSelector } from 'state'
 
@@ -15,7 +15,7 @@ const DiagramView: React.FC = () => {
   return (
     <div className={classes.root}>
       <PopulationCard />
-      {selectedPopulation && selectedPopulation.length > 0 ? <CriteriaCard /> : <></>}
+      {selectedPopulation && selectedPopulation.length > 0 ? <GroupCard /> : <></>}
     </div>
   )
 }

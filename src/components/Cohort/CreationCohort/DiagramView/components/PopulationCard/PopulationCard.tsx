@@ -29,54 +29,58 @@ const PopulationCard: React.FC = () => {
 
   return (
     <>
-      <Card className={classes.root}>
-        <CardHeader
-          className={classes.cardHeader}
-          action={
-            selectedPopulation !== null && (
-              <IconButton size="small" onClick={() => onChangeOpenDrawer(true)} style={{ color: 'currentcolor' }}>
-                <EditIcon />
-              </IconButton>
-            )
-          }
-          title="Population source"
-        />
-        <CardContent className={classes.cardContent}>
-          {selectedPopulation === null && loading === true ? (
-            <CircularProgress />
-          ) : selectedPopulation !== null ? (
-            <>
-              <Typography align="center">Patients ayant été pris en charge à :</Typography>
-              {selectedPopulation &&
-                selectedPopulation.slice(0, 3).map((pop: any) => (
-                  <Typography key={pop.name} align="center" className={classes.populationLabel}>
-                    {pop.name}
+      <div className={selectedPopulation !== null ? classes.root : ''}>
+        <Card className={classes.card}>
+          <CardHeader
+            className={classes.cardHeader}
+            action={
+              selectedPopulation !== null && (
+                <IconButton size="small" onClick={() => onChangeOpenDrawer(true)} style={{ color: 'currentcolor' }}>
+                  <EditIcon />
+                </IconButton>
+              )
+            }
+            title="Population source"
+          />
+          <CardContent className={classes.cardContent}>
+            {selectedPopulation === null && loading === true ? (
+              <CircularProgress />
+            ) : selectedPopulation !== null ? (
+              <>
+                <Typography align="center">Patients ayant été pris en charge à :</Typography>
+                {selectedPopulation &&
+                  selectedPopulation.slice(0, 3).map((pop: any) => (
+                    <Typography key={pop.name} align="center" className={classes.populationLabel}>
+                      {pop.name}
+                    </Typography>
+                  ))}
+                {selectedPopulation && selectedPopulation.length > 3 && (
+                  <Typography align="center" className={classes.populationLabel}>
+                    ...
                   </Typography>
-                ))}
-              {selectedPopulation && selectedPopulation.length > 3 && (
-                <Typography align="center" className={classes.populationLabel}>
-                  ...
+                )}
+              </>
+            ) : (
+              <>
+                <Typography align="center">
+                  Sur quelle population source souhaitez-vous baser votre requête ?
                 </Typography>
-              )}
-            </>
-          ) : (
-            <>
-              <Typography align="center">Sur quelle population source souhaitez-vous baser votre requête ?</Typography>
 
-              <div className={classes.actionButtonContainer}>
-                <Button
-                  onClick={() => onChangeOpenDrawer(true)}
-                  variant="contained"
-                  color="primary"
-                  className={classes.actionButton}
-                >
-                  <Typography variant="h5">Structure hospitalière</Typography>
-                </Button>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+                <div className={classes.actionButtonContainer}>
+                  <Button
+                    onClick={() => onChangeOpenDrawer(true)}
+                    variant="contained"
+                    color="primary"
+                    className={classes.actionButton}
+                  >
+                    <Typography variant="h5">Structure hospitalière</Typography>
+                  </Button>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       <PopulationRightPanel open={openDrawer} onConfirm={submitPopulation} onClose={() => onChangeOpenDrawer(false)} />
     </>
