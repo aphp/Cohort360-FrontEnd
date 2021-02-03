@@ -13,6 +13,25 @@ export const fetchCohorts = async (
   searchInput?: string,
   page?: number
 ): Promise<Back_API_Response<FormattedCohort> | undefined> => {
+  if (CONTEXT === 'fakedata') {
+    const results = [
+      {
+        researchId: '123456789',
+        fhir_group_id: '123456789',
+        name: 'Fausse cohorte',
+        status: 'Cohort360',
+        nPatients: 12,
+        date: '2021-01-20T10:28:28.385368Z',
+        perimeter: '-',
+        favorite: true
+      }
+    ]
+
+    return {
+      results: results,
+      count: 1
+    }
+  }
   if (CONTEXT === 'arkhn') {
     // const cohortResp = await api.get<FHIR_API_Response<IGroup>>(
     //   '/Group?&_sort=-meta.lastUpdated'
@@ -81,6 +100,22 @@ export const fetchCohorts = async (
 }
 
 export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefined> => {
+  if (CONTEXT === 'fakedata') {
+    const results = [
+      {
+        researchId: '123456789',
+        fhir_group_id: '123456789',
+        name: 'Fausse cohorte',
+        status: 'Cohort360',
+        nPatients: 12,
+        date: '2021-01-20T10:28:28.385368Z',
+        perimeter: '-',
+        favorite: true
+      }
+    ]
+
+    return results
+  }
   if (CONTEXT === 'aphp') {
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>('/explorations/cohorts/?favorite=true')
 
@@ -106,6 +141,22 @@ export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefi
 }
 
 export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined> => {
+  if (CONTEXT === 'fakedata') {
+    const results = [
+      {
+        researchId: '123456789',
+        fhir_group_id: '123456789',
+        name: 'Fausse cohorte',
+        status: 'Cohort360',
+        nPatients: 12,
+        date: '2021-01-20T10:28:28.385368Z',
+        perimeter: '-',
+        favorite: true
+      }
+    ]
+
+    return results
+  }
   if (CONTEXT === 'aphp') {
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
       '/explorations/cohorts/?limit=5&ordering=-created_at'

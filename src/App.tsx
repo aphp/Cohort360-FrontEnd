@@ -12,6 +12,7 @@ import moment from 'moment'
 import { PersistGate } from 'redux-persist/integration/react'
 
 import Connexion from './views/Connexion/Connexion'
+import FakeConnexion from './views/Connexion/FakeConnexion'
 import ArkhnConnexion from './views/Connexion/ArkhnConnexion'
 import Accueil from './views/Accueil/Accueil'
 import RechercherPatient from './views/RechercherPatient/RechercherPatient'
@@ -49,7 +50,11 @@ const App = () => (
             <Switch>
               {/* <Route path="/*" render={() => '404 not found'} /> */}
               {/* TODO: Change connexion to /login */}
-              <Route exact path="/" component={CONTEXT === 'arkhn' ? ArkhnConnexion : Connexion} />
+              <Route
+                exact
+                path="/"
+                component={CONTEXT === 'arkhn' ? ArkhnConnexion : CONTEXT === 'aphp' ? Connexion : FakeConnexion}
+              />
               {/* TODO: Change home to / */}
               <PrivateRoute
                 exact

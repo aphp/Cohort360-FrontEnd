@@ -7,6 +7,9 @@ import { getApiResponseResources } from 'utils/apiHelpers'
 const fetchDeidentified = async (
   practitionerId?: string
 ): Promise<{ deidentification: boolean; nominativeGroupsIds?: string[] } | undefined> => {
+  if (CONTEXT === 'fakedata') {
+    return { deidentification: false, nominativeGroupsIds: [] }
+  }
   if (CONTEXT === 'arkhn') {
     return { deidentification: false }
   }
