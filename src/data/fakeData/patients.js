@@ -51,8 +51,8 @@ const patients = [
     ],
     name: [
       {
-        family: 'Nom',
-        given: ['Prénom']
+        family: 'Kylo',
+        given: ['Ren']
       }
     ],
     gender: 'male',
@@ -111,8 +111,8 @@ const patients = [
     ],
     name: [
       {
-        family: 'Nom',
-        given: ['Prénom']
+        family: 'Binks',
+        given: ['Jar Jar']
       }
     ],
     gender: 'male',
@@ -171,8 +171,8 @@ const patients = [
     ],
     name: [
       {
-        family: 'Nom',
-        given: ['Prénom']
+        family: 'Skywalker',
+        given: ['Anakin']
       }
     ],
     gender: 'male',
