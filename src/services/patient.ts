@@ -24,12 +24,15 @@ import { getApiResponseResources } from 'utils/apiHelpers'
 export const fetchPatientsCount = async (): Promise<number | undefined> => {
   if (CONTEXT === 'fakedata') {
     return 12
+  } else if (CONTEXT === 'arkhn') {
+    return undefined
+  } else {
+    const response = await api.get<FHIR_API_Response<IPatient>>('Patient?size=0')
+
+    if (response?.data?.resourceType === 'OperationOutcome') return undefined
+
+    return response.data.total
   }
-  const response = await api.get<FHIR_API_Response<IPatient>>('Patient?size=0')
-
-  if (response?.data?.resourceType === 'OperationOutcome') return undefined
-
-  return response.data.total
 }
 
 export const fillNDAAndServiceProviderDocs = async (
