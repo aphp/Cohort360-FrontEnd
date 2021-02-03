@@ -6,7 +6,12 @@ export const fetchDocTypes = () => {
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
-    return null
+    return docTypes && docTypes.docTypes.length > 0
+      ? docTypes.docTypes.map((_docType: { code: string; label: string }) => ({
+          id: _docType.code,
+          label: capitalizeFirstLetter(_docType.label)
+        }))
+      : []
   } else {
     return docTypes && docTypes.docTypes.length > 0
       ? docTypes.docTypes.map((_docType: { code: string; label: string }) => ({
