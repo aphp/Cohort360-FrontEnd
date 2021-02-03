@@ -11,6 +11,8 @@ import {
 import { FHIR_API_Response, ScopeTreeRow } from '../types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
+import fakeScopeRows from '../data/fakeData/scopeRows'
+
 const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0 }
 
 const getServicePatientsCount = async (
@@ -99,6 +101,11 @@ const getAccessName = (extension?: IExtension[]) => {
 }
 
 export const getScopePerimeters = async (practitionerId: string): Promise<ScopeTreeRow[]> => {
+  if (CONTEXT === 'fakedata') {
+    const scopeRows = fakeScopeRows as ScopeTreeRow[]
+
+    return scopeRows
+  }
   if (CONTEXT === 'aphp') {
     const perimetersResults = await getPerimeters(practitionerId)
 

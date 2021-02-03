@@ -1,6 +1,6 @@
 const fakeGroup = {
   resourceType: 'Group',
-  id: '1',
+  id: '123456789',
   meta: {
     lastUpdated: '2021-01-21T15:01:28.791+01:00'
   },
