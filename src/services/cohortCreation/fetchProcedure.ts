@@ -1,12 +1,19 @@
 import { CONTEXT } from '../../constants'
 import apiRequest from '../../services/apiRequest'
+import { fakeValueSetCCAM /*fakeHierarchyCCAM*/ } from '../../data/fakeData/cohortCreation/procedure'
+import { capitalizeFirstLetter } from '../../utils/capitalize'
 import { alphabeticalSort } from '../../utils/alphabeticalSort'
 
 export const fetchCcamData = async (searchValue?: string) => {
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
-    return null
+    return fakeValueSetCCAM && fakeValueSetCCAM.length > 0
+      ? fakeValueSetCCAM.map((_fakeValueSetCCAM: { code: string; display: string }) => ({
+          id: _fakeValueSetCCAM.code,
+          label: capitalizeFirstLetter(_fakeValueSetCCAM.display)
+        }))
+      : []
   } else {
     if (!searchValue) {
       return []
