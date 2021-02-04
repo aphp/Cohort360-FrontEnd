@@ -138,7 +138,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                     {practitioner && `${practitioner.displayName}`}
                   </Typography>
                 </Grid>
-                <Grid container xs={2}>
+                <Grid container xs={2} item>
                   <ListItemIcon
                     className={clsx(classes.logoutButton, {
                       [classes.hide]: !open

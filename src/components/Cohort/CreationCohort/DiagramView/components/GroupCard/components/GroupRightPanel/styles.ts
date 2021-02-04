@@ -6,7 +6,8 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     width: '95vw',
     maxWidth: 650,
-    height: '100%'
+    overflow: 'auto',
+    height: 'calc(100% - 63px)'
   },
   drawerTitleContainer: {
     display: 'flex',

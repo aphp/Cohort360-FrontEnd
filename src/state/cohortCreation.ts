@@ -196,6 +196,11 @@ const cohortCreationSlice = createSlice({
       state.nextGroupId--
     },
     //
+    editSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
+      const foundItem = state.selectedCriteria.find(({ id }) => id === action.payload.id)
+      const index = foundItem ? state.selectedCriteria.indexOf(foundItem) : -1
+      if (index !== -1) state.selectedCriteria[index] = action.payload
+    },
     editCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroupType>) => {
       const foundItem = state.criteriaGroup.find(({ id }) => id === action.payload.id)
       const index = foundItem ? state.criteriaGroup.indexOf(foundItem) : -1

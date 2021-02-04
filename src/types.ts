@@ -217,6 +217,9 @@ export type CriteriaGroupType = {
   criteriaIds: number[] // = [SelectedCriteriaType.id | CriteriaGroupType.id, ...]
   isSubGroup?: boolean
   isInclusive?: boolean
+  options?: {
+    operator: '=' | '<' | '>' | '<=' | '>-'
+  }
 }
 
 export type CriteriaItemType = {
