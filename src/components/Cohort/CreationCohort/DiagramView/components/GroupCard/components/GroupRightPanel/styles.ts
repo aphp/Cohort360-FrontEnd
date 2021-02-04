@@ -31,6 +31,15 @@ const useStyles = makeStyles((theme) => ({
     background: 'white',
     margin: '8px 0'
   },
+  groupListItem: {
+    display: 'flex',
+    flexDirection: 'column',
+    padding: 8,
+    border: '1px solid grey',
+    borderRadius: 5,
+    background: 'white',
+    margin: '8px 0'
+  },
   listTitle: {
     fontSize: 16,
     color: 'grey',
