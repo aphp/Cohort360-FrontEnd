@@ -15,7 +15,7 @@ const useStyles = makeStyles(() => ({
     width: 450
   },
   card: {
-    width: '80%',
+    width: '90%',
     margin: '10px auto'
   },
   cardHeader: {

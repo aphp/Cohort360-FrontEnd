@@ -57,6 +57,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId }) => {
         <ListItemText
           classes={{ primary: classes.listTitle, secondary: classes.listDesc }}
           primary={currentItem.title}
+          secondaryTypographyProps={{ component: 'span' }}
           secondary={<CriteriaCardContent currentCriteria={currentItem} />}
         />
         <ListItemSecondaryAction>
@@ -79,6 +80,14 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId }) => {
     return (
       <ListItem classes={{ root: classes.groupListItem }} alignItems="flex-start">
         <ListItemText classes={{ primary: classes.listTitle }} primary={currentItem.title} />
+
+        <List style={{ width: '90%', alignSelf: 'center' }}>
+          {currentItem &&
+            currentItem.criteriaIds &&
+            currentItem.criteriaIds.length > 0 &&
+            currentItem.criteriaIds.map((criteriaId: number) => <GroupListItem key={criteriaId} itemId={criteriaId} />)}
+        </List>
+
         <ListItemSecondaryAction style={{ top: 26 }}>
           <Switch edge="end" />
           <IconButton color="primary" edge="end" aria-label="edit">
@@ -88,13 +97,6 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId }) => {
             <DeleteIcon />
           </IconButton>
         </ListItemSecondaryAction>
-
-        <List style={{ width: '90%', alignSelf: 'center' }}>
-          {currentItem &&
-            currentItem.criteriaIds &&
-            currentItem.criteriaIds.length > 0 &&
-            currentItem.criteriaIds.map((criteriaId: number) => <GroupListItem key={criteriaId} itemId={criteriaId} />)}
-        </List>
       </ListItem>
     )
   }
@@ -105,7 +107,11 @@ const initialState: CriteriaGroupType = {
   title: 'Groupe de critère',
   type: 'andGroup',
   criteriaIds: [],
-  isSubGroup: false
+  isSubGroup: false,
+  isInclusive: true,
+  options: {
+    operator: '='
+  }
 }
 
 type GroupRightPanelProps = {
@@ -127,14 +133,13 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
   }>((state) => state.cohortCreation)
 
   const [openDrawer, setOpenDrawer] = useState<'criteria' | 'group' | null>(null)
-
   const [currentGroup, editCurrentGroup] = useState<CriteriaGroupType>(
     currentCriteriaGroup ?? { ...initialState, isSubGroup }
   )
 
   useEffect(() => {
     editCurrentGroup(currentCriteriaGroup ?? { ...initialState, isSubGroup })
-  }, [open])
+  }, [open]) // eslint-disable-line
 
   const _addNewItem = (type: 'criteria' | 'group') => {
     setOpenDrawer(type)
@@ -226,6 +231,8 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
               Ajouter un sous groupe de critère
             </Button>
           </Grid>
+
+          <>{/* ICI OPTIONS DE GROUPE */}</>
         </div>
 
         <Grid className={classes.groupActionContainer}>

@@ -49,8 +49,8 @@ const PopulationCard: React.FC = () => {
               <>
                 <Typography align="center">Patients ayant été pris en charge à :</Typography>
                 {selectedPopulation &&
-                  selectedPopulation.slice(0, 3).map((pop: any) => (
-                    <Typography key={pop.name} align="center" className={classes.populationLabel}>
+                  selectedPopulation.slice(0, 3).map((pop: any, index: number) => (
+                    <Typography key={`${index}-${pop.name}`} align="center" className={classes.populationLabel}>
                       {pop.name}
                     </Typography>
                   ))}
