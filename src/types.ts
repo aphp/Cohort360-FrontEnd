@@ -215,6 +215,8 @@ export type CriteriaGroupType = {
   title: string
   type: 'andGroup' | 'orGroup' | 'NamongM'
   criteriaIds: number[] // = [SelectedCriteriaType.id | CriteriaGroupType.id, ...]
+  isSubGroup?: boolean
+  isInclusive?: boolean
 }
 
 export type CriteriaItemType = {

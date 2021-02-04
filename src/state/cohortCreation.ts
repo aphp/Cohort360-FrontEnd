@@ -166,16 +166,27 @@ const cohortCreationSlice = createSlice({
   name: 'cohortCreation',
   initialState,
   reducers: {
+    resetCohortCreation: () => initialState,
     setCohortName: (state: CohortCreationState, action: PayloadAction<string>) => {
       state.cohortName = action.payload
     },
+    //
     setPopulationSource: (state: CohortCreationState, action: PayloadAction<ScopeTreeRow[] | null>) => {
       state.selectedPopulation = action.payload
     },
     setSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType[]>) => {
       state.selectedCriteria = action.payload
-      // Warning state.nextCriteriaId is not re-set
     },
+    //
+    deleteSelectedCriteria: (state: CohortCreationState, action: PayloadAction<number>) => {
+      const criteriaId = action.payload
+      state.selectedCriteria = state.selectedCriteria.filter(({ id }) => id !== criteriaId)
+    },
+    deleteCriteriaGroup: (state: CohortCreationState, action: PayloadAction<number>) => {
+      const groupId = action.payload
+      state.criteriaGroup = state.criteriaGroup.filter(({ id }) => id !== groupId)
+    },
+    //
     addNewSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
       state.selectedCriteria = [...state.selectedCriteria, action.payload]
       state.nextCriteriaId++
@@ -184,7 +195,12 @@ const cohortCreationSlice = createSlice({
       state.criteriaGroup = [...state.criteriaGroup, action.payload]
       state.nextGroupId--
     },
-    resetCohortCreation: () => initialState
+    //
+    editCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroupType>) => {
+      const foundItem = state.criteriaGroup.find(({ id }) => id === action.payload.id)
+      const index = foundItem ? state.criteriaGroup.indexOf(foundItem) : -1
+      if (index !== -1) state.criteriaGroup[index] = action.payload
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(logout, () => initialState)
@@ -199,8 +215,16 @@ export default cohortCreationSlice.reducer
 export { buildCreationCohort, unbuildCreationCohort }
 export const {
   resetCohortCreation,
+  //
   setCohortName,
   setPopulationSource,
   setSelectedCriteria,
-  addNewSelectedCriteria
+  //
+  deleteSelectedCriteria,
+  deleteCriteriaGroup,
+  //
+  addNewSelectedCriteria,
+  addNewCriteriaGroup,
+  //
+  editCriteriaGroup
 } = cohortCreationSlice.actions

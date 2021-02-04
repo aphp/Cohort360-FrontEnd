@@ -11,12 +11,17 @@ const useStyles = makeStyles(() => ({
       margin: '0 auto'
     }
   },
-  card: {
+  mainCard: {
     width: 450
+  },
+  card: {
+    width: '80%',
+    margin: '10px auto'
   },
   cardHeader: {
     display: 'flex',
     alignItems: 'center',
+    textAlign: 'left',
     background: '#DAF0BF',
     color: '#45505B'
   },
@@ -32,6 +37,10 @@ const useStyles = makeStyles(() => ({
     textDecoration: 'underline',
     fontWeight: 'bold'
   },
+  listItem: {},
+  listTitle: {},
+  listDesc: {},
+  groupListItem: {},
   label: {
     fontWeight: 'bold'
   },

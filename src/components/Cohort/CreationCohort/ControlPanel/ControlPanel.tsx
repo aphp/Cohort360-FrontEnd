@@ -24,10 +24,8 @@ const ControlPanel: React.FC<{
   const dispatch = useDispatch()
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
 
-  const {
-    loading = false,
-    count: { includePatient /*, byrequest, alive, deceased, female, male*/ }
-  } = useAppSelector((state) => state.cohortCreation.request || {})
+  const { loading = false, count = {} } = useAppSelector((state) => state.cohortCreation.request || {})
+  const { includePatient /*, byrequest, alive, deceased, female, male*/ } = count
 
   return (
     <>

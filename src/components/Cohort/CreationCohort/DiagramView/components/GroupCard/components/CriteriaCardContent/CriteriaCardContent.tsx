@@ -1,8 +1,7 @@
 import React from 'react'
 import moment from 'moment'
-// import { useDispatch } from 'react-redux'
 
-import { CardContent, Typography } from '@material-ui/core'
+import Typography from '@material-ui/core/Typography'
 
 import { useAppSelector } from 'state'
 import { SelectedCriteriaType } from 'types'
@@ -323,7 +322,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     return content
   }
 
-  return <CardContent className={classes.cardContent}>{_displayCardContent(currentCriteria)}</CardContent>
+  return <div className={classes.cardContent}>{_displayCardContent(currentCriteria)}</div>
 }
 
 export default CriteriaCardContent

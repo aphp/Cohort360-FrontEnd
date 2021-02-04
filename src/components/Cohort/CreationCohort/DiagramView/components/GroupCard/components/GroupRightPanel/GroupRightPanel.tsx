@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from 'state'
 
@@ -24,13 +24,17 @@ import CriteriaCardContent from '../CriteriaCardContent/CriteriaCardContent'
 
 import { CriteriaItemType, SelectedCriteriaType, CriteriaGroupType } from 'types'
 
-import { addNewSelectedCriteria, CohortCreationState } from 'state/cohortCreation'
+import {
+  addNewSelectedCriteria,
+  addNewCriteriaGroup,
+  editCriteriaGroup,
+  CohortCreationState
+} from 'state/cohortCreation'
 
 import useStyles from './styles'
 
 type GroupListItemProps = {
   itemId: number
-  index?: number
 }
 
 const GroupListItem: React.FC<GroupListItemProps> = ({ itemId }) => {
@@ -41,18 +45,13 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId }) => {
     criteriaGroup: CriteriaGroupType[]
   }>((state) => state.cohortCreation.request || {})
 
-  let currentItem: any = selectedCriteria.find((criteria) => criteria.id === itemId)
-  let isGroupObject = false
-  if (!currentItem) {
-    currentItem = criteriaGroup.find((criteria) => criteria.id === itemId)
-    isGroupObject = currentItem !== undefined
-  }
-  if (!currentItem) {
-    // Bug, not possible ... The current item is not a criteria and is not a group ...
-    return <></>
-  }
-
+  const isGroupObject = itemId < 0
   if (!isGroupObject) {
+    const currentItem: any = selectedCriteria.find((criteria) => criteria.id === itemId)
+    if (!currentItem) {
+      // Bug, not possible ... The current item is not a criteria and is not a group ...
+      return <></>
+    }
     return (
       <ListItem classes={{ root: classes.listItem }} alignItems="flex-start">
         <ListItemText
@@ -72,18 +71,52 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId }) => {
       </ListItem>
     )
   } else {
-    return <ListItem classes={{ root: classes.listItem }} alignItems="flex-start"></ListItem>
+    const currentItem: any = criteriaGroup.find((criteria) => criteria.id === itemId)
+    if (!currentItem) {
+      // Bug, not possible ... The current item is not a criteria and is not a group ...
+      return <></>
+    }
+    return (
+      <ListItem classes={{ root: classes.groupListItem }} alignItems="flex-start">
+        <ListItemText classes={{ primary: classes.listTitle }} primary={currentItem.title} />
+        <ListItemSecondaryAction style={{ top: 26 }}>
+          <Switch edge="end" />
+          <IconButton color="primary" edge="end" aria-label="edit">
+            <EditIcon />
+          </IconButton>
+          <IconButton color="primary" edge="end" aria-label="delete">
+            <DeleteIcon />
+          </IconButton>
+        </ListItemSecondaryAction>
+
+        <List style={{ width: '90%', alignSelf: 'center' }}>
+          {currentItem &&
+            currentItem.criteriaIds &&
+            currentItem.criteriaIds.length > 0 &&
+            currentItem.criteriaIds.map((criteriaId: number) => <GroupListItem key={criteriaId} itemId={criteriaId} />)}
+        </List>
+      </ListItem>
+    )
   }
+}
+
+const initialState: CriteriaGroupType = {
+  id: 0,
+  title: 'Groupe de critère',
+  type: 'andGroup',
+  criteriaIds: [],
+  isSubGroup: false
 }
 
 type GroupRightPanelProps = {
   open: boolean
+  currentCriteriaGroup?: CriteriaGroupType
   isSubGroup?: boolean
-  onClose: () => void
+  onClose: (newSubGroupId?: number) => void
 }
 
 const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
-  const { open, isSubGroup, onClose } = props
+  const { open, currentCriteriaGroup, isSubGroup, onClose } = props
 
   const classes = useStyles()
   const dispatch = useDispatch()
@@ -95,18 +128,19 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
 
   const [openDrawer, setOpenDrawer] = useState<'criteria' | 'group' | null>(null)
 
-  const [currentGroup, editCurrentGroup] = useState<CriteriaGroupType>({
-    id: 0,
-    title: 'Groupe de critère',
-    type: 'andGroup',
-    criteriaIds: []
-  })
+  const [currentGroup, editCurrentGroup] = useState<CriteriaGroupType>(
+    currentCriteriaGroup ?? { ...initialState, isSubGroup }
+  )
+
+  useEffect(() => {
+    editCurrentGroup(currentCriteriaGroup ?? { ...initialState, isSubGroup })
+  }, [open])
 
   const _addNewItem = (type: 'criteria' | 'group') => {
     setOpenDrawer(type)
   }
 
-  const _onAddCriteria = (newCriteria: SelectedCriteriaType) => {
+  const _addCriteria = (newCriteria: SelectedCriteriaType) => {
     newCriteria.id = request.nextCriteriaId
     dispatch(addNewSelectedCriteria(newCriteria))
     editCurrentGroup({
@@ -115,9 +149,34 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
     })
   }
 
+  const _addSubGroup = (newSubGroupId?: number) => {
+    if (newSubGroupId === undefined) return
+    editCurrentGroup({
+      ...currentGroup,
+      criteriaIds: [...currentGroup.criteriaIds, newSubGroupId]
+    })
+    setOpenDrawer(null)
+  }
+
+  const _addGroup = () => {
+    const isEdition = !!currentCriteriaGroup
+    if (isEdition) {
+      dispatch(editCriteriaGroup(currentGroup))
+      onClose()
+    } else {
+      currentGroup.id = request.nextGroupId
+      dispatch(addNewCriteriaGroup(currentGroup))
+      editCurrentGroup({
+        ...currentGroup,
+        criteriaIds: [...currentGroup.criteriaIds, currentGroup.id]
+      })
+      onClose(currentGroup.id)
+    }
+  }
+
   return (
     <>
-      <Drawer anchor="right" open={open} onClose={onClose}>
+      <Drawer anchor="right" open={open} onClose={() => onClose()}>
         <div className={classes.root}>
           <Grid className={classes.drawerTitleContainer}>
             {isSubGroup ? (
@@ -143,8 +202,8 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
               {currentGroup &&
                 currentGroup.criteriaIds &&
                 currentGroup.criteriaIds.length > 0 &&
-                currentGroup.criteriaIds.map((criteriaId, index) => (
-                  <GroupListItem key={index} itemId={criteriaId} index={index} />
+                currentGroup.criteriaIds.map((criteriaId: number) => (
+                  <GroupListItem key={criteriaId} itemId={criteriaId} />
                 ))}
             </List>
 
@@ -170,21 +229,27 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
         </div>
 
         <Grid className={classes.groupActionContainer}>
-          <Button onClick={onClose} color="primary" variant="outlined">
+          <Button onClick={() => onClose()} color="primary" variant="outlined">
             Annuler
           </Button>
-          <Button type="submit" color="primary" variant="contained">
+          <Button onClick={_addGroup} type="submit" color="primary" variant="contained">
             Confirmer
           </Button>
         </Grid>
       </Drawer>
 
-      {!isSubGroup && <GroupRightPanel isSubGroup open={openDrawer === 'group'} onClose={() => setOpenDrawer(null)} />}
+      {!isSubGroup && (
+        <GroupRightPanel
+          isSubGroup
+          open={openDrawer === 'group'}
+          onClose={(newSubGroupId?: number) => _addSubGroup(newSubGroupId)}
+        />
+      )}
 
       <CriteriaRightPanel
         criteria={criteria}
         selectedCriteria={null}
-        onChangeSelectedCriteria={_onAddCriteria}
+        onChangeSelectedCriteria={_addCriteria}
         open={openDrawer === 'criteria'}
         onClose={() => setOpenDrawer(null)}
       />
