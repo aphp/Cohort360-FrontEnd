@@ -134,7 +134,7 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
 
   useEffect(() => {
     editCurrentGroup(currentCriteriaGroup ?? { ...initialState, isSubGroup })
-  }, [open])
+  }, [open]) // eslint-disable-line
 
   const _addNewItem = (type: 'criteria' | 'group') => {
     setOpenDrawer(type)
