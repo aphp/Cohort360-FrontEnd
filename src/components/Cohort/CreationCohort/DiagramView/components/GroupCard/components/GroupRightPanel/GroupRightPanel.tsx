@@ -108,10 +108,7 @@ const initialState: CriteriaGroupType = {
   type: 'andGroup',
   criteriaIds: [],
   isSubGroup: false,
-  isInclusive: true,
-  options: {
-    operator: '='
-  }
+  isInclusive: true
 }
 
 type GroupRightPanelProps = {
