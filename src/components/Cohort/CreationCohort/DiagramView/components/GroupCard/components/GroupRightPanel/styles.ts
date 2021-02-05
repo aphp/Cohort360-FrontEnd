@@ -6,7 +6,8 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     width: '95vw',
     maxWidth: 650,
-    height: '100%'
+    overflow: 'auto',
+    height: 'calc(100% - 63px)'
   },
   drawerTitleContainer: {
     display: 'flex',
@@ -25,6 +26,15 @@ const useStyles = makeStyles((theme) => ({
     padding: 12
   },
   listItem: {
+    padding: 8,
+    border: '1px solid grey',
+    borderRadius: 5,
+    background: 'white',
+    margin: '8px 0'
+  },
+  groupListItem: {
+    display: 'flex',
+    flexDirection: 'column',
     padding: 8,
     border: '1px solid grey',
     borderRadius: 5,

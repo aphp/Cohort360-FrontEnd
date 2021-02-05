@@ -1,8 +1,7 @@
 import React from 'react'
 import moment from 'moment'
-// import { useDispatch } from 'react-redux'
 
-import { CardContent, Typography } from '@material-ui/core'
+import Typography from '@material-ui/core/Typography'
 
 import { useAppSelector } from 'state'
 import { SelectedCriteriaType } from 'types'
@@ -72,7 +71,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             data?.ghmData && data?.ghmData !== 'loading'
               ? data.ghmData.find((ghmElement: any) => ghmElement && ghmElement.id === currentGHM.id)
               : null
-          return <Typography>{selectedGhmData ? selectedGhmData.label : ''}</Typography>
+          return <Typography key={currentGHM.id}>{selectedGhmData ? selectedGhmData.label : ''}</Typography>
         }
 
         content = (
@@ -111,7 +110,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             data?.ccamData && data?.ccamData !== 'loading'
               ? data.ccamData.find((ccamElement: any) => ccamElement && ccamElement.id === currentCCAM.id)
               : null
-          return <Typography>{selectedCcamData ? selectedCcamData.label : ''}.</Typography>
+          return <Typography key={currentCCAM.id}>{selectedCcamData ? selectedCcamData.label : ''}.</Typography>
         }
 
         content = (
@@ -150,7 +149,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             data?.cim10Diagnostic && data?.cim10Diagnostic !== 'loading'
               ? data.cim10Diagnostic.find((ghmElement: any) => ghmElement && ghmElement.id === currentCIM10.id)
               : null
-          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+          return <Typography key={currentCIM10.id}>{selectedCimData ? selectedCimData.label : ''}</Typography>
         }
 
         const selectedDiagnostic = data?.diagnosticTypes
@@ -323,7 +322,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     return content
   }
 
-  return <CardContent className={classes.cardContent}>{_displayCardContent(currentCriteria)}</CardContent>
+  return <div className={classes.cardContent}>{_displayCardContent(currentCriteria)}</div>
 }
 
 export default CriteriaCardContent
