@@ -5,9 +5,11 @@ import useStyles from './style'
 
 type GroupSeparatorProps = {
   groupType?: 'andGroup' | 'orGroup' | 'NamongM'
+  n?: number
+  m?: number
 }
 
-const getGroupTypeLabel = (groupType: 'andGroup' | 'orGroup' | 'NamongM') => {
+const getGroupTypeLabel = (groupType: 'andGroup' | 'orGroup' | 'NamongM', n?: number, m?: number) => {
   switch (groupType) {
     case 'andGroup':
       return 'AND'
@@ -16,7 +18,7 @@ const getGroupTypeLabel = (groupType: 'andGroup' | 'orGroup' | 'NamongM') => {
       return 'OR'
 
     case 'NamongM':
-      return 'N among M'
+      return `${n ?? 'N'} among ${m ?? 'M'}`
 
     default:
       break
@@ -25,13 +27,13 @@ const getGroupTypeLabel = (groupType: 'andGroup' | 'orGroup' | 'NamongM') => {
   return ''
 }
 
-const GroupSeparator: React.FC<GroupSeparatorProps> = ({ groupType = 'andGroup' }) => {
+const GroupSeparator: React.FC<GroupSeparatorProps> = ({ groupType = 'andGroup', n, m }) => {
   const classes = useStyles()
 
   return (
     <div className={classes.root}>
       <div className={classes.separator}>
-        <Typography>{getGroupTypeLabel(groupType)}</Typography>
+        <Typography>{getGroupTypeLabel(groupType, n, m)}</Typography>
       </div>
     </div>
   )

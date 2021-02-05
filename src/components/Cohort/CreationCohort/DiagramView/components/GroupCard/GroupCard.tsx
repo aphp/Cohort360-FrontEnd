@@ -105,14 +105,13 @@ const GroupCard: React.FC = () => {
 
   return (
     <>
-      {displayingCriteriaGroup.map(({ id, title, criteriaIds, type }, index) => {
+      {displayingCriteriaGroup.map(({ id, title, criteriaIds, type }) => {
         const isGroupObject = criteriaIds.length > 1
         const firstChild = !isGroupObject ? selectedCriteria.find(({ id }) => id === criteriaIds[0]) : null
-        const lastChild = index === displayingCriteriaGroup.length - 1
         return (
           <React.Fragment key={id}>
             <GroupSeparator />
-            <div className={clsx(classes.root, { [classes.lastCardItem]: lastChild })}>
+            <div>
               <Card className={classes.mainCard}>
                 <CardHeader
                   className={classes.cardHeader}
@@ -153,7 +152,7 @@ const GroupCard: React.FC = () => {
         )
       })}
 
-      <div className={classes.root}>
+      <div className={classes.buttonContainer}>
         <Button
           disabled={loading}
           className={classes.addButton}

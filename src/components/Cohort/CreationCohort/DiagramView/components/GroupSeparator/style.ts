@@ -17,7 +17,10 @@ const useStyles = makeStyles((theme) => ({
       background: '#D0D7D8',
       display: 'block',
       margin: '0 auto'
-    }
+    },
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
   },
   separator: {
     width: 'fit-content',
@@ -30,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
     minHeight: 42,
     maxHeight: 42,
     borderRadius: 42,
+    padding: theme.spacing(1),
     backgroundColor: theme.palette.primary.main
   }
 }))

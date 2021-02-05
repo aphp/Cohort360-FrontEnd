@@ -21,6 +21,7 @@ import EditIcon from '@material-ui/icons/Edit'
 
 import CriteriaRightPanel from '../CriteriaRightPanel/CriteriaRightPanel'
 import CriteriaCardContent from '../CriteriaCardContent/CriteriaCardContent'
+import GroupSeparator from '../../../GroupSeparator/GroupSeparator'
 
 import { CriteriaItemType, SelectedCriteriaType, CriteriaGroupType } from 'types'
 
@@ -72,7 +73,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId }) => {
       </ListItem>
     )
   } else {
-    const currentItem: any = criteriaGroup.find((criteria) => criteria.id === itemId)
+    const currentItem = criteriaGroup.find((criteria) => criteria.id === itemId)
     if (!currentItem) {
       // Bug, not possible ... The current item is not a criteria and is not a group ...
       return <></>
@@ -82,10 +83,16 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId }) => {
         <ListItemText classes={{ primary: classes.listTitle }} primary={currentItem.title} />
 
         <List style={{ width: '90%', alignSelf: 'center' }}>
-          {currentItem &&
-            currentItem.criteriaIds &&
-            currentItem.criteriaIds.length > 0 &&
-            currentItem.criteriaIds.map((criteriaId: number) => <GroupListItem key={criteriaId} itemId={criteriaId} />)}
+          {currentItem.criteriaIds.length > 0 &&
+            currentItem.criteriaIds.map((criteriaId, index) => {
+              const isLastItem = index === currentItem.criteriaIds.length - 1
+              return (
+                <React.Fragment key={criteriaId}>
+                  <GroupListItem itemId={criteriaId} />
+                  {!isLastItem && <GroupSeparator groupType={currentItem.type} />}
+                </React.Fragment>
+              )
+            })}
         </List>
 
         <ListItemSecondaryAction style={{ top: 26 }}>
@@ -201,12 +208,16 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
             />
 
             <List>
-              {currentGroup &&
-                currentGroup.criteriaIds &&
-                currentGroup.criteriaIds.length > 0 &&
-                currentGroup.criteriaIds.map((criteriaId: number) => (
-                  <GroupListItem key={criteriaId} itemId={criteriaId} />
-                ))}
+              {currentGroup.criteriaIds.length > 0 &&
+                currentGroup.criteriaIds.map((criteriaId, index) => {
+                  const isLastItem = index === currentGroup.criteriaIds.length - 1
+                  return (
+                    <React.Fragment key={criteriaId}>
+                      <GroupListItem itemId={criteriaId} />
+                      {!isLastItem && <GroupSeparator groupType={currentGroup.type} />}
+                    </React.Fragment>
+                  )
+                })}
             </List>
 
             <Button

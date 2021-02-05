@@ -1,17 +1,17 @@
 import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(() => ({
-  root: {},
-  lastCardItem: {
-    '&::after': {
+  buttonContainer: {
+    '&::before': {
       content: '""',
-      width: 2,
+      width: 2.1,
       height: 36,
       background: '#D0D7D8',
       display: 'block',
       margin: '0 auto'
     }
   },
+  lastCardItem: {},
   mainCard: {
     width: 450
   },
