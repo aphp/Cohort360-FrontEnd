@@ -157,7 +157,7 @@ const GroupCard: React.FC = () => {
 
       <GroupRightPanel
         open={openGroupDrawer}
-        currentCriteriaGroup={currentCriteriaGroup}
+        currentCriteriaGroup={currentCriteriaGroup ?? null}
         onClose={() => onChangeOpenGroupDrawer(false)}
       />
     </>

@@ -231,5 +231,6 @@ export const {
   addNewSelectedCriteria,
   addNewCriteriaGroup,
   //
+  editSelectedCriteria,
   editCriteriaGroup
 } = cohortCreationSlice.actions
