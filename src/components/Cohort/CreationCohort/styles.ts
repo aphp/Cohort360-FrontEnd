@@ -4,7 +4,7 @@ const useStyles = makeStyles(() => ({
   tabsContainer: {
     position: 'fixed',
     bottom: 30,
-    right: 300,
+    right: 900,
     zIndex: 1,
     '& span': { backgroundColor: 'transparent !important' }
   },

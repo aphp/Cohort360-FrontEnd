@@ -10,7 +10,16 @@ const TemporalConstraintView: React.FC = () => {
     <>
       <Card className={classes.card}>
         <CardHeader className={classes.cardHeader} title="Choisir une contrainte temporelle" />
-        <CardContent />
+        <CardContent>
+          <>
+            <Typography align="center">Ajouter une contrainte temporelle</Typography>
+            <div className={classes.actionButtonContainer}>
+              <Button variant="contained" color="primary" className={classes.actionButton}>
+                <Typography variant="h5">Contrainte temporelle</Typography>
+              </Button>
+            </div>
+          </>
+        </CardContent>
       </Card>
     </>
   )

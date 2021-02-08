@@ -7,6 +7,16 @@ const useStyles = makeStyles(() => ({
   cardHeader: {
     background: '#D1E2F4',
     color: '#45505B'
+  },
+  actionButtonContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12
+  },
+  actionButton: {
+    margin: 4,
+    outline: 'none'
   }
 }))
 
