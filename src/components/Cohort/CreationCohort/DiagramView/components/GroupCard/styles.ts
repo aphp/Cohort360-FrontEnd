@@ -46,6 +46,7 @@ const useStyles = makeStyles(() => ({
     fontWeight: 'bold'
   },
   addButton: {
+    marginLeft: 204,
     width: 42,
     height: 42,
     minWidth: 42,
