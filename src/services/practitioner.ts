@@ -10,7 +10,6 @@ import { getApiResponseResources } from 'utils/apiHelpers'
 
 export const fetchPractitioner = async (username: string) => {
   if (CONTEXT === 'fakedata') {
-    console.log('tu rentres ici')
     const id = 12
     const userName = 707070
     const firstName = 'John'

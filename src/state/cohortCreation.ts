@@ -109,16 +109,14 @@ const buildCreationCohort = createAsyncThunk<
   CohortCreationState,
   {
     selectedPopulation?: ScopeTreeRow[] | null
-    selectedCriteria?: SelectedCriteriaType[]
-    criteriaGroup?: CriteriaGroupType[]
   },
   { state: RootState }
->('cohortCreation/build', async ({ selectedPopulation, selectedCriteria, criteriaGroup }, { getState }) => {
+>('cohortCreation/build', async ({ selectedPopulation }, { getState }) => {
   const state = getState()
 
   const _selectedPopulation = selectedPopulation ? selectedPopulation : state.cohortCreation.request.selectedPopulation
-  const _selectedCriteria = selectedCriteria ? selectedCriteria : state.cohortCreation.request.selectedCriteria
-  const _criteriaGroup = criteriaGroup ? criteriaGroup : state.cohortCreation.request.criteriaGroup
+  const _selectedCriteria = state.cohortCreation.request.selectedCriteria
+  const _criteriaGroup = state.cohortCreation.request.criteriaGroup
 
   const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup)
   const { requestId, snapshotsHistory, currentSnapshot, count } = await _onSaveNewJson(
