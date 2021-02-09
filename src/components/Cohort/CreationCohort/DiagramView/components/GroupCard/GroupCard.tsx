@@ -12,7 +12,7 @@ import GroupRightPanel from './components/GroupRightPanel/GroupRightPanel'
 import GroupSeparator from '../GroupSeparator/GroupSeparator'
 
 import { useAppSelector } from 'state'
-import { deleteCriteriaGroup, deleteSelectedCriteria } from 'state/cohortCreation'
+import { buildCreationCohort, deleteCriteriaGroup, deleteSelectedCriteria } from 'state/cohortCreation'
 
 import useStyles from './styles'
 
@@ -165,8 +165,11 @@ const GroupCard: React.FC = () => {
 
       <GroupRightPanel
         open={openGroupDrawer}
-        currentCriteriaGroup={currentCriteriaGroup}
-        onClose={() => onChangeOpenGroupDrawer(false)}
+        currentCriteriaGroup={currentCriteriaGroup ?? null}
+        onClose={() => {
+          onChangeOpenGroupDrawer(false)
+          dispatch(buildCreationCohort({}))
+        }}
       />
     </>
   )

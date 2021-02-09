@@ -26,19 +26,24 @@ import GroupSeparator from '../../../GroupSeparator/GroupSeparator'
 import { CriteriaItemType, SelectedCriteriaType, CriteriaGroupType } from 'types'
 
 import {
+  CohortCreationState,
   addNewSelectedCriteria,
   addNewCriteriaGroup,
   editCriteriaGroup,
-  CohortCreationState
+  editSelectedCriteria,
+  deleteSelectedCriteria,
+  deleteCriteriaGroup
 } from 'state/cohortCreation'
 
 import useStyles from './styles'
 
 type GroupListItemProps = {
   itemId: number
+  editItem: (itemId: number) => void
+  deleteItem: (itemId: number) => void
 }
 
-const GroupListItem: React.FC<GroupListItemProps> = ({ itemId }) => {
+const GroupListItem: React.FC<GroupListItemProps> = ({ itemId, editItem, deleteItem }) => {
   const classes = useStyles()
 
   const { selectedCriteria = [], criteriaGroup = [] } = useAppSelector<{
@@ -63,10 +68,10 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId }) => {
         />
         <ListItemSecondaryAction>
           <Switch edge="end" />
-          <IconButton color="primary" edge="end" aria-label="edit">
+          <IconButton onClick={() => editItem(itemId)} color="primary" edge="end" aria-label="edit">
             <EditIcon />
           </IconButton>
-          <IconButton color="primary" edge="end" aria-label="delete">
+          <IconButton onClick={() => deleteItem(itemId)} color="primary" edge="end" aria-label="delete">
             <DeleteIcon />
           </IconButton>
         </ListItemSecondaryAction>
@@ -88,7 +93,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId }) => {
               const isLastItem = index === currentItem.criteriaIds.length - 1
               return (
                 <React.Fragment key={criteriaId}>
-                  <GroupListItem itemId={criteriaId} />
+                  <GroupListItem key={criteriaId} editItem={editItem} deleteItem={deleteItem} itemId={criteriaId} />
                   {!isLastItem && <GroupSeparator groupType={currentItem.type} />}
                 </React.Fragment>
               )
@@ -97,10 +102,10 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId }) => {
 
         <ListItemSecondaryAction style={{ top: 26 }}>
           <Switch edge="end" />
-          <IconButton color="primary" edge="end" aria-label="edit">
+          <IconButton onClick={() => editItem(itemId)} color="primary" edge="end" aria-label="edit">
             <EditIcon />
           </IconButton>
-          <IconButton color="primary" edge="end" aria-label="delete">
+          <IconButton onClick={() => deleteItem(itemId)} color="primary" edge="end" aria-label="delete">
             <DeleteIcon />
           </IconButton>
         </ListItemSecondaryAction>
@@ -120,13 +125,15 @@ const initialState: CriteriaGroupType = {
 
 type GroupRightPanelProps = {
   open: boolean
-  currentCriteriaGroup?: CriteriaGroupType
+  currentCriteriaGroup: CriteriaGroupType | null
   isSubGroup?: boolean
   onClose: (newSubGroupId?: number) => void
 }
 
 const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
   const { open, currentCriteriaGroup, isSubGroup, onClose } = props
+
+  const isEditing = currentCriteriaGroup !== null
 
   const classes = useStyles()
   const dispatch = useDispatch()
@@ -137,6 +144,7 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
   }>((state) => state.cohortCreation)
 
   const [openDrawer, setOpenDrawer] = useState<'criteria' | 'group' | null>(null)
+  const [selectedItemId, setSelectedItemId] = useState<number>(0)
   const [currentGroup, editCurrentGroup] = useState<CriteriaGroupType>(
     currentCriteriaGroup ?? { ...initialState, isSubGroup }
   )
@@ -146,16 +154,24 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
   }, [open]) // eslint-disable-line
 
   const _addNewItem = (type: 'criteria' | 'group') => {
+    setSelectedItemId(0)
     setOpenDrawer(type)
   }
 
   const _addCriteria = (newCriteria: SelectedCriteriaType) => {
-    newCriteria.id = request.nextCriteriaId
-    dispatch(addNewSelectedCriteria(newCriteria))
-    editCurrentGroup({
-      ...currentGroup,
-      criteriaIds: [...currentGroup.criteriaIds, newCriteria.id]
-    })
+    const isEdition = request?.selectedCriteria?.find(({ id }) => id === selectedItemId) !== undefined
+    if (isEdition) {
+      newCriteria.id = selectedItemId
+      dispatch(editSelectedCriteria(newCriteria))
+      setOpenDrawer(null)
+    } else {
+      newCriteria.id = request.nextCriteriaId
+      dispatch(addNewSelectedCriteria(newCriteria))
+      editCurrentGroup({
+        ...currentGroup,
+        criteriaIds: [...currentGroup.criteriaIds, newCriteria.id]
+      })
+    }
   }
 
   const _addSubGroup = (newSubGroupId?: number) => {
@@ -183,15 +199,63 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
     }
   }
 
+  const _editItem = (itemId: number) => {
+    if (itemId < 0) {
+      const _selectedGroup = request?.criteriaGroup?.find(({ id }) => id === itemId) ?? null
+      if (_selectedGroup) {
+        setSelectedItemId(itemId)
+        setOpenDrawer('group')
+      }
+    } else {
+      const _selectedCriteria = request?.selectedCriteria?.find(({ id }) => id === itemId) ?? null
+      if (_selectedCriteria) {
+        setSelectedItemId(itemId)
+        setOpenDrawer('criteria')
+      }
+    }
+  }
+
+  const _deleteItem = (itemId: number) => {
+    if (itemId < 0) {
+      const deletedCriteriaGroup = request?.criteriaGroup
+        ? request?.criteriaGroup.find(({ id }) => id === itemId)
+        : null
+      const children = deletedCriteriaGroup?.criteriaIds ?? []
+      for (const childItemId of children) {
+        if (childItemId > 0) {
+          dispatch(deleteSelectedCriteria(childItemId))
+        } else {
+          _deleteItem(childItemId)
+        }
+      }
+      dispatch(deleteCriteriaGroup(itemId))
+    } else {
+      dispatch(deleteSelectedCriteria(itemId))
+    }
+    const criteriaIds = currentGroup.criteriaIds ? [...currentGroup.criteriaIds] : []
+    const index = criteriaIds.indexOf(itemId) ?? -1
+    if (index !== -1) {
+      criteriaIds.splice(index, 1)
+      editCurrentGroup({
+        ...currentGroup,
+        criteriaIds
+      })
+    }
+  }
+
   return (
     <>
       <Drawer anchor="right" open={open} onClose={() => onClose()}>
         <div className={classes.root}>
           <Grid className={classes.drawerTitleContainer}>
             {isSubGroup ? (
-              <Typography className={classes.title}>Ajouter un sous-groupe de critère</Typography>
+              <Typography className={classes.title}>
+                {!isEditing ? 'Ajouter' : 'Modifier'} un sous-groupe de critère
+              </Typography>
             ) : (
-              <Typography className={classes.title}>Ajouter un groupe de critère</Typography>
+              <Typography className={classes.title}>
+                {!isEditing ? 'Ajouter' : 'Modifier'} un groupe de critère
+              </Typography>
             )}
           </Grid>
 
@@ -213,7 +277,7 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
                   const isLastItem = index === currentGroup.criteriaIds.length - 1
                   return (
                     <React.Fragment key={criteriaId}>
-                      <GroupListItem itemId={criteriaId} />
+                      <GroupListItem editItem={_editItem} deleteItem={_deleteItem} itemId={criteriaId} />
                       {!isLastItem && <GroupSeparator groupType={currentGroup.type} />}
                     </React.Fragment>
                   )
@@ -244,9 +308,11 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
         </div>
 
         <Grid className={classes.groupActionContainer}>
-          <Button onClick={() => onClose()} color="primary" variant="outlined">
-            Annuler
-          </Button>
+          {!currentCriteriaGroup && (
+            <Button onClick={() => onClose()} color="primary" variant="outlined">
+              Annuler
+            </Button>
+          )}
           <Button onClick={_addGroup} type="submit" color="primary" variant="contained">
             Confirmer
           </Button>
@@ -256,17 +322,19 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
       {!isSubGroup && (
         <GroupRightPanel
           isSubGroup
+          currentCriteriaGroup={request?.criteriaGroup?.find(({ id }) => id === selectedItemId) ?? null}
           open={openDrawer === 'group'}
-          onClose={(newSubGroupId?: number) => _addSubGroup(newSubGroupId)}
+          onClose={(newSubGroupId?: number) => (newSubGroupId ? _addSubGroup(newSubGroupId) : setOpenDrawer(null))}
         />
       )}
 
       <CriteriaRightPanel
         criteria={criteria}
-        selectedCriteria={null}
+        selectedCriteria={request?.selectedCriteria?.find(({ id }) => id === selectedItemId) ?? null}
         onChangeSelectedCriteria={_addCriteria}
         open={openDrawer === 'criteria'}
         onClose={() => setOpenDrawer(null)}
+        goBack={() => setOpenDrawer(null)}
       />
     </>
   )

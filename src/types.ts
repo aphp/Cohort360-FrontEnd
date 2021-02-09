@@ -241,6 +241,7 @@ export type CriteriaItemType = {
 
 export type SelectedCriteriaType = {
   id?: number
+  isInclusive: boolean
 } & (CcamDataType | Cim10DataType | DemographicDataType | GhmDataType | EncounterDataType | DocumentDataType)
 
 export type CcamDataType = {
