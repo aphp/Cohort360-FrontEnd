@@ -9,8 +9,7 @@ import EditIcon from '@material-ui/icons/Edit'
 
 import CriteriaCardContent from './components/CriteriaCardContent/CriteriaCardContent'
 import GroupRightPanel from './components/GroupRightPanel/GroupRightPanel'
-
-import { SelectedCriteriaType, CriteriaGroupType } from 'types'
+import GroupSeparator from '../GroupSeparator/GroupSeparator'
 
 import { useAppSelector } from 'state'
 import { deleteCriteriaGroup, deleteSelectedCriteria } from 'state/cohortCreation'
@@ -24,14 +23,11 @@ type GroupCardItemProps = {
 const GroupCardItem: React.FC<GroupCardItemProps> = ({ itemId }) => {
   const classes = useStyles()
 
-  const { selectedCriteria = [], criteriaGroup = [] } = useAppSelector<{
-    selectedCriteria: SelectedCriteriaType[]
-    criteriaGroup: CriteriaGroupType[]
-  }>((state) => state.cohortCreation.request || {})
+  const { selectedCriteria = [], criteriaGroup = [] } = useAppSelector((state) => state.cohortCreation.request || {})
 
   const isGroupObject = itemId < 0
   if (!isGroupObject) {
-    const CurrentCriterion: any = selectedCriteria.find((criteria) => criteria.id === itemId)
+    const CurrentCriterion = selectedCriteria.find((criteria) => criteria.id === itemId)
     if (!CurrentCriterion) return <></> // Bug, not possible ... The current item is not a criteria
 
     return (
@@ -43,20 +39,25 @@ const GroupCardItem: React.FC<GroupCardItemProps> = ({ itemId }) => {
       </Card>
     )
   } else {
-    const currentGroup: any = criteriaGroup.find((criteria) => criteria.id === itemId)
+    const currentGroup = criteriaGroup.find((criteria) => criteria.id === itemId)
     if (!currentGroup) return <></> // Bug, not possible ... The current item is not a group ...
 
+    const { type, criteriaIds } = currentGroup
     return (
       <Card className={classes.card}>
         <CardHeader className={classes.cardHeader} title={currentGroup.title} />
 
         <CardContent className={classes.cardContent}>
-          {currentGroup &&
-            currentGroup.criteriaIds &&
-            currentGroup.criteriaIds.length > 0 &&
-            currentGroup.criteriaIds.map((criteriaId: number) => (
-              <GroupCardItem key={criteriaId} itemId={criteriaId} />
-            ))}
+          {criteriaIds.length > 0 &&
+            criteriaIds.map((criteriaId, index) => {
+              const isLastItem = index === criteriaIds.length - 1
+              return (
+                <React.Fragment key={criteriaId}>
+                  <GroupCardItem itemId={criteriaId} />
+                  {!isLastItem && <GroupSeparator groupType={type} />}
+                </React.Fragment>
+              )
+            })}
         </CardContent>
       </Card>
     )
@@ -67,11 +68,9 @@ const GroupCard: React.FC = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
 
-  const { loading = false, criteriaGroup = [], selectedCriteria = [] } = useAppSelector<{
-    loading: boolean
-    criteriaGroup: CriteriaGroupType[]
-    selectedCriteria: SelectedCriteriaType[]
-  }>((state) => state.cohortCreation.request || {})
+  const { loading = false, criteriaGroup = [], selectedCriteria = [] } = useAppSelector(
+    (state) => state.cohortCreation.request || {}
+  )
 
   const displayingCriteriaGroup = criteriaGroup.filter(({ isSubGroup }) => !isSubGroup)
 
@@ -105,45 +104,54 @@ const GroupCard: React.FC = () => {
 
   return (
     <>
-      {displayingCriteriaGroup.map(({ id, title, criteriaIds }) => {
+      {displayingCriteriaGroup.map(({ id, title, criteriaIds, type }) => {
         const isGroupObject = criteriaIds.length > 1
-        const fisrtChild = !isGroupObject ? selectedCriteria.find(({ id }) => id === criteriaIds[0]) : null
-
+        const firstChild = !isGroupObject ? selectedCriteria.find(({ id }) => id === criteriaIds[0]) : null
         return (
-          <div key={id} className={classes.root}>
-            <Card className={classes.mainCard}>
-              <CardHeader
-                className={classes.cardHeader}
-                title={fisrtChild ? fisrtChild.title : title}
-                action={
-                  <>
-                    <IconButton size="small" onClick={() => _editGroup(id)} style={{ color: 'currentcolor' }}>
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton size="small" onClick={() => _deleteGroup(id)} style={{ color: 'currentcolor' }}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </>
-                }
-              />
+          <React.Fragment key={id}>
+            <GroupSeparator />
+            <div>
+              <Card className={classes.mainCard}>
+                <CardHeader
+                  className={classes.cardHeader}
+                  title={firstChild ? firstChild.title : title}
+                  action={
+                    <>
+                      <IconButton size="small" onClick={() => _editGroup(id)} style={{ color: 'currentcolor' }}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton size="small" onClick={() => _deleteGroup(id)} style={{ color: 'currentcolor' }}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </>
+                  }
+                />
 
-              {fisrtChild ? (
-                <CardContent className={classes.cardContent}>
-                  <CriteriaCardContent currentCriteria={fisrtChild} />
-                </CardContent>
-              ) : (
-                <CardContent className={classes.cardContent}>
-                  {criteriaIds &&
-                    criteriaIds.length > 0 &&
-                    criteriaIds.map((criteriaId) => <GroupCardItem key={criteriaId} itemId={criteriaId} />)}
-                </CardContent>
-              )}
-            </Card>
-          </div>
+                {firstChild ? (
+                  <CardContent className={classes.cardContent}>
+                    <CriteriaCardContent currentCriteria={firstChild} />
+                  </CardContent>
+                ) : (
+                  <CardContent className={classes.cardContent}>
+                    {criteriaIds.length > 0 &&
+                      criteriaIds.map((criteriaId, index) => {
+                        const isLastItem = index === criteriaIds.length - 1
+                        return (
+                          <React.Fragment key={criteriaId}>
+                            <GroupCardItem itemId={criteriaId} />
+                            {!isLastItem && <GroupSeparator groupType={type} />}
+                          </React.Fragment>
+                        )
+                      })}
+                  </CardContent>
+                )}
+              </Card>
+            </div>
+          </React.Fragment>
         )
       })}
 
-      <div className={classes.root}>
+      <div className={classes.buttonContainer}>
         <Button
           disabled={loading}
           className={classes.addButton}

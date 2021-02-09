@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
     background: 'white',
     margin: '8px 0'
   },
+  itemContent: {},
   groupListItem: {
     display: 'flex',
     flexDirection: 'column',
