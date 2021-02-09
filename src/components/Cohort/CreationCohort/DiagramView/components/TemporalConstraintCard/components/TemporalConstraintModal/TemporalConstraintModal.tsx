@@ -1,8 +1,19 @@
 import React from 'react'
 
-import { Dialog, DialogActions, DialogContent, Button, Grid, TextField } from '@material-ui/core'
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+  Grid,
+  TextField,
+  Typography
+} from '@material-ui/core'
 import AutoComplete from '@material-ui/lab/Autocomplete'
 import TrendingFlatIcon from '@material-ui/icons/TrendingFlat'
+
+import useStyles from './styles'
 
 const fakeCriteriaList = [
   {
@@ -47,33 +58,49 @@ const fakeTemporalConstraint = [
 const TemporalConstraintModal: React.FC<{
   onClose: () => void
 }> = ({ onClose }) => {
+  const classes = useStyles()
   const handleClose = () => onClose()
 
   return (
-    <Dialog open onClose={handleClose}>
+    <Dialog fullWidth maxWidth="md" open onClose={handleClose}>
+      <DialogTitle className={classes.title}>Contrainte Temporelle</DialogTitle>
       <DialogContent>
         <Grid container>
-          <Grid item>
+          <Grid item className={classes.gridItemIdStart}>
             <AutoComplete
               options={fakeCriteriaList}
               getOptionLabel={(option) => option.display}
               renderInput={(params) => <TextField {...params} label="Critère de début" variant="outlined" />}
             />
           </Grid>
-          <Grid item>
+          <Grid item className={classes.gridItemTrendingIcon}>
             <TrendingFlatIcon />
           </Grid>
-          <Grid item>
-            <AutoComplete
-              options={fakeTemporalConstraint}
-              getOptionLabel={(option) => option.display}
-              renderInput={(params) => <TextField {...params} label="Contrainte temporelle" variant="outlined" />}
-            />
+          <Grid item className={classes.gridItemTemporalConstraint}>
+            <div id="JE-SUIS-LAAAAAAAAAAAAAA" className={classes.divTemporalConstraintDetail}>
+              <Grid>
+                <Grid>
+                  <Typography variant="h5" align="center">
+                    Type de contrainte
+                  </Typography>
+                </Grid>
+                <Grid>
+                  <AutoComplete
+                    options={fakeTemporalConstraint}
+                    getOptionLabel={(option) => option.display}
+                    renderInput={(params) => <TextField {...params} label="Contrainte temporelle" variant="outlined" />}
+                  />
+                </Grid>
+                <Grid>
+                  <p>je m'active que quand une certaine contrainte est séléctionnée</p>
+                </Grid>
+              </Grid>
+            </div>
           </Grid>
-          <Grid item>
+          <Grid item className={classes.gridItemTrendingIcon}>
             <TrendingFlatIcon />
           </Grid>
-          <Grid item>
+          <Grid item className={classes.gridItemIdEnd}>
             <AutoComplete
               options={fakeCriteriaList}
               getOptionLabel={(option) => option.display}
