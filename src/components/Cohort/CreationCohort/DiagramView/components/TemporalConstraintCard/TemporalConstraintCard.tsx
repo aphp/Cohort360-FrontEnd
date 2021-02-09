@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Card, CardHeader, CardContent, IconButton, Typography, Button } from '@material-ui/core'
 
+import TemporalConstraintModal from './components/TemporalConstraintModal/TemporalConstraintModal'
 import useStyles from './styles'
 
 const TemporalConstraintView: React.FC = () => {
   const classes = useStyles()
+  const [openModal, onSetOpenModal] = useState<'open' | null>(null)
 
   return (
     <>
@@ -14,13 +16,20 @@ const TemporalConstraintView: React.FC = () => {
           <>
             <Typography align="center">Ajouter une contrainte temporelle</Typography>
             <div className={classes.actionButtonContainer}>
-              <Button variant="contained" color="primary" className={classes.actionButton}>
+              <Button
+                onClick={() => onSetOpenModal('open')}
+                variant="contained"
+                color="primary"
+                className={classes.actionButton}
+              >
                 <Typography variant="h5">Contrainte temporelle</Typography>
               </Button>
             </div>
           </>
         </CardContent>
       </Card>
+
+      {openModal === 'open' && <TemporalConstraintModal onClose={() => onSetOpenModal(null)} />}
     </>
   )
 }

@@ -3,8 +3,8 @@ import { makeStyles } from '@material-ui/core/styles'
 const useStyles = makeStyles(() => ({
   tabsContainer: {
     position: 'fixed',
-    bottom: 30,
-    right: 900,
+    bottom: 5,
+    left: 53,
     zIndex: 1,
     '& span': { backgroundColor: 'transparent !important' }
   },
