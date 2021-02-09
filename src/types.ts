@@ -213,14 +213,20 @@ export type PatientData = {
 export type CriteriaGroupType = {
   id: number
   title: string
-  type: 'andGroup' | 'orGroup' | 'NamongM'
   criteriaIds: number[] // = [SelectedCriteriaType.id | CriteriaGroupType.id, ...]
   isSubGroup?: boolean
   isInclusive?: boolean
-  options?: {
-    operator: '=' | '<' | '>' | '<=' | '>-'
-  }
-}
+} & (
+  | {
+      type: 'andGroup' | 'orGroup'
+    }
+  | {
+      type: 'NamongM'
+      options: {
+        operator: '=' | '<' | '>' | '<=' | '>-'
+      }
+    }
+)
 
 export type CriteriaItemType = {
   id: string
