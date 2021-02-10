@@ -18,6 +18,8 @@ import {
   Switch
 } from '@material-ui/core'
 
+import { withStyles } from '@material-ui/core/styles'
+
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 
@@ -38,6 +40,22 @@ import {
 } from 'state/cohortCreation'
 
 import useStyles from './styles'
+
+const SwitchInclusive = withStyles({
+  switchBase: {
+    color: '#DAF0BF',
+    '&$checked': {
+      color: '#FFC695'
+    },
+    '&$checked + $track': {
+      backgroundColor: '#FFC695'
+    }
+  },
+  checked: {},
+  track: {
+    backgroundColor: '#DAF0BF'
+  }
+})(Switch)
 
 type GroupListItemProps = {
   itemId: number
@@ -77,7 +95,11 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId, editItem, deleteI
           secondary={<CriteriaCardContent currentCriteria={currentItem} />}
         />
         <ListItemSecondaryAction>
-          <Switch checked={!currentItem.isInclusive} onChange={(e) => _editIsInclusive(!e.target.checked)} edge="end" />
+          <SwitchInclusive
+            checked={!currentItem.isInclusive}
+            onChange={(e) => _editIsInclusive(!e.target.checked)}
+            edge="end"
+          />
           <IconButton onClick={() => editItem(itemId)} color="primary" edge="end" aria-label="edit">
             <EditIcon />
           </IconButton>
@@ -120,7 +142,11 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId, editItem, deleteI
         </List>
 
         <ListItemSecondaryAction style={{ top: 26 }}>
-          <Switch edge="end" checked={!currentItem.isInclusive} onChange={(e) => _editIsInclusive(!e.target.checked)} />
+          <SwitchInclusive
+            edge="end"
+            checked={!currentItem.isInclusive}
+            onChange={(e) => _editIsInclusive(!e.target.checked)}
+          />
           <IconButton onClick={() => editItem(itemId)} color="primary" edge="end" aria-label="edit">
             <EditIcon />
           </IconButton>
@@ -326,7 +352,7 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
           <Grid container alignItems="flex-end" className={classes.typeCriteriaContainer}>
             <Grid container alignItems="center" justify="space-between">
               <Typography variant="h6">Groupe de type exclusif :</Typography>
-              <Switch
+              <SwitchInclusive
                 checked={!currentGroup.isInclusive}
                 onChange={(e) => editCurrentGroup({ ...currentGroup, isInclusive: !e.target.checked })}
               />
