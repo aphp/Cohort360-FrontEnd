@@ -42,9 +42,21 @@ const useStyles = makeStyles(() => ({
       lineHeight: 2
     }
   },
-  autoCompleteTemporalConstraint: {
+  selectTemporalConstraint: {
     width: '75%',
     marginLeft: '60px'
+  },
+  gridTemporalConstraintOptions: {
+    display: 'flex',
+    flexDirection: 'row',
+    marginTop: '50px',
+    marginLeft: '5px'
+  },
+  gridTemporalContraintOptionsSelect: {
+    marginRight: '94px'
+  },
+  sizeInput: {
+    width: '100px'
   }
 }))
 
