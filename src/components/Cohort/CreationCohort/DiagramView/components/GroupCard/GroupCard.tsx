@@ -32,7 +32,11 @@ const GroupCardItem: React.FC<GroupCardItemProps> = ({ itemId }) => {
 
     return (
       <Card className={classes.card}>
-        <CardHeader className={classes.cardHeader} title={CurrentCriterion.title} />
+        <CardHeader
+          className={classes.cardHeader}
+          style={{ backgroundColor: CurrentCriterion.isInclusive ? '#DAF0BF' : '#FFC695' }}
+          title={CurrentCriterion.title}
+        />
         <CardContent className={classes.cardContent}>
           <CriteriaCardContent currentCriteria={CurrentCriterion} />
         </CardContent>
@@ -45,7 +49,11 @@ const GroupCardItem: React.FC<GroupCardItemProps> = ({ itemId }) => {
     const { type, criteriaIds } = currentGroup
     return (
       <Card className={classes.card}>
-        <CardHeader className={classes.cardHeader} title={currentGroup.title} />
+        <CardHeader
+          className={classes.cardHeader}
+          style={{ backgroundColor: currentGroup.isInclusive ? '#DAF0BF' : '#FFC695' }}
+          title={currentGroup.title}
+        />
 
         <CardContent className={classes.cardContent}>
           {criteriaIds.length > 0 &&

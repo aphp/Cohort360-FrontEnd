@@ -11,8 +11,10 @@ import {
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
+  MenuItem,
   TextField,
   Typography,
+  Select,
   Switch
 } from '@material-ui/core'
 
@@ -45,6 +47,7 @@ type GroupListItemProps = {
 
 const GroupListItem: React.FC<GroupListItemProps> = ({ itemId, editItem, deleteItem }) => {
   const classes = useStyles()
+  const dispatch = useDispatch()
 
   const { selectedCriteria = [], criteriaGroup = [] } = useAppSelector<{
     selectedCriteria: SelectedCriteriaType[]
@@ -58,6 +61,13 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId, editItem, deleteI
       // Bug, not possible ... The current item is not a criteria and is not a group ...
       return <></>
     }
+
+    const _editIsInclusive = (isInclusive: boolean) => {
+      const _currentItem = currentItem ? { ...currentItem, isInclusive } : null
+
+      dispatch(editSelectedCriteria(_currentItem))
+    }
+
     return (
       <ListItem classes={{ root: classes.listItem }} alignItems="flex-start">
         <ListItemText
@@ -67,7 +77,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId, editItem, deleteI
           secondary={<CriteriaCardContent currentCriteria={currentItem} />}
         />
         <ListItemSecondaryAction>
-          <Switch edge="end" />
+          <Switch checked={!currentItem.isInclusive} onChange={(e) => _editIsInclusive(!e.target.checked)} edge="end" />
           <IconButton onClick={() => editItem(itemId)} color="primary" edge="end" aria-label="edit">
             <EditIcon />
           </IconButton>
@@ -83,6 +93,15 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId, editItem, deleteI
       // Bug, not possible ... The current item is not a criteria and is not a group ...
       return <></>
     }
+
+    const _editIsInclusive = (isInclusive: boolean) => {
+      const _currentItem = currentItem ? { ...currentItem, isInclusive } : null
+
+      if (_currentItem === null) return
+
+      dispatch(editCriteriaGroup(_currentItem))
+    }
+
     return (
       <ListItem classes={{ root: classes.groupListItem }} alignItems="flex-start">
         <ListItemText classes={{ primary: classes.listTitle }} primary={currentItem.title} />
@@ -101,7 +120,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId, editItem, deleteI
         </List>
 
         <ListItemSecondaryAction style={{ top: 26 }}>
-          <Switch edge="end" />
+          <Switch edge="end" checked={!currentItem.isInclusive} onChange={(e) => _editIsInclusive(!e.target.checked)} />
           <IconButton onClick={() => editItem(itemId)} color="primary" edge="end" aria-label="edit">
             <EditIcon />
           </IconButton>
@@ -304,7 +323,72 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
             </Button>
           </Grid>
 
-          <>{/* ICI OPTIONS DE GROUPE */}</>
+          <Grid container alignItems="flex-end" className={classes.typeCriteriaContainer}>
+            <Grid container alignItems="center" justify="space-between">
+              <Typography variant="h6">Groupe de type exclusif :</Typography>
+              <Switch
+                checked={!currentGroup.isInclusive}
+                onChange={(e) => editCurrentGroup({ ...currentGroup, isInclusive: !e.target.checked })}
+              />
+            </Grid>
+
+            {currentGroup.criteriaIds.length >= 2 && (
+              <>
+                <Typography variant="h6">Type de groupe :</Typography>
+                <Select
+                  variant="outlined"
+                  className={classes.groupTypeSelect}
+                  value={currentGroup.type}
+                  //@ts-ignore
+                  onChange={(e) => editCurrentGroup({ ...currentGroup, type: e.target.value })}
+                >
+                  <MenuItem value={'andGroup'}>ET</MenuItem>
+                  <MenuItem value={'orGroup'}>OU</MenuItem>
+                  <MenuItem value={'NamongM'}>N parmi M</MenuItem>
+                </Select>
+
+                {currentGroup.type === 'NamongM' && (
+                  <>
+                    <Typography variant="h6">Sélectionner le nombre de critère(s) à inclure/exclure :</Typography>
+
+                    <Grid container alignItems="flex-end" className={classes.options}>
+                      <Select
+                        className={classes.operatorSelect}
+                        variant="outlined"
+                        value={currentGroup.options?.operator ?? '='}
+                        onChange={(e) =>
+                          editCurrentGroup({
+                            ...currentGroup,
+                            //@ts-ignore
+                            options: { ...currentGroup.options, operator: e.target.value }
+                          })
+                        }
+                      >
+                        <MenuItem value={'='}>Nombre égal à</MenuItem>
+                        <MenuItem value={'<'}>Moins de</MenuItem>
+                        <MenuItem value={'>'}>Plus de </MenuItem>
+                        <MenuItem value={'<='}>Au plus</MenuItem>
+                        <MenuItem value={'>='}>Au moins</MenuItem>
+                      </Select>
+                      <TextField
+                        variant="outlined"
+                        className={classes.numberSelect}
+                        type="number"
+                        onChange={(e) =>
+                          editCurrentGroup({
+                            ...currentGroup,
+                            options: { ...currentGroup.options, number: parseInt(e.target.value, 10) }
+                          })
+                        }
+                        value={currentGroup.options?.number ?? currentGroup.criteriaIds.length}
+                      />
+                      <Typography>critère(s) parmi {currentGroup.criteriaIds.length}.</Typography>
+                    </Grid>
+                  </>
+                )}
+              </>
+            )}
+          </Grid>
         </div>
 
         <Grid className={classes.groupActionContainer}>

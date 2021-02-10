@@ -223,7 +223,8 @@ export type CriteriaGroupType = {
   | {
       type: 'NamongM'
       options: {
-        operator: '=' | '<' | '>' | '<=' | '>-'
+        operator: '=' | '<' | '>' | '<=' | '>='
+        number: number
       }
     }
 )
@@ -241,7 +242,7 @@ export type CriteriaItemType = {
 
 export type SelectedCriteriaType = {
   id?: number
-  isInclusive: boolean
+  isInclusive?: boolean
 } & (CcamDataType | Cim10DataType | DemographicDataType | GhmDataType | EncounterDataType | DocumentDataType)
 
 export type CcamDataType = {
