@@ -80,12 +80,11 @@ const TemporalConstraintModal: React.FC<{
             <div id="JE-SUIS-LAAAAAAAAAAAAAA" className={classes.divTemporalConstraintDetail}>
               <Grid>
                 <Grid>
-                  <Typography variant="h5" align="center">
-                    Type de contrainte
-                  </Typography>
+                  <DialogTitle className={classes.titleTemporalConstraint}>Type de contrainte</DialogTitle>
                 </Grid>
                 <Grid>
                   <AutoComplete
+                    className={classes.autoCompleteTemporalConstraint}
                     options={fakeTemporalConstraint}
                     getOptionLabel={(option) => option.display}
                     renderInput={(params) => <TextField {...params} label="Contrainte temporelle" variant="outlined" />}

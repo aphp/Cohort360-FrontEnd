@@ -31,6 +31,20 @@ const useStyles = makeStyles(() => ({
     height: '300px',
     border: '1px solid #C4C4C4',
     borderRadius: '5px'
+  },
+  titleTemporalConstraint: {
+    textAlign: 'center',
+    ' & h2': {
+      fontSize: '15px',
+      fontFamily: "'Montserrat', sans-serif",
+      color: '#0063AF',
+      textTransform: 'none',
+      lineHeight: 2
+    }
+  },
+  autoCompleteTemporalConstraint: {
+    width: '75%',
+    marginLeft: '60px'
   }
 }))
 
