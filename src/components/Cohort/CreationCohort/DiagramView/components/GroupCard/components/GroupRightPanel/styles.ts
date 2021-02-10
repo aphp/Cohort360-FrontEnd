@@ -66,6 +66,28 @@ const useStyles = makeStyles((theme) => ({
     '& > button': {
       margin: '12px 8px'
     }
+  },
+  typeCriteriaContainer: {
+    padding: 12
+  },
+  groupTypeSelect: {
+    width: '100%',
+    margin: '1em'
+  },
+  operatorSelect: {
+    marginRight: 8,
+    width: 150
+  },
+  switch: {
+    marginBottom: -10,
+    marginLeft: 8
+  },
+  options: {
+    padding: 12
+  },
+  numberSelect: {
+    width: 100,
+    marginRight: 8
   }
 }))
 
