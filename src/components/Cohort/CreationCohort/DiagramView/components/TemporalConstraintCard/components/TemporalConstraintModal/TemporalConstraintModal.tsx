@@ -9,7 +9,8 @@ import {
   Grid,
   TextField,
   Select,
-  MenuItem
+  MenuItem,
+  Typography
 } from '@material-ui/core'
 import AutoComplete from '@material-ui/lab/Autocomplete'
 import TrendingFlatIcon from '@material-ui/icons/TrendingFlat'
@@ -77,22 +78,36 @@ const TemporalConstraintModal: React.FC<{
                 </Grid>
                 <Grid>
                   <Select
-                    className={classes.SelectTemporalConstraint}
+                    className={classes.selectTemporalConstraint}
                     variant="outlined"
                     value={currentTemporalConstraint.type}
                     onChange={(e) => onChangeTemporalConstraint({ ...currentTemporalConstraint, type: e.target.value })}
                   >
-                    <MenuItem value={'SameEncounter'}>Même visite</MenuItem>
-                    <MenuItem value={'differentEncounter'}>Différente visite</MenuItem>
-                    <MenuItem value={'directChronologicalOrdering'}>Visite ordonné chronologiquement</MenuItem>
-                    <MenuItem value={'directChronologicalOrderingWithDuration'}>
-                      Visite ordonné chronologiquement séparé par une durée
-                    </MenuItem>
+                    <MenuItem value={'SameEncounter'}>est dans le même séjour que</MenuItem>
+                    <MenuItem value={'differentEncounter'}>est dans un séjour différent de</MenuItem>
+                    <MenuItem value={'directChronologicalOrdering'}>se passe avant</MenuItem>
+                    <MenuItem value={'directChronologicalOrderingWithDuration'}>est séparé de x temps de</MenuItem>
                   </Select>
                 </Grid>
                 {currentTemporalConstraint.type === 'directChronologicalOrderingWithDuration' && (
-                  <Grid>
-                    <p>je m'active que quand une certaine contrainte est séléctionnée</p>
+                  <Grid className={classes.gridTemporalConstraintOptions}>
+                    <Grid className={classes.gridTemporalContraintOptionsSelect}>
+                      <Typography>Durée</Typography>
+                      <Select variant="outlined" className={classes.sizeInput}>
+                        <MenuItem value="hour">heures</MenuItem>
+                        <MenuItem value="day">jours</MenuItem>
+                        <MenuItem value="month">mois</MenuItem>
+                        <MenuItem value="year">années</MenuItem>
+                      </Select>
+                    </Grid>
+                    <Grid className={classes.gridTemporalContraintOptionsSelect}>
+                      <Typography>Minimum</Typography>
+                      <TextField variant="outlined" className={classes.sizeInput} />
+                    </Grid>
+                    <Grid className={classes.gridTemporalContraintOptionsSelect}>
+                      <Typography>Maximum</Typography>
+                      <TextField variant="outlined" className={classes.sizeInput} />
+                    </Grid>
                   </Grid>
                 )}
               </Grid>
