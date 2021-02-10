@@ -63,60 +63,63 @@ const TemporalConstraintModal: React.FC<{
 
   return (
     <Dialog fullWidth maxWidth="md" open onClose={handleClose}>
-      <DialogTitle className={classes.title}>Contrainte Temporelle</DialogTitle>
-      <DialogContent>
-        <Grid container>
-          <Grid item className={classes.gridItemIdStart}>
-            <AutoComplete
-              options={fakeCriteriaList}
-              getOptionLabel={(option) => option.display}
-              renderInput={(params) => <TextField {...params} label="Critère de début" variant="outlined" />}
-            />
-          </Grid>
-          <Grid item className={classes.gridItemTrendingIcon}>
-            <TrendingFlatIcon />
-          </Grid>
-          <Grid item className={classes.gridItemTemporalConstraint}>
-            <div id="JE-SUIS-LAAAAAAAAAAAAAA" className={classes.divTemporalConstraintDetail}>
-              <Grid>
+      <div>
+        <DialogTitle className={classes.title}>Contrainte Temporelle</DialogTitle>
+        <DialogContent>
+          <Grid container>
+            <Grid item className={classes.gridItemIdStart}>
+              <AutoComplete
+                options={fakeCriteriaList}
+                getOptionLabel={(option) => option.display}
+                renderInput={(params) => <TextField {...params} label="Critère de début" variant="outlined" />}
+              />
+            </Grid>
+            <Grid item className={classes.gridItemTrendingIcon}>
+              <TrendingFlatIcon />
+            </Grid>
+            <Grid item className={classes.gridItemTemporalConstraint}>
+              <div id="JE-SUIS-LAAAAAAAAAAAAAA" className={classes.divTemporalConstraintDetail}>
                 <Grid>
-                  <Typography variant="h5" align="center">
-                    Type de contrainte
-                  </Typography>
+                  <Grid>
+                    <DialogTitle className={classes.titleTemporalConstraint}>Type de contrainte</DialogTitle>
+                  </Grid>
+                  <Grid>
+                    <AutoComplete
+                      className={classes.autoCompleteTemporalConstraint}
+                      options={fakeTemporalConstraint}
+                      getOptionLabel={(option) => option.display}
+                      renderInput={(params) => (
+                        <TextField {...params} label="Contrainte temporelle" variant="outlined" />
+                      )}
+                    />
+                  </Grid>
+                  <Grid>
+                    <p>je m'active que quand une certaine contrainte est séléctionnée</p>
+                  </Grid>
                 </Grid>
-                <Grid>
-                  <AutoComplete
-                    options={fakeTemporalConstraint}
-                    getOptionLabel={(option) => option.display}
-                    renderInput={(params) => <TextField {...params} label="Contrainte temporelle" variant="outlined" />}
-                  />
-                </Grid>
-                <Grid>
-                  <p>je m'active que quand une certaine contrainte est séléctionnée</p>
-                </Grid>
-              </Grid>
-            </div>
+              </div>
+            </Grid>
+            <Grid item className={classes.gridItemTrendingIcon}>
+              <TrendingFlatIcon />
+            </Grid>
+            <Grid item className={classes.gridItemIdEnd}>
+              <AutoComplete
+                options={fakeCriteriaList}
+                getOptionLabel={(option) => option.display}
+                renderInput={(params) => <TextField {...params} label="Critère de fin" variant="outlined" />}
+              />
+            </Grid>
           </Grid>
-          <Grid item className={classes.gridItemTrendingIcon}>
-            <TrendingFlatIcon />
-          </Grid>
-          <Grid item className={classes.gridItemIdEnd}>
-            <AutoComplete
-              options={fakeCriteriaList}
-              getOptionLabel={(option) => option.display}
-              renderInput={(params) => <TextField {...params} label="Critère de fin" variant="outlined" />}
-            />
-          </Grid>
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="primary">
-          Annuler
-        </Button>
-        <Button onClick={handleClose} color="primary">
-          Valider
-        </Button>
-      </DialogActions>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Annuler
+          </Button>
+          <Button onClick={handleClose} color="primary">
+            Valider
+          </Button>
+        </DialogActions>
+      </div>
     </Dialog>
   )
 }
