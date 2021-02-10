@@ -112,7 +112,7 @@ const GroupCard: React.FC = () => {
 
   return (
     <>
-      {displayingCriteriaGroup.map(({ id, title, criteriaIds, type }) => {
+      {displayingCriteriaGroup.map(({ id, title, criteriaIds, type, isInclusive }) => {
         const isGroupObject = criteriaIds.length > 1
         const firstChild = !isGroupObject ? selectedCriteria.find(({ id }) => id === criteriaIds[0]) : null
         return (
@@ -122,6 +122,7 @@ const GroupCard: React.FC = () => {
               <Card className={classes.mainCard}>
                 <CardHeader
                   className={classes.cardHeader}
+                  style={{ backgroundColor: isInclusive ? '#DAF0BF' : '#FFC695' }}
                   title={firstChild ? firstChild.title : title}
                   action={
                     <>
