@@ -42,7 +42,7 @@ const useStyles = makeStyles(() => ({
       lineHeight: 2
     }
   },
-  autoCompleteTemporalConstraint: {
+  SelectTemporalConstraint: {
     width: '75%',
     marginLeft: '60px'
   }

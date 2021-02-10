@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import {
   Dialog,
@@ -8,10 +8,13 @@ import {
   Button,
   Grid,
   TextField,
-  Typography
+  Select,
+  MenuItem
 } from '@material-ui/core'
 import AutoComplete from '@material-ui/lab/Autocomplete'
 import TrendingFlatIcon from '@material-ui/icons/TrendingFlat'
+
+import { TemporalConstraintType } from 'types'
 
 import useStyles from './styles'
 
@@ -35,31 +38,21 @@ const fakeCriteriaList = [
   }
 ]
 
-const fakeTemporalConstraint = [
-  {
-    id: '1',
-    display: 'Temporal constraint a'
-  },
-  {
-    id: '2',
-    display: 'Temporal constraint b'
-  },
-  {
-    id: '3',
-    display: 'Temporal constraint c'
-  },
-
-  {
-    id: '4',
-    display: 'Temporal constraint d'
-  }
-]
+const initialState: TemporalConstraintType = {
+  type: 'sameEncounter'
+}
 
 const TemporalConstraintModal: React.FC<{
   onClose: () => void
 }> = ({ onClose }) => {
   const classes = useStyles()
   const handleClose = () => onClose()
+  const [currentTemporalConstraint, onChangeTemporalConstraint] = useState<TemporalConstraintType>(initialState)
+  // const [currentStartId, onChangeStartId] = useState<'' | null>(null)
+  // const [currentEndId, onChangeEndId] = useState<'' | null>(null)
+
+  console.log('initalState', initialState)
+  console.log('currentTemporalConstraint', currentTemporalConstraint)
 
   return (
     <Dialog fullWidth maxWidth="md" open onClose={handleClose}>
@@ -83,16 +76,25 @@ const TemporalConstraintModal: React.FC<{
                   <DialogTitle className={classes.titleTemporalConstraint}>Type de contrainte</DialogTitle>
                 </Grid>
                 <Grid>
-                  <AutoComplete
-                    className={classes.autoCompleteTemporalConstraint}
-                    options={fakeTemporalConstraint}
-                    getOptionLabel={(option) => option.display}
-                    renderInput={(params) => <TextField {...params} label="Contrainte temporelle" variant="outlined" />}
-                  />
+                  <Select
+                    className={classes.SelectTemporalConstraint}
+                    variant="outlined"
+                    value={currentTemporalConstraint.type}
+                    onChange={(e) => onChangeTemporalConstraint({ ...currentTemporalConstraint, type: e.target.value })}
+                  >
+                    <MenuItem value={'SameEncounter'}>Même visite</MenuItem>
+                    <MenuItem value={'differentEncounter'}>Différente visite</MenuItem>
+                    <MenuItem value={'directChronologicalOrdering'}>Visite ordonné chronologiquement</MenuItem>
+                    <MenuItem value={'directChronologicalOrderingWithDuration'}>
+                      Visite ordonné chronologiquement séparé par une durée
+                    </MenuItem>
+                  </Select>
                 </Grid>
-                <Grid>
-                  <p>je m'active que quand une certaine contrainte est séléctionnée</p>
-                </Grid>
+                {currentTemporalConstraint.type === 'directChronologicalOrderingWithDuration' && (
+                  <Grid>
+                    <p>je m'active que quand une certaine contrainte est séléctionnée</p>
+                  </Grid>
+                )}
               </Grid>
             </div>
           </Grid>

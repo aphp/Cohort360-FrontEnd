@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Card, CardHeader, CardContent, IconButton, Typography, Button } from '@material-ui/core'
+import { Card, CardHeader, CardContent, Typography, Button } from '@material-ui/core'
 
 import TemporalConstraintModal from './components/TemporalConstraintModal/TemporalConstraintModal'
 import useStyles from './styles'
