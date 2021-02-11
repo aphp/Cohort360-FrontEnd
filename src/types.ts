@@ -223,10 +223,24 @@ export type CriteriaGroupType = {
   | {
       type: 'NamongM'
       options: {
-        operator: '=' | '<' | '>' | '<=' | '>-'
+        operator: '=' | '<' | '>' | '<=' | '>='
+        number: number
       }
     }
 )
+
+export type TemporalConstraintType = {
+  id?: number
+  title?: string
+  criteriaGroupIds?: number[]
+} & {
+  type:
+    | 'sameEncounter'
+    | 'differentEncounter'
+    | 'directChronologicalOrdering'
+    | 'directChronologicalOrderingWithDuration'
+    | unknown
+}
 
 export type CriteriaItemType = {
   id: string
@@ -241,7 +255,7 @@ export type CriteriaItemType = {
 
 export type SelectedCriteriaType = {
   id?: number
-  isInclusive: boolean
+  isInclusive?: boolean
 } & (CcamDataType | Cim10DataType | DemographicDataType | GhmDataType | EncounterDataType | DocumentDataType)
 
 export type CcamDataType = {

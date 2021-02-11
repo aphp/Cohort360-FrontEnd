@@ -188,6 +188,7 @@ const cohortCreationSlice = createSlice({
     },
     //
     addNewSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
+      action.payload.isInclusive = true
       state.selectedCriteria = [...state.selectedCriteria, action.payload]
       state.nextCriteriaId++
     },
@@ -209,9 +210,11 @@ const cohortCreationSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(logout, () => initialState)
-    builder.addCase(buildCreationCohort.pending, (state) => ({ ...state, loading: true }))
+    // buildCreationCohort
+    builder.addCase(buildCreationCohort.pending, (state) => ({ ...state, loading: false }))
     builder.addCase(buildCreationCohort.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
     builder.addCase(buildCreationCohort.rejected, (state) => ({ ...state, loading: false }))
+    // unbuildCreationCohort
     builder.addCase(unbuildCreationCohort.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(unbuildCreationCohort.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
     builder.addCase(unbuildCreationCohort.rejected, (state) => ({ ...state, loading: false }))
