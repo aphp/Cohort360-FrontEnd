@@ -110,7 +110,7 @@ type RequeteurSearchType = {
 }
 
 const constructFilterSolr = (criterion: SelectedCriteriaType) => {
-  let fhirFilter = ''
+  let filterSolr = ''
 
   const filterReducer = (accumulator: any, currentValue: any) =>
     accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
@@ -129,7 +129,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         ageFilter = `${PATIENT_BIRTHDATE}=ge${date1}&${PATIENT_BIRTHDATE}=le${date2}`
       }
 
-      fhirFilter = [
+      filterSolr = [
         `${criterion.gender ? `${PATIENT_GENDER}=${criterion.gender.id}` : ''}`,
         `${criterion.vitalStatus ? `${PATIENT_DECEASED}=${criterion.vitalStatus.id}` : ''}`,
         `${ageFilter ? `${ageFilter}` : ''}`
@@ -158,7 +158,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         ageFilter = `${ENCOUNTER_BIRTHDATE}=ge${date1}&${ENCOUNTER_BIRTHDATE}=le${date2}`
       }
 
-      fhirFilter = [
+      filterSolr = [
         `${criterion.admissionMode ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode.id}` : ''}`,
         `${criterion.entryMode ? `${ENCOUNTER_ENTRYMODE}=${criterion.entryMode.id}` : ''}`,
         `${criterion.exitMode ? `${ENCOUNTER_EXITMODE}=${criterion.exitMode.id}` : ''}`,
@@ -183,7 +183,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
       }
 
-      fhirFilter = [
+      filterSolr = [
         `${criterion.search ? `${COMPOSITION_TEXT}=${criterion.search}` : ''}`,
         `${criterion.docType ? `${COMPOSITION_TYPE}=${criterion.docType.id}` : ''}`,
         `${criterion.encounter ? `${COMPOSITION_ENCOUNTER}=${criterion.encounter}` : ''}`,
@@ -206,7 +206,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
       }
 
-      fhirFilter = [
+      filterSolr = [
         `${criterion.code ? `${CONDITION_CODE}=${criterion.code.map(({ id }) => id).reduce(searchReducer)}` : ''}`,
         `${criterion.diagnosticType ? `${CONDITION_TYPE}=${criterion.diagnosticType.id}` : ''}`,
         `${criterion.encounter ? `${CONDITION_ENCOUNTER}=${criterion.encounter}` : ''}`,
@@ -229,7 +229,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
       }
 
-      fhirFilter = [
+      filterSolr = [
         `${criterion.code ? `${PROCEDURE_CODE}=${criterion.code.map(({ id }) => id).reduce(searchReducer)}` : ''}`,
         `${criterion.encounter ? `${PROCEDURE_ENCOUNTER}=${criterion.encounter}` : ''}`,
         `${dateFilter ? `${dateFilter}` : ''}`
@@ -251,7 +251,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
       }
 
-      fhirFilter = [
+      filterSolr = [
         `${criterion.code ? `${CLAIM_CODE}=${criterion.code.map(({ id }) => id).reduce(searchReducer)}` : ''}`,
         `${criterion.encounter ? `${CLAIM_ENCOUNTER}=${criterion.encounter}` : ''}`,
         `${dateFilter ? `${CLAIM_DATE}=${dateFilter}` : ''}`
@@ -265,7 +265,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
       break
   }
 
-  return fhirFilter
+  return filterSolr
 }
 
 export function buildRequest(
@@ -350,8 +350,8 @@ export function buildRequest(
 
 export async function unbuildRequest(_json: string) {
   let population: ScopeTreeRow[] | null = null
-  let criteriaItems: SelectedCriteriaType[] = []
-  let criteriaGroup: CriteriaGroupType[] = []
+  let criteriaItems: RequeteurCriteriaType[] = []
+  let criteriaGroup: RequeteurGroupType[] = []
 
   const json = JSON.parse(_json)
   const {
@@ -359,11 +359,18 @@ export async function unbuildRequest(_json: string) {
     request
   } = json
 
+  /**
+   * Retrieve popultion
+   */
   for (const caresiteCohortItem of caresiteCohortList) {
     const newPopulation = await fetchPopulation(caresiteCohortItem ?? '')
     population = population ? [...population, ...newPopulation] : newPopulation
   }
 
+  /**
+   *
+   * @param currentItem
+   */
   const exploreRequest = (currentItem: any) => {
     const { criteria } = currentItem
 
@@ -372,24 +379,348 @@ export async function unbuildRequest(_json: string) {
         criteriaItems = [...criteriaItems, criterion]
       } else {
         criteriaGroup = [...criteriaGroup, { ...criterion, isSubItem: true }]
-
-        if (criterion && criterion.criteria) {
+        if (criterion && criterion.criteria && criterion.criteria.length > 0) {
           exploreRequest(criterion)
         }
       }
     }
   }
-
   for (const criterion of request[0].criteria) {
     // console.log('exploredRequest - MAIN GROUP', criterion)
     criteriaGroup = [...criteriaGroup, criterion]
     exploreRequest(criterion)
   }
 
+  const _retrieveInformationFromJson = async (element: RequeteurCriteriaType) => {
+    console.log('element', element)
+    const currentCriterion: any = {
+      id: element._id,
+      type: element.resourceType,
+      isInclusive: element.isInclusive,
+      title: ''
+    }
+
+    switch (element.resourceType) {
+      case RESSOURCE_TYPE_PATIENT: {
+        if (element.filterSolr) {
+          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+          for (const filter of filters) {
+            const key = filter ? filter[0] : null
+            const value = filter ? filter[1] : null
+            if (key === '_list') {
+              population = await fetchPopulation(value ?? '')
+              return
+            } else {
+              currentCriterion.title = 'Critère démographique'
+              currentCriterion.years = currentCriterion.years ? currentCriterion.years : null
+              currentCriterion.gender = currentCriterion.gender ? currentCriterion.gender : null
+              currentCriterion.vitalStatus = currentCriterion.vitalStatus ? currentCriterion.vitalStatus : null
+              switch (key) {
+                case PATIENT_BIRTHDATE: {
+                  currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
+                  if (value?.search('ge') === 0) {
+                    const date = value?.replace('ge', '') ? moment(value?.replace('ge', ''), 'YYYY-MM-DD') : null
+                    currentCriterion.years[1] = date ? moment().diff(date, 'years') : 0
+                  } else if (value?.search('le') === 0) {
+                    const date = value?.replace('le', '') ? moment(value?.replace('le', ''), 'YYYY-MM-DD') : null
+                    currentCriterion.years[0] = date ? moment().diff(date, 'years') : 130
+                  }
+                  break
+                }
+                case PATIENT_GENDER:
+                  currentCriterion.gender = { id: value }
+                  break
+                case PATIENT_DECEASED:
+                  currentCriterion.vitalStatus = { id: !!value }
+                  break
+                default:
+                  break
+              }
+            }
+          }
+        }
+        break
+      }
+      case RESSOURCE_TYPE_ENCOUNTER: {
+        if (element.filterSolr) {
+          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+
+          currentCriterion.title = 'Critère de prise en charge'
+          currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : null
+          currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : null
+          currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : null
+          currentCriterion.exitMode = currentCriterion.exitMode ? currentCriterion.exitMode : null
+          currentCriterion.fileStatus = currentCriterion.fileStatus ? currentCriterion.fileStatus : null
+
+          for (const filter of filters) {
+            const key = filter ? filter[0] : null
+            const value = filter ? filter[1] : null
+            switch (key) {
+              case ENCOUNTER_LENGTH: {
+                currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [0, 130]
+                if (value?.search('ge') === 0) {
+                  currentCriterion.duration[0] = value?.replace('ge', '') || 0
+                } else if (value?.search('le') === 0) {
+                  currentCriterion.duration[1] = value?.replace('le', '') || 130
+                }
+                break
+              }
+              case ENCOUNTER_BIRTHDATE: {
+                currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
+                currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
+                const ageType = [
+                  { id: 'year', label: 'années' },
+                  { id: 'month', label: 'mois' },
+                  { id: 'day', label: 'jours' }
+                ]
+
+                if (value?.search('ge') === 0) {
+                  const date = value?.replace('ge', '') ? moment(value?.replace('ge', ''), 'YYYY-MM-DD') : null
+                  const diff = date ? moment().diff(date, 'days') : 0
+
+                  let currentAgeType: 'year' | 'month' | 'day' = 'year'
+                  if (diff >= 130 && diff <= 3000) {
+                    currentAgeType = 'month'
+                  } else if (diff <= 130) {
+                    currentAgeType = 'day'
+                  }
+
+                  const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
+                  currentCriterion.ageType = foundAgeType
+                  if (date) currentCriterion.years[1] = moment().diff(date, currentAgeType) || 130
+                } else if (value?.search('le') === 0) {
+                  const date = value?.replace('le', '') ? moment(value?.replace('le', ''), 'YYYY-MM-DD') : null
+                  const diff = date ? moment().diff(date, 'days') : 0
+
+                  let currentAgeType: 'year' | 'month' | 'day' = 'year'
+                  if (currentCriterion.ageType) {
+                    currentAgeType = currentCriterion.ageType.id
+                  } else {
+                    if (diff >= 130 && diff <= 3000) {
+                      currentAgeType = 'month'
+                    } else if (diff <= 130) {
+                      currentAgeType = 'day'
+                    }
+                    const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
+                    currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : foundAgeType
+                  }
+                  currentCriterion.years[0] = moment().diff(date, currentAgeType) || 0
+                }
+                break
+              }
+              case ENCOUNTER_ADMISSIONMODE:
+                currentCriterion.admissionMode = { id: value }
+                break
+              case ENCOUNTER_ENTRYMODE:
+                currentCriterion.entryMode = { id: value }
+                break
+              case ENCOUNTER_EXITMODE:
+                currentCriterion.exitMode = { id: value }
+                break
+              case ENCOUNTER_FILESTATUS:
+                currentCriterion.fileStatus = { id: value }
+                break
+
+              default:
+                break
+            }
+          }
+        }
+        break
+      }
+      case RESSOURCE_TYPE_COMPOSITION: {
+        if (element.filterSolr) {
+          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+
+          currentCriterion.title = 'Critère de document'
+          currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
+          currentCriterion.docType = currentCriterion.docType ? currentCriterion.docType : null
+          currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
+          currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
+          currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+
+          for (const filter of filters) {
+            const key = filter ? filter[0] : null
+            const value = filter ? filter[1] : null
+            switch (key) {
+              case COMPOSITION_TEXT:
+                currentCriterion.search = value
+                break
+              case COMPOSITION_TYPE:
+                currentCriterion.docType = { id: value }
+                break
+              case COMPOSITION_ENCOUNTER:
+                currentCriterion.encounter = value
+                break
+              case COMPOSITION_DATE: {
+                if (value?.search('ge') === 0) {
+                  currentCriterion.startOccurrence = value?.replace('ge', '')
+                } else if (value?.search('le') === 0) {
+                  currentCriterion.endOccurrence = value?.replace('le', '')
+                }
+                break
+              }
+              default:
+                break
+            }
+          }
+        }
+        break
+      }
+      case RESSOURCE_TYPE_CONDITION: {
+        if (element.filterSolr) {
+          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+
+          currentCriterion.title = 'Critère de diagnostic'
+          currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
+          currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : null
+          currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
+          currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
+          currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+
+          for (const filter of filters) {
+            const key = filter ? filter[0] : null
+            const value = filter ? filter[1] : null
+            switch (key) {
+              case CONDITION_CODE:
+                currentCriterion.code = currentCriterion.code
+                  ? [...currentCriterion.code, { id: value }]
+                  : [{ id: value }]
+                break
+              case CONDITION_TYPE:
+                currentCriterion.diagnosticType = { id: value }
+                break
+              case CONDITION_ENCOUNTER:
+                currentCriterion.encounter = value
+                break
+              case CONDITION_DATE: {
+                if (value?.search('ge') === 0) {
+                  currentCriterion.startOccurrence = value?.replace('ge', '')
+                } else if (value?.search('le') === 0) {
+                  currentCriterion.endOccurrence = value?.replace('le', '')
+                }
+                break
+              }
+              default:
+                break
+            }
+          }
+        }
+        break
+      }
+      case RESSOURCE_TYPE_PROCEDURE: {
+        if (element.filterSolr) {
+          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+
+          currentCriterion.title = "Critères d'actes CCAM"
+          currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
+          currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : null
+          currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
+          currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
+          currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+
+          for (const filter of filters) {
+            const key = filter ? filter[0] : null
+            const value = filter ? filter[1] : null
+            switch (key) {
+              case PROCEDURE_CODE:
+                currentCriterion.code = currentCriterion.code
+                  ? [...currentCriterion.code, { id: value }]
+                  : [{ id: value }]
+                break
+              case PROCEDURE_ENCOUNTER:
+                currentCriterion.encounter = value
+                break
+              case PROCEDURE_DATE: {
+                if (value?.search('ge') === 0) {
+                  currentCriterion.startOccurrence = value?.replace('ge', '')
+                } else if (value?.search('le') === 0) {
+                  currentCriterion.endOccurrence = value?.replace('le', '')
+                }
+                break
+              }
+              default:
+                break
+            }
+          }
+        }
+        break
+      }
+      case RESSOURCE_TYPE_CLAIM: {
+        if (element.filterSolr) {
+          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+
+          currentCriterion.title = 'Critère de GHM'
+          currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
+          currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
+          currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
+          currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+
+          for (const filter of filters) {
+            const key = filter ? filter[0] : null
+            const value = filter ? filter[1] : null
+            switch (key) {
+              case CLAIM_CODE:
+                currentCriterion.code = currentCriterion.code
+                  ? [...currentCriterion.code, { id: value }]
+                  : [{ id: value }]
+                break
+              case CLAIM_ENCOUNTER:
+                currentCriterion.encounter = value
+                break
+              case CLAIM_DATE: {
+                if (value?.search('ge') === 0) {
+                  currentCriterion.startOccurrence = value?.replace('ge', '')
+                } else if (value?.search('le') === 0) {
+                  currentCriterion.endOccurrence = value?.replace('le', '')
+                }
+                break
+              }
+              default:
+                break
+            }
+          }
+        }
+        break
+      }
+      default:
+        break
+    }
+    return currentCriterion
+  }
+
+  const convertJsonObjectsToCriteria = async (
+    _criteriaItems: RequeteurCriteriaType[]
+  ): Promise<SelectedCriteriaType[]> => {
+    let newSelectedCriteriaItems: SelectedCriteriaType[] = []
+
+    for (const criteriaItem of _criteriaItems) {
+      newSelectedCriteriaItems = [...newSelectedCriteriaItems, await _retrieveInformationFromJson(criteriaItem)]
+    }
+
+    return newSelectedCriteriaItems
+  }
+
+  const convertJsonObjectsToCriteriaGroup: (_criteriaGroup: RequeteurGroupType[]) => CriteriaGroupType[] = (
+    _criteriaGroup
+  ) => {
+    return _criteriaGroup.map((groupItem: any) => ({
+      id: groupItem._id,
+      title: 'Groupe de critère',
+      criteriaIds:
+        groupItem.criteria && groupItem.criteria.length > 0
+          ? groupItem.criteria.map((criteria: RequeteurCriteriaType | RequeteurGroupType) => criteria._id)
+          : [],
+      isSubGroup: groupItem.isSubItem,
+      isInclusive: groupItem.isInclusive,
+      type: groupItem.type
+    }))
+  }
+
   return {
     population,
-    criteria: criteriaItems,
-    criteriaGroup
+    criteria: await convertJsonObjectsToCriteria(criteriaItems),
+    criteriaGroup: convertJsonObjectsToCriteriaGroup(criteriaGroup)
   }
 }
 

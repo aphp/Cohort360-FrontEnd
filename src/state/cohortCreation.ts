@@ -144,8 +144,6 @@ const unbuildCreationCohort = createAsyncThunk<
   const state = getState()
 
   const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot.json)
-  console.log('criteria', criteria)
-  console.log('criteriaGroup', criteriaGroup)
   const count = await _countCohort(
     newCurrentSnapshot.json,
     newCurrentSnapshot.uuid,
@@ -157,8 +155,9 @@ const unbuildCreationCohort = createAsyncThunk<
     count,
     json: newCurrentSnapshot.json,
     currentSnapshot: newCurrentSnapshot.uuid,
-    selectedPopulation: population
-    // selectedCriteria: criteria
+    selectedPopulation: population,
+    selectedCriteria: criteria,
+    criteriaGroup: criteriaGroup
   }
 })
 
