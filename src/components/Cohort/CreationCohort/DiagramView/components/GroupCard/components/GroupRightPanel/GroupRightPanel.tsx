@@ -339,7 +339,7 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
             </Button>
 
             <Button
-              disabled={isSubGroup}
+              // disabled={isSubGroup}
               style={{ borderRadius: 38, marginLeft: 8 }}
               color="primary"
               variant="contained"
@@ -429,7 +429,7 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
         </Grid>
       </Drawer>
 
-      {!isSubGroup && (
+      {open && (
         <GroupRightPanel
           isSubGroup
           currentCriteriaGroup={request?.criteriaGroup?.find(({ id }) => id === selectedItemId) ?? null}

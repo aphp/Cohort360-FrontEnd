@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-// import { fetchPerimeterInfoForRequeteur as fetchPopulation } from '../services/perimeters'
+import { fetchPerimeterInfoForRequeteur as fetchPopulation } from '../services/perimeters'
 import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType } from 'types'
 
 const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
@@ -47,6 +47,7 @@ const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   vitalStatus: null,
   years: [0, 130]
 }
+
 const DEFAULT_GROUP_ERROR: CriteriaGroupType = {
   id: 0,
   title: '',
@@ -74,29 +75,30 @@ type RequeteurCriteriaType = {
     timeDelayMax?: number
   }
 }
-type RequeteurGroupType = {
-  // GROUP (andGroup | orGroup)
-  _type: 'andGroup' | 'orGroup' | 'NamongM'
-  _id: number
-  isInclusive: boolean
-  criteria: (RequeteurCriteriaType | RequeteurGroupType)[]
-  temporalConstraints?: [] // NOT IMPLEMENTED
-}
-// NOT IMPLEMENTED
-// | {
-//     // GROUP (nAmongM)
-//     _type: 'nAmongM'
-//     _id: number
-//     isInclusive: boolean
-//     criteria: (RequeteurCriteriaType | RequeteurGroupType)[]
-//     nAmongMOptions: {
-//       n: number
-//       operator?: '<=' | '<' | '=' | '>=' | '>'
-//       timeDelayMin?: number
-//       timeDelayMax?: number
-//     }
-//     temporalConstraints?: [] // NOT IMPLEMENTED
-//   }
+type RequeteurGroupType =
+  | {
+      // GROUP (andGroup | orGroup)
+      _type: 'andGroup' | 'orGroup'
+      _id: number
+      isInclusive: boolean
+      criteria: (RequeteurCriteriaType | RequeteurGroupType)[]
+      temporalConstraints?: [] // NOT IMPLEMENTED
+    }
+  // NOT IMPLEMENTED
+  | {
+      // GROUP (nAmongM)
+      _type: 'nAmongM'
+      _id: number
+      isInclusive: boolean
+      criteria: (RequeteurCriteriaType | RequeteurGroupType)[]
+      nAmongMOptions: {
+        n: number
+        operator?: '<=' | '<' | '=' | '>=' | '>'
+        timeDelayMin?: number
+        timeDelayMax?: number
+      }
+      temporalConstraints?: [] // NOT IMPLEMENTED
+    }
 
 type RequeteurSearchType = {
   version: string
@@ -320,9 +322,9 @@ export function buildRequest(
                         })
                       : []
 
-                    // DO SPECIAL THING FOR `nAmongM`
+                    // DO SPECIAL THING FOR `NamongM`
                     return {
-                      _type: group.type,
+                      _type: group.type === 'NamongM' ? 'orGroup' : group.type,
                       _id: group.id,
                       isInclusive: group.isInclusive ?? true,
                       criteria: subItems
@@ -343,333 +345,51 @@ export function buildRequest(
     ]
   }
 
-  console.log('json', json)
-
-  return ''
+  return JSON.stringify(json)
 }
 
-export async function unbuildRequest(json: string) {
-  console.log('json', json)
+export async function unbuildRequest(_json: string) {
+  let population: ScopeTreeRow[] | null = null
+  let criteriaItems: SelectedCriteriaType[] = []
+  let criteriaGroup: CriteriaGroupType[] = []
 
-  const population: ScopeTreeRow[] | null = null
-  const criteria: SelectedCriteriaType[] = []
+  const json = JSON.parse(_json)
+  const {
+    sourcePopulation: { caresiteCohortList },
+    request
+  } = json
 
-  // const _retrieveInformationFromJson = async (element: RequeteurSearchType) => {
-  //   const currentCriterion: any = {
-  //     type: element.resourceType,
-  //     title: ''
-  //   }
-  //   switch (element.resourceType) {
-  //     case RESSOURCE_TYPE_PATIENT: {
-  //       if (element.fhirFilter) {
-  //         const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
-  //         for (const filter of filters) {
-  //           const key = filter ? filter[0] : null
-  //           const value = filter ? filter[1] : null
-  //           if (key === '_list') {
-  //             population = await fetchPopulation(value ?? '')
-  //             return
-  //           } else {
-  //             currentCriterion.title = 'Critère démographique'
-  //             currentCriterion.years = currentCriterion.years ? currentCriterion.years : null
-  //             currentCriterion.gender = currentCriterion.gender ? currentCriterion.gender : null
-  //             currentCriterion.vitalStatus = currentCriterion.vitalStatus ? currentCriterion.vitalStatus : null
-  //             switch (key) {
-  //               case PATIENT_BIRTHDATE: {
-  //                 currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
-  //                 if (value?.search('ge') === 0) {
-  //                   const date = value?.replace('ge', '') ? moment(value?.replace('ge', ''), 'YYYY-MM-DD') : null
-  //                   currentCriterion.years[1] = date ? moment().diff(date, 'years') : 0
-  //                 } else if (value?.search('le') === 0) {
-  //                   const date = value?.replace('le', '') ? moment(value?.replace('le', ''), 'YYYY-MM-DD') : null
-  //                   currentCriterion.years[0] = date ? moment().diff(date, 'years') : 130
-  //                 }
-  //                 break
-  //               }
-  //               case PATIENT_GENDER:
-  //                 currentCriterion.gender = { id: value }
-  //                 break
-  //               case PATIENT_DECEASED:
-  //                 currentCriterion.vitalStatus = { id: !!value }
-  //                 break
-  //               default:
-  //                 break
-  //             }
-  //           }
-  //         }
-  //       }
-  //       break
-  //     }
-  //     case RESSOURCE_TYPE_ENCOUNTER: {
-  //       if (element.fhirFilter) {
-  //         const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
+  for (const caresiteCohortItem of caresiteCohortList) {
+    const newPopulation = await fetchPopulation(caresiteCohortItem ?? '')
+    population = population ? [...population, ...newPopulation] : newPopulation
+  }
 
-  //         currentCriterion.title = 'Critère de prise en charge'
-  //         currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : null
-  //         currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : null
-  //         currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : null
-  //         currentCriterion.exitMode = currentCriterion.exitMode ? currentCriterion.exitMode : null
-  //         currentCriterion.fileStatus = currentCriterion.fileStatus ? currentCriterion.fileStatus : null
+  const exploreRequest = (currentItem: any) => {
+    const { criteria } = currentItem
 
-  //         for (const filter of filters) {
-  //           const key = filter ? filter[0] : null
-  //           const value = filter ? filter[1] : null
-  //           switch (key) {
-  //             case ENCOUNTER_LENGTH: {
-  //               currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [0, 130]
-  //               if (value?.search('ge') === 0) {
-  //                 currentCriterion.duration[0] = value?.replace('ge', '') || 0
-  //               } else if (value?.search('le') === 0) {
-  //                 currentCriterion.duration[1] = value?.replace('le', '') || 130
-  //               }
-  //               break
-  //             }
-  //             case ENCOUNTER_BIRTHDATE: {
-  //               currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
-  //               currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
-  //               const ageType = [
-  //                 { id: 'year', label: 'années' },
-  //                 { id: 'month', label: 'mois' },
-  //                 { id: 'day', label: 'jours' }
-  //               ]
+    for (const criterion of criteria) {
+      if (criterion._type === 'basicResource') {
+        criteriaItems = [...criteriaItems, criterion]
+      } else {
+        criteriaGroup = [...criteriaGroup, { ...criterion, isSubItem: true }]
 
-  //               if (value?.search('ge') === 0) {
-  //                 const date = value?.replace('ge', '') ? moment(value?.replace('ge', ''), 'YYYY-MM-DD') : null
-  //                 const diff = date ? moment().diff(date, 'days') : 0
+        if (criterion && criterion.criteria) {
+          exploreRequest(criterion)
+        }
+      }
+    }
+  }
 
-  //                 let currentAgeType: 'year' | 'month' | 'day' = 'year'
-  //                 if (diff >= 130 && diff <= 3000) {
-  //                   currentAgeType = 'month'
-  //                 } else if (diff <= 130) {
-  //                   currentAgeType = 'day'
-  //                 }
-
-  //                 const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
-  //                 currentCriterion.ageType = foundAgeType
-  //                 if (date) currentCriterion.years[1] = moment().diff(date, currentAgeType) || 130
-  //               } else if (value?.search('le') === 0) {
-  //                 const date = value?.replace('le', '') ? moment(value?.replace('le', ''), 'YYYY-MM-DD') : null
-  //                 const diff = date ? moment().diff(date, 'days') : 0
-
-  //                 let currentAgeType: 'year' | 'month' | 'day' = 'year'
-  //                 if (currentCriterion.ageType) {
-  //                   currentAgeType = currentCriterion.ageType.id
-  //                 } else {
-  //                   if (diff >= 130 && diff <= 3000) {
-  //                     currentAgeType = 'month'
-  //                   } else if (diff <= 130) {
-  //                     currentAgeType = 'day'
-  //                   }
-  //                   const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
-  //                   currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : foundAgeType
-  //                 }
-  //                 currentCriterion.years[0] = moment().diff(date, currentAgeType) || 0
-  //               }
-  //               break
-  //             }
-  //             case ENCOUNTER_ADMISSIONMODE:
-  //               currentCriterion.admissionMode = { id: value }
-  //               break
-  //             case ENCOUNTER_ENTRYMODE:
-  //               currentCriterion.entryMode = { id: value }
-  //               break
-  //             case ENCOUNTER_EXITMODE:
-  //               currentCriterion.exitMode = { id: value }
-  //               break
-  //             case ENCOUNTER_FILESTATUS:
-  //               currentCriterion.fileStatus = { id: value }
-  //               break
-
-  //             default:
-  //               break
-  //           }
-  //         }
-  //       }
-  //       break
-  //     }
-  //     case RESSOURCE_TYPE_COMPOSITION: {
-  //       if (element.fhirFilter) {
-  //         const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
-
-  //         currentCriterion.title = 'Critère de document'
-  //         currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
-  //         currentCriterion.docType = currentCriterion.docType ? currentCriterion.docType : null
-  //         currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
-  //         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
-  //         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
-
-  //         for (const filter of filters) {
-  //           const key = filter ? filter[0] : null
-  //           const value = filter ? filter[1] : null
-  //           switch (key) {
-  //             case COMPOSITION_TEXT:
-  //               currentCriterion.search = value
-  //               break
-  //             case COMPOSITION_TYPE:
-  //               currentCriterion.docType = { id: value }
-  //               break
-  //             case COMPOSITION_ENCOUNTER:
-  //               currentCriterion.encounter = value
-  //               break
-  //             case COMPOSITION_DATE: {
-  //               if (value?.search('ge') === 0) {
-  //                 currentCriterion.startOccurrence = value?.replace('ge', '')
-  //               } else if (value?.search('le') === 0) {
-  //                 currentCriterion.endOccurrence = value?.replace('le', '')
-  //               }
-  //               break
-  //             }
-  //             default:
-  //               break
-  //           }
-  //         }
-  //       }
-  //       break
-  //     }
-  //     case RESSOURCE_TYPE_CONDITION: {
-  //       if (element.fhirFilter) {
-  //         const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
-
-  //         currentCriterion.title = 'Critère de diagnostic'
-  //         currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
-  //         currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : null
-  //         currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
-  //         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
-  //         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
-
-  //         for (const filter of filters) {
-  //           const key = filter ? filter[0] : null
-  //           const value = filter ? filter[1] : null
-  //           switch (key) {
-  //             case CONDITION_CODE:
-  //               currentCriterion.code = { id: value }
-  //               break
-  //             case CONDITION_TYPE:
-  //               currentCriterion.diagnosticType = { id: value }
-  //               break
-  //             case CONDITION_ENCOUNTER:
-  //               currentCriterion.encounter = value
-  //               break
-  //             case CONDITION_DATE: {
-  //               if (value?.search('ge') === 0) {
-  //                 currentCriterion.startOccurrence = value?.replace('ge', '')
-  //               } else if (value?.search('le') === 0) {
-  //                 currentCriterion.endOccurrence = value?.replace('le', '')
-  //               }
-  //               break
-  //             }
-  //             default:
-  //               break
-  //           }
-  //         }
-  //       }
-  //       break
-  //     }
-  //     case RESSOURCE_TYPE_PROCEDURE: {
-  //       if (element.fhirFilter) {
-  //         const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
-
-  //         currentCriterion.title = "Critères d'actes CCAM"
-  //         currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
-  //         currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : null
-  //         currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
-  //         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
-  //         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
-
-  //         for (const filter of filters) {
-  //           const key = filter ? filter[0] : null
-  //           const value = filter ? filter[1] : null
-  //           switch (key) {
-  //             case PROCEDURE_CODE:
-  //               currentCriterion.code = { id: value }
-  //               break
-  //             case PROCEDURE_ENCOUNTER:
-  //               currentCriterion.encounter = value
-  //               break
-  //             case PROCEDURE_DATE: {
-  //               if (value?.search('ge') === 0) {
-  //                 currentCriterion.startOccurrence = value?.replace('ge', '')
-  //               } else if (value?.search('le') === 0) {
-  //                 currentCriterion.endOccurrence = value?.replace('le', '')
-  //               }
-  //               break
-  //             }
-  //             default:
-  //               break
-  //           }
-  //         }
-  //       }
-  //       break
-  //     }
-  //     case RESSOURCE_TYPE_CLAIM: {
-  //       if (element.fhirFilter) {
-  //         const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
-
-  //         currentCriterion.title = 'Critère de GHM'
-  //         currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
-  //         currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
-  //         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
-  //         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
-
-  //         for (const filter of filters) {
-  //           const key = filter ? filter[0] : null
-  //           const value = filter ? filter[1] : null
-  //           switch (key) {
-  //             case CLAIM_CODE:
-  //               currentCriterion.code = { id: value }
-  //               break
-  //             case CLAIM_ENCOUNTER:
-  //               currentCriterion.encounter = value
-  //               break
-  //             case CLAIM_DATE: {
-  //               if (value?.search('ge') === 0) {
-  //                 currentCriterion.startOccurrence = value?.replace('ge', '')
-  //               } else if (value?.search('le') === 0) {
-  //                 currentCriterion.endOccurrence = value?.replace('le', '')
-  //               }
-  //               break
-  //             }
-  //             default:
-  //               break
-  //           }
-  //         }
-  //       }
-  //       break
-  //     }
-  //     default:
-  //       break
-  //   }
-  //   return currentCriterion
-  // }
-
-  // const _browseJson = async (currentJson: any) => {
-  //   if (currentJson && Array.isArray(currentJson) === true) {
-  //     for (const currentJsonElement of currentJson) {
-  //       if (currentJsonElement.child) {
-  //         await _browseJson(currentJsonElement.child)
-  //       }
-  //       if (currentJsonElement._type !== 'InnerJoin') {
-  //         const currentCriterion = await _retrieveInformationFromJson(currentJsonElement)
-  //         if (currentCriterion) criteria = [...criteria, currentCriterion]
-  //       }
-  //     }
-  //   } else {
-  //     if (currentJson.child) {
-  //       await _browseJson(currentJson.child)
-  //     }
-  //     if (currentJson._type !== 'InnerJoin') {
-  //       const currentCriterion = await _retrieveInformationFromJson(currentJson)
-  //       if (currentCriterion) criteria = [...criteria, currentCriterion]
-  //     }
-  //   }
-  // }
-
-  // const _json = json ? JSON.parse(json) : {}
-  // await _browseJson(_json)
+  for (const criterion of request[0].criteria) {
+    // console.log('exploredRequest - MAIN GROUP', criterion)
+    criteriaGroup = [...criteriaGroup, criterion]
+    exploreRequest(criterion)
+  }
 
   return {
     population,
-    criteria
+    criteria: criteriaItems,
+    criteriaGroup
   }
 }
 

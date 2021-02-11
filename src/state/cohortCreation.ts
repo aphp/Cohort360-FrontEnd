@@ -143,7 +143,9 @@ const unbuildCreationCohort = createAsyncThunk<
 >('cohortCreation/unbuild', async ({ newCurrentSnapshot }, { getState }) => {
   const state = getState()
 
-  const { population, criteria } = await unbuildRequest(newCurrentSnapshot.json)
+  const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot.json)
+  console.log('criteria', criteria)
+  console.log('criteriaGroup', criteriaGroup)
   const count = await _countCohort(
     newCurrentSnapshot.json,
     newCurrentSnapshot.uuid,
@@ -155,8 +157,8 @@ const unbuildCreationCohort = createAsyncThunk<
     count,
     json: newCurrentSnapshot.json,
     currentSnapshot: newCurrentSnapshot.uuid,
-    selectedPopulation: population,
-    selectedCriteria: criteria
+    selectedPopulation: population
+    // selectedCriteria: criteria
   }
 })
 
@@ -208,10 +210,14 @@ const cohortCreationSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(logout, () => initialState)
+    // buildCreationCohort
     builder.addCase(buildCreationCohort.pending, (state) => ({ ...state, loading: false }))
     builder.addCase(buildCreationCohort.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
-    builder.addCase(unbuildCreationCohort.pending, (state) => ({ ...state, loading: false }))
+    builder.addCase(buildCreationCohort.rejected, (state) => ({ ...state, loading: false }))
+    // unbuildCreationCohort
+    builder.addCase(unbuildCreationCohort.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(unbuildCreationCohort.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
+    builder.addCase(unbuildCreationCohort.rejected, (state) => ({ ...state, loading: false }))
   }
 })
 
