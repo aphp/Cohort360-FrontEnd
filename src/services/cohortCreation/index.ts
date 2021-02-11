@@ -28,7 +28,7 @@ export const countCohort = async (
       request_query_snapshot_id: snapshotId,
       request_id: requestId,
       fhir_datetime: moment().format('YYYY-MM-DD[T]HH:mm:ss'),
-      measure: count
+      measure: count ?? 0
     })
 
     return {

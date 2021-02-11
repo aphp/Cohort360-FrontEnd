@@ -169,8 +169,8 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
   }
 }
 
-export const fetchPerimeterInfoForRequeteur = async (perimetersId: string): Promise<ScopeTreeRow[] | null> => {
-  if (!perimetersId) return null
+export const fetchPerimeterInfoForRequeteur = async (perimetersId: string): Promise<ScopeTreeRow[]> => {
+  if (!perimetersId) return []
 
   const groupsResults = await api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${perimetersId}`)
   const groups = getApiResponseResources(groupsResults)

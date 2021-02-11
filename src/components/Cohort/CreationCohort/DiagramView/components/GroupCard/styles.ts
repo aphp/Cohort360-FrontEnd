@@ -2,6 +2,10 @@ import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(() => ({
   buttonContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
     '&::before': {
       content: '""',
       width: 2.1,
@@ -13,10 +17,10 @@ const useStyles = makeStyles(() => ({
   },
   lastCardItem: {},
   mainCard: {
-    width: 450
+    width: 600
   },
   card: {
-    width: '90%',
+    width: '95%',
     margin: '0px auto'
   },
   cardHeader: {
@@ -31,7 +35,8 @@ const useStyles = makeStyles(() => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    textAlign: 'center'
+    textAlign: 'center',
+    padding: '8px !important'
   },
   criteriaType: {
     color: '#5BC5F2',
@@ -46,7 +51,6 @@ const useStyles = makeStyles(() => ({
     fontWeight: 'bold'
   },
   addButton: {
-    marginLeft: 204,
     width: 42,
     height: 42,
     minWidth: 42,

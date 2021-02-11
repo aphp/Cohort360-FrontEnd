@@ -52,7 +52,7 @@ const criteriaList: CriteriaItemType[] = [
   },
   {
     id: 'Patient',
-    title: 'Patients',
+    title: 'Démographie',
     color: '#0063AF',
     components: DemographicFrom,
     data: { gender: 'loading', status: 'loading' },

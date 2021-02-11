@@ -12,7 +12,7 @@ const useStyles = makeStyles(() => ({
     // }
   },
   card: {
-    width: 450
+    width: 600
   },
   cardHeader: {
     background: '#D1E2F4',
