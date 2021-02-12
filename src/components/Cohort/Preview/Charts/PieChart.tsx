@@ -46,6 +46,8 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 250, width = 25
 
     const arcs = pie(data)
 
+    const div = d3.select('#tooltip').style('opacity', 0)
+
     svg
       .append('g')
       .attr('stroke', 'white')
@@ -54,6 +56,18 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 250, width = 25
       .join('path')
       .attr('fill', (d) => color(d.data.label))
       .attr('d', arc)
+      .on('mouseover', function (d) {
+        d3.select(this).transition().duration('50').attr('opacity', '.5')
+        div.transition().duration(50).style('opacity', 1)
+        div
+          .html(d.value)
+          .style('left', d3.event.pageX + 10 + 'px')
+          .style('top', d3.event.pageY - 15 + 'px')
+      })
+      .on('mouseout', function () {
+        d3.select(this).transition().duration('50').attr('opacity', '1')
+        div.transition().duration(50).style('opacity', 0)
+      })
 
     setLegend(
       legend({
