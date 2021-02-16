@@ -238,6 +238,7 @@ export type SelectedCriteriaType = {
   docType?: { id: '55188-7' | '11336-5' | '57833-6'; label: string }
   occurence?: number
   ageType?: { id: string; label: string }
+  durationType?: { id: string; label: string }
   duration?: [number, number]
   admissionMode?: { id: string; label: string }
   entryMode?: { id: string; label: string }
@@ -271,6 +272,8 @@ export type DemographicDataType = {
   title: string
   gender: { id: string; label: string } | null
   vitalStatus: { id: string; label: string } | null
+  ageType: { id: string; label: string } | null
+  label: undefined
   years: [number, number]
 }
 
@@ -297,9 +300,11 @@ export type GhmDataType = {
 
 export type EncounterDataType = {
   label: undefined
+  label2: undefined
   title: string
-  ageType: string
+  ageType: { id: string; label: string } | null
   years: [number, number]
+  durationType: { id: string; label: string }
   duration: [number, number]
   admissionMode: { id: string; label: string } | null
   entryMode: { id: string; label: string } | null

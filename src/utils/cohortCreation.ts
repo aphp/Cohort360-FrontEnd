@@ -76,10 +76,12 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
         let ageFilter = ''
         if (selectedCriterion.years && selectedCriterion.years !== [0, 130]) {
           const date1 = moment()
-            .subtract(selectedCriterion.years[1] + 1, 'years')
+            .subtract(selectedCriterion.years[1] + 1, selectedCriterion?.ageType?.id || 'years')
             .add(1, 'days')
             .format('YYYY-MM-DD')
-          const date2 = moment().subtract(selectedCriterion.years[0], 'years').format('YYYY-MM-DD')
+          const date2 = moment()
+            .subtract(selectedCriterion.years[0], selectedCriterion?.ageType?.id || 'years')
+            .format('YYYY-MM-DD')
           ageFilter = `${PATIENT_BIRTHDATE}=ge${date1}&${PATIENT_BIRTHDATE}=le${date2}`
         }
 
@@ -95,8 +97,25 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
 
       case RESSOURCE_TYPE_ENCOUNTER: {
         let lengthFilter = ''
+        let multiplicator = 1
+        if (selectedCriterion.durationType) {
+          switch (selectedCriterion.durationType.id) {
+            case 'month':
+              multiplicator = 31
+              break
+            case 'year':
+              multiplicator = 365
+              break
+            default:
+              multiplicator = 1
+              break
+          }
+        }
+
         if (selectedCriterion.duration && selectedCriterion.duration !== [0, 100]) {
-          lengthFilter = `${ENCOUNTER_LENGTH}=ge${selectedCriterion.duration[0]}&${ENCOUNTER_LENGTH}=le${selectedCriterion.duration[1]}`
+          lengthFilter = `${ENCOUNTER_LENGTH}=ge${
+            +selectedCriterion.duration[0] * multiplicator
+          }&${ENCOUNTER_LENGTH}=le${+selectedCriterion.duration[1] * multiplicator}`
         }
 
         let ageFilter = ''
@@ -264,18 +283,51 @@ export async function unbuildRequest(json: string) {
               return
             } else {
               currentCriterion.title = 'Critère démographique'
+              currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
               currentCriterion.years = currentCriterion.years ? currentCriterion.years : null
               currentCriterion.gender = currentCriterion.gender ? currentCriterion.gender : null
               currentCriterion.vitalStatus = currentCriterion.vitalStatus ? currentCriterion.vitalStatus : null
               switch (key) {
                 case PATIENT_BIRTHDATE: {
+                  currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
                   currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
+                  const ageType = [
+                    { id: 'year', label: 'années' },
+                    { id: 'month', label: 'mois' },
+                    { id: 'day', label: 'jours' }
+                  ]
+
                   if (value?.search('ge') === 0) {
                     const date = value?.replace('ge', '') ? moment(value?.replace('ge', ''), 'YYYY-MM-DD') : null
-                    currentCriterion.years[1] = date ? moment().diff(date, 'years') : 0
+                    const diff = date ? moment().diff(date, 'days') : 0
+
+                    let currentAgeType: 'year' | 'month' | 'day' = 'year'
+                    if (diff >= 130 && diff <= 3000) {
+                      currentAgeType = 'month'
+                    } else if (diff <= 130) {
+                      currentAgeType = 'day'
+                    }
+
+                    const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
+                    currentCriterion.ageType = foundAgeType
+                    if (date) currentCriterion.years[1] = moment().diff(date, currentAgeType) || 130
                   } else if (value?.search('le') === 0) {
                     const date = value?.replace('le', '') ? moment(value?.replace('le', ''), 'YYYY-MM-DD') : null
-                    currentCriterion.years[0] = date ? moment().diff(date, 'years') : 130
+                    const diff = date ? moment().diff(date, 'days') : 0
+
+                    let currentAgeType: 'year' | 'month' | 'day' = 'year'
+                    if (currentCriterion.ageType) {
+                      currentAgeType = currentCriterion.ageType.id
+                    } else {
+                      if (diff >= 130 && diff <= 3000) {
+                        currentAgeType = 'month'
+                      } else if (diff <= 130) {
+                        currentAgeType = 'day'
+                      }
+                      const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
+                      currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : foundAgeType
+                    }
+                    currentCriterion.years[0] = moment().diff(date, currentAgeType) || 0
                   }
                   break
                 }
@@ -309,11 +361,29 @@ export async function unbuildRequest(json: string) {
             const value = filter ? filter[1] : null
             switch (key) {
               case ENCOUNTER_LENGTH: {
+                const ageType = [
+                  { id: 'year', label: 'années' },
+                  { id: 'month', label: 'mois' },
+                  { id: 'day', label: 'jours' }
+                ]
+
                 currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [0, 130]
                 if (value?.search('ge') === 0) {
-                  currentCriterion.duration[0] = value?.replace('ge', '') || 0
+                  currentCriterion.duration[0] = +value?.replace('ge', '') || 0
                 } else if (value?.search('le') === 0) {
-                  currentCriterion.duration[1] = value?.replace('le', '') || 130
+                  currentCriterion.duration[1] = +value?.replace('le', '') || 130
+                }
+
+                if (currentCriterion.duration[1] % 31 === 0) {
+                  currentCriterion.durationType = ageType[1]
+                  currentCriterion.duration[0] = currentCriterion.duration[0] / 31
+                  currentCriterion.duration[1] = currentCriterion.duration[1] / 31
+                } else if (currentCriterion.duration[1] % 365 === 0) {
+                  currentCriterion.durationType = ageType[0]
+                  currentCriterion.duration[0] = currentCriterion.duration[0] / 365
+                  currentCriterion.duration[1] = currentCriterion.duration[1] / 365
+                } else {
+                  currentCriterion.durationType = ageType[2]
                 }
                 break
               }

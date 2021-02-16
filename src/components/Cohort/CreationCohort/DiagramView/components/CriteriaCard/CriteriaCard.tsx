@@ -225,6 +225,11 @@ const CriteriaCard: React.FC = () => {
       }
 
       case 'Patient': {
+        const ageType: any = _selectedCriteria.ageType ? _selectedCriteria.ageType.id : 'year'
+        let ageUnit = 'an(s)'
+        if (ageType === 'month') ageUnit = 'mois'
+        else if (ageType === 'day') ageUnit = 'jour(s)'
+
         const selectedGender = data?.gender
           ? data.gender.find((gender: any) => gender && gender.id === _selectedCriteria?.gender?.id)
           : null
@@ -242,7 +247,7 @@ const CriteriaCard: React.FC = () => {
 
             {!!_selectedCriteria.years && _selectedCriteria.years[0] === _selectedCriteria.years[1] && (
               <Typography>
-                Âge sélectionné: {_selectedCriteria.years?.[0]} ans
+                Âge sélectionné: {_selectedCriteria.years?.[0]} {ageUnit}
                 {_selectedCriteria.years?.[0] === 130 ? ' ou plus.' : '.'}
               </Typography>
             )}
@@ -250,7 +255,7 @@ const CriteriaCard: React.FC = () => {
               _selectedCriteria.years[0] !== _selectedCriteria.years[1] &&
               (_selectedCriteria.years[0] !== 0 || _selectedCriteria.years[1] !== 130) && (
                 <Typography>
-                  Fourchette d'âge comprise entre {_selectedCriteria.years[0]} et {_selectedCriteria.years[1]} ans
+                  Fourchette d'âge comprise entre {_selectedCriteria.years[0]} et {_selectedCriteria.years[1]} {ageUnit}
                   {_selectedCriteria.years[1] === 130 ? ' ou plus.' : '.'}
                 </Typography>
               )}
@@ -294,6 +299,11 @@ const CriteriaCard: React.FC = () => {
         if (ageType === 'month') ageUnit = 'mois'
         else if (ageType === 'day') ageUnit = 'jour(s)'
 
+        const durationType: any = _selectedCriteria.durationType ? _selectedCriteria.durationType.id : 'year'
+        let durationUnit = 'an(s)'
+        if (durationType === 'month') durationUnit = 'mois'
+        else if (durationType === 'day') durationUnit = 'jour(s)'
+
         const selectedAdmissionMode = data.admissionModes
           ? data.admissionModes.find((admissionMode: any) => admissionMode.id === _selectedCriteria?.admissionMode?.id)
           : null
@@ -329,7 +339,7 @@ const CriteriaCard: React.FC = () => {
               )}
             {_selectedCriteria.duration && _selectedCriteria.duration[0] === _selectedCriteria.duration[1] && (
               <Typography>
-                Durée de la prise en charge : {_selectedCriteria.duration?.[0]} jour(s)
+                Durée de la prise en charge : {_selectedCriteria.duration?.[0]} {durationUnit}
                 {_selectedCriteria.duration?.[0] === 100 ? ' ou plus.' : '.'}
               </Typography>
             )}
@@ -338,7 +348,7 @@ const CriteriaCard: React.FC = () => {
               (_selectedCriteria.duration[0] !== 0 || _selectedCriteria.duration[1] !== 100) && (
                 <Typography>
                   Durée de la prise en charge : {_selectedCriteria.duration[0]} et {_selectedCriteria.duration[1]}{' '}
-                  jour(s)
+                  {durationUnit}
                   {_selectedCriteria.duration[1] === 100 ? ' ou plus.' : '.'}
                 </Typography>
               )}
