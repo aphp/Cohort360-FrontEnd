@@ -5,11 +5,7 @@ import { CohortCreationCounterType, CohortCreationSnapshotType, ScopeTreeRow, Se
 
 import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
 
-import {
-  createRequest,
-  createSnapshot
-  // countCohort
-} from 'services/cohortCreation'
+import { createRequest, createSnapshot, countCohort } from 'services/cohortCreation'
 
 export type CohortCreationState = {
   loading: boolean
@@ -39,16 +35,16 @@ const initialState: CohortCreationState = {
  * Set all data to 'loading' to display a loader, save-it.
  * Just after, get new count and save it
  */
-// const _countCohort = async (_json: string, _snapshotId: string, _requestId: string) => {
-//   if (!_json || !_snapshotId || !_requestId) return {}
+const _countCohort = async (_json: string, _snapshotId: string, _requestId: string) => {
+  if (!_json || !_snapshotId || !_requestId) return {}
 
-//   const countResult = await countCohort(_json, _snapshotId, _requestId)
-//   if (!countResult) return {}
-//   return {
-//     uuid: countResult?.uuid,
-//     includePatient: countResult?.count
-//   }
-// }
+  const countResult = await countCohort(_json, _snapshotId, _requestId)
+  if (!countResult) return {}
+  return {
+    uuid: countResult?.uuid,
+    includePatient: countResult?.count
+  }
+}
 
 const _onSaveNewJson = async (cohortCreation: CohortCreationState, newJson: string) => {
   let { requestId, snapshotsHistory, currentSnapshot } = cohortCreation
@@ -93,8 +89,7 @@ const _onSaveNewJson = async (cohortCreation: CohortCreationState, newJson: stri
       snapshotsHistory = [..._snapshotsHistory, { uuid, json, date }]
     }
   }
-  // const count = await _countCohort(newJson, currentSnapshot, requestId)
-  const count = {}
+  const count = await _countCohort(newJson, currentSnapshot, requestId)
   return { count, requestId, snapshotsHistory, currentSnapshot }
 }
 
@@ -134,12 +129,11 @@ const unbuildCreationCohort = createAsyncThunk<
   const state = getState()
 
   const { population, criteria } = await unbuildRequest(newCurrentSnapshot.json)
-  // const count = await _countCohort(
-  //   newCurrentSnapshot.json,
-  //   newCurrentSnapshot.uuid,
-  //   state.cohortCreation.request.requestId
-  // )
-  const count = {}
+  const count = await _countCohort(
+    newCurrentSnapshot.json,
+    newCurrentSnapshot.uuid,
+    state.cohortCreation.request.requestId
+  )
 
   return {
     ...state.cohortCreation.request,
