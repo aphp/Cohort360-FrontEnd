@@ -25,7 +25,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({ patient, deidentified }) 
     ? [...new Set(patient.mainDiagnosis.map((diag) => diag.code?.coding?.[0].display))].slice(0, 3)
     : undefined
   const ipp = deidentified
-    ? `ID Technique: ${patient.id}`
+    ? `IPP chiffré: ${patient.id}`
     : `IPP: ${
         patient.identifier?.find((item) => item.type?.coding?.[0].code === 'IPP')?.value ??
         patient.identifier?.[0].value

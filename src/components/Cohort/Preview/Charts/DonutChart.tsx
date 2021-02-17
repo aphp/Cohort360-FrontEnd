@@ -3,7 +3,6 @@ import React, { useRef, useEffect, useState } from 'react'
 import * as d3 from 'd3'
 import legend from './Legend'
 
-import useStyles from './styles'
 import { SimpleChartDataType } from 'types'
 
 import displayDigit from 'utils/displayDigit'
@@ -15,8 +14,6 @@ type DonutChartProps = {
 }
 
 const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 250 }) => {
-  const classes = useStyles()
-
   const node = useRef<SVGSVGElement | null>(null)
   const [legendHtml, setLegend] = useState()
 
@@ -86,7 +83,6 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 250
         <svg ref={node}></svg>
         <div style={{ display: 'flex' }} dangerouslySetInnerHTML={{ __html: legendHtml }} />
       </div>
-      <div id="tooltip" className={classes.tooltip} />
     </>
   )
 }

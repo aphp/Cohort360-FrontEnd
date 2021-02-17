@@ -181,7 +181,7 @@ const DocumentTable: React.FC<DocumentTableTypes> = ({ deidentified, documents, 
             <TableHead className={classes.tableHead}>
               <TableRow>
                 <TableCell align="left" className={classes.tableHeadCell}>
-                  NDA
+                  {deidentified ? 'NDA chiffré' : 'NDA'}
                 </TableCell>
                 <TableCell align="left" className={classes.tableHeadCell}>
                   Date
