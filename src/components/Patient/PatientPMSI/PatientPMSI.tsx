@@ -428,7 +428,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
             <TableHead className={classes.tableHead}>
               <TableRow>
                 <TableCell align="left" className={classes.tableHeadCell}>
-                  {deidentifiedBoolean ? 'ID Technique Visite' : 'NDA'}
+                  {deidentifiedBoolean ? 'NDA chiffré' : 'NDA'}
                 </TableCell>
                 <TableCell
                   sortDirection={_sortBy === 'date' ? _sortDirection : false}
