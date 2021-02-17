@@ -112,9 +112,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                   <TableCell className={classes.tableHeadCell} align="center">
                     Statut
                   </TableCell>
-                  <TableCell className={classes.tableHeadCell} align="center">
+                  {/* <TableCell className={classes.tableHeadCell} align="center">
                     Périmètre
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell align="center" className={classes.tableHeadCell}>
                     Nombre de patients
                   </TableCell>
@@ -144,7 +144,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                     <TableCell className={classes.status} align="center">
                       {row.status}
                     </TableCell>
-                    <TableCell align="center">{row.perimeter}</TableCell>
+                    {/* <TableCell align="center">{row.perimeter}</TableCell> */}
                     <TableCell align="center">{displayDigit(row.nPatients ?? 0)}</TableCell>
                     <TableCell align="center">
                       {row.date && (
