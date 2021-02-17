@@ -6,6 +6,8 @@ import legend from './Legend'
 
 import displayDigit from 'utils/displayDigit'
 
+import useStyles from './styles'
+
 type PieChartProps = {
   data: SimpleChartDataType[] | 'loading'
   height?: number
@@ -13,6 +15,8 @@ type PieChartProps = {
 }
 
 const PieChart: React.FC<PieChartProps> = memo(({ data, height = 250, width = 250 }) => {
+  const classes = useStyles()
+
   const node = useRef<SVGSVGElement | null>(null)
   const [legendHtml, setLegend] = useState()
 
@@ -79,10 +83,13 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 250, width = 25
   }, [node, data, height, width])
 
   return (
-    <div style={{ display: 'flex' }}>
-      <svg ref={node}></svg>
-      <div style={{ display: 'flex' }} dangerouslySetInnerHTML={{ __html: legendHtml }} />
-    </div>
+    <>
+      <div style={{ display: 'flex' }}>
+        <svg ref={node}></svg>
+        <div style={{ display: 'flex' }} dangerouslySetInnerHTML={{ __html: legendHtml }} />
+      </div>
+      <div id="tooltip" className={classes.tooltip} />
+    </>
   )
 })
 
