@@ -21,7 +21,7 @@ const Index = (props: any) => {
   const classes = useStyles()
 
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>('form')
+  const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>('hierarchy')
   const [defaultValues, onChangeDefaultValues] = useState(selectedCriteria || defaultCondition)
 
   const isEdition = selectedCriteria !== null ? true : false
