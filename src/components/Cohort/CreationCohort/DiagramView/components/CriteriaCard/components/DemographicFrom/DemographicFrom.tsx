@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -20,6 +20,7 @@ const defaultDemographic = {
   title: 'Critère démographique',
   vitalStatus: null,
   gender: null,
+  ageType: { id: 'year', label: 'années' },
   years: [0, 130]
 }
 
@@ -36,6 +37,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
       title: data.title,
       vitalStatus: data.vitalStatus,
       gender: data.gender,
+      ageType: data.ageType,
       years: data.years,
       type: 'Patient'
     })
@@ -90,12 +92,38 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
               autocompleteOptions: criteria?.data?.status || []
             },
             {
-              name: 'years',
-              label: "Fourchette d'âge",
-              type: 'slider',
-              valueLabelDisplay: 'auto',
-              min: 0,
-              max: 130
+              type: 'custom',
+              name: 'label',
+              renderInput: () => (
+                <FormLabel style={{ padding: '0 1em' }} component="legend">
+                  Fourchette d'âge :
+                </FormLabel>
+              )
+            },
+            {
+              type: 'section',
+              title: '',
+              name: '',
+              containerStyle: { display: 'grid', gridTemplateColumns: '1fr 180px' },
+              properties: [
+                {
+                  name: 'years',
+                  type: 'slider',
+                  valueLabelDisplay: 'auto',
+                  min: 0,
+                  max: 130
+                },
+                {
+                  name: 'ageType',
+                  variant: 'outlined',
+                  type: 'autocomplete',
+                  autocompleteOptions: [
+                    { id: 'year', label: 'années' },
+                    { id: 'month', label: 'mois' },
+                    { id: 'day', label: 'jours' }
+                  ]
+                }
+              ]
             }
           ]}
           submit={_onSubmit}
