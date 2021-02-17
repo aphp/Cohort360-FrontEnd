@@ -17,7 +17,7 @@ const defaultDemographic = {
 
 const Index = (props: any) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>('form')
+  const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>('hierarchy')
   const [defaultValues, onChangeDefaultValues] = useState(selectedCriteria || defaultDemographic)
 
   const isEdition = selectedCriteria !== null ? true : false
