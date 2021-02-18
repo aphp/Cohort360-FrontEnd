@@ -510,6 +510,7 @@ const getEncounterDocuments = async (
   groupId?: string
 ) => {
   if (!encounters) return undefined
+  if (encounters.length === 0) return encounters
 
   const _encounters = encounters
 
@@ -548,7 +549,7 @@ const getProcedureDocuments = async (
   groupId?: string
 ) => {
   if (!procedures) return undefined
-
+  if (procedures.length === 0) return procedures
   const _procedures = procedures
 
   const encountersList: any[] = []
