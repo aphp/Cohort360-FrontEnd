@@ -3,18 +3,18 @@ import { CriteriaItemType } from 'types'
 // Components
 import DemographicFrom from './DiagramView/components/GroupCard/components/CriteriaRightPanel/DemographicFrom/DemographicFrom'
 import DocumentsForm from './DiagramView/components/GroupCard/components/CriteriaRightPanel/DocumentsForm/DocumentsForm'
-// import SupportedForm from './DiagramView/components/GroupCard/components/CriteriaRightPanel/SupportedForm/SupportedForm'
+import SupportedForm from './DiagramView/components/GroupCard/components/CriteriaRightPanel/SupportedForm/SupportedForm'
 import CCAMForm from './DiagramView/components/GroupCard/components/CriteriaRightPanel/CCAM'
 import Cim10Form from './DiagramView/components/GroupCard/components/CriteriaRightPanel/Cim10Form'
 import GhmForm from './DiagramView/components/GroupCard/components/CriteriaRightPanel/GHM'
 
 // Fetcher
-// import {
-//   fetchAdmissionModes,
-//   fetchEntryModes,
-//   fetchExitModes,
-//   fetchFileStatus
-// } from '../../../services/cohortCreation/fetchEncounter'
+import {
+  fetchAdmissionModes,
+  fetchEntryModes,
+  fetchExitModes,
+  fetchFileStatus
+} from '../../../services/cohortCreation/fetchEncounter'
 import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetchDemographic'
 import {
   fetchStatusDiagnostic,
@@ -61,11 +61,10 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'Encounter',
     title: 'Visites',
-    color: '#808080',
-    disabled: true,
-    components: null
-    // data: { admissionModes: 'loading', entryModes: 'loading', exitModes: 'loading', fileStatus: 'loading' },
-    // fetch: { fetchAdmissionModes, fetchEntryModes, fetchExitModes, fetchFileStatus }
+    color: '#0063AF',
+    components: SupportedForm,
+    data: { admissionModes: 'loading', entryModes: 'loading', exitModes: 'loading', fileStatus: 'loading' },
+    fetch: { fetchAdmissionModes, fetchEntryModes, fetchExitModes, fetchFileStatus }
   },
   {
     id: 'Composition',

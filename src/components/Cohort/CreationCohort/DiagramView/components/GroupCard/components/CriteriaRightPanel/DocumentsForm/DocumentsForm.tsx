@@ -75,12 +75,15 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
                 required: 'Merci de renseigné un titre'
               }
             },
-            // {
-            //   name: 'search',
-            //   placeholder: 'Recherche dans les documents',
-            //   type: 'text',
-            //   variant: 'outlined'
-            // },
+            {
+              name: 'search',
+              placeholder: 'Recherche dans les documents',
+              type: 'text',
+              variant: 'outlined',
+              validationRules: {
+                required: 'Merci de renseigné une recherche'
+              }
+            },
             {
               name: 'docType',
               variant: 'outlined',
