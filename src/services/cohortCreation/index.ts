@@ -18,10 +18,9 @@ export const countCohort = async (
     // const { data } = request
     return null
   } else {
-    // const countResult = (await api.post('QueryServer/api/count', requeteurJson)) || {}
-    // const { data } = countResult
-    // const count = data && data.result && data.result[0] ? data.result && data.result[0].count : null
-    const count = 0
+    const countResult = (await api.post('QueryServer/api/count', requeteurJson)) || {}
+    const { data } = countResult
+    const count = data && data.result && data.result[0] ? data.result && data.result[0].count : null
 
     const measureResult = await apiBack.post('/explorations/dated-measures/', {
       request_query_snapshot_id: snapshotId,
