@@ -95,7 +95,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
               type: 'custom',
               name: 'label',
               renderInput: () => (
-                <FormLabel style={{ padding: '0 1em' }} component="legend">
+                <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
                   Âge au moment de la prise en charge :
                 </FormLabel>
               )
@@ -109,7 +109,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
                 {
                   name: 'years',
                   type: 'slider',
-                  valueLabelDisplay: 'auto',
+                  valueLabelDisplay: 'on',
                   min: 0,
                   max: 130
                 },
@@ -129,7 +129,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
               type: 'custom',
               name: 'label2',
               renderInput: () => (
-                <FormLabel style={{ padding: '0 1em' }} component="legend">
+                <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
                   Durée de la prise en charge :
                 </FormLabel>
               )
@@ -143,7 +143,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
                 {
                   name: 'duration',
                   type: 'slider',
-                  valueLabelDisplay: 'auto',
+                  valueLabelDisplay: 'on',
                   min: 0,
                   max: 100
                 },

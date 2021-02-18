@@ -225,17 +225,17 @@ export type SelectedCriteriaType = {
   type: 'Patient' | 'Encounter' | 'Claim' | 'Procedure' | 'Condition' | 'Composition'
   title: string
   code?: { id: string; label: string }[]
-  diagnosticType?: { id: string; label: string }
+  diagnosticType?: { id: string; label: string }[]
   encounter: number
   comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
-  gender?: { id: string; label: string }
-  vitalStatus?: { id: string; label: string }
+  gender?: { id: string; label: string }[]
+  vitalStatus?: { id: string; label: string }[]
   years?: [number, number]
   search?: string
-  docType?: { id: '55188-7' | '11336-5' | '57833-6'; label: string }
+  docType?: { id: string; label: string }[]
   occurence?: number
   ageType?: { id: string; label: string }
   durationType?: { id: string; label: string }
@@ -271,8 +271,8 @@ export type Cim10DataType = {
 export type DemographicDataType = {
   title: string
   gender: { id: string; label: string } | null
-  vitalStatus: { id: string; label: string } | null
-  ageType: { id: string; label: string } | null
+  vitalStatus: { id: string; label: string }[] | null
+  ageType: { id: string; label: string }[] | null
   label: undefined
   years: [number, number]
 }

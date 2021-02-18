@@ -97,6 +97,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               label: 'Type de diagnostic',
               variant: 'outlined',
               type: 'autocomplete',
+              multiple: true,
               autocompleteOptions: criteria?.data?.diagnosticTypes || []
             }
             // {

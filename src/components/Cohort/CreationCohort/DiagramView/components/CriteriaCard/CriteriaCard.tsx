@@ -112,7 +112,7 @@ const CriteriaCard: React.FC = () => {
             <Typography>
               Dans <span className={classes.criteriaType}>GHM</span>,
             </Typography>
-            {_selectedCriteria && _selectedCriteria?.code ? (
+            {_selectedCriteria && _selectedCriteria?.code && _selectedCriteria?.code.length > 0 ? (
               <>
                 <Typography>GHM sélectionné : </Typography>
                 {_selectedCriteria?.code?.map((code) => displaySelectedGHM(code))}
@@ -151,7 +151,7 @@ const CriteriaCard: React.FC = () => {
             <Typography>
               Dans <span className={classes.criteriaType}>Actes CCAM</span>,
             </Typography>
-            {_selectedCriteria && _selectedCriteria?.code ? (
+            {_selectedCriteria && _selectedCriteria?.code && _selectedCriteria?.code.length > 0 ? (
               <>
                 <Typography>Acte CCAM sélectionné :</Typography>
                 {_selectedCriteria?.code?.map((code) => displaySelectedCCAM(code))}
@@ -180,33 +180,36 @@ const CriteriaCard: React.FC = () => {
         const displaySelectedCIM10 = (currentCIM10: { id: string; label: string }) => {
           const selectedCimData =
             data?.cim10Diagnostic && data?.cim10Diagnostic !== 'loading'
-              ? data.cim10Diagnostic.find((ghmElement: any) => ghmElement && ghmElement.id === currentCIM10.id)
+              ? data.cim10Diagnostic.find((cimElement: any) => cimElement && cimElement.id === currentCIM10.id)
               : null
           return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
         }
 
-        const selectedDiagnostic = data?.diagnosticTypes
-          ? data.diagnosticTypes.find(
-              (diagnosticType: any) => diagnosticType && diagnosticType.id === _selectedCriteria?.diagnosticType?.id
-            )
-          : null
+        const displaySelectedCimType = (diagnosticType: { id: string; label: string }) => {
+          const selectedCimData =
+            data?.diagnosticTypes && data?.diagnosticTypes !== 'loading'
+              ? data.diagnosticTypes.find((type: any) => type && type.id === diagnosticType.id)
+              : null
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        }
 
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,
             </Typography>
-            {_selectedCriteria && _selectedCriteria?.code ? (
+            {_selectedCriteria && _selectedCriteria?.code && _selectedCriteria?.code.length > 0 && (
               <>
                 <Typography>Diagnostic CIM sélectionné :</Typography>
                 {_selectedCriteria?.code?.map((code) => displaySelectedCIM10(code))}
               </>
-            ) : (
-              <></>
             )}
-            <Typography>
-              {selectedDiagnostic && `Type de diagnostic recherché : "${selectedDiagnostic.label}."`}
-            </Typography>
+            {_selectedCriteria && _selectedCriteria?.diagnosticType && _selectedCriteria?.diagnosticType.length > 0 && (
+              <>
+                <Typography>Type de diagnostic recherché :</Typography>
+                {_selectedCriteria?.diagnosticType?.map((diagnosticType) => displaySelectedCimType(diagnosticType))}
+              </>
+            )}
             {/* <Typography>
               {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
             </Typography> */}
@@ -230,20 +233,37 @@ const CriteriaCard: React.FC = () => {
         if (ageType === 'month') ageUnit = 'mois'
         else if (ageType === 'day') ageUnit = 'jour(s)'
 
-        const selectedGender = data?.gender
-          ? data.gender.find((gender: any) => gender && gender.id === _selectedCriteria?.gender?.id)
-          : null
-        const selectedVitalStatus = data?.status
-          ? data.status.find((status: any) => status && status.id === _selectedCriteria?.vitalStatus?.id)
-          : null
+        const displaySelectedGender = (gender: { id: string; label: string }) => {
+          const selectedCimData =
+            data?.gender && data?.gender !== 'loading'
+              ? data.gender.find((ghmElement: any) => ghmElement && ghmElement.id === gender.id)
+              : null
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        }
+        const displaySelectedVitalStatus = (vitalStatus: { id: string; label: string }) => {
+          const selectedCimData =
+            data?.status && data?.status !== 'loading'
+              ? data.status.find((ghmElement: any) => ghmElement && ghmElement.id === vitalStatus.id)
+              : null
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        }
 
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Démographie Patient</span>,
             </Typography>
-            {selectedGender && <Typography>Genre sélectionné : {selectedGender.label}.</Typography>}
-            {selectedVitalStatus && <Typography>Statut vital : {selectedVitalStatus.label}.</Typography>}
+            {_selectedCriteria && _selectedCriteria.gender && _selectedCriteria?.gender?.length > 0 && (
+              <Typography>
+                Genre sélectionné :{_selectedCriteria?.gender?.map((gender) => displaySelectedGender(gender))}
+              </Typography>
+            )}
+            {_selectedCriteria && _selectedCriteria.vitalStatus && _selectedCriteria?.vitalStatus?.length > 0 && (
+              <Typography>
+                Statut vital :
+                {_selectedCriteria?.vitalStatus?.map((vitalStatus) => displaySelectedVitalStatus(vitalStatus))}
+              </Typography>
+            )}
 
             {!!_selectedCriteria.years && _selectedCriteria.years[0] === _selectedCriteria.years[1] && (
               <Typography>
@@ -265,17 +285,27 @@ const CriteriaCard: React.FC = () => {
       }
 
       case 'Composition': {
-        const selectedDocType = data?.docTypes
-          ? data?.docTypes.find((docTypes: any) => docTypes && docTypes.id === _selectedCriteria?.docType?.id)
-          : {}
+        const displaySelectedDocType = (docType: { id: string; label: string }) => {
+          const selectedCimData =
+            data?.docTypes && data?.docTypes !== 'loading'
+              ? data.docTypes.find((ghmElement: any) => ghmElement && ghmElement.id === docType.id)
+              : null
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        }
 
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Document médical</span>,
             </Typography>
-            <Typography>Recherche textuelle "{_selectedCriteria.search}"</Typography>
-            {selectedDocType && <Typography>Dans {selectedDocType.label}.</Typography>}
+            {_selectedCriteria.search && <Typography>Recherche textuelle "{_selectedCriteria.search}"</Typography>}
+
+            {_selectedCriteria && _selectedCriteria.docType && _selectedCriteria?.docType?.length > 0 && (
+              <Typography>
+                Dans
+                {_selectedCriteria?.docType?.map((docType) => displaySelectedDocType(docType))}
+              </Typography>
+            )}
             {/* <Typography>
               {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
             </Typography> */}

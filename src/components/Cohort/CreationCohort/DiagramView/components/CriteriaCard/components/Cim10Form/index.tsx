@@ -9,7 +9,7 @@ import useStyles from './styles'
 const defaultCondition = {
   title: 'Critère de diagnostic',
   code: [],
-  diagnosticType: '',
+  diagnosticType: [],
   encounter: 0,
   comparator: { id: 'e', label: '=' },
   startOccurrence: '',
