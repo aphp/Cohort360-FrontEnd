@@ -29,8 +29,6 @@ const HospitDialog: React.FC<HospitDialogTypes> = ({ deidentified, open, onClose
     setPage(value)
   }
 
-  console.log('deidentified', deidentified)
-
   useEffect(() => {
     setPage(1)
   }, [open])

@@ -48,6 +48,10 @@ export type CohortComposition = IComposition & {
   NDA?: string
 }
 
+export type CohortEncounter = IEncounter & {
+  documents?: CohortComposition[]
+}
+
 export type CohortPatient = IPatient & {
   lastEncounter?: IEncounter
   lastEncounterName?: string
@@ -61,6 +65,7 @@ export type CohortPatient = IPatient & {
 }
 
 export type PMSIEntry<T extends IProcedure | ICondition | IClaim> = T & {
+  documents?: (CohortComposition | IDocumentReference)[]
   serviceProvider?: string
   NDA?: string
 }
@@ -199,7 +204,7 @@ export type CohortData = {
 
 export type PatientData = {
   patient?: CohortPatient
-  hospit?: IEncounter[]
+  hospit?: (CohortEncounter | IEncounter)[]
   documents?: (CohortComposition | IDocumentReference)[]
   documentsTotal?: number
   consult?: PMSIEntry<IProcedure>[]
