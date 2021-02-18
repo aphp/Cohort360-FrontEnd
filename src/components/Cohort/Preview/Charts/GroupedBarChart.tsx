@@ -58,6 +58,8 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
     const keys = ['Hommes', 'Femmes']
     const color = d3.scaleOrdinal().domain(keys).range(['#78D4FA', '#FC568F', '#8446E4'])
 
+    const div = d3.select('#tooltip').style('opacity', 0)
+
     const x0 = d3
       .scaleBand()
       .domain(customData.map((d) => d[groupKey]))
@@ -108,6 +110,18 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
       .attr('width', x1.bandwidth())
       .attr('height', (d) => y(0) - y(d.value))
       .attr('fill', (d) => color(d.key))
+      .on('mouseover', function (d) {
+        d3.select(this).transition().duration('50').attr('opacity', '.5')
+        div.transition().duration(50).style('opacity', 1)
+        div
+          .html(d.value)
+          .style('left', d3.event.pageX + 10 + 'px')
+          .style('top', d3.event.pageY - 15 + 'px')
+      })
+      .on('mouseout', function () {
+        d3.select(this).transition().duration('50').attr('opacity', '1')
+        div.transition().duration(50).style('opacity', 0)
+      })
 
     svg.append('g').call(xAxis)
 

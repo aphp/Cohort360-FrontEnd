@@ -48,6 +48,10 @@ export type CohortComposition = IComposition & {
   NDA?: string
 }
 
+export type CohortEncounter = IEncounter & {
+  documents?: CohortComposition[]
+}
+
 export type CohortPatient = IPatient & {
   lastEncounter?: IEncounter
   lastEncounterName?: string
@@ -61,6 +65,7 @@ export type CohortPatient = IPatient & {
 }
 
 export type PMSIEntry<T extends IProcedure | ICondition | IClaim> = T & {
+  documents?: (CohortComposition | IDocumentReference)[]
   serviceProvider?: string
   NDA?: string
 }
@@ -199,7 +204,7 @@ export type CohortData = {
 
 export type PatientData = {
   patient?: CohortPatient
-  hospit?: IEncounter[]
+  hospit?: (CohortEncounter | IEncounter)[]
   documents?: (CohortComposition | IDocumentReference)[]
   documentsTotal?: number
   consult?: PMSIEntry<IProcedure>[]
@@ -274,7 +279,7 @@ export type Cim10DataType = {
   title: string
   type: 'Condition'
   code: { id: string; label: string }[] | null
-  diagnosticType: { id: string; label: string } | null
+  diagnosticType: { id: string; label: string }[] | null
   encounter: number
   comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
@@ -285,8 +290,10 @@ export type Cim10DataType = {
 export type DemographicDataType = {
   title: string
   type: 'Patient'
-  gender: { id: string; label: string } | null
-  vitalStatus: { id: string; label: string } | null
+  gender: { id: string; label: string }[] | null
+  vitalStatus: { id: string; label: string }[] | null
+  ageType: { id: string; label: string } | null
+  label: undefined
   years: [number, number]
 }
 
@@ -294,7 +301,7 @@ export type DocumentDataType = {
   title: string
   type: 'Composition'
   search: string
-  docType: { id: string; label: string } | null
+  docType: { id: string; label: string }[] | null
   encounter: number
   comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
@@ -315,10 +322,12 @@ export type GhmDataType = {
 
 export type EncounterDataType = {
   label: undefined
+  label2: undefined
   type: 'Encounter'
   title: string
   ageType: { id: string; label: string } | null
   years: [number, number]
+  durationType: { id: string; label: string }
   duration: [number, number]
   admissionMode: { id: string; label: string } | null
   entryMode: { id: string; label: string } | null

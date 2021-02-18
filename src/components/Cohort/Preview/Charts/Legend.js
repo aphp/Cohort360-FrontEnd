@@ -44,7 +44,7 @@ const legend = ({
           .line {
             display: flex;
             align-items: center;
-            margin-top: 4px;
+            margin-top: 8px;
           }
 
           .bold {

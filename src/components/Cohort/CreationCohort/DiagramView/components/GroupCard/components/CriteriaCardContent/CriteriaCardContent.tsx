@@ -71,7 +71,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             data?.ghmData && data?.ghmData !== 'loading'
               ? data.ghmData.find((ghmElement: any) => ghmElement && ghmElement.id === currentGHM.id)
               : null
-          return <Typography key={currentGHM.id}>{selectedGhmData ? selectedGhmData.label : ''}</Typography>
+          return <Typography>{selectedGhmData ? selectedGhmData.label : ''}</Typography>
         }
 
         content = (
@@ -79,7 +79,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             <Typography>
               Dans <span className={classes.criteriaType}>GHM</span>,
             </Typography>
-            {_currentCriteria && _currentCriteria?.code ? (
+            {_currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 ? (
               <>
                 <Typography>GHM sélectionné : </Typography>
                 {_currentCriteria?.code?.map((code) => displaySelectedGHM(code))}
@@ -110,7 +110,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             data?.ccamData && data?.ccamData !== 'loading'
               ? data.ccamData.find((ccamElement: any) => ccamElement && ccamElement.id === currentCCAM.id)
               : null
-          return <Typography key={currentCCAM.id}>{selectedCcamData ? selectedCcamData.label : ''}.</Typography>
+          return <Typography>{selectedCcamData ? selectedCcamData.label : ''}.</Typography>
         }
 
         content = (
@@ -118,7 +118,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             <Typography>
               Dans <span className={classes.criteriaType}>Actes CCAM</span>,
             </Typography>
-            {_currentCriteria && _currentCriteria?.code ? (
+            {_currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 ? (
               <>
                 <Typography>Acte CCAM sélectionné :</Typography>
                 {_currentCriteria?.code?.map((code) => displaySelectedCCAM(code))}
@@ -147,33 +147,36 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         const displaySelectedCIM10 = (currentCIM10: { id: string; label: string }) => {
           const selectedCimData =
             data?.cim10Diagnostic && data?.cim10Diagnostic !== 'loading'
-              ? data.cim10Diagnostic.find((ghmElement: any) => ghmElement && ghmElement.id === currentCIM10.id)
+              ? data.cim10Diagnostic.find((cimElement: any) => cimElement && cimElement.id === currentCIM10.id)
               : null
-          return <Typography key={currentCIM10.id}>{selectedCimData ? selectedCimData.label : ''}</Typography>
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
         }
 
-        const selectedDiagnostic = data?.diagnosticTypes
-          ? data.diagnosticTypes.find(
-              (diagnosticType: any) => diagnosticType && diagnosticType.id === _currentCriteria?.diagnosticType?.id
-            )
-          : null
+        const displaySelectedCimType = (diagnosticType: { id: string; label: string }) => {
+          const selectedCimData =
+            data?.diagnosticTypes && data?.diagnosticTypes !== 'loading'
+              ? data.diagnosticTypes.find((type: any) => type && type.id === diagnosticType.id)
+              : null
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        }
 
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,
             </Typography>
-            {_currentCriteria && _currentCriteria?.code ? (
+            {_currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
               <>
                 <Typography>Diagnostic CIM sélectionné :</Typography>
                 {_currentCriteria?.code?.map((code) => displaySelectedCIM10(code))}
               </>
-            ) : (
-              <></>
             )}
-            <Typography>
-              {selectedDiagnostic && `Type de diagnostic recherché : "${selectedDiagnostic.label}."`}
-            </Typography>
+            {_currentCriteria && _currentCriteria?.diagnosticType && _currentCriteria?.diagnosticType.length > 0 && (
+              <>
+                <Typography>Type de diagnostic recherché :</Typography>
+                {_currentCriteria?.diagnosticType?.map((diagnosticType) => displaySelectedCimType(diagnosticType))}
+              </>
+            )}
             {/* <Typography>
               {_currentCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_currentCriteria.encounter}` : ''}
             </Typography> */}
@@ -192,24 +195,46 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Patient': {
-        const selectedGender = data?.gender
-          ? data.gender.find((gender: any) => gender && gender.id === _currentCriteria?.gender?.id)
-          : null
-        const selectedVitalStatus = data?.status
-          ? data.status.find((status: any) => status && status.id === _currentCriteria?.vitalStatus?.id)
-          : null
+        const ageType: any = _currentCriteria.ageType ? _currentCriteria.ageType.id : 'year'
+        let ageUnit = 'an(s)'
+        if (ageType === 'month') ageUnit = 'mois'
+        else if (ageType === 'day') ageUnit = 'jour(s)'
+
+        const displaySelectedGender = (gender: { id: string; label: string }) => {
+          const selectedCimData =
+            data?.gender && data?.gender !== 'loading'
+              ? data.gender.find((ghmElement: any) => ghmElement && ghmElement.id === gender.id)
+              : null
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        }
+        const displaySelectedVitalStatus = (vitalStatus: { id: string; label: string }) => {
+          const selectedCimData =
+            data?.status && data?.status !== 'loading'
+              ? data.status.find((ghmElement: any) => ghmElement && ghmElement.id === vitalStatus.id)
+              : null
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        }
 
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Démographie Patient</span>,
             </Typography>
-            {selectedGender && <Typography>Genre sélectionné : {selectedGender.label}.</Typography>}
-            {selectedVitalStatus && <Typography>Statut vital : {selectedVitalStatus.label}.</Typography>}
+            {_currentCriteria && _currentCriteria.gender && _currentCriteria?.gender?.length > 0 && (
+              <Typography>
+                Genre sélectionné :{_currentCriteria?.gender?.map((gender) => displaySelectedGender(gender))}
+              </Typography>
+            )}
+            {_currentCriteria && _currentCriteria.vitalStatus && _currentCriteria?.vitalStatus?.length > 0 && (
+              <Typography>
+                Statut vital :
+                {_currentCriteria?.vitalStatus?.map((vitalStatus) => displaySelectedVitalStatus(vitalStatus))}
+              </Typography>
+            )}
 
             {!!_currentCriteria.years && _currentCriteria.years[0] === _currentCriteria.years[1] && (
               <Typography>
-                Âge sélectionné: {_currentCriteria.years?.[0]} ans
+                Âge sélectionné: {_currentCriteria.years?.[0]} {ageUnit}
                 {_currentCriteria.years?.[0] === 130 ? ' ou plus.' : '.'}
               </Typography>
             )}
@@ -217,7 +242,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               _currentCriteria.years[0] !== _currentCriteria.years[1] &&
               (_currentCriteria.years[0] !== 0 || _currentCriteria.years[1] !== 130) && (
                 <Typography>
-                  Fourchette d'âge comprise entre {_currentCriteria.years[0]} et {_currentCriteria.years[1]} ans
+                  Fourchette d'âge comprise entre {_currentCriteria.years[0]} et {_currentCriteria.years[1]} {ageUnit}
                   {_currentCriteria.years[1] === 130 ? ' ou plus.' : '.'}
                 </Typography>
               )}
@@ -227,17 +252,27 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Composition': {
-        const selectedDocType = data?.docTypes
-          ? data?.docTypes.find((docTypes: any) => docTypes && docTypes.id === _currentCriteria?.docType?.id)
-          : {}
+        const displaySelectedDocType = (docType: { id: string; label: string }) => {
+          const selectedCimData =
+            data?.docTypes && data?.docTypes !== 'loading'
+              ? data.docTypes.find((ghmElement: any) => ghmElement && ghmElement.id === docType.id)
+              : null
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        }
 
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Document médical</span>,
             </Typography>
-            <Typography>Recherche textuelle "{_currentCriteria.search}"</Typography>
-            {selectedDocType && <Typography>Dans {selectedDocType.label}.</Typography>}
+            {_currentCriteria.search && <Typography>Recherche textuelle "{_currentCriteria.search}"</Typography>}
+
+            {_currentCriteria && _currentCriteria.docType && _currentCriteria?.docType?.length > 0 && (
+              <Typography>
+                Dans
+                {_currentCriteria?.docType?.map((docType) => displaySelectedDocType(docType))}
+              </Typography>
+            )}
             {/* <Typography>
               {_currentCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_currentCriteria.encounter}` : ''}
             </Typography> */}
@@ -260,6 +295,11 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         let ageUnit = 'an(s)'
         if (ageType === 'month') ageUnit = 'mois'
         else if (ageType === 'day') ageUnit = 'jour(s)'
+
+        const durationType: any = _currentCriteria.durationType ? _currentCriteria.durationType.id : 'year'
+        let durationUnit = 'an(s)'
+        if (durationType === 'month') durationUnit = 'mois'
+        else if (durationType === 'day') durationUnit = 'jour(s)'
 
         const selectedAdmissionMode = data.admissionModes
           ? data.admissionModes.find((admissionMode: any) => admissionMode.id === _currentCriteria?.admissionMode?.id)
@@ -296,7 +336,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               )}
             {_currentCriteria.duration && _currentCriteria.duration[0] === _currentCriteria.duration[1] && (
               <Typography>
-                Durée de la prise en charge : {_currentCriteria.duration?.[0]} jour(s)
+                Durée de la prise en charge : {_currentCriteria.duration?.[0]} {durationUnit}
                 {_currentCriteria.duration?.[0] === 100 ? ' ou plus.' : '.'}
               </Typography>
             )}
@@ -304,7 +344,8 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               _currentCriteria.duration[0] !== _currentCriteria.duration[1] &&
               (_currentCriteria.duration[0] !== 0 || _currentCriteria.duration[1] !== 100) && (
                 <Typography>
-                  Durée de la prise en charge : {_currentCriteria.duration[0]} et {_currentCriteria.duration[1]} jour(s)
+                  Durée de la prise en charge : {_currentCriteria.duration[0]} et {_currentCriteria.duration[1]}{' '}
+                  {durationUnit}
                   {_currentCriteria.duration[1] === 100 ? ' ou plus.' : '.'}
                 </Typography>
               )}

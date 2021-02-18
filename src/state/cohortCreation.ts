@@ -112,27 +112,34 @@ const buildCreationCohort = createAsyncThunk<
   },
   { state: RootState }
 >('cohortCreation/build', async ({ selectedPopulation }, { getState }) => {
-  const state = getState()
+  try {
+    const state = getState()
 
-  const _selectedPopulation = selectedPopulation ? selectedPopulation : state.cohortCreation.request.selectedPopulation
-  const _selectedCriteria = state.cohortCreation.request.selectedCriteria
-  const _criteriaGroup = state.cohortCreation.request.criteriaGroup
+    const _selectedPopulation = selectedPopulation
+      ? selectedPopulation
+      : state.cohortCreation.request.selectedPopulation
+    const _selectedCriteria = state.cohortCreation.request.selectedCriteria
+    const _criteriaGroup = state.cohortCreation.request.criteriaGroup
 
-  const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup)
-  const { requestId, snapshotsHistory, currentSnapshot, count } = await _onSaveNewJson(
-    state.cohortCreation.request,
-    json
-  )
+    const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup)
+    const { requestId, snapshotsHistory, currentSnapshot, count } = await _onSaveNewJson(
+      state.cohortCreation.request,
+      json
+    )
 
-  return {
-    ...state.cohortCreation.request,
-    requestId,
-    snapshotsHistory,
-    currentSnapshot,
-    json,
-    count,
-    selectedPopulation: _selectedPopulation,
-    selectedCriteria: _selectedCriteria
+    return {
+      ...state.cohortCreation.request,
+      requestId,
+      snapshotsHistory,
+      currentSnapshot,
+      json,
+      count,
+      selectedPopulation: _selectedPopulation,
+      selectedCriteria: _selectedCriteria
+    }
+  } catch (error) {
+    console.error(error)
+    throw error
   }
 })
 
@@ -141,23 +148,28 @@ const unbuildCreationCohort = createAsyncThunk<
   { newCurrentSnapshot: CohortCreationSnapshotType },
   { state: RootState }
 >('cohortCreation/unbuild', async ({ newCurrentSnapshot }, { getState }) => {
-  const state = getState()
+  try {
+    const state = getState()
 
-  const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot.json)
-  const count = await _countCohort(
-    newCurrentSnapshot.json,
-    newCurrentSnapshot.uuid,
-    state.cohortCreation.request.requestId
-  )
+    const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot.json)
+    const count = await _countCohort(
+      newCurrentSnapshot.json,
+      newCurrentSnapshot.uuid,
+      state.cohortCreation.request.requestId
+    )
 
-  return {
-    ...state.cohortCreation.request,
-    count,
-    json: newCurrentSnapshot.json,
-    currentSnapshot: newCurrentSnapshot.uuid,
-    selectedPopulation: population,
-    selectedCriteria: criteria,
-    criteriaGroup: criteriaGroup
+    return {
+      ...state.cohortCreation.request,
+      count,
+      json: newCurrentSnapshot.json,
+      currentSnapshot: newCurrentSnapshot.uuid,
+      selectedPopulation: population,
+      selectedCriteria: criteria,
+      criteriaGroup: criteriaGroup
+    }
+  } catch (error) {
+    console.error(error)
+    throw error
   }
 })
 

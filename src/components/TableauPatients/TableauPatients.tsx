@@ -158,7 +158,7 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                 <TableCell className={classes.tableHeadCell}>Dernier lieu de prise en charge</TableCell>
                 <TableCell className={classes.tableHeadCell}>Statut vital</TableCell>
                 <TableCell align="center" className={classes.tableHeadCell}>
-                  {deidentified ? 'ID Technique Patient' : 'N° IPP'}
+                  {deidentified ? 'IPP chiffré' : 'N° IPP'}
                 </TableCell>
               </TableRow>
             </TableHead>

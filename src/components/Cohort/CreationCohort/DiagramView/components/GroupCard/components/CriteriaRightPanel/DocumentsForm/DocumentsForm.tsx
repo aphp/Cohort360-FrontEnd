@@ -19,7 +19,7 @@ type TestGeneratedFormProps = {
 const defaultDemographic = {
   title: 'Critère de document',
   search: '',
-  docType: null,
+  docType: [],
   encounter: 0,
   startOccurrence: '',
   endOccurrence: ''
@@ -79,13 +79,17 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               name: 'search',
               placeholder: 'Recherche dans les documents',
               type: 'text',
-              variant: 'outlined'
+              variant: 'outlined',
+              validationRules: {
+                required: 'Merci de renseigné une recherche'
+              }
             },
             {
               name: 'docType',
               variant: 'outlined',
               label: 'Type de document',
               type: 'autocomplete',
+              multiple: true,
               autocompleteOptions: criteria?.data?.docTypes || []
             }
             // {
