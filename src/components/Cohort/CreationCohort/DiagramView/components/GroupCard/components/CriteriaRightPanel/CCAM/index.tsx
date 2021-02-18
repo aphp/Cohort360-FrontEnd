@@ -17,7 +17,7 @@ const defaultProcedure = {
 
 const Index = (props: any) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>('form')
+  const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>('hierarchy')
   const [defaultValues, onChangeDefaultValues] = useState(selectedCriteria || defaultProcedure)
 
   const isEdition = selectedCriteria !== null ? true : false
@@ -36,8 +36,8 @@ const Index = (props: any) => {
     <>
       <div>
         <Tabs className={classes.tabs} value={seletedTab} onChange={(e, tab) => onChangeTab(tab)}>
-          <Tab label="Formulaire" value="form" />
           <Tab label="Hierarchie" value="hierarchy" />
+          <Tab label="Formulaire" value="form" />
         </Tabs>
       </div>
 

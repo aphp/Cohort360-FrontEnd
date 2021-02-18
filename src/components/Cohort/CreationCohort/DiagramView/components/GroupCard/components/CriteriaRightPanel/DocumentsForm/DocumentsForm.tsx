@@ -19,7 +19,7 @@ type TestGeneratedFormProps = {
 const defaultDemographic = {
   title: 'Critère de document',
   search: '',
-  docType: null,
+  docType: [],
   encounter: 0,
   startOccurrence: '',
   endOccurrence: ''
@@ -75,17 +75,18 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
                 required: 'Merci de renseigné un titre'
               }
             },
-            {
-              name: 'search',
-              placeholder: 'Recherche dans les documents',
-              type: 'text',
-              variant: 'outlined'
-            },
+            // {
+            //   name: 'search',
+            //   placeholder: 'Recherche dans les documents',
+            //   type: 'text',
+            //   variant: 'outlined'
+            // },
             {
               name: 'docType',
               variant: 'outlined',
               label: 'Type de document',
               type: 'autocomplete',
+              multiple: true,
               autocompleteOptions: criteria?.data?.docTypes || []
             }
             // {

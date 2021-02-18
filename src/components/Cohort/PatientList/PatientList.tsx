@@ -282,7 +282,7 @@ const PatientList: React.FC<PatientListProps> = ({
                   <CircularProgress />
                 </Grid>
               ) : agePyramid && agePyramid.size > 0 ? (
-                <PyramidChart data={agePyramid} width={300} />
+                <PyramidChart data={agePyramid} width={250} />
               ) : (
                 <Typography>Aucun patient</Typography>
               )}

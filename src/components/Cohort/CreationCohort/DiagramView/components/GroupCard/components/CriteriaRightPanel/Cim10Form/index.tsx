@@ -9,7 +9,7 @@ import useStyles from './styles'
 const defaultCondition = {
   title: 'Critère de diagnostic',
   code: [],
-  diagnosticType: '',
+  diagnosticType: [],
   encounter: 0,
   comparator: { id: 'e', label: '=' },
   startOccurrence: '',
@@ -21,7 +21,7 @@ const Index = (props: any) => {
   const classes = useStyles()
 
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>('form')
+  const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>('hierarchy')
   const [defaultValues, onChangeDefaultValues] = useState(selectedCriteria || defaultCondition)
 
   const isEdition = selectedCriteria !== null ? true : false
@@ -38,8 +38,8 @@ const Index = (props: any) => {
     <>
       <div>
         <Tabs className={classes.tabs} value={seletedTab} onChange={(e, tab) => onChangeTab(tab)}>
-          <Tab label="Formulaire" value="form" />
           <Tab label="Hierarchie" value="hierarchy" />
+          <Tab label="Formulaire" value="form" />
         </Tabs>
       </div>
 

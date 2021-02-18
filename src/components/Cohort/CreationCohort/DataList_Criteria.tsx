@@ -3,18 +3,18 @@ import { CriteriaItemType } from 'types'
 // Components
 import DemographicFrom from './DiagramView/components/GroupCard/components/CriteriaRightPanel/DemographicFrom/DemographicFrom'
 import DocumentsForm from './DiagramView/components/GroupCard/components/CriteriaRightPanel/DocumentsForm/DocumentsForm'
-import SupportedForm from './DiagramView/components/GroupCard/components/CriteriaRightPanel/SupportedForm/SupportedForm'
+// import SupportedForm from './DiagramView/components/GroupCard/components/CriteriaRightPanel/SupportedForm/SupportedForm'
 import CCAMForm from './DiagramView/components/GroupCard/components/CriteriaRightPanel/CCAM'
 import Cim10Form from './DiagramView/components/GroupCard/components/CriteriaRightPanel/Cim10Form'
 import GhmForm from './DiagramView/components/GroupCard/components/CriteriaRightPanel/GHM'
 
 // Fetcher
-import {
-  fetchAdmissionModes,
-  fetchEntryModes,
-  fetchExitModes,
-  fetchFileStatus
-} from '../../../services/cohortCreation/fetchEncounter'
+// import {
+//   fetchAdmissionModes,
+//   fetchEntryModes,
+//   fetchExitModes,
+//   fetchFileStatus
+// } from '../../../services/cohortCreation/fetchEncounter'
 import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetchDemographic'
 import {
   fetchStatusDiagnostic,
@@ -45,7 +45,7 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'mes_variables',
     title: 'Mes variables',
-    color: '	#808080',
+    color: '#808080',
     disabled: true,
     data: null,
     components: null
@@ -61,10 +61,11 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'Encounter',
     title: 'Visites',
-    color: '#0063AF',
-    components: SupportedForm,
-    data: { admissionModes: 'loading', entryModes: 'loading', exitModes: 'loading', fileStatus: 'loading' },
-    fetch: { fetchAdmissionModes, fetchEntryModes, fetchExitModes, fetchFileStatus }
+    color: '#808080',
+    disabled: true,
+    components: null
+    // data: { admissionModes: 'loading', entryModes: 'loading', exitModes: 'loading', fileStatus: 'loading' },
+    // fetch: { fetchAdmissionModes, fetchEntryModes, fetchExitModes, fetchFileStatus }
   },
   {
     id: 'Composition',
@@ -114,13 +115,13 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'biologie_microbiologie',
     title: 'Biologie/Microbiologie',
-    color: '	#808080',
+    color: '#808080',
     components: null,
     subItems: [
       {
         id: 'biologie',
         title: 'Biologie',
-        color: '	#808080',
+        color: '#808080',
         disabled: true,
         data: null,
         components: null
@@ -129,7 +130,7 @@ const criteriaList: CriteriaItemType[] = [
         id: 'microbiologie',
         title: 'Microbiologie',
         components: null,
-        color: '	#808080',
+        color: '#808080',
         disabled: true,
         data: null
       }
@@ -138,7 +139,7 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'physiologie',
     title: 'Physiologie',
-    color: '	#808080',
+    color: '#808080',
     disabled: true,
     data: null,
     components: null
@@ -146,14 +147,14 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'médicaments',
     title: 'Médicaments',
-    color: '	#808080',
+    color: '#808080',
     components: null,
     subItems: [
       {
         id: 'prescription_dispension_administration',
         title: 'Prescription - Dispension - Administration',
         components: null,
-        color: '	#808080',
+        color: '#808080',
         disabled: true,
         data: null
       }

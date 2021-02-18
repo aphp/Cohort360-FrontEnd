@@ -12,7 +12,7 @@ import HospitDialog from './HospitDialog/HospitDialog'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 
 import { getEncounterOrProcedureDocs } from 'services/patient'
-import { CohortComposition, PMSIEntry } from 'types'
+import { CohortComposition, CohortEncounter, PMSIEntry } from 'types'
 import { IEncounter, IProcedure, IDocumentReference, IPeriod } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import useStyles from './styles'
@@ -23,7 +23,7 @@ type MonthVisit = {
   hospit: {
     start?: string
     end?: string
-    data: IEncounter
+    data: IEncounter | CohortEncounter
   }[]
   consult: {
     start?: string
@@ -38,7 +38,7 @@ type TimelineData = {
   }
 }
 
-const getTimelineFormattedDataItem = (item: IEncounter | PMSIEntry<IProcedure>) => {
+const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<IProcedure>) => {
   const dataItem: {
     start?: string
     end?: string
@@ -58,7 +58,10 @@ const getTimelineFormattedDataItem = (item: IEncounter | PMSIEntry<IProcedure>) 
   return { dataItem, yearStr, monthStr }
 }
 
-const generateTimelineFormattedData = (hospits?: IEncounter[], consults?: PMSIEntry<IProcedure>[]): TimelineData => {
+const generateTimelineFormattedData = (
+  hospits?: CohortEncounter[],
+  consults?: PMSIEntry<IProcedure>[]
+): TimelineData => {
   const data: TimelineData = {}
 
   hospits?.forEach((item) => {
@@ -95,14 +98,14 @@ const generateTimelineFormattedData = (hospits?: IEncounter[], consults?: PMSIEn
 type PatientTimelineTypes = {
   deidentified: boolean
   documents?: (CohortComposition | IDocumentReference)[]
-  hospits?: IEncounter[]
+  hospits?: CohortEncounter[]
   consults?: PMSIEntry<IProcedure>[]
 }
 const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits, consults }) => {
   const classes = useStyles()
   const timelineData = generateTimelineFormattedData(hospits, consults)
   const [openHospitDialog, setOpenHospitDialog] = useState(false)
-  const [dialogDocuments, setDialogDocuments] = useState<(CohortComposition | IDocumentReference)[]>([])
+  const [dialogDocuments, setDialogDocuments] = useState<(CohortComposition | IDocumentReference)[] | undefined>([])
   const [loading, setLoading] = useState(false)
   const yearComponentSize: { [year: number]: number } = {}
 
@@ -122,7 +125,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits
     ).reverse()
   }
 
-  const handleClickOpenHospitDialog = (hospitOrConsult?: IEncounter | IProcedure) => {
+  const handleClickOpenHospitDialog = (hospitOrConsult?: CohortEncounter | PMSIEntry<IProcedure>) => {
     if (hospitOrConsult) {
       setLoading(true)
       setOpenHospitDialog(true)
