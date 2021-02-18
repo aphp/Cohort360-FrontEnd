@@ -21,6 +21,7 @@ const defaultDemographic = {
   label: '',
   ageType: { id: 'year', label: 'années' },
   years: [0, 130],
+  durationType: { id: 'day', label: 'jours' },
   duration: [0, 100],
   admissionMode: null,
   entryMode: null,
@@ -41,6 +42,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
       title: data.title,
       ageType: data.ageType,
       years: data.years,
+      durationType: data.durationType,
       duration: data.duration,
       admissionMode: data.admissionMode,
       entryMode: data.entryMode,
@@ -93,7 +95,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
               type: 'custom',
               name: 'label',
               renderInput: () => (
-                <FormLabel style={{ padding: '0 1em' }} component="legend">
+                <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
                   Âge au moment de la prise en charge :
                 </FormLabel>
               )
@@ -107,7 +109,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
                 {
                   name: 'years',
                   type: 'slider',
-                  valueLabelDisplay: 'auto',
+                  valueLabelDisplay: 'on',
                   min: 0,
                   max: 130
                 },
@@ -124,12 +126,38 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
               ]
             },
             {
-              label: 'Durée de la prise en charge',
-              name: 'duration',
-              type: 'slider',
-              valueLabelDisplay: 'auto',
-              min: 0,
-              max: 100
+              type: 'custom',
+              name: 'label2',
+              renderInput: () => (
+                <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
+                  Durée de la prise en charge :
+                </FormLabel>
+              )
+            },
+            {
+              type: 'section',
+              title: '',
+              name: '',
+              containerStyle: { display: 'grid', gridTemplateColumns: '1fr 180px' },
+              properties: [
+                {
+                  name: 'duration',
+                  type: 'slider',
+                  valueLabelDisplay: 'on',
+                  min: 0,
+                  max: 100
+                },
+                {
+                  name: 'durationType',
+                  variant: 'outlined',
+                  type: 'autocomplete',
+                  autocompleteOptions: [
+                    { id: 'year', label: 'années' },
+                    { id: 'month', label: 'mois' },
+                    { id: 'day', label: 'jours' }
+                  ]
+                }
+              ]
             }
             // {
             //   name: 'admissionMode',

@@ -1,9 +1,12 @@
 //@ts-nocheck
-import React, { useRef, useEffect, memo } from 'react'
+import React, { useRef, useEffect, memo, useState } from 'react'
 import { SimpleChartDataType } from 'types'
 import * as d3 from 'd3'
+import legend from './Legend'
 
 import displayDigit from 'utils/displayDigit'
+
+import useStyles from './styles'
 
 type PieChartProps = {
   data: SimpleChartDataType[] | 'loading'
@@ -11,8 +14,12 @@ type PieChartProps = {
   width?: number
 }
 
-const PieChart: React.FC<PieChartProps> = memo(({ data, height = 240, width = 200 }) => {
+const PieChart: React.FC<PieChartProps> = memo(({ data, height = 250, width = 250 }) => {
+  const classes = useStyles()
+
   const node = useRef<SVGSVGElement | null>(null)
+  const [legendHtml, setLegend] = useState()
+
   useEffect(() => {
     const svg = d3.select(node.current)
     svg.selectAll('*').remove()
@@ -20,12 +27,14 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 240, width = 20
       .attr('height', height)
       .attr('width', width)
       .attr('viewBox', [-width / 2, -height / 2, width, height])
-    const radius = (Math.min(width, height) / 2 - 15) * 0.6
+    // const radius = (Math.min(width, height) / 2 - 15) * 0.6
 
     const color = d3
       .scaleOrdinal()
       .domain(data.map((d) => d.label))
       .range(data.map((d) => d.color))
+
+    const radius = Math.min(width, height) / 2 - 25
 
     const pie = d3
       .pie<DataType>()
@@ -35,11 +44,13 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 240, width = 20
     const arc = d3
       .arc()
       .innerRadius(0)
-      .outerRadius(Math.min(width, height) / 2)
+      .outerRadius(radius - 1)
 
-    const arcLabel = d3.arc().innerRadius(radius).outerRadius(radius)
+    // const arcLabel = d3.arc().innerRadius(radius).outerRadius(radius)
 
     const arcs = pie(data)
+
+    const div = d3.select('#tooltip').style('opacity', 0)
 
     svg
       .append('g')
@@ -49,36 +60,37 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 240, width = 20
       .join('path')
       .attr('fill', (d) => color(d.data.label))
       .attr('d', arc)
-      .append('title')
-      .text((d) => `${d.data.label}: ${displayDigit(d.data.value)}`)
+      .on('mouseover', function (d) {
+        d3.select(this).transition().duration('50').attr('opacity', '.5')
+        div.transition().duration(50).style('opacity', 1)
+        div
+          .html(d.value)
+          .style('left', d3.event.pageX + 10 + 'px')
+          .style('top', d3.event.pageY - 15 + 'px')
+      })
+      .on('mouseout', function () {
+        d3.select(this).transition().duration('50').attr('opacity', '1')
+        div.transition().duration(50).style('opacity', 0)
+      })
 
-    svg
-      .append('g')
-      .attr('font-family', 'sans-serif')
-      .attr('font-size', 12)
-      .attr('text-anchor', 'middle')
-      .selectAll('text')
-      .data(arcs)
-      .join('text')
-      .attr('transform', (d) => `translate(${arcLabel.centroid(d)})`)
-      .call((text) =>
-        text
-          .append('tspan')
-          .attr('y', '-0.4em')
-          .attr('font-weight', 'bold')
-          .text((d) => d.data.label)
-      )
-      .call((text) =>
-        text
-          .append('tspan')
-          .attr('x', 0)
-          .attr('y', '0.7em')
-          .attr('fill-opacity', 0.7)
-          .text((d) => displayDigit(d.data.value))
-      )
+    setLegend(
+      legend({
+        color: color,
+        columns: '200px',
+        dataValues: data.map((entry) => displayDigit(entry.value))
+      })
+    )
   }, [node, data, height, width])
 
-  return <svg ref={node}></svg>
+  return (
+    <>
+      <div style={{ display: 'flex' }}>
+        <svg ref={node}></svg>
+        <div style={{ display: 'flex' }} dangerouslySetInnerHTML={{ __html: legendHtml }} />
+      </div>
+      <div id="tooltip" className={classes.tooltip} />
+    </>
+  )
 })
 
 export default PieChart

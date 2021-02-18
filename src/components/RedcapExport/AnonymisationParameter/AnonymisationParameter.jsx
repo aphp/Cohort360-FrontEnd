@@ -76,7 +76,7 @@ const AnonymisationParameter = (props) => {
           min={2}
           max={5}
           marks={marksK}
-          valueLabelDisplay="auto"
+          valueLabelDisplay="on"
           onChange={handleChangeK}
         />
       </div>
@@ -96,7 +96,7 @@ const AnonymisationParameter = (props) => {
           min={1}
           max={4}
           marks={marksL}
-          valueLabelDisplay="auto"
+          valueLabelDisplay="on"
           onChange={handleChangeL}
         />
       </div>

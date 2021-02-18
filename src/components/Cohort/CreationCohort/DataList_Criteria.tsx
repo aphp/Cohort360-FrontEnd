@@ -3,18 +3,18 @@ import { CriteriaItemType } from 'types'
 // Components
 import DemographicFrom from './DiagramView/components/CriteriaCard/components/DemographicFrom/DemographicFrom'
 import DocumentsForm from './DiagramView/components/CriteriaCard/components/DocumentsForm/DocumentsForm'
-import SupportedForm from './DiagramView/components/CriteriaCard/components/SupportedForm/SupportedForm'
+// import SupportedForm from './DiagramView/components/CriteriaCard/components/SupportedForm/SupportedForm'
 import CCAMForm from './DiagramView/components/CriteriaCard/components/CCAM'
 import Cim10Form from './DiagramView/components/CriteriaCard/components/Cim10Form'
 import GhmForm from './DiagramView/components/CriteriaCard/components/GHM'
 
 // Fetcher
-import {
-  fetchAdmissionModes,
-  fetchEntryModes,
-  fetchExitModes,
-  fetchFileStatus
-} from '../../../services/cohortCreation/fetchEncounter'
+// import {
+//   fetchAdmissionModes,
+//   fetchEntryModes,
+//   fetchExitModes,
+//   fetchFileStatus
+// } from '../../../services/cohortCreation/fetchEncounter'
 import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetchDemographic'
 import {
   fetchStatusDiagnostic,
@@ -45,7 +45,7 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'mes_variables',
     title: 'Mes variables',
-    color: '	#808080',
+    color: '#808080',
     disabled: true,
     data: null,
     components: null
@@ -61,10 +61,11 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'Encounter',
     title: 'Visites',
-    color: '#0063AF',
-    components: SupportedForm,
-    data: { admissionModes: 'loading', entryModes: 'loading', exitModes: 'loading', fileStatus: 'loading' },
-    fetch: { fetchAdmissionModes, fetchEntryModes, fetchExitModes, fetchFileStatus }
+    color: '#808080',
+    disabled: true,
+    components: null
+    // data: { admissionModes: 'loading', entryModes: 'loading', exitModes: 'loading', fileStatus: 'loading' },
+    // fetch: { fetchAdmissionModes, fetchEntryModes, fetchExitModes, fetchFileStatus }
   },
   {
     id: 'Composition',
@@ -85,7 +86,12 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Diagnostics',
         color: '#0063AF',
         components: Cim10Form,
-        data: { statusDiagnostic: 'loading', diagnosticTypes: 'loading', cim10Diagnostic: 'loading' },
+        data: {
+          statusDiagnostic: 'loading',
+          diagnosticTypes: 'loading',
+          cim10Diagnostic: 'loading',
+          cim10Hierarchy: 'loading'
+        },
         fetch: { fetchStatusDiagnostic, fetchDiagnosticTypes, fetchCim10Diagnostic, fetchCim10Hierarchy }
       },
       {
@@ -93,7 +99,7 @@ const criteriaList: CriteriaItemType[] = [
         title: 'Actes',
         color: '#0063AF',
         components: CCAMForm,
-        data: { ccamData: 'loading' },
+        data: { ccamData: 'loading', ccamHierarchy: 'loading' },
         fetch: { fetchCcamData, fetchCcamHierarchy }
       },
       {
@@ -101,7 +107,7 @@ const criteriaList: CriteriaItemType[] = [
         title: 'GHM',
         color: '#0063AF',
         components: GhmForm,
-        data: { ghmData: 'loading' },
+        data: { ghmData: 'loading', ghmHierarchy: 'loading' },
         fetch: { fetchGhmData, fetchGhmHierarchy }
       }
     ]
@@ -109,13 +115,13 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'biologie_microbiologie',
     title: 'Biologie/Microbiologie',
-    color: '	#808080',
+    color: '#808080',
     components: null,
     subItems: [
       {
         id: 'biologie',
         title: 'Biologie',
-        color: '	#808080',
+        color: '#808080',
         disabled: true,
         data: null,
         components: null
@@ -124,7 +130,7 @@ const criteriaList: CriteriaItemType[] = [
         id: 'microbiologie',
         title: 'Microbiologie',
         components: null,
-        color: '	#808080',
+        color: '#808080',
         disabled: true,
         data: null
       }
@@ -133,7 +139,7 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'physiologie',
     title: 'Physiologie',
-    color: '	#808080',
+    color: '#808080',
     disabled: true,
     data: null,
     components: null
@@ -141,14 +147,14 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'médicaments',
     title: 'Médicaments',
-    color: '	#808080',
+    color: '#808080',
     components: null,
     subItems: [
       {
         id: 'prescription_dispension_administration',
         title: 'Prescription - Dispension - Administration',
         components: null,
-        color: '	#808080',
+        color: '#808080',
         disabled: true,
         data: null
       }

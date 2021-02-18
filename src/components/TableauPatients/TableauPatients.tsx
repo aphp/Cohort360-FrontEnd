@@ -1,5 +1,4 @@
 import React, { memo } from 'react'
-import { useHistory } from 'react-router-dom'
 import moment from 'moment'
 
 import {
@@ -86,7 +85,6 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
     sortDirection,
     onRequestSort
   }) => {
-    const history = useHistory()
     const classes = useStyles()
 
     const patientsToShow =
@@ -160,7 +158,7 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                 <TableCell className={classes.tableHeadCell}>Dernier lieu de prise en charge</TableCell>
                 <TableCell className={classes.tableHeadCell}>Statut vital</TableCell>
                 <TableCell align="center" className={classes.tableHeadCell}>
-                  {deidentified ? 'ID Technique Patient' : 'N° IPP'}
+                  {deidentified ? 'IPP chiffré' : 'N° IPP'}
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -187,7 +185,9 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                         key={patient.id}
                         className={classes.tableBodyRows}
                         hover
-                        onClick={() => history.push(`/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}`)}
+                        onClick={() =>
+                          window.open(`/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}`, '_blank')
+                        }
                       >
                         <TableCell align="center">
                           {patient.gender && <PatientGender gender={patient.gender} className={classes.genderIcon} />}

@@ -15,11 +15,7 @@ import CohortDocuments from '../../components/Cohort/Documents/Documents'
 import TopBar from '../../components/TopBar/TopBar'
 import CohortCreation from '../../views/CohortCreation/CohortCreation'
 
-import { fetchCohort } from '../../services/cohortInfos'
-import { fetchMyPatients } from '../../services/myPatients'
-import { fetchPerimetersInfos } from '../../services/perimeters'
-
-import { setExploredCohort } from '../../state/exploredCohort'
+import { fetchExploredCohort } from '../../state/exploredCohort'
 
 import useStyles from './styles'
 
@@ -64,57 +60,24 @@ const Dashboard: React.FC<{
     setDeidentifiedBoolean(!!valueBoolean)
   }
 
-  const _fetchCohort = async () => {
-    const cohortResp = await fetchCohort(cohortId)
-    if (cohortResp) {
-      dispatch(setExploredCohort(cohortResp))
-      checkDeindentifiedStatus(cohortResp)
-    }
-  }
-
-  const _fetchMyPatients = async () => {
-    const cohortResp = await fetchMyPatients()
-    if (cohortResp) {
-      dispatch(setExploredCohort(cohortResp))
-      checkDeindentifiedStatus(cohortResp)
-    }
-  }
-
-  const _fetchPerimeters = async () => {
-    const cohortResp = await fetchPerimetersInfos(perimetreIds)
-    if (cohortResp) {
-      dispatch(setExploredCohort(cohortResp))
-      checkDeindentifiedStatus(cohortResp)
-    }
-  }
-
   useEffect(() => {
-    dispatch(
-      setExploredCohort({
-        cohort: undefined,
-        name: '',
-        totalPatients: undefined,
-        agePyramidData: undefined,
-        genderRepartitionMap: undefined,
-        monthlyVisitData: undefined,
-        visitTypeRepartitionData: undefined,
-        originalPatients: undefined
-      })
-    )
+    const id = context === 'cohort' ? cohortId : context === 'perimeters' ? perimetreIds : undefined
+
+    if (context !== 'new_cohort') {
+      dispatch(fetchExploredCohort({ context, id }))
+    }
 
     switch (context) {
       case 'patients':
-        _fetchMyPatients()
         setStatus('Exploration de population')
         setTabs([
-          { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: false },
+          { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu', value: 'apercu', to: '/mes_patients/apercu', disabled: false },
           { label: 'Patients', value: 'patients', to: '/mes_patients/patients', disabled: false },
           { label: 'Documents', value: 'documents', to: '/mes_patients/documents', disabled: false }
         ])
         break
       case 'cohort':
-        _fetchCohort()
         setStatus('Exploration de cohorte')
         setTabs([
           { label: 'Édition cohorte', value: 'creation', to: `/cohort/${cohortId}/edition`, disabled: true },
@@ -133,10 +96,9 @@ const Dashboard: React.FC<{
         ])
         break
       case 'perimeters':
-        _fetchPerimeters()
         setStatus('Exploration de périmètres')
         setTabs([
-          { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: false },
+          { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu', value: 'apercu', to: `/perimetres/apercu${location.search}`, disabled: false },
           { label: 'Patients', value: 'patients', to: `/perimetres/patients${location.search}`, disabled: false },
           { label: 'Documents', value: 'documents', to: `/perimetres/documents${location.search}`, disabled: false }
@@ -145,7 +107,11 @@ const Dashboard: React.FC<{
       default:
         break
     }
-  }, [context, cohortId]) //eslint-disable-line
+  }, [context, cohortId]) // eslint-disable-line
+
+  useEffect(() => {
+    checkDeindentifiedStatus(dashboard)
+  }, [dashboard])
 
   const handleOpenRedcapDialog = () => {
     setOpenRedcapDialog(true)
@@ -190,7 +156,7 @@ const Dashboard: React.FC<{
     return <CohortCreation />
   }
 
-  if (dashboard.totalPatients === 0) {
+  if (dashboard.loading === false && dashboard.totalPatients === 0) {
     return (
       <Alert severity="error" className={classes.alert}>
         Les données ne sont pas encore disponibles, veuillez réessayer ultérieurement.
@@ -212,7 +178,7 @@ const Dashboard: React.FC<{
           onClose={handleCloseRedcapDialog}
           // FIX ARKHN: originalPatient only contains paginated results, not the whole group.
           // we need to find a way to tell redcap which patients we need depending on then context
-          patientIds={dashboard.originalPatients.map((p) => p.id)}
+          patientIds={dashboard.originalPatients.map((p: any) => p.id)}
         />
       )}
       <TopBar
@@ -222,6 +188,7 @@ const Dashboard: React.FC<{
         access={deidentifiedBoolean === null ? '-' : deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
         openRedcapDialog={handleOpenRedcapDialog}
         fav
+        loading={dashboard.loading}
       />
 
       <Grid container justify="center" className={classes.tabs}>
@@ -239,6 +206,7 @@ const Dashboard: React.FC<{
                       value={tab.value}
                       component={Link}
                       to={tab.to}
+                      key={tab.value}
                     />
                   )
               )}
@@ -250,10 +218,11 @@ const Dashboard: React.FC<{
           <CohortPreview
             total={dashboard.totalPatients}
             group={_displayGroupName()}
-            agePyramidData={dashboard.agePyramidData ?? 'loading'}
-            genderRepartitionMap={dashboard.genderRepartitionMap ?? 'loading'}
-            monthlyVisitData={dashboard.monthlyVisitData ?? 'loading'}
-            visitTypeRepartitionData={dashboard.visitTypeRepartitionData ?? 'loading'}
+            agePyramidData={dashboard.agePyramidData}
+            genderRepartitionMap={dashboard.genderRepartitionMap}
+            monthlyVisitData={dashboard.monthlyVisitData}
+            visitTypeRepartitionData={dashboard.visitTypeRepartitionData}
+            loading={dashboard.loading}
           />
         )}
         {selectedTab === 'patients' && (

@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, Fragment } from 'react'
 import moment from 'moment'
+import { useDispatch } from 'react-redux'
 
-import { Button, Card, CardHeader, CardContent, IconButton, Typography } from '@material-ui/core'
+import { Button, Card, CardHeader, CardContent, IconButton, Typography, CircularProgress } from '@material-ui/core'
 
 import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
@@ -9,20 +10,22 @@ import EditIcon from '@material-ui/icons/Edit'
 
 import CriteriaRightPanel from './components/CriteriaRightPanel'
 
-import { CriteriaItemType, SelectedCriteriaType } from 'types'
+import { useAppSelector } from 'state'
+import { buildCreationCohort } from 'state/cohortCreation'
+import { SelectedCriteriaType } from 'types'
+
 import useStyles from './styles'
 
-type CriteriaCardProps = {
-  actionLoading: boolean
-  criteria: CriteriaItemType[]
-  selectedCriteria: SelectedCriteriaType[]
-  onChangeSelectedCriteria: (item: SelectedCriteriaType[]) => void
-}
-
-const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
-  const { actionLoading, criteria, selectedCriteria, onChangeSelectedCriteria } = props
-
+const CriteriaCard: React.FC = () => {
   const classes = useStyles()
+  const dispatch = useDispatch()
+
+  const criteria = useAppSelector((state) => state.cohortCreation.criteria)
+  const { loading = false, selectedCriteria = [] } = useAppSelector<{
+    loading: boolean
+    selectedCriteria: SelectedCriteriaType[]
+  }>((state) => state.cohortCreation.request || {})
+
   const [indexCriteria, onChangeIndexCriteria] = useState<number | null>(null)
   const [openCriteriaDrawer, onChangeOpenCriteriaDrawer] = useState<boolean>(false)
 
@@ -39,7 +42,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
   const _deleteSelectedCriteria = (index: number) => {
     const savedSelectedCriteria = [...selectedCriteria]
     savedSelectedCriteria.splice(index, 1)
-    onChangeSelectedCriteria(savedSelectedCriteria)
+    dispatch(buildCreationCohort({ selectedCriteria: savedSelectedCriteria }))
   }
 
   const _onChangeSelectedCriteria = (newSelectedCriteria: SelectedCriteriaType) => {
@@ -49,7 +52,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
     } else {
       savedSelectedCriteria = [...savedSelectedCriteria, newSelectedCriteria]
     }
-    onChangeSelectedCriteria(savedSelectedCriteria)
+    dispatch(buildCreationCohort({ selectedCriteria: savedSelectedCriteria }))
   }
 
   const _displayCardContent = (_selectedCriteria: SelectedCriteriaType) => {
@@ -96,16 +99,27 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
 
     switch (_selectedCriteria.type) {
       case 'Claim': {
-        const selectedGhmData = data?.ghmData
-          ? data.ghmData.find((ghmElement: any) => ghmElement && ghmElement.id === _selectedCriteria.code?.id)
-          : null
+        const displaySelectedGHM = (currentGHM: { id: string; label: string }) => {
+          const selectedGhmData =
+            data?.ghmData && data?.ghmData !== 'loading'
+              ? data.ghmData.find((ghmElement: any) => ghmElement && ghmElement.id === currentGHM.id)
+              : null
+          return <Typography>{selectedGhmData ? selectedGhmData.label : ''}</Typography>
+        }
 
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>GHM</span>,
             </Typography>
-            <Typography>{selectedGhmData ? `GHM sélectionné : "${selectedGhmData.label}"` : ''}</Typography>
+            {_selectedCriteria && _selectedCriteria?.code && _selectedCriteria?.code.length > 0 ? (
+              <>
+                <Typography>GHM sélectionné : </Typography>
+                {_selectedCriteria?.code?.map((code) => displaySelectedGHM(code))}
+              </>
+            ) : (
+              <></>
+            )}
             {/* <Typography>
               {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
             </Typography> */}
@@ -124,16 +138,27 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
       }
 
       case 'Procedure': {
-        const selectedccamData = data?.ccamData
-          ? data.ccamData.find((ccamElement: any) => ccamElement && ccamElement.id === _selectedCriteria?.code?.id)
-          : null
+        const displaySelectedCCAM = (currentCCAM: { id: string; label: string }) => {
+          const selectedCcamData =
+            data?.ccamData && data?.ccamData !== 'loading'
+              ? data.ccamData.find((ccamElement: any) => ccamElement && ccamElement.id === currentCCAM.id)
+              : null
+          return <Typography>{selectedCcamData ? selectedCcamData.label : ''}.</Typography>
+        }
 
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Actes CCAM</span>,
             </Typography>
-            <Typography>{selectedccamData ? `Acte CCAM sélectionné : "${selectedccamData.label}"` : ''}.</Typography>
+            {_selectedCriteria && _selectedCriteria?.code && _selectedCriteria?.code.length > 0 ? (
+              <>
+                <Typography>Acte CCAM sélectionné :</Typography>
+                {_selectedCriteria?.code?.map((code) => displaySelectedCCAM(code))}
+              </>
+            ) : (
+              <></>
+            )}
             {/* <Typography>
               {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
             </Typography> */}
@@ -152,26 +177,39 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
       }
 
       case 'Condition': {
-        const selectedCode = data?.cim10Diagnostic
-          ? data.cim10Diagnostic.find(
-              (cim10Diagnostic: any) => cim10Diagnostic && cim10Diagnostic.id === _selectedCriteria?.code?.id
-            )
-          : null
-        const selectedDiagnostic = data?.diagnosticTypes
-          ? data.diagnosticTypes.find(
-              (diagnosticType: any) => diagnosticType && diagnosticType.id === _selectedCriteria?.diagnosticType?.id
-            )
-          : null
+        const displaySelectedCIM10 = (currentCIM10: { id: string; label: string }) => {
+          const selectedCimData =
+            data?.cim10Diagnostic && data?.cim10Diagnostic !== 'loading'
+              ? data.cim10Diagnostic.find((cimElement: any) => cimElement && cimElement.id === currentCIM10.id)
+              : null
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        }
+
+        const displaySelectedCimType = (diagnosticType: { id: string; label: string }) => {
+          const selectedCimData =
+            data?.diagnosticTypes && data?.diagnosticTypes !== 'loading'
+              ? data.diagnosticTypes.find((type: any) => type && type.id === diagnosticType.id)
+              : null
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        }
 
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,
             </Typography>
-            <Typography>{selectedCode ? `Diagnostic CIM sélectionné : "${selectedCode.label}."` : ''}</Typography>
-            <Typography>
-              {selectedDiagnostic && `Type de diagnostic recherché : "${selectedDiagnostic.label}."`}
-            </Typography>
+            {_selectedCriteria && _selectedCriteria?.code && _selectedCriteria?.code.length > 0 && (
+              <>
+                <Typography>Diagnostic CIM sélectionné :</Typography>
+                {_selectedCriteria?.code?.map((code) => displaySelectedCIM10(code))}
+              </>
+            )}
+            {_selectedCriteria && _selectedCriteria?.diagnosticType && _selectedCriteria?.diagnosticType.length > 0 && (
+              <>
+                <Typography>Type de diagnostic recherché :</Typography>
+                {_selectedCriteria?.diagnosticType?.map((diagnosticType) => displaySelectedCimType(diagnosticType))}
+              </>
+            )}
             {/* <Typography>
               {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
             </Typography> */}
@@ -190,24 +228,46 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
       }
 
       case 'Patient': {
-        const selectedGender = data?.gender
-          ? data.gender.find((gender: any) => gender && gender.id === _selectedCriteria?.gender?.id)
-          : null
-        const selectedVitalStatus = data?.status
-          ? data.status.find((status: any) => status && status.id === _selectedCriteria?.vitalStatus?.id)
-          : null
+        const ageType: any = _selectedCriteria.ageType ? _selectedCriteria.ageType.id : 'year'
+        let ageUnit = 'an(s)'
+        if (ageType === 'month') ageUnit = 'mois'
+        else if (ageType === 'day') ageUnit = 'jour(s)'
+
+        const displaySelectedGender = (gender: { id: string; label: string }) => {
+          const selectedCimData =
+            data?.gender && data?.gender !== 'loading'
+              ? data.gender.find((ghmElement: any) => ghmElement && ghmElement.id === gender.id)
+              : null
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        }
+        const displaySelectedVitalStatus = (vitalStatus: { id: string; label: string }) => {
+          const selectedCimData =
+            data?.status && data?.status !== 'loading'
+              ? data.status.find((ghmElement: any) => ghmElement && ghmElement.id === vitalStatus.id)
+              : null
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        }
 
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Démographie Patient</span>,
             </Typography>
-            {selectedGender && <Typography>Genre sélectionné : {selectedGender.label}.</Typography>}
-            {selectedVitalStatus && <Typography>Statut vital : {selectedVitalStatus.label}.</Typography>}
+            {_selectedCriteria && _selectedCriteria.gender && _selectedCriteria?.gender?.length > 0 && (
+              <Typography>
+                Genre sélectionné :{_selectedCriteria?.gender?.map((gender) => displaySelectedGender(gender))}
+              </Typography>
+            )}
+            {_selectedCriteria && _selectedCriteria.vitalStatus && _selectedCriteria?.vitalStatus?.length > 0 && (
+              <Typography>
+                Statut vital :
+                {_selectedCriteria?.vitalStatus?.map((vitalStatus) => displaySelectedVitalStatus(vitalStatus))}
+              </Typography>
+            )}
 
             {!!_selectedCriteria.years && _selectedCriteria.years[0] === _selectedCriteria.years[1] && (
               <Typography>
-                Âge sélectionné: {_selectedCriteria.years?.[0]} ans
+                Âge sélectionné: {_selectedCriteria.years?.[0]} {ageUnit}
                 {_selectedCriteria.years?.[0] === 130 ? ' ou plus.' : '.'}
               </Typography>
             )}
@@ -215,7 +275,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
               _selectedCriteria.years[0] !== _selectedCriteria.years[1] &&
               (_selectedCriteria.years[0] !== 0 || _selectedCriteria.years[1] !== 130) && (
                 <Typography>
-                  Fourchette d'âge comprise entre {_selectedCriteria.years[0]} et {_selectedCriteria.years[1]} ans
+                  Fourchette d'âge comprise entre {_selectedCriteria.years[0]} et {_selectedCriteria.years[1]} {ageUnit}
                   {_selectedCriteria.years[1] === 130 ? ' ou plus.' : '.'}
                 </Typography>
               )}
@@ -225,17 +285,27 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
       }
 
       case 'Composition': {
-        const selectedDocType = data?.docTypes
-          ? data?.docTypes.find((docTypes: any) => docTypes && docTypes.id === _selectedCriteria?.docType?.id)
-          : {}
+        const displaySelectedDocType = (docType: { id: string; label: string }) => {
+          const selectedCimData =
+            data?.docTypes && data?.docTypes !== 'loading'
+              ? data.docTypes.find((ghmElement: any) => ghmElement && ghmElement.id === docType.id)
+              : null
+          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        }
 
         content = (
           <>
             <Typography>
               Dans <span className={classes.criteriaType}>Document médical</span>,
             </Typography>
-            <Typography>Recherche textuelle "{_selectedCriteria.search}"</Typography>
-            {selectedDocType && <Typography>Dans {selectedDocType.label}.</Typography>}
+            {_selectedCriteria.search && <Typography>Recherche textuelle "{_selectedCriteria.search}"</Typography>}
+
+            {_selectedCriteria && _selectedCriteria.docType && _selectedCriteria?.docType?.length > 0 && (
+              <Typography>
+                Dans
+                {_selectedCriteria?.docType?.map((docType) => displaySelectedDocType(docType))}
+              </Typography>
+            )}
             {/* <Typography>
               {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
             </Typography> */}
@@ -258,6 +328,11 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
         let ageUnit = 'an(s)'
         if (ageType === 'month') ageUnit = 'mois'
         else if (ageType === 'day') ageUnit = 'jour(s)'
+
+        const durationType: any = _selectedCriteria.durationType ? _selectedCriteria.durationType.id : 'year'
+        let durationUnit = 'an(s)'
+        if (durationType === 'month') durationUnit = 'mois'
+        else if (durationType === 'day') durationUnit = 'jour(s)'
 
         const selectedAdmissionMode = data.admissionModes
           ? data.admissionModes.find((admissionMode: any) => admissionMode.id === _selectedCriteria?.admissionMode?.id)
@@ -294,7 +369,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
               )}
             {_selectedCriteria.duration && _selectedCriteria.duration[0] === _selectedCriteria.duration[1] && (
               <Typography>
-                Durée de la prise en charge : {_selectedCriteria.duration?.[0]} jour(s)
+                Durée de la prise en charge : {_selectedCriteria.duration?.[0]} {durationUnit}
                 {_selectedCriteria.duration?.[0] === 100 ? ' ou plus.' : '.'}
               </Typography>
             )}
@@ -303,7 +378,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
               (_selectedCriteria.duration[0] !== 0 || _selectedCriteria.duration[1] !== 100) && (
                 <Typography>
                   Durée de la prise en charge : {_selectedCriteria.duration[0]} et {_selectedCriteria.duration[1]}{' '}
-                  jour(s)
+                  {durationUnit}
                   {_selectedCriteria.duration[1] === 100 ? ' ou plus.' : '.'}
                 </Typography>
               )}
@@ -326,10 +401,10 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
       {selectedCriteria &&
         selectedCriteria.length > 0 &&
         selectedCriteria.map((_selectedCriteria, index) => (
-          <>
+          <Fragment key={`C${index}`}>
             {/* <div className={classes.root}>
               <Button
-                disabled={actionLoading}
+                disabled={loading}
                 className={classes.addButton}
                 onClick={_addSelectedCriteria}
                 variant="contained"
@@ -338,7 +413,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 <AddIcon />
               </Button>
             </div> */}
-            <div className={classes.root} key={`C${index}`}>
+            <div className={classes.root}>
               <Card className={classes.card}>
                 <CardHeader
                   className={classes.cardHeader}
@@ -365,18 +440,18 @@ const CriteriaCard: React.FC<CriteriaCardProps> = (props) => {
                 <CardContent className={classes.cardContent}>{_displayCardContent(_selectedCriteria)}</CardContent>
               </Card>
             </div>
-          </>
+          </Fragment>
         ))}
 
       <div className={classes.root}>
         <Button
-          disabled={actionLoading}
+          disabled={loading}
           className={classes.addButton}
           onClick={_addSelectedCriteria}
           variant="contained"
           color="primary"
         >
-          <AddIcon />
+          {loading ? <CircularProgress className={classes.loading} /> : <AddIcon />}
         </Button>
       </div>
 

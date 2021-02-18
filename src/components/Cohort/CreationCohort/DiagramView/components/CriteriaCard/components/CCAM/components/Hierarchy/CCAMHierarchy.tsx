@@ -21,8 +21,8 @@ import useStyles from './styles'
 
 type CcamListItemProps = {
   ccamItem: any
-  selectedItem?: any
-  handleClick: (ccamItem: any) => void
+  selectedItem?: { id: string; label: string }[] | null
+  handleClick: (ccamItem: { id: string; label: string }[] | null) => void
   fetchHierarchy: (ccamCode: string) => any
 }
 
@@ -34,7 +34,7 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
   const [open, setOpen] = useState(false)
   const [subItems, setSubItems] = useState<any>(['loading'])
 
-  const isSelected = selectedItem ? ccamItem.id === selectedItem.id : false
+  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === ccamItem.id) : false
 
   const _onExpand = async (ccamCode: string) => {
     setOpen(!open)
@@ -53,6 +53,19 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
     _init()
   }, []) //eslint-disable-line
 
+  const handleClickOnHierarchy = (ccamItem: { id: string; label: string }) => {
+    let _selectedItem = selectedItem ? [...selectedItem] : []
+    const foundItem = _selectedItem ? _selectedItem.find(({ id }) => id === ccamItem.id) : undefined
+    const index = foundItem !== undefined ? _selectedItem.indexOf(foundItem) : -1
+
+    if (index !== -1) {
+      _selectedItem?.splice(index, 1)
+    } else {
+      _selectedItem = [..._selectedItem, ccamItem]
+    }
+    handleClick(_selectedItem)
+  }
+
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
     return (
       <ListItem className={classes.ccamItem}>
@@ -63,11 +76,7 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
           />
         </ListItemIcon>
         <Tooltip title={label} enterDelay={2500}>
-          <ListItemText
-            className={classes.label}
-            primary={label}
-            onClick={() => handleClick(isSelected ? null : ccamItem)}
-          />
+          <ListItemText className={classes.label} primary={label} onClick={() => handleClickOnHierarchy(ccamItem)} />
         </Tooltip>
       </ListItem>
     )
@@ -120,10 +129,11 @@ type CcamHierarchyProps = {
 const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
   const { criteria, selectedCriteria, goBack, onChangeSelectedHierarchy, isEdition } = props
 
-  const [ccamHierarchy, onSetCcamHierarchy] = useState([])
-  const [selectedHierarchy, onSetSelectedHierarchy] = useState(isEdition ? selectedCriteria.code : null)
-
   const classes = useStyles()
+  const [ccamHierarchy, onSetCcamHierarchy] = useState([])
+  const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
+    isEdition ? selectedCriteria.code : null
+  )
 
   // Init
   useEffect(() => {

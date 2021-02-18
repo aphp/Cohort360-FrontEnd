@@ -7,10 +7,13 @@ import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from '../../assets/icones/search.svg'
 
 import ResearchTable from './ResearchTable/ResearchTable'
-import { fetchCohorts, setFavorite } from '../../services/savedResearches'
+import { fetchCohorts } from '../../services/savedResearches'
 
 import useStyles from './styles'
 import { FormattedCohort } from 'types'
+
+import { setFavoriteCohortThunk, deleteUserCohortThunk } from 'state/userCohorts'
+import { useAppDispatch } from 'state'
 
 type ResearchProps = {
   simplified?: boolean
@@ -19,6 +22,7 @@ type ResearchProps = {
 }
 const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds }) => {
   const classes = useStyles()
+  const dispatch = useAppDispatch()
   const [page, setPage] = useState(1)
   const [researches, setResearches] = useState<FormattedCohort[] | undefined>()
   const [loadingStatus, setLoadingStatus] = useState(true)
@@ -46,15 +50,16 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
 
   const onDeleteCohort = async (cohortId: string) => {
     setResearches(researches?.filter((r) => r.researchId !== cohortId))
+    dispatch(deleteUserCohortThunk({ cohortId }))
   }
 
-  const onSetCohortFavorite = async (cohortId: string, favStatus: boolean) => {
-    setFavorite(cohortId, favStatus)
-      .then(() => fetchCohorts())
-      .then((cohortsResp) => {
+  const onSetCohortFavorite = async (cohortId: string) => {
+    dispatch(setFavoriteCohortThunk({ cohortId })).then(() =>
+      fetchCohorts().then((cohortsResp) => {
         setResearches(cohortsResp?.results ?? undefined)
         setTotal(cohortsResp?.count ?? 0)
       })
+    )
   }
 
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value = 1) => {

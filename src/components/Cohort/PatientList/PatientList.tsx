@@ -65,7 +65,7 @@ const PatientList: React.FC<PatientListProps> = ({
     ComplexChartDataType<number, { male: number; female: number; other?: number }> | undefined
   >(undefined)
   const [patientData, setPatientData] = useState<
-    { vitalStatusData: SimpleChartDataType[] | undefined; genderData: SimpleChartDataType[] | undefined } | undefined
+    { vitalStatusData?: SimpleChartDataType[]; genderData?: SimpleChartDataType[] } | undefined
   >(undefined)
   const [open, setOpen] = useState(false)
   const [gender, setGender] = useState<PatientGenderKind>(PatientGenderKind._unknown)
@@ -282,7 +282,7 @@ const PatientList: React.FC<PatientListProps> = ({
                   <CircularProgress />
                 </Grid>
               ) : agePyramid && agePyramid.size > 0 ? (
-                <PyramidChart data={agePyramid} width={300} />
+                <PyramidChart data={agePyramid} width={250} />
               ) : (
                 <Typography>Aucun patient</Typography>
               )}

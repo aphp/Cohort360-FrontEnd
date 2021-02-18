@@ -76,16 +76,28 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
         let ageFilter = ''
         if (selectedCriterion.years && selectedCriterion.years !== [0, 130]) {
           const date1 = moment()
-            .subtract(selectedCriterion.years[1] + 1, 'years')
+            .subtract(selectedCriterion.years[1] + 1, selectedCriterion?.ageType?.id || 'years')
             .add(1, 'days')
             .format('YYYY-MM-DD')
-          const date2 = moment().subtract(selectedCriterion.years[0], 'years').format('YYYY-MM-DD')
+          const date2 = moment()
+            .subtract(selectedCriterion.years[0], selectedCriterion?.ageType?.id || 'years')
+            .format('YYYY-MM-DD')
           ageFilter = `${PATIENT_BIRTHDATE}=ge${date1}&${PATIENT_BIRTHDATE}=le${date2}`
         }
 
         fhirFilter = [
-          `${selectedCriterion.gender ? `${PATIENT_GENDER}=${selectedCriterion.gender.id}` : ''}`,
-          `${selectedCriterion.vitalStatus ? `${PATIENT_DECEASED}=${selectedCriterion.vitalStatus.id}` : ''}`,
+          `${
+            selectedCriterion.gender && selectedCriterion.gender.length > 0
+              ? `${PATIENT_GENDER}=${selectedCriterion.gender.map((gender: any) => gender.id).reduce(searchReducer)}`
+              : ''
+          }`,
+          `${
+            selectedCriterion.vitalStatus && selectedCriterion.vitalStatus.length > 0
+              ? `${PATIENT_DECEASED}=${selectedCriterion.vitalStatus
+                  .map((vitalStatus: any) => vitalStatus.id)
+                  .reduce(searchReducer)}`
+              : ''
+          }`,
           `${ageFilter ? `${ageFilter}` : ''}`
         ]
           .filter((elem) => elem)
@@ -95,8 +107,25 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
 
       case RESSOURCE_TYPE_ENCOUNTER: {
         let lengthFilter = ''
+        let multiplicator = 1
+        if (selectedCriterion.durationType) {
+          switch (selectedCriterion.durationType.id) {
+            case 'month':
+              multiplicator = 31
+              break
+            case 'year':
+              multiplicator = 365
+              break
+            default:
+              multiplicator = 1
+              break
+          }
+        }
+
         if (selectedCriterion.duration && selectedCriterion.duration !== [0, 100]) {
-          lengthFilter = `${ENCOUNTER_LENGTH}=ge${selectedCriterion.duration[0]}&${ENCOUNTER_LENGTH}=le${selectedCriterion.duration[1]}`
+          lengthFilter = `${ENCOUNTER_LENGTH}=ge${
+            +selectedCriterion.duration[0] * multiplicator
+          }&${ENCOUNTER_LENGTH}=le${+selectedCriterion.duration[1] * multiplicator}`
         }
 
         let ageFilter = ''
@@ -139,7 +168,13 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
 
         fhirFilter = [
           `${selectedCriterion.search ? `${COMPOSITION_TEXT}=${selectedCriterion.search}` : ''}`,
-          `${selectedCriterion.docType ? `${COMPOSITION_TYPE}=${selectedCriterion.docType.id}` : ''}`,
+          `${
+            selectedCriterion.docType && selectedCriterion.docType.length > 0
+              ? `${COMPOSITION_TYPE}=${selectedCriterion.docType
+                  .map((docType: any) => docType.id)
+                  .reduce(searchReducer)}`
+              : ''
+          }`,
           `${selectedCriterion.encounter ? `${COMPOSITION_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
           `${dateFilter ? `${dateFilter}` : ''}`
         ]
@@ -161,8 +196,18 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
         }
 
         fhirFilter = [
-          `${selectedCriterion.code ? `${CONDITION_CODE}=${selectedCriterion.code.id}` : ''}`,
-          `${selectedCriterion.diagnosticType ? `${CONDITION_TYPE}=${selectedCriterion.diagnosticType.id}` : ''}`,
+          `${
+            selectedCriterion.code && selectedCriterion.code.length > 0
+              ? `${CONDITION_CODE}=${selectedCriterion.code.map((code: any) => code.id).reduce(searchReducer)}`
+              : ''
+          }`,
+          `${
+            selectedCriterion.diagnosticType && selectedCriterion.diagnosticType.length > 0
+              ? `${CONDITION_TYPE}=${selectedCriterion.diagnosticType
+                  .map((diagnosticType: any) => diagnosticType.id)
+                  .reduce(searchReducer)}`
+              : ''
+          }`,
           `${selectedCriterion.encounter ? `${CONDITION_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
           `${dateFilter ? `${dateFilter}` : ''}`
         ]
@@ -184,7 +229,13 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
         }
 
         fhirFilter = [
-          `${selectedCriterion.code ? `${PROCEDURE_CODE}=${selectedCriterion.code.id}` : ''}`,
+          `${
+            selectedCriterion.code && selectedCriterion.code.length > 0
+              ? `${PROCEDURE_CODE}=${selectedCriterion.code
+                  .map((diagnosticType: any) => diagnosticType.id)
+                  .reduce(searchReducer)}`
+              : ''
+          }`,
           `${selectedCriterion.encounter ? `${PROCEDURE_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
           `${dateFilter ? `${dateFilter}` : ''}`
         ]
@@ -206,7 +257,13 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
         }
 
         fhirFilter = [
-          `${selectedCriterion.code ? `${CLAIM_CODE}=${selectedCriterion.code.id}` : ''}`,
+          `${
+            selectedCriterion.code && selectedCriterion.code.length > 0
+              ? `${CLAIM_CODE}=${selectedCriterion.code
+                  .map((diagnosticType: any) => diagnosticType.id)
+                  .reduce(searchReducer)}`
+              : ''
+          }`,
           `${selectedCriterion.encounter ? `${CLAIM_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
           `${dateFilter ? `${CLAIM_DATE}=${dateFilter}` : ''}`
         ]
@@ -264,27 +321,64 @@ export async function unbuildRequest(json: string) {
               return
             } else {
               currentCriterion.title = 'Critère démographique'
+              currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
               currentCriterion.years = currentCriterion.years ? currentCriterion.years : null
-              currentCriterion.gender = currentCriterion.gender ? currentCriterion.gender : null
-              currentCriterion.vitalStatus = currentCriterion.vitalStatus ? currentCriterion.vitalStatus : null
+              currentCriterion.gender = currentCriterion.gender ? currentCriterion.gender : []
+              currentCriterion.vitalStatus = currentCriterion.vitalStatus ? currentCriterion.vitalStatus : []
               switch (key) {
                 case PATIENT_BIRTHDATE: {
+                  currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
                   currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
+                  const ageType = [
+                    { id: 'year', label: 'années' },
+                    { id: 'month', label: 'mois' },
+                    { id: 'day', label: 'jours' }
+                  ]
+
                   if (value?.search('ge') === 0) {
                     const date = value?.replace('ge', '') ? moment(value?.replace('ge', ''), 'YYYY-MM-DD') : null
-                    currentCriterion.years[1] = date ? moment().diff(date, 'years') : 0
+                    const diff = date ? moment().diff(date, 'days') : 0
+
+                    let currentAgeType: 'year' | 'month' | 'day' = 'year'
+                    if (diff >= 130 && diff <= 3000) {
+                      currentAgeType = 'month'
+                    } else if (diff <= 130) {
+                      currentAgeType = 'day'
+                    }
+
+                    const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
+                    currentCriterion.ageType = foundAgeType
+                    if (date) currentCriterion.years[1] = moment().diff(date, currentAgeType) || 130
                   } else if (value?.search('le') === 0) {
                     const date = value?.replace('le', '') ? moment(value?.replace('le', ''), 'YYYY-MM-DD') : null
-                    currentCriterion.years[0] = date ? moment().diff(date, 'years') : 130
+                    const diff = date ? moment().diff(date, 'days') : 0
+
+                    let currentAgeType: 'year' | 'month' | 'day' = 'year'
+                    if (currentCriterion.ageType) {
+                      currentAgeType = currentCriterion.ageType.id
+                    } else {
+                      if (diff >= 130 && diff <= 3000) {
+                        currentAgeType = 'month'
+                      } else if (diff <= 130) {
+                        currentAgeType = 'day'
+                      }
+                      const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
+                      currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : foundAgeType
+                    }
+                    currentCriterion.years[0] = moment().diff(date, currentAgeType) || 0
                   }
                   break
                 }
-                case PATIENT_GENDER:
-                  currentCriterion.gender = { id: value }
+                case PATIENT_GENDER: {
+                  const genderIds = value?.split(',')
+                  currentCriterion.gender = genderIds?.map((genderId: any) => ({ id: genderId }))
                   break
-                case PATIENT_DECEASED:
-                  currentCriterion.vitalStatus = { id: !!value }
+                }
+                case PATIENT_DECEASED: {
+                  const vitalStatusIds = value?.split(',')
+                  currentCriterion.vitalStatus = vitalStatusIds?.map((vitalStatusId: any) => ({ id: vitalStatusId }))
                   break
+                }
                 default:
                   break
               }
@@ -299,21 +393,39 @@ export async function unbuildRequest(json: string) {
 
           currentCriterion.title = 'Critère de prise en charge'
           currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : null
-          currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : null
-          currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : null
-          currentCriterion.exitMode = currentCriterion.exitMode ? currentCriterion.exitMode : null
-          currentCriterion.fileStatus = currentCriterion.fileStatus ? currentCriterion.fileStatus : null
+          currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : []
+          currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : []
+          currentCriterion.exitMode = currentCriterion.exitMode ? currentCriterion.exitMode : []
+          currentCriterion.fileStatus = currentCriterion.fileStatus ? currentCriterion.fileStatus : []
 
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
               case ENCOUNTER_LENGTH: {
+                const ageType = [
+                  { id: 'year', label: 'années' },
+                  { id: 'month', label: 'mois' },
+                  { id: 'day', label: 'jours' }
+                ]
+
                 currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [0, 130]
                 if (value?.search('ge') === 0) {
-                  currentCriterion.duration[0] = value?.replace('ge', '') || 0
+                  currentCriterion.duration[0] = +value?.replace('ge', '') || 0
                 } else if (value?.search('le') === 0) {
-                  currentCriterion.duration[1] = value?.replace('le', '') || 130
+                  currentCriterion.duration[1] = +value?.replace('le', '') || 130
+                }
+
+                if (currentCriterion.duration[1] % 31 === 0) {
+                  currentCriterion.durationType = ageType[1]
+                  currentCriterion.duration[0] = currentCriterion.duration[0] / 31
+                  currentCriterion.duration[1] = currentCriterion.duration[1] / 31
+                } else if (currentCriterion.duration[1] % 365 === 0) {
+                  currentCriterion.durationType = ageType[0]
+                  currentCriterion.duration[0] = currentCriterion.duration[0] / 365
+                  currentCriterion.duration[1] = currentCriterion.duration[1] / 365
+                } else {
+                  currentCriterion.durationType = ageType[2]
                 }
                 break
               }
@@ -386,7 +498,7 @@ export async function unbuildRequest(json: string) {
 
           currentCriterion.title = 'Critère de document'
           currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
-          currentCriterion.docType = currentCriterion.docType ? currentCriterion.docType : null
+          currentCriterion.docType = currentCriterion.docType ? currentCriterion.docType : []
           currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
@@ -398,9 +510,11 @@ export async function unbuildRequest(json: string) {
               case COMPOSITION_TEXT:
                 currentCriterion.search = value
                 break
-              case COMPOSITION_TYPE:
-                currentCriterion.docType = { id: value }
+              case COMPOSITION_TYPE: {
+                const docTypeIds = value?.split(',')
+                currentCriterion.docType = docTypeIds?.map((docTypeId: any) => ({ id: docTypeId }))
                 break
+              }
               case COMPOSITION_ENCOUNTER:
                 currentCriterion.encounter = value
                 break
@@ -424,8 +538,8 @@ export async function unbuildRequest(json: string) {
           const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de diagnostic'
-          currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
-          currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : null
+          currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
+          currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : []
           currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
@@ -434,12 +548,18 @@ export async function unbuildRequest(json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
-              case CONDITION_CODE:
-                currentCriterion.code = { id: value }
+              case CONDITION_CODE: {
+                const codeIds = value?.split(',')
+                currentCriterion.code = codeIds?.map((codeId: any) => ({ id: codeId }))
                 break
-              case CONDITION_TYPE:
-                currentCriterion.diagnosticType = { id: value }
+              }
+              case CONDITION_TYPE: {
+                const diagnosticTypeIds = value?.split(',')
+                currentCriterion.diagnosticType = diagnosticTypeIds?.map((diagnosticTypeId: any) => ({
+                  id: diagnosticTypeId
+                }))
                 break
+              }
               case CONDITION_ENCOUNTER:
                 currentCriterion.encounter = value
                 break
@@ -463,8 +583,8 @@ export async function unbuildRequest(json: string) {
           const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = "Critères d'actes CCAM"
-          currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
-          currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : null
+          currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
+          currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : []
           currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
@@ -473,9 +593,11 @@ export async function unbuildRequest(json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
-              case PROCEDURE_CODE:
-                currentCriterion.code = { id: value }
+              case PROCEDURE_CODE: {
+                const codeIds = value?.split(',')
+                currentCriterion.code = codeIds?.map((codeId: any) => ({ id: codeId }))
                 break
+              }
               case PROCEDURE_ENCOUNTER:
                 currentCriterion.encounter = value
                 break
@@ -499,7 +621,7 @@ export async function unbuildRequest(json: string) {
           const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de GHM'
-          currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
+          currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
           currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
@@ -508,9 +630,11 @@ export async function unbuildRequest(json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
-              case CLAIM_CODE:
-                currentCriterion.code = { id: value }
+              case CLAIM_CODE: {
+                const codeIds = value?.split(',')
+                currentCriterion.code = codeIds?.map((codeId: any) => ({ id: codeId }))
                 break
+              }
               case CLAIM_ENCOUNTER:
                 currentCriterion.encounter = value
                 break
@@ -564,4 +688,59 @@ export async function unbuildRequest(json: string) {
     population,
     criteria
   }
+}
+
+export const getDataFromFetch = async (_criteria: any, selectedCriteria: SelectedCriteriaType[]) => {
+  for (const _criterion of _criteria) {
+    if (_criterion.fetch) {
+      if (!_criterion.data) _criterion.data = {}
+      const fetchKeys = Object.keys(_criterion.fetch)
+      for (const fetchKey of fetchKeys) {
+        const dataKey = fetchKey.replace('fetch', '').replace(/(\b[A-Z])(?![A-Z])/g, ($1) => $1.toLowerCase())
+        const currentSelectedCriteria = selectedCriteria.filter(
+          (selectedCriterion: SelectedCriteriaType) => selectedCriterion.type === _criterion.id
+        )
+        switch (dataKey) {
+          case 'ghmData':
+          case 'ccamData':
+          case 'cim10Diagnostic':
+            if (_criterion.data[dataKey] === 'loading') _criterion.data[dataKey] = []
+
+            if (currentSelectedCriteria) {
+              for (const currentSelectedCriterion of currentSelectedCriteria) {
+                if (
+                  currentSelectedCriterion &&
+                  currentSelectedCriterion.code &&
+                  currentSelectedCriterion.code.length > 0
+                ) {
+                  for (const code of currentSelectedCriterion.code) {
+                    const allreadyHere = _criterion.data[dataKey]
+                      ? _criterion.data[dataKey].find((data: any) => data.id === code?.id)
+                      : undefined
+
+                    if (!allreadyHere) {
+                      _criterion.data[dataKey] = [
+                        ..._criterion.data[dataKey],
+                        ...(await _criterion.fetch[fetchKey](code?.id))
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+            break
+          default:
+            if (_criterion.data[dataKey] === 'loading') {
+              _criterion.data[dataKey] = await _criterion.fetch[fetchKey]()
+            }
+            break
+        }
+      }
+    }
+    _criterion.subItems =
+      _criterion.subItems && _criterion.subItems.length > 0
+        ? await getDataFromFetch(_criterion.subItems, selectedCriteria)
+        : []
+  }
+  return _criteria
 }

@@ -95,7 +95,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
       startDate,
       endDate,
       groupId,
-      encounters?.map((encounter) => encounter.id ?? '').filter((id) => id !== '')
+      encounters?.map((encounter: any) => encounter.id ?? '').filter((id: string) => id !== '')
     )
       .then((result) => {
         if (result) {

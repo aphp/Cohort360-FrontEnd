@@ -23,7 +23,6 @@ import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
 import { ReactComponent as Star } from '../../../assets/icones/star.svg'
 import { ReactComponent as StarFull } from '../../../assets/icones/star full.svg'
 
-import { onRemoveCohort } from '../../../services/savedResearches'
 import { FormattedCohort } from 'types'
 
 import displayDigit from 'utils/displayDigit'
@@ -44,7 +43,7 @@ type ResearchTableProps = {
   simplified?: boolean
   onClickRow?: Function
   researchData?: FormattedCohort[]
-  onSetCohortFavorite: Function
+  onSetCohortFavorite: (cohortId: string) => void
   onDeleteCohort: Function
 }
 const ResearchTable: React.FC<ResearchTableProps> = ({
@@ -61,12 +60,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   const history = useHistory()
 
   const removeCohort = () => {
-    onRemoveCohort(selectedCohort)
     onDeleteCohort(selectedCohort)
-  }
-
-  const handleSetFavorite = (researchId: string, favoriteStatus: boolean) => {
-    onSetCohortFavorite(researchId, favoriteStatus)
   }
 
   const handleClickOpenDialog = () => {
@@ -118,9 +112,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                   <TableCell className={classes.tableHeadCell} align="center">
                     Statut
                   </TableCell>
-                  <TableCell className={classes.tableHeadCell} align="center">
+                  {/* <TableCell className={classes.tableHeadCell} align="center">
                     Périmètre
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell align="center" className={classes.tableHeadCell}>
                     Nombre de patients
                   </TableCell>
@@ -150,7 +144,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                     <TableCell className={classes.status} align="center">
                       {row.status}
                     </TableCell>
-                    <TableCell align="center">{row.perimeter}</TableCell>
+                    {/* <TableCell align="center">{row.perimeter}</TableCell> */}
                     <TableCell align="center">{displayDigit(row.nPatients ?? 0)}</TableCell>
                     <TableCell align="center">
                       {row.date && (
@@ -167,8 +161,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       <IconButton
                         onClick={(event) => {
                           event.stopPropagation()
-                          // @ts-ignore
-                          handleSetFavorite(row.researchId, row.favorite)
+                          onSetCohortFavorite(row.researchId)
                         }}
                       >
                         <FavStar favorite={row.favorite} />

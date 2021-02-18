@@ -161,7 +161,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
               deceased={patient.deceasedDateTime ?? patient.deceasedBoolean}
               ipp={
                 deidentifiedBoolean
-                  ? `ID Technique: ${patient.id}`
+                  ? `IPP chiffré: ${patient.id}`
                   : `IPP: ${
                       patient.identifier?.find((identifier) => identifier.type?.coding?.[0].code === 'IPP')?.value ??
                       'inconnu'

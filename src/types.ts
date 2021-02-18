@@ -48,6 +48,10 @@ export type CohortComposition = IComposition & {
   NDA?: string
 }
 
+export type CohortEncounter = IEncounter & {
+  documents?: CohortComposition[]
+}
+
 export type CohortPatient = IPatient & {
   lastEncounter?: IEncounter
   lastEncounterName?: string
@@ -61,6 +65,7 @@ export type CohortPatient = IPatient & {
 }
 
 export type PMSIEntry<T extends IProcedure | ICondition | IClaim> = T & {
+  documents?: (CohortComposition | IDocumentReference)[]
   serviceProvider?: string
   NDA?: string
 }
@@ -199,7 +204,7 @@ export type CohortData = {
 
 export type PatientData = {
   patient?: CohortPatient
-  hospit?: IEncounter[]
+  hospit?: (CohortEncounter | IEncounter)[]
   documents?: (CohortComposition | IDocumentReference)[]
   documentsTotal?: number
   consult?: PMSIEntry<IProcedure>[]
@@ -224,20 +229,21 @@ export type CriteriaItemType = {
 export type SelectedCriteriaType = {
   type: 'Patient' | 'Encounter' | 'Claim' | 'Procedure' | 'Condition' | 'Composition'
   title: string
-  code?: { id: string; label: string }
-  diagnosticType?: { id: string; label: string }
+  code?: { id: string; label: string }[]
+  diagnosticType?: { id: string; label: string }[]
   encounter: number
   comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
-  gender?: { id: string; label: string }
-  vitalStatus?: { id: string; label: string }
+  gender?: { id: string; label: string }[]
+  vitalStatus?: { id: string; label: string }[]
   years?: [number, number]
   search?: string
-  docType?: { id: '55188-7' | '11336-5' | '57833-6'; label: string }
+  docType?: { id: string; label: string }[]
   occurence?: number
   ageType?: { id: string; label: string }
+  durationType?: { id: string; label: string }
   duration?: [number, number]
   admissionMode?: { id: string; label: string }
   entryMode?: { id: string; label: string }
@@ -248,7 +254,7 @@ export type SelectedCriteriaType = {
 export type CcamDataType = {
   title: string
   hierarchy: undefined
-  code: { id: string; label: string } | null
+  code: { id: string; label: string }[] | null
   encounter: number
   comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
@@ -258,7 +264,7 @@ export type CcamDataType = {
 
 export type Cim10DataType = {
   title: string
-  code: { id: string; label: string } | null
+  code: { id: string; label: string }[] | null
   diagnosticType: { id: string; label: string } | null
   encounter: number
   comparator: { id: 'le' | 'e' | 'ge'; label: string }
@@ -270,7 +276,9 @@ export type Cim10DataType = {
 export type DemographicDataType = {
   title: string
   gender: { id: string; label: string } | null
-  vitalStatus: { id: string; label: string } | null
+  vitalStatus: { id: string; label: string }[] | null
+  ageType: { id: string; label: string }[] | null
+  label: undefined
   years: [number, number]
 }
 
@@ -287,7 +295,7 @@ export type DocumentDataType = {
 
 export type GhmDataType = {
   title: string
-  code: { id: string; label: string } | null
+  code: { id: string; label: string }[] | null
   encounter: number
   comparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
@@ -297,9 +305,11 @@ export type GhmDataType = {
 
 export type EncounterDataType = {
   label: undefined
+  label2: undefined
   title: string
-  ageType: string
+  ageType: { id: string; label: string } | null
   years: [number, number]
+  durationType: { id: string; label: string }
   duration: [number, number]
   admissionMode: { id: string; label: string } | null
   entryMode: { id: string; label: string } | null
@@ -309,10 +319,16 @@ export type EncounterDataType = {
 
 export type CohortCreationCounterType = {
   uuid?: string
-  includePatient?: number | 'loading'
-  byrequest?: number | 'loading'
-  alive?: number | 'loading'
-  deceased?: number | 'loading'
-  female?: number | 'loading'
-  male?: number | 'loading'
+  includePatient?: number
+  byrequest?: number
+  alive?: number
+  deceased?: number
+  female?: number
+  male?: number
+}
+
+export type CohortCreationSnapshotType = {
+  uuid: string
+  json: string
+  date: string
 }

@@ -33,8 +33,6 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
     onChangeSelectedCriteria({
       title: data.title,
       code: data.code,
-      // encounter: data.encounter,
-      // comparator: data.comparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Claim'
@@ -75,11 +73,13 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             },
             {
               name: 'code',
-              label: 'GHM 10 Diag Code',
+              label: 'Code GHM',
               variant: 'outlined',
               type: 'autocomplete',
+              multiple: true,
               autocompleteOptions: criteria?.data?.ghmData || [],
-              getAutocompleteOptions: getGhmOptions
+              getAutocompleteOptions: getGhmOptions,
+              noOptionsText: 'Veuillez entrer un code ou un critère GHM'
             }
             // {
             //   type: 'custom',
