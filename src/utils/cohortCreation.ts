@@ -86,8 +86,18 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
         }
 
         fhirFilter = [
-          `${selectedCriterion.gender ? `${PATIENT_GENDER}=${selectedCriterion.gender.id}` : ''}`,
-          `${selectedCriterion.vitalStatus ? `${PATIENT_DECEASED}=${selectedCriterion.vitalStatus.id}` : ''}`,
+          `${
+            selectedCriterion.gender && selectedCriterion.gender.length > 0
+              ? `${PATIENT_GENDER}=${selectedCriterion.gender.map((gender: any) => gender.id).reduce(searchReducer)}`
+              : ''
+          }`,
+          `${
+            selectedCriterion.vitalStatus && selectedCriterion.vitalStatus.length > 0
+              ? `${PATIENT_DECEASED}=${selectedCriterion.vitalStatus
+                  .map((vitalStatus: any) => vitalStatus.id)
+                  .reduce(searchReducer)}`
+              : ''
+          }`,
           `${ageFilter ? `${ageFilter}` : ''}`
         ]
           .filter((elem) => elem)
@@ -158,7 +168,13 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
 
         fhirFilter = [
           `${selectedCriterion.search ? `${COMPOSITION_TEXT}=${selectedCriterion.search}` : ''}`,
-          `${selectedCriterion.docType ? `${COMPOSITION_TYPE}=${selectedCriterion.docType.id}` : ''}`,
+          `${
+            selectedCriterion.docType && selectedCriterion.docType.length > 0
+              ? `${COMPOSITION_TYPE}=${selectedCriterion.docType
+                  .map((docType: any) => docType.id)
+                  .reduce(searchReducer)}`
+              : ''
+          }`,
           `${selectedCriterion.encounter ? `${COMPOSITION_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
           `${dateFilter ? `${dateFilter}` : ''}`
         ]
@@ -180,8 +196,18 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
         }
 
         fhirFilter = [
-          `${selectedCriterion.code ? `${CONDITION_CODE}=${selectedCriterion.code.id}` : ''}`,
-          `${selectedCriterion.diagnosticType ? `${CONDITION_TYPE}=${selectedCriterion.diagnosticType.id}` : ''}`,
+          `${
+            selectedCriterion.code && selectedCriterion.code.length > 0
+              ? `${CONDITION_CODE}=${selectedCriterion.code.map((code: any) => code.id).reduce(searchReducer)}`
+              : ''
+          }`,
+          `${
+            selectedCriterion.diagnosticType && selectedCriterion.diagnosticType.length > 0
+              ? `${CONDITION_TYPE}=${selectedCriterion.diagnosticType
+                  .map((diagnosticType: any) => diagnosticType.id)
+                  .reduce(searchReducer)}`
+              : ''
+          }`,
           `${selectedCriterion.encounter ? `${CONDITION_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
           `${dateFilter ? `${dateFilter}` : ''}`
         ]
@@ -203,7 +229,13 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
         }
 
         fhirFilter = [
-          `${selectedCriterion.code ? `${PROCEDURE_CODE}=${selectedCriterion.code.id}` : ''}`,
+          `${
+            selectedCriterion.code && selectedCriterion.code.length > 0
+              ? `${PROCEDURE_CODE}=${selectedCriterion.code
+                  .map((diagnosticType: any) => diagnosticType.id)
+                  .reduce(searchReducer)}`
+              : ''
+          }`,
           `${selectedCriterion.encounter ? `${PROCEDURE_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
           `${dateFilter ? `${dateFilter}` : ''}`
         ]
@@ -225,7 +257,13 @@ export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
         }
 
         fhirFilter = [
-          `${selectedCriterion.code ? `${CLAIM_CODE}=${selectedCriterion.code.id}` : ''}`,
+          `${
+            selectedCriterion.code && selectedCriterion.code.length > 0
+              ? `${CLAIM_CODE}=${selectedCriterion.code
+                  .map((diagnosticType: any) => diagnosticType.id)
+                  .reduce(searchReducer)}`
+              : ''
+          }`,
           `${selectedCriterion.encounter ? `${CLAIM_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
           `${dateFilter ? `${CLAIM_DATE}=${dateFilter}` : ''}`
         ]
@@ -331,12 +369,16 @@ export async function unbuildRequest(json: string) {
                   }
                   break
                 }
-                case PATIENT_GENDER:
-                  currentCriterion.gender = { id: value }
+                case PATIENT_GENDER: {
+                  const genderIds = value?.split(',')
+                  currentCriterion.gender = genderIds?.map((genderId: any) => ({ id: genderId }))
                   break
-                case PATIENT_DECEASED:
-                  currentCriterion.vitalStatus = { id: !!value }
+                }
+                case PATIENT_DECEASED: {
+                  const vitalStatusIds = value?.split(',')
+                  currentCriterion.vitalStatus = vitalStatusIds?.map((vitalStatusId: any) => ({ id: vitalStatusId }))
                   break
+                }
                 default:
                   break
               }
@@ -468,9 +510,11 @@ export async function unbuildRequest(json: string) {
               case COMPOSITION_TEXT:
                 currentCriterion.search = value
                 break
-              case COMPOSITION_TYPE:
-                currentCriterion.docType = { id: value }
+              case COMPOSITION_TYPE: {
+                const docTypeIds = value?.split(',')
+                currentCriterion.docType = docTypeIds?.map((docTypeId: any) => ({ id: docTypeId }))
                 break
+              }
               case COMPOSITION_ENCOUNTER:
                 currentCriterion.encounter = value
                 break
@@ -504,12 +548,18 @@ export async function unbuildRequest(json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
-              case CONDITION_CODE:
-                currentCriterion.code = { id: value }
+              case CONDITION_CODE: {
+                const codeIds = value?.split(',')
+                currentCriterion.code = codeIds?.map((codeId: any) => ({ id: codeId }))
                 break
-              case CONDITION_TYPE:
-                currentCriterion.diagnosticType = { id: value }
+              }
+              case CONDITION_TYPE: {
+                const diagnosticTypeIds = value?.split(',')
+                currentCriterion.diagnosticType = diagnosticTypeIds?.map((diagnosticTypeId: any) => ({
+                  id: diagnosticTypeId
+                }))
                 break
+              }
               case CONDITION_ENCOUNTER:
                 currentCriterion.encounter = value
                 break
@@ -543,9 +593,11 @@ export async function unbuildRequest(json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
-              case PROCEDURE_CODE:
-                currentCriterion.code = { id: value }
+              case PROCEDURE_CODE: {
+                const codeIds = value?.split(',')
+                currentCriterion.code = codeIds?.map((codeId: any) => ({ id: codeId }))
                 break
+              }
               case PROCEDURE_ENCOUNTER:
                 currentCriterion.encounter = value
                 break
@@ -578,9 +630,11 @@ export async function unbuildRequest(json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
-              case CLAIM_CODE:
-                currentCriterion.code = { id: value }
+              case CLAIM_CODE: {
+                const codeIds = value?.split(',')
+                currentCriterion.code = codeIds?.map((codeId: any) => ({ id: codeId }))
                 break
+              }
               case CLAIM_ENCOUNTER:
                 currentCriterion.encounter = value
                 break

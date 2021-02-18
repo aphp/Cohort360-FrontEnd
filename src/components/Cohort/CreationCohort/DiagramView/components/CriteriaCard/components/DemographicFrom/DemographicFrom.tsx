@@ -18,8 +18,8 @@ type DemographicFormProps = {
 
 const defaultDemographic = {
   title: 'Critère démographique',
-  vitalStatus: null,
-  gender: null,
+  vitalStatus: [],
+  gender: [],
   ageType: { id: 'year', label: 'années' },
   years: [0, 130]
 }
@@ -82,6 +82,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
               label: 'Genre',
               variant: 'outlined',
               type: 'autocomplete',
+              multiple: true,
               autocompleteOptions: criteria?.data?.gender || []
             },
             {
@@ -89,13 +90,14 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
               variant: 'outlined',
               label: 'Status vital',
               type: 'autocomplete',
+              multiple: true,
               autocompleteOptions: criteria?.data?.status || []
             },
             {
               type: 'custom',
               name: 'label',
               renderInput: () => (
-                <FormLabel style={{ padding: '0 1em' }} component="legend">
+                <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
                   Fourchette d'âge :
                 </FormLabel>
               )
@@ -109,7 +111,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
                 {
                   name: 'years',
                   type: 'slider',
-                  valueLabelDisplay: 'auto',
+                  valueLabelDisplay: 'on',
                   min: 0,
                   max: 130
                 },
