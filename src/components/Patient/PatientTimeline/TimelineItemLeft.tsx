@@ -4,6 +4,7 @@ import { Chip } from '@material-ui/core'
 
 import useStyles from './styles'
 import { IEncounter } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { CohortEncounter } from 'types'
 
 /**
  * @usage
@@ -11,7 +12,7 @@ import { IEncounter } from '@ahryman40k/ts-fhir-types/lib/R4'
  */
 
 type TimelineItemLeftTypes = {
-  data: IEncounter
+  data: CohortEncounter
   open: (encounter?: IEncounter) => void
   dotHeight: number
 }
@@ -44,9 +45,11 @@ const TimelineItemLeft: React.FC<TimelineItemLeftTypes> = ({ data, open, dotHeig
       <li className={classes.timelineItem}>
         <Card className={classes.leftHospitCard} variant="outlined">
           <div>
-            <span className={classes.detailsButton} onClick={() => open(data)}>
-              + de détails
-            </span>
+            {data.documents && data.documents.length > 0 && (
+              <span className={classes.detailsButton} onClick={() => open(data)}>
+                + de détails
+              </span>
+            )}
             {data.serviceProvider?.display && (
               <Chip label={data.serviceProvider.display} size="small" className={classes.chip} />
             )}

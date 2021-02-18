@@ -12,7 +12,7 @@ import HospitDialog from './HospitDialog/HospitDialog'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 
 import { getEncounterOrProcedureDocs } from 'services/patient'
-import { CohortComposition, PMSIEntry } from 'types'
+import { CohortComposition, CohortEncounter, PMSIEntry } from 'types'
 import { IEncounter, IProcedure, IDocumentReference, IPeriod } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import useStyles from './styles'
@@ -23,7 +23,7 @@ type MonthVisit = {
   hospit: {
     start?: string
     end?: string
-    data: IEncounter
+    data: IEncounter | CohortEncounter
   }[]
   consult: {
     start?: string
