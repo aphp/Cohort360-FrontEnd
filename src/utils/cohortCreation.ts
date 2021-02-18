@@ -531,7 +531,11 @@ export async function unbuildRequest(_json: string) {
                 }
                 case PATIENT_DECEASED: {
                   const vitalStatusIds = value?.split(',')
-                  const newVitalStatusIds = vitalStatusIds?.map((vitalStatusId: any) => ({ id: !!vitalStatusId }))
+
+                  // Warning with `id: vitalStatusId === 'true'` ....
+                  const newVitalStatusIds = vitalStatusIds?.map((vitalStatusId: any) => ({
+                    id: vitalStatusId === 'true'
+                  }))
                   if (!newVitalStatusIds) continue
 
                   currentCriterion.vitalStatus = currentCriterion.vitalStatus
