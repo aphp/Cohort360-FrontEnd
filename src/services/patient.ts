@@ -469,7 +469,7 @@ export const getPatientsFromCohortId = async (cohortId: string): Promise<IPatien
 }
 
 export const getEncounterOrProcedureDocs = async (
-  data: IEncounter | IProcedure
+  data: CohortEncounter | PMSIEntry<IProcedure>
 ): Promise<(CohortComposition | IDocumentReference)[]> => {
   if (CONTEXT === 'arkhn') {
     let documents: (CohortComposition | IDocumentReference)[] = []
@@ -499,21 +499,7 @@ export const getEncounterOrProcedureDocs = async (
   }
 
   if (CONTEXT === 'aphp') {
-    let encounterId
-    if (data.resourceType === 'Encounter') {
-      encounterId = data.id
-    } else if (data.resourceType === 'Procedure') {
-      encounterId = data.encounter?.reference
-    }
-
-    const documentsResp = await api.get<FHIR_API_Response<IComposition>>(
-      `/Composition?encounter=${encounterId}&status=final&_elements=encounter,date,type,title,status`
-    )
-
-    //TO DO when deidentified data are fixed: change true to real value
-    const documentsList = await fillNDAAndServiceProviderDocs(true, getApiResponseResources(documentsResp))
-
-    if (documentsList) return documentsList
+    return data.documents ?? []
   }
   return []
 }
