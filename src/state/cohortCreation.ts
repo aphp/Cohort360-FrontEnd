@@ -139,6 +139,7 @@ const buildCreationCohort = createAsyncThunk<
     }
   } catch (error) {
     console.error(error)
+    throw error
   }
 })
 
@@ -168,6 +169,7 @@ const unbuildCreationCohort = createAsyncThunk<
     }
   } catch (error) {
     console.error(error)
+    throw error
   }
 })
 

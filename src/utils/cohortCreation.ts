@@ -45,7 +45,9 @@ const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   title: '',
   gender: [],
   vitalStatus: [],
-  years: [0, 130]
+  years: [0, 130],
+  ageType: { id: 'year', label: 'En année' },
+  label: undefined
 }
 
 const DEFAULT_GROUP_ERROR: CriteriaGroupType = {
@@ -450,7 +452,6 @@ export async function unbuildRequest(_json: string) {
   }
 
   const _retrieveInformationFromJson = async (element: RequeteurCriteriaType) => {
-    console.log('element', element)
     const currentCriterion: any = {
       id: element._id,
       type: element.resourceType,
@@ -530,7 +531,7 @@ export async function unbuildRequest(_json: string) {
                 }
                 case PATIENT_DECEASED: {
                   const vitalStatusIds = value?.split(',')
-                  const newVitalStatusIds = vitalStatusIds?.map((vitalStatusId: any) => ({ id: vitalStatusId }))
+                  const newVitalStatusIds = vitalStatusIds?.map((vitalStatusId: any) => ({ id: !!vitalStatusId }))
                   if (!newVitalStatusIds) continue
 
                   currentCriterion.vitalStatus = currentCriterion.vitalStatus
