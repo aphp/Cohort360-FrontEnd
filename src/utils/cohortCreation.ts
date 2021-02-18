@@ -323,8 +323,8 @@ export async function unbuildRequest(json: string) {
               currentCriterion.title = 'Critère démographique'
               currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
               currentCriterion.years = currentCriterion.years ? currentCriterion.years : null
-              currentCriterion.gender = currentCriterion.gender ? currentCriterion.gender : null
-              currentCriterion.vitalStatus = currentCriterion.vitalStatus ? currentCriterion.vitalStatus : null
+              currentCriterion.gender = currentCriterion.gender ? currentCriterion.gender : []
+              currentCriterion.vitalStatus = currentCriterion.vitalStatus ? currentCriterion.vitalStatus : []
               switch (key) {
                 case PATIENT_BIRTHDATE: {
                   currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
@@ -393,10 +393,10 @@ export async function unbuildRequest(json: string) {
 
           currentCriterion.title = 'Critère de prise en charge'
           currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : null
-          currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : null
-          currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : null
-          currentCriterion.exitMode = currentCriterion.exitMode ? currentCriterion.exitMode : null
-          currentCriterion.fileStatus = currentCriterion.fileStatus ? currentCriterion.fileStatus : null
+          currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : []
+          currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : []
+          currentCriterion.exitMode = currentCriterion.exitMode ? currentCriterion.exitMode : []
+          currentCriterion.fileStatus = currentCriterion.fileStatus ? currentCriterion.fileStatus : []
 
           for (const filter of filters) {
             const key = filter ? filter[0] : null
@@ -498,7 +498,7 @@ export async function unbuildRequest(json: string) {
 
           currentCriterion.title = 'Critère de document'
           currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
-          currentCriterion.docType = currentCriterion.docType ? currentCriterion.docType : null
+          currentCriterion.docType = currentCriterion.docType ? currentCriterion.docType : []
           currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
@@ -538,8 +538,8 @@ export async function unbuildRequest(json: string) {
           const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de diagnostic'
-          currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
-          currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : null
+          currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
+          currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : []
           currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
@@ -583,8 +583,8 @@ export async function unbuildRequest(json: string) {
           const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = "Critères d'actes CCAM"
-          currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
-          currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : null
+          currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
+          currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : []
           currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
@@ -621,7 +621,7 @@ export async function unbuildRequest(json: string) {
           const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de GHM'
-          currentCriterion.code = currentCriterion.code ? currentCriterion.code : null
+          currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
           currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
