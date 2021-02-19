@@ -13,6 +13,9 @@ import {
   fetchAdmissionModes,
   fetchEntryModes,
   fetchExitModes,
+  fetchPriseEnChargeType,
+  fetchTypeDeSejour,
+  fetchOnSaitPas,
   fetchFileStatus
 } from '../../../services/cohortCreation/fetchEncounter'
 import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetchDemographic'
@@ -63,8 +66,24 @@ const criteriaList: CriteriaItemType[] = [
     title: 'Visites',
     color: '#0063AF',
     components: SupportedForm,
-    data: { admissionModes: 'loading', entryModes: 'loading', exitModes: 'loading', fileStatus: 'loading' },
-    fetch: { fetchAdmissionModes, fetchEntryModes, fetchExitModes, fetchFileStatus }
+    data: {
+      admissionModes: 'loading',
+      entryModes: 'loading',
+      exitModes: 'loading',
+      priseEnChargeType: 'loading',
+      typeDeSejour: 'loading',
+      onSaitPas: 'loading',
+      fileStatus: 'loading'
+    },
+    fetch: {
+      fetchAdmissionModes,
+      fetchEntryModes,
+      fetchExitModes,
+      fetchPriseEnChargeType,
+      fetchTypeDeSejour,
+      fetchOnSaitPas,
+      fetchFileStatus
+    }
   },
   {
     id: 'Composition',

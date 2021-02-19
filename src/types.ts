@@ -332,6 +332,9 @@ export type EncounterDataType = {
   admissionMode: { id: string; label: string } | null
   entryMode: { id: string; label: string } | null
   exitMode: { id: string; label: string } | null
+  priseEnChargeType: { id: string; label: string } | null
+  typeDeSejour: { id: string; label: string } | null
+  onSaitPas: { id: string; label: string } | null
   fileStatus: { id: string; label: string } | null
 }
 
