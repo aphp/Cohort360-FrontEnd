@@ -79,6 +79,87 @@ export const fakeExitModes = [
   }
 ]
 
+export const fakePriseEnCharge = [
+  {
+    code: '1',
+    display: 'prise en charge 1'
+  },
+  {
+    code: '2',
+    display: 'prise en charge 2'
+  },
+  {
+    code: '3',
+    display: 'prise en charge 3'
+  },
+  {
+    code: '4',
+    display: 'prise en charge 4'
+  },
+  {
+    code: '5',
+    display: 'prise en charge 5'
+  },
+  {
+    code: '6',
+    display: 'prise en charge 6'
+  }
+]
+
+export const fakeTypeDeSejour = [
+  {
+    code: '1',
+    display: 'type de séjour 1'
+  },
+  {
+    code: '2',
+    display: 'type de séjour 2'
+  },
+  {
+    code: '3',
+    display: 'type de séjour 3'
+  },
+  {
+    code: '4',
+    display: 'type de séjour 4'
+  },
+  {
+    code: '5',
+    display: 'type de séjour 5'
+  },
+  {
+    code: '6',
+    display: 'type de séjour 6'
+  }
+]
+
+export const fakeOnSaitPas = [
+  {
+    code: '1',
+    display: 'on sait pas 1'
+  },
+  {
+    code: '2',
+    display: 'on sait pas 2'
+  },
+  {
+    code: '3',
+    display: 'on sait pas 3'
+  },
+  {
+    code: '4',
+    display: 'on sait pas 4'
+  },
+  {
+    code: '5',
+    display: 'on sait pas 5'
+  },
+  {
+    code: '6',
+    display: 'on sait pas 6'
+  }
+]
+
 export const fakeFileStatus = [
   {
     code: '1',

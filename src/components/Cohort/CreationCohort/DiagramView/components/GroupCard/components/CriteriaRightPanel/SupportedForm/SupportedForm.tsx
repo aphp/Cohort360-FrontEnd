@@ -158,35 +158,56 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
                   ]
                 }
               ]
+            },
+            {
+              name: 'admissionMode',
+              variant: 'outlined',
+              label: "Mode d'admission",
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.admissionModes
+            },
+            {
+              name: 'entryMode',
+              variant: 'outlined',
+              label: "Mode d'entrée",
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.entryModes
+            },
+            {
+              name: 'exitMode',
+              variant: 'outlined',
+              label: 'Mode de sortie',
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.exitModes
+            },
+            {
+              name: 'priseEnChargeType',
+              variant: 'outlined',
+              label: 'Type de prise en charge',
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.priseEnChargeType
+            },
+            {
+              name: 'typeDeSejour',
+              variant: 'outlined',
+              label: 'Type de séjour',
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.typeDeSejour
+            },
+            {
+              name: 'onSaitPas',
+              variant: 'outlined',
+              label: '?????',
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.onSaitPas
+            },
+            {
+              name: 'fileStatus',
+              variant: 'outlined',
+              label: 'Statut Dossier',
+              type: 'autocomplete',
+              autocompleteOptions: criteria?.data?.fileStatus
             }
-            // {
-            //   name: 'admissionMode',
-            //   variant: 'outlined',
-            //   label: "Mode d'admission",
-            //   type: 'autocomplete',
-            //   autocompleteOptions: criteria?.data?.admissionModes
-            // },
-            // {
-            //   name: 'entryMode',
-            //   variant: 'outlined',
-            //   label: "Mode d'entrée",
-            //   type: 'autocomplete',
-            //   autocompleteOptions: criteria?.data?.entryModes
-            // },
-            // {
-            //   name: 'exitMode',
-            //   variant: 'outlined',
-            //   label: 'Mode de sortie',
-            //   type: 'autocomplete',
-            //   autocompleteOptions: criteria?.data?.exitModes
-            // },
-            // {
-            //   name: 'fileStatus',
-            //   variant: 'outlined',
-            //   label: 'Statut Dossier',
-            //   type: 'autocomplete',
-            //   autocompleteOptions: criteria?.data?.fileStatus
-            // }
           ]}
           submit={_onSubmit}
           formId="supported-form"
