@@ -1,4 +1,4 @@
-type ContextType = 'aphp' | 'arkhn'
+type ContextType = 'aphp' | 'arkhn' | 'fakedata'
 
 export const ID_TOKEN_STORAGE_KEY = 'ARKHN_ID_TOKEN'
 export const TOKEN_DATA_STORAGE_KEY = 'ARKHN_TOKEN_DATA'
@@ -23,8 +23,8 @@ export const API_RESOURCE_TAG = process.env.REACT_APP_DEV_API_RESOURCE_TAG
 export const CONTEXT = process.env.REACT_APP_CONTEXT as ContextType
 
 if (!CONTEXT) throw new Error('missing REACT_APP_CONTEXT from environment')
-if (CONTEXT !== 'arkhn' && CONTEXT !== 'aphp') {
-  throw new Error("REACT_APP_CONTEXT must be either 'aphp' or 'arkhn")
+if (CONTEXT !== 'arkhn' && CONTEXT !== 'aphp' && CONTEXT !== 'fakedata') {
+  throw new Error("REACT_APP_CONTEXT must be either 'aphp', 'fakedata' or 'arkhn")
 }
 export const ACCES_TOKEN = 'access'
 export const REFRESH_TOKEN = 'refresh'

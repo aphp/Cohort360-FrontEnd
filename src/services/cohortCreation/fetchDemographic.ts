@@ -1,19 +1,44 @@
+import { CONTEXT } from '../../constants'
 import apiRequest from '../apiRequest'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
 
 export const fetchGender = async () => {
-  try {
-    const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-gender`)
-    const data = res.data.entry[0].resource.compose.include[0].concept || []
+  if (CONTEXT === 'arkhn') {
+    return null
+  } else if (CONTEXT === 'fakedata') {
+    const res = [
+      {
+        id: 'm',
+        label: 'Homme'
+      },
+      {
+        id: 'f',
+        label: 'Femme'
+      },
+      {
+        id: 'o',
+        label: 'Autre'
+      },
+      {
+        id: 'i',
+        label: 'Indeterminé.e'
+      }
+    ]
+    return res
+  } else {
+    try {
+      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-gender`)
+      const data = res.data.entry[0].resource.compose.include[0].concept || []
 
-    return data && data.length > 0
-      ? data.map((_data: { code: string; display: string }) => ({
-          id: _data.code,
-          label: capitalizeFirstLetter(_data.display)
-        }))
-      : []
-  } catch (error) {
-    return []
+      return data && data.length > 0
+        ? data.map((_data: { code: string; display: string }) => ({
+            id: _data.code,
+            label: capitalizeFirstLetter(_data.display)
+          }))
+        : []
+    } catch (error) {
+      return []
+    }
   }
 }
 

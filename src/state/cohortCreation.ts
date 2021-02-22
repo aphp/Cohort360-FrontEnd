@@ -1,7 +1,13 @@
 import { logout } from './me'
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
-import { CohortCreationCounterType, CohortCreationSnapshotType, ScopeTreeRow, SelectedCriteriaType } from 'types'
+import {
+  CohortCreationCounterType,
+  CohortCreationSnapshotType,
+  ScopeTreeRow,
+  SelectedCriteriaType,
+  CriteriaGroupType
+} from 'types'
 
 import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
 
@@ -17,18 +23,24 @@ export type CohortCreationState = {
   count: CohortCreationCounterType
   selectedPopulation: ScopeTreeRow[] | null
   selectedCriteria: SelectedCriteriaType[]
+  criteriaGroup: CriteriaGroupType[]
+  nextCriteriaId: number
+  nextGroupId: number
 }
 
 const initialState: CohortCreationState = {
   loading: false,
   requestId: '',
   cohortName: '',
+  json: '',
   currentSnapshot: '',
   snapshotsHistory: [],
   count: {},
   selectedPopulation: null,
   selectedCriteria: [],
-  json: ''
+  criteriaGroup: [],
+  nextCriteriaId: 1,
+  nextGroupId: -1
 }
 
 /**
@@ -95,18 +107,21 @@ const _onSaveNewJson = async (cohortCreation: CohortCreationState, newJson: stri
 
 const buildCreationCohort = createAsyncThunk<
   CohortCreationState,
-  { selectedPopulation?: ScopeTreeRow[] | null; selectedCriteria?: SelectedCriteriaType[] },
+  {
+    selectedPopulation?: ScopeTreeRow[] | null
+  },
   { state: RootState }
->('cohortCreation/build', async ({ selectedPopulation, selectedCriteria }, { getState }) => {
+>('cohortCreation/build', async ({ selectedPopulation }, { getState }) => {
   try {
     const state = getState()
 
     const _selectedPopulation = selectedPopulation
       ? selectedPopulation
       : state.cohortCreation.request.selectedPopulation
-    const _selectedCriteria = selectedCriteria ? selectedCriteria : state.cohortCreation.request.selectedCriteria
+    const _selectedCriteria = state.cohortCreation.request.selectedCriteria
+    const _criteriaGroup = state.cohortCreation.request.criteriaGroup
 
-    const json = await buildRequest(_selectedPopulation, _selectedCriteria)
+    const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup)
     const { requestId, snapshotsHistory, currentSnapshot, count } = await _onSaveNewJson(
       state.cohortCreation.request,
       json
@@ -123,7 +138,7 @@ const buildCreationCohort = createAsyncThunk<
       selectedCriteria: _selectedCriteria
     }
   } catch (error) {
-    console.error('error', error)
+    console.error(error)
     throw error
   }
 })
@@ -135,7 +150,8 @@ const unbuildCreationCohort = createAsyncThunk<
 >('cohortCreation/unbuild', async ({ newCurrentSnapshot }, { getState }) => {
   try {
     const state = getState()
-    const { population, criteria } = await unbuildRequest(newCurrentSnapshot.json)
+
+    const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot.json)
     const count = await _countCohort(
       newCurrentSnapshot.json,
       newCurrentSnapshot.uuid,
@@ -148,10 +164,11 @@ const unbuildCreationCohort = createAsyncThunk<
       json: newCurrentSnapshot.json,
       currentSnapshot: newCurrentSnapshot.uuid,
       selectedPopulation: population,
-      selectedCriteria: criteria
+      selectedCriteria: criteria,
+      criteriaGroup: criteriaGroup
     }
   } catch (error) {
-    console.error('error', error)
+    console.error(error)
     throw error
   }
 })
@@ -160,22 +177,55 @@ const cohortCreationSlice = createSlice({
   name: 'cohortCreation',
   initialState,
   reducers: {
+    resetCohortCreation: () => initialState,
     setCohortName: (state: CohortCreationState, action: PayloadAction<string>) => {
       state.cohortName = action.payload
     },
+    //
     setPopulationSource: (state: CohortCreationState, action: PayloadAction<ScopeTreeRow[] | null>) => {
       state.selectedPopulation = action.payload
     },
     setSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType[]>) => {
       state.selectedCriteria = action.payload
     },
-    resetCohortCreation: () => initialState
+    //
+    deleteSelectedCriteria: (state: CohortCreationState, action: PayloadAction<number>) => {
+      const criteriaId = action.payload
+      state.selectedCriteria = state.selectedCriteria.filter(({ id }) => id !== criteriaId)
+    },
+    deleteCriteriaGroup: (state: CohortCreationState, action: PayloadAction<number>) => {
+      const groupId = action.payload
+      state.criteriaGroup = state.criteriaGroup.filter(({ id }) => id !== groupId)
+    },
+    //
+    addNewSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
+      action.payload.isInclusive = true
+      state.selectedCriteria = [...state.selectedCriteria, action.payload]
+      state.nextCriteriaId++
+    },
+    addNewCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroupType>) => {
+      state.criteriaGroup = [...state.criteriaGroup, action.payload]
+      state.nextGroupId--
+    },
+    //
+    editSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
+      const foundItem = state.selectedCriteria.find(({ id }) => id === action.payload.id)
+      const index = foundItem ? state.selectedCriteria.indexOf(foundItem) : -1
+      if (index !== -1) state.selectedCriteria[index] = action.payload
+    },
+    editCriteriaGroup: (state: CohortCreationState, action: PayloadAction<CriteriaGroupType>) => {
+      const foundItem = state.criteriaGroup.find(({ id }) => id === action.payload.id)
+      const index = foundItem ? state.criteriaGroup.indexOf(foundItem) : -1
+      if (index !== -1) state.criteriaGroup[index] = action.payload
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(logout, () => initialState)
-    builder.addCase(buildCreationCohort.pending, (state) => ({ ...state, loading: true }))
+    // buildCreationCohort
+    builder.addCase(buildCreationCohort.pending, (state) => ({ ...state, loading: false }))
     builder.addCase(buildCreationCohort.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
     builder.addCase(buildCreationCohort.rejected, (state) => ({ ...state, loading: false }))
+    // unbuildCreationCohort
     builder.addCase(unbuildCreationCohort.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(unbuildCreationCohort.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
     builder.addCase(unbuildCreationCohort.rejected, (state) => ({ ...state, loading: false }))
@@ -184,4 +234,19 @@ const cohortCreationSlice = createSlice({
 
 export default cohortCreationSlice.reducer
 export { buildCreationCohort, unbuildCreationCohort }
-export const { resetCohortCreation, setCohortName, setPopulationSource } = cohortCreationSlice.actions
+export const {
+  resetCohortCreation,
+  //
+  setCohortName,
+  setPopulationSource,
+  setSelectedCriteria,
+  //
+  deleteSelectedCriteria,
+  deleteCriteriaGroup,
+  //
+  addNewSelectedCriteria,
+  addNewCriteriaGroup,
+  //
+  editSelectedCriteria,
+  editCriteriaGroup
+} = cohortCreationSlice.actions

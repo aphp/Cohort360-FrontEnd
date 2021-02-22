@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { CONTEXT } from '../../constants'
 import clsx from 'clsx'
 import { useSelector } from 'react-redux'
 
@@ -10,10 +11,18 @@ import useStyles from './styles'
 import api from '../../services/api'
 
 const fetchPatientNumber = async () => {
-  const response = await api.get('Patient?size=0')
-  if (!response) return 0
+  if (CONTEXT === 'arkhn') {
+    return null
+  } else if (CONTEXT === 'fakedata') {
+    const response = 12
 
-  return response.data ? response.data.total : 0
+    return response
+  } else {
+    const response = await api.get('Patient?size=0')
+    if (!response) return 0
+
+    return response.data ? response.data.total : 0
+  }
 }
 
 const CohortCreation = () => {

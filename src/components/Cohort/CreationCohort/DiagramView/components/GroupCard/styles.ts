@@ -1,31 +1,32 @@
 import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(() => ({
-  root: {
+  buttonContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
     '&::before': {
       content: '""',
-      width: 2,
-      height: 36,
-      background: '#D0D7D8',
-      display: 'block',
-      margin: '0 auto'
-    },
-    '&::after': {
-      content: '""',
-      width: 2,
+      width: 2.1,
       height: 36,
       background: '#D0D7D8',
       display: 'block',
       margin: '0 auto'
     }
   },
+  lastCardItem: {},
+  mainCard: {
+    width: 600
+  },
   card: {
-    width: 450,
-    height: 'fit-content'
+    width: '95%',
+    margin: '0px auto'
   },
   cardHeader: {
     display: 'flex',
     alignItems: 'center',
+    textAlign: 'left',
     background: '#DAF0BF',
     color: '#45505B'
   },
@@ -34,13 +35,18 @@ const useStyles = makeStyles(() => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    textAlign: 'center'
+    textAlign: 'center',
+    padding: '8px !important'
   },
   criteriaType: {
     color: '#5BC5F2',
     textDecoration: 'underline',
     fontWeight: 'bold'
   },
+  listItem: {},
+  listTitle: {},
+  listDesc: {},
+  groupListItem: {},
   label: {
     fontWeight: 'bold'
   },

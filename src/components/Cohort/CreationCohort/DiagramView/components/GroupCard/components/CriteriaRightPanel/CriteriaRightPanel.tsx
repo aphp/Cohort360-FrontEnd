@@ -1,7 +1,19 @@
 import React, { useState, useEffect, Fragment } from 'react'
 
 import Drawer from '@material-ui/core/Drawer'
-import { ListItem, ListItemIcon, ListItemText, Collapse, List, Grid, Typography } from '@material-ui/core'
+import {
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Collapse,
+  List,
+  Grid,
+  Typography,
+  IconButton,
+  Divider
+} from '@material-ui/core'
+
+import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 
@@ -64,10 +76,11 @@ type CriteriaRightPanelProps = {
   onChangeSelectedCriteria: (item: SelectedCriteriaType) => void
   open: boolean
   onClose: () => void
+  goBack?: () => void
 }
 
 const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
-  const { open, onClose, criteria, selectedCriteria, onChangeSelectedCriteria } = props
+  const { open, onClose, goBack, criteria, selectedCriteria, onChangeSelectedCriteria } = props
 
   const classes = useStyles()
   const [action, setAction] = useState<CriteriaItemType | null>(null)
@@ -112,7 +125,17 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
         ) : (
           <>
             <Grid className={classes.drawerTitleContainer}>
-              <Typography className={classes.title}>Ajouter un critère</Typography>
+              {goBack ? (
+                <>
+                  <IconButton className={classes.backButton} onClick={goBack}>
+                    <KeyboardBackspaceIcon />
+                  </IconButton>
+                  <Divider className={classes.divider} orientation="vertical" flexItem />
+                  <Typography className={classes.title}>Ajouter un critère</Typography>
+                </>
+              ) : (
+                <Typography className={classes.title}>Modifier un critère</Typography>
+              )}
             </Grid>
             <List
               component="nav"

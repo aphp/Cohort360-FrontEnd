@@ -1,7 +1,7 @@
 import moment from 'moment'
 
 import { fetchPerimeterInfoForRequeteur as fetchPopulation } from '../services/perimeters'
-import { ScopeTreeRow, SelectedCriteriaType } from 'types'
+import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType } from 'types'
 
 const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
 const PATIENT_GENDER = 'gender' // ok
@@ -37,8 +37,31 @@ const COMPOSITION_TEXT = '_text' // ok
 const COMPOSITION_TYPE = 'type' // ok
 const COMPOSITION_DATE = 'date' // ok
 const COMPOSITION_ENCOUNTER = 'encounter' // on verra
-type RequeteurSearchType = {
+
+const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
+  id: 0,
+  isInclusive: false,
+  type: 'Patient',
+  title: '',
+  gender: [],
+  vitalStatus: [],
+  years: [0, 130],
+  ageType: { id: 'year', label: 'En année' },
+  label: undefined
+}
+
+const DEFAULT_GROUP_ERROR: CriteriaGroupType = {
+  id: 0,
+  title: '',
+  type: 'andGroup',
+  criteriaIds: []
+}
+
+type RequeteurCriteriaType = {
+  // CRITERIA
   _type: string
+  _id: number
+  isInclusive: boolean
   resourceType:
     | typeof RESSOURCE_TYPE_PATIENT
     | typeof RESSOURCE_TYPE_ENCOUNTER
@@ -46,273 +69,400 @@ type RequeteurSearchType = {
     | typeof RESSOURCE_TYPE_PROCEDURE
     | typeof RESSOURCE_TYPE_CONDITION
     | typeof RESSOURCE_TYPE_COMPOSITION
-  fhirFilter: string
+  filterSolr: string
+  occurrence?: {
+    n: number
+    operator?: '<=' | '<' | '=' | '>=' | '>'
+    timeDelayMin?: number
+    timeDelayMax?: number
+  }
+}
+type RequeteurGroupType =
+  | {
+      // GROUP (andGroup | orGroup)
+      _type: 'andGroup' | 'orGroup'
+      _id: number
+      isInclusive: boolean
+      criteria: (RequeteurCriteriaType | RequeteurGroupType)[]
+      temporalConstraints?: [] // NOT IMPLEMENTED
+    }
+  // NOT IMPLEMENTED
+  | {
+      // GROUP (nAmongM)
+      _type: 'nAmongM'
+      _id: number
+      isInclusive: boolean
+      criteria: (RequeteurCriteriaType | RequeteurGroupType)[]
+      nAmongMOptions: {
+        n: number
+        operator?: '<=' | '<' | '=' | '>=' | '>'
+        timeDelayMin?: number
+        timeDelayMax?: number
+      }
+      temporalConstraints?: [] // NOT IMPLEMENTED
+    }
+
+type RequeteurSearchType = {
+  version: string
+  sourcePopulation: {
+    caresiteCohortList?: number[]
+    providerCohorttList?: number[]
+  }
+  request: (RequeteurCriteriaType | RequeteurGroupType)[]
 }
 
-export function buildRequest(selectedPopulation: any, selectedCriteria: any) {
-  if (!selectedPopulation) return ''
+const constructFilterSolr = (criterion: SelectedCriteriaType) => {
+  let filterSolr = ''
 
   const filterReducer = (accumulator: any, currentValue: any) =>
     accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
-  // Preparation du multi requete, par ex: gender = m + f + other
   const searchReducer = (accumulator: any, currentValue: any) =>
     accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 
-  let newJson: RequeteurSearchType[] = [
-    {
-      _type: 'resource',
-      resourceType: RESSOURCE_TYPE_PATIENT,
-      fhirFilter: `_list=${selectedPopulation
-        .map((selectedPopulation: any) => selectedPopulation.id)
-        .reduce(searchReducer)}`
-    }
-  ]
-
-  for (const selectedCriterion of selectedCriteria) {
-    let fhirFilter = ''
-
-    switch (selectedCriterion.type) {
-      case RESSOURCE_TYPE_PATIENT: {
-        let ageFilter = ''
-        if (selectedCriterion.years && selectedCriterion.years !== [0, 130]) {
-          const date1 = moment()
-            .subtract(selectedCriterion.years[1] + 1, selectedCriterion?.ageType?.id || 'years')
-            .add(1, 'days')
-            .format('YYYY-MM-DD')
-          const date2 = moment()
-            .subtract(selectedCriterion.years[0], selectedCriterion?.ageType?.id || 'years')
-            .format('YYYY-MM-DD')
-          ageFilter = `${PATIENT_BIRTHDATE}=ge${date1}&${PATIENT_BIRTHDATE}=le${date2}`
-        }
-
-        fhirFilter = [
-          `${
-            selectedCriterion.gender && selectedCriterion.gender.length > 0
-              ? `${PATIENT_GENDER}=${selectedCriterion.gender.map((gender: any) => gender.id).reduce(searchReducer)}`
-              : ''
-          }`,
-          `${
-            selectedCriterion.vitalStatus && selectedCriterion.vitalStatus.length > 0
-              ? `${PATIENT_DECEASED}=${selectedCriterion.vitalStatus
-                  .map((vitalStatus: any) => vitalStatus.id)
-                  .reduce(searchReducer)}`
-              : ''
-          }`,
-          `${ageFilter ? `${ageFilter}` : ''}`
-        ]
-          .filter((elem) => elem)
-          .reduce(filterReducer)
-        break
+  switch (criterion.type) {
+    case RESSOURCE_TYPE_PATIENT: {
+      let ageFilter = ''
+      if (criterion.years && criterion.years !== [0, 130]) {
+        //@ts-ignore
+        const date1 = moment()
+          .subtract(criterion.years[1] + 1, criterion?.ageType?.id || 'years')
+          .add(1, 'days')
+          .format('YYYY-MM-DD')
+        //@ts-ignore
+        const date2 = moment()
+          .subtract(criterion.years[0], criterion?.ageType?.id || 'years')
+          .format('YYYY-MM-DD')
+        ageFilter = `${PATIENT_BIRTHDATE}=ge${date1}&${PATIENT_BIRTHDATE}=le${date2}`
       }
 
-      case RESSOURCE_TYPE_ENCOUNTER: {
-        let lengthFilter = ''
-        let multiplicator = 1
-        if (selectedCriterion.durationType) {
-          switch (selectedCriterion.durationType.id) {
-            case 'month':
-              multiplicator = 31
-              break
-            case 'year':
-              multiplicator = 365
-              break
-            default:
-              multiplicator = 1
-              break
-          }
-        }
-
-        if (selectedCriterion.duration && selectedCriterion.duration !== [0, 100]) {
-          lengthFilter = `${ENCOUNTER_LENGTH}=ge${
-            +selectedCriterion.duration[0] * multiplicator
-          }&${ENCOUNTER_LENGTH}=le${+selectedCriterion.duration[1] * multiplicator}`
-        }
-
-        let ageFilter = ''
-        if (selectedCriterion.years && selectedCriterion.years !== [0, 130]) {
-          const date1 = moment()
-            .subtract(selectedCriterion.years[1], selectedCriterion?.ageType?.id || 'years')
-            .format('YYYY-MM-DD')
-          const date2 = moment()
-            .subtract(selectedCriterion.years[0], selectedCriterion?.ageType?.id || 'years')
-            .format('YYYY-MM-DD')
-          ageFilter = `${ENCOUNTER_BIRTHDATE}=ge${date1}&${ENCOUNTER_BIRTHDATE}=le${date2}`
-        }
-
-        fhirFilter = [
-          `${
-            selectedCriterion.admissionMode ? `${ENCOUNTER_ADMISSIONMODE}=${selectedCriterion.admissionMode.id}` : ''
-          }`,
-          `${selectedCriterion.entryMode ? `${ENCOUNTER_ENTRYMODE}=${selectedCriterion.entryMode.id}` : ''}`,
-          `${selectedCriterion.exitMode ? `${ENCOUNTER_EXITMODE}=${selectedCriterion.exitMode.id}` : ''}`,
-          `${selectedCriterion.fileStatus ? `${ENCOUNTER_FILESTATUS}=${selectedCriterion.fileStatus.id}` : ''}`,
-          `${lengthFilter ? `${lengthFilter}` : ''}`,
-          `${ageFilter ? `${ageFilter}` : ''}`
-        ]
-          .filter((elem) => elem)
-          .reduce(filterReducer)
-        break
-      }
-
-      case RESSOURCE_TYPE_COMPOSITION: {
-        let dateFilter = ''
-        if (selectedCriterion.startOccurrence || selectedCriterion.endOccurrence) {
-          const dateFilter1 = selectedCriterion.startOccurrence
-            ? `${COMPOSITION_DATE}=ge${moment(selectedCriterion.startOccurrence).format('YYYY-MM-DD')}`
+      filterSolr = [
+        `${
+          criterion.gender && criterion.gender.length > 0
+            ? `${PATIENT_GENDER}=${criterion.gender.map((gender: any) => gender.id).reduce(searchReducer)}`
             : ''
-          const dateFilter2 = selectedCriterion.endOccurrence
-            ? `${COMPOSITION_DATE}=le${moment(selectedCriterion.endOccurrence).format('YYYY-MM-DD')}`
+        }`,
+        `${
+          criterion.vitalStatus && criterion.vitalStatus.length > 0
+            ? `${PATIENT_DECEASED}=${criterion.vitalStatus
+                .map((vitalStatus: any) => vitalStatus.id)
+                .reduce(searchReducer)}`
             : ''
-          dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
-        }
-
-        fhirFilter = [
-          `${selectedCriterion.search ? `${COMPOSITION_TEXT}=${selectedCriterion.search}` : ''}`,
-          `${
-            selectedCriterion.docType && selectedCriterion.docType.length > 0
-              ? `${COMPOSITION_TYPE}=${selectedCriterion.docType
-                  .map((docType: any) => docType.id)
-                  .reduce(searchReducer)}`
-              : ''
-          }`,
-          `${selectedCriterion.encounter ? `${COMPOSITION_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
-          `${dateFilter ? `${dateFilter}` : ''}`
-        ]
-          .filter((elem) => elem)
-          .reduce(filterReducer)
-        break
-      }
-
-      case RESSOURCE_TYPE_CONDITION: {
-        let dateFilter = ''
-        if (selectedCriterion.startOccurrence || selectedCriterion.endOccurrence) {
-          const dateFilter1 = selectedCriterion.startOccurrence
-            ? `${CONDITION_DATE}=ge${moment(selectedCriterion.startOccurrence).format('YYYY-MM-DD')}`
-            : ''
-          const dateFilter2 = selectedCriterion.endOccurrence
-            ? `${CONDITION_DATE}=le${moment(selectedCriterion.endOccurrence).format('YYYY-MM-DD')}`
-            : ''
-          dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
-        }
-
-        fhirFilter = [
-          `${
-            selectedCriterion.code && selectedCriterion.code.length > 0
-              ? `${CONDITION_CODE}=${selectedCriterion.code.map((code: any) => code.id).reduce(searchReducer)}`
-              : ''
-          }`,
-          `${
-            selectedCriterion.diagnosticType && selectedCriterion.diagnosticType.length > 0
-              ? `${CONDITION_TYPE}=${selectedCriterion.diagnosticType
-                  .map((diagnosticType: any) => diagnosticType.id)
-                  .reduce(searchReducer)}`
-              : ''
-          }`,
-          `${selectedCriterion.encounter ? `${CONDITION_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
-          `${dateFilter ? `${dateFilter}` : ''}`
-        ]
-          .filter((elem) => elem)
-          .reduce(filterReducer)
-        break
-      }
-
-      case RESSOURCE_TYPE_PROCEDURE: {
-        let dateFilter = ''
-        if (selectedCriterion.startOccurrence || selectedCriterion.endOccurrence) {
-          const dateFilter1 = selectedCriterion.startOccurrence
-            ? `${PROCEDURE_DATE}=ge${moment(selectedCriterion.startOccurrence).format('YYYY-MM-DD')}`
-            : ''
-          const dateFilter2 = selectedCriterion.endOccurrence
-            ? `${PROCEDURE_DATE}=le${moment(selectedCriterion.endOccurrence).format('YYYY-MM-DD')}`
-            : ''
-          dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
-        }
-
-        fhirFilter = [
-          `${
-            selectedCriterion.code && selectedCriterion.code.length > 0
-              ? `${PROCEDURE_CODE}=${selectedCriterion.code
-                  .map((diagnosticType: any) => diagnosticType.id)
-                  .reduce(searchReducer)}`
-              : ''
-          }`,
-          `${selectedCriterion.encounter ? `${PROCEDURE_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
-          `${dateFilter ? `${dateFilter}` : ''}`
-        ]
-          .filter((elem) => elem)
-          .reduce(filterReducer)
-        break
-      }
-
-      case RESSOURCE_TYPE_CLAIM: {
-        let dateFilter = ''
-        if (selectedCriterion.startOccurrence || selectedCriterion.endOccurrence) {
-          const dateFilter1 = selectedCriterion.startOccurrence
-            ? `${CLAIM_DATE}=ge${moment(selectedCriterion.startOccurrence).format('YYYY-MM-DD')}`
-            : ''
-          const dateFilter2 = selectedCriterion.endOccurrence
-            ? `${CLAIM_DATE}=le${moment(selectedCriterion.endOccurrence).format('YYYY-MM-DD')}`
-            : ''
-          dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
-        }
-
-        fhirFilter = [
-          `${
-            selectedCriterion.code && selectedCriterion.code.length > 0
-              ? `${CLAIM_CODE}=${selectedCriterion.code
-                  .map((diagnosticType: any) => diagnosticType.id)
-                  .reduce(searchReducer)}`
-              : ''
-          }`,
-          `${selectedCriterion.encounter ? `${CLAIM_ENCOUNTER}=${selectedCriterion.encounter}` : ''}`,
-          `${dateFilter ? `${CLAIM_DATE}=${dateFilter}` : ''}`
-        ]
-          .filter((elem) => elem)
-          .reduce(filterReducer)
-        break
-      }
-
-      default:
-        break
+        }`,
+        `${ageFilter ? `${ageFilter}` : ''}`
+      ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
+      break
     }
 
-    newJson = [
-      ...newJson,
+    case RESSOURCE_TYPE_ENCOUNTER: {
+      let lengthFilter = ''
+      let multiplicator = 1
+      if (criterion.durationType) {
+        switch (criterion.durationType.id) {
+          case 'month':
+            multiplicator = 31
+            break
+          case 'year':
+            multiplicator = 365
+            break
+          default:
+            multiplicator = 1
+            break
+        }
+      }
+
+      if (criterion.duration && criterion.duration !== [0, 100]) {
+        lengthFilter = `${ENCOUNTER_LENGTH}=ge${+criterion.duration[0] * multiplicator}&${ENCOUNTER_LENGTH}=le${
+          +criterion.duration[1] * multiplicator
+        }`
+      }
+
+      let ageFilter = ''
+      if (criterion.years && criterion.years !== [0, 130]) {
+        //@ts-ignore
+        const date1 = moment()
+          .subtract(+criterion.years[1], criterion?.ageType?.id || 'years')
+          .format('YYYY-MM-DD')
+        //@ts-ignore
+        const date2 = moment()
+          .subtract(+criterion.years[0], criterion?.ageType?.id || 'years')
+          .format('YYYY-MM-DD')
+        ageFilter = `${ENCOUNTER_BIRTHDATE}=ge${date1}&${ENCOUNTER_BIRTHDATE}=le${date2}`
+      }
+
+      filterSolr = [
+        `${criterion.admissionMode ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode.id}` : ''}`,
+        `${criterion.entryMode ? `${ENCOUNTER_ENTRYMODE}=${criterion.entryMode.id}` : ''}`,
+        `${criterion.exitMode ? `${ENCOUNTER_EXITMODE}=${criterion.exitMode.id}` : ''}`,
+        `${criterion.fileStatus ? `${ENCOUNTER_FILESTATUS}=${criterion.fileStatus.id}` : ''}`,
+        `${lengthFilter ? `${lengthFilter}` : ''}`,
+        `${ageFilter ? `${ageFilter}` : ''}`
+      ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
+      break
+    }
+
+    case RESSOURCE_TYPE_COMPOSITION: {
+      let dateFilter = ''
+
+      if (criterion.startOccurrence || criterion.endOccurrence) {
+        const dateFilter1 = criterion.startOccurrence
+          ? `${COMPOSITION_DATE}=ge${moment(criterion.startOccurrence).format('YYYY-MM-DD')}`
+          : ''
+        const dateFilter2 = criterion.endOccurrence
+          ? `${COMPOSITION_DATE}=le${moment(criterion.endOccurrence).format('YYYY-MM-DD')}`
+          : ''
+        dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
+      }
+
+      filterSolr = [
+        `${criterion.search ? `${COMPOSITION_TEXT}=${criterion.search}` : ''}`,
+        `${
+          criterion.docType && criterion.docType.length > 0
+            ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: any) => docType.id).reduce(searchReducer)}`
+            : ''
+        }`,
+        `${criterion.encounter ? `${COMPOSITION_ENCOUNTER}=${criterion.encounter}` : ''}`,
+        `${dateFilter ? `${dateFilter}` : ''}`
+      ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
+      break
+    }
+
+    case RESSOURCE_TYPE_CONDITION: {
+      let dateFilter = ''
+
+      if (criterion.startOccurrence || criterion.endOccurrence) {
+        const dateFilter1 = criterion.startOccurrence
+          ? `${CONDITION_DATE}=ge${moment(criterion.startOccurrence).format('YYYY-MM-DD')}`
+          : ''
+        const dateFilter2 = criterion.endOccurrence
+          ? `${CONDITION_DATE}=le${moment(criterion.endOccurrence).format('YYYY-MM-DD')}`
+          : ''
+        dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
+      }
+
+      filterSolr = [
+        `${
+          criterion.code && criterion.code.length > 0
+            ? `${CONDITION_CODE}=${criterion.code.map((code: any) => code.id).reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
+          criterion.diagnosticType && criterion.diagnosticType.length > 0
+            ? `${CONDITION_TYPE}=${criterion.diagnosticType
+                .map((diagnosticType: any) => diagnosticType.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${criterion.encounter ? `${CONDITION_ENCOUNTER}=${criterion.encounter}` : ''}`,
+        `${dateFilter ? `${dateFilter}` : ''}`
+      ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
+      break
+    }
+
+    case RESSOURCE_TYPE_PROCEDURE: {
+      let dateFilter = ''
+
+      if (criterion.startOccurrence || criterion.endOccurrence) {
+        const dateFilter1 = criterion.startOccurrence
+          ? `${PROCEDURE_DATE}=ge${moment(criterion.startOccurrence).format('YYYY-MM-DD')}`
+          : ''
+        const dateFilter2 = criterion.endOccurrence
+          ? `${PROCEDURE_DATE}=le${moment(criterion.endOccurrence).format('YYYY-MM-DD')}`
+          : ''
+        dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
+      }
+
+      filterSolr = [
+        `${
+          criterion.code && criterion.code.length > 0
+            ? `${PROCEDURE_CODE}=${criterion.code
+                .map((diagnosticType: any) => diagnosticType.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${criterion.encounter ? `${PROCEDURE_ENCOUNTER}=${criterion.encounter}` : ''}`,
+        `${dateFilter ? `${dateFilter}` : ''}`
+      ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
+      break
+    }
+
+    case RESSOURCE_TYPE_CLAIM: {
+      let dateFilter = ''
+      if (criterion.startOccurrence || criterion.endOccurrence) {
+        const dateFilter1 = criterion.startOccurrence
+          ? `${CLAIM_DATE}=ge${moment(criterion.startOccurrence).format('YYYY-MM-DD')}`
+          : ''
+        const dateFilter2 = criterion.endOccurrence
+          ? `${CLAIM_DATE}=le${moment(criterion.endOccurrence).format('YYYY-MM-DD')}`
+          : ''
+        dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
+      }
+
+      filterSolr = [
+        `${
+          criterion.code && criterion.code.length > 0
+            ? `${CLAIM_CODE}=${criterion.code.map((diagnosticType: any) => diagnosticType.id).reduce(searchReducer)}`
+            : ''
+        }`,
+        `${criterion.encounter ? `${CLAIM_ENCOUNTER}=${criterion.encounter}` : ''}`,
+        `${dateFilter ? `${CLAIM_DATE}=${dateFilter}` : ''}`
+      ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
+      break
+    }
+
+    default:
+      break
+  }
+
+  return filterSolr
+}
+
+export function buildRequest(
+  selectedPopulation: ScopeTreeRow[] | null,
+  selectedCriteria: SelectedCriteriaType[],
+  criteriaGroup: CriteriaGroupType[]
+) {
+  if (!selectedPopulation) return ''
+
+  const mainCriteriaGroups = criteriaGroup.filter(({ isSubGroup }) => !isSubGroup)
+
+  const json: RequeteurSearchType = {
+    version: '1.0',
+    sourcePopulation: {
+      caresiteCohortList: selectedPopulation?.map(({ id }) => +id)
+    },
+    request: [
       {
-        _type: 'resource',
-        resourceType: selectedCriterion.type,
-        fhirFilter
+        _type: 'andGroup',
+        _id: 0,
+        isInclusive: true,
+        criteria: mainCriteriaGroups?.map((mainCriteriaGroup) => {
+          const subItems: (RequeteurCriteriaType | RequeteurGroupType)[] = mainCriteriaGroup.criteriaIds
+            ? mainCriteriaGroup.criteriaIds
+                .map((itemId) => {
+                  const isGroup = itemId < 0
+                  if (!isGroup) {
+                    const item: SelectedCriteriaType =
+                      selectedCriteria.find(({ id }) => id === itemId) ?? DEFAULT_CRITERIA_ERROR
+
+                    return {
+                      _type: 'basicResource',
+                      _id: item.id ?? 0,
+                      resourceType: item.type ?? 'Patient',
+                      isInclusive: item.isInclusive ?? true,
+                      filterSolr: constructFilterSolr(item)
+                    }
+                  } else {
+                    const group: CriteriaGroupType =
+                      criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
+
+                    const subItems = group.criteriaIds
+                      ? group.criteriaIds.map((criteriaId) => {
+                          const subItem: SelectedCriteriaType =
+                            selectedCriteria.find(({ id }) => id === criteriaId) ?? DEFAULT_CRITERIA_ERROR
+
+                          return {
+                            _type: 'basicResource',
+                            _id: subItem.id ?? 0,
+                            resourceType: subItem.type ?? 'Patient',
+                            isInclusive: subItem.isInclusive ?? true,
+                            filterSolr: constructFilterSolr(subItem)
+                          }
+                        })
+                      : []
+
+                    // DO SPECIAL THING FOR `NamongM`
+                    return {
+                      _type: group.type === 'NamongM' ? 'orGroup' : group.type,
+                      _id: group.id,
+                      isInclusive: group.isInclusive ?? true,
+                      criteria: subItems
+                    }
+                  }
+                })
+                .filter((item) => item !== null)
+            : []
+
+          return {
+            _id: mainCriteriaGroup.id,
+            _type: 'andGroup',
+            isInclusive: mainCriteriaGroup.isInclusive ?? true,
+            criteria: subItems
+          }
+        })
       }
     ]
   }
 
-  const newJsonReducer = (accumulator: any, currentValue: any) =>
-    accumulator
-      ? {
-          _type: 'InnerJoin',
-          child: [accumulator, currentValue]
-        }
-      : currentValue
-  const requeteurJson:
-    | { _type: 'InnerJoin'; child: [RequeteurSearchType, RequeteurSearchType] }
-    | RequeteurSearchType
-    | null = newJson && newJson.length > 0 ? newJson.reduce(newJsonReducer) : null
-  return JSON.stringify(requeteurJson)
+  return JSON.stringify(json)
 }
 
-export async function unbuildRequest(json: string) {
+export async function unbuildRequest(_json: string) {
   let population: ScopeTreeRow[] | null = null
-  let criteria: SelectedCriteriaType[] = []
+  let criteriaItems: RequeteurCriteriaType[] = []
+  let criteriaGroup: RequeteurGroupType[] = []
 
-  const _retrieveInformationFromJson = async (element: RequeteurSearchType) => {
+  const json = JSON.parse(_json)
+  const {
+    sourcePopulation: { caresiteCohortList },
+    request
+  } = json
+
+  /**
+   * Retrieve popultion
+   */
+  for (const caresiteCohortItem of caresiteCohortList) {
+    const newPopulation = await fetchPopulation(caresiteCohortItem ?? '')
+    population = population ? [...population, ...newPopulation] : newPopulation
+  }
+
+  /**
+   *
+   * @param currentItem
+   */
+  const exploreRequest = (currentItem: any) => {
+    const { criteria } = currentItem
+
+    for (const criterion of criteria) {
+      if (criterion._type === 'basicResource') {
+        criteriaItems = [...criteriaItems, criterion]
+      } else {
+        criteriaGroup = [...criteriaGroup, { ...criterion, isSubItem: true }]
+        if (criterion && criterion.criteria && criterion.criteria.length > 0) {
+          exploreRequest(criterion)
+        }
+      }
+    }
+  }
+  for (const criterion of request[0].criteria) {
+    // console.log('exploredRequest - MAIN GROUP', criterion)
+    criteriaGroup = [...criteriaGroup, criterion]
+    exploreRequest(criterion)
+  }
+
+  const _retrieveInformationFromJson = async (element: RequeteurCriteriaType) => {
     const currentCriterion: any = {
+      id: element._id,
       type: element.resourceType,
+      isInclusive: element.isInclusive,
       title: ''
     }
+
     switch (element.resourceType) {
       case RESSOURCE_TYPE_PATIENT: {
-        if (element.fhirFilter) {
-          const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
+        if (element.filterSolr) {
+          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
@@ -371,12 +521,26 @@ export async function unbuildRequest(json: string) {
                 }
                 case PATIENT_GENDER: {
                   const genderIds = value?.split(',')
-                  currentCriterion.gender = genderIds?.map((genderId: any) => ({ id: genderId }))
+                  const newGenderIds = genderIds?.map((docTypeId: any) => ({ id: docTypeId }))
+                  if (!newGenderIds) continue
+
+                  currentCriterion.gender = currentCriterion.gender
+                    ? [...currentCriterion.gender, ...newGenderIds]
+                    : newGenderIds
                   break
                 }
                 case PATIENT_DECEASED: {
                   const vitalStatusIds = value?.split(',')
-                  currentCriterion.vitalStatus = vitalStatusIds?.map((vitalStatusId: any) => ({ id: vitalStatusId }))
+
+                  // Warning with `id: vitalStatusId === 'true'` ....
+                  const newVitalStatusIds = vitalStatusIds?.map((vitalStatusId: any) => ({
+                    id: vitalStatusId === 'true'
+                  }))
+                  if (!newVitalStatusIds) continue
+
+                  currentCriterion.vitalStatus = currentCriterion.vitalStatus
+                    ? [...currentCriterion.vitalStatus, ...newVitalStatusIds]
+                    : newVitalStatusIds
                   break
                 }
                 default:
@@ -388,8 +552,8 @@ export async function unbuildRequest(json: string) {
         break
       }
       case RESSOURCE_TYPE_ENCOUNTER: {
-        if (element.fhirFilter) {
-          const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
+        if (element.filterSolr) {
+          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de prise en charge'
           currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : null
@@ -493,8 +657,8 @@ export async function unbuildRequest(json: string) {
         break
       }
       case RESSOURCE_TYPE_COMPOSITION: {
-        if (element.fhirFilter) {
-          const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
+        if (element.filterSolr) {
+          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de document'
           currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
@@ -512,7 +676,12 @@ export async function unbuildRequest(json: string) {
                 break
               case COMPOSITION_TYPE: {
                 const docTypeIds = value?.split(',')
-                currentCriterion.docType = docTypeIds?.map((docTypeId: any) => ({ id: docTypeId }))
+                const newDocTypeIds = docTypeIds?.map((docTypeId: any) => ({ id: docTypeId }))
+                if (!newDocTypeIds) continue
+
+                currentCriterion.docType = currentCriterion.docType
+                  ? [...currentCriterion.docType, ...newDocTypeIds]
+                  : newDocTypeIds
                 break
               }
               case COMPOSITION_ENCOUNTER:
@@ -534,8 +703,8 @@ export async function unbuildRequest(json: string) {
         break
       }
       case RESSOURCE_TYPE_CONDITION: {
-        if (element.fhirFilter) {
-          const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
+        if (element.filterSolr) {
+          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de diagnostic'
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
@@ -550,14 +719,20 @@ export async function unbuildRequest(json: string) {
             switch (key) {
               case CONDITION_CODE: {
                 const codeIds = value?.split(',')
-                currentCriterion.code = codeIds?.map((codeId: any) => ({ id: codeId }))
+                const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
+                if (!newCode) continue
+
+                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
                 break
               }
               case CONDITION_TYPE: {
                 const diagnosticTypeIds = value?.split(',')
-                currentCriterion.diagnosticType = diagnosticTypeIds?.map((diagnosticTypeId: any) => ({
-                  id: diagnosticTypeId
-                }))
+                const newDiagnosticType = diagnosticTypeIds?.map((diagnosticTypeId: any) => ({ id: diagnosticTypeId }))
+                if (!newDiagnosticType) continue
+
+                currentCriterion.diagnosticType = currentCriterion.diagnosticType
+                  ? [...currentCriterion.diagnosticType, ...newDiagnosticType]
+                  : newDiagnosticType
                 break
               }
               case CONDITION_ENCOUNTER:
@@ -579,8 +754,8 @@ export async function unbuildRequest(json: string) {
         break
       }
       case RESSOURCE_TYPE_PROCEDURE: {
-        if (element.fhirFilter) {
-          const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
+        if (element.filterSolr) {
+          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = "Critères d'actes CCAM"
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
@@ -595,7 +770,10 @@ export async function unbuildRequest(json: string) {
             switch (key) {
               case PROCEDURE_CODE: {
                 const codeIds = value?.split(',')
-                currentCriterion.code = codeIds?.map((codeId: any) => ({ id: codeId }))
+                const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
+                if (!newCode) continue
+
+                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
                 break
               }
               case PROCEDURE_ENCOUNTER:
@@ -617,8 +795,8 @@ export async function unbuildRequest(json: string) {
         break
       }
       case RESSOURCE_TYPE_CLAIM: {
-        if (element.fhirFilter) {
-          const filters = element.fhirFilter.split('&').map((elem) => elem.split('='))
+        if (element.filterSolr) {
+          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de GHM'
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
@@ -632,7 +810,10 @@ export async function unbuildRequest(json: string) {
             switch (key) {
               case CLAIM_CODE: {
                 const codeIds = value?.split(',')
-                currentCriterion.code = codeIds?.map((codeId: any) => ({ id: codeId }))
+                const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
+                if (!newCode) continue
+
+                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
                 break
               }
               case CLAIM_ENCOUNTER:
@@ -659,34 +840,38 @@ export async function unbuildRequest(json: string) {
     return currentCriterion
   }
 
-  const _browseJson = async (currentJson: any) => {
-    if (currentJson && Array.isArray(currentJson) === true) {
-      for (const currentJsonElement of currentJson) {
-        if (currentJsonElement.child) {
-          await _browseJson(currentJsonElement.child)
-        }
-        if (currentJsonElement._type !== 'InnerJoin') {
-          const currentCriterion = await _retrieveInformationFromJson(currentJsonElement)
-          if (currentCriterion) criteria = [...criteria, currentCriterion]
-        }
-      }
-    } else {
-      if (currentJson.child) {
-        await _browseJson(currentJson.child)
-      }
-      if (currentJson._type !== 'InnerJoin') {
-        const currentCriterion = await _retrieveInformationFromJson(currentJson)
-        if (currentCriterion) criteria = [...criteria, currentCriterion]
-      }
+  const convertJsonObjectsToCriteria = async (
+    _criteriaItems: RequeteurCriteriaType[]
+  ): Promise<SelectedCriteriaType[]> => {
+    let newSelectedCriteriaItems: SelectedCriteriaType[] = []
+
+    for (const criteriaItem of _criteriaItems) {
+      newSelectedCriteriaItems = [...newSelectedCriteriaItems, await _retrieveInformationFromJson(criteriaItem)]
     }
+
+    return newSelectedCriteriaItems
   }
 
-  const _json = json ? JSON.parse(json) : {}
-  await _browseJson(_json)
+  const convertJsonObjectsToCriteriaGroup: (_criteriaGroup: RequeteurGroupType[]) => CriteriaGroupType[] = (
+    _criteriaGroup
+  ) => {
+    return _criteriaGroup.map((groupItem: any) => ({
+      id: groupItem._id,
+      title: 'Groupe de critère',
+      criteriaIds:
+        groupItem.criteria && groupItem.criteria.length > 0
+          ? groupItem.criteria.map((criteria: RequeteurCriteriaType | RequeteurGroupType) => criteria._id)
+          : [],
+      isSubGroup: groupItem.isSubItem,
+      isInclusive: groupItem.isInclusive,
+      type: groupItem.type
+    }))
+  }
 
   return {
     population,
-    criteria
+    criteria: await convertJsonObjectsToCriteria(criteriaItems),
+    criteriaGroup: convertJsonObjectsToCriteriaGroup(criteriaGroup)
   }
 }
 
@@ -697,23 +882,28 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
       const fetchKeys = Object.keys(_criterion.fetch)
       for (const fetchKey of fetchKeys) {
         const dataKey = fetchKey.replace('fetch', '').replace(/(\b[A-Z])(?![A-Z])/g, ($1) => $1.toLowerCase())
-        const currentSelectedCriteria = selectedCriteria.filter(
-          (selectedCriterion: SelectedCriteriaType) => selectedCriterion.type === _criterion.id
-        )
         switch (dataKey) {
           case 'ghmData':
           case 'ccamData':
-          case 'cim10Diagnostic':
+          case 'cim10Diagnostic': {
             if (_criterion.data[dataKey] === 'loading') _criterion.data[dataKey] = []
+            const currentSelectedCriteria = selectedCriteria.filter(
+              (criterion: SelectedCriteriaType) => criterion.type === _criterion.id
+            )
 
             if (currentSelectedCriteria) {
-              for (const currentSelectedCriterion of currentSelectedCriteria) {
+              for (const currentcriterion of currentSelectedCriteria) {
                 if (
-                  currentSelectedCriterion &&
-                  currentSelectedCriterion.code &&
-                  currentSelectedCriterion.code.length > 0
+                  currentcriterion &&
+                  !(
+                    currentcriterion.type === 'Patient' ||
+                    currentcriterion.type === 'Composition' ||
+                    currentcriterion.type === 'Encounter'
+                  ) &&
+                  currentcriterion.code &&
+                  currentcriterion.code.length > 0
                 ) {
-                  for (const code of currentSelectedCriterion.code) {
+                  for (const code of currentcriterion.code) {
                     const allreadyHere = _criterion.data[dataKey]
                       ? _criterion.data[dataKey].find((data: any) => data.id === code?.id)
                       : undefined
@@ -729,6 +919,7 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
               }
             }
             break
+          }
           default:
             if (_criterion.data[dataKey] === 'loading') {
               _criterion.data[dataKey] = await _criterion.fetch[fetchKey]()

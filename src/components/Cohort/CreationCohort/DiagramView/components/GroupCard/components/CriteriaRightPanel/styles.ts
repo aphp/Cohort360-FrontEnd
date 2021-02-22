@@ -16,9 +16,9 @@ const useStyles = makeStyles((theme) => ({
     color: 'white',
     backgroundColor: '#317EAA'
   },
-  title: {
-    marginLeft: theme.spacing(1)
-  },
+  backButton: { color: 'white' },
+  divider: { background: 'white' },
+  title: { marginLeft: '1em' },
   drawerContentContainer: {
     margin: 12
   },

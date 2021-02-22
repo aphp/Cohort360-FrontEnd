@@ -2,9 +2,11 @@ import api from './api'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import { getLastEncounter } from './myPatients'
 import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { FHIR_API_Response, SearchByTypes } from 'types'
+import { CohortPatient, FHIR_API_Response, SearchByTypes } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import { getServices } from './perimeters'
+
+import fakePatients from '../data/fakeData/patients'
 
 export const searchPatient = async (
   nominativeGroupsIds: string[] | undefined,
@@ -16,6 +18,17 @@ export const searchPatient = async (
   groupId?: string
 ) => {
   const patientSet: Set<IPatient> = new Set()
+
+  if (CONTEXT === 'fakedata') {
+    const patientList = fakePatients as CohortPatient[]
+
+    const totalPatients = fakePatients.length
+
+    return {
+      patientList,
+      totalPatients: totalPatients ?? 0
+    }
+  }
 
   if (CONTEXT === 'arkhn') {
     let searchByFamily = ''
