@@ -8,7 +8,7 @@ import EditIcon from '@material-ui/icons/Edit'
 import PopulationRightPanel from './components/PopulationRightPanel'
 
 import { useAppSelector } from 'state'
-import { buildCreationCohort } from 'state/cohortCreation'
+import { buildCohortCreation } from 'state/cohortCreation'
 
 import { ScopeTreeRow } from 'types'
 
@@ -23,7 +23,7 @@ const PopulationCard: React.FC = () => {
   const [openDrawer, onChangeOpenDrawer] = useState(false)
 
   const submitPopulation = (_selectedPopulation: ScopeTreeRow[] | null) => {
-    dispatch(buildCreationCohort({ selectedPopulation: _selectedPopulation }))
+    dispatch(buildCohortCreation({ selectedPopulation: _selectedPopulation }))
     onChangeOpenDrawer(false)
   }
 

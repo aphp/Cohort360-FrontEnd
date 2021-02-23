@@ -9,7 +9,7 @@ import JsonView from './JsonView/JsonView'
 
 import { useAppSelector } from 'state'
 import { setCriteriaList } from 'state/criteria'
-import { unbuildCreationCohort, resetCohortCreation } from 'state/cohortCreation'
+import { unbuildCohortCreation, resetCohortCreation } from 'state/cohortCreation'
 import { CohortCreationSnapshotType } from 'types'
 
 import constructCriteriaList from './DataList_Criteria'
@@ -51,7 +51,7 @@ const Requeteur = () => {
   }, []) // eslint-disable-line
 
   const _unbuildRequest = async (newCurrentSnapshot: CohortCreationSnapshotType) => {
-    dispatch(unbuildCreationCohort({ newCurrentSnapshot }))
+    dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
   }
 
   /**
