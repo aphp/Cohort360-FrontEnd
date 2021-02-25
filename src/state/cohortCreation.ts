@@ -52,29 +52,22 @@ const initialState: CohortCreationState = {
  *
  */
 type CountCohortCreationParams = {
-  json: string
-  snapshotId: string
-  requestId: string
+  json?: string
+  snapshotId?: string
+  requestId?: string
+  uuid?: string
 }
 
 const countCohortCreation = createAsyncThunk<
-  CohortCreationCounterType,
+  { count?: CohortCreationCounterType },
   CountCohortCreationParams,
   { state: RootState }
->('cohortCreation/count', async ({ json, snapshotId, requestId }) => {
+>('cohortCreation/count', async ({ json, snapshotId, requestId, uuid }) => {
   try {
-    const countResult = await countCohort(json, snapshotId, requestId)
+    const countResult = await countCohort(json, snapshotId, requestId, uuid)
     if (!countResult) return {}
 
-    return {
-      uuid: countResult?.uuid,
-      includePatient: countResult?.count,
-      byrequest: 0,
-      alive: 0,
-      deceased: 0,
-      female: 0,
-      male: 0
-    }
+    return { count: countResult }
   } catch (error) {
     console.error(error)
     throw error
@@ -281,7 +274,7 @@ const cohortCreationSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(logout, () => initialState)
     // buildCohortCreation
-    builder.addCase(buildCohortCreation.pending, (state) => ({ ...state, loading: false }))
+    builder.addCase(buildCohortCreation.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(buildCohortCreation.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
     builder.addCase(buildCohortCreation.rejected, (state) => ({ ...state, loading: false }))
     // unbuildCohortCreation
@@ -299,12 +292,16 @@ const cohortCreationSlice = createSlice({
       ...payload,
       countLoading: false
     }))
-    builder.addCase(countCohortCreation.rejected, (state) => ({ ...state, countLoading: false }))
+    builder.addCase(countCohortCreation.rejected, (state) => ({
+      ...state,
+      count: { status: 'error' },
+      countLoading: false
+    }))
   }
 })
 
 export default cohortCreationSlice.reducer
-export { buildCohortCreation, unbuildCohortCreation }
+export { buildCohortCreation, unbuildCohortCreation, saveJson, countCohortCreation }
 export const {
   resetCohortCreation,
   //

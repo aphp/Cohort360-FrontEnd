@@ -340,6 +340,7 @@ export type EncounterDataType = {
 
 export type CohortCreationCounterType = {
   uuid?: string
+  status?: string
   includePatient?: number
   byrequest?: number
   alive?: number

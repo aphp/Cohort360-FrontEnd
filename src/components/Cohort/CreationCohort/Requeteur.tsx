@@ -20,11 +20,12 @@ import { getDataFromFetch } from '../../../utils/cohortCreation'
 import { createCohort } from '../../../services/cohortCreation'
 
 const Requeteur = () => {
-  const practitioner = useAppSelector((state) => state.me)
   const {
+    loading = false,
     requestId = '',
     currentSnapshot = '',
     selectedCriteria = [],
+    criteriaGroup = [],
     snapshotsHistory = [],
     count = {},
     json = ''
@@ -33,22 +34,16 @@ const Requeteur = () => {
   const classes = useStyles()
   const history = useHistory()
   const dispatch = useDispatch()
-
-  const [loading, setLoading] = useState<boolean>(false)
   const [seletedTab, onChangeTab] = useState<'diagramme' | 'JSON'>('diagramme')
 
   /**
    * Fetch all criteria to display list + retrieve all data from fetcher
    */
   const _fetchCriteria = useCallback(async () => {
-    setLoading(true)
-    if (!practitioner) return
-
     let _criteria = constructCriteriaList()
     _criteria = await getDataFromFetch(Object.freeze(_criteria), selectedCriteria)
     dispatch(setCriteriaList(_criteria))
-    setLoading(false)
-  }, []) // eslint-disable-line
+  }, [criteriaGroup, selectedCriteria]) // eslint-disable-line
 
   const _unbuildRequest = async (newCurrentSnapshot: CohortCreationSnapshotType) => {
     dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
@@ -63,17 +58,9 @@ const Requeteur = () => {
     const _createCohort = async () => {
       if (!json) return
 
-      const newCohortResult = await createCohort(
-        json,
-        count?.uuid,
-        currentSnapshot,
-        requestId,
-        cohortName,
-        cohortDescription
-      )
-
-      history.push(`/cohort/${newCohortResult?.['fhir_group_id']}`)
+      await createCohort(json, count?.uuid, currentSnapshot, requestId, cohortName, cohortDescription)
       dispatch(resetCohortCreation())
+      history.push(`/accueil`)
     }
 
     _createCohort()
