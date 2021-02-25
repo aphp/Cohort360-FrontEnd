@@ -10,12 +10,11 @@ import GhmForm from './DiagramView/components/GroupCard/components/CriteriaRight
 
 // Fetcher
 import {
-  fetchAdmissionModes,
+  // fetchAdmissionModes,
   fetchEntryModes,
   fetchExitModes,
   fetchPriseEnChargeType,
   fetchTypeDeSejour,
-  fetchOnSaitPas,
   fetchFileStatus
 } from '../../../services/cohortCreation/fetchEncounter'
 import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetchDemographic'
@@ -67,21 +66,19 @@ const criteriaList: CriteriaItemType[] = [
     color: '#0063AF',
     components: SupportedForm,
     data: {
-      admissionModes: 'loading',
+      // admissionModes: 'loading',
       entryModes: 'loading',
       exitModes: 'loading',
       priseEnChargeType: 'loading',
       typeDeSejour: 'loading',
-      onSaitPas: 'loading',
       fileStatus: 'loading'
     },
     fetch: {
-      fetchAdmissionModes,
+      // fetchAdmissionModes,
       fetchEntryModes,
       fetchExitModes,
       fetchPriseEnChargeType,
       fetchTypeDeSejour,
-      fetchOnSaitPas,
       fetchFileStatus
     }
   },

@@ -133,33 +133,6 @@ export const fakeTypeDeSejour = [
   }
 ]
 
-export const fakeOnSaitPas = [
-  {
-    code: '1',
-    display: 'on sait pas 1'
-  },
-  {
-    code: '2',
-    display: 'on sait pas 2'
-  },
-  {
-    code: '3',
-    display: 'on sait pas 3'
-  },
-  {
-    code: '4',
-    display: 'on sait pas 4'
-  },
-  {
-    code: '5',
-    display: 'on sait pas 5'
-  },
-  {
-    code: '6',
-    display: 'on sait pas 6'
-  }
-]
-
 export const fakeFileStatus = [
   {
     code: '1',
