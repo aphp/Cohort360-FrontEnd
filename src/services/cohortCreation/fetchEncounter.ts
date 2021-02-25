@@ -9,19 +9,7 @@ import {
   fakeTypeDeSejour
 } from '.././../data/fakeData/cohortCreation/encounter'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
-import { ValueSet } from 'types'
-import { displaySort } from 'utils/alphabeticalSort'
-
-const cleanValueSet = (valueSet: ValueSet[]) => {
-  if (valueSet && valueSet.length > 0) {
-    const cleanData = valueSet.filter((value: ValueSet) => value.code !== 'APHP generated')
-
-    return cleanData.sort(displaySort).map((_data: ValueSet) => ({
-      id: _data.code,
-      label: capitalizeFirstLetter(_data.display)
-    }))
-  } else return []
-}
+import { cleanValueSet } from 'utils/cleanValueSet'
 
 // export const fetchAdmissionModes = async () => {
 //   if (CONTEXT === 'arkhn') {
