@@ -1,7 +1,7 @@
 import { CONTEXT } from '../../constants'
 import apiRequest from '../../services/apiRequest'
 import { fakeValueSetGHM /*fakeHierarchyGHM*/ } from '../../data/fakeData/cohortCreation/claim'
-import { alphabeticalSort } from '../../utils/alphabeticalSort'
+import { codeSort } from '../../utils/alphabeticalSort'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
 
 export const fetchGhmData = async (searchValue?: string) => {
@@ -27,7 +27,7 @@ export const fetchGhmData = async (searchValue?: string) => {
         : []
 
     return data && data.length > 0
-      ? data.sort(alphabeticalSort).map((_data: { code: string; display: string }) => ({
+      ? data.sort(codeSort).map((_data: { code: string; display: string }) => ({
           id: _data.code,
           label: capitalizeFirstLetter(_data.display)
         }))
@@ -51,7 +51,7 @@ export const fetchGhmHierarchy = async (ghmParent: string) => {
 
       GHMList =
         GHMList && GHMList.length > 0
-          ? GHMList.sort(alphabeticalSort).map((ghmData: any) => ({
+          ? GHMList.sort(codeSort).map((ghmData: any) => ({
               id: ghmData.code,
               label: `${ghmData.code} - ${ghmData.display}`
             }))
@@ -84,7 +84,7 @@ export const fetchGhmHierarchy = async (ghmParent: string) => {
 
       GHMList =
         GHMList && GHMList.length > 0
-          ? GHMList.sort(alphabeticalSort).map((ghmData: any) => ({
+          ? GHMList.sort(codeSort).map((ghmData: any) => ({
               id: ghmData.code,
               label: `${ghmData.code} - ${ghmData.display}`
             }))

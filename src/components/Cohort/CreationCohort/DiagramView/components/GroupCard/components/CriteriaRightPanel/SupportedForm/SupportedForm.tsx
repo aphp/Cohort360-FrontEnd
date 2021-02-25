@@ -23,9 +23,11 @@ const defaultDemographic = {
   years: [0, 130],
   durationType: { id: 'day', label: 'jours' },
   duration: [0, 100],
-  admissionMode: null,
+  // admissionMode: null,
   entryMode: null,
   exitMode: null,
+  priseEnCharge: null,
+  typeDeSejour: null,
   fileStatus: null
 }
 
@@ -44,18 +46,22 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
       years: data.years,
       durationType: data.durationType,
       duration: data.duration,
-      admissionMode: data.admissionMode,
+      // admissionMode: data.admissionMode,
       entryMode: data.entryMode,
       exitMode: data.exitMode,
+      priseEnCharge: data.priseEnCharge,
+      typeDeSejour: data.typeDeSejour,
       fileStatus: data.fileStatus,
       type: 'Encounter'
     })
   }
 
   if (
-    criteria?.data?.admissionModes === 'loading' ||
+    // criteria?.data?.admissionModes === 'loading' ||
     criteria?.data?.entryModes === 'loading' ||
     criteria?.data?.exitModes === 'loading' ||
+    criteria?.data?.priseEnCharge === 'loading' ||
+    criteria?.data?.typeDeSejour === 'loading' ||
     criteria?.data?.fileStatus === 'loading'
   ) {
     return <></>
@@ -159,13 +165,13 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
                 }
               ]
             },
-            {
-              name: 'admissionMode',
-              variant: 'outlined',
-              label: "Mode d'admission",
-              type: 'autocomplete',
-              autocompleteOptions: criteria?.data?.admissionModes
-            },
+            // {
+            //   name: 'admissionMode',
+            //   variant: 'outlined',
+            //   label: "Mode d'admission",
+            //   type: 'autocomplete',
+            //   autocompleteOptions: criteria?.data?.admissionModes
+            // },
             {
               name: 'entryMode',
               variant: 'outlined',
@@ -193,13 +199,6 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
               label: 'Type de séjour',
               type: 'autocomplete',
               autocompleteOptions: criteria?.data?.typeDeSejour
-            },
-            {
-              name: 'onSaitPas',
-              variant: 'outlined',
-              label: '?????',
-              type: 'autocomplete',
-              autocompleteOptions: criteria?.data?.onSaitPas
             },
             {
               name: 'fileStatus',

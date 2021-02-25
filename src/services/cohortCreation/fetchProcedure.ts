@@ -2,7 +2,7 @@ import { CONTEXT } from '../../constants'
 import apiRequest from '../../services/apiRequest'
 import { fakeValueSetCCAM /*fakeHierarchyCCAM*/ } from '../../data/fakeData/cohortCreation/procedure'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
-import { alphabeticalSort } from '../../utils/alphabeticalSort'
+import { codeSort } from '../../utils/alphabeticalSort'
 
 export const fetchCcamData = async (searchValue?: string) => {
   if (CONTEXT === 'arkhn') {
@@ -30,7 +30,7 @@ export const fetchCcamData = async (searchValue?: string) => {
         : []
 
     return (
-      CCAMList.sort(alphabeticalSort).map((ccamData: any) => ({
+      CCAMList.sort(codeSort).map((ccamData: any) => ({
         id: ccamData.code,
         label: `${ccamData.code} - ${ccamData.display}`
       })) || []
@@ -54,7 +54,7 @@ export const fetchCcamHierarchy = async (ccamParent: string) => {
 
       CCAMList =
         CCAMList && CCAMList.length > 0
-          ? CCAMList.sort(alphabeticalSort).map((ccamData: any) => ({
+          ? CCAMList.sort(codeSort).map((ccamData: any) => ({
               id: ccamData.code,
               label: `${ccamData.code} - ${ccamData.display}`
             }))
@@ -87,7 +87,7 @@ export const fetchCcamHierarchy = async (ccamParent: string) => {
 
       CCAMList =
         CCAMList && CCAMList.length > 0
-          ? CCAMList.sort(alphabeticalSort).map((ccamData: any) => ({
+          ? CCAMList.sort(codeSort).map((ccamData: any) => ({
               id: ccamData.code,
               label: `${ccamData.code} - ${ccamData.display}`
             }))

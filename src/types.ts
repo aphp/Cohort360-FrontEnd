@@ -353,3 +353,8 @@ export type CohortCreationSnapshotType = {
   json: string
   date: string
 }
+
+export type ValueSet = {
+  code: string
+  display: string
+}
