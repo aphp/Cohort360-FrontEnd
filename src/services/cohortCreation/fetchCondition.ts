@@ -6,7 +6,7 @@ import {
   fakeValueSetCIM10
   // fakeHierarchyCIM10
 } from '../../data/fakeData/cohortCreation/condition'
-import { alphabeticalSort } from 'utils/alphabeticalSort'
+import { codeSort } from 'utils/alphabeticalSort'
 
 const DEFAULT_DIAGNOSTIC_TYPES = [
   {
@@ -88,7 +88,7 @@ export const fetchDiagnosticTypes = async () => {
         : DEFAULT_DIAGNOSTIC_TYPES
 
     return diagnosticKinds && diagnosticKinds.length > 0
-      ? diagnosticKinds.sort(alphabeticalSort).map((cimType: any) => ({
+      ? diagnosticKinds.sort(codeSort).map((cimType: any) => ({
           id: cimType.code,
           label: `${cimType.code} - ${cimType.display}`
         }))
@@ -121,7 +121,7 @@ export const fetchCim10Diagnostic = async (searchValue?: string) => {
 
     cim10List =
       cim10List && cim10List.length > 0
-        ? cim10List.sort(alphabeticalSort).map((cimData: any) => ({
+        ? cim10List.sort(codeSort).map((cimData: any) => ({
             id: cimData.code,
             label: `${cimData.code} - ${cimData.display}`
           }))
@@ -146,7 +146,7 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
 
       cim10List =
         cim10List && cim10List.length > 0
-          ? cim10List.sort(alphabeticalSort).map((cimData: any) => ({
+          ? cim10List.sort(codeSort).map((cimData: any) => ({
               id: cimData.code,
               label: `${cimData.code} - ${cimData.display}`
             }))
@@ -179,7 +179,7 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
 
       cim10List =
         cim10List && cim10List.length > 0
-          ? cim10List.sort(alphabeticalSort).map((cimData: any) => ({
+          ? cim10List.sort(codeSort).map((cimData: any) => ({
               id: cimData.code,
               label: `${cimData.code} - ${cimData.display}`
             }))
