@@ -80,6 +80,7 @@ export type Cohort = {
   favorite?: boolean
   type?: string
   request_id?: string
+  request_job_status?: string
 }
 
 export type FormattedCohort = {
@@ -91,6 +92,7 @@ export type FormattedCohort = {
   date?: string
   perimeter?: string
   favorite?: boolean
+  jobStatus?: string
 }
 
 export type CohortGroup = IGroup & {
