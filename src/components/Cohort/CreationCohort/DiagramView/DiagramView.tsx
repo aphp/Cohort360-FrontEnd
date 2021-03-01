@@ -3,7 +3,7 @@ import { Grid } from '@material-ui/core'
 
 import PopulationCard from './components/PopulationCard/PopulationCard'
 import GroupCard from './components/GroupCard/GroupCard'
-// import TemporalConstraintCard from './components/TemporalConstraintCard/TemporalConstraintCard'
+import TemporalConstraintCard from './components/TemporalConstraintCard/TemporalConstraintCard'
 
 import { useAppSelector } from 'state'
 
@@ -16,12 +16,12 @@ const DiagramView: React.FC = () => {
 
   return (
     <Grid container className={classes.root}>
-      {/* <Grid item>
-        <TemporalConstraintCard />
-      </Grid> */}
       <Grid item>
         <PopulationCard />
         {selectedPopulation && selectedPopulation.length > 0 ? <GroupCard /> : <></>}
+      </Grid>
+      <Grid item>
+        <TemporalConstraintCard />
       </Grid>
     </Grid>
   )
