@@ -34,4 +34,18 @@ const TemporalConstraintView: React.FC = () => {
   )
 }
 
+// const [currentTemporalConstraint, onChangeTemporalConstraint] = useState<TemporalConstraintType>(initialState)
+
+// <Select
+//   className={classes.selectTemporalConstraint}
+//   variant="outlined"
+//   value={currentTemporalConstraint.type}
+//   onChange={(e) => onChangeTemporalConstraint({ ...currentTemporalConstraint, type: e.target.value })}
+// >
+//   <MenuItem value={'SameEncounter'}>est dans le même séjour que</MenuItem>
+//   <MenuItem value={'differentEncounter'}>est dans un séjour différent de</MenuItem>
+//   <MenuItem value={'directChronologicalOrdering'}>se passe avant</MenuItem>
+//   <MenuItem value={'directChronologicalOrderingWithDuration'}>est séparé de x temps de</MenuItem>
+// </Select>
+
 export default TemporalConstraintView
