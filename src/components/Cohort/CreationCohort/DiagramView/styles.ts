@@ -3,12 +3,12 @@ import { makeStyles } from '@material-ui/core/styles'
 const useStyles = makeStyles(() => ({
   root: {
     display: 'flex',
-    width: 'calc(100% - 280px)',
+    flexDirection: 'column',
+    width: 'calc(100% - 300px)',
     height: 'calc(100vh - 73px)',
-    justifyContent: 'space-around',
-    marginRight: 280,
-    padding: '50px 0',
-    overflow: 'auto'
+    padding: '24px 26px',
+    overflow: 'auto',
+    marginRight: 300
   }
 }))
 

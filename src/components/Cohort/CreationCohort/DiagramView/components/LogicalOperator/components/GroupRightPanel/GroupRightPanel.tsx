@@ -25,7 +25,7 @@ import EditIcon from '@material-ui/icons/Edit'
 
 import CriteriaRightPanel from '../CriteriaRightPanel/CriteriaRightPanel'
 import CriteriaCardContent from '../CriteriaCardContent/CriteriaCardContent'
-import GroupSeparator from '../../../GroupSeparator/GroupSeparator'
+import GroupSeparator from '../GroupSeparator/GroupSeparator'
 
 import { CriteriaItemType, SelectedCriteriaType, CriteriaGroupType } from 'types'
 
