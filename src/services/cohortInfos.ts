@@ -82,7 +82,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
         `/Patient?pivotFacet=age_gender,deceased_gender&_list=${cohortId}&size=20&_sort=given&_elements=gender,name,birthDate,deceased,identifier,extension`
       ),
       api.get<FHIR_API_Response<IEncounter>>(
-        `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${cohortId}&size=0&type=VISIT`
+        `/Encounter?facet=class,visit-year-month-gender-facet&_list=${cohortId}&size=0&type=VISIT`
       )
     ])
 
@@ -121,7 +121,9 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     const monthlyVisitData =
       encountersResp.data.resourceType === 'Bundle'
         ? getVisitRepartitionMapAphp(
-            encountersResp.data.meta?.extension?.find((facet: any) => facet.url === 'facet-start-date-facet')?.extension
+            encountersResp.data.meta?.extension?.find(
+              (facet: any) => facet.url === 'facet-visit-year-month-gender-facet'
+            )?.extension
           )
         : undefined
 
