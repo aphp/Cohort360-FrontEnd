@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { ButtonGroup, Button, CircularProgress, Divider } from '@material-ui/core'
+import { ButtonGroup, Button, CircularProgress } from '@material-ui/core'
 
 import LogicalOperatorItem from './components/LogicalOperatorItem/LogicalOperatorItem'
 
@@ -81,10 +81,12 @@ const GroupOperator: React.FC = () => {
   const dispatch = useDispatch()
   const { request } = useAppSelector((state) => state.cohortCreation || {})
 
-  const [openGroupDrawer, onChangeOpenGroupDrawer] = useState<boolean>(false)
+  const [parentId, setParentId] = useState<number | null>(null)
+  const [openDrawer, setOpenDrawer] = useState<'criteria' | null>(null)
 
   const _addNewCriteria = (parentId: number) => {
-    console.log('parentId ::>', parentId)
+    setOpenDrawer('criteria')
+    setParentId(parentId)
   }
 
   const _addNewGroup = (parentId: number) => {
@@ -110,11 +112,7 @@ const GroupOperator: React.FC = () => {
     )
   }
 
-  return (
-    <>
-      <OperatorItem itemId={0} addNewCriteria={_addNewCriteria} addNewGroup={_addNewGroup} />
-    </>
-  )
+  return <OperatorItem itemId={0} addNewCriteria={_addNewCriteria} addNewGroup={_addNewGroup} />
 }
 
 export default GroupOperator

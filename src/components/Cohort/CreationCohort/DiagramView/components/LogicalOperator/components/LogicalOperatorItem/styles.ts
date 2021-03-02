@@ -22,7 +22,7 @@ const useStyles = makeStyles(() => ({
       width: 3,
       background: '#19235a',
       marginTop: 42,
-      marginLeft: -14
+      marginLeft: -11
     }
   },
   logicalOperator: {
@@ -55,7 +55,7 @@ const useStyles = makeStyles(() => ({
       width: 3,
       background: '#19235a',
       marginTop: 42,
-      marginLeft: -14
+      marginLeft: -11
     }
   }
 }))

@@ -10,11 +10,11 @@ const useStyles = makeStyles(() => ({
     '&::before': {
       width: 3,
       height: 16,
-      marginLeft: 16,
       content: "''",
       position: 'absolute',
       background: '#19235A',
-      marginTop: -16
+      marginTop: -16,
+      marginLeft: 19
     },
     '& > button': {
       background: '#19235A'
@@ -24,7 +24,7 @@ const useStyles = makeStyles(() => ({
     disaplay: 'flex'
   },
   operatorChild: {
-    marginLeft: 16,
+    marginLeft: 19,
     borderLeft: '3px solid #19235a',
     paddingLeft: 35
   }
