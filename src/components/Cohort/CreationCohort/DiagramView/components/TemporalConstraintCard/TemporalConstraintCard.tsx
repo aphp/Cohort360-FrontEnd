@@ -21,8 +21,8 @@ const TemporalConstraintView: React.FC = () => {
         value={currentTemporalConstraint.type}
         onChange={(e) => onChangeTemporalConstraint({ ...currentTemporalConstraint, type: e.target.value })}
       >
-        <MenuItem value={'SameEncounter'}>est dans le même séjour que</MenuItem>
-        <MenuItem value={'differentEncounter'}>est dans un séjour différent de</MenuItem>
+        <MenuItem value={'SameEncounter'}>Tous les critères sont dans la meme visite</MenuItem>
+        <MenuItem value={'differentEncounter'}>Les critères sont dans des visites différentes</MenuItem>
         <MenuItem value={'noDifference'}>indifférent</MenuItem>
       </Select>
     </Grid>
