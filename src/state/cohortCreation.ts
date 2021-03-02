@@ -38,7 +38,16 @@ const initialState: CohortCreationState = {
   count: {},
   selectedPopulation: null,
   selectedCriteria: [],
-  criteriaGroup: [],
+  criteriaGroup: [
+    {
+      id: 0,
+      title: `Opérateur logique principal`,
+      type: 'andGroup',
+      criteriaIds: [],
+      isSubGroup: false,
+      isInclusive: true
+    }
+  ],
   nextCriteriaId: 1,
   nextGroupId: -1
 }

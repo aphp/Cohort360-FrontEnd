@@ -1,14 +1,14 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { ButtonGroup, Button, CircularProgress, Divider, Typography } from '@material-ui/core'
+import { ButtonGroup, Button, CircularProgress, Divider } from '@material-ui/core'
 
-import GroupRightPanel from './components/GroupRightPanel/GroupRightPanel'
+import LogicalOperatorItem from './components/LogicalOperatorItem/LogicalOperatorItem'
 
-import { CriteriaGroupType } from 'types'
+import { CriteriaGroupType, SelectedCriteriaType } from 'types'
 
 import { useAppSelector } from 'state'
-import { buildCreationCohort, addNewCriteriaGroup } from 'state/cohortCreation'
+import { addNewCriteriaGroup, editCriteriaGroup } from 'state/cohortCreation'
 
 import useStyles from './styles'
 
@@ -24,37 +24,53 @@ const OperatorItem: React.FC<OperatorItemProps> = ({ itemId, addNewCriteria, add
   const { request } = useAppSelector((state) => state.cohortCreation || {})
   const { loading = false, criteriaGroup = [], selectedCriteria = [] } = request
 
-  const isMainOperator = itemId === 0
-  const displayingCriteriaGroup = itemId ? [] : []
+  const displayingItem = criteriaGroup.filter((_criteriaGroup: CriteriaGroupType) => _criteriaGroup.id === itemId)
 
   return (
     <>
-      {isMainOperator && (
-        <Typography variant="h5" className={classes.logicalOperator}>
-          ET
-        </Typography>
-      )}
+      <LogicalOperatorItem itemId={itemId} />
 
-      {/* {displayingCriteriaGroup &&
-        displayingCriteriaGroup.map(({ id, criteriaIds, type, isInclusive }) => (
-          <div className={classes.operatorRoot} key={id}></div>
-        ))} */}
+      <div className={classes.operatorChild}>
+        {displayingItem &&
+          displayingItem.map(({ criteriaIds }) => {
+            const children: (CriteriaGroupType | SelectedCriteriaType)[] = [
+              ...criteriaGroup.filter((group: CriteriaGroupType) =>
+                criteriaIds.find((criteriaId) => group.id === criteriaId)
+              ),
+              ...selectedCriteria.filter((criteria: SelectedCriteriaType) =>
+                criteriaIds.find((criteriaId) => criteria.id === criteriaId)
+              )
+            ]
+            if (!children) return <></>
+
+            return children.map((child: CriteriaGroupType | SelectedCriteriaType) => {
+              if (!child || child?.id === undefined) return <></>
+
+              return child?.id > 0 ? (
+                // Display criteria
+                <></>
+              ) : (
+                <OperatorItem itemId={child?.id} addNewCriteria={addNewCriteria} addNewGroup={addNewGroup} />
+              )
+            })
+          })}
+      </div>
 
       <ButtonGroup disableElevation className={classes.buttonContainer} variant="contained" color="primary">
-        {loading ? (
+        {loading && (
           <Button disabled>
             <CircularProgress />
           </Button>
-        ) : (
-          <>
-            <Button color="inherit" onClick={() => addNewCriteria(itemId)}>
-              Ajouter un critère
-            </Button>
-            <Divider orientation="vertical" flexItem style={{ background: 'white', margin: '6px 0' }} />
-            <Button color="inherit" onClick={() => addNewGroup(itemId)}>
-              Ajouter un opérateur logique
-            </Button>
-          </>
+        )}
+        {!loading && (
+          <Button color="inherit" onClick={() => addNewCriteria(itemId)}>
+            Ajouter un critère
+          </Button>
+        )}
+        {!loading && (
+          <Button color="inherit" onClick={() => addNewGroup(itemId)}>
+            Ajouter un opérateur logique
+          </Button>
         )}
       </ButtonGroup>
     </>
@@ -62,12 +78,8 @@ const OperatorItem: React.FC<OperatorItemProps> = ({ itemId, addNewCriteria, add
 }
 
 const GroupOperator: React.FC = () => {
-  const classes = useStyles()
   const dispatch = useDispatch()
-
   const { request } = useAppSelector((state) => state.cohortCreation || {})
-
-  const { loading = false, criteriaGroup = [] } = request
 
   const [openGroupDrawer, onChangeOpenGroupDrawer] = useState<boolean>(false)
 
@@ -76,31 +88,31 @@ const GroupOperator: React.FC = () => {
   }
 
   const _addNewGroup = (parentId: number) => {
-    console.log('parentId ::>', parentId)
+    // Add new group
+    const nextGroupId = request.nextGroupId
     const newOperator: CriteriaGroupType = {
-      id: request.nextGroupId,
-      title: `Nouveau opérateur logique ${request.nextGroupId * -1}`,
+      id: nextGroupId,
+      title: `Nouveau opérateur logique ${nextGroupId * -1}`,
       type: 'orGroup',
       criteriaIds: [],
-      isSubGroup: false,
+      isSubGroup: parentId === 0 ? false : true,
       isInclusive: true
     }
     dispatch(addNewCriteriaGroup(newOperator))
+    // Edit parent and add nextGroupId inside criteriaIds
+    const currentParent = request.criteriaGroup ? request.criteriaGroup.find(({ id }) => id === parentId) : null
+    if (!currentParent) return
+    dispatch(
+      editCriteriaGroup({
+        ...currentParent,
+        criteriaIds: [...currentParent.criteriaIds, nextGroupId]
+      })
+    )
   }
 
   return (
     <>
       <OperatorItem itemId={0} addNewCriteria={_addNewCriteria} addNewGroup={_addNewGroup} />
-
-      <GroupRightPanel
-        open={openGroupDrawer}
-        currentCriteriaGroup={null}
-        // currentCriteriaGroup={currentCriteriaGroup ?? null}
-        onClose={() => {
-          onChangeOpenGroupDrawer(false)
-          dispatch(buildCreationCohort({}))
-        }}
-      />
     </>
   )
 }
