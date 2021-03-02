@@ -6,16 +6,18 @@ const useStyles = makeStyles(() => ({
     flexWrap: 'nowrap',
     backgroundColor: '#EFBE5E',
     width: 'fit-content',
-    height: '35px',
+    height: '30px',
     borderRadius: '5px'
   },
   temporalConstraintTypo: {
-    marginTop: '4px',
-    marginRight: '4px'
+    marginTop: '5px',
+    marginRight: '4px',
+    paddingLeft: '2px'
   },
   temporalConstraintSelect: {
     height: '25px',
-    marginTop: '4px'
+    marginTop: '4px',
+    marginRight: '2px'
   }
 }))
 
