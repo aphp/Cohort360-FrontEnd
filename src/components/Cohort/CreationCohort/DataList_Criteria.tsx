@@ -1,12 +1,12 @@
 import { CriteriaItemType } from 'types'
 
 // Components
-// import DemographicFrom from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicFrom/DemographicFrom'
-// import DocumentsForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DocumentsForm/DocumentsForm'
-// import SupportedForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/SupportedForm/SupportedForm'
-// import CCAMForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CCAM'
-// import Cim10Form from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/Cim10Form'
-// import GhmForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/GHM'
+import DemographicFrom from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicFrom/DemographicFrom'
+import DocumentsForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DocumentsForm/DocumentsForm'
+import SupportedForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/SupportedForm/SupportedForm'
+import CCAMForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CCAM'
+import Cim10Form from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/Cim10Form'
+import GhmForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/GHM'
 
 // Fetcher
 import {
@@ -56,8 +56,7 @@ const criteriaList: CriteriaItemType[] = [
     id: 'Patient',
     title: 'Démographie',
     color: '#0063AF',
-    components: null,
-    // components: DemographicFrom,
+    components: DemographicFrom,
     data: { gender: 'loading', status: 'loading' },
     fetch: { fetchGender, fetchStatus }
   },
@@ -65,8 +64,7 @@ const criteriaList: CriteriaItemType[] = [
     id: 'Encounter',
     title: 'Visites',
     color: '#0063AF',
-    components: null,
-    // components: SupportedForm,
+    components: SupportedForm,
     data: {
       // admissionModes: 'loading',
       entryModes: 'loading',
@@ -88,8 +86,7 @@ const criteriaList: CriteriaItemType[] = [
     id: 'Composition',
     title: 'Documents cliniques',
     color: '#0063AF',
-    components: null,
-    // components: DocumentsForm,
+    components: DocumentsForm,
     data: { docTypes: 'loading' },
     fetch: { fetchDocTypes }
   },
@@ -103,8 +100,7 @@ const criteriaList: CriteriaItemType[] = [
         id: 'Condition',
         title: 'Diagnostics',
         color: '#0063AF',
-        components: null,
-        // components: Cim10Form,
+        components: Cim10Form,
         data: {
           statusDiagnostic: 'loading',
           diagnosticTypes: 'loading',
@@ -117,8 +113,7 @@ const criteriaList: CriteriaItemType[] = [
         id: 'Procedure',
         title: 'Actes',
         color: '#0063AF',
-        components: null,
-        // components: CCAMForm,
+        components: CCAMForm,
         data: { ccamData: 'loading', ccamHierarchy: 'loading' },
         fetch: { fetchCcamData, fetchCcamHierarchy }
       },
@@ -126,8 +121,7 @@ const criteriaList: CriteriaItemType[] = [
         id: 'Claim',
         title: 'GHM',
         color: '#0063AF',
-        components: null,
-        // components: GhmForm,
+        components: GhmForm,
         data: { ghmData: 'loading', ghmHierarchy: 'loading' },
         fetch: { fetchGhmData, fetchGhmHierarchy }
       }

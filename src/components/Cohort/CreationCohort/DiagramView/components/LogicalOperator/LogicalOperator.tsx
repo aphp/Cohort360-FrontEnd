@@ -4,11 +4,17 @@ import { useDispatch } from 'react-redux'
 import { ButtonGroup, Button, CircularProgress } from '@material-ui/core'
 
 import LogicalOperatorItem from './components/LogicalOperatorItem/LogicalOperatorItem'
+import CriteriaRightPanel from './components/CriteriaRightPanel/CriteriaRightPanel'
 
 import { CriteriaGroupType, SelectedCriteriaType } from 'types'
 
 import { useAppSelector } from 'state'
-import { addNewCriteriaGroup, editCriteriaGroup } from 'state/cohortCreation'
+import {
+  addNewCriteriaGroup,
+  editCriteriaGroup,
+  addNewSelectedCriteria,
+  editSelectedCriteria
+} from 'state/cohortCreation'
 
 import useStyles from './styles'
 
@@ -79,14 +85,31 @@ const OperatorItem: React.FC<OperatorItemProps> = ({ itemId, addNewCriteria, add
 
 const GroupOperator: React.FC = () => {
   const dispatch = useDispatch()
-  const { request } = useAppSelector((state) => state.cohortCreation || {})
+  const { request, criteria } = useAppSelector((state) => state.cohortCreation || {})
 
   const [parentId, setParentId] = useState<number | null>(null)
   const [openDrawer, setOpenDrawer] = useState<'criteria' | null>(null)
 
-  const _addNewCriteria = (parentId: number) => {
-    setOpenDrawer('criteria')
-    setParentId(parentId)
+  const _addOrEditCriteria = (item: SelectedCriteriaType) => {
+    // Add criteria
+    const nextCriteriaId = request.nextCriteriaId
+    if (item.id) {
+      // Edition
+      dispatch(editSelectedCriteria(item))
+    } else {
+      // Creation
+      item.id = nextCriteriaId
+      dispatch(addNewSelectedCriteria(item))
+    }
+    // Link criteria with group operator
+    const currentParent = request.criteriaGroup ? request.criteriaGroup.find(({ id }) => id === parentId) : null
+    if (!currentParent) return
+    dispatch(
+      editCriteriaGroup({
+        ...currentParent,
+        criteriaIds: [...currentParent.criteriaIds, nextCriteriaId]
+      })
+    )
   }
 
   const _addNewGroup = (parentId: number) => {
@@ -112,7 +135,26 @@ const GroupOperator: React.FC = () => {
     )
   }
 
-  return <OperatorItem itemId={0} addNewCriteria={_addNewCriteria} addNewGroup={_addNewGroup} />
+  return (
+    <>
+      <OperatorItem
+        itemId={0}
+        addNewCriteria={(parentId: number) => {
+          setOpenDrawer('criteria')
+          setParentId(parentId)
+        }}
+        addNewGroup={_addNewGroup}
+      />
+
+      <CriteriaRightPanel
+        criteria={criteria}
+        selectedCriteria={null}
+        onChangeSelectedCriteria={_addOrEditCriteria}
+        open={openDrawer === 'criteria'}
+        onClose={() => setOpenDrawer(null)}
+      />
+    </>
+  )
 }
 
 export default GroupOperator
