@@ -1,44 +1,42 @@
 import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(() => ({
-  root: {
-    // '&::after': {
-    //   content: '""',
-    //   width: 2,
-    //   height: 36,
-    //   background: '#D0D7D8',
-    //   display: 'block',
-    //   margin: '0 auto'
-    // }
-  },
-  card: {
-    width: 600
-  },
-  cardHeader: {
-    background: '#D1E2F4',
-    color: '#45505B'
-  },
-  cardContent: {
+  newPopulationCard: {
     display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    height: 'calc(100% - 53px)'
+    'border-radius': 4,
+    backgroundColor: '#FFFFFF',
+    padding: 15,
+    border: '3px solid #D3DEE8'
+  },
+  centerContainer: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  leftDiv: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  chipContainer: {
+    marginLeft: 12
+  },
+  populationChip: {
+    margin: '0 4px'
   },
   populationLabel: {
-    color: '#5BC5F2',
-    textDecoration: 'underline',
-    fontWeight: 'bold'
-  },
-  actionButtonContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 12
+    textDecoration: 'underline'
   },
   actionButton: {
-    margin: 4,
-    outline: 'none'
+    backgroundColor: '#19235A',
+    color: '#FFFFFF',
+    borderRadius: 25,
+    padding: '6px 12px',
+    '&:hover': {
+      backgroundColor: '#19235A'
+    }
   }
 }))
 

@@ -98,7 +98,7 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
         `/Patient?pivotFacet=age_gender,deceased_gender&_list=${perimetersId}&size=20&_sort=given&_elements=gender,name,birthDate,deceased,identifier,extension`
       ),
       api.get<FHIR_API_Response<IEncounter>>(
-        `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${perimetersId}&size=0&type=VISIT`
+        `/Encounter?facet=class,visit-year-month-gender-facet&_list=${perimetersId}&size=0&type=VISIT`
       )
     ])
 
@@ -125,8 +125,9 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
     const monthlyVisitData =
       encountersResp?.data?.resourceType === 'Bundle'
         ? getVisitRepartitionMapAphp(
-            encountersResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-start-date-facet')?.[0]
-              .extension
+            encountersResp.data.meta?.extension?.filter(
+              (facet: any) => facet.url === 'facet-visit-year-month-gender-facet'
+            )?.[0].extension
           )
         : undefined
 

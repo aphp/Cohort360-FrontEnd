@@ -116,6 +116,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
                   name: 'years',
                   type: 'slider',
                   valueLabelDisplay: 'on',
+                  valueLabelFormat: (value) => (value === 130 ? '130+' : value),
                   min: 0,
                   max: 130
                 },
@@ -150,6 +151,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
                   name: 'duration',
                   type: 'slider',
                   valueLabelDisplay: 'on',
+                  valueLabelFormat: (value) => (value === 100 ? '100+' : value),
                   min: 0,
                   max: 100
                 },
