@@ -1,12 +1,12 @@
 import { CriteriaItemType } from 'types'
 
 // Components
-import DemographicFrom from './DiagramView/components/GroupCard/components/CriteriaRightPanel/DemographicFrom/DemographicFrom'
-import DocumentsForm from './DiagramView/components/GroupCard/components/CriteriaRightPanel/DocumentsForm/DocumentsForm'
-import SupportedForm from './DiagramView/components/GroupCard/components/CriteriaRightPanel/SupportedForm/SupportedForm'
-import CCAMForm from './DiagramView/components/GroupCard/components/CriteriaRightPanel/CCAM'
-import Cim10Form from './DiagramView/components/GroupCard/components/CriteriaRightPanel/Cim10Form'
-import GhmForm from './DiagramView/components/GroupCard/components/CriteriaRightPanel/GHM'
+import DemographicFrom from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicFrom/DemographicFrom'
+import DocumentsForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DocumentsForm/DocumentsForm'
+import SupportedForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/SupportedForm/SupportedForm'
+import CCAMForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CCAM'
+import Cim10Form from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/Cim10Form'
+import GhmForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/GHM'
 
 // Fetcher
 import {
