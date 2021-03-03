@@ -93,9 +93,7 @@ export const fetchMyPatients = async (): Promise<CohortData | undefined> => {
       api.get<FHIR_API_Response<IPatient>>(
         '/Patient?pivotFacet=age_gender,deceased_gender&size=20&_sort=given&_elements=gender,name,birthDate,deceased,identifier,extension'
       ),
-      api.get<FHIR_API_Response<IEncounter>>(
-        '/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&size=0&type=VISIT'
-      )
+      api.get<FHIR_API_Response<IEncounter>>('/Encounter?facet=class,visit-year-month-gender-facet&size=0&type=VISIT')
     ])
 
     const totalPatients = myPatientsResp.data.resourceType === 'Bundle' ? myPatientsResp.data.total : 0
@@ -120,7 +118,7 @@ export const fetchMyPatients = async (): Promise<CohortData | undefined> => {
       myPatientsEncounters.data.resourceType === 'Bundle'
         ? await getVisitRepartitionMapAphp(
             myPatientsEncounters.data.meta?.extension?.filter(
-              (facet: any) => facet.url === 'facet-start-date-facet'
+              (facet: any) => facet.url === 'facet-visit-year-month-gender-facet'
             )?.[0].extension
           )
         : undefined
