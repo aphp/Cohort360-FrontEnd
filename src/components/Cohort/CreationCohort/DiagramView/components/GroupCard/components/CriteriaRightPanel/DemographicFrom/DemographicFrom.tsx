@@ -112,7 +112,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
                   name: 'years',
                   type: 'slider',
                   valueLabelDisplay: 'on',
-                  valueLabelFormat: (value) => (value === 130 ? '130+' : value),
+                  valueLabelFormat: 'test', //(value) => (value === 130 ? '130+' : value),
                   min: 0,
                   max: 130
                 },
