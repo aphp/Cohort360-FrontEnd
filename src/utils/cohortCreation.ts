@@ -69,7 +69,7 @@ type RequeteurCriteriaType = {
     | typeof RESSOURCE_TYPE_PROCEDURE
     | typeof RESSOURCE_TYPE_CONDITION
     | typeof RESSOURCE_TYPE_COMPOSITION
-  filterSolr: string
+  filterFhir: string
   occurrence?: {
     n: number
     operator?: '<=' | '<' | '=' | '>=' | '>'
@@ -104,6 +104,7 @@ type RequeteurGroupType =
 
 type RequeteurSearchType = {
   version: string
+  _type: string
   sourcePopulation: {
     caresiteCohortList?: number[]
     providerCohorttList?: number[]
@@ -112,7 +113,7 @@ type RequeteurSearchType = {
 }
 
 const constructFilterSolr = (criterion: SelectedCriteriaType) => {
-  let filterSolr = ''
+  let filterFhir = ''
 
   const filterReducer = (accumulator: any, currentValue: any) =>
     accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
@@ -135,7 +136,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         ageFilter = `${PATIENT_BIRTHDATE}=ge${date1}&${PATIENT_BIRTHDATE}=le${date2}`
       }
 
-      filterSolr = [
+      filterFhir = [
         `${
           criterion.gender && criterion.gender.length > 0
             ? `${PATIENT_GENDER}=${criterion.gender.map((gender: any) => gender.id).reduce(searchReducer)}`
@@ -191,7 +192,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         ageFilter = `${ENCOUNTER_BIRTHDATE}=ge${date1}&${ENCOUNTER_BIRTHDATE}=le${date2}`
       }
 
-      filterSolr = [
+      filterFhir = [
         `${criterion.admissionMode ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode.id}` : ''}`,
         `${criterion.entryMode ? `${ENCOUNTER_ENTRYMODE}=${criterion.entryMode.id}` : ''}`,
         `${criterion.exitMode ? `${ENCOUNTER_EXITMODE}=${criterion.exitMode.id}` : ''}`,
@@ -217,7 +218,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
       }
 
-      filterSolr = [
+      filterFhir = [
         `${criterion.search ? `${COMPOSITION_TEXT}=${criterion.search}` : ''}`,
         `${
           criterion.docType && criterion.docType.length > 0
@@ -245,7 +246,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
       }
 
-      filterSolr = [
+      filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
             ? `${CONDITION_CODE}=${criterion.code.map((code: any) => code.id).reduce(searchReducer)}`
@@ -279,7 +280,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
       }
 
-      filterSolr = [
+      filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
             ? `${PROCEDURE_CODE}=${criterion.code
@@ -307,7 +308,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
       }
 
-      filterSolr = [
+      filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
             ? `${CLAIM_CODE}=${criterion.code.map((diagnosticType: any) => diagnosticType.id).reduce(searchReducer)}`
@@ -325,7 +326,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
       break
   }
 
-  return filterSolr
+  return filterFhir
 }
 
 export function buildRequest(
@@ -338,7 +339,8 @@ export function buildRequest(
   const mainCriteriaGroups = criteriaGroup.filter(({ isSubGroup }) => !isSubGroup)
 
   const json: RequeteurSearchType = {
-    version: '1.0',
+    version: 'v1.0',
+    _type: 'request',
     sourcePopulation: {
       caresiteCohortList: selectedPopulation?.map(({ id }) => +id)
     },
@@ -361,7 +363,7 @@ export function buildRequest(
                       _id: item.id ?? 0,
                       resourceType: item.type ?? 'Patient',
                       isInclusive: item.isInclusive ?? true,
-                      filterSolr: constructFilterSolr(item)
+                      filterFhir: constructFilterSolr(item)
                     }
                   } else {
                     const group: CriteriaGroupType =
@@ -377,7 +379,7 @@ export function buildRequest(
                             _id: subItem.id ?? 0,
                             resourceType: subItem.type ?? 'Patient',
                             isInclusive: subItem.isInclusive ?? true,
-                            filterSolr: constructFilterSolr(subItem)
+                            filterFhir: constructFilterSolr(subItem)
                           }
                         })
                       : []
@@ -461,8 +463,8 @@ export async function unbuildRequest(_json: string) {
 
     switch (element.resourceType) {
       case RESSOURCE_TYPE_PATIENT: {
-        if (element.filterSolr) {
-          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
@@ -552,8 +554,8 @@ export async function unbuildRequest(_json: string) {
         break
       }
       case RESSOURCE_TYPE_ENCOUNTER: {
-        if (element.filterSolr) {
-          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de prise en charge'
           currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : null
@@ -657,8 +659,8 @@ export async function unbuildRequest(_json: string) {
         break
       }
       case RESSOURCE_TYPE_COMPOSITION: {
-        if (element.filterSolr) {
-          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de document'
           currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
@@ -703,8 +705,8 @@ export async function unbuildRequest(_json: string) {
         break
       }
       case RESSOURCE_TYPE_CONDITION: {
-        if (element.filterSolr) {
-          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de diagnostic'
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
@@ -754,8 +756,8 @@ export async function unbuildRequest(_json: string) {
         break
       }
       case RESSOURCE_TYPE_PROCEDURE: {
-        if (element.filterSolr) {
-          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = "Critères d'actes CCAM"
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
@@ -795,8 +797,8 @@ export async function unbuildRequest(_json: string) {
         break
       }
       case RESSOURCE_TYPE_CLAIM: {
-        if (element.filterSolr) {
-          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de GHM'
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
