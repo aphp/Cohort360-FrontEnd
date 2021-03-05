@@ -5,6 +5,7 @@ import { ButtonGroup, Button, CircularProgress } from '@material-ui/core'
 
 import LogicalOperatorItem from './components/LogicalOperatorItem/LogicalOperatorItem'
 import CriteriaRightPanel from './components/CriteriaRightPanel/CriteriaRightPanel'
+import CriteriaCardItem from '../CriteriaCard/CriteriaCard'
 
 import { CriteriaGroupType, SelectedCriteriaType } from 'types'
 
@@ -53,8 +54,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({ itemId, addNewCriteria, add
               if (!child || child?.id === undefined) return <></>
 
               return child?.id > 0 ? (
-                // Display criteria
-                <></>
+                <CriteriaCardItem itemId={child.id} />
               ) : (
                 <OperatorItem itemId={child?.id} addNewCriteria={addNewCriteria} addNewGroup={addNewGroup} />
               )
