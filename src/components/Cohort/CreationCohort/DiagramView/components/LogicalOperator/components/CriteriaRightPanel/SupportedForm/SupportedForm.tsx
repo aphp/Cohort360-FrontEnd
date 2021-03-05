@@ -212,6 +212,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
           ]}
           submit={_onSubmit}
           formId="supported-form"
+          displaySubmitButton={false}
           formFooter={
             <Grid className={classes.criteriaActionContainer}>
               {!isEdition && (

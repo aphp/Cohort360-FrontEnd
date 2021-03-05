@@ -144,6 +144,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
           ]}
           submit={_onSubmit}
           formId="ccam-form"
+          displaySubmitButton={false}
           formFooter={
             <Grid className={classes.criteriaActionContainer}>
               {!isEdition && (

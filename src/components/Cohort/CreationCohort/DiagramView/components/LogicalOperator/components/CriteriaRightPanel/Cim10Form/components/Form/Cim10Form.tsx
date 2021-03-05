@@ -157,6 +157,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
           ]}
           submit={_onSubmit}
           formId="cim10-form"
+          displaySubmitButton={false}
           formFooter={
             <Grid className={classes.criteriaActionContainer}>
               {!isEdition && (

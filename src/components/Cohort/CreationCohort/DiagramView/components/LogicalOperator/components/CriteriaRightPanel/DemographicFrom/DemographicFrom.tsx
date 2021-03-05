@@ -131,6 +131,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
           ]}
           submit={_onSubmit}
           formId="demographic-form"
+          displaySubmitButton={false}
           formFooter={
             <Grid className={classes.criteriaActionContainer}>
               {!isEdition && (

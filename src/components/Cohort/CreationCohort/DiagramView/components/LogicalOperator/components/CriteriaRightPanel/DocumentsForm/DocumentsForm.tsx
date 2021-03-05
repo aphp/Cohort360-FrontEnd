@@ -120,6 +120,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
           ]}
           submit={_onSubmit}
           formId="documents-form"
+          displaySubmitButton={false}
           formFooter={
             <Grid className={classes.criteriaActionContainer}>
               {!isEdition && (
