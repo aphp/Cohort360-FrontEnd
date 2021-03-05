@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { Box, MenuItem, Select, Typography, TextField } from '@material-ui/core'
+import { Box, IconButton, MenuItem, Select, Typography, TextField } from '@material-ui/core'
+
+import DeleteIcon from '@material-ui/icons/Delete'
 
 import { useAppSelector } from 'state'
-import { editCriteriaGroup } from 'state/cohortCreation'
+import { editCriteriaGroup, deleteCriteriaGroup } from 'state/cohortCreation'
 
 import useStyles from './styles'
 
@@ -20,11 +22,8 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
   const [isOpen, setOpen] = useState<boolean>(false)
   const [groupType, setGroupType] = useState('andGroup')
 
-  const {
-    request: { criteriaGroup }
-  } = useAppSelector((state) => state.cohortCreation || {})
-
-  const currentLogicalOperator = criteriaGroup.find(({ id }) => id === itemId)
+  const { request } = useAppSelector((state) => state.cohortCreation || {})
+  const { criteriaGroup } = request
 
   useEffect(() => {
     const currentLogicalOperator = criteriaGroup.find(({ id }) => id === itemId)
@@ -49,6 +48,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
     }
   }, [itemId]) // eslint-disable-line
 
+  const currentLogicalOperator = criteriaGroup.find(({ id }) => id === itemId)
   if (!currentLogicalOperator) return <></>
 
   const logicalOperatorDic = {
@@ -57,6 +57,21 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
     NamongM: `${currentLogicalOperator.type === 'NamongM' ? currentLogicalOperator.options.number : 'X'} parmi ${
       currentLogicalOperator?.criteriaIds.length
     }`
+  }
+
+  const _deleteLogicalOperator = () => {
+    dispatch(deleteCriteriaGroup(itemId))
+
+    const logicalOperatorParent = request.criteriaGroup
+      ? request.criteriaGroup.find(({ criteriaIds }) => criteriaIds.find((_criteriaId) => _criteriaId === itemId))
+      : undefined
+    if (!logicalOperatorParent) return
+    dispatch(
+      editCriteriaGroup({
+        ...logicalOperatorParent,
+        criteriaIds: logicalOperatorParent.criteriaIds.filter((_criteriaId) => _criteriaId !== itemId)
+      })
+    )
   }
 
   const _handleChangeLogicalOperatorProps = (key: string, value: any) => {
@@ -195,9 +210,13 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
                 />
               )}
 
-              <Typography variant="h5" style={{ lineHeight: '42px' }}>
+              <Typography variant="h5" style={{ lineHeight: '42px', paddingRight: 12 }}>
                 critère(s)
               </Typography>
+
+              <IconButton size="small" onClick={() => _deleteLogicalOperator()} style={{ color: 'currentcolor' }}>
+                <DeleteIcon />
+              </IconButton>
             </>
           ) : (
             <Typography variant="h5" style={{ lineHeight: '42px', margin: 'auto', padding: '0 4px' }}>

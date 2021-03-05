@@ -14,7 +14,8 @@ import {
   addNewCriteriaGroup,
   editCriteriaGroup,
   addNewSelectedCriteria,
-  editSelectedCriteria
+  editSelectedCriteria,
+  deleteSelectedCriteria
 } from 'state/cohortCreation'
 
 import useStyles from './styles'
@@ -23,9 +24,17 @@ type OperatorItemProps = {
   itemId: number
   addNewCriteria: (parentId: number) => void
   addNewGroup: (parentId: number) => void
+  deleteCriteria: (criteriaId: number) => void
+  editCriteria: (criteria: SelectedCriteriaType) => void
 }
 
-const OperatorItem: React.FC<OperatorItemProps> = ({ itemId, addNewCriteria, addNewGroup }) => {
+const OperatorItem: React.FC<OperatorItemProps> = ({
+  itemId,
+  addNewCriteria,
+  addNewGroup,
+  deleteCriteria,
+  editCriteria
+}) => {
   const classes = useStyles()
 
   const { request } = useAppSelector((state) => state.cohortCreation || {})
@@ -40,23 +49,32 @@ const OperatorItem: React.FC<OperatorItemProps> = ({ itemId, addNewCriteria, add
       <div className={classes.operatorChild}>
         {displayingItem &&
           displayingItem.map(({ criteriaIds }) => {
-            const children: (CriteriaGroupType | SelectedCriteriaType)[] = [
-              ...criteriaGroup.filter((group: CriteriaGroupType) =>
-                criteriaIds.find((criteriaId) => group.id === criteriaId)
-              ),
-              ...selectedCriteria.filter((criteria: SelectedCriteriaType) =>
-                criteriaIds.find((criteriaId) => criteria.id === criteriaId)
-              )
-            ]
+            const children: (CriteriaGroupType | SelectedCriteriaType | undefined)[] = criteriaIds
+              .map((criteriaId: number) => {
+                let foundItem: CriteriaGroupType | SelectedCriteriaType | undefined = criteriaGroup.find(
+                  ({ id }) => id === criteriaId
+                )
+                if (!foundItem) {
+                  foundItem = selectedCriteria.find(({ id }) => id === criteriaId)
+                }
+                return foundItem
+              })
+              .filter((elem) => elem !== undefined)
             if (!children) return <></>
 
-            return children.map((child: CriteriaGroupType | SelectedCriteriaType) => {
+            return children.map((child) => {
               if (!child || child?.id === undefined) return <></>
 
               return child?.id > 0 ? (
-                <CriteriaCardItem itemId={child.id} />
+                <CriteriaCardItem deleteCriteria={deleteCriteria} editCriteria={editCriteria} itemId={child.id} />
               ) : (
-                <OperatorItem itemId={child?.id} addNewCriteria={addNewCriteria} addNewGroup={addNewGroup} />
+                <OperatorItem
+                  itemId={child?.id}
+                  addNewCriteria={addNewCriteria}
+                  addNewGroup={addNewGroup}
+                  deleteCriteria={deleteCriteria}
+                  editCriteria={editCriteria}
+                />
               )
             })
           })}
@@ -89,11 +107,12 @@ const GroupOperator: React.FC = () => {
 
   const [parentId, setParentId] = useState<number | null>(null)
   const [openDrawer, setOpenDrawer] = useState<'criteria' | null>(null)
+  const [selectedCriteria, setSelectedCriteria] = useState<SelectedCriteriaType | null>(null)
 
-  const _addOrEditCriteria = (item: SelectedCriteriaType) => {
+  const _onConfirmAddOrEditCriteria = (item: SelectedCriteriaType) => {
     // Add criteria
     const nextCriteriaId = request.nextCriteriaId
-    if (item.id) {
+    if (item.id !== undefined) {
       // Edition
       dispatch(editSelectedCriteria(item))
     } else {
@@ -135,21 +154,45 @@ const GroupOperator: React.FC = () => {
     )
   }
 
+  const _addNewCriteria = (parentId: number) => {
+    setOpenDrawer('criteria')
+    setParentId(parentId)
+    setSelectedCriteria(null)
+  }
+
+  const _editCriteria = (criteria: SelectedCriteriaType) => {
+    setOpenDrawer('criteria')
+    setSelectedCriteria(criteria)
+  }
+
+  const _deleteCriteria = (criteriaId: number) => {
+    dispatch(deleteSelectedCriteria(criteriaId))
+    const logicalOperatorParent = request.criteriaGroup
+      ? request.criteriaGroup.find(({ criteriaIds }) => criteriaIds.find((_criteriaId) => _criteriaId === criteriaId))
+      : undefined
+    if (!logicalOperatorParent) return
+    dispatch(
+      editCriteriaGroup({
+        ...logicalOperatorParent,
+        criteriaIds: logicalOperatorParent.criteriaIds.filter((_criteriaId) => _criteriaId !== criteriaId)
+      })
+    )
+  }
+
   return (
     <>
       <OperatorItem
         itemId={0}
-        addNewCriteria={(parentId: number) => {
-          setOpenDrawer('criteria')
-          setParentId(parentId)
-        }}
+        addNewCriteria={_addNewCriteria}
         addNewGroup={_addNewGroup}
+        deleteCriteria={_deleteCriteria}
+        editCriteria={_editCriteria}
       />
 
       <CriteriaRightPanel
         criteria={criteria}
-        selectedCriteria={null}
-        onChangeSelectedCriteria={_addOrEditCriteria}
+        selectedCriteria={selectedCriteria}
+        onChangeSelectedCriteria={_onConfirmAddOrEditCriteria}
         open={openDrawer === 'criteria'}
         onClose={() => setOpenDrawer(null)}
       />

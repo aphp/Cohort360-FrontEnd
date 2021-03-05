@@ -446,7 +446,6 @@ export async function unbuildRequest(_json: string) {
     }
   }
   for (const criterion of request[0].criteria) {
-    // console.log('exploredRequest - MAIN GROUP', criterion)
     criteriaGroup = [...criteriaGroup, criterion]
     exploreRequest(criterion)
   }

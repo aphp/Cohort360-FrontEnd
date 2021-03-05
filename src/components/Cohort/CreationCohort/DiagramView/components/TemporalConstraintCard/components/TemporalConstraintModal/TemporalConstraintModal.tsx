@@ -52,9 +52,6 @@ const TemporalConstraintModal: React.FC<{
   // const [currentStartId, onChangeStartId] = useState<'' | null>(null)
   // const [currentEndId, onChangeEndId] = useState<'' | null>(null)
 
-  console.log('initalState', initialState)
-  console.log('currentTemporalConstraint', currentTemporalConstraint)
-
   return (
     <Dialog fullWidth maxWidth="md" open onClose={handleClose}>
       <DialogTitle className={classes.title}>Contrainte Temporelle</DialogTitle>
