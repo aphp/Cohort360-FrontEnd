@@ -35,6 +35,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
+      ...defaultValues,
       title: data.title,
       search: data.search,
       docType: data.docType,

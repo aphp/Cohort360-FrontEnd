@@ -34,6 +34,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
+      ...defaultValues,
       title: data.title,
       vitalStatus: data.vitalStatus,
       gender: data.gender,

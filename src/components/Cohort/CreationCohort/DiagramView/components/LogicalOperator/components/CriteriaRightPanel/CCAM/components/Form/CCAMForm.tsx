@@ -31,6 +31,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
+      ...selectedCriteria,
       title: data.title,
       code: data.code,
       // encounter: data.encounter,

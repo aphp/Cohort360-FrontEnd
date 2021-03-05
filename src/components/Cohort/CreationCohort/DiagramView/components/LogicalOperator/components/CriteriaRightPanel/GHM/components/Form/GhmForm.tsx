@@ -31,6 +31,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
+      ...selectedCriteria,
       title: data.title,
       code: data.code,
       startOccurrence: data.startOccurrence,

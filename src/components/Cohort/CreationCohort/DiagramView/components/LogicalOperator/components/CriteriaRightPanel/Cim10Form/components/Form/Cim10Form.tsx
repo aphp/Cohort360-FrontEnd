@@ -31,6 +31,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
+      ...selectedCriteria,
       title: data.title,
       code: data.code,
       diagnosticType: data.diagnosticType,
