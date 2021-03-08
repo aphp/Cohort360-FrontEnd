@@ -42,7 +42,7 @@ const persistConfig = {
   key: 'root',
   storage,
   // blacklist: ['criteria'],
-  transforms: [exploredCohortMapTransform, creationCohortMapTransform]
+  transforms: [exploredCohortMapTransform]
 }
 
 const cohortCreationReducer = combineReducers({
