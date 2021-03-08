@@ -21,6 +21,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     if (!_currentCriteria) return <></>
     let content = <></>
 
+    const reducer = (accumulator: any, currentValue: any) =>
+      accumulator ? `${accumulator} - ${currentValue}` : currentValue ? currentValue : accumulator
+
     let _data: any = null
     const _searchDataFromCriteria = (_criteria: any[], type: string) => {
       for (const _criterion of _criteria) {
@@ -50,20 +53,12 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
     switch (_currentCriteria.type) {
       case 'Claim': {
-        const displaySelectedGHM = (currentGHM: { id: string; label: string }) => {
-          const selectedGhmData =
-            data?.ghmData && data?.ghmData !== 'loading'
-              ? data.ghmData.find((ghmElement: any) => ghmElement && ghmElement.id === currentGHM.id)
-              : null
-          return <Typography>{selectedGhmData ? selectedGhmData.label : ''}</Typography>
-        }
-
         content = (
           <>
             {_currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 ? (
               <Chip
                 className={classes.criteriaChip}
-                label={_currentCriteria?.code?.map((code) => displaySelectedGHM(code))}
+                label={_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
               />
             ) : (
               <></>
@@ -86,20 +81,12 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Procedure': {
-        const displaySelectedCCAM = (currentCCAM: { id: string; label: string }) => {
-          const selectedCcamData =
-            data?.ccamData && data?.ccamData !== 'loading'
-              ? data.ccamData.find((ccamElement: any) => ccamElement && ccamElement.id === currentCCAM.id)
-              : null
-          return <Typography>{selectedCcamData ? selectedCcamData.label : ''}.</Typography>
-        }
-
         content = (
           <>
             {_currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 ? (
               <Chip
                 className={classes.criteriaChip}
-                label={_currentCriteria?.code?.map((code) => displaySelectedCCAM(code))}
+                label={_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
               />
             ) : (
               <></>
@@ -122,36 +109,18 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Condition': {
-        const displaySelectedCIM10 = (currentCIM10: { id: string; label: string }) => {
-          const selectedCimData =
-            data?.cim10Diagnostic && data?.cim10Diagnostic !== 'loading'
-              ? data.cim10Diagnostic.find((cimElement: any) => cimElement && cimElement.id === currentCIM10.id)
-              : null
-          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
-        }
-
-        const displaySelectedCimType = (diagnosticType: { id: string; label: string }) => {
-          const selectedCimData =
-            data?.diagnosticTypes && data?.diagnosticTypes !== 'loading'
-              ? data.diagnosticTypes.find((type: any) => type && type.id === diagnosticType.id)
-              : null
-          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
-        }
-
         content = (
           <>
             {_currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
               <Chip
                 className={classes.criteriaChip}
-                label={_currentCriteria?.code?.map((code) => displaySelectedCIM10(code))}
+                label={_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
               />
             )}
             {_currentCriteria && _currentCriteria?.diagnosticType && _currentCriteria?.diagnosticType.length > 0 && (
               <Chip
                 className={classes.criteriaChip}
-                label={_currentCriteria?.diagnosticType?.map((diagnosticType) =>
-                  displaySelectedCimType(diagnosticType)
-                )}
+                label={_currentCriteria?.diagnosticType?.map((code) => code.id).reduce(reducer)}
               />
             )}
             {/* <Typography>
@@ -177,33 +146,38 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         if (ageType === 'month') ageUnit = 'mois'
         else if (ageType === 'day') ageUnit = 'jour(s)'
 
-        const displaySelectedGender = (gender: { id: string; label: string }) => {
-          const selectedCimData =
-            data?.gender && data?.gender !== 'loading'
-              ? data.gender.find((ghmElement: any) => ghmElement && ghmElement.id === gender.id)
-              : null
-          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        const displaySelectedGender = (genders: { id: string; label: string }[]) => {
+          let currentGender: string[] = []
+          for (const gender of genders) {
+            const selectedGenderData =
+              data?.gender && data?.gender !== 'loading'
+                ? data.gender.find((ghmElement: any) => ghmElement && ghmElement.id === gender.id)
+                : null
+            currentGender = selectedGenderData ? [...currentGender, selectedGenderData.label] : currentGender
+          }
+          return currentGender.reduce(reducer)
         }
-        const displaySelectedVitalStatus = (vitalStatus: { id: string; label: string }) => {
-          const selectedCimData =
-            data?.status && data?.status !== 'loading'
-              ? data.status.find((ghmElement: any) => ghmElement && ghmElement.id === vitalStatus.id)
-              : null
-          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        const displaySelectedVitalStatus = (vitalStatus: { id: string; label: string }[]) => {
+          let currentStatus: string[] = []
+          for (const _vitalStatus of vitalStatus) {
+            const selectedGenderData =
+              data?.status && data?.status !== 'loading'
+                ? data.status.find((statusElement: any) => statusElement && statusElement.id === _vitalStatus.id)
+                : null
+            currentStatus = selectedGenderData ? [...currentStatus, selectedGenderData.label] : currentStatus
+          }
+          return currentStatus.reduce(reducer)
         }
 
         content = (
           <>
             {_currentCriteria && _currentCriteria.gender && _currentCriteria?.gender?.length > 0 && (
-              <Chip
-                className={classes.criteriaChip}
-                label={_currentCriteria?.gender?.map((gender) => displaySelectedGender(gender))}
-              />
+              <Chip className={classes.criteriaChip} label={displaySelectedGender(_currentCriteria?.gender)} />
             )}
             {_currentCriteria && _currentCriteria.vitalStatus && _currentCriteria?.vitalStatus?.length > 0 && (
               <Chip
                 className={classes.criteriaChip}
-                label={_currentCriteria?.vitalStatus?.map((vitalStatus) => displaySelectedVitalStatus(vitalStatus))}
+                label={displaySelectedVitalStatus(_currentCriteria?.vitalStatus)}
               />
             )}
 
@@ -233,12 +207,16 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Composition': {
-        const displaySelectedDocType = (docType: { id: string; label: string }) => {
-          const selectedCimData =
-            data?.docTypes && data?.docTypes !== 'loading'
-              ? data.docTypes.find((ghmElement: any) => ghmElement && ghmElement.id === docType.id)
-              : null
-          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
+        const displaySelectedDocType = (docTypes: { id: string; label: string }[]) => {
+          let currentDocTypes: string[] = []
+          for (const docType of docTypes) {
+            const selectedGenderData =
+              data?.docTypes && data?.docTypes !== 'loading'
+                ? data.docTypes.find((typeElement: any) => typeElement && typeElement.id === docType.id)
+                : null
+            currentDocTypes = selectedGenderData ? [...currentDocTypes, selectedGenderData.label] : currentDocTypes
+          }
+          return currentDocTypes.reduce(reducer)
         }
 
         content = (
@@ -247,10 +225,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               <Chip className={classes.criteriaChip} label={`"${_currentCriteria.search}"`} />
             )}
             {_currentCriteria && _currentCriteria.docType && _currentCriteria?.docType?.length > 0 && (
-              <Chip
-                className={classes.criteriaChip}
-                label={_currentCriteria?.docType?.map((docType) => displaySelectedDocType(docType))}
-              />
+              <Chip className={classes.criteriaChip} label={displaySelectedDocType(_currentCriteria?.docType)} />
             )}
             {/* <Typography>
               {_currentCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_currentCriteria.encounter}` : ''}

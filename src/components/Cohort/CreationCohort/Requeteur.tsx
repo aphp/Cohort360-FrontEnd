@@ -48,7 +48,7 @@ const Requeteur = () => {
     _criteria = await getDataFromFetch(Object.freeze(_criteria), selectedCriteria)
     dispatch(setCriteriaList(_criteria))
     setLoading(false)
-  }, []) // eslint-disable-line
+  }, [dispatch, practitioner, selectedCriteria])
 
   const _unbuildRequest = async (newCurrentSnapshot: CohortCreationSnapshotType) => {
     dispatch(unbuildCreationCohort({ newCurrentSnapshot }))
