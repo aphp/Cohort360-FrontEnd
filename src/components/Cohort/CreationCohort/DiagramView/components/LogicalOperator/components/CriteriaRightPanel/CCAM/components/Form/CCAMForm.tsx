@@ -70,13 +70,10 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
           title="Actes CCAM"
           properties={[
             {
-              name: 'title',
-              placeholder: 'Nom du critère',
-              type: 'text',
-              variant: 'outlined',
-              validationRules: {
-                required: 'Merci de renseigné un titre'
-              }
+              name: 'isInclusive',
+              type: 'switch',
+              trueLabel: 'Exclusif',
+              falseLabel: 'Inclusif'
             },
             {
               name: 'code',

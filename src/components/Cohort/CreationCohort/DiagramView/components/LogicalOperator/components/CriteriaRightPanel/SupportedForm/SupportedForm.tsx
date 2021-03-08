@@ -90,15 +90,6 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
           title="Prise en charge"
           properties={[
             {
-              name: 'title',
-              placeholder: 'Nom du critère',
-              type: 'text',
-              variant: 'outlined',
-              validationRules: {
-                required: 'Merci de renseigné un titre'
-              }
-            },
-            {
               type: 'custom',
               name: 'label',
               renderInput: () => (
