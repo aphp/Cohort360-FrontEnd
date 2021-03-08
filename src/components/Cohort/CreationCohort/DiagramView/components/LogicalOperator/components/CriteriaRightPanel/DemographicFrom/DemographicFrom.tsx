@@ -71,6 +71,15 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
           title={'Démographie patient'}
           properties={[
             {
+              name: 'title',
+              placeholder: 'Nom du critère',
+              type: 'text',
+              variant: 'outlined',
+              validationRules: {
+                required: 'Merci de renseigner un titre'
+              }
+            },
+            {
               name: 'gender',
               label: 'Genre',
               variant: 'outlined',

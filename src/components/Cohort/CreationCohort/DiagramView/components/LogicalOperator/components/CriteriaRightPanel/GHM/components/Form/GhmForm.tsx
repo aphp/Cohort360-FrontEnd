@@ -64,6 +64,15 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
           title="Diagnostic"
           properties={[
             {
+              name: 'title',
+              placeholder: 'Nom du critère',
+              type: 'text',
+              variant: 'outlined',
+              validationRules: {
+                required: 'Merci de renseigner un titre'
+              }
+            },
+            {
               name: 'code',
               label: 'Code GHM',
               variant: 'outlined',

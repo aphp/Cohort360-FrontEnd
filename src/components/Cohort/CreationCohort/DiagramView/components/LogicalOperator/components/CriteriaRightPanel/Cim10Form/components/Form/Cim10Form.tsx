@@ -75,6 +75,15 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
           title="Diagnostic"
           properties={[
             {
+              name: 'title',
+              placeholder: 'Nom du critère',
+              type: 'text',
+              variant: 'outlined',
+              validationRules: {
+                required: 'Merci de renseigner un titre'
+              }
+            },
+            {
               name: 'code',
               label: 'Code CIM10',
               variant: 'outlined',
