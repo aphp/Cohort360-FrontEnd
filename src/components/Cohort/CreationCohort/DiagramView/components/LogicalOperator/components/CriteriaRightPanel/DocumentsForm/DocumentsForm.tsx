@@ -68,21 +68,12 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
           title={'Documents médicaux'}
           properties={[
             {
-              name: 'title',
-              placeholder: 'Nom du critère',
-              type: 'text',
-              variant: 'outlined',
-              validationRules: {
-                required: 'Merci de renseigné un titre'
-              }
-            },
-            {
               name: 'search',
               placeholder: 'Recherche dans les documents',
               type: 'text',
               variant: 'outlined',
               validationRules: {
-                required: 'Merci de renseigné une recherche'
+                required: 'Merci de renseigner une recherche'
               }
             },
             {

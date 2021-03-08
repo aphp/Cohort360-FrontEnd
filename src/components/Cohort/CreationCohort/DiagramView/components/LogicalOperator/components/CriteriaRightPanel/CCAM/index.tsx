@@ -12,7 +12,8 @@ const defaultProcedure = {
   encounter: 0,
   comparator: { id: 'e', label: '=' },
   startOccurrence: '',
-  endOccurrence: ''
+  endOccurrence: '',
+  isInclusive: true
 }
 
 const Index = (props: any) => {

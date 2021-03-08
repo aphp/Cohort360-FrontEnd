@@ -21,7 +21,8 @@ const defaultDemographic = {
   vitalStatus: [],
   gender: [],
   ageType: { id: 'year', label: 'années' },
-  years: [0, 130]
+  years: [0, 130],
+  isInclusive: true
 }
 
 const DemographicForm: React.FC<DemographicFormProps> = (props) => {
@@ -69,15 +70,6 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
           defaultValues={defaultValues}
           title={'Démographie patient'}
           properties={[
-            {
-              name: 'title',
-              placeholder: 'Nom du critère',
-              type: 'text',
-              variant: 'outlined',
-              validationRules: {
-                required: 'Merci de renseigné un titre'
-              }
-            },
             {
               name: 'gender',
               label: 'Genre',
