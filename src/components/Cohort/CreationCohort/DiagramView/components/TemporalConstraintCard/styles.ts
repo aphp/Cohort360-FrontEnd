@@ -1,22 +1,23 @@
 import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(() => ({
-  card: {
-    width: 450
-  },
-  cardHeader: {
-    background: '#D1E2F4',
-    color: '#45505B'
-  },
-  actionButtonContainer: {
+  root: {
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 12
+    flexWrap: 'nowrap',
+    backgroundColor: '#EFBE5E',
+    width: 'fit-content',
+    height: '30px',
+    borderRadius: '5px'
   },
-  actionButton: {
-    margin: 4,
-    outline: 'none'
+  temporalConstraintTypo: {
+    marginTop: '5px',
+    marginRight: '4px',
+    paddingLeft: '2px'
+  },
+  temporalConstraintSelect: {
+    height: '25px',
+    marginTop: '4px',
+    marginRight: '2px'
   }
 }))
 
