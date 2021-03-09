@@ -210,6 +210,9 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
   async ({ newCurrentSnapshot }) => {
     try {
       const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot.json)
+      console.log('population', population)
+      console.log('criteria', criteria)
+      console.log('criteriaGroup', criteriaGroup)
 
       return {
         json: newCurrentSnapshot.json,

@@ -77,6 +77,7 @@ type RequeteurCriteriaType = {
     timeDelayMax?: number
   }
 }
+
 type RequeteurGroupType =
   | {
       // GROUP (andGroup | orGroup)
@@ -112,7 +113,7 @@ type RequeteurSearchType = {
   request: RequeteurGroupType | undefined
 }
 
-const constructFilterSolr = (criterion: SelectedCriteriaType) => {
+const constructFilterFhir = (criterion: SelectedCriteriaType) => {
   let filterFhir = ''
 
   const filterReducer = (accumulator: any, currentValue: any) =>
@@ -352,26 +353,29 @@ export function buildRequest(
             _id: 0,
             isInclusive: true,
             criteria: mainCriteriaGroups?.map((mainCriteriaGroup) => {
+              // @ts-ignore
               const subItems: (RequeteurCriteriaType | RequeteurGroupType)[] = mainCriteriaGroup.criteriaIds
                 ? mainCriteriaGroup.criteriaIds
                     .map((itemId) => {
                       const isGroup = itemId < 0
                       if (!isGroup) {
+                        // return RequeteurCriteriaType
                         const item: SelectedCriteriaType =
                           selectedCriteria.find(({ id }) => id === itemId) ?? DEFAULT_CRITERIA_ERROR
 
                         return {
                           _type: 'basicResource',
                           _id: item.id ?? 0,
-                          resourceType: item.type ?? 'Patient',
                           isInclusive: item.isInclusive ?? true,
-                          filterFhir: constructFilterSolr(item)
+                          resourceType: item.type ?? 'Patient',
+                          filterFhir: constructFilterFhir(item)
                         }
                       } else {
+                        // return RequeteurGroupType
                         const group: CriteriaGroupType =
                           criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
 
-                        const subItems = group.criteriaIds
+                        const subItems: RequeteurCriteriaType[] = group.criteriaIds
                           ? group.criteriaIds.map((criteriaId) => {
                               const subItem: SelectedCriteriaType =
                                 selectedCriteria.find(({ id }) => id === criteriaId) ?? DEFAULT_CRITERIA_ERROR
@@ -381,17 +385,32 @@ export function buildRequest(
                                 _id: subItem.id ?? 0,
                                 resourceType: subItem.type ?? 'Patient',
                                 isInclusive: subItem.isInclusive ?? true,
-                                filterFhir: constructFilterSolr(subItem)
+                                filterFhir: constructFilterFhir(subItem)
                               }
                             })
                           : []
 
                         // DO SPECIAL THING FOR `NamongM`
-                        return {
-                          _type: group.type === 'NamongM' ? 'orGroup' : group.type,
-                          _id: group.id,
-                          isInclusive: group.isInclusive ?? true,
-                          criteria: subItems
+                        if (group.type === 'NamongM') {
+                          return {
+                            _type: 'nAmongM',
+                            _id: group.id,
+                            isInclusive: group.isInclusive ?? true,
+                            criteria: subItems,
+                            nAmongMOptions: {
+                              n: group.options.number,
+                              operator: group.options.operator,
+                              timeDelayMin: group.options.timeDelayMin,
+                              timeDelayMax: group.options.timeDelayMax
+                            }
+                          }
+                        } else {
+                          return {
+                            _type: group.type,
+                            _id: group.id,
+                            isInclusive: group.isInclusive ?? true,
+                            criteria: subItems
+                          }
                         }
                       }
                     })
@@ -431,27 +450,28 @@ export async function unbuildRequest(_json: string) {
   }
 
   /**
+   * Retrieve criteria + groups
    *
-   * @param currentItem
    */
-  const exploreRequest = (currentItem: any) => {
+  const exploreRequest = (currentItem: any, isSubItem: boolean) => {
     const { criteria } = currentItem
 
     for (const criterion of criteria) {
       if (criterion._type === 'basicResource') {
         criteriaItems = [...criteriaItems, criterion]
       } else {
-        criteriaGroup = [...criteriaGroup, { ...criterion, isSubItem: true }]
+        criteriaGroup = [...criteriaGroup, { ...criterion, isSubItem }]
         if (criterion && criterion.criteria && criterion.criteria.length > 0) {
-          exploreRequest(criterion)
+          exploreRequest(criterion, true)
         }
       }
     }
   }
-  for (const criterion of request[0].criteria) {
-    // console.log('exploredRequest - MAIN GROUP', criterion)
-    criteriaGroup = [...criteriaGroup, criterion]
-    exploreRequest(criterion)
+
+  if (request !== undefined) {
+    exploreRequest(request, false)
+  } else {
+    return { population, criteria: [], criteriaGroup: [] }
   }
 
   const _retrieveInformationFromJson = async (element: RequeteurCriteriaType) => {
@@ -857,19 +877,20 @@ export async function unbuildRequest(_json: string) {
 
   const convertJsonObjectsToCriteriaGroup: (_criteriaGroup: RequeteurGroupType[]) => CriteriaGroupType[] = (
     _criteriaGroup
-  ) => {
-    return _criteriaGroup.map((groupItem: any) => ({
-      id: groupItem._id,
-      title: 'Groupe de critère',
-      criteriaIds:
-        groupItem.criteria && groupItem.criteria.length > 0
-          ? groupItem.criteria.map((criteria: RequeteurCriteriaType | RequeteurGroupType) => criteria._id)
-          : [],
-      isSubGroup: groupItem.isSubItem,
-      isInclusive: groupItem.isInclusive,
-      type: groupItem.type
-    }))
-  }
+  ) =>
+    _criteriaGroup && _criteriaGroup.length > 0
+      ? _criteriaGroup.map((groupItem: any) => ({
+          id: groupItem._id,
+          title: 'Groupe de critère',
+          criteriaIds:
+            groupItem.criteria && groupItem.criteria.length > 0
+              ? groupItem.criteria.map((criteria: RequeteurCriteriaType | RequeteurGroupType) => criteria._id)
+              : [],
+          isSubGroup: groupItem.isSubItem,
+          isInclusive: groupItem.isInclusive,
+          type: groupItem.type
+        }))
+      : []
 
   return {
     population,
