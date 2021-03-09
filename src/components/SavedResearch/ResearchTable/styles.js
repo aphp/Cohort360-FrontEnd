@@ -25,6 +25,10 @@ const useStyles = makeStyles(() => ({
     fontSize: '12px',
     fontWeight: 'bold'
   },
+  notAllow: {
+    opacity: 0.7,
+    cursor: 'not-allowed'
+  },
   pointerHover: {
     '&:hover': {
       cursor: 'pointer'

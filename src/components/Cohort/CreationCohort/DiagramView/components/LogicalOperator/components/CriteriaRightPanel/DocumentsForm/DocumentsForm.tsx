@@ -35,6 +35,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
+      ...defaultValues,
       title: data.title,
       search: data.search,
       docType: data.docType,
@@ -72,7 +73,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               type: 'text',
               variant: 'outlined',
               validationRules: {
-                required: 'Merci de renseigné un titre'
+                required: 'Merci de renseigner un titre'
               }
             },
             {
@@ -81,7 +82,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               type: 'text',
               variant: 'outlined',
               validationRules: {
-                required: 'Merci de renseigné une recherche'
+                required: 'Merci de renseigner une recherche'
               }
             },
             {
@@ -120,6 +121,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
           ]}
           submit={_onSubmit}
           formId="documents-form"
+          displaySubmitButton={false}
           formFooter={
             <Grid className={classes.criteriaActionContainer}>
               {!isEdition && (

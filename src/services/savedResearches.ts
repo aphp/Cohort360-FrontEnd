@@ -87,7 +87,8 @@ export const fetchCohorts = async (
             nPatients: cohort.result_size,
             date: cohort.created_at,
             perimeter: '-',
-            favorite: cohort.favorite
+            favorite: cohort.favorite,
+            jobStatus: cohort.request_job_status
           }))
           .filter(Boolean)
       : undefined
@@ -110,7 +111,8 @@ export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefi
         nPatients: 12,
         date: '2021-01-20T10:28:28.385368Z',
         perimeter: '-',
-        favorite: true
+        favorite: true,
+        jobStatus: 'finished'
       }
     ]
 
@@ -130,7 +132,8 @@ export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefi
               nPatients: cohort.result_size,
               date: cohort.created_at,
               perimeter: '-',
-              favorite: cohort.favorite
+              favorite: cohort.favorite,
+              jobStatus: cohort.request_job_status
             }
           })
           .filter(Boolean)
@@ -172,7 +175,8 @@ export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined>
             nPatients: cohort.result_size,
             date: cohort.created_at,
             perimeter: '-',
-            favorite: cohort.favorite
+            favorite: cohort.favorite,
+            jobStatus: cohort.request_job_status
           }))
           .filter(Boolean)
       : undefined

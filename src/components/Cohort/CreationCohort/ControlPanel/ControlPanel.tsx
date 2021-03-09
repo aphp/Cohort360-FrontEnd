@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
@@ -11,7 +11,7 @@ import UpdateSharpIcon from '@material-ui/icons/UpdateSharp'
 import ModalCohortTitle from './components/ModalCohortTitle/ModalCohortTitle'
 
 import { useAppSelector } from 'state'
-import { resetCohortCreation } from 'state/cohortCreation'
+import { resetCohortCreation, countCohortCreation } from 'state/cohortCreation'
 
 import useStyle from './styles'
 
@@ -26,6 +26,17 @@ const ControlPanel: React.FC<{
 
   const { loading = false, count = {} } = useAppSelector((state) => state.cohortCreation.request || {})
   const { includePatient /*, byrequest, alive, deceased, female, male*/ } = count
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (count && count.status && (count.status === 'pending' || count.status === 'started')) {
+        dispatch(countCohortCreation({ uuid: count.uuid }))
+      } else {
+        clearInterval(interval)
+      }
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [count]) //eslint-disable-line
 
   return (
     <>
