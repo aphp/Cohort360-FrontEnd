@@ -11,6 +11,7 @@ import { CriteriaGroupType, SelectedCriteriaType } from 'types'
 
 import { useAppSelector } from 'state'
 import {
+  buildCohortCreation,
   addNewCriteriaGroup,
   editCriteriaGroup,
   addNewSelectedCriteria,
@@ -25,7 +26,7 @@ type OperatorItemProps = {
   addNewCriteria: (parentId: number) => void
   addNewGroup: (parentId: number) => void
   deleteCriteria: (criteriaId: number) => void
-  editCriteria: (criteria: SelectedCriteriaType) => void
+  editCriteria: (criteria: SelectedCriteriaType, parentId: number) => void
 }
 
 const OperatorItem: React.FC<OperatorItemProps> = ({
@@ -66,7 +67,11 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
               if (!child || child?.id === undefined) return <></>
 
               return child?.id > 0 ? (
-                <CriteriaCardItem deleteCriteria={deleteCriteria} editCriteria={editCriteria} itemId={child.id} />
+                <CriteriaCardItem
+                  deleteCriteria={deleteCriteria}
+                  editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
+                  itemId={child.id}
+                />
               ) : (
                 <OperatorItem
                   itemId={child?.id}
@@ -109,6 +114,10 @@ const GroupOperator: React.FC = () => {
   const [openDrawer, setOpenDrawer] = useState<'criteria' | null>(null)
   const [selectedCriteria, setSelectedCriteria] = useState<SelectedCriteriaType | null>(null)
 
+  const _buildCohortCreation = () => {
+    dispatch(buildCohortCreation({}))
+  }
+
   const _onConfirmAddOrEditCriteria = (item: SelectedCriteriaType) => {
     // Add criteria
     const nextCriteriaId = request.nextCriteriaId
@@ -119,16 +128,17 @@ const GroupOperator: React.FC = () => {
       // Creation
       item.id = nextCriteriaId
       dispatch(addNewSelectedCriteria(item))
+      // Link criteria with group operator
+      const currentParent = request.criteriaGroup ? request.criteriaGroup.find(({ id }) => id === parentId) : null
+      if (!currentParent) return
+      dispatch(
+        editCriteriaGroup({
+          ...currentParent,
+          criteriaIds: [...currentParent.criteriaIds, nextCriteriaId]
+        })
+      )
     }
-    // Link criteria with group operator
-    const currentParent = request.criteriaGroup ? request.criteriaGroup.find(({ id }) => id === parentId) : null
-    if (!currentParent) return
-    dispatch(
-      editCriteriaGroup({
-        ...currentParent,
-        criteriaIds: [...currentParent.criteriaIds, nextCriteriaId]
-      })
-    )
+    _buildCohortCreation()
   }
 
   const _addNewGroup = (parentId: number) => {
@@ -160,8 +170,9 @@ const GroupOperator: React.FC = () => {
     setSelectedCriteria(null)
   }
 
-  const _editCriteria = (criteria: SelectedCriteriaType) => {
+  const _editCriteria = (criteria: SelectedCriteriaType, parentId: number) => {
     setOpenDrawer('criteria')
+    setParentId(parentId)
     setSelectedCriteria(criteria)
   }
 
@@ -177,6 +188,7 @@ const GroupOperator: React.FC = () => {
         criteriaIds: logicalOperatorParent.criteriaIds.filter((_criteriaId) => _criteriaId !== criteriaId)
       })
     )
+    _buildCohortCreation()
   }
 
   return (

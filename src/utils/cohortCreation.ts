@@ -337,7 +337,56 @@ export function buildRequest(
 ) {
   if (!selectedPopulation) return ''
 
-  const mainCriteriaGroups = criteriaGroup.filter(({ isSubGroup }) => !isSubGroup)
+  const exploreCriteriaGroup = (itemIds: number[]) => {
+    let children: (RequeteurCriteriaType | RequeteurGroupType)[] = []
+
+    for (const itemId of itemIds) {
+      let child: RequeteurCriteriaType | RequeteurGroupType | null = null
+      const isGroup = itemId < 0
+      if (!isGroup) {
+        // return RequeteurCriteriaType
+        const item: SelectedCriteriaType = selectedCriteria.find(({ id }) => id === itemId) ?? DEFAULT_CRITERIA_ERROR
+
+        child = {
+          _type: 'basicResource',
+          _id: item.id ?? 0,
+          isInclusive: item.isInclusive ?? true,
+          resourceType: item.type ?? 'Patient',
+          filterFhir: constructFilterFhir(item)
+        }
+      } else {
+        // return RequeteurGroupType
+        const group: CriteriaGroupType = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
+
+        // DO SPECIAL THING FOR `NamongM`
+        if (group.type === 'NamongM') {
+          child = {
+            _type: 'nAmongM',
+            _id: group.id,
+            isInclusive: group.isInclusive ?? true,
+            criteria: exploreCriteriaGroup(group.criteriaIds),
+            nAmongMOptions: {
+              n: group.options.number,
+              operator: group.options.operator,
+              timeDelayMin: group.options.timeDelayMin,
+              timeDelayMax: group.options.timeDelayMax
+            }
+          }
+        } else {
+          child = {
+            _type: group.type,
+            _id: group.id,
+            isInclusive: group.isInclusive ?? true,
+            criteria: exploreCriteriaGroup(group.criteriaIds)
+          }
+        }
+      }
+      children = [...children, child]
+    }
+    return children
+  }
+
+  const mainCriteriaGroups = criteriaGroup.find(({ id }) => id === 0)
 
   const json: RequeteurSearchType = {
     version: 'v1.0',
@@ -345,86 +394,14 @@ export function buildRequest(
     sourcePopulation: {
       caresiteCohortList: selectedPopulation?.map(({ id }) => +id)
     },
-    request:
-      !mainCriteriaGroups || mainCriteriaGroups?.length === 0
-        ? undefined
-        : {
-            _type: 'andGroup',
-            _id: -124,
-            isInclusive: true,
-            criteria: mainCriteriaGroups?.map((mainCriteriaGroup) => {
-              // @ts-ignore
-              const subItems: (RequeteurCriteriaType | RequeteurGroupType)[] = mainCriteriaGroup.criteriaIds
-                ? mainCriteriaGroup.criteriaIds
-                    .map((itemId) => {
-                      const isGroup = itemId < 0
-                      if (!isGroup) {
-                        // return RequeteurCriteriaType
-                        const item: SelectedCriteriaType =
-                          selectedCriteria.find(({ id }) => id === itemId) ?? DEFAULT_CRITERIA_ERROR
-
-                        return {
-                          _type: 'basicResource',
-                          _id: item.id ?? 0,
-                          isInclusive: item.isInclusive ?? true,
-                          resourceType: item.type ?? 'Patient',
-                          filterFhir: constructFilterFhir(item)
-                        }
-                      } else {
-                        // return RequeteurGroupType
-                        const group: CriteriaGroupType =
-                          criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
-
-                        const subItems: RequeteurCriteriaType[] = group.criteriaIds
-                          ? group.criteriaIds.map((criteriaId) => {
-                              const subItem: SelectedCriteriaType =
-                                selectedCriteria.find(({ id }) => id === criteriaId) ?? DEFAULT_CRITERIA_ERROR
-
-                              return {
-                                _type: 'basicResource',
-                                _id: subItem.id ?? 0,
-                                resourceType: subItem.type ?? 'Patient',
-                                isInclusive: subItem.isInclusive ?? true,
-                                filterFhir: constructFilterFhir(subItem)
-                              }
-                            })
-                          : []
-
-                        // DO SPECIAL THING FOR `NamongM`
-                        if (group.type === 'NamongM') {
-                          return {
-                            _type: 'nAmongM',
-                            _id: group.id,
-                            isInclusive: group.isInclusive ?? true,
-                            criteria: subItems,
-                            nAmongMOptions: {
-                              n: group.options.number,
-                              operator: group.options.operator,
-                              timeDelayMin: group.options.timeDelayMin,
-                              timeDelayMax: group.options.timeDelayMax
-                            }
-                          }
-                        } else {
-                          return {
-                            _type: group.type,
-                            _id: group.id,
-                            isInclusive: group.isInclusive ?? true,
-                            criteria: subItems
-                          }
-                        }
-                      }
-                    })
-                    .filter((item) => item !== null)
-                : []
-
-              return {
-                _id: mainCriteriaGroup.id,
-                _type: 'andGroup',
-                isInclusive: mainCriteriaGroup.isInclusive ?? true,
-                criteria: subItems
-              }
-            })
-          }
+    request: !mainCriteriaGroups
+      ? undefined
+      : {
+          _id: 0,
+          _type: 'andGroup',
+          isInclusive: true,
+          criteria: exploreCriteriaGroup(mainCriteriaGroups.criteriaIds)
+        }
   }
 
   return JSON.stringify(json)
@@ -453,23 +430,24 @@ export async function unbuildRequest(_json: string) {
    * Retrieve criteria + groups
    *
    */
-  const exploreRequest = (currentItem: any, isSubItem: boolean) => {
+  const exploreRequest = (currentItem: any) => {
     const { criteria } = currentItem
 
     for (const criterion of criteria) {
       if (criterion._type === 'basicResource') {
         criteriaItems = [...criteriaItems, criterion]
       } else {
-        criteriaGroup = [...criteriaGroup, { ...criterion, isSubItem }]
+        criteriaGroup = [...criteriaGroup, { ...criterion }]
         if (criterion && criterion.criteria && criterion.criteria.length > 0) {
-          exploreRequest(criterion, true)
+          exploreRequest(criterion)
         }
       }
     }
   }
 
   if (request !== undefined) {
-    exploreRequest(request, false)
+    criteriaGroup = [...criteriaGroup, { ...request }]
+    exploreRequest(request)
   } else {
     return { population, criteria: [], criteriaGroup: [] }
   }
