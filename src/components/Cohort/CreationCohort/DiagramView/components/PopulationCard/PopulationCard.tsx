@@ -1,14 +1,14 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { Button, Card, CardHeader, CardContent, CircularProgress, IconButton, Typography } from '@material-ui/core'
+import { Button, Chip, CircularProgress, IconButton, Typography } from '@material-ui/core'
 
 import EditIcon from '@material-ui/icons/Edit'
 
 import PopulationRightPanel from './components/PopulationRightPanel'
 
 import { useAppSelector } from 'state'
-import { buildCreationCohort } from 'state/cohortCreation'
+import { buildCohortCreation } from 'state/cohortCreation'
 
 import { ScopeTreeRow } from 'types'
 
@@ -23,64 +23,50 @@ const PopulationCard: React.FC = () => {
   const [openDrawer, onChangeOpenDrawer] = useState(false)
 
   const submitPopulation = (_selectedPopulation: ScopeTreeRow[] | null) => {
-    dispatch(buildCreationCohort({ selectedPopulation: _selectedPopulation }))
+    dispatch(buildCohortCreation({ selectedPopulation: _selectedPopulation }))
     onChangeOpenDrawer(false)
   }
 
   return (
     <>
-      <div className={selectedPopulation !== null ? classes.root : ''}>
-        <Card className={classes.card}>
-          <CardHeader
-            className={classes.cardHeader}
-            action={
-              selectedPopulation !== null && (
-                <IconButton size="small" onClick={() => onChangeOpenDrawer(true)} style={{ color: 'currentcolor' }}>
-                  <EditIcon />
-                </IconButton>
-              )
-            }
-            title="Population source"
-          />
-          <CardContent className={classes.cardContent}>
-            {selectedPopulation === null && loading === true ? (
-              <CircularProgress />
-            ) : selectedPopulation !== null ? (
-              <>
-                <Typography align="center">Patients ayant été pris en charge à :</Typography>
-                {selectedPopulation &&
-                  selectedPopulation.slice(0, 3).map((pop: any, index: number) => (
-                    <Typography key={`${index}-${pop.name}`} align="center" className={classes.populationLabel}>
-                      {pop.name}
-                    </Typography>
-                  ))}
-                {selectedPopulation && selectedPopulation.length > 3 && (
-                  <Typography align="center" className={classes.populationLabel}>
-                    ...
-                  </Typography>
-                )}
-              </>
-            ) : (
-              <>
-                <Typography align="center">
-                  Sur quelle population source souhaitez-vous baser votre requête ?
-                </Typography>
+      {loading ? (
+        <div className={classes.newPopulationCard}>
+          <div className={classes.centerContainer}>
+            <CircularProgress />
+          </div>
+        </div>
+      ) : selectedPopulation !== null ? (
+        <div className={classes.newPopulationCard}>
+          <div className={classes.leftDiv}>
+            <Typography variant="h6" align="left">
+              Population source :
+            </Typography>
 
-                <div className={classes.actionButtonContainer}>
-                  <Button
-                    onClick={() => onChangeOpenDrawer(true)}
-                    variant="contained"
-                    color="primary"
-                    className={classes.actionButton}
-                  >
-                    <Typography variant="h5">Structure hospitalière</Typography>
-                  </Button>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+            <div className={classes.chipContainer}>
+              {selectedPopulation &&
+                selectedPopulation
+                  .slice(0, 4)
+                  .map((pop: any, index: number) => (
+                    <Chip className={classes.populationChip} key={`${index}-${pop.name}`} label={pop.name} />
+                  ))}
+              {selectedPopulation && selectedPopulation.length > 4 && (
+                <Typography component="span" align="center" className={classes.populationLabel}>
+                  ...
+                </Typography>
+              )}
+            </div>
+          </div>
+          <IconButton size="small" onClick={() => onChangeOpenDrawer(true)} style={{ color: 'currentcolor' }}>
+            <EditIcon />
+          </IconButton>
+        </div>
+      ) : (
+        <div className={classes.centerContainer}>
+          <Button className={classes.actionButton} onClick={() => onChangeOpenDrawer(true)}>
+            Choisir une population source
+          </Button>
+        </div>
+      )}
 
       <PopulationRightPanel open={openDrawer} onConfirm={submitPopulation} onClose={() => onChangeOpenDrawer(false)} />
     </>

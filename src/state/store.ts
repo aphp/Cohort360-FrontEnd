@@ -11,7 +11,7 @@ import userCohorts, { UserCohortsState } from './userCohorts'
 import me, { MeState } from './me'
 import drawer from './drawer'
 
-const MapTransform = createTransform(
+const exploredCohortMapTransform = createTransform(
   // transform state on its way to being serialized and persisted.
   (inboundState: any) => {
     // convert exploredCohort to an Array.
@@ -42,7 +42,7 @@ const persistConfig = {
   key: 'root',
   storage,
   // blacklist: ['criteria'],
-  transforms: [MapTransform]
+  transforms: [exploredCohortMapTransform]
 }
 
 const cohortCreationReducer = combineReducers({

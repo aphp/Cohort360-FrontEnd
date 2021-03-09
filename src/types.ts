@@ -80,6 +80,7 @@ export type Cohort = {
   favorite?: boolean
   type?: string
   request_id?: string
+  request_job_status?: string
 }
 
 export type FormattedCohort = {
@@ -91,6 +92,7 @@ export type FormattedCohort = {
   date?: string
   perimeter?: string
   favorite?: boolean
+  jobStatus?: string
 }
 
 export type CohortGroup = IGroup & {
@@ -230,6 +232,8 @@ export type CriteriaGroupType = {
       options: {
         operator: '=' | '<' | '>' | '<=' | '>='
         number: number
+        timeDelayMin: number
+        timeDelayMax: number
       }
     }
 )
@@ -259,8 +263,7 @@ export type CriteriaItemType = {
 }
 
 export type SelectedCriteriaType = {
-  id?: number
-  isInclusive?: boolean
+  id: number
 } & (CcamDataType | Cim10DataType | DemographicDataType | GhmDataType | EncounterDataType | DocumentDataType)
 
 export type CcamDataType = {
@@ -273,6 +276,7 @@ export type CcamDataType = {
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
+  isInclusive?: boolean
 }
 
 export type Cim10DataType = {
@@ -285,6 +289,7 @@ export type Cim10DataType = {
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
+  isInclusive?: boolean
 }
 
 export type DemographicDataType = {
@@ -295,6 +300,7 @@ export type DemographicDataType = {
   ageType: { id: string; label: string } | null
   label: undefined
   years: [number, number]
+  isInclusive?: boolean
 }
 
 export type DocumentDataType = {
@@ -307,6 +313,7 @@ export type DocumentDataType = {
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
+  isInclusive?: boolean
 }
 
 export type GhmDataType = {
@@ -318,6 +325,7 @@ export type GhmDataType = {
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
+  isInclusive?: boolean
 }
 
 export type EncounterDataType = {
@@ -334,12 +342,13 @@ export type EncounterDataType = {
   exitMode: { id: string; label: string } | null
   priseEnChargeType: { id: string; label: string } | null
   typeDeSejour: { id: string; label: string } | null
-  onSaitPas: { id: string; label: string } | null
   fileStatus: { id: string; label: string } | null
+  isInclusive?: boolean
 }
 
 export type CohortCreationCounterType = {
   uuid?: string
+  status?: string
   includePatient?: number
   byrequest?: number
   alive?: number
@@ -352,4 +361,9 @@ export type CohortCreationSnapshotType = {
   uuid: string
   json: string
   date: string
+}
+
+export type ValueSet = {
+  code: string
+  display: string
 }

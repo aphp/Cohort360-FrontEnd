@@ -1,6 +1,6 @@
 import { CONTEXT } from '../../constants'
 import apiRequest from '../apiRequest'
-import { capitalizeFirstLetter } from '../../utils/capitalize'
+import { cleanValueSet } from 'utils/cleanValueSet'
 
 export const fetchGender = async () => {
   if (CONTEXT === 'arkhn') {
@@ -30,12 +30,7 @@ export const fetchGender = async () => {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-gender`)
       const data = res.data.entry[0].resource.compose.include[0].concept || []
 
-      return data && data.length > 0
-        ? data.map((_data: { code: string; display: string }) => ({
-            id: _data.code,
-            label: capitalizeFirstLetter(_data.display)
-          }))
-        : []
+      return cleanValueSet(data)
     } catch (error) {
       return []
     }
