@@ -21,7 +21,8 @@ const defaultDemographic = {
   vitalStatus: [],
   gender: [],
   ageType: { id: 'year', label: 'années' },
-  years: [0, 130]
+  years: [0, 130],
+  isInclusive: true
 }
 
 const DemographicForm: React.FC<DemographicFormProps> = (props) => {
@@ -34,6 +35,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
+      ...defaultValues,
       title: data.title,
       vitalStatus: data.vitalStatus,
       gender: data.gender,
@@ -74,7 +76,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
               type: 'text',
               variant: 'outlined',
               validationRules: {
-                required: 'Merci de renseigné un titre'
+                required: 'Merci de renseigner un titre'
               }
             },
             {
@@ -131,6 +133,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
           ]}
           submit={_onSubmit}
           formId="demographic-form"
+          displaySubmitButton={false}
           formFooter={
             <Grid className={classes.criteriaActionContainer}>
               {!isEdition && (

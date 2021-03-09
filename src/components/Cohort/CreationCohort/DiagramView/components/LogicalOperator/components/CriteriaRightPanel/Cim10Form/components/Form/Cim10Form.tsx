@@ -31,6 +31,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
+      ...selectedCriteria,
       title: data.title,
       code: data.code,
       diagnosticType: data.diagnosticType,
@@ -79,7 +80,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               type: 'text',
               variant: 'outlined',
               validationRules: {
-                required: 'Merci de renseigné un titre'
+                required: 'Merci de renseigner un titre'
               }
             },
             {
@@ -157,6 +158,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
           ]}
           submit={_onSubmit}
           formId="cim10-form"
+          displaySubmitButton={false}
           formFooter={
             <Grid className={classes.criteriaActionContainer}>
               {!isEdition && (

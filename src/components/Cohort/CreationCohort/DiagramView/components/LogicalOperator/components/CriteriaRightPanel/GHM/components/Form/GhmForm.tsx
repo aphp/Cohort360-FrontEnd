@@ -31,6 +31,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
+      ...selectedCriteria,
       title: data.title,
       code: data.code,
       startOccurrence: data.startOccurrence,
@@ -138,6 +139,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
           ]}
           submit={_onSubmit}
           formId="ghm-form"
+          displaySubmitButton={false}
           formFooter={
             <Grid className={classes.criteriaActionContainer}>
               {!isEdition && (

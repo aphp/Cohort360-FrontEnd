@@ -41,6 +41,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
+      ...defaultValues,
       title: data.title,
       ageType: data.ageType,
       years: data.years,
@@ -94,7 +95,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
               type: 'text',
               variant: 'outlined',
               validationRules: {
-                required: 'Merci de renseigné un titre'
+                required: 'Merci de renseigner un titre'
               }
             },
             {
@@ -212,6 +213,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
           ]}
           submit={_onSubmit}
           formId="supported-form"
+          displaySubmitButton={false}
           formFooter={
             <Grid className={classes.criteriaActionContainer}>
               {!isEdition && (

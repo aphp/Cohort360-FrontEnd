@@ -38,7 +38,6 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
 
   const _onExpand = async (ghmCode: string) => {
     setOpen(!open)
-    // console.log('subItems', subItems)
     if (subItems && subItems[0] === 'loading') {
       const _subItems = await fetchHierarchy(ghmCode)
       setSubItems(_subItems)
