@@ -219,9 +219,6 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
   async ({ newCurrentSnapshot }) => {
     try {
       const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot.json)
-      console.log('population', population)
-      console.log('criteria', criteria)
-      console.log('criteriaGroup', criteriaGroup)
 
       return {
         json: newCurrentSnapshot.json,
@@ -263,7 +260,6 @@ const cohortCreationSlice = createSlice({
     },
     //
     addNewSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
-      action.payload.isInclusive = true
       state.selectedCriteria = [...state.selectedCriteria, action.payload]
       state.nextCriteriaId++
     },

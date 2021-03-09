@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography, FormLabel } from '@material-ui/core'
+import { Button, Divider, FormLabel, Grid, IconButton, Switch, Typography } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -28,7 +28,8 @@ const defaultDemographic = {
   exitMode: null,
   priseEnCharge: null,
   typeDeSejour: null,
-  fileStatus: null
+  fileStatus: null,
+  isInclusive: false
 }
 
 const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
@@ -53,7 +54,8 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
       priseEnCharge: data.priseEnCharge,
       typeDeSejour: data.typeDeSejour,
       fileStatus: data.fileStatus,
-      type: 'Encounter'
+      type: 'Encounter',
+      isInclusive: data.isInclusive
     })
   }
 
@@ -97,6 +99,17 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
               validationRules: {
                 required: 'Merci de renseigner un titre'
               }
+            },
+            {
+              name: 'isInclusive',
+              type: 'custom',
+              renderInput: (field: any) => (
+                <Grid component="label" container alignItems="center" style={{ margin: '0 1em' }}>
+                  <Typography>Critère inclusif</Typography>
+                  <Switch checked={!field.value} onChange={(event) => field.onChange(!event.target.checked)} />
+                  <Typography>Exclusif</Typography>
+                </Grid>
+              )
             },
             {
               type: 'custom',

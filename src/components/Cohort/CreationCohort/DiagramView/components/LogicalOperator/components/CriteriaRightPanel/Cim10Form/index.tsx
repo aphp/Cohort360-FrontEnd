@@ -14,7 +14,8 @@ const defaultCondition = {
   comparator: { id: 'e', label: '=' },
   startOccurrence: '',
   endOccurrence: '',
-  type: 'Condition'
+  type: 'Condition',
+  isInclusive: true
 }
 
 const Index = (props: any) => {

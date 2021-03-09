@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Typography /*, FormLabel */ } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Switch, Typography /*, FormLabel */ } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -22,7 +22,8 @@ const defaultDemographic = {
   docType: [],
   encounter: 0,
   startOccurrence: '',
-  endOccurrence: ''
+  endOccurrence: '',
+  isInclusive: true
 }
 
 const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
@@ -42,7 +43,8 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
       // encounter: data.encounter,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
-      type: 'Composition'
+      type: 'Composition',
+      isInclusive: data.isInclusive
     })
   }
 
@@ -75,6 +77,17 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               validationRules: {
                 required: 'Merci de renseigner un titre'
               }
+            },
+            {
+              name: 'isInclusive',
+              type: 'custom',
+              renderInput: (field: any) => (
+                <Grid component="label" container alignItems="center" style={{ margin: '0 1em' }}>
+                  <Typography>Critère inclusif</Typography>
+                  <Switch checked={!field.value} onChange={(event) => field.onChange(!event.target.checked)} />
+                  <Typography>Exclusif</Typography>
+                </Grid>
+              )
             },
             {
               name: 'search',
