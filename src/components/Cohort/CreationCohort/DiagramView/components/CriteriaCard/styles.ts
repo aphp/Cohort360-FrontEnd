@@ -10,6 +10,7 @@ const useStyles = makeStyles(() => ({
     padding: 8,
     marginTop: 12,
     width: 800,
+    position: 'relative',
     '&::before': {
       width: 38,
       height: 3,

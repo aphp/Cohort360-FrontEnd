@@ -5,6 +5,7 @@ import {
   Divider,
   Grid,
   IconButton,
+  Switch,
   Typography
   // FormLabel
 } from '@material-ui/core'
@@ -38,7 +39,8 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
       // comparator: data.comparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
-      type: 'Procedure'
+      type: 'Procedure',
+      isInclusive: data.isInclusive
     })
   }
 
@@ -80,9 +82,14 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             },
             {
               name: 'isInclusive',
-              type: 'switch',
-              trueLabel: 'Exclusif',
-              falseLabel: 'Inclusif'
+              type: 'custom',
+              renderInput: (field: any) => (
+                <Grid component="label" container alignItems="center" style={{ margin: '0 1em' }}>
+                  <Typography>Critère inclusif</Typography>
+                  <Switch checked={!field.value} onChange={(event) => field.onChange(!event.target.checked)} />
+                  <Typography>Exclusif</Typography>
+                </Grid>
+              )
             },
             {
               name: 'code',
