@@ -29,7 +29,7 @@ const defaultDemographic = {
   priseEnCharge: null,
   typeDeSejour: null,
   fileStatus: null,
-  isInclusive: false
+  isInclusive: true
 }
 
 const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
