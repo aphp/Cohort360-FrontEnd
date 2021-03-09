@@ -232,6 +232,8 @@ export type CriteriaGroupType = {
       options: {
         operator: '=' | '<' | '>' | '<=' | '>='
         number: number
+        timeDelayMin: number
+        timeDelayMax: number
       }
     }
 )
