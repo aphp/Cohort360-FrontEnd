@@ -29,7 +29,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, editCriteria, delet
   return (
     <div
       className={classes.criteriaItem}
-      style={{ backgroundColor: !CurrentCriterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
+      style={{ backgroundColor: CurrentCriterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
     >
       <div className={classes.criteriaTitleAndChips}>
         <Typography>{CurrentCriterion.title} :</Typography>
