@@ -9,6 +9,7 @@ const useStyles = makeStyles(() => ({
     borderRadius: 4,
     padding: 8,
     marginTop: 12,
+    width: 800,
     '&::before': {
       width: 38,
       height: 3,
