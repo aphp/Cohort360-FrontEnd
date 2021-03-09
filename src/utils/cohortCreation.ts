@@ -109,7 +109,7 @@ type RequeteurSearchType = {
     caresiteCohortList?: number[]
     providerCohorttList?: number[]
   }
-  request: (RequeteurCriteriaType | RequeteurGroupType)[]
+  request: RequeteurGroupType | undefined
 }
 
 const constructFilterSolr = (criterion: SelectedCriteriaType) => {
@@ -344,67 +344,68 @@ export function buildRequest(
     sourcePopulation: {
       caresiteCohortList: selectedPopulation?.map(({ id }) => +id)
     },
-    request: [
-      {
-        _type: 'andGroup',
-        _id: 0,
-        isInclusive: true,
-        criteria: mainCriteriaGroups?.map((mainCriteriaGroup) => {
-          const subItems: (RequeteurCriteriaType | RequeteurGroupType)[] = mainCriteriaGroup.criteriaIds
-            ? mainCriteriaGroup.criteriaIds
-                .map((itemId) => {
-                  const isGroup = itemId < 0
-                  if (!isGroup) {
-                    const item: SelectedCriteriaType =
-                      selectedCriteria.find(({ id }) => id === itemId) ?? DEFAULT_CRITERIA_ERROR
-
-                    return {
-                      _type: 'basicResource',
-                      _id: item.id ?? 0,
-                      resourceType: item.type ?? 'Patient',
-                      isInclusive: item.isInclusive ?? true,
-                      filterFhir: constructFilterSolr(item)
-                    }
-                  } else {
-                    const group: CriteriaGroupType =
-                      criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
-
-                    const subItems = group.criteriaIds
-                      ? group.criteriaIds.map((criteriaId) => {
-                          const subItem: SelectedCriteriaType =
-                            selectedCriteria.find(({ id }) => id === criteriaId) ?? DEFAULT_CRITERIA_ERROR
-
-                          return {
-                            _type: 'basicResource',
-                            _id: subItem.id ?? 0,
-                            resourceType: subItem.type ?? 'Patient',
-                            isInclusive: subItem.isInclusive ?? true,
-                            filterFhir: constructFilterSolr(subItem)
-                          }
-                        })
-                      : []
-
-                    // DO SPECIAL THING FOR `NamongM`
-                    return {
-                      _type: group.type === 'NamongM' ? 'orGroup' : group.type,
-                      _id: group.id,
-                      isInclusive: group.isInclusive ?? true,
-                      criteria: subItems
-                    }
-                  }
-                })
-                .filter((item) => item !== null)
-            : []
-
-          return {
-            _id: mainCriteriaGroup.id,
+    request:
+      !mainCriteriaGroups || mainCriteriaGroups?.length === 0
+        ? undefined
+        : {
             _type: 'andGroup',
-            isInclusive: mainCriteriaGroup.isInclusive ?? true,
-            criteria: subItems
+            _id: 0,
+            isInclusive: true,
+            criteria: mainCriteriaGroups?.map((mainCriteriaGroup) => {
+              const subItems: (RequeteurCriteriaType | RequeteurGroupType)[] = mainCriteriaGroup.criteriaIds
+                ? mainCriteriaGroup.criteriaIds
+                    .map((itemId) => {
+                      const isGroup = itemId < 0
+                      if (!isGroup) {
+                        const item: SelectedCriteriaType =
+                          selectedCriteria.find(({ id }) => id === itemId) ?? DEFAULT_CRITERIA_ERROR
+
+                        return {
+                          _type: 'basicResource',
+                          _id: item.id ?? 0,
+                          resourceType: item.type ?? 'Patient',
+                          isInclusive: item.isInclusive ?? true,
+                          filterFhir: constructFilterSolr(item)
+                        }
+                      } else {
+                        const group: CriteriaGroupType =
+                          criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
+
+                        const subItems = group.criteriaIds
+                          ? group.criteriaIds.map((criteriaId) => {
+                              const subItem: SelectedCriteriaType =
+                                selectedCriteria.find(({ id }) => id === criteriaId) ?? DEFAULT_CRITERIA_ERROR
+
+                              return {
+                                _type: 'basicResource',
+                                _id: subItem.id ?? 0,
+                                resourceType: subItem.type ?? 'Patient',
+                                isInclusive: subItem.isInclusive ?? true,
+                                filterFhir: constructFilterSolr(subItem)
+                              }
+                            })
+                          : []
+
+                        // DO SPECIAL THING FOR `NamongM`
+                        return {
+                          _type: group.type === 'NamongM' ? 'orGroup' : group.type,
+                          _id: group.id,
+                          isInclusive: group.isInclusive ?? true,
+                          criteria: subItems
+                        }
+                      }
+                    })
+                    .filter((item) => item !== null)
+                : []
+
+              return {
+                _id: mainCriteriaGroup.id,
+                _type: 'andGroup',
+                isInclusive: mainCriteriaGroup.isInclusive ?? true,
+                criteria: subItems
+              }
+            })
           }
-        })
-      }
-    ]
   }
 
   return JSON.stringify(json)
