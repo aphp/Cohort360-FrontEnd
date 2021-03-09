@@ -121,7 +121,7 @@ const Dashboard: React.FC<{
     setOpenRedcapDialog(false)
   }
 
-  const handleChangeTabs = (event: object, newTab: string) => {
+  const handleChangeTabs = (event: any, newTab: string) => {
     selectTab(newTab)
   }
 

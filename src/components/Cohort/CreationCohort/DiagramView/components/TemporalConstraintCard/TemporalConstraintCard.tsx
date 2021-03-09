@@ -1,36 +1,31 @@
 import React, { useState } from 'react'
-import { Card, CardHeader, CardContent, Typography, Button } from '@material-ui/core'
+import { Grid, Typography, Select, MenuItem } from '@material-ui/core'
 
-import TemporalConstraintModal from './components/TemporalConstraintModal/TemporalConstraintModal'
+import { TemporalConstraintType } from 'types'
 import useStyles from './styles'
+
+const initialState: TemporalConstraintType = {
+  type: 'none'
+}
 
 const TemporalConstraintView: React.FC = () => {
   const classes = useStyles()
-  const [openModal, onSetOpenModal] = useState<'open' | null>(null)
+  const [currentTemporalConstraint, onChangeTemporalConstraint] = useState<TemporalConstraintType>(initialState)
 
   return (
-    <>
-      <Card className={classes.card}>
-        <CardHeader className={classes.cardHeader} title="Choisir une contrainte temporelle" />
-        <CardContent>
-          <>
-            <Typography align="center">Ajouter une contrainte temporelle</Typography>
-            <div className={classes.actionButtonContainer}>
-              <Button
-                onClick={() => onSetOpenModal('open')}
-                variant="contained"
-                color="primary"
-                className={classes.actionButton}
-              >
-                <Typography variant="h5">Contrainte temporelle</Typography>
-              </Button>
-            </div>
-          </>
-        </CardContent>
-      </Card>
-
-      {openModal === 'open' && <TemporalConstraintModal onClose={() => onSetOpenModal(null)} />}
-    </>
+    <Grid className={classes.root}>
+      <Typography className={classes.temporalConstraintTypo}>Contrainte temporelle :</Typography>
+      <Select
+        className={classes.temporalConstraintSelect}
+        // variant="filled"
+        value={currentTemporalConstraint.type}
+        onChange={(e) => onChangeTemporalConstraint({ ...currentTemporalConstraint, type: e.target.value })}
+      >
+        <MenuItem value={'sameEncounter'}>Tous les critères ont lieu au cours du meme séjour</MenuItem>
+        <MenuItem value={'differentEncounter'}>Tous les critères ont lieu au cours de séjours différents</MenuItem>
+        <MenuItem value={'none'}>Aucune contrainte sur les séjours</MenuItem>
+      </Select>
+    </Grid>
   )
 }
 

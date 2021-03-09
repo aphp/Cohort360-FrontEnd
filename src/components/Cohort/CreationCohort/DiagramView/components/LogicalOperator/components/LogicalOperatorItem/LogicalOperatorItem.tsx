@@ -88,7 +88,9 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               type: 'NamongM',
               options: {
                 operator: '<',
-                number: 1
+                number: 1,
+                timeDelayMin: 0,
+                timeDelayMax: 0
               }
             })
           )
@@ -100,7 +102,9 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               type: 'NamongM',
               options: {
                 operator: '>',
-                number: 1
+                number: 1,
+                timeDelayMin: 0,
+                timeDelayMax: 0
               }
             })
           )
@@ -112,7 +116,9 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               type: 'NamongM',
               options: {
                 operator: '=',
-                number: 1
+                number: 1,
+                timeDelayMin: 0,
+                timeDelayMax: 0
               }
             })
           )
@@ -135,7 +141,9 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
           type: 'NamongM',
           options: {
             operator: _currentLogicalOperator.type === 'NamongM' ? _currentLogicalOperator.options.operator : '<',
-            number: value
+            number: value,
+            timeDelayMin: _currentLogicalOperator.type === 'NamongM' ? _currentLogicalOperator.options.timeDelayMin : 0,
+            timeDelayMax: _currentLogicalOperator.type === 'NamongM' ? _currentLogicalOperator.options.timeDelayMax : 0
           }
         })
       )

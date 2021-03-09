@@ -80,6 +80,7 @@ export type Cohort = {
   favorite?: boolean
   type?: string
   request_id?: string
+  request_job_status?: string
 }
 
 export type FormattedCohort = {
@@ -91,6 +92,7 @@ export type FormattedCohort = {
   date?: string
   perimeter?: string
   favorite?: boolean
+  jobStatus?: string
 }
 
 export type CohortGroup = IGroup & {
@@ -230,6 +232,8 @@ export type CriteriaGroupType = {
       options: {
         operator: '=' | '<' | '>' | '<=' | '>='
         number: number
+        timeDelayMin: number
+        timeDelayMax: number
       }
     }
 )
@@ -239,12 +243,7 @@ export type TemporalConstraintType = {
   title?: string
   criteriaGroupIds?: number[]
 } & {
-  type:
-    | 'sameEncounter'
-    | 'differentEncounter'
-    | 'directChronologicalOrdering'
-    | 'directChronologicalOrderingWithDuration'
-    | unknown
+  type: 'sameEncounter' | 'differentEncounter' | 'none' | unknown
 }
 
 export type CriteriaItemType = {
@@ -344,6 +343,7 @@ export type EncounterDataType = {
 
 export type CohortCreationCounterType = {
   uuid?: string
+  status?: string
   includePatient?: number
   byrequest?: number
   alive?: number
