@@ -350,7 +350,7 @@ export function buildRequest(
         ? undefined
         : {
             _type: 'andGroup',
-            _id: 0,
+            _id: -124,
             isInclusive: true,
             criteria: mainCriteriaGroups?.map((mainCriteriaGroup) => {
               // @ts-ignore
