@@ -367,9 +367,9 @@ export function buildRequest(
             criteria: exploreCriteriaGroup(group.criteriaIds),
             nAmongMOptions: {
               n: group.options.number,
-              operator: group.options.operator,
-              timeDelayMin: group.options.timeDelayMin,
-              timeDelayMax: group.options.timeDelayMax
+              operator: group.options.operator
+              // timeDelayMin: group.options.timeDelayMin,
+              // timeDelayMax: group.options.timeDelayMax
             }
           }
         } else {
