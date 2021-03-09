@@ -3,11 +3,11 @@ import { makeStyles } from '@material-ui/core/styles'
 const useStyles = makeStyles(() => ({
   root: {
     display: 'flex',
-    flexWrap: 'nowrap',
-    backgroundColor: '#EFBE5E',
     width: 'fit-content',
-    height: '30px',
-    borderRadius: '5px'
+    borderRadius: '5px',
+    marginLeft: 12,
+    alignSelf: 'center',
+    padding: 8
   },
   temporalConstraintTypo: {
     marginTop: '5px',

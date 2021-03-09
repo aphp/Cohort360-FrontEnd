@@ -238,12 +238,9 @@ export type CriteriaGroupType = {
     }
 )
 
-export type TemporalConstraintType = {
-  id?: number
-  title?: string
-  criteriaGroupIds?: number[]
-} & {
-  type: 'sameEncounter' | 'differentEncounter' | 'none' | unknown
+export type TemporalConstraintsType = {
+  idList: 'all' | number[]
+  constraintType: 'none' | 'sameEncounter' | 'differentEncounter' | 'directChronologicalOrdering'
 }
 
 export type CriteriaItemType = {

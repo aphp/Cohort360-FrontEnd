@@ -72,8 +72,6 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
     setOpenDialog(false)
   }
 
-  console.log('researchData :>> ', researchData)
-
   return (
     <>
       {!simplified && (
@@ -156,7 +154,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                     <TableCell align="center">
                       {row.fhir_group_id ? (
                         <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                      ) : row.jobStatus === 'pending' ? (
+                      ) : row.jobStatus === 'pending' || row.jobStatus === 'started' ? (
                         <Chip label="En attente" style={{ backgroundColor: '#ffc107', color: 'black' }} />
                       ) : (
                         <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />

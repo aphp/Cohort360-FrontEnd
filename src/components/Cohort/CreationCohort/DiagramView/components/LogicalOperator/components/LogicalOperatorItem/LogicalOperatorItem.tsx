@@ -6,7 +6,7 @@ import { Box, IconButton, MenuItem, Select, Typography, TextField } from '@mater
 import DeleteIcon from '@material-ui/icons/Delete'
 
 import { useAppSelector } from 'state'
-import { editCriteriaGroup, deleteCriteriaGroup } from 'state/cohortCreation'
+import { editCriteriaGroup, deleteCriteriaGroup, buildCohortCreation } from 'state/cohortCreation'
 
 import useStyles from './styles'
 
@@ -59,6 +59,10 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
     }`
   }
 
+  const _buildCohortCreation = () => {
+    dispatch(buildCohortCreation({}))
+  }
+
   const _deleteLogicalOperator = () => {
     dispatch(deleteCriteriaGroup(itemId))
 
@@ -72,6 +76,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         criteriaIds: logicalOperatorParent.criteriaIds.filter((_criteriaId) => _criteriaId !== itemId)
       })
     )
+    _buildCohortCreation()
   }
 
   const _handleChangeLogicalOperatorProps = (key: string, value: any) => {
@@ -155,6 +160,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         })
       )
     }
+    _buildCohortCreation()
   }
 
   return (
