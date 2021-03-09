@@ -5,6 +5,7 @@ import {
   Divider,
   Grid,
   IconButton,
+  Switch,
   Typography
   //  FormLabel
 } from '@material-ui/core'
@@ -39,7 +40,8 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       // comparator: data.comparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
-      type: 'Condition'
+      type: 'Condition',
+      isInclusive: data.isInclusive
     })
   }
 
@@ -82,6 +84,17 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               validationRules: {
                 required: 'Merci de renseigner un titre'
               }
+            },
+            {
+              name: 'isInclusive',
+              type: 'custom',
+              renderInput: (field: any) => (
+                <Grid component="label" container alignItems="center" style={{ margin: '0 1em' }}>
+                  <Typography>Critère inclusif</Typography>
+                  <Switch checked={!field.value} onChange={(event) => field.onChange(!event.target.checked)} />
+                  <Typography>Exclusif</Typography>
+                </Grid>
+              )
             },
             {
               name: 'code',

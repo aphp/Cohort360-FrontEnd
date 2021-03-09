@@ -263,7 +263,6 @@ const cohortCreationSlice = createSlice({
     },
     //
     addNewSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
-      action.payload.isInclusive = true
       state.selectedCriteria = [...state.selectedCriteria, action.payload]
       state.nextCriteriaId++
     },
