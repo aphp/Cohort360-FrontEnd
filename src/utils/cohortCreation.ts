@@ -69,7 +69,7 @@ type RequeteurCriteriaType = {
     | typeof RESSOURCE_TYPE_PROCEDURE
     | typeof RESSOURCE_TYPE_CONDITION
     | typeof RESSOURCE_TYPE_COMPOSITION
-  filterSolr: string
+  filterFhir: string
   occurrence?: {
     n: number
     operator?: '<=' | '<' | '=' | '>=' | '>'
@@ -77,6 +77,7 @@ type RequeteurCriteriaType = {
     timeDelayMax?: number
   }
 }
+
 type RequeteurGroupType =
   | {
       // GROUP (andGroup | orGroup)
@@ -104,15 +105,16 @@ type RequeteurGroupType =
 
 type RequeteurSearchType = {
   version: string
+  _type: string
   sourcePopulation: {
     caresiteCohortList?: number[]
     providerCohorttList?: number[]
   }
-  request: (RequeteurCriteriaType | RequeteurGroupType)[]
+  request: RequeteurGroupType | undefined
 }
 
-const constructFilterSolr = (criterion: SelectedCriteriaType) => {
-  let filterSolr = ''
+const constructFilterFhir = (criterion: SelectedCriteriaType) => {
+  let filterFhir = ''
 
   const filterReducer = (accumulator: any, currentValue: any) =>
     accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
@@ -135,7 +137,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         ageFilter = `${PATIENT_BIRTHDATE}=ge${date1}&${PATIENT_BIRTHDATE}=le${date2}`
       }
 
-      filterSolr = [
+      filterFhir = [
         `${
           criterion.gender && criterion.gender.length > 0
             ? `${PATIENT_GENDER}=${criterion.gender.map((gender: any) => gender.id).reduce(searchReducer)}`
@@ -191,7 +193,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         ageFilter = `${ENCOUNTER_BIRTHDATE}=ge${date1}&${ENCOUNTER_BIRTHDATE}=le${date2}`
       }
 
-      filterSolr = [
+      filterFhir = [
         `${criterion.admissionMode ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode.id}` : ''}`,
         `${criterion.entryMode ? `${ENCOUNTER_ENTRYMODE}=${criterion.entryMode.id}` : ''}`,
         `${criterion.exitMode ? `${ENCOUNTER_EXITMODE}=${criterion.exitMode.id}` : ''}`,
@@ -217,7 +219,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
       }
 
-      filterSolr = [
+      filterFhir = [
         `${criterion.search ? `${COMPOSITION_TEXT}=${criterion.search}` : ''}`,
         `${
           criterion.docType && criterion.docType.length > 0
@@ -245,7 +247,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
       }
 
-      filterSolr = [
+      filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
             ? `${CONDITION_CODE}=${criterion.code.map((code: any) => code.id).reduce(searchReducer)}`
@@ -279,7 +281,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
       }
 
-      filterSolr = [
+      filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
             ? `${PROCEDURE_CODE}=${criterion.code
@@ -307,7 +309,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
         dateFilter = dateFilter1 && dateFilter2 ? `${dateFilter1}&${dateFilter2}` : dateFilter1 + dateFilter2
       }
 
-      filterSolr = [
+      filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
             ? `${CLAIM_CODE}=${criterion.code.map((diagnosticType: any) => diagnosticType.id).reduce(searchReducer)}`
@@ -325,7 +327,7 @@ const constructFilterSolr = (criterion: SelectedCriteriaType) => {
       break
   }
 
-  return filterSolr
+  return filterFhir
 }
 
 export function buildRequest(
@@ -338,71 +340,91 @@ export function buildRequest(
   const mainCriteriaGroups = criteriaGroup.filter(({ isSubGroup }) => !isSubGroup)
 
   const json: RequeteurSearchType = {
-    version: '1.0',
+    version: 'v1.0',
+    _type: 'request',
     sourcePopulation: {
       caresiteCohortList: selectedPopulation?.map(({ id }) => +id)
     },
-    request: [
-      {
-        _type: 'andGroup',
-        _id: 0,
-        isInclusive: true,
-        criteria: mainCriteriaGroups?.map((mainCriteriaGroup) => {
-          const subItems: (RequeteurCriteriaType | RequeteurGroupType)[] = mainCriteriaGroup.criteriaIds
-            ? mainCriteriaGroup.criteriaIds
-                .map((itemId) => {
-                  const isGroup = itemId < 0
-                  if (!isGroup) {
-                    const item: SelectedCriteriaType =
-                      selectedCriteria.find(({ id }) => id === itemId) ?? DEFAULT_CRITERIA_ERROR
-
-                    return {
-                      _type: 'basicResource',
-                      _id: item.id ?? 0,
-                      resourceType: item.type ?? 'Patient',
-                      isInclusive: item.isInclusive ?? true,
-                      filterSolr: constructFilterSolr(item)
-                    }
-                  } else {
-                    const group: CriteriaGroupType =
-                      criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
-
-                    const subItems = group.criteriaIds
-                      ? group.criteriaIds.map((criteriaId) => {
-                          const subItem: SelectedCriteriaType =
-                            selectedCriteria.find(({ id }) => id === criteriaId) ?? DEFAULT_CRITERIA_ERROR
-
-                          return {
-                            _type: 'basicResource',
-                            _id: subItem.id ?? 0,
-                            resourceType: subItem.type ?? 'Patient',
-                            isInclusive: subItem.isInclusive ?? true,
-                            filterSolr: constructFilterSolr(subItem)
-                          }
-                        })
-                      : []
-
-                    // DO SPECIAL THING FOR `NamongM`
-                    return {
-                      _type: group.type === 'NamongM' ? 'orGroup' : group.type,
-                      _id: group.id,
-                      isInclusive: group.isInclusive ?? true,
-                      criteria: subItems
-                    }
-                  }
-                })
-                .filter((item) => item !== null)
-            : []
-
-          return {
-            _id: mainCriteriaGroup.id,
+    request:
+      !mainCriteriaGroups || mainCriteriaGroups?.length === 0
+        ? undefined
+        : {
             _type: 'andGroup',
-            isInclusive: mainCriteriaGroup.isInclusive ?? true,
-            criteria: subItems
+            _id: 0,
+            isInclusive: true,
+            criteria: mainCriteriaGroups?.map((mainCriteriaGroup) => {
+              // @ts-ignore
+              const subItems: (RequeteurCriteriaType | RequeteurGroupType)[] = mainCriteriaGroup.criteriaIds
+                ? mainCriteriaGroup.criteriaIds
+                    .map((itemId) => {
+                      const isGroup = itemId < 0
+                      if (!isGroup) {
+                        // return RequeteurCriteriaType
+                        const item: SelectedCriteriaType =
+                          selectedCriteria.find(({ id }) => id === itemId) ?? DEFAULT_CRITERIA_ERROR
+
+                        return {
+                          _type: 'basicResource',
+                          _id: item.id ?? 0,
+                          isInclusive: item.isInclusive ?? true,
+                          resourceType: item.type ?? 'Patient',
+                          filterFhir: constructFilterFhir(item)
+                        }
+                      } else {
+                        // return RequeteurGroupType
+                        const group: CriteriaGroupType =
+                          criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
+
+                        const subItems: RequeteurCriteriaType[] = group.criteriaIds
+                          ? group.criteriaIds.map((criteriaId) => {
+                              const subItem: SelectedCriteriaType =
+                                selectedCriteria.find(({ id }) => id === criteriaId) ?? DEFAULT_CRITERIA_ERROR
+
+                              return {
+                                _type: 'basicResource',
+                                _id: subItem.id ?? 0,
+                                resourceType: subItem.type ?? 'Patient',
+                                isInclusive: subItem.isInclusive ?? true,
+                                filterFhir: constructFilterFhir(subItem)
+                              }
+                            })
+                          : []
+
+                        // DO SPECIAL THING FOR `NamongM`
+                        if (group.type === 'NamongM') {
+                          return {
+                            _type: 'nAmongM',
+                            _id: group.id,
+                            isInclusive: group.isInclusive ?? true,
+                            criteria: subItems,
+                            nAmongMOptions: {
+                              n: group.options.number,
+                              operator: group.options.operator,
+                              timeDelayMin: group.options.timeDelayMin,
+                              timeDelayMax: group.options.timeDelayMax
+                            }
+                          }
+                        } else {
+                          return {
+                            _type: group.type,
+                            _id: group.id,
+                            isInclusive: group.isInclusive ?? true,
+                            criteria: subItems
+                          }
+                        }
+                      }
+                    })
+                    .filter((item) => item !== null)
+                : []
+
+              return {
+                _id: mainCriteriaGroup.id,
+                _type: 'andGroup',
+                isInclusive: mainCriteriaGroup.isInclusive ?? true,
+                criteria: subItems
+              }
+            })
           }
-        })
-      }
-    ]
   }
 
   return JSON.stringify(json)
@@ -428,27 +450,28 @@ export async function unbuildRequest(_json: string) {
   }
 
   /**
+   * Retrieve criteria + groups
    *
-   * @param currentItem
    */
-  const exploreRequest = (currentItem: any) => {
+  const exploreRequest = (currentItem: any, isSubItem: boolean) => {
     const { criteria } = currentItem
 
     for (const criterion of criteria) {
       if (criterion._type === 'basicResource') {
         criteriaItems = [...criteriaItems, criterion]
       } else {
-        criteriaGroup = [...criteriaGroup, { ...criterion, isSubItem: true }]
+        criteriaGroup = [...criteriaGroup, { ...criterion, isSubItem }]
         if (criterion && criterion.criteria && criterion.criteria.length > 0) {
-          exploreRequest(criterion)
+          exploreRequest(criterion, true)
         }
       }
     }
   }
-  for (const criterion of request[0].criteria) {
-    // console.log('exploredRequest - MAIN GROUP', criterion)
-    criteriaGroup = [...criteriaGroup, criterion]
-    exploreRequest(criterion)
+
+  if (request !== undefined) {
+    exploreRequest(request, false)
+  } else {
+    return { population, criteria: [], criteriaGroup: [] }
   }
 
   const _retrieveInformationFromJson = async (element: RequeteurCriteriaType) => {
@@ -461,8 +484,8 @@ export async function unbuildRequest(_json: string) {
 
     switch (element.resourceType) {
       case RESSOURCE_TYPE_PATIENT: {
-        if (element.filterSolr) {
-          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
@@ -552,8 +575,8 @@ export async function unbuildRequest(_json: string) {
         break
       }
       case RESSOURCE_TYPE_ENCOUNTER: {
-        if (element.filterSolr) {
-          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de prise en charge'
           currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : null
@@ -657,8 +680,8 @@ export async function unbuildRequest(_json: string) {
         break
       }
       case RESSOURCE_TYPE_COMPOSITION: {
-        if (element.filterSolr) {
-          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de document'
           currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
@@ -703,8 +726,8 @@ export async function unbuildRequest(_json: string) {
         break
       }
       case RESSOURCE_TYPE_CONDITION: {
-        if (element.filterSolr) {
-          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de diagnostic'
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
@@ -754,8 +777,8 @@ export async function unbuildRequest(_json: string) {
         break
       }
       case RESSOURCE_TYPE_PROCEDURE: {
-        if (element.filterSolr) {
-          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = "Critères d'actes CCAM"
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
@@ -795,8 +818,8 @@ export async function unbuildRequest(_json: string) {
         break
       }
       case RESSOURCE_TYPE_CLAIM: {
-        if (element.filterSolr) {
-          const filters = element.filterSolr.split('&').map((elem) => elem.split('='))
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de GHM'
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
@@ -854,19 +877,20 @@ export async function unbuildRequest(_json: string) {
 
   const convertJsonObjectsToCriteriaGroup: (_criteriaGroup: RequeteurGroupType[]) => CriteriaGroupType[] = (
     _criteriaGroup
-  ) => {
-    return _criteriaGroup.map((groupItem: any) => ({
-      id: groupItem._id,
-      title: 'Groupe de critère',
-      criteriaIds:
-        groupItem.criteria && groupItem.criteria.length > 0
-          ? groupItem.criteria.map((criteria: RequeteurCriteriaType | RequeteurGroupType) => criteria._id)
-          : [],
-      isSubGroup: groupItem.isSubItem,
-      isInclusive: groupItem.isInclusive,
-      type: groupItem.type
-    }))
-  }
+  ) =>
+    _criteriaGroup && _criteriaGroup.length > 0
+      ? _criteriaGroup.map((groupItem: any) => ({
+          id: groupItem._id,
+          title: 'Groupe de critère',
+          criteriaIds:
+            groupItem.criteria && groupItem.criteria.length > 0
+              ? groupItem.criteria.map((criteria: RequeteurCriteriaType | RequeteurGroupType) => criteria._id)
+              : [],
+          isSubGroup: groupItem.isSubItem,
+          isInclusive: groupItem.isInclusive,
+          type: groupItem.type
+        }))
+      : []
 
   return {
     population,

@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom'
 
 import {
   Button,
+  Chip,
   Dialog,
   DialogActions,
   DialogTitle,
@@ -71,6 +72,8 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
     setOpenDialog(false)
   }
 
+  console.log('researchData :>> ', researchData)
+
   return (
     <>
       {!simplified && (
@@ -110,11 +113,11 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                 <TableRow className={classes.tableHead}>
                   <TableCell className={classes.tableHeadCell}>Titre</TableCell>
                   <TableCell className={classes.tableHeadCell} align="center">
-                    Statut
+                    Type
                   </TableCell>
-                  {/* <TableCell className={classes.tableHeadCell} align="center">
-                    Périmètre
-                  </TableCell> */}
+                  <TableCell className={classes.tableHeadCell} align="center">
+                    Status
+                  </TableCell>
                   <TableCell align="center" className={classes.tableHeadCell}>
                     Nombre de patients
                   </TableCell>
@@ -135,16 +138,30 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
               <TableBody>
                 {researchData?.map((row: FormattedCohort) => (
                   <TableRow
-                    className={classes.pointerHover}
+                    className={!row.fhir_group_id ? classes.notAllow : classes.pointerHover}
                     hover
                     key={row.researchId}
-                    onClick={onClickRow ? () => onClickRow(row) : () => history.push(`/cohort/${row.fhir_group_id}`)}
+                    onClick={
+                      !row.fhir_group_id
+                        ? () => null
+                        : onClickRow
+                        ? () => onClickRow(row)
+                        : () => history.push(`/cohort/${row.fhir_group_id}`)
+                    }
                   >
                     <TableCell>{row.name}</TableCell>
                     <TableCell className={classes.status} align="center">
                       {row.status}
                     </TableCell>
-                    {/* <TableCell align="center">{row.perimeter}</TableCell> */}
+                    <TableCell align="center">
+                      {row.fhir_group_id ? (
+                        <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
+                      ) : row.jobStatus === 'pending' ? (
+                        <Chip label="En attente" style={{ backgroundColor: '#ffc107', color: 'black' }} />
+                      ) : (
+                        <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
+                      )}
+                    </TableCell>
                     <TableCell align="center">{displayDigit(row.nPatients ?? 0)}</TableCell>
                     <TableCell align="center">
                       {row.date && (

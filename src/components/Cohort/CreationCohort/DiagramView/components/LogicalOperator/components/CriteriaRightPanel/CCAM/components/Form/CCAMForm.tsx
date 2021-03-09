@@ -31,6 +31,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
+      ...selectedCriteria,
       title: data.title,
       code: data.code,
       // encounter: data.encounter,
@@ -74,8 +75,14 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
               type: 'text',
               variant: 'outlined',
               validationRules: {
-                required: 'Merci de renseigné un titre'
+                required: 'Merci de renseigner un titre'
               }
+            },
+            {
+              name: 'isInclusive',
+              type: 'switch',
+              trueLabel: 'Exclusif',
+              falseLabel: 'Inclusif'
             },
             {
               name: 'code',
@@ -144,6 +151,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
           ]}
           submit={_onSubmit}
           formId="ccam-form"
+          displaySubmitButton={false}
           formFooter={
             <Grid className={classes.criteriaActionContainer}>
               {!isEdition && (
