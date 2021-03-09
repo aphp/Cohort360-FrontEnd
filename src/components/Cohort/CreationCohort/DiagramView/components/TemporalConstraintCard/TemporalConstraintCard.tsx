@@ -5,7 +5,7 @@ import { TemporalConstraintType } from 'types'
 import useStyles from './styles'
 
 const initialState: TemporalConstraintType = {
-  type: 'noDifference'
+  type: 'none'
 }
 
 const TemporalConstraintView: React.FC = () => {
@@ -21,9 +21,9 @@ const TemporalConstraintView: React.FC = () => {
         value={currentTemporalConstraint.type}
         onChange={(e) => onChangeTemporalConstraint({ ...currentTemporalConstraint, type: e.target.value })}
       >
-        <MenuItem value={'SameEncounter'}>Tous les critères sont dans la meme visite</MenuItem>
-        <MenuItem value={'differentEncounter'}>Les critères sont dans des visites différentes</MenuItem>
-        <MenuItem value={'noDifference'}>indifférent</MenuItem>
+        <MenuItem value={'sameEncounter'}>Tous les critères ont lieu au cours du meme séjour</MenuItem>
+        <MenuItem value={'differentEncounter'}>Tous les critères ont lieu au cours de séjours différents</MenuItem>
+        <MenuItem value={'none'}>Aucune contrainte sur les séjours</MenuItem>
       </Select>
     </Grid>
   )

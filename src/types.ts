@@ -243,7 +243,7 @@ export type TemporalConstraintType = {
   title?: string
   criteriaGroupIds?: number[]
 } & {
-  type: 'sameEncounter' | 'differentEncounter' | 'noDifference' | unknown
+  type: 'sameEncounter' | 'differentEncounter' | 'none' | unknown
 }
 
 export type CriteriaItemType = {
