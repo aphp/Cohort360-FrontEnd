@@ -1,24 +1,23 @@
 import React, { useEffect } from 'react'
 import moment from 'moment'
 import clsx from 'clsx'
-import { Grid, Paper, Container, Typography } from '@material-ui/core'
+import { Grid, Container, Typography } from '@material-ui/core'
 
 import PerimeterCard from 'features/perimeters/PerimeterCard'
 import SearchPatientCard from 'features/patients/SearchPatientCard'
-import ResearchCard from '../../components/Welcome/ResearchCard/ResearchCard'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { initUserCohortsThunk } from 'state/userCohorts'
 
 import useStyles from './styles'
+import CohortCard from 'features/cohortes/CohortCard'
 
 const Accueil: React.FC = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
-  const { practitioner, open, lastCohorts } = useAppSelector((state) => ({
+  const { practitioner, open } = useAppSelector((state) => ({
     practitioner: state.me,
-    open: state.drawer,
-    lastCohorts: state.userCohorts.lastCohorts
+    open: state.drawer
   }))
 
   const lastConnection = practitioner?.lastConnection
@@ -55,10 +54,8 @@ const Accueil: React.FC = () => {
             </Grid>
           </Grid>
           <Grid item container>
-            <Grid item xs={12} md={12} lg={12}>
-              <Paper className={classes.paper}>
-                <ResearchCard title={'Mes dernières cohortes créées'} cohorts={lastCohorts} />
-              </Paper>
+            <Grid item xs={12}>
+              <CohortCard />
             </Grid>
           </Grid>
         </Grid>

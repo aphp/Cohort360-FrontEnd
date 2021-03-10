@@ -25,9 +25,7 @@ const PerimeterCard = () => {
         </ul>
       </CardContent>
       <CardActions>
-        <Button variant="contained" disableElevation fullWidth>
-          Explorer votre périmètre
-        </Button>
+        <Button fullWidth>Explorer votre périmètre</Button>
       </CardActions>
     </Card>
   )
