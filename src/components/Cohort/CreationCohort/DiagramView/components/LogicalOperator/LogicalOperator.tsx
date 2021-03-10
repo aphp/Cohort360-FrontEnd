@@ -92,12 +92,12 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
           </Button>
         )}
         {!loading && (
-          <Button color="inherit" onClick={() => addNewCriteria(itemId)}>
+          <Button color="inherit" onClick={() => addNewCriteria(itemId)} style={{ borderRadius: '18px 0 0 18px' }}>
             Ajouter un critère
           </Button>
         )}
         {!loading && (
-          <Button color="inherit" onClick={() => addNewGroup(itemId)}>
+          <Button color="inherit" onClick={() => addNewGroup(itemId)} style={{ borderRadius: '0 18px 18px 0' }}>
             Ajouter un opérateur logique
           </Button>
         )}

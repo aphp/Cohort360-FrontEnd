@@ -167,7 +167,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
     <>
       {isMainOperator ? (
         <Box className={classes.mainLogicalOperator}>
-          <Typography variant="h5" style={{ lineHeight: '42px', margin: 'auto' }}>
+          <Typography variant="h5" style={{ lineHeight: '36px', margin: 'auto' }}>
             ET
           </Typography>
         </Box>
@@ -233,7 +233,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               </IconButton>
             </>
           ) : (
-            <Typography variant="h5" style={{ lineHeight: '42px', margin: 'auto', padding: '0 4px' }}>
+            <Typography variant="h5" style={{ lineHeight: '36px', margin: 'auto', padding: '0 4px' }}>
               {groupType === 'andGroup' || groupType === 'orGroup'
                 ? logicalOperatorDic[groupType]
                 : logicalOperatorDic['NamongM']}
