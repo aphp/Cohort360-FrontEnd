@@ -8,7 +8,6 @@ const useStyles = makeStyles(() => ({
     'border-radius': 4,
     backgroundColor: '#FFFFFF',
     padding: '0 16px',
-    height: 50,
     border: '3px solid #D3DEE8',
     flex: 1,
     minWidth: 350,
@@ -28,7 +27,7 @@ const useStyles = makeStyles(() => ({
     marginLeft: 12
   },
   populationChip: {
-    margin: '0 4px',
+    margin: 4,
     fontSize: 11,
     fontWeight: 'bold'
   },
