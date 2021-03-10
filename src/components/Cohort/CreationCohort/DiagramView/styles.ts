@@ -1,12 +1,12 @@
 import { makeStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
     flexWrap: 'nowrap',
     width: 'calc(100% - 300px)',
-    height: 'calc(100vh - 73px)',
+    height: '100vh',
     padding: '24px 26px',
     paddingBottom: 76,
     overflow: 'auto',
@@ -16,7 +16,11 @@ const useStyles = makeStyles(() => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    [theme.breakpoints.down('md')]: {
+      flexDirection: 'column',
+      flexWrap: 'nowrap'
+    }
   }
 }))
 

@@ -32,10 +32,10 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, editCriteria, delet
       style={{ backgroundColor: CurrentCriterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
     >
       <div className={classes.criteriaTitleAndChips}>
-        <Typography>{CurrentCriterion.title} :</Typography>
+        <Typography className={classes.title}>{CurrentCriterion.title} :</Typography>
         <CriteriaCardContent currentCriteria={CurrentCriterion} />
       </div>
-      <div>
+      <div className={classes.actionContainer}>
         <IconButton size="small" onClick={() => editCriteria(CurrentCriterion)} style={{ color: 'currentcolor' }}>
           <EditIcon />
         </IconButton>

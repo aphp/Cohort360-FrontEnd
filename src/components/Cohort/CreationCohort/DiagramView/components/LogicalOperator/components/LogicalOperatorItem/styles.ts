@@ -23,7 +23,7 @@ const useStyles = makeStyles(() => ({
       width: 3,
       background: '#19235a',
       top: 'calc(100% + 3px)',
-      left: 16
+      left: 20
     }
   },
   logicalOperator: {
@@ -31,9 +31,9 @@ const useStyles = makeStyles(() => ({
     boxSizing: 'border-box',
     border: '3px solid #19235A',
     color: 'white',
-    height: 42,
-    minWidth: 42,
-    minHeight: 42,
+    height: 36,
+    minWidth: 50,
+    minHeight: 36,
     width: 'fit-content !important',
     maxWidth: 'inherit !important',
     borderRadius: 18,
@@ -47,9 +47,9 @@ const useStyles = makeStyles(() => ({
       position: 'absolute',
       content: "''",
       height: 3,
-      width: 35,
+      width: 36,
       background: '#19235a',
-      top: 19.5,
+      top: 12,
       left: -38
     },
     '&::after': {
@@ -59,7 +59,55 @@ const useStyles = makeStyles(() => ({
       width: 3,
       background: '#19235a',
       top: 'calc(100% + 3px)',
-      left: 16
+      left: 20
+    }
+  },
+  textOperator: {
+    lineHeight: '30px',
+    margin: 'auto',
+    padding: '0 4px',
+    fontSize: 13
+  },
+  descriptionText: {
+    margin: 'auto',
+    padding: '0 4px',
+    fontSize: 13,
+    marginTop: 5,
+    fontWeight: 100
+  },
+  input: {
+    '& > div': {
+      color: 'currentColor !important'
+    },
+    '& > div > input': {
+      color: 'currentColor !important'
+    }
+  },
+  inputSelect: {
+    color: 'currentColor',
+    fontWeight: 'bolder',
+    fontStyle: 'italic',
+    '&::after': {
+      borderBottom: 'none'
+    },
+    '&::before': {
+      borderBottom: 'none'
+    },
+    '&:hover:not($disabled):not($focused):not($error):before': {
+      borderBottom: `none !important`
+    }
+  },
+  selectIcon: {
+    color: 'currentColor',
+    marginTop: -2
+  },
+  deleteButton: {
+    marginTop: -2,
+    marginLeft: 12,
+    color: 'currentColor',
+    marginRight: 4,
+    '& > span > svg': {
+      fontSize: 18
     }
   }
 }))

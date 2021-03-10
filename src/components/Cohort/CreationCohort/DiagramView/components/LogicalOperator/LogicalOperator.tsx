@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { ButtonGroup, Button, CircularProgress } from '@material-ui/core'
+import { ButtonGroup, Button, IconButton, CircularProgress } from '@material-ui/core'
+
+import AddIcon from '@material-ui/icons/Add'
 
 import LogicalOperatorItem from './components/LogicalOperatorItem/LogicalOperatorItem'
 import CriteriaRightPanel from './components/CriteriaRightPanel/CriteriaRightPanel'
@@ -42,6 +44,8 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   const { loading = false, criteriaGroup = [], selectedCriteria = [] } = request
 
   const displayingItem = criteriaGroup.filter((_criteriaGroup: CriteriaGroupType) => _criteriaGroup.id === itemId)
+
+  const [isExpanded, onExpand] = useState(false)
 
   return (
     <>
@@ -85,23 +89,43 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
           })}
       </div>
 
-      <ButtonGroup disableElevation className={classes.buttonContainer} variant="contained" color="primary">
-        {loading && (
-          <Button disabled>
-            <CircularProgress />
-          </Button>
-        )}
-        {!loading && (
-          <Button color="inherit" onClick={() => addNewCriteria(itemId)} style={{ borderRadius: '18px 0 0 18px' }}>
-            Ajouter un critère
-          </Button>
-        )}
-        {!loading && (
-          <Button color="inherit" onClick={() => addNewGroup(itemId)} style={{ borderRadius: '0 18px 18px 0' }}>
-            Ajouter un opérateur logique
-          </Button>
-        )}
-      </ButtonGroup>
+      {!isExpanded ? (
+        <IconButton size="small" className={classes.addButton} onClick={() => onExpand(true)}>
+          <AddIcon />
+        </IconButton>
+      ) : (
+        <ButtonGroup disableElevation className={classes.buttonContainer} variant="contained" color="primary">
+          {loading && (
+            <Button disabled>
+              <CircularProgress />
+            </Button>
+          )}
+          {!loading && (
+            <Button
+              color="inherit"
+              onClick={() => {
+                addNewCriteria(itemId)
+                onExpand(false)
+              }}
+              style={{ borderRadius: '18px 0 0 18px' }}
+            >
+              Ajouter un critère
+            </Button>
+          )}
+          {!loading && (
+            <Button
+              color="inherit"
+              onClick={() => {
+                addNewGroup(itemId)
+                onExpand(false)
+              }}
+              style={{ borderRadius: '0 18px 18px 0' }}
+            >
+              Ajouter un opérateur logique
+            </Button>
+          )}
+        </ButtonGroup>
+      )}
     </>
   )
 }

@@ -155,7 +155,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 : null
             currentGender = selectedGenderData ? [...currentGender, selectedGenderData.label] : currentGender
           }
-          return currentGender.reduce(reducer)
+          return currentGender && currentGender.length > 0 ? currentGender.reduce(reducer) : ''
         }
         const displaySelectedVitalStatus = (vitalStatus: { id: string; label: string }[]) => {
           let currentStatus: string[] = []
@@ -166,7 +166,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 : null
             currentStatus = selectedGenderData ? [...currentStatus, selectedGenderData.label] : currentStatus
           }
-          return currentStatus.reduce(reducer)
+          return currentStatus && currentStatus.length > 0 ? currentStatus.reduce(reducer) : ''
         }
 
         content = (
@@ -216,7 +216,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 : null
             currentDocTypes = selectedGenderData ? [...currentDocTypes, selectedGenderData.label] : currentDocTypes
           }
-          return currentDocTypes.reduce(reducer)
+          return currentDocTypes && currentDocTypes.length > 0 ? currentDocTypes.reduce(reducer) : ''
         }
 
         content = (
