@@ -6,7 +6,8 @@ import {
   CohortCreationSnapshotType,
   ScopeTreeRow,
   SelectedCriteriaType,
-  CriteriaGroupType
+  CriteriaGroupType,
+  TemporalConstraintsType
 } from 'types'
 
 import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
@@ -26,6 +27,7 @@ export type CohortCreationState = {
   selectedPopulation: ScopeTreeRow[] | null
   selectedCriteria: SelectedCriteriaType[]
   criteriaGroup: CriteriaGroupType[]
+  temporalConstraints: TemporalConstraintsType[]
   nextCriteriaId: number
   nextGroupId: number
 }
@@ -50,6 +52,12 @@ const initialState: CohortCreationState = {
       criteriaIds: [],
       isSubGroup: false,
       isInclusive: true
+    }
+  ],
+  temporalConstraints: [
+    {
+      idList: 'all',
+      constraintType: 'none'
     }
   ],
   nextCriteriaId: 1,
@@ -185,8 +193,9 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
         : state.cohortCreation.request.selectedPopulation
       const _selectedCriteria = state.cohortCreation.request.selectedCriteria
       const _criteriaGroup = state.cohortCreation.request.criteriaGroup
+      const _temporalConstraints = state.cohortCreation.request.temporalConstraints
 
-      const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup)
+      const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
 
       dispatch(saveJson({ newJson: json }))
 
@@ -277,6 +286,12 @@ const cohortCreationSlice = createSlice({
       const foundItem = state.criteriaGroup.find(({ id }) => id === action.payload.id)
       const index = foundItem ? state.criteriaGroup.indexOf(foundItem) : -1
       if (index !== -1) state.criteriaGroup[index] = action.payload
+    },
+    updateTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
+      console.log('state.temporalConstraints', state.temporalConstraints)
+      const foundItem = state.temporalConstraints.find(({ idList }) => idList === action.payload.idList)
+      const index = foundItem ? state.temporalConstraints.indexOf(foundItem) : -1
+      if (index !== -1) state.temporalConstraints[index] = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -324,5 +339,7 @@ export const {
   addNewCriteriaGroup,
   //
   editSelectedCriteria,
-  editCriteriaGroup
+  editCriteriaGroup,
+  //
+  updateTemporalConstraint
 } = cohortCreationSlice.actions

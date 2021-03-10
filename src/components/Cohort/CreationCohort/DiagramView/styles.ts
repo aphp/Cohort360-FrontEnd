@@ -11,6 +11,12 @@ const useStyles = makeStyles(() => ({
     paddingBottom: 76,
     overflow: 'auto',
     marginRight: 300
+  },
+  populationContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap'
   }
 }))
 

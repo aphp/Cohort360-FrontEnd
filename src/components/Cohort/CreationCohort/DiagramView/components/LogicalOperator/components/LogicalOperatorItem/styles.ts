@@ -19,13 +19,13 @@ const useStyles = makeStyles(() => ({
       content: "''",
       height: 12,
       width: 3,
-      background: '#19235a',
+      background: '#19235A',
       top: '100%',
       left: 19
     }
   },
   logicalOperator: {
-    background: '#19235A',
+    // background: '#19235A',
     color: 'white',
     height: 42,
     minWidth: 42,
@@ -44,7 +44,7 @@ const useStyles = makeStyles(() => ({
       content: "''",
       height: 3,
       width: 35,
-      background: '#19235a',
+      background: '#19235A',
       top: 19.5,
       left: -35
     },
@@ -53,7 +53,7 @@ const useStyles = makeStyles(() => ({
       content: "''",
       height: 12,
       width: 3,
-      background: '#19235a',
+      background: '#19235A',
       top: '100%',
       left: 19
     }

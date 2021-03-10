@@ -93,10 +93,10 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               name: 'search',
               placeholder: 'Recherche dans les documents',
               type: 'text',
-              variant: 'outlined',
-              validationRules: {
-                required: 'Merci de renseigner une recherche'
-              }
+              variant: 'outlined'
+              //   validationRules: {
+              //     required: 'Merci de renseigner une recherche'
+              //   }
             },
             {
               name: 'docType',

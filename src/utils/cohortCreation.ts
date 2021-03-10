@@ -1,7 +1,7 @@
 import moment from 'moment'
 
 import { fetchPerimeterInfoForRequeteur as fetchPopulation } from '../services/perimeters'
-import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType } from 'types'
+import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType } from 'types'
 
 const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
 const PATIENT_GENDER = 'gender' // ok
@@ -85,7 +85,7 @@ type RequeteurGroupType =
       _id: number
       isInclusive: boolean
       criteria: (RequeteurCriteriaType | RequeteurGroupType)[]
-      temporalConstraints?: [] // NOT IMPLEMENTED
+      temporalConstraints?: TemporalConstraintsType[] // NOT IMPLEMENTED
     }
   // NOT IMPLEMENTED
   | {
@@ -100,7 +100,7 @@ type RequeteurGroupType =
         timeDelayMin?: number
         timeDelayMax?: number
       }
-      temporalConstraints?: [] // NOT IMPLEMENTED
+      temporalConstraints?: TemporalConstraintsType[] // NOT IMPLEMENTED
     }
 
 type RequeteurSearchType = {
@@ -333,7 +333,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 export function buildRequest(
   selectedPopulation: ScopeTreeRow[] | null,
   selectedCriteria: SelectedCriteriaType[],
-  criteriaGroup: CriteriaGroupType[]
+  criteriaGroup: CriteriaGroupType[],
+  temporalConstraints: TemporalConstraintsType[]
 ) {
   if (!selectedPopulation) return ''
 
@@ -400,7 +401,8 @@ export function buildRequest(
           _id: 0,
           _type: 'andGroup',
           isInclusive: true,
-          criteria: exploreCriteriaGroup(mainCriteriaGroups.criteriaIds)
+          criteria: exploreCriteriaGroup(mainCriteriaGroups.criteriaIds),
+          temporalConstraints: temporalConstraints.filter(({ constraintType }) => constraintType !== 'none')
         }
   }
 

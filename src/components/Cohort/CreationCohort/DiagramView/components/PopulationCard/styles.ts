@@ -8,7 +8,10 @@ const useStyles = makeStyles(() => ({
     'border-radius': 4,
     backgroundColor: '#FFFFFF',
     padding: 15,
-    border: '3px solid #D3DEE8'
+    border: '3px solid #D3DEE8',
+    flex: 1,
+    minWidth: 350,
+    margin: '12px 0'
   },
   centerContainer: {
     width: '100%',
