@@ -2,6 +2,7 @@
   "name": "cohort360_react",
   "version": "1.4.0",
   "private": true,
+  "homepage": "/cohort",
   "dependencies": {
     "@apollo/react-hooks": "^3.1.5",
     "@arkhn/ui": "^1.9.10",

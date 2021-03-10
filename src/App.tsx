@@ -45,7 +45,7 @@ const App = () => (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <ApolloProvider client={authClient}>
-          <BrowserRouter>
+          <BrowserRouter basename="/cohort">
             <CssBaseline />
             <Switch>
               {/* <Route path="/*" render={() => '404 not found'} /> */}
