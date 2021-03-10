@@ -1,13 +1,14 @@
 import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(() => ({
-  newPopulationCard: {
+  populationCard: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     'border-radius': 4,
     backgroundColor: '#FFFFFF',
-    padding: 15,
+    padding: '0 16px',
+    height: 50,
     border: '3px solid #D3DEE8',
     flex: 1,
     minWidth: 350,
@@ -27,7 +28,9 @@ const useStyles = makeStyles(() => ({
     marginLeft: 12
   },
   populationChip: {
-    margin: '0 4px'
+    margin: '0 4px',
+    fontSize: 11,
+    fontWeight: 'bold'
   },
   populationLabel: {
     textDecoration: 'underline'

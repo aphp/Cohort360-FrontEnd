@@ -30,13 +30,13 @@ const PopulationCard: React.FC = () => {
   return (
     <>
       {loading ? (
-        <div className={classes.newPopulationCard}>
+        <div className={classes.populationCard}>
           <div className={classes.centerContainer}>
             <CircularProgress />
           </div>
         </div>
       ) : selectedPopulation !== null ? (
-        <div className={classes.newPopulationCard}>
+        <div className={classes.populationCard}>
           <div className={classes.leftDiv}>
             <Typography variant="h6" align="left">
               Population source :
