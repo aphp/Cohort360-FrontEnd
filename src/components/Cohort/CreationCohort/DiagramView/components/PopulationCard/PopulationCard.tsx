@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { Button, Chip, CircularProgress, IconButton, Typography } from '@material-ui/core'
+import { Button, IconButton, Chip, CircularProgress, Typography } from '@material-ui/core'
 
 import EditIcon from '@material-ui/icons/Edit'
+import CloseIcon from '@material-ui/icons/Close'
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 
 import PopulationRightPanel from './components/PopulationRightPanel'
 
@@ -20,6 +22,7 @@ const PopulationCard: React.FC = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
 
+  const [isExtended, onExtend] = useState(false)
   const [openDrawer, onChangeOpenDrawer] = useState(false)
 
   const submitPopulation = (_selectedPopulation: ScopeTreeRow[] | null) => {
@@ -30,33 +33,51 @@ const PopulationCard: React.FC = () => {
   return (
     <>
       {loading ? (
-        <div className={classes.newPopulationCard}>
+        <div className={classes.populationCard}>
           <div className={classes.centerContainer}>
             <CircularProgress />
           </div>
         </div>
       ) : selectedPopulation !== null ? (
-        <div className={classes.newPopulationCard}>
+        <div className={classes.populationCard}>
           <div className={classes.leftDiv}>
-            <Typography variant="h6" align="left">
+            <Typography variant="h6" align="left" style={{ whiteSpace: 'nowrap' }}>
               Population source :
             </Typography>
 
             <div className={classes.chipContainer}>
-              {selectedPopulation &&
-                selectedPopulation
-                  .slice(0, 4)
-                  .map((pop: any, index: number) => (
-                    <Chip className={classes.populationChip} key={`${index}-${pop.name}`} label={pop.name} />
-                  ))}
-              {selectedPopulation && selectedPopulation.length > 4 && (
-                <Typography component="span" align="center" className={classes.populationLabel}>
-                  ...
-                </Typography>
+              {isExtended ? (
+                <>
+                  {selectedPopulation &&
+                    selectedPopulation.map((pop: any, index: number) => (
+                      <Chip className={classes.populationChip} key={`${index}-${pop.name}`} label={pop.name} />
+                    ))}
+                  <IconButton size="small" classes={{ label: classes.populationLabel }} onClick={() => onExtend(false)}>
+                    <CloseIcon />
+                  </IconButton>
+                </>
+              ) : (
+                <>
+                  {selectedPopulation &&
+                    selectedPopulation
+                      .slice(0, 4)
+                      .map((pop: any, index: number) => (
+                        <Chip className={classes.populationChip} key={`${index}-${pop.name}`} label={pop.name} />
+                      ))}
+                  {selectedPopulation && selectedPopulation.length > 4 && (
+                    <IconButton
+                      size="small"
+                      classes={{ label: classes.populationLabel }}
+                      onClick={() => onExtend(true)}
+                    >
+                      <MoreHorizIcon />
+                    </IconButton>
+                  )}
+                </>
               )}
             </div>
           </div>
-          <IconButton size="small" onClick={() => onChangeOpenDrawer(true)} style={{ color: 'currentcolor' }}>
+          <IconButton className={classes.editButton} size="small" onClick={() => onChangeOpenDrawer(true)}>
             <EditIcon />
           </IconButton>
         </div>

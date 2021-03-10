@@ -9,7 +9,8 @@ const useStyles = makeStyles(() => ({
     borderRadius: 4,
     padding: 8,
     marginTop: 12,
-    width: 800,
+    minWidth: 400,
+    maxWidth: 800,
     position: 'relative',
     '&::before': {
       width: 38,
@@ -23,6 +24,13 @@ const useStyles = makeStyles(() => ({
   criteriaTitleAndChips: {
     display: 'flex',
     alignItems: 'center'
+  },
+  title: {
+    whiteSpace: 'nowrap'
+  },
+  actionContainer: {
+    display: 'flex',
+    flexWrap: 'nowrap'
   }
 }))
 
