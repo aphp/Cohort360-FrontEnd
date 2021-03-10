@@ -34,13 +34,15 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, editCriteria, delet
       <div className={classes.criteriaTitleAndChips}>
         <Typography>{CurrentCriterion.title} :</Typography>
         <CriteriaCardContent currentCriteria={CurrentCriterion} />
+      </div>
+      <div>
         <IconButton size="small" onClick={() => editCriteria(CurrentCriterion)} style={{ color: 'currentcolor' }}>
           <EditIcon />
         </IconButton>
+        <IconButton size="small" onClick={() => deleteCriteria(CurrentCriterion.id)} style={{ color: 'currentcolor' }}>
+          <DeleteIcon />
+        </IconButton>
       </div>
-      <IconButton size="small" onClick={() => deleteCriteria(CurrentCriterion.id)} style={{ color: 'currentcolor' }}>
-        <DeleteIcon />
-      </IconButton>
     </div>
   )
 }
