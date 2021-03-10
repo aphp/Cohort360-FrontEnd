@@ -1,27 +1,23 @@
 import React, { useEffect } from 'react'
 import moment from 'moment'
 import clsx from 'clsx'
-import { Grid, Paper, Container, Typography } from '@material-ui/core'
+import { Grid, Container, Typography } from '@material-ui/core'
 
-import NewsCard from '../../components/Welcome/NewsCard/NewsCard'
-import PatientsCard from '../../components/Welcome/PatientsCard/PatientsCard'
-import ResearchCard from '../../components/Welcome/ResearchCard/ResearchCard'
-import SearchPatientCard from '../../components/Welcome/SearchPatientCard/SearchPatientCard'
-import TutorialsCard from '../../components/Welcome/TutorialsCard/TutorialsCard'
+import PerimeterCard from 'features/perimeters/PerimeterCard'
+import SearchPatientCard from 'features/patients/SearchPatientCard'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { initUserCohortsThunk } from 'state/userCohorts'
 
 import useStyles from './styles'
+import CohortCard from 'features/cohortes/CohortCard'
 
 const Accueil: React.FC = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
-  const { practitioner, open, favoriteCohorts, lastCohorts } = useAppSelector((state) => ({
+  const { practitioner, open } = useAppSelector((state) => ({
     practitioner: state.me,
-    open: state.drawer,
-    favoriteCohorts: state.userCohorts.favoriteCohorts,
-    lastCohorts: state.userCohorts.lastCohorts
+    open: state.drawer
   }))
 
   const lastConnection = practitioner?.lastConnection
@@ -48,44 +44,19 @@ const Accueil: React.FC = () => {
         </Typography>
       </Container>
       <Container maxWidth="lg" className={classes.container} style={{ minHeight: 'calc(100vh - 70px)' }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6} lg={6}>
-            <Grid item>
-              <Paper className={classes.paper}>
-                <PatientsCard />
-              </Paper>
+        <Grid container spacing={2} direction="column">
+          <Grid item container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <PerimeterCard />
             </Grid>
-            <Grid item className={classes.pt3}>
-              <Paper className={classes.paper}>
-                <SearchPatientCard />
-              </Paper>
+            <Grid item xs={12} md={6}>
+              <SearchPatientCard />
             </Grid>
           </Grid>
-          <Grid item xs={12} md={6} lg={6}>
-            <Grid item xs={12} md={12} lg={12}>
-              <Paper className={classes.paper}>
-                <NewsCard />
-              </Paper>
+          <Grid item container>
+            <Grid item xs={12}>
+              <CohortCard />
             </Grid>
-            <Grid item xs={12} md={12} lg={12} className={classes.pt3}>
-              <Paper className={classes.paper}>
-                <TutorialsCard />
-              </Paper>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={12} lg={12}>
-            <Paper className={classes.paper}>
-              <ResearchCard title={'Mes cohortes favorites'} cohorts={favoriteCohorts} />
-            </Paper>
-          </Grid>
-        </Grid>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={12} lg={12}>
-            <Paper className={classes.paper}>
-              <ResearchCard title={'Mes dernières cohortes créées'} cohorts={lastCohorts} />
-            </Paper>
           </Grid>
         </Grid>
       </Container>

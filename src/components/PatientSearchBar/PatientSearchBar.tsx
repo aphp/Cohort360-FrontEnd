@@ -88,7 +88,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   }
 
   return (
-    <Grid container alignItems="center" className={classes.component}>
+    <Grid container alignItems="center">
       {showSelect && (
         <Grid container item xs={2} justify="center">
           <Select value={searchBy} onChange={handleChangeSelect}>
