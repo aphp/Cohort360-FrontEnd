@@ -3,6 +3,8 @@ import { makeStyles } from '@material-ui/core/styles'
 const useStyles = makeStyles(() => ({
   mainLogicalOperator: {
     background: '#19235A',
+    boxSizing: 'border-box',
+    border: '3px solid #19235A',
     color: 'white',
     width: 42,
     height: 42,
@@ -20,12 +22,14 @@ const useStyles = makeStyles(() => ({
       height: 12,
       width: 3,
       background: '#19235a',
-      top: '100%',
-      left: 19
+      top: 'calc(100% + 3px)',
+      left: 16
     }
   },
   logicalOperator: {
     background: '#19235A',
+    boxSizing: 'border-box',
+    border: '3px solid #19235A',
     color: 'white',
     height: 42,
     minWidth: 42,
@@ -46,7 +50,7 @@ const useStyles = makeStyles(() => ({
       width: 35,
       background: '#19235a',
       top: 19.5,
-      left: -35
+      left: -38
     },
     '&::after': {
       position: 'absolute',
@@ -54,8 +58,8 @@ const useStyles = makeStyles(() => ({
       height: 12,
       width: 3,
       background: '#19235a',
-      top: '100%',
-      left: 19
+      top: 'calc(100% + 3px)',
+      left: 16
     }
   }
 }))

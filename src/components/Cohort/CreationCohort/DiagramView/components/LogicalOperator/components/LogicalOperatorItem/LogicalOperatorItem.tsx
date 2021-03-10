@@ -167,13 +167,16 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
     <>
       {isMainOperator ? (
         <Box className={classes.mainLogicalOperator}>
-          <Typography variant="h5" style={{ lineHeight: '42px', margin: 'auto' }}>
+          <Typography variant="h5" style={{ lineHeight: '39px', margin: 'auto' }}>
             ET
           </Typography>
         </Box>
       ) : (
         <Box
           className={classes.logicalOperator}
+          style={{
+            background: !currentLogicalOperator.isInclusive ? '#F2B0B0' : '#19235A'
+          }}
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setTimeout(() => setOpen(false), 500)}
         >
@@ -233,7 +236,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               </IconButton>
             </>
           ) : (
-            <Typography variant="h5" style={{ lineHeight: '42px', margin: 'auto', padding: '0 4px' }}>
+            <Typography variant="h5" style={{ lineHeight: '39px', margin: 'auto', padding: '0 4px' }}>
               {groupType === 'andGroup' || groupType === 'orGroup'
                 ? logicalOperatorDic[groupType]
                 : logicalOperatorDic['NamongM']}

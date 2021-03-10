@@ -84,10 +84,15 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
               name: 'isInclusive',
               type: 'custom',
               renderInput: (field: any) => (
-                <Grid component="label" container alignItems="center" style={{ margin: '0 1em' }}>
-                  <Typography>Critère inclusif</Typography>
+                <Grid style={{ display: 'flex' }}>
+                  <FormLabel
+                    onClick={() => field.onChange(!field.value)}
+                    style={{ margin: 'auto 1em' }}
+                    component="legend"
+                  >
+                    Exclure les patients qui suivent les règles suivantes
+                  </FormLabel>
                   <Switch checked={!field.value} onChange={(event) => field.onChange(!event.target.checked)} />
-                  <Typography>Exclusif</Typography>
                 </Grid>
               )
             },

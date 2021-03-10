@@ -1,14 +1,6 @@
 import React from 'react'
 
-import {
-  Button,
-  Divider,
-  Grid,
-  IconButton,
-  Switch,
-  Typography
-  // FormLabel
-} from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Switch, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -78,10 +70,15 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
               name: 'isInclusive',
               type: 'custom',
               renderInput: (field: any) => (
-                <Grid component="label" container alignItems="center" style={{ margin: '0 1em' }}>
-                  <Typography>Critère inclusif</Typography>
+                <Grid style={{ display: 'flex' }}>
+                  <FormLabel
+                    onClick={() => field.onChange(!field.value)}
+                    style={{ margin: 'auto 1em' }}
+                    component="legend"
+                  >
+                    Exclure les patients qui suivent les règles suivantes
+                  </FormLabel>
                   <Switch checked={!field.value} onChange={(event) => field.onChange(!event.target.checked)} />
-                  <Typography>Exclusif</Typography>
                 </Grid>
               )
             },
