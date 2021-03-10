@@ -4,10 +4,9 @@ const useStyles = makeStyles(() => ({
   root: {
     display: 'flex',
     width: 'fit-content',
-    borderRadius: '5px',
     marginLeft: 12,
     alignSelf: 'center',
-    padding: 8
+    padding: '4px 8px'
   },
   temporalConstraintTypo: {
     marginTop: '5px',
@@ -17,7 +16,21 @@ const useStyles = makeStyles(() => ({
   temporalConstraintSelect: {
     height: '25px',
     marginTop: '4px',
-    marginRight: '2px'
+    marginRight: '2px',
+    '&::after': {
+      borderBottom: 'none'
+    },
+    '&::before': {
+      borderBottom: 'none'
+    },
+    '&:hover:not($disabled):not($focused):not($error):before': {
+      borderBottom: `none !important`
+    },
+    fontSize: 11,
+    color: 'black'
+  },
+  selectIcon: {
+    color: 'black'
   }
 }))
 

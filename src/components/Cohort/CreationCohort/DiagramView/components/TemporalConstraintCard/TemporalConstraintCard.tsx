@@ -29,10 +29,11 @@ const TemporalConstraintView: React.FC = () => {
     <Grid
       className={classes.root}
       style={{
-        backgroundColor: mainTemporalConstraint?.constraintType === 'none' ? '' : '#FFE2A9'
+        backgroundColor: mainTemporalConstraint?.constraintType === 'none' ? '#DEDEDE' : '#FFE2A9'
       }}
     >
       <Select
+        classes={{ icon: classes.selectIcon }}
         className={classes.temporalConstraintSelect}
         value={mainTemporalConstraint ? mainTemporalConstraint.constraintType : 'none'}
         onChange={(e: any) => onChangeTemporalConstraint(e.target.value)}
