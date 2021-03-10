@@ -1,11 +1,10 @@
-import React, { useCallback, useState, useEffect } from 'react'
-import { CircularProgress, Tabs, Tab } from '@material-ui/core'
+import React, { useCallback, useEffect } from 'react'
+import { CircularProgress } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 
 import ControlPanel from './ControlPanel/ControlPanel'
 import DiagramView from './DiagramView/DiagramView'
-import JsonView from './JsonView/JsonView'
 
 import { useAppSelector } from 'state'
 import { setCriteriaList } from 'state/criteria'
@@ -13,8 +12,6 @@ import { unbuildCohortCreation, resetCohortCreation } from 'state/cohortCreation
 import { CohortCreationSnapshotType } from 'types'
 
 import constructCriteriaList from './DataList_Criteria'
-
-import useStyles from './styles'
 
 import { getDataFromFetch } from '../../../utils/cohortCreation'
 import { createCohort } from '../../../services/cohortCreation'
@@ -31,10 +28,8 @@ const Requeteur = () => {
     json = ''
   } = useAppSelector((state) => state.cohortCreation.request || {})
 
-  const classes = useStyles()
   const history = useHistory()
   const dispatch = useDispatch()
-  const [seletedTab, onChangeTab] = useState<'diagramme' | 'JSON'>('diagramme')
 
   /**
    * Fetch all criteria to display list + retrieve all data from fetcher
@@ -123,30 +118,8 @@ const Requeteur = () => {
 
   return (
     <>
-      {/* Div Main */}
-      <div className={classes.tabsContainer}>
-        <Tabs value={seletedTab} onChange={(e, tab) => onChangeTab(tab)}>
-          <Tab
-            classes={{ root: classes.tabItem, selected: classes.selectedTabItem }}
-            label="Diagramme"
-            disableFocusRipple
-            disableRipple
-            value="diagramme"
-          />
-          <Tab
-            classes={{ root: classes.tabItem, selected: classes.selectedTabItem }}
-            label="JSON"
-            disableFocusRipple
-            disableRipple
-            value="json"
-          />
-        </Tabs>
-      </div>
+      <DiagramView />
 
-      {/* Display View (Diagramme + JSON) */}
-      {seletedTab === 'diagramme' ? <DiagramView /> : <JsonView defaultJson={json} onChangeJson={() => null} />}
-
-      {/* Main Pannel */}
       <ControlPanel
         onExecute={_canExecute() ? _onExecute : undefined}
         onUndo={_canUndo() ? _onUndo : undefined}
