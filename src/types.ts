@@ -171,6 +171,7 @@ export type CIMDiagnosticInclusionCriteria = {
 }
 
 export type ScopeTreeRow = {
+  access?: string
   resourceType?: string
   id: string
   name: string

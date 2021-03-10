@@ -313,7 +313,7 @@ const cohortCreationSlice = createSlice({
     builder.addCase(countCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
-      countLoading: false
+      countLoading: payload?.count?.status === 'pending' || payload?.count?.status === 'started' ? true : false
     }))
     builder.addCase(countCohortCreation.rejected, (state) => ({
       ...state,

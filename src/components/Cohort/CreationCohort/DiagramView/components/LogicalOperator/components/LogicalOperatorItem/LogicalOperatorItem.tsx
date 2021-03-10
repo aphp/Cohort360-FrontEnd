@@ -174,6 +174,9 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
       ) : (
         <Box
           className={classes.logicalOperator}
+          style={{
+            background: !currentLogicalOperator.isInclusive ? '#F2B0B0' : '#19235A'
+          }}
           onMouseEnter={() => setOpen(true)}
           onMouseLeave={() => setTimeout(() => setOpen(false), 500)}
         >
