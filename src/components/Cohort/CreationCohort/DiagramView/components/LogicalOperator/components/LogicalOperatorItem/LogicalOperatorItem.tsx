@@ -175,7 +175,6 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         </Box>
       ) : (
         <Box
-          style={{ backgroundColor: currentLogicalOperator.isInclusive ? '#19235A' : '#F2B0B0' }}
           className={classes.logicalOperator}
           style={{
             background: !currentLogicalOperator.isInclusive ? '#F2B0B0' : '#19235A',
