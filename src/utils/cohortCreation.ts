@@ -396,7 +396,7 @@ export function buildRequest(
 
           return {
             _id: mainCriteriaGroup.id,
-            _type: 'andGroup',
+            _type: mainCriteriaGroup.type === 'NamongM' ? 'orGroup' : mainCriteriaGroup.type,
             isInclusive: mainCriteriaGroup.isInclusive ?? true,
             criteria: subItems
           }
