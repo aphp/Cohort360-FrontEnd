@@ -27,7 +27,7 @@ const ControlPanel: React.FC<{
   const { loading = false, countLoading = false, count = {}, selectedPopulation = [] } = useAppSelector(
     (state) => state.cohortCreation.request || {}
   )
-  const { includePatient /*, byrequest, alive, deceased, female, male*/ } = count
+  const { includePatient, /*byrequest,*/ alive, deceased, female, male } = count
 
   const accessIsPseudonymize =
     selectedPopulation === null
@@ -116,33 +116,33 @@ const ControlPanel: React.FC<{
           {/* <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Par requête</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {countLoading ? <Skeleton variant="rect" width={50} height={19} /> : byrequest ?? '-'}
+              {countLoading ? <CircularProgress size={30} /> : byrequest ?? '-'}
             </Typography>
           </Grid> */}
-          {/* <Grid container justify="space-between">
+          <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Patients vivants</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {countLoading ? <Skeleton variant="rect" width={50} height={19} /> : alive ?? '-'}
+              {countLoading ? <CircularProgress size={30} /> : alive ?? '-'}
             </Typography>
-          </Grid> */}
-          {/* <Grid container justify="space-between">
+          </Grid>
+          <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Patients décédés</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {countLoading ? <Skeleton variant="rect" width={50} height={19} /> : deceased ?? '-'}
+              {countLoading ? <CircularProgress size={30} /> : deceased ?? '-'}
             </Typography>
-          </Grid> */}
-          {/* <Grid container justify="space-between">
+          </Grid>
+          <Grid container justify="space-between">
             <Typography className={clsx(classes.sidesMargin)}>Nombre de femmes</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {countLoading ? <Skeleton variant="rect" width={50} height={19} /> : female ?? '-'}
-            </Typography> */}
-          {/* </Grid>
+              {countLoading ? <CircularProgress size={30} /> : female ?? '-'}
+            </Typography>
+          </Grid>
           <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Nombre d'hommes</Typography>
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {countLoading ? <Skeleton variant="rect" width={50} height={19} /> : male ?? '-'}
+              {countLoading ? <CircularProgress size={30} /> : male ?? '-'}
             </Typography>
-          </Grid> */}
+          </Grid>
         </Grid>
       </Grid>
 
