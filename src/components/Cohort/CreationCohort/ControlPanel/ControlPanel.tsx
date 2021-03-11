@@ -27,7 +27,7 @@ const ControlPanel: React.FC<{
   const { loading = false, countLoading = false, count = {}, selectedPopulation = [] } = useAppSelector(
     (state) => state.cohortCreation.request || {}
   )
-  const { includePatient, /*byrequest,*/ alive, deceased, female, male } = count
+  const { includePatient, /*byrequest,*/ alive, deceased, female, male, unknownPatient } = count
 
   const accessIsPseudonymize =
     selectedPopulation === null
@@ -142,6 +142,12 @@ const ControlPanel: React.FC<{
             <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
               {countLoading ? <CircularProgress size={30} /> : male ?? '-'}
             </Typography>
+            <Grid container justify="space-between">
+              <Typography className={classes.sidesMargin}>Nombre d'inconnu</Typography>
+              <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
+                {countLoading ? <CircularProgress size={30} /> : unknownPatient ?? '-'}
+              </Typography>
+            </Grid>
           </Grid>
         </Grid>
       </Grid>

@@ -348,6 +348,7 @@ export type CohortCreationCounterType = {
   deceased?: number
   female?: number
   male?: number
+  unknownPatient?: number
 }
 
 export type CohortCreationSnapshotType = {
