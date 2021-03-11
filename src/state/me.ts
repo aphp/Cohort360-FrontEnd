@@ -9,6 +9,7 @@ export type MeState = null | {
   deidentified: boolean
   nominativeGroupsIds?: any[]
   lastConnection?: string
+  isSuperUser?: boolean
 }
 
 const initialState: MeState = null

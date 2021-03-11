@@ -3,6 +3,7 @@ import moment from 'moment'
 import clsx from 'clsx'
 import { Grid, Container, Typography } from '@material-ui/core'
 
+import AccessRequestNotifCard from 'features/access/AccessRequestNotifCard'
 import PerimeterCard from 'features/perimeters/PerimeterCard'
 import SearchPatientCard from 'features/patients/SearchPatientCard'
 
@@ -49,8 +50,15 @@ const Accueil: React.FC = () => {
             <Grid item xs={12} md={6}>
               <PerimeterCard />
             </Grid>
-            <Grid item xs={12} md={6}>
-              <SearchPatientCard />
+            <Grid item container xs={12} md={6} direction="column">
+              <Grid className={classes.verticalPadding}>
+                <SearchPatientCard />
+              </Grid>
+              {practitioner.isSuperUser ? (
+                <Grid className={classes.verticalPadding}>
+                  <AccessRequestNotifCard />
+                </Grid>
+              ) : null}
             </Grid>
           </Grid>
           <Grid item container>
