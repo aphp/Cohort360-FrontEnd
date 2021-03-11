@@ -1,36 +1,59 @@
 import { makeStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles(() => ({
-  root: {
-    width: 450,
-    height: 'fit-content',
-    minHeight: 180
-  },
-  cardHeader: {
-    background: '#D1E2F4',
-    color: '#45505B'
-  },
-  cardContent: {
+const useStyles = makeStyles((theme) => ({
+  populationCard: {
     display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    height: 'calc(100% - 53px)'
+    'border-radius': 4,
+    backgroundColor: '#FFFFFF',
+    padding: '8px 16px',
+    border: '3px solid #D3DEE8',
+    flex: 1,
+    margin: '12px 0',
+    position: 'relative'
   },
-  populationLabel: {
-    color: '#5BC5F2',
-    textDecoration: 'underline',
+  centerContainer: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  leftDiv: {
+    display: 'flex',
+    alignItems: 'center',
+    [theme.breakpoints.down('md')]: {
+      flexWrap: 'wrap'
+    }
+  },
+  editButton: {
+    color: 'currentcolor',
+    [theme.breakpoints.down('md')]: {
+      position: 'absolute',
+      right: 5,
+      top: 8
+    }
+  },
+  chipContainer: {
+    marginLeft: 12
+  },
+  populationChip: {
+    margin: 4,
+    fontSize: 11,
     fontWeight: 'bold'
   },
-  actionButtonContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 12
+  populationLabel: {
+    color: '#19235A',
+    textDecoration: 'underline'
   },
   actionButton: {
-    margin: 4,
-    outline: 'none'
+    backgroundColor: '#19235A',
+    color: '#FFFFFF',
+    borderRadius: 25,
+    padding: '6px 12px',
+    '&:hover': {
+      backgroundColor: '#19235A'
+    }
   }
 }))
 

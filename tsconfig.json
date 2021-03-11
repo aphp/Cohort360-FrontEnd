@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -14,8 +18,11 @@
     "noEmit": true,
     "jsx": "react",
     "strict": true,
-    "baseUrl": "src" /* Base directory to resolve non-absolute module names. */,
-    "downlevelIteration": true
+    "baseUrl": "src",
+    "downlevelIteration": true,
+    "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }

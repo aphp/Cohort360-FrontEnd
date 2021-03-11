@@ -1,428 +1,49 @@
-import React, { useState, Fragment } from 'react'
-import moment from 'moment'
-import { useDispatch } from 'react-redux'
+import React from 'react'
 
-import { Button, Card, CardHeader, CardContent, IconButton, Typography, CircularProgress } from '@material-ui/core'
+import { IconButton, Typography } from '@material-ui/core'
 
-import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 
-import CriteriaRightPanel from './components/CriteriaRightPanel'
+import CriteriaCardContent from './components/CriteriaCardContent/CriteriaCardContent'
 
 import { useAppSelector } from 'state'
-import { buildCreationCohort } from 'state/cohortCreation'
-import { SelectedCriteriaType } from 'types'
 
 import useStyles from './styles'
+import { SelectedCriteriaType } from 'types'
 
-const CriteriaCard: React.FC = () => {
+type CriteriaCardProps = {
+  itemId: number
+  deleteCriteria: (criteriaId: number) => void
+  editCriteria: (criteria: SelectedCriteriaType) => void
+}
+
+const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, editCriteria, deleteCriteria }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
 
-  const criteria = useAppSelector((state) => state.cohortCreation.criteria)
-  const { loading = false, selectedCriteria = [] } = useAppSelector<{
-    loading: boolean
-    selectedCriteria: SelectedCriteriaType[]
-  }>((state) => state.cohortCreation.request || {})
+  const { selectedCriteria = [] } = useAppSelector((state) => state.cohortCreation.request || {})
 
-  const [indexCriteria, onChangeIndexCriteria] = useState<number | null>(null)
-  const [openCriteriaDrawer, onChangeOpenCriteriaDrawer] = useState<boolean>(false)
-
-  const _addSelectedCriteria = () => {
-    onChangeIndexCriteria(null)
-    onChangeOpenCriteriaDrawer(true)
-  }
-
-  const _editSelectedCriteria = (index: number) => {
-    onChangeIndexCriteria(index)
-    onChangeOpenCriteriaDrawer(true)
-  }
-
-  const _deleteSelectedCriteria = (index: number) => {
-    const savedSelectedCriteria = [...selectedCriteria]
-    savedSelectedCriteria.splice(index, 1)
-    dispatch(buildCreationCohort({ selectedCriteria: savedSelectedCriteria }))
-  }
-
-  const _onChangeSelectedCriteria = (newSelectedCriteria: SelectedCriteriaType) => {
-    let savedSelectedCriteria = [...selectedCriteria]
-    if (indexCriteria !== null) {
-      savedSelectedCriteria[indexCriteria] = newSelectedCriteria
-    } else {
-      savedSelectedCriteria = [...savedSelectedCriteria, newSelectedCriteria]
-    }
-    dispatch(buildCreationCohort({ selectedCriteria: savedSelectedCriteria }))
-  }
-
-  const _displayCardContent = (_selectedCriteria: SelectedCriteriaType) => {
-    if (!_selectedCriteria) return <></>
-    let content = <></>
-
-    let _data: any = null
-    const _searchDataFromCriteria = (_criteria: any[], type: string) => {
-      for (const _criterion of _criteria) {
-        if (_criterion.id === type) {
-          _data = _criterion.data
-        } else if (_criterion.subItems) {
-          _data = _data ? _data : _searchDataFromCriteria(_criterion.subItems, type)
-        }
-      }
-      return _data
-    }
-
-    const data: any = _searchDataFromCriteria(criteria, _selectedCriteria.type)
-
-    // let comparator = ''
-    // if (_selectedCriteria.comparator) {
-    //   switch (_selectedCriteria.comparator.id) {
-    //     case 'le':
-    //       comparator = '<='
-    //       break
-    //     case 'ge':
-    //       comparator = '>='
-    //       break
-    //     case 'e':
-    //       comparator = '='
-    //       break
-    //     default:
-    //       break
-    //   }
-    // }
-
-    const startDate = _selectedCriteria.startOccurrence
-      ? moment(_selectedCriteria.startOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
-      : ''
-    const endDate = _selectedCriteria.endOccurrence
-      ? moment(_selectedCriteria.endOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
-      : ''
-
-    switch (_selectedCriteria.type) {
-      case 'Claim': {
-        const displaySelectedGHM = (currentGHM: { id: string; label: string }) => {
-          const selectedGhmData =
-            data?.ghmData && data?.ghmData !== 'loading'
-              ? data.ghmData.find((ghmElement: any) => ghmElement && ghmElement.id === currentGHM.id)
-              : null
-          return <Typography>{selectedGhmData ? selectedGhmData.label : ''}</Typography>
-        }
-
-        content = (
-          <>
-            <Typography>
-              Dans <span className={classes.criteriaType}>GHM</span>,
-            </Typography>
-            {_selectedCriteria && _selectedCriteria?.code ? (
-              <>
-                <Typography>GHM sélectionné : </Typography>
-                {_selectedCriteria?.code?.map((code) => displaySelectedGHM(code))}
-              </>
-            ) : (
-              <></>
-            )}
-            {/* <Typography>
-              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
-            </Typography> */}
-            {/* <Typography>
-              {startDate
-                ? endDate
-                  ? `Entre le ${startDate} et le ${endDate},`
-                  : `Après le ${startDate},`
-                : endDate
-                ? `Avant le ${endDate},`
-                : ''}
-            </Typography> */}
-          </>
-        )
-        break
-      }
-
-      case 'Procedure': {
-        const displaySelectedCCAM = (currentCCAM: { id: string; label: string }) => {
-          const selectedCcamData =
-            data?.ccamData && data?.ccamData !== 'loading'
-              ? data.ccamData.find((ccamElement: any) => ccamElement && ccamElement.id === currentCCAM.id)
-              : null
-          return <Typography>{selectedCcamData ? selectedCcamData.label : ''}.</Typography>
-        }
-
-        content = (
-          <>
-            <Typography>
-              Dans <span className={classes.criteriaType}>Actes CCAM</span>,
-            </Typography>
-            {_selectedCriteria && _selectedCriteria?.code ? (
-              <>
-                <Typography>Acte CCAM sélectionné :</Typography>
-                {_selectedCriteria?.code?.map((code) => displaySelectedCCAM(code))}
-              </>
-            ) : (
-              <></>
-            )}
-            {/* <Typography>
-              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
-            </Typography> */}
-            {/* <Typography>
-              {startDate
-                ? endDate
-                  ? `Entre le ${startDate} et le ${endDate},`
-                  : `Après le ${startDate},`
-                : endDate
-                ? `Avant le ${endDate},`
-                : ''}
-            </Typography> */}
-          </>
-        )
-        break
-      }
-
-      case 'Condition': {
-        const displaySelectedCIM10 = (currentCIM10: { id: string; label: string }) => {
-          const selectedCimData =
-            data?.cim10Diagnostic && data?.cim10Diagnostic !== 'loading'
-              ? data.cim10Diagnostic.find((ghmElement: any) => ghmElement && ghmElement.id === currentCIM10.id)
-              : null
-          return <Typography>{selectedCimData ? selectedCimData.label : ''}</Typography>
-        }
-
-        const selectedDiagnostic = data?.diagnosticTypes
-          ? data.diagnosticTypes.find(
-              (diagnosticType: any) => diagnosticType && diagnosticType.id === _selectedCriteria?.diagnosticType?.id
-            )
-          : null
-
-        content = (
-          <>
-            <Typography>
-              Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,
-            </Typography>
-            {_selectedCriteria && _selectedCriteria?.code ? (
-              <>
-                <Typography>Diagnostic CIM sélectionné :</Typography>
-                {_selectedCriteria?.code?.map((code) => displaySelectedCIM10(code))}
-              </>
-            ) : (
-              <></>
-            )}
-            <Typography>
-              {selectedDiagnostic && `Type de diagnostic recherché : "${selectedDiagnostic.label}."`}
-            </Typography>
-            {/* <Typography>
-              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
-            </Typography> */}
-            {/* <Typography>
-              {startDate
-                ? endDate
-                  ? `Entre le ${startDate} et le ${endDate},`
-                  : `Après le ${startDate},`
-                : endDate
-                ? `Avant le ${endDate},`
-                : ''}
-            </Typography> */}
-          </>
-        )
-        break
-      }
-
-      case 'Patient': {
-        const selectedGender = data?.gender
-          ? data.gender.find((gender: any) => gender && gender.id === _selectedCriteria?.gender?.id)
-          : null
-        const selectedVitalStatus = data?.status
-          ? data.status.find((status: any) => status && status.id === _selectedCriteria?.vitalStatus?.id)
-          : null
-
-        content = (
-          <>
-            <Typography>
-              Dans <span className={classes.criteriaType}>Démographie Patient</span>,
-            </Typography>
-            {selectedGender && <Typography>Genre sélectionné : {selectedGender.label}.</Typography>}
-            {selectedVitalStatus && <Typography>Statut vital : {selectedVitalStatus.label}.</Typography>}
-
-            {!!_selectedCriteria.years && _selectedCriteria.years[0] === _selectedCriteria.years[1] && (
-              <Typography>
-                Âge sélectionné: {_selectedCriteria.years?.[0]} ans
-                {_selectedCriteria.years?.[0] === 130 ? ' ou plus.' : '.'}
-              </Typography>
-            )}
-            {!!_selectedCriteria.years &&
-              _selectedCriteria.years[0] !== _selectedCriteria.years[1] &&
-              (_selectedCriteria.years[0] !== 0 || _selectedCriteria.years[1] !== 130) && (
-                <Typography>
-                  Fourchette d'âge comprise entre {_selectedCriteria.years[0]} et {_selectedCriteria.years[1]} ans
-                  {_selectedCriteria.years[1] === 130 ? ' ou plus.' : '.'}
-                </Typography>
-              )}
-          </>
-        )
-        break
-      }
-
-      case 'Composition': {
-        const selectedDocType = data?.docTypes
-          ? data?.docTypes.find((docTypes: any) => docTypes && docTypes.id === _selectedCriteria?.docType?.id)
-          : {}
-
-        content = (
-          <>
-            <Typography>
-              Dans <span className={classes.criteriaType}>Document médical</span>,
-            </Typography>
-            <Typography>Recherche textuelle "{_selectedCriteria.search}"</Typography>
-            {selectedDocType && <Typography>Dans {selectedDocType.label}.</Typography>}
-            {/* <Typography>
-              {_selectedCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_selectedCriteria.encounter}` : ''}
-            </Typography> */}
-            <Typography>
-              {startDate
-                ? endDate
-                  ? `Entre le ${startDate} et le ${endDate},`
-                  : `Après le ${startDate},`
-                : endDate
-                ? `Avant le ${endDate},`
-                : ''}
-            </Typography>
-          </>
-        )
-        break
-      }
-
-      case 'Encounter': {
-        const ageType: any = _selectedCriteria.ageType ? _selectedCriteria.ageType.id : 'year'
-        let ageUnit = 'an(s)'
-        if (ageType === 'month') ageUnit = 'mois'
-        else if (ageType === 'day') ageUnit = 'jour(s)'
-
-        const selectedAdmissionMode = data.admissionModes
-          ? data.admissionModes.find((admissionMode: any) => admissionMode.id === _selectedCriteria?.admissionMode?.id)
-          : null
-        const selectedEntryMode = data.entryModes
-          ? data.entryModes.find((entryMode: any) => entryMode.id === _selectedCriteria?.entryMode?.id)
-          : null
-        const selectedExitMode = data.exitModes
-          ? data.exitModes.find((exitMode: any) => exitMode.id === _selectedCriteria?.exitMode?.id)
-          : null
-        const selectedFileStatus = data.fileStatus
-          ? data.fileStatus.find((fileStatus: any) => fileStatus.id === _selectedCriteria?.fileStatus?.id)
-          : null
-
-        content = (
-          <>
-            <Typography>
-              Dans <span className={classes.criteriaType}>Prise en charge</span>,
-            </Typography>
-            {_selectedCriteria.years && _selectedCriteria.years[0] === _selectedCriteria.years[1] && (
-              <Typography>
-                Âge au moment de la prise en charge : {_selectedCriteria.years?.[0]} {ageUnit}
-                {_selectedCriteria.years?.[0] === 130 ? ' ou plus.' : '.'}
-              </Typography>
-            )}
-            {_selectedCriteria.years &&
-              _selectedCriteria.years[0] !== _selectedCriteria.years[1] &&
-              (_selectedCriteria.years[0] !== 0 || _selectedCriteria.years[1] !== 130) && (
-                <Typography>
-                  Âge au moment de la prise en charge : entre {_selectedCriteria.years[0]} et{' '}
-                  {_selectedCriteria.years[1]} {ageUnit}
-                  {_selectedCriteria.years[1] === 130 ? ' ou plus.' : '.'}
-                </Typography>
-              )}
-            {_selectedCriteria.duration && _selectedCriteria.duration[0] === _selectedCriteria.duration[1] && (
-              <Typography>
-                Durée de la prise en charge : {_selectedCriteria.duration?.[0]} jour(s)
-                {_selectedCriteria.duration?.[0] === 100 ? ' ou plus.' : '.'}
-              </Typography>
-            )}
-            {_selectedCriteria.duration &&
-              _selectedCriteria.duration[0] !== _selectedCriteria.duration[1] &&
-              (_selectedCriteria.duration[0] !== 0 || _selectedCriteria.duration[1] !== 100) && (
-                <Typography>
-                  Durée de la prise en charge : {_selectedCriteria.duration[0]} et {_selectedCriteria.duration[1]}{' '}
-                  jour(s)
-                  {_selectedCriteria.duration[1] === 100 ? ' ou plus.' : '.'}
-                </Typography>
-              )}
-            {selectedAdmissionMode && <Typography>Mode d'admission : {selectedAdmissionMode.label}.</Typography>}
-            {selectedEntryMode && <Typography>Mode d'entrée : {selectedEntryMode.label}.</Typography>}
-            {selectedExitMode && <Typography>Mode de sortie : {selectedExitMode.label}.</Typography>}
-            {selectedFileStatus && <Typography>Statut dossier : {selectedFileStatus.label}.</Typography>}
-          </>
-        )
-        break
-      }
-      default:
-        break
-    }
-    return content
-  }
+  const CurrentCriterion = selectedCriteria.find((criteria) => criteria.id === itemId)
+  if (!CurrentCriterion) return <></> // Bug, not possible ... The current item is not a criteria
 
   return (
-    <>
-      {selectedCriteria &&
-        selectedCriteria.length > 0 &&
-        selectedCriteria.map((_selectedCriteria, index) => (
-          <Fragment key={`C${index}`}>
-            {/* <div className={classes.root}>
-              <Button
-                disabled={loading}
-                className={classes.addButton}
-                onClick={_addSelectedCriteria}
-                variant="contained"
-                color="primary"
-              >
-                <AddIcon />
-              </Button>
-            </div> */}
-            <div className={classes.root}>
-              <Card className={classes.card}>
-                <CardHeader
-                  className={classes.cardHeader}
-                  action={
-                    <>
-                      <IconButton
-                        size="small"
-                        onClick={() => _deleteSelectedCriteria(index)}
-                        style={{ color: 'currentcolor' }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => _editSelectedCriteria(index)}
-                        style={{ color: 'currentcolor' }}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                    </>
-                  }
-                  title={`C${index + 1} - ${_selectedCriteria.title}`}
-                />
-                <CardContent className={classes.cardContent}>{_displayCardContent(_selectedCriteria)}</CardContent>
-              </Card>
-            </div>
-          </Fragment>
-        ))}
-
-      <div className={classes.root}>
-        <Button
-          disabled={loading}
-          className={classes.addButton}
-          onClick={_addSelectedCriteria}
-          variant="contained"
-          color="primary"
-        >
-          {loading ? <CircularProgress className={classes.loading} /> : <AddIcon />}
-        </Button>
+    <div
+      className={classes.criteriaItem}
+      style={{ backgroundColor: CurrentCriterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
+    >
+      <div className={classes.criteriaTitleAndChips}>
+        <Typography className={classes.title}>{CurrentCriterion.title} :</Typography>
+        <CriteriaCardContent currentCriteria={CurrentCriterion} />
       </div>
-
-      <CriteriaRightPanel
-        criteria={criteria}
-        selectedCriteria={indexCriteria !== null ? selectedCriteria[indexCriteria] : null}
-        onChangeSelectedCriteria={_onChangeSelectedCriteria}
-        open={openCriteriaDrawer}
-        onClose={() => onChangeOpenCriteriaDrawer(false)}
-      />
-    </>
+      <div className={classes.actionContainer}>
+        <IconButton size="small" onClick={() => editCriteria(CurrentCriterion)} style={{ color: 'currentcolor' }}>
+          <EditIcon />
+        </IconButton>
+        <IconButton size="small" onClick={() => deleteCriteria(CurrentCriterion.id)} style={{ color: 'currentcolor' }}>
+          <DeleteIcon />
+        </IconButton>
+      </div>
+    </div>
   )
 }
 

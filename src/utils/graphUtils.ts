@@ -251,7 +251,7 @@ export const getAgeRepartitionMap = (
   return repartitionMap
 }
 
-export const getVisitRepartitionMapAphp = (facet?: IExtension[]): ComplexChartDataType<Month> => {
+export const getVisitRepartitionMapAphp2 = (facet?: IExtension[]): ComplexChartDataType<Month> => {
   const repartitionMap = new Map()
 
   facet?.forEach((object) => {
@@ -288,6 +288,58 @@ export const getVisitRepartitionMapAphp = (facet?: IExtension[]): ComplexChartDa
         })
       }
     }
+  })
+
+  return repartitionMap
+}
+
+export const getVisitRepartitionMapAphp = (facet?: IExtension[]): ComplexChartDataType<Month> => {
+  const repartitionMap = new Map()
+
+  facet?.forEach((object) => {
+    const data = object.extension
+
+    if (data) {
+      const values = data[0].url?.split('-')
+
+      if (values) {
+        const month = getStringMonthAphp(parseInt(values[1] ?? 'Inconnu', 10))
+
+        if (!repartitionMap.get(month)) {
+          repartitionMap.set(month, {
+            male: 0,
+            maleCount: 0,
+            female: 0,
+            femaleCount: 0,
+            other: 0,
+            otherCount: 0
+          })
+        }
+
+        if (values[2]) {
+          switch (values[2]) {
+            case 'female':
+              repartitionMap.get(month).female += data[0].valueDecimal
+              repartitionMap.get(month).femaleCount += 1
+              break
+            case 'male':
+              repartitionMap.get(month).male += data[0].valueDecimal
+              repartitionMap.get(month).maleCount += 1
+              break
+            default:
+              repartitionMap.get(month).other += data[0].valueDecimal
+              repartitionMap.get(month).otherCount += 1
+              break
+          }
+        }
+      }
+    }
+  })
+
+  repartitionMap.forEach((month) => {
+    month.male = month.male / month.maleCount
+    month.female = month.female / month.femaleCount
+    month.other = month.other / month.otherCount
   })
 
   return repartitionMap

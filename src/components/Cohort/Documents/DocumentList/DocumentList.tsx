@@ -144,7 +144,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
             <Grid container item xs={3} alignItems="center" justify="center">
               <UserIcon height="25px" fill="#5BC5F2" />
               <Grid container item direction="column" xs={6} className={classes.textGrid}>
-                <Typography variant="button">{deidentified ? 'ID Patient' : 'IPP'}</Typography>
+                <Typography variant="button">{deidentified ? 'IPP chiffré' : 'IPP'}</Typography>
                 <Grid container item alignItems="center">
                   <Typography>{row.IPP}</Typography>
                   <IconButton
@@ -160,7 +160,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
           <Grid container item xs={2} alignItems="center" justify="center">
             <DescriptionIcon htmlColor="#5BC5F2" className={classes.iconSize} />
             <Grid container item direction="column" xs={6} className={classes.textGrid}>
-              <Typography variant="button">{deidentified ? 'ID Visite' : 'NDA'}</Typography>
+              <Typography variant="button">{deidentified ? 'NDA chiffré' : 'NDA'}</Typography>
               <Typography>{row.NDA}</Typography>
             </Grid>
           </Grid>

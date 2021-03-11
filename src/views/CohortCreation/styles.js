@@ -29,11 +29,8 @@ export default makeStyles((theme) => ({
   },
   mainContainer: {
     width: '100%',
-    height: 'calc(100vh - 72px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center'
-    // paddingTop: theme.spacing(3),
-    // paddingBottom: theme.spacing(3)
   }
 }))
