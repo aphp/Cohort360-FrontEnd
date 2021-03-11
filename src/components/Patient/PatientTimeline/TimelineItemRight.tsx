@@ -6,13 +6,14 @@ import { IProcedure } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import useStyles from './styles'
 import { getProcedureStatus } from 'utils/documentsFormatter'
+import { PMSIEntry } from 'types'
 
 /**
  * @usage
  * <TimelineItemRight time={time} text={text} />
  */
 type TimelineItemRightTypes = {
-  data: IProcedure
+  data: PMSIEntry<IProcedure>
   open: (procedure?: IProcedure) => void
 }
 const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data, open }) => {
@@ -55,7 +56,15 @@ const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data, open }) => 
           </span>
           {data.status && <Chip label={getProcedureStatus(data.status)} size="small" className={classes.chip} />}
           {data.code && (
-            <div className={classes.timelineTextRight} onClick={() => open(data)}>
+            <div
+              className={classes.timelineTextRight}
+              style={
+                data.documents && data.documents.length > 0 ? { textDecoration: 'underline', cursor: 'pointer' } : {}
+              }
+              onClick={() => {
+                data.documents && data.documents.length > 0 && open(data)
+              }}
+            >
               {`${data.code?.coding?.[0].display} (${data.code?.coding?.[0].code})`}
             </div>
           )}

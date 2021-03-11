@@ -154,10 +154,8 @@ const useStyles = makeStyles({
   timelineTextRight: {
     textAlign: 'left',
     fontSize: fontSize,
-    textDecoration: 'underline',
     marginRight: '.7rem',
     color: '#43435B',
-    cursor: 'pointer',
     zIndex: 5
   },
   chip: {

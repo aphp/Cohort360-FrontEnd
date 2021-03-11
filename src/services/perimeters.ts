@@ -15,6 +15,13 @@ import {
 } from 'utils/graphUtils'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
+import fakeGroup from '../data/fakeData/group'
+import fakeFacetDeceased from '../data/fakeData/facet-deceased'
+import fakeFacetAgeMonth from '../data/fakeData/facet-age-month'
+import fakeFacetClassSimple from '../data/fakeData/facet-class-simple'
+import fakeFacetStartDateFacet from '../data/fakeData/facet-start-date-facet'
+import fakePatients from '../data/fakeData/patients'
+
 export const getServices = async (id: string) => {
   const [respOrganizations, respHealthcareServices] = await Promise.all([
     api.get<FHIR_API_Response<IOrganization>>(`/Organization?_id=${id}${API_RESOURCE_TAG}`),
@@ -60,6 +67,30 @@ const getPatientsAndEncountersFromServiceId = async (serviceId: string) => {
 }
 
 export const fetchPerimetersInfos = async (perimetersId: string): Promise<CohortData | undefined> => {
+  if (CONTEXT === 'fakedata') {
+    const totalPatients = 3
+
+    const cohort = fakeGroup as IGroup
+
+    const originalPatients = fakePatients as IPatient[]
+
+    const agePyramidData = getAgeRepartitionMapAphp(fakeFacetAgeMonth)
+
+    const genderRepartitionMap = getGenderRepartitionMapAphp(fakeFacetDeceased)
+
+    const monthlyVisitData = getVisitRepartitionMapAphp(fakeFacetStartDateFacet)
+
+    const visitTypeRepartitionData = getEncounterRepartitionMapAphp(fakeFacetClassSimple)
+    return {
+      cohort,
+      totalPatients,
+      originalPatients,
+      genderRepartitionMap,
+      visitTypeRepartitionData,
+      agePyramidData,
+      monthlyVisitData
+    }
+  }
   if (CONTEXT === 'aphp') {
     const [perimetersResp, patientsResp, encountersResp] = await Promise.all([
       api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${perimetersId}`),
@@ -67,7 +98,7 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
         `/Patient?pivotFacet=age_gender,deceased_gender&_list=${perimetersId}&size=20&_sort=given&_elements=gender,name,birthDate,deceased,identifier,extension`
       ),
       api.get<FHIR_API_Response<IEncounter>>(
-        `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${perimetersId}&size=0&type=VISIT`
+        `/Encounter?facet=class,visit-year-month-gender-facet&_list=${perimetersId}&size=0&type=VISIT`
       )
     ])
 
@@ -94,8 +125,9 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
     const monthlyVisitData =
       encountersResp?.data?.resourceType === 'Bundle'
         ? getVisitRepartitionMapAphp(
-            encountersResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-start-date-facet')?.[0]
-              .extension
+            encountersResp.data.meta?.extension?.filter(
+              (facet: any) => facet.url === 'facet-visit-year-month-gender-facet'
+            )?.[0].extension
           )
         : undefined
 
@@ -138,8 +170,8 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
   }
 }
 
-export const fetchPerimeterInfoForRequeteur = async (perimetersId: string): Promise<ScopeTreeRow[] | null> => {
-  if (!perimetersId) return null
+export const fetchPerimeterInfoForRequeteur = async (perimetersId: string): Promise<ScopeTreeRow[]> => {
+  if (!perimetersId) return []
 
   const groupsResults = await api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${perimetersId}`)
   const groups = getApiResponseResources(groupsResults)

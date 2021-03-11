@@ -1,7 +1,6 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import moment from 'moment'
-import { useAppSelector } from 'state'
-
+import clsx from 'clsx'
 import { Grid, Paper, Container, Typography } from '@material-ui/core'
 
 import NewsCard from '../../components/Welcome/NewsCard/NewsCard'
@@ -10,21 +9,28 @@ import ResearchCard from '../../components/Welcome/ResearchCard/ResearchCard'
 import SearchPatientCard from '../../components/Welcome/SearchPatientCard/SearchPatientCard'
 import TutorialsCard from '../../components/Welcome/TutorialsCard/TutorialsCard'
 
-import { fetchFavoriteCohorts, fetchLastCohorts } from 'services/savedResearches'
+import { useAppSelector, useAppDispatch } from 'state'
+import { initUserCohortsThunk } from 'state/userCohorts'
 
-import clsx from 'clsx'
 import useStyles from './styles'
 
 const Accueil: React.FC = () => {
   const classes = useStyles()
-  const { practitioner, open } = useAppSelector((state) => ({
+  const dispatch = useAppDispatch()
+  const { practitioner, open, favoriteCohorts, lastCohorts } = useAppSelector((state) => ({
     practitioner: state.me,
-    open: state.drawer
+    open: state.drawer,
+    favoriteCohorts: state.userCohorts.favoriteCohorts,
+    lastCohorts: state.userCohorts.lastCohorts
   }))
 
   const lastConnection = practitioner?.lastConnection
     ? moment(practitioner.lastConnection).format('[Dernière connexion: ]ddd DD MMMM YYYY[, à ]HH:mm')
     : ''
+
+  useEffect(() => {
+    dispatch(initUserCohortsThunk())
+  }, [dispatch])
 
   return practitioner ? (
     <Grid
@@ -71,14 +77,14 @@ const Accueil: React.FC = () => {
         <Grid container spacing={3}>
           <Grid item xs={12} md={12} lg={12}>
             <Paper className={classes.paper}>
-              <ResearchCard title={'Mes cohortes favorites'} fetchCohort={fetchFavoriteCohorts} />
+              <ResearchCard title={'Mes cohortes favorites'} cohorts={favoriteCohorts} />
             </Paper>
           </Grid>
         </Grid>
         <Grid container spacing={3}>
           <Grid item xs={12} md={12} lg={12}>
             <Paper className={classes.paper}>
-              <ResearchCard title={'Mes dernières cohortes créées'} fetchCohort={fetchLastCohorts} />
+              <ResearchCard title={'Mes dernières cohortes créées'} cohorts={lastCohorts} />
             </Paper>
           </Grid>
         </Grid>

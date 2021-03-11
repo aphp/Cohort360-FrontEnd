@@ -1,7 +1,9 @@
 import React from 'react'
+import { Grid } from '@material-ui/core'
 
 import PopulationCard from './components/PopulationCard/PopulationCard'
-import CriteriaCard from './components/CriteriaCard/CriteriaCard'
+import LogicalOperator from './components/LogicalOperator/LogicalOperator'
+import TemporalConstraintCard from './components/TemporalConstraintCard/TemporalConstraintCard'
 
 import { useAppSelector } from 'state'
 
@@ -13,10 +15,13 @@ const DiagramView: React.FC = () => {
   const classes = useStyles()
 
   return (
-    <div className={classes.root}>
-      <PopulationCard />
-      {selectedPopulation && selectedPopulation.length > 0 ? <CriteriaCard /> : <></>}
-    </div>
+    <Grid container className={classes.root}>
+      <Grid className={classes.populationContainer}>
+        <PopulationCard />
+        {selectedPopulation && selectedPopulation.length > 0 ? <TemporalConstraintCard /> : <></>}
+      </Grid>
+      {selectedPopulation && selectedPopulation.length > 0 ? <LogicalOperator /> : <></>}
+    </Grid>
   )
 }
 

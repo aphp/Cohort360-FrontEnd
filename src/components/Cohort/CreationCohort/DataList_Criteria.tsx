@@ -1,18 +1,20 @@
 import { CriteriaItemType } from 'types'
 
 // Components
-import DemographicFrom from './DiagramView/components/CriteriaCard/components/DemographicFrom/DemographicFrom'
-import DocumentsForm from './DiagramView/components/CriteriaCard/components/DocumentsForm/DocumentsForm'
-import SupportedForm from './DiagramView/components/CriteriaCard/components/SupportedForm/SupportedForm'
-import CCAMForm from './DiagramView/components/CriteriaCard/components/CCAM'
-import Cim10Form from './DiagramView/components/CriteriaCard/components/Cim10Form'
-import GhmForm from './DiagramView/components/CriteriaCard/components/GHM'
+import DemographicFrom from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicFrom/DemographicFrom'
+import DocumentsForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DocumentsForm/DocumentsForm'
+import SupportedForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/SupportedForm/SupportedForm'
+import CCAMForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CCAM'
+import Cim10Form from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/Cim10Form'
+import GhmForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/GHM'
 
 // Fetcher
 import {
-  fetchAdmissionModes,
+  // fetchAdmissionModes,
   fetchEntryModes,
   fetchExitModes,
+  fetchPriseEnChargeType,
+  fetchTypeDeSejour,
   fetchFileStatus
 } from '../../../services/cohortCreation/fetchEncounter'
 import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetchDemographic'
@@ -45,14 +47,14 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'mes_variables',
     title: 'Mes variables',
-    color: '	#808080',
+    color: '#808080',
     disabled: true,
     data: null,
     components: null
   },
   {
     id: 'Patient',
-    title: 'Patients',
+    title: 'Démographie',
     color: '#0063AF',
     components: DemographicFrom,
     data: { gender: 'loading', status: 'loading' },
@@ -63,8 +65,22 @@ const criteriaList: CriteriaItemType[] = [
     title: 'Visites',
     color: '#0063AF',
     components: SupportedForm,
-    data: { admissionModes: 'loading', entryModes: 'loading', exitModes: 'loading', fileStatus: 'loading' },
-    fetch: { fetchAdmissionModes, fetchEntryModes, fetchExitModes, fetchFileStatus }
+    data: {
+      // admissionModes: 'loading',
+      entryModes: 'loading',
+      exitModes: 'loading',
+      priseEnChargeType: 'loading',
+      typeDeSejour: 'loading',
+      fileStatus: 'loading'
+    },
+    fetch: {
+      // fetchAdmissionModes,
+      fetchEntryModes,
+      fetchExitModes,
+      fetchPriseEnChargeType,
+      fetchTypeDeSejour,
+      fetchFileStatus
+    }
   },
   {
     id: 'Composition',
@@ -114,13 +130,13 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'biologie_microbiologie',
     title: 'Biologie/Microbiologie',
-    color: '	#808080',
+    color: '#808080',
     components: null,
     subItems: [
       {
         id: 'biologie',
         title: 'Biologie',
-        color: '	#808080',
+        color: '#808080',
         disabled: true,
         data: null,
         components: null
@@ -129,7 +145,7 @@ const criteriaList: CriteriaItemType[] = [
         id: 'microbiologie',
         title: 'Microbiologie',
         components: null,
-        color: '	#808080',
+        color: '#808080',
         disabled: true,
         data: null
       }
@@ -138,7 +154,7 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'physiologie',
     title: 'Physiologie',
-    color: '	#808080',
+    color: '#808080',
     disabled: true,
     data: null,
     components: null
@@ -146,14 +162,14 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'médicaments',
     title: 'Médicaments',
-    color: '	#808080',
+    color: '#808080',
     components: null,
     subItems: [
       {
         id: 'prescription_dispension_administration',
         title: 'Prescription - Dispension - Administration',
         components: null,
-        color: '	#808080',
+        color: '#808080',
         disabled: true,
         data: null
       }

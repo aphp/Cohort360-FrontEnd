@@ -7,7 +7,7 @@ import { fetchCohort } from 'services/cohortInfos'
 import { fetchMyPatients } from 'services/myPatients'
 import { fetchPerimetersInfos } from 'services/perimeters'
 
-type ExploredCohortState = {
+export type ExploredCohortState = {
   importedPatients: any[]
   includedPatients: any[]
   excludedPatients: any[]

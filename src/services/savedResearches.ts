@@ -13,6 +13,25 @@ export const fetchCohorts = async (
   searchInput?: string,
   page?: number
 ): Promise<Back_API_Response<FormattedCohort> | undefined> => {
+  if (CONTEXT === 'fakedata') {
+    const results = [
+      {
+        researchId: '123456789',
+        fhir_group_id: '123456789',
+        name: 'Fausse cohorte',
+        status: 'Cohort360',
+        nPatients: 12,
+        date: '2021-01-20T10:28:28.385368Z',
+        perimeter: '-',
+        favorite: true
+      }
+    ]
+
+    return {
+      results: results,
+      count: 1
+    }
+  }
   if (CONTEXT === 'arkhn') {
     // const cohortResp = await api.get<FHIR_API_Response<IGroup>>(
     //   '/Group?&_sort=-meta.lastUpdated'
@@ -68,7 +87,8 @@ export const fetchCohorts = async (
             nPatients: cohort.result_size,
             date: cohort.created_at,
             perimeter: '-',
-            favorite: cohort.favorite
+            favorite: cohort.favorite,
+            jobStatus: cohort.request_job_status
           }))
           .filter(Boolean)
       : undefined
@@ -80,7 +100,24 @@ export const fetchCohorts = async (
   }
 }
 
-export const fetchFavoriteCohorts = async (): Promise<Back_API_Response<FormattedCohort> | undefined> => {
+export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefined> => {
+  if (CONTEXT === 'fakedata') {
+    const results = [
+      {
+        researchId: '123456789',
+        fhir_group_id: '123456789',
+        name: 'Fausse cohorte',
+        status: 'Cohort360',
+        nPatients: 12,
+        date: '2021-01-20T10:28:28.385368Z',
+        perimeter: '-',
+        favorite: true,
+        jobStatus: 'finished'
+      }
+    ]
+
+    return results
+  }
   if (CONTEXT === 'aphp') {
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>('/explorations/cohorts/?favorite=true')
 
@@ -95,19 +132,34 @@ export const fetchFavoriteCohorts = async (): Promise<Back_API_Response<Formatte
               nPatients: cohort.result_size,
               date: cohort.created_at,
               perimeter: '-',
-              favorite: cohort.favorite
+              favorite: cohort.favorite,
+              jobStatus: cohort.request_job_status
             }
           })
           .filter(Boolean)
       : undefined
 
-    return {
-      results: results
-    }
+    return results
   }
 }
 
-export const fetchLastCohorts = async (): Promise<Back_API_Response<FormattedCohort> | undefined> => {
+export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined> => {
+  if (CONTEXT === 'fakedata') {
+    const results = [
+      {
+        researchId: '123456789',
+        fhir_group_id: '123456789',
+        name: 'Fausse cohorte',
+        status: 'Cohort360',
+        nPatients: 12,
+        date: '2021-01-20T10:28:28.385368Z',
+        perimeter: '-',
+        favorite: true
+      }
+    ]
+
+    return results
+  }
   if (CONTEXT === 'aphp') {
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
       '/explorations/cohorts/?limit=5&ordering=-created_at'
@@ -123,27 +175,30 @@ export const fetchLastCohorts = async (): Promise<Back_API_Response<FormattedCoh
             nPatients: cohort.result_size,
             date: cohort.created_at,
             perimeter: '-',
-            favorite: cohort.favorite
+            favorite: cohort.favorite,
+            jobStatus: cohort.request_job_status
           }))
           .filter(Boolean)
       : undefined
 
-    return {
-      results: results
-    }
+    return results
   }
 }
 
-export const setFavorite = async (cohortId: string, favStatus: boolean) => {
+export const setFavorite = async (cohortId: string, favStatus: boolean): Promise<boolean> => {
   if (CONTEXT === 'aphp') {
-    await apiBackCohort.patch(`/explorations/cohorts/${cohortId}/`, { favorite: !favStatus })
+    const response = await apiBackCohort.patch(`/explorations/cohorts/${cohortId}/`, { favorite: !favStatus })
+    return response.status === 200
   }
+  return false
 }
 
-export const onRemoveCohort = async (selectedCohort?: string) => {
+export const onRemoveCohort = async (selectedCohort?: string): Promise<boolean> => {
   if (CONTEXT === 'arkhn') {
     await api.delete(`/Group/${selectedCohort}`)
   } else if (CONTEXT === 'aphp') {
-    await apiBackCohort.delete(`/explorations/cohorts/${selectedCohort}/`)
+    const deleteRequest = await apiBackCohort.delete(`/explorations/cohorts/${selectedCohort}/`)
+    return [200, 204].includes(deleteRequest.status)
   }
+  return false
 }

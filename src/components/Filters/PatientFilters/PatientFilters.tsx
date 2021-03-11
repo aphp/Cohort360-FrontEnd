@@ -89,7 +89,14 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
         </Grid>
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Âge :</Typography>
-          <Slider value={_age} onChange={_onChangeAge} valueLabelDisplay="auto" max={130} className={classes.slider} />
+          <Slider
+            value={_age}
+            onChange={_onChangeAge}
+            valueLabelDisplay="on"
+            max={130}
+            valueLabelFormat={(value) => (value === 130 ? '130+' : value)}
+            className={classes.slider}
+          />
         </Grid>
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Statut vital :</Typography>

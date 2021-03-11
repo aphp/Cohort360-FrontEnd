@@ -5,7 +5,7 @@ const useStyles = makeStyles(() =>
     rightPanelContainerStyle: {
       position: 'fixed',
       width: 300,
-      height: 'calc(100% - 72px)',
+      height: '100%',
       bottom: '0px',
       right: '0px',
       border: '1px solid #CCCCCD',

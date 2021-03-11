@@ -1,6 +1,14 @@
 import api from './api'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
-import { CohortPatient, CohortComposition, PMSIEntry, FHIR_API_Response, ScopeTreeRow, PatientData } from 'types'
+import {
+  CohortPatient,
+  CohortComposition,
+  PMSIEntry,
+  FHIR_API_Response,
+  ScopeTreeRow,
+  PatientData,
+  CohortEncounter
+} from 'types'
 import {
   IClaim,
   IComposition,
@@ -13,14 +21,26 @@ import {
   IPatient,
   IProcedure
 } from '@ahryman40k/ts-fhir-types/lib/R4'
+import fakePatients from '../data/fakeData/patients'
+import fakeEncounters from '../data/fakeData/encounters'
+import fakeConditions from '../data/fakeData/conditions'
+import fakeProcedures from '../data/fakeData/procedures'
+import fakeClaims from '../data/fakeData/claims'
+import fakeDocuments from '../data/fakeData/documents'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
 export const fetchPatientsCount = async (): Promise<number | undefined> => {
-  const response = await api.get<FHIR_API_Response<IPatient>>('Patient?size=0')
+  if (CONTEXT === 'fakedata') {
+    return 12
+  } else if (CONTEXT === 'arkhn') {
+    return undefined
+  } else {
+    const response = await api.get<FHIR_API_Response<IPatient>>('Patient?size=0')
 
-  if (response?.data?.resourceType === 'OperationOutcome') return undefined
+    if (response?.data?.resourceType === 'OperationOutcome') return undefined
 
-  return response.data.total
+    return response.data.total
+  }
 }
 
 export const fillNDAAndServiceProviderDocs = async (
@@ -202,6 +222,31 @@ export const fetchPMSI = async (
   pmsiData?: PMSIEntry<IClaim | ICondition | IProcedure>[]
   pmsiTotal?: number
 }> => {
+  if (CONTEXT === 'fakedata') {
+    let pmsiData = []
+
+    switch (selectedTab) {
+      case 'CIM10':
+        pmsiData = fakeConditions as PMSIEntry<ICondition>[]
+        break
+      case 'CCAM':
+        pmsiData = fakeProcedures as PMSIEntry<IProcedure>[]
+        break
+      case 'GHM':
+        pmsiData = fakeClaims as PMSIEntry<IClaim>[]
+        break
+      default:
+        pmsiData = fakeConditions
+    }
+
+    const pmsiTotal = pmsiData.length
+
+    return {
+      // @ts-ignore
+      pmsiData,
+      pmsiTotal
+    }
+  }
   if (CONTEXT === 'arkhn') {
     let resource = ''
     let search = ''
@@ -356,6 +401,14 @@ export const fetchDocuments = async (
   endDate?: string | null,
   groupId?: string
 ) => {
+  if (CONTEXT === 'fakedata') {
+    const docsList = fakeDocuments as CohortComposition[]
+
+    return {
+      docsTotal: docsList.length,
+      docsList: docsList
+    }
+  }
   if (CONTEXT === 'aphp') {
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
     const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : []
@@ -461,7 +514,7 @@ export const getPatientsFromCohortId = async (cohortId: string): Promise<IPatien
 }
 
 export const getEncounterOrProcedureDocs = async (
-  data: IEncounter | IProcedure
+  data: CohortEncounter | PMSIEntry<IProcedure>
 ): Promise<(CohortComposition | IDocumentReference)[]> => {
   if (CONTEXT === 'arkhn') {
     let documents: (CohortComposition | IDocumentReference)[] = []
@@ -491,26 +544,126 @@ export const getEncounterOrProcedureDocs = async (
   }
 
   if (CONTEXT === 'aphp') {
-    let encounterId
-    if (data.resourceType === 'Encounter') {
-      encounterId = data.id
-    } else if (data.resourceType === 'Procedure') {
-      encounterId = data.encounter?.reference
-    }
-
-    const documentsResp = await api.get<FHIR_API_Response<IComposition>>(
-      `/Composition?encounter=${encounterId}&status=final&_elements=encounter,date,type,title,status`
-    )
-
-    //TO DO when deidentified data are fixed: change true to real value
-    const documentsList = await fillNDAAndServiceProviderDocs(true, getApiResponseResources(documentsResp))
-
-    if (documentsList) return documentsList
+    return data.documents ?? []
   }
   return []
 }
 
+const getEncounterDocuments = async (
+  encounters?: CohortEncounter[],
+  deidentifiedBoolean?: boolean,
+  groupId?: string
+) => {
+  if (!encounters) return undefined
+  if (encounters.length === 0) return encounters
+
+  const _encounters = encounters
+
+  const encountersList: any[] = []
+
+  _encounters.forEach((encounter) => {
+    encounter.documents = []
+    encountersList.push(encounter.id)
+  })
+
+  const documentsResp = await api.get<FHIR_API_Response<IComposition>>(
+    `/Composition?encounter=${encountersList}&_elements=status,type,subject,encounter,date,title`
+  )
+
+  const documents =
+    documentsResp.data.resourceType === 'Bundle'
+      ? await fillNDAAndServiceProviderDocs(deidentifiedBoolean, getApiResponseResources(documentsResp), groupId)
+      : undefined
+
+  if (!documents) return _encounters
+
+  documents.forEach((document) => {
+    const encounterIndex = _encounters.findIndex((encounter) => encounter.id === document.encounter?.display?.slice(10))
+
+    if (!encounterIndex) return
+
+    _encounters[encounterIndex].documents?.push(document)
+  })
+
+  return _encounters
+}
+
+const getProcedureDocuments = async (
+  procedures?: PMSIEntry<IProcedure>[],
+  deidentifiedBoolean?: boolean,
+  groupId?: string
+) => {
+  if (!procedures) return undefined
+  if (procedures.length === 0) return procedures
+  const _procedures = procedures
+
+  const encountersList: any[] = []
+
+  _procedures.forEach((procedure) => {
+    procedure.documents = []
+    encountersList.push(procedure.encounter?.reference?.slice(10))
+  })
+
+  const documentsResp = await api.get<FHIR_API_Response<IComposition>>(
+    `/Composition?encounter=${encountersList}&_elements=status,type,subject,encounter,date,title`
+  )
+
+  const documents =
+    documentsResp.data.resourceType === 'Bundle'
+      ? await fillNDAAndServiceProviderDocs(deidentifiedBoolean, getApiResponseResources(documentsResp), groupId)
+      : undefined
+
+  if (!documents) return _procedures
+
+  documents.forEach((document) => {
+    const procedureIndex = _procedures.findIndex(
+      (procedure) => procedure.encounter?.reference === document.encounter?.display
+    )
+
+    if (!procedureIndex) return
+
+    _procedures[procedureIndex].documents?.push(document)
+  })
+
+  return _procedures
+}
+
 export const fetchPatient = async (patientId: string, groupId?: string): Promise<PatientData | undefined> => {
+  if (CONTEXT === 'fakedata') {
+    const patientData = fakePatients[0]
+    const hospit = fakeEncounters as IEncounter[]
+    const documents = fakeDocuments as CohortComposition[]
+    const documentsTotal = fakeDocuments.length
+    const consult = fakeProcedures as PMSIEntry<IProcedure>[]
+    const consultTotal = fakeProcedures.length
+    const diagnostic = fakeConditions as PMSIEntry<ICondition>[]
+    const diagnosticTotal = fakeConditions.length
+    const ghm = fakeClaims as PMSIEntry<IClaim>[]
+    const ghmTotal = fakeClaims.length
+
+    const patient = {
+      ...patientData,
+      lastEncounter: hospit[0],
+      lastProcedure: consult[0],
+      lastGhm: ghm[0],
+      mainDiagnosis: diagnostic?.filter((diagnostic: any) => {
+        return diagnostic.extension?.[0].valueString === 'dp'
+      })
+    } as CohortPatient
+
+    return {
+      hospit,
+      documents,
+      documentsTotal,
+      consult,
+      consultTotal,
+      diagnostic,
+      diagnosticTotal,
+      ghm,
+      ghmTotal,
+      patient
+    }
+  }
   if (CONTEXT === 'arkhn') {
     const [
       patientResponse,
@@ -597,7 +750,7 @@ export const fetchPatient = async (patientId: string, groupId?: string): Promise
       ? patientData[0].extension?.find((extension) => extension.url === 'deidentified')?.valueBoolean
       : true
 
-    const hospit = getApiResponseResources(encounterResponse)
+    const hospit = await getEncounterDocuments(getApiResponseResources(encounterResponse), deidentifiedBoolean, groupId)
 
     const documents =
       documentsResponse.data.resourceType === 'Bundle'
@@ -608,7 +761,11 @@ export const fetchPatient = async (patientId: string, groupId?: string): Promise
 
     const consult =
       procedureResponse.data.resourceType === 'Bundle'
-        ? await fillNDAAndServiceProvider(deidentifiedBoolean, getApiResponseResources(procedureResponse), groupId)
+        ? await getProcedureDocuments(
+            await fillNDAAndServiceProvider(deidentifiedBoolean, getApiResponseResources(procedureResponse), groupId),
+            deidentifiedBoolean,
+            groupId
+          )
         : undefined
 
     const consultTotal = procedureResponse.data.resourceType === 'Bundle' ? procedureResponse.data.total : 0

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import Button from '@material-ui/core/Button'
@@ -103,6 +103,10 @@ const Login = () => {
       setErrorLogin(true)
     }
   }
+
+  useEffect(() => {
+    localStorage.clear()
+  }, [])
 
   const login = async () => {
     try {

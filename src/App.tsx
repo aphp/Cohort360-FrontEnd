@@ -12,6 +12,7 @@ import moment from 'moment'
 import { PersistGate } from 'redux-persist/integration/react'
 
 import Connexion from './views/Connexion/Connexion'
+import FakeConnexion from './views/Connexion/FakeConnexion'
 import ArkhnConnexion from './views/Connexion/ArkhnConnexion'
 import Accueil from './views/Accueil/Accueil'
 import RechercherPatient from './views/RechercherPatient/RechercherPatient'
@@ -24,7 +25,7 @@ import Dashboard from './views/Dashboard/Dashboard'
 // import MyPatients from './views/MyPatients/MyPatients'
 import PrivateRoute from './components/Routes/Private'
 import LeftSideBar from './components/LeftSideBar/LeftSideBar'
-// import CohortCreation from './views/CohortCreation/CohortCreation'
+import CohortCreation from './views/CohortCreation/CohortCreation'
 
 import { Provider } from 'react-redux'
 import { store, persistor } from './state/store'
@@ -49,7 +50,11 @@ const App = () => (
             <Switch>
               {/* <Route path="/*" render={() => '404 not found'} /> */}
               {/* TODO: Change connexion to /login */}
-              <Route exact path="/" component={CONTEXT === 'arkhn' ? ArkhnConnexion : Connexion} />
+              <Route
+                exact
+                path="/"
+                component={CONTEXT === 'arkhn' ? ArkhnConnexion : CONTEXT === 'aphp' ? Connexion : FakeConnexion}
+              />
               {/* TODO: Change home to / */}
               <PrivateRoute
                 exact
@@ -126,7 +131,7 @@ const App = () => (
                 render={() => (
                   <>
                     <LeftSideBar />
-                    <Dashboard context="new_cohort" />
+                    <CohortCreation />
                   </>
                 )}
               />
@@ -135,7 +140,7 @@ const App = () => (
                 render={() => (
                   <>
                     <LeftSideBar />
-                    <Dashboard context="new_cohort" />
+                    <CohortCreation />
                   </>
                 )}
               />
