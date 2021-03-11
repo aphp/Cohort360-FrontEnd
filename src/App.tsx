@@ -54,7 +54,7 @@ const App = () => (
                 exact
                 path="/"
                 // TODO(arkhn): fix ArkhnConnexion
-                component={CONTEXT === 'arkhn' ? FakeConnexion : CONTEXT === 'aphp' ? Connexion : FakeConnexion}
+                component={CONTEXT === 'arkhn' ? ArkhnConnexion : CONTEXT === 'aphp' ? Connexion : FakeConnexion}
               />
               {/* TODO: Change home to / */}
               <PrivateRoute
