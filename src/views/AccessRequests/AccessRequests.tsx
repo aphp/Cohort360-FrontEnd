@@ -1,7 +1,7 @@
 import React from 'react'
 import clsx from 'clsx'
 
-import { Container, Grid, Paper, Typography } from '@material-ui/core'
+import { Container, Divider, Grid, Paper, Typography } from '@material-ui/core'
 
 import RequestItem from 'features/access/RequestItem'
 import useStyles from './styles'
@@ -36,9 +36,13 @@ const AccessRequests = () => {
                 </Grid>
               ) : (
                 <Grid item>
+                  <Divider />
                   <RequestItem />
                 </Grid>
               )}
+              <Grid item>
+                <Divider />
+              </Grid>
             </Grid>
           </Paper>
         </Grid>
