@@ -49,7 +49,7 @@ export const fetchPractitioner = async (username: string) => {
     }
   } else if (CONTEXT === 'arkhn') {
     // FIX ME PLEASSSSSSE
-    const practitionerId = '14332'
+    const practitionerId = '23'
     const [respPractitioner /* respObservation */] = await Promise.all([
       api.get<FHIR_API_Response<IPractitioner>>(`/Practitioner?identifier=${practitionerId}`)
       // api.get<FHIR_API_Response<IObservation>>(
@@ -80,7 +80,7 @@ export const fetchPractitioner = async (username: string) => {
     const userName = practitioner.identifier?.[0].value ?? ''
     const firstName = practitioner.name?.[0].given?.join(' ') ?? ''
     const lastName = practitioner.name?.[0].family ?? ''
-    const displayName = practitioner.text?.div ?? `${lastName} ${firstName}`
+    const displayName = `${lastName} ${firstName}`
     return {
       id: practitionerId,
       userName,
