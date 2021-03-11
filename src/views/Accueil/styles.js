@@ -34,9 +34,6 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     overflow: 'auto',
     flexDirection: 'column'
-  },
-  pt3: {
-    paddingTop: theme.spacing(3)
   }
 }))
 
