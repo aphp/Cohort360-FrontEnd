@@ -4,7 +4,6 @@ import { smallDrawerWidth, largeDrawerWidth } from '../../components/LeftSideBar
 const useStyles = makeStyles((theme) => ({
   root: {
     height: '100vh',
-    marginLeft: smallDrawerWidth,
     width: `calc(100% - ${smallDrawerWidth}px)`,
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
