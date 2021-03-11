@@ -1,9 +1,9 @@
 import React from 'react'
 
-import Button from 'common/CohortButton'
-
-import Title from 'components/Title'
 import { Card, CardActions, CardContent, Divider, Typography, makeStyles } from '@material-ui/core'
+
+import Button from 'common/CohortButton'
+import Title from 'components/Title'
 
 const useStyles = makeStyles((theme) => ({
   list: {

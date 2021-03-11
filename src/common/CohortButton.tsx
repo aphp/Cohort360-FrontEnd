@@ -7,7 +7,8 @@ export default withStyles((theme) => ({
     paddingInline: theme.spacing(3),
     color: '#FFF',
     '&:hover': {
-      backgroundColor: '#4355b7'
+      backgroundColor: '#4355b7',
+      color: '#FFF'
     }
   }
 }))(Button)
