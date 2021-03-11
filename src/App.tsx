@@ -53,7 +53,8 @@ const App = () => (
               <Route
                 exact
                 path="/"
-                component={CONTEXT === 'arkhn' ? ArkhnConnexion : CONTEXT === 'aphp' ? Connexion : FakeConnexion}
+                // TODO(arkhn): fix ArkhnConnexion
+                component={CONTEXT === 'arkhn' ? FakeConnexion : CONTEXT === 'aphp' ? Connexion : FakeConnexion}
               />
               {/* TODO: Change home to / */}
               <PrivateRoute
