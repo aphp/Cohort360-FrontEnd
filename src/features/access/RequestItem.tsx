@@ -12,11 +12,6 @@ const useStyles = makeStyles((theme) => ({
   textBlack: {
     color: '#000'
   },
-  perimetersList: {
-    paddingLeft: theme.spacing(2),
-    textIndent: theme.spacing(-2),
-    listStyle: 'none'
-  },
   buttonsContainer: {
     display: 'flex',
     justifyContent: 'space-around',
