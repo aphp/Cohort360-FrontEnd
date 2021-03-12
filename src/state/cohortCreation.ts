@@ -195,17 +195,8 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
       const _criteriaGroup: CriteriaGroupType[] =
         state.cohortCreation.request.criteriaGroup && state.cohortCreation.request.criteriaGroup.length > 0
           ? state.cohortCreation.request.criteriaGroup
-          : [
-              {
-                id: 0,
-                title: `Opérateur logique principal`,
-                type: 'andGroup',
-                criteriaIds: [],
-                isSubGroup: false,
-                isInclusive: true
-              }
-            ]
-      const _temporalConstraints = state.cohortCreation.request.temporalConstraints
+          : initialState.criteriaGroup
+      const _temporalConstraints = state.cohortCreation.request.temporalConstraints ?? initialState.temporalConstraints
 
       const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
 

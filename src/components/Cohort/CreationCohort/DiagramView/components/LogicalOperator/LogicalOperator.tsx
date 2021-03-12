@@ -49,6 +49,8 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
   return (
     <>
+      {isExpanded && <div className={classes.backDrop} onClick={() => onExpand(false)} />}
+
       <LogicalOperatorItem itemId={itemId} />
 
       <div className={classes.operatorChild}>

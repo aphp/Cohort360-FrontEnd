@@ -23,7 +23,8 @@ const useStyles = makeStyles(() => ({
   },
   criteriaTitleAndChips: {
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    width: 'calc(100% - 80px)'
   },
   title: {
     whiteSpace: 'nowrap'
