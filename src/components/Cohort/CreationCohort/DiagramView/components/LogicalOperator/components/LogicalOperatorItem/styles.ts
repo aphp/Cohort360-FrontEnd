@@ -39,10 +39,7 @@ const useStyles = makeStyles(() => ({
     border: '3px solid #19235A',
     color: 'white',
     height: 36,
-    minWidth: 50,
     minHeight: 36,
-    width: 'fit-content !important',
-    maxWidth: 'inherit !important',
     borderRadius: 18,
     textAlign: 'center',
     marginTop: 12,
@@ -83,6 +80,7 @@ const useStyles = makeStyles(() => ({
     fontWeight: 100
   },
   input: {
+    width: 50,
     '& > div': {
       color: 'currentColor !important'
     },

@@ -36,20 +36,21 @@ const useStyles = makeStyles(() => ({
     background: '#19235A',
     fontSize: 13,
     marginTop: 14,
-    marginLeft: 7,
+    marginLeft: 7.5,
     height: 34,
     minHeight: 34,
     maxHeight: 34,
     width: 34,
     minWidth: 34,
     maxWidth: 34,
+    position: 'relative',
     '&::before': {
       width: 3,
       height: 16,
       content: "''",
       position: 'absolute',
       background: '#19235A',
-      marginTop: -46
+      top: -16
     },
     '&:hover': {
       background: '#19235A'
