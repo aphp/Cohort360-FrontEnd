@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import moment from 'moment'
 
 import Chip from '@material-ui/core/Chip'
+import IconButton from '@material-ui/core/IconButton'
 import Typography from '@material-ui/core/Typography'
+
+import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
+import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 
 import { useAppSelector } from 'state'
 import { SelectedCriteriaType } from 'types'
@@ -58,7 +62,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 ? (
             <Chip
               className={classes.criteriaChip}
-              label={_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
+              label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
             />
           ) : (
             <></>
@@ -84,7 +88,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 ? (
             <Chip
               className={classes.criteriaChip}
-              label={_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
+              label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
             />
           ) : (
             <></>
@@ -110,13 +114,17 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
+              label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
             />
           ),
           _currentCriteria && _currentCriteria?.diagnosticType && _currentCriteria?.diagnosticType.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={_currentCriteria?.diagnosticType?.map((code) => code.id).reduce(reducer)}
+              label={
+                <Typography noWrap>
+                  {_currentCriteria?.diagnosticType?.map((code) => code.id).reduce(reducer)}
+                </Typography>
+              }
             />
           )
           // _currentCriteria?.encounter && (
@@ -168,18 +176,28 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
         content = [
           _currentCriteria && _currentCriteria.gender && _currentCriteria?.gender?.length > 0 && (
-            <Chip className={classes.criteriaChip} label={displaySelectedGender(_currentCriteria?.gender)} />
+            <Chip
+              className={classes.criteriaChip}
+              label={<Typography noWrap>{displaySelectedGender(_currentCriteria?.gender)}</Typography>}
+            />
           ),
           _currentCriteria && _currentCriteria.vitalStatus && _currentCriteria?.vitalStatus?.length > 0 && (
-            <Chip className={classes.criteriaChip} label={displaySelectedVitalStatus(_currentCriteria?.vitalStatus)} />
+            <Chip
+              className={classes.criteriaChip}
+              label={<Typography noWrap>{displaySelectedVitalStatus(_currentCriteria?.vitalStatus)}</Typography>}
+            />
           ),
           !!_currentCriteria.years && _currentCriteria.years[0] === _currentCriteria.years[1] && (
             <Chip
               className={classes.criteriaChip}
-              label={`
-            ${_currentCriteria.years?.[0]} ${ageUnit}
-              ${_currentCriteria.years?.[0] === 130 ? ' ou plus' : ''}
-            `}
+              label={
+                <Typography noWrap>
+                  {`
+                    ${_currentCriteria.years?.[0]} ${ageUnit}
+                      ${_currentCriteria.years?.[0] === 130 ? ' ou plus' : ''}
+                  `}
+                </Typography>
+              }
             />
           ),
           !!_currentCriteria.years &&
@@ -187,10 +205,12 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             (_currentCriteria.years[0] !== 0 || _currentCriteria.years[1] !== 130) && (
               <Chip
                 className={classes.criteriaChip}
-                label={` Entre
-              ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit}
-              ${_currentCriteria.years[1] === 130 ? ' ou plus' : ''}
-              `}
+                label={
+                  <Typography noWrap>
+                    {`Entre ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit}
+                    ${_currentCriteria.years[1] === 130 ? ' ou plus' : ''}`}
+                  </Typography>
+                }
               />
             )
         ]
@@ -213,21 +233,29 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         content = [
           _currentCriteria.search && <Chip className={classes.criteriaChip} label={`"${_currentCriteria.search}"`} />,
           _currentCriteria && _currentCriteria.docType && _currentCriteria?.docType?.length > 0 && (
-            <Chip className={classes.criteriaChip} label={displaySelectedDocType(_currentCriteria?.docType)} />
+            <Chip
+              className={classes.criteriaChip}
+              label={<Typography noWrap>{displaySelectedDocType(_currentCriteria?.docType)}</Typography>}
+            />
           ),
           // _currentCriteria?.encounter && <Typography>
           //   Nombre d'occurence: {`${comparator} ${_currentCriteria.encounter}`}
           // </Typography>,
           startDate && (
-            <Typography>
-              {startDate
-                ? endDate
-                  ? `Entre le ${startDate} et le ${endDate},`
-                  : `Après le ${startDate},`
-                : endDate
-                ? `Avant le ${endDate},`
-                : ''}
-            </Typography>
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography noWrap>
+                  {startDate
+                    ? endDate
+                      ? `Entre le ${startDate} et le ${endDate},`
+                      : `Après le ${startDate},`
+                    : endDate
+                    ? `Avant le ${endDate},`
+                    : ''}
+                </Typography>
+              }
+            />
           )
         ]
         break
@@ -261,10 +289,12 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           _currentCriteria.years && _currentCriteria.years[0] === _currentCriteria.years[1] && (
             <Chip
               className={classes.criteriaChip}
-              label={`
-              ${_currentCriteria.years?.[0]} ${ageUnit}
-                ${_currentCriteria.years?.[0] === 130 ? ' ou plus' : ''}
-              `}
+              label={
+                <Typography noWrap>
+                  {`${_currentCriteria.years?.[0]} ${ageUnit}
+                    ${_currentCriteria.years?.[0] === 130 ? ' ou plus' : ''}`}
+                </Typography>
+              }
             />
           ),
           _currentCriteria.years &&
@@ -272,20 +302,23 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             (_currentCriteria.years[0] !== 0 || _currentCriteria.years[1] !== 130) && (
               <Chip
                 className={classes.criteriaChip}
-                label={` 
-                Entre ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit} ${
-                  _currentCriteria.years[1] === 130 ? ' ou plus' : ''
+                label={
+                  <Typography noWrap>
+                    {`Entre ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit}
+                    ${_currentCriteria.years[1] === 130 ? ' ou plus' : ''}`}
+                  </Typography>
                 }
-                `}
               />
             ),
           _currentCriteria.duration && _currentCriteria.duration[0] === _currentCriteria.duration[1] && (
             <Chip
               className={classes.criteriaChip}
-              label={`Prise en charge :
-              ${_currentCriteria.duration?.[0]} ${durationUnit}
-              ${_currentCriteria.duration?.[0] === 100 ? ' ou plus' : ''}
-              `}
+              label={
+                <Typography noWrap>
+                  {`Prise en charge : ${_currentCriteria.duration?.[0]} ${durationUnit}
+                  ${_currentCriteria.duration?.[0] === 100 ? ' ou plus' : ''}`}
+                </Typography>
+              }
             />
           ),
           _currentCriteria.duration &&
@@ -293,23 +326,38 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             (_currentCriteria.duration[0] !== 0 || _currentCriteria.duration[1] !== 100) && (
               <Chip
                 className={classes.criteriaChip}
-                label={`Prise en charge :
-                ${_currentCriteria.duration[0]} et ${_currentCriteria.duration[1]} ${durationUnit}
-                  ${_currentCriteria.duration[1] === 100 ? ' ou plus' : ''}
-                `}
+                label={
+                  <Typography noWrap>
+                    {`Prise en charge : ${_currentCriteria.duration[0]} et ${_currentCriteria.duration[1]}
+                    ${durationUnit}
+                    ${_currentCriteria.duration[1] === 100 ? ' ou plus' : ''}`}
+                  </Typography>
+                }
               />
             ),
           selectedAdmissionMode && (
-            <Chip className={classes.criteriaChip} label={`Mode d'admission: ${selectedAdmissionMode.label}`} />
+            <Chip
+              className={classes.criteriaChip}
+              label={<Typography noWrap>{`Mode d'admission: ${selectedAdmissionMode.label}`}</Typography>}
+            />
           ),
           selectedEntryMode && (
-            <Chip className={classes.criteriaChip} label={`Mode d'entrée : ${selectedEntryMode.label}`} />
+            <Chip
+              className={classes.criteriaChip}
+              label={<Typography noWrap>{`Mode d'entrée : ${selectedEntryMode.label}`}</Typography>}
+            />
           ),
           selectedExitMode && (
-            <Chip className={classes.criteriaChip} label={`Mode de sortie : ${selectedExitMode.label}`} />
+            <Chip
+              className={classes.criteriaChip}
+              label={<Typography noWrap>{`Mode de sortie : ${selectedExitMode.label}`}</Typography>}
+            />
           ),
           selectedFileStatus && (
-            <Chip className={classes.criteriaChip} label={`Statut dossier : ${selectedFileStatus.label}`} />
+            <Chip
+              className={classes.criteriaChip}
+              label={<Typography noWrap>{`Statut dossier : ${selectedFileStatus.label}`}</Typography>}
+            />
           )
         ]
         break
@@ -323,9 +371,54 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
   }
 
   const criteriaContents = _displayCardContent(currentCriteria)
-  console.log('criteriaContents :>> ', criteriaContents)
 
-  return <div className={classes.cardContent}>{criteriaContents}</div>
+  const containerRef = useRef(null)
+  const elementsRef = useRef(criteriaContents.map(() => React.createRef()))
+
+  const [refresh, setRefresh] = useState(false)
+  const [hasCollapse, needCollapse] = useState(false)
+  const [openCollapse, setOpenCollapse] = useState(false)
+
+  const checkIfCardNeedCollapse = () => {
+    setRefresh(true)
+    const element = elementsRef.current
+    // @ts-ignore
+    const elemWidth = element.map((e) => e?.current?.offsetWidth)
+    const maxWidth = elemWidth.reduce((a, b) => a + b)
+    // @ts-ignore
+    const containerWidth = containerRef?.current?.offsetWidth
+    needCollapse(maxWidth > containerWidth)
+  }
+
+  useEffect(() => {
+    function handleResize() {
+      checkIfCardNeedCollapse()
+    }
+    window.addEventListener('resize', handleResize)
+  })
+
+  useEffect(() => {
+    checkIfCardNeedCollapse()
+  }, [elementsRef, refresh])
+
+  return (
+    <div ref={containerRef} style={{ height: openCollapse ? '' : 40 }} className={classes.cardContent}>
+      {criteriaContents &&
+        criteriaContents.map((criteriaContent, index) => (
+          <>
+            {/* @ts-ignore */}
+            <div key={index} ref={elementsRef.current[index]}>
+              {criteriaContent}
+            </div>
+            {hasCollapse && (
+              <IconButton onClick={() => setOpenCollapse(!openCollapse)} className={classes.chevronIcon} size="small">
+                {openCollapse ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              </IconButton>
+            )}
+          </>
+        ))}
+    </div>
+  )
 }
 
 export default CriteriaCardContent

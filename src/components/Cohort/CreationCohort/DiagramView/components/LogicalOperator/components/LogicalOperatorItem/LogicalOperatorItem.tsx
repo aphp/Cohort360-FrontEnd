@@ -18,6 +18,8 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
   const classes = useStyles()
   const dispatch = useDispatch()
 
+  let timeout: any = null
+
   const isMainOperator = itemId === 0
 
   const [isOpen, setOpen] = useState<boolean>(false)
@@ -180,7 +182,12 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
             background: !currentLogicalOperator.isInclusive ? '#F2B0B0' : '#19235A',
             color: !currentLogicalOperator.isInclusive ? '#19235a' : 'white'
           }}
-          onMouseEnter={() => setOpen(true)}
+          onClick={() => setOpen(true)}
+          onMouseEnter={() => {
+            setOpen(true)
+            if (timeout) clearInterval(timeout)
+          }}
+          onMouseLeave={() => (timeout = setTimeout(() => setOpen(false), 1500))}
         >
           {isOpen ? (
             <>

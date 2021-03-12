@@ -162,15 +162,16 @@ const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
       </Grid>
 
       <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-        {ccamHierarchy.map((ccamItem, index) => (
-          <CcamListItem
-            key={index}
-            ccamItem={ccamItem}
-            handleClick={onSetSelectedHierarchy}
-            selectedItem={selectedHierarchy}
-            fetchHierarchy={criteria?.fetch?.fetchCcamHierarchy}
-          />
-        ))}
+        {ccamHierarchy &&
+          ccamHierarchy.map((ccamItem, index) => (
+            <CcamListItem
+              key={index}
+              ccamItem={ccamItem}
+              handleClick={onSetSelectedHierarchy}
+              selectedItem={selectedHierarchy}
+              fetchHierarchy={criteria?.fetch?.fetchCcamHierarchy}
+            />
+          ))}
       </List>
 
       <Grid className={classes.ccamHierarchyActionContainer}>

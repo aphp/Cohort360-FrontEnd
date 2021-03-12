@@ -45,6 +45,8 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
   const displayingItem = criteriaGroup.filter((_criteriaGroup: CriteriaGroupType) => _criteriaGroup.id === itemId)
 
+  let timeout: any = null
+
   const [isExpanded, onExpand] = useState(false)
 
   return (
@@ -92,7 +94,16 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
       </div>
 
       {!isExpanded ? (
-        <IconButton size="small" className={classes.addButton} onClick={() => onExpand(true)}>
+        <IconButton
+          size="small"
+          className={classes.addButton}
+          onClick={() => onExpand(true)}
+          onMouseEnter={() => {
+            onExpand(true)
+            if (timeout) clearInterval(timeout)
+          }}
+          onMouseLeave={() => (timeout = setTimeout(() => onExpand(false), 1500))}
+        >
           <AddIcon />
         </IconButton>
       ) : (
