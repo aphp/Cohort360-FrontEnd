@@ -1,6 +1,13 @@
 import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(() => ({
+  backDrop: {
+    height: '100vh',
+    width: '100vw',
+    position: 'absolute',
+    top: 0,
+    left: 0
+  },
   mainLogicalOperator: {
     background: '#19235A',
     boxSizing: 'border-box',

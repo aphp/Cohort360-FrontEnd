@@ -19,6 +19,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
   const dispatch = useDispatch()
 
   let timeout: any = null
+
   const isMainOperator = itemId === 0
 
   const [isOpen, setOpen] = useState<boolean>(false)
@@ -167,6 +168,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
 
   return (
     <>
+      {isOpen && <div className={classes.backDrop} onClick={() => setOpen(false)} />}
       {isMainOperator ? (
         <Box className={classes.mainLogicalOperator}>
           <Typography variant="h5" className={classes.textOperator}>
@@ -180,11 +182,12 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
             background: !currentLogicalOperator.isInclusive ? '#F2B0B0' : '#19235A',
             color: !currentLogicalOperator.isInclusive ? '#19235a' : 'white'
           }}
+          onClick={() => setOpen(true)}
           onMouseEnter={() => {
             setOpen(true)
             if (timeout) clearInterval(timeout)
           }}
-          onMouseLeave={() => (timeout = setTimeout(() => setOpen(false), 3000))}
+          onMouseLeave={() => (timeout = setTimeout(() => setOpen(false), 1500))}
         >
           {isOpen ? (
             <>

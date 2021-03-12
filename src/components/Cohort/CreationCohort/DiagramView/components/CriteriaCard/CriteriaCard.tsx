@@ -23,23 +23,23 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, editCriteria, delet
 
   const { selectedCriteria = [] } = useAppSelector((state) => state.cohortCreation.request || {})
 
-  const CurrentCriterion = selectedCriteria.find((criteria) => criteria.id === itemId)
-  if (!CurrentCriterion) return <></> // Bug, not possible ... The current item is not a criteria
+  const currentCriterion = selectedCriteria.find((criteria) => criteria.id === itemId)
+  if (!currentCriterion) return <></> // Bug, not possible ... The current item is not a criteria
 
   return (
     <div
       className={classes.criteriaItem}
-      style={{ backgroundColor: CurrentCriterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
+      style={{ backgroundColor: currentCriterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
     >
       <div className={classes.criteriaTitleAndChips}>
-        <Typography className={classes.title}>{CurrentCriterion.title} :</Typography>
-        <CriteriaCardContent currentCriteria={CurrentCriterion} />
+        <Typography className={classes.title}>{currentCriterion.title} :</Typography>
+        <CriteriaCardContent currentCriteria={currentCriterion} />
       </div>
       <div className={classes.actionContainer}>
-        <IconButton size="small" onClick={() => editCriteria(CurrentCriterion)} style={{ color: 'currentcolor' }}>
+        <IconButton size="small" onClick={() => editCriteria(currentCriterion)} style={{ color: 'currentcolor' }}>
           <EditIcon />
         </IconButton>
-        <IconButton size="small" onClick={() => deleteCriteria(CurrentCriterion.id)} style={{ color: 'currentcolor' }}>
+        <IconButton size="small" onClick={() => deleteCriteria(currentCriterion.id)} style={{ color: 'currentcolor' }}>
           <DeleteIcon />
         </IconButton>
       </div>
