@@ -20,7 +20,7 @@ const defaultDemographic = {
   title: 'Critère de document',
   search: '',
   docType: [],
-  encounter: 0,
+  occurrence: 0,
   startOccurrence: '',
   endOccurrence: '',
   isInclusive: true
@@ -40,7 +40,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
       title: data.title,
       search: data.search,
       docType: data.docType,
-      // encounter: data.encounter,
+      // occurrence: data.occurrence,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Composition',
@@ -112,7 +112,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               autocompleteOptions: criteria?.data?.docTypes || []
             }
             // {
-            //   name: 'encounter',
+            //   name: 'occurrence',
             //   label: "Nombre d'occurence",
             //   variant: 'outlined',
             //   type: 'number'

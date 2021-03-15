@@ -220,9 +220,9 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               >
                 <MenuItem value={'andGroup'}>tous les</MenuItem>
                 <MenuItem value={'orGroup'}>un des</MenuItem>
-                <MenuItem value={'exactly'}>exactement</MenuItem>
+                {/* <MenuItem value={'exactly'}>exactement</MenuItem>
                 <MenuItem value={'atLeast'}>au moins</MenuItem>
-                <MenuItem value={'atMost'}>au plus</MenuItem>
+                <MenuItem value={'atMost'}>au plus</MenuItem> */}
               </Select>
 
               {currentLogicalOperator.type === 'NamongM' && (

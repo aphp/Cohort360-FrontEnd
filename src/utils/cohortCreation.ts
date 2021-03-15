@@ -3,6 +3,8 @@ import moment from 'moment'
 import { fetchPerimeterInfoForRequeteur as fetchPopulation } from '../services/perimeters'
 import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType } from 'types'
 
+const REQUETEUR_VERSION = 'v1.2.0'
+
 const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
 const PATIENT_GENDER = 'gender' // ok
 const PATIENT_BIRTHDATE = 'birthdate' // ok
@@ -19,24 +21,24 @@ const ENCOUNTER_FILESTATUS = 'fileStatus' // on verra
 const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
 const CLAIM_CODE = 'diagnosis' // ok
 const CLAIM_DATE = 'created' // ok
-const CLAIM_ENCOUNTER = 'encounter' // on verra
+const CLAIM_ENCOUNTER = 'occurrence' // on verra
 
 const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
 const PROCEDURE_CODE = 'code' // ok
 const PROCEDURE_DATE = 'date' // ok
-const PROCEDURE_ENCOUNTER = 'encounter' // on verra
+const PROCEDURE_ENCOUNTER = 'occurrence' // on verra
 
 const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition' // ok
 const CONDITION_CODE = 'code' // ok
 const CONDITION_TYPE = 'type' // ok
 const CONDITION_DATE = 'recorded-date' // ok
-const CONDITION_ENCOUNTER = 'encounter' // on verra
+const CONDITION_ENCOUNTER = 'occurrence' // on verra
 
 const RESSOURCE_TYPE_COMPOSITION: 'Composition' = 'Composition'
 const COMPOSITION_TEXT = '_text' // ok
 const COMPOSITION_TYPE = 'type' // ok
 const COMPOSITION_DATE = 'date' // ok
-const COMPOSITION_ENCOUNTER = 'encounter' // on verra
+const COMPOSITION_ENCOUNTER = 'occurrence' // on verra
 
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   id: 0,
@@ -226,7 +228,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
             ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: any) => docType.id).reduce(searchReducer)}`
             : ''
         }`,
-        `${criterion.encounter ? `${COMPOSITION_ENCOUNTER}=${criterion.encounter}` : ''}`,
+        `${criterion.occurrence ? `${COMPOSITION_ENCOUNTER}=${criterion.occurrence}` : ''}`,
         `${dateFilter ? `${dateFilter}` : ''}`
       ]
         .filter((elem) => elem)
@@ -260,7 +262,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
                 .reduce(searchReducer)}`
             : ''
         }`,
-        `${criterion.encounter ? `${CONDITION_ENCOUNTER}=${criterion.encounter}` : ''}`,
+        `${criterion.occurrence ? `${CONDITION_ENCOUNTER}=${criterion.occurrence}` : ''}`,
         `${dateFilter ? `${dateFilter}` : ''}`
       ]
         .filter((elem) => elem)
@@ -289,7 +291,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
                 .reduce(searchReducer)}`
             : ''
         }`,
-        `${criterion.encounter ? `${PROCEDURE_ENCOUNTER}=${criterion.encounter}` : ''}`,
+        `${criterion.occurrence ? `${PROCEDURE_ENCOUNTER}=${criterion.occurrence}` : ''}`,
         `${dateFilter ? `${dateFilter}` : ''}`
       ]
         .filter((elem) => elem)
@@ -315,7 +317,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
             ? `${CLAIM_CODE}=${criterion.code.map((diagnosticType: any) => diagnosticType.id).reduce(searchReducer)}`
             : ''
         }`,
-        `${criterion.encounter ? `${CLAIM_ENCOUNTER}=${criterion.encounter}` : ''}`,
+        `${criterion.occurrence ? `${CLAIM_ENCOUNTER}=${criterion.occurrence}` : ''}`,
         `${dateFilter ? `${CLAIM_DATE}=${dateFilter}` : ''}`
       ]
         .filter((elem) => elem)
@@ -390,7 +392,7 @@ export function buildRequest(
   const mainCriteriaGroups = criteriaGroup.find(({ id }) => id === 0)
 
   const json: RequeteurSearchType = {
-    version: 'v1.2.0',
+    version: REQUETEUR_VERSION,
     _type: 'request',
     sourcePopulation: {
       caresiteCohortList: selectedPopulation?.map(({ id }) => +id)
@@ -666,7 +668,7 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.title = 'Critère de document'
           currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
           currentCriterion.docType = currentCriterion.docType ? currentCriterion.docType : []
-          currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
+          currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
 
@@ -688,7 +690,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               case COMPOSITION_ENCOUNTER:
-                currentCriterion.encounter = value
+                currentCriterion.occurrence = value
                 break
               case COMPOSITION_DATE: {
                 if (value?.search('ge') === 0) {
@@ -712,7 +714,7 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.title = 'Critère de diagnostic'
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
           currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : []
-          currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
+          currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
 
@@ -739,7 +741,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               case CONDITION_ENCOUNTER:
-                currentCriterion.encounter = value
+                currentCriterion.occurrence = value
                 break
               case CONDITION_DATE: {
                 if (value?.search('ge') === 0) {
@@ -763,7 +765,7 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.title = "Critères d'actes CCAM"
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
           currentCriterion.diagnosticType = currentCriterion.diagnosticType ? currentCriterion.diagnosticType : []
-          currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
+          currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
 
@@ -780,7 +782,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               case PROCEDURE_ENCOUNTER:
-                currentCriterion.encounter = value
+                currentCriterion.occurrence = value
                 break
               case PROCEDURE_DATE: {
                 if (value?.search('ge') === 0) {
@@ -803,7 +805,7 @@ export async function unbuildRequest(_json: string) {
 
           currentCriterion.title = 'Critère de GHM'
           currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
-          currentCriterion.encounter = currentCriterion.encounter ? currentCriterion.encounter : null
+          currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
           currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
           currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
 
@@ -820,7 +822,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               case CLAIM_ENCOUNTER:
-                currentCriterion.encounter = value
+                currentCriterion.occurrence = value
                 break
               case CLAIM_DATE: {
                 if (value?.search('ge') === 0) {

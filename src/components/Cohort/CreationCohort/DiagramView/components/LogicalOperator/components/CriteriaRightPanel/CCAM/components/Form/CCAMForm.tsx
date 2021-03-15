@@ -27,8 +27,8 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
       ...selectedCriteria,
       title: data.title,
       code: data.code,
-      // encounter: data.encounter,
-      // comparator: data.comparator,
+      // occurrence: data.occurrence,
+      // occurrenceComparator: data.occurrenceComparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Procedure',
@@ -114,7 +114,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             //   containerStyle: { display: 'grid', gridTemplateColumns: '100px 1fr' },
             //   properties: [
             //     {
-            //       name: 'comparator',
+            //       name: 'occurrenceComparator',
             //       variant: 'outlined',
             //       type: 'select',
             //       selectOptions: [
@@ -124,7 +124,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             //       ]
             //     },
             //     {
-            //       name: 'encounter',
+            //       name: 'occurrence',
             //       variant: 'outlined',
             //       type: 'number',
             //       validationRules: {
