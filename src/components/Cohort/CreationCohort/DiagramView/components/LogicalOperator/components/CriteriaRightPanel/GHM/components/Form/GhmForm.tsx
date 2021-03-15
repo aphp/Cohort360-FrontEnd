@@ -108,7 +108,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             //   containerStyle: { display: 'grid', gridTemplateColumns: '100px 1fr' },
             //   properties: [
             //     {
-            //       name: 'comparator',
+            //       name: 'occurrenceComparator',
             //       variant: 'outlined',
             //       type: 'select',
             //       selectOptions: [
@@ -118,7 +118,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             //       ]
             //     },
             //     {
-            //       name: 'encounter',
+            //       name: 'occurrence',
             //       variant: 'outlined',
             //       type: 'number',
             //       validationRules: {

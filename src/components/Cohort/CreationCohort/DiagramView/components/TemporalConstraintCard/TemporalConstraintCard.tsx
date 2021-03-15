@@ -23,7 +23,7 @@ const TemporalConstraintView: React.FC = () => {
     dispatch(buildCohortCreation({}))
   }
 
-  const mainTemporalConstraint = temporalConstraints.find(({ idList }) => idList === ['All'])
+  const mainTemporalConstraint = temporalConstraints.find(({ idList }) => idList && idList[0] && idList[0] === 'All')
 
   return (
     <Grid

@@ -292,8 +292,10 @@ const cohortCreationSlice = createSlice({
       if (index !== -1) state.criteriaGroup[index] = action.payload
     },
     updateTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
-      console.log('state.temporalConstraints', state.temporalConstraints)
-      const foundItem = state.temporalConstraints.find(({ idList }) => idList === action.payload.idList)
+      const foundItem = state.temporalConstraints.find(({ idList }) => {
+        const equals = (a: any[], b: any[]) => a.length === b.length && a.every((v, i) => v === b[i])
+        return equals(idList, action.payload.idList)
+      })
       const index = foundItem ? state.temporalConstraints.indexOf(foundItem) : -1
       if (index !== -1) state.temporalConstraints[index] = action.payload
     }
