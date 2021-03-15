@@ -132,7 +132,7 @@ const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
   const classes = useStyles()
   const [ccamHierarchy, onSetCcamHierarchy] = useState([])
   const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
-    isEdition ? selectedCriteria.code : null
+    isEdition ? selectedCriteria.code : []
   )
 
   // Init
