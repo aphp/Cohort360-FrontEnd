@@ -132,7 +132,7 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
   const classes = useStyles()
   const [ghmHierarchy, onSetGhmHierarchy] = useState([])
   const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
-    isEdition ? selectedCriteria.code : null
+    isEdition ? selectedCriteria.code : []
   )
 
   // Init

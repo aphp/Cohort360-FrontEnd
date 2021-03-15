@@ -132,7 +132,7 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
   const classes = useStyles()
   const [cimHierarchy, onSetCimHieerarchy] = useState([])
   const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
-    isEdition ? selectedCriteria.code : null
+    isEdition ? selectedCriteria.code : []
   )
 
   // Init
