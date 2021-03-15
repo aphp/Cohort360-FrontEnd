@@ -16,14 +16,14 @@ const TemporalConstraintView: React.FC = () => {
   const onChangeTemporalConstraint = (value: 'sameEncounter' | 'differentEncounter' | 'none') => {
     dispatch(
       updateTemporalConstraint({
-        idList: 'all',
+        idList: ['All'],
         constraintType: value
       })
     )
     dispatch(buildCohortCreation({}))
   }
 
-  const mainTemporalConstraint = temporalConstraints.find(({ idList }) => idList === 'all')
+  const mainTemporalConstraint = temporalConstraints.find(({ idList }) => idList === ['All'])
 
   return (
     <Grid

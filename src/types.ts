@@ -240,7 +240,7 @@ export type CriteriaGroupType = {
 )
 
 export type TemporalConstraintsType = {
-  idList: 'all' | number[]
+  idList: ['All'] | number[]
   constraintType: 'none' | 'sameEncounter' | 'differentEncounter' | 'directChronologicalOrdering'
 }
 

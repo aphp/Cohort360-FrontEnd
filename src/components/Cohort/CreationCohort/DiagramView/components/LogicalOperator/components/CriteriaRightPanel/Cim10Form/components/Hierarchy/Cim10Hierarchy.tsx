@@ -162,15 +162,16 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
       </Grid>
 
       <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-        {cimHierarchy.map((cimItem, index) => (
-          <CimListItem
-            key={index}
-            cimItem={cimItem}
-            selectedItem={selectedHierarchy}
-            handleClick={onSetSelectedHierarchy}
-            fetchHierarchy={criteria?.fetch?.fetchCim10Hierarchy}
-          />
-        ))}
+        {cimHierarchy &&
+          cimHierarchy.map((cimItem, index) => (
+            <CimListItem
+              key={index}
+              cimItem={cimItem}
+              selectedItem={selectedHierarchy}
+              handleClick={onSetSelectedHierarchy}
+              fetchHierarchy={criteria?.fetch?.fetchCim10Hierarchy}
+            />
+          ))}
       </List>
 
       <Grid className={classes.cimHierarchyActionContainer}>

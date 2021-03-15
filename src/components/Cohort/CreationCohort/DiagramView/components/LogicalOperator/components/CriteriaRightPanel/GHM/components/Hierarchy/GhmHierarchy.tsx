@@ -162,15 +162,16 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
       </Grid>
 
       <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-        {ghmHierarchy.map((ghmItem, index) => (
-          <GhmListItem
-            selectedItem={selectedHierarchy}
-            key={index}
-            ghmItem={ghmItem}
-            handleClick={onSetSelectedHierarchy}
-            fetchHierarchy={criteria?.fetch?.fetchGhmHierarchy}
-          />
-        ))}
+        {ghmHierarchy &&
+          ghmHierarchy.map((ghmItem, index) => (
+            <GhmListItem
+              selectedItem={selectedHierarchy}
+              key={index}
+              ghmItem={ghmItem}
+              handleClick={onSetSelectedHierarchy}
+              fetchHierarchy={criteria?.fetch?.fetchGhmHierarchy}
+            />
+          ))}
       </List>
 
       <Grid className={classes.ghmHierarchyActionContainer}>
