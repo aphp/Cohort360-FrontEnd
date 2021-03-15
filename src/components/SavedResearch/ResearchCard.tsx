@@ -28,11 +28,21 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
   const [loadingStatus, setLoadingStatus] = useState(true)
   const [total, setTotal] = useState(0)
   const [searchInput, setSearchInput] = useState('')
+  const [sortBy, setSortBy] = useState('date')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 
   const researchLines = 20 // Number of desired lines in the document array
 
   useEffect(() => {
-    fetchCohorts()
+    onFetchCohorts(sortBy, sortDirection)
+  }, []) // eslint-disable-line
+
+  const onFetchCohorts = (sortBy = 'given', sortDirection = 'asc', input = searchInput) => {
+    setLoadingStatus(true)
+    setPage(1)
+    setSortBy(sortBy)
+    setSortDirection(sortDirection as 'asc' | 'desc')
+    fetchCohorts(sortBy, sortDirection, input)
       .then((cohortsResp) => {
         if (filteredIds) {
           setResearches(
@@ -46,7 +56,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
       .then(() => {
         setLoadingStatus(false)
       })
-  }, []) // eslint-disable-line
+  }
 
   const onDeleteCohort = async (cohortId: string) => {
     setResearches(researches?.filter((r) => r.researchId !== cohortId))
@@ -55,7 +65,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
 
   const onSetCohortFavorite = async (cohortId: string) => {
     dispatch(setFavoriteCohortThunk({ cohortId })).then(() =>
-      fetchCohorts().then((cohortsResp) => {
+      fetchCohorts(sortBy, sortDirection).then((cohortsResp) => {
         setResearches(cohortsResp?.results ?? undefined)
         setTotal(cohortsResp?.count ?? 0)
       })
@@ -65,7 +75,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value = 1) => {
     setPage(value)
     setLoadingStatus(true)
-    fetchCohorts(searchInput, value || 1)
+    fetchCohorts(sortBy, sortDirection, searchInput, value || 1)
       .then((cohortsResp) => {
         setResearches(cohortsResp?.results ?? undefined)
         setTotal(cohortsResp?.count ?? 0)
@@ -87,7 +97,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
   const handleClearInput = () => {
     setSearchInput('')
     setLoadingStatus(true)
-    fetchCohorts()
+    fetchCohorts(sortBy, sortDirection)
       .then((cohortsResp) => {
         if (filteredIds) {
           setResearches(
@@ -108,6 +118,15 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
       e.preventDefault()
       onSearchCohort()
     }
+  }
+
+  const handleRequestSort = (event: React.MouseEvent<unknown>, property: any) => {
+    const isAsc: boolean = sortBy === property && sortDirection === 'asc'
+    const _sortDirection = isAsc ? 'desc' : 'asc'
+
+    setSortDirection(_sortDirection)
+    setSortBy(property)
+    onFetchCohorts(property, _sortDirection)
   }
 
   return (
@@ -142,6 +161,9 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
           onDeleteCohort={onDeleteCohort}
           onSetCohortFavorite={onSetCohortFavorite}
           onClickRow={onClickRow}
+          sortBy={sortBy}
+          sortDirection={sortDirection}
+          onRequestSort={handleRequestSort}
         />
       )}
       <Pagination

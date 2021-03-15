@@ -15,6 +15,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TableSortLabel,
   TableRow,
   Typography
 } from '@material-ui/core'
@@ -46,13 +47,19 @@ type ResearchTableProps = {
   researchData?: FormattedCohort[]
   onSetCohortFavorite: (cohortId: string) => void
   onDeleteCohort: Function
+  sortBy?: string
+  sortDirection?: 'asc' | 'desc'
+  onRequestSort?: any
 }
 const ResearchTable: React.FC<ResearchTableProps> = ({
   simplified,
   onClickRow,
   researchData,
   onSetCohortFavorite,
-  onDeleteCohort
+  onDeleteCohort,
+  sortBy,
+  sortDirection,
+  onRequestSort
 }) => {
   const classes = useStyles()
   const [dialogOpen, setOpenDialog] = useState(false)
@@ -72,7 +79,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
     setOpenDialog(false)
   }
 
-  console.log('researchData :>> ', researchData)
+  const createSortHandler = (property: any) => (event: React.MouseEvent<unknown>) => {
+    onRequestSort(event, property)
+  }
 
   return (
     <>
@@ -111,21 +120,64 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
                 <TableRow className={classes.tableHead}>
-                  <TableCell className={classes.tableHeadCell}>Titre</TableCell>
+                  <TableCell
+                    className={classes.tableHeadCell}
+                    sortDirection={sortBy === 'name' ? sortDirection : false}
+                  >
+                    {sortDirection ? (
+                      <TableSortLabel
+                        active={sortBy === 'name'}
+                        direction={sortBy === 'name' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('name')}
+                      >
+                        Titre
+                      </TableSortLabel>
+                    ) : (
+                      'Titre'
+                    )}
+                  </TableCell>
                   <TableCell className={classes.tableHeadCell} align="center">
                     Type
                   </TableCell>
                   <TableCell className={classes.tableHeadCell} align="center">
-                    Status
+                    Statut
                   </TableCell>
                   <TableCell align="center" className={classes.tableHeadCell}>
                     Nombre de patients
                   </TableCell>
-                  <TableCell align="center" className={classes.tableHeadCell}>
-                    Date de création
+                  <TableCell
+                    align="center"
+                    className={classes.tableHeadCell}
+                    sortDirection={sortBy === 'date' ? sortDirection : false}
+                  >
+                    {sortDirection ? (
+                      <TableSortLabel
+                        active={sortBy === 'date'}
+                        direction={sortBy === 'date' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('date')}
+                      >
+                        Date de création
+                      </TableSortLabel>
+                    ) : (
+                      'Date de création'
+                    )}
                   </TableCell>
-                  <TableCell align="center" className={classes.tableHeadCell}>
-                    Favoris
+                  <TableCell
+                    align="center"
+                    className={classes.tableHeadCell}
+                    sortDirection={sortBy === 'favorite' ? sortDirection : false}
+                  >
+                    {sortDirection ? (
+                      <TableSortLabel
+                        active={sortBy === 'favorite'}
+                        direction={sortBy === 'favorite' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('favorite')}
+                      >
+                        Favoris
+                      </TableSortLabel>
+                    ) : (
+                      'Favoris'
+                    )}
                   </TableCell>
 
                   {!simplified && (

@@ -10,6 +10,8 @@ import {
 } from '../types'
 
 export const fetchCohorts = async (
+  sortBy: string,
+  sortDirection: string,
   searchInput?: string,
   page?: number
 ): Promise<Back_API_Response<FormattedCohort> | undefined> => {
@@ -62,6 +64,7 @@ export const fetchCohorts = async (
     //     .filter(Boolean)
     // }
   } else if (CONTEXT === 'aphp') {
+    const _sortDirection = sortDirection === 'desc' ? '-' : ''
     let searchByText = ''
     let offset = ''
 
@@ -74,7 +77,7 @@ export const fetchCohorts = async (
     }
 
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
-      `/explorations/cohorts/?ordering=-favorite${searchByText}&limit=20${offset}`
+      `/explorations/cohorts/?ordering=${_sortDirection}${sortBy}${searchByText}&limit=20${offset}`
     )
 
     const results = cohortResp?.data?.results
