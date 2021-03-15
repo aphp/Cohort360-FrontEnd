@@ -18,10 +18,6 @@ type CriteriaCardContentProps = {
 }
 
 const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriteria }) => {
-  const classes = useStyles()
-
-  const criteria = useAppSelector((state) => state.cohortCreation.criteria)
-
   const _displayCardContent = (_currentCriteria: SelectedCriteriaType) => {
     if (!_currentCriteria) return []
     let content: any[] = []
@@ -370,6 +366,10 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     return content
   }
 
+  const classes = useStyles()
+
+  const criteria = useAppSelector((state) => state.cohortCreation.criteria)
+
   const criteriaContents = _displayCardContent(currentCriteria)
 
   const containerRef = useRef(null)
@@ -382,11 +382,12 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
   const checkIfCardNeedCollapse = () => {
     setRefresh(true)
     const element = elementsRef.current
+    if (elementsRef.current.length === 0) return
     // @ts-ignore
-    const elemWidth = element.map((e) => e?.current?.offsetWidth)
+    const elemWidth = element ? element.map((e) => e?.current?.offsetWidth ?? 0) : [0, 0]
     const maxWidth = elemWidth.reduce((a, b) => a + b)
     // @ts-ignore
-    const containerWidth = containerRef?.current?.offsetWidth
+    const containerWidth = containerRef ? containerRef?.current?.offsetWidth : 0
     needCollapse(maxWidth > containerWidth)
   }
 
@@ -402,7 +403,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
   }, [elementsRef, refresh])
 
   return (
-    <div ref={containerRef} style={{ height: openCollapse ? '' : 40 }} className={classes.cardContent}>
+    <div ref={containerRef} style={{ height: openCollapse ? '' : 40 }} className={`toto ${classes.cardContent}`}>
       {criteriaContents &&
         criteriaContents.map((criteriaContent, index) => (
           <>

@@ -180,7 +180,8 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
           className={classes.logicalOperator}
           style={{
             background: !currentLogicalOperator.isInclusive ? '#F2B0B0' : '#19235A',
-            color: !currentLogicalOperator.isInclusive ? '#19235a' : 'white'
+            color: !currentLogicalOperator.isInclusive ? '#19235a' : 'white',
+            width: currentLogicalOperator.type === 'NamongM' ? (isOpen ? 500 : 75) : isOpen ? 400 : 50
           }}
           onClick={() => setOpen(true)}
           onMouseEnter={() => {
