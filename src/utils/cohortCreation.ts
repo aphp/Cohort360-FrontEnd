@@ -390,7 +390,7 @@ export function buildRequest(
   const mainCriteriaGroups = criteriaGroup.find(({ id }) => id === 0)
 
   const json: RequeteurSearchType = {
-    version: 'v1.0',
+    version: 'v1.2.0',
     _type: 'request',
     sourcePopulation: {
       caresiteCohortList: selectedPopulation?.map(({ id }) => +id)

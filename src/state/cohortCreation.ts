@@ -56,7 +56,7 @@ const initialState: CohortCreationState = {
   ],
   temporalConstraints: [
     {
-      idList: 'all',
+      idList: ['All'],
       constraintType: 'none'
     }
   ],
