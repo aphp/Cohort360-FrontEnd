@@ -8,6 +8,7 @@ import cohortCreation, { CohortCreationState } from './cohortCreation'
 import criteria, { CriteriaState } from './criteria'
 import exploredCohort, { ExploredCohortState } from './exploredCohort'
 import userCohorts, { UserCohortsState } from './userCohorts'
+import accessRequests, { AccessRequestState } from 'features/access/AccessRequestSlice'
 import me, { MeState } from './me'
 import drawer from './drawer'
 
@@ -55,7 +56,8 @@ const rootReducer = combineReducers({
   cohortCreation: cohortCreationReducer,
   exploredCohort,
   userCohorts,
-  drawer
+  drawer,
+  accessRequests
 })
 
 type RootReducerState = CombinedState<{
@@ -67,6 +69,7 @@ type RootReducerState = CombinedState<{
   exploredCohort: ExploredCohortState
   userCohorts: UserCohortsState
   drawer: boolean
+  accessRequests: AccessRequestState
 }>
 
 const persistedReducer = persistReducer<RootReducerState>(persistConfig, rootReducer)

@@ -9,12 +9,10 @@ import { useAppSelector } from 'state'
 
 const AccessRequests = () => {
   const classes = useStyles()
-  const { open } = useAppSelector((state) => ({
-    open: state.drawer
+  const { open, requests } = useAppSelector((state) => ({
+    open: state.drawer,
+    requests: state.accessRequests.requests
   }))
-
-  //TODO: Wire with access requests routes
-  const requestCount = 1
 
   return (
     <Container
@@ -30,15 +28,19 @@ const AccessRequests = () => {
           <Paper elevation={0} className={classes.requestsContainer}>
             <Typography variant="h2">Nouvelles demandes</Typography>
             <Grid container direction="column" spacing={2} className={classes.requestList}>
-              {requestCount <= 0 ? (
+              {requests.length <= 0 ? (
                 <Grid item>
-                  <Typography className={classes.noRequest}>Aucune nouvelle demande</Typography>
+                  <Typography className={classes.noRequest} align="center">
+                    Aucune nouvelle demande
+                  </Typography>
                 </Grid>
               ) : (
-                <Grid item>
-                  <Divider />
-                  <RequestItem />
-                </Grid>
+                requests.map((request) => (
+                  <Grid item key={request.id}>
+                    <Divider />
+                    <RequestItem id={request.id} />
+                  </Grid>
+                ))
               )}
               <Grid item>
                 <Divider />

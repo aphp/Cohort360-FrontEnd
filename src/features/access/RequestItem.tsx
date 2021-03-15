@@ -35,7 +35,11 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-const RequestItem = () => {
+type RequestItemProps = {
+  id: string
+}
+
+const RequestItem = ({ id }: RequestItemProps) => {
   const classes = useStyles()
   const [nominativeAccess, setNominativeAccess] = useState<'yes' | 'no'>('yes')
   const [accessDelay, setAccessDelay] = useState<'week' | 'month' | 'year'>('week')
@@ -50,7 +54,7 @@ const RequestItem = () => {
   return (
     <Grid container className={classes.rootContainer} justify="space-between" spacing={2}>
       <Grid item xs={12} md={7}>
-        <RequestInfos />
+        <RequestInfos id={id} />
       </Grid>
       <Grid item xs={12} md={4}>
         <div className={classes.buttonsContainer}>

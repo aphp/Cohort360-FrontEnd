@@ -6,6 +6,7 @@ import { useHistory } from 'react-router'
 
 import Title from 'components/Title'
 import Button from 'common/CohortButton'
+import { useAppSelector } from 'state'
 
 const useStyles = makeStyles((theme) => ({
   notifIcon: {
@@ -24,9 +25,7 @@ const useStyles = makeStyles((theme) => ({
 const AccessRequestNotifCard = () => {
   const classes = useStyles()
   const history = useHistory()
-
-  //TODO: Wire with access requests routes
-  const requestCount = 0
+  const { requests } = useAppSelector((state) => state.accessRequests)
 
   const handleAccessRequestsClick = () => {
     history.push('/accessRequests')
@@ -38,12 +37,12 @@ const AccessRequestNotifCard = () => {
         <Title>Demandes d'accès</Title>
         <Divider />
         <div className={classes.messageContainer}>
-          {requestCount <= 0 ? (
+          {requests.length <= 0 ? (
             <Typography className={classes.noRequest}>Aucune nouvelle demande</Typography>
           ) : (
             <>
               <Notifications className={classes.notifIcon} />
-              <Typography>1 nouvelle demande</Typography>
+              <Typography>{requests.length} nouvelle(s) demande(s)</Typography>
             </>
           )}
         </div>

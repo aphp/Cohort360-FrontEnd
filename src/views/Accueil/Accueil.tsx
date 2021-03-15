@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import { Grid, Container, Typography } from '@material-ui/core'
 
 import AccessRequestNotifCard from 'features/access/AccessRequestNotifCard'
+import { fetchAccessRequests } from 'features/access/AccessRequestSlice'
 import PerimeterCard from 'features/perimeters/PerimeterCard'
 import SearchPatientCard from 'features/patients/SearchPatientCard'
 
@@ -27,6 +28,7 @@ const Accueil: React.FC = () => {
 
   useEffect(() => {
     dispatch(initUserCohortsThunk())
+    dispatch(fetchAccessRequests())
   }, [dispatch])
 
   return practitioner ? (
