@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   criteriaItem: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -9,7 +9,8 @@ const useStyles = makeStyles(() => ({
     borderRadius: 4,
     padding: 8,
     marginTop: 12,
-    width: 800,
+    minWidth: 400,
+    maxWidth: 800,
     position: 'relative',
     '&::before': {
       width: 38,
@@ -22,7 +23,19 @@ const useStyles = makeStyles(() => ({
   },
   criteriaTitleAndChips: {
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    width: 'calc(100% - 80px)',
+    position: 'relative',
+    [theme.breakpoints.down('sm')]: {
+      flexWrap: 'wrap'
+    }
+  },
+  title: {
+    whiteSpace: 'nowrap'
+  },
+  actionContainer: {
+    display: 'flex',
+    flexWrap: 'nowrap'
   }
 }))
 

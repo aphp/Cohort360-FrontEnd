@@ -1,14 +1,6 @@
 import React from 'react'
 
-import {
-  Button,
-  Divider,
-  Grid,
-  IconButton,
-  Switch,
-  Typography
-  //  FormLabel
-} from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Switch, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -36,8 +28,8 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       title: data.title,
       code: data.code,
       diagnosticType: data.diagnosticType,
-      // encounter: data.encounter,
-      // comparator: data.comparator,
+      // occurrence: data.occurrence,
+      // occurrenceComparator: data.occurrenceComparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Condition',
@@ -89,10 +81,15 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               name: 'isInclusive',
               type: 'custom',
               renderInput: (field: any) => (
-                <Grid component="label" container alignItems="center" style={{ margin: '0 1em' }}>
-                  <Typography>Critère inclusif</Typography>
+                <Grid style={{ display: 'flex' }}>
+                  <FormLabel
+                    onClick={() => field.onChange(!field.value)}
+                    style={{ margin: 'auto 1em' }}
+                    component="legend"
+                  >
+                    Exclure les patients qui suivent les règles suivantes
+                  </FormLabel>
                   <Switch checked={!field.value} onChange={(event) => field.onChange(!event.target.checked)} />
-                  <Typography>Exclusif</Typography>
                 </Grid>
               )
             },
@@ -130,7 +127,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             //   containerStyle: { display: 'grid', gridTemplateColumns: '100px 1fr' },
             //   properties: [
             //     {
-            //       name: 'comparator',
+            //       name: 'occurrenceComparator',
             //       variant: 'outlined',
             //       type: 'select',
             //       selectOptions: [
@@ -140,7 +137,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             //       ]
             //     },
             //     {
-            //       name: 'encounter',
+            //       name: 'occurrence',
             //       variant: 'outlined',
             //       type: 'number',
             //       validationRules: {

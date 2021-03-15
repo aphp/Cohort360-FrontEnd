@@ -6,7 +6,7 @@ import { Box, IconButton, MenuItem, Select, Typography, TextField } from '@mater
 import DeleteIcon from '@material-ui/icons/Delete'
 
 import { useAppSelector } from 'state'
-import { editCriteriaGroup, deleteCriteriaGroup } from 'state/cohortCreation'
+import { editCriteriaGroup, deleteCriteriaGroup, buildCohortCreation } from 'state/cohortCreation'
 
 import useStyles from './styles'
 
@@ -18,7 +18,10 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
   const classes = useStyles()
   const dispatch = useDispatch()
 
+  let timeout: any = null
+
   const isMainOperator = itemId === 0
+
   const [isOpen, setOpen] = useState<boolean>(false)
   const [groupType, setGroupType] = useState('andGroup')
 
@@ -59,6 +62,10 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
     }`
   }
 
+  const _buildCohortCreation = () => {
+    dispatch(buildCohortCreation({}))
+  }
+
   const _deleteLogicalOperator = () => {
     dispatch(deleteCriteriaGroup(itemId))
 
@@ -72,6 +79,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         criteriaIds: logicalOperatorParent.criteriaIds.filter((_criteriaId) => _criteriaId !== itemId)
       })
     )
+    _buildCohortCreation()
   }
 
   const _handleChangeLogicalOperatorProps = (key: string, value: any) => {
@@ -155,21 +163,32 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         })
       )
     }
+    _buildCohortCreation()
   }
 
   return (
     <>
+      {isOpen && <div className={classes.backDrop} onClick={() => setOpen(false)} />}
       {isMainOperator ? (
         <Box className={classes.mainLogicalOperator}>
-          <Typography variant="h5" style={{ lineHeight: '42px', margin: 'auto' }}>
+          <Typography variant="h5" className={classes.textOperator}>
             ET
           </Typography>
         </Box>
       ) : (
         <Box
           className={classes.logicalOperator}
-          onMouseEnter={() => setOpen(true)}
-          onMouseLeave={() => setTimeout(() => setOpen(false), 500)}
+          style={{
+            background: !currentLogicalOperator.isInclusive ? '#F2B0B0' : '#19235A',
+            color: !currentLogicalOperator.isInclusive ? '#19235a' : 'white',
+            width: currentLogicalOperator.type === 'NamongM' ? (isOpen ? 500 : 75) : isOpen ? 400 : 50
+          }}
+          onClick={() => setOpen(true)}
+          onMouseEnter={() => {
+            setOpen(true)
+            if (timeout) clearInterval(timeout)
+          }}
+          onMouseLeave={() => (timeout = setTimeout(() => setOpen(false), 1500))}
         >
           {isOpen ? (
             <>
@@ -177,14 +196,16 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
                 labelId="inclusive-simple-select-label"
                 id="inclusive-select"
                 value={`${currentLogicalOperator.isInclusive}`}
+                classes={{ icon: classes.selectIcon }}
+                className={classes.inputSelect}
                 onChange={(event) => _handleChangeLogicalOperatorProps('isInclusive', event.target.value === 'true')}
-                style={{ width: 100, margin: '0 4px', color: 'currentColor' }}
+                style={{ color: 'currentColor', marginLeft: 8 }}
               >
                 <MenuItem value={'true'}>Inclure</MenuItem>
                 <MenuItem value={'false'}>Exclure</MenuItem>
               </Select>
 
-              <Typography variant="h5" style={{ lineHeight: '42px' }}>
+              <Typography variant="h5" className={classes.descriptionText}>
                 les patients validant
               </Typography>
 
@@ -192,19 +213,21 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
                 labelId="inclusive-simple-select-label"
                 id="inclusive-select"
                 value={groupType}
+                classes={{ icon: classes.selectIcon }}
+                className={classes.inputSelect}
                 onChange={(event) => _handleChangeLogicalOperatorProps('groupType', event.target.value)}
-                style={{ width: 100, margin: '0 4px', color: 'currentColor' }}
+                style={{ color: 'currentColor' }}
               >
                 <MenuItem value={'andGroup'}>tous les</MenuItem>
                 <MenuItem value={'orGroup'}>un des</MenuItem>
-                <MenuItem value={'exactly'}>exactement</MenuItem>
+                {/* <MenuItem value={'exactly'}>exactement</MenuItem>
                 <MenuItem value={'atLeast'}>au moins</MenuItem>
-                <MenuItem value={'atMost'}>au plus</MenuItem>
+                <MenuItem value={'atMost'}>au plus</MenuItem> */}
               </Select>
 
               {currentLogicalOperator.type === 'NamongM' && (
                 <TextField
-                  style={{ color: 'white' }}
+                  classes={{ root: classes.input }}
                   value={currentLogicalOperator?.options?.number}
                   onChange={(event) => _handleChangeLogicalOperatorProps('options.number', event.target.value)}
                   type="number"
@@ -218,16 +241,16 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
                 />
               )}
 
-              <Typography variant="h5" style={{ lineHeight: '42px', paddingRight: 12 }}>
+              <Typography variant="h5" className={classes.descriptionText}>
                 critère(s)
               </Typography>
 
-              <IconButton size="small" onClick={() => _deleteLogicalOperator()} style={{ color: 'currentcolor' }}>
+              <IconButton className={classes.deleteButton} size="small" onClick={() => _deleteLogicalOperator()}>
                 <DeleteIcon />
               </IconButton>
             </>
           ) : (
-            <Typography variant="h5" style={{ lineHeight: '42px', margin: 'auto', padding: '0 4px' }}>
+            <Typography variant="h5" className={classes.textOperator}>
               {groupType === 'andGroup' || groupType === 'orGroup'
                 ? logicalOperatorDic[groupType]
                 : logicalOperatorDic['NamongM']}

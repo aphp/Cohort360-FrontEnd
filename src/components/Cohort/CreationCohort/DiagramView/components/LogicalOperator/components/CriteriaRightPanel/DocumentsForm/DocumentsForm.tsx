@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Divider, Grid, IconButton, Switch, Typography /*, FormLabel */ } from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Switch, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -20,7 +20,7 @@ const defaultDemographic = {
   title: 'Critère de document',
   search: '',
   docType: [],
-  encounter: 0,
+  occurrence: 0,
   startOccurrence: '',
   endOccurrence: '',
   isInclusive: true
@@ -40,7 +40,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
       title: data.title,
       search: data.search,
       docType: data.docType,
-      // encounter: data.encounter,
+      // occurrence: data.occurrence,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Composition',
@@ -82,10 +82,15 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               name: 'isInclusive',
               type: 'custom',
               renderInput: (field: any) => (
-                <Grid component="label" container alignItems="center" style={{ margin: '0 1em' }}>
-                  <Typography>Critère inclusif</Typography>
+                <Grid style={{ display: 'flex' }}>
+                  <FormLabel
+                    onClick={() => field.onChange(!field.value)}
+                    style={{ margin: 'auto 1em' }}
+                    component="legend"
+                  >
+                    Exclure les patients qui suivent les règles suivantes
+                  </FormLabel>
                   <Switch checked={!field.value} onChange={(event) => field.onChange(!event.target.checked)} />
-                  <Typography>Exclusif</Typography>
                 </Grid>
               )
             },
@@ -93,10 +98,10 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               name: 'search',
               placeholder: 'Recherche dans les documents',
               type: 'text',
-              variant: 'outlined',
-              validationRules: {
-                required: 'Merci de renseigner une recherche'
-              }
+              variant: 'outlined'
+              //   validationRules: {
+              //     required: 'Merci de renseigner une recherche'
+              //   }
             },
             {
               name: 'docType',
@@ -107,7 +112,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               autocompleteOptions: criteria?.data?.docTypes || []
             }
             // {
-            //   name: 'encounter',
+            //   name: 'occurrence',
             //   label: "Nombre d'occurence",
             //   variant: 'outlined',
             //   type: 'number'

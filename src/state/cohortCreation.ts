@@ -6,7 +6,8 @@ import {
   CohortCreationSnapshotType,
   ScopeTreeRow,
   SelectedCriteriaType,
-  CriteriaGroupType
+  CriteriaGroupType,
+  TemporalConstraintsType
 } from 'types'
 
 import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
@@ -26,6 +27,7 @@ export type CohortCreationState = {
   selectedPopulation: ScopeTreeRow[] | null
   selectedCriteria: SelectedCriteriaType[]
   criteriaGroup: CriteriaGroupType[]
+  temporalConstraints: TemporalConstraintsType[]
   nextCriteriaId: number
   nextGroupId: number
 }
@@ -50,6 +52,12 @@ const initialState: CohortCreationState = {
       criteriaIds: [],
       isSubGroup: false,
       isInclusive: true
+    }
+  ],
+  temporalConstraints: [
+    {
+      idList: ['All'],
+      constraintType: 'none'
     }
   ],
   nextCriteriaId: 1,
@@ -184,15 +192,20 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
         ? selectedPopulation
         : state.cohortCreation.request.selectedPopulation
       const _selectedCriteria = state.cohortCreation.request.selectedCriteria
-      const _criteriaGroup = state.cohortCreation.request.criteriaGroup
+      const _criteriaGroup: CriteriaGroupType[] =
+        state.cohortCreation.request.criteriaGroup && state.cohortCreation.request.criteriaGroup.length > 0
+          ? state.cohortCreation.request.criteriaGroup
+          : initialState.criteriaGroup
+      const _temporalConstraints = state.cohortCreation.request.temporalConstraints ?? initialState.temporalConstraints
 
-      const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup)
+      const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
 
       dispatch(saveJson({ newJson: json }))
 
       return {
         json,
-        selectedPopulation: _selectedPopulation
+        selectedPopulation: _selectedPopulation,
+        criteriaGroup: _criteriaGroup
       }
     } catch (error) {
       console.error(error)
@@ -277,6 +290,14 @@ const cohortCreationSlice = createSlice({
       const foundItem = state.criteriaGroup.find(({ id }) => id === action.payload.id)
       const index = foundItem ? state.criteriaGroup.indexOf(foundItem) : -1
       if (index !== -1) state.criteriaGroup[index] = action.payload
+    },
+    updateTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
+      const foundItem = state.temporalConstraints.find(({ idList }) => {
+        const equals = (a: any[], b: any[]) => a.length === b.length && a.every((v, i) => v === b[i])
+        return equals(idList, action.payload.idList)
+      })
+      const index = foundItem ? state.temporalConstraints.indexOf(foundItem) : -1
+      if (index !== -1) state.temporalConstraints[index] = action.payload
     }
   },
   extraReducers: (builder) => {
@@ -298,7 +319,7 @@ const cohortCreationSlice = createSlice({
     builder.addCase(countCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
-      countLoading: false
+      countLoading: payload?.count?.status === 'pending' || payload?.count?.status === 'started' ? true : false
     }))
     builder.addCase(countCohortCreation.rejected, (state) => ({
       ...state,
@@ -324,5 +345,7 @@ export const {
   addNewCriteriaGroup,
   //
   editSelectedCriteria,
-  editCriteriaGroup
+  editCriteriaGroup,
+  //
+  updateTemporalConstraint
 } = cohortCreationSlice.actions

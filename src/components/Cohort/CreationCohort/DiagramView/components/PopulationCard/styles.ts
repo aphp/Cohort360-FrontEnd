@@ -1,14 +1,17 @@
 import { makeStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles(() => ({
-  newPopulationCard: {
+const useStyles = makeStyles((theme) => ({
+  populationCard: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     'border-radius': 4,
     backgroundColor: '#FFFFFF',
-    padding: 15,
-    border: '3px solid #D3DEE8'
+    padding: '8px 16px',
+    border: '3px solid #D3DEE8',
+    flex: 1,
+    margin: '12px 0',
+    position: 'relative'
   },
   centerContainer: {
     width: '100%',
@@ -18,15 +21,29 @@ const useStyles = makeStyles(() => ({
   },
   leftDiv: {
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    [theme.breakpoints.down('md')]: {
+      flexWrap: 'wrap'
+    }
+  },
+  editButton: {
+    color: 'currentcolor',
+    [theme.breakpoints.down('md')]: {
+      position: 'absolute',
+      right: 5,
+      top: 8
+    }
   },
   chipContainer: {
     marginLeft: 12
   },
   populationChip: {
-    margin: '0 4px'
+    margin: 4,
+    fontSize: 11,
+    fontWeight: 'bold'
   },
   populationLabel: {
+    color: '#19235A',
     textDecoration: 'underline'
   },
   actionButton: {

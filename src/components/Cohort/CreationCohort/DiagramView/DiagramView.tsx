@@ -16,8 +16,10 @@ const DiagramView: React.FC = () => {
 
   return (
     <Grid container className={classes.root}>
-      <TemporalConstraintCard />
-      <PopulationCard />
+      <Grid className={classes.populationContainer}>
+        <PopulationCard />
+        {selectedPopulation && selectedPopulation.length > 0 ? <TemporalConstraintCard /> : <></>}
+      </Grid>
       {selectedPopulation && selectedPopulation.length > 0 ? <LogicalOperator /> : <></>}
     </Grid>
   )

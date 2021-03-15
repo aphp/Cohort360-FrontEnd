@@ -25,7 +25,7 @@ import Dashboard from './views/Dashboard/Dashboard'
 // import MyPatients from './views/MyPatients/MyPatients'
 import PrivateRoute from './components/Routes/Private'
 import LeftSideBar from './components/LeftSideBar/LeftSideBar'
-// import CohortCreation from './views/CohortCreation/CohortCreation'
+import CohortCreation from './views/CohortCreation/CohortCreation'
 
 import { Provider } from 'react-redux'
 import { store, persistor } from './state/store'
@@ -131,7 +131,7 @@ const App = () => (
                 render={() => (
                   <>
                     <LeftSideBar />
-                    <Dashboard context="new_cohort" />
+                    <CohortCreation />
                   </>
                 )}
               />
@@ -140,7 +140,7 @@ const App = () => (
                 render={() => (
                   <>
                     <LeftSideBar />
-                    <Dashboard context="new_cohort" />
+                    <CohortCreation />
                   </>
                 )}
               />

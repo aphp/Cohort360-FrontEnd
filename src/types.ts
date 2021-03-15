@@ -171,6 +171,7 @@ export type CIMDiagnosticInclusionCriteria = {
 }
 
 export type ScopeTreeRow = {
+  access?: string
   resourceType?: string
   id: string
   name: string
@@ -238,12 +239,9 @@ export type CriteriaGroupType = {
     }
 )
 
-export type TemporalConstraintType = {
-  id?: number
-  title?: string
-  criteriaGroupIds?: number[]
-} & {
-  type: 'sameEncounter' | 'differentEncounter' | 'none' | unknown
+export type TemporalConstraintsType = {
+  idList: ['All'] | number[]
+  constraintType: 'none' | 'sameEncounter' | 'differentEncounter' | 'directChronologicalOrdering'
 }
 
 export type CriteriaItemType = {
@@ -266,8 +264,8 @@ export type CcamDataType = {
   type: 'Procedure'
   hierarchy: undefined
   code: { id: string; label: string }[] | null
-  encounter: number
-  comparator: { id: 'le' | 'e' | 'ge'; label: string }
+  occurrence: number
+  occurrenceComparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
@@ -279,8 +277,8 @@ export type Cim10DataType = {
   type: 'Condition'
   code: { id: string; label: string }[] | null
   diagnosticType: { id: string; label: string }[] | null
-  encounter: number
-  comparator: { id: 'le' | 'e' | 'ge'; label: string }
+  occurrence: number
+  occurrenceComparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
@@ -303,8 +301,8 @@ export type DocumentDataType = {
   type: 'Composition'
   search: string
   docType: { id: string; label: string }[] | null
-  encounter: number
-  comparator: { id: 'le' | 'e' | 'ge'; label: string }
+  occurrence: number
+  occurrenceComparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
@@ -315,8 +313,8 @@ export type GhmDataType = {
   title: string
   type: 'Claim'
   code: { id: string; label: string }[] | null
-  encounter: number
-  comparator: { id: 'le' | 'e' | 'ge'; label: string }
+  occurrence: number
+  occurrenceComparator: { id: 'le' | 'e' | 'ge'; label: string }
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
@@ -350,6 +348,7 @@ export type CohortCreationCounterType = {
   deceased?: number
   female?: number
   male?: number
+  unknownPatient?: number
 }
 
 export type CohortCreationSnapshotType = {

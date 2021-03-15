@@ -10,10 +10,11 @@ export const countCohort = async (requeteurJson?: string, snapshotId?: string, r
       uuid: measureResult?.data?.uuid,
       includePatient: measureResult?.data?.measure,
       byrequest: 0,
-      alive: 0,
-      deceased: 0,
-      female: 0,
-      male: 0
+      alive: measureResult?.data?.measure_alive,
+      deceased: measureResult?.data?.measure_deceased,
+      female: measureResult?.data?.measure_female,
+      male: measureResult?.data?.measure_male,
+      unknownPatient: measureResult?.data?.measure_unknown
     }
   } else {
     if (!requeteurJson || !snapshotId || !requestId) return null

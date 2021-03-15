@@ -1,14 +1,6 @@
 import React from 'react'
 
-import {
-  Button,
-  Divider,
-  Grid,
-  IconButton,
-  Switch,
-  Typography
-  // FormLabel
-} from '@material-ui/core'
+import { Button, Divider, Grid, IconButton, Switch, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { FormBuilder } from '@arkhn/ui'
@@ -35,8 +27,8 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
       ...selectedCriteria,
       title: data.title,
       code: data.code,
-      // encounter: data.encounter,
-      // comparator: data.comparator,
+      // occurrence: data.occurrence,
+      // occurrenceComparator: data.occurrenceComparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Procedure',
@@ -84,10 +76,15 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
               name: 'isInclusive',
               type: 'custom',
               renderInput: (field: any) => (
-                <Grid component="label" container alignItems="center" style={{ margin: '0 1em' }}>
-                  <Typography>Critère inclusif</Typography>
+                <Grid style={{ display: 'flex' }}>
+                  <FormLabel
+                    onClick={() => field.onChange(!field.value)}
+                    style={{ margin: 'auto 1em' }}
+                    component="legend"
+                  >
+                    Exclure les patients qui suivent les règles suivantes
+                  </FormLabel>
                   <Switch checked={!field.value} onChange={(event) => field.onChange(!event.target.checked)} />
-                  <Typography>Exclusif</Typography>
                 </Grid>
               )
             },
@@ -117,7 +114,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             //   containerStyle: { display: 'grid', gridTemplateColumns: '100px 1fr' },
             //   properties: [
             //     {
-            //       name: 'comparator',
+            //       name: 'occurrenceComparator',
             //       variant: 'outlined',
             //       type: 'select',
             //       selectOptions: [
@@ -127,7 +124,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             //       ]
             //     },
             //     {
-            //       name: 'encounter',
+            //       name: 'occurrence',
             //       variant: 'outlined',
             //       type: 'number',
             //       validationRules: {
