@@ -143,7 +143,7 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
           const date = newSnapshot.created_at
 
           const _snapshotsHistory =
-            index === snapshotsHistory.length - 1 ? snapshotsHistory : snapshotsHistory.splice(0, index + 1)
+            index === snapshotsHistory.length - 1 ? snapshotsHistory : [...snapshotsHistory].splice(0, index + 1)
 
           currentSnapshot = uuid
           snapshotsHistory = [..._snapshotsHistory, { uuid, json, date }]
