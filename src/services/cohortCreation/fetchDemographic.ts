@@ -1,10 +1,34 @@
 import { CONTEXT } from '../../constants'
 import apiRequest from '../apiRequest'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
+import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
+
+type Gender = {
+  id: PatientGenderKind
+  label: string
+}
 
 export const fetchGender = async () => {
   if (CONTEXT === 'arkhn') {
-    return null
+    const res: Gender[] = [
+      {
+        id: PatientGenderKind._male,
+        label: 'Homme'
+      },
+      {
+        id: PatientGenderKind._female,
+        label: 'Femme'
+      },
+      {
+        id: PatientGenderKind._other,
+        label: 'Autre'
+      },
+      {
+        id: PatientGenderKind._unknown,
+        label: 'Indeterminé.e'
+      }
+    ]
+    return res
   } else if (CONTEXT === 'fakedata') {
     const res = [
       {

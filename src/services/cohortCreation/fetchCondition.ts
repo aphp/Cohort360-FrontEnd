@@ -8,6 +8,49 @@ import {
 } from '../../data/fakeData/cohortCreation/condition'
 import { alphabeticalSort } from 'utils/alphabeticalSort'
 
+const ICD9_CODES = [
+  {
+    id: '71133',
+    label: 'Néoplasme malin du pylore'
+  },
+  {
+    id: '01646',
+    label: "Lésion d'autres organes intra-abdominaux"
+  },
+  {
+    id: '67440',
+    label: 'Larynx néo-malin NEC'
+  },
+  {
+    id: '81203',
+    label: "Blessures causées par des obus d'artillerie en mer"
+  },
+  {
+    id: '7682',
+    label: 'Traumatisme acoustique'
+  },
+  {
+    id: '0388',
+    label: "Fracture fermée de l'acétabulum"
+  },
+  {
+    id: '65920',
+    label: 'Échec du cathéter stérile'
+  },
+  {
+    id: 'E9950',
+    label: 'Aphakie'
+  },
+  {
+    id: '71642',
+    label: 'Anesthésie compl-antepartum'
+  },
+  {
+    id: '9093',
+    label: 'TB de la vessie non spécifiée'
+  }
+]
+
 const DEFAULT_DIAGNOSTIC_TYPES = [
   {
     code: 'mp',
@@ -99,7 +142,7 @@ export const fetchDiagnosticTypes = async () => {
 // todo: check if the data syntax is correct when available
 export const fetchCim10Diagnostic = async (searchValue?: string) => {
   if (CONTEXT === 'arkhn') {
-    return null
+    return ICD9_CODES
   } else if (CONTEXT === 'fakedata') {
     return fakeValueSetCIM10 && fakeValueSetCIM10.length > 0
       ? fakeValueSetCIM10.map((_fakeValueSetCIM10: { code: string; display: string }) => ({

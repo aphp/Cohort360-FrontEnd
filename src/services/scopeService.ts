@@ -1,13 +1,6 @@
 import api from './api'
-import { CONTEXT, API_RESOURCE_TAG } from '../constants'
-import {
-  IGroup,
-  IPractitionerRole,
-  IOrganization,
-  IHealthcareService,
-  IPatient,
-  IExtension
-} from '@ahryman40k/ts-fhir-types/lib/R4'
+import { CONTEXT } from '../constants'
+import { IExtension, IGroup, IOrganization, IPatient, IPractitionerRole } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { FHIR_API_Response, ScopeTreeRow } from '../types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
@@ -16,29 +9,15 @@ import fakeScopeRows from '../data/fakeData/scopeRows'
 const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0 }
 
 const getServicePatientsCount = async (
-  service: IHealthcareService
-): Promise<{ total: number; serviceId: string | undefined }> => {
+  organization: IOrganization
+): Promise<{ total: number; service: IOrganization }> => {
   const patientsResp = await api.get<FHIR_API_Response<IPatient>>(
-    `Patient?_has:Encounter:subject:service-provider=${service.id}&_summary=count${API_RESOURCE_TAG}`
+    `Patient?_has:Encounter:subject:service-provider=${organization.id}&_summary=count`
   )
   return {
     total: patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total ?? 0 : 0,
-    serviceId: service.id
+    service: organization
   }
-}
-
-const getOrganizationServices = async (
-  orga: IOrganization
-): Promise<{ orgaId: string | undefined; services: IHealthcareService[] }> => {
-  const orgaId = orga.id
-  if (!orgaId) {
-    return { services: [], orgaId }
-  }
-  const orgaServicesResp = await api.get<FHIR_API_Response<IHealthcareService>>(
-    `HealthcareService?organization:Organization=${orgaId}${API_RESOURCE_TAG}`
-  )
-
-  return { services: getApiResponseResources(orgaServicesResp) ?? [], orgaId }
 }
 
 export const getPerimeters = async (practitionerId: string) => {
@@ -143,84 +122,21 @@ export const getScopePerimeters = async (practitionerId: string): Promise<ScopeT
   }
 
   if (CONTEXT === 'arkhn') {
-    const scopeRows: ScopeTreeRow[] = []
-    const [healthcareServicesWOOrgaResp, organizationsResp] = await Promise.all([
-      api.get<FHIR_API_Response<IHealthcareService>>(`HealthcareService?organization:missing=true${API_RESOURCE_TAG}`),
-      api.get<FHIR_API_Response<IOrganization>>(`/Organization?${API_RESOURCE_TAG}`)
-    ])
-
-    const healthcareServicesWOOrga = getApiResponseResources(healthcareServicesWOOrgaResp)
+    const organizationsResp = await api.get<FHIR_API_Response<IOrganization>>(`/Organization?type=dept`)
     const organizations = getApiResponseResources(organizationsResp)
+    if (!organizations) return []
 
-    if (organizations) {
-      const servicesPerOrga = await Promise.all(organizations.map((orga) => getOrganizationServices(orga)))
+    const patientsCountPerServices = await Promise.all(
+      organizations.map((organization) => getServicePatientsCount(organization))
+    )
 
-      const flattenServices = servicesPerOrga.reduce(
-        (
-          acc: {
-            orgaId: string | undefined
-            serviceId: string | undefined
-            service: IHealthcareService
-          }[],
-          serviceObj
-        ) => {
-          return [
-            ...acc,
-            ...serviceObj.services.map((service) => ({
-              orgaId: serviceObj.orgaId,
-              serviceId: service.id,
-              service
-            }))
-          ]
-        },
-        []
-      )
-      const patientsCountPerServices = await Promise.all(
-        flattenServices.map((serviceObj) => getServicePatientsCount(serviceObj.service))
-      )
-
-      flattenServices.forEach((serviceObj, serviceIndex) => {
-        scopeRows.push({
-          id: serviceObj.serviceId ?? '',
-          name: serviceObj.service.name ?? '',
-          quantity: patientsCountPerServices[serviceIndex].total,
-          parentId: serviceObj.orgaId,
-          subItems: []
-        })
-      })
-
-      organizations.forEach((orga) => {
-        const orgaTotalPatients = scopeRows.reduce(
-          (acc, row) => (row.parentId === orga.id ? acc + row.quantity : acc),
-          0
-        )
-        scopeRows.push({
-          resourceType: orga.resourceType,
-          id: orga.id ?? '',
-          name: orga.name ?? '',
-          quantity: orgaTotalPatients,
-          subItems: []
-        })
-      })
-    }
-
-    if (healthcareServicesWOOrga) {
-      //Add healthcare services to scopeRows
-      const servicesPatientsCount = await Promise.all(
-        healthcareServicesWOOrga.map((service) => getServicePatientsCount(service))
-      )
-      healthcareServicesWOOrga.forEach((service) => {
-        const serviceTotalPatient = servicesPatientsCount.find((obj) => obj.serviceId === service.id)
-        scopeRows.push({
-          resourceType: service.resourceType,
-          id: service.id ?? '',
-          name: service.name ?? '',
-          quantity: serviceTotalPatient ? serviceTotalPatient.total : 0,
-          subItems: []
-        })
-      })
-    }
-    return scopeRows
+    return patientsCountPerServices.map((result) => ({
+      resourceType: result.service.resourceType,
+      id: result.service.id || '',
+      name: result.service.name || '',
+      quantity: result.total,
+      subItems: []
+    }))
   }
   return []
 }
