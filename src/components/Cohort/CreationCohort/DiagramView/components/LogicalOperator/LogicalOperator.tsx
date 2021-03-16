@@ -201,6 +201,7 @@ const LogicalOperator: React.FC = () => {
         criteriaIds: [...currentParent.criteriaIds, nextGroupId]
       })
     )
+    _buildCohortCreation()
   }
 
   const _addNewCriteria = (parentId: number) => {

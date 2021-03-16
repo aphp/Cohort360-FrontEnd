@@ -61,7 +61,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
             />
           ),
-          _currentCriteria?.occurrence && (
+          _currentCriteria?.occurrence !== 0 && (
             <Chip
               className={classes.criteriaChip}
               label={
@@ -97,7 +97,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
             />
           ),
-          _currentCriteria?.occurrence && (
+          _currentCriteria?.occurrence !== 0 && (
             <Chip
               className={classes.criteriaChip}
               label={
@@ -143,7 +143,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               }
             />
           ),
-          _currentCriteria?.occurrence && (
+          _currentCriteria?.occurrence !== 0 && (
             <Chip
               className={classes.criteriaChip}
               label={
@@ -264,7 +264,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               label={<Typography noWrap>{displaySelectedDocType(_currentCriteria?.docType)}</Typography>}
             />
           ),
-          _currentCriteria?.occurrence && (
+          _currentCriteria?.occurrence !== 0 && (
             <Chip
               className={classes.criteriaChip}
               label={

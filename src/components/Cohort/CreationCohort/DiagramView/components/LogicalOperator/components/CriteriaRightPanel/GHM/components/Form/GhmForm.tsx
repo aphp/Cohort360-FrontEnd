@@ -27,7 +27,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
       ...selectedCriteria,
       title: data.title,
       code: data.code,
-      occurrence: data.occurrence,
+      occurrence: +data.occurrence,
       occurrenceComparator: data.occurrenceComparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,

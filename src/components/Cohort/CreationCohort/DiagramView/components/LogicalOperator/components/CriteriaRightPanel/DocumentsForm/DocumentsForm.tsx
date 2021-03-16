@@ -42,7 +42,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
       title: data.title,
       search: data.search,
       docType: data.docType,
-      occurrence: data.occurrence,
+      occurrence: +data.occurrence,
       occurrenceComparator: data.occurrenceComparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,

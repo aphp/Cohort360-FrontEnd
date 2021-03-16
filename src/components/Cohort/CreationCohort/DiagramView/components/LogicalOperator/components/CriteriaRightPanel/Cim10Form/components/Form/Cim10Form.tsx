@@ -28,7 +28,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       title: data.title,
       code: data.code,
       diagnosticType: data.diagnosticType,
-      occurrence: data.occurrence,
+      occurrence: +data.occurrence,
       occurrenceComparator: data.occurrenceComparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
