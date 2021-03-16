@@ -99,7 +99,7 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
           {subItems &&
             subItems.map((ccamHierarchySubItem: any, index: number) =>
               ccamHierarchySubItem === 'loading' ? (
-                <></>
+                <Fragment key={index} />
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />

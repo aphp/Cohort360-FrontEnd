@@ -99,7 +99,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
           {subItems &&
             subItems.map((cimHierarchySubItem: any, index: number) =>
               cimHierarchySubItem === 'loading' ? (
-                <></>
+                <Fragment key={index}></Fragment>
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />

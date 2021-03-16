@@ -99,7 +99,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
           {subItems &&
             subItems.map((ghmHierarchySubItem: any, index: number) =>
               ghmHierarchySubItem === 'loading' ? (
-                <></>
+                <Fragment key={index} />
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />

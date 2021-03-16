@@ -28,8 +28,8 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       title: data.title,
       code: data.code,
       diagnosticType: data.diagnosticType,
-      // occurrence: data.occurrence,
-      // occurrenceComparator: data.occurrenceComparator,
+      occurrence: +data.occurrence,
+      occurrenceComparator: data.occurrenceComparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Condition',
@@ -110,61 +110,63 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               type: 'autocomplete',
               multiple: true,
               autocompleteOptions: criteria?.data?.diagnosticTypes || []
+            },
+            {
+              type: 'custom',
+              name: 'label',
+              renderInput: () => (
+                <FormLabel style={{ padding: '0 1em' }} component="legend">
+                  Nombre d'occurrence :
+                </FormLabel>
+              )
+            },
+            {
+              type: 'section',
+              title: '',
+              name: '',
+              containerStyle: { display: 'grid', gridTemplateColumns: '100px 1fr' },
+              properties: [
+                {
+                  name: 'occurrenceComparator',
+                  variant: 'outlined',
+                  type: 'select',
+                  selectOptions: [
+                    { id: '<=', label: '<=' },
+                    { id: '<', label: '<' },
+                    { id: '=', label: '=' },
+                    { id: '>', label: '>' },
+                    { id: '>=', label: '>=' }
+                  ]
+                },
+                {
+                  name: 'occurrence',
+                  variant: 'outlined',
+                  type: 'number',
+                  validationRules: {
+                    min: 0
+                  }
+                }
+              ]
+            },
+            {
+              type: 'custom',
+              name: 'label',
+              renderInput: () => (
+                <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+                  Date d'occurrence :
+                </FormLabel>
+              )
+            },
+            {
+              name: 'startOccurrence',
+              label: 'Avant le',
+              type: 'date'
+            },
+            {
+              name: 'endOccurrence',
+              label: 'Après le',
+              type: 'date'
             }
-            // {
-            //   type: 'custom',
-            //   name: 'label',
-            //   renderInput: () => (
-            //     <FormLabel style={{ padding: '0 1em' }} component="legend">
-            //       Nombre d'occurence :
-            //     </FormLabel>
-            //   )
-            // },
-            // {
-            //   type: 'section',
-            //   title: '',
-            //   name: '',
-            //   containerStyle: { display: 'grid', gridTemplateColumns: '100px 1fr' },
-            //   properties: [
-            //     {
-            //       name: 'occurrenceComparator',
-            //       variant: 'outlined',
-            //       type: 'select',
-            //       selectOptions: [
-            //         { id: 'le', label: '<=' },
-            //         { id: 'e', label: '=' },
-            //         { id: 'ge', label: '>=' }
-            //       ]
-            //     },
-            //     {
-            //       name: 'occurrence',
-            //       variant: 'outlined',
-            //       type: 'number',
-            //       validationRules: {
-            //         min: 0
-            //       }
-            //     }
-            //   ]
-            // }
-            // {
-            //   type: 'custom',
-            //   name: 'label',
-            //   renderInput: () => (
-            //     <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
-            //       Date d'occurrence :
-            //     </FormLabel>
-            //   )
-            // },
-            // {
-            //   name: 'startOccurrence',
-            //   label: 'Avant le',
-            //   type: 'date'
-            // },
-            // {
-            //   name: 'endOccurrence',
-            //   label: 'Après le',
-            //   type: 'date'
-            // }
           ]}
           submit={_onSubmit}
           formId="cim10-form"
