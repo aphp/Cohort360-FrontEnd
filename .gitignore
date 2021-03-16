@@ -20,12 +20,13 @@
 .env.development.local
 .env.test.local
 .env.production.local
+.env.fakedata
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
 # Cohort360 specific
-.env*
+.env.example
 !.env.example
 .mp4
