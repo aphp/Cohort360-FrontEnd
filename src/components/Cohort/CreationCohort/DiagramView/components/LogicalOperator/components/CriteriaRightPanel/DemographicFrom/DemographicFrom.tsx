@@ -107,7 +107,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             {
               name: 'vitalStatus',
               variant: 'outlined',
-              label: 'Status vital',
+              label: 'Statut vital',
               type: 'autocomplete',
               multiple: true,
               autocompleteOptions: criteria?.data?.status || []
