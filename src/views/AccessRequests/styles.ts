@@ -3,16 +3,15 @@ import { smallDrawerWidth, largeDrawerWidth } from '../../components/LeftSideBar
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    height: '100vh'
-  },
-  appBar: {
-    marginLeft: smallDrawerWidth,
+    height: '100vh',
     width: `calc(100% - ${smallDrawerWidth}px)`,
     zIndex: theme.zIndex.drawer + 1,
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen
-    })
+    }),
+    paddingTop: theme.spacing(4),
+    backgroundColor: theme.palette.background.default
   },
   appBarShift: {
     marginLeft: largeDrawerWidth,
@@ -22,21 +21,14 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.enteringScreen
     })
   },
-  title: {
-    flexGrow: 1
+  requestsContainer: {
+    padding: theme.spacing(2)
   },
-  container: {
-    paddingTop: theme.spacing(4),
-    backgroundColor: theme.background
+  requestList: {
+    marginBlock: theme.spacing(2)
   },
-  paper: {
-    padding: theme.spacing(2),
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column'
-  },
-  verticalPadding: {
-    paddingBottom: theme.spacing(2)
+  noRequest: {
+    fontStyle: 'italic'
   }
 }))
 

@@ -94,7 +94,8 @@ const Login = () => {
           ...practitioner,
           deidentified: deidentifiedInfos.deidentification,
           nominativeGroupsIds: deidentifiedInfos.nominativeGroupsIds,
-          lastConnection
+          lastConnection,
+          isSuperUser: true
         })
       )
       history.push('/accueil')
@@ -115,7 +116,7 @@ const Login = () => {
       )
 
       const lastConnection = new Date('12/12/2022')
-      getPractitionerData(lastConnection)
+      await getPractitionerData(lastConnection)
     } catch (err) {
       setErrorLogin(true)
     }
