@@ -870,7 +870,7 @@ export async function unbuildRequest(_json: string) {
               : [],
           isSubGroup: groupItem.isSubItem,
           isInclusive: groupItem.isInclusive,
-          type: groupItem.type
+          type: groupItem._type
         }))
       : []
 

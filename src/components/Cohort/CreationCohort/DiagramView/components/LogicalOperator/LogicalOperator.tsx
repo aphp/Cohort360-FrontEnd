@@ -76,12 +76,14 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
               return child?.id > 0 ? (
                 <CriteriaCardItem
+                  key={child?.id}
                   deleteCriteria={deleteCriteria}
                   editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
                   itemId={child.id}
                 />
               ) : (
                 <OperatorItem
+                  key={child?.id}
                   itemId={child?.id}
                   addNewCriteria={addNewCriteria}
                   addNewGroup={addNewGroup}
@@ -143,7 +145,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   )
 }
 
-const GroupOperator: React.FC = () => {
+const LogicalOperator: React.FC = () => {
   const dispatch = useDispatch()
   const { request, criteria } = useAppSelector((state) => state.cohortCreation || {})
 
@@ -249,4 +251,4 @@ const GroupOperator: React.FC = () => {
   )
 }
 
-export default GroupOperator
+export default LogicalOperator
