@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Card, CardContent, Divider, makeStyles } from '@material-ui/core'
+import { useHistory } from 'react-router'
 
 import Title from 'components/Title'
 import Button from 'common/CohortButton'
@@ -17,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
 const CohortCard = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
+  const history = useHistory()
   const { lastCohorts } = useAppSelector((state) => ({
     lastCohorts: state.userCohorts.lastCohorts
   }))
@@ -28,13 +30,16 @@ const CohortCard = () => {
   const handleSetCohortFavorite = (cohortId: string) => {
     dispatch(setFavoriteCohortThunk({ cohortId }))
   }
+  const handleCreateCohortClick = () => {
+    history.push('cohort/new')
+  }
 
   return (
     <Card>
       <CardContent>
         <Title>Cohortes</Title>
         <Divider />
-        <Button href="cohort/new" className={classes.button}>
+        <Button onClick={handleCreateCohortClick} className={classes.button}>
           Créer une nouvelle cohorte
         </Button>
         <ResearchTable

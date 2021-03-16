@@ -11,6 +11,7 @@ import moment from 'moment'
 
 import { PersistGate } from 'redux-persist/integration/react'
 
+import AccessRequests from 'views/AccessRequests/AccessRequests'
 import Connexion from './views/Connexion/Connexion'
 import FakeConnexion from './views/Connexion/FakeConnexion'
 import ArkhnConnexion from './views/Connexion/ArkhnConnexion'
@@ -196,6 +197,15 @@ const App = () => (
                   <>
                     <LeftSideBar />
                     <Patient />
+                  </>
+                )}
+              />
+              <PrivateRoute
+                path="/accessRequests"
+                render={() => (
+                  <>
+                    <LeftSideBar />
+                    <AccessRequests />
                   </>
                 )}
               />

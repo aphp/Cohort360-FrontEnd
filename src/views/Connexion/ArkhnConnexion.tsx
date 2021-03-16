@@ -1,25 +1,29 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+
+import {
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+  Link,
+  Typography
+} from '@material-ui/core'
+import { unwrapResult } from '@reduxjs/toolkit'
 import { useHistory } from 'react-router-dom'
-import Button from '@material-ui/core/Button'
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
-import Link from '@material-ui/core/Link'
-import Dialog from '@material-ui/core/Dialog'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogActions from '@material-ui/core/DialogActions'
 import queryString from 'query-string'
-import logo from '../../assets/images/logo-login.png'
-import { login as loginAction } from '../../state/me'
-import { arkhnAuthenticationRedirect } from '../../services/authentication'
+
+import logo from 'assets/images/logo-login.png'
 import { ACCES_TOKEN, STATE_STORAGE_KEY } from '../../constants'
-import useStyles from './styles'
-import { fetchPractitioner } from '../../services/practitioner'
-import { fetchDeidentified } from 'services/deidentification'
 import { fetchTokens } from 'services/arkhnAuth/oauth/tokenManager'
-import { CircularProgress } from '@material-ui/core'
+import { arkhnAuthenticationRedirect } from 'services/authentication'
+import { useAppDispatch } from 'state'
+import { fetchLoggedPractitioner } from 'state/me'
+
+import useStyles from './styles'
 
 const LoadingDialog = ({ open }: { open: boolean }) => (
   <Dialog open={open}>
@@ -63,7 +67,7 @@ const LegalMentionDialog = ({ open, setOpen }: { open: boolean; setOpen: (isOpen
 
 const ArkhnConnexion = () => {
   const history = useHistory()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { code, state } = queryString.parse(window.location.search)
   const [loading, setLoading] = useState(false)
   const [accessToken, setAccessToken] = useState(localStorage.getItem(ACCES_TOKEN))
@@ -87,23 +91,14 @@ const ArkhnConnexion = () => {
   useEffect(() => {
     if (accessToken) {
       setLoading(true)
-      fetchPractitioner('')
-        .then((practitioner) => {
-          if (practitioner) {
-            fetchDeidentified()
-              .then((deidentifiedBoolean) => {
-                dispatch(
-                  loginAction({
-                    ...practitioner,
-                    deidentified: deidentifiedBoolean?.deidentification ?? false
-                  })
-                )
-                history.push('/accueil')
-              })
-              .finally(() => setLoading(false))
-          }
+      dispatch(fetchLoggedPractitioner())
+        .then(unwrapResult)
+        .then(() => {
+          history.push('/accueil')
         })
-        .finally(() => setLoading(false))
+        .finally(() => {
+          setLoading(false)
+        })
     }
   }, [accessToken, dispatch, history])
 
