@@ -76,12 +76,14 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
               return child?.id > 0 ? (
                 <CriteriaCardItem
+                  key={child?.id}
                   deleteCriteria={deleteCriteria}
                   editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
                   itemId={child.id}
                 />
               ) : (
                 <OperatorItem
+                  key={child?.id}
                   itemId={child?.id}
                   addNewCriteria={addNewCriteria}
                   addNewGroup={addNewGroup}

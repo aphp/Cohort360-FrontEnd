@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { Fragment, useState, useEffect, useRef } from 'react'
 import moment from 'moment'
 
 import Chip from '@material-ui/core/Chip'
@@ -406,7 +406,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     <div ref={containerRef} style={{ height: openCollapse ? '' : 40 }} className={`toto ${classes.cardContent}`}>
       {criteriaContents &&
         criteriaContents.map((criteriaContent, index) => (
-          <>
+          <Fragment key={index}>
             {/* @ts-ignore */}
             <div key={index} ref={elementsRef.current[index]}>
               {criteriaContent}
@@ -416,7 +416,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 {openCollapse ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
               </IconButton>
             )}
-          </>
+          </Fragment>
         ))}
     </div>
   )
