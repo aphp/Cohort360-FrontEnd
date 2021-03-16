@@ -55,52 +55,72 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     switch (_currentCriteria.type) {
       case 'Claim': {
         content = [
-          _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 ? (
+          _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
             <Chip
               className={classes.criteriaChip}
               label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
             />
-          ) : (
-            <></>
+          ),
+          _currentCriteria?.occurrence && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>{`Nombre d'occurrence: ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
+              }
+            />
+          ),
+          (startDate || endDate) && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>
+                  {startDate
+                    ? endDate
+                      ? `Entre le ${startDate} et le ${endDate}`
+                      : `Après le ${startDate},`
+                    : endDate
+                    ? `Avant le ${endDate}`
+                    : ''}
+                </Typography>
+              }
+            />
           )
-          // {/* <Typography>
-          //   {_currentCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_currentCriteria.encounter}` : ''}
-          // </Typography> */}
-          // {/* <Typography>
-          //   {startDate
-          //     ? endDate
-          //       ? `Entre le ${startDate} et le ${endDate},`
-          //       : `Après le ${startDate},`
-          //     : endDate
-          //     ? `Avant le ${endDate},`
-          //     : ''}
-          // </Typography> */}
         ]
         break
       }
 
       case 'Procedure': {
         content = [
-          _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 ? (
+          _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
             <Chip
               className={classes.criteriaChip}
               label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
             />
-          ) : (
-            <></>
+          ),
+          _currentCriteria?.occurrence && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>{`Nombre d'occurrence: ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
+              }
+            />
+          ),
+          (startDate || endDate) && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>
+                  {startDate
+                    ? endDate
+                      ? `Entre le ${startDate} et le ${endDate}`
+                      : `Après le ${startDate},`
+                    : endDate
+                    ? `Avant le ${endDate}`
+                    : ''}
+                </Typography>
+              }
+            />
           )
-          // {/* <Typography>
-          //   {_currentCriteria?.encounter ? `Nombre d'occurence: ${comparator} ${_currentCriteria.encounter}` : ''}
-          // </Typography> */}
-          // {/* <Typography>
-          //   {startDate
-          //     ? endDate
-          //       ? `Entre le ${startDate} et le ${endDate},`
-          //       : `Après le ${startDate},`
-          //     : endDate
-          //     ? `Avant le ${endDate},`
-          //     : ''}
-          // </Typography> */}
         ]
         break
       }
@@ -122,21 +142,31 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 </Typography>
               }
             />
+          ),
+          _currentCriteria?.occurrence && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>{`Nombre d'occurrence: ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
+              }
+            />
+          ),
+          (startDate || endDate) && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>
+                  {startDate
+                    ? endDate
+                      ? `Entre le ${startDate} et le ${endDate}`
+                      : `Après le ${startDate},`
+                    : endDate
+                    ? `Avant le ${endDate}`
+                    : ''}
+                </Typography>
+              }
+            />
           )
-          // _currentCriteria?.encounter && (
-          //   <Typography>Nombre d'occurence: {`${comparator} ${_currentCriteria.encounter}`}</Typography>
-          // ),
-          // startDate && (
-          //   <Typography>
-          //     {startDate
-          //       ? endDate
-          //         ? `Entre le ${startDate} et le ${endDate},`
-          //         : `Après le ${startDate},`
-          //       : endDate
-          //       ? `Avant le ${endDate},`
-          //       : ''}
-          //   </Typography>
-          // )
         ]
         break
       }
@@ -234,20 +264,25 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               label={<Typography noWrap>{displaySelectedDocType(_currentCriteria?.docType)}</Typography>}
             />
           ),
-          // _currentCriteria?.encounter && <Typography>
-          //   Nombre d'occurence: {`${comparator} ${_currentCriteria.encounter}`}
-          // </Typography>,
-          startDate && (
+          _currentCriteria?.occurrence && (
             <Chip
               className={classes.criteriaChip}
               label={
-                <Typography noWrap>
+                <Typography>{`Nombre d'occurrence: ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
+              }
+            />
+          ),
+          (startDate || endDate) && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>
                   {startDate
                     ? endDate
-                      ? `Entre le ${startDate} et le ${endDate},`
+                      ? `Entre le ${startDate} et le ${endDate}`
                       : `Après le ${startDate},`
                     : endDate
-                    ? `Avant le ${endDate},`
+                    ? `Avant le ${endDate}`
                     : ''}
                 </Typography>
               }

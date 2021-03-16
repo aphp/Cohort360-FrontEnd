@@ -10,7 +10,7 @@ const defaultProcedure = {
   title: "Critères d'actes CCAM",
   code: [],
   occurrence: 0,
-  occurrenceComparator: { id: 'e', label: '=' },
+  occurrenceComparator: '<=',
   startOccurrence: '',
   endOccurrence: '',
   isInclusive: true

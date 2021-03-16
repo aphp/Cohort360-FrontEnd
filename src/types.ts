@@ -265,7 +265,7 @@ export type CcamDataType = {
   hierarchy: undefined
   code: { id: string; label: string }[] | null
   occurrence: number
-  occurrenceComparator: { id: 'le' | 'e' | 'ge'; label: string }
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
@@ -278,7 +278,7 @@ export type Cim10DataType = {
   code: { id: string; label: string }[] | null
   diagnosticType: { id: string; label: string }[] | null
   occurrence: number
-  occurrenceComparator: { id: 'le' | 'e' | 'ge'; label: string }
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
@@ -302,7 +302,7 @@ export type DocumentDataType = {
   search: string
   docType: { id: string; label: string }[] | null
   occurrence: number
-  occurrenceComparator: { id: 'le' | 'e' | 'ge'; label: string }
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
@@ -314,7 +314,7 @@ export type GhmDataType = {
   type: 'Claim'
   code: { id: string; label: string }[] | null
   occurrence: number
-  occurrenceComparator: { id: 'le' | 'e' | 'ge'; label: string }
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
