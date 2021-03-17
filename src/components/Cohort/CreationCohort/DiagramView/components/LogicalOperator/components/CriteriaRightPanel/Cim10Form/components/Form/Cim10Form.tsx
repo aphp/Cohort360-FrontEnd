@@ -71,12 +71,10 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && (
-          <Alert severity="error">Merci de renseigner au moins un diagnostique CIM10, ou un type de diagnostique</Alert>
-        )}
+        {error && <Alert severity="error">Merci de renseigner au moins un code ou un type de diagnostique</Alert>}
         <FormBuilder<Cim10DataType>
           defaultValues={selectedCriteria}
-          title="Diagnostic"
+          title="Diagnostique"
           properties={[
             {
               name: 'title',
@@ -115,7 +113,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             },
             {
               name: 'diagnosticType',
-              label: 'Type de diagnostic',
+              label: 'Type de diagnostique',
               variant: 'outlined',
               type: 'autocomplete',
               multiple: true,
