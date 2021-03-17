@@ -61,7 +61,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
             />
           ),
-          _currentCriteria?.occurrence !== 0 && (
+          +_currentCriteria?.occurrence !== 1 && (
             <Chip
               className={classes.criteriaChip}
               label={
@@ -97,7 +97,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
             />
           ),
-          _currentCriteria?.occurrence !== 0 && (
+          +_currentCriteria?.occurrence !== 1 && (
             <Chip
               className={classes.criteriaChip}
               label={
@@ -143,7 +143,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               }
             />
           ),
-          _currentCriteria?.occurrence !== 0 && (
+          +_currentCriteria?.occurrence !== 1 && (
             <Chip
               className={classes.criteriaChip}
               label={
@@ -173,7 +173,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
       case 'Patient': {
         const ageType: any = _currentCriteria.ageType ? _currentCriteria.ageType.id : 'year'
-        let ageUnit = 'an(s)'
+        let ageUnit: 'an(s)' | 'mois' | 'jour(s)' = 'an(s)'
         if (ageType === 'month') ageUnit = 'mois'
         else if (ageType === 'day') ageUnit = 'jour(s)'
 
@@ -213,7 +213,8 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               label={<Typography noWrap>{displaySelectedVitalStatus(_currentCriteria?.vitalStatus)}</Typography>}
             />
           ),
-          !!_currentCriteria.years && _currentCriteria.years[0] === _currentCriteria.years[1] && (
+          ((!!_currentCriteria.years && _currentCriteria.years[0] === _currentCriteria.years[1]) ||
+            ageUnit !== 'an(s)') && (
             <Chip
               className={classes.criteriaChip}
               label={
@@ -264,7 +265,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               label={<Typography noWrap>{displaySelectedDocType(_currentCriteria?.docType)}</Typography>}
             />
           ),
-          _currentCriteria?.occurrence !== 0 && (
+          +_currentCriteria?.occurrence !== 1 && (
             <Chip
               className={classes.criteriaChip}
               label={
@@ -328,19 +329,20 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               }
             />
           ),
-          _currentCriteria.years &&
-            _currentCriteria.years[0] !== _currentCriteria.years[1] &&
-            (_currentCriteria.years[0] !== 0 || _currentCriteria.years[1] !== 130) && (
-              <Chip
-                className={classes.criteriaChip}
-                label={
-                  <Typography noWrap>
-                    {`Entre ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit}
+          (ageUnit !== 'an(s)' ||
+            (_currentCriteria.years &&
+              _currentCriteria.years[0] !== _currentCriteria.years[1] &&
+              (_currentCriteria.years[0] !== 0 || _currentCriteria.years[1] !== 130))) && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography noWrap>
+                  {`Entre ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit}
                     ${_currentCriteria.years[1] === 130 ? ' ou plus' : ''}`}
-                  </Typography>
-                }
-              />
-            ),
+                </Typography>
+              }
+            />
+          ),
           _currentCriteria.duration && _currentCriteria.duration[0] === _currentCriteria.duration[1] && (
             <Chip
               className={classes.criteriaChip}
@@ -352,20 +354,21 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               }
             />
           ),
-          _currentCriteria.duration &&
-            _currentCriteria.duration[0] !== _currentCriteria.duration[1] &&
-            (_currentCriteria.duration[0] !== 0 || _currentCriteria.duration[1] !== 100) && (
-              <Chip
-                className={classes.criteriaChip}
-                label={
-                  <Typography noWrap>
-                    {`Prise en charge : ${_currentCriteria.duration[0]} et ${_currentCriteria.duration[1]}
+          (durationUnit !== 'jour(s)' ||
+            (_currentCriteria.duration &&
+              _currentCriteria.duration[0] !== _currentCriteria.duration[1] &&
+              (_currentCriteria.duration[0] !== 0 || _currentCriteria.duration[1] !== 100))) && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography noWrap>
+                  {`Prise en charge : ${_currentCriteria.duration[0]} et ${_currentCriteria.duration[1]}
                     ${durationUnit}
                     ${_currentCriteria.duration[1] === 100 ? ' ou plus' : ''}`}
-                  </Typography>
-                }
-              />
-            ),
+                </Typography>
+              }
+            />
+          ),
           selectedAdmissionMode && (
             <Chip
               className={classes.criteriaChip}
