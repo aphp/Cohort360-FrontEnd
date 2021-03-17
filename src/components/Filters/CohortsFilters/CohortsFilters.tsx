@@ -138,8 +138,8 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
           <Typography variant="h3">Favoris :</Typography>
           <RadioGroup name="favorite" value={_favorite} onChange={_onChangeFavorite} row={true}>
             <FormControlLabel value="all" control={<Radio />} label="Toutes les cohortes" />
-            <FormControlLabel value="True" control={<Radio />} label="Cohortes favorites" />
-            <FormControlLabel value="False" control={<Radio />} label="Cohortes non favorites" />
+            <FormControlLabel value="True" control={<Radio />} label="Cohortes favories" />
+            <FormControlLabel value="False" control={<Radio />} label="Cohortes non favories" />
           </RadioGroup>
         </Grid>
 

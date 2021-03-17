@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import moment from 'moment'
 
-import { Button, CircularProgress, Grid, IconButton, InputAdornment, InputBase } from '@material-ui/core'
+import { Button, Chip, CircularProgress, Grid, IconButton, InputAdornment, InputBase } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
 
 import ClearIcon from '@material-ui/icons/Clear'
@@ -43,7 +44,6 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
     startDate: null,
     endDate: null
   })
-  console.log(`filters`, filters)
   const researchLines = 20 // Number of desired lines in the document array
 
   useEffect(() => {
@@ -147,6 +147,13 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
     onFetchCohorts(property, _sortDirection)
   }
 
+  const handleDeleteChip = (filterName: string, value?: string) => {
+    // setFilters({
+    //   ...filters,
+    //   filterName: value ? value : null
+    // })
+  }
+
   return (
     <Grid container justify="flex-end" className={classes.documentTable}>
       <div className={classes.tableButtons}>
@@ -177,6 +184,71 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
           Filtrer
         </Button>
       </div>
+      <Grid>
+        {showFilterChip &&
+          filters.status &&
+          filters.status.length > 0 &&
+          filters.status.map((
+            status: any // CHANGER LE TYPE
+          ) => (
+            <Chip
+              className={classes.chips}
+              key={status.code}
+              label={`Statut ${status.label}`}
+              onDelete={() => handleDeleteChip('status')}
+              color="primary"
+              variant="outlined"
+            />
+          ))}
+        {showFilterChip && filters.type && filters.type !== 'all' && (
+          <Chip
+            className={classes.chips}
+            label={filters.type === 'IMPORT_I2B2' ? 'Cohorte I2B2' : 'Cohorte Cohort360'}
+            onDelete={() => handleDeleteChip('type')}
+            color="primary"
+            variant="outlined"
+          />
+        )}
+        {/* {showFilterChip &&
+          selectedDocTypes.length > 0 &&
+          selectedDocTypes.map((docType) => (
+            <Chip
+              className={classes.chips}
+              key={docType.code}
+              label={docType.label}
+              onDelete={() => handleDeleteChip('selectedDocTypes', docType)}
+              color="primary"
+              variant="outlined"
+            />
+          ))} */}
+        {showFilterChip && filters.startDate && (
+          <Chip
+            className={classes.chips}
+            label={`Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}`}
+            onDelete={() => handleDeleteChip('startDate')}
+            color="primary"
+            variant="outlined"
+          />
+        )}
+        {showFilterChip && filters.endDate && (
+          <Chip
+            className={classes.chips}
+            label={`Avant le : ${moment(filters.endDate).format('DD/MM/YYYY')}`}
+            onDelete={() => handleDeleteChip('endDate')}
+            color="primary"
+            variant="outlined"
+          />
+        )}
+        {showFilterChip && filters.favorite && filters.favorite !== 'all' && (
+          <Chip
+            className={classes.chips}
+            label={filters.favorite === 'True' ? 'Cohortes favories' : 'Cohortes non favories'}
+            onDelete={() => handleDeleteChip('favorite')}
+            color="primary"
+            variant="outlined"
+          />
+        )}
+      </Grid>
       {loadingStatus ? (
         <Grid container justify="center">
           <CircularProgress />

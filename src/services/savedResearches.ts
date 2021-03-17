@@ -65,7 +65,6 @@ export const fetchCohorts = async (
     //     .filter(Boolean)
     // }
   } else if (CONTEXT === 'aphp') {
-    console.log(`filters`, filters)
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
     const typeFilter = filters.type && filters.type !== 'all' ? `&type=${filters.type}` : ''
     const statusFilter =
