@@ -10,7 +10,7 @@ const defaultCondition = {
   title: 'Critère de diagnostic',
   code: [],
   diagnosticType: [],
-  occurrence: 0,
+  occurrence: 1,
   occurrenceComparator: '<=',
   startOccurrence: '',
   endOccurrence: '',

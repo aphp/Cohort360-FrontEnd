@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 
+import { Alert } from '@material-ui/lab'
 import { Button, Divider, Grid, IconButton, Switch, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
@@ -22,7 +23,13 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
 
   const classes = useStyles()
 
+  const [error, setError] = useState(false)
+
   const _onSubmit = (data: any) => {
+    if (data?.code?.length === 0 && data?.diagnosticType?.length === 0) {
+      return setError(true)
+    }
+
     onChangeSelectedCriteria({
       ...selectedCriteria,
       title: data.title,
@@ -64,6 +71,9 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
+        {error && (
+          <Alert severity="error">Merci de renseigner au moins un diagnostique CIM10, ou un type de diagnostique</Alert>
+        )}
         <FormBuilder<Cim10DataType>
           defaultValues={selectedCriteria}
           title="Diagnostic"
@@ -143,7 +153,8 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
                   variant: 'outlined',
                   type: 'number',
                   validationRules: {
-                    min: 0
+                    min: 1,
+                    required: 'Merci de renseigner une occurrence suppérieur à 1'
                   }
                 }
               ]
