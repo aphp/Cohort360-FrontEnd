@@ -1,6 +1,6 @@
 import api from './api'
 import { CONTEXT } from '../constants'
-import { IExtension, IGroup, IOrganization, IPatient, IPractitionerRole } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IGroup, IOrganization, IPatient, IPractitionerRole } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { FHIR_API_Response, ScopeTreeRow } from '../types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
@@ -58,65 +58,9 @@ export const getPerimeters = async (practitionerId: string) => {
   }
 }
 
-const getAccessName = (extension?: IExtension[]) => {
-  if (!extension || !extension.find((extension) => extension.url === 'access level')) {
-    return ''
-  }
-
-  const accessExtension = extension.find((extension) => extension.url === 'access level')
-
-  const access = accessExtension?.valueString
-
-  switch (access) {
-    case 'READ_DATA_NOMINATIVE':
-      return 'Nominatif'
-    case 'READ_DATA_PSEUDOANONYMISED':
-      return 'Pseudonymisé'
-    case 'ADMIN_USERS':
-      return 'Nominatif'
-    default:
-      return ''
-  }
-}
-
-export const getScopePerimeters = async (practitionerId: string): Promise<ScopeTreeRow[]> => {
+export const getScopePerimeters = async (): Promise<ScopeTreeRow[]> => {
   if (CONTEXT === 'fakedata') {
     const scopeRows = fakeScopeRows as ScopeTreeRow[]
-
-    return scopeRows
-  }
-  if (CONTEXT === 'aphp') {
-    const perimetersResults = await getPerimeters(practitionerId)
-
-    let scopeRows: ScopeTreeRow[] = perimetersResults
-      ? perimetersResults?.map<ScopeTreeRow>((perimeterResult) => ({
-          ...perimeterResult,
-          id: perimeterResult.id ?? '0',
-          name: perimeterResult.name?.replace(/^Patients passés par: /, '') ?? '',
-          quantity: perimeterResult.quantity ?? 0,
-          access: getAccessName(perimeterResult.extension),
-          subItems: [loadingItem]
-        }))
-      : []
-
-    // Sort by name
-    scopeRows = scopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
-      if (a.quantity > b.quantity) {
-        return 1
-      } else if (a.quantity < b.quantity) {
-        return -1
-      }
-      return 0
-    })
-    scopeRows = scopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
-      if (b.quantity === 0) return -1
-      if (a.name > b.name) {
-        return 1
-      } else if (a.name < b.name) {
-        return -1
-      }
-      return 0
-    })
 
     return scopeRows
   }
@@ -135,7 +79,8 @@ export const getScopePerimeters = async (practitionerId: string): Promise<ScopeT
       id: result.service.id || '',
       name: result.service.name || '',
       quantity: result.total,
-      subItems: []
+      subItems: [],
+      access: true
     }))
   }
   return []

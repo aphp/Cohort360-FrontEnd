@@ -40,7 +40,7 @@ import displayDigit from 'utils/displayDigit'
 
 type DocumentsProps = {
   groupId?: string
-  deidentifiedBoolean: boolean | null
+  deidentifiedBoolean?: boolean
   sortBy: string
   sortDirection: 'asc' | 'desc'
 }

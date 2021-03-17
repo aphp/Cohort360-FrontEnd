@@ -19,30 +19,32 @@ export type MeState = null | {
 
 const initialState: MeState = null
 
+// Logout action is defined outside of the meSlice because it is being used by all reducers
+export const logout = createAction('LOGOUT')
+
 export const fetchLoggedPractitioner = createAsyncThunk<MeState, void, { state: RootState }>(
   'me/fetchLoggedPractitoner',
-  async () => {
+  async (_, { dispatch }) => {
     const idToken = getIdToken()
     let state: MeState = null
 
     if (idToken) {
-      const { email } = jwt_decode<{ email: string }>(idToken)
+      const { email, name } = jwt_decode<{ email: string; name?: string }>(idToken)
       const practitioner = await fetchPractitioner(email)
       if (practitioner) {
         state = {
           ...practitioner,
-          deidentified: false,
-          isSuperUser: true
+          deidentified: name !== 'admin',
+          isSuperUser: name === 'admin'
         }
+      } else {
+        dispatch(logout())
       }
     }
 
     return state
   }
 )
-
-// Logout action is defined outside of the meSlice because it is being used by all reducers
-export const logout = createAction('LOGOUT')
 
 const meSlice = createSlice({
   name: 'me',

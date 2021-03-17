@@ -51,11 +51,11 @@ const Patient = () => {
   const [ghmTotal, setGhmTotal] = useState(0)
   const [documents, setDocuments] = useState<(IComposition | IDocumentReference)[] | undefined>(undefined)
   const [documentsTotal, setDocumentsTotal] = useState(0)
-  const [deidentifiedBoolean, setDeidentifiedBoolean] = useState(true)
 
-  const { open, cohort } = useAppSelector((state) => ({
+  const { open, cohort, deidentified } = useAppSelector((state) => ({
     open: state.drawer,
-    cohort: state.exploredCohort
+    cohort: state.exploredCohort,
+    deidentified: state.me?.deidentified ?? true
   }))
 
   const location = useLocation()
@@ -79,9 +79,6 @@ const Patient = () => {
         setGhm(patientResp?.ghm)
         setGhmTotal(patientResp?.ghmTotal ?? 0)
         setPatient(patientResp?.patient)
-        setDeidentifiedBoolean(
-          patientResp?.patient?.extension?.find((extension) => extension.url === 'deidentified')?.valueBoolean ?? true
-        )
       })
       .then(() => setLoading(false))
   }, [patientId, groupId])
@@ -120,7 +117,7 @@ const Patient = () => {
         title={title}
         status={status}
         patientsNb={cohort.totalPatients}
-        access={deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
+        access={deidentified ? 'Pseudonymisé' : 'Nominatif'}
       />
       <Grid
         container
@@ -135,7 +132,7 @@ const Patient = () => {
             </IconButton>
           </div>
         )}
-        <PatientHeader patient={patient} deidentified={deidentifiedBoolean} />
+        <PatientHeader patient={patient} deidentified={deidentified} />
         <Grid container item md={11}>
           <Tabs value={selectedTab} onChange={handleChangeTabs} textColor="primary">
             <Tab
@@ -169,14 +166,9 @@ const Patient = () => {
           </Tabs>
         </Grid>
         <Grid className={classes.tabContainer}>
-          {selectedTab === 'apercu' && <PatientPreview patient={patient} deidentified={deidentifiedBoolean} />}
+          {selectedTab === 'apercu' && <PatientPreview patient={patient} deidentified={deidentified} />}
           {selectedTab === 'parcours' && (
-            <PatientTimeline
-              documents={documents}
-              hospits={hospit}
-              consults={consult}
-              deidentified={deidentifiedBoolean}
-            />
+            <PatientTimeline documents={documents} hospits={hospit} consults={consult} deidentified={deidentified} />
           )}
           {selectedTab === 'documents-cliniques' && (
             <PatientDocs
@@ -184,7 +176,7 @@ const Patient = () => {
               patientId={patientId}
               documents={documents}
               total={documentsTotal}
-              deidentifiedBoolean={deidentifiedBoolean}
+              deidentifiedBoolean={deidentified}
               sortBy={'date'}
               sortDirection={'desc'}
             />
@@ -199,7 +191,7 @@ const Patient = () => {
               ccamTotal={consultTotal}
               ghm={ghm}
               ghmTotal={ghmTotal}
-              deidentifiedBoolean={deidentifiedBoolean}
+              deidentifiedBoolean={deidentified}
               sortBy={'date'}
               sortDirection={'desc'}
             />
@@ -211,7 +203,7 @@ const Patient = () => {
           patients={cohort.originalPatients}
           total={cohort.totalPatients ?? 0}
           onClose={() => setSidebarOpened(false)}
-          deidentifiedBoolean={deidentifiedBoolean}
+          deidentifiedBoolean={deidentified}
         />
       </Grid>
     </Grid>

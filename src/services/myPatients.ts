@@ -148,9 +148,7 @@ export const fetchMyPatients = async (): Promise<CohortData | undefined> => {
     const cohortData: CohortData = {
       name: 'Mes Patients'
     }
-    const patients = getApiResponseResources(
-      await api.get<FHIR_API_Response<IPatient>>(`/Patient?_count=700${API_RESOURCE_TAG}`)
-    )
+    const patients = getApiResponseResources(await api.get<FHIR_API_Response<IPatient>>(`/Patient?_count=700`))
 
     if (patients && patients.length > 0) {
       cohortData.totalPatients = patients.length
@@ -160,9 +158,7 @@ export const fetchMyPatients = async (): Promise<CohortData | undefined> => {
 
       const patientsIds = patients.map((p) => p.id ?? '').filter(Boolean)
       const encounters = getApiResponseResources(
-        await api.get<FHIR_API_Response<IEncounter>>(
-          `/Encounter?subject:Patient=${patientsIds.join(',')}&_count=700${API_RESOURCE_TAG}`
-        )
+        await api.get<FHIR_API_Response<IEncounter>>(`/Encounter?subject=${patientsIds.join(',')}`)
       )
       if (encounters) {
         cohortData.encounters = encounters
