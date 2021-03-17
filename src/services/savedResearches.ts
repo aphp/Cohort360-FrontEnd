@@ -97,7 +97,7 @@ export const fetchCohorts = async (
             name: cohort.name,
             status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
             nPatients: cohort.result_size,
-            date: cohort.created_at,
+            date: cohort.dated_measure.fhir_datetime,
             perimeter: '-',
             favorite: cohort.favorite,
             jobStatus: cohort.request_job_status
@@ -142,7 +142,7 @@ export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefi
               name: cohort.name,
               status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
               nPatients: cohort.result_size,
-              date: cohort.created_at,
+              date: cohort.dated_measure.fhir_datetime,
               perimeter: '-',
               favorite: cohort.favorite,
               jobStatus: cohort.request_job_status
@@ -174,7 +174,7 @@ export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined>
   }
   if (CONTEXT === 'aphp') {
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
-      '/explorations/cohorts/?limit=5&ordering=-created_at'
+      '/explorations/cohorts/?limit=5&ordering=-fhir_datetime'
     )
 
     const results = cohortResp?.data?.results
@@ -185,7 +185,7 @@ export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined>
             name: cohort.name,
             status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
             nPatients: cohort.result_size,
-            date: cohort.created_at,
+            date: cohort.dated_measure.fhir_datetime,
             perimeter: '-',
             favorite: cohort.favorite,
             jobStatus: cohort.request_job_status

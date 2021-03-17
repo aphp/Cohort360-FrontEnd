@@ -75,6 +75,7 @@ export type Cohort = {
   fhir_group_id?: string
   name?: string
   result_size?: number
+  dated_measure?: any
   created_at?: string
   modified_at?: string
   favorite?: boolean

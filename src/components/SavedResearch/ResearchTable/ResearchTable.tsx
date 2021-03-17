@@ -136,25 +136,53 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       'Titre'
                     )}
                   </TableCell>
-                  <TableCell className={classes.tableHeadCell} align="center">
-                    Type
+                  <TableCell
+                    className={classes.tableHeadCell}
+                    align="center"
+                    sortDirection={sortBy === 'type' ? sortDirection : false}
+                  >
+                    {sortDirection ? (
+                      <TableSortLabel
+                        active={sortBy === 'type'}
+                        direction={sortBy === 'type' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('type')}
+                      >
+                        Type
+                      </TableSortLabel>
+                    ) : (
+                      'Type'
+                    )}
                   </TableCell>
                   <TableCell className={classes.tableHeadCell} align="center">
                     Statut
                   </TableCell>
-                  <TableCell align="center" className={classes.tableHeadCell}>
-                    Nombre de patients
+                  <TableCell
+                    align="center"
+                    className={classes.tableHeadCell}
+                    sortDirection={sortBy === 'result_size' ? sortDirection : false}
+                  >
+                    {sortDirection ? (
+                      <TableSortLabel
+                        active={sortBy === 'result_size'}
+                        direction={sortBy === 'result_size' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('result_size')}
+                      >
+                        Nombre de patients
+                      </TableSortLabel>
+                    ) : (
+                      'Nombre de patients'
+                    )}
                   </TableCell>
                   <TableCell
                     align="center"
                     className={classes.tableHeadCell}
-                    sortDirection={sortBy === 'date' ? sortDirection : false}
+                    sortDirection={sortBy === 'fhir_datetime' ? sortDirection : false}
                   >
                     {sortDirection ? (
                       <TableSortLabel
-                        active={sortBy === 'date'}
-                        direction={sortBy === 'date' ? sortDirection : 'asc'}
-                        onClick={createSortHandler('date')}
+                        active={sortBy === 'fhir_datetime'}
+                        direction={sortBy === 'fhir_datetime' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('fhir_datetime')}
                       >
                         Date de création
                       </TableSortLabel>
