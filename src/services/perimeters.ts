@@ -108,35 +108,28 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
 
     const originalPatients = await getLastEncounter(getApiResponseResources(patientsResp))
 
+    const ageFacet = patientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-age-month')
+    const deceasedFacet = patientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-deceased')
+    const visitFacet = encountersResp.data.meta?.extension?.filter(
+      (facet: any) => facet.url === 'facet-visit-year-month-gender-facet'
+    )
+    const classFacet = encountersResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-class-simple')
+
     const agePyramidData =
       patientsResp?.data?.resourceType === 'Bundle'
-        ? getAgeRepartitionMapAphp(
-            patientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-age-month')?.[0].extension
-          )
+        ? getAgeRepartitionMapAphp(ageFacet && ageFacet[0] && ageFacet[0].extension)
         : undefined
-
     const genderRepartitionMap =
       patientsResp?.data?.resourceType === 'Bundle'
-        ? getGenderRepartitionMapAphp(
-            patientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-deceased')?.[0].extension
-          )
+        ? getGenderRepartitionMapAphp(deceasedFacet && deceasedFacet[0] && deceasedFacet[0].extension)
         : undefined
-
     const monthlyVisitData =
       encountersResp?.data?.resourceType === 'Bundle'
-        ? getVisitRepartitionMapAphp(
-            encountersResp.data.meta?.extension?.filter(
-              (facet: any) => facet.url === 'facet-visit-year-month-gender-facet'
-            )?.[0].extension
-          )
+        ? getVisitRepartitionMapAphp(visitFacet && visitFacet[0] && visitFacet[0].extension)
         : undefined
-
     const visitTypeRepartitionData =
       encountersResp?.data?.resourceType === 'Bundle'
-        ? getEncounterRepartitionMapAphp(
-            encountersResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-class-simple')?.[0]
-              .extension
-          )
+        ? getEncounterRepartitionMapAphp(classFacet && classFacet[0] && classFacet[0].extension)
         : undefined
 
     return {
