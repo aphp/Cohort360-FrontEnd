@@ -84,11 +84,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && (
-          <Alert severity="error">
-            Merci de renseigner au moins un genre, ou un statut vital, ou une tranche d'age
-          </Alert>
-        )}
+        {error && <Alert severity="error">Merci de renseigner un champs</Alert>}
         <FormBuilder<DemographicDataType>
           defaultValues={defaultValues}
           title={'Démographie patient'}

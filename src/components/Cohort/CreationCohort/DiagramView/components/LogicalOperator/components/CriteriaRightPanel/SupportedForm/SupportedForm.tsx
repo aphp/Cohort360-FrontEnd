@@ -101,11 +101,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && (
-          <Alert severity="error">
-            Merci de renseigner un age au moment de la prise en charge ou une durée de visite
-          </Alert>
-        )}
+        {error && <Alert severity="error">Merci de renseigner un champs</Alert>}
         <FormBuilder<EncounterDataType>
           defaultValues={defaultValues}
           title="Prise en charge"

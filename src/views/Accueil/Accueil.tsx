@@ -33,19 +33,23 @@ const Accueil: React.FC = () => {
   }, [dispatch])
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const pendingCohorts = [...favoriteCohorts, ...lastCohorts].filter(
-        ({ jobStatus }) => jobStatus === 'pending' || jobStatus === 'started'
-      )
+    let interval: any = null
 
-      if (pendingCohorts && pendingCohorts.length > 0) {
+    const pendingCohorts = [...favoriteCohorts, ...lastCohorts].filter(
+      ({ jobStatus }) => jobStatus === 'pending' || jobStatus === 'started'
+    )
+
+    console.log('pendingCohorts :>> ', pendingCohorts)
+
+    if (pendingCohorts && pendingCohorts.length > 0) {
+      interval = setInterval(() => {
         dispatch(initUserCohortsThunk())
-      } else {
-        clearInterval(interval)
-      }
-    }, 5000)
+      }, 5000)
+    } else {
+      clearInterval(interval)
+    }
     return () => clearInterval(interval)
-  }, []) //eslint-disable-line
+  }, [favoriteCohorts, lastCohorts]) //eslint-disable-line
 
   return practitioner ? (
     <Grid

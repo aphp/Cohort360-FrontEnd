@@ -18,7 +18,7 @@ export const fetchCcamData = async (searchValue?: string) => {
     if (!searchValue) {
       return []
     }
-    const _searchValue = searchValue ? `&_text=${searchValue}` : ''
+    const _searchValue = searchValue ? `&_text=${searchValue}*` : ''
 
     const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-ccam${_searchValue}`)
 

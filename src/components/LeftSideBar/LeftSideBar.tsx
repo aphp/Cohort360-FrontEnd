@@ -179,7 +179,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                   [classes.hide]: !open
                 })}
               >
-                <Typography variant="h5">Nouvelle Cohorte</Typography>
+                <Typography variant="h5">Nouvelle requête</Typography>
               </Button>
             </ListItem>
             <Link href="/accueil" underline="none">

@@ -65,7 +65,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
         {error && <Alert severity="error">Merci de renseigner un code GHM</Alert>}
         <FormBuilder<GhmDataType>
           defaultValues={selectedCriteria}
-          title="Diagnostic"
+          title="GHM"
           properties={[
             {
               name: 'title',

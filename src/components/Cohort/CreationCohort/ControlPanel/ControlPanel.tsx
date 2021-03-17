@@ -27,7 +27,7 @@ const ControlPanel: React.FC<{
   const { loading = false, countLoading = false, count = {}, selectedPopulation = [] } = useAppSelector(
     (state) => state.cohortCreation.request || {}
   )
-  const { includePatient, /*byrequest,*/ alive, deceased, female, male, unknownPatient } = count
+  const { includePatient /*byrequest, alive, deceased, female, male, unknownPatient */ } = count
 
   const accessIsPseudonymize =
     selectedPopulation === null
@@ -62,7 +62,7 @@ const ControlPanel: React.FC<{
                   <CircularProgress style={{ marginLeft: '15px' }} size={30} />
                 </>
               ) : (
-                'Exécuter la requête'
+                'Créer la cohorte'
               )}
             </Button>
           </Grid>
@@ -111,7 +111,11 @@ const ControlPanel: React.FC<{
           <Grid container justify="space-between">
             <Typography className={clsx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS</Typography>
             {countLoading ? (
-              <CircularProgress size={12} className={clsx(classes.blueText, classes.sidesMargin)} />
+              <CircularProgress
+                size={12}
+                style={{ marginTop: 14 }}
+                className={clsx(classes.blueText, classes.sidesMargin)}
+              />
             ) : (
               <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
                 {includePatient ?? '-'}
@@ -119,7 +123,7 @@ const ControlPanel: React.FC<{
             )}
           </Grid>
 
-          <Grid container justify="space-between">
+          {/* <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Patients vivants</Typography>
             {countLoading ? (
               <CircularProgress size={12} className={clsx(classes.blueText, classes.sidesMargin)} />
@@ -158,7 +162,7 @@ const ControlPanel: React.FC<{
                 <Typography className={clsx(classes.blueText, classes.sidesMargin)}>{unknownPatient ?? '-'}</Typography>
               )}
             </Grid>
-          </Grid>
+          </Grid> */}
         </Grid>
       </Grid>
 
