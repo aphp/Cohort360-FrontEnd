@@ -173,6 +173,7 @@ export type ScopeTreeRow = {
   id: string
   name: string
   quantity: number
+  access?: boolean
   parentId?: string
   subItems?: ScopeTreeRow[] | undefined
   managingEntity?: any | undefined

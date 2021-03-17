@@ -4,7 +4,7 @@ import { getLastEncounter } from './myPatients'
 import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortPatient, FHIR_API_Response, SearchByTypes } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
-import { getServices } from './perimeters'
+import { getOrganizations } from './perimeters'
 
 import fakePatients from '../data/fakeData/patients'
 
@@ -36,7 +36,7 @@ export const searchPatient = async (
     let searchByIdentifier = ''
     let filterByService = ''
     if (groupId) {
-      const services = (await getServices(groupId)).filter((service) => undefined !== service.id)
+      const services = (await getOrganizations(groupId)).filter((service) => undefined !== service.id)
       const serviceIds = services.map((service) => service.id)
       filterByService = `&_has:Encounter:subject:service-provider=${serviceIds.join(',')}`
     }
