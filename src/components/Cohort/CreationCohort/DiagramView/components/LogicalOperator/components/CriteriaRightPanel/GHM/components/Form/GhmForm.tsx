@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 
+import { Alert } from '@material-ui/lab'
 import { Button, Divider, Grid, IconButton, Switch, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
@@ -22,7 +23,13 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
 
   const classes = useStyles()
 
+  const [error, setError] = useState(false)
+
   const _onSubmit = (data: any) => {
+    if (data?.code?.length === 0) {
+      return setError(true)
+    }
+
     onChangeSelectedCriteria({
       ...selectedCriteria,
       title: data.title,
@@ -55,6 +62,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
+        {error && <Alert severity="error">Merci de renseigner un code GHM</Alert>}
         <FormBuilder<GhmDataType>
           defaultValues={selectedCriteria}
           title="Diagnostic"
@@ -126,7 +134,8 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
                   variant: 'outlined',
                   type: 'number',
                   validationRules: {
-                    min: 0
+                    min: 1,
+                    required: 'Merci de renseigner une occurrence suppérieur à 1'
                   }
                 }
               ]
