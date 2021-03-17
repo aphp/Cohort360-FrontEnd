@@ -107,46 +107,56 @@ const ControlPanel: React.FC<{
               {accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
             </Typography>
           </Grid>
+
           <Grid container justify="space-between">
             <Typography className={clsx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS</Typography>
-            <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
-              {countLoading ? <CircularProgress size={30} /> : includePatient ?? '-'}
-            </Typography>
+            {countLoading ? (
+              <CircularProgress size={12} className={clsx(classes.blueText, classes.sidesMargin)} />
+            ) : (
+              <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
+                {includePatient ?? '-'}
+              </Typography>
+            )}
           </Grid>
-          {/* <Grid container justify="space-between">
-            <Typography className={classes.sidesMargin}>Par requête</Typography>
-            <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {countLoading ? <CircularProgress size={30} /> : byrequest ?? '-'}
-            </Typography>
-          </Grid> */}
+
           <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Patients vivants</Typography>
-            <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {countLoading ? <CircularProgress size={30} /> : alive ?? '-'}
-            </Typography>
+            {countLoading ? (
+              <CircularProgress size={12} className={clsx(classes.blueText, classes.sidesMargin)} />
+            ) : (
+              <Typography className={clsx(classes.blueText, classes.sidesMargin)}>{alive ?? '-'}</Typography>
+            )}
           </Grid>
           <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Patients décédés</Typography>
-            <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {countLoading ? <CircularProgress size={30} /> : deceased ?? '-'}
-            </Typography>
+            {countLoading ? (
+              <CircularProgress size={12} className={clsx(classes.blueText, classes.sidesMargin)} />
+            ) : (
+              <Typography className={clsx(classes.blueText, classes.sidesMargin)}>{deceased ?? '-'}</Typography>
+            )}
           </Grid>
           <Grid container justify="space-between">
             <Typography className={clsx(classes.sidesMargin)}>Nombre de femmes</Typography>
-            <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {countLoading ? <CircularProgress size={30} /> : female ?? '-'}
-            </Typography>
+            {countLoading ? (
+              <CircularProgress size={12} className={clsx(classes.blueText, classes.sidesMargin)} />
+            ) : (
+              <Typography className={clsx(classes.blueText, classes.sidesMargin)}>{female ?? '-'}</Typography>
+            )}
           </Grid>
           <Grid container justify="space-between">
             <Typography className={classes.sidesMargin}>Nombre d'hommes</Typography>
-            <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-              {countLoading ? <CircularProgress size={30} /> : male ?? '-'}
-            </Typography>
+            {countLoading ? (
+              <CircularProgress size={12} className={clsx(classes.blueText, classes.sidesMargin)} />
+            ) : (
+              <Typography className={clsx(classes.blueText, classes.sidesMargin)}>{male ?? '-'}</Typography>
+            )}
             <Grid container justify="space-between">
               <Typography className={classes.sidesMargin}>Nombre d'inconnu</Typography>
-              <Typography className={clsx(classes.blueText, classes.sidesMargin)}>
-                {countLoading ? <CircularProgress size={30} /> : unknownPatient ?? '-'}
-              </Typography>
+              {countLoading ? (
+                <CircularProgress size={12} className={clsx(classes.blueText, classes.sidesMargin)} />
+              ) : (
+                <Typography className={clsx(classes.blueText, classes.sidesMargin)}>{unknownPatient ?? '-'}</Typography>
+              )}
             </Grid>
           </Grid>
         </Grid>

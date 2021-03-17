@@ -99,7 +99,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
           {subItems &&
             subItems.map((cimHierarchySubItem: any, index: number) =>
               cimHierarchySubItem === 'loading' ? (
-                <></>
+                <Fragment key={index}></Fragment>
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
@@ -132,7 +132,7 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
   const classes = useStyles()
   const [cimHierarchy, onSetCimHieerarchy] = useState([])
   const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
-    isEdition ? selectedCriteria.code : null
+    isEdition ? selectedCriteria.code : []
   )
 
   // Init

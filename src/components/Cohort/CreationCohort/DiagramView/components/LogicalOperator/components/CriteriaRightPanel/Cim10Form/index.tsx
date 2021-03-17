@@ -11,7 +11,7 @@ const defaultCondition = {
   code: [],
   diagnosticType: [],
   occurrence: 0,
-  occurrenceComparator: { id: 'e', label: '=' },
+  occurrenceComparator: '<=',
   startOccurrence: '',
   endOccurrence: '',
   type: 'Condition',
