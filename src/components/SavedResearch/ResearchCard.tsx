@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
 
-import { CircularProgress, Grid, IconButton, InputAdornment, InputBase } from '@material-ui/core'
+import { Button, CircularProgress, Grid, IconButton, InputAdornment, InputBase } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
 
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from '../../assets/icones/search.svg'
+import { ReactComponent as FilterList } from '../../assets/icones/filter.svg'
 
 import ResearchTable from './ResearchTable/ResearchTable'
+import CohortsFilter from '../Filters/CohortsFilters/CohortsFilters'
 import { fetchCohorts } from '../../services/savedResearches'
 
 import useStyles from './styles'
@@ -30,19 +32,30 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
   const [searchInput, setSearchInput] = useState('')
   const [sortBy, setSortBy] = useState('date')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
-
+  const [open, setOpen] = useState(false)
+  const [showFilterChip, setShowFilterChip] = useState(false)
+  const [filters, setFilters] = useState({
+    status: [],
+    type: 'all',
+    favorite: 'all',
+    minPatients: null,
+    maxPatients: null,
+    startDate: null,
+    endDate: null
+  })
+  console.log(`filters`, filters)
   const researchLines = 20 // Number of desired lines in the document array
 
   useEffect(() => {
     onFetchCohorts(sortBy, sortDirection)
-  }, []) // eslint-disable-line
+  }, [filters]) // eslint-disable-line
 
   const onFetchCohorts = (sortBy = 'given', sortDirection = 'asc', input = searchInput) => {
     setLoadingStatus(true)
     setPage(1)
     setSortBy(sortBy)
     setSortDirection(sortDirection as 'asc' | 'desc')
-    fetchCohorts(sortBy, sortDirection, input)
+    fetchCohorts(sortBy, sortDirection, filters, input)
       .then((cohortsResp) => {
         if (filteredIds) {
           setResearches(
@@ -65,7 +78,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
 
   const onSetCohortFavorite = async (cohortId: string) => {
     dispatch(setFavoriteCohortThunk({ cohortId })).then(() =>
-      fetchCohorts(sortBy, sortDirection).then((cohortsResp) => {
+      fetchCohorts(sortBy, sortDirection, filters).then((cohortsResp) => {
         setResearches(cohortsResp?.results ?? undefined)
         setTotal(cohortsResp?.count ?? 0)
       })
@@ -75,7 +88,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value = 1) => {
     setPage(value)
     setLoadingStatus(true)
-    fetchCohorts(sortBy, sortDirection, searchInput, value || 1)
+    fetchCohorts(sortBy, sortDirection, filters, searchInput, value || 1)
       .then((cohortsResp) => {
         setResearches(cohortsResp?.results ?? undefined)
         setTotal(cohortsResp?.count ?? 0)
@@ -84,6 +97,11 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
       .then(() => {
         setLoadingStatus(false)
       })
+  }
+
+  const handleCloseDialog = (submit: boolean) => () => {
+    setOpen(false)
+    submit && setShowFilterChip(true)
   }
 
   const handleChangeInput = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -97,7 +115,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
   const handleClearInput = () => {
     setSearchInput('')
     setLoadingStatus(true)
-    fetchCohorts(sortBy, sortDirection)
+    fetchCohorts(sortBy, sortDirection, filters)
       .then((cohortsResp) => {
         if (filteredIds) {
           setResearches(
@@ -149,6 +167,15 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
             <SearchIcon fill="#ED6D91" height="15px" />
           </IconButton>
         </Grid>
+        <Button
+          variant="contained"
+          disableElevation
+          onClick={() => setOpen(true)}
+          startIcon={<FilterList height="15px" fill="#FFF" />}
+          className={classes.searchButton}
+        >
+          Filtrer
+        </Button>
       </div>
       {loadingStatus ? (
         <Grid container justify="center">
@@ -172,6 +199,13 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
         shape="rounded"
         onChange={handleChangePage}
         page={page}
+      />
+      <CohortsFilter
+        open={open}
+        onClose={handleCloseDialog(false)}
+        onSubmit={handleCloseDialog(true)}
+        filters={filters}
+        onChangeFilters={setFilters}
       />
     </Grid>
   )

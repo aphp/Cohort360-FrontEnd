@@ -12,6 +12,7 @@ import {
 export const fetchCohorts = async (
   sortBy: string,
   sortDirection: string,
+  filters?: any, // A CHANGER
   searchInput?: string,
   page?: number
 ): Promise<Back_API_Response<FormattedCohort> | undefined> => {
@@ -64,7 +65,16 @@ export const fetchCohorts = async (
     //     .filter(Boolean)
     // }
   } else if (CONTEXT === 'aphp') {
+    console.log(`filters`, filters)
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
+    const typeFilter = filters.type && filters.type !== 'all' ? `&type=${filters.type}` : ''
+    const statusFilter =
+      filters.status && filters.status.length > 0
+        ? `&request_job_status=${filters.status.map((status: any) => status.code).join()}` // CHANGER LE TYPE
+        : ''
+    const startDateFilter = filters.startDate ? `&min_fhir_datetime=${filters.startDate}` : ''
+    const endDateFilter = filters.endDate ? `&max_fhir_datetime=${filters.endDate}` : ''
+    const favoriteFilter = filters.favorite && filters.favorite !== 'all' ? `&favorite=${filters.favorite}` : ''
     let searchByText = ''
     let offset = ''
 
@@ -77,7 +87,7 @@ export const fetchCohorts = async (
     }
 
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
-      `/explorations/cohorts/?ordering=${_sortDirection}${sortBy}${searchByText}&limit=20${offset}`
+      `/explorations/cohorts/?ordering=${_sortDirection}${sortBy}${typeFilter}${statusFilter}${startDateFilter}${endDateFilter}${favoriteFilter}${searchByText}&limit=20${offset}`
     )
 
     const results = cohortResp?.data?.results
