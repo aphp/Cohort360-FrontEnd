@@ -7,11 +7,11 @@ import Cim10Hierarchy from './components/Hierarchy/Cim10Hierarchy'
 import useStyles from './styles'
 
 const defaultCondition = {
-  title: 'Critère de diagnostic',
+  title: 'Critère de diagnostique',
   code: [],
   diagnosticType: [],
-  encounter: 0,
-  comparator: { id: 'e', label: '=' },
+  occurrence: 1,
+  occurrenceComparator: '<=',
   startOccurrence: '',
   endOccurrence: '',
   type: 'Condition',

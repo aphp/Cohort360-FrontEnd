@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 
+import { Alert } from '@material-ui/lab'
 import { Button, Divider, Grid, IconButton, Switch, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
@@ -22,11 +23,19 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
 
   const classes = useStyles()
 
+  const [error, setError] = useState(false)
+
   const _onSubmit = (data: any) => {
+    if (data?.code?.length === 0) {
+      return setError(true)
+    }
+
     onChangeSelectedCriteria({
       ...selectedCriteria,
       title: data.title,
       code: data.code,
+      occurrence: +data.occurrence,
+      occurrenceComparator: data.occurrenceComparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Claim',
@@ -53,9 +62,10 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
+        {error && <Alert severity="error">Merci de renseigner un code GHM</Alert>}
         <FormBuilder<GhmDataType>
           defaultValues={selectedCriteria}
-          title="Diagnostic"
+          title="GHM"
           properties={[
             {
               name: 'title',
@@ -91,61 +101,64 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
               autocompleteOptions: criteria?.data?.ghmData || [],
               getAutocompleteOptions: getGhmOptions,
               noOptionsText: 'Veuillez entrer un code ou un critère GHM'
+            },
+            {
+              type: 'custom',
+              name: 'label',
+              renderInput: () => (
+                <FormLabel style={{ padding: '0 1em' }} component="legend">
+                  Nombre d'occurrence :
+                </FormLabel>
+              )
+            },
+            {
+              type: 'section',
+              title: '',
+              name: '',
+              containerStyle: { display: 'grid', gridTemplateColumns: '100px 1fr' },
+              properties: [
+                {
+                  name: 'occurrenceComparator',
+                  variant: 'outlined',
+                  type: 'select',
+                  selectOptions: [
+                    { id: '<=', label: '<=' },
+                    { id: '<', label: '<' },
+                    { id: '=', label: '=' },
+                    { id: '>', label: '>' },
+                    { id: '>=', label: '>=' }
+                  ]
+                },
+                {
+                  name: 'occurrence',
+                  variant: 'outlined',
+                  type: 'number',
+                  validationRules: {
+                    min: 1,
+                    required: 'Merci de renseigner une occurrence suppérieur à 1'
+                  }
+                }
+              ]
+            },
+            {
+              type: 'custom',
+              name: 'label',
+              renderInput: () => (
+                <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+                  Date d'occurrence :
+                </FormLabel>
+              )
+            },
+            {
+              name: 'startOccurrence',
+              label: 'Avant le',
+              type: 'date'
+            },
+            {
+              name: 'endOccurrence',
+              label: 'Après le',
+              type: 'date'
             }
-            // {
-            //   type: 'custom',
-            //   name: 'label',
-            //   renderInput: () => (
-            //     <FormLabel style={{ padding: '0 1em' }} component="legend">
-            //       Nombre d'occurence :
-            //     </FormLabel>
-            //   )
-            // },
-            // {
-            //   type: 'section',
-            //   title: '',
-            //   name: '',
-            //   containerStyle: { display: 'grid', gridTemplateColumns: '100px 1fr' },
-            //   properties: [
-            //     {
-            //       name: 'comparator',
-            //       variant: 'outlined',
-            //       type: 'select',
-            //       selectOptions: [
-            //         { id: 'le', label: '<=' },
-            //         { id: 'e', label: '=' },
-            //         { id: 'ge', label: '>=' }
-            //       ]
-            //     },
-            //     {
-            //       name: 'encounter',
-            //       variant: 'outlined',
-            //       type: 'number',
-            //       validationRules: {
-            //         min: 0
-            //       }
-            //     }
-            //   ]
-            // }
-            // {
-            //   type: 'custom',
-            //   name: 'label',
-            //   renderInput: () => (
-            //     <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
-            //       Date d'occurrence :
-            //     </FormLabel>
-            //   )
-            // },
-            // {
-            //   name: 'startOccurrence',
-            //   label: 'Avant le',
-            //   type: 'date'
-            // },
-            // {
-            //   name: 'endOccurrence',
-            //   label: 'Après le',
-            //   type: 'date'
-            // }
           ]}
           submit={_onSubmit}
           formId="ghm-form"

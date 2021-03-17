@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 
+import { Alert } from '@material-ui/lab'
 import { Button, Divider, FormLabel, Grid, IconButton, Typography, Switch } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
@@ -31,9 +32,25 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
 
   const classes = useStyles()
 
+  const [error, setError] = useState(false)
+
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = (data: any) => {
+    if (
+      data &&
+      data.vitalStatus &&
+      data.vitalStatus.length === 0 &&
+      data.gender &&
+      data.gender.length === 0 &&
+      data.years &&
+      +data.years[0] === 0 &&
+      +data.years[1] === 130
+    ) {
+      // If no input has been set
+      return setError(true)
+    }
+
     onChangeSelectedCriteria({
       ...defaultValues,
       title: data.title,
@@ -67,6 +84,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
+        {error && <Alert severity="error">Merci de renseigner un champs</Alert>}
         <FormBuilder<DemographicDataType>
           defaultValues={defaultValues}
           title={'Démographie patient'}
@@ -107,7 +125,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             {
               name: 'vitalStatus',
               variant: 'outlined',
-              label: 'Status vital',
+              label: 'Statut vital',
               type: 'autocomplete',
               multiple: true,
               autocompleteOptions: criteria?.data?.status || []

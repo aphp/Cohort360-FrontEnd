@@ -99,7 +99,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
           {subItems &&
             subItems.map((ghmHierarchySubItem: any, index: number) =>
               ghmHierarchySubItem === 'loading' ? (
-                <></>
+                <Fragment key={index} />
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
@@ -132,7 +132,7 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
   const classes = useStyles()
   const [ghmHierarchy, onSetGhmHierarchy] = useState([])
   const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
-    isEdition ? selectedCriteria.code : null
+    isEdition ? selectedCriteria.code : []
   )
 
   // Init
@@ -162,15 +162,16 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
       </Grid>
 
       <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-        {ghmHierarchy.map((ghmItem, index) => (
-          <GhmListItem
-            selectedItem={selectedHierarchy}
-            key={index}
-            ghmItem={ghmItem}
-            handleClick={onSetSelectedHierarchy}
-            fetchHierarchy={criteria?.fetch?.fetchGhmHierarchy}
-          />
-        ))}
+        {ghmHierarchy &&
+          ghmHierarchy.map((ghmItem, index) => (
+            <GhmListItem
+              selectedItem={selectedHierarchy}
+              key={index}
+              ghmItem={ghmItem}
+              handleClick={onSetSelectedHierarchy}
+              fetchHierarchy={criteria?.fetch?.fetchGhmHierarchy}
+            />
+          ))}
       </List>
 
       <Grid className={classes.ghmHierarchyActionContainer}>

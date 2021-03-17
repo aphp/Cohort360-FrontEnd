@@ -9,8 +9,8 @@ import CcamHierarchy from './components/Hierarchy/CCAMHierarchy'
 const defaultProcedure = {
   title: "Critères d'actes CCAM",
   code: [],
-  encounter: 0,
-  comparator: { id: 'e', label: '=' },
+  occurrence: 1,
+  occurrenceComparator: '<=',
   startOccurrence: '',
   endOccurrence: '',
   isInclusive: true

@@ -56,7 +56,7 @@ const initialState: CohortCreationState = {
   ],
   temporalConstraints: [
     {
-      idList: 'all',
+      idList: ['All'],
       constraintType: 'none'
     }
   ],
@@ -143,7 +143,7 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
           const date = newSnapshot.created_at
 
           const _snapshotsHistory =
-            index === snapshotsHistory.length - 1 ? snapshotsHistory : snapshotsHistory.splice(0, index + 1)
+            index === snapshotsHistory.length - 1 ? snapshotsHistory : [...snapshotsHistory].splice(0, index + 1)
 
           currentSnapshot = uuid
           snapshotsHistory = [..._snapshotsHistory, { uuid, json, date }]
@@ -192,8 +192,11 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
         ? selectedPopulation
         : state.cohortCreation.request.selectedPopulation
       const _selectedCriteria = state.cohortCreation.request.selectedCriteria
-      const _criteriaGroup = state.cohortCreation.request.criteriaGroup
-      const _temporalConstraints = state.cohortCreation.request.temporalConstraints
+      const _criteriaGroup: CriteriaGroupType[] =
+        state.cohortCreation.request.criteriaGroup && state.cohortCreation.request.criteriaGroup.length > 0
+          ? state.cohortCreation.request.criteriaGroup
+          : initialState.criteriaGroup
+      const _temporalConstraints = state.cohortCreation.request.temporalConstraints ?? initialState.temporalConstraints
 
       const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
 
@@ -201,7 +204,8 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
 
       return {
         json,
-        selectedPopulation: _selectedPopulation
+        selectedPopulation: _selectedPopulation,
+        criteriaGroup: _criteriaGroup
       }
     } catch (error) {
       console.error(error)
@@ -288,8 +292,10 @@ const cohortCreationSlice = createSlice({
       if (index !== -1) state.criteriaGroup[index] = action.payload
     },
     updateTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
-      console.log('state.temporalConstraints', state.temporalConstraints)
-      const foundItem = state.temporalConstraints.find(({ idList }) => idList === action.payload.idList)
+      const foundItem = state.temporalConstraints.find(({ idList }) => {
+        const equals = (a: any[], b: any[]) => a.length === b.length && a.every((v, i) => v === b[i])
+        return equals(idList, action.payload.idList)
+      })
       const index = foundItem ? state.temporalConstraints.indexOf(foundItem) : -1
       if (index !== -1) state.temporalConstraints[index] = action.payload
     }

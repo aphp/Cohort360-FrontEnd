@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 
+import { Alert } from '@material-ui/lab'
 import { Button, Divider, FormLabel, Grid, IconButton, Switch, Typography } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
@@ -38,9 +39,22 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
 
   const classes = useStyles()
 
+  const [error, setError] = useState(false)
+
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = (data: any) => {
+    if (
+      data.ageType?.id === 'year' &&
+      data.years[0] === 0 &&
+      data.years[1] === 130 &&
+      data.durationType?.id === 'day' &&
+      data.duration[0] === 0 &&
+      data.duration[1] === 100
+    ) {
+      return setError(true)
+    }
+
     onChangeSelectedCriteria({
       ...defaultValues,
       title: data.title,
@@ -87,6 +101,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
+        {error && <Alert severity="error">Merci de renseigner un champs</Alert>}
         <FormBuilder<EncounterDataType>
           defaultValues={defaultValues}
           title="Prise en charge"
@@ -185,7 +200,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
                   ]
                 }
               ]
-            },
+            }
             // {
             //   name: 'admissionMode',
             //   variant: 'outlined',
@@ -193,41 +208,41 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
             //   type: 'autocomplete',
             //   autocompleteOptions: criteria?.data?.admissionModes
             // },
-            {
-              name: 'entryMode',
-              variant: 'outlined',
-              label: "Mode d'entrée",
-              type: 'autocomplete',
-              autocompleteOptions: criteria?.data?.entryModes
-            },
-            {
-              name: 'exitMode',
-              variant: 'outlined',
-              label: 'Mode de sortie',
-              type: 'autocomplete',
-              autocompleteOptions: criteria?.data?.exitModes
-            },
-            {
-              name: 'priseEnChargeType',
-              variant: 'outlined',
-              label: 'Type de prise en charge',
-              type: 'autocomplete',
-              autocompleteOptions: criteria?.data?.priseEnChargeType
-            },
-            {
-              name: 'typeDeSejour',
-              variant: 'outlined',
-              label: 'Type de séjour',
-              type: 'autocomplete',
-              autocompleteOptions: criteria?.data?.typeDeSejour
-            },
-            {
-              name: 'fileStatus',
-              variant: 'outlined',
-              label: 'Statut Dossier',
-              type: 'autocomplete',
-              autocompleteOptions: criteria?.data?.fileStatus
-            }
+            // {
+            //   name: 'entryMode',
+            //   variant: 'outlined',
+            //   label: "Mode d'entrée",
+            //   type: 'autocomplete',
+            //   autocompleteOptions: criteria?.data?.entryModes
+            // },
+            // {
+            //   name: 'exitMode',
+            //   variant: 'outlined',
+            //   label: 'Mode de sortie',
+            //   type: 'autocomplete',
+            //   autocompleteOptions: criteria?.data?.exitModes
+            // },
+            // {
+            //   name: 'priseEnChargeType',
+            //   variant: 'outlined',
+            //   label: 'Type de prise en charge',
+            //   type: 'autocomplete',
+            //   autocompleteOptions: criteria?.data?.priseEnChargeType
+            // },
+            // {
+            //   name: 'typeDeSejour',
+            //   variant: 'outlined',
+            //   label: 'Type de séjour',
+            //   type: 'autocomplete',
+            //   autocompleteOptions: criteria?.data?.typeDeSejour
+            // },
+            // {
+            //   name: 'fileStatus',
+            //   variant: 'outlined',
+            //   label: 'Statut Dossier',
+            //   type: 'autocomplete',
+            //   autocompleteOptions: criteria?.data?.fileStatus
+            // }
           ]}
           submit={_onSubmit}
           formId="supported-form"

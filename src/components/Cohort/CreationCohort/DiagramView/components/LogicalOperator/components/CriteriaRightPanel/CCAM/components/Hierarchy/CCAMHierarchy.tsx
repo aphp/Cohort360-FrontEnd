@@ -99,7 +99,7 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
           {subItems &&
             subItems.map((ccamHierarchySubItem: any, index: number) =>
               ccamHierarchySubItem === 'loading' ? (
-                <></>
+                <Fragment key={index} />
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
@@ -132,7 +132,7 @@ const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
   const classes = useStyles()
   const [ccamHierarchy, onSetCcamHierarchy] = useState([])
   const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
-    isEdition ? selectedCriteria.code : null
+    isEdition ? selectedCriteria.code : []
   )
 
   // Init
@@ -162,15 +162,16 @@ const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
       </Grid>
 
       <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-        {ccamHierarchy.map((ccamItem, index) => (
-          <CcamListItem
-            key={index}
-            ccamItem={ccamItem}
-            handleClick={onSetSelectedHierarchy}
-            selectedItem={selectedHierarchy}
-            fetchHierarchy={criteria?.fetch?.fetchCcamHierarchy}
-          />
-        ))}
+        {ccamHierarchy &&
+          ccamHierarchy.map((ccamItem, index) => (
+            <CcamListItem
+              key={index}
+              ccamItem={ccamItem}
+              handleClick={onSetSelectedHierarchy}
+              selectedItem={selectedHierarchy}
+              fetchHierarchy={criteria?.fetch?.fetchCcamHierarchy}
+            />
+          ))}
       </List>
 
       <Grid className={classes.ccamHierarchyActionContainer}>

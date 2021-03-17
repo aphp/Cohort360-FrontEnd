@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 
+import { Alert } from '@material-ui/lab'
 import { Button, Divider, Grid, IconButton, Switch, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
@@ -16,37 +17,47 @@ type TestGeneratedFormProps = {
   onChangeSelectedCriteria: (data: any) => void
 }
 
-const defaultDemographic = {
+const defaultComposition = {
   title: 'Critère de document',
   search: '',
   docType: [],
-  encounter: 0,
+  occurrence: 1,
+  occurrenceComparator: '<=',
   startOccurrence: '',
   endOccurrence: '',
   isInclusive: true
 }
 
-const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
+const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const defaultValues = selectedCriteria || defaultDemographic
+  const defaultValues = selectedCriteria || defaultComposition
 
   const classes = useStyles()
+
+  const [error, setError] = useState(false)
 
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = (data: any) => {
+    if (data && data.search?.length === 0 && data.docType?.length === 0) {
+      return setError(true)
+    }
+
     onChangeSelectedCriteria({
       ...defaultValues,
       title: data.title,
       search: data.search,
       docType: data.docType,
-      // encounter: data.encounter,
+      occurrence: +data.occurrence,
+      occurrenceComparator: data.occurrenceComparator,
       startOccurrence: data.startOccurrence,
       endOccurrence: data.endOccurrence,
       type: 'Composition',
       isInclusive: data.isInclusive
     })
   }
+
+  console.log('defaultValues ::>>', defaultValues)
 
   return (
     <Grid className={classes.root}>
@@ -65,6 +76,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
+        {error && <Alert severity="error">Merci de renseigner au moins une recherche, ou un type de document</Alert>}
         <FormBuilder<DocumentDataType>
           defaultValues={defaultValues}
           title={'Documents médicaux'}
@@ -99,9 +111,6 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               placeholder: 'Recherche dans les documents',
               type: 'text',
               variant: 'outlined'
-              //   validationRules: {
-              //     required: 'Merci de renseigner une recherche'
-              //   }
             },
             {
               name: 'docType',
@@ -110,32 +119,64 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               type: 'autocomplete',
               multiple: true,
               autocompleteOptions: criteria?.data?.docTypes || []
+            },
+            {
+              type: 'custom',
+              name: 'label',
+              renderInput: () => (
+                <FormLabel style={{ padding: '0 1em' }} component="legend">
+                  Nombre d'occurrence :
+                </FormLabel>
+              )
+            },
+            {
+              type: 'section',
+              title: '',
+              name: '',
+              containerStyle: { display: 'grid', gridTemplateColumns: '100px 1fr' },
+              properties: [
+                {
+                  name: 'occurrenceComparator',
+                  variant: 'outlined',
+                  type: 'select',
+                  selectOptions: [
+                    { id: '<=', label: '<=' },
+                    { id: '<', label: '<' },
+                    { id: '=', label: '=' },
+                    { id: '>', label: '>' },
+                    { id: '>=', label: '>=' }
+                  ]
+                },
+                {
+                  name: 'occurrence',
+                  variant: 'outlined',
+                  type: 'number',
+                  validationRules: {
+                    min: 1,
+                    required: 'Merci de renseigner une occurrence suppérieure ou égale à 1'
+                  }
+                }
+              ]
+            },
+            {
+              type: 'custom',
+              name: 'label',
+              renderInput: () => (
+                <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
+                  Date d'occurrence :
+                </FormLabel>
+              )
+            },
+            {
+              name: 'startOccurrence',
+              label: 'Avant le',
+              type: 'date'
+            },
+            {
+              name: 'endOccurrence',
+              label: 'Après le',
+              type: 'date'
             }
-            // {
-            //   name: 'encounter',
-            //   label: "Nombre d'occurence",
-            //   variant: 'outlined',
-            //   type: 'number'
-            // }
-            // {
-            //   type: 'custom',
-            //   name: 'label',
-            //   renderInput: () => (
-            //     <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
-            //       Date d'occurrence :
-            //     </FormLabel>
-            //   )
-            // },
-            // {
-            //   name: 'startOccurrence',
-            //   label: 'Avant le',
-            //   type: 'date'
-            // },
-            // {
-            //   name: 'endOccurrence',
-            //   label: 'Après le',
-            //   type: 'date'
-            // }
           ]}
           submit={_onSubmit}
           formId="documents-form"
@@ -158,4 +199,4 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
   )
 }
 
-export default TestGeneratedForm
+export default CompositionForm

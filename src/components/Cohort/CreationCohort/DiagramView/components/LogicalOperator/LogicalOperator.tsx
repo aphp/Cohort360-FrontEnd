@@ -45,10 +45,14 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
   const displayingItem = criteriaGroup.filter((_criteriaGroup: CriteriaGroupType) => _criteriaGroup.id === itemId)
 
+  let timeout: any = null
+
   const [isExpanded, onExpand] = useState(false)
 
   return (
     <>
+      {isExpanded && <div className={classes.backDrop} onClick={() => onExpand(false)} />}
+
       <LogicalOperatorItem itemId={itemId} />
 
       <div className={classes.operatorChild}>
@@ -72,12 +76,14 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
               return child?.id > 0 ? (
                 <CriteriaCardItem
+                  key={child?.id}
                   deleteCriteria={deleteCriteria}
                   editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
                   itemId={child.id}
                 />
               ) : (
                 <OperatorItem
+                  key={child?.id}
                   itemId={child?.id}
                   addNewCriteria={addNewCriteria}
                   addNewGroup={addNewGroup}
@@ -90,7 +96,16 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
       </div>
 
       {!isExpanded ? (
-        <IconButton size="small" className={classes.addButton} onClick={() => onExpand(true)}>
+        <IconButton
+          size="small"
+          className={classes.addButton}
+          onClick={() => onExpand(true)}
+          onMouseEnter={() => {
+            onExpand(true)
+            if (timeout) clearInterval(timeout)
+          }}
+          onMouseLeave={() => (timeout = setTimeout(() => onExpand(false), 1500))}
+        >
           <AddIcon />
         </IconButton>
       ) : (
@@ -130,7 +145,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   )
 }
 
-const GroupOperator: React.FC = () => {
+const LogicalOperator: React.FC = () => {
   const dispatch = useDispatch()
   const { request, criteria } = useAppSelector((state) => state.cohortCreation || {})
 
@@ -186,6 +201,7 @@ const GroupOperator: React.FC = () => {
         criteriaIds: [...currentParent.criteriaIds, nextGroupId]
       })
     )
+    _buildCohortCreation()
   }
 
   const _addNewCriteria = (parentId: number) => {
@@ -236,4 +252,4 @@ const GroupOperator: React.FC = () => {
   )
 }
 
-export default GroupOperator
+export default LogicalOperator

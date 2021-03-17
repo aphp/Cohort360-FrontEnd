@@ -99,7 +99,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
           {subItems &&
             subItems.map((cimHierarchySubItem: any, index: number) =>
               cimHierarchySubItem === 'loading' ? (
-                <></>
+                <Fragment key={index}></Fragment>
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
@@ -132,7 +132,7 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
   const classes = useStyles()
   const [cimHierarchy, onSetCimHieerarchy] = useState([])
   const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
-    isEdition ? selectedCriteria.code : null
+    isEdition ? selectedCriteria.code : []
   )
 
   // Init
@@ -162,15 +162,16 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
       </Grid>
 
       <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-        {cimHierarchy.map((cimItem, index) => (
-          <CimListItem
-            key={index}
-            cimItem={cimItem}
-            selectedItem={selectedHierarchy}
-            handleClick={onSetSelectedHierarchy}
-            fetchHierarchy={criteria?.fetch?.fetchCim10Hierarchy}
-          />
-        ))}
+        {cimHierarchy &&
+          cimHierarchy.map((cimItem, index) => (
+            <CimListItem
+              key={index}
+              cimItem={cimItem}
+              selectedItem={selectedHierarchy}
+              handleClick={onSetSelectedHierarchy}
+              fetchHierarchy={criteria?.fetch?.fetchCim10Hierarchy}
+            />
+          ))}
       </List>
 
       <Grid className={classes.cimHierarchyActionContainer}>

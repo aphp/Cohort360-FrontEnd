@@ -16,14 +16,14 @@ const TemporalConstraintView: React.FC = () => {
   const onChangeTemporalConstraint = (value: 'sameEncounter' | 'differentEncounter' | 'none') => {
     dispatch(
       updateTemporalConstraint({
-        idList: 'all',
+        idList: ['All'],
         constraintType: value
       })
     )
     dispatch(buildCohortCreation({}))
   }
 
-  const mainTemporalConstraint = temporalConstraints.find(({ idList }) => idList === 'all')
+  const mainTemporalConstraint = temporalConstraints.find(({ idList }) => idList && idList[0] && idList[0] === 'All')
 
   return (
     <Grid
@@ -39,7 +39,7 @@ const TemporalConstraintView: React.FC = () => {
         onChange={(e: any) => onChangeTemporalConstraint(e.target.value)}
       >
         <MenuItem value={'sameEncounter'}>Tous les critères ont lieu au cours du même séjour</MenuItem>
-        <MenuItem value={'differentEncounter'}>Tous les critères ont lieu au cours de séjours différents</MenuItem>
+        {/* <MenuItem value={'differentEncounter'}>Tous les critères ont lieu au cours de séjours différents</MenuItem> */}
         <MenuItem value={'none'}>Aucune contrainte sur les séjours</MenuItem>
       </Select>
     </Grid>

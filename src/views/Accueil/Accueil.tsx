@@ -17,7 +17,7 @@ import useStyles from './styles'
 const Accueil: React.FC = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
-  const { practitioner, open, favoriteCohorts, lastCohorts } = useAppSelector((state) => ({
+  const { practitioner, open, favoriteCohorts = [], lastCohorts = [] } = useAppSelector((state) => ({
     practitioner: state.me,
     open: state.drawer,
     favoriteCohorts: state.userCohorts.favoriteCohorts,
@@ -31,6 +31,25 @@ const Accueil: React.FC = () => {
   useEffect(() => {
     dispatch(initUserCohortsThunk())
   }, [dispatch])
+
+  useEffect(() => {
+    let interval: any = null
+
+    const pendingCohorts = [...favoriteCohorts, ...lastCohorts].filter(
+      ({ jobStatus }) => jobStatus === 'pending' || jobStatus === 'started'
+    )
+
+    console.log('pendingCohorts :>> ', pendingCohorts)
+
+    if (pendingCohorts && pendingCohorts.length > 0) {
+      interval = setInterval(() => {
+        dispatch(initUserCohortsThunk())
+      }, 5000)
+    } else {
+      clearInterval(interval)
+    }
+    return () => clearInterval(interval)
+  }, [favoriteCohorts, lastCohorts]) //eslint-disable-line
 
   return practitioner ? (
     <Grid
