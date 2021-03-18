@@ -307,7 +307,7 @@ const cohortCreationSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(logout, () => initialState)
+    builder.addCase(logout, () => defaultInitialState)
     // buildCohortCreation
     builder.addCase(buildCohortCreation.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(buildCohortCreation.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))

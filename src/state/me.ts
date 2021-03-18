@@ -26,9 +26,7 @@ const meSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(logout, () => {
-      return null
-    })
+    builder.addCase(logout, () => null)
   }
 })
 

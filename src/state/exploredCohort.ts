@@ -18,6 +18,28 @@ export type ExploredCohortState = {
 const localStorageExploredCohort = localStorage.getItem('exploredCohort') ?? null
 const jsonExploredCohort = localStorageExploredCohort ? JSON.parse(localStorageExploredCohort) : {}
 
+const defaultInitialState = {
+  // CohortData
+  name: '',
+  cohort: [],
+  totalPatients: 0,
+  originalPatients: [],
+  totalDocs: 0,
+  documentsList: [],
+  wordcloudData: [],
+  encounters: [],
+  genderRepartitionMap: undefined,
+  visitTypeRepartitionData: undefined,
+  monthlyVisitData: undefined,
+  agePyramidData: undefined,
+  requestId: '',
+  // ExploredCohortState
+  importedPatients: [],
+  includedPatients: [],
+  excludedPatients: [],
+  loading: false
+}
+
 const initialState: ExploredCohortState = localStorageExploredCohort
   ? {
       ...jsonExploredCohort,
@@ -27,27 +49,7 @@ const initialState: ExploredCohortState = localStorageExploredCohort
         : new Map(),
       monthlyVisitData: jsonExploredCohort.monthlyVisitData ? new Map(jsonExploredCohort.monthlyVisitData) : new Map()
     }
-  : {
-      // CohortData
-      name: '',
-      cohort: [],
-      totalPatients: 0,
-      originalPatients: [],
-      totalDocs: 0,
-      documentsList: [],
-      wordcloudData: [],
-      encounters: [],
-      genderRepartitionMap: undefined,
-      visitTypeRepartitionData: undefined,
-      monthlyVisitData: undefined,
-      agePyramidData: undefined,
-      requestId: '',
-      // ExploredCohortState
-      importedPatients: [],
-      includedPatients: [],
-      excludedPatients: [],
-      loading: false
-    }
+  : defaultInitialState
 
 const fetchExploredCohort = createAsyncThunk<
   CohortData,
@@ -183,9 +185,7 @@ const exploredCohortSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(logout, () => {
-      return initialState
-    })
+    builder.addCase(logout, () => defaultInitialState)
     builder.addCase(fetchExploredCohort.pending, (state, { meta }) => {
       state.loading = true
       state.requestId = meta.requestId
