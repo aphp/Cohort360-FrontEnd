@@ -1,22 +1,16 @@
 import React, { ChangeEvent } from 'react'
-import { CRF_ATTRIBUTES } from '../../../data/crfParameters'
 
-import Select from '@material-ui/core/Select'
-import MenuItem from '@material-ui/core/MenuItem'
-import Button from '@material-ui/core/Button'
-import TextField from '@material-ui/core/TextField'
-import Tooltip from '@material-ui/core/Tooltip'
+import { IconButton, Select, MenuItem, Button, TextField, Tooltip, TableCell, TableRow } from '@material-ui/core'
+import {
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+  Delete as DeleteIcon,
+  Info as InfoIcon
+} from '@material-ui/icons'
 
-import TableCell from '@material-ui/core/TableCell'
-import TableRow from '@material-ui/core/TableRow'
-
-import DeleteIcon from '@material-ui/icons/Delete'
-import InfoIcon from '@material-ui/icons/Info'
-
+import { CRF_ATTRIBUTES } from 'data/crfParameters'
 import useStyles from './styles'
 import { ExportItem } from '../RedcapExport'
-import { IconButton } from '@material-ui/core'
-import { Visibility, VisibilityOff } from '@material-ui/icons'
 
 type CohortItemProps = {
   item: ExportItem
@@ -86,7 +80,7 @@ const CohortItem = ({ item, onDelete, onChange }: CohortItemProps): JSX.Element 
         <div className={classes.flex}>
           <Tooltip title={`La variable ${item.anonymize ? 'est' : "n'est pas"} anonymisée`}>
             <IconButton onClick={handleChangeAnonymize} disabled={item.att_type === 'insensitive'}>
-              {item.anonymize ? <VisibilityOff /> : <Visibility />}
+              {item.anonymize ? <VisibilityOffIcon /> : <VisibilityIcon />}
             </IconButton>
           </Tooltip>
           <Select
