@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 
-import { Button, Chip, CircularProgress, Grid, IconButton, InputAdornment, InputBase } from '@material-ui/core'
+import {
+  Button,
+  Chip,
+  CircularProgress,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputBase,
+  Typography
+} from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
 
 import ClearIcon from '@material-ui/icons/Clear'
@@ -14,6 +23,8 @@ import { fetchCohorts } from '../../services/savedResearches'
 
 import useStyles from './styles'
 import { FormattedCohort } from 'types'
+
+import displayDigit from 'utils/displayDigit'
 
 import { setFavoriteCohortThunk, deleteUserCohortThunk } from 'state/userCohorts'
 import { useAppDispatch } from 'state'
@@ -158,34 +169,37 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
 
   return (
     <Grid container justify="flex-end" className={classes.documentTable}>
-      <div className={classes.tableButtons}>
-        <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
-          <InputBase
-            placeholder="Rechercher"
-            className={classes.input}
-            value={searchInput}
-            onChange={handleChangeInput}
-            onKeyDown={onKeyDown}
-            endAdornment={
-              <InputAdornment position="end">
-                <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
-              </InputAdornment>
-            }
-          />
-          <IconButton type="submit" aria-label="search" onClick={onSearchCohort}>
-            <SearchIcon fill="#ED6D91" height="15px" />
-          </IconButton>
-        </Grid>
-        <Button
-          variant="contained"
-          disableElevation
-          onClick={() => setOpen(true)}
-          startIcon={<FilterList height="15px" fill="#FFF" />}
-          className={classes.searchButton}
-        >
-          Filtrer
-        </Button>
-      </div>
+      <Grid item container justify="space-between">
+        <Typography variant="button">{displayDigit(total ?? 0)} cohorte(s)</Typography>
+        <div className={classes.tableButtons}>
+          <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
+            <InputBase
+              placeholder="Rechercher"
+              className={classes.input}
+              value={searchInput}
+              onChange={handleChangeInput}
+              onKeyDown={onKeyDown}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                </InputAdornment>
+              }
+            />
+            <IconButton type="submit" aria-label="search" onClick={onSearchCohort}>
+              <SearchIcon fill="#ED6D91" height="15px" />
+            </IconButton>
+          </Grid>
+          <Button
+            variant="contained"
+            disableElevation
+            onClick={() => setOpen(true)}
+            startIcon={<FilterList height="15px" fill="#FFF" />}
+            className={classes.searchButton}
+          >
+            Filtrer
+          </Button>
+        </div>
+      </Grid>
       <Grid>
         {showFilterChip &&
           filters.status &&

@@ -20,7 +20,8 @@ const useStyles = makeStyles((theme) => ({
   tableButtons: {
     display: 'flex',
     justifyContent: 'flex-end',
-    marginBottom: 5
+    marginBottom: 5,
+    width: 'auto'
   },
   searchBar: {
     width: '250px',
