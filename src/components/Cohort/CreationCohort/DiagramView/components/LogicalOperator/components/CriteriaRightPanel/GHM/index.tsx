@@ -10,7 +10,7 @@ const defaultDemographic = {
   title: 'Critères GHM',
   code: [],
   occurrence: 1,
-  occurrenceComparator: '<=',
+  occurrenceComparator: '>=',
   startOccurrence: '',
   endOccurrence: '',
   isInclusive: true
