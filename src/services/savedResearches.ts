@@ -5,14 +5,16 @@ import { CONTEXT } from '../constants'
 import {
   Back_API_Response,
   Cohort,
+  CohortFilters,
   // FHIR_API_Response,
-  FormattedCohort
+  FormattedCohort,
+  ValueSet
 } from '../types'
 
 export const fetchCohorts = async (
   sortBy: string,
   sortDirection: string,
-  filters?: any, // A CHANGER
+  filters?: CohortFilters,
   searchInput?: string,
   page?: number
 ): Promise<Back_API_Response<FormattedCohort> | undefined> => {
@@ -66,16 +68,17 @@ export const fetchCohorts = async (
     // }
   } else if (CONTEXT === 'aphp') {
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
-    const typeFilter = filters.type && filters.type !== 'all' ? `&type=${filters.type}` : ''
+    const typeFilter = filters && filters.type && filters.type !== 'all' ? `&type=${filters.type}` : ''
     const statusFilter =
-      filters.status && filters.status.length > 0
-        ? `&request_job_status=${filters.status.map((status: any) => status.code).join()}` // CHANGER LE TYPE
+      filters && filters.status && filters.status.length > 0
+        ? `&request_job_status=${filters.status.map((status: ValueSet) => status.code).join()}`
         : ''
-    const minPatientsFilter = filters.minPatients ? `&min_result_size=${filters.minPatients}` : ''
-    const maxPatientsFilter = filters.maxPatients ? `&max_result_size=${filters.maxPatients}` : ''
-    const startDateFilter = filters.startDate ? `&min_fhir_datetime=${filters.startDate}` : ''
-    const endDateFilter = filters.endDate ? `&max_fhir_datetime=${filters.endDate}` : ''
-    const favoriteFilter = filters.favorite && filters.favorite !== 'all' ? `&favorite=${filters.favorite}` : ''
+    const minPatientsFilter = filters && filters.minPatients ? `&min_result_size=${filters.minPatients}` : ''
+    const maxPatientsFilter = filters && filters.maxPatients ? `&max_result_size=${filters.maxPatients}` : ''
+    const startDateFilter = filters && filters.startDate ? `&min_fhir_datetime=${filters.startDate}` : ''
+    const endDateFilter = filters && filters.endDate ? `&max_fhir_datetime=${filters.endDate}` : ''
+    const favoriteFilter =
+      filters && filters.favorite && filters.favorite !== 'all' ? `&favorite=${filters.favorite}` : ''
     let searchByText = ''
     let offset = ''
 

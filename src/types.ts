@@ -96,6 +96,16 @@ export type FormattedCohort = {
   jobStatus?: string
 }
 
+export type CohortFilters = {
+  status: ValueSet[]
+  type: string
+  favorite: string
+  minPatients: null | string
+  maxPatients: null | string
+  startDate: null | string
+  endDate: null | string
+}
+
 export type CohortGroup = IGroup & {
   id: string
   name: string

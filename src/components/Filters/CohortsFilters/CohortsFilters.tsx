@@ -22,24 +22,25 @@ import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import ClearIcon from '@material-ui/icons/Clear'
 
+import { CohortFilters, ValueSet } from 'types'
+
 import useStyles from './styles'
 
 type CohortsFiltersProps = {
   open: boolean
   onClose: () => void
   onSubmit: () => void
-  filters: any // A CHANGER
-  onChangeFilters: (filters: any) => void // A CHANGER - CREER UN TYPE
+  filters: CohortFilters
+  onChangeFilters: (filters: CohortFilters) => void
 }
 const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmit, filters, onChangeFilters }) => {
   const classes = useStyles()
 
-  const [_status, setStatus] = useState<any[]>(filters.status)
-  const [_type, setType] = useState(filters.type)
-  const [_favorite, setFavorite] = useState(filters.favorite)
-  const [_selectedPerimeters, setSelectedPerimeters] = useState<any[]>(filters.selectedPerimeters)
-  const [_minPatients, setMinPatients] = useState(filters.minPatients)
-  const [_maxPatients, setMaxPatients] = useState(filters.maxPatients)
+  const [_status, setStatus] = useState<ValueSet[]>(filters.status)
+  const [_type, setType] = useState<string>(filters.type)
+  const [_favorite, setFavorite] = useState<string>(filters.favorite)
+  const [_minPatients, setMinPatients] = useState<null | string>(filters.minPatients)
+  const [_maxPatients, setMaxPatients] = useState<null | string>(filters.maxPatients)
   const [_startDate, setStartDate] = useState<any>(filters.startDate)
   const [_endDate, setEndDate] = useState<any>(filters.endDate)
   const [nbPatientsError, setNbPatientsError] = useState(false)
@@ -47,15 +48,15 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
 
   const statusOptions = [
     {
-      label: 'Terminé',
+      display: 'Terminé',
       code: 'finished'
     },
     {
-      label: 'En attente',
+      display: 'En attente',
       code: 'pending,started'
     },
     {
-      label: 'Erreur',
+      display: 'Erreur',
       code: 'failed'
     }
   ]
@@ -64,7 +65,6 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
     setStatus(filters.status)
     setType(filters.type)
     setFavorite(filters.favorite)
-    setSelectedPerimeters(filters.selectedPerimeters)
     setMinPatients(filters.minPatients)
     setMaxPatients(filters.maxPatients)
     setStartDate(filters.startDate)
@@ -90,7 +90,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
   const _onChangeStatus = (
     event: React.ChangeEvent<{}>,
     value: {
-      label: string
+      display: string
       code: string
     }[]
   ) => {
@@ -122,7 +122,6 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
       status: _status,
       type: _type,
       favorite: _favorite,
-      selectedPerimeters: _selectedPerimeters,
       minPatients: _minPatients,
       maxPatients: _maxPatients,
       startDate: newStartDate,
@@ -143,8 +142,8 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
             options={statusOptions}
             value={_status}
             disableCloseOnSelect
-            getOptionLabel={(status: any) => status.label}
-            renderOption={(status: any) => <React.Fragment>{status.label}</React.Fragment>}
+            getOptionLabel={(status: any) => status.display}
+            renderOption={(status: any) => <React.Fragment>{status.display}</React.Fragment>}
             renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Statut de la cohorte" />}
             className={classes.autocomplete}
           />

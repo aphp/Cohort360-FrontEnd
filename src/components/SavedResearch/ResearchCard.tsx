@@ -22,7 +22,7 @@ import CohortsFilter from '../Filters/CohortsFilters/CohortsFilters'
 import { fetchCohorts } from '../../services/savedResearches'
 
 import useStyles from './styles'
-import { FormattedCohort } from 'types'
+import { CohortFilters, FormattedCohort, ValueSet } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
@@ -46,7 +46,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [open, setOpen] = useState(false)
   const [showFilterChip, setShowFilterChip] = useState(false)
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<CohortFilters>({
     status: [],
     type: 'all',
     favorite: 'all',
@@ -204,13 +204,11 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
         {showFilterChip &&
           filters.status &&
           filters.status.length > 0 &&
-          filters.status.map((
-            status: any // CHANGER LE TYPE
-          ) => (
+          filters.status.map((status: ValueSet) => (
             <Chip
               className={classes.chips}
               key={status.code}
-              label={`Statut ${status.label}`}
+              label={`Statut ${status.display}`}
               onDelete={() => handleDeleteChip('status')}
               color="primary"
               variant="outlined"
