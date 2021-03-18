@@ -9,51 +9,8 @@ import {
 } from '../../data/fakeData/cohortCreation/condition'
 import { alphabeticalSort } from 'utils/alphabeticalSort'
 import { getApiResponseResources } from '../../utils/apiHelpers'
-import { IPatient, IValueSet } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { FHIR_API_Response } from '../../types'
-
-const ICD9_CODES = [
-  {
-    id: '71133',
-    label: 'Néoplasme malin du pylore'
-  },
-  {
-    id: '01646',
-    label: "Lésion d'autres organes intra-abdominaux"
-  },
-  {
-    id: '67440',
-    label: 'Larynx néo-malin NEC'
-  },
-  {
-    id: '81203',
-    label: "Blessures causées par des obus d'artillerie en mer"
-  },
-  {
-    id: '7682',
-    label: 'Traumatisme acoustique'
-  },
-  {
-    id: '0388',
-    label: "Fracture fermée de l'acétabulum"
-  },
-  {
-    id: '65920',
-    label: 'Échec du cathéter stérile'
-  },
-  {
-    id: 'E9950',
-    label: 'Aphakie'
-  },
-  {
-    id: '71642',
-    label: 'Anesthésie compl-antepartum'
-  },
-  {
-    id: '9093',
-    label: 'TB de la vessie non spécifiée'
-  }
-]
+import type { IValueSet } from '@ahryman40k/ts-fhir-types/lib/R4'
+import type { FHIR_API_Response } from '../../types'
 
 const DEFAULT_DIAGNOSTIC_TYPES = [
   {
