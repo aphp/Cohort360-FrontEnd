@@ -173,7 +173,13 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
             <FormLabel component="legend" className={classes.label}>
               Au moins :
             </FormLabel>
-            <TextField type="number" value={_minPatients} onChange={_onChangeMinPatients} variant="outlined" />
+            <TextField
+              type="number"
+              value={_minPatients}
+              onChange={_onChangeMinPatients}
+              variant="outlined"
+              inputProps={{ min: 0 }}
+            />
             <FormLabel component="legend" className={classes.patientsLabel}>
               patients.
             </FormLabel>
@@ -183,7 +189,13 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
             <FormLabel component="legend" className={classes.label}>
               Jusque :
             </FormLabel>
-            <TextField type="number" value={_maxPatients} onChange={_onChangeMaxPatients} variant="outlined" />
+            <TextField
+              type="number"
+              value={_maxPatients}
+              onChange={_onChangeMaxPatients}
+              variant="outlined"
+              inputProps={{ min: 0 }}
+            />
             <FormLabel component="legend" className={classes.patientsLabel}>
               patients.
             </FormLabel>
