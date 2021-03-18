@@ -72,7 +72,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
   }, [open]) //eslint-disable-line
 
   useEffect(() => {
-    if (_minPatients && _maxPatients && _minPatients > _maxPatients) {
+    if (_minPatients && _maxPatients && parseInt(_minPatients, 10) > parseInt(_maxPatients, 10)) {
       setNbPatientsError(true)
     } else {
       setNbPatientsError(false)
