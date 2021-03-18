@@ -71,6 +71,8 @@ export const fetchCohorts = async (
       filters.status && filters.status.length > 0
         ? `&request_job_status=${filters.status.map((status: any) => status.code).join()}` // CHANGER LE TYPE
         : ''
+    const minPatientsFilter = filters.minPatients ? `&min_result_size=${filters.minPatients}` : ''
+    const maxPatientsFilter = filters.maxPatients ? `&max_result_size=${filters.maxPatients}` : ''
     const startDateFilter = filters.startDate ? `&min_fhir_datetime=${filters.startDate}` : ''
     const endDateFilter = filters.endDate ? `&max_fhir_datetime=${filters.endDate}` : ''
     const favoriteFilter = filters.favorite && filters.favorite !== 'all' ? `&favorite=${filters.favorite}` : ''
@@ -86,7 +88,7 @@ export const fetchCohorts = async (
     }
 
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
-      `/explorations/cohorts/?ordering=${_sortDirection}${sortBy}${typeFilter}${statusFilter}${startDateFilter}${endDateFilter}${favoriteFilter}${searchByText}&limit=20${offset}`
+      `/explorations/cohorts/?ordering=${_sortDirection}${sortBy}${typeFilter}${statusFilter}${minPatientsFilter}${maxPatientsFilter}${startDateFilter}${endDateFilter}${favoriteFilter}${searchByText}&limit=20${offset}`
     )
 
     const results = cohortResp?.data?.results

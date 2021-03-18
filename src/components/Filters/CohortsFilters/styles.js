@@ -22,11 +22,15 @@ const useStyles = makeStyles(() => ({
   datePickers: {
     margin: '1em 0 1em 1em'
   },
-  dateLabel: {
+  label: {
     width: 'auto',
     marginRight: 8
   },
-  dateError: {
+  patientsLabel: {
+    width: 'auto',
+    marginLeft: 8
+  },
+  error: {
     color: '#f44336'
   },
   clearDate: {

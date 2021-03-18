@@ -38,8 +38,11 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
   const [_type, setType] = useState(filters.type)
   const [_favorite, setFavorite] = useState(filters.favorite)
   const [_selectedPerimeters, setSelectedPerimeters] = useState<any[]>(filters.selectedPerimeters)
+  const [_minPatients, setMinPatients] = useState(filters.minPatients)
+  const [_maxPatients, setMaxPatients] = useState(filters.maxPatients)
   const [_startDate, setStartDate] = useState<any>(filters.startDate)
   const [_endDate, setEndDate] = useState<any>(filters.endDate)
+  const [nbPatientsError, setNbPatientsError] = useState(false)
   const [dateError, setDateError] = useState(false)
 
   const statusOptions = [
@@ -59,10 +62,22 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
 
   useEffect(() => {
     setStatus(filters.status)
+    setType(filters.type)
+    setFavorite(filters.favorite)
     setSelectedPerimeters(filters.selectedPerimeters)
+    setMinPatients(filters.minPatients)
+    setMaxPatients(filters.maxPatients)
     setStartDate(filters.startDate)
     setEndDate(filters.endDate)
   }, [open]) //eslint-disable-line
+
+  useEffect(() => {
+    if (_minPatients && _maxPatients && _minPatients > _maxPatients) {
+      setNbPatientsError(true)
+    } else {
+      setNbPatientsError(false)
+    }
+  }, [_minPatients, _maxPatients])
 
   useEffect(() => {
     if (moment(_startDate).isAfter(_endDate)) {
@@ -90,6 +105,14 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
     setFavorite(value)
   }
 
+  const _onChangeMinPatients = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setMinPatients(event.target.value)
+  }
+
+  const _onChangeMaxPatients = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setMaxPatients(event.target.value)
+  }
+
   const _onSubmit = () => {
     const newStartDate = moment(_startDate).isValid() ? moment(_startDate).format('YYYY-MM-DD') : null
     const newEndDate = moment(_endDate).isValid() ? moment(_endDate).format('YYYY-MM-DD') : null
@@ -100,6 +123,8 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
       type: _type,
       favorite: _favorite,
       selectedPerimeters: _selectedPerimeters,
+      minPatients: _minPatients,
+      maxPatients: _maxPatients,
       startDate: newStartDate,
       endDate: newEndDate
     })
@@ -144,9 +169,37 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
         </Grid>
 
         <Grid container direction="column" className={classes.filter}>
+          <Typography variant="h3">Nombre de patients :</Typography>
+          <Grid container alignItems="baseline" className={classes.datePickers}>
+            <FormLabel component="legend" className={classes.label}>
+              Au moins :
+            </FormLabel>
+            <TextField type="number" value={_minPatients} onChange={_onChangeMinPatients} variant="outlined" />
+            <FormLabel component="legend" className={classes.patientsLabel}>
+              patients.
+            </FormLabel>
+          </Grid>
+
+          <Grid container alignItems="baseline" className={classes.datePickers}>
+            <FormLabel component="legend" className={classes.label}>
+              Jusque :
+            </FormLabel>
+            <TextField type="number" value={_maxPatients} onChange={_onChangeMaxPatients} variant="outlined" />
+            <FormLabel component="legend" className={classes.patientsLabel}>
+              patients.
+            </FormLabel>
+          </Grid>
+          {nbPatientsError && (
+            <Typography className={classes.error}>
+              Vous ne pouvez pas sélectionner de minimum de patients supérieur au nombre maximum.
+            </Typography>
+          )}
+        </Grid>
+
+        <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Date :</Typography>
           <Grid container alignItems="baseline" className={classes.datePickers}>
-            <FormLabel component="legend" className={classes.dateLabel}>
+            <FormLabel component="legend" className={classes.label}>
               Après le :
             </FormLabel>
             <KeyboardDatePicker
@@ -170,7 +223,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
           </Grid>
 
           <Grid container alignItems="baseline" className={classes.datePickers}>
-            <FormLabel component="legend" className={classes.dateLabel}>
+            <FormLabel component="legend" className={classes.label}>
               Avant le :
             </FormLabel>
             <KeyboardDatePicker
@@ -193,7 +246,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
             )}
           </Grid>
           {dateError && (
-            <Typography className={classes.dateError}>
+            <Typography className={classes.error}>
               Vous ne pouvez pas sélectionner de date de début supérieure à la date de fin.
             </Typography>
           )}
@@ -203,7 +256,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
         <Button onClick={onClose} color="primary">
           Annuler
         </Button>
-        <Button onClick={_onSubmit} color="primary" disabled={dateError}>
+        <Button onClick={_onSubmit} color="primary" disabled={nbPatientsError || dateError}>
           Valider
         </Button>
       </DialogActions>

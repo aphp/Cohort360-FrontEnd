@@ -46,6 +46,8 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
   })
   const researchLines = 20 // Number of desired lines in the document array
 
+  console.log(`filters`, filters)
+
   useEffect(() => {
     onFetchCohorts(sortBy, sortDirection)
   }, [filters]) // eslint-disable-line
@@ -209,18 +211,24 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
             variant="outlined"
           />
         )}
-        {/* {showFilterChip &&
-          selectedDocTypes.length > 0 &&
-          selectedDocTypes.map((docType) => (
-            <Chip
-              className={classes.chips}
-              key={docType.code}
-              label={docType.label}
-              onDelete={() => handleDeleteChip('selectedDocTypes', docType)}
-              color="primary"
-              variant="outlined"
-            />
-          ))} */}
+        {showFilterChip && filters.minPatients && (
+          <Chip
+            className={classes.chips}
+            label={`Au moins ${filters.minPatients} patients`}
+            onDelete={() => handleDeleteChip('minPatients')}
+            color="primary"
+            variant="outlined"
+          />
+        )}
+        {showFilterChip && filters.maxPatients && (
+          <Chip
+            className={classes.chips}
+            label={`Jusque ${filters.maxPatients} patients`}
+            onDelete={() => handleDeleteChip('maxPatients')}
+            color="primary"
+            variant="outlined"
+          />
+        )}
         {showFilterChip && filters.startDate && (
           <Chip
             className={classes.chips}
