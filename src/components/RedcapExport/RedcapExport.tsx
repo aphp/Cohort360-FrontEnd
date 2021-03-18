@@ -28,7 +28,6 @@ import { v4 as uuid } from 'uuid'
 import CohortItem from './CohortItem/CohortItem'
 import { CrfParameter, CRF_ATTRIBUTES } from '../../data/crfParameters'
 import useStyles from './styles'
-import api from '../../services/api'
 
 type RedcapExportProps = {
   patientIds: string[]
