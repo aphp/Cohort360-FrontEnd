@@ -29,7 +29,7 @@ const Accueil: React.FC = () => {
     : ''
 
   useEffect(() => {
-    dispatch(initUserCohortsThunk())
+    dispatch<any>(initUserCohortsThunk())
   }, [dispatch])
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const Accueil: React.FC = () => {
 
     if (pendingCohorts && pendingCohorts.length > 0) {
       interval = setInterval(() => {
-        dispatch(initUserCohortsThunk())
+        dispatch<any>(initUserCohortsThunk())
       }, 5000)
     } else {
       clearInterval(interval)

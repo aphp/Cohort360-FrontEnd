@@ -92,7 +92,7 @@ const ArkhnConnexion = () => {
           if (practitioner) {
             fetchDeidentified()
               .then((deidentifiedBoolean) => {
-                dispatch(
+                dispatch<any>(
                   loginAction({
                     ...practitioner,
                     deidentified: deidentifiedBoolean?.deidentification ?? false

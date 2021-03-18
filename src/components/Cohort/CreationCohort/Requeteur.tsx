@@ -37,11 +37,11 @@ const Requeteur = () => {
   const _fetchCriteria = useCallback(async () => {
     let _criteria = constructCriteriaList()
     _criteria = await getDataFromFetch(Object.freeze(_criteria), selectedCriteria)
-    dispatch(setCriteriaList(_criteria))
+    dispatch<any>(setCriteriaList(_criteria))
   }, [dispatch, criteriaGroup, selectedCriteria]) // eslint-disable-line
 
   const _unbuildRequest = async (newCurrentSnapshot: CohortCreationSnapshotType) => {
-    dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
+    dispatch<any>(unbuildCohortCreation({ newCurrentSnapshot }))
   }
 
   /**
@@ -54,7 +54,7 @@ const Requeteur = () => {
       if (!json) return
 
       await createCohort(json, count?.uuid, currentSnapshot, requestId, cohortName, cohortDescription)
-      dispatch(resetCohortCreation())
+      dispatch<any>(resetCohortCreation())
       history.push(`/accueil`)
     }
 
