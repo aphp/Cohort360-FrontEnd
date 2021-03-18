@@ -89,7 +89,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
 
   return (
     <>
-      <AutoLogoutContainer />
+      {/*<AutoLogoutContainer />*/}
       <div className={classes.root}>
         <Drawer
           variant="permanent"

@@ -1,18 +1,21 @@
 import axios from 'axios'
-import { ACCES_TOKEN, BACK_API_URL } from '../constants'
+import { BACK_API_URL } from '../constants'
+import Cookies from 'js-cookie'
 
 const apiBackCohort = axios.create({
   baseURL: BACK_API_URL,
+  withCredentials: true,
   headers: {
-    Accept: 'application/json'
+    Accept: 'application/json',
+    'X-CSRFToken': Cookies.get('csrftoken')
   }
 })
 
-apiBackCohort.interceptors.request.use((config) => {
-  const token = localStorage.getItem(ACCES_TOKEN)
-  config.headers.Authorization = `Bearer ${token}`
-  return config
-})
+// apiBackCohort.interceptors.request.use((config) => {
+//   const token = localStorage.getItem(ACCES_TOKEN)
+//   config.headers.Authorization = `Bearer ${token}`
+//   return config
+// })
 
 apiBackCohort.interceptors.response.use(
   (response) => {

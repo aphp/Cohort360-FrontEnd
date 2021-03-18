@@ -44,10 +44,10 @@ const createCohortGroup = async (json_query: string): Promise<IGroup> => {
 
       let query = ''
       switch (resource_type) {
-        case 'Condition':
+        case 'Patient':
           query = `/Patient?_count=${PATIENT_COUNT}&${query_filter}`
           break
-        case 'Patient':
+        case 'Condition':
           query = `/Patient?_count=${PATIENT_COUNT}&_has:Condition:patient:${query_filter}`
           break
         default:
