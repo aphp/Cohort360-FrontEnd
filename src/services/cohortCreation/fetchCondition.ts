@@ -1,4 +1,5 @@
 import { CONTEXT } from '../../constants'
+import api from '../../services/api'
 import apiRequest from '../../services/apiRequest'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
 import {
@@ -7,6 +8,9 @@ import {
   // fakeHierarchyCIM10
 } from '../../data/fakeData/cohortCreation/condition'
 import { alphabeticalSort } from 'utils/alphabeticalSort'
+import { getApiResponseResources } from '../../utils/apiHelpers'
+import { IPatient, IValueSet } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { FHIR_API_Response } from '../../types'
 
 const ICD9_CODES = [
   {
@@ -142,7 +146,14 @@ export const fetchDiagnosticTypes = async () => {
 // todo: check if the data syntax is correct when available
 export const fetchCim10Diagnostic = async (searchValue?: string) => {
   if (CONTEXT === 'arkhn') {
-    return ICD9_CODES
+    const response = await api.get<FHIR_API_Response<IValueSet>>('/ValueSet?url=http://arkhn.com/icd9_VS')
+    const valueSet = getApiResponseResources(response)
+    if (!valueSet || valueSet.length === 0) return []
+    const icd9_codes = valueSet[0]?.compose?.include[0]?.concept?.map((value) => ({
+      id: value.code,
+      label: value.display
+    }))
+    return icd9_codes ?? []
   } else if (CONTEXT === 'fakedata') {
     return fakeValueSetCIM10 && fakeValueSetCIM10.length > 0
       ? fakeValueSetCIM10.map((_fakeValueSetCIM10: { code: string; display: string }) => ({
