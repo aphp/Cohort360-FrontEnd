@@ -5,11 +5,16 @@ import { CONTEXT } from '../constants'
 import {
   Back_API_Response,
   Cohort,
+  CohortFilters,
   // FHIR_API_Response,
-  FormattedCohort
+  FormattedCohort,
+  ValueSet
 } from '../types'
 
 export const fetchCohorts = async (
+  sortBy: string,
+  sortDirection: string,
+  filters?: CohortFilters,
   searchInput?: string,
   page?: number
 ): Promise<Back_API_Response<FormattedCohort> | undefined> => {
@@ -62,6 +67,18 @@ export const fetchCohorts = async (
     //     .filter(Boolean)
     // }
   } else if (CONTEXT === 'aphp') {
+    const _sortDirection = sortDirection === 'desc' ? '-' : ''
+    const typeFilter = filters && filters.type && filters.type !== 'all' ? `&type=${filters.type}` : ''
+    const statusFilter =
+      filters && filters.status && filters.status.length > 0
+        ? `&request_job_status=${filters.status.map((status: ValueSet) => status.code).join()}`
+        : ''
+    const minPatientsFilter = filters && filters.minPatients ? `&min_result_size=${filters.minPatients}` : ''
+    const maxPatientsFilter = filters && filters.maxPatients ? `&max_result_size=${filters.maxPatients}` : ''
+    const startDateFilter = filters && filters.startDate ? `&min_fhir_datetime=${filters.startDate}` : ''
+    const endDateFilter = filters && filters.endDate ? `&max_fhir_datetime=${filters.endDate}` : ''
+    const favoriteFilter =
+      filters && filters.favorite && filters.favorite !== 'all' ? `&favorite=${filters.favorite}` : ''
     let searchByText = ''
     let offset = ''
 
@@ -74,7 +91,7 @@ export const fetchCohorts = async (
     }
 
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
-      `/explorations/cohorts/?ordering=-favorite${searchByText}&limit=20${offset}`
+      `/explorations/cohorts/?ordering=${_sortDirection}${sortBy}${typeFilter}${statusFilter}${minPatientsFilter}${maxPatientsFilter}${startDateFilter}${endDateFilter}${favoriteFilter}${searchByText}&limit=20${offset}`
     )
 
     const results = cohortResp?.data?.results
@@ -85,7 +102,7 @@ export const fetchCohorts = async (
             name: cohort.name,
             status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
             nPatients: cohort.result_size,
-            date: cohort.created_at,
+            date: cohort.dated_measure.fhir_datetime,
             perimeter: '-',
             favorite: cohort.favorite,
             jobStatus: cohort.request_job_status
@@ -119,7 +136,9 @@ export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefi
     return results
   }
   if (CONTEXT === 'aphp') {
-    const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>('/explorations/cohorts/?favorite=true')
+    const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
+      '/explorations/cohorts/?favorite=true&ordering=-fhir_datetime'
+    )
 
     const results = cohortResp?.data?.results
       ? cohortResp.data.results
@@ -130,7 +149,7 @@ export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefi
               name: cohort.name,
               status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
               nPatients: cohort.result_size,
-              date: cohort.created_at,
+              date: cohort.dated_measure.fhir_datetime,
               perimeter: '-',
               favorite: cohort.favorite,
               jobStatus: cohort.request_job_status
@@ -162,7 +181,7 @@ export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined>
   }
   if (CONTEXT === 'aphp') {
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
-      '/explorations/cohorts/?limit=5&ordering=-created_at'
+      '/explorations/cohorts/?limit=5&ordering=-fhir_datetime'
     )
 
     const results = cohortResp?.data?.results
@@ -173,7 +192,7 @@ export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined>
             name: cohort.name,
             status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
             nPatients: cohort.result_size,
-            date: cohort.created_at,
+            date: cohort.dated_measure.fhir_datetime,
             perimeter: '-',
             favorite: cohort.favorite,
             jobStatus: cohort.request_job_status

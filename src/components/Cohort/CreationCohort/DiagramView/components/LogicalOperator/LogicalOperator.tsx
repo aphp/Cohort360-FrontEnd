@@ -154,7 +154,7 @@ const LogicalOperator: React.FC = () => {
   const [selectedCriteria, setSelectedCriteria] = useState<SelectedCriteriaType | null>(null)
 
   const _buildCohortCreation = () => {
-    dispatch(buildCohortCreation({}))
+    dispatch<any>(buildCohortCreation({}))
   }
 
   const _onConfirmAddOrEditCriteria = (item: SelectedCriteriaType) => {
@@ -162,15 +162,15 @@ const LogicalOperator: React.FC = () => {
     const nextCriteriaId = request.nextCriteriaId
     if (item.id !== undefined) {
       // Edition
-      dispatch(editSelectedCriteria(item))
+      dispatch<any>(editSelectedCriteria(item))
     } else {
       // Creation
       item.id = nextCriteriaId
-      dispatch(addNewSelectedCriteria(item))
+      dispatch<any>(addNewSelectedCriteria(item))
       // Link criteria with group operator
       const currentParent = request.criteriaGroup ? request.criteriaGroup.find(({ id }) => id === parentId) : null
       if (!currentParent) return
-      dispatch(
+      dispatch<any>(
         editCriteriaGroup({
           ...currentParent,
           criteriaIds: [...currentParent.criteriaIds, nextCriteriaId]
@@ -191,11 +191,11 @@ const LogicalOperator: React.FC = () => {
       isSubGroup: parentId === 0 ? false : true,
       isInclusive: true
     }
-    dispatch(addNewCriteriaGroup(newOperator))
+    dispatch<any>(addNewCriteriaGroup(newOperator))
     // Edit parent and add nextGroupId inside criteriaIds
     const currentParent = request.criteriaGroup ? request.criteriaGroup.find(({ id }) => id === parentId) : null
     if (!currentParent) return
-    dispatch(
+    dispatch<any>(
       editCriteriaGroup({
         ...currentParent,
         criteriaIds: [...currentParent.criteriaIds, nextGroupId]
@@ -217,12 +217,12 @@ const LogicalOperator: React.FC = () => {
   }
 
   const _deleteCriteria = (criteriaId: number) => {
-    dispatch(deleteSelectedCriteria(criteriaId))
+    dispatch<any>(deleteSelectedCriteria(criteriaId))
     const logicalOperatorParent = request.criteriaGroup
       ? request.criteriaGroup.find(({ criteriaIds }) => criteriaIds.find((_criteriaId) => _criteriaId === criteriaId))
       : undefined
     if (!logicalOperatorParent) return
-    dispatch(
+    dispatch<any>(
       editCriteriaGroup({
         ...logicalOperatorParent,
         criteriaIds: logicalOperatorParent.criteriaIds.filter((_criteriaId) => _criteriaId !== criteriaId)
