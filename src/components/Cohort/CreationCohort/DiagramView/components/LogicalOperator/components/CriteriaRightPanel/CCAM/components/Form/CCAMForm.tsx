@@ -139,7 +139,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
                   type: 'number',
                   validationRules: {
                     min: 1,
-                    required: 'Merci de renseigner une occurrence suppérieur à 1'
+                    required: 'Merci de renseigner une occurrence supérieure à 1'
                   }
                 }
               ]

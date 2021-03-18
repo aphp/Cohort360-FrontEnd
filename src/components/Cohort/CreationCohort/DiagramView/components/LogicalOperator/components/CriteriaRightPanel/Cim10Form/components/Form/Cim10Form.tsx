@@ -71,10 +71,10 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner au moins un code ou un type de diagnostique</Alert>}
+        {error && <Alert severity="error">Merci de renseigner au moins un code ou un type de diagnostic</Alert>}
         <FormBuilder<Cim10DataType>
           defaultValues={selectedCriteria}
-          title="Diagnostique"
+          title="Diagnostic"
           properties={[
             {
               name: 'title',
@@ -109,11 +109,11 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               multiple: true,
               autocompleteOptions: criteria?.data?.cim10Diagnostic || [],
               getAutocompleteOptions: getDiagOptions,
-              noOptionsText: 'Veuillez entrer un code ou un diagnostique CIM10'
+              noOptionsText: 'Veuillez entrer un code ou un diagnostic CIM10'
             },
             {
               name: 'diagnosticType',
-              label: 'Type de diagnostique',
+              label: 'Type de diagnostic',
               variant: 'outlined',
               type: 'autocomplete',
               multiple: true,
@@ -152,7 +152,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
                   type: 'number',
                   validationRules: {
                     min: 1,
-                    required: 'Merci de renseigner une occurrence suppérieur à 1'
+                    required: 'Merci de renseigner une occurrence supérieure à 1'
                   }
                 }
               ]
