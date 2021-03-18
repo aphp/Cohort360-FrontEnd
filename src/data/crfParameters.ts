@@ -1,4 +1,12 @@
-export const CRF_ATTRIBUTES = [
+export type CrfParameter = {
+  officialName: string
+  customName: string
+  att_type: 'identifying' | 'quasiidentifying' | 'insensitive' | 'sensitive'
+  anonymize: boolean
+  hierarchy_type?: string
+  type?: 'text'
+}
+export const CRF_ATTRIBUTES: CrfParameter[] = [
   {
     officialName: 'Identifier',
     customName: 'Identifier',

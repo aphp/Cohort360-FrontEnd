@@ -1,14 +1,8 @@
 import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(() => ({
-  attributeSelectDiv: {
-    width: '30%'
-  },
   attributeSelect: {
-    width: '100%'
-  },
-  attributeTextDiv: {
-    width: '30%'
+    maxWidth: 250
   },
   attributeText: {
     width: '100%'
@@ -22,11 +16,8 @@ const useStyles = makeStyles(() => ({
   crfButton: {
     width: 20
   },
-  divCrfButton: {
+  flex: {
     display: 'flex'
-  },
-  tableCell: {
-    padding: 5
   }
 }))
 

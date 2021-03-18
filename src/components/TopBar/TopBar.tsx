@@ -9,6 +9,7 @@ import { ReactComponent as SaveIcon } from '../../assets/icones/save.svg'
 // import { ReactComponent as Star } from '../../assets/icones/star.svg'
 
 import displayDigit from 'utils/displayDigit'
+import { GetApp } from '@material-ui/icons'
 
 type TopBarProps = {
   title?: string
@@ -21,7 +22,7 @@ type TopBarProps = {
   loading?: boolean
 }
 
-const TopBar: React.FC<TopBarProps> = ({ loading, ...props }) => {
+const TopBar: React.FC<TopBarProps> = ({ loading, openRedcapDialog, save, ...props }) => {
   const classes = useStyles()
 
   return (
@@ -46,11 +47,12 @@ const TopBar: React.FC<TopBarProps> = ({ loading, ...props }) => {
           </Grid>
         </Grid>
         <Grid container item xs={2} justify="space-between">
-          {props.save && (
-            <IconButton>
-              <SaveIcon height="25px" fill="#5BC5F2" />
-            </IconButton>
-          )}
+          <IconButton onClick={openRedcapDialog} disabled={!openRedcapDialog}>
+            <GetApp height="25px" fill="#5BC5F2" />
+          </IconButton>
+          <IconButton disabled={!save}>
+            <SaveIcon height="25px" fill="#5BC5F2" />
+          </IconButton>
           {/* {props.fav && (
             <IconButton>
               <Star height="15px" fill="#ED6D91" />

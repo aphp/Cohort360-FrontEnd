@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   exportBox: {
     position: 'absolute',
     display: 'flex',
@@ -14,11 +14,7 @@ const useStyles = makeStyles(() => ({
     height: 40
   },
   addButton: {
-    position: 'relative',
-    marginRight: 5,
-    marginBottom: 5,
-    marginTop: 5,
-    width: 75
+    marginTop: theme.spacing(2)
   },
   dialogPaper: {
     minHeight: '80vh',
@@ -26,18 +22,9 @@ const useStyles = makeStyles(() => ({
     position: 'relative',
     height: '100%'
   },
-  exportContent: {
-    marginLeft: '2%',
-    marginRight: '2%',
-    height: '85%',
-    overflowY: 'scroll'
-  },
   anonymChoice: {
     width: '100%',
     textAlign: 'center'
-  },
-  insideExportContent: {
-    marginRight: 5
   },
   riskText: {
     display: 'flex',
