@@ -9,8 +9,8 @@ import useStyles from './styles'
 const defaultDemographic = {
   title: 'Critères GHM',
   code: [],
-  occurrence: 0,
-  occurrenceComparator: '<=',
+  occurrence: 1,
+  occurrenceComparator: '>=',
   startOccurrence: '',
   endOccurrence: '',
   isInclusive: true

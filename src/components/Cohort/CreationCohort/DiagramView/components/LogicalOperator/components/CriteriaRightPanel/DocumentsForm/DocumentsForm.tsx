@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 
+import { Alert } from '@material-ui/lab'
 import { Button, Divider, Grid, IconButton, Switch, Typography, FormLabel } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
@@ -20,8 +21,8 @@ const defaultComposition = {
   title: 'Critère de document',
   search: '',
   docType: [],
-  occurrence: 0,
-  occurrenceComparator: '<=',
+  occurrence: 1,
+  occurrenceComparator: '>=',
   startOccurrence: '',
   endOccurrence: '',
   isInclusive: true
@@ -33,10 +34,15 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
 
   const classes = useStyles()
 
+  const [error, setError] = useState(false)
+
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = (data: any) => {
-    console.log('data', data)
+    if (data && data.search?.length === 0 && data.docType?.length === 0) {
+      return setError(true)
+    }
+
     onChangeSelectedCriteria({
       ...defaultValues,
       title: data.title,
@@ -70,6 +76,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
+        {error && <Alert severity="error">Merci de renseigner au moins une recherche, ou un type de document</Alert>}
         <FormBuilder<DocumentDataType>
           defaultValues={defaultValues}
           title={'Documents médicaux'}
@@ -104,9 +111,6 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               placeholder: 'Recherche dans les documents',
               type: 'text',
               variant: 'outlined'
-              //   validationRules: {
-              //     required: 'Merci de renseigner une recherche'
-              //   }
             },
             {
               name: 'docType',
@@ -148,7 +152,8 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
                   variant: 'outlined',
                   type: 'number',
                   validationRules: {
-                    min: 0
+                    min: 1,
+                    required: 'Merci de renseigner une occurrence supérieure ou égale à 1'
                   }
                 }
               ]
