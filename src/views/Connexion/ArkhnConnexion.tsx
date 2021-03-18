@@ -12,13 +12,13 @@ import {
   Link,
   Typography
 } from '@material-ui/core'
-import { unwrapResult } from '@reduxjs/toolkit'
+import { SerializedError, unwrapResult } from '@reduxjs/toolkit'
 import { useHistory } from 'react-router-dom'
 import queryString from 'query-string'
 
 import logo from 'assets/images/logo-login.png'
 import { ACCES_TOKEN, STATE_STORAGE_KEY } from '../../constants'
-import { fetchTokens } from 'services/arkhnAuth/oauth/tokenManager'
+import { fetchTokens, removeTokens } from 'services/arkhnAuth/oauth/tokenManager'
 import { arkhnAuthenticationRedirect } from 'services/authentication'
 import { useAppDispatch } from 'state'
 import { fetchLoggedPractitioner } from 'state/me'
@@ -96,7 +96,9 @@ const ArkhnConnexion = () => {
         .then(() => {
           history.push('/accueil')
         })
-        .finally(() => {
+        .catch((error: SerializedError) => {
+          console.error(error)
+          removeTokens()
           setLoading(false)
         })
     }

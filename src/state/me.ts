@@ -24,7 +24,7 @@ export const logout = createAction('LOGOUT')
 
 export const fetchLoggedPractitioner = createAsyncThunk<MeState, void, { state: RootState }>(
   'me/fetchLoggedPractitoner',
-  async (_, { dispatch }) => {
+  async (_, { dispatch, rejectWithValue }) => {
     const idToken = getIdToken()
     let state: MeState = null
 
@@ -39,6 +39,7 @@ export const fetchLoggedPractitioner = createAsyncThunk<MeState, void, { state: 
         }
       } else {
         dispatch(logout())
+        return rejectWithValue(new Error('Practitioner not found'))
       }
     }
 
