@@ -52,11 +52,11 @@ const ControlPanel: React.FC<{
         <Grid>
           <Grid container justify="center" className={classes.requestAction}>
             <Button
-              disabled={typeof onExecute !== 'function'}
+              disabled={loading || countLoading || typeof onExecute !== 'function'}
               onClick={() => onSetOpenModal('executeCohortConfirmation')}
               className={classes.requestExecution}
             >
-              {loading ? (
+              {loading || countLoading ? (
                 <>
                   Veuillez patienter
                   <CircularProgress style={{ marginLeft: '15px' }} size={30} />
