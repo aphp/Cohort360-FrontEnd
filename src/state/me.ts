@@ -11,7 +11,8 @@ export type MeState = null | {
   lastConnection?: string
 }
 
-const initialState: MeState = null
+const localStorageUser = localStorage.getItem('user') || null
+const initialState: MeState = localStorageUser ? JSON.parse(localStorageUser) : null
 
 // Logout action is defined outside of the meSlice because it is being used by all reducers
 export const logout = createAction('LOGOUT')
@@ -26,7 +27,7 @@ const meSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(logout, () => {
-      return initialState
+      return null
     })
   }
 })

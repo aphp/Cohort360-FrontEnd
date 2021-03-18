@@ -14,6 +14,9 @@ import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
 
 import { createRequest, createSnapshot, countCohort } from 'services/cohortCreation'
 
+const localStorageCohortCreation = localStorage.getItem('cohortCreation') ?? null
+const jsonCohortCreation = localStorageCohortCreation ? JSON.parse(localStorageCohortCreation).request : {}
+
 export type CohortCreationState = {
   loading: boolean
   saveLoading: boolean
@@ -32,7 +35,7 @@ export type CohortCreationState = {
   nextGroupId: number
 }
 
-const initialState: CohortCreationState = {
+const defaultInitialState: CohortCreationState = {
   loading: false,
   saveLoading: false,
   countLoading: false,
@@ -63,6 +66,8 @@ const initialState: CohortCreationState = {
   nextCriteriaId: 1,
   nextGroupId: -1
 }
+
+const initialState: CohortCreationState = localStorageCohortCreation ? jsonCohortCreation : defaultInitialState
 
 /**
  * countCohortCreation
@@ -150,7 +155,7 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
         }
       }
 
-      dispatch(
+      dispatch<any>(
         countCohortCreation({
           json: newJson,
           snapshotId: currentSnapshot,
@@ -195,12 +200,13 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
       const _criteriaGroup: CriteriaGroupType[] =
         state.cohortCreation.request.criteriaGroup && state.cohortCreation.request.criteriaGroup.length > 0
           ? state.cohortCreation.request.criteriaGroup
-          : initialState.criteriaGroup
-      const _temporalConstraints = state.cohortCreation.request.temporalConstraints ?? initialState.temporalConstraints
+          : defaultInitialState.criteriaGroup
+      const _temporalConstraints =
+        state.cohortCreation.request.temporalConstraints ?? defaultInitialState.temporalConstraints
 
       const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
 
-      dispatch(saveJson({ newJson: json }))
+      dispatch<any>(saveJson({ newJson: json }))
 
       return {
         json,

@@ -50,11 +50,11 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
 
   const onDeleteCohort = async (cohortId: string) => {
     setResearches(researches?.filter((r) => r.researchId !== cohortId))
-    dispatch(deleteUserCohortThunk({ cohortId }))
+    dispatch<any>(deleteUserCohortThunk({ cohortId }))
   }
 
   const onSetCohortFavorite = async (cohortId: string) => {
-    dispatch(setFavoriteCohortThunk({ cohortId })).then(() =>
+    dispatch<any>(setFavoriteCohortThunk({ cohortId })).then(() =>
       fetchCohorts().then((cohortsResp) => {
         setResearches(cohortsResp?.results ?? undefined)
         setTotal(cohortsResp?.count ?? 0)

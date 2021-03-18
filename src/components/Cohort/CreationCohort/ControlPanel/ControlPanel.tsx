@@ -38,7 +38,7 @@ const ControlPanel: React.FC<{
   useEffect(() => {
     const interval = setInterval(() => {
       if (count && count.status && (count.status === 'pending' || count.status === 'started')) {
-        dispatch(countCohortCreation({ uuid: count.uuid }))
+        dispatch<any>(countCohortCreation({ uuid: count.uuid }))
       } else {
         clearInterval(interval)
       }
@@ -92,7 +92,7 @@ const ControlPanel: React.FC<{
           <Divider /> */}
 
           <Button
-            onClick={() => dispatch(resetCohortCreation())}
+            onClick={() => dispatch<any>(resetCohortCreation())}
             className={classes.actionButton}
             startIcon={<UpdateSharpIcon color="action" className={classes.iconBorder} />}
           >

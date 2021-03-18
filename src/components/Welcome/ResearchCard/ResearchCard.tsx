@@ -22,11 +22,11 @@ const ResearchCard: React.FC<ResearchCardProps> = ({ onClickRow, simplified, tit
   const dispatch = useAppDispatch()
 
   const onDeleteCohort = async (cohortId: string) => {
-    dispatch(deleteUserCohortThunk({ cohortId }))
+    dispatch<any>(deleteUserCohortThunk({ cohortId }))
   }
 
   const onSetCohortFavorite = (cohortId: string) => {
-    dispatch(setFavoriteCohortThunk({ cohortId }))
+    dispatch<any>(setFavoriteCohortThunk({ cohortId }))
   }
 
   return (

@@ -64,7 +64,7 @@ const Dashboard: React.FC<{
     const id = context === 'cohort' ? cohortId : context === 'perimeters' ? perimetreIds : undefined
 
     if (context !== 'new_cohort') {
-      dispatch(fetchExploredCohort({ context, id }))
+      dispatch<any>(fetchExploredCohort({ context, id }))
     }
 
     switch (context) {

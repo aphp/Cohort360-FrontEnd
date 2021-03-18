@@ -8,7 +8,9 @@ export type UserCohortsState = {
   favoriteCohorts?: FormattedCohort[]
 }
 
-const initialState: UserCohortsState = {}
+const localStorageUserCohorts = localStorage.getItem('userCohorts') ?? null
+
+const initialState: UserCohortsState = localStorageUserCohorts ? JSON.parse(localStorageUserCohorts) : {}
 
 const initUserCohortsThunk = createAsyncThunk<UserCohortsState, void, { state: RootState }>(
   'userCohorts/initUserCohortsThunk',
@@ -23,7 +25,7 @@ const fetchFavoriteCohortsThunk = createAsyncThunk<void, void, { state: RootStat
   async (params, { dispatch }) => {
     const favoriteCohorts = await fetchFavoriteCohorts()
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    dispatch(userCohortsSlice.actions.setFavoriteCohorts(favoriteCohorts))
+    dispatch<any>(userCohortsSlice.actions.setFavoriteCohorts(favoriteCohorts))
   }
 )
 
@@ -33,7 +35,7 @@ const setFavoriteCohortThunk = createAsyncThunk<void, { cohortId: string }, { st
     const { favoriteCohorts } = getState().userCohorts
     const isCohortFavorite = favoriteCohorts ? favoriteCohorts.some((cohort) => cohort.researchId === cohortId) : false
     if (await setFavorite(cohortId, isCohortFavorite)) {
-      dispatch(fetchFavoriteCohortsThunk())
+      dispatch<any>(fetchFavoriteCohortsThunk())
     }
   }
 )
@@ -43,7 +45,7 @@ const deleteUserCohortThunk = createAsyncThunk<void, { cohortId: string }, { sta
   async ({ cohortId }, { dispatch }) => {
     if (await onRemoveCohort(cohortId)) {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      dispatch(userCohortsSlice.actions.deleteCohort(cohortId))
+      dispatch<any>(userCohortsSlice.actions.deleteCohort(cohortId))
     }
   }
 )

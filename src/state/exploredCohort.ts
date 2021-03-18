@@ -15,27 +15,39 @@ export type ExploredCohortState = {
   requestId?: string
 } & CohortData
 
-const initialState: ExploredCohortState = {
-  // CohortData
-  name: '',
-  cohort: [],
-  totalPatients: 0,
-  originalPatients: [],
-  totalDocs: 0,
-  documentsList: [],
-  wordcloudData: [],
-  encounters: [],
-  genderRepartitionMap: undefined,
-  visitTypeRepartitionData: undefined,
-  monthlyVisitData: undefined,
-  agePyramidData: undefined,
-  requestId: '',
-  // ExploredCohortState
-  importedPatients: [],
-  includedPatients: [],
-  excludedPatients: [],
-  loading: false
-}
+const localStorageExploredCohort = localStorage.getItem('exploredCohort') ?? null
+const jsonExploredCohort = localStorageExploredCohort ? JSON.parse(localStorageExploredCohort) : {}
+
+const initialState: ExploredCohortState = localStorageExploredCohort
+  ? {
+      ...jsonExploredCohort,
+      agePyramidData: jsonExploredCohort.agePyramidData ? new Map(jsonExploredCohort.agePyramidData) : new Map(),
+      genderRepartitionMap: jsonExploredCohort.genderRepartitionMap
+        ? new Map(jsonExploredCohort.genderRepartitionMap)
+        : new Map(),
+      monthlyVisitData: jsonExploredCohort.monthlyVisitData ? new Map(jsonExploredCohort.monthlyVisitData) : new Map()
+    }
+  : {
+      // CohortData
+      name: '',
+      cohort: [],
+      totalPatients: 0,
+      originalPatients: [],
+      totalDocs: 0,
+      documentsList: [],
+      wordcloudData: [],
+      encounters: [],
+      genderRepartitionMap: undefined,
+      visitTypeRepartitionData: undefined,
+      monthlyVisitData: undefined,
+      agePyramidData: undefined,
+      requestId: '',
+      // ExploredCohortState
+      importedPatients: [],
+      includedPatients: [],
+      excludedPatients: [],
+      loading: false
+    }
 
 const fetchExploredCohort = createAsyncThunk<
   CohortData,
