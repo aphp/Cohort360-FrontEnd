@@ -136,7 +136,9 @@ export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefi
     return results
   }
   if (CONTEXT === 'aphp') {
-    const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>('/explorations/cohorts/?favorite=true')
+    const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
+      '/explorations/cohorts/?favorite=true&ordering=-fhir_datetime'
+    )
 
     const results = cohortResp?.data?.results
       ? cohortResp.data.results
