@@ -20,7 +20,8 @@ const useStyles = makeStyles((theme) => ({
   tableButtons: {
     display: 'flex',
     justifyContent: 'flex-end',
-    marginBottom: 5
+    marginBottom: 5,
+    width: 'auto'
   },
   searchBar: {
     width: '250px',
@@ -39,6 +40,12 @@ const useStyles = makeStyles((theme) => ({
     color: '#FFF',
     borderRadius: '25px',
     marginLeft: 20
+  },
+  chips: {
+    margin: '12px 6px',
+    '&:last-child': {
+      marginRight: 0
+    }
   }
 }))
 

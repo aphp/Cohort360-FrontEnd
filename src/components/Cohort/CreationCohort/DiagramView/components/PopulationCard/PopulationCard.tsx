@@ -26,7 +26,7 @@ const PopulationCard: React.FC = () => {
   const [openDrawer, onChangeOpenDrawer] = useState(false)
 
   const submitPopulation = (_selectedPopulation: ScopeTreeRow[] | null) => {
-    dispatch(buildCohortCreation({ selectedPopulation: _selectedPopulation }))
+    dispatch<any>(buildCohortCreation({ selectedPopulation: _selectedPopulation }))
     onChangeOpenDrawer(false)
   }
 

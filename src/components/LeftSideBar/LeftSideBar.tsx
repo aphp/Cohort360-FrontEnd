@@ -63,27 +63,27 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
 
   useEffect(() => {
     if (props.open) {
-      dispatch(openAction())
+      dispatch<any>(openAction())
     } else {
-      dispatch(closeAction())
+      dispatch<any>(closeAction())
     }
   }, [props.open]) // eslint-disable-line
 
   const handleDrawerOpen = () => {
-    dispatch(openAction())
+    dispatch<any>(openAction())
   }
 
   const handleDrawerClose = () => {
-    dispatch(closeAction())
+    dispatch<any>(closeAction())
   }
 
   const handleNestedList = () => {
-    dispatch(openAction())
+    dispatch<any>(openAction())
     setList(!list)
   }
 
   const handleNestedList2 = () => {
-    dispatch(openAction())
+    dispatch<any>(openAction())
     setList2(!list2)
   }
 
@@ -147,7 +147,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                     <IconButton
                       onClick={() => {
                         localStorage.clear()
-                        dispatch(logoutAction())
+                        dispatch<any>(logoutAction())
                         history.push('/')
                       }}
                     >

@@ -38,7 +38,7 @@ const ControlPanel: React.FC<{
   useEffect(() => {
     const interval = setInterval(() => {
       if (count && count.status && (count.status === 'pending' || count.status === 'started')) {
-        dispatch(countCohortCreation({ uuid: count.uuid }))
+        dispatch<any>(countCohortCreation({ uuid: count.uuid }))
       } else {
         clearInterval(interval)
       }
@@ -52,11 +52,11 @@ const ControlPanel: React.FC<{
         <Grid>
           <Grid container justify="center" className={classes.requestAction}>
             <Button
-              disabled={typeof onExecute !== 'function'}
+              disabled={loading || countLoading || typeof onExecute !== 'function'}
               onClick={() => onSetOpenModal('executeCohortConfirmation')}
               className={classes.requestExecution}
             >
-              {loading ? (
+              {loading || countLoading ? (
                 <>
                   Veuillez patienter
                   <CircularProgress style={{ marginLeft: '15px' }} size={30} />
@@ -92,7 +92,7 @@ const ControlPanel: React.FC<{
           <Divider /> */}
 
           <Button
-            onClick={() => dispatch(resetCohortCreation())}
+            onClick={() => dispatch<any>(resetCohortCreation())}
             className={classes.actionButton}
             startIcon={<UpdateSharpIcon color="action" className={classes.iconBorder} />}
           >
