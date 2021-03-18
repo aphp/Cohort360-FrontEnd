@@ -1,5 +1,5 @@
 import api from './api'
-import { CONTEXT, API_RESOURCE_TAG } from '../constants'
+import { CONTEXT } from '../constants'
 import { IComposition, IPatient, IEncounter, IIdentifier } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortComposition, CohortPatient, FHIR_API_Response, CohortData } from '../types'
 import { getApiResponseResources } from 'utils/apiHelpers'
