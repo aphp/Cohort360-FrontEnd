@@ -7,7 +7,7 @@ import Cim10Hierarchy from './components/Hierarchy/Cim10Hierarchy'
 import useStyles from './styles'
 
 const defaultCondition = {
-  title: 'Critère de diagnostique',
+  title: 'Critère de diagnostic',
   code: [],
   diagnosticType: [],
   occurrence: 1,

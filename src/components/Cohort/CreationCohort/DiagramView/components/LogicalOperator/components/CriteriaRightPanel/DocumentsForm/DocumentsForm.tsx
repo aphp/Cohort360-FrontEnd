@@ -153,7 +153,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
                   type: 'number',
                   validationRules: {
                     min: 1,
-                    required: 'Merci de renseigner une occurrence suppérieure ou égale à 1'
+                    required: 'Merci de renseigner une occurrence supérieure ou égale à 1'
                   }
                 }
               ]
