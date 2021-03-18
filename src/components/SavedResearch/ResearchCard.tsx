@@ -57,8 +57,6 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
   })
   const researchLines = 20 // Number of desired lines in the document array
 
-  console.log(`filters`, filters)
-
   useEffect(() => {
     onFetchCohorts(sortBy, sortDirection)
   }, [filters]) // eslint-disable-line
@@ -160,11 +158,34 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
     onFetchCohorts(property, _sortDirection)
   }
 
-  const handleDeleteChip = (filterName: string, value?: string) => {
-    // setFilters({
-    //   ...filters,
-    //   filterName: value ? value : null
-    // })
+  const handleDeleteChip = (filterName: string, value?: any) => {
+    switch (filterName) {
+      case 'status':
+        value &&
+          setFilters({
+            ...filters,
+            status: filters.status.filter((item) => item !== value)
+          })
+        break
+      case 'type':
+        setFilters({ ...filters, type: 'all' })
+        break
+      case 'favorite':
+        setFilters({ ...filters, favorite: 'all' })
+        break
+      case 'minPatients':
+        setFilters({ ...filters, minPatients: null })
+        break
+      case 'maxPatients':
+        setFilters({ ...filters, maxPatients: null })
+        break
+      case 'startDate':
+        setFilters({ ...filters, startDate: null })
+        break
+      case 'endDate':
+        setFilters({ ...filters, endDate: null })
+        break
+    }
   }
 
   return (
@@ -209,7 +230,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
               className={classes.chips}
               key={status.code}
               label={`Statut ${status.display}`}
-              onDelete={() => handleDeleteChip('status')}
+              onDelete={() => handleDeleteChip('status', status)}
               color="primary"
               variant="outlined"
             />
