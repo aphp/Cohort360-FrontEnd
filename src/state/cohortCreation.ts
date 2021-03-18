@@ -257,7 +257,7 @@ const cohortCreationSlice = createSlice({
   name: 'cohortCreation',
   initialState,
   reducers: {
-    resetCohortCreation: () => initialState,
+    resetCohortCreation: () => defaultInitialState,
     setCohortName: (state: CohortCreationState, action: PayloadAction<string>) => {
       state.cohortName = action.payload
     },
