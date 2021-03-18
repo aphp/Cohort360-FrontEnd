@@ -69,7 +69,7 @@ const RechercherPatient: React.FC<{}> = () => {
   }
 
   useEffect(() => {
-    dispatch(setExploredCohort())
+    dispatch<any>(setExploredCohort())
   }, []) // eslint-disable-line
 
   useEffect(() => {

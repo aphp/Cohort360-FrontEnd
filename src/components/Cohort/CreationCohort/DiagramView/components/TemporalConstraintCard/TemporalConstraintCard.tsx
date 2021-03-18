@@ -14,13 +14,13 @@ const TemporalConstraintView: React.FC = () => {
   const { temporalConstraints = [] } = useAppSelector((state) => state.cohortCreation.request || {})
 
   const onChangeTemporalConstraint = (value: 'sameEncounter' | 'differentEncounter' | 'none') => {
-    dispatch(
+    dispatch<any>(
       updateTemporalConstraint({
         idList: ['All'],
         constraintType: value
       })
     )
-    dispatch(buildCohortCreation({}))
+    dispatch<any>(buildCohortCreation({}))
   }
 
   const mainTemporalConstraint = temporalConstraints.find(({ idList }) => idList && idList[0] && idList[0] === 'All')

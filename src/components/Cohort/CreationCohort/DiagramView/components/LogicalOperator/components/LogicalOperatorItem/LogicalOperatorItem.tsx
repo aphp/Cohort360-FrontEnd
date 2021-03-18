@@ -63,17 +63,17 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
   }
 
   const _buildCohortCreation = () => {
-    dispatch(buildCohortCreation({}))
+    dispatch<any>(buildCohortCreation({}))
   }
 
   const _deleteLogicalOperator = () => {
-    dispatch(deleteCriteriaGroup(itemId))
+    dispatch<any>(deleteCriteriaGroup(itemId))
 
     const logicalOperatorParent = request.criteriaGroup
       ? request.criteriaGroup.find(({ criteriaIds }) => criteriaIds.find((_criteriaId) => _criteriaId === itemId))
       : undefined
     if (!logicalOperatorParent) return
-    dispatch(
+    dispatch<any>(
       editCriteriaGroup({
         ...logicalOperatorParent,
         criteriaIds: logicalOperatorParent.criteriaIds.filter((_criteriaId) => _criteriaId !== itemId)
@@ -90,7 +90,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
 
       switch (value) {
         case 'atLeast':
-          dispatch(
+          dispatch<any>(
             editCriteriaGroup({
               ..._currentLogicalOperator,
               type: 'NamongM',
@@ -104,7 +104,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
           )
           break
         case 'atMost':
-          dispatch(
+          dispatch<any>(
             editCriteriaGroup({
               ..._currentLogicalOperator,
               type: 'NamongM',
@@ -118,7 +118,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
           )
           break
         case 'exactly':
-          dispatch(
+          dispatch<any>(
             editCriteriaGroup({
               ..._currentLogicalOperator,
               type: 'NamongM',
@@ -134,7 +134,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         case 'andGroup':
         case 'orGroup':
         default:
-          dispatch(
+          dispatch<any>(
             editCriteriaGroup({
               ..._currentLogicalOperator,
               type: value
@@ -143,7 +143,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
           break
       }
     } else if (key === 'options.number') {
-      dispatch(
+      dispatch<any>(
         editCriteriaGroup({
           ..._currentLogicalOperator,
           type: 'NamongM',
@@ -156,7 +156,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         })
       )
     } else {
-      dispatch(
+      dispatch<any>(
         editCriteriaGroup({
           ..._currentLogicalOperator,
           [key]: value

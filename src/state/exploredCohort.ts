@@ -15,7 +15,10 @@ export type ExploredCohortState = {
   requestId?: string
 } & CohortData
 
-const initialState: ExploredCohortState = {
+const localStorageExploredCohort = localStorage.getItem('exploredCohort') ?? null
+const jsonExploredCohort = localStorageExploredCohort ? JSON.parse(localStorageExploredCohort) : {}
+
+const defaultInitialState = {
   // CohortData
   name: '',
   cohort: [],
@@ -36,6 +39,17 @@ const initialState: ExploredCohortState = {
   excludedPatients: [],
   loading: false
 }
+
+const initialState: ExploredCohortState = localStorageExploredCohort
+  ? {
+      ...jsonExploredCohort,
+      agePyramidData: jsonExploredCohort.agePyramidData ? new Map(jsonExploredCohort.agePyramidData) : new Map(),
+      genderRepartitionMap: jsonExploredCohort.genderRepartitionMap
+        ? new Map(jsonExploredCohort.genderRepartitionMap)
+        : new Map(),
+      monthlyVisitData: jsonExploredCohort.monthlyVisitData ? new Map(jsonExploredCohort.monthlyVisitData) : new Map()
+    }
+  : defaultInitialState
 
 const fetchExploredCohort = createAsyncThunk<
   CohortData,
@@ -171,9 +185,7 @@ const exploredCohortSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(logout, () => {
-      return initialState
-    })
+    builder.addCase(logout, () => defaultInitialState)
     builder.addCase(fetchExploredCohort.pending, (state, { meta }) => {
       state.loading = true
       state.requestId = meta.requestId
