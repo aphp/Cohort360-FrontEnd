@@ -63,7 +63,11 @@ const Scope = () => {
             Explorer un perimètre
           </Typography>
           <Paper className={classes.paper}>
-            <ScopeTree defaultSelectedItems={selectedItems} onChangeSelectedItem={onChangeSelectedItem} />
+            <ScopeTree
+              defaultSelectedItems={selectedItems}
+              onChangeSelectedItem={onChangeSelectedItem}
+              restrictToPractitionerPerimeter
+            />
 
             <div className={classes.buttons}>
               <Button

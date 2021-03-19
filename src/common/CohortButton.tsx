@@ -10,5 +10,8 @@ export default withStyles((theme) => ({
       backgroundColor: '#4355b7',
       color: '#FFF'
     }
+  },
+  disabled: {
+    backgroundColor: theme.palette.grey[300]
   }
 }))(Button)

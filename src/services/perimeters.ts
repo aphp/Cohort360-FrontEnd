@@ -23,6 +23,7 @@ import fakeFacetClassSimple from '../data/fakeData/facet-class-simple'
 import fakeFacetStartDateFacet from '../data/fakeData/facet-start-date-facet'
 import fakePatients from '../data/fakeData/patients'
 import { FHIR_API_Response, CohortData, ScopeTreeRow } from 'types'
+import { getServicePatientsCount } from './scopeService'
 
 export const getOrganizations = async (ids?: string): Promise<IOrganization[]> => {
   const orgaIdsParam = ids ? `?_id=${ids}` : ''
@@ -32,10 +33,12 @@ export const getOrganizations = async (ids?: string): Promise<IOrganization[]> =
 
 export const getPractitionerPerimeter = async (practitionerId: string) => {
   const resp = await api.get<FHIR_API_Response<IOrganization>>(
-    `/Organization?_has:PractitionerRole:organization:practitioner=${practitionerId}&active=true`
+    `/Organization?_has:PractitionerRole:organization:practitioner=${practitionerId}:active=true`
   )
   const organizations = getApiResponseResources(resp)
-  return organizations ?? []
+  const organizationsWithTotal = organizations && (await Promise.all(organizations.map(getServicePatientsCount)))
+
+  return organizationsWithTotal?.map(({ service, total }) => ({ ...service, total })) ?? []
 }
 
 const getPatientsAndEncountersFromServiceId = async (serviceId: string) => {

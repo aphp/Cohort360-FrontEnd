@@ -8,7 +8,7 @@ import fakeScopeRows from '../data/fakeData/scopeRows'
 
 const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0 }
 
-const getServicePatientsCount = async (
+export const getServicePatientsCount = async (
   organization: IOrganization
 ): Promise<{ total: number; service: IOrganization }> => {
   const patientsResp = await api.get<FHIR_API_Response<IPatient>>(
