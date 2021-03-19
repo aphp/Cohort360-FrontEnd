@@ -60,7 +60,9 @@ const RedcapExport = (props: RedcapExportProps): JSX.Element => {
     setCrfAttribute(tmp)
   }
 
-  const exportCSV = () => {}
+  const exportCSV = () => {
+    ///
+  }
   const removeItem = (item: ExportItem) => {
     const idx = crfAttribute.findIndex(({ id }) => id === item.id)
     const tmp = [...crfAttribute]
