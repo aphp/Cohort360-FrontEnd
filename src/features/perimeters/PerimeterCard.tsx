@@ -1,9 +1,11 @@
 import React from 'react'
 
 import { Card, CardActions, CardContent, Divider, Typography, makeStyles } from '@material-ui/core'
+import { useHistory } from 'react-router'
 
 import Button from 'common/CohortButton'
 import Title from 'components/Title'
+import { useAppSelector } from 'state'
 
 const useStyles = makeStyles((theme) => ({
   list: {
@@ -13,19 +15,33 @@ const useStyles = makeStyles((theme) => ({
 
 const PerimeterCard = () => {
   const classes = useStyles()
+  const history = useHistory()
+  const organizations = useAppSelector((state) => state.me?.practitionerOrganizations)
+  const disableExplore = !organizations || organizations.length === 0
+
+  const handleExplorePerimeter = () => {
+    organizations && history.push(`/perimetres?${organizations.map(({ id }) => id)}`)
+  }
+
   return (
     <Card>
       <CardContent>
         <Title>Votre périmètre</Title>
         <Divider />
         <ul className={classes.list}>
-          <li>
-            <Typography variant="subtitle2">Cardiologie</Typography>
-          </li>
+          {organizations
+            ? organizations.map(({ name, id }) => (
+                <li key={id}>
+                  <Typography variant="subtitle2">{name}</Typography>
+                </li>
+              ))
+            : null}
         </ul>
       </CardContent>
       <CardActions>
-        <Button fullWidth>Explorer votre périmètre</Button>
+        <Button disabled={disableExplore} onClick={handleExplorePerimeter} fullWidth>
+          Explorer votre périmètre
+        </Button>
       </CardActions>
     </Card>
   )

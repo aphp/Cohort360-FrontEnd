@@ -17,7 +17,7 @@ export type MeState = null | {
   nominativeGroupsIds?: any[]
   lastConnection?: string
   isSuperUser?: boolean
-  practitionerOrganizations?: IOrganization[]
+  practitionerOrganizations?: (IOrganization & { total: number })[]
 }
 
 const initialState: MeState = null

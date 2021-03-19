@@ -23,24 +23,29 @@ import displayDigit from 'utils/displayDigit'
 import useStyles from './styles'
 import Lock from '@material-ui/icons/Lock'
 import { CheckCircle } from '@material-ui/icons'
+import { practitionerScopeSelector } from 'features/perimeters/perimetersSelector'
 
 type ScopeTreeProps = {
   defaultSelectedItems: ScopeTreeRow[]
   onChangeSelectedItem: (selectedItems: ScopeTreeRow[]) => void
+  restrictToPractitionerPerimeter?: boolean
 }
 
-const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSelectedItem }) => {
+const ScopeTree: React.FC<ScopeTreeProps> = ({
+  defaultSelectedItems,
+  onChangeSelectedItem,
+  restrictToPractitionerPerimeter
+}) => {
   const classes = useStyles()
 
+  const practitionerScopeRows = useAppSelector(practitionerScopeSelector)
   const [openPopulation, onChangeOpenPopulations] = useState<string[]>([])
-  const [rootRows, setRootRows] = useState<ScopeTreeRow[]>([])
-  const [loading, setLoading] = useState(true)
+  const [rootRows, setRootRows] = useState<ScopeTreeRow[]>(practitionerScopeRows)
+  const [loading, setLoading] = useState(false)
   const [selectedItems, setSelectedItem] = useState(defaultSelectedItems)
 
-  const practitioner = useAppSelector((state) => state.me)
-
   useEffect(() => {
-    if (practitioner) {
+    if (!restrictToPractitionerPerimeter) {
       setLoading(true)
       getScopePerimeters()
         .then((rootRows) => {
@@ -50,7 +55,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
           setLoading(false)
         })
     }
-  }, [practitioner])
+  }, [restrictToPractitionerPerimeter])
 
   useEffect(() => setSelectedItem(defaultSelectedItems), [defaultSelectedItems])
 
@@ -155,16 +160,16 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     // setSelectedItem(savedSelectedItems)
   }
 
-  const _checkIfIndeterminated: (_row: any) => boolean | undefined = (_row) => {
+  const _checkIfIndeterminated: (_row: ScopeTreeRow) => boolean | undefined = (_row) => {
     // Si que un loading => false
     if (_row.subItems && _row.subItems.length > 0 && _row.subItems[0].id === 'loading') {
       return false
     }
     // Si des sub elem && des sub elem qui sont check => true
-    const numberOfSubItemsSelected = _row.subItems.filter((subItem: any) =>
+    const numberOfSubItemsSelected = _row.subItems?.filter((subItem: any) =>
       selectedItems.find(({ id }) => id === subItem.id)
     )?.length
-    if (numberOfSubItemsSelected && numberOfSubItemsSelected !== _row.subItems.length) {
+    if (numberOfSubItemsSelected && numberOfSubItemsSelected !== _row.subItems?.length) {
       return true
     }
     // sinon => false
