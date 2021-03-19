@@ -2,11 +2,14 @@ import api from './api'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import { getLastEncounter } from './myPatients'
 import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { CohortPatient, FHIR_API_Response, SearchByTypes } from 'types'
+import { Back_API_Response, Cohort, CohortPatient, FHIR_API_Response, SearchByTypes, Snapshot, Query } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
-import { getServices } from './perimeters'
 
 import fakePatients from '../data/fakeData/patients'
+import { head } from 'lodash'
+import apiBackCohort from './apiBackCohort'
+
+const PATIENT_MAX_COUNT = 500
 
 export const searchPatient = async (
   nominativeGroupsIds: string[] | undefined,
@@ -36,9 +39,19 @@ export const searchPatient = async (
     let searchByIdentifier = ''
     let filterByService = ''
     if (groupId) {
-      const services = (await getServices(groupId)).filter((service) => undefined !== service.id)
-      const serviceIds = services.map((service) => service.id)
-      filterByService = `&_has:Encounter:subject:service-provider=${serviceIds.join(',')}`
+      const cohortResponse = await apiBackCohort.get<Back_API_Response<Cohort>>(
+        `/explorations/cohorts/?fhir_group_id=${groupId}`
+      )
+      const requestId = head(cohortResponse.data.results)?.request_id
+      const snapshotResponse = await apiBackCohort.get<Back_API_Response<Snapshot>>(
+        `/explorations/request-query-snapshots/?request_id=${requestId}`
+      )
+      const query_json = head(snapshotResponse.data.results)?.serialized_query
+      if (query_json) {
+        const query: Query = JSON.parse(query_json)
+        const perimeters = query.sourcePopulation.caresiteCohortList
+        filterByService = `&_has:Encounter:subject:service-provider=${perimeters.join(',')}`
+      }
     }
     if (input.trim() !== '') {
       searchByFamily = `family=${input}`
@@ -48,21 +61,21 @@ export const searchPatient = async (
       switch (searchBy) {
         case SearchByTypes.family: {
           const matchFamily = await api.get<FHIR_API_Response<IPatient>>(
-            `/Patient?${searchByFamily}${filterByService}${API_RESOURCE_TAG}&_count=10000`
+            `/Patient?${searchByFamily}${filterByService}${API_RESOURCE_TAG}&_count=${PATIENT_MAX_COUNT}`
           )
           getApiResponseResources(matchFamily)?.forEach((patient) => patientSet.add(patient))
           break
         }
         case SearchByTypes.given: {
           const matchGiven = await api.get<FHIR_API_Response<IPatient>>(
-            `/Patient?${searchByGiven}${filterByService}${API_RESOURCE_TAG}&_count=10000`
+            `/Patient?${searchByGiven}${filterByService}${API_RESOURCE_TAG}&_count=${PATIENT_MAX_COUNT}`
           )
           getApiResponseResources(matchGiven)?.forEach((patient) => patientSet.add(patient))
           break
         }
         case SearchByTypes.identifier: {
           const matchIPP = await api.get<FHIR_API_Response<IPatient>>(
-            `/Patient?${searchByIdentifier}${filterByService}${API_RESOURCE_TAG}&_count=10000`
+            `/Patient?${searchByIdentifier}${filterByService}${API_RESOURCE_TAG}&_count=${PATIENT_MAX_COUNT}`
           )
           getApiResponseResources(matchIPP)?.forEach((patient) => patientSet.add(patient))
           break
@@ -70,13 +83,13 @@ export const searchPatient = async (
         default: {
           const [matchIPP, matchFamily, matchGiven] = await Promise.all([
             api.get<FHIR_API_Response<IPatient>>(
-              `/Patient?${searchByIdentifier}${filterByService}${API_RESOURCE_TAG}&_count=10000`
+              `/Patient?${searchByIdentifier}${filterByService}${API_RESOURCE_TAG}&_count=${PATIENT_MAX_COUNT}`
             ),
             api.get<FHIR_API_Response<IPatient>>(
-              `/Patient?${searchByFamily}${filterByService}${API_RESOURCE_TAG}&_count=10000`
+              `/Patient?${searchByFamily}${filterByService}${API_RESOURCE_TAG}&_count=${PATIENT_MAX_COUNT}`
             ),
             api.get<FHIR_API_Response<IPatient>>(
-              `/Patient?${searchByGiven}${filterByService}${API_RESOURCE_TAG}&_count=10000`
+              `/Patient?${searchByGiven}${filterByService}${API_RESOURCE_TAG}&_count=${PATIENT_MAX_COUNT}`
             )
           ])
           getApiResponseResources(matchIPP)?.forEach((patient) => patientSet.add(patient))
@@ -87,7 +100,9 @@ export const searchPatient = async (
       }
     } else {
       const patients = getApiResponseResources(
-        await api.get<FHIR_API_Response<IPatient>>(`/Patient?_count=10000${filterByService}${API_RESOURCE_TAG}`)
+        await api.get<FHIR_API_Response<IPatient>>(
+          `/Patient?_count=${PATIENT_MAX_COUNT}${filterByService}${API_RESOURCE_TAG}`
+        )
       )
       patients && patients.forEach((patient) => patientSet.add(patient))
     }

@@ -6,28 +6,9 @@ import apiRequest from '../apiRequest'
 import apiBack from '../apiBackCohort'
 import { CONTEXT } from '../../constants'
 
-import { Cohort_Creation_API_Response, FHIR_API_Response } from 'types'
+import { Cohort_Creation_API_Response, FHIR_API_Response, Query, QueryGroup } from 'types'
 import { GroupTypeKind, IGroup, IGroup_Member, IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { getApiResponseResources } from '../../utils/apiHelpers'
-
-type SourcePopulation = {
-  caresiteCohortList: string[]
-}
-
-type QueryGroup = {
-  _type?: 'andGroup' | 'orGroup'
-  _id: number
-  resourceType: 'Patient' | 'Condition'
-  isInclusive: boolean
-  criteria: QueryGroup[]
-  filterSolr?: string
-}
-
-type Query = {
-  version: string
-  sourcePopulation: SourcePopulation
-  request: QueryGroup[]
-}
 
 const PATIENT_MAX_COUNT = 500
 

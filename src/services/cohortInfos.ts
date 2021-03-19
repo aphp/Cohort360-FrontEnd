@@ -1,3 +1,5 @@
+import { last } from 'lodash'
+
 import api from './api'
 import apiBackCohort from './apiBackCohort'
 import { getInfos, getLastEncounter } from './myPatients'
@@ -147,28 +149,17 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
 
   if (CONTEXT === 'arkhn') {
     const cohortResult: CohortData = {}
-    const cohort = getApiResponseResources(
-      await api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${cohortId}${API_RESOURCE_TAG}`)
-    )?.[0]
-
+    const cohort = getApiResponseResources(await api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${cohortId}`))?.[0]
     if (cohort) {
       cohortResult.cohort = cohort
 
-      //Fetch cohort related patients & encounters
-      const patientIdentifiers = cohort.member
-        ?.map((m) => m.entity.identifier?.value)
-        .filter((id): id is string => undefined !== id)
-      const patientRefs = cohort.member
-        ?.map((m) => m.entity.reference)
-        .filter((ref): ref is string => undefined !== ref)
+      const patientIds = cohort.member?.map((m) => last(m.entity.reference?.split('/')))
 
-      if (!patientIdentifiers || !patientRefs) {
-        return cohortResult
-      }
+      if (!patientIds) return cohortResult
 
       const [patientsResp, encountersResp] = await Promise.all([
-        api.get<FHIR_API_Response<IPatient>>(`/Patient?identifier=${patientIdentifiers.join(',')}${API_RESOURCE_TAG}`),
-        api.get<FHIR_API_Response<IEncounter>>(`/Encounter?subject=${patientRefs.join(',')}${API_RESOURCE_TAG}`)
+        api.get<FHIR_API_Response<IPatient>>(`/Patient?_id=${patientIds.join(',')}`),
+        api.get<FHIR_API_Response<IEncounter>>(`/Encounter?subject=${patientIds.join(',')}${API_RESOURCE_TAG}`)
       ])
       const patients = getApiResponseResources(patientsResp)
       const encounters = getApiResponseResources(encountersResp)
@@ -177,7 +168,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
         return cohortResult
       }
 
-      cohortResult.totalPatients = patientIdentifiers.length
+      cohortResult.totalPatients = patientIds.length
       cohortResult.originalPatients = patients
       cohortResult.encounters = encounters
       cohortResult.genderRepartitionMap = getGenderRepartitionMap(patients)
