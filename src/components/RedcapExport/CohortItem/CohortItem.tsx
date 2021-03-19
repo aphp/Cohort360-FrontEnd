@@ -24,8 +24,8 @@ const CohortItem = ({ item, onDelete, onChange }: CohortItemProps): JSX.Element 
   const names = CRF_ATTRIBUTES.map((x) => x.officialName)
 
   const getTextLabel = () => {
-    let textLabel = `"${item.officialName}" est un attribut de type ${item.att_type}, `
-    switch (item.att_type) {
+    let textLabel = `"${item.officialName}" est un attribut de type ${item.attr_type}, `
+    switch (item.attr_type) {
       case 'identifying':
         textLabel += "l'information sera supprimée du dataset anonymisé."
         break
@@ -79,7 +79,7 @@ const CohortItem = ({ item, onDelete, onChange }: CohortItemProps): JSX.Element 
       <TableCell padding="none">
         <div className={classes.flex}>
           <Tooltip title={`La variable ${item.anonymize ? 'est' : "n'est pas"} anonymisée`}>
-            <IconButton onClick={handleChangeAnonymize} disabled={item.att_type === 'insensitive'}>
+            <IconButton onClick={handleChangeAnonymize} disabled={item.attr_type === 'insensitive'}>
               {item.anonymize ? <VisibilityOffIcon /> : <VisibilityIcon />}
             </IconButton>
           </Tooltip>
