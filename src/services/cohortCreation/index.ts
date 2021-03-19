@@ -11,7 +11,7 @@ import { GroupTypeKind, IGroup, IGroup_Member, IPatient } from '@ahryman40k/ts-f
 import { getApiResponseResources } from '../../utils/apiHelpers'
 
 type SourcePopulation = {
-  caresiteCohortList: number[]
+  caresiteCohortList: string[]
 }
 
 type QueryGroup = {
@@ -48,6 +48,8 @@ const getPatients = usePatientIdsByQueryMemo()
 
 const createCohortGroup = async (json_query: string): Promise<IGroup> => {
   const query: Query = JSON.parse(json_query)
+  const perimeters = query.sourcePopulation.caresiteCohortList
+  const patientFilter = `_count=${PATIENT_MAX_COUNT}&_has:Encounter:subject:service-provider=${perimeters.join(',')}`
   const criteriaGroup = query.request[0].criteria
 
   const aggregatePatients = async (
@@ -61,12 +63,12 @@ const createCohortGroup = async (json_query: string): Promise<IGroup> => {
           return currentCohort.length === 0 ? [...patientIds] : intersection(currentCohort, patientIds)
         else
           return currentCohort.length === 0
-            ? [...pullAll(await getPatients(`/Patient?_count=${PATIENT_MAX_COUNT}`), patientIds)]
+            ? [...pullAll(await getPatients(`/Patient?${patientFilter}`), patientIds)]
             : [...pullAll(currentCohort, patientIds)]
       case 'orGroup':
         return group.isInclusive
           ? union(currentCohort, patientIds)
-          : union(currentCohort, pullAll(await getPatients(`/Patient?_count=${PATIENT_MAX_COUNT}`), patientIds))
+          : union(currentCohort, pullAll(await getPatients(`/Patient?${patientFilter}`), patientIds))
       default:
         return [...currentCohort]
     }
@@ -75,9 +77,9 @@ const createCohortGroup = async (json_query: string): Promise<IGroup> => {
   const queryByResourceType = (criteria: QueryGroup): string => {
     switch (criteria.resourceType) {
       case 'Patient':
-        return `/Patient?_count=${PATIENT_MAX_COUNT}&${criteria.filterSolr}`
+        return `/Patient?${patientFilter}&${criteria.filterSolr}`
       case 'Condition':
-        return `/Patient?_count=${PATIENT_MAX_COUNT}&_has:Condition:patient:${criteria.filterSolr}`
+        return `/Patient?${patientFilter}&_has:Condition:patient:${criteria.filterSolr}`
       default:
         return ''
     }
