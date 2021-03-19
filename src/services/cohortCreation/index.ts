@@ -15,12 +15,12 @@ type SourcePopulation = {
 }
 
 type QueryGroup = {
-  _type: 'andGroup' | 'orGroup'
+  _type?: 'andGroup' | 'orGroup'
   _id: number
   resourceType: 'Patient' | 'Condition'
   isInclusive: boolean
   criteria: QueryGroup[]
-  filterSolr: string
+  filterSolr?: string
 }
 
 type Query = {
@@ -95,14 +95,27 @@ const createCohortGroup = async (json_query: string): Promise<IGroup> => {
       const groupPatientIds = await group.criteria
         .sort((a, b) => Number(b.isInclusive) - Number(a.isInclusive))
         .reduce(async (groupPatientIdsAcc, criteria) => {
-          const currentCohort = await groupPatientIdsAcc
           const query = queryByResourceType(criteria)
           const patientIds = await getPatients(query)
-          return await aggregatePatients(criteria, patientIds, currentCohort)
-        }, Promise.resolve<(string | undefined)[]>([]))
-      const acc = await patientIdsAcc
 
-      return await aggregatePatients(group, groupPatientIds, acc)
+          return await aggregatePatients(
+            {
+              ...criteria,
+              _type: group._type
+            },
+            patientIds,
+            await groupPatientIdsAcc
+          )
+        }, Promise.resolve<(string | undefined)[]>([]))
+
+      return await aggregatePatients(
+        {
+          ...group,
+          _type: query.request[0]._type
+        },
+        groupPatientIds,
+        await patientIdsAcc
+      )
     }, Promise.resolve<(string | undefined)[]>([]))
 
   return {
