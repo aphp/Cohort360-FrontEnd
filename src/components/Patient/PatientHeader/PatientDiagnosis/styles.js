@@ -9,13 +9,12 @@ export default makeStyles((theme) => ({
     marginLeft: '25px',
     marginTop: 0
   },
-  item: {
-    margin: theme.spacing(0, 1, 1, 0)
-  },
   diagnosticChip: {
+    margin: theme.spacing(0, 1, 1, 0),
     backgroundColor: '#0063AF',
     color: '#FFF',
     fontStyle: 'italic',
-    fontSize: '12px'
+    fontSize: 12,
+    maxWidth: 250
   }
 }))
