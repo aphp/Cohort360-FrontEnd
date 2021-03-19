@@ -30,6 +30,14 @@ export const getOrganizations = async (ids?: string): Promise<IOrganization[]> =
   return getApiResponseResources(respOrganizations) ?? []
 }
 
+export const getPractitionerPerimeter = async (practitionerId: string) => {
+  const resp = await api.get<FHIR_API_Response<IOrganization>>(
+    `/Organization?_has:PractitionerRole:organization:practitioner=${practitionerId}&active=true`
+  )
+  const organizations = getApiResponseResources(resp)
+  return organizations ?? []
+}
+
 const getPatientsAndEncountersFromServiceId = async (serviceId: string) => {
   const [respEncounters, respPatients] = await Promise.all([
     api.get<FHIR_API_Response<IEncounter>>(`/Encounter?service-provider=${serviceId}&_count=10000`),

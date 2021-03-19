@@ -15,7 +15,7 @@ export const fetchPractitioner = async (email: string) => {
   const firstName = practitioner.name?.[0].given?.join(' ') ?? ''
   const lastName = practitioner.name?.[0].family ?? ''
   const displayName = `${lastName} ${firstName}`
-  const id = practitioner.identifier?.[0].value ?? ''
+  const id = practitioner.id ?? ''
   return {
     id,
     email,

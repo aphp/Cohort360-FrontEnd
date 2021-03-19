@@ -21,7 +21,7 @@ import { ACCES_TOKEN, STATE_STORAGE_KEY } from '../../constants'
 import { fetchTokens, removeTokens } from 'services/arkhnAuth/oauth/tokenManager'
 import { arkhnAuthenticationRedirect } from 'services/authentication'
 import { useAppDispatch } from 'state'
-import { fetchLoggedPractitioner } from 'state/me'
+import { fetchPractitionerData } from 'state/me'
 
 import useStyles from './styles'
 
@@ -91,7 +91,7 @@ const ArkhnConnexion = () => {
   useEffect(() => {
     if (accessToken) {
       setLoading(true)
-      dispatch(fetchLoggedPractitioner())
+      dispatch(fetchPractitionerData())
         .then(unwrapResult)
         .then(() => {
           history.push('/accueil')

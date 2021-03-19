@@ -1,9 +1,11 @@
+import { IOrganization } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { createAction, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import jwt_decode from 'jwt-decode'
 
 import { getIdToken } from 'services/arkhnAuth/oauth/tokenManager'
 import { fetchPractitioner } from 'services/practitioner'
 import { RootState } from 'state'
+import { getPractitionerPerimeter } from 'services/perimeters'
 
 export type MeState = null | {
   id: string
@@ -15,6 +17,7 @@ export type MeState = null | {
   nominativeGroupsIds?: any[]
   lastConnection?: string
   isSuperUser?: boolean
+  practitionerOrganizations?: IOrganization[]
 }
 
 const initialState: MeState = null
@@ -22,7 +25,7 @@ const initialState: MeState = null
 // Logout action is defined outside of the meSlice because it is being used by all reducers
 export const logout = createAction('LOGOUT')
 
-export const fetchLoggedPractitioner = createAsyncThunk<MeState, void, { state: RootState }>(
+export const fetchPractitionerData = createAsyncThunk<MeState, void, { state: RootState }>(
   'me/fetchLoggedPractitoner',
   async (_, { dispatch, rejectWithValue }) => {
     const idToken = getIdToken()
@@ -31,9 +34,11 @@ export const fetchLoggedPractitioner = createAsyncThunk<MeState, void, { state: 
     if (idToken) {
       const { email, name } = jwt_decode<{ email: string; name?: string }>(idToken)
       const practitioner = await fetchPractitioner(email)
+      const practitionerOrganizations = practitioner && (await getPractitionerPerimeter(practitioner.id))
       if (practitioner) {
         state = {
           ...practitioner,
+          practitionerOrganizations,
           deidentified: name !== 'admin',
           isSuperUser: name === 'admin'
         }
@@ -59,7 +64,7 @@ const meSlice = createSlice({
     builder.addCase(logout, () => {
       return initialState
     })
-    builder.addCase(fetchLoggedPractitioner.fulfilled, (state, { payload }) => {
+    builder.addCase(fetchPractitionerData.fulfilled, (state, { payload }) => {
       return payload
     })
   }
