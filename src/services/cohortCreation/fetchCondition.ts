@@ -100,17 +100,35 @@ export const fetchDiagnosticTypes = async () => {
   }
 }
 
-// todo: check if the data syntax is correct when available
-export const fetchCim10Diagnostic = async (searchValue?: string) => {
-  if (CONTEXT === 'arkhn') {
+type Code = {
+  id?: string
+  label?: string
+}
+
+const useICD9ValueSetMemo = () => {
+  let icd9Codes: Code[] = []
+  return async (): Promise<Code[]> => {
+    if (icd9Codes.length !== 0) return icd9Codes
     const response = await api.get<FHIR_API_Response<IValueSet>>('/ValueSet?url=http://arkhn.com/icd9_VS')
     const valueSet = getApiResponseResources(response)
     if (!valueSet || valueSet.length === 0) return []
-    const icd9_codes = valueSet[0]?.compose?.include[0]?.concept?.map((value) => ({
-      id: value.code,
-      label: value.display
-    }))
-    return icd9_codes ?? []
+    icd9Codes =
+      valueSet[0]?.compose?.include[0]?.concept
+        ?.map((value) => ({
+          id: value.code,
+          label: value.display
+        }))
+        .sort((a, b) => (a.label && b.label ? a.label.localeCompare(b.label) : 0)) ?? []
+    return icd9Codes
+  }
+}
+
+const fetchICD9ValueSet = useICD9ValueSetMemo()
+
+// todo: check if the data syntax is correct when available
+export const fetchCim10Diagnostic = async (searchValue?: string) => {
+  if (CONTEXT === 'arkhn') {
+    return await fetchICD9ValueSet()
   } else if (CONTEXT === 'fakedata') {
     return fakeValueSetCIM10 && fakeValueSetCIM10.length > 0
       ? fakeValueSetCIM10.map((_fakeValueSetCIM10: { code: string; display: string }) => ({
