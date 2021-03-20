@@ -52,6 +52,21 @@ export const fetchPractitionerData = createAsyncThunk<MeState, void, { state: Ro
   }
 )
 
+export const fetchPractitionerPerimeter = createAsyncThunk<
+  (IOrganization & { patientCount: number })[],
+  void,
+  { state: RootState }
+>('me/fetchPractitionerPerimeter', async (_, { getState }) => {
+  const practitionerId = getState().me?.id
+
+  if (!practitionerId) {
+    return []
+  }
+
+  const organizations = await getPractitionerPerimeter(practitionerId)
+  return organizations ?? []
+})
+
 const meSlice = createSlice({
   name: 'me',
   initialState: initialState as MeState,
@@ -66,6 +81,11 @@ const meSlice = createSlice({
     })
     builder.addCase(fetchPractitionerData.fulfilled, (state, { payload }) => {
       return payload
+    })
+    builder.addCase(fetchPractitionerPerimeter.fulfilled, (state, { payload }) => {
+      if (state) {
+        state.organizations = payload
+      }
     })
   }
 })
