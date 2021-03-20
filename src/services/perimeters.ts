@@ -38,7 +38,7 @@ export const getPractitionerPerimeter = async (practitionerId: string) => {
   const organizations = getApiResponseResources(resp)
   const organizationsWithTotal = organizations && (await Promise.all(organizations.map(getServicePatientsCount)))
 
-  return organizationsWithTotal?.map(({ service, total }) => ({ ...service, total })) ?? []
+  return organizationsWithTotal?.map(({ service, patientCount }) => ({ ...service, patientCount })) ?? []
 }
 
 const getPatientsAndEncountersFromServiceId = async (serviceId: string) => {

@@ -17,7 +17,7 @@ export type MeState = null | {
   nominativeGroupsIds?: any[]
   lastConnection?: string
   isSuperUser?: boolean
-  practitionerOrganizations?: (IOrganization & { total: number })[]
+  organizations?: (IOrganization & { patientCount: number })[]
 }
 
 const initialState: MeState = null
@@ -34,11 +34,11 @@ export const fetchPractitionerData = createAsyncThunk<MeState, void, { state: Ro
     if (idToken) {
       const { email, name } = jwt_decode<{ email: string; name?: string }>(idToken)
       const practitioner = await fetchPractitioner(email)
-      const practitionerOrganizations = practitioner && (await getPractitionerPerimeter(practitioner.id))
+      const organizations = practitioner && (await getPractitionerPerimeter(practitioner.id))
       if (practitioner) {
         state = {
           ...practitioner,
-          practitionerOrganizations,
+          organizations,
           deidentified: name !== 'admin',
           isSuperUser: name === 'admin'
         }

@@ -10,12 +10,12 @@ const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0 
 
 export const getServicePatientsCount = async (
   organization: IOrganization
-): Promise<{ total: number; service: IOrganization }> => {
+): Promise<{ patientCount: number; service: IOrganization }> => {
   const patientsResp = await api.get<FHIR_API_Response<IPatient>>(
     `Patient?_has:Encounter:subject:service-provider=${organization.id}&_summary=count`
   )
   return {
-    total: patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total ?? 0 : 0,
+    patientCount: patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total ?? 0 : 0,
     service: organization
   }
 }
@@ -78,7 +78,7 @@ export const getScopePerimeters = async (): Promise<ScopeTreeRow[]> => {
       resourceType: result.service.resourceType,
       id: result.service.id || '',
       name: result.service.name || '',
-      quantity: result.total,
+      quantity: result.patientCount,
       subItems: [],
       access: true
     }))

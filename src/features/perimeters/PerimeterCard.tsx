@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
 const PerimeterCard = () => {
   const classes = useStyles()
   const history = useHistory()
-  const organizations = useAppSelector((state) => state.me?.practitionerOrganizations)
+  const organizations = useAppSelector((state) => state.me?.organizations)
   const disableExplore = !organizations || organizations.length === 0
 
   const handleExplorePerimeter = () => {
