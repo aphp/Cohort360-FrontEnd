@@ -30,6 +30,7 @@ const PerimeterCard = () => {
   const organizations = useAppSelector((state) => state.me?.organizations)
   const [loading, setLoading] = useState(!organizations)
   const disableExplore = !organizations || organizations.length === 0
+  const isPerimeterEmpty = organizations && organizations.length > 0
 
   useEffect(() => {
     setLoading(true)
@@ -53,13 +54,15 @@ const PerimeterCard = () => {
           </Box>
         ) : (
           <ul className={classes.list}>
-            {organizations
-              ? organizations.map(({ name, id }) => (
-                  <li key={id}>
-                    <Typography variant="subtitle2">{name}</Typography>
-                  </li>
-                ))
-              : null}
+            {isPerimeterEmpty ? (
+              organizations?.map(({ name, id }) => (
+                <li key={id}>
+                  <Typography variant="subtitle2">{name}</Typography>
+                </li>
+              ))
+            ) : (
+              <Typography variant="subtitle2">Périmètre vide</Typography>
+            )}
           </ul>
         )}
       </CardContent>
