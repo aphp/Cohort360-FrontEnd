@@ -6,6 +6,7 @@ import { getIdToken } from 'services/arkhnAuth/oauth/tokenManager'
 import { fetchPractitioner } from 'services/practitioner'
 import { RootState } from 'state'
 import { getPractitionerPerimeter } from 'services/perimeters'
+import { PRACTITIONER_ID } from '../constants'
 
 export type MeState = null | {
   id: string
@@ -42,6 +43,7 @@ export const fetchPractitionerData = createAsyncThunk<MeState, void, { state: Ro
           deidentified: name !== 'admin',
           isSuperUser: name === 'admin'
         }
+        localStorage.setItem(PRACTITIONER_ID, practitioner.id)
       } else {
         dispatch(logout())
         return rejectWithValue(new Error('Practitioner not found'))

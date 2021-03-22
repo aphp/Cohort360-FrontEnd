@@ -1,11 +1,12 @@
 import axios from 'axios'
-import { ACCES_TOKEN, FHIR_API_URL, TOKEN_URL } from '../constants'
+import { ACCES_TOKEN, FHIR_API_URL, TOKEN_URL, PRACTITIONER_ID } from '../constants'
 import { refreshToken, removeTokens } from './arkhnAuth/oauth/tokenManager'
 
 const api = axios.create({
   baseURL: FHIR_API_URL,
   headers: {
-    Accept: 'application/fhir+json'
+    Accept: 'application/fhir+json',
+    Authorization: localStorage.getItem(PRACTITIONER_ID)
   }
 })
 
