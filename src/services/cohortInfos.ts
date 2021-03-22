@@ -1,4 +1,4 @@
-import { last } from 'lodash'
+import { last, head } from 'lodash'
 
 import api from './api'
 import apiBackCohort from './apiBackCohort'
@@ -149,26 +149,26 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
 
   if (CONTEXT === 'arkhn') {
     const cohortResult: CohortData = {}
-    const cohort = getApiResponseResources(await api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${cohortId}`))?.[0]
-    if (cohort) {
-      cohortResult.cohort = cohort
+    const response = getApiResponseResources(
+      await api.get<FHIR_API_Response<IGroup | IPatient>>(`/Group?_id=${cohortId}&_include=Group:member`)
+    )
+    if (response) {
+      cohortResult.cohort = head(response.filter((resource) => resource.resourceType === 'Group') as IGroup[])
 
-      const patientIds = cohort.member?.map((m) => last(m.entity.reference?.split('/')))
+      const patients = response.filter((resource) => resource.resourceType === 'Patient') as IPatient[]
 
-      if (!patientIds) return cohortResult
+      if (!patients) return cohortResult
 
-      const [patientsResp, encountersResp] = await Promise.all([
-        api.get<FHIR_API_Response<IPatient>>(`/Patient?_id=${patientIds.join(',')}`),
-        api.get<FHIR_API_Response<IEncounter>>(`/Encounter?subject=${patientIds.join(',')}${API_RESOURCE_TAG}`)
-      ])
-      const patients = getApiResponseResources(patientsResp)
+      const encountersResp = await api.get<FHIR_API_Response<IEncounter>>(
+        `/Encounter?subject=${patients.map((patient) => patient.id).join(',')}`
+      )
       const encounters = getApiResponseResources(encountersResp)
 
       if (!patients || !encounters) {
         return cohortResult
       }
 
-      cohortResult.totalPatients = patientIds.length
+      cohortResult.totalPatients = patients.length
       cohortResult.originalPatients = patients
       cohortResult.encounters = encounters
       cohortResult.genderRepartitionMap = getGenderRepartitionMap(patients)
