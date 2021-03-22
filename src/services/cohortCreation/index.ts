@@ -110,15 +110,13 @@ const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
     type: GroupTypeKind._person,
     actual: true,
     quantity: patientIds.length,
-    characteristic: perimeters.map<IGroup_Characteristic>((perimeter) => {
-      return {
-        exclude: false,
-        code: { text: 'perimeter' },
-        valueReference: {
-          reference: `Organization/${perimeter}`
-        }
+    characteristic: perimeters.map<IGroup_Characteristic>((perimeter) => ({
+      exclude: false,
+      code: { text: 'perimeter' },
+      valueReference: {
+        reference: `Organization/${perimeter}`
       }
-    }),
+    })),
     member: patientIds.map<IGroup_Member>((id) => ({
       entity: {
         reference: `Patient/${id}`
