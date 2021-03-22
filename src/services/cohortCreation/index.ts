@@ -70,7 +70,8 @@ const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
   }
 
   // We record every requests needed to fetch the patients that meet the cohort criteria
-  // and we fetch the patients once
+  // and thenn
+  //we fetch the patients once
   const queries = criteriaGroup.reduce<string[]>((acc, group) => {
     return [...acc, ...group.criteria.reduce<string[]>((acc, criteria) => [...acc, queryByResourceType(criteria)], [])]
   }, [])
