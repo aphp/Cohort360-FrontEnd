@@ -18,6 +18,7 @@ const defaultCondition = {
 }
 
 const Index = (props: any) => {
+  // FIXME: hierarchy of diagnostics has been disabled
   // const classes = useStyles()
 
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
