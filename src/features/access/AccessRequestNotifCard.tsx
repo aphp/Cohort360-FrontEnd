@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
 const AccessRequestNotifCard = () => {
   const classes = useStyles()
   const history = useHistory()
-  const { requests } = useAppSelector((state) => state.accessRequests)
+  const requests = useAppSelector((state) => state.accessRequests.practitionerRoles)
 
   const handleAccessRequestsClick = () => {
     history.push('/accessRequests')

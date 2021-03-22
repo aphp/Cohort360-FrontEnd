@@ -6,12 +6,13 @@ import { Container, Divider, Grid, Paper, Typography } from '@material-ui/core'
 import RequestItem from 'features/access/RequestItem'
 import useStyles from './styles'
 import { useAppSelector } from 'state'
+import { accessRequestsSelector } from 'features/access/RequestSelector'
 
 const AccessRequests = () => {
   const classes = useStyles()
   const { open, requests } = useAppSelector((state) => ({
     open: state.drawer,
-    requests: state.accessRequests.requests
+    requests: accessRequestsSelector(state)
   }))
 
   return (
@@ -38,7 +39,7 @@ const AccessRequests = () => {
                 requests.map((request) => (
                   <Grid item key={request.id}>
                     <Divider />
-                    <RequestItem id={request.id} />
+                    <RequestItem request={request} />
                   </Grid>
                 ))
               )}
