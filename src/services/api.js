@@ -10,8 +10,7 @@ const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem(PRACTITIONER_ID)
-  config.headers.Authorization = `${token}`
+  config.headers.Authorization = localStorage.getItem(PRACTITIONER_ID)
   return config
 })
 
@@ -25,17 +24,11 @@ api.interceptors.response.use(
       window.location = '/'
     }
 
-    const originalRequest = error.config
-
     if (error.response.status === 401) {
       removeTokens()
       return Promise.reject(error)
     }
 
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
-      return axios(originalRequest)
-    }
     return Promise.reject(error)
   }
 )
