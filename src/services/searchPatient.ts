@@ -1,15 +1,12 @@
+import type { IGroup, IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { last } from 'lodash'
 
 import api from './api'
+import fakePatients from '../data/fakeData/patients'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import { getLastEncounter } from './myPatients'
-import { IGroup, IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { Back_API_Response, Cohort, CohortPatient, FHIR_API_Response, SearchByTypes, Snapshot, Query } from 'types'
+import { CohortPatient, FHIR_API_Response, SearchByTypes } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
-
-import fakePatients from '../data/fakeData/patients'
-import { head } from 'lodash'
-import apiBackCohort from './apiBackCohort'
 
 const PATIENT_MAX_COUNT = 500
 
