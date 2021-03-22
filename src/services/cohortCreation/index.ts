@@ -1,6 +1,6 @@
 import { intersection, pullAll, union, memoize } from 'lodash'
 import moment from 'moment'
-import { GroupTypeKind, IGroup, IGroup_Member, IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { GroupTypeKind, IGroup, IGroup_Characteristic, IGroup_Member, IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import apiFhir from '../api'
 import apiRequest from '../apiRequest'
@@ -110,13 +110,20 @@ const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
     type: GroupTypeKind._person,
     actual: true,
     quantity: patientIds.length,
-    member: patientIds.map(
-      (id): IGroup_Member => ({
-        entity: {
-          reference: `Patient/${id}`
+    characteristic: perimeters.map<IGroup_Characteristic>((perimeter) => {
+      return {
+        exclude: false,
+        code: { text: 'perimeter' },
+        valueReference: {
+          reference: `Organization/${perimeter}`
         }
-      })
-    )
+      }
+    }),
+    member: patientIds.map<IGroup_Member>((id) => ({
+      entity: {
+        reference: `Patient/${id}`
+      }
+    }))
   }
 }
 
