@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { intersection, pullAll, union } from 'lodash'
+import { intersection, pullAll, union, memoize } from 'lodash'
 
 import apiFhir from '../api'
 import apiRequest from '../apiRequest'
@@ -12,20 +12,14 @@ import { getApiResponseResources } from '../../utils/apiHelpers'
 
 const PATIENT_MAX_COUNT = 500
 
-const usePatientIdsByQueryMemo = () => {
-  const patientIdsByQuery: Record<string, (string | undefined)[] | undefined> = {}
-  return async (query: string): Promise<(string | undefined)[]> => {
+const getPatients = memoize(
+  async (query: string): Promise<(string | undefined)[]> => {
     if (!query) return []
-    if (!patientIdsByQuery[query]) {
-      const response = await apiFhir.get<FHIR_API_Response<IPatient>>(query)
-      const patients = getApiResponseResources(response)
-      patientIdsByQuery[query] = patients ? patients.map((patient) => patient.id) : []
-    }
-    return patientIdsByQuery[query] ?? []
+    const response = await apiFhir.get<FHIR_API_Response<IPatient>>(query)
+    const patients = getApiResponseResources(response)
+    return patients ? patients.map((patient) => patient.id) : []
   }
-}
-
-const getPatients = usePatientIdsByQueryMemo()
+)
 
 const createCohortGroup = async (json_query: string): Promise<IGroup> => {
   const query: Query = JSON.parse(json_query)
