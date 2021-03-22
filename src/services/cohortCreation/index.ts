@@ -63,8 +63,7 @@ const createCohortGroup = async (json_query: string): Promise<IGroup> => {
   const queries = criteriaGroup.reduce<string[]>((acc, group) => {
     return [...acc, ...group.criteria.reduce<string[]>((acc, criteria) => [...acc, queryByResourceType(criteria)], [])]
   }, [])
-  const fetchPatients = async (queries: string[]) => await Promise.all(queries.map((query) => getPatients(query)))
-  await fetchPatients(queries)
+  await Promise.all(queries.map((query) => getPatients(query)))
 
   const patientIds = await criteriaGroup
     .sort((a, b) => Number(b.isInclusive) - Number(a.isInclusive))
