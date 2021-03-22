@@ -66,6 +66,7 @@ export const getScopePerimeters = async (): Promise<ScopeTreeRow[]> => {
   }
 
   if (CONTEXT === 'arkhn') {
+    //TODO: Handle pagination
     const organizationsResp = await api.get<FHIR_API_Response<IOrganization>>(`/Organization?type=dept&_count=100`)
     const organizations = getApiResponseResources(organizationsResp)
     if (!organizations) return []

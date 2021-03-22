@@ -35,10 +35,10 @@ export const getPractitionerPerimeter = async (practitionerId: string) => {
   const resp = await api.get<FHIR_API_Response<IOrganization>>(
     `/Organization?_has:PractitionerRole:organization:practitioner=${practitionerId}:active=true`
   )
-  const organizations = getApiResponseResources(resp)
-  const organizationsWithTotal = organizations && (await Promise.all(organizations.map(getServicePatientsCount)))
+  const organizations = getApiResponseResources(resp) ?? []
+  const organizationsWithTotal = await Promise.all(organizations.map(getServicePatientsCount))
 
-  return organizationsWithTotal?.map(({ service, patientCount }) => ({ ...service, patientCount })) ?? []
+  return organizationsWithTotal.map(({ service, patientCount }) => ({ ...service, patientCount }))
 }
 
 const getPatientsAndEncountersFromServiceId = async (serviceId: string) => {
