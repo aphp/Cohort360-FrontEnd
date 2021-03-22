@@ -33,7 +33,7 @@ export const getOrganizations = async (ids?: string): Promise<IOrganization[]> =
 
 export const getPractitionerPerimeter = async (practitionerId: string) => {
   const resp = await api.get<FHIR_API_Response<IOrganization>>(
-    `/Organization?_has:PractitionerRole:organization:practitioner=${practitionerId}:active=true`
+    `/Organization?_has:PractitionerRole:organization:practitioner=${practitionerId}_has:PractitionerRole.code=allowed`
   )
   const organizations = getApiResponseResources(resp) ?? []
   const organizationsWithTotal = await Promise.all(organizations.map(getServicePatientsCount))

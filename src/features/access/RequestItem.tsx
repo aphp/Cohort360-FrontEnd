@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import { Grid, makeStyles, MenuItem, Select, Typography } from '@material-ui/core'
 import CohortButton from 'common/CohortButton'
 import RequestInfos from './RequestInfos'
+import { AccessRequest } from './RequestSelector'
 
 const useStyles = makeStyles((theme) => ({
   rootContainer: {
@@ -36,10 +37,10 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 type RequestItemProps = {
-  id: string
+  request: AccessRequest
 }
 
-const RequestItem = ({ id }: RequestItemProps) => {
+const RequestItem = ({ request }: RequestItemProps) => {
   const classes = useStyles()
   const [nominativeAccess, setNominativeAccess] = useState<'yes' | 'no'>('yes')
   const [accessDelay, setAccessDelay] = useState<'week' | 'month' | 'year'>('week')
@@ -54,7 +55,7 @@ const RequestItem = ({ id }: RequestItemProps) => {
   return (
     <Grid container className={classes.rootContainer} justify="space-between" spacing={2}>
       <Grid item xs={12} md={7}>
-        <RequestInfos id={id} />
+        <RequestInfos request={request} />
       </Grid>
       <Grid item xs={12} md={4}>
         <div className={classes.buttonsContainer}>

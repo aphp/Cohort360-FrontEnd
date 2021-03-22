@@ -2,7 +2,8 @@ import React from 'react'
 
 import { Grid, makeStyles, Typography } from '@material-ui/core'
 import moment from 'moment'
-import { useAppSelector } from 'state'
+
+import { AccessRequest } from './RequestSelector'
 
 const useStyles = makeStyles((theme) => ({
   textBlack: {
@@ -16,14 +17,12 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 type RequestInfosProps = {
-  id: string
+  request: AccessRequest
 }
 
-const RequestInfos = ({ id }: RequestInfosProps) => {
+const RequestInfos = ({ request }: RequestInfosProps) => {
   const classes = useStyles()
-  const { request } = useAppSelector((state) => ({
-    request: state.accessRequests.requests.find(({ id: requestId }) => requestId === id)
-  }))
+
   const dateSubtitle = moment(request?.date).format('[Le] DD MMMM YYYY [à] HH[h]mm')
 
   return request ? (
@@ -41,11 +40,9 @@ const RequestInfos = ({ id }: RequestInfosProps) => {
           Accès aux nouveaux périmètres suivants :
         </Typography>
         <ul className={classes.perimetersList}>
-          {request.perimeterAccess.map((name, index) => (
-            <li key={`${name}_${index}_request`}>
-              <Typography variant="h5">- {name}</Typography>
-            </li>
-          ))}
+          <li>
+            <Typography variant="h5">- {request.perimeterAccess}</Typography>
+          </li>
         </ul>
       </Grid>
       <Grid item>
