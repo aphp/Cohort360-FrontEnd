@@ -1,4 +1,4 @@
-import { last, head } from 'lodash'
+import { head } from 'lodash'
 
 import api from './api'
 import apiBackCohort from './apiBackCohort'
