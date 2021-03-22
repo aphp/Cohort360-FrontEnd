@@ -79,6 +79,7 @@ const meSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(logout, () => {
+      localStorage.removeItem(PRACTITIONER_ID)
       return initialState
     })
     builder.addCase(fetchPractitionerData.fulfilled, (state, { payload }) => {
