@@ -4,7 +4,10 @@ import { CriteriaItemType } from 'types'
 
 export type CriteriaState = CriteriaItemType[]
 
-const initialState: CriteriaState = []
+const localStorageCohortCreation = localStorage.getItem('cohortCreation') ?? null
+const jsonCohortCreation = localStorageCohortCreation ? JSON.parse(localStorageCohortCreation).criteria : []
+
+const initialState: CriteriaState = jsonCohortCreation ?? []
 
 const criteriaSlice = createSlice({
   name: 'criteria',

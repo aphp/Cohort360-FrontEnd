@@ -63,27 +63,27 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
 
   useEffect(() => {
     if (props.open) {
-      dispatch(openAction())
+      dispatch<any>(openAction())
     } else {
-      dispatch(closeAction())
+      dispatch<any>(closeAction())
     }
   }, [props.open]) // eslint-disable-line
 
   const handleDrawerOpen = () => {
-    dispatch(openAction())
+    dispatch<any>(openAction())
   }
 
   const handleDrawerClose = () => {
-    dispatch(closeAction())
+    dispatch<any>(closeAction())
   }
 
   const handleNestedList = () => {
-    dispatch(openAction())
+    dispatch<any>(openAction())
     setList(!list)
   }
 
   const handleNestedList2 = () => {
-    dispatch(openAction())
+    dispatch<any>(openAction())
     setList2(!list2)
   }
 
@@ -138,7 +138,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                     {practitioner && `${practitioner.displayName}`}
                   </Typography>
                 </Grid>
-                <Grid container xs={2}>
+                <Grid container xs={2} item>
                   <ListItemIcon
                     className={clsx(classes.logoutButton, {
                       [classes.hide]: !open
@@ -147,7 +147,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                     <IconButton
                       onClick={() => {
                         localStorage.clear()
-                        dispatch(logoutAction())
+                        dispatch<any>(logoutAction())
                         history.push('/')
                       }}
                     >
@@ -179,7 +179,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                   [classes.hide]: !open
                 })}
               >
-                <Typography variant="h5">Nouvelle Cohorte</Typography>
+                <Typography variant="h5">Nouvelle requête</Typography>
               </Button>
             </ListItem>
             <Link href="/accueil" underline="none">

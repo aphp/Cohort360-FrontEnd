@@ -1,49 +1,12 @@
-import { combineReducers, CombinedState } from 'redux'
-import { configureStore } from '@reduxjs/toolkit'
-import { persistStore, persistReducer, createTransform } from 'redux-persist'
-import { createLogger } from 'redux-logger'
-import storage from 'redux-persist/lib/storage' // defaults to localStorage for web
+import { combineReducers, createStore, applyMiddleware } from 'redux'
+import thunkMiddleware from 'redux-thunk'
 
-import cohortCreation, { CohortCreationState } from './cohortCreation'
-import criteria, { CriteriaState } from './criteria'
-import exploredCohort, { ExploredCohortState } from './exploredCohort'
-import userCohorts, { UserCohortsState } from './userCohorts'
-import me, { MeState } from './me'
+import cohortCreation from './cohortCreation'
+import criteria from './criteria'
+import exploredCohort from './exploredCohort'
+import userCohorts from './userCohorts'
+import me from './me'
 import drawer from './drawer'
-
-const MapTransform = createTransform(
-  // transform state on its way to being serialized and persisted.
-  (inboundState: any) => {
-    // convert exploredCohort to an Array.
-    return {
-      ...inboundState,
-      agePyramidData: inboundState.agePyramidData ? [...inboundState.agePyramidData] : [],
-      genderRepartitionMap: inboundState.genderRepartitionMap ? [...inboundState.genderRepartitionMap] : [],
-      monthlyVisitData: inboundState.monthlyVisitData ? [...inboundState.monthlyVisitData] : []
-    }
-  },
-  // transform state being rehydrated
-  (outboundState: any) => {
-    // convert back to a Map.
-    return {
-      ...outboundState,
-      agePyramidData: outboundState.agePyramidData ? new Map(outboundState.agePyramidData) : new Map(),
-      genderRepartitionMap: outboundState.genderRepartitionMap
-        ? new Map(outboundState.genderRepartitionMap)
-        : new Map(),
-      monthlyVisitData: outboundState.monthlyVisitData ? new Map(outboundState.monthlyVisitData) : new Map()
-    }
-  },
-  // define which reducers this transform gets called for.
-  { whitelist: ['exploredCohort'] }
-)
-
-const persistConfig = {
-  key: 'root',
-  storage,
-  // blacklist: ['criteria'],
-  transforms: [MapTransform]
-}
 
 const cohortCreationReducer = combineReducers({
   criteria,
@@ -58,31 +21,23 @@ const rootReducer = combineReducers({
   drawer
 })
 
-type RootReducerState = CombinedState<{
-  me: MeState
-  cohortCreation: CombinedState<{
-    criteria: CriteriaState
-    request: CohortCreationState
-  }>
-  exploredCohort: ExploredCohortState
-  userCohorts: UserCohortsState
-  drawer: boolean
-}>
+export const store = createStore(rootReducer, applyMiddleware(thunkMiddleware))
 
-const persistedReducer = persistReducer<RootReducerState>(persistConfig, rootReducer)
+store.subscribe(() => {
+  // Auto save store inside localStorage
+  const _store = store.getState() ?? {}
+  const { me, exploredCohort, userCohorts, cohortCreation } = _store
 
-export const store = configureStore({
-  reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) => {
-    return [
-      ...getDefaultMiddleware({
-        thunk: true,
-        serializableCheck: false,
-        immutableCheck: false
-      }),
-      createLogger({})
-    ]
-  }
+  localStorage.setItem('user', JSON.stringify(me))
+  localStorage.setItem(
+    'exploredCohort',
+    JSON.stringify({
+      ...exploredCohort,
+      agePyramidData: exploredCohort.agePyramidData ? [...exploredCohort.agePyramidData] : [],
+      genderRepartitionMap: exploredCohort.genderRepartitionMap ? [...exploredCohort.genderRepartitionMap] : [],
+      monthlyVisitData: exploredCohort.monthlyVisitData ? [...exploredCohort.monthlyVisitData] : []
+    })
+  )
+  localStorage.setItem('userCohorts', JSON.stringify(userCohorts))
+  localStorage.setItem('cohortCreation', JSON.stringify(cohortCreation))
 })
-
-export const persistor = persistStore(store)

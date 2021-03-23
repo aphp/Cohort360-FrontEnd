@@ -103,7 +103,9 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
    */
   const _clickToSelect = (row: ScopeTreeRow) => {
     let savedSelectedItems = selectedItems ? [...selectedItems] : []
-    const index = savedSelectedItems.indexOf(row)
+
+    const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
+    const index = foundItem ? savedSelectedItems.indexOf(foundItem) : -1
 
     const getAllChildren = (parent: ScopeTreeRow) => {
       const getChild: (subItem: ScopeTreeRow) => ScopeTreeRow[] = (subItem: ScopeTreeRow) => {

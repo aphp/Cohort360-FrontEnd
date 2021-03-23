@@ -37,7 +37,7 @@ const PrivateRoute: React.FC<Props> = (props) => {
 
   useEffect(() => {
     if (!me && data && data.me) {
-      dispatch(login(me))
+      dispatch<any>(login(me))
     }
   }, [me, data, dispatch])
 

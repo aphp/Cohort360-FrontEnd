@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom'
 
 import {
   Button,
+  Chip,
   Dialog,
   DialogActions,
   DialogTitle,
@@ -14,6 +15,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TableSortLabel,
   TableRow,
   Typography
 } from '@material-ui/core'
@@ -45,13 +47,19 @@ type ResearchTableProps = {
   researchData?: FormattedCohort[]
   onSetCohortFavorite: (cohortId: string) => void
   onDeleteCohort: Function
+  sortBy?: string
+  sortDirection?: 'asc' | 'desc'
+  onRequestSort?: any
 }
 const ResearchTable: React.FC<ResearchTableProps> = ({
   simplified,
   onClickRow,
   researchData,
   onSetCohortFavorite,
-  onDeleteCohort
+  onDeleteCohort,
+  sortBy,
+  sortDirection,
+  onRequestSort
 }) => {
   const classes = useStyles()
   const [dialogOpen, setOpenDialog] = useState(false)
@@ -69,6 +77,10 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
 
   const handleCloseDialog = () => {
     setOpenDialog(false)
+  }
+
+  const createSortHandler = (property: any) => (event: React.MouseEvent<unknown>) => {
+    onRequestSort(event, property)
   }
 
   return (
@@ -108,21 +120,92 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
             <Table className={classes.table} aria-label="simple table">
               <TableHead>
                 <TableRow className={classes.tableHead}>
-                  <TableCell className={classes.tableHeadCell}>Titre</TableCell>
+                  <TableCell
+                    className={classes.tableHeadCell}
+                    sortDirection={sortBy === 'name' ? sortDirection : false}
+                  >
+                    {sortDirection ? (
+                      <TableSortLabel
+                        active={sortBy === 'name'}
+                        direction={sortBy === 'name' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('name')}
+                      >
+                        Titre
+                      </TableSortLabel>
+                    ) : (
+                      'Titre'
+                    )}
+                  </TableCell>
+                  <TableCell
+                    className={classes.tableHeadCell}
+                    align="center"
+                    sortDirection={sortBy === 'type' ? sortDirection : false}
+                  >
+                    {sortDirection ? (
+                      <TableSortLabel
+                        active={sortBy === 'type'}
+                        direction={sortBy === 'type' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('type')}
+                      >
+                        Type
+                      </TableSortLabel>
+                    ) : (
+                      'Type'
+                    )}
+                  </TableCell>
                   <TableCell className={classes.tableHeadCell} align="center">
                     Statut
                   </TableCell>
-                  {/* <TableCell className={classes.tableHeadCell} align="center">
-                    Périmètre
-                  </TableCell> */}
-                  <TableCell align="center" className={classes.tableHeadCell}>
-                    Nombre de patients
+                  <TableCell
+                    align="center"
+                    className={classes.tableHeadCell}
+                    sortDirection={sortBy === 'result_size' ? sortDirection : false}
+                  >
+                    {sortDirection ? (
+                      <TableSortLabel
+                        active={sortBy === 'result_size'}
+                        direction={sortBy === 'result_size' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('result_size')}
+                      >
+                        Nombre de patients
+                      </TableSortLabel>
+                    ) : (
+                      'Nombre de patients'
+                    )}
                   </TableCell>
-                  <TableCell align="center" className={classes.tableHeadCell}>
-                    Date de création
+                  <TableCell
+                    align="center"
+                    className={classes.tableHeadCell}
+                    sortDirection={sortBy === 'fhir_datetime' ? sortDirection : false}
+                  >
+                    {sortDirection ? (
+                      <TableSortLabel
+                        active={sortBy === 'fhir_datetime'}
+                        direction={sortBy === 'fhir_datetime' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('fhir_datetime')}
+                      >
+                        Date de création
+                      </TableSortLabel>
+                    ) : (
+                      'Date de création'
+                    )}
                   </TableCell>
-                  <TableCell align="center" className={classes.tableHeadCell}>
-                    Favoris
+                  <TableCell
+                    align="center"
+                    className={classes.tableHeadCell}
+                    sortDirection={sortBy === 'favorite' ? sortDirection : false}
+                  >
+                    {sortDirection ? (
+                      <TableSortLabel
+                        active={sortBy === 'favorite'}
+                        direction={sortBy === 'favorite' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('favorite')}
+                      >
+                        Favoris
+                      </TableSortLabel>
+                    ) : (
+                      'Favoris'
+                    )}
                   </TableCell>
 
                   {!simplified && (
@@ -135,16 +218,30 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
               <TableBody>
                 {researchData?.map((row: FormattedCohort) => (
                   <TableRow
-                    className={classes.pointerHover}
+                    className={!row.fhir_group_id ? classes.notAllow : classes.pointerHover}
                     hover
                     key={row.researchId}
-                    onClick={onClickRow ? () => onClickRow(row) : () => history.push(`/cohort/${row.fhir_group_id}`)}
+                    onClick={
+                      !row.fhir_group_id
+                        ? () => null
+                        : onClickRow
+                        ? () => onClickRow(row)
+                        : () => history.push(`/cohort/${row.fhir_group_id}`)
+                    }
                   >
                     <TableCell>{row.name}</TableCell>
                     <TableCell className={classes.status} align="center">
                       {row.status}
                     </TableCell>
-                    {/* <TableCell align="center">{row.perimeter}</TableCell> */}
+                    <TableCell align="center">
+                      {row.fhir_group_id ? (
+                        <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
+                      ) : row.jobStatus === 'pending' || row.jobStatus === 'started' ? (
+                        <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
+                      ) : (
+                        <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
+                      )}
+                    </TableCell>
                     <TableCell align="center">{displayDigit(row.nPatients ?? 0)}</TableCell>
                     <TableCell align="center">
                       {row.date && (

@@ -1,67 +1,41 @@
 import { makeStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles(() => ({
-  root: {
+const useStyles = makeStyles((theme) => ({
+  criteriaItem: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#D1E2F4',
+    borderRadius: 4,
+    padding: 8,
+    marginTop: 12,
+    minWidth: 400,
+    maxWidth: 800,
+    position: 'relative',
     '&::before': {
-      content: '""',
-      width: 2,
-      height: 36,
-      background: '#D0D7D8',
-      display: 'block',
-      margin: '0 auto'
-    },
-    '&::after': {
-      content: '""',
-      width: 2,
-      height: 36,
-      background: '#D0D7D8',
-      display: 'block',
-      margin: '0 auto'
+      width: 38,
+      height: 3,
+      content: "''",
+      position: 'absolute',
+      background: '#19235A',
+      marginLeft: -46
     }
   },
-  card: {
-    width: 450,
-    height: 'fit-content'
-  },
-  cardHeader: {
+  criteriaTitleAndChips: {
     display: 'flex',
     alignItems: 'center',
-    background: '#DAF0BF',
-    color: '#45505B'
+    width: 'calc(100% - 80px)',
+    position: 'relative',
+    [theme.breakpoints.down('sm')]: {
+      flexWrap: 'wrap'
+    }
   },
-  cardContent: {
+  title: {
+    whiteSpace: 'nowrap'
+  },
+  actionContainer: {
     display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center'
-  },
-  criteriaType: {
-    color: '#5BC5F2',
-    textDecoration: 'underline',
-    fontWeight: 'bold'
-  },
-  label: {
-    fontWeight: 'bold'
-  },
-  addButton: {
-    width: 42,
-    height: 42,
-    minWidth: 42,
-    maxWidth: 42,
-    minHeight: 42,
-    maxHeight: 42,
-    borderRadius: 42
-  },
-  loading: {
-    background: 'white',
-    width: 42,
-    height: 42,
-    minWidth: 42,
-    maxWidth: 42,
-    minHeight: 42,
-    maxHeight: 42,
-    borderRadius: 42
+    flexWrap: 'nowrap'
   }
 }))
 

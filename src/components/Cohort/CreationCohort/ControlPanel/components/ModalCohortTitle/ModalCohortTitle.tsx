@@ -35,10 +35,6 @@ const ModalCohortTitle: React.FC<{
       setLoading(false)
       return setError(ERROR_TITLE)
     }
-    if (!description) {
-      setLoading(false)
-      return setError(ERROR_DESCRIPTION)
-    }
 
     if (onExecute) {
       onExecute(title, description)

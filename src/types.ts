@@ -75,11 +75,13 @@ export type Cohort = {
   fhir_group_id?: string
   name?: string
   result_size?: number
+  dated_measure?: any
   created_at?: string
   modified_at?: string
   favorite?: boolean
   type?: string
   request_id?: string
+  request_job_status?: string
 }
 
 export type FormattedCohort = {
@@ -91,6 +93,17 @@ export type FormattedCohort = {
   date?: string
   perimeter?: string
   favorite?: boolean
+  jobStatus?: string
+}
+
+export type CohortFilters = {
+  status: ValueSet[]
+  type: string
+  favorite: string
+  minPatients: null | string
+  maxPatients: null | string
+  startDate: null | string
+  endDate: null | string
 }
 
 export type CohortGroup = IGroup & {
@@ -169,6 +182,7 @@ export type CIMDiagnosticInclusionCriteria = {
 }
 
 export type ScopeTreeRow = {
+  access?: string
   resourceType?: string
   id: string
   name: string
@@ -215,6 +229,32 @@ export type PatientData = {
   ghmTotal?: number
 }
 
+export type CriteriaGroupType = {
+  id: number
+  title: string
+  criteriaIds: number[] // = [SelectedCriteriaType.id | CriteriaGroupType.id, ...]
+  isSubGroup?: boolean
+  isInclusive?: boolean
+} & (
+  | {
+      type: 'andGroup' | 'orGroup'
+    }
+  | {
+      type: 'NamongM'
+      options: {
+        operator: '=' | '<' | '>' | '<=' | '>='
+        number: number
+        timeDelayMin: number
+        timeDelayMax: number
+      }
+    }
+)
+
+export type TemporalConstraintsType = {
+  idList: ['All'] | number[]
+  constraintType: 'none' | 'sameEncounter' | 'differentEncounter' | 'directChronologicalOrdering'
+}
+
 export type CriteriaItemType = {
   id: string
   title: string
@@ -227,85 +267,75 @@ export type CriteriaItemType = {
 }
 
 export type SelectedCriteriaType = {
-  type: 'Patient' | 'Encounter' | 'Claim' | 'Procedure' | 'Condition' | 'Composition'
-  title: string
-  code?: { id: string; label: string }[]
-  diagnosticType?: { id: string; label: string }[]
-  encounter: number
-  comparator: { id: 'le' | 'e' | 'ge'; label: string }
-  label: undefined
-  startOccurrence: Date
-  endOccurrence: Date
-  gender?: { id: string; label: string }[]
-  vitalStatus?: { id: string; label: string }[]
-  years?: [number, number]
-  search?: string
-  docType?: { id: string; label: string }[]
-  occurence?: number
-  ageType?: { id: string; label: string }
-  durationType?: { id: string; label: string }
-  duration?: [number, number]
-  admissionMode?: { id: string; label: string }
-  entryMode?: { id: string; label: string }
-  exitMode?: { id: string; label: string }
-  fileStatus?: { id: string; label: string }
-}
+  id: number
+} & (CcamDataType | Cim10DataType | DemographicDataType | GhmDataType | EncounterDataType | DocumentDataType)
 
 export type CcamDataType = {
   title: string
+  type: 'Procedure'
   hierarchy: undefined
   code: { id: string; label: string }[] | null
-  encounter: number
-  comparator: { id: 'le' | 'e' | 'ge'; label: string }
+  occurrence: number
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
+  isInclusive?: boolean
 }
 
 export type Cim10DataType = {
   title: string
+  type: 'Condition'
   code: { id: string; label: string }[] | null
-  diagnosticType: { id: string; label: string } | null
-  encounter: number
-  comparator: { id: 'le' | 'e' | 'ge'; label: string }
+  diagnosticType: { id: string; label: string }[] | null
+  occurrence: number
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
+  isInclusive?: boolean
 }
 
 export type DemographicDataType = {
   title: string
-  gender: { id: string; label: string } | null
+  type: 'Patient'
+  gender: { id: string; label: string }[] | null
   vitalStatus: { id: string; label: string }[] | null
-  ageType: { id: string; label: string }[] | null
+  ageType: { id: string; label: string } | null
   label: undefined
   years: [number, number]
+  isInclusive?: boolean
 }
 
 export type DocumentDataType = {
   title: string
+  type: 'Composition'
   search: string
-  docType: { id: string; label: string } | null
-  encounter: number
-  comparator: { id: 'le' | 'e' | 'ge'; label: string }
+  docType: { id: string; label: string }[] | null
+  occurrence: number
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
+  isInclusive?: boolean
 }
 
 export type GhmDataType = {
   title: string
+  type: 'Claim'
   code: { id: string; label: string }[] | null
-  encounter: number
-  comparator: { id: 'le' | 'e' | 'ge'; label: string }
+  occurrence: number
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
   startOccurrence: Date
   endOccurrence: Date
+  isInclusive?: boolean
 }
 
 export type EncounterDataType = {
   label: undefined
   label2: undefined
+  type: 'Encounter'
   title: string
   ageType: { id: string; label: string } | null
   years: [number, number]
@@ -314,21 +344,31 @@ export type EncounterDataType = {
   admissionMode: { id: string; label: string } | null
   entryMode: { id: string; label: string } | null
   exitMode: { id: string; label: string } | null
+  priseEnChargeType: { id: string; label: string } | null
+  typeDeSejour: { id: string; label: string } | null
   fileStatus: { id: string; label: string } | null
+  isInclusive?: boolean
 }
 
 export type CohortCreationCounterType = {
   uuid?: string
+  status?: string
   includePatient?: number
   byrequest?: number
   alive?: number
   deceased?: number
   female?: number
   male?: number
+  unknownPatient?: number
 }
 
 export type CohortCreationSnapshotType = {
   uuid: string
   json: string
   date: string
+}
+
+export type ValueSet = {
+  code: string
+  display: string
 }

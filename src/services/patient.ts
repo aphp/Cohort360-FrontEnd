@@ -21,14 +21,26 @@ import {
   IPatient,
   IProcedure
 } from '@ahryman40k/ts-fhir-types/lib/R4'
+import fakePatients from '../data/fakeData/patients'
+import fakeEncounters from '../data/fakeData/encounters'
+import fakeConditions from '../data/fakeData/conditions'
+import fakeProcedures from '../data/fakeData/procedures'
+import fakeClaims from '../data/fakeData/claims'
+import fakeDocuments from '../data/fakeData/documents'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
 export const fetchPatientsCount = async (): Promise<number | undefined> => {
-  const response = await api.get<FHIR_API_Response<IPatient>>('Patient?size=0')
+  if (CONTEXT === 'fakedata') {
+    return 12
+  } else if (CONTEXT === 'arkhn') {
+    return undefined
+  } else {
+    const response = await api.get<FHIR_API_Response<IPatient>>('Patient?size=0')
 
-  if (response?.data?.resourceType === 'OperationOutcome') return undefined
+    if (response?.data?.resourceType === 'OperationOutcome') return undefined
 
-  return response.data.total
+    return response.data.total
+  }
 }
 
 export const fillNDAAndServiceProviderDocs = async (
@@ -210,6 +222,31 @@ export const fetchPMSI = async (
   pmsiData?: PMSIEntry<IClaim | ICondition | IProcedure>[]
   pmsiTotal?: number
 }> => {
+  if (CONTEXT === 'fakedata') {
+    let pmsiData = []
+
+    switch (selectedTab) {
+      case 'CIM10':
+        pmsiData = fakeConditions as PMSIEntry<ICondition>[]
+        break
+      case 'CCAM':
+        pmsiData = fakeProcedures as PMSIEntry<IProcedure>[]
+        break
+      case 'GHM':
+        pmsiData = fakeClaims as PMSIEntry<IClaim>[]
+        break
+      default:
+        pmsiData = fakeConditions
+    }
+
+    const pmsiTotal = pmsiData.length
+
+    return {
+      // @ts-ignore
+      pmsiData,
+      pmsiTotal
+    }
+  }
   if (CONTEXT === 'arkhn') {
     let resource = ''
     let search = ''
@@ -364,6 +401,14 @@ export const fetchDocuments = async (
   endDate?: string | null,
   groupId?: string
 ) => {
+  if (CONTEXT === 'fakedata') {
+    const docsList = fakeDocuments as CohortComposition[]
+
+    return {
+      docsTotal: docsList.length,
+      docsList: docsList
+    }
+  }
   if (CONTEXT === 'aphp') {
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
     const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : []
@@ -584,6 +629,41 @@ const getProcedureDocuments = async (
 }
 
 export const fetchPatient = async (patientId: string, groupId?: string): Promise<PatientData | undefined> => {
+  if (CONTEXT === 'fakedata') {
+    const patientData = fakePatients[0]
+    const hospit = fakeEncounters as IEncounter[]
+    const documents = fakeDocuments as CohortComposition[]
+    const documentsTotal = fakeDocuments.length
+    const consult = fakeProcedures as PMSIEntry<IProcedure>[]
+    const consultTotal = fakeProcedures.length
+    const diagnostic = fakeConditions as PMSIEntry<ICondition>[]
+    const diagnosticTotal = fakeConditions.length
+    const ghm = fakeClaims as PMSIEntry<IClaim>[]
+    const ghmTotal = fakeClaims.length
+
+    const patient = {
+      ...patientData,
+      lastEncounter: hospit[0],
+      lastProcedure: consult[0],
+      lastGhm: ghm[0],
+      mainDiagnosis: diagnostic?.filter((diagnostic: any) => {
+        return diagnostic.extension?.[0].valueString === 'dp'
+      })
+    } as CohortPatient
+
+    return {
+      hospit,
+      documents,
+      documentsTotal,
+      consult,
+      consultTotal,
+      diagnostic,
+      diagnosticTotal,
+      ghm,
+      ghmTotal,
+      patient
+    }
+  }
   if (CONTEXT === 'arkhn') {
     const [
       patientResponse,
