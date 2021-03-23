@@ -35,15 +35,15 @@ export const fetchPractitionerData = createAsyncThunk<MeState, void, { state: Ro
     if (idToken) {
       const { email, name } = jwt_decode<{ email: string; name?: string }>(idToken)
       const practitioner = await fetchPractitioner(email)
-      const organizations = practitioner && (await getPractitionerPerimeter(practitioner.id))
       if (practitioner) {
+        localStorage.setItem(PRACTITIONER_ID, practitioner.id)
+        const organizations = await getPractitionerPerimeter(practitioner.id)
         state = {
           ...practitioner,
           organizations,
           deidentified: name !== 'admin',
           isSuperUser: name === 'admin'
         }
-        localStorage.setItem(PRACTITIONER_ID, practitioner.id)
       } else {
         dispatch(logout())
         return rejectWithValue(new Error('Practitioner not found'))
