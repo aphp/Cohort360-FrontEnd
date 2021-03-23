@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ACCES_TOKEN, BACK_API_URL } from '../constants'
+import { PRACTITIONER_ID, BACK_API_URL } from '../constants'
 
 const apiBackCohort = axios.create({
   baseURL: BACK_API_URL,
@@ -9,8 +9,7 @@ const apiBackCohort = axios.create({
 })
 
 apiBackCohort.interceptors.request.use((config) => {
-  const token = localStorage.getItem(ACCES_TOKEN)
-  config.headers.Authorization = `Bearer ${token}`
+  config.headers.Username = localStorage.getItem(PRACTITIONER_ID)
   return config
 })
 
