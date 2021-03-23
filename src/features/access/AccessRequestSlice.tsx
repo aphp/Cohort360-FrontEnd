@@ -55,12 +55,12 @@ const createAccessRequest = createAsyncThunk<void, void, { state: RootState }>(
     // Then we filter those not in the practitioner's perimeter
     const outOfPerimeterOrgaIds = selectedOrganizationIds.filter((id) => !practitionerOrganizationIds.includes(id))
 
-    const mockOrgaIds = ['87ef5490-e3bc-5e5a-9748-58f22a05b5dd', 'b02deefc-62e4-5c13-8a00-8203d4229cb0']
+    // const mockOrgaIds = ['87ef5490-e3bc-5e5a-9748-58f22a05b5dd', 'b02deefc-62e4-5c13-8a00-8203d4229cb0']
 
     if (!practitionerId) throw new Error('Practitioner not logged')
 
     // Create as many PractitionerRole as "out of scope" organizations
-    const accessResources: IPractitionerRole[] = mockOrgaIds.map((orgaId) => ({
+    const accessResources: IPractitionerRole[] = outOfPerimeterOrgaIds.map((orgaId) => ({
       resourceType: 'PractitionerRole',
       id: uuid(),
       meta: {
