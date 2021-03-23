@@ -21,7 +21,7 @@ export const accessRequestsSelector = createSelector(self, (accessRequestsState)
     const organization = organizations.find((a) => organizationRef?.reference === `Organization/${a.id}`)
 
     if (!author || !organization || !id) {
-      return []
+      continue
     }
 
     const authorFullName = `${author.name?.[0]?.family} ${author.name?.[0]?.given?.[0]}`

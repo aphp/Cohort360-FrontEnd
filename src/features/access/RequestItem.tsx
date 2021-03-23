@@ -1,10 +1,15 @@
 import React, { useState } from 'react'
 import clsx from 'clsx'
 
+import { IPractitionerRole } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { Grid, makeStyles, MenuItem, Select, Typography } from '@material-ui/core'
+
+import { updateAccessRequest } from './AccessRequestSlice'
 import CohortButton from 'common/CohortButton'
 import RequestInfos from './RequestInfos'
 import { AccessRequest } from './RequestSelector'
+import { useAppDispatch } from 'state'
+import moment from 'moment'
 
 const useStyles = makeStyles((theme) => ({
   rootContainer: {
@@ -42,6 +47,7 @@ type RequestItemProps = {
 
 const RequestItem = ({ request }: RequestItemProps) => {
   const classes = useStyles()
+  const dispatch = useAppDispatch()
   const [nominativeAccess, setNominativeAccess] = useState<'yes' | 'no'>('yes')
   const [accessDelay, setAccessDelay] = useState<'week' | 'month' | 'year'>('week')
 
@@ -51,6 +57,27 @@ const RequestItem = ({ request }: RequestItemProps) => {
   const handleChangeAccessDelay = (event: React.ChangeEvent<{ value: unknown }>) => {
     setAccessDelay(event.target.value as 'week' | 'month' | 'year')
   }
+  const handleSubmitAccess = (isRejected?: boolean) => () => {
+    const startDate = new Date()
+    const endDate = moment(startDate).add(1, accessDelay).toDate()
+    const practitionerRole: IPractitionerRole = {
+      resourceType: 'PractitionerRole',
+      id: request.id,
+      extension: [
+        {
+          url: 'http://arkhn.com/fhir/cohort360/StructureDefinition/permission-status',
+          valueCode: isRejected ? `rejected` : 'active'
+        }
+      ],
+      period: isRejected
+        ? undefined
+        : {
+            start: startDate.toISOString(),
+            end: endDate.toISOString()
+          }
+    }
+    dispatch(updateAccessRequest(practitionerRole))
+  }
 
   return (
     <Grid container className={classes.rootContainer} justify="space-between" spacing={2}>
@@ -59,8 +86,10 @@ const RequestItem = ({ request }: RequestItemProps) => {
       </Grid>
       <Grid item xs={12} md={4}>
         <div className={classes.buttonsContainer}>
-          <CohortButton>Donner l'accès</CohortButton>
-          <CohortButton className={classes.denyButton}>Refuser</CohortButton>
+          <CohortButton onClick={handleSubmitAccess()}>Donner l'accès</CohortButton>
+          <CohortButton onClick={handleSubmitAccess(true)} className={classes.denyButton}>
+            Refuser
+          </CohortButton>
         </div>
         <div className={classes.control}>
           <Typography variant="subtitle1" className={clsx(classes.textBlack, classes.controlLabel)}>
