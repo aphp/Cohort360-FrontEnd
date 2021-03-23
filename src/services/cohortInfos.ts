@@ -159,7 +159,6 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
 
       const patients = response.filter((resource) => resource.resourceType === 'Patient') as IPatient[]
       const encounters = response.filter((resource) => resource.resourceType === 'Encounter') as IEncounter[]
-      if (!patients || !encounters) return cohortResult
 
       cohortResult.totalPatients = patients.length
       cohortResult.originalPatients = patients
