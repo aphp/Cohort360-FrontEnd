@@ -150,23 +150,16 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
   if (CONTEXT === 'arkhn') {
     const cohortResult: CohortData = {}
     const response = getApiResponseResources(
-      await api.get<FHIR_API_Response<IGroup | IPatient>>(`/Group?_id=${cohortId}&_include=Group:member`)
+      await api.get<FHIR_API_Response<IEncounter | IPatient | IGroup>>(
+        `/Patient?_has:Group:member:_id=${cohortId}&_revinclude=Group:member&_revinclude=Encounter:patient`
+      )
     )
     if (response) {
       cohortResult.cohort = head(response.filter((resource) => resource.resourceType === 'Group') as IGroup[])
 
       const patients = response.filter((resource) => resource.resourceType === 'Patient') as IPatient[]
-
-      if (!patients) return cohortResult
-
-      const encountersResp = await api.get<FHIR_API_Response<IEncounter>>(
-        `/Encounter?subject=${patients.map((patient) => patient.id).join(',')}`
-      )
-      const encounters = getApiResponseResources(encountersResp)
-
-      if (!patients || !encounters) {
-        return cohortResult
-      }
+      const encounters = response.filter((resource) => resource.resourceType === 'Encounter') as IEncounter[]
+      if (!patients || !encounters) return cohortResult
 
       cohortResult.totalPatients = patients.length
       cohortResult.originalPatients = patients
