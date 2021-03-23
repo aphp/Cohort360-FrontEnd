@@ -1,4 +1,4 @@
-import { IOrganization, IEncounter, IPatient, IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IOrganization, IEncounter, IPatient, IGroup, IPractitionerRole } from '@ahryman40k/ts-fhir-types/lib/R4'
 import uniqBy from 'lodash/uniqBy'
 
 import api from './api'
@@ -32,10 +32,12 @@ export const getOrganizations = async (ids?: string): Promise<IOrganization[]> =
 }
 
 export const getPractitionerPerimeter = async (practitionerId: string) => {
-  const resp = await api.get<FHIR_API_Response<IOrganization>>(
-    `/Organization?_has:PractitionerRole:organization:practitioner=${practitionerId}_has:PractitionerRole.code=allowed`
+  const resp = await api.get<FHIR_API_Response<IOrganization | IPractitionerRole>>(
+    `/PractitionerRole?permission-status=active&practitioner=${practitionerId}&date=lt${new Date().toISOString()}&_include=PractitionerRole:organization`
   )
-  const organizations = getApiResponseResources(resp) ?? []
+  const organizations =
+    (getApiResponseResources(resp)?.filter(({ resourceType }) => resourceType === 'Organization') as IOrganization[]) ??
+    []
   const organizationsWithTotal = await Promise.all(organizations.map(getServicePatientsCount))
 
   return organizationsWithTotal.map(({ service, patientCount }) => ({ ...service, patientCount }))

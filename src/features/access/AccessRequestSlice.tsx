@@ -1,16 +1,11 @@
 import { IPractitionerRole, IPractitioner, IOrganization } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { v4 as uuid } from 'uuid'
 
 import api from 'services/api'
 import { RootState } from 'state'
 import { FHIR_API_Response } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
-
-export type PractitionerConsent = IPractitionerRole & {
-  extension: {
-    valueCode: 'pending' | 'validated' | 'refused' | 'inactive'
-  }
-}
 
 export type AccessRequestState = {
   authors: IPractitioner[]
@@ -21,15 +16,18 @@ export type AccessRequestState = {
 const fetchAccessRequests = createAsyncThunk<AccessRequestState, void, { state: RootState }>(
   'fetchAccessRequests',
   async (_, { getState }) => {
-    const practitionerId = getState().me?.id
+    const meState = getState().me
+    const practitionerId = meState?.id
+    const isSuperUser = meState?.isSuperUser
     if (!practitionerId) throw new Error('Error: Could not get practitioner id')
 
-    const pendingRequestsData = getApiResponseResources(
-      await api.get<FHIR_API_Response<IPractitionerRole | IPractitioner | IOrganization>>(
-        //TODO Wrong request
-        `PractitionerRole?&_include:PractitionerRole:practitioner&_include:PractitionerRole:organization`
-      )
-    )
+    const pendingRequestsData = isSuperUser
+      ? getApiResponseResources(
+          await api.get<FHIR_API_Response<IPractitionerRole | IPractitioner | IOrganization>>(
+            `PractitionerRole?permission-status=proposed&_include=PractitionerRole:practitioner&_include=PractitionerRole:organization&_count=500`
+          )
+        )
+      : []
 
     if (!pendingRequestsData) throw new Error('Error: Could not fetch access requests')
 
@@ -57,14 +55,14 @@ const createAccessRequest = createAsyncThunk<void, void, { state: RootState }>(
     // Then we filter those not in the practitioner's perimeter
     const outOfPerimeterOrgaIds = selectedOrganizationIds.filter((id) => !practitionerOrganizationIds.includes(id))
 
-    // Mock data
-    const mockIds = ['836729c0-91d8-5dec-a96c-d9e86c01836d']
+    const mockOrgaIds = ['87ef5490-e3bc-5e5a-9748-58f22a05b5dd', 'b02deefc-62e4-5c13-8a00-8203d4229cb0']
 
     if (!practitionerId) throw new Error('Practitioner not logged')
 
     // Create as many PractitionerRole as "out of scope" organizations
-    const accessResources: IPractitionerRole[] = mockIds.map((orgaId) => ({
+    const accessResources: IPractitionerRole[] = mockOrgaIds.map((orgaId) => ({
       resourceType: 'PractitionerRole',
+      id: uuid(),
       meta: {
         lastUpdated: new Date().toISOString()
       },
@@ -77,12 +75,33 @@ const createAccessRequest = createAsyncThunk<void, void, { state: RootState }>(
       },
       extension: [
         {
-          valueCode: `pending`
+          url: 'http://arkhn.com/fhir/cohort360/StructureDefinition/permission-status',
+          valueCode: `proposed`
         }
       ]
     }))
 
     await Promise.all(accessResources.map((resource) => api.post(`PractitionerRole`, resource)))
+  }
+)
+
+const updateAccessRequest = createAsyncThunk<void, IPractitionerRole, { state: RootState }>(
+  'updateAccessRequest',
+  async (practitionerRole, { dispatch, getState }) => {
+    const originalPractitionerRole = getState().accessRequests.practitionerRoles.find(
+      ({ id }) => id === practitionerRole.id
+    )
+
+    if (!originalPractitionerRole) throw new Error('Could not find original practitionerRole to update')
+
+    const updateRequest = await api.put(`PractitionerRole/${practitionerRole.id}`, {
+      ...originalPractitionerRole,
+      ...practitionerRole
+    })
+
+    if (updateRequest.status === 200) {
+      dispatch(fetchAccessRequests())
+    }
   }
 )
 
@@ -104,4 +123,4 @@ const AccessRequestSlice = createSlice({
 })
 
 export default AccessRequestSlice.reducer
-export { fetchAccessRequests, createAccessRequest }
+export { fetchAccessRequests, createAccessRequest, updateAccessRequest }
