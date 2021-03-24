@@ -23,8 +23,8 @@ import fakeFacetStartDateFacet from '../data/fakeData/facet-start-date-facet'
 import fakePatients from '../data/fakeData/patients'
 import { FHIR_API_Response, CohortData, ScopeTreeRow } from 'types'
 
-export const getOrganizations = async (ids?: string): Promise<IOrganization[]> => {
-  const orgaIdsParam = ids ? `?_id=${ids}` : ''
+export const getOrganizations = async (ids?: string[]): Promise<IOrganization[]> => {
+  const orgaIdsParam = ids ? `?_id=${ids.join(',')}` : ''
   const respOrganizations = await api.get<FHIR_API_Response<IOrganization>>(`/Organization${orgaIdsParam}`)
   return getApiResponseResources(respOrganizations) ?? []
 }
@@ -48,7 +48,7 @@ const getPatientsAndEncountersFromServiceId = async (serviceId: string) => {
   }
 }
 
-export const fetchPerimetersInfos = async (perimetersId: string): Promise<CohortData | undefined> => {
+export const fetchPerimetersInfos = async (perimeterIds: string[]): Promise<CohortData | undefined> => {
   if (CONTEXT === 'fakedata') {
     const totalPatients = 3
 
@@ -74,13 +74,14 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
     }
   }
   if (CONTEXT === 'aphp') {
+    const perimeterIdsJoined = perimeterIds.join(',')
     const [perimetersResp, patientsResp, encountersResp] = await Promise.all([
-      api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${perimetersId}`),
+      api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${perimeterIdsJoined}`),
       api.get<FHIR_API_Response<IPatient>>(
-        `/Patient?pivotFacet=age_gender,deceased_gender&_list=${perimetersId}&size=20&_sort=given&_elements=gender,name,birthDate,deceased,identifier,extension`
+        `/Patient?pivotFacet=age_gender,deceased_gender&_list=${perimeterIdsJoined}&size=20&_sort=given&_elements=gender,name,birthDate,deceased,identifier,extension`
       ),
       api.get<FHIR_API_Response<IEncounter>>(
-        `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${perimetersId}&size=0&type=VISIT`
+        `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${perimeterIdsJoined}&size=0&type=VISIT`
       )
     ])
 
@@ -130,7 +131,7 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
       monthlyVisitData
     }
   } else if (CONTEXT === 'arkhn') {
-    const services = await getOrganizations(perimetersId)
+    const services = await getOrganizations(perimeterIds)
     const serviceIds = services.map((service) => service.id)
 
     const patientsAndEncountersFromServices = await getPatientsAndEncountersFromServiceId(serviceIds.join(','))
