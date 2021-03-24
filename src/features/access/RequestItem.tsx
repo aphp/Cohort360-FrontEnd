@@ -5,6 +5,7 @@ import moment from 'moment'
 import { IPractitionerRole } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { Grid, makeStyles, MenuItem, Select, Typography } from '@material-ui/core'
 
+import { permissionStatusURL } from './AccessConstants'
 import { updateAccessRequest } from './AccessRequestSlice'
 import CohortButton from 'common/CohortButton'
 import RequestInfos from './RequestInfos'
@@ -65,7 +66,7 @@ const RequestItem = ({ request }: RequestItemProps) => {
       id: request.id,
       extension: [
         {
-          url: 'http://arkhn.com/fhir/cohort360/StructureDefinition/permission-status',
+          url: permissionStatusURL,
           valueCode: isRejected ? `rejected` : 'active'
         }
       ],

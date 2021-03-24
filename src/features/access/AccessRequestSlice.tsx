@@ -6,6 +6,7 @@ import api from 'services/api'
 import { RootState } from 'state'
 import { FHIR_API_Response } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
+import { permissionStatusURL } from './AccessConstants'
 
 export type AccessRequestState = {
   authors: IPractitioner[]
@@ -55,8 +56,6 @@ const createAccessRequest = createAsyncThunk<void, void, { state: RootState }>(
     // Then we filter those not in the practitioner's perimeter
     const outOfPerimeterOrgaIds = selectedOrganizationIds.filter((id) => !practitionerOrganizationIds.includes(id))
 
-    // const mockOrgaIds = ['87ef5490-e3bc-5e5a-9748-58f22a05b5dd', 'b02deefc-62e4-5c13-8a00-8203d4229cb0']
-
     if (!practitionerId) throw new Error('Practitioner not logged')
 
     // Create as many PractitionerRole as "out of scope" organizations
@@ -66,7 +65,6 @@ const createAccessRequest = createAsyncThunk<void, void, { state: RootState }>(
       meta: {
         lastUpdated: new Date().toISOString()
       },
-      // code: 'pending'
       practitioner: {
         reference: `Practitioner/${practitionerId}`
       },
@@ -75,7 +73,7 @@ const createAccessRequest = createAsyncThunk<void, void, { state: RootState }>(
       },
       extension: [
         {
-          url: 'http://arkhn.com/fhir/cohort360/StructureDefinition/permission-status',
+          url: permissionStatusURL,
           valueCode: `proposed`
         }
       ]

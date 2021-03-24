@@ -29,6 +29,19 @@ api.interceptors.response.use(
       return Promise.reject(error)
     }
 
+    /* TODO: Put back oath refresh token
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+
+      const success = await refreshToken()
+      if (!success) {
+        removeTokens()
+        return Promise.reject(error)
+      }
+      return axios(originalRequest)
+    }
+    */
+
     return Promise.reject(error)
   }
 )
