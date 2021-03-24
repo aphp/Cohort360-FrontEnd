@@ -48,8 +48,7 @@ const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   gender: [],
   vitalStatus: [],
   years: [0, 130],
-  ageType: { id: 'year', label: 'En année' },
-  label: undefined
+  ageType: { id: 'year', label: 'En année' }
 }
 
 const DEFAULT_GROUP_ERROR: CriteriaGroupType = {
