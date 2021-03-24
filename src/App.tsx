@@ -18,9 +18,6 @@ import RechercheSauvegarde from './views/RechercheSauvegarde/RechercheSauvegarde
 import Patient from './views/Patient/Patient'
 import Scope from './views/Scope/Scope'
 import Dashboard from './views/Dashboard/Dashboard'
-// import Perimetre from './views/Perimetre/Perimetre'
-// import Cohort from './views/Cohort/Cohort'
-// import MyPatients from './views/MyPatients/MyPatients'
 import PrivateRoute from './components/Routes/Private'
 import LeftSideBar from './components/LeftSideBar/LeftSideBar'
 import CohortCreation from './views/CohortCreation/CohortCreation'
@@ -195,8 +192,8 @@ const App = () => (
                 </>
               )}
             />
+            {/* 404 Not Found */}
             <PrivateRoute
-              exact
               render={() => (
                 <>
                   <LeftSideBar open={true} />

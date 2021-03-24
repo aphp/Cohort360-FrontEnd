@@ -1,5 +1,5 @@
 import React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
 
 import { Chip, ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
 
@@ -43,6 +43,7 @@ const VitalStatusChip: React.FC<VitalStatusChipTypes> = ({ deceased }) => {
 
 type PatientSidebarItemTypes = {
   groupId?: string
+  closeDialog: (open: boolean) => void
   gender?: PatientGenderKind
   firstName?: string
   lastName?: string
@@ -53,6 +54,7 @@ type PatientSidebarItemTypes = {
 }
 const PatientSidebarItem: React.FC<PatientSidebarItemTypes> = ({
   groupId,
+  closeDialog,
   gender,
   firstName,
   lastName,
@@ -61,13 +63,21 @@ const PatientSidebarItem: React.FC<PatientSidebarItemTypes> = ({
   ipp,
   deceased
 }) => {
+  const { patientId, tabName } = useParams<{
+    patientId: string
+    tabName: string
+  }>()
+
   const classes = useStyles()
   const history = useHistory()
   return (
     <ListItem
       divider
-      onClick={() => history.push(`/patients/${id}${groupId ? `?groupId=${groupId}` : ''}`)}
-      className={classes.listItem}
+      onClick={() => {
+        history.push(`/patients/${id}${tabName ? `/${tabName}` : ''}${groupId ? `?groupId=${groupId}` : ''}`)
+        closeDialog(false)
+      }}
+      className={patientId === id ? classes.selectedListItem : classes.listItem}
     >
       <ListItemIcon className={classes.genderIconContainer}>
         <GenderIcon gender={gender} />
