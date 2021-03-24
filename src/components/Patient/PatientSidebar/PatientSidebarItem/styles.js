@@ -7,6 +7,10 @@ export default makeStyles({
       backgroundColor: '#FAF9F9'
     }
   },
+  selectedListItem: {
+    backgroundColor: '#FAF9F9',
+    cursor: 'default'
+  },
   genderIcon: {
     height: '25px',
     fill: '#0063AF'
