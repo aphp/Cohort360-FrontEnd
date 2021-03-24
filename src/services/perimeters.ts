@@ -31,7 +31,7 @@ export const getOrganizations = async (ids?: string): Promise<IOrganization[]> =
   return getApiResponseResources(respOrganizations) ?? []
 }
 
-export const getPractitionerPerimeter = async (practitionerId: string) => {
+export const getPractitionerPerimeters = async (practitionerId: string) => {
   const resp = await api.get<FHIR_API_Response<IOrganization | IPractitionerRole>>(
     `/PractitionerRole?permission-status=active&practitioner=${practitionerId}&date=lt${new Date().toISOString()}&_include=PractitionerRole:organization`
   )

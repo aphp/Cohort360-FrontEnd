@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import clsx from 'clsx'
+import moment from 'moment'
 
 import { IPractitionerRole } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { Grid, makeStyles, MenuItem, Select, Typography } from '@material-ui/core'
@@ -9,7 +10,6 @@ import CohortButton from 'common/CohortButton'
 import RequestInfos from './RequestInfos'
 import { AccessRequest } from './RequestSelector'
 import { useAppDispatch } from 'state'
-import moment from 'moment'
 
 const useStyles = makeStyles((theme) => ({
   rootContainer: {

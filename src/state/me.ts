@@ -5,7 +5,7 @@ import jwt_decode from 'jwt-decode'
 import { getIdToken } from 'services/arkhnAuth/oauth/tokenManager'
 import { fetchPractitioner } from 'services/practitioner'
 import { RootState } from 'state'
-import { getPractitionerPerimeter } from 'services/perimeters'
+import { getPractitionerPerimeters } from 'services/perimeters'
 import { PRACTITIONER_ID } from '../constants'
 
 export type MeState = null | {
@@ -37,7 +37,7 @@ export const fetchPractitionerData = createAsyncThunk<MeState, void, { state: Ro
       const practitioner = await fetchPractitioner(email)
       if (practitioner) {
         localStorage.setItem(PRACTITIONER_ID, practitioner.id)
-        const organizations = await getPractitionerPerimeter(practitioner.id)
+        const organizations = await getPractitionerPerimeters(practitioner.id)
         state = {
           ...practitioner,
           organizations,
@@ -65,7 +65,7 @@ export const fetchPractitionerPerimeter = createAsyncThunk<
     return []
   }
 
-  const organizations = await getPractitionerPerimeter(practitionerId)
+  const organizations = await getPractitionerPerimeters(practitionerId)
   return organizations ?? []
 })
 
