@@ -337,16 +337,16 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
             >
               Ajouter un critère
             </Button>
-
-            <Button
-              // disabled={isSubGroup}
-              style={{ borderRadius: 38, marginLeft: 8 }}
-              color="primary"
-              variant="contained"
-              onClick={() => _addNewItem('group')}
-            >
-              Ajouter un sous groupe de critère
-            </Button>
+            {/* FIXME: adding subgroups of criteria disabled*/}
+            {/*<Button*/}
+            {/*  // disabled={isSubGroup}*/}
+            {/*  style={{ borderRadius: 38, marginLeft: 8 }}*/}
+            {/*  color="primary"*/}
+            {/*  variant="contained"*/}
+            {/*  onClick={() => _addNewItem('group')}*/}
+            {/*>*/}
+            {/*  Ajouter un sous groupe de critère*/}
+            {/*</Button>*/}
           </Grid>
 
           <Grid container alignItems="flex-end" className={classes.typeCriteriaContainer}>

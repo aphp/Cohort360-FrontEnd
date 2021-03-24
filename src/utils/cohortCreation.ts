@@ -105,7 +105,7 @@ type RequeteurGroupType =
 type RequeteurSearchType = {
   version: string
   sourcePopulation: {
-    caresiteCohortList?: number[]
+    caresiteCohortList?: string[]
     providerCohorttList?: number[]
   }
   request: (RequeteurCriteriaType | RequeteurGroupType)[]
@@ -340,7 +340,7 @@ export function buildRequest(
   const json: RequeteurSearchType = {
     version: '1.0',
     sourcePopulation: {
-      caresiteCohortList: selectedPopulation?.map(({ id }) => +id)
+      caresiteCohortList: selectedPopulation?.map(({ id }) => id)
     },
     request: [
       {
@@ -420,7 +420,7 @@ export async function unbuildRequest(_json: string) {
   } = json
 
   /**
-   * Retrieve popultion
+   * Retrieve population
    */
   for (const caresiteCohortItem of caresiteCohortList) {
     const newPopulation = await fetchPopulation(caresiteCohortItem ?? '')

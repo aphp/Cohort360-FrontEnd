@@ -32,8 +32,6 @@ import { useAppSelector } from 'state'
 import { logout as logoutAction } from '../../state/me'
 import { open as openAction, close as closeAction } from '../../state/drawer'
 
-import AutoLogoutContainer from '../Routes/AutoLogoutContainer'
-
 import useStyles from './styles'
 
 const smallDrawerWidth = 52
@@ -89,7 +87,9 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
 
   return (
     <>
-      <AutoLogoutContainer />
+      {/* FIXME: Auto logout disabled
+        <AutoLogoutContainer />
+      */}
       <div className={classes.root}>
         <Drawer
           variant="permanent"

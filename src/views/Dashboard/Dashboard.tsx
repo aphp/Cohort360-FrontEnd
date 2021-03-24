@@ -34,7 +34,7 @@ const Dashboard: React.FC<{
   const classes = useStyles()
   const location = useLocation()
 
-  const perimetreIds = location.search.substr(1)
+  const perimetreIds = location.search.substr(1).split(',')
 
   const [selectedTab, selectTab] = useState(tabName || 'apercu')
   const [tabs, setTabs] = useState<Tabs[]>([])
@@ -210,7 +210,7 @@ const Dashboard: React.FC<{
         )}
         {selectedTab === 'patients' && (
           <PatientList
-            groupId={cohortId || perimetreIds}
+            groupId={cohortId || perimetreIds.join(',')}
             total={dashboard.totalPatients || 0}
             deidentified={deidentified}
             patients={dashboard.originalPatients}
@@ -220,7 +220,7 @@ const Dashboard: React.FC<{
         )}
         {selectedTab === 'documents' && (
           <CohortDocuments
-            groupId={cohortId || perimetreIds}
+            groupId={cohortId || perimetreIds.join(',')}
             deidentifiedBoolean={deidentified}
             sortBy={'date'}
             sortDirection={'desc'}
