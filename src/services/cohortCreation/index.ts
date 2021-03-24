@@ -64,6 +64,8 @@ const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
         return `/Patient?${patientFilter}&${criteria.filterSolr}`
       case 'Condition':
         return `/Patient?${patientFilter}&_has:Condition:patient:${criteria.filterSolr}`
+      case 'Composition':
+        return ''
       default:
         return ''
     }

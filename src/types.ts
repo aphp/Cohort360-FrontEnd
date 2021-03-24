@@ -94,7 +94,7 @@ type SourcePopulation = {
 export type QueryGroup = {
   _type?: 'andGroup' | 'orGroup'
   _id: number
-  resourceType: 'Patient' | 'Condition'
+  resourceType: 'Patient' | 'Condition' | 'Composition'
   isInclusive: boolean
   criteria: QueryGroup[]
   filterSolr?: string
