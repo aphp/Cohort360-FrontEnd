@@ -1,4 +1,4 @@
-import { IEncounter, IGroup, IOrganization, IPatient, IPractitionerRole } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IOrganization, IEncounter, IPatient, IGroup, IPractitionerRole } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import api from './api'
 import {

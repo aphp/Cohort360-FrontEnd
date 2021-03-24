@@ -2,11 +2,15 @@ import { IPractitionerRole, IPractitioner, IOrganization } from '@ahryman40k/ts-
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { v4 as uuid } from 'uuid'
 
+import {
+  PERMISSION_STATUS_STRUCTURE_DEF_URL,
+  PRACTITIONER_CONSENT_PROFILE_URL,
+  CONSENT_CATEGORIES_CODE_URL
+} from '../../constants'
 import api from 'services/api'
 import { RootState } from 'state'
 import { FHIR_API_Response } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
-import { PERMISSION_STATUS_STRUCTURE_DEF_URL } from '../../constants'
 
 export type AccessRequestState = {
   authors: IPractitioner[]
@@ -63,18 +67,31 @@ const createAccessRequest = createAsyncThunk<void, void, { state: RootState }>(
       resourceType: 'PractitionerRole',
       id: uuid(),
       meta: {
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
+        profile: [PRACTITIONER_CONSENT_PROFILE_URL]
       },
       practitioner: {
+        type: 'Practitioner',
         reference: `Practitioner/${practitionerId}`
       },
       organization: {
+        type: 'Organization',
         reference: `Organization/${orgaId}`
       },
       extension: [
         {
           url: PERMISSION_STATUS_STRUCTURE_DEF_URL,
           valueCode: `proposed`
+        }
+      ],
+      code: [
+        {
+          coding: [
+            {
+              system: CONSENT_CATEGORIES_CODE_URL,
+              code: 'research'
+            }
+          ]
         }
       ]
     }))

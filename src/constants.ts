@@ -33,3 +33,6 @@ export const PRACTITIONER_ID = 'practitioner_id'
 export const USERNAME_HEADER = 'username_header'
 export const PERMISSION_STATUS_STRUCTURE_DEF_URL =
   'http://arkhn.com/fhir/cohort360/StructureDefinition/permission-status'
+export const PRACTITIONER_CONSENT_PROFILE_URL =
+  'http://arkhn.com/fhir/cohort360/StructureDefinition/practitioner-consent'
+export const CONSENT_CATEGORIES_CODE_URL = 'http://terminology.hl7.org/CodeSystem/consentcategorycodes'
