@@ -1,15 +1,16 @@
 import React, { useState } from 'react'
 import clsx from 'clsx'
+import moment from 'moment'
 
 import { IPractitionerRole } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { Grid, makeStyles, MenuItem, Select, Typography } from '@material-ui/core'
 
+import { PERMISSION_STATUS_STRUCTURE_DEF_URL } from '../../constants'
 import { updateAccessRequest } from './AccessRequestSlice'
 import CohortButton from 'common/CohortButton'
 import RequestInfos from './RequestInfos'
 import { AccessRequest } from './RequestSelector'
 import { useAppDispatch } from 'state'
-import moment from 'moment'
 
 const useStyles = makeStyles((theme) => ({
   rootContainer: {
@@ -65,7 +66,7 @@ const RequestItem = ({ request }: RequestItemProps) => {
       id: request.id,
       extension: [
         {
-          url: 'http://arkhn.com/fhir/cohort360/StructureDefinition/permission-status',
+          url: PERMISSION_STATUS_STRUCTURE_DEF_URL,
           valueCode: isRejected ? `rejected` : 'active'
         }
       ],
