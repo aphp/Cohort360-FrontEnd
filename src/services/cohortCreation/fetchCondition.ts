@@ -1,55 +1,14 @@
+import { memoize } from 'lodash'
+
 import { CONTEXT } from '../../constants'
+import api from '../../services/api'
 import apiRequest from '../../services/apiRequest'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
-import {
-  fakeValueSetDiagnosticType,
-  fakeValueSetCIM10
-  // fakeHierarchyCIM10
-} from '../../data/fakeData/cohortCreation/condition'
+import { fakeValueSetCIM10, fakeValueSetDiagnosticType } from '../../data/fakeData/cohortCreation/condition'
 import { alphabeticalSort } from 'utils/alphabeticalSort'
-
-const ICD9_CODES = [
-  {
-    id: '71133',
-    label: 'Néoplasme malin du pylore'
-  },
-  {
-    id: '01646',
-    label: "Lésion d'autres organes intra-abdominaux"
-  },
-  {
-    id: '67440',
-    label: 'Larynx néo-malin NEC'
-  },
-  {
-    id: '81203',
-    label: "Blessures causées par des obus d'artillerie en mer"
-  },
-  {
-    id: '7682',
-    label: 'Traumatisme acoustique'
-  },
-  {
-    id: '0388',
-    label: "Fracture fermée de l'acétabulum"
-  },
-  {
-    id: '65920',
-    label: 'Échec du cathéter stérile'
-  },
-  {
-    id: 'E9950',
-    label: 'Aphakie'
-  },
-  {
-    id: '71642',
-    label: 'Anesthésie compl-antepartum'
-  },
-  {
-    id: '9093',
-    label: 'TB de la vessie non spécifiée'
-  }
-]
+import { getApiResponseResources } from '../../utils/apiHelpers'
+import type { IValueSet } from '@ahryman40k/ts-fhir-types/lib/R4'
+import type { FHIR_API_Response } from '../../types'
 
 const DEFAULT_DIAGNOSTIC_TYPES = [
   {
@@ -83,33 +42,16 @@ const DEFAULT_DIAGNOSTIC_TYPES = [
 ]
 
 export const fetchStatusDiagnostic = async () => {
-  if (CONTEXT === 'arkhn') {
-    return null
-  } else if (CONTEXT === 'fakedata') {
-    const res = [
-      {
-        id: 'actif',
-        label: 'Actif'
-      },
-      {
-        id: 'supp',
-        label: 'Supprimé'
-      }
-    ]
-    return res
-  } else {
-    const res = [
-      {
-        id: 'actif',
-        label: 'Actif'
-      },
-      {
-        id: 'supp',
-        label: 'Supprimé'
-      }
-    ]
-    return res
-  }
+  return [
+    {
+      id: 'actif',
+      label: 'Actif'
+    },
+    {
+      id: 'supp',
+      label: 'Supprimé'
+    }
+  ]
 }
 
 export const fetchDiagnosticTypes = async () => {
@@ -139,10 +81,31 @@ export const fetchDiagnosticTypes = async () => {
   }
 }
 
+type Code = {
+  id?: string
+  label?: string
+}
+
+const fetchICD9ValueSet = memoize(
+  async (): Promise<Code[]> => {
+    const response = await api.get<FHIR_API_Response<IValueSet>>('/ValueSet?url=http://arkhn.com/icd9_VS')
+    const valueSet = getApiResponseResources(response)
+    if (!valueSet || valueSet.length === 0) return []
+    return (
+      valueSet[0]?.compose?.include[0]?.concept
+        ?.map((value) => ({
+          id: value.code,
+          label: value.display
+        }))
+        .sort((a, b) => (a.label && b.label ? a.label.localeCompare(b.label) : 0)) ?? []
+    )
+  }
+)
+
 // todo: check if the data syntax is correct when available
 export const fetchCim10Diagnostic = async (searchValue?: string) => {
   if (CONTEXT === 'arkhn') {
-    return ICD9_CODES
+    return fetchICD9ValueSet()
   } else if (CONTEXT === 'fakedata') {
     return fakeValueSetCIM10 && fakeValueSetCIM10.length > 0
       ? fakeValueSetCIM10.map((_fakeValueSetCIM10: { code: string; display: string }) => ({

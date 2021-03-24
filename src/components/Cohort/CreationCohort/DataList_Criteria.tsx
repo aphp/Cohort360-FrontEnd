@@ -45,14 +45,14 @@ import { fetchDocTypes } from '../../../services/cohortCreation/fetchComposition
 // │   ├── Prescription - Dispension - Administration
 
 const criteriaList: CriteriaItemType[] = [
-  {
-    id: 'mes_variables',
-    title: 'Mes variables',
-    color: '#808080',
-    disabled: true,
-    data: null,
-    components: null
-  },
+  // {
+  //   id: 'mes_variables',
+  //   title: 'Mes variables',
+  //   color: '#808080',
+  //   disabled: true,
+  //   data: null,
+  //   components: null
+  // },
   {
     id: 'Patient',
     title: 'Démographie',
@@ -62,9 +62,10 @@ const criteriaList: CriteriaItemType[] = [
     fetch: { fetchGender, fetchStatus }
   },
   {
+    disabled: true,
     id: 'Encounter',
     title: 'Visites',
-    color: '#0063AF',
+    color: '#808080',
     components: SupportedForm,
     data: {
       admissionModes: 'loading',
@@ -113,17 +114,19 @@ const criteriaList: CriteriaItemType[] = [
         fetch: { fetchStatusDiagnostic, fetchDiagnosticTypes, fetchCim10Diagnostic, fetchCim10Hierarchy }
       },
       {
+        disabled: true,
         id: 'Procedure',
         title: 'Actes',
-        color: '#0063AF',
+        color: '#808080',
         components: CCAMForm,
         data: { ccamData: 'loading', ccamHierarchy: 'loading' },
         fetch: { fetchCcamData, fetchCcamHierarchy }
       },
       {
+        disabled: true,
         id: 'Claim',
         title: 'GHM',
-        color: '#0063AF',
+        color: '#808080',
         components: GhmForm,
         data: { ghmData: 'loading', ghmHierarchy: 'loading' },
         fetch: { fetchGhmData, fetchGhmHierarchy }

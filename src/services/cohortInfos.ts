@@ -1,3 +1,5 @@
+import { head } from 'lodash'
+
 import api from './api'
 import apiBackCohort from './apiBackCohort'
 import { getInfos, getLastEncounter } from './myPatients'
@@ -147,37 +149,18 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
 
   if (CONTEXT === 'arkhn') {
     const cohortResult: CohortData = {}
-    const cohort = getApiResponseResources(
-      await api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${cohortId}${API_RESOURCE_TAG}`)
-    )?.[0]
+    const response = getApiResponseResources(
+      await api.get<FHIR_API_Response<IEncounter | IPatient | IGroup>>(
+        `/Patient?_has:Group:member:_id=${cohortId}&_revinclude=Group:member&_revinclude=Encounter:patient`
+      )
+    )
+    if (response) {
+      cohortResult.cohort = head(response.filter((resource) => resource.resourceType === 'Group') as IGroup[])
 
-    if (cohort) {
-      cohortResult.cohort = cohort
+      const patients = response.filter((resource) => resource.resourceType === 'Patient') as IPatient[]
+      const encounters = response.filter((resource) => resource.resourceType === 'Encounter') as IEncounter[]
 
-      //Fetch cohort related patients & encounters
-      const patientIdentifiers = cohort.member
-        ?.map((m) => m.entity.identifier?.value)
-        .filter((id): id is string => undefined !== id)
-      const patientRefs = cohort.member
-        ?.map((m) => m.entity.reference)
-        .filter((ref): ref is string => undefined !== ref)
-
-      if (!patientIdentifiers || !patientRefs) {
-        return cohortResult
-      }
-
-      const [patientsResp, encountersResp] = await Promise.all([
-        api.get<FHIR_API_Response<IPatient>>(`/Patient?identifier=${patientIdentifiers.join(',')}${API_RESOURCE_TAG}`),
-        api.get<FHIR_API_Response<IEncounter>>(`/Encounter?subject=${patientRefs.join(',')}${API_RESOURCE_TAG}`)
-      ])
-      const patients = getApiResponseResources(patientsResp)
-      const encounters = getApiResponseResources(encountersResp)
-
-      if (!patients || !encounters) {
-        return cohortResult
-      }
-
-      cohortResult.totalPatients = patientIdentifiers.length
+      cohortResult.totalPatients = patients.length
       cohortResult.originalPatients = patients
       cohortResult.encounters = encounters
       cohortResult.genderRepartitionMap = getGenderRepartitionMap(patients)

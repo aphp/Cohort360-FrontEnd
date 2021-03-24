@@ -82,6 +82,30 @@ export type Cohort = {
   request_id?: string
 }
 
+export type Snapshot = {
+  request_id: string
+  serialized_query: string
+}
+
+type SourcePopulation = {
+  caresiteCohortList: string[]
+}
+
+export type QueryGroup = {
+  _type?: 'andGroup' | 'orGroup'
+  _id: number
+  resourceType: 'Patient' | 'Condition'
+  isInclusive: boolean
+  criteria: QueryGroup[]
+  filterSolr?: string
+}
+
+export type Query = {
+  version: string
+  sourcePopulation: SourcePopulation
+  request: QueryGroup[]
+}
+
 export type FormattedCohort = {
   researchId: string
   fhir_group_id?: string
