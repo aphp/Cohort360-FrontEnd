@@ -1,8 +1,6 @@
+import { IOrganization, IEncounter, IPatient, IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'
+
 import api from './api'
-import { getLastEncounter } from './myPatients'
-import { CONTEXT, API_RESOURCE_TAG } from '../constants'
-import { FHIR_API_Response, CohortData, ScopeTreeRow } from 'types'
-import { IOrganization, IHealthcareService, IEncounter, IPatient, IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   getGenderRepartitionMapAphp,
   getAgeRepartitionMapAphp,
@@ -15,50 +13,34 @@ import {
 } from 'utils/graphUtils'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
+import { CONTEXT } from '../constants'
+import { getLastEncounter } from './myPatients'
 import fakeGroup from '../data/fakeData/group'
 import fakeFacetDeceased from '../data/fakeData/facet-deceased'
 import fakeFacetAgeMonth from '../data/fakeData/facet-age-month'
 import fakeFacetClassSimple from '../data/fakeData/facet-class-simple'
 import fakeFacetStartDateFacet from '../data/fakeData/facet-start-date-facet'
 import fakePatients from '../data/fakeData/patients'
+import { FHIR_API_Response, CohortData, ScopeTreeRow } from 'types'
 
-export const getServices = async (id: string) => {
-  const [respOrganizations, respHealthcareServices] = await Promise.all([
-    api.get<FHIR_API_Response<IOrganization>>(`/Organization?_id=${id}${API_RESOURCE_TAG}`),
-    api.get<FHIR_API_Response<IHealthcareService>>(`/HealthcareService?_id=${id}${API_RESOURCE_TAG}`)
-  ])
-
-  const organizations = getApiResponseResources(respOrganizations)
-  const healthcareServices = getApiResponseResources(respHealthcareServices)
-  if (!organizations || !healthcareServices) {
-    return []
-  }
-  let services: IHealthcareService[] = [...healthcareServices]
-
-  for (const orga of organizations) {
-    if (orga.id) {
-      const impliedServiceResp = await api.get<FHIR_API_Response<IHealthcareService>>(
-        `/HealthcareService?organization=${orga.id}${API_RESOURCE_TAG}`
-      )
-      const impliedServices = getApiResponseResources(impliedServiceResp)
-      if (impliedServices) {
-        services = [...services, ...impliedServices]
-      }
-    }
-  }
-  return services
+export const getOrganizations = async (ids?: string[]): Promise<IOrganization[]> => {
+  const orgaIdsParam = ids ? `?_id=${ids.join(',')}` : ''
+  const respOrganizations = await api.get<FHIR_API_Response<IOrganization>>(`/Organization${orgaIdsParam}`)
+  return getApiResponseResources(respOrganizations) ?? []
 }
 
 const getPatientsAndEncountersFromServiceId = async (serviceId: string) => {
-  const [respEncounters, respPatients] = await Promise.all([
-    api.get<FHIR_API_Response<IEncounter>>(`/Encounter?service-provider=${serviceId}&_count=10000`),
-    api.get<FHIR_API_Response<IPatient>>(`/Patient?_has:Encounter:subject:service-provider=${serviceId}&_count=10000`)
-  ])
-  const encounters = getApiResponseResources(respEncounters)
-  const patients = getApiResponseResources(respPatients)
-  if (!encounters || !patients) {
-    return
-  }
+  const serviceEncountersAndPatients =
+    getApiResponseResources(
+      await api.get<FHIR_API_Response<IPatient | IEncounter>>(
+        `/Encounter?service-provider=${serviceId}&_include=Encounter:subject&_count=10000`
+      )
+    ) ?? []
+
+  const encounters = serviceEncountersAndPatients.filter(
+    ({ resourceType }) => resourceType === 'Encounter'
+  ) as IEncounter[]
+  const patients = serviceEncountersAndPatients.filter(({ resourceType }) => resourceType === 'Patient') as IPatient[]
 
   return {
     encounters,
@@ -66,7 +48,7 @@ const getPatientsAndEncountersFromServiceId = async (serviceId: string) => {
   }
 }
 
-export const fetchPerimetersInfos = async (perimetersId: string): Promise<CohortData | undefined> => {
+export const fetchPerimetersInfos = async (perimeterIds: string[]): Promise<CohortData | undefined> => {
   if (CONTEXT === 'fakedata') {
     const totalPatients = 3
 
@@ -92,13 +74,14 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
     }
   }
   if (CONTEXT === 'aphp') {
+    const perimeterIdsJoined = perimeterIds.join(',')
     const [perimetersResp, patientsResp, encountersResp] = await Promise.all([
-      api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${perimetersId}`),
+      api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${perimeterIdsJoined}`),
       api.get<FHIR_API_Response<IPatient>>(
-        `/Patient?pivotFacet=age_gender,deceased_gender&_list=${perimetersId}&size=20&_sort=given&_elements=gender,name,birthDate,deceased,identifier,extension`
+        `/Patient?pivotFacet=age_gender,deceased_gender&_list=${perimeterIdsJoined}&size=20&_sort=given&_elements=gender,name,birthDate,deceased,identifier,extension`
       ),
       api.get<FHIR_API_Response<IEncounter>>(
-        `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${perimetersId}&size=0&type=VISIT`
+        `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${perimeterIdsJoined}&size=0&type=VISIT`
       )
     ])
 
@@ -148,10 +131,9 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
       monthlyVisitData
     }
   } else if (CONTEXT === 'arkhn') {
-    const services = (await getServices(perimetersId)).filter((service) => undefined !== service.id)
+    const services = await getOrganizations(perimeterIds)
     const serviceIds = services.map((service) => service.id)
 
-    //FIX: There can be several patients from this request (if a patient is in several services)
     const patientsAndEncountersFromServices = await getPatientsAndEncountersFromServiceId(serviceIds.join(','))
     if (patientsAndEncountersFromServices) {
       const { patients, encounters } = patientsAndEncountersFromServices

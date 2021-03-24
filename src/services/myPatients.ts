@@ -1,5 +1,5 @@
 import api from './api'
-import { CONTEXT, API_RESOURCE_TAG } from '../constants'
+import { CONTEXT } from '../constants'
 import { IComposition, IPatient, IEncounter, IIdentifier } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortComposition, CohortPatient, FHIR_API_Response, CohortData } from '../types'
 import { getApiResponseResources } from 'utils/apiHelpers'
@@ -148,9 +148,7 @@ export const fetchMyPatients = async (): Promise<CohortData | undefined> => {
     const cohortData: CohortData = {
       name: 'Mes Patients'
     }
-    const patients = getApiResponseResources(
-      await api.get<FHIR_API_Response<IPatient>>(`/Patient?_count=700${API_RESOURCE_TAG}`)
-    )
+    const patients = getApiResponseResources(await api.get<FHIR_API_Response<IPatient>>(`/Patient?_count=700`))
 
     if (patients && patients.length > 0) {
       cohortData.totalPatients = patients.length
@@ -158,12 +156,7 @@ export const fetchMyPatients = async (): Promise<CohortData | undefined> => {
       cohortData.agePyramidData = getAgeRepartitionMap(patients)
       cohortData.genderRepartitionMap = getGenderRepartitionMap(patients)
 
-      const patientsIds = patients.map((p) => p.id ?? '').filter(Boolean)
-      const encounters = getApiResponseResources(
-        await api.get<FHIR_API_Response<IEncounter>>(
-          `/Encounter?subject:Patient=${patientsIds.join(',')}&_count=700${API_RESOURCE_TAG}`
-        )
-      )
+      const encounters = getApiResponseResources(await api.get<FHIR_API_Response<IEncounter>>(`/Encounter`))
       if (encounters) {
         cohortData.encounters = encounters
         cohortData.monthlyVisitData = getVisitRepartitionMap(patients, encounters)

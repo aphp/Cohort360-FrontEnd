@@ -4,7 +4,6 @@ import { CONTEXT } from '../../constants'
 import { useDispatch } from 'react-redux'
 import { Link, useParams, useLocation } from 'react-router-dom'
 import { Grid, Tabs, Tab } from '@material-ui/core'
-import { IExtension } from '@ahryman40k/ts-fhir-types/lib/R4'
 import Alert from '@material-ui/lab/Alert'
 
 import InclusionExclusionPatientsPanel from '../../components/Cohort/InclusionExclusionPatients/InclusionExclusionPatients'
@@ -35,30 +34,18 @@ const Dashboard: React.FC<{
   const classes = useStyles()
   const location = useLocation()
 
-  const perimetreIds = location.search.substr(1)
+  const perimetreIds = location.search.substr(1).split(',')
 
   const [selectedTab, selectTab] = useState(tabName || 'apercu')
   const [tabs, setTabs] = useState<Tabs[]>([])
   const [status, setStatus] = useState('')
-  const [deidentifiedBoolean, setDeidentifiedBoolean] = useState<boolean | null>(null)
   const [openRedcapDialog, setOpenRedcapDialog] = useState(false)
 
-  const { open, dashboard } = useAppSelector((state) => ({
+  const { open, dashboard, deidentified } = useAppSelector((state) => ({
     open: state.drawer,
-    dashboard: state.exploredCohort
+    dashboard: state.exploredCohort,
+    deidentified: state.me?.deidentified
   }))
-
-  const checkDeindentifiedStatus = (_dashboard: any) => {
-    // Check if access == 'Pseudonymisé' || 'Nominatif'
-    const { originalPatients } = _dashboard
-    if (!originalPatients || (originalPatients && !originalPatients[0])) return
-    const extension: IExtension[] | undefined = originalPatients[0].extension
-
-    const deidentified = extension?.find((data) => data.url === 'deidentified')
-    const valueBoolean = deidentified ? deidentified.valueBoolean : true
-
-    setDeidentifiedBoolean(!!valueBoolean)
-  }
 
   useEffect(() => {
     const id = context === 'cohort' ? cohortId : context === 'perimeters' ? perimetreIds : undefined
@@ -108,10 +95,6 @@ const Dashboard: React.FC<{
         break
     }
   }, [context, cohortId]) // eslint-disable-line
-
-  useEffect(() => {
-    checkDeindentifiedStatus(dashboard)
-  }, [dashboard])
 
   const handleOpenRedcapDialog = () => {
     setOpenRedcapDialog(true)
@@ -185,7 +168,7 @@ const Dashboard: React.FC<{
         title={dashboard.name}
         status={status}
         patientsNb={dashboard.totalPatients || 0}
-        access={deidentifiedBoolean === null ? '-' : deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
+        access={deidentified === undefined ? '-' : deidentified ? 'Pseudonymisé' : 'Nominatif'}
         openRedcapDialog={handleOpenRedcapDialog}
         fav
         loading={dashboard.loading}
@@ -227,9 +210,9 @@ const Dashboard: React.FC<{
         )}
         {selectedTab === 'patients' && (
           <PatientList
-            groupId={cohortId || perimetreIds}
+            groupId={cohortId || perimetreIds.join(',')}
             total={dashboard.totalPatients || 0}
-            deidentified={deidentifiedBoolean}
+            deidentified={deidentified}
             patients={dashboard.originalPatients}
             agePyramidData={dashboard.agePyramidData}
             genderRepartitionMap={dashboard.genderRepartitionMap}
@@ -237,8 +220,8 @@ const Dashboard: React.FC<{
         )}
         {selectedTab === 'documents' && (
           <CohortDocuments
-            groupId={cohortId || perimetreIds}
-            deidentifiedBoolean={deidentifiedBoolean}
+            groupId={cohortId || perimetreIds.join(',')}
+            deidentifiedBoolean={deidentified}
             sortBy={'date'}
             sortDirection={'desc'}
           />

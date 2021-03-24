@@ -35,7 +35,7 @@ type DocumentFiltersProps = {
   onChangeStartDate: (startDate: string | null) => void
   endDate?: string | null
   onChangeEndDate: (endDate: string | null) => void
-  deidentified: boolean | null
+  deidentified?: boolean
 }
 const DocumentFilters: React.FC<DocumentFiltersProps> = ({
   open,

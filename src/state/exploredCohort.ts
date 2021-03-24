@@ -39,7 +39,7 @@ const initialState: ExploredCohortState = {
 
 const fetchExploredCohort = createAsyncThunk<
   CohortData,
-  { context: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'; id?: string },
+  { context: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'; id?: string | string[] },
   { state: RootState }
 >('exploredCohort/fetchExploredCohort', async ({ context, id }, { getState }) => {
   const state = getState()
@@ -50,19 +50,16 @@ const fetchExploredCohort = createAsyncThunk<
       shouldRefreshData = !stateCohort || Array.isArray(stateCohort) || stateCohort.id !== id
       break
     case 'perimeters': {
-      if (!id) {
+      if (!id || !Array.isArray(id)) {
         throw new Error('No given perimeter ids')
       }
-      const perimeterIds = id.split(',')
       const statePerimeterIds =
         stateCohort &&
         Array.isArray(stateCohort) &&
         (stateCohort.map((group) => group.id).filter((id) => id !== undefined) as string[])
 
       shouldRefreshData =
-        !statePerimeterIds ||
-        statePerimeterIds.length !== perimeterIds.length ||
-        statePerimeterIds.some((id) => !perimeterIds.includes(id))
+        !statePerimeterIds || statePerimeterIds.length !== id.length || statePerimeterIds.some((id) => !id.includes(id))
       break
     }
     case 'patients': {
@@ -78,7 +75,7 @@ const fetchExploredCohort = createAsyncThunk<
     switch (context) {
       case 'cohort': {
         if (id) {
-          cohort = await fetchCohort(id)
+          cohort = await fetchCohort(id as string)
         }
         break
       }
@@ -87,8 +84,9 @@ const fetchExploredCohort = createAsyncThunk<
         break
       }
       case 'perimeters': {
+        // In this case, id is an array or organization ids
         if (id) {
-          cohort = await fetchPerimetersInfos(id)
+          cohort = await fetchPerimetersInfos(id as string[])
         }
         break
       }

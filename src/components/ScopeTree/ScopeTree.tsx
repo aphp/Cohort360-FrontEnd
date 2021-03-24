@@ -21,6 +21,8 @@ import { useAppSelector } from 'state'
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from './styles'
+import Lock from '@material-ui/icons/Lock'
+import { CheckCircle } from '@material-ui/icons'
 
 type ScopeTreeProps = {
   defaultSelectedItems: ScopeTreeRow[]
@@ -30,29 +32,25 @@ type ScopeTreeProps = {
 const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSelectedItem }) => {
   const classes = useStyles()
 
-  const [openPopulation, onChangeOpenPopulations] = useState<number[]>([])
+  const [openPopulation, onChangeOpenPopulations] = useState<string[]>([])
   const [rootRows, setRootRows] = useState<ScopeTreeRow[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedItems, setSelectedItem] = useState(defaultSelectedItems)
 
   const practitioner = useAppSelector((state) => state.me)
 
-  const fetchScopeTree = async () => {
-    if (practitioner) {
-      const rootRows = await getScopePerimeters(practitioner.id)
-      setRootRows(rootRows)
-    }
-  }
-
   useEffect(() => {
-    const _init = async () => {
+    if (practitioner) {
       setLoading(true)
-      await fetchScopeTree()
-      setLoading(false)
+      getScopePerimeters()
+        .then((rootRows) => {
+          setRootRows(rootRows)
+        })
+        .finally(() => {
+          setLoading(false)
+        })
     }
-
-    _init()
-  }, []) // eslint-disable-line
+  }, [practitioner])
 
   useEffect(() => setSelectedItem(defaultSelectedItems), [defaultSelectedItems])
 
@@ -60,7 +58,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
    * This function is called when a user click on chevron
    *
    */
-  const _clickToDeploy = async (rowId: number) => {
+  const _clickToDeploy = async (rowId: string) => {
     let savedSelectedItems = selectedItems ? [...selectedItems] : []
     let _openPopulation = openPopulation ? openPopulation : []
     let _rootRows = rootRows ? [...rootRows] : []
@@ -189,11 +187,10 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
         </Grid>
       ) : (
         <EnhancedTable noCheckbox noPagination rows={rootRows} headCells={headCells}>
-          {(row: any, index: number) => {
+          {(row: ScopeTreeRow, index: number) => {
             if (!row) return <></>
             const labelId = `enhanced-table-checkbox-${index}`
-
-            const _displayLine = (_row: any, level: number, parentAccess: string) => (
+            const _displayLine = (_row: ScopeTreeRow, level: number) => (
               <>
                 {_row.id === 'loading' ? (
                   <TableRow hover key={Math.random()}>
@@ -243,30 +240,30 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                     </TableCell>
 
                     <TableCell align="center">
-                      <Typography>{_row.access ?? parentAccess}</Typography>
+                      {_row.access ? <CheckCircle className={classes.greenIcon} /> : <Lock />}
                     </TableCell>
                   </TableRow>
                 )}
               </>
             )
 
-            const _displayChildren = (_row: any, level: number, parentAccess: string) => {
+            const _displayChildren = (_row: any, level: number) => {
               return (
                 <React.Fragment key={Math.random()}>
-                  {_displayLine(_row, level, parentAccess)}
+                  {_displayLine(_row, level)}
                   {openPopulation.find((id) => _row.id === id) &&
                     _row.subItems &&
-                    _row.subItems.map((subItem: any) => _displayChildren(subItem, level + 1, parentAccess))}
+                    _row.subItems.map((subItem: any) => _displayChildren(subItem, level + 1))}
                 </React.Fragment>
               )
             }
 
             return (
               <React.Fragment key={Math.random()}>
-                {_displayLine(row, 0, row.access)}
+                {_displayLine(row, 0)}
                 {openPopulation.find((id) => row.id === id) &&
                   row.subItems &&
-                  row.subItems.map((subItem: any) => _displayChildren(subItem, 1, row.access))}
+                  row.subItems.map((subItem: any) => _displayChildren(subItem, 1))}
               </React.Fragment>
             )
           }}
