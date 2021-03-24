@@ -43,6 +43,7 @@ const VitalStatusChip: React.FC<VitalStatusChipTypes> = ({ deceased }) => {
 
 type PatientSidebarItemTypes = {
   groupId?: string
+  closeDialog: (open: boolean) => void
   gender?: PatientGenderKind
   firstName?: string
   lastName?: string
@@ -53,6 +54,7 @@ type PatientSidebarItemTypes = {
 }
 const PatientSidebarItem: React.FC<PatientSidebarItemTypes> = ({
   groupId,
+  closeDialog,
   gender,
   firstName,
   lastName,
@@ -66,7 +68,10 @@ const PatientSidebarItem: React.FC<PatientSidebarItemTypes> = ({
   return (
     <ListItem
       divider
-      onClick={() => history.push(`/patients/${id}${groupId ? `?groupId=${groupId}` : ''}`)}
+      onClick={() => {
+        history.push(`/patients/${id}${groupId ? `?groupId=${groupId}` : ''}`)
+        closeDialog(false)
+      }}
       className={classes.listItem}
     >
       <ListItemIcon className={classes.genderIconContainer}>
