@@ -65,7 +65,7 @@ const PrivateRoute: React.FC<Props> = (props) => {
         <DialogTitle id="alert-dialog-title">{''}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Il semblerait que vous n'êtes plus connecté. Vous allez être redirigé vers le formulaire de connexion
+            Il semblerait que vous n'êtes plus connecté. Vous allez être redirigé vers la page de connexion
           </DialogContentText>
         </DialogContent>
         <DialogActions>
