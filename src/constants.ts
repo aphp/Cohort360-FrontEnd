@@ -30,6 +30,7 @@ if (CONTEXT !== 'arkhn' && CONTEXT !== 'aphp' && CONTEXT !== 'fakedata') {
 export const ACCES_TOKEN = 'access'
 export const REFRESH_TOKEN = 'refresh'
 export const PRACTITIONER_ID = 'practitioner_id'
+export const USERNAME_HEADER = 'username_header'
 export const PERMISSION_STATUS_STRUCTURE_DEF_URL =
   'http://arkhn.com/fhir/cohort360/StructureDefinition/permission-status'
 export const PRACTITIONER_CONSENT_PROFILE_URL =

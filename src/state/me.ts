@@ -5,8 +5,9 @@ import jwt_decode from 'jwt-decode'
 import { getIdToken } from 'services/arkhnAuth/oauth/tokenManager'
 import { fetchPractitioner } from 'services/practitioner'
 import { RootState } from 'state'
+import { PRACTITIONER_ID, USERNAME_HEADER } from '../constants'
+import { openApiBackSession } from '../services/apiBackCohort'
 import { getPractitionerPerimeters } from 'services/perimeters'
-import { PRACTITIONER_ID } from '../constants'
 
 export type MeState = null | {
   id: string
@@ -36,7 +37,9 @@ export const fetchPractitionerData = createAsyncThunk<MeState, void, { state: Ro
       const { email, name } = jwt_decode<{ email: string; name?: string }>(idToken)
       const practitioner = await fetchPractitioner(email)
       if (practitioner) {
+        localStorage.setItem(USERNAME_HEADER, email)
         localStorage.setItem(PRACTITIONER_ID, practitioner.id)
+        await openApiBackSession()
         const organizations = await getPractitionerPerimeters(practitioner.id)
         state = {
           ...practitioner,
@@ -79,6 +82,7 @@ const meSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(logout, () => {
+      localStorage.removeItem(USERNAME_HEADER)
       localStorage.removeItem(PRACTITIONER_ID)
       return initialState
     })
