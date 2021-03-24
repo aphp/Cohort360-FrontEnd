@@ -26,10 +26,10 @@ apiBackCohort.interceptors.response.use(
 )
 
 // FIXME: remove this eventually
-// The backend auth a user at the first request and open a session
+// The backend authentifies a user at the first request and open a session
 // by creating a session cookie and a csrf token cookie.
 // We need to open a Django session before sending any useful requests
-//(otherwise we get 403 responses telling use the csrf token is missing).
+//(otherwise we get 403 responses telling us the csrf token is missing).
 export const openApiBackSession = () => apiBackCohort.get('/')
 
 export default apiBackCohort
