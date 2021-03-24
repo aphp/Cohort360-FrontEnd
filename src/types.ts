@@ -54,7 +54,6 @@ export type CohortEncounter = IEncounter & {
 
 export type CohortPatient = IPatient & {
   lastEncounter?: IEncounter
-  lastEncounterName?: string
   lastProcedure?: IProcedure
   mainDiagnosis?: ICondition[]
   labResults?: IObservation[]
