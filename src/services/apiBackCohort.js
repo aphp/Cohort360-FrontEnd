@@ -1,15 +1,15 @@
 import axios from 'axios'
-import { PRACTITIONER_ID, BACK_API_URL } from '../constants'
+import { USERNAME_HEADER, BACK_API_URL } from '../constants'
+import Cookies from 'js-cookie'
 
 const apiBackCohort = axios.create({
   baseURL: BACK_API_URL,
-  headers: {
-    Accept: 'application/json'
-  }
+  withCredentials: true
 })
 
 apiBackCohort.interceptors.request.use((config) => {
-  config.headers.Username = localStorage.getItem(PRACTITIONER_ID)
+  config.headers.Username = localStorage.getItem(USERNAME_HEADER)
+  config.headers['X-CSRFToken'] = Cookies.get('csrftoken')
   return config
 })
 
@@ -24,5 +24,8 @@ apiBackCohort.interceptors.response.use(
     }
   }
 )
+
+// FIXME: remove this eventually
+export const openApiBackSession = () => apiBackCohort.get('/')
 
 export default apiBackCohort

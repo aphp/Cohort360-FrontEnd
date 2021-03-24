@@ -29,3 +29,4 @@ if (CONTEXT !== 'arkhn' && CONTEXT !== 'aphp' && CONTEXT !== 'fakedata') {
 export const ACCES_TOKEN = 'access'
 export const REFRESH_TOKEN = 'refresh'
 export const PRACTITIONER_ID = 'practitioner_id'
+export const USERNAME_HEADER = 'username_header'

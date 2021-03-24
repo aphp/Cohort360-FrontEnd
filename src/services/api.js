@@ -3,10 +3,7 @@ import { FHIR_API_URL, PRACTITIONER_ID } from '../constants'
 import { removeTokens } from './arkhnAuth/oauth/tokenManager'
 
 const api = axios.create({
-  baseURL: FHIR_API_URL,
-  headers: {
-    Accept: 'application/fhir+json'
-  }
+  baseURL: FHIR_API_URL
 })
 
 api.interceptors.request.use((config) => {
