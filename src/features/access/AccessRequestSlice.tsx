@@ -6,7 +6,7 @@ import api from 'services/api'
 import { RootState } from 'state'
 import { FHIR_API_Response } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
-import { permissionStatusURL } from './AccessConstants'
+import { PERMISSION_STATUS_STRUCTURE_DEF_URL } from '../../constants'
 
 export type AccessRequestState = {
   authors: IPractitioner[]
@@ -73,7 +73,7 @@ const createAccessRequest = createAsyncThunk<void, void, { state: RootState }>(
       },
       extension: [
         {
-          url: permissionStatusURL,
+          url: PERMISSION_STATUS_STRUCTURE_DEF_URL,
           valueCode: `proposed`
         }
       ]
