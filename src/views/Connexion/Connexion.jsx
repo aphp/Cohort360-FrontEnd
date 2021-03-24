@@ -98,14 +98,23 @@ const Login = () => {
           lastConnection
         })
       )
-      history.push('/accueil')
+
+      const oldPath = localStorage.getItem('old-path')
+      localStorage.removeItem('old-path')
+      history.push(oldPath ?? '/accueil')
     } else {
       setErrorLogin(true)
     }
   }
 
   useEffect(() => {
-    localStorage.clear()
+    // Do not use localStorage.clear() because localStorage.getItem('old-path') is set for relaunch app with prev page
+    localStorage.removeItem('user')
+    localStorage.removeItem('exploredCohort')
+    localStorage.removeItem('userCohorts')
+    localStorage.removeItem('cohortCreation')
+    localStorage.removeItem('access')
+    localStorage.removeItem('refresh')
   }, [])
 
   const login = async () => {

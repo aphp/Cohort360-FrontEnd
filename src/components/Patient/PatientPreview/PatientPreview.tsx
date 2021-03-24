@@ -14,17 +14,19 @@ import useStyles from './styles'
 type PatientPreviewProps = {
   patient?: CohortPatient
   deidentified: boolean
+  mainLoading: boolean
 }
-const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentified }) => {
+const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentified, mainLoading }) => {
   const classes = useStyles()
 
-  if (!patient) {
+  if (!mainLoading && !patient) {
     return (
       <Alert severity="error" className={classes.alert}>
         Les données ne sont pas encore disponibles, veuillez réessayer ultérieurement.
       </Alert>
     )
   }
+  if (!patient) return <></>
 
   const lastEncounterStart = patient.lastEncounter?.period?.start
   const lastEncounterEnd = patient.lastEncounter?.period?.end

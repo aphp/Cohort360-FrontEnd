@@ -77,7 +77,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   {startDate
                     ? endDate
                       ? `Entre le ${startDate} et le ${endDate}`
-                      : `Après le ${startDate},`
+                      : `Après le ${startDate}`
                     : endDate
                     ? `Avant le ${endDate}`
                     : ''}
@@ -113,7 +113,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   {startDate
                     ? endDate
                       ? `Entre le ${startDate} et le ${endDate}`
-                      : `Après le ${startDate},`
+                      : `Après le ${startDate}`
                     : endDate
                     ? `Avant le ${endDate}`
                     : ''}
@@ -159,7 +159,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   {startDate
                     ? endDate
                       ? `Entre le ${startDate} et le ${endDate}`
-                      : `Après le ${startDate},`
+                      : `Après le ${startDate}`
                     : endDate
                     ? `Avant le ${endDate}`
                     : ''}
