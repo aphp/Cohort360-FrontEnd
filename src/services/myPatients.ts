@@ -156,10 +156,7 @@ export const fetchMyPatients = async (): Promise<CohortData | undefined> => {
       cohortData.agePyramidData = getAgeRepartitionMap(patients)
       cohortData.genderRepartitionMap = getGenderRepartitionMap(patients)
 
-      const patientsIds = patients.map((p) => p.id ?? '').filter(Boolean)
-      const encounters = getApiResponseResources(
-        await api.get<FHIR_API_Response<IEncounter>>(`/Encounter?subject=${patientsIds.join(',')}`)
-      )
+      const encounters = getApiResponseResources(await api.get<FHIR_API_Response<IEncounter>>(`/Encounter`))
       if (encounters) {
         cohortData.encounters = encounters
         cohortData.monthlyVisitData = getVisitRepartitionMap(patients, encounters)

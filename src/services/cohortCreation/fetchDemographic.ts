@@ -8,9 +8,23 @@ type Gender = {
   label: string
 }
 
-export const fetchGender = async () => {
-  if (CONTEXT === 'arkhn') {
-    const res: Gender[] = [
+export const fetchGender = async (): Promise<Gender[]> => {
+  if (CONTEXT === 'aphp') {
+    try {
+      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-gender`)
+      const data = res.data.entry[0].resource.compose.include[0].concept || []
+
+      return data && data.length > 0
+        ? data.map((_data: { code: string; display: string }) => ({
+            id: _data.code,
+            label: capitalizeFirstLetter(_data.display)
+          }))
+        : []
+    } catch (error) {
+      return []
+    }
+  } else {
+    return [
       {
         id: PatientGenderKind._male,
         label: 'Homme'
@@ -28,46 +42,11 @@ export const fetchGender = async () => {
         label: 'Indeterminé.e'
       }
     ]
-    return res
-  } else if (CONTEXT === 'fakedata') {
-    const res = [
-      {
-        id: 'm',
-        label: 'Homme'
-      },
-      {
-        id: 'f',
-        label: 'Femme'
-      },
-      {
-        id: 'o',
-        label: 'Autre'
-      },
-      {
-        id: 'i',
-        label: 'Indeterminé.e'
-      }
-    ]
-    return res
-  } else {
-    try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-gender`)
-      const data = res.data.entry[0].resource.compose.include[0].concept || []
-
-      return data && data.length > 0
-        ? data.map((_data: { code: string; display: string }) => ({
-            id: _data.code,
-            label: capitalizeFirstLetter(_data.display)
-          }))
-        : []
-    } catch (error) {
-      return []
-    }
   }
 }
 
 export const fetchStatus = async () => {
-  const res = [
+  return [
     {
       id: false,
       label: 'Vivant(e)'
@@ -77,5 +56,4 @@ export const fetchStatus = async () => {
       label: 'Décédé(e)'
     }
   ]
-  return res
 }
