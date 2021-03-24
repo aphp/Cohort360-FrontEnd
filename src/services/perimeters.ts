@@ -1,5 +1,4 @@
 import { IOrganization, IEncounter, IPatient, IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'
-import uniqBy from 'lodash/uniqBy'
 
 import api from './api'
 import {
@@ -31,15 +30,17 @@ export const getOrganizations = async (ids?: string): Promise<IOrganization[]> =
 }
 
 const getPatientsAndEncountersFromServiceId = async (serviceId: string) => {
-  const [respEncounters, respPatients] = await Promise.all([
-    api.get<FHIR_API_Response<IEncounter>>(`/Encounter?service-provider=${serviceId}&_count=10000`),
-    api.get<FHIR_API_Response<IPatient>>(`/Patient?_has:Encounter:subject:service-provider=${serviceId}&_count=10000`)
-  ])
-  const encounters = getApiResponseResources(respEncounters)
-  const patients = getApiResponseResources(respPatients)
-  if (!encounters || !patients) {
-    return
-  }
+  const serviceEncountersAndPatients =
+    getApiResponseResources(
+      await api.get<FHIR_API_Response<IPatient | IEncounter>>(
+        `/Encounter?service-provider=${serviceId}&_include=Encounter:subject&_count=10000`
+      )
+    ) ?? []
+
+  const encounters = serviceEncountersAndPatients.filter(
+    ({ resourceType }) => resourceType === 'Encounter'
+  ) as IEncounter[]
+  const patients = serviceEncountersAndPatients.filter(({ resourceType }) => resourceType === 'Patient') as IPatient[]
 
   return {
     encounters,
@@ -129,13 +130,12 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
       monthlyVisitData
     }
   } else if (CONTEXT === 'arkhn') {
-    const services = (await getOrganizations(perimetersId)).filter((service) => undefined !== service.id)
+    const services = await getOrganizations(perimetersId)
     const serviceIds = services.map((service) => service.id)
 
     const patientsAndEncountersFromServices = await getPatientsAndEncountersFromServiceId(serviceIds.join(','))
     if (patientsAndEncountersFromServices) {
-      const { patients: servicesPatients, encounters } = patientsAndEncountersFromServices
-      const patients = uniqBy(servicesPatients, 'id')
+      const { patients, encounters } = patientsAndEncountersFromServices
 
       return {
         originalPatients: patients,
