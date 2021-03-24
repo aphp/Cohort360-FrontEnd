@@ -39,8 +39,6 @@ const Accueil: React.FC = () => {
       ({ jobStatus }) => jobStatus === 'pending' || jobStatus === 'started'
     )
 
-    console.log('pendingCohorts :>> ', pendingCohorts)
-
     if (pendingCohorts && pendingCohorts.length > 0) {
       interval = setInterval(() => {
         dispatch<any>(initUserCohortsThunk())
