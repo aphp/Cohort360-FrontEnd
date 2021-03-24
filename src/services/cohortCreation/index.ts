@@ -1,6 +1,13 @@
-import { intersection, pullAll, union, memoize } from 'lodash'
+import { intersection, pullAll, union, memoize, last } from 'lodash'
 import moment from 'moment'
-import { GroupTypeKind, IGroup, IGroup_Characteristic, IGroup_Member, IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
+import {
+  GroupTypeKind,
+  IGroup,
+  IGroup_Characteristic,
+  IGroup_Member,
+  IPatient,
+  IDocumentReference
+} from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import apiFhir from '../api'
 import apiRequest from '../apiRequest'
@@ -16,8 +23,21 @@ const getPatients = memoize(
     if (!query) return []
     const response = await apiFhir.get<FHIR_API_Response<IPatient>>(query)
     const patients = getApiResponseResources(response)
-    return patients ? patients.map((patient) => patient.id) : []
+    return patients?.map((patient) => patient.id) ?? []
   }
+)
+
+const getPatientsFromDocuments = memoize(
+  async (query: string, filter: string): Promise<(string | undefined)[]> => {
+    const response = await apiFhir.get<FHIR_API_Response<IDocumentReference>>(query)
+    const documents = getApiResponseResources(response)
+    const patients = documents
+      ?.map((document) => last(document.subject?.reference?.split('/')))
+      .filter((patient) => !!patient)
+    const allPatients = await getPatients(`/Patient?${filter}`)
+    return patients?.filter((patient) => allPatients.includes(patient)) ?? []
+  },
+  (a, b) => a + b
 )
 
 /**
@@ -65,18 +85,34 @@ const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
       case 'Condition':
         return `/Patient?${patientFilter}&_has:Condition:patient:${criteria.filterSolr}`
       case 'Composition':
-        return ''
+        return `/DocumentReference/$regex?${criteria.filterSolr?.replace(/^_text/, 'regex')}`
       default:
         return ''
     }
   }
 
-  // We record every requests needed to fetch the patients that meet the cohort criteria
-  // and then we fetch the patients once
-  const queries = criteriaGroup.reduce<string[]>((acc, group) => {
-    return [...acc, ...group.criteria.reduce<string[]>((acc, criteria) => [...acc, queryByResourceType(criteria)], [])]
-  }, [])
-  await Promise.all(queries.map((query) => getPatients(query)))
+  // We record every requests needed to fetch the patients/documents that meet the cohort criteria
+  // and then we fetch the patients/documents once
+  const { patientQueries, documentQueries } = criteriaGroup.reduce<{
+    patientQueries: string[]
+    documentQueries: string[]
+  }>(
+    (acc, group) => {
+      return group.criteria.reduce<{
+        patientQueries: string[]
+        documentQueries: string[]
+      }>(
+        (acc, criteria) => {
+          const key = criteria.resourceType === 'Composition' ? 'documentQueries' : 'patientQueries'
+          return { ...acc, [key]: [...acc[key], queryByResourceType(criteria)] }
+        },
+        { patientQueries: [], documentQueries: [] }
+      )
+    },
+    { patientQueries: [], documentQueries: [] }
+  )
+  await Promise.all(patientQueries.map((query) => getPatients(query)))
+  await Promise.all(documentQueries.map((query) => getPatientsFromDocuments(query, patientFilter)))
 
   const patientIds = await criteriaGroup
     .sort((a, b) => Number(b.isInclusive) - Number(a.isInclusive))
@@ -87,7 +123,10 @@ const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
           const query = queryByResourceType(criteria)
           if (!query) return []
 
-          const patientIds = await getPatients(query)
+          const patientIds =
+            criteria.resourceType === 'Composition'
+              ? await getPatientsFromDocuments(query, patientFilter)
+              : await getPatients(query)
 
           return aggregatePatients(
             {
