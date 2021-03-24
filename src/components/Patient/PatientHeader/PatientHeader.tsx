@@ -12,11 +12,11 @@ import { CohortPatient } from 'types'
 import useStyles from './styles'
 
 type PatientHeaderProps = {
-  patient: CohortPatient
+  patient?: CohortPatient
   deidentified: boolean
 }
 
-const PatientHeader: React.FC<PatientHeaderProps> = ({ patient, deidentified }) => {
+const PatientHeader: React.FC<PatientHeaderProps> = ({ patient = { resourceType: 'Patient' }, deidentified }) => {
   const classes = useStyles()
   const age = getAge(patient)
   const firstName = deidentified ? 'Prénom' : patient.name?.[0].given?.[0]
@@ -25,7 +25,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({ patient, deidentified }) 
     ? [...new Set(patient.mainDiagnosis.map((diag) => diag.code?.coding?.[0].display))].slice(0, 3)
     : undefined
   const ipp = deidentified
-    ? `IPP chiffré: ${patient.id}`
+    ? `IPP chiffré: ${patient.id ?? '-'}`
     : `IPP: ${
         patient.identifier?.find((item) => item.type?.coding?.[0].code === 'IPP')?.value ??
         patient.identifier?.[0].value

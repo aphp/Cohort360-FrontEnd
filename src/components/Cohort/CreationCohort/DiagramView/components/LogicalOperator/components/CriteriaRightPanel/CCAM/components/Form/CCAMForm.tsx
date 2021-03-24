@@ -155,12 +155,12 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             },
             {
               name: 'startOccurrence',
-              label: 'Avant le',
+              label: 'Après le',
               type: 'date'
             },
             {
               name: 'endOccurrence',
-              label: 'Après le',
+              label: 'Avant le',
               type: 'date'
             }
           ]}
