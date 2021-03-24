@@ -746,9 +746,10 @@ export const fetchPatient = async (patientId: string, groupId?: string): Promise
 
     const patientData = getApiResponseResources(patientResponse)
 
-    const deidentifiedBoolean = patientData
-      ? patientData[0].extension?.find((extension) => extension.url === 'deidentified')?.valueBoolean
-      : true
+    const deidentifiedBoolean =
+      patientData && patientData[0]
+        ? patientData[0].extension?.find((extension) => extension.url === 'deidentified')?.valueBoolean
+        : true
 
     const hospit = await getEncounterDocuments(getApiResponseResources(encounterResponse), deidentifiedBoolean, groupId)
 
