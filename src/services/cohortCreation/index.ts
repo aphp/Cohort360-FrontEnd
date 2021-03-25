@@ -1,4 +1,4 @@
-import { intersection, pullAll, union, memoize, last } from 'lodash'
+import { intersection, pullAll, union, last, memoize } from 'lodash'
 import moment from 'moment'
 import {
   GroupTypeKind,
@@ -34,6 +34,8 @@ const getPatientsFromDocuments = memoize(
     const patients = documents
       ?.map((document) => last(document.subject?.reference?.split('/')))
       .filter((patient) => !!patient)
+    if (!patients?.length) return []
+
     const allPatients = await getPatients(`/Patient?${filter}`)
     return patients?.filter((patient) => allPatients.includes(patient)) ?? []
   },
@@ -63,10 +65,9 @@ const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
   ): Promise<(string | undefined)[]> => {
     switch (group._type) {
       case 'andGroup':
-        if (group.isInclusive)
-          return currentCohort.length === 0 ? [...patientIds] : intersection(currentCohort, patientIds)
+        if (group.isInclusive) return !currentCohort.length ? [...patientIds] : intersection(currentCohort, patientIds)
         else
-          return currentCohort.length === 0
+          return !currentCohort.length
             ? [...pullAll(await getPatients(`/Patient?${patientFilter}`), patientIds)]
             : [...pullAll(currentCohort, patientIds)]
       case 'orGroup':
