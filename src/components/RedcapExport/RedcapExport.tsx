@@ -18,16 +18,19 @@ import {
   Select,
   Typography,
   Tooltip,
-  Grid
+  Grid,
+  CircularProgress
 } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 import CloseIcon from '@material-ui/icons/Close'
 import { Alert } from '@material-ui/lab'
 import { v4 as uuid } from 'uuid'
+import fileDownload from 'js-file-download'
 
 import CohortItem from './CohortItem/CohortItem'
 import { CrfParameter, CRF_ATTRIBUTES } from '../../data/crfParameters'
 import useStyles from './styles'
+import api from 'services/apiJpyltime'
 
 type RedcapExportProps = {
   patientIds: string[]
@@ -40,6 +43,7 @@ export type ExportItem = CrfParameter & { id: string }
 
 const RedcapExport = (props: RedcapExportProps): JSX.Element => {
   const [anonymization, setAnonymization] = useState<number>(2)
+  const [isExportLoading, setIsExportLoading] = useState(false)
 
   const [crfAttribute, setCrfAttribute] = useState<ExportItem[]>([
     { ...CRF_ATTRIBUTES[0], id: uuid() },
@@ -61,7 +65,17 @@ const RedcapExport = (props: RedcapExportProps): JSX.Element => {
   }
 
   const exportCSV = () => {
-    ///
+    setIsExportLoading(true)
+    api
+      .post(`fhir2dataset`, {
+        practitioner_id: '1',
+        attributes: [],
+        patient_ids: []
+      })
+      .then((response) => {
+        fileDownload(response.data, 'cohortExport.csv')
+        setIsExportLoading(false)
+      })
   }
   const removeItem = (item: ExportItem) => {
     const idx = crfAttribute.findIndex(({ id }) => id === item.id)
@@ -227,8 +241,14 @@ const RedcapExport = (props: RedcapExportProps): JSX.Element => {
             )
           )}
         </div>
-        <Button className={classes.exportButton} variant="contained" color="primary" onClick={exportCSV}>
-          Export
+        <Button
+          className={classes.exportButton}
+          variant="contained"
+          color="primary"
+          onClick={exportCSV}
+          disabled={isExportLoading}
+        >
+          {isExportLoading ? <CircularProgress size={20} /> : 'Export'}
         </Button>
       </div>
     </Dialog>
