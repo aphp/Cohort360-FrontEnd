@@ -46,6 +46,8 @@ import fakePatients from '../data/fakeData/patients'
 import fakeDocuments from '../data/fakeData/documents'
 // import { fetchPerimetersInfos } from './perimeters'
 
+const PATIENT_MAX_COUNT = 500
+
 const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | undefined> => {
   if (CONTEXT === 'fakedata') {
     const name = 'Fausse cohorte'
@@ -151,11 +153,13 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     const cohortResult: CohortData = {}
     const response = getApiResponseResources(
       await api.get<FHIR_API_Response<IEncounter | IPatient | IGroup>>(
-        `/Patient?_has:Group:member:_id=${cohortId}&_revinclude=Group:member&_revinclude=Encounter:patient`
+        `/Patient?_has:Group:member:_id=${cohortId}&_revinclude=Group:member&_revinclude=Encounter:patient&_count=${PATIENT_MAX_COUNT}`
       )
     )
     if (response) {
-      cohortResult.cohort = head(response.filter((resource) => resource.resourceType === 'Group') as IGroup[])
+      cohortResult.cohort = head(
+        response.filter((resource) => resource.resourceType === 'Group' && resource.id === cohortId) as IGroup[]
+      )
 
       const patients = response.filter((resource) => resource.resourceType === 'Patient') as IPatient[]
       const encounters = response.filter((resource) => resource.resourceType === 'Encounter') as IEncounter[]
