@@ -47,7 +47,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
   useEffect(() => {
     if (!restrictToPractitionerPerimeter) {
       setLoading(true)
-      getScopePerimeters()
+      getScopePerimeters(practitionerScopeRows.map(({ id }) => id))
         .then((rootRows) => {
           setRootRows(rootRows)
         })
@@ -55,7 +55,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
           setLoading(false)
         })
     }
-  }, [restrictToPractitionerPerimeter])
+  }, [restrictToPractitionerPerimeter, practitionerScopeRows])
 
   useEffect(() => setSelectedItem(defaultSelectedItems), [defaultSelectedItems])
 
@@ -241,7 +241,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
                     </TableCell>
 
                     <TableCell align="center">
-                      <Typography>{displayDigit(_row.quantity)}</Typography>
+                      <Typography>{_row.access ? displayDigit(_row.quantity) : '-'}</Typography>
                     </TableCell>
 
                     <TableCell align="center">
