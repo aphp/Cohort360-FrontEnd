@@ -51,7 +51,6 @@ const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
   const query: Query = JSON.parse(jsonQuery)
   const perimeters = query.sourcePopulation.caresiteCohortList
   const patientFilter = `_count=${PATIENT_MAX_COUNT}&_has:Encounter:subject:service-provider=${perimeters.join(',')}`
-  const criteriaGroup = query.request[0].criteria
 
   // aggregatePatients takes a group of criteria and the ids of patients who
   // fulfill those criteria. It mutates the cohort according to
@@ -92,6 +91,8 @@ const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
     }
   }
 
+  const criteriaGroup = query.request[0].criteria
+
   // We record every requests needed to fetch the patients/documents that meet the cohort criteria
   // and then we fetch the patients/documents once
   const { patientQueries, documentQueries } = criteriaGroup.reduce<{
@@ -117,39 +118,41 @@ const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
     ...documentQueries.map((query) => getPatientsFromDocuments(query, patientFilter))
   ])
 
-  const patientIds = await criteriaGroup
-    .sort((a, b) => Number(b.isInclusive) - Number(a.isInclusive))
-    .reduce(async (patientIdsAcc, group) => {
-      const groupPatientIds = await group.criteria
+  const patientIds = !criteriaGroup.length
+    ? await getPatients(`/Patient?${patientFilter}`)
+    : await criteriaGroup
         .sort((a, b) => Number(b.isInclusive) - Number(a.isInclusive))
-        .reduce(async (groupPatientIdsAcc, criteria) => {
-          const query = queryByResourceType(criteria)
-          if (!query) return []
+        .reduce(async (patientIdsAcc, group) => {
+          const groupPatientIds = await group.criteria
+            .sort((a, b) => Number(b.isInclusive) - Number(a.isInclusive))
+            .reduce(async (groupPatientIdsAcc, criteria) => {
+              const query = queryByResourceType(criteria)
+              if (!query) return []
 
-          const patientIds =
-            criteria.resourceType === 'Composition'
-              ? await getPatientsFromDocuments(query, patientFilter)
-              : await getPatients(query)
+              const patientIds =
+                criteria.resourceType === 'Composition'
+                  ? await getPatientsFromDocuments(query, patientFilter)
+                  : await getPatients(query)
+
+              return aggregatePatients(
+                {
+                  ...criteria,
+                  _type: group._type
+                },
+                patientIds,
+                await groupPatientIdsAcc
+              )
+            }, Promise.resolve<(string | undefined)[]>([]))
 
           return aggregatePatients(
             {
-              ...criteria,
-              _type: group._type
+              ...group,
+              _type: query.request[0]._type
             },
-            patientIds,
-            await groupPatientIdsAcc
+            groupPatientIds,
+            await patientIdsAcc
           )
         }, Promise.resolve<(string | undefined)[]>([]))
-
-      return aggregatePatients(
-        {
-          ...group,
-          _type: query.request[0]._type
-        },
-        groupPatientIds,
-        await patientIdsAcc
-      )
-    }, Promise.resolve<(string | undefined)[]>([]))
 
   return {
     resourceType: 'Group',
