@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
-import { useHistory } from 'react-router-dom'
+import { useHistory, Link } from 'react-router-dom'
 import clsx from 'clsx'
 
 import {
@@ -11,7 +11,6 @@ import {
   Grid,
   Icon,
   IconButton,
-  Link,
   List,
   ListItem,
   ListItemIcon,
@@ -166,10 +165,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                   [classes.hide]: open
                 })}
               >
-                <Link
-                  onClick={() => history.push('/cohort/new')}
-                  className={clsx(classes.linkHover, classes.plusButton)}
-                >
+                <Link to="/cohort/new" className={clsx(classes.linkHover, classes.plusButton)}>
                   <Icon>add_circle</Icon>
                 </Link>
               </ListItemIcon>
@@ -182,7 +178,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                 <Typography variant="h5">Nouvelle Cohorte</Typography>
               </Button>
             </ListItem>
-            <Link href="/accueil" underline="none">
+            <Link to="/accueil">
               <ListItem button>
                 <ListItemIcon className={classes.listIcon}>
                   <HomeIcon width="20px" fill="#FFF" />
@@ -212,18 +208,18 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
               <List>
                 {!practitioner?.deidentified && (
                   <ListItem>
-                    <Link href="/rechercher_patient" className={classes.nestedTitle}>
+                    <Link to="/rechercher_patient" className={classes.nestedTitle}>
                       Rechercher un patient
                     </Link>
                   </ListItem>
                 )}
                 <ListItem>
-                  <Link href="/mes_patients" className={classes.nestedTitle}>
+                  <Link to="/mes_patients" className={classes.nestedTitle}>
                     Tous mes patients
                   </Link>
                 </ListItem>
                 <ListItem>
-                  <Link href="/perimetre" className={classes.nestedTitle}>
+                  <Link to="/perimetre" className={classes.nestedTitle}>
                     Explorer un périmètre
                   </Link>
                 </ListItem>
@@ -246,7 +242,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
             >
               <List>
                 <ListItem>
-                  <Link href="/recherche_sauvegarde" className={classes.nestedTitle}>
+                  <Link to="/recherche_sauvegarde" className={classes.nestedTitle}>
                     Recherches sauvegardées
                   </Link>
                 </ListItem>

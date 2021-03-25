@@ -19,6 +19,7 @@ import BarChart from './Charts/BarChart'
 import GroupedBarChart from './Charts/GroupedBarChart'
 import DonutChart from './Charts/DonutChart'
 import PyramidChart from './Charts/PyramidChart'
+import CohortOrgaRepartitionCard from 'features/cohortes/CohortOrgaRepartitionCard'
 
 import useStyles from './styles'
 
@@ -173,6 +174,10 @@ const Preview: React.FC<PreviewProps> = ({
           <Grid item xs={12} sm={6} md={8}>
             <RepartitionTable genderRepartitionMap={genderRepartitionMap} loading={loading} />
           </Grid>
+        </Grid>
+
+        <Grid item xs={12}>
+          <CohortOrgaRepartitionCard loading={loading} />
         </Grid>
 
         <Grid container>

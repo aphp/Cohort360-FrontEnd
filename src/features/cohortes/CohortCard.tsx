@@ -12,6 +12,10 @@ import { deleteUserCohortThunk, setFavoriteCohortThunk } from 'state/userCohorts
 const useStyles = makeStyles((theme) => ({
   button: {
     marginBlock: theme.spacing(2)
+  },
+  buttonsContainer: {
+    display: 'flex',
+    justifyContent: 'space-between'
   }
 }))
 
@@ -33,15 +37,27 @@ const CohortCard = () => {
   const handleCreateCohortClick = () => {
     history.push('cohort/new')
   }
+  const handleBrowseCreatedCohortsClick = () => {
+    history.push('/recherche_sauvegarde')
+  }
 
   return (
     <Card>
       <CardContent>
         <Title>Cohortes</Title>
         <Divider />
-        <Button onClick={handleCreateCohortClick} className={classes.button}>
-          Créer une nouvelle cohorte
-        </Button>
+        <div className={classes.buttonsContainer}>
+          <Button onClick={handleCreateCohortClick} className={classes.button}>
+            Créer une nouvelle cohorte
+          </Button>
+          <Button
+            onClick={handleBrowseCreatedCohortsClick}
+            className={classes.button}
+            disabled={!lastCohorts || lastCohorts.length === 0}
+          >
+            Voir toutes mes cohortes
+          </Button>
+        </div>
         <ResearchTable
           researchData={lastCohorts}
           onDeleteCohort={handleDeleteCohort}
