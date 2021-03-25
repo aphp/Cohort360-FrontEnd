@@ -26,12 +26,12 @@ const defaultDemographic = {
 }
 
 const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const defaultValues = selectedCriteria || defaultDemographic
 
   const classes = useStyles()
 
-  const isEdition = selectedCriteria !== null ? true : false
+  const isEdition = selectedCriteria !== null
 
   const _onSubmit = (data: any) => {
     onChangeSelectedCriteria({
@@ -72,7 +72,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               type: 'text',
               variant: 'outlined',
               validationRules: {
-                required: 'Merci de renseigné un titre'
+                required: 'Merci de renseigner un titre'
               }
             },
             {
@@ -81,17 +81,17 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               type: 'text',
               variant: 'outlined',
               validationRules: {
-                required: 'Merci de renseigné une recherche'
+                required: 'Merci de renseigner une recherche'
               }
-            },
-            {
-              name: 'docType',
-              variant: 'outlined',
-              label: 'Type de document',
-              type: 'autocomplete',
-              multiple: true,
-              autocompleteOptions: criteria?.data?.docTypes || []
             }
+            // {
+            //   name: 'docType',
+            //   variant: 'outlined',
+            //   label: 'Type de document',
+            //   type: 'autocomplete',
+            //   multiple: true,
+            //   autocompleteOptions: criteria?.data?.docTypes || []
+            // }
             // {
             //   name: 'encounter',
             //   label: "Nombre d'occurence",

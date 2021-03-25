@@ -151,11 +151,13 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     const cohortResult: CohortData = {}
     const response = getApiResponseResources(
       await api.get<FHIR_API_Response<IEncounter | IPatient | IGroup>>(
-        `/Patient?_has:Group:member:_id=${cohortId}&_revinclude=Group:member&_revinclude=Encounter:patient`
+        `/Patient?_has:Group:member:_id=${cohortId}&_revinclude=Group:member&_revinclude=Encounter:patient&_count=10000`
       )
     )
     if (response) {
-      cohortResult.cohort = head(response.filter((resource) => resource.resourceType === 'Group') as IGroup[])
+      cohortResult.cohort = head(
+        response.filter((resource) => resource.resourceType === 'Group' && resource.id === cohortId) as IGroup[]
+      )
 
       const patients = response.filter((resource) => resource.resourceType === 'Patient') as IPatient[]
       const encounters = response.filter((resource) => resource.resourceType === 'Encounter') as IEncounter[]

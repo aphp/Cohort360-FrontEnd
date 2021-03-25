@@ -1,6 +1,13 @@
-import { intersection, pullAll, union, memoize } from 'lodash'
+import { intersection, pullAll, union, last, memoize } from 'lodash'
 import moment from 'moment'
-import { GroupTypeKind, IGroup, IGroup_Characteristic, IGroup_Member, IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
+import {
+  GroupTypeKind,
+  IGroup,
+  IGroup_Characteristic,
+  IGroup_Member,
+  IPatient,
+  IDocumentReference
+} from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import apiFhir from '../api'
 import apiRequest from '../apiRequest'
@@ -16,8 +23,23 @@ const getPatients = memoize(
     if (!query) return []
     const response = await apiFhir.get<FHIR_API_Response<IPatient>>(query)
     const patients = getApiResponseResources(response)
-    return patients ? patients.map((patient) => patient.id) : []
+    return patients?.map((patient) => patient.id) ?? []
   }
+)
+
+const getPatientsFromDocuments = memoize(
+  async (documentQuery: string, patientFilter: string): Promise<(string | undefined)[]> => {
+    const response = await apiFhir.get<FHIR_API_Response<IDocumentReference>>(documentQuery)
+    const documents = getApiResponseResources(response)
+    const patientIds = documents
+      ?.map((document) => last(document.subject?.reference?.split('/')))
+      .filter((patientId) => !!patientId)
+    if (!patientIds?.length) return []
+
+    const allPatientIds = await getPatients(`/Patient?${patientFilter}`)
+    return patientIds?.filter((patientId) => allPatientIds.includes(patientId)) ?? []
+  },
+  (documentQuery, patientFilter) => documentQuery + patientFilter
 )
 
 /**
@@ -29,7 +51,6 @@ const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
   const query: Query = JSON.parse(jsonQuery)
   const perimeters = query.sourcePopulation.caresiteCohortList
   const patientFilter = `_count=${PATIENT_MAX_COUNT}&_has:Encounter:subject:service-provider=${perimeters.join(',')}`
-  const criteriaGroup = query.request[0].criteria
 
   // aggregatePatients takes a group of criteria and the ids of patients who
   // fulfill those criteria. It mutates the cohort according to
@@ -43,10 +64,9 @@ const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
   ): Promise<(string | undefined)[]> => {
     switch (group._type) {
       case 'andGroup':
-        if (group.isInclusive)
-          return currentCohort.length === 0 ? [...patientIds] : intersection(currentCohort, patientIds)
+        if (group.isInclusive) return !currentCohort.length ? [...patientIds] : intersection(currentCohort, patientIds)
         else
-          return currentCohort.length === 0
+          return !currentCohort.length
             ? [...pullAll(await getPatients(`/Patient?${patientFilter}`), patientIds)]
             : [...pullAll(currentCohort, patientIds)]
       case 'orGroup':
@@ -64,48 +84,75 @@ const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
         return `/Patient?${patientFilter}&${criteria.filterSolr}`
       case 'Condition':
         return `/Patient?${patientFilter}&_has:Condition:patient:${criteria.filterSolr}`
+      case 'Composition':
+        return `/DocumentReference/$regex?${criteria.filterSolr?.replace(/^_text/, 'regex')}`
       default:
         return ''
     }
   }
 
-  // We record every requests needed to fetch the patients that meet the cohort criteria
-  // and then we fetch the patients once
-  const queries = criteriaGroup.reduce<string[]>((acc, group) => {
-    return [...acc, ...group.criteria.reduce<string[]>((acc, criteria) => [...acc, queryByResourceType(criteria)], [])]
-  }, [])
-  await Promise.all(queries.map((query) => getPatients(query)))
+  const criteriaGroup = query.request[0].criteria
 
-  const patientIds = await criteriaGroup
-    .sort((a, b) => Number(b.isInclusive) - Number(a.isInclusive))
-    .reduce(async (patientIdsAcc, group) => {
-      const groupPatientIds = await group.criteria
+  // We record every requests needed to fetch the patients/documents that meet the cohort criteria
+  // and then we fetch the patients/documents once
+  const { patientQueries, documentQueries } = criteriaGroup.reduce<{
+    patientQueries: string[]
+    documentQueries: string[]
+  }>(
+    (acc, group) => {
+      return group.criteria.reduce<{
+        patientQueries: string[]
+        documentQueries: string[]
+      }>(
+        (acc, criteria) => {
+          const key = criteria.resourceType === 'Composition' ? 'documentQueries' : 'patientQueries'
+          return { ...acc, [key]: [...acc[key], queryByResourceType(criteria)] }
+        },
+        { patientQueries: [], documentQueries: [] }
+      )
+    },
+    { patientQueries: [], documentQueries: [] }
+  )
+  await Promise.all([
+    ...patientQueries.map((query) => getPatients(query)),
+    ...documentQueries.map((query) => getPatientsFromDocuments(query, patientFilter))
+  ])
+
+  const patientIds = !criteriaGroup.length
+    ? await getPatients(`/Patient?${patientFilter}`)
+    : await criteriaGroup
         .sort((a, b) => Number(b.isInclusive) - Number(a.isInclusive))
-        .reduce(async (groupPatientIdsAcc, criteria) => {
-          const query = queryByResourceType(criteria)
-          if (!query) return []
+        .reduce(async (patientIdsAcc, group) => {
+          const groupPatientIds = await group.criteria
+            .sort((a, b) => Number(b.isInclusive) - Number(a.isInclusive))
+            .reduce(async (groupPatientIdsAcc, criteria) => {
+              const query = queryByResourceType(criteria)
+              if (!query) return []
 
-          const patientIds = await getPatients(query)
+              const patientIds =
+                criteria.resourceType === 'Composition'
+                  ? await getPatientsFromDocuments(query, patientFilter)
+                  : await getPatients(query)
+
+              return aggregatePatients(
+                {
+                  ...criteria,
+                  _type: group._type
+                },
+                patientIds,
+                await groupPatientIdsAcc
+              )
+            }, Promise.resolve<(string | undefined)[]>([]))
 
           return aggregatePatients(
             {
-              ...criteria,
-              _type: group._type
+              ...group,
+              _type: query.request[0]._type
             },
-            patientIds,
-            await groupPatientIdsAcc
+            groupPatientIds,
+            await patientIdsAcc
           )
         }, Promise.resolve<(string | undefined)[]>([]))
-
-      return aggregatePatients(
-        {
-          ...group,
-          _type: query.request[0]._type
-        },
-        groupPatientIds,
-        await patientIdsAcc
-      )
-    }, Promise.resolve<(string | undefined)[]>([]))
 
   return {
     resourceType: 'Group',

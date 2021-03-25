@@ -146,7 +146,9 @@ export const setFavorite = async (cohortId: string, favStatus: boolean): Promise
 
 export const onRemoveCohort = async (selectedCohort?: string): Promise<boolean> => {
   if (CONTEXT !== 'fakedata') {
-    await api.delete(`/Group/${selectedCohort}`)
+    const response = await apiBackCohort.get(`/explorations/cohorts/${selectedCohort}/`)
+    const fhir_group_id = response.data.fhir_group_id
+    await api.delete(`/Group/${fhir_group_id}`)
     const deleteRequest = await apiBackCohort.delete(`/explorations/cohorts/${selectedCohort}/`)
     return [200, 204].includes(deleteRequest.status)
   }

@@ -88,7 +88,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
               type: 'text',
               variant: 'outlined',
               validationRules: {
-                required: 'Merci de renseigné un titre'
+                required: 'Merci de renseigner un titre'
               }
             },
             {

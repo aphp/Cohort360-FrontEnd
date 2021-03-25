@@ -2,14 +2,14 @@ import { IOrganization, IEncounter, IPatient, IGroup, IPractitionerRole } from '
 
 import api from './api'
 import {
-  getGenderRepartitionMapAphp,
-  getAgeRepartitionMapAphp,
-  getEncounterRepartitionMapAphp,
-  getEncounterRepartitionMap,
-  getVisitRepartitionMapAphp,
   getAgeRepartitionMap,
+  getAgeRepartitionMapAphp,
+  getEncounterRepartitionMap,
+  getEncounterRepartitionMapAphp,
   getGenderRepartitionMap,
-  getVisitRepartitionMap
+  getGenderRepartitionMapAphp,
+  getVisitRepartitionMap,
+  getVisitRepartitionMapAphp
 } from 'utils/graphUtils'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
@@ -21,7 +21,7 @@ import fakeFacetAgeMonth from '../data/fakeData/facet-age-month'
 import fakeFacetClassSimple from '../data/fakeData/facet-class-simple'
 import fakeFacetStartDateFacet from '../data/fakeData/facet-start-date-facet'
 import fakePatients from '../data/fakeData/patients'
-import { FHIR_API_Response, CohortData, ScopeTreeRow } from 'types'
+import { CohortData, FHIR_API_Response, ScopeTreeRow } from 'types'
 import { getServicePatientsCount } from './scopeService'
 
 export const getOrganizations = async (ids?: string[]): Promise<IOrganization[]> => {
@@ -32,7 +32,7 @@ export const getOrganizations = async (ids?: string[]): Promise<IOrganization[]>
 
 export const getPractitionerPerimeters = async (practitionerId: string) => {
   const resp = await api.get<FHIR_API_Response<IOrganization | IPractitionerRole>>(
-    `/PractitionerRole?permission-status=active&practitioner=${practitionerId}&date=lt${new Date().toISOString()}&_include=PractitionerRole:organization`
+    `/PractitionerRole?permission-status=active&practitioner=${practitionerId}&_include=PractitionerRole:organization`
   )
   const organizations =
     (getApiResponseResources(resp)?.filter(({ resourceType }) => resourceType === 'Organization') as IOrganization[]) ??
@@ -169,7 +169,7 @@ export const fetchPerimeterInfoForRequeteur = async (perimetersId: string): Prom
 
   const groupsResults = await api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${perimetersId}`)
   const groups = getApiResponseResources(groupsResults)
-  const scopeRows: ScopeTreeRow[] = groups
+  return groups
     ? groups?.map<ScopeTreeRow>((group) => ({
         ...group,
         id: group.id ?? '0',
@@ -177,5 +177,4 @@ export const fetchPerimeterInfoForRequeteur = async (perimetersId: string): Prom
         quantity: group.quantity ?? 0
       }))
     : []
-  return scopeRows
 }
