@@ -11,6 +11,7 @@ import api from 'services/api'
 import { RootState } from 'state'
 import { FHIR_API_Response } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
+import { orgaIdsOutOfPractitionerPerimeterSelector } from 'features/cohortes/CohortSelector'
 
 export type AccessRequestState = {
   authors: IPractitioner[]
@@ -53,14 +54,12 @@ const createAccessRequest = createAsyncThunk<void, void, { state: RootState }>(
   async (_, { getState }) => {
     const state = getState()
     const practitionerId = state.me?.id
-    const practitionerOrganizationIds = state.me?.organizations?.map((o) => o.id) ?? []
-    // We get all organization ids selected for the cohort
-    const selectedOrganizationIds = state.cohortCreation.request.selectedPopulation?.map((o) => o.id) ?? []
 
     // Then we filter those not in the practitioner's perimeter
-    const outOfPerimeterOrgaIds = selectedOrganizationIds.filter((id) => !practitionerOrganizationIds.includes(id))
+    const outOfPerimeterOrgaIds = orgaIdsOutOfPractitionerPerimeterSelector(state)
 
     if (!practitionerId) throw new Error('Practitioner not logged')
+    if (!outOfPerimeterOrgaIds) throw new Error('There is no organizations out of the practitioner scope')
 
     // Create as many PractitionerRole as "out of scope" organizations
     const accessResources: IPractitionerRole[] = outOfPerimeterOrgaIds.map((orgaId) => ({
