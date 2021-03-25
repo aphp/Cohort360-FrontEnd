@@ -79,7 +79,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               type: 'text',
               variant: 'outlined',
               validationRules: {
-                required: 'Merci de renseigné un titre'
+                required: 'Merci de renseigner un titre'
               }
             },
             {

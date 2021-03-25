@@ -72,7 +72,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               type: 'text',
               variant: 'outlined',
               validationRules: {
-                required: 'Merci de renseigné un titre'
+                required: 'Merci de renseigner un titre'
               }
             },
             {
@@ -81,7 +81,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
               type: 'text',
               variant: 'outlined',
               validationRules: {
-                required: 'Merci de renseigné une recherche'
+                required: 'Merci de renseigner une recherche'
               }
             }
             // {

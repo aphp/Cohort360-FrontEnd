@@ -74,7 +74,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
               type: 'text',
               variant: 'outlined',
               validationRules: {
-                required: 'Merci de renseigné un titre'
+                required: 'Merci de renseigner un titre'
               }
             },
             {
