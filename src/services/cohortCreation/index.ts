@@ -28,18 +28,18 @@ const getPatients = memoize(
 )
 
 const getPatientsFromDocuments = memoize(
-  async (query: string, filter: string): Promise<(string | undefined)[]> => {
-    const response = await apiFhir.get<FHIR_API_Response<IDocumentReference>>(query)
+  async (documentQuery: string, patientFilter: string): Promise<(string | undefined)[]> => {
+    const response = await apiFhir.get<FHIR_API_Response<IDocumentReference>>(documentQuery)
     const documents = getApiResponseResources(response)
-    const patients = documents
+    const patientIds = documents
       ?.map((document) => last(document.subject?.reference?.split('/')))
-      .filter((patient) => !!patient)
-    if (!patients?.length) return []
+      .filter((patientId) => !!patientId)
+    if (!patientIds?.length) return []
 
-    const allPatients = await getPatients(`/Patient?${filter}`)
-    return patients?.filter((patient) => allPatients.includes(patient)) ?? []
+    const allPatientIds = await getPatients(`/Patient?${patientFilter}`)
+    return patientIds?.filter((patientId) => allPatientIds.includes(patientId)) ?? []
   },
-  (a, b) => a + b
+  (documentQuery, patientFilter) => documentQuery + patientFilter
 )
 
 /**
