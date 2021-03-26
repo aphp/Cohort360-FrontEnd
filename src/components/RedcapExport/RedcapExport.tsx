@@ -31,6 +31,7 @@ import CohortItem from './CohortItem/CohortItem'
 import { CrfParameter, CRF_ATTRIBUTES } from '../../data/crfParameters'
 import useStyles from './styles'
 import api from 'services/apiJpyltime'
+import { useAppSelector } from 'state'
 
 /**
  * 0 = Nominatif
@@ -49,15 +50,18 @@ type RedcapExportProps = {
 export type ExportItem = CrfParameter & { id: string }
 
 const RedcapExport = ({ onClose, open, disabled, cohortName }: RedcapExportProps): JSX.Element => {
+  const { patients, practitionerId } = useAppSelector((state) => ({
+    practitionerId: state.me?.id,
+    patients: state.exploredCohort.originalPatients
+  }))
+
   const [anonymization, setAnonymization] = useState<AnonymizationType>(2)
   const [isExportLoading, setIsExportLoading] = useState(false)
-
   const [crfAttribute, setCrfAttribute] = useState<ExportItem[]>([
     { ...CRF_ATTRIBUTES[0], id: uuid() },
     { ...CRF_ATTRIBUTES[1], id: uuid() },
     { ...CRF_ATTRIBUTES[2], id: uuid() }
   ])
-
   const [risk, setRisk] = useState(null)
   const [error, setError] = useState(null)
 
@@ -72,15 +76,24 @@ const RedcapExport = ({ onClose, open, disabled, cohortName }: RedcapExportProps
   }
 
   const exportCSV = () => {
+    const attributes = crfAttribute.map(({ officialName: official_name, customName: custom_name, anonymize }) => ({
+      official_name,
+      custom_name,
+      anonymize
+    }))
+    const patient_ids = (patients?.map(({ id }) => id) ?? []) as string[]
+
     setIsExportLoading(true)
     api
       .post(`fhir2dataset`, {
-        practitioner_id: '1',
-        attributes: [],
-        patient_ids: []
+        practitioner_id: practitionerId,
+        attributes,
+        patient_ids
       })
       .then((response) => {
         fileDownload(response.data, cohortName ? `${cohortName}.csv` : 'cohortExport.csv')
+      })
+      .finally(() => {
         setIsExportLoading(false)
       })
   }
