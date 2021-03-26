@@ -12,16 +12,24 @@ import {
 import apiFhir from '../api'
 import apiRequest from '../apiRequest'
 import apiBack from '../apiBackCohort'
-import { CONTEXT } from '../../constants'
+import { CONTEXT, FHIR_API_ADMIN_TOKEN, FHIR_API_URL } from '../../constants'
 import { getApiResponseResources } from '../../utils/apiHelpers'
 import type { Cohort_Creation_API_Response, FHIR_API_Response, Query, QueryGroup } from 'types'
+import axios from 'axios'
 
 const PATIENT_MAX_COUNT = 500
+
+const adminApiFhir = axios.create({
+  baseURL: FHIR_API_URL,
+  headers: {
+    Authorization: `Bearer ${FHIR_API_ADMIN_TOKEN}`
+  }
+})
 
 const getPatients = memoize(
   async (query: string): Promise<(string | undefined)[]> => {
     if (!query) return []
-    const response = await apiFhir.get<FHIR_API_Response<IPatient>>(query)
+    const response = await adminApiFhir.get<FHIR_API_Response<IPatient>>(query)
     const patients = getApiResponseResources(response)
     return patients?.map((patient) => patient.id) ?? []
   }
@@ -29,7 +37,7 @@ const getPatients = memoize(
 
 const getPatientsFromDocuments = memoize(
   async (documentQuery: string, patientFilter: string): Promise<(string | undefined)[]> => {
-    const response = await apiFhir.get<FHIR_API_Response<IDocumentReference>>(documentQuery)
+    const response = await adminApiFhir.get<FHIR_API_Response<IDocumentReference>>(documentQuery)
     const documents = getApiResponseResources(response)
     const patientIds = documents
       ?.map((document) => last(document.subject?.reference?.split('/')))
