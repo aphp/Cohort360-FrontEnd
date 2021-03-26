@@ -159,9 +159,8 @@ const Dashboard: React.FC<{
         <RedcapExport
           open={openRedcapDialog}
           onClose={handleCloseRedcapDialog}
-          // FIX ARKHN: originalPatient only contains paginated results, not the whole group.
-          // we need to find a way to tell redcap which patients we need depending on then context
-          patientIds={dashboard.originalPatients.map((p: any) => p.id)}
+          disabled={dashboard.loading}
+          cohortName={dashboard.name}
         />
       )}
       <TopBar
