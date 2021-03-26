@@ -18,11 +18,11 @@ import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
 import DocumentList from './DocumentList/DocumentList'
 // import WordCloud from '../Preview/Charts/WordCloud'
 import SortDialog from '../../Filters/SortDialog/SortDialog'
-import DocumentSearchHelp from '../../DocumentSearchHelp/DocumentSearchHelp'
+// import DocumentSearchHelp from '../../DocumentSearchHelp/DocumentSearchHelp'
 import { fetchDocuments } from '../../../services/cohortInfos'
 
 import ClearIcon from '@material-ui/icons/Clear'
-import InfoIcon from '@material-ui/icons/Info'
+// import InfoIcon from '@material-ui/icons/Info'
 import SortIcon from '@material-ui/icons/Sort'
 import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
 import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
@@ -58,7 +58,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   // const [wordcloudData, setWordcloudData] = useState<IExtension[] | undefined>()
   const [open, setOpen] = useState(false)
   const [openSort, setOpenSort] = useState(false)
-  const [helpOpen, setHelpOpen] = useState(false)
+  // const [helpOpen, setHelpOpen] = useState(false)
   const [nda, setNda] = useState('')
   const [selectedDocTypes, setSelectedDocTypes] = useState<any[]>([])
   const [startDate, setStartDate] = useState<string | null>(null)
@@ -240,10 +240,10 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                     <SearchIcon fill="#ED6D91" height="15px" />
                   </IconButton>
                 </Grid>
-                <IconButton type="submit" onClick={() => setHelpOpen(true)}>
-                  <InfoIcon />
-                </IconButton>
-                <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+                {/*<IconButton type="submit" onClick={() => setHelpOpen(true)}>*/}
+                {/*  <InfoIcon />*/}
+                {/*</IconButton>*/}
+                {/*<DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />*/}
                 <Button
                   variant="contained"
                   disableElevation

@@ -1,5 +1,4 @@
 import {
-  IComposition,
   IPatient,
   IClaim,
   IProcedure,
@@ -39,7 +38,7 @@ export type Cohort_Creation_API_Response = {
   count?: number
 }
 
-export type CohortComposition = IComposition & {
+export type CohortComposition = IDocumentReference & {
   deidentified?: boolean
   idPatient?: string
   IPP?: string

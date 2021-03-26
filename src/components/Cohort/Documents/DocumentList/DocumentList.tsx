@@ -25,7 +25,6 @@ import { ReactComponent as CancelIcon } from '../../../../assets/icones/times.sv
 import { ReactComponent as UserIcon } from '../../../../assets/icones/user.svg'
 import { ReactComponent as SearchIcon } from '../../../../assets/icones/search.svg'
 
-import { FHIR_API_URL } from '../../../../constants'
 import { CohortComposition } from 'types'
 import {
   CompositionStatusKind,
@@ -102,24 +101,28 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
 
   const row = {
     ...document,
-    title: document.resourceType === 'Composition' ? document.title : document.description ?? '-',
+    title: document.description ?? '-',
     IPP:
-      document.resourceType === 'Composition' ? document.IPP ?? 'inconnu' : document.subject?.identifier?.value ?? '-',
+      document.resourceType === 'DocumentReference'
+        ? (document as CohortComposition).IPP ?? 'inconnu'
+        : document.subject?.identifier?.value ?? '-',
     idPatient:
-      document.resourceType === 'Composition' ? document.idPatient : document.subject?.reference?.split('/')[1] ?? '-',
+      document.resourceType === 'DocumentReference'
+        ? (document as CohortComposition).idPatient
+        : document.subject?.reference?.split('/')[1] ?? '-',
     NDA:
-      document.resourceType === 'Composition'
-        ? document.NDA ?? 'inconnu'
+      document.resourceType === 'DocumentReference'
+        ? (document as CohortComposition).NDA ?? 'inconnu'
         : document.context?.encounter?.[0].identifier?.value ?? '-',
     serviceProvider:
-      document.resourceType === 'Composition'
-        ? document.serviceProvider ?? 'non renseigné'
+      document.resourceType === 'DocumentReference'
+        ? (document as CohortComposition).serviceProvider ?? 'non renseigné'
         : documentEncounter?.serviceProvider?.display ?? '-',
     encounterStatus:
-      document.resourceType === 'Composition'
-        ? getEncounterStatus(document.encounterStatus as EncounterStatusKind)
+      document.resourceType === 'DocumentReference'
+        ? getEncounterStatus((document as CohortComposition).encounterStatus as EncounterStatusKind)
         : getEncounterStatus(documentEncounter?.status) ?? '-',
-    section: document.resourceType === 'Composition' ? document.section : []
+    section: []
   }
   const date = row.date ? new Date(row.date).toLocaleDateString('fr-FR') : ''
   const hour = row.date
@@ -203,15 +206,16 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
                       {!documentContent && <Typography>Le contenu du document est introuvable.</Typography>}
                     </>
                   ))}
-                {!deidentified && (
+                {!deidentified && row.content && row.content[0].attachment?.url?.endsWith('.pdf') && (
                   <Document
                     error={'Le document est introuvable.'}
                     loading={'PDF en cours de chargement...'}
                     file={{
-                      url: `${FHIR_API_URL}/Binary/${row.id}`,
+                      url:
+                        `https://${window.location.host}/files/` +
+                        row.content[0].attachment.url.replace(/^file:\/\//, ''),
                       httpHeaders: {
-                        Accept: 'application/pdf',
-                        Authorization: `Bearer ${localStorage.getItem('access')}`
+                        Accept: 'application/pdf'
                       }
                     }}
                     onLoadSuccess={({ numPages }) => setNumPages(numPages)}
@@ -237,16 +241,16 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
         </Grid>
       </Grid>
 
-      {showText && (
-        <Grid container item>
-          {row.section?.map((section) => (
-            <Grid key={section.title} container item direction="column">
-              <Typography variant="h6">{section.title}</Typography>
-              <Typography dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }} />
-            </Grid>
-          ))}
-        </Grid>
-      )}
+      {/*{showText && (*/}
+      {/*  <Grid container item>*/}
+      {/*    {row.section?.map((section) => (*/}
+      {/*      <Grid key={section.title} container item direction="column">*/}
+      {/*        <Typography variant="h6">{section.title}</Typography>*/}
+      {/*        <Typography dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }} />*/}
+      {/*      </Grid>*/}
+      {/*    ))}*/}
+      {/*  </Grid>*/}
+      {/*)}*/}
     </Grid>
   )
 }

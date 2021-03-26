@@ -24,8 +24,6 @@ import { ReactComponent as CancelIcon } from '../../../../assets/icones/times.sv
 import { ReactComponent as CheckIcon } from '../../../../assets/icones/check.svg'
 import { ReactComponent as PdfIcon } from '../../../../assets/icones/file-pdf.svg'
 
-import { FHIR_API_URL } from '../../../../constants'
-
 import useStyles from './styles'
 import { CohortComposition } from 'types'
 import {
@@ -68,11 +66,12 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
   const row = {
     ...document,
     NDA:
-      document.resourceType === 'Composition'
-        ? document.NDA
+      document.resourceType === 'DocumentReference'
+        ? (document as CohortComposition).NDA
         : document.securityLabel?.[0].coding?.[0].display ?? document.securityLabel?.[0].coding?.[0].code ?? '-',
-    title: document.resourceType === 'Composition' ? document.title ?? '-' : document.description ?? '-',
-    serviceProvider: document.resourceType === 'Composition' ? document.serviceProvider : '-',
+    title: document.description ?? '-',
+    serviceProvider:
+      document.resourceType === 'DocumentReference' ? (document as CohortComposition).serviceProvider : '-',
     type: document.type?.coding?.[0].display ?? document.type?.coding?.[0].code ?? '-'
   }
 
@@ -133,15 +132,14 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
                 {!documentContent && <Typography>Le contenu du document est introuvable.</Typography>}
               </>
             ))}
-          {!deidentified && (
+          {!deidentified && row.content && row.content[0].attachment?.url?.endsWith('.pdf') && (
             <Document
               error={'Le document est introuvable.'}
               loading={'PDF en cours de chargement...'}
               file={{
-                url: `${FHIR_API_URL}/Binary/${row.id}`,
+                url: `https://${window.location.host}/files/` + row.content[0].attachment.url.replace(/^file:\/\//, ''),
                 httpHeaders: {
-                  Accept: 'application/pdf',
-                  Authorization: `Bearer ${localStorage.getItem('access')}`
+                  Accept: 'application/pdf'
                 }
               }}
               onLoadSuccess={({ numPages }) => setNumPages(numPages)}

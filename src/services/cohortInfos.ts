@@ -3,7 +3,7 @@ import { head } from 'lodash'
 import api from './api'
 import apiBackCohort from './apiBackCohort'
 import { getInfos, getLastEncounter } from './myPatients'
-import { CONTEXT, API_RESOURCE_TAG } from '../constants'
+import { CONTEXT } from '../constants'
 import {
   FHIR_API_Response,
   CohortData,
@@ -151,7 +151,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     const cohortResult: CohortData = {}
     const response = getApiResponseResources(
       await api.get<FHIR_API_Response<IEncounter | IPatient | IGroup>>(
-        `/Patient?_has:Group:member:_id=${cohortId}&_revinclude=Group:member&_revinclude=Encounter:patient&_count=10000`
+        `/Patient?_has:Group:member:_id=${cohortId}&_revinclude=Group:member&_revinclude=Encounter:patient&_count=500`
       )
     )
     if (response) {
@@ -369,85 +369,78 @@ const fetchDocuments = async (
       // wordcloudData
     }
   }
-  if (CONTEXT === 'aphp') {
-    const searchByGroup = groupId ? `&_list=${groupId}` : ''
-    const search = searchInput ? `&_text=${searchInput}` : ''
-    const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : ''
-    const ndaFilter = nda ? `&encounter.identifier=${nda}` : ''
-    const _sortDirection = sortDirection === 'desc' ? '-' : ''
-    let dateFilter = ''
-    let elements = ''
+  // if (CONTEXT === 'aphp') {
+  const search = searchInput ? `/$regex?regex=${searchInput}&` : '?'
 
-    if (startDate || endDate) {
-      if (startDate && endDate) {
-        dateFilter = `&date=ge${startDate}&date=le${endDate}`
-      } else if (startDate) {
-        dateFilter = `&date=ge${startDate}`
-      } else if (endDate) {
-        dateFilter = `&date=le${endDate}`
-      }
-    }
+  const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : ''
+  const ndaFilter = nda ? `&encounter.identifier=${nda}` : ''
+  const _sortDirection = sortDirection === 'desc' ? '-' : ''
+  let dateFilter = ''
 
-    if (!search) {
-      elements = '&_elements=status,type,subject,encounter,date,title'
-    }
-
-    const [
-      // wordCloudRequest,
-      docsList,
-      allDocsList
-    ] = await Promise.all([
-      // api.get<FHIR_API_Response<IComposition>>(
-      //   `/Composition?facet=cloud&size=0&_sort=${_sortDirection}${sortBy}&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
-      // ),
-      api.get<FHIR_API_Response<IComposition>>(
-        `/Composition?size=20&_sort=${_sortDirection}${sortBy}&offset=${
-          page ? (page - 1) * 20 : 0
-        }&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
-      ),
-      search
-        ? api.get<FHIR_API_Response<IComposition>>(
-            `/Composition?_sort=${_sortDirection}${sortBy}&status=final${searchByGroup}${docTypesFilter}${ndaFilter}${dateFilter}&size=0`
-          )
-        : null
-    ])
-
-    const totalDocs = docsList?.data?.resourceType === 'Bundle' ? docsList.data.total : 0
-    const totalAllDocs = search
-      ? allDocsList?.data?.resourceType === 'Bundle'
-        ? allDocsList.data.total
-        : 0
-      : totalDocs
-
-    const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
-
-    // const wordcloudData =
-    //   wordCloudRequest.data.resourceType === 'Bundle'
-    //     ? wordCloudRequest.data.meta?.extension?.find((facet: any) => facet.url === 'facet-cloud')?.extension
-    //     : []
-
-    return {
-      totalDocs: totalDocs ?? 0,
-      totalAllDocs,
-      documentsList
-      // wordcloudData
+  if (startDate || endDate) {
+    if (startDate && endDate) {
+      dateFilter = `&date=ge${startDate}&date=le${endDate}`
+    } else if (startDate) {
+      dateFilter = `&date=ge${startDate}`
+    } else if (endDate) {
+      dateFilter = `&date=le${endDate}`
     }
   }
 
-  if (CONTEXT === 'arkhn') {
-    //TODO when cohort fetching have been implemented and pagination requests can be done
-    if (encounterIds) {
-      const ndaFilter = nda ? `&encounter:identifier=${nda}` : ''
-      const docResponse = await api.get<FHIR_API_Response<IDocumentReference>>(
-        `/DocumentReference?encounter=${encounterIds.join(',')}${ndaFilter}&_sort=-date&_count=10000${API_RESOURCE_TAG}`
-      )
-      const documents = getApiResponseResources(docResponse)
-      return {
-        totalDocs: docResponse.data.resourceType === 'Bundle' ? docResponse.data.total : 0,
-        documentsList: documents ?? []
-      }
-    }
+  const searchByGroup = encounterIds ? `&encounter=${encounterIds.join(',')}` : ''
+
+  const [
+    // wordCloudRequest,
+    docsList,
+    allDocsList
+  ] = await Promise.all([
+    // api.get<FHIR_API_Response<IComposition>>(
+    //   `/Composition?facet=cloud&size=0&_sort=${_sortDirection}${sortBy}&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
+    // ),
+    api.get<FHIR_API_Response<IDocumentReference>>(
+      `/DocumentReference${search}_count=20&_getpagesoffset=${
+        page ? (page - 1) * 20 : 0
+      }&_sort=${_sortDirection}${sortBy}${searchByGroup}${docTypesFilter}${ndaFilter}${dateFilter}`
+    ),
+    search !== '?'
+      ? api.get<FHIR_API_Response<IDocumentReference>>(
+          `/DocumentReference?_sort=${_sortDirection}${sortBy}${searchByGroup}${docTypesFilter}${ndaFilter}${dateFilter}&_summary=count`
+        )
+      : null
+  ])
+
+  const totalDocs = docsList?.data?.resourceType === 'Bundle' ? docsList.data.entry?.length ?? 0 : 0
+  const totalAllDocs =
+    search !== '?' ? (allDocsList?.data?.resourceType === 'Bundle' ? allDocsList.data.total : 0) : totalDocs
+
+  const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
+  // const wordcloudData =
+  //   wordCloudRequest.data.resourceType === 'Bundle'
+  //     ? wordCloudRequest.data.meta?.extension?.find((facet: any) => facet.url === 'facet-cloud')?.extension
+  //     : []
+
+  return {
+    totalDocs: totalDocs ?? 0,
+    totalAllDocs,
+    documentsList
+    // wordcloudData
   }
+  // }
+
+  // if (CONTEXT === 'arkhn') {
+  //   //TODO when cohort fetching have been implemented and pagination requests can be done
+  //   if (encounterIds) {
+  //     const ndaFilter = nda ? `&encounter:identifier=${nda}` : ''
+  //     const docResponse = await api.get<FHIR_API_Response<IDocumentReference>>(
+  //       `/DocumentReference?encounter=${encounterIds.join(',')}${ndaFilter}&_sort=-date&_count=10000${API_RESOURCE_TAG}`
+  //     )
+  //     const documents = getApiResponseResources(docResponse)
+  //     return {
+  //       totalDocs: docResponse.data.resourceType === 'Bundle' ? docResponse.data.total : 0,
+  //       documentsList: documents ?? []
+  //     }
+  //   }
+  // }
 }
 
 export { fetchCohort, fetchPatientList, fetchDocuments }
