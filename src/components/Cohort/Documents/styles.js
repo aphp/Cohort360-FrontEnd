@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '24px'
   },
   documentButtons: {
-    display: 'flex',
+    display: 'none',
     justifyContent: 'flex-end',
     marginBottom: 5
   },
