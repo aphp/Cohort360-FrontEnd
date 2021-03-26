@@ -24,6 +24,7 @@ import { ReactComponent as CancelIcon } from '../../../../assets/icones/times.sv
 import { ReactComponent as CheckIcon } from '../../../../assets/icones/check.svg'
 import { ReactComponent as PdfIcon } from '../../../../assets/icones/file-pdf.svg'
 
+import { FILES_SERVER_URL } from '../../../../constants'
 import useStyles from './styles'
 import { CohortComposition } from 'types'
 import {
@@ -137,7 +138,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
               error={'Le document est introuvable.'}
               loading={'PDF en cours de chargement...'}
               file={{
-                url: `https://${window.location.host}/files/` + row.content[0].attachment.url.replace(/^file:\/\//, ''),
+                url: FILES_SERVER_URL + row.content[0].attachment.url.replace(/^file:\/\//, ''),
                 httpHeaders: {
                   Accept: 'application/pdf'
                 }

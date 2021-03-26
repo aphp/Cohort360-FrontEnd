@@ -37,6 +37,7 @@ import { fetchDocumentContent } from 'services/cohortInfos'
 import { getDocumentStatus, getEncounterStatus } from 'utils/documentsFormatter'
 
 import useStyles from './styles'
+import { FILES_SERVER_URL } from '../../../../constants'
 
 type DocumentRowTypes = {
   groupId?: string
@@ -211,9 +212,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
                     error={'Le document est introuvable.'}
                     loading={'PDF en cours de chargement...'}
                     file={{
-                      url:
-                        `https://${window.location.host}/files/` +
-                        row.content[0].attachment.url.replace(/^file:\/\//, ''),
+                      url: FILES_SERVER_URL + row.content[0].attachment.url.replace(/^file:\/\//, ''),
                       httpHeaders: {
                         Accept: 'application/pdf'
                       }
