@@ -19,6 +19,7 @@ import axios from 'axios'
 
 const PATIENT_MAX_COUNT = 500
 
+// FIXME: don't use admin rights to create cohorts
 const adminApiFhir = axios.create({
   baseURL: FHIR_API_URL,
   headers: {
