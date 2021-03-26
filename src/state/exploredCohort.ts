@@ -98,6 +98,9 @@ const exploredCohortSlice = createSlice({
   reducers: {
     setExploredCohort: (state: ExploredCohortState, action: PayloadAction<CohortData | undefined>) => {
       return action.payload ? { ...state, ...action.payload } : initialState
+    },
+    setCohortType: (state, action: PayloadAction<typeof initialState.cohortType>) => {
+      state.cohortType = action.payload
     }
   },
   extraReducers: (builder) => {
