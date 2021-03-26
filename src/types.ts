@@ -223,6 +223,7 @@ export type CohortData = {
   visitTypeRepartitionData?: SimpleChartDataType[]
   monthlyVisitData?: ComplexChartDataType<Month>
   agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
+  perimeterRepartitionData?: (SimpleChartDataType & { id?: string })[]
   requestId?: string
 }
 

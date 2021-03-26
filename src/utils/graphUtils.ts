@@ -2,7 +2,8 @@ import {
   PatientGenderKind,
   IPatient,
   IEncounter,
-  IExtension
+  IExtension,
+  IOrganization
   // IReference
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { getAgeArkhn } from './age'
@@ -173,6 +174,26 @@ export const getEncounterRepartitionMap = (encounters: IEncounter[]): SimpleChar
     data[encounterDataIndex] = {
       ...data[encounterDataIndex],
       value: data[encounterDataIndex].value + 1
+    }
+  })
+
+  return data
+}
+
+export const getPerimeterRepartitionData = (
+  organizations: IOrganization[],
+  encounters: IEncounter[]
+): (SimpleChartDataType & { id?: string })[] => {
+  const data = organizations.map((orga) => {
+    const orgaEncounters = encounters.filter((e) => e.serviceProvider?.reference === `Organization/${orga.id}`)
+    const orgaPatientsSet = new Set(orgaEncounters.map(({ subject }) => subject?.reference?.split('/')[1]))
+    const orgaPatientCount = orgaPatientsSet.size
+
+    return {
+      label: orga.name ?? '',
+      color: getRandomColor(),
+      value: orgaPatientCount,
+      id: orga.id
     }
   })
 

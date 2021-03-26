@@ -3,7 +3,10 @@ import { head } from 'lodash'
 import api from './api'
 import apiBackCohort from './apiBackCohort'
 import { getInfos, getLastEncounter } from './myPatients'
+
+import { getOrganizations } from './perimeters'
 import { CONTEXT } from '../constants'
+
 import {
   FHIR_API_Response,
   CohortData,
@@ -31,7 +34,8 @@ import {
   getAgeRepartitionMap,
   getAgeRepartitionMapAphp,
   getVisitRepartitionMap,
-  getVisitRepartitionMapAphp
+  getVisitRepartitionMapAphp,
+  getPerimeterRepartitionData
 } from 'utils/graphUtils'
 import { searchPatient } from './searchPatient'
 import { getAge } from 'utils/age'
@@ -159,8 +163,13 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
         response.filter((resource) => resource.resourceType === 'Group' && resource.id === cohortId) as IGroup[]
       )
 
+      const cohortOrganizationIds = (cohortResult.cohort?.characteristic
+        ?.filter(({ valueReference }) => valueReference?.type === 'Organization')
+        .map(({ valueReference }) => valueReference?.reference?.split('/')[1]) ?? []) as string[]
+
       const patients = response.filter((resource) => resource.resourceType === 'Patient') as IPatient[]
       const encounters = response.filter((resource) => resource.resourceType === 'Encounter') as IEncounter[]
+      const organizations = await getOrganizations(cohortOrganizationIds)
 
       cohortResult.totalPatients = patients.length
       cohortResult.originalPatients = patients
@@ -169,6 +178,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       cohortResult.agePyramidData = getAgeRepartitionMap(patients)
       cohortResult.monthlyVisitData = getVisitRepartitionMap(patients, encounters)
       cohortResult.visitTypeRepartitionData = getEncounterRepartitionMap(encounters)
+      cohortResult.perimeterRepartitionData = getPerimeterRepartitionData(organizations, encounters)
     }
     return cohortResult
   }
