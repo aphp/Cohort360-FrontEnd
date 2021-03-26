@@ -13,6 +13,7 @@ export type ExploredCohortState = {
   excludedPatients: any[]
   loading: boolean
   requestId?: string
+  cohortType?: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'
 } & CohortData
 
 const initialState: ExploredCohortState = {
@@ -39,7 +40,9 @@ const fetchExploredCohort = createAsyncThunk<
   CohortData,
   { context: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'; id?: string | string[] },
   { state: RootState }
->('exploredCohort/fetchExploredCohort', async ({ context, id }, { getState }) => {
+>('exploredCohort/fetchExploredCohort', async ({ context, id }, { getState, dispatch }) => {
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
+  dispatch(exploredCohortSlice.actions.setCohortType(context))
   const state = getState()
   const stateCohort = state.exploredCohort.cohort
   let shouldRefreshData = true
@@ -93,7 +96,7 @@ const fetchExploredCohort = createAsyncThunk<
         break
     }
   }
-  return { ...cohort, cohortType: context } ?? state.exploredCohort
+  return { ...cohort } ?? state.exploredCohort
 })
 
 const exploredCohortSlice = createSlice({
@@ -164,6 +167,9 @@ const exploredCohortSlice = createSlice({
         includedPatients: [],
         excludedPatients: []
       }
+    },
+    setCohortType: (state, action: PayloadAction<typeof initialState.cohortType>) => {
+      state.cohortType = action.payload
     }
   },
   extraReducers: (builder) => {
