@@ -298,19 +298,19 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
           <Tab
             classes={{ selected: classes.selected }}
             className={classes.tabTitle}
-            label="Diagnostics CIM10"
+            label="Diagnostics"
             value="CIM10"
           />
-          <Tab classes={{ selected: classes.selected }} className={classes.tabTitle} label="Actes CCAM" value="CCAM" />
-          <Tab classes={{ selected: classes.selected }} className={classes.tabTitle} label="GHM" value="GHM" />
+          <Tab
+            classes={{ selected: classes.selected }}
+            className={classes.tabTitle}
+            label="Actes médicaux"
+            value="CCAM"
+          />
+          {/* <Tab classes={{ selected: classes.selected }} className={classes.tabTitle} label="GHM" value="GHM" /> */}
         </Tabs>
         <Typography variant="button">
-          {total || 0} /{' '}
-          {selectedTab === 'CIM10'
-            ? `${diagnosticTotal ?? 0} diagnostic(s)`
-            : selectedTab === 'CCAM'
-            ? `${ccamTotal} acte(s)`
-            : `${ghmTotal} GHM`}
+          {total || 0} {selectedTab === 'CIM10' ? `diagnostic(s)` : selectedTab === 'CCAM' ? `acte(s)` : `GHM`}
         </Typography>
         <div className={classes.documentButtons}>
           <Grid item container xs={10} alignItems="center" className={classes.searchBar}>

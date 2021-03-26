@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     margin: '0 auto'
   },
   documentButtons: {
-    display: 'flex',
+    display: 'none',
     justifyContent: 'flex-end',
     marginBottom: 5
   },
