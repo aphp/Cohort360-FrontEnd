@@ -17,6 +17,7 @@ import { ReactComponent as CheckIcon } from '../../../../assets/icones/check.svg
 import { ReactComponent as CancelIcon } from '../../../../assets/icones/times.svg'
 
 import useStyles from './styles'
+import { FILES_SERVER_URL } from '../../../../constants'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
@@ -51,7 +52,7 @@ const DocumentRow = ({ row }) => {
           <Dialog open={documentDialogOpen} onClose={() => setDocumentDialogOpen(false)}>
             <Document
               file={{
-                url: `https://demo.arkhn.com/files/${row.content[0].attachment.url}`,
+                url: FILES_SERVER_URL + row.content[0].attachment.url.replace(/^file:\/\//, ''),
                 httpHeaders: { Accept: 'application/pdf' }
               }}
             >

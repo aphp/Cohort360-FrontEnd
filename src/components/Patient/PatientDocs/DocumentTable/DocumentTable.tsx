@@ -10,6 +10,7 @@ import {
   DialogContent,
   Grid,
   IconButton,
+  Modal,
   Paper,
   Table,
   TableBody,
@@ -24,8 +25,7 @@ import { ReactComponent as CancelIcon } from '../../../../assets/icones/times.sv
 import { ReactComponent as CheckIcon } from '../../../../assets/icones/check.svg'
 import { ReactComponent as PdfIcon } from '../../../../assets/icones/file-pdf.svg'
 
-import { FHIR_API_URL } from '../../../../constants'
-
+import { FILES_SERVER_URL } from '../../../../constants'
 import useStyles from './styles'
 import { CohortComposition } from 'types'
 import {
@@ -35,6 +35,7 @@ import {
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { getDocumentStatus } from 'utils/documentsFormatter'
 import { fetchDocumentContent } from 'services/cohortInfos'
+import ImageIcon from '@material-ui/icons/Image'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
@@ -48,6 +49,10 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
   const [numPages, setNumPages] = useState<number>()
   const [loading, setLoading] = useState(false)
   const [documentContent, setDocumentContent] = useState<any>([])
+  const [isImageOpen, setIsImageOpen] = useState<boolean>(false)
+
+  const handleImageOpen = () => setIsImageOpen(true)
+  const handleImageClose = () => setIsImageOpen(false)
 
   const openPdfDialog = (documentId?: string) => {
     setDocumentDialogOpen(true)
@@ -68,11 +73,12 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
   const row = {
     ...document,
     NDA:
-      document.resourceType === 'Composition'
-        ? document.NDA
+      document.resourceType === 'DocumentReference'
+        ? (document as CohortComposition).NDA
         : document.securityLabel?.[0].coding?.[0].display ?? document.securityLabel?.[0].coding?.[0].code ?? '-',
-    title: document.resourceType === 'Composition' ? document.title ?? '-' : document.description ?? '-',
-    serviceProvider: document.resourceType === 'Composition' ? document.serviceProvider : '-',
+    title: document.description ?? '-',
+    serviceProvider:
+      document.resourceType === 'DocumentReference' ? (document as CohortComposition).serviceProvider : '-',
     type: document.type?.coding?.[0].display ?? document.type?.coding?.[0].code ?? '-'
   }
 
@@ -110,9 +116,27 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
         <TableCell align="center">{row.serviceProvider}</TableCell>
         <TableCell align="center">{getStatusShip(row.status)}</TableCell>
         <TableCell align="center">
-          <IconButton onClick={() => openPdfDialog(row.id)}>
-            <PdfIcon height="30px" fill="#ED6D91" />
-          </IconButton>
+          {row.content && row.content[0] && row.content[0].attachment?.url?.endsWith('.pdf') ? (
+            <IconButton onClick={() => openPdfDialog(row.id)}>
+              <PdfIcon height="30px" fill="#ED6D91" />
+            </IconButton>
+          ) : (
+            row.content &&
+            row.content[0] && (
+              <>
+                <IconButton type="button" onClick={handleImageOpen}>
+                  <ImageIcon />
+                </IconButton>
+                <Modal open={isImageOpen} onClose={handleImageClose}>
+                  <img
+                    className={classes.img}
+                    src={`${FILES_SERVER_URL}${row.content[0].attachment?.url?.replace(/^file:\/\//, '')}`}
+                    alt={row.description}
+                  />
+                </Modal>
+              </>
+            )
+          )}
         </TableCell>
       </TableRow>
 
@@ -133,15 +157,14 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
                 {!documentContent && <Typography>Le contenu du document est introuvable.</Typography>}
               </>
             ))}
-          {!deidentified && (
+          {!deidentified && row.content && row.content[0].attachment?.url?.endsWith('.pdf') && (
             <Document
               error={'Le document est introuvable.'}
               loading={'PDF en cours de chargement...'}
               file={{
-                url: `${FHIR_API_URL}/Binary/${row.id}`,
+                url: `${FILES_SERVER_URL}${row.content[0].attachment?.url?.replace(/^file:\/\//, '')}`,
                 httpHeaders: {
-                  Accept: 'application/pdf',
-                  Authorization: `Bearer ${localStorage.getItem('access')}`
+                  Accept: 'application/pdf'
                 }
               }}
               onLoadSuccess={({ numPages }) => setNumPages(numPages)}

@@ -1,3 +1,5 @@
+import { last } from 'lodash'
+
 import api from './api'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import {
@@ -11,7 +13,6 @@ import {
 } from 'types'
 import {
   IClaim,
-  IComposition,
   ICondition,
   IDocumentReference,
   IEncounter,
@@ -53,7 +54,7 @@ export const fillNDAAndServiceProviderDocs = async (
   }
 
   const listeEncounterIds: string[] = docs
-    .map((e) => e.encounter?.display?.substring(10))
+    .map((e) => e.context?.encounter && last(e.context.encounter[0].reference?.split('/')))
     .filter((s): s is string => undefined !== s)
   const noDuplicatesList: string[] = []
   for (const element of listeEncounterIds) {
@@ -79,7 +80,7 @@ export const fillNDAAndServiceProviderDocs = async (
 
   for (const doc of docs) {
     for (const encounter of listeEncounters) {
-      if (doc.encounter?.display?.substring(10) === encounter.id) {
+      if (doc.context?.encounter && last(doc.context.encounter[0].reference?.split('/')) === encounter.id) {
         doc.encounterStatus = encounter.status ?? 'Statut inconnu'
 
         doc.serviceProvider = encounter.serviceProvider.display ?? 'Non renseigné'
@@ -517,7 +518,6 @@ export const getEncounterOrProcedureDocs = async (
   data: CohortEncounter | PMSIEntry<IProcedure>
 ): Promise<(CohortComposition | IDocumentReference)[]> => {
   if (CONTEXT === 'arkhn') {
-    let documents: (CohortComposition | IDocumentReference)[] = []
     let encounterId: string | undefined = undefined
     switch (data.resourceType) {
       case 'Procedure':
@@ -531,15 +531,11 @@ export const getEncounterOrProcedureDocs = async (
     }
 
     if (encounterId) {
-      const [docRefsResponse, compositionsResponse] = await Promise.all([
-        api.get<FHIR_API_Response<IDocumentReference>>(`/DocumentReference?encounter=${encounterId}`),
-        api.get<FHIR_API_Response<IComposition>>(`/Composition?encounter=${encounterId}`)
-      ])
+      const docRefsResponse = await api.get<FHIR_API_Response<IDocumentReference>>(
+        `/DocumentReference?encounter=${encounterId}`
+      )
       const docRefs = getApiResponseResources(docRefsResponse)
-      const compositions = getApiResponseResources(compositionsResponse)
-      if (docRefs) documents = [...documents, ...docRefs]
-      if (compositions) documents = [...documents, ...compositions]
-      return documents
+      return docRefs ?? []
     }
   }
 
@@ -566,8 +562,8 @@ const getEncounterDocuments = async (
     encountersList.push(encounter.id)
   })
 
-  const documentsResp = await api.get<FHIR_API_Response<IComposition>>(
-    `/Composition?encounter=${encountersList}&_elements=status,type,subject,encounter,date,title`
+  const documentsResp = await api.get<FHIR_API_Response<IDocumentReference>>(
+    `/DocumentReference?encounter=${encountersList}`
   )
 
   const documents =
@@ -578,7 +574,10 @@ const getEncounterDocuments = async (
   if (!documents) return _encounters
 
   documents.forEach((document) => {
-    const encounterIndex = _encounters.findIndex((encounter) => encounter.id === document.encounter?.display?.slice(10))
+    const encounterIndex = _encounters.findIndex(
+      (encounter) =>
+        encounter.id === (document.context?.encounter && last(document.context.encounter[0].reference?.split('/')))
+    )
 
     if (!encounterIndex) return
 
@@ -604,8 +603,8 @@ const getProcedureDocuments = async (
     encountersList.push(procedure.encounter?.reference?.slice(10))
   })
 
-  const documentsResp = await api.get<FHIR_API_Response<IComposition>>(
-    `/Composition?encounter=${encountersList}&_elements=status,type,subject,encounter,date,title`
+  const documentsResp = await api.get<FHIR_API_Response<IDocumentReference>>(
+    `/DocumentReference?encounter=${encountersList}`
   )
 
   const documents =
@@ -617,7 +616,8 @@ const getProcedureDocuments = async (
 
   documents.forEach((document) => {
     const procedureIndex = _procedures.findIndex(
-      (procedure) => procedure.encounter?.reference === document.encounter?.display
+      (procedure) =>
+        procedure.encounter?.reference === (document.context?.encounter && document.context.encounter[0]?.reference)
     )
 
     if (!procedureIndex) return
@@ -739,7 +739,7 @@ export const fetchPatient = async (patientId: string, groupId?: string): Promise
         `/Condition?patient=${patientId}&_sort=-recorded-date&size=20${groupFilter}`
       ),
       api.get<FHIR_API_Response<IClaim>>(`/Claim?patient=${patientId}&_sort=-created&size=20${groupFilter}`),
-      api.get<FHIR_API_Response<IComposition>>(
+      api.get<FHIR_API_Response<IDocumentReference>>(
         `/Composition?patient=${patientId}&size=20&_sort=-date&status=final&_elements=status,type,encounter,date,title${groupFilter}`
       )
     ])

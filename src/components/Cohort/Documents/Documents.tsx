@@ -27,6 +27,7 @@ import SortIcon from '@material-ui/icons/Sort'
 import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
 import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
 
+import { CONTEXT } from '../../../constants'
 import { CohortComposition } from 'types'
 import {
   // IExtension,
@@ -240,10 +241,14 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                     <SearchIcon fill="#ED6D91" height="15px" />
                   </IconButton>
                 </Grid>
-                <IconButton type="submit" onClick={() => setHelpOpen(true)}>
-                  <InfoIcon />
-                </IconButton>
-                <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+                {CONTEXT === 'aphp' && (
+                  <>
+                    <IconButton type="submit" onClick={() => setHelpOpen(true)}>
+                      <InfoIcon />
+                    </IconButton>
+                    <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+                  </>
+                )}
                 <Button
                   variant="contained"
                   disableElevation

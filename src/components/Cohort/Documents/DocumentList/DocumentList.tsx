@@ -12,9 +12,11 @@ import {
   DialogContent,
   Grid,
   IconButton,
+  Modal,
   Paper,
   Typography
 } from '@material-ui/core'
+import ImageIcon from '@material-ui/icons/Image'
 
 import DescriptionIcon from '@material-ui/icons/Description'
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital'
@@ -25,7 +27,6 @@ import { ReactComponent as CancelIcon } from '../../../../assets/icones/times.sv
 import { ReactComponent as UserIcon } from '../../../../assets/icones/user.svg'
 import { ReactComponent as SearchIcon } from '../../../../assets/icones/search.svg'
 
-import { FHIR_API_URL } from '../../../../constants'
 import { CohortComposition } from 'types'
 import {
   CompositionStatusKind,
@@ -38,6 +39,7 @@ import { fetchDocumentContent } from 'services/cohortInfos'
 import { getDocumentStatus, getEncounterStatus } from 'utils/documentsFormatter'
 
 import useStyles from './styles'
+import { FILES_SERVER_URL } from '../../../../constants'
 
 type DocumentRowTypes = {
   groupId?: string
@@ -61,6 +63,10 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
   const [numPages, setNumPages] = useState<number>()
   const [loading, setLoading] = useState(false)
   const [documentContent, setDocumentContent] = useState<any>([])
+  const [isImageOpen, setIsImageOpen] = useState<boolean>(false)
+
+  const handleImageOpen = () => setIsImageOpen(true)
+  const handleImageClose = () => setIsImageOpen(false)
 
   const openPdfDialog = (documentId?: string) => {
     setDocumentDialogOpen(true)
@@ -102,24 +108,28 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
 
   const row = {
     ...document,
-    title: document.resourceType === 'Composition' ? document.title : document.description ?? '-',
+    title: document.description ?? '-',
     IPP:
-      document.resourceType === 'Composition' ? document.IPP ?? 'inconnu' : document.subject?.identifier?.value ?? '-',
+      document.resourceType === 'DocumentReference'
+        ? (document as CohortComposition).IPP ?? 'inconnu'
+        : document.subject?.identifier?.value ?? '-',
     idPatient:
-      document.resourceType === 'Composition' ? document.idPatient : document.subject?.reference?.split('/')[1] ?? '-',
+      document.resourceType === 'DocumentReference'
+        ? (document as CohortComposition).idPatient
+        : document.subject?.reference?.split('/')[1] ?? '-',
     NDA:
-      document.resourceType === 'Composition'
-        ? document.NDA ?? 'inconnu'
+      document.resourceType === 'DocumentReference'
+        ? (document as CohortComposition).NDA ?? 'inconnu'
         : document.context?.encounter?.[0].identifier?.value ?? '-',
     serviceProvider:
-      document.resourceType === 'Composition'
-        ? document.serviceProvider ?? 'non renseigné'
+      document.resourceType === 'DocumentReference'
+        ? (document as CohortComposition).serviceProvider ?? 'non renseigné'
         : documentEncounter?.serviceProvider?.display ?? '-',
     encounterStatus:
-      document.resourceType === 'Composition'
-        ? getEncounterStatus(document.encounterStatus as EncounterStatusKind)
-        : getEncounterStatus(documentEncounter?.status) ?? '-',
-    section: document.resourceType === 'Composition' ? document.section : []
+      document.resourceType === 'DocumentReference'
+        ? getEncounterStatus((document as CohortComposition).encounterStatus as EncounterStatusKind)
+        : getEncounterStatus(documentEncounter?.status) ?? '-'
+    // section: document.resourceType === 'DocumentReference' ? document.section : []
   }
   const date = row.date ? new Date(row.date).toLocaleDateString('fr-FR') : ''
   const hour = row.date
@@ -179,10 +189,27 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
             </Grid>
           </Grid>
           <Grid container item xs={1} justify="center">
-            <IconButton onClick={() => openPdfDialog(row.id)}>
-              <PdfIcon height="30px" fill="#ED6D91" />
-            </IconButton>
-
+            {row.content && row.content[0] && row.content[0].attachment?.url?.endsWith('.pdf') ? (
+              <IconButton onClick={() => openPdfDialog(row.id)}>
+                <PdfIcon height="30px" fill="#ED6D91" />
+              </IconButton>
+            ) : (
+              row.content &&
+              row.content[0] && (
+                <>
+                  <IconButton type="button" onClick={handleImageOpen}>
+                    <ImageIcon />
+                  </IconButton>
+                  <Modal open={isImageOpen} onClose={handleImageClose}>
+                    <img
+                      className={classes.img}
+                      src={`${FILES_SERVER_URL}${row.content[0].attachment?.url?.replace(/^file:\/\//, '')}`}
+                      alt={row.description}
+                    />
+                  </Modal>
+                </>
+              )
+            )}
             <Dialog open={pdfDialogOpen} onClose={() => setDocumentDialogOpen(false)} maxWidth="xl">
               <DialogContent className={classes.dialogContent}>
                 {deidentified &&
@@ -203,15 +230,14 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
                       {!documentContent && <Typography>Le contenu du document est introuvable.</Typography>}
                     </>
                   ))}
-                {!deidentified && (
+                {!deidentified && row.content && row.content[0].attachment?.url?.endsWith('.pdf') && (
                   <Document
                     error={'Le document est introuvable.'}
                     loading={'PDF en cours de chargement...'}
                     file={{
-                      url: `${FHIR_API_URL}/Binary/${row.id}`,
+                      url: `${FILES_SERVER_URL}${row.content[0].attachment?.url?.replace(/^file:\/\//, '')}`,
                       httpHeaders: {
-                        Accept: 'application/pdf',
-                        Authorization: `Bearer ${localStorage.getItem('access')}`
+                        Accept: 'application/pdf'
                       }
                     }}
                     onLoadSuccess={({ numPages }) => setNumPages(numPages)}
@@ -237,16 +263,17 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
         </Grid>
       </Grid>
 
-      {showText && (
-        <Grid container item>
-          {row.section?.map((section) => (
-            <Grid key={section.title} container item direction="column">
-              <Typography variant="h6">{section.title}</Typography>
-              <Typography dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }} />
-            </Grid>
-          ))}
-        </Grid>
-      )}
+      {/* FIXME: commented out because of typing incompatibility */}
+      {/*{CONTEXT === 'aphp' && showText && (*/}
+      {/*  <Grid container item>*/}
+      {/*    {row.section?.map((section) => (*/}
+      {/*      <Grid key={section.title} container item direction="column">*/}
+      {/*        <Typography variant="h6">{section.title}</Typography>*/}
+      {/*        <Typography dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }} />*/}
+      {/*      </Grid>*/}
+      {/*    ))}*/}
+      {/*  </Grid>*/}
+      {/*)}*/}
     </Grid>
   )
 }

@@ -19,14 +19,7 @@ import TopBar from '../../components/TopBar/TopBar'
 import { fetchPatient } from '../../services/patient'
 
 import { CohortPatient, PMSIEntry } from 'types'
-import {
-  IClaim,
-  IComposition,
-  ICondition,
-  IEncounter,
-  IProcedure,
-  IDocumentReference
-} from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IClaim, ICondition, IEncounter, IProcedure, IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import clsx from 'clsx'
 import useStyles from './styles'
@@ -49,7 +42,7 @@ const Patient = () => {
   const [diagnosticTotal, setDiagnosticTotal] = useState(0)
   const [ghm, setGhm] = useState<PMSIEntry<IClaim>[] | undefined>(undefined)
   const [ghmTotal, setGhmTotal] = useState(0)
-  const [documents, setDocuments] = useState<(IComposition | IDocumentReference)[] | undefined>(undefined)
+  const [documents, setDocuments] = useState<IDocumentReference[] | undefined>(undefined)
   const [documentsTotal, setDocumentsTotal] = useState(0)
 
   const { open, cohort, deidentified } = useAppSelector((state) => ({

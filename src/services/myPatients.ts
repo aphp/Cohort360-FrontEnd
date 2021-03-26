@@ -1,56 +1,32 @@
+import { last } from 'lodash'
 import api from './api'
 import { CONTEXT } from '../constants'
-import { IComposition, IPatient, IEncounter, IIdentifier } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { CohortComposition, CohortPatient, FHIR_API_Response, CohortData } from '../types'
+import { IDocumentReference, IEncounter, IIdentifier, IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { CohortComposition, CohortData, CohortPatient, FHIR_API_Response } from '../types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import {
-  getGenderRepartitionMap,
-  getGenderRepartitionMapAphp,
   getAgeRepartitionMap,
   getAgeRepartitionMapAphp,
   getEncounterRepartitionMap,
   getEncounterRepartitionMapAphp,
+  getGenderRepartitionMap,
+  getGenderRepartitionMapAphp,
   getVisitRepartitionMap,
   getVisitRepartitionMapAphp
 } from 'utils/graphUtils'
 
-const getPatientInfos = async (deidentifiedBoolean: boolean, documents?: IComposition[], groupId?: string) => {
+const getPatientInfos = async (deidentifiedBoolean: boolean, documents?: IDocumentReference[], groupId?: string) => {
   if (!documents) {
     return []
   }
   const cohortDocuments = documents as CohortComposition[]
 
-  const listePatientsIds = cohortDocuments.map((e) => e.subject?.display?.substring(8)).join()
-
-  const groupFilter = groupId ? `&_list=${groupId}` : ''
-  const patients = await api.get<FHIR_API_Response<IPatient>>(
-    `/Patient?_id=${listePatientsIds}&_elements=extension,id,identifier${groupFilter}`
-  )
-
-  let listePatients = []
-  if (patients.data.resourceType === 'Bundle' && patients.data.entry) {
-    listePatients = patients?.data?.entry.map((e: any) => e.resource)
-  }
-
   for (const document of cohortDocuments) {
-    for (const patient of listePatients) {
-      if (document.subject?.display?.substring(8) === patient.id) {
-        document.idPatient = patient.id
-
-        if (deidentifiedBoolean) {
-          document.IPP = patient.id
-        } else if (patient.identifier) {
-          const ipp = patient.identifier.find((identifier: IIdentifier) => {
-            return identifier.type?.coding?.[0].code === 'IPP'
-          })
-          document.IPP = ipp.value
-        } else {
-          document.IPP = 'Inconnu'
-        }
-      }
-    }
+    document.idPatient = last(document.subject?.reference?.split('/'))
+    document.IPP = deidentifiedBoolean
+      ? last(document.subject?.reference?.split('/'))
+      : (document.subject?.identifier && document.subject?.identifier?.value) ?? 'Inconnu'
   }
-
   return cohortDocuments
 }
 
@@ -75,7 +51,7 @@ export const getLastEncounter = async (patients?: IPatient[]) => {
 
   for (const patient of cohortPatients) {
     for (const encounter of encountersVisits) {
-      if (patient.id === encounter?.[0].subject?.reference?.substring(8)) {
+      if (patient.id === last(encounter?.[0].subject?.reference?.split('/'))) {
         patient.lastEncounterName = encounter?.[0].serviceProvider?.display
         break
       } else {
@@ -167,29 +143,30 @@ export const fetchMyPatients = async (): Promise<CohortData | undefined> => {
   }
 }
 
-const getEncounterInfos = async (deidentifiedBoolean: boolean, documents?: IComposition[], groupId?: string) => {
+const getEncounterInfos = async (deidentifiedBoolean: boolean, documents?: IDocumentReference[], groupId?: string) => {
   if (!documents) {
     return []
   }
 
   const cohortDocuments = documents as CohortComposition[]
-  const listeEncounterIds = cohortDocuments.map((e) => e.encounter?.display?.substring(10)).join()
-
-  const groupFilter = groupId ? `&_list=${groupId}` : ''
+  const listeEncounterIds = cohortDocuments
+    .map((e) => e.context?.encounter && last(e.context.encounter[0]?.reference?.split('/')))
+    .filter((id) => !!id)
+    .join(',')
 
   const encounters = await api.get<FHIR_API_Response<IEncounter>>(
-    `/Encounter?_id=${listeEncounterIds}&type=VISIT&_elements=status,serviceProvider,identifier${groupFilter}`
+    `/Encounter?_id=${listeEncounterIds}&_elements=status,serviceProvider,identifier`
   )
 
   if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
-    return []
+    return documents
   }
 
   const listeEncounters = encounters.data.entry.map((e: any) => e.resource)
 
   for (const document of cohortDocuments) {
     for (const encounter of listeEncounters) {
-      if (document.encounter?.display?.substring(10) === encounter.id) {
+      if (document.context?.encounter && last(document.context.encounter[0].reference?.split('/')) === encounter.id) {
         document.encounterStatus = encounter.status
 
         if (encounter.serviceProvider) {
@@ -204,7 +181,7 @@ const getEncounterInfos = async (deidentifiedBoolean: boolean, documents?: IComp
           const nda = encounter.identifier.find((identifier: IIdentifier) => {
             return identifier.type?.coding?.[0].code === 'NDA'
           })
-          document.NDA = nda.value
+          document.NDA = nda?.value
         } else {
           document.NDA = 'Inconnu'
         }
@@ -215,10 +192,8 @@ const getEncounterInfos = async (deidentifiedBoolean: boolean, documents?: IComp
   return cohortDocuments
 }
 
-export const getInfos = async (deidentifiedBoolean: boolean, documents?: IComposition[], groupId?: string) => {
-  const docsComplets = await getPatientInfos(deidentifiedBoolean, documents, groupId).then(
+export const getInfos = async (deidentifiedBoolean: boolean, documents?: IDocumentReference[], groupId?: string) => {
+  return await getPatientInfos(deidentifiedBoolean, documents, groupId).then(
     async (docs) => await getEncounterInfos(deidentifiedBoolean, docs, groupId)
   )
-
-  return docsComplets
 }
