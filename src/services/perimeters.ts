@@ -152,6 +152,7 @@ export const fetchPerimetersInfos = async (perimeterIds: string[]): Promise<Coho
       const { patients, encounters } = patientsAndEncountersFromServices
 
       return {
+        name: 'Périmètres',
         originalPatients: patients,
         totalPatients: patients.length,
         encounters: encounters,
