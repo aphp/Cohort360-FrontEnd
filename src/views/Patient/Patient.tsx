@@ -19,13 +19,7 @@ import TopBar from '../../components/TopBar/TopBar'
 import { fetchPatient } from '../../services/patient'
 
 import { CohortPatient, PMSIEntry } from 'types'
-import {
-  IClaim,
-  ICondition,
-  IEncounter,
-  IProcedure,
-  IDocumentReference
-} from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IClaim, ICondition, IEncounter, IProcedure, IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import clsx from 'clsx'
 import useStyles from './styles'

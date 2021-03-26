@@ -128,7 +128,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
     encounterStatus:
       document.resourceType === 'DocumentReference'
         ? getEncounterStatus((document as CohortComposition).encounterStatus as EncounterStatusKind)
-        : getEncounterStatus(documentEncounter?.status) ?? '-',
+        : getEncounterStatus(documentEncounter?.status) ?? '-'
     // section: document.resourceType === 'DocumentReference' ? document.section : []
   }
   const date = row.date ? new Date(row.date).toLocaleDateString('fr-FR') : ''
