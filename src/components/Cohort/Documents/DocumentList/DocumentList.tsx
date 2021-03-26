@@ -129,7 +129,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
       document.resourceType === 'DocumentReference'
         ? getEncounterStatus((document as CohortComposition).encounterStatus as EncounterStatusKind)
         : getEncounterStatus(documentEncounter?.status) ?? '-',
-    section: []
+    // section: document.resourceType === 'DocumentReference' ? document.section : []
   }
   const date = row.date ? new Date(row.date).toLocaleDateString('fr-FR') : ''
   const hour = row.date
@@ -189,12 +189,13 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
             </Grid>
           </Grid>
           <Grid container item xs={1} justify="center">
-            {row.content && row.content[0] ? (
-              row.content[0].attachment?.url?.endsWith('.pdf') ? (
-                <IconButton onClick={() => openPdfDialog(row.id)}>
-                  <PdfIcon height="30px" fill="#ED6D91" />
-                </IconButton>
-              ) : (
+            {row.content && row.content[0] && row.content[0].attachment?.url?.endsWith('.pdf') ? (
+              <IconButton onClick={() => openPdfDialog(row.id)}>
+                <PdfIcon height="30px" fill="#ED6D91" />
+              </IconButton>
+            ) : (
+              row.content &&
+              row.content[0] && (
                 <>
                   <IconButton type="button" onClick={handleImageOpen}>
                     <ImageIcon />
@@ -208,7 +209,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
                   </Modal>
                 </>
               )
-            ) : null}
+            )}
             <Dialog open={pdfDialogOpen} onClose={() => setDocumentDialogOpen(false)} maxWidth="xl">
               <DialogContent className={classes.dialogContent}>
                 {deidentified &&
@@ -234,7 +235,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
                     error={'Le document est introuvable.'}
                     loading={'PDF en cours de chargement...'}
                     file={{
-                      url: FILES_SERVER_URL + row.content[0].attachment.url.replace(/^file:\/\//, ''),
+                      url: `${FILES_SERVER_URL}${row.content[0].attachment?.url?.replace(/^file:\/\//, '')}`,
                       httpHeaders: {
                         Accept: 'application/pdf'
                       }
@@ -262,7 +263,8 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
         </Grid>
       </Grid>
 
-      {/*{showText && (*/}
+      {/* FIXME: commented out because of typing incompatibility */}
+      {/*{CONTEXT === 'aphp' && showText && (*/}
       {/*  <Grid container item>*/}
       {/*    {row.section?.map((section) => (*/}
       {/*      <Grid key={section.title} container item direction="column">*/}

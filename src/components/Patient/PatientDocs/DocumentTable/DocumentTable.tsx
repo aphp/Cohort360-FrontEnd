@@ -116,12 +116,13 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
         <TableCell align="center">{row.serviceProvider}</TableCell>
         <TableCell align="center">{getStatusShip(row.status)}</TableCell>
         <TableCell align="center">
-          {row.content && row.content[0] ? (
-            row.content[0].attachment?.url?.endsWith('.pdf') ? (
-              <IconButton onClick={() => openPdfDialog(row.id)}>
-                <PdfIcon height="30px" fill="#ED6D91" />
-              </IconButton>
-            ) : (
+          {row.content && row.content[0] && row.content[0].attachment?.url?.endsWith('.pdf') ? (
+            <IconButton onClick={() => openPdfDialog(row.id)}>
+              <PdfIcon height="30px" fill="#ED6D91" />
+            </IconButton>
+          ) : (
+            row.content &&
+            row.content[0] && (
               <>
                 <IconButton type="button" onClick={handleImageOpen}>
                   <ImageIcon />
@@ -135,7 +136,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
                 </Modal>
               </>
             )
-          ) : null}
+          )}
         </TableCell>
       </TableRow>
 
@@ -161,7 +162,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
               error={'Le document est introuvable.'}
               loading={'PDF en cours de chargement...'}
               file={{
-                url: FILES_SERVER_URL + row.content[0].attachment.url.replace(/^file:\/\//, ''),
+                url: `${FILES_SERVER_URL}${row.content[0].attachment?.url?.replace(/^file:\/\//, '')}`,
                 httpHeaders: {
                   Accept: 'application/pdf'
                 }
