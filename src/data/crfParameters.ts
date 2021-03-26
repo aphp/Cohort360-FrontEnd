@@ -26,8 +26,8 @@ export const CRF_ATTRIBUTES: CrfParameter[] = [
     anonymize: true
   },
   {
-    officialName: 'Date of birth',
-    customName: 'Date of birth',
+    officialName: 'Birthdate',
+    customName: 'Birthdate',
     attr_type: 'quasiidentifying',
     hierarchy_type: 'date',
     anonymize: true
@@ -114,37 +114,31 @@ export const CRF_ATTRIBUTES: CrfParameter[] = [
     anonymize: false
   },
   {
-    officialName: 'General diagnostic',
-    customName: 'General diagnostic',
+    officialName: 'ICD-9 Diagnosis',
+    customName: 'ICD-9 Diagnosis',
     attr_type: 'sensitive',
     anonymize: true
   },
   {
-    officialName: 'Medication code',
-    customName: 'Medication code',
-    attr_type: 'sensitive',
-    type: 'text',
-    anonymize: true
-  },
-  {
-    officialName: 'Medication name',
-    customName: 'Medication name',
-    attr_type: 'sensitive',
-    type: 'text',
-    anonymize: true
-  },
-  {
-    officialName: 'Specific diagnostic code',
-    customName: 'Specific diagnostic code',
-    attr_type: 'sensitive',
-    type: 'text',
-    anonymize: true
-  },
-  {
-    officialName: 'Specific diagnostic text',
-    customName: 'Specific diagnostic text',
+    officialName: 'Medication',
+    customName: 'Medication',
     attr_type: 'sensitive',
     type: 'text',
     anonymize: true
   }
+  // NOTE : Keep it for later
+  // {
+  //   officialName: 'Specific diagnostic code',
+  //   customName: 'Specific diagnostic code',
+  //   attr_type: 'sensitive',
+  //   type: 'text',
+  //   anonymize: true
+  // },
+  // {
+  //   officialName: 'Specific diagnostic text',
+  //   customName: 'Specific diagnostic text',
+  //   attr_type: 'sensitive',
+  //   type: 'text',
+  //   anonymize: true
+  // }
 ]

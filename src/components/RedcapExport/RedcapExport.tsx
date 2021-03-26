@@ -32,17 +32,24 @@ import { CrfParameter, CRF_ATTRIBUTES } from '../../data/crfParameters'
 import useStyles from './styles'
 import api from 'services/apiJpyltime'
 
+/**
+ * 0 = Nominatif
+ * 1 = Anonymisé
+ * 2 = Pseudonymisé
+ */
+export type AnonymizationType = 0 | 1 | 2
+
 type RedcapExportProps = {
-  patientIds: string[]
   open: boolean
   onClose: () => void
   cohortName?: string
+  disabled?: boolean
 }
 
 export type ExportItem = CrfParameter & { id: string }
 
-const RedcapExport = (props: RedcapExportProps): JSX.Element => {
-  const [anonymization, setAnonymization] = useState<number>(2)
+const RedcapExport = ({ onClose, open, disabled, cohortName }: RedcapExportProps): JSX.Element => {
+  const [anonymization, setAnonymization] = useState<AnonymizationType>(2)
   const [isExportLoading, setIsExportLoading] = useState(false)
 
   const [crfAttribute, setCrfAttribute] = useState<ExportItem[]>([
@@ -55,7 +62,7 @@ const RedcapExport = (props: RedcapExportProps): JSX.Element => {
   const [error, setError] = useState(null)
 
   const handleAnonymization = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setAnonymization(event.target.value as number)
+    setAnonymization(event.target.value as AnonymizationType)
   }
 
   const handleAddButton = () => {
@@ -73,7 +80,7 @@ const RedcapExport = (props: RedcapExportProps): JSX.Element => {
         patient_ids: []
       })
       .then((response) => {
-        fileDownload(response.data, 'cohortExport.csv')
+        fileDownload(response.data, cohortName ? `${cohortName}.csv` : 'cohortExport.csv')
         setIsExportLoading(false)
       })
   }
@@ -95,9 +102,9 @@ const RedcapExport = (props: RedcapExportProps): JSX.Element => {
     <Dialog
       fullWidth={true}
       maxWidth={'lg'}
-      onClose={props.onClose}
+      onClose={onClose}
       aria-labelledby="simple-dialog-title"
-      open={props.open}
+      open={open}
       classes={{ paper: classes.dialogPaper }}
     >
       <DialogTitle id="simple-dialog-title" disableTypography>
@@ -148,7 +155,15 @@ const RedcapExport = (props: RedcapExportProps): JSX.Element => {
                   </TableHead>
                   <TableBody>
                     {crfAttribute.map((item, index) => {
-                      return <CohortItem item={item} key={index} onDelete={removeItem} onChange={handleChangeItem} />
+                      return (
+                        <CohortItem
+                          item={item}
+                          key={index}
+                          onDelete={removeItem}
+                          onChange={handleChangeItem}
+                          anonymization={anonymization}
+                        />
+                      )
                     })}
                   </TableBody>
                 </Table>
@@ -246,7 +261,7 @@ const RedcapExport = (props: RedcapExportProps): JSX.Element => {
           variant="contained"
           color="primary"
           onClick={exportCSV}
-          disabled={isExportLoading}
+          disabled={disabled || isExportLoading}
         >
           {isExportLoading ? <CircularProgress size={20} /> : 'Export'}
         </Button>
