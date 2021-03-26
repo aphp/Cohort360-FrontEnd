@@ -21,6 +21,13 @@ const useStyles = makeStyles(() => ({
       backgroundColor: '#FAF9F9'
     }
   },
+  img: {
+    width: '50%',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)'
+  },
   description: {
     fontWeight: 'bold'
   },

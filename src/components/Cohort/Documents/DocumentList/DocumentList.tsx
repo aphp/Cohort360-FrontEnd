@@ -12,9 +12,11 @@ import {
   DialogContent,
   Grid,
   IconButton,
+  Modal,
   Paper,
   Typography
 } from '@material-ui/core'
+import ImageIcon from '@material-ui/icons/Image'
 
 import DescriptionIcon from '@material-ui/icons/Description'
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital'
@@ -61,6 +63,10 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
   const [numPages, setNumPages] = useState<number>()
   const [loading, setLoading] = useState(false)
   const [documentContent, setDocumentContent] = useState<any>([])
+  const [isImageOpen, setIsImageOpen] = useState<boolean>(false)
+
+  const handleImageOpen = () => setIsImageOpen(true)
+  const handleImageClose = () => setIsImageOpen(false)
 
   const openPdfDialog = (documentId?: string) => {
     setDocumentDialogOpen(true)
@@ -183,10 +189,26 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
             </Grid>
           </Grid>
           <Grid container item xs={1} justify="center">
-            <IconButton onClick={() => openPdfDialog(row.id)}>
-              <PdfIcon height="30px" fill="#ED6D91" />
-            </IconButton>
-
+            {row.content && row.content[0] ? (
+              row.content[0].attachment?.url?.endsWith('.pdf') ? (
+                <IconButton onClick={() => openPdfDialog(row.id)}>
+                  <PdfIcon height="30px" fill="#ED6D91" />
+                </IconButton>
+              ) : (
+                <>
+                  <IconButton type="button" onClick={handleImageOpen}>
+                    <ImageIcon />
+                  </IconButton>
+                  <Modal open={isImageOpen} onClose={handleImageClose}>
+                    <img
+                      className={classes.img}
+                      src={`${FILES_SERVER_URL}${row.content[0].attachment?.url?.replace(/^file:\/\//, '')}`}
+                      alt={row.description}
+                    />
+                  </Modal>
+                </>
+              )
+            ) : null}
             <Dialog open={pdfDialogOpen} onClose={() => setDocumentDialogOpen(false)} maxWidth="xl">
               <DialogContent className={classes.dialogContent}>
                 {deidentified &&

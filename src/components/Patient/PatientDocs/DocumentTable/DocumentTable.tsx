@@ -10,6 +10,7 @@ import {
   DialogContent,
   Grid,
   IconButton,
+  Modal,
   Paper,
   Table,
   TableBody,
@@ -34,6 +35,7 @@ import {
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { getDocumentStatus } from 'utils/documentsFormatter'
 import { fetchDocumentContent } from 'services/cohortInfos'
+import ImageIcon from '@material-ui/icons/Image'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
@@ -47,6 +49,10 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
   const [numPages, setNumPages] = useState<number>()
   const [loading, setLoading] = useState(false)
   const [documentContent, setDocumentContent] = useState<any>([])
+  const [isImageOpen, setIsImageOpen] = useState<boolean>(false)
+
+  const handleImageOpen = () => setIsImageOpen(true)
+  const handleImageClose = () => setIsImageOpen(false)
 
   const openPdfDialog = (documentId?: string) => {
     setDocumentDialogOpen(true)
@@ -110,9 +116,26 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
         <TableCell align="center">{row.serviceProvider}</TableCell>
         <TableCell align="center">{getStatusShip(row.status)}</TableCell>
         <TableCell align="center">
-          <IconButton onClick={() => openPdfDialog(row.id)}>
-            <PdfIcon height="30px" fill="#ED6D91" />
-          </IconButton>
+          {row.content && row.content[0] ? (
+            row.content[0].attachment?.url?.endsWith('.pdf') ? (
+              <IconButton onClick={() => openPdfDialog(row.id)}>
+                <PdfIcon height="30px" fill="#ED6D91" />
+              </IconButton>
+            ) : (
+              <>
+                <IconButton type="button" onClick={handleImageOpen}>
+                  <ImageIcon />
+                </IconButton>
+                <Modal open={isImageOpen} onClose={handleImageClose}>
+                  <img
+                    className={classes.img}
+                    src={`${FILES_SERVER_URL}${row.content[0].attachment?.url?.replace(/^file:\/\//, '')}`}
+                    alt={row.description}
+                  />
+                </Modal>
+              </>
+            )
+          ) : null}
         </TableCell>
       </TableRow>
 

@@ -563,7 +563,7 @@ const getEncounterDocuments = async (
   })
 
   const documentsResp = await api.get<FHIR_API_Response<IDocumentReference>>(
-    `/DocumentReference?encounter=${encountersList}&_elements=status,type,subject,encounter,date,title`
+    `/DocumentReference?encounter=${encountersList}`
   )
 
   const documents =
@@ -604,7 +604,7 @@ const getProcedureDocuments = async (
   })
 
   const documentsResp = await api.get<FHIR_API_Response<IDocumentReference>>(
-    `/Composition?encounter=${encountersList}&_elements=status,type,subject,encounter,date,title`
+    `/Composition?encounter=${encountersList}`
   )
 
   const documents =

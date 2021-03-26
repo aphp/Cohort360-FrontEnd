@@ -23,6 +23,13 @@ const useStyles = makeStyles(() => ({
   textGrid: {
     marginLeft: '16px'
   },
+  img: {
+    width: '50%',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)'
+  },
   searchIcon: {
     padding: 0,
     marginLeft: 4
