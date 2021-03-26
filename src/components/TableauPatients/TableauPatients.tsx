@@ -1,4 +1,5 @@
 import React, { memo } from 'react'
+import { useHistory } from 'react-router-dom'
 import moment from 'moment'
 
 import {
@@ -85,6 +86,7 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
     sortDirection,
     onRequestSort
   }) => {
+    const history = useHistory()
     const classes = useStyles()
 
     const patientsToShow =
@@ -185,9 +187,12 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                         key={patient.id}
                         className={classes.tableBodyRows}
                         hover
-                        onClick={() =>
-                          window.open(`/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}`, '_blank')
-                        }
+                        onClick={() => {
+                          const href = history.createHref({
+                            pathname: `/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}`
+                          })
+                          window.open(href, '_blank')
+                        }}
                       >
                         <TableCell align="center">
                           {patient.gender && <PatientGender gender={patient.gender} className={classes.genderIcon} />}

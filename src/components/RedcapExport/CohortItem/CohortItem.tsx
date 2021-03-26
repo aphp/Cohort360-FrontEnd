@@ -10,18 +10,22 @@ import {
 
 import { CRF_ATTRIBUTES } from 'data/crfParameters'
 import useStyles from './styles'
-import { ExportItem } from '../RedcapExport'
+import { ExportItem, AnonymizationType } from '../RedcapExport'
 
 type CohortItemProps = {
   item: ExportItem
+  anonymization: AnonymizationType
   onDelete: (item: ExportItem) => void
   onChange: (item: ExportItem) => void
 }
 
-const CohortItem = ({ item, onDelete, onChange }: CohortItemProps): JSX.Element => {
+const CohortItem = ({ item, anonymization, onDelete, onChange }: CohortItemProps): JSX.Element => {
   const classes = useStyles()
 
   const names = CRF_ATTRIBUTES.map((x) => x.officialName)
+  const isAnonymizeItemDisabled =
+    item.attr_type === 'insensitive' ||
+    (anonymization === 2 ? ['First name', 'Last name', 'Identifier'].includes(item.officialName) : false)
 
   const getTextLabel = () => {
     let textLabel = `"${item.officialName}" est un attribut de type ${item.attr_type}, `
@@ -79,7 +83,7 @@ const CohortItem = ({ item, onDelete, onChange }: CohortItemProps): JSX.Element 
       <TableCell padding="none">
         <div className={classes.flex}>
           <Tooltip title={`La variable ${item.anonymize ? 'est' : "n'est pas"} anonymisée`}>
-            <IconButton onClick={handleChangeAnonymize} disabled={item.attr_type === 'insensitive'}>
+            <IconButton onClick={handleChangeAnonymize} disabled={isAnonymizeItemDisabled}>
               {item.anonymize ? <VisibilityOffIcon /> : <VisibilityIcon />}
             </IconButton>
           </Tooltip>

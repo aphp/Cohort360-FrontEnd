@@ -18,40 +18,55 @@ import {
   Select,
   Typography,
   Tooltip,
-  Grid
+  Grid,
+  CircularProgress
 } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 import CloseIcon from '@material-ui/icons/Close'
 import { Alert } from '@material-ui/lab'
 import { v4 as uuid } from 'uuid'
+import fileDownload from 'js-file-download'
 
 import CohortItem from './CohortItem/CohortItem'
 import { CrfParameter, CRF_ATTRIBUTES } from '../../data/crfParameters'
 import useStyles from './styles'
+import api from 'services/apiJpyltime'
+import { useAppSelector } from 'state'
+
+/**
+ * 0 = Nominatif
+ * 1 = Anonymisé
+ * 2 = Pseudonymisé
+ */
+export type AnonymizationType = 0 | 1 | 2
 
 type RedcapExportProps = {
-  patientIds: string[]
   open: boolean
   onClose: () => void
   cohortName?: string
+  disabled?: boolean
 }
 
 export type ExportItem = CrfParameter & { id: string }
 
-const RedcapExport = (props: RedcapExportProps): JSX.Element => {
-  const [anonymization, setAnonymization] = useState<number>(2)
+const RedcapExport = ({ onClose, open, disabled, cohortName }: RedcapExportProps): JSX.Element => {
+  const { patients, practitionerId } = useAppSelector((state) => ({
+    practitionerId: state.me?.id,
+    patients: state.exploredCohort.originalPatients
+  }))
 
+  const [anonymization, setAnonymization] = useState<AnonymizationType>(2)
+  const [isExportLoading, setIsExportLoading] = useState(false)
   const [crfAttribute, setCrfAttribute] = useState<ExportItem[]>([
     { ...CRF_ATTRIBUTES[0], id: uuid() },
     { ...CRF_ATTRIBUTES[1], id: uuid() },
     { ...CRF_ATTRIBUTES[2], id: uuid() }
   ])
-
   const [risk, setRisk] = useState(null)
   const [error, setError] = useState(null)
 
   const handleAnonymization = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setAnonymization(event.target.value as number)
+    setAnonymization(event.target.value as AnonymizationType)
   }
 
   const handleAddButton = () => {
@@ -61,7 +76,26 @@ const RedcapExport = (props: RedcapExportProps): JSX.Element => {
   }
 
   const exportCSV = () => {
-    ///
+    const attributes = crfAttribute.map(({ officialName: official_name, customName: custom_name, anonymize }) => ({
+      official_name,
+      custom_name,
+      anonymize
+    }))
+    const patient_ids = (patients?.map(({ id }) => id) ?? []) as string[]
+
+    setIsExportLoading(true)
+    api
+      .post(`fhir2dataset`, {
+        practitioner_id: practitionerId,
+        attributes,
+        patient_ids
+      })
+      .then((response) => {
+        fileDownload(response.data, cohortName ? `${cohortName}.csv` : 'cohortExport.csv')
+      })
+      .finally(() => {
+        setIsExportLoading(false)
+      })
   }
   const removeItem = (item: ExportItem) => {
     const idx = crfAttribute.findIndex(({ id }) => id === item.id)
@@ -81,9 +115,9 @@ const RedcapExport = (props: RedcapExportProps): JSX.Element => {
     <Dialog
       fullWidth={true}
       maxWidth={'lg'}
-      onClose={props.onClose}
+      onClose={onClose}
       aria-labelledby="simple-dialog-title"
-      open={props.open}
+      open={open}
       classes={{ paper: classes.dialogPaper }}
     >
       <DialogTitle id="simple-dialog-title" disableTypography>
@@ -134,7 +168,15 @@ const RedcapExport = (props: RedcapExportProps): JSX.Element => {
                   </TableHead>
                   <TableBody>
                     {crfAttribute.map((item, index) => {
-                      return <CohortItem item={item} key={index} onDelete={removeItem} onChange={handleChangeItem} />
+                      return (
+                        <CohortItem
+                          item={item}
+                          key={index}
+                          onDelete={removeItem}
+                          onChange={handleChangeItem}
+                          anonymization={anonymization}
+                        />
+                      )
                     })}
                   </TableBody>
                 </Table>
@@ -227,8 +269,14 @@ const RedcapExport = (props: RedcapExportProps): JSX.Element => {
             )
           )}
         </div>
-        <Button className={classes.exportButton} variant="contained" color="primary" onClick={exportCSV}>
-          Export
+        <Button
+          className={classes.exportButton}
+          variant="contained"
+          color="primary"
+          onClick={exportCSV}
+          disabled={disabled || isExportLoading}
+        >
+          {isExportLoading ? <CircularProgress size={20} /> : 'Export'}
         </Button>
       </div>
     </Dialog>
