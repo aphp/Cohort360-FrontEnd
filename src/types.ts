@@ -226,6 +226,7 @@ export type CohortData = {
   agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
   perimeterRepartitionData?: (SimpleChartDataType & { id?: string })[]
   requestId?: string
+  cohortType?: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'
 }
 
 export type PatientData = {

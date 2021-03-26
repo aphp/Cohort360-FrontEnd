@@ -16,7 +16,6 @@ export type ExploredCohortState = {
 } & CohortData
 
 const initialState: ExploredCohortState = {
-  // CohortData
   name: '',
   cohort: [],
   totalPatients: 0,
@@ -30,7 +29,6 @@ const initialState: ExploredCohortState = {
   monthlyVisitData: undefined,
   agePyramidData: undefined,
   requestId: '',
-  // ExploredCohortState
   importedPatients: [],
   includedPatients: [],
   excludedPatients: [],
@@ -70,7 +68,7 @@ const fetchExploredCohort = createAsyncThunk<
     default:
       break
   }
-  let cohort
+  let cohort: CohortData | undefined
   if (shouldRefreshData) {
     switch (context) {
       case 'cohort': {
@@ -95,7 +93,7 @@ const fetchExploredCohort = createAsyncThunk<
         break
     }
   }
-  return cohort ?? state.exploredCohort
+  return { ...cohort, cohortType: context } ?? state.exploredCohort
 })
 
 const exploredCohortSlice = createSlice({
