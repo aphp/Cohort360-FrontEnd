@@ -604,7 +604,7 @@ const getProcedureDocuments = async (
   })
 
   const documentsResp = await api.get<FHIR_API_Response<IDocumentReference>>(
-    `/Composition?encounter=${encountersList}`
+    `/DocumentReference?encounter=${encountersList}`
   )
 
   const documents =
@@ -740,7 +740,7 @@ export const fetchPatient = async (patientId: string, groupId?: string): Promise
       ),
       api.get<FHIR_API_Response<IClaim>>(`/Claim?patient=${patientId}&_sort=-created&size=20${groupFilter}`),
       api.get<FHIR_API_Response<IDocumentReference>>(
-        `/DocumentReference?patient=${patientId}&size=20&_sort=-date&status=final&_elements=status,type,encounter,date,title${groupFilter}`
+        `/Composition?patient=${patientId}&size=20&_sort=-date&status=final&_elements=status,type,encounter,date,title${groupFilter}`
       )
     ])
 
