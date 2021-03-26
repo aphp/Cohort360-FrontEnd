@@ -13,6 +13,7 @@ import {
   CircularProgress
 } from '@material-ui/core'
 import Typography from '@material-ui/core/Typography'
+import { Skeleton } from '@material-ui/lab'
 
 import PieChart from './Charts/PieChart'
 import BarChart from './Charts/BarChart'
@@ -28,7 +29,7 @@ import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import displayDigit from 'utils/displayDigit'
 
 import { ComplexChartDataType, SimpleChartDataType, Month } from 'types'
-import { Skeleton } from '@material-ui/lab'
+import { useAppSelector } from 'state'
 
 type RepartitionTableProps = {
   genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
@@ -116,9 +117,11 @@ const Preview: React.FC<PreviewProps> = ({
   loading
 }) => {
   const classes = useStyles()
+  const cohortType = useAppSelector((state) => state.exploredCohort.cohortType)
   const title = group.name
 
   const { vitalStatusData, genderData } = getGenderRepartitionSimpleData(genderRepartitionMap)
+  const isExploringCohort = cohortType === 'cohort'
 
   return (
     <Grid container direction="column" alignItems="center" className={classes.root}>
@@ -176,9 +179,11 @@ const Preview: React.FC<PreviewProps> = ({
           </Grid>
         </Grid>
 
-        <Grid item xs={12}>
-          <CohortOrgaRepartitionCard loading={loading} />
-        </Grid>
+        {isExploringCohort ? (
+          <Grid item xs={12}>
+            <CohortOrgaRepartitionCard loading={loading} />
+          </Grid>
+        ) : null}
 
         <Grid container>
           <Grid container item xs={12} sm={6} md={4} justify="center">

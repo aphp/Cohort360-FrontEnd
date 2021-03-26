@@ -58,7 +58,7 @@ export const getPerimeters = async (practitionerId: string) => {
   }
 }
 
-export const getScopePerimeters = async (): Promise<ScopeTreeRow[]> => {
+export const getScopePerimeters = async (practitionerOrgaIds: string[]): Promise<ScopeTreeRow[]> => {
   if (CONTEXT === 'fakedata') {
     const scopeRows = fakeScopeRows as ScopeTreeRow[]
 
@@ -81,7 +81,7 @@ export const getScopePerimeters = async (): Promise<ScopeTreeRow[]> => {
       name: result.service.name || '',
       quantity: result.patientCount,
       subItems: [],
-      access: true
+      access: practitionerOrgaIds.includes(result.service.id as string)
     }))
   }
   return []
