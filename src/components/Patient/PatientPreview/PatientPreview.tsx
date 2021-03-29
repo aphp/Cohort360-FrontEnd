@@ -55,7 +55,6 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentified }
   const lastProcedure = patient.lastProcedure
     ? patient.lastProcedure?.code?.coding?.[0].code && patient.lastProcedure?.code?.coding?.[0].display
     : '-'
-  const lastGhm = patient.lastGhm ? patient.lastGhm?.diagnosis?.[0].packageCode?.coding?.[0].display : '-'
 
   return (
     <Grid container direction="column" alignItems="center">
@@ -75,8 +74,8 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentified }
           <PatientField fieldName="Dernière prise en charge" fieldValue={lastEncounter} />
           <PatientField fieldName="Durée de prise en charge" fieldValue={lastEncounterDuration} />
           <PatientField fieldName="Dernier acte" fieldValue={lastProcedure} />
-          <PatientField fieldName="Dernier GHM" fieldValue={lastGhm} />
-          {patient.labResults && (
+          {/* <PatientField fieldName="Dernier GHM" fieldValue={lastGhm} /> */}
+          {/* {patient.labResults && (
             <PatientField
               fieldName="Derniers résultats de laboratoire"
               fieldValue={`${patient.lastLabResults?.code?.coding?.[0].display} ${
@@ -90,10 +89,10 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentified }
                   : ''
               }`}
             />
-          )}
+          )} */}
           {patient.inclusion && (
             <PatientField
-              fieldName="Inclusion du patient dans un essai clinique"
+              fieldName="Patient déjà présent dans une cohorte"
               fieldValue={patient.inclusion ? 'Oui' : 'Non'}
             />
           )}

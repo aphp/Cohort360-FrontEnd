@@ -51,7 +51,6 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   const encounters = useAppSelector((state) => state.exploredCohort.encounters)
   const [page, setPage] = useState(1)
   const [documentsNumber, setDocumentsNumber] = useState<number | undefined>(0)
-  const [allDocumentsNumber, setAllDocumentsNumber] = useState<number | undefined>(0)
   const [documents, setDocuments] = useState<(CohortComposition | IDocumentReference)[]>([])
   const [loadingStatus, setLoadingStatus] = useState(true)
   const [searchInput, setSearchInput] = useState('')
@@ -100,18 +99,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     )
       .then((result) => {
         if (result) {
-          const {
-            totalDocs,
-            totalAllDocs,
-            documentsList
-            // wordcloudData
-          } = result
+          const { totalDocs, documentsList } = result
           setDocuments(documentsList)
-          // if (wordcloudData) {
-          //   setWordcloudData(wordcloudData)
-          // }
           setDocumentsNumber(totalDocs)
-          setAllDocumentsNumber(totalAllDocs)
           setPage(page)
         }
       })
@@ -196,28 +186,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
         <Typography variant="h2" className={classes.pageTitle}>
           Documents cliniques
         </Typography>
-
-        {/* <Grid container spacing={3}>
-          <Grid item xs={12}>
-            {wordcloudData && (
-              <Paper className={classes.chartOverlay}>
-                <Grid container item className={classes.chartTitle}>
-                  <Typography variant="h3" color="primary">
-                    Mots les plus fréquents
-                  </Typography>
-                </Grid> */}
-        {/* @ts-ignore */}
-        {/* <WordCloud wordcloudData={wordcloudData} />
-              </Paper>
-            )}
-          </Grid>
-        </Grid> */}
-
         <Grid container item justify="flex-end" className={classes.tableGrid}>
           <Grid container justify="space-between" alignItems="center">
-            <Typography variant="button">
-              {displayDigit(documentsNumber ?? 0)} / {displayDigit(allDocumentsNumber ?? 0)} document(s)
-            </Typography>
+            <Typography variant="button">{displayDigit(documentsNumber ?? 0)} document(s)</Typography>
             <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
               <div className={classes.documentButtons}>
                 <Grid item container xs={10} alignItems="center" className={classes.searchBar}>

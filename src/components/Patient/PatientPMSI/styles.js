@@ -12,7 +12,7 @@ export default makeStyles((theme) =>
       margin: '0 auto'
     },
     documentButtons: {
-      display: 'flex',
+      display: 'none',
       justifyContent: 'flex-end'
     },
     searchBar: {

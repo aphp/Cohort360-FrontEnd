@@ -171,9 +171,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
   return (
     <Grid container item xs={11} justify="flex-end" className={classes.documentTable}>
       <Grid container justify="space-between" alignItems="center">
-        <Typography variant="button">
-          {totalDocs} / {total} document(s)
-        </Typography>
+        <Typography variant="button">{totalDocs} document(s)</Typography>
         <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
           <div className={classes.documentButtons}>
             <Grid item container xs={10} alignItems="center" className={classes.searchBar}>

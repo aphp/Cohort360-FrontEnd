@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 // import { useHistory } from 'react-router'
 import {
   Grid,
@@ -31,20 +31,9 @@ import PropTypes from 'prop-types'
 import useStyles from './styles'
 import ScopeTree from '../../ScopeTree/ScopeTree'
 import Research from '../../SavedResearch/ResearchCard'
-import {
-  addImportedPatients,
-  excludePatients,
-  includePatients,
-  removeImportedPatients,
-  removeExcludedPatients
-  // updateCohort
-} from '../../../state/exploredCohort'
 import { getAgeArkhn } from '../../../utils/age'
 import { ReactComponent as FemaleIcon } from '../../../assets/icones/venus.svg'
 import { ReactComponent as MaleIcon } from '../../../assets/icones/mars.svg'
-
-import { getPatientsFromPerimeter, getPatientsFromCohortId } from 'services/patient'
-// import { patchCohortMembers } from 'services/cohortCreation'
 
 const PatientRow = ({ patient, selected, fromCohort, onClickCheckbox }) => {
   const classes = useStyles()
@@ -90,32 +79,17 @@ PatientRow.propType = {
 }
 
 const ImportPatientMenu = ({ anchorEl, handleClose, setOpenModal, setModalContent }) => {
-  const dispatch = useDispatch()
-  const practitioner = useSelector((state) => state.practitioner)
   const cohort = useSelector((state) => state.exploredCohort)
 
   const classes = useStyles()
 
-  const importPatientsFromPerimeter = useCallback(async (providers) => {
-    const patients = await getPatientsFromPerimeter(providers)
-    dispatch(addImportedPatients(patients))
-  }, []) //eslint-disable-line
+  const importPatientsFromPerimeter = useCallback(async (providers) => {}, []) //eslint-disable-line
 
-  const importPatientsFromCohortId = useCallback(async (cohortId) => {
-    const patients = await getPatientsFromCohortId(cohortId)
-    dispatch(addImportedPatients(patients))
-  }, []) //eslint-disable-line
+  const importPatientsFromCohortId = useCallback(async (cohortId) => {}, []) //eslint-disable-line
 
   return anchorEl !== undefined ? (
     <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
-      <MenuItem
-        onClick={() => {
-          dispatch(addImportedPatients(practitioner.patients))
-          handleClose()
-        }}
-      >
-        Tous mes patients
-      </MenuItem>
+      <MenuItem>Tous mes patients</MenuItem>
       <MenuItem
         onClick={() => {
           setModalContent(
@@ -154,14 +128,7 @@ const ImportPatientMenu = ({ anchorEl, handleClose, setOpenModal, setModalConten
     </Menu>
   ) : (
     <>
-      <Link
-        component="button"
-        underline="always"
-        classes={{ root: classes.buttonLink }}
-        onClick={() => {
-          dispatch(addImportedPatients(practitioner.patients))
-        }}
-      >
+      <Link component="button" underline="always" classes={{ root: classes.buttonLink }}>
         Tous mes patients
       </Link>
       <Link
@@ -322,7 +289,6 @@ const PatientSelectableList = ({ patients, cohortPatients, onChangeSelection, se
 }
 
 const ImportPatientsContent = ({ setModalContent, setOpenModal }) => {
-  const dispatch = useDispatch()
   const classes = useStyles()
 
   const importedPatients = useSelector((state) => state.exploredCohort.importedPatients)
@@ -345,7 +311,6 @@ const ImportPatientsContent = ({ setModalContent, setOpenModal }) => {
               disabled={selectedPatients.length === 0}
               variant="contained"
               onClick={() => {
-                dispatch(includePatients(selectedPatients))
                 setSelectedPatients([])
               }}
             >
@@ -355,7 +320,6 @@ const ImportPatientsContent = ({ setModalContent, setOpenModal }) => {
               disabled={selectedPatients.length === 0}
               variant="contained"
               onClick={() => {
-                dispatch(removeImportedPatients(selectedPatients))
                 setSelectedPatients([])
               }}
             >
@@ -374,7 +338,6 @@ ImportPatientsContent.propType = {
 }
 
 const InclusionExclusionContent = ({ include }) => {
-  const dispatch = useDispatch()
   const classes = useStyles()
   const patients = useSelector((state) =>
     include ? state.exploredCohort.includedPatients : state.exploredCohort.excludedPatients
@@ -398,11 +361,6 @@ const InclusionExclusionContent = ({ include }) => {
               disabled={selectedPatients.length === 0}
               variant="contained"
               onClick={() => {
-                if (include) {
-                  dispatch(excludePatients(selectedPatients))
-                } else {
-                  dispatch(removeExcludedPatients(selectedPatients))
-                }
                 setSelectedPatients([])
               }}
             >
