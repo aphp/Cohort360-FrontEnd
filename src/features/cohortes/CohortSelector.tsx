@@ -5,7 +5,9 @@ import { SimpleChartDataType } from 'types'
 
 const self = (state: RootState) => state
 
-const cohortOrgaRepartitionDataSelector = createSelector(self, (state): SimpleChartDataType[] | null => {
+const cohortOrgaRepartitionDataSelector = createSelector(self, (state):
+  | (SimpleChartDataType & { id?: string })[]
+  | null => {
   const practitionerOrganizations = state.me?.organizations
   const { perimeterRepartitionData } = state.exploredCohort
 
@@ -13,8 +15,8 @@ const cohortOrgaRepartitionDataSelector = createSelector(self, (state): SimpleCh
     return null
   }
 
-  return perimeterRepartitionData.map(({ id, ...data }) => {
-    const isOrgaInScope = practitionerOrganizations?.some((orga) => orga.id === id)
+  return perimeterRepartitionData.map((data) => {
+    const isOrgaInScope = practitionerOrganizations?.some((orga) => orga.id === data.id)
     return {
       ...data,
       color: isOrgaInScope ? '#16BDFF' : '#777777'
@@ -64,8 +66,23 @@ const areCohortOrgaAccessRequestPendingSelector = createSelector(
   }
 )
 
+const showCreateAccessRequestAlertSelector = createSelector(
+  [cohortOrgaRepartitionDataSelector, orgaIdsOutOfPractitionerPerimeterSelector],
+  (orgaRepartitionData, orgaIdsOutOfPractitionerPerimeter) => {
+    if (orgaRepartitionData && orgaIdsOutOfPractitionerPerimeter) {
+      for (const { id: orgaId, value } of orgaRepartitionData) {
+        if (value > 0 && orgaId && orgaIdsOutOfPractitionerPerimeter.includes(orgaId)) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+)
+
 export {
   cohortOrgaRepartitionDataSelector,
   orgaIdsOutOfPractitionerPerimeterSelector,
-  areCohortOrgaAccessRequestPendingSelector
+  areCohortOrgaAccessRequestPendingSelector,
+  showCreateAccessRequestAlertSelector
 }

@@ -4,8 +4,8 @@ import { makeStyles, Paper, Grid, Typography, CircularProgress } from '@material
 
 import {
   cohortOrgaRepartitionDataSelector,
-  orgaIdsOutOfPractitionerPerimeterSelector,
-  areCohortOrgaAccessRequestPendingSelector
+  areCohortOrgaAccessRequestPendingSelector,
+  showCreateAccessRequestAlertSelector
 } from './CohortSelector'
 import BarChart from 'components/Cohort/Preview/Charts/BarChart'
 import { useAppSelector, useAppDispatch } from 'state'
@@ -52,8 +52,8 @@ const CohortOrgaRepartitionCard = ({ loading }: CohortOrgaRepartitionCardProps):
   const classes = useStyles()
   const dispatch = useAppDispatch()
   const perimeterRepartitionData = useAppSelector(cohortOrgaRepartitionDataSelector)
-  const orgaIdsOutOfPractitionerPerimeter = useAppSelector(orgaIdsOutOfPractitionerPerimeterSelector)
   const pendingData = useAppSelector(areCohortOrgaAccessRequestPendingSelector)
+  const showAlert = useAppSelector(showCreateAccessRequestAlertSelector)
   const [isLoadingPendingReqquests, setIsLoadingPendingRequests] = useState(false)
 
   const isAllAccessRequestsArePending = pendingData?.pending
@@ -94,7 +94,7 @@ const CohortOrgaRepartitionCard = ({ loading }: CohortOrgaRepartitionCardProps):
             <BarChart data={perimeterRepartitionData ?? []} width={500} />
           </Grid>
           <Grid item xs={12} lg={6} container alignItems="center">
-            {orgaIdsOutOfPractitionerPerimeter && orgaIdsOutOfPractitionerPerimeter.length > 0 && (
+            {showAlert && (
               <Alert severity="warning">
                 <div className={classes.alertContentContainer}>
                   <Typography gutterBottom>
