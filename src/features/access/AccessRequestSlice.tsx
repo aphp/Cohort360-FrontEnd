@@ -13,6 +13,8 @@ import { FHIR_API_Response } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import { orgaIdsOutOfPractitionerPerimeterSelector } from 'features/cohortes/CohortSelector'
 
+const MAX_PATIENTS = 500
+
 export type AccessRequestState = {
   authors: IPractitioner[]
   practitionerRoles: IPractitionerRole[]
@@ -30,7 +32,7 @@ const fetchAccessRequests = createAsyncThunk<AccessRequestState, void, { state: 
     const pendingRequestsData = isSuperUser
       ? getApiResponseResources(
           await api.get<FHIR_API_Response<IPractitionerRole | IPractitioner | IOrganization>>(
-            `PractitionerRole?permission-status=proposed&_include=PractitionerRole:practitioner&_include=PractitionerRole:organization&_count=500`
+            `PractitionerRole?permission-status=proposed&_include=PractitionerRole:practitioner&_include=PractitionerRole:organization&_count=${MAX_PATIENTS}`
           )
         )
       : []

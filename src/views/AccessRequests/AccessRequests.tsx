@@ -1,19 +1,25 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import clsx from 'clsx'
 
 import { Container, Divider, Grid, Paper, Typography } from '@material-ui/core'
 
 import RequestItem from 'features/access/RequestItem'
 import useStyles from './styles'
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
+import { fetchAccessRequests } from 'features/access/AccessRequestSlice'
 import { accessRequestsSelector } from 'features/access/RequestSelector'
 
 const AccessRequests = () => {
   const classes = useStyles()
+  const dispatch = useAppDispatch()
   const { open, requests } = useAppSelector((state) => ({
     open: state.drawer,
     requests: accessRequestsSelector(state)
   }))
+
+  useEffect(() => {
+    dispatch(fetchAccessRequests())
+  }, [dispatch])
 
   return (
     <Container
