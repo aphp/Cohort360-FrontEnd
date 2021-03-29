@@ -69,17 +69,14 @@ const areCohortOrgaAccessRequestPendingSelector = createSelector(
 const showCreateAccessRequestAlertSelector = createSelector(
   [cohortOrgaRepartitionDataSelector, orgaIdsOutOfPractitionerPerimeterSelector],
   (orgaRepartitionData, orgaIdsOutOfPractitionerPerimeter) => {
-    let showCard = false
     if (orgaRepartitionData && orgaIdsOutOfPractitionerPerimeter) {
       for (const { id: orgaId, value } of orgaRepartitionData) {
         if (value > 0 && orgaId && orgaIdsOutOfPractitionerPerimeter.includes(orgaId)) {
-          showCard = true
-          break
+          return true
         }
       }
     }
-
-    return showCard
+    return false
   }
 )
 
