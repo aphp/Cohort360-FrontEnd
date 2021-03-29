@@ -69,7 +69,7 @@ const filterPatientList = (
     let includePatient = true
 
     // Age filter
-    if (isNaN(agePatient) || agePatient < ageMin || agePatient > ageMax) {
+    if (isNaN(agePatient) || agePatient < ageMin || (agePatient > ageMax && ageMax < 130)) {
       includePatient = false
     }
 
