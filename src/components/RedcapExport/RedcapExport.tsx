@@ -43,17 +43,15 @@ export type AnonymizationType = 0 | 1 | 2
 type RedcapExportProps = {
   open: boolean
   onClose: () => void
+  cohortId: string
   cohortName?: string
   disabled?: boolean
 }
 
 export type ExportItem = CrfParameter & { id: string }
 
-const RedcapExport = ({ onClose, open, disabled, cohortName }: RedcapExportProps): JSX.Element => {
-  const { patients, practitionerId } = useAppSelector((state) => ({
-    practitionerId: state.me?.id,
-    patients: state.exploredCohort.originalPatients
-  }))
+const RedcapExport = ({ onClose, open, cohortId, disabled, cohortName }: RedcapExportProps): JSX.Element => {
+  const practitionerId = useAppSelector((state) => state.me?.id)
 
   const [anonymization, setAnonymization] = useState<AnonymizationType>(2)
   const [isExportLoading, setIsExportLoading] = useState(false)
@@ -81,14 +79,13 @@ const RedcapExport = ({ onClose, open, disabled, cohortName }: RedcapExportProps
       custom_name,
       anonymize
     }))
-    const patient_ids = (patients?.map(({ id }) => id) ?? []) as string[]
 
     setIsExportLoading(true)
     api
       .post(`fhir2dataset`, {
         practitioner_id: practitionerId,
-        attributes,
-        patient_ids
+        cohort_id: cohortId,
+        attributes
       })
       .then((response) => {
         fileDownload(response.data, cohortName ? `${cohortName}.csv` : 'cohortExport.csv')
