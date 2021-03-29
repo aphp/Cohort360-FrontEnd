@@ -27,14 +27,15 @@ import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
 import LockIcon from '@material-ui/icons/Lock'
 import ClearIcon from '@material-ui/icons/Clear'
 
-import { fetchPatientList } from '../../../services/cohortInfos'
-import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { CohortPatient, SimpleChartDataType, ComplexChartDataType, SearchByTypes, VitalStatus } from 'types'
-import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
+import { PatientGenderKind, IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { CohortPatient, ComplexChartDataType, SearchByTypes, VitalStatus } from 'types'
+import { getGenderRepartitionSimpleData, getAgeRepartitionMap, getGenderRepartitionMap } from 'utils/graphUtils'
 
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from './styles'
+import { useAppSelector } from 'state'
+import { getAge } from 'utils/age'
 
 type PatientListProps = {
   total: number
@@ -46,27 +47,98 @@ type PatientListProps = {
   genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
 }
 
-const PatientList: React.FC<PatientListProps> = ({
-  groupId,
-  total,
-  deidentified,
-  patients,
-  agePyramidData,
-  genderRepartitionMap
-}) => {
+const filterPatientList = (
+  patients: IPatient[],
+  page: number,
+  searchBy: SearchByTypes,
+  searchInput: string,
+  gender: PatientGenderKind,
+  age: [number, number],
+  vitalStatus: VitalStatus,
+  sortBy: string,
+  sortDirection: string,
+  groupId?: string,
+  includeFacets?: boolean
+) => {
+  const filteredPatients: IPatient[] = patients.filter((patient) => {
+    const lowerCaseSearchInput = searchInput.toLowerCase()
+    const agePatient = parseInt(getAge(patient))
+    const genderPatient = patient.gender
+    const vitalStatusPatient = patient.deceasedDateTime ? VitalStatus.deceased : VitalStatus.alive
+    const [ageMin, ageMax] = age
+    let includePatient = true
+
+    // Age filter
+    if (isNaN(agePatient) || agePatient < ageMin || agePatient > ageMax) {
+      includePatient = false
+    }
+
+    // Vital status filter
+    if (vitalStatus !== VitalStatus.all && vitalStatusPatient !== vitalStatus) {
+      includePatient = false
+    }
+
+    // Gender filter
+    if (gender !== PatientGenderKind._unknown && genderPatient !== gender) {
+      includePatient = false
+    }
+
+    // Input filter
+    if (searchInput !== '') {
+      const patientName = patient.name?.[0]
+      const familyName = patientName?.family ?? ''
+      const givenName = patientName?.given?.[0] ?? ''
+      const ipp = patient.identifier?.[0].value
+      switch (searchBy) {
+        case SearchByTypes.text: {
+          includePatient =
+            givenName.toLowerCase().includes(lowerCaseSearchInput) ||
+            familyName.toLowerCase().includes(lowerCaseSearchInput) ||
+            ipp === lowerCaseSearchInput
+          break
+        }
+        case SearchByTypes.family: {
+          includePatient = familyName.toLowerCase().includes(lowerCaseSearchInput)
+          break
+        }
+        case SearchByTypes.given: {
+          includePatient = givenName.toLowerCase().includes(lowerCaseSearchInput)
+          break
+        }
+        case SearchByTypes.identifier:
+          includePatient = ipp === lowerCaseSearchInput
+          break
+
+        default:
+          break
+      }
+    }
+
+    return includePatient
+  })
+
+  return {
+    totalPatients: filteredPatients.length,
+    originalPatients: filteredPatients,
+    agePyramidData: getAgeRepartitionMap(filteredPatients),
+    genderRepartitionMap: getGenderRepartitionMap(filteredPatients)
+  }
+}
+
+const PatientList: React.FC<PatientListProps> = ({ groupId, deidentified }) => {
   const classes = useStyles()
   const [page, setPage] = useState(1)
-  const [totalPatients, setTotalPatients] = useState(total)
-  const [patientsList, setPatientsList] = useState(patients)
-  const [loadingStatus, setLoadingStatus] = useState(false)
+
+  const { originalPatients, loading, agePyramidData, genderRepartitionMap } = useAppSelector(
+    (state) => state.exploredCohort
+  )
+
+  const [totalPatients, setTotalPatients] = useState(originalPatients?.length ?? 0)
+  const [patientsList, setPatientsList] = useState(originalPatients)
   const [searchInput, setSearchInput] = useState('')
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
-  const [agePyramid, setAgePyramid] = useState<
-    ComplexChartDataType<number, { male: number; female: number; other?: number }> | undefined
-  >(undefined)
-  const [patientData, setPatientData] = useState<
-    { vitalStatusData?: SimpleChartDataType[]; genderData?: SimpleChartDataType[] } | undefined
-  >(undefined)
+  const [agePyramid, setAgePyramid] = useState(agePyramidData)
+  const [patientData, setPatientData] = useState(getGenderRepartitionSimpleData(genderRepartitionMap))
   const [open, setOpen] = useState(false)
   const [gender, setGender] = useState<PatientGenderKind>(PatientGenderKind._unknown)
   const [age, setAge] = useState<[number, number]>([0, 130])
@@ -76,16 +148,17 @@ const PatientList: React.FC<PatientListProps> = ({
   const [showFilterChip, setShowFilterChip] = useState(false)
 
   useEffect(() => {
+    setTotalPatients(originalPatients?.length ?? 0)
+    setPatientsList(originalPatients)
+  }, [originalPatients])
+
+  useEffect(() => {
     setAgePyramid(agePyramidData)
   }, [agePyramidData])
 
   useEffect(() => {
     setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
   }, [genderRepartitionMap])
-
-  useEffect(() => {
-    setPatientsList(patients)
-  }, [patients])
 
   const handleOpenDialog = () => {
     setOpen(true)
@@ -98,13 +171,8 @@ const PatientList: React.FC<PatientListProps> = ({
     pageValue = 1,
     includeFacets: boolean
   ) => {
-    setLoadingStatus(true)
-    // Set loader on chart
-    if (includeFacets) {
-      setPatientData(undefined)
-      setAgePyramid(undefined)
-    }
-    fetchPatientList(
+    const result = filterPatientList(
+      originalPatients ?? [],
       pageValue,
       searchBy,
       input,
@@ -116,21 +184,16 @@ const PatientList: React.FC<PatientListProps> = ({
       groupId,
       includeFacets
     )
-      .then((result) => {
-        if (result) {
-          const { totalPatients, originalPatients, genderRepartitionMap, agePyramidData } = result
-          setPatientsList(originalPatients)
-          if (includeFacets) {
-            setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
-            setAgePyramid(agePyramidData)
-          }
-          setTotalPatients(totalPatients)
-        }
-      })
-      .catch((error) => console.log(error))
-      .finally(() => {
-        setLoadingStatus(false)
-      })
+
+    if (result) {
+      const { totalPatients, originalPatients, genderRepartitionMap, agePyramidData } = result
+      setPatientsList(originalPatients)
+      if (includeFacets) {
+        setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
+        setAgePyramid(agePyramidData)
+      }
+      setTotalPatients(totalPatients)
+    }
   }
 
   const onSearchPatient = (sortBy = 'given', sortDirection = 'asc', input = searchInput) => {
@@ -164,10 +227,6 @@ const PatientList: React.FC<PatientListProps> = ({
 
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value = 1) => {
     setPage(value)
-    //We only fetch patients if we don't already have them
-    if (patients && patients.length < totalPatients) {
-      fetchPatients(sortBy, sortDirection, searchInput, value, false)
-    }
   }
 
   const handleClearInput = () => {
@@ -240,7 +299,7 @@ const PatientList: React.FC<PatientListProps> = ({
                   Répartition par genre
                 </Typography>
               </Grid>
-              {patientData === undefined || (patientData && patientData.genderData === undefined) ? (
+              {loading ? (
                 <Grid container justify="center" alignItems="center">
                   <CircularProgress />
                 </Grid>
@@ -258,7 +317,7 @@ const PatientList: React.FC<PatientListProps> = ({
                   Répartition par statut vital
                 </Typography>
               </Grid>
-              {patientData === undefined || (patientData && patientData.vitalStatusData === undefined) ? (
+              {loading ? (
                 <Grid container justify="center" alignItems="center">
                   <CircularProgress />
                 </Grid>
@@ -277,7 +336,7 @@ const PatientList: React.FC<PatientListProps> = ({
                   Pyramide des âges
                 </Typography>
               </Grid>
-              {agePyramid === undefined ? (
+              {loading ? (
                 <Grid container justify="center" alignItems="center">
                   <CircularProgress />
                 </Grid>
@@ -291,9 +350,7 @@ const PatientList: React.FC<PatientListProps> = ({
         </Grid>
         <Grid container item justify="flex-end" className={classes.tableGrid}>
           <Grid container justify="space-between" alignItems="center">
-            <Typography variant="button">
-              {displayDigit(totalPatients)} / {displayDigit(total)} patient(s)
-            </Typography>
+            <Typography variant="button">{loading ? '-' : `${displayDigit(totalPatients)} patient(s)`}</Typography>
             <div className={classes.tableButtons}>
               {deidentified ? (
                 <Grid container alignItems="center">
@@ -386,7 +443,7 @@ const PatientList: React.FC<PatientListProps> = ({
             groupId={groupId}
             deidentified={deidentified}
             patients={patientsList ?? []}
-            loading={patientsList === undefined ? true : loadingStatus}
+            loading={loading}
             onChangePage={handleChangePage}
             page={page}
             totalPatientCount={totalPatients}
