@@ -676,8 +676,8 @@ export const fetchPatient = async (patientId: string, groupId?: string): Promise
       groupResponse
     ] = await Promise.all([
       api.get<FHIR_API_Response<IPatient>>(`/Patient?_id=${patientId}${API_RESOURCE_TAG}`),
-      api.get<FHIR_API_Response<IEncounter>>(`/Encounter?subject=${patientId}?_sort=date${API_RESOURCE_TAG}`),
-      api.get<FHIR_API_Response<IProcedure>>(`/Procedure?subject=${patientId}${API_RESOURCE_TAG}`),
+      api.get<FHIR_API_Response<IEncounter>>(`/Encounter?subject=${patientId}&_sort=date${API_RESOURCE_TAG}`),
+      api.get<FHIR_API_Response<IProcedure>>(`/Procedure?subject=${patientId}&_sort=date${API_RESOURCE_TAG}`),
       api.get<FHIR_API_Response<IDocumentReference>>(`/DocumentReference?subject=${patientId}${API_RESOURCE_TAG}`),
       api.get<FHIR_API_Response<ICondition>>(`/Condition?subject=${patientId}${API_RESOURCE_TAG}`),
       api.get<FHIR_API_Response<IClaim>>(`/Claim?patient=${patientId}${API_RESOURCE_TAG}`),
