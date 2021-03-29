@@ -20,6 +20,8 @@ import {
 import ClearIcon from '@material-ui/icons/Clear'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
+import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
+
 import useStyles from './styles'
 
 type Cim10FormProps = {
@@ -109,18 +111,18 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             />
           </Grid>
 
-          <Autocomplete
+          <AutocompleteAsync
             multiple
-            id="criteria-code-autocomplete"
+            options={[]}
             className={classes.inputItem}
-            options={criteria?.data?.cim10Diagnostic || []}
+            autocompleteOptions={criteria?.data?.cim10Diagnostic || []}
             getOptionLabel={(option) => option.label}
             defaultValue={defaultValues.code}
             onChange={(e, value) => _onChangeValue('code', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Code CIM10" />}
+            renderInput={(params: any) => <TextField {...params} variant="outlined" label="Code CIM10" />}
           />
 
-          <Autocomplete
+          <AutocompleteAsync
             multiple
             id="criteria-cim10-type-autocomplete"
             className={classes.inputItem}
@@ -128,7 +130,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             getOptionLabel={(option) => option.label}
             defaultValue={defaultValues.diagnosticType}
             onChange={(e, value) => _onChangeValue('diagnosticType', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Type de diagnostic" />}
+            renderInput={(params: any) => <TextField {...params} variant="outlined" label="Type de diagnostic" />}
           />
 
           <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
