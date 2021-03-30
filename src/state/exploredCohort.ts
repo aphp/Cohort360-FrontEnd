@@ -88,7 +88,7 @@ const fetchExploredCohort = createAsyncThunk<
         break
     }
   }
-  return { ...cohort } ?? state.exploredCohort
+  return cohort ?? state.exploredCohort
 })
 
 const exploredCohortSlice = createSlice({
@@ -111,7 +111,7 @@ const exploredCohortSlice = createSlice({
       state.requestId = meta.requestId
     })
     builder.addCase(fetchExploredCohort.fulfilled, (state, { payload, meta }) => {
-      return { ...payload, loading: state.requestId !== meta.requestId }
+      return { ...payload, cohortType: state.cohortType, loading: state.requestId !== meta.requestId }
     })
   }
 })

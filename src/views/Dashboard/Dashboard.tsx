@@ -155,8 +155,9 @@ const Dashboard: React.FC<{
         [classes.appBarShift]: open
       })}
     >
-      {CONTEXT === 'arkhn' && dashboard.originalPatients && (
+      {CONTEXT === 'arkhn' && context === 'cohort' && dashboard.originalPatients && (
         <RedcapExport
+          cohortId={cohortId!}
           open={openRedcapDialog}
           onClose={handleCloseRedcapDialog}
           disabled={dashboard.loading}
