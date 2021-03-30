@@ -84,7 +84,7 @@ const RedcapExport = ({ onClose, open, cohortId, disabled, cohortName }: RedcapE
     api
       .post(`fhir2dataset`, {
         practitioner_id: practitionerId,
-        cohort_id: cohortId,
+        group_id: cohortId,
         attributes
       })
       .then((response) => {
