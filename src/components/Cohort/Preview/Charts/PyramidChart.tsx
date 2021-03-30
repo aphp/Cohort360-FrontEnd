@@ -4,7 +4,7 @@ import * as d3 from 'd3'
 import legend from './Legend'
 
 type PyramidProps = {
-  data?: Map<number, { male: number; female: number }>
+  data?: Map<number, { male: number; female: number; other?: number }>
   width?: number
   height?: number
 }
@@ -18,41 +18,32 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
       return
     }
     let valueMax = 0
-    const valuesPos = []
-    const sortedData: { age: number; male: number; female: number }[] = []
-    for (const entry of data.entries()) {
-      const [age, ageGenderValues] = entry
-      const maleValue = ageGenderValues.male
-      const femaleValue = ageGenderValues.female
-      sortedData.push({
-        age,
-        male: maleValue,
-        female: femaleValue
-      })
+    const sortedDataEntriesByAge = [...data.entries()].sort(([age1], [age2]) => age1 - age2)
+    const minAge = sortedDataEntriesByAge[0][0]
+    const maxAge = sortedDataEntriesByAge[sortedDataEntriesByAge.length - 1][0]
+    const yValueMin = minAge - 1
+    const yValueMax = maxAge + 1
 
-      if (valueMax < maleValue || valueMax < femaleValue) {
-        valueMax = Math.max(femaleValue, maleValue)
-      }
-      if (femaleValue !== 0 || maleValue !== 0) {
-        valuesPos.push(age)
-      }
-    }
-    sortedData.sort((d1, d2) => d1.age - d2.age)
-    const yValueMin = sortedData[0].age === 0 ? sortedData[0].age : sortedData[0].age - 1
-    const yValueMax = sortedData[sortedData.length - 1].age + 1
+    const customData: { age: number; male: number; female: number }[] = []
 
     // We need to fill all the ages not referred in the sortedData array
-    const customData: { age: number; male: number; female: number }[] = []
     for (let index = 0; index < yValueMax - yValueMin - 1; index++) {
       const age = yValueMin + index + 1
-      const item = sortedData.find((item) => item.age === age)
-      customData.push(
-        item ?? {
+      const item = sortedDataEntriesByAge.find(([itemAge]) => itemAge === age)?.[1]
+
+      if (item) {
+        customData.push({ age, male: item.male, female: item.female })
+        const { male: maleValue, female: femaleValue } = item
+        if (valueMax < maleValue || valueMax < femaleValue) {
+          valueMax = Math.max(femaleValue, maleValue)
+        }
+      } else {
+        customData.push({
           age,
           male: 0,
           female: 0
-        }
-      )
+        })
+      }
     }
     const svg = d3.select(node.current)
     svg.selectAll('*').remove()
