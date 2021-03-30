@@ -447,7 +447,9 @@ const fetchDocuments = async (
   // }
 
   if (CONTEXT === 'arkhn') {
-    const search = searchInput ? `/$regex?regex=${searchInput}&` : '?'
+    // FIXME: $regex operation should support case-insensitive searches
+    // https://github.com/arkhn/jpaltime/issues/10
+    const search = searchInput ? `/$regex?pattern=${searchInput.toLowerCase()}&` : '?'
 
     const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : ''
     const ndaFilter = nda ? `&encounter.identifier=${nda}` : ''
