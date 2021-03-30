@@ -14,6 +14,7 @@ import {
 import { getApiResponseResources } from 'utils/apiHelpers'
 
 import { CONTEXT } from '../constants'
+import { getLastEncounter } from './myPatients'
 import fakeGroup from '../data/fakeData/group'
 import fakeFacetDeceased from '../data/fakeData/facet-deceased'
 import fakeFacetAgeMonth from '../data/fakeData/facet-age-month'
@@ -85,6 +86,65 @@ export const fetchPerimetersInfos = async (perimeterIds: string[]): Promise<Coho
       monthlyVisitData
     }
   }
+  if (CONTEXT === 'aphp') {
+    const perimeterIdsJoined = perimeterIds.join(',')
+    const [perimetersResp, patientsResp, encountersResp] = await Promise.all([
+      api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${perimeterIdsJoined}`),
+      api.get<FHIR_API_Response<IPatient>>(
+        `/Patient?pivotFacet=age_gender,deceased_gender&_list=${perimeterIdsJoined}&size=20&_sort=given&_elements=gender,name,birthDate,deceased,identifier,extension`
+      ),
+      api.get<FHIR_API_Response<IEncounter>>(
+        `/Encounter?pivotFacet=start-date_start-date-month_gender&facet=class&_list=${perimeterIdsJoined}&size=0&type=VISIT`
+      )
+    ])
+
+    const cohort = getApiResponseResources(perimetersResp)?.[0]
+
+    const totalPatients = patientsResp?.data?.resourceType === 'Bundle' ? patientsResp.data.total : 0
+
+    const originalPatients = await getLastEncounter(getApiResponseResources(patientsResp))
+
+    const agePyramidData =
+      patientsResp?.data?.resourceType === 'Bundle'
+        ? getAgeRepartitionMapAphp(
+            patientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-age-month')?.[0].extension
+          )
+        : undefined
+
+    const genderRepartitionMap =
+      patientsResp?.data?.resourceType === 'Bundle'
+        ? getGenderRepartitionMapAphp(
+            patientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-deceased')?.[0].extension
+          )
+        : undefined
+
+    const monthlyVisitData =
+      encountersResp?.data?.resourceType === 'Bundle'
+        ? getVisitRepartitionMapAphp(
+            encountersResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-start-date-facet')?.[0]
+              .extension
+          )
+        : undefined
+
+    const visitTypeRepartitionData =
+      encountersResp?.data?.resourceType === 'Bundle'
+        ? getEncounterRepartitionMapAphp(
+            encountersResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-class-simple')?.[0]
+              .extension
+          )
+        : undefined
+
+    return {
+      cohort,
+      totalPatients,
+      originalPatients,
+      genderRepartitionMap,
+      visitTypeRepartitionData,
+      agePyramidData,
+      monthlyVisitData
+    }
+  }
+
   if (CONTEXT === 'arkhn') {
     const services = await getOrganizations(perimeterIds)
     const serviceIds = services.map((service) => service.id)
