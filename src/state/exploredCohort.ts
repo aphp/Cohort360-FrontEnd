@@ -14,7 +14,6 @@ export type ExploredCohortState = {
 
 const initialState: ExploredCohortState = {
   name: '',
-  cohort: [],
   totalPatients: 0,
   originalPatients: [],
   totalDocs: 0,

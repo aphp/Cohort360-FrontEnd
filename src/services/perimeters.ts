@@ -98,7 +98,7 @@ export const fetchPerimetersInfos = async (perimeterIds: string[]): Promise<Coho
       )
     ])
 
-    const cohort = getApiResponseResources(perimetersResp)
+    const cohort = getApiResponseResources(perimetersResp)?.[0]
 
     const totalPatients = patientsResp?.data?.resourceType === 'Bundle' ? patientsResp.data.total : 0
 

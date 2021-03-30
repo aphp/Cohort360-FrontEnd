@@ -212,7 +212,7 @@ export type ComplexChartDataType<T, V = { [key: string]: number }> = Map<T, V>
 
 export type CohortData = {
   name?: string
-  cohort?: IGroup | IGroup[]
+  cohort?: IGroup
   totalPatients?: number
   originalPatients?: CohortPatient[]
   totalDocs?: number
