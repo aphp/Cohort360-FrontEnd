@@ -143,9 +143,7 @@ export const fetchPerimetersInfos = async (perimeterIds: string[]): Promise<Coho
       agePyramidData,
       monthlyVisitData
     }
-  }
-
-  if (CONTEXT === 'arkhn') {
+  } else if (CONTEXT === 'arkhn') {
     const services = await getOrganizations(perimeterIds)
     const serviceIds = services.map((service) => service.id)
 
