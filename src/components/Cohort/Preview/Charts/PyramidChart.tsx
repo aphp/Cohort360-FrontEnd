@@ -19,12 +19,12 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
     }
     let valueMax = 0
     const valuesPos = []
-    const customData: { age: number; male: number; female: number }[] = []
+    const sortedData: { age: number; male: number; female: number }[] = []
     for (const entry of data.entries()) {
       const [age, ageGenderValues] = entry
       const maleValue = ageGenderValues.male
       const femaleValue = ageGenderValues.female
-      customData.push({
+      sortedData.push({
         age,
         male: maleValue,
         female: femaleValue
@@ -37,10 +37,23 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
         valuesPos.push(age)
       }
     }
-    customData.sort((d1, d2) => d1.age - d2.age)
-    const yValueMin = valuesPos[0] === 0 ? valuesPos[0] : valuesPos[0] - 1
-    const yValueMax = valuesPos[valuesPos.length - 1] + 1
+    sortedData.sort((d1, d2) => d1.age - d2.age)
+    const yValueMin = sortedData[0].age === 0 ? sortedData[0].age : sortedData[0].age - 1
+    const yValueMax = sortedData[sortedData.length - 1].age + 1
 
+    // We need to fill all the ages not referred in the sortedData array
+    const customData: { age: number; male: number; female: number }[] = []
+    for (let index = 0; index < yValueMax - yValueMin - 1; index++) {
+      const age = yValueMin + index + 1
+      const item = sortedData.find((item) => item.age === age)
+      customData.push(
+        item ?? {
+          age,
+          male: 0,
+          female: 0
+        }
+      )
+    }
     const svg = d3.select(node.current)
     svg.selectAll('*').remove()
     svg.attr('height', height).attr('width', width)
