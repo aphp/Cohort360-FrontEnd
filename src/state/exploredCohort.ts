@@ -40,7 +40,8 @@ const fetchExploredCohort = createAsyncThunk<
   let shouldRefreshData = true
   switch (context) {
     case 'cohort':
-      shouldRefreshData = !stateCohort || Array.isArray(stateCohort) || stateCohort.id !== id
+      //FIXME: Cohort exploring cache removed for demo purposes
+      // shouldRefreshData = !stateCohort || Array.isArray(stateCohort) || stateCohort.id !== id
       break
     case 'perimeters': {
       if (!id || !Array.isArray(id)) {
