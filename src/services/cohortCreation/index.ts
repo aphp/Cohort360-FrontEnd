@@ -56,7 +56,7 @@ const getPatientsFromDocuments = memoize(
  * then creates a FHIR Group instance
  * @param jsonQuery
  */
-const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
+const createCohortGroup = async (jsonQuery: string, cohortName?: string): Promise<IGroup> => {
   const query: Query = JSON.parse(jsonQuery)
   const perimeters = query.sourcePopulation.caresiteCohortList
   const patientFilter = `_count=${PATIENT_MAX_COUNT}&_has:Encounter:subject:service-provider=${perimeters.join(',')}`
@@ -165,6 +165,7 @@ const createCohortGroup = async (jsonQuery: string): Promise<IGroup> => {
 
   return {
     resourceType: 'Group',
+    name: cohortName,
     type: GroupTypeKind._person,
     actual: true,
     quantity: patientIds.length,
@@ -238,7 +239,7 @@ export const createCohort = async (
   if (!jsonQuery || !datedMeasureId || !snapshotId || !requestId) return null
 
   if (CONTEXT === 'arkhn') {
-    const patientsGroup = await createCohortGroup(jsonQuery)
+    const patientsGroup = await createCohortGroup(jsonQuery, cohortName)
     const response = await apiFhir.post('/Group', patientsGroup)
     const group: IGroup = response.data
     const fhir_group_id = group.id
