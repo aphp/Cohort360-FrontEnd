@@ -173,7 +173,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
 
       cohortResult.name = cohort?.name
       cohortResult.cohort = cohort
-      cohortResult.totalPatients = patients.length
+      cohortResult.totalPatients = cohort && cohort.member ? cohort.member.length : patients.length
       cohortResult.originalPatients = patients
       cohortResult.encounters = encounters
       cohortResult.genderRepartitionMap = getGenderRepartitionMap(patients)
