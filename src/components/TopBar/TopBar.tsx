@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid'
 import TopBarItem from './TopBarHeader/TopBarItem'
 import IconButton from '@material-ui/core/IconButton'
 
-import { ReactComponent as SaveIcon } from '../../assets/icones/save.svg'
+// import { ReactComponent as SaveIcon } from '../../assets/icones/save.svg'
 // import { ReactComponent as Star } from '../../assets/icones/star.svg'
 
 import displayDigit from 'utils/displayDigit'
