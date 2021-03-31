@@ -18,8 +18,11 @@ import {
 } from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
+import InfoIcon from '@material-ui/icons/Info'
 import ClearIcon from '@material-ui/icons/Clear'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+
+import DocumentSearchHelp from 'components/DocumentSearchHelp/DocumentSearchHelp'
 
 import useStyles from './styles'
 
@@ -49,6 +52,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
 
   const classes = useStyles()
 
+  const [helpOpen, setHelpOpen] = useState(false)
   const [error, setError] = useState(false)
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
 
@@ -115,15 +119,22 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             />
           </Grid>
 
-          <TextField
-            required
-            className={classes.inputItem}
-            id="criteria-search-required"
-            placeholder="Recherche dans les documents"
-            variant="outlined"
-            value={defaultValues.search}
-            onChange={(e) => _onChangeValue('search', e.target.value)}
-          />
+          <Grid style={{ display: 'flex' }}>
+            <TextField
+              required
+              className={classes.inputItem}
+              id="criteria-search-required"
+              placeholder="Recherche dans les documents"
+              variant="outlined"
+              value={defaultValues.search}
+              onChange={(e) => _onChangeValue('search', e.target.value)}
+            />
+
+            <IconButton type="submit" onClick={() => setHelpOpen(true)} style={{ outline: 'none' }}>
+              <InfoIcon />
+            </IconButton>
+            <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+          </Grid>
 
           <Autocomplete
             multiple
@@ -131,8 +142,8 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             className={classes.inputItem}
             options={criteria?.data?.docTypes || []}
             getOptionLabel={(option) => option.label}
-            defaultValue={defaultValues.docTypes}
-            onChange={(e, value) => _onChangeValue('docTypes', value)}
+            value={defaultValues.docType}
+            onChange={(e, value) => _onChangeValue('docType', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Type de document" />}
           />
 
@@ -145,14 +156,14 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               style={{ marginRight: '1em' }}
               id="criteria-occurrenceComparator-select"
               value={defaultValues.occurrenceComparator}
-              onChange={(e, value) => _onChangeValue('occurrenceComparator', value)}
+              onChange={(event) => _onChangeValue('occurrenceComparator', event.target.value as string)}
               variant="outlined"
             >
-              <MenuItem value={'<='}>{'<='}</MenuItem>
-              <MenuItem value={'<'}>{'<'}</MenuItem>
-              <MenuItem value={'='}>{'='}</MenuItem>
-              <MenuItem value={'>'}>{'>'}</MenuItem>
-              <MenuItem value={'>='}>{'>='}</MenuItem>
+              <MenuItem value="<=">{'<='}</MenuItem>
+              <MenuItem value="<">{'<'}</MenuItem>
+              <MenuItem value="=">{'='}</MenuItem>
+              <MenuItem value=">">{'>'}</MenuItem>
+              <MenuItem value=">=">{'>='}</MenuItem>
             </Select>
 
             <TextField

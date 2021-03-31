@@ -28,32 +28,26 @@ type Cim10FormProps = {
   isEdition?: boolean
   criteria: any
   selectedCriteria: any
+  onChangeValue: (key: string, value: any) => void
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
 }
 
 const Cim10Form: React.FC<Cim10FormProps> = (props) => {
-  const { isEdition, criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
   const classes = useStyles()
 
   const [error, setError] = useState(false)
-  const [defaultValues, setDefaultValues] = useState(selectedCriteria)
 
   const _onSubmit = () => {
-    if (defaultValues?.code?.length === 0 && defaultValues?.diagnosticType?.length === 0) {
+    if (selectedCriteria?.code?.length === 0 && selectedCriteria?.diagnosticType?.length === 0) {
       return setError(true)
     }
-    onChangeSelectedCriteria(defaultValues)
+    onChangeSelectedCriteria(selectedCriteria)
   }
 
-  const _onChangeValue = (key: string, value: any) => {
-    const _defaultValues = defaultValues ? { ...defaultValues } : {}
-    _defaultValues[key] = value
-    setDefaultValues(_defaultValues)
-  }
-
-  // const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue)
+  const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue)
 
   if (
     criteria?.data?.diagnosticTypes === 'loading' ||
@@ -90,15 +84,15 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            defaultValue="Critère de diagnostic"
+            defaultValue="Critères de diagnostic"
             variant="outlined"
-            value={defaultValues.title}
-            onChange={(e) => _onChangeValue('title', e.target.value)}
+            value={selectedCriteria.title}
+            onChange={(e) => onChangeValue('title', e.target.value)}
           />
 
           <Grid style={{ display: 'flex' }}>
             <FormLabel
-              onClick={() => _onChangeValue('isInclusive', !defaultValues.isInclusive)}
+              onClick={() => onChangeValue('isInclusive', !selectedCriteria.isInclusive)}
               style={{ margin: 'auto 1em' }}
               component="legend"
             >
@@ -106,32 +100,37 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             </FormLabel>
             <Switch
               id="criteria-inclusive"
-              checked={!defaultValues.isInclusive}
-              onChange={(event) => _onChangeValue('isInclusive', !event.target.checked)}
+              checked={!selectedCriteria.isInclusive}
+              onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
             />
           </Grid>
 
           <AutocompleteAsync
             multiple
-            options={[]}
+            label="Code CIM10"
+            variant="outlined"
+            noOptionsText="Veuillez entrer un code ou un diagnostic CIM10"
+            helperText={'Tous les code CIM10 sélectionnés seront liés par une contrainte OU'}
             className={classes.inputItem}
+            autocompleteValue={selectedCriteria.code}
             autocompleteOptions={criteria?.data?.cim10Diagnostic || []}
-            getOptionLabel={(option) => option.label}
-            defaultValue={defaultValues.code}
-            onChange={(e, value) => _onChangeValue('code', value)}
-            renderInput={(params: any) => <TextField {...params} variant="outlined" label="Code CIM10" />}
+            getAutocompleteOptions={getDiagOptions}
+            onChange={(e, value) => onChangeValue('code', value)}
           />
 
-          <AutocompleteAsync
+          <Autocomplete
             multiple
             id="criteria-cim10-type-autocomplete"
             className={classes.inputItem}
             options={criteria?.data?.diagnosticTypes || []}
             getOptionLabel={(option) => option.label}
-            defaultValue={defaultValues.diagnosticType}
-            onChange={(e, value) => _onChangeValue('diagnosticType', value)}
-            renderInput={(params: any) => <TextField {...params} variant="outlined" label="Type de diagnostic" />}
+            getOptionSelected={(option, value) => option.id === value.id}
+            value={selectedCriteria.diagnosticType}
+            onChange={(e, value) => onChangeValue('diagnosticType', value)}
+            renderInput={(params) => <TextField {...params} variant="outlined" label="Type de diagnostic" />}
           />
+
+          {/* Mettre  */}
 
           <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
             Nombre d'occurrence
@@ -141,8 +140,8 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             <Select
               style={{ marginRight: '1em' }}
               id="criteria-occurrenceComparator-select"
-              value={defaultValues.occurrenceComparator}
-              onChange={(e, value) => _onChangeValue('occurrenceComparator', value)}
+              value={selectedCriteria.occurrenceComparator}
+              onChange={(event) => onChangeValue('occurrenceComparator', event.target.value as string)}
               variant="outlined"
             >
               <MenuItem value={'<='}>{'<='}</MenuItem>
@@ -160,8 +159,8 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               type="number"
               id="criteria-occurrence-required"
               variant="outlined"
-              value={defaultValues.occurrence}
-              onChange={(e) => _onChangeValue('occurrence', e.target.value)}
+              value={selectedCriteria.occurrence}
+              onChange={(e) => onChangeValue('occurrence', e.target.value)}
             />
           </Grid>
 
@@ -177,13 +176,13 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               <Input
                 id="date-start-occurrence"
                 type="date"
-                value={defaultValues.startOccurrence}
+                value={selectedCriteria.startOccurrence}
                 endAdornment={
-                  <IconButton size="small" onClick={() => _onChangeValue('startOccurrence', '')}>
+                  <IconButton size="small" onClick={() => onChangeValue('startOccurrence', '')}>
                     <ClearIcon />
                   </IconButton>
                 }
-                onChange={(e) => _onChangeValue('startOccurrence', e.target.value)}
+                onChange={(e) => onChangeValue('startOccurrence', e.target.value)}
               />
             </FormControl>
 
@@ -194,13 +193,13 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               <Input
                 id="date-end-occurrence"
                 type="date"
-                value={defaultValues.endOccurrence}
+                value={selectedCriteria.endOccurrence}
                 endAdornment={
-                  <IconButton size="small" onClick={() => _onChangeValue('endOccurrence', '')}>
+                  <IconButton size="small" onClick={() => onChangeValue('endOccurrence', '')}>
                     <ClearIcon />
                   </IconButton>
                 }
-                onChange={(e) => _onChangeValue('endOccurrence', e.target.value)}
+                onChange={(e) => onChangeValue('endOccurrence', e.target.value)}
               />
             </FormControl>
           </Grid>

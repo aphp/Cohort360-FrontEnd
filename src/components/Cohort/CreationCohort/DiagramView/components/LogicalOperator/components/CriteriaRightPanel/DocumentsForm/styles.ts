@@ -28,7 +28,8 @@ const useStyles = makeStyles(() => ({
     flexDirection: 'column'
   },
   inputItem: {
-    margin: '1em'
+    margin: '1em',
+    width: 'calc(100% - 2em)'
   },
   criteriaActionContainer: {
     display: 'flex',

@@ -146,7 +146,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
                 { id: 'day', label: 'jours' }
               ]}
               getOptionLabel={(option) => option.label}
-              defaultValue={defaultValues.ageType}
+              value={defaultValues.ageType}
               onChange={(e, value) => _onChangeValue('ageType', value)}
               renderInput={(params) => <TextField {...params} variant="outlined" />}
             />
@@ -175,7 +175,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
                 { id: 'day', label: 'jours' }
               ]}
               getOptionLabel={(option) => option.label}
-              defaultValue={defaultValues.durationType}
+              value={defaultValues.durationType}
               onChange={(e, value) => _onChangeValue('durationType', value)}
               renderInput={(params) => <TextField {...params} variant="outlined" />}
             />

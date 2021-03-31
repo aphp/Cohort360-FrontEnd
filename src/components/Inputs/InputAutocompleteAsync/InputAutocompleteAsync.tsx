@@ -10,47 +10,57 @@ interface ElementType {
 
 type InputAutocompleteAsyncProps = {
   id?: string
+  variant?: 'standard' | 'filled' | 'outlined'
+  label?: string
   className?: string
-  options?: any[]
-  getOptionLabel?: (value: any) => string
-  defaultValue?: any
+  multiple?: boolean
+  autocompleteValue?: any
   onChange?: (e: any, value: any) => void
   renderInput?: any
-  variant?: 'standard' | 'filled' | 'outlined'
-  multiple?: boolean
   autocompleteOptions?: ElementType[]
-  getAutocompleteOptions?: () => any
+  getAutocompleteOptions?: (searchValue: string) => Promise<any>
   noOptionsText?: string
+  helperText?: string
 }
 
 const InputAutocompleteAsync: React.FC<InputAutocompleteAsyncProps> = (props) => {
-  const { variant, multiple, autocompleteOptions, getAutocompleteOptions, noOptionsText } = props
+  const {
+    id,
+    variant,
+    label,
+    className,
+    multiple = false,
+    autocompleteValue = multiple ? null : [],
+    autocompleteOptions = [],
+    onChange,
+    getAutocompleteOptions,
+    noOptionsText,
+    helperText
+  } = props
 
   const [open, setOpen] = useState(false)
-  const [options, setOptions] = useState<ElementType[]>([])
-  const loading = open && options.length === 0
+  const [searchValue, setSearchValue] = useState('')
+  const [options, setOptions] = useState<ElementType[]>(autocompleteOptions)
+  const [loading, setLoading] = useState(false)
 
   React.useEffect(() => {
     let active = true
 
-    if (!loading) {
-      return undefined
-    }
+    ;(async () => {
+      setLoading(true)
+      if (!getAutocompleteOptions) return
+      const response = (await getAutocompleteOptions(searchValue)) || []
 
-    // (async () => {
-    //   const response = await fetch('https://country.register.gov.uk/records.json?page-size=5000');
-    //   await sleep(1e3); // For demo purposes.
-    //   const countries = await response.json();
-
-    //   if (active) {
-    //     setOptions(Object.keys(countries).map((key) => countries[key].item[0]) as ElementType[]);
-    //   }
-    // })();
+      if (active) {
+        setOptions(response)
+        setLoading(false)
+      }
+    })()
 
     return () => {
       active = false
     }
-  }, [loading])
+  }, [searchValue])
 
   React.useEffect(() => {
     if (!open) {
@@ -60,22 +70,31 @@ const InputAutocompleteAsync: React.FC<InputAutocompleteAsyncProps> = (props) =>
 
   return (
     <Autocomplete
-      open={open}
       onOpen={() => {
         setOpen(true)
       }}
       onClose={() => {
         setOpen(false)
       }}
+      id={id}
+      open={open}
+      className={className}
+      multiple={multiple}
+      noOptionsText={noOptionsText}
+      loading={loading}
+      value={autocompleteValue}
+      onChange={onChange}
+      options={options ?? []}
       getOptionSelected={(option, value) => option.id === value.id}
       getOptionLabel={(option) => option.label}
-      options={options}
-      loading={loading}
       renderInput={(params) => (
         <TextField
           {...params}
-          label="Asynchronous"
+          label={label}
           variant={variant}
+          value={searchValue}
+          helperText={helperText}
+          onChange={(e) => setSearchValue(e.target.value)}
           InputProps={{
             ...params.InputProps,
             endAdornment: (

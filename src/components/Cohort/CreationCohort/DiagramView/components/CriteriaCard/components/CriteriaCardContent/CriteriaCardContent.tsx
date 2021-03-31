@@ -3,6 +3,7 @@ import moment from 'moment'
 
 import Chip from '@material-ui/core/Chip'
 import IconButton from '@material-ui/core/IconButton'
+import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
 
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
@@ -54,11 +55,39 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
     switch (_currentCriteria.type) {
       case 'Claim': {
+        const displaySelectedCode = (codes: { id: string; label: string }[]) => {
+          const customReducer = (accumulator: any, currentValue: any) =>
+            accumulator ? (
+              <>
+                {accumulator}
+                <br />
+                {currentValue}
+              </>
+            ) : currentValue ? (
+              currentValue
+            ) : (
+              accumulator
+            )
+
+          let currentCode: string[] = []
+          for (const code of codes) {
+            const selectedCodeData =
+              data?.ghmData && data?.ghmData !== 'loading'
+                ? data.ghmData.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                : null
+            currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+          }
+          return currentCode && currentCode.length > 0 ? currentCode.reduce(customReducer) : ''
+        }
         content = [
           _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
+              label={
+                <Tooltip title={displaySelectedCode(_currentCriteria?.code)}>
+                  <Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>
+                </Tooltip>
+              }
             />
           ),
           +_currentCriteria?.occurrence !== 1 && (
@@ -90,11 +119,39 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Procedure': {
+        const displaySelectedCode = (codes: { id: string; label: string }[]) => {
+          const customReducer = (accumulator: any, currentValue: any) =>
+            accumulator ? (
+              <>
+                {accumulator}
+                <br />
+                {currentValue}
+              </>
+            ) : currentValue ? (
+              currentValue
+            ) : (
+              accumulator
+            )
+
+          let currentCode: string[] = []
+          for (const code of codes) {
+            const selectedCodeData =
+              data?.ccamData && data?.ccamData !== 'loading'
+                ? data.ccamData.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                : null
+            currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+          }
+          return currentCode && currentCode.length > 0 ? currentCode.reduce(customReducer) : ''
+        }
         content = [
           _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
+              label={
+                <Tooltip title={displaySelectedCode(_currentCriteria?.code)}>
+                  <Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>
+                </Tooltip>
+              }
             />
           ),
           +_currentCriteria?.occurrence !== 1 && (
@@ -126,20 +183,64 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Condition': {
+        const displaySelectedCode = (codes: { id: string; label: string }[]) => {
+          const customReducer = (accumulator: any, currentValue: any) =>
+            accumulator ? (
+              <>
+                {accumulator}
+                <br />
+                {currentValue}
+              </>
+            ) : currentValue ? (
+              currentValue
+            ) : (
+              accumulator
+            )
+
+          let currentCode: string[] = []
+          for (const code of codes) {
+            const selectedCodeData =
+              data?.cim10Diagnostic && data?.cim10Diagnostic !== 'loading'
+                ? data.cim10Diagnostic.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                : null
+            currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+          }
+          return currentCode && currentCode.length > 0 ? currentCode.reduce(customReducer) : ''
+        }
+        const displaySelectedDiagTypes = (diagnosticTypes: { id: string; label: string }[]) => {
+          let currentStatus: string[] = []
+          for (const _diagnosticType of diagnosticTypes) {
+            const selectedDiagnosticType =
+              data?.diagnosticTypes && data?.diagnosticTypes !== 'loading'
+                ? data.diagnosticTypes.find(
+                    (diagnosticElement: any) => diagnosticElement && diagnosticElement.id === _diagnosticType.id
+                  )
+                : null
+            currentStatus = selectedDiagnosticType ? [...currentStatus, selectedDiagnosticType.label] : currentStatus
+          }
+          return currentStatus && currentStatus.length > 0 ? currentStatus.reduce(reducer) : ''
+        }
+
         content = [
           _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
+              label={
+                <Tooltip title={displaySelectedCode(_currentCriteria?.code)}>
+                  <Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>
+                </Tooltip>
+              }
             />
           ),
           _currentCriteria && _currentCriteria?.diagnosticType && _currentCriteria?.diagnosticType.length > 0 && (
             <Chip
               className={classes.criteriaChip}
               label={
-                <Typography noWrap>
-                  {_currentCriteria?.diagnosticType?.map((code) => code.id).reduce(reducer)}
-                </Typography>
+                <Tooltip title={displaySelectedDiagTypes(_currentCriteria?.diagnosticType)}>
+                  <Typography noWrap>
+                    {_currentCriteria?.diagnosticType?.map((diagnosticType) => diagnosticType.id).reduce(reducer)}
+                  </Typography>
+                </Tooltip>
               }
             />
           ),
@@ -182,7 +283,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           for (const gender of genders) {
             const selectedGenderData =
               data?.gender && data?.gender !== 'loading'
-                ? data.gender.find((ghmElement: any) => ghmElement && ghmElement.id === gender.id)
+                ? data.gender.find((genderElement: any) => genderElement && genderElement.id === gender.id)
                 : null
             currentGender = selectedGenderData ? [...currentGender, selectedGenderData.label] : currentGender
           }

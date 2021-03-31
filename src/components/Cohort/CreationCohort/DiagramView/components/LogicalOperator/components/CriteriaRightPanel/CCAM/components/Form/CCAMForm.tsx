@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 
-import { Autocomplete, Alert } from '@material-ui/lab'
 import {
   Button,
   Divider,
@@ -16,9 +15,12 @@ import {
   TextField,
   Select
 } from '@material-ui/core'
+import Alert from '@material-ui/lab/Alert'
 
 import ClearIcon from '@material-ui/icons/Clear'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+
+import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
 import useStyles from './styles'
 
@@ -26,30 +28,24 @@ type CcamFormProps = {
   isEdition: boolean
   criteria: any
   selectedCriteria: any
+  onChangeValue: (key: string, value: any) => void
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
 }
 
 const CcamForm: React.FC<CcamFormProps> = (props) => {
-  const { isEdition, criteria, selectedCriteria, goBack, onChangeSelectedCriteria } = props
+  const { isEdition, criteria, selectedCriteria, onChangeValue, goBack, onChangeSelectedCriteria } = props
 
   const classes = useStyles()
 
   const [error, setError] = useState(false)
-  const [defaultValues, setDefaultValues] = useState(selectedCriteria)
 
   const _onSubmit = () => {
-    if (defaultValues?.code?.length === 0) {
+    if (selectedCriteria?.code?.length === 0) {
       return setError(true)
     }
 
-    onChangeSelectedCriteria(defaultValues)
-  }
-
-  const _onChangeValue = (key: string, value: any) => {
-    const _defaultValues = defaultValues ? { ...defaultValues } : {}
-    _defaultValues[key] = value
-    setDefaultValues(_defaultValues)
+    onChangeSelectedCriteria(selectedCriteria)
   }
 
   const getCCAMOptions = async (searchValue: string) => {
@@ -57,9 +53,6 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
 
     return ccamOptions && ccamOptions.length > 0 ? ccamOptions : []
   }
-
-  ;('Actes CCAM')
-  ;("Codes d'actes CCAM")
 
   return (
     <Grid className={classes.root}>
@@ -81,22 +74,22 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
         {error && <Alert severity="error">Merci de renseigner un acte CCAM</Alert>}
 
         <Grid className={classes.inputContainer} container>
-          <Typography variant="h6">Diagnostic</Typography>
+          <Typography variant="h6">Actes CCAM</Typography>
 
           <TextField
             required
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            defaultValue="Critère de diagnostic"
+            defaultValue="Critères d'actes CCAM"
             variant="outlined"
-            value={defaultValues.title}
-            onChange={(e) => _onChangeValue('title', e.target.value)}
+            value={selectedCriteria.title}
+            onChange={(e) => onChangeValue('title', e.target.value)}
           />
 
           <Grid style={{ display: 'flex' }}>
             <FormLabel
-              onClick={() => _onChangeValue('isInclusive', !defaultValues.isInclusive)}
+              onClick={() => onChangeValue('isInclusive', !selectedCriteria.isInclusive)}
               style={{ margin: 'auto 1em' }}
               component="legend"
             >
@@ -104,31 +97,22 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             </FormLabel>
             <Switch
               id="criteria-inclusive"
-              checked={!defaultValues.isInclusive}
-              onChange={(event) => _onChangeValue('isInclusive', !event.target.checked)}
+              checked={!selectedCriteria.isInclusive}
+              onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
             />
           </Grid>
 
-          <Autocomplete
+          <AutocompleteAsync
             multiple
-            id="criteria-code-autocomplete"
+            label="Codes d'actes CCAM"
+            variant="outlined"
+            noOptionsText="Veuillez entrer un code ou un acte CCAM"
+            helperText={'Tous les actes CCAM sélectionnés seront liés par une contrainte OU'}
             className={classes.inputItem}
-            options={criteria?.data?.ccamData || []}
-            getOptionLabel={(option) => option.label}
-            defaultValue={defaultValues.code}
-            onChange={(e, value) => _onChangeValue('code', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Codes d'actes CCAM" />}
-          />
-
-          <Autocomplete
-            multiple
-            id="criteria-cim10-type-autocomplete"
-            className={classes.inputItem}
-            options={criteria?.data?.diagnosticTypes || []}
-            getOptionLabel={(option) => option.label}
-            defaultValue={defaultValues.diagnosticType}
-            onChange={(e, value) => _onChangeValue('diagnosticType', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Type de diagnostic" />}
+            autocompleteValue={selectedCriteria.code}
+            autocompleteOptions={criteria?.data?.ccamData || []}
+            getAutocompleteOptions={getCCAMOptions}
+            onChange={(e, value) => onChangeValue('code', value)}
           />
 
           <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
@@ -139,8 +123,8 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             <Select
               style={{ marginRight: '1em' }}
               id="criteria-occurrenceComparator-select"
-              value={defaultValues.occurrenceComparator}
-              onChange={(e, value) => _onChangeValue('occurrenceComparator', value)}
+              value={selectedCriteria.occurrenceComparator}
+              onChange={(event) => onChangeValue('occurrenceComparator', event.target.value as string)}
               variant="outlined"
             >
               <MenuItem value={'<='}>{'<='}</MenuItem>
@@ -158,8 +142,8 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
               type="number"
               id="criteria-occurrence-required"
               variant="outlined"
-              value={defaultValues.occurrence}
-              onChange={(e) => _onChangeValue('occurrence', e.target.value)}
+              value={selectedCriteria.occurrence}
+              onChange={(e) => onChangeValue('occurrence', e.target.value)}
             />
           </Grid>
 
@@ -175,13 +159,13 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
               <Input
                 id="date-start-occurrence"
                 type="date"
-                value={defaultValues.startOccurrence}
+                value={selectedCriteria.startOccurrence}
                 endAdornment={
-                  <IconButton size="small" onClick={() => _onChangeValue('startOccurrence', '')}>
+                  <IconButton size="small" onClick={() => onChangeValue('startOccurrence', '')}>
                     <ClearIcon />
                   </IconButton>
                 }
-                onChange={(e) => _onChangeValue('startOccurrence', e.target.value)}
+                onChange={(e) => onChangeValue('startOccurrence', e.target.value)}
               />
             </FormControl>
 
@@ -192,13 +176,13 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
               <Input
                 id="date-end-occurrence"
                 type="date"
-                value={defaultValues.endOccurrence}
+                value={selectedCriteria.endOccurrence}
                 endAdornment={
-                  <IconButton size="small" onClick={() => _onChangeValue('endOccurrence', '')}>
+                  <IconButton size="small" onClick={() => onChangeValue('endOccurrence', '')}>
                     <ClearIcon />
                   </IconButton>
                 }
-                onChange={(e) => _onChangeValue('endOccurrence', e.target.value)}
+                onChange={(e) => onChangeValue('endOccurrence', e.target.value)}
               />
             </FormControl>
           </Grid>
