@@ -477,7 +477,7 @@ const fetchDocuments = async (
       //   `/Composition?facet=cloud&size=0&_sort=${_sortDirection}${sortBy}&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
       // ),
       api.get<FHIR_API_Response<IDocumentReference>>(
-        `/DocumentReference${search}_count=20&_getpagesoffset=${
+        `/DocumentReference${search}_count=10000&_getpagesoffset=${
           page ? (page - 1) * 20 : 0
         }&_sort=${_sortDirection}${sortBy}${searchByGroup}${docTypesFilter}${ndaFilter}${dateFilter}`
       ),
