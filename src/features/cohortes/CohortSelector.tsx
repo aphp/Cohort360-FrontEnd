@@ -69,7 +69,8 @@ const areCohortOrgaAccessRequestPendingSelector = createSelector(
 const showCreateAccessRequestAlertSelector = createSelector(
   [self, cohortOrgaRepartitionDataSelector, orgaIdsOutOfPractitionerPerimeterSelector],
   (state, orgaRepartitionData, orgaIdsOutOfPractitionerPerimeter) => {
-    const { totalPatients, cohort } = state.exploredCohort
+    const { originalPatients, cohort } = state.exploredCohort
+    const patientsInPerimeterCount = originalPatients?.length
     const cohortMembersCount = cohort?.member?.length
 
     if (orgaRepartitionData && orgaIdsOutOfPractitionerPerimeter) {
@@ -77,7 +78,7 @@ const showCreateAccessRequestAlertSelector = createSelector(
         if (orgaId && orgaIdsOutOfPractitionerPerimeter.includes(orgaId)) {
           /*  If group members count differs from originalPatients count,
            *  this means there are patients out of the practitioner's perimeter */
-          return totalPatients !== cohortMembersCount
+          return patientsInPerimeterCount !== cohortMembersCount
         }
       }
     }
