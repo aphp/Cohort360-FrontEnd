@@ -8,6 +8,8 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   config.headers.Authorization = localStorage.getItem(PRACTITIONER_ID) || `Bearer ${FHIR_API_ADMIN_TOKEN}`
+  config.headers['Cache-Control'] = 'no-cache'
+
   return config
 })
 

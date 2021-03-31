@@ -159,11 +159,11 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       )
     )
     if (response) {
-      cohortResult.cohort = head(
+      const cohort = head(
         response.filter((resource) => resource.resourceType === 'Group' && resource.id === cohortId) as IGroup[]
       )
 
-      const cohortOrganizationIds = (cohortResult.cohort?.characteristic
+      const cohortOrganizationIds = (cohort?.characteristic
         ?.filter(({ valueReference }) => valueReference?.type === 'Organization')
         .map(({ valueReference }) => valueReference?.reference?.split('/')[1]) ?? []) as string[]
 
@@ -171,6 +171,8 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       const encounters = response.filter((resource) => resource.resourceType === 'Encounter') as IEncounter[]
       const organizations = await getOrganizations(cohortOrganizationIds)
 
+      cohortResult.name = cohort?.name
+      cohortResult.cohort = cohort
       cohortResult.totalPatients = patients.length
       cohortResult.originalPatients = patients
       cohortResult.encounters = encounters
@@ -477,7 +479,7 @@ const fetchDocuments = async (
       //   `/Composition?facet=cloud&size=0&_sort=${_sortDirection}${sortBy}&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
       // ),
       api.get<FHIR_API_Response<IDocumentReference>>(
-        `/DocumentReference${search}_count=20&_getpagesoffset=${
+        `/DocumentReference${search}_count=10000&_getpagesoffset=${
           page ? (page - 1) * 20 : 0
         }&_sort=${_sortDirection}${sortBy}${searchByGroup}${docTypesFilter}${ndaFilter}${dateFilter}`
       ),
