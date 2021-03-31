@@ -159,11 +159,11 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       )
     )
     if (response) {
-      cohortResult.cohort = head(
+      const cohort = head(
         response.filter((resource) => resource.resourceType === 'Group' && resource.id === cohortId) as IGroup[]
       )
 
-      const cohortOrganizationIds = (cohortResult.cohort?.characteristic
+      const cohortOrganizationIds = (cohort?.characteristic
         ?.filter(({ valueReference }) => valueReference?.type === 'Organization')
         .map(({ valueReference }) => valueReference?.reference?.split('/')[1]) ?? []) as string[]
 
@@ -171,6 +171,8 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       const encounters = response.filter((resource) => resource.resourceType === 'Encounter') as IEncounter[]
       const organizations = await getOrganizations(cohortOrganizationIds)
 
+      cohortResult.name = cohort?.name
+      cohortResult.cohort = cohort
       cohortResult.totalPatients = patients.length
       cohortResult.originalPatients = patients
       cohortResult.encounters = encounters
