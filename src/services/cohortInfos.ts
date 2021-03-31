@@ -162,7 +162,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     const cohort = getApiResponseResources(groupResp)?.[0]
 
     if (cohort) {
-      const cohortOrganizationIds = (cohort?.characteristic
+      const cohortOrganizationIds = (cohort.characteristic
         ?.filter(({ valueReference }) => valueReference?.type === 'Organization')
         .map(({ valueReference }) => valueReference?.reference?.split('/')[1]) ?? []) as string[]
 
@@ -172,9 +172,9 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
         (patientsAndEncounters?.filter((resource) => resource.resourceType === 'Encounter') as IEncounter[]) ?? []
       const organizations = await getOrganizations(cohortOrganizationIds)
 
-      cohortResult.name = cohort?.name
+      cohortResult.name = cohort.name
       cohortResult.cohort = cohort
-      cohortResult.totalPatients = cohort && cohort.member ? cohort.member.length : patients.length
+      cohortResult.totalPatients = cohort.member ? cohort.member.length : patients.length
       cohortResult.originalPatients = patients
       cohortResult.encounters = encounters
       cohortResult.genderRepartitionMap = getGenderRepartitionMap(patients)
