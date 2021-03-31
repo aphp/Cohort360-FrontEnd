@@ -1,5 +1,3 @@
-import { head } from 'lodash'
-
 import api from './api'
 import apiBackCohort from './apiBackCohort'
 import { getInfos, getLastEncounter } from './myPatients'
