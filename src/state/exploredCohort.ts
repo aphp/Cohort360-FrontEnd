@@ -39,8 +39,6 @@ const fetchExploredCohort = createAsyncThunk<
   const stateCohort = state.exploredCohort.cohort
   let shouldRefreshData = true
   switch (context) {
-    case 'cohort':
-      break
     case 'perimeters': {
       if (!id || !Array.isArray(id)) {
         throw new Error('No given perimeter ids')
@@ -59,6 +57,7 @@ const fetchExploredCohort = createAsyncThunk<
       break
     }
 
+    case 'cohort':
     default:
       break
   }
