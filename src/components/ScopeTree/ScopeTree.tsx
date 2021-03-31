@@ -40,6 +40,8 @@ const orderRowsByAccess = (rowA: ScopeTreeRow, rowB: ScopeTreeRow): number => {
     if (nameA > nameB) return 1
   } else if (rowA.access) {
     return -1
+  } else if (rowB.access) {
+    return 1
   }
 
   return 0
