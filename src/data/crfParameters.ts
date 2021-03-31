@@ -30,14 +30,14 @@ export const CRF_ATTRIBUTES: CrfParameter[] = [
     customName: 'Birthdate',
     attr_type: 'quasiidentifying',
     hierarchy_type: 'date',
-    anonymize: true
+    anonymize: false
   },
   {
     officialName: 'Postal code',
     customName: 'Postal code',
     attr_type: 'quasiidentifying',
     hierarchy_type: 'redaction',
-    anonymize: true
+    anonymize: false
   },
   {
     officialName: 'Gender',
@@ -50,14 +50,14 @@ export const CRF_ATTRIBUTES: CrfParameter[] = [
     customName: 'Height',
     attr_type: 'quasiidentifying',
     hierarchy_type: 'interval',
-    anonymize: true
+    anonymize: false
   },
   {
     officialName: 'Weight',
     customName: 'Weight',
     attr_type: 'quasiidentifying',
     hierarchy_type: 'interval',
-    anonymize: true
+    anonymize: false
   },
   {
     officialName: 'Albumin',
@@ -117,14 +117,14 @@ export const CRF_ATTRIBUTES: CrfParameter[] = [
     officialName: 'ICD-9 Diagnosis',
     customName: 'ICD-9 Diagnosis',
     attr_type: 'sensitive',
-    anonymize: true
+    anonymize: false
   },
   {
     officialName: 'Medication',
     customName: 'Medication',
     attr_type: 'sensitive',
     type: 'text',
-    anonymize: true
+    anonymize: false
   }
   // NOTE : Keep it for later
   // {
