@@ -29,7 +29,7 @@ const cohortOrgaRepartitionDataSelector = createSelector(self, (state):
     return {
       ...data,
       value: isOrgaInScope ? data.value : Math.floor(patientsOutOfPerimeterCount / orgasOutOfPerimeterCount),
-      color: isOrgaInScope ? '#16BDFF' : '#BBBBBB'
+      color: isOrgaInScope ? '#16BDFF' : '#FFF4E5'
     }
   })
 })
