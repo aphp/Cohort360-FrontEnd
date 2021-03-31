@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid'
 import TopBarItem from './TopBarHeader/TopBarItem'
 import IconButton from '@material-ui/core/IconButton'
 
-import { ReactComponent as SaveIcon } from '../../assets/icones/save.svg'
+// import { ReactComponent as SaveIcon } from '../../assets/icones/save.svg'
 // import { ReactComponent as Star } from '../../assets/icones/star.svg'
 
 import displayDigit from 'utils/displayDigit'
@@ -50,9 +50,9 @@ const TopBar: React.FC<TopBarProps> = ({ loading, openRedcapDialog, save, ...pro
           <IconButton onClick={openRedcapDialog} disabled={!openRedcapDialog}>
             <GetApp height="25px" fill="#5BC5F2" />
           </IconButton>
-          <IconButton disabled={!save}>
+          {/* <IconButton disabled={!save}>
             <SaveIcon height="25px" fill="#5BC5F2" />
-          </IconButton>
+          </IconButton> */}
           {/* {props.fav && (
             <IconButton>
               <Star height="15px" fill="#ED6D91" />
