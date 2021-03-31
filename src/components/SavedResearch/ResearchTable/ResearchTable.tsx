@@ -109,9 +109,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
               <TableHead>
                 <TableRow className={classes.tableHead}>
                   <TableCell className={classes.tableHeadCell}>Titre</TableCell>
-                  <TableCell className={classes.tableHeadCell} align="center">
+                  {/* <TableCell className={classes.tableHeadCell} align="center">
                     Statut
-                  </TableCell>
+                  </TableCell> */}
                   {/* <TableCell className={classes.tableHeadCell} align="center">
                     Périmètre
                   </TableCell> */}
@@ -121,9 +121,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                   <TableCell align="center" className={classes.tableHeadCell}>
                     Date de création
                   </TableCell>
-                  <TableCell align="center" className={classes.tableHeadCell}>
+                  {/* <TableCell align="center" className={classes.tableHeadCell}>
                     Favoris
-                  </TableCell>
+                  </TableCell> */}
 
                   {!simplified && (
                     <TableCell align="center" className={classes.tableHeadCell}>
@@ -141,9 +141,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                     onClick={onClickRow ? () => onClickRow(row) : () => history.push(`/cohort/${row.fhir_group_id}`)}
                   >
                     <TableCell>{row.name}</TableCell>
-                    <TableCell className={classes.status} align="center">
+                    {/* <TableCell className={classes.status} align="center">
                       {row.status}
-                    </TableCell>
+                    </TableCell> */}
                     {/* <TableCell align="center">{row.perimeter}</TableCell> */}
                     <TableCell align="center">{displayDigit(row.nPatients ?? 0)}</TableCell>
                     <TableCell align="center">
@@ -157,7 +157,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                         </>
                       )}
                     </TableCell>
-                    <TableCell align="center">
+                    {/* <TableCell align="center">
                       <IconButton
                         onClick={(event) => {
                           event.stopPropagation()
@@ -166,7 +166,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       >
                         <FavStar favorite={row.favorite} />
                       </IconButton>
-                    </TableCell>
+                    </TableCell> */}
 
                     {!simplified && (
                       <TableCell align="center">
