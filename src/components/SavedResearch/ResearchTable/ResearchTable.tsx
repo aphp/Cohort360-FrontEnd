@@ -20,8 +20,8 @@ import {
 
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
 
-import { ReactComponent as Star } from '../../../assets/icones/star.svg'
-import { ReactComponent as StarFull } from '../../../assets/icones/star full.svg'
+// import { ReactComponent as Star } from '../../../assets/icones/star.svg'
+// import { ReactComponent as StarFull } from '../../../assets/icones/star full.svg'
 
 import { FormattedCohort } from 'types'
 
@@ -32,12 +32,12 @@ import useStyles from './styles'
 type FavStarProps = {
   favorite?: boolean
 }
-const FavStar: React.FC<FavStarProps> = ({ favorite }) => {
-  if (favorite) {
-    return <StarFull height="15px" fill="#ED6D91" />
-  }
-  return <Star height="15px" fill="#ED6D91" />
-}
+// const FavStar: React.FC<FavStarProps> = ({ favorite }) => {
+//   if (favorite) {
+//     return <StarFull height="15px" fill="#ED6D91" />
+//   }
+//   return <Star height="15px" fill="#ED6D91" />
+// }
 
 type ResearchTableProps = {
   simplified?: boolean
@@ -50,7 +50,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   simplified,
   onClickRow,
   researchData,
-  onSetCohortFavorite,
+  // onSetCohortFavorite,
   onDeleteCohort
 }) => {
   const classes = useStyles()
