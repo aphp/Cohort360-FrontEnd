@@ -29,9 +29,10 @@ const BarChart: React.FC<BarChartProps> = memo(({ data, height = 250, width = 30
       .range([margin.left, width - margin.right])
       .padding(0.1)
 
+    const maxYValue = d3.max(data, (d) => d.value)
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(data, (d) => d.value)])
+      .domain([0, maxYValue])
       .nice()
       .range([height - margin.bottom, margin.top])
 
@@ -46,7 +47,7 @@ const BarChart: React.FC<BarChartProps> = memo(({ data, height = 250, width = 30
     const yAxis = (g) =>
       g
         .attr('transform', `translate(${margin.left},0)`)
-        .call(d3.axisLeft(y).ticks(null, 's'))
+        .call(d3.axisLeft(y).ticks(Math.min(maxYValue, 8), 'f'))
         .call((g) => g.select('.domain').remove())
         .call((g) =>
           g.append('text').attr('y', 10).attr('fill', 'currentColor').attr('text-anchor', 'start').text(data.y)

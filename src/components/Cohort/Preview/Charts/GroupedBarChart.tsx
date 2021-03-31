@@ -67,10 +67,10 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
       .paddingInner(0.1)
 
     const x1 = d3.scaleBand().domain(keys).rangeRound([0, x0.bandwidth()]).padding(0.05)
-
+    const maxYValue = d3.max(customData, (d) => d3.max(keys, (key) => d[key]))
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(customData, (d) => d3.max(keys, (key) => d[key]))])
+      .domain([0, maxYValue])
       .nice()
       .rangeRound([height - margin.bottom, margin.top])
 
@@ -84,7 +84,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
     const yAxis = (g) =>
       g
         .attr('transform', `translate(${margin.left},0)`)
-        .call(d3.axisLeft(y).ticks(null, 's'))
+        .call(d3.axisLeft(y).ticks(Math.min(maxYValue, 8), 'f'))
         .call((g) => g.select('.domain').remove())
         .call((g) =>
           g

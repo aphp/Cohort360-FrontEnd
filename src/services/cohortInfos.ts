@@ -1,5 +1,3 @@
-import { head } from 'lodash'
-
 import api from './api'
 import apiBackCohort from './apiBackCohort'
 import { getInfos, getLastEncounter } from './myPatients'
@@ -153,27 +151,30 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
 
   if (CONTEXT === 'arkhn') {
     const cohortResult: CohortData = {}
-    const response = getApiResponseResources(
-      await api.get<FHIR_API_Response<IEncounter | IPatient | IGroup>>(
+    const [patientsAndEncountersResp, groupResp] = await Promise.all([
+      api.get<FHIR_API_Response<IEncounter | IPatient>>(
         `/Patient?_has:Group:member:_id=${cohortId}&_revinclude=Group:member&_revinclude=Encounter:patient&_count=500`
-      )
-    )
-    if (response) {
-      const cohort = head(
-        response.filter((resource) => resource.resourceType === 'Group' && resource.id === cohortId) as IGroup[]
-      )
+      ),
+      api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${cohortId}`)
+    ])
 
-      const cohortOrganizationIds = (cohort?.characteristic
+    const patientsAndEncounters = getApiResponseResources(patientsAndEncountersResp)
+    const cohort = getApiResponseResources(groupResp)?.[0]
+
+    if (cohort) {
+      const cohortOrganizationIds = (cohort.characteristic
         ?.filter(({ valueReference }) => valueReference?.type === 'Organization')
         .map(({ valueReference }) => valueReference?.reference?.split('/')[1]) ?? []) as string[]
 
-      const patients = response.filter((resource) => resource.resourceType === 'Patient') as IPatient[]
-      const encounters = response.filter((resource) => resource.resourceType === 'Encounter') as IEncounter[]
+      const patients: IPatient[] =
+        (patientsAndEncounters?.filter((resource) => resource.resourceType === 'Patient') as IPatient[]) ?? []
+      const encounters: IEncounter[] =
+        (patientsAndEncounters?.filter((resource) => resource.resourceType === 'Encounter') as IEncounter[]) ?? []
       const organizations = await getOrganizations(cohortOrganizationIds)
 
-      cohortResult.name = cohort?.name
+      cohortResult.name = cohort.name
       cohortResult.cohort = cohort
-      cohortResult.totalPatients = patients.length
+      cohortResult.totalPatients = cohort.member ? cohort.member.length : patients.length
       cohortResult.originalPatients = patients
       cohortResult.encounters = encounters
       cohortResult.genderRepartitionMap = getGenderRepartitionMap(patients)
