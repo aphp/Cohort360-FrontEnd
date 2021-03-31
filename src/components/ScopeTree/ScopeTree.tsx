@@ -32,7 +32,7 @@ type ScopeTreeProps = {
 }
 
 const orderRowsByAccess = (rowA: ScopeTreeRow, rowB: ScopeTreeRow): number => {
-  if (rowA.access == rowB.access) {
+  if (rowA.access === rowB.access) {
     const nameA = rowA.name
     const nameB = rowB.name
 
