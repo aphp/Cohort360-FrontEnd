@@ -132,6 +132,7 @@ export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined>
             favorite: cohort.favorite
           }))
           .filter(Boolean)
+          .reverse()
       : undefined
   }
 }
