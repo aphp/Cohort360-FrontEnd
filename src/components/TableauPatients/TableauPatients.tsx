@@ -201,7 +201,13 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                             ? getAge(patient)
                             : `${moment(patient.birthDate).format('DD/MM/YYYY')} (${getAge(patient)})`}
                         </TableCell>
-                        <TableCell>{patient.lastEncounterName}</TableCell>
+                        <TableCell>
+                          {patient.extension &&
+                          patient.extension.find((extension) => extension.url === 'last-visit-service-provider')
+                            ? patient.extension.find((extension) => extension.url === 'last-visit-service-provider')
+                                ?.valueString
+                            : 'Non renseigné'}
+                        </TableCell>
                         <TableCell>
                           <StatusShip type={patient.deceasedDateTime ? 'Décédé' : 'Vivant'} />
                         </TableCell>

@@ -1,7 +1,7 @@
 import api from './api'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import { IComposition, IPatient, IEncounter, IIdentifier } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { CohortComposition, CohortPatient, FHIR_API_Response, CohortData } from '../types'
+import { CohortComposition, FHIR_API_Response, CohortData } from '../types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import {
   getGenderRepartitionMap,
@@ -54,39 +54,6 @@ const getPatientInfos = async (deidentifiedBoolean: boolean, documents?: ICompos
   return cohortDocuments
 }
 
-export const getLastEncounter = async (patients?: IPatient[]) => {
-  if (!patients) {
-    return []
-  }
-
-  const cohortPatients = patients as CohortPatient[]
-
-  const encounters = await Promise.all(
-    cohortPatients.map((patient) =>
-      api.get<FHIR_API_Response<IEncounter>>(
-        `/Encounter?patient=${patient.id}&_sort=-start-date&size=1&_elements=subject,serviceProvider&type=VISIT`
-      )
-    )
-  )
-
-  const encountersVisits = encounters
-    .map((encounter) => getApiResponseResources(encounter))
-    .filter((encounter) => encounter && encounter.length > 0)
-
-  for (const patient of cohortPatients) {
-    for (const encounter of encountersVisits) {
-      if (patient.id === encounter?.[0].subject?.reference?.substring(8)) {
-        patient.lastEncounterName = encounter?.[0].serviceProvider?.display
-        break
-      } else {
-        patient.lastEncounterName = 'Non renseigné'
-      }
-    }
-  }
-
-  return cohortPatients
-}
-
 export const fetchMyPatients = async (): Promise<CohortData | undefined> => {
   if (CONTEXT === 'aphp') {
     const [myPatientsResp, myPatientsEncounters] = await Promise.all([
@@ -98,7 +65,7 @@ export const fetchMyPatients = async (): Promise<CohortData | undefined> => {
 
     const totalPatients = myPatientsResp.data.resourceType === 'Bundle' ? myPatientsResp.data.total : 0
 
-    const originalPatients = await getLastEncounter(getApiResponseResources(myPatientsResp))
+    const originalPatients = getApiResponseResources(myPatientsResp)
 
     const agePyramidData =
       myPatientsResp.data.resourceType === 'Bundle'
