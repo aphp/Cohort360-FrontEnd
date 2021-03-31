@@ -9,7 +9,16 @@ const cohortOrgaRepartitionDataSelector = createSelector(self, (state):
   | (SimpleChartDataType & { id?: string })[]
   | null => {
   const practitionerOrganizations = state.me?.organizations
-  const { perimeterRepartitionData } = state.exploredCohort
+  const { perimeterRepartitionData, originalPatients, cohort } = state.exploredCohort
+
+  const groupOrganizationsCount = cohort?.characteristic?.length ?? 0
+  const groupOrganizationsInPerimeterCount =
+    practitionerOrganizations?.filter((orga) => perimeterRepartitionData?.find(({ id }) => id === orga.id)).length ?? 0
+  const orgasOutOfPerimeterCount = groupOrganizationsCount - groupOrganizationsInPerimeterCount
+
+  const patientsInPerimeterCount = originalPatients?.length ?? 0
+  const cohortMembersCount = cohort?.member?.length ?? 0
+  const patientsOutOfPerimeterCount = cohortMembersCount - patientsInPerimeterCount
 
   if (!practitionerOrganizations || !perimeterRepartitionData) {
     return null
@@ -19,6 +28,7 @@ const cohortOrgaRepartitionDataSelector = createSelector(self, (state):
     const isOrgaInScope = practitionerOrganizations?.some((orga) => orga.id === data.id)
     return {
       ...data,
+      value: isOrgaInScope ? data.value : Math.floor(patientsOutOfPerimeterCount / orgasOutOfPerimeterCount),
       color: isOrgaInScope ? '#16BDFF' : '#777777'
     }
   })
