@@ -7,6 +7,7 @@ import Cim10Hierarchy from './components/Hierarchy/Cim10Hierarchy'
 import useStyles from './styles'
 
 const defaultCondition = {
+  type: 'Condition',
   title: 'Critère de diagnostic',
   code: [],
   diagnosticType: [],
@@ -14,7 +15,6 @@ const defaultCondition = {
   occurrenceComparator: '>=',
   startOccurrence: '',
   endOccurrence: '',
-  type: 'Condition',
   isInclusive: true
 }
 
@@ -22,7 +22,7 @@ const Index = (props: any) => {
   const classes = useStyles()
 
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>('hierarchy')
+  const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
   const [defaultValues, onChangeDefaultValues] = useState(selectedCriteria || defaultCondition)
 
   const isEdition = selectedCriteria !== null ? true : false
@@ -33,6 +33,12 @@ const Index = (props: any) => {
       code
     })
     onChangeTab('form')
+  }
+
+  const _onChangeValue = (key: string, value: any) => {
+    const _defaultValues = defaultValues ? { ...defaultValues } : {}
+    _defaultValues[key] = value
+    onChangeDefaultValues(_defaultValues)
   }
 
   return (
@@ -49,6 +55,7 @@ const Index = (props: any) => {
           isEdition={isEdition}
           criteria={criteria}
           selectedCriteria={defaultValues}
+          onChangeValue={_onChangeValue}
           onChangeSelectedCriteria={onChangeSelectedCriteria}
           goBack={goBack}
         />

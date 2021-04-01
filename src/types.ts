@@ -301,7 +301,6 @@ export type DemographicDataType = {
   gender: { id: string; label: string }[] | null
   vitalStatus: { id: string; label: string }[] | null
   ageType: { id: string; label: string } | null
-  label: undefined
   years: [number, number]
   isInclusive?: boolean
 }
@@ -313,9 +312,8 @@ export type DocumentDataType = {
   docType: { id: string; label: string }[] | null
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
-  label: undefined
-  startOccurrence: Date
-  endOccurrence: Date
+  startOccurrence: Date | null
+  endOccurrence: Date | null
   isInclusive?: boolean
 }
 
@@ -332,8 +330,6 @@ export type GhmDataType = {
 }
 
 export type EncounterDataType = {
-  label: undefined
-  label2: undefined
   type: 'Encounter'
   title: string
   ageType: { id: string; label: string } | null

@@ -71,12 +71,13 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
       <ListItem className={classes.cimItem}>
         <ListItemIcon>
           <div
+            onClick={() => handleClickOnHierarchy(cimItem)}
             className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`}
-            style={{ color: '#0063af' }}
+            style={{ color: '#0063af', cursor: 'pointer' }}
           />
         </ListItemIcon>
         <Tooltip title={label} enterDelay={2500}>
-          <ListItemText className={classes.label} primary={label} onClick={() => handleClickOnHierarchy(cimItem)} />
+          <ListItemText className={classes.label} primary={label} />
         </Tooltip>
       </ListItem>
     )
