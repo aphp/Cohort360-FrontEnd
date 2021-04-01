@@ -38,13 +38,12 @@ const orderRowsByAccess = (rowA: ScopeTreeRow, rowB: ScopeTreeRow): number => {
 
     if (nameA < nameB) return -1
     if (nameA > nameB) return 1
+    return 0
   } else if (rowA.access) {
     return -1
-  } else if (rowB.access) {
+  } else {
     return 1
   }
-
-  return 0
 }
 
 const ScopeTree: React.FC<ScopeTreeProps> = ({
