@@ -110,6 +110,11 @@ const GroupCard: React.FC = () => {
     dispatch(deleteCriteriaGroup(groupId))
   }
 
+  const _deleteAndRebuild = (groupId: number) => {
+    _deleteGroup(groupId)
+    dispatch(buildCreationCohort({}))
+  }
+
   return (
     <>
       {displayingCriteriaGroup.map(({ id, title, criteriaIds, type, isInclusive }) => {
@@ -129,7 +134,7 @@ const GroupCard: React.FC = () => {
                       <IconButton size="small" onClick={() => _editGroup(id)} style={{ color: 'currentcolor' }}>
                         <EditIcon />
                       </IconButton>
-                      <IconButton size="small" onClick={() => _deleteGroup(id)} style={{ color: 'currentcolor' }}>
+                      <IconButton size="small" onClick={() => _deleteAndRebuild(id)} style={{ color: 'currentcolor' }}>
                         <DeleteIcon />
                       </IconButton>
                     </>

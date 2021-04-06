@@ -18,9 +18,12 @@ const useStyles = makeStyles(() =>
     },
     requestExecution: {
       backgroundColor: '#5BC5F2',
+      marginLeft: '20px',
+      marginRight: '20px',
       borderRadius: '26px',
       border: 'none',
       height: '40px',
+      width: 'inherit',
       color: '#FFF',
       '&:hover': {
         backgroundColor: '#499cbf'

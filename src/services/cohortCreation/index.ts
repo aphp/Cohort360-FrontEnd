@@ -55,6 +55,7 @@ const getPatientsFromDocuments = memoize(
  * createCohortGroup parses a json describing the characteristics of a cohort
  * then creates a FHIR Group instance
  * @param jsonQuery
+ * @param cohortName
  */
 const createCohortGroup = async (jsonQuery: string, cohortName?: string): Promise<IGroup> => {
   const query: Query = JSON.parse(jsonQuery)
