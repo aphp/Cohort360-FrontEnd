@@ -153,8 +153,55 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     } else {
       savedSelectedItems = [...savedSelectedItems, ...getAllChildren(row)]
     }
+
+    let _savedSelectedItems = []
+    const checkIfParentIsChecked = (rows: ScopeTreeRow[]) => {
+      for (let index = 0; index < rows.length; index++) {
+        const row = rows[index]
+        if (
+          !row.subItems ||
+          (row && row.subItems.length === 0) ||
+          (row && row.subItems.length === 1 && row.subItems[0].id === 'loading')
+        ) {
+          continue
+        }
+
+        const selectedChildren = row.subItems
+          ? row.subItems.filter((child) => savedSelectedItems.find((selectedChild) => selectedChild.id === child.id))
+          : []
+
+        const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
+        const isNotSelected = foundItem && savedSelectedItems ? savedSelectedItems.indexOf(foundItem) : -1
+
+        if (
+          foundItem &&
+          foundItem.subItems &&
+          selectedChildren.length === foundItem.subItems.length &&
+          isNotSelected === -1
+        ) {
+          savedSelectedItems = [...savedSelectedItems, row]
+        } else if (
+          foundItem &&
+          foundItem.subItems &&
+          selectedChildren.length !== foundItem.subItems.length &&
+          isNotSelected !== -1
+        ) {
+          savedSelectedItems = savedSelectedItems.filter(({ id }) => id !== row.id)
+        }
+        if (row.subItems) checkIfParentIsChecked(row.subItems)
+      }
+    }
+
+    savedSelectedItems = savedSelectedItems.filter((item, index, array) => array.indexOf(item) === index)
+
+    while (savedSelectedItems.length !== _savedSelectedItems.length) {
+      _savedSelectedItems = savedSelectedItems
+      checkIfParentIsChecked(rootRows)
+    }
+
+    savedSelectedItems = savedSelectedItems.filter((item, index, array) => array.indexOf(item) === index)
+
     onChangeSelectedItem(savedSelectedItems)
-    // setSelectedItem(savedSelectedItems)
   }
 
   const _checkIfIndeterminated: (_row: any) => boolean | undefined = (_row) => {
@@ -175,7 +222,13 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
 
   const headCells = [
     { id: '', align: 'left', disablePadding: true, disableOrderBy: true, label: '' },
-    { id: '', align: 'left', disablePadding: true, disableOrderBy: true, label: '' },
+    {
+      id: '',
+      align: 'left',
+      disablePadding: true,
+      disableOrderBy: true,
+      label: <>{/* <Typography>SALUC C'EST VICTOR !</Typography> */}</>
+    },
     { id: 'name', align: 'left', disablePadding: false, disableOrderBy: true, label: 'Nom' },
     { id: 'quantity', align: 'center', disablePadding: false, disableOrderBy: true, label: 'Nombre de patients' },
     { id: 'deidentified', align: 'center', disablePadding: false, disableOrderBy: true, label: 'Accès' }
