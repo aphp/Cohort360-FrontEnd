@@ -169,7 +169,7 @@ const createCohortGroup = async (jsonQuery: string, cohortName?: string): Promis
     name: cohortName,
     type: GroupTypeKind._person,
     actual: true,
-    quantity: patientIds.length,
+    quantity: uniq(patientIds).length,
     characteristic: perimeters.map<IGroup_Characteristic>((perimeter) => ({
       exclude: false,
       code: { text: 'perimeter' },
