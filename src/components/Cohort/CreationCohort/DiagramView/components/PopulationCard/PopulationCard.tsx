@@ -25,8 +25,51 @@ const PopulationCard: React.FC = () => {
   const [isExtended, onExtend] = useState(false)
   const [openDrawer, onChangeOpenDrawer] = useState(false)
 
-  const submitPopulation = (_selectedPopulation: ScopeTreeRow[] | null) => {
-    dispatch<any>(buildCohortCreation({ selectedPopulation: _selectedPopulation }))
+  const submitPopulation = (_selectedPopulations: ScopeTreeRow[] | null) => {
+    if (_selectedPopulations === null) return
+
+    // If you chenge this code, change it too inside: Scope.jsx:25
+    _selectedPopulations = _selectedPopulations.filter((item, index, array) => {
+      const parentItem = array.find(({ subItems }) => !!subItems?.find((subItem) => subItem.id === item.id))
+      if (parentItem !== undefined) {
+        const selectedChildren =
+          parentItem.subItems && parentItem.subItems.length > 0
+            ? parentItem.subItems.filter((subItem) => !!array.find(({ id }) => id === subItem.id))
+            : []
+        if (selectedChildren.length === parentItem.subItems.length) {
+          // Si item + TOUS LES AUTRES child sont select. => Delete it
+          return false
+        } else {
+          // Sinon => Keep it
+          return true
+        }
+      } else {
+        if (
+          !item.subItems ||
+          (item.subItems && item.subItems.length === 0) ||
+          (item.subItems && item.subItems.length > 0 && item.subItems[0].id === 'loading')
+        ) {
+          return true
+        }
+
+        const selectedChildren =
+          item.subItems && item.subItems.length > 0
+            ? item.subItems.filter((subItem) => !!array.find(({ id }) => id === subItem.id))
+            : []
+
+        if (selectedChildren.length === item.subItems.length) {
+          // Si tous les enfants sont check => Keep it
+          return true
+        } else {
+          // Sinon => Delete it
+          return false
+        }
+      }
+    })
+
+    console.log('_selectedPopulations :>> ', _selectedPopulations)
+
+    dispatch<any>(buildCohortCreation({ selectedPopulation: _selectedPopulations }))
     onChangeOpenDrawer(false)
   }
 

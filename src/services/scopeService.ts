@@ -13,7 +13,7 @@ import { getApiResponseResources } from 'utils/apiHelpers'
 
 import fakeScopeRows from '../data/fakeData/scopeRows'
 
-const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0 }
+const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
 const getServicePatientsCount = async (
   service: IHealthcareService
@@ -222,7 +222,7 @@ export const getScopePerimeters = async (practitionerId: string): Promise<ScopeT
   return []
 }
 
-export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<ScopeTreeRow[] | undefined> => {
+export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<ScopeTreeRow[]> => {
   if (!perimeter) return []
   const perimeterGroupId = perimeter?.managingEntity?.display?.replace(/^Organization\//, '') || 0
   const organization = await api.get<FHIR_API_Response<IOrganization>>(

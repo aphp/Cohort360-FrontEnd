@@ -20,32 +20,50 @@ const Scope = () => {
   const open = useSelector((state) => state.drawer)
 
   const trimItems = () => {
-    let onlyParents = []
-    const _selectedItems = selectedItems ? selectedItems : []
+    let _selectedItems = selectedItems ? selectedItems : []
 
-    for (const element of _selectedItems) {
-      if (onlyParents.find((onlyParent) => onlyParent?.subItems?.find(({ id }) => id === element.id))) continue
+    // If you chenge this code, change it too inside: PopulationCard.tsx:31
+    _selectedItems = _selectedItems.filter((item, index, array) => {
+      const parentItem = array.find(({ subItems }) => !!subItems?.find((subItem) => subItem.id === item.id))
+      if (parentItem !== undefined) {
+        const selectedChildren =
+          parentItem.subItems && parentItem.subItems.length > 0
+            ? parentItem.subItems.filter((subItem) => !!array.find(({ id }) => id === subItem.id))
+            : []
 
-      if (element && element.subItems && element.subItems.length > 0 && element.subItems[0].id !== 'loading') {
-        const filteredItems = element.subItems.filter((subItem) =>
-          _selectedItems.some(({ id }) => subItem && subItem.id === id)
-        )
-
-        if (element.subItems.length === filteredItems?.length) {
-          onlyParents = [...onlyParents, element]
+        if (selectedChildren.length === parentItem.subItems.length) {
+          // Si item + TOUS LES AUTRES child sont select. => Delete it
+          return false
         } else {
-          onlyParents = [...onlyParents, ...filteredItems]
+          // Sinon => Keep it
+          return true
         }
       } else {
-        onlyParents = [...onlyParents, element]
+        if (
+          !item.subItems ||
+          (item.subItems && item.subItems.length === 0) ||
+          (item.subItems && item.subItems.length > 0 && item.subItems[0].id === 'loading')
+        ) {
+          // Si pas d'enfant, pas de check => Keep it
+          return true
+        }
+
+        const selectedChildren =
+          item.subItems && item.subItems.length > 0
+            ? item.subItems.filter((subItem) => !!array.find(({ id }) => id === subItem.id))
+            : []
+
+        if (selectedChildren.length === item.subItems.length) {
+          // Si tous les enfants sont check => Keep it
+          return true
+        } else {
+          // Sinon => Delete it
+          return false
+        }
       }
-    }
+    })
 
-    onlyParents = onlyParents.filter(
-      (onlyParent, index) => onlyParents.indexOf(onlyParent) === index && onlyParent?.id !== 'loading'
-    )
-
-    history.push(`/perimetres?${onlyParents.map((selected) => selected.id)}`)
+    history.push(`/perimetres?${_selectedItems.map((selected) => selected.id)}`)
   }
 
   return (
