@@ -162,8 +162,9 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
           !row.subItems ||
           (row && row.subItems.length === 0) ||
           (row && row.subItems.length === 1 && row.subItems[0].id === 'loading')
-        )
+        ) {
           continue
+        }
 
         const selectedChildren = row.subItems
           ? row.subItems.filter((child) => savedSelectedItems.find((selectedChild) => selectedChild.id === child.id))
@@ -171,6 +172,8 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
         const isNotSelected = savedSelectedItems ? savedSelectedItems.indexOf(row) : -1
         if (row.subItems && selectedChildren.length === row.subItems.length && isNotSelected === -1) {
           savedSelectedItems = [...savedSelectedItems, row]
+        } else if (row.subItems && selectedChildren.length !== row.subItems.length && isNotSelected !== -1) {
+          savedSelectedItems = savedSelectedItems.filter(({ id }) => id !== row.id)
         }
         if (row.subItems) checkIfParentIsChecked(row.subItems)
       }
@@ -180,9 +183,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
 
     while (savedSelectedItems.length !== _savedSelectedItems.length) {
       _savedSelectedItems = savedSelectedItems
-      console.log('_savedSelectedItems :>> ', _savedSelectedItems)
       checkIfParentIsChecked(rootRows)
-      console.log('savedSelectedItems :>> ', savedSelectedItems, '\n')
     }
 
     savedSelectedItems = savedSelectedItems.filter((item, index, array) => array.indexOf(item) === index)
@@ -208,7 +209,13 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
 
   const headCells = [
     { id: '', align: 'left', disablePadding: true, disableOrderBy: true, label: '' },
-    { id: '', align: 'left', disablePadding: true, disableOrderBy: true, label: '' },
+    {
+      id: '',
+      align: 'left',
+      disablePadding: true,
+      disableOrderBy: true,
+      label: <>{/* <Typography>SALUC C'EST VICTOR !</Typography> */}</>
+    },
     { id: 'name', align: 'left', disablePadding: false, disableOrderBy: true, label: 'Nom' },
     { id: 'quantity', align: 'center', disablePadding: false, disableOrderBy: true, label: 'Nombre de patients' },
     { id: 'deidentified', align: 'center', disablePadding: false, disableOrderBy: true, label: 'Accès' }
