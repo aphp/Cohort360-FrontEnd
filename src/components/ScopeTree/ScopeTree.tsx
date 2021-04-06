@@ -153,8 +153,41 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     } else {
       savedSelectedItems = [...savedSelectedItems, ...getAllChildren(row)]
     }
+
+    let _savedSelectedItems = []
+    const checkIfParentIsChecked = (rows: ScopeTreeRow[]) => {
+      for (let index = 0; index < rows.length; index++) {
+        const row = rows[index]
+        if (
+          !row.subItems ||
+          (row && row.subItems.length === 0) ||
+          (row && row.subItems.length === 1 && row.subItems[0].id === 'loading')
+        )
+          continue
+
+        const selectedChildren = row.subItems
+          ? row.subItems.filter((child) => savedSelectedItems.find((selectedChild) => selectedChild.id === child.id))
+          : []
+        const isNotSelected = savedSelectedItems ? savedSelectedItems.indexOf(row) : -1
+        if (row.subItems && selectedChildren.length === row.subItems.length && isNotSelected === -1) {
+          savedSelectedItems = [...savedSelectedItems, row]
+        }
+        if (row.subItems) checkIfParentIsChecked(row.subItems)
+      }
+    }
+
+    savedSelectedItems = savedSelectedItems.filter((item, index, array) => array.indexOf(item) === index)
+
+    while (savedSelectedItems.length !== _savedSelectedItems.length) {
+      _savedSelectedItems = savedSelectedItems
+      console.log('_savedSelectedItems :>> ', _savedSelectedItems)
+      checkIfParentIsChecked(rootRows)
+      console.log('savedSelectedItems :>> ', savedSelectedItems, '\n')
+    }
+
+    savedSelectedItems = savedSelectedItems.filter((item, index, array) => array.indexOf(item) === index)
+
     onChangeSelectedItem(savedSelectedItems)
-    // setSelectedItem(savedSelectedItems)
   }
 
   const _checkIfIndeterminated: (_row: any) => boolean | undefined = (_row) => {
