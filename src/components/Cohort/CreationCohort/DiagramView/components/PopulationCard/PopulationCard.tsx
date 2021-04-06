@@ -30,6 +30,11 @@ const PopulationCard: React.FC = () => {
 
     // If you chenge this code, change it too inside: Scope.jsx:25
     _selectedPopulations = _selectedPopulations.filter((item, index, array) => {
+      // reemove double item
+      const foundItem = array.find(({ id }) => item.id === id)
+      const currentIndex = foundItem ? array.indexOf(foundItem) : -1
+      if (index !== currentIndex) return false
+
       const parentItem = array.find(({ subItems }) => !!subItems?.find((subItem) => subItem.id === item.id))
       if (parentItem !== undefined) {
         const selectedChildren =
@@ -66,6 +71,11 @@ const PopulationCard: React.FC = () => {
         }
       }
     })
+
+    _selectedPopulations = _selectedPopulations.map((_selectedPopulation: ScopeTreeRow) => ({
+      ..._selectedPopulation,
+      subItems: []
+    }))
 
     dispatch<any>(buildCohortCreation({ selectedPopulation: _selectedPopulations }))
     onChangeOpenDrawer(false)

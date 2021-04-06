@@ -24,6 +24,11 @@ const Scope = () => {
 
     // If you chenge this code, change it too inside: PopulationCard.tsx:31
     _selectedItems = _selectedItems.filter((item, index, array) => {
+      // reemove double item
+      const foundItem = array.find(({ id }) => item.id === id)
+      const currentIndex = foundItem ? array.indexOf(foundItem) : -1
+      if (index !== currentIndex) return false
+
       const parentItem = array.find(({ subItems }) => !!subItems?.find((subItem) => subItem.id === item.id))
       if (parentItem !== undefined) {
         const selectedChildren =

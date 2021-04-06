@@ -169,7 +169,10 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
         const selectedChildren = row.subItems
           ? row.subItems.filter((child) => savedSelectedItems.find((selectedChild) => selectedChild.id === child.id))
           : []
-        const isNotSelected = savedSelectedItems ? savedSelectedItems.indexOf(row) : -1
+
+        const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
+        const isNotSelected = foundItem && savedSelectedItems ? savedSelectedItems.indexOf(foundItem) : -1
+
         if (row.subItems && selectedChildren.length === row.subItems.length && isNotSelected === -1) {
           savedSelectedItems = [...savedSelectedItems, row]
         } else if (row.subItems && selectedChildren.length !== row.subItems.length && isNotSelected !== -1) {
