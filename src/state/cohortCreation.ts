@@ -121,7 +121,7 @@ const buildCreationCohort = createAsyncThunk<
     const _selectedCriteria = state.cohortCreation.request.selectedCriteria
     const _criteriaGroup = state.cohortCreation.request.criteriaGroup
 
-    const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup)
+    const json = buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup)
     const { requestId, snapshotsHistory, currentSnapshot, count } = await _onSaveNewJson(
       state.cohortCreation.request,
       json
@@ -222,7 +222,9 @@ const cohortCreationSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(logout, () => initialState)
     // buildCreationCohort
-    builder.addCase(buildCreationCohort.pending, (state) => ({ ...state, loading: false }))
+    builder.addCase(buildCreationCohort.pending, (state) => {
+      state.loading = false
+    })
     builder.addCase(buildCreationCohort.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
     builder.addCase(buildCreationCohort.rejected, (state) => ({ ...state, loading: false }))
     // unbuildCreationCohort

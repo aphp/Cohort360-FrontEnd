@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { Button, Card, CardHeader, CardContent, CircularProgress, IconButton, Typography } from '@material-ui/core'
 
@@ -7,24 +6,31 @@ import EditIcon from '@material-ui/icons/Edit'
 
 import PopulationRightPanel from './components/PopulationRightPanel'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { buildCreationCohort } from 'state/cohortCreation'
 
 import { ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
+import { unwrapResult } from '@reduxjs/toolkit'
 
 const PopulationCard: React.FC = () => {
   const { selectedPopulation = [], loading = false } = useAppSelector((state) => state.cohortCreation.request || {})
 
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [openDrawer, onChangeOpenDrawer] = useState(false)
+  const [isLoadingSubmit, setLoadingSubmit] = useState(false)
 
   const submitPopulation = (_selectedPopulation: ScopeTreeRow[] | null) => {
+    setLoadingSubmit(true)
     dispatch(buildCreationCohort({ selectedPopulation: _selectedPopulation }))
-    onChangeOpenDrawer(false)
+      .then(unwrapResult)
+      .finally(() => {
+        setLoadingSubmit(false)
+        onChangeOpenDrawer(false)
+      })
   }
 
   return (
@@ -82,7 +88,12 @@ const PopulationCard: React.FC = () => {
         </Card>
       </div>
 
-      <PopulationRightPanel open={openDrawer} onConfirm={submitPopulation} onClose={() => onChangeOpenDrawer(false)} />
+      <PopulationRightPanel
+        isLoadingSubmit={isLoadingSubmit}
+        open={openDrawer}
+        onConfirm={submitPopulation}
+        onClose={() => onChangeOpenDrawer(false)}
+      />
     </>
   )
 }
