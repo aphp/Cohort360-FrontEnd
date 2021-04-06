@@ -1,4 +1,4 @@
-import { intersection, pullAll, union, last, memoize } from 'lodash'
+import { intersection, pullAll, union, last, memoize, uniq } from 'lodash'
 import moment from 'moment'
 import {
   GroupTypeKind,
@@ -178,7 +178,7 @@ const createCohortGroup = async (jsonQuery: string, cohortName?: string): Promis
         reference: `Organization/${perimeter}`
       }
     })),
-    member: patientIds.map<IGroup_Member>((id) => ({
+    member: uniq(patientIds).map<IGroup_Member>((id) => ({
       entity: {
         type: 'Patient',
         reference: `Patient/${id}`
