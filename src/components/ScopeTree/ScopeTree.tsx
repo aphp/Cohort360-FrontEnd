@@ -173,9 +173,19 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
         const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
         const isNotSelected = foundItem && savedSelectedItems ? savedSelectedItems.indexOf(foundItem) : -1
 
-        if (row.subItems && selectedChildren.length === row.subItems.length && isNotSelected === -1) {
+        if (
+          foundItem &&
+          foundItem.subItems &&
+          selectedChildren.length === foundItem.subItems.length &&
+          isNotSelected === -1
+        ) {
           savedSelectedItems = [...savedSelectedItems, row]
-        } else if (row.subItems && selectedChildren.length !== row.subItems.length && isNotSelected !== -1) {
+        } else if (
+          foundItem &&
+          foundItem.subItems &&
+          selectedChildren.length !== foundItem.subItems.length &&
+          isNotSelected !== -1
+        ) {
           savedSelectedItems = savedSelectedItems.filter(({ id }) => id !== row.id)
         }
         if (row.subItems) checkIfParentIsChecked(row.subItems)
