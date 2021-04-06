@@ -67,8 +67,6 @@ const PopulationCard: React.FC = () => {
       }
     })
 
-    console.log('_selectedPopulations :>> ', _selectedPopulations)
-
     dispatch<any>(buildCohortCreation({ selectedPopulation: _selectedPopulations }))
     onChangeOpenDrawer(false)
   }
