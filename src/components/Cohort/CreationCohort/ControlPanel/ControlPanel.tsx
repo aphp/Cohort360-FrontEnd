@@ -15,6 +15,8 @@ import { resetCohortCreation, countCohortCreation } from 'state/cohortCreation'
 
 import useStyle from './styles'
 
+import displayDigit from 'utils/displayDigit'
+
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string) => void
   onUndo?: () => void
@@ -118,7 +120,7 @@ const ControlPanel: React.FC<{
               />
             ) : (
               <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
-                {includePatient ?? '-'}
+                {includePatient ? displayDigit(includePatient) : '-'}
               </Typography>
             )}
           </Grid>
