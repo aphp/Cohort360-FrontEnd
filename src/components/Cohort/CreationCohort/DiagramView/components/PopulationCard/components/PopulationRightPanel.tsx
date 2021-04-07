@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import Button from '@material-ui/core/Button'
-import Drawer from '@material-ui/core/Drawer'
-import Typography from '@material-ui/core/Typography'
+import { CircularProgress, Button, Drawer, Typography } from '@material-ui/core'
 
 import ScopeTree from '../../../../../../ScopeTree/ScopeTree'
 import { ScopeTreeRow } from 'types'
@@ -15,11 +13,10 @@ type PopulationRightPanelProps = {
   open: boolean
   onConfirm: (selectedPopulation: ScopeTreeRow[] | null) => void
   onClose: () => void
+  isLoadingSubmit?: boolean
 }
 
-const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
-  const { open, onConfirm, onClose } = props
-
+const PopulationRightPanel: React.FC<PopulationRightPanelProps> = ({ open, onConfirm, onClose, isLoadingSubmit }) => {
   const classes = useStyles()
 
   const { selectedPopulation = [] } = useAppSelector((state) => state.cohortCreation.request || {})
@@ -27,7 +24,7 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
 
   useEffect(() => {
     onChangeSelectedPopulation(selectedPopulation ?? [])
-  }, [open]) // eslint-disable-line
+  }, [open, selectedPopulation])
 
   /**
    * Render
@@ -48,12 +45,14 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
             Annuler
           </Button>
           <Button
-            disabled={!_selectedPopulation || (_selectedPopulation && _selectedPopulation.length === 0)}
+            disabled={
+              isLoadingSubmit || !_selectedPopulation || (_selectedPopulation && _selectedPopulation.length === 0)
+            }
             onClick={() => onConfirm(_selectedPopulation)}
             color="primary"
             variant="contained"
           >
-            Confirmer
+            {isLoadingSubmit ? <CircularProgress size={20} /> : 'Confirmer'}
           </Button>
         </div>
       </div>
