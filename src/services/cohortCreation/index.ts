@@ -41,7 +41,7 @@ const getPatientsFromDocuments = memoize(
     const response = await adminApiFhir.get<FHIR_API_Response<IDocumentReference>>(documentQuery)
     const documents = getApiResponseResources(response)
     const patientIds = uniq(
-      documents?.map((document) => last(document.subject?.reference?.split('/'))).filter((patientId) => !!patientId)
+      documents?.map((document) => last(document.subject?.reference?.split('/'))).filter(Boolean)
     )
     if (!patientIds?.length) return []
 
