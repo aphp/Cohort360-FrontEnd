@@ -65,6 +65,30 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
     return <></>
   }
 
+  console.log('criteria?.data :>> ', criteria?.data)
+
+  const defaultValuesGender = defaultValues.gender
+    ? defaultValues.gender.map((gender: any) => {
+        const criteriaGender = criteria.data.gender ? criteria.data.gender.find((g: any) => g.id === gender.id) : null
+        return {
+          id: gender.id,
+          label: gender.label ? gender.label : criteriaGender?.label ?? '?'
+        }
+      })
+    : []
+  console.log('defaultValuesGender :>> ', defaultValuesGender)
+  const defaultValuesVitalStatus = defaultValues.vitalStatus
+    ? defaultValues.vitalStatus.map((vitalStatus: any) => {
+        const criteriaStatus = criteria.data.status
+          ? criteria.data.status.find((s: any) => s.id === vitalStatus.id)
+          : null
+        return {
+          id: vitalStatus.id,
+          label: vitalStatus.label ? vitalStatus.label : criteriaStatus?.label ?? '?'
+        }
+      })
+    : []
+
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
@@ -119,7 +143,8 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             className={classes.inputItem}
             options={criteria?.data?.gender || []}
             getOptionLabel={(option) => option.label}
-            value={defaultValues.gender}
+            getOptionSelected={(option, value) => option.id === value.id}
+            value={defaultValuesGender}
             onChange={(e, value) => _onChangeValue('gender', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Genre" />}
           />
@@ -130,7 +155,8 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             className={classes.inputItem}
             options={criteria?.data?.status || []}
             getOptionLabel={(option) => option.label}
-            value={defaultValues.vitalStatus}
+            getOptionSelected={(option, value) => option.id === value.id}
+            value={defaultValuesVitalStatus}
             onChange={(e, value) => _onChangeValue('vitalStatus', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Statut vital" />}
           />
@@ -159,6 +185,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
                 { id: 'day', label: 'jours' }
               ]}
               getOptionLabel={(option) => option.label}
+              getOptionSelected={(option, value) => option.id === value.id}
               value={defaultValues.ageType}
               onChange={(e, value) => _onChangeValue('ageType', value)}
               renderInput={(params) => <TextField {...params} variant="outlined" />}

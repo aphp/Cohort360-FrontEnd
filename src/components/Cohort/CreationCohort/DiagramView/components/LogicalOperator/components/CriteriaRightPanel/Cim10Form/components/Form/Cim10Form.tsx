@@ -57,6 +57,29 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     return <> </>
   }
 
+  const defaultValuesCode = selectedCriteria.code
+    ? selectedCriteria.code.map((code: any) => {
+        const criteriaCode = criteria.data.cim10Diagnostic
+          ? criteria.data.cim10Diagnostic.find((c: any) => c.id === code.id)
+          : null
+        return {
+          id: code.id,
+          label: code.label ? code.label : criteriaCode?.label ?? '?'
+        }
+      })
+    : []
+  const defaultValuesType = selectedCriteria.diagnosticType
+    ? selectedCriteria.diagnosticType.map((diagnosticType: any) => {
+        const criteriaType = criteria.data.diagnosticTypes
+          ? criteria.data.diagnosticTypes.find((g: any) => g.id === diagnosticType.id)
+          : null
+        return {
+          id: diagnosticType.id,
+          label: diagnosticType.label ? diagnosticType.label : criteriaType?.label ?? '?'
+        }
+      })
+    : []
+
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
@@ -112,7 +135,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             noOptionsText="Veuillez entrer un code ou un diagnostic CIM10"
             helperText={'Tous les code CIM10 sélectionnés seront liés par une contrainte OU'}
             className={classes.inputItem}
-            autocompleteValue={selectedCriteria.code}
+            autocompleteValue={defaultValuesCode}
             autocompleteOptions={criteria?.data?.cim10Diagnostic || []}
             getAutocompleteOptions={getDiagOptions}
             onChange={(e, value) => onChangeValue('code', value)}
@@ -125,12 +148,10 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             options={criteria?.data?.diagnosticTypes || []}
             getOptionLabel={(option) => option.label}
             getOptionSelected={(option, value) => option.id === value.id}
-            value={selectedCriteria.diagnosticType}
+            value={defaultValuesType}
             onChange={(e, value) => onChangeValue('diagnosticType', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Type de diagnostic" />}
           />
-
-          {/* Mettre  */}
 
           <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
             Nombre d'occurrence

@@ -4,7 +4,8 @@ import { fakeValueSetGHM /*fakeHierarchyGHM*/ } from '../../data/fakeData/cohort
 import { codeSort } from '../../utils/alphabeticalSort'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
 
-export const fetchGhmData = async (searchValue?: string) => {
+export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
+  noStar = noStar === undefined ? true : noStar
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
@@ -18,7 +19,14 @@ export const fetchGhmData = async (searchValue?: string) => {
     if (!searchValue) {
       return []
     }
-    const _searchValue = searchValue ? `&_text=${searchValue}*` : ''
+    const _searchValue = noStar
+      ? searchValue
+        ? `&_text=${searchValue}`
+        : ''
+      : searchValue
+      ? `&_text=${searchValue}*`
+      : ''
+
     const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-ghm${_searchValue}`)
 
     const data =

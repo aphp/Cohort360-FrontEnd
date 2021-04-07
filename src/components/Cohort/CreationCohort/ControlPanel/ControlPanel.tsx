@@ -4,8 +4,8 @@ import clsx from 'clsx'
 
 import { Button, CircularProgress, Divider, Grid, Typography } from '@material-ui/core'
 
-// import ArrowBackIcon from '@material-ui/icons/ArrowBack'
-// import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
+import ArrowBackIcon from '@material-ui/icons/ArrowBack'
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
 import UpdateSharpIcon from '@material-ui/icons/UpdateSharp'
 
 import ModalCohortTitle from './components/ModalCohortTitle/ModalCohortTitle'
@@ -21,7 +21,7 @@ const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string) => void
   onUndo?: () => void
   onRedo?: () => void
-}> = ({ onExecute }) => {
+}> = ({ onExecute, onUndo, onRedo }) => {
   const classes = useStyle()
   const dispatch = useDispatch()
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
@@ -71,7 +71,7 @@ const ControlPanel: React.FC<{
 
           <Divider />
 
-          {/* <Button
+          <Button
             className={classes.actionButton}
             onClick={onUndo}
             disabled={typeof onUndo !== 'function'}
@@ -91,7 +91,7 @@ const ControlPanel: React.FC<{
             <Typography className={classes.boldText}>Rétablir</Typography>
           </Button>
 
-          <Divider /> */}
+          <Divider />
 
           <Button
             onClick={() => dispatch<any>(resetCohortCreation())}

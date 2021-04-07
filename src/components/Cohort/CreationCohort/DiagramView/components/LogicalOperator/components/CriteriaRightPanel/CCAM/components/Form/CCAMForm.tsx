@@ -54,6 +54,16 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
     return ccamOptions && ccamOptions.length > 0 ? ccamOptions : []
   }
 
+  const defaultValuesCode = selectedCriteria.code
+    ? selectedCriteria.code.map((code: any) => {
+        const criteriaCode = criteria.data.ccamData ? criteria.data.ccamData.find((g: any) => g.id === code.id) : null
+        return {
+          id: code.id,
+          label: code.label ? code.label : criteriaCode?.label ?? '?'
+        }
+      })
+    : []
+
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
@@ -109,7 +119,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             noOptionsText="Veuillez entrer un code ou un acte CCAM"
             helperText={'Tous les actes CCAM sélectionnés seront liés par une contrainte OU'}
             className={classes.inputItem}
-            autocompleteValue={selectedCriteria.code}
+            autocompleteValue={defaultValuesCode}
             autocompleteOptions={criteria?.data?.ccamData || []}
             getAutocompleteOptions={getCCAMOptions}
             onChange={(e, value) => onChangeValue('code', value)}
