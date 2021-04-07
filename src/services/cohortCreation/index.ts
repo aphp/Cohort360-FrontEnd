@@ -40,9 +40,9 @@ const getPatientsFromDocuments = memoize(
   async (documentQuery: string, patientFilter: string): Promise<(string | undefined)[]> => {
     const response = await adminApiFhir.get<FHIR_API_Response<IDocumentReference>>(documentQuery)
     const documents = getApiResponseResources(response)
-    const patientIds = documents
-      ?.map((document) => last(document.subject?.reference?.split('/')))
-      .filter((patientId) => !!patientId)
+    const patientIds = uniq(
+      documents?.map((document) => last(document.subject?.reference?.split('/'))).filter((patientId) => !!patientId)
+    )
     if (!patientIds?.length) return []
 
     const allPatientIds = await getPatients(`/Patient?${patientFilter}`)
@@ -169,7 +169,7 @@ const createCohortGroup = async (jsonQuery: string, cohortName?: string): Promis
     name: cohortName,
     type: GroupTypeKind._person,
     actual: true,
-    quantity: uniq(patientIds).length,
+    quantity: patientIds.length,
     characteristic: perimeters.map<IGroup_Characteristic>((perimeter) => ({
       exclude: false,
       code: { text: 'perimeter' },
@@ -178,7 +178,7 @@ const createCohortGroup = async (jsonQuery: string, cohortName?: string): Promis
         reference: `Organization/${perimeter}`
       }
     })),
-    member: uniq(patientIds).map<IGroup_Member>((id) => ({
+    member: patientIds.map<IGroup_Member>((id) => ({
       entity: {
         type: 'Patient',
         reference: `Patient/${id}`
