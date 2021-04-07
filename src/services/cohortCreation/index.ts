@@ -40,9 +40,7 @@ const getPatientsFromDocuments = memoize(
   async (documentQuery: string, patientFilter: string): Promise<(string | undefined)[]> => {
     const response = await adminApiFhir.get<FHIR_API_Response<IDocumentReference>>(documentQuery)
     const documents = getApiResponseResources(response)
-    const patientIds = uniq(
-      documents?.map((document) => last(document.subject?.reference?.split('/'))).filter(Boolean)
-    )
+    const patientIds = uniq(documents?.map((document) => last(document.subject?.reference?.split('/'))).filter(Boolean))
     if (!patientIds?.length) return []
 
     const allPatientIds = await getPatients(`/Patient?${patientFilter}`)
