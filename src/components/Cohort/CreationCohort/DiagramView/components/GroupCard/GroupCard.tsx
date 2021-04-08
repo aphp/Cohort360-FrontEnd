@@ -35,7 +35,7 @@ const GroupCardItem: React.FC<GroupCardItemProps> = ({ itemId }) => {
         <CardHeader
           className={classes.cardHeader}
           style={{ backgroundColor: CurrentCriterion.isInclusive ? '#DAF0BF' : '#FFC695' }}
-          title={CurrentCriterion.title}
+          title={`${!CurrentCriterion.isInclusive ? '[ NOT ] ' : ''}${CurrentCriterion.title}`}
         />
         <CardContent className={classes.cardContent}>
           <CriteriaCardContent currentCriteria={CurrentCriterion} />
@@ -117,47 +117,74 @@ const GroupCard: React.FC = () => {
 
   return (
     <>
-      {displayingCriteriaGroup.map(({ id, title, criteriaIds, type, isInclusive }) => {
+      {displayingCriteriaGroup.map(({ id, title, criteriaIds, type, isInclusive: isGroupInclusive }) => {
         const isGroupObject = criteriaIds.length > 1
         const firstChild = !isGroupObject ? selectedCriteria.find(({ id }) => id === criteriaIds[0]) : null
+        const isFirstChildInclusive = firstChild?.isInclusive
         return (
           <React.Fragment key={id}>
             <GroupSeparator />
             <div>
               <Card className={classes.mainCard}>
-                <CardHeader
-                  className={classes.cardHeader}
-                  style={{ backgroundColor: isInclusive ? '#DAF0BF' : '#FFC695' }}
-                  title={firstChild ? firstChild.title : title}
-                  action={
-                    <>
-                      <IconButton size="small" onClick={() => _editGroup(id)} style={{ color: 'currentcolor' }}>
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton size="small" onClick={() => _deleteAndRebuild(id)} style={{ color: 'currentcolor' }}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </>
-                  }
-                />
-
                 {firstChild ? (
-                  <CardContent className={classes.cardContent}>
-                    <CriteriaCardContent currentCriteria={firstChild} />
-                  </CardContent>
+                  <>
+                    <CardHeader
+                      className={classes.cardHeader}
+                      style={{ backgroundColor: firstChild.isInclusive ? '#DAF0BF' : '#FFC695' }}
+                      title={`${!isFirstChildInclusive ? '[ NOT ] ' : ''}${firstChild.title}`}
+                      action={
+                        <>
+                          <IconButton size="small" onClick={() => _editGroup(id)} style={{ color: 'currentcolor' }}>
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => _deleteAndRebuild(id)}
+                            style={{ color: 'currentcolor' }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </>
+                      }
+                    />
+                    <CardContent className={classes.cardContent}>
+                      <CriteriaCardContent currentCriteria={firstChild} />
+                    </CardContent>
+                  </>
                 ) : (
-                  <CardContent className={classes.cardContent}>
-                    {criteriaIds.length > 0 &&
-                      criteriaIds.map((criteriaId, index) => {
-                        const isLastItem = index === criteriaIds.length - 1
-                        return (
-                          <React.Fragment key={criteriaId}>
-                            <GroupCardItem itemId={criteriaId} />
-                            {!isLastItem && <GroupSeparator groupType={type} />}
-                          </React.Fragment>
-                        )
-                      })}
-                  </CardContent>
+                  <>
+                    <CardHeader
+                      className={classes.cardHeader}
+                      style={{ backgroundColor: isGroupInclusive ? '#DAF0BF' : '#FFC695' }}
+                      title={`${!isGroupInclusive ? '[ Exclure si ] ' : ''}${title}`}
+                      action={
+                        <>
+                          <IconButton size="small" onClick={() => _editGroup(id)} style={{ color: 'currentcolor' }}>
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => _deleteAndRebuild(id)}
+                            style={{ color: 'currentcolor' }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </>
+                      }
+                    />
+                    <CardContent className={classes.cardContent}>
+                      {criteriaIds.length > 0 &&
+                        criteriaIds.map((criteriaId, index) => {
+                          const isLastItem = index === criteriaIds.length - 1
+                          return (
+                            <React.Fragment key={criteriaId}>
+                              <GroupCardItem itemId={criteriaId} />
+                              {!isLastItem && <GroupSeparator groupType={type} />}
+                            </React.Fragment>
+                          )
+                        })}
+                    </CardContent>
+                  </>
                 )}
               </Card>
             </div>
