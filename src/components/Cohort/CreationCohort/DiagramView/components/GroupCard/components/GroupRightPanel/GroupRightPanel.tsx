@@ -321,15 +321,15 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
             </Grid>
             {currentGroup.criteriaIds.length >= 2 && (
               <Grid item alignItems="center" spacing={1} className={classes.typeCriteriaContainer}>
-                <Grid item container direction="row" alignItems="center">
+                {/* <Grid item container direction="row" alignItems="center">
                   <SwitchInclusive
                     checked={!currentGroup.isInclusive}
                     onChange={(e) => editCurrentGroup({ ...currentGroup, isInclusive: !e.target.checked })}
                   />
                   <Typography variant="h6">Exclure les patients correspondants aux critères du groupe</Typography>
-                </Grid>
+                </Grid> */}
                 <Grid item container alignItems="flex-start">
-                  <Typography variant="h6">Opérateur logique entre chaque type de groupe</Typography>
+                  <Typography variant="h6">Opérateur logique entre chaque critère du groupe</Typography>
                   <Select
                     variant="outlined"
                     fullWidth
