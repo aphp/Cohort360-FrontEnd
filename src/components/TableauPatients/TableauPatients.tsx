@@ -1,6 +1,4 @@
 import React, { memo } from 'react'
-import { useHistory } from 'react-router-dom'
-import moment from 'moment'
 
 import {
   CircularProgress,
@@ -12,52 +10,15 @@ import {
   TableRow,
   TableSortLabel,
   Typography,
-  Paper,
-  Chip
+  Paper
 } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
 
-import { ReactComponent as FemaleIcon } from '../../assets/icones/venus.svg'
-import { ReactComponent as MaleIcon } from '../../assets/icones/mars.svg'
-import { ReactComponent as UnknownIcon } from '../../assets/icones/autre-inconnu.svg'
-
-import { getAge } from 'utils/age'
-import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortPatient } from 'types'
-import { capitalizeFirstLetter } from 'utils/capitalize'
+import { useAppSelector } from 'state'
 
 import useStyles from './styles'
-
-type PatientGenderProps = {
-  gender: PatientGenderKind
-  className?: string
-}
-
-const PatientGender: React.FC<PatientGenderProps> = ({ gender, className }) => {
-  switch (gender) {
-    case PatientGenderKind._male:
-      return <MaleIcon className={className} />
-
-    case PatientGenderKind._female:
-      return <FemaleIcon className={className} />
-
-    default:
-      return <UnknownIcon className={className} />
-  }
-}
-
-type StatusShipProps = {
-  type: 'Vivant' | 'Décédé'
-}
-
-const StatusShip: React.FC<StatusShipProps> = ({ type }) => {
-  const classes = useStyles()
-  if (type === 'Vivant') {
-    return <Chip className={classes.aliveChip} label={type} />
-  } else {
-    return <Chip className={classes.deceasedChip} label={type} />
-  }
-}
+import TableauPatientRow from './TableauPatientRow'
 
 type TableauPatientsProps = {
   groupId?: any
@@ -86,8 +47,9 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
     sortDirection,
     onRequestSort
   }) => {
-    const history = useHistory()
     const classes = useStyles()
+    const { cohortType } = useAppSelector((state) => state.exploredCohort)
+    const showActionColumn = cohortType === 'cohort'
 
     const patientsToShow =
       patients.length > rowsPerPage
@@ -162,6 +124,11 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                 <TableCell align="center" className={classes.tableHeadCell}>
                   {deidentified ? 'IPP chiffré' : 'N° IPP'}
                 </TableCell>
+                {showActionColumn && (
+                  <TableCell align="center" className={classes.tableHeadCell}>
+                    Actions
+                  </TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -183,43 +150,13 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                 patientsToShow.map((patient) => {
                   return (
                     patient && (
-                      <TableRow
+                      <TableauPatientRow
+                        patient={patient}
+                        deidentified={deidentified}
                         key={patient.id}
-                        className={classes.tableBodyRows}
-                        hover
-                        onClick={() => {
-                          const href = history.createHref({
-                            pathname: `/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}`
-                          })
-                          window.open(href, '_blank')
-                        }}
-                      >
-                        <TableCell align="center">
-                          {patient.gender && <PatientGender gender={patient.gender} className={classes.genderIcon} />}
-                        </TableCell>
-                        <TableCell>
-                          {deidentified ? 'Prénom' : capitalizeFirstLetter(patient.name?.[0].given?.[0])}
-                        </TableCell>
-                        <TableCell>{deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ')}</TableCell>
-                        <TableCell align="center">
-                          {deidentified
-                            ? getAge(patient)
-                            : `${moment(patient.birthDate).format('DD/MM/YYYY')} (${getAge(patient)})`}
-                        </TableCell>
-                        <TableCell>{patient.lastEncounterName}</TableCell>
-                        <TableCell>
-                          <StatusShip type={patient.deceasedDateTime ? 'Décédé' : 'Vivant'} />
-                        </TableCell>
-
-                        <TableCell align="center">
-                          {deidentified
-                            ? patient.id
-                            : patient.identifier?.find((identifier) => identifier.type?.coding?.[0].code === 'IPP')
-                                ?.value ??
-                              patient.identifier?.[0].value ??
-                              'IPP inconnnu'}
-                        </TableCell>
-                      </TableRow>
+                        groupId={groupId}
+                        showActionColumn={showActionColumn}
+                      />
                     )
                   )
                 })

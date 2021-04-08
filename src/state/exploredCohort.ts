@@ -5,6 +5,7 @@ import { RootState } from 'state'
 import { fetchCohort } from 'services/cohortInfos'
 import { fetchMyPatients } from 'services/myPatients'
 import { fetchPerimetersInfos } from 'services/perimeters'
+import api from 'services/api'
 
 export type ExploredCohortState = {
   loading: boolean
@@ -92,6 +93,27 @@ const fetchExploredCohort = createAsyncThunk<
   return cohort ?? state.exploredCohort
 })
 
+const excludePatientFromCohort = createAsyncThunk<void, string | undefined, { state: RootState }>(
+  'exploredCohort/excludePatientFromCohort',
+  async (patientId, { getState, dispatch }) => {
+    const exploredCohortState = getState().exploredCohort
+    const { cohort: group } = exploredCohortState
+
+    if (!group) {
+      return
+    }
+
+    const newGroupMembers = group.member?.filter(({ entity }) => entity?.reference !== `Patient/${patientId}`)
+    const patchRequest = await api.put(`/Group/${group.id}`, { ...group, member: newGroupMembers })
+
+    if (patchRequest.status === 200) {
+      const newGroup = await fetchCohort(group.id as string)
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      newGroup && dispatch(exploredCohortSlice.actions.setExploredCohort(newGroup))
+    }
+  }
+)
+
 const exploredCohortSlice = createSlice({
   name: 'exploredCohort',
   initialState,
@@ -118,5 +140,5 @@ const exploredCohortSlice = createSlice({
 })
 
 export default exploredCohortSlice.reducer
-export { fetchExploredCohort }
+export { fetchExploredCohort, excludePatientFromCohort }
 export const { setExploredCohort } = exploredCohortSlice.actions
