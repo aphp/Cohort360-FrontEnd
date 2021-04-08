@@ -50,6 +50,16 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
 
   const getGhmOptions = async (searchValue: string) => await criteria.fetch.fetchGhmData(searchValue)
 
+  const defaultValuesCode = selectedCriteria.code
+    ? selectedCriteria.code.map((code: any) => {
+        const criteriaCode = criteria.data.ghmData ? criteria.data.ghmData.find((g: any) => g.id === code.id) : null
+        return {
+          id: code.id,
+          label: code.label ? code.label : criteriaCode?.label ?? '?'
+        }
+      })
+    : []
+
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
@@ -105,8 +115,8 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             noOptionsText="Veuillez entrer un code ou un critère GHM"
             helperText={'Tous les critère GHM sélectionnés seront liés par une contrainte OU'}
             className={classes.inputItem}
-            autocompleteValue={selectedCriteria.code}
-            autocompleteOptions={criteria?.data?.ccamData || []}
+            autocompleteValue={defaultValuesCode}
+            autocompleteOptions={criteria?.data?.ghmData || []}
             getAutocompleteOptions={getGhmOptions}
             onChange={(e, value) => onChangeValue('code', value)}
           />

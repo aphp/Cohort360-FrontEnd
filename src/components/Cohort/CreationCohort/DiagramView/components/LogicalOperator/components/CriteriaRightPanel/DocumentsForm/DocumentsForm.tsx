@@ -71,6 +71,18 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
     setDefaultValues(_defaultValues)
   }
 
+  const defaultValuesDocType = defaultValues.docType
+    ? defaultValues.docType.map((docType: any) => {
+        const criteriaDocType = criteria.data.docTypes
+          ? criteria.data.docTypes.find((g: any) => g.id === docType.id)
+          : null
+        return {
+          id: docType.id,
+          label: docType.label ? docType.label : criteriaDocType?.label ?? '?'
+        }
+      })
+    : []
+
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
@@ -142,7 +154,8 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             className={classes.inputItem}
             options={criteria?.data?.docTypes || []}
             getOptionLabel={(option) => option.label}
-            value={defaultValues.docType}
+            getOptionSelected={(option, value) => option.id === value.id}
+            value={defaultValuesDocType}
             onChange={(e, value) => _onChangeValue('docType', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Type de document" />}
           />

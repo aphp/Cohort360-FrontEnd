@@ -4,7 +4,8 @@ import { fakeValueSetCCAM /*fakeHierarchyCCAM*/ } from '../../data/fakeData/coho
 import { capitalizeFirstLetter } from '../../utils/capitalize'
 import { codeSort } from '../../utils/alphabeticalSort'
 
-export const fetchCcamData = async (searchValue?: string) => {
+export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
+  noStar = noStar === undefined ? true : noStar
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
@@ -18,7 +19,13 @@ export const fetchCcamData = async (searchValue?: string) => {
     if (!searchValue) {
       return []
     }
-    const _searchValue = searchValue ? `&_text=${searchValue}*` : ''
+    const _searchValue = noStar
+      ? searchValue
+        ? `&_text=${searchValue}`
+        : ''
+      : searchValue
+      ? `&_text=${searchValue}*`
+      : ''
 
     const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-ccam${_searchValue}`)
 

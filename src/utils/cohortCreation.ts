@@ -924,7 +924,7 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
                     if (!allreadyHere) {
                       _criterion.data[dataKey] = [
                         ..._criterion.data[dataKey],
-                        ...(await _criterion.fetch[fetchKey](code?.id))
+                        ...(await _criterion.fetch[fetchKey](code?.id, true))
                       ]
                     }
                   }

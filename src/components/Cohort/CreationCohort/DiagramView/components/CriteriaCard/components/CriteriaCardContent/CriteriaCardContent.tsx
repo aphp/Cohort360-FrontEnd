@@ -26,6 +26,19 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     const reducer = (accumulator: any, currentValue: any) =>
       accumulator ? `${accumulator} - ${currentValue}` : currentValue ? currentValue : accumulator
 
+    const tooltipReducer = (accumulator: any, currentValue: any) =>
+      accumulator ? (
+        <>
+          {accumulator}
+          <br />
+          {currentValue}
+        </>
+      ) : currentValue ? (
+        currentValue
+      ) : (
+        accumulator
+      )
+
     let _data: any = null
     const _searchDataFromCriteria = (_criteria: any[], type: string) => {
       for (const _criterion of _criteria) {
@@ -184,19 +197,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
       case 'Condition': {
         const displaySelectedCode = (codes: { id: string; label: string }[]) => {
-          const customReducer = (accumulator: any, currentValue: any) =>
-            accumulator ? (
-              <>
-                {accumulator}
-                <br />
-                {currentValue}
-              </>
-            ) : currentValue ? (
-              currentValue
-            ) : (
-              accumulator
-            )
-
           let currentCode: string[] = []
           for (const code of codes) {
             const selectedCodeData =
@@ -205,7 +205,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 : null
             currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
           }
-          return currentCode && currentCode.length > 0 ? currentCode.reduce(customReducer) : ''
+          return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltipReducer) : ''
         }
         const displaySelectedDiagTypes = (diagnosticTypes: { id: string; label: string }[]) => {
           let currentStatus: string[] = []
@@ -218,7 +218,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 : null
             currentStatus = selectedDiagnosticType ? [...currentStatus, selectedDiagnosticType.label] : currentStatus
           }
-          return currentStatus && currentStatus.length > 0 ? currentStatus.reduce(reducer) : ''
+          return currentStatus && currentStatus.length > 0 ? currentStatus.reduce(tooltipReducer) : ''
         }
 
         content = [
