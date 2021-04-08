@@ -15,7 +15,8 @@ import {
   TextField,
   Typography,
   Select,
-  Switch
+  Switch,
+  Tooltip
 } from '@material-ui/core'
 
 import { withStyles } from '@material-ui/core/styles'
@@ -95,11 +96,13 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId, editItem, deleteI
           secondary={<CriteriaCardContent currentCriteria={currentItem} />}
         />
         <ListItemSecondaryAction>
-          <SwitchInclusive
-            checked={!currentItem.isInclusive}
-            onChange={(e) => _editIsInclusive(!e.target.checked)}
-            edge="end"
-          />
+          <Tooltip title={currentItem.isInclusive ? "Appliquer l'opérateur NOT" : "Retirer l'opérateur NOT"}>
+            <SwitchInclusive
+              checked={!currentItem.isInclusive}
+              onChange={(e) => _editIsInclusive(!e.target.checked)}
+              edge="end"
+            />
+          </Tooltip>
           <IconButton onClick={() => editItem(itemId)} color="primary" edge="end" aria-label="edit">
             <EditIcon />
           </IconButton>
