@@ -223,7 +223,7 @@ const cohortCreationSlice = createSlice({
     builder.addCase(logout, () => initialState)
     // buildCreationCohort
     builder.addCase(buildCreationCohort.pending, (state) => {
-      state.loading = false
+      state.loading = true
     })
     builder.addCase(buildCreationCohort.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
     builder.addCase(buildCreationCohort.rejected, (state) => ({ ...state, loading: false }))
