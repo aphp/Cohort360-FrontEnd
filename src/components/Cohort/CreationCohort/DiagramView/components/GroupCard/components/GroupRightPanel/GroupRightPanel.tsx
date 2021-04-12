@@ -15,7 +15,8 @@ import {
   TextField,
   Typography,
   Select,
-  Switch
+  Switch,
+  Tooltip
 } from '@material-ui/core'
 
 import { withStyles } from '@material-ui/core/styles'
@@ -95,11 +96,13 @@ const GroupListItem: React.FC<GroupListItemProps> = ({ itemId, editItem, deleteI
           secondary={<CriteriaCardContent currentCriteria={currentItem} />}
         />
         <ListItemSecondaryAction>
-          <SwitchInclusive
-            checked={!currentItem.isInclusive}
-            onChange={(e) => _editIsInclusive(!e.target.checked)}
-            edge="end"
-          />
+          <Tooltip title={currentItem.isInclusive ? "Appliquer l'opérateur NOT" : "Retirer l'opérateur NOT"}>
+            <SwitchInclusive
+              checked={!currentItem.isInclusive}
+              onChange={(e) => _editIsInclusive(!e.target.checked)}
+              edge="end"
+            />
+          </Tooltip>
           <IconButton onClick={() => editItem(itemId)} color="primary" edge="end" aria-label="edit">
             <EditIcon />
           </IconButton>
@@ -292,7 +295,7 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
     <>
       <Drawer anchor="right" open={open} onClose={() => onClose()}>
         <div className={classes.root}>
-          <Grid className={classes.drawerTitleContainer}>
+          <Grid item className={classes.drawerTitleContainer}>
             {isSubGroup ? (
               <Typography className={classes.title}>
                 {!isEditing ? 'Ajouter' : 'Modifier'} un sous-groupe de critère
@@ -305,79 +308,44 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
           </Grid>
 
           <Grid className={classes.drawerContentContainer}>
-            <Typography variant="subtitle2">Groupe de critère</Typography>
-
-            <TextField
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              placeholder="Nom du groupe"
-              value={currentGroup.title}
-              onChange={(e) => editCurrentGroup({ ...currentGroup, title: e.target.value })}
-            />
-
-            <List>
-              {currentGroup.criteriaIds.length > 0 &&
-                currentGroup.criteriaIds.map((criteriaId, index) => {
-                  const isLastItem = index === currentGroup.criteriaIds.length - 1
-                  return (
-                    <React.Fragment key={criteriaId}>
-                      <GroupListItem editItem={_editItem} deleteItem={_deleteItem} itemId={criteriaId} />
-                      {!isLastItem && <GroupSeparator groupType={currentGroup.type} />}
-                    </React.Fragment>
-                  )
-                })}
-            </List>
-
-            <Button
-              style={{ borderRadius: 38 }}
-              color="primary"
-              variant="contained"
-              onClick={() => _addNewItem('criteria')}
-            >
-              Ajouter un critère
-            </Button>
-            {/* FIXME: adding subgroups of criteria disabled*/}
-            {/*<Button*/}
-            {/*  // disabled={isSubGroup}*/}
-            {/*  style={{ borderRadius: 38, marginLeft: 8 }}*/}
-            {/*  color="primary"*/}
-            {/*  variant="contained"*/}
-            {/*  onClick={() => _addNewItem('group')}*/}
-            {/*>*/}
-            {/*  Ajouter un sous groupe de critère*/}
-            {/*</Button>*/}
-          </Grid>
-
-          <Grid container alignItems="flex-end" className={classes.typeCriteriaContainer}>
-            <Grid container alignItems="center" justify="space-between">
-              <Typography variant="h6">Groupe de type exclusif :</Typography>
-              <SwitchInclusive
-                checked={!currentGroup.isInclusive}
-                onChange={(e) => editCurrentGroup({ ...currentGroup, isInclusive: !e.target.checked })}
+            <Grid item>
+              <Typography variant="subtitle2">Nom du groupe</Typography>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                placeholder="Groupe de critère"
+                value={currentGroup.title}
+                onChange={(e) => editCurrentGroup({ ...currentGroup, title: e.target.value })}
               />
             </Grid>
-
             {currentGroup.criteriaIds.length >= 2 && (
-              <>
-                <Typography variant="h6">Type de groupe :</Typography>
-                <Select
-                  variant="outlined"
-                  className={classes.groupTypeSelect}
-                  value={currentGroup.type}
-                  //@ts-ignore
-                  onChange={(e) => editCurrentGroup({ ...currentGroup, type: e.target.value })}
-                >
-                  <MenuItem value={'andGroup'}>ET</MenuItem>
-                  <MenuItem value={'orGroup'}>OU</MenuItem>
-                  <MenuItem value={'NamongM'}>N parmi M</MenuItem>
-                </Select>
-
+              <Grid item alignItems="center" spacing={1} className={classes.typeCriteriaContainer}>
+                {/* <Grid item container direction="row" alignItems="center">
+                  <SwitchInclusive
+                    checked={!currentGroup.isInclusive}
+                    onChange={(e) => editCurrentGroup({ ...currentGroup, isInclusive: !e.target.checked })}
+                  />
+                  <Typography variant="h6">Exclure les patients correspondants aux critères du groupe</Typography>
+                </Grid> */}
+                <Grid item container alignItems="flex-start">
+                  <Typography variant="h6">Opérateur logique entre chaque critère du groupe</Typography>
+                  <Select
+                    variant="outlined"
+                    fullWidth
+                    value={currentGroup.type}
+                    //@ts-ignore
+                    onChange={(e) => editCurrentGroup({ ...currentGroup, type: e.target.value })}
+                  >
+                    <MenuItem value={'andGroup'}>ET</MenuItem>
+                    <MenuItem value={'orGroup'}>OU</MenuItem>
+                    <MenuItem value={'NamongM'}>N parmi M</MenuItem>
+                  </Select>
+                </Grid>
                 {currentGroup.type === 'NamongM' && (
-                  <>
+                  <Grid item>
                     <Typography variant="h6">Sélectionner le nombre de critère(s) à inclure/exclure :</Typography>
-
-                    <Grid container alignItems="flex-end" className={classes.options}>
+                    <Grid container alignItems="flex-end">
                       <Select
                         className={classes.operatorSelect}
                         variant="outlined"
@@ -410,10 +378,44 @@ const GroupRightPanel: React.FC<GroupRightPanelProps> = (props) => {
                       />
                       <Typography>critère(s) parmi {currentGroup.criteriaIds.length}.</Typography>
                     </Grid>
-                  </>
+                  </Grid>
                 )}
-              </>
+              </Grid>
             )}
+            <Grid item>
+              <List>
+                {currentGroup.criteriaIds.length > 0 &&
+                  currentGroup.criteriaIds.map((criteriaId, index) => {
+                    const isLastItem = index === currentGroup.criteriaIds.length - 1
+                    return (
+                      <React.Fragment key={criteriaId}>
+                        <GroupListItem editItem={_editItem} deleteItem={_deleteItem} itemId={criteriaId} />
+                        {!isLastItem && <GroupSeparator groupType={currentGroup.type} />}
+                      </React.Fragment>
+                    )
+                  })}
+              </List>
+            </Grid>
+            <Grid item>
+              <Button
+                style={{ borderRadius: 38 }}
+                color="primary"
+                variant="contained"
+                onClick={() => _addNewItem('criteria')}
+              >
+                Ajouter un critère
+              </Button>
+            </Grid>
+            {/* FIXME: adding subgroups of criteria disabled*/}
+            {/*<Button*/}
+            {/*  // disabled={isSubGroup}*/}
+            {/*  style={{ borderRadius: 38, marginLeft: 8 }}*/}
+            {/*  color="primary"*/}
+            {/*  variant="contained"*/}
+            {/*  onClick={() => _addNewItem('group')}*/}
+            {/*>*/}
+            {/*  Ajouter un sous groupe de critère*/}
+            {/*</Button>*/}
           </Grid>
         </div>
 

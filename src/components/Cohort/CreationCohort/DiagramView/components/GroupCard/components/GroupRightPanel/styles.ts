@@ -4,9 +4,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
-    width: '95vw',
-    maxWidth: 650,
-    overflow: 'auto',
+    width: 650,
     height: 'calc(100% - 63px)'
   },
   drawerTitleContainer: {
@@ -15,15 +13,16 @@ const useStyles = makeStyles((theme) => ({
     height: 72,
     padding: 20,
     color: 'white',
-    backgroundColor: '#317EAA'
+    backgroundColor: '#317EAA',
+    width: '100%'
   },
   title: {
     marginLeft: theme.spacing(1)
   },
   drawerContentContainer: {
-    margin: 12,
-    backgroundColor: 'rgb(246, 248, 250)',
-    padding: 12
+    padding: theme.spacing(3),
+    flex: 1,
+    overflowY: 'auto'
   },
   listItem: {
     padding: 8,
@@ -68,11 +67,9 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   typeCriteriaContainer: {
-    padding: 12
-  },
-  groupTypeSelect: {
-    width: '100%',
-    margin: '1em'
+    margin: theme.spacing(2),
+    padding: theme.spacing(2),
+    backgroundColor: 'rgb(246, 248, 250)'
   },
   operatorSelect: {
     marginRight: 8,
@@ -81,9 +78,6 @@ const useStyles = makeStyles((theme) => ({
   switch: {
     marginBottom: -10,
     marginLeft: 8
-  },
-  options: {
-    padding: 12
   },
   numberSelect: {
     width: 100,
