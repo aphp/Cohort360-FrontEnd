@@ -15,6 +15,7 @@ import PatientPMSI from '../../components/Patient/PatientPMSI/PatientPMSI'
 import PatientSidebar from '../../components/Patient/PatientSidebar/PatientSidebar'
 import PatientTimeline from '../../components/Patient/PatientTimeline/PatientTimeline'
 import TopBar from '../../components/TopBar/TopBar'
+import PatientLaboTable from 'components/Patient/PatientLaboTable/PatientLaboTable'
 
 import { fetchPatient } from '../../services/patient'
 
@@ -156,6 +157,13 @@ const Patient = () => {
               component={Link}
               to={`/patients/${patientId}/pmsi${groupId ? `?groupId=${groupId}` : ''}`}
             />
+            <Tab
+              className={classes.tabTitle}
+              label="Biologie"
+              value="biology"
+              component={Link}
+              to={`/patients/${patientId}/biology${groupId ? `?groupId=${groupId}` : ''}`}
+            />
           </Tabs>
         </Grid>
         <Grid className={classes.tabContainer}>
@@ -189,6 +197,7 @@ const Patient = () => {
               sortDirection={'desc'}
             />
           )}
+          {selectedTab === 'biology' && <PatientLaboTable patient={patient} />}
         </Grid>
         <PatientSidebar
           openDrawer={isSidebarOpened}

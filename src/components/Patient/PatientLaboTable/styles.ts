@@ -4,7 +4,7 @@ export default makeStyles((theme) => ({
   tabTitle: {
     minWidth: 0,
     color: 'white',
-    fontWeight: '400',
+    fontWeight: 400,
     borderBottom: '#255CA1 inset 4px'
   },
   labTable: {
