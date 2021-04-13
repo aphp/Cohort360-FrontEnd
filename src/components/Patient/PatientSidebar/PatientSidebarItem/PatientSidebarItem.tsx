@@ -1,5 +1,5 @@
 import React from 'react'
-import { useHistory, useParams } from 'react-router-dom'
+import { useHistory, useParams, useLocation } from 'react-router-dom'
 
 import { Chip, ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
 
@@ -53,7 +53,6 @@ type PatientSidebarItemTypes = {
   deceased?: string | boolean
 }
 const PatientSidebarItem: React.FC<PatientSidebarItemTypes> = ({
-  groupId,
   closeDialog,
   gender,
   firstName,
@@ -70,11 +69,14 @@ const PatientSidebarItem: React.FC<PatientSidebarItemTypes> = ({
 
   const classes = useStyles()
   const history = useHistory()
+  const location = useLocation()
+  const { search } = location
+
   return (
     <ListItem
       divider
       onClick={() => {
-        history.push(`/patients/${id}${tabName ? `/${tabName}` : ''}${groupId ? `?groupId=${groupId}` : ''}`)
+        history.push(`/patients/${id}${tabName ? `/${tabName}` : ''}${search}`)
         closeDialog(false)
       }}
       className={patientId === id ? classes.selectedListItem : classes.listItem}

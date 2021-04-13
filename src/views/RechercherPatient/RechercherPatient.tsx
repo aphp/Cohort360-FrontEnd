@@ -108,6 +108,7 @@ const RechercherPatient: React.FC<{}> = () => {
           )}
           {!loading && showTable && (
             <TableauPatients
+              search={searchInput}
               groupId={practitioner?.nominativeGroupsIds}
               patients={patientResults}
               onChangePage={handlePageChange}
