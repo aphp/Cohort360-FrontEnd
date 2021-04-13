@@ -42,7 +42,6 @@ const VitalStatusChip: React.FC<VitalStatusChipTypes> = ({ deceased }) => {
 }
 
 type PatientSidebarItemTypes = {
-  groupId?: string
   closeDialog: (open: boolean) => void
   gender?: PatientGenderKind
   firstName?: string

@@ -60,7 +60,17 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const onSearchPatient = (newSortBy: string, newSortDirection: 'asc' | 'desc', page = 1) => {
     setLoadingStatus(true)
-    fetchPatientList(page, searchBy, searchInput, gender, age, vitalStatus, newSortBy, newSortDirection, groupId)
+    fetchPatientList(
+      page,
+      searchBy,
+      searchInput,
+      gender,
+      age,
+      vitalStatus,
+      newSortBy,
+      newSortDirection,
+      groupId.join(',')
+    )
       .then((patientsResp) => {
         setPatientsList(patientsResp?.originalPatients ?? [])
         setTotalPatients(patientsResp?.totalPatients ?? 0)
@@ -159,7 +169,6 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
             <PatientSidebarItem
               key={patient.id}
               closeDialog={onClose}
-              groupId={groupId}
               firstName={deidentifiedBoolean ? 'Prénom' : patient.name?.[0].given?.[0] ?? ''}
               lastName={deidentifiedBoolean ? 'Nom' : patient.name?.map((e) => e.family).join(' ') ?? ''}
               age={getAge(patient)}
