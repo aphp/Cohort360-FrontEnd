@@ -359,7 +359,16 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         }
 
         content = [
-          _currentCriteria.search && <Chip className={classes.criteriaChip} label={`"${_currentCriteria.search}"`} />,
+          _currentCriteria.search && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Tooltip title={`Contient ${_currentCriteria.search} dans le document`}>
+                  <Typography noWrap>{_currentCriteria.search}</Typography>
+                </Tooltip>
+              }
+            />
+          ),
           _currentCriteria && _currentCriteria.docType && _currentCriteria?.docType?.length > 0 && (
             <Chip
               className={classes.criteriaChip}

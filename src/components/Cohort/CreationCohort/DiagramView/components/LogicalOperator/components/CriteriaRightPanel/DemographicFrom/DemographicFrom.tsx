@@ -65,8 +65,6 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
     return <></>
   }
 
-  console.log('criteria?.data :>> ', criteria?.data)
-
   const defaultValuesGender = defaultValues.gender
     ? defaultValues.gender.map((gender: any) => {
         const criteriaGender = criteria.data.gender ? criteria.data.gender.find((g: any) => g.id === gender.id) : null
@@ -76,7 +74,6 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
         }
       })
     : []
-  console.log('defaultValuesGender :>> ', defaultValuesGender)
   const defaultValuesVitalStatus = defaultValues.vitalStatus
     ? defaultValues.vitalStatus.map((vitalStatus: any) => {
         const criteriaStatus = criteria.data.status
