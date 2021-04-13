@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
@@ -21,8 +21,8 @@ const useStyles = makeStyles(() => ({
     overflow: 'auto',
     maxHeight: 'calc(100vh - 135px)'
   },
-  formControl: {
-    margin: '1em'
+  alert: {
+    marginInline: theme.spacing(3)
   },
   inputText: {
     border: '1px solid #D7DAE3',

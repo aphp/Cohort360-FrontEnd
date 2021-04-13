@@ -2,6 +2,7 @@ import React from 'react'
 
 import { Button, Divider, Grid, IconButton, Typography /*, FormLabel */ } from '@material-ui/core'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import { Alert } from '@material-ui/lab'
 
 import { FormBuilder } from '@arkhn/ui'
 
@@ -24,6 +25,9 @@ const defaultDemographic = {
   startOccurrence: '',
   endOccurrence: ''
 }
+
+const alertInfoContent = `Les négations seront automatiquement filtrées.`
+const alertInfoExample = `Exemple: si vous recherchez le mot "hypertension", les documents comportant la mention "pas d'hypertension" ne seront pas retenus.`
 
 const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
   const { selectedCriteria, onChangeSelectedCriteria, goBack } = props
@@ -65,6 +69,7 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
         <FormBuilder<DocumentDataType>
           defaultValues={defaultValues}
           title={'Documents médicaux'}
+          formStyle={{ height: 'auto' }}
           properties={[
             {
               name: 'title',
@@ -120,19 +125,25 @@ const TestGeneratedForm: React.FC<TestGeneratedFormProps> = (props) => {
           ]}
           submit={_onSubmit}
           formId="documents-form"
-          formFooter={
-            <Grid className={classes.criteriaActionContainer}>
-              {!isEdition && (
-                <Button onClick={goBack} color="primary" variant="outlined">
-                  Annuler
-                </Button>
-              )}
-              <Button type="submit" form="documents-form" color="primary" variant="contained">
-                Confirmer
-              </Button>
-            </Grid>
-          }
+          displaySubmitButton={false}
         />
+        <Alert color="info" className={classes.alert}>
+          <Typography>
+            {alertInfoContent}
+            <br />
+            {alertInfoExample}
+          </Typography>
+        </Alert>
+        <Grid className={classes.criteriaActionContainer}>
+          {!isEdition && (
+            <Button onClick={goBack} color="primary" variant="outlined">
+              Annuler
+            </Button>
+          )}
+          <Button type="submit" form="documents-form" color="primary" variant="contained">
+            Confirmer
+          </Button>
+        </Grid>
       </Grid>
     </Grid>
   )
