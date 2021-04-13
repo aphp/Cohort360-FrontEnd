@@ -188,78 +188,80 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
               <Typography>{row.encounterStatus}</Typography>
             </Grid>
           </Grid>
-          <Grid container item xs={1} justify="center">
-            {row.content && row.content[0] && row.content[0].attachment?.url?.endsWith('.pdf') ? (
-              <IconButton onClick={() => openPdfDialog(row.id)}>
-                <PdfIcon height="30px" fill="#ED6D91" />
-              </IconButton>
-            ) : (
-              row.content &&
-              row.content[0] && (
-                <>
-                  <IconButton type="button" onClick={handleImageOpen}>
-                    <ImageIcon />
-                  </IconButton>
-                  <Modal open={isImageOpen} onClose={handleImageClose}>
-                    <img
-                      className={classes.img}
-                      src={`${FILES_SERVER_URL}${row.content[0].attachment?.url?.replace(/^file:\/\//, '')}`}
-                      alt={row.description}
-                    />
-                  </Modal>
-                </>
-              )
-            )}
-            <Dialog open={pdfDialogOpen} onClose={() => setDocumentDialogOpen(false)} maxWidth="xl">
-              <DialogContent className={classes.dialogContent}>
-                {deidentified &&
-                  (loading ? (
-                    <CircularProgress className={classes.loadingDialog} />
-                  ) : (
-                    <>
-                      {documentContent &&
-                        documentContent.map((section: any) => (
-                          <>
-                            <Typography variant="h6">{section.title}</Typography>
-                            <Typography
-                              key={section.title}
-                              dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }}
-                            />
-                          </>
-                        ))}
-                      {!documentContent && <Typography>Le contenu du document est introuvable.</Typography>}
-                    </>
-                  ))}
-                {!deidentified && row.content && row.content[0].attachment?.url?.endsWith('.pdf') && (
-                  <Document
-                    error={'Le document est introuvable.'}
-                    loading={'PDF en cours de chargement...'}
-                    file={{
-                      url: `${FILES_SERVER_URL}${row.content[0].attachment?.url?.replace(/^file:\/\//, '')}`,
-                      httpHeaders: {
-                        Accept: 'application/pdf'
-                      }
-                    }}
-                    onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                  >
-                    {Array.from(new Array(numPages), (el, index) => (
-                      <Page
-                        width={window.innerWidth * 0.9}
-                        key={`page_${index + 1}`}
-                        pageNumber={index + 1}
-                        loading={'Pages en cours de chargement...'}
+          {!deidentified && (
+            <Grid container item xs={1} justify="center">
+              {row.content && row.content[0] && row.content[0].attachment?.url?.endsWith('.pdf') ? (
+                <IconButton onClick={() => openPdfDialog(row.id)}>
+                  <PdfIcon height="30px" fill="#ED6D91" />
+                </IconButton>
+              ) : (
+                row.content &&
+                row.content[0] && (
+                  <>
+                    <IconButton type="button" onClick={handleImageOpen}>
+                      <ImageIcon />
+                    </IconButton>
+                    <Modal open={isImageOpen} onClose={handleImageClose}>
+                      <img
+                        className={classes.img}
+                        src={`${FILES_SERVER_URL}${row.content[0].attachment?.url?.replace(/^file:\/\//, '')}`}
+                        alt={row.description}
                       />
+                    </Modal>
+                  </>
+                )
+              )}
+              <Dialog open={pdfDialogOpen} onClose={() => setDocumentDialogOpen(false)} maxWidth="xl">
+                <DialogContent className={classes.dialogContent}>
+                  {deidentified &&
+                    (loading ? (
+                      <CircularProgress className={classes.loadingDialog} />
+                    ) : (
+                      <>
+                        {documentContent &&
+                          documentContent.map((section: any) => (
+                            <>
+                              <Typography variant="h6">{section.title}</Typography>
+                              <Typography
+                                key={section.title}
+                                dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }}
+                              />
+                            </>
+                          ))}
+                        {!documentContent && <Typography>Le contenu du document est introuvable.</Typography>}
+                      </>
                     ))}
-                  </Document>
-                )}
-              </DialogContent>
-              <DialogActions>
-                <Button color="primary" onClick={() => setDocumentDialogOpen(false)}>
-                  Fermer
-                </Button>
-              </DialogActions>
-            </Dialog>
-          </Grid>
+                  {!deidentified && row.content && row.content[0].attachment?.url?.endsWith('.pdf') && (
+                    <Document
+                      error={'Le document est introuvable.'}
+                      loading={'PDF en cours de chargement...'}
+                      file={{
+                        url: `${FILES_SERVER_URL}${row.content[0].attachment?.url?.replace(/^file:\/\//, '')}`,
+                        httpHeaders: {
+                          Accept: 'application/pdf'
+                        }
+                      }}
+                      onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                    >
+                      {Array.from(new Array(numPages), (el, index) => (
+                        <Page
+                          width={window.innerWidth * 0.9}
+                          key={`page_${index + 1}`}
+                          pageNumber={index + 1}
+                          loading={'Pages en cours de chargement...'}
+                        />
+                      ))}
+                    </Document>
+                  )}
+                </DialogContent>
+                <DialogActions>
+                  <Button color="primary" onClick={() => setDocumentDialogOpen(false)}>
+                    Fermer
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </Grid>
+          )}
         </Grid>
       </Grid>
 
