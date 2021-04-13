@@ -21,6 +21,8 @@ import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 
 import cohortLogo from '../../assets/images/logo_v3.1_ld.png'
+import arkhnLogo from '../../assets/images/logo-arkhn_white.png'
+import arkhnLogoSmall from '../../assets/images/logo-arkhn_white_small.png'
 import { ReactComponent as HomeIcon } from '../../assets/icones/home-lg.svg'
 import { ReactComponent as LogoutIcon } from '../../assets/icones/power-off.svg'
 import { ReactComponent as MenuIcon } from '../../assets/icones/bars.svg'
@@ -35,6 +37,9 @@ import useStyles from './styles'
 
 const smallDrawerWidth = 52
 const largeDrawerWidth = 260
+const ICON_WIDTH = 20
+const ARKHN_LOGO_WIDTH = 80
+
 export { smallDrawerWidth, largeDrawerWidth }
 
 type LeftSideBarProps = {
@@ -111,7 +116,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                 [classes.hide]: !open
               })}
             >
-              <ChevronLeftIcon color="action" width="20px" />
+              <ChevronLeftIcon color="action" width={ICON_WIDTH} />
             </IconButton>
             <IconButton
               aria-label="open drawer"
@@ -120,7 +125,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                 [classes.hide]: open
               })}
             >
-              <MenuIcon width="20px" fill="#FFF" />
+              <MenuIcon width={ICON_WIDTH} fill="#FFF" />
             </IconButton>
           </div>
           <Divider />
@@ -181,14 +186,14 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
             <Link to="/accueil">
               <ListItem button>
                 <ListItemIcon className={classes.listIcon}>
-                  <HomeIcon width="20px" fill="#FFF" />
+                  <HomeIcon width={ICON_WIDTH} fill="#FFF" />
                 </ListItemIcon>
                 <Typography className={classes.title}>Accueil</Typography>
               </ListItem>
             </Link>
             <ListItem button onClick={handleNestedList}>
               <ListItemIcon className={classes.listIcon}>
-                <PatientIcon width="20px" fill="#FFF" />
+                <PatientIcon width={ICON_WIDTH} fill="#FFF" />
               </ListItemIcon>
               <Grid container justify="space-between" alignItems="center" wrap="nowrap">
                 <Typography className={classes.title}>Mes patients</Typography>
@@ -227,7 +232,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
             </Collapse>
             <ListItem button onClick={handleNestedList2}>
               <ListItemIcon className={classes.listIcon}>
-                <ResearchIcon width="20px" fill="#FFF" />
+                <ResearchIcon width={ICON_WIDTH} fill="#FFF" />
               </ListItemIcon>
               <Grid container justify="space-between" alignItems="center" wrap="nowrap">
                 <Typography className={classes.title}>Mes recherches</Typography>
@@ -249,6 +254,13 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
               </List>
             </Collapse>
           </List>
+          <div className={classes.drawerFooter}>
+            {open ? (
+              <img alt="arkhn_logo" width={ARKHN_LOGO_WIDTH} src={arkhnLogo} />
+            ) : (
+              <img alt="arkn_logo" width={ICON_WIDTH} src={arkhnLogoSmall} />
+            )}
+          </div>
         </Drawer>
       </div>
     </>

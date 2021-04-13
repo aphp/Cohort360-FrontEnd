@@ -119,6 +119,13 @@ const useStyles = makeStyles((theme: Theme) =>
         backgroundColor: '#499cbf',
         color: '#FFF'
       }
+    },
+    drawerFooter: {
+      flex: 1,
+      display: 'flex',
+      alignItems: 'flex-end',
+      justifyContent: 'center',
+      paddingBottom: theme.spacing(2)
     }
   })
 )
