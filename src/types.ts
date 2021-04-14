@@ -81,6 +81,7 @@ export type Cohort = {
   type?: string
   request_id?: string
   request_job_status?: string
+  request_job_fail_msg?: string
 }
 
 export type FormattedCohort = {
@@ -93,6 +94,7 @@ export type FormattedCohort = {
   perimeter?: string
   favorite?: boolean
   jobStatus?: string
+  jobFailMsg?: string
 }
 
 export type CohortFilters = {

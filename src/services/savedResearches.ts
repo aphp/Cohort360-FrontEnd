@@ -28,7 +28,8 @@ export const fetchCohorts = async (
         nPatients: 12,
         date: '2021-01-20T10:28:28.385368Z',
         perimeter: '-',
-        favorite: true
+        favorite: true,
+        jobFailMsg: ''
       }
     ]
 
@@ -95,7 +96,7 @@ export const fetchCohorts = async (
     )
 
     const results = cohortResp?.data?.results
-      ? cohortResp.data.results
+      ? (cohortResp.data.results
           .map((cohort) => ({
             researchId: cohort.uuid ?? '',
             fhir_group_id: cohort.fhir_group_id,
@@ -105,9 +106,10 @@ export const fetchCohorts = async (
             date: cohort.dated_measure.fhir_datetime,
             perimeter: '-',
             favorite: cohort.favorite,
-            jobStatus: cohort.request_job_status
+            jobStatus: cohort.request_job_status,
+            jobFailMsg: cohort.request_job_fail_msg
           }))
-          .filter(Boolean)
+          .filter(Boolean) as FormattedCohort[])
       : undefined
 
     return {
@@ -129,7 +131,8 @@ export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefi
         date: '2021-01-20T10:28:28.385368Z',
         perimeter: '-',
         favorite: true,
-        jobStatus: 'finished'
+        jobStatus: 'finished',
+        jobFailMsg: ''
       }
     ]
 
@@ -152,7 +155,8 @@ export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefi
               date: cohort.dated_measure.fhir_datetime,
               perimeter: '-',
               favorite: cohort.favorite,
-              jobStatus: cohort.request_job_status
+              jobStatus: cohort.request_job_status,
+              jobFailMsg: cohort.request_job_fail_msg
             }
           })
           .filter(Boolean)
@@ -173,7 +177,8 @@ export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined>
         nPatients: 12,
         date: '2021-01-20T10:28:28.385368Z',
         perimeter: '-',
-        favorite: true
+        favorite: true,
+        jobFailMsg: ''
       }
     ]
 
@@ -195,7 +200,8 @@ export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined>
             date: cohort.dated_measure.fhir_datetime,
             perimeter: '-',
             favorite: cohort.favorite,
-            jobStatus: cohort.request_job_status
+            jobStatus: cohort.request_job_status,
+            jobFailMsg: cohort.request_job_fail_msg
           }))
           .filter(Boolean)
       : undefined
