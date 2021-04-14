@@ -73,6 +73,7 @@ export type Cohort = {
   uuid?: string
   fhir_group_id?: string
   name?: string
+  description: string
   result_size?: number
   dated_measure?: any
   created_at?: string
@@ -88,6 +89,7 @@ export type FormattedCohort = {
   researchId: string
   fhir_group_id?: string
   name?: string
+  description: string
   status?: string
   nPatients?: number
   date?: string
@@ -203,6 +205,7 @@ export type ComplexChartDataType<T, V = { [key: string]: number }> = Map<T, V>
 
 export type CohortData = {
   name?: string
+  description?: string
   cohort?: IGroup | IGroup[]
   totalPatients?: number
   originalPatients?: CohortPatient[]

@@ -1,18 +1,22 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   CssBaseline,
   Chip,
   Grid,
   Paper,
+  IconButton,
   TableCell,
   TableRow,
   TableHead,
   Table,
   TableBody,
   TableContainer,
-  CircularProgress
+  CircularProgress,
+  Typography
 } from '@material-ui/core'
-import Typography from '@material-ui/core/Typography'
+
+import CloseIcon from '@material-ui/icons/Close'
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 
 import PieChart from './Charts/PieChart'
 import BarChart from './Charts/BarChart'
@@ -116,6 +120,9 @@ const Preview: React.FC<PreviewProps> = ({
 }) => {
   const classes = useStyles()
   const title = group.name
+  const description = group.description
+
+  const [isExtended, onExtend] = useState(false)
 
   const { vitalStatusData, genderData } = getGenderRepartitionSimpleData(genderRepartitionMap)
 
@@ -129,6 +136,11 @@ const Preview: React.FC<PreviewProps> = ({
             <Typography variant="h2" color="primary">
               {loading ? <Skeleton width={200} height={40} /> : title}
             </Typography>
+            {description && (
+              <Typography variant="subtitle2">
+                {loading ? <Skeleton width={150} height={20} /> : description}
+              </Typography>
+            )}
 
             {group.perimeters && (
               <ul className={classes.perimetersChipsDiv}>
@@ -136,12 +148,40 @@ const Preview: React.FC<PreviewProps> = ({
                   <li>
                     <Skeleton width={100} />
                   </li>
+                ) : isExtended ? (
+                  <>
+                    {group.perimeters &&
+                      group.perimeters.map((perimeter: any) => (
+                        <li key={perimeter} className={classes.item}>
+                          <Chip className={classes.perimetersChip} label={perimeter} />
+                        </li>
+                      ))}
+                    <IconButton
+                      size="small"
+                      classes={{ label: classes.populationLabel }}
+                      onClick={() => onExtend(false)}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  </>
                 ) : (
-                  group.perimeters.map((perimeter) => (
-                    <li key={perimeter} className={classes.item}>
-                      <Chip className={classes.perimetersChip} label={perimeter} />
-                    </li>
-                  ))
+                  <>
+                    {group.perimeters &&
+                      group.perimeters.slice(0, 4).map((perimeter) => (
+                        <li key={perimeter} className={classes.item}>
+                          <Chip className={classes.perimetersChip} label={perimeter} />
+                        </li>
+                      ))}
+                    {group.perimeters && group.perimeters.length > 4 && (
+                      <IconButton
+                        size="small"
+                        classes={{ label: classes.populationLabel }}
+                        onClick={() => onExtend(true)}
+                      >
+                        <MoreHorizIcon />
+                      </IconButton>
+                    )}
+                  </>
                 )}
               </ul>
             )}

@@ -9,7 +9,8 @@ const useStyles = makeStyles((theme) => ({
   },
   header: {
     backgroundColor: '#F3F8FE',
-    height: '100px',
+    minHeight: '100px',
+    padding: theme.spacing(1),
     overflowY: 'scroll'
   },
   progressContainer: {
@@ -79,13 +80,17 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: 0
   },
   item: {
-    margin: theme.spacing(0, 1, 0, 0)
+    margin: theme.spacing(0.5)
   },
   perimetersChip: {
     backgroundColor: '#0063AF',
     color: '#FFF',
     fontStyle: 'italic',
     fontSize: '12px'
+  },
+  populationLabel: {
+    color: '#0063AF',
+    textDecoration: 'underline'
   },
   overflow: {
     overflowY: 'scroll'

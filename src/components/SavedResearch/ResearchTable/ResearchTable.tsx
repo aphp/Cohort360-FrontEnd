@@ -66,8 +66,6 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   const [dialogOpen, setOpenDialog] = useState(false)
   const [selectedCohort, setSelectedCohort] = useState<string | undefined>()
 
-  console.log('researchData :>> ', researchData)
-
   const history = useHistory()
 
   const removeCohort = () => {
