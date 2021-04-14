@@ -45,8 +45,10 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
       defaultValues.gender &&
       defaultValues.gender.length === 0 &&
       defaultValues.years &&
+      defaultValues.ageType &&
       +defaultValues.years[0] === 0 &&
-      +defaultValues.years[1] === 130
+      +defaultValues.years[1] === 130 &&
+      defaultValues.ageType.id === 'year'
     ) {
       // If no input has been set
       return setError(true)
