@@ -1,49 +1,64 @@
 import React, { useState } from 'react'
 
-import { Alert } from '@material-ui/lab'
-import { Button, Divider, Grid, IconButton, Switch, Typography, FormLabel } from '@material-ui/core'
+import {
+  Button,
+  Divider,
+  FormControl,
+  FormLabel,
+  Grid,
+  Input,
+  InputLabel,
+  IconButton,
+  MenuItem,
+  Switch,
+  Typography,
+  TextField,
+  Select
+} from '@material-ui/core'
+import Alert from '@material-ui/lab/Alert'
+
+import ClearIcon from '@material-ui/icons/Clear'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import { FormBuilder } from '@arkhn/ui'
+import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
 import useStyles from './styles'
-
-import { GhmDataType } from 'types'
 
 type GHMFormProps = {
   isEdition: boolean
   criteria: any
   selectedCriteria: any
+  onChangeValue: (key: string, value: any) => void
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
 }
 
 const GhmForm: React.FC<GHMFormProps> = (props) => {
-  const { isEdition, criteria, selectedCriteria, goBack, onChangeSelectedCriteria } = props
+  const { isEdition, criteria, selectedCriteria, onChangeValue, goBack, onChangeSelectedCriteria } = props
 
   const classes = useStyles()
 
   const [error, setError] = useState(false)
 
-  const _onSubmit = (data: any) => {
-    if (data?.code?.length === 0) {
+  const _onSubmit = () => {
+    if (selectedCriteria?.code?.length === 0) {
       return setError(true)
     }
 
-    onChangeSelectedCriteria({
-      ...selectedCriteria,
-      title: data.title,
-      code: data.code,
-      occurrence: +data.occurrence,
-      occurrenceComparator: data.occurrenceComparator,
-      startOccurrence: data.startOccurrence,
-      endOccurrence: data.endOccurrence,
-      type: 'Claim',
-      isInclusive: data.isInclusive
-    })
+    onChangeSelectedCriteria(selectedCriteria)
   }
 
   const getGhmOptions = async (searchValue: string) => await criteria.fetch.fetchGhmData(searchValue)
+
+  const defaultValuesCode = selectedCriteria.code
+    ? selectedCriteria.code.map((code: any) => {
+        const criteriaCode = criteria.data.ghmData ? criteria.data.ghmData.find((g: any) => g.id === code.id) : null
+        return {
+          id: code.id,
+          label: code.label ? code.label : criteriaCode?.label ?? '?'
+        }
+      })
+    : []
 
   return (
     <Grid className={classes.root}>
@@ -63,119 +78,132 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
 
       <Grid className={classes.formContainer}>
         {error && <Alert severity="error">Merci de renseigner un code GHM</Alert>}
-        <FormBuilder<GhmDataType>
-          defaultValues={selectedCriteria}
-          title="GHM"
-          properties={[
-            {
-              name: 'title',
-              placeholder: 'Nom du critère',
-              type: 'text',
-              variant: 'outlined',
-              validationRules: {
-                required: 'Merci de renseigner un titre'
-              }
-            },
-            {
-              name: 'isInclusive',
-              type: 'custom',
-              renderInput: (field: any) => (
-                <Grid style={{ display: 'flex' }}>
-                  <FormLabel
-                    onClick={() => field.onChange(!field.value)}
-                    style={{ margin: 'auto 1em' }}
-                    component="legend"
-                  >
-                    Exclure les patients qui suivent les règles suivantes
-                  </FormLabel>
-                  <Switch checked={!field.value} onChange={(event) => field.onChange(!event.target.checked)} />
-                </Grid>
-              )
-            },
-            {
-              name: 'code',
-              label: 'Code GHM',
-              variant: 'outlined',
-              type: 'autocomplete',
-              multiple: true,
-              autocompleteOptions: criteria?.data?.ghmData || [],
-              getAutocompleteOptions: getGhmOptions,
-              noOptionsText: 'Veuillez entrer un code ou un critère GHM'
-            },
-            {
-              type: 'custom',
-              name: 'label',
-              renderInput: () => (
-                <FormLabel style={{ padding: '0 1em' }} component="legend">
-                  Nombre d'occurrence :
-                </FormLabel>
-              )
-            },
-            {
-              type: 'section',
-              title: '',
-              name: '',
-              containerStyle: { display: 'grid', gridTemplateColumns: '100px 1fr' },
-              properties: [
-                {
-                  name: 'occurrenceComparator',
-                  variant: 'outlined',
-                  type: 'select',
-                  selectOptions: [
-                    { id: '<=', label: '<=' },
-                    { id: '<', label: '<' },
-                    { id: '=', label: '=' },
-                    { id: '>', label: '>' },
-                    { id: '>=', label: '>=' }
-                  ]
-                },
-                {
-                  name: 'occurrence',
-                  variant: 'outlined',
-                  type: 'number',
-                  validationRules: {
-                    min: 1,
-                    required: 'Merci de renseigner une occurrence supérieure à 1'
-                  }
+
+        <Grid className={classes.inputContainer} container>
+          <Typography variant="h6">GHM</Typography>
+
+          <TextField
+            required
+            className={classes.inputItem}
+            id="criteria-name-required"
+            placeholder="Nom du critère"
+            defaultValue="Critères GHM"
+            variant="outlined"
+            value={selectedCriteria.title}
+            onChange={(e) => onChangeValue('title', e.target.value)}
+          />
+
+          <Grid style={{ display: 'flex' }}>
+            <FormLabel
+              onClick={() => onChangeValue('isInclusive', !selectedCriteria.isInclusive)}
+              style={{ margin: 'auto 1em' }}
+              component="legend"
+            >
+              Exclure les patients qui suivent les règles suivantes
+            </FormLabel>
+            <Switch
+              id="criteria-inclusive"
+              checked={!selectedCriteria.isInclusive}
+              onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
+            />
+          </Grid>
+
+          <AutocompleteAsync
+            multiple
+            label="Codes GHM"
+            variant="outlined"
+            noOptionsText="Veuillez entrer un code ou un critère GHM"
+            helperText={'Tous les critère GHM sélectionnés seront liés par une contrainte OU'}
+            className={classes.inputItem}
+            autocompleteValue={defaultValuesCode}
+            autocompleteOptions={criteria?.data?.ghmData || []}
+            getAutocompleteOptions={getGhmOptions}
+            onChange={(e, value) => onChangeValue('code', value)}
+          />
+
+          <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
+            Nombre d'occurrence
+          </FormLabel>
+
+          <Grid style={{ display: 'grid', gridTemplateColumns: '100px 1fr', alignItems: 'center', margin: '0 1em' }}>
+            <Select
+              style={{ marginRight: '1em' }}
+              id="criteria-occurrenceComparator-select"
+              value={selectedCriteria.occurrenceComparator}
+              onChange={(event) => onChangeValue('occurrenceComparator', event.target.value as string)}
+              variant="outlined"
+            >
+              <MenuItem value={'<='}>{'<='}</MenuItem>
+              <MenuItem value={'<'}>{'<'}</MenuItem>
+              <MenuItem value={'='}>{'='}</MenuItem>
+              <MenuItem value={'>'}>{'>'}</MenuItem>
+              <MenuItem value={'>='}>{'>='}</MenuItem>
+            </Select>
+
+            <TextField
+              required
+              inputProps={{
+                min: 1
+              }}
+              type="number"
+              id="criteria-occurrence-required"
+              variant="outlined"
+              value={selectedCriteria.occurrence}
+              onChange={(e) => onChangeValue('occurrence', e.target.value)}
+            />
+          </Grid>
+
+          <FormLabel style={{ padding: '1em 1em 0 1em' }} component="legend">
+            Date d'occurrence
+          </FormLabel>
+
+          <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+            <FormControl className={classes.inputItem}>
+              <InputLabel shrink htmlFor="date-start-occurrence">
+                Avant le
+              </InputLabel>
+              <Input
+                id="date-start-occurrence"
+                type="date"
+                value={selectedCriteria.startOccurrence}
+                endAdornment={
+                  <IconButton size="small" onClick={() => onChangeValue('startOccurrence', '')}>
+                    <ClearIcon />
+                  </IconButton>
                 }
-              ]
-            },
-            {
-              type: 'custom',
-              name: 'label',
-              renderInput: () => (
-                <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
-                  Date d'occurrence :
-                </FormLabel>
-              )
-            },
-            {
-              name: 'startOccurrence',
-              label: 'Après le',
-              type: 'date'
-            },
-            {
-              name: 'endOccurrence',
-              label: 'Avant le',
-              type: 'date'
-            }
-          ]}
-          submit={_onSubmit}
-          formId="ghm-form"
-          displaySubmitButton={false}
-          formFooter={
-            <Grid className={classes.criteriaActionContainer}>
-              {!isEdition && (
-                <Button onClick={goBack} color="primary" variant="outlined">
-                  Annuler
-                </Button>
-              )}
-              <Button type="submit" form="ghm-form" color="primary" variant="contained">
-                Confirmer
-              </Button>
-            </Grid>
-          }
-        />
+                onChange={(e) => onChangeValue('startOccurrence', e.target.value)}
+              />
+            </FormControl>
+
+            <FormControl className={classes.inputItem}>
+              <InputLabel shrink htmlFor="date-end-occurrence">
+                Après le
+              </InputLabel>
+              <Input
+                id="date-end-occurrence"
+                type="date"
+                value={selectedCriteria.endOccurrence}
+                endAdornment={
+                  <IconButton size="small" onClick={() => onChangeValue('endOccurrence', '')}>
+                    <ClearIcon />
+                  </IconButton>
+                }
+                onChange={(e) => onChangeValue('endOccurrence', e.target.value)}
+              />
+            </FormControl>
+          </Grid>
+        </Grid>
+
+        <Grid className={classes.criteriaActionContainer}>
+          {!isEdition && (
+            <Button onClick={goBack} color="primary" variant="outlined">
+              Annuler
+            </Button>
+          )}
+          <Button onClick={_onSubmit} type="submit" form="cim10-form" color="primary" variant="contained">
+            Confirmer
+          </Button>
+        </Grid>
       </Grid>
     </Grid>
   )

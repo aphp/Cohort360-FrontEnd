@@ -1,7 +1,9 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { CircularProgress } from '@material-ui/core'
 import { useHistory } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
+
+import Grid from '@material-ui/core/Grid'
 
 import ControlPanel from './ControlPanel/ControlPanel'
 import DiagramView from './DiagramView/DiagramView'
@@ -15,6 +17,8 @@ import constructCriteriaList from './DataList_Criteria'
 
 import { getDataFromFetch } from '../../../utils/cohortCreation'
 import { createCohort } from '../../../services/cohortCreation'
+
+import useStyles from './styles'
 
 const Requeteur = () => {
   const {
@@ -30,14 +34,19 @@ const Requeteur = () => {
 
   const history = useHistory()
   const dispatch = useDispatch()
+  const classes = useStyles()
+
+  const [criteriaLoading, setCriteriaLoading] = useState(false)
 
   /**
    * Fetch all criteria to display list + retrieve all data from fetcher
    */
   const _fetchCriteria = useCallback(async () => {
+    setCriteriaLoading(true)
     let _criteria = constructCriteriaList()
     _criteria = await getDataFromFetch(Object.freeze(_criteria), selectedCriteria)
     dispatch<any>(setCriteriaList(_criteria))
+    setCriteriaLoading(false)
   }, [dispatch, criteriaGroup, selectedCriteria]) // eslint-disable-line
 
   const _unbuildRequest = async (newCurrentSnapshot: CohortCreationSnapshotType) => {
@@ -114,7 +123,13 @@ const Requeteur = () => {
     _fetchCriteria()
   }, [_fetchCriteria])
 
-  if (loading) return <CircularProgress />
+  if (loading || criteriaLoading) {
+    return (
+      <Grid className={classes.grid} container justify="center" alignItems="center">
+        <CircularProgress />
+      </Grid>
+    )
+  }
 
   return (
     <>

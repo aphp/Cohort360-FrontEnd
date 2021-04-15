@@ -2,31 +2,39 @@ import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
-import { Button, CircularProgress, Divider, Grid, Typography } from '@material-ui/core'
+import { Button, CircularProgress, Divider, Grid, Tooltip, Typography } from '@material-ui/core'
 
-// import ArrowBackIcon from '@material-ui/icons/ArrowBack'
-// import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
+import ArrowBackIcon from '@material-ui/icons/ArrowBack'
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
 import UpdateSharpIcon from '@material-ui/icons/UpdateSharp'
+import HighlightOffIcon from '@material-ui/icons/HighlightOff'
 
 import ModalCohortTitle from './components/ModalCohortTitle/ModalCohortTitle'
 
 import { useAppSelector } from 'state'
 import { resetCohortCreation, countCohortCreation } from 'state/cohortCreation'
+import { editCriteriaGroup, deleteCriteriaGroup, buildCohortCreation } from 'state/cohortCreation'
 
 import useStyle from './styles'
+
+import displayDigit from 'utils/displayDigit'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string) => void
   onUndo?: () => void
   onRedo?: () => void
-}> = ({ onExecute }) => {
+}> = ({ onExecute, onUndo, onRedo }) => {
   const classes = useStyle()
   const dispatch = useDispatch()
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
 
-  const { loading = false, countLoading = false, count = {}, selectedPopulation = [] } = useAppSelector(
-    (state) => state.cohortCreation.request || {}
-  )
+  const {
+    loading = false,
+    countLoading = false,
+    count = {},
+    criteriaGroup = [],
+    selectedPopulation = []
+  } = useAppSelector((state) => state.cohortCreation.request || {})
   const { includePatient /*byrequest, alive, deceased, female, male, unknownPatient */ } = count
 
   const accessIsPseudonymize =
@@ -45,6 +53,44 @@ const ControlPanel: React.FC<{
     }, 1000)
     return () => clearInterval(interval)
   }, [count]) //eslint-disable-line
+
+  const checkIfLogicalOperatorIsEmpty = () => {
+    let _criteriaGroup = criteriaGroup ? criteriaGroup : []
+    _criteriaGroup = _criteriaGroup.filter(({ id }) => id !== 0)
+
+    return _criteriaGroup && _criteriaGroup.length > 0
+      ? _criteriaGroup.filter(({ criteriaIds }) => criteriaIds.length === 0).length > 0
+      : false
+  }
+
+  const cleanLogicalOperator = () => {
+    let _criteriaGroup = criteriaGroup ? criteriaGroup : []
+    _criteriaGroup = _criteriaGroup.filter(({ id }) => id !== 0)
+
+    const logicalOperatorNeedToBeErase =
+      _criteriaGroup && _criteriaGroup.length > 0
+        ? _criteriaGroup.filter(({ criteriaIds }) => criteriaIds.length === 0)
+        : []
+
+    if (logicalOperatorNeedToBeErase && logicalOperatorNeedToBeErase.length > 0) {
+      for (const logicalOperator of logicalOperatorNeedToBeErase) {
+        const { id } = logicalOperator
+        dispatch<any>(deleteCriteriaGroup(id))
+
+        const logicalOperatorParent = criteriaGroup
+          ? criteriaGroup.find(({ criteriaIds }) => criteriaIds.find((_criteriaId) => _criteriaId === id))
+          : undefined
+        if (!logicalOperatorParent) return
+        dispatch<any>(
+          editCriteriaGroup({
+            ...logicalOperatorParent,
+            criteriaIds: logicalOperatorParent.criteriaIds.filter((_criteriaId) => _criteriaId !== id)
+          })
+        )
+      }
+    }
+    dispatch(buildCohortCreation)
+  }
 
   return (
     <>
@@ -69,7 +115,7 @@ const ControlPanel: React.FC<{
 
           <Divider />
 
-          {/* <Button
+          <Button
             className={classes.actionButton}
             onClick={onUndo}
             disabled={typeof onUndo !== 'function'}
@@ -89,7 +135,7 @@ const ControlPanel: React.FC<{
             <Typography className={classes.boldText}>Rétablir</Typography>
           </Button>
 
-          <Divider /> */}
+          <Divider />
 
           <Button
             onClick={() => dispatch<any>(resetCohortCreation())}
@@ -98,6 +144,21 @@ const ControlPanel: React.FC<{
           >
             <Typography className={classes.boldText}>Réinitialiser</Typography>
           </Button>
+
+          {checkIfLogicalOperatorIsEmpty() && (
+            <>
+              <Divider />
+              <Button
+                onClick={cleanLogicalOperator}
+                className={classes.actionButton}
+                startIcon={<HighlightOffIcon color="action" className={classes.iconBorder} />}
+              >
+                <Tooltip title="Supprimer les groupes ne contenant aucun élément">
+                  <Typography className={classes.boldText}>Nettoyer le diagramme</Typography>
+                </Tooltip>
+              </Button>
+            </>
+          )}
         </Grid>
         <Divider />
         <Grid>
@@ -118,7 +179,7 @@ const ControlPanel: React.FC<{
               />
             ) : (
               <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
-                {includePatient ?? '-'}
+                {includePatient ? displayDigit(includePatient) : '-'}
               </Typography>
             )}
           </Grid>

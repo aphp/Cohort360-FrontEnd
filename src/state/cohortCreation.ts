@@ -206,7 +206,9 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
 
       const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
 
-      dispatch<any>(saveJson({ newJson: json }))
+      if (json !== state?.cohortCreation?.request?.json) {
+        dispatch<any>(saveJson({ newJson: json }))
+      }
 
       return {
         json,

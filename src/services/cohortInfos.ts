@@ -47,6 +47,7 @@ import fakeDocuments from '../data/fakeData/documents'
 const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | undefined> => {
   if (CONTEXT === 'fakedata') {
     const name = 'Fausse cohorte'
+    const description = 'Ceci est une fausse cohorte pour faire des tests'
     const requestId = '123456789'
     const totalPatients = 3
 
@@ -64,6 +65,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
 
     return {
       name,
+      description,
       cohort,
       totalPatients,
       originalPatients,
@@ -87,10 +89,12 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     ])
 
     let name = ''
+    let description = ''
     let requestId = ''
 
     if (cohortInfo.data.results && cohortInfo.data.results.length === 1) {
       name = cohortInfo.data.results[0].name ?? ''
+      description = cohortInfo.data.results[0].description ?? ''
       requestId = cohortInfo.data.results[0].request_id ?? ''
     }
 
@@ -136,6 +140,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
 
     return {
       name,
+      description,
       cohort,
       totalPatients,
       originalPatients,

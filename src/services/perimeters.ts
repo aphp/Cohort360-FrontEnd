@@ -172,7 +172,8 @@ export const fetchPerimeterInfoForRequeteur = async (perimetersId: string): Prom
         ...group,
         id: group.id ?? '0',
         name: group.name?.replace(/^Patients passés par: /, '') ?? '',
-        quantity: group.quantity ?? 0
+        quantity: group.quantity ?? 0,
+        subItems: []
       }))
     : []
   return scopeRows

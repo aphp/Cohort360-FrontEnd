@@ -128,18 +128,28 @@ const Dashboard: React.FC<{
   const _displayGroupName = () => {
     let group: {
       name: string
+      description?: string
       perimeters?: string[]
     } = { name: '-', perimeters: [] }
     switch (context) {
       case 'patients':
-        group = { name: 'Mes patients' }
+        group = {
+          name: 'Mes patients',
+          description: '',
+          perimeters: []
+        }
         break
       case 'cohort':
-        group = { name: dashboard.name ?? '-' }
+        group = {
+          name: dashboard.name ?? '-',
+          description: dashboard.description ?? '',
+          perimeters: []
+        }
         break
       case 'perimeters':
         group = {
           name: 'Exploration de périmètres',
+          description: '',
           perimeters:
             dashboard.cohort && Array.isArray(dashboard.cohort)
               ? dashboard.cohort.map((p: any) => p.name.replace('Patients passés par: ', ''))

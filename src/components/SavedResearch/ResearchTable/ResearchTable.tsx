@@ -17,6 +17,7 @@ import {
   TableHead,
   TableSortLabel,
   TableRow,
+  Tooltip,
   Typography
 } from '@material-ui/core'
 
@@ -238,6 +239,10 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                         <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
                       ) : row.jobStatus === 'pending' || row.jobStatus === 'started' ? (
                         <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
+                      ) : row.jobFailMsg ? (
+                        <Tooltip title={row.jobFailMsg}>
+                          <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
+                        </Tooltip>
                       ) : (
                         <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
                       )}
