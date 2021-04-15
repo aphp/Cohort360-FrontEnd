@@ -4,6 +4,7 @@ import moment from 'moment'
 
 import { IPractitionerRole } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { Grid, makeStyles, MenuItem, Select, Typography } from '@material-ui/core'
+import { unwrapResult } from '@reduxjs/toolkit'
 
 import { PERMISSION_STATUS_STRUCTURE_DEF_URL } from '../../constants'
 import { updateAccessRequest } from './AccessRequestSlice'
@@ -44,9 +45,11 @@ const useStyles = makeStyles((theme) => ({
 
 type RequestItemProps = {
   request: AccessRequest
+  onSubmitSuccess?: (isRejected?: boolean) => void
+  onSubmitError?: () => void
 }
 
-const RequestItem = ({ request }: RequestItemProps) => {
+const RequestItem = ({ request, onSubmitSuccess, onSubmitError }: RequestItemProps) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
   const [nominativeAccess, setNominativeAccess] = useState<'yes' | 'no'>('yes')
@@ -78,6 +81,13 @@ const RequestItem = ({ request }: RequestItemProps) => {
           }
     }
     dispatch(updateAccessRequest(practitionerRole))
+      .then(unwrapResult)
+      .then(() => {
+        onSubmitSuccess && onSubmitSuccess(isRejected)
+      })
+      .catch(() => {
+        onSubmitError && onSubmitError()
+      })
   }
 
   return (
