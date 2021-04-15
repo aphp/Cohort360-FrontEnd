@@ -73,6 +73,7 @@ export type Cohort = {
   uuid?: string
   fhir_group_id?: string
   name?: string
+  description: string
   result_size?: number
   dated_measure?: any
   created_at?: string
@@ -81,18 +82,21 @@ export type Cohort = {
   type?: string
   request_id?: string
   request_job_status?: string
+  request_job_fail_msg?: string
 }
 
 export type FormattedCohort = {
   researchId: string
   fhir_group_id?: string
   name?: string
+  description: string
   status?: string
   nPatients?: number
   date?: string
   perimeter?: string
   favorite?: boolean
   jobStatus?: string
+  jobFailMsg?: string
 }
 
 export type CohortFilters = {
@@ -201,6 +205,7 @@ export type ComplexChartDataType<T, V = { [key: string]: number }> = Map<T, V>
 
 export type CohortData = {
   name?: string
+  description?: string
   cohort?: IGroup | IGroup[]
   totalPatients?: number
   originalPatients?: CohortPatient[]

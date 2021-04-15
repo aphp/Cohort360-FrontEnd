@@ -314,8 +314,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               label={<Typography noWrap>{displaySelectedVitalStatus(_currentCriteria?.vitalStatus)}</Typography>}
             />
           ),
-          ((!!_currentCriteria.years && _currentCriteria.years[0] === _currentCriteria.years[1]) ||
-            ageUnit !== 'an(s)') && (
+          !!_currentCriteria.years && _currentCriteria.years[0] === _currentCriteria.years[1] && (
             <Chip
               className={classes.criteriaChip}
               label={
@@ -330,7 +329,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           ),
           !!_currentCriteria.years &&
             _currentCriteria.years[0] !== _currentCriteria.years[1] &&
-            (_currentCriteria.years[0] !== 0 || _currentCriteria.years[1] !== 130) && (
+            !(_currentCriteria.years[0] === 0 && _currentCriteria.years[1] === 130 && ageUnit === 'an(s)') && (
               <Chip
                 className={classes.criteriaChip}
                 label={
@@ -439,20 +438,19 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               }
             />
           ),
-          (ageUnit !== 'an(s)' ||
-            (_currentCriteria.years &&
-              _currentCriteria.years[0] !== _currentCriteria.years[1] &&
-              (_currentCriteria.years[0] !== 0 || _currentCriteria.years[1] !== 130))) && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography noWrap>
-                  {`Entre ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit}
+          _currentCriteria.years &&
+            _currentCriteria.years[0] !== _currentCriteria.years[1] &&
+            !(_currentCriteria.years[0] === 0 && _currentCriteria.years[1] === 130 && ageUnit === 'an(s)') && (
+              <Chip
+                className={classes.criteriaChip}
+                label={
+                  <Typography noWrap>
+                    {`Entre ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit}
                     ${_currentCriteria.years[1] === 130 ? ' ou plus' : ''}`}
-                </Typography>
-              }
-            />
-          ),
+                  </Typography>
+                }
+              />
+            ),
           _currentCriteria.duration && _currentCriteria.duration[0] === _currentCriteria.duration[1] && (
             <Chip
               className={classes.criteriaChip}
@@ -464,21 +462,24 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               }
             />
           ),
-          (durationUnit !== 'jour(s)' ||
-            (_currentCriteria.duration &&
-              _currentCriteria.duration[0] !== _currentCriteria.duration[1] &&
-              (_currentCriteria.duration[0] !== 0 || _currentCriteria.duration[1] !== 100))) && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography noWrap>
-                  {`Prise en charge : ${_currentCriteria.duration[0]} et ${_currentCriteria.duration[1]}
+          _currentCriteria.duration &&
+            _currentCriteria.duration[0] !== _currentCriteria.duration[1] &&
+            !(
+              durationUnit === 'jour(s)' &&
+              _currentCriteria.duration[0] === 0 &&
+              _currentCriteria.duration[1] === 100
+            ) && (
+              <Chip
+                className={classes.criteriaChip}
+                label={
+                  <Typography noWrap>
+                    {`Prise en charge : ${_currentCriteria.duration[0]} et ${_currentCriteria.duration[1]}
                     ${durationUnit}
                     ${_currentCriteria.duration[1] === 100 ? ' ou plus' : ''}`}
-                </Typography>
-              }
-            />
-          ),
+                  </Typography>
+                }
+              />
+            ),
           selectedAdmissionMode && (
             <Chip
               className={classes.criteriaChip}
