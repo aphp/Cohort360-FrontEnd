@@ -202,6 +202,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     savedSelectedItems = savedSelectedItems.filter((item, index, array) => array.indexOf(item) === index)
 
     onChangeSelectedItem(savedSelectedItems)
+    return savedSelectedItems
   }
 
   const _checkIfIndeterminated: (_row: any) => boolean | undefined = (_row) => {
@@ -227,7 +228,22 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
       align: 'left',
       disablePadding: true,
       disableOrderBy: true,
-      label: <>{/* <Typography>SALUC C'EST VICTOR !</Typography> */}</>
+      label: (
+        <div style={{ padding: '0 0 0 4px' }}>
+          <Checkbox
+            color="secondary"
+            checked={selectedItems.length === rootRows.length}
+            onClick={() => {
+              let results: any[] = []
+              for (const rootRow of rootRows) {
+                const toto = _clickToSelect(rootRow)
+                results = [...results, ...toto]
+              }
+              onChangeSelectedItem(results)
+            }}
+          />
+        </div>
+      )
     },
     { id: 'name', align: 'left', disablePadding: false, disableOrderBy: true, label: 'Nom' },
     { id: 'quantity', align: 'center', disablePadding: false, disableOrderBy: true, label: 'Nombre de patients' },
