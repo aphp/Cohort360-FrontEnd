@@ -1,31 +1,19 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
-import { Snackbar } from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
-
 import LeftSideBar from 'components/LeftSideBar/LeftSideBar'
+import Snackbar from 'components/Snackbar/Snackbar'
 
 import Config from './config'
 
 const Layout = (props) => {
-  const [open, setOpen] = useState(true)
-
   return (
     <>
       {props.displaySideBar && <LeftSideBar />}
+
       {props.children}
 
-      <Snackbar
-        open={open}
-        autoHideDuration={5000}
-        onClose={() => setOpen(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <Alert onClose={() => setOpen(false)} color="success" severity="success">
-          This is a success message!
-        </Alert>
-      </Snackbar>
+      <Snackbar />
     </>
   )
 }

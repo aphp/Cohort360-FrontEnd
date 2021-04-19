@@ -41,6 +41,13 @@ export default [
     name: 'rechercher_patient/:search',
     component: RechercherPatient
   },
+  {
+    exact: true,
+    displaySideBar: true,
+    path: '/rechercher_patient',
+    name: 'rechercher_patient',
+    component: RechercherPatient
+  },
   /**
    * Chohort360: Choose Perimeter Page
    */
@@ -62,7 +69,7 @@ export default [
     component: RechercheSauvegarde
   },
   /**
-   * Chohort360: Creation Page
+   * Chohort360: Cohorts Creation Page
    */
   {
     exact: true,
