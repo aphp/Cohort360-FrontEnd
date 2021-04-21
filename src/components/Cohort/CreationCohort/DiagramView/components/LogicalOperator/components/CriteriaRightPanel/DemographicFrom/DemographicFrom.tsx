@@ -34,6 +34,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
   const classes = useStyles()
 
   const [error, setError] = useState(false)
+  const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const isEdition = selectedCriteria !== null ? true : false
 
@@ -106,6 +107,18 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
 
       <Grid className={classes.formContainer}>
         {error && <Alert severity="error">Merci de renseigner un champs</Alert>}
+
+        {!error && !multiFields && (
+          <Alert
+            severity="info"
+            onClose={() => {
+              localStorage.setItem('multiple_fields', 'ok')
+              setMultiFields('ok')
+            }}
+          >
+            Tous les éléments des champs multiples sont liés par une contrainte OU
+          </Alert>
+        )}
 
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">Démographie patient</Typography>
