@@ -30,6 +30,7 @@ const ControlPanel: React.FC<{
 
   const {
     loading = false,
+    saveLoading = false,
     countLoading = false,
     count = {},
     criteriaGroup = [],
@@ -92,17 +93,19 @@ const ControlPanel: React.FC<{
     dispatch(buildCohortCreation)
   }
 
+  const itLoads = loading || countLoading || saveLoading
+
   return (
     <>
       <Grid className={classes.rightPanelContainerStyle}>
         <Grid>
           <Grid container justify="center" className={classes.requestAction}>
             <Button
-              disabled={loading || countLoading || typeof onExecute !== 'function'}
+              disabled={itLoads || typeof onExecute !== 'function'}
               onClick={() => onSetOpenModal('executeCohortConfirmation')}
               className={classes.requestExecution}
             >
-              {loading || countLoading ? (
+              {itLoads ? (
                 <>
                   Veuillez patienter
                   <CircularProgress style={{ marginLeft: '15px' }} size={30} />
@@ -171,7 +174,7 @@ const ControlPanel: React.FC<{
 
           <Grid container justify="space-between">
             <Typography className={clsx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS</Typography>
-            {countLoading ? (
+            {itLoads ? (
               <CircularProgress
                 size={12}
                 style={{ marginTop: 14 }}
