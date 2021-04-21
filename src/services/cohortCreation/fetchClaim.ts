@@ -37,7 +37,7 @@ export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
     return data && data.length > 0
       ? data.sort(codeSort).map((_data: { code: string; display: string }) => ({
           id: _data.code,
-          label: capitalizeFirstLetter(_data.display)
+          label: `${_data.code} - ${capitalizeFirstLetter(_data.display)}`
         }))
       : []
   }
