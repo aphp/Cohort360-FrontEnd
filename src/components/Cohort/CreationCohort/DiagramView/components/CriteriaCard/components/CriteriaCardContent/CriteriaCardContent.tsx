@@ -413,18 +413,87 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         if (durationType === 'month') durationUnit = 'mois'
         else if (durationType === 'day') durationUnit = 'jour(s)'
 
-        const selectedAdmissionMode = data.admissionModes
-          ? data.admissionModes.find((admissionMode: any) => admissionMode.id === _currentCriteria?.admissionMode?.id)
-          : null
-        const selectedEntryMode = data.entryModes
-          ? data.entryModes.find((entryMode: any) => entryMode.id === _currentCriteria?.entryMode?.id)
-          : null
-        const selectedExitMode = data.exitModes
-          ? data.exitModes.find((exitMode: any) => exitMode.id === _currentCriteria?.exitMode?.id)
-          : null
-        const selectedFileStatus = data.fileStatus
-          ? data.fileStatus.find((fileStatus: any) => fileStatus.id === _currentCriteria?.fileStatus?.id)
-          : null
+        const displaySelectedEntryModes = (entryModes: { id: string; label: string }[]) => {
+          let currentEntryModes: string[] = []
+          for (const entryMode of entryModes) {
+            const selectedEntryModesData =
+              data?.entryModes && data?.entryModes !== 'loading'
+                ? data.entryModes.find(
+                    (entryModeElement: any) => entryModeElement && entryModeElement.id === entryMode.id
+                  )
+                : null
+            currentEntryModes = selectedEntryModesData
+              ? [...currentEntryModes, selectedEntryModesData.label]
+              : currentEntryModes
+          }
+          return currentEntryModes && currentEntryModes.length > 0 ? currentEntryModes.reduce(reducer) : ''
+        }
+
+        const displaySelectedExitModes = (exitModes: { id: string; label: string }[]) => {
+          let currentExitModes: string[] = []
+          for (const exitMode of exitModes) {
+            const selectedExitModesData =
+              data?.exitModes && data?.exitModes !== 'loading'
+                ? data.exitModes.find((exitModeElement: any) => exitModeElement && exitModeElement.id === exitMode.id)
+                : null
+            currentExitModes = selectedExitModesData
+              ? [...currentExitModes, selectedExitModesData.label]
+              : currentExitModes
+          }
+          return currentExitModes && currentExitModes.length > 0 ? currentExitModes.reduce(reducer) : ''
+        }
+
+        const displaySelectedPriseEnChargeTypes = (priseEnChargeTypes: { id: string; label: string }[]) => {
+          let currentPriseEnChargeTypes: string[] = []
+          for (const priseEnChargeType of priseEnChargeTypes) {
+            const selectedPriseEnChargeTypesData =
+              data?.priseEnChargeType && data?.priseEnChargeType !== 'loading'
+                ? data.priseEnChargeType.find(
+                    (priseEnChargeTypeElement: any) =>
+                      priseEnChargeTypeElement && priseEnChargeTypeElement.id === priseEnChargeType.id
+                  )
+                : null
+            console.log(`data`, data)
+            currentPriseEnChargeTypes = selectedPriseEnChargeTypesData
+              ? [...currentPriseEnChargeTypes, selectedPriseEnChargeTypesData.label]
+              : currentPriseEnChargeTypes
+          }
+          return currentPriseEnChargeTypes && currentPriseEnChargeTypes.length > 0
+            ? currentPriseEnChargeTypes.reduce(reducer)
+            : ''
+        }
+
+        const displaySelectedTypeDeSejours = (typeDeSejours: { id: string; label: string }[]) => {
+          let currentTypeDeSejours: string[] = []
+          for (const typeDeSejour of typeDeSejours) {
+            const selectedTypeDeSejoursData =
+              data?.typeDeSejour && data?.typeDeSejour !== 'loading'
+                ? data.typeDeSejour.find(
+                    (typeDeSejourElement: any) => typeDeSejourElement && typeDeSejourElement.id === typeDeSejour.id
+                  )
+                : null
+            currentTypeDeSejours = selectedTypeDeSejoursData
+              ? [...currentTypeDeSejours, selectedTypeDeSejoursData.label]
+              : currentTypeDeSejours
+          }
+          return currentTypeDeSejours && currentTypeDeSejours.length > 0 ? currentTypeDeSejours.reduce(reducer) : ''
+        }
+
+        const displaySelectedFileStatus = (fileStatus: { id: string; label: string }[]) => {
+          let currentFileStatus: string[] = []
+          for (const fileStatu of fileStatus) {
+            const selectedFileStatusData =
+              data?.fileStatus && data?.fileStatus !== 'loading'
+                ? data.fileStatus.find(
+                    (fileStatuElement: any) => fileStatuElement && fileStatuElement.id === fileStatu.id
+                  )
+                : null
+            currentFileStatus = selectedFileStatusData
+              ? [...currentFileStatus, selectedFileStatusData.label]
+              : currentFileStatus
+          }
+          return currentFileStatus && currentFileStatus.length > 0 ? currentFileStatus.reduce(reducer) : ''
+        }
 
         content = [
           _currentCriteria.years && _currentCriteria.years[0] === _currentCriteria.years[1] && (
@@ -480,31 +549,40 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 }
               />
             ),
-          selectedAdmissionMode && (
+          _currentCriteria && _currentCriteria.entryMode && _currentCriteria?.entryMode?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{`Mode d'admission: ${selectedAdmissionMode.label}`}</Typography>}
+              label={<Typography noWrap>{displaySelectedEntryModes(_currentCriteria?.entryMode)}</Typography>}
             />
           ),
-          selectedEntryMode && (
+          _currentCriteria && _currentCriteria.exitMode && _currentCriteria?.exitMode?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{`Mode d'entrée : ${selectedEntryMode.label}`}</Typography>}
+              label={<Typography noWrap>{displaySelectedExitModes(_currentCriteria?.exitMode)}</Typography>}
             />
           ),
-          selectedExitMode && (
+          _currentCriteria && _currentCriteria.priseEnChargeType && _currentCriteria?.priseEnChargeType?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{`Mode de sortie : ${selectedExitMode.label}`}</Typography>}
+              label={
+                <Typography noWrap>{displaySelectedPriseEnChargeTypes(_currentCriteria?.priseEnChargeType)}</Typography>
+              }
             />
           ),
-          selectedFileStatus && (
+          _currentCriteria && _currentCriteria.typeDeSejour && _currentCriteria?.typeDeSejour?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{`Statut dossier : ${selectedFileStatus.label}`}</Typography>}
+              label={<Typography noWrap>{displaySelectedTypeDeSejours(_currentCriteria?.typeDeSejour)}</Typography>}
+            />
+          ),
+          _currentCriteria && _currentCriteria.fileStatus && _currentCriteria?.fileStatus?.length > 0 && (
+            <Chip
+              className={classes.criteriaChip}
+              label={<Typography noWrap>{displaySelectedFileStatus(_currentCriteria?.fileStatus)}</Typography>}
             />
           )
         ]
+        console.log(`_currentCriteria`, _currentCriteria)
         break
       }
       default:
