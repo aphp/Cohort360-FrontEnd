@@ -21,12 +21,12 @@ const Layout = (props) => {
 const AppNavigation = () => (
   <Router>
     <Switch>
-      {Config.map((route) => {
+      {Config.map((route, index) => {
         const MyComponent = route.component
 
         return (
           <Route
-            key={route.name}
+            key={index}
             exact={route.exact}
             path={route.path}
             render={(props) => {

@@ -39,6 +39,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
   const classes = useStyles()
 
   const [error, setError] = useState(false)
+  const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const _onSubmit = () => {
     if (selectedCriteria?.code?.length === 0) {
@@ -82,6 +83,18 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
 
       <Grid className={classes.formContainer}>
         {error && <Alert severity="error">Merci de renseigner un acte CCAM</Alert>}
+
+        {!error && !multiFields && (
+          <Alert
+            severity="info"
+            onClose={() => {
+              localStorage.setItem('multiple_fields', 'ok')
+              setMultiFields('ok')
+            }}
+          >
+            Tous les éléments des champs multiples sont liés par une contrainte OU
+          </Alert>
+        )}
 
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">Actes CCAM</Typography>
