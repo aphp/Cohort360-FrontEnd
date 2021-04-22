@@ -55,6 +55,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
   const [helpOpen, setHelpOpen] = useState(false)
   const [error, setError] = useState(false)
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
+  const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const isEdition = selectedCriteria !== null ? true : false
 
@@ -101,6 +102,18 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
 
       <Grid className={classes.formContainer}>
         {error && <Alert severity="error">Merci de renseigner au moins une recherche, ou un type de document</Alert>}
+
+        {!error && !multiFields && (
+          <Alert
+            severity="info"
+            onClose={() => {
+              localStorage.setItem('multiple_fields', 'ok')
+              setMultiFields('ok')
+            }}
+          >
+            Tous les éléments des champs multiples sont liés par une contrainte OU
+          </Alert>
+        )}
 
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">Documents médicaux</Typography>

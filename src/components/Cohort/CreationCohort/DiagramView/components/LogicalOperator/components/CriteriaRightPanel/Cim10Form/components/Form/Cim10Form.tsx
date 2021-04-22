@@ -39,6 +39,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const classes = useStyles()
 
   const [error, setError] = useState(false)
+  const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const _onSubmit = () => {
     if (selectedCriteria?.code?.length === 0 && selectedCriteria?.diagnosticType?.length === 0) {
@@ -98,6 +99,18 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
 
       <Grid className={classes.formContainer}>
         {error && <Alert severity="error">Merci de renseigner au moins un code ou un type de diagnostic</Alert>}
+
+        {!error && !multiFields && (
+          <Alert
+            severity="info"
+            onClose={() => {
+              localStorage.setItem('multiple_fields', 'ok')
+              setMultiFields('ok')
+            }}
+          >
+            Tous les éléments des champs multiples sont liés par une contrainte OU
+          </Alert>
+        )}
 
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">Diagnostic</Typography>

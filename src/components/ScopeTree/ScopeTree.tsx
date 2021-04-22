@@ -19,6 +19,7 @@ import { ScopeTreeRow } from 'types'
 import { useAppSelector } from 'state'
 
 import displayDigit from 'utils/displayDigit'
+import { getSelectedScopes } from 'utils/scopeTree'
 
 import useStyles from './styles'
 
@@ -102,106 +103,25 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
    *
    */
   const _clickToSelect = (row: ScopeTreeRow) => {
-    let savedSelectedItems = selectedItems ? [...selectedItems] : []
-
-    const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
-    const index = foundItem ? savedSelectedItems.indexOf(foundItem) : -1
-
-    const getAllChildren = (parent: ScopeTreeRow) => {
-      const getChild: (subItem: ScopeTreeRow) => ScopeTreeRow[] = (subItem: ScopeTreeRow) => {
-        if (subItem?.id === 'loading') return []
-
-        return [
-          subItem,
-          ...(subItem.subItems ? subItem.subItems.map((subItem: ScopeTreeRow) => getChild(subItem)) : [])
-        ].flat()
-      }
-
-      return [
-        parent,
-        ...(parent.subItems
-          ? parent.id === 'loading'
-            ? []
-            : parent.subItems.map((subItem: ScopeTreeRow) => getChild(subItem))
-          : [])
-      ].flat()
-    }
-
-    const deleteRowAndChild = (parent: ScopeTreeRow) => {
-      const elemToDelete = getAllChildren(parent)
-
-      savedSelectedItems = savedSelectedItems.filter((row) => !elemToDelete.some(({ id }) => id === row.id))
-      savedSelectedItems = savedSelectedItems.filter((row) => {
-        // Remove if one child is not checked
-        if (row.subItems && row.subItems.length > 0 && row.subItems[0].id === 'loading') {
-          return true
-        }
-        const numberOfSubItemsSelected = row?.subItems?.filter((subItem: any) =>
-          savedSelectedItems.find(({ id }) => id === subItem.id)
-        )?.length
-        if (numberOfSubItemsSelected && numberOfSubItemsSelected !== row?.subItems?.length) {
-          return false
-        }
-        return true
-      })
-
-      return savedSelectedItems
-    }
-
-    if (index !== -1) {
-      savedSelectedItems = deleteRowAndChild(row)
-    } else {
-      savedSelectedItems = [...savedSelectedItems, ...getAllChildren(row)]
-    }
-
-    let _savedSelectedItems = []
-    const checkIfParentIsChecked = (rows: ScopeTreeRow[]) => {
-      for (let index = 0; index < rows.length; index++) {
-        const row = rows[index]
-        if (
-          !row.subItems ||
-          (row && row.subItems.length === 0) ||
-          (row && row.subItems.length === 1 && row.subItems[0].id === 'loading')
-        ) {
-          continue
-        }
-
-        const selectedChildren = row.subItems
-          ? row.subItems.filter((child) => savedSelectedItems.find((selectedChild) => selectedChild.id === child.id))
-          : []
-
-        const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
-        const isNotSelected = foundItem && savedSelectedItems ? savedSelectedItems.indexOf(foundItem) : -1
-
-        if (
-          foundItem &&
-          foundItem.subItems &&
-          selectedChildren.length === foundItem.subItems.length &&
-          isNotSelected === -1
-        ) {
-          savedSelectedItems = [...savedSelectedItems, row]
-        } else if (
-          foundItem &&
-          foundItem.subItems &&
-          selectedChildren.length !== foundItem.subItems.length &&
-          isNotSelected !== -1
-        ) {
-          savedSelectedItems = savedSelectedItems.filter(({ id }) => id !== row.id)
-        }
-        if (row.subItems) checkIfParentIsChecked(row.subItems)
-      }
-    }
-
-    savedSelectedItems = savedSelectedItems.filter((item, index, array) => array.indexOf(item) === index)
-
-    while (savedSelectedItems.length !== _savedSelectedItems.length) {
-      _savedSelectedItems = savedSelectedItems
-      checkIfParentIsChecked(rootRows)
-    }
-
-    savedSelectedItems = savedSelectedItems.filter((item, index, array) => array.indexOf(item) === index)
+    const savedSelectedItems: ScopeTreeRow[] = getSelectedScopes(row, selectedItems, rootRows)
 
     onChangeSelectedItem(savedSelectedItems)
+    return savedSelectedItems
+  }
+
+  const _clickToSelectAll = () => {
+    let results: any[] = []
+    if (
+      rootRows.filter((row) => selectedItems.find(({ id }) => id === row.id) !== undefined).length === rootRows.length
+    ) {
+      results = []
+    } else {
+      for (const rootRow of rootRows) {
+        const rowsAndChildren = _clickToSelect(rootRow)
+        results = [...results, ...rowsAndChildren]
+      }
+    }
+    onChangeSelectedItem(results)
   }
 
   const _checkIfIndeterminated: (_row: any) => boolean | undefined = (_row) => {
@@ -227,7 +147,18 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
       align: 'left',
       disablePadding: true,
       disableOrderBy: true,
-      label: <>{/* <Typography>SALUC C'EST VICTOR !</Typography> */}</>
+      label: (
+        <div style={{ padding: '0 0 0 4px' }}>
+          <Checkbox
+            color="secondary"
+            checked={
+              rootRows.filter((row) => selectedItems.find(({ id }) => id === row.id) !== undefined).length ===
+              rootRows.length
+            }
+            onClick={_clickToSelectAll}
+          />
+        </div>
+      )
     },
     { id: 'name', align: 'left', disablePadding: false, disableOrderBy: true, label: 'Nom' },
     { id: 'quantity', align: 'center', disablePadding: false, disableOrderBy: true, label: 'Nombre de patients' },

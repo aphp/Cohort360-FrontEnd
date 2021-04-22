@@ -237,9 +237,18 @@ type UnbuildParams = { newCurrentSnapshot: CohortCreationSnapshotType }
 
 const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParams, { state: RootState }>(
   'cohortCreation/unbuild',
-  async ({ newCurrentSnapshot }) => {
+  async ({ newCurrentSnapshot }, { getState, dispatch }) => {
     try {
+      const state = getState()
       const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot.json)
+
+      dispatch<any>(
+        countCohortCreation({
+          json: newCurrentSnapshot.json,
+          snapshotId: newCurrentSnapshot.uuid,
+          requestId: state.cohortCreation.request.requestId
+        })
+      )
 
       return {
         json: newCurrentSnapshot.json,
