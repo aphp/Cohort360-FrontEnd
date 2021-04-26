@@ -1,4 +1,4 @@
-import { logout } from './me'
+import { logout, login } from './me'
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 import {
@@ -318,6 +318,7 @@ const cohortCreationSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
+    builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout, () => defaultInitialState)
     // buildCohortCreation
     builder.addCase(buildCohortCreation.pending, (state) => ({ ...state, loading: true }))
