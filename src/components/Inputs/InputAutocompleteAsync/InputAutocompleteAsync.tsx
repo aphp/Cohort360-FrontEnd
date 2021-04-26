@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { FC, useEffect, useState, Fragment } from 'react'
 
 import { TextField, CircularProgress } from '@material-ui/core'
 import { Autocomplete } from '@material-ui/lab'
@@ -23,7 +23,7 @@ type InputAutocompleteAsyncProps = {
   helperText?: string
 }
 
-const InputAutocompleteAsync: React.FC<InputAutocompleteAsyncProps> = (props) => {
+const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
   const {
     id,
     variant,
@@ -43,7 +43,7 @@ const InputAutocompleteAsync: React.FC<InputAutocompleteAsyncProps> = (props) =>
   const [options, setOptions] = useState<ElementType[]>(autocompleteOptions)
   const [loading, setLoading] = useState(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     let active = true
 
     ;(async () => {
@@ -60,9 +60,9 @@ const InputAutocompleteAsync: React.FC<InputAutocompleteAsyncProps> = (props) =>
     return () => {
       active = false
     }
-  }, [searchValue])
+  }, [searchValue, getAutocompleteOptions])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) {
       setOptions([])
     }
@@ -98,10 +98,10 @@ const InputAutocompleteAsync: React.FC<InputAutocompleteAsyncProps> = (props) =>
           InputProps={{
             ...params.InputProps,
             endAdornment: (
-              <React.Fragment>
+              <Fragment>
                 {loading ? <CircularProgress color="inherit" size={20} /> : null}
                 {params.InputProps.endAdornment}
-              </React.Fragment>
+              </Fragment>
             )
           }}
         />

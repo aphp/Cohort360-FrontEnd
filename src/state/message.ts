@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
-import { logout } from './me'
+import { logout, login } from './me'
 import { buildCohortCreation, saveJson, countCohortCreation } from './cohortCreation'
 
 export type MessageState = null | {
@@ -24,10 +24,10 @@ const setMessageSlice = createSlice({
         type: action.payload.type ?? state?.type ?? 'info',
         content: action.payload.content ?? ''
       }
-      return null
     }
   },
   extraReducers: (builder) => {
+    builder.addCase(login, () => null)
     builder.addCase(logout, () => null)
     builder.addCase(buildCohortCreation.pending, () => ({
       type: 'info',

@@ -83,7 +83,7 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 250, width = 25
         dataValues: data.map((entry) => displayDigit(entry.value))
       })
     )
-  }, [node, data, height, width])
+  }, [node, data, height, width, total_value])
 
   return (
     <>
