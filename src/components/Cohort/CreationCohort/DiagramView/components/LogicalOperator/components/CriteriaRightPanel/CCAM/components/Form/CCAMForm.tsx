@@ -130,7 +130,6 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             label="Codes d'actes CCAM"
             variant="outlined"
             noOptionsText="Veuillez entrer un code ou un acte CCAM"
-            helperText={'Tous les actes CCAM sélectionnés seront liés par une contrainte OU'}
             className={classes.inputItem}
             autocompleteValue={defaultValuesCode}
             autocompleteOptions={criteria?.data?.ccamData || []}

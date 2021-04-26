@@ -126,7 +126,6 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             label="Codes GHM"
             variant="outlined"
             noOptionsText="Veuillez entrer un code ou un critère GHM"
-            helperText={'Tous les critère GHM sélectionnés seront liés par une contrainte OU'}
             className={classes.inputItem}
             autocompleteValue={defaultValuesCode}
             autocompleteOptions={criteria?.data?.ghmData || []}
