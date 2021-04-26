@@ -77,7 +77,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
           />
         </ListItemIcon>
         <Tooltip title={label} enterDelay={2500}>
-          <ListItemText className={classes.label} primary={label} />
+          <ListItemText onClick={() => handleClickOnHierarchy(cimItem)} className={classes.label} primary={label} />
         </Tooltip>
       </ListItem>
     )
