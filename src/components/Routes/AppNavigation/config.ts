@@ -18,7 +18,7 @@ export default [
   {
     exact: true,
     path: '/',
-    route: 'main',
+    name: 'main',
     component: CONTEXT === 'arkhn' ? ArkhnConnexion : CONTEXT === 'aphp' ? Connexion : FakeConnexion
   },
   /**
@@ -28,7 +28,8 @@ export default [
     exact: true,
     displaySideBar: true,
     path: '/accueil',
-    route: 'accueil',
+    name: 'accueil',
+    isPrivate: true,
     component: Accueil
   },
   /**
@@ -39,6 +40,7 @@ export default [
     displaySideBar: true,
     path: '/rechercher_patient/:search',
     name: 'rechercher_patient/:search',
+    isPrivate: true,
     component: RechercherPatient
   },
   {
@@ -46,6 +48,7 @@ export default [
     displaySideBar: true,
     path: '/rechercher_patient',
     name: 'rechercher_patient',
+    isPrivate: true,
     component: RechercherPatient
   },
   /**
@@ -55,7 +58,8 @@ export default [
     exact: true,
     displaySideBar: true,
     path: '/perimetre',
-    route: 'perimetre',
+    name: 'perimetre',
+    isPrivate: true,
     component: Scope
   },
   /**
@@ -66,6 +70,7 @@ export default [
     displaySideBar: true,
     path: '/recherche_sauvegarde',
     name: 'recherche_sauvegarde',
+    isPrivate: true,
     component: RechercheSauvegarde
   },
   /**
@@ -76,6 +81,23 @@ export default [
     displaySideBar: true,
     path: '/cohort/new',
     name: 'cohort/new',
+    isPrivate: true,
+    component: CohortCreation
+  },
+  {
+    exact: true,
+    displaySideBar: true,
+    path: '/cohort/new/:requestId',
+    name: 'cohort/new/:requestId',
+    isPrivate: true,
+    component: CohortCreation
+  },
+  {
+    exact: true,
+    displaySideBar: true,
+    path: '/cohort/new/:requestId/:snapshotId',
+    name: 'cohort/new/:requestId/:snapshotId',
+    isPrivate: true,
     component: CohortCreation
   },
   {
@@ -100,6 +122,7 @@ export default [
     displaySideBar: true,
     path: '/cohort/:cohortId/:tabName',
     name: 'cohort/:cohortId/:tabName',
+    isPrivate: true,
     component: Dashboard,
     context: 'cohort'
   },
@@ -108,6 +131,7 @@ export default [
     displaySideBar: true,
     path: '/cohort/:cohortId',
     name: 'cohort/:cohortId',
+    isPrivate: true,
     component: Dashboard,
     context: 'cohort'
   },
@@ -118,6 +142,7 @@ export default [
     displaySideBar: true,
     path: '/perimetres/:tabName',
     name: 'perimetres/:tabName',
+    isPrivate: true,
     component: Dashboard,
     context: 'perimeters'
   },
@@ -125,6 +150,7 @@ export default [
     displaySideBar: true,
     path: '/perimetres',
     name: 'perimetres',
+    isPrivate: true,
     component: Dashboard,
     context: 'perimeters'
   },
@@ -135,6 +161,7 @@ export default [
     displaySideBar: true,
     path: '/mes_patients/:tabName',
     name: 'mes_patients/:tabName',
+    isPrivate: true,
     component: Dashboard,
     context: 'patients'
   },
@@ -142,6 +169,7 @@ export default [
     displaySideBar: true,
     path: '/mes_patients',
     name: 'mes_patients',
+    isPrivate: true,
     component: Dashboard,
     context: 'patients'
   },
@@ -152,12 +180,14 @@ export default [
     displaySideBar: true,
     path: '/patients/:patientId/:tabName',
     name: 'patients/:patientId/:tabName',
+    isPrivate: true,
     component: Patient
   },
   {
     displaySideBar: true,
     path: '/patients/:patientId',
     name: 'patients/:patientId',
+    isPrivate: true,
     component: Patient
   }
 ]

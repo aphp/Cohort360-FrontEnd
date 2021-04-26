@@ -1,7 +1,7 @@
 import { CohortData } from 'types'
 import { IGroup_Member } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
-import { logout } from './me'
+import { logout, login } from './me'
 import { RootState } from 'state'
 import { fetchCohort } from 'services/cohortInfos'
 import { fetchMyPatients } from 'services/myPatients'
@@ -186,6 +186,7 @@ const exploredCohortSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
+    builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout, () => defaultInitialState)
     builder.addCase(fetchExploredCohort.pending, (state, { meta }) => {
       state.loading = true

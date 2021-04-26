@@ -78,7 +78,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 250
         dataValues: data.map((entry) => displayDigit(entry.value))
       })
     )
-  }, [node, data, height, width])
+  }, [node, data, height, width, total_value])
 
   return (
     <>

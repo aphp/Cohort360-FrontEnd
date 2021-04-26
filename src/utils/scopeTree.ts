@@ -74,7 +74,8 @@ export const getSelectedScopes = (
       }
 
       const selectedChildren = row.subItems
-        ? row.subItems.filter((child) => savedSelectedItems.find((selectedChild) => selectedChild.id === child.id))
+        ? // eslint-disable-next-line
+          row.subItems.filter((child) => savedSelectedItems.find((selectedChild) => selectedChild.id === child.id))
         : []
 
       const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
