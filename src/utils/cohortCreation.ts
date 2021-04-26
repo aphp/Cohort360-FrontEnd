@@ -48,8 +48,7 @@ const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   gender: [],
   vitalStatus: [],
   years: [0, 130],
-  ageType: { id: 'year', label: 'En année' },
-  label: undefined
+  ageType: { id: 'year', label: 'En année' }
 }
 
 const DEFAULT_GROUP_ERROR: CriteriaGroupType = {
@@ -925,7 +924,7 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
                     if (!allreadyHere) {
                       _criterion.data[dataKey] = [
                         ..._criterion.data[dataKey],
-                        ...(await _criterion.fetch[fetchKey](code?.id))
+                        ...(await _criterion.fetch[fetchKey](code?.id, true))
                       ]
                     }
                   }

@@ -21,6 +21,7 @@ const jsonExploredCohort = localStorageExploredCohort ? JSON.parse(localStorageE
 const defaultInitialState = {
   // CohortData
   name: '',
+  description: '',
   cohort: [],
   totalPatients: 0,
   originalPatients: [],

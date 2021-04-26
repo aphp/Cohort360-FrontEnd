@@ -17,6 +17,9 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 250
   const node = useRef<SVGSVGElement | null>(null)
   const [legendHtml, setLegend] = useState()
 
+  const total_value =
+    data && data.length > 0 ? data.reduce((a, b) => (typeof a === 'number' ? a + b.value : a.value + b.value)) : 0
+
   useEffect(() => {
     if (!data) {
       return
@@ -59,7 +62,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 250
         d3.select(this).transition().duration('50').attr('opacity', '.5')
         div.transition().duration(50).style('opacity', 1)
         div
-          .html(d.value)
+          .html(`${d.value} (${parseInt((d.value / total_value) * 10000) / 100}%)`)
           .style('left', d3.event.pageX + 10 + 'px')
           .style('top', d3.event.pageY - 15 + 'px')
       })

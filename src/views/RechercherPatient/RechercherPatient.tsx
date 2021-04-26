@@ -44,7 +44,7 @@ const RechercherPatient: React.FC<{}> = () => {
     setLoading(true)
     searchPatient(nominativeGroupsIds, page, sortBy, sortDirection, input, searchBy).then((results) => {
       if (results) {
-        setPatientResults(results.patientList)
+        setPatientResults(results.patientList ?? [])
         setTotal(results.totalPatients ?? 0)
         setShowTable(true)
       }
@@ -108,6 +108,7 @@ const RechercherPatient: React.FC<{}> = () => {
           )}
           {!loading && showTable && (
             <TableauPatients
+              search={searchInput}
               groupId={practitioner?.nominativeGroupsIds}
               patients={patientResults}
               onChangePage={handlePageChange}

@@ -62,6 +62,16 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
     }`
   }
 
+  let boxWidth = 50
+  if (currentLogicalOperator.type === 'NamongM') {
+    boxWidth = isOpen ? 500 : 75
+  } else {
+    boxWidth = isOpen ? 400 : 50
+  }
+  if (!isOpen && !currentLogicalOperator.isInclusive) {
+    boxWidth += 30
+  }
+
   const _buildCohortCreation = () => {
     dispatch<any>(buildCohortCreation({}))
   }
@@ -181,7 +191,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
           style={{
             background: !currentLogicalOperator.isInclusive ? '#F2B0B0' : '#19235A',
             color: !currentLogicalOperator.isInclusive ? '#19235a' : 'white',
-            width: currentLogicalOperator.type === 'NamongM' ? (isOpen ? 500 : 75) : isOpen ? 400 : 50
+            width: boxWidth
           }}
           onClick={() => setOpen(true)}
           onMouseEnter={() => {
@@ -251,6 +261,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
             </>
           ) : (
             <Typography variant="h5" className={classes.textOperator}>
+              {!currentLogicalOperator.isInclusive && 'NON '}
               {groupType === 'andGroup' || groupType === 'orGroup'
                 ? logicalOperatorDic[groupType]
                 : logicalOperatorDic['NamongM']}

@@ -1,6 +1,5 @@
 import api from './api'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
-import { getLastEncounter } from './myPatients'
 import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortPatient, FHIR_API_Response, SearchByTypes } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
@@ -119,7 +118,7 @@ export const searchPatient = async (
       }&_sort=${_sortDirection}${sortBy}&${searchBy}=${search}&_elements=gender,name,birthDate,deceased,identifier,extension`
     )
 
-    const patientList = await getLastEncounter(getApiResponseResources(patientResp))
+    const patientList = getApiResponseResources(patientResp)
 
     const totalPatients = patientResp.data.resourceType === 'Bundle' ? patientResp.data.total : 0
 

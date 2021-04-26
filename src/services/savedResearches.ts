@@ -24,11 +24,13 @@ export const fetchCohorts = async (
         researchId: '123456789',
         fhir_group_id: '123456789',
         name: 'Fausse cohorte',
+        description: 'Ceci est une fausse cohort créée pour des tests',
         status: 'Cohort360',
         nPatients: 12,
         date: '2021-01-20T10:28:28.385368Z',
         perimeter: '-',
-        favorite: true
+        favorite: true,
+        jobFailMsg: ''
       }
     ]
 
@@ -95,7 +97,7 @@ export const fetchCohorts = async (
     )
 
     const results = cohortResp?.data?.results
-      ? cohortResp.data.results
+      ? (cohortResp.data.results
           .map((cohort) => ({
             researchId: cohort.uuid ?? '',
             fhir_group_id: cohort.fhir_group_id,
@@ -105,9 +107,10 @@ export const fetchCohorts = async (
             date: cohort.dated_measure.fhir_datetime,
             perimeter: '-',
             favorite: cohort.favorite,
-            jobStatus: cohort.request_job_status
+            jobStatus: cohort.request_job_status,
+            jobFailMsg: cohort.request_job_fail_msg
           }))
-          .filter(Boolean)
+          .filter(Boolean) as FormattedCohort[])
       : undefined
 
     return {
@@ -124,12 +127,14 @@ export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefi
         researchId: '123456789',
         fhir_group_id: '123456789',
         name: 'Fausse cohorte',
+        description: 'Ceci est une fausse cohort créée pour des tests',
         status: 'Cohort360',
         nPatients: 12,
         date: '2021-01-20T10:28:28.385368Z',
         perimeter: '-',
         favorite: true,
-        jobStatus: 'finished'
+        jobStatus: 'finished',
+        jobFailMsg: ''
       }
     ]
 
@@ -147,12 +152,14 @@ export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefi
               researchId: cohort.uuid ?? '',
               fhir_group_id: cohort.fhir_group_id,
               name: cohort.name,
+              description: cohort.description,
               status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
               nPatients: cohort.result_size,
               date: cohort.dated_measure.fhir_datetime,
               perimeter: '-',
               favorite: cohort.favorite,
-              jobStatus: cohort.request_job_status
+              jobStatus: cohort.request_job_status,
+              jobFailMsg: cohort.request_job_fail_msg
             }
           })
           .filter(Boolean)
@@ -169,11 +176,13 @@ export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined>
         researchId: '123456789',
         fhir_group_id: '123456789',
         name: 'Fausse cohorte',
+        description: 'Ceci est une fausse cohort créée pour des tests',
         status: 'Cohort360',
         nPatients: 12,
         date: '2021-01-20T10:28:28.385368Z',
         perimeter: '-',
-        favorite: true
+        favorite: true,
+        jobFailMsg: ''
       }
     ]
 
@@ -190,12 +199,14 @@ export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined>
             researchId: cohort.uuid ?? '',
             fhir_group_id: cohort.fhir_group_id,
             name: cohort.name,
+            description: cohort.description,
             status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
             nPatients: cohort.result_size,
             date: cohort.dated_measure.fhir_datetime,
             perimeter: '-',
             favorite: cohort.favorite,
-            jobStatus: cohort.request_job_status
+            jobStatus: cohort.request_job_status,
+            jobFailMsg: cohort.request_job_fail_msg
           }))
           .filter(Boolean)
       : undefined
