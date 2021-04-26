@@ -691,8 +691,6 @@ export async function unbuildRequest(_json: string) {
                 currentCriterion.fileStatus = currentCriterion.fileStatus
                   ? [...currentCriterion.fileStatus, ...newFileStatusIds]
                   : newFileStatusIds
-                console.log(`newFileStatusIds`, newFileStatusIds)
-                console.log(`currentCriterion`, currentCriterion)
                 break
               }
               default:

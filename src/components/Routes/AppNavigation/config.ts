@@ -78,6 +78,20 @@ export default [
     name: 'cohort/new',
     component: CohortCreation
   },
+  {
+    exact: true,
+    displaySideBar: true,
+    path: '/cohort/new/:requestId',
+    name: 'cohort/new/:requestId',
+    component: CohortCreation
+  },
+  {
+    exact: true,
+    displaySideBar: true,
+    path: '/cohort/new/:requestId/:snapshotId',
+    name: 'cohort/new/:requestId/:snapshotId',
+    component: CohortCreation
+  },
   /**
    * Chohort360: Explore Cohort
    */
