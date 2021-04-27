@@ -247,6 +247,11 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                     Recherches sauvegardées
                   </Link>
                 </ListItem>
+                <ListItem>
+                  <Link href="/mes_projets" className={classes.nestedTitle}>
+                    Mes projets de recherche
+                  </Link>
+                </ListItem>
               </List>
             </Collapse>
           </List>
