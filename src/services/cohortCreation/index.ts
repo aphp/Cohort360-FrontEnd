@@ -74,7 +74,7 @@ export const createCohort = async (
   }
 }
 
-export const createRequest = async () => {
+export const createRequest = async (name: string, description: string) => {
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
@@ -82,8 +82,8 @@ export const createRequest = async () => {
   } else {
     const request =
       (await apiBack.post('/explorations/requests/', {
-        name: 'Nouvelle requête',
-        description: 'Requête créée depuis le front Cohort360',
+        name,
+        description,
         favorite: false,
         data_type_of_query: 'PATIENT'
       })) || {}

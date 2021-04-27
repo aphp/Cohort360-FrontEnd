@@ -112,6 +112,35 @@ const fetchRequestCohortCreation = createAsyncThunk<
 })
 
 /**
+ * createRequestCohortCreation
+ *
+ */
+type CreateRequestCohortCreationParams = {
+  name: string
+  description: string | null
+}
+
+const createRequestCohortCreation = createAsyncThunk<
+  { requestId: string },
+  CreateRequestCohortCreationParams,
+  { state: RootState }
+>('cohortCreation/createRequest', async ({ name, description }) => {
+  try {
+    console.log('cohortCreation/createRequest')
+    const createRequestResult = await createRequest(name, description ?? '')
+    console.log(`createRequestResult`, createRequestResult)
+    if (!createRequestResult) {
+      return { requestId: '' }
+    }
+
+    return { requestId: createRequestResult.uuid }
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+})
+
+/**
  * countCohortCreation
  *
  */
@@ -155,18 +184,13 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
   async ({ newJson }, { getState, dispatch }) => {
     try {
       const state = getState()
-      let { requestId, snapshotsHistory, currentSnapshot } = state.cohortCreation.request
-
-      let _requestId = requestId ? requestId : ''
+      const { requestId } = state.cohortCreation.request
+      let { snapshotsHistory, currentSnapshot } = state.cohortCreation.request
 
       if (!snapshotsHistory || (snapshotsHistory && snapshotsHistory.length === 0)) {
         // Create request + first snapshot
-        const _request = await createRequest()
-        _requestId = _request ? _request.uuid : null
-        if (_requestId) {
-          requestId = _requestId
-
-          const newSnapshot = await createSnapshot(_requestId, newJson, true)
+        if (requestId) {
+          const newSnapshot = await createSnapshot(requestId, newJson, true)
           if (newSnapshot) {
             const uuid = newSnapshot.uuid
             const json = newSnapshot.serialized_query
@@ -206,7 +230,7 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
       )
 
       return {
-        requestId: _requestId,
+        requestId,
         snapshotsHistory,
         currentSnapshot
       }
@@ -394,11 +418,26 @@ const cohortCreationSlice = createSlice({
       loading: false
     }))
     builder.addCase(fetchRequestCohortCreation.rejected, (state) => ({ ...state, loading: false }))
+    // createRequestCohortCreation
+    builder.addCase(createRequestCohortCreation.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(createRequestCohortCreation.fulfilled, (state, { payload }) => ({
+      ...state,
+      ...payload,
+      loading: false
+    }))
+    builder.addCase(createRequestCohortCreation.rejected, (state) => ({ ...state, loading: false }))
   }
 })
 
 export default cohortCreationSlice.reducer
-export { buildCohortCreation, unbuildCohortCreation, saveJson, countCohortCreation, fetchRequestCohortCreation }
+export {
+  buildCohortCreation,
+  unbuildCohortCreation,
+  saveJson,
+  countCohortCreation,
+  fetchRequestCohortCreation,
+  createRequestCohortCreation
+}
 export const {
   resetCohortCreation,
   //
