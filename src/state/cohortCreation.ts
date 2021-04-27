@@ -34,6 +34,8 @@ export type CohortCreationState = {
   temporalConstraints: TemporalConstraintsType[]
   nextCriteriaId: number
   nextGroupId: number
+  projectName?: string
+  requestName?: string
 }
 
 const defaultInitialState: CohortCreationState = {

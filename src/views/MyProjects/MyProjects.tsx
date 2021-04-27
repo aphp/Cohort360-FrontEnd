@@ -53,6 +53,10 @@ const MyProjects = () => {
     }
   }, [])
 
+  console.log('projectList :>> ', projectList)
+  console.log('requestList :>> ', requestList)
+  console.log('cohortList :>> ', cohortList)
+
   if (loading) {
     return (
       <Grid
