@@ -24,12 +24,14 @@ const MyProjects = () => {
   }
 
   const _fetchRequestList = async () => {
-    const _requestList: any[] = await fetchRequestList()
+    const _requestResponse = await fetchRequestList()
+    const _requestList: any[] = _requestResponse.results
     setRequestList(_requestList)
   }
 
   const _fetchCohortList = async () => {
-    const _cohortList: any[] = await fetchCohortList()
+    const _cohortResponse = await fetchCohortList()
+    const _cohortList: any[] = _cohortResponse.results
     setCohortList(_cohortList)
   }
 
@@ -66,10 +68,6 @@ const MyProjects = () => {
       </Grid>
     )
   }
-
-  console.log('projectList :>> ', projectList)
-  console.log('requestList :>> ', requestList)
-  console.log('cohortList :>> ', cohortList)
 
   return (
     <Grid

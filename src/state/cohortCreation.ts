@@ -118,17 +118,16 @@ const fetchRequestCohortCreation = createAsyncThunk<
 type CreateRequestCohortCreationParams = {
   name: string
   description: string | null
+  projectId: string | null
 }
 
 const createRequestCohortCreation = createAsyncThunk<
   { requestId: string },
   CreateRequestCohortCreationParams,
   { state: RootState }
->('cohortCreation/createRequest', async ({ name, description }) => {
+>('cohortCreation/createRequest', async ({ name, description, projectId }) => {
   try {
-    console.log('cohortCreation/createRequest')
-    const createRequestResult = await createRequest(name, description ?? '')
-    console.log(`createRequestResult`, createRequestResult)
+    const createRequestResult = await createRequest(name, description ?? '', projectId)
     if (!createRequestResult) {
       return { requestId: '' }
     }

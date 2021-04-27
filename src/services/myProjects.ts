@@ -1,11 +1,16 @@
 import apiBack from './apiBackCohort'
 import { CONTEXT } from '../constants'
 
+export type ProjectType = {
+  uuid: string
+  name: string
+}
+
 export const fetchProjectsList = async () => {
-  const myProjects = [
+  const myProjects: ProjectType[] = [
     {
       uuid: '1',
-      label: 'Mon projet principal'
+      name: 'Mon projet principal'
     }
   ]
   switch (CONTEXT) {
@@ -19,7 +24,7 @@ export const fetchProjectsList = async () => {
   }
 }
 
-export type RequestResponseType = {
+export type RequestType = {
   created_at: string
   data_type_of_query: string
   description?: string
@@ -28,6 +33,7 @@ export type RequestResponseType = {
   name: string
   owner_id: string
   uuid: string
+  project_id: string
 }[]
 
 export const fetchRequestList = async (limit = 100, offset = 0) => {
@@ -44,10 +50,16 @@ export const fetchRequestList = async (limit = 100, offset = 0) => {
       count: number
       next: string | null
       previous: string | null
-      results: RequestResponseType[]
+      results: RequestType[]
     }>(`/explorations/requests/${search}`)
 
-    return data.results
+    return {
+      ...data,
+      results: data.results.map((res) => ({
+        ...res,
+        project_id: '1'
+      }))
+    }
   } catch (error) {
     console.error(error)
     throw error
@@ -90,7 +102,7 @@ export const fetchCohortList = async (limit = 100, offset = 0) => {
       results: CohortResponseType[]
     }>(`/explorations/cohorts/${search}`)
 
-    return data.results
+    return data
   } catch (error) {
     console.error(error)
     throw error
