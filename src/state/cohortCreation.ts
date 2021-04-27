@@ -1,4 +1,3 @@
-import { logout, login } from './me'
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 import {
@@ -12,7 +11,9 @@ import {
 
 import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
 
-import { createRequest, createSnapshot, countCohort } from 'services/cohortCreation'
+import { logout, login } from './me'
+
+import { createRequest, createSnapshot, countCohort, fetchRequest } from 'services/cohortCreation'
 
 const localStorageCohortCreation = localStorage.getItem('cohortCreation') ?? null
 const jsonCohortCreation = localStorageCohortCreation ? JSON.parse(localStorageCohortCreation).request : {}
@@ -68,6 +69,47 @@ const defaultInitialState: CohortCreationState = {
 }
 
 const initialState: CohortCreationState = localStorageCohortCreation ? jsonCohortCreation : defaultInitialState
+
+/**
+ * fetchRequestCohortCreation
+ *
+ */
+type FetchRequestCohortCreationParams = {
+  requestId: string
+  snapshotId?: string
+}
+type FetchRequestCohortCreationReturn = {
+  requestId?: string
+  snapshotsHistory?: any[]
+  currentSnapshot?: string
+  json?: string
+}
+
+const fetchRequestCohortCreation = createAsyncThunk<
+  FetchRequestCohortCreationReturn,
+  FetchRequestCohortCreationParams,
+  { state: RootState }
+>('cohortCreation/fetchRequest', async ({ requestId, snapshotId }, { dispatch }) => {
+  try {
+    if (!requestId) return {}
+    const requestResult = await fetchRequest(requestId, snapshotId)
+    if (!requestResult) return {}
+
+    const { json, currentSnapshot, snapshotsHistory } = requestResult
+
+    dispatch<any>(unbuildCohortCreation({ newCurrentSnapshot: snapshotsHistory[0] as CohortCreationSnapshotType }))
+
+    return {
+      json,
+      requestId,
+      snapshotsHistory: snapshotsHistory.reverse(),
+      currentSnapshot
+    }
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+})
 
 /**
  * countCohortCreation
@@ -344,11 +386,19 @@ const cohortCreationSlice = createSlice({
       count: { status: 'error' },
       countLoading: false
     }))
+    // fetchRequestCohortCreation
+    builder.addCase(fetchRequestCohortCreation.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(fetchRequestCohortCreation.fulfilled, (state, { payload }) => ({
+      ...state,
+      ...payload,
+      loading: false
+    }))
+    builder.addCase(fetchRequestCohortCreation.rejected, (state) => ({ ...state, loading: false }))
   }
 })
 
 export default cohortCreationSlice.reducer
-export { buildCohortCreation, unbuildCohortCreation, saveJson, countCohortCreation }
+export { buildCohortCreation, unbuildCohortCreation, saveJson, countCohortCreation, fetchRequestCohortCreation }
 export const {
   resetCohortCreation,
   //

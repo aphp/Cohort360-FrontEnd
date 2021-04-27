@@ -453,7 +453,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                       priseEnChargeTypeElement && priseEnChargeTypeElement.id === priseEnChargeType.id
                   )
                 : null
-            console.log(`data`, data)
             currentPriseEnChargeTypes = selectedPriseEnChargeTypesData
               ? [...currentPriseEnChargeTypes, selectedPriseEnChargeTypesData.label]
               : currentPriseEnChargeTypes
@@ -582,7 +581,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             />
           )
         ]
-        console.log(`_currentCriteria`, _currentCriteria)
         break
       }
       default:

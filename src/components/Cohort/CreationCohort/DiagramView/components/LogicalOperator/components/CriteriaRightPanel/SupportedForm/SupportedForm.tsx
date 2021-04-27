@@ -142,8 +142,6 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
       })
     : []
 
-  console.log(`criteria.data`, criteria.data)
-
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
