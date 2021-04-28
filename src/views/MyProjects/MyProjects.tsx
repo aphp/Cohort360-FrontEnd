@@ -3,6 +3,8 @@ import clsx from 'clsx'
 
 import { Grid, Typography, CircularProgress } from '@material-ui/core'
 
+import ProjectTable from 'components/MyProjects/ProjectTable/ProjectTable'
+
 import { fetchProjectsList, fetchRequestList, fetchCohortList } from 'services/myProjects'
 
 import { useAppSelector } from 'state'
@@ -16,7 +18,6 @@ const MyProjects = () => {
   const [loading, setLoading] = useState(true)
   const [projectList, setProjectList] = useState<any[]>([])
   const [requestList, setRequestList] = useState<any[]>([])
-  const [cohortList, setCohortList] = useState<any[]>([])
 
   const _fetchProjectsList = async () => {
     const _projectList: any[] = await fetchProjectsList()
@@ -29,18 +30,11 @@ const MyProjects = () => {
     setRequestList(_requestList)
   }
 
-  const _fetchCohortList = async () => {
-    const _cohortResponse = await fetchCohortList()
-    const _cohortList: any[] = _cohortResponse.results
-    setCohortList(_cohortList)
-  }
-
   useEffect(() => {
     const _fetch = async () => {
       setLoading(true)
       await _fetchProjectsList()
       await _fetchRequestList()
-      await _fetchCohortList()
       setLoading(false)
     }
 
@@ -49,13 +43,11 @@ const MyProjects = () => {
       setLoading(true)
       setProjectList([])
       setRequestList([])
-      setCohortList([])
     }
   }, [])
 
   console.log('projectList :>> ', projectList)
   console.log('requestList :>> ', requestList)
-  console.log('cohortList :>> ', cohortList)
 
   if (loading) {
     return (
@@ -82,10 +74,14 @@ const MyProjects = () => {
       })}
     >
       <Grid container justify="center" alignItems="center">
-        <Grid container item xs={12} sm={9}>
+        <Grid container item xs={12}>
           <Typography variant="h1" color="primary" className={classes.title}>
             Mes projets de recherche
           </Typography>
+        </Grid>
+
+        <Grid container item xs={12}>
+          <ProjectTable projectList={projectList} requestList={requestList} />
         </Grid>
       </Grid>
     </Grid>

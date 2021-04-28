@@ -4,13 +4,18 @@ import { CONTEXT } from '../constants'
 export type ProjectType = {
   uuid: string
   name: string
+  created_at?: string
+  modified_at?: string
+  favorite?: boolean
+  owner_id?: string
 }
 
 export const fetchProjectsList = async () => {
   const myProjects: ProjectType[] = [
     {
       uuid: '1',
-      name: 'Mon projet principal'
+      name: 'Mon projet principal',
+      created_at: new Date().toString()
     }
   ]
   switch (CONTEXT) {
@@ -34,7 +39,7 @@ export type RequestType = {
   owner_id: string
   uuid: string
   project_id: string
-}[]
+}
 
 export const fetchRequestList = async (limit = 100, offset = 0) => {
   try {
