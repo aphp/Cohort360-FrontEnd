@@ -16,6 +16,16 @@ export const fetchProjectsList = async () => {
       uuid: '1',
       name: 'Mon projet principal',
       created_at: new Date().toString()
+    },
+    {
+      uuid: '2',
+      name: 'Mon projet de recherche 1',
+      created_at: new Date().toString()
+    },
+    {
+      uuid: '3',
+      name: 'Mon projet de recherche 2',
+      created_at: new Date().toString()
     }
   ]
   switch (CONTEXT) {
@@ -30,15 +40,15 @@ export const fetchProjectsList = async () => {
 }
 
 export type RequestType = {
-  created_at: string
-  data_type_of_query: string
-  description?: string
-  favorite: boolean
-  modified_at: string
-  name: string
-  owner_id: string
-  uuid: string
   project_id: string
+  uuid: string
+  name: string
+  description?: string
+  owner_id?: string
+  data_type_of_query?: string
+  favorite?: boolean
+  created_at?: string
+  modified_at?: string
 }
 
 export const fetchRequestList = async (limit = 100, offset = 0) => {
@@ -62,7 +72,7 @@ export const fetchRequestList = async (limit = 100, offset = 0) => {
       ...data,
       results: data.results.map((res) => ({
         ...res,
-        project_id: '1'
+        project_id: `${Math.floor(Math.random() * 3) + 1}`
       }))
     }
   } catch (error) {
@@ -72,8 +82,7 @@ export const fetchRequestList = async (limit = 100, offset = 0) => {
 }
 
 export type CohortResponseType = {
-  created_at: string
-  modified_at: string
+  modified_at?: string
   create_task_id: string
   dated_measure_id: string
   description: string
@@ -88,6 +97,7 @@ export type CohortResponseType = {
   request_query_snapshot_id: string
   result_size: number
   uuid: string
+  created_at?: string
 }
 
 export const fetchCohortList = async (limit = 100, offset = 0) => {

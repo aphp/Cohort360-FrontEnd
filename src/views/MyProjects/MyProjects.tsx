@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import clsx from 'clsx'
 
-import { Grid, Typography, CircularProgress } from '@material-ui/core'
+import { Grid, Button, CircularProgress, Typography } from '@material-ui/core'
+import AddIcon from '@material-ui/icons/Add'
 
 import ProjectTable from 'components/MyProjects/ProjectTable/ProjectTable'
+import ModalAddOrEditProject from 'components/MyProjects/Modals/ModalAddOrEditProject/ModalAddOrEditProject'
 
-import { fetchProjectsList, fetchRequestList, fetchCohortList } from 'services/myProjects'
+import { fetchProjectsList, fetchRequestList } from 'services/myProjects'
 
 import { useAppSelector } from 'state'
 
@@ -16,8 +18,12 @@ const MyProjects = () => {
   const open = useAppSelector((state) => state.drawer)
 
   const [loading, setLoading] = useState(true)
+  const [openModal, setOpenModal] = useState<'addOrEditProject' | null>(null)
+
   const [projectList, setProjectList] = useState<any[]>([])
   const [requestList, setRequestList] = useState<any[]>([])
+
+  const [selectedProject, setSelectedProject] = useState<any>(null)
 
   const _fetchProjectsList = async () => {
     const _projectList: any[] = await fetchProjectsList()
@@ -40,14 +46,23 @@ const MyProjects = () => {
 
     _fetch()
     return () => {
-      setLoading(true)
+      setLoading(false)
       setProjectList([])
       setRequestList([])
     }
   }, [])
 
-  console.log('projectList :>> ', projectList)
-  console.log('requestList :>> ', requestList)
+  const handleClickAddOrEditProject = (selectedProjectId: string | null) => {
+    if (selectedProjectId) {
+      let foundItem = projectList.find((project) => project.uuid === selectedProjectId)
+      if (!foundItem) foundItem = null
+      setSelectedProject(foundItem)
+      setOpenModal('addOrEditProject')
+    } else {
+      setSelectedProject(null)
+      setOpenModal('addOrEditProject')
+    }
+  }
 
   if (loading) {
     return (
@@ -66,25 +81,47 @@ const MyProjects = () => {
   }
 
   return (
-    <Grid
-      container
-      direction="column"
-      className={clsx(classes.appBar, {
-        [classes.appBarShift]: open
-      })}
-    >
-      <Grid container justify="center" alignItems="center">
-        <Grid container item xs={12}>
-          <Typography variant="h1" color="primary" className={classes.title}>
-            Mes projets de recherche
-          </Typography>
-        </Grid>
+    <>
+      <Grid
+        container
+        direction="column"
+        className={clsx(classes.appBar, {
+          [classes.appBarShift]: open
+        })}
+      >
+        <Grid container justify="center" alignItems="center">
+          <Grid container item xs={11} sm={9}>
+            <Typography variant="h1" color="primary" className={classes.title}>
+              Mes projets de recherche
+            </Typography>
+          </Grid>
 
-        <Grid container item xs={12}>
-          <ProjectTable projectList={projectList} requestList={requestList} />
+          <Grid container item xs={11} sm={9} className={classes.actionContainer}>
+            <Button
+              startIcon={<AddIcon />}
+              onClick={() => handleClickAddOrEditProject(null)}
+              className={classes.addButton}
+            >
+              Ajouter un projet
+            </Button>
+          </Grid>
+
+          <Grid container item xs={11} sm={9}>
+            <ProjectTable
+              projectList={projectList}
+              requestList={requestList}
+              onEditProject={handleClickAddOrEditProject}
+            />
+          </Grid>
         </Grid>
       </Grid>
-    </Grid>
+
+      <ModalAddOrEditProject
+        open={openModal === 'addOrEditProject'}
+        onClose={() => setOpenModal(null)}
+        selectedProject={selectedProject}
+      />
+    </>
   )
 }
 

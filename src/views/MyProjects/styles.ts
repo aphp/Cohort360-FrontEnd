@@ -27,6 +27,20 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: '20px',
     width: '100%',
     borderBottom: '1px solid #D0D7D8'
+  },
+  actionContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2)
+  },
+  addButton: {
+    backgroundColor: '#5BC5F2',
+    color: '#FFF',
+    borderRadius: '25px',
+    margin: '0 4px',
+    padding: theme.spacing(1)
   }
 }))
 
