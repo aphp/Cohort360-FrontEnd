@@ -6,6 +6,7 @@ import AddIcon from '@material-ui/icons/Add'
 
 import ProjectTable from 'components/MyProjects/ProjectTable/ProjectTable'
 import ModalAddOrEditProject from 'components/MyProjects/Modals/ModalAddOrEditProject/ModalAddOrEditProject'
+import ModalAddOrEditRequest from 'components/Cohort/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 
 import { fetchProjectsList, fetchRequestList } from 'services/myProjects'
 
@@ -18,12 +19,13 @@ const MyProjects = () => {
   const open = useAppSelector((state) => state.drawer)
 
   const [loading, setLoading] = useState(true)
-  const [openModal, setOpenModal] = useState<'addOrEditProject' | null>(null)
+  const [openModal, setOpenModal] = useState<'addOrEditProject' | 'addOrEditRequest' | null>(null)
 
   const [projectList, setProjectList] = useState<any[]>([])
   const [requestList, setRequestList] = useState<any[]>([])
 
   const [selectedProject, setSelectedProject] = useState<any>(null)
+  const [selectedRequest, setSelectedRequest] = useState<any>(null)
 
   const _fetchProjectsList = async () => {
     const _projectList: any[] = await fetchProjectsList()
@@ -36,14 +38,14 @@ const MyProjects = () => {
     setRequestList(_requestList)
   }
 
-  useEffect(() => {
-    const _fetch = async () => {
-      setLoading(true)
-      await _fetchProjectsList()
-      await _fetchRequestList()
-      setLoading(false)
-    }
+  const _fetch = async () => {
+    setLoading(true)
+    await _fetchProjectsList()
+    await _fetchRequestList()
+    setLoading(false)
+  }
 
+  useEffect(() => {
     _fetch()
     return () => {
       setLoading(false)
@@ -61,6 +63,18 @@ const MyProjects = () => {
     } else {
       setSelectedProject(null)
       setOpenModal('addOrEditProject')
+    }
+  }
+
+  const handleClickAddOrEditRequest = (selectedRequestId: string | null) => {
+    if (selectedRequestId) {
+      let foundItem = requestList.find((project) => project.uuid === selectedRequestId)
+      if (!foundItem) foundItem = null
+      setSelectedRequest(foundItem)
+      setOpenModal('addOrEditRequest')
+    } else {
+      setSelectedRequest(null)
+      setOpenModal('addOrEditRequest')
     }
   }
 
@@ -110,6 +124,7 @@ const MyProjects = () => {
             <ProjectTable
               projectList={projectList}
               requestList={requestList}
+              onEditRequest={handleClickAddOrEditRequest}
               onEditProject={handleClickAddOrEditProject}
             />
           </Grid>
@@ -118,9 +133,22 @@ const MyProjects = () => {
 
       <ModalAddOrEditProject
         open={openModal === 'addOrEditProject'}
-        onClose={() => setOpenModal(null)}
+        onClose={() => {
+          setOpenModal(null)
+          _fetch()
+        }}
         selectedProject={selectedProject}
       />
+
+      {openModal === 'addOrEditRequest' && (
+        <ModalAddOrEditRequest
+          onClose={() => {
+            setOpenModal(null)
+            _fetch()
+          }}
+          selectedRequest={selectedRequest}
+        />
+      )}
     </>
   )
 }

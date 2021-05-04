@@ -17,9 +17,10 @@ type ProjectRowProps = {
   row: ProjectType
   requestOfProject: RequestType[]
   onEditProject: (selectedProjectId: string | null) => void
+  onEditRequest: (selectedRequestId: string | null) => void
 }
-const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, onEditProject }) => {
-  const [open, setOpen] = React.useState(false)
+const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, onEditProject, onEditRequest }) => {
+  const [open, setOpen] = React.useState(true)
   const classes = useStyles()
 
   return (
@@ -38,7 +39,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, onEditPr
           </IconButton>
         </TableCell>
         <TableCell className={classes.dateCell} align="center">
-          {moment(row.created_at).fromNow()}
+          {moment(row.created_at).format('DD/MM/YYYY [à] HH:mm')}
         </TableCell>
       </TableRow>
 
@@ -46,7 +47,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, onEditPr
         <TableCell style={{ padding: 0, borderBottomWidth: open ? 1 : 0 }} colSpan={4}>
           <Collapse in={open} timeout="auto" unmountOnExit style={{ width: '100%' }}>
             {requestOfProject.map((request) => (
-              <RequestRow key={request.uuid} row={request} />
+              <RequestRow key={request.uuid} row={request} onEditRequest={onEditRequest} />
             ))}
           </Collapse>
         </TableCell>

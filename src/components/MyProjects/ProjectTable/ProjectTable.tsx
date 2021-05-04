@@ -12,8 +12,9 @@ type ProjectTableProps = {
   projectList: ProjectType[]
   requestList: RequestType[]
   onEditProject: (selectedProjectId: string | null) => void
+  onEditRequest: (selectedRequestId: string | null) => void
 }
-const ProjectTable: React.FC<ProjectTableProps> = ({ projectList, requestList, onEditProject }) => {
+const ProjectTable: React.FC<ProjectTableProps> = ({ projectList, requestList, onEditProject, onEditRequest }) => {
   const classes = useStyles()
 
   return (
@@ -37,6 +38,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ projectList, requestList, o
               row={project}
               requestOfProject={requestList.filter(({ project_id }) => project_id === project.uuid)}
               onEditProject={onEditProject}
+              onEditRequest={onEditRequest}
             />
           ))}
         </TableBody>

@@ -61,12 +61,12 @@ export const fetchRequestList = async (limit = 100, offset = 0) => {
       search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
     }
 
-    const { data } = await apiBack.get<{
+    const { data } = (await apiBack.get<{
       count: number
       next: string | null
       previous: string | null
       results: RequestType[]
-    }>(`/explorations/requests/${search}`)
+    }>(`/explorations/requests/${search}`)) ?? { data: { results: [] } }
 
     return {
       ...data,
@@ -110,14 +110,39 @@ export const fetchCohortList = async (limit = 100, offset = 0) => {
       search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
     }
 
-    const { data } = await apiBack.get<{
+    const { data } = (await apiBack.get<{
       count: number
       next: string | null
       previous: string | null
       results: CohortResponseType[]
-    }>(`/explorations/cohorts/${search}`)
+    }>(`/explorations/cohorts/${search}`)) ?? { data: { results: [] } }
 
     return data
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+export const editRequest = async (request: RequestType) => {
+  try {
+    console.log(`request`, request)
+    const editResult = await apiBack.patch(`/explorations/requests/${request.uuid}/`, {
+      name: request.name,
+      description: request.description
+      // project_id: request.project_id
+    })
+    console.log(`editResult`, editResult)
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+export const deleteRequest = async (requestId: string) => {
+  try {
+    const deleteResult = await apiBack.delete(`/explorations/requests/${requestId}/`)
+    console.log(`deleteResult`, deleteResult)
   } catch (error) {
     console.error(error)
     throw error
