@@ -129,15 +129,28 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     if (_row.subItems && _row.subItems.length > 0 && _row.subItems[0].id === 'loading') {
       return false
     }
-    // Si des sub elem && des sub elem qui sont check => true
-    const numberOfSubItemsSelected = _row.subItems.filter((subItem: any) =>
-      selectedItems.find(({ id }) => id === subItem.id)
-    )?.length
-    if (numberOfSubItemsSelected && numberOfSubItemsSelected !== _row.subItems.length) {
-      return true
+    const checkChild: (item: any) => boolean = (item) => {
+      const numberOfSubItemsSelected = item.subItems.filter((subItem: any) =>
+        selectedItems.find(({ id }) => id === subItem.id)
+      )?.length
+
+      if (numberOfSubItemsSelected && numberOfSubItemsSelected !== item.subItems.length) {
+        // Si un des sub elem qui est check => true
+        return true
+      } else if (item.subItems.length >= numberOfSubItemsSelected) {
+        // Si un des sub-sub (ou sub-sub-sub ...) elem qui est check => true
+        let isCheck = false
+        for (const child of item.subItems) {
+          if (isCheck) continue
+          isCheck = !!checkChild(child)
+        }
+        return isCheck
+      } else {
+        // Sinon => false
+        return false
+      }
     }
-    // sinon => false
-    return false
+    return checkChild(_row)
   }
 
   const headCells = [

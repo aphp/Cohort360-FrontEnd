@@ -251,7 +251,8 @@ export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<
         id: subItemData.id ?? '0',
         name: subItemData.name?.replace(/^Patients passés par: /, '') ?? '',
         quantity: subItemData.quantity ?? 0,
-        subItems: [loadingItem]
+        subItems: [loadingItem],
+        access: perimeter.access
       }))
     : []
 
