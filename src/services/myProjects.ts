@@ -11,7 +11,8 @@ export type ProjectType = {
   owner_id?: string
 }
 
-export const fetchProjectsList = async (limit = 100, offset = 0) => {
+export const fetchProjectsList = async () => {
+  // export const fetchProjectsList = async (limit = 100, offset = 0) => {
   const myProjects: ProjectType[] = [
     {
       uuid: '1',
@@ -29,56 +30,62 @@ export const fetchProjectsList = async (limit = 100, offset = 0) => {
       created_at: new Date().toString()
     }
   ]
-  switch (CONTEXT) {
-    case 'fakedata':
-      return {
-        count: myProjects.length,
-        next: '',
-        previous: '',
-        results: myProjects
-      }
-    case 'arkhn':
-      return {
-        count: myProjects.length,
-        next: '',
-        previous: '',
-        results: myProjects
-      }
-    default: {
-      let search = `?`
-      if (limit) {
-        search += `limit=${limit}`
-      }
-      if (offset) {
-        search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
-      }
-
-      const fetchProjectsResponse = (await apiBack.get<{
-        count: number
-        next: string | null
-        previous: string | null
-        results: ProjectType[]
-      }>(`/explorations/folders/${search}`)) ?? { status: 400 }
-
-      if (fetchProjectsResponse.status === 200) {
-        const { data } = fetchProjectsResponse
-        return {
-          ...data,
-          results: data.results.map((res) => ({
-            ...res,
-            project_id: `${Math.floor(Math.random() * 3) + 1}`
-          }))
-        }
-      } else {
-        return {
-          count: myProjects.length,
-          next: '',
-          previous: '',
-          results: myProjects
-        }
-      }
-    }
+  return {
+    count: myProjects.length,
+    next: '',
+    previous: '',
+    results: myProjects
   }
+  // switch (CONTEXT) {
+  //   case 'fakedata':
+  //     return {
+  //       count: myProjects.length,
+  //       next: '',
+  //       previous: '',
+  //       results: myProjects
+  //     }
+  //   case 'arkhn':
+  //     return {
+  //       count: myProjects.length,
+  //       next: '',
+  //       previous: '',
+  //       results: myProjects
+  //     }
+  //   default: {
+  //     let search = `?`
+  //     if (limit) {
+  //       search += `limit=${limit}`
+  //     }
+  //     if (offset) {
+  //       search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
+  //     }
+
+  //     const fetchProjectsResponse = (await apiBack.get<{
+  //       count: number
+  //       next: string | null
+  //       previous: string | null
+  //       results: ProjectType[]
+  //     }>(`/explorations/folders/${search}`)) ?? { status: 400 }
+
+  //     if (fetchProjectsResponse.status === 200) {
+  //       const { data } = fetchProjectsResponse
+  //       return {
+  //         ...data,
+  //         results: data.results.map((res) => ({
+  //           ...res,
+  //           project_id: `${Math.floor(Math.random() * 3) + 1}`
+  //         }))
+  //       }
+  //     } else {
+  //       return {
+  //         count: myProjects.length,
+  //         next: '',
+  //         previous: '',
+  //         results: myProjects
+  //       }
+  //     }
+  //   }
+  // }
 }
 
 export const addProject = async (newProject: ProjectType) => {
