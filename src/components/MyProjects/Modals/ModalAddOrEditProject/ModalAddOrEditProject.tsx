@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 
 import {
   Button,
@@ -11,6 +12,11 @@ import {
   Typography
 } from '@material-ui/core'
 
+import { useAppSelector } from 'state'
+import { ProjectState, addProject, editProject, deleteProject } from 'state/project'
+
+import { ProjectType } from 'services/myProjects'
+
 import useStyles from './styles'
 
 const ERROR_TITLE = 'error_title'
@@ -20,30 +26,42 @@ const ModalAddOrEditProject: React.FC<{
   open: boolean
   selectedProject: any
   onClose: () => void
-}> = ({ open, selectedProject, onClose }) => {
+}> = ({ open, onClose }) => {
   const classes = useStyles()
+  const dispatch = useDispatch()
+  const { projectState } = useAppSelector<{
+    projectState: ProjectState
+  }>((state) => ({
+    projectState: state.project
+  }))
+  const { selectedProject } = projectState
 
-  const [deletionConfirmation, setDeletionConfirmation] = useState(false)
+  const isEdition = selectedProject !== null && selectedProject.uuid !== ''
 
-  const [title, onChangeTitle] = useState('')
-  const [description, onChangeDescription] = useState('')
+  const [modalProjectState, onChangeProjectState] = useState<ProjectType>({
+    uuid: '',
+    name: 'Projet de recherche',
+    description: ''
+  })
+
   const [error, setError] = useState<'error_title' | 'error_description' | null>(null)
   const [loading, setLoading] = useState(false)
-
-  const isEdition = selectedProject !== null
+  const [deletionConfirmation, setDeletionConfirmation] = useState(false)
 
   useEffect(() => {
-    if (isEdition) {
-      onChangeTitle(selectedProject.name)
-      onChangeDescription(selectedProject.description)
-    } else {
-      onChangeTitle('')
-      onChangeDescription('')
+    if (selectedProject !== null) {
+      onChangeProjectState(selectedProject)
     }
     setError(null)
     setLoading(false)
     setDeletionConfirmation(false)
   }, [open])
+
+  const onChangeValue = (key: 'name' | 'description', value: string) => {
+    const _project = { ...modalProjectState }
+    _project[key] = value
+    onChangeProjectState(_project)
+  }
 
   const handleClose = () => onClose()
 
@@ -51,18 +69,26 @@ const ModalAddOrEditProject: React.FC<{
     if (loading) return
     setLoading(true)
 
-    if (!title) {
+    if (!modalProjectState.name) {
       setLoading(false)
       return setError(ERROR_TITLE)
     }
 
-    onClose()
+    if (!selectedProject) return
+    if (selectedProject.uuid !== '') {
+      dispatch<any>(editProject({ editedProject: modalProjectState }))
+    } else {
+      dispatch<any>(addProject({ newProject: modalProjectState }))
+    }
   }
 
   const handleConfirmDeletion = () => {
     if (loading) return
     setLoading(true)
 
+    if (selectedProject !== null) {
+      dispatch<any>(deleteProject({ deletedProject: selectedProject }))
+    }
     onClose()
   }
 
@@ -76,8 +102,8 @@ const ModalAddOrEditProject: React.FC<{
             <Typography variant="h3">Nom du projet :</Typography>
             <TextField
               placeholder="Nom du projet"
-              value={title}
-              onChange={(e: any) => onChangeTitle(e.target.value)}
+              value={modalProjectState.name}
+              onChange={(e: any) => onChangeValue('name', e.target.value)}
               autoFocus
               id="title"
               margin="normal"
@@ -91,8 +117,8 @@ const ModalAddOrEditProject: React.FC<{
             <Typography variant="h3">Description :</Typography>
             <TextField
               placeholder="Description"
-              value={description}
-              onChange={(e: any) => onChangeDescription(e.target.value)}
+              value={modalProjectState.description}
+              onChange={(e: any) => onChangeValue('description', e.target.value)}
               id="description"
               margin="normal"
               variant="outlined"

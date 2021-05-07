@@ -1,21 +1,28 @@
 import React from 'react'
 
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@material-ui/core'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@material-ui/core'
 
 import ProjectRow from './ProjectRow/ProjectRow'
 
 import { ProjectType, RequestType } from 'services/myProjects'
 
+import { useAppSelector } from 'state'
+import { ProjectState } from 'state/project'
+
 import useStyles from './styles'
 
 type ProjectTableProps = {
-  projectList: ProjectType[]
   requestList: RequestType[]
-  onEditProject: (selectedProjectId: string | null) => void
   onEditRequest: (selectedRequestId: string | null) => void
 }
-const ProjectTable: React.FC<ProjectTableProps> = ({ projectList, requestList, onEditProject, onEditRequest }) => {
+const ProjectTable: React.FC<ProjectTableProps> = ({ requestList, onEditRequest }) => {
   const classes = useStyles()
+  const { projectState } = useAppSelector<{
+    projectState: ProjectState
+  }>((state) => ({
+    projectState: state.project
+  }))
+  const { projectsList } = projectState
 
   return (
     <TableContainer component={Paper}>
@@ -32,12 +39,18 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ projectList, requestList, o
         </TableHead>
 
         <TableBody>
-          {projectList.map((project) => (
+          {projectsList.length === 0 && (
+            <TableRow>
+              <TableCell style={{ textAlign: 'center', height: '40vh' }} colSpan={4}>
+                <Typography>Aucun projet de recherche</Typography>
+              </TableCell>
+            </TableRow>
+          )}
+          {projectsList.map((project: ProjectType) => (
             <ProjectRow
               key={project.uuid}
               row={project}
               requestOfProject={requestList.filter(({ project_id }) => project_id === project.uuid)}
-              onEditProject={onEditProject}
               onEditRequest={onEditRequest}
             />
           ))}

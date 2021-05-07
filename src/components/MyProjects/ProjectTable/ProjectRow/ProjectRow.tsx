@@ -1,4 +1,5 @@
 import React from 'react'
+import { useDispatch } from 'react-redux'
 import moment from 'moment'
 
 import { Collapse, IconButton, TableCell, TableRow, Typography } from '@material-ui/core'
@@ -11,17 +12,27 @@ import RequestRow from '../RequestRow/RequestRow'
 
 import { ProjectType, RequestType } from 'services/myProjects'
 
+import { setSelectedProject } from 'state/project'
+
 import useStyles from '../styles'
 
 type ProjectRowProps = {
   row: ProjectType
   requestOfProject: RequestType[]
-  onEditProject: (selectedProjectId: string | null) => void
   onEditRequest: (selectedRequestId: string | null) => void
 }
-const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, onEditProject, onEditRequest }) => {
+const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, onEditRequest }) => {
   const [open, setOpen] = React.useState(true)
   const classes = useStyles()
+  const dispatch = useDispatch()
+
+  const handleClickAddOrEditProject = (selectedProjectId: string | null) => {
+    if (selectedProjectId) {
+      dispatch<any>(setSelectedProject(selectedProjectId))
+    } else {
+      dispatch<any>(setSelectedProject(null))
+    }
+  }
 
   return (
     <React.Fragment>
@@ -34,7 +45,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, onEditPr
         <TableCell />
         <TableCell className={classes.tdName}>
           <Typography style={{ fontWeight: 900, display: 'inline-table' }}>{row.name}</Typography>
-          <IconButton onClick={() => onEditProject(row.uuid)} className={classes.editButon} size="small">
+          <IconButton onClick={() => handleClickAddOrEditProject(row.uuid)} className={classes.editButon} size="small">
             <EditIcon />
           </IconButton>
         </TableCell>

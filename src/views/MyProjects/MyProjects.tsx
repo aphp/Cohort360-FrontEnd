@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
 import { Grid, Button, CircularProgress, Typography } from '@material-ui/core'
@@ -8,28 +9,36 @@ import ProjectTable from 'components/MyProjects/ProjectTable/ProjectTable'
 import ModalAddOrEditProject from 'components/MyProjects/Modals/ModalAddOrEditProject/ModalAddOrEditProject'
 import ModalAddOrEditRequest from 'components/Cohort/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 
-import { fetchProjectsList, fetchRequestList } from 'services/myProjects'
+import { fetchRequestList } from 'services/myProjects'
 
 import { useAppSelector } from 'state'
+import { ProjectState, fetchProjects as fetchProjectsList, setSelectedProject } from 'state/project'
 
 import useStyles from './styles'
 
 const MyProjects = () => {
   const classes = useStyles()
-  const open = useAppSelector((state) => state.drawer)
+  const dispatch = useDispatch()
+  const { open, projectState } = useAppSelector<{
+    open: boolean
+    projectState: ProjectState
+  }>((state) => ({
+    open: state.drawer,
+    projectState: state.project
+  }))
+  const { selectedProject } = projectState
 
-  const [loading, setLoading] = useState(true)
+  const loadingProject = projectState.loading
+  const loading = loadingProject
+
   const [openModal, setOpenModal] = useState<'addOrEditProject' | 'addOrEditRequest' | null>(null)
 
-  const [projectList, setProjectList] = useState<any[]>([])
   const [requestList, setRequestList] = useState<any[]>([])
 
-  const [selectedProject, setSelectedProject] = useState<any>(null)
   const [selectedRequest, setSelectedRequest] = useState<any>(null)
 
   const _fetchProjectsList = async () => {
-    const _projectList: any[] = await fetchProjectsList()
-    setProjectList(_projectList)
+    dispatch<any>(fetchProjectsList())
   }
 
   const _fetchRequestList = async () => {
@@ -39,31 +48,19 @@ const MyProjects = () => {
   }
 
   const _fetch = async () => {
-    setLoading(true)
     await _fetchProjectsList()
     await _fetchRequestList()
-    setLoading(false)
   }
 
   useEffect(() => {
     _fetch()
     return () => {
-      setLoading(false)
-      setProjectList([])
       setRequestList([])
     }
   }, [])
 
-  const handleClickAddOrEditProject = (selectedProjectId: string | null) => {
-    if (selectedProjectId) {
-      let foundItem = projectList.find((project) => project.uuid === selectedProjectId)
-      if (!foundItem) foundItem = null
-      setSelectedProject(foundItem)
-      setOpenModal('addOrEditProject')
-    } else {
-      setSelectedProject(null)
-      setOpenModal('addOrEditProject')
-    }
+  const handleClickAddProject = () => {
+    dispatch<any>(setSelectedProject(''))
   }
 
   const handleClickAddOrEditRequest = (selectedRequestId: string | null) => {
@@ -111,32 +108,20 @@ const MyProjects = () => {
           </Grid>
 
           <Grid container item xs={11} sm={9} className={classes.actionContainer}>
-            <Button
-              startIcon={<AddIcon />}
-              onClick={() => handleClickAddOrEditProject(null)}
-              className={classes.addButton}
-            >
+            <Button startIcon={<AddIcon />} onClick={() => handleClickAddProject()} className={classes.addButton}>
               Ajouter un projet
             </Button>
           </Grid>
 
           <Grid container item xs={11} sm={9}>
-            <ProjectTable
-              projectList={projectList}
-              requestList={requestList}
-              onEditRequest={handleClickAddOrEditRequest}
-              onEditProject={handleClickAddOrEditProject}
-            />
+            <ProjectTable requestList={requestList} onEditRequest={handleClickAddOrEditRequest} />
           </Grid>
         </Grid>
       </Grid>
 
       <ModalAddOrEditProject
-        open={openModal === 'addOrEditProject'}
-        onClose={() => {
-          setOpenModal(null)
-          _fetch()
-        }}
+        open={selectedProject !== null}
+        onClose={() => dispatch<any>(setSelectedProject(null))}
         selectedProject={selectedProject}
       />
 

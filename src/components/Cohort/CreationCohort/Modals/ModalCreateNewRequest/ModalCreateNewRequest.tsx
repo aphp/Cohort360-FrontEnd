@@ -62,14 +62,14 @@ const ModalCreateNewRequest: React.FC<{
 
   const _fetchProject = async () => {
     const myProjects = (await fetchProjectsList()) || []
-    onSetProjectList(myProjects)
+    onSetProjectList(myProjects.results)
     // Auto select newset project folder
     // + Auto set the new project folder with 'Nouveau projet de recherche ...'
-    if (myProjects && myProjects.length >= 0) {
+    if (myProjects && myProjects.results && myProjects.results.length >= 0) {
       if (!isEdition) {
-        onChangeProjectId(myProjects[myProjects.length - 1].uuid)
+        onChangeProjectId(myProjects.results[myProjects.results.length - 1].uuid)
       }
-      onChangeProjectName(`Nouveau projet de recherche ${(myProjects.length || 0) + 1}`)
+      onChangeProjectName(`Nouveau projet de recherche ${(myProjects.results.length || 0) + 1}`)
     }
   }
 
@@ -164,8 +164,14 @@ const ModalCreateNewRequest: React.FC<{
 
   return (
     <>
-      <Dialog fullWidth maxWidth="sm" open aria-labelledby="form-dialog-title">
-        <DialogTitle className={classes.title}>Création d'une requête</DialogTitle>
+      <Dialog
+        fullWidth
+        onClose={() => onClose && typeof onClose === 'function' && onClose()}
+        maxWidth="sm"
+        open
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle className={classes.title}>{isEdition ? 'Modification' : 'Création'} d'une requête</DialogTitle>
         <DialogContent>
           {loading ? (
             <Grid container direction="column" justify="center" alignItems="center" className={classes.inputContainer}>
@@ -252,7 +258,7 @@ const ModalCreateNewRequest: React.FC<{
             Annuler
           </Button>
           <Button disabled={loading} onClick={handleConfirm} color="primary">
-            Créer
+            {isEdition ? 'Modifier' : 'Créer'}
           </Button>
         </DialogActions>
       </Dialog>
