@@ -7,6 +7,7 @@ import Grid from '@material-ui/core/Grid'
 
 import ControlPanel from './ControlPanel/ControlPanel'
 import DiagramView from './DiagramView/DiagramView'
+import ModalCreateNewRequest from './Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 
 import { useAppSelector } from 'state'
 import { setCriteriaList } from 'state/criteria'
@@ -166,6 +167,8 @@ const Requeteur = () => {
         onUndo={_canUndo() ? _onUndo : undefined}
         onRedo={_canRedo() ? _onRedo : undefined}
       />
+
+      {!requestIdFromUrl && !requestId && <ModalCreateNewRequest />}
     </>
   )
 }

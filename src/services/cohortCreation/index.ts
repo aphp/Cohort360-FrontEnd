@@ -74,16 +74,17 @@ export const createCohort = async (
   }
 }
 
-export const createRequest = async () => {
+export const createRequest = async (name: string, description: string, projectId: string | null) => {
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
+    console.log(`projectId`, projectId)
     return null
   } else {
     const request =
       (await apiBack.post('/explorations/requests/', {
-        name: 'Nouvelle requête',
-        description: 'Requête créée depuis le front Cohort360',
+        name,
+        description,
         favorite: false,
         data_type_of_query: 'PATIENT'
       })) || {}
@@ -128,10 +129,11 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
       ? snapshotsHistoryFromQuery[0]
       : null
     let result = null
+    let snapshotsHistory: any[] = []
 
     if (currentSnapshot) {
       let nextSnap = currentSnapshot.uuid
-      const snapshotsHistory = snapshotsHistoryFromQuery
+      snapshotsHistory = snapshotsHistoryFromQuery
         .map(({ uuid, serialized_query, created_at, previous_snapshot_id }) => {
           if (nextSnap === uuid) {
             nextSnap = previous_snapshot_id
@@ -149,12 +151,11 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
           }
         })
         .filter(({ uuid }) => uuid !== undefined)
-
-      result = {
-        json: currentSnapshot.serialized_query,
-        currentSnapshot: currentSnapshot.uuid,
-        snapshotsHistory: snapshotsHistory.filter(({ uuid }) => uuid !== undefined)
-      }
+    }
+    result = {
+      json: currentSnapshot ? currentSnapshot.serialized_query : '',
+      currentSnapshot: currentSnapshot ? currentSnapshot.uuid : '',
+      snapshotsHistory: snapshotsHistory.filter(({ uuid }) => uuid !== undefined)
     }
     return result
   }
