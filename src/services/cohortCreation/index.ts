@@ -74,24 +74,6 @@ export const createCohort = async (
   }
 }
 
-export const createRequest = async (name: string, description: string, projectId: string | null) => {
-  if (CONTEXT === 'arkhn') {
-    return null
-  } else if (CONTEXT === 'fakedata') {
-    console.log(`projectId`, projectId)
-    return null
-  } else {
-    const request =
-      (await apiBack.post('/explorations/requests/', {
-        name,
-        description,
-        favorite: false,
-        data_type_of_query: 'PATIENT'
-      })) || {}
-    return request && request.data ? request.data : null
-  }
-}
-
 export const createSnapshot = async (id: string, json: string, firstTime?: boolean) => {
   if (CONTEXT === 'arkhn') {
     return null

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+// import { useDispatch } from 'react-redux'
 
 import {
   Button,
@@ -21,13 +21,13 @@ import useStyles from './styles'
 import {
   fetchProjectsList,
   ProjectType,
-  fetchRequestList,
+  fetchRequestsList,
   RequestType,
-  editRequest,
-  deleteRequest
+  editRequest
+  // deleteRequest
 } from 'services/myProjects'
 
-import { createRequestCohortCreation as createRequest } from 'state/cohortCreation'
+// import { createRequestCohortCreation as createRequest } from 'state/cohortCreation'
 
 const ERROR_TITLE = 'error_title'
 const ERROR_DESCRIPTION = 'error_description'
@@ -42,7 +42,7 @@ const ModalCreateNewRequest: React.FC<{
 }> = ({ selectedRequest, onClose }) => {
   const classes = useStyles()
   const history = useHistory()
-  const dispatch = useDispatch()
+  // const dispatch = useDispatch()
 
   const isEdition = !!selectedRequest
   const [deletionConfirmation, setDeletionConfirmation] = useState(false)
@@ -51,7 +51,7 @@ const ModalCreateNewRequest: React.FC<{
 
   const [title, onChangeTitle] = useState<string>(selectedRequest?.name ?? 'Nouvelle requête')
   const [description, onChangeDescription] = useState<string>(selectedRequest?.description ?? '')
-  const [projectId, onChangeProjectId] = useState<string>(selectedRequest?.project_id ?? NEW_PROJECT_ID)
+  const [projectId, onChangeProjectId] = useState<string>(selectedRequest?.parent_folder_id ?? NEW_PROJECT_ID)
   const [projectName, onChangeProjectName] = useState<string>('Nouveau projet de recherche')
 
   const [projectList, onSetProjectList] = useState<ProjectType[]>([])
@@ -75,7 +75,7 @@ const ModalCreateNewRequest: React.FC<{
 
   const _fetchRequestNumber = async () => {
     if (isEdition) return
-    const requestResponse = await fetchRequestList()
+    const requestResponse = await fetchRequestsList()
     if (!requestResponse) return
     onChangeTitle(`Nouvelle requête ${(requestResponse.count || 0) + 1}`)
   }
@@ -134,16 +134,16 @@ const ModalCreateNewRequest: React.FC<{
         ...selectedRequest,
         name: title,
         description,
-        project_id: (projectId === NEW_PROJECT_ID ? newProjectId : projectId) ?? ''
+        parent_folder_id: (projectId === NEW_PROJECT_ID ? newProjectId : projectId) ?? ''
       })
     } else {
-      dispatch<any>(
-        createRequest({
-          name: title,
-          description: description,
-          projectId
-        })
-      )
+      // dispatch<any>(
+      //   createRequest({
+      //     name: title,
+      //     description: description,
+      //     projectId
+      //   })
+      // )
     }
 
     if (onClose && typeof onClose === 'function') {
@@ -155,7 +155,7 @@ const ModalCreateNewRequest: React.FC<{
     if (loading || !isEdition || !selectedRequest) return
     setLoading(true)
 
-    deleteRequest(selectedRequest.uuid)
+    // deleteRequest(selectedRequest.uuid)
 
     if (onClose && typeof onClose === 'function') {
       onClose()

@@ -2,11 +2,12 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import moment from 'moment'
 
-import { Collapse, IconButton, TableCell, TableRow, Typography } from '@material-ui/core'
+import { Button, Collapse, IconButton, TableCell, TableRow, Typography } from '@material-ui/core'
 
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import EditIcon from '@material-ui/icons/Edit'
+import AddIcon from '@material-ui/icons/Add'
 
 import RequestRow from '../RequestRow/RequestRow'
 
@@ -19,9 +20,8 @@ import useStyles from '../styles'
 type ProjectRowProps = {
   row: ProjectType
   requestOfProject: RequestType[]
-  onEditRequest: (selectedRequestId: string | null) => void
 }
-const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, onEditRequest }) => {
+const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject }) => {
   const [open, setOpen] = React.useState(true)
   const classes = useStyles()
   const dispatch = useDispatch()
@@ -57,9 +57,34 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, onEditRe
       <TableRow>
         <TableCell style={{ padding: 0, borderBottomWidth: open ? 1 : 0 }} colSpan={4}>
           <Collapse in={open} timeout="auto" unmountOnExit style={{ width: '100%' }}>
-            {requestOfProject.map((request) => (
-              <RequestRow key={request.uuid} row={request} onEditRequest={onEditRequest} />
-            ))}
+            {requestOfProject && requestOfProject.length > 0 ? (
+              requestOfProject.map((request) => <RequestRow key={request.uuid} row={request} />)
+            ) : (
+              <Typography
+                style={{
+                  height: '20vh',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'column'
+                }}
+              >
+                Aucune requête n'est associée a ce projet de recherche
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  size="small"
+                  style={{
+                    color: '#FFF',
+                    margin: 4,
+                    borderRadius: 25,
+                    backgroundColor: '#5BC5F2'
+                  }}
+                >
+                  Ajouter une requête
+                </Button>
+              </Typography>
+            )}
           </Collapse>
         </TableCell>
       </TableRow>

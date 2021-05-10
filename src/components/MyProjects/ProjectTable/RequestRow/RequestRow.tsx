@@ -1,5 +1,6 @@
 import React from 'react'
 import moment from 'moment'
+import { useDispatch } from 'react-redux'
 
 import { Collapse, IconButton, Link, Table, TableBody, TableCell, TableRow } from '@material-ui/core'
 
@@ -11,15 +12,21 @@ import VersionRow from '../VersionRow/VersionRow'
 
 import { RequestType } from 'services/myProjects'
 
+import { setSelectedRequest } from 'state/request'
+
 import useStyles from '../styles'
 
 type RequestRowProps = {
   row: RequestType
-  onEditRequest: (selectedRequestId: string | null) => void
 }
-const RequestRow: React.FC<RequestRowProps> = ({ row, onEditRequest }) => {
+const RequestRow: React.FC<RequestRowProps> = ({ row }) => {
   const [open, setOpen] = React.useState(false)
   const classes = useStyles()
+  const dispatch = useDispatch()
+
+  const onEditRequest = (requestId: string) => {
+    dispatch<any>(setSelectedRequest(requestId))
+  }
 
   return (
     <Table>

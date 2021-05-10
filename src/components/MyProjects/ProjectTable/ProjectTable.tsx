@@ -4,25 +4,26 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 
 import ProjectRow from './ProjectRow/ProjectRow'
 
-import { ProjectType, RequestType } from 'services/myProjects'
+import { ProjectType } from 'services/myProjects'
 
 import { useAppSelector } from 'state'
 import { ProjectState } from 'state/project'
+import { RequestState } from 'state/request'
 
 import useStyles from './styles'
 
-type ProjectTableProps = {
-  requestList: RequestType[]
-  onEditRequest: (selectedRequestId: string | null) => void
-}
-const ProjectTable: React.FC<ProjectTableProps> = ({ requestList, onEditRequest }) => {
+const ProjectTable: React.FC = () => {
   const classes = useStyles()
-  const { projectState } = useAppSelector<{
+  const { projectState, requestState } = useAppSelector<{
     projectState: ProjectState
+    requestState: RequestState
   }>((state) => ({
-    projectState: state.project
+    projectState: state.project,
+    requestState: state.request
   }))
   const { projectsList } = projectState
+  const { requestsList } = requestState
+  console.log('requestsList :>> ', requestsList)
 
   return (
     <TableContainer component={Paper}>
@@ -50,8 +51,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ requestList, onEditRequest 
             <ProjectRow
               key={project.uuid}
               row={project}
-              requestOfProject={requestList.filter(({ project_id }) => project_id === project.uuid)}
-              onEditRequest={onEditRequest}
+              requestOfProject={requestsList.filter(({ parent_folder_id }) => parent_folder_id === project.uuid)}
             />
           ))}
         </TableBody>

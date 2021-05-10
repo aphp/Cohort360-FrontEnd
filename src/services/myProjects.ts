@@ -1,6 +1,15 @@
 import apiBack from './apiBackCohort'
 import { CONTEXT } from '../constants'
 
+/**
+ * Projects:
+ *  - ProjectType
+ *  - fetchProjectsList : (limit = 100, offset = 0) => response.data
+ *  - addProject : (newProject: ProjectType) => response.data
+ *  - editProject : (editedProject: ProjectType) => response.data
+ *  - deleteProject : (deletedProject: ProjectType) => response.data
+ */
+
 export type ProjectType = {
   uuid: string
   name: string
@@ -11,8 +20,7 @@ export type ProjectType = {
   owner_id?: string
 }
 
-export const fetchProjectsList = async () => {
-  // export const fetchProjectsList = async (limit = 100, offset = 0) => {
+export const fetchProjectsList = async (limit = 100, offset = 0) => {
   const myProjects: ProjectType[] = [
     {
       uuid: '1',
@@ -30,62 +38,56 @@ export const fetchProjectsList = async () => {
       created_at: new Date().toString()
     }
   ]
-  return {
-    count: myProjects.length,
-    next: '',
-    previous: '',
-    results: myProjects
+  switch (CONTEXT) {
+    case 'fakedata':
+      return {
+        count: myProjects.length,
+        next: '',
+        previous: '',
+        results: myProjects
+      }
+    case 'arkhn':
+      return {
+        count: myProjects.length,
+        next: '',
+        previous: '',
+        results: myProjects
+      }
+    default: {
+      let search = `?`
+      if (limit) {
+        search += `limit=${limit}`
+      }
+      if (offset) {
+        search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
+      }
+
+      const fetchProjectsResponse = (await apiBack.get<{
+        count: number
+        next: string | null
+        previous: string | null
+        results: ProjectType[]
+      }>(`/explorations/folders/${search}`)) ?? { status: 400 }
+
+      if (fetchProjectsResponse.status === 200) {
+        const { data } = fetchProjectsResponse
+        return {
+          ...data,
+          results: data.results.map((res) => ({
+            ...res,
+            parent_folder_id: `${Math.floor(Math.random() * 3) + 1}`
+          }))
+        }
+      } else {
+        return {
+          count: myProjects.length,
+          next: '',
+          previous: '',
+          results: myProjects
+        }
+      }
+    }
   }
-  // switch (CONTEXT) {
-  //   case 'fakedata':
-  //     return {
-  //       count: myProjects.length,
-  //       next: '',
-  //       previous: '',
-  //       results: myProjects
-  //     }
-  //   case 'arkhn':
-  //     return {
-  //       count: myProjects.length,
-  //       next: '',
-  //       previous: '',
-  //       results: myProjects
-  //     }
-  //   default: {
-  //     let search = `?`
-  //     if (limit) {
-  //       search += `limit=${limit}`
-  //     }
-  //     if (offset) {
-  //       search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
-  //     }
-
-  //     const fetchProjectsResponse = (await apiBack.get<{
-  //       count: number
-  //       next: string | null
-  //       previous: string | null
-  //       results: ProjectType[]
-  //     }>(`/explorations/folders/${search}`)) ?? { status: 400 }
-
-  //     if (fetchProjectsResponse.status === 200) {
-  //       const { data } = fetchProjectsResponse
-  //       return {
-  //         ...data,
-  //         results: data.results.map((res) => ({
-  //           ...res,
-  //           project_id: `${Math.floor(Math.random() * 3) + 1}`
-  //         }))
-  //       }
-  //     } else {
-  //       return {
-  //         count: myProjects.length,
-  //         next: '',
-  //         previous: '',
-  //         results: myProjects
-  //       }
-  //     }
-  //   }
-  // }
 }
 
 export const addProject = async (newProject: ProjectType) => {
@@ -168,10 +170,19 @@ export const deleteProject = async (deletedProject: ProjectType) => {
   }
 }
 
+/**
+ * Requests:
+ *  - RequestType
+ *  - fetchRequestsList : (limit = 100, offset = 0) => response.data
+ *  - addRequest : (newRequest: RequestType) => response.data
+ *  - editRequest : (editedRequest: RequestType) => response.data
+ *  - deleteRequest : (deletedRequest: RequestType) => response.data
+ */
+
 export type RequestType = {
-  project_id: string
   uuid: string
   name: string
+  parent_folder_id?: string
   description?: string
   owner_id?: string
   data_type_of_query?: string
@@ -180,7 +191,7 @@ export type RequestType = {
   modified_at?: string
 }
 
-export const fetchRequestList = async (limit = 100, offset = 0) => {
+export const fetchRequestsList = async (limit = 100, offset = 0) => {
   try {
     let search = `?`
     if (limit) {
@@ -190,19 +201,24 @@ export const fetchRequestList = async (limit = 100, offset = 0) => {
       search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
     }
 
-    const { data } = (await apiBack.get<{
+    const fetchRequestsListResponse = (await apiBack.get<{
       count: number
       next: string | null
       previous: string | null
       results: RequestType[]
-    }>(`/explorations/requests/${search}`)) ?? { data: { results: [] } }
+    }>(`/explorations/requests/${search}`)) ?? { status: 400 }
 
-    return {
-      ...data,
-      results: data.results.map((res) => ({
-        ...res,
-        project_id: `${Math.floor(Math.random() * 3) + 1}`
-      }))
+    console.log(`fetchRequestsListResponse`, fetchRequestsListResponse)
+
+    if (fetchRequestsListResponse.status === 200) {
+      return fetchRequestsListResponse.data
+    } else {
+      return {
+        count: 0,
+        next: null,
+        previous: null,
+        results: []
+      }
     }
   } catch (error) {
     console.error(error)
@@ -210,24 +226,78 @@ export const fetchRequestList = async (limit = 100, offset = 0) => {
   }
 }
 
-export const editRequest = async (request: RequestType) => {
+export const addRequest = async (newRequest: RequestType) => {
   try {
-    const editResult = await apiBack.patch(`/explorations/requests/${request.uuid}/`, {
-      name: request.name,
-      description: request.description
-      // project_id: request.project_id
-    })
-    return editResult
+    switch (CONTEXT) {
+      case 'fakedata':
+        return {
+          ...newRequest,
+          parent_folder_id: `${Math.floor(Math.random() * 1000) + 1}`
+        }
+      case 'arkhn':
+        return {
+          ...newRequest,
+          parent_folder_id: `${Math.floor(Math.random() * 1000) + 1}`
+        }
+      default: {
+        const addRequestResponse = (await apiBack.post(`/explorations/request/`, newRequest)) ?? { status: 400 }
+        if (addRequestResponse.status === 201) {
+          return addRequestResponse.data as ProjectType
+        } else {
+          return {
+            ...newRequest,
+            parent_folder_id: `${Math.floor(Math.random() * 1000) + 1}`
+          }
+        }
+      }
+    }
   } catch (error) {
     console.error(error)
     throw error
   }
 }
 
-export const deleteRequest = async (requestId: string) => {
+export const editRequest = async (editedRequest: RequestType) => {
   try {
-    const deleteResult = await apiBack.delete(`/explorations/requests/${requestId}/`)
-    return deleteResult
+    switch (CONTEXT) {
+      case 'fakedata':
+      case 'arkhn':
+        return editedRequest
+      default: {
+        const editProjectResponse = (await apiBack.patch(`/explorations/requests/${editedRequest.uuid}/`, {
+          name: editedRequest.name,
+          description: editedRequest.description
+        })) ?? { status: 400 }
+        if (editProjectResponse.status === 200) {
+          return editProjectResponse.data as ProjectType
+        } else {
+          return editedRequest
+        }
+      }
+    }
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+export const deleteRequest = async (deletedRequest: RequestType) => {
+  try {
+    switch (CONTEXT) {
+      case 'fakedata':
+      case 'arkhn':
+        return null
+      default: {
+        const deleteProjectResponse = (await apiBack.delete(`/explorations/folders/${deletedRequest.uuid}/`)) ?? {
+          status: 400
+        }
+        if (deleteProjectResponse.status === 200) {
+          return deleteProjectResponse.data as ProjectType
+        } else {
+          throw new Error('Impossible de supprimer le projet de recherche')
+        }
+      }
+    }
   } catch (error) {
     console.error(error)
     throw error
