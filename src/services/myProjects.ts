@@ -71,13 +71,7 @@ export const fetchProjectsList = async (limit = 100, offset = 0) => {
 
       if (fetchProjectsResponse.status === 200) {
         const { data } = fetchProjectsResponse
-        return {
-          ...data,
-          results: data.results.map((res) => ({
-            ...res,
-            parent_folder_id: `${Math.floor(Math.random() * 3) + 1}`
-          }))
-        }
+        return data
       } else {
         return {
           count: myProjects.length,
@@ -301,26 +295,26 @@ export const deleteRequest = async (deletedRequest: RequestType) => {
   }
 }
 
-export type CohortResponseType = {
-  modified_at?: string
-  create_task_id: string
-  dated_measure_id: string
-  description: string
-  favorite: boolean
-  fhir_group_id: string
-  name: string
-  owner_id: string
-  request_id: string
-  request_job_duration: string
-  request_job_fail_msg: string
-  request_job_status: string
-  request_query_snapshot_id: string
-  result_size: number
+export type CohortType = {
   uuid: string
+  name: string
+  create_task_id?: string
+  dated_measure_id?: string
+  description?: string
+  favorite?: boolean
+  fhir_group_id?: string
+  owner_id?: string
+  request_id?: string
+  request_job_duration?: string
+  request_job_fail_msg?: string
+  request_job_status?: string
+  request_query_snapshot_id?: string
+  result_size?: number
   created_at?: string
+  modified_at?: string
 }
 
-export const fetchCohortList = async (limit = 100, offset = 0) => {
+export const fetchCohortsList = async (limit = 100, offset = 0) => {
   try {
     let search = `?`
     if (limit) {
@@ -334,10 +328,88 @@ export const fetchCohortList = async (limit = 100, offset = 0) => {
       count: number
       next: string | null
       previous: string | null
-      results: CohortResponseType[]
+      results: CohortType[]
     }>(`/explorations/cohorts/${search}`)) ?? { data: { results: [] } }
 
     return data
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+export const addCohort = async (newCohort: CohortType) => {
+  try {
+    switch (CONTEXT) {
+      case 'fakedata':
+        return {
+          ...newCohort,
+          parent_folder_id: `${Math.floor(Math.random() * 1000) + 1}`
+        } as CohortType
+      case 'arkhn':
+        return {
+          ...newCohort,
+          parent_folder_id: `${Math.floor(Math.random() * 1000) + 1}`
+        } as CohortType
+      default: {
+        const addCohortResponse = (await apiBack.post(`/explorations/requests/`, newCohort)) ?? { status: 400 }
+        if (addCohortResponse.status === 201) {
+          return addCohortResponse.data as CohortType
+        } else {
+          return {
+            ...newCohort,
+            parent_folder_id: `${Math.floor(Math.random() * 1000) + 1}`
+          } as CohortType
+        }
+      }
+    }
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+export const editCohort = async (editedCohort: CohortType) => {
+  try {
+    switch (CONTEXT) {
+      case 'fakedata':
+      case 'arkhn':
+        return editedCohort as CohortType
+      default: {
+        const editCohortResponse = (await apiBack.patch(
+          `/explorations/requests/${editedCohort.uuid}/`,
+          editedCohort
+        )) ?? { status: 400 }
+        if (editCohortResponse.status === 200) {
+          return editCohortResponse.data as CohortType
+        } else {
+          return editedCohort as CohortType
+        }
+      }
+    }
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+}
+
+export const deleteCohort = async (deletedCohort: CohortType) => {
+  try {
+    switch (CONTEXT) {
+      case 'fakedata':
+      case 'arkhn':
+        return null
+      default: {
+        const deleteCohortResponse = (await apiBack.delete(`/explorations/requests/${deletedCohort.uuid}/`)) ?? {
+          status: 400
+        }
+        if (deleteCohortResponse.status === 204) {
+          return deleteCohortResponse.data as CohortType
+        } else {
+          throw new Error('Impossible de supprimer le projet de recherche')
+        }
+      }
+    }
   } catch (error) {
     console.error(error)
     throw error
