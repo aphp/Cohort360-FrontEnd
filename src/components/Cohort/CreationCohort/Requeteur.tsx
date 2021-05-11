@@ -32,10 +32,11 @@ const Requeteur = () => {
     count = {},
     json = ''
   } = useAppSelector((state) => state.cohortCreation.request || {})
-  const params = useParams<{
-    requestId: string
-    snapshotId: string
-  }>()
+  const params =
+    useParams<{
+      requestId: string
+      snapshotId: string
+    }>()
 
   const requestIdFromUrl = params.requestId
   const snapshotIdFromUrl = params.snapshotId

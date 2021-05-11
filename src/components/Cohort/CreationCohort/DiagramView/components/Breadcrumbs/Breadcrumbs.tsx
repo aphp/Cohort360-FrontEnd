@@ -7,9 +7,11 @@ import { useAppSelector } from 'state'
 import useStyles from './styles'
 
 const CohortCreationBreadcrumbs: React.FC = () => {
-  const { projectName = 'Mon projet principal', requestName = 'Nouvelle requête', currentSnapshot } = useAppSelector(
-    (state) => state.cohortCreation.request || {}
-  )
+  const {
+    projectName = 'Mon projet principal',
+    requestName = 'Nouvelle requête',
+    currentSnapshot
+  } = useAppSelector((state) => state.cohortCreation.request || {})
 
   const classes = useStyles()
 
