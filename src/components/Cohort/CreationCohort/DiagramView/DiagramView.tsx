@@ -4,6 +4,7 @@ import { Grid } from '@material-ui/core'
 import PopulationCard from './components/PopulationCard/PopulationCard'
 import LogicalOperator from './components/LogicalOperator/LogicalOperator'
 import TemporalConstraintCard from './components/TemporalConstraintCard/TemporalConstraintCard'
+import CohortCreationBreadcrumbs from './components/Breadcrumbs/Breadcrumbs'
 
 import { useAppSelector } from 'state'
 
@@ -17,6 +18,8 @@ const DiagramView: React.FC = () => {
   return (
     <Grid container className={classes.root}>
       <div style={{ minWidth: 500, paddingRight: 24 }}>
+        <CohortCreationBreadcrumbs />
+
         <Grid className={classes.populationContainer}>
           <PopulationCard />
           {selectedPopulation && selectedPopulation.length > 0 ? <TemporalConstraintCard /> : <></>}

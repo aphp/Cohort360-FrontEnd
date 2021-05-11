@@ -9,7 +9,7 @@ import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
 import UpdateSharpIcon from '@material-ui/icons/UpdateSharp'
 import HighlightOffIcon from '@material-ui/icons/HighlightOff'
 
-import ModalCohortTitle from './components/ModalCohortTitle/ModalCohortTitle'
+import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 
 import { useAppSelector } from 'state'
 import { resetCohortCreation, countCohortCreation } from 'state/cohortCreation'

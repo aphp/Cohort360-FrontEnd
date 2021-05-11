@@ -74,23 +74,6 @@ export const createCohort = async (
   }
 }
 
-export const createRequest = async () => {
-  if (CONTEXT === 'arkhn') {
-    return null
-  } else if (CONTEXT === 'fakedata') {
-    return null
-  } else {
-    const request =
-      (await apiBack.post('/explorations/requests/', {
-        name: 'Nouvelle requête',
-        description: 'Requête créée depuis le front Cohort360',
-        favorite: false,
-        data_type_of_query: 'PATIENT'
-      })) || {}
-    return request && request.data ? request.data : null
-  }
-}
-
 export const createSnapshot = async (id: string, json: string, firstTime?: boolean) => {
   if (CONTEXT === 'arkhn') {
     return null
@@ -103,5 +86,59 @@ export const createSnapshot = async (id: string, json: string, firstTime?: boole
     }
     const request = (await apiBack.post('/explorations/request-query-snapshots/', data)) || {}
     return request && request.data ? request.data : null
+  }
+}
+
+export const fetchRequest = async (requestId: string, snapshotId: string | undefined) => {
+  if (CONTEXT === 'arkhn') {
+    return null
+  } else if (CONTEXT === 'fakedata') {
+    return null
+  } else {
+    const requestResult = (await apiBack.get(`/explorations/requests/${requestId}/query-snapshots/`)) || {}
+    const data = requestResult?.data ? requestResult.data : {}
+
+    const snapshotsHistoryFromQuery: {
+      uuid: string
+      serialized_query: string
+      previous_snapshot_id: string
+      created_at: string
+    }[] = data.results
+
+    const currentSnapshot = snapshotId
+      ? snapshotsHistoryFromQuery.find(({ uuid }) => uuid === snapshotId)
+      : snapshotsHistoryFromQuery
+      ? snapshotsHistoryFromQuery[0]
+      : null
+    let result = null
+    let snapshotsHistory: any[] = []
+
+    if (currentSnapshot) {
+      let nextSnap = currentSnapshot.uuid
+      snapshotsHistory = snapshotsHistoryFromQuery
+        .map(({ uuid, serialized_query, created_at, previous_snapshot_id }) => {
+          if (nextSnap === uuid) {
+            nextSnap = previous_snapshot_id
+            return {
+              uuid: uuid,
+              json: serialized_query,
+              date: created_at
+            }
+          } else {
+            return {
+              uuid: undefined,
+              json: serialized_query,
+              date: created_at
+            }
+          }
+        })
+        .filter(({ uuid }) => uuid !== undefined)
+    }
+    result = {
+      json: currentSnapshot ? currentSnapshot.serialized_query : '',
+      currentSnapshot: currentSnapshot ? currentSnapshot.uuid : '',
+      snapshotsHistory: snapshotsHistory.filter(({ uuid }) => uuid !== undefined)
+    }
+    return result
   }
 }
