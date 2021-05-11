@@ -201,14 +201,7 @@ export const fetchRequestsList = async (limit = 100, offset = 0) => {
       search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
     }
 
-    const fetchRequestsListResponse = (await apiBack.get<{
-      count: number
-      next: string | null
-      previous: string | null
-      results: RequestType[]
-    }>(`/explorations/requests/${search}`)) ?? { status: 400 }
-
-    console.log(`fetchRequestsListResponse`, fetchRequestsListResponse)
+    const fetchRequestsListResponse = (await apiBack.get(`/explorations/requests/${search}`)) ?? { status: 400 }
 
     if (fetchRequestsListResponse.status === 200) {
       return fetchRequestsListResponse.data
@@ -240,7 +233,10 @@ export const addRequest = async (newRequest: RequestType) => {
           parent_folder_id: `${Math.floor(Math.random() * 1000) + 1}`
         }
       default: {
-        const addRequestResponse = (await apiBack.post(`/explorations/request/`, newRequest)) ?? { status: 400 }
+        const addRequestResponse = (await apiBack.post(`/explorations/requests/`, {
+          ...newRequest,
+          parent_folder: newRequest.parent_folder_id
+        })) ?? { status: 400 }
         if (addRequestResponse.status === 201) {
           return addRequestResponse.data as ProjectType
         } else {
@@ -266,7 +262,8 @@ export const editRequest = async (editedRequest: RequestType) => {
       default: {
         const editProjectResponse = (await apiBack.patch(`/explorations/requests/${editedRequest.uuid}/`, {
           name: editedRequest.name,
-          description: editedRequest.description
+          description: editedRequest.description,
+          parent_folder_id: editedRequest.parent_folder_id
         })) ?? { status: 400 }
         if (editProjectResponse.status === 200) {
           return editProjectResponse.data as ProjectType
@@ -288,10 +285,10 @@ export const deleteRequest = async (deletedRequest: RequestType) => {
       case 'arkhn':
         return null
       default: {
-        const deleteProjectResponse = (await apiBack.delete(`/explorations/folders/${deletedRequest.uuid}/`)) ?? {
+        const deleteProjectResponse = (await apiBack.delete(`/explorations/requests/${deletedRequest.uuid}/`)) ?? {
           status: 400
         }
-        if (deleteProjectResponse.status === 200) {
+        if (deleteProjectResponse.status === 204) {
           return deleteProjectResponse.data as ProjectType
         } else {
           throw new Error('Impossible de supprimer le projet de recherche')

@@ -23,10 +23,9 @@ const ProjectTable: React.FC = () => {
   }))
   const { projectsList } = projectState
   const { requestsList } = requestState
-  console.log('requestsList :>> ', requestsList)
 
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} className={classes.grid}>
       <Table aria-label="projects table" className={classes.table}>
         <TableHead>
           <TableRow className={classes.tableHead}>

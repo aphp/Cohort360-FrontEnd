@@ -132,7 +132,7 @@ type DeleteRequestReturn = {
 
 const deleteRequest = createAsyncThunk<DeleteRequestReturn, DeleteRequestParams, { state: RootState }>(
   'request/deleteRequest',
-  async ({ deletedRequest }, { getState }) => {
+  async ({ deletedRequest }, { getState, dispatch }) => {
     try {
       const state = getState().request
       // eslint-disable-next-line
@@ -145,6 +145,9 @@ const deleteRequest = createAsyncThunk<DeleteRequestReturn, DeleteRequestParams,
 
         requestsList.splice(index, 1)
       }
+
+      dispatch<any>(fetchRequests())
+
       return {
         selectedRequest: null,
         requestsList: requestsList
@@ -177,7 +180,7 @@ const setRequestSlice = createSlice({
             ...state,
             selectedRequest: {
               uuid: '',
-              name: `Projet de recherche ${requestsList.length + 1}`,
+              name: `Nouvelle requête ${requestsList.length + 1}`,
               description: ''
             }
           }

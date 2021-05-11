@@ -105,12 +105,7 @@ const MyProjects = () => {
         selectedProject={selectedProject}
       />
 
-      {selectedRequest !== null && (
-        <ModalAddOrEditRequest
-          onClose={() => dispatch<any>(setSelectedRequest(null))}
-          selectedRequest={selectedRequest}
-        />
-      )}
+      {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch<any>(setSelectedRequest(null))} />}
     </>
   )
 }

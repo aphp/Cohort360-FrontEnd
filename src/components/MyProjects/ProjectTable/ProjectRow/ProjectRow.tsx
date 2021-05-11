@@ -14,6 +14,7 @@ import RequestRow from '../RequestRow/RequestRow'
 import { ProjectType, RequestType } from 'services/myProjects'
 
 import { setSelectedProject } from 'state/project'
+import { setSelectedRequest } from 'state/request'
 
 import useStyles from '../styles'
 
@@ -32,6 +33,10 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject }) => {
     } else {
       dispatch<any>(setSelectedProject(null))
     }
+  }
+
+  const handleAddRequest = () => {
+    dispatch<any>(setSelectedRequest(''))
   }
 
   return (
@@ -60,26 +65,14 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject }) => {
             {requestOfProject && requestOfProject.length > 0 ? (
               requestOfProject.map((request) => <RequestRow key={request.uuid} row={request} />)
             ) : (
-              <Typography
-                style={{
-                  height: '20vh',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexDirection: 'column'
-                }}
-              >
+              <Typography className={classes.emptyRequestRow}>
                 Aucune requête n'est associée a ce projet de recherche
                 <Button
                   variant="contained"
                   startIcon={<AddIcon />}
                   size="small"
-                  style={{
-                    color: '#FFF',
-                    margin: 4,
-                    borderRadius: 25,
-                    backgroundColor: '#5BC5F2'
-                  }}
+                  onClick={handleAddRequest}
+                  className={classes.addButton}
                 >
                   Ajouter une requête
                 </Button>
