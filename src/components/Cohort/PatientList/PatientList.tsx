@@ -61,12 +61,10 @@ const PatientList: React.FC<PatientListProps> = ({
   const [loadingStatus, setLoadingStatus] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
-  const [agePyramid, setAgePyramid] = useState<
-    ComplexChartDataType<number, { male: number; female: number; other?: number }> | undefined
-  >(undefined)
-  const [patientData, setPatientData] = useState<
-    { vitalStatusData?: SimpleChartDataType[]; genderData?: SimpleChartDataType[] } | undefined
-  >(undefined)
+  const [agePyramid, setAgePyramid] =
+    useState<ComplexChartDataType<number, { male: number; female: number; other?: number }> | undefined>(undefined)
+  const [patientData, setPatientData] =
+    useState<{ vitalStatusData?: SimpleChartDataType[]; genderData?: SimpleChartDataType[] } | undefined>(undefined)
   const [open, setOpen] = useState(false)
   const [gender, setGender] = useState<PatientGenderKind>(PatientGenderKind._unknown)
   const [age, setAge] = useState<[number, number]>([0, 130])
