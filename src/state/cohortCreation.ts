@@ -12,8 +12,9 @@ import {
 import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
 
 import { logout, login } from './me'
+import { addRequest, deleteRequest } from './request'
 
-import { createRequest, createSnapshot, countCohort, fetchRequest } from 'services/cohortCreation'
+import { createSnapshot, countCohort, fetchRequest } from 'services/cohortCreation'
 
 const localStorageCohortCreation = localStorage.getItem('cohortCreation') ?? null
 const jsonCohortCreation = localStorageCohortCreation ? JSON.parse(localStorageCohortCreation).request : {}
@@ -113,33 +114,31 @@ const fetchRequestCohortCreation = createAsyncThunk<
   }
 })
 
-/**
- * createRequestCohortCreation
- *
- */
-type CreateRequestCohortCreationParams = {
-  name: string
-  description: string | null
-  projectId: string | null
-}
+// /**
+//  *
+//  */
+// type CreateRequestCohortCreationParams = {
+//   name: string
+//   description: string | null
+//   projectId: string | null
+// }
 
-const createRequestCohortCreation = createAsyncThunk<
-  { requestId: string },
-  CreateRequestCohortCreationParams,
-  { state: RootState }
->('cohortCreation/createRequest', async ({ name, description, projectId }) => {
-  try {
-    const createRequestResult = await createRequest(name, description ?? '', projectId)
-    if (!createRequestResult) {
-      return { requestId: '' }
-    }
+//   { requestId: string },
+//   CreateRequestCohortCreationParams,
+//   { state: RootState }
+// >('cohortCreation/createRequest', async ({ name, description, projectId }) => {
+//   try {
+//     const createRequestResult = await createRequest(name, description ?? '', projectId)
+//     if (!createRequestResult) {
+//       return { requestId: '' }
+//     }
 
-    return { requestId: createRequestResult.uuid }
-  } catch (error) {
-    console.error(error)
-    throw error
-  }
-})
+//     return { requestId: createRequestResult.uuid }
+//   } catch (error) {
+//     console.error(error)
+//     throw error
+//   }
+// })
 
 /**
  * countCohortCreation
@@ -419,26 +418,18 @@ const cohortCreationSlice = createSlice({
       loading: false
     }))
     builder.addCase(fetchRequestCohortCreation.rejected, (state) => ({ ...state, loading: false }))
-    // createRequestCohortCreation
-    builder.addCase(createRequestCohortCreation.pending, (state) => ({ ...state, loading: true }))
-    builder.addCase(createRequestCohortCreation.fulfilled, (state, { payload }) => ({
-      ...state,
-      ...payload,
-      loading: false
-    }))
-    builder.addCase(createRequestCohortCreation.rejected, (state) => ({ ...state, loading: false }))
+    // Create new request
+    builder.addCase(addRequest.fulfilled, (state, { payload }) => {
+      const newRequestId = payload.requestsList ? payload.requestsList[payload.requestsList.length - 1].uuid : ''
+      return { ...state, requestId: newRequestId, loading: false }
+    })
+    // When you delete a request => reset cohort create (if current request is edited state)
+    builder.addCase(deleteRequest.fulfilled, () => defaultInitialState)
   }
 })
 
 export default cohortCreationSlice.reducer
-export {
-  buildCohortCreation,
-  unbuildCohortCreation,
-  saveJson,
-  countCohortCreation,
-  fetchRequestCohortCreation,
-  createRequestCohortCreation
-}
+export { buildCohortCreation, unbuildCohortCreation, saveJson, countCohortCreation, fetchRequestCohortCreation }
 export const {
   resetCohortCreation,
   //

@@ -69,7 +69,7 @@ const addProject = createAsyncThunk<AddProjectReturn, AddProjectParams, { state:
 
       return {
         selectedProject: null,
-        projectsList: createdProject !== null ? [...projectsList, createdProject] : projectsList
+        projectsList: createdProject !== null ? [createdProject, ...projectsList] : projectsList
       }
     } catch (error) {
       console.error(error)

@@ -18,16 +18,13 @@ import {
 
 import useStyles from './styles'
 
-import {
-  fetchProjectsList,
-  ProjectType,
-  fetchRequestList,
-  RequestType,
-  editRequest,
-  deleteRequest
-} from 'services/myProjects'
+import { ProjectType, RequestType, addProject, fetchProjectsList, fetchRequestsList } from 'services/myProjects'
 
-import { createRequestCohortCreation as createRequest } from 'state/cohortCreation'
+import { useAppSelector } from 'state'
+import { ProjectState, fetchProjects } from 'state/project'
+import { RequestState, addRequest, editRequest, deleteRequest } from 'state/request'
+
+// import { createRequestCohortCreation as createRequest } from 'state/cohortCreation'
 
 const ERROR_TITLE = 'error_title'
 const ERROR_DESCRIPTION = 'error_description'
@@ -37,22 +34,28 @@ const ERROR_PROJECT_NAME = 'error_project_name'
 const NEW_PROJECT_ID = 'new'
 
 const ModalCreateNewRequest: React.FC<{
-  selectedRequest?: RequestType
   onClose?: () => void
-}> = ({ selectedRequest, onClose }) => {
+}> = ({ onClose }) => {
   const classes = useStyles()
   const history = useHistory()
   const dispatch = useDispatch()
+  const { projectState, requestState } = useAppSelector<{
+    projectState: ProjectState
+    requestState: RequestState
+  }>((state) => ({
+    projectState: state.project,
+    requestState: state.request
+  }))
 
-  const isEdition = !!selectedRequest
+  const { selectedRequest } = requestState
+
+  const isEdition = selectedRequest ? selectedRequest.uuid : false
   const [deletionConfirmation, setDeletionConfirmation] = useState(false)
 
   const [loading, setLoading] = useState(true)
 
-  const [title, onChangeTitle] = useState<string>(selectedRequest?.name ?? 'Nouvelle requête')
-  const [description, onChangeDescription] = useState<string>(selectedRequest?.description ?? '')
-  const [projectId, onChangeProjectId] = useState<string>(selectedRequest?.project_id ?? NEW_PROJECT_ID)
-  const [projectName, onChangeProjectName] = useState<string>('Nouveau projet de recherche')
+  const [currentRequest, setCurrentRequest] = useState<RequestType | null>(selectedRequest)
+  const [projectName, onChangeProjectName] = useState<string>('Projet de recherche')
 
   const [projectList, onSetProjectList] = useState<ProjectType[]>([])
 
@@ -60,39 +63,48 @@ const ModalCreateNewRequest: React.FC<{
     'error_title' | 'error_description' | 'error_project' | 'error_project_name' | null
   >(null)
 
+  const _onChangeValue = (key: 'name' | 'parent_folder_id' | 'description', value: string) => {
+    const _currentRequest: RequestType = currentRequest ? { ...currentRequest } : { uuid: '', name: '' }
+    _currentRequest[key] = value
+    setCurrentRequest(_currentRequest)
+  }
+
   const _fetchProject = async () => {
-    const myProjects = (await fetchProjectsList()) || []
-    onSetProjectList(myProjects.results)
+    let projectsList = []
+    if (projectState && projectState.projectsList && projectState.projectsList.length > 0) {
+      projectsList = projectState.projectsList
+    } else {
+      const myProjects = (await fetchProjectsList()) || []
+      projectsList = myProjects.results
+    }
+    onSetProjectList(projectsList)
     // Auto select newset project folder
-    // + Auto set the new project folder with 'Nouveau projet de recherche ...'
-    if (myProjects && myProjects.results && myProjects.results.length >= 0) {
+    // + Auto set the new project folder with 'Projet de recherche ...'
+    if (projectsList && projectsList.length > 0) {
       if (!isEdition) {
-        onChangeProjectId(myProjects.results[myProjects.results.length - 1].uuid)
+        _onChangeValue('parent_folder_id', projectsList[0].uuid)
       }
-      onChangeProjectName(`Nouveau projet de recherche ${(myProjects.results.length || 0) + 1}`)
+      onChangeProjectName(`Projet de recherche ${projectsList.length || ''}`)
     }
   }
 
   const _fetchRequestNumber = async () => {
     if (isEdition) return
-    const requestResponse = await fetchRequestList()
+    const requestResponse = await fetchRequestsList()
     if (!requestResponse) return
-    onChangeTitle(`Nouvelle requête ${(requestResponse.count || 0) + 1}`)
+    _onChangeValue('name', `Nouvelle requête ${(requestResponse.count || 0) + 1}`)
   }
 
   useEffect(() => {
     const fetcher = async () => {
       setLoading(true)
-      await _fetchProject()
       await _fetchRequestNumber()
+      await _fetchProject()
       setLoading(false)
     }
 
     fetcher()
     return () => {
-      onChangeTitle('')
-      onChangeDescription('')
-      onChangeProjectId('')
       onChangeProjectName('')
     }
   }, [])
@@ -106,48 +118,35 @@ const ModalCreateNewRequest: React.FC<{
   }
 
   const handleConfirm = async () => {
-    if (loading) return
+    if (loading || currentRequest === null) return
 
     setLoading(true)
-    if (!title) {
+    if (!currentRequest.name) {
       setLoading(false)
       return setError(ERROR_TITLE)
     }
-    if (!projectId) {
+    if (!currentRequest.parent_folder_id) {
       setLoading(false)
       return setError(ERROR_PROJECT)
     }
-    if (!projectId && !projectName) {
+    if (!currentRequest.parent_folder_id && !projectName) {
       setLoading(false)
       return setError(ERROR_PROJECT_NAME)
     }
 
-    let newProjectId = null
-    if (projectId === NEW_PROJECT_ID) {
+    if (currentRequest.parent_folder_id === NEW_PROJECT_ID) {
       // Create a project before
-      // newProjectId = await createProjectFolder(projectName)
-      newProjectId = '4'
+      const newProject = await addProject({ uuid: '', name: projectName })
+      if (newProject) {
+        currentRequest.parent_folder_id = newProject.uuid
+      }
+      dispatch<any>(fetchProjects())
     }
 
-    if (isEdition && selectedRequest) {
-      await editRequest({
-        ...selectedRequest,
-        name: title,
-        description,
-        project_id: (projectId === NEW_PROJECT_ID ? newProjectId : projectId) ?? ''
-      })
+    if (isEdition) {
+      dispatch<any>(editRequest({ editedRequest: currentRequest }))
     } else {
-      dispatch<any>(
-        createRequest({
-          name: title,
-          description: description,
-          projectId
-        })
-      )
-    }
-
-    if (onClose && typeof onClose === 'function') {
-      onClose()
+      dispatch<any>(addRequest({ newRequest: currentRequest }))
     }
   }
 
@@ -155,11 +154,7 @@ const ModalCreateNewRequest: React.FC<{
     if (loading || !isEdition || !selectedRequest) return
     setLoading(true)
 
-    deleteRequest(selectedRequest.uuid)
-
-    if (onClose && typeof onClose === 'function') {
-      onClose()
-    }
+    dispatch<any>(deleteRequest({ deletedRequest: selectedRequest }))
   }
 
   return (
@@ -173,7 +168,7 @@ const ModalCreateNewRequest: React.FC<{
       >
         <DialogTitle className={classes.title}>{isEdition ? 'Modification' : 'Création'} d'une requête</DialogTitle>
         <DialogContent>
-          {loading ? (
+          {loading || currentRequest === null ? (
             <Grid container direction="column" justify="center" alignItems="center" className={classes.inputContainer}>
               <CircularProgress />
             </Grid>
@@ -183,8 +178,8 @@ const ModalCreateNewRequest: React.FC<{
                 <Typography variant="h3">Nom de la requête :</Typography>
                 <TextField
                   placeholder="Nom de la requête"
-                  value={title}
-                  onChange={(e: any) => onChangeTitle(e.target.value)}
+                  value={currentRequest.name}
+                  onChange={(e: any) => _onChangeValue('name', e.target.value)}
                   autoFocus
                   id="title"
                   margin="normal"
@@ -199,8 +194,8 @@ const ModalCreateNewRequest: React.FC<{
 
                 <Select
                   id="criteria-occurrenceComparator-select"
-                  value={projectId}
-                  onChange={(event) => onChangeProjectId(event.target.value as string)}
+                  value={currentRequest.parent_folder_id}
+                  onChange={(event) => _onChangeValue('parent_folder_id', event.target.value as string)}
                   variant="outlined"
                   error={error === ERROR_PROJECT}
                   style={{ marginTop: 16, marginBottom: 8 }}
@@ -213,7 +208,7 @@ const ModalCreateNewRequest: React.FC<{
                   <MenuItem value={NEW_PROJECT_ID}>Nouveau projet</MenuItem>
                 </Select>
 
-                {projectId === NEW_PROJECT_ID && (
+                {currentRequest.parent_folder_id === NEW_PROJECT_ID && (
                   <TextField
                     placeholder="Nom du nouveau projet"
                     value={projectName}
@@ -231,8 +226,8 @@ const ModalCreateNewRequest: React.FC<{
                 <Typography variant="h3">Description :</Typography>
                 <TextField
                   placeholder="Description"
-                  value={description}
-                  onChange={(e: any) => onChangeDescription(e.target.value)}
+                  value={currentRequest.description}
+                  onChange={(e: any) => _onChangeValue('description', e.target.value)}
                   id="description"
                   margin="normal"
                   variant="outlined"
@@ -271,13 +266,10 @@ const ModalCreateNewRequest: React.FC<{
           onClose={handleClose}
           aria-labelledby="form-dialog-title"
         >
-          <DialogTitle className={classes.title}>Supprimer un projet de recherche</DialogTitle>
+          <DialogTitle className={classes.title}>Supprimer une requête</DialogTitle>
 
           <DialogContent>
-            <Typography>
-              Êtes-vous sur de vouloir supprimer ce projet de recherche ? L'ensemble des requêtes liées à ce projet vont
-              être supprimées également
-            </Typography>
+            <Typography>Êtes-vous sur de vouloir supprimer cette requête ?</Typography>
           </DialogContent>
 
           <DialogActions>

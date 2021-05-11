@@ -1,6 +1,9 @@
 import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme) => ({
+  grid: {
+    marginBottom: theme.spacing(2)
+  },
   table: {
     '& > *': {
       borderBottom: 'unset'
@@ -53,6 +56,19 @@ const useStyles = makeStyles((theme) => ({
     height: 25,
     width: 'fit-content',
     margin: '0 auto'
+  },
+  addButton: {
+    color: '#FFF',
+    margin: 4,
+    borderRadius: 25,
+    backgroundColor: '#5BC5F2'
+  },
+  emptyRequestRow: {
+    height: '10vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column'
   }
 }))
 
