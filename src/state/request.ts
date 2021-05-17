@@ -166,31 +166,33 @@ const setRequestSlice = createSlice({
     clearRequest: () => {
       return defaultInitialState
     },
-    setSelectedRequest: (state: RequestState, action: PayloadAction<string | null>) => {
+    setSelectedRequest: (state: RequestState, action: PayloadAction<RequestType | null>) => {
       const requestsList: RequestType[] = state.requestsList ?? []
-      const selectedRequestId = action.payload
-      switch (selectedRequestId) {
-        case null:
-          return {
-            ...state,
-            selectedRequest: null
-          }
-        case '':
-          return {
-            ...state,
-            selectedRequest: {
-              uuid: '',
-              name: `Nouvelle requête ${requestsList.length + 1}`,
-              description: ''
-            }
-          }
-        default: {
-          const foundItem = requestsList.find(({ uuid }) => uuid === selectedRequestId)
-          if (!foundItem) return state
-          const index = requestsList.indexOf(foundItem)
-          return {
-            ...state,
-            selectedRequest: requestsList[index]
+      const selectedRequest = action.payload
+      const selectedRequestId = selectedRequest?.uuid
+      const selectedProjectId = selectedRequest?.parent_folder_id
+
+      if (selectedRequest === null) {
+        return {
+          ...state,
+          selectedRequest: null
+        }
+      } else if (selectedRequestId) {
+        const foundItem = requestsList.find(({ uuid }) => uuid === selectedRequestId)
+        if (!foundItem) return state
+        const index = requestsList.indexOf(foundItem)
+        return {
+          ...state,
+          selectedRequest: requestsList[index]
+        }
+      } else {
+        return {
+          ...state,
+          selectedRequest: {
+            uuid: '',
+            name: `Nouvelle requête ${requestsList.length + 1}`,
+            parent_folder_id: selectedProjectId,
+            description: ''
           }
         }
       }

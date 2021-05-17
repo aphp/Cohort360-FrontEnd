@@ -31,8 +31,10 @@ const ProjectTable: React.FC = () => {
           <TableRow className={classes.tableHead}>
             <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62 }} />
             <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62 }} />
-            <TableCell className={classes.tableHeadCell}>Titre</TableCell>
-            <TableCell className={`${classes.tableHeadCell} ${classes.dateCell}`} align="center">
+            <TableCell className={classes.tableHeadCell} style={{ width: 'calc(100% - 300px' }}>
+              Titre
+            </TableCell>
+            <TableCell className={classes.tableHeadCell} align="center" style={{ width: 175 }}>
               Date
             </TableCell>
           </TableRow>

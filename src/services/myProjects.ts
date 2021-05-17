@@ -54,12 +54,12 @@ export const fetchProjectsList = async (limit = 100, offset = 0) => {
         results: myProjects
       }
     default: {
-      let search = `?`
+      let search = `?ordering=created_at`
       if (limit) {
         search += `limit=${limit}`
       }
       if (offset) {
-        search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
+        search += search === '?ordering=created_at' ? `offset=${offset}` : `&offset=${offset}`
       }
 
       const fetchProjectsResponse = (await apiBack.get<{

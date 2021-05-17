@@ -50,6 +50,8 @@ const ModalCreateNewRequest: React.FC<{
   const { selectedRequest } = requestState
 
   const isEdition = selectedRequest ? selectedRequest.uuid : false
+  const selectedProjectId = selectedRequest?.parent_folder_id
+
   const [deletionConfirmation, setDeletionConfirmation] = useState(false)
 
   const [loading, setLoading] = useState(true)
@@ -81,7 +83,7 @@ const ModalCreateNewRequest: React.FC<{
     // Auto select newset project folder
     // + Auto set the new project folder with 'Projet de recherche ...'
     if (projectsList && projectsList.length > 0) {
-      if (!isEdition) {
+      if (!isEdition && !selectedProjectId) {
         _onChangeValue('parent_folder_id', projectsList[0].uuid)
       }
       onChangeProjectName(`Projet de recherche ${projectsList.length || ''}`)

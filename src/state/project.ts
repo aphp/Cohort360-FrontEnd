@@ -38,7 +38,7 @@ const fetchProjects = createAsyncThunk<FetchProjectListReturn, void, { state: Ro
       const projects = (await fetchProjectsList()) || []
       return {
         selectedProject: null,
-        projectsList: projects.results
+        projectsList: projects.results.reverse()
       }
     } catch (error) {
       console.error(error)
@@ -177,7 +177,7 @@ const setProjectSlice = createSlice({
             ...state,
             selectedProject: {
               uuid: '',
-              name: `Projet de recherche ${projectsList.length + 1}`,
+              name: `Projet de recherche ${projectsList.length}`,
               description: ''
             }
           }

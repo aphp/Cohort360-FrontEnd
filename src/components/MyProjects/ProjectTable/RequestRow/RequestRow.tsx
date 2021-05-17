@@ -2,7 +2,7 @@ import React from 'react'
 import moment from 'moment'
 import { useDispatch } from 'react-redux'
 
-import { Collapse, IconButton, Link, Table, TableBody, TableCell, TableRow } from '@material-ui/core'
+import { Collapse, IconButton, Link, Table, TableBody, TableCell, TableRow, Tooltip } from '@material-ui/core'
 
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
@@ -25,7 +25,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row }) => {
   const dispatch = useDispatch()
 
   const onEditRequest = (requestId: string) => {
-    dispatch<any>(setSelectedRequest(requestId))
+    dispatch<any>(setSelectedRequest({ uuid: requestId, name: '' }))
   }
 
   return (
@@ -40,9 +40,11 @@ const RequestRow: React.FC<RequestRowProps> = ({ row }) => {
           </TableCell>
           <TableCell className={classes.tdName}>
             <Link href={`/cohort/new/${row.uuid}`}>{row.name}</Link>
-            <IconButton className={classes.editButon} size="small" onClick={() => onEditRequest(row.uuid)}>
-              <EditIcon />
-            </IconButton>
+            <Tooltip title="Modifier la requête">
+              <IconButton className={classes.editButon} size="small" onClick={() => onEditRequest(row.uuid)}>
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
           </TableCell>
           <TableCell className={classes.dateCell} align="center">
             {moment(row.created_at).format('DD/MM/YYYY [à] HH:mm')}
@@ -50,7 +52,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row }) => {
         </TableRow>
 
         <TableRow>
-          <TableCell style={{ padding: 0, borderBottomWidth: open ? 1 : 0 }} colSpan={4}>
+          <TableCell style={{ padding: 0, borderBottomWidth: open ? 1 : 0 }} colSpan={5}>
             <Collapse in={open} timeout="auto" unmountOnExit style={{ width: '100%' }}>
               <VersionRow requestId={row.uuid} />
             </Collapse>

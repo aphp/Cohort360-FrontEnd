@@ -1,7 +1,18 @@
 import React from 'react'
 import moment from 'moment'
 
-import { Box, Link, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@material-ui/core'
+import {
+  Box,
+  Chip,
+  Link,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography
+} from '@material-ui/core'
 
 import { useAppSelector } from 'state'
 import { CohortState } from 'state/cohort'
@@ -33,6 +44,7 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
         <TableHead>
           <TableRow>
             <TableCell>Nom</TableCell>
+            <TableCell align="center">Status</TableCell>
             <TableCell align="center">Version</TableCell>
             <TableCell align="center">Nombre de patient</TableCell>
             <TableCell align="center">Date</TableCell>
@@ -43,7 +55,24 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
             cohorts.map((historyRow) => (
               <TableRow key={historyRow.uuid}>
                 <TableCell>
-                  <Link href={`/cohort/${historyRow.uuid}`}>{historyRow.name}</Link>
+                  {historyRow.fhir_group_id ? (
+                    <Link href={`/cohort/${historyRow.fhir_group_id}`}>{historyRow.name}</Link>
+                  ) : (
+                    <Typography className={classes.notAllowed}>{historyRow.name}</Typography>
+                  )}
+                </TableCell>
+                <TableCell align="center">
+                  {historyRow.fhir_group_id ? (
+                    <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
+                  ) : historyRow.request_job_status === 'pending' || historyRow.request_job_status === 'started' ? (
+                    <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
+                  ) : historyRow.request_job_fail_msg ? (
+                    <Tooltip title={historyRow.request_job_fail_msg}>
+                      <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
+                    </Tooltip>
+                  ) : (
+                    <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
+                  )}
                 </TableCell>
                 <TableCell align="center">
                   <Link
