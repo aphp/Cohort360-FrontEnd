@@ -3,36 +3,26 @@ import moment from 'moment'
 
 import { Box, Link, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@material-ui/core'
 
+import { useAppSelector } from 'state'
+import { CohortState } from 'state/cohort'
+
+import { CohortType } from 'services/myProjects'
+
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from '../styles'
 
 const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
   const classes = useStyles()
+  const { cohortState } = useAppSelector<{
+    cohortState: CohortState
+  }>((state) => ({
+    cohortState: state.cohort || {}
+  }))
 
-  const cohorts = [
-    {
-      uuid: '1',
-      name: 'Cohort 1',
-      version: '92c7ea',
-      result_size: Math.floor(Math.random() * 100000) + 1,
-      created_at: new Date().toString()
-    },
-    {
-      uuid: '2',
-      name: 'Cohort 2',
-      version: 'e718df',
-      result_size: Math.floor(Math.random() * 100000) + 1,
-      created_at: new Date().toString()
-    },
-    {
-      uuid: '3',
-      name: 'Cohort 3',
-      version: 'a37cd4',
-      result_size: Math.floor(Math.random() * 100000) + 1,
-      created_at: new Date().toString()
-    }
-  ]
+  const { cohortsList = [] } = cohortState
+
+  const cohorts: CohortType[] = cohortsList.filter(({ request_id }) => request_id === requestId) || []
 
   return (
     <Box className={classes.versionContainer}>
@@ -49,20 +39,39 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {cohorts.map((historyRow) => (
-            <TableRow key={historyRow.uuid}>
-              <TableCell>
-                <Link href={`/cohort/${historyRow.uuid}`}>{historyRow.name}</Link>
+          {cohorts && cohorts.length > 0 ? (
+            cohorts.map((historyRow) => (
+              <TableRow key={historyRow.uuid}>
+                <TableCell>
+                  <Link href={`/cohort/${historyRow.uuid}`}>{historyRow.name}</Link>
+                </TableCell>
+                <TableCell align="center">
+                  <Link
+                    className={classes.versionLabel}
+                    href={`/cohort/new/${requestId}/${historyRow.request_query_snapshot_id}`}
+                  >
+                    {historyRow.request_query_snapshot_id?.split('-')[0]}
+                  </Link>
+                </TableCell>
+                <TableCell align="center">{displayDigit(historyRow.result_size ?? 0)}</TableCell>
+                <TableCell align="center">{moment(historyRow.created_at).fromNow()}</TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={4}>
+                <Typography className={classes.emptyRequestRow}>
+                  Aucune version n'est liée à cette requête
+                  <br />
+                  Veuillez vous rendre sur la page de création en{' '}
+                  <Link style={{ display: 'contents', fontWeight: 900 }} href={`/cohort/new/${requestId}`}>
+                    cliquant ici
+                  </Link>{' '}
+                  et appuyer sur le bouton "Créer la cohorte"
+                </Typography>
               </TableCell>
-              <TableCell align="center">
-                <Link className={classes.versionLabel} href={`/cohort/new/${requestId}/${historyRow.version}`}>
-                  {historyRow.version}
-                </Link>
-              </TableCell>
-              <TableCell align="center">{displayDigit(historyRow.result_size)}</TableCell>
-              <TableCell align="center">{moment(historyRow.created_at).fromNow()}</TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
     </Box>

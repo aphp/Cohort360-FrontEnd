@@ -75,7 +75,7 @@ const ModalAddOrEditProject: React.FC<{
     }
 
     if (!selectedProject) return
-    if (selectedProject.uuid !== '') {
+    if (isEdition) {
       dispatch<any>(editProject({ editedProject: modalProjectState }))
     } else {
       dispatch<any>(addProject({ newProject: modalProjectState }))
@@ -86,7 +86,7 @@ const ModalAddOrEditProject: React.FC<{
     if (loading) return
     setLoading(true)
 
-    if (selectedProject !== null) {
+    if (isEdition && selectedProject !== null) {
       dispatch<any>(deleteProject({ deletedProject: selectedProject }))
     }
     onClose()
