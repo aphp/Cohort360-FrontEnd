@@ -12,6 +12,7 @@ import ModalAddOrEditRequest from 'components/Cohort/CreationCohort/Modals/Modal
 import { useAppSelector } from 'state'
 import { ProjectState, fetchProjects as fetchProjectsList, setSelectedProject } from 'state/project'
 import { RequestState, fetchRequests as fetchRequestsList, setSelectedRequest } from 'state/request'
+import { fetchCohorts as fetchCohortsList } from 'state/cohort'
 
 import useStyles from './styles'
 
@@ -42,9 +43,14 @@ const MyProjects = () => {
     dispatch<any>(fetchRequestsList())
   }
 
+  const _fetchCohortsList = async () => {
+    dispatch<any>(fetchCohortsList())
+  }
+
   const _fetch = async () => {
     await _fetchProjectsList()
     await _fetchRequestsList()
+    await _fetchCohortsList()
   }
 
   useEffect(() => {
