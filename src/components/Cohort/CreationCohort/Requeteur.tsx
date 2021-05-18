@@ -58,7 +58,7 @@ const Requeteur = () => {
           snapshotId: snapshotIdFromUrl
         })
       )
-      // history.push('/cohort/new')
+      history.replace('/cohort/new')
     } else if (!requestIdFromUrl && !requestId) {
       dispatch<any>(setSelectedRequest({ uuid: '', name: '' }))
     }

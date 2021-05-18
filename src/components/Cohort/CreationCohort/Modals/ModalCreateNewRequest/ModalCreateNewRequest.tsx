@@ -50,7 +50,7 @@ const ModalCreateNewRequest: React.FC<{
   const { selectedRequest } = requestState
 
   const isEdition = selectedRequest ? selectedRequest.uuid : false
-  const selectedProjectId = selectedRequest?.parent_folder_id
+  const selectedProjectId = selectedRequest?.parent_folder
 
   const [deletionConfirmation, setDeletionConfirmation] = useState(false)
 
@@ -65,7 +65,7 @@ const ModalCreateNewRequest: React.FC<{
     'error_title' | 'error_description' | 'error_project' | 'error_project_name' | null
   >(null)
 
-  const _onChangeValue = (key: 'name' | 'parent_folder_id' | 'description', value: string) => {
+  const _onChangeValue = (key: 'name' | 'parent_folder' | 'description', value: string) => {
     const _currentRequest: RequestType = currentRequest ? { ...currentRequest } : { uuid: '', name: '' }
     _currentRequest[key] = value
     setCurrentRequest(_currentRequest)
@@ -84,7 +84,7 @@ const ModalCreateNewRequest: React.FC<{
     // + Auto set the new project folder with 'Projet de recherche ...'
     if (projectsList && projectsList.length > 0) {
       if (!isEdition && !selectedProjectId) {
-        _onChangeValue('parent_folder_id', projectsList[0].uuid)
+        _onChangeValue('parent_folder', projectsList[0].uuid)
       }
       onChangeProjectName(`Projet de recherche ${projectsList.length || ''}`)
     }
@@ -127,20 +127,20 @@ const ModalCreateNewRequest: React.FC<{
       setLoading(false)
       return setError(ERROR_TITLE)
     }
-    if (!currentRequest.parent_folder_id) {
+    if (!currentRequest.parent_folder) {
       setLoading(false)
       return setError(ERROR_PROJECT)
     }
-    if (!currentRequest.parent_folder_id && !projectName) {
+    if (!currentRequest.parent_folder && !projectName) {
       setLoading(false)
       return setError(ERROR_PROJECT_NAME)
     }
 
-    if (currentRequest.parent_folder_id === NEW_PROJECT_ID) {
+    if (currentRequest.parent_folder === NEW_PROJECT_ID) {
       // Create a project before
       const newProject = await addProject({ uuid: '', name: projectName })
       if (newProject) {
-        currentRequest.parent_folder_id = newProject.uuid
+        currentRequest.parent_folder = newProject.uuid
       }
       dispatch<any>(fetchProjects())
     }
@@ -196,8 +196,8 @@ const ModalCreateNewRequest: React.FC<{
 
                 <Select
                   id="criteria-occurrenceComparator-select"
-                  value={currentRequest.parent_folder_id}
-                  onChange={(event) => _onChangeValue('parent_folder_id', event.target.value as string)}
+                  value={currentRequest.parent_folder}
+                  onChange={(event) => _onChangeValue('parent_folder', event.target.value as string)}
                   variant="outlined"
                   error={error === ERROR_PROJECT}
                   style={{ marginTop: 16, marginBottom: 8 }}
@@ -210,7 +210,7 @@ const ModalCreateNewRequest: React.FC<{
                   <MenuItem value={NEW_PROJECT_ID}>Nouveau projet</MenuItem>
                 </Select>
 
-                {currentRequest.parent_folder_id === NEW_PROJECT_ID && (
+                {currentRequest.parent_folder === NEW_PROJECT_ID && (
                   <TextField
                     placeholder="Nom du nouveau projet"
                     value={projectName}

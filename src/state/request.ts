@@ -170,7 +170,7 @@ const setRequestSlice = createSlice({
       const requestsList: RequestType[] = state.requestsList ?? []
       const selectedRequest = action.payload
       const selectedRequestId = selectedRequest?.uuid
-      const selectedProjectId = selectedRequest?.parent_folder_id
+      const selectedProjectId = selectedRequest?.parent_folder
 
       if (selectedRequest === null) {
         return {
@@ -191,7 +191,7 @@ const setRequestSlice = createSlice({
           selectedRequest: {
             uuid: '',
             name: `Nouvelle requête ${requestsList.length + 1}`,
-            parent_folder_id: selectedProjectId,
+            parent_folder: selectedProjectId,
             description: ''
           }
         }

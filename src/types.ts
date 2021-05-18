@@ -80,7 +80,7 @@ export type Cohort = {
   modified_at?: string
   favorite?: boolean
   type?: string
-  request_id?: string
+  request?: string
   request_job_status?: string
   request_job_fail_msg?: string
 }

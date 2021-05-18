@@ -114,32 +114,6 @@ const fetchRequestCohortCreation = createAsyncThunk<
   }
 })
 
-// /**
-//  *
-//  */
-// type CreateRequestCohortCreationParams = {
-//   name: string
-//   description: string | null
-//   projectId: string | null
-// }
-
-//   { requestId: string },
-//   CreateRequestCohortCreationParams,
-//   { state: RootState }
-// >('cohortCreation/createRequest', async ({ name, description, projectId }) => {
-//   try {
-//     const createRequestResult = await createRequest(name, description ?? '', projectId)
-//     if (!createRequestResult) {
-//       return { requestId: '' }
-//     }
-
-//     return { requestId: createRequestResult.uuid }
-//   } catch (error) {
-//     console.error(error)
-//     throw error
-//   }
-// })
-
 /**
  * countCohortCreation
  *
@@ -188,7 +162,6 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
       let { snapshotsHistory, currentSnapshot } = state.cohortCreation.request
 
       if (!snapshotsHistory || (snapshotsHistory && snapshotsHistory.length === 0)) {
-        // Create request + first snapshot
         if (requestId) {
           const newSnapshot = await createSnapshot(requestId, newJson, true)
           if (newSnapshot) {

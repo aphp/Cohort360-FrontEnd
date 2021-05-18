@@ -52,7 +52,7 @@ const ProjectTable: React.FC = () => {
             <ProjectRow
               key={project.uuid}
               row={project}
-              requestOfProject={requestsList.filter(({ parent_folder_id }) => parent_folder_id === project.uuid)}
+              requestOfProject={requestsList.filter(({ parent_folder }) => parent_folder === project.uuid)}
             />
           ))}
         </TableBody>

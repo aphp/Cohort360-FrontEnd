@@ -36,7 +36,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject }) => {
   }
 
   const handleAddRequest = () => {
-    dispatch<any>(setSelectedRequest({ uuid: '', name: '', parent_folder_id: row.uuid }))
+    dispatch<any>(setSelectedRequest({ uuid: '', name: '', parent_folder: row.uuid }))
   }
 
   return (

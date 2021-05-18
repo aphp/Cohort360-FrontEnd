@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
   },
   versionLabel: {
     background: '#0262ae',
-    color: 'white',
+    color: 'white !important',
     padding: '4px 12px',
     borderRadius: 12,
     height: 25,
