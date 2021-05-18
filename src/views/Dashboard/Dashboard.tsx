@@ -26,10 +26,11 @@ type Tabs = { label: string; value: string; to: string; disabled: boolean | unde
 const Dashboard: React.FC<{
   context: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'
 }> = ({ context }) => {
-  const { cohortId, tabName } = useParams<{
-    cohortId?: string | undefined
-    tabName?: string | undefined
-  }>()
+  const { cohortId, tabName } =
+    useParams<{
+      cohortId?: string | undefined
+      tabName?: string | undefined
+    }>()
 
   const dispatch = useDispatch()
   const classes = useStyles()
