@@ -2,7 +2,7 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import moment from 'moment'
 
-import { Button, Collapse, IconButton, TableCell, TableRow, Typography } from '@material-ui/core'
+import { Button, Collapse, IconButton, TableCell, TableRow, Typography, Tooltip } from '@material-ui/core'
 
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
@@ -36,7 +36,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject }) => {
   }
 
   const handleAddRequest = () => {
-    dispatch<any>(setSelectedRequest(''))
+    dispatch<any>(setSelectedRequest({ uuid: '', name: '', parent_folder: row.uuid }))
   }
 
   return (
@@ -50,9 +50,22 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject }) => {
         <TableCell />
         <TableCell className={classes.tdName}>
           <Typography style={{ fontWeight: 900, display: 'inline-table' }}>{row.name}</Typography>
-          <IconButton onClick={() => handleClickAddOrEditProject(row.uuid)} className={classes.editButon} size="small">
-            <EditIcon />
-          </IconButton>
+          <Tooltip title={'Modifier le projet'}>
+            <IconButton
+              onClick={() => handleClickAddOrEditProject(row.uuid)}
+              className={classes.editButon}
+              size="small"
+            >
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+          {requestOfProject && requestOfProject.length > 0 && (
+            <Tooltip title={'Ajouter une requête'}>
+              <IconButton onClick={handleAddRequest} className={classes.smallAddButon} size="small">
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+          )}
         </TableCell>
         <TableCell className={classes.dateCell} align="center">
           {moment(row.created_at).format('DD/MM/YYYY [à] HH:mm')}
@@ -66,13 +79,14 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject }) => {
               requestOfProject.map((request) => <RequestRow key={request.uuid} row={request} />)
             ) : (
               <Typography className={classes.emptyRequestRow}>
-                Aucune requête n'est associée a ce projet de recherche
+                Aucune requête n'est associée à ce projet de recherche
                 <Button
                   variant="contained"
                   startIcon={<AddIcon />}
                   size="small"
                   onClick={handleAddRequest}
                   className={classes.addButton}
+                  style={{ margin: 4 }}
                 >
                   Ajouter une requête
                 </Button>

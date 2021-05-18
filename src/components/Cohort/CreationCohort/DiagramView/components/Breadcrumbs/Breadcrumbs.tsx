@@ -1,38 +1,60 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
 
-import { Breadcrumbs, Grid, Link } from '@material-ui/core'
+import { Breadcrumbs, Grid, Typography } from '@material-ui/core'
 
 import { useAppSelector } from 'state'
+import { fetchProjects as fetchProjectsList } from 'state/project'
+import { fetchRequests as fetchRequestsList } from 'state/request'
 
 import useStyles from './styles'
 
 const CohortCreationBreadcrumbs: React.FC = () => {
-  const {
-    projectName = 'Mon projet principal',
-    requestName = 'Nouvelle requête',
-    currentSnapshot
-  } = useAppSelector((state) => state.cohortCreation.request || {})
-
   const classes = useStyles()
+  const dispatch = useDispatch()
 
-  function handleClick(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
-    event.preventDefault()
-  }
+  const {
+    request: { requestId, currentSnapshot },
+    projects = [],
+    requests = []
+  } = useAppSelector(
+    (state) =>
+      ({
+        request: state.cohortCreation.request,
+        projects: state.project.projectsList,
+        requests: state.request.requestsList
+      } || {
+        request: { requestId: null, currentSnapshot: [] },
+        projects: [],
+        requests: []
+      })
+  )
+  const [projectName, setProjectName] = useState('Projet de recherche')
+  const [requestName, setRequestName] = useState('Requête')
+
+  useEffect(() => {
+    if (!projects || (projects && projects.length === 0)) {
+      dispatch(fetchProjectsList())
+    } else if (!requests || (requests && requests.length === 0)) {
+      dispatch(fetchRequestsList())
+    } else {
+      const foundItem = requests.find(({ uuid }) => uuid === requestId)
+      if (foundItem) {
+        setRequestName(foundItem.name)
+        const foundProject = projects.find(({ uuid }) => uuid === foundItem.parent_folder)
+        if (foundProject) {
+          setProjectName(foundProject.name)
+        }
+      }
+    }
+  }, [projects, requests])
 
   return (
     <Grid container className={classes.root}>
       <Breadcrumbs separator=">" aria-label="breadcrumb">
-        <Link color="inherit" href="/" onClick={handleClick}>
-          {projectName}
-        </Link>
-        <Link color="inherit" href="/getting-started/installation/" onClick={handleClick}>
-          {requestName}
-        </Link>
-        {currentSnapshot && currentSnapshot.length > 0 && (
-          <Link color="inherit" href="/getting-started/installation/" onClick={handleClick}>
-            {currentSnapshot.split('-')[0]}
-          </Link>
-        )}
+        <Typography>{projectName}</Typography>
+        <Typography>{requestName}</Typography>
+        {currentSnapshot && currentSnapshot.length > 0 && <Typography>{currentSnapshot.split('-')[0]}</Typography>}
       </Breadcrumbs>
     </Grid>
   )

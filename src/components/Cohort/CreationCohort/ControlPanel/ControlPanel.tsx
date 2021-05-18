@@ -12,8 +12,14 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff'
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 
 import { useAppSelector } from 'state'
-import { resetCohortCreation, countCohortCreation } from 'state/cohortCreation'
-import { editCriteriaGroup, deleteCriteriaGroup, buildCohortCreation } from 'state/cohortCreation'
+import {
+  resetCohortCreation,
+  countCohortCreation,
+  editCriteriaGroup,
+  deleteCriteriaGroup,
+  buildCohortCreation
+} from 'state/cohortCreation'
+import { setSelectedRequest } from 'state/request'
 
 import useStyle from './styles'
 
@@ -141,7 +147,10 @@ const ControlPanel: React.FC<{
           <Divider />
 
           <Button
-            onClick={() => dispatch<any>(resetCohortCreation())}
+            onClick={() => {
+              dispatch<any>(setSelectedRequest({ uuid: '', name: '' }))
+              dispatch<any>(resetCohortCreation())
+            }}
             className={classes.actionButton}
             startIcon={<UpdateSharpIcon color="action" className={classes.iconBorder} />}
           >
