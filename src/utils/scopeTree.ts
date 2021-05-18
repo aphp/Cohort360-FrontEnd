@@ -61,7 +61,7 @@ export const getSelectedScopes = (
     savedSelectedItems = [...savedSelectedItems, ...getRowAndChildren(row)]
   }
 
-  let _savedSelectedItems = []
+  let _savedSelectedItems: any[] = []
   const checkIfParentIsChecked = (rows: ScopeTreeRow[]) => {
     for (let index = 0; index < rows.length; index++) {
       const row = rows[index]
@@ -86,6 +86,8 @@ export const getSelectedScopes = (
       } else if (
         foundItem &&
         foundItem.subItems &&
+        foundItem.subItems.length > 0 &&
+        foundItem.subItems[0].id !== 'loading' &&
         selectedChildren.length !== foundItem.subItems.length &&
         isNotSelected !== -1
       ) {
