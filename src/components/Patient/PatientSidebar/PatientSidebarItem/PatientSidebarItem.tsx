@@ -61,10 +61,11 @@ const PatientSidebarItem: React.FC<PatientSidebarItemTypes> = ({
   ipp,
   deceased
 }) => {
-  const { patientId, tabName } = useParams<{
-    patientId: string
-    tabName: string
-  }>()
+  const { patientId, tabName } =
+    useParams<{
+      patientId: string
+      tabName: string
+    }>()
 
   const classes = useStyles()
   const history = useHistory()
