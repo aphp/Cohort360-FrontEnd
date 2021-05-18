@@ -8,28 +8,32 @@ import AddIcon from '@material-ui/icons/Add'
 import ProjectTable from 'components/MyProjects/ProjectTable/ProjectTable'
 import ModalAddOrEditProject from 'components/MyProjects/Modals/ModalAddOrEditProject/ModalAddOrEditProject'
 import ModalAddOrEditRequest from 'components/Cohort/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
+import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
 
 import { useAppSelector } from 'state'
 import { ProjectState, fetchProjects as fetchProjectsList, setSelectedProject } from 'state/project'
 import { RequestState, fetchRequests as fetchRequestsList, setSelectedRequest } from 'state/request'
-import { fetchCohorts as fetchCohortsList } from 'state/cohort'
+import { CohortState, fetchCohorts as fetchCohortsList, setSelectedCohort } from 'state/cohort'
 
 import useStyles from './styles'
 
 const MyProjects = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const { open, projectState, requestState } = useAppSelector<{
+  const { open, projectState, requestState, cohortState } = useAppSelector<{
     open: boolean
     projectState: ProjectState
     requestState: RequestState
+    cohortState: CohortState
   }>((state) => ({
     open: state.drawer,
     projectState: state.project,
-    requestState: state.request
+    requestState: state.request,
+    cohortState: state.cohort
   }))
   const { selectedProject } = projectState
   const { selectedRequest } = requestState
+  const { selectedCohort } = cohortState
 
   const loadingProject = projectState.loading
   const loadingRequest = requestState.loading
@@ -112,6 +116,8 @@ const MyProjects = () => {
       />
 
       {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch<any>(setSelectedRequest(null))} />}
+
+      <ModalEditCohort open={selectedCohort !== null} onClose={() => dispatch<any>(setSelectedCohort(null))} />
     </>
   )
 }

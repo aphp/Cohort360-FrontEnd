@@ -98,15 +98,22 @@ const fetchRequestCohortCreation = createAsyncThunk<
     const requestResult = await fetchRequest(requestId, snapshotId)
     if (!requestResult) return {}
 
-    const { json, currentSnapshot, snapshotsHistory } = requestResult
+    const { json, currentSnapshot, snapshotsHistory, count } = requestResult
 
-    dispatch<any>(unbuildCohortCreation({ newCurrentSnapshot: snapshotsHistory[0] as CohortCreationSnapshotType }))
+    console.log(`snapshotsHistory toto`, snapshotsHistory)
+
+    dispatch<any>(
+      unbuildCohortCreation({
+        newCurrentSnapshot: snapshotsHistory[0] as CohortCreationSnapshotType
+      })
+    )
 
     return {
       json,
       requestId,
       snapshotsHistory: snapshotsHistory.reverse(),
-      currentSnapshot
+      currentSnapshot,
+      count
     }
   } catch (error) {
     console.error(error)
@@ -279,13 +286,14 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
   async ({ newCurrentSnapshot }, { getState, dispatch }) => {
     try {
       const state = getState()
+      console.log(`state`, state)
       const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot.json)
+
+      const countId = ''
 
       dispatch<any>(
         countCohortCreation({
-          json: newCurrentSnapshot.json,
-          snapshotId: newCurrentSnapshot.uuid,
-          requestId: state.cohortCreation.request.requestId
+          uuid: countId
         })
       )
 

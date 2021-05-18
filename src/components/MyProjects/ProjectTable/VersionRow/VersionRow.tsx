@@ -1,9 +1,11 @@
 import React from 'react'
+import { useDispatch } from 'react-redux'
 import moment from 'moment'
 
 import {
   Box,
   Chip,
+  IconButton,
   Link,
   Table,
   TableBody,
@@ -14,8 +16,10 @@ import {
   Typography
 } from '@material-ui/core'
 
+import EditIcon from '@material-ui/icons/Edit'
+
 import { useAppSelector } from 'state'
-import { CohortState } from 'state/cohort'
+import { CohortState, setSelectedCohort } from 'state/cohort'
 
 import { CohortType } from 'services/myProjects'
 
@@ -25,6 +29,7 @@ import useStyles from '../styles'
 
 const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
   const classes = useStyles()
+  const dispatch = useDispatch()
   const { cohortState } = useAppSelector<{
     cohortState: CohortState
   }>((state) => ({
@@ -35,8 +40,9 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
 
   const cohorts: CohortType[] = cohortsList.filter(({ request }) => request === requestId) || []
 
-  console.log('cohorts :>> ', cohorts)
-
+  const _handleEditCohort = (cohortId: string) => {
+    dispatch<any>(setSelectedCohort(cohortId))
+  }
   return (
     <Box className={classes.versionContainer}>
       <Typography variant="h6" gutterBottom component="div">
@@ -46,22 +52,37 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
         <TableHead>
           <TableRow>
             <TableCell>Nom</TableCell>
-            <TableCell align="center">Status</TableCell>
-            <TableCell align="center">Cohorte</TableCell>
-            <TableCell align="center">Nombre de patients</TableCell>
-            <TableCell align="center">Date</TableCell>
+            <TableCell align="center" style={{ width: 150 }}>
+              Status
+            </TableCell>
+            <TableCell align="center" style={{ width: 150 }}>
+              Version
+            </TableCell>
+            <TableCell align="center" style={{ width: 150 }}>
+              Nombre de patients
+            </TableCell>
+            <TableCell align="center" style={{ width: 150 }}>
+              Date
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {cohorts && cohorts.length > 0 ? (
             cohorts.map((historyRow) => (
               <TableRow key={historyRow.uuid}>
-                <TableCell>
+                <TableCell className={classes.tdName}>
                   {historyRow.fhir_group_id ? (
                     <Link href={`/cohort/${historyRow.fhir_group_id}`}>{historyRow.name}</Link>
                   ) : (
                     <Typography className={classes.notAllowed}>{historyRow.name}</Typography>
                   )}
+                  <IconButton
+                    className={classes.editButon}
+                    size="small"
+                    onClick={() => _handleEditCohort(historyRow.uuid)}
+                  >
+                    <EditIcon />
+                  </IconButton>
                 </TableCell>
                 <TableCell align="center">
                   {historyRow.fhir_group_id ? (
@@ -90,7 +111,7 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={4}>
+              <TableCell colSpan={5}>
                 <Typography className={classes.emptyRequestRow}>
                   Aucune cohorte n'est liée à cette requête
                   <br />
