@@ -33,10 +33,11 @@ import useStyles from './styles'
 
 const Patient = () => {
   const classes = useStyles()
-  const { patientId, tabName } = useParams<{
-    patientId: string
-    tabName: string
-  }>()
+  const { patientId, tabName } =
+    useParams<{
+      patientId: string
+      tabName: string
+    }>()
 
   const [patient, setPatient] = useState<CohortPatient | undefined>(undefined)
   const [loading, setLoading] = useState(true)
