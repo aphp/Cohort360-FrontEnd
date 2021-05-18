@@ -720,23 +720,29 @@ export const fetchPatient = async (patientId: string, groupId?: string): Promise
   } else if (CONTEXT === 'aphp') {
     const groupFilter = groupId ? `&_list=${groupId}` : ''
 
-    const [patientResponse, procedureResponse, encounterResponse, diagnosticResponse, ghmResponse, documentsResponse] =
-      await Promise.all([
-        api.get<FHIR_API_Response<IPatient>>(`/Patient?_id=${patientId}${groupFilter}`),
-        api.get<FHIR_API_Response<IProcedure>>(
-          `/Procedure?patient=${patientId}&_sort=-date&status=completed&size=20${groupFilter}`
-        ),
-        api.get<FHIR_API_Response<IEncounter>>(
-          `/Encounter?patient=${patientId}&type=VISIT&status=arrived,triaged,in-progress,onleave,finished,unknown&_sort=-start-date${groupFilter}`
-        ),
-        api.get<FHIR_API_Response<ICondition>>(
-          `/Condition?patient=${patientId}&_sort=-recorded-date&size=20${groupFilter}`
-        ),
-        api.get<FHIR_API_Response<IClaim>>(`/Claim?patient=${patientId}&_sort=-created&size=20${groupFilter}`),
-        api.get<FHIR_API_Response<IComposition>>(
-          `/Composition?patient=${patientId}&size=20&_sort=-date&status=final&_elements=status,type,encounter,date,title${groupFilter}`
-        )
-      ])
+    const [
+      patientResponse,
+      procedureResponse,
+      encounterResponse,
+      diagnosticResponse,
+      ghmResponse,
+      documentsResponse
+    ] = await Promise.all([
+      api.get<FHIR_API_Response<IPatient>>(`/Patient?_id=${patientId}${groupFilter}`),
+      api.get<FHIR_API_Response<IProcedure>>(
+        `/Procedure?patient=${patientId}&_sort=-date&status=completed&size=20${groupFilter}`
+      ),
+      api.get<FHIR_API_Response<IEncounter>>(
+        `/Encounter?patient=${patientId}&type=VISIT&status=arrived,triaged,in-progress,onleave,finished,unknown&_sort=-start-date${groupFilter}`
+      ),
+      api.get<FHIR_API_Response<ICondition>>(
+        `/Condition?patient=${patientId}&_sort=-recorded-date&size=20${groupFilter}`
+      ),
+      api.get<FHIR_API_Response<IClaim>>(`/Claim?patient=${patientId}&_sort=-created&size=20${groupFilter}`),
+      api.get<FHIR_API_Response<IComposition>>(
+        `/Composition?patient=${patientId}&size=20&_sort=-date&status=final&_elements=status,type,encounter,date,title${groupFilter}`
+      )
+    ])
 
     const patientData = getApiResponseResources(patientResponse)
 
