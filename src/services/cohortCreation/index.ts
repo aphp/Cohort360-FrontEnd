@@ -101,7 +101,7 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
     const snapshotsHistoryFromQuery: {
       uuid: string
       serialized_query: string
-      previous_snapshot_id: string
+      previous_snapshot: string
       created_at: string
     }[] = data.results
 
@@ -116,9 +116,9 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
     if (currentSnapshot) {
       let nextSnap = currentSnapshot.uuid
       snapshotsHistory = snapshotsHistoryFromQuery
-        .map(({ uuid, serialized_query, created_at, previous_snapshot_id }) => {
+        .map(({ uuid, serialized_query, created_at, previous_snapshot }) => {
           if (nextSnap === uuid) {
-            nextSnap = previous_snapshot_id
+            nextSnap = previous_snapshot
             return {
               uuid: uuid,
               json: serialized_query,

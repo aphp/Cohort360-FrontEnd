@@ -54,12 +54,12 @@ export const fetchProjectsList = async (limit = 100, offset = 0) => {
         results: myProjects
       }
     default: {
-      let search = `?`
+      let search = `?ordering=created_at`
       if (limit) {
         search += `limit=${limit}`
       }
       if (offset) {
-        search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
+        search += search === '?ordering=created_at' ? `offset=${offset}` : `&offset=${offset}`
       }
 
       const fetchProjectsResponse = (await apiBack.get<{
@@ -124,7 +124,7 @@ export const editProject = async (editedProject: ProjectType) => {
       default: {
         const editProjectResponse = (await apiBack.patch(`/explorations/folders/${editedProject.uuid}/`, {
           name: editedProject.name,
-          parent_folder_id: editedProject.uuid
+          parent_folder: editedProject.uuid
         })) ?? {
           data: { results: [] }
         }
@@ -176,7 +176,7 @@ export const deleteProject = async (deletedProject: ProjectType) => {
 export type RequestType = {
   uuid: string
   name: string
-  parent_folder_id?: string
+  parent_folder?: string
   description?: string
   owner_id?: string
   data_type_of_query?: string
@@ -219,24 +219,24 @@ export const addRequest = async (newRequest: RequestType) => {
       case 'fakedata':
         return {
           ...newRequest,
-          parent_folder_id: `${Math.floor(Math.random() * 1000) + 1}`
+          parent_folder: `${Math.floor(Math.random() * 1000) + 1}`
         }
       case 'arkhn':
         return {
           ...newRequest,
-          parent_folder_id: `${Math.floor(Math.random() * 1000) + 1}`
+          parent_folder: `${Math.floor(Math.random() * 1000) + 1}`
         }
       default: {
         const addRequestResponse = (await apiBack.post(`/explorations/requests/`, {
           ...newRequest,
-          parent_folder: newRequest.parent_folder_id
+          parent_folder: newRequest.parent_folder
         })) ?? { status: 400 }
         if (addRequestResponse.status === 201) {
           return addRequestResponse.data as ProjectType
         } else {
           return {
             ...newRequest,
-            parent_folder_id: `${Math.floor(Math.random() * 1000) + 1}`
+            parent_folder: `${Math.floor(Math.random() * 1000) + 1}`
           }
         }
       }
@@ -257,7 +257,7 @@ export const editRequest = async (editedRequest: RequestType) => {
         const editProjectResponse = (await apiBack.patch(`/explorations/requests/${editedRequest.uuid}/`, {
           name: editedRequest.name,
           description: editedRequest.description,
-          parent_folder_id: editedRequest.parent_folder_id
+          parent_folder: editedRequest.parent_folder
         })) ?? { status: 400 }
         if (editProjectResponse.status === 200) {
           return editProjectResponse.data as ProjectType
@@ -304,11 +304,11 @@ export type CohortType = {
   favorite?: boolean
   fhir_group_id?: string
   owner_id?: string
-  request_id?: string
+  request?: string
   request_job_duration?: string
   request_job_fail_msg?: string
   request_job_status?: string
-  request_query_snapshot_id?: string
+  request_query_snapshot?: string
   result_size?: number
   created_at?: string
   modified_at?: string
@@ -344,12 +344,12 @@ export const addCohort = async (newCohort: CohortType) => {
       case 'fakedata':
         return {
           ...newCohort,
-          parent_folder_id: `${Math.floor(Math.random() * 1000) + 1}`
+          parent_folder: `${Math.floor(Math.random() * 1000) + 1}`
         } as CohortType
       case 'arkhn':
         return {
           ...newCohort,
-          parent_folder_id: `${Math.floor(Math.random() * 1000) + 1}`
+          parent_folder: `${Math.floor(Math.random() * 1000) + 1}`
         } as CohortType
       default: {
         const addCohortResponse = (await apiBack.post(`/explorations/requests/`, newCohort)) ?? { status: 400 }
@@ -358,7 +358,7 @@ export const addCohort = async (newCohort: CohortType) => {
         } else {
           return {
             ...newCohort,
-            parent_folder_id: `${Math.floor(Math.random() * 1000) + 1}`
+            parent_folder: `${Math.floor(Math.random() * 1000) + 1}`
           } as CohortType
         }
       }

@@ -31,8 +31,10 @@ const ProjectTable: React.FC = () => {
           <TableRow className={classes.tableHead}>
             <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62 }} />
             <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62 }} />
-            <TableCell className={classes.tableHeadCell}>Titre</TableCell>
-            <TableCell className={`${classes.tableHeadCell} ${classes.dateCell}`} align="center">
+            <TableCell className={classes.tableHeadCell} style={{ width: 'calc(100% - 300px' }}>
+              Titre
+            </TableCell>
+            <TableCell className={classes.tableHeadCell} align="center" style={{ width: 175 }}>
               Date
             </TableCell>
           </TableRow>
@@ -50,7 +52,7 @@ const ProjectTable: React.FC = () => {
             <ProjectRow
               key={project.uuid}
               row={project}
-              requestOfProject={requestsList.filter(({ parent_folder_id }) => parent_folder_id === project.uuid)}
+              requestOfProject={requestsList.filter(({ parent_folder }) => parent_folder === project.uuid)}
             />
           ))}
         </TableBody>

@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   },
   tdName: {
     '&:hover > button': {
-      display: 'inline-table'
+      display: 'inline-flex'
     }
   },
   editButon: {
@@ -40,9 +40,18 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: '#f4F2F2'
     }
   },
+  smallAddButon: {
+    display: 'none',
+    color: '#fff',
+    backgroundColor: '#5BC5F2 !important',
+    marginLeft: theme.spacing(1),
+    '& svg': {
+      color: '#fff',
+      fontSize: 16
+    }
+  },
   dateCell: {
-    width: '20%',
-    minWidth: 150
+    width: 175
   },
   versionContainer: {
     padding: theme.spacing(2),
@@ -50,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
   },
   versionLabel: {
     background: '#0262ae',
-    color: 'white',
+    color: 'white !important',
     padding: '4px 12px',
     borderRadius: 12,
     height: 25,
@@ -70,7 +79,8 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     flexDirection: 'column',
     textAlign: 'center'
-  }
+  },
+  notAllowed: { cursor: 'not-allowed' }
 }))
 
 export default useStyles
