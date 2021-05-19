@@ -74,7 +74,9 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
                   {historyRow.fhir_group_id ? (
                     <Link href={`/cohort/${historyRow.fhir_group_id}`}>{historyRow.name}</Link>
                   ) : (
-                    <Typography className={classes.notAllowed}>{historyRow.name}</Typography>
+                    <Typography component="span" className={classes.notAllowed}>
+                      {historyRow.name}
+                    </Typography>
                   )}
                   <IconButton
                     className={classes.editButon}

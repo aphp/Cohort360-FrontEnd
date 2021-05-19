@@ -53,6 +53,7 @@ const Requeteur = () => {
   const _fetchRequest = useCallback(async () => {
     setRequestLoading(true)
     if (requestIdFromUrl) {
+      dispatch<any>(resetCohortCreation())
       dispatch<any>(
         fetchRequestCohortCreation({
           requestId: requestIdFromUrl,

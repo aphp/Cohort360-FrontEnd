@@ -100,8 +100,6 @@ const fetchRequestCohortCreation = createAsyncThunk<
 
     const { json, currentSnapshot, snapshotsHistory, count } = requestResult
 
-    console.log(`snapshotsHistory toto`, snapshotsHistory)
-
     dispatch<any>(
       unbuildCohortCreation({
         newCurrentSnapshot: snapshotsHistory[0] as CohortCreationSnapshotType
@@ -286,16 +284,28 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
   async ({ newCurrentSnapshot }, { getState, dispatch }) => {
     try {
       const state = getState()
-      console.log(`state`, state)
       const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot.json)
 
-      const countId = ''
+      const dated_measures = newCurrentSnapshot.dated_measures
+        ? newCurrentSnapshot.dated_measures[newCurrentSnapshot.dated_measures.length - 1]
+        : null
+      const countId = dated_measures ? dated_measures.uuid : null
 
-      dispatch<any>(
-        countCohortCreation({
-          uuid: countId
-        })
-      )
+      if (countId) {
+        dispatch<any>(
+          countCohortCreation({
+            uuid: countId
+          })
+        )
+      } else {
+        dispatch<any>(
+          countCohortCreation({
+            json: newCurrentSnapshot.json,
+            snapshotId: newCurrentSnapshot.uuid,
+            requestId: state.cohortCreation.request.requestId
+          })
+        )
+      }
 
       return {
         json: newCurrentSnapshot.json,

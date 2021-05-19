@@ -119,13 +119,14 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
     if (currentSnapshot) {
       let nextSnap = currentSnapshot.uuid
       snapshotsHistory = snapshotsHistoryFromQuery
-        .map(({ uuid, serialized_query, created_at, previous_snapshot }) => {
+        .map(({ uuid, serialized_query, created_at, previous_snapshot, dated_measures }) => {
           if (nextSnap === uuid) {
             nextSnap = previous_snapshot
             return {
               uuid: uuid,
               json: serialized_query,
-              date: created_at
+              date: created_at,
+              dated_measures
             }
           } else {
             return {

@@ -19,9 +19,9 @@ import useStyles from './styles'
 
 const RechercherPatient: React.FC<{}> = () => {
   const classes = useStyles()
-  const { search } = useParams()
   const dispatch = useDispatch()
   const practitioner = useAppSelector((state) => state.me)
+  const { search } = useParams<{ search: string }>()
 
   const [showTable, setShowTable] = useState(false)
   const [patientResults, setPatientResults] = useState<IPatient[]>([])
