@@ -366,6 +366,7 @@ export type CohortCreationSnapshotType = {
   uuid: string
   json: string
   date: string
+  dated_measures?: any[]
 }
 
 export type ValueSet = {

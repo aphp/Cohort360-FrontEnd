@@ -1,8 +1,8 @@
 import React from 'react'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { ApolloProvider } from '@apollo/react-hooks'
+import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { enableMapSet } from 'immer'
-import ApolloClient from 'apollo-boost'
 import { Provider } from 'react-redux'
 import MomentUtils from '@date-io/moment'
 import moment from 'moment'
@@ -18,6 +18,7 @@ import { AUTH_API_URL } from './constants'
 import 'moment/locale/fr'
 
 const authClient = new ApolloClient({
+  cache: new InMemoryCache(),
   uri: AUTH_API_URL
 })
 
