@@ -185,7 +185,7 @@ const setCohortSlice = createSlice({
             ...state,
             selectedCohort: {
               uuid: '',
-              name: `Cohort ${cohortsList.length + 1}`
+              name: `Cohort ${(cohortsList.length || 0) + 1}`
             }
           }
         default: {

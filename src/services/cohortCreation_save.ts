@@ -125,7 +125,7 @@ export const patchCohortMembers = async (params: {
   cohort: IGroup
 }): Promise<IGroup_Member[]> => {
   const { includedPatients, excludedPatients, cohort } = params
-  let newMembers = [...cohort.member]
+  let newMembers = cohort.member ? [...cohort.member] : []
 
   const excludedReferences = excludedPatients.map((p) => `Patient/${p.id}`)
   newMembers = newMembers.filter((member) =>

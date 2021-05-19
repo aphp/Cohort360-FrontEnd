@@ -1,6 +1,8 @@
 import apiBack from '../apiBackCohort'
 import { CONTEXT } from '../../constants'
 
+import { CohortCreationCounterType } from 'types'
+
 export const countCohort = async (requeteurJson?: string, snapshotId?: string, requestId?: string, uuid?: string) => {
   if (uuid) {
     const measureResult = await apiBack.get(`/explorations/dated-measures/${uuid}/`)
@@ -102,6 +104,7 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
       uuid: string
       serialized_query: string
       previous_snapshot: string
+      dated_measures: CohortCreationCounterType[]
       created_at: string
     }[] = data.results
 
@@ -116,13 +119,14 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
     if (currentSnapshot) {
       let nextSnap = currentSnapshot.uuid
       snapshotsHistory = snapshotsHistoryFromQuery
-        .map(({ uuid, serialized_query, created_at, previous_snapshot }) => {
+        .map(({ uuid, serialized_query, created_at, previous_snapshot, dated_measures }) => {
           if (nextSnap === uuid) {
             nextSnap = previous_snapshot
             return {
               uuid: uuid,
               json: serialized_query,
-              date: created_at
+              date: created_at,
+              dated_measures
             }
           } else {
             return {
@@ -134,10 +138,12 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
         })
         .filter(({ uuid }) => uuid !== undefined)
     }
+
     result = {
       json: currentSnapshot ? currentSnapshot.serialized_query : '',
       currentSnapshot: currentSnapshot ? currentSnapshot.uuid : '',
-      snapshotsHistory: snapshotsHistory.filter(({ uuid }) => uuid !== undefined)
+      snapshotsHistory: snapshotsHistory.filter(({ uuid }) => uuid !== undefined),
+      count: currentSnapshot ? currentSnapshot.dated_measures[0] : {}
     }
     return result
   }

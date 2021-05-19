@@ -98,15 +98,20 @@ const fetchRequestCohortCreation = createAsyncThunk<
     const requestResult = await fetchRequest(requestId, snapshotId)
     if (!requestResult) return {}
 
-    const { json, currentSnapshot, snapshotsHistory } = requestResult
+    const { json, currentSnapshot, snapshotsHistory, count } = requestResult
 
-    dispatch<any>(unbuildCohortCreation({ newCurrentSnapshot: snapshotsHistory[0] as CohortCreationSnapshotType }))
+    dispatch<any>(
+      unbuildCohortCreation({
+        newCurrentSnapshot: snapshotsHistory[0] as CohortCreationSnapshotType
+      })
+    )
 
     return {
       json,
       requestId,
       snapshotsHistory: snapshotsHistory.reverse(),
-      currentSnapshot
+      currentSnapshot,
+      count
     }
   } catch (error) {
     console.error(error)
@@ -281,13 +286,26 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
       const state = getState()
       const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot.json)
 
-      dispatch<any>(
-        countCohortCreation({
-          json: newCurrentSnapshot.json,
-          snapshotId: newCurrentSnapshot.uuid,
-          requestId: state.cohortCreation.request.requestId
-        })
-      )
+      const dated_measures = newCurrentSnapshot.dated_measures
+        ? newCurrentSnapshot.dated_measures[newCurrentSnapshot.dated_measures.length - 1]
+        : null
+      const countId = dated_measures ? dated_measures.uuid : null
+
+      if (countId) {
+        dispatch<any>(
+          countCohortCreation({
+            uuid: countId
+          })
+        )
+      } else {
+        dispatch<any>(
+          countCohortCreation({
+            json: newCurrentSnapshot.json,
+            snapshotId: newCurrentSnapshot.uuid,
+            requestId: state.cohortCreation.request.requestId
+          })
+        )
+      }
 
       return {
         json: newCurrentSnapshot.json,
