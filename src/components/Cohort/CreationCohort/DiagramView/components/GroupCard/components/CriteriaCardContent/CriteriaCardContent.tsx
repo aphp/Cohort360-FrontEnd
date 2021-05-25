@@ -163,11 +163,11 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         content = (
           <>
             <Typography>
-              Dans <span className={classes.criteriaType}>Diagnostics CIM10</span>,
+              Dans <span className={classes.criteriaType}>Diagnostics</span>,
             </Typography>
             {_currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
               <>
-                <Typography>Diagnostic CIM sélectionné :</Typography>
+                <Typography>Diagnostic sélectionné :</Typography>
                 {_currentCriteria?.code?.map((code) => displaySelectedCIM10(code))}
               </>
             )}
