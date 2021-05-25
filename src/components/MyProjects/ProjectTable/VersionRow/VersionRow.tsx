@@ -38,7 +38,10 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
 
   const { cohortsList = [] } = cohortState
 
-  const cohorts: CohortType[] = cohortsList.filter(({ request }) => request === requestId) || []
+  const cohorts: CohortType[] =
+    cohortsList
+      .filter(({ request }) => request === requestId)
+      .sort((a, b) => +moment(a.created_at).format('x') - +moment(b.created_at).format('x')) || []
 
   const _handleEditCohort = (cohortId: string) => {
     dispatch<any>(setSelectedCohort(cohortId))
