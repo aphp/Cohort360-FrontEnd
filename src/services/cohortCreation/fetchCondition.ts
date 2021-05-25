@@ -1,6 +1,6 @@
 import { memoize } from 'lodash'
 
-import { CONTEXT } from '../../constants'
+import { CONDITION_VS_URL, CONTEXT } from '../../constants'
 import api from '../../services/api'
 import apiRequest from '../../services/apiRequest'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
@@ -86,9 +86,9 @@ type Code = {
   label?: string
 }
 
-const fetchICDValueSet = memoize(
+const fetchConditionValueSet = memoize(
   async (): Promise<Code[]> => {
-    const response = await api.get<FHIR_API_Response<IValueSet>>('/ValueSet?url=http://arkhn.com/icd9_VS') // FIXME: ICD10 ValueSet
+    const response = await api.get<FHIR_API_Response<IValueSet>>(`/ValueSet?url=${CONDITION_VS_URL}`)
     const valueSet = getApiResponseResources(response)
     if (!valueSet || valueSet.length === 0) return []
     return (
@@ -105,7 +105,7 @@ const fetchICDValueSet = memoize(
 // todo: check if the data syntax is correct when available
 export const fetchCim10Diagnostic = async (searchValue?: string) => {
   if (CONTEXT === 'arkhn') {
-    return fetchICDValueSet()
+    return fetchConditionValueSet()
   } else if (CONTEXT === 'fakedata') {
     return fakeValueSetCIM10 && fakeValueSetCIM10.length > 0
       ? fakeValueSetCIM10.map((_fakeValueSetCIM10: { code: string; display: string }) => ({
