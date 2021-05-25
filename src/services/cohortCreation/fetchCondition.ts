@@ -95,7 +95,7 @@ const fetchICDValueSet = memoize(
       valueSet[0]?.compose?.include[0]?.concept
         ?.map((value) => ({
           id: value.code,
-          label: `[${value.code}] ${value.display}`
+          label: `${value.code} - ${value.display}`
         }))
         .sort((a, b) => (a.label && b.label ? a.label.localeCompare(b.label) : 0)) ?? []
     )
