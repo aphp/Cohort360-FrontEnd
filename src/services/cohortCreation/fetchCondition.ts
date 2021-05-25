@@ -86,16 +86,16 @@ type Code = {
   label?: string
 }
 
-const fetchICD9ValueSet = memoize(
+const fetchICDValueSet = memoize(
   async (): Promise<Code[]> => {
-    const response = await api.get<FHIR_API_Response<IValueSet>>('/ValueSet?url=http://arkhn.com/icd9_VS')
+    const response = await api.get<FHIR_API_Response<IValueSet>>('/ValueSet?url=http://arkhn.com/icd9_VS') // FIXME: ICD10 ValueSet
     const valueSet = getApiResponseResources(response)
     if (!valueSet || valueSet.length === 0) return []
     return (
       valueSet[0]?.compose?.include[0]?.concept
         ?.map((value) => ({
           id: value.code,
-          label: value.display
+          label: `[${value.code}] ${value.display}`
         }))
         .sort((a, b) => (a.label && b.label ? a.label.localeCompare(b.label) : 0)) ?? []
     )
@@ -105,7 +105,7 @@ const fetchICD9ValueSet = memoize(
 // todo: check if the data syntax is correct when available
 export const fetchCim10Diagnostic = async (searchValue?: string) => {
   if (CONTEXT === 'arkhn') {
-    return fetchICD9ValueSet()
+    return fetchICDValueSet()
   } else if (CONTEXT === 'fakedata') {
     return fakeValueSetCIM10 && fakeValueSetCIM10.length > 0
       ? fakeValueSetCIM10.map((_fakeValueSetCIM10: { code: string; display: string }) => ({

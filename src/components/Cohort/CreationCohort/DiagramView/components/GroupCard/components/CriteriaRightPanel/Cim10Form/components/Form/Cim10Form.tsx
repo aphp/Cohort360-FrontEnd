@@ -84,13 +84,13 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             },
             {
               name: 'code',
-              label: 'Code CIM9', // FIXME: ICD10
+              label: 'Code CIM10',
               variant: 'outlined',
               type: 'autocomplete',
               multiple: true,
               autocompleteOptions: criteria?.data?.cim10Diagnostic || [],
               getAutocompleteOptions: getDiagOptions,
-              noOptionsText: 'Veuillez entrer un code ou un diagnostique CIM9' // FIXME: ICD10
+              noOptionsText: 'Veuillez entrer un code ou un diagnostique CIM10'
             }
             // {
             //   name: 'diagnosticType',
