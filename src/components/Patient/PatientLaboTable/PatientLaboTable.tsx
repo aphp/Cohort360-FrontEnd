@@ -17,6 +17,7 @@ import Pagination from '@material-ui/lab/Pagination'
 // import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
 import useStyles from './styles'
 import { CohortPatient } from 'types'
+import { IObservation } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 type PatientLaboTableProps = {
   patient: CohortPatient
@@ -27,17 +28,30 @@ const PatientLaboTable = ({ patient }: PatientLaboTableProps) => {
 
   const [page, setPage] = useState(1)
 
+  const labResultValue = (res: IObservation): string => {
+    if (res.valueQuantity) return `${res.valueQuantity.value} ${res.valueQuantity.unit}`
+    if (res.valueBoolean) return `${res.valueBoolean}`
+    if (res.valueString) return res.valueString
+    if (res.valueTime) return res.valueTime
+    if (res.valueDateTime) return res.valueDateTime
+    if (res.valueInteger) return res.valueInteger.toString()
+    if (res.valueRange?.low || res.valueRange?.high)
+      return `${res.valueRange.low?.value} ${res.valueRange.low?.unit} - ${res.valueRange.high?.value} ${res.valueRange.high?.unit}`
+    if (res.valuePeriod) return `${res.valuePeriod.start} - ${res.valuePeriod.end}`
+    if (res.valueRatio?.numerator || res.valueRatio?.denominator)
+      return `${res.valueRatio.numerator?.value} ${res.valueRatio.numerator?.unit} / ${res.valueRatio.denominator?.value} ${res.valueRatio.denominator?.unit}`
+    if (res.valueCodeableConcept?.text) return res.valueCodeableConcept.text
+    return '-'
+  }
+
   const patientLabResults =
     patient.labResults?.map((labResult) => ({
       id: labResult.id,
       type: labResult.code.coding?.[0].display,
       sampleType: labResult.bodySite ? labResult.bodySite.coding?.[0].code : '-',
       date: labResult.effectiveDateTime ? new Date(labResult.effectiveDateTime).toLocaleDateString('fr-FR') : '-',
-      value: labResult.valueQuantity
-        ? `${labResult.valueQuantity.value} ${labResult.valueQuantity.unit}`
-        : labResult.interpretation
-        ? labResult.interpretation[0].coding?.[0].code
-        : '-'
+      value: labResultValue(labResult),
+      interpretation: labResult.interpretation ? labResult.interpretation[0].coding?.[0].code : ''
     })) ?? []
 
   const labItemNumber = 5 //Number of desired lines in the lab item array
@@ -93,7 +107,9 @@ const PatientLaboTable = ({ patient }: PatientLaboTableProps) => {
                   <TableCell align="left">{res.type}</TableCell>
                   <TableCell align="center">{res.sampleType}</TableCell>
                   <TableCell align="center">{res.date}</TableCell>
-                  <TableCell align="center">{res.value}</TableCell>
+                  <TableCell align="center">
+                    {res.value} {res.interpretation ? `(${res.interpretation})` : ''}
+                  </TableCell>
                 </TableRow>
               )
             })}
