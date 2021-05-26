@@ -88,7 +88,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               variant: 'outlined',
               type: 'autocomplete',
               multiple: true,
-              autocompleteOptions: [],
+              autocompleteOptions: criteria?.data?.cim10Diagnostic || [],
               getAutocompleteOptions: getDiagOptions,
               noOptionsText: 'Veuillez entrer un code ou un diagnostic'
             }
