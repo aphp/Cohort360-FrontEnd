@@ -13,6 +13,7 @@ import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
 
 import { logout, login } from './me'
 import { addRequest, deleteRequest } from './request'
+import { deleteProject } from './project'
 
 import { createSnapshot, countCohort, fetchRequest } from 'services/cohortCreation'
 
@@ -414,8 +415,9 @@ const cohortCreationSlice = createSlice({
       const newRequestId = payload.requestsList ? payload.requestsList[payload.requestsList.length - 1].uuid : ''
       return { ...state, requestId: newRequestId, loading: false }
     })
-    // When you delete a request => reset cohort create (if current request is edited state)
+    // When you delete a request | folder => reset cohort create (if current request is edited state)
     builder.addCase(deleteRequest.fulfilled, () => defaultInitialState)
+    builder.addCase(deleteProject.fulfilled, () => defaultInitialState)
   }
 })
 

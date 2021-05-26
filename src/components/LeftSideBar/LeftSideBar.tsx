@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import clsx from 'clsx'
@@ -14,6 +14,7 @@ import {
   Link,
   List,
   ListItem,
+  ListItemText,
   ListItemIcon,
   Typography
 } from '@material-ui/core'
@@ -38,51 +39,35 @@ const smallDrawerWidth = 52
 const largeDrawerWidth = 260
 export { smallDrawerWidth, largeDrawerWidth }
 
-type LeftSideBarProps = {
-  open?: boolean
-}
-
-const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
+const LeftSideBar: React.FC = () => {
   const classes = useStyles()
-  const [list, setList] = useState(false)
-  const [list2, setList2] = useState(false)
   const history = useHistory()
+  const dispatch = useDispatch()
+
   const { practitioner, open } = useAppSelector((state) => ({
     practitioner: state.me,
     open: state.drawer
   }))
-  const dispatch = useDispatch()
 
-  useEffect(() => {
-    if (!practitioner) {
-      history.push('/')
-    }
-  }, [practitioner]) // eslint-disable-line
+  const [displayPatientList, setDisplayPatientList] = useState(false)
+  const [displaySearchList, setDisplaySearchList] = useState(false)
 
-  useEffect(() => {
-    if (props.open) {
+  const handleDrawerOpenOrClose = (value: boolean) => {
+    if (value) {
       dispatch<any>(openAction())
     } else {
       dispatch<any>(closeAction())
     }
-  }, [props.open]) // eslint-disable-line
-
-  const handleDrawerOpen = () => {
-    dispatch<any>(openAction())
   }
 
-  const handleDrawerClose = () => {
-    dispatch<any>(closeAction())
+  const onDisplayPatientList = () => {
+    dispatch<any>(openAction())
+    setDisplayPatientList(!displayPatientList)
   }
 
-  const handleNestedList = () => {
+  const onDisplaySearchList = () => {
     dispatch<any>(openAction())
-    setList(!list)
-  }
-
-  const handleNestedList2 = () => {
-    dispatch<any>(openAction())
-    setList2(!list2)
+    setDisplaySearchList(!displaySearchList)
   }
 
   return (
@@ -103,25 +88,20 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
         >
           <div className={classes.toolbar}>
             <img src={cohortLogo} alt="Cohort360 logo" className={open ? undefined : classes.hide} />
+
             <IconButton
-              onClick={handleDrawerClose}
-              className={clsx(classes.closeDrawerButton, {
-                [classes.hide]: !open
+              onClick={() => handleDrawerOpenOrClose(!open)}
+              className={clsx({
+                [classes.closeDrawerButton]: open,
+                [classes.menuButton]: !open
               })}
             >
-              <ChevronLeftIcon color="action" width="20px" />
-            </IconButton>
-            <IconButton
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              className={clsx(classes.menuButton, {
-                [classes.hide]: open
-              })}
-            >
-              <MenuIcon width="20px" fill="#FFF" />
+              {open ? <ChevronLeftIcon color="action" width="20px" /> : <MenuIcon width="20px" fill="#FFF" />}
             </IconButton>
           </div>
+
           <Divider />
+
           <List>
             <ListItem>
               <Grid container justify="space-between" alignItems="center" wrap="nowrap">
@@ -154,9 +134,9 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                 </Grid>
               </Grid>
             </ListItem>
-          </List>
-          <Divider />
-          <List>
+
+            <Divider />
+
             <ListItem>
               <ListItemIcon
                 className={clsx(classes.button, {
@@ -170,6 +150,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                   <Icon>add_circle</Icon>
                 </Link>
               </ListItemIcon>
+
               <Button
                 onClick={() => history.push('/cohort/new')}
                 className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
@@ -179,30 +160,29 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                 <Typography variant="h5">Nouvelle requête</Typography>
               </Button>
             </ListItem>
-            <Link href="/accueil" underline="none">
-              <ListItem button>
-                <ListItemIcon className={classes.listIcon}>
-                  <HomeIcon width="20px" fill="#FFF" />
-                </ListItemIcon>
-                <Typography className={classes.title}>Accueil</Typography>
-              </ListItem>
-            </Link>
-            <ListItem button onClick={handleNestedList}>
+
+            <Divider />
+
+            <ListItem>
+              <ListItemIcon className={classes.listIcon}>
+                <HomeIcon width="20px" fill="#FFF" />
+              </ListItemIcon>
+              <ListItemText className={classes.title} primary={'Accueil'} />
+            </ListItem>
+
+            <Divider />
+
+            <ListItem button onClick={onDisplayPatientList}>
               <ListItemIcon className={classes.listIcon}>
                 <PatientIcon width="20px" fill="#FFF" />
               </ListItemIcon>
-              <Grid container justify="space-between" alignItems="center" wrap="nowrap">
-                <Typography className={classes.title}>Mes patients</Typography>
-                {list ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
-              </Grid>
+              <ListItemText className={classes.title} primary={'Mes patients'} />
+              {displayPatientList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
             </ListItem>
+
             <Collapse
-              className={clsx(classes.drawer, classes.nestedList, {
-                [classes.drawerOpen]: open,
-                [classes.drawerClose]: !open,
-                [classes.hide]: !open
-              })}
-              in={list}
+              className={clsx(classes.nestedList, { [classes.hide]: !open })}
+              in={displayPatientList}
               timeout="auto"
               unmountOnExit
             >
@@ -226,17 +206,19 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                 </ListItem>
               </List>
             </Collapse>
-            <ListItem button onClick={handleNestedList2}>
+
+            <Divider />
+
+            <ListItem button onClick={onDisplaySearchList}>
               <ListItemIcon className={classes.listIcon}>
                 <ResearchIcon width="20px" fill="#FFF" />
               </ListItemIcon>
-              <Grid container justify="space-between" alignItems="center" wrap="nowrap">
-                <Typography className={classes.title}>Mes recherches</Typography>
-                {list2 ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
-              </Grid>
+              <ListItemText className={classes.title} primary={'Mes recherches'} />
+              {displayPatientList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
             </ListItem>
+
             <Collapse
-              in={list2}
+              in={displaySearchList}
               timeout="auto"
               unmountOnExit
               className={clsx(classes.nestedList, { [classes.hide]: !open })}

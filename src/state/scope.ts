@@ -102,8 +102,6 @@ const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScop
       _rootRows = await replaceSubItems(scopesList)
     }
 
-    console.log(`savedSelectedItems`, savedSelectedItems)
-
     return {
       scopesList: _rootRows,
       selectedItems: savedSelectedItems,

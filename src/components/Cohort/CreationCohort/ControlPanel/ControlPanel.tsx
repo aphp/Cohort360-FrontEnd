@@ -96,7 +96,7 @@ const ControlPanel: React.FC<{
         )
       }
     }
-    dispatch(buildCohortCreation)
+    dispatch(buildCohortCreation({}))
   }
 
   const itLoads = loading || countLoading || saveLoading
@@ -104,25 +104,21 @@ const ControlPanel: React.FC<{
   return (
     <>
       <Grid className={classes.rightPanelContainerStyle}>
-        <Grid>
-          <Grid container justify="center" className={classes.requestAction}>
-            <Button
-              disabled={itLoads || typeof onExecute !== 'function'}
-              onClick={() => onSetOpenModal('executeCohortConfirmation')}
-              className={classes.requestExecution}
-            >
-              {itLoads ? (
-                <>
-                  Veuillez patienter
-                  <CircularProgress style={{ marginLeft: '15px' }} size={30} />
-                </>
-              ) : (
-                'Créer la cohorte'
-              )}
-            </Button>
-          </Grid>
-
-          <Divider />
+        <Grid className={classes.container}>
+          <Button
+            disabled={itLoads || typeof onExecute !== 'function'}
+            onClick={() => onSetOpenModal('executeCohortConfirmation')}
+            className={classes.requestExecution}
+          >
+            {itLoads ? (
+              <>
+                Veuillez patienter
+                <CircularProgress style={{ marginLeft: '15px' }} size={30} />
+              </>
+            ) : (
+              <>Créer la cohorte</>
+            )}
+          </Button>
 
           <Button
             className={classes.actionButton}
@@ -133,8 +129,6 @@ const ControlPanel: React.FC<{
             <Typography className={classes.boldText}>Annuler</Typography>
           </Button>
 
-          <Divider />
-
           <Button
             className={classes.actionButton}
             onClick={onRedo}
@@ -143,8 +137,6 @@ const ControlPanel: React.FC<{
           >
             <Typography className={classes.boldText}>Rétablir</Typography>
           </Button>
-
-          <Divider />
 
           <Button
             onClick={() => {
@@ -172,15 +164,17 @@ const ControlPanel: React.FC<{
             </>
           )}
         </Grid>
-        <Divider />
-        <Grid>
+
+        <Grid className={classes.container}>
           <Grid container justify="space-between">
             <Typography className={clsx(classes.boldText, classes.patientTypo)}>ACCÈS:</Typography>
             <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
               {accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
             </Typography>
           </Grid>
+        </Grid>
 
+        <Grid className={classes.container}>
           <Grid container justify="space-between">
             <Typography className={clsx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS</Typography>
             {itLoads ? (
