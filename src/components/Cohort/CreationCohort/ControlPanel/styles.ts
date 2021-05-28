@@ -60,6 +60,9 @@ const useStyles = makeStyles(() =>
     blueText: {
       color: '#5BC5F2'
     },
+    redText: {
+      color: '#fc1847'
+    },
     iconBorder: {
       color: 'currentColor',
       position: 'absolute',

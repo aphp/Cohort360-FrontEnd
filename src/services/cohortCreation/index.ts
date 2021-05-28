@@ -97,8 +97,10 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
   } else if (CONTEXT === 'fakedata') {
     return null
   } else {
-    const requestResult = (await apiBack.get(`/explorations/requests/${requestId}/query-snapshots/`)) || {}
-    const data = requestResult?.data ? requestResult.data : {}
+    const requestResponse = (await apiBack.get(`/explorations/requests/${requestId}/`)) || {}
+    const requestData = requestResponse?.data ? requestResponse.data : {}
+
+    const requestName = requestData.name
 
     const snapshotsHistoryFromQuery: {
       uuid: string
@@ -106,7 +108,7 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
       previous_snapshot: string
       dated_measures: CohortCreationCounterType[]
       created_at: string
-    }[] = data.results
+    }[] = requestData.query_snapshots
 
     const currentSnapshot = snapshotId
       ? snapshotsHistoryFromQuery.find(({ uuid }) => uuid === snapshotId)
@@ -140,6 +142,7 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
     }
 
     result = {
+      requestName,
       json: currentSnapshot ? currentSnapshot.serialized_query : '',
       currentSnapshot: currentSnapshot ? currentSnapshot.uuid : '',
       snapshotsHistory: snapshotsHistory.filter(({ uuid }) => uuid !== undefined),

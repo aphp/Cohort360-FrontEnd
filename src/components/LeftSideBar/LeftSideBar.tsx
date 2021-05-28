@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import clsx from 'clsx'
@@ -9,29 +9,34 @@ import {
   Divider,
   Drawer,
   Grid,
-  Icon,
   IconButton,
   Link,
   List,
   ListItem,
   ListItemText,
   ListItemIcon,
-  Typography
+  Typography,
+  Tooltip,
+  Zoom
 } from '@material-ui/core'
+
+import AddIcon from '@material-ui/icons/Add'
+import EditIcon from '@material-ui/icons/Edit'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 
-import cohortLogo from '../../assets/images/logo_v3.1_ld.png'
-import { ReactComponent as HomeIcon } from '../../assets/icones/home-lg.svg'
-import { ReactComponent as LogoutIcon } from '../../assets/icones/power-off.svg'
-import { ReactComponent as MenuIcon } from '../../assets/icones/bars.svg'
-import { ReactComponent as PatientIcon } from '../../assets/icones/user.svg'
-import { ReactComponent as ResearchIcon } from '../../assets/icones/chart-bar.svg'
+import cohortLogo from 'assets/images/logo_v3.1_ld.png'
+import { ReactComponent as HomeIcon } from 'assets/icones/home-lg.svg'
+import { ReactComponent as LogoutIcon } from 'assets/icones/power-off.svg'
+import { ReactComponent as MenuIcon } from 'assets/icones/bars.svg'
+import { ReactComponent as PatientIcon } from 'assets/icones/user.svg'
+import { ReactComponent as ResearchIcon } from 'assets/icones/chart-bar.svg'
 
 import { useAppSelector } from 'state'
-import { logout as logoutAction } from '../../state/me'
-import { open as openAction, close as closeAction } from '../../state/drawer'
+import { logout as logoutAction } from 'state/me'
+import { open as openAction, close as closeAction } from 'state/drawer'
+import { resetCohortCreation } from 'state/cohortCreation'
 
 import useStyles from './styles'
 
@@ -39,20 +44,34 @@ const smallDrawerWidth = 52
 const largeDrawerWidth = 260
 export { smallDrawerWidth, largeDrawerWidth }
 
-const LeftSideBar: React.FC = () => {
+const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
   const classes = useStyles()
   const history = useHistory()
   const dispatch = useDispatch()
 
-  const { practitioner, open } = useAppSelector((state) => ({
+  const { practitioner, open, cohortCreation } = useAppSelector((state) => ({
     practitioner: state.me,
-    open: state.drawer
+    open: state.drawer,
+    cohortCreation: state.cohortCreation
   }))
 
-  const [displayPatientList, setDisplayPatientList] = useState(false)
-  const [displaySearchList, setDisplaySearchList] = useState(false)
+  // v-- just for zoom transition..
+  const [allreadyOpen, setAllreadyOpen] = useState(false)
+
+  const [displayPatientList, setDisplayPatientList] = useState(true)
+  const [displaySearchList, setDisplaySearchList] = useState(true)
+
+  useEffect(() => {
+    if (props.open) {
+      dispatch<any>(openAction())
+    } else {
+      setAllreadyOpen(true)
+      dispatch<any>(closeAction())
+    }
+  }, [props.open]) // eslint-disable-line
 
   const handleDrawerOpenOrClose = (value: boolean) => {
+    setAllreadyOpen(true)
     if (value) {
       dispatch<any>(openAction())
     } else {
@@ -60,14 +79,23 @@ const LeftSideBar: React.FC = () => {
     }
   }
 
-  const onDisplayPatientList = () => {
+  const handleDisplayPatientList = () => {
     dispatch<any>(openAction())
-    setDisplayPatientList(!displayPatientList)
+    if (open) {
+      setDisplayPatientList(!displayPatientList)
+    }
   }
 
-  const onDisplaySearchList = () => {
+  const handleDisplaySearchList = () => {
     dispatch<any>(openAction())
-    setDisplaySearchList(!displaySearchList)
+    if (open) {
+      setDisplaySearchList(!displaySearchList)
+    }
+  }
+
+  const handleNewRequest = () => {
+    dispatch<any>(resetCohortCreation())
+    history.push('/cohort/new')
   }
 
   return (
@@ -90,6 +118,8 @@ const LeftSideBar: React.FC = () => {
             <img src={cohortLogo} alt="Cohort360 logo" className={open ? undefined : classes.hide} />
 
             <IconButton
+              disableRipple
+              disableFocusRipple
               onClick={() => handleDrawerOpenOrClose(!open)}
               className={clsx({
                 [classes.closeDrawerButton]: open,
@@ -137,46 +167,134 @@ const LeftSideBar: React.FC = () => {
 
             <Divider />
 
-            <ListItem>
-              <ListItemIcon
-                className={clsx(classes.button, {
-                  [classes.hide]: open
-                })}
-              >
-                <Link
-                  onClick={() => history.push('/cohort/new')}
-                  className={clsx(classes.linkHover, classes.plusButton)}
-                >
-                  <Icon>add_circle</Icon>
-                </Link>
-              </ListItemIcon>
+            {!cohortCreation?.request?.requestId ? (
+              <ListItem>
+                {!open && (
+                  <Tooltip title="Nouvelle requête">
+                    <Button
+                      variant="contained"
+                      onClick={handleNewRequest}
+                      className={clsx(classes.miniButton, classes.button)}
+                    >
+                      <AddIcon />
+                    </Button>
+                  </Tooltip>
+                )}
+                {allreadyOpen ? (
+                  <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
+                    <Button
+                      onClick={handleNewRequest}
+                      className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                        [classes.hide]: !open
+                      })}
+                    >
+                      <Typography variant="h5">Nouvelle requête</Typography>
+                    </Button>
+                  </Zoom>
+                ) : (
+                  <Button
+                    onClick={handleNewRequest}
+                    className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                      [classes.hide]: !open
+                    })}
+                  >
+                    <Typography variant="h5">Nouvelle requête</Typography>
+                  </Button>
+                )}
+              </ListItem>
+            ) : (
+              <>
+                <ListItem>
+                  {!open && (
+                    <Tooltip title="Nouvelle requête">
+                      <Button
+                        variant="contained"
+                        onClick={handleNewRequest}
+                        className={clsx(classes.miniButton, classes.button)}
+                      >
+                        <AddIcon />
+                      </Button>
+                    </Tooltip>
+                  )}
+                  {allreadyOpen ? (
+                    <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
+                      <Button
+                        onClick={handleNewRequest}
+                        className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                          [classes.hide]: !open
+                        })}
+                      >
+                        <Typography variant="h5">Nouvelle requête</Typography>
+                      </Button>
+                    </Zoom>
+                  ) : (
+                    <Button
+                      onClick={handleNewRequest}
+                      className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                        [classes.hide]: !open
+                      })}
+                    >
+                      <Typography variant="h5">Nouvelle requête</Typography>
+                    </Button>
+                  )}
+                </ListItem>
+                <ListItem style={{ padding: !open ? '0 16px' : undefined }}>
+                  {!open && (
+                    <Tooltip title="Modifier la requête en cours">
+                      <Button
+                        variant="contained"
+                        onClick={() => history.push('/cohort/new')}
+                        className={clsx(classes.miniButton, classes.button)}
+                      >
+                        <EditIcon />
+                      </Button>
+                    </Tooltip>
+                  )}
+                  {allreadyOpen ? (
+                    <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
+                      <Button
+                        onClick={() => history.push('/cohort/new')}
+                        className={clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
+                      >
+                        <Typography variant="h5">Requête en cours</Typography>
+                        <Typography noWrap style={{ width: 200 }}>
+                          {cohortCreation.request.requestName}
+                        </Typography>
+                      </Button>
+                    </Zoom>
+                  ) : (
+                    <Button
+                      onClick={() => history.push('/cohort/new')}
+                      className={clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
+                    >
+                      <Typography variant="h5">Requête en cours</Typography>
+                      <Typography noWrap style={{ width: 200 }}>
+                        {cohortCreation.request.requestName}
+                      </Typography>
+                    </Button>
+                  )}
+                </ListItem>
+              </>
+            )}
 
-              <Button
-                onClick={() => history.push('/cohort/new')}
-                className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                  [classes.hide]: !open
-                })}
-              >
-                <Typography variant="h5">Nouvelle requête</Typography>
-              </Button>
+            <ListItem className={classes.listItem} button onClick={() => history.push('/accueil')}>
+              <Tooltip title={!open ? 'Accueil' : ''}>
+                <ListItemIcon className={classes.listIcon}>
+                  <HomeIcon width="20px" fill="#FFF" />
+                </ListItemIcon>
+              </Tooltip>
+
+              <ListItemText className={classes.title} primary="Accueil" />
             </ListItem>
 
-            <Divider />
+            <ListItem className={classes.listItem} button onClick={handleDisplayPatientList}>
+              <Tooltip title={!open ? 'Mes patients' : ''}>
+                <ListItemIcon className={classes.listIcon}>
+                  <PatientIcon width="20px" fill="#FFF" />
+                </ListItemIcon>
+              </Tooltip>
 
-            <ListItem>
-              <ListItemIcon className={classes.listIcon}>
-                <HomeIcon width="20px" fill="#FFF" />
-              </ListItemIcon>
-              <ListItemText className={classes.title} primary={'Accueil'} />
-            </ListItem>
-
-            <Divider />
-
-            <ListItem button onClick={onDisplayPatientList}>
-              <ListItemIcon className={classes.listIcon}>
-                <PatientIcon width="20px" fill="#FFF" />
-              </ListItemIcon>
-              <ListItemText className={classes.title} primary={'Mes patients'} />
+              <ListItemText className={classes.title} primary="Mes patients" />
               {displayPatientList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
             </ListItem>
 
@@ -207,13 +325,14 @@ const LeftSideBar: React.FC = () => {
               </List>
             </Collapse>
 
-            <Divider />
+            <ListItem className={classes.listItem} button onClick={handleDisplaySearchList}>
+              <Tooltip title={!open ? 'Mes recherches' : ''}>
+                <ListItemIcon className={classes.listIcon}>
+                  <ResearchIcon width="20px" fill="#FFF" />
+                </ListItemIcon>
+              </Tooltip>
 
-            <ListItem button onClick={onDisplaySearchList}>
-              <ListItemIcon className={classes.listIcon}>
-                <ResearchIcon width="20px" fill="#FFF" />
-              </ListItemIcon>
-              <ListItemText className={classes.title} primary={'Mes recherches'} />
+              <ListItemText className={classes.title} primary="Mes recherches" />
               {displayPatientList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
             </ListItem>
 
@@ -237,6 +356,24 @@ const LeftSideBar: React.FC = () => {
               </List>
             </Collapse>
           </List>
+
+          {!open && (
+            <Grid container item>
+              <ListItemIcon className={classes.logoutButton}>
+                <Tooltip title="Se déconnecter">
+                  <IconButton
+                    onClick={() => {
+                      localStorage.clear()
+                      dispatch<any>(logoutAction())
+                      history.push('/')
+                    }}
+                  >
+                    <LogoutIcon className={classes.logoutIcon} />
+                  </IconButton>
+                </Tooltip>
+              </ListItemIcon>
+            </Grid>
+          )}
         </Drawer>
       </div>
     </>
