@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
 import { Button, CircularProgress, Divider, Grid, Tooltip, Typography } from '@material-ui/core'
+import { Alert } from '@material-ui/lab'
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack'
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
@@ -106,8 +107,10 @@ const ControlPanel: React.FC<{
       <Grid className={classes.rightPanelContainerStyle}>
         <Grid className={classes.container}>
           <Button
-            disabled={itLoads || typeof onExecute !== 'function'}
-            onClick={() => onSetOpenModal('executeCohortConfirmation')}
+            disabled={itLoads || typeof onExecute !== 'function' || (includePatient ? includePatient > 20000 : false)}
+            onClick={
+              includePatient && includePatient > 20000 ? undefined : () => onSetOpenModal('executeCohortConfirmation')
+            }
             className={classes.requestExecution}
           >
             {itLoads ? (
@@ -184,7 +187,12 @@ const ControlPanel: React.FC<{
                 className={clsx(classes.blueText, classes.sidesMargin)}
               />
             ) : (
-              <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
+              <Typography
+                className={clsx(classes.boldText, classes.patientTypo, {
+                  [classes.blueText]: includePatient ? includePatient <= 20000 : true,
+                  [classes.redText]: includePatient ? includePatient > 20000 : false
+                })}
+              >
                 {includePatient ? displayDigit(includePatient) : '-'}
               </Typography>
             )}
@@ -231,6 +239,12 @@ const ControlPanel: React.FC<{
             </Grid>
           </Grid> */}
         </Grid>
+
+        {includePatient && includePatient > 20000 && (
+          <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="error">
+            Il est pour le moment impossible de créer des cohortes de plus de 20 000 patients
+          </Alert>
+        )}
       </Grid>
 
       {openModal === 'executeCohortConfirmation' && (
