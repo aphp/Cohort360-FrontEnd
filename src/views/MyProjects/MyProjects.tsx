@@ -40,10 +40,12 @@ const MyProjects = () => {
   const loading = loadingProject || loadingRequest
 
   const _fetchProjectsList = async () => {
+    dispatch<any>(setSelectedProject(null))
     dispatch<any>(fetchProjectsList())
   }
 
   const _fetchRequestsList = async () => {
+    dispatch<any>(setSelectedRequest(null))
     dispatch<any>(fetchRequestsList())
   }
 

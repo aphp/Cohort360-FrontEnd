@@ -13,6 +13,7 @@ import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
 
 import { logout, login } from './me'
 import { addRequest, deleteRequest } from './request'
+import { deleteProject } from './project'
 
 import { createSnapshot, countCohort, fetchRequest } from 'services/cohortCreation'
 
@@ -82,6 +83,7 @@ type FetchRequestCohortCreationParams = {
   snapshotId?: string
 }
 type FetchRequestCohortCreationReturn = {
+  requestName?: string
   requestId?: string
   snapshotsHistory?: any[]
   currentSnapshot?: string
@@ -98,7 +100,7 @@ const fetchRequestCohortCreation = createAsyncThunk<
     const requestResult = await fetchRequest(requestId, snapshotId)
     if (!requestResult) return {}
 
-    const { json, currentSnapshot, snapshotsHistory, count } = requestResult
+    const { requestName, json, currentSnapshot, snapshotsHistory, count } = requestResult
 
     dispatch<any>(
       unbuildCohortCreation({
@@ -107,6 +109,7 @@ const fetchRequestCohortCreation = createAsyncThunk<
     )
 
     return {
+      requestName,
       json,
       requestId,
       snapshotsHistory: snapshotsHistory.reverse(),
@@ -412,10 +415,12 @@ const cohortCreationSlice = createSlice({
     // Create new request
     builder.addCase(addRequest.fulfilled, (state, { payload }) => {
       const newRequestId = payload.requestsList ? payload.requestsList[payload.requestsList.length - 1].uuid : ''
-      return { ...state, requestId: newRequestId, loading: false }
+      const newRequestName = payload.requestsList ? payload.requestsList[payload.requestsList.length - 1].name : ''
+      return { ...state, requestId: newRequestId, requestName: newRequestName, loading: false }
     })
-    // When you delete a request => reset cohort create (if current request is edited state)
+    // When you delete a request | folder => reset cohort create (if current request is edited state)
     builder.addCase(deleteRequest.fulfilled, () => defaultInitialState)
+    builder.addCase(deleteProject.fulfilled, () => defaultInitialState)
   }
 })
 
