@@ -240,7 +240,7 @@ const ControlPanel: React.FC<{
           </Grid> */}
         </Grid>
 
-        {includePatient && includePatient > 20000 && (
+        {!!includePatient && includePatient > 20000 && (
           <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="error">
             Il est pour le moment impossible de créer des cohortes de plus de 20 000 patients
           </Alert>
