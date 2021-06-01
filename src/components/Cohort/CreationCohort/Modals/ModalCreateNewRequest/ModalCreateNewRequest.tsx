@@ -65,9 +65,9 @@ const ModalCreateNewRequest: React.FC<{
     useState<'error_title' | 'error_description' | 'error_project' | 'error_project_name' | null>(null)
 
   const _onChangeValue = (key: 'name' | 'parent_folder' | 'description', value: string) => {
-    const _currentRequest: RequestType = currentRequest ? { ...currentRequest } : { uuid: '', name: '' }
-    _currentRequest[key] = value
-    setCurrentRequest(_currentRequest)
+    setCurrentRequest((prevState) =>
+      prevState ? { ...prevState, [key]: value } : { uuid: '', name: '', [key]: value }
+    )
   }
 
   const _fetchProject = async () => {
@@ -86,6 +86,9 @@ const ModalCreateNewRequest: React.FC<{
         _onChangeValue('parent_folder', projectsList[0].uuid)
       }
       onChangeProjectName(`Projet de recherche ${projectsList.length || ''}`)
+    } else {
+      _onChangeValue('parent_folder', NEW_PROJECT_ID)
+      onChangeProjectName(`Projet de recherche par défaut`)
     }
   }
 
@@ -250,7 +253,7 @@ const ModalCreateNewRequest: React.FC<{
             </Button>
           )}
 
-          <Button disabled={loading} onClick={handleClose} color="primary">
+          <Button disabled={loading} onClick={handleClose} color="secondary">
             Annuler
           </Button>
           <Button disabled={loading} onClick={handleConfirm} color="primary">

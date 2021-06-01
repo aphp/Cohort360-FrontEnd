@@ -27,7 +27,7 @@ const localStorageRequest = localStorage.getItem('request') || null
 const initialState: RequestState = localStorageRequest ? JSON.parse(localStorageRequest) : defaultInitialState
 
 type FetchRequestListReturn = {
-  selectedRequest: null
+  // selectedRequest: null
   requestsList: RequestType[]
 }
 
@@ -37,7 +37,7 @@ const fetchRequests = createAsyncThunk<FetchRequestListReturn, void, { state: Ro
     try {
       const requests = (await fetchRequestsList()) || []
       return {
-        selectedRequest: null,
+        // selectedRequest: null,
         requestsList: requests.results
       }
     } catch (error) {

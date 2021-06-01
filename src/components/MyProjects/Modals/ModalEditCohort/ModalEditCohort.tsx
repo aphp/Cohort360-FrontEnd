@@ -137,7 +137,7 @@ const ModalEditCohort: React.FC<{
             </Button>
           )}
 
-          <Button disabled={loading} onClick={handleClose} color="primary">
+          <Button disabled={loading} onClick={handleClose} color="secondary">
             Annuler
           </Button>
 

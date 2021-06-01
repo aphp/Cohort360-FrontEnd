@@ -97,16 +97,22 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
   } else if (CONTEXT === 'fakedata') {
     return null
   } else {
-    const requestResult = (await apiBack.get(`/explorations/requests/${requestId}/query-snapshots/`)) || {}
-    const data = requestResult?.data ? requestResult.data : {}
+    const requestResponse = (await apiBack.get(`/explorations/requests/${requestId}/`)) || {}
+    const requestData = requestResponse?.data ? requestResponse.data : {}
 
-    const snapshotsHistoryFromQuery: {
+    const requestName = requestData.name
+
+    let snapshotsHistoryFromQuery: {
       uuid: string
       serialized_query: string
       previous_snapshot: string
       dated_measures: CohortCreationCounterType[]
       created_at: string
-    }[] = data.results
+    }[] = requestData.query_snapshots
+
+    snapshotsHistoryFromQuery = snapshotsHistoryFromQuery.sort(
+      ({ created_at: a }, { created_at: b }) => new Date(b).valueOf() - new Date(a).valueOf()
+    )
 
     const currentSnapshot = snapshotId
       ? snapshotsHistoryFromQuery.find(({ uuid }) => uuid === snapshotId)
@@ -140,9 +146,10 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
     }
 
     result = {
+      requestName,
+      snapshotsHistory,
       json: currentSnapshot ? currentSnapshot.serialized_query : '',
       currentSnapshot: currentSnapshot ? currentSnapshot.uuid : '',
-      snapshotsHistory: snapshotsHistory.filter(({ uuid }) => uuid !== undefined),
       count: currentSnapshot ? currentSnapshot.dated_measures[0] : {}
     }
     return result

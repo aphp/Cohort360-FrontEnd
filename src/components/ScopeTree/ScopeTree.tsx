@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 
 import Grid from '@material-ui/core/Grid'
 import CircularProgress from '@material-ui/core/CircularProgress'
@@ -13,10 +14,10 @@ import KeyboardArrowRightIcon from '@material-ui/icons/ChevronRight'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 
 import EnhancedTable from '../EnhancedTable'
-
-import { getScopePerimeters, getScopeSubItems } from '../../services/scopeService'
 import { ScopeTreeRow } from 'types'
+
 import { useAppSelector } from 'state'
+import { ScopeState, fetchScopesList, expandScopeElement } from 'state/scope'
 
 import displayDigit from 'utils/displayDigit'
 import { getSelectedScopes } from 'utils/scopeTree'
@@ -30,30 +31,25 @@ type ScopeTreeProps = {
 
 const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSelectedItem }) => {
   const classes = useStyles()
+  const dispatch = useDispatch()
 
-  const [openPopulation, onChangeOpenPopulations] = useState<number[]>([])
-  const [rootRows, setRootRows] = useState<ScopeTreeRow[]>([])
-  const [loading, setLoading] = useState(true)
   const [selectedItems, setSelectedItem] = useState(defaultSelectedItems)
 
-  const practitioner = useAppSelector((state) => state.me)
+  const { scopeState } = useAppSelector<{
+    scopeState: ScopeState
+  }>((state) => ({
+    scopeState: state.scope || {}
+  }))
+
+  const { loading = false, openPopulation = [], scopesList = [] } = scopeState
 
   const fetchScopeTree = async () => {
-    if (practitioner) {
-      const rootRows = await getScopePerimeters(practitioner.id)
-      setRootRows(rootRows)
-    }
+    dispatch<any>(fetchScopesList())
   }
 
   useEffect(() => {
-    const _init = async () => {
-      setLoading(true)
-      await fetchScopeTree()
-      setLoading(false)
-    }
-
-    _init()
-  }, []) // eslint-disable-line
+    fetchScopeTree()
+  }, [])
 
   useEffect(() => setSelectedItem(defaultSelectedItems), [defaultSelectedItems])
 
@@ -62,39 +58,10 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
    *
    */
   const _clickToDeploy = async (rowId: number) => {
-    let savedSelectedItems = selectedItems ? [...selectedItems] : []
-    let _openPopulation = openPopulation ? openPopulation : []
-    let _rootRows = rootRows ? [...rootRows] : []
-    const index = _openPopulation.indexOf(rowId)
-
-    if (index !== -1) {
-      _openPopulation = _openPopulation.filter((id) => id !== rowId)
-      onChangeOpenPopulations(_openPopulation)
-    } else {
-      _openPopulation = [..._openPopulation, rowId]
-      onChangeOpenPopulations(_openPopulation)
-
-      const replaceSubItems = async (items: any) => {
-        for (const item of items) {
-          if (item.id === rowId) {
-            const foundItem = item.subItems ? item.subItems.find((i: any) => i.id === 'loading') : true
-            if (foundItem) {
-              item.subItems = await getScopeSubItems(item)
-              const isSelected = savedSelectedItems.indexOf(item)
-              if (isSelected !== -1 && item.subItems && item.subItems.length > 0) {
-                savedSelectedItems = [...savedSelectedItems, ...item.subItems]
-                onChangeSelectedItem(savedSelectedItems)
-              }
-            }
-          } else if (item.subItems && item.subItems.length !== 0) {
-            item.subItems = [...(await replaceSubItems(item.subItems))]
-          }
-        }
-        return items
-      }
-
-      _rootRows = await replaceSubItems(_rootRows)
-      setRootRows(_rootRows)
+    const expandResponse = await dispatch<any>(expandScopeElement({ rowId, selectedItems }))
+    if (expandResponse && expandResponse.payload) {
+      const _selectedItems = expandResponse.payload.selectedItems ?? []
+      onChangeSelectedItem(_selectedItems)
     }
   }
 
@@ -103,7 +70,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
    *
    */
   const _clickToSelect = (row: ScopeTreeRow) => {
-    const savedSelectedItems: ScopeTreeRow[] = getSelectedScopes(row, selectedItems, rootRows)
+    const savedSelectedItems: ScopeTreeRow[] = getSelectedScopes(row, selectedItems, scopesList)
 
     onChangeSelectedItem(savedSelectedItems)
     return savedSelectedItems
@@ -112,11 +79,12 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
   const _clickToSelectAll = () => {
     let results: any[] = []
     if (
-      rootRows.filter((row) => selectedItems.find(({ id }) => id === row.id) !== undefined).length === rootRows.length
+      scopesList.filter((row) => selectedItems.find(({ id }) => id === row.id) !== undefined).length ===
+      scopesList.length
     ) {
       results = []
     } else {
-      for (const rootRow of rootRows) {
+      for (const rootRow of scopesList) {
         const rowsAndChildren = _clickToSelect(rootRow)
         results = [...results, ...rowsAndChildren]
       }
@@ -130,14 +98,14 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
       return false
     }
     const checkChild: (item: any) => boolean = (item) => {
-      const numberOfSubItemsSelected = item.subItems.filter((subItem: any) =>
+      const numberOfSubItemsSelected = item.subItems?.filter((subItem: any) =>
         selectedItems.find(({ id }) => id === subItem.id)
       )?.length
 
       if (numberOfSubItemsSelected && numberOfSubItemsSelected !== item.subItems.length) {
         // Si un des sub elem qui est check => true
         return true
-      } else if (item.subItems.length >= numberOfSubItemsSelected) {
+      } else if (item.subItems?.length >= numberOfSubItemsSelected) {
         // Si un des sub-sub (ou sub-sub-sub ...) elem qui est check => true
         let isCheck = false
         for (const child of item.subItems) {
@@ -165,8 +133,8 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
           <Checkbox
             color="secondary"
             checked={
-              rootRows.filter((row) => selectedItems.find(({ id }) => id === row.id) !== undefined).length ===
-              rootRows.length
+              scopesList.filter((row) => selectedItems.find(({ id }) => id === row.id) !== undefined).length ===
+              scopesList.length
             }
             onClick={_clickToSelectAll}
           />
@@ -180,12 +148,12 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
 
   return (
     <div className={classes.container}>
-      {loading ? (
+      {loading && scopesList.length === 0 ? (
         <Grid container justify="center">
           <CircularProgress size={50} />
         </Grid>
       ) : (
-        <EnhancedTable noCheckbox noPagination rows={rootRows} headCells={headCells}>
+        <EnhancedTable noCheckbox noPagination rows={scopesList} headCells={headCells}>
           {(row: any, index: number) => {
             if (!row) return <></>
             const labelId = `enhanced-table-checkbox-${index}`

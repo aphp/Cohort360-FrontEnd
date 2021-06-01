@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
 import Button from '@material-ui/core/Button'
@@ -8,16 +9,23 @@ import Grid from '@material-ui/core/Grid'
 import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 
-import ScopeTree from '../../components/ScopeTree/ScopeTree'
+import ScopeTree from 'components/ScopeTree/ScopeTree'
+
+import { closeAllOpenedPopulation } from 'state/scope'
 
 import useStyles from './styles'
 
 const Scope = () => {
   const classes = useStyles()
   const history = useHistory()
+  const dispatch = useDispatch()
 
   const [selectedItems, onChangeSelectedItem] = useState([])
   const open = useSelector((state) => state.drawer)
+
+  useEffect(() => {
+    dispatch(closeAllOpenedPopulation())
+  }, [])
 
   const trimItems = () => {
     let _selectedItems = selectedItems ? selectedItems : []
