@@ -83,7 +83,13 @@ const useStyles = makeStyles((theme: Theme) =>
       color: '#FFF',
       fontWeight: 600
     },
-    listItem: { padding: 16 },
+    listItem: {
+      padding: 16,
+      height: 56,
+      '& svg': {
+        height: 56
+      }
+    },
     listIcon: {
       minWidth: '35px'
     },
