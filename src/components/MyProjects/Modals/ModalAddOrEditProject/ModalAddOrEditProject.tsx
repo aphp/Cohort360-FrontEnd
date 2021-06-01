@@ -20,7 +20,6 @@ import { ProjectType } from 'services/myProjects'
 import useStyles from './styles'
 
 const ERROR_TITLE = 'error_title'
-const ERROR_DESCRIPTION = 'error_description'
 
 const ModalAddOrEditProject: React.FC<{
   open: boolean
@@ -113,7 +112,7 @@ const ModalAddOrEditProject: React.FC<{
             />
           </Grid>
 
-          <Grid container direction="column" className={classes.inputContainer}>
+          {/* <Grid container direction="column" className={classes.inputContainer}>
             <Typography variant="h3">Description :</Typography>
             <TextField
               placeholder="Description"
@@ -126,9 +125,8 @@ const ModalAddOrEditProject: React.FC<{
               multiline
               rows={5}
               rowsMax={8}
-              error={error === ERROR_DESCRIPTION}
             />
-          </Grid>
+          </Grid> */}
         </DialogContent>
 
         <DialogActions style={{ position: 'relative' }}>
@@ -138,7 +136,7 @@ const ModalAddOrEditProject: React.FC<{
             </Button>
           )}
 
-          <Button disabled={loading} onClick={handleClose} color="primary">
+          <Button disabled={loading} onClick={handleClose} color="secondary">
             Annuler
           </Button>
 
