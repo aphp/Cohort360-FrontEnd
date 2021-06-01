@@ -279,6 +279,8 @@ type UnbuildCohortReturn = {
   selectedPopulation: ScopeTreeRow[] | null
   selectedCriteria: SelectedCriteriaType[]
   criteriaGroup: CriteriaGroupType[]
+  nextCriteriaId: number
+  nextGroupId: number
 }
 type UnbuildParams = { newCurrentSnapshot: CohortCreationSnapshotType }
 
@@ -315,7 +317,9 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
         currentSnapshot: newCurrentSnapshot.uuid,
         selectedPopulation: population,
         selectedCriteria: criteria,
-        criteriaGroup: criteriaGroup
+        criteriaGroup: criteriaGroup,
+        nextCriteriaId: criteria.length + 1,
+        nextGroupId: -(criteriaGroup.length + 1)
       }
     } catch (error) {
       console.error(error)
