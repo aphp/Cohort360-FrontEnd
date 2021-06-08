@@ -61,8 +61,9 @@ const ModalCreateNewRequest: React.FC<{
 
   const [projectList, onSetProjectList] = useState<ProjectType[]>([])
 
-  const [error, setError] =
-    useState<'error_title' | 'error_description' | 'error_project' | 'error_project_name' | null>(null)
+  const [error, setError] = useState<
+    'error_title' | 'error_description' | 'error_project' | 'error_project_name' | null
+  >(null)
 
   const _onChangeValue = (key: 'name' | 'parent_folder' | 'description', value: string) => {
     setCurrentRequest((prevState) =>
