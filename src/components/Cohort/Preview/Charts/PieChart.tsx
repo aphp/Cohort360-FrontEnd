@@ -63,13 +63,13 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 250, width = 25
       .join('path')
       .attr('fill', (d) => color(d.data.label))
       .attr('d', arc)
-      .on('mouseover', function (d) {
+      .on('mouseover', function (event, d) {
         d3.select(this).transition().duration('50').attr('opacity', '.5')
         div.transition().duration(50).style('opacity', 1)
         div
           .html(`${d.value} (${parseInt((d.value / total_value) * 10000) / 100}%)`)
-          .style('left', d3.event.pageX + 10 + 'px')
-          .style('top', d3.event.pageY - 15 + 'px')
+          .style('left', event.pageX + 10 + 'px')
+          .style('top', event.pageY - 15 + 'px')
       })
       .on('mouseout', function () {
         d3.select(this).transition().duration('50').attr('opacity', '1')

@@ -216,7 +216,7 @@ const Preview: React.FC<PreviewProps> = ({
         </Grid>
 
         <Grid container>
-          <Grid container item xs={12} sm={6} md={4} justify="center">
+          <Grid container item xs={12} sm={6} lg={4} justify="center">
             <Paper className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography variant="h3" color="primary">
@@ -234,7 +234,7 @@ const Preview: React.FC<PreviewProps> = ({
             </Paper>
           </Grid>
 
-          <Grid container item xs={12} sm={6} md={4} justify="center">
+          <Grid container item xs={12} sm={6} lg={4} justify="center">
             <Paper className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography variant="h3" color="primary">
@@ -252,7 +252,7 @@ const Preview: React.FC<PreviewProps> = ({
             </Paper>
           </Grid>
 
-          <Grid container item xs={12} sm={6} md={4} justify="center">
+          <Grid container item xs={12} sm={12} lg={4} justify="center">
             <Paper className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography variant="h3" color="primary">
@@ -270,40 +270,44 @@ const Preview: React.FC<PreviewProps> = ({
             </Paper>
           </Grid>
 
-          <Grid container item xs={12} sm={6} justify="center">
-            <Paper className={classes.chartOverlay}>
-              <Grid container item className={classes.chartTitle}>
-                <Typography variant="h3" color="primary">
-                  Pyramide des âges
-                </Typography>
-              </Grid>
-
-              {loading ? (
-                <Grid className={classes.progressContainer}>
-                  <CircularProgress />
+          <Grid container item md={12} lg={6} justify="center">
+            <Grid container item justify="center">
+              <Paper className={classes.chartOverlay}>
+                <Grid container item className={classes.chartTitle}>
+                  <Typography variant="h3" color="primary">
+                    Pyramide des âges
+                  </Typography>
                 </Grid>
-              ) : (
-                <PyramidChart data={agePyramidData} />
-              )}
-            </Paper>
+
+                {loading ? (
+                  <Grid className={classes.progressContainer}>
+                    <CircularProgress />
+                  </Grid>
+                ) : (
+                  <PyramidChart data={agePyramidData} />
+                )}
+              </Paper>
+            </Grid>
           </Grid>
 
-          <Grid container item xs={12} sm={6} justify="center">
-            <Paper className={classes.chartOverlay}>
-              <Grid container item className={classes.chartTitle}>
-                <Typography variant="h3" color="primary">
-                  Répartition des visites par mois
-                </Typography>
-              </Grid>
-
-              {loading ? (
-                <Grid className={classes.progressContainer}>
-                  <CircularProgress />
+          <Grid container item md={12} lg={6} justify="center">
+            <Grid container item justify="center">
+              <Paper className={classes.chartOverlay}>
+                <Grid container item className={classes.chartTitle}>
+                  <Typography variant="h3" color="primary">
+                    Répartition des visites par mois
+                  </Typography>
                 </Grid>
-              ) : (
-                <GroupedBarChart data={monthlyVisitData} />
-              )}
-            </Paper>
+
+                {loading ? (
+                  <Grid className={classes.progressContainer}>
+                    <CircularProgress />
+                  </Grid>
+                ) : (
+                  <GroupedBarChart data={monthlyVisitData} />
+                )}
+              </Paper>
+            </Grid>
           </Grid>
         </Grid>
       </Grid>

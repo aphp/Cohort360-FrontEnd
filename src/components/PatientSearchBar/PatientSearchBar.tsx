@@ -36,7 +36,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   const classes = useStyles()
   const history = useHistory()
   const location = useLocation()
-  const { search } = useParams()
+  const { search } = useParams<{ search: string }>()
 
   const [_searchInput, setSearchInput] = useState(search ?? searchInput)
 

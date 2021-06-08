@@ -20,9 +20,9 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center'
   },
   repartitionTable: {
-    margin: theme.spacing(2),
+    margin: theme.spacing(1),
     height: 150,
-    width: '97%',
+    width: 'calc(100% - 16px)',
     borderRadius: '8px'
   },
   nbPatients: {
@@ -33,12 +33,12 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     backgroundColor: theme.palette.white,
     padding: theme.spacing(2),
-    margin: theme.spacing(2),
+    margin: theme.spacing(1),
     height: '148px',
     borderRadius: '8px',
     alignItems: 'center',
     fontSize: '16px',
-    width: '95%'
+    width: 'calc(100% - 16px)'
   },
   tableHead: {
     height: '42px'
@@ -55,12 +55,12 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     backgroundColor: theme.palette.white,
     padding: theme.spacing(2),
-    margin: theme.spacing(2),
+    margin: theme.spacing(1),
     height: '300px',
     borderRadius: '8px',
     alignItems: 'center',
     fontSize: '16px',
-    width: '95%'
+    width: 'calc(100% - 16px)'
   },
   chartTitle: {
     borderBottom: '2px inset #E6F1FD',

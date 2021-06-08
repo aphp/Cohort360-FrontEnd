@@ -4,23 +4,33 @@ const useStyles = makeStyles(() =>
   createStyles({
     rightPanelContainerStyle: {
       position: 'fixed',
-      width: 300,
-      height: '100%',
-      bottom: '0px',
-      right: '0px',
+      width: 284,
+      height: 'calc(100% - 16px)',
+      top: 0,
+      right: 0,
+      margin: 8
+    },
+    container: {
+      borderRadius: 12,
       border: '1px solid #CCCCCD',
       backgroundColor: 'white',
       display: 'flex',
-      flexDirection: 'column'
-    },
-    requestAction: {
-      margin: '20px 0px'
+      flexDirection: 'column',
+      alignItems: 'center',
+      marginTop: 8,
+      padding: 4,
+      '&:first-child': {
+        marginTop: 0
+      }
     },
     requestExecution: {
+      marginTop: 12,
+      marginBottom: 12,
       backgroundColor: '#5BC5F2',
       borderRadius: '26px',
       border: 'none',
-      height: '40px',
+      height: '42px',
+      width: '90%',
       color: '#FFF',
       '&:hover': {
         backgroundColor: '#499cbf'
@@ -30,7 +40,16 @@ const useStyles = makeStyles(() =>
       }
     },
     actionButton: {
-      width: '100%',
+      backgroundColor: '#FFF',
+      marginBottom: 6,
+      borderRadius: '18px',
+      height: '36px',
+      width: '80%',
+      border: `2px solid currentColor`,
+      '&:disabled': {
+        color: '#ccc',
+        opacity: 0.7
+      },
       '& > span': {
         position: 'relative'
       }
@@ -41,7 +60,11 @@ const useStyles = makeStyles(() =>
     blueText: {
       color: '#5BC5F2'
     },
+    redText: {
+      color: '#fc1847'
+    },
     iconBorder: {
+      color: 'currentColor',
       position: 'absolute',
       top: 0,
       left: 10

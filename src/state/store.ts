@@ -9,6 +9,10 @@ import userCohorts from './userCohorts'
 import me from './me'
 import drawer from './drawer'
 import message from './message'
+import project from './project'
+import request from './request'
+import cohort from './cohort'
+import scope from './scope'
 
 const cohortCreationReducer = combineReducers({
   criteria,
@@ -21,15 +25,19 @@ const rootReducer = combineReducers({
   exploredCohort,
   userCohorts,
   drawer,
-  message
+  message,
+  project,
+  request,
+  cohort,
+  scope
 })
 
 export const store = createStore(rootReducer, applyMiddleware(thunkMiddleware, logger))
 
 store.subscribe(() => {
   // Auto save store inside localStorage
-  const _store = store.getState() ?? {}
-  const { me, exploredCohort, userCohorts, cohortCreation } = _store
+  const state = store.getState() ?? {}
+  const { me, exploredCohort, userCohorts, cohortCreation, project, request, cohort, scope } = state
 
   localStorage.setItem('user', JSON.stringify(me))
   localStorage.setItem(
@@ -43,4 +51,8 @@ store.subscribe(() => {
   )
   localStorage.setItem('userCohorts', JSON.stringify(userCohorts))
   localStorage.setItem('cohortCreation', JSON.stringify(cohortCreation))
+  localStorage.setItem('project', JSON.stringify(project))
+  localStorage.setItem('request', JSON.stringify(request))
+  localStorage.setItem('cohort', JSON.stringify(cohort))
+  localStorage.setItem('scope', JSON.stringify(scope))
 })

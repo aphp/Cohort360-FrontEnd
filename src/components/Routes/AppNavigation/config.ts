@@ -4,6 +4,7 @@ import ArkhnConnexion from 'views/Connexion/ArkhnConnexion'
 import Accueil from 'views/Accueil/Accueil'
 import RechercherPatient from 'views/RechercherPatient/RechercherPatient'
 import RechercheSauvegarde from 'views/RechercheSauvegarde/RechercheSauvegarde'
+import MyProjects from 'views/MyProjects/MyProjects'
 import Patient from 'views/Patient/Patient'
 import Scope from 'views/Scope/Scope'
 import Dashboard from 'views/Dashboard/Dashboard'
@@ -74,6 +75,17 @@ export default [
     component: RechercheSauvegarde
   },
   /**
+   * Cohort360: My Projects + Cohort List Page
+   */
+  {
+    exact: true,
+    displaySideBar: true,
+    path: '/mes_projets',
+    name: 'mes_projects',
+    isPrivate: true,
+    component: MyProjects
+  },
+  /**
    * Chohort360: Cohorts Creation Page
    */
   {
@@ -98,6 +110,20 @@ export default [
     path: '/cohort/new/:requestId/:snapshotId',
     name: 'cohort/new/:requestId/:snapshotId',
     isPrivate: true,
+    component: CohortCreation
+  },
+  {
+    exact: true,
+    displaySideBar: true,
+    path: '/cohort/new/:requestId',
+    name: 'cohort/new/:requestId',
+    component: CohortCreation
+  },
+  {
+    exact: true,
+    displaySideBar: true,
+    path: '/cohort/new/:requestId/:snapshotId',
+    name: 'cohort/new/:requestId/:snapshotId',
     component: CohortCreation
   },
   /**

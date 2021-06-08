@@ -12,7 +12,7 @@ import Config from './config'
 const Layout = (props) => {
   return (
     <>
-      {props.displaySideBar && <LeftSideBar />}
+      {props.displaySideBar && <LeftSideBar open={props.name === 'accueil'} />}
 
       {props.children}
 

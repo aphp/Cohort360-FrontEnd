@@ -61,7 +61,7 @@ export const getSelectedScopes = (
     savedSelectedItems = [...savedSelectedItems, ...getRowAndChildren(row)]
   }
 
-  let _savedSelectedItems = []
+  let _savedSelectedItems: any[] = []
   const checkIfParentIsChecked = (rows: ScopeTreeRow[]) => {
     for (let index = 0; index < rows.length; index++) {
       const row = rows[index]
@@ -79,18 +79,26 @@ export const getSelectedScopes = (
         : []
 
       const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
-      const isNotSelected = foundItem && savedSelectedItems ? savedSelectedItems.indexOf(foundItem) : -1
 
-      if (row && row.subItems && selectedChildren.length === row.subItems.length && isNotSelected === -1) {
+      if (row && row.subItems && selectedChildren.length === row.subItems.length && !foundItem) {
         savedSelectedItems = [...savedSelectedItems, row]
       } else if (
         foundItem &&
         foundItem.subItems &&
-        selectedChildren.length !== foundItem.subItems.length &&
-        isNotSelected !== -1
+        foundItem.subItems.length > 0 &&
+        foundItem.subItems[0].id !== 'loading' &&
+        selectedChildren.length !== foundItem.subItems.length
       ) {
         savedSelectedItems = savedSelectedItems.filter(({ id }) => id !== row.id)
       }
+
+      // Need a real fix .. 🥲
+      // // Protection:
+      // // When the user select a scope, reload, select and unselect a subitems the parent have subitems = []
+      // // So, replace the parent and the condition `selectedChildren.length !== foundItem.subItems.length` can be validated
+      // const indexOfItem = foundItem && savedSelectedItems ? savedSelectedItems.indexOf(foundItem) : -1
+      // if (indexOfItem !== -1) savedSelectedItems[indexOfItem] = row
+
       if (row.subItems) checkIfParentIsChecked(row.subItems)
     }
   }

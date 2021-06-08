@@ -80,7 +80,7 @@ export type Cohort = {
   modified_at?: string
   favorite?: boolean
   type?: string
-  request_id?: string
+  request?: string
   request_job_status?: string
   request_job_fail_msg?: string
 }
@@ -342,11 +342,11 @@ export type EncounterDataType = {
   durationType: { id: string; label: string }
   duration: [number, number]
   admissionMode: { id: string; label: string } | null
-  entryMode: { id: string; label: string } | null
-  exitMode: { id: string; label: string } | null
-  priseEnChargeType: { id: string; label: string } | null
-  typeDeSejour: { id: string; label: string } | null
-  fileStatus: { id: string; label: string } | null
+  entryMode: { id: string; label: string }[] | null
+  exitMode: { id: string; label: string }[] | null
+  priseEnChargeType: { id: string; label: string }[] | null
+  typeDeSejour: { id: string; label: string }[] | null
+  fileStatus: { id: string; label: string }[] | null
   isInclusive?: boolean
 }
 
@@ -366,6 +366,7 @@ export type CohortCreationSnapshotType = {
   uuid: string
   json: string
   date: string
+  dated_measures?: any[]
 }
 
 export type ValueSet = {

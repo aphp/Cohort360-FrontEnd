@@ -150,8 +150,8 @@ const exploredCohortSlice = createSlice({
       const toImported = state.includedPatients.filter((patient) =>
         action.payload.map((p) => p.id).includes(patient.id)
       )
-      const allExcludedPatients = [...state.excludedPatients, ...toExcluded]
-      const allImportedPatients = [...state.importedPatients, ...toImported]
+      const allExcludedPatients = toExcluded ? [...state.excludedPatients, ...toExcluded] : []
+      const allImportedPatients = toImported ? [...state.importedPatients, ...toImported] : []
       return {
         ...state,
         includedPatients: state.includedPatients.filter(
@@ -167,7 +167,9 @@ const exploredCohortSlice = createSlice({
       }
     },
     removeExcludedPatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
-      const originalPatients = [...state.originalPatients, ...action.payload]
+      if (!action || !action.payload) return
+      const statePatient = state.originalPatients || []
+      const originalPatients = [...statePatient, ...action.payload]
       const excludedPatients = state.excludedPatients.filter(
         (patient) => !action.payload.map((p) => p.id).includes(patient.id)
       )
