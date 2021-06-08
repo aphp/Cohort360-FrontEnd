@@ -34,14 +34,6 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 16
     }
   },
-  exportButon: {
-    display: 'flex !important',
-    color: '#5BC5F2',
-    marginLeft: theme.spacing(1),
-    '& svg': {
-      color: '#5BC5F2'
-    }
-  },
   tableBodyRows: {
     height: '80px',
     '&:nth-of-type(even)': {
