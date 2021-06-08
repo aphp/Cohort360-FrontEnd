@@ -16,13 +16,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "strict": true,
     "baseUrl": "src",
     "downlevelIteration": true,
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "src"
+    "./src/**/*.ts"
   ]
 }

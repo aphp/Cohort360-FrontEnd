@@ -41,8 +41,8 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
         const femaleCount = entryData.female
         customData[monthDataIndex] = {
           ...customData[monthDataIndex],
-          Hommes: maleCount,
-          Femmes: femaleCount
+          Hommes: parseInt(maleCount),
+          Femmes: parseInt(femaleCount)
         }
       }
     }
@@ -110,13 +110,15 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
       .attr('width', x1.bandwidth())
       .attr('height', (d) => y(0) - y(d.value))
       .attr('fill', (d) => color(d.key))
-      .on('mouseover', function (d) {
+      .on('mouseover', function (event, d) {
+        const currentMonth = customData.find((customItem) => customItem[d.key] === d.value)
+        const total_value = (currentMonth?.Hommes ?? 0) + (currentMonth?.Femmes ?? 0)
         d3.select(this).transition().duration('50').attr('opacity', '.5')
         div.transition().duration(50).style('opacity', 1)
         div
-          .html(d.value)
-          .style('left', d3.event.pageX + 10 + 'px')
-          .style('top', d3.event.pageY - 15 + 'px')
+          .html(`${d.value} (${parseInt((d.value / total_value) * 10000) / 100}%)`)
+          .style('left', event.pageX + 10 + 'px')
+          .style('top', event.pageY - 15 + 'px')
       })
       .on('mouseout', function () {
         d3.select(this).transition().duration('50').attr('opacity', '1')

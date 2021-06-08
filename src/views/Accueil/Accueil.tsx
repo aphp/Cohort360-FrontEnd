@@ -17,7 +17,12 @@ import useStyles from './styles'
 const Accueil: React.FC = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
-  const { practitioner, open, favoriteCohorts = [], lastCohorts = [] } = useAppSelector((state) => ({
+  const {
+    practitioner,
+    open,
+    favoriteCohorts = [],
+    lastCohorts = []
+  } = useAppSelector((state) => ({
     practitioner: state.me,
     open: state.drawer,
     favoriteCohorts: state.userCohorts.favoriteCohorts,
@@ -38,8 +43,6 @@ const Accueil: React.FC = () => {
     const pendingCohorts = [...favoriteCohorts, ...lastCohorts].filter(
       ({ jobStatus }) => jobStatus === 'pending' || jobStatus === 'started'
     )
-
-    console.log('pendingCohorts :>> ', pendingCohorts)
 
     if (pendingCohorts && pendingCohorts.length > 0) {
       interval = setInterval(() => {

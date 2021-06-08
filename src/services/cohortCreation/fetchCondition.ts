@@ -97,7 +97,8 @@ export const fetchDiagnosticTypes = async () => {
 }
 
 // todo: check if the data syntax is correct when available
-export const fetchCim10Diagnostic = async (searchValue?: string) => {
+export const fetchCim10Diagnostic = async (searchValue?: string, noStar?: boolean) => {
+  noStar = noStar === undefined ? true : noStar
   if (CONTEXT === 'arkhn') {
     return null
   } else if (CONTEXT === 'fakedata') {
@@ -111,7 +112,14 @@ export const fetchCim10Diagnostic = async (searchValue?: string) => {
     if (!searchValue) {
       return []
     }
-    const _searchValue = searchValue ? `&_text=${searchValue}*` : ''
+    const _searchValue = noStar
+      ? searchValue
+        ? `&_text=${searchValue}`
+        : ''
+      : searchValue
+      ? `&_text=${searchValue}*`
+      : ''
+
     const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-cim${_searchValue}`)
 
     let cim10List =

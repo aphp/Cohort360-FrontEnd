@@ -24,7 +24,7 @@ export default makeStyles((theme) => ({
   },
   tabTitle: {
     minWidth: 0,
-    color: '#FFF',
+    color: '#FFF !important',
     fontWeight: 400
   },
   indicator: {

@@ -83,6 +83,13 @@ const useStyles = makeStyles((theme: Theme) =>
       color: '#FFF',
       fontWeight: 600
     },
+    listItem: {
+      padding: 16,
+      height: 56,
+      '& svg': {
+        height: 56
+      }
+    },
     listIcon: {
       minWidth: '35px'
     },
@@ -96,7 +103,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     nestedTitle: {
       color: '#D0D7D8',
-      fontSize: '12px',
+      fontSize: 13,
       lineHeight: '25px'
     },
     button: {
@@ -106,18 +113,44 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: 10,
       marginLeft: -8
     },
+    miniButton: {
+      borderRadius: 14,
+      minHeight: 23,
+      maxHeight: 23,
+      height: 23,
+      minWidth: 23,
+      maxWidth: 23,
+      width: 23,
+      margin: 0,
+      marginLeft: -2,
+      padding: 0,
+      backgroundColor: '#fff',
+      '& svg': {
+        fontSize: 18
+      }
+    },
     linkHover: {
-      color: 'white !important',
+      color: 'white',
       '&:hover': { cursor: 'pointer', textDecoration: 'None' }
     },
     newCohortButton: {
       backgroundColor: '#5BC5F2',
-      borderRadius: '29px',
+      borderRadius: 25,
       border: 'none',
-      height: '40px',
+      height: 45,
       '&:hover': {
         backgroundColor: '#499cbf',
         color: '#FFF'
+      }
+    },
+    editCohortButton: {
+      backgroundColor: 'transparent',
+      border: '2px solid currentColor',
+      color: '#5BC5F2',
+      borderRadius: 25,
+      height: 50,
+      '&:hover': {
+        color: '#499cbf'
       }
     }
   })

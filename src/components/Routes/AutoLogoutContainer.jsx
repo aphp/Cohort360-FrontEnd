@@ -48,6 +48,12 @@ const AutoLogoutContainer = () => {
           localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
         }
       })
+      .catch((error) => {
+        if (error && error.response && error.response.status === 401) {
+          // Unauthorize
+          logout()
+        }
+      })
     setDialogIsOpen(false)
     // console.log('User est resté connecté')
     clearTimeout(sessionInactifTimerRef.current)
@@ -64,6 +70,12 @@ const AutoLogoutContainer = () => {
           if (res.status === 200) {
             localStorage.setItem(ACCES_TOKEN, res.data.access)
             localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
+          }
+        })
+        .catch((error) => {
+          if (error && error.response && error.response.status === 401) {
+            // Unauthorize
+            logout()
           }
         })
     }

@@ -9,7 +9,8 @@ const useStyles = makeStyles((theme) => ({
   },
   header: {
     backgroundColor: '#F3F8FE',
-    height: '100px',
+    minHeight: '100px',
+    padding: theme.spacing(1),
     overflowY: 'scroll'
   },
   progressContainer: {
@@ -19,9 +20,9 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center'
   },
   repartitionTable: {
-    margin: theme.spacing(2),
+    margin: theme.spacing(1),
     height: 150,
-    width: '97%',
+    width: 'calc(100% - 16px)',
     borderRadius: '8px'
   },
   nbPatients: {
@@ -32,12 +33,12 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     backgroundColor: theme.palette.white,
     padding: theme.spacing(2),
-    margin: theme.spacing(2),
+    margin: theme.spacing(1),
     height: '148px',
     borderRadius: '8px',
     alignItems: 'center',
     fontSize: '16px',
-    width: '95%'
+    width: 'calc(100% - 16px)'
   },
   tableHead: {
     height: '42px'
@@ -54,12 +55,12 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     backgroundColor: theme.palette.white,
     padding: theme.spacing(2),
-    margin: theme.spacing(2),
+    margin: theme.spacing(1),
     height: '300px',
     borderRadius: '8px',
     alignItems: 'center',
     fontSize: '16px',
-    width: '95%'
+    width: 'calc(100% - 16px)'
   },
   chartTitle: {
     borderBottom: '2px inset #E6F1FD',
@@ -79,13 +80,17 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: 0
   },
   item: {
-    margin: theme.spacing(0, 1, 0, 0)
+    margin: theme.spacing(0.5)
   },
   perimetersChip: {
     backgroundColor: '#0063AF',
     color: '#FFF',
     fontStyle: 'italic',
     fontSize: '12px'
+  },
+  populationLabel: {
+    color: '#0063AF',
+    textDecoration: 'underline'
   },
   overflow: {
     overflowY: 'scroll'

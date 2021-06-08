@@ -1,5 +1,4 @@
 import api from './api'
-import { getLastEncounter } from './myPatients'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import { FHIR_API_Response, CohortData, ScopeTreeRow } from 'types'
 import { IOrganization, IHealthcareService, IEncounter, IPatient, IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'
@@ -106,7 +105,7 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
 
     const totalPatients = patientsResp?.data?.resourceType === 'Bundle' ? patientsResp.data.total : 0
 
-    const originalPatients = await getLastEncounter(getApiResponseResources(patientsResp))
+    const originalPatients = getApiResponseResources(patientsResp)
 
     const ageFacet = patientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-age-month')
     const deceasedFacet = patientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-deceased')
@@ -173,7 +172,8 @@ export const fetchPerimeterInfoForRequeteur = async (perimetersId: string): Prom
         ...group,
         id: group.id ?? '0',
         name: group.name?.replace(/^Patients passés par: /, '') ?? '',
-        quantity: group.quantity ?? 0
+        quantity: group.quantity ?? 0,
+        subItems: []
       }))
     : []
   return scopeRows

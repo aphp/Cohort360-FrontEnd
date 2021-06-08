@@ -13,7 +13,7 @@ import { getApiResponseResources } from 'utils/apiHelpers'
 
 import fakeScopeRows from '../data/fakeData/scopeRows'
 
-const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0 }
+const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
 const getServicePatientsCount = async (
   service: IHealthcareService
@@ -105,22 +105,20 @@ export const getScopePerimeters = async (practitionerId: string): Promise<ScopeT
     const scopeRows = fakeScopeRows as ScopeTreeRow[]
 
     return scopeRows
-  }
-  if (CONTEXT === 'aphp') {
-    const perimetersResults = await getPerimeters(practitionerId)
+  } else if (CONTEXT === 'aphp') {
+    const perimetersResults = (await getPerimeters(practitionerId)) ?? []
 
-    let scopeRows: ScopeTreeRow[] = perimetersResults
-      ? perimetersResults?.map<ScopeTreeRow>((perimeterResult) => ({
-          ...perimeterResult,
-          id: perimeterResult.id ?? '0',
-          name: perimeterResult.name?.replace(/^Patients passés par: /, '') ?? '',
-          quantity: perimeterResult.quantity ?? 0,
-          access: getAccessName(perimeterResult.extension),
-          subItems: [loadingItem]
-        }))
-      : []
+    let scopeRows: ScopeTreeRow[] = []
 
-    // Sort by name
+    for (const perimetersResult of perimetersResults) {
+      const scopeRow: ScopeTreeRow = perimetersResult as ScopeTreeRow
+      scopeRow.name = perimetersResult.name?.replace(/^Patients passés par: /, '') ?? ''
+      scopeRow.access = getAccessName(perimetersResult.extension)
+      scopeRow.subItems = await getScopeSubItems(perimetersResult as ScopeTreeRow)
+      scopeRows = [...scopeRows, scopeRow]
+    }
+
+    // Sort by quantity
     scopeRows = scopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
       if (a.quantity > b.quantity) {
         return 1
@@ -129,6 +127,7 @@ export const getScopePerimeters = async (practitionerId: string): Promise<ScopeT
       }
       return 0
     })
+    // Sort by name
     scopeRows = scopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
       if (b.quantity === 0) return -1
       if (a.name > b.name) {
@@ -140,9 +139,7 @@ export const getScopePerimeters = async (practitionerId: string): Promise<ScopeT
     })
 
     return scopeRows
-  }
-
-  if (CONTEXT === 'arkhn') {
+  } else if (CONTEXT === 'arkhn') {
     const scopeRows: ScopeTreeRow[] = []
     const [healthcareServicesWOOrgaResp, organizationsResp] = await Promise.all([
       api.get<FHIR_API_Response<IHealthcareService>>(`HealthcareService?organization:missing=true${API_RESOURCE_TAG}`),
@@ -225,7 +222,7 @@ export const getScopePerimeters = async (practitionerId: string): Promise<ScopeT
   return []
 }
 
-export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<ScopeTreeRow[] | undefined> => {
+export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<ScopeTreeRow[]> => {
   if (!perimeter) return []
   const perimeterGroupId = perimeter?.managingEntity?.display?.replace(/^Organization\//, '') || 0
   const organization = await api.get<FHIR_API_Response<IOrganization>>(
@@ -254,7 +251,8 @@ export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<
         id: subItemData.id ?? '0',
         name: subItemData.name?.replace(/^Patients passés par: /, '') ?? '',
         quantity: subItemData.quantity ?? 0,
-        subItems: [loadingItem]
+        subItems: [loadingItem],
+        access: perimeter.access
       }))
     : []
 

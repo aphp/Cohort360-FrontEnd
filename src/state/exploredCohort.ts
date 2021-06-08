@@ -1,7 +1,7 @@
 import { CohortData } from 'types'
 import { IGroup_Member } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
-import { logout } from './me'
+import { logout, login } from './me'
 import { RootState } from 'state'
 import { fetchCohort } from 'services/cohortInfos'
 import { fetchMyPatients } from 'services/myPatients'
@@ -21,6 +21,7 @@ const jsonExploredCohort = localStorageExploredCohort ? JSON.parse(localStorageE
 const defaultInitialState = {
   // CohortData
   name: '',
+  description: '',
   cohort: [],
   totalPatients: 0,
   originalPatients: [],
@@ -149,8 +150,8 @@ const exploredCohortSlice = createSlice({
       const toImported = state.includedPatients.filter((patient) =>
         action.payload.map((p) => p.id).includes(patient.id)
       )
-      const allExcludedPatients = [...state.excludedPatients, ...toExcluded]
-      const allImportedPatients = [...state.importedPatients, ...toImported]
+      const allExcludedPatients = toExcluded ? [...state.excludedPatients, ...toExcluded] : []
+      const allImportedPatients = toImported ? [...state.importedPatients, ...toImported] : []
       return {
         ...state,
         includedPatients: state.includedPatients.filter(
@@ -166,7 +167,9 @@ const exploredCohortSlice = createSlice({
       }
     },
     removeExcludedPatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
-      const originalPatients = [...state.originalPatients, ...action.payload]
+      if (!action || !action.payload) return
+      const statePatient = state.originalPatients || []
+      const originalPatients = [...statePatient, ...action.payload]
       const excludedPatients = state.excludedPatients.filter(
         (patient) => !action.payload.map((p) => p.id).includes(patient.id)
       )
@@ -185,6 +188,7 @@ const exploredCohortSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
+    builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout, () => defaultInitialState)
     builder.addCase(fetchExploredCohort.pending, (state, { meta }) => {
       state.loading = true

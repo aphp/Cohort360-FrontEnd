@@ -71,8 +71,9 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
       <ListItem className={classes.ghmItem}>
         <ListItemIcon>
           <div
+            onClick={() => handleClickOnHierarchy(ghmItem)}
             className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`}
-            style={{ color: '#0063af' }}
+            style={{ color: '#0063af', cursor: 'pointer' }}
           />
         </ListItemIcon>
         <Tooltip title={label} enterDelay={2500}>

@@ -111,7 +111,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
 
   useEffect(() => {
     handleChangePage()
-  }, [nda, selectedDocTypes, startDate, endDate]) // eslint-disable-line
+  }, [patientId, nda, selectedDocTypes, startDate, endDate]) // eslint-disable-line
 
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)

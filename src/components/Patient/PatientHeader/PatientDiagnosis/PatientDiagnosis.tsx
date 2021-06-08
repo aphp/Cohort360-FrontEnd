@@ -12,11 +12,7 @@ const PatientDiagnosis: React.FC<PatientDiagnosisType> = ({ diagnosis }) => {
     <ul className={classes.root}>
       {diagnosis &&
         diagnosis.map((diag) => {
-          return (
-            <li key={diag} className={classes.item}>
-              <Chip className={classes.diagnosticChip} label={diag} />
-            </li>
-          )
+          return <Chip key={diag} className={classes.diagnosticChip} label={diag} title={diag} />
         })}
     </ul>
   )

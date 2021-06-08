@@ -71,7 +71,7 @@ const Dashboard: React.FC<{
       case 'patients':
         setStatus('Exploration de population')
         setTabs([
-          { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
+          // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu', value: 'apercu', to: '/mes_patients/apercu', disabled: false },
           { label: 'Patients', value: 'patients', to: '/mes_patients/patients', disabled: false },
           { label: 'Documents', value: 'documents', to: '/mes_patients/documents', disabled: false }
@@ -80,7 +80,7 @@ const Dashboard: React.FC<{
       case 'cohort':
         setStatus('Exploration de cohorte')
         setTabs([
-          { label: 'Édition cohorte', value: 'creation', to: `/cohort/${cohortId}/edition`, disabled: true },
+          // { label: 'Édition cohorte', value: 'creation', to: `/cohort/${cohortId}/edition`, disabled: true },
           { label: 'Aperçu cohorte', value: 'apercu', to: `/cohort/${cohortId}/apercu`, disabled: false },
           { label: 'Patients', value: 'patients', to: `/cohort/${cohortId}/patients`, disabled: false },
           { label: 'Documents', value: 'documents', to: `/cohort/${cohortId}/documents`, disabled: false }
@@ -89,7 +89,7 @@ const Dashboard: React.FC<{
       case 'new_cohort':
         setStatus("Création d'un cohorte")
         setTabs([
-          { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
+          // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu cohorte', value: 'apercu', to: `/cohort/new/apercu`, disabled: true },
           { label: 'Patients', value: 'patients', to: `/cohort/new/patients`, disabled: true },
           { label: 'Documents', value: 'documents', to: `/cohort/new/documents`, disabled: true }
@@ -98,7 +98,7 @@ const Dashboard: React.FC<{
       case 'perimeters':
         setStatus('Exploration de périmètres')
         setTabs([
-          { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
+          // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu', value: 'apercu', to: `/perimetres/apercu${location.search}`, disabled: false },
           { label: 'Patients', value: 'patients', to: `/perimetres/patients${location.search}`, disabled: false },
           { label: 'Documents', value: 'documents', to: `/perimetres/documents${location.search}`, disabled: false }
@@ -128,18 +128,28 @@ const Dashboard: React.FC<{
   const _displayGroupName = () => {
     let group: {
       name: string
+      description?: string
       perimeters?: string[]
     } = { name: '-', perimeters: [] }
     switch (context) {
       case 'patients':
-        group = { name: 'Mes patients' }
+        group = {
+          name: 'Mes patients',
+          description: '',
+          perimeters: []
+        }
         break
       case 'cohort':
-        group = { name: dashboard.name ?? '-' }
+        group = {
+          name: dashboard.name ?? '-',
+          description: dashboard.description ?? '',
+          perimeters: []
+        }
         break
       case 'perimeters':
         group = {
           name: 'Exploration de périmètres',
+          description: '',
           perimeters:
             dashboard.cohort && Array.isArray(dashboard.cohort)
               ? dashboard.cohort.map((p: any) => p.name.replace('Patients passés par: ', ''))

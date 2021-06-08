@@ -1,6 +1,6 @@
 import api from './api'
 import apiBackCohort from './apiBackCohort'
-import { getInfos, getLastEncounter } from './myPatients'
+import { getInfos } from './myPatients'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import {
   FHIR_API_Response,
@@ -47,6 +47,7 @@ import fakeDocuments from '../data/fakeData/documents'
 const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | undefined> => {
   if (CONTEXT === 'fakedata') {
     const name = 'Fausse cohorte'
+    const description = 'Ceci est une fausse cohorte pour faire des tests'
     const requestId = '123456789'
     const totalPatients = 3
 
@@ -64,6 +65,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
 
     return {
       name,
+      description,
       cohort,
       totalPatients,
       originalPatients,
@@ -87,11 +89,13 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     ])
 
     let name = ''
+    let description = ''
     let requestId = ''
 
     if (cohortInfo.data.results && cohortInfo.data.results.length === 1) {
       name = cohortInfo.data.results[0].name ?? ''
-      requestId = cohortInfo.data.results[0].request_id ?? ''
+      description = cohortInfo.data.results[0].description ?? ''
+      requestId = cohortInfo.data.results[0].request ?? ''
     }
 
     if (!name) {
@@ -102,7 +106,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
 
     const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
 
-    const originalPatients = await getLastEncounter(getApiResponseResources(patientsResp))
+    const originalPatients = getApiResponseResources(patientsResp)
 
     const agePyramidData =
       patientsResp.data.resourceType === 'Bundle'
@@ -136,6 +140,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
 
     return {
       name,
+      description,
       cohort,
       totalPatients,
       originalPatients,
@@ -205,7 +210,7 @@ const fetchPatientList = async (
 ): Promise<
   | {
       totalPatients: number
-      originalPatients: IPatient[]
+      originalPatients: IPatient[] | undefined
       agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
       genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
     }
@@ -242,27 +247,30 @@ const fetchPatientList = async (
     )
 
     if (patientsResp) {
-      const filteredPatients: IPatient[] = patientsResp.patientList.filter((patient) => {
-        const agePatient = parseInt(getAge(patient))
-        const genderPatient = patient.gender
-        const vitalStatusPatient = patient.deceasedDateTime ? VitalStatus.deceased : VitalStatus.alive
-        const [ageMin, ageMax] = age
-        let includePatient = true
+      //@ts-ignore
+      const filteredPatients: IPatient[] =
+        patientsResp.patientList &&
+        patientsResp.patientList.filter((patient) => {
+          const agePatient = parseInt(getAge(patient))
+          const genderPatient = patient.gender
+          const vitalStatusPatient = patient.deceasedDateTime ? VitalStatus.deceased : VitalStatus.alive
+          const [ageMin, ageMax] = age
+          let includePatient = true
 
-        if (isNaN(agePatient) || agePatient < ageMin || agePatient > ageMax) {
-          includePatient = false
-        }
+          if (isNaN(agePatient) || agePatient < ageMin || agePatient > ageMax) {
+            includePatient = false
+          }
 
-        if (vitalStatus !== VitalStatus.all && vitalStatusPatient !== vitalStatus) {
-          includePatient = false
-        }
+          if (vitalStatus !== VitalStatus.all && vitalStatusPatient !== vitalStatus) {
+            includePatient = false
+          }
 
-        if (gender !== PatientGenderKind._unknown && genderPatient !== gender) {
-          includePatient = false
-        }
+          if (gender !== PatientGenderKind._unknown && genderPatient !== gender) {
+            includePatient = false
+          }
 
-        return includePatient
-      })
+          return includePatient
+        })
 
       return {
         totalPatients: filteredPatients.length,
@@ -329,7 +337,7 @@ const fetchPatientList = async (
 
     const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
 
-    const originalPatients = await getLastEncounter(getApiResponseResources(patientsResp))
+    const originalPatients = getApiResponseResources(patientsResp)
 
     const agePyramidData =
       patientsResp.data.resourceType === 'Bundle'

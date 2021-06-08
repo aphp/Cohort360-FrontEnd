@@ -59,6 +59,7 @@ const StatusShip: React.FC<StatusShipProps> = ({ type }) => {
 }
 
 type TableauPatientsProps = {
+  search?: string
   groupId?: any
   deidentified?: boolean | null
   patients: CohortPatient[]
@@ -73,6 +74,7 @@ type TableauPatientsProps = {
 }
 const TableauPatients: React.FC<TableauPatientsProps> = memo(
   ({
+    search,
     groupId,
     deidentified,
     patients,
@@ -186,7 +188,12 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                         className={classes.tableBodyRows}
                         hover
                         onClick={() =>
-                          window.open(`/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}`, '_blank')
+                          window.open(
+                            `/patients/${patient.id}${groupId ? `?groupId=${groupId}` : ''}${
+                              search ? `&search=${search}` : ''
+                            }`,
+                            '_blank'
+                          )
                         }
                       >
                         <TableCell align="center">
@@ -201,7 +208,13 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                             ? getAge(patient)
                             : `${moment(patient.birthDate).format('DD/MM/YYYY')} (${getAge(patient)})`}
                         </TableCell>
-                        <TableCell>{patient.lastEncounterName}</TableCell>
+                        <TableCell>
+                          {patient.extension &&
+                          patient.extension.find((extension) => extension.url === 'last-visit-service-provider')
+                            ? patient.extension.find((extension) => extension.url === 'last-visit-service-provider')
+                                ?.valueString
+                            : 'Non renseigné'}
+                        </TableCell>
                         <TableCell>
                           <StatusShip type={patient.deceasedDateTime ? 'Décédé' : 'Vivant'} />
                         </TableCell>

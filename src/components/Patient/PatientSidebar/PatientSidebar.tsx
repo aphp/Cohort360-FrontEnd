@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 import { CircularProgress, Divider, Drawer, Grid, IconButton, List, Typography } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
@@ -18,7 +19,6 @@ import useStyles from './styles'
 type PatientSidebarTypes = {
   total: number
   patients?: CohortPatient[]
-  groupId?: string
   openDrawer: boolean
   onClose: () => void
   deidentifiedBoolean: boolean
@@ -26,19 +26,24 @@ type PatientSidebarTypes = {
 const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   total,
   patients,
-  groupId,
   openDrawer,
   onClose,
   deidentifiedBoolean
 }) => {
   const classes = useStyles()
+  const location = useLocation()
+
+  const { search } = location
+  const params = new URLSearchParams(search)
+  const _searchInput = params.get('search')
+  const groupId = params.get('groupId')?.split(',') ?? []
 
   const [page, setPage] = useState(1)
   const [totalPatients, setTotalPatients] = useState(total)
   const [patientsList, setPatientsList] = useState(patients)
 
   const [open, setOpen] = useState(false)
-  const [searchInput, setSearchInput] = useState('')
+  const [searchInput, setSearchInput] = useState(_searchInput ?? '')
   const [searchBy, setSearchBy] = useState(SearchByTypes.text)
   const [loadingStatus, setLoadingStatus] = useState(false)
   const [gender, setGender] = useState(PatientGenderKind._unknown)
@@ -55,7 +60,17 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const onSearchPatient = (newSortBy: string, newSortDirection: 'asc' | 'desc', page = 1) => {
     setLoadingStatus(true)
-    fetchPatientList(page, searchBy, searchInput, gender, age, vitalStatus, newSortBy, newSortDirection, groupId)
+    fetchPatientList(
+      page,
+      searchBy,
+      searchInput,
+      gender,
+      age,
+      vitalStatus,
+      newSortBy,
+      newSortDirection,
+      groupId.join(',')
+    )
       .then((patientsResp) => {
         setPatientsList(patientsResp?.originalPatients ?? [])
         setTotalPatients(patientsResp?.totalPatients ?? 0)
@@ -153,7 +168,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
           patientsToDisplay.map((patient) => (
             <PatientSidebarItem
               key={patient.id}
-              groupId={groupId}
+              closeDialog={onClose}
               firstName={deidentifiedBoolean ? 'Prénom' : patient.name?.[0].given?.[0] ?? ''}
               lastName={deidentifiedBoolean ? 'Nom' : patient.name?.map((e) => e.family).join(' ') ?? ''}
               age={getAge(patient)}

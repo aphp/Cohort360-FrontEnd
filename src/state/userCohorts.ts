@@ -3,6 +3,8 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 import { fetchFavoriteCohorts, fetchLastCohorts, setFavorite, onRemoveCohort } from 'services/savedResearches'
 
+import { logout, login } from './me'
+
 export type UserCohortsState = {
   lastCohorts?: FormattedCohort[]
   favoriteCohorts?: FormattedCohort[]
@@ -71,6 +73,14 @@ const userCohortsSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
+    builder.addCase(login, () => ({
+      lastCohorts: [],
+      favoriteCohorts: []
+    }))
+    builder.addCase(logout, () => ({
+      lastCohorts: [],
+      favoriteCohorts: []
+    }))
     builder.addCase(initUserCohortsThunk.fulfilled, (state, { payload }) => {
       return payload
     })

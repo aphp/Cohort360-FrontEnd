@@ -23,22 +23,15 @@ const useStyles = makeStyles(() => ({
     overflow: 'auto',
     maxHeight: 'calc(100vh - 183px)'
   },
-  formControl: {
-    margin: '1em'
-  },
-  inputText: {
-    border: '1px solid #D7DAE3',
-    borderRadius: '5px',
-    padding: '0.5em'
-  },
-  inputTextError: {
-    borderColor: '#c61137',
-    color: '#fc1847'
-  },
-  linkTable: {
+  inputContainer: {
+    padding: '1em',
     display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-end'
+    flex: '1 1 0%',
+    flexDirection: 'column'
+  },
+  inputItem: {
+    margin: '1em',
+    width: 'calc(100% - 2em)'
   },
   criteriaActionContainer: {
     display: 'flex',

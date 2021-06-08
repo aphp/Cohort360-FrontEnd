@@ -54,7 +54,6 @@ export type CohortEncounter = IEncounter & {
 
 export type CohortPatient = IPatient & {
   lastEncounter?: IEncounter
-  lastEncounterName?: string
   lastProcedure?: IProcedure
   mainDiagnosis?: ICondition[]
   labResults?: IObservation[]
@@ -74,26 +73,30 @@ export type Cohort = {
   uuid?: string
   fhir_group_id?: string
   name?: string
+  description: string
   result_size?: number
   dated_measure?: any
   created_at?: string
   modified_at?: string
   favorite?: boolean
   type?: string
-  request_id?: string
+  request?: string
   request_job_status?: string
+  request_job_fail_msg?: string
 }
 
 export type FormattedCohort = {
   researchId: string
   fhir_group_id?: string
   name?: string
+  description: string
   status?: string
   nPatients?: number
   date?: string
   perimeter?: string
   favorite?: boolean
   jobStatus?: string
+  jobFailMsg?: string
 }
 
 export type CohortFilters = {
@@ -188,7 +191,7 @@ export type ScopeTreeRow = {
   name: string
   quantity: number
   parentId?: string
-  subItems?: ScopeTreeRow[] | undefined
+  subItems: ScopeTreeRow[]
   managingEntity?: any | undefined
 }
 
@@ -202,6 +205,7 @@ export type ComplexChartDataType<T, V = { [key: string]: number }> = Map<T, V>
 
 export type CohortData = {
   name?: string
+  description?: string
   cohort?: IGroup | IGroup[]
   totalPatients?: number
   originalPatients?: CohortPatient[]
@@ -302,7 +306,6 @@ export type DemographicDataType = {
   gender: { id: string; label: string }[] | null
   vitalStatus: { id: string; label: string }[] | null
   ageType: { id: string; label: string } | null
-  label: undefined
   years: [number, number]
   isInclusive?: boolean
 }
@@ -314,9 +317,8 @@ export type DocumentDataType = {
   docType: { id: string; label: string }[] | null
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
-  label: undefined
-  startOccurrence: Date
-  endOccurrence: Date
+  startOccurrence: Date | null
+  endOccurrence: Date | null
   isInclusive?: boolean
 }
 
@@ -333,8 +335,6 @@ export type GhmDataType = {
 }
 
 export type EncounterDataType = {
-  label: undefined
-  label2: undefined
   type: 'Encounter'
   title: string
   ageType: { id: string; label: string } | null
@@ -342,11 +342,11 @@ export type EncounterDataType = {
   durationType: { id: string; label: string }
   duration: [number, number]
   admissionMode: { id: string; label: string } | null
-  entryMode: { id: string; label: string } | null
-  exitMode: { id: string; label: string } | null
-  priseEnChargeType: { id: string; label: string } | null
-  typeDeSejour: { id: string; label: string } | null
-  fileStatus: { id: string; label: string } | null
+  entryMode: { id: string; label: string }[] | null
+  exitMode: { id: string; label: string }[] | null
+  priseEnChargeType: { id: string; label: string }[] | null
+  typeDeSejour: { id: string; label: string }[] | null
+  fileStatus: { id: string; label: string }[] | null
   isInclusive?: boolean
 }
 
@@ -366,6 +366,7 @@ export type CohortCreationSnapshotType = {
   uuid: string
   json: string
   date: string
+  dated_measures?: any[]
 }
 
 export type ValueSet = {
