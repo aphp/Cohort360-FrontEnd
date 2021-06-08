@@ -165,6 +165,26 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               </Grid>
             </ListItem>
 
+            {!open && (
+              <ListItem>
+                <Grid container item>
+                  <ListItemIcon className={classes.logoutButton} style={{ marginLeft: -10 }}>
+                    <Tooltip title="Se déconnecter">
+                      <IconButton
+                        onClick={() => {
+                          localStorage.clear()
+                          dispatch<any>(logoutAction())
+                          history.push('/')
+                        }}
+                      >
+                        <LogoutIcon className={classes.logoutIcon} />
+                      </IconButton>
+                    </Tooltip>
+                  </ListItemIcon>
+                </Grid>
+              </ListItem>
+            )}
+
             <Divider />
 
             {!cohortCreation?.request?.requestId ? (
@@ -356,24 +376,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               </List>
             </Collapse>
           </List>
-
-          {!open && (
-            <Grid container item>
-              <ListItemIcon className={classes.logoutButton}>
-                <Tooltip title="Se déconnecter">
-                  <IconButton
-                    onClick={() => {
-                      localStorage.clear()
-                      dispatch<any>(logoutAction())
-                      history.push('/')
-                    }}
-                  >
-                    <LogoutIcon className={classes.logoutIcon} />
-                  </IconButton>
-                </Tooltip>
-              </ListItemIcon>
-            </Grid>
-          )}
         </Drawer>
       </div>
     </>
