@@ -25,178 +25,137 @@ const DocumentSearchHelp = ({ open, onClose }) => {
   const classes = useStyles()
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle className={classes.title}>Aide à la recherche textuelle</DialogTitle>
       <DialogContent className={classes.dialog}>
         <Grid container direction="column">
           <Typography>Les opérateurs ci-dessous vous aideront à affiner la recherche textuelle.</Typography>
+
           <Typography variant="button" className={classes.subtitle}>
-            Recherche textuelle basique :
+            Rappel :
           </Typography>
+
           <TableContainer component={Paper} className={classes.tableContainer}>
             <Table className={classes.table} aria-label="customized table">
               <TableHead>
                 <TableRow className={classes.tableHead}>
                   <TableCell align="center" className={classes.tableHeadCell}>
-                    Opérateurs / Caractères à utiliser
+                    Rappel
                   </TableCell>
                   <TableCell align="center" className={classes.tableHeadCell}>
                     Description
                   </TableCell>
                   <TableCell align="center" className={classes.tableHeadCell}>
-                    Syntaxe
+                    Exemple
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow className={classes.tableBodyRows} hover>
+                <TableRow className={classes.tableBodyRows}>
                   <TableCell align="center">
-                    <Typography className={classes.bold}>AND</Typography>
+                    <Typography className={classes.bold}>Recherche racinisée</Typography>
                   </TableCell>
                   <TableCell align="center">
                     <Typography align="justify">
-                      Recherche si dans un document, les mots, ou groupe de mots (encadrés de parenthèse pour ce
-                      dernier) sont présents. La recherche se base sur la racine des mots. Par exemple pour le mot
-                      embolie, la recherche peut retourner embolisation.
+                      La recherche considère un mot et ses dérivés comme étant équivalents
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Typography className={classes.bold}>Mot1 AND Mot2 () AND ()</Typography>
+                    <Typography className={classes.bold}>
+                      Le mot embolie peut retourner les résultats : embolie, embolise, embolisation, embolique, ….
+                    </Typography>
                   </TableCell>
                 </TableRow>
-                <TableRow className={classes.tableBodyRows} hover>
+
+                <TableRow className={classes.tableBodyRows}>
                   <TableCell align="center">
-                    <Typography className={classes.bold}>OR</Typography>
-                    <Typography className={classes.bold}>|</Typography>
-                    <Typography className={classes.bold}>||</Typography>
+                    <Typography className={classes.bold}>Insensible à la casse</Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography align="justify">La recherche ignore les majuscules/minuscules</Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>
+                      Le mot Embolie est équivalent à : emBoLIE, Embolie, embolie, ...
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>Ignore la ponctuation</Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography align="justify">
+                      La recherche ne prend pas en compte la ponctuation comme , ; ! ? …
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>
+                      Pour rechercher la phrase : Les données administratives, sociales, est équivent à rechercher la
+                      phrase : Les données administratives sociales (sans virgule)
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>Ignore les accents</Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography align="justify">La recherche ne prend pas en compte les accents des mots</Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>
+                      Le mot diabète est équivalent à diabete (sans accents)
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>Ignore les articles</Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography align="justify">
+                      La recherche ne prend pas en compte les articles suivants: le, la, l', lorsqu', de, un, une, …
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>
+                      Le mot une embolie est équivalent à embolie (sans article)
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>Ignore les mots vides</Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography align="justify">
+                      La recherche ne prend pas en compte les termes suivants: au, ce nous, êtes, sommes, et, même, moi,
+                      été, sans, …
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>Les termes être fumeur sont équivalents à fumeur</Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
                     <Typography className={classes.bold}>Espace entre deux mots</Typography>
                   </TableCell>
                   <TableCell align="center">
                     <Typography align="justify">
-                      Recherche dans les documents si au moins un des mots est présent.
+                      En absence d'opérateurs logiques entre deux mots, c'est l'opérateur OR qui s'applique par défaut
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Typography className={classes.bold}>Mot1 OR Mot2</Typography>
-                    <Typography className={classes.bold}>Mot1 |Mot2</Typography>
-                    <Typography className={classes.bold}>Mot1 || Mot2</Typography>
-                    <Typography className={classes.bold}>Mot1 Mot2</Typography>
-                  </TableCell>
-                </TableRow>
-                <TableRow className={classes.tableBodyRows} hover>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>NOT</Typography>
-                    <Typography className={classes.bold}>!</Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography align="justify">
-                      Exprime la négation. La recherche exclut le terme qui suit NOT ou bien !
+                    <Typography className={classes.bold}>
+                      Pour la recherche des mots embolie pulmonaire, c'est équivalent à rechercher embolie OR pulmonaire
                     </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>Mot1 NOT Mot2</Typography>
-                    <Typography className={classes.bold}>Mot1 ! Mot2</Typography>
-                  </TableCell>
-                </TableRow>
-                <TableRow className={classes.tableBodyRows} hover>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>()</Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography align="justify">Les parenthèses permettent de faire un groupe de mots.</Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>(Mot1 Mot2)</Typography>
-                  </TableCell>
-                </TableRow>
-                <TableRow className={classes.tableBodyRows} hover>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>() ()</Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography align="justify">
-                      Recherche dans les documents si au moins un des groupes de mots est présent.
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>(Mot1 Mot2)(Mot3 Mot4)</Typography>
-                  </TableCell>
-                </TableRow>
-                <TableRow className={classes.tableBodyRows} hover>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>*</Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography align="justify">
-                      Lorsque * est placé à la fin du mot, la recherche s&apos;effectue sur tous les mots pouvant
-                      correspondre à la fin du mot souhaité. Par exemple pour embol*, les résultats peuvent être
-                      embolisation, embolie, ...
-                    </Typography>
-                    <Typography align="justify">
-                      Dans le cas où * est placé à l&apos;intérieur d&apos;une chaine de caractères, la recherche
-                      s&apos;effectue sur tous les mots pouvant correspondre au mot souhaité, quelque soit le nombre de
-                      caractères inconnus. Par exemple, pour te*t, les résultats peuvent être testés, texte, tenant,
-                      test, ...
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>Mo*</Typography>
-                    <Typography className={classes.bold}>Mo*t</Typography>
-                  </TableCell>
-                </TableRow>
-                <TableRow className={classes.tableBodyRows} hover>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>?</Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography align="justify">
-                      Dans le cas où ? est placé à l&apos;intérieur d&apos;une chaine de caractères, la recherche
-                      s&apos;effectue sur tous les mots pouvant correspondre au mot souhaité, avec le caractère inconnu.
-                      Par exemple pour te?t, les résultats peuvent être testés, texte, test, ...
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>Mo?t</Typography>
-                  </TableCell>
-                </TableRow>
-                <TableRow className={classes.tableBodyRows} hover>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>~</Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography align="justify">
-                      Recherche de mots similaires. Par exemple pour hormone~, les résultats peuvent être hormonede
-                      (considéré comme faute de frappe), hormono,...
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>Mot~</Typography>
-                  </TableCell>
-                </TableRow>
-                <TableRow className={classes.tableBodyRows} hover>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>+</Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography align="justify">
-                      Le terme qui suit + doit forcément être présent dans les résultats de la recherche. Par exemple
-                      pour embolie+myocarde, la recherche doit forcément trouver le terme myocarde, même si dans le même
-                      docupment le terme embolie &apos;est pas présent.
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>+Mot</Typography>
-                  </TableCell>
-                </TableRow>
-                <TableRow className={classes.tableBodyRows} hover>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>-</Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography align="justify">Le terme qui suit - est exclu de la recherche.</Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>- Mot</Typography>
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -204,8 +163,12 @@ const DocumentSearchHelp = ({ open, onClose }) => {
           </TableContainer>
 
           <Typography variant="button" className={classes.subtitle}>
-            Recherche textuelle avancée :
+            Recherche textuelle basique
           </Typography>
+          <Typography variant="caption" className={classes.helper}>
+            Les opérateurs logiques ne fonctionnent qu'en majuscule
+          </Typography>
+
           <TableContainer component={Paper} className={classes.tableContainer}>
             <Table className={classes.table} aria-label="customized table">
               <TableHead>
@@ -216,45 +179,338 @@ const DocumentSearchHelp = ({ open, onClose }) => {
                   <TableCell align="center" className={classes.tableHeadCell}>
                     Description
                   </TableCell>
+                  <TableCell align="center" className={classes.tableHeadCell} style={{ width: 150 }}>
+                    Syntaxe
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableHeadCell}>
+                    Exemple
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow className={classes.tableBodyRows} hover>
+                <TableRow className={classes.tableBodyRows}>
                   <TableCell align="center">
-                    <Typography className={classes.bold}>&quot;mot1 mot2&quot;</Typography>
+                    <Typography className={classes.bold}>AND</Typography>
                   </TableCell>
-                  <TableCell align="center">
-                    <Typography align="justify">Recherche des deux termes côte à côte.</Typography>
-                  </TableCell>
-                </TableRow>
-                <TableRow className={classes.tableBodyRows} hover>
-                  <TableCell align="center">
-                    <Typography className={classes.bold}>&quot;mot1 mot2&quot;~nombre de mots</Typography>
-                  </TableCell>
-                  <TableCell align="center">
+                  <TableCell align="left">
                     <Typography align="justify">
-                      Recherche des deux termes avec une distance de mots entre les deux. Par exemple pour « embolie
-                      infarctus »~10, la recherche s’effectue dans les documents ayant les deux termes avec une distance
-                      de 10 mots maximum entre les deux.
+                      Recherche la présence de plusieurs mots au sein d'un document
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography>
+                      Mot1 <span className={classes.bold}>AND</span> Mot2
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography>
+                      infarctus <span className={classes.bold}>AND</span> myocarde
+                    </Typography>
+                    <Typography align="justify">
+                      Les deux mots <span className={classes.bold}>infarctus</span> et{' '}
+                      <span className={classes.bold}>myocarde</span> sont présents dans chaque document
                     </Typography>
                   </TableCell>
                 </TableRow>
-                <TableRow className={classes.tableBodyRows} hover>
+
+                <TableRow className={classes.tableBodyRows}>
                   <TableCell align="center">
-                    <Typography className={classes.bold}>^nombre</Typography>
+                    <Typography className={classes.bold}>OR</Typography>
+                    <Typography className={classes.bold}>|</Typography>
+                    <Typography className={classes.bold}>||</Typography>
+                    <Typography className={classes.bold}>Espace entre deux mots</Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography>Recherche dans les documents si au moins un des mots est présent</Typography>
+                    <Typography className={classes.bold}>Ces 4 opérateurs sont équivalents</Typography>
                   </TableCell>
                   <TableCell align="center">
-                    <Typography align="justify">
-                      Permet de rechercher un terme ou un groupe de mots en renforçant sa valeur en lui accordant un
-                      facteur. Par exemple, la requête embolie pulmonaire^4 recherche tous les documents ayant les
-                      termes embolie et pulmonaire mais avec le terme pulmonaire le plus recherché/efficace/important.
+                    <Typography>
+                      Mot1 <span className={classes.bold}>OR</span> Mot 2
+                    </Typography>
+                    <Typography>
+                      Mot1 <span className={classes.bold}>|</span> Mot 2
+                    </Typography>
+                    <Typography>
+                      Mot1 <span className={classes.bold}>||</span> Mot 2
+                    </Typography>
+                    <Typography>
+                      Mot1 <span className={classes.bold}> </span> Mot 2
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography>
+                      greffe <span className={classes.bold}>OR</span> rein
                     </Typography>
                     <Typography align="justify">
-                      Ceci est possible avec des groupes de mots également, par exemple &quot;infarctus du
-                      myocarde&quot;^3 &quot;embolie pulmonaire&quot;.
+                      Les résultats retournent les documents qui contiennent soit{' '}
+                      <span className={classes.bold}>greffe</span>, soit <span className={classes.bold}>rein</span>,
+                      soit les deux mots dans le même document
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>NOT</Typography>
+                    <Typography className={classes.bold}>!</Typography>
+                    <Typography className={classes.bold}>-</Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography align="justify">
+                      Exprime la négation. La recherche exclut le terme qui suit NOT ou ! ou -
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography>
+                      Mot1 <span className={classes.bold}>NOT</span> Mot 2
+                    </Typography>
+                    <Typography>
+                      Mot1 <span className={classes.bold}>!</span> Mot2
+                    </Typography>
+                    <Typography>
+                      Mot1 <span className={classes.bold}>-</span> Mot2
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography>
+                      thyroide <span className={classes.bold}>NOT</span> tumeur
                     </Typography>
                     <Typography align="justify">
-                      Le facteur est à 1 par défaut, il peut aussi être inférieur à 1 (par exemple à 0.2).
+                      Les résultats retournent les documents qui contiennent le terme thyroide, mais pas le terme tumeur
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>() opérateur logique ()</Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography align="justify">
+                      Les parenthèses permettent de créer des groupes de recherches (sous-recherche)
+                    </Typography>
+                    <Typography align="justify">
+                      Un opérateur logique peut être ajouté dans les groupes de recherches et entre les groupes de
+                      recherche
+                    </Typography>
+                    <Typography align="justify">
+                      En absence d'opérateur, un opérateur OR est appliqué par défaut
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography>
+                      <span className={classes.bold}>(</span>Mot1 Mot2<span className={classes.bold}>)</span> AND{' '}
+                      <span className={classes.bold}>(</span>Mot3 Mot4<span className={classes.bold}>)</span>
+                    </Typography>
+                    <Typography>
+                      <span className={classes.bold}>(</span>Mot1 Mot2<span className={classes.bold}>)</span> NOT{' '}
+                      <span className={classes.bold}>(</span>Mot3 Mot4<span className={classes.bold}>)</span>
+                    </Typography>
+                    <Typography>
+                      <span className={classes.bold}>(</span>Mot1 Mot2<span className={classes.bold}>)</span> OR{' '}
+                      <span className={classes.bold}>(</span>Mot3 Mot4<span className={classes.bold}>)</span>
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography>
+                      <span className={classes.bold}>(</span>embolie AND pulmonaire
+                      <span className={classes.bold}>)</span> NOT <span className={classes.bold}>(</span>infarctus AND
+                      myocarde
+                      <span className={classes.bold}>)</span>
+                    </Typography>
+                    <Typography>
+                      Les résultats retournent les documents qui contiennent les deux termes embolie et pulmonaire mais
+                      qui ne contiennent pas les deux mots suivants à la fois : infarctus et myocarde.
+                    </Typography>
+
+                    <br />
+
+                    <Typography>Exemple :</Typography>
+                    <Typography style={{ marginLeft: 8 }}>
+                      - embolie, pulmonaire, infarctus, myocarde =&gt; KO : document ne correspond pas à la recherche.
+                    </Typography>
+                    <Typography style={{ marginLeft: 8 }}>
+                      - embolie, pulmonaire, infarctus =&gt; OK : document correspond à la recherche.
+                    </Typography>
+                    <Typography style={{ marginLeft: 8 }}>
+                      - embolie, pulmonaire, myocarde =&gt; OK : document correspond à la recherche.
+                    </Typography>
+                    <Typography style={{ marginLeft: 8 }}>
+                      - embolie, pulmonaire =&gt; OK : document correspond à la recherche.
+                    </Typography>
+                    <Typography style={{ marginLeft: 8 }}>
+                      - embolie =&gt; KO : document ne correspond pas à la recherche.
+                    </Typography>
+                    <Typography style={{ marginLeft: 8 }}>
+                      - pulmonaire =&gt; KO : document ne correspond pas à la recherche.
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>*</Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography align="justify">Le caractère joker * remplace une chaine de caractères</Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography>
+                      <span className={classes.bold}>*</span>Mot
+                    </Typography>
+                    <Typography>
+                      Mo<span className={classes.bold}>*</span>
+                    </Typography>
+                    <Typography>
+                      Mo<span className={classes.bold}>*</span>t"
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography>
+                      <span className={classes.bold}>*</span>graphie : Recherche tous les mots qui finissent par{' '}
+                      <span className={classes.bold}>graphie</span> et le mot{' '}
+                      <span className={classes.bold}>graphie</span> lui même.
+                      <br />
+                      Par exemple : echographie, radiographie, mammographie, ...
+                    </Typography>
+                    <br />
+                    <Typography>
+                      fum<span className={classes.bold}>*</span> : Recherche tous les mots qui commencent par{' '}
+                      <span className={classes.bold}>fum</span>
+                      <br />
+                      Par exemple: fumeur, fume, fumait, ...
+                    </Typography>
+                    <br />
+                    <Typography>
+                      Te<span className={classes.bold}>*</span>t : Recherche tous les mots qui commencent par{' '}
+                      <span className={classes.bold}>Te</span> et finissent par <span className={classes.bold}>t</span>
+                      <br />
+                      Par exemple: test, tenant, ...
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>?</Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography align="justify">
+                      Le caractère joker <span className={classes.bold}>?</span> remplace un caractère inconnu
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography>
+                      Mo<span className={classes.bold}>?</span>t
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography className={classes.bold}>A?AT</Typography>
+                    <Typography>
+                      Les résultats peuvent retourner les documents comprenant les termes :{' '}
+                      <span className={classes.bold}>ASAT, ALAT, …</span>
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>~</Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography align="justify">
+                      Recherche un mot similaire. Cette recherche est utilisée dans le cas où un mot est mal
+                      orthographié dans les contenus médicaux
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography>
+                      Mot<span className={classes.bold}>~</span>
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography className={classes.bold}>diabète~</Typography>
+                    <Typography>Les résultats retournent les documents qui contiennent des mots similaires.</Typography>
+                    <Typography>Par exemple duabète, diabte, ...</Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>+</Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography align="justify">
+                      Priorise un mot. La recherche inclus systématiquement le terme qui suit le caractère spécial{' '}
+                      <span className={classes.bold}>+</span>
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography>
+                      Mot1 <span className={classes.bold}>+</span> Mot2
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography className={classes.bold}>embolie +pulmonaire</Typography>
+                    <Typography>Recherche les documents qui contiennent obligatoirement le mot pulmonaire.</Typography>
+                    <Typography>
+                      Les résultats retournent les documents{' '}
+                      <span className={classes.bold}>qui contiennent embolie pulmonaire, pulmonaire</span>, mais{' '}
+                      <span className={classes.bold}>pas uniquement embolie</span>
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <Typography variant="button" className={classes.subtitle}>
+            Rechercher textuelle avancée
+          </Typography>
+
+          <TableContainer component={Paper} className={classes.tableContainer}>
+            <Table className={classes.table} aria-label="customized table">
+              <TableHead>
+                <TableRow className={classes.tableHead}>
+                  <TableCell align="center" className={classes.tableHeadCell}>
+                    Opérateurs / Caractères à utiliser
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableHeadCell}>
+                    Description
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableHeadCell} style={{ width: 150 }}>
+                    Syntaxe
+                  </TableCell>
+                  <TableCell align="center" className={classes.tableHeadCell}>
+                    Exemple
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>" "</Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography>Permet de rechercher des expressions exactes.</Typography>
+                    <Typography align="justify">
+                      La recherche par la racine des mots ne s’appliquent pas, dans ce cas précis. Les accents, les
+                      majuscules/minuscules et les articles ne sont pas ignorés
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography>
+                      Mot1 <span className={classes.bold}>AND</span> Mot2
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography>
+                      infarctus <span className={classes.bold}>AND</span> myocarde
+                    </Typography>
+                    <Typography align="justify">
+                      Les deux mots <span className={classes.bold}>infarctus</span> et{' '}
+                      <span className={classes.bold}>myocarde</span> sont présents dans chaque document
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -263,14 +519,15 @@ const DocumentSearchHelp = ({ open, onClose }) => {
           </TableContainer>
 
           <Typography className={classes.subtitle}>
-            Pour plus de fonctionnalités dans la recherche textuelle, vous pouvez consulter le lien suivant :
+            Pour plus de fonctionnalités dans la recherche textuelle, vous pouvez consulter le lien suivant : <br />
             <Link href="https://lucene.apache.org/solr/guide/8_1/the-standard-query-parser.html#fuzzy-searches">
               https://lucene.apache.org/solr/guide/8_1/the-standard-query-parser.html#fuzzy-searches.
             </Link>
           </Typography>
         </Grid>
       </DialogContent>
-      <DialogActions>
+
+      <DialogActions className={classes.dialog}>
         <Button onClick={onClose} color="primary">
           Fermer
         </Button>
