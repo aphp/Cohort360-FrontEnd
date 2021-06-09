@@ -75,15 +75,15 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
       .area()
       .curve(d3.curveLinear)
       .x0(width / 2)
-      .x1((d) => femaleValue(d.female))
-      .y((d) => y(d.age))
+      .x1((d) => femaleValue(d.female ?? 0))
+      .y((d) => y(d.age ?? 0))
 
     const maleAreaGenerator = d3
       .area()
       .curve(d3.curveLinear)
       .x0(width / 2)
-      .x1((d) => maleValue(d.male))
-      .y((d) => y(d.age))
+      .x1((d) => maleValue(d.male ?? 0))
+      .y((d) => y(d.age ?? 0))
 
     const yAxis = (g) =>
       g
