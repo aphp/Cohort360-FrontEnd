@@ -45,8 +45,8 @@ store.subscribe(() => {
     JSON.stringify({
       ...exploredCohort,
       agePyramidData: exploredCohort.agePyramidData ? [...exploredCohort.agePyramidData] : [],
-      genderRepartitionMap: exploredCohort.genderRepartitionMap ? [...exploredCohort.genderRepartitionMap] : [],
-      monthlyVisitData: exploredCohort.monthlyVisitData ? [...exploredCohort.monthlyVisitData] : []
+      genderRepartitionMap: exploredCohort.genderRepartitionMap ? { ...exploredCohort.genderRepartitionMap } : {},
+      monthlyVisitData: exploredCohort.monthlyVisitData ? { ...exploredCohort.monthlyVisitData } : {}
     })
   )
   localStorage.setItem('userCohorts', JSON.stringify(userCohorts))

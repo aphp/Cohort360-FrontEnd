@@ -3,8 +3,10 @@ import React, { useRef, useEffect, memo, useState } from 'react'
 import * as d3 from 'd3'
 import legend from './Legend'
 
+import { AgeRepartitionType } from 'types'
+
 type PyramidProps = {
-  data?: Map<number, { male: number; female: number }>
+  data?: AgeRepartitionType
   width?: number
   height?: number
 }
@@ -14,18 +16,19 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
   const [legendHtml, setLegend] = useState()
 
   useEffect(() => {
-    if (!data || (data && !data.size)) {
+    if (!data || (data && !data.length)) {
       return
     }
     let valueMax = 0
     const valuesPos = []
     const customData: { age: number; male: number; female: number }[] = []
-    for (const entry of data.entries()) {
-      const [age, ageGenderValues] = entry
+    const keys = Object.keys(data)
+    for (const age of keys) {
+      const ageGenderValues = data[age] || {}
       const maleValue = ageGenderValues.male
       const femaleValue = ageGenderValues.female
       customData.push({
-        age,
+        age: +age,
         male: maleValue,
         female: femaleValue
       })
@@ -38,8 +41,13 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
       }
     }
     customData.sort((d1, d2) => d1.age - d2.age)
-    const yValueMin = valuesPos[0] === 0 ? valuesPos[0] : valuesPos[0] - 1
-    const yValueMax = valuesPos[valuesPos.length - 1] + 1
+    // yValueMin = min age with data
+    // yValueMax = yValueMin + valuesPos.length (array with data, each index = different ages)
+    const yValueMin =
+      customData && customData.length > 0
+        ? (customData.find(({ male, female }) => male !== 0 && female !== 0) || { age: 0 }).age
+        : 0
+    const yValueMax = yValueMin + (valuesPos.length + 1)
 
     const svg = d3.select(node.current)
     svg.selectAll('*').remove()

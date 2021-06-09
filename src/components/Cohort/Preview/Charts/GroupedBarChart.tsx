@@ -3,10 +3,10 @@ import React, { useRef, useEffect, useState } from 'react'
 import * as d3 from 'd3'
 import legend from './Legend'
 
-import { ComplexChartDataType, Month } from 'types'
+import { VisiteRepartitionType, Month } from 'types'
 
 type GroupedBarChartProps = {
-  data?: ComplexChartDataType<Month>
+  data?: VisiteRepartitionType
   height?: number
   width?: number
 }
@@ -16,7 +16,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
   const [legendHtml, setLegend] = useState()
 
   useEffect(() => {
-    if (!data || (data && !data.size)) {
+    if (!data) {
       return
     }
     const customData = [
@@ -33,8 +33,9 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
       { Mois: Month.november, Hommes: 0, Femmes: 0 },
       { Mois: Month.december, Hommes: 0, Femmes: 0 }
     ]
-    for (const entry of data) {
-      const [month, entryData] = entry
+    const months = Object.keys(data)
+    for (const month of months) {
+      const entryData = data[month]
       const monthDataIndex = customData.findIndex((d) => d.Mois === month)
       if (monthDataIndex >= 0) {
         const maleCount = entryData.male

@@ -6,7 +6,7 @@ import {
   // IReference
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { getAgeArkhn } from './age'
-import { Month, ComplexChartDataType, SimpleChartDataType } from 'types'
+import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
 import { getStringMonth, getStringMonthAphp } from './formatDate'
 
 function getRandomColor() {
@@ -64,12 +64,13 @@ const getVisitTypeColor = (visitType?: string) => {
   return color
 }
 
-export const getGenderRepartitionMapAphp = (facet?: IExtension[]): ComplexChartDataType<PatientGenderKind> => {
-  const repartitionMap = new Map()
-
-  repartitionMap.set('female', { deceased: 0, alive: 0 })
-  repartitionMap.set('male', { deceased: 0, alive: 0 })
-  repartitionMap.set('other', { deceased: 0, alive: 0 })
+export const getGenderRepartitionMapAphp = (facet?: IExtension[]): GenderRepartitionType => {
+  const repartitionMap = {
+    female: { deceased: 0, alive: 0 },
+    male: { deceased: 0, alive: 0 },
+    other: { deceased: 0, alive: 0 },
+    unknown: { deceased: 0, alive: 0 }
+  }
 
   facet?.forEach((extension) => {
     const isDeceased = extension.extension?.filter((extension) => {
@@ -84,26 +85,26 @@ export const getGenderRepartitionMapAphp = (facet?: IExtension[]): ComplexChartD
       genderData?.forEach((gender) => {
         switch (gender.url) {
           case 'female':
-            repartitionMap.get('female').deceased = gender.valueDecimal
+            repartitionMap.female.deceased = gender.valueDecimal ?? 0
             break
           case 'male':
-            repartitionMap.get('male').deceased = gender.valueDecimal
+            repartitionMap.male.deceased = gender.valueDecimal ?? 0
             break
           default:
-            repartitionMap.get('other').deceased = gender?.valueDecimal
+            repartitionMap.other.deceased = gender?.valueDecimal ?? 0
         }
       })
     } else if (isDeceased === 'false') {
       genderData?.forEach((gender) => {
         switch (gender.url) {
           case 'female':
-            repartitionMap.get('female').alive = gender.valueDecimal
+            repartitionMap.female.alive = gender.valueDecimal ?? 0
             break
           case 'male':
-            repartitionMap.get('male').alive = gender.valueDecimal
+            repartitionMap.male.alive = gender.valueDecimal ?? 0
             break
           default:
-            repartitionMap.get('other').alive = gender?.valueDecimal
+            repartitionMap.other.alive = gender?.valueDecimal ?? 0
         }
       })
     }
@@ -112,18 +113,21 @@ export const getGenderRepartitionMapAphp = (facet?: IExtension[]): ComplexChartD
   return repartitionMap
 }
 
-export const getGenderRepartitionMap = (
-  patients: IPatient[]
-): Map<PatientGenderKind, { alive: number; deceased: number }> => {
-  const repartitionMap = new Map()
+export const getGenderRepartitionMap = (patients: IPatient[]): GenderRepartitionType => {
+  const repartitionMap = {
+    female: { deceased: 0, alive: 0 },
+    male: { deceased: 0, alive: 0 },
+    other: { deceased: 0, alive: 0 },
+    unknown: { deceased: 0, alive: 0 }
+  }
+
   patients.forEach((patient) => {
-    if (!repartitionMap.has(patient.gender)) {
-      repartitionMap.set(patient.gender, { deceased: 0, alive: 0 })
-    }
+    const gender: 'female' | 'male' | 'other' | 'unknown' = patient.gender || 'unknown'
+
     if (patient.deceasedDateTime) {
-      repartitionMap.get(patient.gender).deceased += 1
+      repartitionMap[gender].deceased += 1
     } else {
-      repartitionMap.get(patient.gender).alive += 1
+      repartitionMap[gender].alive += 1
     }
   })
 
@@ -179,10 +183,8 @@ export const getEncounterRepartitionMap = (encounters: IEncounter[]): SimpleChar
   return data
 }
 
-export const getAgeRepartitionMapAphp = (
-  facet?: IExtension[]
-): ComplexChartDataType<number, { male: number; female: number; other?: number }> => {
-  const repartitionMap = new Map()
+export const getAgeRepartitionMapAphp = (facet?: IExtension[]): AgeRepartitionType => {
+  const repartitionMap = new Array(130).map(() => ({ male: 0, female: 0, other: 0 }))
 
   facet?.forEach((extension) => {
     const ageObj = extension.extension?.filter((object) => {
@@ -194,9 +196,11 @@ export const getAgeRepartitionMapAphp = (
     })?.[0]
 
     if (ageObj) {
-      const age = parseInt(ageObj, 10) / 12
+      const age: number = parseInt(ageObj, 10) / 12
 
-      repartitionMap.set(age, { male: 0, female: 0, other: 0 })
+      if (!repartitionMap[age]) {
+        repartitionMap[age] = { male: 0, female: 0, other: 0 }
+      }
 
       if (genderValuesObj) {
         const genderValues = genderValuesObj.extension
@@ -204,13 +208,13 @@ export const getAgeRepartitionMapAphp = (
         genderValues?.forEach((genderValue) => {
           switch (genderValue.url) {
             case 'female':
-              repartitionMap.get(age).female = genderValue.valueDecimal
+              repartitionMap[age].female = genderValue.valueDecimal ?? 0
               break
             case 'male':
-              repartitionMap.get(age).male = genderValue.valueDecimal
+              repartitionMap[age].male = genderValue.valueDecimal ?? 0
               break
             default:
-              repartitionMap.get(age).other = genderValue.valueDecimal
+              repartitionMap[age].other = genderValue.valueDecimal ?? 0
           }
         })
       }
@@ -220,10 +224,8 @@ export const getAgeRepartitionMapAphp = (
   return repartitionMap
 }
 
-export const getAgeRepartitionMap = (
-  patients: IPatient[]
-): ComplexChartDataType<number, { male: number; female: number; other?: number }> => {
-  const repartitionMap = new Map()
+export const getAgeRepartitionMap = (patients: IPatient[]): AgeRepartitionType => {
+  const repartitionMap = new Array(130).map(() => ({ male: 0, female: 0, other: 0 }))
 
   patients.forEach((patient) => {
     if (patient.birthDate) {
@@ -231,18 +233,22 @@ export const getAgeRepartitionMap = (
         new Date(patient.birthDate),
         patient.deceasedDateTime ? new Date(patient.deceasedDateTime) : new Date()
       )
-      if (!repartitionMap.has(age)) {
-        repartitionMap.set(age, { male: 0, female: 0, other: 0 })
+      if (!repartitionMap[age]) {
+        repartitionMap[age] = { male: 0, female: 0, other: 0 }
       }
+
       switch (patient.gender) {
         case 'female':
-          repartitionMap.get(age).female += 1
+          if (!repartitionMap[age].female) repartitionMap[age].female = 0
+          repartitionMap[age].female += 1
           break
         case 'male':
-          repartitionMap.get(age).male += 1
+          if (!repartitionMap[age].male) repartitionMap[age].male = 0
+          repartitionMap[age].male += 1
           break
         default:
-          repartitionMap.get(age).other += 1
+          if (!repartitionMap[age].other) repartitionMap[age].other = 0
+          repartitionMap[age].other += 1
           break
       }
     }
@@ -251,50 +257,21 @@ export const getAgeRepartitionMap = (
   return repartitionMap
 }
 
-export const getVisitRepartitionMapAphp2 = (facet?: IExtension[]): ComplexChartDataType<Month> => {
-  const repartitionMap = new Map()
-
-  facet?.forEach((object) => {
-    const data = object.extension?.filter((obj) => {
-      return obj.url === 'start-date-month-facet'
-    })?.[0].extension
-
-    if (data) {
-      for (let i = 0; i < data.length; i += 2) {
-        const month = getStringMonthAphp(parseInt(data[i].url ?? 'Inconnu', 10))
-
-        if (!repartitionMap.get(month)) {
-          repartitionMap.set(month, {
-            male: 0,
-            female: 0,
-            other: 0
-          })
-        }
-
-        const genderData = data[i + 1] ? data[i + 1].extension : []
-
-        genderData?.forEach((gender) => {
-          switch (gender.url) {
-            case 'female':
-              repartitionMap.get(month).female += gender.valueDecimal
-              break
-            case 'male':
-              repartitionMap.get(month).male += gender.valueDecimal
-              break
-            default:
-              repartitionMap.get(month).other += gender.valueDecimal
-              break
-          }
-        })
-      }
-    }
-  })
-
-  return repartitionMap
-}
-
-export const getVisitRepartitionMapAphp = (facet?: IExtension[]): ComplexChartDataType<Month> => {
-  const repartitionMap = new Map()
+export const getVisitRepartitionMapAphp = (facet?: IExtension[]): VisiteRepartitionType => {
+  const repartitionMap: VisiteRepartitionType = {
+    Janvier: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Février: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Mars: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Avril: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Mai: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Juin: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Juillet: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Août: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Septembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Octobre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Novembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Decembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 }
+  }
 
   facet?.forEach((object) => {
     const data = object.extension
@@ -304,31 +281,19 @@ export const getVisitRepartitionMapAphp = (facet?: IExtension[]): ComplexChartDa
 
       if (values) {
         const month = getStringMonthAphp(parseInt(values[1] ?? 'Inconnu', 10))
-
-        if (!repartitionMap.get(month)) {
-          repartitionMap.set(month, {
-            male: 0,
-            maleCount: 0,
-            female: 0,
-            femaleCount: 0,
-            other: 0,
-            otherCount: 0
-          })
-        }
-
-        if (values[2]) {
+        if (month && values[2]) {
           switch (values[2]) {
             case 'female':
-              repartitionMap.get(month).female += data[0].valueDecimal
-              repartitionMap.get(month).femaleCount += 1
+              repartitionMap[month].female += parseInt(`${data[0].valueDecimal ?? 0}`)
+              repartitionMap[month].femaleCount += 1
               break
             case 'male':
-              repartitionMap.get(month).male += data[0].valueDecimal
-              repartitionMap.get(month).maleCount += 1
+              repartitionMap[month].male += parseInt(`${data[0].valueDecimal ?? 0}`)
+              repartitionMap[month].maleCount += 1
               break
             default:
-              repartitionMap.get(month).other += data[0].valueDecimal
-              repartitionMap.get(month).otherCount += 1
+              repartitionMap[month].other += parseInt(`${data[0].valueDecimal ?? 0}`)
+              repartitionMap[month].otherCount += 1
               break
           }
         }
@@ -336,17 +301,59 @@ export const getVisitRepartitionMapAphp = (facet?: IExtension[]): ComplexChartDa
     }
   })
 
-  repartitionMap.forEach((month) => {
-    month.male = month.male / month.maleCount
-    month.female = month.female / month.femaleCount
-    month.other = month.other / month.otherCount
-  })
+  // Idiot de TS...... Don't forget the type !
+  const months: [
+    'Janvier',
+    'Février',
+    'Mars',
+    'Avril',
+    'Mai',
+    'Juin',
+    'Juillet',
+    'Août',
+    'Septembre',
+    'Octobre',
+    'Novembre',
+    'Decembre'
+  ] = [
+    'Janvier',
+    'Février',
+    'Mars',
+    'Avril',
+    'Mai',
+    'Juin',
+    'Juillet',
+    'Août',
+    'Septembre',
+    'Octobre',
+    'Novembre',
+    'Decembre'
+  ]
+  for (const month of months) {
+    if (!repartitionMap[month]) continue
+    repartitionMap[month].male = repartitionMap[month].male / repartitionMap[month].maleCount
+    repartitionMap[month].female = repartitionMap[month].female / repartitionMap[month].femaleCount
+    repartitionMap[month].other = repartitionMap[month].other / repartitionMap[month].otherCount
+  }
 
   return repartitionMap
 }
 
-export const getVisitRepartitionMap = (patients: IPatient[], encounters: IEncounter[]): ComplexChartDataType<Month> => {
-  const repartitionMap = new Map()
+export const getVisitRepartitionMap = (patients: IPatient[], encounters: IEncounter[]): VisiteRepartitionType => {
+  const repartitionMap = {
+    Janvier: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Février: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Mars: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Avril: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Mai: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Juin: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Juillet: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Août: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Septembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Octobre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Novembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Decembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 }
+  }
 
   encounters.forEach((encounter) => {
     if (encounter.subject?.reference && encounter.period && encounter.period.start) {
@@ -354,19 +361,16 @@ export const getVisitRepartitionMap = (patients: IPatient[], encounters: IEncoun
       const month = new Date(encounter.period.start).getMonth()
       const monthStr = getStringMonth(month)
       if (monthStr && patient) {
-        if (!repartitionMap.has(monthStr)) {
-          repartitionMap.set(monthStr, { male: 0, female: 0, other: 0 })
-        }
         switch (patient.gender) {
           case 'male':
-            repartitionMap.get(monthStr).male += 1
+            repartitionMap[monthStr].male += 1
             break
           case 'female':
-            repartitionMap.get(monthStr).female += 1
+            repartitionMap[monthStr].female += 1
             break
 
           default:
-            repartitionMap.get(monthStr).other += 1
+            repartitionMap[monthStr].other += 1
             break
         }
       }
@@ -376,7 +380,7 @@ export const getVisitRepartitionMap = (patients: IPatient[], encounters: IEncoun
 }
 
 export const getGenderRepartitionSimpleData = (
-  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
+  genderRepartitionMap?: GenderRepartitionType
 ): {
   vitalStatusData?: SimpleChartDataType[]
   genderData?: SimpleChartDataType[]
@@ -386,15 +390,16 @@ export const getGenderRepartitionSimpleData = (
 
   if (!genderRepartitionMap) return { vitalStatusData: undefined, genderData: undefined }
 
-  if (genderRepartitionMap && genderRepartitionMap.size > 0) {
+  const keys: ['male', 'female', 'other', 'unknown'] = ['male', 'female', 'other', 'unknown']
+  if (keys && keys.length > 0) {
     let aliveCount = 0
     let deceasedCount = 0
     let maleCount = 0
     let femaleCount = 0
     let unknownCount = 0
     let otherCount = 0
-    for (const entry of genderRepartitionMap) {
-      const [gender, genderValues] = entry
+    for (const gender of keys) {
+      const genderValues = genderRepartitionMap[gender] || { deceased: 0, alive: 0 }
       const genderTotal = genderValues.alive + genderValues.deceased
       aliveCount += genderValues.alive
       deceasedCount += genderValues.deceased

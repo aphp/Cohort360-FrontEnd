@@ -43,12 +43,17 @@ const defaultInitialState = {
 
 const initialState: ExploredCohortState = localStorageExploredCohort
   ? {
-      ...jsonExploredCohort
-      // agePyramidData: jsonExploredCohort.agePyramidData ? new Map(jsonExploredCohort.agePyramidData) : new Map(),
-      // genderRepartitionMap: jsonExploredCohort.genderRepartitionMap
-      //   ? new Map(jsonExploredCohort.genderRepartitionMap)
-      //   : new Map(),
-      // monthlyVisitData: jsonExploredCohort.monthlyVisitData ? new Map(jsonExploredCohort.monthlyVisitData) : new Map()
+      ...jsonExploredCohort,
+      genderRepartitionMap: jsonExploredCohort.genderRepartitionMap
+        ? jsonExploredCohort.genderRepartitionMap
+        : {
+            female: { deceased: 0, alive: 0 },
+            male: { deceased: 0, alive: 0 },
+            other: { deceased: 0, alive: 0 },
+            unknown: { deceased: 0, alive: 0 }
+          },
+      agePyramidData: jsonExploredCohort.agePyramidData ? jsonExploredCohort.agePyramidData : [],
+      monthlyVisitData: jsonExploredCohort.monthlyVisitData ? jsonExploredCohort.monthlyVisitData : {}
     }
   : defaultInitialState
 
@@ -89,7 +94,7 @@ const fetchExploredCohort = createAsyncThunk<
       break
   }
   let cohort
-  if (shouldRefreshData || !shouldRefreshData) {
+  if (shouldRefreshData) {
     switch (context) {
       case 'cohort': {
         if (id) {
