@@ -16,6 +16,7 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
   const [legendHtml, setLegend] = useState()
 
   useEffect(() => {
+    console.log('data :>> ', data)
     if (!data || (data && !data.length)) {
       return
     }
@@ -25,6 +26,7 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
     const keys = Object.keys(data)
     for (const age of keys) {
       const ageGenderValues = data[age] || {}
+      console.log(`ageGenderValues(${age}) :>> `, ageGenderValues)
       const maleValue = ageGenderValues.male
       const femaleValue = ageGenderValues.female
       customData.push({
@@ -41,13 +43,8 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
       }
     }
     customData.sort((d1, d2) => d1.age - d2.age)
-    // yValueMin = min age with data
-    // yValueMax = yValueMin + valuesPos.length (array with data, each index = different ages)
-    const yValueMin =
-      customData && customData.length > 0
-        ? (customData.find(({ male, female }) => male !== 0 && female !== 0) || { age: 0 }).age
-        : 0
-    const yValueMax = yValueMin + (valuesPos.length + 1)
+    const yValueMin = valuesPos[0] === 0 ? +valuesPos[0] : +valuesPos[0] - 1
+    const yValueMax = +valuesPos[valuesPos.length - 1] + 1
 
     const svg = d3.select(node.current)
     svg.selectAll('*').remove()
