@@ -16,7 +16,6 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
   const [legendHtml, setLegend] = useState()
 
   useEffect(() => {
-    console.log('data :>> ', data)
     if (!data || (data && !data.length)) {
       return
     }
@@ -26,7 +25,6 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
     const keys = Object.keys(data)
     for (const age of keys) {
       const ageGenderValues = data[age] || {}
-      console.log(`ageGenderValues(${age}) :>> `, ageGenderValues)
       const maleValue = ageGenderValues.male
       const femaleValue = ageGenderValues.female
       customData.push({
