@@ -6,7 +6,7 @@ import {
   // IReference
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { getAgeArkhn } from './age'
-import { Month, ComplexChartDataType, SimpleChartDataType, GenderRepartitionType, AgeRepartitionType } from 'types'
+import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
 import { getStringMonth, getStringMonthAphp } from './formatDate'
 
 function getRandomColor() {
@@ -257,50 +257,21 @@ export const getAgeRepartitionMap = (patients: IPatient[]): AgeRepartitionType =
   return repartitionMap
 }
 
-export const getVisitRepartitionMapAphp2 = (facet?: IExtension[]): ComplexChartDataType<Month> => {
-  const repartitionMap = new Map()
-
-  facet?.forEach((object) => {
-    const data = object.extension?.filter((obj) => {
-      return obj.url === 'start-date-month-facet'
-    })?.[0].extension
-
-    if (data) {
-      for (let i = 0; i < data.length; i += 2) {
-        const month = getStringMonthAphp(parseInt(data[i].url ?? 'Inconnu', 10))
-
-        if (!repartitionMap.get(month)) {
-          repartitionMap.set(month, {
-            male: 0,
-            female: 0,
-            other: 0
-          })
-        }
-
-        const genderData = data[i + 1] ? data[i + 1].extension : []
-
-        genderData?.forEach((gender) => {
-          switch (gender.url) {
-            case 'female':
-              repartitionMap.get(month).female += gender.valueDecimal
-              break
-            case 'male':
-              repartitionMap.get(month).male += gender.valueDecimal
-              break
-            default:
-              repartitionMap.get(month).other += gender.valueDecimal
-              break
-          }
-        })
-      }
-    }
-  })
-
-  return repartitionMap
-}
-
-export const getVisitRepartitionMapAphp = (facet?: IExtension[]): ComplexChartDataType<Month> => {
-  const repartitionMap = new Map()
+export const getVisitRepartitionMapAphp = (facet?: IExtension[]): VisiteRepartitionType => {
+  const repartitionMap: VisiteRepartitionType = {
+    Janvier: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Février: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Mars: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Avril: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Mai: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Juin: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Juillet: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Août: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Septembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Octobre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Novembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Decembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 }
+  }
 
   facet?.forEach((object) => {
     const data = object.extension
@@ -310,31 +281,19 @@ export const getVisitRepartitionMapAphp = (facet?: IExtension[]): ComplexChartDa
 
       if (values) {
         const month = getStringMonthAphp(parseInt(values[1] ?? 'Inconnu', 10))
-
-        if (!repartitionMap.get(month)) {
-          repartitionMap.set(month, {
-            male: 0,
-            maleCount: 0,
-            female: 0,
-            femaleCount: 0,
-            other: 0,
-            otherCount: 0
-          })
-        }
-
-        if (values[2]) {
+        if (month && values[2]) {
           switch (values[2]) {
             case 'female':
-              repartitionMap.get(month).female += data[0].valueDecimal
-              repartitionMap.get(month).femaleCount += 1
+              repartitionMap[month].female += parseInt(`${data[0].valueDecimal ?? 0}`)
+              repartitionMap[month].femaleCount += 1
               break
             case 'male':
-              repartitionMap.get(month).male += data[0].valueDecimal
-              repartitionMap.get(month).maleCount += 1
+              repartitionMap[month].male += parseInt(`${data[0].valueDecimal ?? 0}`)
+              repartitionMap[month].maleCount += 1
               break
             default:
-              repartitionMap.get(month).other += data[0].valueDecimal
-              repartitionMap.get(month).otherCount += 1
+              repartitionMap[month].other += parseInt(`${data[0].valueDecimal ?? 0}`)
+              repartitionMap[month].otherCount += 1
               break
           }
         }
@@ -342,17 +301,59 @@ export const getVisitRepartitionMapAphp = (facet?: IExtension[]): ComplexChartDa
     }
   })
 
-  repartitionMap.forEach((month) => {
-    month.male = month.male / month.maleCount
-    month.female = month.female / month.femaleCount
-    month.other = month.other / month.otherCount
-  })
+  // Idiot de TS...... Don't forget the type !
+  const months: [
+    'Janvier',
+    'Février',
+    'Mars',
+    'Avril',
+    'Mai',
+    'Juin',
+    'Juillet',
+    'Août',
+    'Septembre',
+    'Octobre',
+    'Novembre',
+    'Decembre'
+  ] = [
+    'Janvier',
+    'Février',
+    'Mars',
+    'Avril',
+    'Mai',
+    'Juin',
+    'Juillet',
+    'Août',
+    'Septembre',
+    'Octobre',
+    'Novembre',
+    'Decembre'
+  ]
+  for (const month of months) {
+    if (!repartitionMap[month]) continue
+    repartitionMap[month].male = repartitionMap[month].male / repartitionMap[month].maleCount
+    repartitionMap[month].female = repartitionMap[month].female / repartitionMap[month].femaleCount
+    repartitionMap[month].other = repartitionMap[month].other / repartitionMap[month].otherCount
+  }
 
   return repartitionMap
 }
 
-export const getVisitRepartitionMap = (patients: IPatient[], encounters: IEncounter[]): ComplexChartDataType<Month> => {
-  const repartitionMap = new Map()
+export const getVisitRepartitionMap = (patients: IPatient[], encounters: IEncounter[]): VisiteRepartitionType => {
+  const repartitionMap = {
+    Janvier: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Février: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Mars: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Avril: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Mai: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Juin: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Juillet: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Août: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Septembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Octobre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Novembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
+    Decembre: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 }
+  }
 
   encounters.forEach((encounter) => {
     if (encounter.subject?.reference && encounter.period && encounter.period.start) {
@@ -360,19 +361,16 @@ export const getVisitRepartitionMap = (patients: IPatient[], encounters: IEncoun
       const month = new Date(encounter.period.start).getMonth()
       const monthStr = getStringMonth(month)
       if (monthStr && patient) {
-        if (!repartitionMap.has(monthStr)) {
-          repartitionMap.set(monthStr, { male: 0, female: 0, other: 0 })
-        }
         switch (patient.gender) {
           case 'male':
-            repartitionMap.get(monthStr).male += 1
+            repartitionMap[monthStr].male += 1
             break
           case 'female':
-            repartitionMap.get(monthStr).female += 1
+            repartitionMap[monthStr].female += 1
             break
 
           default:
-            repartitionMap.get(monthStr).other += 1
+            repartitionMap[monthStr].other += 1
             break
         }
       }

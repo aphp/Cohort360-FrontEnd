@@ -2,7 +2,6 @@ import React from 'react'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { ApolloClient, InMemoryCache } from '@apollo/client'
-import { enableMapSet } from 'immer'
 import { Provider } from 'react-redux'
 import MomentUtils from '@date-io/moment'
 import moment from 'moment'
@@ -22,7 +21,6 @@ const authClient = new ApolloClient({
   uri: AUTH_API_URL
 })
 
-enableMapSet()
 moment.locale('fr')
 
 const App = () => (

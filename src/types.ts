@@ -212,6 +212,30 @@ export type GenderRepartitionType = {
 
 export type AgeRepartitionType = { male: number; female: number; other: number }[]
 
+export type MonthVisiteRepartitionType = {
+  male: number
+  maleCount: number
+  female: number
+  femaleCount: number
+  other: number
+  otherCount: number
+}
+
+export type VisiteRepartitionType = {
+  Janvier: MonthVisiteRepartitionType
+  Février: MonthVisiteRepartitionType
+  Mars: MonthVisiteRepartitionType
+  Avril: MonthVisiteRepartitionType
+  Mai: MonthVisiteRepartitionType
+  Juin: MonthVisiteRepartitionType
+  Juillet: MonthVisiteRepartitionType
+  Août: MonthVisiteRepartitionType
+  Septembre: MonthVisiteRepartitionType
+  Octobre: MonthVisiteRepartitionType
+  Novembre: MonthVisiteRepartitionType
+  Decembre: MonthVisiteRepartitionType
+}
+
 export type CohortData = {
   name?: string
   description?: string
@@ -224,7 +248,7 @@ export type CohortData = {
   encounters?: IEncounter[]
   genderRepartitionMap?: GenderRepartitionType
   visitTypeRepartitionData?: SimpleChartDataType[]
-  monthlyVisitData?: ComplexChartDataType<Month>
+  monthlyVisitData?: VisiteRepartitionType
   agePyramidData?: AgeRepartitionType
   requestId?: string
 }

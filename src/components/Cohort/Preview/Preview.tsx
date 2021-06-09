@@ -29,7 +29,7 @@ import useStyles from './styles'
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import displayDigit from 'utils/displayDigit'
 
-import { ComplexChartDataType, SimpleChartDataType, Month, GenderRepartitionType, AgeRepartitionType } from 'types'
+import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
 import { Skeleton } from '@material-ui/lab'
 
 type RepartitionTableProps = {
@@ -105,7 +105,7 @@ type PreviewProps = {
   loading?: boolean
   genderRepartitionMap?: GenderRepartitionType
   visitTypeRepartitionData?: SimpleChartDataType[]
-  monthlyVisitData?: ComplexChartDataType<Month>
+  monthlyVisitData?: VisiteRepartitionType
   agePyramidData?: AgeRepartitionType
 }
 const Preview: React.FC<PreviewProps> = ({
