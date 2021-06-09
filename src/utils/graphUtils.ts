@@ -6,7 +6,7 @@ import {
   // IReference
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { getAgeArkhn } from './age'
-import { Month, ComplexChartDataType, SimpleChartDataType, GenderRepartitionType } from 'types'
+import { Month, ComplexChartDataType, SimpleChartDataType, GenderRepartitionType, AgeRepartitionType } from 'types'
 import { getStringMonth, getStringMonthAphp } from './formatDate'
 
 function getRandomColor() {
@@ -183,10 +183,8 @@ export const getEncounterRepartitionMap = (encounters: IEncounter[]): SimpleChar
   return data
 }
 
-export const getAgeRepartitionMapAphp = (
-  facet?: IExtension[]
-): ComplexChartDataType<number, { male: number; female: number; other?: number }> => {
-  const repartitionMap = new Map()
+export const getAgeRepartitionMapAphp = (facet?: IExtension[]): AgeRepartitionType => {
+  const repartitionMap = new Array(130).map(() => ({ male: 0, female: 0, other: 0 }))
 
   facet?.forEach((extension) => {
     const ageObj = extension.extension?.filter((object) => {
@@ -198,9 +196,11 @@ export const getAgeRepartitionMapAphp = (
     })?.[0]
 
     if (ageObj) {
-      const age = parseInt(ageObj, 10) / 12
+      const age: number = parseInt(ageObj, 10) / 12
 
-      repartitionMap.set(age, { male: 0, female: 0, other: 0 })
+      if (!repartitionMap[age]) {
+        repartitionMap[age] = { male: 0, female: 0, other: 0 }
+      }
 
       if (genderValuesObj) {
         const genderValues = genderValuesObj.extension
@@ -208,13 +208,13 @@ export const getAgeRepartitionMapAphp = (
         genderValues?.forEach((genderValue) => {
           switch (genderValue.url) {
             case 'female':
-              repartitionMap.get(age).female = genderValue.valueDecimal
+              repartitionMap[age].female = genderValue.valueDecimal ?? 0
               break
             case 'male':
-              repartitionMap.get(age).male = genderValue.valueDecimal
+              repartitionMap[age].male = genderValue.valueDecimal ?? 0
               break
             default:
-              repartitionMap.get(age).other = genderValue.valueDecimal
+              repartitionMap[age].other = genderValue.valueDecimal ?? 0
           }
         })
       }
@@ -224,10 +224,8 @@ export const getAgeRepartitionMapAphp = (
   return repartitionMap
 }
 
-export const getAgeRepartitionMap = (
-  patients: IPatient[]
-): ComplexChartDataType<number, { male: number; female: number; other?: number }> => {
-  const repartitionMap = new Map()
+export const getAgeRepartitionMap = (patients: IPatient[]): AgeRepartitionType => {
+  const repartitionMap = new Array(130).map(() => ({ male: 0, female: 0, other: 0 }))
 
   patients.forEach((patient) => {
     if (patient.birthDate) {
@@ -235,18 +233,22 @@ export const getAgeRepartitionMap = (
         new Date(patient.birthDate),
         patient.deceasedDateTime ? new Date(patient.deceasedDateTime) : new Date()
       )
-      if (!repartitionMap.has(age)) {
-        repartitionMap.set(age, { male: 0, female: 0, other: 0 })
+      if (!repartitionMap[age]) {
+        repartitionMap[age] = { male: 0, female: 0, other: 0 }
       }
+
       switch (patient.gender) {
         case 'female':
-          repartitionMap.get(age).female += 1
+          if (!repartitionMap[age].female) repartitionMap[age].female = 0
+          repartitionMap[age].female += 1
           break
         case 'male':
-          repartitionMap.get(age).male += 1
+          if (!repartitionMap[age].male) repartitionMap[age].male = 0
+          repartitionMap[age].male += 1
           break
         default:
-          repartitionMap.get(age).other += 1
+          if (!repartitionMap[age].other) repartitionMap[age].other = 0
+          repartitionMap[age].other += 1
           break
       }
     }

@@ -32,8 +32,8 @@ import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   CohortPatient,
   SimpleChartDataType,
-  ComplexChartDataType,
   GenderRepartitionType,
+  AgeRepartitionType,
   SearchByTypes,
   VitalStatus
 } from 'types'
@@ -49,7 +49,7 @@ type PatientListProps = {
   deidentified?: boolean | null
   patients?: CohortPatient[]
   loading?: boolean
-  agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
+  agePyramidData?: AgeRepartitionType
   genderRepartitionMap?: GenderRepartitionType
 }
 
@@ -68,9 +68,7 @@ const PatientList: React.FC<PatientListProps> = ({
   const [loadingStatus, setLoadingStatus] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
-  const [agePyramid, setAgePyramid] = useState<
-    ComplexChartDataType<number, { male: number; female: number; other?: number }> | undefined
-  >(undefined)
+  const [agePyramid, setAgePyramid] = useState<AgeRepartitionType | undefined>(undefined)
   const [patientData, setPatientData] = useState<
     { vitalStatusData?: SimpleChartDataType[]; genderData?: SimpleChartDataType[] } | undefined
   >(undefined)
@@ -288,7 +286,7 @@ const PatientList: React.FC<PatientListProps> = ({
                 <Grid container justify="center" alignItems="center">
                   <CircularProgress />
                 </Grid>
-              ) : agePyramid && agePyramid.size > 0 ? (
+              ) : agePyramid && agePyramid.length > 0 ? (
                 <PyramidChart data={agePyramid} width={250} />
               ) : (
                 <Typography>Aucun patient</Typography>

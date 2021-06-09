@@ -210,6 +210,8 @@ export type GenderRepartitionType = {
   other: { deceased: number; alive: number }
 }
 
+export type AgeRepartitionType = { male: number; female: number; other: number }[]
+
 export type CohortData = {
   name?: string
   description?: string
@@ -223,7 +225,7 @@ export type CohortData = {
   genderRepartitionMap?: GenderRepartitionType
   visitTypeRepartitionData?: SimpleChartDataType[]
   monthlyVisitData?: ComplexChartDataType<Month>
-  agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
+  agePyramidData?: AgeRepartitionType
   requestId?: string
 }
 

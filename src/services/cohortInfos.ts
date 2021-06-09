@@ -5,12 +5,12 @@ import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import {
   FHIR_API_Response,
   CohortData,
-  ComplexChartDataType,
   SearchByTypes,
   VitalStatus,
   Back_API_Response,
   Cohort,
-  CohortComposition
+  CohortComposition,
+  AgeRepartitionType
 } from 'types'
 import {
   IGroup,
@@ -213,7 +213,7 @@ const fetchPatientList = async (
   | {
       totalPatients: number
       originalPatients: IPatient[] | undefined
-      agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
+      agePyramidData?: AgeRepartitionType
       genderRepartitionMap?: GenderRepartitionType
     }
   | undefined
