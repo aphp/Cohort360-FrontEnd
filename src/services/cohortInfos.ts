@@ -35,6 +35,8 @@ import { searchPatient } from './searchPatient'
 import { getAge } from 'utils/age'
 import moment from 'moment'
 
+import { GenderRepartitionType } from 'types'
+
 import fakeGroup from '../data/fakeData/group'
 import fakeFacetDeceased from '../data/fakeData/facet-deceased'
 import fakeFacetAgeMonth from '../data/fakeData/facet-age-month'
@@ -212,7 +214,7 @@ const fetchPatientList = async (
       totalPatients: number
       originalPatients: IPatient[] | undefined
       agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
-      genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
+      genderRepartitionMap?: GenderRepartitionType
     }
   | undefined
 > => {

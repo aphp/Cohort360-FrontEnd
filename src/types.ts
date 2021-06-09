@@ -203,6 +203,13 @@ export type SimpleChartDataType = {
 }
 export type ComplexChartDataType<T, V = { [key: string]: number }> = Map<T, V>
 
+export type GenderRepartitionType = {
+  female: { deceased: number; alive: number }
+  male: { deceased: number; alive: number }
+  unknown: { deceased: number; alive: number }
+  other: { deceased: number; alive: number }
+}
+
 export type CohortData = {
   name?: string
   description?: string
@@ -213,7 +220,7 @@ export type CohortData = {
   documentsList?: (CohortComposition | IDocumentReference)[]
   wordcloudData?: any
   encounters?: IEncounter[]
-  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
+  genderRepartitionMap?: GenderRepartitionType
   visitTypeRepartitionData?: SimpleChartDataType[]
   monthlyVisitData?: ComplexChartDataType<Month>
   agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>

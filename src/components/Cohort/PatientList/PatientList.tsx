@@ -29,7 +29,14 @@ import ClearIcon from '@material-ui/icons/Clear'
 
 import { fetchPatientList } from '../../../services/cohortInfos'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { CohortPatient, SimpleChartDataType, ComplexChartDataType, SearchByTypes, VitalStatus } from 'types'
+import {
+  CohortPatient,
+  SimpleChartDataType,
+  ComplexChartDataType,
+  GenderRepartitionType,
+  SearchByTypes,
+  VitalStatus
+} from 'types'
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 
 import displayDigit from 'utils/displayDigit'
@@ -43,7 +50,7 @@ type PatientListProps = {
   patients?: CohortPatient[]
   loading?: boolean
   agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
-  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
+  genderRepartitionMap?: GenderRepartitionType
 }
 
 const PatientList: React.FC<PatientListProps> = ({

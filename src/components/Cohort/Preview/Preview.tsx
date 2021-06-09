@@ -26,15 +26,14 @@ import PyramidChart from './Charts/PyramidChart'
 
 import useStyles from './styles'
 
-import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import displayDigit from 'utils/displayDigit'
 
-import { ComplexChartDataType, SimpleChartDataType, Month } from 'types'
+import { ComplexChartDataType, SimpleChartDataType, Month, GenderRepartitionType } from 'types'
 import { Skeleton } from '@material-ui/lab'
 
 type RepartitionTableProps = {
-  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
+  genderRepartitionMap?: GenderRepartitionType
   loading?: boolean
 }
 
@@ -51,9 +50,9 @@ const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMa
     )
   }
 
-  if (genderRepartitionMap && genderRepartitionMap.size > 0) {
-    const femaleValues = genderRepartitionMap.get(PatientGenderKind._female)
-    const maleValues = genderRepartitionMap.get(PatientGenderKind._male)
+  if (genderRepartitionMap) {
+    const femaleValues = genderRepartitionMap.female
+    const maleValues = genderRepartitionMap.male
 
     femaleAlive = femaleValues?.alive
     femaleDeceased = femaleValues?.deceased
@@ -104,7 +103,7 @@ type PreviewProps = {
     perimeters?: string[]
   }
   loading?: boolean
-  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
+  genderRepartitionMap?: GenderRepartitionType
   visitTypeRepartitionData?: SimpleChartDataType[]
   monthlyVisitData?: ComplexChartDataType<Month>
   agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>

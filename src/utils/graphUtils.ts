@@ -6,7 +6,7 @@ import {
   // IReference
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { getAgeArkhn } from './age'
-import { Month, ComplexChartDataType, SimpleChartDataType } from 'types'
+import { Month, ComplexChartDataType, SimpleChartDataType, GenderRepartitionType } from 'types'
 import { getStringMonth, getStringMonthAphp } from './formatDate'
 
 function getRandomColor() {
@@ -64,12 +64,13 @@ const getVisitTypeColor = (visitType?: string) => {
   return color
 }
 
-export const getGenderRepartitionMapAphp = (facet?: IExtension[]): ComplexChartDataType<PatientGenderKind> => {
-  const repartitionMap = new Map()
-
-  repartitionMap.set('female', { deceased: 0, alive: 0 })
-  repartitionMap.set('male', { deceased: 0, alive: 0 })
-  repartitionMap.set('other', { deceased: 0, alive: 0 })
+export const getGenderRepartitionMapAphp = (facet?: IExtension[]): GenderRepartitionType => {
+  const repartitionMap = {
+    female: { deceased: 0, alive: 0 },
+    male: { deceased: 0, alive: 0 },
+    other: { deceased: 0, alive: 0 },
+    unknown: { deceased: 0, alive: 0 }
+  }
 
   facet?.forEach((extension) => {
     const isDeceased = extension.extension?.filter((extension) => {
@@ -84,26 +85,26 @@ export const getGenderRepartitionMapAphp = (facet?: IExtension[]): ComplexChartD
       genderData?.forEach((gender) => {
         switch (gender.url) {
           case 'female':
-            repartitionMap.get('female').deceased = gender.valueDecimal
+            repartitionMap.female.deceased = gender.valueDecimal ?? 0
             break
           case 'male':
-            repartitionMap.get('male').deceased = gender.valueDecimal
+            repartitionMap.male.deceased = gender.valueDecimal ?? 0
             break
           default:
-            repartitionMap.get('other').deceased = gender?.valueDecimal
+            repartitionMap.other.deceased = gender?.valueDecimal ?? 0
         }
       })
     } else if (isDeceased === 'false') {
       genderData?.forEach((gender) => {
         switch (gender.url) {
           case 'female':
-            repartitionMap.get('female').alive = gender.valueDecimal
+            repartitionMap.female.alive = gender.valueDecimal ?? 0
             break
           case 'male':
-            repartitionMap.get('male').alive = gender.valueDecimal
+            repartitionMap.male.alive = gender.valueDecimal ?? 0
             break
           default:
-            repartitionMap.get('other').alive = gender?.valueDecimal
+            repartitionMap.other.alive = gender?.valueDecimal ?? 0
         }
       })
     }
@@ -112,18 +113,21 @@ export const getGenderRepartitionMapAphp = (facet?: IExtension[]): ComplexChartD
   return repartitionMap
 }
 
-export const getGenderRepartitionMap = (
-  patients: IPatient[]
-): Map<PatientGenderKind, { alive: number; deceased: number }> => {
-  const repartitionMap = new Map()
+export const getGenderRepartitionMap = (patients: IPatient[]): GenderRepartitionType => {
+  const repartitionMap = {
+    female: { deceased: 0, alive: 0 },
+    male: { deceased: 0, alive: 0 },
+    other: { deceased: 0, alive: 0 },
+    unknown: { deceased: 0, alive: 0 }
+  }
+
   patients.forEach((patient) => {
-    if (!repartitionMap.has(patient.gender)) {
-      repartitionMap.set(patient.gender, { deceased: 0, alive: 0 })
-    }
+    const gender: 'female' | 'male' | 'other' | 'unknown' = patient.gender || 'unknown'
+
     if (patient.deceasedDateTime) {
-      repartitionMap.get(patient.gender).deceased += 1
+      repartitionMap[gender].deceased += 1
     } else {
-      repartitionMap.get(patient.gender).alive += 1
+      repartitionMap[gender].alive += 1
     }
   })
 
@@ -376,7 +380,7 @@ export const getVisitRepartitionMap = (patients: IPatient[], encounters: IEncoun
 }
 
 export const getGenderRepartitionSimpleData = (
-  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
+  genderRepartitionMap?: GenderRepartitionType
 ): {
   vitalStatusData?: SimpleChartDataType[]
   genderData?: SimpleChartDataType[]
@@ -386,15 +390,16 @@ export const getGenderRepartitionSimpleData = (
 
   if (!genderRepartitionMap) return { vitalStatusData: undefined, genderData: undefined }
 
-  if (genderRepartitionMap && genderRepartitionMap.size > 0) {
+  const keys: ['male', 'female', 'other', 'unknown'] = ['male', 'female', 'other', 'unknown']
+  if (keys && keys.length > 0) {
     let aliveCount = 0
     let deceasedCount = 0
     let maleCount = 0
     let femaleCount = 0
     let unknownCount = 0
     let otherCount = 0
-    for (const entry of genderRepartitionMap) {
-      const [gender, genderValues] = entry
+    for (const gender of keys) {
+      const genderValues = genderRepartitionMap[gender] || { deceased: 0, alive: 0 }
       const genderTotal = genderValues.alive + genderValues.deceased
       aliveCount += genderValues.alive
       deceasedCount += genderValues.deceased

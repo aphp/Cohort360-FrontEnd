@@ -45,7 +45,7 @@ store.subscribe(() => {
     JSON.stringify({
       ...exploredCohort,
       agePyramidData: exploredCohort.agePyramidData ? [...exploredCohort.agePyramidData] : [],
-      genderRepartitionMap: exploredCohort.genderRepartitionMap ? [...exploredCohort.genderRepartitionMap] : [],
+      genderRepartitionMap: exploredCohort.genderRepartitionMap ? { ...exploredCohort.genderRepartitionMap } : [],
       monthlyVisitData: exploredCohort.monthlyVisitData ? [...exploredCohort.monthlyVisitData] : []
     })
   )
