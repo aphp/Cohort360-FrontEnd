@@ -125,7 +125,6 @@ const fetchExploredCohort = createAsyncThunk<
         break
     }
   }
-  console.log(`cohort`, cohort)
   return cohort ?? state.exploredCohort
 })
 
