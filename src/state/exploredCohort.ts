@@ -104,11 +104,19 @@ const fetchExploredCohort = createAsyncThunk<
       }
       case 'patients': {
         cohort = await fetchMyPatients()
+        if (cohort) {
+          cohort.name = '-'
+          cohort.description = ''
+        }
         break
       }
       case 'perimeters': {
         if (id) {
           cohort = await fetchPerimetersInfos(id)
+          if (cohort) {
+            cohort.name = '-'
+            cohort.description = ''
+          }
         }
         break
       }
