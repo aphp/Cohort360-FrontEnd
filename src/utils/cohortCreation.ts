@@ -80,8 +80,8 @@ type RequeteurCriteriaType = {
     timeDelayMax?: number
   }
   dateRange?: {
-    minDate: string // YYYY-MM-DD
-    maxDate: string // YYYY-MM-DD
+    minDate?: string // YYYY-MM-DD
+    maxDate?: string // YYYY-MM-DD
     datePreference?: 'event_date' | 'encounter_end-date' | 'encounter_start-date'
     dateIsNotNull?: boolean
   }
@@ -348,8 +348,10 @@ export function buildRequest(
           dateRange:
             !(item.type === 'Patient' || item.type === 'Encounter') && (item.startOccurrence || item.endOccurrence)
               ? {
-                  minDate: item.startOccurrence ? moment(item.startOccurrence).format('YYYY-MM-DD') : '',
-                  maxDate: item.endOccurrence ? moment(item.endOccurrence).format('YYYY-MM-DD') : ''
+                  minDate: item.startOccurrence
+                    ? moment(item.startOccurrence).format('YYYY-MM-DD[T00:00:00Z]')
+                    : undefined,
+                  maxDate: item.endOccurrence ? moment(item.endOccurrence).format('YYYY-MM-DD[T00:00:00Z]') : undefined
                 }
               : undefined
         }
@@ -717,8 +719,8 @@ export async function unbuildRequest(_json: string) {
         }
 
         if (element.dateRange) {
-          currentCriterion.startOccurrence = element.dateRange.minDate
-          currentCriterion.endOccurrence = element.dateRange.maxDate
+          currentCriterion.startOccurrence = element.dateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -773,8 +775,8 @@ export async function unbuildRequest(_json: string) {
         }
 
         if (element.dateRange) {
-          currentCriterion.startOccurrence = element.dateRange.minDate
-          currentCriterion.endOccurrence = element.dateRange.maxDate
+          currentCriterion.startOccurrence = element.dateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -834,8 +836,8 @@ export async function unbuildRequest(_json: string) {
         }
 
         if (element.dateRange) {
-          currentCriterion.startOccurrence = element.dateRange.minDate
-          currentCriterion.endOccurrence = element.dateRange.maxDate
+          currentCriterion.startOccurrence = element.dateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -884,8 +886,8 @@ export async function unbuildRequest(_json: string) {
         }
 
         if (element.dateRange) {
-          currentCriterion.startOccurrence = element.dateRange.minDate
-          currentCriterion.endOccurrence = element.dateRange.maxDate
+          currentCriterion.startOccurrence = element.dateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
