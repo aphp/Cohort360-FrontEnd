@@ -82,8 +82,8 @@ const Dashboard: React.FC<{
         setTabs([
           // { label: 'Édition cohorte', value: 'creation', to: `/cohort/${cohortId}/edition`, disabled: true },
           { label: 'Aperçu cohorte', value: 'apercu', to: `/cohort/${cohortId}/apercu`, disabled: false },
-          { label: 'Patients', value: 'patients', to: `/cohort/${cohortId}/patients`, disabled: false },
-          { label: 'Documents', value: 'documents', to: `/cohort/${cohortId}/documents`, disabled: false }
+          { label: 'Données patient', value: 'patients', to: `/cohort/${cohortId}/patients`, disabled: false },
+          { label: 'Documents cliniques', value: 'documents', to: `/cohort/${cohortId}/documents`, disabled: false }
         ])
         break
       case 'new_cohort':
@@ -91,8 +91,8 @@ const Dashboard: React.FC<{
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu cohorte', value: 'apercu', to: `/cohort/new/apercu`, disabled: true },
-          { label: 'Patients', value: 'patients', to: `/cohort/new/patients`, disabled: true },
-          { label: 'Documents', value: 'documents', to: `/cohort/new/documents`, disabled: true }
+          { label: 'Données patient', value: 'patients', to: `/cohort/new/patients`, disabled: true },
+          { label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true }
         ])
         break
       case 'perimeters':
@@ -100,8 +100,18 @@ const Dashboard: React.FC<{
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu', value: 'apercu', to: `/perimetres/apercu${location.search}`, disabled: false },
-          { label: 'Patients', value: 'patients', to: `/perimetres/patients${location.search}`, disabled: false },
-          { label: 'Documents', value: 'documents', to: `/perimetres/documents${location.search}`, disabled: false }
+          {
+            label: 'Données patient',
+            value: 'patients',
+            to: `/perimetres/patients${location.search}`,
+            disabled: false
+          },
+          {
+            label: 'Documents cliniques',
+            value: 'documents',
+            to: `/perimetres/documents${location.search}`,
+            disabled: false
+          }
         ])
         break
       default:
@@ -125,6 +135,7 @@ const Dashboard: React.FC<{
     selectTab(newTab)
   }
 
+  // eslint-disable-next-line
   const _displayGroupName = () => {
     let group: {
       name: string
@@ -227,7 +238,7 @@ const Dashboard: React.FC<{
         {selectedTab === 'apercu' && (
           <CohortPreview
             total={dashboard.totalPatients}
-            group={_displayGroupName()}
+            // group={_displayGroupName()}
             agePyramidData={dashboard.agePyramidData}
             genderRepartitionMap={dashboard.genderRepartitionMap}
             monthlyVisitData={dashboard.monthlyVisitData}
