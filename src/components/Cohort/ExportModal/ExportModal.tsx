@@ -101,7 +101,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               <ListItemSecondaryAction>
                 <Checkbox
                   checked={settings.tables.length === export_table.length}
-                  indeterminate={settings.tables.length === export_table.length ? false : settings.tables.length}
+                  indeterminate={settings.tables.length === export_table.length ? false : !!settings.tables.length}
                   onChange={() =>
                     handleChangeSettings(
                       'tables',
