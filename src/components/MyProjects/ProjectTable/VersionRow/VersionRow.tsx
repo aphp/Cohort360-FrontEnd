@@ -62,13 +62,13 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
         <TableHead>
           <TableRow>
             <TableCell>Nom</TableCell>
-            <TableCell align="center" style={{ width: 150 }}>
+            <TableCell align="center" style={{ width: 125 }}>
               Status
             </TableCell>
-            <TableCell align="center" style={{ width: 150 }}>
+            <TableCell align="center" style={{ width: 125 }}>
               Version
             </TableCell>
-            <TableCell align="center" style={{ width: 150 }}>
+            <TableCell align="center" style={{ width: 125 }}>
               Nombre de patients
             </TableCell>
             <Hidden mdDown>

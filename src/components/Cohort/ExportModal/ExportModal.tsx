@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
@@ -37,6 +37,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   const classes = useStyles()
   const [settings, setSettings] = useState(initialState)
 
+  useEffect(() => {
+    setSettings(initialState)
+  }, [open])
+
   const handleChangeTables = (tableId: string) => {
     let existingTableIds: string[] = settings.tables
     const foundItem = existingTableIds.find((existingTableId) => existingTableId === tableId)
@@ -57,6 +61,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   }
 
   const handleSubmit = () => {
+    console.log('settings :>> ', settings)
     handleClose()
   }
 
@@ -91,9 +96,24 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
           </Typography>
 
           <List className={classes.list}>
+            <ListItem className={classes.tableListElement}>
+              <ListItemText primary="Toutes les tables" />
+              <ListItemSecondaryAction>
+                <Checkbox
+                  checked={settings.tables.length === export_table.length}
+                  indeterminate={settings.tables.length === export_table.length ? false : settings.tables.length}
+                  onChange={() =>
+                    handleChangeSettings(
+                      'tables',
+                      settings.tables.length ? [] : export_table.map(({ table_id }) => table_id)
+                    )
+                  }
+                />
+              </ListItemSecondaryAction>
+            </ListItem>
             {export_table.map(({ table_name, table_id }) => (
               <ListItem className={classes.tableListElement} key={table_id}>
-                <ListItemText primary={table_name} />
+                <ListItemText primary={table_name} secondary={table_id} />
                 <ListItemSecondaryAction>
                   <Checkbox
                     checked={!!settings.tables.find((tableId) => tableId === table_id)}
@@ -109,7 +129,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               <Switch
                 name="conditions"
                 value={settings.conditions}
-                onChange={(e) => handleChangeSettings('conditions', e.target.value)}
+                onChange={() => handleChangeSettings('conditions', !settings.conditions)}
               />
             }
             labelPlacement="start"
