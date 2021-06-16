@@ -93,11 +93,17 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     let name = ''
     let description = ''
     let requestId = ''
+    let uuid = ''
+    let favorite = false
 
     if (cohortInfo.data.results && cohortInfo.data.results.length === 1) {
       name = cohortInfo.data.results[0].name ?? ''
       description = cohortInfo.data.results[0].description ?? ''
       requestId = cohortInfo.data.results[0].request ?? ''
+      favorite = cohortInfo.data.results[0].favorite ?? false
+      uuid = cohortInfo.data.results[0].uuid ?? ''
+    } else {
+      throw new Error('This cohort is not your or invalid')
     }
 
     if (!name) {
@@ -150,7 +156,9 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       visitTypeRepartitionData,
       agePyramidData,
       monthlyVisitData,
-      requestId
+      requestId,
+      favorite,
+      uuid
     }
   }
 

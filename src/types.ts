@@ -251,6 +251,8 @@ export type CohortData = {
   monthlyVisitData?: VisiteRepartitionType
   agePyramidData?: AgeRepartitionType
   requestId?: string
+  favorite?: boolean
+  uuid?: string
 }
 
 export type PatientData = {

@@ -25,11 +25,14 @@ export default makeStyles((theme) => ({
     fontWeight: 900,
     color: '#5BC5F2',
     // border: `3px solid currentColor`,
-    borderRadius: 50,
+    borderRadius: 4,
     marginRight: 12,
     padding: '4px 8px',
     '&:last-child': {
       marginRight: 0
+    },
+    '&:hover': {
+      textDecoration: 'underline'
     }
   },
   indicator: {

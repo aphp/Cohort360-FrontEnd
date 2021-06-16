@@ -39,7 +39,6 @@ const Dashboard: React.FC<{
 
   const [selectedTab, selectTab] = useState(tabName || 'apercu')
   const [tabs, setTabs] = useState<Tabs[]>([])
-  const [status, setStatus] = useState('')
   const [deidentifiedBoolean, setDeidentifiedBoolean] = useState<boolean | null>(null)
   const [openRedcapDialog, setOpenRedcapDialog] = useState(false)
 
@@ -69,7 +68,6 @@ const Dashboard: React.FC<{
 
     switch (context) {
       case 'patients':
-        setStatus('Exploration de population')
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu', value: 'apercu', to: '/mes_patients/apercu', disabled: false },
@@ -78,16 +76,19 @@ const Dashboard: React.FC<{
         ])
         break
       case 'cohort':
-        setStatus('Exploration de cohorte')
         setTabs([
-          // { label: 'Édition cohorte', value: 'creation', to: `/cohort/${cohortId}/edition`, disabled: true },
+          {
+            label: 'Modifier la requête',
+            value: 'creation',
+            to: `/cohort/new/${dashboard.requestId}`,
+            disabled: false
+          },
           { label: 'Aperçu cohorte', value: 'apercu', to: `/cohort/${cohortId}/apercu`, disabled: false },
           { label: 'Données patient', value: 'patients', to: `/cohort/${cohortId}/patients`, disabled: false },
           { label: 'Documents cliniques', value: 'documents', to: `/cohort/${cohortId}/documents`, disabled: false }
         ])
         break
       case 'new_cohort':
-        setStatus("Création d'un cohorte")
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu cohorte', value: 'apercu', to: `/cohort/new/apercu`, disabled: true },
@@ -96,7 +97,6 @@ const Dashboard: React.FC<{
         ])
         break
       case 'perimeters':
-        setStatus('Exploration de périmètres')
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
           { label: 'Aperçu', value: 'apercu', to: `/perimetres/apercu${location.search}`, disabled: false },
@@ -123,54 +123,12 @@ const Dashboard: React.FC<{
     checkDeindentifiedStatus(dashboard)
   }, [dashboard])
 
-  const handleOpenRedcapDialog = () => {
-    setOpenRedcapDialog(true)
-  }
-
   const handleCloseRedcapDialog = () => {
     setOpenRedcapDialog(false)
   }
 
   const handleChangeTabs = (event: any, newTab: string) => {
     selectTab(newTab)
-  }
-
-  // eslint-disable-next-line
-  const _displayGroupName = () => {
-    let group: {
-      name: string
-      description?: string
-      perimeters?: string[]
-    } = { name: '-', perimeters: [] }
-    switch (context) {
-      case 'patients':
-        group = {
-          name: 'Mes patients',
-          description: '',
-          perimeters: []
-        }
-        break
-      case 'cohort':
-        group = {
-          name: dashboard.name ?? '-',
-          description: dashboard.description ?? '',
-          perimeters: []
-        }
-        break
-      case 'perimeters':
-        group = {
-          name: 'Exploration de périmètres',
-          description: '',
-          perimeters:
-            dashboard.cohort && Array.isArray(dashboard.cohort)
-              ? dashboard.cohort.map((p: any) => p.name.replace('Patients passés par: ', ''))
-              : []
-        }
-        break
-      default:
-        break
-    }
-    return group
   }
 
   if (context === 'new_cohort') {
@@ -202,14 +160,11 @@ const Dashboard: React.FC<{
           patientIds={dashboard.originalPatients.map((p: any) => p.id)}
         />
       )}
+
       <TopBar
-        title={dashboard.name}
-        status={status}
+        context={context}
         patientsNb={dashboard.totalPatients || 0}
         access={deidentifiedBoolean === null ? '-' : deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
-        openRedcapDialog={handleOpenRedcapDialog}
-        fav
-        loading={dashboard.loading}
       />
 
       <Grid container justify="center" className={classes.tabs}>
@@ -238,7 +193,6 @@ const Dashboard: React.FC<{
         {selectedTab === 'apercu' && (
           <CohortPreview
             total={dashboard.totalPatients}
-            // group={_displayGroupName()}
             agePyramidData={dashboard.agePyramidData}
             genderRepartitionMap={dashboard.genderRepartitionMap}
             monthlyVisitData={dashboard.monthlyVisitData}
