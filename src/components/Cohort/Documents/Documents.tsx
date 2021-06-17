@@ -192,10 +192,6 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     <Grid container direction="column" alignItems="center">
       <CssBaseline />
       <Grid container item xs={11} justify="space-between">
-        <Typography variant="h2" className={classes.pageTitle}>
-          Documents cliniques
-        </Typography>
-
         {/* <Grid container spacing={3}>
           <Grid item xs={12}>
             {wordcloudData && (

@@ -5,6 +5,7 @@ import moment from 'moment'
 import {
   Box,
   Chip,
+  Hidden,
   IconButton,
   Link,
   Table,
@@ -17,6 +18,9 @@ import {
 } from '@material-ui/core'
 
 import EditIcon from '@material-ui/icons/Edit'
+import ExportIcon from '@material-ui/icons/GetApp'
+
+import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 
 import { useAppSelector } from 'state'
 import { CohortState, setSelectedCohort } from 'state/cohort'
@@ -38,6 +42,8 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
 
   const { cohortsList = [] } = cohortState
 
+  const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<null | string>(null)
+
   const cohorts: CohortType[] =
     cohortsList
       .filter(({ request }) => request === requestId)
@@ -46,6 +52,7 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
   const _handleEditCohort = (cohortId: string) => {
     dispatch<any>(setSelectedCohort(cohortId))
   }
+
   return (
     <Box className={classes.versionContainer}>
       <Typography variant="h6" gutterBottom component="div">
@@ -55,17 +62,22 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
         <TableHead>
           <TableRow>
             <TableCell>Nom</TableCell>
-            <TableCell align="center" style={{ width: 150 }}>
+            <TableCell align="center" style={{ width: 125 }}>
               Status
             </TableCell>
-            <TableCell align="center" style={{ width: 150 }}>
+            <TableCell align="center" style={{ width: 125 }}>
               Version
             </TableCell>
-            <TableCell align="center" style={{ width: 150 }}>
+            <TableCell align="center" style={{ width: 125 }}>
               Nombre de patients
             </TableCell>
-            <TableCell align="center" style={{ width: 150 }}>
-              Date
+            <Hidden mdDown>
+              <TableCell align="center" style={{ width: 175 }}>
+                Date
+              </TableCell>
+            </Hidden>
+            <TableCell align="center" style={{ width: 66 }}>
+              Exporter
             </TableCell>
           </TableRow>
         </TableHead>
@@ -111,12 +123,19 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
                   </Link>
                 </TableCell>
                 <TableCell align="center">{displayDigit(historyRow.result_size ?? 0)}</TableCell>
-                <TableCell align="center">{moment(historyRow.created_at).fromNow()}</TableCell>
+                <Hidden mdDown>
+                  <TableCell align="center">{moment(historyRow.created_at).format('DD/MM/YYYY [à] HH:mm')}</TableCell>
+                </Hidden>
+                <TableCell align="center">
+                  <IconButton onClick={() => setSelectedExportableCohort(historyRow.fhir_group_id ?? '')}>
+                    <ExportIcon />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={5}>
+              <TableCell colSpan={6}>
                 <Typography className={classes.emptyRequestRow}>
                   Aucune cohorte n'est liée à cette requête
                   <br />
@@ -131,6 +150,12 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
           )}
         </TableBody>
       </Table>
+
+      <ExportModal
+        cohortId={selectedExportableCohort ?? ''}
+        open={!!selectedExportableCohort}
+        handleClose={() => setSelectedExportableCohort(null)}
+      />
     </Box>
   )
 }

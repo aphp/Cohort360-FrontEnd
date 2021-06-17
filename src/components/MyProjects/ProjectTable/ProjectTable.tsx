@@ -26,7 +26,7 @@ const ProjectTable: React.FC = () => {
 
   return (
     <TableContainer component={Paper} className={classes.grid}>
-      <Table aria-label="projects table" id="projects table" className={classes.table}>
+      <Table aria-label="projects table" id="projects_table" className={classes.table}>
         <TableHead>
           <TableRow className={classes.tableHead}>
             <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62 }} />
