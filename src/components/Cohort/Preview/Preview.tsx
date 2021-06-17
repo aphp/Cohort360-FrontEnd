@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
   CssBaseline,
-  Chip,
+  // Chip,
   Grid,
   Paper,
-  IconButton,
+  // IconButton,
   TableCell,
   TableRow,
   TableHead,
@@ -15,8 +15,8 @@ import {
   Typography
 } from '@material-ui/core'
 
-import CloseIcon from '@material-ui/icons/Close'
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
+// import CloseIcon from '@material-ui/icons/Close'
+// import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 
 import PieChart from './Charts/PieChart'
 import BarChart from './Charts/BarChart'
@@ -30,7 +30,7 @@ import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import displayDigit from 'utils/displayDigit'
 
 import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
-import { Skeleton } from '@material-ui/lab'
+// import { Skeleton } from '@material-ui/lab'
 
 type RepartitionTableProps = {
   genderRepartitionMap?: GenderRepartitionType
@@ -97,11 +97,6 @@ const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMa
 
 type PreviewProps = {
   total?: number
-  group: {
-    name: string
-    description?: string
-    perimeters?: string[]
-  }
   loading?: boolean
   genderRepartitionMap?: GenderRepartitionType
   visitTypeRepartitionData?: SimpleChartDataType[]
@@ -110,7 +105,6 @@ type PreviewProps = {
 }
 const Preview: React.FC<PreviewProps> = ({
   total,
-  group,
   genderRepartitionMap,
   visitTypeRepartitionData,
   monthlyVisitData,
@@ -118,77 +112,72 @@ const Preview: React.FC<PreviewProps> = ({
   loading
 }) => {
   const classes = useStyles()
-  const title = group.name
-  const description = group.description
-
-  const [isExtended, onExtend] = useState(false)
 
   const { vitalStatusData, genderData } = getGenderRepartitionSimpleData(genderRepartitionMap)
 
   return (
     <Grid container direction="column" alignItems="center" className={classes.root}>
       <CssBaseline />
-
-      <Grid container item className={classes.header} justify="center">
-        <Grid container item alignItems="center" md={11}>
-          <Grid container item direction="column">
-            <Typography variant="h2" color="primary">
-              {loading ? <Skeleton width={200} height={40} /> : title}
-            </Typography>
-            {description && (
-              <Typography variant="subtitle2">
-                {loading ? <Skeleton width={150} height={20} /> : description}
+      <Grid container direction="column" xs={11} justify="space-between">
+        {/* <Grid container item className={classes.header} justify="center">
+          <Grid container item alignItems="center" md={11}>
+            <Grid container item direction="column">
+              <Typography variant="h2" color="primary">
+                {loading ? <Skeleton width={200} height={40} /> : title}
               </Typography>
-            )}
+              {description && (
+                <Typography variant="subtitle2">
+                  {loading ? <Skeleton width={150} height={20} /> : description}
+                </Typography>
+              )}
 
-            {group.perimeters && (
-              <ul className={classes.perimetersChipsDiv}>
-                {loading ? (
-                  <li>
-                    <Skeleton width={100} />
-                  </li>
-                ) : isExtended ? (
-                  <>
-                    {group.perimeters &&
-                      group.perimeters.map((perimeter: any) => (
-                        <li key={perimeter} className={classes.item}>
-                          <Chip className={classes.perimetersChip} label={perimeter} />
-                        </li>
-                      ))}
-                    <IconButton
-                      size="small"
-                      classes={{ label: classes.populationLabel }}
-                      onClick={() => onExtend(false)}
-                    >
-                      <CloseIcon />
-                    </IconButton>
-                  </>
-                ) : (
-                  <>
-                    {group.perimeters &&
-                      group.perimeters.slice(0, 4).map((perimeter) => (
-                        <li key={perimeter} className={classes.item}>
-                          <Chip className={classes.perimetersChip} label={perimeter} />
-                        </li>
-                      ))}
-                    {group.perimeters && group.perimeters.length > 4 && (
+              {group.perimeters && (
+                <ul className={classes.perimetersChipsDiv}>
+                  {loading ? (
+                    <li>
+                      <Skeleton width={100} />
+                    </li>
+                  ) : isExtended ? (
+                    <>
+                      {group.perimeters &&
+                        group.perimeters.map((perimeter: any) => (
+                          <li key={perimeter} className={classes.item}>
+                            <Chip className={classes.perimetersChip} label={perimeter} />
+                          </li>
+                        ))}
                       <IconButton
                         size="small"
                         classes={{ label: classes.populationLabel }}
-                        onClick={() => onExtend(true)}
+                        onClick={() => onExtend(false)}
                       >
-                        <MoreHorizIcon />
+                        <CloseIcon />
                       </IconButton>
-                    )}
-                  </>
-                )}
-              </ul>
-            )}
+                    </>
+                  ) : (
+                    <>
+                      {group.perimeters &&
+                        group.perimeters.slice(0, 4).map((perimeter) => (
+                          <li key={perimeter} className={classes.item}>
+                            <Chip className={classes.perimetersChip} label={perimeter} />
+                          </li>
+                        ))}
+                      {group.perimeters && group.perimeters.length > 4 && (
+                        <IconButton
+                          size="small"
+                          classes={{ label: classes.populationLabel }}
+                          onClick={() => onExtend(true)}
+                        >
+                          <MoreHorizIcon />
+                        </IconButton>
+                      )}
+                    </>
+                  )}
+                </ul>
+              )}
+            </Grid>
           </Grid>
-        </Grid>
-      </Grid>
+        </Grid> */}
 
-      <Grid container item md={11} className={classes.outlinedContent}>
         <Grid container item justify="space-between" alignItems="center">
           <Grid container item xs={12} sm={6} md={4} justify="center">
             <Paper className={classes.nbPatientsOverlay}>

@@ -4,9 +4,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     backgroundColor: '#E6F1FD'
   },
-  outlinedContent: {
-    backgroundColor: '#E6F1FD'
-  },
   header: {
     backgroundColor: '#F3F8FE',
     minHeight: '100px',

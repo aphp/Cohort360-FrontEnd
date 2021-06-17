@@ -234,11 +234,8 @@ const PatientList: React.FC<PatientListProps> = ({
     <Grid container direction="column" alignItems="center">
       <CssBaseline />
       <Grid container item xs={11} justify="space-between">
-        <Typography variant="h2" className={classes.pageTitle}>
-          Données patient
-        </Typography>
         <Grid container>
-          <Grid container item xs={12} sm={6} lg={4} justify="center">
+          <Grid container item xs={12} md={6} lg={4} justify="center">
             <Paper className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography variant="h3" color="primary">
@@ -256,7 +253,7 @@ const PatientList: React.FC<PatientListProps> = ({
               )}
             </Paper>
           </Grid>
-          <Grid container item xs={12} sm={6} lg={4} justify="center">
+          <Grid container item xs={12} md={6} lg={4} justify="center">
             <Paper className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography variant="h3" color="primary">
@@ -275,7 +272,7 @@ const PatientList: React.FC<PatientListProps> = ({
               )}
             </Paper>
           </Grid>
-          <Grid container item xs={12} sm={6} lg={4} justify="center">
+          <Grid container item md={12} lg={4} justify="center">
             <Paper className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography variant="h3" color="primary">
