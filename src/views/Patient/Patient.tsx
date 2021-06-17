@@ -33,11 +33,10 @@ import useStyles from './styles'
 
 const Patient = () => {
   const classes = useStyles()
-  const { patientId, tabName } =
-    useParams<{
-      patientId: string
-      tabName: string
-    }>()
+  const { patientId, tabName } = useParams<{
+    patientId: string
+    tabName: string
+  }>()
 
   const [patient, setPatient] = useState<CohortPatient | undefined>(undefined)
   const [loading, setLoading] = useState(true)
@@ -88,16 +87,6 @@ const Patient = () => {
       .then(() => setLoading(false))
   }, [patientId, groupId])
 
-  const title = Array.isArray(cohort.cohort) || cohort?.cohort?.name === '-' ? '-' : cohort?.cohort?.name
-
-  const status = Array.isArray(cohort.cohort)
-    ? 'Visualisation de périmètres'
-    : cohort?.cohort?.name
-    ? cohort?.cohort?.name === '-'
-      ? 'Exploration de population'
-      : 'Exploration de cohorte '
-    : "Visualisation d'un patient"
-
   if (!patient && !loading) {
     return (
       <Alert severity="error" className={classes.alert}>
@@ -125,11 +114,11 @@ const Patient = () => {
         })}
       >
         <TopBar
-          title={title}
-          status={status}
+          context="patient_info"
           patientsNb={cohort.totalPatients}
           access={deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
         />
+
         <Grid
           container
           direction="column"

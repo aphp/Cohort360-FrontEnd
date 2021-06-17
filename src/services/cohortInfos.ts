@@ -5,12 +5,12 @@ import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import {
   FHIR_API_Response,
   CohortData,
-  ComplexChartDataType,
   SearchByTypes,
   VitalStatus,
   Back_API_Response,
   Cohort,
-  CohortComposition
+  CohortComposition,
+  AgeRepartitionType
 } from 'types'
 import {
   IGroup,
@@ -34,6 +34,8 @@ import {
 import { searchPatient } from './searchPatient'
 import { getAge } from 'utils/age'
 import moment from 'moment'
+
+import { GenderRepartitionType } from 'types'
 
 import fakeGroup from '../data/fakeData/group'
 import fakeFacetDeceased from '../data/fakeData/facet-deceased'
@@ -91,11 +93,17 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     let name = ''
     let description = ''
     let requestId = ''
+    let uuid = ''
+    let favorite = false
 
     if (cohortInfo.data.results && cohortInfo.data.results.length === 1) {
       name = cohortInfo.data.results[0].name ?? ''
       description = cohortInfo.data.results[0].description ?? ''
       requestId = cohortInfo.data.results[0].request ?? ''
+      favorite = cohortInfo.data.results[0].favorite ?? false
+      uuid = cohortInfo.data.results[0].uuid ?? ''
+    } else {
+      throw new Error('This cohort is not your or invalid')
     }
 
     if (!name) {
@@ -148,7 +156,9 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       visitTypeRepartitionData,
       agePyramidData,
       monthlyVisitData,
-      requestId
+      requestId,
+      favorite,
+      uuid
     }
   }
 
@@ -211,8 +221,8 @@ const fetchPatientList = async (
   | {
       totalPatients: number
       originalPatients: IPatient[] | undefined
-      agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
-      genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
+      agePyramidData?: AgeRepartitionType
+      genderRepartitionMap?: GenderRepartitionType
     }
   | undefined
 > => {

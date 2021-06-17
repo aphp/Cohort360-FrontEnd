@@ -98,7 +98,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               className={classes.criteriaChip}
               label={
                 <Tooltip title={displaySelectedCode(_currentCriteria?.code)}>
-                  <Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    {_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
+                  </Typography>
                 </Tooltip>
               }
             />
@@ -119,9 +121,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   {startDate
                     ? endDate
                       ? `Entre le ${startDate} et le ${endDate}`
-                      : `Après le ${startDate}`
+                      : `Avant le ${startDate}`
                     : endDate
-                    ? `Avant le ${endDate}`
+                    ? `Après le ${endDate}`
                     : ''}
                 </Typography>
               }
@@ -162,7 +164,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               className={classes.criteriaChip}
               label={
                 <Tooltip title={displaySelectedCode(_currentCriteria?.code)}>
-                  <Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    {_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
+                  </Typography>
                 </Tooltip>
               }
             />
@@ -183,9 +187,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   {startDate
                     ? endDate
                       ? `Entre le ${startDate} et le ${endDate}`
-                      : `Après le ${startDate}`
+                      : `Avant le ${startDate}`
                     : endDate
-                    ? `Avant le ${endDate}`
+                    ? `Après le ${endDate}`
                     : ''}
                 </Typography>
               }
@@ -227,7 +231,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               className={classes.criteriaChip}
               label={
                 <Tooltip title={displaySelectedCode(_currentCriteria?.code)}>
-                  <Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    {_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
+                  </Typography>
                 </Tooltip>
               }
             />
@@ -237,7 +243,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               className={classes.criteriaChip}
               label={
                 <Tooltip title={displaySelectedDiagTypes(_currentCriteria?.diagnosticType)}>
-                  <Typography noWrap>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
                     {_currentCriteria?.diagnosticType?.map((diagnosticType) => diagnosticType.id).reduce(reducer)}
                   </Typography>
                 </Tooltip>
@@ -260,9 +266,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   {startDate
                     ? endDate
                       ? `Entre le ${startDate} et le ${endDate}`
-                      : `Après le ${startDate}`
+                      : `Avant le ${startDate}`
                     : endDate
-                    ? `Avant le ${endDate}`
+                    ? `Après le ${endDate}`
                     : ''}
                 </Typography>
               }
@@ -305,20 +311,28 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           _currentCriteria && _currentCriteria.gender && _currentCriteria?.gender?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{displaySelectedGender(_currentCriteria?.gender)}</Typography>}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedGender(_currentCriteria?.gender)}
+                </Typography>
+              }
             />
           ),
           _currentCriteria && _currentCriteria.vitalStatus && _currentCriteria?.vitalStatus?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{displaySelectedVitalStatus(_currentCriteria?.vitalStatus)}</Typography>}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedVitalStatus(_currentCriteria?.vitalStatus)}
+                </Typography>
+              }
             />
           ),
           !!_currentCriteria.years && _currentCriteria.years[0] === _currentCriteria.years[1] && (
             <Chip
               className={classes.criteriaChip}
               label={
-                <Typography noWrap>
+                <Typography style={{ maxWidth: 500 }} noWrap>
                   {`
                     ${_currentCriteria.years?.[0]} ${ageUnit}
                       ${_currentCriteria.years?.[0] === 130 ? ' ou plus' : ''}
@@ -333,7 +347,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               <Chip
                 className={classes.criteriaChip}
                 label={
-                  <Typography noWrap>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
                     {`Entre ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit}
                     ${_currentCriteria.years[1] === 130 ? ' ou plus' : ''}`}
                   </Typography>
@@ -363,7 +377,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               className={classes.criteriaChip}
               label={
                 <Tooltip title={`Contient ${_currentCriteria.search} dans le document`}>
-                  <Typography noWrap>{_currentCriteria.search}</Typography>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    {_currentCriteria.search}
+                  </Typography>
                 </Tooltip>
               }
             />
@@ -371,7 +387,11 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           _currentCriteria && _currentCriteria.docType && _currentCriteria?.docType?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{displaySelectedDocType(_currentCriteria?.docType)}</Typography>}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedDocType(_currentCriteria?.docType)}
+                </Typography>
+              }
             />
           ),
           +_currentCriteria?.occurrence !== 1 && (
@@ -390,9 +410,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   {startDate
                     ? endDate
                       ? `Entre le ${startDate} et le ${endDate}`
-                      : `Après le ${startDate},`
+                      : `Avant le ${startDate},`
                     : endDate
-                    ? `Avant le ${endDate}`
+                    ? `Après le ${endDate}`
                     : ''}
                 </Typography>
               }
@@ -499,7 +519,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             <Chip
               className={classes.criteriaChip}
               label={
-                <Typography noWrap>
+                <Typography style={{ maxWidth: 500 }} noWrap>
                   {`${_currentCriteria.years?.[0]} ${ageUnit}
                     ${_currentCriteria.years?.[0] === 130 ? ' ou plus' : ''}`}
                 </Typography>
@@ -512,7 +532,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               <Chip
                 className={classes.criteriaChip}
                 label={
-                  <Typography noWrap>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
                     {`Entre ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit}
                     ${_currentCriteria.years[1] === 130 ? ' ou plus' : ''}`}
                   </Typography>
@@ -523,7 +543,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             <Chip
               className={classes.criteriaChip}
               label={
-                <Typography noWrap>
+                <Typography style={{ maxWidth: 500 }} noWrap>
                   {`Prise en charge : ${_currentCriteria.duration?.[0]} ${durationUnit}
                   ${_currentCriteria.duration?.[0] === 100 ? ' ou plus' : ''}`}
                 </Typography>
@@ -540,7 +560,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               <Chip
                 className={classes.criteriaChip}
                 label={
-                  <Typography noWrap>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
                     {`Prise en charge : ${_currentCriteria.duration[0]} et ${_currentCriteria.duration[1]}
                     ${durationUnit}
                     ${_currentCriteria.duration[1] === 100 ? ' ou plus' : ''}`}
@@ -551,33 +571,51 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           _currentCriteria && _currentCriteria.entryMode && _currentCriteria?.entryMode?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{displaySelectedEntryModes(_currentCriteria?.entryMode)}</Typography>}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedEntryModes(_currentCriteria?.entryMode)}
+                </Typography>
+              }
             />
           ),
           _currentCriteria && _currentCriteria.exitMode && _currentCriteria?.exitMode?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{displaySelectedExitModes(_currentCriteria?.exitMode)}</Typography>}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedExitModes(_currentCriteria?.exitMode)}
+                </Typography>
+              }
             />
           ),
           _currentCriteria && _currentCriteria.priseEnChargeType && _currentCriteria?.priseEnChargeType?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
               label={
-                <Typography noWrap>{displaySelectedPriseEnChargeTypes(_currentCriteria?.priseEnChargeType)}</Typography>
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedPriseEnChargeTypes(_currentCriteria?.priseEnChargeType)}
+                </Typography>
               }
             />
           ),
           _currentCriteria && _currentCriteria.typeDeSejour && _currentCriteria?.typeDeSejour?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{displaySelectedTypeDeSejours(_currentCriteria?.typeDeSejour)}</Typography>}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedTypeDeSejours(_currentCriteria?.typeDeSejour)}
+                </Typography>
+              }
             />
           ),
           _currentCriteria && _currentCriteria.fileStatus && _currentCriteria?.fileStatus?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{displaySelectedFileStatus(_currentCriteria?.fileStatus)}</Typography>}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedFileStatus(_currentCriteria?.fileStatus)}
+                </Typography>
+              }
             />
           )
         ]

@@ -203,6 +203,39 @@ export type SimpleChartDataType = {
 }
 export type ComplexChartDataType<T, V = { [key: string]: number }> = Map<T, V>
 
+export type GenderRepartitionType = {
+  female: { deceased: number; alive: number }
+  male: { deceased: number; alive: number }
+  unknown: { deceased: number; alive: number }
+  other: { deceased: number; alive: number }
+}
+
+export type AgeRepartitionType = { male: number; female: number; other: number }[]
+
+export type MonthVisiteRepartitionType = {
+  male: number
+  maleCount: number
+  female: number
+  femaleCount: number
+  other: number
+  otherCount: number
+}
+
+export type VisiteRepartitionType = {
+  Janvier: MonthVisiteRepartitionType
+  Février: MonthVisiteRepartitionType
+  Mars: MonthVisiteRepartitionType
+  Avril: MonthVisiteRepartitionType
+  Mai: MonthVisiteRepartitionType
+  Juin: MonthVisiteRepartitionType
+  Juillet: MonthVisiteRepartitionType
+  Août: MonthVisiteRepartitionType
+  Septembre: MonthVisiteRepartitionType
+  Octobre: MonthVisiteRepartitionType
+  Novembre: MonthVisiteRepartitionType
+  Decembre: MonthVisiteRepartitionType
+}
+
 export type CohortData = {
   name?: string
   description?: string
@@ -213,11 +246,13 @@ export type CohortData = {
   documentsList?: (CohortComposition | IDocumentReference)[]
   wordcloudData?: any
   encounters?: IEncounter[]
-  genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
+  genderRepartitionMap?: GenderRepartitionType
   visitTypeRepartitionData?: SimpleChartDataType[]
-  monthlyVisitData?: ComplexChartDataType<Month>
-  agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
+  monthlyVisitData?: VisiteRepartitionType
+  agePyramidData?: AgeRepartitionType
   requestId?: string
+  favorite?: boolean
+  uuid?: string
 }
 
 export type PatientData = {

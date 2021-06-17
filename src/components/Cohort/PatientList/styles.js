@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
     padding: '0.7rem',
     backgroundColor: theme.palette.white,
     height: '300px',
-    width: '342px',
+    width: '100%',
     borderRadius: '8px',
     alignItems: 'center',
     fontSize: '16px'

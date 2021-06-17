@@ -3,6 +3,9 @@ import { IGroup_Member } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { logout, login } from './me'
 import { RootState } from 'state'
+
+import { setFavoriteCohortThunk } from './userCohorts'
+
 import { fetchCohort } from 'services/cohortInfos'
 import { fetchMyPatients } from 'services/myPatients'
 import { fetchPerimetersInfos } from 'services/perimeters'
@@ -34,6 +37,8 @@ const defaultInitialState = {
   monthlyVisitData: undefined,
   agePyramidData: undefined,
   requestId: '',
+  cohortId: '',
+  favorite: false,
   // ExploredCohortState
   importedPatients: [],
   includedPatients: [],
@@ -44,13 +49,35 @@ const defaultInitialState = {
 const initialState: ExploredCohortState = localStorageExploredCohort
   ? {
       ...jsonExploredCohort,
-      agePyramidData: jsonExploredCohort.agePyramidData ? new Map(jsonExploredCohort.agePyramidData) : new Map(),
       genderRepartitionMap: jsonExploredCohort.genderRepartitionMap
-        ? new Map(jsonExploredCohort.genderRepartitionMap)
-        : new Map(),
-      monthlyVisitData: jsonExploredCohort.monthlyVisitData ? new Map(jsonExploredCohort.monthlyVisitData) : new Map()
+        ? jsonExploredCohort.genderRepartitionMap
+        : {
+            female: { deceased: 0, alive: 0 },
+            male: { deceased: 0, alive: 0 },
+            other: { deceased: 0, alive: 0 },
+            unknown: { deceased: 0, alive: 0 }
+          },
+      agePyramidData: jsonExploredCohort.agePyramidData ? jsonExploredCohort.agePyramidData : [],
+      monthlyVisitData: jsonExploredCohort.monthlyVisitData ? jsonExploredCohort.monthlyVisitData : {}
     }
   : defaultInitialState
+
+const favoriteExploredCohort = createAsyncThunk<CohortData, { id: string }, { state: RootState }>(
+  'exploredCohort/favoriteExploredCohort',
+  async ({ id }, { getState, dispatch }) => {
+    const state = getState()
+
+    const favoriteResult = await dispatch(setFavoriteCohortThunk({ cohortId: id }))
+
+    return {
+      ...state.exploredCohort,
+      favorite:
+        favoriteResult.meta.requestStatus === 'fulfilled'
+          ? !state.exploredCohort.favorite
+          : state.exploredCohort.favorite
+    }
+  }
+)
 
 const fetchExploredCohort = createAsyncThunk<
   CohortData,
@@ -99,11 +126,25 @@ const fetchExploredCohort = createAsyncThunk<
       }
       case 'patients': {
         cohort = await fetchMyPatients()
+        if (cohort) {
+          cohort.name = '-'
+          cohort.description = ''
+          cohort.requestId = ''
+          cohort.favorite = false
+          cohort.uuid = ''
+        }
         break
       }
       case 'perimeters': {
         if (id) {
           cohort = await fetchPerimetersInfos(id)
+          if (cohort) {
+            cohort.name = '-'
+            cohort.description = ''
+            cohort.requestId = ''
+            cohort.favorite = false
+            cohort.uuid = ''
+          }
         }
         break
       }
@@ -190,18 +231,20 @@ const exploredCohortSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout, () => defaultInitialState)
-    builder.addCase(fetchExploredCohort.pending, (state, { meta }) => {
-      state.loading = true
-      state.requestId = meta.requestId
-    })
-    builder.addCase(fetchExploredCohort.fulfilled, (state, { payload, meta }) => {
-      return { ...state, ...payload, loading: state.requestId !== meta.requestId }
-    })
+    builder.addCase(fetchExploredCohort.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(fetchExploredCohort.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
+    builder.addCase(fetchExploredCohort.rejected, () => ({ ...defaultInitialState }))
+    builder.addCase(favoriteExploredCohort.pending, (state) => ({ ...state }))
+    builder.addCase(favoriteExploredCohort.fulfilled, (state, { payload }) => ({
+      ...state,
+      ...payload
+    }))
+    builder.addCase(favoriteExploredCohort.rejected, () => ({ ...defaultInitialState }))
   }
 })
 
 export default exploredCohortSlice.reducer
-export { fetchExploredCohort }
+export { fetchExploredCohort, favoriteExploredCohort }
 export const {
   addImportedPatients,
   excludePatients,
