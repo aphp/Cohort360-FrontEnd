@@ -81,9 +81,9 @@ const favoriteExploredCohort = createAsyncThunk<CohortData, { id: string }, { st
 
 const fetchExploredCohort = createAsyncThunk<
   CohortData,
-  { context: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'; id?: string },
+  { context: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'; id?: string; forceReload?: boolean },
   { state: RootState }
->('exploredCohort/fetchExploredCohort', async ({ context, id }, { getState }) => {
+>('exploredCohort/fetchExploredCohort', async ({ context, id, forceReload }, { getState }) => {
   const state = getState()
   const stateCohort = state.exploredCohort.cohort
   let shouldRefreshData = true
@@ -116,7 +116,7 @@ const fetchExploredCohort = createAsyncThunk<
       break
   }
   let cohort
-  if (shouldRefreshData) {
+  if (shouldRefreshData || forceReload) {
     switch (context) {
       case 'cohort': {
         if (id) {
