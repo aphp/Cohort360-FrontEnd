@@ -501,17 +501,105 @@ const DocumentSearchHelp = ({ open, onClose }) => {
                   </TableCell>
                   <TableCell align="center">
                     <Typography>
-                      Mot1 <span className={classes.bold}>AND</span> Mot2
+                      <span className={classes.bold}>"</span>mot1 mot2<span className={classes.bold}>"</span>
                     </Typography>
                   </TableCell>
                   <TableCell align="left">
                     <Typography>
-                      infarctus <span className={classes.bold}>AND</span> myocarde
+                      <span className={classes.bold}>"</span>embolie pulmonaire<span className={classes.bold}>"</span>
                     </Typography>
                     <Typography align="justify">
-                      Les deux mots <span className={classes.bold}>infarctus</span> et{' '}
-                      <span className={classes.bold}>myocarde</span> sont présents dans chaque document
+                      Recherche dans les documents l'expression{' '}
+                      <span className={classes.bold}>embolie pulmonaire exacte</span>, c’est-à-dire les deux termes côte
+                      à côte et avec la même orthographe
                     </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>"... ..."~nombre de mots</Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography>Recherche deux termes avec une distance de mots entre les deux</Typography>
+                    <Typography align="justify">Le recherche s'applique par la racine des mots</Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography>
+                      <span className={classes.bold}>"</span>mot1 mot2<span className={classes.bold}>"~3</span>
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography>
+                      <span className={classes.bold}>"</span>embolie pulmonaire<span className={classes.bold}>"~3</span>
+                    </Typography>
+                    <Typography align="justify">
+                      Recherche dans les documents le mot <span className={classes.bold}>embolie</span> et le mot{' '}
+                      <span className={classes.bold}>pulmonaire</span> mais ces deux mots peuvent être{' '}
+                      <span className={classes.bold}>séparés au maximum par 3 mots</span>
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>^nombre</Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography>
+                      Permet de rechercher un terme en renforçant sa valeur en lui accordant un facteur.
+                    </Typography>
+                    <Typography align="justify">
+                      Il est utile pour booster la recherche d'un mot par rapport aux autres
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography>
+                      mot1<span className={classes.bold}>^3</span> mot2<span className={classes.bold}>^4</span>
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography>
+                      embolie<span className={classes.bold}>^3</span> pulmonaire<span className={classes.bold}>^4</span>
+                    </Typography>
+                    <Typography align="justify">
+                      Recherche dans les documents le mot{' '}
+                      <span className={classes.bold}>embolie avec le niveau de pertinence 3</span> et le mot{' '}
+                      <span className={classes.bold}>pulmonaire avec le niveau de pertinence 2</span>
+                    </Typography>
+                    <Typography>Le mot embolie sera considéré plus pertinent que le mot pulmonaire</Typography>
+                  </TableCell>
+                </TableRow>
+
+                <TableRow className={classes.tableBodyRows}>
+                  <TableCell align="center">
+                    <Typography className={classes.bold}>{'( ... ... )^=nombre'}</Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography>
+                      Permet de rechercher un <span className={classes.bold}>groupe de mots</span> en renforçant sa
+                      valeur en lui accordant un facteur.
+                    </Typography>
+                    <Typography align="justify">
+                      Il est utile pour booster la recherche d'un groupe de mots par rapport aux autres
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography>
+                      (mot1 mot2)<span className={classes.bold}>^=3</span>
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="left">
+                    <Typography className={classes.bold}>
+                      (embolie AND pulmonaire)^=3 OR (cancer AND ovaire)^=2
+                    </Typography>
+                    <Typography align="justify">
+                      Recherche dans les documents le groupe de mots{' '}
+                      <span className={classes.bold}>embolie et pulmonaire avec un niveau de pertinence de 3</span> et
+                      le groupe de mots{' '}
+                      <span className={classes.bold}>cancer et ovaire avec un niveau de pertinence 2</span>.
+                    </Typography>
+                    <Typography>Le premier groupe de mots sera considéré plus pertinent que le second</Typography>
                   </TableCell>
                 </TableRow>
               </TableBody>
