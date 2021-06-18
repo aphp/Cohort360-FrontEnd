@@ -59,13 +59,9 @@ const Dashboard: React.FC<{
     setDeidentifiedBoolean(!!valueBoolean)
   }
 
-  useEffect(() => {
-    const id = context === 'cohort' ? cohortId : context === 'perimeters' ? perimetreIds : undefined
+  console.log('dashboard.requestId :>> ', dashboard.requestId)
 
-    if (context !== 'new_cohort') {
-      dispatch<any>(fetchExploredCohort({ context, id }))
-    }
-
+  const onChangeTabs = () => {
     switch (context) {
       case 'patients':
         setTabs([
@@ -117,10 +113,19 @@ const Dashboard: React.FC<{
       default:
         break
     }
+  }
+
+  useEffect(() => {
+    const id = context === 'cohort' ? cohortId : context === 'perimeters' ? perimetreIds : undefined
+
+    if (context !== 'new_cohort') {
+      dispatch<any>(fetchExploredCohort({ context, id }))
+    }
   }, [context, cohortId]) // eslint-disable-line
 
   useEffect(() => {
     checkDeindentifiedStatus(dashboard)
+    onChangeTabs()
   }, [dashboard])
 
   const forceReload = () => {
