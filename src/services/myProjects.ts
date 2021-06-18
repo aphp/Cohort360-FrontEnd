@@ -74,10 +74,10 @@ export const fetchProjectsList = async (limit = 100, offset = 0) => {
         return data
       } else {
         return {
-          count: myProjects.length,
+          count: 0,
           next: '',
           previous: '',
-          results: myProjects
+          results: []
         }
       }
     }
