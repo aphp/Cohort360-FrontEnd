@@ -191,6 +191,7 @@ const DocumentSearchHelp = ({ open, onClose }) => {
                 <TableRow className={classes.tableBodyRows}>
                   <TableCell align="center">
                     <Typography className={classes.bold}>AND</Typography>
+                    <Typography className={classes.bold}>{'&&'}</Typography>
                   </TableCell>
                   <TableCell align="left">
                     <Typography align="justify">
@@ -200,6 +201,9 @@ const DocumentSearchHelp = ({ open, onClose }) => {
                   <TableCell align="center">
                     <Typography>
                       Mot1 <span className={classes.bold}>AND</span> Mot2
+                    </Typography>
+                    <Typography>
+                      Mot1 <span className={classes.bold}>{'&&'}</span> Mot2
                     </Typography>
                   </TableCell>
                   <TableCell align="left">
@@ -216,7 +220,6 @@ const DocumentSearchHelp = ({ open, onClose }) => {
                 <TableRow className={classes.tableBodyRows}>
                   <TableCell align="center">
                     <Typography className={classes.bold}>OR</Typography>
-                    <Typography className={classes.bold}>|</Typography>
                     <Typography className={classes.bold}>||</Typography>
                     <Typography className={classes.bold}>Espace entre deux mots</Typography>
                   </TableCell>
@@ -227,9 +230,6 @@ const DocumentSearchHelp = ({ open, onClose }) => {
                   <TableCell align="center">
                     <Typography>
                       Mot1 <span className={classes.bold}>OR</span> Mot 2
-                    </Typography>
-                    <Typography>
-                      Mot1 <span className={classes.bold}>|</span> Mot 2
                     </Typography>
                     <Typography>
                       Mot1 <span className={classes.bold}>||</span> Mot 2
