@@ -123,6 +123,11 @@ const Dashboard: React.FC<{
     checkDeindentifiedStatus(dashboard)
   }, [dashboard])
 
+  const forceReload = () => {
+    const id = context === 'cohort' ? cohortId : context === 'perimeters' ? perimetreIds : undefined
+    dispatch<any>(fetchExploredCohort({ context, id, forceReload: true }))
+  }
+
   const handleCloseRedcapDialog = () => {
     setOpenRedcapDialog(false)
   }
@@ -165,6 +170,7 @@ const Dashboard: React.FC<{
         context={context}
         patientsNb={dashboard.totalPatients || 0}
         access={deidentifiedBoolean === null ? '-' : deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
+        afterEdit={() => forceReload()}
       />
 
       <Grid container justify="center" className={classes.tabs}>

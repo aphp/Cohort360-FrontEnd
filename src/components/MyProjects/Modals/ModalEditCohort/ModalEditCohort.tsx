@@ -79,6 +79,7 @@ const ModalEditCohort: React.FC<{
     } else {
       dispatch<any>(addCohort({ newCohort: modalCohortState }))
     }
+    onClose()
   }
 
   const handleConfirmDeletion = () => {
