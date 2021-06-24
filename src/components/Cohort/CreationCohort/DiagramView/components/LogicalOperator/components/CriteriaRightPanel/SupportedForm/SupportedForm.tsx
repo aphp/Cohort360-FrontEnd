@@ -263,7 +263,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
           </Grid>
 
           <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
-            Mode d'entrée :
+            Mode d'entré :
           </FormLabel>
 
           <Autocomplete

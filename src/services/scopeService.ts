@@ -80,11 +80,11 @@ export const getPerimeters = async (practitionerId: string) => {
 }
 
 const getAccessName = (extension?: IExtension[]) => {
-  if (!extension || !extension.find((extension) => extension.url === 'access level')) {
+  if (!extension || !extension.find((extension) => extension.url === 'High Level Organisation Role')) {
     return ''
   }
 
-  const accessExtension = extension.find((extension) => extension.url === 'access level')
+  const accessExtension = extension.find((extension) => extension.url === 'High Level Organisation Role')
 
   const access = accessExtension?.valueString
 
