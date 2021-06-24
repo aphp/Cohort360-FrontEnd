@@ -263,7 +263,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
           </Grid>
 
           <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
-            Mode d'entré :
+            Mode d'entrée :
           </FormLabel>
 
           <Autocomplete
@@ -275,7 +275,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
             getOptionSelected={(option, value) => option.id === value.id}
             value={defaultValuesEntryModes}
             onChange={(e, value) => _onChangeValue('entryMode', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Mode d'entré" />}
+            renderInput={(params) => <TextField {...params} variant="outlined" label="Mode d'entrée" />}
           />
 
           <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
