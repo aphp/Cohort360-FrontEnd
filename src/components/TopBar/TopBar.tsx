@@ -151,14 +151,14 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                   width: cohort.showActionButton && !dashboard.loading ? 'calc(100% - 120px)' : 'calc(100% - 20px)'
                 }}
               >
-                <Grid item xs={9} direction="row" container>
-                  <Grid container style={{ width: 'fit-content' }} alignItems="center">
+                <Grid item xs={9} direction="row" container style={{ flexWrap: 'nowrap' }}>
+                  <Grid container style={{ width: 40 }} alignItems="center">
                     <Avatar style={{ backgroundColor: '#5bc5f1' }}>{cohort.icon}</Avatar>
                   </Grid>
 
                   <Grid
                     container
-                    style={{ width: 'calc(100% - 48px)', marginLeft: 8 }}
+                    style={{ width: 'calc(100% - 40px)', marginLeft: 8 }}
                     direction="column"
                     justify="center"
                   >
@@ -242,7 +242,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
               </Grid>
 
               {cohort.showActionButton && !dashboard.loading && (
-                <Grid container item justify="flex-end" style={{ width: 'fit-content' }}>
+                <Grid container item justify="flex-end" style={{ width: 120 }}>
                   <IconButton onClick={handleFavorite} color="secondary">
                     {dashboard.favorite ? (
                       <StarFullIcon height={18} fill="currentColor" />
