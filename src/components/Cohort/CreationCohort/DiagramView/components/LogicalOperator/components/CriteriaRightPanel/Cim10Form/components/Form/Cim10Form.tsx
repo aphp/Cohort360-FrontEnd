@@ -1,47 +1,51 @@
 import React, { useState } from 'react'
 
-import { Alert } from '@material-ui/lab'
-import { Button, Divider, Grid, IconButton, Switch, Typography, FormLabel } from '@material-ui/core'
+import { Autocomplete, Alert } from '@material-ui/lab'
+import {
+  Button,
+  Divider,
+  FormControl,
+  FormLabel,
+  Grid,
+  Input,
+  InputLabel,
+  IconButton,
+  MenuItem,
+  Switch,
+  Typography,
+  TextField,
+  Select
+} from '@material-ui/core'
+
+import ClearIcon from '@material-ui/icons/Clear'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import { FormBuilder } from '@arkhn/ui'
+import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
 import useStyles from './styles'
-
-import { Cim10DataType } from 'types'
 
 type Cim10FormProps = {
   isEdition?: boolean
   criteria: any
   selectedCriteria: any
+  onChangeValue: (key: string, value: any) => void
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
 }
 
 const Cim10Form: React.FC<Cim10FormProps> = (props) => {
-  const { isEdition, criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
+  const { isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
   const classes = useStyles()
 
   const [error, setError] = useState(false)
+  const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
-  const _onSubmit = (data: any) => {
-    if (data?.code?.length === 0 && data?.diagnosticType?.length === 0) {
+  const _onSubmit = () => {
+    if (selectedCriteria?.code?.length === 0 && selectedCriteria?.diagnosticType?.length === 0) {
       return setError(true)
     }
-
-    onChangeSelectedCriteria({
-      ...selectedCriteria,
-      title: data.title,
-      code: data.code,
-      diagnosticType: data.diagnosticType,
-      occurrence: +data.occurrence,
-      occurrenceComparator: data.occurrenceComparator,
-      startOccurrence: data.startOccurrence,
-      endOccurrence: data.endOccurrence,
-      type: 'Condition',
-      isInclusive: data.isInclusive
-    })
+    onChangeSelectedCriteria(selectedCriteria)
   }
 
   const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue)
@@ -53,6 +57,29 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   ) {
     return <> </>
   }
+
+  const defaultValuesCode = selectedCriteria.code
+    ? selectedCriteria.code.map((code: any) => {
+        const criteriaCode = criteria.data.cim10Diagnostic
+          ? criteria.data.cim10Diagnostic.find((c: any) => c.id === code.id)
+          : null
+        return {
+          id: code.id,
+          label: code.label ? code.label : criteriaCode?.label ?? '?'
+        }
+      })
+    : []
+  const defaultValuesType = selectedCriteria.diagnosticType
+    ? selectedCriteria.diagnosticType.map((diagnosticType: any) => {
+        const criteriaType = criteria.data.diagnosticTypes
+          ? criteria.data.diagnosticTypes.find((g: any) => g.id === diagnosticType.id)
+          : null
+        return {
+          id: diagnosticType.id,
+          label: diagnosticType.label ? diagnosticType.label : criteriaType?.label ?? '?'
+        }
+      })
+    : []
 
   return (
     <Grid className={classes.root}>
@@ -72,127 +99,155 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
 
       <Grid className={classes.formContainer}>
         {error && <Alert severity="error">Merci de renseigner au moins un code ou un type de diagnostic</Alert>}
-        <FormBuilder<Cim10DataType>
-          defaultValues={selectedCriteria}
-          title="Diagnostic"
-          properties={[
-            {
-              name: 'title',
-              placeholder: 'Nom du critère',
-              type: 'text',
-              variant: 'outlined',
-              validationRules: {
-                required: 'Merci de renseigner un titre'
-              }
-            },
-            {
-              name: 'isInclusive',
-              type: 'custom',
-              renderInput: (field: any) => (
-                <Grid style={{ display: 'flex' }}>
-                  <FormLabel
-                    onClick={() => field.onChange(!field.value)}
-                    style={{ margin: 'auto 1em' }}
-                    component="legend"
-                  >
-                    Exclure les patients qui suivent les règles suivantes
-                  </FormLabel>
-                  <Switch checked={!field.value} onChange={(event) => field.onChange(!event.target.checked)} />
-                </Grid>
-              )
-            },
-            {
-              name: 'code',
-              label: 'Code CIM10',
-              variant: 'outlined',
-              type: 'autocomplete',
-              multiple: true,
-              autocompleteOptions: criteria?.data?.cim10Diagnostic || [],
-              getAutocompleteOptions: getDiagOptions,
-              noOptionsText: 'Veuillez entrer un code ou un diagnostic CIM10'
-            },
-            {
-              name: 'diagnosticType',
-              label: 'Type de diagnostic',
-              variant: 'outlined',
-              type: 'autocomplete',
-              multiple: true,
-              autocompleteOptions: criteria?.data?.diagnosticTypes || []
-            },
-            {
-              type: 'custom',
-              name: 'label',
-              renderInput: () => (
-                <FormLabel style={{ padding: '0 1em' }} component="legend">
-                  Nombre d'occurrence :
-                </FormLabel>
-              )
-            },
-            {
-              type: 'section',
-              title: '',
-              name: '',
-              containerStyle: { display: 'grid', gridTemplateColumns: '100px 1fr' },
-              properties: [
-                {
-                  name: 'occurrenceComparator',
-                  variant: 'outlined',
-                  type: 'select',
-                  selectOptions: [
-                    { id: '<=', label: '<=' },
-                    { id: '<', label: '<' },
-                    { id: '=', label: '=' },
-                    { id: '>', label: '>' },
-                    { id: '>=', label: '>=' }
-                  ]
-                },
-                {
-                  name: 'occurrence',
-                  variant: 'outlined',
-                  type: 'number',
-                  validationRules: {
-                    min: 1,
-                    required: 'Merci de renseigner une occurrence supérieure à 1'
-                  }
+
+        {!error && !multiFields && (
+          <Alert
+            severity="info"
+            onClose={() => {
+              localStorage.setItem('multiple_fields', 'ok')
+              setMultiFields('ok')
+            }}
+          >
+            Tous les éléments des champs multiples sont liés par une contrainte OU
+          </Alert>
+        )}
+
+        <Grid className={classes.inputContainer} container>
+          <Typography variant="h6">Diagnostic</Typography>
+
+          <TextField
+            required
+            className={classes.inputItem}
+            id="criteria-name-required"
+            placeholder="Nom du critère"
+            defaultValue="Critères de diagnostic"
+            variant="outlined"
+            value={selectedCriteria.title}
+            onChange={(e) => onChangeValue('title', e.target.value)}
+          />
+
+          <Grid style={{ display: 'flex' }}>
+            <FormLabel
+              onClick={() => onChangeValue('isInclusive', !selectedCriteria.isInclusive)}
+              style={{ margin: 'auto 1em' }}
+              component="legend"
+            >
+              Exclure les patients qui suivent les règles suivantes
+            </FormLabel>
+            <Switch
+              id="criteria-inclusive"
+              checked={!selectedCriteria.isInclusive}
+              onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
+            />
+          </Grid>
+
+          <AutocompleteAsync
+            multiple
+            label="Code CIM10"
+            variant="outlined"
+            noOptionsText="Veuillez entrer un code ou un diagnostic CIM10"
+            className={classes.inputItem}
+            autocompleteValue={defaultValuesCode}
+            autocompleteOptions={criteria?.data?.cim10Diagnostic || []}
+            getAutocompleteOptions={getDiagOptions}
+            onChange={(e, value) => onChangeValue('code', value)}
+          />
+
+          <Autocomplete
+            multiple
+            id="criteria-cim10-type-autocomplete"
+            className={classes.inputItem}
+            options={criteria?.data?.diagnosticTypes || []}
+            getOptionLabel={(option) => option.label}
+            getOptionSelected={(option, value) => option.id === value.id}
+            value={defaultValuesType}
+            onChange={(e, value) => onChangeValue('diagnosticType', value)}
+            renderInput={(params) => <TextField {...params} variant="outlined" label="Type de diagnostic" />}
+          />
+
+          <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
+            Nombre d'occurrence
+          </FormLabel>
+
+          <Grid style={{ display: 'grid', gridTemplateColumns: '100px 1fr', alignItems: 'center', margin: '0 1em' }}>
+            <Select
+              style={{ marginRight: '1em' }}
+              id="criteria-occurrenceComparator-select"
+              value={selectedCriteria.occurrenceComparator}
+              onChange={(event) => onChangeValue('occurrenceComparator', event.target.value as string)}
+              variant="outlined"
+            >
+              <MenuItem value={'<='}>{'<='}</MenuItem>
+              <MenuItem value={'<'}>{'<'}</MenuItem>
+              <MenuItem value={'='}>{'='}</MenuItem>
+              <MenuItem value={'>'}>{'>'}</MenuItem>
+              <MenuItem value={'>='}>{'>='}</MenuItem>
+            </Select>
+
+            <TextField
+              required
+              inputProps={{
+                min: 1
+              }}
+              type="number"
+              id="criteria-occurrence-required"
+              variant="outlined"
+              value={selectedCriteria.occurrence}
+              onChange={(e) => onChangeValue('occurrence', e.target.value)}
+            />
+          </Grid>
+
+          <FormLabel style={{ padding: '1em 1em 0 1em' }} component="legend">
+            Date d'occurrence
+          </FormLabel>
+
+          <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+            <FormControl className={classes.inputItem}>
+              <InputLabel shrink htmlFor="date-start-occurrence">
+                Avant le
+              </InputLabel>
+              <Input
+                id="date-start-occurrence"
+                type="date"
+                value={selectedCriteria.startOccurrence}
+                endAdornment={
+                  <IconButton size="small" onClick={() => onChangeValue('startOccurrence', '')}>
+                    <ClearIcon />
+                  </IconButton>
                 }
-              ]
-            },
-            {
-              type: 'custom',
-              name: 'label',
-              renderInput: () => (
-                <FormLabel style={{ padding: '12px 12px 0 12px', marginBottom: -12 }} component="legend">
-                  Date d'occurrence :
-                </FormLabel>
-              )
-            },
-            {
-              name: 'startOccurrence',
-              label: 'Après le',
-              type: 'date'
-            },
-            {
-              name: 'endOccurrence',
-              label: 'Avant le',
-              type: 'date'
-            }
-          ]}
-          submit={_onSubmit}
-          formId="cim10-form"
-          displaySubmitButton={false}
-          formFooter={
-            <Grid className={classes.criteriaActionContainer}>
-              {!isEdition && (
-                <Button onClick={goBack} color="primary" variant="outlined">
-                  Annuler
-                </Button>
-              )}
-              <Button type="submit" form="cim10-form" color="primary" variant="contained">
-                Confirmer
-              </Button>
-            </Grid>
-          }
-        />
+                onChange={(e) => onChangeValue('startOccurrence', e.target.value)}
+              />
+            </FormControl>
+
+            <FormControl className={classes.inputItem}>
+              <InputLabel shrink htmlFor="date-end-occurrence">
+                Après le
+              </InputLabel>
+              <Input
+                id="date-end-occurrence"
+                type="date"
+                value={selectedCriteria.endOccurrence}
+                endAdornment={
+                  <IconButton size="small" onClick={() => onChangeValue('endOccurrence', '')}>
+                    <ClearIcon />
+                  </IconButton>
+                }
+                onChange={(e) => onChangeValue('endOccurrence', e.target.value)}
+              />
+            </FormControl>
+          </Grid>
+        </Grid>
+
+        <Grid className={classes.criteriaActionContainer}>
+          {!isEdition && (
+            <Button onClick={goBack} color="primary" variant="outlined">
+              Annuler
+            </Button>
+          )}
+          <Button onClick={_onSubmit} type="submit" form="cim10-form" color="primary" variant="contained">
+            Confirmer
+          </Button>
+        </Grid>
       </Grid>
     </Grid>
   )

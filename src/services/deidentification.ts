@@ -1,42 +1,12 @@
 import api from './api'
 import { CONTEXT } from '../constants'
 import { FHIR_API_Response } from 'types'
-import { IExtension, IGroup, IPractitionerRole } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IGroup, IPractitionerRole } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
-const getNominativeRoles = (practitionerRolesData: any) => {
-  if (
-    !practitionerRolesData ||
-    practitionerRolesData.resourceType === 'OperationOutcome' ||
-    !practitionerRolesData.meta ||
-    !practitionerRolesData.meta.extension
-  ) {
-    return []
-  }
-
-  const roles = practitionerRolesData.meta.extension
-  const nominativeRolesNames: string[] = []
-
-  roles.forEach((role: IExtension) => {
-    if (role.extension && role.extension[0].url === 'role details') {
-      if (!role.extension[0].extension) return
-
-      const details = role.extension[0].extension
-
-      const nominativeRightsInfo = details.find((roleDetails) => roleDetails.url === 'RIGHT_READ_DATA_NOMINATIVE')
-
-      if (nominativeRightsInfo && nominativeRightsInfo.valueBoolean === true && role.url) {
-        nominativeRolesNames.push(role.url)
-      }
-    }
-  })
-
-  return nominativeRolesNames
-}
-
-const fetchDeidentified = async (
+export const fetchDeidentified = async (
   practitionerId?: string
-): Promise<{ deidentification: boolean; nominativeGroupsIds?: string[] } | undefined> => {
+): Promise<{ deidentification: boolean; nominativeGroupsIds?: string[] }> => {
   if (CONTEXT === 'fakedata') {
     return { deidentification: false, nominativeGroupsIds: [] }
   }
@@ -48,24 +18,27 @@ const fetchDeidentified = async (
       `/PractitionerRole?practitioner=${practitionerId}&_elements=extension,organization`
     )
 
-    const nominativeRolesNames = getNominativeRoles(rolesResp.data)
-
-    const roles = getApiResponseResources(rolesResp)
+    const { data } = rolesResp
 
     let deidentification = true
     const nominativePerimeters = []
     let nominativeGroupsIds: any[] | undefined = []
 
-    if (roles) {
-      for (const role of roles) {
-        if (
-          role.extension &&
-          role.extension[0] &&
-          role.extension[0].valueString &&
-          nominativeRolesNames.includes(role.extension?.[0].valueString)
-        ) {
+    if (!data || data.resourceType === 'OperationOutcome' || !data.meta || !data.meta.extension) {
+      return { deidentification: deidentification }
+    }
+
+    const highestPerimeters = data.meta.extension.find(
+      (extension) => extension.url === 'Practitioner Organization List'
+    )
+
+    const rolesList = highestPerimeters?.extension?.[0].extension
+
+    if (rolesList) {
+      for (const perimeterRole of rolesList) {
+        if (perimeterRole.valueString && perimeterRole.valueString === 'READ_DATA_NOMINATIVE') {
           deidentification = false
-          nominativePerimeters.push(role.organization?.reference?.substring(13))
+          nominativePerimeters.push(perimeterRole.url)
         }
       }
     }
@@ -82,6 +55,5 @@ const fetchDeidentified = async (
 
     return { deidentification, nominativeGroupsIds }
   }
+  return { deidentification: true }
 }
-
-export { fetchDeidentified }

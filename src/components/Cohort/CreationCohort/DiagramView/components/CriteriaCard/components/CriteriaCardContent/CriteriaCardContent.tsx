@@ -3,6 +3,7 @@ import moment from 'moment'
 
 import Chip from '@material-ui/core/Chip'
 import IconButton from '@material-ui/core/IconButton'
+import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
 
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
@@ -24,6 +25,19 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
     const reducer = (accumulator: any, currentValue: any) =>
       accumulator ? `${accumulator} - ${currentValue}` : currentValue ? currentValue : accumulator
+
+    const tooltipReducer = (accumulator: any, currentValue: any) =>
+      accumulator ? (
+        <>
+          {accumulator}
+          <br />
+          {currentValue}
+        </>
+      ) : currentValue ? (
+        currentValue
+      ) : (
+        accumulator
+      )
 
     let _data: any = null
     const _searchDataFromCriteria = (_criteria: any[], type: string) => {
@@ -54,11 +68,41 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
     switch (_currentCriteria.type) {
       case 'Claim': {
+        const displaySelectedCode = (codes: { id: string; label: string }[]) => {
+          const customReducer = (accumulator: any, currentValue: any) =>
+            accumulator ? (
+              <>
+                {accumulator}
+                <br />
+                {currentValue}
+              </>
+            ) : currentValue ? (
+              currentValue
+            ) : (
+              accumulator
+            )
+
+          let currentCode: string[] = []
+          for (const code of codes) {
+            const selectedCodeData =
+              data?.ghmData && data?.ghmData !== 'loading'
+                ? data.ghmData.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                : null
+            currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+          }
+          return currentCode && currentCode.length > 0 ? currentCode.reduce(customReducer) : ''
+        }
         content = [
           _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
+              label={
+                <Tooltip title={displaySelectedCode(_currentCriteria?.code)}>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    {_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
+                  </Typography>
+                </Tooltip>
+              }
             />
           ),
           +_currentCriteria?.occurrence !== 1 && (
@@ -77,9 +121,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   {startDate
                     ? endDate
                       ? `Entre le ${startDate} et le ${endDate}`
-                      : `Après le ${startDate}`
+                      : `Avant le ${startDate}`
                     : endDate
-                    ? `Avant le ${endDate}`
+                    ? `Après le ${endDate}`
                     : ''}
                 </Typography>
               }
@@ -90,11 +134,41 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Procedure': {
+        const displaySelectedCode = (codes: { id: string; label: string }[]) => {
+          const customReducer = (accumulator: any, currentValue: any) =>
+            accumulator ? (
+              <>
+                {accumulator}
+                <br />
+                {currentValue}
+              </>
+            ) : currentValue ? (
+              currentValue
+            ) : (
+              accumulator
+            )
+
+          let currentCode: string[] = []
+          for (const code of codes) {
+            const selectedCodeData =
+              data?.ccamData && data?.ccamData !== 'loading'
+                ? data.ccamData.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                : null
+            currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+          }
+          return currentCode && currentCode.length > 0 ? currentCode.reduce(customReducer) : ''
+        }
         content = [
           _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
+              label={
+                <Tooltip title={displaySelectedCode(_currentCriteria?.code)}>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    {_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
+                  </Typography>
+                </Tooltip>
+              }
             />
           ),
           +_currentCriteria?.occurrence !== 1 && (
@@ -113,9 +187,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   {startDate
                     ? endDate
                       ? `Entre le ${startDate} et le ${endDate}`
-                      : `Après le ${startDate}`
+                      : `Avant le ${startDate}`
                     : endDate
-                    ? `Avant le ${endDate}`
+                    ? `Après le ${endDate}`
                     : ''}
                 </Typography>
               }
@@ -126,20 +200,53 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Condition': {
+        const displaySelectedCode = (codes: { id: string; label: string }[]) => {
+          let currentCode: string[] = []
+          for (const code of codes) {
+            const selectedCodeData =
+              data?.cim10Diagnostic && data?.cim10Diagnostic !== 'loading'
+                ? data.cim10Diagnostic.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                : null
+            currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+          }
+          return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltipReducer) : ''
+        }
+        const displaySelectedDiagTypes = (diagnosticTypes: { id: string; label: string }[]) => {
+          let currentStatus: string[] = []
+          for (const _diagnosticType of diagnosticTypes) {
+            const selectedDiagnosticType =
+              data?.diagnosticTypes && data?.diagnosticTypes !== 'loading'
+                ? data.diagnosticTypes.find(
+                    (diagnosticElement: any) => diagnosticElement && diagnosticElement.id === _diagnosticType.id
+                  )
+                : null
+            currentStatus = selectedDiagnosticType ? [...currentStatus, selectedDiagnosticType.label] : currentStatus
+          }
+          return currentStatus && currentStatus.length > 0 ? currentStatus.reduce(tooltipReducer) : ''
+        }
+
         content = [
           _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}</Typography>}
+              label={
+                <Tooltip title={displaySelectedCode(_currentCriteria?.code)}>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    {_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
+                  </Typography>
+                </Tooltip>
+              }
             />
           ),
           _currentCriteria && _currentCriteria?.diagnosticType && _currentCriteria?.diagnosticType.length > 0 && (
             <Chip
               className={classes.criteriaChip}
               label={
-                <Typography noWrap>
-                  {_currentCriteria?.diagnosticType?.map((code) => code.id).reduce(reducer)}
-                </Typography>
+                <Tooltip title={displaySelectedDiagTypes(_currentCriteria?.diagnosticType)}>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    {_currentCriteria?.diagnosticType?.map((diagnosticType) => diagnosticType.id).reduce(reducer)}
+                  </Typography>
+                </Tooltip>
               }
             />
           ),
@@ -159,9 +266,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   {startDate
                     ? endDate
                       ? `Entre le ${startDate} et le ${endDate}`
-                      : `Après le ${startDate}`
+                      : `Avant le ${startDate}`
                     : endDate
-                    ? `Avant le ${endDate}`
+                    ? `Après le ${endDate}`
                     : ''}
                 </Typography>
               }
@@ -182,7 +289,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           for (const gender of genders) {
             const selectedGenderData =
               data?.gender && data?.gender !== 'loading'
-                ? data.gender.find((ghmElement: any) => ghmElement && ghmElement.id === gender.id)
+                ? data.gender.find((genderElement: any) => genderElement && genderElement.id === gender.id)
                 : null
             currentGender = selectedGenderData ? [...currentGender, selectedGenderData.label] : currentGender
           }
@@ -204,21 +311,28 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           _currentCriteria && _currentCriteria.gender && _currentCriteria?.gender?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{displaySelectedGender(_currentCriteria?.gender)}</Typography>}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedGender(_currentCriteria?.gender)}
+                </Typography>
+              }
             />
           ),
           _currentCriteria && _currentCriteria.vitalStatus && _currentCriteria?.vitalStatus?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{displaySelectedVitalStatus(_currentCriteria?.vitalStatus)}</Typography>}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedVitalStatus(_currentCriteria?.vitalStatus)}
+                </Typography>
+              }
             />
           ),
-          ((!!_currentCriteria.years && _currentCriteria.years[0] === _currentCriteria.years[1]) ||
-            ageUnit !== 'an(s)') && (
+          !!_currentCriteria.years && _currentCriteria.years[0] === _currentCriteria.years[1] && (
             <Chip
               className={classes.criteriaChip}
               label={
-                <Typography noWrap>
+                <Typography style={{ maxWidth: 500 }} noWrap>
                   {`
                     ${_currentCriteria.years?.[0]} ${ageUnit}
                       ${_currentCriteria.years?.[0] === 130 ? ' ou plus' : ''}
@@ -229,11 +343,11 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           ),
           !!_currentCriteria.years &&
             _currentCriteria.years[0] !== _currentCriteria.years[1] &&
-            (_currentCriteria.years[0] !== 0 || _currentCriteria.years[1] !== 130) && (
+            !(_currentCriteria.years[0] === 0 && _currentCriteria.years[1] === 130 && ageUnit === 'an(s)') && (
               <Chip
                 className={classes.criteriaChip}
                 label={
-                  <Typography noWrap>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
                     {`Entre ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit}
                     ${_currentCriteria.years[1] === 130 ? ' ou plus' : ''}`}
                   </Typography>
@@ -258,11 +372,26 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         }
 
         content = [
-          _currentCriteria.search && <Chip className={classes.criteriaChip} label={`"${_currentCriteria.search}"`} />,
+          _currentCriteria.search && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Tooltip title={`Contient ${_currentCriteria.search} dans le document`}>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    {_currentCriteria.search}
+                  </Typography>
+                </Tooltip>
+              }
+            />
+          ),
           _currentCriteria && _currentCriteria.docType && _currentCriteria?.docType?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{displaySelectedDocType(_currentCriteria?.docType)}</Typography>}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedDocType(_currentCriteria?.docType)}
+                </Typography>
+              }
             />
           ),
           +_currentCriteria?.occurrence !== 1 && (
@@ -281,9 +410,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   {startDate
                     ? endDate
                       ? `Entre le ${startDate} et le ${endDate}`
-                      : `Après le ${startDate},`
+                      : `Avant le ${startDate},`
                     : endDate
-                    ? `Avant le ${endDate}`
+                    ? `Après le ${endDate}`
                     : ''}
                 </Typography>
               }
@@ -304,93 +433,189 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         if (durationType === 'month') durationUnit = 'mois'
         else if (durationType === 'day') durationUnit = 'jour(s)'
 
-        const selectedAdmissionMode = data.admissionModes
-          ? data.admissionModes.find((admissionMode: any) => admissionMode.id === _currentCriteria?.admissionMode?.id)
-          : null
-        const selectedEntryMode = data.entryModes
-          ? data.entryModes.find((entryMode: any) => entryMode.id === _currentCriteria?.entryMode?.id)
-          : null
-        const selectedExitMode = data.exitModes
-          ? data.exitModes.find((exitMode: any) => exitMode.id === _currentCriteria?.exitMode?.id)
-          : null
-        const selectedFileStatus = data.fileStatus
-          ? data.fileStatus.find((fileStatus: any) => fileStatus.id === _currentCriteria?.fileStatus?.id)
-          : null
+        const displaySelectedEntryModes = (entryModes: { id: string; label: string }[]) => {
+          let currentEntryModes: string[] = []
+          for (const entryMode of entryModes) {
+            const selectedEntryModesData =
+              data?.entryModes && data?.entryModes !== 'loading'
+                ? data.entryModes.find(
+                    (entryModeElement: any) => entryModeElement && entryModeElement.id === entryMode.id
+                  )
+                : null
+            currentEntryModes = selectedEntryModesData
+              ? [...currentEntryModes, selectedEntryModesData.label]
+              : currentEntryModes
+          }
+          return currentEntryModes && currentEntryModes.length > 0 ? currentEntryModes.reduce(reducer) : ''
+        }
+
+        const displaySelectedExitModes = (exitModes: { id: string; label: string }[]) => {
+          let currentExitModes: string[] = []
+          for (const exitMode of exitModes) {
+            const selectedExitModesData =
+              data?.exitModes && data?.exitModes !== 'loading'
+                ? data.exitModes.find((exitModeElement: any) => exitModeElement && exitModeElement.id === exitMode.id)
+                : null
+            currentExitModes = selectedExitModesData
+              ? [...currentExitModes, selectedExitModesData.label]
+              : currentExitModes
+          }
+          return currentExitModes && currentExitModes.length > 0 ? currentExitModes.reduce(reducer) : ''
+        }
+
+        const displaySelectedPriseEnChargeTypes = (priseEnChargeTypes: { id: string; label: string }[]) => {
+          let currentPriseEnChargeTypes: string[] = []
+          for (const priseEnChargeType of priseEnChargeTypes) {
+            const selectedPriseEnChargeTypesData =
+              data?.priseEnChargeType && data?.priseEnChargeType !== 'loading'
+                ? data.priseEnChargeType.find(
+                    (priseEnChargeTypeElement: any) =>
+                      priseEnChargeTypeElement && priseEnChargeTypeElement.id === priseEnChargeType.id
+                  )
+                : null
+            currentPriseEnChargeTypes = selectedPriseEnChargeTypesData
+              ? [...currentPriseEnChargeTypes, selectedPriseEnChargeTypesData.label]
+              : currentPriseEnChargeTypes
+          }
+          return currentPriseEnChargeTypes && currentPriseEnChargeTypes.length > 0
+            ? currentPriseEnChargeTypes.reduce(reducer)
+            : ''
+        }
+
+        const displaySelectedTypeDeSejours = (typeDeSejours: { id: string; label: string }[]) => {
+          let currentTypeDeSejours: string[] = []
+          for (const typeDeSejour of typeDeSejours) {
+            const selectedTypeDeSejoursData =
+              data?.typeDeSejour && data?.typeDeSejour !== 'loading'
+                ? data.typeDeSejour.find(
+                    (typeDeSejourElement: any) => typeDeSejourElement && typeDeSejourElement.id === typeDeSejour.id
+                  )
+                : null
+            currentTypeDeSejours = selectedTypeDeSejoursData
+              ? [...currentTypeDeSejours, selectedTypeDeSejoursData.label]
+              : currentTypeDeSejours
+          }
+          return currentTypeDeSejours && currentTypeDeSejours.length > 0 ? currentTypeDeSejours.reduce(reducer) : ''
+        }
+
+        const displaySelectedFileStatus = (fileStatus: { id: string; label: string }[]) => {
+          let currentFileStatus: string[] = []
+          for (const fileStatu of fileStatus) {
+            const selectedFileStatusData =
+              data?.fileStatus && data?.fileStatus !== 'loading'
+                ? data.fileStatus.find(
+                    (fileStatuElement: any) => fileStatuElement && fileStatuElement.id === fileStatu.id
+                  )
+                : null
+            currentFileStatus = selectedFileStatusData
+              ? [...currentFileStatus, selectedFileStatusData.label]
+              : currentFileStatus
+          }
+          return currentFileStatus && currentFileStatus.length > 0 ? currentFileStatus.reduce(reducer) : ''
+        }
 
         content = [
           _currentCriteria.years && _currentCriteria.years[0] === _currentCriteria.years[1] && (
             <Chip
               className={classes.criteriaChip}
               label={
-                <Typography noWrap>
+                <Typography style={{ maxWidth: 500 }} noWrap>
                   {`${_currentCriteria.years?.[0]} ${ageUnit}
                     ${_currentCriteria.years?.[0] === 130 ? ' ou plus' : ''}`}
                 </Typography>
               }
             />
           ),
-          (ageUnit !== 'an(s)' ||
-            (_currentCriteria.years &&
-              _currentCriteria.years[0] !== _currentCriteria.years[1] &&
-              (_currentCriteria.years[0] !== 0 || _currentCriteria.years[1] !== 130))) && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography noWrap>
-                  {`Entre ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit}
+          _currentCriteria.years &&
+            _currentCriteria.years[0] !== _currentCriteria.years[1] &&
+            !(_currentCriteria.years[0] === 0 && _currentCriteria.years[1] === 130 && ageUnit === 'an(s)') && (
+              <Chip
+                className={classes.criteriaChip}
+                label={
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    {`Entre ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit}
                     ${_currentCriteria.years[1] === 130 ? ' ou plus' : ''}`}
-                </Typography>
-              }
-            />
-          ),
+                  </Typography>
+                }
+              />
+            ),
           _currentCriteria.duration && _currentCriteria.duration[0] === _currentCriteria.duration[1] && (
             <Chip
               className={classes.criteriaChip}
               label={
-                <Typography noWrap>
+                <Typography style={{ maxWidth: 500 }} noWrap>
                   {`Prise en charge : ${_currentCriteria.duration?.[0]} ${durationUnit}
                   ${_currentCriteria.duration?.[0] === 100 ? ' ou plus' : ''}`}
                 </Typography>
               }
             />
           ),
-          (durationUnit !== 'jour(s)' ||
-            (_currentCriteria.duration &&
-              _currentCriteria.duration[0] !== _currentCriteria.duration[1] &&
-              (_currentCriteria.duration[0] !== 0 || _currentCriteria.duration[1] !== 100))) && (
+          _currentCriteria.duration &&
+            _currentCriteria.duration[0] !== _currentCriteria.duration[1] &&
+            !(
+              durationUnit === 'jour(s)' &&
+              _currentCriteria.duration[0] === 0 &&
+              _currentCriteria.duration[1] === 100
+            ) && (
+              <Chip
+                className={classes.criteriaChip}
+                label={
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    {`Prise en charge : ${_currentCriteria.duration[0]} et ${_currentCriteria.duration[1]}
+                    ${durationUnit}
+                    ${_currentCriteria.duration[1] === 100 ? ' ou plus' : ''}`}
+                  </Typography>
+                }
+              />
+            ),
+          _currentCriteria && _currentCriteria.entryMode && _currentCriteria?.entryMode?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
               label={
-                <Typography noWrap>
-                  {`Prise en charge : ${_currentCriteria.duration[0]} et ${_currentCriteria.duration[1]}
-                    ${durationUnit}
-                    ${_currentCriteria.duration[1] === 100 ? ' ou plus' : ''}`}
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedEntryModes(_currentCriteria?.entryMode)}
                 </Typography>
               }
             />
           ),
-          selectedAdmissionMode && (
+          _currentCriteria && _currentCriteria.exitMode && _currentCriteria?.exitMode?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{`Mode d'admission: ${selectedAdmissionMode.label}`}</Typography>}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedExitModes(_currentCriteria?.exitMode)}
+                </Typography>
+              }
             />
           ),
-          selectedEntryMode && (
+          _currentCriteria && _currentCriteria.priseEnChargeType && _currentCriteria?.priseEnChargeType?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{`Mode d'entrée : ${selectedEntryMode.label}`}</Typography>}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedPriseEnChargeTypes(_currentCriteria?.priseEnChargeType)}
+                </Typography>
+              }
             />
           ),
-          selectedExitMode && (
+          _currentCriteria && _currentCriteria.typeDeSejour && _currentCriteria?.typeDeSejour?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{`Mode de sortie : ${selectedExitMode.label}`}</Typography>}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedTypeDeSejours(_currentCriteria?.typeDeSejour)}
+                </Typography>
+              }
             />
           ),
-          selectedFileStatus && (
+          _currentCriteria && _currentCriteria.fileStatus && _currentCriteria?.fileStatus?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography noWrap>{`Statut dossier : ${selectedFileStatus.label}`}</Typography>}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedFileStatus(_currentCriteria?.fileStatus)}
+                </Typography>
+              }
             />
           )
         ]

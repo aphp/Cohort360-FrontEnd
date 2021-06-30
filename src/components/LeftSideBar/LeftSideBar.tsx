@@ -9,30 +9,34 @@ import {
   Divider,
   Drawer,
   Grid,
-  Icon,
   IconButton,
   Link,
   List,
   ListItem,
+  ListItemText,
   ListItemIcon,
-  Typography
+  Typography,
+  Tooltip,
+  Zoom
 } from '@material-ui/core'
+
+import AddIcon from '@material-ui/icons/Add'
+import EditIcon from '@material-ui/icons/Edit'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 
-import cohortLogo from '../../assets/images/logo_v3.1_ld.png'
-import { ReactComponent as HomeIcon } from '../../assets/icones/home-lg.svg'
-import { ReactComponent as LogoutIcon } from '../../assets/icones/power-off.svg'
-import { ReactComponent as MenuIcon } from '../../assets/icones/bars.svg'
-import { ReactComponent as PatientIcon } from '../../assets/icones/user.svg'
-import { ReactComponent as ResearchIcon } from '../../assets/icones/chart-bar.svg'
+import cohortLogo from 'assets/images/logo_v3.1_ld.png'
+import { ReactComponent as HomeIcon } from 'assets/icones/home-lg.svg'
+import { ReactComponent as LogoutIcon } from 'assets/icones/power-off.svg'
+import { ReactComponent as MenuIcon } from 'assets/icones/bars.svg'
+import { ReactComponent as PatientIcon } from 'assets/icones/user.svg'
+import { ReactComponent as ResearchIcon } from 'assets/icones/chart-bar.svg'
 
 import { useAppSelector } from 'state'
-import { logout as logoutAction } from '../../state/me'
-import { open as openAction, close as closeAction } from '../../state/drawer'
-
-import AutoLogoutContainer from '../Routes/AutoLogoutContainer'
+import { logout as logoutAction } from 'state/me'
+import { open as openAction, close as closeAction } from 'state/drawer'
+import { resetCohortCreation } from 'state/cohortCreation'
 
 import useStyles from './styles'
 
@@ -40,56 +44,62 @@ const smallDrawerWidth = 52
 const largeDrawerWidth = 260
 export { smallDrawerWidth, largeDrawerWidth }
 
-type LeftSideBarProps = {
-  open?: boolean
-}
-
-const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
+const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
   const classes = useStyles()
-  const [list, setList] = useState(false)
-  const [list2, setList2] = useState(false)
   const history = useHistory()
-  const { practitioner, open } = useAppSelector((state) => ({
-    practitioner: state.me,
-    open: state.drawer
-  }))
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    if (!practitioner) {
-      history.push('/')
-    }
-  }, [practitioner]) // eslint-disable-line
+  const { practitioner, open, cohortCreation } = useAppSelector((state) => ({
+    practitioner: state.me,
+    open: state.drawer,
+    cohortCreation: state.cohortCreation
+  }))
+
+  // v-- just for zoom transition..
+  const [allreadyOpen, setAllreadyOpen] = useState(false)
+
+  const [displayPatientList, setDisplayPatientList] = useState(true)
+  const [displaySearchList, setDisplaySearchList] = useState(true)
 
   useEffect(() => {
     if (props.open) {
       dispatch<any>(openAction())
     } else {
+      setAllreadyOpen(true)
       dispatch<any>(closeAction())
     }
   }, [props.open]) // eslint-disable-line
 
-  const handleDrawerOpen = () => {
-    dispatch<any>(openAction())
+  const handleDrawerOpenOrClose = (value: boolean) => {
+    setAllreadyOpen(true)
+    if (value) {
+      dispatch<any>(openAction())
+    } else {
+      dispatch<any>(closeAction())
+    }
   }
 
-  const handleDrawerClose = () => {
-    dispatch<any>(closeAction())
+  const handleDisplayPatientList = () => {
+    dispatch<any>(openAction())
+    if (open) {
+      setDisplayPatientList(!displayPatientList)
+    }
   }
 
-  const handleNestedList = () => {
+  const handleDisplaySearchList = () => {
     dispatch<any>(openAction())
-    setList(!list)
+    if (open) {
+      setDisplaySearchList(!displaySearchList)
+    }
   }
 
-  const handleNestedList2 = () => {
-    dispatch<any>(openAction())
-    setList2(!list2)
+  const handleNewRequest = () => {
+    dispatch<any>(resetCohortCreation())
+    history.push('/cohort/new')
   }
 
   return (
     <>
-      <AutoLogoutContainer />
       <div className={classes.root}>
         <Drawer
           variant="permanent"
@@ -106,25 +116,22 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
         >
           <div className={classes.toolbar}>
             <img src={cohortLogo} alt="Cohort360 logo" className={open ? undefined : classes.hide} />
+
             <IconButton
-              onClick={handleDrawerClose}
-              className={clsx(classes.closeDrawerButton, {
-                [classes.hide]: !open
+              disableRipple
+              disableFocusRipple
+              onClick={() => handleDrawerOpenOrClose(!open)}
+              className={clsx({
+                [classes.closeDrawerButton]: open,
+                [classes.menuButton]: !open
               })}
             >
-              <ChevronLeftIcon color="action" width="20px" />
-            </IconButton>
-            <IconButton
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              className={clsx(classes.menuButton, {
-                [classes.hide]: open
-              })}
-            >
-              <MenuIcon width="20px" fill="#FFF" />
+              {open ? <ChevronLeftIcon color="action" width="20px" /> : <MenuIcon width="20px" fill="#FFF" />}
             </IconButton>
           </div>
+
           <Divider />
+
           <List>
             <ListItem>
               <Grid container justify="space-between" alignItems="center" wrap="nowrap">
@@ -157,55 +164,163 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                 </Grid>
               </Grid>
             </ListItem>
-          </List>
-          <Divider />
-          <List>
-            <ListItem>
-              <ListItemIcon
-                className={clsx(classes.button, {
-                  [classes.hide]: open
-                })}
-              >
-                <Link
-                  onClick={() => history.push('/cohort/new')}
-                  className={clsx(classes.linkHover, classes.plusButton)}
-                >
-                  <Icon>add_circle</Icon>
-                </Link>
-              </ListItemIcon>
-              <Button
-                onClick={() => history.push('/cohort/new')}
-                className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                  [classes.hide]: !open
-                })}
-              >
-                <Typography variant="h5">Nouvelle requête</Typography>
-              </Button>
-            </ListItem>
-            <Link href="/accueil" underline="none">
-              <ListItem button>
+
+            {!open && (
+              <ListItem>
+                <Grid container item>
+                  <ListItemIcon className={classes.logoutButton} style={{ marginLeft: -10 }}>
+                    <Tooltip title="Se déconnecter">
+                      <IconButton
+                        onClick={() => {
+                          localStorage.clear()
+                          dispatch<any>(logoutAction())
+                          history.push('/')
+                        }}
+                      >
+                        <LogoutIcon className={classes.logoutIcon} />
+                      </IconButton>
+                    </Tooltip>
+                  </ListItemIcon>
+                </Grid>
+              </ListItem>
+            )}
+
+            <Divider />
+
+            {!cohortCreation?.request?.requestId ? (
+              <ListItem>
+                {!open && (
+                  <Tooltip title="Nouvelle requête">
+                    <Button
+                      variant="contained"
+                      onClick={handleNewRequest}
+                      className={clsx(classes.miniButton, classes.button)}
+                    >
+                      <AddIcon />
+                    </Button>
+                  </Tooltip>
+                )}
+                {allreadyOpen ? (
+                  <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
+                    <Button
+                      onClick={handleNewRequest}
+                      className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                        [classes.hide]: !open
+                      })}
+                    >
+                      <Typography variant="h5">Nouvelle requête</Typography>
+                    </Button>
+                  </Zoom>
+                ) : (
+                  <Button
+                    onClick={handleNewRequest}
+                    className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                      [classes.hide]: !open
+                    })}
+                  >
+                    <Typography variant="h5">Nouvelle requête</Typography>
+                  </Button>
+                )}
+              </ListItem>
+            ) : (
+              <>
+                <ListItem>
+                  {!open && (
+                    <Tooltip title="Nouvelle requête">
+                      <Button
+                        variant="contained"
+                        onClick={handleNewRequest}
+                        className={clsx(classes.miniButton, classes.button)}
+                      >
+                        <AddIcon />
+                      </Button>
+                    </Tooltip>
+                  )}
+                  {allreadyOpen ? (
+                    <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
+                      <Button
+                        onClick={handleNewRequest}
+                        className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                          [classes.hide]: !open
+                        })}
+                      >
+                        <Typography variant="h5">Nouvelle requête</Typography>
+                      </Button>
+                    </Zoom>
+                  ) : (
+                    <Button
+                      onClick={handleNewRequest}
+                      className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                        [classes.hide]: !open
+                      })}
+                    >
+                      <Typography variant="h5">Nouvelle requête</Typography>
+                    </Button>
+                  )}
+                </ListItem>
+                <ListItem style={{ padding: !open ? '0 16px' : undefined }}>
+                  {!open && (
+                    <Tooltip title="Modifier la requête en cours">
+                      <Button
+                        variant="contained"
+                        onClick={() => history.push('/cohort/new')}
+                        className={clsx(classes.miniButton, classes.button)}
+                      >
+                        <EditIcon />
+                      </Button>
+                    </Tooltip>
+                  )}
+                  {allreadyOpen ? (
+                    <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
+                      <Button
+                        onClick={() => history.push('/cohort/new')}
+                        className={clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
+                      >
+                        <Typography variant="h5">Requête en cours</Typography>
+                        <Typography noWrap style={{ width: 200 }}>
+                          {cohortCreation.request.requestName}
+                        </Typography>
+                      </Button>
+                    </Zoom>
+                  ) : (
+                    <Button
+                      onClick={() => history.push('/cohort/new')}
+                      className={clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
+                    >
+                      <Typography variant="h5">Requête en cours</Typography>
+                      <Typography noWrap style={{ width: 200 }}>
+                        {cohortCreation.request.requestName}
+                      </Typography>
+                    </Button>
+                  )}
+                </ListItem>
+              </>
+            )}
+
+            <ListItem className={classes.listItem} button onClick={() => history.push('/accueil')}>
+              <Tooltip title={!open ? 'Accueil' : ''}>
                 <ListItemIcon className={classes.listIcon}>
                   <HomeIcon width="20px" fill="#FFF" />
                 </ListItemIcon>
-                <Typography className={classes.title}>Accueil</Typography>
-              </ListItem>
-            </Link>
-            <ListItem button onClick={handleNestedList}>
-              <ListItemIcon className={classes.listIcon}>
-                <PatientIcon width="20px" fill="#FFF" />
-              </ListItemIcon>
-              <Grid container justify="space-between" alignItems="center" wrap="nowrap">
-                <Typography className={classes.title}>Mes patients</Typography>
-                {list ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
-              </Grid>
+              </Tooltip>
+
+              <ListItemText className={classes.title} primary="Accueil" />
             </ListItem>
+
+            <ListItem className={classes.listItem} button onClick={handleDisplayPatientList}>
+              <Tooltip title={!open ? 'Mes patients' : ''}>
+                <ListItemIcon className={classes.listIcon}>
+                  <PatientIcon width="20px" fill="#FFF" />
+                </ListItemIcon>
+              </Tooltip>
+
+              <ListItemText className={classes.title} primary="Mes patients" />
+              {displayPatientList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
+            </ListItem>
+
             <Collapse
-              className={clsx(classes.drawer, classes.nestedList, {
-                [classes.drawerOpen]: open,
-                [classes.drawerClose]: !open,
-                [classes.hide]: !open
-              })}
-              in={list}
+              className={clsx(classes.nestedList, { [classes.hide]: !open })}
+              in={displayPatientList}
               timeout="auto"
               unmountOnExit
             >
@@ -229,17 +344,20 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                 </ListItem>
               </List>
             </Collapse>
-            <ListItem button onClick={handleNestedList2}>
-              <ListItemIcon className={classes.listIcon}>
-                <ResearchIcon width="20px" fill="#FFF" />
-              </ListItemIcon>
-              <Grid container justify="space-between" alignItems="center" wrap="nowrap">
-                <Typography className={classes.title}>Mes recherches</Typography>
-                {list2 ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
-              </Grid>
+
+            <ListItem className={classes.listItem} button onClick={handleDisplaySearchList}>
+              <Tooltip title={!open ? 'Mes recherches' : ''}>
+                <ListItemIcon className={classes.listIcon}>
+                  <ResearchIcon width="20px" fill="#FFF" />
+                </ListItemIcon>
+              </Tooltip>
+
+              <ListItemText className={classes.title} primary="Mes recherches" />
+              {displayPatientList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
             </ListItem>
+
             <Collapse
-              in={list2}
+              in={displaySearchList}
               timeout="auto"
               unmountOnExit
               className={clsx(classes.nestedList, { [classes.hide]: !open })}
@@ -248,6 +366,11 @@ const LeftSideBar: React.FC<LeftSideBarProps> = (props) => {
                 <ListItem>
                   <Link href="/recherche_sauvegarde" className={classes.nestedTitle}>
                     Recherches sauvegardées
+                  </Link>
+                </ListItem>
+                <ListItem>
+                  <Link href="/mes_projets" className={classes.nestedTitle}>
+                    Mes projets de recherche
                   </Link>
                 </ListItem>
               </List>

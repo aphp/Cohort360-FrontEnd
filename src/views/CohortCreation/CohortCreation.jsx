@@ -2,7 +2,7 @@ import React from 'react'
 import clsx from 'clsx'
 import { useSelector } from 'react-redux'
 
-import Requeteur from './../../components/Cohort/CreationCohort/Requeteur'
+import Requeteur from 'components/Cohort/CreationCohort/Requeteur'
 import useStyles from './styles'
 
 const CohortCreation = () => {

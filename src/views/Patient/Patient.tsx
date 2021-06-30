@@ -87,16 +87,6 @@ const Patient = () => {
       .then(() => setLoading(false))
   }, [patientId, groupId])
 
-  const title = Array.isArray(cohort.cohort) || cohort?.cohort?.name === '-' ? '-' : cohort?.cohort?.name
-
-  const status = Array.isArray(cohort.cohort)
-    ? 'Visualisation de périmètres'
-    : cohort?.cohort?.name
-    ? cohort?.cohort?.name === '-'
-      ? 'Exploration de population'
-      : 'Exploration de cohorte '
-    : "Visualisation d'un patient"
-
   if (!patient && !loading) {
     return (
       <Alert severity="error" className={classes.alert}>
@@ -124,11 +114,11 @@ const Patient = () => {
         })}
       >
         <TopBar
-          title={title}
-          status={status}
+          context="patient_info"
           patientsNb={cohort.totalPatients}
           access={deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
         />
+
         <Grid
           container
           direction="column"
@@ -216,7 +206,6 @@ const Patient = () => {
           </Grid>
           <PatientSidebar
             openDrawer={isSidebarOpened}
-            groupId={Array.isArray(cohort.cohort) ? cohort.cohort.map((e: any) => e.id).join() : cohort.cohort?.id}
             patients={cohort.originalPatients}
             total={cohort.totalPatients ?? 0}
             onClose={() => setSidebarOpened(false)}

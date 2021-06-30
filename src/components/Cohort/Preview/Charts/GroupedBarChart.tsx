@@ -3,10 +3,10 @@ import React, { useRef, useEffect, useState } from 'react'
 import * as d3 from 'd3'
 import legend from './Legend'
 
-import { ComplexChartDataType, Month } from 'types'
+import { VisiteRepartitionType, Month } from 'types'
 
 type GroupedBarChartProps = {
-  data?: ComplexChartDataType<Month>
+  data?: VisiteRepartitionType
   height?: number
   width?: number
 }
@@ -16,7 +16,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
   const [legendHtml, setLegend] = useState()
 
   useEffect(() => {
-    if (!data || (data && !data.size)) {
+    if (!data) {
       return
     }
     const customData = [
@@ -33,16 +33,17 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
       { Mois: Month.november, Hommes: 0, Femmes: 0 },
       { Mois: Month.december, Hommes: 0, Femmes: 0 }
     ]
-    for (const entry of data) {
-      const [month, entryData] = entry
+    const months = Object.keys(data)
+    for (const month of months) {
+      const entryData = data[month]
       const monthDataIndex = customData.findIndex((d) => d.Mois === month)
       if (monthDataIndex >= 0) {
         const maleCount = entryData.male
         const femaleCount = entryData.female
         customData[monthDataIndex] = {
           ...customData[monthDataIndex],
-          Hommes: maleCount,
-          Femmes: femaleCount
+          Hommes: parseInt(maleCount),
+          Femmes: parseInt(femaleCount)
         }
       }
     }
@@ -110,13 +111,15 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
       .attr('width', x1.bandwidth())
       .attr('height', (d) => y(0) - y(d.value))
       .attr('fill', (d) => color(d.key))
-      .on('mouseover', function (d) {
+      .on('mouseover', function (event, d) {
+        const currentMonth = customData.find((customItem) => customItem[d.key] === d.value)
+        const total_value = (currentMonth?.Hommes ?? 0) + (currentMonth?.Femmes ?? 0)
         d3.select(this).transition().duration('50').attr('opacity', '.5')
         div.transition().duration(50).style('opacity', 1)
         div
-          .html(d.value)
-          .style('left', d3.event.pageX + 10 + 'px')
-          .style('top', d3.event.pageY - 15 + 'px')
+          .html(`${d.value} (${parseInt((d.value / total_value) * 10000) / 100}%)`)
+          .style('left', event.pageX + 10 + 'px')
+          .style('top', event.pageY - 15 + 'px')
       })
       .on('mouseout', function () {
         d3.select(this).transition().duration('50').attr('opacity', '1')

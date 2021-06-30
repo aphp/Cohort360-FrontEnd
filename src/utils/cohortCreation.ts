@@ -13,23 +13,25 @@ const PATIENT_DECEASED = 'deceased' // ok
 const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
 const ENCOUNTER_LENGTH = 'length' // ok
 const ENCOUNTER_BIRTHDATE = 'patient.birthdate' // ok
-const ENCOUNTER_ADMISSIONMODE = 'admissionMode' // on verra
+// const ENCOUNTER_ADMISSIONMODE = 'admissionMode' // on verra
 const ENCOUNTER_ENTRYMODE = 'entryMode' // on verra
 const ENCOUNTER_EXITMODE = 'exitMode' // on verra
+const ENCOUNTER_PRISENCHARGETYPE = 'priseEnChargeType' //on verra
+const ENCOUNTER_TYPEDESEJOUR = 'typeDeSejour' //on verra
 const ENCOUNTER_FILESTATUS = 'fileStatus' // on verra
 
 const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
-const CLAIM_CODE = 'diagnosis' // ok
+const CLAIM_CODE = 'codeList' // ok
 const CLAIM_DATE = 'created' // ok
 const CLAIM_ENCOUNTER = 'occurrence' // on verra
 
 const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
-const PROCEDURE_CODE = 'code' // ok
+const PROCEDURE_CODE = 'codeList' // ok
 const PROCEDURE_DATE = 'date' // ok
 const PROCEDURE_ENCOUNTER = 'occurrence' // on verra
 
 const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition' // ok
-const CONDITION_CODE = 'code' // ok
+const CONDITION_CODE = 'codeList' // ok
 const CONDITION_TYPE = 'type' // ok
 const CONDITION_DATE = 'recorded-date' // ok
 const CONDITION_ENCOUNTER = 'occurrence' // on verra
@@ -48,8 +50,7 @@ const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   gender: [],
   vitalStatus: [],
   years: [0, 130],
-  ageType: { id: 'year', label: 'En année' },
-  label: undefined
+  ageType: { id: 'year', label: 'En année' }
 }
 
 const DEFAULT_GROUP_ERROR: CriteriaGroupType = {
@@ -79,8 +80,8 @@ type RequeteurCriteriaType = {
     timeDelayMax?: number
   }
   dateRange?: {
-    minDate: string // YYYY-MM-DD
-    maxDate: string // YYYY-MM-DD
+    minDate?: string // YYYY-MM-DD
+    maxDate?: string // YYYY-MM-DD
     datePreference?: 'event_date' | 'encounter_end-date' | 'encounter_start-date'
     dateIsNotNull?: boolean
   }
@@ -202,10 +203,40 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       }
 
       filterFhir = [
-        `${criterion.admissionMode ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode.id}` : ''}`,
-        `${criterion.entryMode ? `${ENCOUNTER_ENTRYMODE}=${criterion.entryMode.id}` : ''}`,
-        `${criterion.exitMode ? `${ENCOUNTER_EXITMODE}=${criterion.exitMode.id}` : ''}`,
-        `${criterion.fileStatus ? `${ENCOUNTER_FILESTATUS}=${criterion.fileStatus.id}` : ''}`,
+        // `${criterion.admissionMode ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode.id}` : ''}`,
+        `${
+          criterion.entryMode && criterion.entryMode.length > 0
+            ? `${ENCOUNTER_ENTRYMODE}=${criterion.entryMode
+                .map((entryMode: any) => entryMode.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
+          criterion.exitMode && criterion.exitMode.length > 0
+            ? `${ENCOUNTER_EXITMODE}=${criterion.exitMode.map((exitMode: any) => exitMode.id).reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
+          criterion.priseEnChargeType && criterion.priseEnChargeType.length > 0
+            ? `${ENCOUNTER_PRISENCHARGETYPE}=${criterion.priseEnChargeType
+                .map((priseEnChargeType: any) => priseEnChargeType.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
+          criterion.typeDeSejour && criterion.typeDeSejour.length > 0
+            ? `${ENCOUNTER_TYPEDESEJOUR}=${criterion.typeDeSejour
+                .map((typeDeSejour: any) => typeDeSejour.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
+          criterion.fileStatus && criterion.fileStatus.length > 0
+            ? `${ENCOUNTER_FILESTATUS}=${criterion.fileStatus
+                .map((fileStatus: any) => fileStatus.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
         `${lengthFilter ? `${lengthFilter}` : ''}`,
         `${ageFilter ? `${ageFilter}` : ''}`
       ]
@@ -317,8 +348,10 @@ export function buildRequest(
           dateRange:
             !(item.type === 'Patient' || item.type === 'Encounter') && (item.startOccurrence || item.endOccurrence)
               ? {
-                  minDate: item.startOccurrence ? moment(item.startOccurrence).format('YYYY-MM-DD') : '',
-                  maxDate: item.endOccurrence ? moment(item.endOccurrence).format('YYYY-MM-DD') : ''
+                  minDate: item.startOccurrence
+                    ? moment(item.startOccurrence).format('YYYY-MM-DD[T00:00:00Z]')
+                    : undefined,
+                  maxDate: item.endOccurrence ? moment(item.endOccurrence).format('YYYY-MM-DD[T00:00:00Z]') : undefined
                 }
               : undefined
         }
@@ -606,19 +639,62 @@ export async function unbuildRequest(_json: string) {
                 }
                 break
               }
-              case ENCOUNTER_ADMISSIONMODE:
-                currentCriterion.admissionMode = { id: value }
-                break
-              case ENCOUNTER_ENTRYMODE:
-                currentCriterion.entryMode = { id: value }
-                break
-              case ENCOUNTER_EXITMODE:
-                currentCriterion.exitMode = { id: value }
-                break
-              case ENCOUNTER_FILESTATUS:
-                currentCriterion.fileStatus = { id: value }
-                break
+              case ENCOUNTER_ENTRYMODE: {
+                const entryModesIds = value?.split(',')
+                const newEntryModesIds = entryModesIds?.map((entryModeId: any) => ({ id: entryModeId }))
+                if (!newEntryModesIds) continue
 
+                currentCriterion.entryMode = currentCriterion.entryMode
+                  ? [...currentCriterion.entryMode, ...newEntryModesIds]
+                  : newEntryModesIds
+                break
+              }
+              case ENCOUNTER_EXITMODE: {
+                const exitModesIds = value?.split(',')
+                const newExitModesIds = exitModesIds?.map((exitModeId: any) => ({ id: exitModeId }))
+                if (!newExitModesIds) continue
+
+                currentCriterion.exitMode = currentCriterion.exitMode
+                  ? [...currentCriterion.exitMode, ...newExitModesIds]
+                  : newExitModesIds
+                break
+              }
+              case ENCOUNTER_PRISENCHARGETYPE: {
+                const priseEnChargeTypesIds = value?.split(',')
+                const newPriseEnChargeTypesIds = priseEnChargeTypesIds?.map((priseEnChargeTypeId: any) => ({
+                  id: priseEnChargeTypeId
+                }))
+                if (!newPriseEnChargeTypesIds) continue
+
+                currentCriterion.priseEnChargeType = currentCriterion.priseEnChargeType
+                  ? [...currentCriterion.priseEnChargeType, ...newPriseEnChargeTypesIds]
+                  : newPriseEnChargeTypesIds
+                break
+              }
+              case ENCOUNTER_TYPEDESEJOUR: {
+                const typeDeSejoursIds = value?.split(',')
+                const newTypeDeSejoursIds = typeDeSejoursIds?.map((typeDeSejourId: any) => ({
+                  id: typeDeSejourId
+                }))
+                if (!newTypeDeSejoursIds) continue
+
+                currentCriterion.typeDeSejour = currentCriterion.typeDeSejour
+                  ? [...currentCriterion.typeDeSejour, ...newTypeDeSejoursIds]
+                  : newTypeDeSejoursIds
+                break
+              }
+              case ENCOUNTER_FILESTATUS: {
+                const fileStatusIds = value?.split(',')
+                const newFileStatusIds = fileStatusIds?.map((fileStatusId: any) => ({
+                  id: fileStatusId
+                }))
+                if (!newFileStatusIds) continue
+
+                currentCriterion.fileStatus = currentCriterion.fileStatus
+                  ? [...currentCriterion.fileStatus, ...newFileStatusIds]
+                  : newFileStatusIds
+                break
+              }
               default:
                 break
             }
@@ -643,8 +719,8 @@ export async function unbuildRequest(_json: string) {
         }
 
         if (element.dateRange) {
-          currentCriterion.startOccurrence = element.dateRange.minDate
-          currentCriterion.endOccurrence = element.dateRange.maxDate
+          currentCriterion.startOccurrence = element.dateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -699,8 +775,8 @@ export async function unbuildRequest(_json: string) {
         }
 
         if (element.dateRange) {
-          currentCriterion.startOccurrence = element.dateRange.minDate
-          currentCriterion.endOccurrence = element.dateRange.maxDate
+          currentCriterion.startOccurrence = element.dateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -760,8 +836,8 @@ export async function unbuildRequest(_json: string) {
         }
 
         if (element.dateRange) {
-          currentCriterion.startOccurrence = element.dateRange.minDate
-          currentCriterion.endOccurrence = element.dateRange.maxDate
+          currentCriterion.startOccurrence = element.dateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -810,8 +886,8 @@ export async function unbuildRequest(_json: string) {
         }
 
         if (element.dateRange) {
-          currentCriterion.startOccurrence = element.dateRange.minDate
-          currentCriterion.endOccurrence = element.dateRange.maxDate
+          currentCriterion.startOccurrence = element.dateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -925,7 +1001,7 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
                     if (!allreadyHere) {
                       _criterion.data[dataKey] = [
                         ..._criterion.data[dataKey],
-                        ...(await _criterion.fetch[fetchKey](code?.id))
+                        ...(await _criterion.fetch[fetchKey](code?.id, true))
                       ]
                     }
                   }

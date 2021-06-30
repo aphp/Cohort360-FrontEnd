@@ -20,7 +20,7 @@ api.interceptors.response.use(
     return response
   },
   async function (error) {
-    if (!error?.response || (401 || 400) === error?.response?.status) {
+    if ((401 || 400) === error?.response?.status) {
       localStorage.clear()
       window.location = '/'
     }

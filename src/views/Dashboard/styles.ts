@@ -19,20 +19,28 @@ export default makeStyles((theme) => ({
       duration: theme.transitions.duration.enteringScreen
     })
   },
-  tabs: {
-    backgroundColor: '#153D8A'
-  },
+  tabs: { margin: '8px 0' },
   tabTitle: {
     minWidth: 0,
-    color: '#FFF',
-    fontWeight: 400
+    fontWeight: 900,
+    color: '#5BC5F2',
+    // border: `3px solid currentColor`,
+    borderRadius: 4,
+    marginRight: 12,
+    padding: '4px 8px',
+    '&:last-child': {
+      marginRight: 0
+    },
+    '&:hover': {
+      textDecoration: 'underline'
+    }
   },
   indicator: {
-    backgroundColor: '#5BC5F2',
-    height: '5px'
+    height: 0,
+    opacity: 0
   },
   selected: {
-    backgroundColor: '#0063AF'
+    color: '#0063AF'
   },
   loading: {
     position: 'absolute',

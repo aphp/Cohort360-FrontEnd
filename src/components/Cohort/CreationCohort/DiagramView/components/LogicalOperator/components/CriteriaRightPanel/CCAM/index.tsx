@@ -7,6 +7,7 @@ import CcamForm from './components/Form/CCAMForm'
 import CcamHierarchy from './components/Hierarchy/CCAMHierarchy'
 
 const defaultProcedure = {
+  type: 'Procedure',
   title: "Critères d'actes CCAM",
   code: [],
   occurrence: 1,
@@ -18,7 +19,7 @@ const defaultProcedure = {
 
 const Index = (props: any) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>('hierarchy')
+  const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
   const [defaultValues, onChangeDefaultValues] = useState(selectedCriteria || defaultProcedure)
 
   const isEdition = selectedCriteria !== null ? true : false
@@ -29,6 +30,12 @@ const Index = (props: any) => {
       code
     })
     onChangeTab('form')
+  }
+
+  const _onChangeValue = (key: string, value: any) => {
+    const _defaultValues = defaultValues ? { ...defaultValues } : {}
+    _defaultValues[key] = value
+    onChangeDefaultValues(_defaultValues)
   }
 
   const classes = useStyles()
@@ -47,6 +54,7 @@ const Index = (props: any) => {
           isEdition={isEdition}
           criteria={criteria}
           selectedCriteria={defaultValues}
+          onChangeValue={_onChangeValue}
           onChangeSelectedCriteria={onChangeSelectedCriteria}
           goBack={goBack}
         />

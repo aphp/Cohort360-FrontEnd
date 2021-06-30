@@ -1,16 +1,16 @@
 import api from './api'
 import apiBackCohort from './apiBackCohort'
-import { getInfos, getLastEncounter } from './myPatients'
+import { getInfos } from './myPatients'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import {
   FHIR_API_Response,
   CohortData,
-  ComplexChartDataType,
   SearchByTypes,
   VitalStatus,
   Back_API_Response,
   Cohort,
-  CohortComposition
+  CohortComposition,
+  AgeRepartitionType
 } from 'types'
 import {
   IGroup,
@@ -35,6 +35,8 @@ import { searchPatient } from './searchPatient'
 import { getAge } from 'utils/age'
 import moment from 'moment'
 
+import { GenderRepartitionType } from 'types'
+
 import fakeGroup from '../data/fakeData/group'
 import fakeFacetDeceased from '../data/fakeData/facet-deceased'
 import fakeFacetAgeMonth from '../data/fakeData/facet-age-month'
@@ -47,6 +49,7 @@ import fakeDocuments from '../data/fakeData/documents'
 const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | undefined> => {
   if (CONTEXT === 'fakedata') {
     const name = 'Fausse cohorte'
+    const description = 'Ceci est une fausse cohorte pour faire des tests'
     const requestId = '123456789'
     const totalPatients = 3
 
@@ -64,6 +67,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
 
     return {
       name,
+      description,
       cohort,
       totalPatients,
       originalPatients,
@@ -87,11 +91,19 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     ])
 
     let name = ''
+    let description = ''
     let requestId = ''
+    let uuid = ''
+    let favorite = false
 
     if (cohortInfo.data.results && cohortInfo.data.results.length === 1) {
       name = cohortInfo.data.results[0].name ?? ''
-      requestId = cohortInfo.data.results[0].request_id ?? ''
+      description = cohortInfo.data.results[0].description ?? ''
+      requestId = cohortInfo.data.results[0].request ?? ''
+      favorite = cohortInfo.data.results[0].favorite ?? false
+      uuid = cohortInfo.data.results[0].uuid ?? ''
+    } else {
+      throw new Error('This cohort is not your or invalid')
     }
 
     if (!name) {
@@ -102,7 +114,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
 
     const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
 
-    const originalPatients = await getLastEncounter(getApiResponseResources(patientsResp))
+    const originalPatients = getApiResponseResources(patientsResp)
 
     const agePyramidData =
       patientsResp.data.resourceType === 'Bundle'
@@ -136,6 +148,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
 
     return {
       name,
+      description,
       cohort,
       totalPatients,
       originalPatients,
@@ -143,7 +156,9 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       visitTypeRepartitionData,
       agePyramidData,
       monthlyVisitData,
-      requestId
+      requestId,
+      favorite,
+      uuid
     }
   }
 
@@ -205,9 +220,9 @@ const fetchPatientList = async (
 ): Promise<
   | {
       totalPatients: number
-      originalPatients: IPatient[]
-      agePyramidData?: ComplexChartDataType<number, { male: number; female: number; other?: number }>
-      genderRepartitionMap?: ComplexChartDataType<PatientGenderKind>
+      originalPatients: IPatient[] | undefined
+      agePyramidData?: AgeRepartitionType
+      genderRepartitionMap?: GenderRepartitionType
     }
   | undefined
 > => {
@@ -242,27 +257,30 @@ const fetchPatientList = async (
     )
 
     if (patientsResp) {
-      const filteredPatients: IPatient[] = patientsResp.patientList.filter((patient) => {
-        const agePatient = parseInt(getAge(patient))
-        const genderPatient = patient.gender
-        const vitalStatusPatient = patient.deceasedDateTime ? VitalStatus.deceased : VitalStatus.alive
-        const [ageMin, ageMax] = age
-        let includePatient = true
+      //@ts-ignore
+      const filteredPatients: IPatient[] =
+        patientsResp.patientList &&
+        patientsResp.patientList.filter((patient) => {
+          const agePatient = parseInt(getAge(patient))
+          const genderPatient = patient.gender
+          const vitalStatusPatient = patient.deceasedDateTime ? VitalStatus.deceased : VitalStatus.alive
+          const [ageMin, ageMax] = age
+          let includePatient = true
 
-        if (isNaN(agePatient) || agePatient < ageMin || agePatient > ageMax) {
-          includePatient = false
-        }
+          if (isNaN(agePatient) || agePatient < ageMin || agePatient > ageMax) {
+            includePatient = false
+          }
 
-        if (vitalStatus !== VitalStatus.all && vitalStatusPatient !== vitalStatus) {
-          includePatient = false
-        }
+          if (vitalStatus !== VitalStatus.all && vitalStatusPatient !== vitalStatus) {
+            includePatient = false
+          }
 
-        if (gender !== PatientGenderKind._unknown && genderPatient !== gender) {
-          includePatient = false
-        }
+          if (gender !== PatientGenderKind._unknown && genderPatient !== gender) {
+            includePatient = false
+          }
 
-        return includePatient
-      })
+          return includePatient
+        })
 
       return {
         totalPatients: filteredPatients.length,
@@ -329,7 +347,7 @@ const fetchPatientList = async (
 
     const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
 
-    const originalPatients = await getLastEncounter(getApiResponseResources(patientsResp))
+    const originalPatients = getApiResponseResources(patientsResp)
 
     const agePyramidData =
       patientsResp.data.resourceType === 'Bundle'
@@ -388,7 +406,29 @@ const fetchDocuments = async (
   }
   if (CONTEXT === 'aphp') {
     const searchByGroup = groupId ? `&_list=${groupId}` : ''
-    const search = searchInput ? `&_text=${searchInput}` : ''
+    let search = ''
+    if (searchInput) {
+      searchInput = searchInput
+        .replaceAll('!', '%21')
+        .replaceAll('#', '%23')
+        .replaceAll('$', '%24')
+        .replaceAll('&', '%26')
+        .replaceAll("'", '%27')
+        .replaceAll('(', '%28')
+        .replaceAll(')', '%29')
+        .replaceAll('*', '%2A')
+        .replaceAll('+', '%2B')
+        .replaceAll(',', '%2C')
+        .replaceAll('/', '%2F')
+        .replaceAll(':', '%3A')
+        .replaceAll(';', '%3B')
+        .replaceAll('=', '%3D')
+        .replaceAll('?', '%3F')
+        .replaceAll('@', '%40')
+        .replaceAll('[', '%5B')
+        .replaceAll(']', '%5D')
+      search = searchInput ? `&_text=${searchInput}` : ''
+    }
     const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : ''
     const ndaFilter = nda ? `&encounter.identifier=${nda}` : ''
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
