@@ -59,8 +59,6 @@ const Dashboard: React.FC<{
     setDeidentifiedBoolean(!!valueBoolean)
   }
 
-  console.log('dashboard.requestId :>> ', dashboard.requestId)
-
   const onChangeTabs = () => {
     switch (context) {
       case 'patients':

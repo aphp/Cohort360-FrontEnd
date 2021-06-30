@@ -21,17 +21,17 @@ const ENCOUNTER_TYPEDESEJOUR = 'typeDeSejour' //on verra
 const ENCOUNTER_FILESTATUS = 'fileStatus' // on verra
 
 const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
-const CLAIM_CODE = 'diagnosis' // ok
+const CLAIM_CODE = 'codeList' // ok
 const CLAIM_DATE = 'created' // ok
 const CLAIM_ENCOUNTER = 'occurrence' // on verra
 
 const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
-const PROCEDURE_CODE = 'code' // ok
+const PROCEDURE_CODE = 'codeList' // ok
 const PROCEDURE_DATE = 'date' // ok
 const PROCEDURE_ENCOUNTER = 'occurrence' // on verra
 
 const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition' // ok
-const CONDITION_CODE = 'code' // ok
+const CONDITION_CODE = 'codeList' // ok
 const CONDITION_TYPE = 'type' // ok
 const CONDITION_DATE = 'recorded-date' // ok
 const CONDITION_ENCOUNTER = 'occurrence' // on verra

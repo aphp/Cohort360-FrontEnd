@@ -193,7 +193,7 @@ const ControlPanel: React.FC<{
                   [classes.redText]: includePatient ? includePatient > 20000 : false
                 })}
               >
-                {includePatient ? displayDigit(includePatient) : '-'}
+                {includePatient !== undefined ? displayDigit(includePatient) : '-'}
               </Typography>
             )}
           </Grid>
