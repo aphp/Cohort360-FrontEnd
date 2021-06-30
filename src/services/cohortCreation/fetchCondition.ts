@@ -156,7 +156,8 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
         cim10List && cim10List.length > 0
           ? cim10List.sort(codeSort).map((cimData: any) => ({
               id: cimData.code,
-              label: `${cimData.code} - ${cimData.display}`
+              label: `${cimData.code} - ${cimData.display}`,
+              subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
             }))
           : []
       return cim10List
@@ -189,7 +190,8 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
         cim10List && cim10List.length > 0
           ? cim10List.sort(codeSort).map((cimData: any) => ({
               id: cimData.code,
-              label: `${cimData.code} - ${cimData.display}`
+              label: `${cimData.code} - ${cimData.display}`,
+              subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
             }))
           : []
       return cim10List

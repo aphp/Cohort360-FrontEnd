@@ -24,6 +24,8 @@ const Index = (props: any) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
   const [defaultValues, onChangeDefaultValues] = useState(selectedCriteria || defaultCondition)
+  console.log('defaultValues :>> ', defaultValues)
+  console.log('selectedCriteria :>> ', selectedCriteria)
 
   const isEdition = selectedCriteria !== null ? true : false
 
@@ -63,7 +65,7 @@ const Index = (props: any) => {
         <Cim10Hierarchy
           isEdition={isEdition}
           criteria={criteria}
-          selectedCriteria={selectedCriteria}
+          selectedCriteria={defaultValues}
           onChangeSelectedHierarchy={_onChangeSelectedHierarchy}
           goBack={goBack}
         />
