@@ -12,7 +12,8 @@ export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
     return fakeValueSetCCAM && fakeValueSetCCAM.length > 0
       ? fakeValueSetCCAM.map((_fakeValueSetCCAM: { code: string; display: string }) => ({
           id: _fakeValueSetCCAM.code,
-          label: capitalizeFirstLetter(_fakeValueSetCCAM.display)
+          label: capitalizeFirstLetter(_fakeValueSetCCAM.display),
+          subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
         }))
       : []
   } else {
@@ -39,7 +40,8 @@ export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
     return (
       CCAMList.sort(codeSort).map((ccamData: any) => ({
         id: ccamData.code,
-        label: `${ccamData.code} - ${ccamData.display}`
+        label: `${ccamData.code} - ${ccamData.display}`,
+        subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
       })) || []
     )
   }
@@ -63,7 +65,8 @@ export const fetchCcamHierarchy = async (ccamParent: string) => {
         CCAMList && CCAMList.length > 0
           ? CCAMList.sort(codeSort).map((ccamData: any) => ({
               id: ccamData.code,
-              label: `${ccamData.code} - ${ccamData.display}`
+              label: `${ccamData.code} - ${ccamData.display}`,
+              subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
             }))
           : []
       return CCAMList
@@ -96,7 +99,8 @@ export const fetchCcamHierarchy = async (ccamParent: string) => {
         CCAMList && CCAMList.length > 0
           ? CCAMList.sort(codeSort).map((ccamData: any) => ({
               id: ccamData.code,
-              label: `${ccamData.code} - ${ccamData.display}`
+              label: `${ccamData.code} - ${ccamData.display}`,
+              subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
             }))
           : []
       return CCAMList

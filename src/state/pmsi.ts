@@ -106,6 +106,36 @@ const fetchCondition = createAsyncThunk<PmsiElementType, void, { state: RootStat
   }
 )
 
+const fetchClaim = createAsyncThunk<PmsiElementType, void, { state: RootState }>(
+  'pmsi/fetchClaim',
+  async (DO_NOT_USE, { getState }) => {
+    const state = getState().pmsi
+    const claimList: PmsiListType[] = await fetchGhmHierarchy('')
+
+    return {
+      ...state.claim,
+      list: claimList,
+      openedElement: [],
+      loading: false
+    }
+  }
+)
+
+const fetchProcedure = createAsyncThunk<PmsiElementType, void, { state: RootState }>(
+  'pmsi/fetchProcedure',
+  async (DO_NOT_USE, { getState }) => {
+    const state = getState().pmsi
+    const procedureList: PmsiListType[] = await fetchCcamHierarchy('')
+
+    return {
+      ...state.procedure,
+      list: procedureList,
+      openedElement: [],
+      loading: false
+    }
+  }
+)
+
 type ExpandPmsiElementParams = {
   rowId: string
   keyElement: 'claim' | 'condition' | 'procedure'
@@ -225,6 +255,26 @@ const pmsiSlice = createSlice({
       condition: { ...state.condition, ...action.payload }
     }))
     builder.addCase(fetchCondition.rejected, (state) => ({ ...state }))
+    // fetchClaim
+    builder.addCase(fetchClaim.pending, (state) => ({
+      ...state,
+      claim: { ...state.claim, loading: true }
+    }))
+    builder.addCase(fetchClaim.fulfilled, (state, action) => ({
+      ...state,
+      claim: { ...state.claim, ...action.payload }
+    }))
+    builder.addCase(fetchClaim.rejected, (state) => ({ ...state }))
+    // fetchProcedure
+    builder.addCase(fetchProcedure.pending, (state) => ({
+      ...state,
+      procedure: { ...state.procedure, loading: true }
+    }))
+    builder.addCase(fetchProcedure.fulfilled, (state, action) => ({
+      ...state,
+      procedure: { ...state.procedure, ...action.payload }
+    }))
+    builder.addCase(fetchProcedure.rejected, (state) => ({ ...state }))
     // expandPmsiElement
     builder.addCase(expandPmsiElement.pending, (state) => ({
       ...state,
@@ -238,5 +288,5 @@ const pmsiSlice = createSlice({
 })
 
 export default pmsiSlice.reducer
-export { initPmsiHierarchy, fetchCondition, expandPmsiElement }
+export { initPmsiHierarchy, fetchCondition, fetchClaim, fetchProcedure, expandPmsiElement }
 export const { clearPmsiHierarchy } = pmsiSlice.actions

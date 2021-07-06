@@ -130,7 +130,13 @@ export const filterSelectedPmsi = (selectedItems: PmsiListType[], rootRows: Pmsi
           parentElement = parentArray
         }
 
-        if (element && element.subItems && element.subItems.length > 0 && element.subItems[0].id !== 'loading') {
+        if (
+          !parentElement &&
+          element &&
+          element.subItems &&
+          element.subItems.length > 0 &&
+          element.subItems[0].id !== 'loading'
+        ) {
           parentElement = returnParentElement(element.subItems, element)
         }
       }

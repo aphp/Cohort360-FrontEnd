@@ -1,4 +1,6 @@
 import React, { useEffect, useState, Fragment } from 'react'
+import clsx from 'clsx'
+import { useDispatch } from 'react-redux'
 
 import {
   Button,
@@ -13,71 +15,79 @@ import {
   List,
   Tooltip
 } from '@material-ui/core'
+import Skeleton from '@material-ui/lab/Skeleton'
+
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
+import { useAppSelector } from 'state'
+import { PmsiListType, fetchProcedure, expandPmsiElement } from 'state/pmsi'
+
+import { getSelectedPmsi, filterSelectedPmsi, checkIfIndeterminated } from 'utils/pmsi'
+
 import useStyles from './styles'
 
-type CcamListItemProps = {
-  ccamItem: any
-  selectedItem?: { id: string; label: string }[] | null
-  handleClick: (ccamItem: { id: string; label: string }[] | null) => void
-  fetchHierarchy: (ccamCode: string) => any
+type ProcedureListItemProps = {
+  procedureItem: PmsiListType
+  selectedItem?: PmsiListType[] | null
+  handleClick: (procedureItem: { id: string; label: string }[] | null) => void
+  fetchHierarchy: (procedureCode: string) => any
 }
 
-const CcamListItem: React.FC<CcamListItemProps> = (props) => {
-  const { ccamItem, selectedItem, handleClick, fetchHierarchy } = props
-  const { id, color, label } = ccamItem
+const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
+  const { procedureItem, selectedItem, handleClick, fetchHierarchy } = props
+  const { id, label, subItems } = procedureItem
 
   const classes = useStyles()
+  const dispatch = useDispatch()
+
+  const procedureState = useAppSelector((state) => state.pmsi.procedure || {})
+  const procedureHierarchy = procedureState.list
+
   const [open, setOpen] = useState(false)
-  const [subItems, setSubItems] = useState<any>(['loading'])
 
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === ccamItem.id) : false
+  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === procedureItem.id) : false
+  const isIndeterminated = checkIfIndeterminated(procedureItem, selectedItem)
 
-  const _onExpand = async (ccamCode: string) => {
+  const _onExpand = async (procedureCode: string) => {
     setOpen(!open)
-    if (subItems && subItems[0] === 'loading') {
-      const _subItems = await fetchHierarchy(ccamCode)
-      setSubItems(_subItems)
+    const expandResult = await dispatch<any>(
+      expandPmsiElement({
+        keyElement: 'procedure',
+        rowId: procedureCode,
+        selectedItems: selectedItem || []
+      })
+    )
+    if (expandResult.payload.savedSelectedItems) {
+      handleClick(expandResult.payload.savedSelectedItems)
     }
   }
 
-  useEffect(() => {
-    const _init = async () => {
-      const _subItems = await fetchHierarchy(id)
-      setSubItems(_subItems)
-    }
-
-    _init()
-  }, []) //eslint-disable-line
-
-  const handleClickOnHierarchy = (ccamItem: { id: string; label: string }) => {
-    let _selectedItem = selectedItem ? [...selectedItem] : []
-    const foundItem = _selectedItem ? _selectedItem.find(({ id }) => id === ccamItem.id) : undefined
-    const index = foundItem !== undefined ? _selectedItem.indexOf(foundItem) : -1
-
-    if (index !== -1) {
-      _selectedItem?.splice(index, 1)
-    } else {
-      _selectedItem = [..._selectedItem, ccamItem]
-    }
-    handleClick(_selectedItem)
+  const handleClickOnHierarchy = (procedureItem: PmsiListType) => {
+    const newSelectedItems = getSelectedPmsi(procedureItem, selectedItem || [], procedureHierarchy)
+    handleClick(newSelectedItems)
   }
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
     return (
-      <ListItem className={classes.ccamItem}>
+      <ListItem className={classes.procedureItem}>
         <ListItemIcon>
           <div
-            onClick={() => handleClickOnHierarchy(ccamItem)}
-            className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`}
+            onClick={() => handleClickOnHierarchy(procedureItem)}
+            className={clsx(classes.indicator, {
+              [classes.selectedIndicator]: isSelected,
+              [classes.indeterminateIndicator]: isIndeterminated
+            })}
             style={{ color: '#0063af', cursor: 'pointer' }}
           />
         </ListItemIcon>
         <Tooltip title={label} enterDelay={2500}>
-          <ListItemText className={classes.label} primary={label} onClick={() => handleClickOnHierarchy(ccamItem)} />
+          <ListItemText
+            onClick={() => handleClickOnHierarchy(procedureItem)}
+            className={classes.label}
+            primary={label}
+          />
         </Tooltip>
       </ListItem>
     )
@@ -85,12 +95,19 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
 
   return (
     <>
-      <ListItem className={classes.ccamItem}>
+      <ListItem className={classes.procedureItem}>
         <ListItemIcon>
-          <div className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`} style={{ color }} />
+          <div
+            onClick={() => handleClickOnHierarchy(procedureItem)}
+            className={clsx(classes.indicator, {
+              [classes.selectedIndicator]: isSelected,
+              [classes.indeterminateIndicator]: isIndeterminated
+            })}
+            style={{ color: '#0063af', cursor: 'pointer' }}
+          />
         </ListItemIcon>
         <Tooltip title={label} enterDelay={2500}>
-          <ListItemText onClick={() => setOpen(!open)} className={classes.label} primary={label} />
+          <ListItemText onClick={() => _onExpand(id)} className={classes.label} primary={label} />
         </Tooltip>
         {open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => _onExpand(id)} />}
       </ListItem>
@@ -98,14 +115,17 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&
-            subItems.map((ccamHierarchySubItem: any, index: number) =>
-              ccamHierarchySubItem === 'loading' ? (
-                <Fragment key={index} />
+            subItems.map((procedureHierarchySubItem: any, index: number) =>
+              procedureHierarchySubItem.id === 'loading' ? (
+                <Fragment key={index}>
+                  <div className={classes.subItemsIndicator} />
+                  <Skeleton style={{ flex: 1, margin: '2px 32px' }} height={32} />
+                </Fragment>
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
-                  <CcamListItem
-                    ccamItem={ccamHierarchySubItem}
+                  <ProcedureListItem
+                    procedureItem={procedureHierarchySubItem}
                     selectedItem={selectedItem}
                     handleClick={handleClick}
                     fetchHierarchy={fetchHierarchy}
@@ -119,7 +139,7 @@ const CcamListItem: React.FC<CcamListItemProps> = (props) => {
   )
 }
 
-type CcamHierarchyProps = {
+type ProcedureHierarchyProps = {
   criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
@@ -127,11 +147,15 @@ type CcamHierarchyProps = {
   isEdition?: boolean
 }
 
-const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
-  const { criteria, selectedCriteria, goBack, onChangeSelectedHierarchy, isEdition } = props
+const ProcedureHierarchy: React.FC<ProcedureHierarchyProps> = (props) => {
+  const { criteria, selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
 
   const classes = useStyles()
-  const [ccamHierarchy, onSetCcamHierarchy] = useState([])
+  const dispatch = useDispatch()
+
+  const procedureState = useAppSelector((state) => state.pmsi.procedure || {})
+  const procedureHierarchy = procedureState.list
+
   const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
     isEdition ? selectedCriteria.code : []
   )
@@ -139,8 +163,9 @@ const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
   // Init
   useEffect(() => {
     const _init = async () => {
-      const newCriteriaTree = await criteria.fetch.fetchCcamHierarchy()
-      onSetCcamHierarchy(newCriteriaTree)
+      if (!procedureHierarchy || (procedureHierarchy && procedureHierarchy.length === 0)) {
+        dispatch<any>(fetchProcedure())
+      }
     }
 
     _init()
@@ -163,28 +188,28 @@ const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
       </Grid>
 
       <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-        {ccamHierarchy &&
-          ccamHierarchy.map((ccamItem, index) => (
-            <CcamListItem
+        {procedureHierarchy &&
+          procedureHierarchy.map((procedureItem, index) => (
+            <ProcedureListItem
               key={index}
-              ccamItem={ccamItem}
-              handleClick={onSetSelectedHierarchy}
+              procedureItem={procedureItem}
               selectedItem={selectedHierarchy}
-              fetchHierarchy={criteria?.fetch?.fetchCcamHierarchy}
+              handleClick={onSetSelectedHierarchy}
+              fetchHierarchy={criteria?.fetch?.fetchProcedureHierarchy}
             />
           ))}
       </List>
 
-      <Grid className={classes.ccamHierarchyActionContainer}>
+      <Grid className={classes.procedureHierarchyActionContainer}>
         {!isEdition && (
           <Button onClick={goBack} color="primary" variant="outlined">
             Annuler
           </Button>
         )}
         <Button
-          onClick={() => onChangeSelectedHierarchy(selectedHierarchy)}
+          onClick={() => onChangeSelectedHierarchy(filterSelectedPmsi(selectedHierarchy || [], procedureHierarchy))}
           type="submit"
-          form="ccam-form"
+          form="procedure-form"
           color="primary"
           variant="contained"
         >
@@ -195,4 +220,4 @@ const CcamHierarchy: React.FC<CcamHierarchyProps> = (props) => {
   )
 }
 
-export default CcamHierarchy
+export default ProcedureHierarchy
