@@ -1,4 +1,5 @@
 import React, { useEffect, useState, Fragment } from 'react'
+import clsx from 'clsx'
 import { useDispatch } from 'react-redux'
 
 import {
@@ -23,7 +24,7 @@ import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 import { useAppSelector } from 'state'
 import { PmsiListType, fetchCondition, expandPmsiElement } from 'state/pmsi'
 
-import { getSelectedPmsi, filterSelectedPmsi } from 'utils/pmsi'
+import { getSelectedPmsi, filterSelectedPmsi, checkIfIndeterminated } from 'utils/pmsi'
 
 import useStyles from './styles'
 
@@ -47,6 +48,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
   const [open, setOpen] = useState(false)
 
   const isSelected = selectedItem ? selectedItem.find(({ id }) => id === cimItem.id) : false
+  const isIndeterminated = checkIfIndeterminated(cimItem, selectedItem)
 
   const _onExpand = async (cimCode: string) => {
     setOpen(!open)
@@ -73,7 +75,10 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(cimItem)}
-            className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`}
+            className={clsx(classes.indicator, {
+              [classes.selectedIndicator]: isSelected,
+              [classes.indeterminateIndicator]: isIndeterminated
+            })}
             style={{ color: '#0063af', cursor: 'pointer' }}
           />
         </ListItemIcon>
@@ -90,7 +95,10 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(cimItem)}
-            className={`${classes.indicator} ${isSelected ? classes.selectedIndicator : ''}`}
+            className={clsx(classes.indicator, {
+              [classes.selectedIndicator]: isSelected,
+              [classes.indeterminateIndicator]: isIndeterminated
+            })}
             style={{ color: '#0063af', cursor: 'pointer' }}
           />
         </ListItemIcon>
@@ -151,7 +159,9 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
   // Init
   useEffect(() => {
     const _init = async () => {
-      dispatch<any>(fetchCondition())
+      if (!cimHierarchy || (cimHierarchy && cimHierarchy.length === 0)) {
+        dispatch<any>(fetchCondition())
+      }
     }
 
     _init()
@@ -193,7 +203,7 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
           </Button>
         )}
         <Button
-          onClick={() => onChangeSelectedHierarchy(filterSelectedPmsi(selectedHierarchy || []))}
+          onClick={() => onChangeSelectedHierarchy(filterSelectedPmsi(selectedHierarchy || [], cimHierarchy))}
           type="submit"
           form="cim10-form"
           color="primary"

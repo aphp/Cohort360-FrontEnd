@@ -109,7 +109,7 @@ export const getSelectedPmsi = (row: PmsiListType, selectedItems: PmsiListType[]
   return savedSelectedItems
 }
 
-export const filterSelectedPmsi = (selectedItems: PmsiListType[]) => {
+export const filterSelectedPmsi = (selectedItems: PmsiListType[], rootRows: PmsiListType[]) => {
   // If you chenge this code, change it too inside: PopulationCard.tsx:31 and Scope.jsx:25
   return selectedItems.filter((item, index, array) => {
     // reemove double item
@@ -117,7 +117,28 @@ export const filterSelectedPmsi = (selectedItems: PmsiListType[]) => {
     const currentIndex = foundItem ? array.indexOf(foundItem) : -1
     if (index !== currentIndex) return false
 
-    const parentItem = array.find(({ subItems }) => !!subItems?.find((subItem) => subItem.id === item.id))
+    const returnParentElement: (
+      _array: PmsiListType[],
+      parentArray: PmsiListType | undefined
+    ) => PmsiListType | undefined = (_array, parentArray) => {
+      let parentElement: PmsiListType | undefined = undefined
+
+      for (const element of _array) {
+        if (parentElement) continue
+
+        if (element.id === item.id) {
+          parentElement = parentArray
+        }
+
+        if (element && element.subItems && element.subItems.length > 0 && element.subItems[0].id !== 'loading') {
+          parentElement = returnParentElement(element.subItems, element)
+        }
+      }
+      return parentElement
+    }
+
+    const parentItem: PmsiListType | undefined = returnParentElement(rootRows, undefined)
+
     if (parentItem !== undefined) {
       const selectedChildren =
         parentItem.subItems && parentItem.subItems.length > 0
@@ -155,4 +176,33 @@ export const filterSelectedPmsi = (selectedItems: PmsiListType[]) => {
       }
     }
   })
+}
+
+export const checkIfIndeterminated: (_row: any, selectedItems: any) => boolean | undefined = (_row, selectedItems) => {
+  // Si que un loading => false
+  if (_row.subItems && _row.subItems.length > 0 && _row.subItems[0].id === 'loading') {
+    return false
+  }
+  const checkChild: (item: any) => boolean = (item) => {
+    const numberOfSubItemsSelected = item.subItems?.filter((subItem: any) =>
+      selectedItems.find((selectedItems: any) => selectedItems.id === subItem.id)
+    )?.length
+
+    if (numberOfSubItemsSelected && numberOfSubItemsSelected !== item.subItems.length) {
+      // Si un des sub elem qui est check => true
+      return true
+    } else if (item.subItems?.length >= numberOfSubItemsSelected) {
+      // Si un des sub-sub (ou sub-sub-sub ...) elem qui est check => true
+      let isCheck = false
+      for (const child of item.subItems) {
+        if (isCheck) continue
+        isCheck = !!checkChild(child)
+      }
+      return isCheck
+    } else {
+      // Sinon => false
+      return false
+    }
+  }
+  return checkChild(_row)
 }
