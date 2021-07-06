@@ -132,7 +132,7 @@ const PatientList: React.FC<PatientListProps> = ({
           setTotalPatients(totalPatients)
         }
       })
-      .catch((error) => console.log(error))
+      .catch((error) => console.error(error))
       .finally(() => {
         setLoadingStatus(false)
       })

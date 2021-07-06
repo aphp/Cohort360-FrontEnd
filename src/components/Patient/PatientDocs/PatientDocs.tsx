@@ -86,7 +86,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
         setDocs(docResp?.docsList ?? [])
         setTotalDocs(docResp?.docsTotal ?? 0)
       })
-      .catch((error) => console.log(error))
+      .catch((error) => console.error(error))
       .then(() => setLoadingStatus(false))
   }
 
