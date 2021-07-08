@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
   backButton: { color: 'white' },
   divider: { background: 'white' },
   titleLabel: { marginLeft: '1em' },
-  ccamHierarchyActionContainer: {
+  procedureHierarchyActionContainer: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -33,7 +33,7 @@ const useStyles = makeStyles(() => ({
       margin: '12px 8px'
     }
   },
-  ccamItem: {
+  procedureItem: {
     padding: '2px 16px'
   },
   label: {
@@ -58,12 +58,21 @@ const useStyles = makeStyles(() => ({
     border: '2px solid currentColor',
     borderRadius: 10
   },
+  indeterminateIndicator: {
+    color: '#555 !important',
+    width: 20,
+    height: 20,
+    backgroundColor: 'currentColor',
+    boxShadow: 'inset 0 0 0 4px white',
+    border: '2px solid currentColor',
+    borderRadius: 10
+  },
   drawerContentContainer: {
     height: 'calc(100vh - 207px)',
     overflow: 'auto',
     margin: 12
   },
-  ccamHierarchyItem: {
+  procedureHierarchyItem: {
     padding: '2px 16px'
   },
   subItemsContainer: {

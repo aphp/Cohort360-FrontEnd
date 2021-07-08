@@ -11,6 +11,10 @@ import TutorialsCard from '../../components/Welcome/TutorialsCard/TutorialsCard'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { initUserCohortsThunk } from 'state/userCohorts'
+import { fetchProjects } from 'state/project'
+import { fetchRequests } from 'state/request'
+import { fetchCohorts } from 'state/cohort'
+import { initPmsiHierarchy } from 'state/pmsi'
 
 import useStyles from './styles'
 
@@ -35,6 +39,13 @@ const Accueil: React.FC = () => {
 
   useEffect(() => {
     dispatch<any>(initUserCohortsThunk())
+    // fetchProjectData
+    dispatch<any>(fetchProjects())
+    dispatch<any>(fetchRequests())
+    dispatch<any>(fetchCohorts())
+
+    // fetchPmsiData
+    dispatch<any>(initPmsiHierarchy())
   }, [dispatch])
 
   useEffect(() => {

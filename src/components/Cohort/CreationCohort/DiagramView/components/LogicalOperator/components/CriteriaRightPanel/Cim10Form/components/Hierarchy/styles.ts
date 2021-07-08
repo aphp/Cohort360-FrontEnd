@@ -58,6 +58,15 @@ const useStyles = makeStyles(() => ({
     border: '2px solid currentColor',
     borderRadius: 10
   },
+  indeterminateIndicator: {
+    color: '#555 !important',
+    width: 20,
+    height: 20,
+    backgroundColor: 'currentColor',
+    boxShadow: 'inset 0 0 0 4px white',
+    border: '2px solid currentColor',
+    borderRadius: 10
+  },
   drawerContentContainer: {
     height: 'calc(100vh - 207px)',
     overflow: 'auto',

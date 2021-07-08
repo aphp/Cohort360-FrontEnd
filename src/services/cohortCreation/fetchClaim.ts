@@ -12,7 +12,8 @@ export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
     return fakeValueSetGHM && fakeValueSetGHM.length > 0
       ? fakeValueSetGHM.map((_fakeValueSetGHM: { code: string; display: string }) => ({
           id: _fakeValueSetGHM.code,
-          label: capitalizeFirstLetter(_fakeValueSetGHM.display)
+          label: capitalizeFirstLetter(_fakeValueSetGHM.display),
+          subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
         }))
       : []
   } else {
@@ -37,7 +38,8 @@ export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
     return data && data.length > 0
       ? data.sort(codeSort).map((_data: { code: string; display: string }) => ({
           id: _data.code,
-          label: `${_data.code} - ${capitalizeFirstLetter(_data.display)}`
+          label: `${_data.code} - ${capitalizeFirstLetter(_data.display)}`,
+          subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
         }))
       : []
   }
@@ -61,7 +63,8 @@ export const fetchGhmHierarchy = async (ghmParent: string) => {
         GHMList && GHMList.length > 0
           ? GHMList.sort(codeSort).map((ghmData: any) => ({
               id: ghmData.code,
-              label: `${ghmData.code} - ${ghmData.display}`
+              label: `${ghmData.code} - ${ghmData.display}`,
+              subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
             }))
           : []
       return GHMList
@@ -94,7 +97,8 @@ export const fetchGhmHierarchy = async (ghmParent: string) => {
         GHMList && GHMList.length > 0
           ? GHMList.sort(codeSort).map((ghmData: any) => ({
               id: ghmData.code,
-              label: `${ghmData.code} - ${ghmData.display}`
+              label: `${ghmData.code} - ${ghmData.display}`,
+              subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
             }))
           : []
       return GHMList

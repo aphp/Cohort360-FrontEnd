@@ -104,7 +104,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
         setResearches(cohortsResp?.results ?? undefined)
         setTotal(cohortsResp?.count ?? 0)
       })
-      .catch((error) => console.log(error))
+      .catch((error) => console.error(error))
       .then(() => {
         setLoadingStatus(false)
       })

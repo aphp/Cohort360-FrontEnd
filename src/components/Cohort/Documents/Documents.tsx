@@ -114,7 +114,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
           setPage(page)
         }
       })
-      .catch((error) => console.log(error))
+      .catch((error) => console.error(error))
       .then(() => {
         setLoadingStatus(false)
       })
