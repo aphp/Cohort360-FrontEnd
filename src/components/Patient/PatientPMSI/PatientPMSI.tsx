@@ -121,7 +121,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       .catch((error) => {
         setData([])
         setTotal(0)
-        console.log(error)
+        console.error(error)
       })
       .then(() => setLoadingStatus(false))
   }

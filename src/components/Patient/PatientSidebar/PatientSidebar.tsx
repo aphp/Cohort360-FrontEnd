@@ -76,7 +76,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
         setTotalPatients(patientsResp?.totalPatients ?? 0)
         setPage(page)
       })
-      .catch((error) => console.log(error))
+      .catch((error) => console.error(error))
       .finally(() => {
         setLoadingStatus(false)
       })
