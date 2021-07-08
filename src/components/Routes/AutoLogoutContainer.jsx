@@ -54,6 +54,9 @@ const AutoLogoutContainer = () => {
           logout()
         }
       })
+    axios.post('/api/portail/accounts/refresh/', {
+      refresh: localStorage.getItem(REFRESH_TOKEN)
+    })
     setDialogIsOpen(false)
     // console.log('User est resté connecté')
     clearTimeout(sessionInactifTimerRef.current)
@@ -78,6 +81,9 @@ const AutoLogoutContainer = () => {
             logout()
           }
         })
+      await axios.post('/api/portail/accounts/refresh/', {
+        refresh: localStorage.getItem(REFRESH_TOKEN)
+      })
     }
   }
 
