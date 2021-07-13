@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
-import { Grid, Button, CircularProgress, Typography } from '@material-ui/core'
+import { Grid, Button, CircularProgress, Typography, InputBase, InputAdornment, IconButton } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
+import ClearIcon from '@material-ui/icons/Clear'
+import SearchIcon from '@material-ui/icons/Search'
 
 import ProjectTable from 'components/MyProjects/ProjectTable/ProjectTable'
 import ModalAddOrEditProject from 'components/MyProjects/Modals/ModalAddOrEditProject/ModalAddOrEditProject'
@@ -20,6 +22,9 @@ import useStyles from './styles'
 const MyProjects = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
+
+  const [searchInput, setSearchInput] = useState('')
+
   const { open, projectState, requestState, cohortState } = useAppSelector<{
     open: boolean
     projectState: ProjectState
@@ -100,13 +105,34 @@ const MyProjects = () => {
           </Grid>
 
           <Grid container item xs={11} sm={9} className={classes.actionContainer}>
+            <Grid item container xs={4} alignItems="center" className={classes.searchBar}>
+              <InputBase
+                placeholder="Rechercher"
+                className={classes.input}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                endAdornment={
+                  searchInput && (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setSearchInput('')}>
+                        <ClearIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }
+              />
+              <IconButton aria-label="search" color="secondary">
+                <SearchIcon fill="#ED6D91" height="15px" />
+              </IconButton>
+            </Grid>
+
             <Button startIcon={<AddIcon />} onClick={() => handleClickAddProject()} className={classes.addButton}>
               Ajouter un projet
             </Button>
           </Grid>
 
           <Grid container item xs={11} sm={9}>
-            <ProjectTable />
+            <ProjectTable searchInput={searchInput} />
           </Grid>
         </Grid>
       </Grid>
