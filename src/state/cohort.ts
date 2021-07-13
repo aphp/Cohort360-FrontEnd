@@ -44,9 +44,23 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, void, { state: Root
   async () => {
     try {
       const cohorts = (await fetchCohortsList()) || []
+
+      let cohortList = cohorts.results || []
+      // cohortList.length <= 100, check fetchCohortsList() for more information
+      if (cohorts.count > cohortList.length) {
+        const newResult = await fetchCohortsList(cohorts.count - 100, 100)
+        // Add elements to cohortList array and filter doublon
+        cohortList = [...cohortList, ...(newResult.results || [])]
+        cohortList = cohortList.filter((item, index, array) => {
+          const foundItem = array.find(({ uuid }) => item.uuid === uuid)
+          const currentIndex = foundItem ? array.indexOf(foundItem) : -1
+          return index === currentIndex
+        })
+      }
+
       return {
         selectedCohort: null,
-        cohortsList: cohorts.results
+        cohortsList: cohortList.reverse()
       }
     } catch (error) {
       console.error(error)

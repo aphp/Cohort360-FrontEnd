@@ -56,10 +56,10 @@ export const fetchProjectsList = async (limit = 100, offset = 0) => {
     default: {
       let search = `?ordering=created_at`
       if (limit) {
-        search += `limit=${limit}`
+        search += `&limit=${limit}`
       }
       if (offset) {
-        search += search === '?ordering=created_at' ? `offset=${offset}` : `&offset=${offset}`
+        search += `&offset=${offset}`
       }
 
       const fetchProjectsResponse = (await apiBack.get<{
@@ -195,7 +195,12 @@ export const fetchRequestsList = async (limit = 100, offset = 0) => {
       search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
     }
 
-    const fetchRequestsListResponse = (await apiBack.get(`/explorations/requests/${search}`)) ?? { status: 400 }
+    const fetchRequestsListResponse = (await apiBack.get<{
+      count: number
+      next: string | null
+      previous: string | null
+      results: RequestType[]
+    }>(`/explorations/requests/${search}`)) ?? { status: 400 }
 
     if (fetchRequestsListResponse.status === 200) {
       return fetchRequestsListResponse.data
@@ -294,6 +299,15 @@ export const deleteRequest = async (deletedRequest: RequestType) => {
     throw error
   }
 }
+
+/**
+ * Cohorts:
+ *  - CohortType
+ *  - fetchCohortsList : (limit = 100, offset = 0) => response.data
+ *  - addCohort : (newCohort: CohortType) => response.data
+ *  - editCohort : (editedCohort: CohortType) => response.data
+ *  - deleteCohort : (deletedCohort: CohortType) => response.data
+ */
 
 export type CohortType = {
   uuid: string

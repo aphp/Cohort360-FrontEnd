@@ -36,9 +36,23 @@ const fetchProjects = createAsyncThunk<FetchProjectListReturn, void, { state: Ro
   async () => {
     try {
       const projects = (await fetchProjectsList()) || []
+
+      let projectList = projects.results || []
+      // projectList.length <= 100, check fetchProjectsList() for more information
+      if (projects.count > projectList.length) {
+        const newResult = await fetchProjectsList(projects.count - 100, 100)
+        // Add elements to projectList array and filter doublon
+        projectList = [...projectList, ...(newResult.results || [])]
+        projectList = projectList.filter((item, index, array) => {
+          const foundItem = array.find(({ uuid }) => item.uuid === uuid)
+          const currentIndex = foundItem ? array.indexOf(foundItem) : -1
+          return index === currentIndex
+        })
+      }
+
       return {
         selectedProject: null,
-        projectsList: projects.results.reverse()
+        projectsList: projectList.reverse()
       }
     } catch (error) {
       console.error(error)

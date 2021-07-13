@@ -36,9 +36,23 @@ const fetchRequests = createAsyncThunk<FetchRequestListReturn, void, { state: Ro
   async () => {
     try {
       const requests = (await fetchRequestsList()) || []
+
+      let requestList = requests.results || []
+      // requestList.length <= 100, check fetchRequestsList() for more information
+      if (requests.count > requestList.length) {
+        const newResult = await fetchRequestsList(requests.count - 100, 100)
+        // Add elements to requestList array and filter doublon
+        requestList = [...requestList, ...(newResult.results || [])]
+        requestList = requestList.filter((item, index, array) => {
+          const foundItem = array.find(({ uuid }) => item.uuid === uuid)
+          const currentIndex = foundItem ? array.indexOf(foundItem) : -1
+          return index === currentIndex
+        })
+      }
+
       return {
         // selectedRequest: null,
-        requestsList: requests.results
+        requestsList: requestList.reverse()
       }
     } catch (error) {
       console.error(error)
