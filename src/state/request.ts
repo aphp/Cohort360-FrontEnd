@@ -13,12 +13,14 @@ import {
 
 export type RequestState = {
   loading: boolean
+  count: number
   selectedRequest: RequestType | null
   requestsList: RequestType[]
 }
 
 const defaultInitialState: RequestState = {
   loading: false,
+  count: 0,
   selectedRequest: null,
   requestsList: []
 }
@@ -27,20 +29,31 @@ const localStorageRequest = localStorage.getItem('request') || null
 const initialState: RequestState = localStorageRequest ? JSON.parse(localStorageRequest) : defaultInitialState
 
 type FetchRequestListReturn = {
+  count: number
   // selectedRequest: null
   requestsList: RequestType[]
 }
 
 const fetchRequests = createAsyncThunk<FetchRequestListReturn, void, { state: RootState }>(
   'request/fetchRequests',
-  async () => {
+  async (DO_NOT_USE, { getState }) => {
     try {
+      const state = getState().request
+
+      const oldRequestList = state.requestsList || []
       const requests = (await fetchRequestsList()) || []
+
+      if (state.count === requests.count) {
+        return {
+          count: state.count,
+          requestsList: oldRequestList
+        }
+      }
 
       let requestList = requests.results || []
       // requestList.length <= 100, check fetchRequestsList() for more information
       if (requests.count > requestList.length) {
-        const newResult = await fetchRequestsList(requests.count - 100, 100)
+        const newResult = await fetchRequestsList(requests.count - requestList.length, requestList.length)
         // Add elements to requestList array and filter doublon
         requestList = [...requestList, ...(newResult.results || [])]
         requestList = requestList.filter((item, index, array) => {
@@ -51,6 +64,7 @@ const fetchRequests = createAsyncThunk<FetchRequestListReturn, void, { state: Ro
       }
 
       return {
+        count: requests.count,
         // selectedRequest: null,
         requestsList: requestList.reverse()
       }
