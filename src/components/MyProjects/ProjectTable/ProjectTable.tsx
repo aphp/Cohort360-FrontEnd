@@ -1,16 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import {
-  CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography
-} from '@material-ui/core'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@material-ui/core'
 
 import ProjectRow from './ProjectRow/ProjectRow'
 
@@ -40,7 +30,6 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput }) => {
 
   const [searchProjectList, setSearchProjectList] = useState(projectsList || [])
   const [searchRequestList, setSearchRequestList] = useState(requestsList || [])
-  const [loading, setLoading] = useState('')
 
   useEffect(() => {
     // eslint-disable-next-line
@@ -54,17 +43,15 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput }) => {
       ? projectsList
       : projectsList.filter(
           ({ name, uuid }) =>
-            name.search(regexp) !== -1 || !!searchRequestList.find(({ parent_folder }) => parent_folder === uuid)
+            name.search(regexp) !== -1 || !!newSearchRequestList.find(({ parent_folder }) => parent_folder === uuid)
         )
 
     setSearchProjectList(newSearchProjectList)
     setSearchRequestList(newSearchRequestList)
-    setLoading(searchInput || '')
 
     return () => {
       setSearchProjectList([])
       setSearchRequestList([])
-      setLoading('')
     }
   }, [searchInput])
 
@@ -85,13 +72,6 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput }) => {
         </TableHead>
 
         <TableBody>
-          {loading !== searchInput && (
-            <TableRow>
-              <TableCell style={{ textAlign: 'center', padding: 8 }} colSpan={4}>
-                <CircularProgress size={20} />
-              </TableCell>
-            </TableRow>
-          )}
           {searchProjectList.length === 0 && (
             <TableRow>
               <TableCell style={{ textAlign: 'center', height: '40vh' }} colSpan={4}>
