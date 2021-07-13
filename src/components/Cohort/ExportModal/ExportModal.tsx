@@ -29,7 +29,14 @@ import { createExport } from 'services/export'
 
 const initialState = {
   motif: '',
-  conditions: false,
+  conditions: {
+    necessary: false,
+    restricted: false,
+    destruction: false,
+    not_communicate: false,
+    inform: false,
+    cnil: false
+  },
   tables: export_table.map(({ table_id }) => table_id)
 }
 const ERROR_MOTIF: 'ERROR_MOTIF' = 'ERROR_MOTIF'
@@ -47,6 +54,16 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   const [settings, setSettings] = useState(initialState)
   const [error, setError] = useState<typeof ERROR_MOTIF | typeof ERROR_CONDITION | typeof ERROR_TABLE | null>(null)
 
+  console.log('settings :>> ', settings)
+
+  const conditions: boolean =
+    !!settings?.conditions?.necessary &&
+    !!settings?.conditions?.restricted &&
+    !!settings?.conditions?.destruction &&
+    !!settings?.conditions?.not_communicate &&
+    !!settings?.conditions?.inform &&
+    !!settings?.conditions?.cnil
+
   useEffect(() => {
     setSettings(initialState)
   }, [open])
@@ -63,20 +80,59 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     handleChangeSettings('tables', existingTableIds)
   }
 
-  const handleChangeSettings = (key: 'motif' | 'conditions' | 'tables', value: any) => {
+  const handleChangeSettings = (
+    key:
+      | 'motif'
+      | 'conditions.necessary'
+      | 'conditions.restricted'
+      | 'conditions.destruction'
+      | 'conditions.not_communicate'
+      | 'conditions.inform'
+      | 'conditions.cnil'
+      | 'tables',
+    value: any
+  ) => {
     setError(null)
-    setSettings((prevState) => ({
-      ...prevState,
-      [key]: value
-    }))
+    switch (key) {
+      case 'conditions.necessary':
+      case 'conditions.restricted':
+      case 'conditions.destruction':
+      case 'conditions.not_communicate':
+      case 'conditions.inform':
+      case 'conditions.cnil': {
+        const newKey = key.split('.')[1]
+        setSettings((prevState) => ({
+          ...prevState,
+          conditions: {
+            ...prevState.conditions,
+            [newKey]: value
+          }
+        }))
+        break
+      }
+      default:
+        setSettings((prevState) => ({
+          ...prevState,
+          [key]: value
+        }))
+        break
+    }
   }
 
   const handleSubmit = () => {
     settings.motif = settings?.motif ? settings?.motif.trim() : ''
 
+    const conditions: boolean =
+      !!settings?.conditions?.necessary &&
+      !!settings?.conditions?.restricted &&
+      !!settings?.conditions?.destruction &&
+      !!settings?.conditions?.not_communicate &&
+      !!settings?.conditions?.inform &&
+      !!settings?.conditions?.cnil
+
     if (!settings?.motif || settings?.motif.length <= 10) {
       return setError(ERROR_MOTIF)
-    } else if (!settings?.conditions) {
+    } else if (!conditions) {
       return setError(ERROR_CONDITION)
     } else if (!settings?.tables || (settings?.tables && settings?.tables.length == 0)) {
       return setError(ERROR_TABLE)
@@ -110,7 +166,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
           )}
 
           {error === ERROR_CONDITION && (
-            <Alert severity="error">Merci d'accepter les conditions de l'Entrepôts de données de santé</Alert>
+            <Alert severity="error">Merci d'accepter toutes les conditions de l'Entrepôts de données de santé</Alert>
           )}
           {error === ERROR_TABLE && (
             <Alert severity="error">Merci d'indiquer les tables que vous voulez exporter</Alert>
@@ -170,18 +226,116 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
             ))}
           </List>
 
+          <Typography variant="caption">
+            Le niveau d’habilitation dont vous disposez dans [i2b2 (à remplacer par Cohort360)] vous autorise à exporter
+            des données à caractère personnel conformément à la réglementation et aux règles institutionnelles
+            d’utilisation des données du Système d’Information du domaine Patient de l’AP-HP. Vous êtes garant des
+            données exportées et vous engagez à :
+          </Typography>
+
           <FormControlLabel
             control={
               <Switch
-                name="conditions"
-                value={settings.conditions}
-                onChange={() => handleChangeSettings('conditions', !settings.conditions)}
+                name="conditions-necessary"
+                value={settings.conditions.necessary}
+                onChange={() => handleChangeSettings('conditions.necessary', !settings.conditions.necessary)}
               />
             }
-            labelPlacement="start"
+            labelPlacement="end"
+            style={{ margin: '4px 0' }}
             label={
-              <Typography>
-                Je reconnais avoir lu et j'accepte les <a href={'/toto'}>conditions de l'EDS</a>
+              <Typography variant="caption">
+                N’exporter, parmi les catégories de données accessibles, que les données strictement nécessaires et
+                pertinentes au regard des objectifs de la recherche
+              </Typography>
+            }
+          />
+
+          <FormControlLabel
+            control={
+              <Switch
+                name="conditions-restricted"
+                value={settings.conditions.restricted}
+                onChange={() => handleChangeSettings('conditions.restricted', !settings.conditions.restricted)}
+              />
+            }
+            labelPlacement="end"
+            style={{ margin: '4px 0' }}
+            label={
+              <Typography variant="caption">
+                A stocker temporairement les données extraites sur un répertoire dont l’accès est techniquement
+                restreint aux personnes dûment habilitées et authentifiées, présentes dans les locaux du responsable de
+                la recherche. A ne pas utiliser du matériel ou des supports de stockage n’appartenant pas à l’AP-HP, à
+                ne pas sortir les données des locaux de l’AP-HP ou sur un support amovible emporté hors AP-HP.
+              </Typography>
+            }
+          />
+
+          <FormControlLabel
+            control={
+              <Switch
+                name="conditions-destruction"
+                value={settings.conditions.destruction}
+                onChange={() => handleChangeSettings('conditions.destruction', !settings.conditions.destruction)}
+              />
+            }
+            labelPlacement="end"
+            style={{ margin: '4px 0' }}
+            label={
+              <Typography variant="caption">
+                A procéder à la destruction de toutes données exportées, dès qu’il n’y a plus nécessité d’en disposer
+                dans le cadre de la recherche dans le périmètre concerné.
+              </Typography>
+            }
+          />
+
+          <FormControlLabel
+            control={
+              <Switch
+                name="conditions-not_communicate"
+                value={settings.conditions.not_communicate}
+                onChange={() =>
+                  handleChangeSettings('conditions.not_communicate', !settings.conditions.not_communicate)
+                }
+              />
+            }
+            labelPlacement="end"
+            style={{ margin: '4px 0' }}
+            label={
+              <Typography variant="caption">A ne pas communiquer les données à des tiers non autorisés</Typography>
+            }
+          />
+
+          <FormControlLabel
+            control={
+              <Switch
+                name="conditions-inform"
+                value={settings.conditions.inform}
+                onChange={() => handleChangeSettings('conditions.inform', !settings.conditions.inform)}
+              />
+            }
+            labelPlacement="end"
+            style={{ margin: '4px 0' }}
+            label={
+              <Typography variant="caption">
+                A informer les chefs de services des UF de Responsabilité où ont été collectées les données exportées
+              </Typography>
+            }
+          />
+
+          <FormControlLabel
+            control={
+              <Switch
+                name="conditions-cnil"
+                value={settings.conditions.cnil}
+                onChange={() => handleChangeSettings('conditions.cnil', !settings.conditions.cnil)}
+              />
+            }
+            labelPlacement="end"
+            style={{ margin: '4px 0' }}
+            label={
+              <Typography variant="caption">
+                A ne pas croiser les données avec tout autre jeu de données, sans autorisation auprès de la CNIL
               </Typography>
             }
           />
@@ -193,7 +347,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
           Annuler
         </Button>
         <Button
-          disabled={!cohortId || !settings.motif || !settings.conditions || !settings.tables.length}
+          disabled={!cohortId || !settings.motif || !conditions || !settings.tables.length}
           onClick={handleSubmit}
           color="primary"
         >
