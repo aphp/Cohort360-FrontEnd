@@ -13,12 +13,14 @@ import {
 
 export type ProjectState = {
   loading: boolean
+  count: number
   selectedProject: ProjectType | null
   projectsList: ProjectType[]
 }
 
 const defaultInitialState: ProjectState = {
   loading: false,
+  count: 0,
   selectedProject: null,
   projectsList: []
 }
@@ -27,18 +29,44 @@ const localStorageProject = localStorage.getItem('project') || null
 const initialState: ProjectState = localStorageProject ? JSON.parse(localStorageProject) : defaultInitialState
 
 type FetchProjectListReturn = {
+  count: number
   selectedProject: null
   projectsList: ProjectType[]
 }
 
 const fetchProjects = createAsyncThunk<FetchProjectListReturn, void, { state: RootState }>(
   'project/fetchProjects',
-  async () => {
+  async (DO_NOT_USE, { getState }) => {
     try {
+      const state = getState().project
+
+      const oldProjectList = state.projectsList || []
       const projects = (await fetchProjectsList()) || []
+
+      if (state.count === projects.count) {
+        return {
+          count: state.count,
+          selectedProject: null,
+          projectsList: oldProjectList
+        }
+      }
+
+      let projectList = projects.results || []
+      if (projects.count > projectList.length) {
+        const newResult = await fetchProjectsList(projects.count - projectList.length, projectList.length)
+        // Add elements to projectList array and filter doublon
+        projectList = [...projectList, ...(newResult.results || [])]
+        projectList = projectList.filter((item, index, array) => {
+          const foundItem = array.find(({ uuid }) => item.uuid === uuid)
+          const currentIndex = foundItem ? array.indexOf(foundItem) : -1
+          return index === currentIndex
+        })
+      }
+
       return {
+        count: projects.count,
         selectedProject: null,
-        projectsList: projects.results.reverse()
+        projectsList: projectList.reverse()
       }
     } catch (error) {
       console.error(error)

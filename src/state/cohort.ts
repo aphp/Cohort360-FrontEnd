@@ -21,12 +21,14 @@ import {
 
 export type CohortState = {
   loading: boolean
+  count: number
   selectedCohort: CohortType | null
   cohortsList: CohortType[]
 }
 
 const defaultInitialState: CohortState = {
   loading: false,
+  count: 0,
   selectedCohort: null,
   cohortsList: []
 }
@@ -35,18 +37,45 @@ const localStorageCohort = localStorage.getItem('cohort') || null
 const initialState: CohortState = localStorageCohort ? JSON.parse(localStorageCohort) : defaultInitialState
 
 type FetchCohortListReturn = {
+  count: number
   selectedCohort: null
   cohortsList: CohortType[]
 }
 
 const fetchCohorts = createAsyncThunk<FetchCohortListReturn, void, { state: RootState }>(
   'cohort/fetchCohorts',
-  async () => {
+  async (DO_NOT_USE, { getState }) => {
     try {
+      const state = getState().cohort
+
+      const oldProjectList = state.cohortsList || []
       const cohorts = (await fetchCohortsList()) || []
+
+      if (state.count === cohorts.count) {
+        return {
+          count: state.count,
+          selectedCohort: null,
+          cohortsList: oldProjectList
+        }
+      }
+
+      let cohortList = cohorts.results || []
+      // cohortList.length <= 100, check fetchCohortsList() for more information
+      if (cohorts.count > cohortList.length) {
+        const newResult = await fetchCohortsList(cohorts.count - cohortList.length, cohortList.length)
+        // Add elements to cohortList array and filter doublon
+        cohortList = [...cohortList, ...(newResult.results || [])]
+        cohortList = cohortList.filter((item, index, array) => {
+          const foundItem = array.find(({ uuid }) => item.uuid === uuid)
+          const currentIndex = foundItem ? array.indexOf(foundItem) : -1
+          return index === currentIndex
+        })
+      }
+
       return {
+        count: cohorts.count,
         selectedCohort: null,
-        cohortsList: cohorts.results
+        cohortsList: cohortList.reverse()
       }
     } catch (error) {
       console.error(error)
