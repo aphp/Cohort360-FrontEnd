@@ -32,6 +32,7 @@ const initialState = {
   conditions: {
     necessary: false,
     restricted: false,
+    hardware: false,
     destruction: false,
     not_communicate: false,
     inform: false,
@@ -44,7 +45,7 @@ const ERROR_CONDITION: 'ERROR_CONDITION' = 'ERROR_CONDITION'
 const ERROR_TABLE: 'ERROR_TABLE' = 'ERROR_TABLE'
 
 type ExportModalProps = {
-  cohortId: string
+  cohortId: number
   open: boolean
   handleClose: () => void
 }
@@ -54,11 +55,12 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   const [settings, setSettings] = useState(initialState)
   const [error, setError] = useState<typeof ERROR_MOTIF | typeof ERROR_CONDITION | typeof ERROR_TABLE | null>(null)
 
-  console.log('settings :>> ', settings)
+  console.log('cohortId :>> ', cohortId)
 
   const conditions: boolean =
     !!settings?.conditions?.necessary &&
     !!settings?.conditions?.restricted &&
+    !!settings?.conditions?.hardware &&
     !!settings?.conditions?.destruction &&
     !!settings?.conditions?.not_communicate &&
     !!settings?.conditions?.inform &&
@@ -85,6 +87,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       | 'motif'
       | 'conditions.necessary'
       | 'conditions.restricted'
+      | 'conditions.hardware'
       | 'conditions.destruction'
       | 'conditions.not_communicate'
       | 'conditions.inform'
@@ -96,6 +99,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     switch (key) {
       case 'conditions.necessary':
       case 'conditions.restricted':
+      case 'conditions.hardware':
       case 'conditions.destruction':
       case 'conditions.not_communicate':
       case 'conditions.inform':
@@ -227,10 +231,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
           </List>
 
           <Typography variant="caption">
-            Le niveau d’habilitation dont vous disposez dans [i2b2 (à remplacer par Cohort360)] vous autorise à exporter
-            des données à caractère personnel conformément à la réglementation et aux règles institutionnelles
-            d’utilisation des données du Système d’Information du domaine Patient de l’AP-HP. Vous êtes garant des
-            données exportées et vous engagez à :
+            Le niveau d’habilitation dont vous disposez dans Cohort360 vous autorise à exporter des données à caractère
+            personnel conformément à la réglementation et aux règles institutionnelles d’utilisation des données du
+            Système d’Information du domaine Patient de l’AP-HP. Vous êtes garant des données exportées et vous engagez
+            à :
           </Typography>
 
           <FormControlLabel
@@ -265,8 +269,25 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               <Typography variant="caption">
                 A stocker temporairement les données extraites sur un répertoire dont l’accès est techniquement
                 restreint aux personnes dûment habilitées et authentifiées, présentes dans les locaux du responsable de
-                la recherche. A ne pas utiliser du matériel ou des supports de stockage n’appartenant pas à l’AP-HP, à
-                ne pas sortir les données des locaux de l’AP-HP ou sur un support amovible emporté hors AP-HP.
+                la recherche.
+              </Typography>
+            }
+          />
+
+          <FormControlLabel
+            control={
+              <Switch
+                name="conditions-hardware"
+                value={settings.conditions.hardware}
+                onChange={() => handleChangeSettings('conditions.hardware', !settings.conditions.hardware)}
+              />
+            }
+            labelPlacement="end"
+            style={{ margin: '4px 0' }}
+            label={
+              <Typography variant="caption">
+                A ne pas utiliser du matériel ou des supports de stockage n’appartenant pas à l’AP-HP, à ne pas sortir
+                les données des locaux de l’AP-HP ou sur un support amovible emporté hors AP-HP.
               </Typography>
             }
           />

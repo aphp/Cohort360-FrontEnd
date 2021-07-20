@@ -1,6 +1,6 @@
 import apiPortailCohort from './apiPortail'
 
-type createExportProps = { cohortId: string; motivation: string; tables: string[]; output_format?: string }
+type createExportProps = { cohortId: number; motivation: string; tables: string[]; output_format?: string }
 export const createExport = async (args: createExportProps) => {
   const { cohortId, motivation, tables, output_format = 'csv' } = args
 
