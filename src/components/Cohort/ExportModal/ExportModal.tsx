@@ -55,8 +55,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   const [settings, setSettings] = useState(initialState)
   const [error, setError] = useState<typeof ERROR_MOTIF | typeof ERROR_CONDITION | typeof ERROR_TABLE | null>(null)
 
-  console.log('cohortId :>> ', cohortId)
-
   const conditions: boolean =
     !!settings?.conditions?.necessary &&
     !!settings?.conditions?.restricted &&

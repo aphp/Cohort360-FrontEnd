@@ -18,9 +18,9 @@ import {
 } from '@material-ui/core'
 
 import EditIcon from '@material-ui/icons/Edit'
-import ExportIcon from '@material-ui/icons/GetApp'
+// import ExportIcon from '@material-ui/icons/GetApp'
 
-import ExportModal from 'components/Cohort/ExportModal/ExportModal'
+// import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 
 import { useAppSelector } from 'state'
 import { CohortState, setSelectedCohort } from 'state/cohort'
@@ -42,7 +42,7 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
 
   const { cohortsList = [] } = cohortState
 
-  const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<null | number>(null)
+  // const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<null | string>(null)
 
   const cohorts: CohortType[] =
     cohortsList
@@ -76,9 +76,9 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
                 Date
               </TableCell>
             </Hidden>
-            <TableCell align="center" style={{ width: 66 }}>
+            {/* <TableCell align="center" style={{ width: 66 }}>
               Exporter
-            </TableCell>
+            </TableCell> */}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -126,15 +126,11 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
                 <Hidden mdDown>
                   <TableCell align="center">{moment(historyRow.created_at).format('DD/MM/YYYY [à] HH:mm')}</TableCell>
                 </Hidden>
-                <TableCell align="center">
-                  <IconButton
-                    onClick={() =>
-                      setSelectedExportableCohort(historyRow.fhir_group_id ? parseInt(historyRow.fhir_group_id) : null)
-                    }
-                  >
+                {/* <TableCell align="center">
+                  <IconButton onClick={() => setSelectedExportableCohort(historyRow.fhir_group_id ?? '')}>
                     <ExportIcon />
                   </IconButton>
-                </TableCell>
+                </TableCell> */}
               </TableRow>
             ))
           ) : (
@@ -155,11 +151,11 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
         </TableBody>
       </Table>
 
-      <ExportModal
-        cohortId={selectedExportableCohort ? selectedExportableCohort : 0}
+      {/* <ExportModal
+        cohortId={selectedExportableCohort ?? ''}
         open={!!selectedExportableCohort}
         handleClose={() => setSelectedExportableCohort(null)}
-      />
+      /> */}
     </Box>
   )
 }
