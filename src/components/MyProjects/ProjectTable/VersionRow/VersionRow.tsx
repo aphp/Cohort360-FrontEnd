@@ -42,7 +42,7 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
 
   const { cohortsList = [] } = cohortState
 
-  const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<null | string>(null)
+  const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<null | number>(null)
 
   const cohorts: CohortType[] =
     cohortsList
@@ -127,7 +127,11 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
                   <TableCell align="center">{moment(historyRow.created_at).format('DD/MM/YYYY [à] HH:mm')}</TableCell>
                 </Hidden>
                 <TableCell align="center">
-                  <IconButton onClick={() => setSelectedExportableCohort(historyRow.fhir_group_id ?? '')}>
+                  <IconButton
+                    onClick={() =>
+                      setSelectedExportableCohort(historyRow.fhir_group_id ? parseInt(historyRow.fhir_group_id) : null)
+                    }
+                  >
                     <ExportIcon />
                   </IconButton>
                 </TableCell>
@@ -152,7 +156,7 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
       </Table>
 
       <ExportModal
-        cohortId={selectedExportableCohort ?? ''}
+        cohortId={selectedExportableCohort ? selectedExportableCohort : 0}
         open={!!selectedExportableCohort}
         handleClose={() => setSelectedExportableCohort(null)}
       />

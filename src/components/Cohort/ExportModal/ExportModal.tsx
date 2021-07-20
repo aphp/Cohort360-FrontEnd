@@ -31,8 +31,8 @@ const initialState = {
   motif: '',
   conditions: {
     necessary: false,
-    not_export: false,
     restricted: false,
+    hardware: false,
     destruction: false,
     not_communicate: false,
     inform: false,
@@ -45,7 +45,7 @@ const ERROR_CONDITION: 'ERROR_CONDITION' = 'ERROR_CONDITION'
 const ERROR_TABLE: 'ERROR_TABLE' = 'ERROR_TABLE'
 
 type ExportModalProps = {
-  cohortId: string
+  cohortId: number
   open: boolean
   handleClose: () => void
 }
@@ -55,12 +55,12 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   const [settings, setSettings] = useState(initialState)
   const [error, setError] = useState<typeof ERROR_MOTIF | typeof ERROR_CONDITION | typeof ERROR_TABLE | null>(null)
 
-  console.log('settings :>> ', settings)
+  console.log('cohortId :>> ', cohortId)
 
   const conditions: boolean =
     !!settings?.conditions?.necessary &&
-    !!settings?.conditions?.not_export &&
     !!settings?.conditions?.restricted &&
+    !!settings?.conditions?.hardware &&
     !!settings?.conditions?.destruction &&
     !!settings?.conditions?.not_communicate &&
     !!settings?.conditions?.inform &&
@@ -86,8 +86,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     key:
       | 'motif'
       | 'conditions.necessary'
-      | 'conditions.not_export'
       | 'conditions.restricted'
+      | 'conditions.hardware'
       | 'conditions.destruction'
       | 'conditions.not_communicate'
       | 'conditions.inform'
@@ -98,8 +98,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     setError(null)
     switch (key) {
       case 'conditions.necessary':
-      case 'conditions.not_export':
       case 'conditions.restricted':
+      case 'conditions.hardware':
       case 'conditions.destruction':
       case 'conditions.not_communicate':
       case 'conditions.inform':
@@ -277,9 +277,9 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
           <FormControlLabel
             control={
               <Switch
-                name="conditions-not_export"
-                value={settings.conditions.not_export}
-                onChange={() => handleChangeSettings('conditions.not_export', !settings.conditions.not_export)}
+                name="conditions-hardware"
+                value={settings.conditions.hardware}
+                onChange={() => handleChangeSettings('conditions.hardware', !settings.conditions.hardware)}
               />
             }
             labelPlacement="end"
