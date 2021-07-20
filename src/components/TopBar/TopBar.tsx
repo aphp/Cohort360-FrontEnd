@@ -32,7 +32,7 @@ import { ReactComponent as StarIcon } from 'assets/icones/star.svg'
 import { ReactComponent as StarFullIcon } from 'assets/icones/star full.svg'
 import MoreButton from '@material-ui/icons/MoreVert'
 
-import ExportModal from 'components/Cohort/ExportModal/ExportModal'
+// import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
 
 import { useAppSelector } from 'state'
@@ -265,14 +265,14 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                     >
                       Modifier
                     </MenuItem>
-                    <MenuItem
+                    {/* <MenuItem
                       onClick={() => {
                         setAnchorEl(null)
                         setOpenModal('export')
                       }}
                     >
                       Exporter
-                    </MenuItem>
+                    </MenuItem> */}
                     <MenuItem
                       onClick={() => {
                         setAnchorEl(null)
@@ -304,11 +304,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         />
       )}
 
-      {openModal === 'export' && (
-        <>
-          <ExportModal cohortId={dashboard.uuid ?? ''} open handleClose={() => handleClose()} />
-        </>
-      )}
+      {/* {openModal === 'export' && (
+        <ExportModal cohortId={dashboard.uuid ?? ''} open handleClose={() => handleClose()} />
+      )} */}
 
       {openModal === 'delete' && (
         <Dialog fullWidth maxWidth="xs" open onClose={handleClose} aria-labelledby="form-dialog-title">
