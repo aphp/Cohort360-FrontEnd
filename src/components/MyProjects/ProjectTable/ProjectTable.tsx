@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from 'react'
 
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@material-ui/core'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TableSortLabel,
+  Paper,
+  Typography
+} from '@material-ui/core'
 
 import ProjectRow from './ProjectRow/ProjectRow'
 
-import { ProjectType } from 'services/myProjects'
+import { ProjectType, RequestType } from 'services/myProjects'
 
 import { useAppSelector } from 'state'
 import { ProjectState } from 'state/project'
@@ -28,12 +38,15 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput }) => {
   const { projectsList } = projectState
   const { requestsList } = requestState
 
+  const [sortBy, setSortBy] = useState<'name' | 'modified_at'>('name')
+  const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('asc')
+
   const [searchProjectList, setSearchProjectList] = useState(projectsList || [])
   const [searchRequestList, setSearchRequestList] = useState(requestsList || [])
 
   useEffect(() => {
     // eslint-disable-next-line
-    const regexp = new RegExp(`${(searchInput || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}`)
+    const regexp = new RegExp(`${(searchInput || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}`, 'gi')
 
     const newSearchRequestList = !searchInput
       ? requestsList
@@ -55,6 +68,67 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput }) => {
     }
   }, [searchInput])
 
+  useEffect(() => {
+    let newSearchRequestList = searchRequestList ? [...searchRequestList] : []
+    let newSearchProjectList = searchProjectList ? [...searchProjectList] : []
+
+    switch (sortBy) {
+      case 'name': {
+        newSearchRequestList = newSearchRequestList.sort((a: RequestType, b: RequestType) => {
+          if (a.name > b.name) {
+            return sortDirection === 'asc' ? 1 : -1
+          } else {
+            return sortDirection === 'asc' ? -1 : 1
+          }
+        })
+
+        newSearchProjectList = newSearchProjectList.sort((a: ProjectType, b: ProjectType) => {
+          if (a.name > b.name) {
+            return sortDirection === 'asc' ? 1 : -1
+          } else {
+            return sortDirection === 'asc' ? -1 : 1
+          }
+        })
+        break
+      }
+
+      case 'modified_at': {
+        newSearchRequestList = newSearchRequestList.sort((a: RequestType, b: RequestType) => {
+          if (a.modified_at && b.modified_at && a.modified_at > b.modified_at) {
+            return sortDirection === 'asc' ? 1 : -1
+          } else {
+            return sortDirection === 'asc' ? -1 : 1
+          }
+        })
+
+        newSearchProjectList = newSearchProjectList.sort((a: ProjectType, b: ProjectType) => {
+          if (a.modified_at && b.modified_at && a.modified_at > b.modified_at) {
+            return sortDirection === 'asc' ? 1 : -1
+          } else {
+            return sortDirection === 'asc' ? -1 : 1
+          }
+        })
+        break
+      }
+      default:
+        break
+    }
+
+    setSearchProjectList(newSearchProjectList)
+    setSearchRequestList(newSearchRequestList)
+
+    return () => {
+      setSearchProjectList([])
+      setSearchRequestList([])
+    }
+  }, [sortBy, sortDirection])
+
+  const handleRequestSort = (property: 'name' | 'modified_at') => {
+    const isAsc = sortBy === property && sortDirection === 'desc'
+    setSortDirection(isAsc ? 'asc' : 'desc')
+    setSortBy(property)
+  }
+
   return (
     <TableContainer component={Paper} className={classes.grid}>
       <Table aria-label="projects table" id="projects_table" className={classes.table}>
@@ -63,10 +137,22 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput }) => {
             <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62 }} />
             <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62 }} />
             <TableCell className={classes.tableHeadCell} style={{ width: 'calc(100% - 300px' }}>
-              Titre
+              <TableSortLabel
+                active={sortBy === 'name'}
+                direction={sortDirection || 'asc'}
+                onClick={() => handleRequestSort('name')}
+              >
+                Titre
+              </TableSortLabel>
             </TableCell>
             <TableCell className={classes.tableHeadCell} align="center" style={{ width: 175 }}>
-              Date
+              <TableSortLabel
+                active={sortBy === 'modified_at'}
+                direction={sortDirection || 'asc'}
+                onClick={() => handleRequestSort('modified_at')}
+              >
+                Date
+              </TableSortLabel>
             </TableCell>
           </TableRow>
         </TableHead>
