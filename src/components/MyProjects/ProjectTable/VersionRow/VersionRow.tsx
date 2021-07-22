@@ -124,7 +124,7 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
                 </TableCell>
                 <TableCell align="center">{displayDigit(historyRow.result_size ?? 0)}</TableCell>
                 <Hidden mdDown>
-                  <TableCell align="center">{moment(historyRow.created_at).format('DD/MM/YYYY [à] HH:mm')}</TableCell>
+                  <TableCell align="center">{moment(historyRow.modified_at).format('DD/MM/YYYY [à] HH:mm')}</TableCell>
                 </Hidden>
                 {/* <TableCell align="center">
                   <IconButton onClick={() => setSelectedExportableCohort(historyRow.fhir_group_id ?? '')}>
