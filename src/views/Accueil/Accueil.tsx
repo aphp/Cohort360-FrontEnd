@@ -15,6 +15,7 @@ import { fetchProjects } from 'state/project'
 import { fetchRequests } from 'state/request'
 import { fetchCohorts } from 'state/cohort'
 import { initPmsiHierarchy } from 'state/pmsi'
+import { fetchScopesList } from 'state/scope'
 
 import useStyles from './styles'
 
@@ -46,6 +47,9 @@ const Accueil: React.FC = () => {
 
     // fetchPmsiData
     dispatch<any>(initPmsiHierarchy())
+
+    // fetchScope
+    dispatch<any>(fetchScopesList())
   }, [dispatch])
 
   useEffect(() => {
