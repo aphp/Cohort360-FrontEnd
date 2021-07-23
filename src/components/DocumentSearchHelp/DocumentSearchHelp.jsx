@@ -266,10 +266,10 @@ const DocumentSearchHelp = ({ open, onClose }) => {
                       Mot1 <span className={classes.bold}>NOT</span> Mot 2
                     </Typography>
                     <Typography>
-                      Mot1 <span className={classes.bold}>!</span> Mot2
+                      Mot1 <span className={classes.bold}>!</span>Mot2
                     </Typography>
                     <Typography>
-                      Mot1 <span className={classes.bold}>-</span> Mot2
+                      Mot1 <span className={classes.bold}>-</span>Mot2
                     </Typography>
                   </TableCell>
                   <TableCell align="left">

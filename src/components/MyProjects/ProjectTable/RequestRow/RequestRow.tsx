@@ -47,7 +47,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row }) => {
             </Tooltip>
           </TableCell>
           <TableCell className={classes.dateCell} align="center">
-            {moment(row.created_at).format('DD/MM/YYYY [à] HH:mm')}
+            {moment(row.modified_at).format('DD/MM/YYYY [à] HH:mm')}
           </TableCell>
         </TableRow>
 

@@ -16,7 +16,7 @@ const PatientSearchCard = () => {
 
   return (
     <>
-      <Title>Explorer les données d'un patient pris en charge</Title>
+      <Title>Chercher un patient</Title>
       <Divider className={classes.divider} />
       {deidentifiedBoolean ? (
         <Grid container item justify="center">

@@ -68,7 +68,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject }) => {
           )}
         </TableCell>
         <TableCell className={classes.dateCell} align="center">
-          {moment(row.created_at).format('DD/MM/YYYY [à] HH:mm')}
+          {moment(row.modified_at).format('DD/MM/YYYY [à] HH:mm')}
         </TableCell>
       </TableRow>
 

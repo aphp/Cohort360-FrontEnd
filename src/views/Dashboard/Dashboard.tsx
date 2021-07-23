@@ -143,10 +143,21 @@ const Dashboard: React.FC<{
     return <CohortCreation />
   }
 
-  if (dashboard.loading === false && dashboard.totalPatients === 0) {
+  if (
+    dashboard.loading === false &&
+    dashboard.cohort &&
+    Array.isArray(dashboard.cohort) &&
+    dashboard.cohort.length === 0
+  ) {
     return (
       <Alert severity="error" className={classes.alert}>
-        Les données ne sont pas encore disponibles, veuillez réessayer ultérieurement.
+        Vous tentez d'accéder à des données qui n'existent pas, ou vous ne disposez pas de droits suffisants
+      </Alert>
+    )
+  } else if (dashboard.loading === false && dashboard.totalPatients === 0) {
+    return (
+      <Alert severity="error" className={classes.alert}>
+        Votre cohorte de patients est vide
       </Alert>
     )
   }
