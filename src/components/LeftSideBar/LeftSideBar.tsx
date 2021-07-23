@@ -49,10 +49,11 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
   const history = useHistory()
   const dispatch = useDispatch()
 
-  const { practitioner, open, cohortCreation } = useAppSelector((state) => ({
+  const { practitioner, open, cohortCreation, scopesList } = useAppSelector((state) => ({
     practitioner: state.me,
     open: state.drawer,
-    cohortCreation: state.cohortCreation
+    cohortCreation: state.cohortCreation,
+    scopesList: state.scope.scopesList || []
   }))
 
   // v-- just for zoom transition..
@@ -337,11 +338,13 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     Tous mes patients
                   </Link>
                 </ListItem>
-                <ListItem>
-                  <Link href="/perimetre" className={classes.nestedTitle}>
-                    Explorer un périmètre
-                  </Link>
-                </ListItem>
+                {scopesList && scopesList.length !== 1 && (
+                  <ListItem>
+                    <Link href="/perimetre" className={classes.nestedTitle}>
+                      Explorer un périmètre
+                    </Link>
+                  </ListItem>
+                )}
               </List>
             </Collapse>
 
