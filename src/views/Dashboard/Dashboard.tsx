@@ -151,7 +151,7 @@ const Dashboard: React.FC<{
   ) {
     return (
       <Alert severity="error" className={classes.alert}>
-        Vous tentez d'accéder à des données qui n'existe pas, ou vous ne disposez pas de droit suffisant
+        Vous tentez d'accéder à des données qui n'existent pas, ou vous ne disposez pas de droits suffisants
       </Alert>
     )
   } else if (dashboard.loading === false && dashboard.totalPatients === 0) {
