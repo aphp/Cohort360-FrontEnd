@@ -114,10 +114,10 @@ export const fetchCim10Diagnostic = async (searchValue?: string, noStar?: boolea
     }
     const _searchValue = noStar
       ? searchValue
-        ? `&_text=${searchValue}`
+        ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
         : ''
       : searchValue
-      ? `&_text=${searchValue}*`
+      ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
       : ''
 
     const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-cim${_searchValue}`)

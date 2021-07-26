@@ -52,7 +52,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
   }
 
   const getCCAMOptions = async (searchValue: string) => {
-    const ccamOptions = await criteria.fetch.fetchCcamData(searchValue)
+    const ccamOptions = await criteria.fetch.fetchCcamData(searchValue, false)
 
     return ccamOptions && ccamOptions.length > 0 ? ccamOptions : []
   }
