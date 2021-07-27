@@ -22,10 +22,10 @@ export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
     }
     const _searchValue = noStar
       ? searchValue
-        ? `&_text=${searchValue}`
+        ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
         : ''
       : searchValue
-      ? `&_text=${searchValue}*`
+      ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
       : ''
 
     const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-ccam${_searchValue}`)
@@ -58,7 +58,7 @@ export const fetchCcamHierarchy = async (ccamParent: string) => {
 
       let CCAMList =
         res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
-          ? res.data.entry[0].resource.compose.include[0].concept
+          ? res.data.entry[0].resource?.compose?.include[0].concept
           : []
 
       CCAMList =

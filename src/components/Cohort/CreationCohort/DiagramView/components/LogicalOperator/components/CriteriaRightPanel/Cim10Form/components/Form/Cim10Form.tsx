@@ -50,7 +50,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     onChangeSelectedCriteria(selectedCriteria)
   }
 
-  const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue)
+  const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue, false)
 
   if (
     criteria?.data?.diagnosticTypes === 'loading' ||

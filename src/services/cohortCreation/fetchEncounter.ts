@@ -24,7 +24,7 @@ import { cleanValueSet } from 'utils/cleanValueSet'
 //   } else {
 //     try {
 //       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit_type`)
-//       const data = res.data.entry[0].resource.compose.include[0].concept || []
+//       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 //       return data && data.length > 0
 //         ? data.map((_data: { code: string; display: string }) => ({
 //             id: _data.code,
@@ -72,7 +72,7 @@ export const fetchExitModes = async () => {
   } else {
     try {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit_mode sortie`)
-      const data = res.data.entry[0].resource.compose.include[0].concept || []
+      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
     } catch (error) {
@@ -94,7 +94,7 @@ export const fetchPriseEnChargeType = async () => {
   } else {
     try {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit_type`)
-      const data = res.data.entry[0].resource.compose.include[0].concept || []
+      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       const cleanData = cleanValueSet(data)
 
@@ -122,7 +122,7 @@ export const fetchTypeDeSejour = async () => {
   } else {
     try {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-type-sejour`)
-      const data = res.data.entry[0].resource.compose.include[0].concept || []
+      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
     } catch (error) {
@@ -144,7 +144,7 @@ export const fetchFileStatus = async () => {
   } else {
     try {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visite-status`)
-      const data = res.data.entry[0].resource.compose.include[0].concept || []
+      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
     } catch (error) {

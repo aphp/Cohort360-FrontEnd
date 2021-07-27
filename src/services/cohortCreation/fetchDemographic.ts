@@ -28,7 +28,7 @@ export const fetchGender = async () => {
   } else {
     try {
       const res = await apiRequest.get(`/ValueSet?url=http://hl7.org/fhir/CodeSystem/administrative-gender`)
-      const data = res.data.entry[0].resource.compose.include[0].concept || []
+      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       if (data && data.length > 0) {
         data.forEach((value: { code: string; display: string }) => {
