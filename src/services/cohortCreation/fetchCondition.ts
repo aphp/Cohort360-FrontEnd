@@ -84,7 +84,7 @@ export const fetchDiagnosticTypes = async () => {
 
     const diagnosticKinds =
       res && res.data && res.data.entry && res.data.entry[0]
-        ? res.data.entry[0].resource.compose.include[0].concept
+        ? res.data.entry[0].resource?.compose?.include[0].concept
         : DEFAULT_DIAGNOSTIC_TYPES
 
     return diagnosticKinds && diagnosticKinds.length > 0
@@ -114,17 +114,17 @@ export const fetchCim10Diagnostic = async (searchValue?: string, noStar?: boolea
     }
     const _searchValue = noStar
       ? searchValue
-        ? `&_text=${searchValue}`
+        ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
         : ''
       : searchValue
-      ? `&_text=${searchValue}*`
+      ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
       : ''
 
     const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-cim${_searchValue}`)
 
     let cim10List =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
-        ? res.data.entry[0].resource.compose.include[0].concept
+        ? res.data.entry[0].resource?.compose?.include[0].concept
         : []
 
     cim10List =
@@ -149,7 +149,7 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
 
       let cim10List =
         res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
-          ? res.data.entry[0].resource.compose.include[0].concept
+          ? res.data.entry[0].resource?.compose?.include[0].concept
           : []
 
       cim10List =

@@ -5,6 +5,7 @@ import { KeyboardDatePicker } from '@material-ui/pickers'
 
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
@@ -116,6 +117,46 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
             value={_selectedDocTypes}
             disableCloseOnSelect
             getOptionLabel={(docType: any) => docType.label}
+            renderGroup={(docType: any) => {
+              const currentDocTypeList = docTypesList
+                ? docTypesList.filter((doc: any) => doc.type === docType.group)
+                : []
+              const currentSelectedDocTypeList = _selectedDocTypes
+                ? _selectedDocTypes.filter((doc: any) => doc.type === docType.group)
+                : []
+
+              const onClick = () => {
+                if (currentDocTypeList.length === currentSelectedDocTypeList.length) {
+                  setSelectedDocTypes(_selectedDocTypes.filter((doc: any) => doc.type !== docType.group))
+                } else {
+                  setSelectedDocTypes(
+                    [..._selectedDocTypes, ...currentDocTypeList].filter(
+                      (item, index, array) => array.indexOf(item) === index
+                    )
+                  )
+                }
+              }
+
+              return (
+                <React.Fragment>
+                  <Grid container direction="row" alignItems="center">
+                    <Checkbox
+                      indeterminate={
+                        currentDocTypeList.length !== currentSelectedDocTypeList.length &&
+                        currentSelectedDocTypeList.length > 0
+                      }
+                      color="primary"
+                      checked={currentDocTypeList.length === currentSelectedDocTypeList.length}
+                      onClick={onClick}
+                    />
+                    <Typography onClick={onClick} noWrap style={{ cursor: 'pointer', width: 'calc(100% - 150px' }}>
+                      {docType.group}
+                    </Typography>
+                  </Grid>
+                  {docType.children}
+                </React.Fragment>
+              )
+            }}
             renderOption={(docType: any) => <React.Fragment>{docType.label}</React.Fragment>}
             renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Types de documents" />}
             className={classes.autocomplete}

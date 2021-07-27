@@ -22,17 +22,17 @@ export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
     }
     const _searchValue = noStar
       ? searchValue
-        ? `&_text=${searchValue}`
+        ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
         : ''
       : searchValue
-      ? `&_text=${searchValue}*`
+      ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
       : ''
 
     const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-ghm${_searchValue}`)
 
     const data =
       res && res.data && res.data.entry && res.data.resourceType === 'Bundle'
-        ? res.data.entry[0].resource.compose.include[0].concept
+        ? res.data.entry[0].resource?.compose?.include[0].concept
         : []
 
     return data && data.length > 0
