@@ -58,7 +58,7 @@ export const fetchCcamHierarchy = async (ccamParent: string) => {
 
       let CCAMList =
         res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
-          ? res.data.entry[0].resource.compose.include[0].concept
+          ? res.data.entry[0].resource?.compose?.include[0].concept
           : []
 
       CCAMList =

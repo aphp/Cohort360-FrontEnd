@@ -32,7 +32,7 @@ export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
 
     const data =
       res && res.data && res.data.entry && res.data.resourceType === 'Bundle'
-        ? res.data.entry[0].resource.compose.include[0].concept
+        ? res.data.entry[0].resource?.compose?.include[0].concept
         : []
 
     return data && data.length > 0
