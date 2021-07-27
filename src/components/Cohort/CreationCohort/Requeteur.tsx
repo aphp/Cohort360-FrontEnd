@@ -11,12 +11,7 @@ import ModalCreateNewRequest from './Modals/ModalCreateNewRequest/ModalCreateNew
 
 import { useAppSelector } from 'state'
 import { setCriteriaList } from 'state/criteria'
-import {
-  fetchRequestCohortCreation,
-  buildCohortCreation,
-  unbuildCohortCreation,
-  resetCohortCreation
-} from 'state/cohortCreation'
+import { fetchRequestCohortCreation, unbuildCohortCreation, resetCohortCreation } from 'state/cohortCreation'
 import { setSelectedRequest } from 'state/request'
 
 import { CohortCreationSnapshotType } from 'types'
@@ -33,14 +28,12 @@ const Requeteur = () => {
     loading = false,
     requestId = '',
     currentSnapshot = '',
-    selectedPopulation = [],
     selectedCriteria = [],
     criteriaGroup = [],
     snapshotsHistory = [],
     count = {},
     json = ''
   } = useAppSelector((state) => state.cohortCreation.request || {})
-  const { scopesList } = useAppSelector((state) => state.scope || {})
 
   const params = useParams<{
     requestId: string
@@ -84,12 +77,6 @@ const Requeteur = () => {
     dispatch<any>(setCriteriaList(_criteria))
     setCriteriaLoading(false)
   }, [dispatch, criteriaGroup, selectedCriteria]) // eslint-disable-line
-
-  useEffect(() => {
-    if (scopesList && scopesList.length === 1 && selectedPopulation === null) {
-      dispatch<any>(buildCohortCreation({ selectedPopulation: scopesList }))
-    }
-  }, [scopesList])
 
   const _unbuildRequest = async (newCurrentSnapshot: CohortCreationSnapshotType) => {
     dispatch<any>(unbuildCohortCreation({ newCurrentSnapshot }))
