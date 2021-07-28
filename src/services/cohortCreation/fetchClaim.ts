@@ -28,7 +28,9 @@ export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
       ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
       : ''
 
-    const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-ghm${_searchValue}`)
+    const res = await apiRequest.get(
+      `/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-ghm${_searchValue}&size=0`
+    )
 
     const data =
       res && res.data && res.data.entry && res.data.resourceType === 'Bundle'

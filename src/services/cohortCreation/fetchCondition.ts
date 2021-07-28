@@ -120,7 +120,9 @@ export const fetchCim10Diagnostic = async (searchValue?: string, noStar?: boolea
       ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
       : ''
 
-    const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-cim${_searchValue}`)
+    const res = await apiRequest.get(
+      `/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-cim${_searchValue}&size=0`
+    )
 
     let cim10List =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
