@@ -7,16 +7,18 @@ export const fetchDocTypes = () => {
     return null
   } else if (CONTEXT === 'fakedata') {
     return docTypes && docTypes.docTypes.length > 0
-      ? docTypes.docTypes.map((_docType: { code: string; label: string }) => ({
+      ? docTypes.docTypes.map((_docType: { code: string; label: string; type: string }) => ({
           id: _docType.code,
-          label: capitalizeFirstLetter(_docType.label)
+          label: capitalizeFirstLetter(_docType.label),
+          type: _docType.type
         }))
       : []
   } else {
     return docTypes && docTypes.docTypes.length > 0
-      ? docTypes.docTypes.map((_docType: { code: string; label: string }) => ({
+      ? docTypes.docTypes.map((_docType: { code: string; label: string; type: string }) => ({
           id: _docType.code,
-          label: capitalizeFirstLetter(_docType.label)
+          label: capitalizeFirstLetter(_docType.label),
+          type: _docType.type
         }))
       : []
   }

@@ -3,6 +3,9 @@ import moment from 'moment'
 import { fetchPerimeterInfoForRequeteur as fetchPopulation } from '../services/perimeters'
 import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType } from 'types'
 
+import { capitalizeFirstLetter } from 'utils/capitalize'
+import { docTypes } from 'assets/docTypes.json'
+
 const REQUETEUR_VERSION = 'v1.2.0'
 
 const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
@@ -735,7 +738,16 @@ export async function unbuildRequest(_json: string) {
                 break
               case COMPOSITION_TYPE: {
                 const docTypeIds = value?.split(',')
-                const newDocTypeIds = docTypeIds?.map((docTypeId: any) => ({ id: docTypeId }))
+                const newDocTypeIds = docTypes
+                  .filter((docType: { code: string; label: string; type: string }) =>
+                    docTypeIds?.find((docTypeId) => docTypeId === docType.code)
+                  )
+                  .map((_docType: { code: string; label: string; type: string }) => ({
+                    id: _docType.code,
+                    label: capitalizeFirstLetter(_docType.label),
+                    type: _docType.type
+                  }))
+
                 if (!newDocTypeIds) continue
 
                 currentCriterion.docType = currentCriterion.docType
