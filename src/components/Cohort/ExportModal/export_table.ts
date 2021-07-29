@@ -36,11 +36,6 @@ const exportTable: ExportTableType[] = [
     table_id: 'concept_relationship'
   },
   {
-    id: 'concept_synonym',
-    table_name: 'Nomenclatures et métadonnées - concept_synonym',
-    table_id: 'concept_synonym'
-  },
-  {
     id: 'condition_occurrence',
     table_name: 'Diagnostics - condition_occurrence',
     table_id: 'condition_occurrence'
@@ -54,16 +49,6 @@ const exportTable: ExportTableType[] = [
     id: 'drug_exposure',
     table_name: 'Médicaments - drug_exposure',
     table_id: 'drug_exposure'
-  },
-  {
-    id: 'drug_exposure_administration',
-    table_name: 'Médicaments - drug_exposure_administration',
-    table_id: 'drug_exposure_administration'
-  },
-  {
-    id: 'drug_exposure_prescription',
-    table_name: 'Médicaments - drug_exposure_prescription',
-    table_id: 'drug_exposure_prescription'
   },
   {
     id: 'fact_relationship',
@@ -86,39 +71,14 @@ const exportTable: ExportTableType[] = [
     table_id: 'measurement'
   },
   {
-    id: 'measurement_physio',
-    table_name: 'TABLE_NAME - measurement_physio',
-    table_id: 'measurement_physio'
-  },
-  {
     id: 'note',
     table_name: 'Documents médicaux - note',
     table_id: 'note'
   },
   {
-    id: 'note_content',
-    table_name: 'Documents médicaux - note_content',
-    table_id: 'note_content'
-  },
-  {
-    id: 'note_section',
-    table_name: 'Documents médicaux - note_section',
-    table_id: 'note_section'
-  },
-  {
     id: 'observation',
     table_name: 'Patient - observation',
     table_id: 'observation'
-  },
-  {
-    id: 'observation_demographic',
-    table_name: 'Patient - observation_demographic',
-    table_id: 'observation_demographic'
-  },
-  {
-    id: 'observation_form',
-    table_name: 'Patient - observation_form',
-    table_id: 'observation_form'
   },
   {
     id: 'person',
@@ -129,11 +89,6 @@ const exportTable: ExportTableType[] = [
     id: 'procedure_occurrence',
     table_name: 'Actes - procedure_occurrence',
     table_id: 'procedure_occurrence'
-  },
-  {
-    id: 'relationship',
-    table_name: 'Nomenclatures et métadonnées - relationship',
-    table_id: 'relationship'
   },
   {
     id: 'specimen',
