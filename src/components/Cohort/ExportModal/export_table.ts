@@ -56,16 +56,6 @@ const exportTable: ExportTableType[] = [
     table_id: 'fact_relationship'
   },
   {
-    id: 'location',
-    table_name: 'Patient - location',
-    table_id: 'location'
-  },
-  {
-    id: 'location_history',
-    table_name: 'Patient - location_history',
-    table_id: 'location_history'
-  },
-  {
     id: 'measurement',
     table_name: 'TABLE_NAME - measurement',
     table_id: 'measurement'
