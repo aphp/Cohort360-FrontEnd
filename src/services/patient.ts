@@ -597,12 +597,14 @@ const getProcedureDocuments = async (
   if (procedures.length === 0) return procedures
   const _procedures = procedures
 
-  const encountersList: any[] = []
+  let encountersList: any[] = []
 
   _procedures.forEach((procedure) => {
     procedure.documents = []
     encountersList.push(procedure.encounter?.reference?.slice(10))
   })
+
+  encountersList = encountersList.filter((item, index, array) => array.indexOf(item) === index)
 
   const documentsResp = await api.get<FHIR_API_Response<IComposition>>(
     `/Composition?encounter=${encountersList}&_elements=status,type,subject,encounter,date,title`
