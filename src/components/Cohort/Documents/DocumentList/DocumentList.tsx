@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
+import clsx from 'clsx'
 
 import { Document, Page } from 'react-pdf'
 
@@ -13,7 +14,13 @@ import {
   Grid,
   IconButton,
   Paper,
-  Typography
+  Typography,
+  TableContainer,
+  Table,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell
 } from '@material-ui/core'
 
 import DescriptionIcon from '@material-ui/icons/Description'
@@ -130,124 +137,121 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
     : ''
 
   return (
-    <Grid container item direction="column" className={classes.row}>
-      <Grid container item>
-        <Grid container item direction="column" justify="center" xs={4}>
+    <>
+      <TableRow className={classes.row}>
+        <TableCell>
           <Typography variant="button">{row.title ?? 'Document sans titre'}</Typography>
           <Typography>
             {date} {hour}
           </Typography>
           {getStatusShip(row.status)}
-        </Grid>
-        <Grid container item xs={8} justify="space-around">
-          {showIpp && (
-            <Grid container item xs={3} alignItems="center" justify="center">
-              <UserIcon height="25px" fill="#5BC5F2" />
-              <Grid container item direction="column" xs={6} className={classes.textGrid}>
-                <Typography variant="button">{deidentified ? 'IPP chiffré' : 'IPP'}</Typography>
-                <Grid container item alignItems="center">
-                  <Typography>{row.IPP}</Typography>
-                  <IconButton
-                    onClick={() => history.push(`/patients/${row.idPatient}${groupId ? `?groupId=${groupId}` : ''}`)}
-                    className={classes.searchIcon}
-                  >
-                    <SearchIcon height="15px" fill="#ED6D91" />
-                  </IconButton>
-                </Grid>
-              </Grid>
-            </Grid>
-          )}
-          <Grid container item xs={2} alignItems="center" justify="center">
-            <DescriptionIcon htmlColor="#5BC5F2" className={classes.iconSize} />
-            <Grid container item direction="column" xs={6} className={classes.textGrid}>
-              <Typography variant="button">{deidentified ? 'NDA chiffré' : 'NDA'}</Typography>
-              <Typography>{row.NDA}</Typography>
-            </Grid>
-          </Grid>
-          <Grid container item xs={4} alignItems="center" justify="center">
-            <LocalHospitalIcon htmlColor="#5BC5F2" className={classes.iconSize} />
-            <Grid container item direction="column" xs={6} className={classes.textGrid}>
-              <Typography variant="button">Unité exécutrice</Typography>
-              <Typography>{row.serviceProvider}</Typography>
-            </Grid>
-          </Grid>
-          <Grid container item xs={2} alignItems="center" justify="center">
-            <ContactsIcon htmlColor="#5BC5F2" className={classes.iconSize} />
-            <Grid container item direction="column" xs={6} className={classes.textGrid}>
-              <Typography variant="button">Visite</Typography>
-              <Typography>{row.encounterStatus}</Typography>
-            </Grid>
-          </Grid>
-          <Grid container item xs={1} justify="center">
-            <IconButton onClick={() => openPdfDialog(row.id)}>
-              <PdfIcon height="30px" fill="#ED6D91" />
-            </IconButton>
+        </TableCell>
 
-            <Dialog open={pdfDialogOpen} onClose={() => setDocumentDialogOpen(false)} maxWidth="xl">
-              <DialogContent className={classes.dialogContent}>
-                {deidentified &&
-                  (loading ? (
-                    <CircularProgress className={classes.loadingDialog} />
-                  ) : (
-                    <>
-                      {documentContent &&
-                        documentContent.map((section: any) => (
-                          <>
-                            <Typography variant="h6">{section.title}</Typography>
-                            <Typography
-                              key={section.title}
-                              dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }}
-                            />
-                          </>
-                        ))}
-                      {!documentContent && <Typography>Le contenu du document est introuvable.</Typography>}
-                    </>
-                  ))}
-                {!deidentified && (
-                  <Document
-                    error={'Le document est introuvable.'}
-                    loading={'PDF en cours de chargement...'}
-                    file={{
-                      url: `${FHIR_API_URL}/Binary/${row.id}`,
-                      httpHeaders: {
-                        Accept: 'application/pdf',
-                        Authorization: `Bearer ${localStorage.getItem('access')}`
-                      }
-                    }}
-                    onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                  >
-                    {Array.from(new Array(numPages), (el, index) => (
-                      <Page
-                        width={window.innerWidth * 0.9}
-                        key={`page_${index + 1}`}
-                        pageNumber={index + 1}
-                        loading={'Pages en cours de chargement...'}
-                      />
-                    ))}
-                  </Document>
-                )}
-              </DialogContent>
-              <DialogActions>
-                <Button color="primary" onClick={() => setDocumentDialogOpen(false)}>
-                  Fermer
-                </Button>
-              </DialogActions>
-            </Dialog>
+        {showIpp && (
+          <TableCell>
+            <Grid container alignItems="center" wrap="nowrap">
+              <UserIcon height="25px" fill="#5BC5F2" className={classes.iconMargin} />
+              <Typography>{row.IPP}</Typography>
+              <IconButton
+                onClick={() => history.push(`/patients/${row.idPatient}${groupId ? `?groupId=${groupId}` : ''}`)}
+                className={classes.searchIcon}
+              >
+                <SearchIcon height="15px" fill="#ED6D91" className={classes.iconMargin} />
+              </IconButton>
+            </Grid>
+          </TableCell>
+        )}
+
+        <TableCell>
+          <Grid container alignItems="center" wrap="nowrap">
+            <DescriptionIcon htmlColor="#5BC5F2" className={clsx(classes.iconSize, classes.iconMargin)} />
+            <Typography>{row.NDA}</Typography>
           </Grid>
-        </Grid>
-      </Grid>
+        </TableCell>
+
+        <TableCell>
+          <Grid container alignItems="center" wrap="nowrap">
+            <LocalHospitalIcon htmlColor="#5BC5F2" className={clsx(classes.iconSize, classes.iconMargin)} />
+            <Typography>{row.serviceProvider}</Typography>
+          </Grid>
+        </TableCell>
+
+        <TableCell>
+          <Grid container alignItems="center" wrap="nowrap">
+            <ContactsIcon htmlColor="#5BC5F2" className={clsx(classes.iconSize, classes.iconMargin)} />
+            <Typography style={{ textTransform: 'capitalize' }}>{row.encounterStatus}</Typography>
+          </Grid>
+        </TableCell>
+
+        <TableCell>
+          <IconButton onClick={() => openPdfDialog(row.id)}>
+            <PdfIcon height="30px" fill="#ED6D91" />
+          </IconButton>
+
+          <Dialog open={pdfDialogOpen} onClose={() => setDocumentDialogOpen(false)} maxWidth="xl">
+            <DialogContent className={classes.dialogContent}>
+              {deidentified &&
+                (loading ? (
+                  <CircularProgress className={classes.loadingDialog} />
+                ) : (
+                  <>
+                    {documentContent &&
+                      documentContent.map((section: any) => (
+                        <>
+                          <Typography variant="h6">{section.title}</Typography>
+                          <Typography
+                            key={section.title}
+                            dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }}
+                          />
+                        </>
+                      ))}
+                    {!documentContent && <Typography>Le contenu du document est introuvable.</Typography>}
+                  </>
+                ))}
+              {!deidentified && (
+                <Document
+                  error={'Le document est introuvable.'}
+                  loading={'PDF en cours de chargement...'}
+                  file={{
+                    url: `${FHIR_API_URL}/Binary/${row.id}`,
+                    httpHeaders: {
+                      Accept: 'application/pdf',
+                      Authorization: `Bearer ${localStorage.getItem('access')}`
+                    }
+                  }}
+                  onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                >
+                  {Array.from(new Array(numPages), (el, index) => (
+                    <Page
+                      width={window.innerWidth * 0.9}
+                      key={`page_${index + 1}`}
+                      pageNumber={index + 1}
+                      loading={'Pages en cours de chargement...'}
+                    />
+                  ))}
+                </Document>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button color="primary" onClick={() => setDocumentDialogOpen(false)}>
+                Fermer
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </TableCell>
+      </TableRow>
 
       {showText && (
-        <Grid container item>
+        <TableRow>
           {row.section?.map((section) => (
-            <Grid key={section.title} container item direction="column">
+            <TableCell key={section.title} colSpan={6}>
               <Typography variant="h6">{section.title}</Typography>
               <Typography dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }} />
-            </Grid>
+            </TableCell>
           ))}
-        </Grid>
+        </TableRow>
       )}
-    </Grid>
+    </>
   )
 }
 
@@ -266,37 +270,85 @@ const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
     return loading ? (
       <CircularProgress className={classes.loadingSpinner} size={50} />
     ) : (
-      <>
-        {documents && documents.length > 0 ? (
-          <Grid component={Paper} container direction="column" justify="center">
-            {documents.map((row) => {
-              let relatedEncounter: IEncounter | undefined = undefined
-              if (row.resourceType === 'DocumentReference') {
-                relatedEncounter = encounters
-                  ? encounters.find(
-                      (encounter) => encounter.id === row.context?.encounter?.[0].reference?.split('/')[1]
-                    )
-                  : undefined
-              }
-              return (
-                <DocumentRow
-                  groupId={groupId}
-                  key={row.id}
-                  document={row}
-                  showText={searchMode}
-                  showIpp={showIpp}
-                  documentEncounter={relatedEncounter}
-                  deidentified={deidentified}
-                />
-              )
-            })}
-          </Grid>
-        ) : (
-          <Grid container justify="center">
-            <Typography variant="button"> Aucun document à afficher </Typography>
-          </Grid>
-        )}
-      </>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow className={classes.tableHead}>
+              <TableCell align="center" className={classes.tableHeadCell}>
+                <Typography variant="button">Nom / date</Typography>
+              </TableCell>
+              <TableCell align="center" className={classes.tableHeadCell}>
+                <Grid container alignItems="center" justify="center">
+                  <Typography style={{ marginLeft: 4 }} variant="button">
+                    {deidentified ? 'IPP chiffré' : 'IPP'}
+                  </Typography>
+                </Grid>
+              </TableCell>
+              <TableCell align="center" className={classes.tableHeadCell}>
+                <Grid container alignItems="center" justify="center">
+                  <Typography style={{ marginLeft: 4 }} variant="button">
+                    {deidentified ? 'NDA chiffré' : 'NDA'}
+                  </Typography>
+                </Grid>
+              </TableCell>
+              <TableCell align="center" className={classes.tableHeadCell}>
+                <Grid container alignItems="center" justify="center">
+                  <Typography style={{ marginLeft: 4 }} variant="button">
+                    Unité exécutrice
+                  </Typography>
+                </Grid>
+              </TableCell>
+              <TableCell align="center" className={classes.tableHeadCell}>
+                <Grid container alignItems="center" justify="center">
+                  <Typography style={{ marginLeft: 4 }} variant="button">
+                    Visite
+                  </Typography>
+                </Grid>
+              </TableCell>
+              <TableCell align="center" className={classes.tableHeadCell}>
+                <Grid container alignItems="center" justify="center">
+                  <Typography style={{ marginLeft: 4 }} variant="button">
+                    Aperçu
+                  </Typography>
+                </Grid>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {documents && documents.length > 0 ? (
+              documents.map((row) => {
+                let relatedEncounter: IEncounter | undefined = undefined
+                if (row.resourceType === 'DocumentReference') {
+                  relatedEncounter = encounters
+                    ? encounters.find(
+                        (encounter) => encounter.id === row.context?.encounter?.[0].reference?.split('/')[1]
+                      )
+                    : undefined
+                }
+                return (
+                  <DocumentRow
+                    key={row.id}
+                    groupId={groupId}
+                    document={row}
+                    showText={searchMode}
+                    showIpp={showIpp}
+                    documentEncounter={relatedEncounter}
+                    deidentified={deidentified}
+                  />
+                )
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6}>
+                  <Grid container justify="center">
+                    <Typography variant="button"> Aucun document à afficher </Typography>
+                  </Grid>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
     )
   }
 )
