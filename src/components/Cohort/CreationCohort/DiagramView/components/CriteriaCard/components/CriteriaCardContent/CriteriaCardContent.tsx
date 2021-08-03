@@ -12,6 +12,8 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import { useAppSelector } from 'state'
 import { SelectedCriteriaType } from 'types'
 
+import { docTypes } from 'assets/docTypes.json'
+
 import useStyles from './styles'
 
 type CriteriaCardContentProps = {
@@ -359,15 +361,31 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Composition': {
-        const displaySelectedDocType = (docTypes: { id: string; label: string }[]) => {
-          let currentDocTypes: string[] = []
-          for (const docType of docTypes) {
-            const selectedGenderData =
-              data?.docTypes && data?.docTypes !== 'loading'
-                ? data.docTypes.find((typeElement: any) => typeElement && typeElement.id === docType.id)
-                : null
-            currentDocTypes = selectedGenderData ? [...currentDocTypes, selectedGenderData.label] : currentDocTypes
+        const displaySelectedDocType = (selectedDocTypes: { id: string; label: string; type?: string }[]) => {
+          let displayingSelectedDocTypes: any[] = []
+          const allTypes = docTypes.map((docType: any) => docType.type)
+
+          for (const selectedDocType of selectedDocTypes) {
+            const numberOfElementFromGroup = (allTypes.filter((type) => type === selectedDocType.type) || []).length
+            const numberOfElementSelected = (
+              selectedDocTypes.filter((selectedDoc) => selectedDoc.type === selectedDocType.type) || []
+            ).length
+
+            if (numberOfElementFromGroup === numberOfElementSelected) {
+              const groupIsAlreadyAdded = displayingSelectedDocTypes.find((dsdt) => dsdt.label === selectedDocType.type)
+              if (groupIsAlreadyAdded) continue
+
+              displayingSelectedDocTypes = [
+                ...displayingSelectedDocTypes,
+                { type: selectedDocType.type, label: selectedDocType.type, code: selectedDocType.type }
+              ]
+            } else {
+              displayingSelectedDocTypes = [...displayingSelectedDocTypes, selectedDocType]
+            }
           }
+          const currentDocTypes = displayingSelectedDocTypes
+            .filter((item, index, array) => array.indexOf(item) === index)
+            .map(({ label }) => label)
           return currentDocTypes && currentDocTypes.length > 0 ? currentDocTypes.reduce(reducer) : ''
         }
 
