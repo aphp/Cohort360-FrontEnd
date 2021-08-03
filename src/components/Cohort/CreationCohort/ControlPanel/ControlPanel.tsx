@@ -106,22 +106,25 @@ const ControlPanel: React.FC<{
     <>
       <Grid className={classes.rightPanelContainerStyle}>
         <Grid className={classes.container}>
-          <Button
-            disabled={itLoads || typeof onExecute !== 'function' || (includePatient ? includePatient > 20000 : false)}
-            onClick={
-              includePatient && includePatient > 20000 ? undefined : () => onSetOpenModal('executeCohortConfirmation')
-            }
-            className={classes.requestExecution}
-          >
-            {itLoads ? (
-              <>
-                Veuillez patienter
-                <CircularProgress style={{ marginLeft: '15px' }} size={30} />
-              </>
-            ) : (
-              <>Créer la cohorte</>
-            )}
-          </Button>
+          <Tooltip title="Une mise à jour est actuellement en cours. La fonctionnalité sera disponible ultérieurement. Vous pouvez toujours travailler sur votre requête et l'éxécuter lorsque le service sera rétabli.">
+            <Button
+              // disabled={itLoads || typeof onExecute !== 'function' || (includePatient ? includePatient > 20000 : false)}
+              // onClick={
+              //   includePatient && includePatient > 20000 ? undefined : () => onSetOpenModal('executeCohortConfirmation')
+              // }
+              className={classes.requestExecution}
+              // disabled
+            >
+              {itLoads ? (
+                <>
+                  Veuillez patienter
+                  <CircularProgress style={{ marginLeft: '15px' }} size={30} />
+                </>
+              ) : (
+                <>Créer la cohorte</>
+              )}
+            </Button>
+          </Tooltip>
 
           <Button
             className={classes.actionButton}
