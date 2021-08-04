@@ -20,12 +20,13 @@ import {
   TableBody,
   TableHead,
   TableRow,
-  TableCell
+  TableCell,
+  TableSortLabel
 } from '@material-ui/core'
 
+import FolderSharedIcon from '@material-ui/icons/FolderShared'
 import DescriptionIcon from '@material-ui/icons/Description'
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital'
-import ContactsIcon from '@material-ui/icons/Contacts'
 import { ReactComponent as PdfIcon } from '../../../../assets/icones/file-pdf.svg'
 import { ReactComponent as CheckIcon } from '../../../../assets/icones/check.svg'
 import { ReactComponent as CancelIcon } from '../../../../assets/icones/times.svg'
@@ -37,12 +38,11 @@ import { CohortComposition } from 'types'
 import {
   CompositionStatusKind,
   DocumentReferenceStatusKind,
-  EncounterStatusKind,
   IEncounter,
   IDocumentReference
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { fetchDocumentContent } from 'services/cohortInfos'
-import { getDocumentStatus, getEncounterStatus } from 'utils/documentsFormatter'
+import { getDocumentStatus } from 'utils/documentsFormatter'
 
 import useStyles from './styles'
 
@@ -122,10 +122,8 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
       document.resourceType === 'Composition'
         ? document.serviceProvider ?? 'non renseigné'
         : documentEncounter?.serviceProvider?.display ?? '-',
-    encounterStatus:
-      document.resourceType === 'Composition'
-        ? getEncounterStatus(document.encounterStatus as EncounterStatusKind)
-        : getEncounterStatus(documentEncounter?.status) ?? '-',
+    docType:
+      document.resourceType === 'Composition' ? (document?.type?.coding ? document.type.coding[0].display : '-') : '-',
     section: document.resourceType === 'Composition' ? document.section : []
   }
   const date = row.date ? new Date(row.date).toLocaleDateString('fr-FR') : ''
@@ -164,7 +162,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
 
         <TableCell>
           <Grid container alignItems="center" wrap="nowrap">
-            <DescriptionIcon htmlColor="#5BC5F2" className={clsx(classes.iconSize, classes.iconMargin)} />
+            <FolderSharedIcon htmlColor="#5BC5F2" className={clsx(classes.iconSize, classes.iconMargin)} />
             <Typography>{row.NDA}</Typography>
           </Grid>
         </TableCell>
@@ -178,8 +176,8 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
 
         <TableCell>
           <Grid container alignItems="center" wrap="nowrap">
-            <ContactsIcon htmlColor="#5BC5F2" className={clsx(classes.iconSize, classes.iconMargin)} />
-            <Typography style={{ textTransform: 'capitalize' }}>{row.encounterStatus}</Typography>
+            <DescriptionIcon htmlColor="#5BC5F2" className={clsx(classes.iconSize, classes.iconMargin)} />
+            <Typography>{row.docType}</Typography>
           </Grid>
         </TableCell>
 
@@ -263,10 +261,37 @@ type DocumentTableTypes = {
   searchMode: boolean
   showIpp: boolean
   deidentified: boolean | null
+  sortBy?: string
+  onChangeSortBy?: (_sortBy: string) => void
+  sortDirection?: 'asc' | 'desc'
+  onChangeSortDirection?: (_sortDirection: 'asc' | 'desc') => void
 }
 const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
-  ({ groupId, loading, documents, searchMode, showIpp, encounters, deidentified }) => {
+  ({
+    groupId,
+    loading,
+    documents,
+    searchMode,
+    showIpp,
+    encounters,
+    deidentified,
+    sortBy,
+    onChangeSortBy,
+    sortDirection,
+    onChangeSortDirection
+  }) => {
     const classes = useStyles()
+
+    const handleRequestSort = (property: string) => {
+      const isAsc = sortBy === property && sortDirection === 'desc'
+      if (onChangeSortDirection && typeof onChangeSortDirection === 'function') {
+        onChangeSortDirection(isAsc ? 'asc' : 'desc')
+      }
+      if (onChangeSortBy && typeof onChangeSortBy === 'function') {
+        onChangeSortBy(property)
+      }
+    }
+
     return loading ? (
       <CircularProgress className={classes.loadingSpinner} size={50} />
     ) : (
@@ -275,39 +300,69 @@ const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
           <TableHead>
             <TableRow className={classes.tableHead}>
               <TableCell align="center" className={classes.tableHeadCell}>
-                <Typography variant="button">Nom / date</Typography>
+                <Typography variant="button" style={{ fontSize: 11, textTransform: 'uppercase' }}>
+                  Nom /
+                  <TableSortLabel
+                    style={{ marginLeft: 4, marginTop: -4 }}
+                    active={sortBy === 'date'}
+                    direction={sortDirection || 'asc'}
+                    onClick={() => handleRequestSort('date')}
+                  >
+                    Date
+                  </TableSortLabel>
+                </Typography>
               </TableCell>
               <TableCell align="center" className={classes.tableHeadCell}>
                 <Grid container alignItems="center" justify="center">
-                  <Typography style={{ marginLeft: 4 }} variant="button">
-                    {deidentified ? 'IPP chiffré' : 'IPP'}
-                  </Typography>
+                  {deidentified ? (
+                    <Typography style={{ marginLeft: 4, fontSize: 11, textTransform: 'uppercase' }} variant="button">
+                      IPP chiffré
+                    </Typography>
+                  ) : (
+                    <TableSortLabel
+                      active={sortBy === 'patient'}
+                      direction={sortDirection || 'asc'}
+                      onClick={() => handleRequestSort('patient')}
+                    >
+                      IPP
+                    </TableSortLabel>
+                  )}
                 </Grid>
               </TableCell>
               <TableCell align="center" className={classes.tableHeadCell}>
                 <Grid container alignItems="center" justify="center">
-                  <Typography style={{ marginLeft: 4 }} variant="button">
+                  <Typography style={{ marginLeft: 4, fontSize: 11, textTransform: 'uppercase' }} variant="button">
                     {deidentified ? 'NDA chiffré' : 'NDA'}
                   </Typography>
                 </Grid>
               </TableCell>
               <TableCell align="center" className={classes.tableHeadCell}>
                 <Grid container alignItems="center" justify="center">
-                  <Typography style={{ marginLeft: 4 }} variant="button">
+                  <Typography style={{ marginLeft: 4, fontSize: 11, textTransform: 'uppercase' }} variant="button">
                     Unité exécutrice
                   </Typography>
+                  {/* <TableSortLabel
+                    active={sortBy === 'encounter.service-provider'}
+                    direction={sortDirection || 'asc'}
+                    onClick={() => handleRequestSort('encounter.service-provider')}
+                  >
+                  </TableSortLabel> */}
                 </Grid>
               </TableCell>
               <TableCell align="center" className={classes.tableHeadCell}>
                 <Grid container alignItems="center" justify="center">
-                  <Typography style={{ marginLeft: 4 }} variant="button">
-                    Visite
-                  </Typography>
+                  <TableSortLabel
+                    active={sortBy === 'type'}
+                    direction={sortDirection || 'asc'}
+                    onClick={() => handleRequestSort('type')}
+                  >
+                    Type de document
+                  </TableSortLabel>
                 </Grid>
               </TableCell>
               <TableCell align="center" className={classes.tableHeadCell}>
                 <Grid container alignItems="center" justify="center">
-                  <Typography style={{ marginLeft: 4 }} variant="button">
+                  <Typography style={{ marginLeft: 4, fontSize: 11, textTransform: 'uppercase' }} variant="button">
                     Aperçu
                   </Typography>
                 </Grid>
