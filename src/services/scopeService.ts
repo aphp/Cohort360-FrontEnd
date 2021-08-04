@@ -85,6 +85,14 @@ export const getPerimeters = async (practitionerId: string) => {
   }
 }
 
+const getScopeName = (perimeter: any) => {
+  const perimeterID = perimeter ? perimeter.extension?.find((extension: any) => extension.url === 'cohort-id') : false
+  if (!perimeterID) {
+    return perimeter ? perimeter.name : ''
+  }
+  return `${perimeterID.valueInteger} - ${perimeter.name}`
+}
+
 const getQuantity = (extension?: IExtension[]) => {
   const accessExtension = extension?.find((extension) => extension.url === 'cohort-size')
   if (!extension || !accessExtension) {
@@ -124,6 +132,8 @@ export const getScopePerimeters = async (practitionerId: string): Promise<ScopeT
 
     for (const perimetersResult of perimetersResults) {
       const scopeRow: ScopeTreeRow = perimetersResult as ScopeTreeRow
+
+      scopeRow.name = getScopeName(perimetersResult)
       scopeRow.quantity = getQuantity(perimetersResult.extension)
       scopeRow.access = getAccessName(perimetersResult.extension)
       scopeRow.subItems = await getScopeSubItems(perimetersResult as ScopeTreeRow)
@@ -234,7 +244,10 @@ export const getScopePerimeters = async (practitionerId: string): Promise<ScopeT
   return []
 }
 
-export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<ScopeTreeRow[]> => {
+export const getScopeSubItems = async (
+  perimeter: ScopeTreeRow | null,
+  getSubItem?: boolean
+): Promise<ScopeTreeRow[]> => {
   if (!perimeter) return []
   const perimeterGroupId = perimeter.id
   const organization = await api.get<FHIR_API_Response<IOrganization>>(
@@ -245,16 +258,19 @@ export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<
   const organizationData = getApiResponseResources(organization) || []
   if (organizationData.length === 0) return []
 
-  let _subItemsData = organizationData
-    ? organizationData.map<ScopeTreeRow>((organization) => ({
-        ...organization,
+  let _subItemsData: ScopeTreeRow[] = []
+  for (const organization of organizationData) {
+    _subItemsData = [
+      ..._subItemsData,
+      {
         id: organization.id ?? '0',
-        name: organization.name ?? '',
+        name: getScopeName(organization),
         quantity: getQuantity(organization.extension) ?? 0,
-        subItems: [loadingItem],
+        subItems: getSubItem === true ? await getScopeSubItems(organization as ScopeTreeRow) : [loadingItem],
         access: perimeter?.access
-      }))
-    : []
+      }
+    ]
+  }
 
   // Sort by name
   _subItemsData = _subItemsData.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
