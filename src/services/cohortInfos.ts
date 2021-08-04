@@ -96,7 +96,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     let uuid = ''
     let favorite = false
 
-    if (cohortInfo.data.results && cohortInfo.data.results.length === 1) {
+    if (cohortInfo.data.results && cohortInfo.data.results.length >= 1) {
       name = cohortInfo.data.results[0].name ?? ''
       description = cohortInfo.data.results[0].description ?? ''
       requestId = cohortInfo.data.results[0].request ?? ''
