@@ -458,13 +458,13 @@ const fetchDocuments = async (
       //   `/Composition?facet=cloud&size=0&_sort=${_sortDirection}${sortBy}&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
       // ),
       api.get<FHIR_API_Response<IComposition>>(
-        `/Composition?size=20&_sort=${_sortDirection}${sortBy}&offset=${
+        `/Composition?size=20&type:not=doc-impor&_sort=${_sortDirection}${sortBy}&offset=${
           page ? (page - 1) * 20 : 0
         }&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
       ),
       search
         ? api.get<FHIR_API_Response<IComposition>>(
-            `/Composition?_sort=${_sortDirection}${sortBy}&status=final${searchByGroup}${docTypesFilter}${ndaFilter}${dateFilter}&size=0`
+            `/Composition?type:not=doc-impor&_sort=${_sortDirection}${sortBy}&status=final${searchByGroup}${docTypesFilter}${ndaFilter}${dateFilter}&size=0`
           )
         : null
     ])
