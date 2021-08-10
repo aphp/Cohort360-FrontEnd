@@ -58,14 +58,25 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     let startDate = null
     let endDate = null
 
+    let encounterStartDate = null
+    let encounterEndDate = null
+
     if (!(_currentCriteria.type === 'Patient' || _currentCriteria.type === 'Encounter')) {
       startDate = _currentCriteria.startOccurrence
         ? moment(_currentCriteria.startOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
-        : ''
+        : null
 
       endDate = _currentCriteria.endOccurrence
         ? moment(_currentCriteria.endOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
-        : ''
+        : null
+    }
+    if (!(_currentCriteria.type === 'Patient' || _currentCriteria.type === 'Encounter')) {
+      encounterStartDate = _currentCriteria.encounterStartDate
+        ? moment(_currentCriteria.encounterStartDate, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
+        : null
+      encounterEndDate = _currentCriteria.encounterEndDate
+        ? moment(_currentCriteria.encounterEndDate, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
+        : null
     }
 
     switch (_currentCriteria.type) {
@@ -126,6 +137,22 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                       : `Avant le ${startDate}`
                     : endDate
                     ? `Après le ${endDate}`
+                    : ''}
+                </Typography>
+              }
+            />
+          ),
+          (encounterStartDate || encounterEndDate) && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>
+                  {encounterStartDate
+                    ? encounterEndDate
+                      ? `Prise en charge entre le ${encounterStartDate} et le ${encounterEndDate}`
+                      : `Prise en charge avant le ${encounterStartDate}`
+                    : encounterEndDate
+                    ? `Prise en charge après le ${encounterEndDate}`
                     : ''}
                 </Typography>
               }
@@ -192,6 +219,22 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                       : `Avant le ${startDate}`
                     : endDate
                     ? `Après le ${endDate}`
+                    : ''}
+                </Typography>
+              }
+            />
+          ),
+          (encounterStartDate || encounterEndDate) && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>
+                  {encounterStartDate
+                    ? encounterEndDate
+                      ? `Prise en charge entre le ${encounterStartDate} et le ${encounterEndDate}`
+                      : `Prise en charge avant le ${encounterStartDate}`
+                    : encounterEndDate
+                    ? `Prise en charge après le ${encounterEndDate}`
                     : ''}
                 </Typography>
               }
@@ -271,6 +314,22 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                       : `Avant le ${startDate}`
                     : endDate
                     ? `Après le ${endDate}`
+                    : ''}
+                </Typography>
+              }
+            />
+          ),
+          (encounterStartDate || encounterEndDate) && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>
+                  {encounterStartDate
+                    ? encounterEndDate
+                      ? `Prise en charge entre le ${encounterStartDate} et le ${encounterEndDate}`
+                      : `Prise en charge avant le ${encounterStartDate}`
+                    : encounterEndDate
+                    ? `Prise en charge après le ${encounterEndDate}`
                     : ''}
                 </Typography>
               }
@@ -431,6 +490,22 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                       : `Avant le ${startDate},`
                     : endDate
                     ? `Après le ${endDate}`
+                    : ''}
+                </Typography>
+              }
+            />
+          ),
+          (encounterStartDate || encounterEndDate) && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>
+                  {encounterStartDate
+                    ? encounterEndDate
+                      ? `Prise en charge entre le ${encounterStartDate} et le ${encounterEndDate}`
+                      : `Prise en charge avant le ${encounterStartDate}`
+                    : encounterEndDate
+                    ? `Prise en charge après le ${encounterEndDate}`
                     : ''}
                 </Typography>
               }
