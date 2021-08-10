@@ -149,7 +149,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
           <TableCell>
             <Grid container alignItems="center" wrap="nowrap">
               <UserIcon height="25px" fill="#5BC5F2" className={classes.iconMargin} />
-              <Typography>{row.IPP}</Typography>
+              {deidentified ? <Typography>{row.idPatient}</Typography> : <Typography>{row.IPP}</Typography>}
               <IconButton
                 onClick={() => history.push(`/patients/${row.idPatient}${groupId ? `?groupId=${groupId}` : ''}`)}
                 className={classes.searchIcon}
