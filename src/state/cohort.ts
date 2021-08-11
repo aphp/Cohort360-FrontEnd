@@ -47,9 +47,10 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, void, { state: Root
   async (DO_NOT_USE, { getState }) => {
     try {
       const state = getState().cohort
+      const providerId = getState().me?.id ?? '0'
 
       const oldProjectList = state.cohortsList || []
-      const cohorts = (await fetchCohortsList()) || []
+      const cohorts = (await fetchCohortsList(+providerId)) || []
 
       if (state.count === cohorts.count) {
         return {
@@ -62,7 +63,7 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, void, { state: Root
       let cohortList = cohorts.results || []
       // cohortList.length <= 100, check fetchCohortsList() for more information
       if (cohorts.count > cohortList.length) {
-        const newResult = await fetchCohortsList(cohorts.count - cohortList.length, cohortList.length)
+        const newResult = await fetchCohortsList(+providerId, cohorts.count - cohortList.length, cohortList.length)
         // Add elements to cohortList array and filter doublon
         cohortList = [...cohortList, ...(newResult.results || [])]
         cohortList = cohortList.filter((item, index, array) => {

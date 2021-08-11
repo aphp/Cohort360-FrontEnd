@@ -1,4 +1,6 @@
+// @ts-nocheck
 import apiBack from './apiBackCohort'
+import apiFhir from './api'
 import { CONTEXT } from '../constants'
 
 /**
@@ -303,7 +305,7 @@ export const deleteRequest = async (deletedRequest: RequestType) => {
 /**
  * Cohorts:
  *  - CohortType
- *  - fetchCohortsList : (limit = 100, offset = 0) => response.data
+ *  - fetchCohortsList : (providerId, limit = 100, offset = 0) => response.data
  *  - addCohort : (newCohort: CohortType) => response.data
  *  - editCohort : (editedCohort: CohortType) => response.data
  *  - deleteCohort : (deletedCohort: CohortType) => response.data
@@ -326,9 +328,19 @@ export type CohortType = {
   result_size?: number
   created_at?: string
   modified_at?: string
+  extension?: any[]
 }
 
-export const fetchCohortsList = async (limit = 100, offset = 0) => {
+export const fetchCohortsList: (
+  providerId: number | null,
+  limit?: number,
+  offset?: number
+) => Promise<{
+  count: number
+  next: string | null
+  previous: string | null
+  results: CohortType[]
+}> = async (providerId = null, limit = 100, offset = 0) => {
   try {
     let search = `?`
     if (limit) {
@@ -345,7 +357,37 @@ export const fetchCohortsList = async (limit = 100, offset = 0) => {
       results: CohortType[]
     }>(`/explorations/cohorts/${search}`)) ?? { data: { results: [] } }
 
-    return data
+    let cohortList = data.results
+
+    // Recupere les droits
+    let rightResponses = await Promise.all(
+      cohortList.map((cohortItem) =>
+        new Promise((resolve) => {
+          resolve(apiFhir.get(`/Group?_list=${cohortItem.fhir_group_id}&provider=${providerId}`))
+        }).catch((error) => {
+          return error
+        })
+      )
+    )
+    // Re-organise l'objet rightResponses
+    rightResponses = rightResponses.map(
+      (rightResponse: any) =>
+        rightResponse?.data?.entry && rightResponse?.data?.entry[0] && rightResponse?.data?.entry[0].resource
+    )
+    // Affecte les droits à chaque cohortItem
+    cohortList = cohortList.map((cohortItem) => ({
+      ...cohortItem,
+      extension: (
+        rightResponses.find(
+          (rightResponse: any) => +(rightResponse?.id ?? '1') === +(cohortItem.fhir_group_id ?? '0')
+        ) || { extension: [] }
+      ).extension
+    }))
+
+    return {
+      ...data,
+      results: cohortList
+    }
   } catch (error) {
     console.error(error)
     throw error

@@ -265,14 +265,16 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                     >
                       Modifier
                     </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        setAnchorEl(null)
-                        setOpenModal('export')
-                      }}
-                    >
-                      Exporter
-                    </MenuItem>
+                    {dashboard.canMakeExport && (
+                      <MenuItem
+                        onClick={() => {
+                          setAnchorEl(null)
+                          setOpenModal('export')
+                        }}
+                      >
+                        Exporter
+                      </MenuItem>
+                    )}
                     <MenuItem
                       onClick={() => {
                         setAnchorEl(null)

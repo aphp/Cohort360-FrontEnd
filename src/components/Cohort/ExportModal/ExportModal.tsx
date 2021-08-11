@@ -155,8 +155,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       </DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Pour effectuer un export de données, veillez renseigner un motif, selectionner les tables que vous voulez
-          exporter et accepter les conditions de l'entrepôt de données (EDS). <br />
+          Pour effectuer un export de données, veuillez renseigner un motif, selectionner uniquement les tables que vous
+          voulez exporter et accepter les conditions de l'entrepôt de données de santé (EDS). <br />
           Tous les champs sont obligatoires
         </DialogContentText>
 
@@ -231,8 +231,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
           <Typography variant="caption">
             Le niveau d’habilitation dont vous disposez dans Cohort360 vous autorise à exporter des données à caractère
             personnel conformément à la réglementation et aux règles institutionnelles d’utilisation des données du
-            Système d’Information du domaine Patient de l’AP-HP. Vous êtes garant des données exportées et vous engagez
-            à :
+            Système d’Information clinique de l’AP-HP. Vous êtes garant des données exportées et vous vous engagez à :
           </Typography>
 
           <FormControlLabel

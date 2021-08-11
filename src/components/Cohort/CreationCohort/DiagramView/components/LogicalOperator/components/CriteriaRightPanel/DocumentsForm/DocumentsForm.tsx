@@ -14,7 +14,8 @@ import {
   Switch,
   Typography,
   TextField,
-  Select
+  Select,
+  Checkbox
 } from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
@@ -79,7 +80,8 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
           : null
         return {
           id: docType.id,
-          label: docType.label ? docType.label : criteriaDocType?.label ?? '?'
+          label: docType.label ? docType.label : criteriaDocType?.label ?? '?',
+          type: docType.type
         }
       })
     : []
@@ -171,6 +173,52 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             value={defaultValuesDocType}
             onChange={(e, value) => _onChangeValue('docType', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Type de document" />}
+            groupBy={(doctype) => doctype.type}
+            disableCloseOnSelect
+            renderGroup={(docType: any) => {
+              const currentDocTypeList = criteria?.data?.docTypes
+                ? criteria?.data?.docTypes.filter((doc: any) => doc.type === docType.group)
+                : []
+              const currentSelectedDocTypeList = defaultValuesDocType
+                ? defaultValuesDocType.filter((doc: any) => doc.type === docType.group)
+                : []
+
+              const onClick = () => {
+                if (currentDocTypeList.length === currentSelectedDocTypeList.length) {
+                  _onChangeValue(
+                    'docType',
+                    defaultValuesDocType.filter((doc: any) => doc.type !== docType.group)
+                  )
+                } else {
+                  _onChangeValue(
+                    'docType',
+                    [...defaultValuesDocType, ...currentDocTypeList].filter(
+                      (item, index, array) => array.indexOf(item) === index
+                    )
+                  )
+                }
+              }
+
+              return (
+                <React.Fragment>
+                  <Grid container direction="row" alignItems="center">
+                    <Checkbox
+                      indeterminate={
+                        currentDocTypeList.length !== currentSelectedDocTypeList.length &&
+                        currentSelectedDocTypeList.length > 0
+                      }
+                      color="primary"
+                      checked={currentDocTypeList.length === currentSelectedDocTypeList.length}
+                      onClick={onClick}
+                    />
+                    <Typography onClick={onClick} noWrap style={{ cursor: 'pointer', width: 'calc(100% - 150px' }}>
+                      {docType.group}
+                    </Typography>
+                  </Grid>
+                  {docType.children}
+                </React.Fragment>
+              )
+            }}
           />
 
           <FormLabel style={{ padding: '0 1em 8px' }} component="legend">

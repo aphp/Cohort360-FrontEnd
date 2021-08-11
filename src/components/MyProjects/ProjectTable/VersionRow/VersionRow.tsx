@@ -53,6 +53,16 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
     dispatch<any>(setSelectedCohort(cohortId))
   }
 
+  // You can make an export if you got 1 cohort with read-deidentified = false && export-deidentified = false
+  const canMakeExport = cohorts.some((cohort) =>
+    cohort.extension && cohort.extension.length > 0
+      ? cohort.extension.find(
+          (extension) => extension.url === 'export-deidentified' && extension.valueBoolean === false
+        ) &&
+        cohort.extension.find((extension) => extension.url === 'read-deidentified' && extension.valueBoolean === false)
+      : false
+  )
+
   return (
     <Box className={classes.versionContainer}>
       <Typography variant="h6" gutterBottom component="div">
@@ -76,63 +86,90 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
                 Date
               </TableCell>
             </Hidden>
-            <TableCell align="center" style={{ width: 66 }}>
-              Exporter
-            </TableCell>
+            {canMakeExport && (
+              <TableCell align="center" style={{ width: 66 }}>
+                Exporter
+              </TableCell>
+            )}
           </TableRow>
         </TableHead>
         <TableBody>
           {cohorts && cohorts.length > 0 ? (
-            cohorts.map((historyRow) => (
-              <TableRow key={historyRow.uuid}>
-                <TableCell className={classes.tdName}>
-                  {historyRow.fhir_group_id ? (
-                    <Link href={`/cohort/${historyRow.fhir_group_id}`}>{historyRow.name}</Link>
-                  ) : (
-                    <Typography component="span" className={classes.notAllowed}>
-                      {historyRow.name}
-                    </Typography>
-                  )}
-                  <IconButton
-                    className={classes.editButon}
-                    size="small"
-                    onClick={() => _handleEditCohort(historyRow.uuid)}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                </TableCell>
-                <TableCell align="center">
-                  {historyRow.fhir_group_id ? (
-                    <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                  ) : historyRow.request_job_status === 'pending' || historyRow.request_job_status === 'started' ? (
-                    <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
-                  ) : historyRow.request_job_fail_msg ? (
-                    <Tooltip title={historyRow.request_job_fail_msg}>
+            cohorts.map((historyRow) => {
+              if (!historyRow) return <></>
+
+              const canExportThisCohort =
+                canMakeExport && historyRow.extension
+                  ? historyRow.extension.some(
+                      (extension) => extension.url === 'export-deidentified' && extension.valueBoolean === false
+                    ) &&
+                    historyRow.extension.some(
+                      (extension) => extension.url === 'read-deidentified' && extension.valueBoolean === false
+                    )
+                  : false
+
+              return (
+                <TableRow key={historyRow.uuid}>
+                  <TableCell className={classes.tdName}>
+                    {historyRow.fhir_group_id ? (
+                      <Link href={`/cohort/${historyRow.fhir_group_id}`}>{historyRow.name}</Link>
+                    ) : (
+                      <Typography component="span" className={classes.notAllowed}>
+                        {historyRow.name}
+                      </Typography>
+                    )}
+                    <IconButton
+                      className={classes.editButon}
+                      size="small"
+                      onClick={() => _handleEditCohort(historyRow.uuid)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </TableCell>
+                  <TableCell align="center">
+                    {historyRow.fhir_group_id ? (
+                      <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
+                    ) : historyRow.request_job_status === 'pending' || historyRow.request_job_status === 'started' ? (
+                      <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
+                    ) : historyRow.request_job_fail_msg ? (
+                      <Tooltip title={historyRow.request_job_fail_msg}>
+                        <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
+                      </Tooltip>
+                    ) : (
                       <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
-                    </Tooltip>
-                  ) : (
-                    <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
+                    )}
+                  </TableCell>
+                  <TableCell align="center">
+                    <Link
+                      className={classes.versionLabel}
+                      href={`/cohort/new/${requestId}/${historyRow.request_query_snapshot}`}
+                    >
+                      {historyRow.request_query_snapshot?.split('-')[0]}
+                    </Link>
+                  </TableCell>
+                  <TableCell align="center">{displayDigit(historyRow.result_size ?? 0)}</TableCell>
+                  <Hidden mdDown>
+                    <TableCell align="center">
+                      {moment(historyRow.modified_at).format('DD/MM/YYYY [à] HH:mm')}
+                    </TableCell>
+                  </Hidden>
+                  {canMakeExport && (
+                    <TableCell align="center">
+                      <IconButton
+                        disabled={!canExportThisCohort}
+                        onClick={
+                          canExportThisCohort
+                            ? () => setSelectedExportableCohort(historyRow.fhir_group_id ?? '')
+                            : () => null
+                        }
+                      >
+                        <ExportIcon />
+                      </IconButton>
+                    </TableCell>
                   )}
-                </TableCell>
-                <TableCell align="center">
-                  <Link
-                    className={classes.versionLabel}
-                    href={`/cohort/new/${requestId}/${historyRow.request_query_snapshot}`}
-                  >
-                    {historyRow.request_query_snapshot?.split('-')[0]}
-                  </Link>
-                </TableCell>
-                <TableCell align="center">{displayDigit(historyRow.result_size ?? 0)}</TableCell>
-                <Hidden mdDown>
-                  <TableCell align="center">{moment(historyRow.modified_at).format('DD/MM/YYYY [à] HH:mm')}</TableCell>
-                </Hidden>
-                <TableCell align="center">
-                  <IconButton onClick={() => setSelectedExportableCohort(historyRow.fhir_group_id ?? '')}>
-                    <ExportIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))
+                </TableRow>
+              )
+            })
           ) : (
             <TableRow>
               <TableCell colSpan={6}>
