@@ -56,7 +56,7 @@ const Accueil: React.FC = () => {
     let interval: any = null
 
     const pendingCohorts = [...favoriteCohorts, ...lastCohorts].filter(
-      ({ jobStatus }) => jobStatus === 'pending' || jobStatus === 'started'
+      ({ fhir_group_id, jobStatus }) => !fhir_group_id && (jobStatus === 'pending' || jobStatus === 'started')
     )
 
     if (pendingCohorts && pendingCohorts.length > 0) {

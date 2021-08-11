@@ -507,4 +507,34 @@ const fetchDocuments = async (
   }
 }
 
-export { fetchCohort, fetchPatientList, fetchDocuments }
+const fetchCohortExportRight = async (cohortId: string, providerId: string) => {
+  try {
+    const rightResponse = await api.get(`/Group?_list=${cohortId}&provider=${providerId}`)
+
+    if (
+      rightResponse &&
+      rightResponse.data &&
+      rightResponse.data.entry &&
+      rightResponse.data.entry[0] &&
+      rightResponse.data.entry[0].resource
+    ) {
+      const currentCohortItem = rightResponse.data.entry[0].resource
+      const canMakeExport =
+        currentCohortItem.extension && currentCohortItem.extension.length > 0
+          ? currentCohortItem.extension.some(
+              (extension: any) => extension.url === 'export-deidentified' && extension.valueBoolean === false
+            ) &&
+            currentCohortItem.extension.some(
+              (extension: any) => extension.url === 'read-deidentified' && extension.valueBoolean === false
+            )
+          : false
+      return canMakeExport
+    }
+    return false
+  } catch (error) {
+    console.error('Error (fetchCohortExportRight) :', error)
+    return false
+  }
+}
+
+export { fetchCohort, fetchPatientList, fetchDocuments, fetchCohortExportRight }

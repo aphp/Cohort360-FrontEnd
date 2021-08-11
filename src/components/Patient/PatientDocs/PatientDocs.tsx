@@ -205,8 +205,6 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
     }
   }
 
-  console.log('selectedDocTypes :>> ', selectedDocTypes)
-
   return (
     <Grid container item xs={11} justify="flex-end" className={classes.documentTable}>
       <Grid container justify="space-between" alignItems="center">
