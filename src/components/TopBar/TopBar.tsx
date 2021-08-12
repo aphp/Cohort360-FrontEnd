@@ -54,8 +54,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   const classes = useStyles()
   const dispatch = useDispatch()
 
-  const { dashboard } = useAppSelector((state) => ({
-    dashboard: state.exploredCohort
+  const { dashboard, cohortList } = useAppSelector((state) => ({
+    dashboard: state.exploredCohort,
+    cohortList: state.cohort.cohortsList
   }))
   const [isExtended, onExtend] = useState(false)
   const [openModal, setOpenModal] = useState<'' | 'edit' | 'export' | 'delete'>('')
@@ -258,7 +259,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                     <MenuItem
                       onClick={async () => {
                         setAnchorEl(null)
-                        await dispatch<any>(fetchCohortsList())
+                        if (!cohortList || (cohortList && cohortList.length === 0)) {
+                          await dispatch<any>(fetchCohortsList())
+                        }
                         await dispatch<any>(setSelectedCohort(dashboard.uuid ?? null))
                         setOpenModal('edit')
                       }}
