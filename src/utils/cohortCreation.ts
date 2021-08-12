@@ -82,10 +82,15 @@ type RequeteurCriteriaType = {
     timeDelayMin?: number
     timeDelayMax?: number
   }
-  dateRange?: {
+  dateRangeList?: {
     minDate?: string // YYYY-MM-DD
     maxDate?: string // YYYY-MM-DD
     datePreference?: 'event_date' | 'encounter_end-date' | 'encounter_start-date'
+    dateIsNotNull?: boolean
+  }[]
+  encounterRangeDate?: {
+    minDate?: string // YYYY-MM-DD
+    maxDate?: string // YYYY-MM-DD
     dateIsNotNull?: boolean
   }
 }
@@ -348,13 +353,29 @@ export function buildRequest(
                   operator: item?.occurrenceComparator
                 }
               : undefined,
-          dateRange:
+          dateRangeList:
             !(item.type === 'Patient' || item.type === 'Encounter') && (item.startOccurrence || item.endOccurrence)
+              ? [
+                  {
+                    minDate: item.startOccurrence
+                      ? moment(item.startOccurrence).format('YYYY-MM-DD[T00:00:00Z]')
+                      : undefined,
+                    maxDate: item.endOccurrence
+                      ? moment(item.endOccurrence).format('YYYY-MM-DD[T00:00:00Z]')
+                      : undefined
+                  }
+                ]
+              : undefined,
+          encounterRangeDate:
+            !(item.type === 'Patient' || item.type === 'Encounter') &&
+            (item.encounterStartDate || item.encounterEndDate)
               ? {
-                  minDate: item.startOccurrence
-                    ? moment(item.startOccurrence).format('YYYY-MM-DD[T00:00:00Z]')
+                  minDate: item.encounterStartDate
+                    ? moment(item.encounterStartDate).format('YYYY-MM-DD[T00:00:00Z]')
                     : undefined,
-                  maxDate: item.endOccurrence ? moment(item.endOccurrence).format('YYYY-MM-DD[T00:00:00Z]') : undefined
+                  maxDate: item.encounterEndDate
+                    ? moment(item.encounterEndDate).format('YYYY-MM-DD[T00:00:00Z]')
+                    : undefined
                 }
               : undefined
         }
@@ -721,9 +742,14 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
         }
 
-        if (element.dateRange) {
-          currentCriterion.startOccurrence = element.dateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.dateRangeList) {
+          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+        }
+
+        if (element.encounterRangeDate) {
+          currentCriterion.encounterStartDate = element.encounterRangeDate.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterRangeDate.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -786,9 +812,14 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
         }
 
-        if (element.dateRange) {
-          currentCriterion.startOccurrence = element.dateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.dateRangeList) {
+          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+        }
+
+        if (element.encounterRangeDate) {
+          currentCriterion.encounterStartDate = element.encounterRangeDate.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterRangeDate.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -847,9 +878,14 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
         }
 
-        if (element.dateRange) {
-          currentCriterion.startOccurrence = element.dateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.dateRangeList) {
+          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+        }
+
+        if (element.encounterRangeDate) {
+          currentCriterion.encounterStartDate = element.encounterRangeDate.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterRangeDate.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -897,9 +933,14 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
         }
 
-        if (element.dateRange) {
-          currentCriterion.startOccurrence = element.dateRange.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.endOccurrence = element.dateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.dateRangeList) {
+          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+        }
+
+        if (element.encounterRangeDate) {
+          currentCriterion.encounterStartDate = element.encounterRangeDate.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterRangeDate.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {

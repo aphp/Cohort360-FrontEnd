@@ -314,6 +314,8 @@ export type CcamDataType = {
   type: 'Procedure'
   hierarchy: undefined
   code: { id: string; label: string }[] | null
+  encounterEndDate: Date | null
+  encounterStartDate: Date | null
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
@@ -327,6 +329,8 @@ export type Cim10DataType = {
   type: 'Condition'
   code: { id: string; label: string }[] | null
   diagnosticType: { id: string; label: string }[] | null
+  encounterEndDate: Date | null
+  encounterStartDate: Date | null
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
@@ -350,6 +354,8 @@ export type DocumentDataType = {
   type: 'Composition'
   search: string
   docType: { id: string; label: string }[] | null
+  encounterEndDate: Date | null
+  encounterStartDate: Date | null
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   startOccurrence: Date | null
@@ -361,6 +367,8 @@ export type GhmDataType = {
   title: string
   type: 'Claim'
   code: { id: string; label: string }[] | null
+  encounterEndDate: Date | null
+  encounterStartDate: Date | null
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
