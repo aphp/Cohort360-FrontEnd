@@ -27,10 +27,10 @@ export const createExport = async (args: createExportProps) => {
         })
     ])
 
-    if (exportResponse && exportResponse[0] && exportResponse[0].status !== 200) {
+    if (exportResponse && exportResponse[0] && exportResponse[0].status !== 201) {
       return { error: exportResponse[0] && exportResponse[0].response.data }
     } else {
-      return exportResponse[0] && exportResponse[0].response.data
+      return exportResponse[0] && exportResponse[0].data
     }
   } catch (error) {
     return { error }
