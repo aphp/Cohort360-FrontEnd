@@ -16,7 +16,6 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
 import IconButton from '@material-ui/core/IconButton'
-import Switch from '@material-ui/core/Switch'
 import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
 
@@ -32,16 +31,8 @@ import { createExport } from 'services/export'
 
 const initialState = {
   motif: '',
-  conditions: {
-    necessary: false,
-    restricted: false,
-    hardware: false,
-    destruction: false,
-    not_communicate: false,
-    inform: false,
-    cnil: false
-  },
-  tables: export_table.map(({ table_id }) => table_id)
+  conditions: false,
+  tables: []
 }
 const ERROR_MOTIF: 'ERROR_MOTIF' = 'ERROR_MOTIF'
 const ERROR_CONDITION: 'ERROR_CONDITION' = 'ERROR_CONDITION'
@@ -59,15 +50,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   const [exportResponse, setExportResponse] = useState<{ status: 'error' | 'finish'; detail: any } | null>(null)
   const [error, setError] = useState<typeof ERROR_MOTIF | typeof ERROR_CONDITION | typeof ERROR_TABLE | null>(null)
 
-  const conditions: boolean =
-    !!settings?.conditions?.necessary &&
-    !!settings?.conditions?.restricted &&
-    !!settings?.conditions?.hardware &&
-    !!settings?.conditions?.destruction &&
-    !!settings?.conditions?.not_communicate &&
-    !!settings?.conditions?.inform &&
-    !!settings?.conditions?.cnil
-
   useEffect(() => {
     setSettings(initialState)
   }, [open])
@@ -84,61 +66,20 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     handleChangeSettings('tables', existingTableIds)
   }
 
-  const handleChangeSettings = (
-    key:
-      | 'motif'
-      | 'conditions.necessary'
-      | 'conditions.restricted'
-      | 'conditions.hardware'
-      | 'conditions.destruction'
-      | 'conditions.not_communicate'
-      | 'conditions.inform'
-      | 'conditions.cnil'
-      | 'tables',
-    value: any
-  ) => {
+  const handleChangeSettings = (key: 'motif' | 'conditions' | 'tables', value: any) => {
     setError(null)
-    switch (key) {
-      case 'conditions.necessary':
-      case 'conditions.restricted':
-      case 'conditions.hardware':
-      case 'conditions.destruction':
-      case 'conditions.not_communicate':
-      case 'conditions.inform':
-      case 'conditions.cnil': {
-        const newKey = key.split('.')[1]
-        setSettings((prevState) => ({
-          ...prevState,
-          conditions: {
-            ...prevState.conditions,
-            [newKey]: value
-          }
-        }))
-        break
-      }
-      default:
-        setSettings((prevState) => ({
-          ...prevState,
-          [key]: value
-        }))
-        break
-    }
+    setSettings((prevState) => ({
+      ...prevState,
+      [key]: value
+    }))
   }
 
   const handleSubmit = async () => {
     settings.motif = settings?.motif ? settings?.motif.trim() : ''
 
-    const conditions: boolean =
-      !!settings?.conditions?.necessary &&
-      !!settings?.conditions?.restricted &&
-      !!settings?.conditions?.destruction &&
-      !!settings?.conditions?.not_communicate &&
-      !!settings?.conditions?.inform &&
-      !!settings?.conditions?.cnil
-
-    if (!settings?.motif || settings?.motif.length <= 10) {
+    if (!settings?.motif || settings?.motif.length < 10) {
       return setError(ERROR_MOTIF)
-    } else if (!conditions) {
+    } else if (!settings?.conditions) {
       return setError(ERROR_CONDITION)
     } else if (!settings?.tables || (settings?.tables && settings?.tables.length == 0)) {
       return setError(ERROR_TABLE)
@@ -216,6 +157,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               rows={3}
               rowsMax={5}
               value={settings.motif}
+              helperText="Le motif doit comporter au moins 10 caractères"
               variant="outlined"
               label="Motif de l'export"
               onChange={(e) => handleChangeSettings('motif', e.target.value)}
@@ -232,24 +174,17 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
             </Grid>
 
             <List className={classes.list}>
-              <ListItem className={classes.tableListElement}>
-                <ListItemText primary="Toutes les tables" />
-                <ListItemSecondaryAction>
-                  <Checkbox
-                    checked={settings.tables.length === export_table.length}
-                    indeterminate={settings.tables.length === export_table.length ? false : !!settings.tables.length}
-                    onChange={() =>
-                      handleChangeSettings(
-                        'tables',
-                        settings.tables.length ? [] : export_table.map(({ table_id }) => table_id)
-                      )
-                    }
-                  />
-                </ListItemSecondaryAction>
-              </ListItem>
               {export_table.map(({ table_name, table_id }) => (
                 <ListItem className={classes.tableListElement} key={table_id}>
-                  <ListItemText primary={table_name} />
+                  <ListItemText disableTypography>
+                    <Grid container direction="row" alignItems="center">
+                      <Typography variant="body1">{table_name} - </Typography>
+                      <Typography variant="body1" style={{ fontStyle: 'italic' }}>
+                        {table_id}
+                      </Typography>
+                    </Grid>
+                  </ListItemText>
+
                   <ListItemSecondaryAction>
                     <Checkbox
                       checked={!!settings.tables.find((tableId) => tableId === table_id)}
@@ -260,6 +195,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               ))}
             </List>
 
+            <Typography className={classes.tableTitle} variant="h6">
+              Conditions de l'EDS
+            </Typography>
+
             <Typography variant="caption">
               Le niveau d’habilitation dont vous disposez dans Cohort360 vous autorise à exporter des données à
               caractère personnel conformément à la réglementation et aux règles institutionnelles d’utilisation des
@@ -267,127 +206,50 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               engagez à :
             </Typography>
 
-            <FormControlLabel
-              control={
-                <Switch
-                  name="conditions-necessary"
-                  value={settings.conditions.necessary}
-                  onChange={() => handleChangeSettings('conditions.necessary', !settings.conditions.necessary)}
-                />
-              }
-              labelPlacement="end"
-              style={{ margin: '4px 0' }}
-              label={
-                <Typography variant="caption">
-                  N’exporter, parmi les catégories de données accessibles, que les données strictement nécessaires et
-                  pertinentes au regard des objectifs de la recherche
-                </Typography>
-              }
-            />
+            <Typography variant="caption" className={classes.conditionItem}>
+              N’exporter, parmi les catégories de données accessibles, que les données strictement nécessaires et
+              pertinentes au regard des objectifs de la recherche
+            </Typography>
+
+            <Typography variant="caption" className={classes.conditionItem}>
+              A stocker temporairement les données extraites sur un répertoire dont l’accès est techniquement restreint
+              aux personnes dûment habilitées et authentifiées, présentes dans les locaux du responsable de la
+              recherche.
+            </Typography>
+
+            <Typography variant="caption" className={classes.conditionItem}>
+              A ne pas utiliser du matériel ou des supports de stockage n’appartenant pas à l’AP-HP, à ne pas sortir les
+              données des locaux de l’AP-HP ou sur un support amovible emporté hors AP-HP.
+            </Typography>
+            <Typography variant="caption" className={classes.conditionItem}>
+              A procéder à la destruction de toutes données exportées, dès qu’il n’y a plus nécessité d’en disposer dans
+              le cadre de la recherche dans le périmètre concerné.
+            </Typography>
+
+            <Typography variant="caption" className={classes.conditionItem}>
+              A ne pas communiquer les données à des tiers non autorisés
+            </Typography>
+
+            <Typography variant="caption" className={classes.conditionItem}>
+              A informer les chefs de services des UF de Responsabilité où ont été collectées les données exportées
+            </Typography>
+
+            <Typography variant="caption" className={classes.conditionItem}>
+              A ne pas croiser les données avec tout autre jeu de données, sans autorisation auprès de la CNIL
+            </Typography>
 
             <FormControlLabel
               control={
-                <Switch
-                  name="conditions-restricted"
-                  value={settings.conditions.restricted}
-                  onChange={() => handleChangeSettings('conditions.restricted', !settings.conditions.restricted)}
+                <Checkbox
+                  name="conditions"
+                  checked={settings.conditions}
+                  onChange={() => handleChangeSettings('conditions', !settings.conditions)}
                 />
               }
               labelPlacement="end"
               style={{ margin: '4px 0' }}
               label={
-                <Typography variant="caption">
-                  A stocker temporairement les données extraites sur un répertoire dont l’accès est techniquement
-                  restreint aux personnes dûment habilitées et authentifiées, présentes dans les locaux du responsable
-                  de la recherche.
-                </Typography>
-              }
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  name="conditions-hardware"
-                  value={settings.conditions.hardware}
-                  onChange={() => handleChangeSettings('conditions.hardware', !settings.conditions.hardware)}
-                />
-              }
-              labelPlacement="end"
-              style={{ margin: '4px 0' }}
-              label={
-                <Typography variant="caption">
-                  A ne pas utiliser du matériel ou des supports de stockage n’appartenant pas à l’AP-HP, à ne pas sortir
-                  les données des locaux de l’AP-HP ou sur un support amovible emporté hors AP-HP.
-                </Typography>
-              }
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  name="conditions-destruction"
-                  value={settings.conditions.destruction}
-                  onChange={() => handleChangeSettings('conditions.destruction', !settings.conditions.destruction)}
-                />
-              }
-              labelPlacement="end"
-              style={{ margin: '4px 0' }}
-              label={
-                <Typography variant="caption">
-                  A procéder à la destruction de toutes données exportées, dès qu’il n’y a plus nécessité d’en disposer
-                  dans le cadre de la recherche dans le périmètre concerné.
-                </Typography>
-              }
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  name="conditions-not_communicate"
-                  value={settings.conditions.not_communicate}
-                  onChange={() =>
-                    handleChangeSettings('conditions.not_communicate', !settings.conditions.not_communicate)
-                  }
-                />
-              }
-              labelPlacement="end"
-              style={{ margin: '4px 0' }}
-              label={
-                <Typography variant="caption">A ne pas communiquer les données à des tiers non autorisés</Typography>
-              }
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  name="conditions-inform"
-                  value={settings.conditions.inform}
-                  onChange={() => handleChangeSettings('conditions.inform', !settings.conditions.inform)}
-                />
-              }
-              labelPlacement="end"
-              style={{ margin: '4px 0' }}
-              label={
-                <Typography variant="caption">
-                  A informer les chefs de services des UF de Responsabilité où ont été collectées les données exportées
-                </Typography>
-              }
-            />
-
-            <FormControlLabel
-              control={
-                <Switch
-                  name="conditions-cnil"
-                  value={settings.conditions.cnil}
-                  onChange={() => handleChangeSettings('conditions.cnil', !settings.conditions.cnil)}
-                />
-              }
-              labelPlacement="end"
-              style={{ margin: '4px 0' }}
-              label={
-                <Typography variant="caption">
-                  A ne pas croiser les données avec tout autre jeu de données, sans autorisation auprès de la CNIL
-                </Typography>
+                <Typography variant="caption">Je reconnais avoir lu et j'accepte les conditions ci-dessus</Typography>
               }
             />
           </FormGroup>
@@ -400,7 +262,13 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
         </Button>
         {exportResponse === null && (
           <Button
-            disabled={!cohortId || !settings.motif || !conditions || !settings.tables.length}
+            disabled={
+              !cohortId ||
+              !settings.motif ||
+              (settings.motif && settings.motif.length < 10) ||
+              !settings.conditions ||
+              !settings.tables.length
+            }
             onClick={handleSubmit}
             color="primary"
           >
