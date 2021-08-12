@@ -45,9 +45,9 @@ const ControlPanel: React.FC<{
   } = useAppSelector((state) => state.cohortCreation.request || {})
   const { includePatient /*byrequest, alive, deceased, female, male, unknownPatient */ } = count
 
-  const accessIsPseudonymize =
+  const accessIsPseudonymize: boolean | null =
     selectedPopulation === null
-      ? false
+      ? null
       : selectedPopulation.map((population) => population.access).filter((elem) => elem && elem === 'Pseudonymisé')
           .length > 0
 
@@ -101,6 +101,8 @@ const ControlPanel: React.FC<{
   }
 
   const itLoads = loading || countLoading || saveLoading
+
+  console.log('accessIsPseudonymize :>> ', accessIsPseudonymize)
 
   return (
     <>
@@ -172,7 +174,7 @@ const ControlPanel: React.FC<{
           <Grid container justify="space-between">
             <Typography className={clsx(classes.boldText, classes.patientTypo)}>ACCÈS:</Typography>
             <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
-              {accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
+              {accessIsPseudonymize === null ? '-' : accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
             </Typography>
           </Grid>
         </Grid>
