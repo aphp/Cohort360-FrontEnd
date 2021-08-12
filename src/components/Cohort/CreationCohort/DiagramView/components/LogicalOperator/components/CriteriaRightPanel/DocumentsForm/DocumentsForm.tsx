@@ -4,26 +4,22 @@ import { Alert } from '@material-ui/lab'
 import {
   Button,
   Divider,
-  FormControl,
   FormLabel,
   Grid,
-  Input,
-  InputLabel,
   IconButton,
-  MenuItem,
   Switch,
   Typography,
   TextField,
-  Select,
   Checkbox
 } from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import InfoIcon from '@material-ui/icons/Info'
-import ClearIcon from '@material-ui/icons/Clear'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import DocumentSearchHelp from 'components/DocumentSearchHelp/DocumentSearchHelp'
+
+import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
 
@@ -43,6 +39,8 @@ const defaultComposition: DocumentDataType = {
   docType: [],
   occurrence: 1,
   occurrenceComparator: '>=',
+  encounterEndDate: null,
+  encounterStartDate: null,
   startOccurrence: null,
   endOccurrence: null,
   isInclusive: true
@@ -221,77 +219,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             }}
           />
 
-          <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
-            Nombre d'occurrence
-          </FormLabel>
-
-          <Grid style={{ display: 'grid', gridTemplateColumns: '100px 1fr', alignItems: 'center', margin: '0 1em' }}>
-            <Select
-              style={{ marginRight: '1em' }}
-              id="criteria-occurrenceComparator-select"
-              value={defaultValues.occurrenceComparator}
-              onChange={(event) => _onChangeValue('occurrenceComparator', event.target.value as string)}
-              variant="outlined"
-            >
-              <MenuItem value="<=">{'<='}</MenuItem>
-              <MenuItem value="<">{'<'}</MenuItem>
-              <MenuItem value="=">{'='}</MenuItem>
-              <MenuItem value=">">{'>'}</MenuItem>
-              <MenuItem value=">=">{'>='}</MenuItem>
-            </Select>
-
-            <TextField
-              required
-              inputProps={{
-                min: 1
-              }}
-              type="number"
-              id="criteria-occurrence-required"
-              variant="outlined"
-              value={defaultValues.occurrence}
-              onChange={(e) => _onChangeValue('occurrence', e.target.value)}
-            />
-          </Grid>
-
-          <FormLabel style={{ padding: '1em 1em 0 1em' }} component="legend">
-            Date d'occurrence
-          </FormLabel>
-
-          <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-            <FormControl className={classes.inputItem}>
-              <InputLabel shrink htmlFor="date-start-occurrence">
-                Avant le
-              </InputLabel>
-              <Input
-                id="date-start-occurrence"
-                type="date"
-                value={defaultValues.startOccurrence}
-                endAdornment={
-                  <IconButton size="small" onClick={() => _onChangeValue('startOccurrence', '')}>
-                    <ClearIcon />
-                  </IconButton>
-                }
-                onChange={(e) => _onChangeValue('startOccurrence', e.target.value)}
-              />
-            </FormControl>
-
-            <FormControl className={classes.inputItem}>
-              <InputLabel shrink htmlFor="date-end-occurrence">
-                Après le
-              </InputLabel>
-              <Input
-                id="date-end-occurrence"
-                type="date"
-                value={defaultValues.endOccurrence}
-                endAdornment={
-                  <IconButton size="small" onClick={() => _onChangeValue('endOccurrence', '')}>
-                    <ClearIcon />
-                  </IconButton>
-                }
-                onChange={(e) => _onChangeValue('endOccurrence', e.target.value)}
-              />
-            </FormControl>
-          </Grid>
+          <AdvancedInputs form="document" selectedCriteria={defaultValues} onChangeValue={_onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
