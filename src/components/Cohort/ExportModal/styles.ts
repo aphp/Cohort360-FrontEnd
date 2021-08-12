@@ -22,6 +22,15 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 26,
       lineHeight: '22px'
     }
+  },
+  heading: {
+    fontWeight: theme.typography.fontWeightRegular
+  },
+  accordion: {
+    marginTop: 12,
+    '&::before': {
+      content: 'none'
+    }
   }
 }))
 

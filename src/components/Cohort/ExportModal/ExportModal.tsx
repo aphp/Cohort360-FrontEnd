@@ -18,8 +18,12 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
 import IconButton from '@material-ui/core/IconButton'
 import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
+import Accordion from '@material-ui/core/Accordion'
+import AccordionSummary from '@material-ui/core/AccordionSummary'
+import AccordionDetails from '@material-ui/core/AccordionDetails'
 
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import CancelIcon from '@material-ui/icons/Cancel'
 
 import InfoIcon from '@material-ui/icons/Info'
@@ -96,7 +100,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     } else {
       setExportResponse({ status: 'finish', detail: '' })
     }
-    // handleClose()
   }
 
   return (
@@ -121,6 +124,18 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
                 Une erreur est survenue lors de votre demande d'export. Veuillez{' '}
                 <a href="mailto:dsi-id-recherche-support-cohort360@aphp.fr">contacter le support</a> pour plus
                 d'informations
+                <Accordion id="reason-accordion" square className={classes.accordion}>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="reason-accordion"
+                    id="reason-accordion-summary"
+                  >
+                    <Typography className={classes.heading}>Motif :</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails id="reason-accordion-details">
+                    <Typography>{exportResponse.detail}</Typography>
+                  </AccordionDetails>
+                </Accordion>
               </DialogContentText>
             </Grid>
           )}
