@@ -417,7 +417,15 @@ export function buildRequest(
     version: REQUETEUR_VERSION,
     _type: 'request',
     sourcePopulation: {
-      caresiteCohortList: selectedPopulation?.map(({ id }) => +id)
+      caresiteCohortList: selectedPopulation?.map((_selectedPopulation: any) =>
+        _selectedPopulation.extension
+          ? (
+              _selectedPopulation.extension.find((extension: any) => extension.url === 'cohort-id') ?? {
+                valueInteger: 0
+              }
+            ).valueInteger
+          : null
+      )
     },
     request: !mainCriteriaGroups
       ? undefined
