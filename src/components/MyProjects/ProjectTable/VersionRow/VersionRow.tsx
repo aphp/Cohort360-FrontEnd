@@ -22,8 +22,7 @@ import ExportIcon from '@material-ui/icons/GetApp'
 
 import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 
-import { useAppSelector } from 'state'
-import { CohortState, setSelectedCohort } from 'state/cohort'
+import { setSelectedCohort } from 'state/cohort'
 
 import { CohortType } from 'services/myProjects'
 
@@ -31,17 +30,9 @@ import displayDigit from 'utils/displayDigit'
 
 import useStyles from '../styles'
 
-const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
+const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = ({ requestId, cohortsList }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
-  const { cohortState } = useAppSelector<{
-    cohortState: CohortState
-  }>((state) => ({
-    cohortState: state.cohort || {}
-  }))
-
-  const { cohortsList = [] } = cohortState
-
   const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<null | string>(null)
 
   const cohorts: CohortType[] =
@@ -53,7 +44,7 @@ const VersionRow: React.FC<{ requestId: string }> = ({ requestId }) => {
     dispatch<any>(setSelectedCohort(cohortId))
   }
 
-  // You can make an export if you got 1 cohort with read-deidentified = false && export-deidentified = false
+  // You can make an export if you got 1 cohort with: read-deidentified = false && export-deidentified = false
   const canMakeExport = cohorts.some((cohort) =>
     cohort.extension && cohort.extension.length > 0
       ? cohort.extension.find(
