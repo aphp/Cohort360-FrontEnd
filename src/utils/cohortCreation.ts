@@ -457,7 +457,8 @@ export async function unbuildRequest(_json: string) {
    */
   for (const caresiteCohortItem of caresiteCohortList) {
     const newPopulation = await fetchPopulation(caresiteCohortItem ?? '')
-    population = population ? [...population, ...newPopulation] : newPopulation
+    if (!newPopulation) continue
+    population = population ? [...population, newPopulation] : [newPopulation]
   }
 
   /**
@@ -501,86 +502,81 @@ export async function unbuildRequest(_json: string) {
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
-            if (key === '_list') {
-              population = await fetchPopulation(value ?? '')
-              return
-            } else {
-              currentCriterion.title = 'Critère démographique'
-              currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
-              currentCriterion.years = currentCriterion.years ? currentCriterion.years : null
-              currentCriterion.gender = currentCriterion.gender ? currentCriterion.gender : []
-              currentCriterion.vitalStatus = currentCriterion.vitalStatus ? currentCriterion.vitalStatus : []
-              switch (key) {
-                case PATIENT_BIRTHDATE: {
-                  currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
-                  currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
-                  const ageType = [
-                    { id: 'year', label: 'années' },
-                    { id: 'month', label: 'mois' },
-                    { id: 'day', label: 'jours' }
-                  ]
+            currentCriterion.title = 'Critère démographique'
+            currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
+            currentCriterion.years = currentCriterion.years ? currentCriterion.years : null
+            currentCriterion.gender = currentCriterion.gender ? currentCriterion.gender : []
+            currentCriterion.vitalStatus = currentCriterion.vitalStatus ? currentCriterion.vitalStatus : []
+            switch (key) {
+              case PATIENT_BIRTHDATE: {
+                currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
+                currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
+                const ageType = [
+                  { id: 'year', label: 'années' },
+                  { id: 'month', label: 'mois' },
+                  { id: 'day', label: 'jours' }
+                ]
 
-                  if (value?.search('ge') === 0) {
-                    const date = value?.replace('ge', '') ? moment(value?.replace('ge', ''), 'YYYY-MM-DD') : null
-                    const diff = date ? moment().diff(date, 'days') : 0
+                if (value?.search('ge') === 0) {
+                  const date = value?.replace('ge', '') ? moment(value?.replace('ge', ''), 'YYYY-MM-DD') : null
+                  const diff = date ? moment().diff(date, 'days') : 0
 
-                    let currentAgeType: 'year' | 'month' | 'day' = 'year'
+                  let currentAgeType: 'year' | 'month' | 'day' = 'year'
+                  if (diff >= 130 && diff <= 3000) {
+                    currentAgeType = 'month'
+                  } else if (diff <= 130) {
+                    currentAgeType = 'day'
+                  }
+
+                  const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
+                  currentCriterion.ageType = foundAgeType
+                  if (date) currentCriterion.years[1] = moment().diff(date, currentAgeType) || 130
+                } else if (value?.search('le') === 0) {
+                  const date = value?.replace('le', '') ? moment(value?.replace('le', ''), 'YYYY-MM-DD') : null
+                  const diff = date ? moment().diff(date, 'days') : 0
+
+                  let currentAgeType: 'year' | 'month' | 'day' = 'year'
+                  if (currentCriterion.ageType) {
+                    currentAgeType = currentCriterion.ageType.id
+                  } else {
                     if (diff >= 130 && diff <= 3000) {
                       currentAgeType = 'month'
                     } else if (diff <= 130) {
                       currentAgeType = 'day'
                     }
-
                     const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
-                    currentCriterion.ageType = foundAgeType
-                    if (date) currentCriterion.years[1] = moment().diff(date, currentAgeType) || 130
-                  } else if (value?.search('le') === 0) {
-                    const date = value?.replace('le', '') ? moment(value?.replace('le', ''), 'YYYY-MM-DD') : null
-                    const diff = date ? moment().diff(date, 'days') : 0
-
-                    let currentAgeType: 'year' | 'month' | 'day' = 'year'
-                    if (currentCriterion.ageType) {
-                      currentAgeType = currentCriterion.ageType.id
-                    } else {
-                      if (diff >= 130 && diff <= 3000) {
-                        currentAgeType = 'month'
-                      } else if (diff <= 130) {
-                        currentAgeType = 'day'
-                      }
-                      const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
-                      currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : foundAgeType
-                    }
-                    currentCriterion.years[0] = moment().diff(date, currentAgeType) || 0
+                    currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : foundAgeType
                   }
-                  break
+                  currentCriterion.years[0] = moment().diff(date, currentAgeType) || 0
                 }
-                case PATIENT_GENDER: {
-                  const genderIds = value?.split(',')
-                  const newGenderIds = genderIds?.map((docTypeId: any) => ({ id: docTypeId }))
-                  if (!newGenderIds) continue
-
-                  currentCriterion.gender = currentCriterion.gender
-                    ? [...currentCriterion.gender, ...newGenderIds]
-                    : newGenderIds
-                  break
-                }
-                case PATIENT_DECEASED: {
-                  const vitalStatusIds = value?.split(',')
-
-                  // Warning with `id: vitalStatusId === 'true'` ....
-                  const newVitalStatusIds = vitalStatusIds?.map((vitalStatusId: any) => ({
-                    id: vitalStatusId === 'true'
-                  }))
-                  if (!newVitalStatusIds) continue
-
-                  currentCriterion.vitalStatus = currentCriterion.vitalStatus
-                    ? [...currentCriterion.vitalStatus, ...newVitalStatusIds]
-                    : newVitalStatusIds
-                  break
-                }
-                default:
-                  break
+                break
               }
+              case PATIENT_GENDER: {
+                const genderIds = value?.split(',')
+                const newGenderIds = genderIds?.map((docTypeId: any) => ({ id: docTypeId }))
+                if (!newGenderIds) continue
+
+                currentCriterion.gender = currentCriterion.gender
+                  ? [...currentCriterion.gender, ...newGenderIds]
+                  : newGenderIds
+                break
+              }
+              case PATIENT_DECEASED: {
+                const vitalStatusIds = value?.split(',')
+
+                // Warning with `id: vitalStatusId === 'true'` ....
+                const newVitalStatusIds = vitalStatusIds?.map((vitalStatusId: any) => ({
+                  id: vitalStatusId === 'true'
+                }))
+                if (!newVitalStatusIds) continue
+
+                currentCriterion.vitalStatus = currentCriterion.vitalStatus
+                  ? [...currentCriterion.vitalStatus, ...newVitalStatusIds]
+                  : newVitalStatusIds
+                break
+              }
+              default:
+                break
             }
           }
         }

@@ -56,20 +56,15 @@ export const getPerimeters = async (practitionerId: string) => {
     )
     if (!perimetersIds || perimetersIds?.length === 0) return undefined
 
-    let organizationApiUrls: string[] = []
-    for (const perimetersId of perimetersIds) {
-      organizationApiUrls = [...organizationApiUrls, `/Organization?_id=${perimetersId}&_elements=name,extension`]
-    }
+    const organisationResult = await api.get(`/Organization?_id=${perimetersIds}&_elements=name,extension`)
+    const organisationData: any[] = organisationResult.data
+      ? organisationResult.data.entry && organisationResult.data.entry.length > 0
+        ? organisationResult.data.entry.map((entry: any) => entry.resource)
+        : null
+      : null
 
-    let organisationResult = await Promise.all(organizationApiUrls.map((apiUrl: string) => api.get(apiUrl)))
-    organisationResult = organisationResult
-      .map((organization: any) =>
-        organization.data ? (organization.data.entry ? organization.data.entry[0].resource : null) : null
-      )
-      .filter((elem) => elem !== null)
-
-    return organisationResult && organisationResult.length > 0
-      ? organisationResult.map((organization: any) => {
+    return organisationData && organisationData.length > 0
+      ? organisationData.map((organization: any) => {
           const organizationId = organization.id
           if (!organizationId) return organization
           const foundItem = practitionerRoleData?.find(
