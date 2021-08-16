@@ -102,8 +102,6 @@ const ControlPanel: React.FC<{
 
   const itLoads = loading || countLoading || saveLoading
 
-  console.log('accessIsPseudonymize :>> ', accessIsPseudonymize)
-
   return (
     <>
       <Grid className={classes.rightPanelContainerStyle}>
