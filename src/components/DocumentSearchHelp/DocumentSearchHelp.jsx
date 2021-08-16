@@ -466,7 +466,7 @@ const DocumentSearchHelp = ({ open, onClose }) => {
           </TableContainer>
 
           <Typography variant="button" className={classes.subtitle}>
-            Rechercher textuelle avancée
+            Recherche textuelle avancée
           </Typography>
 
           <TableContainer component={Paper} className={classes.tableContainer}>
