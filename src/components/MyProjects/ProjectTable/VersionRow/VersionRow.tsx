@@ -48,9 +48,9 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
   const canMakeExport = cohorts.some((cohort) =>
     cohort.extension && cohort.extension.length > 0
       ? cohort.extension.find(
-          (extension) => extension.url === 'export-deidentified' && extension.valueBoolean === false
+          (extension) => extension.url === 'export-deidentified' && extension.valueString === 'false'
         ) &&
-        cohort.extension.find((extension) => extension.url === 'read-deidentified' && extension.valueBoolean === false)
+        cohort.extension.find((extension) => extension.url === 'read-deidentified' && extension.valueString === 'false')
       : false
   )
 
