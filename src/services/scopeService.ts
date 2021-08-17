@@ -10,6 +10,8 @@ import {
 import { FHIR_API_Response, ScopeTreeRow } from '../types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
+import { MeState } from 'state/me'
+
 import fakeScopeRows from '../data/fakeData/scopeRows'
 
 const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
@@ -41,6 +43,7 @@ const getOrganizationServices = async (
 }
 
 export const getPerimeters = async (practitionerId: string) => {
+  console.log(`practitionerId`, practitionerId)
   if (CONTEXT === 'aphp') {
     const practitionerRole = await api.get<FHIR_API_Response<IPractitionerRole>>(
       `/PractitionerRole?practitioner=${practitionerId}&_elements=organization,extension`
@@ -51,9 +54,17 @@ export const getPerimeters = async (practitionerId: string) => {
     if (!data || data?.resourceType === 'OperationOutcome') return undefined
 
     const practitionerRoleData = getApiResponseResources(practitionerRole)
-    const perimetersIds: any[] | undefined = practitionerRoleData?.map(({ organization }) =>
-      organization?.reference?.replace(/^Organization\//, '')
-    )
+
+    const practitionerRoleHighPerimeter = data.meta?.extension?.length
+      ? data.meta?.extension?.find((extension) => extension.url === 'Practitioner Organization List')
+      : { extension: [] }
+    const rolesList: any[] | undefined = practitionerRoleHighPerimeter?.extension?.length
+      ? practitionerRoleHighPerimeter?.extension[0].extension?.length
+        ? practitionerRoleHighPerimeter?.extension[0].extension
+        : []
+      : []
+
+    const perimetersIds = rolesList.map(({ url }) => url)
     if (!perimetersIds || perimetersIds?.length === 0) return undefined
 
     const organisationResult = await api.get(`/Organization?_id=${perimetersIds}&_elements=name,extension`)
@@ -115,7 +126,9 @@ const getAccessName = (extension?: IExtension[]) => {
   }
 }
 
-export const getScopePerimeters = async (practitionerId: string): Promise<ScopeTreeRow[]> => {
+export const getScopePerimeters = async (practitioner: MeState): Promise<ScopeTreeRow[]> => {
+  const practitionerId = practitioner?.id ?? ''
+  console.log(`practitioner`, practitioner)
   if (CONTEXT === 'fakedata') {
     const scopeRows = fakeScopeRows as ScopeTreeRow[]
 
