@@ -37,7 +37,7 @@ const fetchScopesList = createAsyncThunk<FetchScopeListReturn, void, { state: Ro
       if (scopesList.length) {
         return { scopesList }
       } else {
-        const scopes = (await getScopePerimeters(me?.id || '')) || []
+        const scopes = (await getScopePerimeters(me)) || []
         return { scopesList: scopes }
       }
     } catch (error) {
