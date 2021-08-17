@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import moment from 'moment'
 import { useDispatch } from 'react-redux'
 
@@ -10,7 +10,7 @@ import EditIcon from '@material-ui/icons/Edit'
 
 import VersionRow from '../VersionRow/VersionRow'
 
-import { RequestType } from 'services/myProjects'
+import { RequestType, CohortType } from 'services/myProjects'
 
 import { setSelectedRequest } from 'state/request'
 
@@ -18,8 +18,10 @@ import useStyles from '../styles'
 
 type RequestRowProps = {
   row: RequestType
+  cohortsList: CohortType[]
+  isSearch?: boolean
 }
-const RequestRow: React.FC<RequestRowProps> = ({ row }) => {
+const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, isSearch }) => {
   const [open, setOpen] = React.useState(false)
   const classes = useStyles()
   const dispatch = useDispatch()
@@ -27,6 +29,15 @@ const RequestRow: React.FC<RequestRowProps> = ({ row }) => {
   const onEditRequest = (requestId: string) => {
     dispatch<any>(setSelectedRequest({ uuid: requestId, name: '' }))
   }
+
+  useEffect(() => {
+    if (isSearch) {
+      const hasCohorts = cohortsList.some(({ request }) => request === row.uuid)
+      setOpen(hasCohorts)
+    } else {
+      setOpen(false)
+    }
+  }, [isSearch, cohortsList])
 
   return (
     <Table>
@@ -54,7 +65,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row }) => {
         <TableRow>
           <TableCell style={{ padding: 0, borderBottomWidth: open ? 1 : 0 }} colSpan={5}>
             <Collapse in={open} timeout="auto" unmountOnExit style={{ width: '100%' }}>
-              <VersionRow requestId={row.uuid} />
+              <VersionRow requestId={row.uuid} cohortsList={cohortsList} />
             </Collapse>
           </TableCell>
         </TableRow>

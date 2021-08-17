@@ -11,7 +11,7 @@ import AddIcon from '@material-ui/icons/Add'
 
 import RequestRow from '../RequestRow/RequestRow'
 
-import { ProjectType, RequestType } from 'services/myProjects'
+import { ProjectType, RequestType, CohortType } from 'services/myProjects'
 
 import { setSelectedProject } from 'state/project'
 import { setSelectedRequest } from 'state/request'
@@ -21,8 +21,10 @@ import useStyles from '../styles'
 type ProjectRowProps = {
   row: ProjectType
   requestOfProject: RequestType[]
+  cohortsList: CohortType[]
+  searchInput?: string
 }
-const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject }) => {
+const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, cohortsList, searchInput }) => {
   const [open, setOpen] = React.useState(true)
   const classes = useStyles()
   const dispatch = useDispatch()
@@ -38,6 +40,9 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject }) => {
   const handleAddRequest = () => {
     dispatch<any>(setSelectedRequest({ uuid: '', name: '', parent_folder: row.uuid }))
   }
+
+  // eslint-disable-next-line
+  const regexp = new RegExp(`${(searchInput || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}`, 'gi')
 
   return (
     <React.Fragment>
@@ -76,7 +81,19 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject }) => {
         <TableCell style={{ padding: 0, borderBottomWidth: open ? 1 : 0 }} colSpan={4}>
           <Collapse in={open} timeout="auto" unmountOnExit style={{ width: '100%' }}>
             {requestOfProject && requestOfProject.length > 0 ? (
-              requestOfProject.map((request) => <RequestRow key={request.uuid} row={request} />)
+              requestOfProject.map((request) => (
+                <RequestRow
+                  key={request.uuid}
+                  row={request}
+                  cohortsList={cohortsList}
+                  isSearch={
+                    !!searchInput &&
+                    cohortsList.some(
+                      ({ name, ...cohortItem }) => name.search(regexp) !== -1 && cohortItem.request === request.uuid
+                    )
+                  }
+                />
+              ))
             ) : (
               <Typography className={classes.emptyRequestRow}>
                 Aucune requête n'est associée à ce projet de recherche
