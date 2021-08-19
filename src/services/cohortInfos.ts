@@ -522,10 +522,10 @@ const fetchCohortExportRight = async (cohortId: string, providerId: string) => {
       const canMakeExport =
         currentCohortItem.extension && currentCohortItem.extension.length > 0
           ? currentCohortItem.extension.some(
-              (extension: any) => extension.url === 'export-deidentified' && extension.valueBoolean === false
+              (extension: any) => extension.url === 'export-deidentified' && extension.valueString === 'false'
             ) &&
             currentCohortItem.extension.some(
-              (extension: any) => extension.url === 'read-deidentified' && extension.valueBoolean === false
+              (extension: any) => extension.url === 'read-deidentified' && extension.valueString === 'false'
             )
           : false
       return canMakeExport

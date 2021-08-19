@@ -379,9 +379,10 @@ export const fetchCohortsList: (
       ...cohortItem,
       extension: (
         rightResponses.find(
-          (rightResponse: any) => +(rightResponse?.id ?? '1') === +(cohortItem.fhir_group_id ?? '0')
-        ) || { extension: [] }
-      ).extension
+          (rightResponse: any) =>
+            +(rightResponse?.extension ? rightResponse?.extension[0].url : '1') === +(cohortItem.fhir_group_id ?? '0')
+        ) || { extension: [{ extension: [] }] }
+      ).extension[0].extension
     }))
 
     return {

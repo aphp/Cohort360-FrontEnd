@@ -6,7 +6,7 @@ import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstrai
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { docTypes } from 'assets/docTypes.json'
 
-const REQUETEUR_VERSION = 'v1.2.0'
+const REQUETEUR_VERSION = 'v1.2.1'
 
 const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
 const PATIENT_GENDER = 'gender' // ok
@@ -88,7 +88,7 @@ type RequeteurCriteriaType = {
     datePreference?: 'event_date' | 'encounter_end-date' | 'encounter_start-date'
     dateIsNotNull?: boolean
   }[]
-  encounterRangeDate?: {
+  encounterDateRange?: {
     minDate?: string // YYYY-MM-DD
     maxDate?: string // YYYY-MM-DD
     dateIsNotNull?: boolean
@@ -366,7 +366,7 @@ export function buildRequest(
                   }
                 ]
               : undefined,
-          encounterRangeDate:
+          encounterDateRange:
             !(item.type === 'Patient' || item.type === 'Encounter') &&
             (item.encounterStartDate || item.encounterEndDate)
               ? {
@@ -751,9 +751,9 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
-        if (element.encounterRangeDate) {
-          currentCriterion.encounterStartDate = element.encounterRangeDate.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterRangeDate.maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.encounterDateRange) {
+          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -821,9 +821,9 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
-        if (element.encounterRangeDate) {
-          currentCriterion.encounterStartDate = element.encounterRangeDate.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterRangeDate.maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.encounterDateRange) {
+          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -887,9 +887,9 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
-        if (element.encounterRangeDate) {
-          currentCriterion.encounterStartDate = element.encounterRangeDate.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterRangeDate.maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.encounterDateRange) {
+          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
@@ -942,9 +942,9 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
-        if (element.encounterRangeDate) {
-          currentCriterion.encounterStartDate = element.encounterRangeDate.minDate?.replace('T00:00:00Z', '') ?? null
-          currentCriterion.encounterEndDate = element.encounterRangeDate.maxDate?.replace('T00:00:00Z', '') ?? null
+        if (element.encounterDateRange) {
+          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
