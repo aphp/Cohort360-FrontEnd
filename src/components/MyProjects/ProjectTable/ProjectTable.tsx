@@ -79,11 +79,11 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput }) => {
       setSearchProjectList([])
       setSearchRequestList([])
     }
-  }, [searchInput])
+  }, [searchInput, projectsList, requestsList, cohortsList])
 
   useEffect(() => {
-    let newSearchRequestList = searchRequestList ? [...searchRequestList] : []
-    let newSearchProjectList = searchProjectList ? [...searchProjectList] : []
+    let newSearchProjectList = projectsList ? [...projectsList] : []
+    let newSearchRequestList = requestsList ? [...requestsList] : []
 
     switch (sortBy) {
       case 'name': {
@@ -134,7 +134,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput }) => {
       setSearchProjectList([])
       setSearchRequestList([])
     }
-  }, [sortBy, sortDirection])
+  }, [sortBy, sortDirection, projectsList, requestsList, cohortsList])
 
   const handleRequestSort = (property: 'name' | 'modified_at') => {
     const isAsc = sortBy === property && sortDirection === 'desc'

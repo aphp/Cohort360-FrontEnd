@@ -38,21 +38,29 @@ const initialState: CohortState = localStorageCohort ? JSON.parse(localStorageCo
 
 type FetchCohortListReturn = {
   count: number
-  selectedCohort: null
+  selectedCohort?: null
   cohortsList: CohortType[]
 }
 
 const fetchCohorts = createAsyncThunk<FetchCohortListReturn, void, { state: RootState }>(
   'cohort/fetchCohorts',
-  async (DO_NOT_USE, { getState }) => {
+  async (DO_NOT_USE, { getState, dispatch }) => {
     try {
       const state = getState().cohort
       const providerId = getState().me?.id ?? '0'
 
       const oldProjectList = state.cohortsList || []
-      const cohorts = (await fetchCohortsList(+providerId)) || []
+      const cohorts = (await fetchCohortsList(+providerId)) || {}
 
-      if (state.count === cohorts.count) {
+      let forceRefresh =
+        oldProjectList.some(
+          (cohort) => cohort.request_job_status === 'pending' || cohort.request_job_status === 'started'
+        ) ||
+        cohorts?.results?.some(
+          (cohort) => cohort.request_job_status === 'pending' || cohort.request_job_status === 'started'
+        )
+
+      if (state.count === cohorts.count && !forceRefresh) {
         return {
           count: state.count,
           selectedCohort: null,
@@ -73,6 +81,13 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, void, { state: Root
         })
       }
 
+      forceRefresh = cohortList.some(
+        (cohort) => cohort.request_job_status === 'pending' || cohort.request_job_status === 'started'
+      )
+      if (forceRefresh) {
+        dispatch(fetchCohortInBackGround(cohortList))
+      }
+
       return {
         count: cohorts.count,
         selectedCohort: null,
@@ -84,6 +99,33 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, void, { state: Root
     }
   }
 )
+
+const fetchCohortInBackGround = createAsyncThunk<FetchCohortListReturn, CohortType[], { state: RootState }>(
+  'cohort/fetchCohortInBackGround',
+  async (oldCohortsList, { getState }) => {
+    try {
+      const providerId = getState().me?.id ?? '0'
+
+      let count = 0
+      let cohortsList = oldCohortsList
+      while (
+        cohortsList.some((cohort) => cohort.request_job_status === 'pending' || cohort.request_job_status === 'started')
+      ) {
+        console.log('ICI ON PASSE')
+        const newResult = await fetchCohortsList(+providerId, oldCohortsList.length)
+
+        count = newResult.count
+        cohortsList = newResult.results
+      }
+
+      return { count, cohortsList }
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+)
+
 /**
  * addCohort
  *
@@ -245,6 +287,15 @@ const setCohortSlice = createSlice({
     builder.addCase(editCohort.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(editCohort.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
     builder.addCase(editCohort.rejected, (state) => ({ ...state, loading: false }))
+    // fetchCohortInBackGround
+    builder.addCase(fetchCohortInBackGround.pending, (state) => ({
+      ...state,
+      loading: false
+    }))
+    builder.addCase(fetchCohortInBackGround.fulfilled, (state, action) => ({
+      ...state,
+      ...action.payload
+    }))
     // deleteCohort
     builder.addCase(deleteCohort.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(deleteCohort.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
