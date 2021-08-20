@@ -92,10 +92,10 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
               const canExportThisCohort =
                 canMakeExport && historyRow.extension
                   ? historyRow.extension.some(
-                      (extension) => extension.url === 'export-deidentified' && extension.valueBoolean === false
+                      (extension) => extension.url === 'export-deidentified' && extension.valueString === 'false'
                     ) &&
                     historyRow.extension.some(
-                      (extension) => extension.url === 'read-deidentified' && extension.valueBoolean === false
+                      (extension) => extension.url === 'read-deidentified' && extension.valueString === 'false'
                     )
                   : false
 
