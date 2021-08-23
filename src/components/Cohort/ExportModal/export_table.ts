@@ -58,12 +58,7 @@ const exportTable: ExportTableType[] = [
   {
     id: 'fact_relationship',
     table_name: 'Référentiel - Liens entre entités',
-    table_id: 'fact_relationshiFp'
-  },
-  {
-    id: 'concept',
-    table_name: 'Référentiel - Terminologie - Concept',
-    table_id: 'concept'
+    table_id: 'fact_relationship'
   },
   {
     id: 'concept_relationship',
@@ -74,6 +69,11 @@ const exportTable: ExportTableType[] = [
     id: 'vocabulary',
     table_name: 'Référentiel - Terminologie - Vocabulaire et nomenclature',
     table_id: 'vocabulary'
+  },
+  {
+    id: 'concept',
+    table_name: 'Référentiel - Terminologie - Concept',
+    table_id: 'concept'
   }
 ]
 
