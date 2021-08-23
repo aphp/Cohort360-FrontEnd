@@ -191,14 +191,34 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
             <List className={classes.list}>
               {export_table.map(({ table_name, table_id }) => (
                 <ListItem className={classes.tableListElement} key={table_id}>
-                  <ListItemText disableTypography>
-                    <Grid container direction="row" alignItems="center">
-                      <Typography variant="body1">{table_name} - </Typography>
-                      <Typography variant="body1" style={{ fontStyle: 'italic' }}>
-                        {table_id}
-                      </Typography>
-                    </Grid>
-                  </ListItemText>
+                  {table_id === 'concept' ? (
+                    <ListItemText
+                      disableTypography
+                      primary={
+                        <Grid container direction="row" alignItems="center">
+                          <Typography variant="body1">{table_name} -</Typography>
+                          <Typography variant="body1" style={{ fontStyle: 'italic', paddingLeft: 4 }}>
+                            {table_id}
+                          </Typography>
+                        </Grid>
+                      }
+                      secondary={
+                        <Typography variant="body1" style={{ color: 'red' }}>
+                          La taille de cette table est relativement élevée, veuillez ne pas l'exporter à chacune de vos
+                          demandes d'export
+                        </Typography>
+                      }
+                    ></ListItemText>
+                  ) : (
+                    <ListItemText disableTypography>
+                      <Grid container direction="row" alignItems="center">
+                        <Typography variant="body1">{table_name} - </Typography>
+                        <Typography variant="body1" style={{ fontStyle: 'italic', paddingLeft: 4 }}>
+                          {table_id}
+                        </Typography>
+                      </Grid>
+                    </ListItemText>
+                  )}
 
                   <ListItemSecondaryAction>
                     <Checkbox
