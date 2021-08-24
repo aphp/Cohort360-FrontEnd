@@ -43,7 +43,6 @@ const getOrganizationServices = async (
 }
 
 export const getPerimeters = async (practitionerId: string) => {
-  console.log(`practitionerId`, practitionerId)
   if (CONTEXT === 'aphp') {
     const practitionerRole = await api.get<FHIR_API_Response<IPractitionerRole>>(
       `/PractitionerRole?practitioner=${practitionerId}&_elements=organization,extension`
@@ -128,7 +127,6 @@ const getAccessName = (extension?: IExtension[]) => {
 
 export const getScopePerimeters = async (practitioner: MeState): Promise<ScopeTreeRow[]> => {
   const practitionerId = practitioner?.id ?? ''
-  console.log(`practitioner`, practitioner)
   if (CONTEXT === 'fakedata') {
     const scopeRows = fakeScopeRows as ScopeTreeRow[]
 

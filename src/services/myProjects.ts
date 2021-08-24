@@ -360,30 +360,41 @@ export const fetchCohortsList: (
     let cohortList = data.results
 
     // Recupere les droits
-    let rightResponses = await Promise.all(
-      cohortList.map((cohortItem) =>
-        new Promise((resolve) => {
-          resolve(apiFhir.get(`/Group?_list=${cohortItem.fhir_group_id}&provider=${providerId}`))
-        }).catch((error) => {
-          return error
-        })
-      )
-    )
+    let rightResponses = await Promise.all([
+      new Promise((resolve) => {
+        resolve(apiFhir.get(`/Group?_list=${cohortList.map((cohortItem) => cohortItem.fhir_group_id)}`))
+      }).catch((error) => {
+        return error
+      })
+    ])
     // Re-organise l'objet rightResponses
-    rightResponses = rightResponses.map(
-      (rightResponse: any) =>
-        rightResponse?.data?.entry && rightResponse?.data?.entry[0] && rightResponse?.data?.entry[0].resource
-    )
+    rightResponses =
+      rightResponses &&
+      rightResponses[0] &&
+      rightResponses[0]?.data?.entry &&
+      rightResponses[0]?.data?.entry[0] &&
+      rightResponses[0]?.data?.entry[0].resource &&
+      rightResponses[0]?.data?.entry[0].resource.extension
+        ? rightResponses[0]?.data?.entry[0].resource.extension
+        : []
     // Affecte les droits à chaque cohortItem
-    cohortList = cohortList.map((cohortItem) => ({
-      ...cohortItem,
-      extension: (
+    cohortList = cohortList.map((cohortItem) => {
+      const extension = (
         rightResponses.find(
-          (rightResponse: any) =>
-            +(rightResponse?.extension ? rightResponse?.extension[0].url : '1') === +(cohortItem.fhir_group_id ?? '0')
-        ) || { extension: [{ extension: [] }] }
-      ).extension[0].extension
-    }))
+          (rightResponse: any) => +(rightResponse.url ?? '1') === +(cohortItem.fhir_group_id ?? '0')
+        ) || {
+          extension: [
+            { url: 'read-deidentified', valueString: 'true' },
+            { url: 'export-deidentified', valueString: 'true' }
+          ]
+        }
+      ).extension
+
+      return {
+        ...cohortItem,
+        extension
+      }
+    })
 
     return {
       ...data,

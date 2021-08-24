@@ -54,10 +54,14 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, void, { state: Root
 
       let forceRefresh =
         oldProjectList.some(
-          (cohort) => cohort.request_job_status === 'pending' || cohort.request_job_status === 'started'
+          (cohort) =>
+            !cohort.fhir_group_id &&
+            (cohort.request_job_status === 'pending' || cohort.request_job_status === 'started')
         ) ||
         cohorts?.results?.some(
-          (cohort) => cohort.request_job_status === 'pending' || cohort.request_job_status === 'started'
+          (cohort) =>
+            !cohort.fhir_group_id &&
+            (cohort.request_job_status === 'pending' || cohort.request_job_status === 'started')
         )
 
       if (state.count === cohorts.count && !forceRefresh) {
@@ -109,9 +113,12 @@ const fetchCohortInBackGround = createAsyncThunk<FetchCohortListReturn, CohortTy
       let count = 0
       let cohortsList = oldCohortsList
       while (
-        cohortsList.some((cohort) => cohort.request_job_status === 'pending' || cohort.request_job_status === 'started')
+        cohortsList?.some(
+          (cohort) =>
+            !cohort.fhir_group_id &&
+            (cohort.request_job_status === 'pending' || cohort.request_job_status === 'started')
+        )
       ) {
-        console.log('ICI ON PASSE')
         const newResult = await fetchCohortsList(+providerId, oldCohortsList.length)
 
         count = newResult.count
