@@ -6,7 +6,7 @@ import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstrai
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { docTypes } from 'assets/docTypes.json'
 
-const REQUETEUR_VERSION = 'v1.2.0'
+const REQUETEUR_VERSION = 'v1.2.1'
 
 const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
 const PATIENT_GENDER = 'gender' // ok
