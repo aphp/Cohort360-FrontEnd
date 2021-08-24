@@ -6,7 +6,7 @@ import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstrai
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { docTypes } from 'assets/docTypes.json'
 
-const REQUETEUR_VERSION = 'v1.2.0'
+const REQUETEUR_VERSION = 'v1.2.1'
 
 const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
 const PATIENT_GENDER = 'gender' // ok
@@ -16,12 +16,16 @@ const PATIENT_DECEASED = 'deceased' // ok
 const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
 const ENCOUNTER_LENGTH = 'length' // ok
 const ENCOUNTER_BIRTHDATE = 'patient.birthdate' // ok
-// const ENCOUNTER_ADMISSIONMODE = 'admissionMode' // on verra
 const ENCOUNTER_ENTRYMODE = 'entryMode' // on verra
 const ENCOUNTER_EXITMODE = 'exitMode' // on verra
 const ENCOUNTER_PRISENCHARGETYPE = 'priseEnChargeType' //on verra
 const ENCOUNTER_TYPEDESEJOUR = 'typeDeSejour' //on verra
 const ENCOUNTER_FILESTATUS = 'fileStatus' // on verra
+const ENCOUNTER_ADMISSIONMODE = 'admissionMode' // on verra
+const ENCOUNTER_REASON = 'reason' // on verra
+const ENCOUNTER_DESTINATION = 'destination' // on verra
+const ENCOUNTER_PROVENANCE = 'provenance' // on verra
+const ENCOUNTER_ADMISSION = 'admission' // on verra
 
 const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
 const CLAIM_CODE = 'codeList' // ok
@@ -211,7 +215,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       }
 
       filterFhir = [
-        // `${criterion.admissionMode ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode.id}` : ''}`,
+        `${
+          criterion.admissionMode && criterion.admissionMode.length > 0
+            ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode
+                .map((admissionMode: any) => admissionMode.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
         `${
           criterion.entryMode && criterion.entryMode.length > 0
             ? `${ENCOUNTER_ENTRYMODE}=${criterion.entryMode
@@ -242,6 +252,32 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
           criterion.fileStatus && criterion.fileStatus.length > 0
             ? `${ENCOUNTER_FILESTATUS}=${criterion.fileStatus
                 .map((fileStatus: any) => fileStatus.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
+          criterion.reason && criterion.reason.length > 0
+            ? `${ENCOUNTER_REASON}=${criterion.reason.map((reason: any) => reason.id).reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
+          criterion.destination && criterion.destination.length > 0
+            ? `${ENCOUNTER_DESTINATION}=${criterion.destination
+                .map((destination: any) => destination.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
+          criterion.provenance && criterion.provenance.length > 0
+            ? `${ENCOUNTER_PROVENANCE}=${criterion.provenance
+                .map((provenance: any) => provenance.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
+          criterion.admission && criterion.admission.length > 0
+            ? `${ENCOUNTER_ADMISSION}=${criterion.admission
+                .map((admission: any) => admission.id)
                 .reduce(searchReducer)}`
             : ''
         }`,
@@ -721,6 +757,54 @@ export async function unbuildRequest(_json: string) {
                 currentCriterion.fileStatus = currentCriterion.fileStatus
                   ? [...currentCriterion.fileStatus, ...newFileStatusIds]
                   : newFileStatusIds
+                break
+              }
+              case ENCOUNTER_REASON: {
+                const dischargeIds = value?.split(',')
+                const newDischargeIds = dischargeIds?.map((dischargeId: any) => ({
+                  id: dischargeId
+                }))
+                if (!newDischargeIds) continue
+
+                currentCriterion.reason = currentCriterion.reason
+                  ? [...currentCriterion.reason, ...newDischargeIds]
+                  : newDischargeIds
+                break
+              }
+              case ENCOUNTER_DESTINATION: {
+                const destinationIds = value?.split(',')
+                const newDestinationIds = destinationIds?.map((destinationId: any) => ({
+                  id: destinationId
+                }))
+                if (!newDestinationIds) continue
+
+                currentCriterion.destination = currentCriterion.destination
+                  ? [...currentCriterion.destination, ...newDestinationIds]
+                  : newDestinationIds
+                break
+              }
+              case ENCOUNTER_PROVENANCE: {
+                const provenanceIds = value?.split(',')
+                const newProvenanceIds = provenanceIds?.map((provenanceId: any) => ({
+                  id: provenanceId
+                }))
+                if (!newProvenanceIds) continue
+
+                currentCriterion.provenance = currentCriterion.provenance
+                  ? [...currentCriterion.provenance, ...newProvenanceIds]
+                  : newProvenanceIds
+                break
+              }
+              case ENCOUNTER_ADMISSION: {
+                const admissionIds = value?.split(',')
+                const newAdmissionIds = admissionIds?.map((admissionId: any) => ({
+                  id: admissionId
+                }))
+                if (!newAdmissionIds) continue
+
+                currentCriterion.admission = currentCriterion.admission
+                  ? [...currentCriterion.admission, ...newAdmissionIds]
+                  : newAdmissionIds
                 break
               }
               default:
