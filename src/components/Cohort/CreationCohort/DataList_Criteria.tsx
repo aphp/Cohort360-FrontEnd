@@ -10,12 +10,16 @@ import GhmForm from './DiagramView/components/LogicalOperator/components/Criteri
 
 // Fetcher
 import {
-  // fetchAdmissionModes,
+  fetchAdmissionModes,
   fetchEntryModes,
   fetchExitModes,
   fetchPriseEnChargeType,
   fetchTypeDeSejour,
-  fetchFileStatus
+  fetchFileStatus,
+  fetchReason,
+  fetchDestination,
+  fetchProvenance,
+  fetchAdmission
 } from '../../../services/cohortCreation/fetchEncounter'
 import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetchDemographic'
 import {
@@ -66,20 +70,28 @@ const criteriaList: CriteriaItemType[] = [
     color: '#0063AF',
     components: SupportedForm,
     data: {
-      // admissionModes: 'loading',
+      admissionModes: 'loading',
       entryModes: 'loading',
       exitModes: 'loading',
       priseEnChargeType: 'loading',
       typeDeSejour: 'loading',
-      fileStatus: 'loading'
+      fileStatus: 'loading',
+      reason: 'loading',
+      destination: 'loading',
+      provenance: 'loading',
+      admission: 'loading'
     },
     fetch: {
-      // fetchAdmissionModes,
+      fetchAdmissionModes,
       fetchEntryModes,
       fetchExitModes,
       fetchPriseEnChargeType,
       fetchTypeDeSejour,
-      fetchFileStatus
+      fetchFileStatus,
+      fetchReason,
+      fetchDestination,
+      fetchProvenance,
+      fetchAdmission
     }
   },
   {

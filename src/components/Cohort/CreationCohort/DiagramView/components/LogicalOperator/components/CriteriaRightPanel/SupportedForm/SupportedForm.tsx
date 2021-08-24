@@ -10,7 +10,7 @@ import useStyles from './styles'
 
 import { EncounterDataType } from 'types'
 
-type SupportedFormFormProps = {
+type SupportedFormProps = {
   criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
@@ -24,16 +24,21 @@ const defaultEncounter: EncounterDataType = {
   years: [0, 130],
   durationType: { id: 'day', label: 'jours' },
   duration: [0, 100],
-  admissionMode: null,
+  admissionMode: [],
   entryMode: [],
   exitMode: [],
   priseEnChargeType: [],
   typeDeSejour: [],
   fileStatus: [],
+  discharge: [],
+  reason: [],
+  destination: [],
+  provenance: [],
+  admission: [],
   isInclusive: true
 }
 
-const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
+const SupportedForm: React.FC<SupportedFormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultEncounter)
@@ -53,11 +58,17 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
       defaultValues.durationType?.id === 'day' &&
       defaultValues.duration[0] === 0 &&
       defaultValues.duration[1] === 100 &&
+      defaultValues.admissionMode.length === 0 &&
       defaultValues.entryMode.length === 0 &&
       defaultValues.exitMode.length === 0 &&
       defaultValues.priseEnChargeType.length === 0 &&
       defaultValues.typeDeSejour.length === 0 &&
-      defaultValues.fileStatus.length === 0
+      defaultValues.fileStatus.length === 0 &&
+      defaultValues.discharge.length === 0 &&
+      defaultValues.reason.length === 0 &&
+      defaultValues.destination.length === 0 &&
+      defaultValues.provenance.length === 0 &&
+      defaultValues.admission.length === 0
     ) {
       return setError(true)
     }
@@ -72,15 +83,32 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
   }
 
   if (
-    // criteria?.data?.admissionModes === 'loading' ||
+    criteria?.data?.admissionModes === 'loading' ||
     criteria?.data?.entryModes === 'loading' ||
     criteria?.data?.exitModes === 'loading' ||
     criteria?.data?.priseEnChargeType === 'loading' ||
     criteria?.data?.typeDeSejour === 'loading' ||
-    criteria?.data?.fileStatus === 'loading'
+    criteria?.data?.fileStatus === 'loading' ||
+    criteria?.data?.discharge === 'loading' ||
+    criteria?.data?.reason === 'loading' ||
+    criteria?.data?.destination === 'loading' ||
+    criteria?.data?.provenance === 'loading' ||
+    criteria?.data?.admission === 'loading'
   ) {
     return <></>
   }
+
+  const defaultValuesAdmissionModes = defaultValues.admissionMode
+    ? defaultValues.admissionMode.map((admissionMode: any) => {
+        const criteriaAdmissionModes = criteria.data.admissionModes
+          ? criteria.data.admissionModes.find((c: any) => c.id === admissionMode.id)
+          : null
+        return {
+          id: admissionMode.id,
+          label: admissionMode.label ? admissionMode.label : criteriaAdmissionModes?.label ?? '?'
+        }
+      })
+    : []
 
   const defaultValuesEntryModes = defaultValues.entryMode
     ? defaultValues.entryMode.map((entryModes: any) => {
@@ -138,6 +166,64 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
         return {
           id: fileStatus.id,
           label: fileStatus.label ? fileStatus.label : criteriaFileStatus?.label ?? '?'
+        }
+      })
+    : []
+
+  // const defaultValuesDischarge = defaultValues.discharge
+  //   ? defaultValues.discharge.map((discharge: any) => {
+  //       const criteriaDischarge = criteria.data.discharge
+  //         ? criteria.data.discharge.find((d: any) => d.id === discharge.id)
+  //         : null
+  //       return {
+  //         id: discharge.id,
+  //         label: discharge.label ? discharge.label : criteriaDischarge?.label ?? '?'
+  //       }
+  //     })
+  //   : []
+
+  const defaultValuesReason = defaultValues.reason
+    ? defaultValues.reason.map((reason: any) => {
+        const criteriareason = criteria.data.reason ? criteria.data.reason.find((dt: any) => dt.id === reason.id) : null
+        return {
+          id: reason.id,
+          label: reason.label ? reason.label : criteriareason?.label ?? '?'
+        }
+      })
+    : []
+
+  const defaultValuesDestination = defaultValues.destination
+    ? defaultValues.destination.map((destination: any) => {
+        const criteriaDestination = criteria.data.destination
+          ? criteria.data.destination.find((c: any) => c.id === destination.id)
+          : null
+        return {
+          id: destination.id,
+          label: destination.label ? destination.label : criteriaDestination?.label ?? '?'
+        }
+      })
+    : []
+
+  const defaultValuesProvenance = defaultValues.provenance
+    ? defaultValues.provenance.map((provenance: any) => {
+        const criteriaProvenance = criteria.data.provenance
+          ? criteria.data.provenance.find((c: any) => c.id === provenance.id)
+          : null
+        return {
+          id: provenance.id,
+          label: provenance.label ? provenance.label : criteriaProvenance?.label ?? '?'
+        }
+      })
+    : []
+
+  const defaultValuesAdmission = defaultValues.admission
+    ? defaultValues.admission.map((admission: any) => {
+        const criteriaAdmission = criteria.data.admission
+          ? criteria.data.admission.find((c: any) => c.id === admission.id)
+          : null
+        return {
+          id: admission.id,
+          label: admission.label ? admission.label : criteriaAdmission?.label ?? '?'
         }
       })
     : []
@@ -263,6 +349,22 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
           </Grid>
 
           <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
+            Mode d'admission :
+          </FormLabel>
+
+          <Autocomplete
+            multiple
+            id="criteria-admissionMode-autocomplete"
+            className={classes.inputItem}
+            options={criteria?.data?.admissionModes || []}
+            getOptionLabel={(option) => option.label}
+            getOptionSelected={(option, value) => option.id === value.id}
+            value={defaultValuesAdmissionModes}
+            onChange={(e, value) => _onChangeValue('admissionMode', value)}
+            renderInput={(params) => <TextField {...params} variant="outlined" label="Mode d'admission" />}
+          />
+
+          <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
             Mode d'entrée :
           </FormLabel>
 
@@ -327,7 +429,7 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
           />
 
           <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
-            Status dossier :
+            Statut dossier :
           </FormLabel>
 
           <Autocomplete
@@ -339,7 +441,88 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
             getOptionSelected={(option, value) => option.id === value.id}
             value={defaultValuesFileStatus}
             onChange={(e, value) => _onChangeValue('fileStatus', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Status dossier" />}
+            renderInput={(params) => <TextField {...params} variant="outlined" label="Statut dossier" />}
+          />
+
+          {/* 
+          <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
+            Mode de sortie :
+          </FormLabel>
+
+          <Autocomplete
+            multiple
+            id="criteria-discharge-autocomplete"
+            className={classes.inputItem}
+            options={criteria?.data?.discharge || []}
+            getOptionLabel={(option) => option.label}
+            getOptionSelected={(option, value) => option.id === value.id}
+            value={defaultValuesDischarge}
+            onChange={(e, value) => _onChangeValue('discharge', value)}
+            renderInput={(params) => <TextField {...params} variant="outlined" label="Mode de sortie" />}
+          /> */}
+
+          <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
+            Type de sortie :
+          </FormLabel>
+
+          <Autocomplete
+            multiple
+            id="criteria-reason-autocomplete"
+            className={classes.inputItem}
+            options={criteria?.data?.reason || []}
+            getOptionLabel={(option) => option.label}
+            getOptionSelected={(option, value) => option.id === value.id}
+            value={defaultValuesReason}
+            onChange={(e, value) => _onChangeValue('reason', value)}
+            renderInput={(params) => <TextField {...params} variant="outlined" label="Type de sortie" />}
+          />
+
+          <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
+            Destination :
+          </FormLabel>
+
+          <Autocomplete
+            multiple
+            id="criteria-destination-autocomplete"
+            className={classes.inputItem}
+            options={criteria?.data?.destination || []}
+            getOptionLabel={(option) => option.label}
+            getOptionSelected={(option, value) => option.id === value.id}
+            value={defaultValuesDestination}
+            onChange={(e, value) => _onChangeValue('destination', value)}
+            renderInput={(params) => <TextField {...params} variant="outlined" label="Destination" />}
+          />
+
+          <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
+            Provenance :
+          </FormLabel>
+
+          <Autocomplete
+            multiple
+            id="criteria-provenance-autocomplete"
+            className={classes.inputItem}
+            options={criteria?.data?.provenance || []}
+            getOptionLabel={(option) => option.label}
+            getOptionSelected={(option, value) => option.id === value.id}
+            value={defaultValuesProvenance}
+            onChange={(e, value) => _onChangeValue('provenance', value)}
+            renderInput={(params) => <TextField {...params} variant="outlined" label="Provenance" />}
+          />
+
+          <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
+            Admission :
+          </FormLabel>
+
+          <Autocomplete
+            multiple
+            id="criteria-admission-autocomplete"
+            className={classes.inputItem}
+            options={criteria?.data?.admission || []}
+            getOptionLabel={(option) => option.label}
+            getOptionSelected={(option, value) => option.id === value.id}
+            value={defaultValuesAdmission}
+            onChange={(e, value) => _onChangeValue('admission', value)}
+            renderInput={(params) => <TextField {...params} variant="outlined" label="Admission" />}
           />
         </Grid>
 
@@ -358,4 +541,4 @@ const SupportedFormForm: React.FC<SupportedFormFormProps> = (props) => {
   )
 }
 
-export default SupportedFormForm
+export default SupportedForm

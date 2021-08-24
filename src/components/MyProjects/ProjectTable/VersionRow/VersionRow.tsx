@@ -64,7 +64,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
           <TableRow>
             <TableCell>Nom</TableCell>
             <TableCell align="center" style={{ width: 125 }}>
-              Status
+              Statut
             </TableCell>
             <TableCell align="center" style={{ width: 125 }}>
               Version
