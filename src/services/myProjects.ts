@@ -362,7 +362,9 @@ export const fetchCohortsList: (
     // Recupere les droits
     let rightResponses = await Promise.all([
       new Promise((resolve) => {
-        resolve(apiFhir.get(`/Group?_list=${cohortList.map((cohortItem) => cohortItem.fhir_group_id)}`))
+        resolve(
+          apiFhir.get(`/Group?_list=${cohortList.map((cohortItem) => cohortItem.fhir_group_id)}&provider=${providerId}`)
+        )
       }).catch((error) => {
         return error
       })
