@@ -91,12 +91,12 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
     return displayingSelectedDocTypes.filter((item, index, array) => array.indexOf(item) === index)
   })()
 
-  const fetchDocumentsList = (newSortBy: string, newSortDirection: string, input = searchInput, page = 1) => {
+  const fetchDocumentsList = async (newSortBy: string, newSortDirection: string, input = searchInput, page = 1) => {
     setLoadingStatus(true)
 
     const selectedDocTypesCodes = selectedDocTypes.map((docType) => docType.code)
 
-    fetchDocuments(
+    const docResp = await fetchDocuments(
       deidentifiedBoolean,
       newSortBy,
       newSortDirection,
@@ -109,12 +109,10 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
       endDate,
       groupId
     )
-      .then((docResp) => {
-        setDocs(docResp?.docsList ?? [])
-        setTotalDocs(docResp?.docsTotal ?? 0)
-      })
-      .catch((error) => console.error(error))
-      .then(() => setLoadingStatus(false))
+    if (!docResp) return
+    setDocs(docResp?.docsList ?? [])
+    setTotalDocs(docResp?.docsTotal ?? 0)
+    setLoadingStatus(false)
   }
 
   const handleClearInput = () => {

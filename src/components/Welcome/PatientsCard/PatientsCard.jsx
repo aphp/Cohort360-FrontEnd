@@ -14,10 +14,14 @@ const PatientSearchCard = () => {
   const classes = useStyles()
 
   useEffect(() => {
-    setLoading(true)
-    fetchPatientsCount()
-      .then((patientNumber) => setPatientNb(patientNumber))
-      .then(() => setLoading(false))
+    const _fetchPatientsCount = async () => {
+      setLoading(true)
+      const patientNumber = await fetchPatientsCount()
+      setPatientNb(patientNumber)
+      setLoading(false)
+    }
+
+    _fetchPatientsCount()
   }, [])
 
   return (

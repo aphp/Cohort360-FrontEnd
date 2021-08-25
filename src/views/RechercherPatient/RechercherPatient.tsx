@@ -33,7 +33,7 @@ const RechercherPatient: React.FC<{}> = () => {
   const [searchInput, setSearchInput] = useState(search ?? '')
   const [total, setTotal] = useState(0)
 
-  const performQueries = (
+  const performQueries = async (
     page: number,
     sortBy: string,
     sortDirection: string,
@@ -42,14 +42,13 @@ const RechercherPatient: React.FC<{}> = () => {
   ) => {
     const nominativeGroupsIds = practitioner ? practitioner.nominativeGroupsIds : []
     setLoading(true)
-    searchPatient(nominativeGroupsIds, page, sortBy, sortDirection, input, searchBy).then((results) => {
-      if (results) {
-        setPatientResults(results.patientList ?? [])
-        setTotal(results.totalPatients ?? 0)
-        setShowTable(true)
-      }
-      setLoading(false)
-    })
+    const results = await searchPatient(nominativeGroupsIds, page, sortBy, sortDirection, input, searchBy)
+    if (results) {
+      setPatientResults(results.patientList ?? [])
+      setTotal(results.totalPatients ?? 0)
+      setShowTable(true)
+    }
+    setLoading(false)
   }
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {

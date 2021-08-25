@@ -92,7 +92,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     return displayingSelectedDocTypes.filter((item, index, array) => array.indexOf(item) === index)
   })()
 
-  const onSearchDocument = (sortBy: string, sortDirection: 'asc' | 'desc', input = searchInput, page = 1) => {
+  const onSearchDocument = async (sortBy: string, sortDirection: 'asc' | 'desc', input = searchInput, page = 1) => {
     if (input !== '') {
       setSearchMode(true)
     } else {
@@ -102,7 +102,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
 
     const selectedDocTypesCodes = selectedDocTypes.map((docType) => docType.code)
 
-    fetchDocuments(
+    const result = await fetchDocuments(
       !!deidentifiedBoolean,
       sortBy,
       sortDirection,
@@ -115,27 +115,22 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
       groupId,
       encounters?.map((encounter: any) => encounter.id ?? '').filter((id: string) => id !== '')
     )
-      .then((result) => {
-        if (result) {
-          const {
-            totalDocs,
-            totalAllDocs,
-            documentsList
-            // wordcloudData
-          } = result
-          setDocuments(documentsList)
-          // if (wordcloudData) {
-          //   setWordcloudData(wordcloudData)
-          // }
-          setDocumentsNumber(totalDocs)
-          setAllDocumentsNumber(totalAllDocs)
-          setPage(page)
-        }
-      })
-      .catch((error) => console.error(error))
-      .then(() => {
-        setLoadingStatus(false)
-      })
+    if (result) {
+      const {
+        totalDocs,
+        totalAllDocs,
+        documentsList
+        // wordcloudData
+      } = result
+      setDocuments(documentsList)
+      // if (wordcloudData) {
+      //   setWordcloudData(wordcloudData)
+      // }
+      setDocumentsNumber(totalDocs)
+      setAllDocumentsNumber(totalAllDocs)
+      setPage(page)
+    }
+    setLoadingStatus(false)
   }
 
   useEffect(() => {

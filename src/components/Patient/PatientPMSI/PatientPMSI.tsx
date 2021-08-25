@@ -81,7 +81,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
 
   const documentLines = 20 // Number of desired lines in the document array
 
-  const _fetchPMSI = (
+  const _fetchPMSI = async (
     deidentified: boolean,
     page: number,
     patientId: string,
@@ -99,7 +99,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
 
     const selectedDiagnosticTypesCodes = selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
 
-    fetchPMSI(
+    const pmsiResp = await fetchPMSI(
       deidentified,
       page,
       patientId,
@@ -114,16 +114,10 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       startDate,
       endDate
     )
-      .then((pmsiResp) => {
-        setData(pmsiResp?.pmsiData ?? [])
-        setTotal(pmsiResp?.pmsiTotal ?? 0)
-      })
-      .catch((error) => {
-        setData([])
-        setTotal(0)
-        console.error(error)
-      })
-      .then(() => setLoadingStatus(false))
+
+    setData(pmsiResp?.pmsiData ?? [])
+    setTotal(pmsiResp?.pmsiTotal ?? 0)
+    setLoadingStatus(false)
   }
 
   const handleClearInput = () => {
