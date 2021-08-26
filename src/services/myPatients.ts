@@ -188,9 +188,9 @@ const getEncounterInfos = async (deidentifiedBoolean: boolean, documents?: IComp
 }
 
 export const getInfos = async (deidentifiedBoolean: boolean, documents?: IComposition[], groupId?: string) => {
-  const docsComplets = await getPatientInfos(deidentifiedBoolean, documents, groupId).then(
-    async (docs) => await getEncounterInfos(deidentifiedBoolean, docs, groupId)
-  )
+  const docsComplets = await getPatientInfos(deidentifiedBoolean, documents, groupId)
+
+  await getEncounterInfos(deidentifiedBoolean, docsComplets, groupId)
 
   return docsComplets
 }

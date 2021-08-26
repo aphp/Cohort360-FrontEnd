@@ -96,7 +96,7 @@ const PatientList: React.FC<PatientListProps> = ({
     setOpen(true)
   }
 
-  const fetchPatients = (
+  const fetchPatients = async (
     sortBy: string,
     sortDirection: string,
     input = searchInput,
@@ -109,7 +109,7 @@ const PatientList: React.FC<PatientListProps> = ({
       setPatientData(undefined)
       setAgePyramid(undefined)
     }
-    fetchPatientList(
+    const result = await fetchPatientList(
       pageValue,
       searchBy,
       input,
@@ -121,21 +121,17 @@ const PatientList: React.FC<PatientListProps> = ({
       groupId,
       includeFacets
     )
-      .then((result) => {
-        if (result) {
-          const { totalPatients, originalPatients, genderRepartitionMap, agePyramidData } = result
-          setPatientsList(originalPatients)
-          if (includeFacets) {
-            setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
-            setAgePyramid(agePyramidData)
-          }
-          setTotalPatients(totalPatients)
-        }
-      })
-      .catch((error) => console.error(error))
-      .finally(() => {
-        setLoadingStatus(false)
-      })
+    if (result) {
+      const { totalPatients, originalPatients, genderRepartitionMap, agePyramidData } = result
+      setPatientsList(originalPatients)
+      if (includeFacets) {
+        setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
+        setAgePyramid(agePyramidData)
+      }
+      setTotalPatients(totalPatients)
+    } else {
+      setLoadingStatus(false)
+    }
   }
 
   const onSearchPatient = (sortBy = 'given', sortDirection = 'asc', input = searchInput) => {

@@ -61,25 +61,20 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
     onFetchCohorts(sortBy, sortDirection)
   }, [filters]) // eslint-disable-line
 
-  const onFetchCohorts = (sortBy = 'given', sortDirection = 'asc', input = searchInput) => {
+  const onFetchCohorts = async (sortBy = 'given', sortDirection = 'asc', input = searchInput) => {
     setLoadingStatus(true)
     setPage(1)
     setSortBy(sortBy)
     setSortDirection(sortDirection as 'asc' | 'desc')
-    fetchCohorts(sortBy, sortDirection, filters, input)
-      .then((cohortsResp) => {
-        if (filteredIds) {
-          setResearches(
-            cohortsResp ? cohortsResp?.results?.filter((r) => !filteredIds.includes(r.researchId)) : undefined
-          )
-        } else {
-          setResearches(cohortsResp?.results ?? undefined)
-        }
-        setTotal(cohortsResp?.count ?? 0)
-      })
-      .then(() => {
-        setLoadingStatus(false)
-      })
+    const cohortsResp = await fetchCohorts(sortBy, sortDirection, filters, input)
+
+    if (filteredIds) {
+      setResearches(cohortsResp ? cohortsResp?.results?.filter((r) => !filteredIds.includes(r.researchId)) : undefined)
+    } else {
+      setResearches(cohortsResp?.results ?? undefined)
+    }
+    setTotal(cohortsResp?.count ?? 0)
+    setLoadingStatus(false)
   }
 
   const onDeleteCohort = async (cohortId: string) => {
@@ -88,26 +83,23 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
   }
 
   const onSetCohortFavorite = async (cohortId: string) => {
-    dispatch<any>(setFavoriteCohortThunk({ cohortId })).then(() =>
-      fetchCohorts(sortBy, sortDirection, filters).then((cohortsResp) => {
-        setResearches(cohortsResp?.results ?? undefined)
-        setTotal(cohortsResp?.count ?? 0)
-      })
-    )
+    await dispatch<any>(setFavoriteCohortThunk({ cohortId }))
+
+    const cohortsResp = await fetchCohorts(sortBy, sortDirection, filters)
+
+    setResearches(cohortsResp?.results ?? undefined)
+    setTotal(cohortsResp?.count ?? 0)
   }
 
-  const handleChangePage = (event?: React.ChangeEvent<unknown>, value = 1) => {
+  const handleChangePage = async (event?: React.ChangeEvent<unknown>, value = 1) => {
     setPage(value)
     setLoadingStatus(true)
-    fetchCohorts(sortBy, sortDirection, filters, searchInput, value || 1)
-      .then((cohortsResp) => {
-        setResearches(cohortsResp?.results ?? undefined)
-        setTotal(cohortsResp?.count ?? 0)
-      })
-      .catch((error) => console.error(error))
-      .then(() => {
-        setLoadingStatus(false)
-      })
+    const cohortsResp = await fetchCohorts(sortBy, sortDirection, filters, searchInput, value || 1)
+    if (cohortsResp) {
+      setResearches(cohortsResp?.results ?? undefined)
+      setTotal(cohortsResp?.count ?? 0)
+      setLoadingStatus(false)
+    }
   }
 
   const handleCloseDialog = (submit: boolean) => () => {
@@ -123,23 +115,21 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
     handleChangePage()
   }
 
-  const handleClearInput = () => {
+  const handleClearInput = async () => {
     setSearchInput('')
     setLoadingStatus(true)
-    fetchCohorts(sortBy, sortDirection, filters)
-      .then((cohortsResp) => {
-        if (filteredIds) {
-          setResearches(
-            cohortsResp ? cohortsResp?.results?.filter((r) => !filteredIds.includes(r.researchId)) : undefined
-          )
-        } else {
-          setResearches(cohortsResp?.results ?? undefined)
-        }
-        setTotal(cohortsResp?.count ?? 0)
-      })
-      .then(() => {
-        setLoadingStatus(false)
-      })
+    const cohortsResp = await fetchCohorts(sortBy, sortDirection, filters)
+
+    if (filteredIds) {
+      setResearches(
+        cohortsResp && cohortsResp.results && cohortsResp.results.length > 0
+          ? cohortsResp?.results?.filter((r) => !filteredIds.includes(r.researchId))
+          : undefined
+      )
+      setTotal(cohortsResp?.count ?? 0)
+    }
+
+    setLoadingStatus(false)
   }
 
   const onKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {

@@ -69,19 +69,18 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
   const [loading, setLoading] = useState(false)
   const [documentContent, setDocumentContent] = useState<any>([])
 
-  const openPdfDialog = (documentId?: string) => {
+  const openPdfDialog = async (documentId?: string) => {
     setDocumentDialogOpen(true)
     if (deidentified && documentId) {
       setLoading(true)
-      fetchDocumentContent(documentId)
-        .then((doc) => {
-          setLoading(false)
-          setDocumentContent(doc)
-        })
-        .catch(() => {
-          setLoading(false)
-          setDocumentContent(null)
-        })
+      const doc = await fetchDocumentContent(documentId)
+      if (doc) {
+        setLoading(false)
+        setDocumentContent(doc)
+      } else {
+        setLoading(false)
+        setDocumentContent(null)
+      }
     }
   }
 
