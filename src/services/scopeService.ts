@@ -66,7 +66,7 @@ export const getPerimeters = async (practitionerId: string) => {
     const perimetersIds = rolesList.map(({ url }) => url)
     if (!perimetersIds || perimetersIds?.length === 0) return undefined
 
-    const organisationResult = await api.get(`/Organization?_id=${perimetersIds}&_elements=name,extension`)
+    const organisationResult = await api.get(`/Organization?_id=${perimetersIds}&_elements=name,extension,alias`)
     const organisationData: any[] = organisationResult.data
       ? organisationResult.data.entry && organisationResult.data.entry.length > 0
         ? organisationResult.data.entry.map((entry: any) => entry.resource)
@@ -91,11 +91,11 @@ export const getPerimeters = async (practitionerId: string) => {
 }
 
 const getScopeName = (perimeter: any) => {
-  const perimeterID = perimeter ? perimeter.extension?.find((extension: any) => extension.url === 'cohort-id') : false
+  const perimeterID = perimeter ? perimeter.alias?.[0] : false
   if (!perimeterID) {
     return perimeter ? perimeter.name : ''
   }
-  return `${perimeterID.valueInteger} - ${perimeter.name}`
+  return `${perimeterID} - ${perimeter.name}`
 }
 
 const getQuantity = (extension?: IExtension[]) => {
@@ -257,7 +257,7 @@ export const getScopeSubItems = async (
   if (!perimeter) return []
   const perimeterGroupId = perimeter.id
   const organization = await api.get<FHIR_API_Response<IOrganization>>(
-    `/Organization?partof=${perimeterGroupId}&_elements=id,name,extension`
+    `/Organization?partof=${perimeterGroupId}&_elements=id,name,extension,alias`
   )
   if (!organization) return []
 
