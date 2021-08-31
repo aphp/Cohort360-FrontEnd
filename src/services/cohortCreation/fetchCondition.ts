@@ -80,7 +80,7 @@ export const fetchDiagnosticTypes = async () => {
         }))
       : []
   } else {
-    const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-condition_status`)
+    const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-condition-status`)
 
     const diagnosticKinds =
       res && res.data && res.data.entry && res.data.entry[0]

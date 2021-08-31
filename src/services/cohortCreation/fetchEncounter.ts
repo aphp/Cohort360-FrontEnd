@@ -49,7 +49,7 @@ export const fetchEntryModes = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit_mode entree`)
+      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-mode-entree`)
       const data = res.data.entry[1].resource.compose.include[0].concept || []
 
       return cleanValueSet(data)
@@ -71,7 +71,7 @@ export const fetchExitModes = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit_mode sortie`)
+      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-mode-sortie`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
@@ -93,7 +93,7 @@ export const fetchPriseEnChargeType = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit_type`)
+      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-type`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       const cleanData = cleanValueSet(data)
