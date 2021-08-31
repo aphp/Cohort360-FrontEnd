@@ -4,7 +4,7 @@ import clsx from 'clsx'
 import VideoPlayer from 'react-player'
 
 import Divider from '@material-ui/core/Divider'
-import Typography from '@material-ui/core/Typography'
+// import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import IconButton from '@material-ui/core/IconButton'
@@ -49,7 +49,7 @@ const TutorialsCard = () => {
     <>
       <Title>Tutoriels</Title>
       <Divider className={classes.divider} />
-      <Typography color="textSecondary">Nouvelle fonctionnalité à venir !</Typography>
+      {/* <Typography color="textSecondary">Nouvelle fonctionnalité à venir !</Typography> */}
 
       <Grid className={classes.carouselContainer}>
         {/* Content */}
