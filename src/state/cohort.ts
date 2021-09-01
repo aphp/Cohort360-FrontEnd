@@ -104,6 +104,8 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, void, { state: Root
   }
 )
 
+const sleep = (m: any) => new Promise((r: any) => setTimeout(r, m))
+
 const fetchCohortInBackGround = createAsyncThunk<FetchCohortListReturn, CohortType[], { state: RootState }>(
   'cohort/fetchCohortInBackGround',
   async (oldCohortsList, { getState }) => {
@@ -123,6 +125,8 @@ const fetchCohortInBackGround = createAsyncThunk<FetchCohortListReturn, CohortTy
 
         count = newResult.count
         cohortsList = newResult.results
+
+        await sleep(2500)
       }
 
       return { count, cohortsList }
