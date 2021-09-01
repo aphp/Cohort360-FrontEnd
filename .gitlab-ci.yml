@@ -1,0 +1,73 @@
+image: $HARBOR_REPOSITORY_URL/node:$CI_COMMIT_BRANCH
+
+# uncomment when cache will be made available for kube shared runner
+#default:
+#  tags:
+#    - k8s-small-generic
+
+cache:
+  paths:
+    - build/*
+
+variables:
+  REACT_APP_FHIR_API_URL: /api/fhir
+  REACT_APP_BACK_API_URL: /api/back
+  REACT_APP_REQUEST_API_URL: /api/fhir
+  REACT_APP_PORTAIL_API_URL: /api/portail
+  REACT_APP_CONTEXT: aphp
+  REACT_APP_JWT_URL: /api/jwt
+
+stages:
+  - build
+  - test
+  - deploy
+  - release
+
+build:
+  stage: build
+  script:
+    - echo "Build"
+    - rm package-lock.json
+    - npm config set proxy http://proxym-inter.aphp.fr:8080
+    - npm install
+    - npm audit fix
+    - CI=false npm run build
+  rules:
+    - if: ($CI_COMMIT_BRANCH == "fakedata" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "qualif" || $CI_COMMIT_BRANCH == "prod_a" || $CI_COMMIT_BRANCH == "prod_b") && $ONLY_RELEASE == null
+    - when: never
+
+test:
+  stage: test
+  script:
+    - echo "Testing the code"
+#    -
+  rules:
+    - if: ($CI_COMMIT_BRANCH == "fakedata" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "qualif" || $CI_COMMIT_BRANCH == "prod_a" || $CI_COMMIT_BRANCH == "prod_b") && $ONLY_RELEASE == null
+    - when: never
+
+deploy:
+  image :
+    name : $HARBOR_REPOSITORY_URL/kaniko-executor:$CI_COMMIT_BRANCH
+    entrypoint : [ "" ]
+  stage: deploy
+  script:
+    - ENVIRONMENT=${CI_COMMIT_BRANCH/_/-}
+    - sed -i "s/{{ENVIR}}/$CI_COMMIT_BRANCH/g" Dockerfile_aphp
+    - echo "{\"auths\":{\"$HARBOR_REGISTRY\":{\"username\":\"$BOT_NAME\",\"password\":\"$BOT_TOKEN\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile_aphp --destination $HARBOR_REPOSITORY_URL/front:$CI_COMMIT_BRANCH
+  rules:
+    - if: ($CI_COMMIT_BRANCH == "fakedata" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "qualif" || $CI_COMMIT_BRANCH == "prod_a" || $CI_COMMIT_BRANCH == "prod_b") && $ONLY_RELEASE == null
+    - when: never
+
+release:
+  image:
+    name: harbor.eds.aphp.fr/cohort360/kubectl:$CI_COMMIT_BRANCH
+    entrypoint: [ "" ]
+  stage: release
+  script:
+    - bash .gitlab/release.sh
+  rules:
+    - if: $CI_COMMIT_BRANCH == "fakedata" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "qualif"
+    - if: $CI_COMMIT_BRANCH == "prod_a" || $CI_COMMIT_BRANCH == "prod_b"
+      when: manual
+    - when: never
