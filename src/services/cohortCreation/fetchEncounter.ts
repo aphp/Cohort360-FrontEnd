@@ -50,7 +50,7 @@ export const fetchEntryModes = async () => {
   } else {
     try {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-mode-entree`)
-      const data = res.data.entry[1].resource.compose.include[0].concept || []
+      const data = res.data.entry[0].resource.compose.include[0].concept || []
 
       return cleanValueSet(data)
     } catch (error) {
