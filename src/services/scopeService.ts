@@ -83,7 +83,7 @@ export const getPerimeters = async (practitionerId: string) => {
           )
           return {
             ...organization,
-            extension: [...((foundItem && foundItem.extension) || []), ...organization.extension]
+            extension: [...((foundItem && foundItem.extension) || []), ...(organization.extension ?? [])]
           }
         })
       : []
