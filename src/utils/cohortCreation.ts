@@ -369,6 +369,9 @@ export function buildRequest(
   const exploreCriteriaGroup = (itemIds: number[]) => {
     let children: (RequeteurCriteriaType | RequeteurGroupType)[] = []
 
+    let nextGroupId = -1
+    let nextCriteriaId = 1
+
     for (const itemId of itemIds) {
       let child: RequeteurCriteriaType | RequeteurGroupType | null = null
       const isGroup = itemId < 0
@@ -378,7 +381,7 @@ export function buildRequest(
 
         child = {
           _type: 'basicResource',
-          _id: item.id ?? 0,
+          _id: nextCriteriaId,
           isInclusive: item.isInclusive ?? true,
           resourceType: item.type ?? 'Patient',
           filterFhir: constructFilterFhir(item),
@@ -414,6 +417,7 @@ export function buildRequest(
                 }
               : undefined
         }
+        nextCriteriaId++
       } else {
         // return RequeteurGroupType
         const group: CriteriaGroupType = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
@@ -422,24 +426,23 @@ export function buildRequest(
         if (group.type === 'NamongM') {
           child = {
             _type: 'nAmongM',
-            _id: group.id,
+            _id: nextGroupId,
             isInclusive: group.isInclusive ?? true,
             criteria: exploreCriteriaGroup(group.criteriaIds),
             nAmongMOptions: {
               n: group.options.number,
               operator: group.options.operator
-              // timeDelayMin: group.options.timeDelayMin,
-              // timeDelayMax: group.options.timeDelayMax
             }
           }
         } else {
           child = {
             _type: group.type,
-            _id: group.id,
+            _id: nextGroupId,
             isInclusive: group.isInclusive ?? true,
             criteria: exploreCriteriaGroup(group.criteriaIds)
           }
         }
+        nextGroupId--
       }
       children = [...children, child]
     }
@@ -627,6 +630,11 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : []
           currentCriterion.exitMode = currentCriterion.exitMode ? currentCriterion.exitMode : []
           currentCriterion.fileStatus = currentCriterion.fileStatus ? currentCriterion.fileStatus : []
+
+          if (element.encounterDateRange) {
+            currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
+            currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+          }
 
           for (const filter of filters) {
             const key = filter ? filter[0] : null

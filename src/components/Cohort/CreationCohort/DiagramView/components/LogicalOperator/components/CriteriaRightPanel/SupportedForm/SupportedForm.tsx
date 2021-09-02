@@ -66,17 +66,19 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
       defaultValues.durationType?.id === 'day' &&
       defaultValues.duration[0] === 0 &&
       defaultValues.duration[1] === 100 &&
-      defaultValues.admissionMode.length === 0 &&
-      defaultValues.entryMode.length === 0 &&
-      defaultValues.exitMode.length === 0 &&
-      defaultValues.priseEnChargeType.length === 0 &&
-      defaultValues.typeDeSejour.length === 0 &&
-      defaultValues.fileStatus.length === 0 &&
-      defaultValues.discharge.length === 0 &&
-      defaultValues.reason.length === 0 &&
-      defaultValues.destination.length === 0 &&
-      defaultValues.provenance.length === 0 &&
-      defaultValues.admission.length === 0
+      defaultValues.admissionMode?.length === 0 &&
+      defaultValues.entryMode?.length === 0 &&
+      defaultValues.exitMode?.length === 0 &&
+      defaultValues.priseEnChargeType?.length === 0 &&
+      defaultValues.typeDeSejour?.length === 0 &&
+      defaultValues.fileStatus?.length === 0 &&
+      defaultValues.discharge?.length === 0 &&
+      defaultValues.reason?.length === 0 &&
+      defaultValues.destination?.length === 0 &&
+      defaultValues.provenance?.length === 0 &&
+      defaultValues.admission?.length === 0 &&
+      defaultValues.encounterStartDate === null &&
+      defaultValues.encounterEndDate === null
     ) {
       return setError(true)
     }
