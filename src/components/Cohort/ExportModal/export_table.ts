@@ -11,9 +11,9 @@ const exportTable: ExportTableType[] = [
     table_id: 'person'
   },
   {
-    id: 'observation',
+    id: 'observation_demographic',
     table_name: 'Patient - Données démographiques',
-    table_id: 'observation'
+    table_id: 'observation_demographic'
   },
   {
     id: 'visit_occurrence',
