@@ -146,10 +146,9 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
 
           <Grid style={{ display: 'flex' }}>
             <TextField
-              required
               className={classes.inputItem}
               id="criteria-search-required"
-              placeholder="Recherche dans les documents"
+              label="Recherche dans les documents"
               variant="outlined"
               value={defaultValues.search}
               onChange={(e) => _onChangeValue('search', e.target.value)}
