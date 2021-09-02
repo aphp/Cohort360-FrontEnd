@@ -66,7 +66,7 @@ const criteriaList: CriteriaItemType[] = [
   },
   {
     id: 'Encounter',
-    title: 'Visites',
+    title: 'Prise en charge',
     color: '#0063AF',
     components: SupportedForm,
     data: {
