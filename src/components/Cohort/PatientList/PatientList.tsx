@@ -129,9 +129,8 @@ const PatientList: React.FC<PatientListProps> = ({
         setAgePyramid(agePyramidData)
       }
       setTotalPatients(totalPatients)
-    } else {
-      setLoadingStatus(false)
     }
+    setLoadingStatus(false)
   }
 
   const onSearchPatient = (sortBy = 'given', sortDirection = 'asc', input = searchInput) => {
