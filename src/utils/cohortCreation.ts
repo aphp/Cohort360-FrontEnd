@@ -403,8 +403,7 @@ export function buildRequest(
                 ]
               : undefined,
           encounterDateRange:
-            !(item.type === 'Patient' || item.type === 'Encounter') &&
-            (item.encounterStartDate || item.encounterEndDate)
+            item.type !== 'Patient' && (item.encounterStartDate || item.encounterEndDate)
               ? {
                   minDate: item.encounterStartDate
                     ? moment(item.encounterStartDate).format('YYYY-MM-DD[T00:00:00Z]')
