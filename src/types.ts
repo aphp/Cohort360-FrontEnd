@@ -395,6 +395,8 @@ export type EncounterDataType = {
   destination: { id: string; label: string }[] | null
   provenance: { id: string; label: string }[] | null
   admission: { id: string; label: string }[] | null
+  encounterStartDate: Date | null
+  encounterEndDate: Date | null
   isInclusive?: boolean
 }
 
