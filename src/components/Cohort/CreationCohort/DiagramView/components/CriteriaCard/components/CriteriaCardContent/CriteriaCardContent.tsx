@@ -70,7 +70,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         ? moment(_currentCriteria.endOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
     }
-    if (!(_currentCriteria.type === 'Patient' || _currentCriteria.type === 'Encounter')) {
+    if (_currentCriteria.type !== 'Patient') {
       encounterStartDate = _currentCriteria.encounterStartDate
         ? moment(_currentCriteria.encounterStartDate, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
@@ -707,6 +707,22 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               label={
                 <Typography style={{ maxWidth: 500 }} noWrap>
                   {displaySelectedFileStatus(_currentCriteria?.fileStatus)}
+                </Typography>
+              }
+            />
+          ),
+          (encounterStartDate || encounterEndDate) && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>
+                  {encounterStartDate
+                    ? encounterEndDate
+                      ? `Prise en charge entre le ${encounterStartDate} et le ${encounterEndDate}`
+                      : `Prise en charge avant le ${encounterStartDate}`
+                    : encounterEndDate
+                    ? `Prise en charge après le ${encounterEndDate}`
+                    : ''}
                 </Typography>
               }
             />

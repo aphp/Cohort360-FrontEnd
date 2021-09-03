@@ -6,13 +6,12 @@ import ClearIcon from '@material-ui/icons/Clear'
 
 import useStyles from './styles'
 
-type OccurrenceInputsProps = {
-  form: 'cim10' | 'ccam' | 'ghm' | 'document'
+type VisitInputsProps = {
   selectedCriteria: any
   onChangeValue: (key: string, value: any) => void
 }
 
-const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
+const VisitInputs: React.FC<VisitInputsProps> = (props) => {
   const { selectedCriteria, onChangeValue } = props
 
   const classes = useStyles()
@@ -62,4 +61,4 @@ const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
   )
 }
 
-export default OccurrenceInputs
+export default VisitInputs
