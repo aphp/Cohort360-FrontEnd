@@ -9,6 +9,7 @@ import Patient from 'views/Patient/Patient'
 import Scope from 'views/Scope/Scope'
 import Dashboard from 'views/Dashboard/Dashboard'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
+import Contact from 'views/Contact/Contact'
 
 import { CONTEXT } from '../../../constants'
 
@@ -23,7 +24,7 @@ export default [
     component: CONTEXT === 'arkhn' ? ArkhnConnexion : CONTEXT === 'aphp' ? Connexion : FakeConnexion
   },
   /**
-   * Chohort360: Main Page
+   * Cohort360: Main Page
    */
   {
     exact: true,
@@ -34,7 +35,7 @@ export default [
     component: Accueil
   },
   /**
-   * Chohort360: Research Patient Page
+   * Cohort360: Research Patient Page
    */
   {
     exact: true,
@@ -53,7 +54,7 @@ export default [
     component: RechercherPatient
   },
   /**
-   * Chohort360: Choose Perimeter Page
+   * Cohort360: Choose Perimeter Page
    */
   {
     exact: true,
@@ -64,7 +65,7 @@ export default [
     component: Scope
   },
   /**
-   * Chohort360: Saved Cohorts Page
+   * Cohort360: Saved Cohorts Page
    */
   {
     exact: true,
@@ -86,7 +87,7 @@ export default [
     component: MyProjects
   },
   /**
-   * Chohort360: Cohorts Creation Page
+   * Cohort360: Cohorts Creation Page
    */
   {
     exact: true,
@@ -127,7 +128,7 @@ export default [
     component: CohortCreation
   },
   /**
-   * Chohort360: Explore Cohort
+   * Cohort360: Explore Cohort
    */
   {
     exact: true,
@@ -148,7 +149,7 @@ export default [
     context: 'cohort'
   },
   /**
-   * Chohort360: Explore Perimeter
+   * Cohort360: Explore Perimeter
    */
   {
     displaySideBar: true,
@@ -167,7 +168,7 @@ export default [
     context: 'perimeters'
   },
   /**
-   * Chohort360: All Patients Page
+   * Cohort360: All Patients Page
    */
   {
     displaySideBar: true,
@@ -186,7 +187,7 @@ export default [
     context: 'patients'
   },
   /**
-   * Chohort360: Patient Page
+   * Cohort360: Patient Page
    */
   {
     displaySideBar: true,
@@ -201,5 +202,15 @@ export default [
     name: 'patients/:patientId',
     isPrivate: true,
     component: Patient
+  },
+  /**
+   * Cohort360: Contact Page
+   */
+  {
+    displaySideBar: true,
+    path: '/contact',
+    name: 'contact',
+    isPrivate: true,
+    component: Contact
   }
 ]

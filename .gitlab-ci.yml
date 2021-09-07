@@ -1,4 +1,4 @@
-image: $HARBOR_REPOSITORY_URL/node:$CI_COMMIT_BRANCH
+image: $IMAGE_REPOSITORY_URL/node:$CI_COMMIT_BRANCH
 
 # uncomment when cache will be made available for kube shared runner
 #default:
@@ -28,7 +28,7 @@ build:
   script:
     - echo "Build"
     - rm package-lock.json
-    - npm config set proxy http://proxym-inter.aphp.fr:8080
+    - npm config set proxy http://$PROXY_URL
     - npm install
     - npm audit fix
     - CI=false npm run build
@@ -47,21 +47,22 @@ test:
 
 deploy:
   image :
-    name : $HARBOR_REPOSITORY_URL/kaniko-executor:$CI_COMMIT_BRANCH
+    name : $IMAGE_REPOSITORY_URL/kaniko-executor:$CI_COMMIT_BRANCH
     entrypoint : [ "" ]
   stage: deploy
   script:
     - ENVIRONMENT=${CI_COMMIT_BRANCH/_/-}
-    - sed -i "s/{{ENVIR}}/$CI_COMMIT_BRANCH/g" Dockerfile_aphp
-    - echo "{\"auths\":{\"$HARBOR_REGISTRY\":{\"username\":\"$BOT_NAME\",\"password\":\"$BOT_TOKEN\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile_aphp --destination $HARBOR_REPOSITORY_URL/front:$CI_COMMIT_BRANCH
+    - sed -i "s/{{ENVIR}}/$CI_COMMIT_BRANCH/g" Dockerfile
+    - REPO=$(echo $IMAGE_REPOSITORY_URL | sed "s/[^a-zA-Z0-9]/\\\\&/g") && sed -i "s/{{IMAGE_REPOSITORY_URL}}/$REPO/g" Dockerfile
+    - echo "{\"auths\":{\"$IMAGE_REGISTRY\":{\"username\":\"$BOT_NAME\",\"password\":\"$BOT_TOKEN\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $IMAGE_REPOSITORY_URL/front:$CI_COMMIT_BRANCH
   rules:
     - if: ($CI_COMMIT_BRANCH == "fakedata" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "qualif" || $CI_COMMIT_BRANCH == "prod_a" || $CI_COMMIT_BRANCH == "prod_b") && $ONLY_RELEASE == null
     - when: never
 
 release:
   image:
-    name: harbor.eds.aphp.fr/cohort360/kubectl:$CI_COMMIT_BRANCH
+    name: $IMAGE_REPOSITORY_URL/kubectl:$CI_COMMIT_BRANCH
     entrypoint: [ "" ]
   stage: release
   script:
