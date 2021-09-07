@@ -257,29 +257,27 @@ export const getScopeSubItems = async (
   if (!perimeter) return []
   const perimeterGroupId = perimeter.id
   const organization = await api.get<FHIR_API_Response<IOrganization>>(
-    `/Organization?partof=${perimeterGroupId}&_elements=id,name,extension,alias`
+    `/Organization?partof=${perimeterGroupId}&_elements=name,extension,alias`
   )
   if (!organization) return []
 
   const organizationData = getApiResponseResources(organization) || []
   if (organizationData.length === 0) return []
 
-  let _subItemsData: ScopeTreeRow[] = []
-  for (const organization of organizationData) {
-    _subItemsData = [
-      ..._subItemsData,
-      {
-        id: organization.id ?? '0',
-        name: getScopeName(organization),
-        quantity: getQuantity(organization.extension) ?? 0,
-        subItems: getSubItem === true ? await getScopeSubItems(organization as ScopeTreeRow) : [loadingItem],
-        access: perimeter?.access
-      }
-    ]
+  let subScopeRows: ScopeTreeRow[] = []
+
+  for (const perimetersResult of organizationData) {
+    const scopeRow: ScopeTreeRow = perimetersResult as ScopeTreeRow
+
+    scopeRow.name = getScopeName(perimetersResult)
+    scopeRow.quantity = getQuantity(perimetersResult.extension)
+    scopeRow.access = getAccessName(perimetersResult.extension)
+    scopeRow.subItems = getSubItem === true ? await getScopeSubItems(perimetersResult as ScopeTreeRow) : [loadingItem]
+    subScopeRows = [...subScopeRows, scopeRow]
   }
 
   // Sort by name
-  _subItemsData = _subItemsData.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
+  subScopeRows = subScopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
     if (a.quantity > b.quantity) {
       return 1
     } else if (a.quantity < b.quantity) {
@@ -287,7 +285,7 @@ export const getScopeSubItems = async (
     }
     return 0
   })
-  _subItemsData = _subItemsData.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
+  subScopeRows = subScopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
     if (b.quantity === 0) return -1
     if (a.name > b.name) {
       return 1
@@ -296,5 +294,8 @@ export const getScopeSubItems = async (
     }
     return 0
   })
-  return _subItemsData
+
+  console.log(`subScopeRows`, subScopeRows)
+
+  return subScopeRows
 }
