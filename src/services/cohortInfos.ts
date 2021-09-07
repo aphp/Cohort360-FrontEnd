@@ -462,19 +462,16 @@ const fetchDocuments = async (
           page ? (page - 1) * 20 : 0
         }&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
       ),
-      search
+      !!search || !!docTypesFilter || !!ndaFilter || !!dateFilter
         ? api.get<FHIR_API_Response<IComposition>>(
-            `/Composition?type:not=doc-impor&_sort=${_sortDirection}${sortBy}&status=final${searchByGroup}${docTypesFilter}${ndaFilter}${dateFilter}&size=0`
+            `/Composition?type:not=doc-impor&status=final${searchByGroup}&size=0`
           )
         : null
     ])
 
     const totalDocs = docsList?.data?.resourceType === 'Bundle' ? docsList.data.total : 0
-    const totalAllDocs = search
-      ? allDocsList?.data?.resourceType === 'Bundle'
-        ? allDocsList.data.total
-        : 0
-      : totalDocs
+    const totalAllDocs =
+      allDocsList !== null ? (allDocsList?.data?.resourceType === 'Bundle' ? allDocsList.data.total : 0) : totalDocs
 
     const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
 
