@@ -295,7 +295,5 @@ export const getScopeSubItems = async (
     return 0
   })
 
-  console.log(`subScopeRows`, subScopeRows)
-
   return subScopeRows
 }
