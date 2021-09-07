@@ -18,11 +18,11 @@ cat $KUBE_CONFIG > /root/.kube/config
 
 # start helm chart if not exist else rollout deploy
 CHART_NAME="front"
+ENVIRONMENT=${CI_COMMIT_BRANCH/_/-}
 if ! kubectl get deploy | grep -q -e "$ENVIRONMENT-$CHART_NAME"; then
   PROJECT_ID=$(echo $DEVOPS_PROJECT_ID)
   curl --request POST --form "token=$CI_JOB_TOKEN" --form "ref=$CI_COMMIT_BRANCH" --form "variables[SPECIFIC_CHART]=$CHART_NAME" "https://$GITLAB_URL/api/v4/projects/$PROJECT_ID/trigger/pipeline"
 else
-  ENVIRONMENT=${CI_COMMIT_BRANCH/_/-}
   kubectl create secret generic $ENVIRONMENT-$CHART_NAME-env --from-env-file=$ENV_FILE -o yaml --dry-run=client | kubectl apply -f -
   kubectl rollout restart deployment/$ENVIRONMENT-$CHART_NAME
 fi
