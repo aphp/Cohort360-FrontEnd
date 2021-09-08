@@ -1,4 +1,4 @@
-import api from './api'
+import api from './apiFhir'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import {
   IPractitionerRole,

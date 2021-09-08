@@ -1,4 +1,4 @@
-import api from './api'
+import api from './apiFhir'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import { FHIR_API_Response, CohortData, ScopeTreeRow } from 'types'
 import { IOrganization, IHealthcareService, IEncounter, IPatient, IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'

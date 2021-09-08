@@ -1,4 +1,4 @@
-import api from './api'
+import api from './apiFhir'
 
 import { CONTEXT } from '../constants'
 import { FHIR_API_Response } from 'types'

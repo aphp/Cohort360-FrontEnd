@@ -1,5 +1,5 @@
-import api from './api'
-import apiBackCohort from './apiBackCohort'
+import api from './apiFhir'
+import apiBackCohort from './apiBackend'
 import { CONTEXT } from '../constants'
 // import { IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {

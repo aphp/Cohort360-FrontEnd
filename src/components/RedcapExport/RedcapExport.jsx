@@ -29,7 +29,7 @@ import { Alert, AlertTitle } from '@material-ui/lab'
 import PropTypes from 'prop-types'
 import useStyles from './styles'
 
-import api from '../../services/api'
+import api from '../../services/apiFhir'
 import Tooltip from '@material-ui/core/Tooltip'
 
 const RedcapExport = (props) => {

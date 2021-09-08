@@ -2,20 +2,20 @@ import axios from 'axios'
 import { ACCES_TOKEN, FHIR_API_URL, TOKEN_URL } from '../constants'
 import { refreshToken, removeTokens } from './arkhnAuth/oauth/tokenManager'
 
-const api = axios.create({
+const apiFhir = axios.create({
   baseURL: FHIR_API_URL,
   headers: {
     Accept: 'application/fhir+json'
   }
 })
 
-api.interceptors.request.use((config) => {
+apiFhir.interceptors.request.use((config) => {
   const token = localStorage.getItem(ACCES_TOKEN)
   config.headers.Authorization = `Bearer ${token}`
   return config
 })
 
-api.interceptors.response.use(
+apiFhir.interceptors.response.use(
   (response) => {
     return response
   },
@@ -46,4 +46,4 @@ api.interceptors.response.use(
   }
 )
 
-export default api
+export default apiFhir

@@ -1,5 +1,5 @@
-import api from './api'
-import apiBackCohort from './apiBackCohort'
+import api from './apiFhir'
+import apiBackCohort from './apiBackend'
 import { getInfos } from './myPatients'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import {
