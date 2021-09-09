@@ -15,4 +15,3 @@ ENV REACT_APP_JWT_URL /api/jwt
 
 COPY docker/nginx.conf /etc/nginx/conf.d/
 CMD ["bash", "/app/entry-point.sh"]
-
