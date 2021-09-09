@@ -410,6 +410,7 @@ export type CohortCreationCounterType = {
   female?: number
   male?: number
   unknownPatient?: number
+  jobFailMsg?: string
 }
 
 export type CohortCreationSnapshotType = {

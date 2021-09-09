@@ -48,9 +48,11 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
   const canMakeExport = cohorts.some((cohort) =>
     cohort.extension && cohort.extension.length > 0
       ? cohort.extension.find(
-          (extension) => extension.url === 'export-deidentified' && extension.valueString === 'false'
+          (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
         ) &&
-        cohort.extension.find((extension) => extension.url === 'read-deidentified' && extension.valueString === 'false')
+        cohort.extension.find(
+          (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+        )
       : false
   )
 
@@ -92,10 +94,10 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
               const canExportThisCohort =
                 canMakeExport && historyRow.extension
                   ? historyRow.extension.some(
-                      (extension) => extension.url === 'export-deidentified' && extension.valueString === 'false'
+                      (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
                     ) &&
                     historyRow.extension.some(
-                      (extension) => extension.url === 'read-deidentified' && extension.valueString === 'false'
+                      (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
                     )
                   : false
 
