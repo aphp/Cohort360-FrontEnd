@@ -43,7 +43,7 @@ const ControlPanel: React.FC<{
     criteriaGroup = [],
     selectedPopulation = []
   } = useAppSelector((state) => state.cohortCreation.request || {})
-  const { includePatient /*byrequest, alive, deceased, female, male, unknownPatient */ } = count
+  const { includePatient, status, jobFailMsg /*byrequest, alive, deceased, female, male, unknownPatient */ } = count
 
   const accessIsPseudonymize: boolean | null =
     selectedPopulation === null
@@ -243,6 +243,13 @@ const ControlPanel: React.FC<{
         {!!includePatient && includePatient > 20000 && (
           <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="error">
             Il est pour le moment impossible de créer des cohortes de plus de 20 000 patients
+          </Alert>
+        )}
+
+        {(status === 'failed' || status === 'error') && (
+          <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="error">
+            Une erreur est survenue lors du calcule du nombre de patients de votre requête. <br />
+            {jobFailMsg}
           </Alert>
         )}
       </Grid>
