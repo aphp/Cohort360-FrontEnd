@@ -204,12 +204,12 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
                           </Typography>
                         </Grid>
                       }
-                      secondary={
-                        <Typography variant="body1" style={{ color: 'red' }}>
-                          La taille de cette table est relativement élevée, veuillez ne pas l'exporter à chacune de vos
-                          demandes d'export
-                        </Typography>
-                      }
+                      // secondary={
+                      //   <Typography variant="body1" style={{ color: 'red' }}>
+                      //     La taille de cette table est relativement élevée, veuillez ne pas l'exporter à chacune de vos
+                      //     demandes d'export
+                      //   </Typography>
+                      // }
                     ></ListItemText>
                   ) : (
                     <ListItemText disableTypography>

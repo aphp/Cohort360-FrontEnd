@@ -1,10 +1,5 @@
 image: $IMAGE_REPOSITORY_URL/node:$CI_COMMIT_BRANCH
 
-# uncomment when cache will be made available for kube shared runner
-#default:
-#  tags:
-#    - k8s-small-generic
-
 cache:
   paths:
     - build/*
@@ -57,18 +52,18 @@ deploy:
     - echo "{\"auths\":{\"$IMAGE_REGISTRY\":{\"username\":\"$BOT_NAME\",\"password\":\"$BOT_TOKEN\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $IMAGE_REPOSITORY_URL/front:$CI_COMMIT_BRANCH
   rules:
-    - if: ($CI_COMMIT_BRANCH == "fakedata" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "qualif" || $CI_COMMIT_BRANCH == "prod_a" || $CI_COMMIT_BRANCH == "prod_b") && $ONLY_RELEASE == null
+    - if: ('$CI_COMMIT_BRANCH =~ /^($STANDARD_CD_BRANCHES)$/' || '$CI_COMMIT_BRANCH =~ /^($PROTECTED_CD_BRANCHES)$/') && $ONLY_RELEASE == null
     - when: never
 
 release:
   image:
-    name: $IMAGE_REPOSITORY_URL/kubectl:$CI_COMMIT_BRANCH
+    name: $IMAGE_REPOSITORY_URL/alpine:$CI_COMMIT_BRANCH
     entrypoint: [ "" ]
   stage: release
   script:
     - bash .gitlab/release.sh
   rules:
-    - if: $CI_COMMIT_BRANCH == "fakedata" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "qualif"
-    - if: $CI_COMMIT_BRANCH == "prod_a" || $CI_COMMIT_BRANCH == "prod_b"
+    - if: ('$CI_COMMIT_BRANCH =~ /^($STANDARD_CD_BRANCHES)$/') && $ENABLE_RELEASE == "true"
+    - if: ('$CI_COMMIT_BRANCH =~ /^($PROTECTED_CD_BRANCHES)$/') && $ENABLE_RELEASE == "true"
       when: manual
     - when: never
