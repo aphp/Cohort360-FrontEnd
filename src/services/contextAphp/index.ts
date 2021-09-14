@@ -1,9 +1,9 @@
 import servicesCohorts, { IServicesCohorts } from './servicesCohorts'
-import servicePatients, { IServicePatients } from './servicePatients'
+import servicePatients, { IServicesPatients } from './servicePatients'
 
 interface IServiceAphp {
   cohorts: IServicesCohorts
-  patients: IServicePatients
+  patients: IServicesPatients
 }
 
 const serviceAphp: IServiceAphp = {
