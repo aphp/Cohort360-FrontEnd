@@ -6,7 +6,8 @@ import { RootState } from 'state'
 
 import { setFavoriteCohortThunk } from './userCohorts'
 
-import { fetchCohort, fetchCohortExportRight } from 'services/cohortInfos'
+import serviceAphp from 'services/contextAphp'
+import { fetchCohortExportRight } from 'services/cohortInfos'
 import { fetchMyPatients } from 'services/myPatients'
 import { fetchPerimetersInfos } from 'services/perimeters'
 
@@ -120,12 +121,13 @@ const fetchExploredCohort = createAsyncThunk<
     default:
       break
   }
+  shouldRefreshData = true
   let cohort
   if (shouldRefreshData || forceReload) {
     switch (context) {
       case 'cohort': {
         if (id) {
-          cohort = (await fetchCohort(id)) as ExploredCohortState
+          cohort = (await serviceAphp.fetchCohort(id)) as ExploredCohortState
           if (cohort) {
             const currentCohortItem = stateCohortList.find(({ fhir_group_id }) => fhir_group_id === id) ?? {
               extension: []

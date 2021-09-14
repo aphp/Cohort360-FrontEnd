@@ -15,7 +15,7 @@ import {
   ICondition
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 
-import { getApiResponseResources } from 'utils/apiHelpers'
+// import { getApiResponseResources } from 'utils/apiHelpers'
 
 const reducer = (accumulator: any, currentValue: any) =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -49,9 +49,9 @@ export const fetchOrganization = async (args: fetchOrganizationProps) => {
   const response = await apiFhir.get<FHIR_API_Response<IOrganization>>(
     `/Organization?${options.reduce(optionsReducer)}`
   )
-  const data = getApiResponseResources(response)
+  // const data = getApiResponseResources(response)
 
-  return data
+  return response
 }
 /**
  * Group Resource
@@ -82,10 +82,10 @@ export const fetchGroup = async (args: fetchGroupProps) => {
   if (_elements && _elements.length > 0)           options = [...options, `_elements=${_elements.reduce(reducer)}`]                             // eslint-disable-line
   if (managingEntity && managingEntity.length > 0) options = [...options, `managingEntity=${managingEntity.reduce(reducer)}`]                   // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<IGroup>>(`/Groups?${options.reduce(optionsReducer)}`)
-  const data = getApiResponseResources(response)
+  const response = await apiFhir.get<FHIR_API_Response<IGroup>>(`/Group?${options.reduce(optionsReducer)}`)
+  // const data = getApiResponseResources(response)
 
-  return data
+  return response
 }
 
 export const deleteGroup = async (groupID: string) => {
@@ -101,11 +101,12 @@ type fetchPatientProps = {
   _id?: string
   _list?: string[]
   size?: number
-  offset: number
+  offset?: number
   _sort?: string
-  sortDirection: 'asc' | 'desc'
-  gender: PatientGenderKind
+  sortDirection?: 'asc' | 'desc'
+  gender?: PatientGenderKind
   birthdate?: string[]
+  searchBy?: string
   _text?: string
   family?: string
   given?: string
@@ -115,7 +116,7 @@ type fetchPatientProps = {
   _elements?: ('id' | 'gender' | 'name' | 'birthDate' | 'deceased' | 'identifier' | 'extension')[]
 }
 export const fetchPatient = async (args: fetchPatientProps) => {
-  const { _id, size, offset, _sort, sortDirection, gender, _text, family, given, identifier, deceased } = args
+  const { _id, size, offset, _sort, sortDirection, gender, _text, searchBy, family, given, identifier, deceased } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list, birthdate, pivotFacet, _elements } = args
 
@@ -130,7 +131,7 @@ export const fetchPatient = async (args: fetchPatientProps) => {
   if (offset)                                      options = [...options, `offset=${offset}`]                                                   // eslint-disable-line
   if (_sort)                                       options = [...options, `_sort=${_sortDirection}${_sort}`]                                    // eslint-disable-line
   if (gender)                                      options = [...options, `gender=${gender}`]                                                   // eslint-disable-line
-  if (_text)                                       options = [...options, `_text=${_text}`]                                                     // eslint-disable-line
+  if (_text)                                       options = [...options, `${searchBy ? searchBy : '_text'}=${_text}`]                          // eslint-disable-line
   if (family)                                      options = [...options, `family=${family}`]                                                   // eslint-disable-line
   if (given)                                       options = [...options, `given=${given}`]                                                     // eslint-disable-line
   if (identifier)                                  options = [...options, `identifier=${identifier}`]                                           // eslint-disable-line
@@ -146,9 +147,9 @@ export const fetchPatient = async (args: fetchPatientProps) => {
   if (birthdate && birthdate.length > 0)           options = [...options, `birthdate=${birthdate.reduce(optionsReducer)}`]                      // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<IPatient>>(`/Patient?${options.reduce(optionsReducer)}`)
-  const data = getApiResponseResources(response)
+  // const data = getApiResponseResources(response)
 
-  return data
+  return response
 }
 
 /**
@@ -161,38 +162,43 @@ type fetchEncounterProps = {
   _list?: string[]
   type?: string
   size?: number
-  offset: number
+  offset?: number
   _sort?: string
-  sortDirection: 'asc' | 'desc'
+  sortDirection?: 'asc' | 'desc'
   patient?: string
   status?: string[]
   facet?: ('class' | 'visit-year-month-gender-facet')[]
   _elements?: ('status' | 'serviceProvider' | 'identifier')[]
 }
 export const fetchEncounter = async (args: fetchEncounterProps) => {
-  const { _id, size, offset, _sort, sortDirection, patient } = args
+  console.log(`args`, args)
+  const { _id, size, offset, _sort, sortDirection, patient, type } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
-  let { _list, status, _elements } = args
+  let { _list, _elements, status, facet } = args
 
   _list = _list ? _list.filter(uniq) : []
   status = status ? status.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
+  facet = facet ? facet.filter(uniq) : []
 
   let options: string[] = []
   if (_id)                                         options = [...options, `_id=${_id}`]                                                         // eslint-disable-line
-  if (size)                                        options = [...options, `size=${size}`]                                                       // eslint-disable-line
+  if (size !== undefined)                          options = [...options, `size=${size}`]                                                       // eslint-disable-line
   if (offset)                                      options = [...options, `offset=${offset}`]                                                   // eslint-disable-line
   if (_sort)                                       options = [...options, `_sort=${_sortDirection}${_sort}`]                                    // eslint-disable-line
   if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
+  if (type)                                        options = [...options, `type=${type}`]                                                       // eslint-disable-line
 
   if (_list && _list.length > 0)                   options = [...options, `_list=${_list.reduce(reducer)}`]                                     // eslint-disable-line
   if (status && status.length > 0)                 options = [...options, `status=${status.reduce(reducer)}`]                                   // eslint-disable-line
   if (_elements && _elements.length > 0)           options = [...options, `_elements=${_elements.reduce(reducer)}`]                             // eslint-disable-line
+  if (facet && facet.length > 0)                   options = [...options, `facet=${facet.reduce(reducer)}`]                                     // eslint-disable-line
+
 
   const response = await apiFhir.get<FHIR_API_Response<IEncounter>>(`/Encounter?${options.reduce(optionsReducer)}`)
-  const data = getApiResponseResources(response)
+  // const data = getApiResponseResources(response)
 
-  return data
+  return response
 }
 
 /**
@@ -204,9 +210,9 @@ type fetchCompositionProps = {
   _id?: string
   _list?: string[]
   size?: number
-  offset: number
+  offset?: number
   _sort?: string
-  sortDirection: 'asc' | 'desc'
+  sortDirection?: 'asc' | 'desc'
   type?: string
   date?: string[]
   _text?: string
@@ -251,9 +257,9 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   if (date && date.length > 0)                     options = [...options, `date=${date.reduce(optionsReducer)}`]                                // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<IComposition>>(`/Composition?${options.reduce(optionsReducer)}`)
-  const data = getApiResponseResources(response)
+  // const data = getApiResponseResources(response)
 
-  return data
+  return response
 }
 
 export const fetchCompositionContent = async (compositionId: string) => {
@@ -279,9 +285,9 @@ export const fetchPractitioner = async (args: fetchPractitionerProps) => {
   const response = await apiFhir.get<FHIR_API_Response<IPractitioner>>(
     `/Practitioner?${options.reduce(optionsReducer)}`
   )
-  const data = getApiResponseResources(response)
+  // const data = getApiResponseResources(response)
 
-  return data
+  return response
 }
 
 /**
@@ -290,8 +296,8 @@ export const fetchPractitioner = async (args: fetchPractitionerProps) => {
  */
 
 type fetchPractitionerRoleProps = {
-  practitioner: string
-  _elements: ('extension' | 'organization')[]
+  practitioner?: string
+  _elements?: ('extension' | 'organization')[]
 }
 export const fetchPractitionerRole = async (args: fetchPractitionerRoleProps) => {
   const { practitioner } = args
@@ -307,9 +313,9 @@ export const fetchPractitionerRole = async (args: fetchPractitionerRoleProps) =>
   const response = await apiFhir.get<FHIR_API_Response<IPractitionerRole>>(
     `/PractitionerRole?${options.reduce(optionsReducer)}`
   )
-  const data = getApiResponseResources(response)
+  // const data = getApiResponseResources(response)
 
-  return data
+  return response
 }
 
 /**
@@ -320,9 +326,9 @@ export const fetchPractitionerRole = async (args: fetchPractitionerRoleProps) =>
 type fetchProcedureProps = {
   _list?: string[]
   size?: number
-  offset: number
+  offset?: number
   _sort?: string
-  sortDirection: 'asc' | 'desc'
+  sortDirection?: 'asc' | 'desc'
   subject?: string
   patient?: string
   code?: string
@@ -359,9 +365,9 @@ export const fetchProcedure = async (args: fetchProcedureProps) => {
   if (date && date.length > 0)                     options = [...options, `date=${date.reduce(optionsReducer)}`]                                // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<IProcedure>>(`/Procedure?${options.reduce(optionsReducer)}`)
-  const data = getApiResponseResources(response)
+  // const data = getApiResponseResources(response)
 
-  return data
+  return response
 }
 /**
  * Claim Resource
@@ -371,9 +377,9 @@ export const fetchProcedure = async (args: fetchProcedureProps) => {
 type fetchClaimProps = {
   _list?: string[]
   size?: number
-  offset: number
+  offset?: number
   _sort?: string
-  sortDirection: 'asc' | 'desc'
+  sortDirection?: 'asc' | 'desc'
   subject?: string
   patient?: string
   diagnosis?: string
@@ -410,9 +416,9 @@ export const fetchClaim = async (args: fetchClaimProps) => {
   if (created)                                     options = [...options, `created=${created.reduce(optionsReducer)}`]                          // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<IClaim>>(`/Claim?${options.reduce(optionsReducer)}`)
-  const data = getApiResponseResources(response)
+  // const data = getApiResponseResources(response)
 
-  return data
+  return response
 }
 
 /**
@@ -423,9 +429,9 @@ export const fetchClaim = async (args: fetchClaimProps) => {
 type fetchConditionProps = {
   _list?: string[]
   size?: number
-  offset: number
+  offset?: number
   _sort?: string
-  sortDirection: 'asc' | 'desc'
+  sortDirection?: 'asc' | 'desc'
   subject?: string
   patient?: string
   code?: string
@@ -464,7 +470,7 @@ export const fetchCondition = async (args: fetchConditionProps) => {
   if (recordedDate && recordedDate.length > 0)     options = [...options, `recorded-date=${recordedDate.reduce(optionsReducer)}`]               // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<ICondition>>(`/Condition?${options.reduce(optionsReducer)}`)
-  const data = getApiResponseResources(response)
+  // const data = getApiResponseResources(response)
 
-  return data
+  return response
 }
