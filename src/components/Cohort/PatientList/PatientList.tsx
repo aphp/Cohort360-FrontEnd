@@ -27,7 +27,7 @@ import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
 import LockIcon from '@material-ui/icons/Lock'
 import ClearIcon from '@material-ui/icons/Clear'
 
-import { fetchPatientList } from '../../../services/cohortInfos'
+import servicesAphp from 'services/contextAphp'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   CohortPatient,
@@ -109,7 +109,7 @@ const PatientList: React.FC<PatientListProps> = ({
       setPatientData(undefined)
       setAgePyramid(undefined)
     }
-    const result = await fetchPatientList(
+    const result = await servicesAphp.cohorts.fetchPatientList(
       pageValue,
       searchBy,
       input,

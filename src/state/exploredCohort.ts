@@ -6,8 +6,7 @@ import { RootState } from 'state'
 
 import { setFavoriteCohortThunk } from './userCohorts'
 
-import serviceAphp from 'services/contextAphp'
-import { fetchCohortExportRight } from 'services/cohortInfos'
+import serviceAphp from 'services/contextAphp/servicesCohorts'
 import { fetchMyPatients } from 'services/myPatients'
 import { fetchPerimetersInfos } from 'services/perimeters'
 
@@ -142,7 +141,8 @@ const fetchExploredCohort = createAsyncThunk<
                   )
                 : false
 
-            cohort.canMakeExport = canMakeExport ? canMakeExport : await fetchCohortExportRight(id, providerId ?? '')
+            console.log(`cohort.canMakeExport`, canMakeExport)
+            cohort.canMakeExport = await serviceAphp.fetchCohortExportRight(id, providerId ?? '')
           }
         }
         break
