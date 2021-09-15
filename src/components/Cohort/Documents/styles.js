@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: 5
   },
   searchBar: {
-    width: '180px',
+    width: '250px',
     backgroundColor: '#FFF',
     border: '1px solid #D0D7D8',
     boxShadow: '0px 1px 16px #0000000A',
@@ -44,6 +44,12 @@ const useStyles = makeStyles((theme) => ({
     color: '#FFF',
     borderRadius: '25px',
     margin: '0 4px'
+  },
+  advancedSearch: {
+    backgroundColor: '#FFF'
+  },
+  gridAdvencedSearch: {
+    marginBottom: '4px'
   },
   autocomplete: {
     width: 200,
