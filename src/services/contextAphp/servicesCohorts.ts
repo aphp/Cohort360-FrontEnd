@@ -1,6 +1,5 @@
 import moment from 'moment'
 
-import { getInfos } from '../myPatients'
 import {
   CohortData,
   SearchByTypes,
@@ -20,6 +19,8 @@ import {
 import { getApiResponseResources } from 'utils/apiHelpers'
 
 import { fetchGroup, fetchPatient, fetchEncounter, fetchComposition, fetchCompositionContent } from './callApi'
+import servicePatients from './servicePatients'
+
 import apiBackend from '../apiBackend'
 
 export interface IServicesCohorts {
@@ -208,7 +209,8 @@ const servicesCohorts: IServicesCohorts = {
       gender,
       searchBy,
       _text: _searchInput,
-      birthdate: [date1, date2],
+      minBirthdate: date1,
+      maxBirthdate: date2,
       deceased: vitalStatus !== VitalStatus.all ? (vitalStatus === VitalStatus.deceased ? true : false) : undefined
     })
 
@@ -284,9 +286,13 @@ const servicesCohorts: IServicesCohorts = {
         _text: searchInput,
         type: selectedDocTypes.length > 0 ? selectedDocTypes.join(',') : '',
         'encounter.identifier': nda,
-        date: startDate ? [startDate, endDate ? endDate : ''] : []
+        minDate: startDate ?? '',
+        maxDate: endDate ?? ''
       }),
-      !!searchInput || !!selectedDocTypes || !!nda || (startDate ? [startDate, endDate ? endDate : ''] : []).length > 0
+      !!searchInput ||
+      !!selectedDocTypes ||
+      !!nda ||
+      (startDate ? [startDate, endDate ? endDate : ''] : endDate ? [endDate] : []).length > 0
         ? fetchComposition({
             status: 'final',
             _list: groupId ? [groupId] : [],
@@ -299,7 +305,11 @@ const servicesCohorts: IServicesCohorts = {
     const totalAllDocs =
       allDocsList !== null ? (allDocsList?.data?.resourceType === 'Bundle' ? allDocsList.data.total : 0) : totalDocs
 
-    const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
+    const documentsList = await servicePatients.getInfos(
+      deidentifiedBoolean,
+      getApiResponseResources(docsList),
+      groupId
+    )
 
     return {
       totalDocs: totalDocs ?? 0,
