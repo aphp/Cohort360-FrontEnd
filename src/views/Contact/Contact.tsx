@@ -95,7 +95,7 @@ const Contact: React.FC = () => {
           <CssBaseline />
           <Grid container item direction="column" xs={12} sm={9}>
             {loading ? (
-              <CircularProgress />
+              <CircularProgress size={60} className={classes.loading} />
             ) : (
               <>
                 <Typography variant="h1" className={classes.title}>
@@ -169,7 +169,7 @@ const Contact: React.FC = () => {
                 )}
 
                 <Button variant="contained" disableElevation onClick={onSubmit} className={classes.validateButton}>
-                  Valider
+                  Envoyer
                 </Button>
               </>
             )}

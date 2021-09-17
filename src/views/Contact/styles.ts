@@ -42,6 +42,11 @@ const useStyles = makeStyles((theme) => ({
     position: 'fixed',
     bottom: 16,
     right: 50
+  },
+  loading: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%'
   }
 }))
 
