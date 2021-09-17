@@ -124,18 +124,20 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
                 Une erreur est survenue lors de votre demande d'export. Veuillez{' '}
                 <a href="mailto:dsi-id-recherche-support-cohort360@aphp.fr">contacter le support</a> pour plus
                 d'informations
-                <Accordion id="reason-accordion" square className={classes.accordion}>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="reason-accordion"
-                    id="reason-accordion-summary"
-                  >
-                    <Typography className={classes.heading}>Motif :</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails id="reason-accordion-details">
-                    <Typography>{exportResponse.detail}</Typography>
-                  </AccordionDetails>
-                </Accordion>
+                {exportResponse.detail && (
+                  <Accordion id="reason-accordion" square className={classes.accordion}>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="reason-accordion"
+                      id="reason-accordion-summary"
+                    >
+                      <Typography className={classes.heading}>Motif :</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails id="reason-accordion-details">
+                      <Typography>{exportResponse.detail}</Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                )}
               </DialogContentText>
             </Grid>
           )}

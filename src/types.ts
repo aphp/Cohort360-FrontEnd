@@ -424,3 +424,9 @@ export type ValueSet = {
   code: string
   display: string
 }
+
+export type ContactSubmitForm = {
+  label: string
+  title: string
+  description: string
+}
