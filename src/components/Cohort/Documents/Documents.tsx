@@ -10,9 +10,9 @@ import {
   InputAdornment,
   InputBase,
   // Paper,
-  Typography,
-  TextField,
-  Input
+  Typography
+  // TextField,
+  // Input
 } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
 
@@ -275,13 +275,13 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
               </Grid>
             </Grid>
             {areaText ? (
-              <Grid item xs={12} className={classes.gridAdvencedSearch}>
+              <Grid item className={classes.gridAdvancedSearch}>
                 <InputBase
                   className={classes.advancedSearch}
                   placeholder="recherche avancée"
                   value={searchInput}
                   onChange={handleChangeInput}
-                  fullWidth
+                  // fullWidth
                   multiline
                   rows={3}
                   endAdornment={
@@ -293,7 +293,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                   }
                 />
                 <IconButton type="submit" aria-label="search" onClick={() => onSearchDocument(_sortBy, _sortDirection)}>
-                  <SearchIcon fill="#ED6D91" height="15px" />
+                  <SearchIcon fill="#ED6D91" height="17px" />
                 </IconButton>
               </Grid>
             ) : (
