@@ -365,39 +365,3 @@ const servicesCohorts: IServicesCohorts = {
 }
 
 export default servicesCohorts
-
-// ================================================================================
-
-// abstract class IServiceInterface {
-//   fetchCohort: (cohortId: string) => Promise<CohortData | undefined> = () => {
-//     throw new Error('fetchCohort is not implemented')
-//   }
-
-//   fetchPatientList: (
-//     page: number,
-//     searchBy: SearchByTypes,
-//     searchInput: string,
-//     gender: PatientGenderKind,
-//     age: [number, number],
-//     vitalStatus: VitalStatus,
-//     sortBy: string,
-//     sortDirection: string,
-//     groupId?: string,
-//     includeFacets?: boolean
-//   ) => Promise<
-//     | {
-//         totalPatients: number
-//         originalPatients: IPatient[] | undefined
-//         agePyramidData?: AgeRepartitionType
-//         genderRepartitionMap?: GenderRepartitionType
-//       }
-//     | undefined
-//   > = () => {
-//     throw new Error('fetchPatientList is not implemented')
-//   }
-// }
-
-// export class servicesCohorts2 extends IServiceInterface {
-//   fetchCohort = () => {
-//   }
-// }

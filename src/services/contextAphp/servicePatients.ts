@@ -6,7 +6,8 @@ import {
   FHIR_API_Response,
   PatientData,
   CohortEncounter,
-  CohortPatient
+  CohortPatient,
+  SearchByTypes
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -21,13 +22,15 @@ import {
   ICondition,
   IIdentifier,
   IProcedure,
-  IDocumentReference
+  IDocumentReference,
+  IPatient
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { fetchPatient, fetchEncounter, fetchClaim, fetchCondition, fetchProcedure, fetchComposition } from './callApi'
 
 export interface IServicesPatients {
   fetchPatientsCount: () => Promise<number>
   fetchMyPatients: () => Promise<CohortData | undefined>
+  fetchPatient: (patientId: string, groupId?: string) => Promise<PatientData | undefined>
   getInfos: (deidentifiedBoolean: boolean, documents?: IComposition[], groupId?: string) => Promise<CohortComposition[]>
   fetchPMSI: (
     deidentified: boolean,
@@ -66,7 +69,17 @@ export interface IServicesPatients {
   getEncounterOrProcedureDocs: (
     data: CohortEncounter | PMSIEntry<IProcedure>
   ) => Promise<(CohortComposition | IDocumentReference)[]>
-  fetchPatient: (patientId: string, groupId?: string) => Promise<PatientData | undefined>
+  searchPatient: (
+    nominativeGroupsIds: string[] | undefined,
+    page: number,
+    sortBy: string,
+    sortDirection: string,
+    input: string,
+    searchBy: SearchByTypes
+  ) => Promise<{
+    patientList: IPatient[]
+    totalPatients: number
+  }>
 }
 
 const servicesPatients: IServicesPatients = {
@@ -233,7 +246,7 @@ const servicesPatients: IServicesPatients = {
     switch (selectedTab) {
       case 'CIM10':
         pmsiResp = await fetchCondition({
-          offset: (page - 1) * 20,
+          offset: page ? (page - 1) * 20 : 0,
           size: 20,
           _list: groupId ? [groupId] : [],
           patient: patientId,
@@ -249,7 +262,7 @@ const servicesPatients: IServicesPatients = {
         break
       case 'CCAM':
         pmsiResp = await fetchProcedure({
-          offset: (page - 1) * 20,
+          offset: page ? (page - 1) * 20 : 0,
           size: 20,
           _list: groupId ? [groupId] : [],
           patient: patientId,
@@ -264,7 +277,7 @@ const servicesPatients: IServicesPatients = {
         break
       case 'GHM':
         pmsiResp = await fetchClaim({
-          offset: (page - 1) * 20,
+          offset: page ? (page - 1) * 20 : 0,
           size: 20,
           _list: groupId ? [groupId] : [],
           patient: patientId,
@@ -279,6 +292,7 @@ const servicesPatients: IServicesPatients = {
         break
       default:
         pmsiResp = null
+        break
     }
 
     if (pmsiResp === null) return {}
@@ -450,6 +464,44 @@ const servicesPatients: IServicesPatients = {
       ghm,
       ghmTotal,
       patient
+    }
+  },
+
+  searchPatient: async (nominativeGroupsIds, page, sortBy, sortDirection, input, searchBy) => {
+    let search = ''
+    if (input.trim() !== '') {
+      if (searchBy === '_text') {
+        const searches = input
+          .trim() // Remove space before/after search
+          .split(' ') // Split by space (= ['mot1', 'mot2' ...])
+          .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
+
+        for (const _search of searches) {
+          search = search ? `${search} AND "${_search}"` : `"${_search}"`
+        }
+      } else {
+        search = input.trim()
+      }
+    }
+
+    const patientResp = await fetchPatient({
+      _list: nominativeGroupsIds,
+      size: 20,
+      offset: page ? (page - 1) * 20 : 0,
+      _sort: sortBy,
+      sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+      searchBy: searchBy,
+      _text: search,
+      _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
+    })
+
+    const patientList = getApiResponseResources(patientResp)
+
+    const totalPatients = patientResp.data.resourceType === 'Bundle' ? patientResp.data.total : 0
+
+    return {
+      patientList: patientList ?? [],
+      totalPatients: totalPatients ?? 0
     }
   }
 }
