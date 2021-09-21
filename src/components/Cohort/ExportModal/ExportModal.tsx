@@ -114,7 +114,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
             <Grid container alignItems="center" justify="space-between">
               <CheckCircleOutlineIcon style={{ fontSize: 52 }} htmlColor="#BDEA88" />
               <DialogContentText style={{ marginBottom: 0, width: 'calc(100% - 62px)' }}>
-                Votre demande d'export a bien été prise en compte, vous receverez prochainement un email
+                Votre demande d'export a bien été prise en compte. Vous recevrez un email de confirmation prochainement.
               </DialogContentText>
             </Grid>
           ) : (
