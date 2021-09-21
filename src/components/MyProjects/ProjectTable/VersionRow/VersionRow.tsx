@@ -24,7 +24,7 @@ import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 
 import { setSelectedCohort } from 'state/cohort'
 
-import { CohortType } from 'services/myProjects'
+import { CohortType } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 

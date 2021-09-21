@@ -1,5 +1,5 @@
-import api from './apiFhir'
-import { CONTEXT, API_RESOURCE_TAG } from '../constants'
+import api from '../apiFhir'
+import { CONTEXT, API_RESOURCE_TAG } from '../../constants'
 import { FHIR_API_Response, CohortData, ScopeTreeRow } from 'types'
 import { IOrganization, IHealthcareService, IEncounter, IPatient, IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
@@ -14,12 +14,12 @@ import {
 } from 'utils/graphUtils'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
-import fakeGroup from '../data/fakeData/group'
-import fakeFacetDeceased from '../data/fakeData/facet-deceased'
-import fakeFacetAgeMonth from '../data/fakeData/facet-age-month'
-import fakeFacetClassSimple from '../data/fakeData/facet-class-simple'
-import fakeFacetStartDateFacet from '../data/fakeData/facet-start-date-facet'
-import fakePatients from '../data/fakeData/patients'
+import fakeGroup from '../../data/fakeData/group'
+import fakeFacetDeceased from '../../data/fakeData/facet-deceased'
+import fakeFacetAgeMonth from '../../data/fakeData/facet-age-month'
+import fakeFacetClassSimple from '../../data/fakeData/facet-class-simple'
+import fakeFacetStartDateFacet from '../../data/fakeData/facet-start-date-facet'
+import fakePatients from '../../data/fakeData/patients'
 
 export const getServices = async (id: string) => {
   const [respOrganizations, respHealthcareServices] = await Promise.all([

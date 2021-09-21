@@ -31,7 +31,7 @@ import InfoIcon from '@material-ui/icons/Info'
 import useStyles from './styles'
 
 import export_table from './export_table'
-import { createExport } from 'services/export'
+import services from 'services'
 
 const initialState = {
   motif: '',
@@ -79,6 +79,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   }
 
   const handleSubmit = async () => {
+    if (typeof services.cohorts.createExport !== 'function') {
+      return
+    }
+
     settings.motif = settings?.motif ? settings?.motif.trim() : ''
 
     if (!settings?.motif || settings?.motif.length < 10) {
@@ -89,7 +93,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       return setError(ERROR_TABLE)
     }
 
-    const response = await createExport({
+    const response = await services.cohorts.createExport({
       cohortId,
       motivation: settings?.motif,
       tables: settings?.tables

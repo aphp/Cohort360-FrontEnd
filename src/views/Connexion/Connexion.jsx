@@ -16,11 +16,10 @@ import DialogActions from '@material-ui/core/DialogActions'
 import Footer from '../../components/Footer/Footer'
 import logo from '../../assets/images/logo-login.png'
 import { login as loginAction } from '../../state/me'
-import { authenticate } from '../../services/authentication'
 import { ACCES_TOKEN, REFRESH_TOKEN } from '../../constants'
 import useStyles from './styles'
-import { fetchPractitioner } from '../../services/practitioner'
-import { fetchDeidentified } from 'services/deidentification'
+
+import services from 'services'
 
 const ErrorDialog = ({ open, setErrorLogin }) => {
   const _setErrorLogin = () => {
@@ -85,10 +84,17 @@ const Login = () => {
   const [open, setOpen] = useState(false)
 
   const getPractitionerData = async (lastConnection) => {
-    const practitioner = await fetchPractitioner(username)
+    if (
+      typeof services?.practitioner?.fetchPractitioner !== 'function' ||
+      typeof services.perimeters.fetchDeidentified !== 'function'
+    ) {
+      return setErrorLogin(true)
+    }
+
+    const practitioner = await services.practitioner.fetchPractitioner(username)
 
     if (practitioner) {
-      const deidentifiedInfos = await fetchDeidentified(practitioner.id)
+      const deidentifiedInfos = await services.perimeters.fetchDeidentified(practitioner.id)
 
       dispatch(
         loginAction({
@@ -121,7 +127,7 @@ const Login = () => {
     try {
       if (!username || !password) return setErrorLogin(true)
 
-      const response = await authenticate(username, password)
+      const response = await services.practitioner.authenticate(username, password)
       if (!response) return setErrorLogin(true)
 
       const { status, data = {} } = response

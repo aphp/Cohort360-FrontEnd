@@ -4,7 +4,7 @@ import servicePerimeters, { IServicesPerimeters } from './servicePerimeters'
 import servicePractitioner, { IServicesPractitioner } from './servicePractitioner'
 import serviceProjects, { IServicesProjects } from './serviceProjects'
 
-export interface IServiceAphp {
+export interface IServiceArkhn {
   cohorts: IServicesCohorts
   patients: IServicesPatients
   perimeters: IServicesPerimeters
@@ -12,7 +12,7 @@ export interface IServiceAphp {
   projects: IServicesProjects
 }
 
-const serviceAphp: IServiceAphp = {
+const serviceArkhn: IServiceArkhn = {
   cohorts: servicesCohorts,
   patients: servicePatients,
   perimeters: servicePerimeters,
@@ -20,4 +20,4 @@ const serviceAphp: IServiceAphp = {
   projects: serviceProjects
 }
 
-export default serviceAphp
+export default serviceArkhn

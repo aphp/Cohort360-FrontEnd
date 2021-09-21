@@ -1,5 +1,5 @@
-import api from './apiFhir'
-import { CONTEXT } from '../constants'
+import api from '../apiFhir'
+import { CONTEXT } from '../../constants'
 import { FHIR_API_Response } from 'types'
 import { IGroup, IPractitionerRole } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { getApiResponseResources } from 'utils/apiHelpers'

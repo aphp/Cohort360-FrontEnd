@@ -16,7 +16,7 @@ import PatientSidebar from '../../components/Patient/PatientSidebar/PatientSideb
 import PatientTimeline from '../../components/Patient/PatientTimeline/PatientTimeline'
 import TopBar from '../../components/TopBar/TopBar'
 
-import { fetchPatient } from '../../services/patient'
+import services from 'services'
 
 import { CohortPatient, PMSIEntry } from 'types'
 import {
@@ -68,8 +68,9 @@ const Patient = () => {
 
   useEffect(() => {
     const _fetchPatient = async () => {
+      if (typeof services?.patients?.fetchPatient !== 'function') return
       setLoading(true)
-      const patientResp = await fetchPatient(patientId, groupId)
+      const patientResp = await services.patients.fetchPatient(patientId, groupId)
 
       setHospit(patientResp?.hospit ?? undefined)
       setDocuments(patientResp?.documents ?? undefined)

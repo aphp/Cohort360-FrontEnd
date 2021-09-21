@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-import { fetchPerimeterInfoForRequeteur as fetchPopulation } from '../services/perimeters'
+import services from 'services'
 import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType } from 'types'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
@@ -493,8 +493,16 @@ export async function unbuildRequest(_json: string) {
   /**
    * Retrieve popultion
    */
+  if (typeof services.perimeters.fetchPerimeterInfoForRequeteur !== 'function') {
+    return {
+      population: null,
+      criteria: [],
+      criteriaGroup: []
+    }
+  }
+
   for (const caresiteCohortItem of caresiteCohortList) {
-    const newPopulation = await fetchPopulation(caresiteCohortItem ?? '')
+    const newPopulation = await services.perimeters.fetchPerimeterInfoForRequeteur(caresiteCohortItem ?? '')
     if (!newPopulation) continue
     population = population ? [...population, newPopulation] : [newPopulation]
   }

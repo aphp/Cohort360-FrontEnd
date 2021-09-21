@@ -41,7 +41,7 @@ import {
   IEncounter,
   IDocumentReference
 } from '@ahryman40k/ts-fhir-types/lib/R4'
-import servicesAphp from 'services/contextAphp'
+import services from 'services'
 // import { fetchDocumentContent } from 'services/cohortInfos'
 import { getDocumentStatus } from 'utils/documentsFormatter'
 
@@ -74,7 +74,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
     setDocumentDialogOpen(true)
     if (deidentified && documentId) {
       setLoading(true)
-      const doc = await servicesAphp.cohorts.fetchDocumentContent(documentId)
+      const doc = await services.cohorts.fetchDocumentContent(documentId)
       if (doc) {
         setLoading(false)
         setDocumentContent(doc)

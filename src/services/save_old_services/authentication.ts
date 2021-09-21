@@ -1,8 +1,8 @@
 import axios, { AxiosResponse } from 'axios'
 
 import { v4 as uuid } from 'uuid'
-import { STATE_STORAGE_KEY, PORTAIL_API_URL } from '../constants'
-import { authClient } from './arkhnAuth/oauth/authClient'
+import { STATE_STORAGE_KEY, PORTAIL_API_URL } from '../../constants'
+import { authClient } from '../arkhnAuth/oauth/authClient'
 
 type Authentication = {
   status: number

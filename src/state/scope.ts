@@ -3,7 +3,7 @@ import { RootState } from 'state'
 
 import { logout, login } from './me'
 
-import { getScopePerimeters, getScopeSubItems } from 'services/scopeService'
+import services from 'services'
 
 import { ScopeTreeRow } from 'types'
 
@@ -37,7 +37,7 @@ const fetchScopesList = createAsyncThunk<FetchScopeListReturn, void, { state: Ro
       if (scopesList.length) {
         return { scopesList }
       } else {
-        const scopes = (await getScopePerimeters(me)) || []
+        const scopes = (await services.perimeters.getScopePerimeters(me)) || []
         return { scopesList: scopes }
       }
     } catch (error) {
@@ -80,7 +80,7 @@ const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScop
           if (+item.id === +rowId) {
             const foundItem = item.subItems ? item.subItems.find((i: any) => i.id === 'loading') : true
             if (foundItem) {
-              const subItems: ScopeTreeRow[] = await getScopeSubItems(item, true)
+              const subItems: ScopeTreeRow[] = await services.perimeters.getScopeSubItems(item, true)
               item = { ...item, subItems: subItems }
             }
           } else if (item.subItems && item.subItems.length !== 0) {

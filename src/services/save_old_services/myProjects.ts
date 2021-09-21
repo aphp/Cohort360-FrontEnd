@@ -1,7 +1,7 @@
 // @ts-nocheck
-import apiBack from './apiBackend'
-import apiFhir from './apiFhir'
-import { CONTEXT } from '../constants'
+import apiBack from '../apiBackend'
+import apiFhir from '../apiFhir'
+import { CONTEXT } from '../../constants'
 
 /**
  * Projects:

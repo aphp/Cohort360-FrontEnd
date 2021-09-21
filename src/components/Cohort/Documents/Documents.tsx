@@ -18,8 +18,7 @@ import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
 import DocumentList from './DocumentList/DocumentList'
 // import WordCloud from '../Preview/Charts/WordCloud'
 import DocumentSearchHelp from '../../DocumentSearchHelp/DocumentSearchHelp'
-import servicesAphp from 'services/contextAphp'
-// import { fetchDocuments } from '../../../services/cohortInfos'
+import services from 'services'
 
 import ClearIcon from '@material-ui/icons/Clear'
 import InfoIcon from '@material-ui/icons/Info'
@@ -103,7 +102,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
 
     const selectedDocTypesCodes = selectedDocTypes.map((docType) => docType.code)
 
-    const result = await servicesAphp.cohorts.fetchDocuments(
+    const result = await services.cohorts.fetchDocuments(
       !!deidentifiedBoolean,
       sortBy,
       sortDirection,

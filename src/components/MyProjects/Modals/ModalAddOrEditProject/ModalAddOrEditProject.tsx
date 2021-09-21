@@ -15,7 +15,7 @@ import {
 import { useAppSelector } from 'state'
 import { ProjectState, addProject, editProject, deleteProject } from 'state/project'
 
-import { ProjectType } from 'services/myProjects'
+import { ProjectType } from 'types'
 
 import useStyles from './styles'
 

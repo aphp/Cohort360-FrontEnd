@@ -6,9 +6,7 @@ import { RootState } from 'state'
 
 import { setFavoriteCohortThunk } from './userCohorts'
 
-import serviceAphp from 'services/contextAphp/servicesCohorts'
-import { fetchMyPatients } from 'services/myPatients'
-import { fetchPerimetersInfos } from 'services/perimeters'
+import services from 'services'
 
 export type ExploredCohortState = {
   importedPatients: any[]
@@ -126,7 +124,7 @@ const fetchExploredCohort = createAsyncThunk<
     switch (context) {
       case 'cohort': {
         if (id) {
-          cohort = (await serviceAphp.fetchCohort(id)) as ExploredCohortState
+          cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
           if (cohort) {
             const currentCohortItem = stateCohortList.find(({ fhir_group_id }) => fhir_group_id === id) ?? {
               extension: []
@@ -142,13 +140,13 @@ const fetchExploredCohort = createAsyncThunk<
                 : false
 
             console.log(`cohort.canMakeExport`, canMakeExport)
-            cohort.canMakeExport = await serviceAphp.fetchCohortExportRight(id, providerId ?? '')
+            cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
           }
         }
         break
       }
       case 'patients': {
-        cohort = (await fetchMyPatients()) as ExploredCohortState
+        cohort = (await services.patients.fetchMyPatients()) as ExploredCohortState
         if (cohort) {
           cohort.name = '-'
           cohort.description = ''
@@ -161,7 +159,7 @@ const fetchExploredCohort = createAsyncThunk<
       }
       case 'perimeters': {
         if (id) {
-          cohort = (await fetchPerimetersInfos(id)) as ExploredCohortState
+          cohort = (await services.perimeters.fetchPerimetersInfos(id)) as ExploredCohortState
           if (cohort) {
             cohort.name = '-'
             cohort.description = ''

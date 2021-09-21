@@ -15,7 +15,7 @@ import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
 import DocumentList from '../../Cohort/Documents/DocumentList/DocumentList'
 import SortDialog from '../../Filters/SortDialog/SortDialog'
 
-import { fetchDocuments } from '../../../services/patient'
+import services from 'services'
 import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortComposition } from 'types'
 
@@ -92,11 +92,12 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
   })()
 
   const fetchDocumentsList = async (newSortBy: string, newSortDirection: string, input = searchInput, page = 1) => {
+    if (typeof services.patients.fetchDocuments !== 'function') return
     setLoadingStatus(true)
 
     const selectedDocTypesCodes = selectedDocTypes.map((docType) => docType.code)
 
-    const docResp = await fetchDocuments(
+    const docResp = await services.patients.fetchDocuments(
       deidentifiedBoolean,
       newSortBy,
       newSortDirection,
