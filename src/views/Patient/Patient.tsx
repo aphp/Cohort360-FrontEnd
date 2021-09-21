@@ -8,13 +8,13 @@ import { Alert } from '@material-ui/lab'
 
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 
-import PatientDocs from '../../components/Patient/PatientDocs/PatientDocs'
-import PatientHeader from '../../components/Patient/PatientHeader/PatientHeader'
-import PatientPreview from '../../components/Patient/PatientPreview/PatientPreview'
-import PatientPMSI from '../../components/Patient/PatientPMSI/PatientPMSI'
-import PatientSidebar from '../../components/Patient/PatientSidebar/PatientSidebar'
-import PatientTimeline from '../../components/Patient/PatientTimeline/PatientTimeline'
-import TopBar from '../../components/TopBar/TopBar'
+import PatientDocs from 'components/Patient/PatientDocs/PatientDocs'
+import PatientHeader from 'components/Patient/PatientHeader/PatientHeader'
+import PatientPreview from 'components/Patient/PatientPreview/PatientPreview'
+import PatientPMSI from 'components/Patient/PatientPMSI/PatientPMSI'
+import PatientSidebar from 'components/Patient/PatientSidebar/PatientSidebar'
+import PatientTimeline from 'components/Patient/PatientTimeline/PatientTimeline'
+import TopBar from 'components/TopBar/TopBar'
 
 import services from 'services'
 

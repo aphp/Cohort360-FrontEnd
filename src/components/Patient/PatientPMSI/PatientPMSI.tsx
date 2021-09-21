@@ -26,8 +26,8 @@ import Pagination from '@material-ui/lab/Pagination'
 import PMSIFilters from '../../Filters/PMSIFilters/PMSIFilters'
 
 import ClearIcon from '@material-ui/icons/Clear'
-import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
-import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
+import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
+import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import services from 'services'
 

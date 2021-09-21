@@ -22,9 +22,9 @@ import services from 'services'
 
 import ClearIcon from '@material-ui/icons/Clear'
 import InfoIcon from '@material-ui/icons/Info'
-import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
-import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
-import { docTypes } from '../../../assets/docTypes.json'
+import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
+import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
+import { docTypes } from 'assets/docTypes.json'
 
 import { CohortComposition } from 'types'
 import {

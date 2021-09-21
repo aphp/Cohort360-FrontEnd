@@ -7,8 +7,8 @@ import {
   fakeFileStatus,
   fakePriseEnCharge,
   fakeTypeDeSejour
-} from '.././../data/fakeData/cohortCreation/encounter'
-import { capitalizeFirstLetter } from '../../utils/capitalize'
+} from 'data/fakeData/cohortCreation/encounter'
+import { capitalizeFirstLetter } from 'utils/capitalize'
 import { cleanValueSet } from 'utils/cleanValueSet'
 
 export const fetchAdmissionModes = async () => {

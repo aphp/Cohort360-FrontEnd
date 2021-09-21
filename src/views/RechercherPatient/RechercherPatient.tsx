@@ -6,11 +6,11 @@ import { withRouter, useParams } from 'react-router'
 
 import { CircularProgress, Grid, Typography } from '@material-ui/core'
 
-import PatientSearchBar from '../../components/PatientSearchBar/PatientSearchBar'
-import TableauPatients from '../../components/TableauPatients/TableauPatients'
+import PatientSearchBar from 'components/PatientSearchBar/PatientSearchBar'
+import TableauPatients from 'components/TableauPatients/TableauPatients'
 
 import services from 'services'
-import { setExploredCohort } from '../../state/exploredCohort'
+import { setExploredCohort } from 'state/exploredCohort'
 
 import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { SearchByTypes } from 'types'

@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles'
-import { smallDrawerWidth, largeDrawerWidth } from '../../components/LeftSideBar/LeftSideBar'
+import { smallDrawerWidth, largeDrawerWidth } from 'components/LeftSideBar/LeftSideBar'
 
 const useStyles = makeStyles((theme) => ({
   appBar: {

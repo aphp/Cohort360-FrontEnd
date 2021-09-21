@@ -6,7 +6,7 @@ import { useHistory } from 'react-router-dom'
 import { IconButton, Grid, Menu, MenuItem, Typography } from '@material-ui/core'
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack'
-import { ReactComponent as MoreIcon } from '../../../../assets/icones/ellipsis-v.svg'
+import { ReactComponent as MoreIcon } from 'assets/icones/ellipsis-v.svg'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 

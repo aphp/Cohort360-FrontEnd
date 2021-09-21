@@ -5,7 +5,7 @@ import { CohortPatient, FHIR_API_Response, SearchByTypes } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import { getServices } from './perimeters'
 
-import fakePatients from '../../data/fakeData/patients'
+import fakePatients from 'data/fakeData/patients'
 
 export const searchPatient = async (
   nominativeGroupsIds: string[] | undefined,

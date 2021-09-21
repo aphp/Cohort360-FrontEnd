@@ -7,8 +7,8 @@ import { Pagination } from '@material-ui/lab'
 import ClearIcon from '@material-ui/icons/Clear'
 import InfoIcon from '@material-ui/icons/Info'
 import SortIcon from '@material-ui/icons/Sort'
-import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
-import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
+import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
+import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import DocumentSearchHelp from '../../DocumentSearchHelp/DocumentSearchHelp'
 import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
@@ -19,7 +19,7 @@ import services from 'services'
 import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortComposition } from 'types'
 
-import { docTypes } from '../../../assets/docTypes.json'
+import { docTypes } from 'assets/docTypes.json'
 
 import useStyles from './styles'
 

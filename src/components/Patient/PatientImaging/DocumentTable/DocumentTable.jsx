@@ -12,9 +12,9 @@ import Chip from '@material-ui/core/Chip'
 import Dialog from '@material-ui/core/Dialog'
 import PropTypes from 'prop-types'
 
-import { ReactComponent as PdfIcon } from '../../../../assets/icones/file-pdf.svg'
-import { ReactComponent as CheckIcon } from '../../../../assets/icones/check.svg'
-import { ReactComponent as CancelIcon } from '../../../../assets/icones/times.svg'
+import { ReactComponent as PdfIcon } from 'assets/icones/file-pdf.svg'
+import { ReactComponent as CheckIcon } from 'assets/icones/check.svg'
+import { ReactComponent as CancelIcon } from 'assets/icones/times.svg'
 
 import useStyles from './styles'
 

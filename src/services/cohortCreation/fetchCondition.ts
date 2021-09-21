@@ -1,11 +1,11 @@
 import { CONTEXT } from '../../constants'
-import apiRequest from '../../services/apiRequest'
-import { capitalizeFirstLetter } from '../../utils/capitalize'
+import apiRequest from 'services/apiRequest'
+import { capitalizeFirstLetter } from 'utils/capitalize'
 import {
   fakeValueSetDiagnosticType,
   fakeValueSetCIM10
   // fakeHierarchyCIM10
-} from '../../data/fakeData/cohortCreation/condition'
+} from 'data/fakeData/cohortCreation/condition'
 import { codeSort } from 'utils/alphabeticalSort'
 
 const DEFAULT_DIAGNOSTIC_TYPES = [

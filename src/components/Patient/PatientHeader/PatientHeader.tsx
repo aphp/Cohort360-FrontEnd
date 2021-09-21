@@ -6,7 +6,7 @@ import PatientTitle from './PatientTitle/PatientTitle'
 import PatientDiagnosis from './PatientDiagnosis/PatientDiagnosis'
 import PatientInfo from './PatientInfo/PatientInfo'
 
-import { getAge } from '../../../utils/age'
+import { getAge } from 'utils/age'
 import { CohortPatient } from 'types'
 
 import useStyles from './styles'

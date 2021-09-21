@@ -9,7 +9,7 @@ import {
   // FHIR_API_Response,
   FormattedCohort,
   ValueSet
-} from '../types'
+} from 'types'
 
 export const fetchCohorts = async (
   sortBy: string,

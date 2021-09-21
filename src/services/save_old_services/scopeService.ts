@@ -7,12 +7,12 @@ import {
   IPatient,
   IExtension
 } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { FHIR_API_Response, ScopeTreeRow } from '../../types'
+import { FHIR_API_Response, ScopeTreeRow } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
 import { MeState } from 'state/me'
 
-import fakeScopeRows from '../../data/fakeData/scopeRows'
+import fakeScopeRows from 'data/fakeData/scopeRows'
 
 const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 

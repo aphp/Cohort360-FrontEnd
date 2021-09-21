@@ -20,17 +20,17 @@ import {
   fetchDestination,
   fetchProvenance,
   fetchAdmission
-} from '../../../services/cohortCreation/fetchEncounter'
-import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetchDemographic'
+} from 'services/cohortCreation/fetchEncounter'
+import { fetchGender, fetchStatus } from 'services/cohortCreation/fetchDemographic'
 import {
   fetchStatusDiagnostic,
   fetchDiagnosticTypes,
   fetchCim10Diagnostic,
   fetchCim10Hierarchy
-} from '../../../services/cohortCreation/fetchCondition'
-import { fetchCcamData, fetchCcamHierarchy } from '../../../services/cohortCreation/fetchProcedure'
-import { fetchGhmData, fetchGhmHierarchy } from '../../../services/cohortCreation/fetchClaim'
-import { fetchDocTypes } from '../../../services/cohortCreation/fetchComposition'
+} from 'services/cohortCreation/fetchCondition'
+import { fetchCcamData, fetchCcamHierarchy } from 'services/cohortCreation/fetchProcedure'
+import { fetchGhmData, fetchGhmHierarchy } from 'services/cohortCreation/fetchClaim'
+import { fetchDocTypes } from 'services/cohortCreation/fetchComposition'
 
 // ├── Mes variables
 // ├── Patients

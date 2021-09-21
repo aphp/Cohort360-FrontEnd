@@ -13,9 +13,9 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogActions from '@material-ui/core/DialogActions'
 
-import Footer from '../../components/Footer/Footer'
-import logo from '../../assets/images/logo-login.png'
-import { login as loginAction } from '../../state/me'
+import Footer from 'components/Footer/Footer'
+import logo from 'assets/images/logo-login.png'
+import { login as loginAction } from 'state/me'
 import { ACCES_TOKEN, REFRESH_TOKEN } from '../../constants'
 import useStyles from './styles'
 
