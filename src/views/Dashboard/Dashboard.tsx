@@ -11,7 +11,7 @@ import InclusionExclusionPatientsPanel from 'components/Cohort/InclusionExclusio
 import RedcapExport from 'components/RedcapExport/RedcapExport'
 import CohortPreview from 'components/Cohort/Preview/Preview'
 import PatientList from 'components/Cohort/PatientList/PatientList'
-import CohortDocuments from 'components/Cohort/Documents/Documents'
+import Documents from 'components/Cohort/Documents/Documents'
 import TopBar from 'components/TopBar/TopBar'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 
@@ -231,7 +231,7 @@ const Dashboard: React.FC<{
           />
         )}
         {selectedTab === 'documents' && (
-          <CohortDocuments
+          <Documents
             groupId={cohortId || perimetreIds}
             deidentifiedBoolean={deidentifiedBoolean}
             sortBy={'date'}
