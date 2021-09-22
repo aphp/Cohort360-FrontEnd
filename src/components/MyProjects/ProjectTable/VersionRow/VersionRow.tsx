@@ -44,7 +44,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
     dispatch<any>(setSelectedCohort(cohortId))
   }
 
-  // You can make an export if you got 1 cohort with: read-deidentified = false && export-deidentified = false
+  // You can make an export if you got 1 cohort with: EXPORT_DATA_NOMINATIVE = true && READ_DATA_NOMINATIVE = true
   const canMakeExport = cohorts.some((cohort) =>
     cohort.extension && cohort.extension.length > 0
       ? cohort.extension.find(

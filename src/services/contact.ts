@@ -1,5 +1,5 @@
 import { ContactSubmitForm } from 'types'
-import apiBackCohort from './apiBackCohort'
+import apiBackCohort from './apiBackend'
 
 export const postIssue = async (contactSubmitForm: ContactSubmitForm) => {
   try {

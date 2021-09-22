@@ -337,8 +337,6 @@ const servicesCohorts: IServicesCohorts = {
         provider: providerId
       })
 
-      console.log(`rightResponse`, rightResponse.data)
-
       if (
         rightResponse &&
         // @ts-ignore
@@ -355,10 +353,10 @@ const servicesCohorts: IServicesCohorts = {
         const canMakeExport =
           currentCohortItem.extension && currentCohortItem.extension.length > 0
             ? currentCohortItem.extension.some(
-                (extension: any) => extension.url === 'export-deidentified' && extension.valueString === 'false'
+                (extension: any) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
               ) &&
               currentCohortItem.extension.some(
-                (extension: any) => extension.url === 'read-deidentified' && extension.valueString === 'false'
+                (extension: any) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
               )
             : false
         return canMakeExport
