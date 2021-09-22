@@ -248,7 +248,7 @@ const ControlPanel: React.FC<{
 
         {(status === 'failed' || status === 'error') && (
           <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="error">
-            Une erreur est survenue lors du calcule du nombre de patients de votre requête. <br />
+            Une erreur est survenue lors du calcul du nombre de patients de votre requête. <br />
             {jobFailMsg}
           </Alert>
         )}

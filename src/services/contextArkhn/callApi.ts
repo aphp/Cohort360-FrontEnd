@@ -77,7 +77,9 @@ export const fetchGroup = async (args: fetchGroupProps) => {
 
   if (_list && _list.length > 0)                   options = [...options, `_list=${_list.reduce(reducer)}`]                                     // eslint-disable-line
   if (_elements && _elements.length > 0)           options = [...options, `_elements=${_elements.reduce(reducer)}`]                             // eslint-disable-line
-  if (managingEntity && managingEntity.length > 0) options = [...options, `managingEntity=${managingEntity.reduce(reducer)}`]                   // eslint-disable-line
+  if (managingEntity && managingEntity.length > 0) options = [...options, `managing-entity=${managingEntity.reduce(reducer)}`]                   // eslint-disable-line
+
+  console.log(`options`, options)
 
   const response = await apiFhir.get<FHIR_API_Response<IGroup>>(`/Group?${options.reduce(optionsReducer)}`)
 
