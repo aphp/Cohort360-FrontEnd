@@ -132,10 +132,10 @@ const fetchExploredCohort = createAsyncThunk<
             const canMakeExport =
               currentCohortItem.extension && currentCohortItem.extension.length > 0
                 ? currentCohortItem.extension.some(
-                    (extension) => extension.url === 'export-deidentified' && extension.valueString === 'false'
+                    (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
                   ) &&
                   currentCohortItem.extension.some(
-                    (extension) => extension.url === 'read-deidentified' && extension.valueString === 'false'
+                    (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
                   )
                 : false
 

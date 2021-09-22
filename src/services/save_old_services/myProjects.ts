@@ -386,8 +386,8 @@ export const fetchCohortsList: (
           (rightResponse: any) => +(rightResponse.url ?? '1') === +(cohortItem.fhir_group_id ?? '0')
         ) || {
           extension: [
-            { url: 'read-deidentified', valueString: 'true' },
-            { url: 'export-deidentified', valueString: 'true' }
+            { url: 'READ_DATA_NOMINATIVE', valueString: 'false' },
+            { url: 'EXPORT_DATA_NOMINATIVE', valueString: 'false' }
           ]
         }
       ).extension

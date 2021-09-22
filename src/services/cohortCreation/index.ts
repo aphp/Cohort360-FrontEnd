@@ -9,6 +9,7 @@ export const countCohort = async (requeteurJson?: string, snapshotId?: string, r
 
     return {
       status: measureResult?.data?.request_job_status,
+      jobFailMsg: measureResult?.data?.request_job_fail_msg,
       uuid: measureResult?.data?.uuid,
       includePatient: measureResult?.data?.measure,
       byrequest: 0,

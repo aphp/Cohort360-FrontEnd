@@ -410,6 +410,7 @@ export type CohortCreationCounterType = {
   female?: number
   male?: number
   unknownPatient?: number
+  jobFailMsg?: string
 }
 
 export type CohortCreationSnapshotType = {
@@ -464,4 +465,10 @@ export type CohortType = {
   created_at?: string
   modified_at?: string
   extension?: any[]
+}
+
+export type ContactSubmitForm = {
+  label: string
+  title: string
+  description: string
 }

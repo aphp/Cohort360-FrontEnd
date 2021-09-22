@@ -118,7 +118,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
             <Grid container alignItems="center" justify="space-between">
               <CheckCircleOutlineIcon style={{ fontSize: 52 }} htmlColor="#BDEA88" />
               <DialogContentText style={{ marginBottom: 0, width: 'calc(100% - 62px)' }}>
-                Votre demande d'export a bien été prise en compte, vous receverez prochainement un email
+                Votre demande d'export a bien été prise en compte. Vous recevrez un email de confirmation prochainement.
               </DialogContentText>
             </Grid>
           ) : (
@@ -128,18 +128,20 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
                 Une erreur est survenue lors de votre demande d'export. Veuillez{' '}
                 <a href="mailto:dsi-id-recherche-support-cohort360@aphp.fr">contacter le support</a> pour plus
                 d'informations
-                <Accordion id="reason-accordion" square className={classes.accordion}>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="reason-accordion"
-                    id="reason-accordion-summary"
-                  >
-                    <Typography className={classes.heading}>Motif :</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails id="reason-accordion-details">
-                    <Typography>{exportResponse.detail}</Typography>
-                  </AccordionDetails>
-                </Accordion>
+                {exportResponse.detail && (
+                  <Accordion id="reason-accordion" square className={classes.accordion}>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls="reason-accordion"
+                      id="reason-accordion-summary"
+                    >
+                      <Typography className={classes.heading}>Motif :</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails id="reason-accordion-details">
+                      <Typography>{exportResponse.detail}</Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                )}
               </DialogContentText>
             </Grid>
           )}
@@ -205,12 +207,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
                             {table_id}
                           </Typography>
                         </Grid>
-                      }
-                      secondary={
-                        <Typography variant="body1" style={{ color: 'red' }}>
-                          La taille de cette table est relativement élevée, veuillez ne pas l'exporter à chacune de vos
-                          demandes d'export
-                        </Typography>
                       }
                     ></ListItemText>
                   ) : (
