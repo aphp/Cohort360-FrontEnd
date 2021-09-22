@@ -1,9 +1,9 @@
 import { ContactSubmitForm } from 'types'
-import apiBackCohort from './apiBackend'
+import apiBackend from './apiBackend'
 
 export const postIssue = async (contactSubmitForm: ContactSubmitForm) => {
   try {
-    const postIssueResp = await apiBackCohort.post('/voting/create-issue', contactSubmitForm)
+    const postIssueResp = await apiBackend.post('/voting/create-issue', contactSubmitForm)
 
     return postIssueResp.status === 200
   } catch (error) {
