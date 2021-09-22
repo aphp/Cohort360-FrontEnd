@@ -139,8 +139,9 @@ const fetchExploredCohort = createAsyncThunk<
                   )
                 : false
 
-            console.log(`cohort.canMakeExport`, canMakeExport)
-            cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
+            cohort.canMakeExport = canMakeExport
+              ? canMakeExport
+              : await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
           }
         }
         break
