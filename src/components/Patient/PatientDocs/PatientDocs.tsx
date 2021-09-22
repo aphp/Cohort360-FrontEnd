@@ -6,14 +6,12 @@ import { Pagination } from '@material-ui/lab'
 
 import ClearIcon from '@material-ui/icons/Clear'
 import InfoIcon from '@material-ui/icons/Info'
-import SortIcon from '@material-ui/icons/Sort'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import DocumentSearchHelp from '../../DocumentSearchHelp/DocumentSearchHelp'
 import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
 import DocumentList from '../../Cohort/Documents/DocumentList/DocumentList'
-import SortDialog from '../../Filters/SortDialog/SortDialog'
 
 import services from 'services'
 import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
@@ -49,7 +47,6 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
   const [searchInput, setSearchInput] = useState('')
   const [searchMode, setSearchMode] = useState(false)
   const [open, setOpen] = useState(false)
-  const [openSort, setOpenSort] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
   const [nda, setNda] = useState('')
   const [selectedDocTypes, setSelectedDocTypes] = useState<any[]>([])
@@ -60,11 +57,6 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
   const [showFilterChip, setShowFilterChip] = useState(false)
 
   const documentLines = 20 // Number of desired lines in the document array
-
-  const sortOptions = [
-    { label: 'Date', code: 'date' },
-    { label: 'Type de document', code: 'type' }
-  ]
 
   const displayingSelectedDocType: any[] = (() => {
     let displayingSelectedDocTypes: any[] = []
@@ -125,10 +117,6 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
     setOpen(true)
   }
 
-  const handleOpenSortDialog = () => {
-    setOpenSort(true)
-  }
-
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
     setPage(value || 1)
     setLoadingStatus(true)
@@ -137,7 +125,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
 
   useEffect(() => {
     handleChangePage()
-  }, [patientId, nda, selectedDocTypes, startDate, endDate]) // eslint-disable-line
+  }, [patientId, nda, selectedDocTypes, startDate, endDate, _sortBy, _sortDirection]) // eslint-disable-line
 
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
@@ -164,11 +152,6 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
       e.preventDefault()
       onSearchDocument()
     }
-  }
-
-  const handleCloseSortDialog = (submitSort: boolean) => {
-    setOpenSort(false)
-    submitSort && onSearchDocument()
   }
 
   const handleDeleteChip = (filterName: string, value?: string) => {
@@ -242,25 +225,6 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
             >
               Filtrer
             </Button>
-            <Button
-              variant="contained"
-              disableElevation
-              onClick={handleOpenSortDialog}
-              startIcon={<SortIcon height="15px" fill="#FFF" />}
-              className={classes.searchButton}
-            >
-              Trier
-            </Button>
-            <SortDialog
-              open={openSort}
-              onClose={() => handleCloseSortDialog(false)}
-              onSubmit={() => handleCloseSortDialog(true)}
-              sortOptions={sortOptions}
-              sortBy={_sortBy}
-              onChangeSortBy={setSortBy}
-              sortDirection={_sortDirection}
-              onChangeSortDirection={setSortDirection}
-            />
           </div>
         </Grid>
       </Grid>
@@ -316,6 +280,10 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
         searchMode={searchMode}
         showIpp={false}
         deidentified={deidentifiedBoolean}
+        sortBy={_sortBy}
+        onChangeSortBy={setSortBy}
+        sortDirection={_sortDirection}
+        onChangeSortDirection={setSortDirection}
       />
       <Pagination
         className={classes.pagination}
