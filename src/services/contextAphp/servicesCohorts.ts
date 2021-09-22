@@ -213,7 +213,8 @@ const servicesCohorts: IServicesCohorts = {
       sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
       pivotFacet: includeFacets ? ['age_gender', 'deceased_gender'] : [],
       _list: groupId ? [groupId] : [],
-      gender,
+      gender:
+        gender === PatientGenderKind._unknown ? '' : gender === PatientGenderKind._other ? `other,unknown` : gender,
       searchBy,
       _text: _searchInput,
       minBirthdate: date1,

@@ -2,7 +2,6 @@ import apiFhir from '../apiFhir'
 
 import { FHIR_API_Response } from 'types'
 import {
-  PatientGenderKind,
   IOrganization,
   IGroup,
   IPatient,
@@ -100,7 +99,7 @@ type fetchPatientProps = {
   offset?: number
   _sort?: string
   sortDirection?: 'asc' | 'desc'
-  gender?: PatientGenderKind
+  gender?: string
   minBirthdate?: string
   maxBirthdate?: string
   searchBy?: string
