@@ -53,6 +53,7 @@ type DocumentRowTypes = {
   showText: boolean
   showIpp: boolean
   deidentified: boolean | null
+  backgroundColor: string
 }
 const DocumentRow: React.FC<DocumentRowTypes> = ({
   groupId,
@@ -60,7 +61,8 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
   documentEncounter,
   showText,
   showIpp,
-  deidentified
+  deidentified,
+  backgroundColor
 }) => {
   const history = useHistory()
   const classes = useStyles()
@@ -135,7 +137,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
 
   return (
     <>
-      <TableRow className={classes.row}>
+      <TableRow style={{ backgroundColor }}>
         <TableCell>
           <Typography variant="button">{row.title ?? 'Document sans titre'}</Typography>
           <Typography>
@@ -239,13 +241,15 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
       </TableRow>
 
       {showText && (
-        <TableRow>
-          {row.section?.map((section) => (
-            <TableCell key={section.title} colSpan={6}>
-              <Typography variant="h6">{section.title}</Typography>
-              <Typography dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }} />
-            </TableCell>
-          ))}
+        <TableRow style={{ backgroundColor }}>
+          <TableCell colSpan={6}>
+            {row.section?.map((section) => (
+              <Grid key={section.title} container item direction="column">
+                <Typography variant="h6">{section.title}</Typography>
+                <Typography dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }} />
+              </Grid>
+            ))}
+          </TableCell>
         </TableRow>
       )}
     </>
@@ -311,23 +315,25 @@ const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
                   </TableSortLabel>
                 </Typography>
               </TableCell>
-              <TableCell align="center" className={classes.tableHeadCell}>
-                <Grid container alignItems="center" justify="center">
-                  {deidentified ? (
-                    <Typography style={{ marginLeft: 4, fontSize: 11, textTransform: 'uppercase' }} variant="button">
-                      IPP chiffré
-                    </Typography>
-                  ) : (
-                    <TableSortLabel
-                      active={sortBy === 'patient'}
-                      direction={sortDirection || 'asc'}
-                      onClick={() => handleRequestSort('patient')}
-                    >
-                      IPP
-                    </TableSortLabel>
-                  )}
-                </Grid>
-              </TableCell>
+              {showIpp && (
+                <TableCell align="center" className={classes.tableHeadCell}>
+                  <Grid container alignItems="center" justify="center">
+                    {deidentified ? (
+                      <Typography style={{ marginLeft: 4, fontSize: 11, textTransform: 'uppercase' }} variant="button">
+                        IPP chiffré
+                      </Typography>
+                    ) : (
+                      <TableSortLabel
+                        active={sortBy === 'patient'}
+                        direction={sortDirection || 'asc'}
+                        onClick={() => handleRequestSort('patient')}
+                      >
+                        IPP
+                      </TableSortLabel>
+                    )}
+                  </Grid>
+                </TableCell>
+              )}
               <TableCell align="center" className={classes.tableHeadCell}>
                 <Grid container alignItems="center" justify="center">
                   <Typography style={{ marginLeft: 4, fontSize: 11, textTransform: 'uppercase' }} variant="button">
@@ -370,7 +376,7 @@ const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
           </TableHead>
           <TableBody>
             {documents && documents.length > 0 ? (
-              documents.map((row) => {
+              documents.map((row, index) => {
                 let relatedEncounter: IEncounter | undefined = undefined
                 if (row.resourceType === 'DocumentReference') {
                   relatedEncounter = encounters
@@ -388,6 +394,7 @@ const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
                     showIpp={showIpp}
                     documentEncounter={relatedEncounter}
                     deidentified={deidentified}
+                    backgroundColor={index % 2 === 0 ? '#faf9f9' : '#fff'}
                   />
                 )
               })
