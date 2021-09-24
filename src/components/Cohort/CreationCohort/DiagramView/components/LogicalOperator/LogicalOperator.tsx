@@ -180,7 +180,7 @@ const LogicalOperator: React.FC = () => {
     _buildCohortCreation()
   }
 
-  const _addNewGroup = (parentId: number) => {
+  const _addNewGroup = async (parentId: number) => {
     // Add new group
     const nextGroupId = request.nextGroupId
     const newOperator: CriteriaGroupType = {
@@ -191,11 +191,11 @@ const LogicalOperator: React.FC = () => {
       isSubGroup: parentId === 0 ? false : true,
       isInclusive: true
     }
-    dispatch<any>(addNewCriteriaGroup(newOperator))
+    await dispatch<any>(addNewCriteriaGroup(newOperator))
     // Edit parent and add nextGroupId inside criteriaIds
     const currentParent = request.criteriaGroup ? request.criteriaGroup.find(({ id }) => id === parentId) : null
     if (!currentParent) return
-    dispatch<any>(
+    await dispatch<any>(
       editCriteriaGroup({
         ...currentParent,
         criteriaIds: [...currentParent.criteriaIds, nextGroupId]
@@ -216,18 +216,18 @@ const LogicalOperator: React.FC = () => {
     setSelectedCriteria(criteria)
   }
 
-  const _deleteCriteria = (criteriaId: number) => {
-    dispatch<any>(deleteSelectedCriteria(criteriaId))
-    const logicalOperatorParent = request.criteriaGroup
-      ? request.criteriaGroup.find(({ criteriaIds }) => criteriaIds.find((_criteriaId) => _criteriaId === criteriaId))
-      : undefined
-    if (!logicalOperatorParent) return
-    dispatch<any>(
-      editCriteriaGroup({
-        ...logicalOperatorParent,
-        criteriaIds: logicalOperatorParent.criteriaIds.filter((_criteriaId) => _criteriaId !== criteriaId)
-      })
-    )
+  const _deleteCriteria = async (criteriaId: number) => {
+    await dispatch<any>(deleteSelectedCriteria(criteriaId))
+    // const logicalOperatorParent = request.criteriaGroup
+    //   ? request.criteriaGroup.find(({ criteriaIds }) => criteriaIds.find((_criteriaId) => _criteriaId === criteriaId))
+    //   : undefined
+    // if (!logicalOperatorParent) return
+    // await dispatch<any>(
+    //   editCriteriaGroup({
+    //     ...logicalOperatorParent,
+    //     criteriaIds: logicalOperatorParent.criteriaIds.filter((_criteriaId) => _criteriaId !== criteriaId)
+    //   })
+    // )
     _buildCohortCreation()
   }
 

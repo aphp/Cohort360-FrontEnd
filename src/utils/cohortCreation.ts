@@ -369,9 +369,6 @@ export function buildRequest(
   const exploreCriteriaGroup = (itemIds: number[]) => {
     let children: (RequeteurCriteriaType | RequeteurGroupType)[] = []
 
-    let nextGroupId = -1
-    let nextCriteriaId = 1
-
     for (const itemId of itemIds) {
       let child: RequeteurCriteriaType | RequeteurGroupType | null = null
       const isGroup = itemId < 0
@@ -381,7 +378,7 @@ export function buildRequest(
 
         child = {
           _type: 'basicResource',
-          _id: nextCriteriaId,
+          _id: item.id ?? 0,
           isInclusive: item.isInclusive ?? true,
           resourceType: item.type ?? 'Patient',
           filterFhir: constructFilterFhir(item),
@@ -417,7 +414,6 @@ export function buildRequest(
                 }
               : undefined
         }
-        nextCriteriaId++
       } else {
         // return RequeteurGroupType
         const group: CriteriaGroupType = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
@@ -426,7 +422,7 @@ export function buildRequest(
         if (group.type === 'NamongM') {
           child = {
             _type: 'nAmongM',
-            _id: nextGroupId,
+            _id: group.id,
             isInclusive: group.isInclusive ?? true,
             criteria: exploreCriteriaGroup(group.criteriaIds),
             nAmongMOptions: {
@@ -437,12 +433,11 @@ export function buildRequest(
         } else {
           child = {
             _type: group.type,
-            _id: nextGroupId,
+            _id: group.id,
             isInclusive: group.isInclusive ?? true,
             criteria: exploreCriteriaGroup(group.criteriaIds)
           }
         }
-        nextGroupId--
       }
       children = [...children, child]
     }
