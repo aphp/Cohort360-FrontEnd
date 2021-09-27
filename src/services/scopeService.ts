@@ -271,8 +271,8 @@ export const getScopeSubItems = async (
 
     scopeRow.name = getScopeName(perimetersResult)
     scopeRow.quantity = getQuantity(perimetersResult.extension)
-    scopeRow.access = getAccessName(perimetersResult.extension)
     scopeRow.subItems = getSubItem === true ? await getScopeSubItems(perimetersResult as ScopeTreeRow) : [loadingItem]
+    scopeRow.access = perimeter.access
     subScopeRows = [...subScopeRows, scopeRow]
   }
 
