@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
     margin: '0 4px'
   },
   advancedSearch: {
-    width: '96%',
+    width: '100%',
     marginLeft: theme.spacing(1),
     flex: 1
   },

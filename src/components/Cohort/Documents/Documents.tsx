@@ -59,7 +59,6 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   // const [wordcloudData, setWordcloudData] = useState<IExtension[] | undefined>()
   const [open, setOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
-  const [areaText, setAreaText] = useState(false)
   const [nda, setNda] = useState('')
   const [selectedDocTypes, setSelectedDocTypes] = useState<any[]>([])
   const [startDate, setStartDate] = useState<string | null>(null)
@@ -67,10 +66,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   const [_sortBy, setSortBy] = useState(sortBy)
   const [_sortDirection, setSortDirection] = useState<'asc' | 'desc'>(sortDirection)
   const [showFilterChip, setShowFilterChip] = useState(false)
+  const [showAreaText, setShowAreaText] = useState(false)
 
   const documentLines = 20
 
-  console.log(`areaText`, areaText)
+  console.log(`showAreaText`, showAreaText)
 
   const displayingSelectedDocType: any[] = (() => {
     let displayingSelectedDocTypes: any[] = []
@@ -235,7 +235,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
             <Grid item>
               <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
                 <div className={classes.documentButtons}>
-                  {!areaText && (
+                  {!showAreaText && (
                     <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
                       <InputBase
                         placeholder="Rechercher dans les documents"
@@ -274,11 +274,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                 </div>
               </Grid>
             </Grid>
-            {areaText ? (
+            {showAreaText ? (
               <Grid item className={classes.gridAdvancedSearch}>
                 <InputBase
                   className={classes.advancedSearch}
-                  placeholder="recherche avancée"
+                  placeholder="recherche avancée dans les documents"
                   value={searchInput}
                   onChange={handleChangeInput}
                   // fullWidth
@@ -286,19 +286,23 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                   rows={3}
                   endAdornment={
                     <InputAdornment position="end">
-                      <IconButton onClick={() => (handleClearInput(), setAreaText(false))}>
+                      <IconButton onClick={() => (handleClearInput(), setShowAreaText(false))}>
                         <ClearIcon />
+                      </IconButton>
+                      <IconButton
+                        type="submit"
+                        aria-label="search"
+                        onClick={() => onSearchDocument(_sortBy, _sortDirection)}
+                      >
+                        <SearchIcon fill="#ED6D91" height="17px" />
                       </IconButton>
                     </InputAdornment>
                   }
                 />
-                <IconButton type="submit" aria-label="search" onClick={() => onSearchDocument(_sortBy, _sortDirection)}>
-                  <SearchIcon fill="#ED6D91" height="17px" />
-                </IconButton>
               </Grid>
             ) : (
               <Grid item container xs={12} justify="flex-end">
-                <Typography variant="button" onClick={() => setAreaText(true)}>
+                <Typography variant="h6" style={{ cursor: 'pointer' }} onClick={() => setShowAreaText(true)}>
                   Recherche avancée
                 </Typography>
               </Grid>
