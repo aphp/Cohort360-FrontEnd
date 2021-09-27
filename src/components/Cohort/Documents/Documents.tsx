@@ -11,6 +11,8 @@ import {
   InputBase,
   // Paper,
   Typography
+  // TextField,
+  // Input
 } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
 
@@ -64,8 +66,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   const [_sortBy, setSortBy] = useState(sortBy)
   const [_sortDirection, setSortDirection] = useState<'asc' | 'desc'>(sortDirection)
   const [showFilterChip, setShowFilterChip] = useState(false)
+  const [showAreaText, setShowAreaText] = useState(false)
 
   const documentLines = 20
+
+  console.log(`showAreaText`, showAreaText)
 
   const displayingSelectedDocType: any[] = (() => {
     let displayingSelectedDocTypes: any[] = []
@@ -227,44 +232,81 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
             <Typography variant="button">
               {displayDigit(documentsNumber ?? 0)} / {displayDigit(allDocumentsNumber ?? 0)} document(s)
             </Typography>
-            <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
-              <div className={classes.documentButtons}>
-                <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
-                  <InputBase
-                    placeholder="Rechercher dans les documents"
-                    className={classes.input}
-                    value={searchInput}
-                    onChange={handleChangeInput}
-                    onKeyDown={onKeyDown}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
-                      </InputAdornment>
-                    }
-                  />
-                  <IconButton
-                    type="submit"
-                    aria-label="search"
-                    onClick={() => onSearchDocument(_sortBy, _sortDirection)}
-                  >
-                    <SearchIcon fill="#ED6D91" height="15px" />
+            <Grid item>
+              <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
+                <div className={classes.documentButtons}>
+                  {!showAreaText && (
+                    <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
+                      <InputBase
+                        placeholder="Rechercher dans les documents"
+                        className={classes.input}
+                        value={searchInput}
+                        onChange={handleChangeInput}
+                        onKeyDown={onKeyDown}
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                          </InputAdornment>
+                        }
+                      />
+                      <IconButton
+                        type="submit"
+                        aria-label="search"
+                        onClick={() => onSearchDocument(_sortBy, _sortDirection)}
+                      >
+                        <SearchIcon fill="#ED6D91" height="15px" />
+                      </IconButton>
+                    </Grid>
+                  )}
+                  <IconButton type="submit" onClick={() => setHelpOpen(true)}>
+                    <InfoIcon />
                   </IconButton>
-                </Grid>
-                <IconButton type="submit" onClick={() => setHelpOpen(true)}>
-                  <InfoIcon />
-                </IconButton>
-                <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
-                <Button
-                  variant="contained"
-                  disableElevation
-                  onClick={handleOpenDialog}
-                  startIcon={<FilterList height="15px" fill="#FFF" />}
-                  className={classes.searchButton}
-                >
-                  Filtrer
-                </Button>
-              </div>
+                  <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+                  <Button
+                    variant="contained"
+                    disableElevation
+                    onClick={handleOpenDialog}
+                    startIcon={<FilterList height="15px" fill="#FFF" />}
+                    className={classes.searchButton}
+                  >
+                    Filtrer
+                  </Button>
+                </div>
+              </Grid>
             </Grid>
+            {showAreaText ? (
+              <Grid item className={classes.gridAdvancedSearch}>
+                <InputBase
+                  className={classes.advancedSearch}
+                  placeholder="recherche avancée dans les documents"
+                  value={searchInput}
+                  onChange={handleChangeInput}
+                  // fullWidth
+                  multiline
+                  rows={3}
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => (handleClearInput(), setShowAreaText(false))}>
+                        <ClearIcon />
+                      </IconButton>
+                      <IconButton
+                        type="submit"
+                        aria-label="search"
+                        onClick={() => onSearchDocument(_sortBy, _sortDirection)}
+                      >
+                        <SearchIcon fill="#ED6D91" height="17px" />
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                />
+              </Grid>
+            ) : (
+              <Grid item container xs={12} justify="flex-end">
+                <Typography variant="h6" style={{ cursor: 'pointer' }} onClick={() => setShowAreaText(true)}>
+                  Recherche avancée
+                </Typography>
+              </Grid>
+            )}
           </Grid>
           <Grid>
             {showFilterChip &&
