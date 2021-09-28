@@ -76,19 +76,8 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
     dispatch<any>(buildCohortCreation({}))
   }
 
-  const _deleteLogicalOperator = () => {
-    dispatch<any>(deleteCriteriaGroup(itemId))
-
-    const logicalOperatorParent = request.criteriaGroup
-      ? request.criteriaGroup.find(({ criteriaIds }) => criteriaIds.find((_criteriaId) => _criteriaId === itemId))
-      : undefined
-    if (!logicalOperatorParent) return
-    dispatch<any>(
-      editCriteriaGroup({
-        ...logicalOperatorParent,
-        criteriaIds: logicalOperatorParent.criteriaIds.filter((_criteriaId) => _criteriaId !== itemId)
-      })
-    )
+  const _deleteLogicalOperator = async () => {
+    await dispatch<any>(deleteCriteriaGroup(itemId))
     _buildCohortCreation()
   }
 

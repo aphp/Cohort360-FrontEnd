@@ -16,7 +16,6 @@ import { useAppSelector } from 'state'
 import {
   resetCohortCreation,
   countCohortCreation,
-  editCriteriaGroup,
   deleteCriteriaGroup,
   buildCohortCreation
 } from 'state/cohortCreation'
@@ -84,17 +83,6 @@ const ControlPanel: React.FC<{
       for (const logicalOperator of logicalOperatorNeedToBeErase) {
         const { id } = logicalOperator
         dispatch<any>(deleteCriteriaGroup(id))
-
-        const logicalOperatorParent = criteriaGroup
-          ? criteriaGroup.find(({ criteriaIds }) => criteriaIds.find((_criteriaId) => _criteriaId === id))
-          : undefined
-        if (!logicalOperatorParent) return
-        dispatch<any>(
-          editCriteriaGroup({
-            ...logicalOperatorParent,
-            criteriaIds: logicalOperatorParent.criteriaIds.filter((_criteriaId) => _criteriaId !== id)
-          })
-        )
       }
     }
     dispatch(buildCohortCreation({}))
