@@ -34,7 +34,7 @@ export const fetchDeidentified = async (
 
     const rolesList = highestPerimeters?.extension?.[0].extension
 
-    if (rolesList) {
+    if (rolesList && rolesList.length > 0) {
       for (const perimeterRole of rolesList) {
         if (perimeterRole.valueString && perimeterRole.valueString === 'READ_DATA_NOMINATIVE') {
           deidentification = false

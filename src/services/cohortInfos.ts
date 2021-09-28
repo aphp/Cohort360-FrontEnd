@@ -458,23 +458,20 @@ const fetchDocuments = async (
       //   `/Composition?facet=cloud&size=0&_sort=${_sortDirection}${sortBy}&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
       // ),
       api.get<FHIR_API_Response<IComposition>>(
-        `/Composition?size=20&_sort=${_sortDirection}${sortBy}&offset=${
+        `/Composition?size=20&type:not=doc-impor&_sort=${_sortDirection}${sortBy}&offset=${
           page ? (page - 1) * 20 : 0
         }&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
       ),
-      search
+      !!search || !!docTypesFilter || !!ndaFilter || !!dateFilter
         ? api.get<FHIR_API_Response<IComposition>>(
-            `/Composition?_sort=${_sortDirection}${sortBy}&status=final${searchByGroup}${docTypesFilter}${ndaFilter}${dateFilter}&size=0`
+            `/Composition?type:not=doc-impor&status=final${searchByGroup}&size=0`
           )
         : null
     ])
 
     const totalDocs = docsList?.data?.resourceType === 'Bundle' ? docsList.data.total : 0
-    const totalAllDocs = search
-      ? allDocsList?.data?.resourceType === 'Bundle'
-        ? allDocsList.data.total
-        : 0
-      : totalDocs
+    const totalAllDocs =
+      allDocsList !== null ? (allDocsList?.data?.resourceType === 'Bundle' ? allDocsList.data.total : 0) : totalDocs
 
     const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
 
@@ -507,4 +504,34 @@ const fetchDocuments = async (
   }
 }
 
-export { fetchCohort, fetchPatientList, fetchDocuments }
+const fetchCohortExportRight = async (cohortId: string, providerId: string) => {
+  try {
+    const rightResponse = await api.get(`/Group?_list=${cohortId}&provider=${providerId}`)
+
+    if (
+      rightResponse &&
+      rightResponse.data &&
+      rightResponse.data.entry &&
+      rightResponse.data.entry[0] &&
+      rightResponse.data.entry[0].resource
+    ) {
+      const currentCohortItem = rightResponse.data.entry[0].resource
+      const canMakeExport =
+        currentCohortItem.extension && currentCohortItem.extension.length > 0
+          ? currentCohortItem.extension.some(
+              (extension: any) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
+            ) &&
+            currentCohortItem.extension.some(
+              (extension: any) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+            )
+          : false
+      return canMakeExport
+    }
+    return false
+  } catch (error) {
+    console.error('Error (fetchCohortExportRight) :', error)
+    return false
+  }
+}
+
+export { fetchCohort, fetchPatientList, fetchDocuments, fetchCohortExportRight }

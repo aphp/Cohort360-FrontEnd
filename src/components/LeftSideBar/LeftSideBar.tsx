@@ -25,6 +25,7 @@ import EditIcon from '@material-ui/icons/Edit'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
+import HelpIcon from '@material-ui/icons/Help'
 
 import cohortLogo from 'assets/images/logo_v3.1_ld.png'
 import { ReactComponent as HomeIcon } from 'assets/icones/home-lg.svg'
@@ -376,6 +377,28 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               </List>
             </Collapse>
           </List>
+
+          {open ? (
+            <Button
+              onClick={() => history.push('/contact')}
+              variant="contained"
+              color="primary"
+              size="small"
+              startIcon={<HelpIcon />}
+              style={{ position: 'fixed', bottom: 0, width: 'inherit' }}
+            >
+              Contactez-nous
+            </Button>
+          ) : (
+            <IconButton
+              onClick={() => {
+                history.push('/contact')
+              }}
+              style={{ position: 'fixed', bottom: 0 }}
+            >
+              <HelpIcon style={{ color: '#FFF' }} />
+            </IconButton>
+          )}
         </Drawer>
       </div>
     </>

@@ -94,9 +94,12 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
   }
 
   useEffect(() => {
-    fetchDiagnosticTypes().then((diagnosticTypes) => {
+    const _fetchDiagnosticTypes = async () => {
+      const diagnosticTypes = await fetchDiagnosticTypes()
+      if (!diagnosticTypes) return
       setDiagnosticTypesList(diagnosticTypes)
-    })
+    }
+    _fetchDiagnosticTypes()
   }, [])
 
   useEffect(() => {

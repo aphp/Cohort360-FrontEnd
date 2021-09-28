@@ -35,7 +35,7 @@ export const fetchPatientsCount = async (): Promise<number | undefined> => {
   } else if (CONTEXT === 'arkhn') {
     return undefined
   } else {
-    const response = await api.get<FHIR_API_Response<IPatient>>('Patient?size=0')
+    const response = await api.get<FHIR_API_Response<IPatient>>('Patient?size=1')
 
     if (response?.data?.resourceType === 'OperationOutcome') return undefined
 
@@ -433,7 +433,7 @@ export const fetchDocuments = async (
     }
 
     const docsList = await api.get(
-      `/Composition?patient=${patientId}&_sort=${_sortDirection}${sortBy}&size=20&offset=${
+      `/Composition?type:not=doc-impor&patient=${patientId}&_sort=${_sortDirection}${sortBy}&size=20&offset=${
         page ? (page - 1) * 20 : 0
       }&status=final${elements}${search}${docTypesFilter}${ndaFilter}${dateFilter}${groupFilter}`
     )
@@ -533,7 +533,7 @@ export const getEncounterOrProcedureDocs = async (
     if (encounterId) {
       const [docRefsResponse, compositionsResponse] = await Promise.all([
         api.get<FHIR_API_Response<IDocumentReference>>(`/DocumentReference?encounter=${encounterId}`),
-        api.get<FHIR_API_Response<IComposition>>(`/Composition?encounter=${encounterId}`)
+        api.get<FHIR_API_Response<IComposition>>(`/Composition?type:not=doc-impor&encounter=${encounterId}`)
       ])
       const docRefs = getApiResponseResources(docRefsResponse)
       const compositions = getApiResponseResources(compositionsResponse)
@@ -567,7 +567,7 @@ const getEncounterDocuments = async (
   })
 
   const documentsResp = await api.get<FHIR_API_Response<IComposition>>(
-    `/Composition?encounter=${encountersList}&_elements=status,type,subject,encounter,date,title`
+    `/Composition?type:not=doc-impor&encounter=${encountersList}&_elements=status,type,subject,encounter,date,title`
   )
 
   const documents =
@@ -597,15 +597,17 @@ const getProcedureDocuments = async (
   if (procedures.length === 0) return procedures
   const _procedures = procedures
 
-  const encountersList: any[] = []
+  let encountersList: any[] = []
 
   _procedures.forEach((procedure) => {
     procedure.documents = []
     encountersList.push(procedure.encounter?.reference?.slice(10))
   })
 
+  encountersList = encountersList.filter((item, index, array) => array.indexOf(item) === index)
+
   const documentsResp = await api.get<FHIR_API_Response<IComposition>>(
-    `/Composition?encounter=${encountersList}&_elements=status,type,subject,encounter,date,title`
+    `/Composition?type:not=doc-impor&encounter=${encountersList}&_elements=status,type,subject,encounter,date,title`
   )
 
   const documents =
@@ -734,7 +736,7 @@ export const fetchPatient = async (patientId: string, groupId?: string): Promise
         ),
         api.get<FHIR_API_Response<IClaim>>(`/Claim?patient=${patientId}&_sort=-created&size=20${groupFilter}`),
         api.get<FHIR_API_Response<IComposition>>(
-          `/Composition?patient=${patientId}&size=20&_sort=-date&status=final&_elements=status,type,encounter,date,title${groupFilter}`
+          `/Composition?type:not=doc-impor&patient=${patientId}&size=20&_sort=-date&status=final&_elements=status,type,encounter,date,title${groupFilter}`
         )
       ])
 

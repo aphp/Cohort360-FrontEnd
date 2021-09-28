@@ -32,7 +32,7 @@ import { ReactComponent as StarIcon } from 'assets/icones/star.svg'
 import { ReactComponent as StarFullIcon } from 'assets/icones/star full.svg'
 import MoreButton from '@material-ui/icons/MoreVert'
 
-// import ExportModal from 'components/Cohort/ExportModal/ExportModal'
+import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
 
 import { useAppSelector } from 'state'
@@ -54,8 +54,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   const classes = useStyles()
   const dispatch = useDispatch()
 
-  const { dashboard } = useAppSelector((state) => ({
-    dashboard: state.exploredCohort
+  const { dashboard, cohortList } = useAppSelector((state) => ({
+    dashboard: state.exploredCohort,
+    cohortList: state.cohort.cohortsList
   }))
   const [isExtended, onExtend] = useState(false)
   const [openModal, setOpenModal] = useState<'' | 'edit' | 'export' | 'delete'>('')
@@ -138,7 +139,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
 
   return (
     <>
-      <Grid container direction="row">
+      <Grid xs={12} container direction="row">
         <Grid xs={12} item direction="row">
           <Paper className={classes.root} square>
             <Grid container item style={{ paddingInline: 8 }} justify="space-between">
@@ -258,21 +259,25 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                     <MenuItem
                       onClick={async () => {
                         setAnchorEl(null)
-                        await dispatch<any>(fetchCohortsList())
+                        if (!cohortList || (cohortList && cohortList.length === 0)) {
+                          await dispatch<any>(fetchCohortsList())
+                        }
                         await dispatch<any>(setSelectedCohort(dashboard.uuid ?? null))
                         setOpenModal('edit')
                       }}
                     >
                       Modifier
                     </MenuItem>
-                    {/* <MenuItem
-                      onClick={() => {
-                        setAnchorEl(null)
-                        setOpenModal('export')
-                      }}
-                    >
-                      Exporter
-                    </MenuItem> */}
+                    {dashboard.canMakeExport && (
+                      <MenuItem
+                        onClick={() => {
+                          setAnchorEl(null)
+                          setOpenModal('export')
+                        }}
+                      >
+                        Exporter
+                      </MenuItem>
+                    )}
                     <MenuItem
                       onClick={() => {
                         setAnchorEl(null)
@@ -304,9 +309,13 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         />
       )}
 
-      {/* {openModal === 'export' && (
-        <ExportModal cohortId={dashboard.uuid ?? ''} open handleClose={() => handleClose()} />
-      )} */}
+      {openModal === 'export' && (
+        <ExportModal
+          cohortId={Array.isArray(dashboard?.cohort) ? 0 : parseInt(dashboard?.cohort?.id || '0')}
+          open
+          handleClose={() => handleClose()}
+        />
+      )}
 
       {openModal === 'delete' && (
         <Dialog fullWidth maxWidth="xs" open onClose={handleClose} aria-labelledby="form-dialog-title">

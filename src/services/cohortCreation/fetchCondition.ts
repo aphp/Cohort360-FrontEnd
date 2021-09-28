@@ -80,7 +80,7 @@ export const fetchDiagnosticTypes = async () => {
         }))
       : []
   } else {
-    const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-condition_status`)
+    const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-condition-status`)
 
     const diagnosticKinds =
       res && res.data && res.data.entry && res.data.entry[0]
@@ -121,7 +121,7 @@ export const fetchCim10Diagnostic = async (searchValue?: string, noStar?: boolea
       : ''
 
     const res = await apiRequest.get(
-      `/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-cim${_searchValue}&size=0`
+      `/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-cim-${_searchValue}&size=0`
     )
 
     let cim10List =
@@ -147,7 +147,7 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
     return null
   } else {
     if (!cim10Parent) {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-cim`)
+      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-cim-`)
 
       let cim10List =
         res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'

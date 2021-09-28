@@ -10,6 +10,8 @@ import { DialogContentText } from '@material-ui/core'
 import axios from 'axios'
 
 import { ACCES_TOKEN, REFRESH_TOKEN, CONTEXT } from '../../constants'
+
+import { useAppSelector } from 'state'
 import { logout as logoutAction } from '../../state/me'
 import useStyles from './styles'
 
@@ -21,6 +23,8 @@ const AutoLogoutContainer = () => {
   const history = useHistory()
   const inactifTimerRef = useRef(null)
   const sessionInactifTimerRef = useRef(null)
+
+  const { me } = useAppSelector((state) => ({ me: state.me }))
 
   const logout = () => {
     setDialogIsOpen(false)
@@ -37,63 +41,65 @@ const AutoLogoutContainer = () => {
     sessionInactifTimerRef.current = setTimeout(logout, 60 * 1000)
   }
 
-  const stayActive = () => {
-    axios
-      .post('/api/jwt/refresh/', {
+  const stayActive = async () => {
+    try {
+      const res = await axios.post('/api/jwt/refresh/', {
         refresh: localStorage.getItem(REFRESH_TOKEN)
       })
-      .then((res) => {
-        if (res.status === 200) {
-          localStorage.setItem(ACCES_TOKEN, res.data.access)
-          localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
-        }
-      })
-      .catch((error) => {
-        if (error && error.response && error.response.status === 401) {
-          // Unauthorize
-          logout()
-        }
-      })
-    axios.post('/api/portail/accounts/refresh/', {
-      refresh: localStorage.getItem(REFRESH_TOKEN)
-    })
-    setDialogIsOpen(false)
-    // console.log('User est resté connecté')
-    clearTimeout(sessionInactifTimerRef.current)
+
+      if (res && res.status === 200) {
+        localStorage.setItem(ACCES_TOKEN, res.data.access)
+        localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
+        axios.post('/api/portail/accounts/refresh/', {
+          refresh: localStorage.getItem(REFRESH_TOKEN)
+        })
+        setDialogIsOpen(false)
+        // console.log('User est resté connecté')
+        clearTimeout(sessionInactifTimerRef.current)
+      } else {
+        logout()
+      }
+    } catch (error) {
+      console.error(error)
+      logout()
+    }
   }
 
   const refreshToken = async () => {
-    // console.log('refresh still actif')
-    if (CONTEXT === ('aphp' || 'arkhn')) {
-      await axios
-        .post('/api/jwt/refresh/', {
+    try {
+      // console.log('refresh still actif')
+      if (CONTEXT === ('aphp' || 'arkhn')) {
+        const res = await axios.post('/api/jwt/refresh/', {
           refresh: localStorage.getItem(REFRESH_TOKEN)
         })
-        .then((res) => {
-          if (res.status === 200) {
-            localStorage.setItem(ACCES_TOKEN, res.data.access)
-            localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
-          }
-        })
-        .catch((error) => {
-          if (error && error.response && error.response.status === 401) {
-            // Unauthorize
-            logout()
-          }
-        })
-      await axios.post('/api/portail/accounts/refresh/', {
-        refresh: localStorage.getItem(REFRESH_TOKEN)
-      })
+
+        if (res.status === 200) {
+          localStorage.setItem(ACCES_TOKEN, res.data.access)
+          localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
+          await axios.post('/api/portail/accounts/refresh/', {
+            refresh: localStorage.getItem(REFRESH_TOKEN)
+          })
+        } else {
+          logout()
+        }
+      }
+    } catch (error) {
+      console.error(error)
+      logout()
     }
   }
 
   useEffect(() => {
-    refreshToken()
-
-    setInterval(() => {
+    if (me) {
       refreshToken()
-    }, 13 * 60 * 1000)
+
+      setInterval(() => {
+        refreshToken()
+      }, 13 * 60 * 1000)
+    }
   }, [])
+
+  if (!me) return <></>
 
   return (
     <div>

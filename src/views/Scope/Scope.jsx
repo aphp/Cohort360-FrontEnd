@@ -76,7 +76,12 @@ const Scope = () => {
       }
     })
 
-    history.push(`/perimetres?${_selectedItems.map((selected) => selected.id)}`)
+    const perimetresIds = _selectedItems.map((_selected) =>
+      _selected.extension
+        ? (_selected.extension.find((extension) => extension.url === 'cohort-id') ?? { valueInteger: 0 }).valueInteger
+        : null
+    )
+    history.push(`/perimetres?${perimetresIds}`)
   }
 
   return (

@@ -42,11 +42,11 @@ const ControlPanel: React.FC<{
     criteriaGroup = [],
     selectedPopulation = []
   } = useAppSelector((state) => state.cohortCreation.request || {})
-  const { includePatient /*byrequest, alive, deceased, female, male, unknownPatient */ } = count
+  const { includePatient, status, jobFailMsg /*byrequest, alive, deceased, female, male, unknownPatient */ } = count
 
-  const accessIsPseudonymize =
+  const accessIsPseudonymize: boolean | null =
     selectedPopulation === null
-      ? false
+      ? null
       : selectedPopulation.map((population) => population.access).filter((elem) => elem && elem === 'Pseudonymisé')
           .length > 0
 
@@ -160,7 +160,7 @@ const ControlPanel: React.FC<{
           <Grid container justify="space-between">
             <Typography className={clsx(classes.boldText, classes.patientTypo)}>ACCÈS:</Typography>
             <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
-              {accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
+              {accessIsPseudonymize === null ? '-' : accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
             </Typography>
           </Grid>
         </Grid>
@@ -231,6 +231,13 @@ const ControlPanel: React.FC<{
         {!!includePatient && includePatient > 20000 && (
           <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="error">
             Il est pour le moment impossible de créer des cohortes de plus de 20 000 patients
+          </Alert>
+        )}
+
+        {(status === 'failed' || status === 'error') && (
+          <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="error">
+            Une erreur est survenue lors du calcule du nombre de patients de votre requête. <br />
+            {jobFailMsg}
           </Alert>
         )}
       </Grid>

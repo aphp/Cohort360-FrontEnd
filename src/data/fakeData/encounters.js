@@ -15,7 +15,7 @@ const encounters = [
         valueCodeableConcept: {
           coding: [
             {
-              system: 'https://terminology.eds.aphp.fr/aphp-orbis-visit_type',
+              system: 'https://terminology.eds.aphp.fr/aphp-orbis-visit-type',
               code: 'ext',
               display: 'consultation externe'
             }
@@ -196,7 +196,7 @@ const encounters = [
       admitSource: {
         coding: [
           {
-            system: 'https://terminology.eds.aphp.fr/aphp-orbis-visit_mode entree',
+            system: 'https://terminology.eds.aphp.fr/aphp-orbis-visit-mode-entree',
             code: '01_294',
             display: '1 - admission directe'
           }

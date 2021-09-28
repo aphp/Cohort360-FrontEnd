@@ -71,10 +71,9 @@ const ArkhnConnexion = () => {
   const classes = useStyles()
   const [open, setOpen] = useState(false)
 
-  const changeToken = () => {
-    fetchTokens().then(() => {
-      setAccessToken(localStorage.getItem(ACCES_TOKEN))
-    })
+  const changeToken = async () => {
+    await fetchTokens()
+    setAccessToken(localStorage.getItem(ACCES_TOKEN))
   }
 
   useEffect(() => {
@@ -85,25 +84,26 @@ const ArkhnConnexion = () => {
   }, [code, state, storedState])
 
   useEffect(() => {
-    if (accessToken) {
+    const _fetchPractitioner = async () => {
       setLoading(true)
-      fetchPractitioner('')
-        .then((practitioner) => {
-          if (practitioner) {
-            fetchDeidentified()
-              .then((deidentifiedBoolean) => {
-                dispatch<any>(
-                  loginAction({
-                    ...practitioner,
-                    deidentified: deidentifiedBoolean?.deidentification ?? false
-                  })
-                )
-                history.push('/accueil')
-              })
-              .finally(() => setLoading(false))
-          }
-        })
-        .finally(() => setLoading(false))
+      const practitioner = await fetchPractitioner('')
+
+      if (practitioner) {
+        const deidentifiedBoolean = await fetchDeidentified()
+
+        dispatch<any>(
+          loginAction({
+            ...practitioner,
+            deidentified: deidentifiedBoolean?.deidentification ?? false
+          })
+        )
+        history.push('/accueil')
+      }
+      setLoading(false)
+    }
+
+    if (accessToken) {
+      _fetchPractitioner()
     }
   }, [accessToken, dispatch, history])
 

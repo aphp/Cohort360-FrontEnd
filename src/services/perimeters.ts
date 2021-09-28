@@ -162,19 +162,42 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
   }
 }
 
-export const fetchPerimeterInfoForRequeteur = async (perimetersId: string): Promise<ScopeTreeRow[]> => {
-  if (!perimetersId) return []
+export const fetchPerimeterInfoForRequeteur = async (perimeterId: string): Promise<ScopeTreeRow | null> => {
+  if (!perimeterId) return null
 
-  const groupsResults = await api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${perimetersId}`)
-  const groups = getApiResponseResources(groupsResults)
-  const scopeRows: ScopeTreeRow[] = groups
-    ? groups?.map<ScopeTreeRow>((group) => ({
-        ...group,
-        id: group.id ?? '0',
-        name: group.name?.replace(/^Patients passés par: /, '') ?? '',
-        quantity: group.quantity ?? 0,
+  // Get perimeter info with `perimeterId`
+  const groupResults = await api.get(`/Group?_id=${perimeterId}`)
+
+  // Construct an `orgazationId`
+  let organiszationId =
+    groupResults && groupResults.data
+      ? groupResults.data.entry && groupResults.data.entry.length > 0
+        ? groupResults.data.entry[0].resource?.managingEntity?.display
+        : null
+      : null
+  organiszationId = organiszationId.replace('Organization/', '')
+
+  // Get perimeter info with `organiszationId`
+  const organizationResult = await api.get(`/Organization?_id=${organiszationId}&_elements=name,extension`)
+
+  // Convert result in ScopeTreeRow
+  const organization =
+    organizationResult && organizationResult.data
+      ? organizationResult.data.entry && organizationResult.data.entry.length > 0
+        ? organizationResult.data.entry[0].resource
+        : null
+      : null
+  const scopeRows: ScopeTreeRow | null = organization
+    ? {
+        ...organization,
+        id: organization.id,
+        name: organization.name,
+        quantity:
+          organization.extension && organization.extension.length > 0
+            ? organization.extension.find((extension: any) => extension.url)
+            : 0,
         subItems: []
-      }))
-    : []
+      }
+    : null
   return scopeRows
 }

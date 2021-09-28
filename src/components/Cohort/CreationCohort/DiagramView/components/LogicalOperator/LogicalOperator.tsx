@@ -183,7 +183,7 @@ const LogicalOperator: React.FC = () => {
     _buildCohortCreation()
   }
 
-  const _addNewGroup = (parentId: number) => {
+  const _addNewGroup = async (parentId: number) => {
     // Add new group
     const nextGroupId = request.nextGroupId
     const newOperator: CriteriaGroupType = {
@@ -194,11 +194,11 @@ const LogicalOperator: React.FC = () => {
       isSubGroup: parentId === 0 ? false : true,
       isInclusive: true
     }
-    dispatch<any>(addNewCriteriaGroup(newOperator))
+    await dispatch<any>(addNewCriteriaGroup(newOperator))
     // Edit parent and add nextGroupId inside criteriaIds
     const currentParent = request.criteriaGroup ? request.criteriaGroup.find(({ id }) => id === parentId) : null
     if (!currentParent) return
-    dispatch<any>(
+    await dispatch<any>(
       editCriteriaGroup({
         ...currentParent,
         criteriaIds: [...currentParent.criteriaIds, nextGroupId]

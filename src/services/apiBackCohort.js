@@ -23,6 +23,7 @@ apiBackCohort.interceptors.response.use(
       localStorage.clear()
       window.location = '/'
     }
+    return error
   }
 )
 

@@ -6,7 +6,7 @@ import { RootState } from 'state'
 
 import { setFavoriteCohortThunk } from './userCohorts'
 
-import { fetchCohort } from 'services/cohortInfos'
+import { fetchCohort, fetchCohortExportRight } from 'services/cohortInfos'
 import { fetchMyPatients } from 'services/myPatients'
 import { fetchPerimetersInfos } from 'services/perimeters'
 
@@ -16,6 +16,7 @@ export type ExploredCohortState = {
   excludedPatients: any[]
   loading: boolean
   requestId?: string
+  canMakeExport?: boolean
 } & CohortData
 
 const localStorageExploredCohort = localStorage.getItem('exploredCohort') ?? null
@@ -36,6 +37,7 @@ const defaultInitialState = {
   visitTypeRepartitionData: undefined,
   monthlyVisitData: undefined,
   agePyramidData: undefined,
+  canMakeExport: false,
   requestId: '',
   cohortId: '',
   favorite: false,
@@ -85,7 +87,10 @@ const fetchExploredCohort = createAsyncThunk<
   { state: RootState }
 >('exploredCohort/fetchExploredCohort', async ({ context, id, forceReload }, { getState }) => {
   const state = getState()
+  const providerId = state.me?.id
   const stateCohort = state.exploredCohort.cohort
+  const stateCohortList = state.cohort.cohortsList
+
   let shouldRefreshData = true
   switch (context) {
     case 'cohort':
@@ -120,30 +125,48 @@ const fetchExploredCohort = createAsyncThunk<
     switch (context) {
       case 'cohort': {
         if (id) {
-          cohort = await fetchCohort(id)
+          cohort = (await fetchCohort(id)) as ExploredCohortState
+          if (cohort) {
+            const currentCohortItem = stateCohortList.find(({ fhir_group_id }) => fhir_group_id === id) ?? {
+              extension: []
+            }
+            const canMakeExport =
+              currentCohortItem.extension && currentCohortItem.extension.length > 0
+                ? currentCohortItem.extension.some(
+                    (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
+                  ) &&
+                  currentCohortItem.extension.some(
+                    (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+                  )
+                : false
+
+            cohort.canMakeExport = canMakeExport ? canMakeExport : await fetchCohortExportRight(id, providerId ?? '')
+          }
         }
         break
       }
       case 'patients': {
-        cohort = await fetchMyPatients()
+        cohort = (await fetchMyPatients()) as ExploredCohortState
         if (cohort) {
           cohort.name = '-'
           cohort.description = ''
           cohort.requestId = ''
           cohort.favorite = false
           cohort.uuid = ''
+          cohort.canMakeExport = false
         }
         break
       }
       case 'perimeters': {
         if (id) {
-          cohort = await fetchPerimetersInfos(id)
+          cohort = (await fetchPerimetersInfos(id)) as ExploredCohortState
           if (cohort) {
             cohort.name = '-'
             cohort.description = ''
             cohort.requestId = ''
             cohort.favorite = false
             cohort.uuid = ''
+            cohort.canMakeExport = false
           }
         }
         break

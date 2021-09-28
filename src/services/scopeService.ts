@@ -1,7 +1,6 @@
 import api from './api'
 import { CONTEXT, API_RESOURCE_TAG } from '../constants'
 import {
-  IGroup,
   IPractitionerRole,
   IOrganization,
   IHealthcareService,
@@ -10,6 +9,8 @@ import {
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { FHIR_API_Response, ScopeTreeRow } from '../types'
 import { getApiResponseResources } from 'utils/apiHelpers'
+
+import { MeState } from 'state/me'
 
 import fakeScopeRows from '../data/fakeData/scopeRows'
 
@@ -52,40 +53,64 @@ export const getPerimeters = async (practitionerId: string) => {
     if (!data || data?.resourceType === 'OperationOutcome') return undefined
 
     const practitionerRoleData = getApiResponseResources(practitionerRole)
-    const perimetersIds: any[] | undefined = practitionerRoleData?.map(({ organization }) =>
-      organization?.reference?.replace(/^Organization\//, '')
-    )
+
+    const practitionerRoleHighPerimeter = data.meta?.extension?.length
+      ? data.meta?.extension?.find((extension) => extension.url === 'Practitioner Organization List')
+      : { extension: [] }
+    const rolesList: any[] | undefined = practitionerRoleHighPerimeter?.extension?.length
+      ? practitionerRoleHighPerimeter?.extension[0].extension?.length
+        ? practitionerRoleHighPerimeter?.extension[0].extension
+        : []
+      : []
+
+    const perimetersIds = rolesList.map(({ url }) => url)
     if (!perimetersIds || perimetersIds?.length === 0) return undefined
 
-    const perimeters = await api.get<FHIR_API_Response<IGroup>>(
-      `/Group?managing-entity=${perimetersIds}&_elements=name,quantity,managingEntity`
-    )
+    const organisationResult = await api.get(`/Organization?_id=${perimetersIds}&_elements=name,extension,alias`)
+    const organisationData: any[] = organisationResult.data
+      ? organisationResult.data.entry && organisationResult.data.entry.length > 0
+        ? organisationResult.data.entry.map((entry: any) => entry.resource)
+        : null
+      : null
 
-    const perimetersResult = getApiResponseResources(perimeters)
-
-    return perimetersResult && perimetersResult.length > 0
-      ? perimetersResult.map((perimeter) => {
-          const organizationId = perimeter?.managingEntity?.display || null
-          if (!organizationId) return perimeter
+    return organisationData && organisationData.length > 0
+      ? organisationData.map((organization: any) => {
+          const organizationId = organization.id
+          if (!organizationId) return organization
           const foundItem = practitionerRoleData?.find(
-            (practitionerRole) => practitionerRole?.organization?.reference === organizationId
+            (practitionerRole) =>
+              practitionerRole?.organization?.reference?.replace(/^Organization\//, '') === organizationId
           )
           return {
-            ...perimeter,
-            extension: foundItem ? foundItem.extension : undefined
+            ...organization,
+            extension: [...((foundItem && foundItem.extension) || []), ...(organization.extension ?? [])]
           }
         })
       : []
   }
 }
 
+const getScopeName = (perimeter: any) => {
+  const perimeterID = perimeter ? perimeter.alias?.[0] : false
+  if (!perimeterID) {
+    return perimeter ? perimeter.name : ''
+  }
+  return `${perimeterID} - ${perimeter.name}`
+}
+
+const getQuantity = (extension?: IExtension[]) => {
+  const accessExtension = extension?.find((extension) => extension.url === 'cohort-size')
+  if (!extension || !accessExtension) {
+    return 0
+  }
+  return accessExtension.valueInteger || 0
+}
+
 const getAccessName = (extension?: IExtension[]) => {
-  if (!extension || !extension.find((extension) => extension.url === 'High Level Organisation Role')) {
+  const accessExtension = extension?.find((extension) => extension.url === 'High Level Organisation Role')
+  if (!extension || !accessExtension) {
     return ''
   }
-
-  const accessExtension = extension.find((extension) => extension.url === 'High Level Organisation Role')
-
   const access = accessExtension?.valueString
 
   switch (access) {
@@ -100,7 +125,8 @@ const getAccessName = (extension?: IExtension[]) => {
   }
 }
 
-export const getScopePerimeters = async (practitionerId: string): Promise<ScopeTreeRow[]> => {
+export const getScopePerimeters = async (practitioner: MeState): Promise<ScopeTreeRow[]> => {
+  const practitionerId = practitioner?.id ?? ''
   if (CONTEXT === 'fakedata') {
     const scopeRows = fakeScopeRows as ScopeTreeRow[]
 
@@ -112,7 +138,9 @@ export const getScopePerimeters = async (practitionerId: string): Promise<ScopeT
 
     for (const perimetersResult of perimetersResults) {
       const scopeRow: ScopeTreeRow = perimetersResult as ScopeTreeRow
-      scopeRow.name = perimetersResult.name?.replace(/^Patients passés par: /, '') ?? ''
+
+      scopeRow.name = getScopeName(perimetersResult)
+      scopeRow.quantity = getQuantity(perimetersResult.extension)
       scopeRow.access = getAccessName(perimetersResult.extension)
       scopeRow.subItems = await getScopeSubItems(perimetersResult as ScopeTreeRow)
       scopeRows = [...scopeRows, scopeRow]
@@ -222,42 +250,34 @@ export const getScopePerimeters = async (practitionerId: string): Promise<ScopeT
   return []
 }
 
-export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<ScopeTreeRow[]> => {
+export const getScopeSubItems = async (
+  perimeter: ScopeTreeRow | null,
+  getSubItem?: boolean
+): Promise<ScopeTreeRow[]> => {
   if (!perimeter) return []
-  const perimeterGroupId = perimeter?.managingEntity?.display?.replace(/^Organization\//, '') || 0
+  const perimeterGroupId = perimeter.id
   const organization = await api.get<FHIR_API_Response<IOrganization>>(
-    `/Organization?partof=${perimeterGroupId}&_elements=id`
+    `/Organization?partof=${perimeterGroupId}&_elements=name,extension,alias`
   )
   if (!organization) return []
 
-  const organizationData = getApiResponseResources(organization)
-  let organizationIds = organizationData?.map((org) => org.id ?? '').filter((id) => id !== '')
-  organizationIds = organizationIds?.filter((id) => id !== '')
-  if (organizationIds && organizationIds.length === 0) return []
+  const organizationData = getApiResponseResources(organization) || []
+  if (organizationData.length === 0) return []
 
-  const subItemsRequest = await api.get<FHIR_API_Response<IGroup>>(
-    `/Group?managing-entity=${organizationIds}&_elements=name,quantity,managingEntity`
-  )
-  if (!subItemsRequest) return []
+  let subScopeRows: ScopeTreeRow[] = []
 
-  let subItemsData = getApiResponseResources(subItemsRequest)
-  subItemsData = subItemsData?.filter(
-    ({ managingEntity }) => managingEntity?.display?.replace(/^Organization\//, '') !== perimeterGroupId
-  )
+  for (const perimetersResult of organizationData) {
+    const scopeRow: ScopeTreeRow = perimetersResult as ScopeTreeRow
 
-  let _subItemsData = subItemsData
-    ? subItemsData?.map<ScopeTreeRow>((subItemData) => ({
-        ...subItemData,
-        id: subItemData.id ?? '0',
-        name: subItemData.name?.replace(/^Patients passés par: /, '') ?? '',
-        quantity: subItemData.quantity ?? 0,
-        subItems: [loadingItem],
-        access: perimeter.access
-      }))
-    : []
+    scopeRow.name = getScopeName(perimetersResult)
+    scopeRow.quantity = getQuantity(perimetersResult.extension)
+    scopeRow.subItems = getSubItem === true ? await getScopeSubItems(perimetersResult as ScopeTreeRow) : [loadingItem]
+    scopeRow.access = perimeter.access
+    subScopeRows = [...subScopeRows, scopeRow]
+  }
 
   // Sort by name
-  _subItemsData = _subItemsData.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
+  subScopeRows = subScopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
     if (a.quantity > b.quantity) {
       return 1
     } else if (a.quantity < b.quantity) {
@@ -265,7 +285,7 @@ export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<
     }
     return 0
   })
-  _subItemsData = _subItemsData.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
+  subScopeRows = subScopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
     if (b.quantity === 0) return -1
     if (a.name > b.name) {
       return 1
@@ -274,5 +294,6 @@ export const getScopeSubItems = async (perimeter: ScopeTreeRow | null): Promise<
     }
     return 0
   })
-  return _subItemsData
+
+  return subScopeRows
 }

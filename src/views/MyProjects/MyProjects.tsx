@@ -42,7 +42,8 @@ const MyProjects = () => {
 
   const loadingProject = projectState.loading
   const loadingRequest = requestState.loading
-  const loading = loadingProject || loadingRequest
+  const loadingCohort = cohortState.loading
+  const loading = loadingProject || loadingRequest || loadingCohort
 
   const _fetchProjectsList = async () => {
     dispatch<any>(setSelectedProject(null))
