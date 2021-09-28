@@ -25,7 +25,7 @@ const VisitInputs: React.FC<VisitInputsProps> = (props) => {
       <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
         <FormControl className={classes.inputItem}>
           <InputLabel shrink htmlFor="date-start-occurrence">
-            Avant le
+            Après le
           </InputLabel>
           <Input
             id="date-start-occurrence"
@@ -42,7 +42,7 @@ const VisitInputs: React.FC<VisitInputsProps> = (props) => {
 
         <FormControl className={classes.inputItem}>
           <InputLabel shrink htmlFor="date-end-occurrence">
-            Après le
+            Avant le
           </InputLabel>
           <Input
             id="date-end-occurrence"

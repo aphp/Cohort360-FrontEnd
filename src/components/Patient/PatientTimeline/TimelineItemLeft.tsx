@@ -18,7 +18,7 @@ type TimelineItemLeftTypes = {
 }
 const TimelineItemLeft: React.FC<TimelineItemLeftTypes> = ({ data, open, dotHeight }) => {
   let color = ''
-  switch (data?.class.code) {
+  switch (data?.class?.code) {
     case 'hosp':
       color = '#C3DCA5'
       break

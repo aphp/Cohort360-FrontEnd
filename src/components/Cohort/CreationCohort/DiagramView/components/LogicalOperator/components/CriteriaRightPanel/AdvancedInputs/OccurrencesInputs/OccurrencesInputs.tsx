@@ -88,7 +88,7 @@ const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
       <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
         <FormControl className={classes.inputItem}>
           <InputLabel shrink htmlFor="date-start-occurrence">
-            Avant le
+            Après le
           </InputLabel>
           <Input
             id="date-start-occurrence"
@@ -105,7 +105,7 @@ const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
 
         <FormControl className={classes.inputItem}>
           <InputLabel shrink htmlFor="date-end-occurrence">
-            Après le
+            Avant le
           </InputLabel>
           <Input
             id="date-end-occurrence"
