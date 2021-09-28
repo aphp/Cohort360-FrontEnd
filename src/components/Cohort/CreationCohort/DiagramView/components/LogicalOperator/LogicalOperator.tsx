@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { ButtonGroup, Button, IconButton, CircularProgress } from '@material-ui/core'
@@ -18,7 +18,10 @@ import {
   editCriteriaGroup,
   addNewSelectedCriteria,
   editSelectedCriteria,
-  deleteSelectedCriteria
+  deleteSelectedCriteria,
+  countCohortCreation,
+  suspendCount,
+  unsuspendCount
 } from 'state/cohortCreation'
 
 import useStyles from './styles'
@@ -157,20 +160,20 @@ const LogicalOperator: React.FC = () => {
     dispatch<any>(buildCohortCreation({}))
   }
 
-  const _onConfirmAddOrEditCriteria = (item: SelectedCriteriaType) => {
+  const _onConfirmAddOrEditCriteria = async (item: SelectedCriteriaType) => {
     // Add criteria
     const nextCriteriaId = request.nextCriteriaId
     if (item.id !== undefined) {
       // Edition
-      dispatch<any>(editSelectedCriteria(item))
+      await dispatch<any>(editSelectedCriteria(item))
     } else {
       // Creation
       item.id = nextCriteriaId
-      dispatch<any>(addNewSelectedCriteria(item))
+      await dispatch<any>(addNewSelectedCriteria(item))
       // Link criteria with group operator
       const currentParent = request.criteriaGroup ? request.criteriaGroup.find(({ id }) => id === parentId) : null
       if (!currentParent) return
-      dispatch<any>(
+      await dispatch<any>(
         editCriteriaGroup({
           ...currentParent,
           criteriaIds: [...currentParent.criteriaIds, nextCriteriaId]
@@ -205,12 +208,14 @@ const LogicalOperator: React.FC = () => {
   }
 
   const _addNewCriteria = (parentId: number) => {
+    dispatch<any>(suspendCount())
     setOpenDrawer('criteria')
     setParentId(parentId)
     setSelectedCriteria(null)
   }
 
   const _editCriteria = (criteria: SelectedCriteriaType, parentId: number) => {
+    dispatch<any>(suspendCount())
     setOpenDrawer('criteria')
     setParentId(parentId)
     setSelectedCriteria(criteria)
@@ -218,18 +223,20 @@ const LogicalOperator: React.FC = () => {
 
   const _deleteCriteria = async (criteriaId: number) => {
     await dispatch<any>(deleteSelectedCriteria(criteriaId))
-    // const logicalOperatorParent = request.criteriaGroup
-    //   ? request.criteriaGroup.find(({ criteriaIds }) => criteriaIds.find((_criteriaId) => _criteriaId === criteriaId))
-    //   : undefined
-    // if (!logicalOperatorParent) return
-    // await dispatch<any>(
-    //   editCriteriaGroup({
-    //     ...logicalOperatorParent,
-    //     criteriaIds: logicalOperatorParent.criteriaIds.filter((_criteriaId) => _criteriaId !== criteriaId)
-    //   })
-    // )
     _buildCohortCreation()
   }
+
+  useEffect(() => {
+    if (openDrawer === null && request?.count?.status === 'suspended') {
+      if (request?.count?.uuid) {
+        // Relaunch count
+        dispatch<any>(countCohortCreation({ uuid: request?.count?.uuid }))
+      } else {
+        // Stop suspend effect
+        dispatch<any>(unsuspendCount())
+      }
+    }
+  }, [openDrawer, request])
 
   return (
     <>

@@ -1101,10 +1101,42 @@ export async function unbuildRequest(_json: string) {
         }))
       : []
 
+  let _criteriaGroup = convertJsonObjectsToCriteriaGroup(criteriaGroup)
+  const criteriaGroupSaved = [..._criteriaGroup]
+  // Reset Group criteriaIds
+  _criteriaGroup = _criteriaGroup.map((item) => ({ ...item, criteriaIds: [] }))
+  criteriaItems = criteriaItems.map((_criteria, index) => {
+    // Get the parent of current critria
+    const parentGroup = criteriaGroupSaved.find((itemGroup) =>
+      itemGroup.criteriaIds.find((criteriaId) => criteriaId === _criteria._id)
+    )
+    if (parentGroup) {
+      const indexOfParent = criteriaGroupSaved.indexOf(parentGroup)
+      // Assign the new criterion identifier to its group
+      if (indexOfParent !== -1) {
+        _criteriaGroup[indexOfParent] = {
+          ..._criteriaGroup[indexOfParent],
+          criteriaIds: [..._criteriaGroup[indexOfParent].criteriaIds, index + 1]
+        }
+      }
+    }
+    return { ..._criteria, _id: index + 1 }
+  })
+  // Re-assign groups
+  _criteriaGroup = _criteriaGroup.map((itemGroup) => {
+    const foundGroupSaved = criteriaGroupSaved.find(({ id }) => id === itemGroup.id)
+    const oldGroupsChildren = foundGroupSaved ? foundGroupSaved.criteriaIds.filter((criteriaId) => +criteriaId < 0) : []
+    return {
+      ...itemGroup,
+      criteriaIds: [...itemGroup.criteriaIds, ...oldGroupsChildren]
+    }
+  })
+
+  // End of unbuild
   return {
     population,
     criteria: await convertJsonObjectsToCriteria(criteriaItems),
-    criteriaGroup: convertJsonObjectsToCriteriaGroup(criteriaGroup)
+    criteriaGroup: _criteriaGroup
   }
 }
 
