@@ -221,8 +221,8 @@ const LogicalOperator: React.FC = () => {
     setSelectedCriteria(criteria)
   }
 
-  const _deleteCriteria = (criteriaId: number) => {
-    dispatch<any>(deleteSelectedCriteria(criteriaId))
+  const _deleteCriteria = async (criteriaId: number) => {
+    await dispatch<any>(deleteSelectedCriteria(criteriaId))
     _buildCohortCreation()
   }
 
