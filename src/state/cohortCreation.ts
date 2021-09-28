@@ -456,6 +456,15 @@ const cohortCreationSlice = createSlice({
       })
       const index = foundItem ? state.temporalConstraints.indexOf(foundItem) : -1
       if (index !== -1) state.temporalConstraints[index] = action.payload
+    },
+    suspendCount: (state: CohortCreationState) => {
+      state.count = {
+        ...state.count,
+        status: state.count.status === 'pending' || state.count.status === 'started' ? 'suspended' : state.count.status
+      }
+    },
+    unsuspendCount: (state: CohortCreationState) => {
+      state.count = {}
     }
   },
   extraReducers: (builder) => {
@@ -474,7 +483,7 @@ const cohortCreationSlice = createSlice({
     builder.addCase(saveJson.fulfilled, (state, { payload }) => ({ ...state, ...payload, saveLoading: false }))
     builder.addCase(saveJson.rejected, (state) => ({ ...state, saveLoading: false }))
     // countCohortCreation
-    builder.addCase(countCohortCreation.pending, (state) => ({ ...state, countLoading: true }))
+    builder.addCase(countCohortCreation.pending, (state) => ({ ...state, status: '_pending', countLoading: true }))
     builder.addCase(countCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
@@ -522,5 +531,7 @@ export const {
   editSelectedCriteria,
   editCriteriaGroup,
   //
-  updateTemporalConstraint
+  updateTemporalConstraint,
+  suspendCount,
+  unsuspendCount
 } = cohortCreationSlice.actions
