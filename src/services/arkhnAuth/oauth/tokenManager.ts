@@ -70,6 +70,7 @@ export const revokeToken = async () => {
     const revokeResponse = await axios.post(REVOKE_URL!, bodyFormData, conf) // eslint-disable-line
     if (revokeResponse.status !== 200) console.error(revokeResponse.data)
   } catch (err) {
+    // @ts-ignore
     console.error(err.response)
   }
 }
