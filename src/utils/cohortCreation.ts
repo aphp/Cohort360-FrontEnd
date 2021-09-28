@@ -145,7 +145,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
   switch (criterion.type) {
     case RESSOURCE_TYPE_PATIENT: {
       let ageFilter = ''
-      if (criterion.years && criterion.years !== [0, 130]) {
+      if (criterion.years && (criterion.years[0] !== 0 || criterion.years[1] !== 130)) {
         //@ts-ignore
         const date1 = moment()
           .subtract(criterion.years[1] + 1, criterion?.ageType?.id || 'years')
@@ -202,7 +202,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       }
 
       let ageFilter = ''
-      if (criterion.years && criterion.years !== [0, 130]) {
+      if (criterion.years && (criterion.years[0] !== 0 || criterion.years[1] !== 130)) {
         //@ts-ignore
         const date1 = moment()
           .subtract(+criterion.years[1], criterion?.ageType?.id || 'years')
