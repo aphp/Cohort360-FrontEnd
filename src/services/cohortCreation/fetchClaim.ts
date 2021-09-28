@@ -57,8 +57,8 @@ export const fetchGhmHierarchy = async (ghmParent: string) => {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-ghm`)
 
       let GHMList =
-        res && res.data && res.data.entry && res.data.entry[1] && res.data.resourceType === 'Bundle'
-          ? res.data.entry[1].resource.compose.include[0].concept
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource.compose.include[0].concept
           : []
 
       GHMList =
