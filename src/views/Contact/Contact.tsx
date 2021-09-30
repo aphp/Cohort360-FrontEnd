@@ -56,7 +56,6 @@ const Contact: React.FC = () => {
 
   const onSubmit = async () => {
     try {
-      setLoading(true)
       if (!contactRequest.requestType) {
         return setError(ERROR_REQUEST_TYPE)
       }
@@ -68,6 +67,8 @@ const Contact: React.FC = () => {
       if (!contactRequest.message) {
         return setError(ERROR_MESSAGE)
       }
+
+      setLoading(true)
 
       const contactSubmitForm = {
         label: contactRequest.requestType,
@@ -99,7 +100,7 @@ const Contact: React.FC = () => {
             ) : (
               <>
                 <Typography variant="h1" className={classes.title}>
-                  Contactez l'équipe Cohort360 :
+                  Contactez l'équipe Cohort360
                 </Typography>
 
                 <Typography variant="h3">Motif de contact :</Typography>
