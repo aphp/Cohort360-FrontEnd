@@ -143,7 +143,6 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               onChange={(event) => _onChangeValue('isInclusive', !event.target.checked)}
             />
           </Grid>
-
           <Grid style={{ display: 'flex' }}>
             <TextField
               className={classes.inputItem}
@@ -151,6 +150,8 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               label="Recherche dans les documents"
               variant="outlined"
               value={defaultValues.search}
+              multiline
+              rows={3}
               onChange={(e) => _onChangeValue('search', e.target.value)}
             />
 
