@@ -103,7 +103,7 @@ const Contact: React.FC = () => {
                   Contactez l'équipe Cohort360
                 </Typography>
 
-                <Typography variant="h3">Motif de contact :</Typography>
+                <Typography variant="h3">Motif de contact</Typography>
                 <Select
                   required
                   value={contactRequest.requestType}
@@ -119,7 +119,7 @@ const Contact: React.FC = () => {
                   ))}
                 </Select>
 
-                <Typography variant="h3">Objet :</Typography>
+                <Typography variant="h3">Objet</Typography>
                 <TextField
                   required
                   placeholder="Objet"
@@ -134,7 +134,7 @@ const Contact: React.FC = () => {
 
                 {contactRequest.requestType === requestTypes[0].code && (
                   <>
-                    <Typography variant="h3">URL concernée :</Typography>
+                    <Typography variant="h3">URL concernée</Typography>
                     <TextField
                       placeholder="Copiez-collez l'URL concernée par votre demande"
                       value={contactRequest.url}
@@ -147,7 +147,7 @@ const Contact: React.FC = () => {
                   </>
                 )}
 
-                <Typography variant="h3">Message :</Typography>
+                <Typography variant="h3">Message</Typography>
                 <TextField
                   required
                   placeholder="Écrivez votre message ici..."
