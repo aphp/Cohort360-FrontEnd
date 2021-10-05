@@ -6,9 +6,9 @@ import { RootState } from 'state'
 
 import { setFavoriteCohortThunk } from './userCohorts'
 
-import { fetchCohort, fetchCohortExportRight } from 'services/cohortInfos'
+import { fetchCohort, fetchCohortRights, fetchCohortExportRight } from 'services/cohortInfos'
 import { fetchMyPatients } from 'services/myPatients'
-import { fetchPerimetersInfos } from 'services/perimeters'
+import { fetchPerimetersInfos, fetchPerimetersRights } from 'services/perimeters'
 
 export type ExploredCohortState = {
   importedPatients: any[]
@@ -92,10 +92,18 @@ const fetchExploredCohort = createAsyncThunk<
   const stateCohortList = state.cohort.cohortsList
 
   let shouldRefreshData = true
+
   switch (context) {
-    case 'cohort':
+    case 'cohort': {
       shouldRefreshData = !stateCohort || Array.isArray(stateCohort) || stateCohort.id !== id
+
+      // Check rights
+      if (id && providerId) {
+        const hasRight = await fetchCohortRights(id, providerId)
+        if (!hasRight) return defaultInitialState
+      }
       break
+    }
     case 'perimeters': {
       if (!id) {
         throw new Error('No given perimeter ids')
@@ -110,6 +118,12 @@ const fetchExploredCohort = createAsyncThunk<
         !statePerimeterIds ||
         statePerimeterIds.length !== perimeterIds.length ||
         statePerimeterIds.some((id) => !perimeterIds.includes(id))
+
+      // Check rights
+      if (id && providerId) {
+        const hasRight = await fetchPerimetersRights(providerId, perimeterIds)
+        if (!hasRight) return defaultInitialState
+      }
       break
     }
     case 'patients': {
