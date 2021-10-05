@@ -4,11 +4,11 @@ import moment from 'moment'
 import { Button, Chip, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
 import { Pagination } from '@material-ui/lab'
 
-import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
-import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
 import ClearIcon from '@material-ui/icons/Clear'
 import InfoIcon from '@material-ui/icons/Info'
 import SortIcon from '@material-ui/icons/Sort'
+import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
+import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
 
 import DocumentSearchHelp from '../../DocumentSearchHelp/DocumentSearchHelp'
 import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
@@ -18,6 +18,8 @@ import SortDialog from '../../Filters/SortDialog/SortDialog'
 import { fetchDocuments } from '../../../services/patient'
 import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortComposition } from 'types'
+
+import { docTypes } from '../../../assets/docTypes.json'
 
 import useStyles from './styles'
 
@@ -64,12 +66,37 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
     { label: 'Type de document', code: 'type' }
   ]
 
-  const fetchDocumentsList = (newSortBy: string, newSortDirection: string, input = searchInput, page = 1) => {
+  const displayingSelectedDocType: any[] = (() => {
+    let displayingSelectedDocTypes: any[] = []
+    const allTypes = docTypes.map((docType: any) => docType.type)
+
+    for (const selectedDocType of selectedDocTypes) {
+      const numberOfElementFromGroup = (allTypes.filter((type) => type === selectedDocType.type) || []).length
+      const numberOfElementSelected = (
+        selectedDocTypes.filter((selectedDoc) => selectedDoc.type === selectedDocType.type) || []
+      ).length
+
+      if (numberOfElementFromGroup === numberOfElementSelected) {
+        const groupIsAlreadyAdded = displayingSelectedDocTypes.find((dsdt) => dsdt.label === selectedDocType.type)
+        if (groupIsAlreadyAdded) continue
+
+        displayingSelectedDocTypes = [
+          ...displayingSelectedDocTypes,
+          { type: selectedDocType.type, label: selectedDocType.type, code: selectedDocType.type }
+        ]
+      } else {
+        displayingSelectedDocTypes = [...displayingSelectedDocTypes, selectedDocType]
+      }
+    }
+    return displayingSelectedDocTypes.filter((item, index, array) => array.indexOf(item) === index)
+  })()
+
+  const fetchDocumentsList = async (newSortBy: string, newSortDirection: string, input = searchInput, page = 1) => {
     setLoadingStatus(true)
 
     const selectedDocTypesCodes = selectedDocTypes.map((docType) => docType.code)
 
-    fetchDocuments(
+    const docResp = await fetchDocuments(
       deidentifiedBoolean,
       newSortBy,
       newSortDirection,
@@ -82,12 +109,10 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
       endDate,
       groupId
     )
-      .then((docResp) => {
-        setDocs(docResp?.docsList ?? [])
-        setTotalDocs(docResp?.docsTotal ?? 0)
-      })
-      .catch((error) => console.log(error))
-      .then(() => setLoadingStatus(false))
+    if (!docResp) return
+    setDocs(docResp?.docsList ?? [])
+    setTotalDocs(docResp?.docsTotal ?? 0)
+    setLoadingStatus(false)
   }
 
   const handleClearInput = () => {
@@ -156,9 +181,19 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
               .join()
           )
         break
-      case 'selectedDocTypes':
-        value && setSelectedDocTypes(selectedDocTypes.filter((item) => item !== value))
+      case 'selectedDocTypes': {
+        const typesName = docTypes
+          .map((docType: any) => docType.type)
+          .filter((item, index, array) => array.indexOf(item) === index)
+        const isGroupItem = typesName.find((typeName) => typeName === value)
+
+        if (!isGroupItem) {
+          value && setSelectedDocTypes(selectedDocTypes.filter((item) => item.label !== value))
+        } else {
+          value && setSelectedDocTypes(selectedDocTypes.filter((item) => item.type !== value))
+        }
         break
+      }
       case 'startDate':
         setStartDate(null)
         break
@@ -244,13 +279,13 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
               />
             ))}
         {showFilterChip &&
-          selectedDocTypes.length > 0 &&
-          selectedDocTypes.map((docType) => (
+          displayingSelectedDocType.length > 0 &&
+          displayingSelectedDocType.map((docType) => (
             <Chip
               className={classes.chips}
               key={docType.code}
               label={docType.label}
-              onDelete={() => handleDeleteChip('selectedDocTypes', docType)}
+              onDelete={() => handleDeleteChip('selectedDocTypes', docType.label)}
               color="primary"
               variant="outlined"
             />

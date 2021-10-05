@@ -1,26 +1,13 @@
 import React, { useState } from 'react'
 
 import { Autocomplete, Alert } from '@material-ui/lab'
-import {
-  Button,
-  Divider,
-  FormControl,
-  FormLabel,
-  Grid,
-  Input,
-  InputLabel,
-  IconButton,
-  MenuItem,
-  Switch,
-  Typography,
-  TextField,
-  Select
-} from '@material-ui/core'
+import { Button, Divider, FormLabel, Grid, IconButton, Switch, Typography, TextField } from '@material-ui/core'
 
-import ClearIcon from '@material-ui/icons/Clear'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
+
+import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
 
@@ -48,7 +35,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     onChangeSelectedCriteria(selectedCriteria)
   }
 
-  const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue)
+  const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue, false)
 
   if (
     criteria?.data?.diagnosticTypes === 'loading' ||
@@ -165,77 +152,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             renderInput={(params) => <TextField {...params} variant="outlined" label="Type de diagnostic" />}
           />
 
-          <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
-            Nombre d'occurrence
-          </FormLabel>
-
-          <Grid style={{ display: 'grid', gridTemplateColumns: '100px 1fr', alignItems: 'center', margin: '0 1em' }}>
-            <Select
-              style={{ marginRight: '1em' }}
-              id="criteria-occurrenceComparator-select"
-              value={selectedCriteria.occurrenceComparator}
-              onChange={(event) => onChangeValue('occurrenceComparator', event.target.value as string)}
-              variant="outlined"
-            >
-              <MenuItem value={'<='}>{'<='}</MenuItem>
-              <MenuItem value={'<'}>{'<'}</MenuItem>
-              <MenuItem value={'='}>{'='}</MenuItem>
-              <MenuItem value={'>'}>{'>'}</MenuItem>
-              <MenuItem value={'>='}>{'>='}</MenuItem>
-            </Select>
-
-            <TextField
-              required
-              inputProps={{
-                min: 1
-              }}
-              type="number"
-              id="criteria-occurrence-required"
-              variant="outlined"
-              value={selectedCriteria.occurrence}
-              onChange={(e) => onChangeValue('occurrence', e.target.value)}
-            />
-          </Grid>
-
-          <FormLabel style={{ padding: '1em 1em 0 1em' }} component="legend">
-            Date d'occurrence
-          </FormLabel>
-
-          <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-            <FormControl className={classes.inputItem}>
-              <InputLabel shrink htmlFor="date-start-occurrence">
-                Avant le
-              </InputLabel>
-              <Input
-                id="date-start-occurrence"
-                type="date"
-                value={selectedCriteria.startOccurrence}
-                endAdornment={
-                  <IconButton size="small" onClick={() => onChangeValue('startOccurrence', '')}>
-                    <ClearIcon />
-                  </IconButton>
-                }
-                onChange={(e) => onChangeValue('startOccurrence', e.target.value)}
-              />
-            </FormControl>
-
-            <FormControl className={classes.inputItem}>
-              <InputLabel shrink htmlFor="date-end-occurrence">
-                Après le
-              </InputLabel>
-              <Input
-                id="date-end-occurrence"
-                type="date"
-                value={selectedCriteria.endOccurrence}
-                endAdornment={
-                  <IconButton size="small" onClick={() => onChangeValue('endOccurrence', '')}>
-                    <ClearIcon />
-                  </IconButton>
-                }
-                onChange={(e) => onChangeValue('endOccurrence', e.target.value)}
-              />
-            </FormControl>
-          </Grid>
+          <AdvancedInputs form="cim10" selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

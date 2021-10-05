@@ -12,7 +12,8 @@ export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
     return fakeValueSetCCAM && fakeValueSetCCAM.length > 0
       ? fakeValueSetCCAM.map((_fakeValueSetCCAM: { code: string; display: string }) => ({
           id: _fakeValueSetCCAM.code,
-          label: capitalizeFirstLetter(_fakeValueSetCCAM.display)
+          label: capitalizeFirstLetter(_fakeValueSetCCAM.display),
+          subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
         }))
       : []
   } else {
@@ -21,13 +22,15 @@ export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
     }
     const _searchValue = noStar
       ? searchValue
-        ? `&_text=${searchValue}`
+        ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
         : ''
       : searchValue
-      ? `&_text=${searchValue}*`
+      ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
       : ''
 
-    const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-ccam${_searchValue}`)
+    const res = await apiRequest.get(
+      `/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-ccam${_searchValue}&size=0`
+    )
 
     const CCAMObject = res && res.data && res.data.entry && res.data.resourceType === 'Bundle' ? res.data.entry : []
 
@@ -39,7 +42,8 @@ export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
     return (
       CCAMList.sort(codeSort).map((ccamData: any) => ({
         id: ccamData.code,
-        label: `${ccamData.code} - ${ccamData.display}`
+        label: `${ccamData.code} - ${ccamData.display}`,
+        subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
       })) || []
     )
   }
@@ -56,14 +60,15 @@ export const fetchCcamHierarchy = async (ccamParent: string) => {
 
       let CCAMList =
         res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
-          ? res.data.entry[0].resource.compose.include[0].concept
+          ? res.data.entry[0].resource?.compose?.include[0].concept
           : []
 
       CCAMList =
         CCAMList && CCAMList.length > 0
           ? CCAMList.sort(codeSort).map((ccamData: any) => ({
               id: ccamData.code,
-              label: `${ccamData.code} - ${ccamData.display}`
+              label: `${ccamData.code} - ${ccamData.display}`,
+              subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
             }))
           : []
       return CCAMList
@@ -96,7 +101,8 @@ export const fetchCcamHierarchy = async (ccamParent: string) => {
         CCAMList && CCAMList.length > 0
           ? CCAMList.sort(codeSort).map((ccamData: any) => ({
               id: ccamData.code,
-              label: `${ccamData.code} - ${ccamData.display}`
+              label: `${ccamData.code} - ${ccamData.display}`,
+              subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
             }))
           : []
       return CCAMList

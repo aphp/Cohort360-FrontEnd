@@ -11,6 +11,11 @@ import TutorialsCard from '../../components/Welcome/TutorialsCard/TutorialsCard'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { initUserCohortsThunk } from 'state/userCohorts'
+import { fetchProjects } from 'state/project'
+import { fetchRequests } from 'state/request'
+import { fetchCohorts } from 'state/cohort'
+import { initPmsiHierarchy } from 'state/pmsi'
+import { fetchScopesList } from 'state/scope'
 
 import useStyles from './styles'
 
@@ -35,13 +40,23 @@ const Accueil: React.FC = () => {
 
   useEffect(() => {
     dispatch<any>(initUserCohortsThunk())
+    // fetchProjectData
+    dispatch<any>(fetchProjects())
+    dispatch<any>(fetchRequests())
+    dispatch<any>(fetchCohorts())
+
+    // fetchPmsiData
+    dispatch<any>(initPmsiHierarchy())
+
+    // fetchScope
+    dispatch<any>(fetchScopesList())
   }, [dispatch])
 
   useEffect(() => {
     let interval: any = null
 
     const pendingCohorts = [...favoriteCohorts, ...lastCohorts].filter(
-      ({ jobStatus }) => jobStatus === 'pending' || jobStatus === 'started'
+      ({ fhir_group_id, jobStatus }) => !fhir_group_id && (jobStatus === 'pending' || jobStatus === 'started')
     )
 
     if (pendingCohorts && pendingCohorts.length > 0) {

@@ -259,8 +259,7 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
 
       return {
         json,
-        selectedPopulation: _selectedPopulation,
-        criteriaGroup: _criteriaGroup
+        selectedPopulation: _selectedPopulation
       }
     } catch (error) {
       console.error(error)
@@ -346,11 +345,89 @@ const cohortCreationSlice = createSlice({
     //
     deleteSelectedCriteria: (state: CohortCreationState, action: PayloadAction<number>) => {
       const criteriaId = action.payload
-      state.selectedCriteria = state.selectedCriteria.filter(({ id }) => id !== criteriaId)
+      const criteriaGroupSaved = [...state.criteriaGroup]
+      // Reset Group criteriaIds
+      state.criteriaGroup = state.criteriaGroup.map((item) => ({ ...item, criteriaIds: [] }))
+      state.selectedCriteria = state.selectedCriteria
+        .filter(({ id }) => id !== criteriaId)
+        .map((selectedCriteria, index) => {
+          // Get the parent of current critria
+          const parentGroup = criteriaGroupSaved.find((criteriaGroup) =>
+            criteriaGroup.criteriaIds.find((criteriaId) => criteriaId === selectedCriteria.id)
+          )
+          if (parentGroup) {
+            const indexOfParent = criteriaGroupSaved.indexOf(parentGroup)
+            // Assign the new criterion identifier to its group
+            if (indexOfParent !== -1) {
+              state.criteriaGroup[indexOfParent] = {
+                ...state.criteriaGroup[indexOfParent],
+                criteriaIds: [...state.criteriaGroup[indexOfParent].criteriaIds, index + 1]
+              }
+            }
+          }
+          return { ...selectedCriteria, id: index + 1 }
+        })
+      // Re-assign groups
+      state.criteriaGroup = state.criteriaGroup.map((criteriaGroup) => {
+        const foundGroupSaved = criteriaGroupSaved.find(({ id }) => id === criteriaGroup.id)
+        const oldGroupsChildren = foundGroupSaved
+          ? foundGroupSaved.criteriaIds.filter((criteriaId) => +criteriaId < 0)
+          : []
+        return {
+          ...criteriaGroup,
+          criteriaIds: [...criteriaGroup.criteriaIds, ...oldGroupsChildren]
+        }
+      })
+      state.nextCriteriaId = state.selectedCriteria.length + 1
     },
     deleteCriteriaGroup: (state: CohortCreationState, action: PayloadAction<number>) => {
       const groupId = action.payload
-      state.criteriaGroup = state.criteriaGroup.filter(({ id }) => id !== groupId)
+      const criteriaGroupSaved = [...state.criteriaGroup]
+        .filter(({ id }) => id !== groupId)
+        .map((item) => ({
+          id: item.id,
+          criteriaIds: [...item.criteriaIds]
+        }))
+      // Reset Group criteriaIds
+      state.criteriaGroup = state.criteriaGroup
+        .filter(({ id }) => id !== groupId)
+        .map((item) => ({ ...item, criteriaIds: [] }))
+
+      const newCriteriaGroup = state.criteriaGroup.map((criteriaGroup, index) => {
+        const foundGroupSaved = criteriaGroupSaved.find(({ id }) => id === criteriaGroup.id)
+        const oldCriteriaChildren = foundGroupSaved
+          ? foundGroupSaved.criteriaIds.filter((criteriaId) => +criteriaId > 0)
+          : []
+
+        return {
+          ...criteriaGroup,
+          newId: index ? -index : 0,
+          criteriaIds: oldCriteriaChildren
+        }
+      })
+      for (const criteriaGroup of newCriteriaGroup) {
+        const parentGroup = criteriaGroupSaved.find((_criteriaGroup) =>
+          _criteriaGroup.criteriaIds.find((criteriaId) => criteriaId === criteriaGroup.id)
+        )
+        const indexOfParent = parentGroup ? criteriaGroupSaved.indexOf(parentGroup) : -1
+        if (indexOfParent !== -1) {
+          state.criteriaGroup[indexOfParent] = {
+            ...state.criteriaGroup[indexOfParent],
+            criteriaIds: [...state.criteriaGroup[indexOfParent].criteriaIds, criteriaGroup.newId]
+          }
+        }
+
+        const currentGroup = criteriaGroupSaved.find((_criteriaGroup) => _criteriaGroup.id === criteriaGroup.id)
+        const indexOfGroup = currentGroup ? criteriaGroupSaved.indexOf(currentGroup) : -1
+        if (indexOfGroup !== -1) {
+          state.criteriaGroup[indexOfGroup] = {
+            ...state.criteriaGroup[indexOfGroup],
+            id: criteriaGroup.newId,
+            criteriaIds: [...state.criteriaGroup[indexOfGroup].criteriaIds, ...criteriaGroup.criteriaIds]
+          }
+        }
+      }
+      state.nextGroupId = -(state.criteriaGroup.length + 1)
     },
     //
     addNewSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
@@ -379,6 +456,15 @@ const cohortCreationSlice = createSlice({
       })
       const index = foundItem ? state.temporalConstraints.indexOf(foundItem) : -1
       if (index !== -1) state.temporalConstraints[index] = action.payload
+    },
+    suspendCount: (state: CohortCreationState) => {
+      state.count = {
+        ...state.count,
+        status: state.count.status === 'pending' || state.count.status === 'started' ? 'suspended' : state.count.status
+      }
+    },
+    unsuspendCount: (state: CohortCreationState) => {
+      state.count = {}
     }
   },
   extraReducers: (builder) => {
@@ -397,7 +483,7 @@ const cohortCreationSlice = createSlice({
     builder.addCase(saveJson.fulfilled, (state, { payload }) => ({ ...state, ...payload, saveLoading: false }))
     builder.addCase(saveJson.rejected, (state) => ({ ...state, saveLoading: false }))
     // countCohortCreation
-    builder.addCase(countCohortCreation.pending, (state) => ({ ...state, countLoading: true }))
+    builder.addCase(countCohortCreation.pending, (state) => ({ ...state, status: '_pending', countLoading: true }))
     builder.addCase(countCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
@@ -409,11 +495,10 @@ const cohortCreationSlice = createSlice({
       countLoading: false
     }))
     // fetchRequestCohortCreation
-    builder.addCase(fetchRequestCohortCreation.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(fetchRequestCohortCreation.pending, (state) => ({ ...state }))
     builder.addCase(fetchRequestCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
-      ...payload,
-      loading: false
+      ...payload
     }))
     builder.addCase(fetchRequestCohortCreation.rejected, (state) => ({ ...state, loading: false }))
     // Create new request
@@ -446,5 +531,7 @@ export const {
   editSelectedCriteria,
   editCriteriaGroup,
   //
-  updateTemporalConstraint
+  updateTemporalConstraint,
+  suspendCount,
+  unsuspendCount
 } = cohortCreationSlice.actions

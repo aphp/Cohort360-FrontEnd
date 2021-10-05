@@ -12,7 +12,8 @@ export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
     return fakeValueSetGHM && fakeValueSetGHM.length > 0
       ? fakeValueSetGHM.map((_fakeValueSetGHM: { code: string; display: string }) => ({
           id: _fakeValueSetGHM.code,
-          label: capitalizeFirstLetter(_fakeValueSetGHM.display)
+          label: capitalizeFirstLetter(_fakeValueSetGHM.display),
+          subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
         }))
       : []
   } else {
@@ -21,23 +22,26 @@ export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
     }
     const _searchValue = noStar
       ? searchValue
-        ? `&_text=${searchValue}`
+        ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
         : ''
       : searchValue
-      ? `&_text=${searchValue}*`
+      ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
       : ''
 
-    const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-ghm${_searchValue}`)
+    const res = await apiRequest.get(
+      `/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-ghm${_searchValue}&size=0`
+    )
 
     const data =
       res && res.data && res.data.entry && res.data.resourceType === 'Bundle'
-        ? res.data.entry[0].resource.compose.include[0].concept
+        ? res.data.entry[0].resource?.compose?.include[0].concept
         : []
 
     return data && data.length > 0
       ? data.sort(codeSort).map((_data: { code: string; display: string }) => ({
           id: _data.code,
-          label: `${_data.code} - ${capitalizeFirstLetter(_data.display)}`
+          label: `${_data.code} - ${capitalizeFirstLetter(_data.display)}`,
+          subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
         }))
       : []
   }
@@ -53,15 +57,16 @@ export const fetchGhmHierarchy = async (ghmParent: string) => {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-ghm`)
 
       let GHMList =
-        res && res.data && res.data.entry && res.data.entry[1] && res.data.resourceType === 'Bundle'
-          ? res.data.entry[1].resource.compose.include[0].concept
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource.compose.include[0].concept
           : []
 
       GHMList =
         GHMList && GHMList.length > 0
           ? GHMList.sort(codeSort).map((ghmData: any) => ({
               id: ghmData.code,
-              label: `${ghmData.code} - ${ghmData.display}`
+              label: `${ghmData.code} - ${ghmData.display}`,
+              subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
             }))
           : []
       return GHMList
@@ -94,7 +99,8 @@ export const fetchGhmHierarchy = async (ghmParent: string) => {
         GHMList && GHMList.length > 0
           ? GHMList.sort(codeSort).map((ghmData: any) => ({
               id: ghmData.code,
-              label: `${ghmData.code} - ${ghmData.display}`
+              label: `${ghmData.code} - ${ghmData.display}`,
+              subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
             }))
           : []
       return GHMList

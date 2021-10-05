@@ -93,11 +93,17 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
     let name = ''
     let description = ''
     let requestId = ''
+    let uuid = ''
+    let favorite = false
 
-    if (cohortInfo.data.results && cohortInfo.data.results.length === 1) {
+    if (cohortInfo.data.results && cohortInfo.data.results.length >= 1) {
       name = cohortInfo.data.results[0].name ?? ''
       description = cohortInfo.data.results[0].description ?? ''
       requestId = cohortInfo.data.results[0].request ?? ''
+      favorite = cohortInfo.data.results[0].favorite ?? false
+      uuid = cohortInfo.data.results[0].uuid ?? ''
+    } else {
+      throw new Error('This cohort is not your or invalid')
     }
 
     if (!name) {
@@ -150,7 +156,9 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
       visitTypeRepartitionData,
       agePyramidData,
       monthlyVisitData,
-      requestId
+      requestId,
+      favorite,
+      uuid
     }
   }
 
@@ -398,7 +406,29 @@ const fetchDocuments = async (
   }
   if (CONTEXT === 'aphp') {
     const searchByGroup = groupId ? `&_list=${groupId}` : ''
-    const search = searchInput ? `&_text=${searchInput}` : ''
+    let search = ''
+    if (searchInput) {
+      searchInput = searchInput
+        .replaceAll('!', '%21')
+        .replaceAll('#', '%23')
+        .replaceAll('$', '%24')
+        .replaceAll('&', '%26')
+        .replaceAll("'", '%27')
+        .replaceAll('(', '%28')
+        .replaceAll(')', '%29')
+        .replaceAll('*', '%2A')
+        .replaceAll('+', '%2B')
+        .replaceAll(',', '%2C')
+        .replaceAll('/', '%2F')
+        .replaceAll(':', '%3A')
+        .replaceAll(';', '%3B')
+        .replaceAll('=', '%3D')
+        .replaceAll('?', '%3F')
+        .replaceAll('@', '%40')
+        .replaceAll('[', '%5B')
+        .replaceAll(']', '%5D')
+      search = searchInput ? `&_text=${searchInput}` : ''
+    }
     const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : ''
     const ndaFilter = nda ? `&encounter.identifier=${nda}` : ''
     const _sortDirection = sortDirection === 'desc' ? '-' : ''
@@ -428,23 +458,20 @@ const fetchDocuments = async (
       //   `/Composition?facet=cloud&size=0&_sort=${_sortDirection}${sortBy}&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
       // ),
       api.get<FHIR_API_Response<IComposition>>(
-        `/Composition?size=20&_sort=${_sortDirection}${sortBy}&offset=${
+        `/Composition?size=20&type:not=doc-impor&_sort=${_sortDirection}${sortBy}&offset=${
           page ? (page - 1) * 20 : 0
         }&status=final${elements}${searchByGroup}${search}${docTypesFilter}${ndaFilter}${dateFilter}`
       ),
-      search
+      !!search || !!docTypesFilter || !!ndaFilter || !!dateFilter
         ? api.get<FHIR_API_Response<IComposition>>(
-            `/Composition?_sort=${_sortDirection}${sortBy}&status=final${searchByGroup}${docTypesFilter}${ndaFilter}${dateFilter}&size=0`
+            `/Composition?type:not=doc-impor&status=final${searchByGroup}&size=0`
           )
         : null
     ])
 
     const totalDocs = docsList?.data?.resourceType === 'Bundle' ? docsList.data.total : 0
-    const totalAllDocs = search
-      ? allDocsList?.data?.resourceType === 'Bundle'
-        ? allDocsList.data.total
-        : 0
-      : totalDocs
+    const totalAllDocs =
+      allDocsList !== null ? (allDocsList?.data?.resourceType === 'Bundle' ? allDocsList.data.total : 0) : totalDocs
 
     const documentsList = await getInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
 
@@ -477,4 +504,34 @@ const fetchDocuments = async (
   }
 }
 
-export { fetchCohort, fetchPatientList, fetchDocuments }
+const fetchCohortExportRight = async (cohortId: string, providerId: string) => {
+  try {
+    const rightResponse = await api.get(`/Group?_list=${cohortId}&provider=${providerId}`)
+
+    if (
+      rightResponse &&
+      rightResponse.data &&
+      rightResponse.data.entry &&
+      rightResponse.data.entry[0] &&
+      rightResponse.data.entry[0].resource
+    ) {
+      const currentCohortItem = rightResponse.data.entry[0].resource
+      const canMakeExport =
+        currentCohortItem.extension && currentCohortItem.extension.length > 0
+          ? currentCohortItem.extension.some(
+              (extension: any) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
+            ) &&
+            currentCohortItem.extension.some(
+              (extension: any) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+            )
+          : false
+      return canMakeExport
+    }
+    return false
+  } catch (error) {
+    console.error('Error (fetchCohortExportRight) :', error)
+    return false
+  }
+}
+
+export { fetchCohort, fetchPatientList, fetchDocuments, fetchCohortExportRight }

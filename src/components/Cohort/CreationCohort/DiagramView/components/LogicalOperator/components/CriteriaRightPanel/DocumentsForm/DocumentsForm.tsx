@@ -4,25 +4,22 @@ import { Alert } from '@material-ui/lab'
 import {
   Button,
   Divider,
-  FormControl,
   FormLabel,
   Grid,
-  Input,
-  InputLabel,
   IconButton,
-  MenuItem,
   Switch,
   Typography,
   TextField,
-  Select
+  Checkbox
 } from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import InfoIcon from '@material-ui/icons/Info'
-import ClearIcon from '@material-ui/icons/Clear'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import DocumentSearchHelp from 'components/DocumentSearchHelp/DocumentSearchHelp'
+
+import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
 
@@ -42,6 +39,8 @@ const defaultComposition: DocumentDataType = {
   docType: [],
   occurrence: 1,
   occurrenceComparator: '>=',
+  encounterEndDate: null,
+  encounterStartDate: null,
   startOccurrence: null,
   endOccurrence: null,
   isInclusive: true
@@ -79,7 +78,8 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
           : null
         return {
           id: docType.id,
-          label: docType.label ? docType.label : criteriaDocType?.label ?? '?'
+          label: docType.label ? docType.label : criteriaDocType?.label ?? '?',
+          type: docType.type
         }
       })
     : []
@@ -143,15 +143,15 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               onChange={(event) => _onChangeValue('isInclusive', !event.target.checked)}
             />
           </Grid>
-
           <Grid style={{ display: 'flex' }}>
             <TextField
-              required
               className={classes.inputItem}
               id="criteria-search-required"
-              placeholder="Recherche dans les documents"
+              label="Recherche dans les documents"
               variant="outlined"
               value={defaultValues.search}
+              multiline
+              rows={3}
               onChange={(e) => _onChangeValue('search', e.target.value)}
             />
 
@@ -171,79 +171,55 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             value={defaultValuesDocType}
             onChange={(e, value) => _onChangeValue('docType', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Type de document" />}
+            groupBy={(doctype) => doctype.type}
+            disableCloseOnSelect
+            renderGroup={(docType: any) => {
+              const currentDocTypeList = criteria?.data?.docTypes
+                ? criteria?.data?.docTypes.filter((doc: any) => doc.type === docType.group)
+                : []
+              const currentSelectedDocTypeList = defaultValuesDocType
+                ? defaultValuesDocType.filter((doc: any) => doc.type === docType.group)
+                : []
+
+              const onClick = () => {
+                if (currentDocTypeList.length === currentSelectedDocTypeList.length) {
+                  _onChangeValue(
+                    'docType',
+                    defaultValuesDocType.filter((doc: any) => doc.type !== docType.group)
+                  )
+                } else {
+                  _onChangeValue(
+                    'docType',
+                    [...defaultValuesDocType, ...currentDocTypeList].filter(
+                      (item, index, array) => array.indexOf(item) === index
+                    )
+                  )
+                }
+              }
+
+              return (
+                <React.Fragment>
+                  <Grid container direction="row" alignItems="center">
+                    <Checkbox
+                      indeterminate={
+                        currentDocTypeList.length !== currentSelectedDocTypeList.length &&
+                        currentSelectedDocTypeList.length > 0
+                      }
+                      color="primary"
+                      checked={currentDocTypeList.length === currentSelectedDocTypeList.length}
+                      onClick={onClick}
+                    />
+                    <Typography onClick={onClick} noWrap style={{ cursor: 'pointer', width: 'calc(100% - 150px' }}>
+                      {docType.group}
+                    </Typography>
+                  </Grid>
+                  {docType.children}
+                </React.Fragment>
+              )
+            }}
           />
 
-          <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
-            Nombre d'occurrence
-          </FormLabel>
-
-          <Grid style={{ display: 'grid', gridTemplateColumns: '100px 1fr', alignItems: 'center', margin: '0 1em' }}>
-            <Select
-              style={{ marginRight: '1em' }}
-              id="criteria-occurrenceComparator-select"
-              value={defaultValues.occurrenceComparator}
-              onChange={(event) => _onChangeValue('occurrenceComparator', event.target.value as string)}
-              variant="outlined"
-            >
-              <MenuItem value="<=">{'<='}</MenuItem>
-              <MenuItem value="<">{'<'}</MenuItem>
-              <MenuItem value="=">{'='}</MenuItem>
-              <MenuItem value=">">{'>'}</MenuItem>
-              <MenuItem value=">=">{'>='}</MenuItem>
-            </Select>
-
-            <TextField
-              required
-              inputProps={{
-                min: 1
-              }}
-              type="number"
-              id="criteria-occurrence-required"
-              variant="outlined"
-              value={defaultValues.occurrence}
-              onChange={(e) => _onChangeValue('occurrence', e.target.value)}
-            />
-          </Grid>
-
-          <FormLabel style={{ padding: '1em 1em 0 1em' }} component="legend">
-            Date d'occurrence
-          </FormLabel>
-
-          <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-            <FormControl className={classes.inputItem}>
-              <InputLabel shrink htmlFor="date-start-occurrence">
-                Avant le
-              </InputLabel>
-              <Input
-                id="date-start-occurrence"
-                type="date"
-                value={defaultValues.startOccurrence}
-                endAdornment={
-                  <IconButton size="small" onClick={() => _onChangeValue('startOccurrence', '')}>
-                    <ClearIcon />
-                  </IconButton>
-                }
-                onChange={(e) => _onChangeValue('startOccurrence', e.target.value)}
-              />
-            </FormControl>
-
-            <FormControl className={classes.inputItem}>
-              <InputLabel shrink htmlFor="date-end-occurrence">
-                Après le
-              </InputLabel>
-              <Input
-                id="date-end-occurrence"
-                type="date"
-                value={defaultValues.endOccurrence}
-                endAdornment={
-                  <IconButton size="small" onClick={() => _onChangeValue('endOccurrence', '')}>
-                    <ClearIcon />
-                  </IconButton>
-                }
-                onChange={(e) => _onChangeValue('endOccurrence', e.target.value)}
-              />
-            </FormControl>
-          </Grid>
+          <AdvancedInputs form="document" selectedCriteria={defaultValues} onChangeValue={_onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

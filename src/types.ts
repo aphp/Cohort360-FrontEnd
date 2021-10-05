@@ -251,6 +251,8 @@ export type CohortData = {
   monthlyVisitData?: VisiteRepartitionType
   agePyramidData?: AgeRepartitionType
   requestId?: string
+  favorite?: boolean
+  uuid?: string
 }
 
 export type PatientData = {
@@ -312,6 +314,8 @@ export type CcamDataType = {
   type: 'Procedure'
   hierarchy: undefined
   code: { id: string; label: string }[] | null
+  encounterEndDate: Date | null
+  encounterStartDate: Date | null
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
@@ -325,6 +329,8 @@ export type Cim10DataType = {
   type: 'Condition'
   code: { id: string; label: string }[] | null
   diagnosticType: { id: string; label: string }[] | null
+  encounterEndDate: Date | null
+  encounterStartDate: Date | null
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
@@ -348,6 +354,8 @@ export type DocumentDataType = {
   type: 'Composition'
   search: string
   docType: { id: string; label: string }[] | null
+  encounterEndDate: Date | null
+  encounterStartDate: Date | null
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   startOccurrence: Date | null
@@ -359,6 +367,8 @@ export type GhmDataType = {
   title: string
   type: 'Claim'
   code: { id: string; label: string }[] | null
+  encounterEndDate: Date | null
+  encounterStartDate: Date | null
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
@@ -374,12 +384,19 @@ export type EncounterDataType = {
   years: [number, number]
   durationType: { id: string; label: string }
   duration: [number, number]
-  admissionMode: { id: string; label: string } | null
+  admissionMode: { id: string; label: string }[] | null
   entryMode: { id: string; label: string }[] | null
   exitMode: { id: string; label: string }[] | null
   priseEnChargeType: { id: string; label: string }[] | null
   typeDeSejour: { id: string; label: string }[] | null
   fileStatus: { id: string; label: string }[] | null
+  discharge: { id: string; label: string }[] | null
+  reason: { id: string; label: string }[] | null
+  destination: { id: string; label: string }[] | null
+  provenance: { id: string; label: string }[] | null
+  admission: { id: string; label: string }[] | null
+  encounterStartDate: Date | null
+  encounterEndDate: Date | null
   isInclusive?: boolean
 }
 
@@ -393,6 +410,7 @@ export type CohortCreationCounterType = {
   female?: number
   male?: number
   unknownPatient?: number
+  jobFailMsg?: string
 }
 
 export type CohortCreationSnapshotType = {
@@ -405,4 +423,10 @@ export type CohortCreationSnapshotType = {
 export type ValueSet = {
   code: string
   display: string
+}
+
+export type ContactSubmitForm = {
+  label: string
+  title: string
+  description: string
 }

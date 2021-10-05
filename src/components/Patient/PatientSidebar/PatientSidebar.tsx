@@ -58,9 +58,9 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const numberOfRows = 20 // Number of desired lines in the document array
 
-  const onSearchPatient = (newSortBy: string, newSortDirection: 'asc' | 'desc', page = 1) => {
+  const onSearchPatient = async (newSortBy: string, newSortDirection: 'asc' | 'desc', page = 1) => {
     setLoadingStatus(true)
-    fetchPatientList(
+    const patientsResp = await fetchPatientList(
       page,
       searchBy,
       searchInput,
@@ -71,15 +71,10 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       newSortDirection,
       groupId.join(',')
     )
-      .then((patientsResp) => {
-        setPatientsList(patientsResp?.originalPatients ?? [])
-        setTotalPatients(patientsResp?.totalPatients ?? 0)
-        setPage(page)
-      })
-      .catch((error) => console.log(error))
-      .finally(() => {
-        setLoadingStatus(false)
-      })
+    setPatientsList(patientsResp?.originalPatients ?? [])
+    setTotalPatients(patientsResp?.totalPatients ?? 0)
+    setPage(page)
+    setLoadingStatus(false)
   }
 
   const handleChangeSearchInput = (event: { target: { value: React.SetStateAction<string> } }) => {

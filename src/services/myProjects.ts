@@ -1,4 +1,6 @@
+// @ts-nocheck
 import apiBack from './apiBackCohort'
+import apiFhir from './api'
 import { CONTEXT } from '../constants'
 
 /**
@@ -56,10 +58,10 @@ export const fetchProjectsList = async (limit = 100, offset = 0) => {
     default: {
       let search = `?ordering=created_at`
       if (limit) {
-        search += `limit=${limit}`
+        search += `&limit=${limit}`
       }
       if (offset) {
-        search += search === '?ordering=created_at' ? `offset=${offset}` : `&offset=${offset}`
+        search += `&offset=${offset}`
       }
 
       const fetchProjectsResponse = (await apiBack.get<{
@@ -74,10 +76,10 @@ export const fetchProjectsList = async (limit = 100, offset = 0) => {
         return data
       } else {
         return {
-          count: myProjects.length,
+          count: 0,
           next: '',
           previous: '',
-          results: myProjects
+          results: []
         }
       }
     }
@@ -195,7 +197,12 @@ export const fetchRequestsList = async (limit = 100, offset = 0) => {
       search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
     }
 
-    const fetchRequestsListResponse = (await apiBack.get(`/explorations/requests/${search}`)) ?? { status: 400 }
+    const fetchRequestsListResponse = (await apiBack.get<{
+      count: number
+      next: string | null
+      previous: string | null
+      results: RequestType[]
+    }>(`/explorations/requests/${search}`)) ?? { status: 400 }
 
     if (fetchRequestsListResponse.status === 200) {
       return fetchRequestsListResponse.data
@@ -295,6 +302,15 @@ export const deleteRequest = async (deletedRequest: RequestType) => {
   }
 }
 
+/**
+ * Cohorts:
+ *  - CohortType
+ *  - fetchCohortsList : (providerId, limit = 100, offset = 0) => response.data
+ *  - addCohort : (newCohort: CohortType) => response.data
+ *  - editCohort : (editedCohort: CohortType) => response.data
+ *  - deleteCohort : (deletedCohort: CohortType) => response.data
+ */
+
 export type CohortType = {
   uuid: string
   name: string
@@ -312,9 +328,19 @@ export type CohortType = {
   result_size?: number
   created_at?: string
   modified_at?: string
+  extension?: any[]
 }
 
-export const fetchCohortsList = async (limit = 100, offset = 0) => {
+export const fetchCohortsList: (
+  providerId: number | null,
+  limit?: number,
+  offset?: number
+) => Promise<{
+  count: number
+  next: string | null
+  previous: string | null
+  results: CohortType[]
+}> = async (providerId = null, limit = 100, offset = 0) => {
   try {
     let search = `?`
     if (limit) {
@@ -331,7 +357,51 @@ export const fetchCohortsList = async (limit = 100, offset = 0) => {
       results: CohortType[]
     }>(`/explorations/cohorts/${search}`)) ?? { data: { results: [] } }
 
-    return data
+    let cohortList = data.results
+
+    // Recupere les droits
+    let rightResponses = await Promise.all([
+      new Promise((resolve) => {
+        resolve(
+          apiFhir.get(`/Group?_list=${cohortList.map((cohortItem) => cohortItem.fhir_group_id)}&provider=${providerId}`)
+        )
+      }).catch((error) => {
+        return error
+      })
+    ])
+    // Re-organise l'objet rightResponses
+    rightResponses =
+      rightResponses &&
+      rightResponses[0] &&
+      rightResponses[0]?.data?.entry &&
+      rightResponses[0]?.data?.entry[0] &&
+      rightResponses[0]?.data?.entry[0].resource &&
+      rightResponses[0]?.data?.entry[0].resource.extension
+        ? rightResponses[0]?.data?.entry[0].resource.extension
+        : []
+    // Affecte les droits à chaque cohortItem
+    cohortList = cohortList.map((cohortItem) => {
+      const extension = (
+        rightResponses.find(
+          (rightResponse: any) => +(rightResponse.url ?? '1') === +(cohortItem.fhir_group_id ?? '0')
+        ) || {
+          extension: [
+            { url: 'READ_DATA_NOMINATIVE', valueString: 'false' },
+            { url: 'EXPORT_DATA_NOMINATIVE', valueString: 'false' }
+          ]
+        }
+      ).extension
+
+      return {
+        ...cohortItem,
+        extension
+      }
+    })
+
+    return {
+      ...data,
+      results: cohortList
+    }
   } catch (error) {
     console.error(error)
     throw error

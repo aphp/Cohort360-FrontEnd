@@ -2,7 +2,8 @@ import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(() => ({
   dialog: {
-    width: '600px'
+    minWidth: '600px',
+    overflow: 'auto'
   },
   bold: {
     fontWeight: 'bold'
@@ -17,6 +18,9 @@ const useStyles = makeStyles(() => ({
     }
   },
   subtitle: {
+    margin: '8px 0px'
+  },
+  helper: {
     margin: '8px 0px'
   },
   table: {
@@ -39,7 +43,7 @@ const useStyles = makeStyles(() => ({
       backgroundColor: '#FAF9F9'
     },
     '&:hover': {
-      cursor: 'pointer'
+      cursor: 'default'
     }
   }
 }))

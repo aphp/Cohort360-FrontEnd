@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
@@ -6,6 +6,8 @@ import { Grid, Button, CircularProgress, Typography } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 
 import ProjectTable from 'components/MyProjects/ProjectTable/ProjectTable'
+import ProjectSearchBar from 'components/MyProjects/ProjectSearchBar/ProjectSearchBar'
+
 import ModalAddOrEditProject from 'components/MyProjects/Modals/ModalAddOrEditProject/ModalAddOrEditProject'
 import ModalAddOrEditRequest from 'components/Cohort/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
@@ -20,6 +22,9 @@ import useStyles from './styles'
 const MyProjects = () => {
   const classes = useStyles()
   const dispatch = useDispatch()
+
+  const [searchInput, setSearchInput] = useState('')
+
   const { open, projectState, requestState, cohortState } = useAppSelector<{
     open: boolean
     projectState: ProjectState
@@ -37,7 +42,8 @@ const MyProjects = () => {
 
   const loadingProject = projectState.loading
   const loadingRequest = requestState.loading
-  const loading = loadingProject || loadingRequest
+  const loadingCohort = cohortState.loading
+  const loading = loadingProject || loadingRequest || loadingCohort
 
   const _fetchProjectsList = async () => {
     dispatch<any>(setSelectedProject(null))
@@ -100,13 +106,15 @@ const MyProjects = () => {
           </Grid>
 
           <Grid container item xs={11} sm={9} className={classes.actionContainer}>
+            <ProjectSearchBar setSearchInput={(newValue: string) => setSearchInput(newValue)} />
+
             <Button startIcon={<AddIcon />} onClick={() => handleClickAddProject()} className={classes.addButton}>
               Ajouter un projet
             </Button>
           </Grid>
 
           <Grid container item xs={11} sm={9}>
-            <ProjectTable />
+            <ProjectTable searchInput={searchInput} />
           </Grid>
         </Grid>
       </Grid>

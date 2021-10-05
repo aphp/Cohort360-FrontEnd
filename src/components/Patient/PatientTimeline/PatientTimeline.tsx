@@ -125,14 +125,13 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits
     ).reverse()
   }
 
-  const handleClickOpenHospitDialog = (hospitOrConsult?: CohortEncounter | PMSIEntry<IProcedure>) => {
+  const handleClickOpenHospitDialog = async (hospitOrConsult?: CohortEncounter | PMSIEntry<IProcedure>) => {
     if (hospitOrConsult) {
       setLoading(true)
       setOpenHospitDialog(true)
-      getEncounterOrProcedureDocs(hospitOrConsult).then((docs) => {
-        setLoading(false)
-        setDialogDocuments(docs)
-      })
+      const docs = await getEncounterOrProcedureDocs(hospitOrConsult)
+      setDialogDocuments(docs)
+      setLoading(false)
     }
   }
 

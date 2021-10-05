@@ -1,26 +1,13 @@
 import React, { useState } from 'react'
 
-import {
-  Button,
-  Divider,
-  FormControl,
-  FormLabel,
-  Grid,
-  Input,
-  InputLabel,
-  IconButton,
-  MenuItem,
-  Switch,
-  Typography,
-  TextField,
-  Select
-} from '@material-ui/core'
+import { Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
 
-import ClearIcon from '@material-ui/icons/Clear'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
+
+import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
 
@@ -50,7 +37,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
   }
 
   const getCCAMOptions = async (searchValue: string) => {
-    const ccamOptions = await criteria.fetch.fetchCcamData(searchValue)
+    const ccamOptions = await criteria.fetch.fetchCcamData(searchValue, false)
 
     return ccamOptions && ccamOptions.length > 0 ? ccamOptions : []
   }
@@ -137,77 +124,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             onChange={(e, value) => onChangeValue('code', value)}
           />
 
-          <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
-            Nombre d'occurrence
-          </FormLabel>
-
-          <Grid style={{ display: 'grid', gridTemplateColumns: '100px 1fr', alignItems: 'center', margin: '0 1em' }}>
-            <Select
-              style={{ marginRight: '1em' }}
-              id="criteria-occurrenceComparator-select"
-              value={selectedCriteria.occurrenceComparator}
-              onChange={(event) => onChangeValue('occurrenceComparator', event.target.value as string)}
-              variant="outlined"
-            >
-              <MenuItem value={'<='}>{'<='}</MenuItem>
-              <MenuItem value={'<'}>{'<'}</MenuItem>
-              <MenuItem value={'='}>{'='}</MenuItem>
-              <MenuItem value={'>'}>{'>'}</MenuItem>
-              <MenuItem value={'>='}>{'>='}</MenuItem>
-            </Select>
-
-            <TextField
-              required
-              inputProps={{
-                min: 1
-              }}
-              type="number"
-              id="criteria-occurrence-required"
-              variant="outlined"
-              value={selectedCriteria.occurrence}
-              onChange={(e) => onChangeValue('occurrence', e.target.value)}
-            />
-          </Grid>
-
-          <FormLabel style={{ padding: '1em 1em 0 1em' }} component="legend">
-            Date d'occurrence
-          </FormLabel>
-
-          <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-            <FormControl className={classes.inputItem}>
-              <InputLabel shrink htmlFor="date-start-occurrence">
-                Avant le
-              </InputLabel>
-              <Input
-                id="date-start-occurrence"
-                type="date"
-                value={selectedCriteria.startOccurrence}
-                endAdornment={
-                  <IconButton size="small" onClick={() => onChangeValue('startOccurrence', '')}>
-                    <ClearIcon />
-                  </IconButton>
-                }
-                onChange={(e) => onChangeValue('startOccurrence', e.target.value)}
-              />
-            </FormControl>
-
-            <FormControl className={classes.inputItem}>
-              <InputLabel shrink htmlFor="date-end-occurrence">
-                Après le
-              </InputLabel>
-              <Input
-                id="date-end-occurrence"
-                type="date"
-                value={selectedCriteria.endOccurrence}
-                endAdornment={
-                  <IconButton size="small" onClick={() => onChangeValue('endOccurrence', '')}>
-                    <ClearIcon />
-                  </IconButton>
-                }
-                onChange={(e) => onChangeValue('endOccurrence', e.target.value)}
-              />
-            </FormControl>
-          </Grid>
+          <AdvancedInputs form="ccam" selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

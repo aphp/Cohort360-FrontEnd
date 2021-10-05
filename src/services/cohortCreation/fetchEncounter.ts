@@ -1,7 +1,7 @@
 import { CONTEXT } from '../../constants'
 import apiRequest from '../apiRequest'
 import {
-  // fakeAdmissionModes,
+  fakeAdmissionModes,
   fakeEntryModes,
   fakeExitModes,
   fakeFileStatus,
@@ -11,31 +11,31 @@ import {
 import { capitalizeFirstLetter } from '../../utils/capitalize'
 import { cleanValueSet } from 'utils/cleanValueSet'
 
-// export const fetchAdmissionModes = async () => {
-//   if (CONTEXT === 'arkhn') {
-//     return null
-//   } else if (CONTEXT === 'fakedata') {
-//     return fakeAdmissionModes && fakeAdmissionModes.length > 0
-//       ? fakeAdmissionModes.map((_fakeAdmissionModes: { code: string; display: string }) => ({
-//           id: _fakeAdmissionModes.code,
-//           label: capitalizeFirstLetter(_fakeAdmissionModes.display)
-//         }))
-//       : []
-//   } else {
-//     try {
-//       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit_type`)
-//       const data = res.data.entry[0].resource.compose.include[0].concept || []
-//       return data && data.length > 0
-//         ? data.map((_data: { code: string; display: string }) => ({
-//             id: _data.code,
-//             label: capitalizeFirstLetter(_data.display)
-//           }))
-//         : []
-//     } catch (error) {
-//       return []
-//     }
-//   }
-// }
+export const fetchAdmissionModes = async () => {
+  if (CONTEXT === 'arkhn') {
+    return null
+  } else if (CONTEXT === 'fakedata') {
+    return fakeAdmissionModes && fakeAdmissionModes.length > 0
+      ? fakeAdmissionModes.map((_fakeAdmissionModes: { code: string; display: string }) => ({
+          id: _fakeAdmissionModes.code,
+          label: capitalizeFirstLetter(_fakeAdmissionModes.display)
+        }))
+      : []
+  } else {
+    try {
+      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-motif-admission`)
+      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+      return data && data.length > 0
+        ? data.map((_data: { code: string; display: string }) => ({
+            id: _data.code,
+            label: capitalizeFirstLetter(_data.display)
+          }))
+        : []
+    } catch (error) {
+      return []
+    }
+  }
+}
 
 export const fetchEntryModes = async () => {
   if (CONTEXT === 'arkhn') {
@@ -49,8 +49,8 @@ export const fetchEntryModes = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit_mode entree`)
-      const data = res.data.entry[1].resource.compose.include[0].concept || []
+      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-mode-entree`)
+      const data = res.data.entry[0].resource.compose.include[0].concept || []
 
       return cleanValueSet(data)
     } catch (error) {
@@ -71,8 +71,8 @@ export const fetchExitModes = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit_mode sortie`)
-      const data = res.data.entry[0].resource.compose.include[0].concept || []
+      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-mode-sortie`)
+      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
     } catch (error) {
@@ -93,8 +93,8 @@ export const fetchPriseEnChargeType = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit_type`)
-      const data = res.data.entry[0].resource.compose.include[0].concept || []
+      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-type`)
+      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       const cleanData = cleanValueSet(data)
 
@@ -122,7 +122,7 @@ export const fetchTypeDeSejour = async () => {
   } else {
     try {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-type-sejour`)
-      const data = res.data.entry[0].resource.compose.include[0].concept || []
+      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
     } catch (error) {
@@ -144,7 +144,75 @@ export const fetchFileStatus = async () => {
   } else {
     try {
       const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visite-status`)
-      const data = res.data.entry[0].resource.compose.include[0].concept || []
+      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+
+      return cleanValueSet(data)
+    } catch (error) {
+      return []
+    }
+  }
+}
+
+export const fetchReason = async () => {
+  if (CONTEXT === 'arkhn') {
+    return []
+  } else if (CONTEXT === 'fakedata') {
+    return []
+  } else {
+    try {
+      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-type-sortie`)
+      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+
+      return cleanValueSet(data)
+    } catch (error) {
+      return []
+    }
+  }
+}
+
+export const fetchDestination = async () => {
+  if (CONTEXT === 'arkhn') {
+    return []
+  } else if (CONTEXT === 'fakedata') {
+    return []
+  } else {
+    try {
+      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-destination`)
+      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+
+      return cleanValueSet(data)
+    } catch (error) {
+      return []
+    }
+  }
+}
+
+export const fetchProvenance = async () => {
+  if (CONTEXT === 'arkhn') {
+    return []
+  } else if (CONTEXT === 'fakedata') {
+    return []
+  } else {
+    try {
+      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-provenance`)
+      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+
+      return cleanValueSet(data)
+    } catch (error) {
+      return []
+    }
+  }
+}
+
+export const fetchAdmission = async () => {
+  if (CONTEXT === 'arkhn') {
+    return []
+  } else if (CONTEXT === 'fakedata') {
+    return []
+  } else {
+    try {
+      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-type-admission`)
+      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
     } catch (error) {

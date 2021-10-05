@@ -67,35 +67,29 @@ const Patient = () => {
   }, [tabName])
 
   useEffect(() => {
-    setLoading(true)
-    fetchPatient(patientId, groupId)
-      .then((patientResp) => {
-        setHospit(patientResp?.hospit ?? undefined)
-        setDocuments(patientResp?.documents ?? undefined)
-        setDocumentsTotal(patientResp?.documentsTotal ?? 0)
-        setConsult(patientResp?.consult ?? undefined)
-        setConsultTotal(patientResp?.consultTotal ?? 0)
-        setDiagnostic(patientResp?.diagnostic)
-        setDiagnosticTotal(patientResp?.diagnosticTotal ?? 0)
-        setGhm(patientResp?.ghm)
-        setGhmTotal(patientResp?.ghmTotal ?? 0)
-        setPatient(patientResp?.patient)
-        setDeidentifiedBoolean(
-          patientResp?.patient?.extension?.find((extension) => extension.url === 'deidentified')?.valueBoolean ?? true
-        )
-      })
-      .then(() => setLoading(false))
+    const _fetchPatient = async () => {
+      setLoading(true)
+      const patientResp = await fetchPatient(patientId, groupId)
+
+      setHospit(patientResp?.hospit ?? undefined)
+      setDocuments(patientResp?.documents ?? undefined)
+      setDocumentsTotal(patientResp?.documentsTotal ?? 0)
+      setConsult(patientResp?.consult ?? undefined)
+      setConsultTotal(patientResp?.consultTotal ?? 0)
+      setDiagnostic(patientResp?.diagnostic)
+      setDiagnosticTotal(patientResp?.diagnosticTotal ?? 0)
+      setGhm(patientResp?.ghm)
+      setGhmTotal(patientResp?.ghmTotal ?? 0)
+      setPatient(patientResp?.patient)
+      setDeidentifiedBoolean(
+        patientResp?.patient?.extension?.find((extension) => extension.url === 'deidentified')?.valueBoolean ?? true
+      )
+
+      setLoading(false)
+    }
+
+    _fetchPatient()
   }, [patientId, groupId])
-
-  const title = Array.isArray(cohort.cohort) || cohort?.cohort?.name === '-' ? '-' : cohort?.cohort?.name
-
-  const status = Array.isArray(cohort.cohort)
-    ? 'Visualisation de périmètres'
-    : cohort?.cohort?.name
-    ? cohort?.cohort?.name === '-'
-      ? 'Exploration de population'
-      : 'Exploration de cohorte '
-    : "Visualisation d'un patient"
 
   if (!patient && !loading) {
     return (
@@ -124,11 +118,11 @@ const Patient = () => {
         })}
       >
         <TopBar
-          title={title}
-          status={status}
+          context="patient_info"
           patientsNb={cohort.totalPatients}
           access={deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
         />
+
         <Grid
           container
           direction="column"
