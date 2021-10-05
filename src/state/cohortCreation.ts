@@ -460,11 +460,17 @@ const cohortCreationSlice = createSlice({
     suspendCount: (state: CohortCreationState) => {
       state.count = {
         ...state.count,
-        status: state.count.status === 'pending' || state.count.status === 'started' ? 'suspended' : state.count.status
+        status:
+          state.count.status === 'pending' || state.count.status === 'started' || state.count.status === 'suspended'
+            ? 'suspended'
+            : state.count.status
       }
     },
     unsuspendCount: (state: CohortCreationState) => {
-      state.count = {}
+      state.count = {
+        ...state.count,
+        status: 'pending'
+      }
     }
   },
   extraReducers: (builder) => {
@@ -483,7 +489,7 @@ const cohortCreationSlice = createSlice({
     builder.addCase(saveJson.fulfilled, (state, { payload }) => ({ ...state, ...payload, saveLoading: false }))
     builder.addCase(saveJson.rejected, (state) => ({ ...state, saveLoading: false }))
     // countCohortCreation
-    builder.addCase(countCohortCreation.pending, (state) => ({ ...state, status: '_pending', countLoading: true }))
+    builder.addCase(countCohortCreation.pending, (state) => ({ ...state, status: 'pending', countLoading: true }))
     builder.addCase(countCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
