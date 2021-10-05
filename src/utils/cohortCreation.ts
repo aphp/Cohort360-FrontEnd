@@ -291,7 +291,29 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 
     case RESSOURCE_TYPE_COMPOSITION: {
       filterFhir = [
-        `${criterion.search ? `${COMPOSITION_TEXT}=${criterion.search}` : ''}`,
+        `${
+          criterion.search
+            ? `${COMPOSITION_TEXT}=${criterion.search
+                .replaceAll('!', '%21')
+                .replaceAll('#', '%23')
+                .replaceAll('$', '%24')
+                .replaceAll('&', '%26')
+                .replaceAll("'", '%27')
+                .replaceAll('(', '%28')
+                .replaceAll(')', '%29')
+                .replaceAll('*', '%2A')
+                .replaceAll('+', '%2B')
+                .replaceAll(',', '%2C')
+                .replaceAll('/', '%2F')
+                .replaceAll(':', '%3A')
+                .replaceAll(';', '%3B')
+                .replaceAll('=', '%3D')
+                .replaceAll('?', '%3F')
+                .replaceAll('@', '%40')
+                .replaceAll('[', '%5B')
+                .replaceAll(']', '%5D')}`
+            : ''
+        }`,
         `${
           criterion.docType && criterion.docType.length > 0
             ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: any) => docType.id).reduce(searchReducer)}`

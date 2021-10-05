@@ -175,7 +175,8 @@ export const fetchPerimeterInfoForRequeteur = async (perimeterId: string): Promi
         ? groupResults.data.entry[0].resource?.managingEntity?.display
         : null
       : null
-  organiszationId = organiszationId.replace('Organization/', '')
+  organiszationId = organiszationId ? organiszationId.replace('Organization/', '') : ''
+  if (!organiszationId) return null
 
   // Get perimeter info with `organiszationId`
   const organizationResult = await api.get(`/Organization?_id=${organiszationId}&_elements=name,extension`)
