@@ -217,8 +217,7 @@ export const fetchPerimetersRights = async (practitionerId: string, perimetersId
         )
       )
       if (!currentPerimeter) return false
-
-      console.log(`currentPerimeter`, currentPerimeter)
+      return true
     }
     return false
   } catch (error) {
