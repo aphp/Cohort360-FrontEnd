@@ -518,7 +518,7 @@ const fetchCohortRights = async (cohortId: string, providerId: string) => {
       rightResponse.data.entry[0].resource.extension &&
       rightResponse.data.entry[0].resource.extension[0]
     ) {
-      const currentCohortItem = rightResponse.data.entry[0].resource.extension[0]
+      const currentCohortItem = rightResponse.data.entry[0].resource.extension?.[0]
       const hasRight =
         currentCohortItem.extension && currentCohortItem.extension.length > 0
           ? currentCohortItem.extension.some(
@@ -549,7 +549,7 @@ const fetchCohortExportRight = async (cohortId: string, providerId: string) => {
       rightResponse.data.entry[0] &&
       rightResponse.data.entry[0].resource
     ) {
-      const currentCohortItem = rightResponse.data.entry[0].resource
+      const currentCohortItem = rightResponse.data.entry[0].resource.extension?.[0]
       const canMakeExport =
         currentCohortItem.extension && currentCohortItem.extension.length > 0
           ? currentCohortItem.extension.some(
