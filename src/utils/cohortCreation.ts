@@ -18,9 +18,9 @@ const ENCOUNTER_LENGTH = 'length' // ok
 const ENCOUNTER_BIRTHDATE = 'patient.birthdate' // ok
 const ENCOUNTER_ENTRYMODE = 'entryMode' // on verra
 const ENCOUNTER_EXITMODE = 'exitMode' // on verra
-const ENCOUNTER_PRISENCHARGETYPE = 'priseEnChargeType' //on verra
+const ENCOUNTER_PRISENCHARGETYPE = 'type' //on verra
 const ENCOUNTER_TYPEDESEJOUR = 'typeDeSejour' //on verra
-const ENCOUNTER_FILESTATUS = 'fileStatus' // on verra
+const ENCOUNTER_FILESTATUS = 'status' // on verra
 const ENCOUNTER_ADMISSIONMODE = 'admissionMode' // on verra
 const ENCOUNTER_REASON = 'reason' // on verra
 const ENCOUNTER_DESTINATION = 'destination' // on verra
@@ -289,31 +289,50 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       break
     }
 
+    // case RESSOURCE_TYPE_COMPOSITION: {
+    //   filterFhir = [
+    //     `${
+    //       criterion.search
+    //         ? `${COMPOSITION_TEXT}=${criterion.search
+    //             .trim()
+    //             .replaceAll('!', '%21')
+    //             .replaceAll('#', '%23')
+    //             .replaceAll('$', '%24')
+    //             .replaceAll('&', '%26')
+    //             .replaceAll("'", '%27')
+    //             .replaceAll('(', '%28')
+    //             .replaceAll(')', '%29')
+    //             .replaceAll('*', '%2A')
+    //             .replaceAll('+', '%2B')
+    //             .replaceAll(',', '%2C')
+    //             .replaceAll('/', '%2F')
+    //             .replaceAll(':', '%3A')
+    //             .replaceAll(';', '%3B')
+    //             .replaceAll('=', '%3D')
+    //             .replaceAll('?', '%3F')
+    //             .replaceAll('\n', ' ')
+    //             .replaceAll('  ', ' ')
+    //             .replaceAll(' ', '%20')
+    //             .replaceAll('@', '%40')
+    //             .replaceAll('[', '%5B')
+    //             .replaceAll(']', '%5D')
+    //             .replaceAll('|', '%7C')}`
+    //         : ''
+    //     }`,
+    //     `${
+    //       criterion.docType && criterion.docType.length > 0
+    //         ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: any) => docType.id).reduce(searchReducer)}`
+    //         : ''
+    //     }`
+    //   ]
+    //     .filter((elem) => elem)
+    //     .reduce(filterReducer)
+    //   break
+    // }
+
     case RESSOURCE_TYPE_COMPOSITION: {
       filterFhir = [
-        `${
-          criterion.search
-            ? `${COMPOSITION_TEXT}=${criterion.search
-                .replaceAll('!', '%21')
-                .replaceAll('#', '%23')
-                .replaceAll('$', '%24')
-                .replaceAll('&', '%26')
-                .replaceAll("'", '%27')
-                .replaceAll('(', '%28')
-                .replaceAll(')', '%29')
-                .replaceAll('*', '%2A')
-                .replaceAll('+', '%2B')
-                .replaceAll(',', '%2C')
-                .replaceAll('/', '%2F')
-                .replaceAll(':', '%3A')
-                .replaceAll(';', '%3B')
-                .replaceAll('=', '%3D')
-                .replaceAll('?', '%3F')
-                .replaceAll('@', '%40')
-                .replaceAll('[', '%5B')
-                .replaceAll(']', '%5D')}`
-            : ''
-        }`,
+        `${criterion.search ? `${COMPOSITION_TEXT}=${criterion.search}` : ''}`,
         `${
           criterion.docType && criterion.docType.length > 0
             ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: any) => docType.id).reduce(searchReducer)}`
@@ -873,6 +892,28 @@ export async function unbuildRequest(_json: string) {
             switch (key) {
               case COMPOSITION_TEXT:
                 currentCriterion.search = value
+                  ? value
+                      .replaceAll('%21', '!')
+                      .replaceAll('%23', '#')
+                      .replaceAll('%24', '$')
+                      .replaceAll('%26', '&')
+                      .replaceAll('%27', "'")
+                      .replaceAll('%28', '(')
+                      .replaceAll('%29', ')')
+                      .replaceAll('%2A', '*')
+                      .replaceAll('%2B', '+')
+                      .replaceAll('%2C', ',')
+                      .replaceAll('%2F', '/')
+                      .replaceAll('%3A', ':')
+                      .replaceAll('%3B', ';')
+                      .replaceAll('%3D', '=')
+                      .replaceAll('%3F', '?')
+                      .replaceAll('%20', ' ')
+                      .replaceAll('%40', '@')
+                      .replaceAll('%5B', '[')
+                      .replaceAll('%5D', ']')
+                      .replaceAll('%7C', '|')
+                  : null
                 break
               case COMPOSITION_TYPE: {
                 const docTypeIds = value?.split(',')

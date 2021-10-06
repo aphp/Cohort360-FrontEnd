@@ -70,8 +70,6 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
 
   const documentLines = 20
 
-  console.log(`showAreaText`, showAreaText)
-
   const displayingSelectedDocType: any[] = (() => {
     let displayingSelectedDocTypes: any[] = []
     const allTypes = docTypes.map((docType: any) => docType.type)
