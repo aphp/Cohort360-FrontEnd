@@ -311,7 +311,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
                 .replaceAll('?', '%3F')
                 .replaceAll('@', '%40')
                 .replaceAll('[', '%5B')
-                .replaceAll(']', '%5D')}`
+                .replaceAll(']', '%5D')
+                .replaceAll('\n', ' ')
+                .replaceAll('  ', ' ')}`
             : ''
         }`,
         `${

@@ -427,6 +427,7 @@ const fetchDocuments = async (
         .replaceAll('@', '%40')
         .replaceAll('[', '%5B')
         .replaceAll(']', '%5D')
+        .replaceAll('\n', '%20')
       search = searchInput ? `&_text=${searchInput}` : ''
     }
     const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : ''
