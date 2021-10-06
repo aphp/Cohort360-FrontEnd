@@ -427,6 +427,7 @@ const fetchDocuments = async (
         .replaceAll('@', '%40')
         .replaceAll('[', '%5B')
         .replaceAll(']', '%5D')
+        .replaceAll('\n', '%20')
       search = searchInput ? `&_text=${searchInput}` : ''
     }
     const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : ''
@@ -517,7 +518,7 @@ const fetchCohortRights = async (cohortId: string, providerId: string) => {
       rightResponse.data.entry[0].resource.extension &&
       rightResponse.data.entry[0].resource.extension[0]
     ) {
-      const currentCohortItem = rightResponse.data.entry[0].resource.extension[0]
+      const currentCohortItem = rightResponse.data.entry[0].resource.extension?.[0]
       const hasRight =
         currentCohortItem.extension && currentCohortItem.extension.length > 0
           ? currentCohortItem.extension.some(
@@ -548,7 +549,7 @@ const fetchCohortExportRight = async (cohortId: string, providerId: string) => {
       rightResponse.data.entry[0] &&
       rightResponse.data.entry[0].resource
     ) {
-      const currentCohortItem = rightResponse.data.entry[0].resource
+      const currentCohortItem = rightResponse.data.entry[0].resource.extension?.[0]
       const canMakeExport =
         currentCohortItem.extension && currentCohortItem.extension.length > 0
           ? currentCohortItem.extension.some(
