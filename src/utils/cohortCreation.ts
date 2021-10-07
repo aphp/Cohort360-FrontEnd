@@ -843,14 +843,19 @@ export async function unbuildRequest(_json: string) {
         }
 
         if (element.filterFhir) {
-          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+          const filters = element.filterFhir
+            // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
+            .replaceAll('&&', '_+_+_+_')
+            .split('&')
+            .map((elem) => elem.split('='))
 
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
               case COMPOSITION_TEXT:
-                currentCriterion.search = value ? value : null
+                // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
+                currentCriterion.search = value ? value.replaceAll('_+_+_+_', '&&') : null
                 break
               case COMPOSITION_TYPE: {
                 const docTypeIds = value?.split(',')
