@@ -16,16 +16,16 @@ const PATIENT_DECEASED = 'deceased' // ok
 const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
 const ENCOUNTER_LENGTH = 'length' // ok
 const ENCOUNTER_BIRTHDATE = 'patient.birthdate' // ok
-const ENCOUNTER_ENTRYMODE = 'entryMode' // on verra
-const ENCOUNTER_EXITMODE = 'exitMode' // on verra
-const ENCOUNTER_PRISENCHARGETYPE = 'type' //on verra
-const ENCOUNTER_TYPEDESEJOUR = 'typeDeSejour' //on verra
-const ENCOUNTER_FILESTATUS = 'status' // on verra
-const ENCOUNTER_ADMISSIONMODE = 'admissionMode' // on verra
-const ENCOUNTER_REASON = 'reason' // on verra
-const ENCOUNTER_DESTINATION = 'destination' // on verra
-const ENCOUNTER_PROVENANCE = 'provenance' // on verra
-const ENCOUNTER_ADMISSION = 'admission' // on verra
+const ENCOUNTER_ENTRYMODE = 'admitted-from' // ok
+const ENCOUNTER_EXITMODE = 'discharge' // ok
+const ENCOUNTER_PRISENCHARGETYPE = 'class' // ok
+const ENCOUNTER_TYPEDESEJOUR = 'stay' // ok
+const ENCOUNTER_FILESTATUS = 'status' // ok
+const ENCOUNTER_ADMISSIONMODE = 'reason' // ok
+const ENCOUNTER_REASON = 'discharge-type' // ok
+const ENCOUNTER_DESTINATION = 'destination' // ok
+const ENCOUNTER_PROVENANCE = 'provenance' // ok
+const ENCOUNTER_ADMISSION = 'reason-code' // ok
 
 const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
 const CLAIM_CODE = 'codeList' // ok
@@ -288,47 +288,6 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
         .reduce(filterReducer)
       break
     }
-
-    // case RESSOURCE_TYPE_COMPOSITION: {
-    //   filterFhir = [
-    //     `${
-    //       criterion.search
-    //         ? `${COMPOSITION_TEXT}=${criterion.search
-    //             .trim()
-    //             .replaceAll('!', '%21')
-    //             .replaceAll('#', '%23')
-    //             .replaceAll('$', '%24')
-    //             .replaceAll('&', '%26')
-    //             .replaceAll("'", '%27')
-    //             .replaceAll('(', '%28')
-    //             .replaceAll(')', '%29')
-    //             .replaceAll('*', '%2A')
-    //             .replaceAll('+', '%2B')
-    //             .replaceAll(',', '%2C')
-    //             .replaceAll('/', '%2F')
-    //             .replaceAll(':', '%3A')
-    //             .replaceAll(';', '%3B')
-    //             .replaceAll('=', '%3D')
-    //             .replaceAll('?', '%3F')
-    //             .replaceAll('\n', ' ')
-    //             .replaceAll('  ', ' ')
-    //             .replaceAll(' ', '%20')
-    //             .replaceAll('@', '%40')
-    //             .replaceAll('[', '%5B')
-    //             .replaceAll(']', '%5D')
-    //             .replaceAll('|', '%7C')}`
-    //         : ''
-    //     }`,
-    //     `${
-    //       criterion.docType && criterion.docType.length > 0
-    //         ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: any) => docType.id).reduce(searchReducer)}`
-    //         : ''
-    //     }`
-    //   ]
-    //     .filter((elem) => elem)
-    //     .reduce(filterReducer)
-    //   break
-    // }
 
     case RESSOURCE_TYPE_COMPOSITION: {
       filterFhir = [
@@ -891,29 +850,7 @@ export async function unbuildRequest(_json: string) {
             const value = filter ? filter[1] : null
             switch (key) {
               case COMPOSITION_TEXT:
-                currentCriterion.search = value
-                  ? value
-                      .replaceAll('%21', '!')
-                      .replaceAll('%23', '#')
-                      .replaceAll('%24', '$')
-                      .replaceAll('%26', '&')
-                      .replaceAll('%27', "'")
-                      .replaceAll('%28', '(')
-                      .replaceAll('%29', ')')
-                      .replaceAll('%2A', '*')
-                      .replaceAll('%2B', '+')
-                      .replaceAll('%2C', ',')
-                      .replaceAll('%2F', '/')
-                      .replaceAll('%3A', ':')
-                      .replaceAll('%3B', ';')
-                      .replaceAll('%3D', '=')
-                      .replaceAll('%3F', '?')
-                      .replaceAll('%20', ' ')
-                      .replaceAll('%40', '@')
-                      .replaceAll('%5B', '[')
-                      .replaceAll('%5D', ']')
-                      .replaceAll('%7C', '|')
-                  : null
+                currentCriterion.search = value ? value : null
                 break
               case COMPOSITION_TYPE: {
                 const docTypeIds = value?.split(',')
