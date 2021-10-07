@@ -153,7 +153,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
           <Typography variant="h3">Type de cohortes :</Typography>
           <RadioGroup name="cohortType" value={_type} onChange={_onChangeType} row={true}>
             <FormControlLabel value="all" control={<Radio />} label="Toutes les cohortes" />
-            <FormControlLabel value="MY_COHORTS" control={<Radio />} label="Cohortes Cohort360" />
+            <FormControlLabel value="MY_COHORTS" control={<Radio />} label="Cohort360" />
             <FormControlLabel value="IMPORT_I2B2" control={<Radio />} label="Cohortes I2B2" />
           </RadioGroup>
         </Grid>
@@ -162,8 +162,8 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
           <Typography variant="h3">Favoris :</Typography>
           <RadioGroup name="favorite" value={_favorite} onChange={_onChangeFavorite} row={true}>
             <FormControlLabel value="all" control={<Radio />} label="Toutes les cohortes" />
-            <FormControlLabel value="True" control={<Radio />} label="Cohortes favories" />
-            <FormControlLabel value="False" control={<Radio />} label="Cohortes non favories" />
+            <FormControlLabel value="True" control={<Radio />} label="Cohortes favorites" />
+            <FormControlLabel value="False" control={<Radio />} label="Cohortes non favorites" />
           </RadioGroup>
         </Grid>
 
