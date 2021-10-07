@@ -33,14 +33,18 @@ const CohortRightOrNotExist = () => {
             <WarningIcon style={{ fontSize: 60 }} />
           </Grid>
           <Grid item style={{ padding: '8px 32px' }}>
-            <Typography variant="h5" align="center">
+            <Typography style={{ marginBottom: 16 }} variant="h5" align="center">
               Vous tentez d'accéder à des données qui n'existent pas, ou vous ne disposez pas de droits suffisants
+            </Typography>
+            <Typography style={{ marginBottom: 16 }} align="center">
+              S'il s'agit d'une erreur, vous pouvez contacter l'équipe Cohort360 via le formulaire de contact en bas à
+              gauche de l'interface
             </Typography>
           </Grid>
         </Grid>
       </Grid>
 
-      <Grid item style={{ marginTop: 16 }}>
+      <Grid item>
         <Button variant="outlined" style={{ borderColor: 'currentColor' }} onClick={() => history.push('/accueil')}>
           Retour à l'accueil
         </Button>

@@ -33,14 +33,14 @@ const CohortNoPatient = () => {
             <PersonOffIcon style={{ fontSize: 60 }} />
           </Grid>
           <Grid item style={{ padding: '8px 32px' }}>
-            <Typography variant="h5" align="center">
-              Votre cohorte de patients est vide
+            <Typography style={{ marginBottom: 16 }} variant="h5" align="center">
+              Vous tentez d'accéder à une cohorte qui ne contient aucun patient
             </Typography>
           </Grid>
         </Grid>
       </Grid>
 
-      <Grid item style={{ marginTop: 16 }}>
+      <Grid item>
         <Button variant="outlined" style={{ borderColor: 'currentColor' }} onClick={() => history.push('/accueil')}>
           Retour à l'accueil
         </Button>
