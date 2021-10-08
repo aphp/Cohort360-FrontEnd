@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { ButtonGroup, Button, IconButton, CircularProgress } from '@material-ui/core'
@@ -19,7 +19,6 @@ import {
   addNewSelectedCriteria,
   editSelectedCriteria,
   deleteSelectedCriteria,
-  countCohortCreation,
   suspendCount,
   unsuspendCount
 } from 'state/cohortCreation'
@@ -226,18 +225,6 @@ const LogicalOperator: React.FC = () => {
     _buildCohortCreation()
   }
 
-  useEffect(() => {
-    if (openDrawer === null && request?.count?.status === 'suspended') {
-      if (request?.count?.uuid) {
-        // Relaunch count
-        dispatch<any>(countCohortCreation({ uuid: request?.count?.uuid }))
-      } else {
-        // Stop suspend effect
-        dispatch<any>(unsuspendCount())
-      }
-    }
-  }, [openDrawer, request])
-
   return (
     <>
       <OperatorItem
@@ -253,7 +240,10 @@ const LogicalOperator: React.FC = () => {
         selectedCriteria={selectedCriteria}
         onChangeSelectedCriteria={_onConfirmAddOrEditCriteria}
         open={openDrawer === 'criteria'}
-        onClose={() => setOpenDrawer(null)}
+        onClose={() => {
+          dispatch<any>(unsuspendCount())
+          setOpenDrawer(null)
+        }}
       />
     </>
   )

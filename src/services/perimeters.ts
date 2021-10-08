@@ -21,6 +21,8 @@ import fakeFacetClassSimple from '../data/fakeData/facet-class-simple'
 import fakeFacetStartDateFacet from '../data/fakeData/facet-start-date-facet'
 import fakePatients from '../data/fakeData/patients'
 
+import { getPerimeters } from 'services/scopeService'
+
 export const getServices = async (id: string) => {
   const [respOrganizations, respHealthcareServices] = await Promise.all([
     api.get<FHIR_API_Response<IOrganization>>(`/Organization?_id=${id}${API_RESOURCE_TAG}`),
@@ -162,6 +164,14 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
   }
 }
 
+const getScopeName = (perimeter: any) => {
+  const perimeterID = perimeter ? perimeter.alias?.[0] : false
+  if (!perimeterID) {
+    return perimeter ? perimeter.name : ''
+  }
+  return `${perimeterID} - ${perimeter.name}`
+}
+
 export const fetchPerimeterInfoForRequeteur = async (perimeterId: string): Promise<ScopeTreeRow | null> => {
   if (!perimeterId) return null
 
@@ -175,10 +185,11 @@ export const fetchPerimeterInfoForRequeteur = async (perimeterId: string): Promi
         ? groupResults.data.entry[0].resource?.managingEntity?.display
         : null
       : null
-  organiszationId = organiszationId.replace('Organization/', '')
+  organiszationId = organiszationId ? organiszationId.replace('Organization/', '') : ''
+  if (!organiszationId) return null
 
   // Get perimeter info with `organiszationId`
-  const organizationResult = await api.get(`/Organization?_id=${organiszationId}&_elements=name,extension`)
+  const organizationResult = await api.get(`/Organization?_id=${organiszationId}&_elements=name,extension,alias`)
 
   // Convert result in ScopeTreeRow
   const organization =
@@ -191,7 +202,7 @@ export const fetchPerimeterInfoForRequeteur = async (perimeterId: string): Promi
     ? {
         ...organization,
         id: organization.id,
-        name: organization.name,
+        name: getScopeName(organization),
         quantity:
           organization.extension && organization.extension.length > 0
             ? organization.extension.find((extension: any) => extension.url)
@@ -200,4 +211,24 @@ export const fetchPerimeterInfoForRequeteur = async (perimeterId: string): Promi
       }
     : null
   return scopeRows
+}
+
+export const fetchPerimetersRights = async (practitionerId: string, perimetersId: string[]) => {
+  try {
+    const perimeters = await getPerimeters(practitionerId)
+    if (!perimeters) return false
+
+    for (const perimeterId of perimetersId) {
+      const currentPerimeter = perimeters.find((perimeter) =>
+        perimeter.extension.some(
+          (extension: any) => extension.url === 'cohort-id' && extension.valueInteger === +perimeterId
+        )
+      )
+      if (!currentPerimeter) return false
+      return true
+    }
+    return false
+  } catch (error) {
+    console.error('Error (fetchPerimetersRights): ', error)
+  }
 }

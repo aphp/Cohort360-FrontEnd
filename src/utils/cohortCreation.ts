@@ -16,16 +16,16 @@ const PATIENT_DECEASED = 'deceased' // ok
 const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
 const ENCOUNTER_LENGTH = 'length' // ok
 const ENCOUNTER_BIRTHDATE = 'patient.birthdate' // ok
-const ENCOUNTER_ENTRYMODE = 'entryMode' // on verra
-const ENCOUNTER_EXITMODE = 'exitMode' // on verra
-const ENCOUNTER_PRISENCHARGETYPE = 'priseEnChargeType' //on verra
-const ENCOUNTER_TYPEDESEJOUR = 'typeDeSejour' //on verra
-const ENCOUNTER_FILESTATUS = 'fileStatus' // on verra
-const ENCOUNTER_ADMISSIONMODE = 'admissionMode' // on verra
-const ENCOUNTER_REASON = 'reason' // on verra
-const ENCOUNTER_DESTINATION = 'destination' // on verra
-const ENCOUNTER_PROVENANCE = 'provenance' // on verra
-const ENCOUNTER_ADMISSION = 'admission' // on verra
+const ENCOUNTER_ENTRYMODE = 'admitted-from' // ok
+const ENCOUNTER_EXITMODE = 'discharge' // ok
+const ENCOUNTER_PRISENCHARGETYPE = 'class' // ok
+const ENCOUNTER_TYPEDESEJOUR = 'stay' // ok
+const ENCOUNTER_FILESTATUS = 'status' // ok
+const ENCOUNTER_ADMISSIONMODE = 'reason' // ok
+const ENCOUNTER_REASON = 'discharge-type' // ok
+const ENCOUNTER_DESTINATION = 'destination' // ok
+const ENCOUNTER_PROVENANCE = 'provenance' // ok
+const ENCOUNTER_ADMISSION = 'reason-code' // ok
 
 const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
 const CLAIM_CODE = 'codeList' // ok
@@ -843,14 +843,19 @@ export async function unbuildRequest(_json: string) {
         }
 
         if (element.filterFhir) {
-          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+          const filters = element.filterFhir
+            // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
+            .replaceAll('&&', '_+_+_+_')
+            .split('&')
+            .map((elem) => elem.split('='))
 
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
               case COMPOSITION_TEXT:
-                currentCriterion.search = value
+                // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
+                currentCriterion.search = value ? value.replaceAll('_+_+_+_', '&&') : null
                 break
               case COMPOSITION_TYPE: {
                 const docTypeIds = value?.split(',')

@@ -427,6 +427,7 @@ const fetchDocuments = async (
         .replaceAll('@', '%40')
         .replaceAll('[', '%5B')
         .replaceAll(']', '%5D')
+        .replaceAll('\n', '%20')
       search = searchInput ? `&_text=${searchInput}` : ''
     }
     const docTypesFilter = selectedDocTypes.length > 0 ? `&type=${selectedDocTypes.join()}` : ''
@@ -504,6 +505,39 @@ const fetchDocuments = async (
   }
 }
 
+const fetchCohortRights = async (cohortId: string, providerId: string) => {
+  try {
+    const rightResponse = await api.get(`/Group?_list=${cohortId}&provider=${providerId}`)
+
+    if (
+      rightResponse &&
+      rightResponse.data &&
+      rightResponse.data.entry &&
+      rightResponse.data.entry[0] &&
+      rightResponse.data.entry[0].resource &&
+      rightResponse.data.entry[0].resource.extension &&
+      rightResponse.data.entry[0].resource.extension[0]
+    ) {
+      const currentCohortItem = rightResponse.data.entry[0].resource.extension?.[0]
+      const hasRight =
+        currentCohortItem.extension && currentCohortItem.extension.length > 0
+          ? currentCohortItem.extension.some(
+              (extension: any) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+            ) ||
+            currentCohortItem.extension.some(
+              (extension: any) => extension.url === 'READ_DATA_PSEUDOANONYMISED' && extension.valueString === 'true'
+            )
+          : false
+
+      return hasRight
+    }
+    return false
+  } catch (error) {
+    console.error('Error (fetchCohortRights) :', error)
+    return false
+  }
+}
+
 const fetchCohortExportRight = async (cohortId: string, providerId: string) => {
   try {
     const rightResponse = await api.get(`/Group?_list=${cohortId}&provider=${providerId}`)
@@ -515,7 +549,7 @@ const fetchCohortExportRight = async (cohortId: string, providerId: string) => {
       rightResponse.data.entry[0] &&
       rightResponse.data.entry[0].resource
     ) {
-      const currentCohortItem = rightResponse.data.entry[0].resource
+      const currentCohortItem = rightResponse.data.entry[0].resource.extension?.[0]
       const canMakeExport =
         currentCohortItem.extension && currentCohortItem.extension.length > 0
           ? currentCohortItem.extension.some(
@@ -534,4 +568,4 @@ const fetchCohortExportRight = async (cohortId: string, providerId: string) => {
   }
 }
 
-export { fetchCohort, fetchPatientList, fetchDocuments, fetchCohortExportRight }
+export { fetchCohort, fetchPatientList, fetchDocuments, fetchCohortRights, fetchCohortExportRight }
