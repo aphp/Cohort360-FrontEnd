@@ -1,5 +1,9 @@
 image: $IMAGE_REPOSITORY_URL/node:$CI_COMMIT_BRANCH
 
+default:
+  tags:
+    - k8s-small-generic
+
 cache:
   paths:
     - build/*
