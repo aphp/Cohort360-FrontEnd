@@ -13,14 +13,17 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogActions from '@material-ui/core/DialogActions'
 
-import Footer from '../../components/Footer/Footer'
-import logo from '../../assets/images/logo-login.png'
-import { login as loginAction } from '../../state/me'
-import { authenticate } from '../../services/authentication'
+import Footer from 'components/Footer/Footer'
+import logo from 'assets/images/logo-login.png'
+import { login as loginAction } from 'state/me'
+import { authenticate } from 'services/authentication'
 import { ACCES_TOKEN, REFRESH_TOKEN } from '../../constants'
-import useStyles from './styles'
-import { fetchPractitioner } from '../../services/practitioner'
+import { fetchPractitioner } from 'services/practitioner'
 import { fetchDeidentified } from 'services/deidentification'
+import { fetchPractitionerRole } from 'services/practitioner'
+import NoRights from 'components/ErrorView/NoRights'
+
+import useStyles from './styles'
 
 const ErrorDialog = ({ open, setErrorLogin }) => {
   const _setErrorLogin = () => {
@@ -81,6 +84,7 @@ const Login = () => {
   const dispatch = useDispatch()
   const [username, setUsername] = useState(undefined)
   const [password, setPassword] = useState(undefined)
+  const [noRights, setNoRights] = useState(false)
   const [errorLogin, setErrorLogin] = useState(false)
   const [open, setOpen] = useState(false)
 
@@ -130,8 +134,15 @@ const Login = () => {
         localStorage.setItem(ACCES_TOKEN, data.access)
         localStorage.setItem(REFRESH_TOKEN, data.refresh)
 
-        const lastConnection = data.last_connection ? data.last_connection.modified_at : undefined
-        getPractitionerData(lastConnection)
+        const getPractitioner = await fetchPractitioner(username)
+        const getRights = await fetchPractitionerRole(getPractitioner.id)
+
+        if (getRights === undefined) {
+          setNoRights(true)
+        } else {
+          const lastConnection = data.last_connection ? data.last_connection.modified_at : undefined
+          getPractitionerData(lastConnection)
+        }
       } else {
         setErrorLogin(true)
       }
@@ -144,6 +155,8 @@ const Login = () => {
     e.preventDefault()
     login()
   }
+
+  if (noRights == true) return <NoRights />
 
   return (
     <>

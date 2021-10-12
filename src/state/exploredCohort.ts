@@ -6,9 +6,9 @@ import { RootState } from 'state'
 
 import { setFavoriteCohortThunk } from './userCohorts'
 
-import { fetchCohort, fetchCohortRights, fetchCohortExportRight } from 'services/cohortInfos'
+import { fetchCohort, fetchCohortExportRight } from 'services/cohortInfos'
 import { fetchMyPatients } from 'services/myPatients'
-import { fetchPerimetersInfos, fetchPerimetersRights } from 'services/perimeters'
+import { fetchPerimetersInfos } from 'services/perimeters'
 
 export type ExploredCohortState = {
   importedPatients: any[]
@@ -85,23 +85,16 @@ const fetchExploredCohort = createAsyncThunk<
   CohortData,
   { context: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'; id?: string; forceReload?: boolean },
   { state: RootState }
->('exploredCohort/fetchExploredCohort', async ({ context, id, forceReload }, { getState }) => {
+>('exploredCohort/fetchExploredCohort', async ({ context, id, forceReload }, { getState, dispatch }) => {
   const state = getState()
   const providerId = state.me?.id
   const stateCohort = state.exploredCohort.cohort
-  const stateCohortList = state.cohort.cohortsList
 
   let shouldRefreshData = true
 
   switch (context) {
     case 'cohort': {
       shouldRefreshData = !stateCohort || Array.isArray(stateCohort) || stateCohort.id !== id
-
-      // Check rights
-      if (id && providerId) {
-        const hasRight = await fetchCohortRights(id, providerId)
-        if (!hasRight) return defaultInitialState
-      }
       break
     }
     case 'perimeters': {
@@ -118,12 +111,6 @@ const fetchExploredCohort = createAsyncThunk<
         !statePerimeterIds ||
         statePerimeterIds.length !== perimeterIds.length ||
         statePerimeterIds.some((id) => !perimeterIds.includes(id))
-
-      // Check rights
-      if (id && providerId) {
-        const hasRight = await fetchPerimetersRights(providerId, perimeterIds)
-        if (!hasRight) return defaultInitialState
-      }
       break
     }
     case 'patients': {
@@ -141,20 +128,7 @@ const fetchExploredCohort = createAsyncThunk<
         if (id) {
           cohort = (await fetchCohort(id)) as ExploredCohortState
           if (cohort) {
-            const currentCohortItem = stateCohortList.find(({ fhir_group_id }) => fhir_group_id === id) ?? {
-              extension: []
-            }
-            const canMakeExport =
-              currentCohortItem.extension && currentCohortItem.extension.length > 0
-                ? currentCohortItem.extension.some(
-                    (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
-                  ) &&
-                  currentCohortItem.extension.some(
-                    (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
-                  )
-                : false
-
-            cohort.canMakeExport = canMakeExport ? canMakeExport : await fetchCohortExportRight(id, providerId ?? '')
+            cohort.canMakeExport = await fetchCohortExportRight(id, providerId ?? '')
           }
         }
         break
@@ -188,6 +162,57 @@ const fetchExploredCohort = createAsyncThunk<
 
       default:
         break
+    }
+  } else {
+    dispatch<any>(fetchExploredCohortInBackground({ context, id }))
+  }
+  return cohort ?? state.exploredCohort
+})
+
+const fetchExploredCohortInBackground = createAsyncThunk<
+  CohortData,
+  { context: 'patients' | 'cohort' | 'perimeters' | 'new_cohort'; id?: string },
+  { state: RootState }
+>('exploredCohort/fetchExploredCohortInBackground', async ({ context, id }, { getState }) => {
+  const state = getState()
+  const providerId = state.me?.id
+
+  let cohort
+  switch (context) {
+    case 'cohort': {
+      if (id) {
+        cohort = (await fetchCohort(id)) as ExploredCohortState
+        if (cohort) {
+          cohort.canMakeExport = await fetchCohortExportRight(id, providerId ?? '')
+        }
+      }
+      break
+    }
+    case 'patients': {
+      cohort = (await fetchMyPatients()) as ExploredCohortState
+      if (cohort) {
+        cohort.name = '-'
+        cohort.description = ''
+        cohort.requestId = ''
+        cohort.favorite = false
+        cohort.uuid = ''
+        cohort.canMakeExport = false
+      }
+      break
+    }
+    case 'perimeters': {
+      if (id) {
+        cohort = (await fetchPerimetersInfos(id)) as ExploredCohortState
+        if (cohort) {
+          cohort.name = '-'
+          cohort.description = ''
+          cohort.requestId = ''
+          cohort.favorite = false
+          cohort.uuid = ''
+          cohort.canMakeExport = false
+        }
+      }
+      break
     }
   }
   return cohort ?? state.exploredCohort
@@ -271,6 +296,13 @@ const exploredCohortSlice = createSlice({
     builder.addCase(fetchExploredCohort.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(fetchExploredCohort.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
     builder.addCase(fetchExploredCohort.rejected, () => ({ ...defaultInitialState }))
+    builder.addCase(fetchExploredCohortInBackground.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(fetchExploredCohortInBackground.fulfilled, (state, { payload }) => ({
+      ...state,
+      ...payload,
+      loading: false
+    }))
+    builder.addCase(fetchExploredCohortInBackground.rejected, () => ({ ...defaultInitialState }))
     builder.addCase(favoriteExploredCohort.pending, (state) => ({ ...state }))
     builder.addCase(favoriteExploredCohort.fulfilled, (state, { payload }) => ({
       ...state,

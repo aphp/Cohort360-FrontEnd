@@ -29,3 +29,49 @@ if (CONTEXT !== 'arkhn' && CONTEXT !== 'aphp' && CONTEXT !== 'fakedata') {
 }
 export const ACCES_TOKEN = 'access'
 export const REFRESH_TOKEN = 'refresh'
+
+export const CLAIM_HIERARCHY =
+  process.env.VALUE_SET_URL_CLAIM_HIERARCHY ?? 'https://terminology.eds.aphp.fr/aphp-orbis-ghm'
+
+export const CONDITION_HIERARCHY =
+  process.env.VALUE_SET_URL_CONDITION_HIERARCHY ?? 'https://terminology.eds.aphp.fr/aphp-orbis-cim-'
+
+export const CONDITION_STATUS =
+  process.env.VALUE_SET_URL_CONDITION_STATUS ?? 'https://terminology.eds.aphp.fr/aphp-orbis-condition-status'
+
+export const PROCEDURE_HIERARCHY =
+  process.env.VALUE_SET_URL_PROCEDURE_HIERARCHY ?? 'https://terminology.eds.aphp.fr/aphp-orbis-ccam'
+
+export const DEMOGRAPHIC_GENDER =
+  process.env.VALUE_SET_URL_DEMOGRAPHIC_GENDER ?? 'https://terminology.eds.aphp.fr/aphp-orbis-gender'
+
+export const ENCOUNTER_ADMISSION_MODE =
+  process.env.VALUE_SET_URL_ENCOUNTER_ADMISSION_MODE ??
+  'https://terminology.eds.aphp.fr/aphp-orbis-visit-motif-admission'
+
+export const ENCOUNTER_ENTRY_MODE =
+  process.env.VALUE_SET_URL_ENCOUNTER_ENTRY_MODE ?? 'https://terminology.eds.aphp.fr/aphp-orbis-visit-mode-entree'
+
+export const ENCOUNTER_EXIT_MODE =
+  process.env.VALUE_SET_URL_ENCOUNTER_EXIT_MODE ?? 'https://terminology.eds.aphp.fr/aphp-orbis-visit-mode-sortie'
+
+export const ENCOUNTER_VISIT_TYPE =
+  process.env.VALUE_SET_URL_ENCOUNTER_VISIT_TYPE ?? 'https://terminology.eds.aphp.fr/aphp-orbis-visit-type'
+
+export const ENCOUNTER_SEJOUR_TYPE =
+  process.env.VALUE_SET_URL_ENCOUNTER_SEJOUR_TYPE ?? 'https://terminology.eds.aphp.fr/aphp-orbis-type-sejour'
+
+export const ENCOUNTER_FILE_STATUS =
+  process.env.VALUE_SET_URL_ENCOUNTER_FILE_STATUS ?? 'https://terminology.eds.aphp.fr/aphp-orbis-visite-status'
+
+export const ENCOUNTER_EXIT_TYPE =
+  process.env.VALUE_SET_URL_ENCOUNTER_EXIT_TYPE ?? 'https://terminology.eds.aphp.fr/aphp-orbis-visit-type-sortie'
+
+export const ENCOUNTER_DESTINATION =
+  process.env.VALUE_SET_URL_ENCOUNTER_DESTINATION ?? 'https://terminology.eds.aphp.fr/aphp-orbis-visit-destination'
+
+export const ENCOUNTER_PROVENANCE =
+  process.env.VALUE_SET_URL_ENCOUNTER_PROVENANCE ?? 'https://terminology.eds.aphp.fr/aphp-orbis-visit-provenance'
+
+export const ENCOUNTER_ADMISSION =
+  process.env.VALUE_SET_URL_ENCOUNTER_ADMISSION ?? 'https://terminology.eds.aphp.fr/aphp-orbis-visit-type-admission'

@@ -1,4 +1,4 @@
-import { CONTEXT } from '../../constants'
+import { CONTEXT, DEMOGRAPHIC_GENDER } from '../../constants'
 import apiRequest from '../apiRequest'
 import { cleanValueSet } from 'utils/cleanValueSet'
 
@@ -27,7 +27,7 @@ export const fetchGender = async () => {
     return res
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-gender`)
+      const res = await apiRequest.get(`/ValueSet?url=${DEMOGRAPHIC_GENDER}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       if (data && data.length > 0) {
