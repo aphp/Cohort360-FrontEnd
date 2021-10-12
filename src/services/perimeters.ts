@@ -21,8 +21,6 @@ import fakeFacetClassSimple from '../data/fakeData/facet-class-simple'
 import fakeFacetStartDateFacet from '../data/fakeData/facet-start-date-facet'
 import fakePatients from '../data/fakeData/patients'
 
-import { getPerimeters } from 'services/scopeService'
-
 export const getServices = async (id: string) => {
   const [respOrganizations, respHealthcareServices] = await Promise.all([
     api.get<FHIR_API_Response<IOrganization>>(`/Organization?_id=${id}${API_RESOURCE_TAG}`),
@@ -211,24 +209,4 @@ export const fetchPerimeterInfoForRequeteur = async (perimeterId: string): Promi
       }
     : null
   return scopeRows
-}
-
-export const fetchPerimetersRights = async (practitionerId: string, perimetersId: string[]) => {
-  try {
-    const perimeters = await getPerimeters(practitionerId)
-    if (!perimeters) return false
-
-    for (const perimeterId of perimetersId) {
-      const currentPerimeter = perimeters.find((perimeter) =>
-        perimeter.extension.some(
-          (extension: any) => extension.url === 'cohort-id' && extension.valueInteger === +perimeterId
-        )
-      )
-      if (!currentPerimeter) return false
-      return true
-    }
-    return false
-  } catch (error) {
-    console.error('Error (fetchPerimetersRights): ', error)
-  }
 }

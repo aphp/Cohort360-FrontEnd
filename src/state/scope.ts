@@ -28,17 +28,40 @@ type FetchScopeListReturn = {
 
 const fetchScopesList = createAsyncThunk<FetchScopeListReturn, void, { state: RootState }>(
   'scope/fetchScopesList',
-  async (DO_NOT_USE, { getState }) => {
+  async (DO_NOT_USE, { getState, dispatch }) => {
     try {
       const state = getState()
       const { me, scope } = state
       const { scopesList } = scope
 
       if (scopesList.length) {
+        dispatch(fetchScopesListinBackground())
         return { scopesList }
       } else {
         const scopes = (await getScopePerimeters(me)) || []
         return { scopesList: scopes }
+      }
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+)
+
+const fetchScopesListinBackground = createAsyncThunk<FetchScopeListReturn, void, { state: RootState }>(
+  'scope/fetchScopesListinBackground',
+  async (DO_NOT_USE, { getState }) => {
+    try {
+      const state = getState()
+      const { me, scope } = state
+      const { scopesList } = scope
+
+      const scopes = (await getScopePerimeters(me)) || []
+      return {
+        scopesList: scopes.map((scope) => ({
+          ...scope,
+          subItems: (scopesList.find(({ id }) => id === scope.id) || { subItems: [] }).subItems
+        }))
       }
     } catch (error) {
       console.error(error)
@@ -135,6 +158,13 @@ const scopeSlice = createSlice({
       scopesList: action.payload.scopesList
     }))
     builder.addCase(fetchScopesList.rejected, (state) => ({ ...state, loading: false }))
+    // fetchScopesListinBackground
+    builder.addCase(fetchScopesListinBackground.fulfilled, (state, action) => ({
+      ...state,
+      loading: false,
+      scopesList: action.payload.scopesList
+    }))
+    builder.addCase(fetchScopesListinBackground.rejected, (state) => ({ ...state, loading: false }))
     // expandScopeElement
     builder.addCase(expandScopeElement.pending, (state) => ({ ...state }))
     builder.addCase(expandScopeElement.fulfilled, (state, action) => ({
