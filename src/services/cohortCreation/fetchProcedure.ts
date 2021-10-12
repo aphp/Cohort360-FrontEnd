@@ -1,4 +1,4 @@
-import { CONTEXT } from '../../constants'
+import { CONTEXT, PROCEDURE_HIERARCHY } from '../../constants'
 import apiRequest from '../../services/apiRequest'
 import { fakeValueSetCCAM /*fakeHierarchyCCAM*/ } from '../../data/fakeData/cohortCreation/procedure'
 import { capitalizeFirstLetter } from '../../utils/capitalize'
@@ -28,9 +28,7 @@ export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
       ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
       : ''
 
-    const res = await apiRequest.get(
-      `/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-ccam${_searchValue}&size=0`
-    )
+    const res = await apiRequest.get(`/ValueSet?url=${PROCEDURE_HIERARCHY}${_searchValue}&size=0`)
 
     const CCAMObject = res && res.data && res.data.entry && res.data.resourceType === 'Bundle' ? res.data.entry : []
 
@@ -56,7 +54,7 @@ export const fetchCcamHierarchy = async (ccamParent: string) => {
     return null
   } else {
     if (!ccamParent) {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-ccam`)
+      const res = await apiRequest.get(`/ValueSet?url=${PROCEDURE_HIERARCHY}`)
 
       let CCAMList =
         res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -75,7 +73,7 @@ export const fetchCcamHierarchy = async (ccamParent: string) => {
     } else {
       const json = {
         resourceType: 'ValueSet',
-        url: 'https://terminology.eds.aphp.fr/aphp-orbis-ccam',
+        url: PROCEDURE_HIERARCHY,
         compose: {
           include: [
             {
