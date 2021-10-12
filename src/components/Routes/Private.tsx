@@ -10,7 +10,7 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, B
 import { ACCES_TOKEN } from '../../constants'
 import { login } from '../../state/me'
 
-import { useAppSelector } from '../../state/index'
+import { useAppSelector } from 'state'
 
 const ME = gql`
   query me {
@@ -46,8 +46,6 @@ const PrivateRoute: React.FC<Props> = (props) => {
       dispatch<any>(login(me))
     }
   }, [me, data, dispatch])
-
-  // if (loading) return <span>Loading</span>
 
   if (!me || (!me && !authToken) || error || (authToken && !loading && data && !data.me)) {
     if (allowRedirect === true)
