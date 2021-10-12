@@ -60,22 +60,6 @@ export const fetchPractitioner = async (username: string) => {
     if (undefined === practitioner) {
       return
     }
-    //TODO: Keep it for later ?
-
-    // const patientIds: string[] | undefined = getApiResponseResources(
-    //   respObservation
-    // )
-    //   ?.map((obs) => obs.subject?.reference?.split('/')[1])
-    //   .filter((s): s is string => undefined !== s)
-
-    // const respPatients = await Promise.all(
-    //   patientIds
-    //     ? patientIds.map((id: string) => api.get<FHIR_API_Response<IPatient>>(`/Patient?id=${id}`))
-    //     : []
-    // )
-    // const practitionerPatients = respPatients.map(
-    //   (resp) => resp.data.entry[0].resource
-    // )
 
     const userName = practitioner.identifier?.[0].value ?? ''
     const firstName = practitioner.name?.[0].given?.join(' ') ?? ''
@@ -88,5 +72,23 @@ export const fetchPractitioner = async (username: string) => {
       firstName,
       lastName
     }
+  }
+}
+
+export const fetchPractitionerRole = async (practitionerId: string) => {
+  if (CONTEXT === 'aphp') {
+    const practitionerRole = await api.get(
+      `PractitionerRole?practitioner=${practitionerId}&_elements=organization,extension`
+    )
+
+    if (
+      !practitionerRole ||
+      (practitionerRole && !practitionerRole.data) ||
+      (practitionerRole && practitionerRole.data && !practitionerRole.data.entry)
+    )
+      return undefined
+
+    const { resource } = practitionerRole.data.entry[0]
+    return resource
   }
 }
