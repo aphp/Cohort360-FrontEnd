@@ -70,7 +70,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         ? moment(_currentCriteria.endOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
     }
-    if (_currentCriteria.type !== 'Patient') {
+    if (_currentCriteria.type !== 'Patient' && _currentCriteria.type !== 'Medication') {
       encounterStartDate = _currentCriteria.encounterStartDate
         ? moment(_currentCriteria.encounterStartDate, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
@@ -856,6 +856,102 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         ]
         break
       }
+
+      case 'Medication': {
+        const displaySelectedPrescriptionType = (prescriptionTypes: { id: string; label: string }[]) => {
+          let currentPrescriptionType: string[] = []
+          for (const prescriptionType of prescriptionTypes) {
+            const selectedPrescriptionTypeData =
+              data?.cim10Diagnostic && data?.cim10Diagnostic !== 'loading'
+                ? data.cim10Diagnostic.find(
+                    (prescriptionTypeElement: any) =>
+                      prescriptionTypeElement && prescriptionTypeElement.id === prescriptionType.id
+                  )
+                : null
+            currentPrescriptionType = selectedPrescriptionTypeData
+              ? [...currentPrescriptionType, selectedPrescriptionTypeData.label]
+              : currentPrescriptionType
+          }
+          return currentPrescriptionType && currentPrescriptionType.length > 0
+            ? currentPrescriptionType.reduce(tooltipReducer)
+            : ''
+        }
+        const displaySelectedAdministration = (administrations: { id: string; label: string }[]) => {
+          let currentAdministration: string[] = []
+          for (const _administration of administrations) {
+            const selectedAdministration =
+              data?.administrations && data?.administrations !== 'loading'
+                ? data.administrations.find(
+                    (diagnosticElement: any) => diagnosticElement && diagnosticElement.id === _administration.id
+                  )
+                : null
+            currentAdministration = selectedAdministration
+              ? [...currentAdministration, selectedAdministration.label]
+              : currentAdministration
+          }
+          return currentAdministration && currentAdministration.length > 0
+            ? currentAdministration.reduce(tooltipReducer)
+            : ''
+        }
+
+        content = [
+          _currentCriteria &&
+            _currentCriteria.mode === 'prescription' &&
+            _currentCriteria?.prescriptionType &&
+            _currentCriteria?.prescriptionType.length > 0 && (
+              <Chip
+                className={classes.criteriaChip}
+                label={
+                  <Tooltip title={displaySelectedPrescriptionType(_currentCriteria?.prescriptionType)}>
+                    <Typography style={{ maxWidth: 500 }} noWrap>
+                      {_currentCriteria?.prescriptionType
+                        ?.map((prescriptionType) => prescriptionType.id)
+                        .reduce(reducer)}
+                    </Typography>
+                  </Tooltip>
+                }
+              />
+            ),
+          _currentCriteria && _currentCriteria?.administration && _currentCriteria?.administration.length > 0 && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Tooltip title={displaySelectedAdministration(_currentCriteria?.administration)}>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    {_currentCriteria?.administration?.map((administration) => administration.id).reduce(reducer)}
+                  </Typography>
+                </Tooltip>
+              }
+            />
+          ),
+          +_currentCriteria?.occurrence !== 1 && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>{`Nombre d'occurrence ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
+              }
+            />
+          ),
+          (startDate || endDate) && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>
+                  {startDate
+                    ? endDate
+                      ? `Entre le ${startDate} et le ${endDate}`
+                      : `Avant le ${startDate}`
+                    : endDate
+                    ? `Après le ${endDate}`
+                    : ''}
+                </Typography>
+              }
+            />
+          )
+        ]
+        break
+      }
+
       default:
         break
     }

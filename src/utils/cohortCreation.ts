@@ -49,6 +49,8 @@ const COMPOSITION_TYPE = 'type' // ok
 const COMPOSITION_DATE = 'date' // ok
 const COMPOSITION_ENCOUNTER = 'occurrence' // on verra
 
+const RESSOURCE_TYPE_MEDICATION: 'Medication' = 'Medication'
+
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   id: 0,
   isInclusive: false,
@@ -79,6 +81,7 @@ type RequeteurCriteriaType = {
     | typeof RESSOURCE_TYPE_PROCEDURE
     | typeof RESSOURCE_TYPE_CONDITION
     | typeof RESSOURCE_TYPE_COMPOSITION
+    | typeof RESSOURCE_TYPE_MEDICATION
   filterFhir: string
   occurrence?: {
     n: number
@@ -403,7 +406,7 @@ export function buildRequest(
                 ]
               : undefined,
           encounterDateRange:
-            item.type !== 'Patient' && (item.encounterStartDate || item.encounterEndDate)
+            item.type !== 'Patient' && item.type !== 'Medication' && (item.encounterStartDate || item.encounterEndDate)
               ? {
                   minDate: item.encounterStartDate
                     ? moment(item.encounterStartDate).format('YYYY-MM-DD[T00:00:00Z]')
@@ -1168,7 +1171,8 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
                   !(
                     currentcriterion.type === 'Patient' ||
                     currentcriterion.type === 'Composition' ||
-                    currentcriterion.type === 'Encounter'
+                    currentcriterion.type === 'Encounter' ||
+                    currentcriterion.type === 'Medication'
                   ) &&
                   currentcriterion.code &&
                   currentcriterion.code.length > 0

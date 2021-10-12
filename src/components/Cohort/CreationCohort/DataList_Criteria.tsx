@@ -7,6 +7,7 @@ import SupportedForm from './DiagramView/components/LogicalOperator/components/C
 import CCAMForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CCAM'
 import Cim10Form from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/Cim10Form'
 import GhmForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/GHM'
+import MedicationForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/MedicationForm/MedicationForm'
 
 // Fetcher
 import {
@@ -40,12 +41,12 @@ import { fetchDocTypes } from '../../../services/cohortCreation/fetchComposition
 // │   ├── Diagnostics
 // │   ├── Actes
 // │   ├── GHM
+// ├── Médicaments
+// │   ├── Prescription - Dispension - Administration
 // ├── Biologie/Microbiologie
 // │   ├── Biologie
 // │   ├── Microbiologie
 // ├── Physiologie
-// ├── Médicaments
-// │   ├── Prescription - Dispension - Administration
 
 const criteriaList: CriteriaItemType[] = [
   {
@@ -140,6 +141,14 @@ const criteriaList: CriteriaItemType[] = [
     ]
   },
   {
+    id: 'médicaments',
+    title: 'Médicaments (Prescription - Dispension - Administration)',
+    color: '#0063AF',
+    components: MedicationForm,
+    data: null,
+    fetch: null
+  },
+  {
     id: 'biologie_microbiologie',
     title: 'Biologie/Microbiologie',
     color: '#808080',
@@ -170,22 +179,6 @@ const criteriaList: CriteriaItemType[] = [
     disabled: true,
     data: null,
     components: null
-  },
-  {
-    id: 'médicaments',
-    title: 'Médicaments',
-    color: '#808080',
-    components: null,
-    subItems: [
-      {
-        id: 'prescription_dispension_administration',
-        title: 'Prescription - Dispension - Administration',
-        components: null,
-        color: '#808080',
-        disabled: true,
-        data: null
-      }
-    ]
   }
 ]
 
