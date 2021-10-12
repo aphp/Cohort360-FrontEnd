@@ -1,4 +1,16 @@
-import { CONTEXT } from '../../constants'
+import {
+  CONTEXT,
+  ENCOUNTER_ADMISSION_MODE,
+  ENCOUNTER_ENTRY_MODE,
+  ENCOUNTER_EXIT_MODE,
+  ENCOUNTER_VISIT_TYPE,
+  ENCOUNTER_SEJOUR_TYPE,
+  ENCOUNTER_FILE_STATUS,
+  ENCOUNTER_EXIT_TYPE,
+  ENCOUNTER_DESTINATION,
+  ENCOUNTER_PROVENANCE,
+  ENCOUNTER_ADMISSION
+} from '../../constants'
 import apiRequest from '../apiRequest'
 import {
   fakeAdmissionModes,
@@ -23,7 +35,7 @@ export const fetchAdmissionModes = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-motif-admission`)
+      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_ADMISSION_MODE}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
       return data && data.length > 0
         ? data.map((_data: { code: string; display: string }) => ({
@@ -49,7 +61,7 @@ export const fetchEntryModes = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-mode-entree`)
+      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_ENTRY_MODE}`)
       const data = res.data.entry[0].resource.compose.include[0].concept || []
 
       return cleanValueSet(data)
@@ -71,7 +83,7 @@ export const fetchExitModes = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-mode-sortie`)
+      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_EXIT_MODE}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
@@ -93,7 +105,7 @@ export const fetchPriseEnChargeType = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-type`)
+      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_VISIT_TYPE}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       const cleanData = cleanValueSet(data)
@@ -121,7 +133,7 @@ export const fetchTypeDeSejour = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-type-sejour`)
+      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_SEJOUR_TYPE}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
@@ -143,7 +155,7 @@ export const fetchFileStatus = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visite-status`)
+      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_FILE_STATUS}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
@@ -160,7 +172,7 @@ export const fetchReason = async () => {
     return []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-type-sortie`)
+      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_EXIT_TYPE}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
@@ -177,7 +189,7 @@ export const fetchDestination = async () => {
     return []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-destination`)
+      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_DESTINATION}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
@@ -194,7 +206,7 @@ export const fetchProvenance = async () => {
     return []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-provenance`)
+      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_PROVENANCE}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
@@ -211,7 +223,7 @@ export const fetchAdmission = async () => {
     return []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-visit-type-admission`)
+      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_ADMISSION}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
