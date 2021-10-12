@@ -70,11 +70,14 @@ const Contact: React.FC = () => {
 
       setLoading(true)
 
-      const contactSubmitForm = {
-        label: contactRequest.requestType,
-        title: contactRequest.object,
-        description: `**URL concernée :** ${contactRequest.url}\n\n${contactRequest.message}`
-      }
+      const contactSubmitForm = new FormData()
+
+      contactSubmitForm.append('label', contactRequest.requestType)
+      contactSubmitForm.append('title', contactRequest.object)
+      contactSubmitForm.append(
+        'description',
+        `${contactRequest.url !== '' ? `**URL concernée :** ${contactRequest.url}\n\n` : ''} ${contactRequest.message}`
+      )
 
       const postIssueResp = await postIssue(contactSubmitForm)
 
