@@ -209,8 +209,18 @@ const servicesProjects: IServicesProjects = {
     cohortList = cohortList.map((cohortItem) => {
       const extension =
         Array.isArray(rightResponses) &&
-        rightResponses.find((rightResponse: any) => +(rightResponse.url ?? '1') === +(cohortItem.fhir_group_id ?? '0'))
-          ?.extension
+        (
+          rightResponses.find(
+            (rightResponse: any) => +(rightResponse.url ?? '1') === +(cohortItem.fhir_group_id ?? '0')
+          ) || {
+            extension: [
+              { url: 'READ_DATA_NOMINATIVE', valueString: 'false' },
+              { url: 'EXPORT_DATA_NOMINATIVE', valueString: 'false' },
+              { url: 'READ_DATA_PSEUDOANONYMISED', valueString: 'false' },
+              { url: 'EXPORT_DATA_PSEUDOANONYMISED', valueString: 'false' }
+            ]
+          }
+        )?.extension
 
       return {
         ...cohortItem,

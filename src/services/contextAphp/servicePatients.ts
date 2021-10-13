@@ -84,7 +84,7 @@ export interface IServicesPatients {
 
 const servicesPatients: IServicesPatients = {
   fetchPatientsCount: async () => {
-    const response = await fetchPatient({ size: 1 })
+    const response = await fetchPatient({ size: 0 })
     if (response?.data?.resourceType === 'OperationOutcome') return 0
     return response.data.total ?? 0
   },
