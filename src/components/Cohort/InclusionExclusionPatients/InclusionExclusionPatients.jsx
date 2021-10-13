@@ -38,12 +38,12 @@ import {
   removeImportedPatients,
   removeExcludedPatients
   // updateCohort
-} from '../../../state/exploredCohort'
-import { getAgeArkhn } from '../../../utils/age'
-import { ReactComponent as FemaleIcon } from '../../../assets/icones/venus.svg'
-import { ReactComponent as MaleIcon } from '../../../assets/icones/mars.svg'
+} from 'state/exploredCohort'
+import { getAgeArkhn } from 'utils/age'
+import { ReactComponent as FemaleIcon } from 'assets/icones/venus.svg'
+import { ReactComponent as MaleIcon } from 'assets/icones/mars.svg'
 
-import { getPatientsFromPerimeter, getPatientsFromCohortId } from 'services/patient'
+import { getPatientsFromPerimeter, getPatientsFromCohortId } from 'services/save_old_services/patient'
 // import { patchCohortMembers } from 'services/cohortCreation'
 
 const PatientRow = ({ patient, selected, fromCohort, onClickCheckbox }) => {

@@ -15,7 +15,7 @@ import {
 import { useAppSelector } from 'state'
 import { CohortState, addCohort, editCohort, deleteCohort } from 'state/cohort'
 
-import { CohortType } from 'services/myProjects'
+import { CohortType } from 'types'
 
 import useStyles from './styles'
 

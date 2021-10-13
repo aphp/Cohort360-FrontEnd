@@ -1,8 +1,8 @@
 import { CONTEXT, PROCEDURE_HIERARCHY } from '../../constants'
-import apiRequest from '../../services/apiRequest'
-import { fakeValueSetCCAM /*fakeHierarchyCCAM*/ } from '../../data/fakeData/cohortCreation/procedure'
-import { capitalizeFirstLetter } from '../../utils/capitalize'
-import { codeSort } from '../../utils/alphabeticalSort'
+import apiRequest from 'services/apiRequest'
+import { fakeValueSetCCAM /*fakeHierarchyCCAM*/ } from 'data/fakeData/cohortCreation/procedure'
+import { capitalizeFirstLetter } from 'utils/capitalize'
+import { codeSort } from 'utils/alphabeticalSort'
 
 export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
   noStar = noStar === undefined ? true : noStar

@@ -1,8 +1,8 @@
 import { CONTEXT, CLAIM_HIERARCHY } from '../../constants'
-import apiRequest from '../../services/apiRequest'
-import { fakeValueSetGHM /*fakeHierarchyGHM*/ } from '../../data/fakeData/cohortCreation/claim'
-import { codeSort } from '../../utils/alphabeticalSort'
-import { capitalizeFirstLetter } from '../../utils/capitalize'
+import apiRequest from 'services/apiRequest'
+import { fakeValueSetGHM /*fakeHierarchyGHM*/ } from 'data/fakeData/cohortCreation/claim'
+import { codeSort } from 'utils/alphabeticalSort'
+import { capitalizeFirstLetter } from 'utils/capitalize'
 
 export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
   noStar = noStar === undefined ? true : noStar

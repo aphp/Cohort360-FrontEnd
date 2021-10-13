@@ -14,7 +14,7 @@ import {
 
 import ProjectRow from './ProjectRow/ProjectRow'
 
-import { ProjectType, RequestType } from 'services/myProjects'
+import { ProjectType, RequestType } from 'types'
 
 import { useAppSelector } from 'state'
 import { ProjectState } from 'state/project'

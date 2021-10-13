@@ -6,8 +6,8 @@ import IconButton from '@material-ui/core/IconButton'
 import Button from '@material-ui/core/Button'
 import PropTypes from 'prop-types'
 
-import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
-import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
+import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
+import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import DocumentTable from './DocumentTable/DocumentTable'
 

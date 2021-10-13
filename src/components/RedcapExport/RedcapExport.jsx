@@ -11,7 +11,7 @@ import Collapse from '@material-ui/core/Collapse'
 import AnonymisationParameter from './AnonymisationParameter/AnonymisationParameter'
 import CohortItem from './CohortItem/CohortItem'
 
-import { CRF_ATTRIBUTES } from '../../data/crfParameters'
+import { CRF_ATTRIBUTES } from 'data/crfParameters'
 
 import AddIcon from '@material-ui/icons/Add'
 import CloseIcon from '@material-ui/icons/Close'
@@ -29,7 +29,7 @@ import { Alert, AlertTitle } from '@material-ui/lab'
 import PropTypes from 'prop-types'
 import useStyles from './styles'
 
-import api from '../../services/api'
+import api from 'services/apiFhir'
 import Tooltip from '@material-ui/core/Tooltip'
 
 const RedcapExport = (props) => {

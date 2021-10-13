@@ -1,5 +1,5 @@
-import api from './api'
-import { CONTEXT, API_RESOURCE_TAG } from '../constants'
+import api from '../apiFhir'
+import { CONTEXT, API_RESOURCE_TAG } from '../../constants'
 import {
   CohortPatient,
   CohortComposition,
@@ -21,12 +21,12 @@ import {
   IPatient,
   IProcedure
 } from '@ahryman40k/ts-fhir-types/lib/R4'
-import fakePatients from '../data/fakeData/patients'
-import fakeEncounters from '../data/fakeData/encounters'
-import fakeConditions from '../data/fakeData/conditions'
-import fakeProcedures from '../data/fakeData/procedures'
-import fakeClaims from '../data/fakeData/claims'
-import fakeDocuments from '../data/fakeData/documents'
+import fakePatients from 'data/fakeData/patients'
+import fakeEncounters from 'data/fakeData/encounters'
+import fakeConditions from 'data/fakeData/conditions'
+import fakeProcedures from 'data/fakeData/procedures'
+import fakeClaims from 'data/fakeData/claims'
+import fakeDocuments from 'data/fakeData/documents'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
 export const fetchPatientsCount = async (): Promise<number | undefined> => {

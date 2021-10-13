@@ -1,5 +1,5 @@
 // @ts-nocheck
-import apiPortailCohort from './apiPortail'
+import apiPortailCohort from '../apiPortail'
 
 type createExportProps = { cohortId: number; motivation: string; tables: string[]; output_format?: string }
 export const createExport = async (args: createExportProps) => {

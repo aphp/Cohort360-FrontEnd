@@ -2,8 +2,8 @@ import React from 'react'
 
 import { Button, Chip, Grid, IconButton, InputBase, TextField, Typography } from '@material-ui/core'
 
-import { ReactComponent as FilterList } from '../../../../assets/icones/filter.svg'
-import { ReactComponent as SearchIcon } from '../../../../assets/icones/search.svg'
+import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
+import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import LockIcon from '@material-ui/icons/Lock'
 import SortIcon from '@material-ui/icons/Sort'
 

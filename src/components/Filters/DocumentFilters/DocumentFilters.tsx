@@ -20,7 +20,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import ClearIcon from '@material-ui/icons/Clear'
 
-import { docTypes } from '../../../assets/docTypes.json'
+import { docTypes } from 'assets/docTypes.json'
 
 import useStyles from './styles'
 

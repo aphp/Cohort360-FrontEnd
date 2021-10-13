@@ -1,4 +1,4 @@
-import apiBack from '../apiBackCohort'
+import apiBack from '../apiBackend'
 import { CONTEXT } from '../../constants'
 
 import { CohortCreationCounterType } from 'types'

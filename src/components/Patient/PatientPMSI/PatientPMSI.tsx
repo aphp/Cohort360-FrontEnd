@@ -26,10 +26,10 @@ import Pagination from '@material-ui/lab/Pagination'
 import PMSIFilters from '../../Filters/PMSIFilters/PMSIFilters'
 
 import ClearIcon from '@material-ui/icons/Clear'
-import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
-import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
+import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
+import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import { fetchPMSI } from '../../../services/patient'
+import services from 'services'
 
 import useStyles from './styles'
 import { PMSIEntry } from 'types'
@@ -99,7 +99,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
 
     const selectedDiagnosticTypesCodes = selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
 
-    const pmsiResp = await fetchPMSI(
+    const pmsiResp = await services.patients.fetchPMSI(
       deidentified,
       page,
       patientId,

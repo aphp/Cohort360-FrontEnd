@@ -85,6 +85,11 @@ const useStyles = makeStyles((theme) => ({
     '&:last-child': {
       marginRight: 0
     }
+  },
+  loadingSpinner: {
+    position: 'absolute',
+    top: '50%',
+    right: '50%'
   }
 }))
 
