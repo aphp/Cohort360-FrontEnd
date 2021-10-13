@@ -387,7 +387,9 @@ export const fetchCohortsList: (
         ) || {
           extension: [
             { url: 'READ_DATA_NOMINATIVE', valueString: 'false' },
-            { url: 'EXPORT_DATA_NOMINATIVE', valueString: 'false' }
+            { url: 'EXPORT_DATA_NOMINATIVE', valueString: 'false' },
+            { url: 'READ_DATA_PSEUDOANONYMISED', valueString: 'false' },
+            { url: 'EXPORT_DATA_PSEUDOANONYMISED', valueString: 'false' }
           ]
         }
       ).extension

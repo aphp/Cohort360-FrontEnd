@@ -35,7 +35,7 @@ export const fetchPatientsCount = async (): Promise<number | undefined> => {
   } else if (CONTEXT === 'arkhn') {
     return undefined
   } else {
-    const response = await api.get<FHIR_API_Response<IPatient>>('Patient?size=1')
+    const response = await api.get<FHIR_API_Response<IPatient>>('Patient?size=0')
 
     if (response?.data?.resourceType === 'OperationOutcome') return undefined
 

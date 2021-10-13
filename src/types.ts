@@ -467,8 +467,4 @@ export type CohortType = {
   extension?: any[]
 }
 
-export type ContactSubmitForm = {
-  label: string
-  title: string
-  description: string
-}
+export type ContactSubmitForm = FormData

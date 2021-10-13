@@ -56,7 +56,6 @@ const Contact: React.FC = () => {
 
   const onSubmit = async () => {
     try {
-      setLoading(true)
       if (!contactRequest.requestType) {
         return setError(ERROR_REQUEST_TYPE)
       }
@@ -69,11 +68,16 @@ const Contact: React.FC = () => {
         return setError(ERROR_MESSAGE)
       }
 
-      const contactSubmitForm = {
-        label: contactRequest.requestType,
-        title: contactRequest.object,
-        description: `**URL concernée :** ${contactRequest.url}\n\n${contactRequest.message}`
-      }
+      setLoading(true)
+
+      const contactSubmitForm = new FormData()
+
+      contactSubmitForm.append('label', contactRequest.requestType)
+      contactSubmitForm.append('title', contactRequest.object)
+      contactSubmitForm.append(
+        'description',
+        `${contactRequest.url !== '' ? `**URL concernée :** ${contactRequest.url}\n\n` : ''} ${contactRequest.message}`
+      )
 
       const postIssueResp = await postIssue(contactSubmitForm)
 
@@ -99,10 +103,10 @@ const Contact: React.FC = () => {
             ) : (
               <>
                 <Typography variant="h1" className={classes.title}>
-                  Contactez l'équipe Cohort360 :
+                  Contactez l'équipe Cohort360
                 </Typography>
 
-                <Typography variant="h3">Motif de contact :</Typography>
+                <Typography variant="h3">Motif de contact</Typography>
                 <Select
                   required
                   value={contactRequest.requestType}
@@ -118,7 +122,7 @@ const Contact: React.FC = () => {
                   ))}
                 </Select>
 
-                <Typography variant="h3">Objet :</Typography>
+                <Typography variant="h3">Objet</Typography>
                 <TextField
                   required
                   placeholder="Objet"
@@ -133,7 +137,7 @@ const Contact: React.FC = () => {
 
                 {contactRequest.requestType === requestTypes[0].code && (
                   <>
-                    <Typography variant="h3">URL concernée :</Typography>
+                    <Typography variant="h3">URL concernée</Typography>
                     <TextField
                       placeholder="Copiez-collez l'URL concernée par votre demande"
                       value={contactRequest.url}
@@ -146,7 +150,7 @@ const Contact: React.FC = () => {
                   </>
                 )}
 
-                <Typography variant="h3">Message :</Typography>
+                <Typography variant="h3">Message</Typography>
                 <TextField
                   required
                   placeholder="Écrivez votre message ici..."

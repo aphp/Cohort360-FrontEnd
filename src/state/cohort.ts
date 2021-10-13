@@ -84,9 +84,12 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, void, { state: Root
         })
       }
 
-      forceRefresh = cohortList.some(
-        (cohort) => cohort.request_job_status === 'pending' || cohort.request_job_status === 'started'
-      )
+      forceRefresh = forceRefresh
+        ? true
+        : cohortList.some(
+            (cohort) => cohort.request_job_status === 'pending' || cohort.request_job_status === 'started'
+          )
+
       if (forceRefresh) {
         dispatch(fetchCohortInBackGround(cohortList))
       }
@@ -113,6 +116,7 @@ const fetchCohortInBackGround = createAsyncThunk<FetchCohortListReturn, CohortTy
 
       let count = 0
       let cohortsList = oldCohortsList
+
       while (
         cohortsList?.some(
           (cohort) =>

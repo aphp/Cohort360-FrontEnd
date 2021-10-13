@@ -162,6 +162,14 @@ export const fetchPerimetersInfos = async (perimetersId: string): Promise<Cohort
   }
 }
 
+const getScopeName = (perimeter: any) => {
+  const perimeterID = perimeter ? perimeter.alias?.[0] : false
+  if (!perimeterID) {
+    return perimeter ? perimeter.name : ''
+  }
+  return `${perimeterID} - ${perimeter.name}`
+}
+
 export const fetchPerimeterInfoForRequeteur = async (perimeterId: string): Promise<ScopeTreeRow | null> => {
   if (!perimeterId) return null
 
@@ -175,10 +183,11 @@ export const fetchPerimeterInfoForRequeteur = async (perimeterId: string): Promi
         ? groupResults.data.entry[0].resource?.managingEntity?.display
         : null
       : null
-  organiszationId = organiszationId.replace('Organization/', '')
+  organiszationId = organiszationId ? organiszationId.replace('Organization/', '') : ''
+  if (!organiszationId) return null
 
   // Get perimeter info with `organiszationId`
-  const organizationResult = await api.get(`/Organization?_id=${organiszationId}&_elements=name,extension`)
+  const organizationResult = await api.get(`/Organization?_id=${organiszationId}&_elements=name,extension,alias`)
 
   // Convert result in ScopeTreeRow
   const organization =
@@ -191,7 +200,7 @@ export const fetchPerimeterInfoForRequeteur = async (perimeterId: string): Promi
     ? {
         ...organization,
         id: organization.id,
-        name: organization.name,
+        name: getScopeName(organization),
         quantity:
           organization.extension && organization.extension.length > 0
             ? organization.extension.find((extension: any) => extension.url)

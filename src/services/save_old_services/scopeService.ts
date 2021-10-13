@@ -57,36 +57,59 @@ export const getPerimeters = async (practitionerId: string) => {
     const practitionerRoleHighPerimeter = data.meta?.extension?.length
       ? data.meta?.extension?.find((extension) => extension.url === 'Practitioner Organization List')
       : { extension: [] }
-    const rolesList: any[] | undefined = practitionerRoleHighPerimeter?.extension?.length
+    const practitionerRoleList = data.meta?.extension?.length
+      ? data.meta?.extension?.find((extension) => extension.url === 'Role List')
+      : { extension: [] }
+
+    const perimeterList: any[] | undefined = practitionerRoleHighPerimeter?.extension?.length
       ? practitionerRoleHighPerimeter?.extension[0].extension?.length
         ? practitionerRoleHighPerimeter?.extension[0].extension
         : []
       : []
 
-    const perimetersIds = rolesList.map(({ url }) => url)
+    const roleList: any[] | undefined =
+      practitionerRoleList && practitionerRoleList.extension && practitionerRoleList.extension?.length
+        ? practitionerRoleList.extension.filter(
+            (practitionerRoleItem: any) =>
+              practitionerRoleItem.extension.some(
+                (extension: any) => extension.url === 'RIGHT_READ_PATIENT_NOMINATIVE' && extension.valueBoolean === true
+              ) ||
+              practitionerRoleItem.extension.some(
+                (extension: any) =>
+                  extension.url === 'RIGHT_READ_PATIENT_PSEUDO_ANONYMISED' && extension.valueBoolean === true
+              )
+          )
+        : []
+    const perimetersIds = perimeterList.map(({ url }) => url)
     if (!perimetersIds || perimetersIds?.length === 0) return undefined
 
     const organisationResult = await api.get(`/Organization?_id=${perimetersIds}&_elements=name,extension,alias`)
     const organisationData: any[] = organisationResult.data
       ? organisationResult.data.entry && organisationResult.data.entry.length > 0
-        ? organisationResult.data.entry.map((entry: any) => entry.resource)
+        ? organisationResult.data.entry
+            .map((entry: any) => entry.resource)
+            .map((organization: any) => {
+              const organizationId = organization.id
+              if (!organizationId) return organization
+              const foundItem = practitionerRoleData?.find(
+                (practitionerRole) =>
+                  practitionerRole?.organization?.reference?.replace(/^Organization\//, '') === organizationId
+              )
+
+              return {
+                ...organization,
+                extension: [...((foundItem && foundItem.extension) || []), ...(organization.extension ?? [])]
+              }
+            })
         : null
       : null
 
-    return organisationData && organisationData.length > 0
-      ? organisationData.map((organization: any) => {
-          const organizationId = organization.id
-          if (!organizationId) return organization
-          const foundItem = practitionerRoleData?.find(
-            (practitionerRole) =>
-              practitionerRole?.organization?.reference?.replace(/^Organization\//, '') === organizationId
-          )
-          return {
-            ...organization,
-            extension: [...((foundItem && foundItem.extension) || []), ...(organization.extension ?? [])]
-          }
-        })
-      : []
+    return organisationData.filter((organisation: any) =>
+      organisation.extension.some(
+        (extension: any) =>
+          extension.url === 'access level' && roleList.some((role) => role.url === extension.valueString)
+      )
+    )
   }
 }
 
@@ -271,8 +294,8 @@ export const getScopeSubItems = async (
 
     scopeRow.name = getScopeName(perimetersResult)
     scopeRow.quantity = getQuantity(perimetersResult.extension)
-    scopeRow.access = getAccessName(perimetersResult.extension)
     scopeRow.subItems = getSubItem === true ? await getScopeSubItems(perimetersResult as ScopeTreeRow) : [loadingItem]
+    scopeRow.access = perimeter.access
     subScopeRows = [...subScopeRows, scopeRow]
   }
 

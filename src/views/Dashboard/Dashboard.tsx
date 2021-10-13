@@ -5,7 +5,6 @@ import { useDispatch } from 'react-redux'
 import { Link, useParams, useLocation } from 'react-router-dom'
 import { Grid, Tabs, Tab } from '@material-ui/core'
 import { IExtension } from '@ahryman40k/ts-fhir-types/lib/R4'
-import Alert from '@material-ui/lab/Alert'
 
 import InclusionExclusionPatientsPanel from 'components/Cohort/InclusionExclusionPatients/InclusionExclusionPatients'
 import RedcapExport from 'components/RedcapExport/RedcapExport'
@@ -14,6 +13,9 @@ import PatientList from 'components/Cohort/PatientList/PatientList'
 import Documents from 'components/Cohort/Documents/Documents'
 import TopBar from 'components/TopBar/TopBar'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
+
+import CohortRightOrNotExist from 'components/ErrorView/CohortRightOrNotExist'
+import CohortNoPatient from 'components/ErrorView/CohortNoPatient'
 
 import { fetchExploredCohort } from 'state/exploredCohort'
 
@@ -149,17 +151,9 @@ const Dashboard: React.FC<{
     Array.isArray(dashboard.cohort) &&
     dashboard.cohort.length === 0
   ) {
-    return (
-      <Alert severity="error" className={classes.alert}>
-        Vous tentez d'accéder à des données qui n'existent pas, ou vous ne disposez pas de droits suffisants
-      </Alert>
-    )
+    return <CohortRightOrNotExist />
   } else if (dashboard.loading === false && dashboard.totalPatients === 0) {
-    return (
-      <Alert severity="error" className={classes.alert}>
-        Votre cohorte de patients est vide
-      </Alert>
-    )
+    return <CohortNoPatient />
   }
 
   return (

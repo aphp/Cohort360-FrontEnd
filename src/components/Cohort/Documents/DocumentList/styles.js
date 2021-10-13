@@ -32,10 +32,7 @@ const useStyles = makeStyles((theme) => ({
   },
   row: {
     borderBottom: '1px solid rgba(224,224,224,1)',
-    padding: '10px',
-    '&:nth-of-type(even)': {
-      backgroundColor: '#FAF9F9'
-    }
+    padding: '10px'
   },
   loadingSpinner: {
     position: 'absolute',

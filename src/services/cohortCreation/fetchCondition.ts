@@ -1,4 +1,4 @@
-import { CONTEXT } from '../../constants'
+import { CONTEXT, CONDITION_HIERARCHY, CONDITION_STATUS } from '../../constants'
 import apiRequest from 'services/apiRequest'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import {
@@ -80,7 +80,7 @@ export const fetchDiagnosticTypes = async () => {
         }))
       : []
   } else {
-    const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-condition-status`)
+    const res = await apiRequest.get(`/ValueSet?url=${CONDITION_STATUS}`)
 
     const diagnosticKinds =
       res && res.data && res.data.entry && res.data.entry[0]
@@ -120,9 +120,7 @@ export const fetchCim10Diagnostic = async (searchValue?: string, noStar?: boolea
       ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
       : ''
 
-    const res = await apiRequest.get(
-      `/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-cim-${_searchValue}&size=0`
-    )
+    const res = await apiRequest.get(`/ValueSet?url=${CONDITION_HIERARCHY}${_searchValue}&size=0`)
 
     let cim10List =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -147,7 +145,7 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
     return null
   } else {
     if (!cim10Parent) {
-      const res = await apiRequest.get(`/ValueSet?url=https://terminology.eds.aphp.fr/aphp-orbis-cim-`)
+      const res = await apiRequest.get(`/ValueSet?url=${CONDITION_HIERARCHY}`)
 
       let cim10List =
         res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -166,7 +164,7 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
     } else {
       const json = {
         resourceType: 'ValueSet',
-        url: 'https://terminology.eds.aphp.fr/aphp-orbis-cim-',
+        url: CONDITION_HIERARCHY,
         compose: {
           include: [
             {

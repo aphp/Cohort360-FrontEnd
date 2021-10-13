@@ -3,9 +3,14 @@ import apiBackend from './apiBackend'
 
 export const postIssue = async (contactSubmitForm: ContactSubmitForm) => {
   try {
-    const postIssueResp = await apiBackend.post('/voting/create-issue', contactSubmitForm)
+    const requestHeader = {
+      headers: {
+        'content-type': 'multipart/form-data'
+      }
+    }
+    const postIssueResp = await apiBackend.post('/voting/create-issue', contactSubmitForm, requestHeader)
 
-    return postIssueResp.status === 200
+    return postIssueResp.status === 201
   } catch (error) {
     console.error('Erreur lors de la création du ticket', error)
     return false

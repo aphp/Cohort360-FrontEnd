@@ -16,16 +16,16 @@ const PATIENT_DECEASED = 'deceased' // ok
 const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
 const ENCOUNTER_LENGTH = 'length' // ok
 const ENCOUNTER_BIRTHDATE = 'patient.birthdate' // ok
-const ENCOUNTER_ENTRYMODE = 'entryMode' // on verra
-const ENCOUNTER_EXITMODE = 'exitMode' // on verra
-const ENCOUNTER_PRISENCHARGETYPE = 'priseEnChargeType' //on verra
-const ENCOUNTER_TYPEDESEJOUR = 'typeDeSejour' //on verra
-const ENCOUNTER_FILESTATUS = 'fileStatus' // on verra
-const ENCOUNTER_ADMISSIONMODE = 'admissionMode' // on verra
-const ENCOUNTER_REASON = 'reason' // on verra
-const ENCOUNTER_DESTINATION = 'destination' // on verra
-const ENCOUNTER_PROVENANCE = 'provenance' // on verra
-const ENCOUNTER_ADMISSION = 'admission' // on verra
+const ENCOUNTER_ENTRYMODE = 'admitted-from' // ok
+const ENCOUNTER_EXITMODE = 'discharge' // ok
+const ENCOUNTER_PRISENCHARGETYPE = 'class' // ok
+const ENCOUNTER_TYPEDESEJOUR = 'stay' // ok
+const ENCOUNTER_FILESTATUS = 'status' // ok
+const ENCOUNTER_ADMISSIONMODE = 'reason' // ok
+const ENCOUNTER_REASON = 'discharge-type' // ok
+const ENCOUNTER_DESTINATION = 'destination' // ok
+const ENCOUNTER_PROVENANCE = 'provenance' // ok
+const ENCOUNTER_ADMISSION = 'reason-code' // ok
 
 const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
 const CLAIM_CODE = 'codeList' // ok
@@ -145,7 +145,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
   switch (criterion.type) {
     case RESSOURCE_TYPE_PATIENT: {
       let ageFilter = ''
-      if (criterion.years && criterion.years !== [0, 130]) {
+      if (criterion.years && (criterion.years[0] !== 0 || criterion.years[1] !== 130)) {
         //@ts-ignore
         const date1 = moment()
           .subtract(criterion.years[1] + 1, criterion?.ageType?.id || 'years')
@@ -202,7 +202,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       }
 
       let ageFilter = ''
-      if (criterion.years && criterion.years !== [0, 130]) {
+      if (criterion.years && (criterion.years[0] !== 0 || criterion.years[1] !== 130)) {
         //@ts-ignore
         const date1 = moment()
           .subtract(+criterion.years[1], criterion?.ageType?.id || 'years')
@@ -369,9 +369,6 @@ export function buildRequest(
   const exploreCriteriaGroup = (itemIds: number[]) => {
     let children: (RequeteurCriteriaType | RequeteurGroupType)[] = []
 
-    let nextGroupId = -1
-    let nextCriteriaId = 1
-
     for (const itemId of itemIds) {
       let child: RequeteurCriteriaType | RequeteurGroupType | null = null
       const isGroup = itemId < 0
@@ -381,7 +378,7 @@ export function buildRequest(
 
         child = {
           _type: 'basicResource',
-          _id: nextCriteriaId,
+          _id: item.id ?? 0,
           isInclusive: item.isInclusive ?? true,
           resourceType: item.type ?? 'Patient',
           filterFhir: constructFilterFhir(item),
@@ -417,7 +414,6 @@ export function buildRequest(
                 }
               : undefined
         }
-        nextCriteriaId++
       } else {
         // return RequeteurGroupType
         const group: CriteriaGroupType = criteriaGroup.find(({ id }) => id === itemId) ?? DEFAULT_GROUP_ERROR
@@ -426,7 +422,7 @@ export function buildRequest(
         if (group.type === 'NamongM') {
           child = {
             _type: 'nAmongM',
-            _id: nextGroupId,
+            _id: group.id,
             isInclusive: group.isInclusive ?? true,
             criteria: exploreCriteriaGroup(group.criteriaIds),
             nAmongMOptions: {
@@ -437,12 +433,11 @@ export function buildRequest(
         } else {
           child = {
             _type: group.type,
-            _id: nextGroupId,
+            _id: group.id,
             isInclusive: group.isInclusive ?? true,
             criteria: exploreCriteriaGroup(group.criteriaIds)
           }
         }
-        nextGroupId--
       }
       children = [...children, child]
     }
@@ -856,14 +851,19 @@ export async function unbuildRequest(_json: string) {
         }
 
         if (element.filterFhir) {
-          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+          const filters = element.filterFhir
+            // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
+            .replaceAll('&&', '_+_+_+_')
+            .split('&')
+            .map((elem) => elem.split('='))
 
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
               case COMPOSITION_TEXT:
-                currentCriterion.search = value
+                // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
+                currentCriterion.search = value ? value.replaceAll('_+_+_+_', '&&') : null
                 break
               case COMPOSITION_TYPE: {
                 const docTypeIds = value?.split(',')
@@ -1114,10 +1114,42 @@ export async function unbuildRequest(_json: string) {
         }))
       : []
 
+  let _criteriaGroup = convertJsonObjectsToCriteriaGroup(criteriaGroup)
+  const criteriaGroupSaved = [..._criteriaGroup]
+  // Reset Group criteriaIds
+  _criteriaGroup = _criteriaGroup.map((item) => ({ ...item, criteriaIds: [] }))
+  criteriaItems = criteriaItems.map((_criteria, index) => {
+    // Get the parent of current critria
+    const parentGroup = criteriaGroupSaved.find((itemGroup) =>
+      itemGroup.criteriaIds.find((criteriaId) => criteriaId === _criteria._id)
+    )
+    if (parentGroup) {
+      const indexOfParent = criteriaGroupSaved.indexOf(parentGroup)
+      // Assign the new criterion identifier to its group
+      if (indexOfParent !== -1) {
+        _criteriaGroup[indexOfParent] = {
+          ..._criteriaGroup[indexOfParent],
+          criteriaIds: [..._criteriaGroup[indexOfParent].criteriaIds, index + 1]
+        }
+      }
+    }
+    return { ..._criteria, _id: index + 1 }
+  })
+  // Re-assign groups
+  _criteriaGroup = _criteriaGroup.map((itemGroup) => {
+    const foundGroupSaved = criteriaGroupSaved.find(({ id }) => id === itemGroup.id)
+    const oldGroupsChildren = foundGroupSaved ? foundGroupSaved.criteriaIds.filter((criteriaId) => +criteriaId < 0) : []
+    return {
+      ...itemGroup,
+      criteriaIds: [...itemGroup.criteriaIds, ...oldGroupsChildren]
+    }
+  })
+
+  // End of unbuild
   return {
     population,
     criteria: await convertJsonObjectsToCriteria(criteriaItems),
-    criteriaGroup: convertJsonObjectsToCriteriaGroup(criteriaGroup)
+    criteriaGroup: _criteriaGroup
   }
 }
 
