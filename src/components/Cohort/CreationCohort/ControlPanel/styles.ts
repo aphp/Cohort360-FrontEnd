@@ -26,16 +26,15 @@ const useStyles = makeStyles((theme) =>
     requestExecution: {
       marginTop: 12,
       marginBottom: 12,
-      // backgroundColor: '#5BC5F2',
-      backgroundColor: '#9e9e9e',
+      backgroundColor: '#5BC5F2',
       borderRadius: '26px',
       border: 'none',
       height: '42px',
       width: '90%',
       color: '#FFF',
-      // '&:hover': {
-      //   backgroundColor: '#499cbf'
-      // },
+      '&:hover': {
+        backgroundColor: '#499cbf'
+      },
       '&:disabled': {
         opacity: 0.7
       }
