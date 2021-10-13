@@ -29,27 +29,23 @@ const ENCOUNTER_ADMISSION = 'reason-code' // ok
 
 const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
 const CLAIM_CODE = 'codeList' // ok
-const CLAIM_DATE = 'created' // ok
-const CLAIM_ENCOUNTER = 'occurrence' // on verra
 
 const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
 const PROCEDURE_CODE = 'codeList' // ok
-const PROCEDURE_DATE = 'date' // ok
-const PROCEDURE_ENCOUNTER = 'occurrence' // on verra
 
 const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition' // ok
 const CONDITION_CODE = 'codeList' // ok
 const CONDITION_TYPE = 'type' // ok
-const CONDITION_DATE = 'recorded-date' // ok
-const CONDITION_ENCOUNTER = 'occurrence' // on verra
 
 const RESSOURCE_TYPE_COMPOSITION: 'Composition' = 'Composition'
 const COMPOSITION_TEXT = '_text' // ok
 const COMPOSITION_TYPE = 'type' // ok
-const COMPOSITION_DATE = 'date' // ok
-const COMPOSITION_ENCOUNTER = 'occurrence' // on verra
 
 const RESSOURCE_TYPE_MEDICATION: 'Medication' = 'Medication'
+const MEDICATION_CODE = 'CODE' // on verra
+const MEDICATION_MODE = 'MODE' // on verra
+const MEDICATION_PRESCRIPTION_TYPE = 'PRESCRIPTION_TYPE' // on verra
+const MEDICATION_ADMINISTRATION = 'ADMINISTRATION' // on verra
 
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   id: 0,
@@ -346,6 +342,36 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
         `${
           criterion.code && criterion.code.length > 0
             ? `${CLAIM_CODE}=${criterion.code.map((diagnosticType: any) => diagnosticType.id).reduce(searchReducer)}`
+            : ''
+        }`
+      ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
+      break
+    }
+
+    case RESSOURCE_TYPE_MEDICATION: {
+      filterFhir = [
+        `${
+          criterion.code && criterion.code.length > 0
+            ? `${MEDICATION_CODE}=${criterion.code
+                .map((diagnosticType: any) => diagnosticType.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${criterion.mode ? `${MEDICATION_MODE}=${criterion.mode}` : ''}`,
+        `${
+          criterion.prescriptionType && criterion.prescriptionType.length > 0
+            ? `${MEDICATION_PRESCRIPTION_TYPE}=${criterion.prescriptionType
+                .map((prescriptionType: any) => prescriptionType.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
+          criterion.administration && criterion.administration.length > 0
+            ? `${MEDICATION_ADMINISTRATION}=${criterion.administration
+                .map((administration: any) => administration.id)
+                .reduce(searchReducer)}`
             : ''
         }`
       ]
@@ -879,17 +905,6 @@ export async function unbuildRequest(_json: string) {
                   : newDocTypeIds
                 break
               }
-              case COMPOSITION_ENCOUNTER:
-                currentCriterion.occurrence = value
-                break
-              case COMPOSITION_DATE: {
-                if (value?.search('ge') === 0) {
-                  currentCriterion.startOccurrence = value?.replace('ge', '')
-                } else if (value?.search('le') === 0) {
-                  currentCriterion.endOccurrence = value?.replace('le', '')
-                }
-                break
-              }
               default:
                 break
             }
@@ -945,17 +960,6 @@ export async function unbuildRequest(_json: string) {
                   : newDiagnosticType
                 break
               }
-              case CONDITION_ENCOUNTER:
-                currentCriterion.occurrence = value
-                break
-              case CONDITION_DATE: {
-                if (value?.search('ge') === 0) {
-                  currentCriterion.startOccurrence = value?.replace('ge', '')
-                } else if (value?.search('le') === 0) {
-                  currentCriterion.endOccurrence = value?.replace('le', '')
-                }
-                break
-              }
               default:
                 break
             }
@@ -999,17 +1003,6 @@ export async function unbuildRequest(_json: string) {
                 if (!newCode) continue
 
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
-                break
-              }
-              case PROCEDURE_ENCOUNTER:
-                currentCriterion.occurrence = value
-                break
-              case PROCEDURE_DATE: {
-                if (value?.search('ge') === 0) {
-                  currentCriterion.startOccurrence = value?.replace('ge', '')
-                } else if (value?.search('le') === 0) {
-                  currentCriterion.endOccurrence = value?.replace('le', '')
-                }
                 break
               }
               default:
@@ -1056,15 +1049,71 @@ export async function unbuildRequest(_json: string) {
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
                 break
               }
-              case CLAIM_ENCOUNTER:
-                currentCriterion.occurrence = value
+              default:
                 break
-              case CLAIM_DATE: {
-                if (value?.search('ge') === 0) {
-                  currentCriterion.startOccurrence = value?.replace('ge', '')
-                } else if (value?.search('le') === 0) {
-                  currentCriterion.endOccurrence = value?.replace('le', '')
-                }
+            }
+          }
+        }
+        break
+      }
+      case RESSOURCE_TYPE_MEDICATION: {
+        currentCriterion.title = 'Critère de médicament'
+        currentCriterion.mode = currentCriterion.mode ? currentCriterion.mode : []
+        currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
+        currentCriterion.prescriptionType = currentCriterion.prescriptionType ? currentCriterion.prescriptionType : []
+        currentCriterion.administration = currentCriterion.administration ? currentCriterion.administration : []
+        currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
+        currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
+        currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+
+        if (element.occurrence) {
+          currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
+          currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
+        }
+
+        if (element.dateRangeList) {
+          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+        }
+
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+
+          for (const filter of filters) {
+            const key = filter ? filter[0] : null
+            const value = filter ? filter[1] : null
+            switch (key) {
+              case MEDICATION_CODE: {
+                const codeIds = value?.split(',')
+                const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
+                if (!newCode) continue
+
+                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
+                break
+              }
+              case MEDICATION_MODE:
+                currentCriterion.mode = value
+                break
+              case MEDICATION_PRESCRIPTION_TYPE: {
+                const prescriptionTypeIds = value?.split(',')
+                const newPrescription = prescriptionTypeIds?.map((prescriptionTypeId: any) => ({
+                  id: prescriptionTypeId
+                }))
+                if (!newPrescription) continue
+
+                currentCriterion.prescriptionType = currentCriterion.prescriptionType
+                  ? [...currentCriterion.prescriptionType, ...newPrescription]
+                  : newPrescription
+                break
+              }
+              case MEDICATION_ADMINISTRATION: {
+                const administrationIds = value?.split(',')
+                const newAdministration = administrationIds?.map((administrationId: any) => ({ id: administrationId }))
+                if (!newAdministration) continue
+
+                currentCriterion.administration = currentCriterion.administration
+                  ? [...currentCriterion.administration, ...newAdministration]
+                  : newAdministration
                 break
               }
               default:
@@ -1156,6 +1205,7 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
       for (const fetchKey of fetchKeys) {
         const dataKey = fetchKey.replace('fetch', '').replace(/(\b[A-Z])(?![A-Z])/g, ($1) => $1.toLowerCase())
         switch (dataKey) {
+          case 'atcData':
           case 'ghmData':
           case 'ccamData':
           case 'cim10Diagnostic': {
@@ -1171,8 +1221,7 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
                   !(
                     currentcriterion.type === 'Patient' ||
                     currentcriterion.type === 'Composition' ||
-                    currentcriterion.type === 'Encounter' ||
-                    currentcriterion.type === 'Medication'
+                    currentcriterion.type === 'Encounter'
                   ) &&
                   currentcriterion.code &&
                   currentcriterion.code.length > 0

@@ -17,70 +17,50 @@ import {
 
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
+import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
+
+import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
 
-import { MedicationDataType } from 'types'
-
 type MedicationFormProps = {
+  isEdition: boolean
   criteria: any
   selectedCriteria: any
+  onChangeValue: (key: string, value: any) => void
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
 }
 
-const defaultMedication: MedicationDataType = {
-  type: 'Medication',
-  title: 'Critère de médicament',
-  mode: 'prescription',
-  prescriptionType: [],
-  administration: [],
-  occurrence: 1,
-  occurrenceComparator: '>=',
-  startOccurrence: null,
-  endOccurrence: null,
-  isInclusive: true
-}
-
 const MedicationForm: React.FC<MedicationFormProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-
-  const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultMedication)
+  const { isEdition, criteria, selectedCriteria, onChangeValue, goBack, onChangeSelectedCriteria } = props
 
   const classes = useStyles()
 
   const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
-  const isEdition = selectedCriteria !== null ? true : false
+  const getAtcOptions = async (searchValue: string) => await criteria.fetch.fetchAtcData(searchValue, false)
 
   const _onSubmit = () => {
     if (
-      defaultValues.mode === 'prescription' &&
-      defaultValues.prescriptionType.length === 0 &&
-      defaultValues.administration.length === 0 &&
-      defaultValues.encounterStartDate === null &&
-      defaultValues.encounterEndDate === null
+      (selectedCriteria.mode === 'prescription' &&
+        selectedCriteria.prescriptionType.length === 0 &&
+        selectedCriteria.administration.length === 0) ||
+      (selectedCriteria.mode !== 'prescription' && selectedCriteria.administration.length === 0)
     ) {
       return setError(true)
     }
 
-    onChangeSelectedCriteria(defaultValues)
-  }
-
-  const _onChangeValue = (key: string, value: any) => {
-    const _defaultValues = defaultValues ? { ...defaultValues } : {}
-    _defaultValues[key] = value
-    setDefaultValues(_defaultValues)
+    onChangeSelectedCriteria(selectedCriteria)
   }
 
   if (criteria?.data?.prescriptionTypes === 'loading' || criteria?.data?.administrations === 'loading') {
     return <></>
   }
 
-  const defaultValuesPrescriptionType = defaultValues.prescriptionType
-    ? defaultValues.prescriptionType.map((prescriptionType: any) => {
+  const selectedCriteriaPrescriptionType = selectedCriteria.prescriptionType
+    ? selectedCriteria.prescriptionType.map((prescriptionType: any) => {
         const criteriaPrescriptionType = criteria.data.prescriptionTypes
           ? criteria.data.prescriptionTypes.find((p: any) => p.id === prescriptionType.id)
           : null
@@ -91,14 +71,24 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
       })
     : []
 
-  const defaultValuesAdministration = defaultValues.administration
-    ? defaultValues.administration.map((administration: any) => {
+  const selectedCriteriaAdministration = selectedCriteria.administration
+    ? selectedCriteria.administration.map((administration: any) => {
         const criteriaAdministration = criteria.data.administrations
           ? criteria.data.administrations.find((p: any) => p.id === administration.id)
           : null
         return {
           id: administration.id,
           label: administration.label ? administration.label : criteriaAdministration?.label ?? '?'
+        }
+      })
+    : []
+
+  const defaultValuesCode = selectedCriteria.code
+    ? selectedCriteria.code.map((code: any) => {
+        const criteriaCode = criteria.data.atcData ? criteria.data.atcData.find((g: any) => g.id === code.id) : null
+        return {
+          id: code.id,
+          label: code.label ? code.label : criteriaCode?.label ?? '?'
         }
       })
     : []
@@ -144,13 +134,13 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             placeholder="Nom du critère"
             defaultValue="Critère démographique"
             variant="outlined"
-            value={defaultValues.title}
-            onChange={(e) => _onChangeValue('title', e.target.value)}
+            value={selectedCriteria.title}
+            onChange={(e) => onChangeValue('title', e.target.value)}
           />
 
           <Grid style={{ display: 'flex' }}>
             <FormLabel
-              onClick={() => _onChangeValue('isInclusive', !defaultValues.isInclusive)}
+              onClick={() => onChangeValue('isInclusive', !selectedCriteria.isInclusive)}
               style={{ margin: 'auto 1em' }}
               component="legend"
             >
@@ -158,8 +148,8 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             </FormLabel>
             <Switch
               id="criteria-inclusive"
-              checked={!defaultValues.isInclusive}
-              onChange={(event) => _onChangeValue('isInclusive', !event.target.checked)}
+              checked={!selectedCriteria.isInclusive}
+              onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
             />
           </Grid>
 
@@ -170,8 +160,8 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               className={classes.inputItem}
               aria-label="mode"
               name="criteria-mode-radio"
-              value={defaultValues.mode}
-              onChange={(e, value) => _onChangeValue('mode', value)}
+              value={selectedCriteria.mode}
+              onChange={(e, value) => onChangeValue('mode', value)}
             >
               <FormControlLabel value="prescription" control={<Radio />} label="Prescription" />
               <FormControlLabel value="dispensation" control={<Radio />} label="Dispensation" />
@@ -179,7 +169,19 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             </RadioGroup>
           </Grid>
 
-          {defaultValues.mode === 'prescription' && (
+          <AutocompleteAsync
+            multiple
+            label="Codes ATC / UCD"
+            variant="outlined"
+            noOptionsText="Veuillez entrer un code ou un critère ATC / UCD"
+            className={classes.inputItem}
+            autocompleteValue={defaultValuesCode}
+            autocompleteOptions={criteria?.data?.atcData || []}
+            getAutocompleteOptions={getAtcOptions}
+            onChange={(e, value) => onChangeValue('code', value)}
+          />
+
+          {selectedCriteria.mode === 'prescription' && (
             <Autocomplete
               multiple
               id="criteria-prescription-type-autocomplete"
@@ -187,8 +189,8 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               options={criteria?.data?.prescriptionTypes || []}
               getOptionLabel={(option) => option.label}
               getOptionSelected={(option, value) => option.id === value.id}
-              value={defaultValuesPrescriptionType}
-              onChange={(e, value) => _onChangeValue('prescriptionType', value)}
+              value={selectedCriteriaPrescriptionType}
+              onChange={(e, value) => onChangeValue('prescriptionType', value)}
               renderInput={(params) => <TextField {...params} variant="outlined" label="Type de prescription" />}
             />
           )}
@@ -200,12 +202,12 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             options={criteria?.data?.administrations || []}
             getOptionLabel={(option) => option.label}
             getOptionSelected={(option, value) => option.id === value.id}
-            value={defaultValuesAdministration}
-            onChange={(e, value) => _onChangeValue('prescriptionType', value)}
+            value={selectedCriteriaAdministration}
+            onChange={(e, value) => onChangeValue('administration', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Voie d'aministration" />}
           />
 
-          <AdvancedInputs form="medication" selectedCriteria={defaultValues} onChangeValue={_onChangeValue} />
+          <AdvancedInputs form="medication" selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

@@ -862,8 +862,8 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           let currentPrescriptionType: string[] = []
           for (const prescriptionType of prescriptionTypes) {
             const selectedPrescriptionTypeData =
-              data?.cim10Diagnostic && data?.cim10Diagnostic !== 'loading'
-                ? data.cim10Diagnostic.find(
+              data?.prescriptionTypes && data?.prescriptionTypes !== 'loading'
+                ? data.prescriptionTypes.find(
                     (prescriptionTypeElement: any) =>
                       prescriptionTypeElement && prescriptionTypeElement.id === prescriptionType.id
                   )
@@ -872,6 +872,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               ? [...currentPrescriptionType, selectedPrescriptionTypeData.label]
               : currentPrescriptionType
           }
+
           return currentPrescriptionType && currentPrescriptionType.length > 0
             ? currentPrescriptionType.reduce(tooltipReducer)
             : ''
@@ -882,13 +883,15 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             const selectedAdministration =
               data?.administrations && data?.administrations !== 'loading'
                 ? data.administrations.find(
-                    (diagnosticElement: any) => diagnosticElement && diagnosticElement.id === _administration.id
+                    (administrationElement: any) =>
+                      administrationElement && administrationElement.id === _administration.id
                   )
                 : null
             currentAdministration = selectedAdministration
               ? [...currentAdministration, selectedAdministration.label]
               : currentAdministration
           }
+
           return currentAdministration && currentAdministration.length > 0
             ? currentAdministration.reduce(tooltipReducer)
             : ''
@@ -902,13 +905,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               <Chip
                 className={classes.criteriaChip}
                 label={
-                  <Tooltip title={displaySelectedPrescriptionType(_currentCriteria?.prescriptionType)}>
-                    <Typography style={{ maxWidth: 500 }} noWrap>
-                      {_currentCriteria?.prescriptionType
-                        ?.map((prescriptionType) => prescriptionType.id)
-                        .reduce(reducer)}
-                    </Typography>
-                  </Tooltip>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    {displaySelectedPrescriptionType(_currentCriteria?.prescriptionType)}
+                  </Typography>
                 }
               />
             ),
@@ -916,11 +915,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             <Chip
               className={classes.criteriaChip}
               label={
-                <Tooltip title={displaySelectedAdministration(_currentCriteria?.administration)}>
-                  <Typography style={{ maxWidth: 500 }} noWrap>
-                    {_currentCriteria?.administration?.map((administration) => administration.id).reduce(reducer)}
-                  </Typography>
-                </Tooltip>
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedAdministration(_currentCriteria?.administration)}
+                </Typography>
               }
             />
           ),

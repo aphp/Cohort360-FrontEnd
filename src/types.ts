@@ -411,6 +411,8 @@ export type EncounterDataType = {
 export type MedicationDataType = {
   type: 'Medication'
   title: string
+  code: { id: string; label: string }[] | null
+  prescriptionType: { id: string; label: string }[] | null
   administration: { id: string; label: string }[] | null
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='

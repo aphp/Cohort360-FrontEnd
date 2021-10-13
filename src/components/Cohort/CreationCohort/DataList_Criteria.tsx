@@ -7,7 +7,7 @@ import SupportedForm from './DiagramView/components/LogicalOperator/components/C
 import CCAMForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CCAM'
 import Cim10Form from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/Cim10Form'
 import GhmForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/GHM'
-import MedicationForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/MedicationForm/MedicationForm'
+import MedicationForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/MedicationForm'
 
 // Fetcher
 import {
@@ -21,17 +21,23 @@ import {
   fetchDestination,
   fetchProvenance,
   fetchAdmission
-} from '../../../services/cohortCreation/fetchEncounter'
-import { fetchGender, fetchStatus } from '../../../services/cohortCreation/fetchDemographic'
+} from 'services/cohortCreation/fetchEncounter'
+import { fetchGender, fetchStatus } from 'services/cohortCreation/fetchDemographic'
 import {
   fetchStatusDiagnostic,
   fetchDiagnosticTypes,
   fetchCim10Diagnostic,
   fetchCim10Hierarchy
-} from '../../../services/cohortCreation/fetchCondition'
-import { fetchCcamData, fetchCcamHierarchy } from '../../../services/cohortCreation/fetchProcedure'
-import { fetchGhmData, fetchGhmHierarchy } from '../../../services/cohortCreation/fetchClaim'
-import { fetchDocTypes } from '../../../services/cohortCreation/fetchComposition'
+} from 'services/cohortCreation/fetchCondition'
+import { fetchCcamData, fetchCcamHierarchy } from 'services/cohortCreation/fetchProcedure'
+import { fetchGhmData, fetchGhmHierarchy } from 'services/cohortCreation/fetchClaim'
+import { fetchDocTypes } from 'services/cohortCreation/fetchComposition'
+import {
+  fetchAtcData,
+  fetchAtcHierarchy,
+  fetchPrescriptionTypes,
+  fetchAdministrations
+} from 'services/cohortCreation/fetchMedication'
 
 // ├── Mes variables
 // ├── Patients
@@ -141,12 +147,12 @@ const criteriaList: CriteriaItemType[] = [
     ]
   },
   {
-    id: 'médicaments',
+    id: 'Medication',
     title: 'Médicaments (Prescription - Dispension - Administration)',
     color: '#0063AF',
     components: MedicationForm,
-    data: null,
-    fetch: null
+    data: { atcData: 'loading', atcHierarchy: 'loading', prescriptionTypes: 'loading', administrations: 'loading' },
+    fetch: { fetchAtcData, fetchAtcHierarchy, fetchPrescriptionTypes, fetchAdministrations }
   },
   {
     id: 'biologie_microbiologie',
