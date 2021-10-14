@@ -4,11 +4,6 @@ default:
   tags:
     - $GITLAB_RUNNER_TAG
 
-cache:
-  key: "$CI_PIPELINE_ID-$CI_COMMIT_REF_SLUG"
-  paths:
-    - build/*
-
 variables:
   REACT_APP_FHIR_API_URL: /api/fhir
   REACT_APP_BACK_API_URL: /api/back
@@ -25,6 +20,10 @@ stages:
 
 build:
   stage: build
+  artifacts:
+    paths:
+      - build/
+    expire_in: 1 week
   script:
     - echo "Build"
     - rm package-lock.json
@@ -50,8 +49,12 @@ deploy:
     name : $IMAGE_REPOSITORY_URL/kaniko-executor:$CI_COMMIT_BRANCH
     entrypoint : [ "" ]
   stage: deploy
+  needs:
+    - job: build
+      artifacts: true
   script:
     - ENVIRONMENT=${CI_COMMIT_BRANCH/_/-}
+    - ls
     - sed -i "s/{{ENVIR}}/$CI_COMMIT_BRANCH/g" Dockerfile
     - REPO=$(echo $IMAGE_REPOSITORY_URL | sed "s/[^a-zA-Z0-9]/\\\\&/g") && sed -i "s/{{IMAGE_REPOSITORY_URL}}/$REPO/g" Dockerfile
     - echo "{\"auths\":{\"$IMAGE_REGISTRY\":{\"username\":\"$BOT_NAME\",\"password\":\"$BOT_TOKEN\"}}}" > /kaniko/.docker/config.json
