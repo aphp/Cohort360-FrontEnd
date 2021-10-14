@@ -432,7 +432,7 @@ export const fetchDocuments = async (
       elements = '&_elements=status,type,encounter,date,title'
     }
 
-    const docsList = await api.get(
+    const docsList = await api.get<any>(
       `/Composition?type:not=doc-impor&patient=${patientId}&_sort=${_sortDirection}${sortBy}&size=20&offset=${
         page ? (page - 1) * 20 : 0
       }&status=final${elements}${search}${docTypesFilter}${ndaFilter}${dateFilter}${groupFilter}`

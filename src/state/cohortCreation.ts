@@ -171,7 +171,7 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
 
       if (!snapshotsHistory || (snapshotsHistory && snapshotsHistory.length === 0)) {
         if (requestId) {
-          const newSnapshot = await createSnapshot(requestId, newJson, true)
+          const newSnapshot: any = await createSnapshot(requestId, newJson, true)
           if (newSnapshot) {
             const uuid = newSnapshot.uuid
             const json = newSnapshot.serialized_query
@@ -183,7 +183,7 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
         }
       } else if (currentSnapshot) {
         // Update snapshots list
-        const newSnapshot = await createSnapshot(currentSnapshot, newJson, false)
+        const newSnapshot: any = await createSnapshot(currentSnapshot, newJson, false)
         if (newSnapshot) {
           const foundItem = snapshotsHistory.find(
             (snapshotsHistory: CohortCreationSnapshotType) => snapshotsHistory.uuid === currentSnapshot
