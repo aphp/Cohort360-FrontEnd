@@ -50,6 +50,7 @@ deploy:
     entrypoint : [ "" ]
   stage: deploy
   needs:
+    - job: test
     - job: build
       artifacts: true
   script:
