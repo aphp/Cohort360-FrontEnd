@@ -858,6 +858,19 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Medication': {
+        const displaySelectedCode = (codes: { id: string; label: string }[]) => {
+          let currentCode: string[] = []
+          for (const code of codes) {
+            const selectedCodeData =
+              data?.atcData && data?.atcData !== 'loading'
+                ? data.atcData.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                : null
+            currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+          }
+
+          return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltipReducer) : ''
+        }
+
         const displaySelectedPrescriptionType = (prescriptionTypes: { id: string; label: string }[]) => {
           let currentPrescriptionType: string[] = []
           for (const prescriptionType of prescriptionTypes) {
@@ -877,6 +890,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             ? currentPrescriptionType.reduce(tooltipReducer)
             : ''
         }
+
         const displaySelectedAdministration = (administrations: { id: string; label: string }[]) => {
           let currentAdministration: string[] = []
           for (const _administration of administrations) {
@@ -898,6 +912,16 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         }
 
         content = [
+          _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedCode(_currentCriteria?.code)}
+                </Typography>
+              }
+            />
+          ),
           _currentCriteria &&
             _currentCriteria.mode === 'prescription' &&
             _currentCriteria?.prescriptionType &&

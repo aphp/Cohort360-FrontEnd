@@ -45,9 +45,12 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
   const _onSubmit = () => {
     if (
       (selectedCriteria.mode === 'prescription' &&
+        selectedCriteria.code.length === 0 &&
         selectedCriteria.prescriptionType.length === 0 &&
         selectedCriteria.administration.length === 0) ||
-      (selectedCriteria.mode !== 'prescription' && selectedCriteria.administration.length === 0)
+      (selectedCriteria.mode !== 'prescription' &&
+        selectedCriteria.code.length === 0 &&
+        selectedCriteria.administration.length === 0)
     ) {
       return setError(true)
     }
