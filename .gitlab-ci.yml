@@ -1,6 +1,11 @@
 image: $IMAGE_REPOSITORY_URL/node:$CI_COMMIT_BRANCH
 
+default:
+  tags:
+    - $GITLAB_RUNNER_TAG
+
 cache:
+  key: "$CI_PIPELINE_ID-$CI_COMMIT_REF_SLUG"
   paths:
     - build/*
 
