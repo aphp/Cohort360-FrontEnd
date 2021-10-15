@@ -1,15 +1,10 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
+import { RequestType } from 'types'
 
 import { logout, login } from './me'
 
-import {
-  fetchRequestsList,
-  addRequest as addRequestAPI,
-  editRequest as editRequestAPI,
-  deleteRequest as deleteRequestAPI,
-  RequestType
-} from 'services/myProjects'
+import services from 'services'
 
 export type RequestState = {
   loading: boolean
@@ -41,7 +36,7 @@ const fetchRequests = createAsyncThunk<FetchRequestListReturn, void, { state: Ro
       const state = getState().request
 
       const oldRequestList = state.requestsList || []
-      const requests = (await fetchRequestsList()) || []
+      const requests = (await services.projects.fetchRequestsList(100, 0)) || []
 
       if (state.count === requests.count) {
         return {
@@ -53,7 +48,10 @@ const fetchRequests = createAsyncThunk<FetchRequestListReturn, void, { state: Ro
       let requestList = requests.results || []
       // requestList.length <= 100, check fetchRequestsList() for more information
       if (requests.count > requestList.length) {
-        const newResult = await fetchRequestsList(requests.count - requestList.length, requestList.length)
+        const newResult = await services.projects.fetchRequestsList(
+          requests.count - requestList.length,
+          requestList.length
+        )
         // Add elements to requestList array and filter doublon
         requestList = [...requestList, ...(newResult.results || [])]
         requestList = requestList.filter((item, index, array) => {
@@ -93,7 +91,7 @@ const addRequest = createAsyncThunk<AddRequestReturn, AddRequestParams, { state:
       const state = getState().request
       const requestsList: RequestType[] = state.requestsList ?? []
 
-      const createdRequest = await addRequestAPI(newRequest)
+      const createdRequest = await services.projects.addRequest(newRequest)
 
       return {
         selectedRequest: null,
@@ -132,7 +130,7 @@ const editRequest = createAsyncThunk<EditRequestReturn, EditRequestParams, { sta
       } else {
         const index = requestsList.indexOf(foundItem)
 
-        const modifiedRequest = await editRequestAPI(editedRequest)
+        const modifiedRequest = await services.projects.editRequest(editedRequest)
 
         requestsList[index] = modifiedRequest
       }
@@ -169,7 +167,7 @@ const deleteRequest = createAsyncThunk<DeleteRequestReturn, DeleteRequestParams,
       const index = foundItem ? requestsList.indexOf(foundItem) : -1
       if (index !== -1) {
         // delete item at index
-        await deleteRequestAPI(deletedRequest)
+        await services.projects.deleteRequest(deletedRequest)
 
         requestsList.splice(index, 1)
       }

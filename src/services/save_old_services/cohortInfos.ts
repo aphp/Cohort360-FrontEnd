@@ -1,7 +1,7 @@
-import api from './api'
-import apiBackCohort from './apiBackCohort'
+import api from '../apiFhir'
+import apiBackCohort from '../apiBackend'
 import { getInfos } from './myPatients'
-import { CONTEXT, API_RESOURCE_TAG } from '../constants'
+import { CONTEXT, API_RESOURCE_TAG } from '../../constants'
 import {
   FHIR_API_Response,
   CohortData,
@@ -37,13 +37,13 @@ import moment from 'moment'
 
 import { GenderRepartitionType } from 'types'
 
-import fakeGroup from '../data/fakeData/group'
-import fakeFacetDeceased from '../data/fakeData/facet-deceased'
-import fakeFacetAgeMonth from '../data/fakeData/facet-age-month'
-import fakeFacetClassSimple from '../data/fakeData/facet-class-simple'
-import fakeFacetStartDateFacet from '../data/fakeData/facet-start-date-facet'
-import fakePatients from '../data/fakeData/patients'
-import fakeDocuments from '../data/fakeData/documents'
+import fakeGroup from 'data/fakeData/group'
+import fakeFacetDeceased from 'data/fakeData/facet-deceased'
+import fakeFacetAgeMonth from 'data/fakeData/facet-age-month'
+import fakeFacetClassSimple from 'data/fakeData/facet-class-simple'
+import fakeFacetStartDateFacet from 'data/fakeData/facet-start-date-facet'
+import fakePatients from 'data/fakeData/patients'
+import fakeDocuments from 'data/fakeData/documents'
 // import { fetchPerimetersInfos } from './perimeters'
 
 const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | undefined> => {
@@ -507,7 +507,7 @@ const fetchDocuments = async (
 
 const fetchCohortRights = async (cohortId: string, providerId: string) => {
   try {
-    const rightResponse = await api.get(`/Group?_list=${cohortId}&provider=${providerId}`)
+    const rightResponse = await api.get<any>(`/Group?_list=${cohortId}&provider=${providerId}`)
 
     if (
       rightResponse &&
@@ -540,7 +540,7 @@ const fetchCohortRights = async (cohortId: string, providerId: string) => {
 
 const fetchCohortExportRight = async (cohortId: string, providerId: string) => {
   try {
-    const rightResponse = await api.get(`/Group?_list=${cohortId}&provider=${providerId}`)
+    const rightResponse = await api.get<any>(`/Group?_list=${cohortId}&provider=${providerId}`)
 
     if (
       rightResponse &&

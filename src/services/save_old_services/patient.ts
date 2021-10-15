@@ -1,5 +1,5 @@
-import api from './api'
-import { CONTEXT, API_RESOURCE_TAG } from '../constants'
+import api from '../apiFhir'
+import { CONTEXT, API_RESOURCE_TAG } from '../../constants'
 import {
   CohortPatient,
   CohortComposition,
@@ -21,12 +21,12 @@ import {
   IPatient,
   IProcedure
 } from '@ahryman40k/ts-fhir-types/lib/R4'
-import fakePatients from '../data/fakeData/patients'
-import fakeEncounters from '../data/fakeData/encounters'
-import fakeConditions from '../data/fakeData/conditions'
-import fakeProcedures from '../data/fakeData/procedures'
-import fakeClaims from '../data/fakeData/claims'
-import fakeDocuments from '../data/fakeData/documents'
+import fakePatients from 'data/fakeData/patients'
+import fakeEncounters from 'data/fakeData/encounters'
+import fakeConditions from 'data/fakeData/conditions'
+import fakeProcedures from 'data/fakeData/procedures'
+import fakeClaims from 'data/fakeData/claims'
+import fakeDocuments from 'data/fakeData/documents'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
 export const fetchPatientsCount = async (): Promise<number | undefined> => {
@@ -35,7 +35,7 @@ export const fetchPatientsCount = async (): Promise<number | undefined> => {
   } else if (CONTEXT === 'arkhn') {
     return undefined
   } else {
-    const response = await api.get<FHIR_API_Response<IPatient>>('Patient?size=1')
+    const response = await api.get<FHIR_API_Response<IPatient>>('Patient?size=0')
 
     if (response?.data?.resourceType === 'OperationOutcome') return undefined
 
@@ -432,7 +432,7 @@ export const fetchDocuments = async (
       elements = '&_elements=status,type,encounter,date,title'
     }
 
-    const docsList = await api.get(
+    const docsList = await api.get<any>(
       `/Composition?type:not=doc-impor&patient=${patientId}&_sort=${_sortDirection}${sortBy}&size=20&offset=${
         page ? (page - 1) * 20 : 0
       }&status=final${elements}${search}${docTypesFilter}${ndaFilter}${dateFilter}${groupFilter}`

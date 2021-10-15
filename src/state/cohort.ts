@@ -8,16 +8,11 @@
 
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
+import { CohortType } from 'types'
 
 import { logout, login } from './me'
 
-import {
-  fetchCohortsList,
-  addCohort as addCohortAPI,
-  editCohort as editCohortAPI,
-  deleteCohort as deleteCohortAPI,
-  CohortType
-} from 'services/myProjects'
+import services from 'services'
 
 export type CohortState = {
   loading: boolean
@@ -50,7 +45,7 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, void, { state: Root
       const providerId = getState().me?.id ?? '0'
 
       const oldProjectList = state.cohortsList || []
-      const cohorts = (await fetchCohortsList(+providerId)) || {}
+      const cohorts = (await services.projects.fetchCohortsList((+providerId).toString(), 100, 0)) || {}
 
       let forceRefresh =
         oldProjectList.some(
@@ -75,7 +70,11 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, void, { state: Root
       let cohortList = cohorts.results || []
       // cohortList.length <= 100, check fetchCohortsList() for more information
       if (cohorts.count > cohortList.length) {
-        const newResult = await fetchCohortsList(+providerId, cohorts.count - cohortList.length, cohortList.length)
+        const newResult = await services.projects.fetchCohortsList(
+          (+providerId).toString(),
+          cohorts.count - cohortList.length,
+          cohortList.length
+        )
         // Add elements to cohortList array and filter doublon
         cohortList = [...cohortList, ...(newResult.results || [])]
         cohortList = cohortList.filter((item, index, array) => {
@@ -125,7 +124,7 @@ const fetchCohortInBackGround = createAsyncThunk<FetchCohortListReturn, CohortTy
             (cohort.request_job_status === 'pending' || cohort.request_job_status === 'started')
         )
       ) {
-        const newResult = await fetchCohortsList(+providerId, oldCohortsList.length)
+        const newResult = await services.projects.fetchCohortsList((+providerId).toString(), oldCohortsList.length, 0)
 
         count = newResult.count
         cohortsList = newResult.results
@@ -160,7 +159,7 @@ const addCohort = createAsyncThunk<AddCohortReturn, AddCohortParams, { state: Ro
       const state = getState().cohort
       const cohortsList: CohortType[] = state.cohortsList ?? []
 
-      const createdCohort = await addCohortAPI(newCohort)
+      const createdCohort = await services.projects.addCohort(newCohort)
 
       return {
         selectedCohort: null,
@@ -199,7 +198,7 @@ const editCohort = createAsyncThunk<EditCohortReturn, EditCohortParams, { state:
       } else {
         const index = cohortsList.indexOf(foundItem)
 
-        const modifiedCohort = await editCohortAPI(editedCohort)
+        const modifiedCohort = await services.projects.editCohort(editedCohort)
 
         cohortsList[index] = modifiedCohort
       }
@@ -236,7 +235,7 @@ const deleteCohort = createAsyncThunk<DeleteCohortReturn, DeleteCohortParams, { 
       const index = foundItem ? cohortsList.indexOf(foundItem) : -1
       if (index !== -1) {
         // delete item at index
-        await deleteCohortAPI(deletedCohort)
+        await services.projects.deleteCohort(deletedCohort)
 
         cohortsList.splice(index, 1)
       }

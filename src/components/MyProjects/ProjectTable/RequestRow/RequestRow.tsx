@@ -10,7 +10,7 @@ import EditIcon from '@material-ui/icons/Edit'
 
 import VersionRow from '../VersionRow/VersionRow'
 
-import { RequestType, CohortType } from 'services/myProjects'
+import { RequestType, CohortType } from 'types'
 
 import { setSelectedRequest } from 'state/request'
 

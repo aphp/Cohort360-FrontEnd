@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { CRF_ATTRIBUTES } from '../../../data/crfParameters'
+import { CRF_ATTRIBUTES } from 'data/crfParameters'
 
 import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'

@@ -19,8 +19,8 @@ import { Autocomplete } from '@material-ui/lab'
 
 import ClearIcon from '@material-ui/icons/Clear'
 
-import { fetchDiagnosticTypes } from '../../../services/cohortCreation/fetchCondition'
-import { capitalizeFirstLetter } from '../../../utils/capitalize'
+import { fetchDiagnosticTypes } from 'services/cohortCreation/fetchCondition'
+import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
 

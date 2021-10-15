@@ -1,11 +1,11 @@
-import api from './api'
-import { CONTEXT, API_RESOURCE_TAG } from '../constants'
+import api from '../apiFhir'
+import { CONTEXT, API_RESOURCE_TAG } from '../../constants'
 import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortPatient, FHIR_API_Response, SearchByTypes } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 import { getServices } from './perimeters'
 
-import fakePatients from '../data/fakeData/patients'
+import fakePatients from 'data/fakeData/patients'
 
 export const searchPatient = async (
   nominativeGroupsIds: string[] | undefined,

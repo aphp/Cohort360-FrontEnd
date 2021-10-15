@@ -11,7 +11,7 @@ import AddIcon from '@material-ui/icons/Add'
 
 import RequestRow from '../RequestRow/RequestRow'
 
-import { ProjectType, RequestType, CohortType } from 'services/myProjects'
+import { ProjectType, RequestType, CohortType } from 'types'
 
 import { setSelectedProject } from 'state/project'
 import { setSelectedRequest } from 'state/request'

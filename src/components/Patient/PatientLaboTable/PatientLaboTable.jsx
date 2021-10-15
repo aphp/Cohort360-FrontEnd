@@ -15,8 +15,8 @@ import InputBase from '@material-ui/core/InputBase'
 import IconButton from '@material-ui/core/IconButton'
 import Button from '@material-ui/core/Button'
 
-import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
-import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
+import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
+import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 const PatientLaboTable = ({ patient }) => {
   const classes = useStyles()

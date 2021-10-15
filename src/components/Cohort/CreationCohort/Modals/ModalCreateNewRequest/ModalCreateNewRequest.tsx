@@ -18,7 +18,8 @@ import {
 
 import useStyles from './styles'
 
-import { ProjectType, RequestType, addProject, fetchProjectsList, fetchRequestsList } from 'services/myProjects'
+import { ProjectType, RequestType } from 'types'
+import services from 'services'
 
 import { useAppSelector } from 'state'
 import { ProjectState, fetchProjects } from 'state/project'
@@ -76,7 +77,7 @@ const ModalCreateNewRequest: React.FC<{
     if (projectState && projectState.projectsList && projectState.projectsList.length > 0) {
       projectsList = projectState.projectsList
     } else {
-      const myProjects = (await fetchProjectsList()) || []
+      const myProjects = (await services.projects.fetchProjectsList(100, 0)) || []
       projectsList = myProjects.results
     }
     onSetProjectList(projectsList)
@@ -95,7 +96,7 @@ const ModalCreateNewRequest: React.FC<{
 
   const _fetchRequestNumber = async () => {
     if (isEdition) return
-    const requestResponse = await fetchRequestsList()
+    const requestResponse = await services.projects.fetchRequestsList(100, 0)
     if (!requestResponse) return
     _onChangeValue('name', `Nouvelle requête ${(requestResponse.count || 0) + 1}`)
   }
@@ -141,7 +142,7 @@ const ModalCreateNewRequest: React.FC<{
 
     if (currentRequest.parent_folder === NEW_PROJECT_ID) {
       // Create a project before
-      const newProject = await addProject({ uuid: '', name: projectName })
+      const newProject = await services.projects.addProject({ uuid: '', name: projectName })
       if (newProject) {
         currentRequest.parent_folder = newProject.uuid
       }

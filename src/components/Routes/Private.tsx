@@ -8,9 +8,9 @@ import { gql } from 'apollo-boost'
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core'
 
 import { ACCES_TOKEN } from '../../constants'
-import { login } from '../../state/me'
 
 import { useAppSelector } from 'state'
+import { login } from 'state/me'
 
 const ME = gql`
   query me {
@@ -47,9 +47,7 @@ const PrivateRoute: React.FC<Props> = (props) => {
     }
   }, [me, data, dispatch])
 
-  if (loading) return <span>Loading</span>
-
-  if ((!me && !authToken) || error || (authToken && !loading && data && !data.me)) {
+  if (!me || (!me && !authToken) || error || (authToken && !loading && data && !data.me)) {
     if (allowRedirect === true)
       return (
         <Redirect

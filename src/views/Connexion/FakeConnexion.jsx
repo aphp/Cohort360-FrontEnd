@@ -13,13 +13,12 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogActions from '@material-ui/core/DialogActions'
 
-import Footer from '../../components/Footer/Footer'
-import logo from '../../assets/images/logo-login.png'
-import { login as loginAction } from '../../state/me'
+import Footer from 'components/Footer/Footer'
+import logo from 'assets/images/logo-login.png'
+import { login as loginAction } from 'state/me'
 import { ACCES_TOKEN, REFRESH_TOKEN } from '../../constants'
 import useStyles from './styles'
-import { fetchPractitioner } from '../../services/practitioner'
-import { fetchDeidentified } from 'services/deidentification'
+import services from 'services'
 
 const ErrorDialog = ({ open, setErrorLogin }) => {
   const _setErrorLogin = () => {
@@ -84,10 +83,17 @@ const Login = () => {
   const [open, setOpen] = useState(false)
 
   const getPractitionerData = async (lastConnection) => {
-    const practitioner = await fetchPractitioner(username)
+    if (
+      typeof services?.practitioner?.fetchPractitioner !== 'function' ||
+      typeof services.perimeters.fetchDeidentified !== 'function'
+    ) {
+      return setErrorLogin(true)
+    }
+
+    const practitioner = await services.practitioner.fetchPractitioner(username)
 
     if (practitioner) {
-      const deidentifiedInfos = await fetchDeidentified(practitioner.id)
+      const deidentifiedInfos = await services.perimeters.fetchDeidentified(practitioner.id)
 
       dispatch(
         loginAction({

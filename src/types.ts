@@ -452,4 +452,46 @@ export type ValueSet = {
   display: string
 }
 
+export type ProjectType = {
+  uuid: string
+  name: string
+  description?: string
+  created_at?: string
+  modified_at?: string
+  favorite?: boolean
+  owner_id?: string
+}
+
+export type RequestType = {
+  uuid: string
+  name: string
+  parent_folder?: string
+  description?: string
+  owner_id?: string
+  data_type_of_query?: string
+  favorite?: boolean
+  created_at?: string
+  modified_at?: string
+}
+
+export type CohortType = {
+  uuid: string
+  name: string
+  create_task_id?: string
+  dated_measure_id?: string
+  description?: string
+  favorite?: boolean
+  fhir_group_id?: string
+  owner_id?: string
+  request?: string
+  request_job_duration?: string
+  request_job_fail_msg?: string
+  request_job_status?: string
+  request_query_snapshot?: string
+  result_size?: number
+  created_at?: string
+  modified_at?: string
+  extension?: any[]
+}
+
 export type ContactSubmitForm = FormData

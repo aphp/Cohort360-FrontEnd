@@ -1,5 +1,5 @@
-import api from './api'
-import { CONTEXT, API_RESOURCE_TAG } from '../constants'
+import api from '../apiFhir'
+import { CONTEXT, API_RESOURCE_TAG } from '../../constants'
 import {
   IPractitionerRole,
   IOrganization,
@@ -7,12 +7,12 @@ import {
   IPatient,
   IExtension
 } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { FHIR_API_Response, ScopeTreeRow } from '../types'
+import { FHIR_API_Response, ScopeTreeRow } from 'types'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
 import { MeState } from 'state/me'
 
-import fakeScopeRows from '../data/fakeData/scopeRows'
+import fakeScopeRows from 'data/fakeData/scopeRows'
 
 const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
@@ -83,7 +83,7 @@ export const getPerimeters = async (practitionerId: string) => {
     const perimetersIds = perimeterList.map(({ url }) => url)
     if (!perimetersIds || perimetersIds?.length === 0) return undefined
 
-    const organisationResult = await api.get(`/Organization?_id=${perimetersIds}&_elements=name,extension,alias`)
+    const organisationResult = await api.get<any>(`/Organization?_id=${perimetersIds}&_elements=name,extension,alias`)
     const organisationData: any[] = organisationResult.data
       ? organisationResult.data.entry && organisationResult.data.entry.length > 0
         ? organisationResult.data.entry

@@ -1,15 +1,10 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
+import { ProjectType } from 'types'
 
 import { logout, login } from './me'
 
-import {
-  fetchProjectsList,
-  addProject as addProjectAPI,
-  editProject as editProjectAPI,
-  deleteProject as deleteProjectAPI,
-  ProjectType
-} from 'services/myProjects'
+import services from 'services'
 
 export type ProjectState = {
   loading: boolean
@@ -41,7 +36,7 @@ const fetchProjects = createAsyncThunk<FetchProjectListReturn, void, { state: Ro
       const state = getState().project
 
       const oldProjectList = state.projectsList || []
-      const projects = (await fetchProjectsList()) || []
+      const projects = (await services.projects.fetchProjectsList(100, 0)) || []
 
       if (state.count === projects.count) {
         return {
@@ -53,7 +48,10 @@ const fetchProjects = createAsyncThunk<FetchProjectListReturn, void, { state: Ro
 
       let projectList = projects.results || []
       if (projects.count > projectList.length) {
-        const newResult = await fetchProjectsList(projects.count - projectList.length, projectList.length)
+        const newResult = await services.projects.fetchProjectsList(
+          projects.count - projectList.length,
+          projectList.length
+        )
         // Add elements to projectList array and filter doublon
         projectList = [...projectList, ...(newResult.results || [])]
         projectList = projectList.filter((item, index, array) => {
@@ -93,7 +91,7 @@ const addProject = createAsyncThunk<AddProjectReturn, AddProjectParams, { state:
       const state = getState().project
       const projectsList: ProjectType[] = state.projectsList ?? []
 
-      const createdProject = await addProjectAPI(newProject)
+      const createdProject = await services.projects.addProject(newProject)
 
       return {
         selectedProject: null,
@@ -132,7 +130,7 @@ const editProject = createAsyncThunk<EditProjectReturn, EditProjectParams, { sta
       } else {
         const index = projectsList.indexOf(foundItem)
 
-        const modifiedProject = await editProjectAPI(editedProject)
+        const modifiedProject = await services.projects.editProject(editedProject)
 
         projectsList[index] = modifiedProject
       }
@@ -169,7 +167,7 @@ const deleteProject = createAsyncThunk<DeleteProjectReturn, DeleteProjectParams,
       const index = foundItem ? projectsList.indexOf(foundItem) : -1
       if (index !== -1) {
         // delete item at index
-        await deleteProjectAPI(deletedProject)
+        await services.projects.deleteProject(deletedProject)
 
         projectsList.splice(index, 1)
       }

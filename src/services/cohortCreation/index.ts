@@ -1,11 +1,11 @@
-import apiBack from '../apiBackCohort'
+import apiBack from '../apiBackend'
 import { CONTEXT } from '../../constants'
 
 import { CohortCreationCounterType } from 'types'
 
 export const countCohort = async (requeteurJson?: string, snapshotId?: string, requestId?: string, uuid?: string) => {
   if (uuid) {
-    const measureResult = await apiBack.get(`/explorations/dated-measures/${uuid}/`)
+    const measureResult = await apiBack.get<any>(`/explorations/dated-measures/${uuid}/`)
 
     return {
       status: measureResult?.data?.request_job_status,
@@ -29,7 +29,7 @@ export const countCohort = async (requeteurJson?: string, snapshotId?: string, r
     } else if (CONTEXT === 'fakedata') {
       return null
     } else {
-      const measureResult = await apiBack.post('/explorations/dated-measures/', {
+      const measureResult = await apiBack.post<any>('/explorations/dated-measures/', {
         request_query_snapshot_id: snapshotId,
         request_id: requestId
       })
@@ -98,7 +98,7 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
   } else if (CONTEXT === 'fakedata') {
     return null
   } else {
-    const requestResponse = (await apiBack.get(`/explorations/requests/${requestId}/`)) || {}
+    const requestResponse = (await apiBack.get<any>(`/explorations/requests/${requestId}/`)) || {}
     const requestData = requestResponse?.data ? requestResponse.data : {}
 
     const requestName = requestData.name

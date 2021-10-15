@@ -9,8 +9,8 @@ import PatientSidebarItem from './PatientSidebarItem/PatientSidebarItem'
 
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 
-import { getAge } from '../../../utils/age'
-import { fetchPatientList } from '../../../services/cohortInfos'
+import { getAge } from 'utils/age'
+import services from 'services'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortPatient, SearchByTypes, VitalStatus } from 'types'
 
@@ -60,7 +60,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const onSearchPatient = async (newSortBy: string, newSortDirection: 'asc' | 'desc', page = 1) => {
     setLoadingStatus(true)
-    const patientsResp = await fetchPatientList(
+    const patientsResp = await services.cohorts.fetchPatientList(
       page,
       searchBy,
       searchInput,
