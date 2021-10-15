@@ -361,7 +361,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
         }`,
         `${criterion.mode ? `${MEDICATION_MODE}=${criterion.mode}` : ''}`,
         `${
-          criterion.prescriptionType && criterion.prescriptionType.length > 0
+          criterion.mode === 'prescription' && criterion.prescriptionType && criterion.prescriptionType.length > 0
             ? `${MEDICATION_PRESCRIPTION_TYPE}=${criterion.prescriptionType
                 .map((prescriptionType: any) => prescriptionType.id)
                 .reduce(searchReducer)}`

@@ -80,7 +80,8 @@ export const MEDICATION_ATC =
   process.env.VALUE_SET_URL_MEDICATION_ATC ?? 'https://terminology.eds.aphp.fr/aphp-orbis-atc-medicament'
 
 export const MEDICATION_PRESCRIPTION_TYPES =
-  process.env.VALUE_SET_URL_MEDICATION_PRESCRIPTION_TYPES ?? 'https://terminology.eds.aphp.fr/'
+  process.env.VALUE_SET_URL_MEDICATION_PRESCRIPTION_TYPES ??
+  'https://terminology.eds.aphp.fr/aphp-orbis-medicament-type-prescription'
 
 export const MEDICATION_ADMINISTRATIONS =
   process.env.VALUE_SET_URL_MEDICATION_ADMINISTRATIONS ?? 'https://terminology.eds.aphp.fr/'

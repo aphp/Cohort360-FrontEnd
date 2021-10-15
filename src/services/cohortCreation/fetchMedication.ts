@@ -55,11 +55,14 @@ export const fetchAtcHierarchy = async (atcParent: string) => {
 
       ATCList =
         ATCList && ATCList.length > 0
-          ? ATCList.sort(codeSort).map((atcData: any) => ({
-              id: atcData.code,
-              label: `${atcData.code} - ${atcData.display}`,
-              subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
-            }))
+          ? ATCList.sort(codeSort)
+              .map((atcData: any) => ({
+                id: atcData.code,
+                label: `${atcData.code} - ${atcData.display}`,
+                subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
+              }))
+              // V--[ @TODO: This is a hot fix, remove this after a clean of data ]--V
+              .filter((atcData: any) => atcData.label.search(new RegExp(/^[A-Z] - /, 'gi')) !== -1)
           : []
       return ATCList
     } else {
