@@ -9,7 +9,7 @@ import OccurrencesInputs from './OccurrencesInputs/OccurrencesInputs'
 import VisitInputs from './VisitInputs/VisitInputs'
 
 type AdvancedInputsProps = {
-  form: 'cim10' | 'ccam' | 'ghm' | 'document'
+  form: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication'
   selectedCriteria: any
   onChangeValue: (key: string, value: any) => void
 }
@@ -47,7 +47,7 @@ const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
       </Grid>
 
       <Collapse in={checked} unmountOnExit>
-        <VisitInputs selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
+        {form !== 'medication' && <VisitInputs selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />}
 
         <OccurrencesInputs form={form} selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
       </Collapse>

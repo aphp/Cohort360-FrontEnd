@@ -307,7 +307,15 @@ export type CriteriaItemType = {
 
 export type SelectedCriteriaType = {
   id: number
-} & (CcamDataType | Cim10DataType | DemographicDataType | GhmDataType | EncounterDataType | DocumentDataType)
+} & (
+  | CcamDataType
+  | Cim10DataType
+  | DemographicDataType
+  | GhmDataType
+  | EncounterDataType
+  | DocumentDataType
+  | MedicationDataType
+)
 
 export type CcamDataType = {
   title: string
@@ -372,8 +380,8 @@ export type GhmDataType = {
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
-  startOccurrence: Date
-  endOccurrence: Date
+  startOccurrence: Date | null
+  endOccurrence: Date | null
   isInclusive?: boolean
 }
 
@@ -399,6 +407,25 @@ export type EncounterDataType = {
   encounterEndDate: Date | null
   isInclusive?: boolean
 }
+
+export type MedicationDataType = {
+  type: 'Medication'
+  title: string
+  code: { id: string; label: string }[] | null
+  prescriptionType: { id: string; label: string }[] | null
+  administration: { id: string; label: string }[] | null
+  occurrence: number
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
+  startOccurrence: Date | null
+  endOccurrence: Date | null
+  isInclusive?: boolean
+} & (
+  | {
+      mode: 'prescription'
+      prescriptionType: { id: string; label: string }[] | null
+    }
+  | { mode: 'dispensation' | 'administration' }
+)
 
 export type CohortCreationCounterType = {
   uuid?: string
