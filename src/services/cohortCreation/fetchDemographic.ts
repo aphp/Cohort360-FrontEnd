@@ -27,7 +27,7 @@ export const fetchGender = async () => {
     return res
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=${DEMOGRAPHIC_GENDER}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${DEMOGRAPHIC_GENDER}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       if (data && data.length > 0) {

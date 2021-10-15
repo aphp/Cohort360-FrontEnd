@@ -28,7 +28,7 @@ export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
       ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
       : ''
 
-    const res = await apiRequest.get(`/ValueSet?url=${PROCEDURE_HIERARCHY}${_searchValue}&size=0`)
+    const res = await apiRequest.get<any>(`/ValueSet?url=${PROCEDURE_HIERARCHY}${_searchValue}&size=0`)
 
     const CCAMObject = res && res.data && res.data.entry && res.data.resourceType === 'Bundle' ? res.data.entry : []
 
@@ -54,7 +54,7 @@ export const fetchCcamHierarchy = async (ccamParent: string) => {
     return null
   } else {
     if (!ccamParent) {
-      const res = await apiRequest.get(`/ValueSet?url=${PROCEDURE_HIERARCHY}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${PROCEDURE_HIERARCHY}`)
 
       let CCAMList =
         res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -88,7 +88,7 @@ export const fetchCcamHierarchy = async (ccamParent: string) => {
         }
       }
 
-      const res = await apiRequest.post(`/ValueSet/$expand`, JSON.stringify(json))
+      const res = await apiRequest.post<any>(`/ValueSet/$expand`, JSON.stringify(json))
 
       let CCAMList =
         res && res.data && res.data.expansion && res.data.expansion.contains && res.data.resourceType === 'ValueSet'

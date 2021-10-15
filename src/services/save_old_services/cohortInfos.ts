@@ -507,7 +507,7 @@ const fetchDocuments = async (
 
 const fetchCohortRights = async (cohortId: string, providerId: string) => {
   try {
-    const rightResponse = await api.get(`/Group?_list=${cohortId}&provider=${providerId}`)
+    const rightResponse = await api.get<any>(`/Group?_list=${cohortId}&provider=${providerId}`)
 
     if (
       rightResponse &&
@@ -540,7 +540,7 @@ const fetchCohortRights = async (cohortId: string, providerId: string) => {
 
 const fetchCohortExportRight = async (cohortId: string, providerId: string) => {
   try {
-    const rightResponse = await api.get(`/Group?_list=${cohortId}&provider=${providerId}`)
+    const rightResponse = await api.get<any>(`/Group?_list=${cohortId}&provider=${providerId}`)
 
     if (
       rightResponse &&

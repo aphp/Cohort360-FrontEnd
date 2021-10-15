@@ -174,7 +174,7 @@ export const fetchPerimeterInfoForRequeteur = async (perimeterId: string): Promi
   if (!perimeterId) return null
 
   // Get perimeter info with `perimeterId`
-  const groupResults = await api.get(`/Group?_id=${perimeterId}`)
+  const groupResults = await api.get<any>(`/Group?_id=${perimeterId}`)
 
   // Construct an `orgazationId`
   let organiszationId =
@@ -187,7 +187,7 @@ export const fetchPerimeterInfoForRequeteur = async (perimeterId: string): Promi
   if (!organiszationId) return null
 
   // Get perimeter info with `organiszationId`
-  const organizationResult = await api.get(`/Organization?_id=${organiszationId}&_elements=name,extension,alias`)
+  const organizationResult = await api.get<any>(`/Organization?_id=${organiszationId}&_elements=name,extension,alias`)
 
   // Convert result in ScopeTreeRow
   const organization =

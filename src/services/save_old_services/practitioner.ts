@@ -25,7 +25,7 @@ export const fetchPractitioner = async (username: string) => {
     }
   }
   if (CONTEXT === 'aphp') {
-    const practitioner = await api.get(`/Practitioner?identifier=${username}`)
+    const practitioner = await api.get<any>(`/Practitioner?identifier=${username}`)
     if (
       !practitioner ||
       (practitioner && !practitioner.data) ||
@@ -77,7 +77,7 @@ export const fetchPractitioner = async (username: string) => {
 
 export const fetchPractitionerRole = async (practitionerId: string) => {
   if (CONTEXT === 'aphp') {
-    const practitionerRole = await api.get(
+    const practitionerRole = await api.get<any>(
       `PractitionerRole?practitioner=${practitionerId}&_elements=organization,extension`
     )
 

@@ -4,15 +4,7 @@ import { v4 as uuid } from 'uuid'
 import { STATE_STORAGE_KEY, PORTAIL_API_URL } from '../../constants'
 import { authClient } from '../arkhnAuth/oauth/authClient'
 
-type Authentication = {
-  status: number
-  data: {
-    access: string
-    refresh: string
-  }
-}
-
-export const authenticate = async (username: string, password: string): Promise<Authentication> => {
+export const authenticate = async (username: string, password: string): Promise<any> => {
   getCsrfToken(username, password)
   return axios({
     method: 'POST',
