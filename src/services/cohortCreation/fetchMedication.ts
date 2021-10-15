@@ -22,7 +22,7 @@ export const fetchAtcData = async (searchValue?: string, noStar?: boolean) => {
       ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
       : ''
 
-    const res = await apiRequest.get(`/ValueSet?url=${MEDICATION_ATC}${_searchValue}&size=0`)
+    const res = await apiRequest.get<any>(`/ValueSet?url=${MEDICATION_ATC}${_searchValue}&size=0`)
 
     const data =
       res && res.data && res.data.entry && res.data.resourceType === 'Bundle'
@@ -46,7 +46,7 @@ export const fetchAtcHierarchy = async (atcParent: string) => {
     return null
   } else {
     if (!atcParent) {
-      const res = await apiRequest.get(`/ValueSet?url=${MEDICATION_ATC}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${MEDICATION_ATC}`)
 
       let ATCList =
         res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -110,7 +110,7 @@ export const fetchPrescriptionTypes = async () => {
     return []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=${MEDICATION_PRESCRIPTION_TYPES}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${MEDICATION_PRESCRIPTION_TYPES}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       if (data && data.length > 0) {
@@ -131,7 +131,7 @@ export const fetchAdministrations = async () => {
     return []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=${MEDICATION_ADMINISTRATIONS}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${MEDICATION_ADMINISTRATIONS}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       if (data && data.length > 0) {
