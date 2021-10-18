@@ -83,7 +83,7 @@ export const fetchAtcHierarchy = async (atcParent: string) => {
         }
       }
 
-      const res = await apiRequest.post(`/ValueSet/$expand`, JSON.stringify(json))
+      const res = await apiRequest.post<any>(`/ValueSet/$expand`, JSON.stringify(json))
 
       let ATCList =
         res && res.data && res.data.expansion && res.data.expansion.contains && res.data.resourceType === 'ValueSet'
