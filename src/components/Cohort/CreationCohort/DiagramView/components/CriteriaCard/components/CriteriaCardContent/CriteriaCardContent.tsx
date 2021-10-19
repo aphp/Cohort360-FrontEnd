@@ -70,7 +70,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         ? moment(_currentCriteria.endOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
     }
-    if (_currentCriteria.type !== 'Patient') {
+    if (_currentCriteria.type !== 'Patient' && _currentCriteria.type !== 'Medication') {
       encounterStartDate = _currentCriteria.encounterStartDate
         ? moment(_currentCriteria.encounterStartDate, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
@@ -82,19 +82,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     switch (_currentCriteria.type) {
       case 'Claim': {
         const displaySelectedCode = (codes: { id: string; label: string }[]) => {
-          const customReducer = (accumulator: any, currentValue: any) =>
-            accumulator ? (
-              <>
-                {accumulator}
-                <br />
-                {currentValue}
-              </>
-            ) : currentValue ? (
-              currentValue
-            ) : (
-              accumulator
-            )
-
           let currentCode: string[] = []
           for (const code of codes) {
             const selectedCodeData =
@@ -103,8 +90,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 : null
             currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
           }
-          return currentCode && currentCode.length > 0 ? currentCode.reduce(customReducer) : ''
+          return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltipReducer) : ''
         }
+
         content = [
           _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
             <Chip
@@ -164,19 +152,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
       case 'Procedure': {
         const displaySelectedCode = (codes: { id: string; label: string }[]) => {
-          const customReducer = (accumulator: any, currentValue: any) =>
-            accumulator ? (
-              <>
-                {accumulator}
-                <br />
-                {currentValue}
-              </>
-            ) : currentValue ? (
-              currentValue
-            ) : (
-              accumulator
-            )
-
           let currentCode: string[] = []
           for (const code of codes) {
             const selectedCodeData =
@@ -185,7 +160,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 : null
             currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
           }
-          return currentCode && currentCode.length > 0 ? currentCode.reduce(customReducer) : ''
+          return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltipReducer) : ''
         }
         content = [
           _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
@@ -856,6 +831,128 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         ]
         break
       }
+
+      case 'Medication': {
+        const displaySelectedMode = (mode: 'prescription' | 'administration' | 'dispensation') => {
+          switch (mode) {
+            case 'prescription':
+              return 'Prescription'
+            case 'administration':
+              return 'Administration'
+            case 'dispensation':
+              return 'Dispensation'
+            default:
+              return '?'
+          }
+        }
+
+        const displaySelectedCode = (codes: { id: string; label: string }[]) => {
+          let currentCode: string[] = []
+          for (const code of codes) {
+            const selectedCodeData =
+              data?.atcData && data?.atcData !== 'loading'
+                ? data.atcData.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                : null
+            currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+          }
+
+          return currentCode && currentCode.length > 0 ? currentCode.reduce(reducer) : ''
+        }
+
+        const displaySelectedPrescriptionType = (prescriptionTypes: { id: string; label: string }[]) => {
+          let currentPrescriptionType: string[] = []
+          for (const prescriptionType of prescriptionTypes) {
+            const selectedPrescriptionTypeData =
+              data?.prescriptionTypes && data?.prescriptionTypes !== 'loading'
+                ? data.prescriptionTypes.find(
+                    (prescriptionTypeElement: any) =>
+                      prescriptionTypeElement && prescriptionTypeElement.id === prescriptionType.id
+                  )
+                : null
+            currentPrescriptionType = selectedPrescriptionTypeData
+              ? [...currentPrescriptionType, selectedPrescriptionTypeData.label]
+              : currentPrescriptionType
+          }
+
+          return currentPrescriptionType && currentPrescriptionType.length > 0
+            ? currentPrescriptionType.reduce(reducer)
+            : ''
+        }
+
+        const displaySelectedAdministration = (administrations: { id: string; label: string }[]) => {
+          let currentAdministration: string[] = []
+          for (const _administration of administrations) {
+            const selectedAdministration =
+              data?.administrations && data?.administrations !== 'loading'
+                ? data.administrations.find(
+                    (administrationElement: any) =>
+                      administrationElement && administrationElement.id === _administration.id
+                  )
+                : null
+            currentAdministration = selectedAdministration
+              ? [...currentAdministration, selectedAdministration.label]
+              : currentAdministration
+          }
+
+          return currentAdministration && currentAdministration.length > 0 ? currentAdministration.reduce(reducer) : ''
+        }
+
+        content = [
+          _currentCriteria && _currentCriteria?.mode && (
+            <Chip
+              className={classes.criteriaChip}
+              label={<Typography>{displaySelectedMode(_currentCriteria?.mode)}</Typography>}
+            />
+          ),
+          _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
+            <Chip
+              className={classes.criteriaChip}
+              label={<Typography>{displaySelectedCode(_currentCriteria?.code)}</Typography>}
+            />
+          ),
+          _currentCriteria &&
+            _currentCriteria.mode === 'prescription' &&
+            _currentCriteria?.prescriptionType &&
+            _currentCriteria?.prescriptionType.length > 0 && (
+              <Chip
+                className={classes.criteriaChip}
+                label={<Typography>{displaySelectedPrescriptionType(_currentCriteria?.prescriptionType)}</Typography>}
+              />
+            ),
+          _currentCriteria && _currentCriteria?.administration && _currentCriteria?.administration.length > 0 && (
+            <Chip
+              className={classes.criteriaChip}
+              label={<Typography>{displaySelectedAdministration(_currentCriteria?.administration)}</Typography>}
+            />
+          ),
+          +_currentCriteria?.occurrence !== 1 && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>{`Nombre d'occurrence ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
+              }
+            />
+          ),
+          (startDate || endDate) && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Typography>
+                  {startDate
+                    ? endDate
+                      ? `Entre le ${startDate} et le ${endDate}`
+                      : `Avant le ${startDate}`
+                    : endDate
+                    ? `Après le ${endDate}`
+                    : ''}
+                </Typography>
+              }
+            />
+          )
+        ]
+        break
+      }
+
       default:
         break
     }
@@ -901,7 +998,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
   }, [elementsRef, refresh])
 
   return (
-    <div ref={containerRef} style={{ height: openCollapse ? '' : 40 }} className={`toto ${classes.cardContent}`}>
+    <div ref={containerRef} style={{ height: openCollapse ? '' : 40 }} className={classes.cardContent}>
       {criteriaContents &&
         criteriaContents.map((criteriaContent, index) => (
           <Fragment key={index}>

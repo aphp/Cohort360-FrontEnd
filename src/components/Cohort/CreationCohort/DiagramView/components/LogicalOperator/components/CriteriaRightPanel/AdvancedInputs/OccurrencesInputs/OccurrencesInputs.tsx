@@ -19,7 +19,7 @@ import InfoIcon from '@material-ui/icons/Info'
 import useStyles from './styles'
 
 type OccurrenceInputsProps = {
-  form: 'cim10' | 'ccam' | 'ghm' | 'document'
+  form: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication'
   selectedCriteria: any
   onChangeValue: (key: string, value: any) => void
 }
