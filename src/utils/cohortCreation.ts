@@ -41,11 +41,13 @@ const RESSOURCE_TYPE_COMPOSITION: 'Composition' = 'Composition'
 const COMPOSITION_TEXT = '_text' // ok
 const COMPOSITION_TYPE = 'type' // ok
 
+// const RESSOURCE_TYPE_MEDICATION: 'MedicationRequest' = 'MedicationRequest' = Prescription
+// const RESSOURCE_TYPE_MEDICATION: 'MedicationAdministration' = 'MedicationAdministration' // = Administration
 const RESSOURCE_TYPE_MEDICATION: 'Medication' = 'Medication'
-const MEDICATION_CODE = 'CODE' // on verra
-const MEDICATION_MODE = 'MODE' // on verra
-const MEDICATION_PRESCRIPTION_TYPE = 'PRESCRIPTION_TYPE' // on verra
-const MEDICATION_ADMINISTRATION = 'ADMINISTRATION' // on verra
+const MEDICATION_CODE = 'hierarchy-ATC' // ok
+const MEDICATION_MODE = 'code_id' // ok
+const MEDICATION_PRESCRIPTION_TYPE = 'type' // ok
+const MEDICATION_ADMINISTRATION = 'route' // ok
 
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   id: 0,

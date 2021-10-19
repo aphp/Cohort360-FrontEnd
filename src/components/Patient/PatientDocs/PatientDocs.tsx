@@ -27,18 +27,8 @@ type PatientDocsTypes = {
   documents?: (CohortComposition | IDocumentReference)[]
   total: number
   deidentifiedBoolean: boolean
-  sortBy: string
-  sortDirection: 'asc' | 'desc'
 }
-const PatientDocs: React.FC<PatientDocsTypes> = ({
-  groupId,
-  patientId,
-  documents,
-  total,
-  deidentifiedBoolean,
-  sortBy,
-  sortDirection
-}) => {
+const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents, total, deidentifiedBoolean }) => {
   const classes = useStyles()
   const [page, setPage] = useState(1)
   const [totalDocs, setTotalDocs] = useState(total)
@@ -52,8 +42,8 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
   const [selectedDocTypes, setSelectedDocTypes] = useState<any[]>([])
   const [startDate, setStartDate] = useState<string | null>(null)
   const [endDate, setEndDate] = useState<string | null>(null)
-  const [_sortBy, setSortBy] = useState(sortBy)
-  const [_sortDirection, setSortDirection] = useState(sortDirection)
+  const [sortBy, setSortBy] = useState('date')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [showFilterChip, setShowFilterChip] = useState(false)
 
   const documentLines = 20 // Number of desired lines in the document array
@@ -110,7 +100,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
 
   const handleClearInput = () => {
     setSearchInput('')
-    fetchDocumentsList(_sortBy, _sortDirection, '')
+    fetchDocumentsList(sortBy, sortDirection, '')
   }
 
   const handleOpenDialog = () => {
@@ -120,12 +110,12 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
     setPage(value || 1)
     setLoadingStatus(true)
-    fetchDocumentsList(_sortBy, _sortDirection, searchInput, value || 1)
+    fetchDocumentsList(sortBy, sortDirection, searchInput, value || 1)
   }
 
   useEffect(() => {
     handleChangePage()
-  }, [patientId, nda, selectedDocTypes, startDate, endDate, _sortBy, _sortDirection]) // eslint-disable-line
+  }, [patientId, nda, selectedDocTypes, startDate, endDate, sortBy, sortDirection]) // eslint-disable-line
 
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
@@ -280,9 +270,9 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
         searchMode={searchMode}
         showIpp={false}
         deidentified={deidentifiedBoolean}
-        sortBy={_sortBy}
+        sortBy={sortBy}
         onChangeSortBy={setSortBy}
-        sortDirection={_sortDirection}
+        sortDirection={sortDirection}
         onChangeSortDirection={setSortDirection}
       />
       <Pagination
