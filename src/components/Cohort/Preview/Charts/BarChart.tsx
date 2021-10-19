@@ -83,7 +83,7 @@ const BarChart: React.FC<BarChartProps> = memo(({ data, height = 250, width = 30
 
     svg.append('g').call(xAxis)
     svg.append('g').call(yAxis)
-  }, [node, data, height, width])
+  }, [node, data, data.length, height, width])
 
   return <svg ref={node}></svg>
 })
