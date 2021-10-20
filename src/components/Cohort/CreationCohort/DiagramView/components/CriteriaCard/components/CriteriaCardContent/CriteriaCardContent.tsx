@@ -44,7 +44,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     let _data: any = null
     const _searchDataFromCriteria = (_criteria: any[], type: string) => {
       for (const _criterion of _criteria) {
-        if (_criterion.id === type) {
+        if (_criterion.id === 'Medication' && ('MedicationRequest' === type || 'MedicationAdministration' === type)) {
+          _data = _criterion.data
+        } else if (_criterion.id === type) {
           _data = _criterion.data
         } else if (_criterion.subItems) {
           _data = _data ? _data : _searchDataFromCriteria(_criterion.subItems, type)
@@ -70,7 +72,11 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         ? moment(_currentCriteria.endOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
     }
-    if (_currentCriteria.type !== 'Patient' && _currentCriteria.type !== 'Medication') {
+    if (
+      _currentCriteria.type !== 'Patient' &&
+      _currentCriteria.type !== 'MedicationRequest' &&
+      _currentCriteria.type !== 'MedicationAdministration'
+    ) {
       encounterStartDate = _currentCriteria.encounterStartDate
         ? moment(_currentCriteria.encounterStartDate, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
@@ -832,15 +838,16 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         break
       }
 
-      case 'Medication': {
-        const displaySelectedMode = (mode: 'prescription' | 'administration' | 'dispensation') => {
-          switch (mode) {
-            case 'prescription':
+      case 'MedicationRequest':
+      case 'MedicationAdministration': {
+        const displaySelectedMode = (type: 'MedicationRequest' | 'MedicationAdministration') => {
+          switch (type) {
+            case 'MedicationRequest':
               return 'Prescription'
-            case 'administration':
+            case 'MedicationAdministration':
               return 'Administration'
-            case 'dispensation':
-              return 'Dispensation'
+            // case 'dispensation':
+            //   return 'Dispensation'
             default:
               return '?'
           }
@@ -848,6 +855,8 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
         const displaySelectedCode = (codes: { id: string; label: string }[]) => {
           let currentCode: string[] = []
+          console.log('codes :>> ', codes)
+          console.log('data?.atcData :>> ', data?.atcData)
           for (const code of codes) {
             const selectedCodeData =
               data?.atcData && data?.atcData !== 'loading'
@@ -881,6 +890,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
         const displaySelectedAdministration = (administrations: { id: string; label: string }[]) => {
           let currentAdministration: string[] = []
+
           for (const _administration of administrations) {
             const selectedAdministration =
               data?.administrations && data?.administrations !== 'loading'
@@ -894,14 +904,17 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               : currentAdministration
           }
 
+          console.log('currentAdministration :>> ', currentAdministration)
           return currentAdministration && currentAdministration.length > 0 ? currentAdministration.reduce(reducer) : ''
         }
 
+        console.log('_currentCriteria :>> ', _currentCriteria)
+
         content = [
-          _currentCriteria && _currentCriteria?.mode && (
+          _currentCriteria && _currentCriteria?.type && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography>{displaySelectedMode(_currentCriteria?.mode)}</Typography>}
+              label={<Typography>{displaySelectedMode(_currentCriteria?.type)}</Typography>}
             />
           ),
           _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
@@ -911,7 +924,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             />
           ),
           _currentCriteria &&
-            _currentCriteria.mode === 'prescription' &&
+            _currentCriteria?.type === 'MedicationRequest' &&
             _currentCriteria?.prescriptionType &&
             _currentCriteria?.prescriptionType.length > 0 && (
               <Chip

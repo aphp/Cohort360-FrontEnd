@@ -103,7 +103,12 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
           const { id, subItems } = criteriaItem
           if (subItems) searchChild(subItems)
 
-          if (id === selectedCriteria.type) _action = criteriaItem
+          if (id === 'Medication') {
+            if ('MedicationRequest' === selectedCriteria.type) _action = criteriaItem
+            if ('MedicationAdministration' === selectedCriteria.type) _action = criteriaItem
+          } else {
+            if (id === selectedCriteria.type) _action = criteriaItem
+          }
         }
       }
       searchChild(criteria)

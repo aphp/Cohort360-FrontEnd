@@ -41,11 +41,10 @@ const RESSOURCE_TYPE_COMPOSITION: 'Composition' = 'Composition'
 const COMPOSITION_TEXT = '_text' // ok
 const COMPOSITION_TYPE = 'type' // ok
 
-// const RESSOURCE_TYPE_MEDICATION: 'MedicationRequest' = 'MedicationRequest' = Prescription
-// const RESSOURCE_TYPE_MEDICATION: 'MedicationAdministration' = 'MedicationAdministration' // = Administration
-const RESSOURCE_TYPE_MEDICATION: 'Medication' = 'Medication'
+const RESSOURCE_TYPE_MEDICATION_REQUEST: 'MedicationRequest' = 'MedicationRequest' // = Prescription
+const RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: 'MedicationAdministration' = 'MedicationAdministration' // = Administration
 const MEDICATION_CODE = 'hierarchy-ATC' // ok
-const MEDICATION_MODE = 'code_id' // ok
+// const MEDICATION_UCD = 'code_id' // ok
 const MEDICATION_PRESCRIPTION_TYPE = 'type' // ok
 const MEDICATION_ADMINISTRATION = 'route' // ok
 
@@ -79,7 +78,8 @@ type RequeteurCriteriaType = {
     | typeof RESSOURCE_TYPE_PROCEDURE
     | typeof RESSOURCE_TYPE_CONDITION
     | typeof RESSOURCE_TYPE_COMPOSITION
-    | typeof RESSOURCE_TYPE_MEDICATION
+    | typeof RESSOURCE_TYPE_MEDICATION_REQUEST
+    | typeof RESSOURCE_TYPE_MEDICATION_ADMINISTRATION
   filterFhir: string
   occurrence?: {
     n: number
@@ -352,7 +352,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       break
     }
 
-    case RESSOURCE_TYPE_MEDICATION: {
+    case RESSOURCE_TYPE_MEDICATION_REQUEST:
+    case RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: {
       filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
@@ -361,9 +362,10 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
                 .reduce(searchReducer)}`
             : ''
         }`,
-        `${criterion.mode ? `${MEDICATION_MODE}=${criterion.mode}` : ''}`,
         `${
-          criterion.mode === 'prescription' && criterion.prescriptionType && criterion.prescriptionType.length > 0
+          criterion.type === RESSOURCE_TYPE_MEDICATION_REQUEST &&
+          criterion.prescriptionType &&
+          criterion.prescriptionType.length > 0
             ? `${MEDICATION_PRESCRIPTION_TYPE}=${criterion.prescriptionType
                 .map((prescriptionType: any) => prescriptionType.id)
                 .reduce(searchReducer)}`
@@ -411,17 +413,18 @@ export function buildRequest(
           _type: 'basicResource',
           _id: item.id ?? 0,
           isInclusive: item.isInclusive ?? true,
-          resourceType: item.type ?? 'Patient',
+          resourceType: item.type ?? RESSOURCE_TYPE_PATIENT,
           filterFhir: constructFilterFhir(item),
           occurrence:
-            !(item.type === 'Patient' || item.type === 'Encounter') && item.occurrence
+            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_ENCOUNTER) && item.occurrence
               ? {
                   n: item.occurrence,
                   operator: item?.occurrenceComparator
                 }
               : undefined,
           dateRangeList:
-            !(item.type === 'Patient' || item.type === 'Encounter') && (item.startOccurrence || item.endOccurrence)
+            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_ENCOUNTER) &&
+            (item.startOccurrence || item.endOccurrence)
               ? [
                   {
                     minDate: item.startOccurrence
@@ -434,7 +437,10 @@ export function buildRequest(
                 ]
               : undefined,
           encounterDateRange:
-            item.type !== 'Patient' && item.type !== 'Medication' && (item.encounterStartDate || item.encounterEndDate)
+            item.type !== RESSOURCE_TYPE_PATIENT &&
+            item.type !== RESSOURCE_TYPE_MEDICATION_ADMINISTRATION &&
+            item.type !== RESSOURCE_TYPE_MEDICATION_REQUEST &&
+            (item.encounterStartDate || item.encounterEndDate)
               ? {
                   minDate: item.encounterStartDate
                     ? moment(item.encounterStartDate).format('YYYY-MM-DD[T00:00:00Z]')
@@ -1066,7 +1072,8 @@ export async function unbuildRequest(_json: string) {
         }
         break
       }
-      case RESSOURCE_TYPE_MEDICATION: {
+      case RESSOURCE_TYPE_MEDICATION_REQUEST:
+      case RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: {
         currentCriterion.title = 'Critère de médicament'
         currentCriterion.mode = currentCriterion.mode ? currentCriterion.mode : []
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
@@ -1101,9 +1108,6 @@ export async function unbuildRequest(_json: string) {
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
                 break
               }
-              case MEDICATION_MODE:
-                currentCriterion.mode = value
-                break
               case MEDICATION_PRESCRIPTION_TYPE: {
                 const prescriptionTypeIds = value?.split(',')
                 const newPrescription = prescriptionTypeIds?.map((prescriptionTypeId: any) => ({
@@ -1221,7 +1225,12 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
           case 'cim10Diagnostic': {
             if (_criterion.data[dataKey] === 'loading') _criterion.data[dataKey] = []
             const currentSelectedCriteria = selectedCriteria.filter(
-              (criterion: SelectedCriteriaType) => criterion.type === _criterion.id
+              (criterion: SelectedCriteriaType) =>
+                criterion.type === _criterion.id ||
+                // V-- [ Link with Medication and `MedicationAdministration` or `MedicationRequest` ]
+                (_criterion.id === 'Medication' &&
+                  (criterion.type === RESSOURCE_TYPE_MEDICATION_REQUEST ||
+                    criterion.type === RESSOURCE_TYPE_MEDICATION_ADMINISTRATION))
             )
 
             if (currentSelectedCriteria) {
@@ -1229,9 +1238,9 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
                 if (
                   currentcriterion &&
                   !(
-                    currentcriterion.type === 'Patient' ||
-                    currentcriterion.type === 'Composition' ||
-                    currentcriterion.type === 'Encounter'
+                    currentcriterion.type === RESSOURCE_TYPE_PATIENT ||
+                    currentcriterion.type === RESSOURCE_TYPE_ENCOUNTER ||
+                    currentcriterion.type === RESSOURCE_TYPE_COMPOSITION
                   ) &&
                   currentcriterion.code &&
                   currentcriterion.code.length > 0
