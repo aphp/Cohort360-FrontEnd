@@ -409,7 +409,6 @@ export type EncounterDataType = {
 }
 
 export type MedicationDataType = {
-  type: 'Medication'
   title: string
   code: { id: string; label: string }[] | null
   prescriptionType: { id: string; label: string }[] | null
@@ -421,10 +420,10 @@ export type MedicationDataType = {
   isInclusive?: boolean
 } & (
   | {
-      mode: 'prescription'
+      type: 'MedicationRequest'
       prescriptionType: { id: string; label: string }[] | null
     }
-  | { mode: 'dispensation' | 'administration' }
+  | { type: 'MedicationAdministration' }
 )
 
 export type CohortCreationCounterType = {

@@ -46,8 +46,6 @@ type PatientPMSITypes = {
   ghm?: PMSIEntry<IClaim>[]
   ghmTotal: number
   deidentifiedBoolean: boolean
-  sortBy: string
-  sortDirection: 'asc' | 'desc'
 }
 const PatientPMSI: React.FC<PatientPMSITypes> = ({
   groupId,
@@ -58,9 +56,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
   ccamTotal,
   ghm,
   ghmTotal,
-  deidentifiedBoolean,
-  sortBy,
-  sortDirection
+  deidentifiedBoolean
 }) => {
   const classes = useStyles()
   const [selectedTab, selectTab] = useState<'CIM10' | 'CCAM' | 'GHM'>('CIM10')
@@ -75,8 +71,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
   const [selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>([])
   const [startDate, setStartDate] = useState<string | null>(null)
   const [endDate, setEndDate] = useState<string | null>(null)
-  const [_sortBy, setSortBy] = useState(sortBy)
-  const [_sortDirection, setSortDirection] = useState(sortDirection)
+  const [sortBy, setSortBy] = useState('date')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [showFilterChip, setShowFilterChip] = useState(false)
 
   const documentLines = 20 // Number of desired lines in the document array
@@ -132,15 +128,15 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       nda,
       code,
       selectedDiagnosticTypes,
-      _sortBy,
-      _sortDirection,
+      sortBy,
+      sortDirection,
       startDate,
       endDate
     )
   }
 
   const handleSort = (property: any) => (event: React.MouseEvent<unknown> /*eslint-disable-line*/) => {
-    const isAsc: boolean = _sortBy === property && _sortDirection === 'asc'
+    const isAsc: boolean = sortBy === property && sortDirection === 'asc'
     const newDirection = isAsc ? 'desc' : 'asc'
 
     setSortDirection(newDirection)
@@ -174,8 +170,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       nda,
       code,
       selectedDiagnosticTypes,
-      _sortBy,
-      _sortDirection,
+      sortBy,
+      sortDirection,
       startDate,
       endDate
     )
@@ -425,26 +421,26 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
                   {deidentifiedBoolean ? 'NDA chiffré' : 'NDA'}
                 </TableCell>
                 <TableCell
-                  sortDirection={_sortBy === 'date' ? _sortDirection : false}
+                  sortDirection={sortBy === 'date' ? sortDirection : false}
                   align="left"
                   className={classes.tableHeadCell}
                 >
                   <TableSortLabel
-                    active={_sortBy === 'date'}
-                    direction={_sortBy === 'date' ? _sortDirection : 'asc'}
+                    active={sortBy === 'date'}
+                    direction={sortBy === 'date' ? sortDirection : 'asc'}
                     onClick={handleSort('date')}
                   >
                     Codage le
                   </TableSortLabel>
                 </TableCell>
                 <TableCell
-                  sortDirection={_sortBy === 'code' ? _sortDirection : false}
+                  sortDirection={sortBy === 'code' ? sortDirection : false}
                   align="center"
                   className={classes.tableHeadCell}
                 >
                   <TableSortLabel
-                    active={_sortBy === 'code'}
-                    direction={_sortBy === 'code' ? _sortDirection : 'asc'}
+                    active={sortBy === 'code'}
+                    direction={sortBy === 'code' ? sortDirection : 'asc'}
                     onClick={handleSort('code')}
                   >
                     Code

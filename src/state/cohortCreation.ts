@@ -459,11 +459,13 @@ const cohortCreationSlice = createSlice({
     },
     suspendCount: (state: CohortCreationState) => {
       state.count = {
-        ...state.count,
+        ...(state.count || {}),
         status:
-          state.count.status === 'pending' || state.count.status === 'started' || state.count.status === 'suspended'
+          (state.count || {}).status === 'pending' ||
+          (state.count || {}).status === 'started' ||
+          (state.count || {}).status === 'suspended'
             ? 'suspended'
-            : state.count.status
+            : (state.count || {}).status
       }
     },
     unsuspendCount: (state: CohortCreationState) => {

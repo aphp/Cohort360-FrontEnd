@@ -9,9 +9,8 @@ import { MedicationDataType } from 'types'
 import useStyles from './styles'
 
 const defaultMedication: MedicationDataType = {
-  type: 'Medication',
+  type: 'MedicationRequest',
   title: 'Critère de médicament',
-  mode: 'prescription',
   code: [],
   prescriptionType: [],
   administration: [],

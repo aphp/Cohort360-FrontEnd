@@ -267,7 +267,7 @@ type DocumentTableTypes = {
   deidentified: boolean | null
   sortBy?: string
   onChangeSortBy?: (_sortBy: string) => void
-  sortDirection?: 'asc' | 'desc'
+  sortDirection: 'asc' | 'desc'
   onChangeSortDirection?: (_sortDirection: 'asc' | 'desc') => void
 }
 const DocumentTable: React.FC<DocumentTableTypes> = React.memo(

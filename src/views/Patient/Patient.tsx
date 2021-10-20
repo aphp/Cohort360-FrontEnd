@@ -11,9 +11,10 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import PatientDocs from 'components/Patient/PatientDocs/PatientDocs'
 import PatientHeader from 'components/Patient/PatientHeader/PatientHeader'
 import PatientPreview from 'components/Patient/PatientPreview/PatientPreview'
-import PatientPMSI from 'components/Patient/PatientPMSI/PatientPMSI'
 import PatientSidebar from 'components/Patient/PatientSidebar/PatientSidebar'
 import PatientTimeline from 'components/Patient/PatientTimeline/PatientTimeline'
+import PatientPMSI from 'components/Patient/PatientPMSI/PatientPMSI'
+import PatientMedication from 'components/Patient/PatientMedication/PatientMedication'
 import TopBar from 'components/TopBar/TopBar'
 
 import services from 'services'
@@ -168,6 +169,13 @@ const Patient = () => {
                 component={Link}
                 to={`/patients/${patientId}/pmsi${groupId ? `?groupId=${groupId}` : ''}`}
               />
+              <Tab
+                className={classes.tabTitle}
+                label="Médicament"
+                value="medication"
+                component={Link}
+                to={`/patients/${patientId}/medication${groupId ? `?groupId=${groupId}` : ''}`}
+              />
             </Tabs>
           </Grid>
           <Grid className={classes.tabContainer}>
@@ -189,8 +197,6 @@ const Patient = () => {
                 documents={documents}
                 total={documentsTotal}
                 deidentifiedBoolean={deidentifiedBoolean}
-                sortBy={'date'}
-                sortDirection={'desc'}
               />
             )}
             {selectedTab === 'pmsi' && (
@@ -204,11 +210,21 @@ const Patient = () => {
                 ghm={ghm}
                 ghmTotal={ghmTotal}
                 deidentifiedBoolean={deidentifiedBoolean}
-                sortBy={'date'}
-                sortDirection={'desc'}
+              />
+            )}
+            {selectedTab === 'medication' && (
+              <PatientMedication
+                groupId={groupId}
+                patientId={patientId}
+                prescription={diagnostic}
+                prescriptionTotal={diagnosticTotal}
+                administration={consult}
+                administrationTotal={consultTotal}
+                deidentifiedBoolean={deidentifiedBoolean}
               />
             )}
           </Grid>
+
           <PatientSidebar
             openDrawer={isSidebarOpened}
             patients={cohort.originalPatients}
