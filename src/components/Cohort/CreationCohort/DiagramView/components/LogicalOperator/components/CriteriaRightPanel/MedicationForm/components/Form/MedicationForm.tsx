@@ -167,7 +167,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               onChange={(e, value) => onChangeValue('mode', value)}
             >
               <FormControlLabel value="prescription" control={<Radio />} label="Prescription" />
-              <FormControlLabel value="dispensation" control={<Radio />} label="Dispensation" />
+              {/* <FormControlLabel value="dispensation" control={<Radio />} label="Dispensation" /> */}
               <FormControlLabel value="administration" control={<Radio />} label="Administration" />
             </RadioGroup>
           </Grid>
