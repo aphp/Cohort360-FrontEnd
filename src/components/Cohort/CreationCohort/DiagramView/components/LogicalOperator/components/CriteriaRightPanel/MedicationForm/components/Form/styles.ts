@@ -21,7 +21,7 @@ const useStyles = makeStyles(() => ({
   titleLabel: { marginLeft: '1em' },
   formContainer: {
     overflow: 'auto',
-    maxHeight: 'calc(100vh - 135px)'
+    maxHeight: 'calc(100vh - 183px)'
   },
   inputContainer: {
     padding: '1em',
@@ -43,6 +43,7 @@ const useStyles = makeStyles(() => ({
     width: '100%',
     bottom: 0,
     left: 0,
+    background: '#fff',
     '& > button': {
       margin: '12px 8px'
     }

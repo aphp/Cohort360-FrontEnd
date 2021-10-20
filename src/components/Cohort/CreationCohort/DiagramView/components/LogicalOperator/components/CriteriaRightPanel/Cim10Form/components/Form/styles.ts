@@ -43,6 +43,7 @@ const useStyles = makeStyles(() => ({
     width: '100%',
     bottom: 0,
     left: 0,
+    background: '#fff',
     '& > button': {
       margin: '12px 8px'
     }

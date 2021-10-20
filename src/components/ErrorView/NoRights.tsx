@@ -21,12 +21,12 @@ const CohortRightOrNotExist = () => {
           </Grid>
           <Grid item style={{ padding: '8px 32px' }}>
             <Typography style={{ marginBottom: 16 }} variant="h5" align="center">
-              Vous n'avez accès à l'application Cohort360. Merci de vous rapprocher de votre coordinateur pour demander
-              la création de votre compte Cohort360 ainsi qu'un créneau de formation obligatoire pour utiliser à
+              Vous n'avez pas accès à l'application Cohort360. Merci de vous rapprocher de votre coordinateur pour
+              demander la création de votre compte Cohort360 ainsi qu'un créneau de formation obligatoire pour utiliser
               l'application.
             </Typography>
             <Typography style={{ marginBottom: 16 }} align="center">
-              S'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à
+              S'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante:
               dsi-id-recherche-support-cohort360@aphp.fr
             </Typography>
           </Grid>
