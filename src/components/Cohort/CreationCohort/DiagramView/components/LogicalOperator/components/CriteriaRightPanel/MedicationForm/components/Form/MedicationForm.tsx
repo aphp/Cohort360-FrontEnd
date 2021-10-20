@@ -44,11 +44,11 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
 
   const _onSubmit = () => {
     if (
-      (selectedCriteria.mode === 'prescription' &&
+      (selectedCriteria.type === 'MedicationRequest' &&
         selectedCriteria.code.length === 0 &&
         selectedCriteria.prescriptionType.length === 0 &&
         selectedCriteria.administration.length === 0) ||
-      (selectedCriteria.mode !== 'prescription' &&
+      (selectedCriteria.type !== 'MedicationRequest' &&
         selectedCriteria.code.length === 0 &&
         selectedCriteria.administration.length === 0)
     ) {
@@ -163,12 +163,12 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               className={classes.inputItem}
               aria-label="mode"
               name="criteria-mode-radio"
-              value={selectedCriteria.mode}
-              onChange={(e, value) => onChangeValue('mode', value)}
+              value={selectedCriteria.type}
+              onChange={(e, value) => onChangeValue('type', value)}
             >
-              <FormControlLabel value="prescription" control={<Radio />} label="Prescription" />
-              <FormControlLabel value="dispensation" control={<Radio />} label="Dispensation" />
-              <FormControlLabel value="administration" control={<Radio />} label="Administration" />
+              <FormControlLabel value="MedicationRequest" control={<Radio />} label="Prescription" />
+              {/* <FormControlLabel value="dispensation" control={<Radio />} label="Dispensation" /> */}
+              <FormControlLabel value="MedicationAdministration" control={<Radio />} label="Administration" />
             </RadioGroup>
           </Grid>
 
@@ -184,7 +184,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             onChange={(e, value) => onChangeValue('code', value)}
           />
 
-          {selectedCriteria.mode === 'prescription' && (
+          {selectedCriteria.type === 'MedicationRequest' && (
             <Autocomplete
               multiple
               id="criteria-prescription-type-autocomplete"
