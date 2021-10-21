@@ -3,7 +3,7 @@ import { smallDrawerWidth, largeDrawerWidth } from 'components/LeftSideBar/LeftS
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    height: '100vh'
+    minHeight: 'calc(100vh + 20px)'
   },
   appBar: {
     marginLeft: smallDrawerWidth,
@@ -26,8 +26,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1
   },
   container: {
-    paddingTop: theme.spacing(4),
-    backgroundColor: theme.background
+    paddingTop: theme.spacing(4)
   },
   paper: {
     padding: theme.spacing(2),

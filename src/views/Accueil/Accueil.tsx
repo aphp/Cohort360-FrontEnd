@@ -88,7 +88,11 @@ const Accueil: React.FC = () => {
           {lastConnection}
         </Typography>
       </Container>
-      <Container maxWidth="lg" className={classes.container} style={{ minHeight: 'calc(100vh - 70px)' }}>
+      <Container
+        maxWidth="lg"
+        className={classes.container}
+        style={{ minHeight: 'calc(100vh - 70px)', marginBottom: 8 }}
+      >
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={6}>
             <Grid item>
