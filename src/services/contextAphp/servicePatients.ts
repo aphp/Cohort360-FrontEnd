@@ -50,6 +50,22 @@ export interface IServicesPatients {
     pmsiData?: PMSIEntry<IClaim | ICondition | IProcedure>[]
     pmsiTotal?: number
   }>
+  fetchMedication: (
+    deidentified: boolean,
+    page: number,
+    patientId: string,
+    selectedTab: 'prescription' | 'administration',
+    searchInput: string,
+    nda: string,
+    sortBy: string,
+    sortDirection: string,
+    groupId?: string,
+    startDate?: string | null,
+    endDate?: string | null
+  ) => Promise<{
+    medicationData?: any[]
+    medicationTotal?: number
+  }>
   fetchDocuments: (
     deidentified: boolean,
     sortBy: string,
@@ -308,6 +324,13 @@ const servicesPatients: IServicesPatients = {
       pmsiData,
       pmsiTotal
     }
+  },
+
+  fetchMedication: async () => {
+    const medicationData: any[] = []
+    const medicationTotal = 0
+
+    return { medicationData, medicationTotal }
   },
 
   fetchDocuments: async (
