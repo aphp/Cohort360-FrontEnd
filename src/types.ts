@@ -12,7 +12,9 @@ import {
   IOperationOutcome,
   PatientGenderKind,
   IObservation,
-  IDocumentReference
+  IDocumentReference,
+  IMedicationRequest,
+  IMedicationAdministration
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 export interface TypedEntry<T extends IResourceList> extends IBundle_Entry {
@@ -64,6 +66,12 @@ export type CohortPatient = IPatient & {
 }
 
 export type PMSIEntry<T extends IProcedure | ICondition | IClaim> = T & {
+  documents?: (CohortComposition | IDocumentReference)[]
+  serviceProvider?: string
+  NDA?: string
+}
+
+export type MedicationEntry<T extends IMedicationRequest | IMedicationAdministration> = T & {
   documents?: (CohortComposition | IDocumentReference)[]
   serviceProvider?: string
   NDA?: string
@@ -266,6 +274,10 @@ export type PatientData = {
   diagnosticTotal?: number
   ghm?: PMSIEntry<IClaim>[]
   ghmTotal?: number
+  medicationRequest?: IMedicationRequest[]
+  medicationRequestTotal?: number
+  medicationAdministration?: IMedicationAdministration[]
+  medicationAdministrationTotal?: number
 }
 
 export type CriteriaGroupType = {

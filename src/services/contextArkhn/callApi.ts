@@ -2,7 +2,6 @@ import apiFhir from '../apiFhir'
 
 import { FHIR_API_Response } from 'types'
 import {
-  PatientGenderKind,
   IOrganization,
   IGroup,
   IPatient,
@@ -12,7 +11,9 @@ import {
   IPractitionerRole,
   IProcedure,
   IClaim,
-  ICondition
+  ICondition,
+  IMedicationRequest,
+  IMedicationAdministration
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 const reducer = (accumulator: any, currentValue: any) =>
@@ -77,7 +78,7 @@ export const fetchGroup = async (args: fetchGroupProps) => {
 
   if (_list && _list.length > 0)                   options = [...options, `_list=${_list.reduce(reducer)}`]                                     // eslint-disable-line
   if (_elements && _elements.length > 0)           options = [...options, `_elements=${_elements.reduce(reducer)}`]                             // eslint-disable-line
-  if (managingEntity && managingEntity.length > 0) options = [...options, `managing-entity=${managingEntity.reduce(reducer)}`]                   // eslint-disable-line
+  if (managingEntity && managingEntity.length > 0) options = [...options, `managing-entity=${managingEntity.reduce(reducer)}`]                  // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<IGroup>>(`/Group?${options.reduce(optionsReducer)}`)
 
@@ -100,7 +101,7 @@ type fetchPatientProps = {
   offset?: number
   _sort?: string
   sortDirection?: 'asc' | 'desc'
-  gender?: PatientGenderKind
+  gender?: string
   minBirthdate?: string
   maxBirthdate?: string
   searchBy?: string
@@ -455,12 +456,80 @@ export const fetchCondition = async (args: fetchConditionProps) => {
   if (_text)                                       options = [...options, `_text=${_text}`]                                                     // eslint-disable-line
   if (status)                                      options = [...options, `status=${status}`]                                                   // eslint-disable-line
   if (encounterIdentifier)                         options = [...options, `encounter.identifier=${encounterIdentifier}`]                        // eslint-disable-line
-  if (minRecordedDate)                             options = [...options, `recorded-date=ge${minRecordedDate}`]                                          // eslint-disable-line
-  if (maxRecordedDate)                             options = [...options, `recorded-date=le${maxRecordedDate}`]                                          // eslint-disable-line
+  if (minRecordedDate)                             options = [...options, `recorded-date=ge${minRecordedDate}`]                                 // eslint-disable-line
+  if (maxRecordedDate)                             options = [...options, `recorded-date=le${maxRecordedDate}`]                                 // eslint-disable-line
 
   if (_list && _list.length > 0)                   options = [...options, `_list=${_list.reduce(reducer)}`]                                     // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<ICondition>>(`/Condition?${options.reduce(optionsReducer)}`)
+
+  return response
+}
+
+type fetchMedicationRequestProps = {
+  id?: string
+  size?: number
+  offset?: number
+  _sort?: string
+  sortDirection?: 'asc' | 'desc'
+  encounter?: string
+  patient?: string
+  _list?: string[]
+}
+export const fetchMedicationRequest = async (args: fetchMedicationRequestProps) => {
+  const { id, size, offset, _sort, sortDirection, encounter, patient } = args
+  const _sortDirection = sortDirection === 'desc' ? '-' : ''
+  let { _list } = args
+
+  _list = _list ? _list.filter(uniq) : []
+
+  let options: string[] = []
+  if (id)                                          options = [...options, `id=${id}`]                                                           // eslint-disable-line
+  if (size !== undefined)                          options = [...options, `size=${size}`]                                                       // eslint-disable-line
+  if (offset)                                      options = [...options, `offset=${offset}`]                                                   // eslint-disable-line
+  if (_sort)                                       options = [...options, `_sort=${_sortDirection}${_sort}`]                                    // eslint-disable-line
+  if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
+  if (encounter)                                   options = [...options, `encounter=${encounter}`]                                             // eslint-disable-line
+
+  if (_list && _list.length > 0)                   options = [...options, `_list=${_list.reduce(reducer)}`]                                     // eslint-disable-line
+
+  const response = await apiFhir.get<FHIR_API_Response<IMedicationRequest>>(
+    `/MedicationRequest?${options.reduce(optionsReducer)}`
+  )
+
+  return response
+}
+
+type fetchMedicationAdministrationProps = {
+  id?: string
+  size?: number
+  offset?: number
+  _sort?: string
+  sortDirection?: 'asc' | 'desc'
+  encounter?: string
+  patient?: string
+  _list?: string[]
+}
+export const fetchMedicationAdministration = async (args: fetchMedicationAdministrationProps) => {
+  const { id, size, offset, _sort, sortDirection, encounter, patient } = args
+  const _sortDirection = sortDirection === 'desc' ? '-' : ''
+  let { _list } = args
+
+  _list = _list ? _list.filter(uniq) : []
+
+  let options: string[] = []
+  if (id)                                          options = [...options, `id=${id}`]                                                           // eslint-disable-line
+  if (size !== undefined)                          options = [...options, `size=${size}`]                                                       // eslint-disable-line
+  if (offset)                                      options = [...options, `offset=${offset}`]                                                   // eslint-disable-line
+  if (_sort)                                       options = [...options, `_sort=${_sortDirection}${_sort}`]                                    // eslint-disable-line
+  if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
+  if (encounter)                                   options = [...options, `encounter=${encounter}`]                                             // eslint-disable-line
+
+  if (_list && _list.length > 0)                   options = [...options, `_list=${_list.reduce(reducer)}`]                                     // eslint-disable-line
+
+  const response = await apiFhir.get<FHIR_API_Response<IMedicationAdministration>>(
+    `/MedicationAdministration?${options.reduce(optionsReducer)}`
+  )
 
   return response
 }

@@ -26,7 +26,9 @@ import {
   ICondition,
   IEncounter,
   IProcedure,
-  IDocumentReference
+  IDocumentReference,
+  IMedicationRequest,
+  IMedicationAdministration
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import clsx from 'clsx'
@@ -49,6 +51,12 @@ const Patient = () => {
   const [diagnostic, setDiagnostic] = useState<PMSIEntry<ICondition>[] | undefined>(undefined)
   const [diagnosticTotal, setDiagnosticTotal] = useState(0)
   const [ghm, setGhm] = useState<PMSIEntry<IClaim>[] | undefined>(undefined)
+  const [medicationRequest, setMedicationRequest] = useState<IMedicationRequest[] | undefined>(undefined)
+  const [medicationRequestTotal, setMedicationRequestTotal] = useState(0)
+  const [medicationAdministration, setMedicationAdministration] = useState<IMedicationAdministration[] | undefined>(
+    undefined
+  )
+  const [medicationAdministrationTotal, setMedicationAdministrationTotal] = useState(0)
   const [ghmTotal, setGhmTotal] = useState(0)
   const [documents, setDocuments] = useState<(IComposition | IDocumentReference)[] | undefined>(undefined)
   const [documentsTotal, setDocumentsTotal] = useState(0)
@@ -82,6 +90,12 @@ const Patient = () => {
       setDiagnosticTotal(patientResp?.diagnosticTotal ?? 0)
       setGhm(patientResp?.ghm)
       setGhmTotal(patientResp?.ghmTotal ?? 0)
+
+      setMedicationRequest(patientResp?.medicationRequest)
+      setMedicationRequestTotal(patientResp?.medicationRequestTotal ?? 0)
+      setMedicationAdministration(patientResp?.medicationAdministration)
+      setMedicationAdministrationTotal(patientResp?.medicationAdministrationTotal ?? 0)
+
       setPatient(patientResp?.patient)
       setDeidentifiedBoolean(
         patientResp?.patient?.extension?.find((extension) => extension.url === 'deidentified')?.valueBoolean ?? true
@@ -216,10 +230,10 @@ const Patient = () => {
               <PatientMedication
                 groupId={groupId}
                 patientId={patientId}
-                prescription={diagnostic}
-                prescriptionTotal={diagnosticTotal}
-                administration={consult}
-                administrationTotal={consultTotal}
+                prescription={medicationRequest}
+                prescriptionTotal={medicationRequestTotal}
+                administration={medicationAdministration}
+                administrationTotal={medicationAdministrationTotal}
                 deidentifiedBoolean={deidentifiedBoolean}
               />
             )}

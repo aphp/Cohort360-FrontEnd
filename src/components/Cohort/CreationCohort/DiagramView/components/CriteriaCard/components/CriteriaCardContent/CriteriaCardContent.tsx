@@ -855,8 +855,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
         const displaySelectedCode = (codes: { id: string; label: string }[]) => {
           let currentCode: string[] = []
-          console.log('codes :>> ', codes)
-          console.log('data?.atcData :>> ', data?.atcData)
           for (const code of codes) {
             const selectedCodeData =
               data?.atcData && data?.atcData !== 'loading'
@@ -903,12 +901,8 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               ? [...currentAdministration, selectedAdministration.label]
               : currentAdministration
           }
-
-          console.log('currentAdministration :>> ', currentAdministration)
           return currentAdministration && currentAdministration.length > 0 ? currentAdministration.reduce(reducer) : ''
         }
-
-        console.log('_currentCriteria :>> ', _currentCriteria)
 
         content = [
           _currentCriteria && _currentCriteria?.type && (
