@@ -374,7 +374,7 @@ const servicesCohorts: IServicesCohorts = {
     try {
       const { cohortId, motivation, tables, output_format = 'csv' } = args
 
-      const exportResponse = new Promise((resolve) => {
+      const exportResponse = await new Promise((resolve) => {
         resolve(
           apiPortail.post('/exports/', {
             cohort_id: cohortId,
