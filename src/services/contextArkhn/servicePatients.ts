@@ -7,7 +7,8 @@ import {
   PatientData,
   CohortEncounter,
   CohortPatient,
-  SearchByTypes
+  SearchByTypes,
+  MedicationEntry
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -23,9 +24,20 @@ import {
   IIdentifier,
   IProcedure,
   IDocumentReference,
-  IPatient
+  IPatient,
+  IMedicationRequest,
+  IMedicationAdministration
 } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { fetchPatient, fetchEncounter, fetchClaim, fetchCondition, fetchProcedure, fetchComposition } from './callApi'
+import {
+  fetchPatient,
+  fetchEncounter,
+  fetchClaim,
+  fetchCondition,
+  fetchProcedure,
+  fetchComposition,
+  fetchMedicationRequest,
+  fetchMedicationAdministration
+} from './callApi'
 
 export interface IServicesPatients {
   fetchPatientsCount: () => Promise<number>
@@ -63,7 +75,7 @@ export interface IServicesPatients {
     startDate?: string | null,
     endDate?: string | null
   ) => Promise<{
-    medicationData?: any[]
+    medicationData?: MedicationEntry<IMedicationAdministration | IMedicationRequest>[]
     medicationTotal?: number
   }>
   fetchDocuments: (
@@ -315,7 +327,7 @@ const servicesPatients: IServicesPatients = {
 
     const pmsiData =
       pmsiResp.data.resourceType === 'Bundle'
-        ? await fillNDAAndServiceProvider(deidentified, getApiResponseResources(pmsiResp), groupId)
+        ? await fillNDAAndServiceProviderPMSI(deidentified, getApiResponseResources(pmsiResp), groupId)
         : undefined
 
     const pmsiTotal = pmsiResp.data.resourceType === 'Bundle' ? pmsiResp.data.total : 0
@@ -326,9 +338,40 @@ const servicesPatients: IServicesPatients = {
     }
   },
 
-  fetchMedication: async () => {
-    const medicationData: any[] = []
-    const medicationTotal = 0
+  fetchMedication: async (deidentified, page, patientId, selectedTab, sortBy, sortDirection, groupId) => {
+    let medicationResp: AxiosResponse<FHIR_API_Response<IMedicationRequest | IMedicationAdministration>> | null = null
+
+    switch (selectedTab) {
+      case 'prescription':
+        medicationResp = await fetchMedicationRequest({
+          offset: page ? (page - 1) * 20 : 0,
+          size: 20,
+          _list: groupId ? [groupId] : [],
+          patient: patientId,
+          _sort: sortBy,
+          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc'
+        })
+        break
+      case 'administration':
+        medicationResp = await fetchMedicationAdministration({
+          offset: page ? (page - 1) * 20 : 0,
+          size: 20,
+          _list: groupId ? [groupId] : [],
+          patient: patientId,
+          _sort: sortBy,
+          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc'
+        })
+        break
+      default:
+        medicationResp = null
+        break
+    }
+
+    if (medicationResp === null) return {}
+
+    const medicationData: MedicationEntry<IMedicationAdministration | IMedicationRequest>[] | undefined =
+      await fillNDAAndServiceProviderMedication(deidentified, getApiResponseResources(medicationResp), groupId)
+    const medicationTotal = medicationResp.data.resourceType === 'Bundle' ? medicationResp.data.total : 0
 
     return { medicationData, medicationTotal }
   },
@@ -380,48 +423,68 @@ const servicesPatients: IServicesPatients = {
   },
 
   fetchPatient: async (patientId, groupId) => {
-    const [patientResponse, procedureResponse, encounterResponse, diagnosticResponse, ghmResponse, documentsResponse] =
-      await Promise.all([
-        fetchPatient({ _id: patientId, _list: groupId ? [groupId] : [] }),
-        fetchProcedure({
-          patient: patientId,
-          _sort: 'date',
-          sortDirection: 'desc',
-          status: 'complete',
-          size: 20,
-          _list: groupId ? [groupId] : []
-        }),
-        fetchEncounter({
-          patient: patientId,
-          type: 'VISIT',
-          status: ['arrived', 'triaged', 'in-progress', 'onleave', 'finished', 'unknown'],
-          _sort: 'start-date',
-          sortDirection: 'desc',
-          _list: groupId ? [groupId] : []
-        }),
-        fetchCondition({
-          patient: patientId,
-          _sort: 'recorded-date',
-          sortDirection: 'desc',
-          size: 20,
-          _list: groupId ? [groupId] : []
-        }),
-        fetchClaim({
-          patient: patientId,
-          _sort: 'created',
-          sortDirection: 'desc',
-          size: 20,
-          _list: groupId ? [groupId] : []
-        }),
-        fetchComposition({
-          patient: patientId,
-          _sort: 'date',
-          sortDirection: 'desc',
-          size: 20,
-          _list: groupId ? [groupId] : [],
-          _elements: ['status', 'type', 'encounter', 'date', 'title']
-        })
-      ])
+    const [
+      patientResponse,
+      procedureResponse,
+      encounterResponse,
+      diagnosticResponse,
+      ghmResponse,
+      documentsResponse,
+      medicationRequestResponse,
+      medicationAdministrationResponse
+    ] = await Promise.all([
+      fetchPatient({ _id: patientId, _list: groupId ? [groupId] : [] }),
+      fetchProcedure({
+        patient: patientId,
+        _sort: 'date',
+        sortDirection: 'desc',
+        status: 'complete',
+        size: 20,
+        _list: groupId ? [groupId] : []
+      }),
+      fetchEncounter({
+        patient: patientId,
+        type: 'VISIT',
+        status: ['arrived', 'triaged', 'in-progress', 'onleave', 'finished', 'unknown'],
+        _sort: 'start-date',
+        sortDirection: 'desc',
+        _list: groupId ? [groupId] : []
+      }),
+      fetchCondition({
+        patient: patientId,
+        _sort: 'recorded-date',
+        sortDirection: 'desc',
+        size: 20,
+        _list: groupId ? [groupId] : []
+      }),
+      fetchClaim({
+        patient: patientId,
+        _sort: 'created',
+        sortDirection: 'desc',
+        size: 20,
+        _list: groupId ? [groupId] : []
+      }),
+      fetchComposition({
+        patient: patientId,
+        _sort: 'date',
+        sortDirection: 'desc',
+        size: 20,
+        _list: groupId ? [groupId] : [],
+        _elements: ['status', 'type', 'encounter', 'date', 'title']
+      }),
+      fetchMedicationRequest({
+        size: 20,
+        _list: groupId ? [groupId] : [],
+        patient: patientId,
+        _sort: '_lastUpdated'
+      }),
+      fetchMedicationAdministration({
+        size: 20,
+        _list: groupId ? [groupId] : [],
+        patient: patientId,
+        _sort: '_lastUpdated'
+      })
+    ])
 
     const patientData = getApiResponseResources(patientResponse)
 
@@ -442,7 +505,11 @@ const servicesPatients: IServicesPatients = {
     const consult =
       procedureResponse.data.resourceType === 'Bundle'
         ? await getProcedureDocuments(
-            await fillNDAAndServiceProvider(deidentifiedBoolean, getApiResponseResources(procedureResponse), groupId),
+            await fillNDAAndServiceProviderPMSI(
+              deidentifiedBoolean,
+              getApiResponseResources(procedureResponse),
+              groupId
+            ),
             deidentifiedBoolean,
             groupId
           )
@@ -452,17 +519,33 @@ const servicesPatients: IServicesPatients = {
 
     const diagnostic =
       diagnosticResponse.data.resourceType === 'Bundle'
-        ? await fillNDAAndServiceProvider(deidentifiedBoolean, getApiResponseResources(diagnosticResponse), groupId)
+        ? await fillNDAAndServiceProviderPMSI(deidentifiedBoolean, getApiResponseResources(diagnosticResponse), groupId)
         : undefined
 
     const diagnosticTotal = diagnosticResponse.data.resourceType === 'Bundle' ? diagnosticResponse.data.total : 0
 
     const ghm =
       ghmResponse.data.resourceType === 'Bundle'
-        ? await fillNDAAndServiceProvider(deidentifiedBoolean, getApiResponseResources(ghmResponse), groupId)
+        ? await fillNDAAndServiceProviderPMSI(deidentifiedBoolean, getApiResponseResources(ghmResponse), groupId)
         : undefined
 
     const ghmTotal = ghmResponse.data.resourceType === 'Bundle' ? ghmResponse.data.total : 0
+
+    const medicationRequest =
+      medicationRequestResponse.data.resourceType === 'Bundle'
+        ? getApiResponseResources(medicationRequestResponse)
+        : undefined
+
+    const medicationRequestTotal =
+      medicationRequestResponse.data.resourceType === 'Bundle' ? medicationRequestResponse.data.total : 0
+
+    const medicationAdministration =
+      medicationAdministrationResponse.data.resourceType === 'Bundle'
+        ? getApiResponseResources(medicationAdministrationResponse)
+        : undefined
+
+    const medicationAdministrationTotal =
+      medicationAdministrationResponse.data.resourceType === 'Bundle' ? medicationAdministrationResponse.data.total : 0
 
     const patient = patientResponse.data
       ? ({
@@ -486,6 +569,10 @@ const servicesPatients: IServicesPatients = {
       diagnosticTotal,
       ghm,
       ghmTotal,
+      medicationRequest,
+      medicationRequestTotal,
+      medicationAdministration,
+      medicationAdministrationTotal,
       patient
     }
   },
@@ -531,7 +618,7 @@ const servicesPatients: IServicesPatients = {
 
 export default servicesPatients
 
-export async function fillNDAAndServiceProvider<T extends IProcedure | ICondition | IClaim>(
+export async function fillNDAAndServiceProviderPMSI<T extends IProcedure | ICondition | IClaim>(
   deidentifiedBoolean?: boolean,
   pmsi?: T[],
   groupId?: string
@@ -601,6 +688,69 @@ export async function fillNDAAndServiceProvider<T extends IProcedure | IConditio
   }
 
   return pmsiEntries
+}
+
+export async function fillNDAAndServiceProviderMedication<T extends IMedicationRequest | IMedicationAdministration>(
+  deidentifiedBoolean?: boolean,
+  medication?: T[],
+  groupId?: string
+): Promise<MedicationEntry<T>[] | undefined> {
+  if (!medication) {
+    return undefined
+  }
+
+  const medicationEntries: MedicationEntry<T>[] = medication
+  const listeEncounterIds = medicationEntries
+    .map((e) =>
+      e.resourceType === 'MedicationRequest'
+        ? // @ts-ignore
+          e.encounter?.reference?.replace(/^Encounter\//, '')
+        : // @ts-ignore
+          e.context?.reference?.replace(/^Encounter\//, '')
+    )
+    .filter((s): s is string => undefined !== s)
+
+  const noDuplicatesList: string[] = listeEncounterIds.filter((item, index, array) => array.indexOf(item) === index)
+  if (noDuplicatesList.length === 0) return medicationEntries
+
+  const encounters = await fetchEncounter({
+    _id: noDuplicatesList.join(','),
+    type: 'VISIT',
+    _elements: ['serviceProvider', 'identifier'],
+    _list: groupId ? [groupId] : []
+  })
+
+  if (!encounters || encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
+    return []
+  }
+
+  const listeEncounters = encounters.data.entry.map((e: any) => e.resource)
+
+  for (const entry of medicationEntries) {
+    const medicationEncounterId =
+      entry.resourceType === 'MedicationRequest'
+        ? // @ts-ignore
+          entry.encounter?.reference?.replace(/^Encounter\//, '')
+        : // @ts-ignore
+          entry.context?.reference?.replace(/^Encounter\//, '')
+
+    const foundEncounter = listeEncounters.find((encounter: any) => encounter.id === medicationEncounterId)
+    if (!foundEncounter) continue
+
+    entry.serviceProvider = foundEncounter.serviceProvider.display ?? 'Non renseigné'
+    if (deidentifiedBoolean) {
+      entry.NDA = foundEncounter.id
+    } else if (foundEncounter.identifier) {
+      const nda = foundEncounter.identifier.filter((identifier: IIdentifier) => {
+        return identifier.type?.coding?.[0].code === 'NDA'
+      })
+      entry.NDA = nda[0].value
+    } else {
+      entry.NDA = 'Inconnu'
+    }
+  }
+
+  return medicationEntries
 }
 
 export const fillNDAAndServiceProviderDocs = async (

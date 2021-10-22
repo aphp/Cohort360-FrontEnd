@@ -26,20 +26,23 @@ import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
+import { MedicationEntry } from 'types'
+import { IMedicationRequest, IMedicationAdministration } from '@ahryman40k/ts-fhir-types/lib/R4'
+
 import services from 'services'
 
 import useStyles from './styles'
 
-type PatientPMSITypes = {
+type PatientMedicationTypes = {
   groupId?: string
   patientId: string
-  prescription?: any[]
+  prescription?: MedicationEntry<IMedicationRequest>[]
   prescriptionTotal: number
-  administration?: any[]
+  administration?: MedicationEntry<IMedicationAdministration>[]
   administrationTotal: number
   deidentifiedBoolean: boolean
 }
-const PatientPMSI: React.FC<PatientPMSITypes> = ({
+const PatientMedication: React.FC<PatientMedicationTypes> = ({
   groupId,
   patientId,
   prescription,
@@ -79,6 +82,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
     endDate?: string | null
   ) => {
     setLoadingStatus(true)
+    if (!services.patients.fetchMedication || typeof services.patients?.fetchMedication !== 'function') return
 
     const medicationResp = await services.patients.fetchMedication(
       deidentified,
@@ -331,31 +335,40 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
               {data ? (
                 <>
                   {data.map((row) => {
+                    const nda = row.NDA
+                    const date = selectedTab === 'prescription' ? row.dispenseRequest?.validityPeriod?.start : ''
+                    const codeATC = selectedTab === 'prescription' ? row.category?.[0]?.id : row.category?.id
+
+                    const codeUCD = row.contained?.[0]?.code?.coding?.[0]?.id
+                    const name = row.contained?.[0]?.code?.coding?.[0]?.display
+
+                    const prescriptionType =
+                      selectedTab === 'prescription' &&
+                      (row.extension?.find((extension: any) => extension.url === 'type') || {}).valueString
+                    const administrationRoute =
+                      selectedTab === 'prescription'
+                        ? row.dosageInstruction?.[0]?.route?.text
+                        : row.dosage?.route?.coding?.[0]?.display
+                    const serviceProvider = row.serviceProvider
+
                     return (
                       <TableRow className={classes.tableBodyRows} key={row.id}>
-                        <TableCell align="left">{row.NDA ?? 'Inconnu'}</TableCell>
+                        <TableCell align="left">{nda ?? 'Inconnu'}</TableCell>
                         <TableCell align="left">
-                          {selectedTab === 'prescription' &&
-                            row.recordedDate &&
-                            (new Date(row.recordedDate).toLocaleDateString('fr-FR') ?? 'Date inconnue')}
-                          {selectedTab === 'administration' &&
-                            row.created &&
-                            (new Date(row.created).toLocaleDateString('fr-FR') ?? 'Date inconnue')}
+                          {date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}
                         </TableCell>
-                        <TableCell align="center">
-                          {selectedTab === 'prescription' && row.code_atc}
-                          {selectedTab === 'administration' && row.code_atc}
-                        </TableCell>
+                        <TableCell align="center">{codeATC ?? '-'}</TableCell>
+                        <TableCell align="center">{codeUCD === 'No matching concept' ? '-' : codeUCD ?? '-'}</TableCell>
                         <TableCell align="center" className={classes.libelle}>
-                          {selectedTab === 'prescription' && row.code_ucd}
-                          {selectedTab === 'administration' && row.code_ucd}
+                          {name === 'No matching concept' ? '-' : name ?? 'Non renseigné'}
                         </TableCell>
-                        <TableCell align="center">{row.name ?? 'Non renseigné'}</TableCell>
                         {selectedTab === 'prescription' && (
-                          <TableCell align="center">{row.prescriptionType ?? 'Non renseigné'}</TableCell>
+                          <TableCell align="center">{prescriptionType ?? 'Non renseigné'}</TableCell>
                         )}
-                        <TableCell align="center">{row.route ?? 'Non renseigné'}</TableCell>
-                        <TableCell align="center">{row.serviceProvider ?? 'Non renseigné'}</TableCell>
+                        <TableCell align="center">
+                          {administrationRoute === 'No matching concept' ? '-' : administrationRoute ?? 'Non renseigné'}
+                        </TableCell>
+                        <TableCell align="center">{serviceProvider ?? 'Non renseigné'}</TableCell>
                       </TableRow>
                     )
                   })}
@@ -380,4 +393,4 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
     </Grid>
   )
 }
-export default PatientPMSI
+export default PatientMedication
