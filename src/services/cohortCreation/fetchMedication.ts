@@ -63,6 +63,7 @@ export const fetchAtcHierarchy = async (atcParent: string) => {
               }))
               // V--[ @TODO: This is a hot fix, remove this after a clean of data ]--V
               .filter((atcData: any) => atcData.label.search(new RegExp(/^[A-Z] - /, 'gi')) !== -1)
+              .filter((atcData: any) => atcData.label.search(new RegExp(/^[X-Y] - /, 'gi')) !== 0)
           : []
       return ATCList
     } else {
