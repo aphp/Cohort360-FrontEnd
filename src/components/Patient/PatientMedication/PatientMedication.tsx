@@ -26,10 +26,14 @@ import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
+import MedicationFilters from 'components/Filters/MedicationFilters/MedicationFilters'
+
 import { MedicationEntry } from 'types'
 import { IMedicationRequest, IMedicationAdministration } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import services from 'services'
+
+import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
 
@@ -53,15 +57,21 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
 }) => {
   const classes = useStyles()
 
+  const [loadingStatus, setLoadingStatus] = useState(false)
   const [selectedTab, selectTab] = useState<'prescription' | 'administration'>('prescription')
   const [data, setData] = useState<any[]>([])
-  const [loadingStatus, setLoadingStatus] = useState(false)
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState('')
   const [open, setOpen] = useState<string | null>(null)
-  const [nda, setNda] = useState('')
-  const [filter, setFilter] = useState<{ startDate: string | null; endDate: string | null }>({
+  const [filter, setFilter] = useState<{
+    nda: string
+    startDate: string | null
+    endDate: string | null
+    selectedPrescriptionTypes: { id: string; label: string }[]
+  }>({
+    nda: '',
+    selectedPrescriptionTypes: [],
     startDate: null,
     endDate: null
   })
@@ -112,7 +122,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
       patientId,
       selectedTab,
       '',
-      nda,
+      filter.nda,
       sort.by,
       sort.direction,
       filter.startDate,
@@ -134,7 +144,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
       patientId,
       selectedTab,
       searchInput,
-      nda,
+      filter.nda,
       property,
       newDirection,
       filter.startDate,
@@ -151,7 +161,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
       patientId,
       selectedTab,
       searchInput,
-      nda,
+      filter.nda,
       sort.by,
       sort.direction,
       filter.startDate,
@@ -163,15 +173,19 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
     setSearchInput(event.target.value)
   }
 
-  const handleDeleteChip = (filterName: string, value?: string) => {
+  const handleChangeFilter = (
+    filterName: 'nda' | 'startDate' | 'endDate' | 'selectedPrescriptionTypes',
+    value: any
+  ) => {
     switch (filterName) {
+      case 'selectedPrescriptionTypes':
+      case 'nda':
       case 'startDate':
-        setFilter((prevState) => ({ ...prevState, startDate: null }))
-        break
       case 'endDate':
-        setFilter((prevState) => ({ ...prevState, endDate: null }))
+        setFilter((prevState) => ({ ...prevState, [filterName]: value }))
         break
       default:
+        console.log('filterName :>> ', filterName)
         console.log('value :>> ', value)
         break
     }
@@ -190,13 +204,17 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
 
   useEffect(() => {
     handleChangePage()
-  }, [nda, filter]) // eslint-disable-line
+  }, [filter]) // eslint-disable-line
 
   useEffect(() => {
     setPage(1)
     setSearchInput('')
-    setNda('')
-    setFilter({ startDate: null, endDate: null })
+    setFilter({
+      nda: '',
+      selectedPrescriptionTypes: [],
+      startDate: null,
+      endDate: null
+    })
     switch (selectedTab) {
       case 'prescription':
         setData(prescription ?? [])
@@ -270,15 +288,49 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
           >
             Filtrer
           </Button>
+
+          <MedicationFilters
+            open={open === 'filter'}
+            onClose={() => setOpen(null)}
+            onSubmit={() => setOpen(null)}
+            nda={filter.nda}
+            onChangeNda={(_nda: string) => handleChangeFilter('nda', _nda)}
+            startDate={filter.startDate}
+            onChangeStartDate={(_startDate: string | null) => handleChangeFilter('startDate', _startDate)}
+            endDate={filter.endDate}
+            onChangeEndDate={(_endDate: string | null) => handleChangeFilter('endDate', _endDate)}
+            deidentified={deidentifiedBoolean}
+            selectedPrescriptionTypes={filter.selectedPrescriptionTypes}
+            onChangeSelectedPrescriptionTypes={(_selectedPrescriptionTypes: { id: string; label: string }[]) =>
+              handleChangeFilter('selectedPrescriptionTypes', _selectedPrescriptionTypes)
+            }
+            showPrescriptionTypes={selectedTab === 'prescription'}
+          />
         </div>
       </Grid>
 
       <Grid>
+        {filter.selectedPrescriptionTypes.length > 0 &&
+          filter.selectedPrescriptionTypes.map((prescriptionType) => (
+            <Chip
+              className={classes.chips}
+              key={prescriptionType.id}
+              label={capitalizeFirstLetter(prescriptionType.label)}
+              onDelete={() =>
+                handleChangeFilter(
+                  'selectedPrescriptionTypes',
+                  filter.selectedPrescriptionTypes.filter(({ id }) => id !== prescriptionType.id)
+                )
+              }
+              color="primary"
+              variant="outlined"
+            />
+          ))}
         {filter.startDate && (
           <Chip
             className={classes.chips}
             label={`Après le : ${moment(filter.startDate).format('DD/MM/YYYY')}`}
-            onDelete={() => handleDeleteChip('startDate')}
+            onDelete={() => handleChangeFilter('startDate', null)}
             color="primary"
             variant="outlined"
           />
@@ -287,7 +339,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
           <Chip
             className={classes.chips}
             label={`Avant le : ${moment(filter.endDate).format('DD/MM/YYYY')}`}
-            onDelete={() => handleDeleteChip('endDate')}
+            onDelete={() => handleChangeFilter('endDate', null)}
             color="primary"
             variant="outlined"
           />
@@ -326,6 +378,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                 <TableCell align="center" className={classes.tableHeadCell}>
                   Voie d'administration
                 </TableCell>
+                {selectedTab === 'administration' && (
+                  <TableCell align="center" className={classes.tableHeadCell}>
+                    Quantité
+                  </TableCell>
+                )}
                 <TableCell align="center" className={classes.tableHeadCell}>
                   Unité exécutrice
                 </TableCell>
@@ -352,6 +409,8 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                       selectedTab === 'prescription'
                         ? row.dosageInstruction?.[0]?.route?.text
                         : row.dosage?.route?.coding?.[0]?.display
+                    const dose = selectedTab === 'administration' && 'XX'
+                    const unit = selectedTab === 'administration' && row.dosage?.dose?.unit
                     const serviceProvider = row.serviceProvider
 
                     return (
@@ -360,7 +419,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                         <TableCell align="left">
                           {date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}
                         </TableCell>
-                        <TableCell align="center">{codeATC ?? '-'}</TableCell>
+                        <TableCell align="center">{codeATC === 'No matching concept' ? '-' : codeATC ?? '-'}</TableCell>
                         <TableCell align="center">{codeUCD === 'No matching concept' ? '-' : codeUCD ?? '-'}</TableCell>
                         <TableCell align="center" className={classes.libelle}>
                           {name === 'No matching concept' ? '-' : name ?? 'Non renseigné'}
@@ -371,6 +430,12 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                         <TableCell align="center">
                           {administrationRoute === 'No matching concept' ? '-' : administrationRoute ?? 'Non renseigné'}
                         </TableCell>
+                        {selectedTab === 'administration' && (
+                          <TableCell align="center">
+                            <Typography>{dose}</Typography>
+                            <Typography>{unit}</Typography>
+                          </TableCell>
+                        )}
                         <TableCell align="center">{serviceProvider ?? 'Non renseigné'}</TableCell>
                       </TableRow>
                     )
