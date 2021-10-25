@@ -336,7 +336,10 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                 <>
                   {data.map((row) => {
                     const nda = row.NDA
-                    const date = selectedTab === 'prescription' ? row.dispenseRequest?.validityPeriod?.start : ''
+                    const date =
+                      selectedTab === 'prescription'
+                        ? row.dispenseRequest?.validityPeriod?.start
+                        : row.effectivePeriod?.start
                     const codeATC = selectedTab === 'prescription' ? row.category?.[0]?.id : row.category?.id
 
                     const codeUCD = row.contained?.[0]?.code?.coding?.[0]?.id

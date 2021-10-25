@@ -475,14 +475,12 @@ const servicesPatients: IServicesPatients = {
       fetchMedicationRequest({
         size: 20,
         _list: groupId ? [groupId] : [],
-        patient: patientId,
-        _sort: '_lastUpdated'
+        patient: patientId
       }),
       fetchMedicationAdministration({
         size: 20,
         _list: groupId ? [groupId] : [],
-        patient: patientId,
-        _sort: '_lastUpdated'
+        patient: patientId
       })
     ])
 
