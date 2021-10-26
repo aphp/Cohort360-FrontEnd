@@ -132,8 +132,6 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
   }
 
   const handleSort = (property: any) => (event: React.MouseEvent<unknown> /*eslint-disable-line*/) => {
-    console.log('open :>> ', open)
-
     const isAsc: boolean = sort.by === property && sort.direction === 'asc'
     const newDirection = isAsc ? 'desc' : 'asc'
 
