@@ -194,7 +194,11 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents
                 onKeyDown={onKeyDown}
                 endAdornment={
                   <InputAdornment position="end">
-                    <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                    {searchInput && (
+                      <IconButton onClick={handleClearInput}>
+                        <ClearIcon />
+                      </IconButton>
+                    )}
                   </InputAdornment>
                 }
               />

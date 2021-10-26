@@ -216,7 +216,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                           onKeyDown={onKeyDown}
                           endAdornment={
                             <InputAdornment position="end">
-                              <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                              {searchInput && (
+                                <IconButton onClick={handleClearInput}>
+                                  <ClearIcon />
+                                </IconButton>
+                              )}
                             </InputAdornment>
                           }
                         />
