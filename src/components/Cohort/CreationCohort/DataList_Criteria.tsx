@@ -148,7 +148,8 @@ const criteriaList: CriteriaItemType[] = [
   },
   {
     id: 'Medication',
-    title: 'Médicaments (Prescription - Dispension - Administration)',
+    // title: 'Médicaments (Prescription - Dispension - Administration)',
+    title: 'Médicaments (Prescription - Administration)',
     color: '#0063AF',
     components: MedicationForm,
     data: { atcData: 'loading', atcHierarchy: 'loading', prescriptionTypes: 'loading', administrations: 'loading' },
