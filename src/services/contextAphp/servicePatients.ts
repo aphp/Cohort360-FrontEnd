@@ -359,6 +359,7 @@ const servicesPatients: IServicesPatients = {
           _list: groupId ? [groupId] : [],
           encounter: nda,
           patient: patientId,
+          _text: searchInput,
           _sort: sortBy,
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc'
         })
@@ -370,6 +371,7 @@ const servicesPatients: IServicesPatients = {
           _list: groupId ? [groupId] : [],
           encounter: nda,
           patient: patientId,
+          _text: searchInput,
           _sort: sortBy,
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc'
         })
@@ -525,9 +527,6 @@ const servicesPatients: IServicesPatients = {
         : undefined
 
     const consultTotal = procedureResponse.data.resourceType === 'Bundle' ? procedureResponse.data.total : 0
-
-    // @ts-ignore
-    console.log(`procedureResponse.data.total`, procedureResponse)
 
     const diagnostic =
       diagnosticResponse.data.resourceType === 'Bundle'
