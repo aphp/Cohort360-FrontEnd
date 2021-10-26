@@ -120,7 +120,7 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle className={classes.title}>Filtrer les documents par... :</DialogTitle>
+      <DialogTitle className={classes.title}>Filtrer par :</DialogTitle>
       <DialogContent className={classes.dialog}>
         {!deidentified && (
           <Grid container direction="column" className={classes.filter}>

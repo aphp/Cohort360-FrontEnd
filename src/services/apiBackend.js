@@ -19,7 +19,7 @@ apiBackend.interceptors.response.use(
     return response
   },
   function (error) {
-    if ((401 || 400) === error.response.status) {
+    if ((401 || 400 || 403) === error.response.status) {
       localStorage.clear()
       window.location = '/'
     }

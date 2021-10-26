@@ -818,6 +818,18 @@ export async function unbuildRequest(_json: string) {
                   : newDischargeIds
                 break
               }
+              case ENCOUNTER_ADMISSIONMODE: {
+                const admissionModeIds = value?.split(',')
+                const newAdmissionModeIds = admissionModeIds?.map((admissionModeId: any) => ({
+                  id: admissionModeId
+                }))
+                if (!newAdmissionModeIds) continue
+
+                currentCriterion.admissionMode = currentCriterion.admissionMode
+                  ? [...currentCriterion.admissionMode, ...newAdmissionModeIds]
+                  : newAdmissionModeIds
+                break
+              }
               case ENCOUNTER_DESTINATION: {
                 const destinationIds = value?.split(',')
                 const newDestinationIds = destinationIds?.map((destinationId: any) => ({
