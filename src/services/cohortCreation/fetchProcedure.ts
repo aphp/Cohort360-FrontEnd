@@ -30,20 +30,18 @@ export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
 
     const res = await apiRequest.get<any>(`/ValueSet?url=${PROCEDURE_HIERARCHY}${_searchValue}&size=0`)
 
-    const CCAMObject = res && res.data && res.data.entry && res.data.resourceType === 'Bundle' ? res.data.entry : []
-
-    const CCAMList =
-      CCAMObject && CCAMObject.find((entry: any) => entry.resource.name === 'ORBIS - CCAM')
-        ? CCAMObject.find((entry: any) => entry.resource.name === 'ORBIS - CCAM').resource.compose.include[0].concept
+    const data =
+      res && res.data && res.data.entry && res.data.resourceType === 'Bundle'
+        ? res.data.entry[0].resource?.compose?.include[0].concept
         : []
 
-    return (
-      CCAMList.sort(codeSort).map((ccamData: any) => ({
-        id: ccamData.code,
-        label: `${ccamData.code} - ${ccamData.display}`,
-        subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
-      })) || []
-    )
+    return data && data.length > 0
+      ? data.sort(codeSort).map((_data: { code: string; display: string }) => ({
+          id: _data.code,
+          label: `${_data.code} - ${capitalizeFirstLetter(_data.display)}`,
+          subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
+        }))
+      : []
   }
 }
 
