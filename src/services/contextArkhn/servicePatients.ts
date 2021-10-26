@@ -438,7 +438,6 @@ const servicesPatients: IServicesPatients = {
         patient: patientId,
         _sort: 'date',
         sortDirection: 'desc',
-        status: 'complete',
         size: 20,
         _list: groupId ? [groupId] : []
       }),
