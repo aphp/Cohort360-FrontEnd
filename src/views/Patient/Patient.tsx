@@ -135,7 +135,7 @@ const Patient = () => {
       >
         <TopBar
           context="patient_info"
-          patientsNb={cohort.totalPatients}
+          patientsNb={cohort.totalPatients ? cohort.totalPatients : undefined}
           access={deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
         />
 

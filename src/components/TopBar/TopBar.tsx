@@ -39,6 +39,8 @@ import { useAppSelector } from 'state'
 import { favoriteExploredCohort } from 'state/exploredCohort'
 import { fetchCohorts as fetchCohortsList, setSelectedCohort } from 'state/cohort'
 
+import services from 'services'
+
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from './styles'
@@ -60,6 +62,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   }))
   const [isExtended, onExtend] = useState(false)
   const [openModal, setOpenModal] = useState<'' | 'edit' | 'export' | 'delete'>('')
+  const [patientsNumber, setPatientsNumber] = useState<number>(patientsNb ?? 0)
   const [anchorEl, setAnchorEl] = useState(null)
 
   const handleClick = (event: any) => {
@@ -70,6 +73,18 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
     setAnchorEl(null)
     setOpenModal('')
   }
+
+  React.useEffect(() => {
+    const _fetchPatientNumber = async () => {
+      const _patientNumber = await services.patients.fetchPatientsCount()
+
+      setPatientsNumber(_patientNumber)
+    }
+
+    if (patientsNb === undefined) {
+      _fetchPatientNumber()
+    }
+  }, [patientsNb])
 
   let cohort: {
     name: string
@@ -92,13 +107,6 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
       cohort = {
         name: 'Information patient',
         description: '',
-        // description: Array.isArray(dashboard.cohort)
-        //   ? 'Visualisation de périmètres'
-        //   : dashboard?.cohort?.name
-        //   ? dashboard?.cohort?.name === '-'
-        //     ? 'Exploration de population'
-        //     : 'Exploration de cohorte '
-        //   : "Visualisation d'un patient",
         perimeters: [],
         icon: <FaceIcon />,
         showActionButton: false
@@ -232,7 +240,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                   ) : (
                     <>
                       <Typography align="right" noWrap>
-                        Nb de patients : {displayDigit(patientsNb ?? 0)}
+                        Nb de patients : {displayDigit(patientsNumber ?? 0)}
                       </Typography>
                       <Typography align="right" noWrap>
                         Accès : {access}
