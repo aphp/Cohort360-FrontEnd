@@ -29,11 +29,12 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
   const handleMenuClose = () => setAnchorEl(null)
 
   const goBacktoCohort = () => {
-    const path = Array.isArray(cohort.cohort)
-      ? `/perimetres/patients?${cohort.cohort.map((e: any) => e.id).join()}`
-      : cohort.cohort?.id
-      ? `/cohort/${cohort.cohort?.id}/patients`
-      : '/mes_patients/patients'
+    const path =
+      Array.isArray(cohort.cohort) && cohort.cohort.length > 0
+        ? `/perimetres/patients?${cohort.cohort.map((e: any) => e.id).join()}`
+        : !Array.isArray(cohort.cohort) && cohort.cohort?.id
+        ? `/cohort/${cohort.cohort?.id}/patients`
+        : '/mes_patients/patients'
 
     history.push(path)
   }

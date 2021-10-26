@@ -450,7 +450,6 @@ const servicesPatients: IServicesPatients = {
         patient: patientId,
         _sort: 'date',
         sortDirection: 'desc',
-        status: 'complete',
         size: 20,
         _list: groupId ? [groupId] : []
       }),
@@ -526,6 +525,9 @@ const servicesPatients: IServicesPatients = {
         : undefined
 
     const consultTotal = procedureResponse.data.resourceType === 'Bundle' ? procedureResponse.data.total : 0
+
+    // @ts-ignore
+    console.log(`procedureResponse.data.total`, procedureResponse)
 
     const diagnostic =
       diagnosticResponse.data.resourceType === 'Bundle'
