@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios'
 
 import { PORTAIL_API_URL } from '../../constants'
 
-import { fetchPractitioner } from './callApi'
+import { fetchPractitioner, fetchPractitionerRole } from './callApi'
 
 export interface IServicesPractitioner {
   authenticate: (username: string, password: string) => Promise<any>
@@ -13,6 +13,7 @@ export interface IServicesPractitioner {
     firstName: string
     lastName: string
   } | null>
+  fetchPractitionerRole: (practionerId: string) => Promise<any>
 }
 
 const servicePractitioner: IServicesPractitioner = {
@@ -52,6 +53,26 @@ const servicePractitioner: IServicesPractitioner = {
       displayName,
       firstName,
       lastName
+    }
+  },
+
+  fetchPractitionerRole: async (practitionerId) => {
+    const practitionerRole = await fetchPractitionerRole({
+      practitioner: practitionerId,
+      _elements: ['organization', 'extension']
+    })
+
+    if (
+      !practitionerRole ||
+      (practitionerRole && !practitionerRole.data) ||
+      // @ts-ignore
+      (practitionerRole && practitionerRole.data && !practitionerRole.data.entry)
+    ) {
+      return undefined
+    } else {
+      // @ts-ignore
+      const { resource } = practitionerRole.data.entry[0]
+      return resource
     }
   }
 }
