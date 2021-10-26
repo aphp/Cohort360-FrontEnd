@@ -34,6 +34,7 @@ import { IMedicationRequest, IMedicationAdministration } from '@ahryman40k/ts-fh
 import services from 'services'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
+import displayDigit from 'utils/displayDigit'
 
 import useStyles from './styles'
 
@@ -409,7 +410,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                       selectedTab === 'prescription'
                         ? row.dosageInstruction?.[0]?.route?.text
                         : row.dosage?.route?.coding?.[0]?.display
-                    const dose = selectedTab === 'administration' && 'XX'
+                    const dose = selectedTab === 'administration' && displayDigit(+row.dosage?.dose?.value)
                     const unit = selectedTab === 'administration' && row.dosage?.dose?.unit
                     const serviceProvider = row.serviceProvider
 
