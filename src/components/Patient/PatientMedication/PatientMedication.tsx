@@ -26,8 +26,10 @@ import Pagination from '@material-ui/lab/Pagination'
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
+import CommentIcon from '@material-ui/icons/Comment'
 
 import MedicationFilters from 'components/Filters/MedicationFilters/MedicationFilters'
+import ModalAdministrationComment from './ModalAdministrationComment/ModalAdministrationComment'
 
 import { MedicationEntry } from 'types'
 import { IMedicationRequest, IMedicationAdministration } from '@ahryman40k/ts-fhir-types/lib/R4'
@@ -66,6 +68,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
   const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState('')
   const [open, setOpen] = useState<string | null>(null)
+  const [selectedComment, setSelectedComment] = useState<string | null>(null)
   const [filter, setFilter] = useState<{
     nda: string
     startDate: string | null
@@ -410,7 +413,13 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                 </TableCell>
                 {selectedTab === 'prescription' && (
                   <TableCell align="center" className={classes.tableHeadCell}>
-                    Type de prescription
+                    <TableSortLabel
+                      active={sort.by === 'type'}
+                      direction={sort.by === 'type' ? sort.direction : 'asc'}
+                      onClick={handleSort('type')}
+                    >
+                      Type de prescription
+                    </TableSortLabel>
                   </TableCell>
                 )}
                 <TableCell align="center" className={classes.tableHeadCell}>
@@ -430,6 +439,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                 <TableCell align="center" className={classes.tableHeadCell}>
                   Unité exécutrice
                 </TableCell>
+                {selectedTab === 'administration' && deidentifiedBoolean === false && (
+                  <TableCell align="center" className={classes.tableHeadCell}>
+                    Commentaire
+                  </TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -456,6 +470,8 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                     const dose = selectedTab === 'administration' && displayDigit(+row.dosage?.dose?.value)
                     const unit = selectedTab === 'administration' && row.dosage?.dose?.unit
                     const serviceProvider = row.serviceProvider
+
+                    const comment = selectedTab === 'administration' ? row.dosage?.text : null
 
                     return (
                       <TableRow className={classes.tableBodyRows} key={row.id}>
@@ -486,6 +502,13 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                           </TableCell>
                         )}
                         <TableCell align="center">{serviceProvider ?? '-'}</TableCell>
+                        {selectedTab === 'administration' && deidentifiedBoolean === false && (
+                          <TableCell align="center">
+                            <IconButton onClick={() => setSelectedComment(comment)}>
+                              <CommentIcon />
+                            </IconButton>
+                          </TableCell>
+                        )}
                       </TableRow>
                     )
                   })}
@@ -506,6 +529,12 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
         shape="rounded"
         onChange={handleChangePage}
         page={page}
+      />
+
+      <ModalAdministrationComment
+        open={selectedComment !== null}
+        comment={selectedComment ?? ''}
+        handleClose={() => setSelectedComment(null)}
       />
     </Grid>
   )
