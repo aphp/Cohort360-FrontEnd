@@ -81,10 +81,12 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
       setPatientsNumber(_patientNumber)
     }
 
-    if (patientsNb === undefined) {
+    if (dashboard.totalPatients === undefined) {
       _fetchPatientNumber()
+    } else {
+      setPatientsNumber(dashboard.totalPatients)
     }
-  }, [patientsNb])
+  }, [dashboard.totalPatients])
 
   let cohort: {
     name: string

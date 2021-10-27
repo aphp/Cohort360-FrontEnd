@@ -133,11 +133,7 @@ const Patient = () => {
           [classes.appBarShift]: open
         })}
       >
-        <TopBar
-          context="patient_info"
-          patientsNb={cohort.totalPatients ? cohort.totalPatients : undefined}
-          access={deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
-        />
+        <TopBar context="patient_info" access={deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'} />
 
         <Grid
           container
