@@ -17,6 +17,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   Tabs,
   Typography
 } from '@material-ui/core'
@@ -25,8 +26,10 @@ import Pagination from '@material-ui/lab/Pagination'
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
+import CommentIcon from '@material-ui/icons/Comment'
 
 import MedicationFilters from 'components/Filters/MedicationFilters/MedicationFilters'
+import ModalAdministrationComment from './ModalAdministrationComment/ModalAdministrationComment'
 
 import { MedicationEntry } from 'types'
 import { IMedicationRequest, IMedicationAdministration } from '@ahryman40k/ts-fhir-types/lib/R4'
@@ -65,6 +68,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
   const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState('')
   const [open, setOpen] = useState<string | null>(null)
+  const [selectedComment, setSelectedComment] = useState<string | null>(null)
   const [filter, setFilter] = useState<{
     nda: string
     startDate: string | null
@@ -76,7 +80,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
     startDate: null,
     endDate: null
   })
-  const [sort, setSort] = useState<{ by: string; direction: 'asc' | 'desc' }>({ by: '', direction: 'asc' })
+  const [sort, setSort] = useState<{ by: string; direction: 'asc' | 'desc' }>({ by: 'Period-start', direction: 'asc' })
 
   const documentLines = 20 // Number of desired lines in the document array
 
@@ -132,8 +136,6 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
   }
 
   const handleSort = (property: any) => (event: React.MouseEvent<unknown> /*eslint-disable-line*/) => {
-    console.log('open :>> ', open)
-
     const isAsc: boolean = sort.by === property && sort.direction === 'asc'
     const newDirection = isAsc ? 'desc' : 'asc'
 
@@ -272,7 +274,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
               onKeyDown={onKeyDown}
               endAdornment={
                 <InputAdornment position="end">
-                  <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                  {searchInput && (
+                    <IconButton onClick={handleClearInput}>
+                      <ClearIcon />
+                    </IconButton>
+                  )}
                 </InputAdornment>
               }
             />
@@ -357,27 +363,73 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
             <TableHead className={classes.tableHead}>
               <TableRow>
                 <TableCell align="left" className={classes.tableHeadCell}>
-                  {deidentifiedBoolean ? 'NDA chiffré' : 'NDA'}
-                </TableCell>
-                <TableCell align="left" className={classes.tableHeadCell}>
-                  Date
+                  {deidentifiedBoolean ? (
+                    'NDA chiffré'
+                  ) : (
+                    <TableSortLabel
+                      active={sort.by === 'encounter'}
+                      direction={sort.by === 'encounter' ? sort.direction : 'asc'}
+                      onClick={handleSort('encounter')}
+                    >
+                      NDA
+                    </TableSortLabel>
+                  )}
                 </TableCell>
                 <TableCell align="center" className={classes.tableHeadCell}>
-                  Code ATC
+                  <TableSortLabel
+                    active={sort.by === 'Period-start'}
+                    direction={sort.by === 'Period-start' ? sort.direction : 'asc'}
+                    onClick={handleSort('Period-start')}
+                  >
+                    {selectedTab === 'prescription' ? 'Date de préscription' : "Date d'administration"}
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="center" className={classes.tableHeadCell}>
-                  Code UCD
+                  <TableSortLabel
+                    active={sort.by === 'class'}
+                    direction={sort.by === 'class' ? sort.direction : 'asc'}
+                    onClick={handleSort('class')}
+                  >
+                    Code ATC
+                  </TableSortLabel>
                 </TableCell>
                 <TableCell align="center" className={classes.tableHeadCell}>
-                  Libellé
+                  <TableSortLabel
+                    active={sort.by === 'code'}
+                    direction={sort.by === 'code' ? sort.direction : 'asc'}
+                    onClick={handleSort('code')}
+                  >
+                    Code UCD
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="center" className={classes.tableHeadCell}>
+                  <TableSortLabel
+                    active={sort.by === 'medication-text'}
+                    direction={sort.by === 'medication-text' ? sort.direction : 'asc'}
+                    onClick={handleSort('medication-text')}
+                  >
+                    Libellé
+                  </TableSortLabel>
                 </TableCell>
                 {selectedTab === 'prescription' && (
                   <TableCell align="center" className={classes.tableHeadCell}>
-                    Type de prescription
+                    <TableSortLabel
+                      active={sort.by === 'type'}
+                      direction={sort.by === 'type' ? sort.direction : 'asc'}
+                      onClick={handleSort('type')}
+                    >
+                      Type de prescription
+                    </TableSortLabel>
                   </TableCell>
                 )}
                 <TableCell align="center" className={classes.tableHeadCell}>
-                  Voie d'administration
+                  <TableSortLabel
+                    active={sort.by === 'route'}
+                    direction={sort.by === 'route' ? sort.direction : 'asc'}
+                    onClick={handleSort('route')}
+                  >
+                    Voie d'administration
+                  </TableSortLabel>
                 </TableCell>
                 {selectedTab === 'administration' && (
                   <TableCell align="center" className={classes.tableHeadCell}>
@@ -387,6 +439,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                 <TableCell align="center" className={classes.tableHeadCell}>
                   Unité exécutrice
                 </TableCell>
+                {selectedTab === 'administration' && deidentifiedBoolean === false && (
+                  <TableCell align="center" className={classes.tableHeadCell}>
+                    Commentaire
+                  </TableCell>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -414,30 +471,44 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                     const unit = selectedTab === 'administration' && row.dosage?.dose?.unit
                     const serviceProvider = row.serviceProvider
 
+                    const comment = selectedTab === 'administration' ? row.dosage?.text : null
+
                     return (
                       <TableRow className={classes.tableBodyRows} key={row.id}>
                         <TableCell align="left">{nda ?? 'Inconnu'}</TableCell>
-                        <TableCell align="left">
+                        <TableCell align="center">
                           {date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}
                         </TableCell>
                         <TableCell align="center">{codeATC === 'No matching concept' ? '-' : codeATC ?? '-'}</TableCell>
                         <TableCell align="center">{codeUCD === 'No matching concept' ? '-' : codeUCD ?? '-'}</TableCell>
                         <TableCell align="center" className={classes.libelle}>
-                          {name === 'No matching concept' ? '-' : name ?? 'Non renseigné'}
+                          {name === 'No matching concept' ? '-' : name ?? '-'}
                         </TableCell>
                         {selectedTab === 'prescription' && (
-                          <TableCell align="center">{prescriptionType ?? 'Non renseigné'}</TableCell>
+                          <TableCell align="center">{prescriptionType ?? '-'}</TableCell>
                         )}
                         <TableCell align="center">
-                          {administrationRoute === 'No matching concept' ? '-' : administrationRoute ?? 'Non renseigné'}
+                          {administrationRoute === 'No matching concept' ? '-' : administrationRoute ?? '-'}
                         </TableCell>
                         {selectedTab === 'administration' && (
                           <TableCell align="center">
-                            <Typography>{dose}</Typography>
-                            <Typography>{unit}</Typography>
+                            {unit !== 'Non Renseigné' ? (
+                              <>
+                                {dose} {unit}
+                              </>
+                            ) : (
+                              '-'
+                            )}
                           </TableCell>
                         )}
-                        <TableCell align="center">{serviceProvider ?? 'Non renseigné'}</TableCell>
+                        <TableCell align="center">{serviceProvider ?? '-'}</TableCell>
+                        {selectedTab === 'administration' && deidentifiedBoolean === false && (
+                          <TableCell align="center">
+                            <IconButton onClick={() => setSelectedComment(comment)}>
+                              <CommentIcon />
+                            </IconButton>
+                          </TableCell>
+                        )}
                       </TableRow>
                     )
                   })}
@@ -458,6 +529,12 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
         shape="rounded"
         onChange={handleChangePage}
         page={page}
+      />
+
+      <ModalAdministrationComment
+        open={selectedComment !== null}
+        comment={selectedComment ?? ''}
+        handleClose={() => setSelectedComment(null)}
       />
     </Grid>
   )

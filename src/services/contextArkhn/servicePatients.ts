@@ -338,7 +338,17 @@ const servicesPatients: IServicesPatients = {
     }
   },
 
-  fetchMedication: async (deidentified, page, patientId, selectedTab, sortBy, sortDirection, groupId) => {
+  fetchMedication: async (
+    deidentified,
+    page,
+    patientId,
+    selectedTab,
+    searchInput,
+    nda,
+    sortBy,
+    sortDirection,
+    groupId
+  ) => {
     let medicationResp: AxiosResponse<FHIR_API_Response<IMedicationRequest | IMedicationAdministration>> | null = null
 
     switch (selectedTab) {
@@ -347,7 +357,9 @@ const servicesPatients: IServicesPatients = {
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
           _list: groupId ? [groupId] : [],
+          encounter: nda,
           patient: patientId,
+          _text: searchInput,
           _sort: sortBy,
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc'
         })
@@ -357,7 +369,9 @@ const servicesPatients: IServicesPatients = {
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
           _list: groupId ? [groupId] : [],
+          encounter: nda,
           patient: patientId,
+          _text: searchInput,
           _sort: sortBy,
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc'
         })
@@ -474,14 +488,12 @@ const servicesPatients: IServicesPatients = {
       fetchMedicationRequest({
         size: 20,
         _list: groupId ? [groupId] : [],
-        patient: patientId,
-        _sort: '_lastUpdated'
+        patient: patientId
       }),
       fetchMedicationAdministration({
         size: 20,
         _list: groupId ? [groupId] : [],
-        patient: patientId,
-        _sort: '_lastUpdated'
+        patient: patientId
       })
     ])
 

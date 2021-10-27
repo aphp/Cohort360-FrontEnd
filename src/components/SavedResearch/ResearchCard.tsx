@@ -192,7 +192,11 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
               onKeyDown={onKeyDown}
               endAdornment={
                 <InputAdornment position="end">
-                  <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                  {searchInput && (
+                    <IconButton onClick={handleClearInput}>
+                      <ClearIcon />
+                    </IconButton>
+                  )}
                 </InputAdornment>
               }
             />

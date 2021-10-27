@@ -109,7 +109,7 @@ const servicesCohorts: IServicesCohorts = {
     let uuid = ''
     let favorite = false
 
-    if (cohortInfo.data.results && cohortInfo.data.results.length === 1) {
+    if (cohortInfo.data.results && cohortInfo.data.results.length >= 1) {
       name = cohortInfo.data.results[0].name ?? ''
       description = cohortInfo.data.results[0].description ?? ''
       requestId = cohortInfo.data.results[0].request ?? ''
@@ -213,7 +213,8 @@ const servicesCohorts: IServicesCohorts = {
       sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
       pivotFacet: includeFacets ? ['age_gender', 'deceased_gender'] : [],
       _list: groupId ? [groupId] : [],
-      gender,
+      gender:
+        gender === PatientGenderKind._unknown ? '' : gender === PatientGenderKind._other ? `other,unknown` : gender,
       searchBy,
       _text: _searchInput,
       minBirthdate: date1,
@@ -279,6 +280,7 @@ const servicesCohorts: IServicesCohorts = {
         .replaceAll('@', '%40')
         .replaceAll('[', '%5B')
         .replaceAll(']', '%5D')
+        .replaceAll('\n', '%20')
     }
 
     const [docsList, allDocsList] = await Promise.all([
@@ -349,7 +351,7 @@ const servicesCohorts: IServicesCohorts = {
         rightResponse.data.entry[0].resource
       ) {
         //@ts-ignore
-        const currentCohortItem = rightResponse.data.entry[0].resource
+        const currentCohortItem = rightResponse.data.entry[0].resource.extension?.[0]
         const canMakeExport =
           currentCohortItem.extension && currentCohortItem.extension.length > 0
             ? currentCohortItem.extension.some(

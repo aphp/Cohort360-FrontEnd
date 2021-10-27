@@ -314,7 +314,11 @@ const PatientList: React.FC<PatientListProps> = ({
                       onKeyDown={onKeyDown}
                       endAdornment={
                         <InputAdornment position="end">
-                          <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                          {searchInput && (
+                            <IconButton onClick={handleClearInput}>
+                              <ClearIcon />
+                            </IconButton>
+                          )}
                         </InputAdornment>
                       }
                     />
