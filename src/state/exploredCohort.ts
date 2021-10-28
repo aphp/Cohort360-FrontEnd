@@ -25,7 +25,7 @@ const defaultInitialState = {
   name: '',
   description: '',
   cohort: [],
-  totalPatients: 0,
+  totalPatients: undefined,
   originalPatients: [],
   totalDocs: 0,
   documentsList: [],

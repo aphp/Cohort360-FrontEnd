@@ -68,7 +68,7 @@ const ModalEditCohort: React.FC<{
     if (loading) return
     setLoading(true)
 
-    if (!modalCohortState.name) {
+    if (!modalCohortState.name || (modalCohortState.name && modalCohortState.name.length > 50)) {
       setLoading(false)
       return setError(ERROR_TITLE)
     }
@@ -110,6 +110,7 @@ const ModalEditCohort: React.FC<{
               variant="outlined"
               fullWidth
               error={error === ERROR_TITLE}
+              helperText={error === ERROR_TITLE ? 'Le nom est trop long (50 caractère max.)' : ''}
             />
           </Grid>
 

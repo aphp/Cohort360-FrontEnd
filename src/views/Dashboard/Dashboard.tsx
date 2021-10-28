@@ -176,7 +176,6 @@ const Dashboard: React.FC<{
 
       <TopBar
         context={context}
-        patientsNb={dashboard.totalPatients || 0}
         access={deidentifiedBoolean === null ? '-' : deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
         afterEdit={() => forceReload()}
       />
