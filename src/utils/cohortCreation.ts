@@ -582,7 +582,7 @@ export async function unbuildRequest(_json: string) {
             const value = filter ? filter[1] : null
             currentCriterion.title = 'Critère démographique'
             currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
-            currentCriterion.years = currentCriterion.years ? currentCriterion.years : null
+            currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
             currentCriterion.gender = currentCriterion.gender ? currentCriterion.gender : []
             currentCriterion.vitalStatus = currentCriterion.vitalStatus ? currentCriterion.vitalStatus : []
             switch (key) {
@@ -665,11 +665,26 @@ export async function unbuildRequest(_json: string) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de prise en charge'
-          currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : null
+          currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [0, 100]
+          currentCriterion.durationType = currentCriterion.durationType
+            ? currentCriterion.durationType
+            : { id: 'day', label: 'jours' }
+          currentCriterion.ageType = currentCriterion.ageType
+            ? currentCriterion.ageType
+            : { id: 'year', label: 'années' }
+          currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
           currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : []
           currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : []
           currentCriterion.exitMode = currentCriterion.exitMode ? currentCriterion.exitMode : []
+          currentCriterion.priseEnChargeType = currentCriterion.priseEnChargeType
+            ? currentCriterion.priseEnChargeType
+            : []
+          currentCriterion.typeDeSejour = currentCriterion.typeDeSejour ? currentCriterion.typeDeSejour : []
           currentCriterion.fileStatus = currentCriterion.fileStatus ? currentCriterion.fileStatus : []
+          currentCriterion.reason = currentCriterion.reason ? currentCriterion.reason : []
+          currentCriterion.destination = currentCriterion.destination ? currentCriterion.destination : []
+          currentCriterion.provenance = currentCriterion.provenance ? currentCriterion.provenance : []
+          currentCriterion.admission = currentCriterion.admission ? currentCriterion.admission : []
 
           if (element.encounterDateRange) {
             currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
@@ -686,8 +701,6 @@ export async function unbuildRequest(_json: string) {
                   { id: 'month', label: 'mois' },
                   { id: 'day', label: 'jours' }
                 ]
-
-                currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [0, 130]
                 if (value?.search('ge') === 0) {
                   currentCriterion.duration[0] = +value?.replace('ge', '') || 0
                 } else if (value?.search('le') === 0) {
@@ -708,8 +721,6 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               case ENCOUNTER_BIRTHDATE: {
-                currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
-                currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
                 const ageType = [
                   { id: 'year', label: 'années' },
                   { id: 'month', label: 'mois' },

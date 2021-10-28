@@ -37,7 +37,9 @@ import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalE
 
 import { useAppSelector } from 'state'
 import { favoriteExploredCohort } from 'state/exploredCohort'
-import { fetchCohorts as fetchCohortsList, setSelectedCohort } from 'state/cohort'
+import { fetchCohorts as fetchCohortsList, setSelectedCohort, deleteCohort } from 'state/cohort'
+
+import { CohortType } from 'types'
 
 import services from 'services'
 
@@ -144,6 +146,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   }
 
   const handleConfirmDeletion = () => {
+    dispatch(deleteCohort({ deletedCohort: dashboard as CohortType }))
     handleClose()
   }
 
