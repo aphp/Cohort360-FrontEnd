@@ -153,7 +153,14 @@ const Requeteur = () => {
   }
 
   const _canExecute: () => boolean = () => {
-    if (!json || !count?.uuid || !currentSnapshot || !requestId) {
+    if (
+      !json ||
+      !count?.uuid ||
+      count.status === 'failed' ||
+      count.status === 'error' ||
+      !currentSnapshot ||
+      !requestId
+    ) {
       return false
     }
     return true
