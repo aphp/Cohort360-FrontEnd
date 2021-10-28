@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 
 import Avatar from '@material-ui/core/Avatar'
@@ -57,6 +58,7 @@ type TopBarProps = {
 const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const history = useHistory()
 
   const { dashboard, cohortList } = useAppSelector((state) => ({
     dashboard: state.exploredCohort,
@@ -147,7 +149,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
 
   const handleConfirmDeletion = () => {
     dispatch(deleteCohort({ deletedCohort: dashboard as CohortType }))
-    handleClose()
+    history.push('/accueil')
   }
 
   return (
