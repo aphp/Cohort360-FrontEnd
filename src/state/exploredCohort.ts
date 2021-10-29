@@ -312,7 +312,7 @@ const exploredCohortSlice = createSlice({
 })
 
 export default exploredCohortSlice.reducer
-export { fetchExploredCohort, favoriteExploredCohort }
+export { fetchExploredCohort, favoriteExploredCohort, fetchExploredCohortInBackground }
 export const {
   addImportedPatients,
   excludePatients,

@@ -11,7 +11,8 @@ import { RootState } from 'state'
 import { CohortType } from 'types'
 
 import { logout, login } from './me'
-
+import { fetchExploredCohortInBackground } from './exploredCohort'
+import { initUserCohortsThunk } from './userCohorts'
 import services from 'services'
 
 export type CohortState = {
@@ -154,12 +155,14 @@ type AddCohortReturn = {
 
 const addCohort = createAsyncThunk<AddCohortReturn, AddCohortParams, { state: RootState }>(
   'cohort/addCohort',
-  async ({ newCohort }, { getState }) => {
+  async ({ newCohort }, { getState, dispatch }) => {
     try {
       const state = getState().cohort
       const cohortsList: CohortType[] = state.cohortsList ?? []
 
       const createdCohort = await services.projects.addCohort(newCohort)
+
+      dispatch(initUserCohortsThunk())
 
       return {
         selectedCohort: null,
@@ -189,6 +192,7 @@ const editCohort = createAsyncThunk<EditCohortReturn, EditCohortParams, { state:
   async ({ editedCohort }, { getState, dispatch }) => {
     try {
       const state = getState().cohort
+      const stateExploredCohort = getState().exploredCohort
       // eslint-disable-next-line
       let cohortsList: CohortType[] = state.cohortsList ? [...state.cohortsList] : []
       const foundItem = cohortsList.find(({ uuid }) => uuid === editedCohort.uuid)
@@ -202,6 +206,12 @@ const editCohort = createAsyncThunk<EditCohortReturn, EditCohortParams, { state:
 
         cohortsList[index] = modifiedCohort
       }
+
+      if (stateExploredCohort.uuid === editedCohort.uuid) {
+        dispatch(fetchExploredCohortInBackground({ context: 'cohort', id: editedCohort.fhir_group_id }))
+      }
+      dispatch(initUserCohortsThunk())
+
       return {
         selectedCohort: null,
         cohortsList: cohortsList
@@ -226,7 +236,7 @@ type DeleteCohortReturn = {
 
 const deleteCohort = createAsyncThunk<DeleteCohortReturn, DeleteCohortParams, { state: RootState }>(
   'cohort/deleteCohort',
-  async ({ deletedCohort }, { getState }) => {
+  async ({ deletedCohort }, { getState, dispatch }) => {
     try {
       const state = getState().cohort
       // eslint-disable-next-line
@@ -239,6 +249,10 @@ const deleteCohort = createAsyncThunk<DeleteCohortReturn, DeleteCohortParams, { 
 
         cohortsList.splice(index, 1)
       }
+      setTimeout(() => {
+        dispatch(initUserCohortsThunk())
+      }, 500)
+
       return {
         selectedCohort: null,
         cohortsList: cohortsList
