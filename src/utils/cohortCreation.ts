@@ -196,7 +196,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
         }
       }
 
-      if (criterion.duration && criterion.duration !== [0, 100]) {
+      if (criterion.duration && (criterion.duration[0] !== 0 || criterion.duration[1] !== 100)) {
         lengthFilter = `${ENCOUNTER_LENGTH}=ge${+criterion.duration[0] * multiplicator}&${ENCOUNTER_LENGTH}=le${
           +criterion.duration[1] * multiplicator
         }`

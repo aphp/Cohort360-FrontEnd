@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 import Alert from '@material-ui/lab/Alert'
 import Button from '@material-ui/core/Button'
@@ -54,6 +54,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   const [exportResponse, setExportResponse] = useState<{ status: 'error' | 'finish'; detail: any } | null>(null)
   const [error, setError] = useState<typeof ERROR_MOTIF | typeof ERROR_CONDITION | typeof ERROR_TABLE | null>(null)
 
+  const dialogRef = useRef<HTMLHeadingElement>(null)
+
   useEffect(() => {
     setSettings(initialState)
   }, [open])
@@ -85,11 +87,23 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
 
     settings.motif = settings?.motif ? settings?.motif.trim() : ''
 
+    const _scrollUp = () => {
+      if (dialogRef !== null) {
+        dialogRef?.current?.scrollTo({
+          behavior: 'smooth',
+          top: 0
+        })
+      }
+    }
+
     if (!settings?.motif || settings?.motif.length < 10) {
+      _scrollUp()
       return setError(ERROR_MOTIF)
     } else if (!settings?.conditions) {
+      _scrollUp()
       return setError(ERROR_CONDITION)
     } else if (!settings?.tables || (settings?.tables && settings?.tables.length == 0)) {
+      _scrollUp()
       return setError(ERROR_TABLE)
     }
 
@@ -113,7 +127,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       </DialogTitle>
 
       {exportResponse !== null ? (
-        <DialogContent>
+        <DialogContent ref={dialogRef}>
           {exportResponse.status === 'finish' ? (
             <Grid container alignItems="center" justify="space-between">
               <CheckCircleOutlineIcon style={{ fontSize: 52 }} htmlColor="#BDEA88" />
@@ -147,7 +161,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
           )}
         </DialogContent>
       ) : (
-        <DialogContent>
+        <DialogContent ref={dialogRef}>
           <DialogContentText>
             Pour effectuer un export de données, veuillez renseigner un motif, selectionner uniquement les tables que
             vous voulez exporter et accepter les conditions de l'entrepôt de données de santé (EDS). <br />
@@ -297,13 +311,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
         </Button>
         {exportResponse === null && (
           <Button
-            disabled={
-              !cohortId ||
-              !settings.motif ||
-              (settings.motif && settings.motif.length < 10) ||
-              !settings.conditions ||
-              !settings.tables.length
-            }
+            disabled={!cohortId || !settings.motif || !settings.conditions || !settings.tables.length}
             onClick={handleSubmit}
             color="primary"
           >
