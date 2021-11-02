@@ -184,7 +184,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                 max={130}
               />
 
-              <Grid container justifyContent="space-around">
+              <Grid container justify="space-around">
                 <Grid item>
                   <TextField
                     value={defaultValues.years[0]}
@@ -244,7 +244,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                 max={100}
               />
 
-              <Grid container justifyContent="space-around">
+              <Grid container justify="space-around">
                 <Grid item>
                   <TextField
                     value={defaultValues.duration[0]}

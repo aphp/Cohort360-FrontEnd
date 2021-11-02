@@ -188,7 +188,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
                 min={0}
                 max={130}
               />
-              <Grid container justifyContent="space-around">
+              <Grid container justify="space-around">
                 <Grid item>
                   <TextField
                     value={defaultValues.years[0]}
