@@ -1,4 +1,6 @@
-![cohort360-front](https://github.com/aphp/Cohort360/actions/workflows/app.yml/badge.svg)
+<div align="center" style="display:flex;flex-direction:column;">
+  ![cohort360-front](https://github.com/aphp/Cohort360/actions/workflows/app.yml/badge.svg)
+</div>
 
 <div align="center" style="display:flex;flex-direction:column;">
   <img src="./public/logo_c360.png" alt="Cohort360 logo" />
