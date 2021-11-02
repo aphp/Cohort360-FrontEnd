@@ -19,11 +19,9 @@ import {
 import { getApiResponseResources } from 'utils/apiHelpers'
 import {
   IClaim,
-  IComposition,
   ICondition,
   IIdentifier,
   IProcedure,
-  IDocumentReference,
   IPatient,
   IMedicationRequest,
   IMedicationAdministration
@@ -43,7 +41,6 @@ export interface IServicesPatients {
   fetchPatientsCount: () => Promise<number>
   fetchMyPatients: () => Promise<CohortData | undefined>
   fetchPatient: (patientId: string, groupId?: string) => Promise<PatientData | undefined>
-  getInfos: (deidentifiedBoolean: boolean, documents?: IComposition[], groupId?: string) => Promise<CohortComposition[]>
   fetchPMSI: (
     deidentified: boolean,
     page: number,
@@ -94,9 +91,6 @@ export interface IServicesPatients {
     docsTotal: number
     docsList: CohortComposition[]
   }>
-  getEncounterOrProcedureDocs: (
-    data: CohortEncounter | PMSIEntry<IProcedure>
-  ) => Promise<(CohortComposition | IDocumentReference)[]>
   searchPatient: (
     nominativeGroupsIds: string[] | undefined,
     page: number,
@@ -176,82 +170,6 @@ const servicesPatients: IServicesPatients = {
       agePyramidData,
       monthlyVisitData
     }
-  },
-
-  getInfos: async (deidentifiedBoolean, documents, groupId) => {
-    const cohortDocuments = documents as CohortComposition[]
-
-    const listePatientsIds = cohortDocuments.map((e) => e.subject?.display?.substring(8)).join()
-    const listeEncounterIds = cohortDocuments.map((e) => e.encounter?.display?.substring(10)).join()
-
-    const [patients, encounters] = await Promise.all([
-      fetchPatient({
-        _id: listePatientsIds,
-        _list: groupId ? [groupId] : [],
-        _elements: ['extension', 'id', 'identifier']
-      }),
-      fetchEncounter({
-        _id: listeEncounterIds,
-        _list: groupId ? [groupId] : [],
-        type: 'VISIT',
-        _elements: ['status', 'serviceProvider', 'identifier']
-      })
-    ])
-
-    if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
-      return []
-    }
-
-    const listeEncounters = encounters.data.entry.map((e: any) => e.resource)
-
-    let listePatients = []
-    if (patients.data.resourceType === 'Bundle' && patients.data.entry) {
-      listePatients = patients?.data?.entry.map((e: any) => e.resource)
-    }
-
-    for (const document of cohortDocuments) {
-      for (const patient of listePatients) {
-        if (document.subject?.display?.substring(8) === patient.id) {
-          document.idPatient = patient.id
-
-          if (deidentifiedBoolean) {
-            document.IPP = patient.id
-          } else if (patient.identifier) {
-            const ipp = patient.identifier.find((identifier: IIdentifier) => {
-              return identifier.type?.coding?.[0].code === 'IPP'
-            })
-            document.IPP = ipp.value
-          } else {
-            document.IPP = 'Inconnu'
-          }
-        }
-      }
-
-      for (const encounter of listeEncounters) {
-        if (document.encounter?.display?.substring(10) === encounter.id) {
-          document.encounterStatus = encounter.status
-
-          if (encounter.serviceProvider) {
-            document.serviceProvider = encounter.serviceProvider.display
-          } else {
-            document.serviceProvider = 'Non renseigné'
-          }
-
-          if (deidentifiedBoolean) {
-            document.NDA = encounter.id
-          } else if (encounter.identifier) {
-            const nda = encounter.identifier.find((identifier: IIdentifier) => {
-              return identifier.type?.coding?.[0].code === 'NDA'
-            })
-            document.NDA = nda.value
-          } else {
-            document.NDA = 'Inconnu'
-          }
-        }
-      }
-    }
-
-    return cohortDocuments
   },
 
   fetchPMSI: async (
@@ -430,10 +348,6 @@ const servicesPatients: IServicesPatients = {
       docsTotal: docsList.data.total,
       docsList: (await fillNDAAndServiceProviderDocs(deidentified, getApiResponseResources(docsList), groupId)) ?? []
     }
-  },
-
-  getEncounterOrProcedureDocs: async (data) => {
-    return data.documents ?? []
   },
 
   fetchPatient: async (patientId, groupId) => {

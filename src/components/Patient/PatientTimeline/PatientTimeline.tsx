@@ -11,7 +11,6 @@ import HospitDialog from './HospitDialog/HospitDialog'
 
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 
-import services from 'services'
 import { CohortComposition, CohortEncounter, PMSIEntry } from 'types'
 import { IEncounter, IProcedure, IDocumentReference, IPeriod } from '@ahryman40k/ts-fhir-types/lib/R4'
 
@@ -126,10 +125,10 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits
   }
 
   const handleClickOpenHospitDialog = async (hospitOrConsult?: CohortEncounter | PMSIEntry<IProcedure>) => {
-    if (hospitOrConsult && typeof services.patients.getEncounterOrProcedureDocs === 'function') {
+    if (hospitOrConsult) {
       setLoading(true)
       setOpenHospitDialog(true)
-      const docs = await services.patients.getEncounterOrProcedureDocs(hospitOrConsult)
+      const docs = hospitOrConsult.documents
       setDialogDocuments(docs)
       setLoading(false)
     }

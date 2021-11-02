@@ -1,6 +1,7 @@
 import moment from 'moment'
 
 import {
+  CohortComposition,
   CohortData,
   SearchByTypes,
   VitalStatus,
@@ -9,7 +10,13 @@ import {
   AgeRepartitionType,
   GenderRepartitionType
 } from 'types'
-import { IPatient, IComposition, IComposition_Section, PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
+import {
+  IPatient,
+  IComposition,
+  IComposition_Section,
+  PatientGenderKind,
+  IIdentifier
+} from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   getGenderRepartitionMapAphp,
   getEncounterRepartitionMapAphp,
@@ -19,7 +26,6 @@ import {
 import { getApiResponseResources } from 'utils/apiHelpers'
 
 import { fetchGroup, fetchPatient, fetchEncounter, fetchComposition, fetchCompositionContent } from './callApi'
-import servicePatients from './servicePatients'
 
 import apiBackend from '../apiBackend'
 import apiPortail from '../apiPortail'
@@ -314,11 +320,7 @@ const servicesCohorts: IServicesCohorts = {
     const totalAllDocs =
       allDocsList !== null ? (allDocsList?.data?.resourceType === 'Bundle' ? allDocsList.data.total : 0) : totalDocs
 
-    const documentsList = await servicePatients.getInfos(
-      deidentifiedBoolean,
-      getApiResponseResources(docsList),
-      groupId
-    )
+    const documentsList = await getDocumentInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
 
     return {
       totalDocs: totalDocs ?? 0,
@@ -374,7 +376,7 @@ const servicesCohorts: IServicesCohorts = {
     try {
       const { cohortId, motivation, tables, output_format = 'csv' } = args
 
-      const exportResponse = new Promise((resolve) => {
+      const exportResponse = await new Promise((resolve) => {
         resolve(
           apiPortail.post('/exports/', {
             cohort_id: cohortId,
@@ -408,3 +410,83 @@ const servicesCohorts: IServicesCohorts = {
 }
 
 export default servicesCohorts
+
+const getDocumentInfos: (
+  deidentifiedBoolean: boolean,
+  documents?: IComposition[],
+  groupId?: string
+) => Promise<CohortComposition[]> = async (deidentifiedBoolean: boolean, documents, groupId) => {
+  const cohortDocuments = documents as CohortComposition[]
+
+  const listePatientsIds = cohortDocuments.map((e) => e.subject?.display?.substring(8)).join()
+  const listeEncounterIds = cohortDocuments.map((e) => e.encounter?.display?.substring(10)).join()
+
+  const [patients, encounters] = await Promise.all([
+    fetchPatient({
+      _id: listePatientsIds,
+      _list: groupId ? [groupId] : [],
+      _elements: ['extension', 'id', 'identifier']
+    }),
+    fetchEncounter({
+      _id: listeEncounterIds,
+      _list: groupId ? [groupId] : [],
+      type: 'VISIT',
+      _elements: ['status', 'serviceProvider', 'identifier']
+    })
+  ])
+
+  if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
+    return []
+  }
+
+  const listeEncounters = encounters.data.entry.map((e: any) => e.resource)
+
+  let listePatients = []
+  if (patients.data.resourceType === 'Bundle' && patients.data.entry) {
+    listePatients = patients?.data?.entry.map((e: any) => e.resource)
+  }
+
+  for (const document of cohortDocuments) {
+    for (const patient of listePatients) {
+      if (document.subject?.display?.substring(8) === patient.id) {
+        document.idPatient = patient.id
+
+        if (deidentifiedBoolean) {
+          document.IPP = patient.id
+        } else if (patient.identifier) {
+          const ipp = patient.identifier.find((identifier: IIdentifier) => {
+            return identifier.type?.coding?.[0].code === 'IPP'
+          })
+          document.IPP = ipp.value
+        } else {
+          document.IPP = 'Inconnu'
+        }
+      }
+    }
+
+    for (const encounter of listeEncounters) {
+      if (document.encounter?.display?.substring(10) === encounter.id) {
+        document.encounterStatus = encounter.status
+
+        if (encounter.serviceProvider) {
+          document.serviceProvider = encounter.serviceProvider.display
+        } else {
+          document.serviceProvider = 'Non renseigné'
+        }
+
+        if (deidentifiedBoolean) {
+          document.NDA = encounter.id
+        } else if (encounter.identifier) {
+          const nda = encounter.identifier.find((identifier: IIdentifier) => {
+            return identifier.type?.coding?.[0].code === 'NDA'
+          })
+          document.NDA = nda.value
+        } else {
+          document.NDA = 'Inconnu'
+        }
+      }
+    }
+  }
+
+  return cohortDocuments
+}
