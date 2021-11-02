@@ -127,7 +127,7 @@ const ModalCreateNewRequest: React.FC<{
     if (loading || currentRequest === null) return
 
     setLoading(true)
-    if (!currentRequest.name) {
+    if (!currentRequest.name || (currentRequest.name && currentRequest.name.length > 255)) {
       setLoading(false)
       return setError(ERROR_TITLE)
     }
@@ -192,6 +192,7 @@ const ModalCreateNewRequest: React.FC<{
                   variant="outlined"
                   fullWidth
                   error={error === ERROR_TITLE}
+                  helperText={error === ERROR_TITLE ? 'Le nom est trop long (255 caractère max.)' : ''}
                 />
               </Grid>
 
