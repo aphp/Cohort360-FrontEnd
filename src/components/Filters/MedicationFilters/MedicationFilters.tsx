@@ -19,7 +19,7 @@ import { Autocomplete } from '@material-ui/lab'
 
 import ClearIcon from '@material-ui/icons/Clear'
 
-import { fetchPrescriptionTypes } from 'services/cohortCreation/fetchMedication'
+import { fetchPrescriptionTypes, fetchAdministrations } from 'services/cohortCreation/fetchMedication'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
@@ -38,6 +38,9 @@ type MedicationFiltersProps = {
   selectedPrescriptionTypes: { id: string; label: string }[]
   onChangeSelectedPrescriptionTypes: (selectedPrescriptionTypes: { id: string; label: string }[]) => void
   showPrescriptionTypes: boolean
+  selectedAdministrationRoutes: { id: string; label: string }[]
+  onChangeSelectedAdministrationRoutes: (selectedAdministrationRoutes: { id: string; label: string }[]) => void
+  showAdministrationRoutes: boolean
 }
 const MedicationFilters: React.FC<MedicationFiltersProps> = ({
   open,
@@ -52,7 +55,10 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
   deidentified,
   selectedPrescriptionTypes,
   onChangeSelectedPrescriptionTypes,
-  showPrescriptionTypes
+  showPrescriptionTypes,
+  selectedAdministrationRoutes,
+  onChangeSelectedAdministrationRoutes,
+  showAdministrationRoutes
 }) => {
   const classes = useStyles()
 
@@ -60,9 +66,11 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
   const [_startDate, setStartDate] = useState<any>(startDate)
   const [_endDate, setEndDate] = useState<any>(endDate)
   const [_selectedPrescriptionTypes, setSelectedPrescriptionTypes] = useState<any[]>(selectedPrescriptionTypes)
+  const [_selectedAdministrationRoutes, setSelectedAdministrationRoutes] = useState<any[]>(selectedAdministrationRoutes)
   const [dateError, setDateError] = useState(false)
 
   const [prescriptionTypesList, setPrescriptionTypesList] = useState<any[]>([])
+  const [administrationRoutesList, setAdministrationRoutesList] = useState<any[]>([])
 
   const _onChangeNda = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNda(event.target.value)
@@ -70,6 +78,10 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
 
   const _onChangeSelectedPrescriptionTypes = (event: React.ChangeEvent<{}>, value: any[]) => {
     setSelectedPrescriptionTypes(value)
+  }
+
+  const _onChangeSelectedAdministrationRoutes = (event: React.ChangeEvent<{}>, value: any[]) => {
+    setSelectedAdministrationRoutes(value)
   }
 
   const _onSubmit = () => {
@@ -80,6 +92,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
     onChangeStartDate(newStartDate)
     onChangeEndDate(newEndDate)
     onChangeSelectedPrescriptionTypes(_selectedPrescriptionTypes)
+    onChangeSelectedAdministrationRoutes(_selectedAdministrationRoutes)
     onSubmit()
     onClose()
   }
@@ -90,7 +103,13 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
       if (!prescriptionTypes) return
       setPrescriptionTypesList(prescriptionTypes)
     }
+    const _fetchAdministrationRoutes = async () => {
+      const administrationRoutesList = await fetchAdministrations()
+      if (!administrationRoutesList) return
+      setAdministrationRoutesList(administrationRoutesList)
+    }
     _fetchPrescriptionTypes()
+    _fetchAdministrationRoutes()
   }, [])
 
   useEffect(() => {
@@ -123,6 +142,32 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
               placeholder="Exemple: 6601289264,141740347"
               value={_nda}
               onChange={_onChangeNda}
+            />
+          </Grid>
+        )}
+
+        {showAdministrationRoutes && (
+          <Grid container direction="column" className={classes.filter}>
+            <Typography variant="h3">Voie d'administration :</Typography>
+            <Autocomplete
+              multiple
+              onChange={_onChangeSelectedAdministrationRoutes}
+              options={administrationRoutesList}
+              value={_selectedAdministrationRoutes}
+              disableCloseOnSelect
+              getOptionLabel={(administrationRoute: any) => capitalizeFirstLetter(administrationRoute.label)}
+              renderOption={(administrationRoute: any) => (
+                <React.Fragment>{capitalizeFirstLetter(administrationRoute.label)}</React.Fragment>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Voie d'administration"
+                  placeholder="Sélectionner une ou plusieurs voie d'arministration"
+                />
+              )}
+              className={classes.autocomplete}
             />
           </Grid>
         )}

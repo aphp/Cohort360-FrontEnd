@@ -8,18 +8,78 @@ import {
 } from 'utils/graphUtils'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
-import { MeState } from 'state/me'
-
 import { fetchGroup, fetchPatient, fetchEncounter, fetchOrganization, fetchPractitionerRole } from './callApi'
 
 const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
 export interface IServicesPerimeters {
+  /**
+   * Cette fonction retourne les informations lié à un (ou plusieur) périmètre(s)
+   *
+   * Argument:
+   *   - perimetersId: ID du périmètre (liste d'ID séparé par des virgules)
+   *
+   * Retour:
+   *   - CohortData | undefined
+   */
   fetchPerimetersInfos: (perimetersId: string) => Promise<CohortData | undefined>
+
+  /**
+   * Cette fonction retourne les informations lié à un périmètre
+   * (Cette fonction n'est appelée que lors de la transformation du JSON en carte dans le requeteur)
+   *
+   * Argument:
+   *   - perimeterId: ID du périmètre
+   *
+   * Retour:
+   *   - ScopeTreeRow | undefined
+   */
   fetchPerimeterInfoForRequeteur: (perimeterId: string) => Promise<ScopeTreeRow | undefined>
+
+  /**
+   * Cette fonction retroune l'ensemble des perimetres auquels un practitioner a le droit
+   *
+   * Argument:
+   *   - practitionerId: Identifiant technique du practitioner
+   *
+   * Retour:
+   *   - IOrganization[]
+   */
   getPerimeters: (practitionerId: string) => Promise<IOrganization[]>
-  getScopePerimeters: (practitioner: MeState) => Promise<ScopeTreeRow[]>
+
+  /**
+   * Cette fonction se base sur la fonction `getPerimeters` du service, et ré-organise la donnée sous forme d'un ScopeTreeRow[]
+   *
+   * Argument:
+   *   - practitionerId: Identifiant technique du practitioner
+   *
+   * Retour:
+   *   - ScopeTreeRow[]
+   */
+  getScopePerimeters: (practitionerId: string) => Promise<ScopeTreeRow[]>
+
+  /**
+   * Cette fonction retoune l'ensemble des périmètres enfant d'un périmètre passé en argument
+   *
+   * Argument:
+   *   - perimeter: Périmètres parent (récupéré par `getScopePerimeters`)
+   *   - getSubItem: = true si on demande à avoir les enfants des enfants
+   *
+   * Retour:
+   *   - ScopeTreeRow[]
+   */
   getScopeSubItems: (perimeter: ScopeTreeRow | null, getSubItem?: boolean) => Promise<ScopeTreeRow[]>
+
+  /**
+   *
+   *
+   * Argument:
+   *   - practitionerId: Identifiant technique du practitioner
+   *
+   * Retour:
+   *   - deidentification: = true si au moins 1 périmètre est en pseudonymisé
+   *   - nominativeGroupsIds: Liste de périmètres nominatifs
+   */
   fetchDeidentified: (practitionerId: string) => Promise<{ deidentification: boolean; nominativeGroupsIds: any[] }>
 }
 
@@ -216,8 +276,8 @@ const servicesPerimeters: IServicesPerimeters = {
     )
   },
 
-  getScopePerimeters: async (practitioner) => {
-    const practitionerId = practitioner?.id ?? ''
+  getScopePerimeters: async (practitionerId) => {
+    if (!practitionerId) return []
 
     const perimetersResults = (await servicesPerimeters.getPerimeters(practitionerId)) ?? []
 
@@ -317,7 +377,7 @@ const servicesPerimeters: IServicesPerimeters = {
     let nominativeGroupsIds: string[] = []
 
     if (!data || data.resourceType === 'OperationOutcome' || !data.meta || !data.meta.extension) {
-      return { deidentification, nominativeGroupsIds: [] }
+      return { deidentification, nominativeGroupsIds }
     }
 
     const highestPerimeters = data.meta.extension.find(

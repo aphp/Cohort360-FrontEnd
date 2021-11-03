@@ -74,9 +74,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
     startDate: string | null
     endDate: string | null
     selectedPrescriptionTypes: { id: string; label: string }[]
+    selectedAdministrationRoutes: { id: string; label: string }[]
   }>({
     nda: '',
     selectedPrescriptionTypes: [],
+    selectedAdministrationRoutes: [],
     startDate: null,
     endDate: null
   })
@@ -177,10 +179,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
   }
 
   const handleChangeFilter = (
-    filterName: 'nda' | 'startDate' | 'endDate' | 'selectedPrescriptionTypes',
+    filterName: 'nda' | 'startDate' | 'endDate' | 'selectedPrescriptionTypes' | 'selectedAdministrationRoutes',
     value: any
   ) => {
     switch (filterName) {
+      case 'selectedAdministrationRoutes':
       case 'selectedPrescriptionTypes':
       case 'nda':
       case 'startDate':
@@ -215,6 +218,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
     setFilter({
       nda: '',
       selectedPrescriptionTypes: [],
+      selectedAdministrationRoutes: [],
       startDate: null,
       endDate: null
     })
@@ -312,6 +316,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
               handleChangeFilter('selectedPrescriptionTypes', _selectedPrescriptionTypes)
             }
             showPrescriptionTypes={selectedTab === 'prescription'}
+            selectedAdministrationRoutes={filter.selectedAdministrationRoutes}
+            onChangeSelectedAdministrationRoutes={(_selectedAdministrationRoutes: { id: string; label: string }[]) =>
+              handleChangeFilter('selectedAdministrationRoutes', _selectedAdministrationRoutes)
+            }
+            showAdministrationRoutes={selectedTab === 'administration'}
           />
         </div>
       </Grid>
