@@ -96,6 +96,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
     name: string
     description?: string
     perimeters?: string[]
+    cohortId?: string
     icon?: React.ReactElement
     showActionButton?: boolean
   } = { name: '-', perimeters: [] }
@@ -104,6 +105,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
       cohort = {
         name: 'Tous mes patients',
         description: '',
+        cohortId: '',
         perimeters: [],
         icon: <GroupIcon />,
         showActionButton: false
@@ -113,6 +115,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
       cohort = {
         name: 'Information patient',
         description: '',
+        cohortId: '',
         perimeters: [],
         icon: <FaceIcon />,
         showActionButton: false
@@ -122,6 +125,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
       cohort = {
         name: dashboard.name ?? '-',
         description: dashboard.description ?? '',
+        cohortId: dashboard.cohortId ?? '',
         perimeters: [],
         icon: <ViewListIcon />,
         showActionButton: true
@@ -151,6 +155,8 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
     dispatch(deleteCohort({ deletedCohort: dashboard as CohortType }))
     history.push('/accueil')
   }
+
+  console.log('cohort :>> ', cohort)
 
   return (
     <>
@@ -252,6 +258,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                       <Typography align="right" noWrap>
                         Accès : {access}
                       </Typography>
+                      {cohort.cohortId && (
+                        <Typography variant="subtitle2">Identifiant de la cohorte: {cohort.cohortId} </Typography>
+                      )}
                     </>
                   )}
                 </Grid>

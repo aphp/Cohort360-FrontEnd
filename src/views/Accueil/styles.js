@@ -25,6 +25,10 @@ const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1
   },
+  subtitle: {
+    flexGrow: 1,
+    borderBottom: '1px solid #ccc'
+  },
   container: {
     paddingTop: theme.spacing(4)
   },
@@ -35,7 +39,13 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column'
   },
   pt3: {
-    paddingTop: theme.spacing(3)
+    paddingTop: theme.spacing(1.5)
+  },
+  newsGrid: {
+    flexDirection: 'column',
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column-reverse'
+    }
   }
 }))
 

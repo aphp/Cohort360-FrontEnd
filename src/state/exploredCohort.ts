@@ -14,6 +14,7 @@ export type ExploredCohortState = {
   excludedPatients: any[]
   loading: boolean
   requestId?: string
+  cohortId?: string
   canMakeExport?: boolean
 } & CohortData
 
@@ -127,6 +128,7 @@ const fetchExploredCohort = createAsyncThunk<
         if (id) {
           cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
           if (cohort) {
+            cohort.cohortId = id
             cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
           }
         }
