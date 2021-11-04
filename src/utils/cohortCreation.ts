@@ -215,6 +215,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
         ageFilter = `${ENCOUNTER_BIRTHDATE}=ge${date1}&${ENCOUNTER_BIRTHDATE}=le${date2}`
       }
 
+      // Ignore TypeScript because we need to check if array is not empty
+      // @ts-ignore
       filterFhir = [
         `${
           criterion.admissionMode && criterion.admissionMode.length > 0
@@ -284,9 +286,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
         }`,
         `${lengthFilter ? `${lengthFilter}` : ''}`,
         `${ageFilter ? `${ageFilter}` : ''}`
-      ]
-        .filter((elem) => elem)
-        .reduce(filterReducer)
+      ].filter((elem) => elem)
+
+      if (filterFhir && filterFhir.length > 0) {
+        // Ignore TypeScript because we need to check if array is not empty
+        // @ts-ignore
+        filterFhir = filterFhir.reduce(filterReducer)
+      }
       break
     }
 
@@ -372,7 +378,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
             : ''
         }`,
         `${
-          criterion.administration && criterion.administration.length > 0
+          criterion.type === RESSOURCE_TYPE_MEDICATION_ADMINISTRATION &&
+          criterion.administration &&
+          criterion.administration.length > 0
             ? `${MEDICATION_ADMINISTRATION}=${criterion.administration
                 .map((administration: any) => administration.id)
                 .reduce(searchReducer)}`

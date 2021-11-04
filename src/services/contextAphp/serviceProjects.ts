@@ -3,6 +3,19 @@ import apiBack from '../apiBackend'
 import { fetchGroup } from './callApi'
 
 export interface IServicesProjects {
+  /**
+   * Retourne la liste de projet de recherche d'un practitioner
+   *
+   * Argument:
+   *   - limit: Determine une limite de projet demandé
+   *   - offset: Determine un index de départ
+   *
+   * Retoune:
+   *   - count: Nombre total de projet de recherche
+   *   - next: URL d'appel pour récupérer les projet de recherche suivant
+   *   - previous: URL d'appel pour récupérer les projet de recherche précédent
+   *   - results: Liste de projet de recherche récupéré
+   */
   fetchProjectsList: (
     limit?: number,
     offset?: number
@@ -12,10 +25,53 @@ export interface IServicesProjects {
     previous: string | null
     results: ProjectType[]
   }>
+
+  /**
+   * Cette fonction ajoute un nouveau projet de recherche
+   *
+   * Argument:
+   *   - newProject: Nouveau projet de recherche
+   *
+   * Retourne:
+   *   - Projet de recherche ajouté
+   */
   addProject: (newProject: ProjectType) => Promise<ProjectType>
+
+  /**
+   * Cette fonction modifie un projet de recherche existant
+   *
+   * Argument:
+   *   - newProject: Projet de recherche à modifier
+   *
+   * Retourne:
+   *   - Projet de recherche modifié
+   */
   editProject: (editedProject: ProjectType) => Promise<ProjectType>
+
+  /**
+   * Cette fonction supprime un projet de recherche existant
+   *
+   * Argument:
+   *   - newProject: Projet de recherche à supprimer
+   *
+   * Retourne:
+   *   - Projet de recherche supprimé
+   */
   deleteProject: (deletedProject: ProjectType) => Promise<ProjectType>
 
+  /**
+   * Retourne la liste de requete d'un practitioner
+   *
+   * Argument:
+   *   - limit: Determine une limite de requete demandé
+   *   - offset: Determine un index de départ
+   *
+   * Retoune:
+   *   - count: Nombre total de requete
+   *   - next: URL d'appel pour récupérer les requete suivant
+   *   - previous: URL d'appel pour récupérer les requete précédent
+   *   - results: Liste de requete récupéré
+   */
   fetchRequestsList: (
     limit?: number,
     offset?: number
@@ -25,10 +81,53 @@ export interface IServicesProjects {
     previous: string | null
     results: RequestType[]
   }>
+
+  /**
+   * Cette fonction ajoute une nouvelle requete
+   *
+   * Argument:
+   *   - newProject: Nouvelle requete
+   *
+   * Retourne:
+   *   - Requete ajoutée
+   */
   addRequest: (newRequest: RequestType) => Promise<RequestType>
+
+  /**
+   * Cette fonction modifie un requete existant
+   *
+   * Argument:
+   *   - newProject: Requete à modifier
+   *
+   * Retourne:
+   *   - Requete modifiée
+   */
   editRequest: (editedRequest: RequestType) => Promise<RequestType>
+
+  /**
+   * Cette fonction supprime un requete existant
+   *
+   * Argument:
+   *   - newProject: Requete à supprimer
+   *
+   * Retourne:
+   *   - Requete supprimée
+   */
   deleteRequest: (deletedRequest: RequestType) => Promise<RequestType>
 
+  /**
+   * Retourne la liste de Cohort d'un practitioner
+   *
+   * Argument:
+   *   - limit: Determine une limite de projet demandé
+   *   - offset: Determine un index de départ
+   *
+   * Retoune:
+   *   - count: Nombre total de Cohort
+   *   - next: URL d'appel pour récupérer les Cohort suivant
+   *   - previous: URL d'appel pour récupérer les Cohort précédent
+   *   - results: Liste de Cohort récupéré
+   */
   fetchCohortsList: (
     providerId: string,
     limit?: number,
@@ -39,8 +138,38 @@ export interface IServicesProjects {
     previous: string | null
     results: CohortType[]
   }>
+
+  /**
+   * Cette fonction ajoute une nouvelle cohorte
+   *
+   * Argument:
+   *   - newProject: Nouvelle cohorte
+   *
+   * Retourne:
+   *   - Cohorte ajoutée
+   */
   addCohort: (newCohort: CohortType) => Promise<CohortType>
+
+  /**
+   * Cette fonction modifie un cohorte existant
+   *
+   * Argument:
+   *   - newProject: Cohorte à modifier
+   *
+   * Retourne:
+   *   - Cohorte modifiée
+   */
   editCohort: (editedCohort: CohortType) => Promise<CohortType>
+
+  /**
+   * Cette fonction supprime un cohorte existant
+   *
+   * Argument:
+   *   - newProject: Cohorte à supprimer
+   *
+   * Retourne:
+   *   - Cohorte supprimée
+   */
   deleteCohort: (deletedCohort: CohortType) => Promise<CohortType>
 }
 

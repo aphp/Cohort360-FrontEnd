@@ -1,7 +1,17 @@
 import React, { useState } from 'react'
 import { useAppSelector } from 'state'
 
-import { Button, CircularProgress, CssBaseline, Grid, MenuItem, Select, TextField, Typography } from '@material-ui/core'
+import {
+  Button,
+  CircularProgress,
+  CssBaseline,
+  Grid,
+  MenuItem,
+  Select,
+  Snackbar,
+  TextField,
+  Typography
+} from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 
 import useStyles from './styles'
@@ -47,7 +57,7 @@ const Contact: React.FC = () => {
     null
   )
   const [errorFiles, setErrorFiles] = useState(false)
-  const [createIssueSuccess, setCreateIssueSuccess] = useState(false)
+  const [createIssueSuccess, setCreateIssueSuccess] = useState(true)
   const [createIssueFail, setCreateIssueFail] = useState(false)
 
   const _onChangeValue = (key: 'requestType' | 'object' | 'url' | 'files' | 'message', value: any) => {
@@ -220,14 +230,28 @@ const Contact: React.FC = () => {
       </Grid>
 
       {createIssueSuccess && (
-        <Alert severity="success" onClose={() => setCreateIssueSuccess(false)} className={classes.alert}>
-          Votre demande a bien été transmise.
-        </Alert>
+        <Snackbar
+          open
+          onClose={() => setCreateIssueSuccess(false)}
+          autoHideDuration={3000}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert severity="success" onClose={() => setCreateIssueSuccess(false)} className={classes.alert}>
+            Votre demande a bien été transmise.
+          </Alert>
+        </Snackbar>
       )}
       {createIssueFail && (
-        <Alert severity="error" onClose={() => setCreateIssueFail(false)} className={classes.alert}>
-          Une erreur s'est produite lors de la transmission de votre demande.
-        </Alert>
+        <Snackbar
+          open
+          onClose={() => setCreateIssueFail(false)}
+          autoHideDuration={3000}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert severity="error" onClose={() => setCreateIssueFail(false)}>
+            Une erreur s'est produite lors de la transmission de votre demande.
+          </Alert>
+        </Snackbar>
       )}
     </>
   )

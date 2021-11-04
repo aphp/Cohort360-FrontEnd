@@ -5,7 +5,30 @@ import { PORTAIL_API_URL } from '../../constants'
 import { fetchPractitioner, fetchPractitionerRole } from './callApi'
 
 export interface IServicesPractitioner {
+  /**
+   * Fonction qui permet d'authetifier un utilisateur avec un username et un password
+   *
+   * Argument:
+   *  - username: Identifiant du practitioner
+   *  - password: Mot de passe du practitioner
+   *
+   * Retourne la reponse de Axios
+   */
   authenticate: (username: string, password: string) => Promise<any>
+
+  /**
+   * Cette fonction nous retourne les informations relative à un pratitioner
+   *
+   * Argument:
+   *   - username: Identifiant du practitioner
+   *
+   * Retourne:
+   *  - id: Identifiant technique du practitioner
+   *  - userName: Identifiant AP-HP
+   *  - displayName: Nom + prénom du practitioner
+   *  - firstName: Prénom du practitioner
+   *  - lastName: Nom du practitioner
+   */
   fetchPractitioner: (username: string) => Promise<{
     id: number
     userName: number
@@ -13,6 +36,16 @@ export interface IServicesPractitioner {
     firstName: string
     lastName: string
   } | null>
+
+  /**
+   * Cette fonction nous retourne les organisations ainsi que les roles attitrés
+   *
+   * Argument:
+   *   - practionerId: Identifiant technique du practitioner
+   *
+   * Retourne:
+   *   - Liste d'organisations + droit attitré
+   */
   fetchPractitionerRole: (practionerId: string) => Promise<any>
 }
 

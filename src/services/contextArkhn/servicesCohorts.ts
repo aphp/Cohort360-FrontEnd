@@ -31,8 +31,49 @@ import apiBackend from '../apiBackend'
 import apiPortail from '../apiPortail'
 
 export interface IServicesCohorts {
+  /**
+   * Retourne les informations d'une cohorte
+   *
+   * Argument:
+   *   - cohortId: Identifiant de la cohorte
+   *
+   * Retourne:
+   *   - name: Nom de la cohorte
+   *   - description: Description de la cohorte
+   *   - cohort: Objet Cohort lié a FHIR
+   *   - totalPatients: Nombre total de la cohorte
+   *   - originalPatients: Liste de patients de la cohorte
+   *   - genderRepartitionMap: Données lié au graphique de la répartition par genre
+   *   - visitTypeRepartitionData: Données lié au graphique de la répartition des visites
+   *   - agePyramidData: Données lié au graphique de la pyramide des ages
+   *   - monthlyVisitData: Données lié au graphique des visites par mois
+   *   - requestId: Identifiant de la requete lié à la cohorte
+   *   - favorite: = true si la cohorte est une cohorte favorite
+   *   - uuid: Identifiant de la cohorte lié au back-end
+   */
   fetchCohort: (cohortId: string) => Promise<CohortData | undefined>
 
+  /**
+   * Retourne la liste de patient lié à une cohorte
+   *
+   * Argument:
+   *   - page: Permet la pagination (definie un offset + limit)
+   *   - searchBy: Permet la recherche sur un champs précis (_text, family, given, identifier)
+   *   - searchInput: Permet la recherche textuelle
+   *   - gender: Permet le filtre par genre
+   *   - age: Permet le filtre par age
+   *   - vitalStatus: Permet le filtre par status vital
+   *   - sortBy: Permet le tri
+   *   - sortDirection: Permet le tri dans l'ordre croissant ou décroissant
+   *   - groupId: (optionnel) Périmètre auquel la cohorte est lié
+   *   - includeFacets: = true si vous voulez inclure les graphique
+   *
+   * Retourne:
+   *   - totalPatients: Nombre de patient (dépend des filtres)
+   *   - originalPatients: Liste de patients
+   *   - agePyramidData: Données lié au graphique de la pyramide des ages
+   *   - genderRepartitionMap: Données lié au graphique de la répartition par genre
+   */
   fetchPatientList: (
     page: number,
     searchBy: SearchByTypes,
@@ -54,6 +95,21 @@ export interface IServicesCohorts {
     | undefined
   >
 
+  /**
+   * Retourne la liste de documents lié à une cohorte
+   *
+   * Argument:
+   *   - deidentifiedBoolean: = true si la cohorte est pseudo. (permet un traitement particulié des éléments)
+   *   - sortBy: Permet le tri
+   *   - sortDirection: Permet le tri dans l'ordre croissant ou décroissant
+   *   - page: Permet la pagination (definie un offset + limit)
+   *   - searchInput: Permet la recherche textuelle
+   *   - selectedDocTypes: Permet de filtrer sur le type de documents
+   *   - nda: Permet de filtrer les documents sur un NDA particulié (uniquement en nominatif)
+   *   - startDate: Permet de filtrer sur une date
+   *   - endDate: Permet de filtrer sur une date
+   *   - groupId: (optionnel) Périmètre auquel la cohorte est lié
+   */
   fetchDocuments: (
     deidentifiedBoolean: boolean,
     sortBy: string,
@@ -64,17 +120,45 @@ export interface IServicesCohorts {
     nda: string,
     startDate?: string | null,
     endDate?: string | null,
-    groupId?: string,
-    encounterIds?: string[]
+    groupId?: string
   ) => Promise<{
     totalDocs: number
     totalAllDocs: number
     documentsList: IComposition[]
   }>
 
+  /**
+   * Permet de récupérer le contenue d'un document
+   *
+   * Argument:
+   *   - compositionId: Identifiant du documents
+   *
+   * Retoune:
+   *   - IComposition_Section: Contenue du document
+   */
   fetchDocumentContent: (compositionId: string) => Promise<IComposition_Section[]>
 
+  /**
+   * Permet la récupération des droits d'export lié a une cohorte
+   *
+   * Argument:
+   *   - cohortId: Identifiant de la cohorte
+   *   - providerId: Identifiant technique du practitioner
+   *
+   * Retoune:
+   *   - Si un utilisateur peut faire une demande d'export sur la cohorte
+   */
   fetchCohortExportRight: (cohortId: string, providerId: string) => Promise<boolean>
+
+  /**
+   * Permet de créer une demande d'export d'une cohorte
+   *
+   * Argument:
+   *   - cohortId: Identifiant de la cohorte
+   *   - motivation: Raison de l'export
+   *   - tables: Liste de table demandé dans l'export
+   *   - output_format: Format de l'export ('csv' ou 'jupiter', par défaut = 'csv')
+   */
   createExport: (args: {
     cohortId: number
     motivation: string

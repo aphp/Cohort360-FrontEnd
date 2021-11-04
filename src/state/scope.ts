@@ -38,7 +38,8 @@ const fetchScopesList = createAsyncThunk<FetchScopeListReturn, void, { state: Ro
         dispatch(fetchScopesListinBackground())
         return { scopesList }
       } else {
-        const scopes = (await services.perimeters.getScopePerimeters(me)) || []
+        if (!me) return { scopesList: [] }
+        const scopes = (await services.perimeters.getScopePerimeters(me.id)) || []
         return { scopesList: scopes }
       }
     } catch (error) {
@@ -56,7 +57,8 @@ const fetchScopesListinBackground = createAsyncThunk<FetchScopeListReturn, void,
       const { me, scope } = state
       const { scopesList } = scope
 
-      const scopes = (await services.perimeters.getScopePerimeters(me)) || []
+      if (!me) return { scopesList: [] }
+      const scopes = (await services.perimeters.getScopePerimeters(me.id)) || []
       return {
         scopesList: scopes.map((scope) => ({
           ...scope,

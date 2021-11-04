@@ -38,9 +38,53 @@ import {
 } from './callApi'
 
 export interface IServicesPatients {
+  /*
+   ** Cette fonction permet de récupérer un nombre de patient totale lié à un utilisateur
+   **
+   ** Elle ne prend aucun argument, et un nombre de patient
+   */
   fetchPatientsCount: () => Promise<number>
+
+  /*
+   ** Cette fonction permet de récupérer l'ensemble des patients lié à un utilisateur
+   **
+   ** Elle ne prend aucun argument, et retourne un object CohortData ou undefined en cas d'erreur
+   */
   fetchMyPatients: () => Promise<CohortData | undefined>
+
+  /*
+   ** Cette fonction permet de récupérer les informations lié à un patient
+   **
+   ** Arguement:
+   **   - patientId: identifiant technique d'un patient
+   **   - groupId: (optionnel) Périmètre auquel le patient est lié
+   **
+   ** Retourne un objet PatientData ou undefined en cas d'erreur
+   */
   fetchPatient: (patientId: string, groupId?: string) => Promise<PatientData | undefined>
+
+  /*
+   ** Cette fonction permet de récupérer les élèments de PMSI lié à un patient
+   **
+   ** Arguement:
+   **   - deidentified: permet certaine anonymisation de la donnée
+   **   - page: permet la pagination des éléments
+   **   - patientId: identifiant technique d'un patient
+   **   - selectedTab: permet de selectionner la collection Condition, Procedure, ou Claim
+   **   - searchInput: permet la recherche textuelle
+   **   - nda: permet de filtrer sur un NDA précis
+   **   - code: permet de filtrer un code
+   **   - diagnosticTypes: permet de filtrer par un type de diagnostic (uniquement pour les CIM10)
+   **   - sortBy: permet le tri
+   **   - sortDirection: permet le tri dans l'ordre croissant ou décroissant
+   **   - groupId: (optionnel) Périmètre auquel le patient est lié
+   **   - startDate: (optionnel) permet le filtre par date
+   **   - endDate: (optionnel) permet le filtre par date
+   **
+   ** Retour:
+   **   - pmsiData: Liste de 20 éléments de PMSI lié à un patient et au "selectedTab", donc soit un élément de Condition, Procedure ou Claim
+   **   - pmsiTotal: Nombre d'élément totale par rapport au filtre indiqué
+   */
   fetchPMSI: (
     deidentified: boolean,
     page: number,
@@ -59,6 +103,30 @@ export interface IServicesPatients {
     pmsiData?: PMSIEntry<IClaim | ICondition | IProcedure>[]
     pmsiTotal?: number
   }>
+
+  /*
+   ** Cette fonction permet de récupérer les élèments de Medication lié à un patient
+   **
+   ** Arguement:
+   **   - deidentified: permet certaine anonymisation de la donnée
+   **   - page: permet la pagination des éléments
+   **   - patientId: identifiant technique d'un patient
+   **   - selectedTab: permet de selectionner la collection MedicationRequest ou MedicationAdministration
+   **   - searchInput: permet la recherche textuelle
+   **   - nda: permet de filtrer sur un NDA précis
+   **   - sortBy: permet le tri
+   **   - sortDirection: permet le tri dans l'ordre croissant ou décroissant
+   **   - selectedPrescriptionTypeIds: permet le filtre par type de prescription
+   **   - selectedAdministrationRouteIds: permet le filtre par la voie d'administration
+   **   - groupId: (optionnel) Périmètre auquel le patient est lié
+   **   - startDate: (optionnel) permet le filtre par date
+   **   - endDate: (optionnel) permet le filtre par date
+   **
+   ** Retour:
+   **   - medicationData: Liste de 20 éléments de Medication lié à un patient et à "selectedTab", donc soit un élément de MedicationRequest ou MedicationAdministration
+   **   - medicationTotal: Nombre d'élément totale par rapport au filtre indiqué
+   */
+
   fetchMedication: (
     deidentified: boolean,
     page: number,
@@ -68,13 +136,36 @@ export interface IServicesPatients {
     nda: string,
     sortBy: string,
     sortDirection: string,
+    selectedPrescriptionTypeIds: string,
+    selectedAdministrationRouteIds: string,
     groupId?: string,
-    startDate?: string | null,
-    endDate?: string | null
+    startDate?: string,
+    endDate?: string
   ) => Promise<{
     medicationData?: MedicationEntry<IMedicationAdministration | IMedicationRequest>[]
     medicationTotal?: number
   }>
+
+  /*
+   ** Cette fonction permet de récupérer les élèments de Composition lié à un patient
+   **
+   ** Arguement:
+   **   - deidentified: permet certaine anonymisation de la donnée
+   **   - sortBy: permet le tri
+   **   - sortDirection: permet le tri dans l'ordre croissant ou décroissant
+   **   - page: permet la pagination des éléments
+   **   - patientId: identifiant technique d'un patient
+   **   - searchInput: permet la recherche textuelle
+   **   - selectedDocTypes: permet de filtrer par un type de documents
+   **   - nda: permet de filtrer sur un NDA précis
+   **   - startDate: (optionnel) permet le filtre par date
+   **   - endDate: (optionnel) permet le filtre par date
+   **   - groupId: (optionnel) Périmètre auquel le patient est lié
+   **
+   ** Retour:
+   **   - docsList: Liste de 20 éléments de Composition lié à un patient
+   **   - docsTotal: Nombre d'élément totale par rapport au filtre indiqué
+   */
   fetchDocuments: (
     deidentified: boolean,
     sortBy: string,
@@ -88,9 +179,25 @@ export interface IServicesPatients {
     endDate?: string | null,
     groupId?: string
   ) => Promise<{
-    docsTotal: number
     docsList: CohortComposition[]
+    docsTotal: number
   }>
+
+  /*
+   ** Cette fonction permet de chercher un patient grâce à une barre de recherche
+   **
+   ** Arguement:
+   **   - nominativeGroupsIds: permet certaine anonymisation de la donnée
+   **   - page: permet la pagination des éléments
+   **   - sortBy: permet le tri
+   **   - sortDirection: permet le tri dans l'ordre croissant ou décroissant
+   **   - input: permet la recherche d'un patient
+   **   - searchBy: permet la recherche sur un élément précis (nom, prénom ou indeterminé)
+   **
+   ** Retour:
+   **   - patientList: Liste de 20 patients lié à la recherche
+   **   - totalPatients: Nombre d'élément totale par rapport au filtre indiqué
+   */
   searchPatient: (
     nominativeGroupsIds: string[] | undefined,
     page: number,
@@ -265,7 +372,11 @@ const servicesPatients: IServicesPatients = {
     nda,
     sortBy,
     sortDirection,
-    groupId
+    selectedPrescriptionTypeIds,
+    selectedAdministrationRouteIds,
+    groupId,
+    startDate,
+    endDate
   ) => {
     let medicationResp: AxiosResponse<FHIR_API_Response<IMedicationRequest | IMedicationAdministration>> | null = null
 
@@ -279,7 +390,10 @@ const servicesPatients: IServicesPatients = {
           patient: patientId,
           _text: searchInput,
           _sort: sortBy,
-          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc'
+          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+          type: selectedPrescriptionTypeIds,
+          minDate: startDate,
+          maxDate: endDate
         })
         break
       case 'administration':
@@ -291,7 +405,10 @@ const servicesPatients: IServicesPatients = {
           patient: patientId,
           _text: searchInput,
           _sort: sortBy,
-          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc'
+          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+          route: selectedAdministrationRouteIds,
+          minDate: startDate,
+          maxDate: endDate
         })
         break
       default:

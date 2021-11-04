@@ -74,9 +74,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
     startDate: string | null
     endDate: string | null
     selectedPrescriptionTypes: { id: string; label: string }[]
+    selectedAdministrationRoutes: { id: string; label: string }[]
   }>({
     nda: '',
     selectedPrescriptionTypes: [],
+    selectedAdministrationRoutes: [],
     startDate: null,
     endDate: null
   })
@@ -93,6 +95,8 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
     nda: string,
     sortBy: string,
     sortDirection: string,
+    selectedPrescriptionTypes: { id: string; label: string }[],
+    selectedAdministrationRoutes: { id: string; label: string }[],
     startDate?: string | null,
     endDate?: string | null
   ) => {
@@ -108,9 +112,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
       nda,
       sortBy,
       sortDirection,
+      selectedPrescriptionTypes.map(({ id }) => id).join(','),
+      selectedAdministrationRoutes.map(({ id }) => id).join(','),
       groupId,
-      startDate,
-      endDate
+      startDate ?? undefined,
+      endDate ?? undefined
     )
 
     setData(medicationResp?.medicationData ?? [])
@@ -130,6 +136,8 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
       filter.nda,
       sort.by,
       sort.direction,
+      filter.selectedPrescriptionTypes ?? [],
+      filter.selectedAdministrationRoutes ?? [],
       filter.startDate,
       filter.endDate
     )
@@ -150,6 +158,8 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
       filter.nda,
       property,
       newDirection,
+      filter.selectedPrescriptionTypes ?? [],
+      filter.selectedAdministrationRoutes ?? [],
       filter.startDate,
       filter.endDate
     )
@@ -167,6 +177,8 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
       filter.nda,
       sort.by,
       sort.direction,
+      filter.selectedPrescriptionTypes ?? [],
+      filter.selectedAdministrationRoutes ?? [],
       filter.startDate,
       filter.endDate
     )
@@ -177,10 +189,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
   }
 
   const handleChangeFilter = (
-    filterName: 'nda' | 'startDate' | 'endDate' | 'selectedPrescriptionTypes',
+    filterName: 'nda' | 'startDate' | 'endDate' | 'selectedPrescriptionTypes' | 'selectedAdministrationRoutes',
     value: any
   ) => {
     switch (filterName) {
+      case 'selectedAdministrationRoutes':
       case 'selectedPrescriptionTypes':
       case 'nda':
       case 'startDate':
@@ -215,6 +228,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
     setFilter({
       nda: '',
       selectedPrescriptionTypes: [],
+      selectedAdministrationRoutes: [],
       startDate: null,
       endDate: null
     })
@@ -312,6 +326,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
               handleChangeFilter('selectedPrescriptionTypes', _selectedPrescriptionTypes)
             }
             showPrescriptionTypes={selectedTab === 'prescription'}
+            selectedAdministrationRoutes={filter.selectedAdministrationRoutes}
+            onChangeSelectedAdministrationRoutes={(_selectedAdministrationRoutes: { id: string; label: string }[]) =>
+              handleChangeFilter('selectedAdministrationRoutes', _selectedAdministrationRoutes)
+            }
+            showAdministrationRoutes={selectedTab === 'administration'}
           />
         </div>
       </Grid>
@@ -381,7 +400,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                     direction={sort.by === 'Period-start' ? sort.direction : 'asc'}
                     onClick={handleSort('Period-start')}
                   >
-                    {selectedTab === 'prescription' ? 'Date de préscription' : "Date d'administration"}
+                    {selectedTab === 'prescription' ? 'Date de prescription' : "Date d'administration"}
                   </TableSortLabel>
                 </TableCell>
                 <TableCell align="center" className={classes.tableHeadCell}>

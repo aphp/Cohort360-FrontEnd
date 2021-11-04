@@ -150,33 +150,14 @@ Ce fichier définie l'ensemble des fonction lié à la récupération de donnée
 
 ```
 export  interface  IServicesPatients {
-	/*
-	** Cette fonction permet de récupérer un nombre de patient totale lié à un utilisateur
-	**
-	** Elle ne prend aucun argument, et un nombre de patient
-	*/
 	fetchPatientsCount: () =>  Promise<
 		number
 	>
 
-	/*
-	** Cette fonction permet de récupérer l'ensemble des patients lié à un utilisateur
-	**
-	** Elle ne prend aucun argument, et retourne un object CohortData ou undefined en cas d'erreur
-	*/
 	fetchMyPatients: () =>  Promise<
 		CohortData | undefined
 	>
 
-	/*
-	** Cette fonction permet de récupérer les informations lié à un patient
-	**
-	** Arguement:
-	**   - patientId: identifiant technique d'un patient
-	**   - groupId: (optionnel) Périmètre auquel le patient est lié
-	**
-	** Retourne un objet PatientData ou undefined en cas d'erreur
-	*/
 	fetchPatient: (
 		patientId: string,
 		groupId?: string
@@ -184,28 +165,6 @@ export  interface  IServicesPatients {
 		PatientData | undefined
 	>
 
-	/*
-	** Cette fonction permet de récupérer les élèments de PMSI lié à un patient
-	**
-	** Arguement:
-	**   - deidentified: permet certaine anonymisation de la donnée
-	**   - page: permet la pagination des éléments
-	**   - patientId: identifiant technique d'un patient
-	**   - selectedTab: permet de selectionner la collection Condition, Procedure, ou Claim
-	**   - searchInput: permet la recherche textuelle
-	**   - nda: permet de filtrer sur un NDA précis
-	**   - code: permet de filtrer un code
-	**   - diagnosticTypes: permet de filtrer par un type de diagnostic (uniquement pour les CIM10)
-	**   - sortBy: permet le tri
-	**   - sortDirection: permet le tri dans l'ordre croissant ou décroissant
-	**   - groupId: (optionnel) Périmètre auquel le patient est lié
-	**   - startDate: (optionnel) permet le filtre par date
-	**   - endDate: (optionnel) permet le filtre par date
-	**
-	** Retourne:
-	**   - pmsiData: Liste de 20 éléments de PMSI lié au "selectedTab", donc soit un élément de Condition, Procedure ou Claim
-	**   - pmsiTotal: Nombre d'élément totale par rapport au filtre indiqué
-	*/
 	fetchPMSI: (
 		deidentified: boolean,
 		page: number,
@@ -225,26 +184,6 @@ export  interface  IServicesPatients {
 		pmsiTotal?: number
 	}>
 
-	/*
-	** Cette fonction permet de récupérer les élèments de Medication lié à un patient
-	**
-	** Arguement:
-	**   - deidentified: permet certaine anonymisation de la donnée
-	**   - page: permet la pagination des éléments
-	**   - patientId: identifiant technique d'un patient
-	**   - selectedTab: permet de selectionner la collection MedicationRequest ou MedicationAdministration
-	**   - searchInput: permet la recherche textuelle
-	**   - nda: permet de filtrer sur un NDA précis
-	**   - sortBy: permet le tri
-	**   - sortDirection: permet le tri dans l'ordre croissant ou décroissant
-	**   - groupId: (optionnel) Périmètre auquel le patient est lié
-	**   - startDate: (optionnel) permet le filtre par date
-	**   - endDate: (optionnel) permet le filtre par date
-	**
-	** Retourne:
-	**   - medicationData: Liste de 20 éléments de Medication lié au "selectedTab", donc soit un élément de MedicationRequest ou MedicationAdministration
-	**   - medicationTotal: Nombre d'élément totale par rapport au filtre indiqué
-	*/
 	fetchMedication: (
 		deidentified: boolean,
 		page: number,
@@ -262,26 +201,6 @@ export  interface  IServicesPatients {
 		medicationTotal?: number
     }>
 
-	/*
-	** Cette fonction permet de récupérer les élèments de Composition lié à un patient
-	**
-	** Arguement:
-	**   - deidentified: permet certaine anonymisation de la donnée
-	**   - sortBy: permet le tri
-	**   - sortDirection: permet le tri dans l'ordre croissant ou décroissant
-	**   - page: permet la pagination des éléments
-	**   - patientId: identifiant technique d'un patient
-	**   - searchInput: permet la recherche textuelle
-	**   - selectedDocTypes: permet de filtrer par un type de documents
-	**   - nda: permet de filtrer sur un NDA précis
-	**   - startDate: (optionnel) permet le filtre par date
-	**   - endDate: (optionnel) permet le filtre par date
-	**   - groupId: (optionnel) Périmètre auquel le patient est lié
-	**
-	** Retourne:
-	**   - pmsiData: Liste de 20 éléments de Composition
-	**   - pmsiTotal: Nombre d'élément totale par rapport au filtre indiqué
-	*/
 	fetchDocuments: (
 		deidentified: boolean,
 		sortBy: string,
@@ -299,22 +218,6 @@ export  interface  IServicesPatients {
 		docsTotal: number
 	}>
 
-
-	/*
-	** Cette fonction permet de chercher un patient grâce à une barre de recherche
-	**
-	** Arguement:
-	**   - nominativeGroupsIds: permet certaine anonymisation de la donnée
-	**   - page: permet la pagination des éléments
-	**   - sortBy: permet le tri
-	**   - sortDirection: permet le tri dans l'ordre croissant ou décroissant
-	**   - input: permet la recherche d'un patient
-	**   - searchBy: permet la recherche sur un élément précis (nom, prénom ou indeterminé)
-	**
-	** Retourne:
-	**   - patientList: Liste de 20 patients
-	**   - totalPatients: Nombre d'élément totale par rapport au filtre indiqué
-	*/
 	searchPatient: (
 		nominativeGroupsIds: string[] | undefined,
 		page: number,
@@ -326,5 +229,170 @@ export  interface  IServicesPatients {
 		patientList: IPatient[]
 		totalPatients: number
 	}>
+}
+```
+
+##### servicePerimeters.ts
+
+> Pour l'ensemble des fonctions définie dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définie dans un premier temps pour éviter tous problèmes de typage.
+
+Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à un périmètre, et définie l'interface suivante :
+
+```
+export  interface  IServicesPerimeters {
+	fetchPerimetersInfos: (
+		perimetersId: string
+	) =>  Promise<
+		CohortData | undefined
+	>
+
+	fetchPerimeterInfoForRequeteur: (
+		perimeterId: string
+	) =>  Promise<
+		ScopeTreeRow | undefined
+	>
+
+	getPerimeters: (
+		practitionerId: string
+	) =>  Promise<
+		IOrganization[]
+	>
+
+	getScopePerimeters: (
+		practitionerId: string
+	) =>  Promise<
+		ScopeTreeRow[]
+	>
+
+	getScopeSubItems: (
+		perimeter: ScopeTreeRow | null,
+		getSubItem?: boolean
+	) =>  Promise<
+		ScopeTreeRow[]
+	>
+
+	fetchDeidentified: (
+		practitionerId: string
+	) =>  Promise<{
+		deidentification: boolean;
+		nominativeGroupsIds: any[]
+	}>
+}
+```
+
+##### servicePractitioner.ts
+
+> Pour l'ensemble des fonctions définie dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définie dans un premier temps pour éviter tous problèmes de typage.
+
+Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à un practitioner (utilisateur de cohort360), et définie l'interface suivante :
+
+```
+export  interface  IServicesPractitioner {
+	authenticate: (
+		username: string,
+		password: string
+	) =>  Promise<any>
+
+	fetchPractitioner: (
+		username: string
+	) =>  Promise<{
+		id: number
+		userName: number
+		displayName: string
+		firstName: string
+		lastName: string
+	} | null>
+
+	fetchPractitionerRole: (
+		practionerId: string
+	) =>  Promise<any>
+}
+```
+
+##### servicePractitioner.ts
+
+> ⚠️ Cette interface est lié au back-end de Cohort360 et non à FHIR comme le reste des interfaces.
+
+> Pour l'ensemble des fonctions définie dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définie dans un premier temps pour éviter tous problèmes de typage.
+
+Ce fichier définie l'ensemble des fonctions lié à la récupération de donnée lié aux projets de recherche, aux requêtes, et aux cohortes, et définie l'interface suivante :
+
+```
+export  interface  IServicesProjects {
+	fetchProjectsList: (
+		limit?: number,
+		offset?: number
+	) =>  Promise<{
+		count: number
+		next: string | null
+		previous: string | null
+		results: ProjectType[]
+	}>
+	addProject: (
+		newProject: ProjectType
+	) =>  Promise<
+		ProjectType
+	>
+	editProject: (
+		editedProject: ProjectType
+	) =>  Promise<
+		ProjectType
+	>
+	deleteProject: (
+		deletedProject: ProjectType
+	) =>  Promise<
+		ProjectType
+	>
+
+	fetchRequestsList: (
+		limit?: number,
+		offset?: number
+	) =>  Promise<{
+		count: number
+		next: string | null
+		previous: string | null
+		results: RequestType[]
+	}>
+	addRequest: (
+		newRequest: RequestType
+	) =>  Promise<
+		RequestType
+	>
+	editRequest: (
+		editedRequest: RequestType
+	) =>  Promise<
+		RequestType
+	>
+	deleteRequest: (
+		deletedRequest: RequestType
+	) =>  Promise<
+		RequestType
+	>
+
+	fetchCohortsList: (
+		providerId: string,
+		limit?: number,
+		offset?: number
+	) =>  Promise<{
+		count: number
+		next: string | null
+		previous: string | null
+		results: CohortType[]
+	}>
+	addCohort: (
+		newCohort: CohortType
+	) =>  Promise<
+		CohortType
+	>
+	editCohort: (
+		editedCohort: CohortType
+	) =>  Promise<
+		CohortType
+	>
+	deleteCohort: (
+		deletedCohort: CohortType
+	) =>  Promise<
+		CohortType
+	>
 }
 ```

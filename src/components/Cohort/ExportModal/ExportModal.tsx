@@ -211,28 +211,14 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
             <List className={classes.list}>
               {export_table.map(({ table_name, table_id }) => (
                 <ListItem className={classes.tableListElement} key={table_id}>
-                  {table_id === 'concept' ? (
-                    <ListItemText
-                      disableTypography
-                      primary={
-                        <Grid container direction="row" alignItems="center">
-                          <Typography variant="body1">{table_name} -</Typography>
-                          <Typography variant="body1" style={{ fontStyle: 'italic', paddingLeft: 4 }}>
-                            {table_id}
-                          </Typography>
-                        </Grid>
-                      }
-                    ></ListItemText>
-                  ) : (
-                    <ListItemText disableTypography>
-                      <Grid container direction="row" alignItems="center">
-                        <Typography variant="body1">{table_name} - </Typography>
-                        <Typography variant="body1" style={{ fontStyle: 'italic', paddingLeft: 4 }}>
-                          {table_id}
-                        </Typography>
-                      </Grid>
-                    </ListItemText>
-                  )}
+                  <ListItemText disableTypography>
+                    <Grid container direction="row" alignItems="center">
+                      <Typography variant="body1">{table_name} - </Typography>
+                      <Typography variant="body1" style={{ fontStyle: 'italic', paddingLeft: 4 }}>
+                        {table_id}
+                      </Typography>
+                    </Grid>
+                  </ListItemText>
 
                   <ListItemSecondaryAction>
                     <Checkbox
