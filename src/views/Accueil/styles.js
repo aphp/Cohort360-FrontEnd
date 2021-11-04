@@ -25,6 +25,10 @@ const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1
   },
+  subtitle: {
+    flexGrow: 1,
+    borderBottom: '1px solid #ccc'
+  },
   container: {
     paddingTop: theme.spacing(4)
   },
