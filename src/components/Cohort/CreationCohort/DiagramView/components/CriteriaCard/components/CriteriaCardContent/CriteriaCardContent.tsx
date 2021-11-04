@@ -111,46 +111,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 </Tooltip>
               }
             />
-          ),
-          +_currentCriteria?.occurrence !== 1 && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>{`Nombre d'occurrence ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
-              }
-            />
-          ),
-          (startDate || endDate) && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>
-                  {startDate
-                    ? endDate
-                      ? `Entre le ${startDate} et le ${endDate}`
-                      : `Avant le ${startDate}`
-                    : endDate
-                    ? `Après le ${endDate}`
-                    : ''}
-                </Typography>
-              }
-            />
-          ),
-          (encounterStartDate || encounterEndDate) && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>
-                  {encounterStartDate
-                    ? encounterEndDate
-                      ? `Prise en charge entre le ${encounterStartDate} et le ${encounterEndDate}`
-                      : `Prise en charge avant le ${encounterStartDate}`
-                    : encounterEndDate
-                    ? `Prise en charge après le ${encounterEndDate}`
-                    : ''}
-                </Typography>
-              }
-            />
           )
         ]
         break
@@ -178,46 +138,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                     {_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
                   </Typography>
                 </Tooltip>
-              }
-            />
-          ),
-          +_currentCriteria?.occurrence !== 1 && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>{`Nombre d'occurrence ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
-              }
-            />
-          ),
-          (startDate || endDate) && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>
-                  {startDate
-                    ? endDate
-                      ? `Entre le ${startDate} et le ${endDate}`
-                      : `Avant le ${startDate}`
-                    : endDate
-                    ? `Après le ${endDate}`
-                    : ''}
-                </Typography>
-              }
-            />
-          ),
-          (encounterStartDate || encounterEndDate) && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>
-                  {encounterStartDate
-                    ? encounterEndDate
-                      ? `Prise en charge entre le ${encounterStartDate} et le ${encounterEndDate}`
-                      : `Prise en charge avant le ${encounterStartDate}`
-                    : encounterEndDate
-                    ? `Prise en charge après le ${encounterEndDate}`
-                    : ''}
-                </Typography>
               }
             />
           )
@@ -273,46 +193,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                     {_currentCriteria?.diagnosticType?.map((diagnosticType) => diagnosticType.id).reduce(reducer)}
                   </Typography>
                 </Tooltip>
-              }
-            />
-          ),
-          +_currentCriteria?.occurrence !== 1 && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>{`Nombre d'occurrence ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
-              }
-            />
-          ),
-          (startDate || endDate) && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>
-                  {startDate
-                    ? endDate
-                      ? `Entre le ${startDate} et le ${endDate}`
-                      : `Avant le ${startDate}`
-                    : endDate
-                    ? `Après le ${endDate}`
-                    : ''}
-                </Typography>
-              }
-            />
-          ),
-          (encounterStartDate || encounterEndDate) && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>
-                  {encounterStartDate
-                    ? encounterEndDate
-                      ? `Prise en charge entre le ${encounterStartDate} et le ${encounterEndDate}`
-                      : `Prise en charge avant le ${encounterStartDate}`
-                    : encounterEndDate
-                    ? `Prise en charge après le ${encounterEndDate}`
-                    : ''}
-                </Typography>
               }
             />
           )
@@ -448,46 +328,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               label={
                 <Typography style={{ maxWidth: 500 }} noWrap>
                   {displaySelectedDocType(_currentCriteria?.docType)}
-                </Typography>
-              }
-            />
-          ),
-          +_currentCriteria?.occurrence !== 1 && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>{`Nombre d'occurrence ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
-              }
-            />
-          ),
-          (startDate || endDate) && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>
-                  {startDate
-                    ? endDate
-                      ? `Entre le ${startDate} et le ${endDate}`
-                      : `Avant le ${startDate},`
-                    : endDate
-                    ? `Après le ${endDate}`
-                    : ''}
-                </Typography>
-              }
-            />
-          ),
-          (encounterStartDate || encounterEndDate) && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>
-                  {encounterStartDate
-                    ? encounterEndDate
-                      ? `Prise en charge entre le ${encounterStartDate} et le ${encounterEndDate}`
-                      : `Prise en charge avant le ${encounterStartDate}`
-                    : encounterEndDate
-                    ? `Prise en charge après le ${encounterEndDate}`
-                    : ''}
                 </Typography>
               }
             />
@@ -817,22 +657,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 </Typography>
               }
             />
-          ),
-          (encounterStartDate || encounterEndDate) && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>
-                  {encounterStartDate
-                    ? encounterEndDate
-                      ? `Prise en charge entre le ${encounterStartDate} et le ${encounterEndDate}`
-                      : `Prise en charge avant le ${encounterStartDate}`
-                    : encounterEndDate
-                    ? `Prise en charge après le ${encounterEndDate}`
-                    : ''}
-                </Typography>
-              }
-            />
           )
         ]
         break
@@ -926,42 +750,77 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 label={<Typography>{displaySelectedPrescriptionType(_currentCriteria?.prescriptionType)}</Typography>}
               />
             ),
-          _currentCriteria && _currentCriteria?.administration && _currentCriteria?.administration.length > 0 && (
-            <Chip
-              className={classes.criteriaChip}
-              label={<Typography>{displaySelectedAdministration(_currentCriteria?.administration)}</Typography>}
-            />
-          ),
-          +_currentCriteria?.occurrence !== 1 && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>{`Nombre d'occurrence ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
-              }
-            />
-          ),
-          (startDate || endDate) && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography>
-                  {startDate
-                    ? endDate
-                      ? `Entre le ${startDate} et le ${endDate}`
-                      : `Avant le ${startDate}`
-                    : endDate
-                    ? `Après le ${endDate}`
-                    : ''}
-                </Typography>
-              }
-            />
-          )
+          _currentCriteria &&
+            _currentCriteria?.type === 'MedicationAdministration' &&
+            _currentCriteria?.administration &&
+            _currentCriteria?.administration.length > 0 && (
+              <Chip
+                className={classes.criteriaChip}
+                label={<Typography>{displaySelectedAdministration(_currentCriteria?.administration)}</Typography>}
+              />
+            )
         ]
         break
       }
 
       default:
         break
+    }
+
+    if (
+      _currentCriteria.type !== 'Patient' &&
+      _currentCriteria.type !== 'MedicationRequest' &&
+      _currentCriteria.type !== 'MedicationAdministration' &&
+      (encounterStartDate || encounterEndDate)
+    ) {
+      content = [
+        ...content,
+        <Chip
+          key={parseInt(`${Math.random() * 10000}`)}
+          className={classes.criteriaChip}
+          label={
+            <Typography>
+              {encounterStartDate
+                ? encounterEndDate
+                  ? `Prise en charge entre le ${encounterStartDate} et le ${encounterEndDate}`
+                  : `Prise en charge après le ${encounterStartDate}`
+                : encounterEndDate
+                ? `Prise en charge avant le ${encounterEndDate}`
+                : ''}
+            </Typography>
+          }
+        />
+      ]
+    }
+
+    if (_currentCriteria.type !== 'Patient' && _currentCriteria.type !== 'Encounter') {
+      content = [
+        ...content,
+        +_currentCriteria?.occurrence !== 1 && (
+          <Chip
+            className={classes.criteriaChip}
+            label={
+              <Typography>{`Nombre d'occurrence ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
+            }
+          />
+        ),
+        (startDate || endDate) && (
+          <Chip
+            className={classes.criteriaChip}
+            label={
+              <Typography>
+                {startDate
+                  ? endDate
+                    ? `Entre le ${startDate} et le ${endDate}`
+                    : `Avant le ${startDate}`
+                  : endDate
+                  ? `Après le ${endDate}`
+                  : ''}
+              </Typography>
+            }
+          />
+        )
+      ]
     }
 
     content = content.filter((c) => c) // Filter null element
