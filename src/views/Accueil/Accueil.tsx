@@ -97,7 +97,7 @@ const Accueil: React.FC = () => {
           <Grid item xs={12} md={6} lg={6}>
             <Grid item>
               <Paper className={classes.paper}>
-                <PatientsCard />
+                <NewsCard />
               </Paper>
             </Grid>
             <Grid item className={classes.pt3}>
@@ -109,12 +109,12 @@ const Accueil: React.FC = () => {
           <Grid item xs={12} md={6} lg={6}>
             <Grid item xs={12} md={12} lg={12}>
               <Paper className={classes.paper}>
-                <NewsCard />
+                <TutorialsCard />
               </Paper>
             </Grid>
             <Grid item xs={12} md={12} lg={12} className={classes.pt3}>
               <Paper className={classes.paper}>
-                <TutorialsCard />
+                <PatientsCard />
               </Paper>
             </Grid>
           </Grid>
