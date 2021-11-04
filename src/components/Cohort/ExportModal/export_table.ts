@@ -16,11 +16,6 @@ const exportTable: ExportTableType[] = [
     table_id: 'observation'
   },
   {
-    id: 'drug_exposure',
-    table_name: 'Patient - Médicaments',
-    table_id: 'drug_exposure'
-  },
-  {
     id: 'drug_exposure_prescription',
     table_name: 'Patient - Médicaments - Prescription',
     table_id: 'drug_exposure_prescription'
