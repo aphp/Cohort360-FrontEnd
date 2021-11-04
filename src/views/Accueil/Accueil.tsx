@@ -93,33 +93,37 @@ const Accueil: React.FC = () => {
         className={classes.container}
         style={{ minHeight: 'calc(100vh - 70px)', marginBottom: 8 }}
       >
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6} lg={6}>
-            <Grid item>
+        <Grid container spacing={1}>
+          <Grid container className={classes.newsGrid} item xs={12} md={6} lg={6}>
+            <Grid item className={classes.pt3}>
               <Paper className={classes.paper}>
                 <NewsCard />
               </Paper>
             </Grid>
+
             <Grid item className={classes.pt3}>
-              <Paper className={classes.paper}>
-                <SearchPatientCard />
-              </Paper>
-            </Grid>
-          </Grid>
-          <Grid item xs={12} md={6} lg={6}>
-            <Grid item xs={12} md={12} lg={12}>
-              <Paper className={classes.paper}>
-                <TutorialsCard />
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={12} lg={12} className={classes.pt3}>
               <Paper className={classes.paper}>
                 <PatientsCard />
               </Paper>
             </Grid>
           </Grid>
+
+          <Grid container item xs={12} md={6} lg={6}>
+            <Grid item xs={12} md={12} lg={12} className={classes.pt3}>
+              <Paper className={classes.paper}>
+                <TutorialsCard />
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12} md={12} lg={12} className={classes.pt3}>
+              <Paper className={classes.paper}>
+                <SearchPatientCard />
+              </Paper>
+            </Grid>
+          </Grid>
         </Grid>
-        <Grid container spacing={3}>
+
+        <Grid container spacing={3} style={{ paddingTop: 8 }}>
           <Grid item xs={12} md={12} lg={12}>
             <Paper className={classes.paper}>
               <ResearchCard title={'Mes cohortes favorites'} cohorts={favoriteCohorts} />
