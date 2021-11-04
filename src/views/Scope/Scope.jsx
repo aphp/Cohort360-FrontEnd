@@ -100,28 +100,29 @@ const Scope = () => {
           </Typography>
           <Paper className={classes.paper}>
             <ScopeTree defaultSelectedItems={selectedItems} onChangeSelectedItem={onChangeSelectedItem} />
-
-            <div className={classes.buttons}>
-              <Button
-                variant="contained"
-                disableElevation
-                onClick={() => onChangeSelectedItem([])}
-                disabled={!selectedItems.length}
-                className={classes.cancelButton}
-              >
-                Annuler
-              </Button>
-              <Button
-                variant="contained"
-                disableElevation
-                disabled={!selectedItems.length}
-                onClick={trimItems}
-                className={classes.validateButton}
-              >
-                Valider
-              </Button>
-            </div>
           </Paper>
+        </Grid>
+        <Grid container item justify="center" className={classes.bottomBar}>
+          <Grid container item justify="flex-end" xs={9} className={classes.buttons}>
+            <Button
+              variant="contained"
+              disableElevation
+              onClick={() => onChangeSelectedItem([])}
+              disabled={!selectedItems.length}
+              className={classes.cancelButton}
+            >
+              Annuler
+            </Button>
+            <Button
+              variant="contained"
+              disableElevation
+              disabled={!selectedItems.length}
+              onClick={trimItems}
+              className={classes.validateButton}
+            >
+              Valider
+            </Button>
+          </Grid>
         </Grid>
       </Grid>
     </Grid>
