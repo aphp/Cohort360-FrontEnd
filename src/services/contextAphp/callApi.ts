@@ -475,10 +475,13 @@ type fetchMedicationRequestProps = {
   _text?: string
   encounter?: string
   patient?: string
+  type?: string
+  minDate?: string
+  maxDate?: string
   _list?: string[]
 }
 export const fetchMedicationRequest = async (args: fetchMedicationRequestProps) => {
-  const { id, size, offset, _sort, sortDirection, _text, encounter, patient } = args
+  const { id, size, offset, _sort, sortDirection, _text, encounter, patient, type, minDate, maxDate } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
 
@@ -492,6 +495,9 @@ export const fetchMedicationRequest = async (args: fetchMedicationRequestProps) 
   if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
   if (encounter)                                   options = [...options, `encounter=${encounter}`]                                             // eslint-disable-line
   if (_text)                                       options = [...options, `_text=${_text}`]                                                     // eslint-disable-line
+  if (type)                                        options = [...options, `type=${type}`]                                                       // eslint-disable-line
+  if (minDate)                                     options = [...options, `Period-start=ge${minDate}`]                                          // eslint-disable-line
+  if (maxDate)                                     options = [...options, `Period-start=le${maxDate}`]                                          // eslint-disable-line
 
   if (_list && _list.length > 0)                   options = [...options, `_list=${_list.reduce(reducer)}`]                                     // eslint-disable-line
 
@@ -511,10 +517,13 @@ type fetchMedicationAdministrationProps = {
   _text?: string
   encounter?: string
   patient?: string
+  route?: string
+  minDate?: string
+  maxDate?: string
   _list?: string[]
 }
 export const fetchMedicationAdministration = async (args: fetchMedicationAdministrationProps) => {
-  const { id, size, offset, _sort, sortDirection, _text, encounter, patient } = args
+  const { id, size, offset, _sort, sortDirection, _text, encounter, patient, route, minDate, maxDate } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
 
@@ -528,6 +537,9 @@ export const fetchMedicationAdministration = async (args: fetchMedicationAdminis
   if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
   if (encounter)                                   options = [...options, `encounter=${encounter}`]                                             // eslint-disable-line
   if (_text)                                       options = [...options, `_text=${_text}`]                                                     // eslint-disable-line
+  if (route)                                       options = [...options, `route=${route}`]                                                     // eslint-disable-line
+  if (minDate)                                     options = [...options, `Period-start=ge${minDate}`]                                          // eslint-disable-line
+  if (maxDate)                                     options = [...options, `Period-start=le${maxDate}`]                                          // eslint-disable-line
 
   if (_list && _list.length > 0)                   options = [...options, `_list=${_list.reduce(reducer)}`]                                     // eslint-disable-line
 

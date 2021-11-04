@@ -181,7 +181,7 @@ const Patient = () => {
               />
               <Tab
                 className={classes.tabTitle}
-                label="Médicament"
+                label="Médicaments"
                 value="medication"
                 component={Link}
                 to={`/patients/${patientId}/medication${groupId ? `?groupId=${groupId}` : ''}`}

@@ -116,6 +116,8 @@ export interface IServicesPatients {
    **   - nda: permet de filtrer sur un NDA précis
    **   - sortBy: permet le tri
    **   - sortDirection: permet le tri dans l'ordre croissant ou décroissant
+   **   - selectedPrescriptionTypeIds: permet le filtre par type de prescription
+   **   - selectedAdministrationRouteIds: permet le filtre par la voie d'administration
    **   - groupId: (optionnel) Périmètre auquel le patient est lié
    **   - startDate: (optionnel) permet le filtre par date
    **   - endDate: (optionnel) permet le filtre par date
@@ -134,9 +136,11 @@ export interface IServicesPatients {
     nda: string,
     sortBy: string,
     sortDirection: string,
+    selectedPrescriptionTypeIds: string,
+    selectedAdministrationRouteIds: string,
     groupId?: string,
-    startDate?: string | null,
-    endDate?: string | null
+    startDate?: string,
+    endDate?: string
   ) => Promise<{
     medicationData?: MedicationEntry<IMedicationAdministration | IMedicationRequest>[]
     medicationTotal?: number
@@ -368,7 +372,11 @@ const servicesPatients: IServicesPatients = {
     nda,
     sortBy,
     sortDirection,
-    groupId
+    selectedPrescriptionTypeIds,
+    selectedAdministrationRouteIds,
+    groupId,
+    startDate,
+    endDate
   ) => {
     let medicationResp: AxiosResponse<FHIR_API_Response<IMedicationRequest | IMedicationAdministration>> | null = null
 
@@ -382,7 +390,10 @@ const servicesPatients: IServicesPatients = {
           patient: patientId,
           _text: searchInput,
           _sort: sortBy,
-          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc'
+          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+          type: selectedPrescriptionTypeIds,
+          minDate: startDate,
+          maxDate: endDate
         })
         break
       case 'administration':
@@ -394,7 +405,10 @@ const servicesPatients: IServicesPatients = {
           patient: patientId,
           _text: searchInput,
           _sort: sortBy,
-          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc'
+          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+          route: selectedAdministrationRouteIds,
+          minDate: startDate,
+          maxDate: endDate
         })
         break
       default:
