@@ -17,11 +17,11 @@ const exportTable: ExportTableType[] = [
     table_id: 'observation',
     table_subtitle: '⚠️ Attention cette table conerne des données identifiantes'
   },
-  {
-    id: 'drug_exposure',
-    table_name: 'Patient - Médicaments',
-    table_id: 'drug_exposure'
-  },
+  // {
+  //   id: 'drug_exposure',
+  //   table_name: 'Patient - Médicaments',
+  //   table_id: 'drug_exposure'
+  // },
   {
     id: 'visit_occurrence',
     table_name: 'Visite',
