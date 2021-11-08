@@ -2,6 +2,7 @@ export type ExportTableType = {
   id: string
   table_name: string
   table_id: string
+  table_subtitle?: string
 }
 
 const exportTable: ExportTableType[] = [
@@ -13,13 +14,14 @@ const exportTable: ExportTableType[] = [
   {
     id: 'observation',
     table_name: 'Patient - Données démographiques',
-    table_id: 'observation'
+    table_id: 'observation',
+    table_subtitle: '⚠️ Attention cette table conerne des données identifiantes'
   },
-  {
-    id: 'drug_exposure',
-    table_name: 'Patient - Médicaments',
-    table_id: 'drug_exposure'
-  },
+  // {
+  //   id: 'drug_exposure',
+  //   table_name: 'Patient - Médicaments',
+  //   table_id: 'drug_exposure'
+  // },
   {
     id: 'visit_occurrence',
     table_name: 'Visite',
@@ -66,6 +68,11 @@ const exportTable: ExportTableType[] = [
     table_id: 'fact_relationship'
   },
   {
+    id: 'concept',
+    table_name: 'Référentiel - Terminologie - Concept',
+    table_id: 'concept'
+  },
+  {
     id: 'concept_relationship',
     table_name: 'Référentiel - Terminologie - Lien entre concepts',
     table_id: 'concept_relationship'
@@ -74,11 +81,6 @@ const exportTable: ExportTableType[] = [
     id: 'vocabulary',
     table_name: 'Référentiel - Terminologie - Vocabulaire et nomenclature',
     table_id: 'vocabulary'
-  },
-  {
-    id: 'concept',
-    table_name: 'Référentiel - Terminologie - Concept',
-    table_id: 'concept'
   }
 ]
 

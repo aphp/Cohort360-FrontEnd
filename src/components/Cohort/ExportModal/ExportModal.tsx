@@ -67,6 +67,20 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       const index = existingTableIds.indexOf(foundItem)
       existingTableIds.splice(index, 1)
     } else {
+      // Attention règle particulière
+      if (tableId === 'fact_relationship') {
+        const careSiteItem = existingTableIds.find((existingTableId) => existingTableId === 'care_site')
+        if (!careSiteItem) {
+          existingTableIds = [...existingTableIds, 'care_site']
+        }
+      }
+      if (tableId === 'concept_relationship') {
+        const careSiteItem = existingTableIds.find((existingTableId) => existingTableId === 'concept')
+        if (!careSiteItem) {
+          existingTableIds = [...existingTableIds, 'concept']
+        }
+      }
+
       existingTableIds = [...existingTableIds, tableId]
     }
     handleChangeSettings('tables', existingTableIds)
@@ -209,16 +223,28 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
             </Grid>
 
             <List className={classes.list}>
-              {export_table.map(({ table_name, table_id }) => (
+              {export_table.map(({ table_name, table_id, table_subtitle }) => (
                 <ListItem className={classes.tableListElement} key={table_id}>
-                  <ListItemText disableTypography>
-                    <Grid container direction="row" alignItems="center">
-                      <Typography variant="body1">{table_name} - </Typography>
-                      <Typography variant="body1" style={{ fontStyle: 'italic', paddingLeft: 4 }}>
-                        {table_id}
-                      </Typography>
-                    </Grid>
-                  </ListItemText>
+                  <ListItemText
+                    disableTypography
+                    primary={
+                      <Grid container direction="row" alignItems="center">
+                        <Typography variant="body1">{table_name} - </Typography>
+                        <Typography variant="body1" style={{ fontStyle: 'italic', paddingLeft: 4 }}>
+                          {table_id}
+                        </Typography>
+                      </Grid>
+                    }
+                    secondary={
+                      table_subtitle && (
+                        <Grid container direction="row" alignItems="center">
+                          <Typography variant="body2" style={{ color: '#fc1847' }}>
+                            {table_subtitle}
+                          </Typography>
+                        </Grid>
+                      )
+                    }
+                  />
 
                   <ListItemSecondaryAction>
                     <Checkbox
