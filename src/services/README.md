@@ -309,7 +309,7 @@ export  interface  IServicesPractitioner {
 }
 ```
 
-##### servicePractitioner.ts
+##### serviceProjects.ts
 
 > ⚠️ Cette interface est lié au back-end de Cohort360 et non à FHIR comme le reste des interfaces.
 
@@ -394,5 +394,79 @@ export  interface  IServicesProjects {
 	) =>  Promise<
 		CohortType
 	>
+}
+```
+
+##### servicesCohorts.ts
+
+> Pour l'ensemble des fonctions définie dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définie dans un premier temps pour éviter tous problèmes de typage.
+
+Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à une cohorte, et définie l'interface suivante :
+
+```
+export interface IServicesCohorts {
+  fetchCohort: (
+		cohortId: string
+	) => Promise<
+		CohortData | undefined
+	>
+
+  fetchPatientList: (
+    page: number,
+    searchBy: SearchByTypes,
+    searchInput: string,
+    gender: PatientGenderKind,
+    age: [number, number],
+    vitalStatus: VitalStatus,
+    sortBy: string,
+    sortDirection: string,
+    groupId?: string,
+    includeFacets?: boolean
+  ) => Promise<
+    | {
+        totalPatients: number
+        originalPatients: IPatient[] | undefined
+        agePyramidData?: AgeRepartitionType
+        genderRepartitionMap?: GenderRepartitionType
+      }
+    | undefined
+  >
+
+  fetchDocuments: (
+    deidentifiedBoolean: boolean,
+    sortBy: string,
+    sortDirection: string,
+    page: number,
+    searchInput: string,
+    selectedDocTypes: string[],
+    nda: string,
+    startDate?: string | null,
+    endDate?: string | null,
+    groupId?: string
+  ) => Promise<{
+    totalDocs: number
+    totalAllDocs: number
+    documentsList: IComposition[]
+  }>
+
+  fetchDocumentContent: (
+		compositionId: string
+	) => Promise<
+		IComposition_Section[]
+	>
+
+  fetchCohortExportRight: (
+		cohortId: string,
+		providerId: string
+	) => Promise<
+		boolean
+	>
+
+  createExport: (args: {
+    cohortId: number
+    motivation: string
+    tables: string[]
+    output_format?: string
+  }) => Promise<any>
 }
 ```
