@@ -750,15 +750,12 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 label={<Typography>{displaySelectedPrescriptionType(_currentCriteria?.prescriptionType)}</Typography>}
               />
             ),
-          _currentCriteria &&
-            _currentCriteria?.type === 'MedicationAdministration' &&
-            _currentCriteria?.administration &&
-            _currentCriteria?.administration.length > 0 && (
-              <Chip
-                className={classes.criteriaChip}
-                label={<Typography>{displaySelectedAdministration(_currentCriteria?.administration)}</Typography>}
-              />
-            )
+          _currentCriteria && _currentCriteria?.administration && _currentCriteria?.administration.length > 0 && (
+            <Chip
+              className={classes.criteriaChip}
+              label={<Typography>{displaySelectedAdministration(_currentCriteria?.administration)}</Typography>}
+            />
+          )
         ]
         break
       }

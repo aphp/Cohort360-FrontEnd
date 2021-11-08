@@ -378,9 +378,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
             : ''
         }`,
         `${
-          criterion.type === RESSOURCE_TYPE_MEDICATION_ADMINISTRATION &&
-          criterion.administration &&
-          criterion.administration.length > 0
+          criterion.administration && criterion.administration.length > 0
             ? `${MEDICATION_ADMINISTRATION}=${criterion.administration
                 .map((administration: any) => administration.id)
                 .reduce(searchReducer)}`
