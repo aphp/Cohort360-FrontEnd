@@ -134,10 +134,130 @@ return (
 
 ##### LogicalOperator.tsx
 
-##### TemporalConstraint.tsx
+Ce composant est un composant relativement important pour le Requêteur, il permet de créer les groupes de critères avec le composant `OperatorItem` mais également le composant `CriteriaRightPanel` qui permet quand a lui d'avoir le panneau latéral contenant la liste des types de critères ainsi que des formulaires.
 
-##### LogicalOperator.tsx
+> Ces groupes de critères sont générés de manière récursive, donc les groupes de critères crée les carte des critères, mais également des groupes de critères.
+
+> Ce composant n'a pas de props. (propriétés), l'appel de ce composant ce fait de la manière suivante :
+
+```jsx
+import LogicalOperator from 'components/Cohort/CreationCohort/DiagramView/components/LogicalOperator/LogicalOperator';
+
+...
+
+return (
+  ...
+  <LogicalOperator />
+  ...
+)
+```
 
 ##### CriteriaCard.tsx
 
+Ce composant permet de créer les cartes pour un critère. Il gère l'affichage du nom du critère, des boutons d'edition et de suppression et fait appelle au composant `CriteriaCardContent`, qui lui gère l'affichage des arguments du critère.
+
+Ce composant contient les propriétés suivantes :
+
+| Nom            | Type                                       | Fonction                                                                             |
+| -------------- | ------------------------------------------ | ------------------------------------------------------------------------------------ |
+| itemId         | `number`                                   | Identifiant du critère que l'on souhaite affiché                                     |
+| deleteCriteria | `(criteriaId: number) => void`             | Lorsque l'utilisateur appuie sur le bouton de suppression, cette fonction est appelé |
+| editCriteria   | `(criteria: SelectedCriteriaType) => void` | Lorsque l'utilisateur appuie sur le bouton d'édition, cette fonction est appelé      |
+
+L'appel de ce composant ce fait de la manière suivante :
+
+```jsx
+import CriteriaCard from 'components/Cohort/CreationCohort/DiagramView/components/CriteriaCard/CriteriaCard';
+
+...
+
+return (
+  ...
+  <CriteriaCard
+    itemId={...}
+    deleteCriteria={...}
+    editCriteria={...} />
+  ...
+)
+```
+
+##### CriteriaCardContent.tsx
+
+Ce composant permet d'afficher les bulle que compose les cartes de critères. Il se base sur le critère passé en paramètre et passe dans une fonction `_displayCardContent` qui va contenir un switch/case pour afficher correctement chaque critère.
+
+Ce composant contient les propriétés suivantes :
+
+| Nom             | Type                   | Fonction                                   |
+| --------------- | ---------------------- | ------------------------------------------ |
+| currentCriteria | `SelectedCriteriaType` | Objet du critère que l'on souhaite affiché |
+
+L'appel de ce composant ce fait de la manière suivante :
+
+```jsx
+import CriteriaCardContent from 'components/Cohort/CreationCohort/DiagramView/components/CriteriaCard/compontents/CriteriaCardContent/CriteriaCardContent';
+
+...
+
+return (
+  ...
+  <CriteriaCardContent
+    currentCriteria={...} />
+  ...
+)
+```
+
 ##### CriteriaRightPanel.tsx
+
+Au meme titre que le composant `LogicalOperator`, ce composant est un composant primaire du requêteur. Il permet l'affichage du panneau latéral lors d'ajout et de modification d'un critère. Lorsque vous appuyer sur le bouton `Ajouter un critère` ou sur le bouton d'édition d'un critère, un panneau lateral s'affiche, c'est ce composant qui permet cet affichage.
+
+Il est composé de deux états :
+
+- Lors d'un ajout de critère, une liste est affiché. Cette liste est la liste de type de critère (Démographie, Prise en charge, Documents cliniques etc ...)
+- Lorsqu'un type de critère est selectionné, ou lors d'une édition de critère, le panneau lateral affiche un formulaire.
+
+Ce composant contient les propriétés suivantes :
+
+| Nom                      | Type                                   | Fonction                                                                                                                   |
+| ------------------------ | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| criteria                 | `CriteriaItemType[]`                   | Liste de critère présent dans `state.cohortCreation.criteria`                                                              |
+| selectedCriteria         | `SelectedCriteriaType` ou `null`       | Dans le cas d'une édition, `selectedCriteria` correspond au critère que nous souhaitons éditer, vaut `null` en cas d'ajout |
+| onChangeSelectedCriteria | `(item: SelectedCriteriaType) => void` | Fonction qui permet l'ajout ou l'édition d'un critère                                                                      |
+| open                     | `boolean`                              | Determine si le panneau lateral est ouvert ou non                                                                          |
+| onClose                  | `() => void`                           | Fonction qui permet de fermer le panneau lateral                                                                           |
+
+L'appel de ce composant ce fait de la manière suivante :
+
+```jsx
+import CriteriaCardContent from 'components/Cohort/CreationCohort/DiagramView/components/CriteriaCard/compontents/CriteriaCardContent/CriteriaCardContent';
+
+...
+
+return (
+  ...
+  <CriteriaRightPanel
+    criteria={...}
+    selectedCriteria={...}
+    onChangeSelectedCriteria={...}
+    open={...}
+    onClose={...} />
+  ...
+)
+```
+
+##### TemporalConstraint.tsx
+
+Ce composant est le composant qui permet l'affichage des contraintes temporelles, elle se trouve à coté de la population source. Elle contient un `<Select />` qui permet de changer de contrainte temporelle.
+
+> Ce composant n'a pas de props. (propriétés), l'appel de ce composant ce fait de la manière suivante :
+
+```jsx
+import TemporalConstraint from 'components/Cohort/CreationCohort/DiagramView/components/TemporalConstraint/TemporalConstraint';
+
+...
+
+return (
+  ...
+  <TemporalConstraint />
+  ...
+)
+```
