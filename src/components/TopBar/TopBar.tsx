@@ -156,8 +156,6 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
     history.push('/accueil')
   }
 
-  console.log('cohort :>> ', cohort)
-
   return (
     <>
       <Grid xs={12} container direction="row">
