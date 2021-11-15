@@ -493,7 +493,7 @@ export const fetchMedicationRequest = async (args: fetchMedicationRequestProps) 
   if (offset)                                      options = [...options, `offset=${offset}`]                                                   // eslint-disable-line
   if (_sort)                                       options = [...options, `_sort=${_sortDirection}${_sort}`]                                    // eslint-disable-line
   if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
-  if (encounter)                                   options = [...options, `encounter=${encounter}`]                                             // eslint-disable-line
+  if (encounter)                                   options = [...options, `encounter.identifier=${encounter}`]                                  // eslint-disable-line
   if (_text)                                       options = [...options, `_text=${_text}`]                                                     // eslint-disable-line
   if (type)                                        options = [...options, `type=${type}`]                                                       // eslint-disable-line
   if (minDate)                                     options = [...options, `Period-start=ge${minDate}`]                                          // eslint-disable-line
@@ -535,7 +535,7 @@ export const fetchMedicationAdministration = async (args: fetchMedicationAdminis
   if (offset)                                      options = [...options, `offset=${offset}`]                                                   // eslint-disable-line
   if (_sort)                                       options = [...options, `_sort=${_sortDirection}${_sort}`]                                    // eslint-disable-line
   if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
-  if (encounter)                                   options = [...options, `encounter=${encounter}`]                                             // eslint-disable-line
+  if (encounter)                                   options = [...options, `encounter.identifier=${encounter}`]                                  // eslint-disable-line
   if (_text)                                       options = [...options, `_text=${_text}`]                                                     // eslint-disable-line
   if (route)                                       options = [...options, `route=${route}`]                                                     // eslint-disable-line
   if (minDate)                                     options = [...options, `Period-start=ge${minDate}`]                                          // eslint-disable-line
