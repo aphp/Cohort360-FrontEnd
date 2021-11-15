@@ -156,8 +156,6 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
     history.push('/accueil')
   }
 
-  console.log('cohort :>> ', cohort)
-
   return (
     <>
       <Grid xs={12} container direction="row">
@@ -259,7 +257,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                         Accès : {access}
                       </Typography>
                       {cohort.cohortId && (
-                        <Typography variant="subtitle2">Identifiant de la cohorte: {cohort.cohortId} </Typography>
+                        <Typography align="right" variant="subtitle2">
+                          Identifiant de la cohorte: {cohort.cohortId}
+                        </Typography>
                       )}
                     </>
                   )}

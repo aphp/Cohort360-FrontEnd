@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
+import { useHistory, useLocation } from 'react-router-dom'
 import { CONTEXT } from '../../../../constants'
 import { useAppSelector } from 'state'
-import { useHistory } from 'react-router-dom'
 
 import { IconButton, Grid, Menu, MenuItem, Typography } from '@material-ui/core'
 
@@ -20,6 +20,10 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
   const classes = useStyles()
   const history = useHistory()
 
+  const location = useLocation()
+  const search = new URLSearchParams(location.search)
+  const groupId = search.get('groupId') ?? undefined
+
   const { cohort } = useAppSelector((state) => ({
     cohort: state.exploredCohort
   }))
@@ -34,6 +38,8 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
         ? `/perimetres/patients?${cohort.cohort.map((e: any) => e.id).join()}`
         : !Array.isArray(cohort.cohort) && cohort.cohort?.id
         ? `/cohort/${cohort.cohort?.id}/patients`
+        : groupId
+        ? `/perimetres/patients?${groupId}`
         : '/mes_patients/patients'
 
     history.push(path)

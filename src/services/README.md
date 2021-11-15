@@ -52,7 +52,7 @@ Ces fichiers servent à faire le lien avec différents services et à régler le
 
 ##### index.ts
 
-```
+```ts
 import { CONTEXT } from './../constants'
 import servicesAphp, { IServiceAphp } from './contextAphp'
 
@@ -83,7 +83,7 @@ Nous trouvons donc :
 
 Dans ce fichier, nous allons définir un objets `service...` qui contiendra les propriétés `cohorts`, `patients`, `perimeters`, `practitioner` et `projects`. Chacune de ces propriétés contiendra une multitude de fonctions.
 
-```
+```ts
 // Liste d'import de l'interface + type de l'interface
 import servicesCohorts, { IServicesCohorts } from './servicesCohorts'
 import servicePatients, { IServicesPatients } from './servicePatients'
@@ -148,7 +148,7 @@ Pour un soucis de clarté dans le code, nous avons créé ce fichier `callApi.ts
 
 Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à un patient, et définie l'interface suivante :
 
-```
+```ts
 export  interface  IServicesPatients {
 	fetchPatientsCount: () =>  Promise<
 		number
@@ -238,7 +238,7 @@ export  interface  IServicesPatients {
 
 Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à un périmètre, et définie l'interface suivante :
 
-```
+```ts
 export  interface  IServicesPerimeters {
 	fetchPerimetersInfos: (
 		perimetersId: string
@@ -286,7 +286,7 @@ export  interface  IServicesPerimeters {
 
 Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à un practitioner (utilisateur de cohort360), et définie l'interface suivante :
 
-```
+```ts
 export  interface  IServicesPractitioner {
 	authenticate: (
 		username: string,
@@ -317,7 +317,7 @@ export  interface  IServicesPractitioner {
 
 Ce fichier définie l'ensemble des fonctions lié à la récupération de donnée lié aux projets de recherche, aux requêtes, et aux cohortes, et définie l'interface suivante :
 
-```
+```ts
 export  interface  IServicesProjects {
 	fetchProjectsList: (
 		limit?: number,
@@ -403,7 +403,7 @@ export  interface  IServicesProjects {
 
 Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à une cohorte, et définie l'interface suivante :
 
-```
+```ts
 export interface IServicesCohorts {
   fetchCohort: (
 		cohortId: string

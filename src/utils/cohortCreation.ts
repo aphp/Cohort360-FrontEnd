@@ -292,6 +292,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
         // Ignore TypeScript because we need to check if array is not empty
         // @ts-ignore
         filterFhir = filterFhir.reduce(filterReducer)
+      } else {
+        filterFhir = ''
       }
       break
     }
