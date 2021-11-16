@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   heading: {
-    fontWeight: theme.typography.fontWeightRegular
+    fontWeight: 'inherit'
   },
   accordion: {
     marginTop: 12,

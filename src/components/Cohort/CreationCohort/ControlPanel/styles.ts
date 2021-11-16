@@ -1,6 +1,6 @@
 import { makeStyles, createStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     rightPanelContainerStyle: {
       position: 'fixed',
@@ -74,9 +74,6 @@ const useStyles = makeStyles((theme) =>
     },
     sidesMargin: {
       margin: '0 10px'
-    },
-    heading: {
-      fontWeight: theme.typography.fontWeightRegular
     },
     accordion: {
       background: 'transparent',
