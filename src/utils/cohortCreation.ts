@@ -15,7 +15,8 @@ const PATIENT_DECEASED = 'deceased' // ok
 
 const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
 const ENCOUNTER_LENGTH = 'length' // ok
-const ENCOUNTER_BIRTHDATE = 'patient.birthdate' // ok
+const ENCOUNTER_MIN_BIRTHDATE = 'start-age-visit' // ok
+const ENCOUNTER_MAX_BIRTHDATE = 'end-age-visit' // ok
 const ENCOUNTER_ENTRYMODE = 'admitted-from' // ok
 const ENCOUNTER_EXITMODE = 'discharge' // ok
 const ENCOUNTER_PRISENCHARGETYPE = 'class' // ok
@@ -181,8 +182,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 
     case RESSOURCE_TYPE_ENCOUNTER: {
       let lengthFilter = ''
-      let multiplicator = 1
+      let ageFilter = ''
       if (criterion.durationType) {
+        let multiplicator = 1
         switch (criterion.durationType.id) {
           case 'month':
             multiplicator = 31
@@ -194,25 +196,33 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
             multiplicator = 1
             break
         }
+
+        if (criterion.duration && (criterion.duration[0] !== 0 || criterion.duration[1] !== 100)) {
+          lengthFilter = `${ENCOUNTER_LENGTH}=ge${+criterion.duration[0] * multiplicator}&${ENCOUNTER_LENGTH}=le${
+            +criterion.duration[1] * multiplicator
+          }`
+        }
       }
 
-      if (criterion.duration && (criterion.duration[0] !== 0 || criterion.duration[1] !== 100)) {
-        lengthFilter = `${ENCOUNTER_LENGTH}=ge${+criterion.duration[0] * multiplicator}&${ENCOUNTER_LENGTH}=le${
-          +criterion.duration[1] * multiplicator
-        }`
-      }
+      if (criterion.ageType) {
+        let multiplicator = 1
+        switch (criterion.ageType.id) {
+          case 'month':
+            multiplicator = 31
+            break
+          case 'year':
+            multiplicator = 365
+            break
+          default:
+            multiplicator = 1
+            break
+        }
 
-      let ageFilter = ''
-      if (criterion.years && (criterion.years[0] !== 0 || criterion.years[1] !== 130)) {
-        //@ts-ignore
-        const date1 = moment()
-          .subtract(+criterion.years[1], criterion?.ageType?.id || 'years')
-          .format('YYYY-MM-DD')
-        //@ts-ignore
-        const date2 = moment()
-          .subtract(+criterion.years[0], criterion?.ageType?.id || 'years')
-          .format('YYYY-MM-DD')
-        ageFilter = `${ENCOUNTER_BIRTHDATE}=ge${date1}&${ENCOUNTER_BIRTHDATE}=le${date2}`
+        if (criterion.years && (criterion.years[0] !== 0 || criterion.years[1] !== 100)) {
+          ageFilter = `${ENCOUNTER_MIN_BIRTHDATE}=ge${
+            +criterion.years[0] * multiplicator
+          }&${ENCOUNTER_MAX_BIRTHDATE}=le${+criterion.years[1] * multiplicator}`
+        }
       }
 
       // Ignore TypeScript because we need to check if array is not empty
@@ -677,9 +687,7 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.durationType = currentCriterion.durationType
             ? currentCriterion.durationType
             : { id: 'day', label: 'jours' }
-          currentCriterion.ageType = currentCriterion.ageType
-            ? currentCriterion.ageType
-            : { id: 'year', label: 'années' }
+          currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
           currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
           currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : []
           currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : []
@@ -712,7 +720,7 @@ export async function unbuildRequest(_json: string) {
                 if (value?.search('ge') === 0) {
                   currentCriterion.duration[0] = +value?.replace('ge', '') || 0
                 } else if (value?.search('le') === 0) {
-                  currentCriterion.duration[1] = +value?.replace('le', '') || 130
+                  currentCriterion.duration[1] = +value?.replace('le', '') || 100
                 }
 
                 if (currentCriterion.duration[1] % 31 === 0) {
@@ -728,7 +736,8 @@ export async function unbuildRequest(_json: string) {
                 }
                 break
               }
-              case ENCOUNTER_BIRTHDATE: {
+              case ENCOUNTER_MIN_BIRTHDATE:
+              case ENCOUNTER_MAX_BIRTHDATE: {
                 const ageType = [
                   { id: 'year', label: 'années' },
                   { id: 'month', label: 'mois' },
@@ -736,37 +745,27 @@ export async function unbuildRequest(_json: string) {
                 ]
 
                 if (value?.search('ge') === 0) {
-                  const date = value?.replace('ge', '') ? moment(value?.replace('ge', ''), 'YYYY-MM-DD') : null
-                  const diff = date ? moment().diff(date, 'days') : 0
-
-                  let currentAgeType: 'year' | 'month' | 'day' = 'year'
-                  if (diff >= 130 && diff <= 3000) {
-                    currentAgeType = 'month'
-                  } else if (diff <= 130) {
-                    currentAgeType = 'day'
-                  }
-
-                  const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
-                  currentCriterion.ageType = foundAgeType
-                  if (date) currentCriterion.years[1] = moment().diff(date, currentAgeType) || 130
+                  currentCriterion.years[0] = +value?.replace('ge', '') || 0
                 } else if (value?.search('le') === 0) {
-                  const date = value?.replace('le', '') ? moment(value?.replace('le', ''), 'YYYY-MM-DD') : null
-                  const diff = date ? moment().diff(date, 'days') : 0
-
-                  let currentAgeType: 'year' | 'month' | 'day' = 'year'
-                  if (currentCriterion.ageType) {
-                    currentAgeType = currentCriterion.ageType.id
-                  } else {
-                    if (diff >= 130 && diff <= 3000) {
-                      currentAgeType = 'month'
-                    } else if (diff <= 130) {
-                      currentAgeType = 'day'
-                    }
-                    const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
-                    currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : foundAgeType
-                  }
-                  currentCriterion.years[0] = moment().diff(date, currentAgeType) || 0
+                  currentCriterion.years[1] = +value?.replace('le', '') || 130
                 }
+
+                console.log(`currentCriterion.years`, currentCriterion.years)
+
+                if (currentCriterion.years[1] % 31 === 0) {
+                  currentCriterion.ageType = ageType[1]
+                  currentCriterion.years[0] = currentCriterion.years[0] / 31
+                  currentCriterion.years[1] = currentCriterion.years[1] / 31
+                } else if (currentCriterion.years[1] % 365 === 0) {
+                  currentCriterion.ageType = ageType[0]
+                  currentCriterion.years[0] = currentCriterion.years[0] / 365
+                  currentCriterion.years[1] = currentCriterion.years[1] / 365
+                } else {
+                  currentCriterion.ageType = ageType[2]
+                }
+
+                console.log(`currentCriterion.ageType`, currentCriterion.ageType)
+                console.log(`currentCriterion.years`, currentCriterion.years)
                 break
               }
               case ENCOUNTER_ENTRYMODE: {
