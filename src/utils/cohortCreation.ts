@@ -15,7 +15,8 @@ const PATIENT_DECEASED = 'deceased' // ok
 
 const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
 const ENCOUNTER_LENGTH = 'length' // ok
-const ENCOUNTER_BIRTHDATE = 'patient.birthdate' // ok
+const ENCOUNTER_MIN_BIRTHDATE = 'start-age-visit' // ok
+const ENCOUNTER_MAX_BIRTHDATE = 'end-age-visit' // ok
 const ENCOUNTER_ENTRYMODE = 'admitted-from' // ok
 const ENCOUNTER_EXITMODE = 'discharge' // ok
 const ENCOUNTER_PRISENCHARGETYPE = 'class' // ok
@@ -206,13 +207,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       if (criterion.years && (criterion.years[0] !== 0 || criterion.years[1] !== 130)) {
         //@ts-ignore
         const date1 = moment()
-          .subtract(+criterion.years[1], criterion?.ageType?.id || 'years')
-          .format('YYYY-MM-DD')
+          .add(+criterion.years[1], criterion?.ageType?.id || 'years')
+          .diff(moment(), 'days')
         //@ts-ignore
         const date2 = moment()
-          .subtract(+criterion.years[0], criterion?.ageType?.id || 'years')
-          .format('YYYY-MM-DD')
-        ageFilter = `${ENCOUNTER_BIRTHDATE}=ge${date1}&${ENCOUNTER_BIRTHDATE}=le${date2}`
+          .add(+criterion.years[0], criterion?.ageType?.id || 'years')
+          .diff(moment(), 'days')
+        ageFilter = `${ENCOUNTER_MIN_BIRTHDATE}=ge${date1}&${ENCOUNTER_MAX_BIRTHDATE}=le${date2}`
       }
 
       // Ignore TypeScript because we need to check if array is not empty
@@ -728,7 +729,8 @@ export async function unbuildRequest(_json: string) {
                 }
                 break
               }
-              case ENCOUNTER_BIRTHDATE: {
+              case ENCOUNTER_MIN_BIRTHDATE:
+              case ENCOUNTER_MAX_BIRTHDATE: {
                 const ageType = [
                   { id: 'year', label: 'années' },
                   { id: 'month', label: 'mois' },
@@ -736,27 +738,27 @@ export async function unbuildRequest(_json: string) {
                 ]
 
                 if (value?.search('ge') === 0) {
-                  const date = value?.replace('ge', '') ? moment(value?.replace('ge', ''), 'YYYY-MM-DD') : null
-                  const diff = date ? moment().diff(date, 'days') : 0
+                  const diff = value?.replace('ge', '') ? +value?.replace('ge', '') : null
 
                   let currentAgeType: 'year' | 'month' | 'day' = 'year'
-                  if (diff >= 130 && diff <= 3000) {
-                    currentAgeType = 'month'
-                  } else if (diff <= 130) {
-                    currentAgeType = 'day'
+                  if (diff !== null) {
+                    if (diff >= 130 && diff <= 3000) {
+                      currentAgeType = 'month'
+                    } else if (diff <= 130) {
+                      currentAgeType = 'day'
+                    }
                   }
 
                   const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
-                  currentCriterion.ageType = foundAgeType
-                  if (date) currentCriterion.years[1] = moment().diff(date, currentAgeType) || 130
+                  currentCriterion.ageType = foundAgeType || ageType[0]
+                  currentCriterion.years[1] = diff || 130
                 } else if (value?.search('le') === 0) {
-                  const date = value?.replace('le', '') ? moment(value?.replace('le', ''), 'YYYY-MM-DD') : null
-                  const diff = date ? moment().diff(date, 'days') : 0
+                  const diff = value?.replace('le', '') ? +value?.replace('le', '') : null
 
                   let currentAgeType: 'year' | 'month' | 'day' = 'year'
                   if (currentCriterion.ageType) {
                     currentAgeType = currentCriterion.ageType.id
-                  } else {
+                  } else if (diff !== null) {
                     if (diff >= 130 && diff <= 3000) {
                       currentAgeType = 'month'
                     } else if (diff <= 130) {
@@ -765,7 +767,7 @@ export async function unbuildRequest(_json: string) {
                     const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
                     currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : foundAgeType
                   }
-                  currentCriterion.years[0] = moment().diff(date, currentAgeType) || 0
+                  currentCriterion.years[0] = diff || 0
                 }
                 break
               }
