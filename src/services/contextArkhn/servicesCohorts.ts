@@ -502,8 +502,14 @@ const getDocumentInfos: (
 ) => Promise<CohortComposition[]> = async (deidentifiedBoolean: boolean, documents, groupId) => {
   const cohortDocuments = documents as CohortComposition[]
 
-  const listePatientsIds = cohortDocuments.map((e) => e.subject?.display?.substring(8)).join()
-  const listeEncounterIds = cohortDocuments.map((e) => e.encounter?.display?.substring(10)).join()
+  const listePatientsIds = cohortDocuments
+    .map((e) => e.subject?.display?.substring(8))
+    .filter((item, index, array) => array.indexOf(item) === index)
+    .join()
+  const listeEncounterIds = cohortDocuments
+    .map((e) => e.encounter?.display?.substring(10))
+    .filter((item, index, array) => array.indexOf(item) === index)
+    .join()
 
   const [patients, encounters] = await Promise.all([
     fetchPatient({
