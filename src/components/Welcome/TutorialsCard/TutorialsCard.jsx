@@ -1,8 +1,6 @@
 import React, { useState } from 'react'
 import clsx from 'clsx'
 
-import VideoPlayer from 'react-player'
-
 import Divider from '@material-ui/core/Divider'
 // import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
@@ -19,28 +17,29 @@ import Title from '../../Title'
 
 import useStyles from './styles'
 
+const YoutubeEmbed = ({ embedId }) => (
+  <Grid className="video-responsive">
+    <iframe
+      width="510"
+      height="360"
+      src={`https://www.youtube.com/embed/${embedId}`}
+      frameBorder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen
+      title="Embedded youtube"
+    />
+  </Grid>
+)
+
 const TutorialsCard = () => {
   const classes = useStyles()
 
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  const medias = [
-    {
-      url: '/api/dispose/Cohort360_video_Creation_cohorte_v1.3.mp4',
-      poster: '/api/dispose/Screenshot-2021-08-26-at-10.57.28.png'
-    },
-    {
-      url: '/api/dispose/Cohort360_video_Detail_patient_v1.3.mp4',
-      poster: '/api/dispose/Screenshot-2021-08-26-at-10.56.33.png'
-    },
-    {
-      url: '/api/dispose/Recherche_video_textuelle_video_v1.2.mp4',
-      poster: '/api/dispose/Screenshot-2021-08-26-at-10.55.10.png'
-    }
-  ]
+  const youtubeIds = ['BdtmlvXjKWs', 'ykyMg_4MVcI', 'ze-NYJmFZsI', '-UjXIK4Svb4', 'uMeBJdWPnQM']
 
   const _onChangeCurrentIndex = (index) => {
-    if (index >= 0 && index <= medias.length - 1) {
+    if (index >= 0 && index <= youtubeIds.length - 1) {
       setCurrentIndex(index)
     }
   }
@@ -53,25 +52,11 @@ const TutorialsCard = () => {
 
       <Grid className={classes.carouselContainer}>
         {/* Content */}
-        {medias.map(
+        {youtubeIds.map(
           (m, i) =>
             currentIndex === i && (
               <Paper key={i} className={classes.carouselPaper}>
-                <Grid>
-                  <VideoPlayer
-                    url={m.url}
-                    width="100%"
-                    controls
-                    config={{
-                      file: {
-                        attributes: {
-                          poster: m.poster,
-                          preload: 'metadata'
-                        }
-                      }
-                    }}
-                  />
-                </Grid>
+                <YoutubeEmbed embedId={m} />
               </Paper>
             )
         )}
@@ -84,7 +69,7 @@ const TutorialsCard = () => {
             </IconButton>
           </Grid>
         )}
-        {currentIndex < medias.length - 1 && (
+        {currentIndex < youtubeIds.length - 1 && (
           <Grid className={clsx(classes.indicator, classes.rightIndicator)}>
             <IconButton onClick={() => _onChangeCurrentIndex(currentIndex + 1)}>
               <KeyboardArrowRightIcon />
@@ -93,7 +78,7 @@ const TutorialsCard = () => {
         )}
 
         <Grid className={classes.dotIndicatorContainer}>
-          {medias.map((DO_NOT_USE, i) =>
+          {youtubeIds.map((DO_NOT_USE, i) =>
             currentIndex === i ? (
               <RadioButtonCheckedIcon onClick={() => setCurrentIndex(i)} />
             ) : (
