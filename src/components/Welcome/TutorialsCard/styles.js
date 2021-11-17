@@ -18,7 +18,9 @@ const useStyles = makeStyles((theme) => ({
   },
   carouselPaper: {
     display: 'flex',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   indicator: {
     position: 'absolute',
@@ -43,6 +45,18 @@ const useStyles = makeStyles((theme) => ({
       opacity: 0,
       transition: 'all 250ms ease-in',
       fontSize: '21px'
+    }
+  },
+  videoResponsive: {
+    overflow: 'hidden',
+    position: 'relative',
+    height: 0,
+    '& iframe': {
+      left: 0,
+      top: 0,
+      height: '100%',
+      width: '100%',
+      position: 'absolute'
     }
   }
 }))
