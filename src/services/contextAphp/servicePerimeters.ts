@@ -146,58 +146,62 @@ const servicesPerimeters: IServicesPerimeters = {
   },
 
   fetchPerimeterInfoForRequeteur: async (perimeterId) => {
-    if (!perimeterId) return undefined
+    try {
+      if (!perimeterId) return undefined
 
-    // Get perimeter info with `perimeterId`
-    const groupResults = await fetchGroup({
-      _id: perimeterId
-    })
+      // Get perimeter info with `perimeterId`
+      const groupResults = await fetchGroup({
+        _id: perimeterId
+      })
 
-    // Construct an `orgazationId`
-    let organiszationId =
-      groupResults && groupResults.data && groupResults.data.resourceType === 'Bundle'
-        ? groupResults.data.entry && groupResults.data.entry.length > 0
-          ? groupResults.data.entry[0].resource?.managingEntity?.display ?? ''
+      // Construct an `orgazationId`
+      let organiszationId =
+        groupResults && groupResults.data && groupResults.data.resourceType === 'Bundle'
+          ? groupResults.data.entry && groupResults.data.entry.length > 0
+            ? groupResults.data.entry[0].resource?.managingEntity?.display ?? ''
+            : ''
           : ''
-        : ''
-    organiszationId = organiszationId ? organiszationId.replace('Organization/', '') : ''
-    if (!organiszationId) return undefined
+      organiszationId = organiszationId ? organiszationId.replace('Organization/', '') : ''
+      if (!organiszationId) return undefined
 
-    // Get perimeter info with `organiszationId`
-    const organizationResult = await fetchOrganization({
-      _id: organiszationId,
-      _elements: ['name', 'extension', 'alias']
-    })
+      // Get perimeter info with `organiszationId`
+      const organizationResult = await fetchOrganization({
+        _id: organiszationId,
+        _elements: ['name', 'extension', 'alias']
+      })
 
-    // Convert result in ScopeTreeRow
-    const organization =
-      organizationResult && organizationResult.data && organizationResult.data.resourceType === 'Bundle'
-        ? organizationResult.data.entry && organizationResult.data.entry.length > 0
-          ? organizationResult.data.entry[0].resource
+      // Convert result in ScopeTreeRow
+      const organization =
+        organizationResult && organizationResult.data && organizationResult.data.resourceType === 'Bundle'
+          ? organizationResult.data.entry && organizationResult.data.entry.length > 0
+            ? organizationResult.data.entry[0].resource
+            : undefined
           : undefined
-        : undefined
 
-    const getScopeName = (perimeter: any) => {
-      const perimeterID = perimeter ? perimeter.alias?.[0] : false
-      if (!perimeterID) {
-        return perimeter ? perimeter.name : ''
-      }
-      return `${perimeterID} - ${perimeter.name}`
-    }
-
-    const scopeRows: ScopeTreeRow | undefined = organization
-      ? {
-          ...organization,
-          id: organization.id ?? '',
-          name: getScopeName(organization),
-          quantity:
-            organization.extension && organization.extension.length > 0
-              ? organization.extension.find((extension: any) => extension.url === 'cohort-size')?.valueInteger ?? 0
-              : 0,
-          subItems: []
+      const getScopeName = (perimeter: any) => {
+        const perimeterID = perimeter ? perimeter.alias?.[0] : false
+        if (!perimeterID) {
+          return perimeter ? perimeter.name : ''
         }
-      : undefined
-    return scopeRows
+        return `${perimeterID} - ${perimeter.name}`
+      }
+
+      const scopeRows: ScopeTreeRow | undefined = organization
+        ? {
+            ...organization,
+            id: organization.id ?? '',
+            name: getScopeName(organization),
+            quantity:
+              organization.extension && organization.extension.length > 0
+                ? organization.extension.find((extension: any) => extension.url === 'cohort-size')?.valueInteger ?? 0
+                : 0,
+            subItems: []
+          }
+        : undefined
+      return scopeRows
+    } catch (error) {
+      return undefined
+    }
   },
 
   getPerimeters: async (practitionerId) => {

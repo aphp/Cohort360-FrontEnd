@@ -18,7 +18,15 @@ import { deleteProject } from './project'
 import { createSnapshot, countCohort, fetchRequest } from 'services/cohortCreation'
 
 const localStorageCohortCreation = localStorage.getItem('cohortCreation') ?? null
-const jsonCohortCreation = localStorageCohortCreation ? JSON.parse(localStorageCohortCreation).request : {}
+const jsonCohortCreation = localStorageCohortCreation
+  ? {
+      ...JSON.parse(localStorageCohortCreation).request,
+      selectedPopulation:
+        JSON.parse(localStorageCohortCreation).request.selectedPopulation?.map((population: ScopeTreeRow | null) =>
+          population === null ? undefined : population
+        ) ?? null
+    }
+  : {}
 
 export type CohortCreationState = {
   loading: boolean
@@ -30,7 +38,7 @@ export type CohortCreationState = {
   currentSnapshot: string
   snapshotsHistory: CohortCreationSnapshotType[]
   count: CohortCreationCounterType
-  selectedPopulation: ScopeTreeRow[] | null
+  selectedPopulation: (ScopeTreeRow | undefined)[] | null
   selectedCriteria: SelectedCriteriaType[]
   criteriaGroup: CriteriaGroupType[]
   temporalConstraints: TemporalConstraintsType[]
@@ -238,7 +246,7 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
  */
 type BuildCohortReturn = {
   json: string
-  selectedPopulation: ScopeTreeRow[] | null
+  selectedPopulation: (ScopeTreeRow | undefined)[] | null
 }
 type BuildCohortParams = {
   selectedPopulation?: ScopeTreeRow[] | null
@@ -292,7 +300,7 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
 type UnbuildCohortReturn = {
   json: string
   currentSnapshot: string
-  selectedPopulation: ScopeTreeRow[] | null
+  selectedPopulation: (ScopeTreeRow | undefined)[] | null
   selectedCriteria: SelectedCriteriaType[]
   criteriaGroup: CriteriaGroupType[]
   nextCriteriaId: number
