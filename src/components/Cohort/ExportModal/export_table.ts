@@ -24,12 +24,12 @@ const exportTable: ExportTableType[] = [
   // },
   {
     id: 'visit_occurrence',
-    table_name: 'Visite',
+    table_name: 'Prise en charge',
     table_id: 'visit_occurrence'
   },
   {
     id: 'visit_detail',
-    table_name: 'Visite - Mouvements / Passages ',
+    table_name: 'Prise en charge - Passages ',
     table_id: 'visit_detail'
   },
   {
