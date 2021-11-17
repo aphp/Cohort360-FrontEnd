@@ -12,6 +12,7 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogActions from '@material-ui/core/DialogActions'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 import Footer from 'components/Footer/Footer'
 import NoRights from 'components/ErrorView/NoRights'
@@ -81,6 +82,7 @@ const Login = () => {
   const history = useHistory()
   const classes = useStyles()
   const dispatch = useDispatch()
+  const [loading, setLoading] = useState(false)
   const [username, setUsername] = useState(undefined)
   const [password, setPassword] = useState(undefined)
   const [noRights, setNoRights] = useState(false)
@@ -92,6 +94,7 @@ const Login = () => {
       typeof services?.practitioner?.fetchPractitioner !== 'function' ||
       typeof services.perimeters.fetchDeidentified !== 'function'
     ) {
+      setLoading(false)
       return setErrorLogin(true)
     }
 
@@ -112,7 +115,9 @@ const Login = () => {
       const oldPath = localStorage.getItem('old-path')
       localStorage.removeItem('old-path')
       history.push(oldPath ?? '/accueil')
+      setLoading(false)
     } else {
+      setLoading(false)
       setErrorLogin(true)
     }
   }
@@ -135,10 +140,19 @@ const Login = () => {
 
   const login = async () => {
     try {
-      if (!username || !password) return setErrorLogin(true)
+      if (loading) return
+      setLoading(true)
+
+      if (!username || !password) {
+        setLoading(false)
+        return setErrorLogin(true)
+      }
 
       const response = await services.practitioner.authenticate(username, password)
-      if (!response) return setErrorLogin(true)
+      if (!response) {
+        setLoading(false)
+        return setErrorLogin(true)
+      }
 
       const { status, data = {} } = response
 
@@ -156,9 +170,11 @@ const Login = () => {
           getPractitionerData(lastConnection)
         }
       } else {
-        setErrorLogin(true)
+        setLoading(false)
+        return setErrorLogin(true)
       }
     } catch (err) {
+      setLoading(false)
       setErrorLogin(true)
     }
   }
@@ -229,14 +245,14 @@ const Login = () => {
                 </Typography>
 
                 <Button
-                  disabled={!username || !password}
+                  disabled={loading || !username || !password}
                   type="submit"
                   fullWidth
                   variant="contained"
                   color="primary"
                   className={classes.submit}
                 >
-                  Connexion
+                  {loading ? <CircularProgress /> : 'Connexion'}
                 </Button>
               </Grid>
 
