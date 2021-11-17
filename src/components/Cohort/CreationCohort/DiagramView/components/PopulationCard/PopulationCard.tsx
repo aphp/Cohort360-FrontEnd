@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { Button, IconButton, Chip, CircularProgress, Typography } from '@material-ui/core'
@@ -7,6 +7,7 @@ import EditIcon from '@material-ui/icons/Edit'
 import CloseIcon from '@material-ui/icons/Close'
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 
+import ModalRightError from './components/ModalRightError'
 import PopulationRightPanel from './components/PopulationRightPanel'
 
 import { useAppSelector } from 'state'
@@ -24,6 +25,7 @@ const PopulationCard: React.FC = () => {
 
   const [isExtended, onExtend] = useState(false)
   const [openDrawer, onChangeOpenDrawer] = useState(false)
+  const [rightError, setRightError] = useState(false)
 
   const submitPopulation = (_selectedPopulations: ScopeTreeRow[] | null) => {
     if (_selectedPopulations === null) return
@@ -81,6 +83,19 @@ const PopulationCard: React.FC = () => {
     onChangeOpenDrawer(false)
   }
 
+  useEffect(() => {
+    let _rightError = false
+
+    const populationWithRightError = selectedPopulation
+      ? selectedPopulation.filter((selectedPopulation) => selectedPopulation === undefined)
+      : []
+    if (populationWithRightError && populationWithRightError.length > 0) {
+      _rightError = true
+    }
+
+    setRightError(_rightError)
+  }, [selectedPopulation])
+
   return (
     <>
       {loading ? (
@@ -112,9 +127,13 @@ const PopulationCard: React.FC = () => {
                   {selectedPopulation &&
                     selectedPopulation
                       .slice(0, 4)
-                      .map((pop: any, index: number) => (
-                        <Chip className={classes.populationChip} key={`${index}-${pop.name}`} label={pop.name} />
-                      ))}
+                      .map((pop: any, index: number) =>
+                        pop ? (
+                          <Chip className={classes.populationChip} key={`${index}-${pop.name}`} label={pop.name} />
+                        ) : (
+                          <Chip className={classes.populationChip} key={index} label={'?'} />
+                        )
+                      )}
                   {selectedPopulation && selectedPopulation.length > 4 && (
                     <IconButton
                       size="small"
@@ -139,6 +158,8 @@ const PopulationCard: React.FC = () => {
           </Button>
         </div>
       )}
+
+      <ModalRightError open={rightError} handleClose={() => onChangeOpenDrawer(true)} />
 
       <PopulationRightPanel open={openDrawer} onConfirm={submitPopulation} onClose={() => onChangeOpenDrawer(false)} />
     </>

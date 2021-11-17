@@ -410,12 +410,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 }
 
 export function buildRequest(
-  selectedPopulation: ScopeTreeRow[] | null,
+  selectedPopulation: (ScopeTreeRow | undefined)[] | null,
   selectedCriteria: SelectedCriteriaType[],
   criteriaGroup: CriteriaGroupType[],
   temporalConstraints: TemporalConstraintsType[]
 ) {
   if (!selectedPopulation) return ''
+  selectedPopulation = selectedPopulation.filter((elem) => elem !== undefined)
 
   const exploreCriteriaGroup = (itemIds: number[]) => {
     let children: (RequeteurCriteriaType | RequeteurGroupType)[] = []
@@ -530,7 +531,7 @@ export function buildRequest(
 }
 
 export async function unbuildRequest(_json: string) {
-  let population: ScopeTreeRow[] | null = null
+  let population: (ScopeTreeRow | undefined)[] | null = null
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
 
@@ -552,8 +553,12 @@ export async function unbuildRequest(_json: string) {
   }
 
   for (const caresiteCohortItem of caresiteCohortList) {
+    console.log(`caresiteCohortItem`, caresiteCohortItem)
     const newPopulation = await services.perimeters.fetchPerimeterInfoForRequeteur(caresiteCohortItem ?? '')
-    if (!newPopulation) continue
+    console.log(`newPopulation`, newPopulation)
+    // Don't do that, do not filter population, if you have a pop. with an undefined,
+    // you got a modal with the posibility to change your current source pop.
+    // if (!newPopulation) continue
     population = population ? [...population, newPopulation] : [newPopulation]
   }
 
