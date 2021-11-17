@@ -23,8 +23,8 @@ import {
 
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
 
-import { ReactComponent as Star } from '../../../assets/icones/star.svg'
-import { ReactComponent as StarFull } from '../../../assets/icones/star full.svg'
+import { ReactComponent as Star } from 'assets/icones/star.svg'
+import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
 
 import { FormattedCohort } from 'types'
 

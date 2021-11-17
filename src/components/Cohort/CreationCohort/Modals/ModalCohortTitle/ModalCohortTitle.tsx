@@ -31,7 +31,7 @@ const ModalCohortTitle: React.FC<{
 
   const handleConfirm = () => {
     setLoading(true)
-    if (!title) {
+    if (!title || (title && title.length > 255)) {
       setLoading(false)
       return setError(ERROR_TITLE)
     }
@@ -57,6 +57,7 @@ const ModalCohortTitle: React.FC<{
             variant="outlined"
             fullWidth
             error={error === ERROR_TITLE}
+            helperText={error === ERROR_TITLE ? 'Le nom est trop long (255 caractère max.)' : ''}
           />
         </Grid>
 

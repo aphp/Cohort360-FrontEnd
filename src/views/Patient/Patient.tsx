@@ -8,15 +8,16 @@ import { Alert } from '@material-ui/lab'
 
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 
-import PatientDocs from '../../components/Patient/PatientDocs/PatientDocs'
-import PatientHeader from '../../components/Patient/PatientHeader/PatientHeader'
-import PatientPreview from '../../components/Patient/PatientPreview/PatientPreview'
-import PatientPMSI from '../../components/Patient/PatientPMSI/PatientPMSI'
-import PatientSidebar from '../../components/Patient/PatientSidebar/PatientSidebar'
-import PatientTimeline from '../../components/Patient/PatientTimeline/PatientTimeline'
-import TopBar from '../../components/TopBar/TopBar'
+import PatientDocs from 'components/Patient/PatientDocs/PatientDocs'
+import PatientHeader from 'components/Patient/PatientHeader/PatientHeader'
+import PatientPreview from 'components/Patient/PatientPreview/PatientPreview'
+import PatientSidebar from 'components/Patient/PatientSidebar/PatientSidebar'
+import PatientTimeline from 'components/Patient/PatientTimeline/PatientTimeline'
+import PatientPMSI from 'components/Patient/PatientPMSI/PatientPMSI'
+import PatientMedication from 'components/Patient/PatientMedication/PatientMedication'
+import TopBar from 'components/TopBar/TopBar'
 
-import { fetchPatient } from '../../services/patient'
+import services from 'services'
 
 import { CohortPatient, PMSIEntry } from 'types'
 import {
@@ -25,7 +26,9 @@ import {
   ICondition,
   IEncounter,
   IProcedure,
-  IDocumentReference
+  IDocumentReference,
+  IMedicationRequest,
+  IMedicationAdministration
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import clsx from 'clsx'
@@ -48,6 +51,12 @@ const Patient = () => {
   const [diagnostic, setDiagnostic] = useState<PMSIEntry<ICondition>[] | undefined>(undefined)
   const [diagnosticTotal, setDiagnosticTotal] = useState(0)
   const [ghm, setGhm] = useState<PMSIEntry<IClaim>[] | undefined>(undefined)
+  const [medicationRequest, setMedicationRequest] = useState<IMedicationRequest[] | undefined>(undefined)
+  const [medicationRequestTotal, setMedicationRequestTotal] = useState(0)
+  const [medicationAdministration, setMedicationAdministration] = useState<IMedicationAdministration[] | undefined>(
+    undefined
+  )
+  const [medicationAdministrationTotal, setMedicationAdministrationTotal] = useState(0)
   const [ghmTotal, setGhmTotal] = useState(0)
   const [documents, setDocuments] = useState<(IComposition | IDocumentReference)[] | undefined>(undefined)
   const [documentsTotal, setDocumentsTotal] = useState(0)
@@ -68,8 +77,9 @@ const Patient = () => {
 
   useEffect(() => {
     const _fetchPatient = async () => {
+      if (typeof services?.patients?.fetchPatient !== 'function') return
       setLoading(true)
-      const patientResp = await fetchPatient(patientId, groupId)
+      const patientResp = await services.patients.fetchPatient(patientId, groupId)
 
       setHospit(patientResp?.hospit ?? undefined)
       setDocuments(patientResp?.documents ?? undefined)
@@ -80,6 +90,12 @@ const Patient = () => {
       setDiagnosticTotal(patientResp?.diagnosticTotal ?? 0)
       setGhm(patientResp?.ghm)
       setGhmTotal(patientResp?.ghmTotal ?? 0)
+
+      setMedicationRequest(patientResp?.medicationRequest)
+      setMedicationRequestTotal(patientResp?.medicationRequestTotal ?? 0)
+      setMedicationAdministration(patientResp?.medicationAdministration)
+      setMedicationAdministrationTotal(patientResp?.medicationAdministrationTotal ?? 0)
+
       setPatient(patientResp?.patient)
       setDeidentifiedBoolean(
         patientResp?.patient?.extension?.find((extension) => extension.url === 'deidentified')?.valueBoolean ?? true
@@ -117,11 +133,7 @@ const Patient = () => {
           [classes.appBarShift]: open
         })}
       >
-        <TopBar
-          context="patient_info"
-          patientsNb={cohort.totalPatients}
-          access={deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
-        />
+        <TopBar context="patient_info" access={deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'} />
 
         <Grid
           container
@@ -167,6 +179,13 @@ const Patient = () => {
                 component={Link}
                 to={`/patients/${patientId}/pmsi${groupId ? `?groupId=${groupId}` : ''}`}
               />
+              <Tab
+                className={classes.tabTitle}
+                label="Médicaments"
+                value="medication"
+                component={Link}
+                to={`/patients/${patientId}/medication${groupId ? `?groupId=${groupId}` : ''}`}
+              />
             </Tabs>
           </Grid>
           <Grid className={classes.tabContainer}>
@@ -188,8 +207,6 @@ const Patient = () => {
                 documents={documents}
                 total={documentsTotal}
                 deidentifiedBoolean={deidentifiedBoolean}
-                sortBy={'date'}
-                sortDirection={'desc'}
               />
             )}
             {selectedTab === 'pmsi' && (
@@ -203,11 +220,21 @@ const Patient = () => {
                 ghm={ghm}
                 ghmTotal={ghmTotal}
                 deidentifiedBoolean={deidentifiedBoolean}
-                sortBy={'date'}
-                sortDirection={'desc'}
+              />
+            )}
+            {selectedTab === 'medication' && (
+              <PatientMedication
+                groupId={groupId}
+                patientId={patientId}
+                prescription={medicationRequest}
+                prescriptionTotal={medicationRequestTotal}
+                administration={medicationAdministration}
+                administrationTotal={medicationAdministrationTotal}
+                deidentifiedBoolean={deidentifiedBoolean}
               />
             )}
           </Grid>
+
           <PatientSidebar
             openDrawer={isSidebarOpened}
             patients={cohort.originalPatients}

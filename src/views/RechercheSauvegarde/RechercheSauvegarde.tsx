@@ -3,7 +3,7 @@ import { useAppSelector } from 'state'
 
 import { CssBaseline, Grid, Typography } from '@material-ui/core'
 
-import Research from '../../components/SavedResearch/ResearchCard'
+import Research from 'components/SavedResearch/ResearchCard'
 
 import useStyles from './styles'
 import clsx from 'clsx'

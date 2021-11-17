@@ -3,11 +3,11 @@ import moment from 'moment'
 import clsx from 'clsx'
 import { Grid, Paper, Container, Typography } from '@material-ui/core'
 
-import NewsCard from '../../components/Welcome/NewsCard/NewsCard'
-import PatientsCard from '../../components/Welcome/PatientsCard/PatientsCard'
-import ResearchCard from '../../components/Welcome/ResearchCard/ResearchCard'
-import SearchPatientCard from '../../components/Welcome/SearchPatientCard/SearchPatientCard'
-import TutorialsCard from '../../components/Welcome/TutorialsCard/TutorialsCard'
+import NewsCard from 'components/Welcome/NewsCard/NewsCard'
+import PatientsCard from 'components/Welcome/PatientsCard/PatientsCard'
+import ResearchCard from 'components/Welcome/ResearchCard/ResearchCard'
+import SearchPatientCard from 'components/Welcome/SearchPatientCard/SearchPatientCard'
+import TutorialsCard from 'components/Welcome/TutorialsCard/TutorialsCard'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { initUserCohortsThunk } from 'state/userCohorts'
@@ -15,6 +15,7 @@ import { fetchProjects } from 'state/project'
 import { fetchRequests } from 'state/request'
 import { fetchCohorts } from 'state/cohort'
 import { initPmsiHierarchy } from 'state/pmsi'
+import { initMedicationHierarchy } from 'state/medication'
 import { fetchScopesList } from 'state/scope'
 
 import useStyles from './styles'
@@ -48,6 +49,9 @@ const Accueil: React.FC = () => {
     // fetchPmsiData
     dispatch<any>(initPmsiHierarchy())
 
+    // fetchMedicationData
+    dispatch<any>(initMedicationHierarchy())
+
     // fetchScope
     dispatch<any>(fetchScopesList())
   }, [dispatch])
@@ -80,38 +84,46 @@ const Accueil: React.FC = () => {
         <Typography component="h1" variant="h1" color="inherit" noWrap className={classes.title}>
           Bienvenue {practitioner.displayName}
         </Typography>
-        <Typography component="h6" variant="h6" color="inherit" noWrap className={classes.title}>
+        <Typography component="h6" variant="h6" color="inherit" noWrap className={classes.subtitle}>
           {lastConnection}
         </Typography>
       </Container>
-      <Container maxWidth="lg" className={classes.container} style={{ minHeight: 'calc(100vh - 70px)' }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6} lg={6}>
-            <Grid item>
-              <Paper className={classes.paper}>
-                <PatientsCard />
-              </Paper>
-            </Grid>
+      <Container
+        maxWidth="lg"
+        className={classes.container}
+        style={{ minHeight: 'calc(100vh - 70px)', marginBottom: 8 }}
+      >
+        <Grid container spacing={1}>
+          <Grid container className={classes.newsGrid} item xs={12} md={6} lg={6}>
             <Grid item className={classes.pt3}>
-              <Paper className={classes.paper}>
-                <SearchPatientCard />
-              </Paper>
-            </Grid>
-          </Grid>
-          <Grid item xs={12} md={6} lg={6}>
-            <Grid item xs={12} md={12} lg={12}>
               <Paper className={classes.paper}>
                 <NewsCard />
               </Paper>
             </Grid>
+
+            <Grid item className={classes.pt3}>
+              <Paper className={classes.paper}>
+                <PatientsCard />
+              </Paper>
+            </Grid>
+          </Grid>
+
+          <Grid container item xs={12} md={6} lg={6}>
             <Grid item xs={12} md={12} lg={12} className={classes.pt3}>
               <Paper className={classes.paper}>
                 <TutorialsCard />
               </Paper>
             </Grid>
+
+            <Grid item xs={12} md={12} lg={12} className={classes.pt3}>
+              <Paper className={classes.paper}>
+                <SearchPatientCard />
+              </Paper>
+            </Grid>
           </Grid>
         </Grid>
-        <Grid container spacing={3}>
+
+        <Grid container spacing={3} style={{ paddingTop: 8 }}>
           <Grid item xs={12} md={12} lg={12}>
             <Paper className={classes.paper}>
               <ResearchCard title={'Mes cohortes favorites'} cohorts={favoriteCohorts} />

@@ -1,7 +1,7 @@
-import CIMTypes from '../data/CIMTypes'
-import criteriaSearchFields from '../data/criteriaSearchField'
-import genders from '../data/gender'
-import api from '../services/api'
+import CIMTypes from 'data/CIMTypes'
+import criteriaSearchFields from 'data/criteriaSearchField'
+import genders from 'data/gender'
+import api from 'services/apiFhir'
 import {
   CIMDiagnosticInclusionCriteria,
   PatientDemographyInclusionCriteria,

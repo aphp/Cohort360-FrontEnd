@@ -15,7 +15,7 @@ import {
 import { useAppSelector } from 'state'
 import { CohortState, addCohort, editCohort, deleteCohort } from 'state/cohort'
 
-import { CohortType } from 'services/myProjects'
+import { CohortType } from 'types'
 
 import useStyles from './styles'
 
@@ -68,7 +68,7 @@ const ModalEditCohort: React.FC<{
     if (loading) return
     setLoading(true)
 
-    if (!modalCohortState.name) {
+    if (!modalCohortState.name || (modalCohortState.name && modalCohortState.name.length > 255)) {
       setLoading(false)
       return setError(ERROR_TITLE)
     }
@@ -110,6 +110,7 @@ const ModalEditCohort: React.FC<{
               variant="outlined"
               fullWidth
               error={error === ERROR_TITLE}
+              helperText={error === ERROR_TITLE ? 'Le nom est trop long (255 caractère max.)' : ''}
             />
           </Grid>
 

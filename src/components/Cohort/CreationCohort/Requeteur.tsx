@@ -91,9 +91,21 @@ const Requeteur = () => {
     const _createCohort = async () => {
       if (!json) return
 
-      await createCohort(json, count?.uuid, currentSnapshot, requestId, cohortName, cohortDescription)
-      dispatch<any>(resetCohortCreation())
-      history.push(`/accueil`)
+      const createCohortResult = await createCohort(
+        json,
+        count?.uuid,
+        currentSnapshot,
+        requestId,
+        cohortName,
+        cohortDescription
+      )
+
+      if (createCohortResult && createCohortResult.status === 201) {
+        dispatch<any>(resetCohortCreation())
+        history.push(`/accueil`)
+      } else {
+        console.log('createCohortResult :>> ', createCohortResult)
+      }
     }
 
     _createCohort()
@@ -141,7 +153,14 @@ const Requeteur = () => {
   }
 
   const _canExecute: () => boolean = () => {
-    if (!json || !count?.uuid || !currentSnapshot || !requestId) {
+    if (
+      !json ||
+      !count?.uuid ||
+      count.status === 'failed' ||
+      count.status === 'error' ||
+      !currentSnapshot ||
+      !requestId
+    ) {
       return false
     }
     return true

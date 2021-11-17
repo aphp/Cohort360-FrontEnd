@@ -26,10 +26,10 @@ import Pagination from '@material-ui/lab/Pagination'
 import PMSIFilters from '../../Filters/PMSIFilters/PMSIFilters'
 
 import ClearIcon from '@material-ui/icons/Clear'
-import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
-import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
+import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
+import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import { fetchPMSI } from '../../../services/patient'
+import services from 'services'
 
 import useStyles from './styles'
 import { PMSIEntry } from 'types'
@@ -46,8 +46,6 @@ type PatientPMSITypes = {
   ghm?: PMSIEntry<IClaim>[]
   ghmTotal: number
   deidentifiedBoolean: boolean
-  sortBy: string
-  sortDirection: 'asc' | 'desc'
 }
 const PatientPMSI: React.FC<PatientPMSITypes> = ({
   groupId,
@@ -58,9 +56,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
   ccamTotal,
   ghm,
   ghmTotal,
-  deidentifiedBoolean,
-  sortBy,
-  sortDirection
+  deidentifiedBoolean
 }) => {
   const classes = useStyles()
   const [selectedTab, selectTab] = useState<'CIM10' | 'CCAM' | 'GHM'>('CIM10')
@@ -75,8 +71,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
   const [selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>([])
   const [startDate, setStartDate] = useState<string | null>(null)
   const [endDate, setEndDate] = useState<string | null>(null)
-  const [_sortBy, setSortBy] = useState(sortBy)
-  const [_sortDirection, setSortDirection] = useState(sortDirection)
+  const [sortBy, setSortBy] = useState('date')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [showFilterChip, setShowFilterChip] = useState(false)
 
   const documentLines = 20 // Number of desired lines in the document array
@@ -99,7 +95,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
 
     const selectedDiagnosticTypesCodes = selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
 
-    const pmsiResp = await fetchPMSI(
+    const pmsiResp = await services.patients.fetchPMSI(
       deidentified,
       page,
       patientId,
@@ -132,15 +128,15 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       nda,
       code,
       selectedDiagnosticTypes,
-      _sortBy,
-      _sortDirection,
+      sortBy,
+      sortDirection,
       startDate,
       endDate
     )
   }
 
   const handleSort = (property: any) => (event: React.MouseEvent<unknown> /*eslint-disable-line*/) => {
-    const isAsc: boolean = _sortBy === property && _sortDirection === 'asc'
+    const isAsc: boolean = sortBy === property && sortDirection === 'asc'
     const newDirection = isAsc ? 'desc' : 'asc'
 
     setSortDirection(newDirection)
@@ -174,8 +170,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       nda,
       code,
       selectedDiagnosticTypes,
-      _sortBy,
-      _sortDirection,
+      sortBy,
+      sortDirection,
       startDate,
       endDate
     )
@@ -316,7 +312,11 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
               onKeyDown={onKeyDown}
               endAdornment={
                 <InputAdornment position="end">
-                  <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                  {searchInput && (
+                    <IconButton onClick={handleClearInput}>
+                      <ClearIcon />
+                    </IconButton>
+                  )}
                 </InputAdornment>
               }
             />
@@ -425,26 +425,26 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
                   {deidentifiedBoolean ? 'NDA chiffré' : 'NDA'}
                 </TableCell>
                 <TableCell
-                  sortDirection={_sortBy === 'date' ? _sortDirection : false}
+                  sortDirection={sortBy === 'date' ? sortDirection : false}
                   align="left"
                   className={classes.tableHeadCell}
                 >
                   <TableSortLabel
-                    active={_sortBy === 'date'}
-                    direction={_sortBy === 'date' ? _sortDirection : 'asc'}
+                    active={sortBy === 'date'}
+                    direction={sortBy === 'date' ? sortDirection : 'asc'}
                     onClick={handleSort('date')}
                   >
                     Codage le
                   </TableSortLabel>
                 </TableCell>
                 <TableCell
-                  sortDirection={_sortBy === 'code' ? _sortDirection : false}
+                  sortDirection={sortBy === 'code' ? sortDirection : false}
                   align="center"
                   className={classes.tableHeadCell}
                 >
                   <TableSortLabel
-                    active={_sortBy === 'code'}
-                    direction={_sortBy === 'code' ? _sortDirection : 'asc'}
+                    active={sortBy === 'code'}
+                    direction={sortBy === 'code' ? sortDirection : 'asc'}
                     onClick={handleSort('code')}
                   >
                     Code

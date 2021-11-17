@@ -14,14 +14,13 @@ import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogActions from '@material-ui/core/DialogActions'
 
 import Footer from 'components/Footer/Footer'
+import NoRights from 'components/ErrorView/NoRights'
+
 import logo from 'assets/images/logo-login.png'
 import { login as loginAction } from 'state/me'
-import { authenticate } from 'services/authentication'
 import { ACCES_TOKEN, REFRESH_TOKEN } from '../../constants'
-import { fetchPractitioner } from 'services/practitioner'
-import { fetchDeidentified } from 'services/deidentification'
-import { fetchPractitionerRole } from 'services/practitioner'
-import NoRights from 'components/ErrorView/NoRights'
+
+import services from 'services'
 
 import useStyles from './styles'
 
@@ -89,10 +88,17 @@ const Login = () => {
   const [open, setOpen] = useState(false)
 
   const getPractitionerData = async (lastConnection) => {
-    const practitioner = await fetchPractitioner(username)
+    if (
+      typeof services?.practitioner?.fetchPractitioner !== 'function' ||
+      typeof services.perimeters.fetchDeidentified !== 'function'
+    ) {
+      return setErrorLogin(true)
+    }
+
+    const practitioner = await services.practitioner.fetchPractitioner(username)
 
     if (practitioner) {
-      const deidentifiedInfos = await fetchDeidentified(practitioner.id)
+      const deidentifiedInfos = await services.perimeters.fetchDeidentified(practitioner.id)
 
       dispatch(
         loginAction({
@@ -117,6 +123,12 @@ const Login = () => {
     localStorage.removeItem('exploredCohort')
     localStorage.removeItem('userCohorts')
     localStorage.removeItem('cohortCreation')
+    localStorage.removeItem('medication')
+    localStorage.removeItem('scope')
+    localStorage.removeItem('project')
+    localStorage.removeItem('cohort')
+    localStorage.removeItem('request')
+    localStorage.removeItem('pmsi')
     localStorage.removeItem('access')
     localStorage.removeItem('refresh')
   }, [])
@@ -125,7 +137,7 @@ const Login = () => {
     try {
       if (!username || !password) return setErrorLogin(true)
 
-      const response = await authenticate(username, password)
+      const response = await services.practitioner.authenticate(username, password)
       if (!response) return setErrorLogin(true)
 
       const { status, data = {} } = response
@@ -134,8 +146,8 @@ const Login = () => {
         localStorage.setItem(ACCES_TOKEN, data.access)
         localStorage.setItem(REFRESH_TOKEN, data.refresh)
 
-        const getPractitioner = await fetchPractitioner(username)
-        const getRights = await fetchPractitionerRole(getPractitioner.id)
+        const getPractitioner = await services.practitioner.fetchPractitioner(username)
+        const getRights = await services.practitioner.fetchPractitionerRole(getPractitioner.id)
 
         if (getRights === undefined) {
           setNoRights(true)

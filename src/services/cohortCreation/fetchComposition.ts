@@ -1,6 +1,6 @@
 import { CONTEXT } from '../../constants'
-import docTypes from '../../assets/docTypes.json'
-import { capitalizeFirstLetter } from '../../utils/capitalize'
+import docTypes from 'assets/docTypes.json'
+import { capitalizeFirstLetter } from 'utils/capitalize'
 
 export const fetchDocTypes = () => {
   if (CONTEXT === 'arkhn') {

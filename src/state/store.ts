@@ -14,6 +14,7 @@ import request from './request'
 import cohort from './cohort'
 import scope from './scope'
 import pmsi from './pmsi'
+import medication from './medication'
 
 const cohortCreationReducer = combineReducers({
   criteria,
@@ -31,7 +32,8 @@ const rootReducer = combineReducers({
   request,
   cohort,
   scope,
-  pmsi
+  pmsi,
+  medication
 })
 
 export const store = createStore(rootReducer, applyMiddleware(thunkMiddleware, logger))
@@ -39,7 +41,7 @@ export const store = createStore(rootReducer, applyMiddleware(thunkMiddleware, l
 store.subscribe(() => {
   // Auto save store inside localStorage
   const state = store.getState() ?? {}
-  const { me, exploredCohort, userCohorts, cohortCreation, project, request, cohort, scope, pmsi } = state
+  const { me, exploredCohort, userCohorts, cohortCreation, project, request, cohort, scope, pmsi, medication } = state
 
   localStorage.setItem('user', JSON.stringify(me))
   localStorage.setItem(
@@ -58,4 +60,5 @@ store.subscribe(() => {
   localStorage.setItem('cohort', JSON.stringify(cohort))
   localStorage.setItem('scope', JSON.stringify(scope))
   localStorage.setItem('pmsi', JSON.stringify(pmsi))
+  localStorage.setItem('medication', JSON.stringify(medication))
 })

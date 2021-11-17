@@ -1,52 +1,7 @@
-import apiBack from '../apiBackCohort'
+import apiBack from '../apiBackend'
 import { CONTEXT } from '../../constants'
 
 import { CohortCreationCounterType } from 'types'
-
-export const countCohort = async (requeteurJson?: string, snapshotId?: string, requestId?: string, uuid?: string) => {
-  if (uuid) {
-    const measureResult = await apiBack.get(`/explorations/dated-measures/${uuid}/`)
-
-    return {
-      status: measureResult?.data?.request_job_status,
-      jobFailMsg: measureResult?.data?.request_job_fail_msg,
-      uuid: measureResult?.data?.uuid,
-      includePatient: measureResult?.data?.measure,
-      byrequest: 0,
-      alive: measureResult?.data?.measure_alive,
-      deceased: measureResult?.data?.measure_deceased,
-      female: measureResult?.data?.measure_female,
-      male: measureResult?.data?.measure_male,
-      unknownPatient: measureResult?.data?.measure_unknown
-    }
-  } else {
-    if (!requeteurJson || !snapshotId || !requestId) return null
-
-    if (CONTEXT === 'arkhn') {
-      // const request: Cohort_Count_API_Response = await api.post('QueryServer/api/count', requeteurJson)
-      // const { data } = request
-      return null
-    } else if (CONTEXT === 'fakedata') {
-      return null
-    } else {
-      const measureResult = await apiBack.post('/explorations/dated-measures/', {
-        request_query_snapshot_id: snapshotId,
-        request_id: requestId
-      })
-
-      return {
-        status: measureResult?.data?.request_job_status,
-        uuid: measureResult?.data?.uuid,
-        includePatient: 0,
-        byrequest: 0,
-        alive: 0,
-        deceased: 0,
-        female: 0,
-        male: 0
-      }
-    }
-  }
-}
 
 export const createCohort = async (
   requeteurJson: string | undefined,
@@ -77,6 +32,51 @@ export const createCohort = async (
   }
 }
 
+export const countCohort = async (requeteurJson?: string, snapshotId?: string, requestId?: string, uuid?: string) => {
+  if (uuid) {
+    const measureResult = await apiBack.get<any>(`/explorations/dated-measures/${uuid}/`)
+
+    return {
+      status: measureResult?.data?.request_job_status,
+      jobFailMsg: measureResult?.data?.request_job_fail_msg,
+      uuid: measureResult?.data?.uuid,
+      includePatient: measureResult?.data?.measure,
+      byrequest: 0,
+      alive: measureResult?.data?.measure_alive,
+      deceased: measureResult?.data?.measure_deceased,
+      female: measureResult?.data?.measure_female,
+      male: measureResult?.data?.measure_male,
+      unknownPatient: measureResult?.data?.measure_unknown
+    }
+  } else {
+    if (!requeteurJson || !snapshotId || !requestId) return null
+
+    if (CONTEXT === 'arkhn') {
+      // const request: Cohort_Count_API_Response = await api.post('QueryServer/api/count', requeteurJson)
+      // const { data } = request
+      return null
+    } else if (CONTEXT === 'fakedata') {
+      return null
+    } else {
+      const measureResult = await apiBack.post<any>('/explorations/dated-measures/create-unique/', {
+        request_query_snapshot_id: snapshotId,
+        request_id: requestId
+      })
+
+      return {
+        status: measureResult?.data?.request_job_status,
+        uuid: measureResult?.data?.uuid,
+        includePatient: 0,
+        byrequest: 0,
+        alive: 0,
+        deceased: 0,
+        female: 0,
+        male: 0
+      }
+    }
+  }
+}
+
 export const createSnapshot = async (id: string, json: string, firstTime?: boolean) => {
   if (CONTEXT === 'arkhn') {
     return null
@@ -98,7 +98,7 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
   } else if (CONTEXT === 'fakedata') {
     return null
   } else {
-    const requestResponse = (await apiBack.get(`/explorations/requests/${requestId}/`)) || {}
+    const requestResponse = (await apiBack.get<any>(`/explorations/requests/${requestId}/`)) || {}
     const requestData = requestResponse?.data ? requestResponse.data : {}
 
     const requestName = requestData.name

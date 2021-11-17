@@ -1,7 +1,17 @@
 import React, { useState } from 'react'
 import { useAppSelector } from 'state'
 
-import { Button, CircularProgress, CssBaseline, Grid, MenuItem, Select, TextField, Typography } from '@material-ui/core'
+import {
+  Button,
+  CircularProgress,
+  CssBaseline,
+  Grid,
+  MenuItem,
+  Select,
+  Snackbar,
+  TextField,
+  Typography
+} from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 
 import useStyles from './styles'
@@ -12,6 +22,7 @@ const defaultContactRequest = {
   requestType: '',
   object: '',
   url: '',
+  files: FileList as any,
   message: ''
 }
 
@@ -45,10 +56,11 @@ const Contact: React.FC = () => {
   const [error, setError] = useState<typeof ERROR_REQUEST_TYPE | typeof ERROR_OBJECT | typeof ERROR_MESSAGE | null>(
     null
   )
-  const [createIssueSuccess, setCreateIssueSuccess] = useState(false)
+  const [errorFiles, setErrorFiles] = useState(false)
+  const [createIssueSuccess, setCreateIssueSuccess] = useState(true)
   const [createIssueFail, setCreateIssueFail] = useState(false)
 
-  const _onChangeValue = (key: 'requestType' | 'object' | 'url' | 'message', value: any) => {
+  const _onChangeValue = (key: 'requestType' | 'object' | 'url' | 'files' | 'message', value: any) => {
     const _contactRequest = { ...contactRequest }
     _contactRequest[key] = value
     setContactRequest(_contactRequest)
@@ -68,6 +80,12 @@ const Contact: React.FC = () => {
         return setError(ERROR_MESSAGE)
       }
 
+      if (contactRequest.files?.[0] && contactRequest.files[0].size > 10000000) {
+        return setErrorFiles(true)
+      } else {
+        setErrorFiles(false)
+      }
+
       setLoading(true)
 
       const contactSubmitForm = new FormData()
@@ -78,6 +96,9 @@ const Contact: React.FC = () => {
         'description',
         `${contactRequest.url !== '' ? `**URL concernée :** ${contactRequest.url}\n\n` : ''} ${contactRequest.message}`
       )
+      if (contactRequest.files && contactRequest.files.length > 0) {
+        contactSubmitForm.append('attachment', contactRequest.files[0])
+      }
 
       const postIssueResp = await postIssue(contactSubmitForm)
 
@@ -166,10 +187,37 @@ const Contact: React.FC = () => {
                   error={error === ERROR_MESSAGE}
                 />
 
+                <Typography variant="h3">Pièce jointe</Typography>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <input
+                    id="fileInput"
+                    type="file"
+                    style={{ display: 'none' }}
+                    onChange={(event) => _onChangeValue('files', event.target?.files)}
+                  />
+                  <label htmlFor="fileInput">
+                    <Button
+                      variant="contained"
+                      disableElevation
+                      component="span"
+                      className={classes.validateButton}
+                      style={{ marginBottom: 24 }}
+                    >
+                      Parcourir...
+                    </Button>
+                  </label>
+                  {contactRequest.files.length > 0 && (
+                    <Typography style={{ marginLeft: 8 }}>{contactRequest.files[0].name}</Typography>
+                  )}
+                </div>
+
                 {error && (
                   <Typography color="secondary">
                     Le motif de contact, l'objet et le message sont des champs obligatoires.
                   </Typography>
+                )}
+                {errorFiles && (
+                  <Typography color="secondary">La pièce jointe ne doit pas dépasser les 10Mo.</Typography>
                 )}
 
                 <Button variant="contained" disableElevation onClick={onSubmit} className={classes.validateButton}>
@@ -182,14 +230,28 @@ const Contact: React.FC = () => {
       </Grid>
 
       {createIssueSuccess && (
-        <Alert severity="success" onClose={() => setCreateIssueSuccess(false)} className={classes.alert}>
-          Votre demande a bien été transmise.
-        </Alert>
+        <Snackbar
+          open
+          onClose={() => setCreateIssueSuccess(false)}
+          autoHideDuration={3000}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert severity="success" onClose={() => setCreateIssueSuccess(false)} className={classes.alert}>
+            Votre demande a bien été transmise.
+          </Alert>
+        </Snackbar>
       )}
       {createIssueFail && (
-        <Alert severity="error" onClose={() => setCreateIssueFail(false)} className={classes.alert}>
-          Une erreur s'est produite lors de la transmission de votre demande.
-        </Alert>
+        <Snackbar
+          open
+          onClose={() => setCreateIssueFail(false)}
+          autoHideDuration={3000}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert severity="error" onClose={() => setCreateIssueFail(false)}>
+            Une erreur s'est produite lors de la transmission de votre demande.
+          </Alert>
+        </Snackbar>
       )}
     </>
   )

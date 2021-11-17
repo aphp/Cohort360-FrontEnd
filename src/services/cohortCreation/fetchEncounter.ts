@@ -19,8 +19,8 @@ import {
   fakeFileStatus,
   fakePriseEnCharge,
   fakeTypeDeSejour
-} from '.././../data/fakeData/cohortCreation/encounter'
-import { capitalizeFirstLetter } from '../../utils/capitalize'
+} from 'data/fakeData/cohortCreation/encounter'
+import { capitalizeFirstLetter } from 'utils/capitalize'
 import { cleanValueSet } from 'utils/cleanValueSet'
 
 export const fetchAdmissionModes = async () => {
@@ -35,7 +35,7 @@ export const fetchAdmissionModes = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_ADMISSION_MODE}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_ADMISSION_MODE}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
       return data && data.length > 0
         ? data.map((_data: { code: string; display: string }) => ({
@@ -61,7 +61,7 @@ export const fetchEntryModes = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_ENTRY_MODE}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_ENTRY_MODE}`)
       const data = res.data.entry[0].resource.compose.include[0].concept || []
 
       return cleanValueSet(data)
@@ -83,7 +83,7 @@ export const fetchExitModes = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_EXIT_MODE}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_EXIT_MODE}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
@@ -105,7 +105,7 @@ export const fetchPriseEnChargeType = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_VISIT_TYPE}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_VISIT_TYPE}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       const cleanData = cleanValueSet(data)
@@ -133,7 +133,7 @@ export const fetchTypeDeSejour = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_SEJOUR_TYPE}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_SEJOUR_TYPE}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
@@ -155,7 +155,7 @@ export const fetchFileStatus = async () => {
       : []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_FILE_STATUS}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_FILE_STATUS}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
@@ -172,7 +172,7 @@ export const fetchReason = async () => {
     return []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_EXIT_TYPE}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_EXIT_TYPE}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
@@ -189,7 +189,7 @@ export const fetchDestination = async () => {
     return []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_DESTINATION}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_DESTINATION}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
@@ -206,7 +206,7 @@ export const fetchProvenance = async () => {
     return []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_PROVENANCE}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_PROVENANCE}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)
@@ -223,7 +223,7 @@ export const fetchAdmission = async () => {
     return []
   } else {
     try {
-      const res = await apiRequest.get(`/ValueSet?url=${ENCOUNTER_ADMISSION}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_ADMISSION}`)
       const data = res.data.entry[0].resource?.compose?.include[0].concept || []
 
       return cleanValueSet(data)

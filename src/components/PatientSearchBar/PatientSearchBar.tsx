@@ -4,7 +4,7 @@ import { useHistory, useLocation, useParams } from 'react-router-dom'
 import { Grid, IconButton, InputAdornment, InputBase, MenuItem, Select } from '@material-ui/core'
 
 import ClearIcon from '@material-ui/icons/Clear'
-import { ReactComponent as SearchIcon } from '../../assets/icones/search.svg'
+import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
 import { SearchByTypes } from 'types'
 

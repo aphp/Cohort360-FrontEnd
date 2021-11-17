@@ -134,15 +134,32 @@ type CountCohortCreationParams = {
 }
 
 const countCohortCreation = createAsyncThunk<
-  { count?: CohortCreationCounterType },
+  { count?: CohortCreationCounterType; snapshotsHistory?: CohortCreationSnapshotType[] },
   CountCohortCreationParams,
   { state: RootState }
->('cohortCreation/count', async ({ json, snapshotId, requestId, uuid }) => {
+>('cohortCreation/count', async ({ json, snapshotId, requestId, uuid }, { getState }) => {
   try {
+    const state = getState()
+    const { snapshotsHistory } = state.cohortCreation.request
+    const newSnapshotsHistory = [...snapshotsHistory].map((item) => ({ ...item }))
+
     const countResult = await countCohort(json, snapshotId, requestId, uuid)
     if (!countResult) return {}
 
-    return { count: countResult }
+    if (!uuid) {
+      const currentSnapshot = newSnapshotsHistory.find(({ uuid }) => uuid === snapshotId)
+      if (!currentSnapshot) {
+        return { count: countResult, snapshotsHistory }
+      }
+      const index = newSnapshotsHistory.indexOf(currentSnapshot)
+      if (newSnapshotsHistory[index].dated_measures === undefined) {
+        newSnapshotsHistory[index].dated_measures = []
+      }
+      // @ts-ignore
+      newSnapshotsHistory[index].dated_measures = [...newSnapshotsHistory[index].dated_measures, countResult]
+    }
+
+    return { count: countResult, snapshotsHistory: newSnapshotsHistory }
   } catch (error) {
     console.error(error)
     throw error
@@ -156,14 +173,14 @@ const countCohortCreation = createAsyncThunk<
  */
 type SaveJsonReturn = {
   requestId: string
-  snapshotsHistory: any[]
+  snapshotsHistory: CohortCreationSnapshotType[]
   currentSnapshot: string
 }
 type SaveJsonParams = { newJson: string }
 
 const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootState }>(
   'cohortCreation/saveJson',
-  async ({ newJson }, { getState, dispatch }) => {
+  async ({ newJson }, { getState }) => {
     try {
       const state = getState()
       const { requestId } = state.cohortCreation.request
@@ -171,7 +188,7 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
 
       if (!snapshotsHistory || (snapshotsHistory && snapshotsHistory.length === 0)) {
         if (requestId) {
-          const newSnapshot = await createSnapshot(requestId, newJson, true)
+          const newSnapshot: any = await createSnapshot(requestId, newJson, true)
           if (newSnapshot) {
             const uuid = newSnapshot.uuid
             const json = newSnapshot.serialized_query
@@ -183,7 +200,7 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
         }
       } else if (currentSnapshot) {
         // Update snapshots list
-        const newSnapshot = await createSnapshot(currentSnapshot, newJson, false)
+        const newSnapshot: any = await createSnapshot(currentSnapshot, newJson, false)
         if (newSnapshot) {
           const foundItem = snapshotsHistory.find(
             (snapshotsHistory: CohortCreationSnapshotType) => snapshotsHistory.uuid === currentSnapshot
@@ -201,14 +218,6 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
           snapshotsHistory = [..._snapshotsHistory, { uuid, json, date }]
         }
       }
-
-      dispatch<any>(
-        countCohortCreation({
-          json: newJson,
-          snapshotId: currentSnapshot,
-          requestId
-        })
-      )
 
       return {
         requestId,
@@ -254,7 +263,15 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
       const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
 
       if (json !== state?.cohortCreation?.request?.json) {
-        dispatch<any>(saveJson({ newJson: json }))
+        const saveJsonResponse = await dispatch<any>(saveJson({ newJson: json }))
+
+        await dispatch<any>(
+          countCohortCreation({
+            json: json,
+            snapshotId: saveJsonResponse.payload.currentSnapshot,
+            requestId: saveJsonResponse.payload.requestId
+          })
+        )
       }
 
       return {
@@ -459,11 +476,13 @@ const cohortCreationSlice = createSlice({
     },
     suspendCount: (state: CohortCreationState) => {
       state.count = {
-        ...state.count,
+        ...(state.count || {}),
         status:
-          state.count.status === 'pending' || state.count.status === 'started' || state.count.status === 'suspended'
+          (state.count || {}).status === 'pending' ||
+          (state.count || {}).status === 'started' ||
+          (state.count || {}).status === 'suspended'
             ? 'suspended'
-            : state.count.status
+            : (state.count || {}).status
       }
     },
     unsuspendCount: (state: CohortCreationState) => {

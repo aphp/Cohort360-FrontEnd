@@ -6,7 +6,7 @@ import { Alert } from '@material-ui/lab'
 
 import PatientField from './PatientField/PatientField'
 
-import { getAge } from '../../../utils/age'
+import { getAge } from 'utils/age'
 import { CohortPatient } from 'types'
 
 import useStyles from './styles'

@@ -12,7 +12,7 @@ import axios from 'axios'
 import { ACCES_TOKEN, REFRESH_TOKEN, CONTEXT } from '../../constants'
 
 import { useAppSelector } from 'state'
-import { logout as logoutAction } from '../../state/me'
+import { logout as logoutAction } from 'state/me'
 import useStyles from './styles'
 
 const AutoLogoutContainer = () => {

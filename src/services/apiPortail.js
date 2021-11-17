@@ -1,25 +1,25 @@
 import axios from 'axios'
 import { ACCES_TOKEN, PORTAIL_API_URL } from '../constants'
 
-const apiPortailCohort = axios.create({
+const apiPortail = axios.create({
   baseURL: PORTAIL_API_URL,
   headers: {
     Accept: 'application/json'
   }
 })
 
-apiPortailCohort.interceptors.request.use((config) => {
+apiPortail.interceptors.request.use((config) => {
   const token = localStorage.getItem(ACCES_TOKEN)
   config.headers.Authorization = `Bearer ${token}`
   return config
 })
 
-apiPortailCohort.interceptors.response.use(
+apiPortail.interceptors.response.use(
   (response) => {
     return response
   },
   function (error) {
-    if ((401 || 400) === error.response.status) {
+    if ((401 || 400 || 403) === error.response.status) {
       localStorage.clear()
       window.location = '/'
     }
@@ -27,4 +27,4 @@ apiPortailCohort.interceptors.response.use(
   }
 )
 
-export default apiPortailCohort
+export default apiPortail

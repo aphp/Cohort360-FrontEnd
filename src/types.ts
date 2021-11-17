@@ -12,7 +12,9 @@ import {
   IOperationOutcome,
   PatientGenderKind,
   IObservation,
-  IDocumentReference
+  IDocumentReference,
+  IMedicationRequest,
+  IMedicationAdministration
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 export interface TypedEntry<T extends IResourceList> extends IBundle_Entry {
@@ -64,6 +66,12 @@ export type CohortPatient = IPatient & {
 }
 
 export type PMSIEntry<T extends IProcedure | ICondition | IClaim> = T & {
+  documents?: (CohortComposition | IDocumentReference)[]
+  serviceProvider?: string
+  NDA?: string
+}
+
+export type MedicationEntry<T extends IMedicationRequest | IMedicationAdministration> = T & {
   documents?: (CohortComposition | IDocumentReference)[]
   serviceProvider?: string
   NDA?: string
@@ -266,6 +274,10 @@ export type PatientData = {
   diagnosticTotal?: number
   ghm?: PMSIEntry<IClaim>[]
   ghmTotal?: number
+  medicationRequest?: IMedicationRequest[]
+  medicationRequestTotal?: number
+  medicationAdministration?: IMedicationAdministration[]
+  medicationAdministrationTotal?: number
 }
 
 export type CriteriaGroupType = {
@@ -307,7 +319,15 @@ export type CriteriaItemType = {
 
 export type SelectedCriteriaType = {
   id: number
-} & (CcamDataType | Cim10DataType | DemographicDataType | GhmDataType | EncounterDataType | DocumentDataType)
+} & (
+  | CcamDataType
+  | Cim10DataType
+  | DemographicDataType
+  | GhmDataType
+  | EncounterDataType
+  | DocumentDataType
+  | MedicationDataType
+)
 
 export type CcamDataType = {
   title: string
@@ -372,8 +392,8 @@ export type GhmDataType = {
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
-  startOccurrence: Date
-  endOccurrence: Date
+  startOccurrence: Date | null
+  endOccurrence: Date | null
   isInclusive?: boolean
 }
 
@@ -400,6 +420,24 @@ export type EncounterDataType = {
   isInclusive?: boolean
 }
 
+export type MedicationDataType = {
+  title: string
+  code: { id: string; label: string }[] | null
+  prescriptionType: { id: string; label: string }[] | null
+  administration: { id: string; label: string }[] | null
+  occurrence: number
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
+  startOccurrence: Date | null
+  endOccurrence: Date | null
+  isInclusive?: boolean
+} & (
+  | {
+      type: 'MedicationRequest'
+      prescriptionType: { id: string; label: string }[] | null
+    }
+  | { type: 'MedicationAdministration' }
+)
+
 export type CohortCreationCounterType = {
   uuid?: string
   status?: string
@@ -423,6 +461,48 @@ export type CohortCreationSnapshotType = {
 export type ValueSet = {
   code: string
   display: string
+}
+
+export type ProjectType = {
+  uuid: string
+  name: string
+  description?: string
+  created_at?: string
+  modified_at?: string
+  favorite?: boolean
+  owner_id?: string
+}
+
+export type RequestType = {
+  uuid: string
+  name: string
+  parent_folder?: string
+  description?: string
+  owner_id?: string
+  data_type_of_query?: string
+  favorite?: boolean
+  created_at?: string
+  modified_at?: string
+}
+
+export type CohortType = {
+  uuid: string
+  name: string
+  create_task_id?: string
+  dated_measure_id?: string
+  description?: string
+  favorite?: boolean
+  fhir_group_id?: string
+  owner_id?: string
+  request?: string
+  request_job_duration?: string
+  request_job_fail_msg?: string
+  request_job_status?: string
+  request_query_snapshot?: string
+  result_size?: number
+  created_at?: string
+  modified_at?: string
+  extension?: any[]
 }
 
 export type ContactSubmitForm = FormData

@@ -2,9 +2,9 @@ import React from 'react'
 
 import { Grid, Typography } from '@material-ui/core'
 
-import { ReactComponent as FemaleIcon } from '../../../../assets/icones/venus.svg'
-import { ReactComponent as MaleIcon } from '../../../../assets/icones/mars.svg'
-import { ReactComponent as UnknownIcon } from '../../../../assets/icones/autre-inconnu.svg'
+import { ReactComponent as FemaleIcon } from 'assets/icones/venus.svg'
+import { ReactComponent as MaleIcon } from 'assets/icones/mars.svg'
+import { ReactComponent as UnknownIcon } from 'assets/icones/autre-inconnu.svg'
 
 import useStyles from './styles'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'

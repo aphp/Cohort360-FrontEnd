@@ -178,15 +178,43 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
           </FormLabel>
 
           <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 180px', alignItems: 'center', margin: '0 1em' }}>
-            <Slider
-              value={defaultValues.years}
-              onChange={(e, value) => _onChangeValue('years', value)}
-              aria-labelledby="range-slider"
-              valueLabelDisplay="on"
-              valueLabelFormat={(value) => (value === 130 ? '130+' : value)}
-              min={0}
-              max={130}
-            />
+            <Grid>
+              <Slider
+                value={defaultValues.years}
+                onChange={(e, value) => _onChangeValue('years', value)}
+                aria-labelledby="range-slider"
+                valueLabelDisplay="off"
+                valueLabelFormat={(value) => (value === 130 ? '130+' : value)}
+                min={0}
+                max={130}
+              />
+              <Grid container justify="space-around">
+                <Grid item>
+                  <TextField
+                    value={defaultValues.years[0]}
+                    type="number"
+                    onChange={(e) =>
+                      _onChangeValue('years', [
+                        +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : defaultValues.years[0],
+                        defaultValues.years[1]
+                      ])
+                    }
+                  />
+                </Grid>
+                <Grid item>
+                  <TextField
+                    value={defaultValues.years[1]}
+                    type="number"
+                    onChange={(e) =>
+                      _onChangeValue('years', [
+                        defaultValues.years[0],
+                        +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : defaultValues.years[1]
+                      ])
+                    }
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
 
             <Autocomplete
               id="criteria-ageType-autocomplete"

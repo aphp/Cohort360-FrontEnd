@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 
 import Avatar from '@material-ui/core/Avatar'
@@ -37,7 +38,11 @@ import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalE
 
 import { useAppSelector } from 'state'
 import { favoriteExploredCohort } from 'state/exploredCohort'
-import { fetchCohorts as fetchCohortsList, setSelectedCohort } from 'state/cohort'
+import { fetchCohorts as fetchCohortsList, setSelectedCohort, deleteCohort } from 'state/cohort'
+
+import { CohortType } from 'types'
+
+import services from 'services'
 
 import displayDigit from 'utils/displayDigit'
 
@@ -53,6 +58,7 @@ type TopBarProps = {
 const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
+  const history = useHistory()
 
   const { dashboard, cohortList } = useAppSelector((state) => ({
     dashboard: state.exploredCohort,
@@ -60,6 +66,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   }))
   const [isExtended, onExtend] = useState(false)
   const [openModal, setOpenModal] = useState<'' | 'edit' | 'export' | 'delete'>('')
+  const [patientsNumber, setPatientsNumber] = useState<number>(patientsNb ?? 0)
   const [anchorEl, setAnchorEl] = useState(null)
 
   const handleClick = (event: any) => {
@@ -71,10 +78,25 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
     setOpenModal('')
   }
 
+  React.useEffect(() => {
+    const _fetchPatientNumber = async () => {
+      const _patientNumber = await services.patients.fetchPatientsCount()
+
+      setPatientsNumber(_patientNumber)
+    }
+
+    if (dashboard.totalPatients === undefined) {
+      _fetchPatientNumber()
+    } else {
+      setPatientsNumber(dashboard.totalPatients)
+    }
+  }, [dashboard.totalPatients])
+
   let cohort: {
     name: string
     description?: string
     perimeters?: string[]
+    cohortId?: string
     icon?: React.ReactElement
     showActionButton?: boolean
   } = { name: '-', perimeters: [] }
@@ -83,6 +105,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
       cohort = {
         name: 'Tous mes patients',
         description: '',
+        cohortId: '',
         perimeters: [],
         icon: <GroupIcon />,
         showActionButton: false
@@ -92,13 +115,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
       cohort = {
         name: 'Information patient',
         description: '',
-        // description: Array.isArray(dashboard.cohort)
-        //   ? 'Visualisation de périmètres'
-        //   : dashboard?.cohort?.name
-        //   ? dashboard?.cohort?.name === '-'
-        //     ? 'Exploration de population'
-        //     : 'Exploration de cohorte '
-        //   : "Visualisation d'un patient",
+        cohortId: '',
         perimeters: [],
         icon: <FaceIcon />,
         showActionButton: false
@@ -108,6 +125,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
       cohort = {
         name: dashboard.name ?? '-',
         description: dashboard.description ?? '',
+        cohortId: dashboard.cohortId ?? '',
         perimeters: [],
         icon: <ViewListIcon />,
         showActionButton: true
@@ -134,7 +152,8 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   }
 
   const handleConfirmDeletion = () => {
-    handleClose()
+    dispatch(deleteCohort({ deletedCohort: dashboard as CohortType }))
+    history.push('/accueil')
   }
 
   return (
@@ -232,11 +251,16 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                   ) : (
                     <>
                       <Typography align="right" noWrap>
-                        Nb de patients : {displayDigit(patientsNb ?? 0)}
+                        Nb de patients : {displayDigit(patientsNumber ?? 0)}
                       </Typography>
                       <Typography align="right" noWrap>
                         Accès : {access}
                       </Typography>
+                      {cohort.cohortId && (
+                        <Typography align="right" variant="subtitle2">
+                          Identifiant de la cohorte: {cohort.cohortId}
+                        </Typography>
+                      )}
                     </>
                   )}
                 </Grid>

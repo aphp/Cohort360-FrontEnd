@@ -6,20 +6,18 @@ import { Pagination } from '@material-ui/lab'
 
 import ClearIcon from '@material-ui/icons/Clear'
 import InfoIcon from '@material-ui/icons/Info'
-import SortIcon from '@material-ui/icons/Sort'
-import { ReactComponent as SearchIcon } from '../../../assets/icones/search.svg'
-import { ReactComponent as FilterList } from '../../../assets/icones/filter.svg'
+import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
+import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import DocumentSearchHelp from '../../DocumentSearchHelp/DocumentSearchHelp'
 import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
 import DocumentList from '../../Cohort/Documents/DocumentList/DocumentList'
-import SortDialog from '../../Filters/SortDialog/SortDialog'
 
-import { fetchDocuments } from '../../../services/patient'
+import services from 'services'
 import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortComposition } from 'types'
 
-import { docTypes } from '../../../assets/docTypes.json'
+import { docTypes } from 'assets/docTypes.json'
 
 import useStyles from './styles'
 
@@ -29,18 +27,8 @@ type PatientDocsTypes = {
   documents?: (CohortComposition | IDocumentReference)[]
   total: number
   deidentifiedBoolean: boolean
-  sortBy: string
-  sortDirection: 'asc' | 'desc'
 }
-const PatientDocs: React.FC<PatientDocsTypes> = ({
-  groupId,
-  patientId,
-  documents,
-  total,
-  deidentifiedBoolean,
-  sortBy,
-  sortDirection
-}) => {
+const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents, total, deidentifiedBoolean }) => {
   const classes = useStyles()
   const [page, setPage] = useState(1)
   const [totalDocs, setTotalDocs] = useState(total)
@@ -49,22 +37,16 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
   const [searchInput, setSearchInput] = useState('')
   const [searchMode, setSearchMode] = useState(false)
   const [open, setOpen] = useState(false)
-  const [openSort, setOpenSort] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
   const [nda, setNda] = useState('')
   const [selectedDocTypes, setSelectedDocTypes] = useState<any[]>([])
   const [startDate, setStartDate] = useState<string | null>(null)
   const [endDate, setEndDate] = useState<string | null>(null)
-  const [_sortBy, setSortBy] = useState(sortBy)
-  const [_sortDirection, setSortDirection] = useState(sortDirection)
+  const [sortBy, setSortBy] = useState('date')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [showFilterChip, setShowFilterChip] = useState(false)
 
   const documentLines = 20 // Number of desired lines in the document array
-
-  const sortOptions = [
-    { label: 'Date', code: 'date' },
-    { label: 'Type de document', code: 'type' }
-  ]
 
   const displayingSelectedDocType: any[] = (() => {
     let displayingSelectedDocTypes: any[] = []
@@ -92,11 +74,12 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
   })()
 
   const fetchDocumentsList = async (newSortBy: string, newSortDirection: string, input = searchInput, page = 1) => {
+    if (typeof services.patients.fetchDocuments !== 'function') return
     setLoadingStatus(true)
 
     const selectedDocTypesCodes = selectedDocTypes.map((docType) => docType.code)
 
-    const docResp = await fetchDocuments(
+    const docResp = await services.patients.fetchDocuments(
       deidentifiedBoolean,
       newSortBy,
       newSortDirection,
@@ -117,26 +100,22 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
 
   const handleClearInput = () => {
     setSearchInput('')
-    fetchDocumentsList(_sortBy, _sortDirection, '')
+    fetchDocumentsList(sortBy, sortDirection, '')
   }
 
   const handleOpenDialog = () => {
     setOpen(true)
   }
 
-  const handleOpenSortDialog = () => {
-    setOpenSort(true)
-  }
-
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
     setPage(value || 1)
     setLoadingStatus(true)
-    fetchDocumentsList(_sortBy, _sortDirection, searchInput, value || 1)
+    fetchDocumentsList(sortBy, sortDirection, searchInput, value || 1)
   }
 
   useEffect(() => {
     handleChangePage()
-  }, [patientId, nda, selectedDocTypes, startDate, endDate]) // eslint-disable-line
+  }, [patientId, nda, selectedDocTypes, startDate, endDate, sortBy, sortDirection]) // eslint-disable-line
 
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
@@ -163,11 +142,6 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
       e.preventDefault()
       onSearchDocument()
     }
-  }
-
-  const handleCloseSortDialog = (submitSort: boolean) => {
-    setOpenSort(false)
-    submitSort && onSearchDocument()
   }
 
   const handleDeleteChip = (filterName: string, value?: string) => {
@@ -220,7 +194,11 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
                 onKeyDown={onKeyDown}
                 endAdornment={
                   <InputAdornment position="end">
-                    <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                    {searchInput && (
+                      <IconButton onClick={handleClearInput}>
+                        <ClearIcon />
+                      </IconButton>
+                    )}
                   </InputAdornment>
                 }
               />
@@ -241,25 +219,6 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
             >
               Filtrer
             </Button>
-            <Button
-              variant="contained"
-              disableElevation
-              onClick={handleOpenSortDialog}
-              startIcon={<SortIcon height="15px" fill="#FFF" />}
-              className={classes.searchButton}
-            >
-              Trier
-            </Button>
-            <SortDialog
-              open={openSort}
-              onClose={() => handleCloseSortDialog(false)}
-              onSubmit={() => handleCloseSortDialog(true)}
-              sortOptions={sortOptions}
-              sortBy={_sortBy}
-              onChangeSortBy={setSortBy}
-              sortDirection={_sortDirection}
-              onChangeSortDirection={setSortDirection}
-            />
           </div>
         </Grid>
       </Grid>
@@ -315,6 +274,10 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({
         searchMode={searchMode}
         showIpp={false}
         deidentified={deidentifiedBoolean}
+        sortBy={sortBy}
+        onChangeSortBy={setSortBy}
+        sortDirection={sortDirection}
+        onChangeSortDirection={setSortDirection}
       />
       <Pagination
         className={classes.pagination}

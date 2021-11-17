@@ -14,12 +14,12 @@ import {
 import Pagination from '@material-ui/lab/Pagination'
 
 import ClearIcon from '@material-ui/icons/Clear'
-import { ReactComponent as SearchIcon } from '../../assets/icones/search.svg'
-import { ReactComponent as FilterList } from '../../assets/icones/filter.svg'
+import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
+import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import ResearchTable from './ResearchTable/ResearchTable'
 import CohortsFilter from '../Filters/CohortsFilters/CohortsFilters'
-import { fetchCohorts } from '../../services/savedResearches'
+import { fetchCohorts } from 'services/savedResearches'
 
 import useStyles from './styles'
 import { CohortFilters, FormattedCohort, ValueSet } from 'types'
@@ -192,7 +192,11 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
               onKeyDown={onKeyDown}
               endAdornment={
                 <InputAdornment position="end">
-                  <IconButton onClick={handleClearInput}>{searchInput && <ClearIcon />}</IconButton>
+                  {searchInput && (
+                    <IconButton onClick={handleClearInput}>
+                      <ClearIcon />
+                    </IconButton>
+                  )}
                 </InputAdornment>
               }
             />

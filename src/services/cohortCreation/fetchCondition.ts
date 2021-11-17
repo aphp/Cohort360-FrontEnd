@@ -1,11 +1,11 @@
 import { CONTEXT, CONDITION_HIERARCHY, CONDITION_STATUS } from '../../constants'
-import apiRequest from '../../services/apiRequest'
-import { capitalizeFirstLetter } from '../../utils/capitalize'
+import apiRequest from 'services/apiRequest'
+import { capitalizeFirstLetter } from 'utils/capitalize'
 import {
   fakeValueSetDiagnosticType,
   fakeValueSetCIM10
   // fakeHierarchyCIM10
-} from '../../data/fakeData/cohortCreation/condition'
+} from 'data/fakeData/cohortCreation/condition'
 import { codeSort } from 'utils/alphabeticalSort'
 
 const DEFAULT_DIAGNOSTIC_TYPES = [
@@ -80,7 +80,7 @@ export const fetchDiagnosticTypes = async () => {
         }))
       : []
   } else {
-    const res = await apiRequest.get(`/ValueSet?url=${CONDITION_STATUS}`)
+    const res = await apiRequest.get<any>(`/ValueSet?url=${CONDITION_STATUS}`)
 
     const diagnosticKinds =
       res && res.data && res.data.entry && res.data.entry[0]
@@ -114,13 +114,13 @@ export const fetchCim10Diagnostic = async (searchValue?: string, noStar?: boolea
     }
     const _searchValue = noStar
       ? searchValue
-        ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
+        ? `&code=${searchValue.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
         : ''
       : searchValue
-      ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
+      ? `&_text=${searchValue.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
       : ''
 
-    const res = await apiRequest.get(`/ValueSet?url=${CONDITION_HIERARCHY}${_searchValue}&size=0`)
+    const res = await apiRequest.get<any>(`/ValueSet?url=${CONDITION_HIERARCHY}${_searchValue}&size=0`)
 
     let cim10List =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -145,7 +145,7 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
     return null
   } else {
     if (!cim10Parent) {
-      const res = await apiRequest.get(`/ValueSet?url=${CONDITION_HIERARCHY}`)
+      const res = await apiRequest.get<any>(`/ValueSet?url=${CONDITION_HIERARCHY}`)
 
       let cim10List =
         res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -179,7 +179,7 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
         }
       }
 
-      const res = await apiRequest.post(`/ValueSet/$expand`, JSON.stringify(json))
+      const res = await apiRequest.post<any>(`/ValueSet/$expand`, JSON.stringify(json))
 
       let cim10List =
         res && res.data && res.data.expansion && res.data.expansion.contains && res.data.resourceType === 'ValueSet'

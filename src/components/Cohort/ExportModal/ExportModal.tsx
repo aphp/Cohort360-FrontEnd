@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 import Alert from '@material-ui/lab/Alert'
 import Button from '@material-ui/core/Button'
@@ -31,7 +31,7 @@ import InfoIcon from '@material-ui/icons/Info'
 import useStyles from './styles'
 
 import export_table from './export_table'
-import { createExport } from 'services/export'
+import services from 'services'
 
 const initialState = {
   motif: '',
@@ -54,6 +54,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   const [exportResponse, setExportResponse] = useState<{ status: 'error' | 'finish'; detail: any } | null>(null)
   const [error, setError] = useState<typeof ERROR_MOTIF | typeof ERROR_CONDITION | typeof ERROR_TABLE | null>(null)
 
+  const dialogRef = useRef<HTMLHeadingElement>(null)
+
   useEffect(() => {
     setSettings(initialState)
   }, [open])
@@ -65,6 +67,20 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       const index = existingTableIds.indexOf(foundItem)
       existingTableIds.splice(index, 1)
     } else {
+      // Attention règle particulière
+      if (tableId === 'fact_relationship') {
+        const careSiteItem = existingTableIds.find((existingTableId) => existingTableId === 'care_site')
+        if (!careSiteItem) {
+          existingTableIds = [...existingTableIds, 'care_site']
+        }
+      }
+      if (tableId === 'concept_relationship') {
+        const careSiteItem = existingTableIds.find((existingTableId) => existingTableId === 'concept')
+        if (!careSiteItem) {
+          existingTableIds = [...existingTableIds, 'concept']
+        }
+      }
+
       existingTableIds = [...existingTableIds, tableId]
     }
     handleChangeSettings('tables', existingTableIds)
@@ -79,17 +95,33 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   }
 
   const handleSubmit = async () => {
+    if (typeof services.cohorts.createExport !== 'function') {
+      return
+    }
+
     settings.motif = settings?.motif ? settings?.motif.trim() : ''
 
+    const _scrollUp = () => {
+      if (dialogRef !== null) {
+        dialogRef?.current?.scrollTo({
+          behavior: 'smooth',
+          top: 0
+        })
+      }
+    }
+
     if (!settings?.motif || settings?.motif.length < 10) {
+      _scrollUp()
       return setError(ERROR_MOTIF)
     } else if (!settings?.conditions) {
+      _scrollUp()
       return setError(ERROR_CONDITION)
     } else if (!settings?.tables || (settings?.tables && settings?.tables.length == 0)) {
+      _scrollUp()
       return setError(ERROR_TABLE)
     }
 
-    const response = await createExport({
+    const response = await services.cohorts.createExport({
       cohortId,
       motivation: settings?.motif,
       tables: settings?.tables
@@ -109,7 +141,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       </DialogTitle>
 
       {exportResponse !== null ? (
-        <DialogContent>
+        <DialogContent ref={dialogRef}>
           {exportResponse.status === 'finish' ? (
             <Grid container alignItems="center" justify="space-between">
               <CheckCircleOutlineIcon style={{ fontSize: 52 }} htmlColor="#BDEA88" />
@@ -143,7 +175,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
           )}
         </DialogContent>
       ) : (
-        <DialogContent>
+        <DialogContent ref={dialogRef}>
           <DialogContentText>
             Pour effectuer un export de données, veuillez renseigner un motif, selectionner uniquement les tables que
             vous voulez exporter et accepter les conditions de l'entrepôt de données de santé (EDS). <br />
@@ -191,30 +223,28 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
             </Grid>
 
             <List className={classes.list}>
-              {export_table.map(({ table_name, table_id }) => (
+              {export_table.map(({ table_name, table_id, table_subtitle }) => (
                 <ListItem className={classes.tableListElement} key={table_id}>
-                  {table_id === 'concept' ? (
-                    <ListItemText
-                      disableTypography
-                      primary={
-                        <Grid container direction="row" alignItems="center">
-                          <Typography variant="body1">{table_name} -</Typography>
-                          <Typography variant="body1" style={{ fontStyle: 'italic', paddingLeft: 4 }}>
-                            {table_id}
-                          </Typography>
-                        </Grid>
-                      }
-                    ></ListItemText>
-                  ) : (
-                    <ListItemText disableTypography>
+                  <ListItemText
+                    disableTypography
+                    primary={
                       <Grid container direction="row" alignItems="center">
                         <Typography variant="body1">{table_name} - </Typography>
                         <Typography variant="body1" style={{ fontStyle: 'italic', paddingLeft: 4 }}>
                           {table_id}
                         </Typography>
                       </Grid>
-                    </ListItemText>
-                  )}
+                    }
+                    secondary={
+                      table_subtitle && (
+                        <Grid container direction="row" alignItems="center">
+                          <Typography variant="body2" style={{ color: '#fc1847' }}>
+                            {table_subtitle}
+                          </Typography>
+                        </Grid>
+                      )
+                    }
+                  />
 
                   <ListItemSecondaryAction>
                     <Checkbox
@@ -293,13 +323,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
         </Button>
         {exportResponse === null && (
           <Button
-            disabled={
-              !cohortId ||
-              !settings.motif ||
-              (settings.motif && settings.motif.length < 10) ||
-              !settings.conditions ||
-              !settings.tables.length
-            }
+            disabled={!cohortId || !settings.motif || !settings.conditions || !settings.tables.length}
             onClick={handleSubmit}
             color="primary"
           >

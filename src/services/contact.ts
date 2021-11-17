@@ -1,5 +1,5 @@
 import { ContactSubmitForm } from 'types'
-import apiBackCohort from './apiBackCohort'
+import apiBackend from './apiBackend'
 
 export const postIssue = async (contactSubmitForm: ContactSubmitForm) => {
   try {
@@ -8,7 +8,7 @@ export const postIssue = async (contactSubmitForm: ContactSubmitForm) => {
         'content-type': 'multipart/form-data'
       }
     }
-    const postIssueResp = await apiBackCohort.post('/voting/create-issue', contactSubmitForm, requestHeader)
+    const postIssueResp = await apiBackend.post('/voting/create-issue', contactSubmitForm, requestHeader)
 
     return postIssueResp.status === 201
   } catch (error) {

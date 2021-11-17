@@ -15,7 +15,7 @@ import {
 import { useAppSelector } from 'state'
 import { ProjectState, addProject, editProject, deleteProject } from 'state/project'
 
-import { ProjectType } from 'services/myProjects'
+import { ProjectType } from 'types'
 
 import useStyles from './styles'
 
@@ -68,7 +68,7 @@ const ModalAddOrEditProject: React.FC<{
     if (loading) return
     setLoading(true)
 
-    if (!modalProjectState.name) {
+    if (!modalProjectState.name || (modalProjectState.name && modalProjectState.name.length > 255)) {
       setLoading(false)
       return setError(ERROR_TITLE)
     }
@@ -109,6 +109,7 @@ const ModalAddOrEditProject: React.FC<{
               variant="outlined"
               fullWidth
               error={error === ERROR_TITLE}
+              helperText={error === ERROR_TITLE ? 'Le nom est trop long (255 caractère max.)' : ''}
             />
           </Grid>
 

@@ -6,9 +6,7 @@ import { RootState } from 'state'
 
 import { setFavoriteCohortThunk } from './userCohorts'
 
-import { fetchCohort, fetchCohortExportRight } from 'services/cohortInfos'
-import { fetchMyPatients } from 'services/myPatients'
-import { fetchPerimetersInfos } from 'services/perimeters'
+import services from 'services'
 
 export type ExploredCohortState = {
   importedPatients: any[]
@@ -16,6 +14,7 @@ export type ExploredCohortState = {
   excludedPatients: any[]
   loading: boolean
   requestId?: string
+  cohortId?: string
   canMakeExport?: boolean
 } & CohortData
 
@@ -27,7 +26,7 @@ const defaultInitialState = {
   name: '',
   description: '',
   cohort: [],
-  totalPatients: 0,
+  totalPatients: undefined,
   originalPatients: [],
   totalDocs: 0,
   documentsList: [],
@@ -121,20 +120,22 @@ const fetchExploredCohort = createAsyncThunk<
     default:
       break
   }
+  shouldRefreshData = true
   let cohort
   if (shouldRefreshData || forceReload) {
     switch (context) {
       case 'cohort': {
         if (id) {
-          cohort = (await fetchCohort(id)) as ExploredCohortState
+          cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
           if (cohort) {
-            cohort.canMakeExport = await fetchCohortExportRight(id, providerId ?? '')
+            cohort.cohortId = id
+            cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
           }
         }
         break
       }
       case 'patients': {
-        cohort = (await fetchMyPatients()) as ExploredCohortState
+        cohort = (await services.patients.fetchMyPatients()) as ExploredCohortState
         if (cohort) {
           cohort.name = '-'
           cohort.description = ''
@@ -147,7 +148,7 @@ const fetchExploredCohort = createAsyncThunk<
       }
       case 'perimeters': {
         if (id) {
-          cohort = (await fetchPerimetersInfos(id)) as ExploredCohortState
+          cohort = (await services.perimeters.fetchPerimetersInfos(id)) as ExploredCohortState
           if (cohort) {
             cohort.name = '-'
             cohort.description = ''
@@ -181,15 +182,15 @@ const fetchExploredCohortInBackground = createAsyncThunk<
   switch (context) {
     case 'cohort': {
       if (id) {
-        cohort = (await fetchCohort(id)) as ExploredCohortState
+        cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
         if (cohort) {
-          cohort.canMakeExport = await fetchCohortExportRight(id, providerId ?? '')
+          cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
         }
       }
       break
     }
     case 'patients': {
-      cohort = (await fetchMyPatients()) as ExploredCohortState
+      cohort = (await services.patients.fetchMyPatients()) as ExploredCohortState
       if (cohort) {
         cohort.name = '-'
         cohort.description = ''
@@ -202,7 +203,7 @@ const fetchExploredCohortInBackground = createAsyncThunk<
     }
     case 'perimeters': {
       if (id) {
-        cohort = (await fetchPerimetersInfos(id)) as ExploredCohortState
+        cohort = (await services.perimeters.fetchPerimetersInfos(id)) as ExploredCohortState
         if (cohort) {
           cohort.name = '-'
           cohort.description = ''
@@ -313,7 +314,7 @@ const exploredCohortSlice = createSlice({
 })
 
 export default exploredCohortSlice.reducer
-export { fetchExploredCohort, favoriteExploredCohort }
+export { fetchExploredCohort, favoriteExploredCohort, fetchExploredCohortInBackground }
 export const {
   addImportedPatients,
   excludePatients,
