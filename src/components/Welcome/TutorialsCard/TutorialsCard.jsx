@@ -36,7 +36,7 @@ const TutorialsCard = () => {
 
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  const youtubeIds = ['BdtmlvXjKWs', 'ykyMg_4MVcI', 'ze-NYJmFZsI', '-UjXIK4Svb4', 'uMeBJdWPnQM']
+  const youtubeIds = ['uMeBJdWPnQM', 'BdtmlvXjKWs', 'ykyMg_4MVcI', 'ze-NYJmFZsI', '-UjXIK4Svb4']
 
   const _onChangeCurrentIndex = (index) => {
     if (index >= 0 && index <= youtubeIds.length - 1) {
