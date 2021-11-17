@@ -40,7 +40,10 @@ const ControlPanel: React.FC<{
     countLoading = false,
     count = {},
     criteriaGroup = [],
-    selectedPopulation = []
+    selectedPopulation = [],
+    currentSnapshot,
+    requestId,
+    json
   } = useAppSelector((state) => state.cohortCreation.request || {})
   const { includePatient, status, jobFailMsg /*byrequest, alive, deceased, female, male, unknownPatient */ } = count
 
@@ -50,17 +53,6 @@ const ControlPanel: React.FC<{
       : selectedPopulation
           .map((population) => population && population.access)
           .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (count && count.status && (count.status === 'pending' || count.status === 'started')) {
-        dispatch<any>(countCohortCreation({ uuid: count.uuid }))
-      } else {
-        clearInterval(interval)
-      }
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [count]) //eslint-disable-line
 
   const checkIfLogicalOperatorIsEmpty = () => {
     let _criteriaGroup = criteriaGroup ? criteriaGroup : []
@@ -89,7 +81,28 @@ const ControlPanel: React.FC<{
     dispatch(buildCohortCreation({}))
   }
 
+  const _relaunchCount = () => {
+    dispatch<any>(
+      countCohortCreation({
+        json,
+        snapshotId: currentSnapshot,
+        requestId
+      })
+    )
+  }
+
   const itLoads = loading || countLoading || saveLoading
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (count && count.status && (count.status === 'pending' || count.status === 'started')) {
+        dispatch<any>(countCohortCreation({ uuid: count.uuid }))
+      } else {
+        clearInterval(interval)
+      }
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [count]) //eslint-disable-line
 
   return (
     <>
@@ -239,6 +252,9 @@ const ControlPanel: React.FC<{
           <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="error">
             Une erreur est survenue lors du calcul du nombre de patients de votre requête. <br />
             {jobFailMsg}
+            <Button onClick={_relaunchCount} variant="outlined" color="secondary" size="small" style={{ marginTop: 8 }}>
+              Relancer la requête
+            </Button>
           </Alert>
         )}
       </Grid>
