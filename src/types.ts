@@ -319,6 +319,7 @@ export type CriteriaItemType = {
 
 export type SelectedCriteriaType = {
   id: number
+  error?: boolean
 } & (
   | CcamDataType
   | Cim10DataType
@@ -449,6 +450,7 @@ export type CohortCreationCounterType = {
   male?: number
   unknownPatient?: number
   jobFailMsg?: string
+  date?: string
 }
 
 export type CohortCreationSnapshotType = {

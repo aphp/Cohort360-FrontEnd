@@ -37,6 +37,7 @@ export const countCohort = async (requeteurJson?: string, snapshotId?: string, r
     const measureResult = await apiBack.get<any>(`/explorations/dated-measures/${uuid}/`)
 
     return {
+      date: measureResult?.data?.created_at,
       status: measureResult?.data?.request_job_status,
       jobFailMsg: measureResult?.data?.request_job_fail_msg,
       uuid: measureResult?.data?.uuid,
@@ -64,6 +65,7 @@ export const countCohort = async (requeteurJson?: string, snapshotId?: string, r
       })
 
       return {
+        date: measureResult?.data?.updated_at,
         status: measureResult?.data?.request_job_status,
         uuid: measureResult?.data?.uuid,
         includePatient: 0,
