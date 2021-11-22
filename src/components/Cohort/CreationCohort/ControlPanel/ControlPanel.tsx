@@ -27,7 +27,7 @@ import useStyle from './styles'
 import displayDigit from 'utils/displayDigit'
 
 const ControlPanel: React.FC<{
-  onExecute?: (cohortName: string, cohortDescription: string) => void
+  onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
   onUndo?: () => void
   onRedo?: () => void
 }> = ({ onExecute, onUndo, onRedo }) => {

@@ -104,6 +104,7 @@ export const fetchCohorts = async (
             name: cohort.name,
             status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
             nPatients: cohort.result_size,
+            nAphp: cohort.global_estimate,
             date: cohort.dated_measure.fhir_datetime,
             perimeter: '-',
             favorite: cohort.favorite,

@@ -83,6 +83,7 @@ export type Cohort = {
   name?: string
   description: string
   result_size?: number
+  global_estimate?: number
   dated_measure?: any
   created_at?: string
   modified_at?: string
@@ -100,6 +101,7 @@ export type FormattedCohort = {
   description: string
   status?: string
   nPatients?: number
+  nAphp?: number
   date?: string
   perimeter?: string
   favorite?: boolean

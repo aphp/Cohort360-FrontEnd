@@ -177,6 +177,23 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                   <TableCell
                     align="center"
                     className={classes.tableHeadCell}
+                    sortDirection={sortBy === 'aphp_size' ? sortDirection : false}
+                  >
+                    {sortDirection ? (
+                      <TableSortLabel
+                        active={sortBy === 'aphp_size'}
+                        direction={sortBy === 'aphp_size' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('aphp_size')}
+                      >
+                        Estimation du nombre de patients APHP
+                      </TableSortLabel>
+                    ) : (
+                      'Estimation du nombre de patients APHP'
+                    )}
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    className={classes.tableHeadCell}
                     sortDirection={sortBy === 'fhir_datetime' ? sortDirection : false}
                   >
                     {sortDirection ? (
@@ -248,6 +265,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       )}
                     </TableCell>
                     <TableCell align="center">{displayDigit(row.nPatients ?? 0)}</TableCell>
+                    <TableCell align="center">{displayDigit(row.nAphp ?? 0)}</TableCell>
                     <TableCell align="center">
                       {row.date && (
                         <>

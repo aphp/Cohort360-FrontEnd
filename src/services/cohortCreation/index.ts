@@ -9,9 +9,11 @@ export const createCohort = async (
   snapshotId: string | undefined,
   requestId: string | undefined,
   cohortName: string | undefined,
-  cohortDescription: string | undefined
+  cohortDescription: string | undefined,
+  globalCount: boolean | undefined
 ) => {
   if (!requeteurJson || !datedMeasureId || !snapshotId || !requestId) return null
+  if (globalCount === undefined) globalCount = false
 
   if (CONTEXT === 'arkhn') {
     // const request: Cohort_Creation_API_Response = await api.post('QueryServer/api/count', requeteurJson)
@@ -25,7 +27,8 @@ export const createCohort = async (
       request_query_snapshot_id: snapshotId,
       request_id: requestId,
       name: cohortName,
-      description: cohortDescription
+      description: cohortDescription,
+      global_estimate: globalCount
     })
 
     return cohortResult
