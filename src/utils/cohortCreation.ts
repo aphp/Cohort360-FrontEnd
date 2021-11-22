@@ -553,9 +553,7 @@ export async function unbuildRequest(_json: string) {
   }
 
   for (const caresiteCohortItem of caresiteCohortList) {
-    console.log(`caresiteCohortItem`, caresiteCohortItem)
     const newPopulation = await services.perimeters.fetchPerimeterInfoForRequeteur(caresiteCohortItem ?? '')
-    console.log(`newPopulation`, newPopulation)
     // Don't do that, do not filter population, if you have a pop. with an undefined,
     // you got a modal with the posibility to change your current source pop.
     // if (!newPopulation) continue
@@ -677,6 +675,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               default:
+                currentCriterion.error = true
                 break
             }
           }
@@ -755,8 +754,6 @@ export async function unbuildRequest(_json: string) {
                   currentCriterion.years[1] = +value?.replace('le', '') || 130
                 }
 
-                console.log(`currentCriterion.years`, currentCriterion.years)
-
                 if (currentCriterion.years[1] % 31 === 0) {
                   currentCriterion.ageType = ageType[1]
                   currentCriterion.years[0] = currentCriterion.years[0] / 31
@@ -768,9 +765,6 @@ export async function unbuildRequest(_json: string) {
                 } else {
                   currentCriterion.ageType = ageType[2]
                 }
-
-                console.log(`currentCriterion.ageType`, currentCriterion.ageType)
-                console.log(`currentCriterion.years`, currentCriterion.years)
                 break
               }
               case ENCOUNTER_ENTRYMODE: {
@@ -890,6 +884,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               default:
+                currentCriterion.error = true
                 break
             }
           }
@@ -957,6 +952,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               default:
+                currentCriterion.error = true
                 break
             }
           }
@@ -1012,6 +1008,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               default:
+                currentCriterion.error = true
                 break
             }
           }
@@ -1057,6 +1054,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               default:
+                currentCriterion.error = true
                 break
             }
           }
@@ -1101,6 +1099,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               default:
+                currentCriterion.error = true
                 break
             }
           }
@@ -1166,6 +1165,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               default:
+                currentCriterion.error = true
                 break
             }
           }

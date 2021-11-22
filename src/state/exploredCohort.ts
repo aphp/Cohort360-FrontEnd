@@ -120,7 +120,6 @@ const fetchExploredCohort = createAsyncThunk<
     default:
       break
   }
-  shouldRefreshData = true
   let cohort
   if (shouldRefreshData || forceReload) {
     switch (context) {

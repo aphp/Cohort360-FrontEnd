@@ -87,7 +87,7 @@ const Requeteur = () => {
    *  - Create it with `createCohort`
    *  - Link fhir result with the back end, call /cohorts/
    */
-  const _onExecute = (cohortName: string, cohortDescription: string) => {
+  const _onExecute = (cohortName: string, cohortDescription: string, globalCount: boolean) => {
     const _createCohort = async () => {
       if (!json) return
 
@@ -97,7 +97,8 @@ const Requeteur = () => {
         currentSnapshot,
         requestId,
         cohortName,
-        cohortDescription
+        cohortDescription,
+        globalCount
       )
 
       if (createCohortResult && createCohortResult.status === 201) {
