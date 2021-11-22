@@ -151,9 +151,15 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
         .filter(({ uuid }) => uuid !== undefined)
     }
 
+    console.log('object :>> ', {
+      json: currentSnapshot ? currentSnapshot.serialized_query : '',
+      currentSnapshot: currentSnapshot ? currentSnapshot.uuid : '',
+      count: currentSnapshot ? currentSnapshot.dated_measures[(currentSnapshot.dated_measures.length ?? 1) - 1] : {}
+    })
+
     result = {
       requestName,
-      snapshotsHistory,
+      snapshotsHistory: snapshotsHistory ? snapshotsHistory.reverse() : [],
       json: currentSnapshot ? currentSnapshot.serialized_query : '',
       currentSnapshot: currentSnapshot ? currentSnapshot.uuid : '',
       count: currentSnapshot ? currentSnapshot.dated_measures[0] : {}

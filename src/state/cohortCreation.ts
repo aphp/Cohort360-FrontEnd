@@ -112,7 +112,9 @@ const fetchRequestCohortCreation = createAsyncThunk<
 
     dispatch<any>(
       unbuildCohortCreation({
-        newCurrentSnapshot: snapshotsHistory[0] as CohortCreationSnapshotType
+        newCurrentSnapshot: snapshotsHistory[
+          snapshotsHistory.length ? snapshotsHistory.length - 1 : 0
+        ] as CohortCreationSnapshotType
       })
     )
 
@@ -120,7 +122,7 @@ const fetchRequestCohortCreation = createAsyncThunk<
       requestName,
       json,
       requestId,
-      snapshotsHistory: snapshotsHistory.reverse(),
+      snapshotsHistory,
       currentSnapshot,
       count
     }

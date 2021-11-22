@@ -75,7 +75,11 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
   const DrawerComponent = action ? action.components : null
 
   const _onChangeSelectedCriteria = (newSelectedCriteria: SelectedCriteriaType) => {
-    onChangeSelectedCriteria(newSelectedCriteria)
+    const _newSelectedCriteria = {
+      ...newSelectedCriteria,
+      error: undefined
+    }
+    onChangeSelectedCriteria(_newSelectedCriteria)
     onClose()
   }
 
