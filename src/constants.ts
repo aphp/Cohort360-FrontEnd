@@ -30,6 +30,8 @@ if (CONTEXT !== 'arkhn' && CONTEXT !== 'aphp' && CONTEXT !== 'fakedata') {
 export const ACCES_TOKEN = 'access'
 export const REFRESH_TOKEN = 'refresh'
 
+console.log('process.env :>> ', process.env)
+
 export const CLAIM_HIERARCHY =
   process.env.VALUE_SET_URL_CLAIM_HIERARCHY ?? 'https://terminology.eds.aphp.fr/aphp-orbis-ghm'
 
