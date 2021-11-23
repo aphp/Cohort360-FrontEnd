@@ -158,9 +158,11 @@ export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefi
               description: cohort.description,
               status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
               nPatients: cohort.result_size,
-              nGlobal: `${cohort.dated_measure_global.measure_min ?? 'X'} - ${
-                cohort.dated_measure_global.measure_max ?? 'X'
-              }`,
+              nGlobal: cohort.dated_measure_global
+                ? `${cohort.dated_measure_global.measure_min ?? 'X'} - ${
+                    cohort.dated_measure_global.measure_max ?? 'X'
+                  }`
+                : undefined,
               date: cohort.dated_measure.fhir_datetime,
               perimeter: '-',
               favorite: cohort.favorite,
@@ -208,9 +210,9 @@ export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined>
             description: cohort.description,
             status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
             nPatients: cohort.result_size,
-            nGlobal: `${cohort.dated_measure_global.measure_min ?? 'X'} - ${
-              cohort.dated_measure_global.measure_max ?? 'X'
-            }`,
+            nGlobal: cohort.dated_measure_global
+              ? `${cohort.dated_measure_global.measure_min ?? 'X'} - ${cohort.dated_measure_global.measure_max ?? 'X'}`
+              : undefined,
             date: cohort.dated_measure.fhir_datetime,
             perimeter: '-',
             favorite: cohort.favorite,
