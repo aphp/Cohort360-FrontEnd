@@ -317,9 +317,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
       const state = getState()
       const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot.json)
 
-      const dated_measures = newCurrentSnapshot.dated_measures
-        ? newCurrentSnapshot.dated_measures[newCurrentSnapshot.dated_measures.length - 1]
-        : null
+      const dated_measures = newCurrentSnapshot.dated_measures ? newCurrentSnapshot.dated_measures[0] : null
       const countId = dated_measures ? dated_measures.uuid : null
 
       if (countId) {
