@@ -26,6 +26,8 @@ import useStyle from './styles'
 
 import displayDigit from 'utils/displayDigit'
 
+const DISPLAY_ESTIMATE_LIMIT = 24
+
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
   onUndo?: () => void
@@ -245,7 +247,7 @@ const ControlPanel: React.FC<{
           </Alert>
         )}
 
-        {lastUpdated.diff(moment(), 'days') > 1 && (
+        {moment().diff(lastUpdated, 'hours') > DISPLAY_ESTIMATE_LIMIT && (
           <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="info">
             Attention l'estimation du nombre de patient correspondant à votre requête effectuée le{' '}
             {lastUpdated.format('DD/MM/YYYY')} est peut être dépassé, voulez vous le recalculer ?

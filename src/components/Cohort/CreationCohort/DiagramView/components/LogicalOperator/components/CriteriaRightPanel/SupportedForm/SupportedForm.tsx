@@ -77,8 +77,8 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
       defaultValues.destination?.length === 0 &&
       defaultValues.provenance?.length === 0 &&
       defaultValues.admission?.length === 0 &&
-      defaultValues.encounterStartDate === null &&
-      defaultValues.encounterEndDate === null
+      !defaultValues.encounterStartDate &&
+      !defaultValues.encounterEndDate
     ) {
       return setError(true)
     }

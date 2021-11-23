@@ -691,7 +691,9 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.durationType = currentCriterion.durationType
             ? currentCriterion.durationType
             : { id: 'day', label: 'jours' }
-          currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
+          currentCriterion.ageType = currentCriterion.ageType
+            ? currentCriterion.ageType
+            : { id: 'year', label: 'années' }
           currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
           currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : []
           currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : []
@@ -705,6 +707,7 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.destination = currentCriterion.destination ? currentCriterion.destination : []
           currentCriterion.provenance = currentCriterion.provenance ? currentCriterion.provenance : []
           currentCriterion.admission = currentCriterion.admission ? currentCriterion.admission : []
+          currentCriterion.discharge = currentCriterion.discharge ? currentCriterion.discharge : []
 
           if (element.encounterDateRange) {
             currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null

@@ -153,7 +153,7 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
 
     result = {
       requestName,
-      snapshotsHistory,
+      snapshotsHistory: snapshotsHistory ? snapshotsHistory.reverse() : [],
       json: currentSnapshot ? currentSnapshot.serialized_query : '',
       currentSnapshot: currentSnapshot ? currentSnapshot.uuid : '',
       count: currentSnapshot ? currentSnapshot.dated_measures[0] : {}
