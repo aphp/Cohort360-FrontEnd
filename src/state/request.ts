@@ -63,7 +63,6 @@ const fetchRequests = createAsyncThunk<FetchRequestListReturn, void, { state: Ro
 
       return {
         count: requests.count,
-        // selectedRequest: null,
         requestsList: requestList.reverse()
       }
     } catch (error) {
