@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import Alert from '@material-ui/lab/Alert'
 import Button from '@material-ui/core/Button'
 import Checkbox from '@material-ui/core/Checkbox'
+import CircularProgress from '@material-ui/core/CircularProgress'
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
@@ -50,6 +51,7 @@ type ExportModalProps = {
 
 const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }) => {
   const classes = useStyles()
+  const [loading, setLoading] = useState(false)
   const [settings, setSettings] = useState(initialState)
   const [exportResponse, setExportResponse] = useState<{ status: 'error' | 'finish'; detail: any } | null>(null)
   const [error, setError] = useState<typeof ERROR_MOTIF | typeof ERROR_CONDITION | typeof ERROR_TABLE | null>(null)
@@ -58,6 +60,9 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
 
   useEffect(() => {
     setSettings(initialState)
+    setExportResponse(null)
+    setLoading(false)
+    setError(null)
   }, [open])
 
   const handleChangeTables = (tableId: string) => {
@@ -95,8 +100,10 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
   }
 
   const handleSubmit = async () => {
+    if (loading) return
+    setLoading(true)
     if (typeof services.cohorts.createExport !== 'function') {
-      return
+      return setLoading(false)
     }
 
     settings.motif = settings?.motif ? settings?.motif.trim() : ''
@@ -112,12 +119,15 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
 
     if (!settings?.motif || settings?.motif.length < 10) {
       _scrollUp()
+      setLoading(false)
       return setError(ERROR_MOTIF)
     } else if (!settings?.conditions) {
       _scrollUp()
+      setLoading(false)
       return setError(ERROR_CONDITION)
     } else if (!settings?.tables || (settings?.tables && settings?.tables.length == 0)) {
       _scrollUp()
+      setLoading(false)
       return setError(ERROR_TABLE)
     }
 
@@ -132,10 +142,11 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
     } else {
       setExportResponse({ status: 'finish', detail: '' })
     }
+    setLoading(false)
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title-export">
+    <Dialog open={loading || open} onClose={handleClose} aria-labelledby="form-dialog-title-export">
       <DialogTitle id="form-dialog-export-title" disableTypography>
         <Typography>Demande d'export</Typography>
       </DialogTitle>
@@ -318,16 +329,16 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       )}
 
       <DialogActions>
-        <Button onClick={handleClose} color="secondary">
+        <Button disabled={loading} onClick={handleClose} color="secondary">
           {exportResponse === null ? 'Annuler' : 'Fermer'}
         </Button>
         {exportResponse === null && (
           <Button
-            disabled={!cohortId || !settings.motif || !settings.conditions || !settings.tables.length}
+            disabled={loading || !cohortId || !settings.motif || !settings.conditions || !settings.tables.length}
             onClick={handleSubmit}
             color="primary"
           >
-            Exporter les données
+            {loading ? <CircularProgress size={20} /> : 'Exporter les données'}
           </Button>
         )}
       </DialogActions>
