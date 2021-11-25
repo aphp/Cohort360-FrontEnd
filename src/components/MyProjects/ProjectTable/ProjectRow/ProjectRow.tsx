@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import moment from 'moment'
+// import moment from 'moment'
 
 import { Button, Collapse, IconButton, TableCell, TableRow, Typography, Tooltip } from '@material-ui/core'
 
@@ -73,7 +73,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, cohortsL
           )}
         </TableCell>
         <TableCell className={classes.dateCell} align="center">
-          {moment(row.modified_at).format('DD/MM/YYYY [à] HH:mm')}
+          {/* {moment(row.modified_at).format('DD/MM/YYYY [à] HH:mm')} */}
         </TableCell>
       </TableRow>
 

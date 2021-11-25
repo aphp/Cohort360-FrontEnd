@@ -11,6 +11,8 @@ import {
   ValueSet
 } from 'types'
 
+import services from './index'
+
 export const fetchCohorts = async (
   sortBy: string,
   sortDirection: string,
@@ -96,34 +98,44 @@ export const fetchCohorts = async (
       `/explorations/cohorts/?ordering=${_sortDirection}${sortBy}${typeFilter}${statusFilter}${minPatientsFilter}${maxPatientsFilter}${startDateFilter}${endDateFilter}${favoriteFilter}${searchByText}&limit=20${offset}`
     )
 
-    const results = cohortResp?.data?.results
-      ? (cohortResp.data.results
-          .map((cohort) => ({
-            researchId: cohort.uuid ?? '',
-            fhir_group_id: cohort.fhir_group_id,
-            name: cohort.name,
-            status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
-            nPatients: cohort.result_size,
-            nGlobal: cohort.dated_measure_global
-              ? `${cohort.dated_measure_global.measure_min ?? 'X'} - ${cohort.dated_measure_global.measure_max ?? 'X'}`
-              : undefined,
-            date: cohort.dated_measure.fhir_datetime,
-            perimeter: '-',
-            favorite: cohort.favorite,
-            jobStatus: cohort.request_job_status,
-            jobFailMsg: cohort.request_job_fail_msg
-          }))
-          .filter(Boolean) as FormattedCohort[])
-      : undefined
+    let cohortResult: FormattedCohort[] = []
+    // @ts-ignore
+    if (!cohortResp || !cohortResp.data || !cohortResp.data.results || cohortResp.data.results.length === 0) return []
+
+    // @ts-ignore
+    for (const cohort of cohortResp?.data?.results) {
+      const canMakeExport = await services.cohorts.fetchCohortExportRight(cohort.fhir_group_id ?? '')
+
+      cohortResult = [
+        ...cohortResult,
+        {
+          researchId: cohort.uuid ?? '',
+          fhir_group_id: cohort.fhir_group_id,
+          name: cohort.name,
+          description: cohort.description,
+          status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
+          nPatients: cohort.result_size,
+          nGlobal: cohort.dated_measure_global
+            ? `${cohort.dated_measure_global.measure_min ?? 'X'} - ${cohort.dated_measure_global.measure_max ?? 'X'}`
+            : undefined,
+          date: cohort.dated_measure.fhir_datetime,
+          perimeter: '-',
+          favorite: cohort.favorite,
+          jobStatus: cohort.request_job_status,
+          jobFailMsg: cohort.request_job_fail_msg,
+          canMakeExport
+        }
+      ]
+    }
 
     return {
-      results: results,
+      results: cohortResult,
       count: cohortResp?.data?.count ?? 0
     }
   }
 }
 
-export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefined> => {
+export const fetchFavoriteCohorts = async (providerId: string | undefined): Promise<FormattedCohort[] | undefined> => {
   if (CONTEXT === 'fakedata') {
     const results = [
       {
@@ -148,36 +160,41 @@ export const fetchFavoriteCohorts = async (): Promise<FormattedCohort[] | undefi
       '/explorations/cohorts/?favorite=true&ordering=-fhir_datetime&limit=5'
     )
 
-    const results = cohortResp?.data?.results
-      ? cohortResp.data.results
-          .map((cohort: Cohort) => {
-            return {
-              researchId: cohort.uuid ?? '',
-              fhir_group_id: cohort.fhir_group_id,
-              name: cohort.name,
-              description: cohort.description,
-              status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
-              nPatients: cohort.result_size,
-              nGlobal: cohort.dated_measure_global
-                ? `${cohort.dated_measure_global.measure_min ?? 'X'} - ${
-                    cohort.dated_measure_global.measure_max ?? 'X'
-                  }`
-                : undefined,
-              date: cohort.dated_measure.fhir_datetime,
-              perimeter: '-',
-              favorite: cohort.favorite,
-              jobStatus: cohort.request_job_status,
-              jobFailMsg: cohort.request_job_fail_msg
-            }
-          })
-          .filter(Boolean)
-      : undefined
+    let cohortResult: FormattedCohort[] = []
+    // @ts-ignore
+    if (!cohortResp || !cohortResp.data || !cohortResp.data.results || cohortResp.data.results.length === 0) return []
 
-    return results
+    // @ts-ignore
+    for (const cohort of cohortResp?.data?.results) {
+      const canMakeExport = await services.cohorts.fetchCohortExportRight(cohort.fhir_group_id ?? '', providerId ?? '')
+
+      cohortResult = [
+        ...cohortResult,
+        {
+          researchId: cohort.uuid ?? '',
+          fhir_group_id: cohort.fhir_group_id,
+          name: cohort.name,
+          description: cohort.description,
+          status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
+          nPatients: cohort.result_size,
+          nGlobal: cohort.dated_measure_global
+            ? `${cohort.dated_measure_global.measure_min ?? 'X'} - ${cohort.dated_measure_global.measure_max ?? 'X'}`
+            : undefined,
+          date: cohort.dated_measure.fhir_datetime,
+          perimeter: '-',
+          favorite: cohort.favorite,
+          jobStatus: cohort.request_job_status,
+          jobFailMsg: cohort.request_job_fail_msg,
+          canMakeExport
+        }
+      ]
+    }
+
+    return cohortResult
   }
 }
 
-export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined> => {
+export const fetchLastCohorts = async (providerId: string | undefined): Promise<FormattedCohort[] | undefined> => {
   if (CONTEXT === 'fakedata') {
     const results = [
       {
@@ -201,28 +218,37 @@ export const fetchLastCohorts = async (): Promise<FormattedCohort[] | undefined>
       '/explorations/cohorts/?limit=5&ordering=-fhir_datetime'
     )
 
-    const results = cohortResp?.data?.results
-      ? cohortResp.data.results
-          .map((cohort) => ({
-            researchId: cohort.uuid ?? '',
-            fhir_group_id: cohort.fhir_group_id,
-            name: cohort.name,
-            description: cohort.description,
-            status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
-            nPatients: cohort.result_size,
-            nGlobal: cohort.dated_measure_global
-              ? `${cohort.dated_measure_global.measure_min ?? 'X'} - ${cohort.dated_measure_global.measure_max ?? 'X'}`
-              : undefined,
-            date: cohort.dated_measure.fhir_datetime,
-            perimeter: '-',
-            favorite: cohort.favorite,
-            jobStatus: cohort.request_job_status,
-            jobFailMsg: cohort.request_job_fail_msg
-          }))
-          .filter(Boolean)
-      : undefined
+    let cohortResult: FormattedCohort[] = []
+    // @ts-ignore
+    if (!cohortResp || !cohortResp.data || !cohortResp.data.results || cohortResp.data.results.length === 0) return []
 
-    return results
+    // @ts-ignore
+    for (const cohort of cohortResp?.data?.results) {
+      const canMakeExport = await services.cohorts.fetchCohortExportRight(cohort.fhir_group_id ?? '', providerId ?? '')
+
+      cohortResult = [
+        ...cohortResult,
+        {
+          researchId: cohort.uuid ?? '',
+          fhir_group_id: cohort.fhir_group_id,
+          name: cohort.name,
+          description: cohort.description,
+          status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
+          nPatients: cohort.result_size,
+          nGlobal: cohort.dated_measure_global
+            ? `${cohort.dated_measure_global.measure_min ?? 'X'} - ${cohort.dated_measure_global.measure_max ?? 'X'}`
+            : undefined,
+          date: cohort.dated_measure.fhir_datetime,
+          perimeter: '-',
+          favorite: cohort.favorite,
+          jobStatus: cohort.request_job_status,
+          jobFailMsg: cohort.request_job_fail_msg,
+          canMakeExport
+        }
+      ]
+    }
+
+    return cohortResult
   }
 }
 
