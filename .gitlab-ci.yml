@@ -4,6 +4,18 @@ default:
   tags:
     - $GITLAB_RUNNER_TAG
 
+.default_rules:
+  rules:
+    - if: ($CI_COMMIT_BRANCH =~ /${STANDARD_CD_BRANCHES}/ || $CI_COMMIT_BRANCH =~ /${PROTECTED_CD_BRANCHES}/) && $ONLY_RELEASE == null
+    - when: never
+
+.release_rules:
+  rules:
+    - if: ($CI_COMMIT_BRANCH =~ /${STANDARD_CD_BRANCHES}/) && $ENABLE_RELEASE == "true"
+    - if: ($CI_COMMIT_BRANCH =~ /${$PROTECTED_CD_BRANCHES}/) && $ENABLE_RELEASE == "true"
+      when: manual
+    - when: never
+
 variables:
   REACT_APP_FHIR_API_URL: /api/fhir
   REACT_APP_BACK_API_URL: /api/back
@@ -32,8 +44,7 @@ build:
     - npm audit fix
     - CI=false npm run build
   rules:
-    - if: ($CI_COMMIT_BRANCH == "fakedata" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "qualif" || $CI_COMMIT_BRANCH == "prod_a" || $CI_COMMIT_BRANCH == "prod_b") && $ONLY_RELEASE == null
-    - when: never
+    - !reference [.default_rules, rules]
 
 test:
   stage: test
@@ -41,8 +52,7 @@ test:
     - echo "Testing the code"
 #    -
   rules:
-    - if: ($CI_COMMIT_BRANCH == "fakedata" || $CI_COMMIT_BRANCH == "dev" || $CI_COMMIT_BRANCH == "qualif" || $CI_COMMIT_BRANCH == "prod_a" || $CI_COMMIT_BRANCH == "prod_b") && $ONLY_RELEASE == null
-    - when: never
+    - !reference [.default_rules, rules]
 
 deploy:
   image :
@@ -50,18 +60,17 @@ deploy:
     entrypoint : [ "" ]
   stage: deploy
   needs:
+    - job: test
     - job: build
       artifacts: true
   script:
     - ENVIRONMENT=${CI_COMMIT_BRANCH/_/-}
-    - ls
     - sed -i "s/{{ENVIR}}/$CI_COMMIT_BRANCH/g" Dockerfile
     - REPO=$(echo $IMAGE_REPOSITORY_URL | sed "s/[^a-zA-Z0-9]/\\\\&/g") && sed -i "s/{{IMAGE_REPOSITORY_URL}}/$REPO/g" Dockerfile
     - echo "{\"auths\":{\"$IMAGE_REGISTRY\":{\"username\":\"$BOT_NAME\",\"password\":\"$BOT_TOKEN\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $IMAGE_REPOSITORY_URL/front:$CI_COMMIT_BRANCH
   rules:
-    - if: ('$CI_COMMIT_BRANCH =~ /^($STANDARD_CD_BRANCHES)$/' || '$CI_COMMIT_BRANCH =~ /^($PROTECTED_CD_BRANCHES)$/') && $ONLY_RELEASE == null
-    - when: never
+    - !reference [.default_rules, rules]
 
 release:
   image:
@@ -71,7 +80,4 @@ release:
   script:
     - bash .gitlab/release.sh
   rules:
-    - if: ('$CI_COMMIT_BRANCH =~ /^($STANDARD_CD_BRANCHES)$/') && $ENABLE_RELEASE == "true"
-    - if: ('$CI_COMMIT_BRANCH =~ /^($PROTECTED_CD_BRANCHES)$/') && $ENABLE_RELEASE == "true"
-      when: manual
-    - when: never
+    - !reference [.release_rules, rules]

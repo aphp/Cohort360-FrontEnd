@@ -16,16 +16,24 @@ const initialState: UserCohortsState = localStorageUserCohorts ? JSON.parse(loca
 
 const initUserCohortsThunk = createAsyncThunk<UserCohortsState, void, { state: RootState }>(
   'userCohorts/initUserCohortsThunk',
-  async () => {
-    const [favoriteCohorts, lastCohorts] = await Promise.all([fetchFavoriteCohorts(), fetchLastCohorts()])
+  async (params, { getState }) => {
+    const meState = getState().me
+
+    const [favoriteCohorts, lastCohorts] = await Promise.all([
+      fetchFavoriteCohorts(meState?.id),
+      fetchLastCohorts(meState?.id)
+    ])
+
     return { favoriteCohorts: favoriteCohorts ?? [], lastCohorts: lastCohorts ?? [] }
   }
 )
 
 const fetchFavoriteCohortsThunk = createAsyncThunk<void, void, { state: RootState }>(
   'userCohorts/fetchFavoriteCohortsThunk',
-  async (params, { dispatch }) => {
-    const favoriteCohorts = await fetchFavoriteCohorts()
+  async (params, { getState, dispatch }) => {
+    const meState = getState().me
+
+    const favoriteCohorts = await fetchFavoriteCohorts(meState?.id)
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     dispatch<any>(userCohortsSlice.actions.setFavoriteCohorts(favoriteCohorts))
   }

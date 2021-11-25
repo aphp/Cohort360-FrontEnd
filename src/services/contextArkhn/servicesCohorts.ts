@@ -148,7 +148,7 @@ export interface IServicesCohorts {
    * Retoune:
    *   - Si un utilisateur peut faire une demande d'export sur la cohorte
    */
-  fetchCohortExportRight: (cohortId: string, providerId: string) => Promise<boolean>
+  fetchCohortExportRight: (cohortId: string, providerId?: string) => Promise<boolean>
 
   /**
    * Permet de créer une demande d'export d'une cohorte

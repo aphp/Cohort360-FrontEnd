@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 
 import {
   Button,
@@ -10,6 +11,8 @@ import {
   Grid,
   IconButton,
   Paper,
+  Menu,
+  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -18,13 +21,23 @@ import {
   TableSortLabel,
   TableRow,
   Tooltip,
-  Typography
+  Typography,
+  Hidden
 } from '@material-ui/core'
 
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
 
 import { ReactComponent as Star } from 'assets/icones/star.svg'
 import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
+import EditIcon from '@material-ui/icons/Edit'
+import ExportIcon from '@material-ui/icons/GetApp'
+import MoreVertIcon from '@material-ui/icons/MoreVert'
+
+import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
+import ExportModal from 'components/Cohort/ExportModal/ExportModal'
+
+import { useAppSelector } from 'state'
+import { CohortState, setSelectedCohort as setSelectedCohortState } from 'state/cohort'
 
 import { FormattedCohort } from 'types'
 
@@ -63,10 +76,25 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   onRequestSort
 }) => {
   const classes = useStyles()
+  const dispatch = useDispatch()
+  const history = useHistory()
+
   const [dialogOpen, setOpenDialog] = useState(false)
   const [selectedCohort, setSelectedCohort] = useState<string | undefined>()
+  const [selectedExportableCohort, setSelectedExportableCohort] = useState<number | undefined>()
+  const [anchorEl, setAnchorEl] = React.useState(null)
+  const openMenuItem = Boolean(anchorEl)
 
-  const history = useHistory()
+  const { cohortState } = useAppSelector<{
+    cohortState: CohortState
+  }>((state) => ({
+    cohortState: state.cohort
+  }))
+  const selectedCohortState = cohortState.selectedCohort
+
+  const _onClickRow = (row: any) => {
+    return !row.fhir_group_id ? null : onClickRow ? onClickRow(row) : history.push(`/cohort/${row.fhir_group_id}`)
+  }
 
   const removeCohort = () => {
     onDeleteCohort(selectedCohort)
@@ -86,30 +114,6 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
 
   return (
     <>
-      {!simplified && (
-        <Dialog
-          open={dialogOpen}
-          onClose={handleCloseDialog}
-          aria-labelledby="alert-dialog-slide-title"
-          aria-describedby="alert-dialog-slide-description"
-        >
-          <DialogTitle id="alert-dialog-slide-title">Etes-vous sûr de vouloir supprimer la cohorte ?</DialogTitle>
-          <DialogActions>
-            <Button onClick={handleCloseDialog} color="primary">
-              Non
-            </Button>
-            <Button
-              onClick={() => {
-                handleCloseDialog()
-                removeCohort()
-              }}
-              color="secondary"
-            >
-              Oui
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
       {
         //@ts-ignore
         !researchData?.length > 0 ? (
@@ -194,29 +198,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       'Date de création'
                     )}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    className={classes.tableHeadCell}
-                    sortDirection={sortBy === 'favorite' ? sortDirection : false}
-                  >
-                    {sortDirection ? (
-                      <TableSortLabel
-                        active={sortBy === 'favorite'}
-                        direction={sortBy === 'favorite' ? sortDirection : 'asc'}
-                        onClick={createSortHandler('favorite')}
-                      >
-                        Favoris
-                      </TableSortLabel>
-                    ) : (
-                      'Favoris'
-                    )}
+                  <TableCell align="center" className={classes.tableHeadCell}>
+                    Actions
                   </TableCell>
-
-                  {!simplified && (
-                    <TableCell align="center" className={classes.tableHeadCell}>
-                      Supprimer
-                    </TableCell>
-                  )}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -225,19 +209,12 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                     className={!row.fhir_group_id ? classes.notAllow : classes.pointerHover}
                     hover
                     key={row.researchId}
-                    onClick={
-                      !row.fhir_group_id
-                        ? () => null
-                        : onClickRow
-                        ? () => onClickRow(row)
-                        : () => history.push(`/cohort/${row.fhir_group_id}`)
-                    }
                   >
-                    <TableCell>{row.name}</TableCell>
-                    <TableCell className={classes.status} align="center">
+                    <TableCell onClick={() => _onClickRow(row)}>{row.name}</TableCell>
+                    <TableCell onClick={() => _onClickRow(row)} className={classes.status} align="center">
                       {row.status}
                     </TableCell>
-                    <TableCell align="center">
+                    <TableCell onClick={() => _onClickRow(row)} align="center">
                       {row.fhir_group_id ? (
                         <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
                       ) : row.jobStatus === 'pending' || row.jobStatus === 'started' ? (
@@ -250,9 +227,13 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                         <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
                       )}
                     </TableCell>
-                    <TableCell align="center">{displayDigit(row.nPatients ?? 0)}</TableCell>
-                    <TableCell align="center">{row.nGlobal ?? '-'}</TableCell>
-                    <TableCell align="center">
+                    <TableCell onClick={() => _onClickRow(row)} align="center">
+                      {displayDigit(row.nPatients ?? 0)}
+                    </TableCell>
+                    <TableCell onClick={() => _onClickRow(row)} align="center">
+                      {row.nGlobal ?? '-'}
+                    </TableCell>
+                    <TableCell onClick={() => _onClickRow(row)} align="center">
                       {row.date && (
                         <>
                           {new Date(row.date).toLocaleDateString('fr-FR')}{' '}
@@ -264,29 +245,130 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       )}
                     </TableCell>
                     <TableCell align="center">
-                      <IconButton
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          onSetCohortFavorite(row.researchId)
-                        }}
-                      >
-                        <FavStar favorite={row.favorite} />
-                      </IconButton>
-                    </TableCell>
+                      <Hidden mdDown>
+                        <Grid
+                          container
+                          direction="row"
+                          alignItems="center"
+                          justifyContent="center"
+                          style={{ width: 'max-content', margin: 'auto' }}
+                        >
+                          <Grid item>
+                            <IconButton
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                onSetCohortFavorite(row.researchId)
+                              }}
+                            >
+                              <FavStar favorite={row.favorite} />
+                            </IconButton>
+                          </Grid>
 
-                    {!simplified && (
-                      <TableCell align="center">
+                          {row.canMakeExport && (
+                            <Grid item>
+                              <IconButton
+                                size="small"
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
+                                }}
+                              >
+                                <ExportIcon />
+                              </IconButton>
+                            </Grid>
+                          )}
+
+                          <Grid item>
+                            <IconButton
+                              size="small"
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                dispatch(setSelectedCohortState(row.researchId))
+                              }}
+                            >
+                              <EditIcon />
+                            </IconButton>
+                          </Grid>
+
+                          <Grid item>
+                            <IconButton
+                              size="small"
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                handleClickOpenDialog()
+                                setSelectedCohort(row.researchId)
+                              }}
+                            >
+                              <DeleteOutlineIcon />
+                            </IconButton>
+                          </Grid>
+                        </Grid>
+                      </Hidden>
+                      <Hidden lgUp>
                         <IconButton
+                          aria-label="more"
+                          id="long-button"
+                          aria-controls="long-menu"
+                          aria-expanded={openMenuItem ? 'true' : undefined}
+                          aria-haspopup="true"
                           onClick={(event) => {
                             event.stopPropagation()
-                            handleClickOpenDialog()
+                            // @ts-ignore
+                            setAnchorEl(event.currentTarget)
                             setSelectedCohort(row.researchId)
                           }}
                         >
-                          <DeleteOutlineIcon />
+                          <MoreVertIcon />
                         </IconButton>
-                      </TableCell>
-                    )}
+                        <Menu
+                          anchorEl={anchorEl}
+                          open={openMenuItem && row.researchId === selectedCohort}
+                          onClose={() => setAnchorEl(null)}
+                        >
+                          <MenuItem
+                            className={classes.menuItem}
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              onSetCohortFavorite(row.researchId)
+                              setAnchorEl(null)
+                            }}
+                          >
+                            <FavStar favorite={row.favorite} /> Favori
+                          </MenuItem>
+                          <MenuItem
+                            className={classes.menuItem}
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
+                              setAnchorEl(null)
+                            }}
+                          >
+                            <ExportIcon /> Exporter
+                          </MenuItem>
+                          <MenuItem
+                            className={classes.menuItem}
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              dispatch(setSelectedCohortState(row.researchId))
+                              setAnchorEl(null)
+                            }}
+                          >
+                            <EditIcon /> Modifier
+                          </MenuItem>
+                          <MenuItem
+                            className={classes.menuItem}
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              setSelectedCohort(row.researchId)
+                              handleClickOpenDialog()
+                              setAnchorEl(null)
+                            }}
+                          >
+                            <DeleteOutlineIcon /> Supprimer
+                          </MenuItem>
+                        </Menu>
+                      </Hidden>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -294,6 +376,42 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
           </TableContainer>
         )
       }
+
+      {!simplified && (
+        <Dialog
+          open={dialogOpen}
+          onClose={handleCloseDialog}
+          aria-labelledby="alert-dialog-slide-title"
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle id="alert-dialog-slide-title">Etes-vous sûr de vouloir supprimer la cohorte ?</DialogTitle>
+          <DialogActions>
+            <Button onClick={handleCloseDialog} color="primary">
+              Non
+            </Button>
+            <Button
+              onClick={() => {
+                handleCloseDialog()
+                removeCohort()
+              }}
+              color="secondary"
+            >
+              Oui
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
+      <ModalEditCohort
+        open={selectedCohortState !== null}
+        onClose={() => dispatch<any>(setSelectedCohortState(null))}
+      />
+
+      <ExportModal
+        cohortId={selectedExportableCohort ? selectedExportableCohort : 0}
+        open={!!selectedExportableCohort}
+        handleClose={() => setSelectedExportableCohort(undefined)}
+      />
     </>
   )
 }

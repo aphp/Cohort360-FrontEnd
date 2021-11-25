@@ -107,6 +107,7 @@ export type FormattedCohort = {
   favorite?: boolean
   jobStatus?: string
   jobFailMsg?: string
+  canMakeExport?: boolean
 }
 
 export type CohortFilters = {
