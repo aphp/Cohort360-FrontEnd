@@ -17,8 +17,8 @@ const useStyles = makeStyles(() => ({
     border: `1px solid #ccc`,
     borderRadius: 4,
     marginTop: 8,
-    maxHeight: 500,
-    minHeight: 250,
+    maxHeight: 650,
+    minHeight: 300,
     overflow: 'auto',
     padding: '4px 8px'
   },
