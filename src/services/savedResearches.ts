@@ -12,6 +12,7 @@ import {
 } from 'types'
 
 import services from './index'
+import displayDigit from 'utils/displayDigit'
 
 export const fetchCohorts = async (
   sortBy: string,
@@ -116,7 +117,9 @@ export const fetchCohorts = async (
           status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
           nPatients: cohort.result_size,
           nGlobal: cohort.dated_measure_global
-            ? `${cohort.dated_measure_global.measure_min ?? 'X'} - ${cohort.dated_measure_global.measure_max ?? 'X'}`
+            ? `${displayDigit(cohort.dated_measure_global.measure_min) ?? 'X'} - ${
+                displayDigit(cohort.dated_measure_global.measure_max) ?? 'X'
+              }`
             : undefined,
           date: cohort.dated_measure.fhir_datetime,
           perimeter: '-',
@@ -178,7 +181,9 @@ export const fetchFavoriteCohorts = async (providerId: string | undefined): Prom
           status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
           nPatients: cohort.result_size,
           nGlobal: cohort.dated_measure_global
-            ? `${cohort.dated_measure_global.measure_min ?? 'X'} - ${cohort.dated_measure_global.measure_max ?? 'X'}`
+            ? `${displayDigit(cohort.dated_measure_global.measure_min) ?? 'X'} - ${
+                displayDigit(cohort.dated_measure_global.measure_max) ?? 'X'
+              }`
             : undefined,
           date: cohort.dated_measure.fhir_datetime,
           perimeter: '-',
@@ -236,7 +241,9 @@ export const fetchLastCohorts = async (providerId: string | undefined): Promise<
           status: cohort.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohorte i2b2',
           nPatients: cohort.result_size,
           nGlobal: cohort.dated_measure_global
-            ? `${cohort.dated_measure_global.measure_min ?? 'X'} - ${cohort.dated_measure_global.measure_max ?? 'X'}`
+            ? `${displayDigit(cohort.dated_measure_global.measure_min) ?? 'X'} - ${
+                displayDigit(cohort.dated_measure_global.measure_max) ?? 'X'
+              }`
             : undefined,
           date: cohort.dated_measure.fhir_datetime,
           perimeter: '-',
