@@ -250,7 +250,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                           container
                           direction="row"
                           alignItems="center"
-                          justifyContent="center"
+                          justify="center"
                           style={{ width: 'max-content', margin: 'auto' }}
                         >
                           <Grid item>

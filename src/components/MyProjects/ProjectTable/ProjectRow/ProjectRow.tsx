@@ -23,8 +23,17 @@ type ProjectRowProps = {
   requestOfProject: RequestType[]
   cohortsList: CohortType[]
   searchInput?: string
+  selectedRequests: string[]
+  onSelectedRow: (selectedRequests: string[]) => void
 }
-const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, cohortsList, searchInput }) => {
+const ProjectRow: React.FC<ProjectRowProps> = ({
+  row,
+  requestOfProject,
+  cohortsList,
+  searchInput,
+  selectedRequests,
+  onSelectedRow
+}) => {
   const [open, setOpen] = React.useState(true)
   const classes = useStyles()
   const dispatch = useDispatch()
@@ -92,6 +101,8 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, cohortsL
                       ({ name, ...cohortItem }) => name.search(regexp) !== -1 && cohortItem.request === request.uuid
                     )
                   }
+                  selectedRequests={selectedRequests}
+                  onSelectedRow={onSelectedRow}
                 />
               ))
             ) : (

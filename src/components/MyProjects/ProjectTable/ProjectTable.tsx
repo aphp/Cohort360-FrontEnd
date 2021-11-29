@@ -49,6 +49,8 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput }) => {
   const [searchRequestList, setSearchRequestList] = useState(requestsList || [])
   const [searchCohortList, setSearchCohortList] = useState(cohortsList || [])
 
+  const [selectedRequests, setSelectedRequests] = useState<string[]>([])
+
   useEffect(() => {
     // eslint-disable-next-line
     const regexp = new RegExp(`${(searchInput || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}`, 'gi')
@@ -142,6 +144,10 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput }) => {
     setSortBy(property)
   }
 
+  const _onSelectedRow = (_selectedRequests: string[]) => {
+    setSelectedRequests(_selectedRequests)
+  }
+
   return (
     <TableContainer component={Paper} className={classes.grid}>
       <Table aria-label="projects table" id="projects_table" className={classes.table}>
@@ -189,6 +195,8 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput }) => {
                   : requestsList.filter(({ parent_folder }) => parent_folder === project.uuid)
               }
               cohortsList={searchCohortList && searchCohortList.length > 0 ? searchCohortList : cohortsList}
+              selectedRequests={selectedRequests}
+              onSelectedRow={_onSelectedRow}
             />
           ))}
         </TableBody>
