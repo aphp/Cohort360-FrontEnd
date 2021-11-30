@@ -249,7 +249,6 @@ const deleteRequests = createAsyncThunk<DeleteRequestsReturn, DeleteRequestsPara
       let requestsList: RequestType[] = state.requestsList ? [...state.requestsList] : []
 
       const results = await services.projects.deleteRequests(deletedRequests)
-      console.log(`results`, results)
 
       requestsList = requestsList.filter((requestItem) => {
         const foundItem = results.find((result) => result.uuid === requestItem.uuid)

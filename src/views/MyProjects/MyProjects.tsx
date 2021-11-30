@@ -114,7 +114,7 @@ const MyProjects = () => {
           </Grid>
 
           <Grid item xs={11} sm={9}>
-            <Grid container justifyContent="space-between">
+            <Grid container justify="space-between">
               <Grid className={classes.secondaryContainer}>
                 {selectedRequests.length > 0 && (
                   <>
