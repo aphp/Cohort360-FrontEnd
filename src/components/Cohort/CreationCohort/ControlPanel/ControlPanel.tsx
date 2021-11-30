@@ -105,10 +105,8 @@ const ControlPanel: React.FC<{
     const interval = setInterval(() => {
       if (count && count.status && (count.status === 'pending' || count.status === 'started')) {
         dispatch<any>(countCohortCreation({ uuid: count.uuid }))
-        setOldCount(null)
       } else {
         clearInterval(interval)
-        setOldCount(null)
       }
     }, 1000)
     return () => clearInterval(interval)
@@ -206,7 +204,11 @@ const ControlPanel: React.FC<{
                 })}
               >
                 {includePatient !== undefined && includePatient !== null ? displayDigit(includePatient) : '-'}
-                {oldCount !== null ? `(${oldCount - (includePatient ?? 0)})` : ''}
+                {oldCount !== null
+                  ? (includePatient ?? 0) - oldCount > 0
+                    ? ` (+${(includePatient ?? 0) - oldCount})`
+                    : ` (${(includePatient ?? 0) - oldCount})`
+                  : ''}
               </Typography>
             )}
           </Grid>
@@ -250,7 +252,7 @@ const ControlPanel: React.FC<{
         {moment().diff(lastUpdated, 'hours') > DISPLAY_ESTIMATE_LIMIT && (
           <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="info">
             Attention l'estimation du nombre de patient correspondant à votre requête effectuée le{' '}
-            {lastUpdated.format('DD/MM/YYYY')} est peut être dépassé, voulez vous le recalculer ?
+            {lastUpdated.format('DD/MM/YYYY')} est peut être dépassée, voulez vous la recalculer ?
             <Button
               onClick={() => _relaunchCount(true)}
               variant="outlined"
