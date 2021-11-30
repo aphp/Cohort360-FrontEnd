@@ -120,7 +120,7 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
       ({ created_at: a }, { created_at: b }) => new Date(b).valueOf() - new Date(a).valueOf()
     )
 
-    const currentSnapshot = snapshotId
+    let currentSnapshot = snapshotId
       ? snapshotsHistoryFromQuery.find(({ uuid }) => uuid === snapshotId)
       : snapshotsHistoryFromQuery
       ? snapshotsHistoryFromQuery[0]
@@ -129,6 +129,12 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
     let snapshotsHistory: any[] = []
 
     if (currentSnapshot) {
+      // clean Global count
+      currentSnapshot = {
+        ...currentSnapshot,
+        dated_measures: currentSnapshot.dated_measures.filter((dated_measure: any) => dated_measure.mode !== 'Global')
+      }
+
       let nextSnap = currentSnapshot.uuid
       snapshotsHistory = snapshotsHistoryFromQuery
         .map(({ uuid, serialized_query, created_at, previous_snapshot, dated_measures }) => {
@@ -138,7 +144,8 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
               uuid: uuid,
               json: serialized_query,
               date: created_at,
-              dated_measures
+              // clean Global count
+              dated_measures: dated_measures.filter((dated_measure: any) => dated_measure.mode !== 'Global')
             }
           } else {
             return {
