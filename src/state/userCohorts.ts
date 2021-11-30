@@ -2,6 +2,7 @@ import { FormattedCohort } from 'types'
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 import { fetchFavoriteCohorts, fetchLastCohorts, setFavorite, onRemoveCohort } from 'services/savedResearches'
+import { setAsFavoriteCohort } from './cohort'
 
 import { logout, login } from './me'
 
@@ -46,6 +47,7 @@ const setFavoriteCohortThunk = createAsyncThunk<void, { cohortId: string }, { st
     const isCohortFavorite = favoriteCohorts ? favoriteCohorts.some((cohort) => cohort.researchId === cohortId) : false
     if (await setFavorite(cohortId, isCohortFavorite)) {
       dispatch<any>(fetchFavoriteCohortsThunk())
+      dispatch<any>(setAsFavoriteCohort(cohortId))
     }
   }
 )

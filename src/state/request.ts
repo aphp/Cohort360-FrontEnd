@@ -184,6 +184,89 @@ const deleteRequest = createAsyncThunk<DeleteRequestReturn, DeleteRequestParams,
   }
 )
 
+/**
+ * moveRequests
+ *
+ */
+type MoveRequestParams = {
+  selectedRequests: RequestType[]
+  parent_folder: string | undefined
+}
+type MoveRequestReturn = {
+  selectedRequest: null
+  requestsList: RequestType[]
+}
+
+const moveRequests = createAsyncThunk<MoveRequestReturn, MoveRequestParams, { state: RootState }>(
+  'request/moveRequests',
+  async ({ selectedRequests, parent_folder }, { getState }) => {
+    try {
+      const state = getState().request
+      let requestsList: RequestType[] = state.requestsList ? [...state.requestsList] : []
+
+      const results = await services.projects.moveRequests(selectedRequests, parent_folder ?? '')
+
+      requestsList = requestsList.map((requestItem) => {
+        const foundItem = results.find((result) => result.uuid === requestItem.uuid)
+        if (foundItem) {
+          return {
+            ...requestItem,
+            parent_folder
+          }
+        } else {
+          return requestItem
+        }
+      })
+
+      return {
+        selectedRequest: null,
+        requestsList: requestsList
+      }
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+)
+
+/**
+ * deleteRequests
+ *
+ */
+type DeleteRequestsParams = {
+  deletedRequests: RequestType[]
+}
+type DeleteRequestsReturn = {
+  selectedRequest: null
+  requestsList: RequestType[]
+}
+
+const deleteRequests = createAsyncThunk<DeleteRequestsReturn, DeleteRequestsParams, { state: RootState }>(
+  'request/deleteRequests',
+  async ({ deletedRequests }, { getState }) => {
+    try {
+      const state = getState().request
+      let requestsList: RequestType[] = state.requestsList ? [...state.requestsList] : []
+
+      const results = await services.projects.deleteRequests(deletedRequests)
+      console.log(`results`, results)
+
+      requestsList = requestsList.filter((requestItem) => {
+        const foundItem = results.find((result) => result.uuid === requestItem.uuid)
+        return foundItem === undefined
+      })
+
+      return {
+        selectedRequest: null,
+        requestsList: requestsList
+      }
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+)
+
 const setRequestSlice = createSlice({
   name: 'request',
   initialState: initialState as RequestState,
@@ -242,9 +325,17 @@ const setRequestSlice = createSlice({
     builder.addCase(deleteRequest.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(deleteRequest.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
     builder.addCase(deleteRequest.rejected, (state) => ({ ...state, loading: false }))
+    // moveRequests
+    builder.addCase(moveRequests.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(moveRequests.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
+    builder.addCase(moveRequests.rejected, (state) => ({ ...state, loading: false }))
+    // deleteRequests
+    builder.addCase(deleteRequests.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(deleteRequests.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
+    builder.addCase(deleteRequests.rejected, (state) => ({ ...state, loading: false }))
   }
 })
 
 export default setRequestSlice.reducer
-export { fetchRequests, addRequest, editRequest, deleteRequest }
+export { fetchRequests, addRequest, editRequest, deleteRequest, moveRequests, deleteRequests }
 export const { clearRequest, setSelectedRequest } = setRequestSlice.actions

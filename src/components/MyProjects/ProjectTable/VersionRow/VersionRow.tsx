@@ -19,9 +19,12 @@ import {
 
 import EditIcon from '@material-ui/icons/Edit'
 import ExportIcon from '@material-ui/icons/GetApp'
+import { ReactComponent as Star } from 'assets/icones/star.svg'
+import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
 
 import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 
+import { setFavoriteCohortThunk } from 'state/userCohorts'
 import { setSelectedCohort } from 'state/cohort'
 
 import { CohortType } from 'types'
@@ -56,6 +59,10 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
       : false
   )
 
+  const onSetCohortFavorite = async (cohortId: string) => {
+    await dispatch<any>(setFavoriteCohortThunk({ cohortId }))
+  }
+
   return (
     <Box className={classes.versionContainer}>
       <Typography variant="h6" gutterBottom component="div">
@@ -65,6 +72,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
         <TableHead>
           <TableRow>
             <TableCell>Nom</TableCell>
+            <TableCell align="center">Favoris</TableCell>
             <TableCell align="center" style={{ width: 125 }}>
               Statut
             </TableCell>
@@ -117,6 +125,11 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
                       onClick={() => _handleEditCohort(historyRow.uuid)}
                     >
                       <EditIcon />
+                    </IconButton>
+                  </TableCell>
+                  <TableCell align="center">
+                    <IconButton onClick={() => onSetCohortFavorite(historyRow.uuid)}>
+                      <FavStar favorite={historyRow.favorite} />
                     </IconButton>
                   </TableCell>
                   <TableCell align="center">
@@ -188,6 +201,16 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
       />
     </Box>
   )
+}
+
+type FavStarProps = {
+  favorite?: boolean
+}
+const FavStar: React.FC<FavStarProps> = ({ favorite }) => {
+  if (favorite) {
+    return <StarFull height="15px" fill="#ED6D91" />
+  }
+  return <Star height="15px" fill="#ED6D91" />
 }
 
 export default VersionRow

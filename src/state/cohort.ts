@@ -271,6 +271,18 @@ const setCohortSlice = createSlice({
     clearCohort: () => {
       return defaultInitialState
     },
+    setAsFavoriteCohort: (state: CohortState, action: PayloadAction<string | null>) => {
+      const cohortsList: CohortType[] = state.cohortsList ? [...state.cohortsList] : []
+      const selectedCohortId = action.payload
+      return {
+        ...state,
+        cohortsList: cohortsList.map((cohortItem) => {
+          return cohortItem.uuid === selectedCohortId
+            ? { ...cohortItem, favorite: !cohortItem.favorite }
+            : { ...cohortItem }
+        })
+      }
+    },
     setSelectedCohort: (state: CohortState, action: PayloadAction<string | null>) => {
       const cohortsList: CohortType[] = state.cohortsList ?? []
       const selectedCohortId = action.payload
@@ -333,4 +345,4 @@ const setCohortSlice = createSlice({
 
 export default setCohortSlice.reducer
 export { fetchCohorts, addCohort, editCohort, deleteCohort }
-export const { clearCohort, setSelectedCohort } = setCohortSlice.actions
+export const { clearCohort, setSelectedCohort, setAsFavoriteCohort } = setCohortSlice.actions

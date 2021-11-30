@@ -144,6 +144,23 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                   <TableCell
                     className={classes.tableHeadCell}
                     align="center"
+                    sortDirection={sortBy === 'favorite' ? sortDirection : false}
+                  >
+                    {sortDirection ? (
+                      <TableSortLabel
+                        active={sortBy === 'favorite'}
+                        direction={sortBy === 'favorite' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('favorite')}
+                      >
+                        Favoris
+                      </TableSortLabel>
+                    ) : (
+                      'Favoris'
+                    )}
+                  </TableCell>
+                  <TableCell
+                    className={classes.tableHeadCell}
+                    align="center"
                     sortDirection={sortBy === 'type' ? sortDirection : false}
                   >
                     {sortDirection ? (
@@ -211,6 +228,16 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                     key={row.researchId}
                   >
                     <TableCell onClick={() => _onClickRow(row)}>{row.name}</TableCell>
+                    <TableCell align="center">
+                      <IconButton
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          onSetCohortFavorite(row.researchId)
+                        }}
+                      >
+                        <FavStar favorite={row.favorite} />
+                      </IconButton>
+                    </TableCell>
                     <TableCell onClick={() => _onClickRow(row)} className={classes.status} align="center">
                       {row.status}
                     </TableCell>
@@ -250,20 +277,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                           container
                           direction="row"
                           alignItems="center"
-                          justifyContent="center"
+                          justify="center"
                           style={{ width: 'max-content', margin: 'auto' }}
                         >
-                          <Grid item>
-                            <IconButton
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                onSetCohortFavorite(row.researchId)
-                              }}
-                            >
-                              <FavStar favorite={row.favorite} />
-                            </IconButton>
-                          </Grid>
-
                           {row.canMakeExport && (
                             <Grid item>
                               <IconButton
@@ -325,16 +341,6 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                           open={openMenuItem && row.researchId === selectedCohort}
                           onClose={() => setAnchorEl(null)}
                         >
-                          <MenuItem
-                            className={classes.menuItem}
-                            onClick={(event) => {
-                              event.stopPropagation()
-                              onSetCohortFavorite(row.researchId)
-                              setAnchorEl(null)
-                            }}
-                          >
-                            <FavStar favorite={row.favorite} /> Favori
-                          </MenuItem>
                           <MenuItem
                             className={classes.menuItem}
                             onClick={(event) => {

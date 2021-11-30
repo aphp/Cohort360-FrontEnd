@@ -23,13 +23,23 @@ type ProjectRowProps = {
   requestOfProject: RequestType[]
   cohortsList: CohortType[]
   searchInput?: string
+  selectedRequests: RequestType[]
+  onSelectedRow: (selectedRequests: RequestType[]) => void
 }
-const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, cohortsList, searchInput }) => {
+const ProjectRow: React.FC<ProjectRowProps> = ({
+  row,
+  requestOfProject,
+  cohortsList,
+  searchInput,
+  selectedRequests,
+  onSelectedRow
+}) => {
   const [open, setOpen] = React.useState(true)
   const classes = useStyles()
   const dispatch = useDispatch()
 
   const handleClickAddOrEditProject = (selectedProjectId: string | null) => {
+    onSelectedRow([])
     if (selectedProjectId) {
       dispatch<any>(setSelectedProject(selectedProjectId))
     } else {
@@ -38,6 +48,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, cohortsL
   }
 
   const handleAddRequest = () => {
+    onSelectedRow([])
     dispatch<any>(setSelectedRequest({ uuid: '', name: '', parent_folder: row.uuid }))
   }
 
@@ -47,14 +58,21 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, cohortsL
   return (
     <React.Fragment>
       <TableRow>
-        <TableCell>
-          <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
+        <TableCell style={{ width: 62 }}>
+          <IconButton style={{ marginLeft: 4 }} aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
         <TableCell />
         <TableCell className={classes.tdName}>
           <Typography style={{ fontWeight: 900, display: 'inline-table' }}>{row.name}</Typography>
+          {requestOfProject && requestOfProject.length > 0 && (
+            <Tooltip title={'Ajouter une requête'}>
+              <IconButton onClick={handleAddRequest} className={classes.smallAddButon} size="small">
+                <AddIcon />
+              </IconButton>
+            </Tooltip>
+          )}
           <Tooltip title={'Modifier le projet'}>
             <IconButton
               onClick={() => handleClickAddOrEditProject(row.uuid)}
@@ -64,13 +82,6 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, cohortsL
               <EditIcon />
             </IconButton>
           </Tooltip>
-          {requestOfProject && requestOfProject.length > 0 && (
-            <Tooltip title={'Ajouter une requête'}>
-              <IconButton onClick={handleAddRequest} className={classes.smallAddButon} size="small">
-                <AddIcon />
-              </IconButton>
-            </Tooltip>
-          )}
         </TableCell>
         <TableCell className={classes.dateCell} align="center">
           {/* {moment(row.modified_at).format('DD/MM/YYYY [à] HH:mm')} */}
@@ -92,6 +103,8 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ row, requestOfProject, cohortsL
                       ({ name, ...cohortItem }) => name.search(regexp) !== -1 && cohortItem.request === request.uuid
                     )
                   }
+                  selectedRequests={selectedRequests}
+                  onSelectedRow={onSelectedRow}
                 />
               ))
             ) : (

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import moment from 'moment'
 import { useDispatch } from 'react-redux'
 
-import { Collapse, IconButton, Link, Table, TableBody, TableCell, TableRow, Tooltip } from '@material-ui/core'
+import { Checkbox, Collapse, IconButton, Link, Table, TableBody, TableCell, TableRow, Tooltip } from '@material-ui/core'
 
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
@@ -19,9 +19,11 @@ import useStyles from '../styles'
 type RequestRowProps = {
   row: RequestType
   cohortsList: CohortType[]
+  selectedRequests: RequestType[]
+  onSelectedRow: (selectedRequests: RequestType[]) => void
   isSearch?: boolean
 }
-const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, isSearch }) => {
+const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedRequests, onSelectedRow, isSearch }) => {
   const [open, setOpen] = React.useState(false)
   const classes = useStyles()
   const dispatch = useDispatch()
@@ -35,15 +37,29 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, isSearch }) =
       const hasCohorts = cohortsList.some(({ request }) => request === row.uuid)
       setOpen(hasCohorts)
     } else {
-      setOpen(false)
+      setOpen(open)
     }
   }, [isSearch, cohortsList])
+
+  const rowIsSelected = selectedRequests.find((selectedRequest) => selectedRequest.uuid === row.uuid)
 
   return (
     <Table>
       <TableBody>
-        <TableRow>
-          <TableCell style={{ width: 62 }} />
+        <TableRow style={{ background: '#FAF9F9' }}>
+          <TableCell style={{ width: 62 }}>
+            <Checkbox
+              size="small"
+              checked={!!rowIsSelected}
+              onChange={() => {
+                if (rowIsSelected) {
+                  onSelectedRow(selectedRequests.filter((selectedRequest) => selectedRequest.uuid !== row.uuid))
+                } else {
+                  onSelectedRow([...selectedRequests, row])
+                }
+              }}
+            />
+          </TableCell>
           <TableCell style={{ width: 62 }}>
             <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
               {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}

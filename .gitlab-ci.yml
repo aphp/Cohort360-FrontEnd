@@ -6,23 +6,15 @@ default:
 
 .default_rules:
   rules:
-    - if: ($CI_COMMIT_BRANCH =~ /${STANDARD_CD_BRANCHES}/ || $CI_COMMIT_BRANCH =~ /${PROTECTED_CD_BRANCHES}/) && $ONLY_RELEASE == null
+    - if: ($CI_COMMIT_BRANCH =~ $STANDARD_CD_BRANCHES || $CI_COMMIT_BRANCH =~ $PROTECTED_CD_BRANCHES) && $ONLY_RELEASE == null
     - when: never
 
 .release_rules:
   rules:
-    - if: ($CI_COMMIT_BRANCH =~ /${STANDARD_CD_BRANCHES}/) && $ENABLE_RELEASE == "true"
-    - if: ($CI_COMMIT_BRANCH =~ /${$PROTECTED_CD_BRANCHES}/) && $ENABLE_RELEASE == "true"
+    - if: ($CI_COMMIT_BRANCH =~ $STANDARD_CD_BRANCHES) && $ENABLE_RELEASE == "true"
+    - if: ($CI_COMMIT_BRANCH =~ $PROTECTED_CD_BRANCHES) && $ENABLE_RELEASE == "true"
       when: manual
     - when: never
-
-variables:
-  REACT_APP_FHIR_API_URL: /api/fhir
-  REACT_APP_BACK_API_URL: /api/back
-  REACT_APP_REQUEST_API_URL: /api/fhir
-  REACT_APP_PORTAIL_API_URL: /api/portail
-  REACT_APP_CONTEXT: aphp
-  REACT_APP_JWT_URL: /api/jwt
 
 stages:
   - build
@@ -37,7 +29,7 @@ build:
       - build/
     expire_in: 1 week
   script:
-    - echo "Build"
+    - name=${CI_COMMIT_BRANCH}_build_ENV  && cp ${!name} $CI_PROJECT_DIR/.env
     - rm package-lock.json
     - npm config set proxy http://$PROXY_URL
     - npm install
