@@ -97,7 +97,7 @@ export interface IServicesProjects {
    * Cette fonction modifie un requete existant
    *
    * Argument:
-   *   - newProject: Requete à modifier
+   *   - editedRequest: Requete à modifier
    *
    * Retourne:
    *   - Requete modifiée
@@ -108,12 +108,35 @@ export interface IServicesProjects {
    * Cette fonction supprime un requete existant
    *
    * Argument:
-   *   - newProject: Requete à supprimer
+   *   - deletedRequest: Requete à supprimer
    *
    * Retourne:
    *   - Requete supprimée
    */
   deleteRequest: (deletedRequest: RequestType) => Promise<RequestType>
+
+  /**
+   * Cette fonction déplace des requetes existant vers un autre dossier
+   *
+   * Argument:
+   *   - selectedRequests: Requetes à déplacer
+   *   - parent_folder: destination des requêtes
+   *
+   * Retourne:
+   *   - Requete supprimée
+   */
+  moveRequests: (selectedRequests: RequestType[], parent_folder: string) => Promise<RequestType[]>
+
+  /**
+   * Cette fonction supprimer des requetes existantes
+   *
+   * Argument:
+   *   - deletedRequests: Requetes à supprimer
+   *
+   * Retourne:
+   *   - Requete supprimée
+   */
+  deleteRequests: (deletedRequests: RequestType[]) => Promise<RequestType[]>
 
   /**
    * Retourne la liste de Cohort d'un practitioner
@@ -296,6 +319,47 @@ const servicesProjects: IServicesProjects = {
     } else {
       throw new Error('Impossible de supprimer la requête')
     }
+  },
+
+  moveRequests: async (selectedRequests, parent_folder) => {
+    if (!parent_folder) return []
+
+    const moveRequestsResponse = await Promise.all(
+      selectedRequests.map((selectedRequest) =>
+        new Promise((resolve) => {
+          resolve(
+            apiBack.patch(`/explorations/requests/${selectedRequest.uuid}/`, {
+              parent_folder
+            })
+          )
+        })
+          .then((values) => {
+            return values
+          })
+          .catch((error) => {
+            return error
+          })
+      )
+    )
+    return moveRequestsResponse && moveRequestsResponse.length > 0
+      ? // @ts-ignore
+        moveRequestsResponse.map((moveRequestResponse) => moveRequestResponse?.data as RequestType)
+      : []
+  },
+
+  deleteRequests: async (deletedRequests) => {
+    const deleteRequestsResponse = await Promise.all(
+      deletedRequests.map(
+        (deletedRequest) =>
+          new Promise((resolve) => {
+            resolve(apiBack.delete(`/explorations/requests/${deletedRequest.uuid}/`))
+          })
+      )
+    )
+
+    // @ts-ignore
+    const checkResponse = deleteRequestsResponse.filter(({ status }) => status === 204)
+    return checkResponse.length === deletedRequests.length ? deletedRequests : []
   },
 
   fetchCohortsList: async (providerId, limit, offset) => {

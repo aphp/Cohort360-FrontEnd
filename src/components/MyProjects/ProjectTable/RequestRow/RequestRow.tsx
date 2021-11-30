@@ -19,8 +19,8 @@ import useStyles from '../styles'
 type RequestRowProps = {
   row: RequestType
   cohortsList: CohortType[]
-  selectedRequests: string[]
-  onSelectedRow: (selectedRequests: string[]) => void
+  selectedRequests: RequestType[]
+  onSelectedRow: (selectedRequests: RequestType[]) => void
   isSearch?: boolean
 }
 const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedRequests, onSelectedRow, isSearch }) => {
@@ -37,11 +37,11 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
       const hasCohorts = cohortsList.some(({ request }) => request === row.uuid)
       setOpen(hasCohorts)
     } else {
-      setOpen(false)
+      setOpen(open)
     }
   }, [isSearch, cohortsList])
 
-  const rowIsSelected = selectedRequests.find((selectedRequest) => selectedRequest === row.uuid)
+  const rowIsSelected = selectedRequests.find((selectedRequest) => selectedRequest.uuid === row.uuid)
 
   return (
     <Table>
@@ -53,9 +53,9 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
               checked={!!rowIsSelected}
               onChange={() => {
                 if (rowIsSelected) {
-                  onSelectedRow(selectedRequests.filter((selectedRequest) => selectedRequest !== row.uuid))
+                  onSelectedRow(selectedRequests.filter((selectedRequest) => selectedRequest.uuid !== row.uuid))
                 } else {
-                  onSelectedRow([...selectedRequests, row.uuid])
+                  onSelectedRow([...selectedRequests, row])
                 }
               }}
             />
