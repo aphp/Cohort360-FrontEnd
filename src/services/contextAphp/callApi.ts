@@ -228,16 +228,18 @@ type fetchCompositionProps = {
   encounter?: string
   'encounter.identifier'?: string
   facet?: ('class' | 'visit-year-month-gender-facet')[]
+  uniqueFacet?: 'patient'[]
   _elements?: ('status' | 'type' | 'subject' | 'encounter' | 'date' | 'title')[]
 }
 export const fetchComposition = async (args: fetchCompositionProps) => {
   const { _id, size, offset, _sort, sortDirection, type, _text, status, patient, encounter, minDate, maxDate } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
-  let { _list, facet, _elements } = args
+  let { _list, facet, uniqueFacet, _elements } = args
   const encounterIdentifier = args['encounter.identifier']
 
   _list = _list ? _list.filter(uniq) : []
   facet = facet ? facet.filter(uniq) : []
+  uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
 
   // By default, all the calls to `/Composition` will have `type:not=doc-impor in parameter
@@ -258,6 +260,7 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
 
   if (_list && _list.length > 0)                   options = [...options, `_list=${_list.reduce(reducer)}`]                                     // eslint-disable-line
   if (facet && facet.length > 0)                   options = [...options, `facet=${facet.reduce(reducer)}`]                                     // eslint-disable-line
+  if (uniqueFacet && uniqueFacet.length > 0)       options = [...options, `uniqueFacet=${uniqueFacet.reduce(reducer)}`]                         // eslint-disable-line
   if (_elements && _elements.length > 0)           options = [...options, `_elements=${_elements.reduce(reducer)}`]                             // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<IComposition>>(`/Composition?${options.reduce(optionsReducer)}`)

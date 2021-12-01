@@ -124,6 +124,7 @@ export interface IServicesCohorts {
   ) => Promise<{
     totalDocs: number
     totalAllDocs: number
+    totalPatientDocs: number
     documentsList: IComposition[]
   }>
 
@@ -373,6 +374,9 @@ const servicesCohorts: IServicesCohorts = {
         .replaceAll('\n', '%20')
     }
 
+    console.log(`startDate`, startDate)
+    console.log(`endDate`, endDate)
+
     const [docsList, allDocsList] = await Promise.all([
       fetchComposition({
         size: 20,
@@ -386,12 +390,10 @@ const servicesCohorts: IServicesCohorts = {
         type: selectedDocTypes.length > 0 ? selectedDocTypes.join(',') : '',
         'encounter.identifier': nda,
         minDate: startDate ?? '',
-        maxDate: endDate ?? ''
+        maxDate: endDate ?? '',
+        uniqueFacet: ['patient']
       }),
-      !!searchInput ||
-      !!selectedDocTypes ||
-      !!nda ||
-      (startDate ? [startDate, endDate ? endDate : ''] : endDate ? [endDate] : []).length > 0
+      !!searchInput || !!selectedDocTypes || !!nda || !!startDate || !!endDate
         ? fetchComposition({
             status: 'final',
             _list: groupId ? [groupId] : [],
@@ -403,12 +405,21 @@ const servicesCohorts: IServicesCohorts = {
     const totalDocs = docsList?.data?.resourceType === 'Bundle' ? docsList.data.total : 0
     const totalAllDocs =
       allDocsList !== null ? (allDocsList?.data?.resourceType === 'Bundle' ? allDocsList.data.total : 0) : totalDocs
+    const totalPatientDocs =
+      docsList?.data?.resourceType === 'Bundle'
+        ? (
+            docsList?.data?.meta?.extension?.find((extension) => extension.url === 'unique-patient') || {
+              valueDecimal: 0
+            }
+          ).valueDecimal
+        : 0
 
     const documentsList = await getDocumentInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
 
     return {
       totalDocs: totalDocs ?? 0,
       totalAllDocs: totalAllDocs ?? 0,
+      totalPatientDocs: totalPatientDocs ?? 0,
       documentsList
     }
   },
