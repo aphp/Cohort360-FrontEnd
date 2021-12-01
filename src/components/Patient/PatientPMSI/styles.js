@@ -6,7 +6,8 @@ export default makeStyles((theme) =>
       minWidth: 0,
       color: 'white',
       fontWeight: '400',
-      borderBottom: '#255CA1 inset 4px'
+      borderBottom: '#255CA1 inset 4px',
+      minHeight: 41
     },
     documentTable: {
       margin: '0 auto'
@@ -16,28 +17,28 @@ export default makeStyles((theme) =>
       justifyContent: 'flex-end'
     },
     searchBar: {
-      width: '180px',
+      minWidth: 200,
       backgroundColor: '#FFF',
       border: '1px solid #D0D7D8',
       boxShadow: '0px 1px 16px #0000000A',
-      borderRadius: '20px'
+      borderRadius: '25px'
     },
     input: {
       marginLeft: theme.spacing(1),
       flex: 1
     },
     searchButton: {
-      width: '125px',
+      minWidth: 150,
       backgroundColor: '#5BC5F2',
       color: '#FFF',
       borderRadius: '25px',
-      marginLeft: 20
+      marginLeft: 8
     },
     root: {
-      marginBottom: '5px',
       backgroundColor: '#153D8A',
       borderRadius: '8px',
-      color: 'white'
+      color: 'white',
+      minHeight: 41
     },
     indicator: {
       backgroundColor: '#5BC5F2',
@@ -86,6 +87,9 @@ export default makeStyles((theme) =>
       '&:last-child': {
         marginRight: 0
       }
+    },
+    filterAndSort: {
+      '& > *': { marginBottom: 5 }
     }
   })
 )

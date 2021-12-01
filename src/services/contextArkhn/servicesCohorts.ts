@@ -374,9 +374,6 @@ const servicesCohorts: IServicesCohorts = {
         .replaceAll('\n', '%20')
     }
 
-    console.log(`startDate`, startDate)
-    console.log(`endDate`, endDate)
-
     const [docsList, allDocsList] = await Promise.all([
       fetchComposition({
         size: 20,

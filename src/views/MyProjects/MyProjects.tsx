@@ -13,7 +13,7 @@ import ProjectSearchBar from 'components/MyProjects/ProjectSearchBar/ProjectSear
 import ModalAddOrEditProject from 'components/MyProjects/Modals/ModalAddOrEditProject/ModalAddOrEditProject'
 import ModalAddOrEditRequest from 'components/Cohort/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
-import ModalMoveRequest from 'components/MyProjects/Modals/ModalMoveRequest/ModalMoveRequest'
+import ModalMoveRequests from 'components/MyProjects/Modals/ModalMoveRequest/ModalMoveRequest'
 import ModalDeleteRequests from 'components/MyProjects/Modals/ModalDeleteRequests/ModalDeleteRequests'
 
 import { RequestType } from 'types'
@@ -107,13 +107,13 @@ const MyProjects = () => {
         })}
       >
         <Grid container justify="center" alignItems="center">
-          <Grid container item xs={11} sm={9}>
+          <Grid container item xs={11}>
             <Typography variant="h1" color="primary" className={classes.title}>
               Mes projets de recherche
             </Typography>
           </Grid>
 
-          <Grid item xs={11} sm={9}>
+          <Grid item xs={11}>
             <Grid container justify="space-between">
               <Grid className={classes.secondaryContainer}>
                 {selectedRequests.length > 0 && (
@@ -183,7 +183,7 @@ const MyProjects = () => {
             </Typography>
           </Grid>
 
-          <Grid container item xs={11} sm={9}>
+          <Grid container item xs={11}>
             <ProjectTable
               searchInput={searchInput}
               selectedRequests={selectedRequests}
@@ -203,7 +203,7 @@ const MyProjects = () => {
 
       <ModalEditCohort open={selectedCohort !== null} onClose={() => dispatch<any>(setSelectedCohort(null))} />
 
-      <ModalMoveRequest
+      <ModalMoveRequests
         open={openModal === 'move_to_folder'}
         onClose={(onConfirm?: boolean) => {
           setOpenModal(null)

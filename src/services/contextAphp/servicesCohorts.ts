@@ -374,9 +374,6 @@ const servicesCohorts: IServicesCohorts = {
         .replaceAll('\n', '%20')
     }
 
-    console.log(`startDate`, startDate)
-    console.log(`endDate`, endDate)
-
     const [docsList, allDocsList] = await Promise.all([
       fetchComposition({
         size: 20,
@@ -393,7 +390,7 @@ const servicesCohorts: IServicesCohorts = {
         maxDate: endDate ?? '',
         uniqueFacet: ['patient']
       }),
-      !!searchInput || !!selectedDocTypes || !!nda || !!startDate || !!endDate
+      !!searchInput || selectedDocTypes.length > 0 || !!nda || !!startDate || !!endDate
         ? fetchComposition({
             status: 'final',
             _list: groupId ? [groupId] : [],

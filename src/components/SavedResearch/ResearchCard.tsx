@@ -204,6 +204,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
               <SearchIcon fill="#ED6D91" height="15px" />
             </IconButton>
           </Grid>
+
           <Button
             variant="contained"
             disableElevation
