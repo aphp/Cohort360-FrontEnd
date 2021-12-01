@@ -185,6 +185,10 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents
         </Typography>
         <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
           <div className={classes.documentButtons}>
+            <IconButton size="small" onClick={() => setHelpOpen(true)}>
+              <InfoIcon />
+            </IconButton>
+
             <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
               <InputBase
                 placeholder="Rechercher dans les documents"
@@ -206,16 +210,15 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents
                 <SearchIcon fill="#ED6D91" height="15px" />
               </IconButton>
             </Grid>
-            <IconButton type="submit" onClick={() => setHelpOpen(true)}>
-              <InfoIcon />
-            </IconButton>
+
             <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+
             <Button
               variant="contained"
               disableElevation
-              onClick={handleOpenDialog}
               startIcon={<FilterList height="15px" fill="#FFF" />}
               className={classes.searchButton}
+              onClick={handleOpenDialog}
             >
               Filtrer
             </Button>

@@ -118,7 +118,7 @@ const Contact: React.FC = () => {
       <Grid container direction="column" className={clsx(classes.appBar, { [classes.appBarShift]: open })}>
         <Grid container direction="column" alignItems="center">
           <CssBaseline />
-          <Grid container item direction="column" xs={12} sm={9}>
+          <Grid container item direction="column" xs={11}>
             {loading ? (
               <CircularProgress size={60} className={classes.loading} />
             ) : (

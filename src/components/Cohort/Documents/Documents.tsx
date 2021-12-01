@@ -14,6 +14,7 @@ import {
   // TextField,
   // Input
 } from '@material-ui/core'
+import Skeleton from '@material-ui/lab/Skeleton'
 import Pagination from '@material-ui/lab/Pagination'
 
 import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
@@ -48,10 +49,14 @@ type DocumentsProps = {
 
 const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sortBy, sortDirection }) => {
   const classes = useStyles()
-  const encounters = useAppSelector((state) => state.exploredCohort.encounters)
+  const { dashboard } = useAppSelector((state) => ({
+    dashboard: state.exploredCohort
+  }))
+  const { encounters, totalPatients } = dashboard
   const [page, setPage] = useState(1)
   const [documentsNumber, setDocumentsNumber] = useState<number | undefined>(0)
   const [allDocumentsNumber, setAllDocumentsNumber] = useState<number | undefined>(0)
+  const [patientDocumentsNumber, setPatientDocumentsNumber] = useState<number | undefined>(0)
   const [documents, setDocuments] = useState<(CohortComposition | IDocumentReference)[]>([])
   const [loadingStatus, setLoadingStatus] = useState(true)
   const [searchInput, setSearchInput] = useState('')
@@ -118,9 +123,10 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     )
 
     if (result) {
-      const { totalDocs, totalAllDocs, documentsList } = result
+      const { totalDocs, totalAllDocs, documentsList, totalPatientDocs } = result
       setDocumentsNumber(totalDocs)
       setAllDocumentsNumber(totalAllDocs)
+      setPatientDocumentsNumber(totalPatientDocs)
       setPage(page)
       setDocuments(documentsList)
       setLoadingStatus(false)
@@ -199,43 +205,62 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
         <Grid container item xs={11} justify="space-between">
           <Grid container item justify="flex-end" className={classes.tableGrid}>
             <Grid container justify="space-between" alignItems="center">
-              <Typography variant="button">
-                {displayDigit(documentsNumber ?? 0)} / {displayDigit(allDocumentsNumber ?? 0)} document(s)
-              </Typography>
+              <Grid container direction="column" justify="flex-start" style={{ width: 'fit-content' }}>
+                {loadingStatus || deidentifiedBoolean === null ? (
+                  <>
+                    <Skeleton width={200} height={40} />
+                    <Skeleton width={150} height={40} />
+                  </>
+                ) : (
+                  <>
+                    <Typography variant="button">
+                      {displayDigit(documentsNumber ?? 0)} / {displayDigit(allDocumentsNumber ?? 0)} document(s)
+                    </Typography>
+                    <Typography variant="button">
+                      {displayDigit(patientDocumentsNumber ?? 0)} / {displayDigit(totalPatients ?? 0)} patients(s)
+                    </Typography>
+                  </>
+                )}
+              </Grid>
               <Grid item>
                 <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
                   <div className={classes.documentButtons}>
                     {!showAreaText && (
-                      <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
-                        <InputBase
-                          placeholder="Rechercher dans les documents"
-                          className={classes.input}
-                          value={searchInput}
-                          onChange={handleChangeInput}
-                          onKeyDown={onKeyDown}
-                          endAdornment={
-                            <InputAdornment position="end">
-                              {searchInput && (
-                                <IconButton onClick={handleClearInput}>
-                                  <ClearIcon />
-                                </IconButton>
-                              )}
-                            </InputAdornment>
-                          }
-                        />
-                        <IconButton
-                          type="submit"
-                          aria-label="search"
-                          onClick={() => onSearchDocument(_sortBy, _sortDirection)}
-                        >
-                          <SearchIcon fill="#ED6D91" height="15px" />
+                      <>
+                        <IconButton size="small" onClick={() => setHelpOpen(true)}>
+                          <InfoIcon />
                         </IconButton>
-                      </Grid>
+
+                        <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
+                          <InputBase
+                            placeholder="Rechercher dans les documents"
+                            className={classes.input}
+                            value={searchInput}
+                            onChange={handleChangeInput}
+                            onKeyDown={onKeyDown}
+                            endAdornment={
+                              <InputAdornment position="end">
+                                {searchInput && (
+                                  <IconButton onClick={handleClearInput}>
+                                    <ClearIcon />
+                                  </IconButton>
+                                )}
+                              </InputAdornment>
+                            }
+                          />
+                          <IconButton
+                            type="submit"
+                            aria-label="search"
+                            onClick={() => onSearchDocument(_sortBy, _sortDirection)}
+                          >
+                            <SearchIcon fill="#ED6D91" height="15px" />
+                          </IconButton>
+                        </Grid>
+                      </>
                     )}
-                    <IconButton type="submit" onClick={() => setHelpOpen(true)}>
-                      <InfoIcon />
-                    </IconButton>
+
                     <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+
                     <Button
                       variant="contained"
                       disableElevation
@@ -248,21 +273,33 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                   </div>
                 </Grid>
               </Grid>
-              {showAreaText ? (
-                <Grid item className={classes.gridAdvancedSearch}>
+
+              <Grid item container xs={12} style={{ marginBottom: 4 }} justify="flex-end">
+                <Button size="small" onClick={() => setShowAreaText(!showAreaText)}>
+                  <Typography variant="h6">Recherche {showAreaText ? 'simple' : 'avancée'}</Typography>
+                </Button>
+              </Grid>
+
+              {showAreaText && (
+                <Grid container item className={classes.gridAdvancedSearch}>
                   <InputBase
+                    fullWidth
                     className={classes.advancedSearch}
-                    placeholder="recherche avancée dans les documents"
+                    placeholder="Recherche avancée dans les documents"
                     value={searchInput}
                     onChange={handleChangeInput}
                     multiline
                     rows={3}
                     endAdornment={
                       <InputAdornment position="end">
-                        <IconButton onClick={() => (handleClearInput(), setShowAreaText(false))}>
+                        <IconButton size="small" onClick={() => setHelpOpen(true)}>
+                          <InfoIcon />
+                        </IconButton>
+                        <IconButton size="small" onClick={() => handleClearInput()}>
                           <ClearIcon />
                         </IconButton>
                         <IconButton
+                          size="small"
                           type="submit"
                           aria-label="search"
                           onClick={() => onSearchDocument(_sortBy, _sortDirection)}
@@ -272,12 +309,6 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                       </InputAdornment>
                     }
                   />
-                </Grid>
-              ) : (
-                <Grid item container xs={12} justify="flex-end">
-                  <Typography variant="h6" style={{ cursor: 'pointer' }} onClick={() => setShowAreaText(true)}>
-                    Recherche avancée
-                  </Typography>
                 </Grid>
               )}
             </Grid>

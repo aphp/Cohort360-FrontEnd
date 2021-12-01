@@ -276,7 +276,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
 
   return (
     <Grid container item xs={11} justify="flex-end" className={classes.documentTable}>
-      <Grid item container justify="space-between" alignItems="center">
+      <Grid item container justify="space-between" alignItems="center" className={classes.filterAndSort}>
         <Tabs
           classes={{
             root: classes.root,

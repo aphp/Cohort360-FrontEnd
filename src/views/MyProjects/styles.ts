@@ -43,11 +43,11 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#5BC5F2',
     color: '#FFF',
     borderRadius: '25px',
-    margin: '0 4px',
+    marginLeft: 8,
     padding: '8px 12px'
   },
   addIconButton: {
-    margin: '0 4px',
+    marginLeft: 8,
     backgroundColor: '#5BC5F2',
     color: '#FFF'
   }
