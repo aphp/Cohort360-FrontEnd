@@ -52,11 +52,12 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   const { dashboard } = useAppSelector((state) => ({
     dashboard: state.exploredCohort
   }))
-  const { encounters, totalPatients } = dashboard
+  const { encounters } = dashboard
   const [page, setPage] = useState(1)
   const [documentsNumber, setDocumentsNumber] = useState<number | undefined>(0)
   const [allDocumentsNumber, setAllDocumentsNumber] = useState<number | undefined>(0)
   const [patientDocumentsNumber, setPatientDocumentsNumber] = useState<number | undefined>(0)
+  const [allPatientDocumentsNumber, setAllPatientDocumentsNumber] = useState<number | undefined>(0)
   const [documents, setDocuments] = useState<(CohortComposition | IDocumentReference)[]>([])
   const [loadingStatus, setLoadingStatus] = useState(true)
   const [searchInput, setSearchInput] = useState('')
@@ -123,10 +124,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     )
 
     if (result) {
-      const { totalDocs, totalAllDocs, documentsList, totalPatientDocs } = result
+      const { totalDocs, totalAllDocs, documentsList, totalPatientDocs, totalAllPatientDocs } = result
       setDocumentsNumber(totalDocs)
       setAllDocumentsNumber(totalAllDocs)
       setPatientDocumentsNumber(totalPatientDocs)
+      setAllPatientDocumentsNumber(totalAllPatientDocs)
       setPage(page)
       setDocuments(documentsList)
       setLoadingStatus(false)
@@ -217,7 +219,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                       {displayDigit(documentsNumber ?? 0)} / {displayDigit(allDocumentsNumber ?? 0)} document(s)
                     </Typography>
                     <Typography variant="button">
-                      {displayDigit(patientDocumentsNumber ?? 0)} / {displayDigit(totalPatients ?? 0)} patients(s)
+                      {displayDigit(patientDocumentsNumber ?? 0)} / {displayDigit(allPatientDocumentsNumber ?? 0)}{' '}
+                      patients(s)
                     </Typography>
                   </>
                 )}

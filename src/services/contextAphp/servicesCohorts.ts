@@ -125,6 +125,7 @@ export interface IServicesCohorts {
     totalDocs: number
     totalAllDocs: number
     totalPatientDocs: number
+    totalAllPatientDocs: number
     documentsList: IComposition[]
   }>
 
@@ -394,7 +395,8 @@ const servicesCohorts: IServicesCohorts = {
         ? fetchComposition({
             status: 'final',
             _list: groupId ? [groupId] : [],
-            size: 0
+            size: 0,
+            uniqueFacet: ['patient']
           })
         : null
     ])
@@ -402,6 +404,7 @@ const servicesCohorts: IServicesCohorts = {
     const totalDocs = docsList?.data?.resourceType === 'Bundle' ? docsList.data.total : 0
     const totalAllDocs =
       allDocsList !== null ? (allDocsList?.data?.resourceType === 'Bundle' ? allDocsList.data.total : 0) : totalDocs
+
     const totalPatientDocs =
       docsList?.data?.resourceType === 'Bundle'
         ? (
@@ -410,6 +413,14 @@ const servicesCohorts: IServicesCohorts = {
             }
           ).valueDecimal
         : 0
+    const totalAllPatientDocs =
+      allDocsList !== null
+        ? (
+            allDocsList?.data?.meta?.extension?.find((extension) => extension.url === 'unique-patient') || {
+              valueDecimal: 0
+            }
+          ).valueDecimal
+        : totalPatientDocs
 
     const documentsList = await getDocumentInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
 
@@ -417,6 +428,7 @@ const servicesCohorts: IServicesCohorts = {
       totalDocs: totalDocs ?? 0,
       totalAllDocs: totalAllDocs ?? 0,
       totalPatientDocs: totalPatientDocs ?? 0,
+      totalAllPatientDocs: totalAllPatientDocs ?? 0,
       documentsList
     }
   },
