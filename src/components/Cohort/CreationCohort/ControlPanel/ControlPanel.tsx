@@ -251,7 +251,7 @@ const ControlPanel: React.FC<{
 
         {moment().diff(lastUpdated, 'hours') > DISPLAY_ESTIMATE_LIMIT && (
           <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="info">
-            Attention l'estimation du nombre de patient correspondant à votre requête effectuée le{' '}
+            Attention l'estimation du nombre de patients correspondant à votre requête effectuée le{' '}
             {lastUpdated.format('DD/MM/YYYY')} est peut être dépassée, voulez vous la recalculer ?
             <Button
               onClick={() => _relaunchCount(true)}
