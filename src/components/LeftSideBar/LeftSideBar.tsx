@@ -354,7 +354,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               </Tooltip>
 
               <ListItemText className={classes.title} primary="Mes recherches" />
-              {displayPatientList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
+              {displaySearchList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
             </ListItem>
 
             <Collapse
