@@ -220,7 +220,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                     </Typography>
                     <Typography variant="button">
                       {displayDigit(patientDocumentsNumber ?? 0)} / {displayDigit(allPatientDocumentsNumber ?? 0)}{' '}
-                      patients(s)
+                      patient(s)
                     </Typography>
                   </>
                 )}
