@@ -2,15 +2,9 @@ import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import clsx from 'clsx'
 
-import { Document, Page } from 'react-pdf'
-
 import {
-  Button,
   Chip,
   CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
   Grid,
   IconButton,
   Paper,
@@ -33,7 +27,6 @@ import { ReactComponent as CancelIcon } from 'assets/icones/times.svg'
 import { ReactComponent as UserIcon } from 'assets/icones/user.svg'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
-import { FHIR_API_URL } from '../../../../constants'
 import { CohortComposition } from 'types'
 import {
   CompositionStatusKind,
@@ -41,7 +34,9 @@ import {
   IEncounter,
   IDocumentReference
 } from '@ahryman40k/ts-fhir-types/lib/R4'
-import services from 'services'
+
+import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
+
 // import { fetchDocumentContent } from 'services/cohortInfos'
 import { getDocumentStatus } from 'utils/documentsFormatter'
 
@@ -52,7 +47,7 @@ type DocumentRowTypes = {
   document: CohortComposition | IDocumentReference
   documentEncounter?: IEncounter
   showText: boolean
-  showIpp: boolean
+  showIpp?: boolean
   deidentified: boolean | null
   backgroundColor: string
 }
@@ -68,24 +63,6 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
   const history = useHistory()
   const classes = useStyles()
   const [pdfDialogOpen, setDocumentDialogOpen] = useState(false)
-  const [numPages, setNumPages] = useState<number>()
-  const [loading, setLoading] = useState(false)
-  const [documentContent, setDocumentContent] = useState<any>([])
-
-  const openPdfDialog = async (documentId?: string) => {
-    setDocumentDialogOpen(true)
-    if (deidentified && documentId) {
-      setLoading(true)
-      const doc = await services.cohorts.fetchDocumentContent(documentId)
-      if (doc) {
-        setLoading(false)
-        setDocumentContent(doc)
-      } else {
-        setLoading(false)
-        setDocumentContent(null)
-      }
-    }
-  }
 
   const getStatusShip = (type?: CompositionStatusKind | DocumentReferenceStatusKind) => {
     if (type === 'final' || type === 'current') {
@@ -184,60 +161,17 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
         </TableCell>
 
         <TableCell>
-          <IconButton onClick={() => openPdfDialog(row.id)}>
+          <IconButton onClick={() => setDocumentDialogOpen(true)}>
             <PdfIcon height="30px" fill="#ED6D91" />
           </IconButton>
 
-          <Dialog open={pdfDialogOpen} onClose={() => setDocumentDialogOpen(false)} maxWidth="xl">
-            <DialogContent className={classes.dialogContent}>
-              {deidentified &&
-                (loading ? (
-                  <CircularProgress className={classes.loadingDialog} />
-                ) : (
-                  <>
-                    {documentContent &&
-                      documentContent.map((section: any) => (
-                        <>
-                          <Typography variant="h6">{section.title}</Typography>
-                          <Typography
-                            key={section.title}
-                            dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }}
-                          />
-                        </>
-                      ))}
-                    {!documentContent && <Typography>Le contenu du document est introuvable.</Typography>}
-                  </>
-                ))}
-              {!deidentified && (
-                <Document
-                  error={'Le document est introuvable.'}
-                  loading={'PDF en cours de chargement...'}
-                  file={{
-                    url: `${FHIR_API_URL}/Binary/${row.id}`,
-                    httpHeaders: {
-                      Accept: 'application/pdf',
-                      Authorization: `Bearer ${localStorage.getItem('access')}`
-                    }
-                  }}
-                  onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-                >
-                  {Array.from(new Array(numPages), (el, index) => (
-                    <Page
-                      width={window.innerWidth * 0.9}
-                      key={`page_${index + 1}`}
-                      pageNumber={index + 1}
-                      loading={'Pages en cours de chargement...'}
-                    />
-                  ))}
-                </Document>
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button color="primary" onClick={() => setDocumentDialogOpen(false)}>
-                Fermer
-              </Button>
-            </DialogActions>
-          </Dialog>
+          <DocumentViewer
+            deidentified={deidentified ?? false}
+            open={pdfDialogOpen}
+            handleClose={() => setDocumentDialogOpen(false)}
+            documentId={row.id ?? ''}
+            list={groupId ? groupId.split(',') : undefined}
+          />
         </TableCell>
       </TableRow>
 
@@ -263,7 +197,7 @@ type DocumentTableTypes = {
   documents?: (CohortComposition | IDocumentReference)[]
   encounters?: IEncounter[]
   searchMode: boolean
-  showIpp: boolean
+  showIpp?: boolean
   deidentified: boolean | null
   sortBy?: string
   onChangeSortBy?: (_sortBy: string) => void

@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
-import { Document, Page, pdfjs } from 'react-pdf'
+
+import { CohortComposition } from 'types'
+import {
+  CompositionStatusKind,
+  DocumentReferenceStatusKind,
+  IDocumentReference
+} from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import {
-  Button,
   Chip,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
   Grid,
   IconButton,
   Paper,
@@ -24,46 +25,20 @@ import { ReactComponent as CancelIcon } from 'assets/icones/times.svg'
 import { ReactComponent as CheckIcon } from 'assets/icones/check.svg'
 import { ReactComponent as PdfIcon } from 'assets/icones/file-pdf.svg'
 
-import { FHIR_API_URL } from '../../../../constants'
+import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
+
+import { getDocumentStatus } from 'utils/documentsFormatter'
 
 import useStyles from './styles'
-import { CohortComposition } from 'types'
-import {
-  CompositionStatusKind,
-  DocumentReferenceStatusKind,
-  IDocumentReference
-} from '@ahryman40k/ts-fhir-types/lib/R4'
-import { getDocumentStatus } from 'utils/documentsFormatter'
-import services from 'services'
-// import { fetchDocumentContent } from 'services/cohortInfos'
-
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`
 
 type DocumentRowTypes = {
   deidentified: boolean
   document: CohortComposition | IDocumentReference
+  groupId: string
 }
-const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => {
+const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, groupId }) => {
   const classes = useStyles()
   const [documentDialogOpen, setDocumentDialogOpen] = useState(false)
-  const [numPages, setNumPages] = useState<number>()
-  const [loading, setLoading] = useState(false)
-  const [documentContent, setDocumentContent] = useState<any>([])
-
-  const openPdfDialog = async (documentId?: string) => {
-    setDocumentDialogOpen(true)
-    if (deidentified && documentId) {
-      setLoading(true)
-      const doc = await services.cohorts.fetchDocumentContent(documentId)
-      if (doc) {
-        setLoading(false)
-        setDocumentContent(doc)
-      } else {
-        setLoading(false)
-        setDocumentContent(null)
-      }
-    }
-  }
 
   const row = {
     ...document,
@@ -110,57 +85,19 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document }) => 
         <TableCell align="center">{row.serviceProvider}</TableCell>
         <TableCell align="center">{getStatusShip(row.status)}</TableCell>
         <TableCell align="center">
-          <IconButton onClick={() => openPdfDialog(row.id)}>
+          <IconButton onClick={() => setDocumentDialogOpen(true)}>
             <PdfIcon height="30px" fill="#ED6D91" />
           </IconButton>
         </TableCell>
       </TableRow>
 
-      <Dialog open={documentDialogOpen} onClose={() => setDocumentDialogOpen(false)} maxWidth="xl">
-        <DialogContent className={classes.dialogContent}>
-          {deidentified &&
-            (loading ? (
-              <CircularProgress className={classes.loadingDialog} />
-            ) : (
-              <>
-                {documentContent &&
-                  documentContent.map((section: any) => (
-                    <>
-                      <Typography variant="h6">{section.title}</Typography>
-                      <Typography key={section.title} dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }} />
-                    </>
-                  ))}
-                {!documentContent && <Typography>Le contenu du document est introuvable.</Typography>}
-              </>
-            ))}
-          {!deidentified && (
-            <Document
-              error={'Le document est introuvable.'}
-              loading={'PDF en cours de chargement...'}
-              file={{
-                url: `${FHIR_API_URL}/Binary/${row.id}`,
-                httpHeaders: {
-                  Accept: 'application/pdf',
-                  Authorization: `Bearer ${localStorage.getItem('access')}`
-                }
-              }}
-              onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-            >
-              {Array.from(new Array(numPages), (el, index) => (
-                <Page
-                  width={window.innerWidth * 0.9}
-                  key={`page_${index + 1}`}
-                  pageNumber={index + 1}
-                  loading={'Pages en cours de chargement...'}
-                />
-              ))}
-            </Document>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDocumentDialogOpen(false)}>Fermer</Button>
-        </DialogActions>
-      </Dialog>
+      <DocumentViewer
+        deidentified={deidentified ?? false}
+        open={documentDialogOpen}
+        handleClose={() => setDocumentDialogOpen(false)}
+        documentId={row.id ?? ''}
+        list={groupId ? groupId.split(',') : undefined}
+      />
     </>
   )
 }
@@ -173,6 +110,10 @@ type DocumentTableTypes = {
 }
 const DocumentTable: React.FC<DocumentTableTypes> = ({ deidentified, documents, page, documentLines }) => {
   const classes = useStyles()
+
+  const search = new URLSearchParams(location.search)
+  const groupId = search.get('groupId') ?? ''
+
   return (
     <>
       {documents && documents.length > 0 ? (
@@ -205,7 +146,12 @@ const DocumentTable: React.FC<DocumentTableTypes> = ({ deidentified, documents, 
             </TableHead>
             <TableBody>
               {documents.slice((page - 1) * documentLines, page * documentLines).map((document, index) => (
-                <DocumentRow key={`docRow ${index}`} document={document} deidentified={deidentified} />
+                <DocumentRow
+                  key={`docRow ${index}`}
+                  document={document}
+                  deidentified={deidentified}
+                  groupId={groupId}
+                />
               ))}
             </TableBody>
           </Table>
