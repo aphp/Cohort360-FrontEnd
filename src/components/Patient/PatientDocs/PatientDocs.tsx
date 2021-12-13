@@ -272,6 +272,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents
         )}
       </Grid>
       <DocumentList
+        groupId={groupId}
         loading={loadingStatus}
         documents={docs}
         searchMode={searchMode}
