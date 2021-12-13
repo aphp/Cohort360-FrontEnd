@@ -69,7 +69,7 @@ const PrivateRoute: React.FC<Props> = (props) => {
         <DialogActions>
           <Button
             onClick={() => {
-              localStorage.setItem('old-path', location.pathname)
+              localStorage.setItem('old-path', location.pathname + location.search)
               setRedirection(true)
             }}
             color="primary"
