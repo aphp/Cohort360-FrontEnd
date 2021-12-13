@@ -79,11 +79,10 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
             error={'Le document est introuvable.'}
             loading={'PDF en cours de chargement...'}
             file={{
-              url: `${FHIR_API_URL}/Binary/${documentId}/`,
+              url: `${FHIR_API_URL}/Binary/${documentId}?_list=${list}`,
               httpHeaders: {
                 Accept: 'application/pdf',
-                Authorization: `Bearer ${localStorage.getItem('access')}`,
-                _list: list
+                Authorization: `Bearer ${localStorage.getItem('access')}`
               }
             }}
             onLoadSuccess={({ numPages }) => setNumPages(numPages)}
