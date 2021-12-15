@@ -1,31 +1,21 @@
 import React from 'react'
-import { CONTEXT } from '../../../constants'
 
 import { Grid, Paper } from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
 
 import PatientField from './PatientField/PatientField'
 
 import { getAge } from 'utils/age'
-import { CohortPatient } from 'types'
+import { CohortPatient, IPatientDetails } from 'types'
 
 import useStyles from './styles'
 
 type PatientPreviewProps = {
-  patient?: CohortPatient
-  deidentified: boolean
-  mainLoading: boolean
+  patient?: IPatientDetails
+  deidentifiedBoolean: boolean
 }
-const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentified, mainLoading }) => {
+const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBoolean }) => {
   const classes = useStyles()
 
-  if (!mainLoading && !patient) {
-    return (
-      <Alert severity="error" className={classes.alert}>
-        Les données ne sont pas encore disponibles, veuillez réessayer ultérieurement.
-      </Alert>
-    )
-  }
   if (!patient) return <></>
 
   const lastEncounterStart = patient.lastEncounter?.period?.start
@@ -33,13 +23,17 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentified, 
 
   const birthDate = patient.birthDate ? new Date(patient.birthDate).toLocaleDateString('fr-FR') : ''
 
-  const age = getAge(patient)
+  const age = getAge({
+    ...patient,
+    lastGhm: patient.lastGhm !== 'loading' ? patient.lastGhm : undefined,
+    lastProcedure: patient.lastProcedure !== 'loading' ? patient.lastProcedure : undefined,
+    mainDiagnosis: patient.mainDiagnosis !== 'loading' ? patient.mainDiagnosis : undefined
+  } as CohortPatient)
 
   const mainDiagnosis = patient.mainDiagnosis
-    ? patient.mainDiagnosis
-        .slice(0, 3)
-        .map((diag) => diag.code?.coding?.[0].display)
-        .join(', ')
+    ? patient.mainDiagnosis === 'loading'
+      ? 'loading'
+      : patient.mainDiagnosis.slice(0, 3).map((diag: any) => diag.code?.coding?.[0].display)
     : 'Pas de diagnostic principal'
 
   const lastEncounter =
@@ -54,51 +48,31 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentified, 
           (new Date(lastEncounterEnd).getTime() - new Date(lastEncounterStart).getTime()) / (1000 * 60 * 60 * 24)
         )} jours`
       : '-'
+
   const lastProcedure = patient.lastProcedure
-    ? patient.lastProcedure?.code?.coding?.[0].code && patient.lastProcedure?.code?.coding?.[0].display
+    ? patient.lastProcedure === 'loading'
+      ? 'loading'
+      : patient.lastProcedure?.code?.coding?.[0].code && patient.lastProcedure?.code?.coding?.[0].display
     : '-'
-  const lastGhm = patient.lastGhm ? patient.lastGhm?.diagnosis?.[0].packageCode?.coding?.[0].display : '-'
+  const lastGhm = patient.lastGhm
+    ? patient.lastGhm === 'loading'
+      ? 'loading'
+      : patient.lastGhm?.diagnosis?.[0].packageCode?.coding?.[0].display
+    : '-'
 
   return (
     <Grid container direction="column" alignItems="center">
       <Grid component={Paper} container item sm={11} className={classes.patientTable}>
         <Grid container>
           <PatientField
-            fieldName={deidentified ? 'Âge' : 'Date de naissance'}
-            fieldValue={deidentified ? age : `${birthDate} (${age})`}
+            fieldName={deidentifiedBoolean ? 'Âge' : 'Date de naissance'}
+            fieldValue={deidentifiedBoolean ? age : `${birthDate} (${age})`}
           />
-          {CONTEXT === 'arkhn' && (
-            <>
-              <PatientField fieldName="Situation sociale" fieldValue={patient.maritalStatus?.coding?.[0].code} />
-              <PatientField fieldName="Adresse" fieldValue={patient.address?.[0].city} />
-            </>
-          )}
-          {mainDiagnosis && <PatientField fieldName="Diagnostics principaux" fieldValue={mainDiagnosis} />}
+          <PatientField fieldName="Diagnostics principaux" fieldValue={mainDiagnosis} />
           <PatientField fieldName="Dernière prise en charge" fieldValue={lastEncounter} />
           <PatientField fieldName="Durée de prise en charge" fieldValue={lastEncounterDuration} />
           <PatientField fieldName="Dernier acte" fieldValue={lastProcedure} />
           <PatientField fieldName="Dernier GHM" fieldValue={lastGhm} />
-          {patient.labResults && (
-            <PatientField
-              fieldName="Derniers résultats de laboratoire"
-              fieldValue={`${patient.lastLabResults?.code?.coding?.[0].display} ${
-                patient.lastLabResults?.effectiveDateTime
-                  ? `le ${new Date(patient.lastLabResults?.effectiveDateTime).toLocaleDateString('fr-FR')}`
-                  : ''
-              }
-              ${
-                patient.lastLabResults?.interpretation
-                  ? `(${patient.lastLabResults?.interpretation?.[0].coding?.[0].code})`
-                  : ''
-              }`}
-            />
-          )}
-          {patient.inclusion && (
-            <PatientField
-              fieldName="Inclusion du patient dans un essai clinique"
-              fieldValue={patient.inclusion ? 'Oui' : 'Non'}
-            />
-          )}
         </Grid>
       </Grid>
     </Grid>

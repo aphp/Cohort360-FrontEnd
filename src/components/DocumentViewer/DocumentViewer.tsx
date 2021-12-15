@@ -52,7 +52,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
   }, [open, documentId])
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} fullWidth maxWidth="lg" onClose={handleClose}>
       <DialogTitle id="document-viewer-dialog-title"></DialogTitle>
       <DialogContent id="document-viewer-dialog-content">
         {deidentified ? (

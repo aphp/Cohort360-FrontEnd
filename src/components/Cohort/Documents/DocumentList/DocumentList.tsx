@@ -334,7 +334,7 @@ const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
                 )
               })
             ) : (
-              <TableRow>
+              <TableRow className={classes.emptyTableRow}>
                 <TableCell colSpan={6}>
                   <Grid container justify="center">
                     <Typography variant="button"> Aucun document à afficher </Typography>

@@ -58,6 +58,11 @@ const useStyles = makeStyles((theme) => ({
     color: '#0063AF',
     padding: '0 20px',
     textTransform: 'uppercase'
+  },
+  emptyTableRow: {
+    minHeight: `calc(100vh - 500px)`,
+    height: `calc(100vh - 500px)`,
+    maxHeight: `calc(100vh - 500px)`
   }
 }))
 
