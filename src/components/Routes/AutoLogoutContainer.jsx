@@ -51,7 +51,7 @@ const AutoLogoutContainer = () => {
         localStorage.setItem(ACCES_TOKEN, res.data.access)
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
         axios.post('/api/portail/accounts/refresh/', {
-          refresh: localStorage.getItem(REFRESH_TOKEN)
+          refresh: res.data.refresh
         })
         setDialogIsOpen(false)
         // console.log('User est resté connecté')
@@ -77,7 +77,7 @@ const AutoLogoutContainer = () => {
           localStorage.setItem(ACCES_TOKEN, res.data.access)
           localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
           await axios.post('/api/portail/accounts/refresh/', {
-            refresh: localStorage.getItem(REFRESH_TOKEN)
+            refresh: res.data.refresh
           })
         } else {
           logout()
