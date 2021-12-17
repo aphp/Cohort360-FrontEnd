@@ -26,6 +26,7 @@ import {
 } from '@material-ui/core'
 
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
+import InfoIcon from '@material-ui/icons/Info'
 
 import { ReactComponent as Star } from 'assets/icones/star.svg'
 import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
@@ -196,7 +197,14 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                     )}
                   </TableCell>
                   <TableCell className={classes.tableHeadCell} align="center">
-                    Estimation du nombre de patients APHP
+                    <Grid style={{ position: 'relative' }}>
+                      Estimation du nombre de patients APHP
+                      <Tooltip title="Cet interval correspond à une estimation du nombre de patients correspondant aux critères de votre requête avec comme population source tous les hopitaux de l'APHP">
+                        <IconButton size="small" className={classes.infoButton}>
+                          <InfoIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Grid>
                   </TableCell>
                   <TableCell
                     align="center"
