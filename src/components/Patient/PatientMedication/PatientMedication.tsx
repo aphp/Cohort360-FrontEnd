@@ -123,7 +123,6 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
 
     setSort({ by: property, direction: newDirection })
     setPage(1)
-    _fetchMedication(1)
   }
 
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
@@ -357,15 +356,6 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
                     Code UCD
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  <TableSortLabel
-                    active={sort.by === 'medication-text'}
-                    direction={sort.by === 'medication-text' ? sort.direction : 'asc'}
-                    onClick={handleSort('medication-text')}
-                  >
-                    Libellé
-                  </TableSortLabel>
-                </TableCell>
                 {selectedTab === 'prescription' && (
                   <TableCell align="center" className={classes.tableHeadCell}>
                     <TableSortLabel
@@ -411,9 +401,10 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
                         ? row.dispenseRequest?.validityPeriod?.start
                         : row.effectivePeriod?.start
                     const codeATC = selectedTab === 'prescription' ? row.category?.[0]?.id : row.category?.id
+                    const displayATC = selectedTab === 'prescription' ? row.category?.[0]?.text : row.category?.text
 
                     const codeUCD = row.contained?.[0]?.code?.coding?.[0]?.id
-                    const name = row.contained?.[0]?.code?.coding?.[0]?.display
+                    const displayUCD = row.contained?.[0]?.code?.coding?.[0]?.display
 
                     const prescriptionType =
                       selectedTab === 'prescription' &&
@@ -434,10 +425,21 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
                         <TableCell align="center">
                           {date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}
                         </TableCell>
-                        <TableCell align="center">{codeATC === 'No matching concept' ? '-' : codeATC ?? '-'}</TableCell>
-                        <TableCell align="center">{codeUCD === 'No matching concept' ? '-' : codeUCD ?? '-'}</TableCell>
-                        <TableCell align="center" className={classes.libelle}>
-                          {name === 'No matching concept' ? '-' : name ?? '-'}
+                        <TableCell align="center">
+                          <Typography>
+                            {codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : codeATC ?? ''}
+                          </Typography>
+                          <Typography className={classes.libelle}>
+                            {displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Typography>
+                            {codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : codeUCD ?? ''}
+                          </Typography>
+                          <Typography className={classes.libelle}>
+                            {displayUCD === 'No matching concept' ? '-' : displayUCD ?? '-'}
+                          </Typography>
                         </TableCell>
                         {selectedTab === 'prescription' && (
                           <TableCell align="center">{prescriptionType ?? '-'}</TableCell>
