@@ -215,7 +215,12 @@ const ModalCreateNewRequest: React.FC<{
               Supprimer
             </Button>
           ) : (
-            <Button disabled={loading} onClick={() => setTab(tab === 'form' ? 'open' : 'form')}>
+            <Button
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              onClick={() => setTab(tab === 'form' ? 'open' : 'form')}
+            >
               {tab === 'form' ? 'Ouvrir' : 'Nouvelle requête'}
             </Button>
           )}
