@@ -90,6 +90,11 @@ export default makeStyles((theme) =>
     },
     filterAndSort: {
       '& > *': { marginBottom: 5 }
+    },
+    emptyTableRow: {
+      minHeight: `calc(100vh - 500px)`,
+      height: `calc(100vh - 500px)`,
+      maxHeight: `calc(100vh - 500px)`
     }
   })
 )

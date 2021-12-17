@@ -31,10 +31,10 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   leftIndicator: {
-    left: theme.spacing(2)
+    left: theme.spacing(6)
   },
   rightIndicator: {
-    right: theme.spacing(2)
+    right: theme.spacing(6)
   },
   dotIndicatorContainer: {
     position: 'absolute',
@@ -49,8 +49,6 @@ const useStyles = makeStyles((theme) => ({
   },
   videoResponsive: {
     overflow: 'hidden',
-    position: 'relative',
-    height: 0,
     '& iframe': {
       left: 0,
       top: 0,

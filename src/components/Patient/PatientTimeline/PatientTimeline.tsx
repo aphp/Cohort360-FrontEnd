@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
-
+import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import { useParams } from 'react-router-dom'
 import moment from 'moment'
 
 import Grid from '@material-ui/core/Grid'
@@ -13,6 +14,8 @@ import MoreVertIcon from '@material-ui/icons/MoreVert'
 
 import { CohortComposition, CohortEncounter, PMSIEntry } from 'types'
 import { IEncounter, IProcedure, IDocumentReference, IPeriod } from '@ahryman40k/ts-fhir-types/lib/R4'
+
+import { fetchAllProcedures } from 'state/patient'
 
 import useStyles from './styles'
 
@@ -98,19 +101,42 @@ type PatientTimelineTypes = {
   deidentified: boolean
   documents?: (CohortComposition | IDocumentReference)[]
   hospits?: CohortEncounter[]
-  consults?: PMSIEntry<IProcedure>[]
+  consults?: IProcedure[]
 }
 const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits, consults }) => {
+  const dispatch = useDispatch()
   const classes = useStyles()
-  const timelineData = generateTimelineFormattedData(hospits, consults)
+  const [timelineData, setTimelineData] = useState<TimelineData>({})
   const [openHospitDialog, setOpenHospitDialog] = useState(false)
   const [dialogDocuments, setDialogDocuments] = useState<(CohortComposition | IDocumentReference)[] | undefined>([])
   const [loading, setLoading] = useState(false)
   const yearComponentSize: { [year: number]: number } = {}
 
-  let yearList: number[] = Object.keys(timelineData)
-    .map((key) => parseInt(key))
-    .reverse()
+  const search = new URLSearchParams(location.search)
+  const groupId = search.get('groupId') ?? undefined
+
+  const { patientId } = useParams<{ patientId: string }>()
+
+  useEffect(() => {
+    dispatch(
+      fetchAllProcedures({
+        patientId,
+        groupId
+      })
+    )
+  }, [])
+
+  useEffect(() => {
+    const _timelineData = generateTimelineFormattedData(hospits, consults)
+    setTimelineData(_timelineData)
+  }, [hospits, consults])
+
+  let yearList: number[] = timelineData
+    ? Object.keys(timelineData)
+        .map((key) => parseInt(key))
+        .filter((elem) => !isNaN(elem))
+        .reverse()
+    : []
 
   const timelinePeriod = {
     start: yearList[yearList.length - 1],
@@ -147,13 +173,15 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits
     const isConsultDuringYearSearched = (consult: { start?: string | undefined; end?: string | undefined }) =>
       new Date(consult.start ?? '').getFullYear() === yearSearched
 
-    return Object.keys(timelineData).some((year) =>
-      Object.keys(timelineData[year]).some(
-        (month) =>
-          timelineData[year][month].hospit.some((hospit) => isHospitDuringYearSearched(hospit)) ||
-          timelineData[year][month].consult.some((consult) => isConsultDuringYearSearched(consult))
-      )
-    )
+    return timelineData
+      ? Object.keys(timelineData).some((year) =>
+          Object.keys(timelineData[year]).some(
+            (month) =>
+              timelineData[year][month].hospit.some((hospit) => isHospitDuringYearSearched(hospit)) ||
+              timelineData[year][month].consult.some((consult) => isConsultDuringYearSearched(consult))
+          )
+        )
+      : false
   }
 
   const getMonthComponent = (monthVisits: MonthVisit) => {

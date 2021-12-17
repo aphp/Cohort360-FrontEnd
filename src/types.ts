@@ -511,3 +511,80 @@ export type CohortType = {
 }
 
 export type ContactSubmitForm = FormData
+
+/**
+ * Patient State Types
+ */
+
+export type IPatientDetails = IPatient & {
+  lastEncounter?: IEncounter
+  lastGhm?: IClaim | 'loading'
+  lastProcedure?: IProcedure | 'loading'
+  mainDiagnosis?: ICondition[] | 'loading'
+}
+
+export type IPatientDocuments = {
+  loading: boolean
+  count: number
+  total: number
+  list: CohortComposition[]
+  page: number
+  options?: {
+    filters?: {
+      searchInput: string
+      nda: string
+      selectedDocTypes: string[]
+      startDate: string | null
+      endDate: string | null
+    }
+    sort?: {
+      by: string
+      direction: string
+    }
+  }
+}
+
+export type IPatientPmsi<T extends IProcedure | ICondition | IClaim> = {
+  loading: boolean
+  count: number
+  total: number
+  list: T[]
+  page: number
+  options?: {
+    filters?: {
+      searchInput: string
+      nda: string
+      startDate: string | null
+      endDate: string | null
+      code?: string
+      diagnosticTypes?: string[]
+    }
+    sort?: {
+      by: string
+      direction: string
+    }
+  }
+}
+
+export type IPatientMedication<T extends IMedicationRequest | IMedicationAdministration> = {
+  loading: boolean
+  count: number
+  total: number
+  list: T[]
+  page: number
+  options?: {
+    filters?: {
+      searchInput: string
+      nda: string
+      startDate: string | null
+      endDate: string | null
+      code?: string
+      selectedPrescriptionTypes?: { id: string; label: string }[]
+      selectedAdministrationRoutes?: { id: string; label: string }[]
+    }
+    sort?: {
+      by: string
+      direction: string
+    }
+  }
+}

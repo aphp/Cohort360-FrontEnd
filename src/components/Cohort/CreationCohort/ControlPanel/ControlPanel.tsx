@@ -10,6 +10,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack'
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
 import UpdateSharpIcon from '@material-ui/icons/UpdateSharp'
 import HighlightOffIcon from '@material-ui/icons/HighlightOff'
+import InfoIcon from '@material-ui/icons/Info'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 
@@ -36,7 +37,7 @@ const ControlPanel: React.FC<{
   const classes = useStyle()
   const dispatch = useDispatch()
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
-  const [oldCount, setOldCount] = useState<number | null>(null)
+  const [oldCount, setOldCount] = useState<any | null>(null)
 
   const {
     loading = false,
@@ -87,7 +88,7 @@ const ControlPanel: React.FC<{
   }
 
   const _relaunchCount = (keepCount: boolean) => {
-    if (keepCount) setOldCount(count.includePatient ?? null)
+    if (keepCount) setOldCount(count ?? null)
     dispatch<any>(
       countCohortCreation({
         json,
@@ -100,6 +101,7 @@ const ControlPanel: React.FC<{
   const itLoads = loading || countLoading || saveLoading
   const errorCriteria = selectedCriteria.filter((criteria) => criteria.error)
   const lastUpdated = moment(count.date)
+  const lastUpdatedOldCount = oldCount ? moment(oldCount.date) : null
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -197,19 +199,34 @@ const ControlPanel: React.FC<{
                 className={clsx(classes.blueText, classes.sidesMargin)}
               />
             ) : (
-              <Typography
-                className={clsx(classes.boldText, classes.patientTypo, {
-                  [classes.blueText]: includePatient ? includePatient <= 20000 : true,
-                  [classes.redText]: includePatient ? includePatient > 20000 : false
-                })}
-              >
-                {includePatient !== undefined && includePatient !== null ? displayDigit(includePatient) : '-'}
-                {oldCount !== null
-                  ? (includePatient ?? 0) - oldCount > 0
-                    ? ` (+${(includePatient ?? 0) - oldCount})`
-                    : ` (${(includePatient ?? 0) - oldCount})`
-                  : ''}
-              </Typography>
+              <Grid container alignItems="center" style={{ width: 'fit-content' }}>
+                <Typography
+                  className={clsx(classes.boldText, classes.patientTypo, {
+                    [classes.blueText]: includePatient ? includePatient <= 20000 : true,
+                    [classes.redText]: includePatient ? includePatient > 20000 : false
+                  })}
+                >
+                  {includePatient !== undefined && includePatient !== null ? displayDigit(includePatient) : '-'}
+                  {oldCount !== null
+                    ? (includePatient ?? 0) - oldCount?.includePatient > 0
+                      ? ` (+${(includePatient ?? 0) - oldCount?.includePatient})`
+                      : ` (${(includePatient ?? 0) - oldCount?.includePatient})`
+                    : ''}
+                </Typography>
+                {oldCount !== null && (
+                  <Tooltip
+                    title={`Le delta ${
+                      (includePatient ?? 0) - oldCount?.includePatient > 0
+                        ? ` (+${(includePatient ?? 0) - oldCount?.includePatient})`
+                        : ` (${(includePatient ?? 0) - oldCount?.includePatient})`
+                    } est la différence de patient entre le ${lastUpdatedOldCount?.format(
+                      'DD/MM/YYYY'
+                    )} et la date du jour.`}
+                  >
+                    <InfoIcon />
+                  </Tooltip>
+                )}
+              </Grid>
             )}
           </Grid>
         </Grid>

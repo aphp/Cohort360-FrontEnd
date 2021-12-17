@@ -25,7 +25,14 @@ import {
 } from 'utils/graphUtils'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
-import { fetchGroup, fetchPatient, fetchEncounter, fetchComposition, fetchCompositionContent } from './callApi'
+import {
+  fetchGroup,
+  fetchPatient,
+  fetchEncounter,
+  fetchComposition,
+  fetchCompositionContent,
+  fetchBinary
+} from './callApi'
 
 import apiBackend from '../apiBackend'
 import apiPortail from '../apiPortail'
@@ -139,6 +146,17 @@ export interface IServicesCohorts {
    *   - IComposition_Section: Contenue du document
    */
   fetchDocumentContent: (compositionId: string) => Promise<IComposition_Section[]>
+
+  /**
+   * Permet de recuperer le contenue d'un document (/Binary)
+   *
+   * Argument:
+   *   - documentId: Identifiant du documents
+   *
+   * Retoune:
+   *   - IComposition_Section: Contenue du document
+   */
+  fetchBinary: (documentId: string, list?: string[]) => Promise<any>
 
   /**
    * Permet la récupération des droits d'export lié a une cohorte
@@ -436,6 +454,13 @@ const servicesCohorts: IServicesCohorts = {
   fetchDocumentContent: async (compositionId) => {
     const documentContent = await fetchCompositionContent(compositionId)
     return documentContent
+  },
+
+  fetchBinary: async (documentId, list) => {
+    const documentBinary = await fetchBinary({ _id: documentId, _list: list })
+
+    // @ts-ignore
+    return documentBinary && documentBinary.entry && documentBinary.entry[0] && documentBinary.entry[0].resource
   },
 
   fetchCohortExportRight: async (cohortId, providerId) => {

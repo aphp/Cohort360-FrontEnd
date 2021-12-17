@@ -24,7 +24,9 @@ const PatientSearchCard = () => {
           <Typography variant="h6">Fonctionnalité désactivée en mode pseudonymisé.</Typography>
         </Grid>
       ) : (
-        <PatientSearchBar />
+        <Grid container direction="column" justifyContent="space-evenly" style={{ height: '100%', marginTop: 8 }}>
+          <PatientSearchBar />
+        </Grid>
       )}
     </>
   )
