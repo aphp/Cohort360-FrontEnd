@@ -464,12 +464,13 @@ type fetchConditionProps = {
 export const fetchCondition = async (args: fetchConditionProps) => {
   const { size, offset, _sort, sortDirection, subject, patient, code, _text, status } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
-  let { _list } = args
+  let { _list, type } = args
   const encounterIdentifier = args['encounter.identifier']
   const minRecordedDate = args['min-recorded-date']
   const maxRecordedDate = args['max-recorded-date']
 
   _list = _list ? _list.filter(uniq) : []
+  type = type ? type.filter(uniq) : []
 
   let options: string[] = []
   if (size !== undefined)                          options = [...options, `size=${size}`]                                                       // eslint-disable-line
@@ -485,6 +486,7 @@ export const fetchCondition = async (args: fetchConditionProps) => {
   if (maxRecordedDate)                             options = [...options, `recorded-date=le${maxRecordedDate}`]                                 // eslint-disable-line
 
   if (_list && _list.length > 0)                   options = [...options, `_list=${_list.reduce(reducer)}`]                                     // eslint-disable-line
+  if (type && type.length > 0)                     options = [...options, `type=${type.reduce(reducer)}`]                                       // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<ICondition>>(`/Condition?${options.reduce(optionsReducer)}`)
 
