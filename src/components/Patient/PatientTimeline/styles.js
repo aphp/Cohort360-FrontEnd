@@ -27,6 +27,13 @@ const useStyles = makeStyles({
       transform: 'translateX(-50%)'
     }
   },
+  loadingContainer: {
+    display: 'flex',
+    width: '50%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: '50%'
+  },
 
   timeline: {
     display: 'flex',

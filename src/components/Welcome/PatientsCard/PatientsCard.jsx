@@ -33,10 +33,10 @@ const PatientSearchCard = () => {
       <Title>{loading ? <CircularProgress size={20} /> : displayDigit(patientNb)} patients pris en charge</Title>
       <Divider />
       <Grid container direction="column" justifyContent="space-evenly" style={{ height: '100%', marginTop: 8 }}>
-        <Button href="/mes_patients" variant="contained" disableElevation className={classes.button}>
+        <Button href="/mes_patients" size="small" variant="contained" disableElevation className={classes.button}>
           Explorer tous les patients
         </Button>
-        <Button href="/perimetre" variant="contained" disableElevation className={classes.button}>
+        <Button href="/perimetre" size="small" variant="contained" disableElevation className={classes.button}>
           Explorer un périmètre
         </Button>
       </Grid>

@@ -62,13 +62,19 @@ const TimelineItemLeft: React.FC<TimelineItemLeftTypes> = ({ data, open, dotHeig
                     : ''
                 }`} */}
               </div>
-              <div className={classes.hospitDates}>
-                {data.period?.start
-                  ? `Du ${new Date(data.period.start).toLocaleDateString('fr-FR')} au ${
-                      data.period.end ? new Date(data.period.end).toLocaleDateString('fr-FR') : '-'
-                    }`
-                  : 'Pas de date'}
-              </div>
+              {data?.class?.code === 'ext' ? (
+                <div className={classes.hospitDates}>
+                  {data.period?.start ? `Le ${new Date(data.period.start).toLocaleDateString('fr-FR')}` : 'Pas de date'}
+                </div>
+              ) : (
+                <div className={classes.hospitDates}>
+                  {data.period?.start
+                    ? `Du ${new Date(data.period.start).toLocaleDateString('fr-FR')} au ${
+                        data.period.end ? new Date(data.period.end).toLocaleDateString('fr-FR') : '-'
+                      }`
+                    : 'Pas de date'}
+                </div>
+              )}
             </div>
           </div>
         </Card>

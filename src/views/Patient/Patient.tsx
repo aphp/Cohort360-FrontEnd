@@ -158,9 +158,11 @@ const Patient = () => {
           )}
           {selectedTab === 'parcours' && (
             <PatientTimeline
+              loadingPmsi={(patient?.pmsi?.ccam?.loading || patient?.pmsi?.diagnostic?.loading) ?? false}
               documents={patient?.documents?.list ?? []}
               hospits={patient?.hospits?.list ?? []}
               consults={patient?.pmsi?.ccam?.list ?? []}
+              diagnostics={patient?.pmsi?.diagnostic?.list ?? []}
               deidentified={deidentified}
             />
           )}
