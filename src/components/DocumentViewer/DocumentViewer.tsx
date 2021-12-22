@@ -8,6 +8,7 @@ import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
+import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 
 import { Document, Page, pdfjs } from 'react-pdf'
@@ -51,8 +52,14 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
     }
   }, [open, documentId])
 
+  const pdfViewerContainerStyle = {
+    width: '75%',
+    zoom: 0.75,
+    margin: 'auto'
+  }
+
   return (
-    <Dialog open={open} fullWidth maxWidth="lg" onClose={handleClose}>
+    <Dialog open={open} fullWidth maxWidth="xl" onClose={handleClose}>
       <DialogTitle id="document-viewer-dialog-title"></DialogTitle>
       <DialogContent id="document-viewer-dialog-content">
         {deidentified ? (
@@ -75,27 +82,29 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
             </>
           )
         ) : (
-          <Document
-            error={'Le document est introuvable.'}
-            loading={'PDF en cours de chargement...'}
-            file={{
-              url: `${FHIR_API_URL}/Binary/${documentId}${list ? `:${list}` : ''}`,
-              httpHeaders: {
-                Accept: 'application/pdf',
-                Authorization: `Bearer ${localStorage.getItem('access')}`
-              }
-            }}
-            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-          >
-            {Array.from(new Array(numPages), (el, index) => (
-              <Page
-                width={window.innerWidth * 0.9}
-                key={`page_${index + 1}`}
-                pageNumber={index + 1}
-                loading={'Pages en cours de chargement...'}
-              />
-            ))}
-          </Document>
+          <Grid style={pdfViewerContainerStyle}>
+            <Document
+              error={'Le document est introuvable.'}
+              loading={'PDF en cours de chargement...'}
+              file={{
+                url: `${FHIR_API_URL}/Binary/${documentId}${list ? `:${list}` : ''}`,
+                httpHeaders: {
+                  Accept: 'application/pdf',
+                  Authorization: `Bearer ${localStorage.getItem('access')}`
+                }
+              }}
+              onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+            >
+              {Array.from(new Array(numPages), (el, index) => (
+                <Page
+                  width={window.innerWidth * 0.9}
+                  key={`page_${index + 1}`}
+                  pageNumber={index + 1}
+                  loading={'Pages en cours de chargement...'}
+                />
+              ))}
+            </Document>
+          </Grid>
         )}
       </DialogContent>
       <DialogActions>
