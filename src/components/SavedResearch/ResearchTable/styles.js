@@ -40,6 +40,14 @@ const useStyles = makeStyles(() => ({
       width: 24,
       marginRight: 8
     }
+  },
+  infoButton: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    '& svg': {
+      fontSize: 20
+    }
   }
 }))
 

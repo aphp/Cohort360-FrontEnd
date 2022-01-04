@@ -3,17 +3,19 @@ import { useDispatch } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import moment from 'moment'
 
+import CircularProgress from '@material-ui/core/CircularProgress'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 
-import TimelineItemRight from './TimelineItemRight'
+import TimelineItemRightProcedure from './TimelineItemRightProcedure'
+import TimelineItemRightCondition from './TimelineItemRightCondition'
 import TimelineItemLeft from './TimelineItemLeft'
 import HospitDialog from './HospitDialog/HospitDialog'
 
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 
 import { CohortComposition, CohortEncounter, PMSIEntry } from 'types'
-import { IEncounter, IProcedure, IDocumentReference, IPeriod } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IEncounter, IProcedure, IDocumentReference, IPeriod, ICondition } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import { fetchAllProcedures } from 'state/patient'
 
@@ -27,10 +29,10 @@ type MonthVisit = {
     end?: string
     data: IEncounter | CohortEncounter
   }[]
-  consult: {
+  pmsi: {
     start?: string
     end?: string
-    data: PMSIEntry<IProcedure>
+    data: PMSIEntry<IProcedure | ICondition>
   }[]
 }
 
@@ -40,7 +42,7 @@ type TimelineData = {
   }
 }
 
-const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<IProcedure>) => {
+const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<IProcedure> | PMSIEntry<ICondition>) => {
   const dataItem: {
     start?: string
     end?: string
@@ -48,8 +50,10 @@ const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<IProcedu
   let date = moment()
   if (item.resourceType === 'Encounter') {
     date = moment(item.period?.start ?? item.meta?.lastUpdated, dateFormat)
-  } else {
+  } else if (item.resourceType === 'Procedure') {
     date = moment(item.performedDateTime ?? item.meta?.lastUpdated, dateFormat)
+  } else {
+    date = moment(item.recordedDate ?? item.meta?.lastUpdated, dateFormat)
   }
   const yearStr = date.format('YYYY')
   const monthStr = date.format('MM')
@@ -62,7 +66,8 @@ const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<IProcedu
 
 const generateTimelineFormattedData = (
   hospits?: CohortEncounter[],
-  consults?: PMSIEntry<IProcedure>[]
+  consults?: PMSIEntry<IProcedure>[],
+  diagnostics?: PMSIEntry<ICondition>[]
 ): TimelineData => {
   const data: TimelineData = {}
 
@@ -71,7 +76,7 @@ const generateTimelineFormattedData = (
     data[yearStr] = data[yearStr] ?? {}
     data[yearStr][monthStr] = data[yearStr][monthStr] ?? {
       hospit: [],
-      consult: []
+      pmsi: []
     }
     data[yearStr][monthStr].hospit.push({ ...dataItem, data: item })
   })
@@ -80,9 +85,18 @@ const generateTimelineFormattedData = (
     data[yearStr] = data[yearStr] ?? {}
     data[yearStr][monthStr] = data[yearStr][monthStr] ?? {
       hospit: [],
-      consult: []
+      pmsi: []
     }
-    data[yearStr][monthStr].consult.push({ ...dataItem, data: item })
+    data[yearStr][monthStr].pmsi.push({ ...dataItem, data: item })
+  })
+  diagnostics?.forEach((item) => {
+    const { dataItem, monthStr, yearStr } = getTimelineFormattedDataItem(item)
+    data[yearStr] = data[yearStr] ?? {}
+    data[yearStr][monthStr] = data[yearStr][monthStr] ?? {
+      hospit: [],
+      pmsi: []
+    }
+    data[yearStr][monthStr].pmsi.push({ ...dataItem, data: item })
   })
 
   return data
@@ -98,12 +112,20 @@ const generateTimelineFormattedData = (
  */
 
 type PatientTimelineTypes = {
+  loadingPmsi: boolean
   deidentified: boolean
   documents?: (CohortComposition | IDocumentReference)[]
   hospits?: CohortEncounter[]
   consults?: IProcedure[]
+  diagnostics?: ICondition[]
 }
-const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits, consults }) => {
+const PatientTimeline: React.FC<PatientTimelineTypes> = ({
+  loadingPmsi,
+  deidentified,
+  hospits,
+  consults,
+  diagnostics
+}) => {
   const dispatch = useDispatch()
   const classes = useStyles()
   const [timelineData, setTimelineData] = useState<TimelineData>({})
@@ -127,9 +149,9 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits
   }, [])
 
   useEffect(() => {
-    const _timelineData = generateTimelineFormattedData(hospits, consults)
+    const _timelineData = generateTimelineFormattedData(hospits, consults, diagnostics)
     setTimelineData(_timelineData)
-  }, [hospits, consults])
+  }, [hospits, consults, diagnostics])
 
   let yearList: number[] = timelineData
     ? Object.keys(timelineData)
@@ -178,7 +200,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits
           Object.keys(timelineData[year]).some(
             (month) =>
               timelineData[year][month].hospit.some((hospit) => isHospitDuringYearSearched(hospit)) ||
-              timelineData[year][month].consult.some((consult) => isConsultDuringYearSearched(consult))
+              timelineData[year][month].pmsi.some((pmsi) => isConsultDuringYearSearched(pmsi))
           )
         )
       : false
@@ -223,15 +245,15 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits
             ))}
           </div>
         )}
-        {monthVisits.consult && (
+        {monthVisits.pmsi && (
           <div className={classes.rightElements}>
-            {monthVisits.consult.map((consult, index) => (
-              <TimelineItemRight
-                key={`procedure ${consult.data.id ?? index}`}
-                data={consult.data}
-                open={handleClickOpenHospitDialog}
-              />
-            ))}
+            {monthVisits.pmsi.map((pmsi, index) =>
+              pmsi.data.resourceType === 'Procedure' ? (
+                <TimelineItemRightProcedure key={`procedure ${pmsi.data.id ?? index}`} data={pmsi.data} />
+              ) : (
+                <TimelineItemRightCondition key={`condition ${pmsi.data.id ?? index}`} data={pmsi.data} />
+              )
+            )}
           </div>
         )}
       </>
@@ -278,6 +300,12 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits
             documents={dialogDocuments}
             deidentified={deidentified}
           />
+
+          {loadingPmsi && (
+            <div className={classes.loadingContainer}>
+              <CircularProgress size={25} />
+            </div>
+          )}
           <div className={classes.centeredTimeline}>
             <div className={classes.verticalBar} />
             {yearList.map((year) => (

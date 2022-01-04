@@ -316,7 +316,12 @@ type FetchAllProceduresParams = {
   patientId: string
   groupId?: string
 }
-type FetchAllProceduresReturn = { ccam?: IPatientPmsi<IProcedure> } | undefined
+type FetchAllProceduresReturn =
+  | {
+      ccam?: IPatientPmsi<IProcedure>
+      diagnostic?: IPatientPmsi<ICondition>
+    }
+  | undefined
 const fetchAllProcedures = createAsyncThunk<FetchAllProceduresReturn, FetchAllProceduresParams, { state: RootState }>(
   'patient/fetchAllProcedures',
   async ({ patientId, groupId }, { getState }) => {
@@ -325,30 +330,53 @@ const fetchAllProcedures = createAsyncThunk<FetchAllProceduresReturn, FetchAllPr
 
       const deidentified = patientState?.deidentified ?? true
       const hospits = patientState?.hospits?.list ?? []
-      const total = patientState?.pmsi?.ccam?.total ?? 0
-      let count = patientState?.pmsi?.ccam?.list.length ?? 0
+      // CCAM Variables:
+      const ccamTotal = patientState?.pmsi?.ccam?.total ?? 0
+      let ccamCount = patientState?.pmsi?.ccam?.list.length ?? 0
 
-      if (total - count <= 0)
-        return {
-          ccam: patientState?.pmsi?.ccam
-            ? {
-                ...patientState?.pmsi?.ccam,
-                loading: false
-              }
-            : undefined
-        }
+      // CIM10 Variables:
+      const diagnosticTotal = patientState?.pmsi?.diagnostic?.total ?? 0
+      let diagnosticCount = patientState?.pmsi?.diagnostic?.list.length ?? 0
 
-      const procedureResponse = await services.patients.fetchAllProcedures(patientId, groupId ?? '', total - count)
-      let ccamList: IProcedure[] = linkElementWithEncounter(procedureResponse as IProcedure[], hospits, deidentified)
+      // API Calls:
+      const [ccamResponses, diagnosticResponses] = await Promise.all([
+        ccamTotal - ccamCount !== 0
+          ? services.patients.fetchAllProcedures(patientId, groupId ?? '', ccamTotal - ccamCount)
+          : null,
+        diagnosticTotal - diagnosticCount !== 0
+          ? services.patients.fetchMainDiagnostics(patientId, groupId ?? '', diagnosticTotal - diagnosticCount)
+          : null
+      ])
+
+      // CCAM List:
+      let ccamList: IProcedure[] = ccamResponses
+        ? linkElementWithEncounter(ccamResponses as IProcedure[], hospits, deidentified)
+        : []
       ccamList = patientState?.pmsi?.ccam?.list ? [...patientState?.pmsi?.ccam?.list, ...ccamList] : ccamList
-      count = ccamList.length
+      ccamCount = ccamList.length
+
+      // CIM10 List:
+      let diagnosticList: ICondition[] = diagnosticResponses
+        ? linkElementWithEncounter(diagnosticResponses as ICondition[], hospits, deidentified)
+        : []
+      diagnosticList = patientState?.pmsi?.diagnostic?.list
+        ? [...patientState?.pmsi?.diagnostic?.list, ...diagnosticList]
+        : diagnosticList
+      diagnosticCount = diagnosticList.length
 
       return {
         ccam: {
           loading: false,
-          count,
-          total: total ?? count,
+          count: ccamCount,
+          total: ccamTotal ?? ccamCount,
           list: ccamList,
+          page: 1
+        },
+        diagnostic: {
+          loading: false,
+          count: diagnosticCount,
+          total: diagnosticTotal ?? diagnosticCount,
+          list: diagnosticList,
           page: 1
         }
       }
@@ -589,6 +617,12 @@ const patientSlice = createSlice({
                         ...state.pmsi.ccam,
                         loading: true
                       }
+                    : undefined,
+                  diagnostic: state.pmsi.diagnostic
+                    ? {
+                        ...state.pmsi.diagnostic,
+                        loading: true
+                      }
                     : undefined
                 }
               : undefined
@@ -603,10 +637,12 @@ const patientSlice = createSlice({
             pmsi: state?.pmsi
               ? {
                   ...state?.pmsi,
-                  ccam: action.payload.ccam
+                  ccam: action.payload.ccam,
+                  diagnostic: action.payload.diagnostic
                 }
               : {
-                  ccam: action.payload.ccam
+                  ccam: action.payload.ccam,
+                  diagnostic: action.payload.diagnostic
                 }
           }
     )
