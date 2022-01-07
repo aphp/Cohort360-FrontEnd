@@ -163,6 +163,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
           <Paper className={classes.root} square>
             <Grid container item style={{ paddingInline: 8 }} justify="space-between">
               <Grid
+                id="context-bar"
                 container
                 item
                 direction="row"
@@ -189,10 +190,14 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                       </>
                     ) : (
                       <>
-                        {cohort.name && <Typography variant="h5">{cohort.name} </Typography>}
+                        {cohort.name && (
+                          <Typography id="cohort-name" variant="h5">
+                            {cohort.name}{' '}
+                          </Typography>
+                        )}
                         {cohort.description && (
                           <Tooltip title={cohort.description}>
-                            <Typography noWrap style={{ width: '100%' }} variant="subtitle2">
+                            <Typography id="cohort-description" noWrap style={{ width: '100%' }} variant="subtitle2">
                               {cohort.description}
                             </Typography>
                           </Tooltip>
@@ -250,10 +255,10 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                     </>
                   ) : (
                     <>
-                      <Typography align="right" noWrap>
+                      <Typography id="cohort-patient-number" align="right" noWrap>
                         Nb de patients : {displayDigit(patientsNumber ?? 0)}
                       </Typography>
-                      <Typography align="right" noWrap>
+                      <Typography id="cohort-access-type" align="right" noWrap>
                         Accès : {access}
                       </Typography>
                       {cohort.cohortId && (
