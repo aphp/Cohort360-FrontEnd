@@ -1,32 +1,47 @@
 import React from 'react'
-import { Grid, Link } from '@material-ui/core'
+import { Grid, Link, CircularProgress } from '@material-ui/core'
 
-import Title from '../../Title'
-import ResearchTable from '../../SavedResearch/ResearchTable/ResearchTable'
+import Title from 'components/Title'
+import ResearchTable from 'components/SavedResearch/ResearchTable/ResearchTable'
+import RequestsTable from 'components/SavedResearch/ResearchTable/RequestsTable'
 
-import { setFavoriteCohortThunk, deleteUserCohortThunk } from 'state/userCohorts'
-import { FormattedCohort } from 'types'
+import { Cohort, RequestType } from 'types'
 import { useAppDispatch } from 'state'
+import { deleteCohort, setFavoriteCohort } from 'state/cohort'
 
 import useStyles from './styles'
 
 type ResearchCardProps = {
+  isFav?: boolean
   simplified?: boolean
+  onClickLink?: (props: any) => void
   onClickRow?: (props: any) => void
   title?: string
-  cohorts?: FormattedCohort[]
+  linkLabel?: string
+  cohorts?: Cohort[]
+  requests?: RequestType[]
+  loading?: boolean
 }
 
-const ResearchCard: React.FC<ResearchCardProps> = ({ onClickRow, simplified, title, cohorts }) => {
+const ResearchCard: React.FC<ResearchCardProps> = ({
+  onClickRow,
+  onClickLink,
+  simplified,
+  title,
+  linkLabel,
+  cohorts,
+  requests,
+  loading
+}) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
-  const onDeleteCohort = async (cohortId: string) => {
-    dispatch<any>(deleteUserCohortThunk({ cohortId }))
+  const onDeleteCohort = async (cohort: Cohort) => {
+    dispatch<any>(deleteCohort({ deletedCohort: cohort }))
   }
 
-  const onSetCohortFavorite = (cohortId: string) => {
-    dispatch<any>(setFavoriteCohortThunk({ cohortId }))
+  const onSetCohortFavorite = (cohort: Cohort) => {
+    dispatch<any>(setFavoriteCohort({ favCohort: cohort }))
   }
 
   return (
@@ -36,19 +51,28 @@ const ResearchCard: React.FC<ResearchCardProps> = ({ onClickRow, simplified, tit
           <Title>{title}</Title>
         </Grid>
         <Grid item container xs={3} justify="flex-end">
-          <Link underline="always" className={classes.link} href="/recherche_sauvegarde">
-            Voir toutes mes cohortes
+          <Link underline="always" className={classes.link} onClick={onClickLink}>
+            {linkLabel}
           </Link>
         </Grid>
       </Grid>
       <Grid item xs={12} className={classes.tableContainer}>
-        <ResearchTable
-          simplified={simplified}
-          researchData={cohorts}
-          onDeleteCohort={onDeleteCohort}
-          onSetCohortFavorite={onSetCohortFavorite}
-          onClickRow={onClickRow}
-        />
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <>
+            {requests && requests.length > 0 && <RequestsTable simplified={simplified} researchData={requests} />}
+            {cohorts && cohorts.length > 0 && (
+              <ResearchTable
+                simplified={simplified}
+                researchData={cohorts}
+                onDeleteCohort={onDeleteCohort}
+                onSetCohortFavorite={onSetCohortFavorite}
+                onClickRow={onClickRow}
+              />
+            )}
+          </>
+        )}
       </Grid>
     </>
   )

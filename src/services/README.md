@@ -377,22 +377,22 @@ export  interface  IServicesProjects {
 		count: number
 		next: string | null
 		previous: string | null
-		results: CohortType[]
+		results: Cohort[]
 	}>
 	addCohort: (
-		newCohort: CohortType
+		newCohort: Cohort
 	) =>  Promise<
-		CohortType
+		Cohort
 	>
 	editCohort: (
-		editedCohort: CohortType
+		editedCohort: Cohort
 	) =>  Promise<
-		CohortType
+		Cohort
 	>
 	deleteCohort: (
-		deletedCohort: CohortType
+		deletedCohort: Cohort
 	) =>  Promise<
-		CohortType
+		Cohort
 	>
 }
 ```

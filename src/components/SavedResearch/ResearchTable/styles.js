@@ -42,9 +42,6 @@ const useStyles = makeStyles(() => ({
     }
   },
   infoButton: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
     '& svg': {
       fontSize: 20
     }

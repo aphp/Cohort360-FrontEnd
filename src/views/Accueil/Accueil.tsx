@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react'
+import { useHistory } from 'react-router'
 import moment from 'moment'
 import clsx from 'clsx'
+
 import { Grid, Paper, Container, Typography } from '@material-ui/core'
 
 import NewsCard from 'components/Welcome/NewsCard/NewsCard'
@@ -10,7 +12,6 @@ import SearchPatientCard from 'components/Welcome/SearchPatientCard/SearchPatien
 import TutorialsCard from 'components/Welcome/TutorialsCard/TutorialsCard'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { initUserCohortsThunk } from 'state/userCohorts'
 import { fetchProjects } from 'state/project'
 import { fetchRequests } from 'state/request'
 import { fetchCohorts } from 'state/cohort'
@@ -23,24 +24,29 @@ import useStyles from './styles'
 const Accueil: React.FC = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
-  const {
-    practitioner,
-    open,
-    favoriteCohorts = [],
-    lastCohorts = []
-  } = useAppSelector((state) => ({
+  const history = useHistory()
+  const { practitioner, open, cohortState, requestState } = useAppSelector((state) => ({
     practitioner: state.me,
     open: state.drawer,
-    favoriteCohorts: state.userCohorts.favoriteCohorts,
-    lastCohorts: state.userCohorts.lastCohorts
+    cohortState: state.cohort,
+    requestState: state.request
   }))
+
+  const loadingCohort = cohortState.loading
+  const loadingRequest = requestState.loading
+
+  const favoriteCohorts =
+    cohortState.cohortsList?.length > 0
+      ? [...cohortState.cohortsList].filter((cohortItem) => cohortItem.favorite).splice(0, 5)
+      : []
+  const lastCohorts = cohortState.cohortsList?.length > 0 ? [...cohortState.cohortsList].splice(0, 5) : []
+  const lastRequest = requestState.requestsList?.length > 0 ? [...requestState.requestsList].splice(0, 5) : []
 
   const lastConnection = practitioner?.lastConnection
     ? moment(practitioner.lastConnection).format('[Dernière connexion: ]ddd DD MMMM YYYY[, à ]HH:mm')
     : ''
 
   useEffect(() => {
-    dispatch<any>(initUserCohortsThunk())
     // fetchProjectData
     dispatch<any>(fetchProjects())
     dispatch<any>(fetchRequests())
@@ -55,23 +61,6 @@ const Accueil: React.FC = () => {
     // fetchScope
     dispatch<any>(fetchScopesList())
   }, [dispatch])
-
-  useEffect(() => {
-    let interval: any = null
-
-    const pendingCohorts = [...favoriteCohorts, ...lastCohorts].filter(
-      ({ fhir_group_id, jobStatus }) => !fhir_group_id && (jobStatus === 'pending' || jobStatus === 'started')
-    )
-
-    if (pendingCohorts && pendingCohorts.length > 0) {
-      interval = setInterval(() => {
-        dispatch<any>(initUserCohortsThunk())
-      }, 5000)
-    } else {
-      clearInterval(interval)
-    }
-    return () => clearInterval(interval)
-  }, [favoriteCohorts, lastCohorts]) //eslint-disable-line
 
   return practitioner ? (
     <Grid
@@ -126,14 +115,40 @@ const Accueil: React.FC = () => {
         <Grid container spacing={3} style={{ paddingTop: 8 }}>
           <Grid item xs={12} md={12} lg={12}>
             <Paper className={classes.paper}>
-              <ResearchCard title={'Mes cohortes favorites'} cohorts={favoriteCohorts} />
+              <ResearchCard
+                title={'Mes cohortes favorites'}
+                linkLabel={'Voir toutes mes cohortes favorites'}
+                onClickLink={() => history.push('/recherche_sauvegarde?fav=true')}
+                loading={loadingCohort}
+                cohorts={favoriteCohorts}
+                isFav
+              />
             </Paper>
           </Grid>
         </Grid>
         <Grid container spacing={3}>
           <Grid item xs={12} md={12} lg={12}>
             <Paper className={classes.paper}>
-              <ResearchCard title={'Mes dernières cohortes créées'} cohorts={lastCohorts} />
+              <ResearchCard
+                title={'Mes dernières cohortes créées'}
+                linkLabel={'Voir toutes mes cohortes'}
+                onClickLink={() => history.push('/recherche_sauvegarde')}
+                loading={loadingCohort}
+                cohorts={lastCohorts}
+              />
+            </Paper>
+          </Grid>
+        </Grid>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={12} lg={12}>
+            <Paper className={classes.paper}>
+              <ResearchCard
+                title={'Mes dernières requêtes créées'}
+                linkLabel={'Voir toutes mes requêtes'}
+                onClickLink={() => history.push('/mes_projets')}
+                loading={loadingRequest}
+                requests={lastRequest}
+              />
             </Paper>
           </Grid>
         </Grid>

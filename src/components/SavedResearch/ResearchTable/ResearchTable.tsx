@@ -40,7 +40,7 @@ import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 import { useAppSelector } from 'state'
 import { CohortState, setSelectedCohort as setSelectedCohortState } from 'state/cohort'
 
-import { FormattedCohort } from 'types'
+import { Cohort } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
@@ -59,8 +59,8 @@ const FavStar: React.FC<FavStarProps> = ({ favorite }) => {
 type ResearchTableProps = {
   simplified?: boolean
   onClickRow?: Function
-  researchData?: FormattedCohort[]
-  onSetCohortFavorite: (cohortId: string) => void
+  researchData?: Cohort[]
+  onSetCohortFavorite: (cohort: Cohort) => void
   onDeleteCohort: Function
   sortBy?: string
   sortDirection?: 'asc' | 'desc'
@@ -112,6 +112,20 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   const createSortHandler = (property: any) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property)
   }
+
+  // You can make an export if you got 1 cohort with: EXPORT_DATA_NOMINATIVE = true && READ_DATA_NOMINATIVE = true
+  const canMakeExport = researchData
+    ? researchData.some((cohort) =>
+        cohort.extension && cohort.extension.length > 0
+          ? cohort.extension.find(
+              (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
+            ) &&
+            cohort.extension.find(
+              (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+            )
+          : false
+      )
+    : []
 
   return (
     <>
@@ -197,14 +211,12 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                     )}
                   </TableCell>
                   <TableCell className={classes.tableHeadCell} align="center">
-                    <Grid style={{ position: 'relative' }}>
-                      Estimation du nombre de patients APHP
-                      <Tooltip title="Cet interval correspond à une estimation du nombre de patients correspondant aux critères de votre requête avec comme population source tous les hopitaux de l'APHP">
-                        <IconButton size="small" className={classes.infoButton}>
-                          <InfoIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </Grid>
+                    Estimation du nombre de patients APHP
+                    <Tooltip title="Cet interval correspond à une estimation du nombre de patients correspondant aux critères de votre requête avec comme population source tous les hopitaux de l'APHP">
+                      <IconButton size="small" className={classes.infoButton}>
+                        <InfoIcon />
+                      </IconButton>
+                    </Tooltip>
                   </TableCell>
                   <TableCell
                     align="center"
@@ -229,162 +241,182 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {researchData?.map((row: FormattedCohort) => (
-                  <TableRow
-                    className={!row.fhir_group_id ? classes.notAllow : classes.pointerHover}
-                    hover
-                    key={row.researchId}
-                  >
-                    <TableCell onClick={() => _onClickRow(row)}>{row.name}</TableCell>
-                    <TableCell align="center">
-                      <IconButton
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          onSetCohortFavorite(row.researchId)
-                        }}
-                      >
-                        <FavStar favorite={row.favorite} />
-                      </IconButton>
-                    </TableCell>
-                    <TableCell onClick={() => _onClickRow(row)} className={classes.status} align="center">
-                      {row.status}
-                    </TableCell>
-                    <TableCell onClick={() => _onClickRow(row)} align="center">
-                      {row.fhir_group_id ? (
-                        <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                      ) : row.jobStatus === 'pending' || row.jobStatus === 'started' ? (
-                        <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
-                      ) : row.jobFailMsg ? (
-                        <Tooltip title={row.jobFailMsg}>
-                          <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
-                        </Tooltip>
-                      ) : (
-                        <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
-                      )}
-                    </TableCell>
-                    <TableCell onClick={() => _onClickRow(row)} align="center">
-                      {displayDigit(row.nPatients ?? 0)}
-                    </TableCell>
-                    <TableCell onClick={() => _onClickRow(row)} align="center">
-                      {row.nGlobal ?? '-'}
-                    </TableCell>
-                    <TableCell onClick={() => _onClickRow(row)} align="center">
-                      {row.date && (
-                        <>
-                          {new Date(row.date).toLocaleDateString('fr-FR')}{' '}
-                          {new Date(row.date).toLocaleTimeString('fr-FR', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </>
-                      )}
-                    </TableCell>
-                    <TableCell align="center">
-                      <Hidden mdDown>
-                        <Grid
-                          container
-                          direction="row"
-                          alignItems="center"
-                          justify="center"
-                          style={{ width: 'max-content', margin: 'auto' }}
+                {researchData?.map((row: Cohort) => {
+                  const canExportThisCohort =
+                    canMakeExport && row.extension
+                      ? row.extension.some(
+                          (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
+                        ) &&
+                        row.extension.some(
+                          (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+                        )
+                      : false
+
+                  return (
+                    <TableRow
+                      className={!row.fhir_group_id ? classes.notAllow : classes.pointerHover}
+                      hover
+                      key={row.uuid}
+                    >
+                      <TableCell onClick={() => _onClickRow(row)}>{row.name}</TableCell>
+                      <TableCell align="center">
+                        <IconButton
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            onSetCohortFavorite(row)
+                          }}
                         >
-                          {row.canMakeExport && (
+                          <FavStar favorite={row.favorite} />
+                        </IconButton>
+                      </TableCell>
+                      <TableCell onClick={() => _onClickRow(row)} className={classes.status} align="center">
+                        {row.type}
+                      </TableCell>
+                      <TableCell onClick={() => _onClickRow(row)} align="center">
+                        {row.fhir_group_id ? (
+                          <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
+                        ) : row.request_job_status === 'pending' || row.request_job_status === 'started' ? (
+                          <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
+                        ) : row.request_job_fail_msg ? (
+                          <Tooltip title={row.request_job_fail_msg}>
+                            <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
+                          </Tooltip>
+                        ) : (
+                          <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
+                        )}
+                      </TableCell>
+                      <TableCell onClick={() => _onClickRow(row)} align="center">
+                        {displayDigit(row.result_size ?? 0)}
+                      </TableCell>
+                      <TableCell onClick={() => _onClickRow(row)} align="center">
+                        {row.dated_measure_global
+                          ? `${displayDigit(row.dated_measure_global.measure_min) ?? 'X'} - ${
+                              displayDigit(row.dated_measure_global.measure_max) ?? 'X'
+                            }`
+                          : '-'}
+                      </TableCell>
+                      <TableCell onClick={() => _onClickRow(row)} align="center">
+                        {row.dated_measure && row.dated_measure.fhir_datetime ? (
+                          <>
+                            {new Date(row.dated_measure.fhir_datetime).toLocaleDateString('fr-FR')}{' '}
+                            {new Date(row.dated_measure.fhir_datetime).toLocaleTimeString('fr-FR', {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </>
+                        ) : (
+                          '-'
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Hidden mdDown>
+                          <Grid
+                            container
+                            direction="row"
+                            alignItems="center"
+                            justify="center"
+                            style={{ width: 'max-content', margin: 'auto' }}
+                          >
+                            {canExportThisCohort && (
+                              <Grid item>
+                                <IconButton
+                                  size="small"
+                                  onClick={(event) => {
+                                    event.stopPropagation()
+                                    setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
+                                  }}
+                                >
+                                  <ExportIcon />
+                                </IconButton>
+                              </Grid>
+                            )}
+
                             <Grid item>
                               <IconButton
                                 size="small"
                                 onClick={(event) => {
                                   event.stopPropagation()
-                                  setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
+                                  dispatch(setSelectedCohortState(row.uuid ?? null))
                                 }}
                               >
-                                <ExportIcon />
+                                <EditIcon />
                               </IconButton>
                             </Grid>
-                          )}
 
-                          <Grid item>
-                            <IconButton
-                              size="small"
+                            <Grid item>
+                              <IconButton
+                                size="small"
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  handleClickOpenDialog()
+                                  setSelectedCohort(row.uuid)
+                                }}
+                              >
+                                <DeleteOutlineIcon />
+                              </IconButton>
+                            </Grid>
+                          </Grid>
+                        </Hidden>
+                        <Hidden lgUp>
+                          <IconButton
+                            aria-label="more"
+                            id="long-button"
+                            aria-controls="long-menu"
+                            aria-expanded={openMenuItem ? 'true' : undefined}
+                            aria-haspopup="true"
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              // @ts-ignore
+                              setAnchorEl(event.currentTarget)
+                              setSelectedCohort(row.uuid)
+                            }}
+                          >
+                            <MoreVertIcon />
+                          </IconButton>
+                          <Menu
+                            anchorEl={anchorEl}
+                            open={openMenuItem && row.uuid === selectedCohort}
+                            onClose={() => setAnchorEl(null)}
+                          >
+                            {canExportThisCohort && (
+                              <MenuItem
+                                className={classes.menuItem}
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
+                                  setAnchorEl(null)
+                                }}
+                              >
+                                <ExportIcon /> Exporter
+                              </MenuItem>
+                            )}
+                            <MenuItem
+                              className={classes.menuItem}
                               onClick={(event) => {
                                 event.stopPropagation()
-                                dispatch(setSelectedCohortState(row.researchId))
+                                dispatch(setSelectedCohortState(row.uuid ?? null))
+                                setAnchorEl(null)
                               }}
                             >
-                              <EditIcon />
-                            </IconButton>
-                          </Grid>
-
-                          <Grid item>
-                            <IconButton
-                              size="small"
+                              <EditIcon /> Modifier
+                            </MenuItem>
+                            <MenuItem
+                              className={classes.menuItem}
                               onClick={(event) => {
                                 event.stopPropagation()
+                                setSelectedCohort(row.uuid)
                                 handleClickOpenDialog()
-                                setSelectedCohort(row.researchId)
+                                setAnchorEl(null)
                               }}
                             >
-                              <DeleteOutlineIcon />
-                            </IconButton>
-                          </Grid>
-                        </Grid>
-                      </Hidden>
-                      <Hidden lgUp>
-                        <IconButton
-                          aria-label="more"
-                          id="long-button"
-                          aria-controls="long-menu"
-                          aria-expanded={openMenuItem ? 'true' : undefined}
-                          aria-haspopup="true"
-                          onClick={(event) => {
-                            event.stopPropagation()
-                            // @ts-ignore
-                            setAnchorEl(event.currentTarget)
-                            setSelectedCohort(row.researchId)
-                          }}
-                        >
-                          <MoreVertIcon />
-                        </IconButton>
-                        <Menu
-                          anchorEl={anchorEl}
-                          open={openMenuItem && row.researchId === selectedCohort}
-                          onClose={() => setAnchorEl(null)}
-                        >
-                          <MenuItem
-                            className={classes.menuItem}
-                            onClick={(event) => {
-                              event.stopPropagation()
-                              setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
-                              setAnchorEl(null)
-                            }}
-                          >
-                            <ExportIcon /> Exporter
-                          </MenuItem>
-                          <MenuItem
-                            className={classes.menuItem}
-                            onClick={(event) => {
-                              event.stopPropagation()
-                              dispatch(setSelectedCohortState(row.researchId))
-                              setAnchorEl(null)
-                            }}
-                          >
-                            <EditIcon /> Modifier
-                          </MenuItem>
-                          <MenuItem
-                            className={classes.menuItem}
-                            onClick={(event) => {
-                              event.stopPropagation()
-                              setSelectedCohort(row.researchId)
-                              handleClickOpenDialog()
-                              setAnchorEl(null)
-                            }}
-                          >
-                            <DeleteOutlineIcon /> Supprimer
-                          </MenuItem>
-                        </Menu>
-                      </Hidden>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                              <DeleteOutlineIcon /> Supprimer
+                            </MenuItem>
+                          </Menu>
+                        </Hidden>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
               </TableBody>
             </Table>
           </TableContainer>

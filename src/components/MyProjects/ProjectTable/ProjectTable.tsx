@@ -58,7 +58,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, setSelectedReq
 
     const newSearchCohortList = !searchInput
       ? cohortsList
-      : cohortsList.filter(({ name }) => name.search(regexp) !== -1)
+      : cohortsList.filter(({ name }) => name?.search(regexp) !== -1)
 
     const newSearchRequestList = !searchInput
       ? requestsList
