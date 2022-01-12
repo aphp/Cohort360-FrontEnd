@@ -75,6 +75,7 @@ const PatientList: React.FC<PatientListProps> = ({
   const [open, setOpen] = useState(false)
   const [gender, setGender] = useState<PatientGenderKind>(PatientGenderKind._unknown)
   const [age, setAge] = useState<[number, number]>([0, 130])
+  const [ageType, setAgeType] = useState<'year' | 'month' | 'days'>('year')
   const [vitalStatus, setVitalStatus] = useState<VitalStatus>(VitalStatus.all)
   const [sortBy, setSortBy] = useState('given') // eslint-disable-line
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc') // eslint-disable-line
@@ -115,6 +116,7 @@ const PatientList: React.FC<PatientListProps> = ({
       input,
       gender,
       age,
+      ageType,
       vitalStatus,
       sortBy,
       sortDirection,
@@ -182,6 +184,7 @@ const PatientList: React.FC<PatientListProps> = ({
         break
       case 'age':
         setAge([0, 130])
+        setAgeType('year')
         break
       case 'vitalStatus':
         setVitalStatus(VitalStatus.all)
@@ -349,6 +352,8 @@ const PatientList: React.FC<PatientListProps> = ({
                 onChangeGender={setGender}
                 age={age}
                 onChangeAge={setAge}
+                ageType={ageType}
+                onChangeAgeType={setAgeType}
                 vitalStatus={vitalStatus}
                 onChangeVitalStatus={setVitalStatus}
               />
