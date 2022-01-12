@@ -1,6 +1,7 @@
 import apiBack from '../apiBackend'
 
 import { fetchGroup } from './callApi'
+import { ProjectType, RequestType, Cohort } from 'types'
 
 export interface IServicesProjects {
   /**
@@ -142,14 +143,14 @@ export interface IServicesProjects {
    * Retourne la liste de Cohort d'un practitioner
    *
    * Argument:
-   *   - limit: Determine une limite de projet demandé
+   *   - limit: Determine une limite de cohorte demandé
    *   - offset: Determine un index de départ
    *
    * Retoune:
-   *   - count: Nombre total de Cohort
-   *   - next: URL d'appel pour récupérer les Cohort suivant
-   *   - previous: URL d'appel pour récupérer les Cohort précédent
-   *   - results: Liste de Cohort récupéré
+   *   - count: Nombre total de cohortes
+   *   - next: URL d'appel pour récupérer les cohortes suivant
+   *   - previous: URL d'appel pour récupérer les cohortes précédent
+   *   - results: Liste de cohortes récupérées
    */
   fetchCohortsList: (
     providerId: string,
@@ -159,7 +160,7 @@ export interface IServicesProjects {
     count: number
     next: string | null
     previous: string | null
-    results: CohortType[]
+    results: Cohort[]
   }>
 
   /**
@@ -171,10 +172,10 @@ export interface IServicesProjects {
    * Retourne:
    *   - Cohorte ajoutée
    */
-  addCohort: (newCohort: CohortType) => Promise<CohortType>
+  addCohort: (newCohort: Cohort) => Promise<Cohort>
 
   /**
-   * Cette fonction modifie un cohorte existant
+   * Cette fonction modifie une cohorte existant
    *
    * Argument:
    *   - newProject: Cohorte à modifier
@@ -182,10 +183,10 @@ export interface IServicesProjects {
    * Retourne:
    *   - Cohorte modifiée
    */
-  editCohort: (editedCohort: CohortType) => Promise<CohortType>
+  editCohort: (editedCohort: Cohort) => Promise<Cohort>
 
   /**
-   * Cette fonction supprime un cohorte existant
+   * Cette fonction supprime une cohorte existant
    *
    * Argument:
    *   - newProject: Cohorte à supprimer
@@ -193,7 +194,7 @@ export interface IServicesProjects {
    * Retourne:
    *   - Cohorte supprimée
    */
-  deleteCohort: (deletedCohort: CohortType) => Promise<CohortType>
+  deleteCohort: (deletedCohort: Cohort) => Promise<Cohort>
 }
 
 const servicesProjects: IServicesProjects = {
@@ -375,7 +376,7 @@ const servicesProjects: IServicesProjects = {
       count: number
       next: string | null
       previous: string | null
-      results: CohortType[]
+      results: Cohort[]
     }>(`/explorations/cohorts/${search}`)) ?? { data: { results: [] } }
 
     let cohortList = data.results
@@ -430,7 +431,7 @@ const servicesProjects: IServicesProjects = {
     const addCohortResponse = (await apiBack.post(`/explorations/cohorts/`, newCohort)) ?? { status: 400 }
 
     if (addCohortResponse.status === 201) {
-      return addCohortResponse.data as CohortType
+      return addCohortResponse.data as Cohort
     } else {
       throw new Error('Impossible de créer la liste de patients')
     }
@@ -438,11 +439,12 @@ const servicesProjects: IServicesProjects = {
   editCohort: async (editedCohort) => {
     const editCohortResponse = (await apiBack.patch(`/explorations/cohorts/${editedCohort.uuid}/`, {
       name: editedCohort.name,
-      description: editedCohort.description
+      description: editedCohort.description,
+      favorite: editedCohort.favorite !== undefined ? !!editedCohort.favorite : undefined
     })) ?? { status: 400 }
 
     if (editCohortResponse.status === 200) {
-      return editCohortResponse.data as CohortType
+      return editCohortResponse.data as Cohort
     } else {
       throw new Error('Impossible de modifier la liste de patients')
     }
@@ -453,7 +455,7 @@ const servicesProjects: IServicesProjects = {
     }
 
     if (deleteCohortResponse.status === 204) {
-      return deleteCohortResponse.data as CohortType
+      return deleteCohortResponse.data as Cohort
     } else {
       throw new Error('Impossible de supprimer la liste de patients')
     }
@@ -461,45 +463,3 @@ const servicesProjects: IServicesProjects = {
 }
 
 export default servicesProjects
-
-export type ProjectType = {
-  uuid: string
-  name: string
-  description?: string
-  created_at?: string
-  modified_at?: string
-  favorite?: boolean
-  owner_id?: string
-}
-
-export type RequestType = {
-  uuid: string
-  name: string
-  parent_folder?: string
-  description?: string
-  owner_id?: string
-  data_type_of_query?: string
-  favorite?: boolean
-  created_at?: string
-  modified_at?: string
-}
-
-export type CohortType = {
-  uuid: string
-  name: string
-  create_task_id?: string
-  dated_measure_id?: string
-  description?: string
-  favorite?: boolean
-  fhir_group_id?: string
-  owner_id?: string
-  request?: string
-  request_job_duration?: string
-  request_job_fail_msg?: string
-  request_job_status?: string
-  request_query_snapshot?: string
-  result_size?: number
-  created_at?: string
-  modified_at?: string
-  extension?: any[]
-}

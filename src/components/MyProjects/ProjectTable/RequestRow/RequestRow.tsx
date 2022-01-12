@@ -10,7 +10,7 @@ import EditIcon from '@material-ui/icons/Edit'
 
 import VersionRow from '../VersionRow/VersionRow'
 
-import { RequestType, CohortType } from 'types'
+import { RequestType, Cohort } from 'types'
 
 import { setSelectedRequest } from 'state/request'
 
@@ -18,7 +18,7 @@ import useStyles from '../styles'
 
 type RequestRowProps = {
   row: RequestType
-  cohortsList: CohortType[]
+  cohortsList: Cohort[]
   selectedRequests: RequestType[]
   onSelectedRow: (selectedRequests: RequestType[]) => void
   isSearch?: boolean

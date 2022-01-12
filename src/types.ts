@@ -92,6 +92,35 @@ export type Cohort = {
   request?: string
   request_job_status?: string
   request_job_fail_msg?: string
+  create_task_id?: string
+  dated_measure_id?: string
+  owner_id?: string
+  request_job_duration?: string
+  request_query_snapshot?: string
+  extension?: any[]
+}
+
+export type CohortType = {
+  uuid: string
+  name: string
+  create_task_id?: string
+  dated_measure_id?: string
+  dated_measure_global?: any
+  description?: string
+  favorite?: boolean
+  fhir_group_id?: string
+  owner_id?: string
+  request?: string
+  request_job_duration?: string
+  request_job_fail_msg?: string
+  request_job_status?: string
+  request_query_snapshot?: string
+  result_size?: number
+  created_at?: string
+  modified_at?: string
+  extension?: any[]
+  // ??
+  type?: string
 }
 
 export type FormattedCohort = {
@@ -488,26 +517,6 @@ export type RequestType = {
   favorite?: boolean
   created_at?: string
   modified_at?: string
-}
-
-export type CohortType = {
-  uuid: string
-  name: string
-  create_task_id?: string
-  dated_measure_id?: string
-  description?: string
-  favorite?: boolean
-  fhir_group_id?: string
-  owner_id?: string
-  request?: string
-  request_job_duration?: string
-  request_job_fail_msg?: string
-  request_job_status?: string
-  request_query_snapshot?: string
-  result_size?: number
-  created_at?: string
-  modified_at?: string
-  extension?: any[]
 }
 
 export type ContactSubmitForm = FormData
