@@ -5,7 +5,6 @@ import logger from 'redux-logger'
 import cohortCreation from './cohortCreation'
 import criteria from './criteria'
 import exploredCohort from './exploredCohort'
-import userCohorts from './userCohorts'
 import me from './me'
 import drawer from './drawer'
 import message from './message'
@@ -26,7 +25,6 @@ const rootReducer = combineReducers({
   me,
   cohortCreation: cohortCreationReducer,
   exploredCohort,
-  userCohorts,
   drawer,
   message,
   project,
@@ -43,19 +41,7 @@ export const store = createStore(rootReducer, applyMiddleware(thunkMiddleware, l
 store.subscribe(() => {
   // Auto save store inside localStorage
   const state = store.getState() ?? {}
-  const {
-    me,
-    exploredCohort,
-    userCohorts,
-    cohortCreation,
-    project,
-    request,
-    cohort,
-    scope,
-    pmsi,
-    medication,
-    patient
-  } = state
+  const { me, exploredCohort, cohortCreation, project, request, cohort, scope, pmsi, medication, patient } = state
 
   localStorage.setItem('user', JSON.stringify(me))
   localStorage.setItem(
@@ -67,7 +53,6 @@ store.subscribe(() => {
       monthlyVisitData: exploredCohort.monthlyVisitData ? { ...exploredCohort.monthlyVisitData } : {}
     })
   )
-  localStorage.setItem('userCohorts', JSON.stringify(userCohorts))
   localStorage.setItem('cohortCreation', JSON.stringify(cohortCreation))
   localStorage.setItem('project', JSON.stringify(project))
   localStorage.setItem('request', JSON.stringify(request))

@@ -1,6 +1,5 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import moment from 'moment'
 
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
@@ -10,38 +9,7 @@ import TablePagination from '@material-ui/core/TablePagination'
 import TableRow from '@material-ui/core/TableRow'
 
 import EnhancedTableHead from './components/TableHead'
-
-function descendingComparator(a, b, orderBy) {
-  const dateA = moment(new Date(a[orderBy]))
-  const dateB = moment(new Date(b[orderBy]))
-
-  if (dateA.isValid() && dateB.isValid()) {
-    return dateA.isSameOrBefore(dateB) ? -1 : 1
-  }
-  if (b[orderBy] < a[orderBy]) {
-    return -1
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1
-  }
-  return 0
-}
-
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy)
-}
-
-function stableSort(array, comparator) {
-  const stabilizedThis = array.map((el, index) => [el, index])
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0])
-    if (order !== 0) return order
-    return a[1] - b[1]
-  })
-  return stabilizedThis.map((el) => el[0])
-}
+import { getComparator, stableSort } from 'utils/alphabeticalSort'
 
 const useStyles = makeStyles(() => ({
   root: {

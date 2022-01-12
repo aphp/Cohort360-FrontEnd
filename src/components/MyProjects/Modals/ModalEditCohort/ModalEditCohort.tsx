@@ -15,7 +15,7 @@ import {
 import { useAppSelector } from 'state'
 import { CohortState, addCohort, editCohort, deleteCohort } from 'state/cohort'
 
-import { CohortType } from 'types'
+import { Cohort } from 'types'
 
 import useStyles from './styles'
 
@@ -37,7 +37,7 @@ const ModalEditCohort: React.FC<{
 
   const isEdition = selectedCohort !== null && selectedCohort.uuid !== ''
 
-  const [modalCohortState, onChangeCohortState] = useState<CohortType>({
+  const [modalCohortState, onChangeCohortState] = useState<Cohort>({
     uuid: '',
     name: 'Cohort',
     description: ''
