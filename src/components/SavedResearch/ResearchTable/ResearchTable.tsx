@@ -270,7 +270,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                         </IconButton>
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} className={classes.status} align="center">
-                        {row.type}
+                        {row.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohort I2B2'}
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} align="center">
                         {row.fhir_group_id ? (

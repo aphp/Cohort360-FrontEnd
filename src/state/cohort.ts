@@ -4,7 +4,6 @@ import { Cohort } from 'types'
 
 import { logout, login } from './me'
 import { fetchExploredCohortInBackground } from './exploredCohort'
-import { initUserCohortsThunk } from './userCohorts'
 import services from 'services'
 
 export type CohortState = {
@@ -147,14 +146,12 @@ type AddCohortReturn = {
 
 const addCohort = createAsyncThunk<AddCohortReturn, AddCohortParams, { state: RootState }>(
   'cohort/addCohort',
-  async ({ newCohort }, { getState, dispatch }) => {
+  async ({ newCohort }, { getState }) => {
     try {
       const state = getState().cohort
       const cohortsList: Cohort[] = state.cohortsList ?? []
 
       const createdCohort = await services.projects.addCohort(newCohort)
-
-      dispatch(initUserCohortsThunk())
 
       return {
         selectedCohort: null,
@@ -202,7 +199,6 @@ const editCohort = createAsyncThunk<EditCohortReturn, EditCohortParams, { state:
       if (stateExploredCohort.uuid === editedCohort.uuid) {
         dispatch(fetchExploredCohortInBackground({ context: 'cohort', id: editedCohort.fhir_group_id }))
       }
-      dispatch(initUserCohortsThunk())
 
       return {
         selectedCohort: null,
@@ -228,7 +224,7 @@ type DeleteCohortReturn = {
 
 const deleteCohort = createAsyncThunk<DeleteCohortReturn, DeleteCohortParams, { state: RootState }>(
   'cohort/deleteCohort',
-  async ({ deletedCohort }, { getState, dispatch }) => {
+  async ({ deletedCohort }, { getState }) => {
     try {
       const state = getState().cohort
       // eslint-disable-next-line
@@ -241,9 +237,6 @@ const deleteCohort = createAsyncThunk<DeleteCohortReturn, DeleteCohortParams, { 
 
         cohortsList.splice(index, 1)
       }
-      setTimeout(() => {
-        dispatch(initUserCohortsThunk())
-      }, 500)
 
       return {
         selectedCohort: null,
@@ -267,7 +260,7 @@ type SetFavoriteCohortReturn = {
 }
 
 const setFavoriteCohort = createAsyncThunk<SetFavoriteCohortReturn, SetFavoriteCohortParams, { state: RootState }>(
-  'userCohorts/setFavoriteCohortThunk',
+  'cohort/setFavoriteCohortThunk',
   async ({ favCohort }, { getState }) => {
     const cohortsState = getState().cohort
 

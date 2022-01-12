@@ -74,7 +74,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
   const openMenuItem = Boolean(anchorEl)
 
   const _onClickRow = (row: any) => {
-    return !row.fhir_group_id ? null : onClickRow ? onClickRow(row) : history.push(`/request/${row.fhir_group_id}`)
+    return !row.uuid ? null : onClickRow ? onClickRow(row) : history.push(`/cohort/new/${row.uuid}`)
   }
 
   const handleClickOpenDialog = () => {
