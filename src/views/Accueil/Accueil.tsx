@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import moment from 'moment'
 import clsx from 'clsx'
@@ -19,6 +19,8 @@ import { initPmsiHierarchy } from 'state/pmsi'
 import { initMedicationHierarchy } from 'state/medication'
 import { fetchScopesList } from 'state/scope'
 
+import { Cohort, RequestType } from 'types'
+
 import useStyles from './styles'
 
 const Accueil: React.FC = () => {
@@ -35,12 +37,9 @@ const Accueil: React.FC = () => {
   const loadingCohort = cohortState.loading
   const loadingRequest = requestState.loading
 
-  const favoriteCohorts =
-    cohortState.cohortsList?.length > 0
-      ? [...cohortState.cohortsList].filter((cohortItem) => cohortItem.favorite).splice(0, 5)
-      : []
-  const lastCohorts = cohortState.cohortsList?.length > 0 ? [...cohortState.cohortsList].splice(0, 5) : []
-  const lastRequest = requestState.requestsList?.length > 0 ? [...requestState.requestsList].splice(0, 5) : []
+  const [favoriteCohorts, setFavoriteCohorts] = useState<Cohort[]>([])
+  const [lastCohorts, setLastCohorts] = useState<Cohort[]>([])
+  const [lastRequest, setLastRequest] = useState<RequestType[]>([])
 
   const lastConnection = practitioner?.lastConnection
     ? moment(practitioner.lastConnection).format('[Dernière connexion: ]ddd DD MMMM YYYY[, à ]HH:mm')
@@ -61,6 +60,27 @@ const Accueil: React.FC = () => {
     // fetchScope
     dispatch<any>(fetchScopesList())
   }, [dispatch])
+
+  useEffect(() => {
+    const _favoriteCohorts =
+      cohortState.cohortsList?.length > 0
+        ? [...cohortState.cohortsList]
+            .sort((a, b) => +moment(b?.modified_at).format('X') - +moment(a.modified_at).format('X'))
+            .filter((cohortItem) => cohortItem.favorite)
+            .splice(0, 5)
+        : []
+    const _lastCohorts =
+      cohortState.cohortsList?.length > 0
+        ? [...cohortState.cohortsList]
+            .sort((a, b) => +moment(b?.modified_at).format('X') - +moment(a.modified_at).format('X'))
+            .splice(0, 5)
+        : []
+    const _lastRequest = requestState.requestsList?.length > 0 ? [...requestState.requestsList].splice(0, 5) : []
+
+    setFavoriteCohorts(_favoriteCohorts)
+    setLastCohorts(_lastCohorts)
+    setLastRequest(_lastRequest)
+  }, [cohortState, requestState])
 
   return practitioner ? (
     <Grid
