@@ -232,13 +232,13 @@ const ControlPanel: React.FC<{
         </Grid>
 
         {!!includePatient && includePatient > 20000 && (
-          <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="error">
+          <Alert className={classes.errorAlert} severity="error">
             Il est pour le moment impossible de créer des cohortes de plus de 20 000 patients
           </Alert>
         )}
 
         {(status === 'failed' || status === 'error') && (
-          <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="error">
+          <Alert className={classes.errorAlert} severity="error">
             Une erreur est survenue lors du calcul du nombre de patients de votre requête. <br />
             {jobFailMsg}
             <Button
@@ -254,20 +254,23 @@ const ControlPanel: React.FC<{
         )}
 
         {errorCriteria && errorCriteria.length > 0 && (
-          <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="error">
+          <Alert className={classes.errorAlert} severity="error">
             Les critères suivants sont obsolètes : <br />
             <List>
               {errorCriteria.map((errorCrit) => (
                 <ListItem key={errorCrit.id}>{errorCrit.title}</ListItem>
               ))}
             </List>
-            Vous risquez d'avoir perdu les informations concernant ces critères, merci de les vérifier avant de
-            relancer/modifier votre requête
+            <Typography>Merci de recréer ces critères avant de relancer la requête.</Typography>
+            <Typography>
+              En effet, la nouvelle version du requeteur n'est pas compatible avec l'ancien paramétrage.
+            </Typography>
+            <Typography>Ce problème est temporaire. Une solution est en cours de développement.</Typography>
           </Alert>
         )}
 
         {moment().diff(lastUpdated, 'hours') > DISPLAY_ESTIMATE_LIMIT && (
-          <Alert style={{ marginTop: 8, borderRadius: 12, border: '1px solid currentColor' }} severity="info">
+          <Alert className={classes.errorAlert} severity="info">
             Attention l'estimation du nombre de patients correspondant à votre requête effectuée le{' '}
             {lastUpdated.format('DD/MM/YYYY')} est peut être dépassée, voulez vous la recalculer ?
             <Button
