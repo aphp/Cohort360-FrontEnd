@@ -29,6 +29,8 @@ type PatientSidebarHeaderTypes = {
   onChangeGender: (gender: PatientGenderKind) => void
   age: [number, number]
   onChangeAge: (newAge: [number, number]) => void
+  ageType: 'year' | 'month' | 'days'
+  onChangeAgeType: (newAgeType: 'year' | 'month' | 'days') => void
   vitalStatus: VitalStatus
   onChangeVitalStatus: (status: VitalStatus) => void
   searchInput: string
@@ -79,6 +81,8 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
             onChangeGender={props.onChangeGender}
             age={props.age}
             onChangeAge={props.onChangeAge}
+            ageType={props.ageType}
+            onChangeAgeType={props.onChangeAgeType}
             vitalStatus={props.vitalStatus}
             onChangeVitalStatus={props.onChangeVitalStatus}
           />
@@ -182,6 +186,8 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
           onChangeGender={props.onChangeGender}
           age={props.age}
           onChangeAge={props.onChangeAge}
+          ageType={props.ageType}
+          onChangeAgeType={props.onChangeAgeType}
           vitalStatus={props.vitalStatus}
           onChangeVitalStatus={props.onChangeVitalStatus}
         />

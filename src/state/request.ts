@@ -25,7 +25,7 @@ const initialState: RequestState = localStorageRequest ? JSON.parse(localStorage
 
 type FetchRequestListReturn = {
   count: number
-  // selectedRequest: null
+  selectedRequest: null
   requestsList: RequestType[]
 }
 
@@ -41,6 +41,7 @@ const fetchRequests = createAsyncThunk<FetchRequestListReturn, void, { state: Ro
       if (state.count === requests.count) {
         return {
           count: state.count,
+          selectedRequest: null,
           requestsList: oldRequestList
         }
       }
@@ -63,6 +64,7 @@ const fetchRequests = createAsyncThunk<FetchRequestListReturn, void, { state: Ro
 
       return {
         count: requests.count,
+        selectedRequest: null,
         requestsList: requestList.reverse()
       }
     } catch (error) {

@@ -11,7 +11,7 @@ import AddIcon from '@material-ui/icons/Add'
 
 import RequestRow from '../RequestRow/RequestRow'
 
-import { ProjectType, RequestType, CohortType } from 'types'
+import { ProjectType, RequestType, Cohort } from 'types'
 
 import { setSelectedProject } from 'state/project'
 import { setSelectedRequest } from 'state/request'
@@ -21,7 +21,7 @@ import useStyles from '../styles'
 type ProjectRowProps = {
   row: ProjectType
   requestOfProject: RequestType[]
-  cohortsList: CohortType[]
+  cohortsList: Cohort[]
   searchInput?: string
   selectedRequests: RequestType[]
   onSelectedRow: (selectedRequests: RequestType[]) => void
@@ -100,7 +100,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
                   isSearch={
                     !!searchInput &&
                     cohortsList.some(
-                      ({ name, ...cohortItem }) => name.search(regexp) !== -1 && cohortItem.request === request.uuid
+                      ({ name, ...cohortItem }) => name?.search(regexp) !== -1 && cohortItem.request === request.uuid
                     )
                   }
                   selectedRequests={selectedRequests}

@@ -24,27 +24,26 @@ import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
 
 import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 
-import { setFavoriteCohortThunk } from 'state/userCohorts'
-import { setSelectedCohort } from 'state/cohort'
+import { setSelectedCohort, setFavoriteCohort } from 'state/cohort'
 
-import { CohortType } from 'types'
+import { Cohort } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from '../styles'
 
-const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = ({ requestId, cohortsList }) => {
+const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<null | string>(null)
 
-  const cohorts: CohortType[] =
+  const cohorts: Cohort[] =
     cohortsList
       .filter(({ request }) => request === requestId)
       .sort((a, b) => +moment(a.created_at).format('x') - +moment(b.created_at).format('x')) || []
 
-  const _handleEditCohort = (cohortId: string) => {
-    dispatch<any>(setSelectedCohort(cohortId))
+  const _handleEditCohort = (cohortId?: string) => {
+    dispatch<any>(setSelectedCohort(cohortId ?? null))
   }
 
   // You can make an export if you got 1 cohort with: EXPORT_DATA_NOMINATIVE = true && READ_DATA_NOMINATIVE = true
@@ -59,8 +58,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
       : false
   )
 
-  const onSetCohortFavorite = async (cohortId: string) => {
-    await dispatch<any>(setFavoriteCohortThunk({ cohortId }))
+  const onSetCohortFavorite = async (cohort: Cohort) => {
+    await dispatch<any>(setFavoriteCohort({ favCohort: cohort }))
   }
 
   return (
@@ -128,7 +127,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
                     </IconButton>
                   </TableCell>
                   <TableCell align="center">
-                    <IconButton onClick={() => onSetCohortFavorite(historyRow.uuid)}>
+                    <IconButton onClick={() => onSetCohortFavorite(historyRow)}>
                       <FavStar favorite={historyRow.favorite} />
                     </IconButton>
                   </TableCell>

@@ -19,33 +19,44 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import ResearchTable from './ResearchTable/ResearchTable'
 import CohortsFilter from '../Filters/CohortsFilters/CohortsFilters'
-import { fetchCohorts } from 'services/savedResearches'
 
 import useStyles from './styles'
-import { CohortFilters, FormattedCohort, ValueSet } from 'types'
+import { Cohort, CohortFilters, ValueSet } from 'types'
 
 import displayDigit from 'utils/displayDigit'
+import { stableSort, getComparator } from 'utils/alphabeticalSort'
 
-import { setFavoriteCohortThunk, deleteUserCohortThunk } from 'state/userCohorts'
-import { useAppDispatch } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
+import { fetchCohorts, deleteCohort, setFavoriteCohort } from 'state/cohort'
 
 type ResearchProps = {
   simplified?: boolean
   onClickRow?: Function
   filteredIds?: string[]
 }
-const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds }) => {
+const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
+
+  const cohortState = useAppSelector((state) => state.cohort)
+
+  const total = cohortState.count
+  const loadingStatus = cohortState.loading
+
+  const [researches, setResearches] = useState<Cohort[]>([])
   const [page, setPage] = useState(1)
-  const [researches, setResearches] = useState<FormattedCohort[] | undefined>()
-  const [loadingStatus, setLoadingStatus] = useState(true)
-  const [total, setTotal] = useState(0)
+
   const [searchInput, setSearchInput] = useState('')
-  const [sortBy, setSortBy] = useState('fhir_datetime')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+
+  const search = new URLSearchParams(location.search)
+  const favInUrl = (search.get('fav') ?? 'false') === 'true'
+
+  const [sortBy, setSortBy] = useState(favInUrl ? 'favorite' : 'fhir_datetime')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+
   const [open, setOpen] = useState(false)
   const [showFilterChip, setShowFilterChip] = useState(false)
+
   const [filters, setFilters] = useState<CohortFilters>({
     status: [],
     type: 'all',
@@ -58,48 +69,35 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
   const researchLines = 20 // Number of desired lines in the document array
 
   useEffect(() => {
+    dispatch<any>(fetchCohorts())
+  }, [])
+
+  useEffect(() => {
     onFetchCohorts(sortBy, sortDirection)
-  }, [filters]) // eslint-disable-line
+  }, [cohortState, filters]) // eslint-disable-line
 
   const onFetchCohorts = async (sortBy = 'given', sortDirection = 'asc', input = searchInput) => {
-    setLoadingStatus(true)
-    setPage(1)
-    setSortBy(sortBy)
-    setSortDirection(sortDirection as 'asc' | 'desc')
-    const cohortsResp = await fetchCohorts(sortBy, sortDirection, filters, input)
+    let cohortsList = cohortState.cohortsList
 
-    if (filteredIds) {
-      setResearches(cohortsResp ? cohortsResp?.results?.filter((r) => !filteredIds.includes(r.researchId)) : undefined)
-    } else {
-      setResearches(cohortsResp?.results ?? undefined)
+    if (input) {
+      const regexp = new RegExp(`${(input || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}`, 'gi') // eslint-disable-line
+      cohortsList = cohortsList.filter(({ name }) => name?.search(regexp) !== -1)
     }
-    setTotal(cohortsResp?.count ?? 0)
-    setLoadingStatus(false)
+
+    const sortedCohortsList = stableSort(cohortsList, getComparator(sortDirection, sortBy))
+    setResearches(sortedCohortsList)
   }
 
-  const onDeleteCohort = async (cohortId: string) => {
-    setResearches(researches?.filter((r) => r.researchId !== cohortId))
-    dispatch<any>(deleteUserCohortThunk({ cohortId }))
+  const onDeleteCohort = async (cohort: Cohort) => {
+    dispatch<any>(deleteCohort({ deletedCohort: cohort }))
   }
 
-  const onSetCohortFavorite = async (cohortId: string) => {
-    await dispatch<any>(setFavoriteCohortThunk({ cohortId }))
-
-    const cohortsResp = await fetchCohorts(sortBy, sortDirection, filters)
-
-    setResearches(cohortsResp?.results ?? undefined)
-    setTotal(cohortsResp?.count ?? 0)
+  const onSetCohortFavorite = async (cohort: Cohort) => {
+    await dispatch<any>(setFavoriteCohort({ favCohort: cohort }))
   }
 
   const handleChangePage = async (event?: React.ChangeEvent<unknown>, value = 1) => {
     setPage(value)
-    setLoadingStatus(true)
-    const cohortsResp = await fetchCohorts(sortBy, sortDirection, filters, searchInput, value || 1)
-    if (cohortsResp) {
-      setResearches(cohortsResp?.results ?? undefined)
-      setTotal(cohortsResp?.count ?? 0)
-      setLoadingStatus(false)
-    }
   }
 
   const handleCloseDialog = (submit: boolean) => () => {
@@ -117,19 +115,6 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow, filteredIds
 
   const handleClearInput = async () => {
     setSearchInput('')
-    setLoadingStatus(true)
-    const cohortsResp = await fetchCohorts(sortBy, sortDirection, filters)
-
-    if (filteredIds) {
-      setResearches(
-        cohortsResp && cohortsResp.results && cohortsResp.results.length > 0
-          ? cohortsResp?.results?.filter((r) => !filteredIds.includes(r.researchId))
-          : undefined
-      )
-      setTotal(cohortsResp?.count ?? 0)
-    }
-
-    setLoadingStatus(false)
   }
 
   const onKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
