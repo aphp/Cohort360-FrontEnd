@@ -105,10 +105,10 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Âge :</Typography>
 
-          <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 180px', alignItems: 'center', margin: '0 1em' }}>
+          <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 160px', alignItems: 'center' }}>
             <Grid>
               <Slider
-                value={age}
+                value={_age}
                 onChange={_onChangeAge}
                 aria-labelledby="range-slider"
                 valueLabelDisplay="off"
@@ -118,21 +118,21 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
               />
 
               <Grid container justify="space-around">
-                <Grid item>
+                <Grid item style={{ flex: 0.5, margin: '0 4px' }}>
                   <TextField
-                    value={age[0]}
+                    value={_age[0]}
                     type="number"
                     onChange={(e) =>
-                      setAge([+e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : age[0], age[1]])
+                      setAge([+e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : _age[0], _age[1]])
                     }
                   />
                 </Grid>
-                <Grid item>
+                <Grid item style={{ flex: 0.5, margin: '0 4px' }}>
                   <TextField
-                    value={age[1]}
+                    value={_age[1]}
                     type="number"
                     onChange={(e) =>
-                      setAge([age[0], +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : age[1]])
+                      setAge([_age[0], +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : _age[1]])
                     }
                   />
                 </Grid>
