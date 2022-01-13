@@ -75,7 +75,12 @@ const Accueil: React.FC = () => {
             .sort((a, b) => +moment(b?.modified_at).format('X') - +moment(a.modified_at).format('X'))
             .splice(0, 5)
         : []
-    const _lastRequest = requestState.requestsList?.length > 0 ? [...requestState.requestsList].splice(0, 5) : []
+    const _lastRequest =
+      requestState.requestsList?.length > 0
+        ? [...requestState.requestsList]
+            .sort((a, b) => +moment(b?.modified_at).format('X') - +moment(a.modified_at).format('X'))
+            .splice(0, 5)
+        : []
 
     setFavoriteCohorts(_favoriteCohorts)
     setLastCohorts(_lastCohorts)
