@@ -184,7 +184,7 @@ const Login = () => {
     login()
   }
 
-  if (noRights == true) return <NoRights />
+  if (noRights === true) return <NoRights />
 
   return (
     <>
