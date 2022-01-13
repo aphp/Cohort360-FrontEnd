@@ -11,8 +11,10 @@ import {
   Radio,
   RadioGroup,
   Slider,
+  TextField,
   Typography
 } from '@material-ui/core'
+import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { VitalStatus } from 'types'
@@ -26,6 +28,8 @@ type PatientFiltersProps = {
   onChangeGender: (gender: PatientGenderKind) => void
   age: [number, number]
   onChangeAge: (newAge: [number, number]) => void
+  ageType: 'year' | 'month' | 'days'
+  onChangeAgeType: (newAgeType: 'year' | 'month' | 'days') => void
   vitalStatus: VitalStatus
   onChangeVitalStatus: (status: VitalStatus) => void
 }
@@ -38,6 +42,8 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
   onChangeGender,
   age,
   onChangeAge,
+  ageType,
+  onChangeAgeType,
   vitalStatus,
   onChangeVitalStatus
 }) => {
@@ -45,6 +51,7 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
 
   const [_gender, setGender] = useState<PatientGenderKind>(gender)
   const [_age, setAge] = useState<[number, number]>(age)
+  const [_ageType, setAgeType] = useState<'year' | 'month' | 'days'>(ageType)
   const [_vitalStatus, setVitalStatus] = useState<VitalStatus>(vitalStatus)
 
   useEffect(() => {
@@ -70,9 +77,17 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
   const _onSubmit = () => {
     onChangeGender(_gender)
     onChangeAge(_age)
+    onChangeAgeType(_ageType)
     onChangeVitalStatus(_vitalStatus)
     onSubmit()
   }
+
+  const ageTypeList = [
+    { id: 'year', label: 'années' },
+    { id: 'month', label: 'mois' },
+    { id: 'days', label: 'jours' }
+  ]
+  const currentAgeType = ageTypeList.find(({ id }) => id === _ageType)
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -89,15 +104,54 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
         </Grid>
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Âge :</Typography>
-          <Slider
-            value={_age}
-            onChange={_onChangeAge}
-            valueLabelDisplay="on"
-            max={130}
-            valueLabelFormat={(value) => (value === 130 ? '130+' : value)}
-            className={classes.slider}
-          />
+
+          <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 160px', alignItems: 'center' }}>
+            <Grid>
+              <Slider
+                value={_age}
+                onChange={_onChangeAge}
+                aria-labelledby="range-slider"
+                valueLabelDisplay="off"
+                valueLabelFormat={(value) => (value === 130 ? '130+' : value)}
+                min={0}
+                max={130}
+              />
+
+              <Grid container justify="space-around">
+                <Grid item style={{ flex: 0.5, margin: '0 4px' }}>
+                  <TextField
+                    value={_age[0]}
+                    type="number"
+                    onChange={(e) =>
+                      setAge([+e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : _age[0], _age[1]])
+                    }
+                  />
+                </Grid>
+                <Grid item style={{ flex: 0.5, margin: '0 4px' }}>
+                  <TextField
+                    value={_age[1]}
+                    type="number"
+                    onChange={(e) =>
+                      setAge([_age[0], +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : _age[1]])
+                    }
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+
+            <Autocomplete
+              id="criteria-ageType-autocomplete"
+              className={classes.inputItem}
+              options={ageTypeList}
+              getOptionLabel={(option) => option.label}
+              getOptionSelected={(option, value) => option.id === value.id}
+              value={currentAgeType}
+              onChange={(e, value) => setAgeType((value?.id ?? 'year') as 'year' | 'month' | 'days')}
+              renderInput={(params) => <TextField {...params} variant="outlined" />}
+            />
+          </Grid>
         </Grid>
+
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Statut vital :</Typography>
           <RadioGroup name="VitalStatus" value={_vitalStatus} onChange={_onChangeVitalStatus} row={true}>

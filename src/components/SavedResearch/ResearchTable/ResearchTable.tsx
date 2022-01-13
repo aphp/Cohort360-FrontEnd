@@ -81,7 +81,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   const history = useHistory()
 
   const [dialogOpen, setOpenDialog] = useState(false)
-  const [selectedCohort, setSelectedCohort] = useState<string | undefined>()
+  const [selectedCohort, setSelectedCohort] = useState<Cohort | undefined>()
   const [selectedExportableCohort, setSelectedExportableCohort] = useState<number | undefined>()
   const [anchorEl, setAnchorEl] = React.useState(null)
   const openMenuItem = Boolean(anchorEl)
@@ -221,18 +221,18 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                   <TableCell
                     align="center"
                     className={classes.tableHeadCell}
-                    sortDirection={sortBy === 'fhir_datetime' ? sortDirection : false}
+                    sortDirection={sortBy === 'modified_at' ? sortDirection : false}
                   >
                     {sortDirection ? (
                       <TableSortLabel
-                        active={sortBy === 'fhir_datetime'}
-                        direction={sortBy === 'fhir_datetime' ? sortDirection : 'asc'}
-                        onClick={createSortHandler('fhir_datetime')}
+                        active={sortBy === 'modified_at'}
+                        direction={sortBy === 'modified_at' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('modified_at')}
                       >
-                        Date de création
+                        Date de modification
                       </TableSortLabel>
                     ) : (
-                      'Date de création'
+                      'Date de modification'
                     )}
                   </TableCell>
                   <TableCell align="center" className={classes.tableHeadCell}>
@@ -296,10 +296,10 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                           : '-'}
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} align="center">
-                        {row.dated_measure && row.dated_measure.fhir_datetime ? (
+                        {row.modified_at ? (
                           <>
-                            {new Date(row.dated_measure.fhir_datetime).toLocaleDateString('fr-FR')}{' '}
-                            {new Date(row.dated_measure.fhir_datetime).toLocaleTimeString('fr-FR', {
+                            {new Date(row.modified_at).toLocaleDateString('fr-FR')}{' '}
+                            {new Date(row.modified_at).toLocaleTimeString('fr-FR', {
                               hour: '2-digit',
                               minute: '2-digit'
                             })}
@@ -336,7 +336,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                 size="small"
                                 onClick={(event) => {
                                   event.stopPropagation()
-                                  dispatch(setSelectedCohortState(row.uuid ?? null))
+                                  dispatch(setSelectedCohortState(row?.uuid ?? null))
                                 }}
                               >
                                 <EditIcon />
@@ -349,7 +349,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                 onClick={(event) => {
                                   event.stopPropagation()
                                   handleClickOpenDialog()
-                                  setSelectedCohort(row.uuid)
+                                  setSelectedCohort(row)
                                 }}
                               >
                                 <DeleteOutlineIcon />
@@ -368,14 +368,14 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                               event.stopPropagation()
                               // @ts-ignore
                               setAnchorEl(event.currentTarget)
-                              setSelectedCohort(row.uuid)
+                              setSelectedCohort(row)
                             }}
                           >
                             <MoreVertIcon />
                           </IconButton>
                           <Menu
                             anchorEl={anchorEl}
-                            open={openMenuItem && row.uuid === selectedCohort}
+                            open={openMenuItem && row.uuid === selectedCohort?.uuid}
                             onClose={() => setAnchorEl(null)}
                           >
                             {canExportThisCohort && (
@@ -404,7 +404,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                               className={classes.menuItem}
                               onClick={(event) => {
                                 event.stopPropagation()
-                                setSelectedCohort(row.uuid)
+                                setSelectedCohort(row)
                                 handleClickOpenDialog()
                                 setAnchorEl(null)
                               }}

@@ -193,7 +193,13 @@ const editCohort = createAsyncThunk<EditCohortReturn, EditCohortParams, { state:
 
         const modifiedCohort = await services.projects.editCohort(editedCohort)
 
-        cohortsList[index] = modifiedCohort
+        cohortsList[index] = {
+          ...cohortsList[index],
+          name: modifiedCohort.name,
+          description: modifiedCohort.description,
+          favorite: modifiedCohort.favorite,
+          modified_at: modifiedCohort.modified_at
+        }
       }
 
       if (stateExploredCohort.uuid === editedCohort.uuid) {
