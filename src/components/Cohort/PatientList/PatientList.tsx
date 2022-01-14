@@ -144,7 +144,7 @@ const PatientList: React.FC<PatientListProps> = ({
 
   useEffect(() => {
     onSearchPatient()
-  }, [gender, age, vitalStatus]) // eslint-disable-line
+  }, [gender, age, ageType, vitalStatus]) // eslint-disable-line
 
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
@@ -225,6 +225,17 @@ const PatientList: React.FC<PatientListProps> = ({
         return 'Patients vivants'
       case VitalStatus.deceased:
         return 'Patients décédés'
+    }
+  }
+
+  const ageTypeName = () => {
+    switch (ageType) {
+      case 'year':
+        return 'année(s)'
+      case 'month':
+        return 'mois'
+      case 'days':
+        return 'jour(s)'
     }
   }
 
@@ -372,7 +383,7 @@ const PatientList: React.FC<PatientListProps> = ({
             {showFilterChip && (age[0] !== 0 || age[1] !== 130) && (
               <Chip
                 className={classes.chips}
-                label={`Âge entre ${age[0]} et ${age[1]} ans`}
+                label={`Âge entre ${age[0]} et ${age[1]} ${ageTypeName()}`}
                 onDelete={() => handleDeleteChip('age')}
                 color="primary"
                 variant="outlined"

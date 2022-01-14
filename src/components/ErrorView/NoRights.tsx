@@ -3,12 +3,13 @@ import { useHistory } from 'react-router-dom'
 
 import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
+import Link from '@material-ui/core/Link'
 import Typography from '@material-ui/core/Typography'
 import WarningIcon from '@material-ui/icons/Report'
 
 import useStyles from './styles'
 
-const CohortRightOrNotExist = () => {
+const NoRights = () => {
   const classes = useStyles()
   const history = useHistory()
 
@@ -19,7 +20,7 @@ const CohortRightOrNotExist = () => {
           <Grid item style={{ padding: 16 }}>
             <WarningIcon style={{ fontSize: 60 }} />
           </Grid>
-          <Grid item style={{ padding: '8px 32px' }}>
+          <Grid item container justifyContent="center" style={{ padding: '8px 32px' }}>
             <Typography style={{ marginBottom: 16 }} variant="h5" align="center">
               Vous n'avez pas accès à l'application Cohort360. Merci de vous rapprocher de votre coordinateur pour
               demander la création de votre compte Cohort360 ainsi qu'un créneau de formation obligatoire pour utiliser
@@ -29,6 +30,13 @@ const CohortRightOrNotExist = () => {
               S'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante:
               dsi-id-recherche-support-cohort360@aphp.fr
             </Typography>
+            <Link
+              target="_blank"
+              rel="noopener"
+              href="https://eds.aphp.fr/sites/default/files/2021-09/EDS_AP-HP_ListeCoordGHDS_20210901.pdf"
+            >
+              Liste des coordinateurs
+            </Link>
           </Grid>
         </Grid>
       </Grid>
@@ -42,4 +50,4 @@ const CohortRightOrNotExist = () => {
   )
 }
 
-export default CohortRightOrNotExist
+export default NoRights
