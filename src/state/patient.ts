@@ -344,7 +344,7 @@ const fetchAllProcedures = createAsyncThunk<FetchAllProceduresReturn, FetchAllPr
           ? services.patients.fetchAllProcedures(patientId, groupId ?? '', ccamTotal - ccamCount)
           : null,
         diagnosticTotal - diagnosticCount !== 0
-          ? services.patients.fetchMainDiagnostics(patientId, groupId ?? '', diagnosticTotal - diagnosticCount)
+          ? services.patients.fetchAllConditions(patientId, groupId ?? '', diagnosticTotal - diagnosticCount)
           : null
       ])
 
@@ -493,14 +493,25 @@ type FetchPatientReturn = {
 
 const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams, { state: RootState }>(
   'patient/fetchPatientInfo',
-  async ({ patientId, groupId }, { dispatch }) => {
+  async ({ patientId, groupId }, { getState, dispatch }) => {
     try {
+      const patientState = getState().patient
+
       const fetchPatientResponse = await services.patients.fetchPatientInfo(patientId, groupId)
       if (fetchPatientResponse === undefined) return null
 
       const { patientInfo, hospits, deidentifiedBoolean } = fetchPatientResponse
 
-      dispatch(fetchLastPmsiInfo({ patientId, groupId }))
+      if (
+        !patientState?.patientInfo?.lastGhm ||
+        patientState?.patientInfo?.lastGhm === 'loading' ||
+        !patientState?.patientInfo?.lastProcedure ||
+        patientState?.patientInfo?.lastProcedure === 'loading' ||
+        !patientState?.patientInfo?.mainDiagnosis ||
+        patientState?.patientInfo?.mainDiagnosis === 'loading'
+      ) {
+        dispatch(fetchLastPmsiInfo({ patientId, groupId }))
+      }
 
       return {
         patientInfo,
@@ -545,10 +556,7 @@ const patientSlice = createSlice({
             patientInfo: state.patientInfo
               ? state.patientInfo
               : {
-                  resourceType: 'Patient',
-                  lastGhm: 'loading',
-                  lastProcedure: 'loading',
-                  mainDiagnosis: 'loading'
+                  resourceType: 'Patient'
                 }
           }
     )
@@ -561,10 +569,8 @@ const patientSlice = createSlice({
             loading: false,
             deidentified: action.payload.deidentified,
             patientInfo: {
-              ...action.payload.patientInfo,
-              lastGhm: 'loading',
-              lastProcedure: 'loading',
-              mainDiagnosis: 'loading'
+              ...(state?.patientInfo ?? {}),
+              ...action.payload.patientInfo
             },
             hospits: action.payload.hospits
           }
@@ -573,10 +579,8 @@ const patientSlice = createSlice({
             loading: false,
             deidentified: action.payload.deidentified,
             patientInfo: {
-              ...action.payload.patientInfo,
-              lastGhm: 'loading',
-              lastProcedure: 'loading',
-              mainDiagnosis: 'loading'
+              ...state?.patientInfo,
+              ...action.payload.patientInfo
             },
             hospits: action.payload.hospits,
             documents: undefined,
@@ -585,6 +589,30 @@ const patientSlice = createSlice({
           }
     )
     builder.addCase(fetchPatientInfo.rejected, () => null)
+    builder.addCase(fetchLastPmsiInfo.pending, (state) =>
+      state === null
+        ? {
+            loading: true,
+            patientInfo: {
+              resourceType: 'Patient',
+              lastGhm: 'loading',
+              lastProcedure: 'loading',
+              mainDiagnosis: 'loading'
+            }
+          }
+        : {
+            ...state,
+            loading: true,
+            patientInfo: state.patientInfo
+              ? { ...state.patientInfo, lastGhm: 'loading', lastProcedure: 'loading', mainDiagnosis: 'loading' }
+              : {
+                  resourceType: 'Patient',
+                  lastGhm: 'loading',
+                  lastProcedure: 'loading',
+                  mainDiagnosis: 'loading'
+                }
+          }
+    )
     builder.addCase(fetchLastPmsiInfo.fulfilled, (state, action) =>
       action.payload === null
         ? null

@@ -30,7 +30,7 @@ const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
               ? new Date(data.meta.lastUpdated).toLocaleDateString('fr-FR')
               : 'Date inconnue'}
           </span>
-          <div className={classes.chip} />
+
           {data.code && (
             <div className={classes.timelineTextRight}>
               {`${data.code?.coding?.[0].display} (${data.code?.coding?.[0].code})`}

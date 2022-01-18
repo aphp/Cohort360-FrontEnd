@@ -1,11 +1,8 @@
 import React from 'react'
 
-import { Chip } from '@material-ui/core'
-
 import { IProcedure } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import useStyles from './styles'
-import { getProcedureStatus } from 'utils/documentsFormatter'
 import { PMSIEntry } from 'types'
 
 /**
@@ -53,7 +50,6 @@ const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
               ? new Date(data.meta.lastUpdated).toLocaleDateString('fr-FR')
               : 'Date inconnue'}
           </span>
-          {data.status && <Chip label={getProcedureStatus(data.status)} size="small" className={classes.chip} />}
           {data.code && (
             <div className={classes.timelineTextRight}>
               {`${data.code?.coding?.[0].display} (${data.code?.coding?.[0].code})`}
