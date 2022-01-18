@@ -8,7 +8,9 @@ export default function TutorialsCard() {
   const classes = useStyles()
   return (
     <>
-      <Title>Actualités</Title>
+      <div id="news-card-title">
+        <Title>Actualités</Title>
+      </div>
       <Divider className={classes.divider} />
 
       <Typography color="textSecondary" style={{ paddingBottom: 14 }}>
