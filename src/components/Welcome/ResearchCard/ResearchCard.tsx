@@ -47,7 +47,7 @@ const ResearchCard: React.FC<ResearchCardProps> = ({
   return (
     <>
       <Grid container spacing={3}>
-        <Grid item xs={9}>
+        <Grid id="research-card-title" item xs={9}>
           <Title>{title}</Title>
         </Grid>
         <Grid item container xs={3} justify="flex-end">

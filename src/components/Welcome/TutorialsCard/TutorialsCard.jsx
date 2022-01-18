@@ -44,11 +44,12 @@ const TutorialsCard = () => {
 
   return (
     <>
-      <Title>Tutoriels</Title>
+      <div id="tutorials-card-title">
+        <Title>Tutoriels</Title>
+      </div>
       <Divider className={classes.divider} />
-      {/* <Typography color="textSecondary">Nouvelle fonctionnalité à venir !</Typography> */}
 
-      <Grid className={classes.carouselContainer}>
+      <Grid id="tutorials-card-carousel" className={classes.carouselContainer}>
         {/* Content */}
         {youtubeIds.map(
           (m, i) =>

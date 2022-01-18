@@ -121,7 +121,7 @@ export interface IServicesPatients {
    *
    *
    */
-  fetchMainDiagnostics: (patientId: string, groupId: string, size?: number) => Promise<ICondition[]>
+  fetchAllConditions: (patientId: string, groupId: string, size?: number) => Promise<ICondition[]>
 
   /*
    ** Cette fonction permet de récupérer les élèments de Medication lié à un patient
@@ -389,15 +389,14 @@ const servicesPatients: IServicesPatients = {
     return proceduresData
   },
 
-  fetchMainDiagnostics: async (patientId, groupId, size) => {
+  fetchAllConditions: async (patientId, groupId, size) => {
     const diagnosticsResp = await fetchCondition({
       offset: 20,
       size,
       _list: groupId ? [groupId] : [],
       patient: patientId,
       _sort: 'recorded-date',
-      sortDirection: 'desc',
-      type: ['dp']
+      sortDirection: 'desc'
     })
 
     const diagnosticsData: ICondition[] = getApiResponseResources(diagnosticsResp) ?? []

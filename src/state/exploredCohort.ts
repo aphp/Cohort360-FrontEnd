@@ -74,7 +74,6 @@ const favoriteExploredCohort = createAsyncThunk<CohortData, { id: string }, { st
     if (!foundItem) return state.exploredCohort
 
     const favoriteResult = await dispatch(setFavoriteCohort({ favCohort: foundItem }))
-    console.log(`favoriteResult`, favoriteResult)
 
     return {
       ...state.exploredCohort,
