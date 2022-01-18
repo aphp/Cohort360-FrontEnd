@@ -30,13 +30,29 @@ const PatientSearchCard = () => {
 
   return (
     <>
-      <Title>{loading ? <CircularProgress size={20} /> : displayDigit(patientNb)} patients pris en charge</Title>
+      <div id="patients-card-title">
+        <Title>{loading ? <CircularProgress size={20} /> : displayDigit(patientNb)} patients pris en charge</Title>
+      </div>
       <Divider />
       <Grid container direction="column" justifyContent="space-evenly" style={{ height: '100%', marginTop: 8 }}>
-        <Button href="/mes_patients" size="small" variant="contained" disableElevation className={classes.button}>
+        <Button
+          id="patients-research-button"
+          href="/mes_patients"
+          size="small"
+          variant="contained"
+          disableElevation
+          className={classes.button}
+        >
           Explorer tous les patients
         </Button>
-        <Button href="/perimetre" size="small" variant="contained" disableElevation className={classes.button}>
+        <Button
+          id="scope-research-button"
+          href="/perimetre"
+          size="small"
+          variant="contained"
+          disableElevation
+          className={classes.button}
+        >
           Explorer un périmètre
         </Button>
       </Grid>

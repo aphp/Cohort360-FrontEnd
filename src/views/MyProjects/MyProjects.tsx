@@ -108,7 +108,7 @@ const MyProjects = () => {
       >
         <Grid container justify="center" alignItems="center">
           <Grid container item xs={11}>
-            <Typography variant="h1" color="primary" className={classes.title}>
+            <Typography id="myProject-title" variant="h1" color="primary" className={classes.title}>
               Mes projets de recherche
             </Typography>
           </Grid>

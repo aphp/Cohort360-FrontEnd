@@ -110,13 +110,17 @@ const Accueil: React.FC = () => {
         <Grid container spacing={1}>
           <Grid container className={classes.newsGrid} item xs={12} md={6} lg={6}>
             <Grid item className={classes.pt3}>
-              <Paper className={classes.paper} style={{ maxHeight: 150, minHeight: 150, height: 150 }}>
+              <Paper
+                id="patients-card"
+                className={classes.paper}
+                style={{ maxHeight: 150, minHeight: 150, height: 150 }}
+              >
                 <PatientsCard />
               </Paper>
             </Grid>
 
             <Grid item className={classes.pt3}>
-              <Paper className={classes.paper} style={{ maxHeight: 450, minHeight: 450, height: 450 }}>
+              <Paper id="news-card" className={classes.paper} style={{ maxHeight: 450, minHeight: 450, height: 450 }}>
                 <NewsCard />
               </Paper>
             </Grid>
@@ -124,13 +128,21 @@ const Accueil: React.FC = () => {
 
           <Grid container item xs={12} md={6} lg={6}>
             <Grid item xs={12} md={12} lg={12} className={classes.pt3}>
-              <Paper className={classes.paper} style={{ maxHeight: 150, minHeight: 150, height: 150 }}>
+              <Paper
+                id="search-patient-card"
+                className={classes.paper}
+                style={{ maxHeight: 150, minHeight: 150, height: 150 }}
+              >
                 <SearchPatientCard />
               </Paper>
             </Grid>
 
             <Grid item xs={12} md={12} lg={12} className={classes.pt3}>
-              <Paper className={classes.paper} style={{ maxHeight: 450, minHeight: 450, height: 450 }}>
+              <Paper
+                id="tutorials-card"
+                className={classes.paper}
+                style={{ maxHeight: 450, minHeight: 450, height: 450 }}
+              >
                 <TutorialsCard />
               </Paper>
             </Grid>
@@ -139,7 +151,7 @@ const Accueil: React.FC = () => {
 
         <Grid container spacing={3} style={{ paddingTop: 8 }}>
           <Grid item xs={12} md={12} lg={12}>
-            <Paper className={classes.paper}>
+            <Paper id="favorite-cohort-research-card" className={classes.paper}>
               <ResearchCard
                 title={'Mes cohortes favorites'}
                 linkLabel={'Voir toutes mes cohortes favorites'}
@@ -153,7 +165,7 @@ const Accueil: React.FC = () => {
         </Grid>
         <Grid container spacing={3}>
           <Grid item xs={12} md={12} lg={12}>
-            <Paper className={classes.paper}>
+            <Paper id="last-created-cohort-research-card" className={classes.paper}>
               <ResearchCard
                 title={'Mes dernières cohortes créées'}
                 linkLabel={'Voir toutes mes cohortes'}
@@ -166,7 +178,7 @@ const Accueil: React.FC = () => {
         </Grid>
         <Grid container spacing={3}>
           <Grid item xs={12} md={12} lg={12}>
-            <Paper className={classes.paper}>
+            <Paper id="last-created-request-research-card" className={classes.paper}>
               <ResearchCard
                 title={'Mes dernières requêtes créées'}
                 linkLabel={'Voir toutes mes requêtes'}
