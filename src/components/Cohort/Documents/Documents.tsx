@@ -1,45 +1,29 @@
 import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 
-import {
-  Button,
-  CircularProgress,
-  Chip,
-  CssBaseline,
-  Grid,
-  IconButton,
-  InputAdornment,
-  InputBase,
-  Typography
-  // TextField,
-  // Input
-} from '@material-ui/core'
+import { Button, CircularProgress, Chip, CssBaseline, Grid, Typography } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
 import Skeleton from '@material-ui/lab/Skeleton'
 import Pagination from '@material-ui/lab/Pagination'
 
 import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
 import DocumentList from './DocumentList/DocumentList'
-// import WordCloud from '../Preview/Charts/WordCloud'
-import DocumentSearchHelp from '../../DocumentSearchHelp/DocumentSearchHelp'
-import services from 'services'
 
-import ClearIcon from '@material-ui/icons/Clear'
-import InfoIcon from '@material-ui/icons/Info'
-import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
+import InputSearchDocumentSimple from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentSimple'
+import InputSearchDocumentExtend from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentExtend'
+
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
-import { docTypes } from 'assets/docTypes.json'
 
 import { CohortComposition } from 'types'
-import {
-  // IExtension,
-  IDocumentReference
-} from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 
-import useStyles from './styles'
+import services from 'services'
 import { useAppSelector } from 'state'
 
 import displayDigit from 'utils/displayDigit'
+import { docTypes } from 'assets/docTypes.json'
+
+import useStyles from './styles'
 
 type DocumentsProps = {
   groupId?: string
@@ -54,24 +38,29 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     dashboard: state.exploredCohort
   }))
   const { encounters } = dashboard
-  const [page, setPage] = useState(1)
+
   const [documentsNumber, setDocumentsNumber] = useState<number | undefined>(0)
   const [allDocumentsNumber, setAllDocumentsNumber] = useState<number | undefined>(0)
   const [patientDocumentsNumber, setPatientDocumentsNumber] = useState<number | undefined>(0)
   const [allPatientDocumentsNumber, setAllPatientDocumentsNumber] = useState<number | undefined>(0)
+
   const [documents, setDocuments] = useState<(CohortComposition | IDocumentReference)[]>([])
   const [loadingStatus, setLoadingStatus] = useState(true)
+  const [page, setPage] = useState(1)
+
   const [searchInput, setSearchInput] = useState('')
   const [searchMode, setSearchMode] = useState(false)
-  const [open, setOpen] = useState(false)
-  const [helpOpen, setHelpOpen] = useState(false)
+
+  const [openFilter, setOpenFilter] = useState(false)
+
   const [nda, setNda] = useState('')
   const [selectedDocTypes, setSelectedDocTypes] = useState<any[]>([])
   const [startDate, setStartDate] = useState<string | null>(null)
   const [endDate, setEndDate] = useState<string | null>(null)
+
   const [_sortBy, setSortBy] = useState(sortBy)
   const [_sortDirection, setSortDirection] = useState<'asc' | 'desc'>(sortDirection)
-  const [showFilterChip, setShowFilterChip] = useState(false)
+
   const [showAreaText, setShowAreaText] = useState(false)
 
   const documentLines = 20
@@ -101,7 +90,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     return displayingSelectedDocTypes.filter((item, index, array) => array.indexOf(item) === index)
   })()
 
-  const onSearchDocument = async (sortBy: string, sortDirection: 'asc' | 'desc', input = searchInput, page = 1) => {
+  const onSearchDocument = async (sortBy: string, sortDirection: 'asc' | 'desc', input?: string, page = 1) => {
     if (input !== '') {
       setSearchMode(true)
     } else {
@@ -116,7 +105,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
       sortBy,
       sortDirection,
       page,
-      input,
+      input ?? '',
       selectedDocTypesCodes,
       nda,
       startDate,
@@ -140,29 +129,12 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     onSearchDocument(_sortBy, _sortDirection)
   }, [!!deidentifiedBoolean, selectedDocTypes, nda, startDate, endDate, _sortBy, _sortDirection]) // eslint-disable-line
 
-  const handleClearInput = () => {
-    setSearchInput('')
-    onSearchDocument(_sortBy, _sortDirection, '')
-  }
-
   const handleOpenDialog = () => {
-    setOpen(true)
+    setOpenFilter(true)
   }
 
-  const handleCloseDialog = (submit: boolean) => () => {
-    setOpen(false)
-    submit && setShowFilterChip(true)
-  }
-
-  const handleChangeInput = (event: any) => {
-    setSearchInput(event.target.value)
-  }
-
-  const onKeyDown = async (e: any) => {
-    if (e.keyCode === 13) {
-      e.preventDefault()
-      onSearchDocument(_sortBy, _sortDirection)
-    }
+  const handleCloseDialog = () => () => {
+    setOpenFilter(false)
   }
 
   const handleDeleteChip = (filterName: string, value?: string) => {
@@ -226,44 +198,22 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                   </>
                 )}
               </Grid>
+
               <Grid item>
                 <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
                   <div className={classes.documentButtons}>
                     {!showAreaText && (
-                      <>
-                        <IconButton size="small" onClick={() => setHelpOpen(true)}>
-                          <InfoIcon />
-                        </IconButton>
-
-                        <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
-                          <InputBase
-                            placeholder="Rechercher dans les documents"
-                            className={classes.input}
-                            value={searchInput}
-                            onChange={handleChangeInput}
-                            onKeyDown={onKeyDown}
-                            endAdornment={
-                              <InputAdornment position="end">
-                                {searchInput && (
-                                  <IconButton onClick={handleClearInput}>
-                                    <ClearIcon />
-                                  </IconButton>
-                                )}
-                              </InputAdornment>
-                            }
-                          />
-                          <IconButton
-                            type="submit"
-                            aria-label="search"
-                            onClick={() => onSearchDocument(_sortBy, _sortDirection)}
-                          >
-                            <SearchIcon fill="#ED6D91" height="15px" />
-                          </IconButton>
-                        </Grid>
-                      </>
+                      <InputSearchDocumentSimple
+                        defaultSearchInput={searchInput}
+                        setDefaultSearchInput={(newSearchInput: string) => {
+                          console.log('newSearchInput :>> ', newSearchInput)
+                          setSearchInput(newSearchInput)
+                        }}
+                        onSearchDocument={(newInputText: string) =>
+                          onSearchDocument(_sortBy, _sortDirection, newInputText)
+                        }
+                      />
                     )}
-
-                    <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
 
                     <Button
                       variant="contained"
@@ -285,40 +235,19 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
               </Grid>
 
               {showAreaText && (
-                <Grid container item className={classes.gridAdvancedSearch}>
-                  <InputBase
-                    fullWidth
-                    className={classes.advancedSearch}
-                    placeholder="Recherche avancée dans les documents"
-                    value={searchInput}
-                    onChange={handleChangeInput}
-                    multiline
-                    rows={3}
-                    endAdornment={
-                      <InputAdornment position="end">
-                        <IconButton size="small" onClick={() => setHelpOpen(true)}>
-                          <InfoIcon />
-                        </IconButton>
-                        <IconButton size="small" onClick={() => handleClearInput()}>
-                          <ClearIcon />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          type="submit"
-                          aria-label="search"
-                          onClick={() => onSearchDocument(_sortBy, _sortDirection)}
-                        >
-                          <SearchIcon fill="#ED6D91" height="17px" />
-                        </IconButton>
-                      </InputAdornment>
-                    }
-                  />
-                </Grid>
+                <InputSearchDocumentExtend
+                  defaultSearchInput={searchInput}
+                  setDefaultSearchInput={(newSearchInput: string) => {
+                    console.log('newSearchInput :>> ', newSearchInput)
+                    setSearchInput(newSearchInput)
+                  }}
+                  onSearchDocument={(newInputText: string) => onSearchDocument(_sortBy, _sortDirection, newInputText)}
+                />
               )}
             </Grid>
+
             <Grid>
-              {showFilterChip &&
-                nda !== '' &&
+              {nda !== '' &&
                 nda
                   .split(',')
                   .map((value) => (
@@ -331,8 +260,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                       variant="outlined"
                     />
                   ))}
-              {showFilterChip &&
-                displayingSelectedDocType.length > 0 &&
+              {displayingSelectedDocType.length > 0 &&
                 displayingSelectedDocType.map((docType) => (
                   <Chip
                     className={classes.chips}
@@ -343,7 +271,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                     variant="outlined"
                   />
                 ))}
-              {showFilterChip && startDate && (
+
+              {startDate && (
                 <Chip
                   className={classes.chips}
                   label={`Après le : ${moment(startDate).format('DD/MM/YYYY')}`}
@@ -352,7 +281,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                   variant="outlined"
                 />
               )}
-              {showFilterChip && endDate && (
+
+              {endDate && (
                 <Chip
                   className={classes.chips}
                   label={`Avant le : ${moment(endDate).format('DD/MM/YYYY')}`}
@@ -364,7 +294,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
             </Grid>
 
             <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
-              Attention : La recherche est pseudonimisée pour la prévisualisation des documents. Vous pouvez donc
+              Attention : La recherche est pseudonymisée pour la prévisualisation des documents. Vous pouvez donc
               trouver des incohérences entre les informations de votre patient et celles du document prévisualisé.
             </Alert>
 
@@ -385,6 +315,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                   sortDirection={_sortDirection}
                   onChangeSortDirection={setSortDirection}
                 />
+
                 <Pagination
                   className={classes.pagination}
                   count={Math.ceil((documentsNumber ?? 0) / documentLines)}
@@ -405,9 +336,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
       </Grid>
 
       <DocumentFilters
-        open={open}
-        onClose={handleCloseDialog(false)}
-        onSubmit={handleCloseDialog(true)}
+        open={openFilter}
+        onClose={handleCloseDialog()}
+        onSubmit={handleCloseDialog()}
         nda={nda}
         onChangeNda={setNda}
         selectedDocTypes={selectedDocTypes}

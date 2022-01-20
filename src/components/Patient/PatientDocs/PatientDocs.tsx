@@ -3,7 +3,7 @@ import moment from 'moment'
 import { useDispatch } from 'react-redux'
 
 import { Button, Chip, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
-import { Pagination } from '@material-ui/lab'
+import { Alert, Pagination } from '@material-ui/lab'
 
 import ClearIcon from '@material-ui/icons/Clear'
 import InfoIcon from '@material-ui/icons/Info'
@@ -268,6 +268,11 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
           />
         )}
       </Grid>
+
+      <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
+        Attention : La recherche est pseudonymisée pour la prévisualisation des documents. Vous pouvez donc trouver des
+        incohérences entre les informations de votre patient et celles du document prévisualisé.
+      </Alert>
 
       <DocumentList
         groupId={groupId}
