@@ -14,6 +14,7 @@ import {
   // TextField,
   // Input
 } from '@material-ui/core'
+import Alert from '@material-ui/lab/Alert'
 import Skeleton from '@material-ui/lab/Skeleton'
 import Pagination from '@material-ui/lab/Pagination'
 
@@ -361,6 +362,12 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                 />
               )}
             </Grid>
+
+            <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
+              Attention : La recherche est pseudonimisée pour la prévisualisation des documents. Vous pouvez donc
+              trouver des incohérences entre les informations de votre patient et celles du document prévisualisé.
+            </Alert>
+
             {loadingStatus || deidentifiedBoolean === null ? (
               <CircularProgress className={classes.loadingSpinner} size={50} />
             ) : (
