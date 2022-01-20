@@ -298,7 +298,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               </>
             )}
 
-            <ListItem className={classes.listItem} button onClick={() => history.push('/accueil')}>
+            <ListItem id="accueil" className={classes.listItem} button onClick={() => history.push('/accueil')}>
               <Tooltip title={!open ? 'Accueil' : ''}>
                 <ListItemIcon className={classes.listIcon}>
                   <HomeIcon width="20px" fill="#FFF" />
@@ -308,7 +308,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               <ListItemText className={classes.title} primary="Accueil" />
             </ListItem>
 
-            <ListItem className={classes.listItem} button onClick={handleDisplayPatientList}>
+            <ListItem id="patients" className={classes.listItem} button onClick={handleDisplayPatientList}>
               <Tooltip title={!open ? 'Mes patients' : ''}>
                 <ListItemIcon className={classes.listIcon}>
                   <PatientIcon width="20px" fill="#FFF" />
@@ -325,28 +325,29 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               timeout="auto"
               unmountOnExit
             >
-              <List>
+              <List id="patients-collapse">
                 {!practitioner?.deidentified && (
                   <ListItem>
-                    <Link href="/rechercher_patient" className={classes.nestedTitle}>
+                    <Link id="patientResearch-link" href="/rechercher_patient" className={classes.nestedTitle}>
                       Rechercher un patient
                     </Link>
                   </ListItem>
                 )}
                 <ListItem>
-                  <Link href="/mes_patients" className={classes.nestedTitle}>
+                  <Link id="myPatient-link" href="/mes_patients" className={classes.nestedTitle}>
                     Tous mes patients
                   </Link>
                 </ListItem>
                 <ListItem>
-                  <Link href="/perimetre" className={classes.nestedTitle}>
+                  <Link id="scoopeTree-link" href="/perimetre" className={classes.nestedTitle}>
                     Explorer un périmètre
                   </Link>
                 </ListItem>
               </List>
+              `
             </Collapse>
 
-            <ListItem className={classes.listItem} button onClick={handleDisplaySearchList}>
+            <ListItem id="research" className={classes.listItem} button onClick={handleDisplaySearchList}>
               <Tooltip title={!open ? 'Mes recherches' : ''}>
                 <ListItemIcon className={classes.listIcon}>
                   <ResearchIcon width="20px" fill="#FFF" />
@@ -354,7 +355,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               </Tooltip>
 
               <ListItemText className={classes.title} primary="Mes recherches" />
-              {displayPatientList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
+              {displaySearchList ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
             </ListItem>
 
             <Collapse
@@ -363,14 +364,14 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               unmountOnExit
               className={clsx(classes.nestedList, { [classes.hide]: !open })}
             >
-              <List>
+              <List id="research-collapse">
                 <ListItem>
-                  <Link href="/recherche_sauvegarde" className={classes.nestedTitle}>
+                  <Link id="savedResearch-link" href="/recherche_sauvegarde" className={classes.nestedTitle}>
                     Recherches sauvegardées
                   </Link>
                 </ListItem>
                 <ListItem>
-                  <Link href="/mes_projets" className={classes.nestedTitle}>
+                  <Link id="myProject-link" href="/mes_projets" className={classes.nestedTitle}>
                     Mes projets de recherche
                   </Link>
                 </ListItem>

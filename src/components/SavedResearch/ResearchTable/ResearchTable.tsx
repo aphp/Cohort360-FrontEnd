@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 
 import {
   Button,
@@ -10,6 +11,8 @@ import {
   Grid,
   IconButton,
   Paper,
+  Menu,
+  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -18,15 +21,26 @@ import {
   TableSortLabel,
   TableRow,
   Tooltip,
-  Typography
+  Typography,
+  Hidden
 } from '@material-ui/core'
 
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
+import InfoIcon from '@material-ui/icons/Info'
 
 import { ReactComponent as Star } from 'assets/icones/star.svg'
 import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
+import EditIcon from '@material-ui/icons/Edit'
+import ExportIcon from '@material-ui/icons/GetApp'
+import MoreVertIcon from '@material-ui/icons/MoreVert'
 
-import { FormattedCohort } from 'types'
+import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
+import ExportModal from 'components/Cohort/ExportModal/ExportModal'
+
+import { useAppSelector } from 'state'
+import { CohortState, setSelectedCohort as setSelectedCohortState } from 'state/cohort'
+
+import { Cohort } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
@@ -45,8 +59,8 @@ const FavStar: React.FC<FavStarProps> = ({ favorite }) => {
 type ResearchTableProps = {
   simplified?: boolean
   onClickRow?: Function
-  researchData?: FormattedCohort[]
-  onSetCohortFavorite: (cohortId: string) => void
+  researchData?: Cohort[]
+  onSetCohortFavorite: (cohort: Cohort) => void
   onDeleteCohort: Function
   sortBy?: string
   sortDirection?: 'asc' | 'desc'
@@ -63,10 +77,25 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   onRequestSort
 }) => {
   const classes = useStyles()
-  const [dialogOpen, setOpenDialog] = useState(false)
-  const [selectedCohort, setSelectedCohort] = useState<string | undefined>()
-
+  const dispatch = useDispatch()
   const history = useHistory()
+
+  const [dialogOpen, setOpenDialog] = useState(false)
+  const [selectedCohort, setSelectedCohort] = useState<Cohort | undefined>()
+  const [selectedExportableCohort, setSelectedExportableCohort] = useState<number | undefined>()
+  const [anchorEl, setAnchorEl] = React.useState(null)
+  const openMenuItem = Boolean(anchorEl)
+
+  const { cohortState } = useAppSelector<{
+    cohortState: CohortState
+  }>((state) => ({
+    cohortState: state.cohort
+  }))
+  const selectedCohortState = cohortState.selectedCohort
+
+  const _onClickRow = (row: any) => {
+    return !row.fhir_group_id ? null : onClickRow ? onClickRow(row) : history.push(`/cohort/${row.fhir_group_id}`)
+  }
 
   const removeCohort = () => {
     onDeleteCohort(selectedCohort)
@@ -84,32 +113,22 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
     onRequestSort(event, property)
   }
 
+  // You can make an export if you got 1 cohort with: EXPORT_DATA_NOMINATIVE = true && READ_DATA_NOMINATIVE = true
+  const canMakeExport = researchData
+    ? researchData.some((cohort) =>
+        cohort.extension && cohort.extension.length > 0
+          ? cohort.extension.find(
+              (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
+            ) &&
+            cohort.extension.find(
+              (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+            )
+          : false
+      )
+    : []
+
   return (
     <>
-      {!simplified && (
-        <Dialog
-          open={dialogOpen}
-          onClose={handleCloseDialog}
-          aria-labelledby="alert-dialog-slide-title"
-          aria-describedby="alert-dialog-slide-description"
-        >
-          <DialogTitle id="alert-dialog-slide-title">Etes-vous sûr de vouloir supprimer la cohorte ?</DialogTitle>
-          <DialogActions>
-            <Button onClick={handleCloseDialog} color="primary">
-              Non
-            </Button>
-            <Button
-              onClick={() => {
-                handleCloseDialog()
-                removeCohort()
-              }}
-              color="secondary"
-            >
-              Oui
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
       {
         //@ts-ignore
         !researchData?.length > 0 ? (
@@ -135,6 +154,23 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       </TableSortLabel>
                     ) : (
                       'Titre'
+                    )}
+                  </TableCell>
+                  <TableCell
+                    className={classes.tableHeadCell}
+                    align="center"
+                    sortDirection={sortBy === 'favorite' ? sortDirection : false}
+                  >
+                    {sortDirection ? (
+                      <TableSortLabel
+                        active={sortBy === 'favorite'}
+                        direction={sortBy === 'favorite' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('favorite')}
+                      >
+                        Favoris
+                      </TableSortLabel>
+                    ) : (
+                      'Favoris'
                     )}
                   </TableCell>
                   <TableCell
@@ -174,122 +210,254 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       'Nombre de patients'
                     )}
                   </TableCell>
-                  <TableCell
-                    align="center"
-                    className={classes.tableHeadCell}
-                    sortDirection={sortBy === 'fhir_datetime' ? sortDirection : false}
-                  >
-                    {sortDirection ? (
-                      <TableSortLabel
-                        active={sortBy === 'fhir_datetime'}
-                        direction={sortBy === 'fhir_datetime' ? sortDirection : 'asc'}
-                        onClick={createSortHandler('fhir_datetime')}
-                      >
-                        Date de création
-                      </TableSortLabel>
-                    ) : (
-                      'Date de création'
-                    )}
+                  <TableCell className={classes.tableHeadCell} align="center">
+                    Estimation du nombre de patients APHP
+                    <Tooltip title="Cet interval correspond à une estimation du nombre de patients correspondant aux critères de votre requête avec comme population source tous les hopitaux de l'APHP">
+                      <IconButton size="small" className={classes.infoButton}>
+                        <InfoIcon />
+                      </IconButton>
+                    </Tooltip>
                   </TableCell>
                   <TableCell
                     align="center"
                     className={classes.tableHeadCell}
-                    sortDirection={sortBy === 'favorite' ? sortDirection : false}
+                    sortDirection={sortBy === 'modified_at' ? sortDirection : false}
                   >
                     {sortDirection ? (
                       <TableSortLabel
-                        active={sortBy === 'favorite'}
-                        direction={sortBy === 'favorite' ? sortDirection : 'asc'}
-                        onClick={createSortHandler('favorite')}
+                        active={sortBy === 'modified_at'}
+                        direction={sortBy === 'modified_at' ? sortDirection : 'asc'}
+                        onClick={createSortHandler('modified_at')}
                       >
-                        Favoris
+                        Date de modification
                       </TableSortLabel>
                     ) : (
-                      'Favoris'
+                      'Date de modification'
                     )}
                   </TableCell>
-
-                  {!simplified && (
-                    <TableCell align="center" className={classes.tableHeadCell}>
-                      Supprimer
-                    </TableCell>
-                  )}
+                  <TableCell align="center" className={classes.tableHeadCell}>
+                    Actions
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {researchData?.map((row: FormattedCohort) => (
-                  <TableRow
-                    className={!row.fhir_group_id ? classes.notAllow : classes.pointerHover}
-                    hover
-                    key={row.researchId}
-                    onClick={
-                      !row.fhir_group_id
-                        ? () => null
-                        : onClickRow
-                        ? () => onClickRow(row)
-                        : () => history.push(`/cohort/${row.fhir_group_id}`)
-                    }
-                  >
-                    <TableCell>{row.name}</TableCell>
-                    <TableCell className={classes.status} align="center">
-                      {row.status}
-                    </TableCell>
-                    <TableCell align="center">
-                      {row.fhir_group_id ? (
-                        <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                      ) : row.jobStatus === 'pending' || row.jobStatus === 'started' ? (
-                        <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
-                      ) : row.jobFailMsg ? (
-                        <Tooltip title={row.jobFailMsg}>
-                          <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
-                        </Tooltip>
-                      ) : (
-                        <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
-                      )}
-                    </TableCell>
-                    <TableCell align="center">{displayDigit(row.nPatients ?? 0)}</TableCell>
-                    <TableCell align="center">
-                      {row.date && (
-                        <>
-                          {new Date(row.date).toLocaleDateString('fr-FR')}{' '}
-                          {new Date(row.date).toLocaleTimeString('fr-FR', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </>
-                      )}
-                    </TableCell>
-                    <TableCell align="center">
-                      <IconButton
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          onSetCohortFavorite(row.researchId)
-                        }}
-                      >
-                        <FavStar favorite={row.favorite} />
-                      </IconButton>
-                    </TableCell>
+                {researchData?.map((row: Cohort) => {
+                  const canExportThisCohort =
+                    canMakeExport && row.extension
+                      ? row.extension.some(
+                          (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
+                        ) &&
+                        row.extension.some(
+                          (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+                        )
+                      : false
 
-                    {!simplified && (
+                  return (
+                    <TableRow
+                      className={!row.fhir_group_id ? classes.notAllow : classes.pointerHover}
+                      hover
+                      key={row.uuid}
+                    >
+                      <TableCell onClick={() => _onClickRow(row)}>{row.name}</TableCell>
                       <TableCell align="center">
                         <IconButton
                           onClick={(event) => {
                             event.stopPropagation()
-                            handleClickOpenDialog()
-                            setSelectedCohort(row.researchId)
+                            onSetCohortFavorite(row)
                           }}
                         >
-                          <DeleteOutlineIcon />
+                          <FavStar favorite={row.favorite} />
                         </IconButton>
                       </TableCell>
-                    )}
-                  </TableRow>
-                ))}
+                      <TableCell onClick={() => _onClickRow(row)} className={classes.status} align="center">
+                        {row.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohort I2B2'}
+                      </TableCell>
+                      <TableCell onClick={() => _onClickRow(row)} align="center">
+                        {row.fhir_group_id ? (
+                          <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
+                        ) : row.request_job_status === 'pending' || row.request_job_status === 'started' ? (
+                          <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
+                        ) : row.request_job_fail_msg ? (
+                          <Tooltip title={row.request_job_fail_msg}>
+                            <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
+                          </Tooltip>
+                        ) : (
+                          <Chip label="Erreur" style={{ backgroundColor: '#dc3545', color: 'black' }} />
+                        )}
+                      </TableCell>
+                      <TableCell onClick={() => _onClickRow(row)} align="center">
+                        {displayDigit(row.result_size ?? 0)}
+                      </TableCell>
+                      <TableCell onClick={() => _onClickRow(row)} align="center">
+                        {row.dated_measure_global
+                          ? `${displayDigit(row.dated_measure_global.measure_min) ?? 'X'} - ${
+                              displayDigit(row.dated_measure_global.measure_max) ?? 'X'
+                            }`
+                          : '-'}
+                      </TableCell>
+                      <TableCell onClick={() => _onClickRow(row)} align="center">
+                        {row.modified_at ? (
+                          <>
+                            {new Date(row.modified_at).toLocaleDateString('fr-FR')}{' '}
+                            {new Date(row.modified_at).toLocaleTimeString('fr-FR', {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </>
+                        ) : (
+                          '-'
+                        )}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Hidden mdDown>
+                          <Grid
+                            container
+                            direction="row"
+                            alignItems="center"
+                            justify="center"
+                            style={{ width: 'max-content', margin: 'auto' }}
+                          >
+                            {canExportThisCohort && (
+                              <Grid item>
+                                <IconButton
+                                  size="small"
+                                  onClick={(event) => {
+                                    event.stopPropagation()
+                                    setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
+                                  }}
+                                >
+                                  <ExportIcon />
+                                </IconButton>
+                              </Grid>
+                            )}
+
+                            <Grid item>
+                              <IconButton
+                                size="small"
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  dispatch(setSelectedCohortState(row?.uuid ?? null))
+                                }}
+                              >
+                                <EditIcon />
+                              </IconButton>
+                            </Grid>
+
+                            <Grid item>
+                              <IconButton
+                                size="small"
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  handleClickOpenDialog()
+                                  setSelectedCohort(row)
+                                }}
+                              >
+                                <DeleteOutlineIcon />
+                              </IconButton>
+                            </Grid>
+                          </Grid>
+                        </Hidden>
+                        <Hidden lgUp>
+                          <IconButton
+                            aria-label="more"
+                            id="long-button"
+                            aria-controls="long-menu"
+                            aria-expanded={openMenuItem ? 'true' : undefined}
+                            aria-haspopup="true"
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              // @ts-ignore
+                              setAnchorEl(event.currentTarget)
+                              setSelectedCohort(row)
+                            }}
+                          >
+                            <MoreVertIcon />
+                          </IconButton>
+                          <Menu
+                            anchorEl={anchorEl}
+                            open={openMenuItem && row.uuid === selectedCohort?.uuid}
+                            onClose={() => setAnchorEl(null)}
+                          >
+                            {canExportThisCohort && (
+                              <MenuItem
+                                className={classes.menuItem}
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
+                                  setAnchorEl(null)
+                                }}
+                              >
+                                <ExportIcon /> Exporter
+                              </MenuItem>
+                            )}
+                            <MenuItem
+                              className={classes.menuItem}
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                dispatch(setSelectedCohortState(row.uuid ?? null))
+                                setAnchorEl(null)
+                              }}
+                            >
+                              <EditIcon /> Modifier
+                            </MenuItem>
+                            <MenuItem
+                              className={classes.menuItem}
+                              onClick={(event) => {
+                                event.stopPropagation()
+                                setSelectedCohort(row)
+                                handleClickOpenDialog()
+                                setAnchorEl(null)
+                              }}
+                            >
+                              <DeleteOutlineIcon /> Supprimer
+                            </MenuItem>
+                          </Menu>
+                        </Hidden>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
               </TableBody>
             </Table>
           </TableContainer>
         )
       }
+
+      {!simplified && (
+        <Dialog
+          open={dialogOpen}
+          onClose={handleCloseDialog}
+          aria-labelledby="alert-dialog-slide-title"
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <DialogTitle id="alert-dialog-slide-title">Etes-vous sûr de vouloir supprimer la cohorte ?</DialogTitle>
+          <DialogActions>
+            <Button onClick={handleCloseDialog} color="primary">
+              Non
+            </Button>
+            <Button
+              onClick={() => {
+                handleCloseDialog()
+                removeCohort()
+              }}
+              color="secondary"
+            >
+              Oui
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
+      <ModalEditCohort
+        open={selectedCohortState !== null}
+        onClose={() => dispatch<any>(setSelectedCohortState(null))}
+      />
+
+      <ExportModal
+        cohortId={selectedExportableCohort ? selectedExportableCohort : 0}
+        open={!!selectedExportableCohort}
+        handleClose={() => setSelectedExportableCohort(undefined)}
+      />
     </>
   )
 }

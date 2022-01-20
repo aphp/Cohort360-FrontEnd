@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import moment from 'moment'
 
 import {
@@ -23,115 +24,89 @@ import {
 } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
 
-import PMSIFilters from '../../Filters/PMSIFilters/PMSIFilters'
-
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import services from 'services'
+import PMSIFilters from '../../Filters/PMSIFilters/PMSIFilters'
+
+import { capitalizeFirstLetter } from 'utils/capitalize'
+
+import { useAppSelector } from 'state'
+import { fetchPmsi } from 'state/patient'
 
 import useStyles from './styles'
-import { PMSIEntry } from 'types'
-import { IClaim, ICondition, IProcedure } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { capitalizeFirstLetter } from 'utils/capitalize'
 
 type PatientPMSITypes = {
   groupId?: string
-  patientId: string
-  diagnostic?: PMSIEntry<ICondition>[]
-  diagnosticTotal: number
-  ccam?: PMSIEntry<IProcedure>[]
-  ccamTotal: number
-  ghm?: PMSIEntry<IClaim>[]
-  ghmTotal: number
-  deidentifiedBoolean: boolean
 }
-const PatientPMSI: React.FC<PatientPMSITypes> = ({
-  groupId,
-  patientId,
-  diagnostic,
-  diagnosticTotal,
-  ccam,
-  ccamTotal,
-  ghm,
-  ghmTotal,
-  deidentifiedBoolean
-}) => {
+const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   const classes = useStyles()
-  const [selectedTab, selectTab] = useState<'CIM10' | 'CCAM' | 'GHM'>('CIM10')
-  const [data, setData] = useState<PMSIEntry<IClaim | ICondition | IProcedure>[] | undefined>([])
-  const [loadingStatus, setLoadingStatus] = useState(false)
-  const [total, setTotal] = useState(0)
+  const dispatch = useDispatch()
+  const { patient } = useAppSelector((state) => ({
+    patient: state.patient
+  }))
+
+  const [selectedTab, selectTab] = useState<'diagnostic' | 'ghm' | 'ccam'>('diagnostic')
+
+  const pmsiPatient = patient?.pmsi ?? {}
+  const currrentPmsi = pmsiPatient[selectedTab] ?? {
+    loading: false,
+    count: 0,
+    total: 0,
+    list: []
+  }
+
+  const loading = currrentPmsi.loading ?? false
+  const deidentifiedBoolean = patient?.deidentified ?? false
+  const totalPmsi = currrentPmsi.count ?? 0
+  const totalAllPmsi = currrentPmsi.total ?? 0
+
+  const [patientPmsiList, setPatientPmsiList] = useState<any[]>([])
+
   const [page, setPage] = useState(1)
-  const [searchInput, setSearchInput] = useState('')
-  const [open, setOpen] = useState(false)
-  const [nda, setNda] = useState('')
-  const [code, setCode] = useState('')
-  const [selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>([])
-  const [startDate, setStartDate] = useState<string | null>(null)
-  const [endDate, setEndDate] = useState<string | null>(null)
+
+  const [filters, setFilters] = useState<{
+    searchInput: string
+    nda: string
+    code: string
+    selectedDiagnosticTypes: any[]
+    startDate: string | null
+    endDate: string | null
+  }>({
+    searchInput: '',
+    nda: '',
+    code: '',
+    selectedDiagnosticTypes: [],
+    startDate: null,
+    endDate: null
+  })
+
   const [sortBy, setSortBy] = useState('date')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
-  const [showFilterChip, setShowFilterChip] = useState(false)
+
+  const [open, setOpen] = useState(false)
 
   const documentLines = 20 // Number of desired lines in the document array
 
-  const _fetchPMSI = async (
-    deidentified: boolean,
-    page: number,
-    patientId: string,
-    selectedTab: 'CIM10' | 'CCAM' | 'GHM',
-    searchInput: string,
-    nda: string,
-    code: string,
-    diagnosticTypes: string[],
-    sortBy: string,
-    sortDirection: string,
-    startDate?: string | null,
-    endDate?: string | null
-  ) => {
-    setLoadingStatus(true)
-
-    const selectedDiagnosticTypesCodes = selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
-
-    const pmsiResp = await services.patients.fetchPMSI(
-      deidentified,
-      page,
-      patientId,
-      selectedTab,
-      searchInput,
-      nda,
-      code,
-      selectedDiagnosticTypesCodes,
-      sortBy,
-      sortDirection,
-      groupId,
-      startDate,
-      endDate
-    )
-
-    setData(pmsiResp?.pmsiData ?? [])
-    setTotal(pmsiResp?.pmsiTotal ?? 0)
-    setLoadingStatus(false)
-  }
-
-  const handleClearInput = () => {
-    setSearchInput('')
-    setPage(1)
-    _fetchPMSI(
-      deidentifiedBoolean,
-      1,
-      patientId,
-      selectedTab,
-      '',
-      nda,
-      code,
-      selectedDiagnosticTypes,
-      sortBy,
-      sortDirection,
-      startDate,
-      endDate
+  const _fetchPMSI = async (page: number) => {
+    const selectedDiagnosticTypesCodes = filters.selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
+    dispatch(
+      fetchPmsi({
+        selectedTab,
+        groupId,
+        options: {
+          page,
+          sort: {
+            by: sortBy,
+            direction: sortDirection
+          },
+          filters: {
+            ...filters,
+            diagnosticTypes: selectedDiagnosticTypesCodes
+          }
+        }
+      })
     )
   }
 
@@ -141,61 +116,27 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
 
     setSortDirection(newDirection)
     setSortBy(property)
-    setPage(1)
-    _fetchPMSI(
-      deidentifiedBoolean,
-      1,
-      patientId,
-      selectedTab,
-      searchInput,
-      nda,
-      code,
-      selectedDiagnosticTypes,
-      property,
-      newDirection,
-      startDate,
-      endDate
-    )
   }
 
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
     setPage(value ? value : 1)
-    setLoadingStatus(true)
-    _fetchPMSI(
-      deidentifiedBoolean,
-      value ? value : 1,
-      patientId,
-      selectedTab,
-      searchInput,
-      nda,
-      code,
-      selectedDiagnosticTypes,
-      sortBy,
-      sortDirection,
-      startDate,
-      endDate
-    )
+    _fetchPMSI(value ? value : 1)
   }
 
-  const handleOpenDialog = () => {
-    setOpen(true)
-  }
-
-  const handleCloseDialog = () => {
-    setOpen(false)
-    setShowFilterChip(true)
-  }
-
-  const handleChangeSearchInput = (event: { target: { value: React.SetStateAction<string> } }) => {
-    setSearchInput(event.target.value)
+  const onChangeOptions = (key: string, value: any) => {
+    setFilters((prevState) => ({
+      ...prevState,
+      [key]: value
+    }))
   }
 
   const handleDeleteChip = (filterName: string, value?: string) => {
     switch (filterName) {
       case 'nda':
         value &&
-          setNda(
-            nda
+          onChangeOptions(
+            filterName,
+            filters.nda
               .split(',')
               .filter((item) => item !== value)
               .join()
@@ -203,21 +144,26 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
         break
       case 'code':
         value &&
-          setCode(
-            code
+          onChangeOptions(
+            filterName,
+            filters.code
               .split(',')
               .filter((item) => item !== value)
               .join()
           )
         break
       case 'startDate':
-        setStartDate(null)
+        onChangeOptions(filterName, null)
         break
       case 'endDate':
-        setEndDate(null)
+        onChangeOptions(filterName, null)
         break
       case 'selectedDiagnosticTypes':
-        value && setSelectedDiagnosticTypes(selectedDiagnosticTypes.filter((item) => item !== value))
+        value &&
+          onChangeOptions(
+            filterName,
+            filters.selectedDiagnosticTypes.filter((item) => item !== value)
+          )
         break
     }
   }
@@ -233,50 +179,52 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
     }
   }
 
+  const handleClearInput = () => {
+    onChangeOptions('searchInput', '')
+    handleChangePage()
+  }
+
   useEffect(() => {
     handleChangePage()
-  }, [nda, code, startDate, endDate, selectedDiagnosticTypes]) // eslint-disable-line
+  }, [
+    filters.nda,
+    filters.code,
+    filters.startDate,
+    filters.endDate,
+    filters.selectedDiagnosticTypes,
+    sortBy,
+    sortDirection
+  ]) // eslint-disable-line
 
   useEffect(() => {
     setPage(1)
-    setSearchInput('')
-    switch (selectedTab) {
-      case 'CIM10':
-        setData(diagnostic ?? [])
-        setTotal(diagnosticTotal ?? 0)
-        setNda('')
-        setCode('')
-        setSelectedDiagnosticTypes([])
-        setStartDate(null)
-        setEndDate(null)
-        break
-      case 'CCAM':
-        setData(ccam ?? [])
-        setTotal(ccamTotal ?? 0)
-        setNda('')
-        setCode('')
-        setSelectedDiagnosticTypes([])
-        setStartDate(null)
-        setEndDate(null)
-        break
-      case 'GHM':
-        setData(ghm ?? [])
-        setTotal(ghmTotal ?? 0)
-        setNda('')
-        setCode('')
-        setSelectedDiagnosticTypes([])
-        setStartDate(null)
-        setEndDate(null)
-        break
-      default:
-        setData([])
-        break
+    // Clear filter state
+    setFilters({
+      searchInput: '',
+      nda: '',
+      code: '',
+      selectedDiagnosticTypes: [],
+      startDate: null,
+      endDate: null
+    })
+    setSortBy('date')
+    setSortDirection('desc')
+  }, [selectedTab]) // eslint-disable-line
+
+  useEffect(() => {
+    const pmsiPatient = patient?.pmsi ?? {}
+    const currrentPmsi = pmsiPatient[selectedTab] ?? {
+      loading: false,
+      count: 0,
+      total: 0,
+      list: []
     }
-  }, [patientId, selectedTab]) // eslint-disable-line
+    setPatientPmsiList(currrentPmsi.list)
+  }, [currrentPmsi, currrentPmsi?.list]) // eslint-disable-line
 
   return (
     <Grid container item xs={11} justify="flex-end" className={classes.documentTable}>
-      <Grid item container justify="space-between" alignItems="center">
+      <Grid item container justify="space-between" alignItems="center" className={classes.filterAndSort}>
         <Tabs
           classes={{
             root: classes.root,
@@ -289,30 +237,29 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
             classes={{ selected: classes.selected }}
             className={classes.tabTitle}
             label="Diagnostics CIM10"
-            value="CIM10"
+            value="diagnostic"
           />
-          <Tab classes={{ selected: classes.selected }} className={classes.tabTitle} label="Actes CCAM" value="CCAM" />
-          <Tab classes={{ selected: classes.selected }} className={classes.tabTitle} label="GHM" value="GHM" />
+          <Tab classes={{ selected: classes.selected }} className={classes.tabTitle} label="Actes CCAM" value="ccam" />
+          <Tab classes={{ selected: classes.selected }} className={classes.tabTitle} label="GHM" value="ghm" />
         </Tabs>
+
         <Typography variant="button">
-          {total || 0} /{' '}
-          {selectedTab === 'CIM10'
-            ? `${diagnosticTotal ?? 0} diagnostic(s)`
-            : selectedTab === 'CCAM'
-            ? `${ccamTotal} acte(s)`
-            : `${ghmTotal} GHM`}
+          {`${totalPmsi || 0} / ${totalAllPmsi} ${
+            selectedTab !== 'diagnostic' ? (selectedTab !== 'ccam' ? 'ghm' : 'acte(s)') : 'diagnostic(s)'
+          }`}
         </Typography>
+
         <div className={classes.documentButtons}>
           <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
             <InputBase
               placeholder="Rechercher"
               className={classes.input}
-              value={searchInput}
-              onChange={handleChangeSearchInput}
+              value={filters.searchInput}
+              onChange={(event) => onChangeOptions('searchInput', event.target.value)}
               onKeyDown={onKeyDown}
               endAdornment={
                 <InputAdornment position="end">
-                  {searchInput && (
+                  {filters.searchInput && (
                     <IconButton onClick={handleClearInput}>
                       <ClearIcon />
                     </IconButton>
@@ -329,33 +276,33 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
             disableElevation
             startIcon={<FilterList height="15px" fill="#FFF" />}
             className={classes.searchButton}
-            onClick={handleOpenDialog}
+            onClick={() => setOpen(true)}
           >
             Filtrer
           </Button>
+
           <PMSIFilters
             open={open}
             onClose={() => setOpen(false)}
-            onSubmit={handleCloseDialog}
-            nda={nda}
-            onChangeNda={setNda}
-            code={code}
-            onChangeCode={setCode}
-            startDate={startDate}
-            onChangeStartDate={setStartDate}
-            endDate={endDate}
-            onChangeEndDate={setEndDate}
+            onSubmit={() => setOpen(false)}
+            nda={filters.nda}
+            onChangeNda={(value) => onChangeOptions('nda', value)}
+            code={filters.code}
+            onChangeCode={(value) => onChangeOptions('code', value)}
+            selectedDiagnosticTypes={filters.selectedDiagnosticTypes}
+            onChangeSelectedDiagnosticTypes={(value) => onChangeOptions('selectedDiagnosticTypes', value)}
+            startDate={filters.startDate}
+            onChangeStartDate={(value) => onChangeOptions('startDate', value)}
+            endDate={filters.endDate}
+            onChangeEndDate={(value) => onChangeOptions('endDate', value)}
             deidentified={deidentifiedBoolean}
-            showDiagnosticTypes={selectedTab === 'CIM10'}
-            selectedDiagnosticTypes={selectedDiagnosticTypes}
-            onChangeSelectedDiagnosticTypes={setSelectedDiagnosticTypes}
+            showDiagnosticTypes={selectedTab === 'diagnostic'}
           />
         </div>
       </Grid>
       <Grid>
-        {showFilterChip &&
-          nda !== '' &&
-          nda
+        {filters.nda !== '' &&
+          filters.nda
             .split(',')
             .map((value) => (
               <Chip
@@ -367,9 +314,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
                 variant="outlined"
               />
             ))}
-        {showFilterChip &&
-          code !== '' &&
-          code
+        {filters.code !== '' &&
+          filters.code
             .split(',')
             .map((value) => (
               <Chip
@@ -381,27 +327,26 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
                 variant="outlined"
               />
             ))}
-        {showFilterChip && startDate && (
+        {filters.startDate && (
           <Chip
             className={classes.chips}
-            label={`Après le : ${moment(startDate).format('DD/MM/YYYY')}`}
+            label={`Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}`}
             onDelete={() => handleDeleteChip('startDate')}
             color="primary"
             variant="outlined"
           />
         )}
-        {showFilterChip && endDate && (
+        {filters.endDate && (
           <Chip
             className={classes.chips}
-            label={`Avant le : ${moment(endDate).format('DD/MM/YYYY')}`}
+            label={`Avant le : ${moment(filters.endDate).format('DD/MM/YYYY')}`}
             onDelete={() => handleDeleteChip('endDate')}
             color="primary"
             variant="outlined"
           />
         )}
-        {showFilterChip &&
-          selectedDiagnosticTypes.length > 0 &&
-          selectedDiagnosticTypes.map((diagnosticType) => (
+        {filters.selectedDiagnosticTypes.length > 0 &&
+          filters.selectedDiagnosticTypes.map((diagnosticType) => (
             <Chip
               className={classes.chips}
               key={diagnosticType.id}
@@ -412,7 +357,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
             />
           ))}
       </Grid>
-      {loadingStatus ? (
+      {loading ? (
         <Grid container justify="center">
           <CircularProgress />
         </Grid>
@@ -453,7 +398,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
                 <TableCell align="center" className={classes.tableHeadCell}>
                   Libellé
                 </TableCell>
-                {selectedTab === 'CIM10' && (
+                {selectedTab === 'diagnostic' && (
                   <TableCell align="center" className={classes.tableHeadCell}>
                     Type
                   </TableCell>
@@ -464,9 +409,9 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
               </TableRow>
             </TableHead>
             <TableBody>
-              {data ? (
+              {patientPmsiList && patientPmsiList.length > 0 ? (
                 <>
-                  {data.map((row) => {
+                  {patientPmsiList.map((row) => {
                     return (
                       <TableRow className={classes.tableBodyRows} key={row.id}>
                         <TableCell align="left">{row.NDA ?? 'Inconnu'}</TableCell>
@@ -493,7 +438,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
                             : // @ts-ignore TODO: There is no class member in Conditon or Procedure FHIR types
                               row.class?.code || row.code?.coding?.[0].display}
                         </TableCell>
-                        {selectedTab === 'CIM10' && (
+                        {selectedTab === 'diagnostic' && (
                           <TableCell align="center">
                             {row.extension ? row.extension[0].valueString?.toUpperCase() : '-'}
                           </TableCell>
@@ -504,9 +449,15 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
                   })}
                 </>
               ) : (
-                <Grid container justify="center">
-                  <Typography variant="button">Aucun document à afficher</Typography>
-                </Grid>
+                <TableRow className={classes.emptyTableRow}>
+                  <TableCell colSpan={9} align="left">
+                    <Grid container justify="center">
+                      <Typography variant="button">{`Aucun ${
+                        selectedTab !== 'diagnostic' ? (selectedTab !== 'ccam' ? 'ghm' : 'acte') : 'diagnostic'
+                      } à afficher`}</Typography>
+                    </Grid>
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>
@@ -514,7 +465,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({
       )}
       <Pagination
         className={classes.pagination}
-        count={Math.ceil(total / documentLines)}
+        count={Math.ceil(totalPmsi / documentLines)}
         shape="rounded"
         onChange={handleChangePage}
         page={page}

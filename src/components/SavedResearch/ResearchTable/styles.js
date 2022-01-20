@@ -33,6 +33,18 @@ const useStyles = makeStyles(() => ({
     '&:hover': {
       cursor: 'pointer'
     }
+  },
+  menuItem: {
+    '& > svg': {
+      height: 24,
+      width: 24,
+      marginRight: 8
+    }
+  },
+  infoButton: {
+    '& svg': {
+      fontSize: 20
+    }
   }
 }))
 

@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
-import { Grid, Button, CircularProgress, Typography } from '@material-ui/core'
+import { Button, IconButton, CircularProgress, Grid, Hidden, Tooltip, Typography } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
+import DeleteIcon from '@material-ui/icons/Delete'
+import { ReactComponent as DriveFileMoveIcon } from 'assets/icones/drive-file-move.svg'
 
 import ProjectTable from 'components/MyProjects/ProjectTable/ProjectTable'
 import ProjectSearchBar from 'components/MyProjects/ProjectSearchBar/ProjectSearchBar'
@@ -11,6 +13,10 @@ import ProjectSearchBar from 'components/MyProjects/ProjectSearchBar/ProjectSear
 import ModalAddOrEditProject from 'components/MyProjects/Modals/ModalAddOrEditProject/ModalAddOrEditProject'
 import ModalAddOrEditRequest from 'components/Cohort/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
+import ModalMoveRequests from 'components/MyProjects/Modals/ModalMoveRequest/ModalMoveRequest'
+import ModalDeleteRequests from 'components/MyProjects/Modals/ModalDeleteRequests/ModalDeleteRequests'
+
+import { RequestType } from 'types'
 
 import { useAppSelector } from 'state'
 import { ProjectState, fetchProjects as fetchProjectsList, setSelectedProject } from 'state/project'
@@ -24,6 +30,8 @@ const MyProjects = () => {
   const dispatch = useDispatch()
 
   const [searchInput, setSearchInput] = useState('')
+  const [selectedRequests, setSelectedRequests] = useState<RequestType[]>([])
+  const [openModal, setOpenModal] = useState<'move_to_folder' | 'delete_items' | null>(null)
 
   const { open, projectState, requestState, cohortState } = useAppSelector<{
     open: boolean
@@ -37,7 +45,7 @@ const MyProjects = () => {
     cohortState: state.cohort
   }))
   const { selectedProject } = projectState
-  const { selectedRequest } = requestState
+  const { selectedRequest, requestsList } = requestState
   const { selectedCohort } = cohortState
 
   const loadingProject = projectState.loading
@@ -99,22 +107,88 @@ const MyProjects = () => {
         })}
       >
         <Grid container justify="center" alignItems="center">
-          <Grid container item xs={11} sm={9}>
-            <Typography variant="h1" color="primary" className={classes.title}>
+          <Grid container item xs={11}>
+            <Typography id="myProject-title" variant="h1" color="primary" className={classes.title}>
               Mes projets de recherche
             </Typography>
           </Grid>
 
-          <Grid container item xs={11} sm={9} className={classes.actionContainer}>
-            <ProjectSearchBar setSearchInput={(newValue: string) => setSearchInput(newValue)} />
+          <Grid item xs={11}>
+            <Grid container justify="space-between">
+              <Grid className={classes.secondaryContainer}>
+                {selectedRequests.length > 0 && (
+                  <>
+                    <Grid container direction="row">
+                      <Hidden only={['xs', 'sm', 'md']}>
+                        <Button
+                          startIcon={<DriveFileMoveIcon />}
+                          onClick={() => setOpenModal('move_to_folder')}
+                          color="primary"
+                        >
+                          Deplacer {selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}
+                        </Button>
+                      </Hidden>
+                      <Hidden only={['lg', 'xl']}>
+                        <Tooltip title={`Deplacer ${selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}`}>
+                          <IconButton onClick={() => setOpenModal('move_to_folder')} color="primary">
+                            <DriveFileMoveIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </Hidden>
 
-            <Button startIcon={<AddIcon />} onClick={() => handleClickAddProject()} className={classes.addButton}>
-              Ajouter un projet
-            </Button>
+                      <Hidden only={['xs', 'sm', 'md']}>
+                        <Button
+                          startIcon={<DeleteIcon />}
+                          onClick={() => setOpenModal('delete_items')}
+                          color="secondary"
+                        >
+                          Supprimer {selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}
+                        </Button>
+                      </Hidden>
+                      <Hidden only={['lg', 'xl']}>
+                        <Tooltip title={`Supprimer ${selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}`}>
+                          <IconButton onClick={() => setOpenModal('delete_items')} color="secondary">
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </Hidden>
+                    </Grid>
+                  </>
+                )}
+              </Grid>
+              <Grid className={classes.actionContainer}>
+                <ProjectSearchBar setSearchInput={(newValue: string) => setSearchInput(newValue)} />
+
+                <Hidden only={['xs', 'sm', 'md']}>
+                  <Button startIcon={<AddIcon />} onClick={() => handleClickAddProject()} className={classes.addButton}>
+                    Ajouter un projet
+                  </Button>
+                </Hidden>
+
+                <Hidden only={['lg', 'xl']}>
+                  <Tooltip title={'Ajouter un projet'}>
+                    <IconButton onClick={() => handleClickAddProject()} className={classes.addIconButton}>
+                      <AddIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Hidden>
+              </Grid>
+            </Grid>
+
+            <Typography style={{ height: 20 }}>
+              {selectedRequests.length > 0 &&
+                `${selectedRequests.length} selectionnée${selectedRequests.length === 1 ? '' : 's'} / ${
+                  requestsList.length
+                } requête${requestsList.length === 1 ? '' : 's'}`}
+            </Typography>
           </Grid>
 
-          <Grid container item xs={11} sm={9}>
-            <ProjectTable searchInput={searchInput} />
+          <Grid container item xs={11}>
+            <ProjectTable
+              searchInput={searchInput}
+              selectedRequests={selectedRequests}
+              setSelectedRequests={setSelectedRequests}
+            />
           </Grid>
         </Grid>
       </Grid>
@@ -128,6 +202,28 @@ const MyProjects = () => {
       {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch<any>(setSelectedRequest(null))} />}
 
       <ModalEditCohort open={selectedCohort !== null} onClose={() => dispatch<any>(setSelectedCohort(null))} />
+
+      <ModalMoveRequests
+        open={openModal === 'move_to_folder'}
+        onClose={(onConfirm?: boolean) => {
+          setOpenModal(null)
+          if (onConfirm) {
+            setSelectedRequests([])
+          }
+        }}
+        selectedRequests={selectedRequests}
+      />
+
+      <ModalDeleteRequests
+        open={openModal === 'delete_items'}
+        onClose={(onConfirm?: boolean) => {
+          setOpenModal(null)
+          if (onConfirm) {
+            setSelectedRequests([])
+          }
+        }}
+        selectedRequests={selectedRequests}
+      />
     </>
   )
 }

@@ -1,6 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 650
   },
@@ -20,6 +20,16 @@ const useStyles = makeStyles(() => ({
     '&:nth-of-type(even)': {
       backgroundColor: '#FAF9F9'
     }
+  },
+  iconSize: {
+    fontSize: '30px'
+  },
+  searchIcon: {
+    padding: 0,
+    marginLeft: 4
+  },
+  iconMargin: {
+    margin: `0 ${theme.spacing(1)}px`
   },
   description: {
     fontWeight: 'bold'

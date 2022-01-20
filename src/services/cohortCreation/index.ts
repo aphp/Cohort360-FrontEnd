@@ -9,9 +9,11 @@ export const createCohort = async (
   snapshotId: string | undefined,
   requestId: string | undefined,
   cohortName: string | undefined,
-  cohortDescription: string | undefined
+  cohortDescription: string | undefined,
+  globalCount: boolean | undefined
 ) => {
   if (!requeteurJson || !datedMeasureId || !snapshotId || !requestId) return null
+  if (globalCount === undefined) globalCount = false
 
   if (CONTEXT === 'arkhn') {
     // const request: Cohort_Creation_API_Response = await api.post('QueryServer/api/count', requeteurJson)
@@ -25,7 +27,8 @@ export const createCohort = async (
       request_query_snapshot_id: snapshotId,
       request_id: requestId,
       name: cohortName,
-      description: cohortDescription
+      description: cohortDescription,
+      global_estimate: globalCount
     })
 
     return cohortResult
@@ -37,6 +40,7 @@ export const countCohort = async (requeteurJson?: string, snapshotId?: string, r
     const measureResult = await apiBack.get<any>(`/explorations/dated-measures/${uuid}/`)
 
     return {
+      date: measureResult?.data?.created_at,
       status: measureResult?.data?.request_job_status,
       jobFailMsg: measureResult?.data?.request_job_fail_msg,
       uuid: measureResult?.data?.uuid,
@@ -64,6 +68,7 @@ export const countCohort = async (requeteurJson?: string, snapshotId?: string, r
       })
 
       return {
+        date: measureResult?.data?.updated_at,
         status: measureResult?.data?.request_job_status,
         uuid: measureResult?.data?.uuid,
         includePatient: 0,
@@ -115,7 +120,7 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
       ({ created_at: a }, { created_at: b }) => new Date(b).valueOf() - new Date(a).valueOf()
     )
 
-    const currentSnapshot = snapshotId
+    let currentSnapshot = snapshotId
       ? snapshotsHistoryFromQuery.find(({ uuid }) => uuid === snapshotId)
       : snapshotsHistoryFromQuery
       ? snapshotsHistoryFromQuery[0]
@@ -124,6 +129,12 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
     let snapshotsHistory: any[] = []
 
     if (currentSnapshot) {
+      // clean Global count
+      currentSnapshot = {
+        ...currentSnapshot,
+        dated_measures: currentSnapshot.dated_measures.filter((dated_measure: any) => dated_measure.mode !== 'Global')
+      }
+
       let nextSnap = currentSnapshot.uuid
       snapshotsHistory = snapshotsHistoryFromQuery
         .map(({ uuid, serialized_query, created_at, previous_snapshot, dated_measures }) => {
@@ -133,7 +144,8 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
               uuid: uuid,
               json: serialized_query,
               date: created_at,
-              dated_measures
+              // clean Global count
+              dated_measures: dated_measures.filter((dated_measure: any) => dated_measure.mode !== 'Global')
             }
           } else {
             return {
@@ -148,7 +160,7 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
 
     result = {
       requestName,
-      snapshotsHistory,
+      snapshotsHistory: snapshotsHistory ? snapshotsHistory.reverse() : [],
       json: currentSnapshot ? currentSnapshot.serialized_query : '',
       currentSnapshot: currentSnapshot ? currentSnapshot.uuid : '',
       count: currentSnapshot ? currentSnapshot.dated_measures[0] : {}

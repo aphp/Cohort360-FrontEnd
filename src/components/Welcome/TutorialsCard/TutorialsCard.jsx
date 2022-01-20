@@ -18,17 +18,15 @@ import Title from '../../Title'
 import useStyles from './styles'
 
 const YoutubeEmbed = ({ embedId }) => (
-  <Grid className="video-responsive">
-    <iframe
-      width="510"
-      height="360"
-      src={`https://www.youtube.com/embed/${embedId}`}
-      frameBorder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowFullScreen
-      title="Embedded youtube"
-    />
-  </Grid>
+  <iframe
+    width="510"
+    height="360"
+    src={`https://www.youtube.com/embed/${embedId}`}
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+    title="Tutorial youtube"
+  />
 )
 
 const TutorialsCard = () => {
@@ -36,7 +34,7 @@ const TutorialsCard = () => {
 
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  const youtubeIds = ['uMeBJdWPnQM', 'BdtmlvXjKWs', 'ykyMg_4MVcI', 'ze-NYJmFZsI', '-UjXIK4Svb4']
+  const youtubeIds = ['01ZgR9lk_aE', 'BdtmlvXjKWs', 'ykyMg_4MVcI', 'ze-NYJmFZsI', '-UjXIK4Svb4']
 
   const _onChangeCurrentIndex = (index) => {
     if (index >= 0 && index <= youtubeIds.length - 1) {
@@ -46,17 +44,20 @@ const TutorialsCard = () => {
 
   return (
     <>
-      <Title>Tutoriels</Title>
+      <div id="tutorials-card-title">
+        <Title>Tutoriels</Title>
+      </div>
       <Divider className={classes.divider} />
-      {/* <Typography color="textSecondary">Nouvelle fonctionnalité à venir !</Typography> */}
 
-      <Grid className={classes.carouselContainer}>
+      <Grid id="tutorials-card-carousel" className={classes.carouselContainer}>
         {/* Content */}
         {youtubeIds.map(
           (m, i) =>
             currentIndex === i && (
               <Paper key={i} className={classes.carouselPaper}>
-                <YoutubeEmbed embedId={m} />
+                <Grid className={classes.videoResponsive}>
+                  <YoutubeEmbed embedId={m} />
+                </Grid>
               </Paper>
             )
         )}
@@ -64,15 +65,15 @@ const TutorialsCard = () => {
         {/* Pagination Items (Left/Right Chevron + indicator) */}
         {currentIndex > 0 && (
           <Grid className={clsx(classes.indicator, classes.leftIndicator)}>
-            <IconButton onClick={() => _onChangeCurrentIndex(currentIndex - 1)}>
-              <KeyboardArrowLeftIcon />
+            <IconButton size="small" onClick={() => _onChangeCurrentIndex(currentIndex - 1)}>
+              <KeyboardArrowLeftIcon fontSize="medium" />
             </IconButton>
           </Grid>
         )}
         {currentIndex < youtubeIds.length - 1 && (
           <Grid className={clsx(classes.indicator, classes.rightIndicator)}>
-            <IconButton onClick={() => _onChangeCurrentIndex(currentIndex + 1)}>
-              <KeyboardArrowRightIcon />
+            <IconButton size="small" onClick={() => _onChangeCurrentIndex(currentIndex + 1)}>
+              <KeyboardArrowRightIcon fontSize="medium" />
             </IconButton>
           </Grid>
         )}

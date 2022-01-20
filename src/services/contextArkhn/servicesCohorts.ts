@@ -25,7 +25,14 @@ import {
 } from 'utils/graphUtils'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
-import { fetchGroup, fetchPatient, fetchEncounter, fetchComposition, fetchCompositionContent } from './callApi'
+import {
+  fetchGroup,
+  fetchPatient,
+  fetchEncounter,
+  fetchComposition,
+  fetchCompositionContent,
+  fetchBinary
+} from './callApi'
 
 import apiBackend from '../apiBackend'
 import apiPortail from '../apiPortail'
@@ -80,6 +87,7 @@ export interface IServicesCohorts {
     searchInput: string,
     gender: PatientGenderKind,
     age: [number, number],
+    ageType: 'year' | 'month' | 'days',
     vitalStatus: VitalStatus,
     sortBy: string,
     sortDirection: string,
@@ -124,6 +132,8 @@ export interface IServicesCohorts {
   ) => Promise<{
     totalDocs: number
     totalAllDocs: number
+    totalPatientDocs: number
+    totalAllPatientDocs: number
     documentsList: IComposition[]
   }>
 
@@ -139,6 +149,17 @@ export interface IServicesCohorts {
   fetchDocumentContent: (compositionId: string) => Promise<IComposition_Section[]>
 
   /**
+   * Permet de recuperer le contenue d'un document (/Binary)
+   *
+   * Argument:
+   *   - documentId: Identifiant du documents
+   *
+   * Retoune:
+   *   - IComposition_Section: Contenue du document
+   */
+  fetchBinary: (documentId: string, list?: string[]) => Promise<any>
+
+  /**
    * Permet la récupération des droits d'export lié a une cohorte
    *
    * Argument:
@@ -148,7 +169,7 @@ export interface IServicesCohorts {
    * Retoune:
    *   - Si un utilisateur peut faire une demande d'export sur la cohorte
    */
-  fetchCohortExportRight: (cohortId: string, providerId: string) => Promise<boolean>
+  fetchCohortExportRight: (cohortId: string, providerId?: string) => Promise<boolean>
 
   /**
    * Permet de créer une demande d'export d'une cohorte
@@ -271,6 +292,7 @@ const servicesCohorts: IServicesCohorts = {
     searchInput,
     gender,
     age,
+    ageType,
     vitalStatus,
     sortBy,
     sortDirection,
@@ -290,10 +312,12 @@ const servicesCohorts: IServicesCohorts = {
     let date2 = ''
     if (age[0] !== 0 || age[1] !== 130) {
       date1 = moment()
-        .subtract(age[1] + 1, 'years')
+        .subtract(age[1], ageType)
+        // - 1 year + 1 day to gets people with X years and 363 days
+        .subtract(1, 'year')
         .add(1, 'days')
-        .format('YYYY-MM-DD') //`${today.getFullYear() - age[1]}-${monthStr}-${dayStr}`
-      date2 = moment().subtract(age[0], 'years').format('YYYY-MM-DD') //`${today.getFullYear() - age[0]}-${monthStr}-${dayStr}`
+        .format('YYYY-MM-DD')
+      date2 = moment().subtract(age[0], ageType).format('YYYY-MM-DD')
     }
 
     const patientsResp = await fetchPatient({
@@ -386,16 +410,15 @@ const servicesCohorts: IServicesCohorts = {
         type: selectedDocTypes.length > 0 ? selectedDocTypes.join(',') : '',
         'encounter.identifier': nda,
         minDate: startDate ?? '',
-        maxDate: endDate ?? ''
+        maxDate: endDate ?? '',
+        uniqueFacet: ['patient']
       }),
-      !!searchInput ||
-      !!selectedDocTypes ||
-      !!nda ||
-      (startDate ? [startDate, endDate ? endDate : ''] : endDate ? [endDate] : []).length > 0
+      !!searchInput || selectedDocTypes.length > 0 || !!nda || !!startDate || !!endDate
         ? fetchComposition({
             status: 'final',
             _list: groupId ? [groupId] : [],
-            size: 0
+            size: 0,
+            uniqueFacet: ['patient']
           })
         : null
     ])
@@ -404,11 +427,30 @@ const servicesCohorts: IServicesCohorts = {
     const totalAllDocs =
       allDocsList !== null ? (allDocsList?.data?.resourceType === 'Bundle' ? allDocsList.data.total : 0) : totalDocs
 
+    const totalPatientDocs =
+      docsList?.data?.resourceType === 'Bundle'
+        ? (
+            docsList?.data?.meta?.extension?.find((extension) => extension.url === 'unique-patient') || {
+              valueDecimal: 0
+            }
+          ).valueDecimal
+        : 0
+    const totalAllPatientDocs =
+      allDocsList !== null
+        ? (
+            allDocsList?.data?.meta?.extension?.find((extension) => extension.url === 'unique-patient') || {
+              valueDecimal: 0
+            }
+          ).valueDecimal
+        : totalPatientDocs
+
     const documentsList = await getDocumentInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
 
     return {
       totalDocs: totalDocs ?? 0,
       totalAllDocs: totalAllDocs ?? 0,
+      totalPatientDocs: totalPatientDocs ?? 0,
+      totalAllPatientDocs: totalAllPatientDocs ?? 0,
       documentsList
     }
   },
@@ -416,6 +458,13 @@ const servicesCohorts: IServicesCohorts = {
   fetchDocumentContent: async (compositionId) => {
     const documentContent = await fetchCompositionContent(compositionId)
     return documentContent
+  },
+
+  fetchBinary: async (documentId, list) => {
+    const documentBinary = await fetchBinary({ _id: documentId, _list: list })
+
+    // @ts-ignore
+    return documentBinary && documentBinary.entry && documentBinary.entry[0] && documentBinary.entry[0].resource
   },
 
   fetchCohortExportRight: async (cohortId, providerId) => {
@@ -502,8 +551,14 @@ const getDocumentInfos: (
 ) => Promise<CohortComposition[]> = async (deidentifiedBoolean: boolean, documents, groupId) => {
   const cohortDocuments = documents as CohortComposition[]
 
-  const listePatientsIds = cohortDocuments.map((e) => e.subject?.display?.substring(8)).join()
-  const listeEncounterIds = cohortDocuments.map((e) => e.encounter?.display?.substring(10)).join()
+  const listePatientsIds = cohortDocuments
+    .map((e) => e.subject?.display?.substring(8))
+    .filter((item, index, array) => array.indexOf(item) === index)
+    .join()
+  const listeEncounterIds = cohortDocuments
+    .map((e) => e.encounter?.display?.substring(10))
+    .filter((item, index, array) => array.indexOf(item) === index)
+    .join()
 
   const [patients, encounters] = await Promise.all([
     fetchPatient({

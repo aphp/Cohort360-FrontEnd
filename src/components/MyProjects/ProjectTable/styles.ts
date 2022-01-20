@@ -41,7 +41,6 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   smallAddButon: {
-    display: 'none',
     color: '#fff',
     backgroundColor: '#5BC5F2 !important',
     marginLeft: theme.spacing(1),

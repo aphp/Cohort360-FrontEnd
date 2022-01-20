@@ -18,6 +18,10 @@ const useStyles = makeStyles(() => ({
   },
   slider: {
     marginTop: '40px'
+  },
+  inputItem: {
+    margin: '1em',
+    width: 'calc(100% - 2em)'
   }
 }))
 

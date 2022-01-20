@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import moment from 'moment'
 
 import {
@@ -31,10 +32,8 @@ import CommentIcon from '@material-ui/icons/Comment'
 import MedicationFilters from 'components/Filters/MedicationFilters/MedicationFilters'
 import ModalAdministrationComment from './ModalAdministrationComment/ModalAdministrationComment'
 
-import { MedicationEntry } from 'types'
-import { IMedicationRequest, IMedicationAdministration } from '@ahryman40k/ts-fhir-types/lib/R4'
-
-import services from 'services'
+import { useAppSelector } from 'state'
+import { fetchMedication } from 'state/patient'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import displayDigit from 'utils/displayDigit'
@@ -43,32 +42,38 @@ import useStyles from './styles'
 
 type PatientMedicationTypes = {
   groupId?: string
-  patientId: string
-  prescription?: MedicationEntry<IMedicationRequest>[]
-  prescriptionTotal: number
-  administration?: MedicationEntry<IMedicationAdministration>[]
-  administrationTotal: number
-  deidentifiedBoolean: boolean
 }
-const PatientMedication: React.FC<PatientMedicationTypes> = ({
-  groupId,
-  patientId,
-  prescription,
-  prescriptionTotal,
-  administration,
-  administrationTotal,
-  deidentifiedBoolean
-}) => {
+const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   const classes = useStyles()
+  const dispatch = useDispatch()
+  const { patient } = useAppSelector((state) => ({
+    patient: state.patient
+  }))
 
-  const [loadingStatus, setLoadingStatus] = useState(false)
   const [selectedTab, selectTab] = useState<'prescription' | 'administration'>('prescription')
-  const [data, setData] = useState<any[]>([])
-  const [total, setTotal] = useState(0)
+
+  const medicationPatient = patient?.medication ?? {}
+  const currrentMedication = medicationPatient[selectedTab] ?? {
+    loading: false,
+    count: 0,
+    total: 0,
+    list: []
+  }
+
+  const loading = currrentMedication.loading ?? false
+  const deidentifiedBoolean = patient?.deidentified ?? false
+  const totalMedication = currrentMedication.count ?? 0
+  const totalAllMedication = currrentMedication.total ?? 0
+
+  const [patientMedicationList, setPatientMedicationList] = useState<any[]>([])
+
   const [page, setPage] = useState(1)
+
   const [searchInput, setSearchInput] = useState('')
+
   const [open, setOpen] = useState<string | null>(null)
   const [selectedComment, setSelectedComment] = useState<string | null>(null)
+
   const [filter, setFilter] = useState<{
     nda: string
     startDate: string | null
@@ -86,61 +91,30 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
 
   const documentLines = 20 // Number of desired lines in the document array
 
-  const _fetchMedication = async (
-    deidentified: boolean,
-    page: number,
-    patientId: string,
-    selectedTab: 'prescription' | 'administration',
-    searchInput: string,
-    nda: string,
-    sortBy: string,
-    sortDirection: string,
-    selectedPrescriptionTypes: { id: string; label: string }[],
-    selectedAdministrationRoutes: { id: string; label: string }[],
-    startDate?: string | null,
-    endDate?: string | null
-  ) => {
-    setLoadingStatus(true)
-    if (!services.patients.fetchMedication || typeof services.patients?.fetchMedication !== 'function') return
-
-    const medicationResp = await services.patients.fetchMedication(
-      deidentified,
-      page,
-      patientId,
-      selectedTab,
-      searchInput,
-      nda,
-      sortBy,
-      sortDirection,
-      selectedPrescriptionTypes.map(({ id }) => id).join(','),
-      selectedAdministrationRoutes.map(({ id }) => id).join(','),
-      groupId,
-      startDate ?? undefined,
-      endDate ?? undefined
+  const _fetchMedication = async (page: number) => {
+    dispatch(
+      fetchMedication({
+        selectedTab,
+        groupId,
+        options: {
+          page,
+          sort,
+          filters: {
+            searchInput,
+            nda: filter.nda,
+            selectedPrescriptionTypes: filter.selectedPrescriptionTypes,
+            selectedAdministrationRoutes: filter.selectedAdministrationRoutes,
+            startDate: filter.startDate,
+            endDate: filter.endDate
+          }
+        }
+      })
     )
-
-    setData(medicationResp?.medicationData ?? [])
-    setTotal(medicationResp?.medicationTotal ?? 0)
-    setLoadingStatus(false)
   }
 
   const handleClearInput = () => {
     setSearchInput('')
-    setPage(1)
-    _fetchMedication(
-      deidentifiedBoolean,
-      1,
-      patientId,
-      selectedTab,
-      '',
-      filter.nda,
-      sort.by,
-      sort.direction,
-      filter.selectedPrescriptionTypes ?? [],
-      filter.selectedAdministrationRoutes ?? [],
-      filter.startDate,
-      filter.endDate
-    )
+    _fetchMedication(1)
   }
 
   const handleSort = (property: any) => (event: React.MouseEvent<unknown> /*eslint-disable-line*/) => {
@@ -149,43 +123,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
 
     setSort({ by: property, direction: newDirection })
     setPage(1)
-    _fetchMedication(
-      deidentifiedBoolean,
-      1,
-      patientId,
-      selectedTab,
-      searchInput,
-      filter.nda,
-      property,
-      newDirection,
-      filter.selectedPrescriptionTypes ?? [],
-      filter.selectedAdministrationRoutes ?? [],
-      filter.startDate,
-      filter.endDate
-    )
   }
 
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
     setPage(value ? value : 1)
-    setLoadingStatus(true)
-    _fetchMedication(
-      deidentifiedBoolean,
-      value ? value : 1,
-      patientId,
-      selectedTab,
-      searchInput,
-      filter.nda,
-      sort.by,
-      sort.direction,
-      filter.selectedPrescriptionTypes ?? [],
-      filter.selectedAdministrationRoutes ?? [],
-      filter.startDate,
-      filter.endDate
-    )
-  }
-
-  const handleChangeSearchInput = (event: { target: { value: React.SetStateAction<string> } }) => {
-    setSearchInput(event.target.value)
+    _fetchMedication(value ? value : 1)
   }
 
   const handleChangeFilter = (
@@ -199,10 +141,6 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
       case 'startDate':
       case 'endDate':
         setFilter((prevState) => ({ ...prevState, [filterName]: value }))
-        break
-      default:
-        console.log('filterName :>> ', filterName)
-        console.log('value :>> ', value)
         break
     }
   }
@@ -220,7 +158,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
 
   useEffect(() => {
     handleChangePage()
-  }, [filter]) // eslint-disable-line
+  }, [filter, sort]) // eslint-disable-line
 
   useEffect(() => {
     setPage(1)
@@ -232,25 +170,22 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
       startDate: null,
       endDate: null
     })
-    switch (selectedTab) {
-      case 'prescription':
-        setData(prescription ?? [])
-        setTotal(prescriptionTotal ?? 0)
-        break
-      case 'administration':
-        setData(administration ?? [])
-        setTotal(administrationTotal ?? 0)
-        break
-      default:
-        setData([])
-        setTotal(0)
-        break
+  }, [selectedTab]) // eslint-disable-line
+
+  useEffect(() => {
+    const medicationPatient = patient?.medication ?? {}
+    const currrentMedication = medicationPatient[selectedTab] ?? {
+      loading: false,
+      count: 0,
+      total: 0,
+      list: []
     }
-  }, [patientId, selectedTab]) // eslint-disable-line
+    setPatientMedicationList(currrentMedication.list)
+  }, [currrentMedication, currrentMedication?.list]) // eslint-disable-line
 
   return (
     <Grid container item xs={11} justify="flex-end" className={classes.documentTable}>
-      <Grid item container justify="space-between" alignItems="center">
+      <Grid item container justify="space-between" alignItems="center" className={classes.filterAndSort}>
         <Tabs
           classes={{
             root: classes.root,
@@ -273,10 +208,10 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
           />
         </Tabs>
         <Typography variant="button">
-          {total || 0} /{' '}
+          {totalMedication || 0} /{' '}
           {selectedTab === 'prescription'
-            ? `${prescriptionTotal ?? 0} prescription(s)`
-            : `${administrationTotal} administration(s)`}
+            ? `${totalAllMedication ?? 0} prescription(s)`
+            : `${totalAllMedication ?? 0} administration(s)`}
         </Typography>
         <div className={classes.documentButtons}>
           <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
@@ -284,7 +219,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
               placeholder="Rechercher"
               className={classes.input}
               value={searchInput}
-              onChange={handleChangeSearchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
               onKeyDown={onKeyDown}
               endAdornment={
                 <InputAdornment position="end">
@@ -372,7 +307,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
         )}
       </Grid>
 
-      {loadingStatus ? (
+      {loading ? (
         <Grid container justify="center">
           <CircularProgress />
         </Grid>
@@ -421,15 +356,6 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                     Code UCD
                   </TableSortLabel>
                 </TableCell>
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  <TableSortLabel
-                    active={sort.by === 'medication-text'}
-                    direction={sort.by === 'medication-text' ? sort.direction : 'asc'}
-                    onClick={handleSort('medication-text')}
-                  >
-                    Libellé
-                  </TableSortLabel>
-                </TableCell>
                 {selectedTab === 'prescription' && (
                   <TableCell align="center" className={classes.tableHeadCell}>
                     <TableSortLabel
@@ -466,18 +392,19 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
               </TableRow>
             </TableHead>
             <TableBody>
-              {data ? (
+              {patientMedicationList && patientMedicationList.length > 0 ? (
                 <>
-                  {data.map((row) => {
+                  {patientMedicationList.map((row) => {
                     const nda = row.NDA
                     const date =
                       selectedTab === 'prescription'
                         ? row.dispenseRequest?.validityPeriod?.start
                         : row.effectivePeriod?.start
                     const codeATC = selectedTab === 'prescription' ? row.category?.[0]?.id : row.category?.id
+                    const displayATC = selectedTab === 'prescription' ? row.category?.[0]?.text : row.category?.text
 
                     const codeUCD = row.contained?.[0]?.code?.coding?.[0]?.id
-                    const name = row.contained?.[0]?.code?.coding?.[0]?.display
+                    const displayUCD = row.contained?.[0]?.code?.coding?.[0]?.display
 
                     const prescriptionType =
                       selectedTab === 'prescription' &&
@@ -498,10 +425,21 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                         <TableCell align="center">
                           {date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}
                         </TableCell>
-                        <TableCell align="center">{codeATC === 'No matching concept' ? '-' : codeATC ?? '-'}</TableCell>
-                        <TableCell align="center">{codeUCD === 'No matching concept' ? '-' : codeUCD ?? '-'}</TableCell>
-                        <TableCell align="center" className={classes.libelle}>
-                          {name === 'No matching concept' ? '-' : name ?? '-'}
+                        <TableCell align="center">
+                          <Typography>
+                            {codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : codeATC ?? ''}
+                          </Typography>
+                          <Typography className={classes.libelle}>
+                            {displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Typography>
+                            {codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : codeUCD ?? ''}
+                          </Typography>
+                          <Typography className={classes.libelle}>
+                            {displayUCD === 'No matching concept' ? '-' : displayUCD ?? '-'}
+                          </Typography>
                         </TableCell>
                         {selectedTab === 'prescription' && (
                           <TableCell align="center">{prescriptionType ?? '-'}</TableCell>
@@ -533,9 +471,15 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
                   })}
                 </>
               ) : (
-                <Grid container justify="center">
-                  <Typography variant="button">Aucun document à afficher</Typography>
-                </Grid>
+                <TableRow className={classes.emptyTableRow}>
+                  <TableCell colSpan={9} align="left">
+                    <Grid container justify="center">
+                      <Typography variant="button">{`Aucune ${
+                        selectedTab === 'prescription' ? 'prescription' : 'administration'
+                      } à afficher`}</Typography>
+                    </Grid>
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>
@@ -544,7 +488,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({
 
       <Pagination
         className={classes.pagination}
-        count={Math.ceil(total / documentLines)}
+        count={Math.ceil(totalAllMedication / documentLines)}
         shape="rounded"
         onChange={handleChangePage}
         page={page}

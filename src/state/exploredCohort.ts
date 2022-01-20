@@ -4,7 +4,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { logout, login } from './me'
 import { RootState } from 'state'
 
-import { setFavoriteCohortThunk } from './userCohorts'
+import { setFavoriteCohort } from 'state/cohort'
 
 import services from 'services'
 
@@ -67,8 +67,13 @@ const favoriteExploredCohort = createAsyncThunk<CohortData, { id: string }, { st
   'exploredCohort/favoriteExploredCohort',
   async ({ id }, { getState, dispatch }) => {
     const state = getState()
+    const cohortState = state.cohort
+    const cohortList = cohortState ? cohortState.cohortsList : []
 
-    const favoriteResult = await dispatch(setFavoriteCohortThunk({ cohortId: id }))
+    const foundItem = cohortList.find(({ uuid }) => uuid === id)
+    if (!foundItem) return state.exploredCohort
+
+    const favoriteResult = await dispatch(setFavoriteCohort({ favCohort: foundItem }))
 
     return {
       ...state.exploredCohort,
@@ -120,7 +125,6 @@ const fetchExploredCohort = createAsyncThunk<
     default:
       break
   }
-  shouldRefreshData = true
   let cohort
   if (shouldRefreshData || forceReload) {
     switch (context) {

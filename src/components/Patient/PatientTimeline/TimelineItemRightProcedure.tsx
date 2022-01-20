@@ -1,11 +1,8 @@
 import React from 'react'
 
-import { Chip } from '@material-ui/core'
-
 import { IProcedure } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import useStyles from './styles'
-import { getProcedureStatus } from 'utils/documentsFormatter'
 import { PMSIEntry } from 'types'
 
 /**
@@ -14,9 +11,8 @@ import { PMSIEntry } from 'types'
  */
 type TimelineItemRightTypes = {
   data: PMSIEntry<IProcedure>
-  open: (procedure?: IProcedure) => void
 }
-const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data, open }) => {
+const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
   let color = 'red'
   switch (data.status) {
     case 'preparation':
@@ -54,17 +50,8 @@ const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data, open }) => 
               ? new Date(data.meta.lastUpdated).toLocaleDateString('fr-FR')
               : 'Date inconnue'}
           </span>
-          {data.status && <Chip label={getProcedureStatus(data.status)} size="small" className={classes.chip} />}
           {data.code && (
-            <div
-              className={classes.timelineTextRight}
-              style={
-                data.documents && data.documents.length > 0 ? { textDecoration: 'underline', cursor: 'pointer' } : {}
-              }
-              onClick={() => {
-                data.documents && data.documents.length > 0 && open(data)
-              }}
-            >
+            <div className={classes.timelineTextRight}>
               {`${data.code?.coding?.[0].display} (${data.code?.coding?.[0].code})`}
             </div>
           )}

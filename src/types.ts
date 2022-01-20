@@ -84,6 +84,7 @@ export type Cohort = {
   description: string
   result_size?: number
   dated_measure?: any
+  dated_measure_global?: any
   created_at?: string
   modified_at?: string
   favorite?: boolean
@@ -91,6 +92,35 @@ export type Cohort = {
   request?: string
   request_job_status?: string
   request_job_fail_msg?: string
+  create_task_id?: string
+  dated_measure_id?: string
+  owner_id?: string
+  request_job_duration?: string
+  request_query_snapshot?: string
+  extension?: any[]
+}
+
+export type CohortType = {
+  uuid: string
+  name: string
+  create_task_id?: string
+  dated_measure_id?: string
+  dated_measure_global?: any
+  description?: string
+  favorite?: boolean
+  fhir_group_id?: string
+  owner_id?: string
+  request?: string
+  request_job_duration?: string
+  request_job_fail_msg?: string
+  request_job_status?: string
+  request_query_snapshot?: string
+  result_size?: number
+  created_at?: string
+  modified_at?: string
+  extension?: any[]
+  // ??
+  type?: string
 }
 
 export type FormattedCohort = {
@@ -100,11 +130,13 @@ export type FormattedCohort = {
   description: string
   status?: string
   nPatients?: number
+  nGlobal?: string
   date?: string
   perimeter?: string
   favorite?: boolean
   jobStatus?: string
   jobFailMsg?: string
+  canMakeExport?: boolean
 }
 
 export type CohortFilters = {
@@ -319,6 +351,7 @@ export type CriteriaItemType = {
 
 export type SelectedCriteriaType = {
   id: number
+  error?: boolean
 } & (
   | CcamDataType
   | Cim10DataType
@@ -449,6 +482,7 @@ export type CohortCreationCounterType = {
   male?: number
   unknownPatient?: number
   jobFailMsg?: string
+  date?: string
 }
 
 export type CohortCreationSnapshotType = {
@@ -485,24 +519,81 @@ export type RequestType = {
   modified_at?: string
 }
 
-export type CohortType = {
-  uuid: string
-  name: string
-  create_task_id?: string
-  dated_measure_id?: string
-  description?: string
-  favorite?: boolean
-  fhir_group_id?: string
-  owner_id?: string
-  request?: string
-  request_job_duration?: string
-  request_job_fail_msg?: string
-  request_job_status?: string
-  request_query_snapshot?: string
-  result_size?: number
-  created_at?: string
-  modified_at?: string
-  extension?: any[]
+export type ContactSubmitForm = FormData
+
+/**
+ * Patient State Types
+ */
+
+export type IPatientDetails = IPatient & {
+  lastEncounter?: IEncounter
+  lastGhm?: IClaim | 'loading'
+  lastProcedure?: IProcedure | 'loading'
+  mainDiagnosis?: ICondition[] | 'loading'
 }
 
-export type ContactSubmitForm = FormData
+export type IPatientDocuments = {
+  loading: boolean
+  count: number
+  total: number
+  list: CohortComposition[]
+  page: number
+  options?: {
+    filters?: {
+      searchInput: string
+      nda: string
+      selectedDocTypes: string[]
+      startDate: string | null
+      endDate: string | null
+    }
+    sort?: {
+      by: string
+      direction: string
+    }
+  }
+}
+
+export type IPatientPmsi<T extends IProcedure | ICondition | IClaim> = {
+  loading: boolean
+  count: number
+  total: number
+  list: T[]
+  page: number
+  options?: {
+    filters?: {
+      searchInput: string
+      nda: string
+      startDate: string | null
+      endDate: string | null
+      code?: string
+      diagnosticTypes?: string[]
+    }
+    sort?: {
+      by: string
+      direction: string
+    }
+  }
+}
+
+export type IPatientMedication<T extends IMedicationRequest | IMedicationAdministration> = {
+  loading: boolean
+  count: number
+  total: number
+  list: T[]
+  page: number
+  options?: {
+    filters?: {
+      searchInput: string
+      nda: string
+      startDate: string | null
+      endDate: string | null
+      code?: string
+      selectedPrescriptionTypes?: { id: string; label: string }[]
+      selectedAdministrationRoutes?: { id: string; label: string }[]
+    }
+    sort?: {
+      by: string
+      direction: string
+    }
+  }
+}

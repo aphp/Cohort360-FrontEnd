@@ -1,18 +1,31 @@
-import React, { useState } from 'react'
-
+import React, { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import { useParams } from 'react-router-dom'
 import moment from 'moment'
 
+import Chip from '@material-ui/core/Chip'
+import Button from '@material-ui/core/Button'
+import CircularProgress from '@material-ui/core/CircularProgress'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 
-import TimelineItemRight from './TimelineItemRight'
+import TimelineItemRightProcedure from './TimelineItemRightProcedure'
+import TimelineItemRightCondition from './TimelineItemRightCondition'
 import TimelineItemLeft from './TimelineItemLeft'
 import HospitDialog from './HospitDialog/HospitDialog'
+import FilterTimelineDialog from './FilterTimelineDialog/FilterTimelineDialog'
 
 import MoreVertIcon from '@material-ui/icons/MoreVert'
+import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import { CohortComposition, CohortEncounter, PMSIEntry } from 'types'
-import { IEncounter, IProcedure, IDocumentReference, IPeriod } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IEncounter, IProcedure, IDocumentReference, IPeriod, ICondition } from '@ahryman40k/ts-fhir-types/lib/R4'
+
+import { capitalizeFirstLetter } from 'utils/capitalize'
+
+import { fetchAllProcedures } from 'state/patient'
+
+import { fetchDiagnosticTypes } from 'services/cohortCreation/fetchCondition'
 
 import useStyles from './styles'
 
@@ -24,10 +37,10 @@ type MonthVisit = {
     end?: string
     data: IEncounter | CohortEncounter
   }[]
-  consult: {
+  pmsi: {
     start?: string
     end?: string
-    data: PMSIEntry<IProcedure>
+    data: PMSIEntry<IProcedure | ICondition>
   }[]
 }
 
@@ -37,7 +50,7 @@ type TimelineData = {
   }
 }
 
-const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<IProcedure>) => {
+const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<IProcedure> | PMSIEntry<ICondition>) => {
   const dataItem: {
     start?: string
     end?: string
@@ -45,8 +58,10 @@ const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<IProcedu
   let date = moment()
   if (item.resourceType === 'Encounter') {
     date = moment(item.period?.start ?? item.meta?.lastUpdated, dateFormat)
-  } else {
+  } else if (item.resourceType === 'Procedure') {
     date = moment(item.performedDateTime ?? item.meta?.lastUpdated, dateFormat)
+  } else {
+    date = moment(item.recordedDate ?? item.meta?.lastUpdated, dateFormat)
   }
   const yearStr = date.format('YYYY')
   const monthStr = date.format('MM')
@@ -59,7 +74,9 @@ const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<IProcedu
 
 const generateTimelineFormattedData = (
   hospits?: CohortEncounter[],
-  consults?: PMSIEntry<IProcedure>[]
+  consults?: PMSIEntry<IProcedure>[],
+  diagnostics?: PMSIEntry<ICondition>[],
+  selectedTypes?: { id: string; label: string }[]
 ): TimelineData => {
   const data: TimelineData = {}
 
@@ -68,18 +85,36 @@ const generateTimelineFormattedData = (
     data[yearStr] = data[yearStr] ?? {}
     data[yearStr][monthStr] = data[yearStr][monthStr] ?? {
       hospit: [],
-      consult: []
+      pmsi: []
     }
     data[yearStr][monthStr].hospit.push({ ...dataItem, data: item })
   })
-  consults?.forEach((item) => {
+  consults
+    ?.filter((item) => item.code?.coding?.[0].display !== 'No matching concept')
+    .forEach((item) => {
+      const { dataItem, monthStr, yearStr } = getTimelineFormattedDataItem(item)
+      data[yearStr] = data[yearStr] ?? {}
+      data[yearStr][monthStr] = data[yearStr][monthStr] ?? {
+        hospit: [],
+        pmsi: []
+      }
+      data[yearStr][monthStr].pmsi.push({ ...dataItem, data: item })
+    })
+
+  diagnostics = diagnostics?.filter((item) =>
+    selectedTypes && selectedTypes.length > 0
+      ? selectedTypes.find((selectedType) => selectedType.id === item.extension?.[0].valueString) !== undefined
+      : true
+  )
+  diagnostics = diagnostics?.filter((item) => item.code?.coding?.[0].display !== 'No matching concept')
+  diagnostics?.forEach((item) => {
     const { dataItem, monthStr, yearStr } = getTimelineFormattedDataItem(item)
     data[yearStr] = data[yearStr] ?? {}
     data[yearStr][monthStr] = data[yearStr][monthStr] ?? {
       hospit: [],
-      consult: []
+      pmsi: []
     }
-    data[yearStr][monthStr].consult.push({ ...dataItem, data: item })
+    data[yearStr][monthStr].pmsi.push({ ...dataItem, data: item })
   })
 
   return data
@@ -95,22 +130,72 @@ const generateTimelineFormattedData = (
  */
 
 type PatientTimelineTypes = {
+  loadingPmsi: boolean
   deidentified: boolean
   documents?: (CohortComposition | IDocumentReference)[]
   hospits?: CohortEncounter[]
-  consults?: PMSIEntry<IProcedure>[]
+  consults?: IProcedure[]
+  diagnostics?: ICondition[]
 }
-const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits, consults }) => {
+const PatientTimeline: React.FC<PatientTimelineTypes> = ({
+  loadingPmsi,
+  deidentified,
+  hospits,
+  consults,
+  diagnostics
+}) => {
+  const dispatch = useDispatch()
   const classes = useStyles()
-  const timelineData = generateTimelineFormattedData(hospits, consults)
+  const [timelineData, setTimelineData] = useState<TimelineData>({})
   const [openHospitDialog, setOpenHospitDialog] = useState(false)
   const [dialogDocuments, setDialogDocuments] = useState<(CohortComposition | IDocumentReference)[] | undefined>([])
+  const [openFilter, setOpenFilter] = useState(false)
+
+  const [selectedTypes, setSelectedTypes] = useState<any[]>([])
+  const [diagnosticTypesList, setDiagnosticTypesList] = useState<any[]>([])
+
   const [loading, setLoading] = useState(false)
   const yearComponentSize: { [year: number]: number } = {}
 
-  let yearList: number[] = Object.keys(timelineData)
-    .map((key) => parseInt(key))
-    .reverse()
+  const search = new URLSearchParams(location.search)
+  const groupId = search.get('groupId') ?? undefined
+
+  const { patientId } = useParams<{ patientId: string }>()
+
+  useEffect(() => {
+    dispatch(
+      fetchAllProcedures({
+        patientId,
+        groupId
+      })
+    )
+  }, [])
+
+  useEffect(() => {
+    const _fetchDiagnosticTypes = async () => {
+      const diagnosticTypes = await fetchDiagnosticTypes()
+      if (!diagnosticTypes) return
+
+      // Find main dianosys
+      const foundItem = diagnosticTypes.find((diagnosticTypes: any) => diagnosticTypes.id === 'dp')
+      foundItem && setSelectedTypes([foundItem])
+      setDiagnosticTypesList(diagnosticTypes)
+    }
+
+    _fetchDiagnosticTypes()
+  }, [])
+
+  useEffect(() => {
+    const _timelineData = generateTimelineFormattedData(hospits, consults, diagnostics, selectedTypes)
+    setTimelineData(_timelineData)
+  }, [hospits, consults, diagnostics, selectedTypes])
+
+  let yearList: number[] = timelineData
+    ? Object.keys(timelineData)
+        .map((key) => parseInt(key))
+        .filter((elem) => !isNaN(elem))
+        .reverse()
+    : []
 
   const timelinePeriod = {
     start: yearList[yearList.length - 1],
@@ -147,13 +232,15 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits
     const isConsultDuringYearSearched = (consult: { start?: string | undefined; end?: string | undefined }) =>
       new Date(consult.start ?? '').getFullYear() === yearSearched
 
-    return Object.keys(timelineData).some((year) =>
-      Object.keys(timelineData[year]).some(
-        (month) =>
-          timelineData[year][month].hospit.some((hospit) => isHospitDuringYearSearched(hospit)) ||
-          timelineData[year][month].consult.some((consult) => isConsultDuringYearSearched(consult))
-      )
-    )
+    return timelineData
+      ? Object.keys(timelineData).some((year) =>
+          Object.keys(timelineData[year]).some(
+            (month) =>
+              timelineData[year][month].hospit.some((hospit) => isHospitDuringYearSearched(hospit)) ||
+              timelineData[year][month].pmsi.some((pmsi) => isConsultDuringYearSearched(pmsi))
+          )
+        )
+      : false
   }
 
   const getMonthComponent = (monthVisits: MonthVisit) => {
@@ -195,15 +282,15 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits
             ))}
           </div>
         )}
-        {monthVisits.consult && (
+        {monthVisits.pmsi && (
           <div className={classes.rightElements}>
-            {monthVisits.consult.map((consult, index) => (
-              <TimelineItemRight
-                key={`procedure ${consult.data.id ?? index}`}
-                data={consult.data}
-                open={handleClickOpenHospitDialog}
-              />
-            ))}
+            {monthVisits.pmsi.map((pmsi, index) =>
+              pmsi.data.resourceType === 'Procedure' ? (
+                <TimelineItemRightProcedure key={`procedure ${index}`} data={pmsi.data} />
+              ) : (
+                <TimelineItemRightCondition key={`condition ${index}`} data={pmsi.data} />
+              )
+            )}
           </div>
         )}
       </>
@@ -235,6 +322,10 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits
     </React.Fragment>
   )
 
+  const handleDeleteChip = (value: any) => {
+    value && setSelectedTypes(selectedTypes.filter((item: any) => item.id !== value.id))
+  }
+
   return (
     <>
       {hospits && consults && hospits.length === 0 && consults.length === 0 ? (
@@ -250,6 +341,46 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({ deidentified, hospits
             documents={dialogDocuments}
             deidentified={deidentified}
           />
+
+          <FilterTimelineDialog
+            diagnosticTypesList={diagnosticTypesList}
+            selectedDiagnosticTypes={selectedTypes}
+            onChangeSelectedDiagnosticTypes={(newSelectedTypes: string[]) => setSelectedTypes(newSelectedTypes)}
+            open={openFilter}
+            onClose={() => setOpenFilter(false)}
+          />
+
+          <Grid container alignItems="center" justifyContent="flex-end" xs={11} style={{ margin: 'auto' }}>
+            <Button
+              variant="contained"
+              disableElevation
+              onClick={() => setOpenFilter(true)}
+              startIcon={<FilterList height="15px" fill="#FFF" />}
+              className={classes.searchButton}
+            >
+              Filtrer
+            </Button>
+          </Grid>
+
+          <Grid container alignItems="center" justifyContent="flex-end" xs={11} style={{ margin: 'auto' }}>
+            {selectedTypes.length > 0 &&
+              selectedTypes.map((diagnosticType) => (
+                <Chip
+                  className={classes.chips}
+                  key={diagnosticType.id}
+                  label={capitalizeFirstLetter(diagnosticType.label)}
+                  onDelete={() => handleDeleteChip(diagnosticType)}
+                  color="primary"
+                  variant="outlined"
+                />
+              ))}
+          </Grid>
+          {loadingPmsi && (
+            <div className={classes.loadingContainer}>
+              <CircularProgress size={25} />
+            </div>
+          )}
+
           <div className={classes.centeredTimeline}>
             <div className={classes.verticalBar} />
             {yearList.map((year) => (

@@ -27,6 +27,27 @@ const useStyles = makeStyles({
       transform: 'translateX(-50%)'
     }
   },
+  loadingContainer: {
+    display: 'flex',
+    width: '50%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: '50%'
+  },
+  searchButton: {
+    minWidth: 150,
+    height: 41,
+    backgroundColor: '#5BC5F2',
+    color: '#FFF',
+    borderRadius: '25px',
+    marginLeft: 8
+  },
+  chips: {
+    margin: '2px 4px',
+    '&:last-child': {
+      marginRight: 0
+    }
+  },
 
   timeline: {
     display: 'flex',
@@ -64,7 +85,8 @@ const useStyles = makeStyles({
   time: {
     fontSize: fontSize,
     color: '#999',
-    textAlign: 'left'
+    textAlign: 'left',
+    marginRight: 8
   },
   timelabel: {
     fontSize: fontSize,

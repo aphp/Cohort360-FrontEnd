@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
+import { useDispatch } from 'react-redux'
 
 import { Button, Chip, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
 import { Pagination } from '@material-ui/lab'
@@ -13,38 +14,51 @@ import DocumentSearchHelp from '../../DocumentSearchHelp/DocumentSearchHelp'
 import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
 import DocumentList from '../../Cohort/Documents/DocumentList/DocumentList'
 
-import services from 'services'
-import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { CohortComposition } from 'types'
+import { useAppSelector } from 'state'
+import { fetchDocuments } from 'state/patient'
 
 import { docTypes } from 'assets/docTypes.json'
 
 import useStyles from './styles'
 
-type PatientDocsTypes = {
+type PatientDocsProps = {
   groupId?: string
-  patientId: string
-  documents?: (CohortComposition | IDocumentReference)[]
-  total: number
-  deidentifiedBoolean: boolean
 }
-const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents, total, deidentifiedBoolean }) => {
+const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   const classes = useStyles()
+  const dispatch = useDispatch()
+  const { patient } = useAppSelector((state) => ({
+    patient: state.patient
+  }))
+
+  const loading = patient?.documents?.loading ?? false
+  const totalDocs = patient?.documents?.count ?? 0
+  const totalAllDoc = patient?.documents?.total ?? 0
+
+  const patientDocumentsState = patient?.documents?.list ?? []
+
   const [page, setPage] = useState(1)
-  const [totalDocs, setTotalDocs] = useState(total)
-  const [docs, setDocs] = useState(documents)
-  const [loadingStatus, setLoadingStatus] = useState(false)
-  const [searchInput, setSearchInput] = useState('')
+
+  const [filters, setFilters] = useState<{
+    searchInput: string
+    nda: string
+    selectedDocTypes: any[]
+    startDate: string | null
+    endDate: string | null
+  }>({
+    searchInput: '',
+    nda: '',
+    selectedDocTypes: [],
+    startDate: null,
+    endDate: null
+  })
+
+  const [sortBy, setSortBy] = useState('date')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+
   const [searchMode, setSearchMode] = useState(false)
   const [open, setOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
-  const [nda, setNda] = useState('')
-  const [selectedDocTypes, setSelectedDocTypes] = useState<any[]>([])
-  const [startDate, setStartDate] = useState<string | null>(null)
-  const [endDate, setEndDate] = useState<string | null>(null)
-  const [sortBy, setSortBy] = useState('date')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
-  const [showFilterChip, setShowFilterChip] = useState(false)
 
   const documentLines = 20 // Number of desired lines in the document array
 
@@ -52,10 +66,10 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents
     let displayingSelectedDocTypes: any[] = []
     const allTypes = docTypes.map((docType: any) => docType.type)
 
-    for (const selectedDocType of selectedDocTypes) {
+    for (const selectedDocType of filters.selectedDocTypes) {
       const numberOfElementFromGroup = (allTypes.filter((type) => type === selectedDocType.type) || []).length
       const numberOfElementSelected = (
-        selectedDocTypes.filter((selectedDoc) => selectedDoc.type === selectedDocType.type) || []
+        filters.selectedDocTypes.filter((selectedDoc) => selectedDoc.type === selectedDocType.type) || []
       ).length
 
       if (numberOfElementFromGroup === numberOfElementSelected) {
@@ -73,87 +87,61 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents
     return displayingSelectedDocTypes.filter((item, index, array) => array.indexOf(item) === index)
   })()
 
-  const fetchDocumentsList = async (newSortBy: string, newSortDirection: string, input = searchInput, page = 1) => {
-    if (typeof services.patients.fetchDocuments !== 'function') return
-    setLoadingStatus(true)
-
-    const selectedDocTypesCodes = selectedDocTypes.map((docType) => docType.code)
-
-    const docResp = await services.patients.fetchDocuments(
-      deidentifiedBoolean,
-      newSortBy,
-      newSortDirection,
-      page,
-      patientId,
-      input,
-      selectedDocTypesCodes,
-      nda,
-      startDate,
-      endDate,
-      groupId
+  const fetchDocumentsList = async (page: number) => {
+    const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
+    dispatch(
+      fetchDocuments({
+        groupId,
+        options: {
+          page,
+          sort: {
+            by: sortBy,
+            direction: sortDirection
+          },
+          filters: {
+            ...filters,
+            selectedDocTypes: selectedDocTypesCodes
+          }
+        }
+      })
     )
-    if (!docResp) return
-    setDocs(docResp?.docsList ?? [])
-    setTotalDocs(docResp?.docsTotal ?? 0)
-    setLoadingStatus(false)
-  }
 
-  const handleClearInput = () => {
-    setSearchInput('')
-    fetchDocumentsList(sortBy, sortDirection, '')
-  }
-
-  const handleOpenDialog = () => {
-    setOpen(true)
+    setSearchMode(!!filters.searchInput)
   }
 
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
     setPage(value || 1)
-    setLoadingStatus(true)
-    fetchDocumentsList(sortBy, sortDirection, searchInput, value || 1)
+    fetchDocumentsList(value || 1)
   }
 
   useEffect(() => {
     handleChangePage()
-  }, [patientId, nda, selectedDocTypes, startDate, endDate, sortBy, sortDirection]) // eslint-disable-line
+  }, [filters.nda, filters.selectedDocTypes, filters.startDate, filters.endDate, sortBy, sortDirection]) // eslint-disable-line
 
-  const handleCloseDialog = (submit: boolean) => () => {
-    setOpen(false)
-    if (submit) {
-      setShowFilterChip(true)
-    }
-  }
-
-  const handleChangeInput = (event: { target: { value: React.SetStateAction<string> } }) => {
-    setSearchInput(event.target.value)
-  }
-
-  const onSearchDocument = () => {
-    if (searchInput !== '') {
-      setSearchMode(true)
-    } else {
-      setSearchMode(false)
-    }
-    handleChangePage()
+  const onChangeOptions = (key: string, value: any) => {
+    setFilters((prevState) => ({
+      ...prevState,
+      [key]: value
+    }))
   }
 
   const onKeyDown = (e: { keyCode: number; preventDefault: () => void }) => {
     if (e.keyCode === 13) {
       e.preventDefault()
-      onSearchDocument()
+      fetchDocumentsList(1)
     }
   }
 
   const handleDeleteChip = (filterName: string, value?: string) => {
     switch (filterName) {
       case 'nda':
-        value &&
-          setNda(
-            nda
-              .split(',')
-              .filter((item) => item !== value)
-              .join()
-          )
+        onChangeOptions(
+          filterName,
+          filters.nda
+            .split(',')
+            .filter((item: string) => item !== value)
+            .join()
+        )
         break
       case 'selectedDocTypes': {
         const typesName = docTypes
@@ -162,17 +150,23 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents
         const isGroupItem = typesName.find((typeName) => typeName === value)
 
         if (!isGroupItem) {
-          value && setSelectedDocTypes(selectedDocTypes.filter((item) => item.label !== value))
+          onChangeOptions(
+            filterName,
+            filters.selectedDocTypes.filter((item) => item.label !== value)
+          )
         } else {
-          value && setSelectedDocTypes(selectedDocTypes.filter((item) => item.type !== value))
+          onChangeOptions(
+            filterName,
+            filters.selectedDocTypes.filter((item) => item.type !== value)
+          )
         }
         break
       }
       case 'startDate':
-        setStartDate(null)
+        onChangeOptions(filterName, null)
         break
       case 'endDate':
-        setEndDate(null)
+        onChangeOptions(filterName, null)
         break
     }
   }
@@ -181,41 +175,49 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents
     <Grid container item xs={11} justify="flex-end" className={classes.documentTable}>
       <Grid container justify="space-between" alignItems="center">
         <Typography variant="button">
-          {totalDocs} / {total} document(s)
+          {totalDocs} / {totalAllDoc} document(s)
         </Typography>
         <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
           <div className={classes.documentButtons}>
+            <IconButton size="small" onClick={() => setHelpOpen(true)}>
+              <InfoIcon />
+            </IconButton>
+
             <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
               <InputBase
                 placeholder="Rechercher dans les documents"
                 className={classes.input}
-                value={searchInput}
-                onChange={handleChangeInput}
+                value={filters.searchInput}
+                onChange={(event) => onChangeOptions('searchInput', event.target.value)}
                 onKeyDown={onKeyDown}
                 endAdornment={
                   <InputAdornment position="end">
-                    {searchInput && (
-                      <IconButton onClick={handleClearInput}>
+                    {filters.searchInput && (
+                      <IconButton
+                        onClick={() => {
+                          onChangeOptions('searchInput', '')
+                          fetchDocumentsList(1)
+                        }}
+                      >
                         <ClearIcon />
                       </IconButton>
                     )}
                   </InputAdornment>
                 }
               />
-              <IconButton type="submit" aria-label="search" onClick={onSearchDocument}>
+              <IconButton type="submit" aria-label="search" onClick={() => fetchDocumentsList(1)}>
                 <SearchIcon fill="#ED6D91" height="15px" />
               </IconButton>
             </Grid>
-            <IconButton type="submit" onClick={() => setHelpOpen(true)}>
-              <InfoIcon />
-            </IconButton>
+
             <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+
             <Button
               variant="contained"
               disableElevation
-              onClick={handleOpenDialog}
               startIcon={<FilterList height="15px" fill="#FFF" />}
               className={classes.searchButton}
+              onClick={() => setOpen(true)}
             >
               Filtrer
             </Button>
@@ -223,9 +225,8 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents
         </Grid>
       </Grid>
       <Grid>
-        {showFilterChip &&
-          nda !== '' &&
-          nda
+        {filters.nda !== '' &&
+          filters.nda
             .split(',')
             .map((value) => (
               <Chip
@@ -237,8 +238,7 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents
                 variant="outlined"
               />
             ))}
-        {showFilterChip &&
-          displayingSelectedDocType.length > 0 &&
+        {displayingSelectedDocType.length > 0 &&
           displayingSelectedDocType.map((docType) => (
             <Chip
               className={classes.chips}
@@ -249,36 +249,38 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents
               variant="outlined"
             />
           ))}
-        {showFilterChip && startDate && (
+        {filters.startDate && (
           <Chip
             className={classes.chips}
-            label={`Après le : ${moment(startDate).format('DD/MM/YYYY')}`}
+            label={`Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}`}
             onDelete={() => handleDeleteChip('startDate')}
             color="primary"
             variant="outlined"
           />
         )}
-        {showFilterChip && endDate && (
+        {filters.endDate && (
           <Chip
             className={classes.chips}
-            label={`Avant le : ${moment(endDate).format('DD/MM/YYYY')}`}
+            label={`Avant le : ${moment(filters.endDate).format('DD/MM/YYYY')}`}
             onDelete={() => handleDeleteChip('endDate')}
             color="primary"
             variant="outlined"
           />
         )}
       </Grid>
+
       <DocumentList
-        loading={loadingStatus}
-        documents={docs}
+        groupId={groupId}
+        loading={loading}
+        documents={patientDocumentsState}
         searchMode={searchMode}
-        showIpp={false}
-        deidentified={deidentifiedBoolean}
+        deidentified={false}
         sortBy={sortBy}
         onChangeSortBy={setSortBy}
         sortDirection={sortDirection}
         onChangeSortDirection={setSortDirection}
       />
+
       <Pagination
         className={classes.pagination}
         count={Math.ceil(totalDocs / documentLines)}
@@ -286,19 +288,20 @@ const PatientDocs: React.FC<PatientDocsTypes> = ({ groupId, patientId, documents
         onChange={handleChangePage}
         page={page}
       />
+
       <DocumentFilters
         open={open}
-        onClose={handleCloseDialog(false)}
-        onSubmit={handleCloseDialog(true)}
-        nda={nda}
-        onChangeNda={setNda}
-        selectedDocTypes={selectedDocTypes}
-        onChangeSelectedDocTypes={setSelectedDocTypes}
-        startDate={startDate}
-        onChangeStartDate={setStartDate}
-        endDate={endDate}
-        onChangeEndDate={setEndDate}
-        deidentified={deidentifiedBoolean}
+        onClose={() => setOpen(false)}
+        onSubmit={() => setOpen(false)}
+        nda={filters.nda}
+        onChangeNda={(nda: string) => onChangeOptions('nda', nda)}
+        selectedDocTypes={filters.selectedDocTypes}
+        onChangeSelectedDocTypes={(selectedDocTypes: string[]) => onChangeOptions('selectedDocTypes', selectedDocTypes)}
+        startDate={filters.startDate}
+        onChangeStartDate={(startDate: string | null) => onChangeOptions('startDate', startDate)}
+        endDate={filters.endDate}
+        onChangeEndDate={(endDate: string | null) => onChangeOptions('endDate', endDate)}
+        deidentified={false}
       />
     </Grid>
   )

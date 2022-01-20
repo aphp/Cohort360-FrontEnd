@@ -75,6 +75,7 @@ const PatientList: React.FC<PatientListProps> = ({
   const [open, setOpen] = useState(false)
   const [gender, setGender] = useState<PatientGenderKind>(PatientGenderKind._unknown)
   const [age, setAge] = useState<[number, number]>([0, 130])
+  const [ageType, setAgeType] = useState<'year' | 'month' | 'days'>('year')
   const [vitalStatus, setVitalStatus] = useState<VitalStatus>(VitalStatus.all)
   const [sortBy, setSortBy] = useState('given') // eslint-disable-line
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc') // eslint-disable-line
@@ -115,6 +116,7 @@ const PatientList: React.FC<PatientListProps> = ({
       input,
       gender,
       age,
+      ageType,
       vitalStatus,
       sortBy,
       sortDirection,
@@ -142,7 +144,7 @@ const PatientList: React.FC<PatientListProps> = ({
 
   useEffect(() => {
     onSearchPatient()
-  }, [gender, age, vitalStatus]) // eslint-disable-line
+  }, [gender, age, ageType, vitalStatus]) // eslint-disable-line
 
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
@@ -182,6 +184,7 @@ const PatientList: React.FC<PatientListProps> = ({
         break
       case 'age':
         setAge([0, 130])
+        setAgeType('year')
         break
       case 'vitalStatus':
         setVitalStatus(VitalStatus.all)
@@ -222,6 +225,17 @@ const PatientList: React.FC<PatientListProps> = ({
         return 'Patients vivants'
       case VitalStatus.deceased:
         return 'Patients décédés'
+    }
+  }
+
+  const ageTypeName = () => {
+    switch (ageType) {
+      case 'year':
+        return 'année(s)'
+      case 'month':
+        return 'mois'
+      case 'days':
+        return 'jour(s)'
     }
   }
 
@@ -349,6 +363,8 @@ const PatientList: React.FC<PatientListProps> = ({
                 onChangeGender={setGender}
                 age={age}
                 onChangeAge={setAge}
+                ageType={ageType}
+                onChangeAgeType={setAgeType}
                 vitalStatus={vitalStatus}
                 onChangeVitalStatus={setVitalStatus}
               />
@@ -367,7 +383,7 @@ const PatientList: React.FC<PatientListProps> = ({
             {showFilterChip && (age[0] !== 0 || age[1] !== 130) && (
               <Chip
                 className={classes.chips}
-                label={`Âge entre ${age[0]} et ${age[1]} ans`}
+                label={`Âge entre ${age[0]} et ${age[1]} ${ageTypeName()}`}
                 onDelete={() => handleDeleteChip('age')}
                 color="primary"
                 variant="outlined"

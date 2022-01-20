@@ -410,12 +410,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 }
 
 export function buildRequest(
-  selectedPopulation: ScopeTreeRow[] | null,
+  selectedPopulation: (ScopeTreeRow | undefined)[] | null,
   selectedCriteria: SelectedCriteriaType[],
   criteriaGroup: CriteriaGroupType[],
   temporalConstraints: TemporalConstraintsType[]
 ) {
   if (!selectedPopulation) return ''
+  selectedPopulation = selectedPopulation.filter((elem) => elem !== undefined)
 
   const exploreCriteriaGroup = (itemIds: number[]) => {
     let children: (RequeteurCriteriaType | RequeteurGroupType)[] = []
@@ -530,7 +531,7 @@ export function buildRequest(
 }
 
 export async function unbuildRequest(_json: string) {
-  let population: ScopeTreeRow[] | null = null
+  let population: (ScopeTreeRow | undefined)[] | null = null
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
 
@@ -553,7 +554,9 @@ export async function unbuildRequest(_json: string) {
 
   for (const caresiteCohortItem of caresiteCohortList) {
     const newPopulation = await services.perimeters.fetchPerimeterInfoForRequeteur(caresiteCohortItem ?? '')
-    if (!newPopulation) continue
+    // Don't do that, do not filter population, if you have a pop. with an undefined,
+    // you got a modal with the posibility to change your current source pop.
+    // if (!newPopulation) continue
     population = population ? [...population, newPopulation] : [newPopulation]
   }
 
@@ -672,6 +675,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               default:
+                currentCriterion.error = true
                 break
             }
           }
@@ -687,7 +691,9 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.durationType = currentCriterion.durationType
             ? currentCriterion.durationType
             : { id: 'day', label: 'jours' }
-          currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
+          currentCriterion.ageType = currentCriterion.ageType
+            ? currentCriterion.ageType
+            : { id: 'year', label: 'années' }
           currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
           currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : []
           currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : []
@@ -701,6 +707,7 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.destination = currentCriterion.destination ? currentCriterion.destination : []
           currentCriterion.provenance = currentCriterion.provenance ? currentCriterion.provenance : []
           currentCriterion.admission = currentCriterion.admission ? currentCriterion.admission : []
+          currentCriterion.discharge = currentCriterion.discharge ? currentCriterion.discharge : []
 
           if (element.encounterDateRange) {
             currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
@@ -750,8 +757,6 @@ export async function unbuildRequest(_json: string) {
                   currentCriterion.years[1] = +value?.replace('le', '') || 130
                 }
 
-                console.log(`currentCriterion.years`, currentCriterion.years)
-
                 if (currentCriterion.years[1] % 31 === 0) {
                   currentCriterion.ageType = ageType[1]
                   currentCriterion.years[0] = currentCriterion.years[0] / 31
@@ -763,9 +768,6 @@ export async function unbuildRequest(_json: string) {
                 } else {
                   currentCriterion.ageType = ageType[2]
                 }
-
-                console.log(`currentCriterion.ageType`, currentCriterion.ageType)
-                console.log(`currentCriterion.years`, currentCriterion.years)
                 break
               }
               case ENCOUNTER_ENTRYMODE: {
@@ -885,6 +887,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               default:
+                currentCriterion.error = true
                 break
             }
           }
@@ -952,6 +955,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               default:
+                currentCriterion.error = true
                 break
             }
           }
@@ -1007,6 +1011,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               default:
+                currentCriterion.error = true
                 break
             }
           }
@@ -1052,6 +1057,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               default:
+                currentCriterion.error = true
                 break
             }
           }
@@ -1096,6 +1102,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               default:
+                currentCriterion.error = true
                 break
             }
           }
@@ -1161,6 +1168,7 @@ export async function unbuildRequest(_json: string) {
                 break
               }
               default:
+                currentCriterion.error = true
                 break
             }
           }

@@ -18,22 +18,22 @@ const useStyles = makeStyles((theme) => ({
   },
   documentButtons: {
     display: 'flex',
-    justifyContent: 'flex-end',
-    marginBottom: 5
+    justifyContent: 'flex-end'
   },
   searchBar: {
-    width: '180px',
+    minWidth: 200,
     backgroundColor: '#FFF',
     border: '1px solid #D0D7D8',
     boxShadow: '0px 1px 16px #0000000A',
-    borderRadius: '20px'
+    borderRadius: '25px'
   },
   autocomplete: {
     width: 200,
     margin: '0 16px'
   },
   filterAndSort: {
-    width: 'auto'
+    width: 'auto',
+    '& > *': { marginBottom: 5 }
   },
   radioGroup: {
     flexDirection: 'row',
@@ -44,11 +44,11 @@ const useStyles = makeStyles((theme) => ({
     flex: 1
   },
   searchButton: {
-    width: '150px',
+    minWidth: 150,
     backgroundColor: '#5BC5F2',
     color: '#FFF',
     borderRadius: '25px',
-    margin: '0 4px'
+    marginLeft: 8
   },
   chips: {
     margin: '12px 6px',

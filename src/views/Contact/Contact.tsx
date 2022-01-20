@@ -57,7 +57,7 @@ const Contact: React.FC = () => {
     null
   )
   const [errorFiles, setErrorFiles] = useState(false)
-  const [createIssueSuccess, setCreateIssueSuccess] = useState(true)
+  const [createIssueSuccess, setCreateIssueSuccess] = useState(false)
   const [createIssueFail, setCreateIssueFail] = useState(false)
 
   const _onChangeValue = (key: 'requestType' | 'object' | 'url' | 'files' | 'message', value: any) => {
@@ -118,7 +118,7 @@ const Contact: React.FC = () => {
       <Grid container direction="column" className={clsx(classes.appBar, { [classes.appBarShift]: open })}>
         <Grid container direction="column" alignItems="center">
           <CssBaseline />
-          <Grid container item direction="column" xs={12} sm={9}>
+          <Grid container item direction="column" xs={11}>
             {loading ? (
               <CircularProgress size={60} className={classes.loading} />
             ) : (

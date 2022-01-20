@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { useAppSelector } from 'state'
 
 import { Divider, Grid, Typography } from '@material-ui/core'
@@ -16,7 +16,9 @@ const PatientSearchCard = () => {
 
   return (
     <>
-      <Title>Chercher un patient</Title>
+      <div id="search-patient-card-title">
+        <Title>Chercher un patient</Title>
+      </div>
       <Divider className={classes.divider} />
       {deidentifiedBoolean ? (
         <Grid container item justify="center">
@@ -24,7 +26,9 @@ const PatientSearchCard = () => {
           <Typography variant="h6">Fonctionnalité désactivée en mode pseudonymisé.</Typography>
         </Grid>
       ) : (
-        <PatientSearchBar />
+        <Grid container direction="column" justifyContent="space-evenly" style={{ height: '100%', marginTop: 8 }}>
+          <PatientSearchBar />
+        </Grid>
       )}
     </>
   )

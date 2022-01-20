@@ -8,7 +8,8 @@ const useStyles = makeStyles(() =>
       height: 'calc(100% - 16px)',
       top: 0,
       right: 0,
-      margin: 8
+      margin: 8,
+      overflow: 'auto'
     },
     container: {
       borderRadius: 12,
@@ -82,6 +83,11 @@ const useStyles = makeStyles(() =>
       '&::before': {
         content: 'none'
       }
+    },
+    errorAlert: {
+      marginTop: 8,
+      borderRadius: 12,
+      border: '1px solid currentColor'
     }
   })
 )

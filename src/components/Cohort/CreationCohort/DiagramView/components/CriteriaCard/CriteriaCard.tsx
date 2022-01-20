@@ -4,6 +4,7 @@ import { IconButton, Typography } from '@material-ui/core'
 
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
+import WarningIcon from '@material-ui/icons/Warning'
 
 import CriteriaCardContent from './components/CriteriaCardContent/CriteriaCardContent'
 
@@ -36,6 +37,13 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, editCriteria, delet
         <CriteriaCardContent currentCriteria={currentCriterion} />
       </div>
       <div className={classes.actionContainer}>
+        {currentCriterion.error ? (
+          <IconButton size="small" onClick={() => editCriteria(currentCriterion)} color="secondary">
+            <WarningIcon />
+          </IconButton>
+        ) : (
+          <></>
+        )}
         <IconButton size="small" onClick={() => editCriteria(currentCriterion)} style={{ color: 'currentcolor' }}>
           <EditIcon />
         </IconButton>

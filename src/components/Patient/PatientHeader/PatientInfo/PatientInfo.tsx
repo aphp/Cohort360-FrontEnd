@@ -34,7 +34,7 @@ const PatientInfo: React.FC<PatientInfoTypes> = ({ gender, age, ipp }) => {
   const classes = useStyles()
 
   return (
-    <Grid direction="column" className={classes.root} container={true}>
+    <Grid className={classes.root} container direction="column">
       <Grid container item justify="center" alignItems="center" className={classes.whiteCircle}>
         <GenderIcon gender={gender} />
       </Grid>

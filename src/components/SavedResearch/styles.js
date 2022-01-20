@@ -14,8 +14,7 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   documentTable: {
-    marginTop: '40px',
-    marginBottom: '24px'
+    marginTop: '24px'
   },
   tableButtons: {
     display: 'flex',
@@ -24,22 +23,23 @@ const useStyles = makeStyles((theme) => ({
     width: 'auto'
   },
   searchBar: {
-    width: '250px',
+    width: 250,
+    maxWidth: 250,
     backgroundColor: '#FFF',
     border: '1px solid #D0D7D8',
     boxShadow: '0px 1px 16px #0000000A',
-    borderRadius: '20px'
+    borderRadius: '25px'
   },
   input: {
     marginLeft: theme.spacing(1),
     flex: 1
   },
   searchButton: {
-    width: '125px',
+    minWidth: 150,
     backgroundColor: '#5BC5F2',
     color: '#FFF',
     borderRadius: '25px',
-    marginLeft: 20
+    marginLeft: 8
   },
   chips: {
     margin: '12px 6px',

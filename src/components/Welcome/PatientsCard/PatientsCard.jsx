@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 
 import Button from '@material-ui/core/Button'
+import Divider from '@material-ui/core/Divider'
+import Grid from '@material-ui/core/Grid'
 import useStyles from './styles'
 import Title from '../../Title'
 import CircularProgress from '@material-ui/core/CircularProgress'
@@ -28,13 +30,32 @@ const PatientSearchCard = () => {
 
   return (
     <>
-      <Title>{loading ? <CircularProgress size={20} /> : displayDigit(patientNb)} patients pris en charge</Title>
-      <Button href="/mes_patients" variant="contained" disableElevation className={classes.button}>
-        Explorer tous les patients
-      </Button>
-      <Button href="/perimetre" variant="contained" disableElevation className={classes.button}>
-        Explorer un périmètre
-      </Button>
+      <div id="patients-card-title">
+        <Title>{loading ? <CircularProgress size={20} /> : displayDigit(patientNb)} patients pris en charge</Title>
+      </div>
+      <Divider />
+      <Grid container direction="column" justifyContent="space-evenly" style={{ height: '100%', marginTop: 8 }}>
+        <Button
+          id="patients-research-button"
+          href="/mes_patients"
+          size="small"
+          variant="contained"
+          disableElevation
+          className={classes.button}
+        >
+          Explorer tous les patients
+        </Button>
+        <Button
+          id="scope-research-button"
+          href="/perimetre"
+          size="small"
+          variant="contained"
+          disableElevation
+          className={classes.button}
+        >
+          Explorer un périmètre
+        </Button>
+      </Grid>
     </>
   )
 }

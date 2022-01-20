@@ -26,7 +26,9 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
   const [_selectedPopulation, onChangeSelectedPopulation] = useState<ScopeTreeRow[]>([])
 
   useEffect(() => {
-    onChangeSelectedPopulation(selectedPopulation ?? [])
+    onChangeSelectedPopulation(
+      selectedPopulation !== null ? (selectedPopulation.filter((elem) => elem !== undefined) as ScopeTreeRow[]) : []
+    )
   }, [open]) // eslint-disable-line
 
   /**

@@ -94,7 +94,7 @@ const Scope = () => {
       })}
     >
       <Grid container justify="center" alignItems="center">
-        <Grid container item xs={12} sm={9} direction="column">
+        <Grid container item xs={11} direction="column">
           <Typography variant="h1" color="primary" className={classes.title}>
             Explorer un perimètre
           </Typography>
@@ -103,7 +103,7 @@ const Scope = () => {
           </Paper>
         </Grid>
         <Grid container item justify="center" className={classes.bottomBar}>
-          <Grid container item justify="flex-end" xs={9} className={classes.buttons}>
+          <Grid container item justify="flex-end" xs={11} className={classes.buttons}>
             <Button
               variant="contained"
               disableElevation

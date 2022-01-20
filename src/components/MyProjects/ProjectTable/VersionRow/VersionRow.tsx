@@ -19,29 +19,31 @@ import {
 
 import EditIcon from '@material-ui/icons/Edit'
 import ExportIcon from '@material-ui/icons/GetApp'
+import { ReactComponent as Star } from 'assets/icones/star.svg'
+import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
 
 import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 
-import { setSelectedCohort } from 'state/cohort'
+import { setSelectedCohort, setFavoriteCohort } from 'state/cohort'
 
-import { CohortType } from 'types'
+import { Cohort } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from '../styles'
 
-const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = ({ requestId, cohortsList }) => {
+const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
   const classes = useStyles()
   const dispatch = useDispatch()
   const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<null | string>(null)
 
-  const cohorts: CohortType[] =
+  const cohorts: Cohort[] =
     cohortsList
       .filter(({ request }) => request === requestId)
       .sort((a, b) => +moment(a.created_at).format('x') - +moment(b.created_at).format('x')) || []
 
-  const _handleEditCohort = (cohortId: string) => {
-    dispatch<any>(setSelectedCohort(cohortId))
+  const _handleEditCohort = (cohortId?: string) => {
+    dispatch<any>(setSelectedCohort(cohortId ?? null))
   }
 
   // You can make an export if you got 1 cohort with: EXPORT_DATA_NOMINATIVE = true && READ_DATA_NOMINATIVE = true
@@ -56,6 +58,10 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
       : false
   )
 
+  const onSetCohortFavorite = async (cohort: Cohort) => {
+    await dispatch<any>(setFavoriteCohort({ favCohort: cohort }))
+  }
+
   return (
     <Box className={classes.versionContainer}>
       <Typography variant="h6" gutterBottom component="div">
@@ -65,6 +71,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
         <TableHead>
           <TableRow>
             <TableCell>Nom</TableCell>
+            <TableCell align="center">Favoris</TableCell>
             <TableCell align="center" style={{ width: 125 }}>
               Statut
             </TableCell>
@@ -117,6 +124,11 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
                       onClick={() => _handleEditCohort(historyRow.uuid)}
                     >
                       <EditIcon />
+                    </IconButton>
+                  </TableCell>
+                  <TableCell align="center">
+                    <IconButton onClick={() => onSetCohortFavorite(historyRow)}>
+                      <FavStar favorite={historyRow.favorite} />
                     </IconButton>
                   </TableCell>
                   <TableCell align="center">
@@ -188,6 +200,16 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: CohortType[] }> = (
       />
     </Box>
   )
+}
+
+type FavStarProps = {
+  favorite?: boolean
+}
+const FavStar: React.FC<FavStarProps> = ({ favorite }) => {
+  if (favorite) {
+    return <StarFull height="15px" fill="#ED6D91" />
+  }
+  return <Star height="15px" fill="#ED6D91" />
 }
 
 export default VersionRow

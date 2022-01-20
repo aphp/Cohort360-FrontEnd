@@ -97,7 +97,7 @@ const RechercherPatient: React.FC<{}> = () => {
       })}
     >
       <Grid container justify="center" alignItems="center">
-        <Grid container item xs={12} sm={9}>
+        <Grid container item xs={11}>
           <Typography variant="h1" color="primary" className={classes.title}>
             Rechercher un patient
           </Typography>

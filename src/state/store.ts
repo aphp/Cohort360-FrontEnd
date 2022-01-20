@@ -5,7 +5,6 @@ import logger from 'redux-logger'
 import cohortCreation from './cohortCreation'
 import criteria from './criteria'
 import exploredCohort from './exploredCohort'
-import userCohorts from './userCohorts'
 import me from './me'
 import drawer from './drawer'
 import message from './message'
@@ -15,6 +14,7 @@ import cohort from './cohort'
 import scope from './scope'
 import pmsi from './pmsi'
 import medication from './medication'
+import patient from './patient'
 
 const cohortCreationReducer = combineReducers({
   criteria,
@@ -25,7 +25,6 @@ const rootReducer = combineReducers({
   me,
   cohortCreation: cohortCreationReducer,
   exploredCohort,
-  userCohorts,
   drawer,
   message,
   project,
@@ -33,7 +32,8 @@ const rootReducer = combineReducers({
   cohort,
   scope,
   pmsi,
-  medication
+  medication,
+  patient
 })
 
 export const store = createStore(rootReducer, applyMiddleware(thunkMiddleware, logger))
@@ -41,7 +41,7 @@ export const store = createStore(rootReducer, applyMiddleware(thunkMiddleware, l
 store.subscribe(() => {
   // Auto save store inside localStorage
   const state = store.getState() ?? {}
-  const { me, exploredCohort, userCohorts, cohortCreation, project, request, cohort, scope, pmsi, medication } = state
+  const { me, exploredCohort, cohortCreation, project, request, cohort, scope, pmsi, medication, patient } = state
 
   localStorage.setItem('user', JSON.stringify(me))
   localStorage.setItem(
@@ -53,7 +53,6 @@ store.subscribe(() => {
       monthlyVisitData: exploredCohort.monthlyVisitData ? { ...exploredCohort.monthlyVisitData } : {}
     })
   )
-  localStorage.setItem('userCohorts', JSON.stringify(userCohorts))
   localStorage.setItem('cohortCreation', JSON.stringify(cohortCreation))
   localStorage.setItem('project', JSON.stringify(project))
   localStorage.setItem('request', JSON.stringify(request))
@@ -61,4 +60,5 @@ store.subscribe(() => {
   localStorage.setItem('scope', JSON.stringify(scope))
   localStorage.setItem('pmsi', JSON.stringify(pmsi))
   localStorage.setItem('medication', JSON.stringify(medication))
+  localStorage.setItem('patient', JSON.stringify(patient))
 })

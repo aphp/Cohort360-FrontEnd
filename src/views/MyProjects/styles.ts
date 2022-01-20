@@ -35,12 +35,21 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(2),
     paddingBottom: theme.spacing(2)
   },
+  secondaryContainer: {
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2)
+  },
   addButton: {
     backgroundColor: '#5BC5F2',
     color: '#FFF',
     borderRadius: '25px',
-    margin: '0 4px',
-    padding: theme.spacing(1)
+    marginLeft: 8,
+    padding: '8px 12px'
+  },
+  addIconButton: {
+    marginLeft: 8,
+    backgroundColor: '#5BC5F2',
+    color: '#FFF'
   }
 }))
 
