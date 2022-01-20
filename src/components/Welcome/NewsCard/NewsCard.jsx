@@ -20,7 +20,7 @@ export default function TutorialsCard() {
         <b>• Informations: des infobulles ont été ajoutées pour vous accompagner </b>
       </Typography>
       <Typography color="textSecondary" style={{ paddingBottom: 8 }}>
-        Dans l'utilisation de l'estimation du nombre de patients AP-HP au moment de la création de votre cohort.
+        Dans l'utilisation de l'estimation du nombre de patients AP-HP au moment de la création de votre cohorte.
       </Typography>
       <Typography color="textSecondary" style={{ paddingBottom: 8 }}>
         Dans le calcul du delta de nombre de patients par rapport à une ancienne requête.
@@ -38,7 +38,7 @@ export default function TutorialsCard() {
         <b>• Correctif</b>
       </Typography>
       <Typography color="textSecondary" style={{ paddingBottom: 8 }}>
-        L'anomalie concernant la visualisation des PDF des documents médicaux a été corrigée.
+        L'anomalie concernant la visualisation des pdf des documents médicaux a été corrigée.
       </Typography>
       <Typography color="textSecondary" style={{ paddingTop: 6 }}>
         <b>L'équipe Cohort360</b>
