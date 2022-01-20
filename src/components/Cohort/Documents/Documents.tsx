@@ -10,7 +10,8 @@ import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
 import DocumentList from './DocumentList/DocumentList'
 
 import InputSearchDocumentSimple from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentSimple'
-import InputSearchDocumentExtend from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentExtend'
+import InputSearchDocumentRegex from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentRegex'
+import InputSearchDocumentButton from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentButton'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
@@ -61,7 +62,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   const [_sortBy, setSortBy] = useState(sortBy)
   const [_sortDirection, setSortDirection] = useState<'asc' | 'desc'>(sortDirection)
 
-  const [showAreaText, setShowAreaText] = useState(false)
+  const [inputMode, setInputMode] = useState<'simple' | 'regex' | 'extend'>('simple')
 
   const documentLines = 20
 
@@ -91,7 +92,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   })()
 
   const onSearchDocument = async (sortBy: string, sortDirection: 'asc' | 'desc', input?: string, page = 1) => {
-    if (input !== '') {
+    if (input) {
       setSearchMode(true)
     } else {
       setSearchMode(false)
@@ -99,6 +100,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     setLoadingStatus(true)
 
     const selectedDocTypesCodes = selectedDocTypes.map((docType) => docType.code)
+
+    if (inputMode === 'regex') input = `/${input}/`
 
     const result = await services.cohorts.fetchDocuments(
       !!deidentifiedBoolean,
@@ -121,8 +124,10 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
       setAllPatientDocumentsNumber(totalAllPatientDocs)
       setPage(page)
       setDocuments(documentsList)
-      setLoadingStatus(false)
+    } else {
+      setDocuments([])
     }
+    setLoadingStatus(false)
   }
 
   useEffect(() => {
@@ -179,7 +184,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
         <CssBaseline />
         <Grid container item xs={11} justify="space-between">
           <Grid container item justify="flex-end" className={classes.tableGrid}>
-            <Grid container justify="space-between" alignItems="center">
+            <Grid container justify="space-between" alignItems="center" style={{ marginBottom: 8 }}>
               <Grid container direction="column" justify="flex-start" style={{ width: 'fit-content' }}>
                 {loadingStatus || deidentifiedBoolean === null ? (
                   <>
@@ -202,19 +207,6 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
               <Grid item>
                 <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
                   <div className={classes.documentButtons}>
-                    {!showAreaText && (
-                      <InputSearchDocumentSimple
-                        defaultSearchInput={searchInput}
-                        setDefaultSearchInput={(newSearchInput: string) => {
-                          console.log('newSearchInput :>> ', newSearchInput)
-                          setSearchInput(newSearchInput)
-                        }}
-                        onSearchDocument={(newInputText: string) =>
-                          onSearchDocument(_sortBy, _sortDirection, newInputText)
-                        }
-                      />
-                    )}
-
                     <Button
                       variant="contained"
                       disableElevation
@@ -224,28 +216,28 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                     >
                       Filtrer
                     </Button>
+
+                    <InputSearchDocumentButton currentMode={inputMode} onChangeMode={setInputMode} />
                   </div>
                 </Grid>
               </Grid>
-
-              <Grid item container xs={12} style={{ marginBottom: 4 }} justify="flex-end">
-                <Button size="small" onClick={() => setShowAreaText(!showAreaText)}>
-                  <Typography variant="h6">Recherche {showAreaText ? 'simple' : 'avancée'}</Typography>
-                </Button>
-              </Grid>
-
-              {showAreaText && (
-                <InputSearchDocumentExtend
-                  defaultSearchInput={searchInput}
-                  setDefaultSearchInput={(newSearchInput: string) => {
-                    console.log('newSearchInput :>> ', newSearchInput)
-                    setSearchInput(newSearchInput)
-                  }}
-                  onSearchDocument={(newInputText: string) => onSearchDocument(_sortBy, _sortDirection, newInputText)}
-                />
-              )}
             </Grid>
 
+            {inputMode === 'simple' && (
+              <InputSearchDocumentSimple
+                defaultSearchInput={searchInput}
+                setDefaultSearchInput={(newSearchInput: string) => setSearchInput(newSearchInput)}
+                onSearchDocument={(newInputText: string) => onSearchDocument(_sortBy, _sortDirection, newInputText)}
+              />
+            )}
+
+            {inputMode === 'regex' && (
+              <InputSearchDocumentRegex
+                defaultSearchInput={searchInput}
+                setDefaultSearchInput={(newSearchInput: string) => setSearchInput(newSearchInput)}
+                onSearchDocument={(newInputText: string) => onSearchDocument(_sortBy, _sortDirection, newInputText)}
+              />
+            )}
             <Grid>
               {nda !== '' &&
                 nda

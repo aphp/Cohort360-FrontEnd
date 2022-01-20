@@ -15,12 +15,16 @@ type InputSearchDocumentExtendProps = {
   defaultSearchInput?: string
   setDefaultSearchInput?: (newSearchInput: string) => void
   onSearchDocument: (newInputText: string) => void
+  noInfoIcon?: boolean
+  noClearIcon?: boolean
+  noSearchIcon?: boolean
 }
 const InputSearchDocumentExtend: React.FC<InputSearchDocumentExtendProps> = ({
   placeholder,
   defaultSearchInput,
   setDefaultSearchInput,
-  onSearchDocument
+  onSearchDocument,
+  ...props
 }) => {
   const classes = useStyles()
 
@@ -66,17 +70,28 @@ const InputSearchDocumentExtend: React.FC<InputSearchDocumentExtendProps> = ({
           onKeyDown={onKeyDown}
           endAdornment={
             <InputAdornment position="end">
-              <IconButton size="small" onClick={() => setHelpOpen(true)}>
-                <InfoIcon />
-              </IconButton>
+              {!props.noInfoIcon && (
+                <IconButton size="small" onClick={() => setHelpOpen(true)}>
+                  <InfoIcon />
+                </IconButton>
+              )}
 
-              <IconButton size="small" onClick={handleClearInput}>
-                <ClearIcon />
-              </IconButton>
+              {!props.noClearIcon && searchInput && (
+                <IconButton size="small" onClick={handleClearInput}>
+                  <ClearIcon />
+                </IconButton>
+              )}
 
-              <IconButton size="small" type="submit" aria-label="search" onClick={() => onSearchDocument(searchInput)}>
-                <SearchIcon fill="#ED6D91" height="17px" />
-              </IconButton>
+              {!props.noSearchIcon && (
+                <IconButton
+                  size="small"
+                  type="submit"
+                  aria-label="search"
+                  onClick={() => onSearchDocument(searchInput)}
+                >
+                  <SearchIcon fill="#ED6D91" height="17px" />
+                </IconButton>
+              )}
             </InputAdornment>
           }
         />

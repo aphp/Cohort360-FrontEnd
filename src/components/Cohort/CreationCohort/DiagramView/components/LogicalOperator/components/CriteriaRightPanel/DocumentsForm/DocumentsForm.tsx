@@ -148,6 +148,8 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               defaultSearchInput={defaultValues.search}
               setDefaultSearchInput={(newSearchInput: string) => _onChangeValue('search', newSearchInput)}
               onSearchDocument={() => null}
+              noClearIcon
+              noSearchIcon
             />
           </Grid>
 

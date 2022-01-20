@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 import { useDispatch } from 'react-redux'
 
-import { Button, Chip, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
+import { Button, Chip, Grid, Typography } from '@material-ui/core'
 import { Alert, Pagination } from '@material-ui/lab'
 
-import ClearIcon from '@material-ui/icons/Clear'
-import InfoIcon from '@material-ui/icons/Info'
-import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import DocumentSearchHelp from '../../DocumentSearchHelp/DocumentSearchHelp'
+import InputSearchDocumentSimple from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentSimple'
+import InputSearchDocumentRegex from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentRegex'
+import InputSearchDocumentButton from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentButton'
+
 import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
 import DocumentList from '../../Cohort/Documents/DocumentList/DocumentList'
 
@@ -40,25 +40,25 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   const [page, setPage] = useState(1)
 
   const [filters, setFilters] = useState<{
-    searchInput: string
     nda: string
     selectedDocTypes: any[]
     startDate: string | null
     endDate: string | null
   }>({
-    searchInput: '',
     nda: '',
     selectedDocTypes: [],
     startDate: null,
     endDate: null
   })
 
+  const [searchInput, setSearchInput] = useState('date')
   const [sortBy, setSortBy] = useState('date')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 
   const [searchMode, setSearchMode] = useState(false)
   const [open, setOpen] = useState(false)
-  const [helpOpen, setHelpOpen] = useState(false)
+
+  const [inputMode, setInputMode] = useState<'simple' | 'regex' | 'extend'>('simple')
 
   const documentLines = 20 // Number of desired lines in the document array
 
@@ -87,8 +87,11 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     return displayingSelectedDocTypes.filter((item, index, array) => array.indexOf(item) === index)
   })()
 
-  const fetchDocumentsList = async (page: number) => {
+  const fetchDocumentsList = async (page: number, input = searchInput) => {
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
+
+    if (inputMode === 'regex') input = `/${input}/`
+
     dispatch(
       fetchDocuments({
         groupId,
@@ -100,13 +103,14 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
           },
           filters: {
             ...filters,
+            searchInput: input,
             selectedDocTypes: selectedDocTypesCodes
           }
         }
       })
     )
 
-    setSearchMode(!!filters.searchInput)
+    setSearchMode(!!searchInput)
   }
 
   const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
@@ -123,13 +127,6 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
       ...prevState,
       [key]: value
     }))
-  }
-
-  const onKeyDown = (e: { keyCode: number; preventDefault: () => void }) => {
-    if (e.keyCode === 13) {
-      e.preventDefault()
-      fetchDocumentsList(1)
-    }
   }
 
   const handleDeleteChip = (filterName: string, value?: string) => {
@@ -179,39 +176,6 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         </Typography>
         <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
           <div className={classes.documentButtons}>
-            <IconButton size="small" onClick={() => setHelpOpen(true)}>
-              <InfoIcon />
-            </IconButton>
-
-            <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
-              <InputBase
-                placeholder="Rechercher dans les documents"
-                className={classes.input}
-                value={filters.searchInput}
-                onChange={(event) => onChangeOptions('searchInput', event.target.value)}
-                onKeyDown={onKeyDown}
-                endAdornment={
-                  <InputAdornment position="end">
-                    {filters.searchInput && (
-                      <IconButton
-                        onClick={() => {
-                          onChangeOptions('searchInput', '')
-                          fetchDocumentsList(1)
-                        }}
-                      >
-                        <ClearIcon />
-                      </IconButton>
-                    )}
-                  </InputAdornment>
-                }
-              />
-              <IconButton type="submit" aria-label="search" onClick={() => fetchDocumentsList(1)}>
-                <SearchIcon fill="#ED6D91" height="15px" />
-              </IconButton>
-            </Grid>
-
-            <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
-
             <Button
               variant="contained"
               disableElevation
@@ -221,9 +185,28 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
             >
               Filtrer
             </Button>
+
+            <InputSearchDocumentButton currentMode={inputMode} onChangeMode={setInputMode} />
           </div>
         </Grid>
       </Grid>
+
+      {inputMode === 'simple' && (
+        <InputSearchDocumentSimple
+          defaultSearchInput={searchInput}
+          setDefaultSearchInput={(newSearchInput: string) => setSearchInput(newSearchInput)}
+          onSearchDocument={(newInputText: string) => fetchDocumentsList(1, newInputText)}
+        />
+      )}
+
+      {inputMode === 'regex' && (
+        <InputSearchDocumentRegex
+          defaultSearchInput={searchInput}
+          setDefaultSearchInput={(newSearchInput: string) => setSearchInput(newSearchInput)}
+          onSearchDocument={(newInputText: string) => fetchDocumentsList(1, newInputText)}
+        />
+      )}
+
       <Grid>
         {filters.nda !== '' &&
           filters.nda

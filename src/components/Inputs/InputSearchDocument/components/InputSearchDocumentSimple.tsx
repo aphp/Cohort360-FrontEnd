@@ -11,14 +11,20 @@ import DocumentSearchHelp from 'components/DocumentSearchHelp/DocumentSearchHelp
 import useStyles from './styles'
 
 type InputSearchDocumentSimpleProps = {
+  placeholder?: string
   defaultSearchInput?: string
   setDefaultSearchInput?: (newSearchInput: string) => void
   onSearchDocument: (newInputText: string) => void
+  noInfoIcon?: boolean
+  noClearIcon?: boolean
+  noSearchIcon?: boolean
 }
 const InputSearchDocumentSimple: React.FC<InputSearchDocumentSimpleProps> = ({
+  placeholder,
   defaultSearchInput,
   setDefaultSearchInput,
-  onSearchDocument
+  onSearchDocument,
+  ...props
 }) => {
   const classes = useStyles()
 
@@ -41,7 +47,7 @@ const InputSearchDocumentSimple: React.FC<InputSearchDocumentSimpleProps> = ({
   }
 
   const onKeyDown = async (e: any) => {
-    if (e.keyCode === 13) {
+    if (e.keyCode === 13 && !e.shiftKey) {
       e.preventDefault()
       onSearchDocument(searchInput)
     }
@@ -53,34 +59,44 @@ const InputSearchDocumentSimple: React.FC<InputSearchDocumentSimpleProps> = ({
 
   return (
     <>
-      <IconButton size="small" onClick={() => setHelpOpen(true)}>
-        <InfoIcon />
-      </IconButton>
-
-      <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
+      <Grid container item className={classes.gridAdvancedSearch}>
         <InputBase
-          placeholder="Rechercher dans les documents"
-          className={classes.input}
+          fullWidth
+          placeholder={placeholder ?? 'Recherche dans les documents'}
           value={searchInput}
           onChange={handleChangeInput}
+          multiline
           onKeyDown={onKeyDown}
           endAdornment={
             <InputAdornment position="end">
-              {searchInput && (
-                <IconButton onClick={handleClearInput}>
+              {!props.noInfoIcon && (
+                <IconButton size="small" onClick={() => setHelpOpen(true)}>
+                  <InfoIcon />
+                </IconButton>
+              )}
+
+              {!props.noClearIcon && searchInput && (
+                <IconButton size="small" onClick={handleClearInput}>
                   <ClearIcon />
+                </IconButton>
+              )}
+
+              {!props.noSearchIcon && (
+                <IconButton
+                  size="small"
+                  type="submit"
+                  aria-label="search"
+                  onClick={() => onSearchDocument(searchInput)}
+                >
+                  <SearchIcon fill="#ED6D91" height="17px" />
                 </IconButton>
               )}
             </InputAdornment>
           }
         />
-
-        <IconButton type="submit" aria-label="search" onClick={() => onSearchDocument(searchInput)}>
-          <SearchIcon fill="#ED6D91" height="15px" />
-        </IconButton>
-
-        <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
       </Grid>
+
+      <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
     </>
   )
 }
