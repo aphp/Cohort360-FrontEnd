@@ -312,10 +312,12 @@ const servicesCohorts: IServicesCohorts = {
     let date2 = ''
     if (age[0] !== 0 || age[1] !== 130) {
       date1 = moment()
-        .subtract(age[1] + 1, ageType)
+        .subtract(age[1], ageType)
+        // - 1 year + 1 day to gets people with X years and 363 days
+        .subtract(1, 'year')
         .add(1, 'days')
-        .format('YYYY-MM-DD') //`${today.getFullYear() - age[1]}-${monthStr}-${dayStr}`
-      date2 = moment().subtract(age[0], ageType).format('YYYY-MM-DD') //`${today.getFullYear() - age[0]}-${monthStr}-${dayStr}`
+        .format('YYYY-MM-DD')
+      date2 = moment().subtract(age[0], ageType).format('YYYY-MM-DD')
     }
 
     const patientsResp = await fetchPatient({
