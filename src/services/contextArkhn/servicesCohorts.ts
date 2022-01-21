@@ -1,5 +1,3 @@
-import moment from 'moment'
-
 import {
   CohortComposition,
   CohortData,
@@ -68,7 +66,7 @@ export interface IServicesCohorts {
    *   - searchBy: Permet la recherche sur un champs précis (_text, family, given, identifier)
    *   - searchInput: Permet la recherche textuelle
    *   - gender: Permet le filtre par genre
-   *   - age: Permet le filtre par age
+   *   - birthdates: Permet le filtre par date de naissances
    *   - vitalStatus: Permet le filtre par status vital
    *   - sortBy: Permet le tri
    *   - sortDirection: Permet le tri dans l'ordre croissant ou décroissant
@@ -86,8 +84,7 @@ export interface IServicesCohorts {
     searchBy: SearchByTypes,
     searchInput: string,
     gender: PatientGenderKind,
-    age: [number, number],
-    ageType: 'year' | 'month' | 'days',
+    birthdates: [string, string],
     vitalStatus: VitalStatus,
     sortBy: string,
     sortDirection: string,
@@ -291,8 +288,7 @@ const servicesCohorts: IServicesCohorts = {
     searchBy,
     searchInput,
     gender,
-    age,
-    ageType,
+    birthdates,
     vitalStatus,
     sortBy,
     sortDirection,
@@ -308,18 +304,6 @@ const servicesCohorts: IServicesCohorts = {
       _searchInput = _searchInput ? `${_searchInput} AND "${_search}"` : `"${_search}"`
     }
 
-    let date1 = ''
-    let date2 = ''
-    if (age[0] !== 0 || age[1] !== 130) {
-      date1 = moment()
-        .subtract(age[1], ageType)
-        // - 1 year + 1 day to gets people with X years and 363 days
-        .subtract(1, 'year')
-        .add(1, 'days')
-        .format('YYYY-MM-DD')
-      date2 = moment().subtract(age[0], ageType).format('YYYY-MM-DD')
-    }
-
     const patientsResp = await fetchPatient({
       size: 20,
       offset: page ? (page - 1) * 20 : 0,
@@ -331,8 +315,8 @@ const servicesCohorts: IServicesCohorts = {
         gender === PatientGenderKind._unknown ? '' : gender === PatientGenderKind._other ? `other,unknown` : gender,
       searchBy,
       _text: _searchInput,
-      minBirthdate: date1,
-      maxBirthdate: date2,
+      minBirthdate: birthdates[0],
+      maxBirthdate: birthdates[1],
       deceased: vitalStatus !== VitalStatus.all ? (vitalStatus === VitalStatus.deceased ? true : false) : undefined
     })
 

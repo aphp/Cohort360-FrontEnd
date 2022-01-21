@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import moment from 'moment'
 
 import {
   Button,
@@ -74,8 +75,10 @@ const PatientList: React.FC<PatientListProps> = ({
   >(undefined)
   const [open, setOpen] = useState(false)
   const [gender, setGender] = useState<PatientGenderKind>(PatientGenderKind._unknown)
-  const [age, setAge] = useState<[number, number]>([0, 130])
-  const [ageType, setAgeType] = useState<'year' | 'month' | 'days'>('year')
+  const [birthdates, setBirthdates] = useState<[string, string]>([
+    moment().subtract(130, 'years').format('YYYY-MM-DD'),
+    moment().format('YYYY-MM-DD')
+  ])
   const [vitalStatus, setVitalStatus] = useState<VitalStatus>(VitalStatus.all)
   const [sortBy, setSortBy] = useState('given') // eslint-disable-line
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc') // eslint-disable-line
@@ -115,8 +118,7 @@ const PatientList: React.FC<PatientListProps> = ({
       searchBy,
       input,
       gender,
-      age,
-      ageType,
+      birthdates,
       vitalStatus,
       sortBy,
       sortDirection,
@@ -144,7 +146,7 @@ const PatientList: React.FC<PatientListProps> = ({
 
   useEffect(() => {
     onSearchPatient()
-  }, [gender, age, ageType, vitalStatus]) // eslint-disable-line
+  }, [gender, birthdates, vitalStatus]) // eslint-disable-line
 
   const handleCloseDialog = (submit: boolean) => () => {
     setOpen(false)
@@ -182,9 +184,8 @@ const PatientList: React.FC<PatientListProps> = ({
       case 'gender':
         setGender(PatientGenderKind._unknown)
         break
-      case 'age':
-        setAge([0, 130])
-        setAgeType('year')
+      case 'birthdates':
+        setBirthdates([moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')])
         break
       case 'vitalStatus':
         setVitalStatus(VitalStatus.all)
@@ -225,17 +226,6 @@ const PatientList: React.FC<PatientListProps> = ({
         return 'Patients vivants'
       case VitalStatus.deceased:
         return 'Patients décédés'
-    }
-  }
-
-  const ageTypeName = () => {
-    switch (ageType) {
-      case 'year':
-        return 'année(s)'
-      case 'month':
-        return 'mois'
-      case 'days':
-        return 'jour(s)'
     }
   }
 
@@ -361,10 +351,8 @@ const PatientList: React.FC<PatientListProps> = ({
                 onSubmit={handleCloseDialog(true)}
                 gender={gender}
                 onChangeGender={setGender}
-                age={age}
-                onChangeAge={setAge}
-                ageType={ageType}
-                onChangeAgeType={setAgeType}
+                birthdates={birthdates}
+                onChangeBirthdates={setBirthdates}
                 vitalStatus={vitalStatus}
                 onChangeVitalStatus={setVitalStatus}
               />
@@ -380,11 +368,11 @@ const PatientList: React.FC<PatientListProps> = ({
                 variant="outlined"
               />
             )}
-            {showFilterChip && (age[0] !== 0 || age[1] !== 130) && (
+            {showFilterChip && birthdates && (
               <Chip
                 className={classes.chips}
-                label={`Âge entre ${age[0]} et ${age[1]} ${ageTypeName()}`}
-                onDelete={() => handleDeleteChip('age')}
+                label={`Âge entre ${birthdates[0]} et ${birthdates[1]}`}
+                onDelete={() => handleDeleteChip('birthdates')}
                 color="primary"
                 variant="outlined"
               />

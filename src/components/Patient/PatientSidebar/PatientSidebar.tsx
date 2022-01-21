@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import moment from 'moment'
 
 import { CircularProgress, Divider, Drawer, Grid, IconButton, List, Typography } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
@@ -47,8 +48,10 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   const [searchBy, setSearchBy] = useState(SearchByTypes.text)
   const [loadingStatus, setLoadingStatus] = useState(false)
   const [gender, setGender] = useState(PatientGenderKind._unknown)
-  const [age, setAge] = useState<[number, number]>([0, 130])
-  const [ageType, setAgeType] = useState<'year' | 'month' | 'days'>('year')
+  const [birthdates, setBirthdates] = useState<[string, string]>([
+    moment().subtract(130, 'years').format('YYYY-MM-DD'),
+    moment().format('YYYY-MM-DD')
+  ])
   const [vitalStatus, setVitalStatus] = useState(VitalStatus.all)
 
   const [openSort, setOpenSort] = useState(false)
@@ -66,8 +69,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       searchBy,
       searchInput,
       gender,
-      age,
-      ageType,
+      birthdates,
       vitalStatus,
       newSortBy,
       newSortDirection,
@@ -110,7 +112,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   useEffect(() => {
     onSearchPatient(sortBy, sortDirection)
-  }, [gender, age, vitalStatus]) // eslint-disable-line
+  }, [gender, birthdates, vitalStatus]) // eslint-disable-line
 
   const patientsToDisplay =
     patientsList?.length === totalPatients
@@ -141,10 +143,8 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
         onSubmitDialog={handleCloseDialog(true)}
         gender={gender}
         onChangeGender={setGender}
-        age={age}
-        onChangeAge={setAge}
-        ageType={ageType}
-        onChangeAgeType={setAgeType}
+        birthdates={birthdates}
+        onChangeBirthdates={setBirthdates}
         vitalStatus={vitalStatus}
         onChangeVitalStatus={setVitalStatus}
         // sort dialog props
