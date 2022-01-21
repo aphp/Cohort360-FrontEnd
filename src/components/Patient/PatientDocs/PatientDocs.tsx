@@ -7,9 +7,7 @@ import { Alert, Pagination } from '@material-ui/lab'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import InputSearchDocumentSimple from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentSimple'
-import InputSearchDocumentRegex from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentRegex'
-import InputSearchDocumentButton from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentButton'
+import { InputSearchDocumentSimple, InputSearchDocumentRegex, InputSearchDocumentButton } from 'components/Inputs'
 
 import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
 import DocumentList from '../../Cohort/Documents/DocumentList/DocumentList'
@@ -31,6 +29,8 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     patient: state.patient
   }))
 
+  const deidentified = patient?.deidentified ?? true
+
   const loading = patient?.documents?.loading ?? false
   const totalDocs = patient?.documents?.count ?? 0
   const totalAllDoc = patient?.documents?.total ?? 0
@@ -51,7 +51,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     endDate: null
   })
 
-  const [searchInput, setSearchInput] = useState('date')
+  const [searchInput, setSearchInput] = useState('')
   const [sortBy, setSortBy] = useState('date')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 
@@ -262,7 +262,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         loading={loading}
         documents={patientDocumentsState}
         searchMode={searchMode}
-        deidentified={false}
+        deidentified={deidentified}
         sortBy={sortBy}
         onChangeSortBy={setSortBy}
         sortDirection={sortDirection}

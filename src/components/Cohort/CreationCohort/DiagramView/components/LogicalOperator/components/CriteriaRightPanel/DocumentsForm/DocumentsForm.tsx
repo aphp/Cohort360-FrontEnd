@@ -18,7 +18,7 @@ import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
-import InputSearchDocumentExtend from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentExtend'
+import { InputSearchDocumentExtend } from 'components/Inputs'
 
 import useStyles from './styles'
 
