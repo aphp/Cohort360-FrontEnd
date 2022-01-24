@@ -29,3 +29,4 @@ yarn-error.log*
 .env*
 !.env.example
 .mp4
+/script.sh

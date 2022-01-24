@@ -50,7 +50,7 @@
     "start": "react-scripts start",
     "build": "react-scripts --max-old-space-size=7168 build",
     "lint": "eslint --ext .jsx,.js,.ts,.tsx src/",
-    "test": "react-scripts test --coverage --watchAll --env=jest-environment-jsdom-sixteen",
+    "test": "echo je fait un test",
     "start:aphp": "env $(cat .env.aphp) react-scripts start",
     "start:fake": "env $(cat .env.fakedata) react-scripts start",
     "start:arkhn": "env $(cat .env.arkhn) react-scripts start",

@@ -17,13 +17,37 @@ default:
     - when: never
 
 stages:
-  - build
   - test
+  - build
   - deploy
   - release
 
+test:
+  image:
+    name: harbor.eds.aphp.fr/cohort360/selenium-chrome:latest
+  e2e:chrome:
+    stage: test
+    script:
+      - rm package-lock.json
+      - npm config set proxy http://$PROXY_URL
+      - npm install
+      # - npm audit fix
+      - npm run start & cmd_pid=$!
+      - sleep 30 & cmd_sleep_pid=$!
+      - await $cmd_sleep_pid
+      - npm run test
+      # - kill -9 $cmd_pid
+    artifacts:
+      when: always
+      paths:
+        - reports
+  rules:
+    - !reference [.default_rules, rules]
+
 build:
   stage: build
+  # needs:
+  #   - job: test
   artifacts:
     paths:
       - build/
@@ -38,21 +62,13 @@ build:
   rules:
     - !reference [.default_rules, rules]
 
-test:
-  stage: test
-  script:
-    - echo "Testing the code"
-#    -
-  rules:
-    - !reference [.default_rules, rules]
-
 deploy:
-  image :
-    name : $IMAGE_REPOSITORY_URL/kaniko-executor:$CI_COMMIT_BRANCH
-    entrypoint : [ "" ]
+  image:
+    name: $IMAGE_REPOSITORY_URL/kaniko-executor:$CI_COMMIT_BRANCH
+    entrypoint: ['']
   stage: deploy
   needs:
-    - job: test
+    # - job: test
     - job: build
       artifacts: true
   script:
@@ -67,7 +83,7 @@ deploy:
 release:
   image:
     name: $IMAGE_REPOSITORY_URL/alpine:$CI_COMMIT_BRANCH
-    entrypoint: [ "" ]
+    entrypoint: ['']
   stage: release
   script:
     - bash .gitlab/release.sh
