@@ -7,6 +7,7 @@ import InputSearchDocumentExtend from './InputSearchDocument/components/InputSea
 import InputSearchDocumentRegex from './InputSearchDocument/components/InputSearchDocumentRegex'
 import InputSearchDocumentSimple from './InputSearchDocument/components/InputSearchDocumentSimple'
 
+import InputAgeRange from './InputAgeRange'
 import InputAgeRangeSlider from './InputAgeRange/InputAgeRangeSlider'
 import InputAgeRangeAdvanced from './InputAgeRange/InputAgeRangeAdvanced'
 
@@ -18,6 +19,7 @@ export {
   InputSearchDocumentExtend,
   InputSearchDocumentRegex,
   InputSearchDocumentSimple,
+  InputAgeRange,
   InputAgeRangeSlider,
   InputAgeRangeAdvanced
 }

@@ -82,20 +82,27 @@ const InputAgeRangeSlider: React.FC<InputAgeRangeSliderProps> = ({ birthdates, o
   const _onChangeAgeType = (newAgeType: 'year' | 'month' | 'days') => {
     setAgeType(newAgeType)
 
+    const newAge = _age as [number, number]
+
     switch (newAgeType) {
       case 'days':
         setLimits([0, 31])
+        newAge[1] = newAge[1] > 31 ? 31 : newAge[1]
         break
       case 'month':
         setLimits([0, 24])
+        newAge[1] = newAge[1] > 24 ? 24 : newAge[1]
         break
       case 'year':
       default:
         setLimits([0, 130])
+        newAge[1] = newAge[1] > 130 ? 30 : newAge[1]
         break
     }
+    setAge(newAge)
+
     if (onChangeBirthdates && typeof onChangeBirthdates === 'function') {
-      onChangeBirthdates(convertToBirthdate(_age, newAgeType))
+      onChangeBirthdates(convertToBirthdate(newAge, newAgeType))
     }
   }
 

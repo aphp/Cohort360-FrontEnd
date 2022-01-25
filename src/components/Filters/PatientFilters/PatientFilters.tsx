@@ -13,7 +13,7 @@ import {
   Typography
 } from '@material-ui/core'
 
-import { InputAgeRangeSlider } from 'components/Inputs'
+import { InputAgeRange } from 'components/Inputs'
 
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { VitalStatus } from 'types'
@@ -83,7 +83,7 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
           </RadioGroup>
         </Grid>
         <Grid container direction="column" className={classes.filter}>
-          <InputAgeRangeSlider
+          <InputAgeRange
             birthdates={_birthdates}
             onChangeBirthdates={(newBirthdates: [string, string]) => setBirthdates(newBirthdates)}
           />
