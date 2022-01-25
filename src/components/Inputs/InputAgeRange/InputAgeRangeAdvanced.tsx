@@ -59,15 +59,11 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
     const _maxState = maxState
 
     if (stateName === 'minState') {
-      setMinState((prevState) => ({
-        ...prevState,
-        [key]: value
-      }))
+      _minState[key] = value
+      setMinState(_minState)
     } else {
-      setMaxState((prevState) => ({
-        ...prevState,
-        [key]: value
-      }))
+      _maxState[key] = value
+      setMaxState(_maxState)
     }
     const newMinDate = moment()
       .subtract(_minState.days, 'days')
@@ -89,11 +85,12 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
     <>
       <Typography variant="h3">Âge :</Typography>
 
-      <Grid container>
+      <Grid container alignItems="center">
+        <Typography style={{ width: 35, margin: '0 4px' }}>De : </Typography>
         <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
           <TextField
             InputProps={{
-              endAdornment: <Typography>en année(s)</Typography>
+              endAdornment: <Typography>an(s)</Typography>
             }}
             value={minState.year}
             type="number"
@@ -103,7 +100,7 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
         <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
           <TextField
             InputProps={{
-              endAdornment: <Typography>en mois</Typography>
+              endAdornment: <Typography>mois</Typography>
             }}
             value={minState.month}
             type="number"
@@ -113,7 +110,7 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
         <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
           <TextField
             InputProps={{
-              endAdornment: <Typography>en jour(s)</Typography>
+              endAdornment: <Typography>jour(s)</Typography>
             }}
             value={minState.days}
             type="number"
@@ -122,11 +119,12 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
         </Grid>
       </Grid>
 
-      <Grid container>
+      <Grid container alignItems="center">
+        <Typography style={{ width: 35, margin: '0 4px' }}>À : </Typography>
         <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
           <TextField
             InputProps={{
-              endAdornment: <Typography>en année(s)</Typography>
+              endAdornment: <Typography>an(s)</Typography>
             }}
             value={maxState.year}
             type="number"
@@ -136,7 +134,7 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
         <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
           <TextField
             InputProps={{
-              endAdornment: <Typography>en mois</Typography>
+              endAdornment: <Typography>mois</Typography>
             }}
             value={maxState.month}
             type="number"
@@ -146,7 +144,7 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
         <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
           <TextField
             InputProps={{
-              endAdornment: <Typography>en jour(s)</Typography>
+              endAdornment: <Typography>jour(s)</Typography>
             }}
             value={maxState.days}
             type="number"
