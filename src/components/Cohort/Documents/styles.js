@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#5BC5F2',
     color: '#FFF',
     borderRadius: '25px',
-    marginLeft: 8
+    marginRight: 8
   },
   gridAdvancedSearch: {
     backgroundColor: '#FFF',
