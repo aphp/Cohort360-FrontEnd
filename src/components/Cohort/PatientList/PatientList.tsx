@@ -147,10 +147,6 @@ const PatientList: React.FC<PatientListProps> = ({
     onSearchPatient()
   }, [gender, birthdates, vitalStatus]) // eslint-disable-line
 
-  const handleCloseDialog = () => () => {
-    setOpen(false)
-  }
-
   const handleChangeSelect = (
     event: React.ChangeEvent<{
       name?: string | undefined

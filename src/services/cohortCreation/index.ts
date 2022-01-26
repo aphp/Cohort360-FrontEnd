@@ -1,7 +1,7 @@
 import apiBack from '../apiBackend'
 import { CONTEXT } from '../../constants'
 
-import { CohortCreationCounterType } from 'types'
+import { CriteriaItemType, SelectedCriteriaType, CohortCreationCounterType } from 'types'
 
 export const createCohort = async (
   requeteurJson: string | undefined,

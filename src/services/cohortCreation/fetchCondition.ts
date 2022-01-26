@@ -83,7 +83,7 @@ export const fetchDiagnosticTypes = async () => {
     const res = await apiRequest.get<any>(`/ValueSet?url=${CONDITION_STATUS}`)
 
     const diagnosticKinds =
-      res && res.data && res.data.entry && res.data.entry[0]
+      res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
         : DEFAULT_DIAGNOSTIC_TYPES
 

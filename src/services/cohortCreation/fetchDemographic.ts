@@ -28,7 +28,10 @@ export const fetchGender = async () => {
   } else {
     try {
       const res = await apiRequest.get<any>(`/ValueSet?url=${DEMOGRAPHIC_GENDER}`)
-      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+      const data =
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource?.compose?.include[0].concept
+          : []
 
       if (data && data.length > 0) {
         return cleanValueSet(data)

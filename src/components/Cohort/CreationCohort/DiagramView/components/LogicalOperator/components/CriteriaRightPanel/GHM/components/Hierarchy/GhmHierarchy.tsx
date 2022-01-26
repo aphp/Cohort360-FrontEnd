@@ -32,11 +32,10 @@ type GhmListItemProps = {
   ghmItem: PmsiListType
   selectedItem?: PmsiListType[] | null
   handleClick: (ghmItem: { id: string; label: string }[] | null) => void
-  fetchHierarchy: (ghmCode: string) => any
 }
 
 const GhmListItem: React.FC<GhmListItemProps> = (props) => {
-  const { ghmItem, selectedItem, handleClick, fetchHierarchy } = props
+  const { ghmItem, selectedItem, handleClick } = props
   const { id, label, subItems } = ghmItem
 
   const classes = useStyles()
@@ -120,12 +119,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
-                  <GhmListItem
-                    ghmItem={ghmHierarchySubItem}
-                    selectedItem={selectedItem}
-                    handleClick={handleClick}
-                    fetchHierarchy={fetchHierarchy}
-                  />
+                  <GhmListItem ghmItem={ghmHierarchySubItem} selectedItem={selectedItem} handleClick={handleClick} />
                 </Fragment>
               )
             )}
@@ -136,7 +130,6 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
 }
 
 type GhmHierarchyProps = {
-  criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
   onChangeSelectedHierarchy: (data: any) => void
@@ -144,7 +137,7 @@ type GhmHierarchyProps = {
 }
 
 const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
+  const { selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
 
   const classes = useStyles()
   const dispatch = useDispatch()
@@ -191,7 +184,6 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
               ghmItem={ghmItem}
               selectedItem={selectedHierarchy}
               handleClick={onSetSelectedHierarchy}
-              fetchHierarchy={criteria?.fetch?.fetchGhmHierarchy}
             />
           ))}
       </List>

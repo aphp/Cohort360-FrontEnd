@@ -32,11 +32,10 @@ type ProcedureListItemProps = {
   procedureItem: PmsiListType
   selectedItem?: PmsiListType[] | null
   handleClick: (procedureItem: { id: string; label: string }[] | null) => void
-  fetchHierarchy: (procedureCode: string) => any
 }
 
 const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
-  const { procedureItem, selectedItem, handleClick, fetchHierarchy } = props
+  const { procedureItem, selectedItem, handleClick } = props
   const { id, label, subItems } = procedureItem
 
   const classes = useStyles()
@@ -128,7 +127,6 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
                     procedureItem={procedureHierarchySubItem}
                     selectedItem={selectedItem}
                     handleClick={handleClick}
-                    fetchHierarchy={fetchHierarchy}
                   />
                 </Fragment>
               )
@@ -140,7 +138,6 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
 }
 
 type ProcedureHierarchyProps = {
-  criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
   onChangeSelectedHierarchy: (data: any) => void
@@ -148,7 +145,7 @@ type ProcedureHierarchyProps = {
 }
 
 const ProcedureHierarchy: React.FC<ProcedureHierarchyProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
+  const { selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
 
   const classes = useStyles()
   const dispatch = useDispatch()
@@ -195,7 +192,6 @@ const ProcedureHierarchy: React.FC<ProcedureHierarchyProps> = (props) => {
               procedureItem={procedureItem}
               selectedItem={selectedHierarchy}
               handleClick={onSetSelectedHierarchy}
-              fetchHierarchy={criteria?.fetch?.fetchProcedureHierarchy}
             />
           ))}
       </List>
