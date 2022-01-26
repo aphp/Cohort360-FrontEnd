@@ -32,11 +32,10 @@ type MedicationListItemProps = {
   medicationItem: MedicationListType
   selectedItem?: MedicationListType[] | null
   handleClick: (medicationItem: { id: string; label: string }[] | null) => void
-  fetchHierarchy: (medicationCode: string) => any
 }
 
 const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
-  const { medicationItem, selectedItem, handleClick, fetchHierarchy } = props
+  const { medicationItem, selectedItem, handleClick } = props
   const { id, label, subItems } = medicationItem
 
   const classes = useStyles()
@@ -127,7 +126,6 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
                     medicationItem={medicationHierarchySubItem}
                     selectedItem={selectedItem}
                     handleClick={handleClick}
-                    fetchHierarchy={fetchHierarchy}
                   />
                 </Fragment>
               )
@@ -139,7 +137,6 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
 }
 
 type MedicationHierarchyProps = {
-  criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
   onChangeSelectedHierarchy: (data: any) => void
@@ -147,7 +144,7 @@ type MedicationHierarchyProps = {
 }
 
 const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
+  const { selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
 
   const classes = useStyles()
   const dispatch = useDispatch()
@@ -194,7 +191,6 @@ const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
               medicationItem={medicationItem}
               selectedItem={selectedHierarchy}
               handleClick={onSetSelectedHierarchy}
-              fetchHierarchy={criteria?.fetch?.fetchMedicationHierarchy}
             />
           ))}
       </List>

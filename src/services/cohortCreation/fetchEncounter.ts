@@ -36,7 +36,10 @@ export const fetchAdmissionModes = async () => {
   } else {
     try {
       const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_ADMISSION_MODE}`)
-      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+      const data =
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource?.compose?.include[0].concept
+          : []
       return data && data.length > 0
         ? data.map((_data: { code: string; display: string }) => ({
             id: _data.code,
@@ -62,7 +65,10 @@ export const fetchEntryModes = async () => {
   } else {
     try {
       const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_ENTRY_MODE}`)
-      const data = res.data.entry[0].resource.compose.include[0].concept || []
+      const data =
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource?.compose?.include[0].concept
+          : []
 
       return cleanValueSet(data)
     } catch (error) {
@@ -84,7 +90,10 @@ export const fetchExitModes = async () => {
   } else {
     try {
       const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_EXIT_MODE}`)
-      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+      const data =
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource?.compose?.include[0].concept
+          : []
 
       return cleanValueSet(data)
     } catch (error) {
@@ -106,7 +115,10 @@ export const fetchPriseEnChargeType = async () => {
   } else {
     try {
       const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_VISIT_TYPE}`)
-      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+      const data =
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource?.compose?.include[0].concept
+          : []
 
       const cleanData = cleanValueSet(data)
 
@@ -134,7 +146,10 @@ export const fetchTypeDeSejour = async () => {
   } else {
     try {
       const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_SEJOUR_TYPE}`)
-      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+      const data =
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource?.compose?.include[0].concept
+          : []
 
       return cleanValueSet(data)
     } catch (error) {
@@ -156,7 +171,10 @@ export const fetchFileStatus = async () => {
   } else {
     try {
       const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_FILE_STATUS}`)
-      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+      const data =
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource?.compose?.include[0].concept
+          : []
 
       return cleanValueSet(data)
     } catch (error) {
@@ -173,7 +191,10 @@ export const fetchReason = async () => {
   } else {
     try {
       const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_EXIT_TYPE}`)
-      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+      const data =
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource?.compose?.include[0].concept
+          : []
 
       return cleanValueSet(data)
     } catch (error) {
@@ -190,7 +211,10 @@ export const fetchDestination = async () => {
   } else {
     try {
       const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_DESTINATION}`)
-      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+      const data =
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource?.compose?.include[0].concept
+          : []
 
       return cleanValueSet(data)
     } catch (error) {
@@ -207,7 +231,10 @@ export const fetchProvenance = async () => {
   } else {
     try {
       const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_PROVENANCE}`)
-      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+      const data =
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource?.compose?.include[0].concept
+          : []
 
       return cleanValueSet(data)
     } catch (error) {
@@ -224,7 +251,10 @@ export const fetchAdmission = async () => {
   } else {
     try {
       const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_ADMISSION}`)
-      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+      const data =
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource?.compose?.include[0].concept
+          : []
 
       return cleanValueSet(data)
     } catch (error) {

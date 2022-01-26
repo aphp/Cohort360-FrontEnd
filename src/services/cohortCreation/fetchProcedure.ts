@@ -31,7 +31,7 @@ export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
     const res = await apiRequest.get<any>(`/ValueSet?url=${PROCEDURE_HIERARCHY}${_searchValue}&size=0`)
 
     const data =
-      res && res.data && res.data.entry && res.data.resourceType === 'Bundle'
+      res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
         : []
 
