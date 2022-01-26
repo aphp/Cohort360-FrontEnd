@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import moment from 'moment'
 
 import {
   Button,
@@ -74,12 +75,13 @@ const PatientList: React.FC<PatientListProps> = ({
   >(undefined)
   const [open, setOpen] = useState(false)
   const [gender, setGender] = useState<PatientGenderKind>(PatientGenderKind._unknown)
-  const [age, setAge] = useState<[number, number]>([0, 130])
-  const [ageType, setAgeType] = useState<'year' | 'month' | 'days'>('year')
+  const [birthdates, setBirthdates] = useState<[string, string]>([
+    moment().subtract(130, 'years').format('YYYY-MM-DD'),
+    moment().format('YYYY-MM-DD')
+  ])
   const [vitalStatus, setVitalStatus] = useState<VitalStatus>(VitalStatus.all)
   const [sortBy, setSortBy] = useState('given') // eslint-disable-line
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc') // eslint-disable-line
-  const [showFilterChip, setShowFilterChip] = useState(false)
 
   useEffect(() => {
     setAgePyramid(agePyramidData)
@@ -115,8 +117,7 @@ const PatientList: React.FC<PatientListProps> = ({
       searchBy,
       input,
       gender,
-      age,
-      ageType,
+      birthdates,
       vitalStatus,
       sortBy,
       sortDirection,
@@ -144,11 +145,10 @@ const PatientList: React.FC<PatientListProps> = ({
 
   useEffect(() => {
     onSearchPatient()
-  }, [gender, age, ageType, vitalStatus]) // eslint-disable-line
+  }, [gender, birthdates, vitalStatus]) // eslint-disable-line
 
-  const handleCloseDialog = (submit: boolean) => () => {
+  const handleCloseDialog = () => () => {
     setOpen(false)
-    submit && setShowFilterChip(true)
   }
 
   const handleChangeSelect = (
@@ -182,9 +182,8 @@ const PatientList: React.FC<PatientListProps> = ({
       case 'gender':
         setGender(PatientGenderKind._unknown)
         break
-      case 'age':
-        setAge([0, 130])
-        setAgeType('year')
+      case 'birthdates':
+        setBirthdates([moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')])
         break
       case 'vitalStatus':
         setVitalStatus(VitalStatus.all)
@@ -219,23 +218,55 @@ const PatientList: React.FC<PatientListProps> = ({
     }
   }
 
+  const ageName = () => {
+    const minDate: any = {}
+    const maxDate: any = {}
+
+    maxDate.year = moment().diff(moment(birthdates[0], 'YYYY-MM-DD'), 'year') || 0
+    maxDate.month = moment().subtract(maxDate.year, 'year').diff(moment(birthdates[0], 'YYYY-MM-DD'), 'month')
+    maxDate.days = moment()
+      .subtract(maxDate.year, 'year')
+      .subtract(maxDate.month, 'month')
+      .diff(moment(birthdates[0], 'YYYY-MM-DD'), 'days')
+
+    minDate.year = moment().diff(moment(birthdates[1], 'YYYY-MM-DD'), 'year') || 0
+    minDate.month = moment().subtract(minDate.year, 'year').diff(moment(birthdates[1], 'YYYY-MM-DD'), 'month')
+    minDate.days = moment()
+      .subtract(minDate.year, 'year')
+      .subtract(minDate.month, 'month')
+      .diff(moment(birthdates[1], 'YYYY-MM-DD'), 'days')
+
+    if (
+      minDate.year === 0 &&
+      minDate.month === 0 &&
+      minDate.days === 0 &&
+      maxDate.year === 130 &&
+      maxDate.month === 0 &&
+      maxDate.days === 0
+    ) {
+      return ''
+    }
+
+    return `Age entre
+      ${
+        minDate.year || minDate.month || minDate.days
+          ? `${minDate.year > 0 ? `${minDate.year} an(s) ` : ``}
+            ${minDate.month > 0 ? `${minDate.month} mois ` : ``}
+            ${minDate.days > 0 ? `${minDate.days} jour(s) ` : ``}`
+          : 0
+      }
+    et
+      ${maxDate.year > 0 ? `${maxDate.year} an(s) ` : ``}
+      ${maxDate.month > 0 ? `${maxDate.month} mois ` : ``}
+      ${maxDate.days > 0 ? `${maxDate.days} jour(s) ` : ``}`
+  }
+
   const vitalStatusName = () => {
     switch (vitalStatus) {
       case VitalStatus.alive:
         return 'Patients vivants'
       case VitalStatus.deceased:
         return 'Patients décédés'
-    }
-  }
-
-  const ageTypeName = () => {
-    switch (ageType) {
-      case 'year':
-        return 'année(s)'
-      case 'month':
-        return 'mois'
-      case 'days':
-        return 'jour(s)'
     }
   }
 
@@ -357,21 +388,19 @@ const PatientList: React.FC<PatientListProps> = ({
               </Button>
               <PatientFilters
                 open={open}
-                onClose={handleCloseDialog(false)}
-                onSubmit={handleCloseDialog(true)}
+                onClose={() => setOpen(false)}
+                onSubmit={() => setOpen(false)}
                 gender={gender}
                 onChangeGender={setGender}
-                age={age}
-                onChangeAge={setAge}
-                ageType={ageType}
-                onChangeAgeType={setAgeType}
+                birthdates={birthdates}
+                onChangeBirthdates={setBirthdates}
                 vitalStatus={vitalStatus}
                 onChangeVitalStatus={setVitalStatus}
               />
             </div>
           </Grid>
           <Grid>
-            {showFilterChip && gender !== PatientGenderKind._unknown && (
+            {gender !== PatientGenderKind._unknown && (
               <Chip
                 className={classes.chips}
                 label={genderName()}
@@ -380,16 +409,16 @@ const PatientList: React.FC<PatientListProps> = ({
                 variant="outlined"
               />
             )}
-            {showFilterChip && (age[0] !== 0 || age[1] !== 130) && (
+            {birthdates && ageName() !== '' && (
               <Chip
                 className={classes.chips}
-                label={`Âge entre ${age[0]} et ${age[1]} ${ageTypeName()}`}
-                onDelete={() => handleDeleteChip('age')}
+                label={ageName()}
+                onDelete={() => handleDeleteChip('birthdates')}
                 color="primary"
                 variant="outlined"
               />
             )}
-            {showFilterChip && vitalStatus !== VitalStatus.all && (
+            {vitalStatus !== VitalStatus.all && (
               <Chip
                 className={classes.chips}
                 label={vitalStatusName()}
