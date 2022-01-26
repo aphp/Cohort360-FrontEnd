@@ -25,7 +25,7 @@ export const fetchAtcData = async (searchValue?: string, noStar?: boolean) => {
     const res = await apiRequest.get<any>(`/ValueSet?url=${MEDICATION_ATC}${_searchValue}&size=0`)
 
     const data =
-      res && res.data && res.data.entry && res.data.resourceType === 'Bundle'
+      res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
         : []
 
@@ -50,7 +50,7 @@ export const fetchAtcHierarchy = async (atcParent: string) => {
 
       let ATCList =
         res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
-          ? res.data.entry[0].resource.compose.include[0].concept
+          ? res.data.entry[0].resource?.compose?.include[0].concept
           : []
 
       ATCList =
@@ -112,7 +112,10 @@ export const fetchPrescriptionTypes = async () => {
   } else {
     try {
       const res = await apiRequest.get<any>(`/ValueSet?url=${MEDICATION_PRESCRIPTION_TYPES}`)
-      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+      const data =
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource?.compose?.include[0].concept
+          : []
 
       if (data && data.length > 0) {
         return cleanValueSet(data)
@@ -133,7 +136,10 @@ export const fetchAdministrations = async () => {
   } else {
     try {
       const res = await apiRequest.get<any>(`/ValueSet?url=${MEDICATION_ADMINISTRATIONS}`)
-      const data = res.data.entry[0].resource?.compose?.include[0].concept || []
+      const data =
+        res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
+          ? res.data.entry[0].resource?.compose?.include[0].concept
+          : []
 
       if (data && data.length > 0) {
         return cleanValueSet(data)

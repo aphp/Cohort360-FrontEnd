@@ -61,7 +61,6 @@ const Index = (props: any) => {
       ) : (
         <GHMHierarchy
           isEdition={isEdition}
-          criteria={criteria}
           selectedCriteria={selectedCriteria}
           onChangeSelectedHierarchy={_onChangeSelectedHierarchy}
           goBack={goBack}

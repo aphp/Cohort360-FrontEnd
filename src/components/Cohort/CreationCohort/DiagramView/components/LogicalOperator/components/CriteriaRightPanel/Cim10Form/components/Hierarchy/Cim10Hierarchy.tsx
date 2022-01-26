@@ -32,11 +32,10 @@ type CimListItemProps = {
   cimItem: PmsiListType
   selectedItem?: PmsiListType[] | null
   handleClick: (cimItem: { id: string; label: string }[] | null) => void
-  fetchHierarchy: (cimCode: string) => any
 }
 
 const CimListItem: React.FC<CimListItemProps> = (props) => {
-  const { cimItem, selectedItem, handleClick, fetchHierarchy } = props
+  const { cimItem, selectedItem, handleClick } = props
   const { id, label, subItems } = cimItem
 
   const classes = useStyles()
@@ -120,12 +119,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
-                  <CimListItem
-                    cimItem={cimHierarchySubItem}
-                    selectedItem={selectedItem}
-                    handleClick={handleClick}
-                    fetchHierarchy={fetchHierarchy}
-                  />
+                  <CimListItem cimItem={cimHierarchySubItem} selectedItem={selectedItem} handleClick={handleClick} />
                 </Fragment>
               )
             )}
@@ -136,7 +130,6 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
 }
 
 type Cim10HierarchyProps = {
-  criteria: any
   selectedCriteria: any
   goBack: (data: any) => void
   onChangeSelectedHierarchy: (data: any) => void
@@ -144,7 +137,7 @@ type Cim10HierarchyProps = {
 }
 
 const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
-  const { criteria, selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
+  const { selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
 
   const classes = useStyles()
   const dispatch = useDispatch()
@@ -191,7 +184,6 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
               cimItem={cimItem}
               selectedItem={selectedHierarchy}
               handleClick={onSetSelectedHierarchy}
-              fetchHierarchy={criteria?.fetch?.fetchCim10Hierarchy}
             />
           ))}
       </List>

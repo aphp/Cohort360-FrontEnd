@@ -14,12 +14,11 @@ import {
 } from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
-import InfoIcon from '@material-ui/icons/Info'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import DocumentSearchHelp from 'components/DocumentSearchHelp/DocumentSearchHelp'
-
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
+
+import { InputSearchDocumentExtend } from 'components/Inputs'
 
 import useStyles from './styles'
 
@@ -51,7 +50,6 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
 
   const classes = useStyles()
 
-  const [helpOpen, setHelpOpen] = useState(false)
   const [error, setError] = useState(false)
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
@@ -143,22 +141,16 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               onChange={(event) => _onChangeValue('isInclusive', !event.target.checked)}
             />
           </Grid>
-          <Grid style={{ display: 'flex' }}>
-            <TextField
-              className={classes.inputItem}
-              id="criteria-search-required"
-              label="Recherche dans les documents"
-              variant="outlined"
-              value={defaultValues.search}
-              multiline
-              rows={3}
-              onChange={(e) => _onChangeValue('search', e.target.value)}
-            />
 
-            <IconButton type="submit" onClick={() => setHelpOpen(true)} style={{ outline: 'none' }}>
-              <InfoIcon />
-            </IconButton>
-            <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+          <Grid style={{ display: 'flex' }} className={classes.inputItem}>
+            <InputSearchDocumentExtend
+              placeholder="Recherche dans les documents"
+              defaultSearchInput={defaultValues.search}
+              setDefaultSearchInput={(newSearchInput: string) => _onChangeValue('search', newSearchInput)}
+              onSearchDocument={() => null}
+              noClearIcon
+              noSearchIcon
+            />
           </Grid>
 
           <Autocomplete
