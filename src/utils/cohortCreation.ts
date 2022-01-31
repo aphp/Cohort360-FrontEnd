@@ -310,7 +310,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 
     case RESSOURCE_TYPE_COMPOSITION: {
       filterFhir = [
-        `${criterion.search ? `${COMPOSITION_TEXT}=${criterion.search}` : ''}`,
+        `status=final&type:not=doc-impor`,
+        `${criterion.search ? `${COMPOSITION_TEXT}=${encodeURIComponent(criterion.search)}` : ''}`,
+        `${criterion.regex_search ? `${COMPOSITION_TEXT}=${encodeURIComponent(`/${criterion.regex_search}/`)}` : ''}`,
         `${
           criterion.docType && criterion.docType.length > 0
             ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: any) => docType.id).reduce(searchReducer)}`
@@ -923,7 +925,6 @@ export async function unbuildRequest(_json: string) {
         if (element.filterFhir) {
           const filters = element.filterFhir
             // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
-            .replaceAll('&&', '_+_+_+_')
             .split('&')
             .map((elem) => elem.split('='))
 
@@ -931,10 +932,17 @@ export async function unbuildRequest(_json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
-              case COMPOSITION_TEXT:
+              case COMPOSITION_TEXT: {
+                const isRegex: boolean = value ? decodeURIComponent(value).search(/\/.*\//) === 0 : false
+
                 // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
-                currentCriterion.search = value ? value.replaceAll('_+_+_+_', '&&') : null
+                if (isRegex) {
+                  currentCriterion.regex_search = value ? decodeURIComponent(value).replaceAll('/', '') : ''
+                } else {
+                  currentCriterion.search = value ? decodeURIComponent(value) : ''
+                }
                 break
+              }
               case COMPOSITION_TYPE: {
                 const docTypeIds = value?.split(',')
                 const newDocTypeIds = docTypes
@@ -954,6 +962,9 @@ export async function unbuildRequest(_json: string) {
                   : newDocTypeIds
                 break
               }
+              case 'status':
+              case 'type:not':
+                break
               default:
                 currentCriterion.error = true
                 break

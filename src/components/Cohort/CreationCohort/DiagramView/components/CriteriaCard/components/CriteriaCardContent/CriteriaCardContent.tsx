@@ -316,7 +316,21 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               label={
                 <Tooltip title={`Contient ${_currentCriteria.search} dans le document`}>
                   <Typography style={{ maxWidth: 500 }} noWrap>
-                    {_currentCriteria.search}
+                    Contient "{_currentCriteria.search}" dans le document
+                  </Typography>
+                </Tooltip>
+              }
+            />
+          ),
+          _currentCriteria.regex_search && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Tooltip
+                  title={`Qui suit l'expression régulière suivante /${_currentCriteria.regex_search}/ dans le document`}
+                >
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    Qui suit l'expression régulière suivante /{_currentCriteria.regex_search}/ dans le document
                   </Typography>
                 </Tooltip>
               }

@@ -9,7 +9,6 @@ const useStyles = makeStyles((theme) => ({
     width: '250px',
     backgroundColor: '#FFF',
     border: '1px solid #D0D7D8',
-    boxShadow: '0px 1px 16px #0000000A',
     borderRadius: '25px',
     paddingRight: 8
   },
@@ -26,9 +25,14 @@ const useStyles = makeStyles((theme) => ({
   gridAdvancedSearch: {
     backgroundColor: '#FFF',
     border: '1px solid #c4c4c4',
-    boxShadow: '0px 1px 16px #0000000A',
     padding: 8,
     borderRadius: 25
+  },
+  gridAdvancedSearchSqared: {
+    backgroundColor: '#FFF',
+    border: '1px solid #c4c4c4',
+    padding: 8,
+    borderRadius: 4
   },
   slash: {
     fontSize: 25,

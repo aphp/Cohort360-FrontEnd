@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import Grid from '@material-ui/core/Grid'
 
@@ -10,26 +10,30 @@ type InputSearchDocumentProps = {
   placeholder?: string
   defaultSearchInput?: string
   setDefaultSearchInput?: (newSearchInput: string) => void
+  defaultInputMode?: 'simple' | 'regex'
+  setdefaultInputMode?: (newInputMode: 'simple' | 'regex') => void
   onSearchDocument: (newInputText: string) => void
   noInfoIcon?: boolean
   noClearIcon?: boolean
   noSearchIcon?: boolean
+  sqareInput?: boolean
 }
-
 const InputSearchDocument: React.FC<InputSearchDocumentProps> = ({ ...props }) => {
-  const [inputMode, setInputMode] = useState<'simple' | 'regex'>('simple')
-
   return (
-    <Grid container direction="column" justifyContent="flex-end">
-      <Grid item>
-        {inputMode === 'simple' && <InputSearchDocumentSimple {...props} />}
+    <Grid container direction="column" alignItems="flex-end">
+      {props.defaultInputMode && props.setdefaultInputMode && (
+        <>
+          <Grid item style={{ marginBottom: 8, width: '100%' }}>
+            {props.defaultInputMode === 'simple' && <InputSearchDocumentSimple {...props} />}
 
-        {inputMode === 'regex' && <InputSearchDocumentRegex {...props} />}
-      </Grid>
+            {props.defaultInputMode === 'regex' && <InputSearchDocumentRegex {...props} />}
+          </Grid>
 
-      <Grid item>
-        <InputSearchDocumentButton currentMode={inputMode} onChangeMode={setInputMode} />
-      </Grid>
+          <Grid item>
+            <InputSearchDocumentButton currentMode={props.defaultInputMode} onChangeMode={props.setdefaultInputMode} />
+          </Grid>
+        </>
+      )}
     </Grid>
   )
 }
