@@ -58,7 +58,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   const [searchMode, setSearchMode] = useState(false)
   const [open, setOpen] = useState(false)
 
-  const [inputMode, setInputMode] = useState<'simple' | 'regex' | 'extend'>('simple')
+  const [inputMode, setInputMode] = useState<'simple' | 'regex'>('simple')
 
   const documentLines = 20 // Number of desired lines in the document array
 
