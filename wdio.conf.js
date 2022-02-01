@@ -24,15 +24,15 @@ exports.config = {
   // NPM script (see https://docs.npmjs.com/cli/run-script) then the current working
   // directory is where your package.json resides, so `wdio` will be called from there.
   //
-  specs: ['./test/test/specs/**/*.js'],
+  // specs: ['./test/test/specs/**/*.js'],
 
   suites: {
     Generics: [
-      './test/test/specs/generics/cohort360-SCG00-LoginLogout.js',
-      './test/test/specs/generics/cohort360-SCG01-LeftMenu.js'
+      './test/test/specs/generics/cohort360-SCG00-LoginLogout.js'
+      // './test/test/specs/generics/cohort360-SCG01-LeftMenu.js'
       // './test/test/specs/generics/cohort360-SCG02-PatientContextBar.js'
-    ],
-    HomePage: ['./test/test/specs/pages/cohort360-SCP01-HomePage.js']
+    ]
+    // HomePage: ['./test/test/specs/pages/cohort360-SCP01-HomePage.js']
     // MyPatients: [
     //     './test/test/specs/pages/cohort360-SCP02-MyPatientsPage.js',
     //     './test/test/specs/pages/cohort360-SCP03-MyPatientDatasPage.js',
