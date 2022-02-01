@@ -5,7 +5,7 @@
 
 # testing
 /coverage
-/test_e2e/.env
+/reports
 
 # production
 /build
@@ -30,4 +30,3 @@ yarn-error.log*
 .env*
 !.env.example
 .mp4
-/script.sh
