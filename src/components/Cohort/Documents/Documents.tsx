@@ -363,10 +363,18 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
               )}
             </Grid>
 
-            <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
-              Attention : La recherche est pseudonimisée pour la prévisualisation des documents. Vous pouvez donc
-              trouver des incohérences entre les informations de votre patient et celles du document prévisualisé.
-            </Alert>
+            {deidentifiedBoolean ? (
+              <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
+                Attention : Les données identifiantes des patients sont remplacées par des informations fictives dans
+                les résultats de la recherche et dans les documents prévisualisés.
+              </Alert>
+            ) : (
+              <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
+                Attention : Les données identifiantes des patients sont remplacées par des informations fictives lorsque
+                vous prévisualisez les résultats d'une recherche. Vous retrouverez les données personnelles de votre
+                patient en consultant les documents via le mode aperçu.
+              </Alert>
+            )}
 
             {loadingStatus || deidentifiedBoolean === null ? (
               <CircularProgress className={classes.loadingSpinner} size={50} />
