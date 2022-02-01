@@ -24,10 +24,11 @@ stages:
 
 test_e2e_chrome:
   image:
-    name: harbor.eds.aphp.fr/cohort360/selenium-chrome:latest
+    name: harbor.eds.aphp.fr/cohort360/selenium-chrome:$CI_COMMIT_BRANCH
   stage: test
   script:
     - bash .gitlab/test.sh
+    - npm run test
   allow_failure: true
   artifacts:
     when: always
