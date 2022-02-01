@@ -8,5 +8,5 @@ cat /etc/nginx/conf.d/nginx.conf
 export $(cat $(printenv | grep -E "\b""$CI_COMMIT_BRANCH""_ENV""\b" | cut -d '=' -f 2-) | xargs)
 bash docker/entry-point.sh
 cat /etc/nginx/conf.d/nginx.conf
-nginx
+service nginx restart
 echo "done"
