@@ -31,7 +31,7 @@ test_e2e_chrome:
     - npm config set proxy http://$PROXY_URL
     - npm install
     # - npm audit fix
-    - npm run start &
+    - npm run start file.log 2>&1 &
     - sleep 30 & cmd_sleep_pid=$!
     - await $cmd_sleep_pid
     - npm run test
