@@ -310,7 +310,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 
     case RESSOURCE_TYPE_COMPOSITION: {
       filterFhir = [
-        `${criterion.search ? `${COMPOSITION_TEXT}=${criterion.search}` : ''}`,
+        `status=final&type:not=doc-impor`,
+        `${criterion.search ? `${COMPOSITION_TEXT}=${encodeURIComponent(criterion.search)}` : ''}`,
+        `${criterion.regex_search ? `${COMPOSITION_TEXT}=${encodeURIComponent(`/${criterion.regex_search}/`)}` : ''}`,
         `${
           criterion.docType && criterion.docType.length > 0
             ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: any) => docType.id).reduce(searchReducer)}`
@@ -923,7 +925,6 @@ export async function unbuildRequest(_json: string) {
         if (element.filterFhir) {
           const filters = element.filterFhir
             // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
-            .replaceAll('&&', '_+_+_+_')
             .split('&')
             .map((elem) => elem.split('='))
 
@@ -931,10 +932,17 @@ export async function unbuildRequest(_json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
-              case COMPOSITION_TEXT:
+              case COMPOSITION_TEXT: {
+                const isRegex: boolean = value ? decodeURIComponent(value).search(/\/.*\//) === 0 : false
+
                 // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
-                currentCriterion.search = value ? value.replaceAll('_+_+_+_', '&&') : null
+                if (isRegex) {
+                  currentCriterion.regex_search = value ? decodeURIComponent(value).replaceAll('/', '') : ''
+                } else {
+                  currentCriterion.search = value ? decodeURIComponent(value) : ''
+                }
                 break
+              }
               case COMPOSITION_TYPE: {
                 const docTypeIds = value?.split(',')
                 const newDocTypeIds = docTypes
@@ -954,6 +962,9 @@ export async function unbuildRequest(_json: string) {
                   : newDocTypeIds
                 break
               }
+              case 'status':
+              case 'type:not':
+                break
               default:
                 currentCriterion.error = true
                 break
@@ -1249,11 +1260,17 @@ export async function unbuildRequest(_json: string) {
   }
 }
 
-export const getDataFromFetch = async (_criteria: any, selectedCriteria: SelectedCriteriaType[]) => {
+export const getDataFromFetch = async (
+  _criteria: any,
+  selectedCriteria: SelectedCriteriaType[],
+  oldCriteriaList?: any
+) => {
   for (const _criterion of _criteria) {
+    const oldCriterion = oldCriteriaList?.find((oldCriterionItem: any) => oldCriterionItem.id === _criterion.id)
     if (_criterion.fetch) {
       if (!_criterion.data) _criterion.data = {}
       const fetchKeys = Object.keys(_criterion.fetch)
+
       for (const fetchKey of fetchKeys) {
         const dataKey = fetchKey.replace('fetch', '').replace(/(\b[A-Z])(?![A-Z])/g, ($1) => $1.toLowerCase())
         switch (dataKey) {
@@ -1284,8 +1301,8 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
                   currentcriterion.code.length > 0
                 ) {
                   for (const code of currentcriterion.code) {
-                    const allreadyHere = _criterion.data[dataKey]
-                      ? _criterion.data[dataKey].find((data: any) => data.id === code?.id)
+                    const allreadyHere = oldCriterion?.data?.[dataKey]
+                      ? oldCriterion?.data?.[dataKey].find((data: any) => data.id === code?.id)
                       : undefined
 
                     if (!allreadyHere) {
@@ -1293,6 +1310,8 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
                         ..._criterion.data[dataKey],
                         ...(await _criterion.fetch[fetchKey](code?.id, true))
                       ]
+                    } else {
+                      _criterion.data[dataKey] = [..._criterion.data[dataKey], allreadyHere]
                     }
                   }
                 }
@@ -1301,16 +1320,24 @@ export const getDataFromFetch = async (_criteria: any, selectedCriteria: Selecte
             break
           }
           default:
-            if (_criterion.data[dataKey] === 'loading') {
+            if (
+              !oldCriterion ||
+              !oldCriterion?.data ||
+              !oldCriterion?.data?.[dataKey] ||
+              oldCriterion?.data?.[dataKey] === 'loading'
+            ) {
               _criterion.data[dataKey] = await _criterion.fetch[fetchKey]()
+            } else {
+              _criterion.data[dataKey] = oldCriterion?.data?.[dataKey]
             }
             break
         }
       }
     }
+
     _criterion.subItems =
       _criterion.subItems && _criterion.subItems.length > 0
-        ? await getDataFromFetch(_criterion.subItems, selectedCriteria)
+        ? await getDataFromFetch(_criterion.subItems, selectedCriteria, oldCriterion?.subItems ?? [])
         : []
   }
   return _criteria

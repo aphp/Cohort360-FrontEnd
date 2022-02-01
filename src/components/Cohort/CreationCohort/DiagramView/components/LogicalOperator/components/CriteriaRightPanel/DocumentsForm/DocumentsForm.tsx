@@ -14,12 +14,11 @@ import {
 } from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
-import InfoIcon from '@material-ui/icons/Info'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import DocumentSearchHelp from 'components/DocumentSearchHelp/DocumentSearchHelp'
-
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
+
+import { InputSearchDocument } from 'components/Inputs'
 
 import useStyles from './styles'
 
@@ -36,6 +35,7 @@ const defaultComposition: DocumentDataType = {
   type: 'Composition',
   title: 'Critère de document',
   search: '',
+  regex_search: '',
   docType: [],
   occurrence: 1,
   occurrenceComparator: '>=',
@@ -51,15 +51,20 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
 
   const classes = useStyles()
 
-  const [helpOpen, setHelpOpen] = useState(false)
   const [error, setError] = useState(false)
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
+  const [inputMode, setInputMode] = useState<'simple' | 'regex'>(defaultValues.regex_search ? 'regex' : 'simple')
 
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = () => {
-    if (defaultValues && defaultValues.search?.length === 0 && defaultValues.docType?.length === 0) {
+    if (
+      defaultValues &&
+      defaultValues.search?.length === 0 &&
+      defaultValues.regex_search?.length === 0 &&
+      defaultValues.docType?.length === 0
+    ) {
       return setError(true)
     }
     onChangeSelectedCriteria(defaultValues)
@@ -143,22 +148,28 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               onChange={(event) => _onChangeValue('isInclusive', !event.target.checked)}
             />
           </Grid>
-          <Grid style={{ display: 'flex' }}>
-            <TextField
-              className={classes.inputItem}
-              id="criteria-search-required"
-              label="Recherche dans les documents"
-              variant="outlined"
-              value={defaultValues.search}
-              multiline
-              rows={3}
-              onChange={(e) => _onChangeValue('search', e.target.value)}
-            />
 
-            <IconButton type="submit" onClick={() => setHelpOpen(true)} style={{ outline: 'none' }}>
-              <InfoIcon />
-            </IconButton>
-            <DocumentSearchHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+          <Grid className={classes.inputItem}>
+            <InputSearchDocument
+              placeholder="Recherche dans les documents"
+              defaultSearchInput={inputMode === 'simple' ? defaultValues.search : defaultValues.regex_search}
+              setDefaultSearchInput={(newSearchInput: string) =>
+                _onChangeValue(inputMode === 'simple' ? 'search' : 'regex_search', newSearchInput)
+              }
+              defaultInputMode={inputMode}
+              setdefaultInputMode={(newInputMode: 'simple' | 'regex') => {
+                setInputMode(newInputMode)
+                setDefaultValues((prevState: any) => ({
+                  ...prevState,
+                  search: newInputMode !== 'simple' ? '' : prevState.regex_search,
+                  regex_search: newInputMode === 'simple' ? '' : prevState.search
+                }))
+              }}
+              onSearchDocument={() => null}
+              noClearIcon
+              noSearchIcon
+              sqareInput
+            />
           </Grid>
 
           <Autocomplete

@@ -61,7 +61,6 @@ const Index = (props: any) => {
       ) : (
         <CcamHierarchy
           isEdition={isEdition}
-          criteria={criteria}
           selectedCriteria={selectedCriteria}
           onChangeSelectedHierarchy={_onChangeSelectedHierarchy}
           goBack={goBack}

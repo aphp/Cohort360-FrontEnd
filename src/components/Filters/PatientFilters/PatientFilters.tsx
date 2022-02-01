@@ -10,11 +10,10 @@ import {
   Grid,
   Radio,
   RadioGroup,
-  Slider,
-  TextField,
   Typography
 } from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+
+import { InputAgeRange } from 'components/Inputs'
 
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { VitalStatus } from 'types'
@@ -26,10 +25,8 @@ type PatientFiltersProps = {
   onSubmit: () => void
   gender: PatientGenderKind
   onChangeGender: (gender: PatientGenderKind) => void
-  age: [number, number]
-  onChangeAge: (newAge: [number, number]) => void
-  ageType: 'year' | 'month' | 'days'
-  onChangeAgeType: (newAgeType: 'year' | 'month' | 'days') => void
+  birthdates: [string, string]
+  onChangeBirthdates: (birthdates: [string, string]) => void
   vitalStatus: VitalStatus
   onChangeVitalStatus: (status: VitalStatus) => void
 }
@@ -40,34 +37,25 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
   onSubmit,
   gender,
   onChangeGender,
-  age,
-  onChangeAge,
-  ageType,
-  onChangeAgeType,
+  birthdates,
+  onChangeBirthdates,
   vitalStatus,
   onChangeVitalStatus
 }) => {
   const classes = useStyles()
 
   const [_gender, setGender] = useState<PatientGenderKind>(gender)
-  const [_age, setAge] = useState<[number, number]>(age)
-  const [_ageType, setAgeType] = useState<'year' | 'month' | 'days'>(ageType)
+  const [_birthdates, setBirthdates] = useState<[string, string]>(birthdates)
   const [_vitalStatus, setVitalStatus] = useState<VitalStatus>(vitalStatus)
 
   useEffect(() => {
     setGender(gender)
-    setAge(age)
+    setBirthdates(birthdates)
     setVitalStatus(vitalStatus)
   }, [open]) // eslint-disable-line
 
   const _onChangeGender = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setGender(value as PatientGenderKind)
-  }
-
-  const _onChangeAge = (event: React.ChangeEvent<{}>, value: number | number[]) => {
-    if (Array.isArray(value) && value.length === 2) {
-      setAge([value[0], value[1]])
-    }
   }
 
   const _onChangeVitalStatus = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
@@ -76,18 +64,10 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
 
   const _onSubmit = () => {
     onChangeGender(_gender)
-    onChangeAge(_age)
-    onChangeAgeType(_ageType)
+    onChangeBirthdates(_birthdates)
     onChangeVitalStatus(_vitalStatus)
     onSubmit()
   }
-
-  const ageTypeList = [
-    { id: 'year', label: 'années' },
-    { id: 'month', label: 'mois' },
-    { id: 'days', label: 'jours' }
-  ]
-  const currentAgeType = ageTypeList.find(({ id }) => id === _ageType)
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -103,53 +83,10 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
           </RadioGroup>
         </Grid>
         <Grid container direction="column" className={classes.filter}>
-          <Typography variant="h3">Âge :</Typography>
-
-          <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 160px', alignItems: 'center' }}>
-            <Grid>
-              <Slider
-                value={_age}
-                onChange={_onChangeAge}
-                aria-labelledby="range-slider"
-                valueLabelDisplay="off"
-                valueLabelFormat={(value) => (value === 130 ? '130+' : value)}
-                min={0}
-                max={130}
-              />
-
-              <Grid container justify="space-around">
-                <Grid item style={{ flex: 0.5, margin: '0 4px' }}>
-                  <TextField
-                    value={_age[0]}
-                    type="number"
-                    onChange={(e) =>
-                      setAge([+e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : _age[0], _age[1]])
-                    }
-                  />
-                </Grid>
-                <Grid item style={{ flex: 0.5, margin: '0 4px' }}>
-                  <TextField
-                    value={_age[1]}
-                    type="number"
-                    onChange={(e) =>
-                      setAge([_age[0], +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : _age[1]])
-                    }
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
-
-            <Autocomplete
-              id="criteria-ageType-autocomplete"
-              className={classes.inputItem}
-              options={ageTypeList}
-              getOptionLabel={(option) => option.label}
-              getOptionSelected={(option, value) => option.id === value.id}
-              value={currentAgeType}
-              onChange={(e, value) => setAgeType((value?.id ?? 'year') as 'year' | 'month' | 'days')}
-              renderInput={(params) => <TextField {...params} variant="outlined" />}
-            />
-          </Grid>
+          <InputAgeRange
+            birthdates={_birthdates}
+            onChangeBirthdates={(newBirthdates: [string, string]) => setBirthdates(newBirthdates)}
+          />
         </Grid>
 
         <Grid container direction="column" className={classes.filter}>

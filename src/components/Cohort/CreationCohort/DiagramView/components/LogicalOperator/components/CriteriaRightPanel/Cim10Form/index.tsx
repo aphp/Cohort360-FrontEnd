@@ -62,7 +62,6 @@ const Index = (props: any) => {
       ) : (
         <Cim10Hierarchy
           isEdition={isEdition}
-          criteria={criteria}
           selectedCriteria={defaultValues}
           onChangeSelectedHierarchy={_onChangeSelectedHierarchy}
           goBack={goBack}

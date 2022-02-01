@@ -25,15 +25,21 @@ import useStyles from './styles'
 
 const Requeteur = () => {
   const {
-    loading = false,
-    requestId = '',
-    currentSnapshot = '',
-    selectedCriteria = [],
-    criteriaGroup = [],
-    snapshotsHistory = [],
-    count = {},
-    json = ''
-  } = useAppSelector((state) => state.cohortCreation.request || {})
+    request: {
+      loading = false,
+      requestId = '',
+      currentSnapshot = '',
+      selectedCriteria = [],
+      criteriaGroup = [],
+      snapshotsHistory = [],
+      count = {},
+      json = ''
+    },
+    criteriaList
+  } = useAppSelector((state) => ({
+    request: state.cohortCreation.request || {},
+    criteriaList: state.cohortCreation.criteria || {}
+  }))
 
   const params = useParams<{
     requestId: string
@@ -73,7 +79,7 @@ const Requeteur = () => {
   const _fetchCriteria = useCallback(async () => {
     setCriteriaLoading(true)
     let _criteria = constructCriteriaList()
-    _criteria = await getDataFromFetch(Object.freeze(_criteria), selectedCriteria)
+    _criteria = await getDataFromFetch(Object.freeze(_criteria), selectedCriteria, criteriaList)
     dispatch<any>(setCriteriaList(_criteria))
     setCriteriaLoading(false)
   }, [dispatch, criteriaGroup, selectedCriteria]) // eslint-disable-line

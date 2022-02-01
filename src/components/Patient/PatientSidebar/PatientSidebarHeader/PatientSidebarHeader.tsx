@@ -1,4 +1,5 @@
 import React from 'react'
+import moment from 'moment'
 
 import { Button, Chip, Grid, IconButton, InputBase, TextField, Typography } from '@material-ui/core'
 
@@ -27,10 +28,8 @@ type PatientSidebarHeaderTypes = {
   onSubmitDialog: () => void
   gender: PatientGenderKind
   onChangeGender: (gender: PatientGenderKind) => void
-  age: [number, number]
-  onChangeAge: (newAge: [number, number]) => void
-  ageType: 'year' | 'month' | 'days'
-  onChangeAgeType: (newAgeType: 'year' | 'month' | 'days') => void
+  birthdates: [string, string]
+  onChangeBirthdates: (birthdates: [string, string]) => void
   vitalStatus: VitalStatus
   onChangeVitalStatus: (status: VitalStatus) => void
   searchInput: string
@@ -79,10 +78,8 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
             onSubmit={props.onSubmitDialog}
             gender={props.gender}
             onChangeGender={props.onChangeGender}
-            age={props.age}
-            onChangeAge={props.onChangeAge}
-            ageType={props.ageType}
-            onChangeAgeType={props.onChangeAgeType}
+            birthdates={props.birthdates}
+            onChangeBirthdates={props.onChangeBirthdates}
             vitalStatus={props.vitalStatus}
             onChangeVitalStatus={props.onChangeVitalStatus}
           />
@@ -115,7 +112,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
         props.onChangeGender(PatientGenderKind._unknown)
         break
       case 'age':
-        props.onChangeAge([0, 130])
+        props.onChangeBirthdates([moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')])
         break
       case 'vitalStatus':
         props.onChangeVitalStatus(VitalStatus.all)
@@ -184,10 +181,8 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
           onSubmit={props.onSubmitDialog}
           gender={props.gender}
           onChangeGender={props.onChangeGender}
-          age={props.age}
-          onChangeAge={props.onChangeAge}
-          ageType={props.ageType}
-          onChangeAgeType={props.onChangeAgeType}
+          birthdates={props.birthdates}
+          onChangeBirthdates={props.onChangeBirthdates}
           vitalStatus={props.vitalStatus}
           onChangeVitalStatus={props.onChangeVitalStatus}
         />
@@ -230,11 +225,11 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
             variant="outlined"
           />
         )}
-        {props.showFilterChip && (props.age[0] !== 0 || props.age[1] !== 130) && (
+        {props.showFilterChip && props.birthdates && (
           <Chip
             className={classes.chips}
-            label={`Âge entre ${props.age[0]} et ${props.age[1]} ans`}
-            onDelete={() => handleDeleteChip('age')}
+            label={`Âge entre ${props.birthdates[0]} et ${props.birthdates[1]}`}
+            onDelete={() => handleDeleteChip('birthdates')}
             color="primary"
             variant="outlined"
           />
