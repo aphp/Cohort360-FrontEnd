@@ -22,25 +22,24 @@ stages:
   - deploy
   - release
 
-test:
+test_e2e_chrome:
   image:
     name: harbor.eds.aphp.fr/cohort360/selenium-chrome:latest
-  e2e:chrome:
-    stage: test
-    script:
-      - rm package-lock.json
-      - npm config set proxy http://$PROXY_URL
-      - npm install
-      # - npm audit fix
-      - npm run start & cmd_pid=$!
-      - sleep 30 & cmd_sleep_pid=$!
-      - await $cmd_sleep_pid
-      - npm run test
-      # - kill -9 $cmd_pid
-    artifacts:
-      when: always
-      paths:
-        - reports
+  stage: test
+  script:
+    # - rm package-lock.json
+    - npm config set proxy http://$PROXY_URL
+    - npm install
+    # - npm audit fix
+    - npm run start &
+    - sleep 30 & cmd_sleep_pid=$!
+    - await $cmd_sleep_pid
+    - npm run test
+  allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - reports
   rules:
     - !reference [.default_rules, rules]
 
