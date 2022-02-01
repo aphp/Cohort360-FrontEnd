@@ -60,7 +60,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   const [_sortBy, setSortBy] = useState(sortBy)
   const [_sortDirection, setSortDirection] = useState<'asc' | 'desc'>(sortDirection)
 
-  const [inputMode, setInputMode] = useState<'simple' | 'regex' | 'extend'>('simple')
+  const [inputMode, setInputMode] = useState<'simple' | 'regex'>('simple')
 
   const documentLines = 20
 

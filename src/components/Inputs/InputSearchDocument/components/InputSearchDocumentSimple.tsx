@@ -18,6 +18,7 @@ type InputSearchDocumentSimpleProps = {
   noInfoIcon?: boolean
   noClearIcon?: boolean
   noSearchIcon?: boolean
+  sqareInput?: boolean
 }
 const InputSearchDocumentSimple: React.FC<InputSearchDocumentSimpleProps> = ({
   placeholder,
@@ -59,7 +60,7 @@ const InputSearchDocumentSimple: React.FC<InputSearchDocumentSimpleProps> = ({
 
   return (
     <>
-      <Grid container item className={classes.gridAdvancedSearch}>
+      <Grid container item className={props.sqareInput ? classes.gridAdvancedSearchSqared : classes.gridAdvancedSearch}>
         <InputBase
           fullWidth
           placeholder={placeholder ?? 'Recherche dans les documents'}

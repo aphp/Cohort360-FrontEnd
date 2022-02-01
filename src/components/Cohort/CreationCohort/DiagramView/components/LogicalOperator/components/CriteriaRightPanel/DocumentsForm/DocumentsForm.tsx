@@ -18,7 +18,7 @@ import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
-import { InputSearchDocumentExtend } from 'components/Inputs'
+import { InputSearchDocument } from 'components/Inputs'
 
 import useStyles from './styles'
 
@@ -35,6 +35,7 @@ const defaultComposition: DocumentDataType = {
   type: 'Composition',
   title: 'Critère de document',
   search: '',
+  regex_search: '',
   docType: [],
   occurrence: 1,
   occurrenceComparator: '>=',
@@ -53,11 +54,17 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
   const [error, setError] = useState(false)
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
+  const [inputMode, setInputMode] = useState<'simple' | 'regex'>(defaultValues.regex_search ? 'regex' : 'simple')
 
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = () => {
-    if (defaultValues && defaultValues.search?.length === 0 && defaultValues.docType?.length === 0) {
+    if (
+      defaultValues &&
+      defaultValues.search?.length === 0 &&
+      defaultValues.regex_search?.length === 0 &&
+      defaultValues.docType?.length === 0
+    ) {
       return setError(true)
     }
     onChangeSelectedCriteria(defaultValues)
@@ -142,14 +149,26 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             />
           </Grid>
 
-          <Grid style={{ display: 'flex' }} className={classes.inputItem}>
-            <InputSearchDocumentExtend
+          <Grid className={classes.inputItem}>
+            <InputSearchDocument
               placeholder="Recherche dans les documents"
-              defaultSearchInput={defaultValues.search}
-              setDefaultSearchInput={(newSearchInput: string) => _onChangeValue('search', newSearchInput)}
+              defaultSearchInput={inputMode === 'simple' ? defaultValues.search : defaultValues.regex_search}
+              setDefaultSearchInput={(newSearchInput: string) =>
+                _onChangeValue(inputMode === 'simple' ? 'search' : 'regex_search', newSearchInput)
+              }
+              defaultInputMode={inputMode}
+              setdefaultInputMode={(newInputMode: 'simple' | 'regex') => {
+                setInputMode(newInputMode)
+                setDefaultValues((prevState: any) => ({
+                  ...prevState,
+                  search: newInputMode !== 'simple' ? '' : prevState.regex_search,
+                  regex_search: newInputMode === 'simple' ? '' : prevState.search
+                }))
+              }}
               onSearchDocument={() => null}
               noClearIcon
               noSearchIcon
+              sqareInput
             />
           </Grid>
 

@@ -15,6 +15,7 @@ type InputSearchDocumentRegexProps = {
   noInfoIcon?: boolean
   noClearIcon?: boolean
   noSearchIcon?: boolean
+  sqareInput?: boolean
 }
 const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
   placeholder,

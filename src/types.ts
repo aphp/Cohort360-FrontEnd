@@ -407,6 +407,7 @@ export type DocumentDataType = {
   title: string
   type: 'Composition'
   search: string
+  regex_search: string
   docType: { id: string; label: string }[] | null
   encounterEndDate: Date | null
   encounterStartDate: Date | null

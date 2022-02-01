@@ -7,8 +7,8 @@ import ButtonGroup from '@material-ui/core/ButtonGroup'
 import useStyle from './styles'
 
 type InputSearchDocumentButtonProps = {
-  currentMode: 'simple' | 'regex' | 'extend'
-  onChangeMode: (newMode: 'simple' | 'regex' | 'extend') => void
+  currentMode: 'simple' | 'regex'
+  onChangeMode: (newMode: 'simple' | 'regex') => void
 }
 const InputSearchDocumentButton: React.FC<InputSearchDocumentButtonProps> = ({ currentMode, onChangeMode }) => {
   const classes = useStyle()
