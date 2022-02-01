@@ -17,13 +17,29 @@ default:
     - when: never
 
 stages:
-  - build
   - test
+  - build
   - deploy
   - release
 
+test_e2e_chrome:
+  image:
+    name: harbor.eds.aphp.fr/cohort360/selenium-chrome:latest
+  stage: test
+  script:
+    - bash .gitlab/test.sh
+  allow_failure: true
+  artifacts:
+    when: always
+    paths:
+      - reports
+  rules:
+    - !reference [.default_rules, rules]
+
 build:
   stage: build
+  # needs:
+  #   - job: test
   artifacts:
     paths:
       - build/
@@ -38,21 +54,13 @@ build:
   rules:
     - !reference [.default_rules, rules]
 
-test:
-  stage: test
-  script:
-    - echo "Testing the code"
-#    -
-  rules:
-    - !reference [.default_rules, rules]
-
 deploy:
-  image :
-    name : $IMAGE_REPOSITORY_URL/kaniko-executor:$CI_COMMIT_BRANCH
-    entrypoint : [ "" ]
+  image:
+    name: $IMAGE_REPOSITORY_URL/kaniko-executor:$CI_COMMIT_BRANCH
+    entrypoint: ['']
   stage: deploy
   needs:
-    - job: test
+    # - job: test
     - job: build
       artifacts: true
   script:
@@ -67,7 +75,7 @@ deploy:
 release:
   image:
     name: $IMAGE_REPOSITORY_URL/alpine:$CI_COMMIT_BRANCH
-    entrypoint: [ "" ]
+    entrypoint: ['']
   stage: release
   script:
     - bash .gitlab/release.sh
