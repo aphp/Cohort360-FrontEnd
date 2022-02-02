@@ -9,4 +9,3 @@ for NAME in ${UrlArray[@]}; do
 done
 
 service nginx restart
-sleep infinity
