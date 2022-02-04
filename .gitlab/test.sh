@@ -7,3 +7,4 @@ npm config set proxy http://$PROXY_URL
 npm install
 npm run start > file.log 2>&1 &
 sleep 30
+service nginx restart
