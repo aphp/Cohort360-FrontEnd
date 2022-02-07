@@ -1,7 +1,7 @@
 cp .gitlab/nginx-test.conf /etc/nginx/conf.d/nginx.conf
 export $(cat $(printenv | grep -E "\b""$CI_COMMIT_BRANCH""_ENV""\b" | cut -d '=' -f 2-) | xargs)
 export $(cat $(printenv | grep -E "\b""$CI_COMMIT_BRANCH""_build_ENV""\b" | cut -d '=' -f 2-) | xargs)
-bash docker/entry-point.sh
+bash .gitlab/nginx-rename.sh
 service nginx restart
 npm config set proxy http://$PROXY_URL
 npm install
