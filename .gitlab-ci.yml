@@ -17,42 +17,51 @@ default:
     - when: never
 
 stages:
-  - build
   - test
+  - build
   - deploy
   - release
 
+test_e2e_chrome:
+  image:
+    name: harbor.eds.aphp.fr/cohort360/selenium-chrome:$CI_COMMIT_BRANCH
+  stage: test
+  script:
+    - bash .gitlab/test.sh
+    - echo "npm run test"
+    - npm run test
+  artifacts:
+    when: always
+    paths:
+      - reports
+    expire_in: 1 week
+  allow_failure: true
+  rules:
+    - !reference [.default_rules, rules]
+
 build:
   stage: build
+  # needs:
+  #   - job: test
   artifacts:
     paths:
       - build/
     expire_in: 1 week
   script:
     - name=${CI_COMMIT_BRANCH}_build_ENV  && cp ${!name} $CI_PROJECT_DIR/.env
-    - rm package-lock.json
     - npm config set proxy http://$PROXY_URL
     - npm install
-    - npm audit fix
     - CI=false npm run build
   rules:
     - !reference [.default_rules, rules]
 
-test:
-  stage: test
-  script:
-    - echo "Testing the code"
-#    -
-  rules:
-    - !reference [.default_rules, rules]
-
 deploy:
-  image :
-    name : $IMAGE_REPOSITORY_URL/kaniko-executor:$CI_COMMIT_BRANCH
-    entrypoint : [ "" ]
+  image:
+    name: $IMAGE_REPOSITORY_URL/kaniko-executor:$CI_COMMIT_BRANCH
+    entrypoint: ['']
   stage: deploy
   needs:
-    - job: test
+    # - job: test
     - job: build
       artifacts: true
   script:
@@ -67,7 +76,7 @@ deploy:
 release:
   image:
     name: $IMAGE_REPOSITORY_URL/alpine:$CI_COMMIT_BRANCH
-    entrypoint: [ "" ]
+    entrypoint: ['']
   stage: release
   script:
     - bash .gitlab/release.sh
