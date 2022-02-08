@@ -96,7 +96,7 @@ export const fetchCohorts = async (
     }
 
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
-      `/explorations/cohorts/?ordering=${_sortDirection}${sortBy}${typeFilter}${statusFilter}${minPatientsFilter}${maxPatientsFilter}${startDateFilter}${endDateFilter}${favoriteFilter}${searchByText}&limit=20${offset}`
+      `/cohort/cohorts/?ordering=${_sortDirection}${sortBy}${typeFilter}${statusFilter}${minPatientsFilter}${maxPatientsFilter}${startDateFilter}${endDateFilter}${favoriteFilter}${searchByText}&limit=20${offset}`
     )
 
     let cohortResult: FormattedCohort[] = []
@@ -160,7 +160,7 @@ export const fetchFavoriteCohorts = async (providerId: string | undefined): Prom
   }
   if (CONTEXT === 'aphp') {
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
-      '/explorations/cohorts/?favorite=true&ordering=-fhir_datetime&limit=5'
+      '/cohort/cohorts/?favorite=true&ordering=-fhir_datetime&limit=5'
     )
 
     let cohortResult: FormattedCohort[] = []
@@ -220,7 +220,7 @@ export const fetchLastCohorts = async (providerId: string | undefined): Promise<
   }
   if (CONTEXT === 'aphp') {
     const cohortResp = await apiBackCohort.get<Back_API_Response<Cohort>>(
-      '/explorations/cohorts/?limit=5&ordering=-fhir_datetime'
+      '/cohort/cohorts/?limit=5&ordering=-fhir_datetime'
     )
 
     let cohortResult: FormattedCohort[] = []
@@ -261,7 +261,7 @@ export const fetchLastCohorts = async (providerId: string | undefined): Promise<
 
 export const setFavorite = async (cohortId: string, favStatus: boolean): Promise<boolean> => {
   if (CONTEXT === 'aphp') {
-    const response = await apiBackCohort.patch(`/explorations/cohorts/${cohortId}/`, { favorite: !favStatus })
+    const response = await apiBackCohort.patch(`/cohort/cohorts/${cohortId}/`, { favorite: !favStatus })
     return response.status === 200
   }
   return false
@@ -271,7 +271,7 @@ export const onRemoveCohort = async (selectedCohort?: string): Promise<boolean> 
   if (CONTEXT === 'arkhn') {
     await api.delete(`/Group/${selectedCohort}`)
   } else if (CONTEXT === 'aphp') {
-    const deleteRequest = await apiBackCohort.delete(`/explorations/cohorts/${selectedCohort}/`)
+    const deleteRequest = await apiBackCohort.delete(`/cohort/cohorts/${selectedCohort}/`)
     return [200, 204].includes(deleteRequest.status)
   }
   return false

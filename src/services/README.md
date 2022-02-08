@@ -43,7 +43,6 @@ Ces fichiers servent à faire le lien avec différents services et à régler le
 | ------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------ |
 | apiBackend.ts | Permet le liens avec `cohort-back`                                                                        | `BACK_API_URL`                       |
 | apiFhir.ts    | Permet le liens avec `FHIR`                                                                               | `FHIR_API_URL`                       |
-| apiPortail.ts | Permet le liens avec `portail-back`                                                                       | `PORTAIL_API_URL`                    |
 | apiRequest.ts | Permet le liens avec `FHIR` (uniquement pour les `ValueSet` présent dans la partie `Création de requête`) | `REQUEST_API_URL`                    |
 
 ### Point d'entré :
