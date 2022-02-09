@@ -214,8 +214,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               multiline
               autoFocus
               fullWidth
-              rows={3}
-              rowsMax={5}
+              minRows={3}
+              maxRows={5}
               value={settings.motif}
               helperText="Le motif doit comporter au moins 10 caractères"
               variant="outlined"
