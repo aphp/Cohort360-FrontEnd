@@ -9,7 +9,7 @@ import Button from '@material-ui/core/Button'
 import { DialogContentText } from '@material-ui/core'
 import axios from 'axios'
 
-import { ACCES_TOKEN, REFRESH_TOKEN, CONTEXT } from '../../constants'
+import { ACCES_TOKEN, REFRESH_TOKEN, CONTEXT, BACK_API_URL } from '../../constants'
 
 import { useAppSelector } from 'state'
 import { logout as logoutAction } from 'state/me'
@@ -43,14 +43,17 @@ const AutoLogoutContainer = () => {
 
   const stayActive = async () => {
     try {
+      const refreshToken = localStorage.getItem(REFRESH_TOKEN)
+      if (!refreshToken) return
+
       const res = await axios.post('/api/jwt/refresh/', {
-        refresh: localStorage.getItem(REFRESH_TOKEN)
+        refresh: refreshToken
       })
 
       if (res && res.status === 200) {
         localStorage.setItem(ACCES_TOKEN, res.data.access)
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
-        axios.post('/api/portail/accounts/refresh/', {
+        axios.post(`${BACK_API_URL}/accounts/refresh/`, {
           refresh: res.data.refresh
         })
         setDialogIsOpen(false)
@@ -69,14 +72,18 @@ const AutoLogoutContainer = () => {
     try {
       // console.log('refresh still actif')
       if (CONTEXT === ('aphp' || 'arkhn')) {
+        const refreshToken = localStorage.getItem(REFRESH_TOKEN)
+        if (!refreshToken) return
+
         const res = await axios.post('/api/jwt/refresh/', {
-          refresh: localStorage.getItem(REFRESH_TOKEN)
+          refresh: refreshToken
         })
 
         if (res.status === 200) {
           localStorage.setItem(ACCES_TOKEN, res.data.access)
           localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
-          await axios.post('/api/portail/accounts/refresh/', {
+
+          await axios.post(`${BACK_API_URL}/accounts/refresh/`, {
             refresh: res.data.refresh
           })
         } else {
