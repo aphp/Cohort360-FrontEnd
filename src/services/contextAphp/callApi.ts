@@ -243,8 +243,8 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
 
-  // By default, all the calls to `/Composition` will have `type:not=doc-impor in parameter
-  let options: string[] = ['type:not=doc-impor']
+  // By default, all the calls to `/Composition` will have `type:not=doc-impor` + `empty=false` in parameter
+  let options: string[] = ['type:not=doc-impor&empty=false']
   if (_id)                                         options = [...options, `_id=${_id}`]                                                         // eslint-disable-line
   if (size !== undefined)                          options = [...options, `size=${size}`]                                                       // eslint-disable-line
   if (offset)                                      options = [...options, `offset=${offset}`]                                                   // eslint-disable-line
