@@ -19,6 +19,7 @@ import {
   addNewSelectedCriteria,
   editSelectedCriteria,
   deleteSelectedCriteria,
+  duplicateSelectedCriteria,
   suspendCount,
   unsuspendCount
 } from 'state/cohortCreation'
@@ -30,6 +31,7 @@ type OperatorItemProps = {
   addNewCriteria: (parentId: number) => void
   addNewGroup: (parentId: number) => void
   deleteCriteria: (criteriaId: number) => void
+  duplicateCriteria: (criteriaId: number) => void
   editCriteria: (criteria: SelectedCriteriaType, parentId: number) => void
 }
 
@@ -38,6 +40,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   addNewCriteria,
   addNewGroup,
   deleteCriteria,
+  duplicateCriteria,
   editCriteria
 }) => {
   const classes = useStyles()
@@ -79,6 +82,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
               return child?.id > 0 ? (
                 <CriteriaCardItem
                   key={child?.id}
+                  duplicateCriteria={duplicateCriteria}
                   deleteCriteria={deleteCriteria}
                   editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
                   itemId={child.id}
@@ -89,6 +93,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
                   itemId={child?.id}
                   addNewCriteria={addNewCriteria}
                   addNewGroup={addNewGroup}
+                  duplicateCriteria={duplicateCriteria}
                   deleteCriteria={deleteCriteria}
                   editCriteria={editCriteria}
                 />
@@ -225,12 +230,18 @@ const LogicalOperator: React.FC = () => {
     _buildCohortCreation()
   }
 
+  const _duplicateCriteria = async (criteriaId: number) => {
+    await dispatch<any>(duplicateSelectedCriteria(criteriaId))
+    _buildCohortCreation()
+  }
+
   return (
     <>
       <OperatorItem
         itemId={0}
         addNewCriteria={_addNewCriteria}
         addNewGroup={_addNewGroup}
+        duplicateCriteria={_duplicateCriteria}
         deleteCriteria={_deleteCriteria}
         editCriteria={_editCriteria}
       />
