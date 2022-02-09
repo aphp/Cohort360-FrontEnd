@@ -89,16 +89,11 @@ const Login = () => {
   const [errorLogin, setErrorLogin] = useState(false)
   const [open, setOpen] = useState(false)
 
-  const getPractitionerData = async (lastConnection) => {
-    if (
-      typeof services?.practitioner?.fetchPractitioner !== 'function' ||
-      typeof services.perimeters.fetchDeidentified !== 'function'
-    ) {
+  const getPractitionerData = async (practitioner, lastConnection) => {
+    if (typeof services.perimeters.fetchDeidentified !== 'function') {
       setLoading(false)
       return setErrorLogin(true)
     }
-
-    const practitioner = await services.practitioner.fetchPractitioner(username)
 
     if (practitioner) {
       const deidentifiedInfos = await services.perimeters.fetchDeidentified(practitioner.id)
@@ -115,7 +110,6 @@ const Login = () => {
       const oldPath = localStorage.getItem('old-path')
       localStorage.removeItem('old-path')
       history.push(oldPath ?? '/accueil')
-      setLoading(false)
     } else {
       setLoading(false)
       setErrorLogin(true)
@@ -160,14 +154,14 @@ const Login = () => {
         localStorage.setItem(ACCES_TOKEN, data.access)
         localStorage.setItem(REFRESH_TOKEN, data.refresh)
 
-        const getPractitioner = await services.practitioner.fetchPractitioner(username)
-        const getRights = await services.practitioner.fetchPractitionerRole(getPractitioner.id)
+        const practitioner = await services.practitioner.fetchPractitioner(username)
+        const getRights = await services.practitioner.fetchPractitionerRole(practitioner.id)
 
         if (getRights === undefined) {
           setNoRights(true)
         } else {
           const lastConnection = data.last_connection ? data.last_connection.modified_at : undefined
-          getPractitionerData(lastConnection)
+          getPractitionerData(practitioner, lastConnection)
         }
       } else {
         setLoading(false)

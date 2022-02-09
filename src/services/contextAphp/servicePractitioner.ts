@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios'
 
-import { PORTAIL_API_URL } from '../../constants'
+import { BACK_API_URL } from '../../constants'
 
 import { fetchPractitioner, fetchPractitionerRole } from './callApi'
 
@@ -119,7 +119,7 @@ export const getCsrfToken = (username: string, password: string): Promise<AxiosR
 
   return axios({
     method: 'POST',
-    url: `${PORTAIL_API_URL}/accounts/login/`,
+    url: `${BACK_API_URL}/accounts/login/`,
     data: formData
   })
 }

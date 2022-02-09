@@ -80,7 +80,7 @@ const fetchCohort = async (cohortId: string | undefined): Promise<CohortData | u
   }
   if (CONTEXT === 'aphp') {
     const [cohortInfo, cohortResp, patientsResp, encountersResp] = await Promise.all([
-      apiBackCohort.get<Back_API_Response<Cohort>>(`/explorations/cohorts/?fhir_group_id=${cohortId}`),
+      apiBackCohort.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?fhir_group_id=${cohortId}`),
       api.get<FHIR_API_Response<IGroup>>(`/Group?_id=${cohortId}`),
       api.get<FHIR_API_Response<IPatient>>(
         `/Patient?pivotFacet=age_gender,deceased_gender&_list=${cohortId}&size=20&_sort=given&_elements=gender,name,birthDate,deceased,identifier,extension`

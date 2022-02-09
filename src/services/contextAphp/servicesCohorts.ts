@@ -33,7 +33,6 @@ import {
 } from './callApi'
 
 import apiBackend from '../apiBackend'
-import apiPortail from '../apiPortail'
 
 export interface IServicesCohorts {
   /**
@@ -189,7 +188,7 @@ const servicesCohorts: IServicesCohorts = {
   fetchCohort: async (cohortId) => {
     // eslint-disable-next-line
     let fetchCohortsResults = await Promise.all([
-      apiBackend.get<Back_API_Response<Cohort>>(`/explorations/cohorts/?fhir_group_id=${cohortId}`),
+      apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?fhir_group_id=${cohortId}`),
       fetchGroup({ _id: cohortId }),
       fetchPatient({
         pivotFacet: ['age_gender', 'deceased_gender'],
@@ -476,7 +475,7 @@ const servicesCohorts: IServicesCohorts = {
 
       const exportResponse = await new Promise((resolve) => {
         resolve(
-          apiPortail.post('/exports/', {
+          apiBackend.post('/exports/', {
             cohort_id: cohortId,
             motivation,
             tables: tables.map((table: string) => ({

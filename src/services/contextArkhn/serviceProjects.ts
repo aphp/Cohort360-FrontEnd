@@ -213,7 +213,7 @@ const servicesProjects: IServicesProjects = {
       next: string | null
       previous: string | null
       results: ProjectType[]
-    }>(`/explorations/folders/${search}`)) ?? { status: 400 }
+    }>(`/cohort/folders/${search}`)) ?? { status: 400 }
 
     if (fetchProjectsResponse.status === 200) {
       const { data } = fetchProjectsResponse
@@ -228,7 +228,7 @@ const servicesProjects: IServicesProjects = {
     }
   },
   addProject: async (newProject) => {
-    const addProjectResponse = (await apiBack.post(`/explorations/folders/`, newProject)) ?? { status: 400 }
+    const addProjectResponse = (await apiBack.post(`/cohort/folders/`, newProject)) ?? { status: 400 }
 
     if (addProjectResponse.status === 201) {
       return addProjectResponse.data as ProjectType
@@ -237,7 +237,7 @@ const servicesProjects: IServicesProjects = {
     }
   },
   editProject: async (editedProject) => {
-    const editProjectResponse = (await apiBack.patch(`/explorations/folders/${editedProject.uuid}/`, {
+    const editProjectResponse = (await apiBack.patch(`/cohort/folders/${editedProject.uuid}/`, {
       name: editedProject.name,
       parent_folder: editedProject.uuid
     })) ?? {
@@ -251,7 +251,7 @@ const servicesProjects: IServicesProjects = {
     }
   },
   deleteProject: async (deletedProject) => {
-    const deleteProjectResponse = (await apiBack.delete(`/explorations/folders/${deletedProject.uuid}/`)) ?? {
+    const deleteProjectResponse = (await apiBack.delete(`/cohort/folders/${deletedProject.uuid}/`)) ?? {
       data: { results: [] }
     }
 
@@ -276,7 +276,7 @@ const servicesProjects: IServicesProjects = {
       next: string | null
       previous: string | null
       results: RequestType[]
-    }>(`/explorations/requests/${search}`)) ?? { status: 400 }
+    }>(`/cohort/requests/${search}`)) ?? { status: 400 }
 
     if (fetchRequestsListResponse.status === 200) {
       return fetchRequestsListResponse.data
@@ -290,7 +290,7 @@ const servicesProjects: IServicesProjects = {
     }
   },
   addRequest: async (newRequest) => {
-    const addRequestResponse = (await apiBack.post(`/explorations/requests/`, {
+    const addRequestResponse = (await apiBack.post(`/cohort/requests/`, {
       ...newRequest,
       parent_folder: newRequest.parent_folder
     })) ?? { status: 400 }
@@ -301,7 +301,7 @@ const servicesProjects: IServicesProjects = {
     }
   },
   editRequest: async (editedRequest) => {
-    const editProjectResponse = (await apiBack.patch(`/explorations/requests/${editedRequest.uuid}/`, {
+    const editProjectResponse = (await apiBack.patch(`/cohort/requests/${editedRequest.uuid}/`, {
       name: editedRequest.name,
       description: editedRequest.description,
       parent_folder: editedRequest.parent_folder
@@ -313,7 +313,7 @@ const servicesProjects: IServicesProjects = {
     }
   },
   deleteRequest: async (deletedRequest) => {
-    const deleteProjectResponse = (await apiBack.delete(`/explorations/requests/${deletedRequest.uuid}/`)) ?? {
+    const deleteProjectResponse = (await apiBack.delete(`/cohort/requests/${deletedRequest.uuid}/`)) ?? {
       status: 400
     }
     if (deleteProjectResponse.status === 204) {
@@ -330,7 +330,7 @@ const servicesProjects: IServicesProjects = {
       selectedRequests.map((selectedRequest) =>
         new Promise((resolve) => {
           resolve(
-            apiBack.patch(`/explorations/requests/${selectedRequest.uuid}/`, {
+            apiBack.patch(`/cohort/requests/${selectedRequest.uuid}/`, {
               parent_folder
             })
           )
@@ -353,7 +353,7 @@ const servicesProjects: IServicesProjects = {
     const deleteRequestsResponse = await Promise.all(
       deletedRequests.map((deletedRequest) =>
         new Promise((resolve) => {
-          resolve(apiBack.delete(`/explorations/requests/${deletedRequest.uuid}/`))
+          resolve(apiBack.delete(`/cohort/requests/${deletedRequest.uuid}/`))
         })
           .then((values) => {
             return values
@@ -383,7 +383,7 @@ const servicesProjects: IServicesProjects = {
       next: string | null
       previous: string | null
       results: Cohort[]
-    }>(`/explorations/cohorts/${search}`)) ?? { data: { results: [] } }
+    }>(`/cohort/cohorts/${search}`)) ?? { data: { results: [] } }
 
     let cohortList = data.results
 
@@ -434,7 +434,7 @@ const servicesProjects: IServicesProjects = {
     }
   },
   addCohort: async (newCohort) => {
-    const addCohortResponse = (await apiBack.post(`/explorations/cohorts/`, newCohort)) ?? { status: 400 }
+    const addCohortResponse = (await apiBack.post(`/cohort/cohorts/`, newCohort)) ?? { status: 400 }
 
     if (addCohortResponse.status === 201) {
       return addCohortResponse.data as Cohort
@@ -443,7 +443,7 @@ const servicesProjects: IServicesProjects = {
     }
   },
   editCohort: async (editedCohort) => {
-    const editCohortResponse = (await apiBack.patch(`/explorations/cohorts/${editedCohort.uuid}/`, {
+    const editCohortResponse = (await apiBack.patch(`/cohort/cohorts/${editedCohort.uuid}/`, {
       name: editedCohort.name,
       description: editedCohort.description,
       favorite: editedCohort.favorite !== undefined ? !!editedCohort.favorite : undefined
@@ -456,7 +456,7 @@ const servicesProjects: IServicesProjects = {
     }
   },
   deleteCohort: async (deletedCohort) => {
-    const deleteCohortResponse = (await apiBack.delete(`/explorations/cohorts/${deletedCohort.uuid}/`)) ?? {
+    const deleteCohortResponse = (await apiBack.delete(`/cohort/cohorts/${deletedCohort.uuid}/`)) ?? {
       status: 400
     }
 

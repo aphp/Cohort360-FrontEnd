@@ -81,9 +81,9 @@ const TutorialsCard = () => {
         <Grid className={classes.dotIndicatorContainer}>
           {youtubeIds.map((DO_NOT_USE, i) =>
             currentIndex === i ? (
-              <RadioButtonCheckedIcon onClick={() => setCurrentIndex(i)} />
+              <RadioButtonCheckedIcon key={i} onClick={() => setCurrentIndex(i)} />
             ) : (
-              <RadioButtonUncheckedIcon onClick={() => setCurrentIndex(i)} />
+              <RadioButtonUncheckedIcon key={i} onClick={() => setCurrentIndex(i)} />
             )
           )}
         </Grid>

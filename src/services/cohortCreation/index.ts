@@ -22,7 +22,7 @@ export const createCohort = async (
   } else if (CONTEXT === 'fakedata') {
     return null
   } else {
-    const cohortResult = await apiBack.post('/explorations/cohorts/', {
+    const cohortResult = await apiBack.post('/cohort/cohorts/', {
       dated_measure_id: datedMeasureId,
       request_query_snapshot_id: snapshotId,
       request_id: requestId,
@@ -37,7 +37,7 @@ export const createCohort = async (
 
 export const countCohort = async (requeteurJson?: string, snapshotId?: string, requestId?: string, uuid?: string) => {
   if (uuid) {
-    const measureResult = await apiBack.get<any>(`/explorations/dated-measures/${uuid}/`)
+    const measureResult = await apiBack.get<any>(`/cohort/dated-measures/${uuid}/`)
 
     return {
       date: measureResult?.data?.created_at,
@@ -62,7 +62,7 @@ export const countCohort = async (requeteurJson?: string, snapshotId?: string, r
     } else if (CONTEXT === 'fakedata') {
       return null
     } else {
-      const measureResult = await apiBack.post<any>('/explorations/dated-measures/create-unique/', {
+      const measureResult = await apiBack.post<any>('/cohort/dated-measures/create-unique/', {
         request_query_snapshot_id: snapshotId,
         request_id: requestId
       })
@@ -92,7 +92,7 @@ export const createSnapshot = async (id: string, json: string, firstTime?: boole
       [firstTime ? 'request_id' : 'previous_snapshot_id']: id,
       serialized_query: json
     }
-    const request = (await apiBack.post('/explorations/request-query-snapshots/', data)) || {}
+    const request = (await apiBack.post('/cohort/request-query-snapshots/', data)) || {}
     return request && request.data ? request.data : null
   }
 }
@@ -103,7 +103,7 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
   } else if (CONTEXT === 'fakedata') {
     return null
   } else {
-    const requestResponse = (await apiBack.get<any>(`/explorations/requests/${requestId}/`)) || {}
+    const requestResponse = (await apiBack.get<any>(`/cohort/requests/${requestId}/`)) || {}
     const requestData = requestResponse?.data ? requestResponse.data : {}
 
     const requestName = requestData.name

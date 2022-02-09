@@ -75,8 +75,8 @@ const ModalCohortTitle: React.FC<{
             variant="outlined"
             fullWidth
             multiline
-            rows={5}
-            rowsMax={8}
+            minRows={5}
+            maxRows={8}
             error={error === ERROR_DESCRIPTION}
           />
         </Grid>

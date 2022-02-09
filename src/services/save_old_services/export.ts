@@ -1,5 +1,6 @@
 // @ts-nocheck
-import apiPortailCohort from '../apiPortail'
+
+import apiBackend from '../apiBackend'
 
 type createExportProps = { cohortId: number; motivation: string; tables: string[]; output_format?: string }
 export const createExport = async (args: createExportProps) => {
@@ -9,7 +10,7 @@ export const createExport = async (args: createExportProps) => {
     const exportResponse = await Promise.all([
       new Promise((resolve) => {
         resolve(
-          apiPortailCohort.post('/exports/', {
+          apiBackend.post('/exports/', {
             cohort_id: cohortId,
             motivation,
             tables: tables.map((table: string) => ({
