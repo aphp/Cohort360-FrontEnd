@@ -310,6 +310,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 
     case RESSOURCE_TYPE_COMPOSITION: {
       filterFhir = [
+        `status=final&type:not=doc-impor&empty=false`,
         `${criterion.search ? `${COMPOSITION_TEXT}=${criterion.search}` : ''}`,
         `${
           criterion.docType && criterion.docType.length > 0
@@ -954,6 +955,10 @@ export async function unbuildRequest(_json: string) {
                   : newDocTypeIds
                 break
               }
+              case 'status':
+              case 'type:not':
+              case 'empty':
+                break
               default:
                 currentCriterion.error = true
                 break
