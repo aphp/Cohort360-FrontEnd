@@ -161,7 +161,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
       <Grid xs={12} container direction="row">
         <Grid xs={12} item direction="row">
           <Paper className={classes.root} square>
-            <Grid container item style={{ paddingInline: 8 }} justify="space-between">
+            <Grid container item style={{ paddingInline: 8 }} justifyContent="space-between">
               <Grid
                 id="context-bar"
                 container
@@ -181,7 +181,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                     container
                     style={{ width: 'calc(100% - 40px)', marginLeft: 8 }}
                     direction="column"
-                    justify="center"
+                    justifyContent="center"
                   >
                     {dashboard.loading ? (
                       <>
@@ -247,7 +247,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                   </Grid>
                 </Grid>
 
-                <Grid item xs={3} direction="column" container justify="center" alignItems="flex-end">
+                <Grid item xs={3} direction="column" container justifyContent="center" alignItems="flex-end">
                   {dashboard.loading ? (
                     <>
                       <Skeleton width={100} />
@@ -272,7 +272,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
               </Grid>
 
               {cohort.showActionButton && !dashboard.loading && (
-                <Grid container item justify="flex-end" style={{ width: 120 }}>
+                <Grid container item justifyContent="flex-end" style={{ width: 120 }}>
                   <IconButton onClick={handleFavorite} color="secondary">
                     {dashboard.favorite ? (
                       <StarFullIcon height={18} fill="currentColor" />

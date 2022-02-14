@@ -149,7 +149,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
   return (
     <div className={classes.container}>
       {loading && scopesList.length === 0 ? (
-        <Grid container justify="center">
+        <Grid container justifyContent="center">
           <CircularProgress size={50} />
         </Grid>
       ) : (

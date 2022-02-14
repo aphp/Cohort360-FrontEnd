@@ -23,7 +23,7 @@ const PatientDocs = ({ documents }) => {
     setPage(value)
   }
   return (
-    <Grid container item xs={11} justify="flex-end" className={classes.documentTable}>
+    <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
       <div className={classes.documentButtons}>
         <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
           <InputBase placeholder="Rechercher" className={classes.input} />

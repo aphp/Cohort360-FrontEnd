@@ -193,7 +193,7 @@ const Login = () => {
           md={6}
           elevation={6}
           direction="column"
-          justify="center"
+          justifyContent="center"
           alignItems="center"
           className={classes.rightPanel}
         >

@@ -132,7 +132,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
       {
         //@ts-ignore
         !researchData?.length > 0 ? (
-          <Grid container justify="center">
+          <Grid container justifyContent="center">
             <Typography variant="button"> Aucune cohorte à afficher </Typography>
           </Grid>
         ) : (
@@ -314,7 +314,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                             container
                             direction="row"
                             alignItems="center"
-                            justify="center"
+                            justifyContent="center"
                             style={{ width: 'max-content', margin: 'auto' }}
                           >
                             {canExportThisCohort && (

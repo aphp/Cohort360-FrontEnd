@@ -157,7 +157,7 @@ const DocumentTable: React.FC<DocumentTableTypes> = ({ deidentified, documents, 
           </Table>
         </TableContainer>
       ) : (
-        <Grid container justify="center">
+        <Grid container justifyContent="center">
           <Typography variant="button"> Aucun document à afficher </Typography>
         </Grid>
       )}

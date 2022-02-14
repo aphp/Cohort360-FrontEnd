@@ -164,8 +164,8 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   }
 
   return (
-    <Grid container justify="flex-end" className={classes.documentTable}>
-      <Grid item container justify="space-between">
+    <Grid container justifyContent="flex-end" className={classes.documentTable}>
+      <Grid item container justifyContent="space-between">
         <Typography variant="button">{displayDigit(total ?? 0)} cohorte(s)</Typography>
         <div className={classes.tableButtons}>
           <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
@@ -271,7 +271,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
         )}
       </Grid>
       {loadingStatus ? (
-        <Grid container justify="center">
+        <Grid container justifyContent="center">
           <CircularProgress />
         </Grid>
       ) : (

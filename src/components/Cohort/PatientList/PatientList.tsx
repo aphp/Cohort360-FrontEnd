@@ -269,9 +269,9 @@ const PatientList: React.FC<PatientListProps> = ({
   return (
     <Grid container direction="column" alignItems="center">
       <CssBaseline />
-      <Grid container item xs={11} justify="space-between">
+      <Grid container item xs={11} justifyContent="space-between">
         <Grid container>
-          <Grid container item xs={12} md={6} lg={4} justify="center">
+          <Grid container item xs={12} md={6} lg={4} justifyContent="center">
             <Paper className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography variant="h3" color="primary">
@@ -279,7 +279,7 @@ const PatientList: React.FC<PatientListProps> = ({
                 </Typography>
               </Grid>
               {patientData === undefined || (patientData && patientData.genderData === undefined) ? (
-                <Grid container justify="center" alignItems="center">
+                <Grid container justifyContent="center" alignItems="center">
                   <CircularProgress />
                 </Grid>
               ) : patientData.genderData && patientData.genderData.length > 0 ? (
@@ -289,7 +289,7 @@ const PatientList: React.FC<PatientListProps> = ({
               )}
             </Paper>
           </Grid>
-          <Grid container item xs={12} md={6} lg={4} justify="center">
+          <Grid container item xs={12} md={6} lg={4} justifyContent="center">
             <Paper className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography variant="h3" color="primary">
@@ -297,7 +297,7 @@ const PatientList: React.FC<PatientListProps> = ({
                 </Typography>
               </Grid>
               {patientData === undefined || (patientData && patientData.vitalStatusData === undefined) ? (
-                <Grid container justify="center" alignItems="center">
+                <Grid container justifyContent="center" alignItems="center">
                   <CircularProgress />
                 </Grid>
               ) : patientData.vitalStatusData &&
@@ -308,7 +308,7 @@ const PatientList: React.FC<PatientListProps> = ({
               )}
             </Paper>
           </Grid>
-          <Grid container item md={12} lg={4} justify="center">
+          <Grid container item md={12} lg={4} justifyContent="center">
             <Paper className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography variant="h3" color="primary">
@@ -316,7 +316,7 @@ const PatientList: React.FC<PatientListProps> = ({
                 </Typography>
               </Grid>
               {agePyramid === undefined ? (
-                <Grid container justify="center" alignItems="center">
+                <Grid container justifyContent="center" alignItems="center">
                   <CircularProgress />
                 </Grid>
               ) : agePyramid && agePyramid.length > 0 ? (
@@ -327,8 +327,8 @@ const PatientList: React.FC<PatientListProps> = ({
             </Paper>
           </Grid>
         </Grid>
-        <Grid container item justify="flex-end" className={classes.tableGrid}>
-          <Grid container justify="space-between" alignItems="center">
+        <Grid container item justifyContent="flex-end" className={classes.tableGrid}>
+          <Grid container justifyContent="space-between" alignItems="center">
             <Typography variant="button">
               {displayDigit(totalPatients)} / {displayDigit(total)} patient(s)
             </Typography>

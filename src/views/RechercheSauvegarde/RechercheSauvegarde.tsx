@@ -20,7 +20,7 @@ const SavedResearches = () => {
         [classes.appBarShift]: open
       })}
     >
-      <Grid container justify="center" alignItems="center">
+      <Grid container justifyContent="center" alignItems="center">
         <CssBaseline />
         <Grid container item xs={11}>
           <Typography id="cohortSaved-title" variant="h1" color="primary" className={classes.title}>

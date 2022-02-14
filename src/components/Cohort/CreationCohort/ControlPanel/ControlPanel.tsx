@@ -181,7 +181,7 @@ const ControlPanel: React.FC<{
         </Grid>
 
         <Grid className={classes.container}>
-          <Grid container justify="space-between">
+          <Grid container justifyContent="space-between">
             <Typography className={clsx(classes.boldText, classes.patientTypo)}>ACCÈS:</Typography>
             <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
               {accessIsPseudonymize === null ? '-' : accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
@@ -190,7 +190,7 @@ const ControlPanel: React.FC<{
         </Grid>
 
         <Grid className={classes.container}>
-          <Grid container justify="space-between">
+          <Grid container justifyContent="space-between">
             <Typography className={clsx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS</Typography>
             {itLoads ? (
               <CircularProgress

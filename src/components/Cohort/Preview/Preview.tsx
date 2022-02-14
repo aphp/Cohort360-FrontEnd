@@ -118,8 +118,8 @@ const Preview: React.FC<PreviewProps> = ({
   return (
     <Grid container direction="column" alignItems="center" className={classes.root}>
       <CssBaseline />
-      <Grid container direction="column" xs={11} justify="space-between">
-        {/* <Grid container item className={classes.header} justify="center">
+      <Grid container direction="column" xs={11} justifyContent="space-between">
+        {/* <Grid container item className={classes.header} justifyContent="center">
           <Grid container item alignItems="center" md={11}>
             <Grid container item direction="column">
               <Typography variant="h2" color="primary">
@@ -178,8 +178,8 @@ const Preview: React.FC<PreviewProps> = ({
           </Grid>
         </Grid> */}
 
-        <Grid container item justify="space-between" alignItems="center">
-          <Grid container item xs={12} sm={6} md={4} justify="center">
+        <Grid container item justifyContent="space-between" alignItems="center">
+          <Grid container item xs={12} sm={6} md={4} justifyContent="center">
             <Paper className={classes.nbPatientsOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography variant="h3" color="primary">
@@ -204,7 +204,7 @@ const Preview: React.FC<PreviewProps> = ({
         </Grid>
 
         <Grid container>
-          <Grid container item xs={12} sm={6} lg={4} justify="center">
+          <Grid container item xs={12} sm={6} lg={4} justifyContent="center">
             <Paper className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography variant="h3" color="primary">
@@ -222,7 +222,7 @@ const Preview: React.FC<PreviewProps> = ({
             </Paper>
           </Grid>
 
-          <Grid container item xs={12} sm={6} lg={4} justify="center">
+          <Grid container item xs={12} sm={6} lg={4} justifyContent="center">
             <Paper className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography variant="h3" color="primary">
@@ -240,7 +240,7 @@ const Preview: React.FC<PreviewProps> = ({
             </Paper>
           </Grid>
 
-          <Grid container item xs={12} sm={12} lg={4} justify="center">
+          <Grid container item xs={12} sm={12} lg={4} justifyContent="center">
             <Paper className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography variant="h3" color="primary">
@@ -258,8 +258,8 @@ const Preview: React.FC<PreviewProps> = ({
             </Paper>
           </Grid>
 
-          <Grid container item md={12} lg={6} justify="center">
-            <Grid container item justify="center">
+          <Grid container item md={12} lg={6} justifyContent="center">
+            <Grid container item justifyContent="center">
               <Paper className={classes.chartOverlay}>
                 <Grid container item className={classes.chartTitle}>
                   <Typography variant="h3" color="primary">
@@ -278,8 +278,8 @@ const Preview: React.FC<PreviewProps> = ({
             </Grid>
           </Grid>
 
-          <Grid container item md={12} lg={6} justify="center">
-            <Grid container item justify="center">
+          <Grid container item md={12} lg={6} justifyContent="center">
+            <Grid container item justifyContent="center">
               <Paper className={classes.chartOverlay}>
                 <Grid container item className={classes.chartTitle}>
                   <Typography variant="h3" color="primary">

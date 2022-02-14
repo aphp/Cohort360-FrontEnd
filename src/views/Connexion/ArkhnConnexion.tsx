@@ -118,11 +118,11 @@ const ArkhnConnexion = () => {
           sm={6}
           md={6}
           direction="column"
-          justify="center"
+          justifyContent="center"
           alignItems="center"
           className={classes.rightPanel}
         >
-          <Grid container item xs={8} lg={6} direction="column" alignItems="center" justify="space-around">
+          <Grid container item xs={8} lg={6} direction="column" alignItems="center" justifyContent="space-around">
             <Grid item>
               <img className={classes.logo} src={logo} alt="Logo Cohort360" />
               <Typography color="primary" className={classes.bienvenue}>

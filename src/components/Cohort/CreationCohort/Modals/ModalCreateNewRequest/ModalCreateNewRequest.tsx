@@ -185,7 +185,13 @@ const ModalCreateNewRequest: React.FC<{
         )}
         <DialogContent>
           {loading || currentRequest === null ? (
-            <Grid container direction="column" justify="center" alignItems="center" className={classes.inputContainer}>
+            <Grid
+              container
+              direction="column"
+              justifyContent="center"
+              alignItems="center"
+              className={classes.inputContainer}
+            >
               <CircularProgress />
             </Grid>
           ) : tab === 'form' ? (

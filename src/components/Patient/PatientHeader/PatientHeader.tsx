@@ -35,12 +35,12 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
       }`
 
   return (
-    <Grid container direction="row" justify="center" alignItems="center" className={classes.root}>
-      <Grid container item xs={11} justify="center" alignItems="center">
+    <Grid container direction="row" justifyContent="center" alignItems="center" className={classes.root}>
+      <Grid container item xs={11} justifyContent="center" alignItems="center">
         <Grid container item xs={9}>
           <PatientTitle firstName={firstName} lastName={lastName} />
         </Grid>
-        <Grid container item justify="flex-end" xs={3}>
+        <Grid container item justifyContent="flex-end" xs={3}>
           <PatientInfo age={age} ipp={ipp} gender={patient.gender} />
         </Grid>
       </Grid>

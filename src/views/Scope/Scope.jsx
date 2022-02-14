@@ -93,7 +93,7 @@ const Scope = () => {
         [classes.appBarShift]: open
       })}
     >
-      <Grid container justify="center" alignItems="center">
+      <Grid container justifyContent="center" alignItems="center">
         <Grid container item xs={11} direction="column">
           <Typography variant="h1" color="primary" className={classes.title}>
             Explorer un perimètre
@@ -102,8 +102,8 @@ const Scope = () => {
             <ScopeTree defaultSelectedItems={selectedItems} onChangeSelectedItem={onChangeSelectedItem} />
           </Paper>
         </Grid>
-        <Grid container item justify="center" className={classes.bottomBar}>
-          <Grid container item justify="flex-end" xs={11} className={classes.buttons}>
+        <Grid container item justifyContent="center" className={classes.bottomBar}>
+          <Grid container item justifyContent="flex-end" xs={11} className={classes.buttons}>
             <Button
               variant="contained"
               disableElevation

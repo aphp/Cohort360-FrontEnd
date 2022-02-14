@@ -184,7 +184,7 @@ const Requeteur = () => {
 
   if (loading || criteriaLoading || requestLoading || (requestIdFromUrl && requestId !== requestIdFromUrl)) {
     return (
-      <Grid className={classes.grid} container justify="center" alignItems="center">
+      <Grid className={classes.grid} container justifyContent="center" alignItems="center">
         <CircularProgress />
       </Grid>
     )

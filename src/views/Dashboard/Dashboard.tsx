@@ -180,7 +180,7 @@ const Dashboard: React.FC<{
         afterEdit={() => forceReload()}
       />
 
-      <Grid container justify="center" className={classes.tabs}>
+      <Grid container justifyContent="center" className={classes.tabs}>
         <Grid container item xs={11}>
           <Tabs value={selectedTab} onChange={handleChangeTabs} classes={{ indicator: classes.indicator }}>
             {tabs &&
