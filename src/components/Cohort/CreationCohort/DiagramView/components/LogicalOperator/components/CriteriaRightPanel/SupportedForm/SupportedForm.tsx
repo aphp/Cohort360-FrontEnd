@@ -41,8 +41,8 @@ const defaultEncounter: EncounterDataType = {
   destination: [],
   provenance: [],
   admission: [],
-  encounterStartDate: null,
-  encounterEndDate: null,
+  encounterStartDate: '',
+  encounterEndDate: '',
   isInclusive: true
 }
 
@@ -147,7 +147,6 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            defaultValue="Critère démographique"
             variant="outlined"
             value={defaultValues.title}
             onChange={(e) => _onChangeValue('title', e.target.value)}

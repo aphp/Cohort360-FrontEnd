@@ -373,8 +373,8 @@ export type CcamDataType = {
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
-  startOccurrence: Date
-  endOccurrence: Date
+  startOccurrence: Date | ''
+  endOccurrence: Date | ''
   isInclusive?: boolean
 }
 
@@ -388,8 +388,8 @@ export type Cim10DataType = {
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
-  startOccurrence: Date
-  endOccurrence: Date
+  startOccurrence: Date | ''
+  endOccurrence: Date | ''
   isInclusive?: boolean
 }
 
@@ -409,12 +409,12 @@ export type DocumentDataType = {
   search: string
   regex_search: string
   docType: { id: string; label: string }[] | null
-  encounterEndDate: Date | null
-  encounterStartDate: Date | null
+  encounterEndDate: Date | ''
+  encounterStartDate: Date | ''
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
-  startOccurrence: Date | null
-  endOccurrence: Date | null
+  startOccurrence: Date | ''
+  endOccurrence: Date | ''
   isInclusive?: boolean
 }
 
@@ -427,8 +427,8 @@ export type GhmDataType = {
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
-  startOccurrence: Date | null
-  endOccurrence: Date | null
+  startOccurrence: Date | ''
+  endOccurrence: Date | ''
   isInclusive?: boolean
 }
 
@@ -450,8 +450,8 @@ export type EncounterDataType = {
   destination: { id: string; label: string }[] | null
   provenance: { id: string; label: string }[] | null
   admission: { id: string; label: string }[] | null
-  encounterStartDate: Date | null
-  encounterEndDate: Date | null
+  encounterStartDate: Date | ''
+  encounterEndDate: Date | ''
   isInclusive?: boolean
 }
 
@@ -462,8 +462,8 @@ export type MedicationDataType = {
   administration: { id: string; label: string }[] | null
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
-  startOccurrence: Date | null
-  endOccurrence: Date | null
+  startOccurrence: Date | ''
+  endOccurrence: Date | ''
   isInclusive?: boolean
 } & (
   | {
