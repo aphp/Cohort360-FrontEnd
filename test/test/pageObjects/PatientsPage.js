@@ -17,9 +17,9 @@ module.exports = class PatientsPage extends Page {
         return PatientContextBar.accessValue
     }*/
 
-    access = async () => {
-        await PatientContextBar.access.waitUntil(() => PatientContextBar.accessValue != PatientContextBar.defaultAccessValue)
-        return PatientContextBar.accessValue
+    async access () {
+        // await PatientContextBar.accessValue().waitUntil(() => PatientContextBar.accessValue.getText() != PatientContextBar.defaultAccessValue) 
+        return PatientContextBar.accessValue()
     }
 
     // Bloc "Nombre de Patients"
@@ -65,7 +65,7 @@ module.exports = class PatientsPage extends Page {
     }
 
     async getAccesses () {
-        let accesses = await this.access
+        let accesses = this.access
         return accesses
     }
 }

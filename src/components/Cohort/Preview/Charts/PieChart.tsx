@@ -88,7 +88,7 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 250, width = 25
   return (
     <>
       <div style={{ display: 'flex' }}>
-        <svg ref={node}></svg>
+        <svg id="vital-repartition-card-svg" ref={node}></svg>
         <div style={{ display: 'flex' }} dangerouslySetInnerHTML={{ __html: legendHtml }} />
       </div>
       <div id="tooltip" className={classes.tooltip} />

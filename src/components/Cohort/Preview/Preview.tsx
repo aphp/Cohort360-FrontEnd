@@ -61,7 +61,7 @@ const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMa
   }
 
   return (
-    <TableContainer component={Paper} className={classes.repartitionTable}>
+    <TableContainer id="repartition-table-card" component={Paper} className={classes.repartitionTable}>
       <Table aria-label="simple table">
         <TableHead>
           <TableRow className={classes.tableHead}>
@@ -79,15 +79,23 @@ const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMa
             <TableCell component="th" scope="row" className={classes.tableHeadCell}>
               Femmes
             </TableCell>
-            <TableCell align="center">{displayDigit(femaleAlive ?? 0)}</TableCell>
-            <TableCell align="center">{displayDigit(femaleDeceased ?? 0)}</TableCell>
+            <TableCell id="female-alive-cell" align="center">
+              {displayDigit(femaleAlive ?? 0)}
+            </TableCell>
+            <TableCell id="female-deceased-cell" align="center">
+              {displayDigit(femaleDeceased ?? 0)}
+            </TableCell>
           </TableRow>
           <TableRow>
             <TableCell component="th" scope="row" className={classes.tableHeadCell}>
               Hommes
             </TableCell>
-            <TableCell align="center">{displayDigit(maleAlive ?? 0)}</TableCell>
-            <TableCell align="center">{displayDigit(maleDeceased ?? 0)}</TableCell>
+            <TableCell id="male-alive-cell" align="center">
+              {displayDigit(maleAlive ?? 0)}
+            </TableCell>
+            <TableCell id="male-deceased-cell" align="center">
+              {displayDigit(maleDeceased ?? 0)}
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -180,9 +188,9 @@ const Preview: React.FC<PreviewProps> = ({
 
         <Grid container item justify="space-between" alignItems="center">
           <Grid container item xs={12} sm={6} md={4} justify="center">
-            <Paper className={classes.nbPatientsOverlay}>
+            <Paper id="patient-number-card" className={classes.nbPatientsOverlay}>
               <Grid container item className={classes.chartTitle}>
-                <Typography variant="h3" color="primary">
+                <Typography id="patient-number-card-title" variant="h3" color="primary">
                   Nombre de patients
                 </Typography>
               </Grid>
@@ -192,7 +200,7 @@ const Preview: React.FC<PreviewProps> = ({
                   <CircularProgress />
                 </Grid>
               ) : (
-                <Typography variant="h4" className={classes.nbPatients}>
+                <Typography id="patient-number-card-value" variant="h4" className={classes.nbPatients}>
                   {displayDigit(total)} patients
                 </Typography>
               )}
@@ -205,9 +213,9 @@ const Preview: React.FC<PreviewProps> = ({
 
         <Grid container>
           <Grid container item xs={12} sm={6} lg={4} justify="center">
-            <Paper className={classes.chartOverlay}>
+            <Paper id="vital-repartition-card" className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
-                <Typography variant="h3" color="primary">
+                <Typography id="vital-repartition-card-title" variant="h3" color="primary">
                   Répartition par statut vital
                 </Typography>
               </Grid>
@@ -223,9 +231,9 @@ const Preview: React.FC<PreviewProps> = ({
           </Grid>
 
           <Grid container item xs={12} sm={6} lg={4} justify="center">
-            <Paper className={classes.chartOverlay}>
+            <Paper id="visite-type-repartition-card" className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
-                <Typography variant="h3" color="primary">
+                <Typography id="visite-type-repartition-card-title" variant="h3" color="primary">
                   Répartition par type de visite
                 </Typography>
               </Grid>
@@ -241,9 +249,9 @@ const Preview: React.FC<PreviewProps> = ({
           </Grid>
 
           <Grid container item xs={12} sm={12} lg={4} justify="center">
-            <Paper className={classes.chartOverlay}>
+            <Paper id="gender-repartition-card" className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
-                <Typography variant="h3" color="primary">
+                <Typography id="gender-repartition-card-title" variant="h3" color="primary">
                   Répartition par genre
                 </Typography>
               </Grid>

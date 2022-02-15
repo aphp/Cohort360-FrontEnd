@@ -83,7 +83,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, height = 250, width = 250
   return (
     <>
       <div style={{ display: 'flex' }}>
-        <svg ref={node}></svg>
+        <svg id="visite-type-repartition-card-svg" ref={node}></svg>
         <div style={{ display: 'flex' }} dangerouslySetInnerHTML={{ __html: legendHtml }} />
       </div>
     </>

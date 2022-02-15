@@ -27,23 +27,23 @@ exports.config = {
   // specs: ['./test/test/specs/**/*.js'],
 
   suites: {
-    Generics: [
-      './test/test/specs/generics/cohort360-SCG00-LoginLogout.js'
-      // './test/test/specs/generics/cohort360-SCG01-LeftMenu.js'
-      // './test/test/specs/generics/cohort360-SCG02-PatientContextBar.js'
+    // Generics: [
+    //   './test/test/specs/generics/cohort360-SCG00-LoginLogout.js',
+    //   './test/test/specs/generics/cohort360-SCG01-LeftMenu.js'
+    //   // './test/test/specs/generics/cohort360-SCG02-PatientContextBar.js'
+    // ]
+    // HomePage: ['./test/test/specs/pages/cohort360-SCP01-HomePage.js'],
+    MyPatients: [
+      './test/test/specs/pages/cohort360-SCP02-MyPatientsPage.js'
+      // './test/test/specs/pages/cohort360-SCP03-MyPatientDatasPage.js',
+      // './test/test/specs/pages/cohort360-SCP04-MyPatientDocumentsPage.js',
+      // './test/test/specs/pages/cohort360-SCP05-MyPatientSearchPage.js',
+      // './test/test/specs/filters/cohort360-SCF01-PatientListFilter.js',
+      // './test/test/specs/filters/cohort360-SCF02-PatientListSearchFilter.js',
+      // // './test/test/specs/filters/cohort360-SCF03-DocumentListSortFilter.js',
+      // './test/test/specs/filters/cohort360-SCF04-DocumentListFilter.js',
+      // './test/test/specs/filters/cohort360-SCF05-DocumentListSearchFilter.js'
     ]
-    // HomePage: ['./test/test/specs/pages/cohort360-SCP01-HomePage.js']
-    // MyPatients: [
-    //     './test/test/specs/pages/cohort360-SCP02-MyPatientsPage.js',
-    //     './test/test/specs/pages/cohort360-SCP03-MyPatientDatasPage.js',
-    //     './test/test/specs/pages/cohort360-SCP04-MyPatientDocumentsPage.js',
-    //     './test/test/specs/pages/cohort360-SCP05-MyPatientSearchPage.js',
-    //     './test/test/specs/filters/cohort360-SCF01-PatientListFilter.js',
-    //     './test/test/specs/filters/cohort360-SCF02-PatientListSearchFilter.js',
-    //     // './test/test/specs/filters/cohort360-SCF03-DocumentListSortFilter.js',
-    //     './test/test/specs/filters/cohort360-SCF04-DocumentListFilter.js',
-    //     './test/test/specs/filters/cohort360-SCF05-DocumentListSearchFilter.js'
-    // ],
     // Requests: [
     //     './test/test/specs/pages/cohort360-SCP06-MyResearchProjectsPage.js',
     //     // './test/test/specs/pages/cohort360-SCP07-NewCohortPage.js',
