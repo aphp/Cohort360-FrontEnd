@@ -239,14 +239,7 @@ const Login = () => {
                   </Link>
                 </Typography>
 
-                <Button
-                  disabled={loading || !username || !password}
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                >
+                <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
                   {loading ? <CircularProgress /> : 'Connexion'}
                 </Button>
               </Grid>
@@ -260,6 +253,7 @@ const Login = () => {
       </Grid>
 
       <ErrorDialog open={errorLogin !== false} setErrorLogin={setErrorLogin} />
+
       <LegalMentionDialog open={open} setOpen={setOpen} />
     </>
   )
