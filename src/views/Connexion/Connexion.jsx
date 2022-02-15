@@ -130,6 +130,7 @@ const Login = () => {
     localStorage.removeItem('pmsi')
     localStorage.removeItem('access')
     localStorage.removeItem('refresh')
+    localStorage.removeItem('patient')
   }, [])
 
   const login = async () => {
