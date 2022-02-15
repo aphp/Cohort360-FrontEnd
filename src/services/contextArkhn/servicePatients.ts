@@ -110,14 +110,14 @@ export interface IServicesPatients {
   }>
 
   /**
-   * Cette fonction retourne la totalité des Procedure d'un patient donné
+   * Cette fonction retourne la totalité des Procedures d'un patient donné
    *
    *
    */
   fetchAllProcedures: (patientId: string, groupId: string, size?: number) => Promise<IProcedure[]>
 
   /**
-   * Cette fonction retourne la totalité des Procedure d'un patient donné
+   * Cette fonction retourne la totalité des Conditions d'un patient donné
    *
    *
    */

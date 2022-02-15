@@ -122,6 +122,7 @@ export interface IServicesCohorts {
     searchInput: string,
     selectedDocTypes: string[],
     nda: string,
+    ipp: string,
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string
@@ -353,6 +354,7 @@ const servicesCohorts: IServicesCohorts = {
     searchInput,
     selectedDocTypes,
     nda,
+    ipp,
     startDate,
     endDate,
     groupId
@@ -373,11 +375,12 @@ const servicesCohorts: IServicesCohorts = {
         _text: searchInput,
         type: selectedDocTypes.length > 0 ? selectedDocTypes.join(',') : '',
         'encounter.identifier': nda,
+        'patient.identifier': ipp,
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
         uniqueFacet: ['patient']
       }),
-      !!searchInput || selectedDocTypes.length > 0 || !!nda || !!startDate || !!endDate
+      !!searchInput || selectedDocTypes.length > 0 || !!nda || !!ipp || !!startDate || !!endDate
         ? fetchComposition({
             status: 'final',
             _list: groupId ? [groupId] : [],

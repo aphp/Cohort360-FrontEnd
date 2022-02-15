@@ -228,6 +228,7 @@ type fetchCompositionProps = {
   patient?: string
   encounter?: string
   'encounter.identifier'?: string
+  'patient.identifier'?: string
   facet?: ('class' | 'visit-year-month-gender-facet')[]
   uniqueFacet?: 'patient'[]
   _elements?: ('status' | 'type' | 'subject' | 'encounter' | 'date' | 'title')[]
@@ -237,6 +238,7 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list, facet, uniqueFacet, _elements } = args
   const encounterIdentifier = args['encounter.identifier']
+  const patientIdentifier = args['patient.identifier']
 
   _list = _list ? _list.filter(uniq) : []
   facet = facet ? facet.filter(uniq) : []
@@ -253,8 +255,8 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   if (_text)                                       options = [...options, `_text=${_text}`]                                                     // eslint-disable-line
   if (status)                                      options = [...options, `status=${status}`]                                                   // eslint-disable-line
   if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
+  if (patientIdentifier)                           options = [...options, `patient.identifier=${patientIdentifier}`]                                                 // eslint-disable-line
   if (encounter)                                   options = [...options, `encounter=${encounter}`]                                             // eslint-disable-line
-  if (encounterIdentifier)                         options = [...options, `encounter.identifier=${encounterIdentifier}`]                        // eslint-disable-line
   if (encounterIdentifier)                         options = [...options, `encounter.identifier=${encounterIdentifier}`]                        // eslint-disable-line
   if (minDate)                                     options = [...options, `date=ge${minDate}`]                                                  // eslint-disable-line
   if (maxDate)                                     options = [...options, `date=le${maxDate}`]                                                  // eslint-disable-line
