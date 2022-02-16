@@ -95,7 +95,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
         //@ts-ignore
         !researchData?.length > 0 ? (
           <Grid container justifyContent="center">
-            <Typography variant="button"> Aucune requeste à afficher </Typography>
+            <Typography variant="button"> Aucune requête à afficher </Typography>
           </Grid>
         ) : (
           <TableContainer component={Paper}>

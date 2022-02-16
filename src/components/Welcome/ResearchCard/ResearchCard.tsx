@@ -61,8 +61,8 @@ const ResearchCard: React.FC<ResearchCardProps> = ({
           <CircularProgress />
         ) : (
           <>
-            {requests && requests.length > 0 && <RequestsTable simplified={simplified} researchData={requests} />}
-            {cohorts && cohorts.length > 0 && (
+            {requests && <RequestsTable simplified={simplified} researchData={requests} />}
+            {cohorts && (
               <ResearchTable
                 simplified={simplified}
                 researchData={cohorts}
