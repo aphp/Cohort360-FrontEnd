@@ -34,7 +34,7 @@ import {
 
 import apiBackend from '../apiBackend'
 
-export interface IServicesCohorts {
+export interface IServiceCohorts {
   /**
    * Retourne les informations d'une cohorte
    *
@@ -185,7 +185,7 @@ export interface IServicesCohorts {
   }) => Promise<any>
 }
 
-const servicesCohorts: IServicesCohorts = {
+const servicesCohorts: IServiceCohorts = {
   fetchCohort: async (cohortId) => {
     // eslint-disable-next-line
     let fetchCohortsResults = await Promise.all([

@@ -17,12 +17,13 @@ services
 │   └── index.ts
 ├── contextAphp
 │   ├── callApi.ts
+│   ├── serviceCohorts.ts
+│   ├── serviceCohortCreation.ts
+│   ├── serviceContact.ts
 │   ├── servicePatients.ts
 │   ├── servicePerimeters.ts
 │   ├── servicePractitioner.ts
 │   ├── serviceProjects.ts
-│   ├── servicesCohorts.ts
-│   ├── servicesContact.ts
 │   └── index.ts
 ├── context...
 │   └── ...
@@ -80,37 +81,47 @@ Nous trouvons donc :
 
 ##### index.ts
 
-Dans ce fichier, nous allons définir un objets `service...` qui contiendra les propriétés `cohorts`, `patients`, `perimeters`, `practitioner` et `projects`. Chacune de ces propriétés contiendra une multitude de fonctions.
+Dans ce fichier, nous allons définir un objets `service...` qui contiendra les propriétés `cohorts`, `contact`, `patients`, `perimeters`, `practitioner` et `projects`. Chacune de ces propriétés contiendra une multitude de fonctions.
 
 ```ts
 // Liste d'import de l'interface + type de l'interface
-import servicesCohorts, { IServicesCohorts } from './servicesCohorts'
-import servicePatients, { IServicesPatients } from './servicePatients'
-import servicePerimeters, { IServicesPerimeters } from './servicePerimeters'
-import servicePractitioner, { IServicesPractitioner } from './servicePractitioner'
-import serviceProjects, { IServicesProjects } from './serviceProjects'
+import serviceCohorts, { IServiceCohorts } from './serviceCohorts'
+import serviceCohortCreation, { IServiceCohortCreation } from './serviceCohortCreation'
+import serviceContact, { IServiceContact } from './serviceContact'
+import servicePatients, { IServicePatients } from './servicePatients'
+import servicePerimeters, { IServicePerimeters } from './servicePerimeters'
+import servicePractitioner, { IServicePractitioner } from './servicePractitioner'
+import serviceProjects, { IServiceProjects } from './serviceProjects'
 
 // Type de votre interface
 export interface IService... {
 	// Ensemble des fonctions liés à l'exploration d'une cohorte
-	cohorts: IServicesCohorts
+	cohorts: IServiceCohorts
+
+	// Explble des fonctions lié à l'utilisation du requêteur
+	cohortCreation: IServiceCohortCreation
+
+	// Ensemble des fonctions liés à la page de contact
+	contact: IServiceContact
 
 	// Ensemble des fonctions liés aux patients
-	patients: IServicesPatients
+	patients: IServicePatients
 
 	// Ensemble des fonctions liés aux périmètres
-	perimeters: IServicesPerimeters
+	perimeters: IServicePerimeters
 
 	// Ensemble des fonctions liés à l'utilisateur courant
-	practitioner: IServicesPractitioner
+	practitioner: IServicePractitioner
 
 	// Ensemble des fonctions liés aux projets de recherches
-	projects: IServicesProjects
+	projects: IServiceProjects
 }
 
 // Definition de votre service
 const service...: IService... = {
-	cohorts: servicesCohorts,
+	cohorts: serviceCohorts,
+	cohortCreation: serviceCohortCreation,
+	contact: serviceContact,
 	patients: servicePatients,
 	perimeters: servicePerimeters,
 	practitioner: servicePractitioner,
@@ -148,7 +159,7 @@ Pour un soucis de clarté dans le code, nous avons créé ce fichier `callApi.ts
 Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à un patient, et définie l'interface suivante :
 
 ```ts
-export  interface  IServicesPatients {
+export  interface  IServicePatients {
 	fetchPatientsCount: () =>  Promise<
 		number
 	>
@@ -238,7 +249,7 @@ export  interface  IServicesPatients {
 Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à un périmètre, et définie l'interface suivante :
 
 ```ts
-export  interface  IServicesPerimeters {
+export  interface  IServicePerimeters {
 	fetchPerimetersInfos: (
 		perimetersId: string
 	) =>  Promise<
@@ -286,7 +297,7 @@ export  interface  IServicesPerimeters {
 Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à un practitioner (utilisateur de cohort360), et définie l'interface suivante :
 
 ```ts
-export  interface  IServicesPractitioner {
+export  interface  IServicePractitioner {
 	authenticate: (
 		username: string,
 		password: string
@@ -317,7 +328,7 @@ export  interface  IServicesPractitioner {
 Ce fichier définie l'ensemble des fonctions lié à la récupération de donnée lié aux projets de recherche, aux requêtes, et aux cohortes, et définie l'interface suivante :
 
 ```ts
-export  interface  IServicesProjects {
+export  interface  IServiceProjects {
 	fetchProjectsList: (
 		limit?: number,
 		offset?: number
@@ -396,14 +407,14 @@ export  interface  IServicesProjects {
 }
 ```
 
-##### servicesCohorts.ts
+##### serviceCohorts.ts
 
 > Pour l'ensemble des fonctions définie dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définie dans un premier temps pour éviter tous problèmes de typage.
 
 Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à une cohorte, et définie l'interface suivante :
 
 ```ts
-export interface IServicesCohorts {
+export interface IServiceCohorts {
   fetchCohort: (
 		cohortId: string
 	) => Promise<
@@ -467,5 +478,21 @@ export interface IServicesCohorts {
     tables: string[]
     output_format?: string
   }) => Promise<any>
+}
+```
+
+##### serviceContact.ts
+
+> Pour l'ensemble des fonctions définie dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définie dans un premier temps pour éviter tous problèmes de typage.
+
+Ce fichier définie l'ensemble des fonction lié à la fonctionnalité de prise de contact, et définie l'interface suivante :
+
+```ts
+export interface IServiceContact {
+  postIssue: (
+		contactSubmitForm: ContactSubmitForm
+	) => Promise<
+		boolean
+	>
 }
 ```

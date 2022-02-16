@@ -1,27 +1,50 @@
 import apiBack from '../apiBackend'
-import { CONTEXT } from '../../constants'
 
 import { CohortCreationCounterType } from 'types'
 
-export const createCohort = async (
-  requeteurJson: string | undefined,
-  datedMeasureId: string | undefined,
-  snapshotId: string | undefined,
-  requestId: string | undefined,
-  cohortName: string | undefined,
-  cohortDescription: string | undefined,
-  globalCount: boolean | undefined
-) => {
-  if (!requeteurJson || !datedMeasureId || !snapshotId || !requestId) return null
-  if (globalCount === undefined) globalCount = false
+export interface IServiceCohortCreation {
+  /**
+   * Cette fornction permet de créer une cohorte à partir d'une requete dans le requeteur
+   */
+  createCohort: (
+    requeteurJson?: string,
+    datedMeasureId?: string,
+    snapshotId?: string,
+    requestId?: string,
+    cohortName?: string,
+    cohortDescription?: string,
+    globalCount?: boolean
+  ) => Promise<any>
 
-  if (CONTEXT === 'arkhn') {
-    // const request: Cohort_Creation_API_Response = await api.post('QueryServer/api/count', requeteurJson)
-    // const { data } = request
-    return null
-  } else if (CONTEXT === 'fakedata') {
-    return null
-  } else {
+  /**
+   * Cette fonction permet de récupérer le count d'une requête
+   */
+  countCohort: (requeteurJson?: string, snapshotId?: string, requestId?: string, uuid?: string) => Promise<any>
+
+  /**
+   * Cette fonction permet de créer un état de `snapshot` pour l'historique d'une requête
+   */
+  createSnapshot: (id: string, json: string, firstTime?: boolean) => Promise<any>
+
+  /**
+   * Permet de récupérer toutes les informations utilent pour l'utilisation du requeteur
+   */
+  fetchRequest: (requestId: string, snapshotId?: string) => Promise<any>
+}
+
+const servicesCohortCreation: IServiceCohortCreation = {
+  createCohort: async (
+    requeteurJson,
+    datedMeasureId,
+    snapshotId,
+    requestId,
+    cohortName,
+    cohortDescription,
+    globalCount
+  ) => {
+    if (!requeteurJson || !datedMeasureId || !snapshotId || !requestId) return null
+    if (globalCount === undefined) globalCount = false
+
     const cohortResult = await apiBack.post('/cohort/cohorts/', {
       dated_measure_id: datedMeasureId,
       request_query_snapshot_id: snapshotId,
@@ -32,36 +55,28 @@ export const createCohort = async (
     })
 
     return cohortResult
-  }
-}
+  },
 
-export const countCohort = async (requeteurJson?: string, snapshotId?: string, requestId?: string, uuid?: string) => {
-  if (uuid) {
-    const measureResult = await apiBack.get<any>(`/cohort/dated-measures/${uuid}/`)
+  countCohort: async (requeteurJson?: string, snapshotId?: string, requestId?: string, uuid?: string) => {
+    if (uuid) {
+      const measureResult = await apiBack.get<any>(`/cohort/dated-measures/${uuid}/`)
 
-    return {
-      date: measureResult?.data?.created_at,
-      status: measureResult?.data?.request_job_status,
-      jobFailMsg: measureResult?.data?.request_job_fail_msg,
-      uuid: measureResult?.data?.uuid,
-      includePatient: measureResult?.data?.measure,
-      byrequest: 0,
-      alive: measureResult?.data?.measure_alive,
-      deceased: measureResult?.data?.measure_deceased,
-      female: measureResult?.data?.measure_female,
-      male: measureResult?.data?.measure_male,
-      unknownPatient: measureResult?.data?.measure_unknown
-    }
-  } else {
-    if (!requeteurJson || !snapshotId || !requestId) return null
-
-    if (CONTEXT === 'arkhn') {
-      // const request: Cohort_Count_API_Response = await api.post('QueryServer/api/count', requeteurJson)
-      // const { data } = request
-      return null
-    } else if (CONTEXT === 'fakedata') {
-      return null
+      return {
+        date: measureResult?.data?.created_at,
+        status: measureResult?.data?.request_job_status,
+        jobFailMsg: measureResult?.data?.request_job_fail_msg,
+        uuid: measureResult?.data?.uuid,
+        includePatient: measureResult?.data?.measure,
+        byrequest: 0,
+        alive: measureResult?.data?.measure_alive,
+        deceased: measureResult?.data?.measure_deceased,
+        female: measureResult?.data?.measure_female,
+        male: measureResult?.data?.measure_male,
+        unknownPatient: measureResult?.data?.measure_unknown
+      }
     } else {
+      if (!requeteurJson || !snapshotId || !requestId) return null
+
       const measureResult = await apiBack.post<any>('/cohort/dated-measures/create-unique/', {
         request_query_snapshot_id: snapshotId,
         request_id: requestId
@@ -79,30 +94,18 @@ export const countCohort = async (requeteurJson?: string, snapshotId?: string, r
         male: 0
       }
     }
-  }
-}
+  },
 
-export const createSnapshot = async (id: string, json: string, firstTime?: boolean) => {
-  if (CONTEXT === 'arkhn') {
-    return null
-  } else if (CONTEXT === 'fakedata') {
-    return null
-  } else {
+  createSnapshot: async (id, json, firstTime) => {
     const data = {
       [firstTime ? 'request_id' : 'previous_snapshot_id']: id,
       serialized_query: json
     }
     const request = (await apiBack.post('/cohort/request-query-snapshots/', data)) || {}
     return request && request.data ? request.data : null
-  }
-}
+  },
 
-export const fetchRequest = async (requestId: string, snapshotId: string | undefined) => {
-  if (CONTEXT === 'arkhn') {
-    return null
-  } else if (CONTEXT === 'fakedata') {
-    return null
-  } else {
+  fetchRequest: async (requestId, snapshotId) => {
     const requestResponse = (await apiBack.get<any>(`/cohort/requests/${requestId}/`)) || {}
     const requestData = requestResponse?.data ? requestResponse.data : {}
 
@@ -168,3 +171,5 @@ export const fetchRequest = async (requestId: string, snapshotId: string | undef
     return result
   }
 }
+
+export default servicesCohortCreation

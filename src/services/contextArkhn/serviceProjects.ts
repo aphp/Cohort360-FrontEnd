@@ -1,10 +1,9 @@
 import apiBack from '../apiBackend'
 
 import { fetchGroup } from './callApi'
-
 import { ProjectType, RequestType, Cohort } from 'types'
 
-export interface IServicesProjects {
+export interface IServiceProjects {
   /**
    * Retourne la liste de projet de recherche d'un practitioner
    *
@@ -144,14 +143,14 @@ export interface IServicesProjects {
    * Retourne la liste de Cohort d'un practitioner
    *
    * Argument:
-   *   - limit: Determine une limite de projet demandé
+   *   - limit: Determine une limite de cohorte demandé
    *   - offset: Determine un index de départ
    *
    * Retoune:
-   *   - count: Nombre total de Cohort
-   *   - next: URL d'appel pour récupérer les Cohort suivant
-   *   - previous: URL d'appel pour récupérer les Cohort précédent
-   *   - results: Liste de Cohort récupéré
+   *   - count: Nombre total de cohortes
+   *   - next: URL d'appel pour récupérer les cohortes suivant
+   *   - previous: URL d'appel pour récupérer les cohortes précédent
+   *   - results: Liste de cohortes récupérées
    */
   fetchCohortsList: (
     providerId: string,
@@ -176,7 +175,7 @@ export interface IServicesProjects {
   addCohort: (newCohort: Cohort) => Promise<Cohort>
 
   /**
-   * Cette fonction modifie un cohorte existant
+   * Cette fonction modifie une cohorte existant
    *
    * Argument:
    *   - newProject: Cohorte à modifier
@@ -187,7 +186,7 @@ export interface IServicesProjects {
   editCohort: (editedCohort: Cohort) => Promise<Cohort>
 
   /**
-   * Cette fonction supprime un cohorte existant
+   * Cette fonction supprime une cohorte existant
    *
    * Argument:
    *   - newProject: Cohorte à supprimer
@@ -198,7 +197,7 @@ export interface IServicesProjects {
   deleteCohort: (deletedCohort: Cohort) => Promise<Cohort>
 }
 
-const servicesProjects: IServicesProjects = {
+const servicesProjects: IServiceProjects = {
   fetchProjectsList: async (limit, offset) => {
     let search = `?ordering=created_at`
     if (limit) {
@@ -351,22 +350,17 @@ const servicesProjects: IServicesProjects = {
 
   deleteRequests: async (deletedRequests) => {
     const deleteRequestsResponse = await Promise.all(
-      deletedRequests.map((deletedRequest) =>
-        new Promise((resolve) => {
-          resolve(apiBack.delete(`/cohort/requests/${deletedRequest.uuid}/`))
-        })
-          .then((values) => {
-            return values
-          })
-          .catch((error) => {
-            return error
+      deletedRequests.map(
+        (deletedRequest) =>
+          new Promise((resolve) => {
+            resolve(apiBack.delete(`/cohort/requests/${deletedRequest.uuid}/`))
           })
       )
     )
-    return deleteRequestsResponse && deleteRequestsResponse.length > 0
-      ? // @ts-ignore
-        deleteRequestsResponse.map((deleteRequestResponse) => deleteRequestResponse?.data as RequestType)
-      : []
+
+    // @ts-ignore
+    const checkResponse = deleteRequestsResponse.filter(({ status }) => status === 204)
+    return checkResponse.length === deletedRequests.length ? deletedRequests : []
   },
 
   fetchCohortsList: async (providerId, limit, offset) => {

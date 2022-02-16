@@ -4,7 +4,7 @@ import { BACK_API_URL } from '../../constants'
 
 import { fetchPractitioner, fetchPractitionerRole } from './callApi'
 
-export interface IServicesPractitioner {
+export interface IServicePractitioner {
   /**
    * Fonction qui permet d'authetifier un utilisateur avec un username et un password
    *
@@ -49,7 +49,7 @@ export interface IServicesPractitioner {
   fetchPractitionerRole: (practionerId: string) => Promise<any>
 }
 
-const servicePractitioner: IServicesPractitioner = {
+const servicePractitioner: IServicePractitioner = {
   authenticate: async (username, password) => {
     getCsrfToken(username, password)
     return axios({

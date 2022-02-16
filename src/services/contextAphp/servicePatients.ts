@@ -29,7 +29,7 @@ import {
   fetchMedicationAdministration
 } from './callApi'
 
-export interface IServicesPatients {
+export interface IServicePatients {
   /*
    ** Cette fonction permet de récupérer un nombre de patient totale lié à un utilisateur
    **
@@ -228,7 +228,7 @@ export interface IServicesPatients {
   }>
 }
 
-const servicesPatients: IServicesPatients = {
+const servicesPatients: IServicePatients = {
   fetchPatientsCount: async () => {
     const response = await fetchPatient({ size: 0 })
     if (response?.data?.resourceType === 'OperationOutcome') return 0

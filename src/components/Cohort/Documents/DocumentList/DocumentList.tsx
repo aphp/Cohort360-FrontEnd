@@ -37,7 +37,6 @@ import {
 
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 
-// import { fetchDocumentContent } from 'services/cohortInfos'
 import { getDocumentStatus } from 'utils/documentsFormatter'
 
 import useStyles from './styles'

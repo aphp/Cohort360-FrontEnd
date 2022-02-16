@@ -3,7 +3,7 @@ import apiBack from '../apiBackend'
 import { fetchGroup } from './callApi'
 import { ProjectType, RequestType, Cohort } from 'types'
 
-export interface IServicesProjects {
+export interface IServiceProjects {
   /**
    * Retourne la liste de projet de recherche d'un practitioner
    *
@@ -197,7 +197,7 @@ export interface IServicesProjects {
   deleteCohort: (deletedCohort: Cohort) => Promise<Cohort>
 }
 
-const servicesProjects: IServicesProjects = {
+const servicesProjects: IServiceProjects = {
   fetchProjectsList: async (limit, offset) => {
     let search = `?ordering=created_at`
     if (limit) {
