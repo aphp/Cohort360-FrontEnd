@@ -16,7 +16,8 @@ import {
   IMedicationRequest,
   IMedicationAdministration,
   IEncounter,
-  IComposition
+  IComposition,
+  IObservation
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   fetchPatient,
@@ -26,7 +27,8 @@ import {
   fetchProcedure,
   fetchComposition,
   fetchMedicationRequest,
-  fetchMedicationAdministration
+  fetchMedicationAdministration,
+  fetchObservation
 } from './callApi'
 
 export interface IServicePatients {
@@ -162,6 +164,44 @@ export interface IServicePatients {
   ) => Promise<{
     medicationData?: MedicationEntry<IMedicationAdministration | IMedicationRequest>[]
     medicationTotal?: number
+  }>
+
+  /*
+   ** Cette fonction permet de récupérer les élèments de Observation lié à un patient
+   **
+   ** Arguments:
+   **   - deidentified: permet certaine anonymisation de la donnée
+   **   - sortBy: permet le tri
+   **   - sortDirection: permet le tri dans l'ordre croissant ou décroissant
+   **   - page: permet la pagination des éléments
+   **   - patientId: identifiant technique d'un patient
+   **   - searchInput: permet la recherche textuelle
+   **   - nda: permet de filtrer sur un NDA précis
+   **   - loinc: permet de filtrer sur un code LOINC précis
+   **   - anabio: permet de filtrer sur un code ANABIO précis
+   **   - startDate: (optionnel) permet le filtre par date
+   **   - endDate: (optionnel) permet le filtre par date
+   **   - groupId: (optionnel) Périmètre auquel le patient est lié
+   **
+   ** Retour:
+   **   - biologyList: Liste de 20 éléments de Observation lié à un patient
+   **   - biologyTotal: Nombre d'élément total par rapport au filtre indiqué
+   */
+  fetchObservation: (
+    sortBy: string,
+    sortDirection: string,
+    page: number,
+    patientId: string,
+    searchInput: string,
+    nda: string,
+    loinc: string,
+    anabio: string,
+    startDate?: string | null,
+    endDate?: string | null,
+    groupId?: string
+  ) => Promise<{
+    biologyList: IObservation[]
+    biologyTotal: number
   }>
 
   /*
@@ -462,6 +502,42 @@ const servicesPatients: IServicePatients = {
     const medicationTotal = medicationResp.data.resourceType === 'Bundle' ? medicationResp.data.total : 0
 
     return { medicationData, medicationTotal }
+  },
+
+  fetchObservation: async (
+    sortBy: string,
+    sortDirection: string,
+    page: number,
+    patientId: string,
+    searchInput: string,
+    nda: string,
+    loinc: string,
+    anabio: string,
+    startDate?: string | null,
+    endDate?: string | null,
+    groupId?: string
+  ) => {
+    const observationResp = await fetchObservation({
+      patient: patientId,
+      _list: groupId ? [groupId] : [],
+      _sort: sortBy,
+      sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+      size: 20,
+      offset: page ? (page - 1) * 20 : 0,
+      _text: searchInput,
+      encounter: nda,
+      loinc: loinc,
+      anabio: anabio,
+      minDate: startDate ?? '',
+      maxDate: endDate ?? ''
+    })
+
+    const biologyTotal = observationResp.data.resourceType === 'Bundle' ? observationResp.data.total : 0
+
+    return {
+      biologyList: getApiResponseResources(observationResp) ?? [],
+      biologyTotal: biologyTotal ?? 0
+    }
   },
 
   fetchDocuments: async (
