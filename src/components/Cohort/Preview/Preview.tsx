@@ -231,9 +231,9 @@ const Preview: React.FC<PreviewProps> = ({
           </Grid>
 
           <Grid container item xs={12} sm={6} lg={4} justify="center">
-            <Paper id="visite-type-repartition-card" className={classes.chartOverlay}>
+            <Paper id="visit-type-repartition-card" className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
-                <Typography id="visite-type-repartition-card-title" variant="h3" color="primary">
+                <Typography id="visit-type-repartition-card-title" variant="h3" color="primary">
                   Répartition par type de visite
                 </Typography>
               </Grid>
@@ -268,9 +268,9 @@ const Preview: React.FC<PreviewProps> = ({
 
           <Grid container item md={12} lg={6} justify="center">
             <Grid container item justify="center">
-              <Paper className={classes.chartOverlay}>
+              <Paper id="age-structure-card" className={classes.chartOverlay}>
                 <Grid container item className={classes.chartTitle}>
-                  <Typography variant="h3" color="primary">
+                  <Typography id="age-structure-card-title" variant="h3" color="primary">
                     Pyramide des âges
                   </Typography>
                 </Grid>
@@ -288,9 +288,9 @@ const Preview: React.FC<PreviewProps> = ({
 
           <Grid container item md={12} lg={6} justify="center">
             <Grid container item justify="center">
-              <Paper className={classes.chartOverlay}>
+              <Paper id="month-repartition-visit-card" className={classes.chartOverlay}>
                 <Grid container item className={classes.chartTitle}>
-                  <Typography variant="h3" color="primary">
+                  <Typography id="month-repartition-visit-card-title" variant="h3" color="primary">
                     Répartition des visites par mois
                   </Typography>
                 </Grid>

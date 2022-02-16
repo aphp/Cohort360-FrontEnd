@@ -140,7 +140,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
 
   return (
     <div style={{ display: 'flex' }}>
-      <svg ref={node}></svg>
+      <svg id="month-repartition-visit-card-svg" ref={node}></svg>
       <div style={{ display: 'flex' }} dangerouslySetInnerHTML={{ __html: legendHtml }} />
     </div>
   )
