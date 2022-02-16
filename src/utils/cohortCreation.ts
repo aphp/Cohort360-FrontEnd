@@ -142,7 +142,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
   const filterReducer = (accumulator: any, currentValue: any) =>
     accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
   const searchReducer = (accumulator: any, currentValue: any) =>
-    accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
+    accumulator || accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 
   switch (criterion.type) {
     case RESSOURCE_TYPE_PATIENT: {
