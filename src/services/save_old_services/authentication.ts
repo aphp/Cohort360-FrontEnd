@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios'
 
 import { v4 as uuid } from 'uuid'
 import { STATE_STORAGE_KEY, BACK_API_URL } from '../../constants'
-import { authClient } from '../arkhnAuth/oauth/authClient'
+import { authClient } from '../contextArkhn/oauth/authClient'
 
 export const authenticate = async (username: string, password: string): Promise<any> => {
   getCsrfToken(username, password)

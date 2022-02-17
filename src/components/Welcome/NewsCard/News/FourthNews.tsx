@@ -10,15 +10,15 @@ const FirstNews = () => {
       </Typography>
 
       <Typography color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
-        • La biologie est disponible dans le requêteur et la fiche patient. Attention, pour l'instant, la biologie est
-        restreinte aux 3000 codes ANABIO les plus utilisés.
+        • Les résultats de biologie sont disponibles dans le requêteur et la fiche patient. Attention, pour l'instant,
+        la biologie est restreinte aux 3000 codes ANABIO les plus utilisés.
       </Typography>
       <Typography color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
-        • L'unité exécutrice dans la fiche patient affiche maintenant les Unité Fonctionnelles dans lesquels les
+        • L'unité exécutrice dans la fiche patient affiche maintenant les Unités Fonctionnelles dans lesquelles les
         patients ont réalisé un séjour.
       </Typography>
       <Typography color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
-        • Il est maintenant possible de filtrer par IPP les documents du patient
+        • Il est maintenant possible de filtrer les documents des patients par IPP
       </Typography>
 
       <Typography color="textSecondary" style={{ paddingTop: 6 }}>

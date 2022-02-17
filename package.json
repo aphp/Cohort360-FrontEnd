@@ -52,7 +52,7 @@
   "scripts": {
     "fix-packages": "npx npm-force-resolutions",
     "start": "react-scripts start",
-    "build": "react-scripts --max-old-space-size=7168 build",
+    "build": "react-scripts build",
     "lint": "eslint --ext .jsx,.js,.ts,.tsx src/",
     "test": "wdio wdio.conf.js --suite Generics --suite HomePage --suite MyPatients --suite Requests",
     "start:aphp": "env $(cat .env.aphp) react-scripts start",
