@@ -30,6 +30,7 @@ import BiologyFilters from 'components/Filters/BiologyFilters/BiologyFilters'
 
 import { fetchBiology } from 'state/patient'
 import { useAppSelector } from 'state'
+import { CohortObservation } from 'types'
 
 import useStyles from './styles'
 
@@ -293,7 +294,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
             <TableBody>
               {patient?.biology?.list && patient?.biology?.list.length > 0 ? (
                 <>
-                  {patient?.biology?.list.map((row) => {
+                  {patient?.biology?.list.map((row: CohortObservation) => {
                     const nda = row.NDA
                     const date = row.effectiveDateTime
                     const libelleANABIO = row.code?.coding?.find((code: any) => code.id === 'CODE ANABIO')?.display
