@@ -55,7 +55,6 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
   const [open, setOpen] = useState(false)
-  const [showFilterChip, setShowFilterChip] = useState(false)
 
   const [filters, setFilters] = useState<CohortFilters>({
     status: [],
@@ -84,6 +83,49 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
       cohortsList = cohortsList.filter(({ name }) => name?.search(regexp) !== -1)
     }
 
+    if (filters.minPatients) {
+      cohortsList = cohortsList.filter(({ result_size }) => (result_size ?? 0) >= parseInt(filters.minPatients ?? '0'))
+    }
+    if (filters.maxPatients) {
+      cohortsList = cohortsList.filter(({ result_size }) => (result_size ?? 0) <= parseInt(filters.maxPatients ?? '0'))
+    }
+
+    if (filters.type && filters.type !== 'all') {
+      cohortsList = cohortsList.filter(({ type }) =>
+        filters.type === 'IMPORT_I2B2' ? type !== 'MY_COHORTS' : type === 'MY_COHORTS'
+      )
+    }
+
+    if (filters.favorite && filters.favorite !== 'all') {
+      cohortsList = cohortsList.filter(({ favorite }) =>
+        filters.favorite === 'True' ? favorite === true : favorite === false
+      )
+    }
+
+    if (filters.startDate || filters.endDate) {
+      cohortsList = cohortsList.filter(({ modified_at }) =>
+        filters.startDate && filters.endDate
+          ? // Filtrer les deux
+            moment(modified_at).isAfter(moment(filters.startDate)) &&
+            moment(modified_at).isBefore(moment(filters.endDate))
+          : filters.startDate
+          ? // Filtrer par rapport à startDate
+            moment(modified_at).isAfter(moment(filters.startDate))
+          : // Filtrer par rapport à endDate
+            moment(modified_at).isBefore(moment(filters.endDate))
+      )
+    }
+
+    if (filters.status && filters.status.length > 0) {
+      cohortsList = cohortsList.filter(({ request_job_status }) =>
+        filters.status.find((status) => {
+          return status.code === 'pending,started'
+            ? request_job_status === 'pending' || request_job_status === 'started'
+            : request_job_status === status.code
+        })
+      )
+    }
+
     const sortedCohortsList = stableSort(cohortsList, getComparator(sortDirection, sortBy))
     setResearches(sortedCohortsList)
   }
@@ -98,11 +140,6 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
 
   const handleChangePage = async (event?: React.ChangeEvent<unknown>, value = 1) => {
     setPage(value)
-  }
-
-  const handleCloseDialog = (submit: boolean) => () => {
-    setOpen(false)
-    submit && setShowFilterChip(true)
   }
 
   const handleChangeInput = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -202,8 +239,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
         </div>
       </Grid>
       <Grid>
-        {showFilterChip &&
-          filters.status &&
+        {filters.status &&
           filters.status.length > 0 &&
           filters.status.map((status: ValueSet) => (
             <Chip
@@ -215,7 +251,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
               variant="outlined"
             />
           ))}
-        {showFilterChip && filters.type && filters.type !== 'all' && (
+        {filters.type && filters.type !== 'all' && (
           <Chip
             className={classes.chips}
             label={filters.type === 'IMPORT_I2B2' ? 'Cohorte I2B2' : 'Cohorte Cohort360'}
@@ -224,7 +260,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
             variant="outlined"
           />
         )}
-        {showFilterChip && filters.minPatients && (
+        {filters.minPatients && (
           <Chip
             className={classes.chips}
             label={`Au moins ${filters.minPatients} patients`}
@@ -233,7 +269,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
             variant="outlined"
           />
         )}
-        {showFilterChip && filters.maxPatients && (
+        {filters.maxPatients && (
           <Chip
             className={classes.chips}
             label={`Jusque ${filters.maxPatients} patients`}
@@ -242,7 +278,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
             variant="outlined"
           />
         )}
-        {showFilterChip && filters.startDate && (
+        {filters.startDate && (
           <Chip
             className={classes.chips}
             label={`Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}`}
@@ -251,7 +287,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
             variant="outlined"
           />
         )}
-        {showFilterChip && filters.endDate && (
+        {filters.endDate && (
           <Chip
             className={classes.chips}
             label={`Avant le : ${moment(filters.endDate).format('DD/MM/YYYY')}`}
@@ -260,7 +296,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
             variant="outlined"
           />
         )}
-        {showFilterChip && filters.favorite && filters.favorite !== 'all' && (
+        {filters.favorite && filters.favorite !== 'all' && (
           <Chip
             className={classes.chips}
             label={filters.favorite === 'True' ? 'Cohortes favories' : 'Cohortes non favories'}
@@ -293,10 +329,11 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
         onChange={handleChangePage}
         page={page}
       />
+
       <CohortsFilter
         open={open}
-        onClose={handleCloseDialog(false)}
-        onSubmit={handleCloseDialog(true)}
+        onClose={() => setOpen(false)}
+        onSubmit={() => setOpen(false)}
         filters={filters}
         onChangeFilters={setFilters}
       />
