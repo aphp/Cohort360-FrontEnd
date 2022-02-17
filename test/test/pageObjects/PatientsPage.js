@@ -12,14 +12,9 @@ module.exports = class PatientsPage extends Page {
 
     get previewTab () { return  $('a.MuiButtonBase-root:nth-child(1)') }
 
-    /*get access () { 
-        PatientContextBar.accessValue.waitUntil(() => PatientContextBar.accessValue.getText() != PatientContextBar.defaultAccessValue) 
-        return PatientContextBar.accessValue
-    }*/
-
     async access () {
-        // await PatientContextBar.accessValue().waitUntil(() => PatientContextBar.accessValue.getText() != PatientContextBar.defaultAccessValue) 
-        return PatientContextBar.accessValue()
+        await PatientContextBar.accessValue() != PatientContextBar.defaultAccessValue
+        return await PatientContextBar.accessValue()
     }
 
     // Bloc "Nombre de Patients"

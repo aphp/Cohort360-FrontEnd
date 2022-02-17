@@ -8,20 +8,21 @@ describe('Cohort360 - SCP02 - Page "Mes patients"', () => {
 	// ------------------------------
 	it('Accès à la page "Tous mes patients" (authentification)', async () => {
 
-    Logger.log('Accès à la page "Tous mes patients"')
-    await MyPatientsPage.login()
-	  expect(await browser.getUrl()).withContext('@ L\'URL de la page "Tous mes patients" doit être : ' + MyPatientsPage.getUrl()).toBe(MyPatientsPage.getUrl())
+    	Logger.log('Accès à la page "Tous mes patients"')
+    	await MyPatientsPage.login()
+		expect(await browser.getUrl()).withContext('@ L\'URL de la page "Tous mes patients" doit être : ' + MyPatientsPage.getUrl()).toBe(MyPatientsPage.getUrl())
 
-	// Logger.log(PatientContextBar.accessLibValue + ' ' + await MyPatientsPage.access())
-	// expect(MyPatientsPage.access()).withContext('@ ' + PatientContextBar.accessLibValue + ' ' + MyPatientsPage.access).not.toBe(PatientContextBar.defaultAccessValue)
+		Logger.log(PatientContextBar.accessLibValue + ' ' + await MyPatientsPage.access())
+		expect(await MyPatientsPage.access()).withContext('@ ' + PatientContextBar.accessLibValue + ' ' + await MyPatientsPage.access()).not.toBe(PatientContextBar.defaultAccessValue)
 
-	// Logger.log('L\'onglet "Aperçu" est actif')
-	// expect(await MyPatientsPage.previewTab.getAttribute('aria-selected')).withContext('@ L\'onglet "Aperçu" est actif').toBe('true')
+		Logger.log('L\'onglet "Aperçu" est actif')
+		expect(await MyPatientsPage.previewTab.getAttribute('aria-selected')).withContext('@ L\'onglet "Aperçu" est actif').toBe('true')
 	})
 
 	// Bloc "Nombre de patients"
 	// -------------------------
 	it('Bloc "Nombre de patients"', async () => {
+
 		Logger.log('Le bloc "Nombre de patients" est affiché')
 		expect(await MyPatientsPage.nbPatientsBlock.block.waitForDisplayed()).withContext('@ Le bloc "Nombre de patients" est affiché').toBe(true)
 
@@ -35,6 +36,7 @@ describe('Cohort360 - SCP02 - Page "Mes patients"', () => {
 	// Bloc "Statut vital"
 	// -------------------
 	it('Bloc "Statut vital"', async () => {
+
 		Logger.log('Le bloc "Statut vital" est affiché')
 		expect(await MyPatientsPage.vitalStatusBlock.block.waitForDisplayed()).withContext('@ Le bloc "Statut vital" est affiché').toBe(true)
 
@@ -54,6 +56,7 @@ describe('Cohort360 - SCP02 - Page "Mes patients"', () => {
 	// Bloc "Répartition par statut vital"
 	// -----------------------------------
 	it('Bloc "Répartition par statut vital"', async () => {
+
 		Logger.log('Le bloc "Répartition par statut vital" est affiché')
 		expect(await MyPatientsPage.vitalStatusDistribBlock.block.waitForDisplayed()).withContext('@ Le bloc "Répartition par statut vital" est affiché').toBe(true)
 
@@ -67,6 +70,7 @@ describe('Cohort360 - SCP02 - Page "Mes patients"', () => {
 	// Bloc "Répartition par type de visite"
 	// -----------------------------------
 	it('Bloc "Répartition par type de visite"', async () => {
+
 		Logger.log('Le bloc "Répartition par type de visite" est affiché')
 		expect(await MyPatientsPage.visitTypeDistribBlock.block.waitForDisplayed()).withContext('@ Le bloc "Répartition par type de visite" est affiché').toBe(true)
 
@@ -80,6 +84,7 @@ describe('Cohort360 - SCP02 - Page "Mes patients"', () => {
 	// Bloc "Répartition par genre"
 	// ----------------------------
 	it('Bloc "Répartition par genre"', async () => {
+
 		Logger.log('Le bloc "Répartition par genre" est affiché')
 		expect(await MyPatientsPage.genderDistribBlock.block.waitForDisplayed()).withContext('@ Le bloc "Répartition par genre" est affiché').toBe(true)
 
@@ -90,37 +95,40 @@ describe('Cohort360 - SCP02 - Page "Mes patients"', () => {
 		expect(await MyPatientsPage.genderDistribBlock.graph.waitForDisplayed()).withContext('@ Le graphique est affiché').toBe(true)
 	})
 
-	// // Bloc "Pyramide des âges"
-	// // ------------------------
-	// it('Bloc "Pyramide des âges"', () => {
-	// 	Logger.log('Le bloc "Pyramide des âges" est affiché')
-	// 	expect(MyPatientsPage.ageStructureBlock.block.waitForDisplayed()).withContext('@ Le bloc "Pyramide des âges" est affiché').toBe(true)
+	// Bloc "Pyramide des âges"
+	// ------------------------
+	it('Bloc "Pyramide des âges"', async () => {
 
-	// 	Logger.log('Le tire du bloc doit être "' + MyPatientsPage.ageStructureBlock.titleValue + '"')
-	// 	expect(MyPatientsPage.ageStructureBlock.title.getText()).withContext('@ Le tire du bloc doit être "' + MyPatientsPage.ageStructureBlock.titleValue + '"').toBe(MyPatientsPage.ageStructureBlock.titleValue)
+		Logger.log('Le bloc "Pyramide des âges" est affiché')
+		expect(await MyPatientsPage.ageStructureBlock.block.waitForDisplayed()).withContext('@ Le bloc "Pyramide des âges" est affiché').toBe(true)
 
-	// 	Logger.log('Le graphique est affiché')
-	// 	expect(MyPatientsPage.ageStructureBlock.graph.waitForDisplayed()).withContext('@ Le graphique est affiché').toBe(true)
-	// })
+		Logger.log('Le tire du bloc doit être "' + MyPatientsPage.ageStructureBlock.titleValue + '"')
+		expect(await MyPatientsPage.ageStructureBlock.title.getText()).withContext('@ Le tire du bloc doit être "' + MyPatientsPage.ageStructureBlock.titleValue + '"').toBe(MyPatientsPage.ageStructureBlock.titleValue)
 
-	// // Bloc "Répartition des visites par mois"
-	// // ---------------------------------------
-	// it('Bloc "Répartition des visites par mois"', () => {
-	// 	Logger.log('Le bloc "Répartition des visites par mois" est affiché')
-	// 	expect(MyPatientsPage.visitsPerMonthDistribBlock.block.waitForDisplayed()).withContext('@ Le bloc "Répartition des visites par mois" est affiché').toBe(true)
+		Logger.log('Le graphique est affiché')
+		expect(await MyPatientsPage.ageStructureBlock.graph.waitForDisplayed()).withContext('@ Le graphique est affiché').toBe(true)
+	})
 
-	// 	Logger.log('Le tire du bloc doit être "' + MyPatientsPage.visitsPerMonthDistribBlock.titleValue + '"')
-	// 	expect(MyPatientsPage.visitsPerMonthDistribBlock.title.getText()).withContext('@ Le tire du bloc doit être "' + MyPatientsPage.visitsPerMonthDistribBlock.titleValue + '"').toBe(MyPatientsPage.visitsPerMonthDistribBlock.titleValue)
+	// Bloc "Répartition des visites par mois"
+	// ---------------------------------------
+	it('Bloc "Répartition des visites par mois"', async () => {
 
-	// 	Logger.log('Le graphique est affiché')
-	// 	expect(MyPatientsPage.visitsPerMonthDistribBlock.graph.waitForDisplayed()).withContext('@ Le graphique est affiché').toBe(true)
-	// })
+		Logger.log('Le bloc "Répartition des visites par mois" est affiché')
+		expect(await MyPatientsPage.visitsPerMonthDistribBlock.block.waitForDisplayed()).withContext('@ Le bloc "Répartition des visites par mois" est affiché').toBe(true)
+
+		Logger.log('Le tire du bloc doit être "' + MyPatientsPage.visitsPerMonthDistribBlock.titleValue + '"')
+		expect(await MyPatientsPage.visitsPerMonthDistribBlock.title.getText()).withContext('@ Le tire du bloc doit être "' + MyPatientsPage.visitsPerMonthDistribBlock.titleValue + '"').toBe(MyPatientsPage.visitsPerMonthDistribBlock.titleValue)
+
+		Logger.log('Le graphique est affiché')
+		expect(await MyPatientsPage.visitsPerMonthDistribBlock.graph.waitForDisplayed()).withContext('@ Le graphique est affiché').toBe(true)
+	})
 
     // Déconnexion
 	// -----------
-	it('Déconnexion', () => {
+	it('Déconnexion', async () => {
+
 		Logger.log('Déconnexion')
-		MyPatientsPage.logout()
+		await MyPatientsPage.logout()
 	})
 	
 })

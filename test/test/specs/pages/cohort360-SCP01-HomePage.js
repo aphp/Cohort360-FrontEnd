@@ -130,8 +130,8 @@ describe("Cohort360 - SCP01 - Page d'accueil", () => {
 
   // Déconnexion
   // -----------
-  it('Déconnexion', () => {
+  it('Déconnexion', async () => {
     Logger.log('Déconnexion')
-    HomePage.logout()
+    await HomePage.logout()
   })
 })
