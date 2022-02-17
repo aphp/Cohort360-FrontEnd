@@ -15,6 +15,7 @@ import PatientSidebar from 'components/Patient/PatientSidebar/PatientSidebar'
 import PatientTimeline from 'components/Patient/PatientTimeline/PatientTimeline'
 import PatientPMSI from 'components/Patient/PatientPMSI/PatientPMSI'
 import PatientMedication from 'components/Patient/PatientMedication/PatientMedication'
+import PatientBiology from 'components/Patient/PatientBiology/PatientBiology'
 import TopBar from 'components/TopBar/TopBar'
 
 import { useAppSelector } from 'state'
@@ -29,7 +30,8 @@ import { fetchPatientInfo } from 'state/patient'
 //   IProcedure,
 //   IDocumentReference,
 //   IMedicationRequest,
-//   IMedicationAdministration
+//   IMedicationAdministration,
+//   IObservation
 // } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import clsx from 'clsx'
@@ -150,6 +152,13 @@ const Patient = () => {
               component={Link}
               to={`/patients/${patientId}/medication${groupId ? `?groupId=${groupId}` : ''}`}
             />
+            <Tab
+              className={classes.tabTitle}
+              label="Biologie"
+              value="biology"
+              component={Link}
+              to={`/patients/${patientId}/biology${groupId ? `?groupId=${groupId}` : ''}`}
+            />
           </Tabs>
         </Grid>
         <Grid className={classes.tabContainer}>
@@ -169,6 +178,7 @@ const Patient = () => {
           {selectedTab === 'documents-cliniques' && <PatientDocs groupId={groupId} />}
           {selectedTab === 'pmsi' && <PatientPMSI groupId={groupId} />}
           {selectedTab === 'medication' && <PatientMedication groupId={groupId} />}
+          {selectedTab === 'biology' && <PatientBiology groupId={groupId} />}
         </Grid>
 
         <PatientSidebar
