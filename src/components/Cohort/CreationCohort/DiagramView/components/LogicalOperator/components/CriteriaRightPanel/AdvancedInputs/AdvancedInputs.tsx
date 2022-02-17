@@ -9,7 +9,7 @@ import OccurrencesInputs from './OccurrencesInputs/OccurrencesInputs'
 import VisitInputs from './VisitInputs/VisitInputs'
 
 type AdvancedInputsProps = {
-  form: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication'
+  form: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication' | 'biology'
   selectedCriteria: any
   onChangeValue: (key: string, value: any) => void
 }

@@ -37,16 +37,17 @@ services
 
 ### Différentes API:
 
-Au départ du dossier de services, vous trouverez 4 fichier TypeScript `apiBackend.ts`, `apiFhir.ts`, `apiPortail.ts`, `apiRequest.ts`.
+Au départ du dossier de services, vous trouverez 4 fichiers TypeScript `apiBackend.ts`, `apiFhir.ts`, `apiPortail.ts`, `apiRequest.ts`.
 Ces fichiers servent à faire le lien avec différents services et à régler les `Headers` et créer des `Interceptors`.
 
 | Fichier       | Fonctionnalités                                                                                           | Variable d'environnement lié à l'URL |
 | ------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| apiBackend.ts | Permet le liens avec `cohort-back`                                                                        | `BACK_API_URL`                       |
-| apiFhir.ts    | Permet le liens avec `FHIR`                                                                               | `FHIR_API_URL`                       |
-| apiRequest.ts | Permet le liens avec `FHIR` (uniquement pour les `ValueSet` présent dans la partie `Création de requête`) | `REQUEST_API_URL`                    |
+| apiBackend.ts | Permet le lien avec `cohort-back`                                                                         | `BACK_API_URL`                       |
+| apiFhir.ts    | Permet le lien avec `FHIR`                                                                                | `FHIR_API_URL`                       |
+| apiPortail.ts | Permet le lien avec `portail-back`                                                                        | `PORTAIL_API_URL`                    |
+| apiRequest.ts | Permet le lien avec `FHIR` (uniquement pour les `ValueSet` présents dans la partie `Création de requête`) | `REQUEST_API_URL`                    |
 
-### Point d'entré :
+### Point d'entrée :
 
 À la racine du dossier `services`, vous trouverez le fichier `index.ts` qui va vous permettre de créer votre propre `context`, de la même manière suivante :
 
@@ -70,7 +71,7 @@ switch (CONTEXT) {
 export default services
 ```
 
-De la même manière que le service `servicesAphp`, vous devrez créer votre propre dossier `context...` qui contiendra l'ensemble des fonctions liés à la récupération de vos données et le lié au `switch/case` à la variable d’environement `CONTEXT`
+De la même manière que le service `servicesAphp`, vous devrez créer votre propre dossier `context...` qui contiendra l'ensemble des fonctions liées à la récupération de vos données et le lier au `switch/case` à la variable d’environnement `CONTEXT`
 
 > Pour le moment, toutes les fonctions sont obligatoires et aucune protection n'est effectuée. Nous vous conseillons donc de dupliquer le dossier `contextAphp` et de l'adapter à vos besoin.
 
@@ -81,7 +82,7 @@ Nous trouvons donc :
 
 ##### index.ts
 
-Dans ce fichier, nous allons définir un objets `service...` qui contiendra les propriétés `cohorts`, `contact`, `patients`, `perimeters`, `practitioner` et `projects`. Chacune de ces propriétés contiendra une multitude de fonctions.
+Dans ce fichier, nous allons définir un objet `service...` qui contiendra les propriétés `cohorts`, `contact`, `patients`, `perimeters`, `practitioner` et `projects`. Chacune de ces propriétés contiendra une multitude de fonctions.
 
 ```ts
 // Liste d'import de l'interface + type de l'interface
@@ -133,7 +134,7 @@ export default service...
 
 ##### callApi.ts
 
-Pour un soucis de clarté dans le code, nous avons créé ce fichier `callApi.ts` qui nous permet d'avoir un ensemble de fonction permettant le lien avec FHIR. Les fonctions présentent sont les suivantes :
+Pour un soucis de clarté dans le code, nous avons créé ce fichier `callApi.ts` qui nous permet d'avoir un ensemble de fonction permettant le lien avec FHIR. Les fonctions présentes sont les suivantes :
 
 - fetchOrganization
 - fetchGroup
@@ -149,277 +150,199 @@ Pour un soucis de clarté dans le code, nous avons créé ce fichier `callApi.ts
 - fetchCondition
 - fetchMedicationRequest
 - fetchMedicationAdministration
+- fetchObservation
 
 > Ce fichier n'est pas obligatoire, dans votre service, vous pouvez très bien utiliser une autre méthode pour vos appels à votre FHIR.
 
 ##### servicePatients.ts
 
-> Pour l'ensemble des fonctions définie dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définie dans un premier temps pour éviter tous problèmes de typage.
+> Pour l'ensemble des fonctions définies dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définis dans un premier temps pour éviter tous problèmes de typage.
 
-Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à un patient, et définie l'interface suivante :
+Ce fichier définit l'ensemble des fonctions liées à la récupération de données liées à un patient, et définit l'interface suivante :
 
 ```ts
-export  interface  IServicePatients {
-	fetchPatientsCount: () =>  Promise<
-		number
-	>
+export interface IServicePatients {
+  fetchPatientsCount: () => Promise<number>
 
-	fetchMyPatients: () =>  Promise<
-		CohortData | undefined
-	>
+  fetchMyPatients: () => Promise<CohortData | undefined>
 
-	fetchPatient: (
-		patientId: string,
-		groupId?: string
-	) =>  Promise<
-		PatientData | undefined
-	>
+  fetchPatient: (patientId: string, groupId?: string) => Promise<PatientData | undefined>
 
-	fetchPMSI: (
-		deidentified: boolean,
-		page: number,
-		patientId: string,
-		selectedTab: 'CIM10' | 'CCAM' | 'GHM',
-		searchInput: string,
-		nda: string,
-		code: string,
-		diagnosticTypes: string[],
-		sortBy: string,
-		sortDirection: string,
-		groupId?: string,
-		startDate?: string | null,
-		endDate?: string | null
-	) =>  Promise<{
-		pmsiData?: PMSIEntry<IClaim | ICondition | IProcedure>[]
-		pmsiTotal?: number
-	}>
+  fetchPMSI: (
+    deidentified: boolean,
+    page: number,
+    patientId: string,
+    selectedTab: 'CIM10' | 'CCAM' | 'GHM',
+    searchInput: string,
+    nda: string,
+    code: string,
+    diagnosticTypes: string[],
+    sortBy: string,
+    sortDirection: string,
+    groupId?: string,
+    startDate?: string | null,
+    endDate?: string | null
+  ) => Promise<{
+    pmsiData?: PMSIEntry<IClaim | ICondition | IProcedure>[]
+    pmsiTotal?: number
+  }>
 
-	fetchMedication: (
-		deidentified: boolean,
-		page: number,
-		patientId: string,
-		selectedTab: 'prescription' | 'administration',
-		searchInput: string,
-		nda: string,
-		sortBy: string,
-		sortDirection: string,
-		groupId?: string,
-		startDate?: string | null,
-		endDate?: string | null
-	) =>  Promise<{
-		medicationData?: MedicationEntry<IMedicationAdministration | IMedicationRequest>[]
-		medicationTotal?: number
-    }>
+  fetchMedication: (
+    deidentified: boolean,
+    page: number,
+    patientId: string,
+    selectedTab: 'prescription' | 'administration',
+    searchInput: string,
+    nda: string,
+    sortBy: string,
+    sortDirection: string,
+    groupId?: string,
+    startDate?: string | null,
+    endDate?: string | null
+  ) => Promise<{
+    medicationData?: MedicationEntry<IMedicationAdministration | IMedicationRequest>[]
+    medicationTotal?: number
+  }>
 
-	fetchDocuments: (
-		deidentified: boolean,
-		sortBy: string,
-		sortDirection: string,
-		page: number,
-		patientId: string,
-		searchInput: string,
-		selectedDocTypes: string[],
-		nda: string,
-		startDate?: string | null,
-		endDate?: string | null,
-		groupId?: string
-	) =>  Promise<{
-		docsList: CohortComposition[]
-		docsTotal: number
-	}>
+  fetchDocuments: (
+    deidentified: boolean,
+    sortBy: string,
+    sortDirection: string,
+    page: number,
+    patientId: string,
+    searchInput: string,
+    selectedDocTypes: string[],
+    nda: string,
+    startDate?: string | null,
+    endDate?: string | null,
+    groupId?: string
+  ) => Promise<{
+    docsList: CohortComposition[]
+    docsTotal: number
+  }>
 
-	searchPatient: (
-		nominativeGroupsIds: string[] | undefined,
-		page: number,
-		sortBy: string,
-		sortDirection: string,
-		input: string,
-		searchBy: SearchByTypes
-	) =>  Promise<{
-		patientList: IPatient[]
-		totalPatients: number
-	}>
+  searchPatient: (
+    nominativeGroupsIds: string[] | undefined,
+    page: number,
+    sortBy: string,
+    sortDirection: string,
+    input: string,
+    searchBy: SearchByTypes
+  ) => Promise<{
+    patientList: IPatient[]
+    totalPatients: number
+  }>
 }
 ```
 
 ##### servicePerimeters.ts
 
-> Pour l'ensemble des fonctions définie dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définie dans un premier temps pour éviter tous problèmes de typage.
+> Pour l'ensemble des fonctions définies dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définis dans un premier temps pour éviter tous problèmes de typage.
 
-Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à un périmètre, et définie l'interface suivante :
+Ce fichier définit l'ensemble des fonction lié à la récupération de données liées à un périmètre, et définit l'interface suivante :
 
 ```ts
-export  interface  IServicePerimeters {
-	fetchPerimetersInfos: (
-		perimetersId: string
-	) =>  Promise<
-		CohortData | undefined
-	>
+export interface IServicePerimeters {
+  fetchPerimetersInfos: (perimetersId: string) => Promise<CohortData | undefined>
 
-	fetchPerimeterInfoForRequeteur: (
-		perimeterId: string
-	) =>  Promise<
-		ScopeTreeRow | undefined
-	>
+  fetchPerimeterInfoForRequeteur: (perimeterId: string) => Promise<ScopeTreeRow | undefined>
 
-	getPerimeters: (
-		practitionerId: string
-	) =>  Promise<
-		IOrganization[]
-	>
+  getPerimeters: (practitionerId: string) => Promise<IOrganization[]>
 
-	getScopePerimeters: (
-		practitionerId: string
-	) =>  Promise<
-		ScopeTreeRow[]
-	>
+  getScopePerimeters: (practitionerId: string) => Promise<ScopeTreeRow[]>
 
-	getScopeSubItems: (
-		perimeter: ScopeTreeRow | null,
-		getSubItem?: boolean
-	) =>  Promise<
-		ScopeTreeRow[]
-	>
+  getScopeSubItems: (perimeter: ScopeTreeRow | null, getSubItem?: boolean) => Promise<ScopeTreeRow[]>
 
-	fetchDeidentified: (
-		practitionerId: string
-	) =>  Promise<{
-		deidentification: boolean;
-		nominativeGroupsIds: any[]
-	}>
+  fetchDeidentified: (practitionerId: string) => Promise<{
+    deidentification: boolean
+    nominativeGroupsIds: any[]
+  }>
 }
 ```
 
 ##### servicePractitioner.ts
 
-> Pour l'ensemble des fonctions définie dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définie dans un premier temps pour éviter tous problèmes de typage.
+> Pour l'ensemble des fonctions définies dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définis dans un premier temps pour éviter tous problèmes de typage.
 
-Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à un practitioner (utilisateur de cohort360), et définie l'interface suivante :
+Ce fichier définit l'ensemble des fonction liées à la récupération de données liées à un practitioner (utilisateur de cohort360), et définit l'interface suivante :
 
 ```ts
-export  interface  IServicePractitioner {
-	authenticate: (
-		username: string,
-		password: string
-	) =>  Promise<any>
+export interface IServicePractitioner {
+  authenticate: (username: string, password: string) => Promise<any>
 
-	fetchPractitioner: (
-		username: string
-	) =>  Promise<{
-		id: number
-		userName: number
-		displayName: string
-		firstName: string
-		lastName: string
-	} | null>
+  fetchPractitioner: (username: string) => Promise<{
+    id: number
+    userName: number
+    displayName: string
+    firstName: string
+    lastName: string
+  } | null>
 
-	fetchPractitionerRole: (
-		practionerId: string
-	) =>  Promise<any>
+  fetchPractitionerRole: (practionerId: string) => Promise<any>
 }
 ```
 
 ##### serviceProjects.ts
 
-> ⚠️ Cette interface est lié au back-end de Cohort360 et non à FHIR comme le reste des interfaces.
+> ⚠️ Cette interface est liée au back-end de Cohort360 et non à FHIR comme le reste des interfaces.
 
-> Pour l'ensemble des fonctions définie dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définie dans un premier temps pour éviter tous problèmes de typage.
+> Pour l'ensemble des fonctions définies dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définis dans un premier temps pour éviter tous problèmes de typage.
 
-Ce fichier définie l'ensemble des fonctions lié à la récupération de donnée lié aux projets de recherche, aux requêtes, et aux cohortes, et définie l'interface suivante :
+Ce fichier définit l'ensemble des fonctions liées à la récupération de donnéees liées aux projets de recherche, aux requêtes, et aux cohortes, et définit l'interface suivante :
 
 ```ts
-export  interface  IServiceProjects {
-	fetchProjectsList: (
-		limit?: number,
-		offset?: number
-	) =>  Promise<{
-		count: number
-		next: string | null
-		previous: string | null
-		results: ProjectType[]
-	}>
-	addProject: (
-		newProject: ProjectType
-	) =>  Promise<
-		ProjectType
-	>
-	editProject: (
-		editedProject: ProjectType
-	) =>  Promise<
-		ProjectType
-	>
-	deleteProject: (
-		deletedProject: ProjectType
-	) =>  Promise<
-		ProjectType
-	>
+export interface IServiceProjects {
+  fetchProjectsList: (
+    limit?: number,
+    offset?: number
+  ) => Promise<{
+    count: number
+    next: string | null
+    previous: string | null
+    results: ProjectType[]
+  }>
+  addProject: (newProject: ProjectType) => Promise<ProjectType>
+  editProject: (editedProject: ProjectType) => Promise<ProjectType>
+  deleteProject: (deletedProject: ProjectType) => Promise<ProjectType>
 
-	fetchRequestsList: (
-		limit?: number,
-		offset?: number
-	) =>  Promise<{
-		count: number
-		next: string | null
-		previous: string | null
-		results: RequestType[]
-	}>
-	addRequest: (
-		newRequest: RequestType
-	) =>  Promise<
-		RequestType
-	>
-	editRequest: (
-		editedRequest: RequestType
-	) =>  Promise<
-		RequestType
-	>
-	deleteRequest: (
-		deletedRequest: RequestType
-	) =>  Promise<
-		RequestType
-	>
+  fetchRequestsList: (
+    limit?: number,
+    offset?: number
+  ) => Promise<{
+    count: number
+    next: string | null
+    previous: string | null
+    results: RequestType[]
+  }>
+  addRequest: (newRequest: RequestType) => Promise<RequestType>
+  editRequest: (editedRequest: RequestType) => Promise<RequestType>
+  deleteRequest: (deletedRequest: RequestType) => Promise<RequestType>
 
-	fetchCohortsList: (
-		providerId: string,
-		limit?: number,
-		offset?: number
-	) =>  Promise<{
-		count: number
-		next: string | null
-		previous: string | null
-		results: Cohort[]
-	}>
-	addCohort: (
-		newCohort: Cohort
-	) =>  Promise<
-		Cohort
-	>
-	editCohort: (
-		editedCohort: Cohort
-	) =>  Promise<
-		Cohort
-	>
-	deleteCohort: (
-		deletedCohort: Cohort
-	) =>  Promise<
-		Cohort
-	>
+  fetchCohortsList: (
+    providerId: string,
+    limit?: number,
+    offset?: number
+  ) => Promise<{
+    count: number
+    next: string | null
+    previous: string | null
+    results: Cohort[]
+  }>
+  addCohort: (newCohort: Cohort) => Promise<Cohort>
+  editCohort: (editedCohort: Cohort) => Promise<Cohort>
+  deleteCohort: (deletedCohort: Cohort) => Promise<Cohort>
 }
 ```
 
 ##### serviceCohorts.ts
 
-> Pour l'ensemble des fonctions définie dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définie dans un premier temps pour éviter tous problèmes de typage.
+> Pour l'ensemble des fonctions définies dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définis dans un premier temps pour éviter tous problèmes de typage.
 
-Ce fichier définie l'ensemble des fonction lié à la récupération de donnée lié à une cohorte, et définie l'interface suivante :
+Ce fichier définit l'ensemble des fonctions liées à la récupération de donnéees liées à une cohorte, et définit l'interface suivante :
 
 ```ts
 export interface IServiceCohorts {
-  fetchCohort: (
-		cohortId: string
-	) => Promise<
-		CohortData | undefined
-	>
+  fetchCohort: (cohortId: string) => Promise<CohortData | undefined>
 
   fetchPatientList: (
     page: number,
@@ -459,18 +382,9 @@ export interface IServiceCohorts {
     documentsList: IComposition[]
   }>
 
-  fetchDocumentContent: (
-		compositionId: string
-	) => Promise<
-		IComposition_Section[]
-	>
+  fetchDocumentContent: (compositionId: string) => Promise<IComposition_Section[]>
 
-  fetchCohortExportRight: (
-		cohortId: string,
-		providerId: string
-	) => Promise<
-		boolean
-	>
+  fetchCohortExportRight: (cohortId: string, providerId: string) => Promise<boolean>
 
   createExport: (args: {
     cohortId: number
@@ -489,10 +403,6 @@ Ce fichier définie l'ensemble des fonction lié à la fonctionnalité de prise 
 
 ```ts
 export interface IServiceContact {
-  postIssue: (
-		contactSubmitForm: ContactSubmitForm
-	) => Promise<
-		boolean
-	>
+  postIssue: (contactSubmitForm: ContactSubmitForm) => Promise<boolean>
 }
 ```

@@ -49,6 +49,12 @@ const MEDICATION_CODE = 'hierarchy-ATC' // ok
 const MEDICATION_PRESCRIPTION_TYPE = 'type' // ok
 const MEDICATION_ADMINISTRATION = 'route' // ok
 
+const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
+// TODO: pas sure pour code
+const OBSERVATION_CODE = 'codeList'
+// TODO: pas sure pour value
+const OBSERVATION_VALUE = 'value'
+
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   id: 0,
   isInclusive: false,
@@ -81,6 +87,7 @@ type RequeteurCriteriaType = {
     | typeof RESSOURCE_TYPE_COMPOSITION
     | typeof RESSOURCE_TYPE_MEDICATION_REQUEST
     | typeof RESSOURCE_TYPE_MEDICATION_ADMINISTRATION
+    | typeof RESSOURCE_TYPE_OBSERVATION
   filterFhir: string
   occurrence?: {
     n: number
@@ -404,6 +411,28 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       break
     }
 
+    case RESSOURCE_TYPE_OBSERVATION: {
+      filterFhir = [
+        `${
+          criterion.code && criterion.code.length > 0
+            ? `${OBSERVATION_CODE}=${criterion.code
+                .map((diagnosticType: any) => diagnosticType.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        // TODO: vérifier si à ajouter seulement si code = feuille
+        // TODO: vérifier la faisabilité du critère value
+        `${
+          criterion.valueComparator && criterion.value
+            ? `${OBSERVATION_VALUE}=${criterion.valueComparator}${criterion.value}`
+            : ''
+        }`
+      ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
+      break
+    }
+
     default:
       break
   }
@@ -461,6 +490,7 @@ export function buildRequest(
             item.type !== RESSOURCE_TYPE_PATIENT &&
             item.type !== RESSOURCE_TYPE_MEDICATION_ADMINISTRATION &&
             item.type !== RESSOURCE_TYPE_MEDICATION_REQUEST &&
+            item.type !== RESSOURCE_TYPE_OBSERVATION &&
             (item.encounterStartDate || item.encounterEndDate)
               ? {
                   minDate: item.encounterStartDate
@@ -1187,6 +1217,30 @@ export async function unbuildRequest(_json: string) {
         }
         break
       }
+      case RESSOURCE_TYPE_OBSERVATION: {
+        // TODO: tout à vérifier et comprendre
+        currentCriterion.title = 'Critère de biologie'
+        currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
+        currentCriterion.value = currentCriterion.value ? currentCriterion.value : null
+        currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
+        currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
+        currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+
+        // TODO: v faux donc à comprendre
+        // if (element.value) {}
+
+        if (element.occurrence) {
+          currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
+          currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
+        }
+
+        if (element.dateRangeList) {
+          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+        }
+
+        break
+      }
       default:
         break
     }
@@ -1276,6 +1330,7 @@ export const getDataFromFetch = async (
         const dataKey = fetchKey.replace('fetch', '').replace(/(\b[A-Z])(?![A-Z])/g, ($1) => $1.toLowerCase())
         switch (dataKey) {
           case 'atcData':
+          case 'biologyData':
           case 'ghmData':
           case 'ccamData':
           case 'cim10Diagnostic': {
