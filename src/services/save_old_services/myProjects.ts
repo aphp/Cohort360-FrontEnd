@@ -69,7 +69,7 @@ export const fetchProjectsList = async (limit = 100, offset = 0) => {
         next: string | null
         previous: string | null
         results: ProjectType[]
-      }>(`/explorations/folders/${search}`)) ?? { status: 400 }
+      }>(`/cohort/folders/${search}`)) ?? { status: 400 }
 
       if (fetchProjectsResponse.status === 200) {
         const { data } = fetchProjectsResponse
@@ -100,7 +100,7 @@ export const addProject = async (newProject: ProjectType) => {
           uuid: `${Math.floor(Math.random() * 1000) + 1}`
         }
       default: {
-        const addProjectResponse = (await apiBack.post(`/explorations/folders/`, newProject)) ?? { status: 400 }
+        const addProjectResponse = (await apiBack.post(`/cohort/folders/`, newProject)) ?? { status: 400 }
         if (addProjectResponse.status === 201) {
           return addProjectResponse.data as ProjectType
         } else {
@@ -124,7 +124,7 @@ export const editProject = async (editedProject: ProjectType) => {
       case 'arkhn':
         return editedProject
       default: {
-        const editProjectResponse = (await apiBack.patch(`/explorations/folders/${editedProject.uuid}/`, {
+        const editProjectResponse = (await apiBack.patch(`/cohort/folders/${editedProject.uuid}/`, {
           name: editedProject.name,
           parent_folder: editedProject.uuid
         })) ?? {
@@ -150,7 +150,7 @@ export const deleteProject = async (deletedProject: ProjectType) => {
       case 'arkhn':
         return null
       default: {
-        const deleteProjectResponse = (await apiBack.delete(`/explorations/folders/${deletedProject.uuid}/`)) ?? {
+        const deleteProjectResponse = (await apiBack.delete(`/cohort/folders/${deletedProject.uuid}/`)) ?? {
           data: { results: [] }
         }
         if (deleteProjectResponse.status === 204) {
@@ -202,7 +202,7 @@ export const fetchRequestsList = async (limit = 100, offset = 0) => {
       next: string | null
       previous: string | null
       results: RequestType[]
-    }>(`/explorations/requests/${search}`)) ?? { status: 400 }
+    }>(`/cohort/requests/${search}`)) ?? { status: 400 }
 
     if (fetchRequestsListResponse.status === 200) {
       return fetchRequestsListResponse.data
@@ -234,7 +234,7 @@ export const addRequest = async (newRequest: RequestType) => {
           parent_folder: `${Math.floor(Math.random() * 1000) + 1}`
         }
       default: {
-        const addRequestResponse = (await apiBack.post(`/explorations/requests/`, {
+        const addRequestResponse = (await apiBack.post(`/cohort/requests/`, {
           ...newRequest,
           parent_folder: newRequest.parent_folder
         })) ?? { status: 400 }
@@ -261,7 +261,7 @@ export const editRequest = async (editedRequest: RequestType) => {
       case 'arkhn':
         return editedRequest
       default: {
-        const editProjectResponse = (await apiBack.patch(`/explorations/requests/${editedRequest.uuid}/`, {
+        const editProjectResponse = (await apiBack.patch(`/cohort/requests/${editedRequest.uuid}/`, {
           name: editedRequest.name,
           description: editedRequest.description,
           parent_folder: editedRequest.parent_folder
@@ -286,7 +286,7 @@ export const deleteRequest = async (deletedRequest: RequestType) => {
       case 'arkhn':
         return null
       default: {
-        const deleteProjectResponse = (await apiBack.delete(`/explorations/requests/${deletedRequest.uuid}/`)) ?? {
+        const deleteProjectResponse = (await apiBack.delete(`/cohort/requests/${deletedRequest.uuid}/`)) ?? {
           status: 400
         }
         if (deleteProjectResponse.status === 204) {
@@ -355,7 +355,7 @@ export const fetchCohortsList: (
       next: string | null
       previous: string | null
       results: CohortType[]
-    }>(`/explorations/cohorts/${search}`)) ?? { data: { results: [] } }
+    }>(`/cohort/cohorts/${search}`)) ?? { data: { results: [] } }
 
     let cohortList = data.results
 
@@ -424,7 +424,7 @@ export const addCohort = async (newCohort: CohortType) => {
           parent_folder: `${Math.floor(Math.random() * 1000) + 1}`
         } as CohortType
       default: {
-        const addCohortResponse = (await apiBack.post(`/explorations/cohorts/`, newCohort)) ?? { status: 400 }
+        const addCohortResponse = (await apiBack.post(`/cohort/cohorts/`, newCohort)) ?? { status: 400 }
         if (addCohortResponse.status === 201) {
           return addCohortResponse.data as CohortType
         } else {
@@ -448,7 +448,7 @@ export const editCohort = async (editedCohort: CohortType) => {
       case 'arkhn':
         return editedCohort as CohortType
       default: {
-        const editCohortResponse = (await apiBack.patch(`/explorations/cohorts/${editedCohort.uuid}/`, {
+        const editCohortResponse = (await apiBack.patch(`/cohort/cohorts/${editedCohort.uuid}/`, {
           name: editedCohort.name,
           description: editedCohort.description
         })) ?? { status: 400 }
@@ -472,7 +472,7 @@ export const deleteCohort = async (deletedCohort: CohortType) => {
       case 'arkhn':
         return null
       default: {
-        const deleteCohortResponse = (await apiBack.delete(`/explorations/cohorts/${deletedCohort.uuid}/`)) ?? {
+        const deleteCohortResponse = (await apiBack.delete(`/cohort/cohorts/${deletedCohort.uuid}/`)) ?? {
           status: 400
         }
         if (deleteCohortResponse.status === 204) {

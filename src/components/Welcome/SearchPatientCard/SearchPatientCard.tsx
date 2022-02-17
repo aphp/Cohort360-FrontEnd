@@ -21,7 +21,7 @@ const PatientSearchCard = () => {
       </div>
       <Divider className={classes.divider} />
       {deidentifiedBoolean ? (
-        <Grid container item justify="center">
+        <Grid container item justifyContent="center">
           <LockIcon className={classes.lockIcon} />
           <Typography variant="h6">Fonctionnalité désactivée en mode pseudonymisé.</Typography>
         </Grid>

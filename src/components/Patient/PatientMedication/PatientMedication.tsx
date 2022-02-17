@@ -184,8 +184,8 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   }, [currrentMedication, currrentMedication?.list]) // eslint-disable-line
 
   return (
-    <Grid container item xs={11} justify="flex-end" className={classes.documentTable}>
-      <Grid item container justify="space-between" alignItems="center" className={classes.filterAndSort}>
+    <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
+      <Grid item container justifyContent="space-between" alignItems="center" className={classes.filterAndSort}>
         <Tabs
           classes={{
             root: classes.root,
@@ -308,7 +308,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
       </Grid>
 
       {loading ? (
-        <Grid container justify="center">
+        <Grid container justifyContent="center">
           <CircularProgress />
         </Grid>
       ) : (
@@ -473,7 +473,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
               ) : (
                 <TableRow className={classes.emptyTableRow}>
                   <TableCell colSpan={9} align="left">
-                    <Grid container justify="center">
+                    <Grid container justifyContent="center">
                       <Typography variant="button">{`Aucune ${
                         selectedTab === 'prescription' ? 'prescription' : 'administration'
                       } à afficher`}</Typography>

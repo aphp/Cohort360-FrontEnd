@@ -129,7 +129,7 @@ const InputAgeRangeSlider: React.FC<InputAgeRangeSliderProps> = ({ birthdates, o
             max={limits[1]}
           />
 
-          <Grid container justify="space-around">
+          <Grid container justifyContent="space-around">
             <Grid item style={{ flex: 0.5, margin: '0 4px' }}>
               <TextField
                 value={_age[0]}

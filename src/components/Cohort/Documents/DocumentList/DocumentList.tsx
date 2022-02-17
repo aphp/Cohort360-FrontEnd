@@ -37,7 +37,6 @@ import {
 
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 
-// import { fetchDocumentContent } from 'services/cohortInfos'
 import { getDocumentStatus } from 'utils/documentsFormatter'
 
 import useStyles from './styles'
@@ -252,7 +251,7 @@ const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
               </TableCell>
               {showIpp && (
                 <TableCell align="center" className={classes.tableHeadCell}>
-                  <Grid container alignItems="center" justify="center">
+                  <Grid container alignItems="center" justifyContent="center">
                     {deidentified ? (
                       <Typography style={{ marginLeft: 4, fontSize: 11, textTransform: 'uppercase' }} variant="button">
                         IPP chiffré
@@ -270,14 +269,14 @@ const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
                 </TableCell>
               )}
               <TableCell align="center" className={classes.tableHeadCell}>
-                <Grid container alignItems="center" justify="center">
+                <Grid container alignItems="center" justifyContent="center">
                   <Typography style={{ marginLeft: 4, fontSize: 11, textTransform: 'uppercase' }} variant="button">
                     {deidentified ? 'NDA chiffré' : 'NDA'}
                   </Typography>
                 </Grid>
               </TableCell>
               <TableCell align="center" className={classes.tableHeadCell}>
-                <Grid container alignItems="center" justify="center">
+                <Grid container alignItems="center" justifyContent="center">
                   <Typography style={{ marginLeft: 4, fontSize: 11, textTransform: 'uppercase' }} variant="button">
                     Unité exécutrice
                   </Typography>
@@ -290,7 +289,7 @@ const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
                 </Grid>
               </TableCell>
               <TableCell align="center" className={classes.tableHeadCell}>
-                <Grid container alignItems="center" justify="center">
+                <Grid container alignItems="center" justifyContent="center">
                   <TableSortLabel
                     active={sortBy === 'type'}
                     direction={sortDirection || 'asc'}
@@ -301,7 +300,7 @@ const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
                 </Grid>
               </TableCell>
               <TableCell align="center" className={classes.tableHeadCell}>
-                <Grid container alignItems="center" justify="center">
+                <Grid container alignItems="center" justifyContent="center">
                   <Typography style={{ marginLeft: 4, fontSize: 11, textTransform: 'uppercase' }} variant="button">
                     Aperçu
                   </Typography>
@@ -336,7 +335,7 @@ const DocumentTable: React.FC<DocumentTableTypes> = React.memo(
             ) : (
               <TableRow className={classes.emptyTableRow}>
                 <TableCell colSpan={6}>
-                  <Grid container justify="center">
+                  <Grid container justifyContent="center">
                     <Typography variant="button"> Aucun document à afficher </Typography>
                   </Grid>
                 </TableCell>

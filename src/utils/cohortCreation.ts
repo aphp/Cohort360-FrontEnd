@@ -49,6 +49,8 @@ const MEDICATION_CODE = 'hierarchy-ATC' // ok
 const MEDICATION_PRESCRIPTION_TYPE = 'type' // ok
 const MEDICATION_ADMINISTRATION = 'route' // ok
 
+const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
+
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   id: 0,
   isInclusive: false,
@@ -81,6 +83,7 @@ type RequeteurCriteriaType = {
     | typeof RESSOURCE_TYPE_COMPOSITION
     | typeof RESSOURCE_TYPE_MEDICATION_REQUEST
     | typeof RESSOURCE_TYPE_MEDICATION_ADMINISTRATION
+    | typeof RESSOURCE_TYPE_OBSERVATION
   filterFhir: string
   occurrence?: {
     n: number
@@ -142,7 +145,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
   const filterReducer = (accumulator: any, currentValue: any) =>
     accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
   const searchReducer = (accumulator: any, currentValue: any) =>
-    accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
+    accumulator || accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 
   switch (criterion.type) {
     case RESSOURCE_TYPE_PATIENT: {
@@ -310,7 +313,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 
     case RESSOURCE_TYPE_COMPOSITION: {
       filterFhir = [
-        `status=final&type:not=doc-impor`,
+        `status=final&type:not=doc-impor&empty=false`,
         `${criterion.search ? `${COMPOSITION_TEXT}=${encodeURIComponent(criterion.search)}` : ''}`,
         `${criterion.regex_search ? `${COMPOSITION_TEXT}=${encodeURIComponent(`/${criterion.regex_search}/`)}` : ''}`,
         `${
@@ -964,6 +967,7 @@ export async function unbuildRequest(_json: string) {
               }
               case 'status':
               case 'type:not':
+              case 'empty':
                 break
               default:
                 currentCriterion.error = true

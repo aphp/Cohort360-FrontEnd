@@ -130,7 +130,6 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            defaultValue="Critère démographique"
             variant="outlined"
             value={defaultValues.title}
             onChange={(e) => _onChangeValue('title', e.target.value)}
@@ -190,7 +189,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
                 min={0}
                 max={130}
               />
-              <Grid container justify="space-around">
+              <Grid container justifyContent="space-around">
                 <Grid item>
                   <TextField
                     value={defaultValues.years[0]}

@@ -19,7 +19,8 @@ import { CohortCreationSnapshotType } from 'types'
 import constructCriteriaList from './DataList_Criteria'
 
 import { getDataFromFetch } from 'utils/cohortCreation'
-import { createCohort } from 'services/cohortCreation'
+
+import services from 'services'
 
 import useStyles from './styles'
 
@@ -90,14 +91,14 @@ const Requeteur = () => {
 
   /**
    * Execute query:
-   *  - Create it with `createCohort`
+   *  - Create it with `services.cohortCreation.createCohort`
    *  - Link fhir result with the back end, call /cohorts/
    */
   const _onExecute = (cohortName: string, cohortDescription: string, globalCount: boolean) => {
     const _createCohort = async () => {
       if (!json) return
 
-      const createCohortResult = await createCohort(
+      const createCohortResult = await services.cohortCreation.createCohort(
         json,
         count?.uuid,
         currentSnapshot,
@@ -184,7 +185,7 @@ const Requeteur = () => {
 
   if (loading || criteriaLoading || requestLoading || (requestIdFromUrl && requestId !== requestIdFromUrl)) {
     return (
-      <Grid className={classes.grid} container justify="center" alignItems="center">
+      <Grid className={classes.grid} container justifyContent="center" alignItems="center">
         <CircularProgress />
       </Grid>
     )

@@ -1,4 +1,5 @@
 import React from 'react'
+import { useHistory } from 'react-router-dom'
 
 import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
@@ -12,6 +13,12 @@ type ModalRightErrorProps = {
   handleClose: () => void
 }
 const ModalRightError: React.FC<ModalRightErrorProps> = ({ open, handleClose }) => {
+  const history = useHistory()
+
+  const _handleReturnHome = () => {
+    history.push(`/accueil`)
+  }
+
   return (
     <Dialog
       open={open}
@@ -27,6 +34,9 @@ const ModalRightError: React.FC<ModalRightErrorProps> = ({ open, handleClose }) 
         </DialogContentText>
       </DialogContent>
       <DialogActions>
+        <Button color="secondary" onClick={_handleReturnHome}>
+          Annuler
+        </Button>
         <Button onClick={handleClose}>Choisir population source</Button>
       </DialogActions>
     </Dialog>

@@ -66,7 +66,7 @@ const InputSearchDocumentExtend: React.FC<InputSearchDocumentExtendProps> = ({
           value={searchInput}
           onChange={handleChangeInput}
           multiline
-          rows={3}
+          minRows={3}
           onKeyDown={onKeyDown}
           endAdornment={
             <InputAdornment position="end">

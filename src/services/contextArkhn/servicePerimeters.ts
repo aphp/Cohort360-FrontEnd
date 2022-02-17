@@ -12,7 +12,7 @@ import { fetchGroup, fetchPatient, fetchEncounter, fetchOrganization, fetchPract
 
 const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
-export interface IServicesPerimeters {
+export interface IServicePerimeters {
   /**
    * Cette fonction retourne les informations lié à un (ou plusieur) périmètre(s)
    *
@@ -83,7 +83,7 @@ export interface IServicesPerimeters {
   fetchDeidentified: (practitionerId: string) => Promise<{ deidentification: boolean; nominativeGroupsIds: any[] }>
 }
 
-const servicesPerimeters: IServicesPerimeters = {
+const servicesPerimeters: IServicePerimeters = {
   fetchPerimetersInfos: async (perimetersId) => {
     const [perimetersResp, patientsResp, encountersResp] = await Promise.all([
       fetchGroup({

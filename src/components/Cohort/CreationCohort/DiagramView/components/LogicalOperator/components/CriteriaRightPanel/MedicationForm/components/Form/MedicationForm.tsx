@@ -135,7 +135,6 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            defaultValue="Critère démographique"
             variant="outlined"
             value={selectedCriteria.title}
             onChange={(e) => onChangeValue('title', e.target.value)}

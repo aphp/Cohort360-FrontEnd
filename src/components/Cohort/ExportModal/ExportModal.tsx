@@ -154,14 +154,14 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
       {exportResponse !== null ? (
         <DialogContent ref={dialogRef}>
           {exportResponse.status === 'finish' ? (
-            <Grid container alignItems="center" justify="space-between">
+            <Grid container alignItems="center" justifyContent="space-between">
               <CheckCircleOutlineIcon style={{ fontSize: 52 }} htmlColor="#BDEA88" />
               <DialogContentText style={{ marginBottom: 0, width: 'calc(100% - 62px)' }}>
                 Votre demande d'export a bien été prise en compte. Vous recevrez un email de confirmation prochainement.
               </DialogContentText>
             </Grid>
           ) : (
-            <Grid container alignItems="center" justify="space-between">
+            <Grid container alignItems="center" justifyContent="space-between">
               <CancelIcon style={{ fontSize: 52 }} htmlColor="#FC5656" />
               <DialogContentText style={{ marginBottom: 0, width: 'calc(100% - 62px)' }}>
                 Une erreur est survenue lors de votre demande d'export. Veuillez{' '}
@@ -214,8 +214,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               multiline
               autoFocus
               fullWidth
-              rows={3}
-              rowsMax={5}
+              minRows={3}
+              maxRows={5}
               value={settings.motif}
               helperText="Le motif doit comporter au moins 10 caractères"
               variant="outlined"
@@ -223,7 +223,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               onChange={(e) => handleChangeSettings('motif', e.target.value)}
             />
 
-            <Grid container justify="space-between" alignItems="center">
+            <Grid container justifyContent="space-between" alignItems="center">
               <Typography className={classes.tableTitle} variant="h6">
                 Tables exportées
               </Typography>

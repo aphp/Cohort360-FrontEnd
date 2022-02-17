@@ -89,16 +89,11 @@ const Login = () => {
   const [errorLogin, setErrorLogin] = useState(false)
   const [open, setOpen] = useState(false)
 
-  const getPractitionerData = async (lastConnection) => {
-    if (
-      typeof services?.practitioner?.fetchPractitioner !== 'function' ||
-      typeof services.perimeters.fetchDeidentified !== 'function'
-    ) {
+  const getPractitionerData = async (practitioner, lastConnection) => {
+    if (typeof services.perimeters.fetchDeidentified !== 'function') {
       setLoading(false)
       return setErrorLogin(true)
     }
-
-    const practitioner = await services.practitioner.fetchPractitioner(username)
 
     if (practitioner) {
       const deidentifiedInfos = await services.perimeters.fetchDeidentified(practitioner.id)
@@ -115,7 +110,6 @@ const Login = () => {
       const oldPath = localStorage.getItem('old-path')
       localStorage.removeItem('old-path')
       history.push(oldPath ?? '/accueil')
-      setLoading(false)
     } else {
       setLoading(false)
       setErrorLogin(true)
@@ -136,6 +130,7 @@ const Login = () => {
     localStorage.removeItem('pmsi')
     localStorage.removeItem('access')
     localStorage.removeItem('refresh')
+    localStorage.removeItem('patient')
   }, [])
 
   const login = async () => {
@@ -160,14 +155,14 @@ const Login = () => {
         localStorage.setItem(ACCES_TOKEN, data.access)
         localStorage.setItem(REFRESH_TOKEN, data.refresh)
 
-        const getPractitioner = await services.practitioner.fetchPractitioner(username)
-        const getRights = await services.practitioner.fetchPractitionerRole(getPractitioner.id)
+        const practitioner = await services.practitioner.fetchPractitioner(username)
+        const getRights = await services.practitioner.fetchPractitionerRole(practitioner.id)
 
         if (getRights === undefined) {
           setNoRights(true)
         } else {
           const lastConnection = data.last_connection ? data.last_connection.modified_at : undefined
-          getPractitionerData(lastConnection)
+          getPractitionerData(practitioner, lastConnection)
         }
       } else {
         setLoading(false)
@@ -199,7 +194,7 @@ const Login = () => {
           md={6}
           elevation={6}
           direction="column"
-          justify="center"
+          justifyContent="center"
           alignItems="center"
           className={classes.rightPanel}
         >
@@ -244,14 +239,7 @@ const Login = () => {
                   </Link>
                 </Typography>
 
-                <Button
-                  disabled={loading || !username || !password}
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                >
+                <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
                   {loading ? <CircularProgress /> : 'Connexion'}
                 </Button>
               </Grid>
@@ -265,6 +253,7 @@ const Login = () => {
       </Grid>
 
       <ErrorDialog open={errorLogin !== false} setErrorLogin={setErrorLogin} />
+
       <LegalMentionDialog open={open} setOpen={setOpen} />
     </>
   )

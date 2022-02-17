@@ -94,8 +94,8 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
       {
         //@ts-ignore
         !researchData?.length > 0 ? (
-          <Grid container justify="center">
-            <Typography variant="button"> Aucune requeste à afficher </Typography>
+          <Grid container justifyContent="center">
+            <Typography variant="button"> Aucune requête à afficher </Typography>
           </Grid>
         ) : (
           <TableContainer component={Paper}>
@@ -153,7 +153,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                           container
                           direction="row"
                           alignItems="center"
-                          justify="center"
+                          justifyContent="center"
                           style={{ width: 'max-content', margin: 'auto' }}
                         >
                           <Grid item>

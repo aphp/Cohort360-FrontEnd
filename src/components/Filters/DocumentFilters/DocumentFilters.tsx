@@ -30,6 +30,8 @@ type DocumentFiltersProps = {
   onSubmit: () => void
   nda: string
   onChangeNda: (nda: string) => void
+  ipp?: string
+  onChangeIpp?: (nda: string) => void
   selectedDocTypes: string[]
   onChangeSelectedDocTypes: (selectedDocTypes: string[]) => void
   startDate?: string | null
@@ -44,6 +46,8 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
   onSubmit,
   nda,
   onChangeNda,
+  ipp,
+  onChangeIpp,
   selectedDocTypes,
   onChangeSelectedDocTypes,
   startDate,
@@ -55,6 +59,7 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
   const classes = useStyles()
 
   const [_nda, setNda] = useState<string>(nda)
+  const [_ipp, setIpp] = useState<string>(ipp ?? '')
   const [_selectedDocTypes, setSelectedDocTypes] = useState<any[]>(selectedDocTypes)
   const [_startDate, setStartDate] = useState<any>(startDate)
   const [_endDate, setEndDate] = useState<any>(endDate)
@@ -64,6 +69,7 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
 
   useEffect(() => {
     setNda(nda)
+    setIpp(ipp ?? '')
     setSelectedDocTypes(selectedDocTypes)
     setStartDate(startDate)
     setEndDate(endDate)
@@ -88,16 +94,14 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
     if (value) setSelectedDocTypes(value)
   }
 
-  const _onChangeNda = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNda(event.target.value)
-  }
-
   const _onSubmit = () => {
     const newStartDate = moment(_startDate).isValid() ? moment(_startDate).format('YYYY-MM-DD') : null
     const newEndDate = moment(_endDate).isValid() ? moment(_endDate).format('YYYY-MM-DD') : null
 
     onChangeSelectedDocTypes(_selectedDocTypes)
     onChangeNda(_nda)
+    // onChangeIpp can be equal to undefined
+    onChangeIpp && onChangeIpp(_ipp)
     onChangeStartDate(newStartDate)
     onChangeEndDate(newEndDate)
     onSubmit()
@@ -170,10 +174,23 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
               margin="normal"
               fullWidth
               label="NDA"
-              autoFocus
               placeholder="Exemple: 6601289264,141740347"
               value={_nda}
-              onChange={_onChangeNda}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setNda(event.target.value)}
+            />
+          </Grid>
+        )}
+        {!deidentified && onChangeIpp && (
+          <Grid container direction="column" className={classes.filter}>
+            <Typography variant="h3">IPP :</Typography>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              label="IPP"
+              placeholder="Exemple: 6601289264,141740347"
+              value={_ipp}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIpp(event.target.value)}
             />
           </Grid>
         )}

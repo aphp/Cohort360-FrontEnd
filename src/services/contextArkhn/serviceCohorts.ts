@@ -33,9 +33,8 @@ import {
 } from './callApi'
 
 import apiBackend from '../apiBackend'
-import apiPortail from '../apiPortail'
 
-export interface IServicesCohorts {
+export interface IServiceCohorts {
   /**
    * Retourne les informations d'une cohorte
    *
@@ -123,6 +122,7 @@ export interface IServicesCohorts {
     searchInput: string,
     selectedDocTypes: string[],
     nda: string,
+    ipp: string,
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string
@@ -185,11 +185,11 @@ export interface IServicesCohorts {
   }) => Promise<any>
 }
 
-const servicesCohorts: IServicesCohorts = {
+const servicesCohorts: IServiceCohorts = {
   fetchCohort: async (cohortId) => {
     // eslint-disable-next-line
     let fetchCohortsResults = await Promise.all([
-      apiBackend.get<Back_API_Response<Cohort>>(`/explorations/cohorts/?fhir_group_id=${cohortId}`),
+      apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?fhir_group_id=${cohortId}`),
       fetchGroup({ _id: cohortId }),
       fetchPatient({
         pivotFacet: ['age_gender', 'deceased_gender'],
@@ -354,6 +354,7 @@ const servicesCohorts: IServicesCohorts = {
     searchInput,
     selectedDocTypes,
     nda,
+    ipp,
     startDate,
     endDate,
     groupId
@@ -374,11 +375,12 @@ const servicesCohorts: IServicesCohorts = {
         _text: searchInput,
         type: selectedDocTypes.length > 0 ? selectedDocTypes.join(',') : '',
         'encounter.identifier': nda,
+        'patient.identifier': ipp,
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
         uniqueFacet: ['patient']
       }),
-      !!searchInput || selectedDocTypes.length > 0 || !!nda || !!startDate || !!endDate
+      !!searchInput || selectedDocTypes.length > 0 || !!nda || !!ipp || !!startDate || !!endDate
         ? fetchComposition({
             status: 'final',
             _list: groupId ? [groupId] : [],
@@ -476,7 +478,7 @@ const servicesCohorts: IServicesCohorts = {
 
       const exportResponse = await new Promise((resolve) => {
         resolve(
-          apiPortail.post('/exports/', {
+          apiBackend.post('/exports/', {
             cohort_id: cohortId,
             motivation,
             tables: tables.map((table: string) => ({

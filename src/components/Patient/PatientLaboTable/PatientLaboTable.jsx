@@ -48,7 +48,7 @@ const PatientLaboTable = ({ patient }) => {
   }
 
   return (
-    <Grid container item xs={11} justify="flex-end" className={classes.labTable}>
+    <Grid container item xs={11} justifyContent="flex-end" className={classes.labTable}>
       <div className={classes.labButtons}>
         <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
           <InputBase placeholder="Rechercher" className={classes.input} disabled />
