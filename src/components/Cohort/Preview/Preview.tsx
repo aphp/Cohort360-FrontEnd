@@ -118,7 +118,7 @@ const Preview: React.FC<PreviewProps> = ({
   return (
     <Grid container direction="column" alignItems="center" className={classes.root}>
       <CssBaseline />
-      <Grid container direction="column" xs={11} justifyContent="space-between">
+      <Grid container direction="column" xs={11} item justifyContent="space-between">
         {/* <Grid container item className={classes.header} justifyContent="center">
           <Grid container item alignItems="center" md={11}>
             <Grid container item direction="column">

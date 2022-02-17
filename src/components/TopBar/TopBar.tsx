@@ -158,8 +158,8 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
 
   return (
     <>
-      <Grid xs={12} container direction="row">
-        <Grid xs={12} item direction="row">
+      <Grid xs={12} container item direction="row">
+        <Grid xs={12} item>
           <Paper className={classes.root} square>
             <Grid container item style={{ paddingInline: 8 }} justifyContent="space-between">
               <Grid
