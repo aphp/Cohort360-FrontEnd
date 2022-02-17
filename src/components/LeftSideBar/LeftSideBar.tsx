@@ -367,7 +367,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               <List id="research-collapse">
                 <ListItem>
                   <Link id="savedResearch-link" href="/recherche_sauvegarde" className={classes.nestedTitle}>
-                    Recherches sauvegardées
+                    Cohortes sauvegardées
                   </Link>
                 </ListItem>
                 <ListItem>
