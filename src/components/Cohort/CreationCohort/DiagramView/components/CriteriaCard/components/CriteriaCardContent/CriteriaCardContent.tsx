@@ -800,7 +800,22 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   </Tooltip>
                 }
               />
-            )
+            ),
+            _currentCriteria &&
+              _currentCriteria.isLeaf &&
+              _currentCriteria?.valueComparator &&
+              _currentCriteria?.valueMin && (
+                <Chip
+                  className={classes.criteriaChip}
+                  label={
+                    <Typography>
+                      {_currentCriteria?.valueComparator === '<x>'
+                        ? `Unité comprise entre ${_currentCriteria.valueMin} et ${_currentCriteria.valueMax}`
+                        : `Unité ${_currentCriteria.valueComparator} ${_currentCriteria.valueMin}`}
+                    </Typography>
+                  }
+                />
+              )
           ]
         }
         break

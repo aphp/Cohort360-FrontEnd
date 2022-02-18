@@ -50,10 +50,8 @@ const MEDICATION_PRESCRIPTION_TYPE = 'type' // ok
 const MEDICATION_ADMINISTRATION = 'route' // ok
 
 const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
-// TODO: pas sure pour code
 const OBSERVATION_CODE = 'codeList'
-// TODO: pas sure pour value
-const OBSERVATION_VALUE = 'value'
+const OBSERVATION_VALUE = 'value-quantity-value'
 
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   id: 0,
@@ -412,6 +410,30 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
     }
 
     case RESSOURCE_TYPE_OBSERVATION: {
+      let valueComparatorFilter = ''
+      if (criterion.valueComparator) {
+        switch (criterion.valueComparator) {
+          case '<':
+            valueComparatorFilter = 'l'
+            break
+          case '<=':
+            valueComparatorFilter = 'le'
+            break
+          case '=':
+            valueComparatorFilter = ''
+            break
+          case '>':
+            valueComparatorFilter = 'g'
+            break
+          case '>=':
+            valueComparatorFilter = 'ge'
+            break
+          default:
+            valueComparatorFilter = ''
+            break
+        }
+      }
+
       filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
@@ -420,11 +442,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
                 .reduce(searchReducer)}`
             : ''
         }`,
-        // TODO: vérifier si à ajouter seulement si code = feuille
-        // TODO: vérifier la faisabilité du critère value
         `${
-          criterion.valueComparator && criterion.value
-            ? `${OBSERVATION_VALUE}=${criterion.valueComparator}${criterion.value}`
+          criterion.isLeaf && criterion.valueComparator && criterion.valueMin
+            ? criterion.valueComparator === '<x>' && criterion.valueMax
+              ? `${OBSERVATION_VALUE}=l${criterion.valueMin},${OBSERVATION_VALUE}=g${criterion.valueMax}`
+              : `${OBSERVATION_VALUE}=${valueComparatorFilter}${criterion.valueMin}`
             : ''
         }`
       ]
@@ -1218,16 +1240,14 @@ export async function unbuildRequest(_json: string) {
         break
       }
       case RESSOURCE_TYPE_OBSERVATION: {
+        console.log('element', element)
         // TODO: tout à vérifier et comprendre
         currentCriterion.title = 'Critère de biologie'
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
-        currentCriterion.value = currentCriterion.value ? currentCriterion.value : null
+        // TODO: ajouter values et valueComparator
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
-
-        // TODO: v faux donc à comprendre
-        // if (element.value) {}
 
         if (element.occurrence) {
           currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
@@ -1239,6 +1259,32 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
+        if (element.encounterDateRange) {
+          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+        }
+
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+
+          for (const filter of filters) {
+            const key = filter ? filter[0] : null
+            const value = filter ? filter[1] : null
+            switch (key) {
+              case PROCEDURE_CODE: {
+                const codeIds = value?.split(',')
+                const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
+                if (!newCode) continue
+
+                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
+                break
+              }
+              default:
+                currentCriterion.error = true
+                break
+            }
+          }
+        }
         break
       }
       default:

@@ -10,13 +10,14 @@ const defaultBiology = {
   type: 'Observation',
   title: 'Critères de biologie',
   code: [],
-  // TODO: ajouter les valeurs pour value
-  value: 1,
+  isLeaf: false,
+  valueMin: 0,
+  valueMax: 0,
   valueComparator: '>=',
-  occurence: 1,
-  occurenceComparator: '>=',
-  startOccurence: '',
-  endOccurence: '',
+  occurrence: 1,
+  occurrenceComparator: '>=',
+  startOccurrence: '',
+  endOccurrence: '',
   isInclusive: true
 }
 

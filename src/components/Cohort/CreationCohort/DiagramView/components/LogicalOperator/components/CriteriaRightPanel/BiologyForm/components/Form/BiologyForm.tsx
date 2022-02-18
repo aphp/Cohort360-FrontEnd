@@ -63,14 +63,10 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
           : null
         return {
           id: code.id,
-          label: code.label ? code.label : criteriaCode?.label ?? '?',
-          // TODO: checker si c'est si facile d'ajouter isLeaf vvv
-          isLeaf: code.isLeaf
+          label: code.label ? code.label : criteriaCode?.label ?? '?'
         }
       })
     : []
-
-  // useEffect sur selectedCriteria.code pour checker s'il y a des enfants
 
   useEffect(() => {
     if (selectedCriteria.valueMin < selectedCriteria.valueMax) {
@@ -79,6 +75,28 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       setValuesError(false)
     }
   }, [selectedCriteria.valueMax])
+
+  useEffect(() => {
+    const checkChildren = async () => {
+      try {
+        const getChildrenResp = await criteria.fetch.fetchBiologyHierarchy(selectedCriteria.code[0].id)
+
+        if (getChildrenResp.length > 0) {
+          onChangeValue('isLeaf', false)
+        } else {
+          onChangeValue('isLeaf', true)
+        }
+      } catch (error) {
+        console.error('Erreur lors du check des enfants du code de biologie sélectionné', error)
+      }
+    }
+
+    if (selectedCriteria.code.length === 1) {
+      checkChildren()
+    } else {
+      onChangeValue('isLeaf', false)
+    }
+  }, [selectedCriteria.code])
 
   return (
     <Grid className={classes.root}>
@@ -163,16 +181,19 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
               </Tooltip>
             </Grid>
 
-            {/* TODO: disable si code != niveau feuille */}
-
-            <Grid style={{ display: 'grid', gridTemplateColumns: '100px 1fr', alignItems: 'center' }}>
+            <Grid
+              style={{
+                display: 'grid',
+                gridTemplateColumns: selectedCriteria.valueComparator === '<X>' ? '100px 1fr 1fr' : '100px 1fr',
+                alignItems: 'center'
+              }}
+            >
               <Select
                 style={{ marginRight: '1em' }}
                 id="biology-value-comparator-select"
                 value={selectedCriteria.valueComparator}
                 onChange={(event) => onChangeValue('valueComparator', event.target.value as string)}
                 variant="outlined"
-                // TODO: isLeaf existe?
                 disabled={!selectedCriteria.isLeaf}
               >
                 <MenuItem value={'<='}>{'<='}</MenuItem>
@@ -192,8 +213,8 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 id="criteria-value"
                 variant="outlined"
                 value={selectedCriteria.valueMin}
-                onChange={(e) => onChangeValue('value', e.target.value)}
-                // TODO: isLeaf existe?
+                onChange={(e) => onChangeValue('valueMin', e.target.value)}
+                placeholder={selectedCriteria.valueComparator === '<X>' ? 'Valeur minimale' : ''}
                 disabled={!selectedCriteria.isLeaf}
               />
               {selectedCriteria.valueComparator === '<X>' && (
@@ -207,13 +228,13 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                   id="criteria-value"
                   variant="outlined"
                   value={selectedCriteria.valueMax}
-                  onChange={(e) => onChangeValue('value', e.target.value)}
-                  // TODO: isLeaf existe?
+                  onChange={(e) => onChangeValue('valueMax', e.target.value)}
+                  placeholder="Valeur maximale"
                   disabled={!selectedCriteria.isLeaf}
                 />
               )}
 
-              {/* TODO: ajouter textfield 2 si value comparator = <X> */}
+              {/* TODO: gérer l'erreur si valumin > valuemax */}
             </Grid>
           </Grid>
 

@@ -16,7 +16,6 @@ type AdvancedInputsProps = {
 
 const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
   const { form, selectedCriteria = {}, onChangeValue } = props
-
   const optionsIsUsed =
     +selectedCriteria.occurrence !== 1 ||
     selectedCriteria.occurrenceComparator !== '>=' ||

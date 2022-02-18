@@ -33,8 +33,7 @@ const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
     <>
       <FormLabel style={{ padding: '0 1em 8px', display: 'flex', alignItems: 'center' }} component="legend">
         Nombre d'occurrence
-        {/* TODO: ajouter case pour biology? */}
-        {(form == 'ccam' || form === 'cim10' || form === 'ghm') && (
+        {(form == 'ccam' || form === 'cim10' || form === 'ghm' || form == 'biology') && (
           <Tooltip
             title={
               <>

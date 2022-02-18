@@ -22,6 +22,7 @@ const defaultInitialState: BiologyState = {
   openedElement: []
 }
 
+// TODO: check pourquoi ligne d'en dessous non prise en compte
 // const localStorageScope = localStorage.getItem('biology') || null
 const localStorageScope = null
 console.log('localStorageScope', localStorageScope)

@@ -1,10 +1,8 @@
-import { BIOLOGY_HIERARCHY_ITM_ANABIO, CONTEXT } from '../../constants'
+import { BIOLOGY_HIERARCHY_ITM_ANABIO, BIOLOGY_HIERARCHY_ITM_LOINC, CONTEXT } from '../../constants'
 import apiRequest from '../apiRequest'
-import { cleanValueSet } from 'utils/cleanValueSet'
 import { codeSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
-// TODO: demander ce qu'est noStar
 export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) => {
   noStar = noStar === undefined ? true : noStar
 
@@ -25,7 +23,9 @@ export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) =
       ? `&_text=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
       : ''
 
-    const res = await apiRequest.get<any>(`/ValueSet?url=${BIOLOGY_HIERARCHY_ITM_ANABIO}${_searchValue}&size=0`)
+    const res = await apiRequest.get<any>(
+      `/ValueSet?url=${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}${_searchValue}&size=0`
+    )
 
     const data =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -34,7 +34,6 @@ export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) =
 
     return data && data.length > 0
       ? data.sort(codeSort).map((_data: { code: string; display: string }) => ({
-          // TODO: ajouter isLeaf?
           id: _data.code,
           label: `${_data.code} - ${capitalizeFirstLetter(_data.display)}`,
           subItems: [{ id: 'loading', label: 'loading', subItems: [] }]

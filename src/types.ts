@@ -361,6 +361,7 @@ export type SelectedCriteriaType = {
   | EncounterDataType
   | DocumentDataType
   | MedicationDataType
+  | ObservationDataType
 )
 
 export type CcamDataType = {
@@ -472,6 +473,23 @@ export type MedicationDataType = {
     }
   | { type: 'MedicationAdministration' }
 )
+
+export type ObservationDataType = {
+  title: string
+  type: 'Observation'
+  code: { id: string; label: string }[] | null
+  isLeaf: boolean
+  valueMin: number
+  valueMax: number
+  valueComparator: '<=' | '<' | '=' | '>' | '>=' | '<x>'
+  occurrence: number
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
+  startOccurrence: Date | null
+  endOccurrence: Date | null
+  isInclusive?: boolean
+  encounterStartDate: Date | null
+  encounterEndDate: Date | null
+}
 
 export type CohortCreationCounterType = {
   uuid?: string
@@ -592,6 +610,33 @@ export type IPatientMedication<T extends IMedicationRequest | IMedicationAdminis
       code?: string
       selectedPrescriptionTypes?: { id: string; label: string }[]
       selectedAdministrationRoutes?: { id: string; label: string }[]
+    }
+    sort?: {
+      by: string
+      direction: string
+    }
+  }
+}
+
+export type CohortObservation = IObservation & {
+  serviceProvider?: string
+  NDA?: string
+}
+
+export type IPatientObservation<T extends CohortObservation> = {
+  loading: boolean
+  count: number
+  total: number
+  list: T[]
+  page: number
+  options?: {
+    filters?: {
+      searchInput: string
+      nda: string
+      loinc: string
+      anabio: string
+      startDate: string | null
+      endDate: string | null
     }
     sort?: {
       by: string
