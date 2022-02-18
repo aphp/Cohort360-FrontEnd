@@ -204,9 +204,14 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                         </TableCell>
                         <TableCell>{deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ')}</TableCell>
                         <TableCell align="center">
-                          {deidentified
-                            ? getAge(patient)
-                            : `${moment(patient.birthDate).format('DD/MM/YYYY')} (${getAge(patient)})`}
+                          {deidentified ? (
+                            <Typography>{getAge(patient)}</Typography>
+                          ) : (
+                            <>
+                              <Typography>{moment(patient.birthDate).format('DD/MM/YYYY')}</Typography>
+                              <Typography>{`(${getAge(patient)})`}</Typography>
+                            </>
+                          )}
                         </TableCell>
                         <TableCell>
                           {patient.extension &&

@@ -11,7 +11,7 @@ const REQUETEUR_VERSION = 'v1.2.1'
 
 const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
 const PATIENT_GENDER = 'gender' // ok
-const PATIENT_BIRTHDATE = 'birthdate' // ok
+const PATIENT_BIRTHDATE = 'age-day' // ok
 const PATIENT_DECEASED = 'deceased' // ok
 
 const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
@@ -154,16 +154,19 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
     case RESSOURCE_TYPE_PATIENT: {
       let ageFilter = ''
       if (criterion.years && (criterion.years[0] !== 0 || criterion.years[1] !== 130)) {
+        const today = moment()
         //@ts-ignore
         const date1 = moment()
           .subtract(criterion.years[1] + 1, criterion?.ageType?.id || 'years')
           .add(1, 'days')
-          .format('YYYY-MM-DD')
         //@ts-ignore
-        const date2 = moment()
-          .subtract(criterion.years[0], criterion?.ageType?.id || 'years')
-          .format('YYYY-MM-DD')
-        ageFilter = `${PATIENT_BIRTHDATE}=ge${date1}&${PATIENT_BIRTHDATE}=le${date2}`
+        const date2 = moment().subtract(criterion.years[0], criterion?.ageType?.id || 'years')
+
+        ageFilter =
+          `${PATIENT_BIRTHDATE}=` +
+          `ge${today.diff(date1, 'day')}` +
+          `&${PATIENT_BIRTHDATE}=` +
+          `le${today.diff(date2, 'day')}`
       }
 
       filterFhir = [
@@ -676,7 +679,7 @@ export async function unbuildRequest(_json: string) {
                 ]
 
                 if (value?.search('ge') === 0) {
-                  const date = value?.replace('ge', '') ? moment(value?.replace('ge', ''), 'YYYY-MM-DD') : null
+                  const date = value?.replace('ge', '') ? moment().subtract(value?.replace('ge', ''), 'days') : null
                   const diff = date ? moment().diff(date, 'days') : 0
 
                   let currentAgeType: 'year' | 'month' | 'day' = 'year'
@@ -690,7 +693,9 @@ export async function unbuildRequest(_json: string) {
                   currentCriterion.ageType = foundAgeType
                   if (date) currentCriterion.years[1] = moment().diff(date, currentAgeType) || 130
                 } else if (value?.search('le') === 0) {
-                  const date = value?.replace('le', '') ? moment(value?.replace('le', ''), 'YYYY-MM-DD') : null
+                  const date = value?.replace('le', '')
+                    ? moment().subtract(+value?.replace('le', '') + 1, 'days')
+                    : null
                   const diff = date ? moment().diff(date, 'days') : 0
 
                   let currentAgeType: 'year' | 'month' | 'day' = 'year'

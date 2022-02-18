@@ -84,14 +84,8 @@ const servicesCohortCreation: IServiceCohortCreation = {
 
       return {
         date: measureResult?.data?.updated_at,
-        status: measureResult?.data?.request_job_status,
-        uuid: measureResult?.data?.uuid,
-        includePatient: 0,
-        byrequest: 0,
-        alive: 0,
-        deceased: 0,
-        female: 0,
-        male: 0
+        status: measureResult?.data?.request_job_status ?? 'error',
+        uuid: measureResult?.data?.uuid
       }
     }
   },
