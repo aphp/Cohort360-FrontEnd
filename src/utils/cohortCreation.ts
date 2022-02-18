@@ -443,9 +443,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
             : ''
         }`,
         `${
-          criterion.isLeaf && criterion.valueComparator && criterion.valueMin
+          criterion.isLeaf &&
+          criterion.code &&
+          criterion.code.length === 1 &&
+          criterion.valueComparator &&
+          (criterion.valueMin || criterion.valueMax)
             ? criterion.valueComparator === '<x>' && criterion.valueMax
-              ? `${OBSERVATION_VALUE}=l${criterion.valueMin},${OBSERVATION_VALUE}=g${criterion.valueMax}`
+              ? `${OBSERVATION_VALUE}=le${criterion.valueMin},${OBSERVATION_VALUE}=ge${criterion.valueMax}`
               : `${OBSERVATION_VALUE}=${valueComparatorFilter}${criterion.valueMin}`
             : ''
         }`
@@ -1244,7 +1248,10 @@ export async function unbuildRequest(_json: string) {
         // TODO: tout à vérifier et comprendre
         currentCriterion.title = 'Critère de biologie'
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
-        // TODO: ajouter values et valueComparator
+        currentCriterion.isLeaf = currentCriterion.isLeaf ? currentCriterion.isLeaf : false
+        currentCriterion.valueMin = currentCriterion.valueMin ? currentCriterion.valueMin : 0
+        currentCriterion.valueMax = currentCriterion.valueMax ? currentCriterion.valueMax : 0
+        currentCriterion.valueComparator = currentCriterion.valueComparator ? currentCriterion.valueComparator : '>='
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
@@ -1271,14 +1278,22 @@ export async function unbuildRequest(_json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
-              case PROCEDURE_CODE: {
+              case OBSERVATION_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
                 if (!newCode) continue
 
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
+
+                // isLeaf ?????
                 break
               }
+
+              case OBSERVATION_VALUE: {
+                // TODO: Faire cette gestion
+                break
+              }
+
               default:
                 currentCriterion.error = true
                 break

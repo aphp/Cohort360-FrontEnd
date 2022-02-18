@@ -804,7 +804,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             _currentCriteria &&
               _currentCriteria.isLeaf &&
               _currentCriteria?.valueComparator &&
-              _currentCriteria?.valueMin && (
+              (_currentCriteria?.valueMin || _currentCriteria?.valueMax) && (
                 <Chip
                   className={classes.criteriaChip}
                   label={
