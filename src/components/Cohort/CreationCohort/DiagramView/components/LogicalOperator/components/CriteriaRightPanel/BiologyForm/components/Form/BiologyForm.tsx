@@ -39,7 +39,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   const classes = useStyles()
 
   const [error, setError] = useState(false)
-  const [valuesError, setValuesError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const _onSubmit = () => {
@@ -67,14 +66,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
         }
       })
     : []
-
-  useEffect(() => {
-    if (selectedCriteria.valueMin < selectedCriteria.valueMax) {
-      setValuesError(true)
-    } else {
-      setValuesError(false)
-    }
-  }, [selectedCriteria.valueMax])
 
   useEffect(() => {
     const checkChildren = async () => {
@@ -184,7 +175,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             <Grid
               style={{
                 display: 'grid',
-                gridTemplateColumns: selectedCriteria.valueComparator === '<X>' ? '100px 1fr 1fr' : '100px 1fr',
+                gridTemplateColumns: selectedCriteria.valueComparator === '<x>' ? '100px 1fr 1fr' : '100px 1fr',
                 alignItems: 'center'
               }}
             >
@@ -201,7 +192,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 <MenuItem value={'='}>{'='}</MenuItem>
                 <MenuItem value={'>'}>{'>'}</MenuItem>
                 <MenuItem value={'>='}>{'>='}</MenuItem>
-                <MenuItem value={'<X>'}>{'< X >'}</MenuItem>
+                <MenuItem value={'<x>'}>{'< X >'}</MenuItem>
               </Select>
 
               <TextField
@@ -214,12 +205,11 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 variant="outlined"
                 value={selectedCriteria.valueMin}
                 onChange={(e) => onChangeValue('valueMin', e.target.value)}
-                placeholder={selectedCriteria.valueComparator === '<X>' ? 'Valeur minimale' : ''}
+                placeholder={selectedCriteria.valueComparator === '<x>' ? 'Valeur minimale' : ''}
                 disabled={!selectedCriteria.isLeaf}
               />
-              {selectedCriteria.valueComparator === '<X>' && (
+              {selectedCriteria.valueComparator === '<x>' && (
                 <TextField
-                  error={valuesError}
                   required
                   inputProps={{
                     min: 1

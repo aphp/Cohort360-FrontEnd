@@ -22,8 +22,6 @@ const defaultInitialState: BiologyState = {
   openedElement: []
 }
 
-// TODO: check pourquoi ligne d'en dessous non prise en compte
-// const localStorageScope = localStorage.getItem('biology') || null
 const localStorageScope = localStorage.getItem('biology') ?? null
 const initialState: BiologyState = localStorageScope ? JSON.parse(localStorageScope) : defaultInitialState
 

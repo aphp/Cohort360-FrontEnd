@@ -5,6 +5,7 @@ import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstrai
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { docTypes } from 'assets/docTypes.json'
+import { fetchBiologyHierarchy } from 'services/cohortCreation/fetchObservation'
 
 const REQUETEUR_VERSION = 'v1.2.1'
 
@@ -449,7 +450,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
           criterion.valueComparator &&
           (criterion.valueMin || criterion.valueMax)
             ? criterion.valueComparator === '<x>' && criterion.valueMax
-              ? `${OBSERVATION_VALUE}=le${criterion.valueMin},${OBSERVATION_VALUE}=ge${criterion.valueMax}`
+              ? `${OBSERVATION_VALUE}=le${criterion.valueMin}&${OBSERVATION_VALUE}=ge${criterion.valueMax}`
               : `${OBSERVATION_VALUE}=${valueComparatorFilter}${criterion.valueMin}`
             : ''
         }`
@@ -1244,8 +1245,6 @@ export async function unbuildRequest(_json: string) {
         break
       }
       case RESSOURCE_TYPE_OBSERVATION: {
-        console.log('element', element)
-        // TODO: tout à vérifier et comprendre
         currentCriterion.title = 'Critère de biologie'
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
         currentCriterion.isLeaf = currentCriterion.isLeaf ? currentCriterion.isLeaf : false
@@ -1274,9 +1273,13 @@ export async function unbuildRequest(_json: string) {
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
+          const nbValueComparators = element?.filterFhir.match(/value-quantity-value/g)?.length
+          // TODO: remplacer value-quantity-value par vraie regex
+
           for (const filter of filters) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
+
             switch (key) {
               case OBSERVATION_CODE: {
                 const codeIds = value?.split(',')
@@ -1285,12 +1288,53 @@ export async function unbuildRequest(_json: string) {
 
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
 
-                // isLeaf ?????
+                // TODO: pas propre vvvv
+                if (currentCriterion.code.length === 1) {
+                  try {
+                    const checkChildrenResp = await fetchBiologyHierarchy(currentCriterion.code?.[0].id)
+
+                    if (checkChildrenResp.length === 0) {
+                      currentCriterion.isLeaf = true
+                    }
+                  } catch (error) {
+                    console.error('Erreur lors du check des enfants du code de biologie sélectionné', error)
+                  }
+                }
+
                 break
               }
 
               case OBSERVATION_VALUE: {
-                // TODO: Faire cette gestion
+                let valueComparator = ''
+                let valueMin = 0
+                let valueMax = 0
+
+                if (value?.search('le') === 0) {
+                  valueComparator = '<='
+                  valueMin = parseInt(value?.replace('le', '')) ?? 0
+                } else if (value?.search('l') === 0) {
+                  valueComparator = '<'
+                  valueMin = parseInt(value?.replace('l', '')) ?? 0
+                } else if (value?.search('ge') === 0) {
+                  if (nbValueComparators === 2) {
+                    valueComparator = '<x>'
+                    valueMax = parseInt(value?.replace('ge', '')) ?? 0
+                  } else {
+                    valueComparator = '>='
+                    valueMin = parseInt(value?.replace('ge', '')) ?? 0
+                  }
+                } else if (value?.search('g') === 0) {
+                  valueComparator = '>'
+                  valueMin = parseInt(value?.replace('g', '')) ?? 0
+                } else {
+                  valueComparator = '='
+                  valueMin = parseInt(value ?? '0')
+                }
+
+                currentCriterion.valueComparator = valueComparator
+                currentCriterion.valueMin = valueMin
+                currentCriterion.valueMax = valueMax
+
                 break
               }
 
