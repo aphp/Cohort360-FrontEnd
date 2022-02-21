@@ -5,6 +5,7 @@ import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstrai
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { docTypes } from 'assets/docTypes.json'
+import { fetchBiologyHierarchy } from 'services/cohortCreation/fetchObservation'
 
 const REQUETEUR_VERSION = 'v1.2.1'
 
@@ -50,6 +51,8 @@ const MEDICATION_PRESCRIPTION_TYPE = 'type' // ok
 const MEDICATION_ADMINISTRATION = 'route' // ok
 
 const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
+const OBSERVATION_CODE = 'codeList'
+const OBSERVATION_VALUE = 'value-quantity-value'
 
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   id: 0,
@@ -410,6 +413,56 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       break
     }
 
+    case RESSOURCE_TYPE_OBSERVATION: {
+      let valueComparatorFilter = ''
+      if (criterion.valueComparator) {
+        switch (criterion.valueComparator) {
+          case '<':
+            valueComparatorFilter = 'l'
+            break
+          case '<=':
+            valueComparatorFilter = 'le'
+            break
+          case '=':
+            valueComparatorFilter = ''
+            break
+          case '>':
+            valueComparatorFilter = 'g'
+            break
+          case '>=':
+            valueComparatorFilter = 'ge'
+            break
+          default:
+            valueComparatorFilter = ''
+            break
+        }
+      }
+
+      filterFhir = [
+        `${
+          criterion.code && criterion.code.length > 0
+            ? `${OBSERVATION_CODE}=${criterion.code
+                .map((diagnosticType: any) => diagnosticType.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
+          criterion.isLeaf &&
+          criterion.code &&
+          criterion.code.length === 1 &&
+          criterion.valueComparator &&
+          (criterion.valueMin || criterion.valueMax)
+            ? criterion.valueComparator === '<x>' && criterion.valueMax
+              ? `${OBSERVATION_VALUE}=le${criterion.valueMin}&${OBSERVATION_VALUE}=ge${criterion.valueMax}`
+              : `${OBSERVATION_VALUE}=${valueComparatorFilter}${criterion.valueMin}`
+            : ''
+        }`
+      ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
+      break
+    }
+
     default:
       break
   }
@@ -467,6 +520,7 @@ export function buildRequest(
             item.type !== RESSOURCE_TYPE_PATIENT &&
             item.type !== RESSOURCE_TYPE_MEDICATION_ADMINISTRATION &&
             item.type !== RESSOURCE_TYPE_MEDICATION_REQUEST &&
+            item.type !== RESSOURCE_TYPE_OBSERVATION &&
             (item.encounterStartDate || item.encounterEndDate)
               ? {
                   minDate: item.encounterStartDate
@@ -1195,6 +1249,108 @@ export async function unbuildRequest(_json: string) {
         }
         break
       }
+      case RESSOURCE_TYPE_OBSERVATION: {
+        currentCriterion.title = 'Critère de biologie'
+        currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
+        currentCriterion.isLeaf = currentCriterion.isLeaf ? currentCriterion.isLeaf : false
+        currentCriterion.valueMin = currentCriterion.valueMin ? currentCriterion.valueMin : 0
+        currentCriterion.valueMax = currentCriterion.valueMax ? currentCriterion.valueMax : 0
+        currentCriterion.valueComparator = currentCriterion.valueComparator ? currentCriterion.valueComparator : '>='
+        currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
+        currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
+        currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+
+        if (element.occurrence) {
+          currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
+          currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
+        }
+
+        if (element.dateRangeList) {
+          currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+        }
+
+        if (element.encounterDateRange) {
+          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+        }
+
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+
+          const nbValueComparators = element?.filterFhir.match(/value-quantity-value/g)?.length
+          // TODO: remplacer value-quantity-value par vraie regex
+
+          for (const filter of filters) {
+            const key = filter ? filter[0] : null
+            const value = filter ? filter[1] : null
+
+            switch (key) {
+              case OBSERVATION_CODE: {
+                const codeIds = value?.split(',')
+                const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
+                if (!newCode) continue
+
+                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
+
+                // TODO: pas propre vvvv
+                if (currentCriterion.code.length === 1) {
+                  try {
+                    const checkChildrenResp = await fetchBiologyHierarchy(currentCriterion.code?.[0].id)
+
+                    if (checkChildrenResp.length === 0) {
+                      currentCriterion.isLeaf = true
+                    }
+                  } catch (error) {
+                    console.error('Erreur lors du check des enfants du code de biologie sélectionné', error)
+                  }
+                }
+
+                break
+              }
+
+              case OBSERVATION_VALUE: {
+                let valueComparator = ''
+                let valueMin = 0
+                let valueMax = 0
+
+                if (value?.search('le') === 0) {
+                  valueComparator = '<='
+                  valueMin = parseInt(value?.replace('le', '')) ?? 0
+                } else if (value?.search('l') === 0) {
+                  valueComparator = '<'
+                  valueMin = parseInt(value?.replace('l', '')) ?? 0
+                } else if (value?.search('ge') === 0) {
+                  if (nbValueComparators === 2) {
+                    valueComparator = '<x>'
+                    valueMax = parseInt(value?.replace('ge', '')) ?? 0
+                  } else {
+                    valueComparator = '>='
+                    valueMin = parseInt(value?.replace('ge', '')) ?? 0
+                  }
+                } else if (value?.search('g') === 0) {
+                  valueComparator = '>'
+                  valueMin = parseInt(value?.replace('g', '')) ?? 0
+                } else {
+                  valueComparator = '='
+                  valueMin = parseInt(value ?? '0')
+                }
+
+                currentCriterion.valueComparator = valueComparator
+                currentCriterion.valueMin = valueMin
+                currentCriterion.valueMax = valueMax
+
+                break
+              }
+
+              default:
+                currentCriterion.error = true
+                break
+            }
+          }
+        }
+        break
+      }
       default:
         break
     }
@@ -1284,6 +1440,7 @@ export const getDataFromFetch = async (
         const dataKey = fetchKey.replace('fetch', '').replace(/(\b[A-Z])(?![A-Z])/g, ($1) => $1.toLowerCase())
         switch (dataKey) {
           case 'atcData':
+          case 'biologyData':
           case 'ghmData':
           case 'ccamData':
           case 'cim10Diagnostic': {

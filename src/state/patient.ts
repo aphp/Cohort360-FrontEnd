@@ -207,11 +207,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
         groupId
       )
 
-      const biologyList: any[] = linkElementWithEncounter(
-        biologyResponse.biologyList as CohortObservation[],
-        hospits,
-        deidentified
-      )
+      const biologyList: any[] = linkElementWithEncounter(biologyResponse.biologyList, hospits, deidentified)
 
       return {
         biology: {
@@ -911,17 +907,7 @@ const patientSlice = createSlice({
         : {
             ...state,
             loading: false,
-            biology: action.payload
-              ? {
-                  ...action.payload.biology
-                }
-              : {
-                  loading: false,
-                  count: 0,
-                  total: 0,
-                  list: [],
-                  page: 1
-                }
+            biology: action.payload?.biology
           }
     )
   }

@@ -17,6 +17,7 @@ import { fetchRequests } from 'state/request'
 import { fetchCohorts } from 'state/cohort'
 import { initPmsiHierarchy } from 'state/pmsi'
 import { initMedicationHierarchy } from 'state/medication'
+import { initBiologyHierarchy } from 'state/biology'
 import { fetchScopesList } from 'state/scope'
 
 import { Cohort, RequestType } from 'types'
@@ -56,6 +57,9 @@ const Accueil: React.FC = () => {
 
     // fetchMedicationData
     dispatch<any>(initMedicationHierarchy())
+
+    // fetchBiologyData
+    dispatch<any>(initBiologyHierarchy())
 
     // fetchScope
     dispatch<any>(fetchScopesList())

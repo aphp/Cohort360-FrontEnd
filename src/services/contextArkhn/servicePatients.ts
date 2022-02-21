@@ -526,9 +526,8 @@ const servicesPatients: IServicePatients = {
       offset: page ? (page - 1) * 20 : 0,
       _text: searchInput,
       encounter: nda,
-      // TODO: changer paramètres
-      // loinc: loinc, paramètre à vérifier
-      // anabio: anabio, paramètre à vérifier
+      loinc: loinc,
+      anabio: anabio,
       minDate: startDate ?? '',
       maxDate: endDate ?? ''
     })
