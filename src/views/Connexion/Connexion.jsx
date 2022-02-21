@@ -123,6 +123,7 @@ const Login = () => {
     localStorage.removeItem('userCohorts')
     localStorage.removeItem('cohortCreation')
     localStorage.removeItem('medication')
+    localStorage.removeItem('biology')
     localStorage.removeItem('scope')
     localStorage.removeItem('project')
     localStorage.removeItem('cohort')

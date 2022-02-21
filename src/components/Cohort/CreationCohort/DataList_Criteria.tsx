@@ -8,6 +8,7 @@ import CCAMForm from './DiagramView/components/LogicalOperator/components/Criter
 import Cim10Form from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/Cim10Form'
 import GhmForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/GHM'
 import MedicationForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/MedicationForm'
+import BiologyForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/BiologyForm'
 
 // Fetcher
 import {
@@ -38,6 +39,7 @@ import {
   fetchPrescriptionTypes,
   fetchAdministrations
 } from 'services/cohortCreation/fetchMedication'
+import { fetchBiologyData, fetchBiologyHierarchy } from 'services/cohortCreation/fetchObservation'
 
 // ├── Mes variables
 // ├── Patients
@@ -158,16 +160,16 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'biologie_microbiologie',
     title: 'Biologie/Microbiologie',
-    color: '#808080',
+    color: '#0063AF',
     components: null,
     subItems: [
       {
-        id: 'biologie',
+        id: 'Observation',
         title: 'Biologie',
-        color: '#808080',
-        disabled: true,
-        data: null,
-        components: null
+        color: '#0063AF',
+        components: BiologyForm,
+        data: { biologyData: 'loading', biologyHierarchy: 'loading' },
+        fetch: { fetchBiologyData, fetchBiologyHierarchy }
       },
       {
         id: 'microbiologie',

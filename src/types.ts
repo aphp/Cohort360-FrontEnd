@@ -478,7 +478,9 @@ export type ObservationDataType = {
   title: string
   type: 'Observation'
   code: { id: string; label: string }[] | null
-  value: number[]
+  isLeaf: boolean
+  valueMin: number
+  valueMax: number
   valueComparator: '<=' | '<' | '=' | '>' | '>=' | '<x>'
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
