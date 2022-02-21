@@ -774,6 +774,52 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         break
       }
 
+      case 'Observation':
+        {
+          const displaySelectedCode = (codes: { id: string; label: string }[]) => {
+            let currentCode: string[] = []
+            for (const code of codes) {
+              const selectedCodeData =
+                data?.biologyData && data?.biologyData !== 'loading'
+                  ? data.biologyData.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                  : null
+              currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+            }
+            return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltipReducer) : ''
+          }
+
+          content = [
+            _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
+              <Chip
+                className={classes.criteriaChip}
+                label={
+                  <Tooltip title={displaySelectedCode(_currentCriteria?.code)}>
+                    <Typography style={{ maxWidth: 500 }} noWrap>
+                      {_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
+                    </Typography>
+                  </Tooltip>
+                }
+              />
+            ),
+            _currentCriteria &&
+              _currentCriteria.isLeaf &&
+              _currentCriteria?.valueComparator &&
+              (_currentCriteria?.valueMin || _currentCriteria?.valueMax) && (
+                <Chip
+                  className={classes.criteriaChip}
+                  label={
+                    <Typography>
+                      {_currentCriteria?.valueComparator === '<x>'
+                        ? `Valeur comprise entre ${_currentCriteria.valueMin} et ${_currentCriteria.valueMax}`
+                        : `Valeur ${_currentCriteria.valueComparator} ${_currentCriteria.valueMin}`}
+                    </Typography>
+                  }
+                />
+              )
+          ]
+        }
+        break
+
       default:
         break
     }

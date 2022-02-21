@@ -92,3 +92,9 @@ export const MEDICATION_PRESCRIPTION_TYPES =
 export const MEDICATION_ADMINISTRATIONS =
   process.env.REACT_APP_VALUE_SET_URL_MEDICATION_ADMINISTRATIONS ??
   'https://terminology.eds.aphp.fr/aphp-orbis-medicament-voie-administration'
+
+export const BIOLOGY_HIERARCHY_ITM_ANABIO =
+  process.env.REACT_APP_VALUE_SET_URL_BIOLOGY ?? 'https://terminology.eds.aphp.fr/aphp-itm-anabio'
+
+export const BIOLOGY_HIERARCHY_ITM_LOINC =
+  process.env.REACT_APP_VALUE_SET_URL_BIOLOGY ?? 'https://terminology.eds.aphp.fr/aphp-itm-loinc'
