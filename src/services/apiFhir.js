@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { ACCES_TOKEN, FHIR_API_URL, TOKEN_URL } from '../constants'
-import { refreshToken, removeTokens } from './arkhnAuth/oauth/tokenManager'
+import { refreshToken, removeTokens } from './contextArkhn/oauth/tokenManager'
 
 const apiFhir = axios.create({
   baseURL: FHIR_API_URL,

@@ -361,6 +361,7 @@ export type SelectedCriteriaType = {
   | EncounterDataType
   | DocumentDataType
   | MedicationDataType
+  | ObservationDataType
 )
 
 export type CcamDataType = {
@@ -373,8 +374,8 @@ export type CcamDataType = {
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
-  startOccurrence: Date
-  endOccurrence: Date
+  startOccurrence: Date | ''
+  endOccurrence: Date | ''
   isInclusive?: boolean
 }
 
@@ -388,8 +389,8 @@ export type Cim10DataType = {
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
-  startOccurrence: Date
-  endOccurrence: Date
+  startOccurrence: Date | ''
+  endOccurrence: Date | ''
   isInclusive?: boolean
 }
 
@@ -409,12 +410,12 @@ export type DocumentDataType = {
   search: string
   regex_search: string
   docType: { id: string; label: string }[] | null
-  encounterEndDate: Date | null
-  encounterStartDate: Date | null
+  encounterEndDate: Date | ''
+  encounterStartDate: Date | ''
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
-  startOccurrence: Date | null
-  endOccurrence: Date | null
+  startOccurrence: Date | ''
+  endOccurrence: Date | ''
   isInclusive?: boolean
 }
 
@@ -427,8 +428,8 @@ export type GhmDataType = {
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   label: undefined
-  startOccurrence: Date | null
-  endOccurrence: Date | null
+  startOccurrence: Date | ''
+  endOccurrence: Date | ''
   isInclusive?: boolean
 }
 
@@ -450,8 +451,8 @@ export type EncounterDataType = {
   destination: { id: string; label: string }[] | null
   provenance: { id: string; label: string }[] | null
   admission: { id: string; label: string }[] | null
-  encounterStartDate: Date | null
-  encounterEndDate: Date | null
+  encounterStartDate: Date | ''
+  encounterEndDate: Date | ''
   isInclusive?: boolean
 }
 
@@ -462,8 +463,8 @@ export type MedicationDataType = {
   administration: { id: string; label: string }[] | null
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
-  startOccurrence: Date | null
-  endOccurrence: Date | null
+  startOccurrence: Date | ''
+  endOccurrence: Date | ''
   isInclusive?: boolean
 } & (
   | {
@@ -472,6 +473,23 @@ export type MedicationDataType = {
     }
   | { type: 'MedicationAdministration' }
 )
+
+export type ObservationDataType = {
+  title: string
+  type: 'Observation'
+  code: { id: string; label: string }[] | null
+  isLeaf: boolean
+  valueMin: number
+  valueMax: number
+  valueComparator: '<=' | '<' | '=' | '>' | '>=' | '<x>'
+  occurrence: number
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
+  startOccurrence: Date | null
+  endOccurrence: Date | null
+  isInclusive?: boolean
+  encounterStartDate: Date | null
+  encounterEndDate: Date | null
+}
 
 export type CohortCreationCounterType = {
   uuid?: string
@@ -592,6 +610,33 @@ export type IPatientMedication<T extends IMedicationRequest | IMedicationAdminis
       code?: string
       selectedPrescriptionTypes?: { id: string; label: string }[]
       selectedAdministrationRoutes?: { id: string; label: string }[]
+    }
+    sort?: {
+      by: string
+      direction: string
+    }
+  }
+}
+
+export type CohortObservation = IObservation & {
+  serviceProvider?: string
+  NDA?: string
+}
+
+export type IPatientObservation<T extends CohortObservation> = {
+  loading: boolean
+  count: number
+  total: number
+  list: T[]
+  page: number
+  options?: {
+    filters?: {
+      searchInput: string
+      nda: string
+      loinc: string
+      anabio: string
+      startDate: string | null
+      endDate: string | null
     }
     sort?: {
       by: string

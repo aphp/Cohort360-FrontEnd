@@ -19,7 +19,7 @@ import InfoIcon from '@material-ui/icons/Info'
 import useStyles from './styles'
 
 type OccurrenceInputsProps = {
-  form: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication'
+  form: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication' | 'biology'
   selectedCriteria: any
   onChangeValue: (key: string, value: any) => void
 }
@@ -33,7 +33,7 @@ const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
     <>
       <FormLabel style={{ padding: '0 1em 8px', display: 'flex', alignItems: 'center' }} component="legend">
         Nombre d'occurrence
-        {(form == 'ccam' || form === 'cim10' || form === 'ghm') && (
+        {(form == 'ccam' || form === 'cim10' || form === 'ghm' || form == 'biology') && (
           <Tooltip
             title={
               <>

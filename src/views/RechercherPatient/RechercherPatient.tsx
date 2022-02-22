@@ -96,7 +96,7 @@ const RechercherPatient: React.FC<{}> = () => {
         [classes.appBarShift]: open
       })}
     >
-      <Grid container justify="center" alignItems="center">
+      <Grid container justifyContent="center" alignItems="center">
         <Grid container item xs={11}>
           <Typography variant="h1" color="primary" className={classes.title}>
             Rechercher un patient
@@ -110,7 +110,7 @@ const RechercherPatient: React.FC<{}> = () => {
             onChangeSearchBy={setSearchBy}
           />
           {loading && (
-            <Grid container item justify="center">
+            <Grid container item justifyContent="center">
               <CircularProgress />
             </Grid>
           )}

@@ -9,7 +9,7 @@ const Footer = () => {
   const classes = useStyles()
 
   return (
-    <Grid container justify="center">
+    <Grid container justifyContent="center">
       <Link href="https://eds.aphp.fr">
         <img className={classes.logoAPHP} src={logoAPHP} alt="Footer" />
       </Link>

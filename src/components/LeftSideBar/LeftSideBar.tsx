@@ -135,7 +135,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
 
           <List>
             <ListItem>
-              <Grid container justify="space-between" alignItems="center" wrap="nowrap">
+              <Grid container justifyContent="space-between" alignItems="center" wrap="nowrap">
                 <Grid container wrap="nowrap" xs={10} alignItems="center" item>
                   <ListItemIcon className={classes.listIcon}>
                     <div className={classes.avatar}>
@@ -367,7 +367,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               <List id="research-collapse">
                 <ListItem>
                   <Link id="savedResearch-link" href="/recherche_sauvegarde" className={classes.nestedTitle}>
-                    Recherches sauvegardées
+                    Cohortes sauvegardées
                   </Link>
                 </ListItem>
                 <ListItem>

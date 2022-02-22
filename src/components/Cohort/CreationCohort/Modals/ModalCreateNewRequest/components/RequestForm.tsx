@@ -93,8 +93,8 @@ const RequestForm: React.FC<RequestFormProps> = ({
           variant="outlined"
           fullWidth
           multiline
-          rows={5}
-          rowsMax={8}
+          minRows={5}
+          maxRows={8}
         />
       </Grid>
     </>

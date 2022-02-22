@@ -1,10 +1,10 @@
 import axios, { AxiosResponse } from 'axios'
 
-import { PORTAIL_API_URL } from '../../constants'
+import { BACK_API_URL } from '../../constants'
 
 import { fetchPractitioner, fetchPractitionerRole } from './callApi'
 
-export interface IServicesPractitioner {
+export interface IServicePractitioner {
   /**
    * Fonction qui permet d'authetifier un utilisateur avec un username et un password
    *
@@ -49,7 +49,7 @@ export interface IServicesPractitioner {
   fetchPractitionerRole: (practionerId: string) => Promise<any>
 }
 
-const servicePractitioner: IServicesPractitioner = {
+const servicePractitioner: IServicePractitioner = {
   authenticate: async (username, password) => {
     getCsrfToken(username, password)
     return axios({
@@ -119,7 +119,7 @@ export const getCsrfToken = (username: string, password: string): Promise<AxiosR
 
   return axios({
     method: 'POST',
-    url: `${PORTAIL_API_URL}/accounts/login/`,
+    url: `${BACK_API_URL}/accounts/login/`,
     data: formData
   })
 }

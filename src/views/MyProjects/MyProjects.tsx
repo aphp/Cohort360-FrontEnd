@@ -90,7 +90,7 @@ const MyProjects = () => {
           [classes.appBarShift]: open
         })}
       >
-        <Grid container className={classes.loaderGrid} justify="center" alignItems="center">
+        <Grid container className={classes.loaderGrid} justifyContent="center" alignItems="center">
           <CircularProgress />
         </Grid>
       </Grid>
@@ -106,7 +106,7 @@ const MyProjects = () => {
           [classes.appBarShift]: open
         })}
       >
-        <Grid container justify="center" alignItems="center">
+        <Grid container justifyContent="center" alignItems="center">
           <Grid container item xs={11}>
             <Typography id="myProject-title" variant="h1" color="primary" className={classes.title}>
               Mes projets de recherche
@@ -114,7 +114,7 @@ const MyProjects = () => {
           </Grid>
 
           <Grid item xs={11}>
-            <Grid container justify="space-between">
+            <Grid container justifyContent="space-between">
               <Grid className={classes.secondaryContainer}>
                 {selectedRequests.length > 0 && (
                   <>

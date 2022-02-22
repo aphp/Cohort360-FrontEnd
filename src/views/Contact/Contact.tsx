@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useAppSelector } from 'state'
+import clsx from 'clsx'
 
 import {
   Button,
@@ -14,9 +15,9 @@ import {
 } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 
+import services from 'services'
+
 import useStyles from './styles'
-import clsx from 'clsx'
-import { postIssue } from 'services/contact'
 
 const defaultContactRequest = {
   requestType: '',
@@ -100,7 +101,7 @@ const Contact: React.FC = () => {
         contactSubmitForm.append('attachment', contactRequest.files[0])
       }
 
-      const postIssueResp = await postIssue(contactSubmitForm)
+      const postIssueResp = await services.contact.postIssue(contactSubmitForm)
 
       setContactRequest(defaultContactRequest)
       setLoading(false)
@@ -181,8 +182,8 @@ const Contact: React.FC = () => {
                   variant="outlined"
                   fullWidth
                   multiline
-                  rows={5}
-                  rowsMax={8}
+                  minRows={5}
+                  maxRows={8}
                   style={{ backgroundColor: 'white', marginBottom: 24 }}
                   error={error === ERROR_MESSAGE}
                 />

@@ -160,7 +160,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       <Divider />
       <List className={classes.patientList} disablePadding>
         {loadingStatus ? (
-          <Grid container justify="center" className={classes.loading}>
+          <Grid container justifyContent="center" className={classes.loading}>
             <CircularProgress />
           </Grid>
         ) : patientsToDisplay ? (
@@ -185,7 +185,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
             />
           ))
         ) : (
-          <Grid container justify="center">
+          <Grid container justifyContent="center">
             <Typography variant="h6">Aucun patient à afficher</Typography>
           </Grid>
         )}

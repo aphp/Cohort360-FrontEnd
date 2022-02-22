@@ -1,4 +1,5 @@
 import { CohortPatient } from 'types'
+import moment from 'moment'
 import { CONTEXT } from '../constants'
 
 export const getAgeArkhn = (birthDate: Date, deathOrTodayDate = new Date()) => {
@@ -12,19 +13,26 @@ export const getAgeArkhn = (birthDate: Date, deathOrTodayDate = new Date()) => {
 }
 
 export const getAgeAphp = (ageObj: any) => {
-  if (ageObj.valueString) {
-    let ageUnit = ''
-    if (ageObj.url.includes('Years')) {
-      ageUnit = 'ans'
-    } else if (ageObj.url.includes('Months')) {
-      ageUnit = 'mois'
-    } else if (ageObj.url.includes('Days')) {
-      ageUnit = 'jours'
+  if (ageObj.valueInteger) {
+    let ageUnit: 'year' | 'month' | 'day' = 'year'
+    let ageUnitDisplay = ''
+    const momentAge = moment().subtract(ageObj.valueInteger, 'days')
+    const today = moment()
+
+    if (today.diff(momentAge, 'year') > 0) {
+      ageUnit = 'year'
+      ageUnitDisplay = 'ans'
+    } else if (today.diff(momentAge, 'month') > 0) {
+      ageUnit = 'month'
+      ageUnitDisplay = 'mois'
+    } else if (today.diff(momentAge, 'day') > 0) {
+      ageUnit = 'day'
+      ageUnitDisplay = 'jours'
     } else {
       return 'Âge inconnu'
     }
 
-    return `${ageObj.valueString.slice(0, ageObj.valueString.indexOf('.'))} ${ageUnit}`
+    return `${today.diff(momentAge, ageUnit)} ${ageUnitDisplay}`
   } else {
     return 'Âge inconnu'
   }
@@ -33,7 +41,7 @@ export const getAgeAphp = (ageObj: any) => {
 export const getAge = (patient: CohortPatient): string => {
   if (CONTEXT === 'aphp') {
     if (patient.extension) {
-      return getAgeAphp(patient.extension.find((item) => item.url?.includes('Age')))
+      return getAgeAphp(patient.extension.find((item) => item.url?.includes('Age(TotalDays)')))
     }
   } else if (CONTEXT === 'arkhn') {
     if (patient.birthDate) {

@@ -1,8 +1,8 @@
 import axios, { AxiosResponse } from 'axios'
 
 import { v4 as uuid } from 'uuid'
-import { STATE_STORAGE_KEY, PORTAIL_API_URL } from '../../constants'
-import { authClient } from '../arkhnAuth/oauth/authClient'
+import { STATE_STORAGE_KEY, BACK_API_URL } from '../../constants'
+import { authClient } from '../contextArkhn/oauth/authClient'
 
 export const authenticate = async (username: string, password: string): Promise<any> => {
   getCsrfToken(username, password)
@@ -29,7 +29,7 @@ export const getCsrfToken = (username: string, password: string): Promise<AxiosR
 
   return axios({
     method: 'POST',
-    url: `${PORTAIL_API_URL}/accounts/login/`,
+    url: `${BACK_API_URL}/accounts/login/`,
     data: formData
   })
 }

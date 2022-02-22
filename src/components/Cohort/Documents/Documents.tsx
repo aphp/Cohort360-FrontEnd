@@ -53,6 +53,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   const [openFilter, setOpenFilter] = useState(false)
 
   const [nda, setNda] = useState('')
+  const [ipp, setIpp] = useState('')
   const [selectedDocTypes, setSelectedDocTypes] = useState<any[]>([])
   const [startDate, setStartDate] = useState<string | null>(null)
   const [endDate, setEndDate] = useState<string | null>(null)
@@ -109,6 +110,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
       input ?? '',
       selectedDocTypesCodes,
       nda,
+      ipp,
       startDate,
       endDate,
       groupId
@@ -130,7 +132,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
 
   useEffect(() => {
     onSearchDocument(_sortBy, _sortDirection)
-  }, [!!deidentifiedBoolean, selectedDocTypes, nda, startDate, endDate, _sortBy, _sortDirection]) // eslint-disable-line
+  }, [!!deidentifiedBoolean, selectedDocTypes, nda, ipp, startDate, endDate, _sortBy, _sortDirection]) // eslint-disable-line
 
   const handleOpenDialog = () => {
     setOpenFilter(true)
@@ -146,6 +148,15 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
         value &&
           setNda(
             nda
+              .split(',')
+              .filter((item) => item !== value)
+              .join(',')
+          )
+        break
+      case 'ipp':
+        value &&
+          setIpp(
+            ipp
               .split(',')
               .filter((item) => item !== value)
               .join(',')
@@ -250,6 +261,19 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
                       variant="outlined"
                     />
                   ))}
+              {ipp !== '' &&
+                ipp
+                  .split(',')
+                  .map((value) => (
+                    <Chip
+                      className={classes.chips}
+                      key={value}
+                      label={value}
+                      onDelete={() => handleDeleteChip('ipp', value)}
+                      color="primary"
+                      variant="outlined"
+                    />
+                  ))}
               {displayingSelectedDocType.length > 0 &&
                 displayingSelectedDocType.map((docType) => (
                   <Chip
@@ -339,6 +363,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
         onSubmit={handleCloseDialog()}
         nda={nda}
         onChangeNda={setNda}
+        ipp={ipp}
+        onChangeIpp={setIpp}
         selectedDocTypes={selectedDocTypes}
         onChangeSelectedDocTypes={setSelectedDocTypes}
         startDate={startDate}

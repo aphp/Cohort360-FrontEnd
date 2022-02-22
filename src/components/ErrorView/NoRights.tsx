@@ -14,9 +14,16 @@ const NoRights = () => {
   const history = useHistory()
 
   return (
-    <Grid container direction="column" justify="center" alignItems="center" spacing={2} className={classes.appBar}>
+    <Grid
+      container
+      direction="column"
+      justifyContent="center"
+      alignItems="center"
+      spacing={2}
+      className={classes.appBar}
+    >
       <Grid item className={classes.item}>
-        <Grid container direction="column" justify="center" alignItems="center">
+        <Grid container direction="column" justifyContent="center" alignItems="center">
           <Grid item style={{ padding: 16 }}>
             <WarningIcon style={{ fontSize: 60 }} />
           </Grid>

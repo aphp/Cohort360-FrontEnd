@@ -223,8 +223,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   }, [currrentPmsi, currrentPmsi?.list]) // eslint-disable-line
 
   return (
-    <Grid container item xs={11} justify="flex-end" className={classes.documentTable}>
-      <Grid item container justify="space-between" alignItems="center" className={classes.filterAndSort}>
+    <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
+      <Grid item container justifyContent="space-between" alignItems="center" className={classes.filterAndSort}>
         <Tabs
           classes={{
             root: classes.root,
@@ -358,7 +358,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
           ))}
       </Grid>
       {loading ? (
-        <Grid container justify="center">
+        <Grid container justifyContent="center">
           <CircularProgress />
         </Grid>
       ) : (
@@ -451,7 +451,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
               ) : (
                 <TableRow className={classes.emptyTableRow}>
                   <TableCell colSpan={9} align="left">
-                    <Grid container justify="center">
+                    <Grid container justifyContent="center">
                       <Typography variant="button">{`Aucun ${
                         selectedTab !== 'diagnostic' ? (selectedTab !== 'ccam' ? 'ghm' : 'acte') : 'diagnostic'
                       } à afficher`}</Typography>

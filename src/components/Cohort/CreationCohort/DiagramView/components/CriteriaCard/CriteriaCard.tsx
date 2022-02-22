@@ -5,6 +5,7 @@ import { IconButton, Typography } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
 import WarningIcon from '@material-ui/icons/Warning'
+import LibraryAddIcon from '@material-ui/icons/LibraryAdd'
 
 import CriteriaCardContent from './components/CriteriaCardContent/CriteriaCardContent'
 
@@ -15,11 +16,12 @@ import { SelectedCriteriaType } from 'types'
 
 type CriteriaCardProps = {
   itemId: number
+  duplicateCriteria: (criteriaId: number) => void
   deleteCriteria: (criteriaId: number) => void
   editCriteria: (criteria: SelectedCriteriaType) => void
 }
 
-const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, editCriteria, deleteCriteria }) => {
+const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, editCriteria, deleteCriteria }) => {
   const classes = useStyles()
 
   const { selectedCriteria = [] } = useAppSelector((state) => state.cohortCreation.request || {})
@@ -44,6 +46,13 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, editCriteria, delet
         ) : (
           <></>
         )}
+        <IconButton
+          size="small"
+          onClick={() => duplicateCriteria(currentCriterion.id)}
+          style={{ color: 'currentcolor' }}
+        >
+          <LibraryAddIcon />
+        </IconButton>
         <IconButton size="small" onClick={() => editCriteria(currentCriterion)} style={{ color: 'currentcolor' }}>
           <EditIcon />
         </IconButton>

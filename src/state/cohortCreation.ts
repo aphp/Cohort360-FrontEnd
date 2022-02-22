@@ -15,7 +15,7 @@ import { logout, login } from './me'
 import { addRequest, deleteRequest } from './request'
 import { deleteProject } from './project'
 
-import { createSnapshot, countCohort, fetchRequest } from 'services/cohortCreation'
+import services from 'services'
 
 const localStorageCohortCreation = localStorage.getItem('cohortCreation') ?? null
 const jsonCohortCreation = localStorageCohortCreation
@@ -105,7 +105,7 @@ const fetchRequestCohortCreation = createAsyncThunk<
 >('cohortCreation/fetchRequest', async ({ requestId, snapshotId }, { dispatch }) => {
   try {
     if (!requestId) return {}
-    const requestResult = await fetchRequest(requestId, snapshotId)
+    const requestResult = await services.cohortCreation.fetchRequest(requestId, snapshotId)
     if (!requestResult) return {}
 
     const { requestName, json, currentSnapshot, snapshotsHistory, count } = requestResult
@@ -153,7 +153,7 @@ const countCohortCreation = createAsyncThunk<
     const { snapshotsHistory } = state.cohortCreation.request
     const newSnapshotsHistory = [...snapshotsHistory].map((item) => ({ ...item }))
 
-    const countResult = await countCohort(json, snapshotId, requestId, uuid)
+    const countResult = await services.cohortCreation.countCohort(json, snapshotId, requestId, uuid)
     if (!countResult) return {}
 
     if (!uuid) {
@@ -198,7 +198,7 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
 
       if (!snapshotsHistory || (snapshotsHistory && snapshotsHistory.length === 0)) {
         if (requestId) {
-          const newSnapshot: any = await createSnapshot(requestId, newJson, true)
+          const newSnapshot: any = await services.cohortCreation.createSnapshot(requestId, newJson, true)
           if (newSnapshot) {
             const uuid = newSnapshot.uuid
             const json = newSnapshot.serialized_query
@@ -210,7 +210,7 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
         }
       } else if (currentSnapshot) {
         // Update snapshots list
-        const newSnapshot: any = await createSnapshot(currentSnapshot, newJson, false)
+        const newSnapshot: any = await services.cohortCreation.createSnapshot(currentSnapshot, newJson, false)
         if (newSnapshot) {
           const foundItem = snapshotsHistory.find(
             (snapshotsHistory: CohortCreationSnapshotType) => snapshotsHistory.uuid === currentSnapshot
@@ -403,7 +403,7 @@ const cohortCreationSlice = createSlice({
           criteriaIds: [...criteriaGroup.criteriaIds, ...oldGroupsChildren]
         }
       })
-      state.nextCriteriaId = state.selectedCriteria.length + 1
+      state.nextCriteriaId += 1
     },
     deleteCriteriaGroup: (state: CohortCreationState, action: PayloadAction<number>) => {
       const groupId = action.payload
@@ -473,6 +473,51 @@ const cohortCreationSlice = createSlice({
       const foundItem = state.criteriaGroup.find(({ id }) => id === action.payload.id)
       const index = foundItem ? state.criteriaGroup.indexOf(foundItem) : -1
       if (index !== -1) state.criteriaGroup[index] = action.payload
+    },
+    duplicateSelectedCriteria: (state: CohortCreationState, action: PayloadAction<number>) => {
+      const criteriaId = action.payload
+
+      // Duplicate
+      const duplicatedCriterion = state.selectedCriteria.find(({ id }) => id === criteriaId)
+      if (!duplicatedCriterion) return
+
+      state.selectedCriteria = [...state.selectedCriteria, duplicatedCriterion]
+
+      // Re-assign IDs of selectedCriteria + criteriaIDs into criteriaGroup
+      const criteriaGroupSaved = [...state.criteriaGroup]
+      // Reset Group criteriaIds
+      state.criteriaGroup = state.criteriaGroup.map((item) => ({ ...item, criteriaIds: [] }))
+
+      // Re-assign IDs of selectedCriteria
+      state.selectedCriteria = state.selectedCriteria.map((selectedCriteria, index) => {
+        // Get the parent of current critria
+        const parentGroup = criteriaGroupSaved.find((criteriaGroup) =>
+          criteriaGroup.criteriaIds.find((criteriaId) => criteriaId === selectedCriteria.id)
+        )
+        if (parentGroup) {
+          const indexOfParent = criteriaGroupSaved.indexOf(parentGroup)
+          // Assign the new criterion identifier to its group
+          if (indexOfParent !== -1) {
+            state.criteriaGroup[indexOfParent] = {
+              ...state.criteriaGroup[indexOfParent],
+              criteriaIds: [...state.criteriaGroup[indexOfParent].criteriaIds, index + 1]
+            }
+          }
+        }
+        return { ...selectedCriteria, id: index + 1 }
+      })
+      // Re-assign IDs of criteriaIDs into criteriaGroup
+      state.criteriaGroup = state.criteriaGroup.map((criteriaGroup) => {
+        const foundGroupSaved = criteriaGroupSaved.find(({ id }) => id === criteriaGroup.id)
+        const oldGroupsChildren = foundGroupSaved
+          ? foundGroupSaved.criteriaIds.filter((criteriaId) => +criteriaId < 0)
+          : []
+        return {
+          ...criteriaGroup,
+          criteriaIds: [...criteriaGroup.criteriaIds, ...oldGroupsChildren]
+        }
+      })
+      state.nextCriteriaId += 1
     },
     updateTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
       const foundItem = state.temporalConstraints.find(({ idList }) => {
@@ -563,6 +608,8 @@ export const {
   //
   editSelectedCriteria,
   editCriteriaGroup,
+  //
+  duplicateSelectedCriteria,
   //
   updateTemporalConstraint,
   suspendCount,

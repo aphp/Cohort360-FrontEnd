@@ -62,7 +62,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
   if (props.deidentified) {
     return (
       <div className={classes.root}>
-        <Grid container item justify="flex-end" className={classes.margin}>
+        <Grid container item justifyContent="flex-end" className={classes.margin}>
           <Button
             variant="contained"
             disableElevation
@@ -143,7 +143,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
   return (
     <div className={classes.root}>
       <Typography variant="button">Rechercher par :</Typography>
-      <Grid container item justify="space-between" alignItems="center">
+      <Grid container item justifyContent="space-between" alignItems="center">
         <Autocomplete
           options={searchByNames}
           getOptionLabel={(option) => option.label}
@@ -165,7 +165,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
           </IconButton>
         </Grid>
       </Grid>
-      <Grid container item justify="space-between">
+      <Grid container item justifyContent="space-between">
         <Button
           variant="contained"
           disableElevation

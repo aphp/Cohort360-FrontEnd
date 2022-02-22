@@ -16,8 +16,8 @@ const defaultMedication: MedicationDataType = {
   administration: [],
   occurrence: 1,
   occurrenceComparator: '>=',
-  startOccurrence: null,
-  endOccurrence: null,
+  startOccurrence: '',
+  endOccurrence: '',
   isInclusive: true
 }
 

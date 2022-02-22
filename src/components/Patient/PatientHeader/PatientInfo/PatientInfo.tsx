@@ -35,7 +35,7 @@ const PatientInfo: React.FC<PatientInfoTypes> = ({ gender, age, ipp }) => {
 
   return (
     <Grid className={classes.root} container direction="column">
-      <Grid container item justify="center" alignItems="center" className={classes.whiteCircle}>
+      <Grid container item justifyContent="center" alignItems="center" className={classes.whiteCircle}>
         <GenderIcon gender={gender} />
       </Grid>
       <Typography variant="body1">{age}</Typography>

@@ -22,13 +22,13 @@ const CohortNoPatient = () => {
     <Grid
       container
       direction="column"
-      justify="center"
+      justifyContent="center"
       alignItems="center"
       spacing={2}
       className={clsx(classes.appBar, { [classes.appBarShift]: openDrawer })}
     >
       <Grid item className={classes.item}>
-        <Grid container direction="column" justify="center" alignItems="center">
+        <Grid container direction="column" justifyContent="center" alignItems="center">
           <Grid item style={{ padding: 16 }}>
             <PersonOffIcon style={{ fontSize: 60 }} />
           </Grid>

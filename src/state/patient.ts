@@ -11,9 +11,18 @@ import {
   ICondition,
   IIdentifier,
   IMedicationAdministration,
-  IMedicationRequest
+  IMedicationRequest,
+  IObservation
 } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { CohortEncounter, IPatientDetails, IPatientDocuments, IPatientPmsi, IPatientMedication } from 'types'
+import {
+  CohortEncounter,
+  CohortObservation,
+  IPatientDetails,
+  IPatientDocuments,
+  IPatientPmsi,
+  IPatientMedication,
+  IPatientObservation
+} from 'types'
 
 import { logout } from './me'
 
@@ -37,6 +46,7 @@ export type PatientState = null | {
     administration?: IPatientMedication<IMedicationAdministration>
     prescription?: IPatientMedication<IMedicationRequest>
   }
+  biology?: IPatientObservation<CohortObservation>
 }
 
 const localStoragePatient = localStorage.getItem('patient') || null
@@ -135,6 +145,87 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
     }
   }
 )
+
+/**
+ * fetchBiology
+ *
+ */
+type FetchBiologyParams = {
+  groupId?: string
+  options?: {
+    page?: number
+    filters?: {
+      searchInput: string
+      nda: string
+      loinc: string
+      anabio: string
+      startDate: string | null
+      endDate: string | null
+    }
+    sort?: {
+      by: string
+      direction: string
+    }
+  }
+}
+type FetchBiologyReturn = undefined | { biology: IPatientObservation<CohortObservation> }
+const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { state: RootState }>(
+  'patient/fetchBiology',
+  async ({ groupId, options }, { getState }) => {
+    try {
+      const patientState = getState().patient
+
+      const patientId = patientState?.patientInfo?.id ?? ''
+      if (!patientId) {
+        throw new Error('Patient Error: patient is required')
+      }
+
+      const deidentified = patientState?.deidentified ?? true
+      const hospits = patientState?.hospits?.list ?? []
+
+      const sortBy = options?.sort?.by ?? ''
+      const sortDirection = options?.sort?.direction ?? ''
+      const page = options?.page ?? 1
+      const searchInput = options?.filters?.searchInput ?? ''
+      const nda = options?.filters?.nda ?? ''
+      const loinc = options?.filters?.loinc ?? ''
+      const anabio = options?.filters?.anabio ?? ''
+      const startDate = options?.filters?.startDate ?? null
+      const endDate = options?.filters?.endDate ?? null
+
+      const biologyResponse = await services.patients.fetchObservation(
+        sortBy,
+        sortDirection,
+        page,
+        patientId,
+        searchInput,
+        nda,
+        loinc,
+        anabio,
+        startDate,
+        endDate,
+        groupId
+      )
+
+      const biologyList: any[] = linkElementWithEncounter(biologyResponse.biologyList, hospits, deidentified)
+
+      return {
+        biology: {
+          loading: false,
+          count: biologyResponse.biologyTotal,
+          total: patientState?.biology?.total ? patientState?.biology?.total : biologyResponse.biologyTotal,
+          list: biologyList,
+          page,
+          options
+        } as IPatientObservation<CohortObservation>
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération de la biologie', error)
+      throw error
+    }
+  }
+)
+
 /**
  * fetchMedication
  *
@@ -585,7 +676,8 @@ const patientSlice = createSlice({
             hospits: action.payload.hospits,
             documents: undefined,
             pmsi: undefined,
-            medication: undefined
+            medication: undefined,
+            biology: undefined
           }
     )
     builder.addCase(fetchPatientInfo.rejected, () => null)
@@ -789,15 +881,59 @@ const patientSlice = createSlice({
           }
     )
     builder.addCase(fetchMedication.rejected, () => null)
+    builder.addCase(fetchBiology.rejected, () => null)
+    builder.addCase(fetchBiology.pending, (state) =>
+      state === null
+        ? null
+        : {
+            ...state,
+            biology: state.biology
+              ? {
+                  ...state.biology,
+                  loading: true
+                }
+              : {
+                  loading: true,
+                  count: 0,
+                  total: 0,
+                  list: [],
+                  page: 1
+                }
+          }
+    )
+    builder.addCase(fetchBiology.fulfilled, (state, action) =>
+      action.payload === undefined
+        ? null
+        : {
+            ...state,
+            loading: false,
+            biology: action.payload?.biology
+          }
+    )
   }
 })
 
 export default patientSlice.reducer
-export { fetchPatientInfo, fetchLastPmsiInfo, fetchAllProcedures, fetchDocuments, fetchPmsi, fetchMedication }
+export {
+  fetchPatientInfo,
+  fetchLastPmsiInfo,
+  fetchAllProcedures,
+  fetchDocuments,
+  fetchPmsi,
+  fetchMedication,
+  fetchBiology
+}
 export const { clearPatient } = patientSlice.actions
 
 function linkElementWithEncounter<
-  T extends IProcedure | ICondition | IClaim | IComposition | IMedicationRequest | IMedicationAdministration
+  T extends
+    | IProcedure
+    | ICondition
+    | IClaim
+    | IComposition
+    | IMedicationRequest
+    | IMedicationAdministration
+    | IObservation
 >(pmsiEntries: T[], listeEncounters: any[], deidentifiedBoolean: any) {
   let elementList: (T & {
     serviceProvider?: string
@@ -830,6 +966,9 @@ function linkElementWithEncounter<
         break
       case 'MedicationAdministration':
         encounterId = (entry as IMedicationAdministration).context?.reference?.replace(/^Encounter\//, '') ?? ''
+        break
+      case 'Observation':
+        encounterId = (entry as IObservation).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
     }
     const foundEncounter = listeEncounters.find(({ id }) => id === encounterId) || {}

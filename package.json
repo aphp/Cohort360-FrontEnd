@@ -41,7 +41,7 @@
   "resolutions": {
     "ansi-html": "https://registry.npmjs.org/ansi-html-community/-/ansi-html-community-0.0.8.tgz",
     "ansi-regex": "^5.0.0",
-    "node-forge": "^0.10.0",
+    "node-forge": "^1.0.0",
     "browserslist": "^4.17.4",
     "glob-parent": "^6.0.2",
     "immer": "^9.0.6",
@@ -52,7 +52,7 @@
   "scripts": {
     "fix-packages": "npx npm-force-resolutions",
     "start": "react-scripts start",
-    "build": "react-scripts --max-old-space-size=7168 build",
+    "build": "react-scripts build",
     "lint": "eslint --ext .jsx,.js,.ts,.tsx src/",
     "test": "wdio wdio.conf.js --suite Generics --suite HomePage --suite MyPatients --suite Requests",
     "start:aphp": "env $(cat .env.aphp) react-scripts start",

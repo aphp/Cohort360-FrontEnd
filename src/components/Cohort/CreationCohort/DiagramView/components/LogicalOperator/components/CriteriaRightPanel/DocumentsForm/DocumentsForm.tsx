@@ -39,10 +39,10 @@ const defaultComposition: DocumentDataType = {
   docType: [],
   occurrence: 1,
   occurrenceComparator: '>=',
-  encounterEndDate: null,
-  encounterStartDate: null,
-  startOccurrence: null,
-  endOccurrence: null,
+  encounterEndDate: '',
+  encounterStartDate: '',
+  startOccurrence: '',
+  endOccurrence: '',
   isInclusive: true
 }
 
@@ -128,7 +128,6 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            defaultValue="Critère de document"
             variant="outlined"
             value={defaultValues.title}
             onChange={(e) => _onChangeValue('title', e.target.value)}
