@@ -7,23 +7,26 @@ const Page = MyPatientDatasPage
 
 describe('Cohort360 - SCP03 - Page "Données patient"', () => {
 
-  // Accès à la page "Données patients"
+	// Accès à la page "Données patients"
 	// ----------------------------------
+
 	it('Accès à la page "Données patients" (authentification)', async () => {
-    Logger.log('Accès à la page "Données patients"')
-    await MyPatientDatasPage.login()
+
+    	Logger.log('Accès à la page "Données patients"')
+    	await MyPatientDatasPage.login()
 		expect(await browser.getUrl()).withContext('@ L\'URL de la page "Données patients" doit être : ' + MyPatientDatasPage.getUrl()).toBe(MyPatientDatasPage.getUrl())
 
-		// Logger.log(PatientContextBar.accessLibValue + ' ' + MyPatientDatasPage.access)
-		// expect(MyPatientDatasPage.access).withContext('@ ' + PatientContextBar.accessLibValue + ' ' + MyPatientDatasPage.access).not.toBe(PatientContextBar.defaultAccessValue)
+		Logger.log(PatientContextBar.accessLibValue + ' ' + await MyPatientDatasPage.access())
+		expect(await MyPatientDatasPage.access()).withContext('@ ' + PatientContextBar.accessLibValue + ' ' + await MyPatientDatasPage.access()).not.toBe(PatientContextBar.defaultAccessValue)
 
-		// Logger.log('L\'onglet "Patients" est actif')
-		// expect(MyPatientDatasPage.patientsTab.getAttribute('aria-selected')).withContext('@ L\'onglet "Patients" est actif').toBe('true')
+		Logger.log('L\'onglet "Patients" est actif')
+		expect(await MyPatientDatasPage.patientsTab.getAttribute('aria-selected')).withContext('@ L\'onglet "Patients" est actif').toBe('true')
 
-		// Logger.log('La 1ère ligne de la liste de patients est affichée')
-		// MyPatientDatasPage.patientListBlock.resetList()
+		Logger.log('La 1ère ligne de la liste de patients est affichée')
+		MyPatientDatasPage.patientListBlock.resetList()
 		// MyPatientDatasPage.patientListBlock.setCurrentLine(0)
 		// expect(MyPatientDatasPage.patientListBlock.currentLine.waitForDisplayed()).withContext('@ La 1ère ligne de la lise de documents est affichée').toBe(true)
+
 		// Logger.log(MyPatientDatasPage.patientListBlock.currentLineDisplayed)
 	})
 	
@@ -138,9 +141,9 @@ describe('Cohort360 - SCP03 - Page "Données patient"', () => {
 
   // Déconnexion
 	// -----------
-	it('Déconnexion', () => {
+	it('Déconnexion', async () => {
 		Logger.log('Déconnexion')
-		MyPatientDatasPage.logout()
+		await MyPatientDatasPage.logout()
 	})
 
 })
