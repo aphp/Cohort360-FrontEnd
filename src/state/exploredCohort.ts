@@ -72,7 +72,6 @@ const fetchExploredCohort = createAsyncThunk<
   { state: RootState }
 >('exploredCohort/fetchExploredCohort', async ({ context, id, forceReload }, { getState, dispatch }) => {
   const state = getState()
-  const providerId = state.me?.id
   const stateCohort = state.exploredCohort.cohort
 
   let shouldRefreshData = true
@@ -114,7 +113,7 @@ const fetchExploredCohort = createAsyncThunk<
           cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
           if (cohort) {
             cohort.cohortId = id
-            cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
+            cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id)
           }
         }
         break
@@ -161,7 +160,6 @@ const fetchExploredCohortInBackground = createAsyncThunk<
   { state: RootState }
 >('exploredCohort/fetchExploredCohortInBackground', async ({ context, id }, { getState }) => {
   const state = getState()
-  const providerId = state.me?.id
 
   let cohort
   switch (context) {
@@ -169,7 +167,7 @@ const fetchExploredCohortInBackground = createAsyncThunk<
       if (id) {
         cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
         if (cohort) {
-          cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
+          cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id)
         }
       }
       break
