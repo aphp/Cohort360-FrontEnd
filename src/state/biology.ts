@@ -22,9 +22,6 @@ const defaultInitialState: BiologyState = {
   openedElement: []
 }
 
-const localStorageScope = localStorage.getItem('biology') ?? null
-const initialState: BiologyState = localStorageScope ? JSON.parse(localStorageScope) : defaultInitialState
-
 const initBiologyHierarchy = createAsyncThunk<BiologyState, void, { state: RootState }>(
   'biology/fetchElements',
   async (DO_NOT_USE, { getState }) => {
@@ -129,7 +126,7 @@ const expandBiologyElement = createAsyncThunk<BiologyState, ExpandBiologyElement
 
 const biologySlice = createSlice({
   name: 'biology',
-  initialState,
+  initialState: defaultInitialState,
   reducers: {
     clearBiologyHierarchy: () => {
       return {

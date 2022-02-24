@@ -42,7 +42,7 @@ function EnhancedTableHead(props) {
           <TableCell
             key={headCell.id || Math.random()}
             align={headCell.align}
-            padding={headCell.disablePadding ? 'none' : 'default'}
+            padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
