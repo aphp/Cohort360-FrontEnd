@@ -120,6 +120,12 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
           </Alert>
         )}
 
+        <Alert severity="warning">
+          Les mesures de biologie sont pour l'instant restreintes aux 3300 codes d'analyse du référentiel qui
+          représentent XX% des résultats intégrés à l'EDS. De plus, les résultats concernent uniquement les analyses
+          quantitatives enregistrées sur GLIMS V9 qui ont été créés et mises à jours depuis mars 2020.
+        </Alert>
+
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">Biologie</Typography>
 
