@@ -98,3 +98,11 @@ export const BIOLOGY_HIERARCHY_ITM_ANABIO =
 
 export const BIOLOGY_HIERARCHY_ITM_LOINC =
   process.env.REACT_APP_VALUE_SET_URL_BIOLOGY ?? 'https://terminology.eds.aphp.fr/aphp-itm-loinc'
+
+export const ODD_BIOLOGY: boolean = process.env.REACT_APP_ODD_BIOLOGY === 'true' ?? false
+export const ODD_COMPOSITION: boolean = process.env.REACT_APP_ODD_COMPOSITION === 'true' ?? false
+export const ODD_PROCEDURE: boolean = process.env.REACT_APP_ODD_PROCEDURE === 'true' ?? false
+export const ODD_CLAIM: boolean = process.env.REACT_APP_ODD_CLAIM === 'true' ?? false
+export const ODD_CONDITION: boolean = process.env.REACT_APP_ODD_CONDITION === 'true' ?? false
+export const ODD_OBSERVATION: boolean = process.env.REACT_APP_ODD_OBSERVATION === 'true' ?? false
+export const ODD_MEDICATION: boolean = process.env.REACT_APP_ODD_MEDICATION === 'true' ?? false
