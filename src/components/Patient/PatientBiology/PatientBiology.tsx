@@ -21,6 +21,7 @@ import {
   Typography
 } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
+import Alert from '@material-ui/lab/Alert'
 
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
@@ -157,6 +158,14 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
 
   return (
     <Grid container item xs={11} justify="flex-end" className={classes.documentTable}>
+      <Grid container item style={{ marginBottom: 8 }}>
+        <Alert severity="warning">
+          Les mesures de biologie sont pour l'instant restreintes aux 3300 codes d'analyse du référentiel qui
+          représentent XX% des résultats intégrés à l'EDS. De plus, les résultats concernent uniquement les analyses
+          quantitatives enregistrées sur GLIMS V9 qui ont été créés et mises à jours depuis mars 2020.
+        </Alert>
+      </Grid>
+
       <Grid container item justify="space-between" alignItems="center" className={classes.filterAndSort}>
         <Typography variant="button">
           {totalBiology || 0} / {totalAllBiology ?? 0} résultats

@@ -42,9 +42,6 @@ const defaultInitialState: PmsiState = {
   }
 }
 
-const localStorageScope = localStorage.getItem('pmsi') || null
-const initialState: PmsiState = localStorageScope ? JSON.parse(localStorageScope) : defaultInitialState
-
 const initPmsiHierarchy = createAsyncThunk<PmsiState, void, { state: RootState }>(
   'pmsi/fetchElements',
   async (DO_NOT_USE, { getState }) => {
@@ -213,7 +210,7 @@ const expandPmsiElement = createAsyncThunk<PmsiState, ExpandPmsiElementParams, {
 
 const pmsiSlice = createSlice({
   name: 'pmsi',
-  initialState,
+  initialState: defaultInitialState,
   reducers: {
     clearPmsiHierarchy: () => {
       return {

@@ -10,12 +10,9 @@ export type MessageState = null | {
   content: string
 }
 
-const localStorageMessage = localStorage.getItem('message') || null
-const initialState: MessageState = localStorageMessage ? JSON.parse(localStorageMessage) : null
-
 const setMessageSlice = createSlice({
   name: 'message',
-  initialState: initialState as MessageState,
+  initialState: null as MessageState,
   reducers: {
     clearMessage: () => {
       return null

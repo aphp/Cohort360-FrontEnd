@@ -384,7 +384,7 @@ export interface IServiceCohorts {
 
   fetchDocumentContent: (compositionId: string) => Promise<IComposition_Section[]>
 
-  fetchCohortExportRight: (cohortId: string, providerId: string) => Promise<boolean>
+  fetchCohortExportRight: (cohortId: string) => Promise<boolean>
 
   createExport: (args: {
     cohortId: number

@@ -33,7 +33,7 @@ const PatientField: React.FC<PatientFieldProps> = ({ fieldName, fieldValue }) =>
             <Typography>{fieldValue}</Typography>
           )
         ) : (
-          fieldValue?.map((value: string) => <Typography key={value}>{value}</Typography>)
+          fieldValue?.map((value: string, index: number) => <Typography key={index}>{value}</Typography>)
         )}
       </Grid>
     </Grid>

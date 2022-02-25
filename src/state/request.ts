@@ -20,9 +20,6 @@ const defaultInitialState: RequestState = {
   requestsList: []
 }
 
-const localStorageRequest = localStorage.getItem('request') || null
-const initialState: RequestState = localStorageRequest ? JSON.parse(localStorageRequest) : defaultInitialState
-
 type FetchRequestListReturn = {
   count: number
   selectedRequest: null
@@ -270,7 +267,7 @@ const deleteRequests = createAsyncThunk<DeleteRequestsReturn, DeleteRequestsPara
 
 const setRequestSlice = createSlice({
   name: 'request',
-  initialState: initialState as RequestState,
+  initialState: defaultInitialState as RequestState,
   reducers: {
     clearRequest: () => {
       return defaultInitialState

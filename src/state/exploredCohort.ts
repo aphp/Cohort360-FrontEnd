@@ -18,14 +18,11 @@ export type ExploredCohortState = {
   canMakeExport?: boolean
 } & CohortData
 
-const localStorageExploredCohort = localStorage.getItem('exploredCohort') ?? null
-const jsonExploredCohort = localStorageExploredCohort ? JSON.parse(localStorageExploredCohort) : {}
-
 const defaultInitialState = {
   // CohortData
   name: '',
   description: '',
-  cohort: [],
+  cohort: undefined,
   totalPatients: undefined,
   originalPatients: [],
   totalDocs: 0,
@@ -46,22 +43,6 @@ const defaultInitialState = {
   excludedPatients: [],
   loading: false
 }
-
-const initialState: ExploredCohortState = localStorageExploredCohort
-  ? {
-      ...jsonExploredCohort,
-      genderRepartitionMap: jsonExploredCohort.genderRepartitionMap
-        ? jsonExploredCohort.genderRepartitionMap
-        : {
-            female: { deceased: 0, alive: 0 },
-            male: { deceased: 0, alive: 0 },
-            other: { deceased: 0, alive: 0 },
-            unknown: { deceased: 0, alive: 0 }
-          },
-      agePyramidData: jsonExploredCohort.agePyramidData ? jsonExploredCohort.agePyramidData : [],
-      monthlyVisitData: jsonExploredCohort.monthlyVisitData ? jsonExploredCohort.monthlyVisitData : {}
-    }
-  : defaultInitialState
 
 const favoriteExploredCohort = createAsyncThunk<CohortData, { id: string }, { state: RootState }>(
   'exploredCohort/favoriteExploredCohort',
@@ -91,7 +72,6 @@ const fetchExploredCohort = createAsyncThunk<
   { state: RootState }
 >('exploredCohort/fetchExploredCohort', async ({ context, id, forceReload }, { getState, dispatch }) => {
   const state = getState()
-  const providerId = state.me?.id
   const stateCohort = state.exploredCohort.cohort
 
   let shouldRefreshData = true
@@ -133,7 +113,7 @@ const fetchExploredCohort = createAsyncThunk<
           cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
           if (cohort) {
             cohort.cohortId = id
-            cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
+            cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id)
           }
         }
         break
@@ -180,7 +160,6 @@ const fetchExploredCohortInBackground = createAsyncThunk<
   { state: RootState }
 >('exploredCohort/fetchExploredCohortInBackground', async ({ context, id }, { getState }) => {
   const state = getState()
-  const providerId = state.me?.id
 
   let cohort
   switch (context) {
@@ -188,7 +167,7 @@ const fetchExploredCohortInBackground = createAsyncThunk<
       if (id) {
         cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
         if (cohort) {
-          cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
+          cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id)
         }
       }
       break
@@ -225,10 +204,10 @@ const fetchExploredCohortInBackground = createAsyncThunk<
 
 const exploredCohortSlice = createSlice({
   name: 'exploredCohort',
-  initialState,
+  initialState: defaultInitialState as ExploredCohortState,
   reducers: {
     setExploredCohort: (state: ExploredCohortState, action: PayloadAction<CohortData | undefined>) => {
-      return action.payload ? { ...state, ...action.payload } : initialState
+      return action.payload ? { ...state, ...action.payload } : defaultInitialState
     },
     addImportedPatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
       const importedPatients = [...state.importedPatients, ...action.payload]

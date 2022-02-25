@@ -166,7 +166,7 @@ export interface IServiceCohorts {
    * Retoune:
    *   - Si un utilisateur peut faire une demande d'export sur la cohorte
    */
-  fetchCohortExportRight: (cohortId: string, providerId?: string) => Promise<boolean>
+  fetchCohortExportRight: (cohortId: string) => Promise<boolean>
 
   /**
    * Permet de créer une demande d'export d'une cohorte
@@ -434,36 +434,47 @@ const servicesCohorts: IServiceCohorts = {
     return documentBinary && documentBinary.entry && documentBinary.entry[0] && documentBinary.entry[0].resource
   },
 
-  fetchCohortExportRight: async (cohortId, providerId) => {
+  fetchCohortExportRight: async (cohortId) => {
     try {
-      const rightResponse = await fetchGroup({
-        _list: [cohortId],
-        provider: providerId
-      })
+      const cohortResponse = await fetchGroup({ _id: cohortId })
 
       if (
-        rightResponse &&
-        // @ts-ignore
-        rightResponse.data &&
-        // @ts-ignore
-        rightResponse.data.entry &&
-        // @ts-ignore
-        rightResponse.data.entry[0] &&
-        // @ts-ignore
-        rightResponse.data.entry[0].resource
+        cohortResponse &&
+        cohortResponse.data.resourceType === 'Bundle' &&
+        cohortResponse.data &&
+        cohortResponse.data.entry &&
+        cohortResponse.data.entry[0]
       ) {
-        //@ts-ignore
-        const currentCohortItem = rightResponse.data.entry[0].resource.extension?.[0]
-        const canMakeExport =
-          currentCohortItem.extension && currentCohortItem.extension.length > 0
-            ? currentCohortItem.extension.some(
-                (extension: any) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
-              ) &&
-              currentCohortItem.extension.some(
-                (extension: any) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
-              )
-            : false
-        return canMakeExport
+        const currentCohortItem = cohortResponse.data.entry[0]
+        if (!currentCohortItem) return false
+
+        const parentGroupsId =
+          currentCohortItem &&
+          currentCohortItem.resource &&
+          (currentCohortItem.resource.member || [])
+            .map((member: any) => member.entity.display && member.entity.display.replace('Group/', ''))
+            .filter((item: any, index: number, array: any[]) => array.indexOf(item) === index)
+            .join(',')
+
+        const parentResponse = await fetchGroup({ _id: parentGroupsId })
+
+        const currentParentItems = (parentResponse.data.resourceType === 'Bundle' && parentResponse?.data?.entry) || []
+        const caresiteIds = currentParentItems
+          .map(
+            (elem: any) =>
+              elem.resource?.managingEntity?.display &&
+              elem.resource?.managingEntity?.display.replace('Organization/', '')
+          )
+          .filter((item: any, index: number, array: any[]) => array.indexOf(item) === index)
+          .join(',')
+
+        const rightResponse = await apiBackend.get(`accesses/my-rights/?care-site-ids=${caresiteIds}`)
+        const rightData: any = rightResponse.data ?? []
+        const filteredRightData = rightData.filter(
+          (_rightData: any) => _rightData.right_export_csv_nominative && _rightData.right_read_patient_nominative
+        )
+
+        return rightData.length > 0 && rightData.length === filteredRightData.length
       }
       return false
     } catch (error) {

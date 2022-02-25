@@ -4,14 +4,9 @@ import { CriteriaItemType } from 'types'
 
 export type CriteriaState = CriteriaItemType[]
 
-const localStorageCohortCreation = localStorage.getItem('cohortCreation') ?? null
-const jsonCohortCreation = localStorageCohortCreation ? JSON.parse(localStorageCohortCreation).criteria : []
-
-const initialState: CriteriaState = jsonCohortCreation ?? []
-
 const criteriaSlice = createSlice({
   name: 'criteria',
-  initialState,
+  initialState: [] as CriteriaState,
   reducers: {
     setCriteriaList: (state: CriteriaState, action: PayloadAction<CriteriaState>) => {
       return action.payload
