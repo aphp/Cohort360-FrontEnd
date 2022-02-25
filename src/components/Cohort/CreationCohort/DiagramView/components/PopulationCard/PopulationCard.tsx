@@ -11,17 +11,28 @@ import ModalRightError from './components/ModalRightError'
 import PopulationRightPanel from './components/PopulationRightPanel'
 
 import { useAppSelector } from 'state'
-import { buildCohortCreation } from 'state/cohortCreation'
+import { CohortCreationState, buildCohortCreation } from 'state/cohortCreation'
+import { ScopeState, fetchScopesList } from 'state/scope'
 
 import { ScopeTreeRow } from 'types'
+import { getSelectedScopes, filterScopeTree } from 'utils/scopeTree'
 
 import useStyles from './styles'
 
 const PopulationCard: React.FC = () => {
-  const { selectedPopulation = [], loading = false } = useAppSelector((state) => state.cohortCreation.request || {})
-
   const classes = useStyles()
   const dispatch = useDispatch()
+
+  const {
+    request: { selectedPopulation = [], ...requestState },
+    scopeState
+  } = useAppSelector<{
+    request: CohortCreationState
+    scopeState: ScopeState
+  }>((state) => ({ request: state.cohortCreation.request || {}, scopeState: state.scope || {} }))
+
+  const { scopesList = [] } = scopeState
+  const loading = requestState.loading || scopeState.loading
 
   const [isExtended, onExtend] = useState(false)
   const [openDrawer, onChangeOpenDrawer] = useState(false)
@@ -30,50 +41,7 @@ const PopulationCard: React.FC = () => {
   const submitPopulation = (_selectedPopulations: ScopeTreeRow[] | null) => {
     if (_selectedPopulations === null) return
 
-    // If you chenge this code, change it too inside: Scope.jsx:25
-    _selectedPopulations = _selectedPopulations.filter((item, index, array) => {
-      // reemove double item
-      const foundItem = array.find(({ id }) => item.id === id)
-      const currentIndex = foundItem ? array.indexOf(foundItem) : -1
-      if (index !== currentIndex) return false
-
-      const parentItem = array.find(({ subItems }) => !!subItems?.find((subItem) => subItem.id === item.id))
-      if (parentItem !== undefined) {
-        const selectedChildren =
-          parentItem.subItems && parentItem.subItems.length > 0
-            ? parentItem.subItems.filter((subItem) => !!array.find(({ id }) => id === subItem.id))
-            : []
-        if (selectedChildren.length === parentItem.subItems.length) {
-          // Si item + TOUS LES AUTRES child sont select. => Delete it
-          return false
-        } else {
-          // Sinon => Keep it
-          return true
-        }
-      } else {
-        if (
-          !item.subItems ||
-          (item.subItems && item.subItems.length === 0) ||
-          (item.subItems && item.subItems.length > 0 && item.subItems[0].id === 'loading')
-        ) {
-          return true
-        }
-
-        const selectedChildren =
-          item.subItems && item.subItems.length > 0
-            ? item.subItems.filter((subItem) => !!array.find(({ id }) => id === subItem.id))
-            : []
-
-        if (selectedChildren.length === item.subItems.length) {
-          // Si tous les enfants sont check => Keep it
-          return true
-        } else {
-          // Sinon => Delete it
-          return false
-        }
-      }
-    })
-
+    _selectedPopulations = filterScopeTree(_selectedPopulations)
     _selectedPopulations = _selectedPopulations.map((_selectedPopulation: ScopeTreeRow) => ({
       ..._selectedPopulation,
       subItems: []
@@ -82,6 +50,16 @@ const PopulationCard: React.FC = () => {
     dispatch<any>(buildCohortCreation({ selectedPopulation: _selectedPopulations }))
     onChangeOpenDrawer(false)
   }
+
+  const fetchScopeTree = () => {
+    if (scopesList && scopesList.length === 0) {
+      dispatch<any>(fetchScopesList())
+    }
+  }
+
+  useEffect(() => {
+    fetchScopeTree()
+  }, [])
 
   useEffect(() => {
     let _rightError = false
@@ -95,6 +73,19 @@ const PopulationCard: React.FC = () => {
 
     setRightError(_rightError)
   }, [selectedPopulation])
+
+  useEffect(() => {
+    if (
+      !openDrawer &&
+      scopesList &&
+      scopesList.length === 1 &&
+      requestState.requestId &&
+      (selectedPopulation === null || (selectedPopulation && selectedPopulation.length === 0))
+    ) {
+      const savedSelectedItems: ScopeTreeRow[] = getSelectedScopes(scopesList[0], [], scopesList)
+      submitPopulation(savedSelectedItems)
+    }
+  }, [scopesList, requestState])
 
   return (
     <>
