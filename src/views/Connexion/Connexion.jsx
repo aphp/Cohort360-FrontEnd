@@ -118,20 +118,7 @@ const Login = () => {
 
   useEffect(() => {
     // Do not use localStorage.clear() because localStorage.getItem('old-path') is set for relaunch app with prev page
-    localStorage.removeItem('user')
-    localStorage.removeItem('exploredCohort')
-    localStorage.removeItem('userCohorts')
-    localStorage.removeItem('cohortCreation')
-    localStorage.removeItem('medication')
-    localStorage.removeItem('biology')
-    localStorage.removeItem('scope')
-    localStorage.removeItem('project')
-    localStorage.removeItem('cohort')
-    localStorage.removeItem('request')
-    localStorage.removeItem('pmsi')
-    localStorage.removeItem('access')
-    localStorage.removeItem('refresh')
-    localStorage.removeItem('patient')
+    localStorage.removeItem('persit:root')
   }, [])
 
   const login = async () => {

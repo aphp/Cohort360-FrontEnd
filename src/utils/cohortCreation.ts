@@ -1431,7 +1431,9 @@ export const getDataFromFetch = async (
   oldCriteriaList?: any
 ) => {
   for (const _criterion of _criteria) {
-    const oldCriterion = oldCriteriaList?.find((oldCriterionItem: any) => oldCriterionItem.id === _criterion.id)
+    const oldCriterion = oldCriteriaList
+      ? oldCriteriaList?.find((oldCriterionItem: any) => oldCriterionItem.id === _criterion.id)
+      : []
     if (_criterion.fetch) {
       if (!_criterion.data) _criterion.data = {}
       const fetchKeys = Object.keys(_criterion.fetch)

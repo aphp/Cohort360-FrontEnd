@@ -20,9 +20,6 @@ const defaultInitialState: CohortState = {
   cohortsList: []
 }
 
-const localStorageCohort = localStorage.getItem('cohort') || null
-const initialState: CohortState = localStorageCohort ? JSON.parse(localStorageCohort) : defaultInitialState
-
 type FetchCohortListReturn = {
   count: number
   selectedCohort?: null
@@ -288,7 +285,7 @@ const setFavoriteCohort = createAsyncThunk<SetFavoriteCohortReturn, SetFavoriteC
 
 const setCohortSlice = createSlice({
   name: 'cohort',
-  initialState: initialState as CohortState,
+  initialState: defaultInitialState as CohortState,
   reducers: {
     clearCohort: () => {
       return defaultInitialState

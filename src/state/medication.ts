@@ -22,9 +22,6 @@ const defaultInitialState: MedicationState = {
   openedElement: []
 }
 
-const localStorageScope = localStorage.getItem('medication') || null
-const initialState: MedicationState = localStorageScope ? JSON.parse(localStorageScope) : defaultInitialState
-
 const initMedicationHierarchy = createAsyncThunk<MedicationState, void, { state: RootState }>(
   'medication/fetchElements',
   async (DO_NOT_USE, { getState }) => {
@@ -130,7 +127,7 @@ const expandMedicationElement = createAsyncThunk<MedicationState, ExpandMedicati
 
 const medicationSlice = createSlice({
   name: 'medication',
-  initialState,
+  initialState: defaultInitialState as MedicationState,
   reducers: {
     clearMedicationHierarchy: () => {
       return {

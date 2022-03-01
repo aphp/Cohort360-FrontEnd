@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
-
+import clsx from 'clsx'
 import { Link, useLocation, useParams } from 'react-router-dom'
 
 import { IconButton, Grid, Tabs, Tab, CircularProgress } from '@material-ui/core'
@@ -21,20 +21,8 @@ import TopBar from 'components/TopBar/TopBar'
 import { useAppSelector } from 'state'
 import { fetchPatientInfo } from 'state/patient'
 
-// import { CohortPatient, PMSIEntry } from 'types'
-// import {
-//   IClaim,
-//   IComposition,
-//   ICondition,
-//   IEncounter,
-//   IProcedure,
-//   IDocumentReference,
-//   IMedicationRequest,
-//   IMedicationAdministration,
-//   IObservation
-// } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { ODD_BIOLOGY } from '../../constants'
 
-import clsx from 'clsx'
 import useStyles from './styles'
 
 const Patient = () => {
@@ -152,13 +140,15 @@ const Patient = () => {
               component={Link}
               to={`/patients/${patientId}/medication${groupId ? `?groupId=${groupId}` : ''}`}
             />
-            <Tab
-              className={classes.tabTitle}
-              label="Biologie"
-              value="biology"
-              component={Link}
-              to={`/patients/${patientId}/biology${groupId ? `?groupId=${groupId}` : ''}`}
-            />
+            {ODD_BIOLOGY && (
+              <Tab
+                className={classes.tabTitle}
+                label="Biologie"
+                value="biology"
+                component={Link}
+                to={`/patients/${patientId}/biology${groupId ? `?groupId=${groupId}` : ''}`}
+              />
+            )}
           </Tabs>
         </Grid>
         <Grid className={classes.tabContainer}>
@@ -178,7 +168,7 @@ const Patient = () => {
           {selectedTab === 'documents-cliniques' && <PatientDocs groupId={groupId} />}
           {selectedTab === 'pmsi' && <PatientPMSI groupId={groupId} />}
           {selectedTab === 'medication' && <PatientMedication groupId={groupId} />}
-          {selectedTab === 'biology' && <PatientBiology groupId={groupId} />}
+          {ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology groupId={groupId} />}
         </Grid>
 
         <PatientSidebar

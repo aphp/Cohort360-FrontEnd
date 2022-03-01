@@ -41,6 +41,8 @@ import {
 } from 'services/cohortCreation/fetchMedication'
 import { fetchBiologyData, fetchBiologyHierarchy } from 'services/cohortCreation/fetchObservation'
 
+import { ODD_BIOLOGY } from '../../../constants'
+
 // ├── Mes variables
 // ├── Patients
 // ├── Visites
@@ -160,14 +162,15 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'biologie_microbiologie',
     title: 'Biologie/Microbiologie',
-    color: '#0063AF',
+    color: ODD_BIOLOGY ? '#0063AF' : '#808080',
     components: null,
     subItems: [
       {
         id: 'Observation',
         title: 'Biologie',
-        color: '#0063AF',
-        components: BiologyForm,
+        color: ODD_BIOLOGY ? '#0063AF' : '#808080',
+        components: ODD_BIOLOGY ? BiologyForm : null,
+        disabled: !ODD_BIOLOGY ?? false,
         data: { biologyData: 'loading', biologyHierarchy: 'loading' },
         fetch: { fetchBiologyData, fetchBiologyHierarchy }
       },
