@@ -16,8 +16,8 @@ class LoginPage extends Page {
     get submitButton () { return LoginLogout.submitButton }
    
     
-    login (username, password) {
-        super.login(username, password)
+    async login (username, password) {
+        await super.login(username, password)
     }
 
     open () {

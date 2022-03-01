@@ -62,7 +62,7 @@ describe('Cohort360 - SC00 - Connexion / Déconnexion', () => {
 	// ----------------------------------------------------------
 	it('Saisie login/pwd incorrects et connexion', async () => {
 
-		LoginPage.login('aaaaaaaaaa', 'aaaaaaaaaa')
+		await LoginPage.login('aaaaaaaaaa', 'aaaaaaaaaa')
 
 		Logger.log('Affichage de la fenêtre modale')
 		expect(await LoginPage.modalBox.box.waitForDisplayed()).withContext('@ Affichage de la fenêtre modale').toBe(true)
