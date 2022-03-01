@@ -160,7 +160,12 @@ const MyProjects = () => {
                 <ProjectSearchBar setSearchInput={(newValue: string) => setSearchInput(newValue)} />
 
                 <Hidden only={['xs', 'sm', 'md']}>
-                  <Button startIcon={<AddIcon />} onClick={() => handleClickAddProject()} className={classes.addButton}>
+                  <Button
+                    id="new-project-button"
+                    startIcon={<AddIcon />}
+                    onClick={() => handleClickAddProject()}
+                    className={classes.addButton}
+                  >
                     Ajouter un projet
                   </Button>
                 </Hidden>
