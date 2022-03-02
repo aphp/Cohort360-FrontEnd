@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios'
 import apiBack from '../apiBackend'
 
 import { CohortCreationCounterType } from 'types'
@@ -103,6 +104,17 @@ const servicesCohortCreation: IServiceCohortCreation = {
     const requestResponse = (await apiBack.get<any>(`/cohort/requests/${requestId}/`)) || {}
     const requestData = requestResponse?.data ? requestResponse.data : {}
 
+    const querySnapshotResponse: AxiosResponse[] =
+      requestData.query_snapshots && requestData.query_snapshots.length > 0
+        ? await Promise.all(
+            requestData.query_snapshots.map((query_snapshot: string) =>
+              apiBack.get<AxiosResponse>(`/cohort/request-query-snapshots/${query_snapshot}/`)
+            )
+          )
+        : []
+
+    const query_snapshots = querySnapshotResponse.map((querySnapshot: any) => querySnapshot.data)
+
     const requestName = requestData.name
 
     let snapshotsHistoryFromQuery: {
@@ -111,7 +123,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
       previous_snapshot: string
       dated_measures: CohortCreationCounterType[]
       created_at: string
-    }[] = requestData.query_snapshots
+    }[] = query_snapshots
 
     snapshotsHistoryFromQuery = snapshotsHistoryFromQuery.sort(
       ({ created_at: a }, { created_at: b }) => new Date(b).valueOf() - new Date(a).valueOf()
@@ -126,6 +138,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
     let snapshotsHistory: any[] = []
 
     if (currentSnapshot) {
+      console.log('currentSnapshot :>> ', currentSnapshot)
       // clean Global count
       currentSnapshot = {
         ...currentSnapshot,
