@@ -1,7 +1,8 @@
 import apiBack from '../apiBackend'
 
-import { fetchGroup } from './callApi'
 import { ProjectType, RequestType, Cohort } from 'types'
+
+import servicesCohorts from './serviceCohorts'
 
 export interface IServiceProjects {
   /**
@@ -379,48 +380,8 @@ const servicesProjects: IServiceProjects = {
       results: Cohort[]
     }>(`/cohort/cohorts/${search}`)) ?? { data: { results: [] } }
 
-    let cohortList = data.results
-
     // Recupere les droits
-    let [rightResponses] = await Promise.all([
-      fetchGroup({
-        _list: cohortList.map((cohortItem) => cohortItem.fhir_group_id ?? ''),
-        provider: providerId
-      })
-    ])
-    // Re-organise l'objet rightResponses
-    // @ts-ignore
-    rightResponses =
-      rightResponses &&
-      rightResponses.data.resourceType === 'Bundle' &&
-      rightResponses.data?.entry &&
-      rightResponses.data?.entry[0] &&
-      rightResponses.data?.entry[0].resource &&
-      rightResponses.data?.entry[0].resource.extension
-        ? rightResponses.data?.entry[0].resource.extension
-        : []
-    // Affecte les droits à chaque cohortItem
-    cohortList = cohortList.map((cohortItem) => {
-      const extension =
-        Array.isArray(rightResponses) &&
-        (
-          rightResponses.find(
-            (rightResponse: any) => +(rightResponse.url ?? '1') === +(cohortItem.fhir_group_id ?? '0')
-          ) || {
-            extension: [
-              { url: 'READ_DATA_NOMINATIVE', valueString: 'false' },
-              { url: 'EXPORT_DATA_NOMINATIVE', valueString: 'false' },
-              { url: 'READ_DATA_PSEUDOANONYMISED', valueString: 'false' },
-              { url: 'EXPORT_DATA_PSEUDOANONYMISED', valueString: 'false' }
-            ]
-          }
-        )?.extension
-
-      return {
-        ...cohortItem,
-        extension
-      }
-    })
+    const cohortList = await servicesCohorts.fetchCohortsExportRights(data.results)
 
     return {
       ...data,

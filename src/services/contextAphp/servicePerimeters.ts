@@ -10,6 +10,8 @@ import { getApiResponseResources } from 'utils/apiHelpers'
 
 import { fetchGroup, fetchPatient, fetchEncounter, fetchOrganization, fetchPractitionerRole } from './callApi'
 
+import apiBackend from '../apiBackend'
+
 const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
 export interface IServicePerimeters {
@@ -348,47 +350,50 @@ const servicesPerimeters: IServicePerimeters = {
   },
 
   fetchDeidentified: async (practitionerId) => {
-    const rolesResp = await fetchPractitionerRole({
-      practitioner: practitionerId,
-      _elements: ['extension', 'organization']
-    })
-    const { data } = rolesResp
+    const rightResponse = await apiBackend.get('accesses/my-rights/?pop-children')
+    console.log('rightResponse :>> ', rightResponse)
 
-    let deidentification = true
-    const nominativePerimeters = []
-    let nominativeGroupsIds: string[] = []
+    // const rolesResp = await fetchPractitionerRole({
+    //   practitioner: practitionerId,
+    //   _elements: ['extension', 'organization']
+    // })
+    // const { data } = rolesResp
 
-    if (!data || data.resourceType === 'OperationOutcome' || !data.meta || !data.meta.extension) {
-      return { deidentification, nominativeGroupsIds }
-    }
+    const deidentification = true
+    // const nominativePerimeters = []
+    const nominativeGroupsIds: string[] = []
 
-    const highestPerimeters = data.meta.extension.find(
-      (extension: { url?: string; valueString?: string }) => extension.url === 'Practitioner Organization List'
-    )
+    // if (!data || data.resourceType === 'OperationOutcome' || !data.meta || !data.meta.extension) {
+    return { deidentification, nominativeGroupsIds }
+    // }
 
-    const rolesList = highestPerimeters?.extension?.[0].extension
+    // const highestPerimeters = data.meta.extension.find(
+    //   (extension: { url?: string; valueString?: string }) => extension.url === 'Practitioner Organization List'
+    // )
 
-    if (rolesList && rolesList.length > 0) {
-      for (const perimeterRole of rolesList) {
-        if (perimeterRole.valueString && perimeterRole.valueString === 'READ_DATA_NOMINATIVE') {
-          deidentification = false
-          nominativePerimeters.push(perimeterRole.url ?? '')
-        }
-      }
-    }
+    // const rolesList = highestPerimeters?.extension?.[0].extension
 
-    if (nominativePerimeters.length > 0) {
-      const nominativeGroupsResp = await fetchGroup({
-        'managing-entity': nominativePerimeters,
-        _elements: ['name', 'managingEntity']
-      })
+    // if (rolesList && rolesList.length > 0) {
+    //   for (const perimeterRole of rolesList) {
+    //     if (perimeterRole.valueString && perimeterRole.valueString === 'READ_DATA_NOMINATIVE') {
+    //       deidentification = false
+    //       nominativePerimeters.push(perimeterRole.url ?? '')
+    //     }
+    //   }
+    // }
 
-      const nominativeGroups = getApiResponseResources(nominativeGroupsResp)
+    // if (nominativePerimeters.length > 0) {
+    //   const nominativeGroupsResp = await fetchGroup({
+    //     'managing-entity': nominativePerimeters,
+    //     _elements: ['name', 'managingEntity']
+    //   })
 
-      nominativeGroupsIds = nominativeGroups ? nominativeGroups.map((group) => group.id ?? '') : []
-    }
+    //   const nominativeGroups = getApiResponseResources(nominativeGroupsResp)
 
-    return { deidentification, nominativeGroupsIds: nominativeGroupsIds ?? [] }
+    //   nominativeGroupsIds = nominativeGroups ? nominativeGroups.map((group) => group.id ?? '') : []
+    // }
+
+    // return { deidentification, nominativeGroupsIds: nominativeGroupsIds ?? [] }
   }
 }
 

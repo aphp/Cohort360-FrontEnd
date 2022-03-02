@@ -46,15 +46,10 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
     dispatch<any>(setSelectedCohort(cohortId ?? null))
   }
 
-  // You can make an export if you got 1 cohort with: EXPORT_DATA_NOMINATIVE = true && READ_DATA_NOMINATIVE = true
+  // You can make an export if you got 1 cohort with: EXPORT_RIGHT = true
   const canMakeExport = cohorts.some((cohort) =>
     cohort.extension && cohort.extension.length > 0
-      ? cohort.extension.find(
-          (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
-        ) &&
-        cohort.extension.find(
-          (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
-        )
+      ? cohort.extension.find((extension) => extension.url === 'EXPORT_RIGHT' && extension.valueBoolean === true)
       : false
   )
 
@@ -101,10 +96,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
               const canExportThisCohort =
                 canMakeExport && historyRow.extension
                   ? historyRow.extension.some(
-                      (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
-                    ) &&
-                    historyRow.extension.some(
-                      (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+                      (extension) => extension.url === 'EXPORT_RIGHT' && extension.valueBoolean === true
                     )
                   : false
 
