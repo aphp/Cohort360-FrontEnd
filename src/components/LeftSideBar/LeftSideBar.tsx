@@ -117,7 +117,9 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           }}
         >
           <div className={classes.toolbar}>
-            <img src={cohortLogo} alt="Cohort360 logo" className={open ? undefined : classes.hide} />
+            <Link href="/accueil">
+              <img src={cohortLogo} alt="Cohort360 logo" className={open ? undefined : classes.hide} />
+            </Link>
 
             <IconButton
               disableRipple
