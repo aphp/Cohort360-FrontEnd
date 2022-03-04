@@ -24,8 +24,8 @@ describe('Cohort360 - SCP03 - Page "Données patient"', () => {
 
 		Logger.log('La 1ère ligne de la liste de patients est affichée')
 		MyPatientDatasPage.patientListBlock.resetList()
-		// MyPatientDatasPage.patientListBlock.setCurrentLine(0)
-		// expect(MyPatientDatasPage.patientListBlock.currentLine.waitForDisplayed()).withContext('@ La 1ère ligne de la lise de documents est affichée').toBe(true)
+		MyPatientDatasPage.patientListBlock.setCurrentLine(0)
+		expect(await MyPatientDatasPage.patientListBlock.currentLine).waitForDisplayed().withContext('@ La 1ère ligne de la lise de documents est affichée').toBe(true)
 
 		// Logger.log(MyPatientDatasPage.patientListBlock.currentLineDisplayed)
 	})

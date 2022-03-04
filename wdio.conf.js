@@ -35,8 +35,8 @@ exports.config = {
     // HomePage: ['./test/test/specs/pages/cohort360-SCP01-HomePage.js'],
     MyPatients: [
       //   './test/test/specs/pages/cohort360-SCP02-MyPatientsPage.js',
-      './test/test/specs/pages/cohort360-SCP06-MyResearchProjectsPage.js'
-      // './test/test/specs/pages/cohort360-SCP03-MyPatientDatasPage.js'
+      // './test/test/specs/pages/cohort360-SCP06-MyResearchProjectsPage.js'
+      './test/test/specs/pages/cohort360-SCP03-MyPatientDatasPage.js'
       // './test/test/specs/pages/cohort360-SCP04-MyPatientDocumentsPage.js',
       // './test/test/specs/pages/cohort360-SCP05-MyPatientSearchPage.js',
       // './test/test/specs/filters/cohort360-SCF01-PatientListFilter.js',
