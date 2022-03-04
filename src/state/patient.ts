@@ -625,7 +625,7 @@ const patientSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(logout, () => null)
+    builder.addCase(logout.fulfilled, () => null)
     // fetchPatientInfo
     builder.addCase(fetchPatientInfo.pending, (state) =>
       state === null

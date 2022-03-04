@@ -148,7 +148,7 @@ const scopeSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
-    builder.addCase(logout, () => defaultInitialState)
+    builder.addCase(logout.fulfilled, () => defaultInitialState)
     // fetchScopesList
     builder.addCase(fetchScopesList.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(fetchScopesList.fulfilled, (state, action) => ({

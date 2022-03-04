@@ -93,6 +93,7 @@ const Login = () => {
     if (practitioner) {
       const practitionerPerimeters = await services.perimeters.getPerimeters()
       if (practitionerPerimeters.length === 0) {
+        // setTimeout(() => services.practitioner.logout(), 2500)
         localStorage.clear()
         setLoading(false)
         return setNoRights(true)
