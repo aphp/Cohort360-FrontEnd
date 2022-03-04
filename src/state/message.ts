@@ -27,7 +27,7 @@ const setMessageSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(login, () => null)
-    builder.addCase(logout, () => null)
+    builder.addCase(logout.fulfilled, () => null)
     builder.addCase(buildCohortCreation.pending, () => ({
       type: 'info',
       content: 'Sauvegarde de la requête'

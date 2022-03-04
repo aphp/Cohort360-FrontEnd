@@ -17,6 +17,12 @@ export interface IServicePractitioner {
   authenticate: (username: string, password: string) => Promise<any>
 
   /**
+   * Cette fonction permet d'appeler la route de logout
+   *
+   */
+  logout: () => Promise<void>
+
+  /**
    * Cette fonction nous retourne les informations relative à un pratitioner
    *
    * Argument:
@@ -45,6 +51,13 @@ const servicePractitioner: IServicePractitioner = {
       method: 'POST',
       url: '/api/jwt/',
       data: { username: username, password: password }
+    })
+  },
+
+  logout: async () => {
+    axios({
+      method: 'POST',
+      url: `${BACK_API_URL}/accounts/logout/`
     })
   },
 
