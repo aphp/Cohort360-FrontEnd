@@ -12,8 +12,6 @@ type InputAgeRangeProps = {
 const InputAgeRange: React.FC<InputAgeRangeProps> = ({ birthdates, onChangeBirthdates }) => {
   const [mode, setMode] = useState<'simple' | 'advanced'>('simple')
 
-  console.table('birthdates :>> ', birthdates)
-
   return (
     <>
       {mode === 'simple' ? (

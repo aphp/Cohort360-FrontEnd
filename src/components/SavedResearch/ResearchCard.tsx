@@ -189,8 +189,6 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
     }
   }
 
-  console.log('researches :>> ', researches)
-
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
       <Grid item container justifyContent="space-between">

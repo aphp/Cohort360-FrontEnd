@@ -138,7 +138,6 @@ const servicesCohortCreation: IServiceCohortCreation = {
     let snapshotsHistory: any[] = []
 
     if (currentSnapshot) {
-      console.log('currentSnapshot :>> ', currentSnapshot)
       // clean Global count
       currentSnapshot = {
         ...currentSnapshot,
