@@ -106,3 +106,5 @@ export const ODD_CLAIM: boolean = process.env.REACT_APP_ODD_CLAIM === 'true' ?? 
 export const ODD_CONDITION: boolean = process.env.REACT_APP_ODD_CONDITION === 'true' ?? false
 export const ODD_OBSERVATION: boolean = process.env.REACT_APP_ODD_OBSERVATION === 'true' ?? false
 export const ODD_MEDICATION: boolean = process.env.REACT_APP_ODD_MEDICATION === 'true' ?? false
+
+export const ODD_CONTACT: boolean = process.env.REACT_APP_ODD_CONTACT === 'true' ?? false

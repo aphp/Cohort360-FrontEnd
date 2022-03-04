@@ -10,7 +10,7 @@ import Dashboard from 'views/Dashboard/Dashboard'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 import Contact from 'views/Contact/Contact'
 
-import { CONTEXT } from '../../../constants'
+import { CONTEXT, ODD_CONTACT } from '../../../constants'
 
 export default [
   /**
@@ -205,7 +205,7 @@ export default [
   /**
    * Cohort360: Contact Page
    */
-  {
+  ODD_CONTACT && {
     displaySideBar: true,
     path: '/contact',
     name: 'contact',

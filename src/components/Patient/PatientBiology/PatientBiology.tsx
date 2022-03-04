@@ -157,16 +157,16 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   }, [filters, sort])
 
   return (
-    <Grid container item xs={11} justify="flex-end" className={classes.documentTable}>
+    <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
       <Grid container item style={{ marginBottom: 8 }}>
         <Alert severity="warning">
-          Les mesures de biologie sont pour l'instant restreintes aux 3300 codes d'analyse du référentiel qui
-          représentent XX% des résultats intégrés à l'EDS. De plus, les résultats concernent uniquement les analyses
-          quantitatives enregistrées sur GLIMS V9 qui ont été créés et mises à jours depuis mars 2020.
+          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes d'analyse les plus utilisés du
+          référentiel. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS V9
+          qui ont été créés et mises à jours depuis mars 2020.
         </Alert>
       </Grid>
 
-      <Grid container item justify="space-between" alignItems="center" className={classes.filterAndSort}>
+      <Grid container item justifyContent="space-between" alignItems="center" className={classes.filterAndSort}>
         <Typography variant="button">
           {totalBiology || 0} / {totalAllBiology ?? 0} résultats
         </Typography>
@@ -275,7 +275,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
       </Grid>
 
       {loading ? (
-        <Grid container justify="center">
+        <Grid container justifyContent="center">
           <CircularProgress />
         </Grid>
       ) : (
@@ -346,7 +346,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
               ) : (
                 <TableRow className={classes.emptyTableRow}>
                   <TableCell colSpan={9} align="left">
-                    <Grid container justify="center">
+                    <Grid container justifyContent="center">
                       <Typography variant="button">Aucun résultat de biologie à afficher</Typography>
                     </Grid>
                   </TableCell>
