@@ -1,5 +1,4 @@
 import Connexion from 'views/Connexion/Connexion'
-import FakeConnexion from 'views/Connexion/FakeConnexion'
 import ArkhnConnexion from 'views/Connexion/ArkhnConnexion'
 import Accueil from 'views/Accueil/Accueil'
 import RechercherPatient from 'views/RechercherPatient/RechercherPatient'
@@ -21,7 +20,7 @@ export default [
     exact: true,
     path: '/',
     name: 'main',
-    component: CONTEXT === 'arkhn' ? ArkhnConnexion : CONTEXT === 'aphp' ? Connexion : FakeConnexion
+    component: CONTEXT === 'arkhn' ? ArkhnConnexion : Connexion
   },
   /**
    * Cohort360: Main Page
