@@ -6,7 +6,7 @@ const FirstNews = () => {
   return (
     <>
       <Typography color="textSecondary" style={{ paddingBottom: 14 }}>
-        <b>Nouvelle mise en production de fonctionnalités !</b> - 04/11/2021
+        <b>Nouvelle mise en production de fonctionnalités !</b> - 11/2021
       </Typography>
       <Typography color="textSecondary" style={{ paddingBottom: 8 }}>
         La fonctionnalité d'<b>export est disponible</b> pour les utilisateurs avec un accès périmètre équipe de soins !

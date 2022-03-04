@@ -169,6 +169,17 @@ export interface IServiceCohorts {
   fetchCohortExportRight: (cohortId: string) => Promise<boolean>
 
   /**
+   * Permet la récupération des droits d'export lié a plusieurs cohortes
+   *
+   * Argument:
+   *   - cohorts: Tableau de cohortes de type `Cohort[]`
+   *
+   * Retoune:
+   *   - Si un utilisateur peut faire une demande d'export sur la cohorte
+   */
+  fetchCohortsExportRights: (cohorts: Cohort[]) => Promise<Cohort[]>
+
+  /**
    * Permet de créer une demande d'export d'une cohorte
    *
    * Argument:
@@ -448,15 +459,15 @@ const servicesCohorts: IServiceCohorts = {
         const currentCohortItem = cohortResponse.data.entry[0]
         if (!currentCohortItem) return false
 
-        const parentGroupsId =
+        const parentGroupId =
           currentCohortItem &&
           currentCohortItem.resource &&
-          (currentCohortItem.resource.member || [])
-            .map((member: any) => member.entity.display && member.entity.display.replace('Group/', ''))
-            .filter((item: any, index: number, array: any[]) => array.indexOf(item) === index)
-            .join(',')
+          currentCohortItem.resource.member &&
+          currentCohortItem.resource.member.length === 1
+            ? currentCohortItem.resource.member[0].entity.display?.replace('Group/', '')
+            : ''
 
-        const parentResponse = await fetchGroup({ _id: parentGroupsId })
+        const parentResponse = await fetchGroup({ _id: parentGroupId || '' })
 
         const currentParentItems = (parentResponse.data.resourceType === 'Bundle' && parentResponse?.data?.entry) || []
         const caresiteIds = currentParentItems
@@ -480,6 +491,119 @@ const servicesCohorts: IServiceCohorts = {
     } catch (error) {
       console.error('Error (fetchCohortExportRight) :', error)
       return false
+    }
+  },
+
+  fetchCohortsExportRights: async (cohorts) => {
+    try {
+      // On recupère les info d'une cohort pour avoir les IDs des groupes
+      const cohortsResponse = await Promise.all(
+        cohorts.map(({ fhir_group_id }) =>
+          new Promise((resolve) => {
+            resolve(fetchGroup({ _id: fhir_group_id }))
+          })
+            .then((values) => {
+              return values
+            })
+            .catch((error) => {
+              return { error: true, ...error }
+            })
+        )
+      )
+
+      // On créer un dictionnaire pour faire le lien entre les cohortes et les périmètres
+      const cohortLinkList = cohortsResponse
+        .filter((cohortResponse: any) => cohortResponse.error !== true)
+        .map(
+          (cohortResponse: any) =>
+            cohortResponse.data &&
+            cohortResponse.data.resourceType === 'Bundle' &&
+            cohortResponse.data.entry &&
+            cohortResponse.data.entry[0] &&
+            cohortResponse.data.entry[0].resource
+        )
+
+      const parentGroupsId =
+        cohortLinkList && cohortLinkList.length > 0
+          ? cohortLinkList
+              .map((cohortLinkItem: any) =>
+                cohortLinkItem && cohortLinkItem.member && cohortLinkItem.member.length === 1
+                  ? cohortLinkItem.member[0].entity.display?.replace('Group/', '')
+                  : ''
+              )
+              .filter((item: any, index: number, array: any[]) => array.indexOf(item) === index)
+          : []
+
+      const parentGroupsResponse = await Promise.all(
+        parentGroupsId.map((parentGroupId: string) =>
+          new Promise((resolve) => {
+            resolve(fetchGroup({ _id: parentGroupId }))
+          })
+            .then((values) => {
+              return values
+            })
+            .catch((error) => {
+              return { error: true, ...error }
+            })
+        )
+      )
+
+      const organizationLinkList = parentGroupsResponse
+        .filter((parentGroupResponse: any) => parentGroupResponse.error !== true)
+        .map(
+          (parentGroupResponse: any) =>
+            parentGroupResponse.data &&
+            parentGroupResponse.data.resourceType === 'Bundle' &&
+            parentGroupResponse.data.entry &&
+            parentGroupResponse.data.entry[0] &&
+            parentGroupResponse.data.entry[0].resource
+        )
+      if (!organizationLinkList || organizationLinkList?.length === 0) return cohorts
+
+      const caresiteIds = organizationLinkList
+        .map(
+          (currentParentItem: any) =>
+            currentParentItem.managingEntity?.display &&
+            currentParentItem.managingEntity?.display.replace('Organization/', '')
+        )
+        .filter((item: any, index: number, array: any[]) => array.indexOf(item) === index)
+        .join(',')
+
+      const rightResponse = await apiBackend.get(`accesses/my-rights/?care-site-ids=${caresiteIds}`)
+      const rightData: any = rightResponse.data ?? []
+      const filteredRightData = rightData.filter(
+        (_rightData: any) => _rightData.right_export_csv_nominative && _rightData.right_read_patient_nominative
+      )
+
+      return cohorts.map((cohort) => {
+        let valueBoolean = false
+        const cohortLinkItem = cohortLinkList.find((cohortLink: any) => cohortLink.id === cohort.fhir_group_id)
+        const organizationLinkItem = !cohortLinkItem
+          ? undefined
+          : organizationLinkList.find(
+              (organizationLink: any) =>
+                organizationLink.id === cohortLinkItem.member[0].entity.display?.replace('Group/', '')
+            )
+
+        valueBoolean =
+          !cohortLinkItem || !organizationLinkItem
+            ? false
+            : filteredRightData.some(
+                (filteredRightData: any) =>
+                  filteredRightData.care_site_id ===
+                  +organizationLinkItem.managingEntity.display.replace('Organization/', '')
+              )
+
+        return {
+          ...cohort,
+          extension: cohort.extension
+            ? [...cohort.extension, { url: 'EXPORT_RIGHT', valueBoolean }]
+            : [{ url: 'EXPORT_RIGHT', valueBoolean }]
+        }
+      })
+    } catch (error) {
+      console.error('Error (fetchCohortExportRight) :', error)
+      return []
     }
   },
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import Button from '@material-ui/core/Button'
@@ -90,19 +90,28 @@ const Login = () => {
   const [open, setOpen] = useState(false)
 
   const getPractitionerData = async (practitioner, lastConnection) => {
-    if (typeof services.perimeters.fetchDeidentified !== 'function') {
-      setLoading(false)
-      return setErrorLogin(true)
-    }
-
     if (practitioner) {
-      const deidentifiedInfos = await services.perimeters.fetchDeidentified(practitioner.id)
+      const practitionerPerimeters = await services.perimeters.getPerimeters()
+      if (practitionerPerimeters.length === 0) {
+        localStorage.clear()
+        setLoading(false)
+        return setNoRights(true)
+      }
+
+      const nominativeGroupsIds = practitionerPerimeters
+        .map((practitionerPerimeter) => {
+          const groupId = practitionerPerimeter.extension?.find(({ url }) => url === 'cohort-id')
+            ? `${practitionerPerimeter.extension?.find(({ url }) => url === 'cohort-id').valueInteger}`
+            : ''
+          return groupId
+        })
+        .filter((item) => item)
 
       dispatch(
         loginAction({
           ...practitioner,
-          deidentified: deidentifiedInfos.deidentification,
-          nominativeGroupsIds: deidentifiedInfos.nominativeGroupsIds,
+          nominativeGroupsIds,
+          deidentified: nominativeGroupsIds.length === 0,
           lastConnection
         })
       )
@@ -115,11 +124,6 @@ const Login = () => {
       setErrorLogin(true)
     }
   }
-
-  useEffect(() => {
-    // Do not use localStorage.clear() because localStorage.getItem('old-path') is set for relaunch app with prev page
-    localStorage.removeItem('persit:root')
-  }, [])
 
   const login = async () => {
     try {
@@ -144,14 +148,8 @@ const Login = () => {
         localStorage.setItem(REFRESH_TOKEN, data.refresh)
 
         const practitioner = await services.practitioner.fetchPractitioner(username)
-        const getRights = await services.practitioner.fetchPractitionerRole(practitioner.id)
-
-        if (getRights === undefined) {
-          setNoRights(true)
-        } else {
-          const lastConnection = data.last_connection ? data.last_connection.modified_at : undefined
-          getPractitionerData(practitioner, lastConnection)
-        }
+        const lastConnection = data.last_connection ? data.last_connection.modified_at : undefined
+        getPractitionerData(practitioner, lastConnection)
       } else {
         setLoading(false)
         return setErrorLogin(true)

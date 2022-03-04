@@ -169,8 +169,8 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   }
 
   return (
-    <Grid container item xs={11} justify="flex-end" className={classes.documentTable}>
-      <Grid container justify="space-between" alignItems="center">
+    <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
+      <Grid container justifyContent="space-between" alignItems="center">
         <Typography variant="button">
           {totalDocs} / {totalAllDoc} document(s)
         </Typography>

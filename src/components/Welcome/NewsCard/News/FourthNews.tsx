@@ -6,7 +6,7 @@ const FirstNews = () => {
   return (
     <>
       <Typography color="textSecondary" style={{ paddingBottom: 14 }}>
-        <b>Nouvelles fonctionnalités</b> - 22/02/2022
+        <b>Nouvelles fonctionnalités</b> - 03/2022
       </Typography>
 
       <Typography color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>

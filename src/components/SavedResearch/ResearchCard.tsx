@@ -11,7 +11,6 @@ import {
   InputBase,
   Typography
 } from '@material-ui/core'
-import Pagination from '@material-ui/lab/Pagination'
 
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
@@ -44,7 +43,6 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   const loadingStatus = cohortState.loading
 
   const [researches, setResearches] = useState<Cohort[]>([])
-  const [page, setPage] = useState(1)
 
   const [searchInput, setSearchInput] = useState('')
 
@@ -65,7 +63,6 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
     startDate: null,
     endDate: null
   })
-  const researchLines = 20 // Number of desired lines in the document array
 
   useEffect(() => {
     dispatch<any>(fetchCohorts())
@@ -138,16 +135,8 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
     await dispatch<any>(setFavoriteCohort({ favCohort: cohort }))
   }
 
-  const handleChangePage = async (event?: React.ChangeEvent<unknown>, value = 1) => {
-    setPage(value)
-  }
-
   const handleChangeInput = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setSearchInput(event.target.value)
-  }
-
-  const onSearchCohort = async () => {
-    handleChangePage()
   }
 
   const handleClearInput = async () => {
@@ -157,7 +146,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   const onKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     if (e.keyCode === 13) {
       e.preventDefault()
-      onSearchCohort()
+      onFetchCohorts(sortBy, sortDirection)
     }
   }
 
@@ -222,7 +211,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
                 </InputAdornment>
               }
             />
-            <IconButton type="submit" aria-label="search" onClick={onSearchCohort}>
+            <IconButton type="submit" aria-label="search" onClick={() => onFetchCohorts(sortBy, sortDirection)}>
               <SearchIcon fill="#ED6D91" height="15px" />
             </IconButton>
           </Grid>
@@ -322,13 +311,6 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
           onRequestSort={handleRequestSort}
         />
       )}
-      <Pagination
-        className={classes.pagination}
-        count={Math.ceil(total / researchLines)}
-        shape="rounded"
-        onChange={handleChangePage}
-        page={page}
-      />
 
       <CohortsFilter
         open={open}
