@@ -24,7 +24,7 @@ const SavedResearches = () => {
         <CssBaseline />
         <Grid container item xs={11}>
           <Typography id="cohortSaved-title" variant="h1" color="primary" className={classes.title}>
-            Cohortes sauvegardées
+            Mes cohortes sauvegardées
           </Typography>
           <Research />
         </Grid>
