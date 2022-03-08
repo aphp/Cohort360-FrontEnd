@@ -34,6 +34,8 @@ import {
   fetchBinary
 } from './callApi'
 
+import { ODD_EXPORT } from '../../constants'
+
 import apiBackend from '../apiBackend'
 import apiPortail from '../apiPortail'
 
@@ -487,8 +489,8 @@ const servicesCohorts: IServicesCohorts = {
       ) {
         //@ts-ignore
         const currentCohortItem = rightResponse.data.entry[0].resource.extension?.[0]
-        const canMakeExport =
-          currentCohortItem.extension && currentCohortItem.extension.length > 0
+        const canMakeExport = ODD_EXPORT
+          ? currentCohortItem.extension && currentCohortItem.extension.length > 0
             ? currentCohortItem.extension.some(
                 (extension: any) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
               ) &&
@@ -496,6 +498,7 @@ const servicesCohorts: IServicesCohorts = {
                 (extension: any) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
               )
             : false
+          : false
         return canMakeExport
       }
       return false

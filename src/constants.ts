@@ -93,3 +93,20 @@ export const MEDICATION_PRESCRIPTION_TYPES =
 export const MEDICATION_ADMINISTRATIONS =
   process.env.REACT_APP_VALUE_SET_URL_MEDICATION_ADMINISTRATIONS ??
   'https://terminology.eds.aphp.fr/aphp-orbis-medicament-voie-administration'
+
+export const BIOLOGY_HIERARCHY_ITM_ANABIO =
+  process.env.REACT_APP_VALUE_SET_URL_BIOLOGY ?? 'https://terminology.eds.aphp.fr/aphp-itm-anabio'
+
+export const BIOLOGY_HIERARCHY_ITM_LOINC =
+  process.env.REACT_APP_VALUE_SET_URL_BIOLOGY ?? 'https://terminology.eds.aphp.fr/aphp-itm-loinc'
+
+export const ODD_BIOLOGY: boolean = process.env.REACT_APP_ODD_BIOLOGY === 'true' ?? false
+export const ODD_COMPOSITION: boolean = process.env.REACT_APP_ODD_COMPOSITION === 'true' ?? false
+export const ODD_PROCEDURE: boolean = process.env.REACT_APP_ODD_PROCEDURE === 'true' ?? false
+export const ODD_CLAIM: boolean = process.env.REACT_APP_ODD_CLAIM === 'true' ?? false
+export const ODD_CONDITION: boolean = process.env.REACT_APP_ODD_CONDITION === 'true' ?? false
+export const ODD_OBSERVATION: boolean = process.env.REACT_APP_ODD_OBSERVATION === 'true' ?? false
+export const ODD_MEDICATION: boolean = process.env.REACT_APP_ODD_MEDICATION === 'true' ?? false
+
+export const ODD_CONTACT: boolean = process.env.REACT_APP_ODD_CONTACT === 'true' ?? false
+export const ODD_EXPORT: boolean = process.env.REACT_APP_ODD_EXPORT === 'true' ?? false

@@ -1,7 +1,7 @@
 import api from '../apiFhir'
 import apiBackCohort from '../apiBackend'
 import { getInfos } from './myPatients'
-import { CONTEXT, API_RESOURCE_TAG } from '../../constants'
+import { CONTEXT, API_RESOURCE_TAG, ODD_EXPORT } from '../../constants'
 import {
   FHIR_API_Response,
   CohortData,
@@ -550,8 +550,8 @@ const fetchCohortExportRight = async (cohortId: string, providerId: string) => {
       rightResponse.data.entry[0].resource
     ) {
       const currentCohortItem = rightResponse.data.entry[0].resource.extension?.[0]
-      const canMakeExport =
-        currentCohortItem.extension && currentCohortItem.extension.length > 0
+      const canMakeExport = ODD_EXPORT
+        ? currentCohortItem.extension && currentCohortItem.extension.length > 0
           ? currentCohortItem.extension.some(
               (extension: any) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
             ) &&
@@ -559,6 +559,7 @@ const fetchCohortExportRight = async (cohortId: string, providerId: string) => {
               (extension: any) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
             )
           : false
+        : false
       return canMakeExport
     }
     return false
