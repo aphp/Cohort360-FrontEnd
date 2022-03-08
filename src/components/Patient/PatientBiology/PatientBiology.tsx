@@ -160,7 +160,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
       <Grid container item style={{ marginBottom: 8 }}>
         <Alert severity="warning">
-          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes d'analyse les plus utilisés du
+          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes d'analyse les plus utilisées du
           référentiel. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS V9
           qui ont été créés et mises à jours depuis mars 2020.
         </Alert>
