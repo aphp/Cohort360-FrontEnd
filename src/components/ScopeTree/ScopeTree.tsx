@@ -199,15 +199,15 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                       />
                     </TableCell>
 
-                    <TableCell>
+                    <TableCell style={{ cursor: 'pointer' }} onClick={() => _clickToSelect(_row)}>
                       <Typography>{_row.name}</Typography>
                     </TableCell>
 
-                    <TableCell align="center">
+                    <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => _clickToSelect(_row)}>
                       <Typography>{displayDigit(_row.quantity)}</Typography>
                     </TableCell>
 
-                    <TableCell align="center">
+                    <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => _clickToSelect(_row)}>
                       <Typography>{_row.access ?? parentAccess}</Typography>
                     </TableCell>
                   </TableRow>
