@@ -43,6 +43,8 @@ import { Cohort } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
+import { ODD_EXPORT } from '../../../constants'
+
 import useStyles from './styles'
 
 type FavStarProps = {
@@ -114,14 +116,15 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
 
   // You can make an export if you got 1 cohort with: EXPORT_ACCESS = 'DATA_NOMINATIVE'
   const canMakeExport = researchData
-    ? researchData.some((cohort) =>
+    ? ODD_EXPORT &&
+      researchData.some((cohort) =>
         cohort.extension && cohort.extension.length > 0
           ? cohort.extension.find(
               (extension) => extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
             )
           : false
       )
-    : []
+    : false
 
   return (
     <>
@@ -447,11 +450,13 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
         onClose={() => dispatch<any>(setSelectedCohortState(null))}
       />
 
-      <ExportModal
-        cohortId={selectedExportableCohort ? selectedExportableCohort : 0}
-        open={!!selectedExportableCohort}
-        handleClose={() => setSelectedExportableCohort(undefined)}
-      />
+      {ODD_EXPORT && (
+        <ExportModal
+          cohortId={selectedExportableCohort ? selectedExportableCohort : 0}
+          open={!!selectedExportableCohort}
+          handleClose={() => setSelectedExportableCohort(undefined)}
+        />
+      )}
     </>
   )
 }

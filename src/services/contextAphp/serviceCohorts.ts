@@ -32,6 +32,8 @@ import {
   fetchBinary
 } from './callApi'
 
+import { ODD_EXPORT } from '../../constants'
+
 import apiBackend from '../apiBackend'
 
 export interface IServiceCohorts {
@@ -434,6 +436,8 @@ const servicesCohorts: IServiceCohorts = {
   },
 
   fetchCohortsRights: async (cohorts) => {
+    if (!ODD_EXPORT) return cohorts
+
     try {
       // On recupère les info d'une cohort pour avoir les IDs des groupes
       const cohortsResponse = await Promise.all(

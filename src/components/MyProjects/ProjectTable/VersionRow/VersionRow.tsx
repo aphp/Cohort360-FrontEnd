@@ -30,6 +30,8 @@ import { Cohort } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
+import { ODD_EXPORT } from '../../../../constants'
+
 import useStyles from '../styles'
 
 const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
@@ -47,13 +49,18 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
   }
 
   // You can make an export if you got 1 cohort with: EXPORT_ACCESS = 'DATA_NOMINATIVE'
-  const canMakeExport = cohorts.some((cohort) =>
-    cohort.extension && cohort.extension.length > 0
-      ? cohort.extension.find(
-          (extension) => extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
-        )
-      : false
-  )
+  const canMakeExport =
+    ODD_EXPORT &&
+    cohorts.some((cohort) =>
+      cohort.extension && cohort.extension.length > 0
+        ? cohort.extension.some(
+            (extension) => extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
+          ) &&
+          cohort.extension.some(
+            (extension) => extension.url === 'READ_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
+          )
+        : false
+    )
 
   const onSetCohortFavorite = async (cohort: Cohort) => {
     await dispatch<any>(setFavoriteCohort({ favCohort: cohort }))
@@ -193,11 +200,13 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
         </TableBody>
       </Table>
 
-      <ExportModal
-        cohortId={selectedExportableCohort ? +selectedExportableCohort : 0}
-        open={!!selectedExportableCohort}
-        handleClose={() => setSelectedExportableCohort(null)}
-      />
+      {ODD_EXPORT && (
+        <ExportModal
+          cohortId={selectedExportableCohort ? +selectedExportableCohort : 0}
+          open={!!selectedExportableCohort}
+          handleClose={() => setSelectedExportableCohort(null)}
+        />
+      )}
     </Box>
   )
 }

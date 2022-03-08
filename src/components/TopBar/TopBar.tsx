@@ -45,6 +45,8 @@ import services from 'services'
 
 import displayDigit from 'utils/displayDigit'
 
+import { ODD_EXPORT } from '../../constants'
+
 import useStyles from './styles'
 
 type TopBarProps = {
@@ -296,7 +298,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                     >
                       Modifier
                     </MenuItem>
-                    {dashboard.canMakeExport && (
+                    {ODD_EXPORT && dashboard.canMakeExport && (
                       <MenuItem
                         onClick={() => {
                           setAnchorEl(null)
@@ -325,7 +327,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         )}
       </Grid>
 
-      {openModal === 'edit' && (
+      {ODD_EXPORT && openModal === 'edit' && (
         <ModalEditCohort
           open
           onClose={() => {

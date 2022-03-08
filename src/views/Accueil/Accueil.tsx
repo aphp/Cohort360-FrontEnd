@@ -4,6 +4,7 @@ import moment from 'moment'
 import clsx from 'clsx'
 
 import { Grid, Paper, Container, Typography } from '@material-ui/core'
+import Alert from '@material-ui/lab/Alert'
 
 import NewsCard from 'components/Welcome/NewsCard/NewsCard'
 import PatientsCard from 'components/Welcome/PatientsCard/PatientsCard'
@@ -112,6 +113,11 @@ const Accueil: React.FC = () => {
         style={{ minHeight: 'calc(100vh - 70px)', marginBottom: 8 }}
       >
         <Grid container spacing={1}>
+          <Alert severity="warning" style={{ marginTop: '-12px', width: '100%' }}>
+            Une anomalie a été détectée sur l'export de données et les contraintes temporelles. Ces fonctionnalités ont
+            été désactivées. L'équipe Cohort360 met tout en œuvre pour résoudre ces problèmes.
+          </Alert>
+
           <Grid container className={classes.newsGrid} item xs={12} md={6} lg={6}>
             <Grid item className={classes.pt3}>
               <Paper

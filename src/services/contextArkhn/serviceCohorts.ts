@@ -1,36 +1,38 @@
 import {
-  CohortComposition,
-  CohortData,
-  SearchByTypes,
-  VitalStatus,
+  AgeRepartitionType,
   Back_API_Response,
   Cohort,
-  AgeRepartitionType,
-  GenderRepartitionType
+  CohortComposition,
+  CohortData,
+  GenderRepartitionType,
+  SearchByTypes,
+  VitalStatus
 } from 'types'
 import {
-  IPatient,
   IComposition,
   IComposition_Section,
-  PatientGenderKind,
-  IIdentifier
+  IIdentifier,
+  IPatient,
+  PatientGenderKind
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
-  getGenderRepartitionMapAphp,
-  getEncounterRepartitionMapAphp,
   getAgeRepartitionMapAphp,
+  getEncounterRepartitionMapAphp,
+  getGenderRepartitionMapAphp,
   getVisitRepartitionMapAphp
 } from 'utils/graphUtils'
-import { getApiResponseResources } from 'utils/apiHelpers'
+import {getApiResponseResources} from 'utils/apiHelpers'
 
 import {
-  fetchGroup,
-  fetchPatient,
-  fetchEncounter,
+  fetchBinary,
   fetchComposition,
   fetchCompositionContent,
-  fetchBinary
+  fetchEncounter,
+  fetchGroup,
+  fetchPatient
 } from './callApi'
+
+import {ODD_EXPORT} from '../../constants'
 
 import apiBackend from '../apiBackend'
 
@@ -422,8 +424,7 @@ const servicesCohorts: IServiceCohorts = {
   },
 
   fetchDocumentContent: async (compositionId) => {
-    const documentContent = await fetchCompositionContent(compositionId)
-    return documentContent
+    return await fetchCompositionContent(compositionId)
   },
 
   fetchBinary: async (documentId, list) => {
@@ -434,6 +435,8 @@ const servicesCohorts: IServiceCohorts = {
   },
 
   fetchCohortsRights: async (cohorts) => {
+    if (!ODD_EXPORT) return cohorts
+
     try {
       // On recupère les info d'une cohort pour avoir les IDs des groupes
       const cohortsResponse = await Promise.all(

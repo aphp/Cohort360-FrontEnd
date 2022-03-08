@@ -134,3 +134,5 @@ export const ODD_MEDICATION: boolean =
   (process.env.NODE_ENV !== 'development' ? '{ODD_MEDICATION}' : process.env.REACT_APP_ODD_MEDICATION) === 'true'
 export const ODD_CONTACT: boolean =
   (process.env.NODE_ENV !== 'development' ? '{ODD_CONTACT}' : process.env.REACT_APP_ODD_CONTACT) === 'true'
+export const ODD_EXPORT: boolean =
+  (process.env.NODE_ENV !== 'development' ? '{ODD_EXPORT}' : process.env.REACT_APP_ODD_EXPORT) === 'true'
