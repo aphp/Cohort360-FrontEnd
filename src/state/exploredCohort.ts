@@ -5,6 +5,7 @@ import { logout, login } from './me'
 import { RootState } from 'state'
 
 import { setFavoriteCohort } from 'state/cohort'
+import { ODD_EXPORT } from '../constants'
 
 import services from 'services'
 
@@ -133,7 +134,9 @@ const fetchExploredCohort = createAsyncThunk<
           cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
           if (cohort) {
             cohort.cohortId = id
-            cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
+            cohort.canMakeExport = ODD_EXPORT
+              ? await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
+              : false
           }
         }
         break
@@ -188,7 +191,9 @@ const fetchExploredCohortInBackground = createAsyncThunk<
       if (id) {
         cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
         if (cohort) {
-          cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
+          cohort.canMakeExport = ODD_EXPORT
+            ? await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
+            : false
         }
       }
       break

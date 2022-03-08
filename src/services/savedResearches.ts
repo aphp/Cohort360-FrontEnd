@@ -1,6 +1,6 @@
 import api from './apiFhir'
 import apiBackCohort from './apiBackend'
-import { CONTEXT } from '../constants'
+import { CONTEXT, ODD_EXPORT } from '../constants'
 // import { IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   Back_API_Response,
@@ -105,7 +105,9 @@ export const fetchCohorts = async (
 
     // @ts-ignore
     for (const cohort of cohortResp?.data?.results) {
-      const canMakeExport = await services.cohorts.fetchCohortExportRight(cohort.fhir_group_id ?? '')
+      const canMakeExport = ODD_EXPORT
+        ? await services.cohorts.fetchCohortExportRight(cohort.fhir_group_id ?? '')
+        : false
 
       cohortResult = [
         ...cohortResult,
@@ -229,7 +231,9 @@ export const fetchLastCohorts = async (providerId: string | undefined): Promise<
 
     // @ts-ignore
     for (const cohort of cohortResp?.data?.results) {
-      const canMakeExport = await services.cohorts.fetchCohortExportRight(cohort.fhir_group_id ?? '', providerId ?? '')
+      const canMakeExport = ODD_EXPORT
+        ? await services.cohorts.fetchCohortExportRight(cohort.fhir_group_id ?? '', providerId ?? '')
+        : false
 
       cohortResult = [
         ...cohortResult,
