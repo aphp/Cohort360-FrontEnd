@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
-import { Grid, IconButton, InputAdornment, InputBase } from '@material-ui/core'
+import { Grid, IconButton, InputAdornment, InputBase, Typography, Tooltip } from '@material-ui/core'
 
+import InfoIcon from '@material-ui/icons/Info'
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
@@ -26,6 +27,7 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
 }) => {
   const classes = useStyles()
 
+  const [tooltip, setTooltip] = useState<boolean>(false)
   const [searchInput, setSearchInput] = useState<string>(defaultSearchInput ?? '')
 
   const handleChangeInput = (event: any) => {
@@ -55,7 +57,7 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
   }, [defaultSearchInput])
 
   return (
-    <Grid container item className={classes.gridAdvancedSearch}>
+    <Grid container item className={props.sqareInput ? classes.gridAdvancedSearchSqared : classes.gridAdvancedSearch}>
       <InputBase
         fullWidth
         placeholder={placeholder ?? 'Recherche avec regex dans les documents (Ne pas renseigner les séparateurs)'}
@@ -69,7 +71,28 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
         }
         endAdornment={
           <InputAdornment position="end">
-            <Grid className={classes.slash}>/</Grid>
+            {!props.noInfoIcon && (
+              <Tooltip
+                open={tooltip}
+                title={
+                  <>
+                    <Typography>Une expression régulière permet de faire des recherches complexes.</Typography>
+                    <Typography>Vous pouvez les tester ici : https://regex101.com/</Typography>
+                    <Typography style={{ marginTop: 8 }}>Quelques exemples :</Typography>
+                    <Typography style={{ marginLeft: 16 }}>[a-z] : Lettres minuscules de a à z</Typography>
+                    <Typography style={{ marginLeft: 16 }}>[A-Z] : Lettres majuscules de A à Z</Typography>
+                    <Typography style={{ marginLeft: 16 }}>[0-9] : Chiffres de 0 à 9</Typography>
+                    <Typography style={{ marginLeft: 16 }}>
+                      [a-z0-9] : Lettres minuscules de a à z ou chiffres de 0 à 9
+                    </Typography>
+                  </>
+                }
+              >
+                <IconButton onClick={() => setTooltip(!tooltip)} size="small">
+                  <InfoIcon />
+                </IconButton>
+              </Tooltip>
+            )}
 
             {!props.noClearIcon && searchInput && (
               <IconButton size="small" onClick={handleClearInput}>
@@ -82,6 +105,7 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
                 <SearchIcon fill="#ED6D91" height="17px" />
               </IconButton>
             )}
+            <Grid className={classes.slash}>/</Grid>
           </InputAdornment>
         }
       />
