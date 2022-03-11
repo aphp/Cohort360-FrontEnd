@@ -381,7 +381,7 @@ const servicesProjects: IServiceProjects = {
     }>(`/cohort/cohorts/${search}`)) ?? { data: { results: [] } }
 
     // Recupere les droits
-    const cohortList = await servicesCohorts.fetchCohortsExportRights(data.results)
+    const cohortList = await servicesCohorts.fetchCohortsRights(data.results)
 
     return {
       ...data,

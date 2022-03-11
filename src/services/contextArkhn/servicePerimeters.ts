@@ -1,5 +1,5 @@
 import { CohortData, ScopeTreeRow } from 'types'
-import { IOrganization, IExtension } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IGroup, IOrganization, IExtension } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   getGenderRepartitionMapAphp,
   getAgeRepartitionMapAphp,
@@ -71,6 +71,14 @@ export interface IServicePerimeters {
    *   - ScopeTreeRow[]
    */
   getScopeSubItems: (perimeter: ScopeTreeRow | null, getSubItem?: boolean) => Promise<ScopeTreeRow[]>
+
+  /**
+   * Cette fonction retourne les droits de lecture d'un périmetre
+   *
+   * Arguments:
+   *   - perimetersId: ID du périmètre (liste d'ID séparé par des virgules)
+   */
+  fetchPerimetersRights: (perimeters: IGroup[]) => Promise<IGroup[]>
 }
 
 const servicesPerimeters: IServicePerimeters = {
@@ -94,7 +102,7 @@ const servicesPerimeters: IServicePerimeters = {
       })
     ])
 
-    const cohort = getApiResponseResources(perimetersResp)
+    const cohort = await servicesPerimeters.fetchPerimetersRights(getApiResponseResources(perimetersResp) ?? [])
 
     const totalPatients = patientsResp?.data?.resourceType === 'Bundle' ? patientsResp.data.total : 0
 
@@ -228,7 +236,7 @@ const servicesPerimeters: IServicePerimeters = {
               },
               {
                 url: 'EXPORT_ACCESS',
-                valueString: foundRight?.right_export_csv_nominative ? 'DATA_NOMINATIVE' : 'DATA_PSEUDOANONYMISED'
+                valueString: 'DATA_PSEUDOANONYMISED' // Impossible de faire un export de donnée sur un périmètre
               }
             ]
           }
@@ -328,6 +336,43 @@ const servicesPerimeters: IServicePerimeters = {
     })
 
     return subScopeRows
+  },
+
+  fetchPerimetersRights: async (perimeters) => {
+    const caresiteIds = perimeters
+      .map((perimeter) =>
+        perimeter.managingEntity?.display?.search('Organization/') !== -1
+          ? perimeter.managingEntity?.display?.replace('Organization/', '')
+          : ''
+      )
+      .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
+      .join(',')
+
+    const rightResponse = await apiBackend.get(`accesses/my-rights/?care-site-ids=${caresiteIds}`)
+    const rightsData = (rightResponse.data as any[]) ?? []
+
+    return perimeters.map((perimeter) => {
+      const caresiteId =
+        perimeter.managingEntity?.display?.search('Organization/') !== -1
+          ? perimeter.managingEntity?.display?.replace('Organization/', '')
+          : ''
+      const foundRight = rightsData.find((rightData) => rightData.care_site_id === +(caresiteId ?? '0'))
+
+      return {
+        ...perimeter,
+        extension: [
+          ...(perimeter.extension ?? []),
+          {
+            url: 'READ_ACCESS',
+            valueString: foundRight?.right_read_patient_nominative ? 'DATA_NOMINATIVE' : 'DATA_PSEUDOANONYMISED'
+          },
+          {
+            url: 'EXPORT_ACCESS',
+            valueString: 'DATA_PSEUDOANONYMISED' // Impossible de faire un export de donnée sur un périmètre
+          }
+        ]
+      }
+    })
   }
 }
 

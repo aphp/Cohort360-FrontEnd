@@ -220,7 +220,7 @@ const setProjectSlice = createSlice({
     builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout.fulfilled, () => defaultInitialState)
     // fetchProjects
-    builder.addCase(fetchProjects.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(fetchProjects.pending, (state) => ({ ...state, loading: !state.count }))
     builder.addCase(fetchProjects.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
     builder.addCase(fetchProjects.rejected, (state) => ({ ...state, loading: false }))
     // addProject
