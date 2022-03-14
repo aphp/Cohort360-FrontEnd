@@ -191,10 +191,10 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     <>
       <Grid container direction="column" alignItems="center">
         <CssBaseline />
-        <Grid container item xs={11} justify="space-between">
-          <Grid container item justify="flex-end" className={classes.tableGrid}>
-            <Grid container justify="space-between" alignItems="center" style={{ marginBottom: 8 }}>
-              <Grid container direction="column" justify="flex-start" style={{ width: 'fit-content' }}>
+        <Grid container item xs={11} justifyContent="space-between">
+          <Grid container item justifyContent="flex-end" className={classes.tableGrid}>
+            <Grid container justifyContent="space-between" alignItems="center" style={{ marginBottom: 8 }}>
+              <Grid container direction="column" justifyContent="flex-start" style={{ width: 'fit-content' }}>
                 {loadingStatus || deidentifiedBoolean === null ? (
                   <>
                     <Skeleton width={200} height={40} />

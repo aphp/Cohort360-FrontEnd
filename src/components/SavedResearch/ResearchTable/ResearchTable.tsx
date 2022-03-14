@@ -113,15 +113,12 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
     onRequestSort(event, property)
   }
 
-  // You can make an export if you got 1 cohort with: EXPORT_DATA_NOMINATIVE = true && READ_DATA_NOMINATIVE = true
+  // You can make an export if you got 1 cohort with: EXPORT_ACCESS = 'DATA_NOMINATIVE'
   const canMakeExport = researchData
     ? researchData.some((cohort) =>
         cohort.extension && cohort.extension.length > 0
           ? cohort.extension.find(
-              (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
-            ) &&
-            cohort.extension.find(
-              (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+              (extension) => extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
             )
           : false
       )
@@ -245,10 +242,8 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                   const canExportThisCohort =
                     canMakeExport && row.extension
                       ? row.extension.some(
-                          (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
-                        ) &&
-                        row.extension.some(
-                          (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+                          (extension) =>
+                            extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
                         )
                       : false
 

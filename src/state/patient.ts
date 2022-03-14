@@ -49,9 +49,6 @@ export type PatientState = null | {
   biology?: IPatientObservation<CohortObservation>
 }
 
-const localStoragePatient = localStorage.getItem('patient') || null
-const initialState: PatientState = localStoragePatient ? JSON.parse(localStoragePatient) : null
-
 /**
  * fetchPmsi
  *
@@ -621,14 +618,14 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
 
 const patientSlice = createSlice({
   name: 'patient',
-  initialState: initialState as PatientState,
+  initialState: null as PatientState,
   reducers: {
     clearPatient: () => {
       return null
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(logout, () => null)
+    builder.addCase(logout.fulfilled, () => null)
     // fetchPatientInfo
     builder.addCase(fetchPatientInfo.pending, (state) =>
       state === null

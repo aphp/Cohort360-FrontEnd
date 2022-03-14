@@ -57,7 +57,7 @@ const ControlPanel: React.FC<{
     selectedPopulation === null
       ? null
       : selectedPopulation
-          .map((population) => population && population.access)
+          .map((population: any) => population && population.access)
           .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
 
   const checkIfLogicalOperatorIsEmpty = () => {

@@ -4,7 +4,6 @@ import { CONTEXT } from '../../constants'
 import { useDispatch } from 'react-redux'
 import { Link, useParams, useLocation } from 'react-router-dom'
 import { Grid, Tabs, Tab } from '@material-ui/core'
-import { IExtension } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import InclusionExclusionPatientsPanel from 'components/Cohort/InclusionExclusionPatients/InclusionExclusionPatients'
 import RedcapExport from 'components/RedcapExport/RedcapExport'
@@ -41,25 +40,12 @@ const Dashboard: React.FC<{
 
   const [selectedTab, selectTab] = useState(tabName || 'apercu')
   const [tabs, setTabs] = useState<Tabs[]>([])
-  const [deidentifiedBoolean, setDeidentifiedBoolean] = useState<boolean | null>(null)
   const [openRedcapDialog, setOpenRedcapDialog] = useState(false)
 
   const { open, dashboard } = useAppSelector((state) => ({
     open: state.drawer,
     dashboard: state.exploredCohort
   }))
-
-  const checkDeindentifiedStatus = (_dashboard: any) => {
-    // Check if access == 'Pseudonymisé' || 'Nominatif'
-    const { originalPatients } = _dashboard
-    if (!originalPatients || (originalPatients && !originalPatients[0])) return
-    const extension: IExtension[] | undefined = originalPatients[0].extension
-
-    const deidentified = extension?.find((data) => data.url === 'deidentified')
-    const valueBoolean = deidentified ? deidentified.valueBoolean : true
-
-    setDeidentifiedBoolean(!!valueBoolean)
-  }
 
   const onChangeTabs = () => {
     switch (context) {
@@ -124,7 +110,6 @@ const Dashboard: React.FC<{
   }, [context, cohortId]) // eslint-disable-line
 
   useEffect(() => {
-    checkDeindentifiedStatus(dashboard)
     onChangeTabs()
   }, [dashboard])
 
@@ -176,7 +161,13 @@ const Dashboard: React.FC<{
 
       <TopBar
         context={context}
-        access={deidentifiedBoolean === null ? '-' : deidentifiedBoolean ? 'Pseudonymisé' : 'Nominatif'}
+        access={
+          dashboard.deidentifiedBoolean === undefined
+            ? '-'
+            : dashboard.deidentifiedBoolean
+            ? 'Pseudonymisé'
+            : 'Nominatif'
+        }
         afterEdit={() => forceReload()}
       />
 
@@ -217,7 +208,7 @@ const Dashboard: React.FC<{
           <PatientList
             groupId={cohortId || perimetreIds}
             total={dashboard.totalPatients || 0}
-            deidentified={deidentifiedBoolean}
+            deidentified={dashboard.deidentifiedBoolean}
             patients={dashboard.originalPatients}
             agePyramidData={dashboard.agePyramidData}
             genderRepartitionMap={dashboard.genderRepartitionMap}
@@ -226,7 +217,7 @@ const Dashboard: React.FC<{
         {selectedTab === 'documents' && (
           <Documents
             groupId={cohortId || perimetreIds}
-            deidentifiedBoolean={deidentifiedBoolean}
+            deidentifiedBoolean={dashboard.deidentifiedBoolean ?? false}
             sortBy={'date'}
             sortDirection={'desc'}
           />

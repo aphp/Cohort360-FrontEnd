@@ -46,14 +46,11 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
     dispatch<any>(setSelectedCohort(cohortId ?? null))
   }
 
-  // You can make an export if you got 1 cohort with: EXPORT_DATA_NOMINATIVE = true && READ_DATA_NOMINATIVE = true
+  // You can make an export if you got 1 cohort with: EXPORT_ACCESS = 'DATA_NOMINATIVE'
   const canMakeExport = cohorts.some((cohort) =>
     cohort.extension && cohort.extension.length > 0
       ? cohort.extension.find(
-          (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
-        ) &&
-        cohort.extension.find(
-          (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+          (extension) => extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
         )
       : false
   )
@@ -98,13 +95,16 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
             cohorts.map((historyRow) => {
               if (!historyRow) return <></>
 
+              const isError =
+                !historyRow.fhir_group_id ||
+                historyRow.request_job_status === 'pending' ||
+                historyRow.request_job_status === 'started' ||
+                !!historyRow.request_job_fail_msg
+
               const canExportThisCohort =
-                canMakeExport && historyRow.extension
+                canMakeExport && !isError && historyRow.extension
                   ? historyRow.extension.some(
-                      (extension) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
-                    ) &&
-                    historyRow.extension.some(
-                      (extension) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+                      (extension) => extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
                     )
                   : false
 

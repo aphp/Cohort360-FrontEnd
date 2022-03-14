@@ -1,5 +1,4 @@
 import Connexion from 'views/Connexion/Connexion'
-import FakeConnexion from 'views/Connexion/FakeConnexion'
 import ArkhnConnexion from 'views/Connexion/ArkhnConnexion'
 import Accueil from 'views/Accueil/Accueil'
 import RechercherPatient from 'views/RechercherPatient/RechercherPatient'
@@ -11,7 +10,7 @@ import Dashboard from 'views/Dashboard/Dashboard'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 import Contact from 'views/Contact/Contact'
 
-import { CONTEXT } from '../../../constants'
+import { CONTEXT, ODD_CONTACT } from '../../../constants'
 
 export default [
   /**
@@ -21,7 +20,7 @@ export default [
     exact: true,
     path: '/',
     name: 'main',
-    component: CONTEXT === 'arkhn' ? ArkhnConnexion : CONTEXT === 'aphp' ? Connexion : FakeConnexion
+    component: CONTEXT === 'arkhn' ? ArkhnConnexion : Connexion
   },
   /**
    * Cohort360: Main Page
@@ -206,7 +205,7 @@ export default [
   /**
    * Cohort360: Contact Page
    */
-  {
+  ODD_CONTACT && {
     displaySideBar: true,
     path: '/contact',
     name: 'contact',

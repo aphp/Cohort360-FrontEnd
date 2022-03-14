@@ -17,17 +17,6 @@ import { deleteProject } from './project'
 
 import services from 'services'
 
-const localStorageCohortCreation = localStorage.getItem('cohortCreation') ?? null
-const jsonCohortCreation = localStorageCohortCreation
-  ? {
-      ...JSON.parse(localStorageCohortCreation).request,
-      selectedPopulation:
-        JSON.parse(localStorageCohortCreation).request.selectedPopulation?.map((population: ScopeTreeRow | null) =>
-          population === null ? undefined : population
-        ) ?? null
-    }
-  : {}
-
 export type CohortCreationState = {
   loading: boolean
   saveLoading: boolean
@@ -79,8 +68,6 @@ const defaultInitialState: CohortCreationState = {
   nextCriteriaId: 1,
   nextGroupId: -1
 }
-
-const initialState: CohortCreationState = localStorageCohortCreation ? jsonCohortCreation : defaultInitialState
 
 /**
  * fetchRequestCohortCreation
@@ -354,7 +341,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
 
 const cohortCreationSlice = createSlice({
   name: 'cohortCreation',
-  initialState,
+  initialState: defaultInitialState,
   reducers: {
     resetCohortCreation: () => defaultInitialState,
     setCohortName: (state: CohortCreationState, action: PayloadAction<string>) => {
@@ -547,7 +534,7 @@ const cohortCreationSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
-    builder.addCase(logout, () => defaultInitialState)
+    builder.addCase(logout.fulfilled, () => defaultInitialState)
     // buildCohortCreation
     builder.addCase(buildCohortCreation.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(buildCohortCreation.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))

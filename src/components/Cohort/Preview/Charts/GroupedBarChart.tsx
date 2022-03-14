@@ -113,7 +113,7 @@ const GroupedBarChart: React.FC<GroupedBarChartProps> = ({ data, height = 250, w
       .attr('fill', (d) => color(d.key))
       .on('mouseover', function (event, d) {
         const currentMonth = customData.find((customItem) => customItem[d.key] === d.value)
-        const total_value = (currentMonth?.Hommes ?? 0) + (currentMonth?.Femmes ?? 0)
+        const total_value = (currentMonth?.Hommes || 0) + (currentMonth?.Femmes || 0)
         d3.select(this).transition().duration('50').attr('opacity', '.5')
         div.transition().duration(50).style('opacity', 1)
         div

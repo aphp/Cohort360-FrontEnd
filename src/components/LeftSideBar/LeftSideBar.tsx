@@ -39,6 +39,7 @@ import { logout as logoutAction } from 'state/me'
 import { open as openAction, close as closeAction } from 'state/drawer'
 import { resetCohortCreation } from 'state/cohortCreation'
 
+import { ODD_CONTACT } from '../../constants'
 import useStyles from './styles'
 
 const smallDrawerWidth = 52
@@ -116,7 +117,9 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           }}
         >
           <div className={classes.toolbar}>
-            <img src={cohortLogo} alt="Cohort360 logo" className={open ? undefined : classes.hide} />
+            <Link href="/accueil">
+              <img src={cohortLogo} alt="Cohort360 logo" className={open ? undefined : classes.hide} />
+            </Link>
 
             <IconButton
               disableRipple
@@ -367,7 +370,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               <List id="research-collapse">
                 <ListItem>
                   <Link id="savedResearch-link" href="/recherche_sauvegarde" className={classes.nestedTitle}>
-                    Cohortes sauvegardées
+                    Mes cohortes sauvegardées
                   </Link>
                 </ListItem>
                 <ListItem>
@@ -379,27 +382,28 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             </Collapse>
           </List>
 
-          {open ? (
-            <Button
-              onClick={() => history.push('/contact')}
-              variant="contained"
-              color="primary"
-              size="small"
-              startIcon={<HelpIcon />}
-              style={{ position: 'fixed', bottom: 0, width: 'inherit' }}
-            >
-              Contactez-nous
-            </Button>
-          ) : (
-            <IconButton
-              onClick={() => {
-                history.push('/contact')
-              }}
-              style={{ position: 'fixed', bottom: 0 }}
-            >
-              <HelpIcon style={{ color: '#FFF' }} />
-            </IconButton>
-          )}
+          {ODD_CONTACT &&
+            (open ? (
+              <Button
+                onClick={() => history.push('/contact')}
+                variant="contained"
+                color="primary"
+                size="small"
+                startIcon={<HelpIcon />}
+                style={{ position: 'fixed', bottom: 0, width: 'inherit' }}
+              >
+                Contactez-nous
+              </Button>
+            ) : (
+              <IconButton
+                onClick={() => {
+                  history.push('/contact')
+                }}
+                style={{ position: 'fixed', bottom: 0 }}
+              >
+                <HelpIcon style={{ color: '#FFF' }} />
+              </IconButton>
+            ))}
         </Drawer>
       </div>
     </>

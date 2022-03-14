@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios'
 
 import { BACK_API_URL } from '../../constants'
 
-import { fetchPractitioner, fetchPractitionerRole } from './callApi'
+import { fetchPractitioner } from './callApi'
 
 export interface IServicePractitioner {
   /**
@@ -15,6 +15,12 @@ export interface IServicePractitioner {
    * Retourne la reponse de Axios
    */
   authenticate: (username: string, password: string) => Promise<any>
+
+  /**
+   * Cette fonction permet d'appeler la route de logout
+   *
+   */
+  logout: () => Promise<void>
 
   /**
    * Cette fonction nous retourne les informations relative à un pratitioner
@@ -36,17 +42,6 @@ export interface IServicePractitioner {
     firstName: string
     lastName: string
   } | null>
-
-  /**
-   * Cette fonction nous retourne les organisations ainsi que les roles attitrés
-   *
-   * Argument:
-   *   - practionerId: Identifiant technique du practitioner
-   *
-   * Retourne:
-   *   - Liste d'organisations + droit attitré
-   */
-  fetchPractitionerRole: (practionerId: string) => Promise<any>
 }
 
 const servicePractitioner: IServicePractitioner = {
@@ -56,6 +51,13 @@ const servicePractitioner: IServicePractitioner = {
       method: 'POST',
       url: '/api/jwt/',
       data: { username: username, password: password }
+    })
+  },
+
+  logout: async () => {
+    axios({
+      method: 'POST',
+      url: `${BACK_API_URL}/accounts/logout/`
     })
   },
 
@@ -86,26 +88,6 @@ const servicePractitioner: IServicePractitioner = {
       displayName,
       firstName,
       lastName
-    }
-  },
-
-  fetchPractitionerRole: async (practitionerId) => {
-    const practitionerRole = await fetchPractitionerRole({
-      practitioner: practitionerId,
-      _elements: ['organization', 'extension']
-    })
-
-    if (
-      !practitionerRole ||
-      (practitionerRole && !practitionerRole.data) ||
-      // @ts-ignore
-      (practitionerRole && practitionerRole.data && !practitionerRole.data.entry)
-    ) {
-      return undefined
-    } else {
-      // @ts-ignore
-      const { resource } = practitionerRole.data.entry[0]
-      return resource
     }
   }
 }

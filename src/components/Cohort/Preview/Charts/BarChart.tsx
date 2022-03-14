@@ -18,8 +18,10 @@ const BarChart: React.FC<BarChartProps> = memo(({ data, height = 250, width = 30
       return
     }
 
-    const total_value =
-      data && data.length > 0 ? data.reduce((a, b) => (typeof a === 'number' ? a + b.value : a.value + b.value)) : 0
+    const woman_value = data.find(({ label }) => label === 'Femmes')
+    const men_value = data.find(({ label }) => label === 'Hommes')
+    const other_value = data.find(({ label }) => label !== 'Hommes' && label !== 'Femmes')
+    const total_value = (woman_value?.value || 0) + (men_value?.value || 0) + (other_value?.value || 0)
 
     const svg = d3.select(node.current)
     svg.selectAll('*').remove()
@@ -83,7 +85,7 @@ const BarChart: React.FC<BarChartProps> = memo(({ data, height = 250, width = 30
 
     svg.append('g').call(xAxis)
     svg.append('g').call(yAxis)
-  }, [node, data, data.length, height, width])
+  }, [node, data, height, width])
 
   return <svg id="gender-repartition-card-svg" ref={node}></svg>
 })

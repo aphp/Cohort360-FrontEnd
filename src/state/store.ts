@@ -2,6 +2,9 @@ import { combineReducers, createStore, applyMiddleware } from 'redux'
 import thunkMiddleware from 'redux-thunk'
 import logger from 'redux-logger'
 
+import { persistStore, persistReducer } from 'redux-persist'
+import localforage from 'localforage'
+
 import cohortCreation from './cohortCreation'
 import criteria from './criteria'
 import exploredCohort from './exploredCohort'
@@ -38,49 +41,12 @@ const rootReducer = combineReducers({
   patient
 })
 
-export const store = createStore(rootReducer, applyMiddleware(thunkMiddleware, logger))
+const persistConfig = {
+  key: 'root',
+  storage: localforage
+}
 
-store.subscribe(() => {
-  // Auto save store inside localStorage
-  const state = store.getState() ?? {}
-  const { me, exploredCohort, cohortCreation, project, request, cohort, scope, pmsi, medication, biology, patient } =
-    state
+const persistedReducer = persistReducer(persistConfig, rootReducer)
 
-  localStorage.setItem('user', JSON.stringify(me))
-  localStorage.setItem('exploredCohort', JSON.stringify(exploredCohort))
-  localStorage.setItem(
-    'cohortCreation',
-    JSON.stringify({
-      ...cohortCreation,
-      request: {
-        ...cohortCreation.request,
-        snapshotsHistory:
-          cohortCreation.request.snapshotsHistory && cohortCreation.request.snapshotsHistory.length > 0
-            ? cohortCreation.request.snapshotsHistory.slice(0, 50)
-            : []
-      }
-    })
-  )
-
-  localStorage.setItem('project', JSON.stringify(project))
-
-  localStorage.setItem(
-    'request',
-    JSON.stringify({
-      ...request,
-      requestsList:
-        request.requestsList && request.requestsList.length > 0
-          ? request.requestsList.map((requestsList) => ({
-              ...requestsList,
-              query_snapshots: []
-            }))
-          : []
-    })
-  )
-  localStorage.setItem('cohort', JSON.stringify(cohort))
-  localStorage.setItem('scope', JSON.stringify(scope))
-  localStorage.setItem('pmsi', JSON.stringify(pmsi))
-  localStorage.setItem('medication', JSON.stringify(medication))
-  localStorage.setItem('biology', JSON.stringify(biology))
-  localStorage.setItem('patient', JSON.stringify(patient))
-})
+export const store = createStore(persistedReducer, applyMiddleware(thunkMiddleware, logger))
+export const persistor = persistStore(store)

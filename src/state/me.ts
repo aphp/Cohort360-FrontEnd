@@ -1,4 +1,7 @@
-import { createAction, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
+import { RootState } from 'state'
+
+import services from 'services'
 
 export type MeState = null | {
   id: string
@@ -11,24 +14,26 @@ export type MeState = null | {
   lastConnection?: string
 }
 
-const localStorageUser = localStorage.getItem('user') || null
-const initialState: MeState = localStorageUser ? JSON.parse(localStorageUser) : null
-
 // Logout action is defined outside of the meSlice because it is being used by all reducers
-export const logout = createAction('LOGOUT')
+const logout = createAsyncThunk<MeState, void, { state: RootState }>('scope/logout', async () => {
+  services.practitioner.logout()
+  return null
+})
 
 const meSlice = createSlice({
   name: 'me',
-  initialState: initialState as MeState,
+  initialState: null as MeState,
   reducers: {
     login: (state: MeState, action: PayloadAction<MeState>) => {
       return action.payload
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(logout, () => null)
+    builder.addCase(logout.fulfilled, () => null)
+    builder.addCase(logout.rejected, () => null)
   }
 })
 
 export default meSlice.reducer
+export { logout }
 export const { login } = meSlice.actions

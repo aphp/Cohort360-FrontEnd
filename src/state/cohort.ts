@@ -20,9 +20,6 @@ const defaultInitialState: CohortState = {
   cohortsList: []
 }
 
-const localStorageCohort = localStorage.getItem('cohort') || null
-const initialState: CohortState = localStorageCohort ? JSON.parse(localStorageCohort) : defaultInitialState
-
 type FetchCohortListReturn = {
   count: number
   selectedCohort?: null
@@ -288,7 +285,7 @@ const setFavoriteCohort = createAsyncThunk<SetFavoriteCohortReturn, SetFavoriteC
 
 const setCohortSlice = createSlice({
   name: 'cohort',
-  initialState: initialState as CohortState,
+  initialState: defaultInitialState as CohortState,
   reducers: {
     clearCohort: () => {
       return defaultInitialState
@@ -325,9 +322,9 @@ const setCohortSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
-    builder.addCase(logout, () => defaultInitialState)
+    builder.addCase(logout.fulfilled, () => defaultInitialState)
     // fetchCohorts
-    builder.addCase(fetchCohorts.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(fetchCohorts.pending, (state) => ({ ...state, loading: !state.count }))
     builder.addCase(fetchCohorts.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
     builder.addCase(fetchCohorts.rejected, (state) => ({ ...state, loading: false }))
     // addCohort

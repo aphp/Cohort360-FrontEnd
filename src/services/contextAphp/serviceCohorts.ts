@@ -157,16 +157,15 @@ export interface IServiceCohorts {
   fetchBinary: (documentId: string, list?: string[]) => Promise<any>
 
   /**
-   * Permet la récupération des droits d'export lié a une cohorte
+   * Permet la récupération des droits lié a plusieurs cohortes
    *
    * Argument:
-   *   - cohortId: Identifiant de la cohorte
-   *   - providerId: Identifiant technique du practitioner
+   *   - cohorts: Tableau de cohortes de type `Cohort[]`
    *
    * Retoune:
-   *   - Si un utilisateur peut faire une demande d'export sur la cohorte
+   *   - La liste de cohortes avec une extension lié au droit d'accès + export
    */
-  fetchCohortExportRight: (cohortId: string, providerId?: string) => Promise<boolean>
+  fetchCohortsRights: (cohorts: Cohort[]) => Promise<Cohort[]>
 
   /**
    * Permet de créer une demande d'export d'une cohorte
@@ -434,41 +433,195 @@ const servicesCohorts: IServiceCohorts = {
     return documentBinary && documentBinary.entry && documentBinary.entry[0] && documentBinary.entry[0].resource
   },
 
-  fetchCohortExportRight: async (cohortId, providerId) => {
+  fetchCohortsRights: async (cohorts) => {
     try {
-      const rightResponse = await fetchGroup({
-        _list: [cohortId],
-        provider: providerId
-      })
+      // On recupère les info d'une cohort pour avoir les IDs des groupes
+      const cohortsResponse = await Promise.all(
+        cohorts.map(({ fhir_group_id }) =>
+          new Promise((resolve) => {
+            resolve(fetchGroup({ _id: fhir_group_id }))
+          })
+            .then((values) => {
+              return values
+            })
+            .catch((error) => {
+              return { error: true, ...error }
+            })
+        )
+      )
+      let caresiteIds = ''
+      let organizationLinkList: any[] = []
 
-      if (
-        rightResponse &&
-        // @ts-ignore
-        rightResponse.data &&
-        // @ts-ignore
-        rightResponse.data.entry &&
-        // @ts-ignore
-        rightResponse.data.entry[0] &&
-        // @ts-ignore
-        rightResponse.data.entry[0].resource
-      ) {
-        //@ts-ignore
-        const currentCohortItem = rightResponse.data.entry[0].resource.extension?.[0]
-        const canMakeExport =
-          currentCohortItem.extension && currentCohortItem.extension.length > 0
-            ? currentCohortItem.extension.some(
-                (extension: any) => extension.url === 'EXPORT_DATA_NOMINATIVE' && extension.valueString === 'true'
-              ) &&
-              currentCohortItem.extension.some(
-                (extension: any) => extension.url === 'READ_DATA_NOMINATIVE' && extension.valueString === 'true'
+      // On crée un dictionnaire pour faire le lien entre les cohortes et les périmètres (Dictionnaire 1)
+      const cohortLinkList = cohortsResponse
+        .filter((cohortResponse: any) => cohortResponse.error !== true)
+        .map(
+          (cohortResponse: any) =>
+            cohortResponse.data &&
+            cohortResponse.data.resourceType === 'Bundle' &&
+            cohortResponse.data.entry &&
+            cohortResponse.data.entry[0] &&
+            cohortResponse.data.entry[0].resource
+        )
+
+      // On cherche la liste des Organisations présente dans l'objet `member`
+      caresiteIds =
+        cohortLinkList && cohortLinkList.length > 0
+          ? cohortLinkList
+              .map((cohortLinkItem: any) =>
+                cohortLinkItem && cohortLinkItem.member && cohortLinkItem.member.length > 0
+                  ? cohortLinkItem.member.map((member: any) =>
+                      member.entity.display?.search('Organization/') !== -1
+                        ? member.entity.display?.replace('Organization/', '')
+                        : ''
+                    )
+                  : ''
               )
-            : false
-        return canMakeExport
+              .flat()
+              .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
+              .join(',')
+          : ''
+
+      if (caresiteIds) {
+        // Si une liste d'Organisation est présente dans l'objet `member`
+        // On crée un dictionnaire pour faire le lien entre les Groups et les Organisations (Dictionnaire 2)
+        organizationLinkList =
+          cohortLinkList && cohortLinkList.length > 0
+            ? cohortLinkList
+                .map((cohortLinkItem: any) => {
+                  const members = cohortLinkItem.member
+                  let organizationLinks: any[] = []
+
+                  for (let index = 0; index < members.length; index += 2) {
+                    const group = members[index] || null
+                    const organization = members[index + 1] || null
+                    organizationLinks = [
+                      ...organizationLinks,
+                      {
+                        id: group.entity.display.replace('Group/', ''),
+                        managingEntity: organization.entity
+                      }
+                    ]
+                  }
+
+                  return organizationLinks
+                })
+                .flat()
+                .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
+            : []
+      } else {
+        // Sinon
+        // On cherche les Group ID
+        const parentGroupsId =
+          cohortLinkList && cohortLinkList.length > 0
+            ? cohortLinkList
+                .map((cohortLinkItem: any) =>
+                  cohortLinkItem && cohortLinkItem.member && cohortLinkItem.member.length > 0
+                    ? cohortLinkItem.member.map((member: any) =>
+                        member.entity.display?.search('Group/') !== -1
+                          ? member.entity.display?.replace('Group/', '')
+                          : ''
+                      )
+                    : ''
+                )
+                .flat()
+                .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
+            : []
+
+        // Pour les récupérer les informations du périmètre de la cohorte
+        const parentGroupsResponse = await Promise.all(
+          parentGroupsId.map((parentGroupId: string) =>
+            new Promise((resolve) => {
+              resolve(fetchGroup({ _id: parentGroupId }))
+            })
+              .then((values) => {
+                return values
+              })
+              .catch((error) => {
+                return { error: true, ...error }
+              })
+          )
+        )
+
+        // Et faire le liens avec les organisations, donc ...
+        // On crée un dictionnaire pour faire le lien entre les Groups et les Organisations (Dictionnaire 2)
+        organizationLinkList = parentGroupsResponse
+          .filter((parentGroupResponse: any) => parentGroupResponse.error !== true)
+          .map(
+            (parentGroupResponse: any) =>
+              parentGroupResponse.data &&
+              parentGroupResponse.data.resourceType === 'Bundle' &&
+              parentGroupResponse.data.entry &&
+              parentGroupResponse.data.entry[0] &&
+              parentGroupResponse.data.entry[0].resource
+          )
+
+        if (!organizationLinkList || organizationLinkList?.length === 0) return cohorts
+
+        // On crée une liste des Organisations lié au périmètre (caresiteIds = string)
+        caresiteIds = organizationLinkList
+          .map(
+            (currentParentItem: any) =>
+              currentParentItem.managingEntity?.display &&
+              currentParentItem.managingEntity?.display.replace('Organization/', '')
+          )
+          .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
+          .join(',')
       }
-      return false
+
+      // On appelle le back-end pour avoir la liste des droits
+      const rightsResponse = await apiBackend.get(`accesses/my-rights/?care-site-ids=${caresiteIds}`)
+      const rightsData: any = rightsResponse.data ?? []
+
+      return cohorts.map((cohort) => {
+        const cohortLinkItem = cohortLinkList.find((cohortLink: any) => cohortLink.id === cohort.fhir_group_id)
+        const organizationLinkItems = !cohortLinkItem
+          ? undefined
+          : organizationLinkList.filter((organizationLink: any) =>
+              cohortLinkItem.member.find(
+                (member: any) => member.entity.display?.replace('Group/', '') === organizationLink.id
+              )
+            )
+        const allRightOfCohort = !organizationLinkItems
+          ? []
+          : rightsData.filter((rightData: any) =>
+              organizationLinkItems.find(
+                (organizationLinkItem) =>
+                  +organizationLinkItem.managingEntity.display.replace('Organization/', '') === rightData.care_site_id
+              )
+            )
+
+        const newExtension = [
+          {
+            url: 'EXPORT_ACCESS',
+            valueString:
+              allRightOfCohort.filter(
+                (rightOfCohort: any) =>
+                  rightOfCohort.right_export_csv_nominative === true &&
+                  rightOfCohort.right_read_patient_nominative === true
+              ).length === allRightOfCohort.length
+                ? 'DATA_NOMINATIVE'
+                : 'DATA_PSEUDOANONYMISED'
+          },
+          {
+            url: 'READ_ACCESS',
+            valueString:
+              allRightOfCohort.filter(
+                (rightOfCohort: any) => rightOfCohort.right_read_patient_nominative === true // eslint-disabled-line
+              ).length === allRightOfCohort.length
+                ? 'DATA_NOMINATIVE'
+                : 'DATA_PSEUDOANONYMISED'
+          }
+        ]
+
+        return {
+          ...cohort,
+          extension: cohort.extension ? [...cohort.extension, ...newExtension] : [...newExtension]
+        }
+      })
     } catch (error) {
-      console.error('Error (fetchCohortExportRight) :', error)
-      return false
+      console.error('Error (fetchCohortsRights) :', error)
+      return []
     }
   },
 
@@ -557,15 +710,12 @@ const getDocumentInfos: (
       if (document.subject?.display?.substring(8) === patient.id) {
         document.idPatient = patient.id
 
-        if (deidentifiedBoolean) {
-          document.IPP = patient.id
-        } else if (patient.identifier) {
+        document.IPP = patient.id ?? 'Inconnu'
+        if (patient.identifier) {
           const ipp = patient.identifier.find((identifier: IIdentifier) => {
             return identifier.type?.coding?.[0].code === 'IPP'
           })
-          document.IPP = ipp.value
-        } else {
-          document.IPP = 'Inconnu'
+          document.IPP = ipp?.value ?? 'Inconnu'
         }
       }
     }
@@ -580,15 +730,12 @@ const getDocumentInfos: (
           document.serviceProvider = 'Non renseigné'
         }
 
-        if (deidentifiedBoolean) {
-          document.NDA = encounter.id
-        } else if (encounter.identifier) {
+        document.NDA = encounter.id ?? 'Inconnu'
+        if (encounter.identifier) {
           const nda = encounter.identifier.find((identifier: IIdentifier) => {
             return identifier.type?.coding?.[0].code === 'NDA'
           })
-          document.NDA = nda.value
-        } else {
-          document.NDA = 'Inconnu'
+          document.NDA = nda?.value ?? 'Inconnu'
         }
       }
     }

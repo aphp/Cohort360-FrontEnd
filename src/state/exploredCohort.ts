@@ -16,16 +16,14 @@ export type ExploredCohortState = {
   requestId?: string
   cohortId?: string
   canMakeExport?: boolean
+  deidentifiedBoolean?: boolean
 } & CohortData
-
-const localStorageExploredCohort = localStorage.getItem('exploredCohort') ?? null
-const jsonExploredCohort = localStorageExploredCohort ? JSON.parse(localStorageExploredCohort) : {}
 
 const defaultInitialState = {
   // CohortData
   name: '',
   description: '',
-  cohort: [],
+  cohort: undefined,
   totalPatients: undefined,
   originalPatients: [],
   totalDocs: 0,
@@ -36,7 +34,6 @@ const defaultInitialState = {
   visitTypeRepartitionData: undefined,
   monthlyVisitData: undefined,
   agePyramidData: undefined,
-  canMakeExport: false,
   requestId: '',
   cohortId: '',
   favorite: false,
@@ -44,24 +41,10 @@ const defaultInitialState = {
   importedPatients: [],
   includedPatients: [],
   excludedPatients: [],
-  loading: false
+  loading: false,
+  canMakeExport: false,
+  deidentifiedBoolean: undefined
 }
-
-const initialState: ExploredCohortState = localStorageExploredCohort
-  ? {
-      ...jsonExploredCohort,
-      genderRepartitionMap: jsonExploredCohort.genderRepartitionMap
-        ? jsonExploredCohort.genderRepartitionMap
-        : {
-            female: { deceased: 0, alive: 0 },
-            male: { deceased: 0, alive: 0 },
-            other: { deceased: 0, alive: 0 },
-            unknown: { deceased: 0, alive: 0 }
-          },
-      agePyramidData: jsonExploredCohort.agePyramidData ? jsonExploredCohort.agePyramidData : [],
-      monthlyVisitData: jsonExploredCohort.monthlyVisitData ? jsonExploredCohort.monthlyVisitData : {}
-    }
-  : defaultInitialState
 
 const favoriteExploredCohort = createAsyncThunk<CohortData, { id: string }, { state: RootState }>(
   'exploredCohort/favoriteExploredCohort',
@@ -91,7 +74,6 @@ const fetchExploredCohort = createAsyncThunk<
   { state: RootState }
 >('exploredCohort/fetchExploredCohort', async ({ context, id, forceReload }, { getState, dispatch }) => {
   const state = getState()
-  const providerId = state.me?.id
   const stateCohort = state.exploredCohort.cohort
 
   let shouldRefreshData = true
@@ -133,13 +115,23 @@ const fetchExploredCohort = createAsyncThunk<
           cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
           if (cohort) {
             cohort.cohortId = id
-            cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
+            const cohortRights = await services.cohorts.fetchCohortsRights([{ fhir_group_id: id }])
+            const cohortRight = cohortRights && cohortRights[0]
+            cohort.canMakeExport =
+              cohortRight?.extension?.some(
+                ({ url, valueString }) => url === 'EXPORT_ACCESS' && valueString === 'DATA_NOMINATIVE'
+              ) ?? false
+            cohort.deidentifiedBoolean =
+              cohortRight?.extension?.some(
+                ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
+              ) ?? true
           }
         }
         break
       }
       case 'patients': {
         cohort = (await services.patients.fetchMyPatients()) as ExploredCohortState
+        const perimeters = await services.perimeters.getPerimeters()
         if (cohort) {
           cohort.name = '-'
           cohort.description = ''
@@ -147,6 +139,11 @@ const fetchExploredCohort = createAsyncThunk<
           cohort.favorite = false
           cohort.uuid = ''
           cohort.canMakeExport = false
+          cohort.deidentifiedBoolean = perimeters.some((perimeter) =>
+            perimeter.extension?.some(
+              (extension) => extension.url === 'READ_ACCESS' && extension.valueString === 'DATA_PSEUDOANONYMISED'
+            )
+          )
         }
         break
       }
@@ -160,6 +157,14 @@ const fetchExploredCohort = createAsyncThunk<
             cohort.favorite = false
             cohort.uuid = ''
             cohort.canMakeExport = false
+            cohort.deidentifiedBoolean =
+              cohort.cohort && cohort.cohort && Array.isArray(cohort.cohort)
+                ? cohort.cohort.some((cohort) =>
+                    cohort.extension?.some(
+                      ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
+                    )
+                  ) ?? true
+                : true
           }
         }
         break
@@ -180,7 +185,6 @@ const fetchExploredCohortInBackground = createAsyncThunk<
   { state: RootState }
 >('exploredCohort/fetchExploredCohortInBackground', async ({ context, id }, { getState }) => {
   const state = getState()
-  const providerId = state.me?.id
 
   let cohort
   switch (context) {
@@ -188,13 +192,23 @@ const fetchExploredCohortInBackground = createAsyncThunk<
       if (id) {
         cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
         if (cohort) {
-          cohort.canMakeExport = await services.cohorts.fetchCohortExportRight(id, providerId ?? '')
+          const cohortRights = await services.cohorts.fetchCohortsRights([{ fhir_group_id: id }])
+          const cohortRight = cohortRights && cohortRights[0]
+          cohort.canMakeExport =
+            cohortRight?.extension?.some(
+              ({ url, valueString }) => url === 'EXPORT_ACCESS' && valueString === 'DATA_NOMINATIVE'
+            ) ?? false
+          cohort.deidentifiedBoolean =
+            cohortRight?.extension?.some(
+              ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
+            ) ?? true
         }
       }
       break
     }
     case 'patients': {
       cohort = (await services.patients.fetchMyPatients()) as ExploredCohortState
+      const perimeters = await services.perimeters.getPerimeters()
       if (cohort) {
         cohort.name = '-'
         cohort.description = ''
@@ -202,6 +216,11 @@ const fetchExploredCohortInBackground = createAsyncThunk<
         cohort.favorite = false
         cohort.uuid = ''
         cohort.canMakeExport = false
+        cohort.deidentifiedBoolean = perimeters.some((perimeter) =>
+          perimeter.extension?.some(
+            (extension) => extension.url === 'READ_ACCESS' && extension.valueString === 'DATA_PSEUDOANONYMISED'
+          )
+        )
       }
       break
     }
@@ -215,6 +234,14 @@ const fetchExploredCohortInBackground = createAsyncThunk<
           cohort.favorite = false
           cohort.uuid = ''
           cohort.canMakeExport = false
+          cohort.deidentifiedBoolean =
+            cohort.cohort && cohort.cohort && Array.isArray(cohort.cohort)
+              ? cohort.cohort.some((cohort) =>
+                  cohort.extension?.some(
+                    ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
+                  )
+                ) ?? true
+              : true
         }
       }
       break
@@ -225,10 +252,10 @@ const fetchExploredCohortInBackground = createAsyncThunk<
 
 const exploredCohortSlice = createSlice({
   name: 'exploredCohort',
-  initialState,
+  initialState: defaultInitialState as ExploredCohortState,
   reducers: {
     setExploredCohort: (state: ExploredCohortState, action: PayloadAction<CohortData | undefined>) => {
-      return action.payload ? { ...state, ...action.payload } : initialState
+      return action.payload ? { ...state, ...action.payload } : defaultInitialState
     },
     addImportedPatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
       const importedPatients = [...state.importedPatients, ...action.payload]
@@ -297,7 +324,7 @@ const exploredCohortSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
-    builder.addCase(logout, () => defaultInitialState)
+    builder.addCase(logout.fulfilled, () => defaultInitialState)
     builder.addCase(fetchExploredCohort.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(fetchExploredCohort.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
     builder.addCase(fetchExploredCohort.rejected, () => ({ ...defaultInitialState }))

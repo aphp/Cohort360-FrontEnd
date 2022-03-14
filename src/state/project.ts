@@ -20,9 +20,6 @@ const defaultInitialState: ProjectState = {
   projectsList: []
 }
 
-const localStorageProject = localStorage.getItem('project') || null
-const initialState: ProjectState = localStorageProject ? JSON.parse(localStorageProject) : defaultInitialState
-
 type FetchProjectListReturn = {
   count: number
   selectedProject: null
@@ -184,7 +181,7 @@ const deleteProject = createAsyncThunk<DeleteProjectReturn, DeleteProjectParams,
 
 const setProjectSlice = createSlice({
   name: 'project',
-  initialState: initialState as ProjectState,
+  initialState: defaultInitialState as ProjectState,
   reducers: {
     clearProject: () => {
       return defaultInitialState
@@ -221,9 +218,9 @@ const setProjectSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
-    builder.addCase(logout, () => defaultInitialState)
+    builder.addCase(logout.fulfilled, () => defaultInitialState)
     // fetchProjects
-    builder.addCase(fetchProjects.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(fetchProjects.pending, (state) => ({ ...state, loading: !state.count }))
     builder.addCase(fetchProjects.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
     builder.addCase(fetchProjects.rejected, (state) => ({ ...state, loading: false }))
     // addProject

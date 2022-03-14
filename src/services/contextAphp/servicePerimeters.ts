@@ -1,5 +1,5 @@
 import { CohortData, ScopeTreeRow } from 'types'
-import { IOrganization, IExtension } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IGroup, IOrganization, IExtension } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   getGenderRepartitionMapAphp,
   getAgeRepartitionMapAphp,
@@ -8,7 +8,9 @@ import {
 } from 'utils/graphUtils'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
-import { fetchGroup, fetchPatient, fetchEncounter, fetchOrganization, fetchPractitionerRole } from './callApi'
+import { fetchGroup, fetchPatient, fetchEncounter, fetchOrganization } from './callApi'
+
+import apiBackend from '../apiBackend'
 
 const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
@@ -45,7 +47,7 @@ export interface IServicePerimeters {
    * Retour:
    *   - IOrganization[]
    */
-  getPerimeters: (practitionerId: string) => Promise<IOrganization[]>
+  getPerimeters: () => Promise<IOrganization[]>
 
   /**
    * Cette fonction se base sur la fonction `getPerimeters` du service, et ré-organise la donnée sous forme d'un ScopeTreeRow[]
@@ -71,16 +73,12 @@ export interface IServicePerimeters {
   getScopeSubItems: (perimeter: ScopeTreeRow | null, getSubItem?: boolean) => Promise<ScopeTreeRow[]>
 
   /**
+   * Cette fonction retourne les droits de lecture d'un périmetre
    *
-   *
-   * Argument:
-   *   - practitionerId: Identifiant technique du practitioner
-   *
-   * Retour:
-   *   - deidentification: = true si au moins 1 périmètre est en pseudonymisé
-   *   - nominativeGroupsIds: Liste de périmètres nominatifs
+   * Arguments:
+   *   - perimetersId: ID du périmètre (liste d'ID séparé par des virgules)
    */
-  fetchDeidentified: (practitionerId: string) => Promise<{ deidentification: boolean; nominativeGroupsIds: any[] }>
+  fetchPerimetersRights: (perimeters: IGroup[]) => Promise<IGroup[]>
 }
 
 const servicesPerimeters: IServicePerimeters = {
@@ -104,7 +102,7 @@ const servicesPerimeters: IServicePerimeters = {
       })
     ])
 
-    const cohort = getApiResponseResources(perimetersResp)
+    const cohort = await servicesPerimeters.fetchPerimetersRights(getApiResponseResources(perimetersResp) ?? [])
 
     const totalPatients = patientsResp?.data?.resourceType === 'Bundle' ? patientsResp.data.total : 0
 
@@ -204,64 +202,57 @@ const servicesPerimeters: IServicePerimeters = {
     }
   },
 
-  getPerimeters: async (practitionerId) => {
-    const practitionerRole = await fetchPractitionerRole({
-      practitioner: practitionerId,
-      _elements: ['organization', 'extension']
-    })
-    if (!practitionerRole) return []
+  getPerimeters: async () => {
+    try {
+      const rightResponse = await apiBackend.get('accesses/my-rights/?pop-children')
+      const rightsData: any[] = rightResponse.status === 200 ? (rightResponse?.data as any[]) : []
 
-    const { data } = practitionerRole
-    if (!data || data?.resourceType === 'OperationOutcome') return []
+      let perimetersIds = []
+      let organizationList: IOrganization[] = []
 
-    const practitionerRoleHighPerimeter = data.meta?.extension?.length
-      ? data.meta?.extension?.find((extension: any) => extension.url === 'Practitioner Organization List')
-      : { extension: [] }
+      if (rightResponse.status !== 200 || (rightsData && rightsData.length === 0)) {
+        return []
+      }
 
-    const perimeterList: any[] = practitionerRoleHighPerimeter?.extension?.length
-      ? practitionerRoleHighPerimeter?.extension[0].extension?.length
-        ? practitionerRoleHighPerimeter?.extension[0].extension ?? []
-        : []
-      : []
+      perimetersIds = rightsData.map((rightData) => rightData.care_site_id)
 
-    const perimetersIds = perimeterList.map(({ url }) => url)
-    if (!perimetersIds || perimetersIds?.length === 0) return []
+      if (perimetersIds.length > 0) {
+        const organisationResult = await fetchOrganization({
+          _id: perimetersIds.join(','),
+          _elements: ['name', 'extension', 'alias']
+        })
 
-    const organisationResult = await fetchOrganization({
-      _id: perimetersIds.join(','),
-      _elements: ['name', 'extension', 'alias']
-    })
+        organizationList = getApiResponseResources(organisationResult) ?? []
+        organizationList = organizationList.map((organizationItem) => {
+          const foundRight = rightsData.find((rightData) => rightData.care_site_id === +(organizationItem.id ?? '0'))
 
-    const organisationData: any[] =
-      organisationResult.data && organisationResult.data.resourceType === 'Bundle'
-        ? organisationResult.data.entry && organisationResult.data.entry.length > 0
-          ? organisationResult.data.entry
-              .map((entry: any) => entry.resource)
-              .map((organization: any) => {
-                const organizationId = organization.id
-                if (!organizationId) return organization
-
-                const foundItem = perimeterList?.find((perimeterItem: any) => perimeterItem.url === organizationId)
-                if (!foundItem) return organization
-
-                return {
-                  ...organization,
-                  extension: [
-                    ...(organization.extension ?? []),
-                    { url: 'High Level Organisation Role', valueString: foundItem.valueString }
-                  ]
-                }
-              })
-          : []
-        : []
-
-    return organisationData
+          return {
+            ...organizationItem,
+            extension: [
+              ...(organizationItem.extension ?? []),
+              {
+                url: 'READ_ACCESS',
+                valueString: foundRight?.right_read_patient_nominative ? 'DATA_NOMINATIVE' : 'DATA_PSEUDOANONYMISED'
+              },
+              {
+                url: 'EXPORT_ACCESS',
+                valueString: 'DATA_PSEUDOANONYMISED' // Impossible de faire un export de donnée sur un périmètre
+              }
+            ]
+          }
+        })
+      }
+      return organizationList
+    } catch (error) {
+      console.error('Error (getPerimeters) :', error)
+      return []
+    }
   },
 
   getScopePerimeters: async (practitionerId) => {
     if (!practitionerId) return []
 
-    const perimetersResults = (await servicesPerimeters.getPerimeters(practitionerId)) ?? []
+    const perimetersResults = (await servicesPerimeters.getPerimeters()) ?? []
 
     let scopeRows: ScopeTreeRow[] = []
 
@@ -347,48 +338,41 @@ const servicesPerimeters: IServicePerimeters = {
     return subScopeRows
   },
 
-  fetchDeidentified: async (practitionerId) => {
-    const rolesResp = await fetchPractitionerRole({
-      practitioner: practitionerId,
-      _elements: ['extension', 'organization']
-    })
-    const { data } = rolesResp
+  fetchPerimetersRights: async (perimeters) => {
+    const caresiteIds = perimeters
+      .map((perimeter) =>
+        perimeter.managingEntity?.display?.search('Organization/') !== -1
+          ? perimeter.managingEntity?.display?.replace('Organization/', '')
+          : ''
+      )
+      .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
+      .join(',')
 
-    let deidentification = true
-    const nominativePerimeters = []
-    let nominativeGroupsIds: string[] = []
+    const rightResponse = await apiBackend.get(`accesses/my-rights/?care-site-ids=${caresiteIds}`)
+    const rightsData = (rightResponse.data as any[]) ?? []
 
-    if (!data || data.resourceType === 'OperationOutcome' || !data.meta || !data.meta.extension) {
-      return { deidentification, nominativeGroupsIds }
-    }
+    return perimeters.map((perimeter) => {
+      const caresiteId =
+        perimeter.managingEntity?.display?.search('Organization/') !== -1
+          ? perimeter.managingEntity?.display?.replace('Organization/', '')
+          : ''
+      const foundRight = rightsData.find((rightData) => rightData.care_site_id === +(caresiteId ?? '0'))
 
-    const highestPerimeters = data.meta.extension.find(
-      (extension: { url?: string; valueString?: string }) => extension.url === 'Practitioner Organization List'
-    )
-
-    const rolesList = highestPerimeters?.extension?.[0].extension
-
-    if (rolesList && rolesList.length > 0) {
-      for (const perimeterRole of rolesList) {
-        if (perimeterRole.valueString && perimeterRole.valueString === 'READ_DATA_NOMINATIVE') {
-          deidentification = false
-          nominativePerimeters.push(perimeterRole.url ?? '')
-        }
+      return {
+        ...perimeter,
+        extension: [
+          ...(perimeter.extension ?? []),
+          {
+            url: 'READ_ACCESS',
+            valueString: foundRight?.right_read_patient_nominative ? 'DATA_NOMINATIVE' : 'DATA_PSEUDOANONYMISED'
+          },
+          {
+            url: 'EXPORT_ACCESS',
+            valueString: 'DATA_PSEUDOANONYMISED' // Impossible de faire un export de donnée sur un périmètre
+          }
+        ]
       }
-    }
-
-    if (nominativePerimeters.length > 0) {
-      const nominativeGroupsResp = await fetchGroup({
-        'managing-entity': nominativePerimeters,
-        _elements: ['name', 'managingEntity']
-      })
-
-      const nominativeGroups = getApiResponseResources(nominativeGroupsResp)
-
-      nominativeGroupsIds = nominativeGroups ? nominativeGroups.map((group) => group.id ?? '') : []
-    }
-
-    return { deidentification, nominativeGroupsIds: nominativeGroupsIds ?? [] }
+    })
   }
 }
 
@@ -411,20 +395,16 @@ const getQuantity = (extension?: IExtension[]) => {
 }
 
 const getAccessName = (extension?: IExtension[]) => {
-  const accessExtension = extension?.find((extension) => extension.url === 'High Level Organisation Role')
+  const accessExtension = extension?.find((extension) => extension.url === 'READ_ACCESS')
   if (!extension || !accessExtension) {
     return ''
   }
   const access = accessExtension?.valueString
 
   switch (access) {
-    case 'READ_DATA_NOMINATIVE':
-      return 'Nominatif'
-    case 'READ_DATA_PSEUDOANONYMISED':
+    case 'DATA_PSEUDOANONYMISED':
       return 'Pseudonymisé'
-    case 'ADMIN_USERS':
-      return 'Nominatif'
     default:
-      return ''
+      return 'Nominatif'
   }
 }

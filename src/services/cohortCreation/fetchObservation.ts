@@ -35,7 +35,8 @@ export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) =
     return data && data.length > 0
       ? data.sort(codeSort).map((_data: { code: string; display: string }) => ({
           id: _data.code,
-          label: `${_data.code} - ${capitalizeFirstLetter(_data.display)}`,
+          // label: `${_data.code} - ${capitalizeFirstLetter(_data.display)}`,
+          label: capitalizeFirstLetter(_data.display),
           subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
         }))
       : []
@@ -60,7 +61,8 @@ export const fetchBiologyHierarchy = async (biologyParent?: string) => {
         anabioList && anabioList.length > 0
           ? anabioList.sort(codeSort).map((anabioData: any) => ({
               id: anabioData.code,
-              label: `${anabioData.code} - ${anabioData.display}`,
+              // label: `${anabioData.code} - ${anabioData.display}`,
+              label: anabioData.display,
               subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
             }))
           : []
@@ -94,7 +96,8 @@ export const fetchBiologyHierarchy = async (biologyParent?: string) => {
         anabioList && anabioList.length > 0
           ? anabioList.sort(codeSort).map((anabioData: any) => ({
               id: anabioData.code,
-              label: `${anabioData.code} - ${anabioData.display}`,
+              // label: `${anabioData.code} - ${anabioData.display}`,
+              label: anabioData.display,
               subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
             }))
           : []

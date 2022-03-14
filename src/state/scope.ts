@@ -19,9 +19,6 @@ const defaultInitialState: ScopeState = {
   openPopulation: []
 }
 
-const localStorageScope = localStorage.getItem('scope') || null
-const initialState: ScopeState = localStorageScope ? JSON.parse(localStorageScope) : defaultInitialState
-
 type FetchScopeListReturn = {
   scopesList: ScopeTreeRow[]
 }
@@ -137,7 +134,7 @@ const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScop
 
 const scopeSlice = createSlice({
   name: 'scope',
-  initialState: initialState as ScopeState,
+  initialState: defaultInitialState as ScopeState,
   reducers: {
     clearScope: () => {
       return defaultInitialState
@@ -151,7 +148,7 @@ const scopeSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
-    builder.addCase(logout, () => defaultInitialState)
+    builder.addCase(logout.fulfilled, () => defaultInitialState)
     // fetchScopesList
     builder.addCase(fetchScopesList.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(fetchScopesList.fulfilled, (state, action) => ({
