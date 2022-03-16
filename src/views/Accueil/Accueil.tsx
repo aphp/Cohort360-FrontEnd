@@ -110,8 +110,8 @@ const Accueil: React.FC = () => {
       >
         <Grid container spacing={1}>
           <Alert severity="warning" style={{ marginTop: '-12px', width: '100%' }}>
-            Une anomalie a été détectée sur l'export de données et les contraintes temporelles. Ces fonctionnalités ont
-            été désactivées. L'équipe Cohort360 met tout en œuvre pour résoudre ces problèmes.
+            Une anomalie a été détectée sur les contraintes temporelles. Cette fonctionnalité a été désactivée. L'équipe
+            Cohort360 met tout en œuvre pour résoudre ce problème.
           </Alert>
 
           <Grid container className={classes.newsGrid} item xs={12} md={6} lg={6}>

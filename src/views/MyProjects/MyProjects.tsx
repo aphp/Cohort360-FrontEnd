@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
 import { Button, IconButton, CircularProgress, Grid, Hidden, Tooltip, Typography } from '@material-ui/core'
-import Alert from '@material-ui/lab/Alert'
 import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
 import { ReactComponent as DriveFileMoveIcon } from 'assets/icones/drive-file-move.svg'
@@ -115,11 +114,6 @@ const MyProjects = () => {
           </Grid>
 
           <Grid item xs={11}>
-            <Alert severity="warning" style={{ marginTop: 16 }}>
-              Une anomalie a été détectée sur l'export de données. Cette fonctionnalité a été désactivée. L'équipe
-              Cohort360 met tout en œuvre pour résoudre ce problème.
-            </Alert>
-
             <Grid container justify="space-between">
               <Grid className={classes.secondaryContainer}>
                 {selectedRequests.length > 0 && (
