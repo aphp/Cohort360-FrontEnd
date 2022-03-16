@@ -4,6 +4,11 @@ const TimelineReporter = require('wdio-timeline-reporter').default
 
 exports.config = {
   //
+  // ==========================
+  // Chromedriver Configuration
+  // ==========================
+  //
+  //
   // ====================
   // Runner Configuration
   // ====================
