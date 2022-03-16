@@ -34,7 +34,7 @@ const Cohort360_Snackbar = () => {
   return (
     <Snackbar
       open={snackbarState.content !== ''}
-      autoHideDuration={3500}
+      autoHideDuration={5000}
       onClose={onClose}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
     >
