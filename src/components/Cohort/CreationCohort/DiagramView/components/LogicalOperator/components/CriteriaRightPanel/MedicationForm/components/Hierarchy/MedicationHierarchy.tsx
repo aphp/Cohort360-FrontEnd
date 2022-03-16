@@ -1,6 +1,5 @@
 import React, { useEffect, useState, Fragment } from 'react'
 import clsx from 'clsx'
-import { useDispatch } from 'react-redux'
 
 import {
   Button,
@@ -21,7 +20,7 @@ import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { MedicationListType, fetchMedication, expandMedicationElement } from 'state/medication'
 
 import { getSelectedPmsi, filterSelectedPmsi, checkIfIndeterminated } from 'utils/pmsi'
@@ -39,7 +38,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
   const { id, label, subItems } = medicationItem
 
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const medicationState = useAppSelector((state) => state.medication || {})
   const medicationHierarchy = medicationState.list
@@ -147,7 +146,7 @@ const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
   const { selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
 
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const medicationState = useAppSelector((state) => state.medication || {})
   const medicationHierarchy = medicationState.list

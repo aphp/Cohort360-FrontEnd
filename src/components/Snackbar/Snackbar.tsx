@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { Snackbar } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { clearMessage, MessageState } from 'state/message'
 
 type SnackbarTypeOfMessage = 'success' | 'error' | 'warning' | 'info' | undefined
 
 const Cohort360_Snackbar = () => {
   const { message } = useAppSelector<{ message: MessageState }>((state) => ({ message: state.message }))
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const content: string = message ? message.content : ''
   const type: SnackbarTypeOfMessage = message ? message.type : undefined

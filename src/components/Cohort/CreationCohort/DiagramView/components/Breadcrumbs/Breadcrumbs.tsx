@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { Breadcrumbs, Grid, Typography } from '@material-ui/core'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { fetchProjects as fetchProjectsList } from 'state/project'
 import { fetchRequests as fetchRequestsList } from 'state/request'
 
@@ -11,7 +10,7 @@ import useStyles from './styles'
 
 const CohortCreationBreadcrumbs: React.FC = () => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const {
     request: { requestId, currentSnapshot },
@@ -34,9 +33,9 @@ const CohortCreationBreadcrumbs: React.FC = () => {
 
   useEffect(() => {
     if (!projects || (projects && projects.length === 0)) {
-      dispatch(fetchProjectsList())
+      dispatch<any>(fetchProjectsList())
     } else if (!requests || (requests && requests.length === 0)) {
-      dispatch(fetchRequestsList())
+      dispatch<any>(fetchRequestsList())
     } else {
       const foundItem = requests.find(({ uuid }) => uuid === requestId)
       if (foundItem) {

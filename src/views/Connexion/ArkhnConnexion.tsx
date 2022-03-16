@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
@@ -12,6 +11,7 @@ import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogActions from '@material-ui/core/DialogActions'
 import queryString from 'query-string'
 import logo from 'assets/images/logo-login.png'
+import { useAppDispatch } from 'state'
 import { login as loginAction } from 'state/me'
 import { arkhnAuthenticationRedirect } from 'services/save_old_services/authentication'
 import { ACCES_TOKEN, STATE_STORAGE_KEY } from '../../constants'
@@ -63,7 +63,7 @@ const LegalMentionDialog = ({ open, setOpen }: { open: boolean; setOpen: (isOpen
 
 const ArkhnConnexion = () => {
   const history = useHistory()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { code, state } = queryString.parse(window.location.search)
   const [loading, setLoading] = useState(false)
   const [accessToken, setAccessToken] = useState(localStorage.getItem(ACCES_TOKEN))

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import moment from 'moment'
 
 import {
@@ -29,8 +28,8 @@ import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
 import BiologyFilters from 'components/Filters/BiologyFilters/BiologyFilters'
 
+import { useAppSelector, useAppDispatch } from 'state'
 import { fetchBiology } from 'state/patient'
-import { useAppSelector } from 'state'
 import { CohortObservation } from 'types'
 
 import useStyles from './styles'
@@ -43,7 +42,7 @@ const filtersDefault = { nda: '', loinc: '', anabio: '', startDate: null, endDat
 
 const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { patient } = useAppSelector((state) => ({
     patient: state.patient
   }))
@@ -82,7 +81,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   ]
 
   const _fetchBiology = async (page: number, _searchInput: string) => {
-    dispatch(
+    dispatch<any>(
       fetchBiology({
         groupId,
         options: {

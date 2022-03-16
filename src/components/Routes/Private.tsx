@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Route } from 'react-router'
 import { Redirect, useLocation } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
 import { useQuery } from '@apollo/react-hooks'
 import { gql } from 'apollo-boost'
 
@@ -9,7 +8,7 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, B
 
 import { ACCES_TOKEN } from '../../constants'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { login } from 'state/me'
 
 const ME = gql`
@@ -26,7 +25,7 @@ type Props = React.ComponentProps<typeof Route>
 
 const PrivateRoute: React.FC<Props> = (props) => {
   const me = useAppSelector((state) => state.me)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const location = useLocation()
   const authToken = localStorage.getItem(ACCES_TOKEN)
 

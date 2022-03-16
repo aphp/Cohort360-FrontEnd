@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 
 import {
   Button,
@@ -12,7 +11,7 @@ import {
   Typography
 } from '@material-ui/core'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { CohortState, addCohort, editCohort, deleteCohort } from 'state/cohort'
 
 import { Cohort } from 'types'
@@ -27,7 +26,7 @@ const ModalEditCohort: React.FC<{
   onClose: () => void
 }> = ({ open, onClose }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { cohortState } = useAppSelector<{
     cohortState: CohortState
   }>((state) => ({

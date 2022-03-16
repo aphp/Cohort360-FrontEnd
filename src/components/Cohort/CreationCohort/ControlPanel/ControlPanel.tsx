@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 import moment from 'moment'
 
@@ -14,7 +13,7 @@ import InfoIcon from '@material-ui/icons/Info'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import {
   resetCohortCreation,
   countCohortCreation,
@@ -35,7 +34,7 @@ const ControlPanel: React.FC<{
   onRedo?: () => void
 }> = ({ onExecute, onUndo, onRedo }) => {
   const classes = useStyle()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
   const [oldCount, setOldCount] = useState<any | null>(null)
 
@@ -84,7 +83,7 @@ const ControlPanel: React.FC<{
         dispatch<any>(deleteCriteriaGroup(id))
       }
     }
-    dispatch(buildCohortCreation({}))
+    dispatch<any>(buildCohortCreation({}))
   }
 
   const _relaunchCount = (keepCount: boolean) => {

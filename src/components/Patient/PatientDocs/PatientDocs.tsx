@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
-import { useDispatch } from 'react-redux'
 
 import { Button, Chip, Grid, Typography } from '@material-ui/core'
 import { Alert, Pagination } from '@material-ui/lab'
@@ -12,7 +11,7 @@ import { InputSearchDocumentSimple, InputSearchDocumentRegex, InputSearchDocumen
 import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
 import DocumentList from '../../Cohort/Documents/DocumentList/DocumentList'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'
 
 import { docTypes } from 'assets/docTypes.json'
@@ -24,7 +23,7 @@ type PatientDocsProps = {
 }
 const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { patient } = useAppSelector((state) => ({
     patient: state.patient
   }))
@@ -92,7 +91,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
 
     if (inputMode === 'regex') input = `/${input}/`
 
-    dispatch(
+    dispatch<any>(
       fetchDocuments({
         groupId,
         options: {

@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import IdleTimer from 'react-idle-timer'
 import Dialog from '@material-ui/core/Dialog'
@@ -11,7 +10,7 @@ import axios from 'axios'
 
 import { ACCES_TOKEN, REFRESH_TOKEN, CONTEXT, BACK_API_URL } from '../../constants'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { logout as logoutAction } from 'state/me'
 import useStyles from './styles'
 
@@ -19,7 +18,7 @@ const AutoLogoutContainer = () => {
   const classes = useStyles()
 
   const [dialogIsOpen, setDialogIsOpen] = useState(false)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const history = useHistory()
   const inactifTimerRef = useRef(null)
   const sessionInactifTimerRef = useRef(null)

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
 
 import {
   Button,
@@ -19,7 +18,7 @@ import RequestList from './components/RequestList'
 import { RequestType } from 'types'
 import services from 'services'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { ProjectState, fetchProjects } from 'state/project'
 import { RequestState, fetchRequests, addRequest, editRequest, deleteRequest } from 'state/request'
 import { fetchRequestCohortCreation } from 'state/cohortCreation'
@@ -37,7 +36,7 @@ const ModalCreateNewRequest: React.FC<{
 }> = ({ onClose }) => {
   const classes = useStyles()
   const history = useHistory()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { projectState, requestState } = useAppSelector<{
     projectState: ProjectState
     requestState: RequestState

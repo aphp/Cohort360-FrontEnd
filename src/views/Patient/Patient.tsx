@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 import { Link, useLocation, useParams } from 'react-router-dom'
 
@@ -18,7 +17,7 @@ import PatientMedication from 'components/Patient/PatientMedication/PatientMedic
 import PatientBiology from 'components/Patient/PatientBiology/PatientBiology'
 import TopBar from 'components/TopBar/TopBar'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPatientInfo } from 'state/patient'
 
 import { ODD_BIOLOGY } from '../../constants'
@@ -26,7 +25,7 @@ import { ODD_BIOLOGY } from '../../constants'
 import useStyles from './styles'
 
 const Patient = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const location = useLocation()
   const classes = useStyles()
 

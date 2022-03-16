@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import moment from 'moment'
 
 import {
@@ -32,7 +31,7 @@ import PMSIFilters from '../../Filters/PMSIFilters/PMSIFilters'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPmsi } from 'state/patient'
 
 import useStyles from './styles'
@@ -42,7 +41,7 @@ type PatientPMSITypes = {
 }
 const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { patient } = useAppSelector((state) => ({
     patient: state.patient
   }))
@@ -91,7 +90,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
 
   const _fetchPMSI = async (page: number) => {
     const selectedDiagnosticTypesCodes = filters.selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
-    dispatch(
+    dispatch<any>(
       fetchPmsi({
         selectedTab,
         groupId,

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { CircularProgress } from '@material-ui/core'
 import { useHistory, useParams } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
 
 import Grid from '@material-ui/core/Grid'
 
@@ -9,7 +8,7 @@ import ControlPanel from './ControlPanel/ControlPanel'
 import DiagramView from './DiagramView/DiagramView'
 import ModalCreateNewRequest from './Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { setCriteriaList } from 'state/criteria'
 import { fetchRequestCohortCreation, unbuildCohortCreation, resetCohortCreation } from 'state/cohortCreation'
 import { setSelectedRequest } from 'state/request'
@@ -51,7 +50,7 @@ const Requeteur = () => {
   const snapshotIdFromUrl = params.snapshotId
 
   const history = useHistory()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const classes = useStyles()
 
   const [requestLoading, setRequestLoading] = useState(true)
