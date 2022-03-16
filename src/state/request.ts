@@ -308,7 +308,7 @@ const setRequestSlice = createSlice({
     builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout.fulfilled, () => defaultInitialState)
     // fetchRequests
-    builder.addCase(fetchRequests.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(fetchRequests.pending, (state) => ({ ...state, loading: !state.count }))
     builder.addCase(fetchRequests.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
     builder.addCase(fetchRequests.rejected, (state) => ({ ...state, loading: false }))
     // addRequest

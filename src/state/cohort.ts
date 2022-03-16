@@ -324,7 +324,7 @@ const setCohortSlice = createSlice({
     builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout.fulfilled, () => defaultInitialState)
     // fetchCohorts
-    builder.addCase(fetchCohorts.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(fetchCohorts.pending, (state) => ({ ...state, loading: !state.count }))
     builder.addCase(fetchCohorts.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
     builder.addCase(fetchCohorts.rejected, (state) => ({ ...state, loading: false }))
     // addCohort

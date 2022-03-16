@@ -81,7 +81,7 @@ export type Cohort = {
   uuid?: string
   fhir_group_id?: string
   name?: string
-  description: string
+  description?: string
   result_size?: number
   dated_measure?: any
   dated_measure_global?: any
