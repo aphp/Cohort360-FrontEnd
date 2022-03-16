@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
 
 import { Button, IconButton, CircularProgress, Grid, Hidden, Tooltip, Typography } from '@material-ui/core'
-import Alert from '@material-ui/lab/Alert'
 import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
 import { ReactComponent as DriveFileMoveIcon } from 'assets/icones/drive-file-move.svg'
