@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { Button, IconButton, Chip, CircularProgress, Typography } from '@material-ui/core'
 
@@ -10,7 +9,7 @@ import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
 import ModalRightError from './components/ModalRightError'
 import PopulationRightPanel from './components/PopulationRightPanel'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { CohortCreationState, buildCohortCreation } from 'state/cohortCreation'
 import { ScopeState, fetchScopesList } from 'state/scope'
 
@@ -21,7 +20,7 @@ import useStyles from './styles'
 
 const PopulationCard: React.FC = () => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const {
     request: { selectedPopulation = [], ...requestState },

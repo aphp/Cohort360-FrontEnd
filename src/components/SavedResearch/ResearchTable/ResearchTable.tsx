@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
 
 import {
   Button,
@@ -37,7 +36,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert'
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
 import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { CohortState, setSelectedCohort as setSelectedCohortState } from 'state/cohort'
 
 import { Cohort } from 'types'
@@ -77,7 +76,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   onRequestSort
 }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const history = useHistory()
 
   const [dialogOpen, setOpenDialog] = useState(false)

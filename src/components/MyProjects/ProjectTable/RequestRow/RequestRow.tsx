@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import moment from 'moment'
-import { useDispatch } from 'react-redux'
 
 import { Checkbox, Collapse, IconButton, Link, Table, TableBody, TableCell, TableRow, Tooltip } from '@material-ui/core'
 
@@ -12,6 +11,7 @@ import VersionRow from '../VersionRow/VersionRow'
 
 import { RequestType, Cohort } from 'types'
 
+import { useAppDispatch } from 'state'
 import { setSelectedRequest } from 'state/request'
 
 import useStyles from '../styles'
@@ -26,7 +26,7 @@ type RequestRowProps = {
 const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedRequests, onSelectedRow, isSearch }) => {
   const [open, setOpen] = React.useState(false)
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const onEditRequest = (requestId: string) => {
     dispatch<any>(setSelectedRequest({ uuid: requestId, name: '' }))

@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
 // import { useHistory } from 'react-router'
 import {
   Grid,
@@ -31,6 +30,8 @@ import PropTypes from 'prop-types'
 import useStyles from './styles'
 import ScopeTree from '../../ScopeTree/ScopeTree'
 import Research from '../../SavedResearch/ResearchCard'
+
+import { useAppSelector, useAppDispatch } from 'state'
 import {
   addImportedPatients,
   excludePatients,
@@ -90,9 +91,11 @@ PatientRow.propType = {
 }
 
 const ImportPatientMenu = ({ anchorEl, handleClose, setOpenModal, setModalContent }) => {
-  const dispatch = useDispatch()
-  const practitioner = useSelector((state) => state.practitioner)
-  const cohort = useSelector((state) => state.exploredCohort)
+  const dispatch = useAppDispatch()
+  const { cohort, practitioner } = useAppSelector((state) => ({
+    cohort: state.cohort,
+    practitioner: state.practitioner
+  }))
 
   const classes = useStyles()
 
@@ -322,10 +325,10 @@ const PatientSelectableList = ({ patients, cohortPatients, onChangeSelection, se
 }
 
 const ImportPatientsContent = ({ setModalContent, setOpenModal }) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const classes = useStyles()
 
-  const importedPatients = useSelector((state) => state.exploredCohort.importedPatients)
+  const importedPatients = useAppSelector((state) => state.exploredCohort.importedPatients)
 
   const [selectedPatients, setSelectedPatients] = useState([])
 
@@ -374,12 +377,12 @@ ImportPatientsContent.propType = {
 }
 
 const InclusionExclusionContent = ({ include }) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const classes = useStyles()
-  const patients = useSelector((state) =>
-    include ? state.exploredCohort.includedPatients : state.exploredCohort.excludedPatients
-  )
-  const originalPatients = useSelector((state) => (include ? state.exploredCohort.originalPatients : []))
+  const { patients, originalPatients } = useAppSelector((state) => ({
+    patients: include ? state.exploredCohort.includedPatients : state.exploredCohort.excludedPatients,
+    originalPatients: include ? state.exploredCohort.originalPatients : []
+  }))
   const [selectedPatients, setSelectedPatients] = useState([])
   return (
     <>
@@ -421,7 +424,7 @@ InclusionExclusionContent.propType = {
 const InclusionExclusionPatientsPanel = () => {
   const classes = useStyles()
   // const history = useHistory()
-  // const dispatch = useDispatch()
+  // const dispatch = useAppDispatch()
 
   const [openModal, setOpenModal] = useState(false)
   const [modalContent, setModalContent] = useState(null)

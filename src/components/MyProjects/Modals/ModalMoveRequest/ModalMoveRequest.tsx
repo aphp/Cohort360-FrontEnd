@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 
 import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
@@ -14,7 +13,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import { ProjectType, RequestType } from 'types'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { ProjectState } from 'state/project'
 import { moveRequests } from 'state/request'
 
@@ -28,7 +27,7 @@ interface IModalMoveRequestProps {
 
 const ModalMoveRequest: React.FunctionComponent<IModalMoveRequestProps> = ({ open, onClose, selectedRequests }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [currentFolder, onChangeCurrentFolder] = useState<ProjectType | null>(null)
 
@@ -47,7 +46,7 @@ const ModalMoveRequest: React.FunctionComponent<IModalMoveRequestProps> = ({ ope
   }, [open])
 
   const _onConfirm = async () => {
-    await dispatch(
+    await dispatch<any>(
       moveRequests({
         selectedRequests,
         parent_folder: currentFolder !== null ? currentFolder.uuid : undefined

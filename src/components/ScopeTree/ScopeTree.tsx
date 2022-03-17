@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 
 import Grid from '@material-ui/core/Grid'
 import CircularProgress from '@material-ui/core/CircularProgress'
@@ -16,7 +15,7 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import EnhancedTable from '../EnhancedTable'
 import { ScopeTreeRow } from 'types'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { ScopeState, fetchScopesList, expandScopeElement } from 'state/scope'
 
 import displayDigit from 'utils/displayDigit'
@@ -31,7 +30,7 @@ type ScopeTreeProps = {
 
 const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSelectedItem }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [selectedItems, setSelectedItem] = useState(defaultSelectedItems)
 

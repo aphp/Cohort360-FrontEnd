@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import clsx from 'clsx'
 import { CONTEXT } from '../../constants'
-import { useDispatch } from 'react-redux'
 import { Link, useParams, useLocation } from 'react-router-dom'
 import { Grid, Tabs, Tab } from '@material-ui/core'
 
@@ -20,7 +19,7 @@ import { fetchExploredCohort } from 'state/exploredCohort'
 
 import useStyles from './styles'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 
 type Tabs = { label: string; value: string; to: string; disabled: boolean | undefined } | undefined
 
@@ -32,7 +31,7 @@ const Dashboard: React.FC<{
     tabName?: string | undefined
   }>()
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const classes = useStyles()
   const location = useLocation()
 

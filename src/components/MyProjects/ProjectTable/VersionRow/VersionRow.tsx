@@ -1,5 +1,4 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
 import moment from 'moment'
 
 import {
@@ -24,6 +23,7 @@ import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
 
 import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 
+import { useAppDispatch } from 'state'
 import { setSelectedCohort, setFavoriteCohort } from 'state/cohort'
 
 import { Cohort } from 'types'
@@ -34,7 +34,7 @@ import useStyles from '../styles'
 
 const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<null | string>(null)
 
   const cohorts: Cohort[] =

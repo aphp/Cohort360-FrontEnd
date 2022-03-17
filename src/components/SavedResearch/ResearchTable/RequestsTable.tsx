@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
 import moment from 'moment'
 
 import {
@@ -31,7 +30,7 @@ import MoreVertIcon from '@material-ui/icons/MoreVert'
 
 import ModalAddOrEditRequest from 'components/Cohort/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import {
   RequestState,
   setSelectedRequest as setSelectedRequestState,
@@ -58,7 +57,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
   onRequestSort
 }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const history = useHistory()
 
   const { requestState } = useAppSelector<{

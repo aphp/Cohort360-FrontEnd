@@ -28,7 +28,7 @@ export interface IServiceCohortCreation {
   createSnapshot: (id: string, json: string, firstTime?: boolean) => Promise<any>
 
   /**
-   * Permet de récupérer toutes les informations utilent pour l'utilisation du requeteur
+   * Permet de récupérer toutes les informations utiles pour l'utilisation du requeteur
    */
   fetchRequest: (requestId: string, snapshotId?: string) => Promise<any>
 }

@@ -586,13 +586,13 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
     try {
       const patientState = getState().patient
 
-      // if (patientState && patientState.patientInfo && patientState.patientInfo.id === patientId) {
-      //   return {
-      //     patientInfo: patientState.patientInfo,
-      //     deidentified: patientState.deidentified,
-      //     hospits: patientState.hospits
-      //   }
-      // }
+      if (patientState && patientState.patientInfo && patientState.patientInfo.id === patientId) {
+        return {
+          patientInfo: patientState.patientInfo,
+          deidentified: patientState.deidentified,
+          hospits: patientState.hospits
+        }
+      }
 
       const fetchPatientResponse = await services.patients.fetchPatientInfo(patientId, groupId)
       if (fetchPatientResponse === undefined) return null
@@ -619,10 +619,8 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
           )
         )
       }
-
-      console.log('deidentifiedBoolean :>> ', deidentifiedBoolean)
-
       if (
+        patientState?.patientInfo?.id !== patientId ||
         !patientState?.patientInfo?.lastGhm ||
         patientState?.patientInfo?.lastGhm === 'loading' ||
         !patientState?.patientInfo?.lastProcedure ||
@@ -795,7 +793,26 @@ const patientSlice = createSlice({
                 }
           }
     )
-    builder.addCase(fetchAllProcedures.rejected, () => null)
+    builder.addCase(fetchAllProcedures.rejected, (state) => ({
+      ...state,
+      loading: false,
+      pmsi: {
+        ccam: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        },
+        diagnostics: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        }
+      }
+    }))
     builder.addCase(fetchDocuments.pending, (state) =>
       state === null
         ? null
@@ -818,7 +835,10 @@ const patientSlice = createSlice({
             documents: action.payload.documents ?? undefined
           }
     )
-    builder.addCase(fetchDocuments.rejected, () => null)
+    builder.addCase(fetchDocuments.rejected, (state) => ({
+      ...state,
+      loading: false
+    }))
     builder.addCase(fetchPmsi.pending, (state) =>
       state === null
         ? null
@@ -867,7 +887,53 @@ const patientSlice = createSlice({
               : undefined
           }
     )
-    builder.addCase(fetchPmsi.rejected, () => null)
+    builder.addCase(fetchPmsi.rejected, (state) => ({
+      ...state,
+      loading: false,
+      pmsi: {
+        diagnostic: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        },
+        ghm: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        },
+        ccam: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        }
+      }
+    }))
+    builder.addCase(fetchMedication.rejected, (state) => ({
+      ...state,
+      loading: false,
+      medication: {
+        administration: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        },
+        prescription: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        }
+      }
+    }))
     builder.addCase(fetchMedication.pending, (state) =>
       state === null
         ? null
@@ -909,8 +975,17 @@ const patientSlice = createSlice({
               : undefined
           }
     )
-    builder.addCase(fetchMedication.rejected, () => null)
-    builder.addCase(fetchBiology.rejected, () => null)
+    builder.addCase(fetchBiology.rejected, (state) => ({
+      ...state,
+      loading: false,
+      biology: {
+        loading: false,
+        count: 0,
+        total: 0,
+        list: [],
+        page: 0
+      }
+    }))
     builder.addCase(fetchBiology.pending, (state) =>
       state === null
         ? null

@@ -1,5 +1,4 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
 
 import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
@@ -12,6 +11,7 @@ import Typography from '@material-ui/core/Typography'
 
 import { RequestType } from 'types'
 
+import { useAppDispatch } from 'state'
 import { deleteRequests } from 'state/request'
 
 import useStyles from './styles'
@@ -24,10 +24,10 @@ interface IModalMoveRequestProps {
 
 const ModalMoveRequest: React.FunctionComponent<IModalMoveRequestProps> = ({ open, onClose, selectedRequests }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const _onConfirm = async () => {
-    await dispatch(deleteRequests({ deletedRequests: selectedRequests }))
+    await dispatch<any>(deleteRequests({ deletedRequests: selectedRequests }))
 
     onClose(true)
   }

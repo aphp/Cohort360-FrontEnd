@@ -1,15 +1,14 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
 import { Grid, Select, MenuItem } from '@material-ui/core'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { buildCohortCreation, updateTemporalConstraint } from 'state/cohortCreation'
 
 import useStyles from './styles'
 
 const TemporalConstraintView: React.FC = () => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const { temporalConstraints = [] } = useAppSelector((state) => state.cohortCreation.request || {})
 
