@@ -1,5 +1,4 @@
 import Connexion from 'views/Connexion/Connexion'
-import ArkhnConnexion from 'views/Connexion/ArkhnConnexion'
 import Accueil from 'views/Accueil/Accueil'
 import RechercherPatient from 'views/RechercherPatient/RechercherPatient'
 import RechercheSauvegarde from 'views/RechercheSauvegarde/RechercheSauvegarde'
@@ -10,7 +9,7 @@ import Dashboard from 'views/Dashboard/Dashboard'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 import Contact from 'views/Contact/Contact'
 
-import { CONTEXT, ODD_CONTACT } from '../../../constants'
+import { ODD_CONTACT } from '../../../constants'
 
 export default [
   /**
@@ -20,7 +19,7 @@ export default [
     exact: true,
     path: '/',
     name: 'main',
-    component: CONTEXT === 'arkhn' ? ArkhnConnexion : Connexion
+    component: Connexion
   },
   /**
    * Cohort360: Main Page
