@@ -489,7 +489,7 @@ const servicesCohorts: IServiceCohorts = {
           cohortLinkList && cohortLinkList.length > 0
             ? cohortLinkList
                 .map((cohortLinkItem: any) => {
-                  const members = cohortLinkItem.member
+                  const members = cohortLinkItem?.member ?? []
                   let organizationLinks: any[] = []
 
                   for (let index = 0; index < members.length; index += 2) {
@@ -574,7 +574,7 @@ const servicesCohorts: IServiceCohorts = {
       const rightsData: any = rightsResponse.data ?? []
 
       return cohorts.map((cohort) => {
-        const cohortLinkItem = cohortLinkList.find((cohortLink: any) => cohortLink.id === cohort.fhir_group_id)
+        const cohortLinkItem = cohortLinkList.find((cohortLink: any) => cohortLink?.id === cohort.fhir_group_id)
         const organizationLinkItems = !cohortLinkItem
           ? undefined
           : organizationLinkList.filter((organizationLink: any) =>
