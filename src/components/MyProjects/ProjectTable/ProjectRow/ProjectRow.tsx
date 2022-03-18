@@ -1,5 +1,4 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
 // import moment from 'moment'
 
 import { Button, Collapse, IconButton, TableCell, TableRow, Typography, Tooltip } from '@material-ui/core'
@@ -13,6 +12,7 @@ import RequestRow from '../RequestRow/RequestRow'
 
 import { ProjectType, RequestType, Cohort } from 'types'
 
+import { useAppDispatch } from 'state'
 import { setSelectedProject } from 'state/project'
 import { setSelectedRequest } from 'state/request'
 
@@ -36,7 +36,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
 }) => {
   const [open, setOpen] = React.useState(true)
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const handleClickAddOrEditProject = (selectedProjectId: string | null) => {
     onSelectedRow([])

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { Box, IconButton, MenuItem, Select, Typography, TextField } from '@material-ui/core'
 
 import DeleteIcon from '@material-ui/icons/Delete'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { editCriteriaGroup, deleteCriteriaGroup, buildCohortCreation } from 'state/cohortCreation'
 
 import useStyles from './styles'
@@ -16,7 +15,7 @@ type LogicalOperatorItemProps = {
 
 const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   let timeout: any = null
 

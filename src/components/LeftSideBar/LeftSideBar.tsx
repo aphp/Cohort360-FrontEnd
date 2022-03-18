@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import clsx from 'clsx'
 
@@ -34,7 +33,7 @@ import { ReactComponent as MenuIcon } from 'assets/icones/bars.svg'
 import { ReactComponent as PatientIcon } from 'assets/icones/user.svg'
 import { ReactComponent as ResearchIcon } from 'assets/icones/chart-bar.svg'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { logout as logoutAction } from 'state/me'
 import { open as openAction, close as closeAction } from 'state/drawer'
 import { resetCohortCreation } from 'state/cohortCreation'
@@ -49,7 +48,7 @@ export { smallDrawerWidth, largeDrawerWidth }
 const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
   const classes = useStyles()
   const history = useHistory()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const { practitioner, open, cohortCreation } = useAppSelector((state) => ({
     practitioner: state.me,

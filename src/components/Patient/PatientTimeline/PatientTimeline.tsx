@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import moment from 'moment'
 
@@ -23,6 +22,7 @@ import { IEncounter, IProcedure, IDocumentReference, IPeriod, ICondition } from 
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
+import { useAppDispatch } from 'state'
 import { fetchAllProcedures } from 'state/patient'
 
 import { fetchDiagnosticTypes } from 'services/cohortCreation/fetchCondition'
@@ -144,7 +144,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   consults,
   diagnostics
 }) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const classes = useStyles()
   const [timelineData, setTimelineData] = useState<TimelineData>({})
   const [openHospitDialog, setOpenHospitDialog] = useState(false)
@@ -163,7 +163,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   const { patientId } = useParams<{ patientId: string }>()
 
   useEffect(() => {
-    dispatch(
+    dispatch<any>(
       fetchAllProcedures({
         patientId,
         groupId

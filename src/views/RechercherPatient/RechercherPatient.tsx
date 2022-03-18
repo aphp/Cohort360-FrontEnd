@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
 import { useAppSelector } from 'state'
-import { useDispatch } from 'react-redux'
 import { withRouter, useParams } from 'react-router'
 
 import { CircularProgress, Grid, Typography } from '@material-ui/core'
@@ -10,6 +9,7 @@ import PatientSearchBar from 'components/PatientSearchBar/PatientSearchBar'
 import TableauPatients from 'components/TableauPatients/TableauPatients'
 
 import services from 'services'
+import { useAppDispatch } from 'state'
 import { setExploredCohort } from 'state/exploredCohort'
 
 import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
@@ -19,7 +19,7 @@ import useStyles from './styles'
 
 const RechercherPatient: React.FC<{}> = () => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const practitioner = useAppSelector((state) => state.me)
   const { search } = useParams<{ search: string }>()
 

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import moment from 'moment'
 
 import {
@@ -32,7 +31,7 @@ import CommentIcon from '@material-ui/icons/Comment'
 import MedicationFilters from 'components/Filters/MedicationFilters/MedicationFilters'
 import ModalAdministrationComment from './ModalAdministrationComment/ModalAdministrationComment'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { fetchMedication } from 'state/patient'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
@@ -45,7 +44,7 @@ type PatientMedicationTypes = {
 }
 const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { patient } = useAppSelector((state) => ({
     patient: state.patient
   }))
@@ -92,7 +91,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   const documentLines = 20 // Number of desired lines in the document array
 
   const _fetchMedication = async (page: number) => {
-    dispatch(
+    dispatch<any>(
       fetchMedication({
         selectedTab,
         groupId,

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
 import { Button, IconButton, CircularProgress, Grid, Hidden, Tooltip, Typography } from '@material-ui/core'
@@ -18,7 +17,7 @@ import ModalDeleteRequests from 'components/MyProjects/Modals/ModalDeleteRequest
 
 import { RequestType } from 'types'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { ProjectState, fetchProjects as fetchProjectsList, setSelectedProject } from 'state/project'
 import { RequestState, fetchRequests as fetchRequestsList, setSelectedRequest } from 'state/request'
 import { CohortState, fetchCohorts as fetchCohortsList, setSelectedCohort } from 'state/cohort'
@@ -27,7 +26,7 @@ import useStyles from './styles'
 
 const MyProjects = () => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [searchInput, setSearchInput] = useState('')
   const [selectedRequests, setSelectedRequests] = useState<RequestType[]>([])

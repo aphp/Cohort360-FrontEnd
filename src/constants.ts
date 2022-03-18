@@ -94,10 +94,10 @@ export const MEDICATION_ADMINISTRATIONS =
   'https://terminology.eds.aphp.fr/aphp-orbis-medicament-voie-administration'
 
 export const BIOLOGY_HIERARCHY_ITM_ANABIO =
-  process.env.REACT_APP_VALUE_SET_URL_BIOLOGY ?? 'https://terminology.eds.aphp.fr/aphp-itm-anabio'
+  process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_ANABIO ?? 'https://terminology.eds.aphp.fr/aphp-itm-anabio'
 
 export const BIOLOGY_HIERARCHY_ITM_LOINC =
-  process.env.REACT_APP_VALUE_SET_URL_BIOLOGY ?? 'https://terminology.eds.aphp.fr/aphp-itm-loinc'
+  process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_LOINC ?? 'https://terminology.eds.aphp.fr/aphp-itm-loinc'
 
 export const ODD_BIOLOGY: boolean = process.env.REACT_APP_ODD_BIOLOGY === 'true' ?? false
 export const ODD_COMPOSITION: boolean = process.env.REACT_APP_ODD_COMPOSITION === 'true' ?? false

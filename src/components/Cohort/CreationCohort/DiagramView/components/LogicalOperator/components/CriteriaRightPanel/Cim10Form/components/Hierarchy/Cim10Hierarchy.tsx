@@ -1,6 +1,5 @@
 import React, { useEffect, useState, Fragment } from 'react'
 import clsx from 'clsx'
-import { useDispatch } from 'react-redux'
 
 import {
   Button,
@@ -21,7 +20,7 @@ import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { PmsiListType, fetchCondition, expandPmsiElement } from 'state/pmsi'
 
 import { getSelectedPmsi, filterSelectedPmsi, checkIfIndeterminated } from 'utils/pmsi'
@@ -39,7 +38,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
   const { id, label, subItems } = cimItem
 
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const conditionState = useAppSelector((state) => state.pmsi.condition || {})
   const cimHierarchy = conditionState.list
@@ -140,7 +139,7 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
   const { selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
 
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const conditionState = useAppSelector((state) => state.pmsi.condition || {})
   const cimHierarchy = conditionState.list

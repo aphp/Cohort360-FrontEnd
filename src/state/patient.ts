@@ -12,7 +12,8 @@ import {
   IIdentifier,
   IMedicationAdministration,
   IMedicationRequest,
-  IObservation
+  IObservation,
+  IExtension
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   CohortEncounter,
@@ -572,7 +573,7 @@ type FetchPatientReturn = {
   patientInfo: IPatient & {
     lastEncounter?: IEncounter
   }
-  deidentified: boolean
+  deidentified?: boolean
   hospits?: {
     loading: boolean
     list: (CohortEncounter | IEncounter)[]
@@ -585,12 +586,41 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
     try {
       const patientState = getState().patient
 
+      if (patientState && patientState.patientInfo && patientState.patientInfo.id === patientId) {
+        return {
+          patientInfo: patientState.patientInfo,
+          deidentified: patientState.deidentified,
+          hospits: patientState.hospits
+        }
+      }
+
       const fetchPatientResponse = await services.patients.fetchPatientInfo(patientId, groupId)
       if (fetchPatientResponse === undefined) return null
 
-      const { patientInfo, hospits, deidentifiedBoolean } = fetchPatientResponse
+      const { patientInfo, hospits } = fetchPatientResponse
+      let deidentifiedBoolean = true
 
+      if (groupId) {
+        const perimeters = (await services.perimeters.fetchPerimetersInfos(groupId)) ?? {}
+        deidentifiedBoolean =
+          perimeters && perimeters.cohort && Array.isArray(perimeters.cohort)
+            ? perimeters.cohort.some((perimeter: any) =>
+                perimeter.extension?.some(
+                  (extension: any) =>
+                    extension.url === 'READ_ACCESS' && extension.valueString === 'DATA_PSEUDOANONYMISED'
+                )
+              )
+            : true
+      } else {
+        const perimeters = await services.perimeters.getPerimeters()
+        deidentifiedBoolean = perimeters.some((perimeter) =>
+          perimeter.extension?.some(
+            (extension) => extension.url === 'READ_ACCESS' && extension.valueString === 'DATA_PSEUDOANONYMISED'
+          )
+        )
+      }
       if (
+        patientState?.patientInfo?.id !== patientId ||
         !patientState?.patientInfo?.lastGhm ||
         patientState?.patientInfo?.lastGhm === 'loading' ||
         !patientState?.patientInfo?.lastProcedure ||
@@ -603,7 +633,7 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
 
       return {
         patientInfo,
-        deidentified: deidentifiedBoolean ?? false,
+        deidentified: deidentifiedBoolean,
         hospits: {
           loading: false,
           list: hospits ?? []
@@ -763,7 +793,26 @@ const patientSlice = createSlice({
                 }
           }
     )
-    builder.addCase(fetchAllProcedures.rejected, () => null)
+    builder.addCase(fetchAllProcedures.rejected, (state) => ({
+      ...state,
+      loading: false,
+      pmsi: {
+        ccam: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        },
+        diagnostics: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        }
+      }
+    }))
     builder.addCase(fetchDocuments.pending, (state) =>
       state === null
         ? null
@@ -786,7 +835,10 @@ const patientSlice = createSlice({
             documents: action.payload.documents ?? undefined
           }
     )
-    builder.addCase(fetchDocuments.rejected, () => null)
+    builder.addCase(fetchDocuments.rejected, (state) => ({
+      ...state,
+      loading: false
+    }))
     builder.addCase(fetchPmsi.pending, (state) =>
       state === null
         ? null
@@ -835,7 +887,53 @@ const patientSlice = createSlice({
               : undefined
           }
     )
-    builder.addCase(fetchPmsi.rejected, () => null)
+    builder.addCase(fetchPmsi.rejected, (state) => ({
+      ...state,
+      loading: false,
+      pmsi: {
+        diagnostic: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        },
+        ghm: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        },
+        ccam: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        }
+      }
+    }))
+    builder.addCase(fetchMedication.rejected, (state) => ({
+      ...state,
+      loading: false,
+      medication: {
+        administration: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        },
+        prescription: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        }
+      }
+    }))
     builder.addCase(fetchMedication.pending, (state) =>
       state === null
         ? null
@@ -877,8 +975,17 @@ const patientSlice = createSlice({
               : undefined
           }
     )
-    builder.addCase(fetchMedication.rejected, () => null)
-    builder.addCase(fetchBiology.rejected, () => null)
+    builder.addCase(fetchBiology.rejected, (state) => ({
+      ...state,
+      loading: false,
+      biology: {
+        loading: false,
+        count: 0,
+        total: 0,
+        list: [],
+        page: 0
+      }
+    }))
     builder.addCase(fetchBiology.pending, (state) =>
       state === null
         ? null
@@ -931,14 +1038,14 @@ function linkElementWithEncounter<
     | IMedicationRequest
     | IMedicationAdministration
     | IObservation
->(pmsiEntries: T[], listeEncounters: any[], deidentifiedBoolean: any) {
+>(elementEntries: T[], encounterList: any[], deidentifiedBoolean: any) {
   let elementList: (T & {
     serviceProvider?: string
     NDA?: string
     documents?: any[]
   })[] = []
 
-  for (const entry of pmsiEntries) {
+  for (const entry of elementEntries) {
     const newElement = entry as T & {
       serviceProvider?: string
       NDA?: string
@@ -968,23 +1075,28 @@ function linkElementWithEncounter<
         encounterId = (entry as IObservation).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
     }
-    const foundEncounter = listeEncounters.find(({ id }) => id === encounterId) || {}
+    const foundEncounter = encounterList.find(({ id }) => id === encounterId) || {}
 
-    newElement.serviceProvider = foundEncounter?.serviceProvider?.display ?? 'Non renseigné'
+    if (foundEncounter) {
+      newElement.serviceProvider =
+        foundEncounter?.serviceProvider?.extension?.find(
+          (extension: IExtension) => extension.url === 'Organization child'
+        )?.valueString ?? 'Non renseigné'
 
-    if (deidentifiedBoolean) {
       newElement.NDA = foundEncounter?.id ?? 'Inconnu'
-    } else if (foundEncounter?.identifier) {
-      const nda = foundEncounter.identifier.filter((identifier: IIdentifier) => {
-        return identifier.type?.coding?.[0].code === 'NDA'
-      })
-      newElement.NDA = nda[0].value
-    } else {
-      newElement.NDA = 'Inconnu'
-    }
 
-    if (entry.resourceType !== 'Composition' && foundEncounter?.documents && foundEncounter.documents.length > 0) {
-      newElement.documents = foundEncounter.documents
+      if (!deidentifiedBoolean && foundEncounter?.identifier) {
+        const nda = foundEncounter.identifier.find((identifier: IIdentifier) => {
+          return identifier.type?.coding?.[0].code === 'NDA'
+        })
+        if (nda) {
+          newElement.NDA = nda.value
+        }
+      }
+
+      if (entry.resourceType !== 'Composition' && foundEncounter?.documents && foundEncounter.documents.length > 0) {
+        newElement.documents = foundEncounter.documents
+      }
     }
 
     elementList = [...elementList, newElement]
@@ -992,25 +1104,3 @@ function linkElementWithEncounter<
 
   return elementList
 }
-
-// function checkEqualityOfOptions(oldOptions: any, newOptions: any) {
-//   let categories = Object.keys(newOptions)
-//   // Remove page
-//   categories = categories.filter((newKey: string) => newKey !== 'page')
-
-//   for (const categorie of categories) {
-//     const items = Object.keys(newOptions[categorie])
-//     for (const item of items) {
-//       if (Array.isArray(newOptions?.[categorie]?.[item])) {
-//         if (oldOptions?.[categorie]?.[item]?.length !== newOptions?.[categorie]?.[item].length) {
-//           return true
-//         }
-//       } else {
-//         if (oldOptions?.[categorie]?.[item] !== newOptions?.[categorie]?.[item]) {
-//           return true
-//         }
-//       }
-//     }
-//   }
-//   return false
-// }

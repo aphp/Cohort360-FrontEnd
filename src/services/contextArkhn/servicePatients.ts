@@ -17,7 +17,8 @@ import {
   IMedicationAdministration,
   IEncounter,
   IComposition,
-  IObservation
+  IObservation,
+  IExtension
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   fetchPatient,
@@ -66,7 +67,6 @@ export interface IServicePatients {
           lastProcedure?: IProcedure
           mainDiagnosis?: ICondition[]
         }
-        deidentifiedBoolean: boolean
         hospits?: (CohortEncounter | IEncounter)[]
       }
     | undefined
@@ -600,12 +600,8 @@ const servicesPatients: IServicePatients = {
     if (patientDataList === undefined || (patientDataList && patientDataList.length === 0)) return undefined
     const patientData = patientDataList[0]
 
-    const deidentifiedBoolean = patientData
-      ? patientData.extension?.find((extension: any) => extension.url === 'deidentified')?.valueBoolean
-      : true
-
     const encounters: IEncounter[] = getApiResponseResources(encounterResponse) || []
-    const hospits = await getEncounterDocuments(deidentifiedBoolean, encounters, groupId)
+    const hospits = await getEncounterDocuments(encounters, groupId)
 
     const patientInfo = {
       ...patientData,
@@ -614,7 +610,6 @@ const servicesPatients: IServicePatients = {
 
     return {
       patientInfo,
-      deidentifiedBoolean: deidentifiedBoolean ?? false,
       hospits
     }
   },
@@ -660,74 +655,7 @@ const servicesPatients: IServicePatients = {
 
 export default servicesPatients
 
-export async function fillNDAAndServiceProviderMedication<T extends IMedicationRequest | IMedicationAdministration>(
-  deidentifiedBoolean?: boolean,
-  medication?: T[],
-  groupId?: string
-): Promise<MedicationEntry<T>[] | undefined> {
-  if (!medication) {
-    return undefined
-  }
-
-  const medicationEntries: MedicationEntry<T>[] = medication
-  const listeEncounterIds = medicationEntries
-    .map((e) =>
-      e.resourceType === 'MedicationRequest'
-        ? // @ts-ignore
-          e.encounter?.reference?.replace(/^Encounter\//, '')
-        : // @ts-ignore
-          e.context?.reference?.replace(/^Encounter\//, '')
-    )
-    .filter((s): s is string => undefined !== s)
-
-  const noDuplicatesList: string[] = listeEncounterIds.filter((item, index, array) => array.indexOf(item) === index)
-  if (noDuplicatesList.length === 0) return medicationEntries
-
-  const encounters = await fetchEncounter({
-    _id: noDuplicatesList.join(','),
-    type: 'VISIT',
-    _elements: ['serviceProvider', 'identifier'],
-    _list: groupId ? [groupId] : []
-  })
-
-  if (!encounters || encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {
-    return []
-  }
-
-  const listeEncounters = encounters.data.entry.map((e: any) => e.resource)
-
-  for (const entry of medicationEntries) {
-    const medicationEncounterId =
-      entry.resourceType === 'MedicationRequest'
-        ? // @ts-ignore
-          entry.encounter?.reference?.replace(/^Encounter\//, '')
-        : // @ts-ignore
-          entry.context?.reference?.replace(/^Encounter\//, '')
-
-    const foundEncounter = listeEncounters.find((encounter: any) => encounter.id === medicationEncounterId)
-    if (!foundEncounter) continue
-
-    entry.serviceProvider = foundEncounter.serviceProvider.display ?? 'Non renseigné'
-    if (deidentifiedBoolean) {
-      entry.NDA = foundEncounter.id
-    } else if (foundEncounter.identifier) {
-      const nda = foundEncounter.identifier.filter((identifier: IIdentifier) => {
-        return identifier.type?.coding?.[0].code === 'NDA'
-      })
-      entry.NDA = nda[0].value
-    } else {
-      entry.NDA = 'Inconnu'
-    }
-  }
-
-  return medicationEntries
-}
-
-export const getEncounterDocuments = async (
-  deidentifiedBoolean?: boolean,
-  encounters?: CohortEncounter[],
-  groupId?: string
-) => {
+export const getEncounterDocuments = async (encounters?: CohortEncounter[], groupId?: string) => {
   if (!encounters) return undefined
   if (encounters.length === 0) return encounters
 
@@ -756,17 +684,20 @@ export const getEncounterDocuments = async (
     if (encounterIndex === -1) continue
 
     const foundEncounter = _encounters[encounterIndex]
-    document.serviceProvider = foundEncounter?.serviceProvider?.display ?? 'Non renseigné'
+    document.serviceProvider =
+      foundEncounter?.serviceProvider?.extension?.find(
+        (extension: IExtension) => extension.url === 'Organization child'
+      )?.valueString ?? 'Non renseigné'
 
-    if (deidentifiedBoolean) {
-      document.NDA = foundEncounter.id
-    } else if (foundEncounter.identifier) {
-      const nda = foundEncounter.identifier.filter((identifier: IIdentifier) => {
+    document.NDA = foundEncounter.id ?? 'Inconnu'
+
+    if (foundEncounter.identifier) {
+      const nda = foundEncounter.identifier.find((identifier: IIdentifier) => {
         return identifier.type?.coding?.[0].code === 'NDA'
       })
-      document.NDA = nda[0].value
-    } else {
-      document.NDA = 'Inconnu'
+      if (nda) {
+        document.NDA = nda?.value
+      }
     }
 
     _encounters[encounterIndex].documents?.push(document)

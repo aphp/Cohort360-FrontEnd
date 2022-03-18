@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
 
 import { ButtonGroup, Button, IconButton, CircularProgress } from '@material-ui/core'
 
@@ -11,7 +10,7 @@ import CriteriaCardItem from '../CriteriaCard/CriteriaCard'
 
 import { CriteriaGroupType, SelectedCriteriaType } from 'types'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import {
   buildCohortCreation,
   addNewCriteriaGroup,
@@ -153,7 +152,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 }
 
 const LogicalOperator: React.FC = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const { request, criteria } = useAppSelector((state) => state.cohortCreation || {})
 
   const [parentId, setParentId] = useState<number | null>(null)

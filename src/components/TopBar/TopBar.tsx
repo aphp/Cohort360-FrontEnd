@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
 
 import Avatar from '@material-ui/core/Avatar'
 import Button from '@material-ui/core/Button'
@@ -36,7 +35,7 @@ import MoreButton from '@material-ui/icons/MoreVert'
 import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 import { favoriteExploredCohort } from 'state/exploredCohort'
 import { fetchCohorts as fetchCohortsList, setSelectedCohort, deleteCohort } from 'state/cohort'
 
@@ -57,7 +56,7 @@ type TopBarProps = {
 
 const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const history = useHistory()
 
   const { dashboard, cohortList } = useAppSelector((state) => ({
@@ -148,11 +147,11 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   }
 
   const handleFavorite = () => {
-    dispatch(favoriteExploredCohort({ id: dashboard.uuid ?? '' }))
+    dispatch<any>(favoriteExploredCohort({ id: dashboard.uuid ?? '' }))
   }
 
   const handleConfirmDeletion = () => {
-    dispatch(deleteCohort({ deletedCohort: dashboard as Cohort }))
+    dispatch<any>(deleteCohort({ deletedCohort: dashboard as Cohort }))
     history.push('/accueil')
   }
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
+import localforage from 'localforage'
+
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import Grid from '@material-ui/core/Grid'
@@ -18,6 +19,8 @@ import Footer from 'components/Footer/Footer'
 import NoRights from 'components/ErrorView/NoRights'
 
 import logo from 'assets/images/logo-login.png'
+
+import { useAppDispatch } from 'state'
 import { login as loginAction } from 'state/me'
 import { ACCES_TOKEN, REFRESH_TOKEN } from '../../constants'
 
@@ -81,13 +84,27 @@ const LegalMentionDialog = ({ open, setOpen }) => {
 const Login = () => {
   const history = useHistory()
   const classes = useStyles()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
   const [username, setUsername] = useState(undefined)
   const [password, setPassword] = useState(undefined)
   const [noRights, setNoRights] = useState(false)
   const [errorLogin, setErrorLogin] = useState(false)
   const [open, setOpen] = useState(false)
+
+  React.useEffect(() => {
+    localforage
+      .setItem('persist:root', '')
+      .then(function (data) {
+        // Run this code once the database has been entirely deleted.
+        // console.log('Database is now empty.')
+        console.log('data :>> ', data)
+      })
+      .catch(function (err) {
+        // This code runs if there were any errors
+        console.log(err)
+      })
+  }, [])
 
   const getPractitionerData = async (practitioner, lastConnection) => {
     if (practitioner) {

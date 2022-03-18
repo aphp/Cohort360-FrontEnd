@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import clsx from 'clsx'
-import { CONTEXT } from '../../constants'
-import { useDispatch } from 'react-redux'
 import { Link, useParams, useLocation } from 'react-router-dom'
 import { Grid, Tabs, Tab } from '@material-ui/core'
 
-import InclusionExclusionPatientsPanel from 'components/Cohort/InclusionExclusionPatients/InclusionExclusionPatients'
-import RedcapExport from 'components/RedcapExport/RedcapExport'
 import CohortPreview from 'components/Cohort/Preview/Preview'
 import PatientList from 'components/Cohort/PatientList/PatientList'
 import Documents from 'components/Cohort/Documents/Documents'
@@ -20,7 +16,7 @@ import { fetchExploredCohort } from 'state/exploredCohort'
 
 import useStyles from './styles'
 
-import { useAppSelector } from 'state'
+import { useAppSelector, useAppDispatch } from 'state'
 
 type Tabs = { label: string; value: string; to: string; disabled: boolean | undefined } | undefined
 
@@ -32,7 +28,7 @@ const Dashboard: React.FC<{
     tabName?: string | undefined
   }>()
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const classes = useStyles()
   const location = useLocation()
 
@@ -40,7 +36,6 @@ const Dashboard: React.FC<{
 
   const [selectedTab, selectTab] = useState(tabName || 'apercu')
   const [tabs, setTabs] = useState<Tabs[]>([])
-  const [openRedcapDialog, setOpenRedcapDialog] = useState(false)
 
   const { open, dashboard } = useAppSelector((state) => ({
     open: state.drawer,
@@ -118,10 +113,6 @@ const Dashboard: React.FC<{
     dispatch<any>(fetchExploredCohort({ context, id, forceReload: true }))
   }
 
-  const handleCloseRedcapDialog = () => {
-    setOpenRedcapDialog(false)
-  }
-
   const handleChangeTabs = (event: any, newTab: string) => {
     selectTab(newTab)
   }
@@ -149,16 +140,6 @@ const Dashboard: React.FC<{
         [classes.appBarShift]: open
       })}
     >
-      {CONTEXT === 'arkhn' && dashboard.originalPatients && (
-        <RedcapExport
-          open={openRedcapDialog}
-          onClose={handleCloseRedcapDialog}
-          // FIX ARKHN: originalPatient only contains paginated results, not the whole group.
-          // we need to find a way to tell redcap which patients we need depending on then context
-          patientIds={dashboard.originalPatients.map((p: any) => p.id)}
-        />
-      )}
-
       <TopBar
         context={context}
         access={
@@ -222,7 +203,6 @@ const Dashboard: React.FC<{
             sortDirection={'desc'}
           />
         )}
-        {CONTEXT === 'arkhn' && selectedTab === 'inclusion-exclusion' && <InclusionExclusionPatientsPanel />}
       </div>
     </Grid>
   )

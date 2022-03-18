@@ -39,6 +39,8 @@ import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 
 import { getDocumentStatus } from 'utils/documentsFormatter'
 
+import docTypes from '../../../../assets/docTypes.json'
+
 import useStyles from './styles'
 
 type DocumentRowTypes = {
