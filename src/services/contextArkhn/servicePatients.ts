@@ -17,8 +17,7 @@ import {
   IMedicationAdministration,
   IEncounter,
   IComposition,
-  IObservation,
-  IExtension
+  IObservation
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   fetchPatient,
@@ -684,10 +683,7 @@ export const getEncounterDocuments = async (encounters?: CohortEncounter[], grou
     if (encounterIndex === -1) continue
 
     const foundEncounter = _encounters[encounterIndex]
-    document.serviceProvider =
-      foundEncounter?.serviceProvider?.extension?.find(
-        (extension: IExtension) => extension.url === 'Organization child'
-      )?.valueString ?? 'Non renseigné'
+    document.serviceProvider = foundEncounter?.serviceProvider?.display ?? 'Non renseigné'
 
     document.NDA = foundEncounter.id ?? 'Inconnu'
 
