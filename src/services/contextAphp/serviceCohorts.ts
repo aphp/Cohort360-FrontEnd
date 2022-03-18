@@ -578,9 +578,11 @@ const servicesCohorts: IServiceCohorts = {
         const organizationLinkItems = !cohortLinkItem
           ? undefined
           : organizationLinkList.filter((organizationLink: any) =>
-              cohortLinkItem.member.find(
-                (member: any) => member.entity.display?.replace('Group/', '') === organizationLink.id
-              )
+              cohortLinkItem && cohortLinkItem.member && cohortLinkItem.member.length > 0
+                ? cohortLinkItem.member?.find(
+                    (member: any) => member.entity.display?.replace('Group/', '') === organizationLink.id
+                  )
+                : false
             )
         const allRightOfCohort = !organizationLinkItems
           ? []

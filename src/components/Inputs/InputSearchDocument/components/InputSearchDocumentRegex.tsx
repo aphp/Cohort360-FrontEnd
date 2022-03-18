@@ -76,8 +76,10 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
                 open={tooltip}
                 title={
                   <>
-                    <Typography>Une expression régulière permet de faire des recherches complexes.</Typography>
-                    <Typography>Vous pouvez les tester ici : https://regex101.com/</Typography>
+                    <Typography>Une Expression régulière permet de faire des recherches complexes.</Typography>
+                    <Typography>
+                      Vous pouvez les tester ici : https://regex101.com/ avec la configuration FLAVOR = 'Java 8'
+                    </Typography>
                     <Typography style={{ marginTop: 8 }}>Quelques exemples :</Typography>
                     <Typography style={{ marginLeft: 16 }}>[a-z] : Lettres minuscules de a à z</Typography>
                     <Typography style={{ marginLeft: 16 }}>[A-Z] : Lettres majuscules de A à Z</Typography>
