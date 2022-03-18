@@ -4,18 +4,22 @@ export const ID_TOKEN_STORAGE_KEY = 'ARKHN_ID_TOKEN'
 export const TOKEN_DATA_STORAGE_KEY = 'ARKHN_TOKEN_DATA'
 export const STATE_STORAGE_KEY = 'ARKHN_AUTH_STATE'
 
-export const {
-  REACT_APP_CLIENT_ID: CLIENT_ID,
-  REACT_APP_CLIENT_SECRET: CLIENT_SECRET,
-  REACT_APP_BACK_API_URL: BACK_API_URL,
-  REACT_APP_REQUEST_API_URL: REQUEST_API_URL,
-  REACT_APP_FHIR_API_URL: FHIR_API_URL,
-  REACT_APP_AUTH_API_URL: AUTH_API_URL,
-  REACT_APP_FILES_URL: FILES_URL,
-  REACT_APP_TOKEN_URL: TOKEN_URL,
-  REACT_APP_REVOKE_URL: REVOKE_URL,
-  REACT_APP_LOGIN_REDIRECT_URL: LOGIN_REDIRECT_URL
-} = process.env
+export const CLIENT_ID = process.env.NODE_ENV !== 'development' ? '{CLIENT_ID}' : process.env.REACT_APP_CLIENT_ID
+export const CLIENT_SECRET =
+  process.env.NODE_ENV !== 'development' ? '{CLIENT_SECRET}' : process.env.REACT_APP_CLIENT_SECRET
+export const BACK_API_URL =
+  process.env.NODE_ENV !== 'development' ? '{BACK_API_URL}' : process.env.REACT_APP_BACK_API_URL
+export const REQUEST_API_URL =
+  process.env.NODE_ENV !== 'development' ? '{REQUEST_API_URL}' : process.env.REACT_APP_REQUEST_API_URL
+export const FHIR_API_URL =
+  process.env.NODE_ENV !== 'development' ? '{FHIR_API_URL}' : process.env.REACT_APP_FHIR_API_URL
+export const AUTH_API_URL =
+  process.env.NODE_ENV !== 'development' ? '{AUTH_API_URL}' : process.env.REACT_APP_AUTH_API_URL
+export const FILES_URL = process.env.NODE_ENV !== 'development' ? '{FILES_URL}' : process.env.REACT_APP_FILES_URL
+export const TOKEN_URL = process.env.NODE_ENV !== 'development' ? '{TOKEN_URL}' : process.env.REACT_APP_TOKEN_URL
+export const REVOKE_URL = process.env.NODE_ENV !== 'development' ? '{REVOKE_URL}' : process.env.REACT_APP_REVOKE_URL
+export const LOGIN_REDIRECT_URL =
+  process.env.NODE_ENV !== 'development' ? '{LOGIN_REDIRECT_URL}' : process.env.REACT_APP_LOGIN_REDIRECT_URL
 
 export const API_RESOURCE_TAG = process.env.REACT_APP_DEV_API_RESOURCE_TAG
   ? '&_tag=' + process.env.REACT_APP_DEV_API_RESOURCE_TAG
