@@ -12,8 +12,7 @@ import {
   IIdentifier,
   IMedicationAdministration,
   IMedicationRequest,
-  IObservation,
-  IExtension
+  IObservation
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   CohortEncounter,
@@ -1078,10 +1077,7 @@ function linkElementWithEncounter<
     const foundEncounter = encounterList.find(({ id }) => id === encounterId) || {}
 
     if (foundEncounter) {
-      newElement.serviceProvider =
-        foundEncounter?.serviceProvider?.extension?.find(
-          (extension: IExtension) => extension.url === 'Organization child'
-        )?.valueString ?? 'Non renseigné'
+      newElement.serviceProvider = foundEncounter?.serviceProvider?.display ?? 'Non renseigné'
 
       newElement.NDA = foundEncounter?.id ?? 'Inconnu'
 

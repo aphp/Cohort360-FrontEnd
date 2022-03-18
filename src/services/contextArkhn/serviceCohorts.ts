@@ -727,9 +727,7 @@ const getDocumentInfos: (
         document.encounterStatus = encounter.status
 
         if (encounter.serviceProvider) {
-          document.serviceProvider =
-            encounter?.serviceProvider?.extension?.find((extension: any) => extension.url === 'Organization child')
-              ?.valueString ?? 'Non renseigné'
+          document.serviceProvider = encounter?.serviceProvider?.display ?? 'Non renseigné'
         } else {
           document.serviceProvider = 'Non renseigné'
         }
