@@ -186,8 +186,8 @@ const Preview: React.FC<PreviewProps> = ({
           </Grid>
         </Grid> */}
 
-        <Grid container item justify="space-between" alignItems="center">
-          <Grid container item xs={12} sm={6} md={4} justify="center">
+        <Grid container item justifyContent="space-between" alignItems="center">
+          <Grid container item xs={12} sm={6} md={4} justifyContent="center">
             <Paper id="patient-number-card" className={classes.nbPatientsOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography id="patient-number-card-title" variant="h3" color="primary">
@@ -212,7 +212,7 @@ const Preview: React.FC<PreviewProps> = ({
         </Grid>
 
         <Grid container>
-          <Grid container item xs={12} sm={6} lg={4} justify="center">
+          <Grid container item xs={12} sm={6} lg={4} justifyContent="center">
             <Paper id="vital-repartition-card" className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography id="vital-repartition-card-title" variant="h3" color="primary">
@@ -230,7 +230,7 @@ const Preview: React.FC<PreviewProps> = ({
             </Paper>
           </Grid>
 
-          <Grid container item xs={12} sm={6} lg={4} justify="center">
+          <Grid container item xs={12} sm={6} lg={4} justifyContent="center">
             <Paper id="visit-type-repartition-card" className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography id="visit-type-repartition-card-title" variant="h3" color="primary">
@@ -248,7 +248,7 @@ const Preview: React.FC<PreviewProps> = ({
             </Paper>
           </Grid>
 
-          <Grid container item xs={12} sm={12} lg={4} justify="center">
+          <Grid container item xs={12} sm={12} lg={4} justifyContent="center">
             <Paper id="gender-repartition-card" className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
                 <Typography id="gender-repartition-card-title" variant="h3" color="primary">
@@ -266,8 +266,8 @@ const Preview: React.FC<PreviewProps> = ({
             </Paper>
           </Grid>
 
-          <Grid container item md={12} lg={6} justify="center">
-            <Grid container item justify="center">
+          <Grid container item md={12} lg={6} justifyContent="center">
+            <Grid container item justifyContent="center">
               <Paper id="age-structure-card" className={classes.chartOverlay}>
                 <Grid container item className={classes.chartTitle}>
                   <Typography id="age-structure-card-title" variant="h3" color="primary">
@@ -286,8 +286,8 @@ const Preview: React.FC<PreviewProps> = ({
             </Grid>
           </Grid>
 
-          <Grid container item md={12} lg={6} justify="center">
-            <Grid container item justify="center">
+          <Grid container item md={12} lg={6} justifyContent="center">
+            <Grid container item justifyContent="center">
               <Paper id="month-repartition-visit-card" className={classes.chartOverlay}>
                 <Grid container item className={classes.chartTitle}>
                   <Typography id="month-repartition-visit-card-title" variant="h3" color="primary">
