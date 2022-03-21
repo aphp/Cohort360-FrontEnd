@@ -5,29 +5,29 @@ class LoginLogout {
     
     get loginField () { return $('#identifiant') }
     get passwordField () { return $('#password') }
-    get submitButton () { return $('button[type="submit"]') }
+    get submitButton () { return $('#connection-button-submit') }
     
-    login (username, password) {
+    async login (username, password) {
         
-        if (username == null || password == null) {
+        if (await username == null || await password == null) {
             username = COHORT360_PARAMS.LOGIN
             password = COHORT360_PARAMS.PASSWORD
             console.log(`username est il appele 3 fois`, username)
             console.log(`password`, password)
         }
 
-        if (browser.getUrl() != COHORT360_PARAMS.URL)
-            browser.url(COHORT360_PARAMS.URL)
+        if (await browser.getUrl() != COHORT360_PARAMS.URL)
+            await browser.url(COHORT360_PARAMS.URL)
 
         /*if (browser.getUrl() != process.env.COHORT360_URL) {
             COHORT360_PARAMS.URL_TEST = process.env.COHORT360_URL
             browser.url(COHORT360_PARAMS.URL_TEST)
         }*/
 
-        if (this.loginField.isDisplayed() && this.passwordField.isDisplayed()) {
-            this.loginField.setValue(username)
-            this.passwordField.setValue(password)
-            this.submitButton.click()
+        if (await this.loginField.isDisplayed() && await this.passwordField.isDisplayed()) {
+            await this.loginField.setValue(username)
+            await this.passwordField.setValue(password)
+            await this.submitButton.click()
         }
     }
 
