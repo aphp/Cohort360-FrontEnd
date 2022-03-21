@@ -585,13 +585,13 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
     try {
       const patientState = getState().patient
 
-      // if (patientState && patientState.patientInfo && patientState.patientInfo.id === patientId) {
-      //   return {
-      //     patientInfo: patientState.patientInfo,
-      //     deidentified: patientState.deidentified,
-      //     hospits: patientState.hospits
-      //   }
-      // }
+      if (patientState && patientState.patientInfo && patientState.patientInfo.id === patientId) {
+        return {
+          patientInfo: patientState.patientInfo,
+          deidentified: patientState.deidentified,
+          hospits: patientState.hospits
+        }
+      }
 
       const fetchPatientResponse = await services.patients.fetchPatientInfo(patientId, groupId)
       if (fetchPatientResponse === undefined) return null
