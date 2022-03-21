@@ -585,13 +585,13 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
     try {
       const patientState = getState().patient
 
-      if (patientState && patientState.patientInfo && patientState.patientInfo.id === patientId) {
-        return {
-          patientInfo: patientState.patientInfo,
-          deidentified: patientState.deidentified,
-          hospits: patientState.hospits
-        }
-      }
+      // if (patientState && patientState.patientInfo && patientState.patientInfo.id === patientId) {
+      //   return {
+      //     patientInfo: patientState.patientInfo,
+      //     deidentified: patientState.deidentified,
+      //     hospits: patientState.hospits
+      //   }
+      // }
 
       const fetchPatientResponse = await services.patients.fetchPatientInfo(patientId, groupId)
       if (fetchPatientResponse === undefined) return null
@@ -600,16 +600,7 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
       let deidentifiedBoolean = true
 
       if (groupId) {
-        const perimeters = (await services.perimeters.fetchPerimetersInfos(groupId)) ?? {}
-        deidentifiedBoolean =
-          perimeters && perimeters.cohort && Array.isArray(perimeters.cohort)
-            ? perimeters.cohort.some((perimeter: any) =>
-                perimeter.extension?.some(
-                  (extension: any) =>
-                    extension.url === 'READ_ACCESS' && extension.valueString === 'DATA_PSEUDOANONYMISED'
-                )
-              )
-            : true
+        deidentifiedBoolean = (await services.patients.fetchRights(groupId)) ?? {}
       } else {
         const perimeters = await services.perimeters.getPerimeters()
         deidentifiedBoolean = perimeters.some((perimeter) =>
