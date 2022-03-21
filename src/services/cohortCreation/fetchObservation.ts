@@ -1,6 +1,6 @@
 import { BIOLOGY_HIERARCHY_ITM_ANABIO, BIOLOGY_HIERARCHY_ITM_LOINC, CONTEXT } from '../../constants'
 import apiRequest from '../apiRequest'
-import { codeSort, displaySort } from 'utils/alphabeticalSort'
+import { displaySort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) => {

@@ -10,13 +10,25 @@ class PatientContextBar {
     get nbPatientsLibValue () { return 'Nb de patients :' }
     get accessLibValue () { return 'Accès :' }
 
-    get title () { return this.contextBar.$('#cohort-name') }
-    get nbPatients () { return this.contextBar.$('#cohort-patient-number') }
-    get nbPatientsLib () { return this.nbPatients.getText().substring(0, this.nbPatients.getText().indexOf(':') + 1).trim() }
-    get nbPatientsValue () { return this.nbPatients.getText().substring(this.nbPatients.getText().indexOf(':') + 1).trim() }
-    get access () { return this.contextBar.$('#cohort-access-type') }
-    get accessLib () { return this.access.getText().substring(0, this.access.getText().indexOf(':') + 1).trim() }
-    get accessValue () { return this.access.getText().substring(this.access.getText().indexOf(':') + 1).trim() }
+    get title () { return $('#cohort-name') }
+    get nbPatients () { return $('#cohort-patient-number') }
+    get access () { return $('#cohort-access-type') }
+
+    async nbPatientsLib () {
+        return (await this.nbPatients.getText()).substring(0, (await this.nbPatients.getText()).indexOf(':') + 1).trim()
+    }
+
+    async nbPatientsValue () {
+        return (await this.nbPatients.getText()).substring((await this.nbPatients.getText()).indexOf(':') + 1).trim()
+    }
+
+    async accessLib () {
+        return (await this.access.getText()).substring(0, (await this.access.getText()).indexOf(':') + 1).trim() 
+    }
+
+    async accessValue () {
+        return (await this.access.getText()).substring((await this.access.getText()).indexOf(':') + 1).trim()
+    }
 }
 
 module.exports = new PatientContextBar()

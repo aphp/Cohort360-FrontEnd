@@ -44,11 +44,11 @@ module.exports = class List {
 
     CURRENT_LINE_BLOCK = null
 
-    get currentLineBlock () {
-        if (this.LINE_NUMBER > this.ALL_LINE_BLOCKS.length)
+    async currentLineBlock () {
+        if (this.LINE_NUMBER > await this.ALL_LINE_BLOCKS.length)
             return null
         
-        return this.ALL_LINE_BLOCKS[this.LINE_NUMBER]
+        return await this.ALL_LINE_BLOCKS[this.LINE_NUMBER]
     }
 
     setCurrentLine (pLineNumber) { this.LINE_NUMBER = pLineNumber }

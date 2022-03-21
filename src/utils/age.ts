@@ -13,29 +13,25 @@ export const getAgeArkhn = (birthDate: Date, deathOrTodayDate = new Date()) => {
 }
 
 export const getAgeAphp = (ageObj: any) => {
-  if (ageObj.valueInteger) {
-    let ageUnit: 'year' | 'month' | 'day' = 'year'
-    let ageUnitDisplay = ''
-    const momentAge = moment().subtract(ageObj.valueInteger, 'days')
-    const today = moment()
+  let ageUnit: 'year' | 'month' | 'day' = 'year'
+  let ageUnitDisplay = ''
+  const momentAge = moment().subtract(ageObj.valueInteger, 'days')
+  const today = moment()
 
-    if (today.diff(momentAge, 'year') > 0) {
-      ageUnit = 'year'
-      ageUnitDisplay = 'ans'
-    } else if (today.diff(momentAge, 'month') > 0) {
-      ageUnit = 'month'
-      ageUnitDisplay = 'mois'
-    } else if (today.diff(momentAge, 'day') > 0) {
-      ageUnit = 'day'
-      ageUnitDisplay = 'jours'
-    } else {
-      return 'Âge inconnu'
-    }
-
-    return `${today.diff(momentAge, ageUnit)} ${ageUnitDisplay}`
+  if (today.diff(momentAge, 'year') > 0) {
+    ageUnit = 'year'
+    ageUnitDisplay = 'ans'
+  } else if (today.diff(momentAge, 'month') > 0) {
+    ageUnit = 'month'
+    ageUnitDisplay = 'mois'
+  } else if (today.diff(momentAge, 'day') >= 0) {
+    ageUnit = 'day'
+    ageUnitDisplay = 'jours'
   } else {
     return 'Âge inconnu'
   }
+
+  return `${today.diff(momentAge, ageUnit)} ${ageUnitDisplay}`
 }
 
 export const getAge = (patient: CohortPatient): string => {

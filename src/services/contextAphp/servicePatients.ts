@@ -20,6 +20,7 @@ import {
   IObservation
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
+  fetchGroup,
   fetchPatient,
   fetchEncounter,
   fetchClaim,
@@ -30,6 +31,9 @@ import {
   fetchMedicationAdministration,
   fetchObservation
 } from './callApi'
+
+import servicesPerimeters from './servicePerimeters'
+import servicesCohorts from './serviceCohorts'
 
 export interface IServicePatients {
   /*
@@ -265,6 +269,17 @@ export interface IServicePatients {
     patientList: IPatient[]
     totalPatients: number
   }>
+
+  /**
+   * Retourne le droit de la vue d'un patient
+   *
+   * Arguments:
+   *   - groupId: (optionnel) Périmètre auquel le patient est lié
+   *
+   * Retour :
+   *   - Retourne true si les droits de vision sont en pseudo / false si c'est en nomi
+   */
+  fetchRights: (groupId: string) => Promise<boolean>
 }
 
 const servicesPatients: IServicePatients = {
@@ -648,6 +663,33 @@ const servicesPatients: IServicePatients = {
     return {
       patientList: patientList ?? [],
       totalPatients: totalPatients ?? 0
+    }
+  },
+
+  fetchRights: async (groupId) => {
+    const groups = await fetchGroup({ _id: groupId })
+    const groupsData = getApiResponseResources(groups)
+
+    if (!groupsData) return false
+
+    const isPerimeter = groupsData.some((group) => group.managingEntity?.display?.search('Organization/') !== -1)
+
+    if (isPerimeter) {
+      const perimeterRights = await servicesPerimeters.fetchPerimetersRights(groupsData)
+      return perimeterRights.some((perimeterRight) =>
+        perimeterRight.extension?.some(
+          ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
+        )
+      )
+    } else {
+      const cohortRights = await servicesCohorts.fetchCohortsRights(
+        groupsData.map((groupData) => ({ fhir_group_id: groupData.id ?? '' }))
+      )
+      return cohortRights.some((cohortRight) =>
+        cohortRight.extension?.some(
+          ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
+        )
+      )
     }
   }
 }

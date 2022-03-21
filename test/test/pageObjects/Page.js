@@ -11,7 +11,7 @@ module.exports = class Page {
     
     async login (username, password) {
         try {
-            LoginLogout.login(username, password)
+            await LoginLogout.login(username, password)
             await browser.waitUntil(() => browser.getUrl() === (this.baseURL + COHORT360_PARAMS.HOME_PAGE_PATH), { timeout: 3000 })
         }
         catch (error) {
