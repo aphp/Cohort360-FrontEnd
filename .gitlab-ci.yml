@@ -25,7 +25,7 @@ test-job: # This job runs in the test stage.
     - sleep 30 # Wait until application is started
     - npm run test
   cache:
-    key: $CI_COMMIT_REF_SLUG
+    key: cohort360_nodemodules_cache
     paths:
       - node_modules/
 
@@ -43,7 +43,7 @@ build-job:
     - if: '$CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "main"'
       when: on_success
   cache:
-    key: $CI_COMMIT_REF_SLUG
+    key: cohort360_nodemodules_cache
     paths:
       - node_modules/
 
