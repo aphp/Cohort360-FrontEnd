@@ -87,7 +87,7 @@ const BarChart: React.FC<BarChartProps> = memo(({ data, height = 250, width = 30
     svg.append('g').call(yAxis)
   }, [node, data, height, width])
 
-  return <svg ref={node}></svg>
+  return <svg id="gender-repartition-card-svg" ref={node}></svg>
 })
 
 export default BarChart

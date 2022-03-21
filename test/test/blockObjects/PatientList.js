@@ -39,9 +39,9 @@ class PatientList extends List {
             return $$(this.blockSelectorValue + ' > div')[1] 
         return null    
     }
-    get listBlock () { 
-        if (browser.getUrl().indexOf(COHORT360_PARAMS.PATIENT_DATAS_PAGE_PATH) != -1 || browser.getUrl().indexOf(COHORT360_PARAMS.EXPLORE_PERIMETER_PATIENT_DATAS_PAGE_PATH) != -1)
-            return $$(this.blockSelectorValue + ' > div')[2] 
+    async listBlock () { 
+        if ((await browser.getUrl()).indexOf(COHORT360_PARAMS.PATIENT_DATAS_PAGE_PATH) != -1 || (await browser.getUrl()).indexOf(COHORT360_PARAMS.EXPLORE_PERIMETER_PATIENT_DATAS_PAGE_PATH) != -1)
+            return await $$( this.blockSelectorValue + ' > div')[2] 
         if (browser.getUrl().indexOf(COHORT360_PARAMS.SEARCH_PATIENT_PAGE_PATH) != -1)
             return $('div.MuiPaper-root:nth-child(3)') 
         return null
@@ -82,21 +82,21 @@ class PatientList extends List {
     get headerPatientTechIdOrIPP () { return this.header.$('th.MuiTableCell-root:nth-child(7)') }
     get headerDisplayed () { return '| ' + this.headerGender.getText() + ' | ' + this.headerFirstName.getText() + ' | ' + this.headerLastName.getText() + ' | ' + this.headerAgeOrBirthDate.getText() + ' | ' + this.headerLastCareLocation.getText() + ' | ' + this.headerVitalStatus.getText() + ' | ' + this.headerPatientTechIdOrIPP.getText() + ' |' }
 
-    get allLineBlocks () {
-        if (super.allLineBlocks == null) {
+    async  allLineBlocks () {
+        if (await super.allLineBlocks == null) {
             try {
-                browser.waitUntil(() => this.listBlock.$$('table')[0].$$('tbody')[0].$$('tr')[super.maxLine - 1] != null) 
+                await this.listBlock.$$('table')[0].$$('tbody')[0].$$('tr')[super.maxLine - 1] != null
             }
             catch (error) {
-                browser.waitUntil(() => this.listBlock.$$('table')[0].$$('tbody')[0].$$('tr') != null && this.listBlock.$$('table')[0].$$('tbody')[0].$$('tr').length != 0) 
+                await this.listBlock.$$('table')[0].$$('tbody')[0].$$('tr') != null && this.listBlock.$$('table')[0].$$('tbody')[0].$$('tr').length != 0
             }
-            super.allLineBlocks = this.listBlock.$$('table')[0].$$('tbody')[0].$$('tr')
+            super.allLineBlocks = await this.listBlock.$$('table')[0].$$('tbody')[0].$$('tr')
         }
-        return super.allLineBlocks
+        return await super.allLineBlocks
     }
 
     get currentLine () {
-        return super.currentLineBlock
+        return super.currentLineBlock()
     }
 
     get currentLineGender () { return this.currentLine.$('td:nth-child(1) > svg:nth-child(1) > path:nth-child(1)') }

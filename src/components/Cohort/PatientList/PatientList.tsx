@@ -327,7 +327,7 @@ const PatientList: React.FC<PatientListProps> = ({
             </Paper>
           </Grid>
         </Grid>
-        <Grid container item justifyContent="flex-end" className={classes.tableGrid}>
+        <Grid id="patient-data-grid" container item justifyContent="flex-end" className={classes.tableGrid}>
           <Grid container justifyContent="space-between" alignItems="center">
             <Typography variant="button">
               {displayDigit(totalPatients)} / {displayDigit(total)} patient(s)

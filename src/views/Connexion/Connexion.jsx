@@ -243,7 +243,14 @@ const Login = () => {
                   </Link>
                 </Typography>
 
-                <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                  id="connection-button-submit"
+                >
                   {loading ? <CircularProgress /> : 'Connexion'}
                 </Button>
               </Grid>
