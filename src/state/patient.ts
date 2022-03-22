@@ -1036,7 +1036,7 @@ function linkElementWithEncounter<
   })[] = []
 
   for (const entry of elementEntries) {
-    const newElement = entry as T & {
+    let newElement = entry as T & {
       serviceProvider?: string
       NDA?: string
       documents?: any[]
@@ -1065,29 +1065,68 @@ function linkElementWithEncounter<
         encounterId = (entry as IObservation).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
     }
-    const foundEncounter = encounterList.find(({ id }) => id === encounterId) || {}
 
-    if (foundEncounter) {
-      newElement.serviceProvider = foundEncounter?.serviceProvider?.display ?? 'Non renseigné'
+    const foundEncounter = encounterList.find(({ id }) => id === encounterId) || null
+    const foundEncounterWithDetails =
+      // @ts-ignore
+      encounterList.find(({ details }) => details?.find(({ id }) => id === encounterId)) || null
 
-      newElement.NDA = foundEncounter?.id ?? 'Inconnu'
-
-      if (!deidentifiedBoolean && foundEncounter?.identifier) {
-        const nda = foundEncounter.identifier.find((identifier: IIdentifier) => {
-          return identifier.type?.coding?.[0].code === 'NDA'
-        })
-        if (nda) {
-          newElement.NDA = nda.value
-        }
-      }
-
-      if (entry.resourceType !== 'Composition' && foundEncounter?.documents && foundEncounter.documents.length > 0) {
-        newElement.documents = foundEncounter.documents
-      }
-    }
+    newElement = fillElementInformation(
+      deidentifiedBoolean,
+      newElement,
+      foundEncounterWithDetails ?? foundEncounter,
+      encounterId,
+      newElement.resourceType
+    )
 
     elementList = [...elementList, newElement]
   }
 
   return elementList
+}
+
+function fillElementInformation<
+  T extends
+    | IProcedure
+    | ICondition
+    | IClaim
+    | IComposition
+    | IMedicationRequest
+    | IMedicationAdministration
+    | IObservation
+>(deidentifiedBoolean: boolean, element: T, encounter: any, encounterId: string, resourceType: string) {
+  const newElement = element as T & {
+    serviceProvider?: string
+    NDA?: string
+    documents?: any[]
+  }
+
+  const encounterIsDetailed = encounter?.id !== encounterId
+
+  if (!encounterIsDetailed) {
+    newElement.serviceProvider = encounter?.serviceProvider?.display ?? 'Non renseigné'
+  } else {
+    // @ts-ignore
+    const foundEncounterDetail = encounter?.details?.find(({ id }) => id === encounterId)
+    newElement.serviceProvider = `${encounter?.serviceProvider?.display} > ${
+      foundEncounterDetail?.serviceProvider?.display ?? 'Non renseigné'
+    }`.replace('undefined > ', '')
+  }
+
+  newElement.NDA = encounter?.id ?? 'Inconnu'
+
+  if (!deidentifiedBoolean && encounter?.identifier) {
+    const nda = encounter.identifier.find((identifier: IIdentifier) => {
+      return identifier.type?.coding?.[0].code === 'NDA'
+    })
+    if (nda) {
+      newElement.NDA = nda?.value ?? 'Inconnu'
+    }
+  }
+
+  if (resourceType !== 'Composition' && encounter?.documents && encounter.documents.length > 0) {
+    newElement.documents = encounter.documents
+  }
+
+  return newElement
 }

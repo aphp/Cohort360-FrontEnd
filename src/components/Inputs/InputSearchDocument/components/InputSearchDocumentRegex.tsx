@@ -76,7 +76,7 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
                 open={tooltip}
                 title={
                   <>
-                    <Typography>Une Expression régulière permet de faire des recherches complexes.</Typography>
+                    <Typography>Une expression régulière permet de faire des recherches complexes.</Typography>
                     <Typography>
                       Vous pouvez les tester ici : https://regex101.com/ avec la configuration FLAVOR = 'Java 8'
                     </Typography>

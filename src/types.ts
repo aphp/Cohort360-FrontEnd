@@ -52,6 +52,7 @@ export type CohortComposition = IComposition & {
 
 export type CohortEncounter = IEncounter & {
   documents?: CohortComposition[]
+  details?: IEncounter[]
 }
 
 export type CohortPatient = IPatient & {
