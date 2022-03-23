@@ -46,6 +46,7 @@ build-job:
     key: cohort360_nodemodules_cache
     paths:
       - node_modules/
+    policy: pull
 
 deploy-job:
   image: gcr.io/kaniko-project/executor:debug
