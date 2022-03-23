@@ -20,7 +20,6 @@ import {
   deleteCriteriaGroup,
   buildCohortCreation
 } from 'state/cohortCreation'
-import { setSelectedRequest } from 'state/request'
 
 import useStyle from './styles'
 
@@ -154,7 +153,6 @@ const ControlPanel: React.FC<{
 
           <Button
             onClick={() => {
-              dispatch<any>(setSelectedRequest({ uuid: '', name: '' }))
               dispatch<any>(resetCohortCreation())
             }}
             className={classes.actionButton}
