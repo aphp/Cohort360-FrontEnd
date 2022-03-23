@@ -182,7 +182,7 @@ const Requeteur = () => {
     _fetchRequest()
   }, [_fetchRequest])
 
-  if (loading || criteriaLoading || requestLoading || (requestIdFromUrl && requestId !== requestIdFromUrl)) {
+  if (loading || criteriaLoading || requestLoading || (!!requestIdFromUrl && requestId !== requestIdFromUrl)) {
     return (
       <Grid className={classes.grid} container justifyContent="center" alignItems="center">
         <CircularProgress />
