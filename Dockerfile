@@ -6,4 +6,5 @@ COPY src src
 COPY public public
 COPY build build
 
-RUN apt-get update -y && apt-get install -y curl nginx
+ENV http_proxy="http://proxym-inter.aphp.fr:8080"
+RUN apt-get update -y && apt-get install -y curl
