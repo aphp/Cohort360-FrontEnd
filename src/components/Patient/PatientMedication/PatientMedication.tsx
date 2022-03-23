@@ -374,9 +374,9 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
                 </TableCell>
                 <TableCell align="center" className={classes.tableHeadCell}>
                   <TableSortLabel
-                    active={sort.by === 'class'}
-                    direction={sort.by === 'class' ? sort.direction : 'asc'}
-                    onClick={handleSort('class')}
+                    active={sort.by === 'class-simple'}
+                    direction={sort.by === 'class-simple' ? sort.direction : 'asc'}
+                    onClick={handleSort('class-simple')}
                   >
                     Code ATC
                   </TableSortLabel>
