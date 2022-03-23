@@ -93,17 +93,7 @@ const Login = () => {
   const [open, setOpen] = useState(false)
 
   React.useEffect(() => {
-    localforage
-      .setItem('persist:root', '')
-      .then(function (data) {
-        // Run this code once the database has been entirely deleted.
-        // console.log('Database is now empty.')
-        console.log('data :>> ', data)
-      })
-      .catch(function (err) {
-        // This code runs if there were any errors
-        console.log(err)
-      })
+    localforage.setItem('persist:root', '')
   }, [])
 
   const getPractitionerData = async (practitioner, lastConnection) => {

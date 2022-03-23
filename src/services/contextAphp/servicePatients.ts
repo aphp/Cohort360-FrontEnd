@@ -1,5 +1,12 @@
 import { AxiosResponse } from 'axios'
-import { CohortData, FHIR_API_Response, CohortEncounter, SearchByTypes, MedicationEntry } from 'types'
+import {
+  CohortData,
+  FHIR_API_Response,
+  CohortEncounter,
+  CohortComposition,
+  SearchByTypes,
+  MedicationEntry
+} from 'types'
 import {
   getGenderRepartitionMapAphp,
   getEncounterRepartitionMapAphp,
@@ -598,12 +605,19 @@ const servicesPatients: IServicePatients = {
   },
 
   fetchPatientInfo: async (patientId, groupId) => {
-    const [patientResponse, encounterResponse] = await Promise.all([
+    const [patientResponse, encounterResponse, encounterDetailResponse] = await Promise.all([
       fetchPatient({ _id: patientId, _list: groupId ? [groupId] : [] }),
       fetchEncounter({
         patient: patientId,
         type: 'VISIT',
         status: ['arrived', 'triaged', 'in-progress', 'onleave', 'finished', 'unknown'],
+        _sort: 'start-date',
+        sortDirection: 'desc',
+        _list: groupId ? [groupId] : []
+      }),
+      fetchEncounter({
+        patient: patientId,
+        'type:not': 'VISIT',
         _sort: 'start-date',
         sortDirection: 'desc',
         _list: groupId ? [groupId] : []
@@ -615,7 +629,9 @@ const servicesPatients: IServicePatients = {
     const patientData = patientDataList[0]
 
     const encounters: IEncounter[] = getApiResponseResources(encounterResponse) || []
-    const hospits = await getEncounterDocuments(encounters, groupId)
+    const encountersDetail: IEncounter[] = getApiResponseResources(encounterDetailResponse) || []
+
+    const hospits = await getEncounterDocuments(encounters, encountersDetail, groupId)
 
     const patientInfo = {
       ...patientData,
@@ -696,49 +712,57 @@ const servicesPatients: IServicePatients = {
 
 export default servicesPatients
 
-export const getEncounterDocuments = async (encounters?: CohortEncounter[], groupId?: string) => {
+export const getEncounterDocuments = async (
+  encounters?: CohortEncounter[],
+  encountersDetail?: CohortEncounter[],
+  groupId?: string
+) => {
   if (!encounters) return undefined
   if (encounters.length === 0) return encounters
 
   const _encounters = encounters
-
-  const encountersList: any[] = []
+  const encountersIdList: any[] = []
 
   _encounters.forEach((encounter) => {
     encounter.documents = []
-    encountersList.push(encounter.id)
+    encountersIdList.push(encounter.id)
   })
 
   const documentsResp = await fetchComposition({
-    encounter: encountersList.join(','),
+    encounter: encountersIdList.join(','),
     _elements: ['status', 'type', 'subject', 'encounter', 'date', 'title'],
     status: 'final',
     _list: groupId ? groupId.split(',') : []
   })
 
-  const documents: any[] | undefined =
-    documentsResp.data.resourceType === 'Bundle' ? getApiResponseResources(documentsResp) : undefined
-  if (!documents) return _encounters
+  const documents: CohortComposition[] = getApiResponseResources(documentsResp) ?? []
 
-  for (const document of documents) {
-    const encounterIndex = _encounters.findIndex((encounter) => encounter.id === document.encounter?.display?.slice(10))
-    if (encounterIndex === -1) continue
+  for (const encounter of _encounters) {
+    const currentDocuments = documents?.filter(
+      (document) => encounter.id === document.encounter?.display?.replace('Encounter/', '')
+    )
+    const currentDetails = encountersDetail?.filter(
+      (encounterDetail) => encounter.id === encounterDetail?.partOf?.reference?.replace('Encounter/', '')
+    )
 
-    const foundEncounter = _encounters[encounterIndex]
-    document.serviceProvider = foundEncounter?.serviceProvider?.display ?? 'Non renseigné'
+    encounter.documents = currentDocuments
+    encounter.details = currentDetails
 
-    document.NDA = foundEncounter.id ?? 'Inconnu'
+    if (!currentDocuments || (currentDocuments && currentDocuments.length === 0)) continue
 
-    if (foundEncounter.identifier) {
-      const nda = foundEncounter.identifier.find((identifier: IIdentifier) => {
-        return identifier.type?.coding?.[0].code === 'NDA'
-      })
-      if (nda) {
-        document.NDA = nda?.value
+    for (const currentDocument of currentDocuments) {
+      currentDocument.serviceProvider = encounter?.serviceProvider?.display ?? 'Non renseigné'
+
+      currentDocument.NDA = encounter.id ?? 'Inconnu'
+      if (encounter.identifier) {
+        const nda = encounter.identifier.find((identifier: IIdentifier) => {
+          return identifier.type?.coding?.[0].code === 'NDA'
+        })
+        if (nda) {
+          currentDocument.NDA = nda?.value
+        }
       }
     }
-
-    _encounters[encounterIndex].documents?.push(document)
   }
 
   return _encounters

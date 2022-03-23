@@ -171,6 +171,7 @@ type fetchEncounterProps = {
   _id?: string
   _list?: string[]
   type?: string
+  'type:not'?: string
   size?: number
   offset?: number
   _sort?: string
@@ -184,6 +185,7 @@ export const fetchEncounter = async (args: fetchEncounterProps) => {
   const { _id, size, offset, _sort, sortDirection, patient, type } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list, _elements, status, facet } = args
+  const typeNot = args['type:not']
 
   _list = _list ? _list.filter(uniq) : []
   status = status ? status.filter(uniq) : []
@@ -197,6 +199,7 @@ export const fetchEncounter = async (args: fetchEncounterProps) => {
   if (_sort)                                       options = [...options, `_sort=${_sortDirection}${_sort},id`]                                 // eslint-disable-line
   if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
   if (type)                                        options = [...options, `type=${type}`]                                                       // eslint-disable-line
+  if (typeNot)                                     options = [...options, `type:not=${typeNot}`]                                                // eslint-disable-line
 
   if (_list && _list.length > 0)                   options = [...options, `_list=${_list.reduce(reducer)}`]                                     // eslint-disable-line
   if (status && status.length > 0)                 options = [...options, `status=${status.reduce(reducer)}`]                                   // eslint-disable-line
