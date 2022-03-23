@@ -560,7 +560,7 @@ const cohortCreationSlice = createSlice({
       countLoading: false
     }))
     // fetchRequestCohortCreation
-    builder.addCase(fetchRequestCohortCreation.pending, (state) => ({ ...state }))
+    builder.addCase(fetchRequestCohortCreation.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(fetchRequestCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload

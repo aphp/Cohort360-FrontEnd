@@ -239,7 +239,7 @@ const ControlPanel: React.FC<{
         {(status === 'failed' || status === 'error') && (
           <Alert className={classes.errorAlert} severity="error">
             Une erreur est survenue lors du calcul du nombre de patients de votre requête. <br />
-            {jobFailMsg}
+            <Typography style={{ wordBreak: 'break-all' }}>{jobFailMsg}</Typography>
             <Button
               onClick={() => _relaunchCount(false)}
               variant="outlined"

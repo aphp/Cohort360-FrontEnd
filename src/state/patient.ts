@@ -1108,9 +1108,7 @@ function fillElementInformation<
   } else {
     // @ts-ignore
     const foundEncounterDetail = encounter?.details?.find(({ id }) => id === encounterId)
-    newElement.serviceProvider = `${encounter?.serviceProvider?.display} > ${
-      foundEncounterDetail?.serviceProvider?.display ?? 'Non renseigné'
-    }`.replace('undefined > ', '')
+    newElement.serviceProvider = foundEncounterDetail?.serviceProvider?.display ?? 'Non renseigné'
   }
 
   newElement.NDA = encounter?.id ?? 'Inconnu'
