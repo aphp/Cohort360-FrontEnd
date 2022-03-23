@@ -55,7 +55,6 @@ deploy-job:
     - job: build-job
       artifacts: true
   script:
-    - apt update -y && apt install -y curl nginx
     - export VERSION=$(cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"harbor.eds.aphp.fr\":{\"username\":\"${BOT_NAME}\",\"password\":\"${BOT_TOKEN}\"}}}" > /kaniko/.docker/config.json
