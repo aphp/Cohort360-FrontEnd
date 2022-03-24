@@ -42,4 +42,6 @@ sed -i "s@{ODD_CONTACT}@$ODD_CONTACT@g" /app/build/static/js/*.js
 
 cat /etc/nginx/conf.d/nginx.conf
 
+printenv
+
 nginx -g "daemon off;"
