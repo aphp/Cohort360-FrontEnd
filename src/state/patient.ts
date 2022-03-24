@@ -740,7 +740,46 @@ const patientSlice = createSlice({
             pmsi: action.payload.pmsi
           }
     )
-    builder.addCase(fetchLastPmsiInfo.rejected, () => null)
+    builder.addCase(fetchLastPmsiInfo.rejected, (state) => ({
+      ...state,
+      loading: false,
+      patientInfo: state?.patientInfo
+        ? {
+            ...state?.patientInfo,
+            lastGhm: undefined,
+            lastProcedure: undefined,
+            mainDiagnosis: undefined
+          }
+        : {
+            resourceType: 'Patient',
+            lastGhm: undefined,
+            lastProcedure: undefined,
+            mainDiagnosis: undefined
+          },
+      pmsi: {
+        ccam: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        },
+        diagnostics: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        },
+        ghm: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        }
+      }
+    }))
     builder.addCase(fetchAllProcedures.pending, (state) =>
       state === null
         ? null

@@ -599,6 +599,14 @@ export async function unbuildRequest(_json: string) {
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
 
+  if (!_json) {
+    return {
+      population: null,
+      criteria: [],
+      criteriaGroup: []
+    }
+  }
+
   const json = JSON.parse(_json)
   const {
     sourcePopulation: { caresiteCohortList },
