@@ -274,7 +274,10 @@ const setFavoriteCohort = createAsyncThunk<SetFavoriteCohortReturn, SetFavoriteC
     const foundItem = cohortsList.find(({ uuid }) => uuid === newFavCohort.uuid)
     const index = foundItem ? cohortsList.indexOf(foundItem) : -1
     if (index !== -1) {
-      cohortsList[index] = newFavCohort
+      cohortsList[index] = {
+        ...cohortsList[index],
+        favorite: newFavCohort.favorite
+      }
     }
 
     return {
