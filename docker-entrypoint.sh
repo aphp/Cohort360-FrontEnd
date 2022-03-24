@@ -40,4 +40,6 @@ sed -i "s@{ODD_OBSERVATION}@$ODD_OBSERVATION@g" /app/build/static/js/*.js
 sed -i "s@{ODD_MEDICATION}@$ODD_MEDICATION@g" /app/build/static/js/*.js
 sed -i "s@{ODD_CONTACT}@$ODD_CONTACT@g" /app/build/static/js/*.js
 
+cat /etc/nginx/conf.d/nginx.conf
+
 nginx -g "daemon off;"
