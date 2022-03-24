@@ -16,7 +16,7 @@ RUN apt-get update -y && apt-get install -y curl
 COPY docker/nginx.conf /etc/nginx/conf.d/
 
 # Entrypoint script is used to replace environment variables
-COPY ./docker-entrypoint.sh /
+COPY ./docker-entrypoint.sh /app
 RUN chmod +x docker-entrypoint.sh
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
