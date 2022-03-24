@@ -33,7 +33,10 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBo
   const mainDiagnosis = patient.mainDiagnosis
     ? patient.mainDiagnosis === 'loading'
       ? 'loading'
-      : patient.mainDiagnosis.slice(0, 3).map((diag: any) => diag.code?.coding?.[0].display)
+      : patient.mainDiagnosis
+          .slice(0, 3)
+          .map((diag: any) => diag.code?.coding?.[0].display)
+          .join(' - ')
     : 'Pas de diagnostic principal'
 
   const lastEncounter =

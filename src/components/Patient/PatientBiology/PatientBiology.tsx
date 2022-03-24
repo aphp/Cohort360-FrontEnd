@@ -105,25 +105,11 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     _fetchBiology(value ? value : 1, searchInput)
   }
 
-  const handleChangeFilter = (
-    filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate',
-    value: any,
-    item?: any
-  ) => {
+  const handleChangeFilter = (filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate', value: any) => {
     switch (filterName) {
       case 'nda':
       case 'loinc':
       case 'anabio':
-        if (item) {
-          const _filterArray = filters[filterName].split(',')
-          const itemToDelete = _filterArray.indexOf(item)
-          _filterArray.splice(itemToDelete, 1)
-
-          setFilters((prevState) => ({ ...prevState, [filterName]: _filterArray.join() }))
-        } else {
-          setFilters((prevState) => ({ ...prevState, [filterName]: value }))
-        }
-        break
       case 'startDate':
       case 'endDate':
         setFilters((prevState) => ({ ...prevState, [filterName]: value }))
@@ -159,9 +145,9 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
       <Grid container item style={{ marginBottom: 8 }}>
         <Alert severity="warning">
-          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes d'analyse les plus utilisées du
-          référentiel. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS V9
-          ou supérieur qui ont été créés et mises à jours depuis mars 2020.
+          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondant aux analyses les
+          plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses
+          quantitatives enregistrées sur GLIMS, qui ont été validés et mis à jour depuis mars 2020.
         </Alert>
       </Grid>
 
@@ -215,44 +201,62 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
 
       <Grid>
         {filters.nda !== '' &&
-          filters.nda
-            .split(',')
-            .map((nda) => (
-              <Chip
-                className={classes.chips}
-                key={nda}
-                label={nda}
-                onDelete={() => handleChangeFilter('nda', null, nda)}
-                color="primary"
-                variant="outlined"
-              />
-            ))}
+          filters.nda.split(',').map((nda) => (
+            <Chip
+              className={classes.chips}
+              key={nda}
+              label={`NDA: ${nda}`}
+              onDelete={() =>
+                handleChangeFilter(
+                  'nda',
+                  filters.nda
+                    .split(',')
+                    .filter((value) => value !== nda)
+                    .join()
+                )
+              }
+              color="primary"
+              variant="outlined"
+            />
+          ))}
         {filters.loinc !== '' &&
-          filters.loinc
-            .split(',')
-            .map((loinc) => (
-              <Chip
-                className={classes.chips}
-                key={`Code LOINC: ${loinc}`}
-                label={loinc}
-                onDelete={() => handleChangeFilter('loinc', null, loinc)}
-                color="primary"
-                variant="outlined"
-              />
-            ))}
+          filters.loinc.split(',').map((loinc) => (
+            <Chip
+              className={classes.chips}
+              key={loinc}
+              label={`Code LOINC: ${loinc.toLocaleUpperCase()}`}
+              onDelete={() =>
+                handleChangeFilter(
+                  'loinc',
+                  filters.loinc
+                    .split(',')
+                    .filter((value) => value !== loinc)
+                    .join()
+                )
+              }
+              color="primary"
+              variant="outlined"
+            />
+          ))}
         {filters.anabio !== '' &&
-          filters.anabio
-            .split(',')
-            .map((anabio) => (
-              <Chip
-                className={classes.chips}
-                key={`Code ANABIO: ${anabio}`}
-                label={anabio}
-                onDelete={() => handleChangeFilter('anabio', null, anabio)}
-                color="primary"
-                variant="outlined"
-              />
-            ))}
+          filters.anabio.split(',').map((anabio) => (
+            <Chip
+              className={classes.chips}
+              label={`Code ANABIO: ${anabio.toLocaleUpperCase()}`}
+              key={anabio}
+              onDelete={() =>
+                handleChangeFilter(
+                  'anabio',
+                  filters.anabio
+                    .split(',')
+                    .filter((value) => value !== anabio)
+                    .join()
+                )
+              }
+              color="primary"
+              variant="outlined"
+            />
+          ))}
         {filters.startDate && (
           <Chip
             className={classes.chips}

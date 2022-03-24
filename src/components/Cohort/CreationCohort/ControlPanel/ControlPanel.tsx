@@ -20,7 +20,6 @@ import {
   deleteCriteriaGroup,
   buildCohortCreation
 } from 'state/cohortCreation'
-import { setSelectedRequest } from 'state/request'
 
 import useStyle from './styles'
 
@@ -154,7 +153,6 @@ const ControlPanel: React.FC<{
 
           <Button
             onClick={() => {
-              dispatch<any>(setSelectedRequest({ uuid: '', name: '' }))
               dispatch<any>(resetCohortCreation())
             }}
             className={classes.actionButton}
@@ -239,7 +237,7 @@ const ControlPanel: React.FC<{
         {(status === 'failed' || status === 'error') && (
           <Alert className={classes.errorAlert} severity="error">
             Une erreur est survenue lors du calcul du nombre de patients de votre requête. <br />
-            {jobFailMsg}
+            <Typography style={{ wordBreak: 'break-all' }}>{jobFailMsg}</Typography>
             <Button
               onClick={() => _relaunchCount(false)}
               variant="outlined"

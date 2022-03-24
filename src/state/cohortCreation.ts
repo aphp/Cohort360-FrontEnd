@@ -302,7 +302,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
   async ({ newCurrentSnapshot }, { getState, dispatch }) => {
     try {
       const state = getState()
-      const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot.json)
+      const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot?.json)
 
       const dated_measures = newCurrentSnapshot.dated_measures ? newCurrentSnapshot.dated_measures[0] : null
       const countId = dated_measures ? dated_measures.uuid : null
@@ -560,7 +560,7 @@ const cohortCreationSlice = createSlice({
       countLoading: false
     }))
     // fetchRequestCohortCreation
-    builder.addCase(fetchRequestCohortCreation.pending, (state) => ({ ...state }))
+    builder.addCase(fetchRequestCohortCreation.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(fetchRequestCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload
