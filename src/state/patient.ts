@@ -1145,17 +1145,16 @@ function fillElementInformation<
   if (!encounterIsDetailed) {
     newElement.serviceProvider = encounter?.serviceProvider?.display ?? 'Non renseigné'
   } else {
-    // @ts-ignore
-    const foundEncounterDetail = encounter?.details?.find(({ id }) => id === encounterId)
+    const foundEncounterDetail =
+      // @ts-ignore
+      encounter?.details?.find(({ id }) => id === encounterId) ?? encounter
     newElement.serviceProvider = foundEncounterDetail?.serviceProvider?.display ?? 'Non renseigné'
   }
 
   newElement.NDA = encounter?.id ?? 'Inconnu'
 
   if (!deidentifiedBoolean && encounter?.identifier) {
-    const nda = encounter.identifier.find((identifier: IIdentifier) => {
-      return identifier.type?.coding?.[0].code === 'NDA'
-    })
+    const nda = encounter.identifier.find((identifier: IIdentifier) => identifier.type?.coding?.[0].code === 'NDA')
     if (nda) {
       newElement.NDA = nda?.value ?? 'Inconnu'
     }
