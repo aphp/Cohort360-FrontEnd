@@ -249,7 +249,7 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
 
-  // By default, all the calls to `/Composition` will have `type:not=doc-impor in parameter
+  // By default, all the calls to `/Composition` will have `type:not=doc-impor` in parameter
   let options: string[] = ['type:not=doc-impor', 'empty=false']
   if (_id)                                         options = [...options, `_id=${_id}`]                                                         // eslint-disable-line
   if (size !== undefined)                          options = [...options, `size=${size}`]                                                       // eslint-disable-line
@@ -523,13 +523,14 @@ export const fetchObservation = async (args: fetchObservationProps) => {
 
   _list = _list ? _list.filter(uniq) : []
 
-  let options: string[] = []
+  // By default, all the calls to `/Observation` will have 'value-quantity-value=ge0,le0' in the parameters
+  let options: string[] = ['value-quantity-value=ge0,le0']
   if (id)                                           options = [...options, `id=${id}`]                                                                 // eslint-disable-line
   if (size !== undefined)                           options = [...options, `size=${size}`]                                                             // eslint-disable-line
   if (offset)                                       options = [...options, `offset=${offset}`]                                                         // eslint-disable-line
   if (_sort)                                        options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort},id`}`] // eslint-disable-line
   if (_text)                                        options = [...options, `_text=${_text}`]                                                           // eslint-disable-line
-  if (encounter)                                    options = [...options, `encounter=${encounter}`]                                                   // eslint-disable-line
+  if (encounter)                                    options = [...options, `encounter.identifier=${encounter}`]                                        // eslint-disable-line
   if (anabio || loinc)                              options = [...options, `code=${anabio ? `${anabio},` : ""}${loinc}`]                               // eslint-disable-line
   if (patient)                                      options = [...options, `patient=${patient}`]                                                       // eslint-disable-line
   if (type)                                         options = [...options, `type=${type}`]                                                             // eslint-disable-line
