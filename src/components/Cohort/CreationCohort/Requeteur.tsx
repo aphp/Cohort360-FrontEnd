@@ -11,7 +11,6 @@ import ModalCreateNewRequest from './Modals/ModalCreateNewRequest/ModalCreateNew
 import { useAppSelector, useAppDispatch } from 'state'
 import { setCriteriaList } from 'state/criteria'
 import { fetchRequestCohortCreation, unbuildCohortCreation, resetCohortCreation } from 'state/cohortCreation'
-import { setSelectedRequest } from 'state/request'
 
 import { CohortCreationSnapshotType } from 'types'
 
@@ -67,8 +66,6 @@ const Requeteur = () => {
         })
       )
       history.replace('/cohort/new')
-    } else if (!requestIdFromUrl && !requestId) {
-      dispatch<any>(setSelectedRequest({ uuid: '', name: '' }))
     }
     setRequestLoading(false)
   }, [dispatch, requestIdFromUrl, snapshotIdFromUrl])
@@ -182,7 +179,7 @@ const Requeteur = () => {
     _fetchRequest()
   }, [_fetchRequest])
 
-  if (loading || criteriaLoading || requestLoading || (requestIdFromUrl && requestId !== requestIdFromUrl)) {
+  if (loading || criteriaLoading || requestLoading || (!!requestIdFromUrl && requestId !== requestIdFromUrl)) {
     return (
       <Grid className={classes.grid} container justifyContent="center" alignItems="center">
         <CircularProgress />

@@ -489,7 +489,7 @@ const servicesCohorts: IServiceCohorts = {
           cohortLinkList && cohortLinkList.length > 0
             ? cohortLinkList
                 .map((cohortLinkItem: any) => {
-                  const members = cohortLinkItem.member
+                  const members = cohortLinkItem?.member ?? []
                   let organizationLinks: any[] = []
 
                   for (let index = 0; index < members.length; index += 2) {
@@ -574,13 +574,15 @@ const servicesCohorts: IServiceCohorts = {
       const rightsData: any = rightsResponse.data ?? []
 
       return cohorts.map((cohort) => {
-        const cohortLinkItem = cohortLinkList.find((cohortLink: any) => cohortLink.id === cohort.fhir_group_id)
+        const cohortLinkItem = cohortLinkList.find((cohortLink: any) => cohortLink?.id === cohort.fhir_group_id)
         const organizationLinkItems = !cohortLinkItem
           ? undefined
           : organizationLinkList.filter((organizationLink: any) =>
-              cohortLinkItem.member.find(
-                (member: any) => member.entity.display?.replace('Group/', '') === organizationLink.id
-              )
+              cohortLinkItem && cohortLinkItem.member && cohortLinkItem.member.length > 0
+                ? cohortLinkItem.member?.find(
+                    (member: any) => member.entity.display?.replace('Group/', '') === organizationLink.id
+                  )
+                : false
             )
         const allRightOfCohort = !organizationLinkItems
           ? []
@@ -725,9 +727,7 @@ const getDocumentInfos: (
         document.encounterStatus = encounter.status
 
         if (encounter.serviceProvider) {
-          document.serviceProvider =
-            encounter?.serviceProvider?.extension?.find((extension: any) => extension.url === 'Organization child')
-              ?.valueString ?? 'Non renseigné'
+          document.serviceProvider = encounter?.serviceProvider?.display ?? 'Non renseigné'
         } else {
           document.serviceProvider = 'Non renseigné'
         }

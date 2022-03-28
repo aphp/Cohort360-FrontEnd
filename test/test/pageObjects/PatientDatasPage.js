@@ -12,14 +12,9 @@ module.exports = class PatientDatasPage extends Page {
     /*get titleValue () { return 'Données patient' }
     get title () { return $('h2.MuiTypography-root') }*/
 
-    /*get access () { 
-        PatientContextBar.accessValue.waitUntil(() => PatientContextBar.accessValue.getText() != PatientContextBar.defaultAccessValue) 
-        return PatientContextBar.accessValue
-    }*/
-
-    get access () { 
-        PatientContextBar.access.waitUntil(() => PatientContextBar.accessValue != PatientContextBar.defaultAccessValue) 
-        return PatientContextBar.accessValue
+    async  access () { 
+        await PatientContextBar.accessValue() != PatientContextBar.defaultAccessValue 
+        return PatientContextBar.accessValue()
     }
 
     // Bloc "Répartition par genre"
@@ -51,8 +46,8 @@ module.exports = class PatientDatasPage extends Page {
         return super.getUrl(pPath)
     }
 
-    login (username, password) {
-        super.login (username, password)
+    async login (username, password) {
+        await super.login (username, password)
     }
 
 }

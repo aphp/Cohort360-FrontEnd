@@ -10,7 +10,8 @@ class ResearchProjectList extends List {
     get addProjectButtonLabel () { return 'Ajouter un projet' }
     get editProjectButtonLabel () { return 'Modifier le projet' }
 
-    get addProjectButton () { return $('#root > div.MuiGrid-root.MuiGrid-container.MuiGrid-direction-xs-column > div.MuiGrid-root.MuiGrid-container.MuiGrid-align-items-xs-center.MuiGrid-justify-content-xs-center > div.MuiGrid-root.MuiGrid-container.MuiGrid-item.MuiGrid-grid-xs-11.MuiGrid-grid-sm-9 > button.MuiButtonBase-root.MuiButton-root.MuiButton-text') }
+    // get addProjectButton () { return $('#root > div.MuiGrid-root.MuiGrid-container.MuiGrid-direction-xs-column > div.MuiGrid-root.MuiGrid-container.MuiGrid-align-items-xs-center.MuiGrid-justify-content-xs-center > div.MuiGrid-root.MuiGrid-container.MuiGrid-item.MuiGrid-grid-xs-11.MuiGrid-grid-sm-9 > button.MuiButtonBase-root.MuiButton-root.MuiButton-text') }
+    get addProjectButton () { return $('#new-project-button') }
 
     // get blockSelectorValue () { return '[id="projects_table"] tbody.MuiTableBody-root:nth-child(2)' }
     get blockSelectorValue () { return '[id="projects_table"] > tbody.MuiTableBody-root:nth-child(2)' }
@@ -105,13 +106,13 @@ class ResearchProjectList extends List {
         return this.currentProjectRequestList.currentRequestEditButton 
     }
 
-    currentProjectRequestDisplayed (pIndex) { return ' | ' + this.currentProjectRequestTitle(pIndex).getText() + ' | ' + this.currentProjectRequestDate(pIndex).getText() + ' | ' }
+    async currentProjectRequestDisplayed (pIndex) { return ' | ' + await this.currentProjectRequestTitle(pIndex).getText() + ' | ' + await this.currentProjectRequestDate(pIndex).getText() + ' | ' }
 
     get currentProjectNoRequest () { return this.currentProjectRequestBlock.$('div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > p') }
     get currentProjectNoRequestAddButton () { return this.currentProjectNoRequest.$('button') }
 
-    get currentProjectDisplayed () { 
-        return ' | ' + this.currentProjectTitle.getText() + ' | ' + this.currentProjectDate.getText() + ' | '
+    async currentProjectDisplayed () { 
+        return ' | ' + await this.currentProjectTitle.getText() + ' | ' + await this.currentProjectDate.getText() + ' | '
     }
 
     setCurrentProject (pLineNumber) { super.setCurrentLine(pLineNumber * 2) }

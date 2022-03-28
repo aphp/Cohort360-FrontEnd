@@ -1,6 +1,6 @@
 import { BIOLOGY_HIERARCHY_ITM_ANABIO, BIOLOGY_HIERARCHY_ITM_LOINC, CONTEXT } from '../../constants'
 import apiRequest from '../apiRequest'
-import { codeSort } from 'utils/alphabeticalSort'
+import { displaySort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) => {
@@ -33,7 +33,7 @@ export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) =
         : []
 
     return data && data.length > 0
-      ? data.sort(codeSort).map((_data: { code: string; display: string }) => ({
+      ? data.sort(displaySort).map((_data: { code: string; display: string }) => ({
           id: _data.code,
           // label: `${_data.code} - ${capitalizeFirstLetter(_data.display)}`,
           label: capitalizeFirstLetter(_data.display),
@@ -59,7 +59,7 @@ export const fetchBiologyHierarchy = async (biologyParent?: string) => {
 
       anabioList =
         anabioList && anabioList.length > 0
-          ? anabioList.sort(codeSort).map((anabioData: any) => ({
+          ? anabioList.sort(displaySort).map((anabioData: any) => ({
               id: anabioData.code,
               // label: `${anabioData.code} - ${anabioData.display}`,
               label: anabioData.display,
@@ -94,7 +94,7 @@ export const fetchBiologyHierarchy = async (biologyParent?: string) => {
 
       anabioList =
         anabioList && anabioList.length > 0
-          ? anabioList.sort(codeSort).map((anabioData: any) => ({
+          ? anabioList.sort(displaySort).map((anabioData: any) => ({
               id: anabioData.code,
               // label: `${anabioData.code} - ${anabioData.display}`,
               label: anabioData.display,

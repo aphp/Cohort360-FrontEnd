@@ -130,7 +130,7 @@ const PyramidChart: React.FC<PyramidProps> = memo(({ data, width = 400, height =
 
   return (
     <div style={{ display: 'flex' }}>
-      <svg ref={node}></svg>
+      <svg id="age-structure-card-svg" ref={node}></svg>
       <div style={{ display: 'flex' }} dangerouslySetInnerHTML={{ __html: legendHtml }} />
     </div>
   )

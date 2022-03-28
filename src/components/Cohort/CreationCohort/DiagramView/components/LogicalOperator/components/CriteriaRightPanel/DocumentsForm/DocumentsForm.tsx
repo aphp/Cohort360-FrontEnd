@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 
 import { Alert } from '@material-ui/lab'
 import {
@@ -19,6 +19,8 @@ import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
 import { InputSearchDocument } from 'components/Inputs'
+
+import { debounce } from 'utils/debounce'
 
 import useStyles from './styles'
 
@@ -55,6 +57,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const [inputMode, setInputMode] = useState<'simple' | 'regex'>(defaultValues.regex_search ? 'regex' : 'simple')
+  const [errorRegex, setErrorRegex] = useState(false)
 
   const isEdition = selectedCriteria !== null ? true : false
 
@@ -70,10 +73,27 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
     onChangeSelectedCriteria(defaultValues)
   }
 
+  const checkRegex = useMemo(() => {
+    return debounce((query: string) => {
+      try {
+        // Try to create regex
+        new RegExp(query)
+        setErrorRegex(false)
+      } catch (error) {
+        // If error, set error variable
+        setErrorRegex(true)
+      }
+    }, 750)
+  }, [])
+
   const _onChangeValue = (key: string, value: any) => {
     const _defaultValues = defaultValues ? { ...defaultValues } : {}
     _defaultValues[key] = value
     setDefaultValues(_defaultValues)
+
+    if (key === 'regex_search' && inputMode === 'regex') {
+      checkRegex(value)
+    }
   }
 
   const defaultValuesDocType = defaultValues.docType
@@ -238,7 +258,14 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="documents-form" color="primary" variant="contained">
+          <Button
+            onClick={_onSubmit}
+            disabled={errorRegex}
+            type="submit"
+            form="documents-form"
+            color="primary"
+            variant="contained"
+          >
             Confirmer
           </Button>
         </Grid>

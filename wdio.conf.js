@@ -28,22 +28,22 @@ exports.config = {
 
   suites: {
     Generics: [
-      './test/test/specs/generics/cohort360-SCG00-LoginLogout.js'
-      // './test/test/specs/generics/cohort360-SCG01-LeftMenu.js'
-      // './test/test/specs/generics/cohort360-SCG02-PatientContextBar.js'
+      './test/test/specs/generics/cohort360-SCG00-LoginLogout.js',
+      './test/test/specs/generics/cohort360-SCG01-LeftMenu.js',
+      './test/test/specs/generics/cohort360-SCG02-PatientContextBar.js'
+    ],
+    HomePage: ['./test/test/specs/pages/cohort360-SCP01-HomePage.js'],
+    MyPatients: [
+      './test/test/specs/pages/cohort360-SCP02-MyPatientsPage.js'
+      //     './test/test/specs/pages/cohort360-SCP03-MyPatientDatasPage.js',
+      //     './test/test/specs/pages/cohort360-SCP04-MyPatientDocumentsPage.js',
+      //     './test/test/specs/pages/cohort360-SCP05-MyPatientSearchPage.js',
+      //     './test/test/specs/filters/cohort360-SCF01-PatientListFilter.js',
+      //     './test/test/specs/filters/cohort360-SCF02-PatientListSearchFilter.js',
+      //     // './test/test/specs/filters/cohort360-SCF03-DocumentListSortFilter.js',
+      //     './test/test/specs/filters/cohort360-SCF04-DocumentListFilter.js',
+      //     './test/test/specs/filters/cohort360-SCF05-DocumentListSearchFilter.js'
     ]
-    // HomePage: ['./test/test/specs/pages/cohort360-SCP01-HomePage.js']
-    // MyPatients: [
-    //     './test/test/specs/pages/cohort360-SCP02-MyPatientsPage.js',
-    //     './test/test/specs/pages/cohort360-SCP03-MyPatientDatasPage.js',
-    //     './test/test/specs/pages/cohort360-SCP04-MyPatientDocumentsPage.js',
-    //     './test/test/specs/pages/cohort360-SCP05-MyPatientSearchPage.js',
-    //     './test/test/specs/filters/cohort360-SCF01-PatientListFilter.js',
-    //     './test/test/specs/filters/cohort360-SCF02-PatientListSearchFilter.js',
-    //     // './test/test/specs/filters/cohort360-SCF03-DocumentListSortFilter.js',
-    //     './test/test/specs/filters/cohort360-SCF04-DocumentListFilter.js',
-    //     './test/test/specs/filters/cohort360-SCF05-DocumentListSearchFilter.js'
-    // ],
     // Requests: [
     //     './test/test/specs/pages/cohort360-SCP06-MyResearchProjectsPage.js',
     //     // './test/test/specs/pages/cohort360-SCP07-NewCohortPage.js',
@@ -91,6 +91,7 @@ exports.config = {
       acceptInsecureCerts: true,
       'goog:chromeOptions': {
         args: ['--no-sandbox', '--disable-infobars', '--headless', '--disable-gpu', '--window-size=1440,735']
+        // args: ['--no-sandbox', '--disable-infobars', /*'--headless',*/ '--disable-gpu', '--window-size=1440,735']
       }
       // If outputDir is provided WebdriverIO can capture driver session logs
       // it is possible to configure which logTypes to include/exclude.
@@ -296,7 +297,7 @@ exports.config = {
   // beforeTest: function (test, context) {
   // },
   beforeTest: function (test) {
-    // test.description = '@it ' + test.description;
+    // test.description = '@it ' + test.description;
     // console.log('-----------------------------------------------------------------------------------------------');
     console.group()
     console.log('\x1b[35m' + '@it' + '\x1b[0m', '\x1b[1m\x1b[36m' + test.description + '\x1b[0m\x1b[0m')
@@ -332,10 +333,10 @@ exports.config = {
     if (!passed) {
       const failedMatchers = test.failedExpectations.filter((element) => !element.passed)
       const testIsFailed = failedMatchers.length !== 0 || !passed
-      // console.log('Test: ' + test.description + (testIsFailed ? ' => FAILED' : ' => PASSED'))
+      // console.log('Test: ' + test.description + (testIsFailed ? ' => FAILED' : ' => PASSED'))
 
       if (testIsFailed) {
-        // console.log('Saving screenshot for failed test ' + test.description);
+        // console.log('Saving screenshot for failed test ' + test.description);
         // get current test title and clean it, to use it as file name
         var filename = encodeURIComponent(test.fullName.replace(/\s+/g, '-'))
         browser.saveScreenshot('./reports/' + filename + '.png')

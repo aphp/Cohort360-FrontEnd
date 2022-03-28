@@ -270,6 +270,25 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
       </Grid>
 
       <Grid>
+        {filter.nda !== '' &&
+          filter.nda.split(',').map((nda) => (
+            <Chip
+              className={classes.chips}
+              key={nda}
+              label={`NDA: ${nda}`}
+              onDelete={() =>
+                handleChangeFilter(
+                  'nda',
+                  filter.nda
+                    .split(',')
+                    .filter((id) => id !== nda)
+                    .join()
+                )
+              }
+              color="primary"
+              variant="outlined"
+            />
+          ))}
         {filter.selectedPrescriptionTypes.length > 0 &&
           filter.selectedPrescriptionTypes.map((prescriptionType) => (
             <Chip
@@ -280,6 +299,22 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
                 handleChangeFilter(
                   'selectedPrescriptionTypes',
                   filter.selectedPrescriptionTypes.filter(({ id }) => id !== prescriptionType.id)
+                )
+              }
+              color="primary"
+              variant="outlined"
+            />
+          ))}
+        {filter.selectedAdministrationRoutes.length > 0 &&
+          filter.selectedAdministrationRoutes.map((administrationRoute) => (
+            <Chip
+              className={classes.chips}
+              key={administrationRoute.id}
+              label={capitalizeFirstLetter(administrationRoute.label)}
+              onDelete={() =>
+                handleChangeFilter(
+                  'selectedAdministrationRoutes',
+                  filter.selectedAdministrationRoutes.filter(({ id }) => id !== administrationRoute.id)
                 )
               }
               color="primary"
@@ -339,9 +374,9 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
                 </TableCell>
                 <TableCell align="center" className={classes.tableHeadCell}>
                   <TableSortLabel
-                    active={sort.by === 'class'}
-                    direction={sort.by === 'class' ? sort.direction : 'asc'}
-                    onClick={handleSort('class')}
+                    active={sort.by === 'class-simple'}
+                    direction={sort.by === 'class-simple' ? sort.direction : 'asc'}
+                    onClick={handleSort('class-simple')}
                   >
                     Code ATC
                   </TableSortLabel>
@@ -487,7 +522,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
 
       <Pagination
         className={classes.pagination}
-        count={Math.ceil(totalAllMedication / documentLines)}
+        count={Math.ceil(totalMedication / documentLines)}
         shape="rounded"
         onChange={handleChangePage}
         page={page}

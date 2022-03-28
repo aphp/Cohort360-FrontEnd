@@ -41,6 +41,12 @@ const useStyles = makeStyles((theme) => ({
   activeButton: {
     opacity: 0.6
   },
+  error: {
+    border: '1px solid #f44336'
+  },
+  errorText: {
+    color: '#f44336'
+  },
   buttonContainer: {
     borderRadius: 25,
     '& > button:first-child': {

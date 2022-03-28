@@ -217,5 +217,4 @@ describe('Cohort360 - SCG01 - Menu gauche', () => {
 		Logger.log('Déconnexion')
 		await LoginLogout.logout()
 	})
-
 })

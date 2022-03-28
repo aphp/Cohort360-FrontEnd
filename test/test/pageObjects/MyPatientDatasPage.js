@@ -15,15 +15,15 @@ class MyPatientDatasPage extends PatientDatasPage {
         return super.getUrl(this.path)
     }
 
-    login (username, password) {
-        super.login (username, password)
-        LeftMenu.open()
-        LeftMenu.openMyPatientsMenu()
-        LeftMenu.myPatientsAllLink.click()
-        browser.waitUntil(() => browser.getUrl() === MyPatientsPage.getUrl())
-        MyPatientsPage.access
-        this.patientsTab.click()
-        browser.waitUntil(() => browser.getUrl() === this.getUrl())
+    async login (username, password) {
+        await super.login (username, password)
+        await LeftMenu.open()
+        await LeftMenu.openMyPatientsMenu()
+        await LeftMenu.myPatientsAllLink.click()
+        await browser.getUrl() === MyPatientsPage.getUrl()
+        await MyPatientsPage.access()
+        await this.patientsTab.click()
+        await browser.getUrl() === this.getUrl()
     }
 
 }

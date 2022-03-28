@@ -121,9 +121,9 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
         )}
 
         <Alert severity="warning">
-          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes d'analyse les plus utilisées du
-          référentiel. De plus, les résultats concernent uniquement les analyses quantitatives enregistrées sur GLIMS V9
-          qui ont été créés et mises à jours depuis mars 2020.
+          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondant aux analyses les
+          plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses
+          quantitatives enregistrées sur GLIMS, qui ont été validés et mis à jour depuis mars 2020.
         </Alert>
 
         <Grid className={classes.inputContainer} container>

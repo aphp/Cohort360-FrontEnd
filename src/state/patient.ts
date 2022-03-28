@@ -12,8 +12,7 @@ import {
   IIdentifier,
   IMedicationAdministration,
   IMedicationRequest,
-  IObservation,
-  IExtension
+  IObservation
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   CohortEncounter,
@@ -601,16 +600,7 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
       let deidentifiedBoolean = true
 
       if (groupId) {
-        const perimeters = (await services.perimeters.fetchPerimetersInfos(groupId)) ?? {}
-        deidentifiedBoolean =
-          perimeters && perimeters.cohort && Array.isArray(perimeters.cohort)
-            ? perimeters.cohort.some((perimeter: any) =>
-                perimeter.extension?.some(
-                  (extension: any) =>
-                    extension.url === 'READ_ACCESS' && extension.valueString === 'DATA_PSEUDOANONYMISED'
-                )
-              )
-            : true
+        deidentifiedBoolean = (await services.patients.fetchRights(groupId)) ?? {}
       } else {
         const perimeters = await services.perimeters.getPerimeters()
         deidentifiedBoolean = perimeters.some((perimeter) =>
@@ -750,7 +740,46 @@ const patientSlice = createSlice({
             pmsi: action.payload.pmsi
           }
     )
-    builder.addCase(fetchLastPmsiInfo.rejected, () => null)
+    builder.addCase(fetchLastPmsiInfo.rejected, (state) => ({
+      ...state,
+      loading: false,
+      patientInfo: state?.patientInfo
+        ? {
+            ...state?.patientInfo,
+            lastGhm: undefined,
+            lastProcedure: undefined,
+            mainDiagnosis: undefined
+          }
+        : {
+            resourceType: 'Patient',
+            lastGhm: undefined,
+            lastProcedure: undefined,
+            mainDiagnosis: undefined
+          },
+      pmsi: {
+        ccam: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        },
+        diagnostics: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        },
+        ghm: {
+          loading: false,
+          count: 0,
+          total: 0,
+          list: [],
+          page: 0
+        }
+      }
+    }))
     builder.addCase(fetchAllProcedures.pending, (state) =>
       state === null
         ? null
@@ -1046,7 +1075,7 @@ function linkElementWithEncounter<
   })[] = []
 
   for (const entry of elementEntries) {
-    const newElement = entry as T & {
+    let newElement = entry as T & {
       serviceProvider?: string
       NDA?: string
       documents?: any[]
@@ -1075,32 +1104,65 @@ function linkElementWithEncounter<
         encounterId = (entry as IObservation).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
     }
-    const foundEncounter = encounterList.find(({ id }) => id === encounterId) || {}
 
-    if (foundEncounter) {
-      newElement.serviceProvider =
-        foundEncounter?.serviceProvider?.extension?.find(
-          (extension: IExtension) => extension.url === 'Organization child'
-        )?.valueString ?? 'Non renseigné'
+    const foundEncounter = encounterList.find(({ id }) => id === encounterId) || null
+    const foundEncounterWithDetails =
+      // @ts-ignore
+      encounterList.find(({ details }) => details?.find(({ id }) => id === encounterId)) || null
 
-      newElement.NDA = foundEncounter?.id ?? 'Inconnu'
-
-      if (!deidentifiedBoolean && foundEncounter?.identifier) {
-        const nda = foundEncounter.identifier.find((identifier: IIdentifier) => {
-          return identifier.type?.coding?.[0].code === 'NDA'
-        })
-        if (nda) {
-          newElement.NDA = nda.value
-        }
-      }
-
-      if (entry.resourceType !== 'Composition' && foundEncounter?.documents && foundEncounter.documents.length > 0) {
-        newElement.documents = foundEncounter.documents
-      }
-    }
+    newElement = fillElementInformation(
+      deidentifiedBoolean,
+      newElement,
+      foundEncounterWithDetails ?? foundEncounter,
+      encounterId,
+      newElement.resourceType
+    )
 
     elementList = [...elementList, newElement]
   }
 
   return elementList
+}
+
+function fillElementInformation<
+  T extends
+    | IProcedure
+    | ICondition
+    | IClaim
+    | IComposition
+    | IMedicationRequest
+    | IMedicationAdministration
+    | IObservation
+>(deidentifiedBoolean: boolean, element: T, encounter: any, encounterId: string, resourceType: string) {
+  const newElement = element as T & {
+    serviceProvider?: string
+    NDA?: string
+    documents?: any[]
+  }
+
+  const encounterIsDetailed = encounter?.id !== encounterId
+
+  if (!encounterIsDetailed) {
+    newElement.serviceProvider = encounter?.serviceProvider?.display ?? 'Non renseigné'
+  } else {
+    const foundEncounterDetail =
+      // @ts-ignore
+      encounter?.details?.find(({ id }) => id === encounterId) ?? encounter
+    newElement.serviceProvider = foundEncounterDetail?.serviceProvider?.display ?? 'Non renseigné'
+  }
+
+  newElement.NDA = encounter?.id ?? 'Inconnu'
+
+  if (!deidentifiedBoolean && encounter?.identifier) {
+    const nda = encounter.identifier.find((identifier: IIdentifier) => identifier.type?.coding?.[0].code === 'NDA')
+    if (nda) {
+      newElement.NDA = nda?.value ?? 'Inconnu'
+    }
+  }
+
+  if (resourceType !== 'Composition' && encounter?.documents && encounter.documents.length > 0) {
+    newElement.documents = encounter.documents
+  }
+
+  return newElement
 }

@@ -314,9 +314,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
               </Alert>
             ) : (
               <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
-                Attention : Les données identifiantes des patients sont remplacées par des informations fictives lorsque
-                vous prévisualisez les résultats d'une recherche. Vous retrouverez les données personnelles de votre
-                patient en consultant les documents via le mode aperçu.
+                Attention : La recherche textuelle est pseudonymisée (les données identifiantes des patients sont
+                remplacées par des informations fictives). Vous retrouverez les données personnelles de votre patient en
+                cliquant sur l'aperçu.
               </Alert>
             )}
 

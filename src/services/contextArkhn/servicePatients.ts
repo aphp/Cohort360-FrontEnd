@@ -1,5 +1,12 @@
 import { AxiosResponse } from 'axios'
-import { CohortData, FHIR_API_Response, CohortEncounter, SearchByTypes, MedicationEntry } from 'types'
+import {
+  CohortData,
+  FHIR_API_Response,
+  CohortEncounter,
+  CohortComposition,
+  SearchByTypes,
+  MedicationEntry
+} from 'types'
 import {
   getGenderRepartitionMapAphp,
   getEncounterRepartitionMapAphp,
@@ -17,10 +24,10 @@ import {
   IMedicationAdministration,
   IEncounter,
   IComposition,
-  IObservation,
-  IExtension
+  IObservation
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
+  fetchGroup,
   fetchPatient,
   fetchEncounter,
   fetchClaim,
@@ -31,6 +38,9 @@ import {
   fetchMedicationAdministration,
   fetchObservation
 } from './callApi'
+
+import servicesPerimeters from './servicePerimeters'
+import servicesCohorts from './serviceCohorts'
 
 export interface IServicePatients {
   /*
@@ -266,6 +276,17 @@ export interface IServicePatients {
     patientList: IPatient[]
     totalPatients: number
   }>
+
+  /**
+   * Retourne le droit de la vue d'un patient
+   *
+   * Arguments:
+   *   - groupId: (optionnel) Périmètre auquel le patient est lié
+   *
+   * Retour :
+   *   - Retourne true si les droits de vision sont en pseudo / false si c'est en nomi
+   */
+  fetchRights: (groupId: string) => Promise<boolean>
 }
 
 const servicesPatients: IServicePatients = {
@@ -584,12 +605,19 @@ const servicesPatients: IServicePatients = {
   },
 
   fetchPatientInfo: async (patientId, groupId) => {
-    const [patientResponse, encounterResponse] = await Promise.all([
+    const [patientResponse, encounterResponse, encounterDetailResponse] = await Promise.all([
       fetchPatient({ _id: patientId, _list: groupId ? [groupId] : [] }),
       fetchEncounter({
         patient: patientId,
         type: 'VISIT',
         status: ['arrived', 'triaged', 'in-progress', 'onleave', 'finished', 'unknown'],
+        _sort: 'start-date',
+        sortDirection: 'desc',
+        _list: groupId ? [groupId] : []
+      }),
+      fetchEncounter({
+        patient: patientId,
+        'type:not': 'VISIT',
         _sort: 'start-date',
         sortDirection: 'desc',
         _list: groupId ? [groupId] : []
@@ -601,7 +629,9 @@ const servicesPatients: IServicePatients = {
     const patientData = patientDataList[0]
 
     const encounters: IEncounter[] = getApiResponseResources(encounterResponse) || []
-    const hospits = await getEncounterDocuments(encounters, groupId)
+    const encountersDetail: IEncounter[] = getApiResponseResources(encounterDetailResponse) || []
+
+    const hospits = await getEncounterDocuments(encounters, encountersDetail, groupId)
 
     const patientInfo = {
       ...patientData,
@@ -650,57 +680,89 @@ const servicesPatients: IServicePatients = {
       patientList: patientList ?? [],
       totalPatients: totalPatients ?? 0
     }
+  },
+
+  fetchRights: async (groupId) => {
+    const groups = await fetchGroup({ _id: groupId })
+    const groupsData = getApiResponseResources(groups)
+
+    if (!groupsData) return false
+
+    const isPerimeter = groupsData.some((group) => group.managingEntity?.display?.search('Organization/') !== -1)
+
+    if (isPerimeter) {
+      const perimeterRights = await servicesPerimeters.fetchPerimetersRights(groupsData)
+      return perimeterRights.some((perimeterRight) =>
+        perimeterRight.extension?.some(
+          ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
+        )
+      )
+    } else {
+      const cohortRights = await servicesCohorts.fetchCohortsRights(
+        groupsData.map((groupData) => ({ fhir_group_id: groupData.id ?? '' }))
+      )
+      return cohortRights.some((cohortRight) =>
+        cohortRight.extension?.some(
+          ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
+        )
+      )
+    }
   }
 }
 
 export default servicesPatients
 
-export const getEncounterDocuments = async (encounters?: CohortEncounter[], groupId?: string) => {
+export const getEncounterDocuments = async (
+  encounters?: CohortEncounter[],
+  encountersDetail?: CohortEncounter[],
+  groupId?: string
+) => {
   if (!encounters) return undefined
   if (encounters.length === 0) return encounters
 
   const _encounters = encounters
-
-  const encountersList: any[] = []
+  const encountersIdList: any[] = []
 
   _encounters.forEach((encounter) => {
     encounter.documents = []
-    encountersList.push(encounter.id)
+    encountersIdList.push(encounter.id)
   })
 
   const documentsResp = await fetchComposition({
-    encounter: encountersList.join(','),
+    encounter: encountersIdList.join(','),
     _elements: ['status', 'type', 'subject', 'encounter', 'date', 'title'],
     status: 'final',
     _list: groupId ? groupId.split(',') : []
   })
 
-  const documents: any[] | undefined =
-    documentsResp.data.resourceType === 'Bundle' ? getApiResponseResources(documentsResp) : undefined
-  if (!documents) return _encounters
+  const documents: CohortComposition[] = getApiResponseResources(documentsResp) ?? []
 
-  for (const document of documents) {
-    const encounterIndex = _encounters.findIndex((encounter) => encounter.id === document.encounter?.display?.slice(10))
-    if (encounterIndex === -1) continue
+  for (const encounter of _encounters) {
+    const currentDocuments = documents?.filter(
+      (document) => encounter.id === document.encounter?.display?.replace('Encounter/', '')
+    )
+    const currentDetails = encountersDetail?.filter(
+      (encounterDetail) => encounter.id === encounterDetail?.partOf?.reference?.replace('Encounter/', '')
+    )
 
-    const foundEncounter = _encounters[encounterIndex]
-    document.serviceProvider =
-      foundEncounter?.serviceProvider?.extension?.find(
-        (extension: IExtension) => extension.url === 'Organization child'
-      )?.valueString ?? 'Non renseigné'
+    encounter.documents = currentDocuments
+    encounter.details = currentDetails
 
-    document.NDA = foundEncounter.id ?? 'Inconnu'
+    if (!currentDocuments || (currentDocuments && currentDocuments.length === 0)) continue
 
-    if (foundEncounter.identifier) {
-      const nda = foundEncounter.identifier.find((identifier: IIdentifier) => {
-        return identifier.type?.coding?.[0].code === 'NDA'
-      })
-      if (nda) {
-        document.NDA = nda?.value
+    for (const currentDocument of currentDocuments) {
+      currentDocument.serviceProvider = encounter?.serviceProvider?.display ?? 'Non renseigné'
+
+      currentDocument.NDA = encounter.id ?? 'Inconnu'
+      if (encounter.identifier) {
+        const nda = encounter.identifier.find((identifier: IIdentifier) => {
+          return identifier.type?.coding?.[0].code === 'NDA'
+        })
+        if (nda) {
+          currentDocument.NDA = nda?.value
+        }
       }
     }
-
-    _encounters[encounterIndex].documents?.push(document)
   }
 
   return _encounters

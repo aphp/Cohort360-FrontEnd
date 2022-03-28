@@ -31,12 +31,12 @@ class MyResearchProjectsPage extends Page {
         return super.getUrl(this.path)
     }
 
-    login (username, password) {
-        super.login (username, password)
-        LeftMenu.open()
-        LeftMenu.openMyResearchMenu()
-        LeftMenu.myResearchProjectLink.click()
-        browser.waitUntil(() => browser.getUrl() === this.getUrl())
+    async login (username, password) {
+        await super.login (username, password)
+        await LeftMenu.open()
+        await LeftMenu.openMyResearchMenu()
+        await LeftMenu.myResearchProjectLink.click()
+        await browser.getUrl() === this.getUrl()
         // super.access.getText()
     }
 }
