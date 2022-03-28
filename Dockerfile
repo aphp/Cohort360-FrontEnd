@@ -1,4 +1,4 @@
-FROM nginx:1.14
+FROM nginx:1.21
 
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -7,7 +7,12 @@ COPY public public
 COPY build build
 
 # Proxy need to be setup for apt
-ENV http_proxy="http://proxym-inter.aphp.fr:8080"
+ENV urn_proxy="proxym-inter.aphp.fr:8080"
+ENV http_proxy=http://$urn_proxy
+ENV HTTP_PROXY=http://$urn_proxy
+ENV https_proxy=http://$urn_proxy
+ENV HTTPS_PROXY=http://$urn_proxy
+ENV no_proxy=localhost,127.0.0.1,0.0.0.0
 
 # Curl is needed inside the pod to check liveness
 RUN apt-get update -y && apt-get install -y curl
