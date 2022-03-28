@@ -19,7 +19,8 @@ import { Autocomplete } from '@material-ui/lab'
 
 import ClearIcon from '@material-ui/icons/Clear'
 
-import { fetchDiagnosticTypes } from 'services/cohortCreation/fetchCondition'
+import services from 'services'
+
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
@@ -95,7 +96,7 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
 
   useEffect(() => {
     const _fetchDiagnosticTypes = async () => {
-      const diagnosticTypes = await fetchDiagnosticTypes()
+      const diagnosticTypes = await services.cohortCreation.fetchDiagnosticTypes()
       if (!diagnosticTypes) return
       setDiagnosticTypesList(diagnosticTypes)
     }

@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import { RootState } from 'state'
 
-import { fetchAtcHierarchy } from 'services/cohortCreation/fetchMedication'
+import services from 'services'
 
 export type MedicationListType = {
   id: string
@@ -32,7 +32,7 @@ const initMedicationHierarchy = createAsyncThunk<MedicationState, void, { state:
       let medicationList = []
 
       if (list && list.length === 0) {
-        medicationList = await fetchAtcHierarchy('')
+        medicationList = await services.cohortCreation.fetchAtcHierarchy('')
       }
 
       return {
@@ -51,7 +51,7 @@ const fetchMedication = createAsyncThunk<MedicationState, void, { state: RootSta
   'medication/fetchMedication',
   async (DO_NOT_USE, { getState }) => {
     const state = getState().medication
-    const medicationList: MedicationListType[] = await fetchAtcHierarchy('')
+    const medicationList: MedicationListType[] = await services.cohortCreation.fetchAtcHierarchy('')
 
     return {
       ...state,
@@ -92,7 +92,7 @@ const expandMedicationElement = createAsyncThunk<MedicationState, ExpandMedicati
             const foundItem = item.subItems ? item.subItems.find((i: any) => i.id === 'loading') : true
             if (foundItem) {
               let subItems: MedicationListType[] = []
-              subItems = await fetchAtcHierarchy(item.id)
+              subItems = await services.cohortCreation.fetchAtcHierarchy(item.id)
 
               item = { ...item, subItems: subItems }
             }

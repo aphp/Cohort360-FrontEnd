@@ -2,9 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import { RootState } from 'state'
 
-import { fetchGhmHierarchy } from 'services/cohortCreation/fetchClaim'
-import { fetchCim10Hierarchy } from 'services/cohortCreation/fetchCondition'
-import { fetchCcamHierarchy } from 'services/cohortCreation/fetchProcedure'
+import services from 'services'
 
 export type PmsiListType = {
   id: string
@@ -54,13 +52,13 @@ const initPmsiHierarchy = createAsyncThunk<PmsiState, void, { state: RootState }
       let procedureList = []
 
       if (claim && claim.list && claim.list.length === 0) {
-        claimList = await fetchGhmHierarchy('')
+        claimList = await services.cohortCreation.fetchGhmHierarchy('')
       }
       if (condition && condition.list && condition.list.length === 0) {
-        conditionList = await fetchCim10Hierarchy('')
+        conditionList = await services.cohortCreation.fetchCim10Hierarchy('')
       }
       if (procedure && procedure.list && procedure.list.length === 0) {
-        procedureList = await fetchCcamHierarchy('')
+        procedureList = await services.cohortCreation.fetchCcamHierarchy('')
       }
 
       return {
@@ -92,7 +90,7 @@ const fetchCondition = createAsyncThunk<PmsiElementType, void, { state: RootStat
   'pmsi/fetchCondition',
   async (DO_NOT_USE, { getState }) => {
     const state = getState().pmsi
-    const conditionList: PmsiListType[] = await fetchCim10Hierarchy('')
+    const conditionList: PmsiListType[] = await services.cohortCreation.fetchCim10Hierarchy('')
 
     return {
       ...state.condition,
@@ -107,7 +105,7 @@ const fetchClaim = createAsyncThunk<PmsiElementType, void, { state: RootState }>
   'pmsi/fetchClaim',
   async (DO_NOT_USE, { getState }) => {
     const state = getState().pmsi
-    const claimList: PmsiListType[] = await fetchGhmHierarchy('')
+    const claimList: PmsiListType[] = await services.cohortCreation.fetchGhmHierarchy('')
 
     return {
       ...state.claim,
@@ -122,7 +120,7 @@ const fetchProcedure = createAsyncThunk<PmsiElementType, void, { state: RootStat
   'pmsi/fetchProcedure',
   async (DO_NOT_USE, { getState }) => {
     const state = getState().pmsi
-    const procedureList: PmsiListType[] = await fetchCcamHierarchy('')
+    const procedureList: PmsiListType[] = await services.cohortCreation.fetchCcamHierarchy('')
 
     return {
       ...state.procedure,
@@ -165,13 +163,13 @@ const expandPmsiElement = createAsyncThunk<PmsiState, ExpandPmsiElementParams, {
             if (foundItem) {
               let subItems: PmsiListType[] = []
               if (keyElement === 'claim') {
-                subItems = await fetchGhmHierarchy(item.id)
+                subItems = await services.cohortCreation.fetchGhmHierarchy(item.id)
               }
               if (keyElement === 'condition') {
-                subItems = await fetchCim10Hierarchy(item.id)
+                subItems = await services.cohortCreation.fetchCim10Hierarchy(item.id)
               }
               if (keyElement === 'procedure') {
-                subItems = await fetchCcamHierarchy(item.id)
+                subItems = await services.cohortCreation.fetchCcamHierarchy(item.id)
               }
 
               item = { ...item, subItems: subItems }

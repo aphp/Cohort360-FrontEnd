@@ -19,7 +19,7 @@ import { Autocomplete } from '@material-ui/lab'
 
 import ClearIcon from '@material-ui/icons/Clear'
 
-import { fetchPrescriptionTypes, fetchAdministrations } from 'services/cohortCreation/fetchMedication'
+import services from 'services'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
@@ -99,12 +99,12 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
 
   useEffect(() => {
     const _fetchPrescriptionTypes = async () => {
-      const prescriptionTypes = await fetchPrescriptionTypes()
+      const prescriptionTypes = await services.cohortCreation.fetchPrescriptionTypes()
       if (!prescriptionTypes) return
       setPrescriptionTypesList(prescriptionTypes)
     }
     const _fetchAdministrationRoutes = async () => {
-      const administrationRoutesList = await fetchAdministrations()
+      const administrationRoutesList = await services.cohortCreation.fetchAdministrations()
       if (!administrationRoutesList) return
       setAdministrationRoutesList(administrationRoutesList)
     }

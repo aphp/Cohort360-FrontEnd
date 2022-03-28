@@ -10,36 +10,8 @@ import GhmForm from './DiagramView/components/LogicalOperator/components/Criteri
 import MedicationForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/MedicationForm'
 import BiologyForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/BiologyForm'
 
-// Fetcher
-import {
-  fetchAdmissionModes,
-  fetchEntryModes,
-  fetchExitModes,
-  fetchPriseEnChargeType,
-  fetchTypeDeSejour,
-  fetchFileStatus,
-  fetchReason,
-  fetchDestination,
-  fetchProvenance,
-  fetchAdmission
-} from 'services/cohortCreation/fetchEncounter'
-import { fetchGender, fetchStatus } from 'services/cohortCreation/fetchDemographic'
-import {
-  fetchStatusDiagnostic,
-  fetchDiagnosticTypes,
-  fetchCim10Diagnostic,
-  fetchCim10Hierarchy
-} from 'services/cohortCreation/fetchCondition'
-import { fetchCcamData, fetchCcamHierarchy } from 'services/cohortCreation/fetchProcedure'
-import { fetchGhmData, fetchGhmHierarchy } from 'services/cohortCreation/fetchClaim'
-import { fetchDocTypes } from 'services/cohortCreation/fetchComposition'
-import {
-  fetchAtcData,
-  fetchAtcHierarchy,
-  fetchPrescriptionTypes,
-  fetchAdministrations
-} from 'services/cohortCreation/fetchMedication'
-import { fetchBiologyData, fetchBiologyHierarchy } from 'services/cohortCreation/fetchObservation'
+// services.cohortCreation.Fetcher
+import services from 'services'
 
 import { ODD_BIOLOGY } from '../../../constants'
 
@@ -73,7 +45,7 @@ const criteriaList: CriteriaItemType[] = [
     color: '#0063AF',
     components: DemographicFrom,
     data: { gender: 'loading', status: 'loading' },
-    fetch: { fetchGender, fetchStatus }
+    fetch: { fetchGender: services.cohortCreation.fetchGender, fetchStatus: services.cohortCreation.fetchStatus }
   },
   {
     id: 'Encounter',
@@ -93,16 +65,16 @@ const criteriaList: CriteriaItemType[] = [
       admission: 'loading'
     },
     fetch: {
-      fetchAdmissionModes,
-      fetchEntryModes,
-      fetchExitModes,
-      fetchPriseEnChargeType,
-      fetchTypeDeSejour,
-      fetchFileStatus,
-      fetchReason,
-      fetchDestination,
-      fetchProvenance,
-      fetchAdmission
+      fetchAdmissionModes: services.cohortCreation.fetchAdmissionModes,
+      fetchEntryModes: services.cohortCreation.fetchEntryModes,
+      fetchExitModes: services.cohortCreation.fetchExitModes,
+      fetchPriseEnChargeType: services.cohortCreation.fetchPriseEnChargeType,
+      fetchTypeDeSejour: services.cohortCreation.fetchTypeDeSejour,
+      fetchFileStatus: services.cohortCreation.fetchFileStatus,
+      fetchReason: services.cohortCreation.fetchReason,
+      fetchDestination: services.cohortCreation.fetchDestination,
+      fetchProvenance: services.cohortCreation.fetchProvenance,
+      fetchAdmission: services.cohortCreation.fetchAdmission
     }
   },
   {
@@ -111,7 +83,7 @@ const criteriaList: CriteriaItemType[] = [
     color: '#0063AF',
     components: DocumentsForm,
     data: { docTypes: 'loading' },
-    fetch: { fetchDocTypes }
+    fetch: { fetchDocTypes: services.cohortCreation.fetchDocTypes }
   },
   {
     id: 'pmsi',
@@ -130,7 +102,12 @@ const criteriaList: CriteriaItemType[] = [
           cim10Diagnostic: 'loading',
           cim10Hierarchy: 'loading'
         },
-        fetch: { fetchStatusDiagnostic, fetchDiagnosticTypes, fetchCim10Diagnostic, fetchCim10Hierarchy }
+        fetch: {
+          fetchStatusDiagnostic: services.cohortCreation.fetchStatusDiagnostic,
+          fetchDiagnosticTypes: services.cohortCreation.fetchDiagnosticTypes,
+          fetchCim10Diagnostic: services.cohortCreation.fetchCim10Diagnostic,
+          fetchCim10Hierarchy: services.cohortCreation.fetchCim10Hierarchy
+        }
       },
       {
         id: 'Procedure',
@@ -138,7 +115,10 @@ const criteriaList: CriteriaItemType[] = [
         color: '#0063AF',
         components: CCAMForm,
         data: { ccamData: 'loading', ccamHierarchy: 'loading' },
-        fetch: { fetchCcamData, fetchCcamHierarchy }
+        fetch: {
+          fetchCcamData: services.cohortCreation.fetchCcamData,
+          fetchCcamHierarchy: services.cohortCreation.fetchCcamHierarchy
+        }
       },
       {
         id: 'Claim',
@@ -146,7 +126,10 @@ const criteriaList: CriteriaItemType[] = [
         color: '#0063AF',
         components: GhmForm,
         data: { ghmData: 'loading', ghmHierarchy: 'loading' },
-        fetch: { fetchGhmData, fetchGhmHierarchy }
+        fetch: {
+          fetchGhmData: services.cohortCreation.fetchGhmData,
+          fetchGhmHierarchy: services.cohortCreation.fetchGhmHierarchy
+        }
       }
     ]
   },
@@ -157,7 +140,12 @@ const criteriaList: CriteriaItemType[] = [
     color: '#0063AF',
     components: MedicationForm,
     data: { atcData: 'loading', atcHierarchy: 'loading', prescriptionTypes: 'loading', administrations: 'loading' },
-    fetch: { fetchAtcData, fetchAtcHierarchy, fetchPrescriptionTypes, fetchAdministrations }
+    fetch: {
+      fetchAtcData: services.cohortCreation.fetchAtcData,
+      fetchAtcHierarchy: services.cohortCreation.fetchAtcHierarchy,
+      fetchPrescriptionTypes: services.cohortCreation.fetchPrescriptionTypes,
+      fetchAdministrations: services.cohortCreation.fetchAdministrations
+    }
   },
   {
     id: 'biologie_microbiologie',
@@ -172,7 +160,10 @@ const criteriaList: CriteriaItemType[] = [
         components: ODD_BIOLOGY ? BiologyForm : null,
         disabled: !ODD_BIOLOGY ?? false,
         data: { biologyData: 'loading', biologyHierarchy: 'loading' },
-        fetch: { fetchBiologyData, fetchBiologyHierarchy }
+        fetch: {
+          fetchBiologyData: services.cohortCreation.fetchBiologyData,
+          fetchBiologyHierarchy: services.cohortCreation.fetchBiologyHierarchy
+        }
       },
       {
         id: 'microbiologie',
