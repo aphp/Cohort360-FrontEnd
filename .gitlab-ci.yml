@@ -9,8 +9,8 @@ include: # Variables needed for Selenium tests
   project: dev/test_newci_front
   file: '/.gitlab/selenium_variables.yml'
 
-test-job: # This job runs in the test stage.
-  stage: test    # It only starts when the job in the build stage completes successfully.
+test-job:
+  stage: test
   artifacts:
     when: always
     paths:
