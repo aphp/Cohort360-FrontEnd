@@ -529,7 +529,7 @@ export const fetchObservation = async (args: fetchObservationProps) => {
   if (offset)                                       options = [...options, `offset=${offset}`]                                                         // eslint-disable-line
   if (_sort)                                        options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort},id`}`] // eslint-disable-line
   if (_text)                                        options = [...options, `_text=${_text}`]                                                           // eslint-disable-line
-  if (encounter)                                    options = [...options, `encounter=${encounter}`]                                                   // eslint-disable-line
+  if (encounter)                                    options = [...options, `encounter.identifier=${encounter}`]                                        // eslint-disable-line
   if (anabio || loinc)                              options = [...options, `code=${anabio ? `${anabio},` : ""}${loinc}`]                               // eslint-disable-line
   if (patient)                                      options = [...options, `patient=${patient}`]                                                       // eslint-disable-line
   if (type)                                         options = [...options, `type=${type}`]                                                             // eslint-disable-line
