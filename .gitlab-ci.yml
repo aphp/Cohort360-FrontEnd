@@ -6,7 +6,7 @@ stages: # List of stages for jobs in their order of execution
   - deploy
 
 include: # Variables needed for Selenium tests
-  project: dev/cohort360
+  project: dev/cohort360/frontend
   file: '/.gitlab/selenium_variables.yml'
 
 test-e2e-chrome-job:
