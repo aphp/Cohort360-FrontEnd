@@ -7,6 +7,11 @@
 
 # Cohort360
 
+
+Develop: [![pipeline status](https://gitlab.eds.aphp.fr/dev/cohort360/source-code/badges/develop/pipeline.svg)](https://gitlab.eds.aphp.fr/dev/cohort360/source-code/-/commits/develop)
+
+Master: [![pipeline status](https://gitlab.eds.aphp.fr/dev/cohort360/source-code/badges/master/pipeline.svg)](https://gitlab.eds.aphp.fr/dev/cohort360/source-code/-/commits/master)
+
 Cohort360 is a web application for knowledge discovery in clinical data warehouses. It provides tools for clinicians and researchers to find patients, build cohorts and visualize data. Cohort360 has been initiated by Greater Paris University Hospital (AP-HP) and it is now an open-source project being developed collaboratively by a community of contributors and partners, working together to unleash research on clinical data.
 
 ## Architecture 
