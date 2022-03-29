@@ -4,22 +4,21 @@ export const ID_TOKEN_STORAGE_KEY = 'ARKHN_ID_TOKEN'
 export const TOKEN_DATA_STORAGE_KEY = 'ARKHN_TOKEN_DATA'
 export const STATE_STORAGE_KEY = 'ARKHN_AUTH_STATE'
 
-export const {
-  REACT_APP_CLIENT_ID: CLIENT_ID,
-  REACT_APP_CLIENT_SECRET: CLIENT_SECRET,
-  REACT_APP_BACK_API_URL: BACK_API_URL,
-  REACT_APP_REQUEST_API_URL: REQUEST_API_URL,
-  REACT_APP_FHIR_API_URL: FHIR_API_URL,
-  REACT_APP_AUTH_API_URL: AUTH_API_URL,
-  REACT_APP_FILES_URL: FILES_URL,
-  REACT_APP_TOKEN_URL: TOKEN_URL,
-  REACT_APP_REVOKE_URL: REVOKE_URL,
-  REACT_APP_LOGIN_REDIRECT_URL: LOGIN_REDIRECT_URL
-} = process.env
+export const CLIENT_ID = 'irrelevant'
+export const CLIENT_SECRET = 'irrelevant'
+export const BACK_API_URL =
+  process.env.NODE_ENV !== 'development' ? '{BACK_API_URL}' : process.env.REACT_APP_BACK_API_URL
+export const REQUEST_API_URL =
+  process.env.NODE_ENV !== 'development' ? '{REQUEST_API_URL}' : process.env.REACT_APP_REQUEST_API_URL
+export const FHIR_API_URL =
+  process.env.NODE_ENV !== 'development' ? '{FHIR_API_URL}' : process.env.REACT_APP_FHIR_API_URL
+export const AUTH_API_URL =
+  process.env.NODE_ENV !== 'development' ? '{AUTH_API_URL}' : process.env.REACT_APP_AUTH_API_URL
+export const FILES_URL = 'irrelevant'
+export const TOKEN_URL = 'irrelevant'
+export const REVOKE_URL = 'irrelevant'
+export const LOGIN_REDIRECT_URL = 'irrelevant'
 
-export const API_RESOURCE_TAG = process.env.REACT_APP_DEV_API_RESOURCE_TAG
-  ? '&_tag=' + process.env.REACT_APP_DEV_API_RESOURCE_TAG
-  : ''
 export const CONTEXT = process.env.REACT_APP_CONTEXT as ContextType
 
 if (!CONTEXT) throw new Error('missing REACT_APP_CONTEXT from environment')
@@ -30,81 +29,108 @@ export const ACCES_TOKEN = 'access'
 export const REFRESH_TOKEN = 'refresh'
 
 export const CLAIM_HIERARCHY =
-  process.env.REACT_APP_VALUE_SET_URL_CLAIM_HIERARCHY ?? 'https://terminology.eds.aphp.fr/aphp-orbis-ghm'
-
+  process.env.NODE_ENV !== 'development' ? '{CLAIM_HIERARCHY}' : process.env.REACT_APP_VALUE_SET_URL_CLAIM_HIERARCHY
 export const CONDITION_HIERARCHY =
-  process.env.REACT_APP_VALUE_SET_URL_CONDITION_HIERARCHY ?? 'https://terminology.eds.aphp.fr/aphp-orbis-cim-'
-
+  process.env.NODE_ENV !== 'development'
+    ? '{CONDITION_HIERARCHY}'
+    : process.env.REACT_APP_VALUE_SET_URL_CONDITION_HIERARCHY
 export const CONDITION_STATUS =
-  process.env.REACT_APP_VALUE_SET_URL_CONDITION_STATUS ?? 'https://terminology.eds.aphp.fr/aphp-orbis-condition-status'
-
+  process.env.NODE_ENV !== 'development' ? '{CONDITION_STATUS}' : process.env.REACT_APP_VALUE_SET_URL_CONDITION_STATUS
 export const PROCEDURE_HIERARCHY =
-  process.env.REACT_APP_VALUE_SET_URL_PROCEDURE_HIERARCHY ?? 'https://terminology.eds.aphp.fr/aphp-orbis-ccam'
-
+  process.env.NODE_ENV !== 'development'
+    ? '{PROCEDURE_HIERARCHY}'
+    : process.env.REACT_APP_VALUE_SET_URL_PROCEDURE_HIERARCHY
 export const DEMOGRAPHIC_GENDER =
-  process.env.REACT_APP_VALUE_SET_URL_DEMOGRAPHIC_GENDER ?? 'https://terminology.eds.aphp.fr/aphp-orbis-gender'
+  process.env.NODE_ENV !== 'development'
+    ? '{DEMOGRAPHIC_GENDER}'
+    : process.env.REACT_APP_VALUE_SET_URL_DEMOGRAPHIC_GENDER
 
 export const ENCOUNTER_ADMISSION_MODE =
-  process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_ADMISSION_MODE ??
-  'https://terminology.eds.aphp.fr/aphp-orbis-visit-motif-admission'
+  process.env.NODE_ENV !== 'development'
+    ? '{ENCOUNTER_ADMISSION_MODE}'
+    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_ADMISSION_MODE
 
 export const ENCOUNTER_ENTRY_MODE =
-  process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_ENTRY_MODE ??
-  'https://terminology.eds.aphp.fr/aphp-orbis-visit-mode-entree'
+  process.env.NODE_ENV !== 'development'
+    ? '{ENCOUNTER_ENTRY_MODE}'
+    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_ENTRY_MODE
 
 export const ENCOUNTER_EXIT_MODE =
-  process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_EXIT_MODE ??
-  'https://terminology.eds.aphp.fr/aphp-orbis-visit-mode-sortie'
+  process.env.NODE_ENV !== 'development'
+    ? '{ENCOUNTER_EXIT_MODE}'
+    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_EXIT_MODE
 
 export const ENCOUNTER_VISIT_TYPE =
-  process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_VISIT_TYPE ?? 'https://terminology.eds.aphp.fr/aphp-orbis-visit-type'
+  process.env.NODE_ENV !== 'development'
+    ? '{ENCOUNTER_VISIT_TYPE}'
+    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_VISIT_TYP
 
 export const ENCOUNTER_SEJOUR_TYPE =
-  process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_SEJOUR_TYPE ?? 'https://terminology.eds.aphp.fr/aphp-orbis-type-sejour'
+  process.env.NODE_ENV !== 'development'
+    ? '{ENCOUNTER_SEJOUR_TYPE}'
+    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_SEJOUR_TYPE
 
 export const ENCOUNTER_FILE_STATUS =
-  process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_FILE_STATUS ??
-  'https://terminology.eds.aphp.fr/aphp-orbis-visite-status'
+  process.env.NODE_ENV !== 'development'
+    ? '{ENCOUNTER_FILE_STATUS}'
+    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_FILE_STATUS
 
 export const ENCOUNTER_EXIT_TYPE =
-  process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_EXIT_TYPE ??
-  'https://terminology.eds.aphp.fr/aphp-orbis-visit-type-sortie'
+  process.env.NODE_ENV !== 'development'
+    ? '{ENCOUNTER_EXIT_TYPE}'
+    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_EXIT_TYPE
 
 export const ENCOUNTER_DESTINATION =
-  process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_DESTINATION ??
-  'https://terminology.eds.aphp.fr/aphp-orbis-visit-destination'
+  process.env.NODE_ENV !== 'development'
+    ? '{ENCOUNTER_DESTINATION}'
+    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_DESTINATION
 
 export const ENCOUNTER_PROVENANCE =
-  process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_PROVENANCE ??
-  'https://terminology.eds.aphp.fr/aphp-orbis-visit-provenance'
+  process.env.NODE_ENV !== 'development'
+    ? '{ENCOUNTER_PROVENANCE}'
+    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_PROVENANCE
 
 export const ENCOUNTER_ADMISSION =
-  process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_ADMISSION ??
-  'https://terminology.eds.aphp.fr/aphp-orbis-visit-type-admission'
+  process.env.NODE_ENV !== 'development'
+    ? '{ENCOUNTER_ADMISSION}'
+    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_ADMISSION
 
 export const MEDICATION_ATC =
-  process.env.REACT_APP_VALUE_SET_URL_MEDICATION_ATC ?? 'https://terminology.eds.aphp.fr/aphp-orbis-atc-medicament'
+  process.env.NODE_ENV !== 'development' ? '{MEDICATION_ATC}' : process.env.REACT_APP_VALUE_SET_URL_MEDICATION_ATC
 
 export const MEDICATION_PRESCRIPTION_TYPES =
-  process.env.REACT_APP_VALUE_SET_URL_MEDICATION_PRESCRIPTION_TYPES ??
-  'https://terminology.eds.aphp.fr/aphp-orbis-medicament-type-prescription'
+  process.env.NODE_ENV !== 'development'
+    ? '{MEDICATION_PRESCRIPTION_TYPES}'
+    : process.env.REACT_APP_VALUE_SET_URL_MEDICATION_PRESCRIPTION_TYPES
 
 export const MEDICATION_ADMINISTRATIONS =
-  process.env.REACT_APP_VALUE_SET_URL_MEDICATION_ADMINISTRATIONS ??
-  'https://terminology.eds.aphp.fr/aphp-orbis-medicament-voie-administration'
+  process.env.NODE_ENV !== 'development'
+    ? '{MEDICATION_ADMINISTRATIONS}'
+    : process.env.REACT_APP_VALUE_SET_URL_MEDICATION_ADMINISTRATIONS
 
 export const BIOLOGY_HIERARCHY_ITM_ANABIO =
-  process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_ANABIO ?? 'https://terminology.eds.aphp.fr/aphp-itm-anabio'
+  process.env.NODE_ENV !== 'development'
+    ? '{BIOLOGY_HIERARCHY_ITM_ANABIO}'
+    : process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_ANABIO
 
 export const BIOLOGY_HIERARCHY_ITM_LOINC =
-  process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_LOINC ?? 'https://terminology.eds.aphp.fr/aphp-itm-loinc'
+  process.env.NODE_ENV !== 'development'
+    ? '{BIOLOGY_HIERARCHY_ITM_LOINC}'
+    : process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_LOINC
 
-export const ODD_BIOLOGY: boolean = process.env.REACT_APP_ODD_BIOLOGY === 'true' ?? false
-export const ODD_COMPOSITION: boolean = process.env.REACT_APP_ODD_COMPOSITION === 'true' ?? false
-export const ODD_PROCEDURE: boolean = process.env.REACT_APP_ODD_PROCEDURE === 'true' ?? false
-export const ODD_CLAIM: boolean = process.env.REACT_APP_ODD_CLAIM === 'true' ?? false
-export const ODD_CONDITION: boolean = process.env.REACT_APP_ODD_CONDITION === 'true' ?? false
-export const ODD_OBSERVATION: boolean = process.env.REACT_APP_ODD_OBSERVATION === 'true' ?? false
-export const ODD_MEDICATION: boolean = process.env.REACT_APP_ODD_MEDICATION === 'true' ?? false
-
-export const ODD_CONTACT: boolean = process.env.REACT_APP_ODD_CONTACT === 'true' ?? false
+export const ODD_BIOLOGY: boolean =
+  (process.env.NODE_ENV !== 'development' ? '{ODD_BIOLOGY}' : process.env.REACT_APP_ODD_BIOLOGY) === 'true'
+export const ODD_COMPOSITION: boolean =
+  (process.env.NODE_ENV !== 'development' ? '{ODD_COMPOSITION}' : process.env.REACT_APP_ODD_COMPOSITION) === 'true'
+export const ODD_PROCEDURE: boolean =
+  (process.env.NODE_ENV !== 'development' ? '{ODD_PROCEDURE}' : process.env.REACT_APP_OODD_PROCEDURE) === 'true'
+export const ODD_CLAIM: boolean =
+  (process.env.NODE_ENV !== 'development' ? '{ODD_CLAIM}' : process.env.REACT_APP_ODD_CLAIM) === 'true'
+export const ODD_CONDITION: boolean =
+  (process.env.NODE_ENV !== 'development' ? '{ODD_CONDITION}' : process.env.REACT_APP_ODD_CONDITION) === 'true'
+export const ODD_OBSERVATION: boolean =
+  (process.env.NODE_ENV !== 'development' ? '{ODD_OBSERVATION}' : process.env.REACT_APP_ODD_OBSERVATION) === 'true'
+export const ODD_MEDICATION: boolean =
+  (process.env.NODE_ENV !== 'development' ? '{ODD_MEDICATION}' : process.env.REACT_APP_ODD_MEDICATION) === 'true'
+export const ODD_CONTACT: boolean =
+  (process.env.NODE_ENV !== 'development' ? '{ODD_CONTACT}' : process.env.REACT_APP_ODD_CONTACT) === 'true'
