@@ -8,8 +8,8 @@ import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import LockIcon from '@material-ui/icons/Lock'
 import SortIcon from '@material-ui/icons/Sort'
 
-import PatientFilters from '../../../Filters/PatientFilters/PatientFilters'
-import SortDialog from '../../../Filters/SortDialog/SortDialog'
+import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
+import SortDialog from 'components/Filters/SortDialog/SortDialog'
 
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { SearchByTypes, VitalStatus } from 'types'

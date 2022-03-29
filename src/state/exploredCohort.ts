@@ -254,9 +254,6 @@ const exploredCohortSlice = createSlice({
   name: 'exploredCohort',
   initialState: defaultInitialState as ExploredCohortState,
   reducers: {
-    setExploredCohort: (state: ExploredCohortState, action: PayloadAction<CohortData | undefined>) => {
-      return action.payload ? { ...state, ...action.payload } : defaultInitialState
-    },
     addImportedPatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
       const importedPatients = [...state.importedPatients, ...action.payload]
       state.importedPatients = importedPatients.filter(
@@ -349,7 +346,6 @@ export { fetchExploredCohort, favoriteExploredCohort, fetchExploredCohortInBackg
 export const {
   addImportedPatients,
   excludePatients,
-  setExploredCohort,
   removeImportedPatients,
   includePatients,
   removeExcludedPatients,

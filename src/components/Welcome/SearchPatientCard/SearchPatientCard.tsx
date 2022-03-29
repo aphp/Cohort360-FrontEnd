@@ -3,8 +3,8 @@ import { useAppSelector } from 'state'
 
 import { Divider, Grid, Typography } from '@material-ui/core'
 
-import PatientSearchBar from '../../PatientSearchBar/PatientSearchBar'
-import Title from '../../Title'
+import PatientSearchBar from 'components/PatientSearchBar/PatientSearchBar'
+import Title from 'components/Title'
 
 import LockIcon from '@material-ui/icons/Lock'
 

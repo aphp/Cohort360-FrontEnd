@@ -13,7 +13,7 @@ import BiologyForm from './DiagramView/components/LogicalOperator/components/Cri
 // services.cohortCreation.Fetcher
 import services from 'services'
 
-import { ODD_BIOLOGY } from '../../../constants'
+import { ODD_BIOLOGY } from '../../constants'
 
 // ├── Mes variables
 // ├── Patients

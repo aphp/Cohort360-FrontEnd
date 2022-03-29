@@ -8,8 +8,8 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import { InputSearchDocumentSimple, InputSearchDocumentRegex, InputSearchDocumentButton } from 'components/Inputs'
 
-import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
-import DocumentList from '../../Cohort/Documents/DocumentList/DocumentList'
+import DocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
+import DocumentList from 'components/Dashboard/Documents/DocumentList/DocumentList'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'

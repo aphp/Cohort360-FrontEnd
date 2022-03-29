@@ -9,17 +9,14 @@ import PatientSearchBar from 'components/PatientSearchBar/PatientSearchBar'
 import TableauPatients from 'components/TableauPatients/TableauPatients'
 
 import services from 'services'
-import { useAppDispatch } from 'state'
-import { setExploredCohort } from 'state/exploredCohort'
 
 import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { SearchByTypes } from 'types'
 
 import useStyles from './styles'
 
-const RechercherPatient: React.FC<{}> = () => {
+const SearchPatient: React.FC<{}> = () => {
   const classes = useStyles()
-  const dispatch = useAppDispatch()
   const practitioner = useAppSelector((state) => state.me)
   const { search } = useParams<{ search: string }>()
 
@@ -77,10 +74,6 @@ const RechercherPatient: React.FC<{}> = () => {
   }
 
   useEffect(() => {
-    dispatch<any>(setExploredCohort())
-  }, []) // eslint-disable-line
-
-  useEffect(() => {
     if (search) {
       performQueries(page, sortBy, sortDirection, search, searchBy)
     }
@@ -133,4 +126,4 @@ const RechercherPatient: React.FC<{}> = () => {
   )
 }
 
-export default withRouter(RechercherPatient)
+export default withRouter(SearchPatient)

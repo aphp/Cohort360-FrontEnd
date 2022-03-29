@@ -6,7 +6,7 @@ import Alert from '@material-ui/lab/Alert'
 import Skeleton from '@material-ui/lab/Skeleton'
 import Pagination from '@material-ui/lab/Pagination'
 
-import DocumentFilters from '../../Filters/DocumentFilters/DocumentFilters'
+import DocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
 import DocumentList from './DocumentList/DocumentList'
 
 import { InputSearchDocumentSimple, InputSearchDocumentRegex, InputSearchDocumentButton } from 'components/Inputs'

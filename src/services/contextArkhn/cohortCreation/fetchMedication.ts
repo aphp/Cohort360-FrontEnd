@@ -1,5 +1,5 @@
 import { MEDICATION_ATC, MEDICATION_PRESCRIPTION_TYPES, MEDICATION_ADMINISTRATIONS } from '../../../constants'
-import apiRequest from '../../apiRequest'
+import apiRequest from 'services/apiRequest'
 import { cleanValueSet } from 'utils/cleanValueSet'
 import { codeSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'

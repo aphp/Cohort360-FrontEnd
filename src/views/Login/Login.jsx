@@ -15,10 +15,10 @@ import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogActions from '@material-ui/core/DialogActions'
 import CircularProgress from '@material-ui/core/CircularProgress'
 
-import Footer from 'components/Footer/Footer'
 import NoRights from 'components/ErrorView/NoRights'
 
 import logo from 'assets/images/logo-login.png'
+import logoAPHP from 'assets/images/logo-aphp.png'
 
 import { useAppDispatch } from 'state'
 import { login as loginAction } from 'state/me'
@@ -246,7 +246,11 @@ const Login = () => {
               </Grid>
 
               <Box mt={10} align="center">
-                <Footer />
+                <Grid container justifyContent="center">
+                  <Link href="https://eds.aphp.fr">
+                    <img className={classes.logoAPHP} src={logoAPHP} alt="Footer" />
+                  </Link>
+                </Grid>
               </Box>
             </form>
           </Grid>

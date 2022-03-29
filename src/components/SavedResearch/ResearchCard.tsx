@@ -17,7 +17,7 @@ import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import ResearchTable from './ResearchTable/ResearchTable'
-import CohortsFilter from '../Filters/CohortsFilters/CohortsFilters'
+import CohortsFilter from 'components/Filters/CohortsFilters/CohortsFilters'
 
 import useStyles from './styles'
 import { Cohort, CohortFilters, ValueSet } from 'types'

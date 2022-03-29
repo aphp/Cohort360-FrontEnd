@@ -24,7 +24,7 @@ import { Cohort, RequestType } from 'types'
 
 import useStyles from './styles'
 
-const Accueil: React.FC = () => {
+const Welcome: React.FC = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
   const history = useHistory()
@@ -106,6 +106,7 @@ const Accueil: React.FC = () => {
           {lastConnection}
         </Typography>
       </Container>
+
       <Container
         maxWidth="lg"
         className={classes.container}
@@ -198,4 +199,4 @@ const Accueil: React.FC = () => {
   ) : null
 }
 
-export default Accueil
+export default Welcome

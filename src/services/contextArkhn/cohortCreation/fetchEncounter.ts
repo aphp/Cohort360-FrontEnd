@@ -10,7 +10,7 @@ import {
   ENCOUNTER_PROVENANCE,
   ENCOUNTER_ADMISSION
 } from '../../../constants'
-import apiRequest from '../../apiRequest'
+import apiRequest from 'services/apiRequest'
 import { cleanValueSet } from 'utils/cleanValueSet'
 
 export const fetchAdmissionModes = async () => {

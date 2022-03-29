@@ -16,8 +16,8 @@ import {
   Typography
 } from '@material-ui/core'
 
-import PatientFilters from '../../Filters/PatientFilters/PatientFilters'
-import TableauPatient from '../../TableauPatients/TableauPatients'
+import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
+import TableauPatient from 'components/TableauPatients/TableauPatients'
 
 import PieChart from '../Preview/Charts/PieChart'
 import BarChart from '../Preview/Charts/BarChart'

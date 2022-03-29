@@ -99,6 +99,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
           </Select>
         </Grid>
       )}
+
       <Grid item container xs={showSelect ? 10 : 12} alignItems="center" className={classes.searchBar}>
         <InputBase
           placeholder="Cherchez un ipp, nom et/ou prénom"
@@ -112,6 +113,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
             </InputAdornment>
           }
         />
+
         <IconButton type="submit" aria-label="search" onClick={onSearchPatient}>
           <SearchIcon fill="#ED6D91" height="15px" />
         </IconButton>

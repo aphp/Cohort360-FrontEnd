@@ -38,7 +38,7 @@ import { logout as logoutAction } from 'state/me'
 import { open as openAction, close as closeAction } from 'state/drawer'
 import { resetCohortCreation } from 'state/cohortCreation'
 
-import { ODD_CONTACT } from '../../constants'
+import { ODD_CONTACT } from '../../../constants'
 import useStyles from './styles'
 
 const smallDrawerWidth = 52

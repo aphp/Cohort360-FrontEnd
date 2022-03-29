@@ -27,7 +27,7 @@ import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import PMSIFilters from '../../Filters/PMSIFilters/PMSIFilters'
+import PMSIFilters from 'components/Filters/PMSIFilters/PMSIFilters'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 

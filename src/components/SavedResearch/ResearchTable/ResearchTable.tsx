@@ -34,7 +34,7 @@ import ExportIcon from '@material-ui/icons/GetApp'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
-import ExportModal from 'components/Cohort/ExportModal/ExportModal'
+import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { CohortState, setSelectedCohort as setSelectedCohortState } from 'state/cohort'

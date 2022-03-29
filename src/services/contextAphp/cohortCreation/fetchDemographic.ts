@@ -1,5 +1,5 @@
 import { DEMOGRAPHIC_GENDER } from '../../../constants'
-import apiRequest from '../../apiRequest'
+import apiRequest from 'services/apiRequest'
 import { cleanValueSet } from 'utils/cleanValueSet'
 
 export const fetchGender = async () => {

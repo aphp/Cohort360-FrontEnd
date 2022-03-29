@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
 import { CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
-import DocumentTable from '../../PatientDocs/DocumentTable/DocumentTable'
+import DocumentTable from 'components/Patient/PatientDocs/DocumentTable/DocumentTable'
 
 import Pagination from '@material-ui/lab/Pagination'
 

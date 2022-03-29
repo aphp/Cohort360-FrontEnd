@@ -4,7 +4,7 @@ import Button from '@material-ui/core/Button'
 import Drawer from '@material-ui/core/Drawer'
 import Typography from '@material-ui/core/Typography'
 
-import ScopeTree from '../../../../../../ScopeTree/ScopeTree'
+import ScopeTree from 'components/ScopeTree/ScopeTree'
 import { ScopeTreeRow } from 'types'
 
 import { useAppSelector } from 'state'

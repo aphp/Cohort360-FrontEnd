@@ -1,5 +1,5 @@
 import { BIOLOGY_HIERARCHY_ITM_ANABIO, BIOLOGY_HIERARCHY_ITM_LOINC } from '../../../constants'
-import apiRequest from '../../apiRequest'
+import apiRequest from 'services/apiRequest'
 import { cleanValueSet } from 'utils/cleanValueSet'
 
 export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) => {
