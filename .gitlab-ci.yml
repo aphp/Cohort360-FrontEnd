@@ -1,84 +1,68 @@
-image: $IMAGE_REPOSITORY_URL/node:$CI_COMMIT_BRANCH
+image: harbor.eds.aphp.fr/cohort360/selenium-chrome:dev
 
-default:
-  tags:
-    - $GITLAB_RUNNER_TAG
-
-.default_rules:
-  rules:
-    - if: ($CI_COMMIT_BRANCH =~ $STANDARD_CD_BRANCHES || $CI_COMMIT_BRANCH =~ $PROTECTED_CD_BRANCHES) && $ONLY_RELEASE == null
-    - when: never
-
-.release_rules:
-  rules:
-    - if: ($CI_COMMIT_BRANCH =~ $STANDARD_CD_BRANCHES) && $ENABLE_RELEASE == "true"
-    - if: ($CI_COMMIT_BRANCH =~ $PROTECTED_CD_BRANCHES) && $ENABLE_RELEASE == "true"
-      when: manual
-    - when: never
-
-stages:
+stages: # List of stages for jobs in their order of execution
   - test
   - build
   - deploy
-  - release
 
-test_e2e_chrome:
-  image:
-    name: harbor.eds.aphp.fr/cohort360/selenium-chrome:$CI_COMMIT_BRANCH
+include: # Variables needed for Selenium tests
+  project: dev/test_newci_front
+  file: '/.gitlab/selenium_variables.yml'
+
+test-e2e-chrome-job:
   stage: test
-  script:
-    - bash .gitlab/test.sh
-    - echo "npm run test"
-    - npm run test
   artifacts:
     when: always
     paths:
       - reports
     expire_in: 1 week
   allow_failure: true
-  rules:
-    - !reference [.default_rules, rules]
+  script:
+    - npm install
+    - cp .gitlab/nginx-test.conf /etc/nginx/conf.d/nginx.conf
+    - service nginx restart
+    - npm run start > file.log 2>&1 &
+    - sleep 30 # Wait until application is started
+    - npm run test
+  cache:
+    key: cohort360_nodemodules_cache
+    paths:
+      - node_modules/
 
-build:
+build-job:
+  image: node:16.13.2
   stage: build
-  # needs:
-  #   - job: test
+  script:
+    - npm install
+    - npm run build
   artifacts:
     paths:
       - build/
-    expire_in: 1 week
-  script:
-    - name=${CI_COMMIT_BRANCH}_build_ENV  && cp ${!name} $CI_PROJECT_DIR/.env
-    - npm config set proxy http://$PROXY_URL
-    - npm install
-    - CI=false npm run build
+    expire_in: 1 day
   rules:
-    - !reference [.default_rules, rules]
+    - if: '$CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "main"'
+      when: on_success
+  cache:
+    key: cohort360_nodemodules_cache
+    paths:
+      - node_modules/
+    policy: pull
 
-deploy:
-  image:
-    name: $IMAGE_REPOSITORY_URL/kaniko-executor:$CI_COMMIT_BRANCH
-    entrypoint: ['']
+deploy-job:
+  image: gcr.io/kaniko-project/executor:debug
   stage: deploy
   needs:
-    # - job: test
-    - job: build
+    - job: build-job
       artifacts: true
   script:
-    - ENVIRONMENT=${CI_COMMIT_BRANCH/_/-}
-    - sed -i "s/{{ENVIR}}/$CI_COMMIT_BRANCH/g" Dockerfile
-    - REPO=$(echo $IMAGE_REPOSITORY_URL | sed "s/[^a-zA-Z0-9]/\\\\&/g") && sed -i "s/{{IMAGE_REPOSITORY_URL}}/$REPO/g" Dockerfile
-    - echo "{\"auths\":{\"$IMAGE_REGISTRY\":{\"username\":\"$BOT_NAME\",\"password\":\"$BOT_TOKEN\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $IMAGE_REPOSITORY_URL/front:$CI_COMMIT_BRANCH
+    - export VERSION=$(cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"harbor.eds.aphp.fr\":{\"username\":\"${BOT_NAME}\",\"password\":\"${BOT_TOKEN}\"}}}" > /kaniko/.docker/config.json
+    - >-
+      /kaniko/executor
+      --context ${CI_PROJECT_DIR}
+      --dockerfile ${CI_PROJECT_DIR}/Dockerfile
+      --destination harbor.eds.aphp.fr/cohort360/front:${VERSION}
   rules:
-    - !reference [.default_rules, rules]
-
-release:
-  image:
-    name: $IMAGE_REPOSITORY_URL/alpine:$CI_COMMIT_BRANCH
-    entrypoint: ['']
-  stage: release
-  script:
-    - bash .gitlab/release.sh
-  rules:
-    - !reference [.release_rules, rules]
+    - if: '$CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "main"'
+      when: on_success
