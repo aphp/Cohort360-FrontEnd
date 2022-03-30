@@ -37,7 +37,7 @@ const AutoLogoutContainer = () => {
   const onIdle = () => {
     setDialogIsOpen(true)
     // console.log('User inactif depuis 10 secondes')
-    sessionInactifTimerRef.current = setTimeout(logout, 60 * 1000)
+    sessionInactifTimerRef.current = setTimeout(logout, 30 * 1000)
   }
 
   const stayActive = async () => {
@@ -101,7 +101,7 @@ const AutoLogoutContainer = () => {
 
       setInterval(() => {
         refreshToken()
-      }, 13 * 60 * 1000)
+      }, 3 * 60 * 1000)
     }
   }, [])
 
@@ -122,12 +122,7 @@ const AutoLogoutContainer = () => {
           <Button onClick={logout}>Déconnexion</Button>
         </DialogActions>
       </Dialog>
-      <IdleTimer
-        ref={inactifTimerRef}
-        timeout={14 * 60 * 1000}
-        // timeout={10 * 1000}
-        onIdle={onIdle}
-      ></IdleTimer>
+      <IdleTimer ref={inactifTimerRef} timeout={13 * 60 * 1000} onIdle={onIdle}></IdleTimer>
     </div>
   )
 }
