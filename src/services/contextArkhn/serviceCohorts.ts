@@ -21,7 +21,7 @@ import {
   getGenderRepartitionMapAphp,
   getVisitRepartitionMapAphp
 } from 'utils/graphUtils'
-import {getApiResponseResources} from 'utils/apiHelpers'
+import { getApiResponseResources } from 'utils/apiHelpers'
 
 import {
   fetchBinary,
@@ -32,7 +32,7 @@ import {
   fetchPatient
 } from './callApi'
 
-import {ODD_EXPORT} from '../../constants'
+import { ODD_EXPORT } from '../../constants'
 
 import apiBackend from '../apiBackend'
 
