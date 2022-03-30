@@ -40,8 +40,7 @@ build-job:
       - build/
     expire_in: 1 day
   rules:
-    - if: '$CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "main"'
-      when: on_success
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
   cache:
     key: cohort360_nodemodules_cache
     paths:
@@ -64,5 +63,4 @@ deploy-job:
       --dockerfile ${CI_PROJECT_DIR}/Dockerfile
       --destination harbor.eds.aphp.fr/cohort360/front:${VERSION}
   rules:
-    - if: '$CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "main"'
-      when: on_success
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
