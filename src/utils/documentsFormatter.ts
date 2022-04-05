@@ -4,6 +4,8 @@ import {
   EncounterStatusKind
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 
+import { docTypes } from 'assets/docTypes.json'
+
 export const getDocumentStatus = (status?: CompositionStatusKind | DocumentReferenceStatusKind): string => {
   switch (status) {
     case CompositionStatusKind._amended:
@@ -55,4 +57,29 @@ export const getProcedureStatus = (status?: string): string => {
     default:
       return 'Statut inconnu'
   }
+}
+
+export const getDisplayingSelectedDocTypes = (selectedDocTypes: any[]) => {
+  let displayingSelectedDocTypes: any[] = []
+  const allTypes = docTypes.map((docType: any) => docType.type)
+
+  for (const selectedDocType of selectedDocTypes) {
+    const numberOfElementFromGroup = (allTypes.filter((type) => type === selectedDocType.type) || []).length
+    const numberOfElementSelected = (
+      selectedDocTypes.filter((selectedDoc) => selectedDoc.type === selectedDocType.type) || []
+    ).length
+
+    if (numberOfElementFromGroup === numberOfElementSelected) {
+      const groupIsAlreadyAdded = displayingSelectedDocTypes.find((dsdt) => dsdt.label === selectedDocType.type)
+      if (groupIsAlreadyAdded) continue
+
+      displayingSelectedDocTypes = [
+        ...displayingSelectedDocTypes,
+        { type: selectedDocType.type, label: selectedDocType.type, code: selectedDocType.type }
+      ]
+    } else {
+      displayingSelectedDocTypes = [...displayingSelectedDocTypes, selectedDocType]
+    }
+  }
+  return displayingSelectedDocTypes.filter((item, index, array) => array.indexOf(item) === index)
 }

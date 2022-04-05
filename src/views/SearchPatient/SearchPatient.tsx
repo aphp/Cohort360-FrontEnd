@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
 import { useAppSelector } from 'state'
-import { withRouter, useParams } from 'react-router'
+import { useParams } from 'react-router'
 
 import { CircularProgress, Grid, Typography } from '@material-ui/core'
 
 import PatientSearchBar from 'components/PatientSearchBar/PatientSearchBar'
-import TableauPatients from 'components/TableauPatients/TableauPatients'
+import DataTablePatient from 'components/DataTable/DataTablePatient'
 
 import services from 'services'
 
 import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { SearchByTypes } from 'types'
+import { SearchByTypes, Order } from 'types'
 
 import useStyles from './styles'
 
@@ -20,32 +20,32 @@ const SearchPatient: React.FC<{}> = () => {
   const practitioner = useAppSelector((state) => state.me)
   const { search } = useParams<{ search: string }>()
 
+  const [loading, setLoading] = useState(false)
   const [showTable, setShowTable] = useState(false)
   const [patientResults, setPatientResults] = useState<IPatient[]>([])
-  const [loading, setLoading] = useState(false)
-  const [sortBy, setSortBy] = useState('given')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+  const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
+
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
   const [searchInput, setSearchInput] = useState(search ?? '')
-  const [total, setTotal] = useState(0)
 
-  const performQueries = async (
-    page: number,
-    sortBy: string,
-    sortDirection: string,
-    input: string,
-    searchBy = SearchByTypes.text
-  ) => {
+  const [order, setOrder] = useState<Order>({
+    orderBy: 'given',
+    orderDirection: 'asc'
+  })
+
+  const performQueries = async (page: number) => {
     const nominativeGroupsIds = practitioner ? practitioner.nominativeGroupsIds : []
+    if (!searchInput) return
+
     setLoading(true)
     if (typeof services?.patients?.searchPatient === 'function') {
       const results = await services.patients.searchPatient(
         nominativeGroupsIds,
         page,
-        sortBy,
-        sortDirection,
-        input,
+        order.orderBy,
+        order.orderDirection,
+        searchInput,
         searchBy
       )
       if (results) {
@@ -57,27 +57,14 @@ const SearchPatient: React.FC<{}> = () => {
     setLoading(false)
   }
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+  const handleChangePage = (page: number) => {
     setPage(page)
-    if (total > patientResults.length) {
-      performQueries(page, sortBy, sortDirection, searchInput, searchBy)
-    }
-  }
-
-  const handleRequestSort = (event: React.MouseEvent<unknown>, property: any) => {
-    const isAsc: boolean = sortBy === property && sortDirection === 'asc'
-    const _sortDirection = isAsc ? 'desc' : 'asc'
-
-    setSortDirection(_sortDirection)
-    setSortBy(property)
-    performQueries(page, property, _sortDirection, searchInput, searchBy)
+    performQueries(page)
   }
 
   useEffect(() => {
-    if (search) {
-      performQueries(page, sortBy, sortDirection, search, searchBy)
-    }
-  }, [search]) // eslint-disable-line
+    performQueries(page)
+  }, [order.orderBy, order.orderDirection, searchBy]) // eslint-disable-line
 
   const open = useAppSelector((state) => state.drawer)
 
@@ -95,8 +82,8 @@ const SearchPatient: React.FC<{}> = () => {
             Rechercher un patient
           </Typography>
           <PatientSearchBar
+            showSelect
             performQueries={performQueries}
-            showSelect={true}
             searchInput={searchInput}
             onChangeInput={setSearchInput}
             searchBy={searchBy}
@@ -108,16 +95,17 @@ const SearchPatient: React.FC<{}> = () => {
             </Grid>
           )}
           {!loading && showTable && (
-            <TableauPatients
+            <DataTablePatient
+              loading={loading}
+              groupId={practitioner?.nominativeGroupsIds ? practitioner?.nominativeGroupsIds.join(',') : undefined}
               search={searchInput}
-              groupId={practitioner?.nominativeGroupsIds}
-              patients={patientResults}
-              onChangePage={handlePageChange}
+              deidentified={practitioner?.deidentified ?? true}
+              patientsList={patientResults ?? []}
+              order={order}
+              setOrder={setOrder}
               page={page}
-              totalPatientCount={total}
-              sortBy={sortBy}
-              sortDirection={'asc'}
-              onRequestSort={handleRequestSort}
+              setPage={(newPage) => handleChangePage(newPage)}
+              total={total}
             />
           )}
         </Grid>
@@ -126,4 +114,4 @@ const SearchPatient: React.FC<{}> = () => {
   )
 }
 
-export default withRouter(SearchPatient)
+export default SearchPatient

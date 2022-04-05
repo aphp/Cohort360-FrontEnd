@@ -4,7 +4,8 @@ import Button from '@material-ui/core/Button'
 import Divider from '@material-ui/core/Divider'
 import Grid from '@material-ui/core/Grid'
 import useStyles from './styles'
-import Title from '../../Title'
+
+import Typography from '@material-ui/core/Typography'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import services from 'services'
 
@@ -31,7 +32,9 @@ const PatientSearchCard = () => {
   return (
     <>
       <div id="patients-card-title">
-        <Title>{loading ? <CircularProgress size={20} /> : displayDigit(patientNb)} patients pris en charge</Title>
+        <Typography component="h2" variant="h2" color="primary" gutterBottom>
+          {loading ? <CircularProgress size={20} /> : displayDigit(patientNb)} patients pris en charge
+        </Typography>
       </div>
       <Divider />
       <Grid container direction="column" justifyContent="space-evenly" style={{ height: '100%', marginTop: 8 }}>

@@ -2,19 +2,21 @@ import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
 import { Button, Chip, Grid, Typography } from '@material-ui/core'
-import { Alert, Pagination } from '@material-ui/lab'
-
+import { Alert } from '@material-ui/lab'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import { InputSearchDocumentSimple, InputSearchDocumentRegex, InputSearchDocumentButton } from 'components/Inputs'
 
 import DocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
-import DocumentList from 'components/Dashboard/Documents/DocumentList/DocumentList'
+import DataTableComposition from 'components/DataTable/DataTableComposition'
+
+import { Order } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'
 
 import { docTypes } from 'assets/docTypes.json'
+import { getDisplayingSelectedDocTypes } from 'utils/documentsFormatter'
 
 import useStyles from './styles'
 
@@ -34,7 +36,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   const totalDocs = patient?.documents?.count ?? 0
   const totalAllDoc = patient?.documents?.total ?? 0
 
-  const patientDocumentsState = patient?.documents?.list ?? []
+  const patientDocumentsList = patient?.documents?.list ?? []
 
   const [page, setPage] = useState(1)
 
@@ -51,40 +53,17 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   })
 
   const [searchInput, setSearchInput] = useState('')
-  const [sortBy, setSortBy] = useState('date')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+  const [order, setOrder] = useState<Order>({
+    orderBy: 'date',
+    orderDirection: 'asc'
+  })
 
   const [searchMode, setSearchMode] = useState(false)
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState<'filter' | string | null>(null)
 
   const [inputMode, setInputMode] = useState<'simple' | 'regex'>('simple')
 
-  const documentLines = 20 // Number of desired lines in the document array
-
-  const displayingSelectedDocType: any[] = (() => {
-    let displayingSelectedDocTypes: any[] = []
-    const allTypes = docTypes.map((docType: any) => docType.type)
-
-    for (const selectedDocType of filters.selectedDocTypes) {
-      const numberOfElementFromGroup = (allTypes.filter((type) => type === selectedDocType.type) || []).length
-      const numberOfElementSelected = (
-        filters.selectedDocTypes.filter((selectedDoc) => selectedDoc.type === selectedDocType.type) || []
-      ).length
-
-      if (numberOfElementFromGroup === numberOfElementSelected) {
-        const groupIsAlreadyAdded = displayingSelectedDocTypes.find((dsdt) => dsdt.label === selectedDocType.type)
-        if (groupIsAlreadyAdded) continue
-
-        displayingSelectedDocTypes = [
-          ...displayingSelectedDocTypes,
-          { type: selectedDocType.type, label: selectedDocType.type, code: selectedDocType.type }
-        ]
-      } else {
-        displayingSelectedDocTypes = [...displayingSelectedDocTypes, selectedDocType]
-      }
-    }
-    return displayingSelectedDocTypes.filter((item, index, array) => array.indexOf(item) === index)
-  })()
+  const displayingSelectedDocType: any[] = getDisplayingSelectedDocTypes(filters.selectedDocTypes)
 
   const fetchDocumentsList = async (page: number, input = searchInput) => {
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
@@ -97,8 +76,8 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         options: {
           page,
           sort: {
-            by: sortBy,
-            direction: sortDirection
+            by: order.orderBy,
+            direction: order.orderDirection
           },
           filters: {
             ...filters,
@@ -119,7 +98,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
 
   useEffect(() => {
     handleChangePage()
-  }, [filters.nda, filters.selectedDocTypes, filters.startDate, filters.endDate, sortBy, sortDirection]) // eslint-disable-line
+  }, [filters.nda, filters.selectedDocTypes, filters.startDate, filters.endDate, order.orderBy, order.orderDirection]) // eslint-disable-line
 
   const onChangeOptions = (key: string, value: any) => {
     setFilters((prevState) => ({
@@ -180,7 +159,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
               disableElevation
               startIcon={<FilterList height="15px" fill="#FFF" />}
               className={classes.searchButton}
-              onClick={() => setOpen(true)}
+              onClick={() => setOpen('filter')}
             >
               Filtrer
             </Button>
@@ -256,30 +235,23 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         incohérences entre les informations de votre patient et celles du document prévisualisé.
       </Alert>
 
-      <DocumentList
-        groupId={groupId}
+      <DataTableComposition
         loading={loading}
-        documents={patientDocumentsState}
-        searchMode={searchMode}
         deidentified={deidentified}
-        sortBy={sortBy}
-        onChangeSortBy={setSortBy}
-        sortDirection={sortDirection}
-        onChangeSortDirection={setSortDirection}
-      />
-
-      <Pagination
-        className={classes.pagination}
-        count={Math.ceil(totalDocs / documentLines)}
-        shape="rounded"
-        onChange={handleChangePage}
+        searchMode={searchMode}
+        groupId={groupId}
+        documentsList={patientDocumentsList}
+        order={order}
+        setOrder={setOrder}
         page={page}
+        setPage={setPage}
+        total={totalDocs}
       />
 
       <DocumentFilters
-        open={open}
-        onClose={() => setOpen(false)}
-        onSubmit={() => setOpen(false)}
+        open={open === 'filter'}
+        onClose={() => setOpen(null)}
+        onSubmit={() => setOpen(null)}
         nda={filters.nda}
         onChangeNda={(nda: string) => onChangeOptions('nda', nda)}
         selectedDocTypes={filters.selectedDocTypes}

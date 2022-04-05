@@ -107,6 +107,9 @@ const Login = () => {
       }
 
       const nominativeGroupsIds = practitionerPerimeters
+        .filter(({ extension }) =>
+          extension.some(({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_NOMINATIVE')
+        )
         .map((practitionerPerimeter) => {
           const groupId = practitionerPerimeter.extension?.find(({ url }) => url === 'cohort-id')
             ? `${practitionerPerimeter.extension?.find(({ url }) => url === 'cohort-id').valueInteger}`

@@ -66,16 +66,11 @@ export default function EnhancedTable(props) {
     const selectedIndex = selected.indexOf(_id)
     let newSelected = []
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, _id)
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1))
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1))
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1))
+    if (selectedIndex !== -1) {
+      newSelected = selected.filter((selected) => selected !== _id)
+    } else {
+      newSelected = [...selected, _id]
     }
-
     setSelected(newSelected)
   }
 
@@ -105,6 +100,7 @@ export default function EnhancedTable(props) {
             rowCount={rows.length}
             headCells={props.headCells}
           />
+
           <TableBody>
             {noPagination !== true
               ? stableSort(rows, getComparator(order, orderBy))
@@ -119,6 +115,7 @@ export default function EnhancedTable(props) {
                     {props.children(item, index, selected, handleClick, onClickRow)}
                   </React.Fragment>
                 ))}
+
             {emptyRows > 0 && (
               <TableRow style={{ height: 76 * emptyRows }}>
                 <TableCell colSpan={props.headCells ? props.headCells.length + 1 : 0} />
@@ -127,6 +124,7 @@ export default function EnhancedTable(props) {
           </TableBody>
         </Table>
       </TableContainer>
+
       {noPagination !== true && (
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}

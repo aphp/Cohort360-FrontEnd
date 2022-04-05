@@ -4,7 +4,6 @@ import { useAppSelector } from 'state'
 import { Divider, Grid, Typography } from '@material-ui/core'
 
 import PatientSearchBar from 'components/PatientSearchBar/PatientSearchBar'
-import Title from 'components/Title'
 
 import LockIcon from '@material-ui/icons/Lock'
 
@@ -17,7 +16,9 @@ const PatientSearchCard = () => {
   return (
     <>
       <div id="search-patient-card-title">
-        <Title>Chercher un patient</Title>
+        <Typography component="h2" variant="h2" color="primary" gutterBottom>
+          Chercher un patient
+        </Typography>
       </div>
       <Divider className={classes.divider} />
       {deidentifiedBoolean ? (

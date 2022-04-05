@@ -17,7 +17,7 @@ import {
 } from '@material-ui/core'
 
 import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
-import TableauPatient from 'components/TableauPatients/TableauPatients'
+import DataTablePatient from 'components/DataTable/DataTablePatient'
 
 import PieChart from '../Preview/Charts/PieChart'
 import BarChart from '../Preview/Charts/BarChart'
@@ -36,7 +36,8 @@ import {
   GenderRepartitionType,
   AgeRepartitionType,
   SearchByTypes,
-  VitalStatus
+  VitalStatus,
+  Order
 } from 'types'
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 
@@ -70,6 +71,7 @@ const PatientList: React.FC<PatientListProps> = ({
   const [searchInput, setSearchInput] = useState('')
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
   const [agePyramid, setAgePyramid] = useState<AgeRepartitionType | undefined>(undefined)
+
   const [patientData, setPatientData] = useState<
     { vitalStatusData?: SimpleChartDataType[]; genderData?: SimpleChartDataType[] } | undefined
   >(undefined)
@@ -80,8 +82,11 @@ const PatientList: React.FC<PatientListProps> = ({
     moment().format('YYYY-MM-DD')
   ])
   const [vitalStatus, setVitalStatus] = useState<VitalStatus>(VitalStatus.all)
-  const [sortBy, setSortBy] = useState('given') // eslint-disable-line
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc') // eslint-disable-line
+
+  const [order, setOrder] = useState<Order>({
+    orderBy: 'given',
+    orderDirection: 'asc'
+  })
 
   useEffect(() => {
     setAgePyramid(agePyramidData)
@@ -95,17 +100,7 @@ const PatientList: React.FC<PatientListProps> = ({
     setPatientsList(patients)
   }, [patients])
 
-  const handleOpenDialog = () => {
-    setOpen(true)
-  }
-
-  const fetchPatients = async (
-    sortBy: string,
-    sortDirection: string,
-    input = searchInput,
-    pageValue = 1,
-    includeFacets: boolean
-  ) => {
+  const fetchPatients = async (pageValue = 1, includeFacets: boolean, inputSearch = searchInput) => {
     setLoadingStatus(true)
     // Set loader on chart
     if (includeFacets) {
@@ -115,12 +110,12 @@ const PatientList: React.FC<PatientListProps> = ({
     const result = await services.cohorts.fetchPatientList(
       pageValue,
       searchBy,
-      input,
+      inputSearch,
       gender,
       birthdates,
       vitalStatus,
-      sortBy,
-      sortDirection,
+      order.orderBy,
+      order.orderDirection,
       groupId,
       includeFacets
     )
@@ -136,16 +131,14 @@ const PatientList: React.FC<PatientListProps> = ({
     setLoadingStatus(false)
   }
 
-  const onSearchPatient = (sortBy = 'given', sortDirection = 'asc', input = searchInput) => {
+  const onSearchPatient = (inputSearch?: string) => {
     setPage(1)
-    setSortBy(sortBy)
-    setSortDirection(sortDirection as 'asc' | 'desc')
-    fetchPatients(sortBy, sortDirection, input, 1, true)
+    fetchPatients(1, true, inputSearch)
   }
 
   useEffect(() => {
     onSearchPatient()
-  }, [gender, birthdates, vitalStatus]) // eslint-disable-line
+  }, [gender, birthdates, vitalStatus, searchBy]) // eslint-disable-line
 
   const handleChangeSelect = (
     event: React.ChangeEvent<{
@@ -160,17 +153,17 @@ const PatientList: React.FC<PatientListProps> = ({
     setSearchInput(event.target.value)
   }
 
-  const handleChangePage = (event?: React.ChangeEvent<unknown>, value = 1) => {
-    setPage(value)
+  const handleChangePage = (value?: number) => {
+    setPage(value ?? 1)
     //We only fetch patients if we don't already have them
     if (patients && patients.length < totalPatients) {
-      fetchPatients(sortBy, sortDirection, searchInput, value, false)
+      fetchPatients(value ?? 1, false)
     }
   }
 
-  const handleClearInput = () => {
+  const handleClearInput = async () => {
     setSearchInput('')
-    onSearchPatient(sortBy, sortDirection, '')
+    onSearchPatient('')
   }
 
   const handleDeleteChip = (filterName: string) => {
@@ -192,15 +185,6 @@ const PatientList: React.FC<PatientListProps> = ({
       e.preventDefault()
       onSearchPatient()
     }
-  }
-
-  const handleRequestSort = (event: React.MouseEvent<unknown>, property: any) => {
-    const isAsc: boolean = sortBy === property && sortDirection === 'asc'
-    const _sortDirection = isAsc ? 'desc' : 'asc'
-
-    setSortDirection(_sortDirection)
-    setSortBy(property)
-    onSearchPatient(property, _sortDirection)
   }
 
   const genderName = () => {
@@ -289,6 +273,7 @@ const PatientList: React.FC<PatientListProps> = ({
               )}
             </Paper>
           </Grid>
+
           <Grid container item xs={12} md={6} lg={4} justifyContent="center">
             <Paper className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
@@ -308,6 +293,7 @@ const PatientList: React.FC<PatientListProps> = ({
               )}
             </Paper>
           </Grid>
+
           <Grid container item md={12} lg={4} justifyContent="center">
             <Paper className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
@@ -327,6 +313,7 @@ const PatientList: React.FC<PatientListProps> = ({
             </Paper>
           </Grid>
         </Grid>
+
         <Grid id="patient-data-grid" container item justifyContent="flex-end" className={classes.tableGrid}>
           <Grid container justifyContent="space-between" alignItems="center">
             <Typography variant="button">
@@ -363,11 +350,7 @@ const PatientList: React.FC<PatientListProps> = ({
                         </InputAdornment>
                       }
                     />
-                    <IconButton
-                      type="submit"
-                      aria-label="search"
-                      onClick={() => onSearchPatient(sortBy, sortDirection)}
-                    >
+                    <IconButton type="submit" aria-label="search" onClick={() => onSearchPatient()}>
                       <SearchIcon fill="#ED6D91" height="15px" />
                     </IconButton>
                   </Grid>
@@ -378,7 +361,7 @@ const PatientList: React.FC<PatientListProps> = ({
                 disableElevation
                 startIcon={<FilterList height="15px" fill="#FFF" />}
                 className={classes.searchButton}
-                onClick={handleOpenDialog}
+                onClick={() => setOpen(true)}
               >
                 Filtrer
               </Button>
@@ -424,17 +407,17 @@ const PatientList: React.FC<PatientListProps> = ({
               />
             )}
           </Grid>
-          <TableauPatient
+
+          <DataTablePatient
+            loading={loadingStatus}
             groupId={groupId}
-            deidentified={deidentified}
-            patients={patientsList ?? []}
-            loading={patientsList === undefined ? true : loadingStatus}
-            onChangePage={handleChangePage}
+            deidentified={deidentified ?? false}
+            patientsList={patientsList ?? []}
+            order={order}
+            setOrder={setOrder}
             page={page}
-            totalPatientCount={totalPatients}
-            sortBy={sortBy}
-            sortDirection={sortDirection}
-            onRequestSort={handleRequestSort}
+            setPage={(newPage) => handleChangePage(newPage)}
+            total={totalPatients}
           />
         </Grid>
       </Grid>

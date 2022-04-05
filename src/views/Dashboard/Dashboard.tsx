@@ -196,12 +196,7 @@ const Dashboard: React.FC<{
           />
         )}
         {selectedTab === 'documents' && (
-          <Documents
-            groupId={cohortId || perimetreIds}
-            deidentifiedBoolean={dashboard.deidentifiedBoolean ?? false}
-            sortBy={'date'}
-            sortDirection={'desc'}
-          />
+          <Documents groupId={cohortId || perimetreIds} deidentifiedBoolean={dashboard.deidentifiedBoolean ?? false} />
         )}
       </div>
     </Grid>

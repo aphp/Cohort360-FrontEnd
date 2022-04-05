@@ -1,25 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 
-import { Button, CircularProgress, Chip, CssBaseline, Grid, Typography } from '@material-ui/core'
+import { Button, Chip, CssBaseline, Grid, Typography } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
 import Skeleton from '@material-ui/lab/Skeleton'
-import Pagination from '@material-ui/lab/Pagination'
 
 import DocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
-import DocumentList from './DocumentList/DocumentList'
+import DataTableComposition from 'components/DataTable/DataTableComposition'
 
 import { InputSearchDocumentSimple, InputSearchDocumentRegex, InputSearchDocumentButton } from 'components/Inputs'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import { CohortComposition } from 'types'
-import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { CohortComposition, Order } from 'types'
 
 import services from 'services'
 import { useAppSelector } from 'state'
 
 import displayDigit from 'utils/displayDigit'
+import { getDisplayingSelectedDocTypes } from 'utils/documentsFormatter'
 import { docTypes } from 'assets/docTypes.json'
 
 import useStyles from './styles'
@@ -27,11 +26,9 @@ import useStyles from './styles'
 type DocumentsProps = {
   groupId?: string
   deidentifiedBoolean: boolean | null
-  sortBy: string
-  sortDirection: 'asc' | 'desc'
 }
 
-const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sortBy, sortDirection }) => {
+const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) => {
   const classes = useStyles()
   const { dashboard } = useAppSelector((state) => ({
     dashboard: state.exploredCohort
@@ -43,7 +40,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   const [patientDocumentsNumber, setPatientDocumentsNumber] = useState<number | undefined>(0)
   const [allPatientDocumentsNumber, setAllPatientDocumentsNumber] = useState<number | undefined>(0)
 
-  const [documents, setDocuments] = useState<(CohortComposition | IDocumentReference)[]>([])
+  const [documents, setDocuments] = useState<CohortComposition[]>([])
   const [loadingStatus, setLoadingStatus] = useState(true)
   const [page, setPage] = useState(1)
 
@@ -58,37 +55,14 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   const [startDate, setStartDate] = useState<string | null>(null)
   const [endDate, setEndDate] = useState<string | null>(null)
 
-  const [_sortBy, setSortBy] = useState(sortBy)
-  const [_sortDirection, setSortDirection] = useState<'asc' | 'desc'>(sortDirection)
+  const [order, setOrder] = useState<Order>({
+    orderBy: 'date',
+    orderDirection: 'asc'
+  })
 
   const [inputMode, setInputMode] = useState<'simple' | 'regex'>('simple')
 
-  const documentLines = 20
-
-  const displayingSelectedDocType: any[] = (() => {
-    let displayingSelectedDocTypes: any[] = []
-    const allTypes = docTypes.map((docType: any) => docType.type)
-
-    for (const selectedDocType of selectedDocTypes) {
-      const numberOfElementFromGroup = (allTypes.filter((type) => type === selectedDocType.type) || []).length
-      const numberOfElementSelected = (
-        selectedDocTypes.filter((selectedDoc) => selectedDoc.type === selectedDocType.type) || []
-      ).length
-
-      if (numberOfElementFromGroup === numberOfElementSelected) {
-        const groupIsAlreadyAdded = displayingSelectedDocTypes.find((dsdt) => dsdt.label === selectedDocType.type)
-        if (groupIsAlreadyAdded) continue
-
-        displayingSelectedDocTypes = [
-          ...displayingSelectedDocTypes,
-          { type: selectedDocType.type, label: selectedDocType.type, code: selectedDocType.type }
-        ]
-      } else {
-        displayingSelectedDocTypes = [...displayingSelectedDocTypes, selectedDocType]
-      }
-    }
-    return displayingSelectedDocTypes.filter((item, index, array) => array.indexOf(item) === index)
-  })()
+  const displayingSelectedDocType: any[] = getDisplayingSelectedDocTypes(selectedDocTypes)
 
   const onSearchDocument = async (sortBy: string, sortDirection: 'asc' | 'desc', input?: string, page = 1) => {
     if (input) {
@@ -131,8 +105,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   }
 
   useEffect(() => {
-    onSearchDocument(_sortBy, _sortDirection)
-  }, [!!deidentifiedBoolean, selectedDocTypes, nda, ipp, startDate, endDate, _sortBy, _sortDirection]) // eslint-disable-line
+    onSearchDocument(order.orderBy, order.orderDirection)
+  }, [!!deidentifiedBoolean, selectedDocTypes, nda, ipp, startDate, endDate, order.orderBy, order.orderDirection]) // eslint-disable-line
 
   const handleOpenDialog = () => {
     setOpenFilter(true)
@@ -184,9 +158,6 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
     }
   }
 
-  const documentsToDisplay =
-    documents.length > documentLines ? documents.slice((page - 1) * documentLines, page * documentLines) : documents
-
   return (
     <>
       <Grid container direction="column" alignItems="center">
@@ -236,7 +207,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
               <InputSearchDocumentSimple
                 defaultSearchInput={searchInput}
                 setDefaultSearchInput={(newSearchInput: string) => setSearchInput(newSearchInput)}
-                onSearchDocument={(newInputText: string) => onSearchDocument(_sortBy, _sortDirection, newInputText)}
+                onSearchDocument={(newInputText: string) =>
+                  onSearchDocument(order.orderBy, order.orderDirection, newInputText)
+                }
               />
             )}
 
@@ -244,7 +217,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
               <InputSearchDocumentRegex
                 defaultSearchInput={searchInput}
                 setDefaultSearchInput={(newSearchInput: string) => setSearchInput(newSearchInput)}
-                onSearchDocument={(newInputText: string) => onSearchDocument(_sortBy, _sortDirection, newInputText)}
+                onSearchDocument={(newInputText: string) =>
+                  onSearchDocument(order.orderBy, order.orderDirection, newInputText)
+                }
               />
             )}
             <Grid>
@@ -320,39 +295,18 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
               </Alert>
             )}
 
-            {loadingStatus || deidentifiedBoolean === null ? (
-              <CircularProgress className={classes.loadingSpinner} size={50} />
-            ) : (
-              <>
-                <DocumentList
-                  groupId={groupId}
-                  loading={loadingStatus}
-                  documents={documentsToDisplay}
-                  searchMode={searchMode}
-                  showIpp
-                  deidentified={deidentifiedBoolean}
-                  encounters={encounters}
-                  sortBy={_sortBy}
-                  onChangeSortBy={setSortBy}
-                  sortDirection={_sortDirection}
-                  onChangeSortDirection={setSortDirection}
-                />
-
-                <Pagination
-                  className={classes.pagination}
-                  count={Math.ceil((documentsNumber ?? 0) / documentLines)}
-                  shape="rounded"
-                  onChange={(event, page) => {
-                    if (documents.length <= documentLines) {
-                      onSearchDocument(_sortBy, _sortDirection, searchInput, page)
-                    } else {
-                      setPage(page)
-                    }
-                  }}
-                  page={page}
-                />
-              </>
-            )}
+            <DataTableComposition
+              loading={loadingStatus ?? false}
+              deidentified={deidentifiedBoolean ?? true}
+              searchMode={searchMode}
+              groupId={groupId}
+              documentsList={documents ?? []}
+              order={order}
+              setOrder={setOrder}
+              page={page}
+              setPage={setPage}
+              total={documentsNumber}
+            />
           </Grid>
         </Grid>
       </Grid>

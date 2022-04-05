@@ -11,13 +11,7 @@ import { SearchByTypes } from 'types'
 import useStyles from './styles'
 
 type PatientSearchBarProps = {
-  performQueries?: (
-    page: number,
-    sortBy: string,
-    sortDirection: string,
-    searchInput: string,
-    searchBy: SearchByTypes
-  ) => void
+  performQueries?: (page: number, searchInput: string, searchBy: SearchByTypes) => void
   showSelect?: boolean
   searchInput?: string
   onChangeInput?: (input: string) => void
@@ -41,8 +35,6 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   const [_searchInput, setSearchInput] = useState(search ?? searchInput)
 
   const page = 1
-  const sortBy = 'given'
-  const sortDirection = 'asc'
 
   const handleChangeSelect = (
     event: React.ChangeEvent<{
@@ -73,7 +65,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
       if (location.pathname === '/accueil') {
         history.push(`/rechercher_patient/${_searchInput}`)
       } else {
-        performQueries && performQueries(page, sortBy, sortDirection, _searchInput, searchBy)
+        performQueries && performQueries(page, _searchInput, searchBy)
       }
     }
   }
@@ -83,7 +75,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
     if (location.pathname === '/accueil') {
       history.push(`/rechercher_patient/${_searchInput}`)
     } else {
-      performQueries && performQueries(page, sortBy, sortDirection, _searchInput, searchBy)
+      performQueries && performQueries(page, _searchInput, searchBy)
     }
   }
 

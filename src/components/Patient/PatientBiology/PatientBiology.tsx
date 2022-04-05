@@ -1,25 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import {
-  Button,
-  Chip,
-  CircularProgress,
-  Grid,
-  IconButton,
-  InputAdornment,
-  InputBase,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  Typography
-} from '@material-ui/core'
-import Pagination from '@material-ui/lab/Pagination'
+import { Button, Chip, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
 
 import ClearIcon from '@material-ui/icons/Clear'
@@ -27,10 +9,11 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
 import BiologyFilters from 'components/Filters/BiologyFilters/BiologyFilters'
+import DataTableObservation from 'components/DataTable/DataTableObservation'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchBiology } from 'state/patient'
-import { CohortObservation } from 'types'
+import { Order } from 'types'
 
 import useStyles from './styles'
 
@@ -52,6 +35,8 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   const totalBiology = patient?.biology?.count ?? 0
   const totalAllBiology = patient?.biology?.total ?? 0
 
+  const observationsListState = patient?.biology?.list ?? []
+
   const [page, setPage] = useState(1)
 
   const [searchInput, setSearchInput] = useState('')
@@ -66,19 +51,10 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     endDate: string | null
   }>(filtersDefault)
 
-  const [sort, setSort] = useState<{ by: string; direction: 'asc' | 'desc' }>({
-    by: 'effectiveDatetime',
-    direction: 'asc'
+  const [order, setOrder] = useState<Order>({
+    orderBy: 'effectiveDatetime',
+    orderDirection: 'asc'
   })
-
-  const columns = [
-    { label: `NDA${deidentifiedBoolean ? ' chiffré' : ''}`, code: '' },
-    { label: 'Date de prélèvement', code: 'effectiveDatetime' },
-    { label: 'ANABIO', code: 'codeSimple-anabio' },
-    { label: 'LOINC', code: 'codeSimple-loinc' },
-    { label: 'Résultat', code: '' },
-    { label: 'Unité exécutrice', code: '' }
-  ]
 
   const _fetchBiology = async (page: number, _searchInput: string) => {
     dispatch<any>(
@@ -86,7 +62,10 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
         groupId,
         options: {
           page,
-          sort,
+          sort: {
+            by: order.orderBy,
+            direction: order.orderDirection
+          },
           filters: {
             searchInput: _searchInput,
             nda: filters.nda,
@@ -100,7 +79,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     )
   }
 
-  const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
+  const handleChangePage = (value?: number) => {
     setPage(value ? value : 1)
     _fetchBiology(value ? value : 1, searchInput)
   }
@@ -119,15 +98,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
 
   const handleClearInput = () => {
     setSearchInput('')
-    _fetchBiology(1, '')
-  }
-
-  const handleSort = (property: any) => (event: React.MouseEvent<unknown> /*eslint-disable-line*/) => {
-    const isAsc: boolean = sort.by === property && sort.direction === 'asc'
-    const newDirection = isAsc ? 'desc' : 'asc'
-
-    setSort({ by: property, direction: newDirection })
-    setPage(1)
+    handleChangePage(1)
   }
 
   const onKeyDown = async (e: { keyCode: number; preventDefault: () => void }) => {
@@ -139,7 +110,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
 
   useEffect(() => {
     handleChangePage()
-  }, [filters, sort])
+  }, [filters, order])
 
   return (
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
@@ -173,7 +144,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
                 </InputAdornment>
               }
             />
-            <IconButton type="submit" aria-label="search" onClick={handleChangePage}>
+            <IconButton type="submit" aria-label="search" onClick={() => handleChangePage()}>
               <SearchIcon fill="#ED6D91" height="15px" />
             </IconButton>
           </Grid>
@@ -277,95 +248,15 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
         )}
       </Grid>
 
-      {loading ? (
-        <Grid container justifyContent="center">
-          <CircularProgress />
-        </Grid>
-      ) : (
-        <TableContainer component={Paper}>
-          <Table className={classes.table}>
-            <TableHead className={classes.tableHead}>
-              <TableRow>
-                {columns.map((column, index: number) => (
-                  <TableCell key={index} align="center" className={classes.tableHeadCell}>
-                    {column.code !== '' ? (
-                      <TableSortLabel
-                        active={sort.by === column.code}
-                        direction={sort.by === column.code ? sort.direction : 'asc'}
-                        onClick={handleSort(column.code)}
-                      >
-                        {column.label}
-                      </TableSortLabel>
-                    ) : (
-                      column.label
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {patient?.biology?.list && patient?.biology?.list.length > 0 ? (
-                <>
-                  {patient?.biology?.list.map((row: CohortObservation) => {
-                    const nda = row.NDA
-                    const date = row.effectiveDateTime
-                    const libelleANABIO = row.code?.coding?.find((code: any) => code.id === 'CODE ANABIO')?.display
-                    const codeLOINC = row.code?.coding?.find((code: any) => code.id === 'CODE LOINC')?.code
-                    const libelleLOINC = row.code?.coding?.find((code: any) => code.id === 'CODE LOINC')?.display
-                    const result = row.valueQuantity
-                      ? row.valueQuantity.code
-                        ? row.valueQuantity.code
-                        : row.valueQuantity.value
-                        ? `${row.valueQuantity.value} ${row.valueQuantity.unit}`
-                        : '-'
-                      : '-'
-                    const serviceProvider = row.serviceProvider
-
-                    return (
-                      <TableRow className={classes.tableBodyRows} key={row.id}>
-                        <TableCell align="left">{nda ?? 'Inconnu'}</TableCell>
-                        <TableCell align="center">
-                          {date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography className={classes.libelle}>
-                            {libelleANABIO === 'No matching concept' ? '-' : libelleANABIO ?? '-'}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography className={classes.libelle}>
-                            {codeLOINC === 'No matching concept' || codeLOINC === 'Non Renseigné'
-                              ? ''
-                              : codeLOINC ?? ''}{' '}
-                            - {libelleLOINC === 'No matching concept' ? '-' : libelleLOINC ?? '-'}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">{result}</TableCell>
-                        <TableCell align="center">{serviceProvider ?? '-'}</TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </>
-              ) : (
-                <TableRow className={classes.emptyTableRow}>
-                  <TableCell colSpan={9} align="left">
-                    <Grid container justifyContent="center">
-                      <Typography variant="button">Aucun résultat de biologie à afficher</Typography>
-                    </Grid>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-
-      <Pagination
-        className={classes.pagination}
-        count={Math.ceil(totalBiology / 20)}
-        shape="rounded"
-        onChange={handleChangePage}
+      <DataTableObservation
+        loading={loading}
+        deidentified={deidentifiedBoolean}
+        observationsList={observationsListState}
+        order={order}
+        setOrder={setOrder}
         page={page}
+        setPage={(newPage) => handleChangePage(newPage)}
+        total={totalBiology}
       />
     </Grid>
   )

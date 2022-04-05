@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import {
   IComposition,
   IPatient,
@@ -10,7 +11,6 @@ import {
   IBundle_Entry,
   IResourceList,
   IOperationOutcome,
-  PatientGenderKind,
   IObservation,
   IDocumentReference,
   IMedicationRequest,
@@ -29,15 +29,6 @@ export type FHIR_API_Response<T extends IResourceList> = TypedBundle<T> | IOpera
 
 export type Back_API_Response<T> = {
   results?: T[]
-  count?: number
-}
-
-export type Cohort_Creation_API_Response = {
-  status: number
-  data: {
-    jobId: string
-    result: { _type: 'count'; 'group.id': string; 'group.count': number; source: 'from-cache' | 'from-cache' }[]
-  }
   count?: number
 }
 
@@ -134,12 +125,6 @@ export enum Month {
   december = 'Decembre'
 }
 
-export enum InclusionCriteriaTypes {
-  medicalDocument = 'Document médical',
-  patientDemography = 'Démographie patient',
-  CIMDiagnostic = 'Diagnostic CIM'
-}
-
 export enum SearchByTypes {
   text = '_text',
   family = 'family',
@@ -153,37 +138,21 @@ export enum VitalStatus {
   all = 'all'
 }
 
-export type InclusionCriteria =
-  | MedicalDocumentInclusionCriteria
-  | PatientDemographyInclusionCriteria
-  | CIMDiagnosticInclusionCriteria
+export type Column =
+  | {
+      label: string | ReactNode
+      code?: string
+      align: 'inherit' | 'left' | 'center' | 'right' | 'justify'
+      sortableColumn?: boolean
+      multiple?: undefined
+    }
+  | {
+      multiple: Column[]
+    }
 
-export type MedicalDocumentInclusionCriteria = {
-  type: InclusionCriteriaTypes.medicalDocument
-  name: string
-  searchValue: string
-  searchFieldCode: string
-}
-
-export type PatientDemographyInclusionCriteria = {
-  type: InclusionCriteriaTypes.patientDemography
-  name: string
-  gender: PatientGenderKind
-  ageMin: number
-  ageMax: number
-}
-
-export type CIMDiagnosticInclusionCriteria = {
-  type: InclusionCriteriaTypes.CIMDiagnostic
-  name: string
-  CIMTypeId: string
-  CIMDiagnosis: {
-    'DIAGNOSIS CODE': string
-    'LONG DESCRIPTION': string
-    'SHORT DESCRIPTION': string
-    FIELD4: string
-    FIELD5: string
-  }
+export type Order = {
+  orderBy: string
+  orderDirection: 'asc' | 'desc'
 }
 
 export type ScopeTreeRow = {
@@ -203,7 +172,6 @@ export type SimpleChartDataType = {
   color: string
   size?: number
 }
-export type ComplexChartDataType<T, V = { [key: string]: number }> = Map<T, V>
 
 export type GenderRepartitionType = {
   female: { deceased: number; alive: number }
@@ -555,6 +523,11 @@ export type IPatientPmsi<T extends IProcedure | ICondition | IClaim> = {
       direction: string
     }
   }
+}
+
+export type CohortMedication<T extends IMedicationRequest | IMedicationAdministration> = T & {
+  serviceProvider?: string
+  NDA?: string
 }
 
 export type IPatientMedication<T extends IMedicationRequest | IMedicationAdministration> = {

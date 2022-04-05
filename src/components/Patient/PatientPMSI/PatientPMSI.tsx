@@ -1,38 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import {
-  Button,
-  Chip,
-  CircularProgress,
-  Grid,
-  IconButton,
-  InputAdornment,
-  InputBase,
-  Paper,
-  Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  Tabs,
-  Typography
-} from '@material-ui/core'
-import Pagination from '@material-ui/lab/Pagination'
+import { Button, Chip, Grid, IconButton, InputAdornment, InputBase, Tab, Tabs, Typography } from '@material-ui/core'
 
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import PMSIFilters from 'components/Filters/PMSIFilters/PMSIFilters'
+import DataTablePmsi from 'components/DataTable/DataTablePmsi'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPmsi } from 'state/patient'
+
+import { Order } from 'types'
 
 import useStyles from './styles'
 
@@ -81,12 +64,12 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
     endDate: null
   })
 
-  const [sortBy, setSortBy] = useState('date')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+  const [order, setOrder] = useState<Order>({
+    orderBy: 'date',
+    orderDirection: 'desc'
+  })
 
   const [open, setOpen] = useState(false)
-
-  const documentLines = 20 // Number of desired lines in the document array
 
   const _fetchPMSI = async (page: number) => {
     const selectedDiagnosticTypesCodes = filters.selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
@@ -97,8 +80,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
         options: {
           page,
           sort: {
-            by: sortBy,
-            direction: sortDirection
+            by: order.orderBy,
+            direction: order.orderDirection
           },
           filters: {
             ...filters,
@@ -109,15 +92,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
     )
   }
 
-  const handleSort = (property: any) => (event: React.MouseEvent<unknown> /*eslint-disable-line*/) => {
-    const isAsc: boolean = sortBy === property && sortDirection === 'asc'
-    const newDirection = isAsc ? 'desc' : 'asc'
-
-    setSortDirection(newDirection)
-    setSortBy(property)
-  }
-
-  const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
+  const handleChangePage = (value?: number) => {
     setPage(value ? value : 1)
     _fetchPMSI(value ? value : 1)
   }
@@ -191,8 +166,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
     filters.startDate,
     filters.endDate,
     filters.selectedDiagnosticTypes,
-    sortBy,
-    sortDirection
+    order.orderBy,
+    order.orderDirection
   ]) // eslint-disable-line
 
   useEffect(() => {
@@ -206,8 +181,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
       startDate: null,
       endDate: null
     })
-    setSortBy('date')
-    setSortDirection('desc')
+    setOrder({ orderBy: 'date', orderDirection: 'desc' })
   }, [selectedTab]) // eslint-disable-line
 
   useEffect(() => {
@@ -356,118 +330,17 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
             />
           ))}
       </Grid>
-      {loading ? (
-        <Grid container justifyContent="center">
-          <CircularProgress />
-        </Grid>
-      ) : (
-        <TableContainer component={Paper}>
-          <Table className={classes.table} aria-label="simple table">
-            <TableHead className={classes.tableHead}>
-              <TableRow>
-                <TableCell align="left" className={classes.tableHeadCell}>
-                  {deidentifiedBoolean ? 'NDA chiffré' : 'NDA'}
-                </TableCell>
-                <TableCell
-                  sortDirection={sortBy === 'date' ? sortDirection : false}
-                  align="left"
-                  className={classes.tableHeadCell}
-                >
-                  <TableSortLabel
-                    active={sortBy === 'date'}
-                    direction={sortBy === 'date' ? sortDirection : 'asc'}
-                    onClick={handleSort('date')}
-                  >
-                    Codage le
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell
-                  sortDirection={sortBy === 'code' ? sortDirection : false}
-                  align="center"
-                  className={classes.tableHeadCell}
-                >
-                  <TableSortLabel
-                    active={sortBy === 'code'}
-                    direction={sortBy === 'code' ? sortDirection : 'asc'}
-                    onClick={handleSort('code')}
-                  >
-                    Code
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  Libellé
-                </TableCell>
-                {selectedTab === 'diagnostic' && (
-                  <TableCell align="center" className={classes.tableHeadCell}>
-                    Type
-                  </TableCell>
-                )}
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  Unité exécutrice
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {patientPmsiList && patientPmsiList.length > 0 ? (
-                <>
-                  {patientPmsiList.map((row) => {
-                    return (
-                      <TableRow className={classes.tableBodyRows} key={row.id}>
-                        <TableCell align="left">{row.NDA ?? 'Inconnu'}</TableCell>
-                        <TableCell align="left">
-                          {row.resourceType === 'Condition' &&
-                            row.recordedDate &&
-                            (new Date(row.recordedDate).toLocaleDateString('fr-FR') ?? 'Date inconnue')}
-                          {row.resourceType === 'Claim' &&
-                            row.created &&
-                            (new Date(row.created).toLocaleDateString('fr-FR') ?? 'Date inconnue')}
-                          {row.resourceType === 'Procedure' &&
-                            row.performedDateTime &&
-                            (new Date(row.performedDateTime).toLocaleDateString('fr-FR') ?? 'Date inconnue')}
-                        </TableCell>
-                        <TableCell align="center">
-                          {row.resourceType === 'Claim'
-                            ? row.diagnosis?.[0].packageCode?.coding?.[0].code
-                            : // @ts-ignore TODO: There is no class member in Conditon or Procedure FHIR types
-                              row.class?.code || row.code?.coding?.[0].code}
-                        </TableCell>
-                        <TableCell align="center" className={classes.libelle}>
-                          {row.resourceType === 'Claim'
-                            ? row.diagnosis?.[0].packageCode?.coding?.[0].display
-                            : // @ts-ignore TODO: There is no class member in Conditon or Procedure FHIR types
-                              row.class?.code || row.code?.coding?.[0].display}
-                        </TableCell>
-                        {selectedTab === 'diagnostic' && (
-                          <TableCell align="center">
-                            {row.extension ? row.extension[0].valueString?.toUpperCase() : '-'}
-                          </TableCell>
-                        )}
-                        <TableCell align="center">{row.serviceProvider ?? 'Non renseigné'}</TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </>
-              ) : (
-                <TableRow className={classes.emptyTableRow}>
-                  <TableCell colSpan={9} align="left">
-                    <Grid container justifyContent="center">
-                      <Typography variant="button">{`Aucun ${
-                        selectedTab !== 'diagnostic' ? (selectedTab !== 'ccam' ? 'ghm' : 'acte') : 'diagnostic'
-                      } à afficher`}</Typography>
-                    </Grid>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-      <Pagination
-        className={classes.pagination}
-        count={Math.ceil(totalPmsi / documentLines)}
-        shape="rounded"
-        onChange={handleChangePage}
+
+      <DataTablePmsi
+        loading={loading}
+        selectedTab={selectedTab}
+        pmsiList={patientPmsiList}
+        deidentified={deidentifiedBoolean}
+        order={order}
+        setOrder={setOrder}
         page={page}
+        setPage={(newPage) => handleChangePage(newPage)}
+        total={totalPmsi}
       />
     </Grid>
   )
