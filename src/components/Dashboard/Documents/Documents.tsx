@@ -15,7 +15,6 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 import { CohortComposition, Order } from 'types'
 
 import services from 'services'
-import { useAppSelector } from 'state'
 
 import displayDigit from 'utils/displayDigit'
 import { getDisplayingSelectedDocTypes } from 'utils/documentsFormatter'
@@ -30,10 +29,6 @@ type DocumentsProps = {
 
 const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) => {
   const classes = useStyles()
-  const { dashboard } = useAppSelector((state) => ({
-    dashboard: state.exploredCohort
-  }))
-  const { encounters } = dashboard
 
   const [documentsNumber, setDocumentsNumber] = useState<number | undefined>(0)
   const [allDocumentsNumber, setAllDocumentsNumber] = useState<number | undefined>(0)
