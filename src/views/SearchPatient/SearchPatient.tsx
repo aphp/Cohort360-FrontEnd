@@ -5,7 +5,7 @@ import { useParams } from 'react-router'
 
 import { CircularProgress, Grid, Typography } from '@material-ui/core'
 
-import PatientSearchBar from 'components/PatientSearchBar/PatientSearchBar'
+import PatientSearchBar from 'components/Inputs/PatientSearchBar/PatientSearchBar'
 import DataTablePatient from 'components/DataTable/DataTablePatient'
 
 import services from 'services'

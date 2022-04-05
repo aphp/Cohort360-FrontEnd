@@ -12,7 +12,7 @@ import Skeleton from '@material-ui/lab/Skeleton'
 import KeyboardArrowRightIcon from '@material-ui/icons/ChevronRight'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 
-import EnhancedTable from 'components/EnhancedTable'
+import EnhancedTable from 'components/ScopeTree/ScopeTreeTable'
 import { ScopeTreeRow } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
