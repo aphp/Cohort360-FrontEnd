@@ -15,6 +15,8 @@ import { Document, Page, pdfjs } from 'react-pdf'
 import { FHIR_API_URL } from '../../constants'
 import services from 'services'
 
+import Watermark from 'assets/images/watermark.svg'
+
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 
 type DocumentViewerProps = {
@@ -68,7 +70,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
               <CircularProgress />
             </DialogContent>
           ) : (
-            <>
+            <div style={{ backgroundImage: `url(${Watermark})` }}>
               {documentContent && documentContent.length > 0 ? (
                 documentContent.map((section: any) => (
                   <>
@@ -79,7 +81,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
               ) : (
                 <Typography>Le contenu du document est introuvable.</Typography>
               )}
-            </>
+            </div>
           )
         ) : (
           <Grid style={pdfViewerContainerStyle}>
