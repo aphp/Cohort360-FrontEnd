@@ -599,7 +599,8 @@ const servicesCohorts: IServiceCohorts = {
           {
             url: 'EXPORT_ACCESS',
             valueString:
-              !ODD_EXPORT && allRightOfCohort.filter(
+              ODD_EXPORT &&
+              allRightOfCohort.filter(
                 (rightOfCohort: any) =>
                   rightOfCohort.right_export_csv_nominative === true &&
                   rightOfCohort.right_read_patient_nominative === true
