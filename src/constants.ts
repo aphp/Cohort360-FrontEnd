@@ -19,11 +19,12 @@ export const TOKEN_URL = 'irrelevant'
 export const REVOKE_URL = 'irrelevant'
 export const LOGIN_REDIRECT_URL = 'irrelevant'
 
-export const CONTEXT = process.env.REACT_APP_CONTEXT as ContextType
+export const CONTEXT =
+  process.env.NODE_ENV !== 'development' ? '{CONTEXT}' : (process.env.REACT_APP_CONTEXT as ContextType)
 
 if (!CONTEXT) throw new Error('missing REACT_APP_CONTEXT from environment')
-if (CONTEXT !== 'arkhn' && CONTEXT !== 'aphp' && CONTEXT !== 'fakedata') {
-  throw new Error("REACT_APP_CONTEXT must be either 'aphp', 'fakedata' or 'arkhn")
+if (CONTEXT !== 'arkhn' && CONTEXT !== 'aphp' && CONTEXT !== 'fakedata' && CONTEXT !== '{CONTEXT}') {
+  throw new Error("REACT_APP_CONTEXT must be either 'aphp', 'fakedata' or 'arkhn and context is" + CONTEXT)
 }
 export const ACCES_TOKEN = 'access'
 export const REFRESH_TOKEN = 'refresh'
