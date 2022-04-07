@@ -1,10 +1,10 @@
 import React from 'react'
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
 
-import LeftSideBar from 'components/LeftSideBar/LeftSideBar'
 import Snackbar from 'components/Snackbar/Snackbar'
 
 import PrivateRoute from '../Private'
+import LeftSideBar from '../LeftSideBar/LeftSideBar'
 import AutoLogoutContainer from '../AutoLogoutContainer'
 
 import Config from './config'
