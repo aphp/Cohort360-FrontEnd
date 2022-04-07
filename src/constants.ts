@@ -22,10 +22,13 @@ export const LOGIN_REDIRECT_URL = 'irrelevant'
 export const CONTEXT =
   process.env.NODE_ENV !== 'development' ? '{CONTEXT}' : (process.env.REACT_APP_CONTEXT as ContextType)
 
+// export const CONTEXT = process.env.NODE_ENV !== 'development' ? '{CONTEXT}' : (process.env.REACT_APP_CONTEXT as string)
+
 // if (!CONTEXT) throw new Error('missing REACT_APP_CONTEXT from environment')
-// if (CONTEXT != 'arkhn' && CONTEXT != 'aphp' && CONTEXT != 'fakedata') {
+// if (CONTEXT !== 'arkhn' && CONTEXT !== 'aphp' && CONTEXT !== 'fakedata') {
 //   throw new Error("REACT_APP_CONTEXT must be either 'aphp', 'fakedata' or 'arkhn and context is {" + CONTEXT + '}')
 // }
+
 export const ACCES_TOKEN = 'access'
 export const REFRESH_TOKEN = 'refresh'
 
@@ -120,7 +123,10 @@ export const BIOLOGY_HIERARCHY_ITM_LOINC =
     : process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_LOINC
 
 export const ODD_BIOLOGY: boolean =
-  (process.env.NODE_ENV !== 'development' ? '{ODD_BIOLOGY}' : process.env.REACT_APP_ODD_BIOLOGY) === 'true'
+  //@ts-ignore
+  (process.env.NODE_ENV !== 'development' ? '{ODD_BIOLOGY}' === 'true' : process.env.REACT_APP_ODD_BIOLOGY) === 'true'
+// export const ODD_BIOLOGY: boolean =
+//   (process.env.NODE_ENV !== 'development' ? '{ODD_BIOLOGY}' : process.env.REACT_APP_ODD_BIOLOGY) === 'true'
 export const ODD_COMPOSITION: boolean =
   (process.env.NODE_ENV !== 'development' ? '{ODD_COMPOSITION}' : process.env.REACT_APP_ODD_COMPOSITION) === 'true'
 export const ODD_PROCEDURE: boolean =
