@@ -31,7 +31,7 @@ sed -i "s@{MEDICATION_PRESCRIPTION_TYPES}@$MEDICATION_PRESCRIPTION_TYPES@g" /app
 sed -i "s@{MEDICATION_ADMINISTRATIONS}@$MEDICATION_ADMINISTRATIONS@g" /app/build/static/js/*.js
 sed -i "s@{BIOLOGY_HIERARCHY_ITM_ANABIO}@$BIOLOGY_HIERARCHY_ITM_ANABIO@g" /app/build/static/js/*.js
 sed -i "s@{BIOLOGY_HIERARCHY_ITM_LOINC}@$BIOLOGY_HIERARCHY_ITM_LOINC@g" /app/build/static/js/*.js
-sed -i "s@{ODD_BIOLOGY}@$ODD_BIOLOGY@g" /app/build/static/js/*.js
+sed -i "s@{ODD_BIOLOGY}@'$ODD_BIOLOGY'@g" /app/build/static/js/*.js
 sed -i "s@{ODD_COMPOSITION}@$ODD_COMPOSITION@g" /app/build/static/js/*.js
 sed -i "s@{ODD_PROCEDURE}@$ODD_PROCEDURE@g" /app/build/static/js/*.js
 sed -i "s@{ODD_CLAIM}@$ODD_CLAIM@g" /app/build/static/js/*.js
