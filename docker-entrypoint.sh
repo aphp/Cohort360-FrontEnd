@@ -10,7 +10,7 @@ sed -i "s@{DISPOSE_URL}@$DISPOSE_URL@g" /etc/nginx/conf.d/nginx.conf
 sed -i "s@{BACK_API_URL}@$BACK_API_URL@g" /app/build/static/js/*.js
 sed -i "s@{REQUEST_API_URL}@$REQUEST_API_URL@g" /app/build/static/js/*.js
 sed -i "s@{FHIR_API_URL}@$FHIR_API_URL@g" /app/build/static/js/*.js
-sed -i "s@{CONTEXT}@$CONTEXT@g" /app/build/static/js/*.js
+sed -i "s/{CONTEXT}/$CONTEXT/g" /app/build/static/js/*.js
 sed -i "s@{CLAIM_HIERARCHY}@$CLAIM_HIERARCHY@g" /app/build/static/js/*.js
 sed -i "s@{CONDITION_HIERARCHY}@$CONDITION_HIERARCHY@g" /app/build/static/js/*.js
 sed -i "s@{CONDITION_STATUS}@$CONDITION_STATUS@g" /app/build/static/js/*.js
