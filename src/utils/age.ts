@@ -49,3 +49,46 @@ export const getAge = (patient: CohortPatient): string => {
   }
   return 'Âge inconnu'
 }
+
+export const ageName = (dates: [string, string]) => {
+  const minDate: any = {}
+  const maxDate: any = {}
+
+  maxDate.year = moment().diff(moment(dates[0], 'YYYY-MM-DD'), 'year') || 0
+  maxDate.month = moment().subtract(maxDate.year, 'year').diff(moment(dates[0], 'YYYY-MM-DD'), 'month')
+  maxDate.days = moment()
+    .subtract(maxDate.year, 'year')
+    .subtract(maxDate.month, 'month')
+    .diff(moment(dates[0], 'YYYY-MM-DD'), 'days')
+
+  minDate.year = moment().diff(moment(dates[1], 'YYYY-MM-DD'), 'year') || 0
+  minDate.month = moment().subtract(minDate.year, 'year').diff(moment(dates[1], 'YYYY-MM-DD'), 'month')
+  minDate.days = moment()
+    .subtract(minDate.year, 'year')
+    .subtract(minDate.month, 'month')
+    .diff(moment(dates[1], 'YYYY-MM-DD'), 'days')
+
+  if (
+    minDate.year === 0 &&
+    minDate.month === 0 &&
+    minDate.days === 0 &&
+    maxDate.year === 130 &&
+    maxDate.month === 0 &&
+    maxDate.days === 0
+  ) {
+    return ''
+  }
+
+  return `Age entre
+    ${
+      minDate.year || minDate.month || minDate.days
+        ? `${minDate.year > 0 ? `${minDate.year} an(s) ` : ``}
+          ${minDate.month > 0 ? `${minDate.month} mois ` : ``}
+          ${minDate.days > 0 ? `${minDate.days} jour(s) ` : ``}`
+        : 0
+    }
+  et
+    ${maxDate.year > 0 ? `${maxDate.year} an(s) ` : ``}
+    ${maxDate.month > 0 ? `${maxDate.month} mois ` : ``}
+    ${maxDate.days > 0 ? `${maxDate.days} jour(s) ` : ``}`
+}

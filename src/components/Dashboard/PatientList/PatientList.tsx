@@ -31,19 +31,21 @@ import ClearIcon from '@material-ui/icons/Clear'
 import services from 'services'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
-  CohortPatient,
-  SimpleChartDataType,
-  GenderRepartitionType,
   AgeRepartitionType,
+  CohortPatient,
+  GenderRepartitionType,
+  Order,
+  PatientFilters as PatientFiltersType,
   SearchByTypes,
-  VitalStatus,
-  Order
+  SimpleChartDataType,
+  VitalStatus
 } from 'types'
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from './styles'
+import { ageName } from 'utils/age'
 
 type PatientListProps = {
   total: number
@@ -76,12 +78,12 @@ const PatientList: React.FC<PatientListProps> = ({
     { vitalStatusData?: SimpleChartDataType[]; genderData?: SimpleChartDataType[] } | undefined
   >(undefined)
   const [open, setOpen] = useState(false)
-  const [gender, setGender] = useState<PatientGenderKind>(PatientGenderKind._unknown)
-  const [birthdates, setBirthdates] = useState<[string, string]>([
-    moment().subtract(130, 'years').format('YYYY-MM-DD'),
-    moment().format('YYYY-MM-DD')
-  ])
-  const [vitalStatus, setVitalStatus] = useState<VitalStatus>(VitalStatus.all)
+
+  const [filters, setFilters] = useState<PatientFiltersType>({
+    gender: PatientGenderKind._unknown,
+    birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
+    vitalStatus: VitalStatus.all
+  })
 
   const [order, setOrder] = useState<Order>({
     orderBy: 'given',
@@ -111,9 +113,9 @@ const PatientList: React.FC<PatientListProps> = ({
       pageValue,
       searchBy,
       inputSearch,
-      gender,
-      birthdates,
-      vitalStatus,
+      filters.gender,
+      filters.birthdates,
+      filters.vitalStatus,
       order.orderBy,
       order.orderDirection,
       groupId,
@@ -138,7 +140,7 @@ const PatientList: React.FC<PatientListProps> = ({
 
   useEffect(() => {
     onSearchPatient()
-  }, [gender, birthdates, vitalStatus, searchBy]) // eslint-disable-line
+  }, [filters, searchBy]) // eslint-disable-line
 
   const handleChangeSelect = (
     event: React.ChangeEvent<{
@@ -169,13 +171,22 @@ const PatientList: React.FC<PatientListProps> = ({
   const handleDeleteChip = (filterName: string) => {
     switch (filterName) {
       case 'gender':
-        setGender(PatientGenderKind._unknown)
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          gender: PatientGenderKind._unknown
+        }))
         break
       case 'birthdates':
-        setBirthdates([moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')])
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]
+        }))
         break
       case 'vitalStatus':
-        setVitalStatus(VitalStatus.all)
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          vitalStatus: VitalStatus.all
+        }))
         break
     }
   }
@@ -188,7 +199,7 @@ const PatientList: React.FC<PatientListProps> = ({
   }
 
   const genderName = () => {
-    switch (gender) {
+    switch (filters.gender) {
       case PatientGenderKind._female:
         return 'Genre: Femmes'
       case PatientGenderKind._male:
@@ -198,51 +209,8 @@ const PatientList: React.FC<PatientListProps> = ({
     }
   }
 
-  const ageName = () => {
-    const minDate: any = {}
-    const maxDate: any = {}
-
-    maxDate.year = moment().diff(moment(birthdates[0], 'YYYY-MM-DD'), 'year') || 0
-    maxDate.month = moment().subtract(maxDate.year, 'year').diff(moment(birthdates[0], 'YYYY-MM-DD'), 'month')
-    maxDate.days = moment()
-      .subtract(maxDate.year, 'year')
-      .subtract(maxDate.month, 'month')
-      .diff(moment(birthdates[0], 'YYYY-MM-DD'), 'days')
-
-    minDate.year = moment().diff(moment(birthdates[1], 'YYYY-MM-DD'), 'year') || 0
-    minDate.month = moment().subtract(minDate.year, 'year').diff(moment(birthdates[1], 'YYYY-MM-DD'), 'month')
-    minDate.days = moment()
-      .subtract(minDate.year, 'year')
-      .subtract(minDate.month, 'month')
-      .diff(moment(birthdates[1], 'YYYY-MM-DD'), 'days')
-
-    if (
-      minDate.year === 0 &&
-      minDate.month === 0 &&
-      minDate.days === 0 &&
-      maxDate.year === 130 &&
-      maxDate.month === 0 &&
-      maxDate.days === 0
-    ) {
-      return ''
-    }
-
-    return `Age entre
-      ${
-        minDate.year || minDate.month || minDate.days
-          ? `${minDate.year > 0 ? `${minDate.year} an(s) ` : ``}
-            ${minDate.month > 0 ? `${minDate.month} mois ` : ``}
-            ${minDate.days > 0 ? `${minDate.days} jour(s) ` : ``}`
-          : 0
-      }
-    et
-      ${maxDate.year > 0 ? `${maxDate.year} an(s) ` : ``}
-      ${maxDate.month > 0 ? `${maxDate.month} mois ` : ``}
-      ${maxDate.days > 0 ? `${maxDate.days} jour(s) ` : ``}`
-  }
-
   const vitalStatusName = () => {
-    switch (vitalStatus) {
+    switch (filters.vitalStatus) {
       case VitalStatus.alive:
         return 'Patients vivants'
       case VitalStatus.deceased:
@@ -369,17 +337,13 @@ const PatientList: React.FC<PatientListProps> = ({
                 open={open}
                 onClose={() => setOpen(false)}
                 onSubmit={() => setOpen(false)}
-                gender={gender}
-                onChangeGender={setGender}
-                birthdates={birthdates}
-                onChangeBirthdates={setBirthdates}
-                vitalStatus={vitalStatus}
-                onChangeVitalStatus={setVitalStatus}
+                filters={filters}
+                onChangeFilters={setFilters}
               />
             </div>
           </Grid>
           <Grid>
-            {gender !== PatientGenderKind._unknown && (
+            {filters.gender !== PatientGenderKind._unknown && (
               <Chip
                 className={classes.chips}
                 label={genderName()}
@@ -388,16 +352,16 @@ const PatientList: React.FC<PatientListProps> = ({
                 variant="outlined"
               />
             )}
-            {birthdates && ageName() !== '' && (
+            {filters.birthdates && ageName(filters.birthdates) !== '' && (
               <Chip
                 className={classes.chips}
-                label={ageName()}
+                label={ageName(filters.birthdates)}
                 onDelete={() => handleDeleteChip('birthdates')}
                 color="primary"
                 variant="outlined"
               />
             )}
-            {vitalStatus !== VitalStatus.all && (
+            {filters.vitalStatus !== VitalStatus.all && (
               <Chip
                 className={classes.chips}
                 label={vitalStatusName()}

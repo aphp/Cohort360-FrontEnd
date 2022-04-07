@@ -16,42 +16,28 @@ import {
 import { InputAgeRange } from 'components/Inputs'
 
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { VitalStatus } from 'types'
+import { PatientFilters as PatientFiltersType, VitalStatus } from 'types'
 
 import useStyles from './styles'
 type PatientFiltersProps = {
   open: boolean
   onClose: () => void
   onSubmit: () => void
-  gender: PatientGenderKind
-  onChangeGender: (gender: PatientGenderKind) => void
-  birthdates: [string, string]
-  onChangeBirthdates: (birthdates: [string, string]) => void
-  vitalStatus: VitalStatus
-  onChangeVitalStatus: (status: VitalStatus) => void
+  filters: PatientFiltersType
+  onChangeFilters: (newFilters: PatientFiltersType) => void
 }
 
-const PatientFilters: React.FC<PatientFiltersProps> = ({
-  open,
-  onClose,
-  onSubmit,
-  gender,
-  onChangeGender,
-  birthdates,
-  onChangeBirthdates,
-  vitalStatus,
-  onChangeVitalStatus
-}) => {
+const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit, filters, onChangeFilters }) => {
   const classes = useStyles()
 
-  const [_gender, setGender] = useState<PatientGenderKind>(gender)
-  const [_birthdates, setBirthdates] = useState<[string, string]>(birthdates)
-  const [_vitalStatus, setVitalStatus] = useState<VitalStatus>(vitalStatus)
+  const [_gender, setGender] = useState<PatientGenderKind>(filters.gender)
+  const [_birthdates, setBirthdates] = useState<[string, string]>(filters.birthdates)
+  const [_vitalStatus, setVitalStatus] = useState<VitalStatus>(filters.vitalStatus)
 
   useEffect(() => {
-    setGender(gender)
-    setBirthdates(birthdates)
-    setVitalStatus(vitalStatus)
+    setGender(filters.gender)
+    setBirthdates(filters.birthdates)
+    setVitalStatus(filters.vitalStatus)
   }, [open]) // eslint-disable-line
 
   const _onChangeGender = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
@@ -63,9 +49,12 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({
   }
 
   const _onSubmit = () => {
-    onChangeGender(_gender)
-    onChangeBirthdates(_birthdates)
-    onChangeVitalStatus(_vitalStatus)
+    onChangeFilters({
+      gender: _gender,
+      birthdates: _birthdates,
+      vitalStatus: _vitalStatus
+    })
+
     onSubmit()
   }
 

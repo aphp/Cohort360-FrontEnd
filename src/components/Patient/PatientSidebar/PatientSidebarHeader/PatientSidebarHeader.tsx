@@ -12,10 +12,11 @@ import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
 import SortDialog from 'components/Filters/SortDialog/SortDialog'
 
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { SearchByTypes, VitalStatus } from 'types'
+import { PatientFilters as PatientFiltersType, SearchByTypes, VitalStatus } from 'types'
 
 import useStyles from './styles'
 import { Autocomplete } from '@material-ui/lab'
+import { ageName } from 'utils/age'
 
 type PatientSidebarHeaderTypes = {
   showFilterChip: boolean
@@ -26,12 +27,8 @@ type PatientSidebarHeaderTypes = {
   open: boolean
   onCloseFilterDialog: () => void
   onSubmitDialog: () => void
-  gender: PatientGenderKind
-  onChangeGender: (gender: PatientGenderKind) => void
-  birthdates: [string, string]
-  onChangeBirthdates: (birthdates: [string, string]) => void
-  vitalStatus: VitalStatus
-  onChangeVitalStatus: (status: VitalStatus) => void
+  filters: PatientFiltersType
+  onChangeFilters: (newFilters: PatientFiltersType) => void
   searchInput: string
   onChangeSearchInput: (event: { target: { value: React.SetStateAction<string> } }) => void
   onKeyDownSearchInput: (e: { keyCode: number; preventDefault: () => void }) => void
@@ -76,12 +73,8 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
             open={props.open}
             onClose={props.onCloseFilterDialog}
             onSubmit={props.onSubmitDialog}
-            gender={props.gender}
-            onChangeGender={props.onChangeGender}
-            birthdates={props.birthdates}
-            onChangeBirthdates={props.onChangeBirthdates}
-            vitalStatus={props.vitalStatus}
-            onChangeVitalStatus={props.onChangeVitalStatus}
+            filters={props.filters}
+            onChangeFilters={props.onChangeFilters}
           />
         </Grid>
         <Grid container alignItems="center">
@@ -109,19 +102,31 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
   const handleDeleteChip = (filterName: string) => {
     switch (filterName) {
       case 'gender':
-        props.onChangeGender(PatientGenderKind._unknown)
+        // @ts-ignore
+        props.onChangeFilters((prevFilters) => ({
+          ...prevFilters,
+          gender: PatientGenderKind._unknown
+        }))
         break
-      case 'age':
-        props.onChangeBirthdates([moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')])
+      case 'birthdates':
+        // @ts-ignore
+        props.onChangeFilters((prevFilters) => ({
+          ...prevFilters,
+          birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]
+        }))
         break
       case 'vitalStatus':
-        props.onChangeVitalStatus(VitalStatus.all)
+        // @ts-ignore
+        props.onChangeFilters((prevFilters) => ({
+          ...prevFilters,
+          vitalStatus: VitalStatus.all
+        }))
         break
     }
   }
 
   const genderName = () => {
-    switch (props.gender) {
+    switch (props.filters.gender) {
       case PatientGenderKind._female:
         return 'Genre: Femmes'
       case PatientGenderKind._male:
@@ -132,7 +137,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
   }
 
   const vitalStatusName = () => {
-    switch (props.vitalStatus) {
+    switch (props.filters.vitalStatus) {
       case VitalStatus.alive:
         return 'Patients vivants'
       case VitalStatus.deceased:
@@ -179,12 +184,8 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
           open={props.open}
           onClose={props.onCloseFilterDialog}
           onSubmit={props.onSubmitDialog}
-          gender={props.gender}
-          onChangeGender={props.onChangeGender}
-          birthdates={props.birthdates}
-          onChangeBirthdates={props.onChangeBirthdates}
-          vitalStatus={props.vitalStatus}
-          onChangeVitalStatus={props.onChangeVitalStatus}
+          filters={props.filters}
+          onChangeFilters={props.onChangeFilters}
         />
         <Button
           variant="contained"
@@ -207,7 +208,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
         />
       </Grid>
       <Grid className={classes.filterChipsGrid}>
-        {props.showFilterChip && props.gender !== PatientGenderKind._unknown && (
+        {props.showFilterChip && props.filters.gender !== PatientGenderKind._unknown && (
           <Chip
             className={classes.chips}
             label={genderName()}
@@ -216,7 +217,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
             variant="outlined"
           />
         )}
-        {props.showFilterChip && props.vitalStatus !== VitalStatus.all && (
+        {props.showFilterChip && props.filters.vitalStatus !== VitalStatus.all && (
           <Chip
             className={classes.chips}
             label={vitalStatusName()}
@@ -225,10 +226,10 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
             variant="outlined"
           />
         )}
-        {props.showFilterChip && props.birthdates && (
+        {props.showFilterChip && props.filters.birthdates && ageName(props.filters.birthdates) && (
           <Chip
             className={classes.chips}
-            label={`Âge entre ${props.birthdates[0]} et ${props.birthdates[1]}`}
+            label={ageName(props.filters.birthdates)}
             onDelete={() => handleDeleteChip('birthdates')}
             color="primary"
             variant="outlined"
