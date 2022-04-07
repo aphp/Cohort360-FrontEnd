@@ -7,10 +7,10 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import { InputSearchDocumentSimple, InputSearchDocumentRegex, InputSearchDocumentButton } from 'components/Inputs'
 
-import DocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
+import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
 
-import { Order } from 'types'
+import { Order, DocumentFilters } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'
@@ -40,12 +40,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
 
   const [page, setPage] = useState(1)
 
-  const [filters, setFilters] = useState<{
-    nda: string
-    selectedDocTypes: any[]
-    startDate: string | null
-    endDate: string | null
-  }>({
+  const [filters, setFilters] = useState<DocumentFilters>({
     nda: '',
     selectedDocTypes: [],
     startDate: null,
@@ -248,18 +243,12 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         total={totalDocs}
       />
 
-      <DocumentFilters
+      <ModalDocumentFilters
         open={open === 'filter'}
         onClose={() => setOpen(null)}
-        onSubmit={() => setOpen(null)}
-        nda={filters.nda}
-        onChangeNda={(nda: string) => onChangeOptions('nda', nda)}
-        selectedDocTypes={filters.selectedDocTypes}
-        onChangeSelectedDocTypes={(selectedDocTypes: string[]) => onChangeOptions('selectedDocTypes', selectedDocTypes)}
-        startDate={filters.startDate}
-        onChangeStartDate={(startDate: string | null) => onChangeOptions('startDate', startDate)}
-        endDate={filters.endDate}
-        onChangeEndDate={(endDate: string | null) => onChangeOptions('endDate', endDate)}
+        showIpp
+        filters={filters}
+        onChangeFilters={setFilters}
         deidentified={false}
       />
     </Grid>

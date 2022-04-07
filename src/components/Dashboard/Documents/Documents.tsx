@@ -5,14 +5,14 @@ import { Button, Chip, CssBaseline, Grid, Typography } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
 import Skeleton from '@material-ui/lab/Skeleton'
 
-import DocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
+import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
 
 import { InputSearchDocumentSimple, InputSearchDocumentRegex, InputSearchDocumentButton } from 'components/Inputs'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import { CohortComposition, Order } from 'types'
+import { CohortComposition, DocumentFilters, Order } from 'types'
 
 import services from 'services'
 
@@ -44,11 +44,13 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const [openFilter, setOpenFilter] = useState(false)
 
-  const [nda, setNda] = useState('')
-  const [ipp, setIpp] = useState('')
-  const [selectedDocTypes, setSelectedDocTypes] = useState<any[]>([])
-  const [startDate, setStartDate] = useState<string | null>(null)
-  const [endDate, setEndDate] = useState<string | null>(null)
+  const [filters, setFilters] = useState<DocumentFilters>({
+    nda: '',
+    ipp: '',
+    selectedDocTypes: [],
+    startDate: null,
+    endDate: null
+  })
 
   const [order, setOrder] = useState<Order>({
     orderBy: 'date',
@@ -57,7 +59,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const [inputMode, setInputMode] = useState<'simple' | 'regex'>('simple')
 
-  const displayingSelectedDocType: any[] = getDisplayingSelectedDocTypes(selectedDocTypes)
+  const displayingSelectedDocType: any[] = getDisplayingSelectedDocTypes(filters.selectedDocTypes)
 
   const onSearchDocument = async (sortBy: string, sortDirection: 'asc' | 'desc', input?: string, page = 1) => {
     if (input) {
@@ -67,7 +69,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     }
     setLoadingStatus(true)
 
-    const selectedDocTypesCodes = selectedDocTypes.map((docType) => docType.code)
+    const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
 
     if (inputMode === 'regex') input = `/${input}/`
 
@@ -78,10 +80,10 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
       page,
       input ?? '',
       selectedDocTypesCodes,
-      nda,
-      ipp,
-      startDate,
-      endDate,
+      filters.nda,
+      filters.ipp ?? '',
+      filters.startDate,
+      filters.endDate,
       groupId
     )
 
@@ -101,7 +103,16 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   useEffect(() => {
     onSearchDocument(order.orderBy, order.orderDirection)
-  }, [!!deidentifiedBoolean, selectedDocTypes, nda, ipp, startDate, endDate, order.orderBy, order.orderDirection]) // eslint-disable-line
+  }, [
+    !!deidentifiedBoolean,
+    filters.selectedDocTypes,
+    filters.nda,
+    filters.ipp,
+    filters.startDate,
+    filters.endDate,
+    order.orderBy,
+    order.orderDirection
+  ]) // eslint-disable-line
 
   const handleOpenDialog = () => {
     setOpenFilter(true)
@@ -111,25 +122,20 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     setOpenFilter(false)
   }
 
-  const handleDeleteChip = (filterName: string, value?: string) => {
+  const handleDeleteChip = (
+    filterName: 'nda' | 'ipp' | 'selectedDocTypes' | 'startDate' | 'endDate',
+    value?: string
+  ) => {
     switch (filterName) {
       case 'nda':
-        value &&
-          setNda(
-            nda
-              .split(',')
-              .filter((item) => item !== value)
-              .join(',')
-          )
-        break
       case 'ipp':
-        value &&
-          setIpp(
-            ipp
-              .split(',')
-              .filter((item) => item !== value)
-              .join(',')
-          )
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          [filterName]: (prevFilters[filterName] ?? '')
+            .split(',')
+            .filter((item) => item !== value)
+            .join(',')
+        }))
         break
       case 'selectedDocTypes': {
         const typesName = docTypes
@@ -137,18 +143,18 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
           .filter((item, index, array) => array.indexOf(item) === index)
         const isGroupItem = typesName.find((typeName) => typeName === value)
 
+        let newSelectedDocTypes: any[] = []
         if (!isGroupItem) {
-          value && setSelectedDocTypes(selectedDocTypes.filter((item) => item.label !== value))
+          newSelectedDocTypes = filters.selectedDocTypes.filter((item) => item.label !== value)
         } else {
-          value && setSelectedDocTypes(selectedDocTypes.filter((item) => item.type !== value))
+          newSelectedDocTypes = filters.selectedDocTypes.filter((item) => item.type !== value)
         }
+        setFilters((prevFilters) => ({ ...prevFilters, selectedDocTypes: newSelectedDocTypes }))
         break
       }
       case 'startDate':
-        setStartDate(null)
-        break
       case 'endDate':
-        setEndDate(null)
+        setFilters((prevFilters) => ({ ...prevFilters, [filterName]: null }))
         break
     }
   }
@@ -218,8 +224,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
               />
             )}
             <Grid>
-              {nda !== '' &&
-                nda
+              {filters.nda !== '' &&
+                filters.nda
                   .split(',')
                   .map((value) => (
                     <Chip
@@ -231,8 +237,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
                       variant="outlined"
                     />
                   ))}
-              {ipp !== '' &&
-                ipp
+              {filters.ipp &&
+                filters.ipp
                   .split(',')
                   .map((value) => (
                     <Chip
@@ -256,20 +262,20 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
                   />
                 ))}
 
-              {startDate && (
+              {filters.startDate && (
                 <Chip
                   className={classes.chips}
-                  label={`Après le : ${moment(startDate).format('DD/MM/YYYY')}`}
+                  label={`Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}`}
                   onDelete={() => handleDeleteChip('startDate')}
                   color="primary"
                   variant="outlined"
                 />
               )}
 
-              {endDate && (
+              {filters.endDate && (
                 <Chip
                   className={classes.chips}
-                  label={`Avant le : ${moment(endDate).format('DD/MM/YYYY')}`}
+                  label={`Avant le : ${moment(filters.endDate).format('DD/MM/YYYY')}`}
                   onDelete={() => handleDeleteChip('endDate')}
                   color="primary"
                   variant="outlined"
@@ -306,20 +312,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         </Grid>
       </Grid>
 
-      <DocumentFilters
+      <ModalDocumentFilters
         open={openFilter}
         onClose={handleCloseDialog()}
-        onSubmit={handleCloseDialog()}
-        nda={nda}
-        onChangeNda={setNda}
-        ipp={ipp}
-        onChangeIpp={setIpp}
-        selectedDocTypes={selectedDocTypes}
-        onChangeSelectedDocTypes={setSelectedDocTypes}
-        startDate={startDate}
-        onChangeStartDate={setStartDate}
-        endDate={endDate}
-        onChangeEndDate={setEndDate}
+        filters={filters}
+        onChangeFilters={setFilters}
         deidentified={deidentifiedBoolean}
       />
     </>

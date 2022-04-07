@@ -102,6 +102,14 @@ export type CohortFilters = {
   endDate: null | string
 }
 
+export type DocumentFilters = {
+  ipp?: string
+  nda: string
+  selectedDocTypes: { code: string; label: string; type: string }[]
+  startDate: string | null
+  endDate: string | null
+}
+
 export type CohortGroup = IGroup & {
   id: string
   name: string

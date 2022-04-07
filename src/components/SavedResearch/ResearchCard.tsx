@@ -312,13 +312,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
         />
       )}
 
-      <CohortsFilter
-        open={open}
-        onClose={() => setOpen(false)}
-        onSubmit={() => setOpen(false)}
-        filters={filters}
-        onChangeFilters={setFilters}
-      />
+      <CohortsFilter open={open} onClose={() => setOpen(false)} filters={filters} onChangeFilters={setFilters} />
     </Grid>
   )
 }
