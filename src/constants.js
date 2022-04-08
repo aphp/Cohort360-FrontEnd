@@ -112,25 +112,61 @@ export const BIOLOGY_HIERARCHY_ITM_LOINC =
     ? '{BIOLOGY_HIERARCHY_ITM_LOINC}'
     : process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_LOINC
 
-export const ODD_BIOLOGY: boolean | string =
+export const ODD_BIOLOGY =
   (process.env.NODE_ENV !== 'development' ? '{ODD_BIOLOGY}' : process.env.REACT_APP_ODD_BIOLOGY) === 'true'
-export const ODD_COMPOSITION: boolean | string =
+export const ODD_COMPOSITION =
   (process.env.NODE_ENV !== 'development' ? '{ODD_COMPOSITION}' : process.env.REACT_APP_ODD_COMPOSITION) === 'true'
-export const ODD_PROCEDURE: boolean | string =
+export const ODD_PROCEDURE =
   (process.env.NODE_ENV !== 'development' ? '{ODD_PROCEDURE}' : process.env.REACT_APP_OODD_PROCEDURE) === 'true'
-export const ODD_CLAIM: boolean | string =
+export const ODD_CLAIM =
   (process.env.NODE_ENV !== 'development' ? '{ODD_CLAIM}' : process.env.REACT_APP_ODD_CLAIM) === 'true'
-export const ODD_CONDITION: boolean | string =
+export const ODD_CONDITION =
   (process.env.NODE_ENV !== 'development' ? '{ODD_CONDITION}' : process.env.REACT_APP_ODD_CONDITION) === 'true'
-export const ODD_OBSERVATION: boolean | string =
+export const ODD_OBSERVATION =
   (process.env.NODE_ENV !== 'development' ? '{ODD_OBSERVATION}' : process.env.REACT_APP_ODD_OBSERVATION) === 'true'
-export const ODD_MEDICATION: boolean | string =
+export const ODD_MEDICATION =
   (process.env.NODE_ENV !== 'development' ? '{ODD_MEDICATION}' : process.env.REACT_APP_ODD_MEDICATION) === 'true'
-export const ODD_CONTACT: boolean | string =
+export const ODD_CONTACT =
   (process.env.NODE_ENV !== 'development' ? '{ODD_CONTACT}' : process.env.REACT_APP_ODD_CONTACT) === 'true'
-export const ODD_EXPORT: boolean | string =
+export const ODD_EXPORT =
   (process.env.NODE_ENV !== 'development' ? '{ODD_EXPORT}' : process.env.REACT_APP_ODD_EXPORT) === 'true'
 
+console.log('ID_TOKEN_STORAGE_KEY', ID_TOKEN_STORAGE_KEY)
+console.log('TOKEN_DATA_STORAGE_KEY', TOKEN_DATA_STORAGE_KEY)
+console.log('STATE_STORAGE_KEY', STATE_STORAGE_KEY)
+console.log('CLIENT_ID', CLIENT_ID)
+console.log('CLIENT_SECRET', CLIENT_SECRET)
+console.log('BACK_API_URL', BACK_API_URL)
+console.log('REQUEST_API_URL', REQUEST_API_URL)
+console.log('FHIR_API_URL', FHIR_API_URL)
+console.log('AUTH_API_URL', AUTH_API_URL)
+console.log('FILES_URL', FILES_URL)
+console.log('TOKEN_URL', TOKEN_URL)
+console.log('REVOKE_URL', REVOKE_URL)
+console.log('LOGIN_REDIRECT_URL', LOGIN_REDIRECT_URL)
+console.log('CONTEXT', CONTEXT)
+console.log('ACCES_TOKEN', ACCES_TOKEN)
+console.log('REFRESH_TOKEN', REFRESH_TOKEN)
+console.log('CLAIM_HIERARCHY', CLAIM_HIERARCHY)
+console.log('CONDITION_HIERARCHY', CONDITION_HIERARCHY)
+console.log('CONDITION_STATUS', CONDITION_STATUS)
+console.log('PROCEDURE_HIERARCHY', PROCEDURE_HIERARCHY)
+console.log('DEMOGRAPHIC_GENDER', DEMOGRAPHIC_GENDER)
+console.log('ENCOUNTER_ADMISSION_MODE', ENCOUNTER_ADMISSION_MODE)
+console.log('ENCOUNTER_ENTRY_MODE', ENCOUNTER_ENTRY_MODE)
+console.log('ENCOUNTER_EXIT_MODE', ENCOUNTER_EXIT_MODE)
+console.log('ENCOUNTER_VISIT_TYPE', ENCOUNTER_VISIT_TYPE)
+console.log('ENCOUNTER_SEJOUR_TYPE', ENCOUNTER_SEJOUR_TYPE)
+console.log('ENCOUNTER_FILE_STATUS', ENCOUNTER_FILE_STATUS)
+console.log('ENCOUNTER_EXIT_TYPE', ENCOUNTER_EXIT_TYPE)
+console.log('ENCOUNTER_DESTINATION', ENCOUNTER_DESTINATION)
+console.log('ENCOUNTER_PROVENANCE', ENCOUNTER_PROVENANCE)
+console.log('ENCOUNTER_ADMISSION', ENCOUNTER_ADMISSION)
+console.log('MEDICATION_ATC', MEDICATION_ATC)
+console.log('MEDICATION_PRESCRIPTION_TYPES', MEDICATION_PRESCRIPTION_TYPES)
+console.log('MEDICATION_ADMINISTRATIONS', MEDICATION_ADMINISTRATIONS)
+console.log('BIOLOGY_HIERARCHY_ITM_ANABIO', BIOLOGY_HIERARCHY_ITM_ANABIO)
+console.log('BIOLOGY_HIERARCHY_ITM_LOINC', BIOLOGY_HIERARCHY_ITM_LOINC)
 console.log('ODD_BIOLOGY', ODD_BIOLOGY)
 console.log('ODD_COMPOSITION', ODD_COMPOSITION)
 console.log('ODD_PROCEDURE', ODD_PROCEDURE)
@@ -140,13 +176,4 @@ console.log('ODD_OBSERVATION', ODD_OBSERVATION)
 console.log('ODD_MEDICATION', ODD_MEDICATION)
 console.log('ODD_CONTACT', ODD_CONTACT)
 console.log('ODD_EXPORT', ODD_EXPORT)
-console.log('CONTEXT', CONTEXT)
-console.log('CLAIM_HIERARCHY', CLAIM_HIERARCHY)
-console.log('BACK_API_URL', BACK_API_URL)
-console.log('REQUEST_API_URL', REQUEST_API_URL)
-console.log('FHIR_API_URL', FHIR_API_URL)
-console.log('CONDITION_HIERARCHY', CONDITION_HIERARCHY)
-console.log('CONDITION_STATUS', CONDITION_STATUS)
-console.log('BIOLOGY_HIERARCHY_ITM_LOINC', BIOLOGY_HIERARCHY_ITM_LOINC)
-
-console.log(process.env.NODE_ENV)
+console.log('NODE_ENV', process.env.NODE_ENV)
