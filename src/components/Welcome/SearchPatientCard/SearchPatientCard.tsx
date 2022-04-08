@@ -21,7 +21,7 @@ const SearchPatientCard = () => {
         </Typography>
       </div>
       <Divider className={classes.divider} />
-      {!deidentifiedBoolean ? (
+      {deidentifiedBoolean ? (
         <Grid container item justifyContent="center">
           <LockIcon className={classes.lockIcon} />
           <Typography variant="h6" align="center">

@@ -13,7 +13,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import { getAge } from 'utils/age'
 import services from 'services'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { CohortPatient, SearchByTypes, VitalStatus } from 'types'
+import { CohortPatient, PatientFilters as PatientFiltersType, SearchByTypes, VitalStatus } from 'types'
 
 import useStyles from './styles'
 
@@ -47,12 +47,12 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   const [searchInput, setSearchInput] = useState(_searchInput ?? '')
   const [searchBy, setSearchBy] = useState(SearchByTypes.text)
   const [loadingStatus, setLoadingStatus] = useState(false)
-  const [gender, setGender] = useState(PatientGenderKind._unknown)
-  const [birthdates, setBirthdates] = useState<[string, string]>([
-    moment().subtract(130, 'years').format('YYYY-MM-DD'),
-    moment().format('YYYY-MM-DD')
-  ])
-  const [vitalStatus, setVitalStatus] = useState(VitalStatus.all)
+
+  const [filters, setFilters] = useState<PatientFiltersType>({
+    gender: PatientGenderKind._unknown,
+    birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
+    vitalStatus: VitalStatus.all
+  })
 
   const [openSort, setOpenSort] = useState(false)
   const [sortBy, setSortBy] = useState('given')
@@ -68,9 +68,9 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       page,
       searchBy,
       searchInput,
-      gender,
-      birthdates,
-      vitalStatus,
+      filters.gender,
+      filters.birthdates,
+      filters.vitalStatus,
       newSortBy,
       newSortDirection,
       groupId.join(',')
@@ -112,7 +112,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   useEffect(() => {
     onSearchPatient(sortBy, sortDirection)
-  }, [gender, birthdates, vitalStatus]) // eslint-disable-line
+  }, [filters]) // eslint-disable-line
 
   const patientsToDisplay =
     patientsList?.length === totalPatients
@@ -141,12 +141,8 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
         open={open}
         onCloseFilterDialog={handleCloseDialog(false)}
         onSubmitDialog={handleCloseDialog(true)}
-        gender={gender}
-        onChangeGender={setGender}
-        birthdates={birthdates}
-        onChangeBirthdates={setBirthdates}
-        vitalStatus={vitalStatus}
-        onChangeVitalStatus={setVitalStatus}
+        filters={filters}
+        onChangeFilters={setFilters}
         // sort dialog props
         onClickSortButton={() => setOpenSort(true)}
         openSort={openSort}

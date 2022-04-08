@@ -14,7 +14,8 @@ import {
   IObservation,
   IDocumentReference,
   IMedicationRequest,
-  IMedicationAdministration
+  IMedicationAdministration,
+  PatientGenderKind
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 export interface TypedEntry<T extends IResourceList> extends IBundle_Entry {
@@ -124,6 +125,12 @@ export type PMSIFilters = {
   startDate: string | null
   endDate: string | null
   selectedDiagnosticTypes: { id: string; label: string }[]
+}
+
+export type PatientFilters = {
+  gender: PatientGenderKind
+  birthdates: [string, string]
+  vitalStatus: VitalStatus
 }
 
 export type CohortGroup = IGroup & {
