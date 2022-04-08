@@ -298,7 +298,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                     >
                       Modifier
                     </MenuItem>
-                    {ODD_EXPORT && dashboard.canMakeExport && (
+                    {!!ODD_EXPORT && dashboard.canMakeExport && (
                       <MenuItem
                         onClick={() => {
                           setAnchorEl(null)
@@ -327,7 +327,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         )}
       </Grid>
 
-      {ODD_EXPORT && openModal === 'edit' && (
+      {!!ODD_EXPORT && openModal === 'edit' && (
         <ModalEditCohort
           open
           onClose={() => {
