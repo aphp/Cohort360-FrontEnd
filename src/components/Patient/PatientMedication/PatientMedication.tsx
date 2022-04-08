@@ -10,7 +10,7 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 import MedicationFilters from 'components/Filters/MedicationFilters/MedicationFilters'
 import DataTableMedication from 'components/DataTable/DataTableMedication'
 
-import { Order } from 'types'
+import { MedicationsFilters, Order } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchMedication } from 'state/patient'
@@ -51,13 +51,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   const [open, setOpen] = useState<string | null>(null)
   const [page, setPage] = useState(1)
 
-  const [filter, setFilter] = useState<{
-    nda: string
-    startDate: string | null
-    endDate: string | null
-    selectedPrescriptionTypes: { id: string; label: string }[]
-    selectedAdministrationRoutes: { id: string; label: string }[]
-  }>({
+  const [filter, setFilter] = useState<MedicationsFilters>({
     nda: '',
     selectedPrescriptionTypes: [],
     selectedAdministrationRoutes: [],
@@ -213,24 +207,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
           <MedicationFilters
             open={open === 'filter'}
             onClose={() => setOpen(null)}
-            onSubmit={() => setOpen(null)}
-            nda={filter.nda}
-            onChangeNda={(_nda: string) => handleChangeFilter('nda', _nda)}
-            startDate={filter.startDate}
-            onChangeStartDate={(_startDate: string | null) => handleChangeFilter('startDate', _startDate)}
-            endDate={filter.endDate}
-            onChangeEndDate={(_endDate: string | null) => handleChangeFilter('endDate', _endDate)}
             deidentified={deidentifiedBoolean}
-            selectedPrescriptionTypes={filter.selectedPrescriptionTypes}
-            onChangeSelectedPrescriptionTypes={(_selectedPrescriptionTypes: { id: string; label: string }[]) =>
-              handleChangeFilter('selectedPrescriptionTypes', _selectedPrescriptionTypes)
-            }
             showPrescriptionTypes={selectedTab === 'prescription'}
-            selectedAdministrationRoutes={filter.selectedAdministrationRoutes}
-            onChangeSelectedAdministrationRoutes={(_selectedAdministrationRoutes: { id: string; label: string }[]) =>
-              handleChangeFilter('selectedAdministrationRoutes', _selectedAdministrationRoutes)
-            }
             showAdministrationRoutes={selectedTab === 'administration'}
+            filters={filter}
+            setFilters={setFilter}
           />
         </div>
       </Grid>

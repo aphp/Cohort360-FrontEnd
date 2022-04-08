@@ -110,6 +110,22 @@ export type DocumentFilters = {
   endDate: string | null
 }
 
+export type MedicationsFilters = {
+  nda: string
+  startDate: string | null
+  endDate: string | null
+  selectedPrescriptionTypes: { id: string; label: string }[]
+  selectedAdministrationRoutes: { id: string; label: string }[]
+}
+
+export type PMSIFilters = {
+  nda: string
+  code: string
+  startDate: string | null
+  endDate: string | null
+  selectedDiagnosticTypes: { id: string; label: string }[]
+}
+
 export type CohortGroup = IGroup & {
   id: string
   name: string

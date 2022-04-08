@@ -7,7 +7,7 @@ import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import PMSIFilters from 'components/Filters/PMSIFilters/PMSIFilters'
+import ModalPMSIFilters from 'components/Filters/PMSIFilters/PMSIFilters'
 import DataTablePmsi from 'components/DataTable/DataTablePmsi'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
@@ -15,7 +15,7 @@ import { capitalizeFirstLetter } from 'utils/capitalize'
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPmsi } from 'state/patient'
 
-import { Order } from 'types'
+import { PMSIFilters, Order } from 'types'
 
 import useStyles from './styles'
 
@@ -48,14 +48,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
 
   const [page, setPage] = useState(1)
 
-  const [filters, setFilters] = useState<{
-    searchInput: string
-    nda: string
-    code: string
-    selectedDiagnosticTypes: any[]
-    startDate: string | null
-    endDate: string | null
-  }>({
+  const [filters, setFilters] = useState<PMSIFilters & { searchInput: string }>({
     searchInput: '',
     nda: '',
     code: '',
@@ -104,7 +97,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
     }))
   }
 
-  const handleDeleteChip = (filterName: string, value?: string) => {
+  const handleDeleteChip = (filterName: string, value?: any) => {
     switch (filterName) {
       case 'nda':
         value &&
@@ -254,22 +247,18 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
             Filtrer
           </Button>
 
-          <PMSIFilters
+          <ModalPMSIFilters
             open={open}
             onClose={() => setOpen(false)}
-            onSubmit={() => setOpen(false)}
-            nda={filters.nda}
-            onChangeNda={(value) => onChangeOptions('nda', value)}
-            code={filters.code}
-            onChangeCode={(value) => onChangeOptions('code', value)}
-            selectedDiagnosticTypes={filters.selectedDiagnosticTypes}
-            onChangeSelectedDiagnosticTypes={(value) => onChangeOptions('selectedDiagnosticTypes', value)}
-            startDate={filters.startDate}
-            onChangeStartDate={(value) => onChangeOptions('startDate', value)}
-            endDate={filters.endDate}
-            onChangeEndDate={(value) => onChangeOptions('endDate', value)}
             deidentified={deidentifiedBoolean}
             showDiagnosticTypes={selectedTab === 'diagnostic'}
+            filters={filters}
+            setFilters={(newFilters) =>
+              setFilters({
+                searchInput: filters.searchInput,
+                ...newFilters
+              })
+            }
           />
         </div>
       </Grid>

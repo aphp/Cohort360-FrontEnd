@@ -22,51 +22,37 @@ import ClearIcon from '@material-ui/icons/Clear'
 import services from 'services'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
+import { MedicationsFilters } from 'types'
+
 import useStyles from './styles'
 
 type MedicationFiltersProps = {
   open: boolean
-  onClose: () => void
-  onSubmit: () => void
-  nda: string
-  onChangeNda: (nda: string) => void
-  startDate?: string | null
-  onChangeStartDate: (startDate: string | null) => void
-  endDate?: string | null
-  onChangeEndDate: (endDate: string | null) => void
   deidentified: boolean
-  selectedPrescriptionTypes: { id: string; label: string }[]
-  onChangeSelectedPrescriptionTypes: (selectedPrescriptionTypes: { id: string; label: string }[]) => void
   showPrescriptionTypes: boolean
-  selectedAdministrationRoutes: { id: string; label: string }[]
-  onChangeSelectedAdministrationRoutes: (selectedAdministrationRoutes: { id: string; label: string }[]) => void
   showAdministrationRoutes: boolean
+  onClose: () => void
+  filters: MedicationsFilters
+  setFilters: (filters: MedicationsFilters) => void
 }
 const MedicationFilters: React.FC<MedicationFiltersProps> = ({
   open,
   onClose,
-  onSubmit,
-  nda,
-  onChangeNda,
-  startDate,
-  onChangeStartDate,
-  endDate,
-  onChangeEndDate,
   deidentified,
-  selectedPrescriptionTypes,
-  onChangeSelectedPrescriptionTypes,
   showPrescriptionTypes,
-  selectedAdministrationRoutes,
-  onChangeSelectedAdministrationRoutes,
-  showAdministrationRoutes
+  showAdministrationRoutes,
+  filters,
+  setFilters
 }) => {
   const classes = useStyles()
 
-  const [_nda, setNda] = useState<string>(nda)
-  const [_startDate, setStartDate] = useState<any>(startDate)
-  const [_endDate, setEndDate] = useState<any>(endDate)
-  const [_selectedPrescriptionTypes, setSelectedPrescriptionTypes] = useState<any[]>(selectedPrescriptionTypes)
-  const [_selectedAdministrationRoutes, setSelectedAdministrationRoutes] = useState<any[]>(selectedAdministrationRoutes)
+  const [_nda, setNda] = useState<string>(filters.nda)
+  const [_startDate, setStartDate] = useState<any>(filters.startDate)
+  const [_endDate, setEndDate] = useState<any>(filters.endDate)
+  const [_selectedPrescriptionTypes, setSelectedPrescriptionTypes] = useState<any[]>(filters.selectedPrescriptionTypes)
+  const [_selectedAdministrationRoutes, setSelectedAdministrationRoutes] = useState<any[]>(
+    filters.selectedAdministrationRoutes
+  )
   const [dateError, setDateError] = useState(false)
 
   const [prescriptionTypesList, setPrescriptionTypesList] = useState<any[]>([])
@@ -88,12 +74,13 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
     const newStartDate = moment(_startDate).isValid() ? moment(_startDate).format('YYYY-MM-DD') : null
     const newEndDate = moment(_endDate).isValid() ? moment(_endDate).format('YYYY-MM-DD') : null
 
-    onChangeNda(_nda)
-    onChangeStartDate(newStartDate)
-    onChangeEndDate(newEndDate)
-    onChangeSelectedPrescriptionTypes(_selectedPrescriptionTypes)
-    onChangeSelectedAdministrationRoutes(_selectedAdministrationRoutes)
-    onSubmit()
+    setFilters({
+      nda: _nda,
+      startDate: newStartDate,
+      endDate: newEndDate,
+      selectedPrescriptionTypes: _selectedPrescriptionTypes,
+      selectedAdministrationRoutes: _selectedAdministrationRoutes
+    })
     onClose()
   }
 
@@ -113,10 +100,11 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
   }, [])
 
   useEffect(() => {
-    setNda(nda)
-    setStartDate(startDate)
-    setEndDate(endDate)
-    setSelectedPrescriptionTypes(selectedPrescriptionTypes)
+    setNda(filters.nda)
+    setStartDate(filters.startDate)
+    setEndDate(filters.endDate)
+    setSelectedPrescriptionTypes(filters.selectedPrescriptionTypes)
+    setSelectedAdministrationRoutes(filters.selectedAdministrationRoutes)
   }, [open]) // eslint-disable-line
 
   useEffect(() => {

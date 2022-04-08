@@ -23,49 +23,33 @@ import services from 'services'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
+import { PMSIFilters } from 'types'
+
 import useStyles from './styles'
 
-type PMSIFiltersProps = {
+type ModalPMSIFiltersProps = {
   open: boolean
   onClose: () => void
-  onSubmit: () => void
-  nda: string
-  onChangeNda: (nda: string) => void
-  code: string
-  onChangeCode: (code: string) => void
-  startDate?: string | null
-  onChangeStartDate: (startDate: string | null) => void
-  endDate?: string | null
-  onChangeEndDate: (endDate: string | null) => void
   deidentified: boolean
-  selectedDiagnosticTypes: string[]
-  onChangeSelectedDiagnosticTypes: (selectedDiagnosticTypes: string[]) => void
   showDiagnosticTypes: boolean
+  filters: PMSIFilters
+  setFilters: (filters: PMSIFilters) => void
 }
-const PMSIFilters: React.FC<PMSIFiltersProps> = ({
+const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
   open,
   onClose,
-  onSubmit,
-  nda,
-  onChangeNda,
-  code,
-  onChangeCode,
-  startDate,
-  onChangeStartDate,
-  endDate,
-  onChangeEndDate,
   deidentified,
-  selectedDiagnosticTypes,
-  onChangeSelectedDiagnosticTypes,
-  showDiagnosticTypes
+  showDiagnosticTypes,
+  filters,
+  setFilters
 }) => {
   const classes = useStyles()
 
-  const [_nda, setNda] = useState<string>(nda)
-  const [_code, setCode] = useState<string>(code)
-  const [_startDate, setStartDate] = useState<any>(startDate)
-  const [_endDate, setEndDate] = useState<any>(endDate)
-  const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>(selectedDiagnosticTypes)
+  const [_nda, setNda] = useState<string>(filters.nda)
+  const [_code, setCode] = useState<string>(filters.code)
+  const [_startDate, setStartDate] = useState<any>(filters.startDate)
+  const [_endDate, setEndDate] = useState<any>(filters.endDate)
+  const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>(filters.selectedDiagnosticTypes)
   const [dateError, setDateError] = useState(false)
 
   const [diagnosticTypesList, setDiagnosticTypesList] = useState<any[]>([])
@@ -86,12 +70,14 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
     const newStartDate = moment(_startDate).isValid() ? moment(_startDate).format('YYYY-MM-DD') : null
     const newEndDate = moment(_endDate).isValid() ? moment(_endDate).format('YYYY-MM-DD') : null
 
-    onChangeNda(_nda)
-    onChangeCode(_code)
-    onChangeStartDate(newStartDate)
-    onChangeEndDate(newEndDate)
-    onChangeSelectedDiagnosticTypes(_selectedDiagnosticTypes)
-    onSubmit()
+    setFilters({
+      nda: _nda,
+      code: _code,
+      startDate: newStartDate,
+      endDate: newEndDate,
+      selectedDiagnosticTypes: _selectedDiagnosticTypes
+    })
+    onClose()
   }
 
   useEffect(() => {
@@ -104,11 +90,11 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
   }, [])
 
   useEffect(() => {
-    setNda(nda)
-    setCode(code)
-    setStartDate(startDate)
-    setEndDate(endDate)
-    setSelectedDiagnosticTypes(selectedDiagnosticTypes)
+    setNda(filters.nda)
+    setCode(filters.code)
+    setStartDate(filters.startDate)
+    setEndDate(filters.endDate)
+    setSelectedDiagnosticTypes(filters.selectedDiagnosticTypes)
   }, [open]) // eslint-disable-line
 
   useEffect(() => {
@@ -243,4 +229,4 @@ const PMSIFilters: React.FC<PMSIFiltersProps> = ({
   )
 }
 
-export default PMSIFilters
+export default ModalPMSIFilters
