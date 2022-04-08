@@ -119,24 +119,24 @@ export const BIOLOGY_HIERARCHY_ITM_LOINC =
     ? '{BIOLOGY_HIERARCHY_ITM_LOINC}'
     : process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_LOINC
 
-export const ODD_BIOLOGY: boolean =
+export const ODD_BIOLOGY: boolean | string =
   //@ts-ignore
   (process.env.NODE_ENV !== 'development' ? '{ODD_BIOLOGY}' === 'true' : process.env.REACT_APP_ODD_BIOLOGY) === 'true'
-// export const ODD_BIOLOGY: boolean =
+// export const ODD_BIOLOGY: boolean | string =
 //   (process.env.NODE_ENV !== 'development' ? '{ODD_BIOLOGY}' : process.env.REACT_APP_ODD_BIOLOGY) === 'true'
-export const ODD_COMPOSITION: boolean =
+export const ODD_COMPOSITION: boolean | string =
   (process.env.NODE_ENV !== 'development' ? '{ODD_COMPOSITION}' : process.env.REACT_APP_ODD_COMPOSITION) === 'true'
-export const ODD_PROCEDURE: boolean =
+export const ODD_PROCEDURE: boolean | string =
   (process.env.NODE_ENV !== 'development' ? '{ODD_PROCEDURE}' : process.env.REACT_APP_OODD_PROCEDURE) === 'true'
-export const ODD_CLAIM: boolean =
+export const ODD_CLAIM: boolean | string =
   (process.env.NODE_ENV !== 'development' ? '{ODD_CLAIM}' : process.env.REACT_APP_ODD_CLAIM) === 'true'
-export const ODD_CONDITION: boolean =
+export const ODD_CONDITION: boolean | string =
   (process.env.NODE_ENV !== 'development' ? '{ODD_CONDITION}' : process.env.REACT_APP_ODD_CONDITION) === 'true'
-export const ODD_OBSERVATION: boolean =
+export const ODD_OBSERVATION: boolean | string =
   (process.env.NODE_ENV !== 'development' ? '{ODD_OBSERVATION}' : process.env.REACT_APP_ODD_OBSERVATION) === 'true'
-export const ODD_MEDICATION: boolean =
+export const ODD_MEDICATION: boolean | string =
   (process.env.NODE_ENV !== 'development' ? '{ODD_MEDICATION}' : process.env.REACT_APP_ODD_MEDICATION) === 'true'
-export const ODD_CONTACT: boolean =
+export const ODD_CONTACT: boolean | string =
   (process.env.NODE_ENV !== 'development' ? '{ODD_CONTACT}' : process.env.REACT_APP_ODD_CONTACT) === 'true'
-export const ODD_EXPORT: boolean =
+export const ODD_EXPORT: boolean | string =
   (process.env.NODE_ENV !== 'development' ? '{ODD_EXPORT}' : process.env.REACT_APP_ODD_EXPORT) === 'true'
