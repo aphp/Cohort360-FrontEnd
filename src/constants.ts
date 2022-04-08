@@ -1,4 +1,4 @@
-type ContextType = 'aphp' | 'arkhn' | 'fakedata'
+// type ContextType = 'aphp' | 'arkhn' | 'fakedata'
 
 export const ID_TOKEN_STORAGE_KEY = 'ARKHN_ID_TOKEN'
 export const TOKEN_DATA_STORAGE_KEY = 'ARKHN_TOKEN_DATA'
