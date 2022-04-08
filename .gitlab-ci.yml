@@ -11,6 +11,9 @@ stages: # List of stages for jobs in their order of execution
 
 # test-e2e-chrome-job:
 #   stage: test
+#   include: # Variables needed for Selenium tests
+#     project: dev/cohort360/frontend
+#     file: '/.gitlab/selenium_variables.yml'
 #   artifacts:
 #     when: always
 #     paths:

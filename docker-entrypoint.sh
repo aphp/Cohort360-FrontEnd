@@ -42,4 +42,4 @@ sed -i "s@{ODD_CONTACT}@$ODD_CONTACT@g" /app/build/static/js/*.js
 
 service nginx restart
 
-service nginx -g 'daemon off;'
+nginx -g 'daemon off;'
