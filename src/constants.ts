@@ -113,10 +113,7 @@ export const BIOLOGY_HIERARCHY_ITM_LOINC =
     : process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_LOINC
 
 export const ODD_BIOLOGY: boolean | string =
-  //@ts-ignore
-  (process.env.NODE_ENV !== 'development' ? '{ODD_BIOLOGY}' === 'true' : process.env.REACT_APP_ODD_BIOLOGY) === 'true'
-// export const ODD_BIOLOGY: boolean | string =
-//   (process.env.NODE_ENV !== 'development' ? '{ODD_BIOLOGY}' : process.env.REACT_APP_ODD_BIOLOGY) === 'true'
+  (process.env.NODE_ENV !== 'development' ? '{ODD_BIOLOGY}' : process.env.REACT_APP_ODD_BIOLOGY) === 'true'
 export const ODD_COMPOSITION: boolean | string =
   (process.env.NODE_ENV !== 'development' ? '{ODD_COMPOSITION}' : process.env.REACT_APP_ODD_COMPOSITION) === 'true'
 export const ODD_PROCEDURE: boolean | string =
@@ -133,3 +130,21 @@ export const ODD_CONTACT: boolean | string =
   (process.env.NODE_ENV !== 'development' ? '{ODD_CONTACT}' : process.env.REACT_APP_ODD_CONTACT) === 'true'
 export const ODD_EXPORT: boolean | string =
   (process.env.NODE_ENV !== 'development' ? '{ODD_EXPORT}' : process.env.REACT_APP_ODD_EXPORT) === 'true'
+
+console.log('ODD_BIOLOGY', ODD_BIOLOGY)
+console.log('ODD_COMPOSITION', ODD_COMPOSITION)
+console.log('ODD_PROCEDURE', ODD_PROCEDURE)
+console.log('ODD_CLAIM', ODD_CLAIM)
+console.log('ODD_CONDITION', ODD_CONDITION)
+console.log('ODD_OBSERVATION', ODD_OBSERVATION)
+console.log('ODD_MEDICATION', ODD_MEDICATION)
+console.log('ODD_CONTACT', ODD_CONTACT)
+console.log('ODD_EXPORT', ODD_EXPORT)
+console.log('CONTEXT', CONTEXT)
+console.log('CLAIM_HIERARCHY', CLAIM_HIERARCHY)
+console.log('BACK_API_URL', BACK_API_URL)
+console.log('REQUEST_API_URL', REQUEST_API_URL)
+console.log('FHIR_API_URL', FHIR_API_URL)
+console.log('CONDITION_HIERARCHY', CONDITION_HIERARCHY)
+console.log('CONDITION_STATUS', CONDITION_STATUS)
+console.log('BIOLOGY_HIERARCHY_ITM_LOINC', BIOLOGY_HIERARCHY_ITM_LOINC)
