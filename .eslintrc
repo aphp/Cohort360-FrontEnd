@@ -33,6 +33,7 @@
     "@typescript-eslint/explicit-module-boundary-types": 0,
     "ban-ts-ignore": 0,
     "react/display-name": 0,
+    "no-extra-boolean-cast": 0,
     "@typescript-eslint/ban-types": [
       "error",
       {

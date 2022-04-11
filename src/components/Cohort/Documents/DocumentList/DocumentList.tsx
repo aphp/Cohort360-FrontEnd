@@ -38,6 +38,7 @@ import {
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 
 import { getDocumentStatus } from 'utils/documentsFormatter'
+import Watermark from 'assets/images/watermark.svg'
 
 import useStyles from './styles'
 
@@ -176,7 +177,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({
 
       {showText && (
         <TableRow style={{ backgroundColor }}>
-          <TableCell colSpan={6}>
+          <TableCell colSpan={6} style={{ backgroundImage: `url(${Watermark})`, backgroundSize: 'contain' }}>
             {row.section?.map((section) => (
               <Grid key={section.title} container item direction="column">
                 <Typography variant="h6">{section.title}</Typography>

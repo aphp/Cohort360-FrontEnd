@@ -119,7 +119,7 @@ const fetchExploredCohort = createAsyncThunk<
             const cohortRights = await services.cohorts.fetchCohortsRights([{ fhir_group_id: id }])
             const cohortRight = cohortRights && cohortRights[0]
             cohort.canMakeExport =
-              (ODD_EXPORT &&
+              (!!ODD_EXPORT &&
                 cohortRight?.extension?.some(
                   ({ url, valueString }) => url === 'EXPORT_ACCESS' && valueString === 'DATA_NOMINATIVE'
                 )) ??
@@ -198,7 +198,7 @@ const fetchExploredCohortInBackground = createAsyncThunk<
           const cohortRights = await services.cohorts.fetchCohortsRights([{ fhir_group_id: id }])
           const cohortRight = cohortRights && cohortRights[0]
           cohort.canMakeExport =
-            (ODD_EXPORT &&
+            (!!ODD_EXPORT &&
               cohortRight?.extension?.some(
                 ({ url, valueString }) => url === 'EXPORT_ACCESS' && valueString === 'DATA_NOMINATIVE'
               )) ??

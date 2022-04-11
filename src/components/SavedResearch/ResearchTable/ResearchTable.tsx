@@ -116,7 +116,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
 
   // You can make an export if you got 1 cohort with: EXPORT_ACCESS = 'DATA_NOMINATIVE'
   const canMakeExport = researchData
-    ? ODD_EXPORT &&
+    ? !!ODD_EXPORT &&
       researchData.some((cohort) =>
         cohort.extension && cohort.extension.length > 0
           ? cohort.extension.find(
@@ -450,7 +450,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
         onClose={() => dispatch<any>(setSelectedCohortState(null))}
       />
 
-      {ODD_EXPORT && (
+      {!!ODD_EXPORT && (
         <ExportModal
           cohortId={selectedExportableCohort ? selectedExportableCohort : 0}
           open={!!selectedExportableCohort}

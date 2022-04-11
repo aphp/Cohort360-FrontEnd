@@ -139,7 +139,7 @@ const Patient = () => {
               component={Link}
               to={`/patients/${patientId}/medication${groupId ? `?groupId=${groupId}` : ''}`}
             />
-            {ODD_BIOLOGY && (
+            {!!ODD_BIOLOGY && (
               <Tab
                 className={classes.tabTitle}
                 label="Biologie"
@@ -167,7 +167,7 @@ const Patient = () => {
           {selectedTab === 'documents-cliniques' && <PatientDocs groupId={groupId} />}
           {selectedTab === 'pmsi' && <PatientPMSI groupId={groupId} />}
           {selectedTab === 'medication' && <PatientMedication groupId={groupId} />}
-          {ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology groupId={groupId} />}
+          {!!ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology groupId={groupId} />}
         </Grid>
 
         <PatientSidebar

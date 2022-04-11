@@ -436,8 +436,6 @@ const servicesCohorts: IServiceCohorts = {
   },
 
   fetchCohortsRights: async (cohorts) => {
-    if (!ODD_EXPORT) return cohorts
-
     try {
       // On recupère les info d'une cohort pour avoir les IDs des groupes
       const cohortsResponse = await Promise.all(
@@ -601,6 +599,7 @@ const servicesCohorts: IServiceCohorts = {
           {
             url: 'EXPORT_ACCESS',
             valueString:
+              !!ODD_EXPORT &&
               allRightOfCohort.filter(
                 (rightOfCohort: any) =>
                   rightOfCohort.right_export_csv_nominative === true &&
