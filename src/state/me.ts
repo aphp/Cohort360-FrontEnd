@@ -12,6 +12,7 @@ export type MeState = null | {
   deidentified: boolean
   nominativeGroupsIds?: any[]
   lastConnection?: string
+  maintenance?: any[]
 }
 
 // Logout action is defined outside of the meSlice because it is being used by all reducers
