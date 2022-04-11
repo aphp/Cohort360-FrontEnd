@@ -12,7 +12,7 @@ import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
 import SortDialog from 'components/Filters/SortDialog/SortDialog'
 
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { PatientFilters as PatientFiltersType, SearchByTypes, VitalStatus } from 'types'
+import { PatientFilters as PatientFiltersType, SearchByTypes, Sort, VitalStatus } from 'types'
 
 import useStyles from './styles'
 import { Autocomplete } from '@material-ui/lab'
@@ -38,10 +38,8 @@ type PatientSidebarHeaderTypes = {
   openSort: boolean
   onCloseSort: () => void
   onSubmitSort: () => void
-  sortBy: string
-  sortDirection: 'asc' | 'desc'
-  onChangeSortBy: (sortBy: string) => void
-  onChangeSortDirection: (sortDirection: 'asc' | 'desc') => void
+  sort: Sort
+  onChangeSort: (sort: Sort) => void
 }
 const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
   const classes = useStyles()
@@ -90,13 +88,6 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
     { label: 'Nom', code: SearchByTypes.family },
     { label: 'Prénom', code: SearchByTypes.given },
     { label: 'IPP', code: SearchByTypes.identifier }
-  ]
-
-  const sortOptions = [
-    { label: 'Sexe', code: 'gender' },
-    { label: 'Prénom', code: 'given' },
-    { label: 'Nom', code: 'family' },
-    { label: 'Date de Naissance', code: 'birthdate' }
   ]
 
   const handleDeleteChip = (filterName: string) => {
@@ -200,11 +191,8 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
           open={props.openSort}
           onClose={props.onCloseSort}
           onSubmit={props.onSubmitSort}
-          sortBy={props.sortBy}
-          sortOptions={sortOptions}
-          onChangeSortBy={props.onChangeSortBy}
-          sortDirection={props.sortDirection}
-          onChangeSortDirection={props.onChangeSortDirection}
+          sort={props.sort}
+          onChangeSort={props.onChangeSort}
         />
       </Grid>
       <Grid className={classes.filterChipsGrid}>

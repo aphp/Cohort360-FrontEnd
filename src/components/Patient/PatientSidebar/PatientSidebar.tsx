@@ -13,7 +13,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import { getAge } from 'utils/age'
 import services from 'services'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { CohortPatient, PatientFilters as PatientFiltersType, SearchByTypes, VitalStatus } from 'types'
+import { CohortPatient, PatientFilters as PatientFiltersType, SearchByTypes, Sort, VitalStatus } from 'types'
 
 import useStyles from './styles'
 
@@ -24,6 +24,7 @@ type PatientSidebarTypes = {
   onClose: () => void
   deidentifiedBoolean: boolean
 }
+
 const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   total,
   patients,
@@ -55,14 +56,16 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   })
 
   const [openSort, setOpenSort] = useState(false)
-  const [sortBy, setSortBy] = useState('given')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+  const [sort, setSort] = useState<Sort>({
+    sortBy: 'given',
+    sortDirection: 'asc'
+  })
 
   const [showFilterChip, setShowFilterChip] = useState(false)
 
   const numberOfRows = 20 // Number of desired lines in the document array
 
-  const onSearchPatient = async (newSortBy: string, newSortDirection: 'asc' | 'desc', page = 1) => {
+  const onSearchPatient = async (sort: Sort, page = 1) => {
     setLoadingStatus(true)
     const patientsResp = await services.cohorts.fetchPatientList(
       page,
@@ -71,8 +74,8 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       filters.gender,
       filters.birthdates,
       filters.vitalStatus,
-      newSortBy,
-      newSortDirection,
+      sort.sortBy,
+      sort.sortDirection,
       groupId.join(',')
     )
     setPatientsList(patientsResp?.originalPatients ?? [])
@@ -88,13 +91,13 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   const onKeyDown = (e: { keyCode: number; preventDefault: () => void }) => {
     if (e.keyCode === 13) {
       e.preventDefault()
-      onSearchPatient(sortBy, sortDirection)
+      onSearchPatient(sort)
     }
   }
 
   const handleChangePage = (event: React.ChangeEvent<unknown>, page: number) => {
     if (patientsList && patientsList.length < totalPatients) {
-      onSearchPatient(sortBy, sortDirection, page)
+      onSearchPatient(sort, page)
     } else {
       setPage(page)
     }
@@ -105,14 +108,13 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
     submit && setShowFilterChip(true)
   }
 
-  const handleCloseSortDialog = (submitSort: boolean) => () => {
+  const handleCloseSortDialog = () => () => {
     setOpenSort(false)
-    submitSort && onSearchPatient(sortBy, sortDirection)
   }
 
   useEffect(() => {
-    onSearchPatient(sortBy, sortDirection)
-  }, [filters]) // eslint-disable-line
+    onSearchPatient(sort)
+  }, [filters, sort]) // eslint-disable-line
 
   const patientsToDisplay =
     patientsList?.length === totalPatients
@@ -134,7 +136,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
         onKeyDownSearchInput={onKeyDown}
         searchBy={searchBy}
         onChangeSelect={setSearchBy}
-        onSearchPatient={() => onSearchPatient(sortBy, sortDirection)}
+        onSearchPatient={() => onSearchPatient(sort)}
         showFilterChip={showFilterChip}
         // filter dialog props
         onClickFilterButton={() => setOpen(true)}
@@ -146,12 +148,10 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
         // sort dialog props
         onClickSortButton={() => setOpenSort(true)}
         openSort={openSort}
-        onCloseSort={handleCloseSortDialog(false)}
-        onSubmitSort={handleCloseSortDialog(true)}
-        sortBy={sortBy}
-        onChangeSortBy={setSortBy}
-        sortDirection={sortDirection}
-        onChangeSortDirection={setSortDirection}
+        onCloseSort={handleCloseSortDialog}
+        onSubmitSort={handleCloseSortDialog}
+        sort={sort}
+        onChangeSort={setSort}
       />
       <Divider />
       <List className={classes.patientList} disablePadding>

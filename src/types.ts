@@ -133,6 +133,11 @@ export type PatientFilters = {
   vitalStatus: VitalStatus
 }
 
+export type Sort = {
+  sortBy: string
+  sortDirection: 'asc' | 'desc'
+}
+
 export type CohortGroup = IGroup & {
   id: string
   name: string
