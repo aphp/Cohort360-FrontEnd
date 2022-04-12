@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import moment from 'moment'
 
-import { Button, Chip, Grid, IconButton, InputAdornment, InputBase, Tab, Tabs, Typography } from '@material-ui/core'
+import { Button, Grid, IconButton, InputAdornment, InputBase, Tab, Tabs, Typography } from '@material-ui/core'
 
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
@@ -9,8 +8,9 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import ModalPMSIFilters from 'components/Filters/PMSIFilters/PMSIFilters'
 import DataTablePmsi from 'components/DataTable/DataTablePmsi'
+import MasterChips from 'components/MasterChips/MasterChips'
 
-import { capitalizeFirstLetter } from 'utils/capitalize'
+import { buildPmsiFiltersChips } from 'utils/chips'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPmsi } from 'state/patient'
@@ -129,7 +129,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
         value &&
           onChangeOptions(
             filterName,
-            filters.selectedDiagnosticTypes.filter((item) => item !== value)
+            filters.selectedDiagnosticTypes.filter((item) => item.id !== value.id)
           )
         break
     }
@@ -262,63 +262,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
           />
         </div>
       </Grid>
-      <Grid>
-        {filters.nda !== '' &&
-          filters.nda
-            .split(',')
-            .map((value) => (
-              <Chip
-                className={classes.chips}
-                key={value}
-                label={`NDA: ${value.toUpperCase()}`}
-                onDelete={() => handleDeleteChip('nda', value)}
-                color="primary"
-                variant="outlined"
-              />
-            ))}
-        {filters.code !== '' &&
-          filters.code
-            .split(',')
-            .map((value) => (
-              <Chip
-                className={classes.chips}
-                key={value}
-                label={`Code: ${value.toUpperCase()}`}
-                onDelete={() => handleDeleteChip('code', value)}
-                color="primary"
-                variant="outlined"
-              />
-            ))}
-        {filters.startDate && (
-          <Chip
-            className={classes.chips}
-            label={`Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}`}
-            onDelete={() => handleDeleteChip('startDate')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {filters.endDate && (
-          <Chip
-            className={classes.chips}
-            label={`Avant le : ${moment(filters.endDate).format('DD/MM/YYYY')}`}
-            onDelete={() => handleDeleteChip('endDate')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {filters.selectedDiagnosticTypes.length > 0 &&
-          filters.selectedDiagnosticTypes.map((diagnosticType) => (
-            <Chip
-              className={classes.chips}
-              key={diagnosticType.id}
-              label={capitalizeFirstLetter(diagnosticType.label)}
-              onDelete={() => handleDeleteChip('selectedDiagnosticTypes', diagnosticType)}
-              color="primary"
-              variant="outlined"
-            />
-          ))}
-      </Grid>
+
+      <MasterChips chips={buildPmsiFiltersChips(filters as PMSIFilters, handleDeleteChip)} />
 
       <DataTablePmsi
         loading={loading}

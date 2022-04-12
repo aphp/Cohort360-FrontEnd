@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react'
+import clsx from 'clsx'
 
 import {
   Grid,
@@ -9,7 +10,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TableSortLabel
+  TableSortLabel,
+  Typography
 } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
 
@@ -81,11 +83,12 @@ const DataTable: React.FC<DataTableProps> = ({
                 ) : (
                   <TableCell key={index} className={classes.tableHeadCell}>
                     {column.multiple.map(
-                      (subColumn) =>
+                      (subColumn, index) =>
                         subColumn.multiple === undefined && (
-                          <>
+                          <React.Fragment key={index}>
                             {subColumn.sortableColumn ? (
                               <TableSortLabel
+                                className={classes.multiple}
                                 active={order?.orderBy === subColumn.code}
                                 direction={order?.orderBy === subColumn.code ? order?.orderDirection : 'asc'}
                                 onClick={createSortHandler(subColumn.code)}
@@ -93,9 +96,13 @@ const DataTable: React.FC<DataTableProps> = ({
                                 {subColumn.label}
                               </TableSortLabel>
                             ) : (
-                              subColumn.label
+                              <Typography
+                                className={clsx([classes.multiple, classes.tableHeadCell, classes.tableHeadLabel])}
+                              >
+                                {subColumn.label}
+                              </Typography>
                             )}
-                          </>
+                          </React.Fragment>
                         )
                     )}
                   </TableCell>

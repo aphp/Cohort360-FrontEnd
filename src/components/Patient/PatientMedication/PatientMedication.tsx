@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import moment from 'moment'
 
-import { Button, Chip, Grid, IconButton, InputAdornment, InputBase, Tab, Tabs, Typography } from '@material-ui/core'
+import { Button, Grid, IconButton, InputAdornment, InputBase, Tab, Tabs, Typography } from '@material-ui/core'
 
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
@@ -9,13 +8,14 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import MedicationFilters from 'components/Filters/MedicationFilters/MedicationFilters'
 import DataTableMedication from 'components/DataTable/DataTableMedication'
+import MasterChips from 'components/MasterChips/MasterChips'
 
 import { MedicationsFilters, Order } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchMedication } from 'state/patient'
 
-import { capitalizeFirstLetter } from 'utils/capitalize'
+import { buildMedicationFiltersChips } from 'utils/chips'
 
 import useStyles from './styles'
 
@@ -94,7 +94,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
     _fetchMedication(value ? value : 1)
   }
 
-  const handleChangeFilter = (
+  const handleDeleteChip = (
     filterName: 'nda' | 'startDate' | 'endDate' | 'selectedPrescriptionTypes' | 'selectedAdministrationRoutes',
     value: any
   ) => {
@@ -216,77 +216,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
         </div>
       </Grid>
 
-      <Grid>
-        {filter.nda !== '' &&
-          filter.nda.split(',').map((nda) => (
-            <Chip
-              className={classes.chips}
-              key={nda}
-              label={`NDA: ${nda}`}
-              onDelete={() =>
-                handleChangeFilter(
-                  'nda',
-                  filter.nda
-                    .split(',')
-                    .filter((id) => id !== nda)
-                    .join()
-                )
-              }
-              color="primary"
-              variant="outlined"
-            />
-          ))}
-        {filter.selectedPrescriptionTypes.length > 0 &&
-          filter.selectedPrescriptionTypes.map((prescriptionType) => (
-            <Chip
-              className={classes.chips}
-              key={prescriptionType.id}
-              label={capitalizeFirstLetter(prescriptionType.label)}
-              onDelete={() =>
-                handleChangeFilter(
-                  'selectedPrescriptionTypes',
-                  filter.selectedPrescriptionTypes.filter(({ id }) => id !== prescriptionType.id)
-                )
-              }
-              color="primary"
-              variant="outlined"
-            />
-          ))}
-        {filter.selectedAdministrationRoutes.length > 0 &&
-          filter.selectedAdministrationRoutes.map((administrationRoute) => (
-            <Chip
-              className={classes.chips}
-              key={administrationRoute.id}
-              label={capitalizeFirstLetter(administrationRoute.label)}
-              onDelete={() =>
-                handleChangeFilter(
-                  'selectedAdministrationRoutes',
-                  filter.selectedAdministrationRoutes.filter(({ id }) => id !== administrationRoute.id)
-                )
-              }
-              color="primary"
-              variant="outlined"
-            />
-          ))}
-        {filter.startDate && (
-          <Chip
-            className={classes.chips}
-            label={`Après le : ${moment(filter.startDate).format('DD/MM/YYYY')}`}
-            onDelete={() => handleChangeFilter('startDate', null)}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {filter.endDate && (
-          <Chip
-            className={classes.chips}
-            label={`Avant le : ${moment(filter.endDate).format('DD/MM/YYYY')}`}
-            onDelete={() => handleChangeFilter('endDate', null)}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-      </Grid>
+      <MasterChips chips={buildMedicationFiltersChips(filter, handleDeleteChip)} />
 
       <DataTableMedication
         loading={loading}

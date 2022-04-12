@@ -132,13 +132,15 @@ const Patient = () => {
               component={Link}
               to={`/patients/${patientId}/pmsi${groupId ? `?groupId=${groupId}` : ''}`}
             />
-            <Tab
-              className={classes.tabTitle}
-              label="Médicaments"
-              value="medication"
-              component={Link}
-              to={`/patients/${patientId}/medication${groupId ? `?groupId=${groupId}` : ''}`}
-            />
+            {ODD_MEDICATION && (
+              <Tab
+                className={classes.tabTitle}
+                label="Médicaments"
+                value="medication"
+                component={Link}
+                to={`/patients/${patientId}/medication${groupId ? `?groupId=${groupId}` : ''}`}
+              />
+            )}
             {ODD_BIOLOGY && (
               <Tab
                 className={classes.tabTitle}

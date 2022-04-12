@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import moment from 'moment'
 
-import { Button, Chip, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
+import { Button, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
 
 import ClearIcon from '@material-ui/icons/Clear'
@@ -10,10 +9,13 @@ import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
 import BiologyFilters from 'components/Filters/BiologyFilters/BiologyFilters'
 import DataTableObservation from 'components/DataTable/DataTableObservation'
+import MasterChips from 'components/MasterChips/MasterChips'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchBiology } from 'state/patient'
-import { Order } from 'types'
+import { Order, ObservationFilters } from 'types'
+
+import { buildObservationFiltersChips } from 'utils/chips'
 
 import useStyles from './styles'
 
@@ -43,13 +45,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
 
   const [open, setOpen] = useState<string | null>(null)
 
-  const [filters, setFilters] = useState<{
-    nda: string
-    loinc: string
-    anabio: string
-    startDate: string | null
-    endDate: string | null
-  }>(filtersDefault)
+  const [filters, setFilters] = useState<ObservationFilters>(filtersDefault)
 
   const [order, setOrder] = useState<Order>({
     orderBy: 'effectiveDatetime',
@@ -170,83 +166,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
         </div>
       </Grid>
 
-      <Grid>
-        {filters.nda !== '' &&
-          filters.nda.split(',').map((nda) => (
-            <Chip
-              className={classes.chips}
-              key={nda}
-              label={`NDA: ${nda}`}
-              onDelete={() =>
-                handleChangeFilter(
-                  'nda',
-                  filters.nda
-                    .split(',')
-                    .filter((value) => value !== nda)
-                    .join()
-                )
-              }
-              color="primary"
-              variant="outlined"
-            />
-          ))}
-        {filters.loinc !== '' &&
-          filters.loinc.split(',').map((loinc) => (
-            <Chip
-              className={classes.chips}
-              key={loinc}
-              label={`Code LOINC: ${loinc.toLocaleUpperCase()}`}
-              onDelete={() =>
-                handleChangeFilter(
-                  'loinc',
-                  filters.loinc
-                    .split(',')
-                    .filter((value) => value !== loinc)
-                    .join()
-                )
-              }
-              color="primary"
-              variant="outlined"
-            />
-          ))}
-        {filters.anabio !== '' &&
-          filters.anabio.split(',').map((anabio) => (
-            <Chip
-              className={classes.chips}
-              label={`Code ANABIO: ${anabio.toLocaleUpperCase()}`}
-              key={anabio}
-              onDelete={() =>
-                handleChangeFilter(
-                  'anabio',
-                  filters.anabio
-                    .split(',')
-                    .filter((value) => value !== anabio)
-                    .join()
-                )
-              }
-              color="primary"
-              variant="outlined"
-            />
-          ))}
-        {filters.startDate && (
-          <Chip
-            className={classes.chips}
-            label={`Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}`}
-            onDelete={() => handleChangeFilter('startDate', null)}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {filters.endDate && (
-          <Chip
-            className={classes.chips}
-            label={`Avant le : ${moment(filters.endDate).format('DD/MM/YYYY')}`}
-            onDelete={() => handleChangeFilter('endDate', null)}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-      </Grid>
+      <MasterChips chips={buildObservationFiltersChips(filters, handleChangeFilter)} />
 
       <DataTableObservation
         loading={loading}

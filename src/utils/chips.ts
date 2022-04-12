@@ -1,27 +1,38 @@
 import moment from 'moment'
 
+import { capitalizeFirstLetter } from 'utils/capitalize'
 import { getDisplayingSelectedDocTypes } from 'utils/documentsFormatter'
 import { genderName, vitalStatusName } from 'utils/patient'
 import { ageName } from 'utils/age'
 
-import { DocumentFilters, PatientFilters as PatientFiltersType } from 'types'
+import {
+  DocumentFilters as DocumentFiltersType,
+  PatientFilters as PatientFiltersType,
+  ObservationFilters as ObservationFiltersType,
+  MedicationsFilters as MedicationFiltersType,
+  PMSIFilters as PMSIFiltersType
+} from 'types'
 
 export const buildDocumentFiltersChips = (
-  filters: DocumentFilters,
+  filters: DocumentFiltersType,
   handleDeleteChip: (filterName: 'nda' | 'ipp' | 'selectedDocTypes' | 'startDate' | 'endDate', value?: string) => void
 ) => {
   const displayingSelectedDocType: any[] = getDisplayingSelectedDocTypes(filters.selectedDocTypes)
 
   return (
     [
-      filters.nda &&
-        filters.nda.split(',').map((nda) => ({ label: nda ? nda : '', onDelete: () => handleDeleteChip('nda', nda) })),
-      filters.ipp &&
-        filters.ipp.split(',').map((ipp) => ({ label: ipp ? ipp : '', onDelete: () => handleDeleteChip('ipp', ipp) })),
-      displayingSelectedDocType &&
+      !!filters.nda &&
+        filters.nda
+          .split(',')
+          .map((nda) => ({ label: nda ? `NDA : ${nda}` : '', onDelete: () => handleDeleteChip('nda', nda) })),
+      !!filters.ipp &&
+        filters.ipp
+          .split(',')
+          .map((ipp) => ({ label: ipp ? `IPP : ${ipp}` : '', onDelete: () => handleDeleteChip('ipp', ipp) })),
+      displayingSelectedDocType?.length > 0 &&
         displayingSelectedDocType.map((docType) => ({
-          label: docType.label ? docType.label : '',
-          onDelete: () => handleDeleteChip('selectedDocTypes', docType.label)
+          label: docType?.label ? docType?.label : '',
+          onDelete: () => handleDeleteChip('selectedDocTypes', docType?.label)
         })),
       {
         label: filters.startDate ? `Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}` : '',
@@ -34,7 +45,7 @@ export const buildDocumentFiltersChips = (
     ]
       .flat()
       // @ts-ignore
-      .filter((chip) => chip.label) as {
+      .filter((chip) => chip?.label) as {
       label: string
       onDelete?: (args: any) => void
     }[]
@@ -53,8 +64,135 @@ export const buildPatientFiltersChips = (
     { label: gender ? gender : '', onDelete: () => handleDeleteChip('gender') },
     { label: birthdates ? birthdates : '', onDelete: () => handleDeleteChip('birthdates') },
     { label: vitalStatus ? vitalStatus : '', onDelete: () => handleDeleteChip('vitalStatus') }
-  ].filter((chip) => chip.label) as {
+  ].filter((chip) => chip?.label) as {
     label: string
     onDelete?: (args: any) => void
   }[]
+}
+
+export const buildObservationFiltersChips = (
+  filters: ObservationFiltersType,
+  handleDeleteChip: (filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate', value?: any) => void
+) => {
+  return (
+    [
+      filters.nda &&
+        filters.nda
+          .split(',')
+          .map((nda) => ({ label: nda ? `NDA : ${nda}` : '', onDelete: () => handleDeleteChip('nda', nda) })),
+      filters.loinc &&
+        filters.loinc.split(',').map((loinc) => ({
+          label: loinc ? `Code LOINC : ${loinc}` : '',
+          onDelete: () => handleDeleteChip('loinc', loinc)
+        })),
+      filters.anabio &&
+        filters.anabio.split(',').map((anabio) => ({
+          label: anabio ? `Code ANABIO : ${anabio}` : '',
+          onDelete: () => handleDeleteChip('anabio', anabio)
+        })),
+      {
+        label: filters.startDate ? `Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}` : '',
+        onDelete: () => handleDeleteChip('startDate')
+      },
+      {
+        label: filters.endDate ? `Avant le : ${moment(filters.endDate).format('DD/MM/YYYY')}` : '',
+        onDelete: () => handleDeleteChip('endDate')
+      }
+    ]
+      .flat()
+      // @ts-ignore
+      .filter((chip) => chip?.label) as {
+      label: string
+      onDelete?: (args: any) => void
+    }[]
+  )
+}
+
+export const buildMedicationFiltersChips = (
+  filters: MedicationFiltersType,
+  handleDeleteChip: (
+    filterName: 'nda' | 'selectedPrescriptionTypes' | 'selectedAdministrationRoutes' | 'startDate' | 'endDate',
+    value?: any
+  ) => void
+) => {
+  return (
+    [
+      filters.nda &&
+        filters.nda
+          .split(',')
+          .map((nda) => ({ label: nda ? `NDA : ${nda}` : '', onDelete: () => handleDeleteChip('nda', nda) })),
+      filters.selectedPrescriptionTypes?.length > 0 &&
+        filters.selectedPrescriptionTypes.map(({ label, ...prescriptionType }) => ({
+          label: label ? `Type de prescription : ${label}` : '',
+          onDelete: () =>
+            handleDeleteChip(
+              'selectedPrescriptionTypes',
+              filters.selectedPrescriptionTypes.filter(({ id }) => id !== prescriptionType.id)
+            )
+        })),
+      filters.selectedAdministrationRoutes?.length > 0 &&
+        filters.selectedAdministrationRoutes.map(({ label, ...administrationRoute }) => ({
+          label: label ? `Voie d'admistration : ${label}` : '',
+          onDelete: () =>
+            handleDeleteChip(
+              'selectedAdministrationRoutes',
+              filters.selectedAdministrationRoutes.filter(({ id }) => id !== administrationRoute.id)
+            )
+        })),
+      {
+        label: filters.startDate ? `Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}` : '',
+        onDelete: () => handleDeleteChip('startDate')
+      },
+      {
+        label: filters.endDate ? `Avant le : ${moment(filters.endDate).format('DD/MM/YYYY')}` : '',
+        onDelete: () => handleDeleteChip('endDate')
+      }
+    ]
+      .flat()
+      // @ts-ignore
+      .filter((chip) => chip?.label) as {
+      label: string
+      onDelete?: (args: any) => void
+    }[]
+  )
+}
+
+export const buildPmsiFiltersChips = (
+  filters: PMSIFiltersType,
+  handleDeleteChip: (
+    filterName: 'nda' | 'code' | 'selectedDiagnosticTypes' | 'startDate' | 'endDate',
+    value?: any
+  ) => void
+) => {
+  return (
+    [
+      filters.nda &&
+        filters.nda
+          .split(',')
+          .map((nda) => ({ label: nda ? `NDA : ${nda}` : '', onDelete: () => handleDeleteChip('nda', nda) })),
+      filters.code &&
+        filters.code
+          .split(',')
+          .map((code) => ({ label: code ? `Code : ${code}` : '', onDelete: () => handleDeleteChip('code', code) })),
+      filters.selectedDiagnosticTypes?.length > 0 &&
+        filters.selectedDiagnosticTypes.map(({ label, ...selectedDiagnosticType }) => ({
+          label: label ? `Type : ${capitalizeFirstLetter(label)}` : '',
+          onDelete: () => handleDeleteChip('selectedDiagnosticTypes', selectedDiagnosticType)
+        })),
+      {
+        label: filters.startDate ? `Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}` : '',
+        onDelete: () => handleDeleteChip('startDate')
+      },
+      {
+        label: filters.endDate ? `Avant le : ${moment(filters.endDate).format('DD/MM/YYYY')}` : '',
+        onDelete: () => handleDeleteChip('endDate')
+      }
+    ]
+      .flat()
+      // @ts-ignore
+      .filter((chip) => chip?.label) as {
+      label: string
+      onDelete?: (args: any) => void
+    }[]
+  )
 }

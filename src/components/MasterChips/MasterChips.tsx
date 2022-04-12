@@ -16,7 +16,7 @@ const MasterChips: React.FC<MasterChipsProps> = ({ chips }) => {
 
   return (
     <Grid>
-      {chips?.length &&
+      {chips?.length > 0 &&
         chips.map(({ label, onDelete }, index) => (
           <Chip
             key={index}

@@ -260,6 +260,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         filters={filters}
         onChangeFilters={setFilters}
         deidentified={deidentifiedBoolean}
+        showIpp
       />
     </>
   )

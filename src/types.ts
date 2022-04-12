@@ -133,6 +133,14 @@ export type PatientFilters = {
   vitalStatus: VitalStatus
 }
 
+export type ObservationFilters = {
+  nda: string
+  loinc: string
+  anabio: string
+  startDate: string | null
+  endDate: string | null
+}
+
 export type Sort = {
   sortBy: string
   sortDirection: 'asc' | 'desc'

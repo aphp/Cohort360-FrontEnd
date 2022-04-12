@@ -80,6 +80,24 @@ const useStyles = makeStyles((theme) =>
       position: 'absolute',
       fontSize: '2vw',
       transform: 'rotate(-35deg)'
+    },
+    multiple: {
+      '&::after': {
+        content: "'/'",
+        padding: '0 4px'
+      },
+      '&:last-child::after': {
+        content: "''",
+        padding: 0
+      }
+    },
+    tableHeadLabel: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      padding: 0,
+      top: 2,
+      position: 'relative'
     }
   })
 )

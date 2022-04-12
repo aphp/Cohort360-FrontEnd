@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react'
-import moment from 'moment'
 
-import { Button, Chip, Grid, Typography } from '@material-ui/core'
+import { Button, Grid, Typography } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
+
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import { InputSearchDocumentSimple, InputSearchDocumentRegex, InputSearchDocumentButton } from 'components/Inputs'
-
 import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
+import MasterChips from 'components/MasterChips/MasterChips'
 
 import { Order, DocumentFilters } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'
 
+import { buildDocumentFiltersChips } from 'utils/chips'
 import { docTypes } from 'assets/docTypes.json'
-import { getDisplayingSelectedDocTypes } from 'utils/documentsFormatter'
 
 import useStyles from './styles'
 
@@ -57,8 +57,6 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   const [open, setOpen] = useState<'filter' | string | null>(null)
 
   const [inputMode, setInputMode] = useState<'simple' | 'regex'>('simple')
-
-  const displayingSelectedDocType: any[] = getDisplayingSelectedDocTypes(filters.selectedDocTypes)
 
   const fetchDocumentsList = async (page: number, input = searchInput) => {
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
@@ -180,50 +178,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         />
       )}
 
-      <Grid>
-        {filters.nda !== '' &&
-          filters.nda
-            .split(',')
-            .map((value) => (
-              <Chip
-                className={classes.chips}
-                key={value}
-                label={value}
-                onDelete={() => handleDeleteChip('nda', value)}
-                color="primary"
-                variant="outlined"
-              />
-            ))}
-        {displayingSelectedDocType.length > 0 &&
-          displayingSelectedDocType.map((docType) => (
-            <Chip
-              className={classes.chips}
-              key={docType.code}
-              label={docType.label}
-              onDelete={() => handleDeleteChip('selectedDocTypes', docType.label)}
-              color="primary"
-              variant="outlined"
-            />
-          ))}
-        {filters.startDate && (
-          <Chip
-            className={classes.chips}
-            label={`Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}`}
-            onDelete={() => handleDeleteChip('startDate')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {filters.endDate && (
-          <Chip
-            className={classes.chips}
-            label={`Avant le : ${moment(filters.endDate).format('DD/MM/YYYY')}`}
-            onDelete={() => handleDeleteChip('endDate')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-      </Grid>
+      <MasterChips chips={buildDocumentFiltersChips(filters, handleDeleteChip)} />
 
       <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
         Attention : La recherche est pseudonymisée pour la prévisualisation des documents. Vous pouvez donc trouver des

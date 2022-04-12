@@ -141,7 +141,7 @@ const PatientList: React.FC<PatientListProps> = ({
 
   useEffect(() => {
     onSearchPatient()
-  }, [filters, searchBy]) // eslint-disable-line
+  }, [filters, order, searchBy]) // eslint-disable-line
 
   const handleChangeSelect = (
     event: React.ChangeEvent<{

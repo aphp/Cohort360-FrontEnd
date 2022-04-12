@@ -166,7 +166,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
             />
           </Grid>
         )}
-        {!deidentified && (
+        {!deidentified && showIpp && (
           <Grid container direction="column" className={classes.filter}>
             <Typography variant="h3">IPP :</Typography>
             <TextField
