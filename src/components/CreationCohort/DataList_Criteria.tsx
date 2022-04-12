@@ -151,15 +151,15 @@ const criteriaList: CriteriaItemType[] = [
   {
     id: 'biologie_microbiologie',
     title: 'Biologie/Microbiologie',
-    color: ODD_BIOLOGY ? '#0063AF' : '#808080',
+    color: !!ODD_BIOLOGY ? '#0063AF' : '#808080',
     components: null,
     subItems: [
       {
         id: 'Observation',
         title: 'Biologie',
-        color: ODD_BIOLOGY ? '#0063AF' : '#808080',
-        components: ODD_BIOLOGY ? BiologyForm : null,
-        disabled: !ODD_BIOLOGY ?? false,
+        color: !!ODD_BIOLOGY ? '#0063AF' : '#808080',
+        components: !!ODD_BIOLOGY ? BiologyForm : null,
+        disabled: !!!ODD_BIOLOGY ?? false,
         data: { biologyData: 'loading', biologyHierarchy: 'loading' },
         fetch: {
           fetchBiologyData: services.cohortCreation.fetchBiologyData,

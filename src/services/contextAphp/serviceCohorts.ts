@@ -32,6 +32,8 @@ import {
   fetchBinary
 } from './callApi'
 
+import { ODD_EXPORT } from '../../constants'
+
 import apiBackend from '../apiBackend'
 
 export interface IServiceCohorts {
@@ -597,6 +599,7 @@ const servicesCohorts: IServiceCohorts = {
           {
             url: 'EXPORT_ACCESS',
             valueString:
+              !!ODD_EXPORT &&
               allRightOfCohort.filter(
                 (rightOfCohort: any) =>
                   rightOfCohort.right_export_csv_nominative === true &&
