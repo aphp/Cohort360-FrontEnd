@@ -32,11 +32,11 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
 
   const columns: Column[] = [
     { label: `NDA${deidentified ? ' chiffré' : ''}`, code: '', align: 'left', sortableColumn: false },
-    { label: 'Date de prélèvement', code: 'effectiveDatetime', align: 'left', sortableColumn: true },
-    { label: 'ANABIO', code: 'codeSimple-anabio', align: 'left', sortableColumn: true },
-    { label: 'LOINC', code: 'codeSimple-loinc', align: 'left', sortableColumn: true },
-    { label: 'Résultat', code: '', align: 'left', sortableColumn: false },
-    { label: 'Unité exécutrice', code: '', align: 'left', sortableColumn: false }
+    { label: 'Date de prélèvement', code: 'effectiveDatetime', align: 'center', sortableColumn: true },
+    { label: 'ANABIO', code: 'codeSimple-anabio', align: 'center', sortableColumn: true },
+    { label: 'LOINC', code: 'codeSimple-loinc', align: 'center', sortableColumn: true },
+    { label: 'Résultat', code: '', align: 'center', sortableColumn: false },
+    { label: 'Unité exécutrice', code: '', align: 'center', sortableColumn: false }
   ]
 
   return (
