@@ -1,16 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 
-import {
-  Button,
-  Chip,
-  CircularProgress,
-  Grid,
-  IconButton,
-  InputAdornment,
-  InputBase,
-  Typography
-} from '@material-ui/core'
+import { Button, CircularProgress, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
 
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
@@ -18,12 +9,14 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import ResearchTable from './ResearchTable/ResearchTable'
 import CohortsFilter from 'components/Filters/CohortsFilters/CohortsFilters'
+import MasterChips from 'components/MasterChips/MasterChips'
 
 import useStyles from './styles'
-import { Cohort, CohortFilters, ValueSet } from 'types'
+import { Cohort, CohortFilters } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 import { stableSort, getComparator } from 'utils/alphabeticalSort'
+import { buildCohortFiltersChips } from 'utils/chips'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchCohorts, deleteCohort, setFavoriteCohort } from 'state/cohort'
@@ -165,26 +158,18 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
         value &&
           setFilters({
             ...filters,
-            status: filters.status.filter((item) => item !== value)
+            status: filters.status.filter((item) => item.code !== value.code)
           })
         break
       case 'type':
-        setFilters({ ...filters, type: 'all' })
-        break
       case 'favorite':
-        setFilters({ ...filters, favorite: 'all' })
+        setFilters({ ...filters, [filterName]: 'all' })
         break
       case 'minPatients':
-        setFilters({ ...filters, minPatients: null })
-        break
       case 'maxPatients':
-        setFilters({ ...filters, maxPatients: null })
-        break
       case 'startDate':
-        setFilters({ ...filters, startDate: null })
-        break
       case 'endDate':
-        setFilters({ ...filters, endDate: null })
+        setFilters({ ...filters, [filterName]: null })
         break
     }
   }
@@ -227,74 +212,9 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
           </Button>
         </div>
       </Grid>
-      <Grid>
-        {filters.status &&
-          filters.status.length > 0 &&
-          filters.status.map((status: ValueSet) => (
-            <Chip
-              className={classes.chips}
-              key={status.code}
-              label={`Statut ${status.display}`}
-              onDelete={() => handleDeleteChip('status', status)}
-              color="primary"
-              variant="outlined"
-            />
-          ))}
-        {filters.type && filters.type !== 'all' && (
-          <Chip
-            className={classes.chips}
-            label={filters.type === 'IMPORT_I2B2' ? 'Cohorte I2B2' : 'Cohorte Cohort360'}
-            onDelete={() => handleDeleteChip('type')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {filters.minPatients && (
-          <Chip
-            className={classes.chips}
-            label={`Au moins ${filters.minPatients} patients`}
-            onDelete={() => handleDeleteChip('minPatients')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {filters.maxPatients && (
-          <Chip
-            className={classes.chips}
-            label={`Jusque ${filters.maxPatients} patients`}
-            onDelete={() => handleDeleteChip('maxPatients')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {filters.startDate && (
-          <Chip
-            className={classes.chips}
-            label={`Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}`}
-            onDelete={() => handleDeleteChip('startDate')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {filters.endDate && (
-          <Chip
-            className={classes.chips}
-            label={`Avant le : ${moment(filters.endDate).format('DD/MM/YYYY')}`}
-            onDelete={() => handleDeleteChip('endDate')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {filters.favorite && filters.favorite !== 'all' && (
-          <Chip
-            className={classes.chips}
-            label={filters.favorite === 'True' ? 'Cohortes favories' : 'Cohortes non favories'}
-            onDelete={() => handleDeleteChip('favorite')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-      </Grid>
+
+      <MasterChips chips={buildCohortFiltersChips(filters, handleDeleteChip)} />
+
       {loadingStatus ? (
         <Grid container justifyContent="center">
           <CircularProgress />

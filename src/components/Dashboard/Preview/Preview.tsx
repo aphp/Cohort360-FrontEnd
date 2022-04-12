@@ -127,65 +127,6 @@ const Preview: React.FC<PreviewProps> = ({
     <Grid container direction="column" alignItems="center" className={classes.root}>
       <CssBaseline />
       <Grid container direction="column" xs={11} item justifyContent="space-between">
-        {/* <Grid container item className={classes.header} justifyContent="center">
-          <Grid container item alignItems="center" md={11}>
-            <Grid container item direction="column">
-              <Typography variant="h2" color="primary">
-                {loading ? <Skeleton width={200} height={40} /> : title}
-              </Typography>
-              {description && (
-                <Typography variant="subtitle2">
-                  {loading ? <Skeleton width={150} height={20} /> : description}
-                </Typography>
-              )}
-
-              {group.perimeters && (
-                <ul className={classes.perimetersChipsDiv}>
-                  {loading ? (
-                    <li>
-                      <Skeleton width={100} />
-                    </li>
-                  ) : isExtended ? (
-                    <>
-                      {group.perimeters &&
-                        group.perimeters.map((perimeter: any) => (
-                          <li key={perimeter} className={classes.item}>
-                            <Chip className={classes.perimetersChip} label={perimeter} />
-                          </li>
-                        ))}
-                      <IconButton
-                        size="small"
-                        classes={{ label: classes.populationLabel }}
-                        onClick={() => onExtend(false)}
-                      >
-                        <CloseIcon />
-                      </IconButton>
-                    </>
-                  ) : (
-                    <>
-                      {group.perimeters &&
-                        group.perimeters.slice(0, 4).map((perimeter) => (
-                          <li key={perimeter} className={classes.item}>
-                            <Chip className={classes.perimetersChip} label={perimeter} />
-                          </li>
-                        ))}
-                      {group.perimeters && group.perimeters.length > 4 && (
-                        <IconButton
-                          size="small"
-                          classes={{ label: classes.populationLabel }}
-                          onClick={() => onExtend(true)}
-                        >
-                          <MoreHorizIcon />
-                        </IconButton>
-                      )}
-                    </>
-                  )}
-                </ul>
-              )}
-            </Grid>
-          </Grid>
-        </Grid> */}
-
         <Grid container item justifyContent="space-between" alignItems="center">
           <Grid container item xs={12} sm={6} md={4} justifyContent="center">
             <Paper id="patient-number-card" className={classes.nbPatientsOverlay}>
