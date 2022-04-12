@@ -3,7 +3,6 @@ import moment from 'moment'
 
 import {
   Button,
-  Chip,
   CircularProgress,
   CssBaseline,
   Grid,
@@ -28,6 +27,8 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 import LockIcon from '@material-ui/icons/Lock'
 import ClearIcon from '@material-ui/icons/Clear'
 
+import MasterChips from 'components/MasterChips/MasterChips'
+
 import services from 'services'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
@@ -40,12 +41,12 @@ import {
   SimpleChartDataType,
   VitalStatus
 } from 'types'
-import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 
+import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import displayDigit from 'utils/displayDigit'
+import { buildPatientFiltersChips } from 'utils/chips'
 
 import useStyles from './styles'
-import { ageName } from 'utils/age'
 
 type PatientListProps = {
   total: number
@@ -198,26 +199,6 @@ const PatientList: React.FC<PatientListProps> = ({
     }
   }
 
-  const genderName = () => {
-    switch (filters.gender) {
-      case PatientGenderKind._female:
-        return 'Genre: Femmes'
-      case PatientGenderKind._male:
-        return 'Genre: Hommes'
-      case PatientGenderKind._other:
-        return 'Genre: Autre'
-    }
-  }
-
-  const vitalStatusName = () => {
-    switch (filters.vitalStatus) {
-      case VitalStatus.alive:
-        return 'Patients vivants'
-      case VitalStatus.deceased:
-        return 'Patients décédés'
-    }
-  }
-
   return (
     <Grid container direction="column" alignItems="center">
       <CssBaseline />
@@ -342,35 +323,8 @@ const PatientList: React.FC<PatientListProps> = ({
               />
             </div>
           </Grid>
-          <Grid>
-            {filters.gender !== PatientGenderKind._unknown && (
-              <Chip
-                className={classes.chips}
-                label={genderName()}
-                onDelete={() => handleDeleteChip('gender')}
-                color="primary"
-                variant="outlined"
-              />
-            )}
-            {filters.birthdates && ageName(filters.birthdates) !== '' && (
-              <Chip
-                className={classes.chips}
-                label={ageName(filters.birthdates)}
-                onDelete={() => handleDeleteChip('birthdates')}
-                color="primary"
-                variant="outlined"
-              />
-            )}
-            {filters.vitalStatus !== VitalStatus.all && (
-              <Chip
-                className={classes.chips}
-                label={vitalStatusName()}
-                onDelete={() => handleDeleteChip('vitalStatus')}
-                color="primary"
-                variant="outlined"
-              />
-            )}
-          </Grid>
+
+          <MasterChips chips={buildPatientFiltersChips(filters, handleDeleteChip)} />
 
           <DataTablePatient
             loading={loadingStatus}

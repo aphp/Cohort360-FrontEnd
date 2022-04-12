@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import moment from 'moment'
 
-import { Button, Chip, CssBaseline, Grid, Typography } from '@material-ui/core'
+import { Button, CssBaseline, Grid, Typography } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
 import Skeleton from '@material-ui/lab/Skeleton'
 
@@ -9,6 +8,7 @@ import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFil
 import DataTableComposition from 'components/DataTable/DataTableComposition'
 
 import { InputSearchDocumentSimple, InputSearchDocumentRegex, InputSearchDocumentButton } from 'components/Inputs'
+import MasterChips from 'components/MasterChips/MasterChips'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
@@ -17,7 +17,8 @@ import { CohortComposition, DocumentFilters, Order } from 'types'
 import services from 'services'
 
 import displayDigit from 'utils/displayDigit'
-import { getDisplayingSelectedDocTypes } from 'utils/documentsFormatter'
+import { buildDocumentFiltersChips } from 'utils/chips'
+
 import { docTypes } from 'assets/docTypes.json'
 
 import useStyles from './styles'
@@ -58,8 +59,6 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   })
 
   const [inputMode, setInputMode] = useState<'simple' | 'regex'>('simple')
-
-  const displayingSelectedDocType: any[] = getDisplayingSelectedDocTypes(filters.selectedDocTypes)
 
   const onSearchDocument = async (sortBy: string, sortDirection: 'asc' | 'desc', input?: string, page = 1) => {
     if (input) {
@@ -223,65 +222,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
                 }
               />
             )}
-            <Grid>
-              {filters.nda !== '' &&
-                filters.nda
-                  .split(',')
-                  .map((value) => (
-                    <Chip
-                      className={classes.chips}
-                      key={value}
-                      label={value}
-                      onDelete={() => handleDeleteChip('nda', value)}
-                      color="primary"
-                      variant="outlined"
-                    />
-                  ))}
-              {filters.ipp &&
-                filters.ipp
-                  .split(',')
-                  .map((value) => (
-                    <Chip
-                      className={classes.chips}
-                      key={value}
-                      label={value}
-                      onDelete={() => handleDeleteChip('ipp', value)}
-                      color="primary"
-                      variant="outlined"
-                    />
-                  ))}
-              {displayingSelectedDocType.length > 0 &&
-                displayingSelectedDocType.map((docType) => (
-                  <Chip
-                    className={classes.chips}
-                    key={docType.code}
-                    label={docType.label}
-                    onDelete={() => handleDeleteChip('selectedDocTypes', docType.label)}
-                    color="primary"
-                    variant="outlined"
-                  />
-                ))}
 
-              {filters.startDate && (
-                <Chip
-                  className={classes.chips}
-                  label={`Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}`}
-                  onDelete={() => handleDeleteChip('startDate')}
-                  color="primary"
-                  variant="outlined"
-                />
-              )}
-
-              {filters.endDate && (
-                <Chip
-                  className={classes.chips}
-                  label={`Avant le : ${moment(filters.endDate).format('DD/MM/YYYY')}`}
-                  onDelete={() => handleDeleteChip('endDate')}
-                  color="primary"
-                  variant="outlined"
-                />
-              )}
-            </Grid>
+            <MasterChips chips={buildDocumentFiltersChips(filters, handleDeleteChip)} />
 
             {deidentifiedBoolean ? (
               <Alert severity="info" style={{ backgroundColor: 'transparent' }}>

@@ -13,7 +13,7 @@ import BiologyForm from './DiagramView/components/LogicalOperator/components/Cri
 // services.cohortCreation.Fetcher
 import services from 'services'
 
-import { ODD_BIOLOGY } from '../../constants'
+import { ODD_BIOLOGY, ODD_MEDICATION } from '../../constants'
 
 // ├── Mes variables
 // ├── Patients
@@ -137,8 +137,9 @@ const criteriaList: CriteriaItemType[] = [
     id: 'Medication',
     // title: 'Médicaments (Prescription - Dispension - Administration)',
     title: 'Médicaments (Prescription - Administration)',
-    color: '#0063AF',
-    components: MedicationForm,
+    color: ODD_MEDICATION ? '#0063AF' : '#808080',
+    components: ODD_MEDICATION ? MedicationForm : null,
+    disabled: !ODD_MEDICATION ?? false,
     data: { atcData: 'loading', atcHierarchy: 'loading', prescriptionTypes: 'loading', administrations: 'loading' },
     fetch: {
       fetchAtcData: services.cohortCreation.fetchAtcData,
