@@ -1,5 +1,3 @@
-type ContextType = 'aphp' | 'arkhn' | 'fakedata'
-
 export const ID_TOKEN_STORAGE_KEY = 'ARKHN_ID_TOKEN'
 export const TOKEN_DATA_STORAGE_KEY = 'ARKHN_TOKEN_DATA'
 export const STATE_STORAGE_KEY = 'ARKHN_AUTH_STATE'
@@ -19,12 +17,8 @@ export const TOKEN_URL = 'irrelevant'
 export const REVOKE_URL = 'irrelevant'
 export const LOGIN_REDIRECT_URL = 'irrelevant'
 
-export const CONTEXT = process.env.REACT_APP_CONTEXT as ContextType
+export const CONTEXT = process.env.NODE_ENV !== 'development' ? '{CONTEXT}' : process.env.REACT_APP_CONTEXT
 
-if (!CONTEXT) throw new Error('missing REACT_APP_CONTEXT from environment')
-if (CONTEXT !== 'arkhn' && CONTEXT !== 'aphp' && CONTEXT !== 'fakedata') {
-  throw new Error("REACT_APP_CONTEXT must be either 'aphp', 'fakedata' or 'arkhn")
-}
 export const ACCES_TOKEN = 'access'
 export const REFRESH_TOKEN = 'refresh'
 
@@ -118,19 +112,20 @@ export const BIOLOGY_HIERARCHY_ITM_LOINC =
     ? '{BIOLOGY_HIERARCHY_ITM_LOINC}'
     : process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_LOINC
 
-export const ODD_BIOLOGY: boolean =
-  (process.env.NODE_ENV !== 'development' ? '{ODD_BIOLOGY}' : process.env.REACT_APP_ODD_BIOLOGY) === 'true'
-export const ODD_COMPOSITION: boolean =
-  (process.env.NODE_ENV !== 'development' ? '{ODD_COMPOSITION}' : process.env.REACT_APP_ODD_COMPOSITION) === 'true'
-export const ODD_PROCEDURE: boolean =
-  (process.env.NODE_ENV !== 'development' ? '{ODD_PROCEDURE}' : process.env.REACT_APP_OODD_PROCEDURE) === 'true'
-export const ODD_CLAIM: boolean =
-  (process.env.NODE_ENV !== 'development' ? '{ODD_CLAIM}' : process.env.REACT_APP_ODD_CLAIM) === 'true'
-export const ODD_CONDITION: boolean =
-  (process.env.NODE_ENV !== 'development' ? '{ODD_CONDITION}' : process.env.REACT_APP_ODD_CONDITION) === 'true'
-export const ODD_OBSERVATION: boolean =
-  (process.env.NODE_ENV !== 'development' ? '{ODD_OBSERVATION}' : process.env.REACT_APP_ODD_OBSERVATION) === 'true'
-export const ODD_MEDICATION: boolean =
-  (process.env.NODE_ENV !== 'development' ? '{ODD_MEDICATION}' : process.env.REACT_APP_ODD_MEDICATION) === 'true'
-export const ODD_CONTACT: boolean =
-  (process.env.NODE_ENV !== 'development' ? '{ODD_CONTACT}' : process.env.REACT_APP_ODD_CONTACT) === 'true'
+export const ODD_BIOLOGY = process.env.NODE_ENV !== 'development' ? '{ODD_BIOLOGY}' : process.env.REACT_APP_ODD_BIOLOGY
+export const ODD_COMPOSITION =
+  process.env.NODE_ENV !== 'development' ? '{ODD_COMPOSITION}' : process.env.REACT_APP_ODD_COMPOSITION
+export const ODD_PROCEDURE =
+  process.env.NODE_ENV !== 'development' ? '{ODD_PROCEDURE}' : process.env.REACT_APP_OODD_PROCEDURE
+export const ODD_CLAIM = process.env.NODE_ENV !== 'development' ? '{ODD_CLAIM}' : process.env.REACT_APP_ODD_CLAIM
+export const ODD_CONDITION =
+  process.env.NODE_ENV !== 'development' ? '{ODD_CONDITION}' : process.env.REACT_APP_ODD_CONDITION
+export const ODD_OBSERVATION =
+  process.env.NODE_ENV !== 'development' ? '{ODD_OBSERVATION}' : process.env.REACT_APP_ODD_OBSERVATION
+export const ODD_MEDICATION =
+  process.env.NODE_ENV !== 'development' ? '{ODD_MEDICATION}' : process.env.REACT_APP_ODD_MEDICATION
+export const ODD_CONTACT = process.env.NODE_ENV !== 'development' ? '{ODD_CONTACT}' : process.env.REACT_APP_ODD_CONTACT
+export const ODD_EXPORT = process.env.NODE_ENV !== 'development' ? '{ODD_EXPORT}' : process.env.REACT_APP_ODD_EXPORT
+
+console.log('ODD_BIOLOGY', ODD_BIOLOGY)
+console.log('typeof ODD_BIOLOGY', typeof ODD_BIOLOGY)

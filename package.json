@@ -1,6 +1,6 @@
 {
   "name": "cohort360_react",
-  "version": "2.13.0-SNAPSHOT",
+  "version": "2.13.0",
   "private": true,
   "dependencies": {
     "@apollo/react-hooks": "^4.0.0",
@@ -38,7 +38,8 @@
     "react-scripts": "^4.0.3",
     "redux": "^4.1.1",
     "redux-logger": "^3.0.6",
-    "redux-persist": "^6.0.0"
+    "redux-persist": "^6.0.0",
+    "source-map-js": "^1.0.2"
   },
   "resolutions": {
     "ansi-html": "https://registry.npmjs.org/ansi-html-community/-/ansi-html-community-0.0.8.tgz",

@@ -204,7 +204,7 @@ export default [
   /**
    * Cohort360: Contact Page
    */
-  ODD_CONTACT && {
+  !!ODD_CONTACT && {
     displaySideBar: true,
     path: '/contact',
     name: 'contact',
