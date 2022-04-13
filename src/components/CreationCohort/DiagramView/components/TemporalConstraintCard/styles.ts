@@ -11,11 +11,6 @@ const useStyles = makeStyles((theme) => ({
       alignSelf: 'flex-end'
     }
   },
-  temporalConstraintTypo: {
-    marginTop: '5px',
-    marginRight: '4px',
-    paddingLeft: '2px'
-  },
   temporalConstraintSelect: {
     height: '25px',
     marginTop: '4px',

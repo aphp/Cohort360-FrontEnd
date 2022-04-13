@@ -30,11 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
         duration: theme.transitions.duration.leavingScreen
       }),
       overflowX: 'hidden',
-      width: 52 // Pourquoi changer la taille ?
-      // width: theme.spacing(7) + 1,
-      // [theme.breakpoints.up('sm')]: {
-      //   width: 52
-      // }
+      width: 52
     },
     closeDrawerButton: {
       marginRight: '-4px'
@@ -108,10 +104,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     button: {
       marginLeft: 7
-    },
-    plusButton: {
-      marginTop: 10,
-      marginLeft: -8
     },
     miniButton: {
       borderRadius: 14,

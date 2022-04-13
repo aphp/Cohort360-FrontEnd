@@ -41,13 +41,5 @@ export default makeStyles((theme) => ({
   },
   selected: {
     color: '#0063AF'
-  },
-  loading: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%'
-  },
-  alert: {
-    marginLeft: '50px'
   }
 }))

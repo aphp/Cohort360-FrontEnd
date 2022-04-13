@@ -45,7 +45,7 @@ const Scope = () => {
       container
       direction="column"
       position="fixed"
-      className={clsx(classes.root, classes.appBar, {
+      className={clsx(classes.appBar, {
         [classes.appBarShift]: open
       })}
     >

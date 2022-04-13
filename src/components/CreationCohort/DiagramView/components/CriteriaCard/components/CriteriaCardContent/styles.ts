@@ -17,14 +17,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#FFFFFF',
     margin: '4px'
   },
-  criteriaType: {
-    color: '#5BC5F2',
-    textDecoration: 'underline',
-    fontWeight: 'bold'
-  },
-  label: {
-    fontWeight: 'bold'
-  },
   chevronIcon: {
     outline: 'none !important',
     position: 'absolute',

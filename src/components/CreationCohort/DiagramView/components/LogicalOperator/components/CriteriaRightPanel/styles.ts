@@ -16,8 +16,6 @@ const useStyles = makeStyles(() => ({
     color: 'white',
     backgroundColor: '#317EAA'
   },
-  backButton: { color: 'white' },
-  divider: { background: 'white' },
   title: { marginLeft: '1em' },
   drawerContentContainer: {
     margin: 12

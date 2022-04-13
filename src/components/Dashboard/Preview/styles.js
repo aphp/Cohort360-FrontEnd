@@ -63,11 +63,6 @@ const useStyles = makeStyles((theme) => ({
     borderBottom: '2px inset #E6F1FD',
     paddingBottom: '10px'
   },
-  loadingSpinner: {
-    position: 'absolute',
-    top: '50%',
-    right: '50%'
-  },
   perimetersChipsDiv: {
     display: 'flex',
     flexWrap: 'wrap',
@@ -88,9 +83,6 @@ const useStyles = makeStyles((theme) => ({
   populationLabel: {
     color: '#0063AF',
     textDecoration: 'underline'
-  },
-  overflow: {
-    overflowY: 'scroll'
   }
 }))
 

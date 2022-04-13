@@ -18,15 +18,6 @@ export default makeStyles((theme) => ({
       duration: theme.transitions.duration.enteringScreen
     })
   },
-  tabTitle: {
-    minWidth: 0,
-    color: '#43425D',
-    textTransform: 'none'
-  },
-  selectedTabTitle: {
-    color: '#43425D',
-    textDecoration: 'underline'
-  },
   mainContainer: {
     width: '100%',
     display: 'flex',

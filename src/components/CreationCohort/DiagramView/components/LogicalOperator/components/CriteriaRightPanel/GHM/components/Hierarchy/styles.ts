@@ -72,9 +72,6 @@ const useStyles = makeStyles(() => ({
     overflow: 'auto',
     margin: 12
   },
-  ghmHierarchyItem: {
-    padding: '2px 16px'
-  },
   subItemsContainer: {
     position: 'relative',
     marginLeft: 25

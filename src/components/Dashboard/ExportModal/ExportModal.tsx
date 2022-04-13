@@ -235,7 +235,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
 
             <List className={classes.list}>
               {export_table.map(({ table_name, table_id, table_subtitle }) => (
-                <ListItem className={classes.tableListElement} key={table_id}>
+                <ListItem key={table_id}>
                   <ListItemText
                     disableTypography
                     primary={

@@ -119,7 +119,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                       </Typography>
                     )}
                     <IconButton
-                      className={classes.editButon}
+                      className={classes.editButton}
                       size="small"
                       onClick={() => _handleEditCohort(historyRow.uuid)}
                     >

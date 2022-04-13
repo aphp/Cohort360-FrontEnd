@@ -9,7 +9,6 @@ const useStyles = makeStyles((theme) => ({
     minHeight: 200,
     overflow: 'auto'
   },
-  tableListElement: {},
   conditionItem: {
     margin: '4px 0 4px 36px',
     position: 'relative',

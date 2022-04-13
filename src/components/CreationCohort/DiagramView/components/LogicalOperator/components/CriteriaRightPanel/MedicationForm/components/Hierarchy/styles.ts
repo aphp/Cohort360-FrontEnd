@@ -72,9 +72,6 @@ const useStyles = makeStyles(() => ({
     overflow: 'auto',
     margin: 12
   },
-  medicationHierarchyItem: {
-    padding: '2px 16px'
-  },
   subItemsContainer: {
     position: 'relative',
     marginLeft: 25

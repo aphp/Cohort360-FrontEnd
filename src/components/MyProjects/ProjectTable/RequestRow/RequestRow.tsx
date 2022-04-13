@@ -68,7 +68,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
           <TableCell className={classes.tdName}>
             <Link href={`/cohort/new/${row.uuid}`}>{row.name}</Link>
             <Tooltip title="Modifier la requête">
-              <IconButton className={classes.editButon} size="small" onClick={() => onEditRequest(row.uuid)}>
+              <IconButton className={classes.editButton} size="small" onClick={() => onEditRequest(row.uuid)}>
                 <EditIcon />
               </IconButton>
             </Tooltip>

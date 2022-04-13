@@ -1,10 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme) => ({
-  pageTitle: {
-    color: '#0063AF',
-    margin: '24px 0'
-  },
   chartOverlay: {
     display: 'flex',
     flexDirection: 'column',
@@ -20,18 +16,6 @@ const useStyles = makeStyles((theme) => ({
   chartTitle: {
     borderBottom: '2px inset #E6F1FD',
     paddingBottom: '10px'
-  },
-  pagination: {
-    margin: '10px 0',
-    float: 'right',
-    '& button': {
-      backgroundColor: '#fff',
-      color: '#5BC5F2'
-    },
-    '& .MuiPaginationItem-page.Mui-selected': {
-      color: '#0063AF',
-      backgroundColor: '#FFF'
-    }
   },
   tableGrid: {
     marginTop: '24px'
@@ -62,12 +46,6 @@ const useStyles = makeStyles((theme) => ({
   },
   select: {
     marginRight: '4px'
-  },
-  chips: {
-    margin: '12px 6px',
-    '&:last-child': {
-      marginRight: 0
-    }
   }
 }))
 
