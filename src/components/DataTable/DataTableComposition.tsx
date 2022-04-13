@@ -17,6 +17,7 @@ import DataTable from 'components/DataTable/DataTable'
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 
 import { docTypes } from 'assets/docTypes.json'
+import Watermark from 'assets/images/watermark.svg'
 
 import { getDocumentStatus } from 'utils/documentsFormatter'
 
@@ -213,8 +214,7 @@ const DataTableCompositionLine: React.FC<{
 
       {section && section.length > 0 && (
         <TableRow className={classes.tableBodyRows}>
-          <TableCell colSpan={5} style={{ position: 'relative', overflow: 'hidden' }}>
-            <Typography className={classes.watermark}>Données pseudonymisées</Typography>
+          <TableCell colSpan={6} style={{ backgroundImage: `url(${Watermark})`, backgroundSize: 'contain' }}>
             {section.map((section) => (
               <Grid key={section.title} container item direction="column">
                 <Typography variant="h6">{section.title}</Typography>

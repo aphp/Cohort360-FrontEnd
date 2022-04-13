@@ -5,7 +5,6 @@ import { CohortPatient, IPatientDetails } from 'types'
 import Grid from '@material-ui/core/Grid'
 
 import PatientTitle from './PatientTitle/PatientTitle'
-// import PatientDiagnosis from './PatientDiagnosis/PatientDiagnosis'
 import PatientInfo from './PatientInfo/PatientInfo'
 
 import { getAge } from 'utils/age'

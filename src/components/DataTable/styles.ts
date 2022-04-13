@@ -68,19 +68,6 @@ const useStyles = makeStyles((theme) =>
     iconMargin: {
       margin: `0 ${theme.spacing(1)}px`
     },
-    watermark: {
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-      margin: 'auto',
-      width: 'fit-content',
-      height: 'fit-content',
-      color: '#0003',
-      position: 'absolute',
-      fontSize: '2vw',
-      transform: 'rotate(-35deg)'
-    },
     multiple: {
       '&::after': {
         content: "'/'",

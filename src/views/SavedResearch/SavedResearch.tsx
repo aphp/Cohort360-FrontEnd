@@ -26,6 +26,7 @@ const SavedResearches = () => {
           <Typography id="cohortSaved-title" variant="h1" color="primary" className={classes.title}>
             Mes cohortes sauvegardées
           </Typography>
+
           <Research />
         </Grid>
       </Grid>

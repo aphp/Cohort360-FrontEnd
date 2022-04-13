@@ -1,10 +1,11 @@
 import { CohortData } from 'types'
 import { IGroup_Member } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
-import { logout, login } from './me'
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { login, logout } from './me'
 import { RootState } from 'state'
 
 import { setFavoriteCohort } from 'state/cohort'
+import { ODD_EXPORT } from '../constants'
 
 import services from 'services'
 
@@ -118,9 +119,11 @@ const fetchExploredCohort = createAsyncThunk<
             const cohortRights = await services.cohorts.fetchCohortsRights([{ fhir_group_id: id }])
             const cohortRight = cohortRights && cohortRights[0]
             cohort.canMakeExport =
-              cohortRight?.extension?.some(
-                ({ url, valueString }) => url === 'EXPORT_ACCESS' && valueString === 'DATA_NOMINATIVE'
-              ) ?? false
+              (!!ODD_EXPORT &&
+                cohortRight?.extension?.some(
+                  ({ url, valueString }) => url === 'EXPORT_ACCESS' && valueString === 'DATA_NOMINATIVE'
+                )) ??
+              false
             cohort.deidentifiedBoolean =
               cohortRight?.extension?.some(
                 ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
@@ -195,9 +198,11 @@ const fetchExploredCohortInBackground = createAsyncThunk<
           const cohortRights = await services.cohorts.fetchCohortsRights([{ fhir_group_id: id }])
           const cohortRight = cohortRights && cohortRights[0]
           cohort.canMakeExport =
-            cohortRight?.extension?.some(
-              ({ url, valueString }) => url === 'EXPORT_ACCESS' && valueString === 'DATA_NOMINATIVE'
-            ) ?? false
+            (!!ODD_EXPORT &&
+              cohortRight?.extension?.some(
+                ({ url, valueString }) => url === 'EXPORT_ACCESS' && valueString === 'DATA_NOMINATIVE'
+              )) ??
+            false
           cohort.deidentifiedBoolean =
             cohortRight?.extension?.some(
               ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
@@ -269,10 +274,9 @@ const exploredCohortSlice = createSlice({
     },
     includePatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
       const includedPatients = [...state.includedPatients, ...action.payload]
-      const importedPatients = state.importedPatients.filter(
+      state.importedPatients = state.importedPatients.filter(
         (patient) => !action.payload.map((p) => p.id).includes(patient.id)
       )
-      state.importedPatients = importedPatients
       state.includedPatients = includedPatients
     },
     excludePatients: (state: ExploredCohortState, action: PayloadAction<any[]>) => {
@@ -312,7 +316,12 @@ const exploredCohortSlice = createSlice({
       return {
         ...state,
         cohort:
-          Array.isArray(state.cohort) || !state.cohort ? state.cohort : { ...state.cohort, member: action.payload },
+          Array.isArray(state.cohort) || !state.cohort
+            ? state.cohort
+            : {
+                ...state.cohort,
+                member: action.payload
+              },
         importedPatients: [],
         includedPatients: [],
         excludedPatients: []
@@ -343,11 +352,5 @@ const exploredCohortSlice = createSlice({
 
 export default exploredCohortSlice.reducer
 export { fetchExploredCohort, favoriteExploredCohort, fetchExploredCohortInBackground }
-export const {
-  addImportedPatients,
-  excludePatients,
-  removeImportedPatients,
-  includePatients,
-  removeExcludedPatients,
-  updateCohort
-} = exploredCohortSlice.actions
+export const { addImportedPatients, excludePatients, removeImportedPatients, includePatients, removeExcludedPatients } =
+  exploredCohortSlice.actions

@@ -10,7 +10,8 @@ import {
   PatientFilters as PatientFiltersType,
   ObservationFilters as ObservationFiltersType,
   MedicationsFilters as MedicationFiltersType,
-  PMSIFilters as PMSIFiltersType
+  PMSIFilters as PMSIFiltersType,
+  CohortFilters as CohortFiltersType
 } from 'types'
 
 export const buildDocumentFiltersChips = (
@@ -179,6 +180,64 @@ export const buildPmsiFiltersChips = (
           label: label ? `Type : ${capitalizeFirstLetter(label)}` : '',
           onDelete: () => handleDeleteChip('selectedDiagnosticTypes', selectedDiagnosticType)
         })),
+      {
+        label: filters.startDate ? `Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}` : '',
+        onDelete: () => handleDeleteChip('startDate')
+      },
+      {
+        label: filters.endDate ? `Avant le : ${moment(filters.endDate).format('DD/MM/YYYY')}` : '',
+        onDelete: () => handleDeleteChip('endDate')
+      }
+    ]
+      .flat()
+      // @ts-ignore
+      .filter((chip) => chip?.label) as {
+      label: string
+      onDelete?: (args: any) => void
+    }[]
+  )
+}
+
+export const buildCohortFiltersChips = (
+  filters: CohortFiltersType,
+  handleDeleteChip: (
+    filterName: 'status' | 'type' | 'favorite' | 'minPatients' | 'maxPatients' | 'startDate' | 'endDate',
+    value?: any
+  ) => void
+) => {
+  return (
+    [
+      filters.status?.length > 0 &&
+        filters.status.map(({ display, code }) => ({
+          label: display ? `Statut : ${capitalizeFirstLetter(display)}` : '',
+          onDelete: () => handleDeleteChip('status', { display, code })
+        })),
+      {
+        label:
+          filters.type && filters.type !== 'all'
+            ? filters.type === 'IMPORT_I2B2'
+              ? 'Cohorte I2B2'
+              : 'Cohorte Cohort360'
+            : '',
+        onDelete: () => handleDeleteChip('type')
+      },
+      {
+        label:
+          filters.favorite && filters.favorite !== 'all'
+            ? filters.favorite === 'True'
+              ? 'Cohortes favories'
+              : 'Cohortes non favories'
+            : '',
+        onDelete: () => handleDeleteChip('favorite')
+      },
+      {
+        label: filters.minPatients ? `Au moins ${filters.minPatients} patients` : '',
+        onDelete: () => handleDeleteChip('minPatients')
+      },
+      {
+        label: filters.maxPatients ? `Jusque ${filters.maxPatients} patients` : '',
+        onDelete: () => handleDeleteChip('maxPatients')
+      },
       {
         label: filters.startDate ? `Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}` : '',
         onDelete: () => handleDeleteChip('startDate')

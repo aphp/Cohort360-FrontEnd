@@ -1,7 +1,8 @@
 import React from 'react'
 import moment from 'moment'
 
-import { Button, Chip, Grid, IconButton, InputBase, TextField, Typography } from '@material-ui/core'
+import { Button, Grid, IconButton, InputBase, TextField, Typography } from '@material-ui/core'
+import { Autocomplete } from '@material-ui/lab'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
@@ -10,13 +11,14 @@ import SortIcon from '@material-ui/icons/Sort'
 
 import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
 import SortDialog from 'components/Filters/SortDialog/SortDialog'
+import MasterChips from 'components/MasterChips/MasterChips'
 
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { PatientFilters as PatientFiltersType, SearchByTypes, Sort, VitalStatus } from 'types'
 
+import { buildPatientFiltersChips } from 'utils/chips'
+
 import useStyles from './styles'
-import { Autocomplete } from '@material-ui/lab'
-import { ageName } from 'utils/age'
 
 type PatientSidebarHeaderTypes = {
   showFilterChip: boolean
@@ -116,26 +118,6 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
     }
   }
 
-  const genderName = () => {
-    switch (props.filters.gender) {
-      case PatientGenderKind._female:
-        return 'Genre: Femmes'
-      case PatientGenderKind._male:
-        return 'Genre: Hommes'
-      case PatientGenderKind._other:
-        return 'Genre: Autre'
-    }
-  }
-
-  const vitalStatusName = () => {
-    switch (props.filters.vitalStatus) {
-      case VitalStatus.alive:
-        return 'Patients vivants'
-      case VitalStatus.deceased:
-        return 'Patients décédés'
-    }
-  }
-
   return (
     <div className={classes.root}>
       <Typography variant="button">Rechercher par :</Typography>
@@ -195,35 +177,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
           onChangeSort={props.onChangeSort}
         />
       </Grid>
-      <Grid className={classes.filterChipsGrid}>
-        {props.showFilterChip && props.filters.gender !== PatientGenderKind._unknown && (
-          <Chip
-            className={classes.chips}
-            label={genderName()}
-            onDelete={() => handleDeleteChip('gender')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {props.showFilterChip && props.filters.vitalStatus !== VitalStatus.all && (
-          <Chip
-            className={classes.chips}
-            label={vitalStatusName()}
-            onDelete={() => handleDeleteChip('vitalStatus')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {props.showFilterChip && props.filters.birthdates && ageName(props.filters.birthdates) && (
-          <Chip
-            className={classes.chips}
-            label={ageName(props.filters.birthdates)}
-            onDelete={() => handleDeleteChip('birthdates')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-      </Grid>
+      <MasterChips chips={buildPatientFiltersChips(props.filters, handleDeleteChip)} />
     </div>
   )
 }
