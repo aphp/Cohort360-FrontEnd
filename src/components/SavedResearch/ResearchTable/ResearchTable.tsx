@@ -39,6 +39,8 @@ import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 import { useAppSelector, useAppDispatch } from 'state'
 import { CohortState, setSelectedCohort as setSelectedCohortState } from 'state/cohort'
 
+import { MeState } from 'state/me'
+
 import { Cohort } from 'types'
 
 import displayDigit from 'utils/displayDigit'
@@ -55,6 +57,13 @@ const FavStar: React.FC<FavStarProps> = ({ favorite }) => {
     return <StarFull height="15px" fill="#ED6D91" />
   }
   return <Star height="15px" fill="#ED6D91" />
+}
+
+const DisabledFavStar: React.FC<FavStarProps> = ({ favorite }) => {
+  if (favorite) {
+    return <StarFull height="15px" fill="#CBCFCF" />
+  }
+  return <Star height="15px" fill="#CBCFCF" />
 }
 
 type ResearchTableProps = {
@@ -93,6 +102,14 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
     cohortState: state.cohort
   }))
   const selectedCohortState = cohortState.selectedCohort
+
+  const { meState } = useAppSelector<{
+    meState: MeState
+  }>((state) => ({
+    meState: state.me
+  }))
+
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const _onClickRow = (row: any) => {
     return !row.fhir_group_id ? null : onClickRow ? onClickRow(row) : history.push(`/cohort/${row.fhir_group_id}`)
@@ -256,16 +273,30 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       key={row.uuid}
                     >
                       <TableCell onClick={() => _onClickRow(row)}>{row.name}</TableCell>
-                      <TableCell align="center">
-                        <IconButton
-                          onClick={(event) => {
-                            event.stopPropagation()
-                            onSetCohortFavorite(row)
-                          }}
-                        >
-                          <FavStar favorite={row.favorite} />
-                        </IconButton>
-                      </TableCell>
+                      {maintenanceIsActive ? (
+                        <TableCell align="center">
+                          <IconButton
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              onSetCohortFavorite(row)
+                            }}
+                            disabled
+                          >
+                            <DisabledFavStar favorite={row.favorite} />
+                          </IconButton>
+                        </TableCell>
+                      ) : (
+                        <TableCell align="center">
+                          <IconButton
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              onSetCohortFavorite(row)
+                            }}
+                          >
+                            <FavStar favorite={row.favorite} />
+                          </IconButton>
+                        </TableCell>
+                      )}
                       <TableCell onClick={() => _onClickRow(row)} className={classes.status} align="center">
                         {row.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohort I2B2'}
                       </TableCell>
@@ -316,42 +347,88 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                           >
                             {canExportThisCohort && (
                               <Grid item>
-                                <IconButton
-                                  size="small"
-                                  onClick={(event) => {
-                                    event.stopPropagation()
-                                    setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
-                                  }}
-                                >
-                                  <ExportIcon />
-                                </IconButton>
+                                {maintenanceIsActive ? (
+                                  <IconButton
+                                    size="small"
+                                    onClick={(event) => {
+                                      event.stopPropagation()
+                                      setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
+                                    }}
+                                    disabled
+                                  >
+                                    <ExportIcon />
+                                  </IconButton>
+                                ) : (
+                                  <IconButton
+                                    size="small"
+                                    onClick={(event) => {
+                                      event.stopPropagation()
+                                      setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
+                                    }}
+                                  >
+                                    <ExportIcon />
+                                  </IconButton>
+                                )}
                               </Grid>
                             )}
 
-                            <Grid item>
-                              <IconButton
-                                size="small"
-                                onClick={(event) => {
-                                  event.stopPropagation()
-                                  dispatch(setSelectedCohortState(row?.uuid ?? null))
-                                }}
-                              >
-                                <EditIcon />
-                              </IconButton>
-                            </Grid>
+                            {maintenanceIsActive ? (
+                              <>
+                                <Grid item>
+                                  <IconButton
+                                    size="small"
+                                    onClick={(event) => {
+                                      event.stopPropagation()
+                                      dispatch(setSelectedCohortState(row?.uuid ?? null))
+                                    }}
+                                    disabled
+                                  >
+                                    <EditIcon />
+                                  </IconButton>
+                                </Grid>
 
-                            <Grid item>
-                              <IconButton
-                                size="small"
-                                onClick={(event) => {
-                                  event.stopPropagation()
-                                  handleClickOpenDialog()
-                                  setSelectedCohort(row)
-                                }}
-                              >
-                                <DeleteOutlineIcon />
-                              </IconButton>
-                            </Grid>
+                                <Grid item>
+                                  <IconButton
+                                    size="small"
+                                    onClick={(event) => {
+                                      event.stopPropagation()
+                                      handleClickOpenDialog()
+                                      setSelectedCohort(row)
+                                    }}
+                                    disabled
+                                  >
+                                    <DeleteOutlineIcon />
+                                  </IconButton>
+                                </Grid>
+                              </>
+                            ) : (
+                              <>
+                                <Grid item>
+                                  <IconButton
+                                    size="small"
+                                    onClick={(event) => {
+                                      event.stopPropagation()
+                                      dispatch(setSelectedCohortState(row?.uuid ?? null))
+                                    }}
+                                  >
+                                    <EditIcon />
+                                  </IconButton>
+                                </Grid>
+
+                                <Grid item>
+                                  <IconButton
+                                    size="small"
+                                    onClick={(event) => {
+                                      event.stopPropagation()
+                                      handleClickOpenDialog()
+                                      setSelectedCohort(row)
+                                    }}
+                                  >
+                                    <DeleteOutlineIcon />
+                                  </IconButton>
+                                </Grid>
+                              </>
+                            )}
                           </Grid>
                         </Hidden>
                         <Hidden lgUp>

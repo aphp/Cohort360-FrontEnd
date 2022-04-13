@@ -37,6 +37,8 @@ import {
   deleteRequest as deleteRequestState
 } from 'state/request'
 
+import { MeState } from 'state/me'
+
 import { RequestType } from 'types'
 
 import useStyles from './styles'
@@ -66,6 +68,13 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
     requestState: state.request
   }))
   const selectedRequestState = requestState.selectedRequest
+
+  const { meState } = useAppSelector<{
+    meState: MeState
+  }>((state) => ({
+    meState: state.me
+  }))
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const [dialogOpen, setOpenDialog] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<string | undefined>()
@@ -148,38 +157,75 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                     </TableCell>
                     <TableCell align="center">
                       <Hidden mdDown>
-                        <Grid
-                          container
-                          direction="row"
-                          alignItems="center"
-                          justifyContent="center"
-                          style={{ width: 'max-content', margin: 'auto' }}
-                        >
-                          <Grid item>
-                            <IconButton
-                              size="small"
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                dispatch(setSelectedRequestState(row ?? null))
-                              }}
-                            >
-                              <EditIcon />
-                            </IconButton>
-                          </Grid>
+                        {maintenanceIsActive ? (
+                          <Grid
+                            container
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="center"
+                            style={{ width: 'max-content', margin: 'auto' }}
+                          >
+                            <Grid item>
+                              <IconButton
+                                size="small"
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  dispatch(setSelectedRequestState(row ?? null))
+                                }}
+                                disabled
+                              >
+                                <EditIcon />
+                              </IconButton>
+                            </Grid>
 
-                          <Grid item>
-                            <IconButton
-                              size="small"
-                              onClick={(event) => {
-                                event.stopPropagation()
-                                handleClickOpenDialog()
-                                setSelectedRequest(row.uuid)
-                              }}
-                            >
-                              <DeleteOutlineIcon />
-                            </IconButton>
+                            <Grid item>
+                              <IconButton
+                                size="small"
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  handleClickOpenDialog()
+                                  setSelectedRequest(row.uuid)
+                                }}
+                                disabled
+                              >
+                                <DeleteOutlineIcon />
+                              </IconButton>
+                            </Grid>
                           </Grid>
-                        </Grid>
+                        ) : (
+                          <Grid
+                            container
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="center"
+                            style={{ width: 'max-content', margin: 'auto' }}
+                          >
+                            <Grid item>
+                              <IconButton
+                                size="small"
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  dispatch(setSelectedRequestState(row ?? null))
+                                }}
+                              >
+                                <EditIcon />
+                              </IconButton>
+                            </Grid>
+
+                            <Grid item>
+                              <IconButton
+                                size="small"
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  handleClickOpenDialog()
+                                  setSelectedRequest(row.uuid)
+                                }}
+                              >
+                                <DeleteOutlineIcon />
+                              </IconButton>
+                            </Grid>
+                          </Grid>
+                        )}
                       </Hidden>
                       <Hidden lgUp>
                         <IconButton

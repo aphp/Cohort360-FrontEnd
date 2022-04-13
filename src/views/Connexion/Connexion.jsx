@@ -160,7 +160,6 @@ const Login = () => {
 
         const maintenanceResponse = await services.practitioner.maintenance()
         const maintenance = maintenanceResponse.data
-        console.log('maintenance', maintenance)
         getPractitionerData(practitioner, lastConnection, maintenance)
       } else {
         setLoading(false)
