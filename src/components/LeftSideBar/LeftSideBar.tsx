@@ -56,7 +56,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
     cohortCreation: state.cohortCreation
   }))
   const maintenanceIsActive = practitioner?.maintenance?.active
-  console.log('maintenanceIsActive', maintenanceIsActive)
 
   // v-- just for zoom transition..
   const [allreadyOpen, setAllreadyOpen] = useState(false)
@@ -195,31 +194,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             {!cohortCreation?.request?.requestId ? (
               <ListItem>
                 {!open && (
-                  // <>
-                  //   {maintenanceIsActive ? (
-                  //     <Tooltip title="Nouvelle requête disabled">
-                  //       <Button
-                  //         variant="contained"
-                  //         onClick={handleNewRequest}
-                  //         className={clsx(classes.miniButton, classes.button)}
-                  //         disabled
-                  //       >
-                  //         <AddIcon />
-                  //       </Button>
-                  //     </Tooltip>
-                  //   ) : (
-                  //     <Tooltip title="Nouvelle requête c'est bien">
-                  //       <Button
-                  //         variant="contained"
-                  //         onClick={handleNewRequest}
-                  //         className={clsx(classes.miniButton, classes.button)}
-                  //         disabled={maintenanceIsActive}
-                  //       >
-                  //         <AddIcon />
-                  //       </Button>
-                  //     </Tooltip>
-                  //   )}
-                  // </>
                   <Tooltip title="Nouvelle requête disabled">
                     <Button
                       variant="contained"
@@ -237,206 +211,178 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 )}
                 {allreadyOpen ? (
                   <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
-                    {maintenanceIsActive ? (
-                      <Button
-                        onClick={handleNewRequest}
-                        className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                          [classes.hide]: !open
-                        })}
-                        disabled
-                      >
+                    <Button
+                      onClick={handleNewRequest}
+                      className={
+                        maintenanceIsActive
+                          ? clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                              [classes.hide]: !open
+                            })
+                          : clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                              [classes.hide]: !open
+                            })
+                      }
+                      disabled={maintenanceIsActive}
+                    >
+                      {maintenanceIsActive ? (
                         <Typography variant="h6">Nouvelle requête désactivée</Typography>
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={handleNewRequest}
-                        className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                          [classes.hide]: !open
-                        })}
-                      >
-                        <Typography variant="h5">Nouvelle requête</Typography>
-                      </Button>
-                    )}
+                      ) : (
+                        <Typography variant="h6">Nouvelle requête</Typography>
+                      )}
+                    </Button>
                   </Zoom>
                 ) : (
-                  <>
-                    {maintenanceIsActive ? (
-                      <Button
-                        onClick={handleNewRequest}
-                        className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                          [classes.hide]: !open
-                        })}
-                        disabled
-                      >
-                        <Typography variant="h6">Nouvelle requête désactivée</Typography>
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={handleNewRequest}
-                        className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                          [classes.hide]: !open
-                        })}
-                      >
-                        <Typography variant="h5">Nouvelle requête</Typography>
-                      </Button>
-                    )}
-                  </>
+                  <Button
+                    onClick={handleNewRequest}
+                    className={
+                      maintenanceIsActive
+                        ? clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                            [classes.hide]: !open
+                          })
+                        : clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                            [classes.hide]: !open
+                          })
+                    }
+                    disabled={maintenanceIsActive}
+                  >
+                    <Typography variant="h6">Nouvelle requête désactivée</Typography>
+                  </Button>
                 )}
               </ListItem>
             ) : (
               <>
                 <ListItem>
                   {!open && (
-                    <>
-                      {maintenanceIsActive ? (
-                        <Tooltip title="Nouvelle requête disabled">
-                          <Button
-                            variant="contained"
-                            onClick={handleNewRequest}
-                            className={clsx(classes.miniButton, classes.button)}
-                            disabled
-                          >
-                            <AddIcon />
-                          </Button>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip title="Nouvelle requête">
-                          <Button
-                            variant="contained"
-                            onClick={handleNewRequest}
-                            className={clsx(classes.miniButton, classes.button)}
-                          >
-                            <AddIcon />
-                          </Button>
-                        </Tooltip>
-                      )}
-                    </>
+                    <Tooltip title="Nouvelle requête disabled">
+                      <Button
+                        variant="contained"
+                        onClick={handleNewRequest}
+                        className={
+                          maintenanceIsActive
+                            ? clsx(classes.miniButton, classes.button)
+                            : clsx(classes.miniButton, classes.button)
+                        }
+                        disabled={maintenanceIsActive}
+                      >
+                        <AddIcon />
+                      </Button>
+                    </Tooltip>
                   )}
                   {allreadyOpen ? (
                     <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
-                      {maintenanceIsActive ? (
-                        <Button
-                          onClick={handleNewRequest}
-                          className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                            [classes.hide]: !open
-                          })}
-                          disabled
-                        >
+                      <Button
+                        onClick={handleNewRequest}
+                        className={
+                          maintenanceIsActive
+                            ? clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                                [classes.hide]: !open
+                              })
+                            : clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                                [classes.hide]: !open
+                              })
+                        }
+                        disabled={maintenanceIsActive}
+                      >
+                        {maintenanceIsActive ? (
                           <Typography variant="h6">Nouvelle requête désactivée</Typography>
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={handleNewRequest}
-                          className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                            [classes.hide]: !open
-                          })}
-                        >
-                          <Typography variant="h5">Nouvelle requête</Typography>
-                        </Button>
-                      )}
+                        ) : (
+                          <Typography variant="h6">Nouvelle requête</Typography>
+                        )}
+                      </Button>
                     </Zoom>
                   ) : (
-                    <>
+                    <Button
+                      onClick={handleNewRequest}
+                      className={
+                        maintenanceIsActive
+                          ? clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                              [classes.hide]: !open
+                            })
+                          : clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                              [classes.hide]: !open
+                            })
+                      }
+                      disabled={maintenanceIsActive}
+                    >
                       {maintenanceIsActive ? (
-                        <Button
-                          onClick={handleNewRequest}
-                          className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                            [classes.hide]: !open
-                          })}
-                          disabled
-                        >
-                          <Typography variant="h6">Nouvelle requête désactivée</Typography>
-                        </Button>
+                        <Typography variant="h6">Nouvelle requête désactivée</Typography>
                       ) : (
-                        <Button
-                          onClick={handleNewRequest}
-                          className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                            [classes.hide]: !open
-                          })}
-                        >
-                          <Typography variant="h5">Nouvelle requête</Typography>
-                        </Button>
+                        <Typography variant="h6">Nouvelle requête</Typography>
                       )}
-                    </>
+                    </Button>
                   )}
                 </ListItem>
                 <ListItem style={{ padding: !open ? '0 16px' : undefined }}>
                   {!open && (
-                    <>
-                      {maintenanceIsActive ? (
-                        <Tooltip title="Modifier la requête en cours disabled">
-                          <Button
-                            variant="contained"
-                            onClick={() => history.push('/cohort/new')}
-                            className={clsx(classes.miniButton, classes.button)}
-                            disabled
-                          >
-                            <EditIcon />
-                          </Button>
-                        </Tooltip>
-                      ) : (
-                        <Tooltip title="Modifier la requête en cours">
-                          <Button
-                            variant="contained"
-                            onClick={() => history.push('/cohort/new')}
-                            className={clsx(classes.miniButton, classes.button)}
-                          >
-                            <EditIcon />
-                          </Button>
-                        </Tooltip>
-                      )}
-                    </>
+                    <Tooltip title="Modifier la requête en cours disabled">
+                      <Button
+                        variant="contained"
+                        onClick={() => history.push('/cohort/new')}
+                        className={
+                          maintenanceIsActive
+                            ? clsx(classes.miniButton, classes.button)
+                            : clsx(classes.miniButton, classes.button)
+                        }
+                        disabled={maintenanceIsActive}
+                      >
+                        <EditIcon />
+                      </Button>
+                    </Tooltip>
                   )}
                   {allreadyOpen ? (
                     <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
-                      {maintenanceIsActive ? (
-                        <Button
-                          onClick={() => history.push('/cohort/new')}
-                          className={clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
-                          disabled
-                        >
-                          <Typography variant="h5">Requête en cours disabled</Typography>
-                          <Typography noWrap style={{ width: 200 }}>
-                            {cohortCreation.request.requestName}
-                          </Typography>
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() => history.push('/cohort/new')}
-                          className={clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
-                        >
-                          <Typography variant="h5">Requête en cours</Typography>
-                          <Typography noWrap style={{ width: 200 }}>
-                            {cohortCreation.request.requestName}
-                          </Typography>
-                        </Button>
-                      )}
+                      <Button
+                        onClick={() => history.push('/cohort/new')}
+                        className={
+                          maintenanceIsActive
+                            ? clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)
+                            : clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)
+                        }
+                        disabled={maintenanceIsActive}
+                      >
+                        {maintenanceIsActive ? (
+                          <>
+                            <Typography variant="h5">Requête en cours désactivée</Typography>
+                            <Typography noWrap style={{ width: 200 }}>
+                              {cohortCreation.request.requestName}
+                            </Typography>
+                          </>
+                        ) : (
+                          <>
+                            <Typography variant="h5">Requête en cours</Typography>
+                            <Typography noWrap style={{ width: 200 }}>
+                              {cohortCreation.request.requestName}
+                            </Typography>
+                          </>
+                        )}
+                      </Button>
                     </Zoom>
                   ) : (
-                    <>
+                    <Button
+                      onClick={() => history.push('/cohort/new')}
+                      className={
+                        maintenanceIsActive
+                          ? clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)
+                          : clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)
+                      }
+                      disabled={maintenanceIsActive}
+                    >
                       {maintenanceIsActive ? (
-                        <Button
-                          onClick={() => history.push('/cohort/new')}
-                          className={clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
-                          disabled
-                        >
-                          <Typography variant="h5">Requête en cours disabled</Typography>
+                        <>
+                          <Typography variant="h5">Requête en cours désactivée</Typography>
                           <Typography noWrap style={{ width: 200 }}>
                             {cohortCreation.request.requestName}
                           </Typography>
-                        </Button>
+                        </>
                       ) : (
-                        <Button
-                          onClick={() => history.push('/cohort/new')}
-                          className={clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
-                        >
+                        <>
                           <Typography variant="h5">Requête en cours</Typography>
                           <Typography noWrap style={{ width: 200 }}>
                             {cohortCreation.request.requestName}
                           </Typography>
-                        </Button>
+                        </>
                       )}
-                    </>
+                    </Button>
                   )}
                 </ListItem>
               </>
