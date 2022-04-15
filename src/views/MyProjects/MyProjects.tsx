@@ -21,6 +21,7 @@ import { useAppSelector, useAppDispatch } from 'state'
 import { ProjectState, fetchProjects as fetchProjectsList, setSelectedProject } from 'state/project'
 import { RequestState, fetchRequests as fetchRequestsList, setSelectedRequest } from 'state/request'
 import { CohortState, fetchCohorts as fetchCohortsList, setSelectedCohort } from 'state/cohort'
+import { MeState } from 'state/me'
 
 import useStyles from './styles'
 
@@ -32,20 +33,23 @@ const MyProjects = () => {
   const [selectedRequests, setSelectedRequests] = useState<RequestType[]>([])
   const [openModal, setOpenModal] = useState<'move_to_folder' | 'delete_items' | null>(null)
 
-  const { open, projectState, requestState, cohortState } = useAppSelector<{
+  const { open, projectState, requestState, cohortState, meState } = useAppSelector<{
     open: boolean
     projectState: ProjectState
     requestState: RequestState
     cohortState: CohortState
+    meState: MeState
   }>((state) => ({
     open: state.drawer,
     projectState: state.project,
     requestState: state.request,
-    cohortState: state.cohort
+    cohortState: state.cohort,
+    meState: state.me
   }))
   const { selectedProject } = projectState
   const { selectedRequest, requestsList } = requestState
   const { selectedCohort } = cohortState
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const loadingProject = projectState.loading
   const loadingRequest = requestState.loading
@@ -123,6 +127,7 @@ const MyProjects = () => {
                           startIcon={<DriveFileMoveIcon />}
                           onClick={() => setOpenModal('move_to_folder')}
                           color="primary"
+                          disabled={maintenanceIsActive}
                         >
                           Deplacer {selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}
                         </Button>
@@ -140,6 +145,7 @@ const MyProjects = () => {
                           startIcon={<DeleteIcon />}
                           onClick={() => setOpenModal('delete_items')}
                           color="secondary"
+                          disabled={maintenanceIsActive}
                         >
                           Supprimer {selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}
                         </Button>
@@ -164,6 +170,7 @@ const MyProjects = () => {
                     startIcon={<AddIcon />}
                     onClick={() => handleClickAddProject()}
                     className={classes.addButton}
+                    disabled={maintenanceIsActive}
                   >
                     Ajouter un projet
                   </Button>
@@ -171,7 +178,11 @@ const MyProjects = () => {
 
                 <Hidden only={['lg', 'xl']}>
                   <Tooltip title={'Ajouter un projet'}>
-                    <IconButton onClick={() => handleClickAddProject()} className={classes.addIconButton}>
+                    <IconButton
+                      onClick={() => handleClickAddProject()}
+                      className={classes.addIconButton}
+                      disabled={maintenanceIsActive}
+                    >
                       <AddIcon />
                     </IconButton>
                   </Tooltip>
