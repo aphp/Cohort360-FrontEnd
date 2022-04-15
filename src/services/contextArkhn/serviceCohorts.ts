@@ -360,10 +360,6 @@ const servicesCohorts: IServiceCohorts = {
     endDate,
     groupId
   ) => {
-    if (searchInput) {
-      searchInput = encodeURIComponent(searchInput)
-    }
-
     const [docsList, allDocsList] = await Promise.all([
       fetchComposition({
         size: 20,
