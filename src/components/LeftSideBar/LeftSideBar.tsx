@@ -194,7 +194,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             {!cohortCreation?.request?.requestId ? (
               <ListItem>
                 {!open && (
-                  <Tooltip title="Nouvelle requête disabled">
+                  <Tooltip title="Nouvelle requête">
                     <Button
                       variant="contained"
                       onClick={handleNewRequest}
@@ -245,7 +245,11 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     }
                     disabled={maintenanceIsActive}
                   >
-                    <Typography variant="h6">Nouvelle requête désactivée</Typography>
+                    {maintenanceIsActive ? (
+                      <Typography variant="h6">Nouvelle requête désactivée</Typography>
+                    ) : (
+                      <Typography variant="h6">Nouvelle requête</Typography>
+                    )}
                   </Button>
                 )}
               </ListItem>
@@ -253,7 +257,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               <>
                 <ListItem>
                   {!open && (
-                    <Tooltip title="Nouvelle requête disabled">
+                    <Tooltip title="Nouvelle requête">
                       <Button
                         variant="contained"
                         onClick={handleNewRequest}
@@ -314,7 +318,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 </ListItem>
                 <ListItem style={{ padding: !open ? '0 16px' : undefined }}>
                   {!open && (
-                    <Tooltip title="Modifier la requête en cours disabled">
+                    <Tooltip title="Modifier la requête en cours">
                       <Button
                         variant="contained"
                         onClick={() => history.push('/cohort/new')}
