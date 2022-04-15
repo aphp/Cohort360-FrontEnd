@@ -100,7 +100,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
 
     const selectedDocTypesCodes = selectedDocTypes.map((docType) => docType.code)
 
-    if (inputMode === 'regex') input = `/${input}/`
+    if (inputMode === 'regex') input = input ? `/${input}/` : ''
 
     const result = await services.cohorts.fetchDocuments(
       !!deidentifiedBoolean,
@@ -131,7 +131,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean, sor
   }
 
   useEffect(() => {
-    onSearchDocument(_sortBy, _sortDirection)
+    onSearchDocument(_sortBy, _sortDirection, searchInput)
   }, [!!deidentifiedBoolean, selectedDocTypes, nda, ipp, startDate, endDate, _sortBy, _sortDirection]) // eslint-disable-line
 
   const handleOpenDialog = () => {
