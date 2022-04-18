@@ -11,14 +11,17 @@ const FirstNews = () => {
 
       <Typography color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
         • Les résultats de biologie sont disponibles dans le requêteur et la fiche patient. Attention, pour l'instant,
-        la biologie est restreinte aux 3000 codes ANABIO les plus utilisés.
+        la biologie est restreinte aux 3870 codes ANABIO les plus utilisés.
       </Typography>
-      {/* <Typography color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
+      <Typography color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
         • L'unité exécutrice dans la fiche patient affiche maintenant les Unités Fonctionnelles dans lesquelles les
         patients ont réalisé un séjour.
-      </Typography> */}
+      </Typography>
       <Typography color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
         • Il est maintenant possible de filtrer les documents des patients par IPP
+      </Typography>
+      <Typography color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
+        • La mise à disposition da la recherche par expression régulière
       </Typography>
 
       <Typography color="textSecondary" style={{ paddingTop: 6 }}>
