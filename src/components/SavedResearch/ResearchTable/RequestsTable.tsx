@@ -220,6 +220,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                               dispatch(setSelectedRequestState(row ?? null))
                               setAnchorEl(null)
                             }}
+                            disabled={maintenanceIsActive}
                           >
                             <EditIcon /> Modifier
                           </MenuItem>
@@ -231,6 +232,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                               handleClickOpenDialog()
                               setAnchorEl(null)
                             }}
+                            disabled={maintenanceIsActive}
                           >
                             <DeleteOutlineIcon /> Supprimer
                           </MenuItem>

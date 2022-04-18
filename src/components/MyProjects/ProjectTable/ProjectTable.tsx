@@ -21,7 +21,6 @@ import { useAppSelector } from 'state'
 import { ProjectState } from 'state/project'
 import { RequestState } from 'state/request'
 import { CohortState } from 'state/cohort'
-import { MeState } from 'state/me'
 
 import useStyles from './styles'
 
@@ -33,21 +32,18 @@ type ProjectTableProps = {
 
 const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, setSelectedRequests, selectedRequests }) => {
   const classes = useStyles()
-  const { projectState, requestState, cohortState, meState } = useAppSelector<{
+  const { projectState, requestState, cohortState } = useAppSelector<{
     projectState: ProjectState
     requestState: RequestState
     cohortState: CohortState
-    meState: MeState
   }>((state) => ({
     projectState: state.project,
     requestState: state.request,
-    cohortState: state.cohort,
-    meState: state.me
+    cohortState: state.cohort
   }))
   const { projectsList } = projectState
   const { requestsList } = requestState
   const { cohortsList } = cohortState
-  const maintenanceIsActive = meState?.maintenance?.active
 
   const [sortBy, setSortBy] = useState<'name' | 'modified_at'>('name')
   const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('asc')

@@ -227,7 +227,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                       {maintenanceIsActive ? (
                         <Typography variant="h6">Nouvelle requête désactivée</Typography>
                       ) : (
-                        <Typography variant="h6">Nouvelle requête</Typography>
+                        <Typography variant="h5">Nouvelle requête</Typography>
                       )}
                     </Button>
                   </Zoom>
@@ -248,7 +248,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     {maintenanceIsActive ? (
                       <Typography variant="h6">Nouvelle requête désactivée</Typography>
                     ) : (
-                      <Typography variant="h6">Nouvelle requête</Typography>
+                      <Typography variant="h5">Nouvelle requête</Typography>
                     )}
                   </Button>
                 )}
@@ -290,7 +290,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                         {maintenanceIsActive ? (
                           <Typography variant="h6">Nouvelle requête désactivée</Typography>
                         ) : (
-                          <Typography variant="h6">Nouvelle requête</Typography>
+                          <Typography variant="h5">Nouvelle requête</Typography>
                         )}
                       </Button>
                     </Zoom>
@@ -311,7 +311,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                       {maintenanceIsActive ? (
                         <Typography variant="h6">Nouvelle requête désactivée</Typography>
                       ) : (
-                        <Typography variant="h6">Nouvelle requête</Typography>
+                        <Typography variant="h5">Nouvelle requête</Typography>
                       )}
                     </Button>
                   )}
@@ -346,7 +346,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                       >
                         {maintenanceIsActive ? (
                           <>
-                            <Typography variant="h5">Requête en cours désactivée</Typography>
+                            <Typography variant="h5">Requête en cours</Typography>
                             <Typography noWrap style={{ width: 200 }}>
                               {cohortCreation.request.requestName}
                             </Typography>
@@ -373,7 +373,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     >
                       {maintenanceIsActive ? (
                         <>
-                          <Typography variant="h5">Requête en cours désactivée</Typography>
+                          <Typography variant="h5">Requête en cours</Typography>
                           <Typography noWrap style={{ width: 200 }}>
                             {cohortCreation.request.requestName}
                           </Typography>

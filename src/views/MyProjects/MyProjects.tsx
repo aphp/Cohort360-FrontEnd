@@ -134,7 +134,11 @@ const MyProjects = () => {
                       </Hidden>
                       <Hidden only={['lg', 'xl']}>
                         <Tooltip title={`Deplacer ${selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}`}>
-                          <IconButton onClick={() => setOpenModal('move_to_folder')} color="primary">
+                          <IconButton
+                            onClick={() => setOpenModal('move_to_folder')}
+                            color="primary"
+                            disabled={maintenanceIsActive}
+                          >
                             <DriveFileMoveIcon />
                           </IconButton>
                         </Tooltip>
@@ -152,7 +156,11 @@ const MyProjects = () => {
                       </Hidden>
                       <Hidden only={['lg', 'xl']}>
                         <Tooltip title={`Supprimer ${selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}`}>
-                          <IconButton onClick={() => setOpenModal('delete_items')} color="secondary">
+                          <IconButton
+                            onClick={() => setOpenModal('delete_items')}
+                            color="secondary"
+                            disabled={maintenanceIsActive}
+                          >
                             <DeleteIcon />
                           </IconButton>
                         </Tooltip>

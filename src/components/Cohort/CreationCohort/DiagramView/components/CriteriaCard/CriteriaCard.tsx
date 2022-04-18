@@ -10,6 +10,7 @@ import LibraryAddIcon from '@material-ui/icons/LibraryAdd'
 import CriteriaCardContent from './components/CriteriaCardContent/CriteriaCardContent'
 
 import { useAppSelector } from 'state'
+import { MeState } from 'state/me'
 
 import useStyles from './styles'
 import { SelectedCriteriaType } from 'types'
@@ -23,6 +24,9 @@ type CriteriaCardProps = {
 
 const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, editCriteria, deleteCriteria }) => {
   const classes = useStyles()
+
+  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const { selectedCriteria = [] } = useAppSelector((state) => state.cohortCreation.request || {})
 
@@ -40,7 +44,12 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
       </div>
       <div className={classes.actionContainer}>
         {currentCriterion.error ? (
-          <IconButton size="small" onClick={() => editCriteria(currentCriterion)} color="secondary">
+          <IconButton
+            size="small"
+            onClick={() => editCriteria(currentCriterion)}
+            color="secondary"
+            disabled={maintenanceIsActive}
+          >
             <WarningIcon />
           </IconButton>
         ) : (
@@ -49,14 +58,25 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
         <IconButton
           size="small"
           onClick={() => duplicateCriteria(currentCriterion.id)}
-          style={{ color: 'currentcolor' }}
+          style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
+          disabled={maintenanceIsActive}
         >
           <LibraryAddIcon />
         </IconButton>
-        <IconButton size="small" onClick={() => editCriteria(currentCriterion)} style={{ color: 'currentcolor' }}>
+        <IconButton
+          size="small"
+          onClick={() => editCriteria(currentCriterion)}
+          style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
+          disabled={maintenanceIsActive}
+        >
           <EditIcon />
         </IconButton>
-        <IconButton size="small" onClick={() => deleteCriteria(currentCriterion.id)} style={{ color: 'currentcolor' }}>
+        <IconButton
+          size="small"
+          onClick={() => deleteCriteria(currentCriterion.id)}
+          style={maintenanceIsActive ? { color: '#CBCFCF' } : { color: 'currentcolor' }}
+          disabled={maintenanceIsActive}
+        >
           <DeleteIcon />
         </IconButton>
       </div>

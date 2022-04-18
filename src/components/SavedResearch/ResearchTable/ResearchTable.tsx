@@ -410,6 +410,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                   setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
                                   setAnchorEl(null)
                                 }}
+                                disabled={maintenanceIsActive}
                               >
                                 <ExportIcon /> Exporter
                               </MenuItem>
@@ -421,6 +422,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                 dispatch(setSelectedCohortState(row.uuid ?? null))
                                 setAnchorEl(null)
                               }}
+                              disabled={maintenanceIsActive}
                             >
                               <EditIcon /> Modifier
                             </MenuItem>
@@ -432,6 +434,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                 handleClickOpenDialog()
                                 setAnchorEl(null)
                               }}
+                              disabled={maintenanceIsActive}
                             >
                               <DeleteOutlineIcon /> Supprimer
                             </MenuItem>
