@@ -39,6 +39,8 @@ import ExportModal from 'components/Cohort/ExportModal/ExportModal'
 import { useAppSelector, useAppDispatch } from 'state'
 import { CohortState, setSelectedCohort as setSelectedCohortState } from 'state/cohort'
 
+import { MeState } from 'state/me'
+
 import { Cohort } from 'types'
 
 import displayDigit from 'utils/displayDigit'
@@ -55,6 +57,13 @@ const FavStar: React.FC<FavStarProps> = ({ favorite }) => {
     return <StarFull height="15px" fill="#ED6D91" />
   }
   return <Star height="15px" fill="#ED6D91" />
+}
+
+const DisabledFavStar: React.FC<FavStarProps> = ({ favorite }) => {
+  if (favorite) {
+    return <StarFull height="15px" fill="#CBCFCF" />
+  }
+  return <Star height="15px" fill="#CBCFCF" />
 }
 
 type ResearchTableProps = {
@@ -93,6 +102,14 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
     cohortState: state.cohort
   }))
   const selectedCohortState = cohortState.selectedCohort
+
+  const { meState } = useAppSelector<{
+    meState: MeState
+  }>((state) => ({
+    meState: state.me
+  }))
+
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const _onClickRow = (row: any) => {
     return !row.fhir_group_id ? null : onClickRow ? onClickRow(row) : history.push(`/cohort/${row.fhir_group_id}`)
@@ -262,8 +279,13 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                             event.stopPropagation()
                             onSetCohortFavorite(row)
                           }}
+                          disabled={maintenanceIsActive}
                         >
-                          <FavStar favorite={row.favorite} />
+                          {maintenanceIsActive ? (
+                            <DisabledFavStar favorite={row.favorite} />
+                          ) : (
+                            <FavStar favorite={row.favorite} />
+                          )}
                         </IconButton>
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} className={classes.status} align="center">
@@ -322,36 +344,41 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                     event.stopPropagation()
                                     setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
                                   }}
+                                  disabled={maintenanceIsActive}
                                 >
                                   <ExportIcon />
                                 </IconButton>
                               </Grid>
                             )}
 
-                            <Grid item>
-                              <IconButton
-                                size="small"
-                                onClick={(event) => {
-                                  event.stopPropagation()
-                                  dispatch(setSelectedCohortState(row?.uuid ?? null))
-                                }}
-                              >
-                                <EditIcon />
-                              </IconButton>
-                            </Grid>
+                            <>
+                              <Grid item>
+                                <IconButton
+                                  size="small"
+                                  onClick={(event) => {
+                                    event.stopPropagation()
+                                    dispatch(setSelectedCohortState(row?.uuid ?? null))
+                                  }}
+                                  disabled={maintenanceIsActive}
+                                >
+                                  <EditIcon />
+                                </IconButton>
+                              </Grid>
 
-                            <Grid item>
-                              <IconButton
-                                size="small"
-                                onClick={(event) => {
-                                  event.stopPropagation()
-                                  handleClickOpenDialog()
-                                  setSelectedCohort(row)
-                                }}
-                              >
-                                <DeleteOutlineIcon />
-                              </IconButton>
-                            </Grid>
+                              <Grid item>
+                                <IconButton
+                                  size="small"
+                                  onClick={(event) => {
+                                    event.stopPropagation()
+                                    handleClickOpenDialog()
+                                    setSelectedCohort(row)
+                                  }}
+                                  disabled={maintenanceIsActive}
+                                >
+                                  <DeleteOutlineIcon />
+                                </IconButton>
+                              </Grid>
+                            </>
                           </Grid>
                         </Hidden>
                         <Hidden lgUp>
@@ -383,6 +410,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                   setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
                                   setAnchorEl(null)
                                 }}
+                                disabled={maintenanceIsActive}
                               >
                                 <ExportIcon /> Exporter
                               </MenuItem>
@@ -394,6 +422,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                 dispatch(setSelectedCohortState(row.uuid ?? null))
                                 setAnchorEl(null)
                               }}
+                              disabled={maintenanceIsActive}
                             >
                               <EditIcon /> Modifier
                             </MenuItem>
@@ -405,6 +434,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                 handleClickOpenDialog()
                                 setAnchorEl(null)
                               }}
+                              disabled={maintenanceIsActive}
                             >
                               <DeleteOutlineIcon /> Supprimer
                             </MenuItem>

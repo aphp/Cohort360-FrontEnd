@@ -20,6 +20,7 @@ import {
   deleteCriteriaGroup,
   buildCohortCreation
 } from 'state/cohortCreation'
+import { MeState } from 'state/me'
 
 import useStyle from './styles'
 
@@ -50,6 +51,9 @@ const ControlPanel: React.FC<{
     json
   } = useAppSelector((state) => state.cohortCreation.request || {})
   const { includePatient, status, jobFailMsg /*byrequest, alive, deceased, female, male, unknownPatient */ } = count
+
+  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const accessIsPseudonymize: boolean | null =
     selectedPopulation === null
@@ -117,7 +121,12 @@ const ControlPanel: React.FC<{
       <Grid className={classes.rightPanelContainerStyle}>
         <Grid className={classes.container}>
           <Button
-            disabled={itLoads || typeof onExecute !== 'function' || (includePatient ? includePatient > 20000 : false)}
+            disabled={
+              itLoads ||
+              typeof onExecute !== 'function' ||
+              (includePatient ? includePatient > 20000 : false) ||
+              maintenanceIsActive
+            }
             onClick={
               includePatient && includePatient > 20000 ? undefined : () => onSetOpenModal('executeCohortConfirmation')
             }
@@ -136,7 +145,7 @@ const ControlPanel: React.FC<{
           <Button
             className={classes.actionButton}
             onClick={onUndo}
-            disabled={typeof onUndo !== 'function'}
+            disabled={typeof onUndo !== 'function' || maintenanceIsActive}
             startIcon={<ArrowBackIcon color="action" className={classes.iconBorder} />}
           >
             <Typography className={classes.boldText}>Annuler</Typography>
@@ -145,7 +154,7 @@ const ControlPanel: React.FC<{
           <Button
             className={classes.actionButton}
             onClick={onRedo}
-            disabled={typeof onRedo !== 'function'}
+            disabled={typeof onRedo !== 'function' || maintenanceIsActive}
             startIcon={<ArrowForwardIcon color="action" className={classes.iconBorder} />}
           >
             <Typography className={classes.boldText}>Rétablir</Typography>
@@ -157,6 +166,7 @@ const ControlPanel: React.FC<{
             }}
             className={classes.actionButton}
             startIcon={<UpdateSharpIcon color="action" className={classes.iconBorder} />}
+            disabled={maintenanceIsActive}
           >
             <Typography className={classes.boldText}>Réinitialiser</Typography>
           </Button>
@@ -168,6 +178,7 @@ const ControlPanel: React.FC<{
                 onClick={cleanLogicalOperator}
                 className={classes.actionButton}
                 startIcon={<HighlightOffIcon color="action" className={classes.iconBorder} />}
+                disabled={maintenanceIsActive}
               >
                 <Tooltip title="Supprimer les groupes ne contenant aucun élément">
                   <Typography className={classes.boldText}>Nettoyer le diagramme</Typography>
@@ -246,6 +257,7 @@ const ControlPanel: React.FC<{
               color="secondary"
               size="small"
               style={{ marginTop: -14 }}
+              disabled={maintenanceIsActive}
             >
               Relancer la requête
             </Button>
@@ -278,6 +290,7 @@ const ControlPanel: React.FC<{
               color="primary"
               size="small"
               style={{ marginTop: 8 }}
+              disabled={maintenanceIsActive}
             >
               Relancer la requête
             </Button>
