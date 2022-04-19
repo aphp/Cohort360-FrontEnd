@@ -5,29 +5,32 @@ stages: # List of stages for jobs in their order of execution
   - build
   - deploy
 
-include: # Variables needed for Selenium tests
-  project: dev/cohort360/frontend
-  file: '/.gitlab/selenium_variables.yml'
+# include: # Variables needed for Selenium tests
+#   project: dev/cohort360/frontend
+#   file: '/.gitlab/selenium_variables.yml'
 
-test-e2e-chrome-job:
-  stage: test
-  artifacts:
-    when: always
-    paths:
-      - reports
-    expire_in: 1 week
-  allow_failure: true
-  script:
-    - npm install
-    - cp .gitlab/nginx-test.conf /etc/nginx/conf.d/nginx.conf
-    - service nginx restart
-    - npm run start > file.log 2>&1 &
-    - sleep 30 # Wait until application is started
-    - npm run test
-  cache:
-    key: cohort360_nodemodules_cache
-    paths:
-      - node_modules/
+# test-e2e-chrome-job:
+#   stage: test
+#   include: # Variables needed for Selenium tests
+#     project: dev/cohort360/frontend
+#     file: '/.gitlab/selenium_variables.yml'
+#   artifacts:
+#     when: always
+#     paths:
+#       - reports
+#     expire_in: 1 week
+#   allow_failure: true
+#   script:
+#     - npm install
+#     - cp .gitlab/nginx-test.conf /etc/nginx/conf.d/nginx.conf
+#     - service nginx restart
+#     - npm run start > file.log 2>&1 &
+#     - sleep 30 # Wait until application is started
+#     - npm run test
+#   cache:
+#     key: cohort360_nodemodules_cache
+#     paths:
+#       - node_modules/
 
 build-job:
   image: node:16.13.2

@@ -38,6 +38,7 @@ import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalE
 import { useAppSelector, useAppDispatch } from 'state'
 import { favoriteExploredCohort } from 'state/exploredCohort'
 import { fetchCohorts as fetchCohortsList, setSelectedCohort, deleteCohort } from 'state/cohort'
+import { MeState } from 'state/me'
 
 import { Cohort } from 'types'
 
@@ -60,6 +61,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   const classes = useStyles()
   const dispatch = useAppDispatch()
   const history = useHistory()
+
+  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const { dashboard, cohortList } = useAppSelector((state) => ({
     dashboard: state.exploredCohort,
@@ -274,7 +278,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
 
               {cohort.showActionButton && !dashboard.loading && (
                 <Grid container item justifyContent="flex-end" style={{ width: 120 }}>
-                  <IconButton onClick={handleFavorite} color="secondary">
+                  <IconButton onClick={handleFavorite} color="secondary" disabled={maintenanceIsActive}>
                     {dashboard.favorite ? (
                       <StarFullIcon height={18} fill="currentColor" />
                     ) : (
@@ -282,7 +286,12 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                     )}
                   </IconButton>
 
-                  <IconButton aria-controls="cohort-more-menu" aria-haspopup="true" onClick={handleClick}>
+                  <IconButton
+                    aria-controls="cohort-more-menu"
+                    aria-haspopup="true"
+                    onClick={handleClick}
+                    disabled={maintenanceIsActive}
+                  >
                     <MoreButton />
                   </IconButton>
                   <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
@@ -298,7 +307,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                     >
                       Modifier
                     </MenuItem>
-                    {ODD_EXPORT && dashboard.canMakeExport && (
+                    {!!ODD_EXPORT && dashboard.canMakeExport && (
                       <MenuItem
                         onClick={() => {
                           setAnchorEl(null)
@@ -327,7 +336,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         )}
       </Grid>
 
-      {ODD_EXPORT && openModal === 'edit' && (
+      {!!ODD_EXPORT && openModal === 'edit' && (
         <ModalEditCohort
           open
           onClose={() => {

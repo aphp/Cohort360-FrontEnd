@@ -12,9 +12,10 @@ import RequestRow from '../RequestRow/RequestRow'
 
 import { ProjectType, RequestType, Cohort } from 'types'
 
-import { useAppDispatch } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import { setSelectedProject } from 'state/project'
 import { setSelectedRequest } from 'state/request'
+import { MeState } from 'state/me'
 
 import useStyles from '../styles'
 
@@ -38,6 +39,13 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
+  const { meState } = useAppSelector<{
+    meState: MeState
+  }>((state) => ({
+    meState: state.me
+  }))
+  const maintenanceIsActive = meState?.maintenance?.active
+
   const handleClickAddOrEditProject = (selectedProjectId: string | null) => {
     onSelectedRow([])
     if (selectedProjectId) {
@@ -56,7 +64,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
   const regexp = new RegExp(`${(searchInput || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}`, 'gi')
 
   return (
-    <React.Fragment>
+    <>
       <TableRow>
         <TableCell style={{ width: 62 }}>
           <IconButton style={{ marginLeft: 4 }} aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
@@ -68,7 +76,12 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
           <Typography style={{ fontWeight: 900, display: 'inline-table' }}>{row.name}</Typography>
           {requestOfProject && requestOfProject.length > 0 && (
             <Tooltip title={'Ajouter une requête'}>
-              <IconButton onClick={handleAddRequest} className={classes.smallAddButon} size="small">
+              <IconButton
+                onClick={handleAddRequest}
+                className={classes.smallAddButon}
+                size="small"
+                disabled={maintenanceIsActive}
+              >
                 <AddIcon />
               </IconButton>
             </Tooltip>
@@ -78,6 +91,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
               onClick={() => handleClickAddOrEditProject(row.uuid)}
               className={classes.editButon}
               size="small"
+              disabled={maintenanceIsActive}
             >
               <EditIcon />
             </IconButton>
@@ -117,6 +131,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
                   onClick={handleAddRequest}
                   className={classes.addButton}
                   style={{ margin: 4 }}
+                  disabled={maintenanceIsActive}
                 >
                   Ajouter une requête
                 </Button>
@@ -125,7 +140,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
           </Collapse>
         </TableCell>
       </TableRow>
-    </React.Fragment>
+    </>
   )
 }
 

@@ -22,6 +22,7 @@ import {
   suspendCount,
   unsuspendCount
 } from 'state/cohortCreation'
+import { MeState } from 'state/me'
 
 import useStyles from './styles'
 
@@ -46,6 +47,9 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
   const { request } = useAppSelector((state) => state.cohortCreation || {})
   const { loading = false, criteriaGroup = [], selectedCriteria = [] } = request
+
+  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const displayingItem = criteriaGroup.filter((_criteriaGroup: CriteriaGroupType) => _criteriaGroup.id === itemId)
 
@@ -115,7 +119,13 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
           <AddIcon />
         </IconButton>
       ) : (
-        <ButtonGroup disableElevation className={classes.buttonContainer} variant="contained" color="primary">
+        <ButtonGroup
+          disableElevation
+          className={classes.buttonContainer}
+          variant="contained"
+          color="primary"
+          disabled={maintenanceIsActive}
+        >
           {loading && (
             <Button disabled>
               <CircularProgress />
@@ -129,6 +139,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
                 onExpand(false)
               }}
               style={{ borderRadius: '18px 0 0 18px' }}
+              disabled={maintenanceIsActive}
             >
               Ajouter un critère
             </Button>
@@ -141,6 +152,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
                 onExpand(false)
               }}
               style={{ borderRadius: '0 18px 18px 0' }}
+              disabled={maintenanceIsActive}
             >
               Ajouter un opérateur logique
             </Button>

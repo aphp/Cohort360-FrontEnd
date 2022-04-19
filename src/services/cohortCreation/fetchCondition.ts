@@ -117,7 +117,7 @@ export const fetchCim10Diagnostic = async (searchValue?: string, noStar?: boolea
         ? `&code=${searchValue.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
         : ''
       : searchValue
-      ? `&_text=${searchValue.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}*` //eslint-disable-line
+      ? `&_text=${encodeURIComponent(searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line
       : ''
 
     const res = await apiRequest.get<any>(`/ValueSet?url=${CONDITION_HIERARCHY}${_searchValue}&size=0`)

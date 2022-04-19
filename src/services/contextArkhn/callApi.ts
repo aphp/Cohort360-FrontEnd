@@ -145,7 +145,7 @@ export const fetchPatient = async (args: fetchPatientProps) => {
   if (offset)                                      options = [...options, `offset=${offset}`]                                                   // eslint-disable-line
   if (_sort)                                       options = [...options, `_sort=${_sortDirection}${_sort}`]                                    // eslint-disable-line
   if (gender)                                      options = [...options, `gender=${gender}`]                                                   // eslint-disable-line
-  if (_text)                                       options = [...options, `${searchBy ? searchBy : '_text'}=${_text}`]                          // eslint-disable-line
+  if (_text)                                       options = [...options, `${searchBy ? searchBy : '_text'}=${encodeURIComponent(_text)}`]      // eslint-disable-line
   if (family)                                      options = [...options, `family=${family}`]                                                   // eslint-disable-line
   if (given)                                       options = [...options, `given=${given}`]                                                     // eslint-disable-line
   if (identifier)                                  options = [...options, `identifier=${identifier}`]                                           // eslint-disable-line
@@ -249,14 +249,14 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
 
-  // By default, all the calls to `/Composition` will have `type:not=doc-impor in parameter
+  // By default, all the calls to `/Composition` will have `type:not=doc-impor` in parameter
   let options: string[] = ['type:not=doc-impor', 'empty=false']
   if (_id)                                         options = [...options, `_id=${_id}`]                                                         // eslint-disable-line
   if (size !== undefined)                          options = [...options, `size=${size}`]                                                       // eslint-disable-line
   if (offset)                                      options = [...options, `offset=${offset}`]                                                   // eslint-disable-line
   if (_sort)                                       options = [...options, `_sort=${_sortDirection}${_sort},id`]                                 // eslint-disable-line
   if (type)                                        options = [...options, `type=${type}`]                                                       // eslint-disable-line
-  if (_text)                                       options = [...options, `_text=${_text}`]                                                     // eslint-disable-line
+  if (_text)                                       options = [...options, `_text=${encodeURIComponent(_text)}`]                                 // eslint-disable-line
   if (status)                                      options = [...options, `status=${status}`]                                                   // eslint-disable-line
   if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
   if (patientIdentifier)                           options = [...options, `patient.identifier=${patientIdentifier}`]                            // eslint-disable-line
@@ -385,7 +385,7 @@ export const fetchProcedure = async (args: fetchProcedureProps) => {
   if (subject)                                     options = [...options, `subject=${subject}`]                                                 // eslint-disable-line
   if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
   if (code)                                        options = [...options, `code=${code}`]                                                       // eslint-disable-line
-  if (_text)                                       options = [...options, `_text=${_text}`]                                                     // eslint-disable-line
+  if (_text)                                       options = [...options, `_text=${encodeURIComponent(_text)}`]                                 // eslint-disable-line
   if (status)                                      options = [...options, `status=${status}`]                                                   // eslint-disable-line
   if (encounterIdentifier)                         options = [...options, `encounter.identifier=${encounterIdentifier}`]                        // eslint-disable-line
   if (minDate)                                      options = [...options, `date=ge${minDate}`]                                                 // eslint-disable-line
@@ -433,7 +433,7 @@ export const fetchClaim = async (args: fetchClaimProps) => {
   if (subject)                                     options = [...options, `subject=${subject}`]                                                 // eslint-disable-line
   if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
   if (diagnosis)                                   options = [...options, `diagnosis=${diagnosis}`]                                             // eslint-disable-line
-  if (_text)                                       options = [...options, `_text=${_text}`]                                                     // eslint-disable-line
+  if (_text)                                       options = [...options, `_text=${encodeURIComponent(_text)}`]                                 // eslint-disable-line
   if (status)                                      options = [...options, `status=${status}`]                                                   // eslint-disable-line
   if (encounterIdentifier)                         options = [...options, `encounter.identifier=${encounterIdentifier}`]                        // eslint-disable-line
   if (minCreated)                                  options = [...options, `created=ge${minCreated}`]                                            // eslint-disable-line
@@ -485,7 +485,7 @@ export const fetchCondition = async (args: fetchConditionProps) => {
   if (subject)                                     options = [...options, `subject=${subject}`]                                                 // eslint-disable-line
   if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
   if (code)                                        options = [...options, `code=${code}`]                                                       // eslint-disable-line
-  if (_text)                                       options = [...options, `_text=${_text}`]                                                     // eslint-disable-line
+  if (_text)                                       options = [...options, `_text=${encodeURIComponent(_text)}`]                                 // eslint-disable-line
   if (status)                                      options = [...options, `status=${status}`]                                                   // eslint-disable-line
   if (encounterIdentifier)                         options = [...options, `encounter.identifier=${encounterIdentifier}`]                        // eslint-disable-line
   if (minRecordedDate)                             options = [...options, `recorded-date=ge${minRecordedDate}`]                                 // eslint-disable-line
@@ -523,13 +523,14 @@ export const fetchObservation = async (args: fetchObservationProps) => {
 
   _list = _list ? _list.filter(uniq) : []
 
-  let options: string[] = []
+  // By default, all the calls to `/Observation` will have 'value-quantity-value=ge0,le0' in the parameters
+  let options: string[] = ['value-quantity-value=ge0,le0']
   if (id)                                           options = [...options, `id=${id}`]                                                                 // eslint-disable-line
   if (size !== undefined)                           options = [...options, `size=${size}`]                                                             // eslint-disable-line
   if (offset)                                       options = [...options, `offset=${offset}`]                                                         // eslint-disable-line
   if (_sort)                                        options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort},id`}`] // eslint-disable-line
-  if (_text)                                        options = [...options, `_text=${_text}`]                                                           // eslint-disable-line
-  if (encounter)                                    options = [...options, `encounter=${encounter}`]                                                   // eslint-disable-line
+  if (_text)                                        options = [...options, `_text=${encodeURIComponent(_text)}`]                                       // eslint-disable-line
+  if (encounter)                                    options = [...options, `encounter.identifier=${encounter}`]                                        // eslint-disable-line
   if (anabio || loinc)                              options = [...options, `code=${anabio ? `${anabio},` : ""}${loinc}`]                               // eslint-disable-line
   if (patient)                                      options = [...options, `patient=${patient}`]                                                       // eslint-disable-line
   if (type)                                         options = [...options, `type=${type}`]                                                             // eslint-disable-line
@@ -571,7 +572,7 @@ export const fetchMedicationRequest = async (args: fetchMedicationRequestProps) 
   if (_sort)                                       options = [...options, `_sort=${_sortDirection}${_sort},id`]                                 // eslint-disable-line
   if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
   if (encounter)                                   options = [...options, `encounter.identifier=${encounter}`]                                  // eslint-disable-line
-  if (_text)                                       options = [...options, `_text=${_text}`]                                                     // eslint-disable-line
+  if (_text)                                       options = [...options, `_text=${encodeURIComponent(_text)}`]                                 // eslint-disable-line
   if (type)                                        options = [...options, `type=${type}`]                                                       // eslint-disable-line
   if (minDate)                                     options = [...options, `Period-start=ge${minDate}`]                                          // eslint-disable-line
   if (maxDate)                                     options = [...options, `Period-start=le${maxDate}`]                                          // eslint-disable-line
@@ -613,7 +614,7 @@ export const fetchMedicationAdministration = async (args: fetchMedicationAdminis
   if (_sort)                                       options = [...options, `_sort=${_sortDirection}${_sort},id`]                                 // eslint-disable-line
   if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
   if (encounter)                                   options = [...options, `encounter.identifier=${encounter}`]                                  // eslint-disable-line
-  if (_text)                                       options = [...options, `_text=${_text}`]                                                     // eslint-disable-line
+  if (_text)                                       options = [...options, `_text=${encodeURIComponent(_text)}`]                                 // eslint-disable-line
   if (route)                                       options = [...options, `route=${route}`]                                                     // eslint-disable-line
   if (minDate)                                     options = [...options, `Period-start=ge${minDate}`]                                          // eslint-disable-line
   if (maxDate)                                     options = [...options, `Period-start=le${maxDate}`]                                          // eslint-disable-line

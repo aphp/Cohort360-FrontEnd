@@ -360,10 +360,6 @@ const servicesCohorts: IServiceCohorts = {
     endDate,
     groupId
   ) => {
-    if (searchInput) {
-      searchInput = encodeURIComponent(searchInput)
-    }
-
     const [docsList, allDocsList] = await Promise.all([
       fetchComposition({
         size: 20,
@@ -599,7 +595,7 @@ const servicesCohorts: IServiceCohorts = {
           {
             url: 'EXPORT_ACCESS',
             valueString:
-              ODD_EXPORT &&
+              !!ODD_EXPORT &&
               allRightOfCohort.filter(
                 (rightOfCohort: any) =>
                   rightOfCohort.right_export_csv_nominative === true &&

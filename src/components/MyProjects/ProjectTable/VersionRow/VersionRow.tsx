@@ -200,7 +200,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
         </TableBody>
       </Table>
 
-      {ODD_EXPORT && (
+      {!!ODD_EXPORT && (
         <ExportModal
           cohortId={selectedExportableCohort ? +selectedExportableCohort : 0}
           open={!!selectedExportableCohort}
