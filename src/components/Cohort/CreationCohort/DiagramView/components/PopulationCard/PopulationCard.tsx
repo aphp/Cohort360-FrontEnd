@@ -12,6 +12,7 @@ import PopulationRightPanel from './components/PopulationRightPanel'
 import { useAppSelector, useAppDispatch } from 'state'
 import { CohortCreationState, buildCohortCreation } from 'state/cohortCreation'
 import { ScopeState, fetchScopesList } from 'state/scope'
+import { MeState } from 'state/me'
 
 import { ScopeTreeRow } from 'types'
 import { getSelectedScopes, filterScopeTree } from 'utils/scopeTree'
@@ -24,11 +25,19 @@ const PopulationCard: React.FC = () => {
 
   const {
     request: { selectedPopulation = [], ...requestState },
-    scopeState
+    scopeState,
+    meState
   } = useAppSelector<{
     request: CohortCreationState
     scopeState: ScopeState
-  }>((state) => ({ request: state.cohortCreation.request || {}, scopeState: state.scope || {} }))
+    meState: MeState
+  }>((state) => ({
+    request: state.cohortCreation.request || {},
+    scopeState: state.scope || {},
+    meState: state.me
+  }))
+
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const { scopesList = [] } = scopeState
   const loading = requestState.loading || scopeState.loading
@@ -137,7 +146,12 @@ const PopulationCard: React.FC = () => {
               )}
             </div>
           </div>
-          <IconButton className={classes.editButton} size="small" onClick={() => onChangeOpenDrawer(true)}>
+          <IconButton
+            className={classes.editButton}
+            size="small"
+            onClick={() => onChangeOpenDrawer(true)}
+            disabled={maintenanceIsActive}
+          >
             <EditIcon />
           </IconButton>
         </div>

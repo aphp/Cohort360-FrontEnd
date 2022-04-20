@@ -6,7 +6,7 @@ import { fetchPractitioner } from './callApi'
 
 export interface IServicePractitioner {
   /**
-   * Fonction qui permet d'authetifier un utilisateur avec un username et un password
+   * Fonction qui permet d'authentifier un utilisateur avec un username et un password
    *
    * Argument:
    *  - username: Identifiant du practitioner
@@ -21,6 +21,11 @@ export interface IServicePractitioner {
    *
    */
   logout: () => Promise<void>
+
+  /**
+   * Maintenance
+   */
+  maintenance: () => Promise<any>
 
   /**
    * Cette fonction nous retourne les informations relative à un pratitioner
@@ -47,6 +52,7 @@ export interface IServicePractitioner {
 const servicePractitioner: IServicePractitioner = {
   authenticate: async (username, password) => {
     getCsrfToken(username, password)
+
     return axios({
       method: 'POST',
       url: '/api/jwt/',
@@ -58,6 +64,13 @@ const servicePractitioner: IServicePractitioner = {
     axios({
       method: 'POST',
       url: `${BACK_API_URL}/accounts/logout/`
+    })
+  },
+
+  maintenance: async () => {
+    return axios({
+      method: 'GET',
+      url: `${BACK_API_URL}/maintenance/`
     })
   },
 

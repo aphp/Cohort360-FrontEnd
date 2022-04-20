@@ -8,11 +8,17 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogTitle from '@material-ui/core/DialogTitle'
 
+import { useAppSelector } from 'state'
+import { MeState } from 'state/me'
+
 type ModalRightErrorProps = {
   open: boolean
   handleClose: () => void
 }
 const ModalRightError: React.FC<ModalRightErrorProps> = ({ open, handleClose }) => {
+  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
+  const maintenanceIsActive = meState?.maintenance?.active
+
   const history = useHistory()
 
   const _handleReturnHome = () => {
@@ -37,7 +43,9 @@ const ModalRightError: React.FC<ModalRightErrorProps> = ({ open, handleClose }) 
         <Button color="secondary" onClick={_handleReturnHome}>
           Annuler
         </Button>
-        <Button onClick={handleClose}>Choisir population source</Button>
+        <Button onClick={handleClose} disabled={maintenanceIsActive}>
+          Choisir population source
+        </Button>
       </DialogActions>
     </Dialog>
   )
