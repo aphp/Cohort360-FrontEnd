@@ -38,7 +38,7 @@ import {
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 
 import { getDocumentStatus } from 'utils/documentsFormatter'
-import Watermark from 'assets/images/watermark.svg'
+import Watermark from 'assets/images/watermark_pseudo.svg'
 
 import useStyles from './styles'
 

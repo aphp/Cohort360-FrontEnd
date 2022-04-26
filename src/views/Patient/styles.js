@@ -33,7 +33,6 @@ export default makeStyles((theme) =>
     tabTitle: {
       minWidth: 0,
       color: 'rgba(0, 99, 175, 0.4)',
-      fontWeight: 'regular',
       borderBottom: '#CFE4FD 2px inset'
     },
     tabContainer: {
