@@ -225,12 +225,14 @@ const TableauPatients: React.FC<TableauPatientsProps> = memo(
                         </TableCell>
 
                         <TableCell align="center">
-                          {deidentified
-                            ? patient.id
-                            : patient.identifier?.find((identifier) => identifier.type?.coding?.[0].code === 'IPP')
-                                ?.value ??
-                              patient.identifier?.[0].value ??
-                              'IPP inconnnu'}
+                          <Typography onClick={(event) => event.stopPropagation()}>
+                            {deidentified
+                              ? patient.id
+                              : patient.identifier?.find((identifier) => identifier.type?.coding?.[0].code === 'IPP')
+                                  ?.value ??
+                                patient.identifier?.[0].value ??
+                                'IPP inconnnu'}
+                          </Typography>
                         </TableCell>
                       </TableRow>
                     )
