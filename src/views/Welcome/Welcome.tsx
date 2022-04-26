@@ -29,15 +29,17 @@ const Welcome: React.FC = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
   const history = useHistory()
-  const { practitioner, open, cohortState, requestState } = useAppSelector((state) => ({
+  const { practitioner, open, cohortState, requestState, meState } = useAppSelector((state) => ({
     practitioner: state.me,
     open: state.drawer,
     cohortState: state.cohort,
-    requestState: state.request
+    requestState: state.request,
+    meState: state.me
   }))
 
   const loadingCohort = cohortState.loading
   const loadingRequest = requestState.loading
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const [favoriteCohorts, setFavoriteCohorts] = useState<Cohort[]>([])
   const [lastCohorts, setLastCohorts] = useState<Cohort[]>([])
@@ -114,10 +116,12 @@ const Welcome: React.FC = () => {
         style={{ minHeight: 'calc(100vh - 70px)', marginBottom: 8 }}
       >
         <Grid container spacing={1}>
-          <Alert severity="warning" style={{ marginTop: '-12px', width: '100%' }}>
-            Une anomalie a été détectée sur les contraintes temporelles. Cette fonctionnalité a été désactivée. L'équipe
-            Cohort360 met tout en œuvre pour résoudre ce problème.
-          </Alert>
+          {maintenanceIsActive && (
+            <Alert severity="warning" style={{ marginTop: '-12px', width: '100%' }}>
+              Une maintenance est en cours. Seule la consultation des cohorts, requetes et données patients est activée.
+              Toute création, édition et suppression de cohort/requete est desactivées.
+            </Alert>
+          )}
 
           <Grid container className={classes.newsGrid} item xs={12} md={6} lg={6}>
             <Grid item className={classes.pt3}>

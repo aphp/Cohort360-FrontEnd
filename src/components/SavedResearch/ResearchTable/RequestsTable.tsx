@@ -37,6 +37,8 @@ import {
   deleteRequest as deleteRequestState
 } from 'state/request'
 
+import { MeState } from 'state/me'
+
 import { RequestType } from 'types'
 
 import useStyles from './styles'
@@ -66,6 +68,13 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
     requestState: state.request
   }))
   const selectedRequestState = requestState.selectedRequest
+
+  const { meState } = useAppSelector<{
+    meState: MeState
+  }>((state) => ({
+    meState: state.me
+  }))
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const [dialogOpen, setOpenDialog] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<string | undefined>()
@@ -162,6 +171,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                                 event.stopPropagation()
                                 dispatch(setSelectedRequestState(row ?? null))
                               }}
+                              disabled={maintenanceIsActive}
                             >
                               <EditIcon />
                             </IconButton>
@@ -175,6 +185,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                                 handleClickOpenDialog()
                                 setSelectedRequest(row.uuid)
                               }}
+                              disabled={maintenanceIsActive}
                             >
                               <DeleteOutlineIcon />
                             </IconButton>
@@ -209,6 +220,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                               dispatch(setSelectedRequestState(row ?? null))
                               setAnchorEl(null)
                             }}
+                            disabled={maintenanceIsActive}
                           >
                             <EditIcon /> Modifier
                           </MenuItem>
@@ -220,6 +232,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                               handleClickOpenDialog()
                               setAnchorEl(null)
                             }}
+                            disabled={maintenanceIsActive}
                           >
                             <DeleteOutlineIcon /> Supprimer
                           </MenuItem>

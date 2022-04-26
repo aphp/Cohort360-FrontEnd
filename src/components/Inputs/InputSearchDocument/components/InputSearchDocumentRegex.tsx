@@ -42,6 +42,11 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
       try {
         // Try to create regex
         new RegExp(query)
+        if (query.search(/\//) !== -1 && query.search(/\\\//) === -1) {
+          // If query contain '/' but no '\/', set error variable
+          setError(ERROR_REGEX)
+          return
+        }
         setError(null)
       } catch (error) {
         // If error, set error variable

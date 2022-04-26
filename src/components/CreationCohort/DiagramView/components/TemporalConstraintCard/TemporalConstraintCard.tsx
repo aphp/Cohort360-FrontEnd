@@ -3,6 +3,7 @@ import { Grid, Select, MenuItem } from '@material-ui/core'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { buildCohortCreation, updateTemporalConstraint } from 'state/cohortCreation'
+import { MeState } from 'state/me'
 
 import useStyles from './styles'
 
@@ -11,6 +12,9 @@ const TemporalConstraintView: React.FC = () => {
   const dispatch = useAppDispatch()
 
   const { temporalConstraints = [] } = useAppSelector((state) => state.cohortCreation.request || {})
+  const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
+
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const onChangeTemporalConstraint = (value: 'sameEncounter' | 'differentEncounter' | 'none') => {
     dispatch<any>(
@@ -36,6 +40,7 @@ const TemporalConstraintView: React.FC = () => {
         className={classes.temporalConstraintSelect}
         value={mainTemporalConstraint ? mainTemporalConstraint.constraintType : 'none'}
         onChange={(e: any) => onChangeTemporalConstraint(e.target.value)}
+        disabled={maintenanceIsActive}
       >
         <MenuItem value={'sameEncounter'}>Tous les critères ont lieu au cours du même séjour</MenuItem>
         {/* <MenuItem value={'differentEncounter'}>Tous les critères ont lieu au cours de séjours différents</MenuItem> */}

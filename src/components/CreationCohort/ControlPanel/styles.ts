@@ -79,8 +79,7 @@ const useStyles = makeStyles(() =>
     errorAlert: {
       marginTop: 8,
       borderRadius: 12,
-      border: '1px solid currentColor',
-      width: 'calc(100% - 20px)'
+      border: '1px solid currentColor'
     }
   })
 )

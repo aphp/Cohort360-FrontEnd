@@ -78,6 +78,11 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
       try {
         // Try to create regex
         new RegExp(query)
+        if (query.search(/\//) !== -1 && query.search(/\\\//) === -1) {
+          // If query contain '/' but no '\/', set error variable
+          setErrorRegex(true)
+          return
+        }
         setErrorRegex(false)
       } catch (error) {
         // If error, set error variable

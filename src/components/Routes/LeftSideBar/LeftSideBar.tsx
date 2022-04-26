@@ -55,6 +55,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
     open: state.drawer,
     cohortCreation: state.cohortCreation
   }))
+  const maintenanceIsActive = practitioner?.maintenance?.active
 
   // v-- just for zoom transition..
   const [allreadyOpen, setAllreadyOpen] = useState(false)
@@ -197,7 +198,12 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     <Button
                       variant="contained"
                       onClick={handleNewRequest}
-                      className={clsx(classes.miniButton, classes.button)}
+                      className={
+                        maintenanceIsActive
+                          ? clsx(classes.miniButton, classes.button)
+                          : clsx(classes.miniButton, classes.button)
+                      }
+                      disabled={maintenanceIsActive}
                     >
                       <AddIcon />
                     </Button>
@@ -207,21 +213,43 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
                     <Button
                       onClick={handleNewRequest}
-                      className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                        [classes.hide]: !open
-                      })}
+                      className={
+                        maintenanceIsActive
+                          ? clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                              [classes.hide]: !open
+                            })
+                          : clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                              [classes.hide]: !open
+                            })
+                      }
+                      disabled={maintenanceIsActive}
                     >
-                      <Typography variant="h5">Nouvelle requête</Typography>
+                      {maintenanceIsActive ? (
+                        <Typography variant="h6">Nouvelle requête désactivée</Typography>
+                      ) : (
+                        <Typography variant="h5">Nouvelle requête</Typography>
+                      )}
                     </Button>
                   </Zoom>
                 ) : (
                   <Button
                     onClick={handleNewRequest}
-                    className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                      [classes.hide]: !open
-                    })}
+                    className={
+                      maintenanceIsActive
+                        ? clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                            [classes.hide]: !open
+                          })
+                        : clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                            [classes.hide]: !open
+                          })
+                    }
+                    disabled={maintenanceIsActive}
                   >
-                    <Typography variant="h5">Nouvelle requête</Typography>
+                    {maintenanceIsActive ? (
+                      <Typography variant="h6">Nouvelle requête désactivée</Typography>
+                    ) : (
+                      <Typography variant="h5">Nouvelle requête</Typography>
+                    )}
                   </Button>
                 )}
               </ListItem>
@@ -233,7 +261,12 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                       <Button
                         variant="contained"
                         onClick={handleNewRequest}
-                        className={clsx(classes.miniButton, classes.button)}
+                        className={
+                          maintenanceIsActive
+                            ? clsx(classes.miniButton, classes.button)
+                            : clsx(classes.miniButton, classes.button)
+                        }
+                        disabled={maintenanceIsActive}
                       >
                         <AddIcon />
                       </Button>
@@ -243,21 +276,43 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
                       <Button
                         onClick={handleNewRequest}
-                        className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                          [classes.hide]: !open
-                        })}
+                        className={
+                          maintenanceIsActive
+                            ? clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                                [classes.hide]: !open
+                              })
+                            : clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                                [classes.hide]: !open
+                              })
+                        }
+                        disabled={maintenanceIsActive}
                       >
-                        <Typography variant="h5">Nouvelle requête</Typography>
+                        {maintenanceIsActive ? (
+                          <Typography variant="h6">Nouvelle requête désactivée</Typography>
+                        ) : (
+                          <Typography variant="h5">Nouvelle requête</Typography>
+                        )}
                       </Button>
                     </Zoom>
                   ) : (
                     <Button
                       onClick={handleNewRequest}
-                      className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                        [classes.hide]: !open
-                      })}
+                      className={
+                        maintenanceIsActive
+                          ? clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                              [classes.hide]: !open
+                            })
+                          : clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                              [classes.hide]: !open
+                            })
+                      }
+                      disabled={maintenanceIsActive}
                     >
-                      <Typography variant="h5">Nouvelle requête</Typography>
+                      {maintenanceIsActive ? (
+                        <Typography variant="h6">Nouvelle requête désactivée</Typography>
+                      ) : (
+                        <Typography variant="h5">Nouvelle requête</Typography>
+                      )}
                     </Button>
                   )}
                 </ListItem>
@@ -267,7 +322,12 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                       <Button
                         variant="contained"
                         onClick={() => history.push('/cohort/new')}
-                        className={clsx(classes.miniButton, classes.button)}
+                        className={
+                          maintenanceIsActive
+                            ? clsx(classes.miniButton, classes.button)
+                            : clsx(classes.miniButton, classes.button)
+                        }
+                        disabled={maintenanceIsActive}
                       >
                         <EditIcon />
                       </Button>
@@ -277,23 +337,55 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
                       <Button
                         onClick={() => history.push('/cohort/new')}
-                        className={clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
+                        className={
+                          maintenanceIsActive
+                            ? clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)
+                            : clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)
+                        }
+                        disabled={maintenanceIsActive}
                       >
-                        <Typography variant="h5">Requête en cours</Typography>
-                        <Typography noWrap style={{ width: 200 }}>
-                          {cohortCreation.request.requestName}
-                        </Typography>
+                        {maintenanceIsActive ? (
+                          <>
+                            <Typography variant="h5">Requête en cours</Typography>
+                            <Typography noWrap style={{ width: 200 }}>
+                              {cohortCreation.request.requestName}
+                            </Typography>
+                          </>
+                        ) : (
+                          <>
+                            <Typography variant="h5">Requête en cours</Typography>
+                            <Typography noWrap style={{ width: 200 }}>
+                              {cohortCreation.request.requestName}
+                            </Typography>
+                          </>
+                        )}
                       </Button>
                     </Zoom>
                   ) : (
                     <Button
                       onClick={() => history.push('/cohort/new')}
-                      className={clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
+                      className={
+                        maintenanceIsActive
+                          ? clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)
+                          : clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)
+                      }
+                      disabled={maintenanceIsActive}
                     >
-                      <Typography variant="h5">Requête en cours</Typography>
-                      <Typography noWrap style={{ width: 200 }}>
-                        {cohortCreation.request.requestName}
-                      </Typography>
+                      {maintenanceIsActive ? (
+                        <>
+                          <Typography variant="h5">Requête en cours</Typography>
+                          <Typography noWrap style={{ width: 200 }}>
+                            {cohortCreation.request.requestName}
+                          </Typography>
+                        </>
+                      ) : (
+                        <>
+                          <Typography variant="h5">Requête en cours</Typography>
+                          <Typography noWrap style={{ width: 200 }}>
+                            {cohortCreation.request.requestName}
+                          </Typography>
+                        </>
+                      )}
                     </Button>
                   )}
                 </ListItem>

@@ -37,7 +37,7 @@ const AutoLogoutContainer = () => {
   const onIdle = () => {
     setDialogIsOpen(true)
     // console.log('User inactif depuis 10 secondes')
-    sessionInactifTimerRef.current = setTimeout(logout, 30 * 1000)
+    sessionInactifTimerRef.current = setTimeout(logout, 2 * 30 * 1000)
   }
 
   const stayActive = async () => {

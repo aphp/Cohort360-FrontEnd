@@ -11,9 +11,9 @@ import VersionRow from '../VersionRow/VersionRow'
 
 import { RequestType, Cohort } from 'types'
 
-import { useAppDispatch } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import { setSelectedRequest } from 'state/request'
-
+import { MeState } from 'state/me'
 import useStyles from '../styles'
 
 type RequestRowProps = {
@@ -27,6 +27,13 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
   const [open, setOpen] = React.useState(false)
   const classes = useStyles()
   const dispatch = useAppDispatch()
+
+  const { meState } = useAppSelector<{
+    meState: MeState
+  }>((state) => ({
+    meState: state.me
+  }))
+  const maintenanceIsActive = meState?.maintenance?.active
 
   const onEditRequest = (requestId: string) => {
     dispatch<any>(setSelectedRequest({ uuid: requestId, name: '' }))
@@ -68,7 +75,12 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
           <TableCell className={classes.tdName}>
             <Link href={`/cohort/new/${row.uuid}`}>{row.name}</Link>
             <Tooltip title="Modifier la requête">
-              <IconButton className={classes.editButton} size="small" onClick={() => onEditRequest(row.uuid)}>
+              <IconButton
+                className={classes.editButon}
+                size="small"
+                onClick={() => onEditRequest(row.uuid)}
+                disabled={maintenanceIsActive}
+              >
                 <EditIcon />
               </IconButton>
             </Tooltip>

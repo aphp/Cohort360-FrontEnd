@@ -96,7 +96,7 @@ const Login = () => {
     localforage.setItem('persist:root', '')
   }, [])
 
-  const getPractitionerData = async (practitioner, lastConnection) => {
+  const getPractitionerData = async (practitioner, lastConnection, maintenance) => {
     if (practitioner) {
       const practitionerPerimeters = await services.perimeters.getPerimeters()
       if (practitionerPerimeters.length === 0) {
@@ -123,7 +123,8 @@ const Login = () => {
           ...practitioner,
           nominativeGroupsIds,
           deidentified: nominativeGroupsIds.length === 0,
-          lastConnection
+          lastConnection,
+          maintenance
         })
       )
 
@@ -151,7 +152,6 @@ const Login = () => {
         setLoading(false)
         return setErrorLogin(true)
       }
-
       const { status, data = {} } = response
 
       if (status === 200) {
@@ -160,7 +160,10 @@ const Login = () => {
 
         const practitioner = await services.practitioner.fetchPractitioner(username)
         const lastConnection = data.last_connection ? data.last_connection.modified_at : undefined
-        getPractitionerData(practitioner, lastConnection)
+
+        const maintenanceResponse = await services.practitioner.maintenance()
+        const maintenance = maintenanceResponse.data
+        getPractitionerData(practitioner, lastConnection, maintenance)
       } else {
         setLoading(false)
         return setErrorLogin(true)
