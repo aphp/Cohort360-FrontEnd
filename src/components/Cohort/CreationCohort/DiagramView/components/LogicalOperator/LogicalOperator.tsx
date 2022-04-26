@@ -200,19 +200,19 @@ const LogicalOperator: React.FC = () => {
 
   const _addNewGroup = async (parentId: number) => {
     // Add new group
+    const currentParent = request.criteriaGroup ? request.criteriaGroup.find(({ id }) => id === parentId) : null
+    if (!currentParent) return
     const nextGroupId = request.nextGroupId
     const newOperator: CriteriaGroupType = {
       id: nextGroupId,
       title: `Nouveau opérateur logique ${nextGroupId * -1}`,
-      type: 'orGroup',
+      type: currentParent.type === 'orGroup' ? 'andGroup' : 'orGroup',
       criteriaIds: [],
       isSubGroup: parentId === 0 ? false : true,
       isInclusive: true
     }
     await dispatch<any>(addNewCriteriaGroup(newOperator))
     // Edit parent and add nextGroupId inside criteriaIds
-    const currentParent = request.criteriaGroup ? request.criteriaGroup.find(({ id }) => id === parentId) : null
-    if (!currentParent) return
     await dispatch<any>(
       editCriteriaGroup({
         ...currentParent,
