@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 
-import { Button, Grid, Typography } from '@material-ui/core'
+import Grid from '@material-ui/core/Grid'
 import { Alert } from '@material-ui/lab'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import { InputSearchDocumentSimple, InputSearchDocumentRegex, InputSearchDocumentButton } from 'components/Inputs'
 import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
+import DataTableTopBar from 'components/DataTable/DataTableTopBar'
 import MasterChips from 'components/MasterChips/MasterChips'
 
 import { Order, DocumentFilters } from 'types'
@@ -54,15 +54,10 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   })
 
   const [searchMode, setSearchMode] = useState(false)
-  const [open, setOpen] = useState<'filter' | string | null>(null)
+  const [open, setOpen] = useState<'filter' | null>(null)
 
-  const [inputMode, setInputMode] = useState<'simple' | 'regex'>('simple')
-
-  const fetchDocumentsList = async (page: number, input = searchInput) => {
+  const fetchDocumentsList = async (page: number) => {
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
-
-    if (inputMode === 'regex') input = `/${input}/`
-
     dispatch<any>(
       fetchDocuments({
         groupId,
@@ -74,7 +69,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
           },
           filters: {
             ...filters,
-            searchInput: input,
+            searchInput,
             selectedDocTypes: selectedDocTypesCodes
           }
         }
@@ -91,7 +86,15 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
 
   useEffect(() => {
     handleChangePage()
-  }, [filters.nda, filters.selectedDocTypes, filters.startDate, filters.endDate, order.orderBy, order.orderDirection]) // eslint-disable-line
+  }, [
+    searchInput,
+    filters.nda,
+    filters.selectedDocTypes,
+    filters.startDate,
+    filters.endDate,
+    order.orderBy,
+    order.orderDirection
+  ]) // eslint-disable-line
 
   const onChangeOptions = (key: string, value: any) => {
     setFilters((prevState) => ({
@@ -141,42 +144,22 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
 
   return (
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
-      <Grid container justifyContent="space-between" alignItems="center">
-        <Typography variant="button">
-          {totalDocs} / {totalAllDoc} document(s)
-        </Typography>
-        <Grid container direction="row" alignItems="center" className={classes.filterAndSort}>
-          <div className={classes.documentButtons}>
-            <Button
-              variant="contained"
-              disableElevation
-              startIcon={<FilterList height="15px" fill="#FFF" />}
-              className={classes.searchButton}
-              onClick={() => setOpen('filter')}
-            >
-              Filtrer
-            </Button>
-
-            <InputSearchDocumentButton currentMode={inputMode} onChangeMode={setInputMode} />
-          </div>
-        </Grid>
-      </Grid>
-
-      {inputMode === 'simple' && (
-        <InputSearchDocumentSimple
-          defaultSearchInput={searchInput}
-          setDefaultSearchInput={(newSearchInput: string) => setSearchInput(newSearchInput)}
-          onSearchDocument={(newInputText: string) => fetchDocumentsList(1, newInputText)}
-        />
-      )}
-
-      {inputMode === 'regex' && (
-        <InputSearchDocumentRegex
-          defaultSearchInput={searchInput}
-          setDefaultSearchInput={(newSearchInput: string) => setSearchInput(newSearchInput)}
-          onSearchDocument={(newInputText: string) => fetchDocumentsList(1, newInputText)}
-        />
-      )}
+      <DataTableTopBar
+        results={{ nb: totalDocs, total: totalAllDoc, label: 'document(s)' }}
+        searchBar={{
+          type: 'document',
+          value: searchInput,
+          onSearch: (newSearchInput: string) =>
+            setSearchInput(newSearchInput ? newSearchInput.replace(/^\/|\/$/gi, '') : '')
+        }}
+        buttons={[
+          {
+            label: 'Filtrer',
+            icon: <FilterList height="15px" fill="#FFF" />,
+            onClick: () => setOpen('filter')
+          }
+        ]}
+      />
 
       <MasterChips chips={buildDocumentFiltersChips(filters, handleDeleteChip)} />
 

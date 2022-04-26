@@ -235,6 +235,10 @@ const getStatusShip = (type?: CompositionStatusKind | DocumentReferenceStatusKin
     return (
       <Chip
         className={classes.validChip}
+        style={{
+          width: 95,
+          height: 20
+        }}
         icon={<CheckIcon height="15px" fill="#FFF" />}
         label={getDocumentStatus(type)}
       />
@@ -243,6 +247,10 @@ const getStatusShip = (type?: CompositionStatusKind | DocumentReferenceStatusKin
     return (
       <Chip
         className={classes.cancelledChip}
+        style={{
+          width: 95,
+          height: 20
+        }}
         icon={<CancelIcon height="15px" fill="#FFF" />}
         label={getDocumentStatus(type)}
       />

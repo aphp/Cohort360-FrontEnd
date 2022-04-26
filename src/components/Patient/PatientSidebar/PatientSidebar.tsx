@@ -88,8 +88,8 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
     setSearchInput(event.target.value)
   }
 
-  const onKeyDown = (e: { keyCode: number; preventDefault: () => void }) => {
-    if (e.keyCode === 13) {
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    if (e.key === 'Enter') {
       e.preventDefault()
       onSearchPatient(sort)
     }

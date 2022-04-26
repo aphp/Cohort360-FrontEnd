@@ -59,7 +59,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   }
 
   const onKeyDown = async (event: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    if (event.keyCode === 13) {
+    if (event.key === 'Enter') {
       event.preventDefault()
       if (!_searchInput) return
       if (location.pathname === '/accueil') {

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { ReactNode, ReactElement } from 'react'
 import {
   IComposition,
   IPatient,
@@ -622,4 +622,32 @@ export type IPatientObservation<T extends CohortObservation> = {
       direction: string
     }
   }
+}
+
+// DataTableTopBarProps
+export type DTTB_TabsType = {
+  value: any
+  onChange: (event: any, newValue?: any) => void
+  list: {
+    label: string
+    value: any
+    icon?: ReactElement
+    wrapped?: boolean
+  }[]
+}
+export type DTTB_ResultsType = {
+  nb: number
+  total: number
+  label?: string
+}
+export type DTTB_SearchBarType = {
+  type: 'simple' | 'patient' | 'document'
+  value: string
+  onSearch: (newSearch: string, newSearchBy?: SearchByTypes) => void
+  searchBy?: any
+}
+export type DTTB_ButtonType = {
+  label: string
+  icon?: ReactElement
+  onClick: (args?: any) => void
 }

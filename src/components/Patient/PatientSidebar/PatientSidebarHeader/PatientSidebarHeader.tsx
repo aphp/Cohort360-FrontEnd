@@ -33,7 +33,7 @@ type PatientSidebarHeaderTypes = {
   onChangeFilters: (newFilters: PatientFiltersType) => void
   searchInput: string
   onChangeSearchInput: (event: { target: { value: React.SetStateAction<string> } }) => void
-  onKeyDownSearchInput: (e: { keyCode: number; preventDefault: () => void }) => void
+  onKeyDownSearchInput: (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => void
   onSearchPatient: () => void
   onCloseButtonClick: () => void
   onClickSortButton: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void

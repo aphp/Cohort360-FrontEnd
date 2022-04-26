@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react'
 
-import { Button, Grid, IconButton, InputAdornment, InputBase, Tab, Tabs, Typography } from '@material-ui/core'
+import Grid from '@material-ui/core/Grid'
 
-import ClearIcon from '@material-ui/icons/Clear'
-import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import MedicationFilters from 'components/Filters/MedicationFilters/MedicationFilters'
 import DataTableMedication from 'components/DataTable/DataTableMedication'
+import DataTableTopBar from 'components/DataTable/DataTableTopBar'
 import MasterChips from 'components/MasterChips/MasterChips'
 
 import { MedicationsFilters, Order } from 'types'
@@ -84,11 +83,6 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
     )
   }
 
-  const handleClearInput = () => {
-    setSearchInput('')
-    handleChangePage()
-  }
-
   const handleChangePage = (value?: number) => {
     setPage(value ? value : 1)
     _fetchMedication(value ? value : 1)
@@ -109,16 +103,9 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
     }
   }
 
-  const onKeyDown = async (e: { keyCode: number; preventDefault: () => void }) => {
-    if (e.keyCode === 13) {
-      e.preventDefault()
-      handleChangePage()
-    }
-  }
-
   useEffect(() => {
     handleChangePage()
-  }, [filter, order]) // eslint-disable-line
+  }, [filter, order, searchInput]) // eslint-disable-line
 
   useEffect(() => {
     setSearchInput('')
@@ -144,77 +131,33 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
 
   return (
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
-      <Grid item container justifyContent="space-between" alignItems="center" className={classes.filterAndSort}>
-        <Tabs
-          classes={{
-            root: classes.root,
-            indicator: classes.indicator
-          }}
-          value={selectedTab}
-          onChange={(event, value) => selectTab(value)}
-        >
-          <Tab
-            classes={{ selected: classes.selected }}
-            className={classes.tabTitle}
-            label="Prescription"
-            value="prescription"
-          />
-          <Tab
-            classes={{ selected: classes.selected }}
-            className={classes.tabTitle}
-            label="Administration"
-            value="administration"
-          />
-        </Tabs>
-        <Typography variant="button">
-          {totalMedication || 0} /{' '}
-          {selectedTab === 'prescription'
-            ? `${totalAllMedication ?? 0} prescription(s)`
-            : `${totalAllMedication ?? 0} administration(s)`}
-        </Typography>
-        <div className={classes.documentButtons}>
-          <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
-            <InputBase
-              placeholder="Rechercher"
-              className={classes.input}
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-              onKeyDown={onKeyDown}
-              endAdornment={
-                <InputAdornment position="end">
-                  {searchInput && (
-                    <IconButton onClick={handleClearInput}>
-                      <ClearIcon />
-                    </IconButton>
-                  )}
-                </InputAdornment>
-              }
-            />
-            <IconButton type="submit" aria-label="search" onClick={() => handleChangePage()}>
-              <SearchIcon fill="#ED6D91" height="15px" />
-            </IconButton>
-          </Grid>
-          <Button
-            variant="contained"
-            disableElevation
-            startIcon={<FilterList height="15px" fill="#FFF" />}
-            className={classes.searchButton}
-            onClick={() => setOpen('filter')}
-          >
-            Filtrer
-          </Button>
-
-          <MedicationFilters
-            open={open === 'filter'}
-            onClose={() => setOpen(null)}
-            deidentified={deidentifiedBoolean}
-            showPrescriptionTypes={selectedTab === 'prescription'}
-            showAdministrationRoutes={selectedTab === 'administration'}
-            filters={filter}
-            setFilters={setFilter}
-          />
-        </div>
-      </Grid>
+      <DataTableTopBar
+        tabs={{
+          list: [
+            { label: 'Prescription', value: 'prescription' },
+            { label: 'Administration', value: 'administration' }
+          ],
+          value: selectedTab,
+          onChange: (event: any, newTab?: any) => selectTab(newTab)
+        }}
+        results={{
+          nb: totalMedication,
+          total: totalAllMedication,
+          label: selectedTab === 'prescription' ? `prescription(s)` : `administration(s)`
+        }}
+        searchBar={{
+          type: 'simple',
+          value: searchInput,
+          onSearch: (newSearchInput: string) => setSearchInput(newSearchInput)
+        }}
+        buttons={[
+          {
+            label: 'Filtrer',
+            icon: <FilterList height="15px" fill="#FFF" />,
+            onClick: () => setOpen('filter')
+          }
+        ]}
+      />
 
       <MasterChips chips={buildMedicationFiltersChips(filter, handleDeleteChip)} />
 
@@ -228,6 +171,16 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
         page={page}
         setPage={(newPage) => handleChangePage(newPage)}
         total={totalMedication}
+      />
+
+      <MedicationFilters
+        open={open === 'filter'}
+        onClose={() => setOpen(null)}
+        deidentified={deidentifiedBoolean}
+        showPrescriptionTypes={selectedTab === 'prescription'}
+        showAdministrationRoutes={selectedTab === 'administration'}
+        filters={filter}
+        setFilters={setFilter}
       />
     </Grid>
   )

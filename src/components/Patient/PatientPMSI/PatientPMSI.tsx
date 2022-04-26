@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react'
 
-import { Button, Grid, IconButton, InputAdornment, InputBase, Tab, Tabs, Typography } from '@material-ui/core'
+import { Grid } from '@material-ui/core'
 
-import ClearIcon from '@material-ui/icons/Clear'
-import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import ModalPMSIFilters from 'components/Filters/PMSIFilters/PMSIFilters'
 import DataTablePmsi from 'components/DataTable/DataTablePmsi'
+import DataTableTopBar from 'components/DataTable/DataTableTopBar'
 import MasterChips from 'components/MasterChips/MasterChips'
 
 import { buildPmsiFiltersChips } from 'utils/chips'
@@ -135,25 +134,10 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
     }
   }
 
-  const onSearchPMSI = async () => {
-    handleChangePage()
-  }
-
-  const onKeyDown = async (e: { keyCode: number; preventDefault: () => void }) => {
-    if (e.keyCode === 13) {
-      e.preventDefault()
-      onSearchPMSI()
-    }
-  }
-
-  const handleClearInput = () => {
-    onChangeOptions('searchInput', '')
-    handleChangePage()
-  }
-
   useEffect(() => {
     handleChangePage()
   }, [
+    filters.searchInput,
     filters.nda,
     filters.code,
     filters.startDate,
@@ -190,78 +174,34 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
 
   return (
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
-      <Grid item container justifyContent="space-between" alignItems="center" className={classes.filterAndSort}>
-        <Tabs
-          classes={{
-            root: classes.root,
-            indicator: classes.indicator
-          }}
-          value={selectedTab}
-          onChange={(event, value) => selectTab(value)}
-        >
-          <Tab
-            classes={{ selected: classes.selected }}
-            className={classes.tabTitle}
-            label="Diagnostics CIM10"
-            value="diagnostic"
-          />
-          <Tab classes={{ selected: classes.selected }} className={classes.tabTitle} label="Actes CCAM" value="ccam" />
-          <Tab classes={{ selected: classes.selected }} className={classes.tabTitle} label="GHM" value="ghm" />
-        </Tabs>
-
-        <Typography variant="button">
-          {`${totalPmsi || 0} / ${totalAllPmsi} ${
-            selectedTab !== 'diagnostic' ? (selectedTab !== 'ccam' ? 'ghm' : 'acte(s)') : 'diagnostic(s)'
-          }`}
-        </Typography>
-
-        <div className={classes.documentButtons}>
-          <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
-            <InputBase
-              placeholder="Rechercher"
-              className={classes.input}
-              value={filters.searchInput}
-              onChange={(event) => onChangeOptions('searchInput', event.target.value)}
-              onKeyDown={onKeyDown}
-              endAdornment={
-                <InputAdornment position="end">
-                  {filters.searchInput && (
-                    <IconButton onClick={handleClearInput}>
-                      <ClearIcon />
-                    </IconButton>
-                  )}
-                </InputAdornment>
-              }
-            />
-            <IconButton type="submit" aria-label="search" onClick={onSearchPMSI}>
-              <SearchIcon fill="#ED6D91" height="15px" />
-            </IconButton>
-          </Grid>
-          <Button
-            variant="contained"
-            disableElevation
-            startIcon={<FilterList height="15px" fill="#FFF" />}
-            className={classes.searchButton}
-            onClick={() => setOpen(true)}
-          >
-            Filtrer
-          </Button>
-
-          <ModalPMSIFilters
-            open={open}
-            onClose={() => setOpen(false)}
-            deidentified={deidentifiedBoolean}
-            showDiagnosticTypes={selectedTab === 'diagnostic'}
-            filters={filters}
-            setFilters={(newFilters) =>
-              setFilters({
-                searchInput: filters.searchInput,
-                ...newFilters
-              })
-            }
-          />
-        </div>
-      </Grid>
+      <DataTableTopBar
+        tabs={{
+          list: [
+            { label: 'Diagnostics CIM10', value: 'diagnostic' },
+            { label: 'Actes CCAM', value: 'ccam' },
+            { label: 'GHM', value: 'ghm' }
+          ],
+          value: selectedTab,
+          onChange: (event: any, newTab?: any) => selectTab(newTab)
+        }}
+        results={{
+          nb: totalPmsi,
+          total: totalAllPmsi,
+          label: selectedTab === 'diagnostic' ? 'diagnostic(s)' : selectedTab === 'ccam' ? 'ccam' : 'ghm'
+        }}
+        searchBar={{
+          type: 'simple',
+          value: filters.searchInput,
+          onSearch: (newSearchInput: string) => onChangeOptions('searchInput', newSearchInput)
+        }}
+        buttons={[
+          {
+            label: 'Filtrer',
+            icon: <FilterList height="15px" fill="#FFF" />,
+            onClick: () => setOpen(true)
+          }
+        ]}
+      />
 
       <MasterChips chips={buildPmsiFiltersChips(filters as PMSIFilters, handleDeleteChip)} />
 
@@ -275,6 +215,20 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
         page={page}
         setPage={(newPage) => handleChangePage(newPage)}
         total={totalPmsi}
+      />
+
+      <ModalPMSIFilters
+        open={open}
+        onClose={() => setOpen(false)}
+        deidentified={deidentifiedBoolean}
+        showDiagnosticTypes={selectedTab === 'diagnostic'}
+        filters={filters}
+        setFilters={(newFilters) =>
+          setFilters({
+            searchInput: filters.searchInput,
+            ...newFilters
+          })
+        }
       />
     </Grid>
   )

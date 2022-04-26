@@ -13,6 +13,7 @@ export const getAgeArkhn = (birthDate: Date, deathOrTodayDate = new Date()) => {
 }
 
 export const getAgeAphp = (ageObj: any) => {
+  if (!ageObj) return 'Âge inconnu'
   let ageUnit: 'year' | 'month' | 'day' = 'year'
   let ageUnitDisplay = ''
   const momentAge = moment().subtract(ageObj.valueInteger, 'days')

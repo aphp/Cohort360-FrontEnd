@@ -137,7 +137,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   }
 
   const onKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    if (e.keyCode === 13) {
+    if (e.key === 'Enter') {
       e.preventDefault()
       onFetchCohorts(sortBy, sortDirection)
     }
