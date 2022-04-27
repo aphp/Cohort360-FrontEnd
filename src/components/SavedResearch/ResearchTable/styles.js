@@ -15,12 +15,6 @@ const useStyles = makeStyles(() => ({
     color: '#0063AF',
     padding: '0 20px'
   },
-  tableBodyRows: {
-    height: '80px',
-    '&:nth-of-type(even)': {
-      backgroundColor: '#f4F2F2'
-    }
-  },
   status: {
     fontSize: '12px',
     fontWeight: 'bold'

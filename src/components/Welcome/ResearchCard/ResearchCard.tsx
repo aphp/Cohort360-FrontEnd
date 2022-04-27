@@ -1,7 +1,6 @@
 import React from 'react'
-import { Grid, Link, CircularProgress } from '@material-ui/core'
+import { Grid, Link, CircularProgress, Typography } from '@material-ui/core'
 
-import Title from 'components/Title'
 import ResearchTable from 'components/SavedResearch/ResearchTable/ResearchTable'
 import RequestsTable from 'components/SavedResearch/ResearchTable/RequestsTable'
 
@@ -48,7 +47,9 @@ const ResearchCard: React.FC<ResearchCardProps> = ({
     <>
       <Grid container spacing={3}>
         <Grid id="research-card-title" item xs={9}>
-          <Title>{title}</Title>
+          <Typography component="h2" variant="h2" color="primary" gutterBottom>
+            {title}
+          </Typography>
         </Grid>
         <Grid item container xs={3} justifyContent="flex-end">
           <Link underline="always" className={classes.link} onClick={onClickLink}>

@@ -26,17 +26,6 @@ const useStyles = makeStyles(() => ({
     width: 150,
     margin: 0
   },
-  inputText: {
-    border: '1px solid #D7DAE3',
-    borderRadius: '20px',
-    padding: '0.5em',
-    '& > input[type=number]::-webkit-inner-spin-button': {
-      '-webkit-appearance': 'none'
-    },
-    '& > input[type=number]::-webkit-outer-spin-button': {
-      '-webkit-appearance': 'none'
-    }
-  },
   inputTextError: {
     borderColor: '#c61137',
     color: '#fc1847'

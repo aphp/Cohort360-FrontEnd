@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles'
-import { smallDrawerWidth, largeDrawerWidth } from 'components/LeftSideBar/LeftSideBar'
+import { smallDrawerWidth, largeDrawerWidth } from 'components/Routes/LeftSideBar/LeftSideBar'
 
 export default makeStyles((theme) => ({
   appBar: {
@@ -41,13 +41,5 @@ export default makeStyles((theme) => ({
   },
   selected: {
     color: '#0063AF'
-  },
-  loading: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%'
-  },
-  alert: {
-    marginLeft: '50px'
   }
 }))

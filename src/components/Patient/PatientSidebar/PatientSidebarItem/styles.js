@@ -18,16 +18,8 @@ export default makeStyles({
   genderIconContainer: {
     minWidth: '32px'
   },
-  deceasedChip: {
+  chip: {
     fontSize: '11px',
-    backgroundColor: '#D0D7D8',
-    color: '#FFF',
-    fontWeight: 'bold',
-    marginRight: '16px'
-  },
-  aliveChip: {
-    fontSize: '11px',
-    backgroundColor: '#5BC5F2',
     color: '#FFF',
     fontWeight: 'bold',
     marginRight: '16px'

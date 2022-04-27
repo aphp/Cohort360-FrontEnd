@@ -26,7 +26,8 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#FFF',
     border: '1px solid #c4c4c4',
     padding: 8,
-    borderRadius: 25
+    borderRadius: 25,
+    marginBlock: 4
   },
   gridAdvancedSearchSqared: {
     backgroundColor: '#FFF',
@@ -49,16 +50,24 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonContainer: {
     borderRadius: 25,
-    '& > button:first-child': {
-      borderRadius: '25px 0 0 25px',
+    height: 41,
+    '& > button': {
       backgroundColor: '#5BC5F2',
       color: 'white'
     },
-    '& > button:last-child': {
-      borderRadius: '0 25px 25px 0',
-      borderRadiusRightBottom: 25,
+    '&:focus > button': {
       backgroundColor: '#5BC5F2',
       color: 'white'
+    },
+    '&:hover > button': {
+      backgroundColor: '#5BC5F2',
+      color: 'white'
+    },
+    '& > button:first-child': {
+      borderRadius: '25px 0 0 25px'
+    },
+    '& > button:last-child': {
+      borderRadius: '0 25px 25px 0'
     }
   }
 }))

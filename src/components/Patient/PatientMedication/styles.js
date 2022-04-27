@@ -47,54 +47,8 @@ export default makeStyles((theme) =>
     selected: {
       backgroundColor: '#0063AF'
     },
-    table: {
-      minWidth: 650
-    },
-    tableHead: {
-      height: 42,
-      backgroundColor: '#D1E2F4',
-      textTransform: 'uppercase'
-    },
-    tableHeadCell: {
-      fontSize: 11,
-      fontWeight: 'bold',
-      color: '#0063AF',
-      padding: '0 20px'
-    },
-    tableBodyRows: {
-      height: '80px',
-      '&:nth-of-type(even)': {
-        backgroundColor: '#FAF9F9'
-      }
-    },
-    libelle: {
-      fontWeight: 'bold'
-    },
-    pagination: {
-      margin: '10px 0',
-      float: 'right',
-      '& button': {
-        backgroundColor: '#fff',
-        color: '#5BC5F2'
-      },
-      '& .MuiPaginationItem-page.Mui-selected': {
-        color: '#0063AF',
-        backgroundColor: '#FFF'
-      }
-    },
-    chips: {
-      margin: '12px 6px',
-      '&:last-child': {
-        marginRight: 0
-      }
-    },
     filterAndSort: {
       '& > *': { marginBottom: 5 }
-    },
-    emptyTableRow: {
-      minHeight: `calc(100vh - 500px)`,
-      height: `calc(100vh - 500px)`,
-      maxHeight: `calc(100vh - 500px)`
     }
   })
 )

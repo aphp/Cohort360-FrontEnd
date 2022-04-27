@@ -29,11 +29,10 @@ import useStyles from './styles'
 type CohortsFiltersProps = {
   open: boolean
   onClose: () => void
-  onSubmit: () => void
   filters: CohortFilters
   onChangeFilters: (filters: CohortFilters) => void
 }
-const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmit, filters, onChangeFilters }) => {
+const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters, onChangeFilters }) => {
   const classes = useStyles()
 
   const [_status, setStatus] = useState<ValueSet[]>(filters.status)
@@ -127,7 +126,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, onSubmi
       startDate: newStartDate,
       endDate: newEndDate
     })
-    onSubmit()
+    onClose()
   }
 
   return (

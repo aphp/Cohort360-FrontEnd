@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import { RootState } from 'state'
 
-import { fetchBiologyHierarchy } from 'services/cohortCreation/fetchObservation'
+import services from 'services'
 
 export type BiologyListType = {
   id: string
@@ -32,7 +32,7 @@ const initBiologyHierarchy = createAsyncThunk<BiologyState, void, { state: RootS
       let biologyList: BiologyListType[] = []
 
       if (list && list.length === 0) {
-        biologyList = await fetchBiologyHierarchy()
+        biologyList = await services.cohortCreation.fetchBiologyHierarchy()
       }
 
       return {
@@ -51,7 +51,7 @@ const fetchBiology = createAsyncThunk<BiologyState, void, { state: RootState }>(
   'biology/fetchBiology',
   async (DO_NOT_USE, { getState }) => {
     const state = getState().biology
-    const biologyList: BiologyListType[] = await fetchBiologyHierarchy()
+    const biologyList: BiologyListType[] = await services.cohortCreation.fetchBiologyHierarchy()
 
     return {
       ...state,
@@ -91,7 +91,7 @@ const expandBiologyElement = createAsyncThunk<BiologyState, ExpandBiologyElement
             const foundItem = item.subItems ? item.subItems.find((i: any) => i.id === 'loading') : true
             if (foundItem) {
               let subItems: BiologyListType[] = []
-              subItems = await fetchBiologyHierarchy(item.id)
+              subItems = await services.cohortCreation.fetchBiologyHierarchy(item.id)
 
               item = { ...item, subItems: subItems }
             }

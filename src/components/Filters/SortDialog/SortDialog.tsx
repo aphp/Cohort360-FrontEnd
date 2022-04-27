@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import {
   Button,
@@ -8,12 +8,14 @@ import {
   DialogTitle,
   FormControlLabel,
   Grid,
+  MenuItem,
   Radio,
   RadioGroup,
-  TextField,
+  Select,
   Typography
 } from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+
+import { Sort } from 'types'
 
 import useStyles from './styles'
 
@@ -21,36 +23,24 @@ type SortDialogProps = {
   open: boolean
   onClose: () => void
   onSubmit: () => void
-  sortBy: string
-  sortOptions: { label: string; code: string }[]
-  onChangeSortBy: any
-  sortDirection: 'asc' | 'desc'
-  onChangeSortDirection: any
+  sort: Sort
+  onChangeSort: (sort: Sort) => void
 }
-const SortDialog: React.FC<SortDialogProps> = ({
-  open,
-  onClose,
-  onSubmit,
-  sortBy,
-  sortOptions,
-  onChangeSortBy,
-  sortDirection,
-  onChangeSortDirection
-}) => {
+
+const sortOptions = [
+  { label: 'Sexe', code: 'gender' },
+  { label: 'Prénom', code: 'given' },
+  { label: 'Nom', code: 'family' },
+  { label: 'Date de Naissance', code: 'birthdate' }
+]
+
+const SortDialog: React.FC<SortDialogProps> = ({ open, onClose, onSubmit, sort, onChangeSort }) => {
   const classes = useStyles()
+  const [_sort, setSort] = useState(sort)
 
-  const _onChangeSortBy = (
-    event: React.ChangeEvent<{}>,
-    value: {
-      label: string
-      code: string
-    } | null
-  ) => {
-    onChangeSortBy(value?.code)
-  }
-
-  const _onChangeSortDirection = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    onChangeSortDirection(value)
+  const _onSubmit = () => {
+    onChangeSort(_sort)
+    onSubmit()
   }
 
   return (
@@ -58,17 +48,29 @@ const SortDialog: React.FC<SortDialogProps> = ({
       <DialogTitle className={classes.title}>Trier par :</DialogTitle>
       <DialogContent className={classes.dialog}>
         <Grid container direction="row" justifyContent="space-between">
-          <Autocomplete
-            options={sortOptions}
-            getOptionLabel={(option) => option.label}
-            value={sortOptions.find((value) => value.code === sortBy)}
-            renderInput={(params) => <TextField {...params} label="Trier par :" variant="outlined" />}
-            onChange={_onChangeSortBy}
+          <Select
+            value={_sort.sortBy}
+            onChange={(
+              event: React.ChangeEvent<{
+                name?: string | undefined
+                value: unknown
+              }>
+            ) => setSort({ ..._sort, sortBy: event.target.value as string })}
             className={classes.autocomplete}
-          />
+          >
+            {sortOptions.map((option) => (
+              <MenuItem key={option.code} value={option.code}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
           <div className={classes.orderBy}>
             <Typography variant="button">Ordre :</Typography>
-            <RadioGroup value={sortDirection} onChange={_onChangeSortDirection} classes={{ root: classes.radioGroup }}>
+            <RadioGroup
+              value={_sort.sortDirection}
+              onChange={(event, value) => setSort({ ..._sort, sortDirection: value as 'asc' | 'desc' })}
+              classes={{ root: classes.radioGroup }}
+            >
               <FormControlLabel value="asc" control={<Radio />} label="Croissant" />
               <FormControlLabel value="desc" control={<Radio />} label="Décroissant" />
             </RadioGroup>
@@ -79,7 +81,7 @@ const SortDialog: React.FC<SortDialogProps> = ({
         <Button onClick={onClose} color="primary">
           Annuler
         </Button>
-        <Button onClick={onSubmit} color="primary">
+        <Button onClick={_onSubmit} color="primary">
           Valider
         </Button>
       </DialogActions>
