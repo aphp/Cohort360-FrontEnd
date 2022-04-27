@@ -583,8 +583,8 @@ export function buildRequest(
       ? undefined
       : {
           _id: 0,
-          _type: 'andGroup',
-          isInclusive: true,
+          _type: mainCriteriaGroups.type === 'orGroup' ? 'orGroup' : 'andGroup',
+          isInclusive: !!mainCriteriaGroups.isInclusive,
           criteria: exploreCriteriaGroup(mainCriteriaGroups.criteriaIds),
           temporalConstraints: temporalConstraints.filter(({ constraintType }) => constraintType !== 'none')
         }
@@ -687,7 +687,6 @@ export async function unbuildRequest(_json: string) {
                   { id: 'day', label: 'jours' }
                 ]
 
-                //inverser ici
                 if (value?.search('le') === 0) {
                   const date = value?.replace('le', '') ? moment().subtract(value?.replace('le', ''), 'days') : null
                   const diff = date ? moment().diff(date, 'days') : 0
@@ -702,7 +701,6 @@ export async function unbuildRequest(_json: string) {
                   const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
                   currentCriterion.ageType = foundAgeType
                   if (date) currentCriterion.years[1] = moment().diff(date, currentAgeType) || 130
-                  // inverser ici aussi
                 } else if (value?.search('ge') === 0) {
                   const date = value?.replace('ge', '')
                     ? moment().subtract(+value?.replace('ge', '') + 1, 'days')
