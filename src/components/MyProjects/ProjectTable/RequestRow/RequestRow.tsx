@@ -6,13 +6,15 @@ import { Checkbox, Collapse, IconButton, Link, Table, TableBody, TableCell, Tabl
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import EditIcon from '@material-ui/icons/Edit'
+import ShareIcon from '@material-ui/icons/Share'
 
 import VersionRow from '../VersionRow/VersionRow'
+import ModalShareRequest from '../../Modals/ModalShareRequest/ModalShareRequest'
 
 import { RequestType, Cohort } from 'types'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { setSelectedRequest } from 'state/request'
+import { setSelectedRequest, setSelectedRequestShare } from 'state/request'
 import { MeState } from 'state/me'
 import useStyles from '../styles'
 
@@ -37,6 +39,10 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
 
   const onEditRequest = (requestId: string) => {
     dispatch<any>(setSelectedRequest({ uuid: requestId, name: '' }))
+  }
+
+  const onShareRequest = (requestId: string) => {
+    dispatch<any>(setSelectedRequestShare({ uuid: requestId, name: '' }))
   }
 
   useEffect(() => {
@@ -84,7 +90,18 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
                 <EditIcon />
               </IconButton>
             </Tooltip>
+            <Tooltip title="Partager la requête">
+              <IconButton
+                className={classes.editButon}
+                size="small"
+                onClick={() => onShareRequest(row.uuid)}
+                disabled={maintenanceIsActive}
+              >
+                <ShareIcon />
+              </IconButton>
+            </Tooltip>
           </TableCell>
+
           <TableCell className={classes.dateCell} align="center">
             {moment(row.modified_at).format('DD/MM/YYYY [à] HH:mm')}
           </TableCell>

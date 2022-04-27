@@ -499,6 +499,7 @@ export type RequestType = {
   favorite?: boolean
   created_at?: string
   modified_at?: string
+  query_snapshots?: string[]
 }
 
 export type ContactSubmitForm = FormData

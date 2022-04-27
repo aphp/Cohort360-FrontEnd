@@ -10,6 +10,7 @@ export type RequestState = {
   loading: boolean
   count: number
   selectedRequest: RequestType | null
+  selectedRequestShare: RequestType | null
   requestsList: RequestType[]
 }
 
@@ -17,6 +18,7 @@ const defaultInitialState: RequestState = {
   loading: false,
   count: 0,
   selectedRequest: null,
+  selectedRequestShare: null,
   requestsList: []
 }
 
@@ -103,6 +105,38 @@ const addRequest = createAsyncThunk<AddRequestReturn, AddRequestParams, { state:
 )
 
 /**
+ * shareRequest
+ *
+ */
+type ShareRequestParams = {
+  sharedRequest: RequestType
+}
+type ShareRequestReturn = {
+  selectedRequestShare: null
+  requestsList: RequestType[]
+}
+
+const shareRequest = createAsyncThunk<ShareRequestReturn, ShareRequestParams, { state: RootState }>(
+  'request/shareRequest',
+  async ({ sharedRequest }, { getState }) => {
+    try {
+      const state = getState().request
+      const requestsList: RequestType[] = state.requestsList ?? []
+
+      const sendRequest = await services.projects.shareRequest(sharedRequest)
+
+      return {
+        selectedRequestShare: null,
+        requestsList: sendRequest !== null ? [...requestsList, sendRequest] : requestsList
+      }
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+)
+
+/**
  * editRequest
  *
  */
@@ -142,6 +176,7 @@ const editRequest = createAsyncThunk<EditRequestReturn, EditRequestParams, { sta
     }
   }
 )
+
 /**
  * deleteRequest
  *
@@ -302,6 +337,35 @@ const setRequestSlice = createSlice({
           }
         }
       }
+    },
+    setSelectedRequestShare: (state: RequestState, action: PayloadAction<RequestType | null>) => {
+      const requestsList: RequestType[] = state.requestsList ?? []
+      const selectedRequestShare = action.payload
+      const selectedRequestShareId = selectedRequestShare?.uuid
+
+      if (selectedRequestShare === null) {
+        return {
+          ...state,
+          selectedRequestShare: null
+        }
+      } else {
+        if (selectedRequestShareId) {
+          const foundItem = requestsList.find(({ uuid }) => uuid === selectedRequestShareId)
+          if (!foundItem) {
+            return state
+          } else {
+            const index = requestsList.indexOf(foundItem)
+            if (!index) {
+              return state
+            } else {
+              return {
+                ...state,
+                selectedRequestShare: requestsList[index]
+              }
+            }
+          }
+        }
+      }
     }
   },
   extraReducers: (builder) => {
@@ -319,6 +383,10 @@ const setRequestSlice = createSlice({
     builder.addCase(editRequest.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(editRequest.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
     builder.addCase(editRequest.rejected, (state) => ({ ...state, loading: false }))
+    // shareRequest
+    builder.addCase(shareRequest.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(shareRequest.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
+    builder.addCase(shareRequest.rejected, (state) => ({ ...state, loading: false }))
     // deleteRequest
     builder.addCase(deleteRequest.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(deleteRequest.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
@@ -335,5 +403,5 @@ const setRequestSlice = createSlice({
 })
 
 export default setRequestSlice.reducer
-export { fetchRequests, addRequest, editRequest, deleteRequest, moveRequests, deleteRequests }
-export const { clearRequest, setSelectedRequest } = setRequestSlice.actions
+export { fetchRequests, addRequest, editRequest, shareRequest, deleteRequest, moveRequests, deleteRequests }
+export const { clearRequest, setSelectedRequest, setSelectedRequestShare } = setRequestSlice.actions

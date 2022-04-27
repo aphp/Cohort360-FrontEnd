@@ -14,6 +14,7 @@ import ModalAddOrEditRequest from 'components/Cohort/CreationCohort/Modals/Modal
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
 import ModalMoveRequests from 'components/MyProjects/Modals/ModalMoveRequest/ModalMoveRequest'
 import ModalDeleteRequests from 'components/MyProjects/Modals/ModalDeleteRequests/ModalDeleteRequests'
+import ModalShareRequest from 'components/MyProjects/Modals/ModalShareRequest/ModalShareRequest'
 
 import { RequestType } from 'types'
 
@@ -47,7 +48,7 @@ const MyProjects = () => {
     meState: state.me
   }))
   const { selectedProject } = projectState
-  const { selectedRequest, requestsList } = requestState
+  const { selectedRequest, selectedRequestShare, requestsList } = requestState
   const { selectedCohort } = cohortState
   const maintenanceIsActive = meState?.maintenance?.active
 
@@ -223,6 +224,8 @@ const MyProjects = () => {
       />
 
       {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch<any>(setSelectedRequest(null))} />}
+      {selectedRequestShare !== null && console.log(selectedRequestShare)}
+      {selectedRequestShare !== null && console.log(selectedRequestShare?.query_snapshots)}
 
       <ModalEditCohort open={selectedCohort !== null} onClose={() => dispatch<any>(setSelectedCohort(null))} />
 
