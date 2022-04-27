@@ -50,12 +50,12 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
     {
       label: !deidentified ? 'Date de naissance' : 'Âge',
       code: 'birthdate',
-      align: 'left',
+      align: 'center',
       sortableColumn: !deidentified
     },
     { label: 'Dernier lieu de prise en charge', code: '', align: 'left', sortableColumn: false },
-    { label: 'Status vital', code: '', align: 'left', sortableColumn: false },
-    { label: `IPP${!deidentified ? '' : ' chiffré'}`, code: '', align: 'left', sortableColumn: false }
+    { label: 'Statut vital', code: '', align: 'left', sortableColumn: false },
+    { label: `IPP${!deidentified ? '' : ' chiffré'}`, code: '', align: 'center', sortableColumn: false }
   ]
 
   return (
@@ -135,16 +135,18 @@ const DataTablePatientLine: React.FC<{
           ? patient.extension.find((extension) => extension.url === 'last-visit-service-provider')?.valueString
           : 'Non renseigné'}
       </TableCell>
-      <TableCell>
+      <TableCell align="center">
         <StatusShip type={patient.deceasedDateTime ? 'Décédé' : 'Vivant'} />
       </TableCell>
 
       <TableCell align="center">
-        {deidentified
-          ? patient.id
-          : patient.identifier?.find((identifier) => identifier.type?.coding?.[0].code === 'IPP')?.value ??
-            patient.identifier?.[0].value ??
-            'IPP inconnnu'}
+        <Typography onClick={(event) => event.stopPropagation()}>
+          {deidentified
+            ? patient.id
+            : patient.identifier?.find((identifier) => identifier.type?.coding?.[0].code === 'IPP')?.value ??
+              patient.identifier?.[0].value ??
+              'IPP inconnnu'}
+        </Typography>
       </TableCell>
     </TableRow>
   )
