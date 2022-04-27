@@ -12,11 +12,11 @@ export const getAgeArkhn = (birthDate: Date, deathOrTodayDate = new Date()) => {
   return age
 }
 
-export const getAgeAphp = (ageObj: any) => {
+export const getAgeAphp = (ageObj: any, momentUnit: 'days' | 'months') => {
   if (!ageObj) return 'Âge inconnu'
   let ageUnit: 'year' | 'month' | 'day' = 'year'
   let ageUnitDisplay = ''
-  const momentAge = moment().subtract(ageObj.valueInteger, 'days')
+  const momentAge = moment().subtract(ageObj.valueInteger, momentUnit)
   const today = moment()
 
   if (today.diff(momentAge, 'year') > 0) {
@@ -38,7 +38,13 @@ export const getAgeAphp = (ageObj: any) => {
 export const getAge = (patient: CohortPatient): string => {
   if (CONTEXT === 'aphp') {
     if (patient.extension) {
-      return getAgeAphp(patient.extension.find((item) => item.url?.includes('Age(TotalDays)')))
+      const totalDays = patient.extension.find((item) => item.url?.includes('Age(TotalDays)'))
+      if (totalDays) {
+        return getAgeAphp(totalDays, 'days')
+      } else {
+        const totalMonths = patient.extension.find((item) => item.url?.includes('Age(TotalMonths)'))
+        return getAgeAphp(totalMonths, 'months')
+      }
     }
   } else if (CONTEXT === 'arkhn') {
     if (patient.birthDate) {
