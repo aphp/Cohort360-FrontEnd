@@ -16,8 +16,8 @@ const ProjectSearchBar: React.FC<ProjectSearchBarProps> = ({ setSearchInput }) =
 
   const [search, setSearch] = useState('')
 
-  const onKeyDown = async (e: any) => {
-    if (e.keyCode === 13) {
+  const onKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    if (e.key === 'Enter') {
       e.preventDefault()
       setSearchInput(search)
     }

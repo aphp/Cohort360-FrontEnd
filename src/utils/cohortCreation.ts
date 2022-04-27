@@ -5,7 +5,6 @@ import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstrai
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { docTypes } from 'assets/docTypes.json'
-import { fetchBiologyHierarchy } from 'services/cohortCreation/fetchObservation'
 
 const REQUETEUR_VERSION = 'v1.2.1'
 
@@ -1306,7 +1305,9 @@ export async function unbuildRequest(_json: string) {
                 // TODO: pas propre vvvv
                 if (currentCriterion.code.length === 1) {
                   try {
-                    const checkChildrenResp = await fetchBiologyHierarchy(currentCriterion.code?.[0].id)
+                    const checkChildrenResp = await services.cohortCreation.fetchBiologyHierarchy(
+                      currentCriterion.code?.[0].id
+                    )
 
                     if (checkChildrenResp.length === 0) {
                       currentCriterion.isLeaf = true

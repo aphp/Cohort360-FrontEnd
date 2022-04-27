@@ -6,7 +6,7 @@ import InfoIcon from '@material-ui/icons/Info'
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
-import DocumentSearchHelp from 'components/DocumentSearchHelp/DocumentSearchHelp'
+import DocumentSearchHelp from 'components/Inputs/InputSearchDocument/components/DocumentSearchHelp/DocumentSearchHelp'
 
 import useStyles from './styles'
 
@@ -48,7 +48,7 @@ const InputSearchDocumentSimple: React.FC<InputSearchDocumentSimpleProps> = ({
   }
 
   const onKeyDown = async (e: any) => {
-    if (e.keyCode === 13 && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       onSearchDocument(searchInput)
     }

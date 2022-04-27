@@ -32,7 +32,7 @@ import { ReactComponent as StarIcon } from 'assets/icones/star.svg'
 import { ReactComponent as StarFullIcon } from 'assets/icones/star full.svg'
 import MoreButton from '@material-ui/icons/MoreVert'
 
-import ExportModal from 'components/Cohort/ExportModal/ExportModal'
+import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
 
 import { useAppSelector, useAppDispatch } from 'state'
