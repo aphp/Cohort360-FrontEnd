@@ -355,12 +355,12 @@ const setRequestSlice = createSlice({
             return state
           } else {
             const index = requestsList.indexOf(foundItem)
-            if (!index) {
-              return state
-            } else {
-              return {
-                ...state,
-                selectedRequestShare: requestsList[index]
+            return {
+              ...state,
+              selectedRequestShare: {
+                uuid: requestsList[index].uuid,
+                name: requestsList[index].name,
+                query_snapshots: requestsList[index].query_snapshots?.slice(-1)
               }
             }
           }

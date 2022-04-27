@@ -92,7 +92,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
             </Tooltip>
             <Tooltip title="Partager la requête">
               <IconButton
-                className={classes.editButon}
+                className={classes.editButton}
                 size="small"
                 onClick={() => onShareRequest(row.uuid)}
                 disabled={maintenanceIsActive}
