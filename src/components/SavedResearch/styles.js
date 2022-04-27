@@ -1,18 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme) => ({
-  pagination: {
-    marginTop: 10,
-    float: 'right',
-    '& button': {
-      backgroundColor: '#FFF',
-      color: '#5BC5F2'
-    },
-    '& .MuiPaginationItem-page.Mui-selected': {
-      color: '#0063AF',
-      backgroundColor: '#FFF'
-    }
-  },
   documentTable: {
     marginTop: '24px'
   },

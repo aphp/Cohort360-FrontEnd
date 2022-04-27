@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
       display: 'inline-flex'
     }
   },
-  editButon: {
+  editButton: {
     display: 'none',
     color: '#5BC5F2',
     marginLeft: theme.spacing(1),
@@ -34,13 +34,7 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 16
     }
   },
-  tableBodyRows: {
-    height: '80px',
-    '&:nth-of-type(even)': {
-      backgroundColor: '#f4F2F2'
-    }
-  },
-  smallAddButon: {
+  smallAddButton: {
     color: '#fff',
     backgroundColor: '#5BC5F2 !important',
     marginLeft: theme.spacing(1),

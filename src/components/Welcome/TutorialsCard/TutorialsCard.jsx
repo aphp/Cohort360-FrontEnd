@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import clsx from 'clsx'
 
 import Divider from '@material-ui/core/Divider'
-// import Typography from '@material-ui/core/Typography'
+import Typography from '@material-ui/core/Typography'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import IconButton from '@material-ui/core/IconButton'
@@ -12,8 +12,6 @@ import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight'
 
 import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked'
 import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked'
-
-import Title from '../../Title'
 
 import useStyles from './styles'
 
@@ -45,7 +43,9 @@ const TutorialsCard = () => {
   return (
     <>
       <div id="tutorials-card-title">
-        <Title>Tutoriels</Title>
+        <Typography component="h2" variant="h2" color="primary" gutterBottom>
+          Tutoriels
+        </Typography>
       </div>
       <Divider className={classes.divider} />
 

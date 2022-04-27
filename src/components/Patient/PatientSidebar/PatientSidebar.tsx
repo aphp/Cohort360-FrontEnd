@@ -13,7 +13,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 import { getAge } from 'utils/age'
 import services from 'services'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { CohortPatient, SearchByTypes, VitalStatus } from 'types'
+import { CohortPatient, PatientFilters as PatientFiltersType, SearchByTypes, Sort, VitalStatus } from 'types'
 
 import useStyles from './styles'
 
@@ -24,6 +24,7 @@ type PatientSidebarTypes = {
   onClose: () => void
   deidentifiedBoolean: boolean
 }
+
 const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   total,
   patients,
@@ -47,32 +48,34 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   const [searchInput, setSearchInput] = useState(_searchInput ?? '')
   const [searchBy, setSearchBy] = useState(SearchByTypes.text)
   const [loadingStatus, setLoadingStatus] = useState(false)
-  const [gender, setGender] = useState(PatientGenderKind._unknown)
-  const [birthdates, setBirthdates] = useState<[string, string]>([
-    moment().subtract(130, 'years').format('YYYY-MM-DD'),
-    moment().format('YYYY-MM-DD')
-  ])
-  const [vitalStatus, setVitalStatus] = useState(VitalStatus.all)
+
+  const [filters, setFilters] = useState<PatientFiltersType>({
+    gender: PatientGenderKind._unknown,
+    birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
+    vitalStatus: VitalStatus.all
+  })
 
   const [openSort, setOpenSort] = useState(false)
-  const [sortBy, setSortBy] = useState('given')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+  const [sort, setSort] = useState<Sort>({
+    sortBy: 'given',
+    sortDirection: 'asc'
+  })
 
   const [showFilterChip, setShowFilterChip] = useState(false)
 
   const numberOfRows = 20 // Number of desired lines in the document array
 
-  const onSearchPatient = async (newSortBy: string, newSortDirection: 'asc' | 'desc', page = 1) => {
+  const onSearchPatient = async (sort: Sort, page = 1) => {
     setLoadingStatus(true)
     const patientsResp = await services.cohorts.fetchPatientList(
       page,
       searchBy,
       searchInput,
-      gender,
-      birthdates,
-      vitalStatus,
-      newSortBy,
-      newSortDirection,
+      filters.gender,
+      filters.birthdates,
+      filters.vitalStatus,
+      sort.sortBy,
+      sort.sortDirection,
       groupId.join(',')
     )
     setPatientsList(patientsResp?.originalPatients ?? [])
@@ -85,16 +88,16 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
     setSearchInput(event.target.value)
   }
 
-  const onKeyDown = (e: { keyCode: number; preventDefault: () => void }) => {
-    if (e.keyCode === 13) {
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    if (e.key === 'Enter') {
       e.preventDefault()
-      onSearchPatient(sortBy, sortDirection)
+      onSearchPatient(sort)
     }
   }
 
   const handleChangePage = (event: React.ChangeEvent<unknown>, page: number) => {
     if (patientsList && patientsList.length < totalPatients) {
-      onSearchPatient(sortBy, sortDirection, page)
+      onSearchPatient(sort, page)
     } else {
       setPage(page)
     }
@@ -105,14 +108,13 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
     submit && setShowFilterChip(true)
   }
 
-  const handleCloseSortDialog = (submitSort: boolean) => () => {
+  const handleCloseSortDialog = () => () => {
     setOpenSort(false)
-    submitSort && onSearchPatient(sortBy, sortDirection)
   }
 
   useEffect(() => {
-    onSearchPatient(sortBy, sortDirection)
-  }, [gender, birthdates, vitalStatus]) // eslint-disable-line
+    onSearchPatient(sort)
+  }, [filters, sort]) // eslint-disable-line
 
   const patientsToDisplay =
     patientsList?.length === totalPatients
@@ -134,28 +136,22 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
         onKeyDownSearchInput={onKeyDown}
         searchBy={searchBy}
         onChangeSelect={setSearchBy}
-        onSearchPatient={() => onSearchPatient(sortBy, sortDirection)}
+        onSearchPatient={() => onSearchPatient(sort)}
         showFilterChip={showFilterChip}
         // filter dialog props
         onClickFilterButton={() => setOpen(true)}
         open={open}
         onCloseFilterDialog={handleCloseDialog(false)}
         onSubmitDialog={handleCloseDialog(true)}
-        gender={gender}
-        onChangeGender={setGender}
-        birthdates={birthdates}
-        onChangeBirthdates={setBirthdates}
-        vitalStatus={vitalStatus}
-        onChangeVitalStatus={setVitalStatus}
+        filters={filters}
+        onChangeFilters={setFilters}
         // sort dialog props
         onClickSortButton={() => setOpenSort(true)}
         openSort={openSort}
-        onCloseSort={handleCloseSortDialog(false)}
-        onSubmitSort={handleCloseSortDialog(true)}
-        sortBy={sortBy}
-        onChangeSortBy={setSortBy}
-        sortDirection={sortDirection}
-        onChangeSortDirection={setSortDirection}
+        onCloseSort={handleCloseSortDialog}
+        onSubmitSort={handleCloseSortDialog}
+        sort={sort}
+        onChangeSort={setSort}
       />
       <Divider />
       <List className={classes.patientList} disablePadding>

@@ -1,7 +1,8 @@
 import React from 'react'
 import useStyles from './styles'
+
+import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
-import Title from '../../Title'
 
 import FirstNews from './News/FirstNews'
 import SecondNews from './News/SecondNews'
@@ -13,7 +14,9 @@ export default function TutorialsCard() {
   return (
     <>
       <div id="news-card-title">
-        <Title>Actualités</Title>
+        <Typography component="h2" variant="h2" color="primary" gutterBottom>
+          Actualités
+        </Typography>
       </div>
       <Divider className={classes.divider} />
 

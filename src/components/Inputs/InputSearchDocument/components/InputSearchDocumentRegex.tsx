@@ -72,8 +72,8 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
     }
   }
 
-  const onKeyDown = async (e: any) => {
-    if (e.keyCode === 13) {
+  const onKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    if (e.key === 'Enter') {
       e.preventDefault()
       onSearchDocument(searchInput)
     }

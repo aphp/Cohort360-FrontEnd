@@ -11,13 +11,6 @@ const useStyles = makeStyles((theme) => ({
   input: {
     marginLeft: theme.spacing(1),
     flex: 1
-  },
-  searchButton: {
-    width: '125px',
-    backgroundColor: '#5BC5F2',
-    color: '#FFF',
-    borderRadius: '25px',
-    marginLeft: 8
   }
 }))
 

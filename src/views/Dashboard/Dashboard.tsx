@@ -3,9 +3,9 @@ import clsx from 'clsx'
 import { Link, useParams, useLocation } from 'react-router-dom'
 import { Grid, Tabs, Tab } from '@material-ui/core'
 
-import CohortPreview from 'components/Cohort/Preview/Preview'
-import PatientList from 'components/Cohort/PatientList/PatientList'
-import Documents from 'components/Cohort/Documents/Documents'
+import CohortPreview from 'components/Dashboard/Preview/Preview'
+import PatientList from 'components/Dashboard/PatientList/PatientList'
+import Documents from 'components/Dashboard/Documents/Documents'
 import TopBar from 'components/TopBar/TopBar'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 
@@ -196,12 +196,7 @@ const Dashboard: React.FC<{
           />
         )}
         {selectedTab === 'documents' && (
-          <Documents
-            groupId={cohortId || perimetreIds}
-            deidentifiedBoolean={dashboard.deidentifiedBoolean ?? false}
-            sortBy={'date'}
-            sortDirection={'desc'}
-          />
+          <Documents groupId={cohortId || perimetreIds} deidentifiedBoolean={dashboard.deidentifiedBoolean ?? false} />
         )}
       </div>
     </Grid>

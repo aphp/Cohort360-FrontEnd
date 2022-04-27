@@ -1,41 +1,20 @@
 import React, { useEffect, useState } from 'react'
-import moment from 'moment'
 
-import {
-  Button,
-  Chip,
-  CircularProgress,
-  Grid,
-  IconButton,
-  InputAdornment,
-  InputBase,
-  Paper,
-  Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  Tabs,
-  Typography
-} from '@material-ui/core'
-import Pagination from '@material-ui/lab/Pagination'
+import Grid from '@material-ui/core/Grid'
 
-import ClearIcon from '@material-ui/icons/Clear'
-import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
-import CommentIcon from '@material-ui/icons/Comment'
 
 import MedicationFilters from 'components/Filters/MedicationFilters/MedicationFilters'
-import ModalAdministrationComment from './ModalAdministrationComment/ModalAdministrationComment'
+import DataTableMedication from 'components/DataTable/DataTableMedication'
+import DataTableTopBar from 'components/DataTable/DataTableTopBar'
+import MasterChips from 'components/MasterChips/MasterChips'
+
+import { MedicationsFilters, Order } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchMedication } from 'state/patient'
 
-import { capitalizeFirstLetter } from 'utils/capitalize'
-import displayDigit from 'utils/displayDigit'
+import { buildMedicationFiltersChips } from 'utils/chips'
 
 import useStyles from './styles'
 
@@ -66,29 +45,19 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
 
   const [patientMedicationList, setPatientMedicationList] = useState<any[]>([])
 
-  const [page, setPage] = useState(1)
-
   const [searchInput, setSearchInput] = useState('')
 
   const [open, setOpen] = useState<string | null>(null)
-  const [selectedComment, setSelectedComment] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
 
-  const [filter, setFilter] = useState<{
-    nda: string
-    startDate: string | null
-    endDate: string | null
-    selectedPrescriptionTypes: { id: string; label: string }[]
-    selectedAdministrationRoutes: { id: string; label: string }[]
-  }>({
+  const [filter, setFilter] = useState<MedicationsFilters>({
     nda: '',
     selectedPrescriptionTypes: [],
     selectedAdministrationRoutes: [],
     startDate: null,
     endDate: null
   })
-  const [sort, setSort] = useState<{ by: string; direction: 'asc' | 'desc' }>({ by: 'Period-start', direction: 'asc' })
-
-  const documentLines = 20 // Number of desired lines in the document array
+  const [order, setOrder] = useState<Order>({ orderBy: 'Period-start', orderDirection: 'asc' })
 
   const _fetchMedication = async (page: number) => {
     dispatch<any>(
@@ -97,7 +66,10 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
         groupId,
         options: {
           page,
-          sort,
+          sort: {
+            by: order.orderBy,
+            direction: order.orderDirection
+          },
           filters: {
             searchInput,
             nda: filter.nda,
@@ -111,25 +83,12 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
     )
   }
 
-  const handleClearInput = () => {
-    setSearchInput('')
-    _fetchMedication(1)
-  }
-
-  const handleSort = (property: any) => (event: React.MouseEvent<unknown> /*eslint-disable-line*/) => {
-    const isAsc: boolean = sort.by === property && sort.direction === 'asc'
-    const newDirection = isAsc ? 'desc' : 'asc'
-
-    setSort({ by: property, direction: newDirection })
-    setPage(1)
-  }
-
-  const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
+  const handleChangePage = (value?: number) => {
     setPage(value ? value : 1)
     _fetchMedication(value ? value : 1)
   }
 
-  const handleChangeFilter = (
+  const handleDeleteChip = (
     filterName: 'nda' | 'startDate' | 'endDate' | 'selectedPrescriptionTypes' | 'selectedAdministrationRoutes',
     value: any
   ) => {
@@ -144,23 +103,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
     }
   }
 
-  const onSearchPMSI = async () => {
-    handleChangePage()
-  }
-
-  const onKeyDown = async (e: { keyCode: number; preventDefault: () => void }) => {
-    if (e.keyCode === 13) {
-      e.preventDefault()
-      onSearchPMSI()
-    }
-  }
-
   useEffect(() => {
     handleChangePage()
-  }, [filter, sort]) // eslint-disable-line
+  }, [filter, order, searchInput]) // eslint-disable-line
 
   useEffect(() => {
-    setPage(1)
     setSearchInput('')
     setFilter({
       nda: '',
@@ -184,354 +131,56 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
 
   return (
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
-      <Grid item container justifyContent="space-between" alignItems="center" className={classes.filterAndSort}>
-        <Tabs
-          classes={{
-            root: classes.root,
-            indicator: classes.indicator
-          }}
-          value={selectedTab}
-          onChange={(event, value) => selectTab(value)}
-        >
-          <Tab
-            classes={{ selected: classes.selected }}
-            className={classes.tabTitle}
-            label="Prescription"
-            value="prescription"
-          />
-          <Tab
-            classes={{ selected: classes.selected }}
-            className={classes.tabTitle}
-            label="Administration"
-            value="administration"
-          />
-        </Tabs>
-        <Typography variant="button">
-          {totalMedication || 0} /{' '}
-          {selectedTab === 'prescription'
-            ? `${totalAllMedication ?? 0} prescription(s)`
-            : `${totalAllMedication ?? 0} administration(s)`}
-        </Typography>
-        <div className={classes.documentButtons}>
-          <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
-            <InputBase
-              placeholder="Rechercher"
-              className={classes.input}
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-              onKeyDown={onKeyDown}
-              endAdornment={
-                <InputAdornment position="end">
-                  {searchInput && (
-                    <IconButton onClick={handleClearInput}>
-                      <ClearIcon />
-                    </IconButton>
-                  )}
-                </InputAdornment>
-              }
-            />
-            <IconButton type="submit" aria-label="search" onClick={onSearchPMSI}>
-              <SearchIcon fill="#ED6D91" height="15px" />
-            </IconButton>
-          </Grid>
-          <Button
-            variant="contained"
-            disableElevation
-            startIcon={<FilterList height="15px" fill="#FFF" />}
-            className={classes.searchButton}
-            onClick={() => setOpen('filter')}
-          >
-            Filtrer
-          </Button>
-
-          <MedicationFilters
-            open={open === 'filter'}
-            onClose={() => setOpen(null)}
-            onSubmit={() => setOpen(null)}
-            nda={filter.nda}
-            onChangeNda={(_nda: string) => handleChangeFilter('nda', _nda)}
-            startDate={filter.startDate}
-            onChangeStartDate={(_startDate: string | null) => handleChangeFilter('startDate', _startDate)}
-            endDate={filter.endDate}
-            onChangeEndDate={(_endDate: string | null) => handleChangeFilter('endDate', _endDate)}
-            deidentified={deidentifiedBoolean}
-            selectedPrescriptionTypes={filter.selectedPrescriptionTypes}
-            onChangeSelectedPrescriptionTypes={(_selectedPrescriptionTypes: { id: string; label: string }[]) =>
-              handleChangeFilter('selectedPrescriptionTypes', _selectedPrescriptionTypes)
-            }
-            showPrescriptionTypes={selectedTab === 'prescription'}
-            selectedAdministrationRoutes={filter.selectedAdministrationRoutes}
-            onChangeSelectedAdministrationRoutes={(_selectedAdministrationRoutes: { id: string; label: string }[]) =>
-              handleChangeFilter('selectedAdministrationRoutes', _selectedAdministrationRoutes)
-            }
-            showAdministrationRoutes={selectedTab === 'administration'}
-          />
-        </div>
-      </Grid>
-
-      <Grid>
-        {filter.nda !== '' &&
-          filter.nda.split(',').map((nda) => (
-            <Chip
-              className={classes.chips}
-              key={nda}
-              label={`NDA: ${nda}`}
-              onDelete={() =>
-                handleChangeFilter(
-                  'nda',
-                  filter.nda
-                    .split(',')
-                    .filter((id) => id !== nda)
-                    .join()
-                )
-              }
-              color="primary"
-              variant="outlined"
-            />
-          ))}
-        {filter.selectedPrescriptionTypes.length > 0 &&
-          filter.selectedPrescriptionTypes.map((prescriptionType) => (
-            <Chip
-              className={classes.chips}
-              key={prescriptionType.id}
-              label={capitalizeFirstLetter(prescriptionType.label)}
-              onDelete={() =>
-                handleChangeFilter(
-                  'selectedPrescriptionTypes',
-                  filter.selectedPrescriptionTypes.filter(({ id }) => id !== prescriptionType.id)
-                )
-              }
-              color="primary"
-              variant="outlined"
-            />
-          ))}
-        {filter.selectedAdministrationRoutes.length > 0 &&
-          filter.selectedAdministrationRoutes.map((administrationRoute) => (
-            <Chip
-              className={classes.chips}
-              key={administrationRoute.id}
-              label={capitalizeFirstLetter(administrationRoute.label)}
-              onDelete={() =>
-                handleChangeFilter(
-                  'selectedAdministrationRoutes',
-                  filter.selectedAdministrationRoutes.filter(({ id }) => id !== administrationRoute.id)
-                )
-              }
-              color="primary"
-              variant="outlined"
-            />
-          ))}
-        {filter.startDate && (
-          <Chip
-            className={classes.chips}
-            label={`Après le : ${moment(filter.startDate).format('DD/MM/YYYY')}`}
-            onDelete={() => handleChangeFilter('startDate', null)}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {filter.endDate && (
-          <Chip
-            className={classes.chips}
-            label={`Avant le : ${moment(filter.endDate).format('DD/MM/YYYY')}`}
-            onDelete={() => handleChangeFilter('endDate', null)}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-      </Grid>
-
-      {loading ? (
-        <Grid container justifyContent="center">
-          <CircularProgress />
-        </Grid>
-      ) : (
-        <TableContainer component={Paper}>
-          <Table className={classes.table} aria-label="simple table">
-            <TableHead className={classes.tableHead}>
-              <TableRow>
-                <TableCell align="left" className={classes.tableHeadCell}>
-                  {deidentifiedBoolean ? (
-                    'NDA chiffré'
-                  ) : (
-                    <TableSortLabel
-                      active={sort.by === 'encounter'}
-                      direction={sort.by === 'encounter' ? sort.direction : 'asc'}
-                      onClick={handleSort('encounter')}
-                    >
-                      NDA
-                    </TableSortLabel>
-                  )}
-                </TableCell>
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  <TableSortLabel
-                    active={sort.by === 'Period-start'}
-                    direction={sort.by === 'Period-start' ? sort.direction : 'asc'}
-                    onClick={handleSort('Period-start')}
-                  >
-                    {selectedTab === 'prescription' ? 'Date de prescription' : "Date d'administration"}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  <TableSortLabel
-                    active={sort.by === 'class-simple'}
-                    direction={sort.by === 'class-simple' ? sort.direction : 'asc'}
-                    onClick={handleSort('class-simple')}
-                  >
-                    Code ATC
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  <TableSortLabel
-                    active={sort.by === 'code'}
-                    direction={sort.by === 'code' ? sort.direction : 'asc'}
-                    onClick={handleSort('code')}
-                  >
-                    Code UCD
-                  </TableSortLabel>
-                </TableCell>
-                {selectedTab === 'prescription' && (
-                  <TableCell align="center" className={classes.tableHeadCell}>
-                    <TableSortLabel
-                      active={sort.by === 'type'}
-                      direction={sort.by === 'type' ? sort.direction : 'asc'}
-                      onClick={handleSort('type')}
-                    >
-                      Type de prescription
-                    </TableSortLabel>
-                  </TableCell>
-                )}
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  <TableSortLabel
-                    active={sort.by === 'route'}
-                    direction={sort.by === 'route' ? sort.direction : 'asc'}
-                    onClick={handleSort('route')}
-                  >
-                    Voie d'administration
-                  </TableSortLabel>
-                </TableCell>
-                {selectedTab === 'administration' && (
-                  <TableCell align="center" className={classes.tableHeadCell}>
-                    Quantité
-                  </TableCell>
-                )}
-                <TableCell align="center" className={classes.tableHeadCell}>
-                  Unité exécutrice
-                </TableCell>
-                {selectedTab === 'administration' && deidentifiedBoolean === false && (
-                  <TableCell align="center" className={classes.tableHeadCell}>
-                    Commentaire
-                  </TableCell>
-                )}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {patientMedicationList && patientMedicationList.length > 0 ? (
-                <>
-                  {patientMedicationList.map((row) => {
-                    const nda = row.NDA
-                    const date =
-                      selectedTab === 'prescription'
-                        ? row.dispenseRequest?.validityPeriod?.start
-                        : row.effectivePeriod?.start
-                    const codeATC = selectedTab === 'prescription' ? row.category?.[0]?.id : row.category?.id
-                    const displayATC = selectedTab === 'prescription' ? row.category?.[0]?.text : row.category?.text
-
-                    const codeUCD = row.contained?.[0]?.code?.coding?.[0]?.id
-                    const displayUCD = row.contained?.[0]?.code?.coding?.[0]?.display
-
-                    const prescriptionType =
-                      selectedTab === 'prescription' &&
-                      (row.extension?.find((extension: any) => extension.url === 'type') || {}).valueString
-                    const administrationRoute =
-                      selectedTab === 'prescription'
-                        ? row.dosageInstruction?.[0]?.route?.text
-                        : row.dosage?.route?.coding?.[0]?.display
-                    const dose = selectedTab === 'administration' && displayDigit(+row.dosage?.dose?.value)
-                    const unit = selectedTab === 'administration' && row.dosage?.dose?.unit
-                    const serviceProvider = row.serviceProvider
-
-                    const comment = selectedTab === 'administration' ? row.dosage?.text : null
-
-                    return (
-                      <TableRow className={classes.tableBodyRows} key={row.id}>
-                        <TableCell align="left">{nda ?? 'Inconnu'}</TableCell>
-                        <TableCell align="center">
-                          {date ? new Date(date).toLocaleDateString('fr-FR') : 'Date inconnue'}
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography>
-                            {codeATC === 'No matching concept' || codeATC === 'Non Renseigné' ? '' : codeATC ?? ''}
-                          </Typography>
-                          <Typography className={classes.libelle}>
-                            {displayATC === 'No matching concept' ? '-' : displayATC ?? '-'}
-                          </Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography>
-                            {codeUCD === 'No matching concept' || codeUCD === 'Non Renseigné' ? '' : codeUCD ?? ''}
-                          </Typography>
-                          <Typography className={classes.libelle}>
-                            {displayUCD === 'No matching concept' ? '-' : displayUCD ?? '-'}
-                          </Typography>
-                        </TableCell>
-                        {selectedTab === 'prescription' && (
-                          <TableCell align="center">{prescriptionType ?? '-'}</TableCell>
-                        )}
-                        <TableCell align="center">
-                          {administrationRoute === 'No matching concept' ? '-' : administrationRoute ?? '-'}
-                        </TableCell>
-                        {selectedTab === 'administration' && (
-                          <TableCell align="center">
-                            {unit !== 'Non Renseigné' ? (
-                              <>
-                                {dose} {unit}
-                              </>
-                            ) : (
-                              '-'
-                            )}
-                          </TableCell>
-                        )}
-                        <TableCell align="center">{serviceProvider ?? '-'}</TableCell>
-                        {selectedTab === 'administration' && deidentifiedBoolean === false && (
-                          <TableCell align="center">
-                            <IconButton onClick={() => setSelectedComment(comment)}>
-                              <CommentIcon />
-                            </IconButton>
-                          </TableCell>
-                        )}
-                      </TableRow>
-                    )
-                  })}
-                </>
-              ) : (
-                <TableRow className={classes.emptyTableRow}>
-                  <TableCell colSpan={9} align="left">
-                    <Grid container justifyContent="center">
-                      <Typography variant="button">{`Aucune ${
-                        selectedTab === 'prescription' ? 'prescription' : 'administration'
-                      } à afficher`}</Typography>
-                    </Grid>
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-
-      <Pagination
-        className={classes.pagination}
-        count={Math.ceil(totalMedication / documentLines)}
-        shape="rounded"
-        onChange={handleChangePage}
-        page={page}
+      <DataTableTopBar
+        tabs={{
+          list: [
+            { label: 'Prescription', value: 'prescription' },
+            { label: 'Administration', value: 'administration' }
+          ],
+          value: selectedTab,
+          onChange: (event: any, newTab?: any) => selectTab(newTab)
+        }}
+        results={{
+          nb: totalMedication,
+          total: totalAllMedication,
+          label: selectedTab === 'prescription' ? `prescription(s)` : `administration(s)`
+        }}
+        searchBar={{
+          type: 'simple',
+          value: searchInput,
+          onSearch: (newSearchInput: string) => setSearchInput(newSearchInput)
+        }}
+        buttons={[
+          {
+            label: 'Filtrer',
+            icon: <FilterList height="15px" fill="#FFF" />,
+            onClick: () => setOpen('filter')
+          }
+        ]}
       />
 
-      <ModalAdministrationComment
-        open={selectedComment !== null}
-        comment={selectedComment ?? ''}
-        handleClose={() => setSelectedComment(null)}
+      <MasterChips chips={buildMedicationFiltersChips(filter, handleDeleteChip)} />
+
+      <DataTableMedication
+        loading={loading}
+        selectedTab={selectedTab}
+        medicationsList={patientMedicationList}
+        deidentified={deidentifiedBoolean}
+        order={order}
+        setOrder={setOrder}
+        page={page}
+        setPage={(newPage) => handleChangePage(newPage)}
+        total={totalMedication}
+      />
+
+      <MedicationFilters
+        open={open === 'filter'}
+        onClose={() => setOpen(null)}
+        deidentified={deidentifiedBoolean}
+        showPrescriptionTypes={selectedTab === 'prescription'}
+        showAdministrationRoutes={selectedTab === 'administration'}
+        filters={filter}
+        setFilters={setFilter}
       />
     </Grid>
   )

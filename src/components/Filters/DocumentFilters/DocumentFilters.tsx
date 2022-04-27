@@ -21,58 +21,43 @@ import Autocomplete from '@material-ui/lab/Autocomplete'
 import ClearIcon from '@material-ui/icons/Clear'
 
 import { docTypes } from 'assets/docTypes.json'
+import { DocumentFilters } from 'types'
 
 import useStyles from './styles'
 
 type DocumentFiltersProps = {
   open: boolean
   onClose: () => void
-  onSubmit: () => void
-  nda: string
-  onChangeNda: (nda: string) => void
-  ipp?: string
-  onChangeIpp?: (nda: string) => void
-  selectedDocTypes: string[]
-  onChangeSelectedDocTypes: (selectedDocTypes: string[]) => void
-  startDate?: string | null
-  onChangeStartDate: (startDate: string | null) => void
-  endDate?: string | null
-  onChangeEndDate: (endDate: string | null) => void
+  showIpp?: boolean
+  filters: DocumentFilters
+  onChangeFilters: (newFilters: DocumentFilters) => void
   deidentified: boolean | null
 }
-const DocumentFilters: React.FC<DocumentFiltersProps> = ({
+const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
   open,
   onClose,
-  onSubmit,
-  nda,
-  onChangeNda,
-  ipp,
-  onChangeIpp,
-  selectedDocTypes,
-  onChangeSelectedDocTypes,
-  startDate,
-  onChangeStartDate,
-  endDate,
-  onChangeEndDate,
+  filters,
+  onChangeFilters,
+  showIpp,
   deidentified
 }) => {
   const classes = useStyles()
 
-  const [_nda, setNda] = useState<string>(nda)
-  const [_ipp, setIpp] = useState<string>(ipp ?? '')
-  const [_selectedDocTypes, setSelectedDocTypes] = useState<any[]>(selectedDocTypes)
-  const [_startDate, setStartDate] = useState<any>(startDate)
-  const [_endDate, setEndDate] = useState<any>(endDate)
+  const [_nda, setNda] = useState<string>(filters.nda)
+  const [_ipp, setIpp] = useState<string>(filters.ipp ?? '')
+  const [_selectedDocTypes, setSelectedDocTypes] = useState<any[]>(filters.selectedDocTypes)
+  const [_startDate, setStartDate] = useState<any>(filters.startDate)
+  const [_endDate, setEndDate] = useState<any>(filters.endDate)
   const [dateError, setDateError] = useState(false)
 
   const docTypesList = docTypes
 
   useEffect(() => {
-    setNda(nda)
-    setIpp(ipp ?? '')
-    setSelectedDocTypes(selectedDocTypes)
-    setStartDate(startDate)
-    setEndDate(endDate)
+    setNda(filters.nda)
+    showIpp && setIpp(filters.ipp ?? '')
+    setSelectedDocTypes(filters.selectedDocTypes)
+    setStartDate(filters.startDate)
+    setEndDate(filters.endDate)
   }, [open]) //eslint-disable-line
 
   useEffect(() => {
@@ -98,13 +83,14 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
     const newStartDate = moment(_startDate).isValid() ? moment(_startDate).format('YYYY-MM-DD') : null
     const newEndDate = moment(_endDate).isValid() ? moment(_endDate).format('YYYY-MM-DD') : null
 
-    onChangeSelectedDocTypes(_selectedDocTypes)
-    onChangeNda(_nda)
-    // onChangeIpp can be equal to undefined
-    onChangeIpp && onChangeIpp(_ipp)
-    onChangeStartDate(newStartDate)
-    onChangeEndDate(newEndDate)
-    onSubmit()
+    onChangeFilters({
+      nda: _nda,
+      ipp: _ipp,
+      selectedDocTypes: _selectedDocTypes,
+      startDate: newStartDate,
+      endDate: newEndDate
+    })
+    onClose()
   }
 
   return (
@@ -180,7 +166,7 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
             />
           </Grid>
         )}
-        {!deidentified && onChangeIpp && (
+        {!deidentified && showIpp && (
           <Grid container direction="column" className={classes.filter}>
             <Typography variant="h3">IPP :</Typography>
             <TextField
@@ -262,4 +248,4 @@ const DocumentFilters: React.FC<DocumentFiltersProps> = ({
   )
 }
 
-export default DocumentFilters
+export default ModalDocumentFilters

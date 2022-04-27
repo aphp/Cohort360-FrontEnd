@@ -1,21 +1,24 @@
 import React from 'react'
 import moment from 'moment'
 
-import { Button, Chip, Grid, IconButton, InputBase, TextField, Typography } from '@material-ui/core'
+import { Button, Grid, IconButton, InputBase, TextField, Typography } from '@material-ui/core'
+import { Autocomplete } from '@material-ui/lab'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import LockIcon from '@material-ui/icons/Lock'
 import SortIcon from '@material-ui/icons/Sort'
 
-import PatientFilters from '../../../Filters/PatientFilters/PatientFilters'
-import SortDialog from '../../../Filters/SortDialog/SortDialog'
+import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
+import SortDialog from 'components/Filters/SortDialog/SortDialog'
+import MasterChips from 'components/MasterChips/MasterChips'
 
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { SearchByTypes, VitalStatus } from 'types'
+import { PatientFilters as PatientFiltersType, SearchByTypes, Sort, VitalStatus } from 'types'
+
+import { buildPatientFiltersChips } from 'utils/chips'
 
 import useStyles from './styles'
-import { Autocomplete } from '@material-ui/lab'
 
 type PatientSidebarHeaderTypes = {
   showFilterChip: boolean
@@ -26,25 +29,19 @@ type PatientSidebarHeaderTypes = {
   open: boolean
   onCloseFilterDialog: () => void
   onSubmitDialog: () => void
-  gender: PatientGenderKind
-  onChangeGender: (gender: PatientGenderKind) => void
-  birthdates: [string, string]
-  onChangeBirthdates: (birthdates: [string, string]) => void
-  vitalStatus: VitalStatus
-  onChangeVitalStatus: (status: VitalStatus) => void
+  filters: PatientFiltersType
+  onChangeFilters: (newFilters: PatientFiltersType) => void
   searchInput: string
   onChangeSearchInput: (event: { target: { value: React.SetStateAction<string> } }) => void
-  onKeyDownSearchInput: (e: { keyCode: number; preventDefault: () => void }) => void
+  onKeyDownSearchInput: (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => void
   onSearchPatient: () => void
   onCloseButtonClick: () => void
   onClickSortButton: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   openSort: boolean
   onCloseSort: () => void
   onSubmitSort: () => void
-  sortBy: string
-  sortDirection: 'asc' | 'desc'
-  onChangeSortBy: (sortBy: string) => void
-  onChangeSortDirection: (sortDirection: 'asc' | 'desc') => void
+  sort: Sort
+  onChangeSort: (sort: Sort) => void
 }
 const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
   const classes = useStyles()
@@ -76,12 +73,8 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
             open={props.open}
             onClose={props.onCloseFilterDialog}
             onSubmit={props.onSubmitDialog}
-            gender={props.gender}
-            onChangeGender={props.onChangeGender}
-            birthdates={props.birthdates}
-            onChangeBirthdates={props.onChangeBirthdates}
-            vitalStatus={props.vitalStatus}
-            onChangeVitalStatus={props.onChangeVitalStatus}
+            filters={props.filters}
+            onChangeFilters={props.onChangeFilters}
           />
         </Grid>
         <Grid container alignItems="center">
@@ -99,44 +92,29 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
     { label: 'IPP', code: SearchByTypes.identifier }
   ]
 
-  const sortOptions = [
-    { label: 'Sexe', code: 'gender' },
-    { label: 'Prénom', code: 'given' },
-    { label: 'Nom', code: 'family' },
-    { label: 'Date de Naissance', code: 'birthdate' }
-  ]
-
   const handleDeleteChip = (filterName: string) => {
     switch (filterName) {
       case 'gender':
-        props.onChangeGender(PatientGenderKind._unknown)
+        // @ts-ignore
+        props.onChangeFilters((prevFilters) => ({
+          ...prevFilters,
+          gender: PatientGenderKind._unknown
+        }))
         break
-      case 'age':
-        props.onChangeBirthdates([moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')])
+      case 'birthdates':
+        // @ts-ignore
+        props.onChangeFilters((prevFilters) => ({
+          ...prevFilters,
+          birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]
+        }))
         break
       case 'vitalStatus':
-        props.onChangeVitalStatus(VitalStatus.all)
+        // @ts-ignore
+        props.onChangeFilters((prevFilters) => ({
+          ...prevFilters,
+          vitalStatus: VitalStatus.all
+        }))
         break
-    }
-  }
-
-  const genderName = () => {
-    switch (props.gender) {
-      case PatientGenderKind._female:
-        return 'Genre: Femmes'
-      case PatientGenderKind._male:
-        return 'Genre: Hommes'
-      case PatientGenderKind._other:
-        return 'Genre: Autre'
-    }
-  }
-
-  const vitalStatusName = () => {
-    switch (props.vitalStatus) {
-      case VitalStatus.alive:
-        return 'Patients vivants'
-      case VitalStatus.deceased:
-        return 'Patients décédés'
     }
   }
 
@@ -179,12 +157,8 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
           open={props.open}
           onClose={props.onCloseFilterDialog}
           onSubmit={props.onSubmitDialog}
-          gender={props.gender}
-          onChangeGender={props.onChangeGender}
-          birthdates={props.birthdates}
-          onChangeBirthdates={props.onChangeBirthdates}
-          vitalStatus={props.vitalStatus}
-          onChangeVitalStatus={props.onChangeVitalStatus}
+          filters={props.filters}
+          onChangeFilters={props.onChangeFilters}
         />
         <Button
           variant="contained"
@@ -199,42 +173,11 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
           open={props.openSort}
           onClose={props.onCloseSort}
           onSubmit={props.onSubmitSort}
-          sortBy={props.sortBy}
-          sortOptions={sortOptions}
-          onChangeSortBy={props.onChangeSortBy}
-          sortDirection={props.sortDirection}
-          onChangeSortDirection={props.onChangeSortDirection}
+          sort={props.sort}
+          onChangeSort={props.onChangeSort}
         />
       </Grid>
-      <Grid className={classes.filterChipsGrid}>
-        {props.showFilterChip && props.gender !== PatientGenderKind._unknown && (
-          <Chip
-            className={classes.chips}
-            label={genderName()}
-            onDelete={() => handleDeleteChip('gender')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {props.showFilterChip && props.vitalStatus !== VitalStatus.all && (
-          <Chip
-            className={classes.chips}
-            label={vitalStatusName()}
-            onDelete={() => handleDeleteChip('vitalStatus')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-        {props.showFilterChip && props.birthdates && (
-          <Chip
-            className={classes.chips}
-            label={`Âge entre ${props.birthdates[0]} et ${props.birthdates[1]}`}
-            onDelete={() => handleDeleteChip('birthdates')}
-            color="primary"
-            variant="outlined"
-          />
-        )}
-      </Grid>
+      <MasterChips chips={buildPatientFiltersChips(props.filters, handleDeleteChip)} />
     </div>
   )
 }

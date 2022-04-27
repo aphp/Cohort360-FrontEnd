@@ -1,7 +1,7 @@
-import Connexion from 'views/Connexion/Connexion'
-import Accueil from 'views/Accueil/Accueil'
-import RechercherPatient from 'views/RechercherPatient/RechercherPatient'
-import RechercheSauvegarde from 'views/RechercheSauvegarde/RechercheSauvegarde'
+import Login from 'views/Login/Login'
+import Welcome from 'views/Welcome/Welcome'
+import SearchPatient from 'views/SearchPatient/SearchPatient'
+import SavedResearch from 'views/SavedResearch/SavedResearch'
 import MyProjects from 'views/MyProjects/MyProjects'
 import Patient from 'views/Patient/Patient'
 import Scope from 'views/Scope/Scope'
@@ -13,13 +13,13 @@ import { ODD_CONTACT } from '../../../constants'
 
 export default [
   /**
-   * Cohort360 Connexion Page
+   * Cohort360 Login Page
    */
   {
     exact: true,
     path: '/',
     name: 'main',
-    component: Connexion
+    component: Login
   },
   /**
    * Cohort360: Main Page
@@ -30,7 +30,7 @@ export default [
     path: '/accueil',
     name: 'accueil',
     isPrivate: true,
-    component: Accueil
+    component: Welcome
   },
   /**
    * Cohort360: Research Patient Page
@@ -41,7 +41,7 @@ export default [
     path: '/rechercher_patient/:search',
     name: 'rechercher_patient/:search',
     isPrivate: true,
-    component: RechercherPatient
+    component: SearchPatient
   },
   {
     exact: true,
@@ -49,7 +49,7 @@ export default [
     path: '/rechercher_patient',
     name: 'rechercher_patient',
     isPrivate: true,
-    component: RechercherPatient
+    component: SearchPatient
   },
   /**
    * Cohort360: Choose Perimeter Page
@@ -71,7 +71,7 @@ export default [
     path: '/recherche_sauvegarde',
     name: 'recherche_sauvegarde',
     isPrivate: true,
-    component: RechercheSauvegarde
+    component: SavedResearch
   },
   /**
    * Cohort360: My Projects + Cohort List Page
@@ -109,20 +109,6 @@ export default [
     path: '/cohort/new/:requestId/:snapshotId',
     name: 'cohort/new/:requestId/:snapshotId',
     isPrivate: true,
-    component: CohortCreation
-  },
-  {
-    exact: true,
-    displaySideBar: true,
-    path: '/cohort/new/:requestId',
-    name: 'cohort/new/:requestId',
-    component: CohortCreation
-  },
-  {
-    exact: true,
-    displaySideBar: true,
-    path: '/cohort/new/:requestId/:snapshotId',
-    name: 'cohort/new/:requestId/:snapshotId',
     component: CohortCreation
   },
   /**
