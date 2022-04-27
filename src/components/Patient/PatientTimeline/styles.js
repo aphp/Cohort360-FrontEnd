@@ -162,17 +162,6 @@ const useStyles = makeStyles({
     zIndex: -2,
     right: 0
   },
-  hospitalLabel: {
-    position: 'relative',
-    fontWeight: 600,
-    padding: '1px 2px',
-    backgroundColor: 'rgb(240, 240, 246);',
-    borderRadius: 10,
-    marginLeft: 5,
-    marginRight: 5,
-    fontSize: 12,
-    textAlign: 'center'
-  },
   timelineTextRight: {
     textAlign: 'left',
     fontSize: fontSize,

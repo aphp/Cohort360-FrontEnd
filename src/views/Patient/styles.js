@@ -1,5 +1,5 @@
 import { createStyles, makeStyles } from '@material-ui/core/styles'
-import { smallDrawerWidth, largeDrawerWidth } from 'components/LeftSideBar/LeftSideBar'
+import { smallDrawerWidth, largeDrawerWidth } from 'components/Routes/LeftSideBar/LeftSideBar'
 
 export const sidebarWidth = '350px'
 
@@ -25,11 +25,6 @@ export default makeStyles((theme) =>
     contentShift: {
       marginRight: sidebarWidth
     },
-    tabList: {
-      '> span ': {
-        backgroundColor: '#F9F8F8'
-      }
-    },
     tabTitle: {
       minWidth: 0,
       color: 'rgba(0, 99, 175, 0.4)',
@@ -43,9 +38,6 @@ export default makeStyles((theme) =>
       position: 'absolute',
       top: '50%',
       left: '50%'
-    },
-    alert: {
-      marginLeft: '50px'
     },
     openLeftBar: {
       backgroundColor: '#FFF',

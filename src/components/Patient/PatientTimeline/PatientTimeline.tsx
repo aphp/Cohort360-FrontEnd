@@ -25,7 +25,7 @@ import { capitalizeFirstLetter } from 'utils/capitalize'
 import { useAppDispatch } from 'state'
 import { fetchAllProcedures } from 'state/patient'
 
-import { fetchDiagnosticTypes } from 'services/cohortCreation/fetchCondition'
+import services from 'services'
 
 import useStyles from './styles'
 
@@ -173,7 +173,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
 
   useEffect(() => {
     const _fetchDiagnosticTypes = async () => {
-      const diagnosticTypes = await fetchDiagnosticTypes()
+      const diagnosticTypes = await services.cohortCreation.fetchDiagnosticTypes()
       if (!diagnosticTypes) return
 
       // Find main dianosys

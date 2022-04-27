@@ -76,7 +76,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
             <Link href={`/cohort/new/${row.uuid}`}>{row.name}</Link>
             <Tooltip title="Modifier la requête">
               <IconButton
-                className={classes.editButon}
+                className={classes.editButton}
                 size="small"
                 onClick={() => onEditRequest(row.uuid)}
                 disabled={maintenanceIsActive}
