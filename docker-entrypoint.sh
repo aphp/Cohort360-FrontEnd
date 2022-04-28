@@ -4,7 +4,6 @@ set -e
 sed -i "s@{JWT_URL}@$JWT_URL@g" /etc/nginx/conf.d/nginx.conf
 sed -i "s@{FHIR_URL}@$FHIR_URL@g" /etc/nginx/conf.d/nginx.conf
 sed -i "s@{BACK_URL}@$BACK_URL@g" /etc/nginx/conf.d/nginx.conf
-sed -i "s@{PORTAIL_URL}@$PORTAIL_URL@g" /etc/nginx/conf.d/nginx.conf
 sed -i "s@{DISPOSE_URL}@$DISPOSE_URL@g" /etc/nginx/conf.d/nginx.conf
 
 sed -i "s@{BACK_API_URL}@$BACK_API_URL@g" /app/build/static/js/*.js
