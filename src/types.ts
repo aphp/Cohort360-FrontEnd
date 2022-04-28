@@ -512,6 +512,7 @@ export type RequestType = {
   created_at?: string
   modified_at?: string
   query_snapshots?: string[]
+  shared_query_snapshot?: string[]
 }
 
 export type ContactSubmitForm = FormData

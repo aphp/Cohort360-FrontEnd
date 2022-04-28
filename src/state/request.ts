@@ -360,7 +360,8 @@ const setRequestSlice = createSlice({
               selectedRequestShare: {
                 uuid: requestsList[index].uuid,
                 name: requestsList[index].name,
-                query_snapshots: requestsList[index].query_snapshots?.slice(-1)
+                query_snapshots: requestsList[index].query_snapshots,
+                shared_query_snapshot: requestsList[index].query_snapshots?.slice(-1)
               }
             }
           }

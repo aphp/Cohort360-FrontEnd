@@ -9,7 +9,6 @@ import EditIcon from '@material-ui/icons/Edit'
 import ShareIcon from '@material-ui/icons/Share'
 
 import VersionRow from '../VersionRow/VersionRow'
-import ModalShareRequest from '../../Modals/ModalShareRequest/ModalShareRequest'
 
 import { RequestType, Cohort } from 'types'
 

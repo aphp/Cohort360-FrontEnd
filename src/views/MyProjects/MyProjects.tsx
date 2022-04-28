@@ -226,6 +226,7 @@ const MyProjects = () => {
       {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch<any>(setSelectedRequest(null))} />}
       {selectedRequestShare !== null && console.log(selectedRequestShare)}
       {selectedRequestShare !== null && console.log(selectedRequestShare?.query_snapshots)}
+      {selectedRequestShare !== null && console.log(selectedRequestShare.shared_query_snapshot)}
 
       <ModalEditCohort open={selectedCohort !== null} onClose={() => dispatch<any>(setSelectedCohort(null))} />
 
