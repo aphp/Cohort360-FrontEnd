@@ -37,6 +37,11 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
 
   const [error, setError] = useState<string | null>(null)
 
+  const _onSearchDocument = (newInputText: string) => {
+    if (error === ERROR_REGEX) return
+    onSearchDocument(newInputText)
+  }
+
   const checkRegex = useMemo(() => {
     return debounce((query: string) => {
       try {
@@ -75,7 +80,7 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
   const onKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault()
-      onSearchDocument(searchInput)
+      _onSearchDocument(searchInput)
     }
   }
 
@@ -144,7 +149,7 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
                   size="small"
                   type="submit"
                   aria-label="search"
-                  onClick={() => onSearchDocument(searchInput)}
+                  onClick={() => _onSearchDocument(searchInput)}
                 >
                   <SearchIcon fill="#ED6D91" height="17px" />
                 </IconButton>
