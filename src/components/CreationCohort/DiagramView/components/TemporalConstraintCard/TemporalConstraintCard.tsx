@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Grid, Select, MenuItem } from '@material-ui/core'
 
 import { useAppSelector, useAppDispatch } from 'state'
@@ -11,10 +11,25 @@ const TemporalConstraintView: React.FC = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
-  const { temporalConstraints = [] } = useAppSelector((state) => state.cohortCreation.request || {})
+  const { temporalConstraints = [], criteriaGroup = [] } = useAppSelector((state) => state.cohortCreation.request || {})
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
 
+  const [disableTemporalConstraint, onDisableTemporalConstraint] = useState(false)
+
   const maintenanceIsActive = meState?.maintenance?.active
+  const mainTemporalConstraint = temporalConstraints.find(({ idList }) => idList && idList[0] && idList[0] === 'All')
+
+  useEffect(() => {
+    if (criteriaGroup && criteriaGroup.length > 0) {
+      const mainCriteriaGroup = criteriaGroup.find(({ id }) => id === 0)
+      if (!disableTemporalConstraint && mainCriteriaGroup && mainCriteriaGroup.type !== 'andGroup') {
+        onDisableTemporalConstraint(true)
+        if (mainTemporalConstraint?.constraintType !== 'none') {
+          onChangeTemporalConstraint('none')
+        }
+      }
+    }
+  }, [])
 
   const onChangeTemporalConstraint = (value: 'sameEncounter' | 'differentEncounter' | 'none') => {
     dispatch<any>(
@@ -25,8 +40,6 @@ const TemporalConstraintView: React.FC = () => {
     )
     dispatch<any>(buildCohortCreation({}))
   }
-
-  const mainTemporalConstraint = temporalConstraints.find(({ idList }) => idList && idList[0] && idList[0] === 'All')
 
   return (
     <Grid
@@ -40,7 +53,7 @@ const TemporalConstraintView: React.FC = () => {
         className={classes.temporalConstraintSelect}
         value={mainTemporalConstraint ? mainTemporalConstraint.constraintType : 'none'}
         onChange={(e: any) => onChangeTemporalConstraint(e.target.value)}
-        disabled={maintenanceIsActive}
+        disabled={maintenanceIsActive || disableTemporalConstraint}
       >
         <MenuItem value={'sameEncounter'}>Tous les critères ont lieu au cours du même séjour</MenuItem>
         {/* <MenuItem value={'differentEncounter'}>Tous les critères ont lieu au cours de séjours différents</MenuItem> */}
