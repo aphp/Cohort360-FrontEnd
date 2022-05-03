@@ -20,7 +20,12 @@ import { RequestType } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { ProjectState, fetchProjects as fetchProjectsList, setSelectedProject } from 'state/project'
-import { RequestState, fetchRequests as fetchRequestsList, setSelectedRequest } from 'state/request'
+import {
+  RequestState,
+  fetchRequests as fetchRequestsList,
+  setSelectedRequest,
+  setSelectedRequestShare
+} from 'state/request'
 import { CohortState, fetchCohorts as fetchCohortsList, setSelectedCohort } from 'state/cohort'
 import { MeState } from 'state/me'
 
@@ -224,9 +229,13 @@ const MyProjects = () => {
       />
 
       {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch<any>(setSelectedRequest(null))} />}
-      {selectedRequestShare !== null && console.log(selectedRequestShare)}
+      {selectedRequestShare !== null && (
+        <ModalShareRequest onClose={() => dispatch<any>(setSelectedRequestShare(null))} />
+      )}
+
       {selectedRequestShare !== null && console.log(selectedRequestShare?.query_snapshots)}
       {selectedRequestShare !== null && console.log(selectedRequestShare.shared_query_snapshot)}
+      {console.log('selectedRequestShare2', selectedRequestShare)}
 
       <ModalEditCohort open={selectedCohort !== null} onClose={() => dispatch<any>(setSelectedCohort(null))} />
 

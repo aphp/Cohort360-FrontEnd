@@ -1,6 +1,6 @@
 import apiBack from '../apiBackend'
 
-import { ProjectType, RequestType, Cohort } from 'types'
+import { ProjectType, RequestType, Cohort, Provider } from 'types'
 
 import servicesCohorts from './serviceCohorts'
 
@@ -115,7 +115,7 @@ export interface IServiceProjects {
    * Retourne:
    *  - Requete partagée
    */
-  shareRequest: (sharedRequest: RequestType) => Promise<RequestType>
+  shareRequest: (sharedRequest: RequestType) => Promise<any>
 
   /**
    * Cette fonction supprime un requete existant
@@ -324,10 +324,15 @@ const servicesProjects: IServiceProjects = {
     }
   },
   shareRequest: async (sharedRequest) => {
-    const shareProjectResponse = (await apiBack.post(`/cohort/requests/${sharedRequest.uuid}/`)) ?? {
-      status: 400
-    }
-    if (shareProjectResponse.status === 204) {
+    const usersToShareId = sharedRequest.usersToShare?.map((userToshareId) => userToshareId.provider_username)
+    const shareProjectResponse = (await apiBack.post(
+      `/cohort/request-query-snapshots/${sharedRequest.shared_query_snapshot}/share/`,
+      {
+        name: sharedRequest.name,
+        recipients: usersToShareId?.join()
+      }
+    )) ?? { status: 400 }
+    if (shareProjectResponse.status === 201) {
       return shareProjectResponse.data as ProjectType
     } else {
       throw new Error('Impossible de partager la requête')

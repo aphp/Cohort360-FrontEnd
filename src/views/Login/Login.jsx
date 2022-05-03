@@ -155,11 +155,11 @@ const Login = () => {
       const { status, data = {} } = response
 
       if (status === 200) {
-        localStorage.setItem(ACCES_TOKEN, data.access)
-        localStorage.setItem(REFRESH_TOKEN, data.refresh)
+        localStorage.setItem(ACCES_TOKEN, data.jwt.access)
+        localStorage.setItem(REFRESH_TOKEN, data.jwt.refresh)
 
         const practitioner = await services.practitioner.fetchPractitioner(username)
-        const lastConnection = data.last_connection ? data.last_connection.modified_at : undefined
+        const lastConnection = data.jwt.last_connection ? data.jwt.last_connection.modified_at : undefined
 
         const maintenanceResponse = await services.practitioner.maintenance()
         const maintenance = maintenanceResponse.data

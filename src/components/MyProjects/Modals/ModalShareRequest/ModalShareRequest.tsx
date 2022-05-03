@@ -1,61 +1,100 @@
-import React, { Fragment } from 'react'
+import React, { useState } from 'react'
+import { useHistory } from 'react-router-dom'
 
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, CircularProgress } from '@material-ui/core'
 
-const machin: React.FC<{ onClose?: () => void }> = ({ onClose }) => {
+import { RequestType, Provider } from 'types'
+
+import { useAppSelector } from 'state'
+import { RequestState } from 'state/request'
+
+import RequestShareForm from './components/RequestShareForm'
+import useStyles from './styles'
+import services from 'services'
+
+const ERROR_TITLE = 'error_title'
+const ERROR_USER_SHARE_LIST = 'error_user_share_list'
+
+const ModalShareRequest: React.FC<{
+  onClose: () => void
+}> = ({ onClose }) => {
+  const { requestState } = useAppSelector<{
+    requestState: RequestState
+  }>((state) => ({
+    requestState: state.request
+  }))
+  const history = useHistory()
+  const classes = useStyles()
+  const { selectedRequestShare } = requestState
+  const [loading, setLoading] = useState(false)
+  const [currentRequest, setCurrentRequest] = useState<RequestType | null>(selectedRequestShare)
+  const [currentUserToShare, setCurrentUserToShare] = useState<Provider[] | null>(null)
+  const [error, setError] = useState<'error_title' | 'error_user_share_list' | null>(null)
+
+  const _onChangeValue = (key: 'name' | 'usersToShare', value: string | Provider[]) => {
+    if (value && typeof value !== 'string') {
+      setCurrentUserToShare(value)
+    }
+    setCurrentRequest((prevState) =>
+      prevState ? { ...prevState, [key]: value } : { uuid: '', name: '', [key]: value }
+    )
+  }
+
+  const handleConfirm = async () => {
+    if (loading || currentRequest === null) return
+
+    setLoading(true)
+    if (!currentRequest.name || (currentRequest.name && currentRequest.name.length > 255)) {
+      setLoading(false)
+      return setError(ERROR_TITLE)
+    }
+
+    if (!currentUserToShare) {
+      setLoading(false)
+      return setError(ERROR_USER_SHARE_LIST)
+    }
+    await services.projects.shareRequest(currentRequest)
+    onClose()
+  }
+
   const handleClose = () => {
     if (onClose && typeof onClose === 'function') {
       onClose()
+    } else {
+      history.push('/accueil')
     }
   }
 
   return (
-    <Dialog open onClose={() => onClose} fullWidth maxWidth="sm" aria-labelledby="form-dialog-title">
+    <Dialog
+      open
+      onClose={() => onClose && typeof onClose === 'function' && onClose()}
+      fullWidth
+      maxWidth="md"
+      aria-labelledby="form-dialog-title"
+    >
       <DialogTitle>Partager une requete</DialogTitle>
-      {/* <DialogContent>
-        <Autocomplete
-          noOptionsText="Recherchez un utilisateur"
-          clearOnEscape
-          options={providersSearchResults ?? []}
-          loading={loadingOnSearch}
-          onChange={(e, value) => {
-            addProvider(value)
-            setSearchInput('')
-          }}
-          inputValue={searchInput}
-          onInputChange={() => setSearchInput('')}
-          getOptionLabel={(option) =>
-            `${option.provider_source_value} - ${option.lastname?.toLocaleUpperCase()} ${option.firstname} - ${
-              option.email
-            }` ?? ''
-          }
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Rechercher un utilisateur"
-              variant="outlined"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              InputProps={{
-                ...params.InputProps,
-                endAdornment: (
-                  <Fragment>
-                    {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                    {params.InputProps.endAdornment}
-                  </Fragment>
-                )
-              }}
-              style={{ marginBottom: '1em' }}
-            />
-          )}
-        />
-      </DialogContent> */}
+      <DialogContent>
+        {currentRequest === null ? (
+          <Grid
+            container
+            direction="column"
+            justifyContent="center"
+            alignItems="center"
+            className={classes.inputContainer}
+          >
+            <CircularProgress />
+          </Grid>
+        ) : (
+          <RequestShareForm currentRequest={currentRequest} onChangeValue={_onChangeValue} error={error} />
+        )}
+      </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>Fermer</Button>
+        <Button onClick={handleClose}>Annuler</Button>
+        <Button onClick={handleConfirm}>Valider</Button>
       </DialogActions>
     </Dialog>
   )
 }
 
-export default machin
+export default ModalShareRequest

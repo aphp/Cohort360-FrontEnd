@@ -105,38 +105,6 @@ const addRequest = createAsyncThunk<AddRequestReturn, AddRequestParams, { state:
 )
 
 /**
- * shareRequest
- *
- */
-type ShareRequestParams = {
-  sharedRequest: RequestType
-}
-type ShareRequestReturn = {
-  selectedRequestShare: null
-  requestsList: RequestType[]
-}
-
-const shareRequest = createAsyncThunk<ShareRequestReturn, ShareRequestParams, { state: RootState }>(
-  'request/shareRequest',
-  async ({ sharedRequest }, { getState }) => {
-    try {
-      const state = getState().request
-      const requestsList: RequestType[] = state.requestsList ?? []
-
-      const sendRequest = await services.projects.shareRequest(sharedRequest)
-
-      return {
-        selectedRequestShare: null,
-        requestsList: sendRequest !== null ? [...requestsList, sendRequest] : requestsList
-      }
-    } catch (error) {
-      console.error(error)
-      throw error
-    }
-  }
-)
-
-/**
  * editRequest
  *
  */
@@ -384,10 +352,6 @@ const setRequestSlice = createSlice({
     builder.addCase(editRequest.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(editRequest.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
     builder.addCase(editRequest.rejected, (state) => ({ ...state, loading: false }))
-    // shareRequest
-    builder.addCase(shareRequest.pending, (state) => ({ ...state, loading: true }))
-    builder.addCase(shareRequest.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
-    builder.addCase(shareRequest.rejected, (state) => ({ ...state, loading: false }))
     // deleteRequest
     builder.addCase(deleteRequest.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(deleteRequest.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
@@ -404,5 +368,5 @@ const setRequestSlice = createSlice({
 })
 
 export default setRequestSlice.reducer
-export { fetchRequests, addRequest, editRequest, shareRequest, deleteRequest, moveRequests, deleteRequests }
+export { fetchRequests, addRequest, editRequest, deleteRequest, moveRequests, deleteRequests }
 export const { clearRequest, setSelectedRequest, setSelectedRequestShare } = setRequestSlice.actions
