@@ -73,7 +73,7 @@ const ModalShareRequest: React.FC<{
       maxWidth="md"
       aria-labelledby="form-dialog-title"
     >
-      <DialogTitle>Partager une requete</DialogTitle>
+      <DialogTitle>Partager une requête</DialogTitle>
       <DialogContent>
         {currentRequest === null ? (
           <Grid

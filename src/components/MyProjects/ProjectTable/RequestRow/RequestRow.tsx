@@ -79,7 +79,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
           </TableCell>
           <TableCell className={classes.tdName}>
             {row?.shared_by?.displayed_name ? (
-              <Link href={`/cohort/new/${row.uuid}`}>{`${row.name} - Envoyé par : ${
+              <Link href={`/cohort/new/${row.uuid}`}>{`${row.name} - Envoyée par : ${
                 row?.shared_by?.firstname
               } ${row?.shared_by?.lastname?.toUpperCase()}`}</Link>
             ) : (

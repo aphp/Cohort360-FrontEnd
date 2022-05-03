@@ -225,7 +225,7 @@ const DocumentSearchHelp = ({ open, onClose }) => {
                   </TableCell>
                   <TableCell align="left">
                     <Typography>Recherche dans les documents si au moins un des mots est présent</Typography>
-                    <Typography className={classes.bold}>Ces 4 opérateurs sont équivalents</Typography>
+                    <Typography className={classes.bold}>Ces 3 opérateurs sont équivalents</Typography>
                   </TableCell>
                   <TableCell align="center">
                     <Typography>

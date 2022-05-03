@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
 
-import { Button, IconButton, CircularProgress, Grid, Hidden, Tooltip, Typography } from '@material-ui/core'
+import { Button, IconButton, CircularProgress, Grid, Hidden, Tooltip, Typography, Snackbar } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
+import { Alert } from '@material-ui/lab'
+
 import { ReactComponent as DriveFileMoveIcon } from 'assets/icones/drive-file-move.svg'
 
 import ProjectTable from 'components/MyProjects/ProjectTable/ProjectTable'
@@ -31,7 +33,7 @@ import { MeState } from 'state/me'
 
 import useStyles from './styles'
 
-const MyProjects = () => {
+const MyProjects: React.FC<{}> = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
@@ -229,13 +231,26 @@ const MyProjects = () => {
       />
 
       {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch<any>(setSelectedRequest(null))} />}
-      {selectedRequestShare !== null && (
-        <ModalShareRequest onClose={() => dispatch<any>(setSelectedRequestShare(null))} />
-      )}
+      {selectedRequestShare !== null &&
+        selectedRequestShare?.shared_query_snapshot !== undefined &&
+        selectedRequestShare?.shared_query_snapshot?.length > 0 && (
+          <ModalShareRequest onClose={() => dispatch<any>(setSelectedRequestShare(null))} />
+        )}
 
-      {selectedRequestShare !== null && console.log(selectedRequestShare?.query_snapshots)}
-      {selectedRequestShare !== null && console.log(selectedRequestShare.shared_query_snapshot)}
-      {console.log('selectedRequestShare2', selectedRequestShare)}
+      {selectedRequestShare !== null &&
+        selectedRequestShare?.shared_query_snapshot !== undefined &&
+        selectedRequestShare?.shared_query_snapshot?.length === 0 && (
+          <Snackbar
+            open
+            onClose={() => dispatch<any>(setSelectedRequestShare(null))}
+            autoHideDuration={5000}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          >
+            <Alert severity="error" onClose={() => dispatch<any>(setSelectedRequestShare(null))}>
+              Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
+            </Alert>
+          </Snackbar>
+        )}
 
       <ModalEditCohort open={selectedCohort !== null} onClose={() => dispatch<any>(setSelectedCohort(null))} />
 

@@ -12,6 +12,7 @@ import useStyles from '../styles'
 import { useDebounce } from 'utils/debounce'
 
 const ERROR_TITLE = 'error_title'
+const ERROR_USER_SHARE_LIST = 'error_user_share_list'
 
 const orderDefault = { orderBy: 'lastname', orderDirection: 'asc' } as Order
 
@@ -113,6 +114,8 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
             renderInput={(params) => (
               <TextField
                 {...params}
+                error={error === ERROR_USER_SHARE_LIST}
+                helperText={error === ERROR_USER_SHARE_LIST ? 'Veuillez ajouter au moins un utilisateur' : ''}
                 label="Rechercher un utilisateur"
                 variant="outlined"
                 value={searchInput}
