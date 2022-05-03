@@ -1,6 +1,7 @@
 import { CriteriaItemType } from 'types'
 
 // Components
+import RequestForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/RequestForm/RequestForm'
 import DemographicFrom from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicFrom/DemographicFrom'
 import DocumentsForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DocumentsForm/DocumentsForm'
 import SupportedForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/SupportedForm/SupportedForm'
@@ -38,6 +39,12 @@ const criteriaList: CriteriaItemType[] = [
     disabled: true,
     data: null,
     components: null
+  },
+  {
+    id: 'Request',
+    title: 'Mes requête',
+    color: '#0063AF',
+    components: RequestForm
   },
   {
     id: 'Patient',
