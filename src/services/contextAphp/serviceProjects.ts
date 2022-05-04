@@ -328,10 +328,11 @@ const servicesProjects: IServiceProjects = {
     const shared_query_snapshot_id = sharedRequest.shared_query_snapshot
       ? sharedRequest.shared_query_snapshot
       : sharedRequest.currentSnapshot
+    const shared_query_snapshot_name = sharedRequest.name ? sharedRequest.name : sharedRequest.requestName
     const shareProjectResponse = (await apiBack.post(
       `/cohort/request-query-snapshots/${shared_query_snapshot_id}/share/`,
       {
-        name: sharedRequest.name,
+        name: shared_query_snapshot_name,
         recipients: usersToShareId?.join()
       }
     )) ?? { status: 400 }

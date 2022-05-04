@@ -231,6 +231,7 @@ const MyProjects: React.FC<{}> = () => {
       />
 
       {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch<any>(setSelectedRequest(null))} />}
+
       {selectedRequestShare !== null &&
         selectedRequestShare?.shared_query_snapshot !== undefined &&
         selectedRequestShare?.shared_query_snapshot?.length > 0 && (

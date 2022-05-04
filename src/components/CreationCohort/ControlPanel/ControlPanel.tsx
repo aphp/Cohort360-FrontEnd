@@ -76,8 +76,6 @@ const ControlPanel: React.FC<{
     uuid: ''
   })
 
-  console.log('props récupérer du controle panel', requestShare)
-
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active
 
@@ -352,20 +350,17 @@ const ControlPanel: React.FC<{
         <ModalShareRequest requestShare={requestShare} onClose={() => handleCloseSharedModal()} />
       )}
 
-      {openShareRequestModal && requestShare !== null && (
-        <>
-          {console.log('requestShare?.currentSnapshot', requestShare?.currentSnapshot)}
-          <Snackbar
-            open
-            onClose={() => handleCloseSharedModal}
-            autoHideDuration={5000}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          >
-            <Alert severity="error" onClose={() => handleCloseSharedModal()}>
-              Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
-            </Alert>
-          </Snackbar>
-        </>
+      {openShareRequestModal && requestShare?.currentSnapshot === undefined && (
+        <Snackbar
+          open
+          onClose={() => handleCloseSharedModal}
+          autoHideDuration={5000}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert severity="error" onClose={() => handleCloseSharedModal()}>
+            Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
+          </Alert>
+        </Snackbar>
       )}
     </>
   )

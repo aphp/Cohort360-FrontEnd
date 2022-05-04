@@ -18,18 +18,16 @@ const orderDefault = { orderBy: 'lastname', orderDirection: 'asc' } as Order
 
 type RequestShareFormProps = {
   currentRequest: RequestType | undefined
-  onChangeValue: (key: 'name' | 'usersToShare', value: string | Provider[]) => void
+  onChangeValue: (key: 'name' | 'requestName' | 'usersToShare', value: string | string | Provider[]) => void
   error: 'error_title' | 'error_user_share_list' | null
 }
 
 const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onChangeValue, error }) => {
   const [providersSearchResults, setProvidersSearchResults] = useState<Provider[]>([])
   const [loadingOnSearch, setLoadingOnSearch] = useState(false)
-  const [usersToShare, setUsersToShare] = useState<Provider[]>([])
+  const [usersToShare] = useState<Provider[]>([])
   const [searchInput, setSearchInput] = useState('')
   const classes = useStyles()
-
-  console.log('currentRequest du formulaire dans la modale', currentRequest)
 
   const debouncedSearchTerm = useDebounce(700, searchInput)
 
@@ -84,7 +82,8 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
           placeholder="Nom de la requête"
           // value={currentRequest?.name}
           value={currentRequest?.name ? currentRequest?.name : currentRequest?.requestName}
-          onChange={(e: any) => onChangeValue('name', e.target.value)}
+          onChange={(e: any) => onChangeValue(currentRequest?.name ? 'name' : 'requestName', e.target.value)}
+          {...console.log('onChangeValue', onChangeValue)}
           autoFocus
           id="title"
           margin="normal"
