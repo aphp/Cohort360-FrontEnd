@@ -1,4 +1,4 @@
-import { CLAIM_HIERARCHY } from '../../../constants'
+import { CLAIM_HIERARCHY, VALUE_SET_SIZE } from '../../../constants'
 import apiRequest from 'services/apiRequest'
 import { codeSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
@@ -17,7 +17,9 @@ export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
     ? `&_text=${encodeURIComponent(searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line
     : ''
 
-  const res = await apiRequest.get<any>(`/ValueSet?url=${CLAIM_HIERARCHY}${_searchValue}&size=0`)
+  const res = await apiRequest.get<any>(
+    `/ValueSet?url=${CLAIM_HIERARCHY}${_searchValue}&size=${VALUE_SET_SIZE ?? 9999}`
+  )
 
   const data =
     res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'

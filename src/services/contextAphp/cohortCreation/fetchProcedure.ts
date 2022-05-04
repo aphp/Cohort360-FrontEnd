@@ -1,4 +1,4 @@
-import { PROCEDURE_HIERARCHY } from '../../../constants'
+import { PROCEDURE_HIERARCHY, VALUE_SET_SIZE } from '../../../constants'
 import apiRequest from 'services/apiRequest'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { codeSort } from 'utils/alphabeticalSort'
@@ -17,7 +17,9 @@ export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
     ? `&_text=${encodeURIComponent(searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line
     : ''
 
-  const res = await apiRequest.get<any>(`/ValueSet?url=${PROCEDURE_HIERARCHY}${_searchValue}&size=0`)
+  const res = await apiRequest.get<any>(
+    `/ValueSet?url=${PROCEDURE_HIERARCHY}${_searchValue}&size=${VALUE_SET_SIZE ?? 9999}`
+  )
 
   const data =
     res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'

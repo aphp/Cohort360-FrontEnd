@@ -1,4 +1,9 @@
-import { MEDICATION_ATC, MEDICATION_PRESCRIPTION_TYPES, MEDICATION_ADMINISTRATIONS } from '../../../constants'
+import {
+  MEDICATION_ATC,
+  MEDICATION_PRESCRIPTION_TYPES,
+  MEDICATION_ADMINISTRATIONS,
+  VALUE_SET_SIZE
+} from '../../../constants'
 import apiRequest from 'services/apiRequest'
 import { cleanValueSet } from 'utils/cleanValueSet'
 import { codeSort } from 'utils/alphabeticalSort'
@@ -18,7 +23,7 @@ export const fetchAtcData = async (searchValue?: string, noStar?: boolean) => {
     ? `&_text=${encodeURIComponent(searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line
     : ''
 
-  const res = await apiRequest.get<any>(`/ValueSet?url=${MEDICATION_ATC}${_searchValue}&size=0`)
+  const res = await apiRequest.get<any>(`/ValueSet?url=${MEDICATION_ATC}${_searchValue}&size=${VALUE_SET_SIZE ?? 9999}`)
 
   const data =
     res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'

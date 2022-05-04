@@ -126,3 +126,5 @@ export const ODD_MEDICATION =
   process.env.NODE_ENV !== 'development' ? '{ODD_MEDICATION}' : process.env.REACT_APP_ODD_MEDICATION
 export const ODD_CONTACT = process.env.NODE_ENV !== 'development' ? '{ODD_CONTACT}' : process.env.REACT_APP_ODD_CONTACT
 export const ODD_EXPORT = process.env.NODE_ENV !== 'development' ? '{ODD_EXPORT}' : process.env.REACT_APP_ODD_EXPORT
+
+export const VALUE_SET_SIZE = '9999'
