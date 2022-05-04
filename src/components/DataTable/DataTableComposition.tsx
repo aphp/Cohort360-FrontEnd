@@ -17,7 +17,7 @@ import DataTable from 'components/DataTable/DataTable'
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 
 import { docTypes } from 'assets/docTypes.json'
-import Watermark from 'assets/images/watermark.svg'
+import Watermark from 'assets/images/watermark_pseudo.svg'
 
 import { getDocumentStatus } from 'utils/documentsFormatter'
 
