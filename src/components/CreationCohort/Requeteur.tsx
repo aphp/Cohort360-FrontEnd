@@ -107,8 +107,6 @@ const Requeteur = () => {
       if (createCohortResult && createCohortResult.status === 201) {
         dispatch<any>(resetCohortCreation())
         history.push(`/accueil`)
-      } else {
-        console.log('createCohortResult :>> ', createCohortResult)
       }
     }
 

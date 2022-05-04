@@ -33,6 +33,29 @@ export type Back_API_Response<T> = {
   count?: number
 }
 
+export type Provider = {
+  birth_date?: string
+  cdm_source?: string
+  delete_datetime?: string
+  displayed_name?: string
+  email?: string
+  firstname?: string
+  gender_concept_id?: number
+  gender_source_concept_id?: number
+  gender_source_value?: string
+  insert_datetime?: string
+  lastname?: string
+  provider_username?: string
+  provider_id?: number
+  provider_name?: string
+  provider_source_value?: string
+  specialty_concept_id?: number
+  specialty_source_concept_id?: number
+  specialty_source_value?: string
+  update_datetime?: string
+  year_of_birth?: number
+}
+
 export type CohortComposition = IComposition & {
   deidentified?: boolean
   idPatient?: string
@@ -511,6 +534,13 @@ export type RequestType = {
   favorite?: boolean
   created_at?: string
   modified_at?: string
+  query_snapshots?: string[]
+  shared_query_snapshot?: string[]
+  usersToShare?: Provider[]
+  shared_by?: Provider
+  currentSnapshot?: string
+  requestId?: string
+  requestName?: string
 }
 
 export type ContactSubmitForm = FormData

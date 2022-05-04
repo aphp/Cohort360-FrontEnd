@@ -42,19 +42,11 @@ const AutoLogoutContainer = () => {
 
   const stayActive = async () => {
     try {
-      const refreshToken = localStorage.getItem(REFRESH_TOKEN)
-      if (!refreshToken) return
+      const res = await axios.post(`${BACK_API_URL}/accounts/refresh/`)
 
-      const res = await axios.post('/api/jwt/refresh/', {
-        refresh: refreshToken
-      })
-
-      if (res && res.status === 200) {
+      if (res.status === 200) {
         localStorage.setItem(ACCES_TOKEN, res.data.access)
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
-        axios.post(`${BACK_API_URL}/accounts/refresh/`, {
-          refresh: res.data.refresh
-        })
         setDialogIsOpen(false)
         // console.log('User est resté connecté')
         clearTimeout(sessionInactifTimerRef.current)
@@ -71,20 +63,11 @@ const AutoLogoutContainer = () => {
     try {
       // console.log('refresh still actif')
       if (CONTEXT === ('aphp' || 'arkhn')) {
-        const refreshToken = localStorage.getItem(REFRESH_TOKEN)
-        if (!refreshToken) return
-
-        const res = await axios.post('/api/jwt/refresh/', {
-          refresh: refreshToken
-        })
+        const res = await axios.post(`${BACK_API_URL}/accounts/refresh/`)
 
         if (res.status === 200) {
           localStorage.setItem(ACCES_TOKEN, res.data.access)
           localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
-
-          await axios.post(`${BACK_API_URL}/accounts/refresh/`, {
-            refresh: res.data.refresh
-          })
         } else {
           logout()
         }
@@ -101,7 +84,7 @@ const AutoLogoutContainer = () => {
 
       setInterval(() => {
         refreshToken()
-      }, 3 * 60 * 1000)
+      }, 5 * 60 * 1000)
     }
   }, [])
 
