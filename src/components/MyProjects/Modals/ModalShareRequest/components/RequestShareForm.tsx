@@ -16,8 +16,8 @@ const ERROR_USER_SHARE_LIST = 'error_user_share_list'
 
 const orderDefault = { orderBy: 'lastname', orderDirection: 'asc' } as Order
 
-interface RequestShareFormProps {
-  currentRequest: RequestType
+type RequestShareFormProps = {
+  currentRequest: RequestType | undefined
   onChangeValue: (key: 'name' | 'usersToShare', value: string | Provider[]) => void
   error: 'error_title' | 'error_user_share_list' | null
 }
@@ -28,6 +28,8 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
   const [usersToShare, setUsersToShare] = useState<Provider[]>([])
   const [searchInput, setSearchInput] = useState('')
   const classes = useStyles()
+
+  console.log('currentRequest du formulaire dans la modale', currentRequest)
 
   const debouncedSearchTerm = useDebounce(700, searchInput)
 
@@ -80,7 +82,8 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
         <Typography variant="h3">Nom de la requête à partager:</Typography>
         <TextField
           placeholder="Nom de la requête"
-          value={currentRequest.name}
+          // value={currentRequest?.name}
+          value={currentRequest?.name ? currentRequest?.name : currentRequest?.requestName}
           onChange={(e: any) => onChangeValue('name', e.target.value)}
           autoFocus
           id="title"

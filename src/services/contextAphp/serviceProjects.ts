@@ -1,6 +1,6 @@
 import apiBack from '../apiBackend'
 
-import { ProjectType, RequestType, Cohort, Provider } from 'types'
+import { ProjectType, RequestType, Cohort } from 'types'
 
 import servicesCohorts from './serviceCohorts'
 
@@ -325,8 +325,11 @@ const servicesProjects: IServiceProjects = {
   },
   shareRequest: async (sharedRequest) => {
     const usersToShareId = sharedRequest.usersToShare?.map((userToshareId) => userToshareId.provider_username)
+    const shared_query_snapshot_id = sharedRequest.shared_query_snapshot
+      ? sharedRequest.shared_query_snapshot
+      : sharedRequest.currentSnapshot
     const shareProjectResponse = (await apiBack.post(
-      `/cohort/request-query-snapshots/${sharedRequest.shared_query_snapshot}/share/`,
+      `/cohort/request-query-snapshots/${shared_query_snapshot_id}/share/`,
       {
         name: sharedRequest.name,
         recipients: usersToShareId?.join()

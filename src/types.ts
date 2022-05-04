@@ -538,6 +538,9 @@ export type RequestType = {
   shared_query_snapshot?: string[]
   usersToShare?: Provider[]
   shared_by?: Provider
+  currentSnapshot?: string
+  requestId?: string
+  requestName?: string
 }
 
 export type ContactSubmitForm = FormData

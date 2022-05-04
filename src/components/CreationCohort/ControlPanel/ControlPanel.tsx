@@ -2,7 +2,17 @@ import React, { useState, useEffect } from 'react'
 import clsx from 'clsx'
 import moment from 'moment'
 
-import { Button, CircularProgress, Divider, Grid, List, ListItem, Tooltip, Typography } from '@material-ui/core'
+import {
+  Button,
+  CircularProgress,
+  Divider,
+  Grid,
+  List,
+  ListItem,
+  Tooltip,
+  Typography,
+  Snackbar
+} from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack'
@@ -10,8 +20,10 @@ import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
 import UpdateSharpIcon from '@material-ui/icons/UpdateSharp'
 import HighlightOffIcon from '@material-ui/icons/HighlightOff'
 import InfoIcon from '@material-ui/icons/Info'
+import ShareIcon from '@material-ui/icons/Share'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
+import ModalShareRequest from 'components/MyProjects/Modals/ModalShareRequest/ModalShareRequest'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import {
@@ -21,6 +33,8 @@ import {
   buildCohortCreation
 } from 'state/cohortCreation'
 import { MeState } from 'state/me'
+
+import { RequestType } from 'types'
 
 import useStyle from './styles'
 
@@ -37,6 +51,7 @@ const ControlPanel: React.FC<{
   const dispatch = useAppDispatch()
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
   const [oldCount, setOldCount] = useState<any | null>(null)
+  const [openShareRequestModal, setOpenShareRequestModal] = useState<boolean>(false)
 
   const {
     loading = false,
@@ -48,9 +63,20 @@ const ControlPanel: React.FC<{
     selectedPopulation = [],
     currentSnapshot,
     requestId,
+    requestName,
     json
   } = useAppSelector((state) => state.cohortCreation.request || {})
   const { includePatient, status, jobFailMsg /*byrequest, alive, deceased, female, male, unknownPatient */ } = count
+
+  const [requestShare, setRequestShare] = useState<RequestType | null>({
+    currentSnapshot,
+    requestId,
+    requestName,
+    name: '',
+    uuid: ''
+  })
+
+  console.log('props récupérer du controle panel', requestShare)
 
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active
@@ -98,6 +124,15 @@ const ControlPanel: React.FC<{
         requestId
       })
     )
+  }
+
+  const handleOpenSharedModal = () => {
+    setRequestShare({ currentSnapshot, requestId, requestName, name: '', uuid: '' })
+    setOpenShareRequestModal(true)
+  }
+  const handleCloseSharedModal = () => {
+    setRequestShare(null)
+    setOpenShareRequestModal(false)
   }
 
   const itLoads = loading || countLoading || saveLoading
@@ -169,6 +204,17 @@ const ControlPanel: React.FC<{
             disabled={maintenanceIsActive}
           >
             <Typography className={classes.boldText}>Réinitialiser</Typography>
+          </Button>
+
+          <Button
+            onClick={() => {
+              handleOpenSharedModal()
+            }}
+            className={classes.actionButton}
+            startIcon={<ShareIcon color="action" className={classes.iconBorder} />}
+            disabled={maintenanceIsActive}
+          >
+            <Typography className={classes.boldText}>Partager ma requête</Typography>
           </Button>
 
           {checkIfLogicalOperatorIsEmpty() && (
@@ -300,6 +346,26 @@ const ControlPanel: React.FC<{
 
       {openModal === 'executeCohortConfirmation' && (
         <ModalCohortTitle onExecute={onExecute} onClose={() => onSetOpenModal(null)} />
+      )}
+
+      {openShareRequestModal && requestShare !== null && requestShare?.currentSnapshot !== undefined && (
+        <ModalShareRequest requestShare={requestShare} onClose={() => handleCloseSharedModal()} />
+      )}
+
+      {openShareRequestModal && requestShare !== null && (
+        <>
+          {console.log('requestShare?.currentSnapshot', requestShare?.currentSnapshot)}
+          <Snackbar
+            open
+            onClose={() => handleCloseSharedModal}
+            autoHideDuration={5000}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          >
+            <Alert severity="error" onClose={() => handleCloseSharedModal()}>
+              Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
+            </Alert>
+          </Snackbar>
+        </>
       )}
     </>
   )

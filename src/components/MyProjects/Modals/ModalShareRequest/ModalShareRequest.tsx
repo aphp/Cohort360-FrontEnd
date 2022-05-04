@@ -16,20 +16,23 @@ const ERROR_TITLE = 'error_title'
 const ERROR_USER_SHARE_LIST = 'error_user_share_list'
 
 const ModalShareRequest: React.FC<{
+  requestShare?: RequestType | null
   onClose: () => void
-}> = ({ onClose }) => {
-  const { requestState } = useAppSelector<{
-    requestState: RequestState
-  }>((state) => ({
-    requestState: state.request
-  }))
+}> = ({ requestShare, onClose }) => {
+  const { requestState } = useAppSelector<{ requestState: RequestState }>((state) => ({ requestState: state.request }))
   const history = useHistory()
   const classes = useStyles()
   const { selectedRequestShare } = requestState
+  const selectedCurrentRequest = selectedRequestShare || requestShare
   const [loading, setLoading] = useState(false)
-  const [currentRequest, setCurrentRequest] = useState<RequestType | null>(selectedRequestShare)
+  const [currentRequest, setCurrentRequest] = useState<RequestType | null | undefined>(selectedCurrentRequest)
   const [currentUserToShare, setCurrentUserToShare] = useState<Provider[] | null>(null)
   const [error, setError] = useState<'error_title' | 'error_user_share_list' | null>(null)
+
+  console.log('props passé a la modal de shareRequest par le state', selectedRequestShare)
+  console.log('props passé a la modale par la props requestShare', requestShare)
+  console.log('selectedCurrentRequest', selectedCurrentRequest)
+  console.log('currentRequest', currentRequest)
 
   const _onChangeValue = (key: 'name' | 'usersToShare', value: string | Provider[]) => {
     if (value && typeof value !== 'string') {
@@ -44,7 +47,12 @@ const ModalShareRequest: React.FC<{
     if (loading || currentRequest === null) return
 
     setLoading(true)
-    if (!currentRequest.name || (currentRequest.name && currentRequest.name.length > 255)) {
+    if (
+      !currentRequest?.name ||
+      !currentRequest?.requestName ||
+      (currentRequest?.name && currentRequest?.name.length > 255) ||
+      (currentRequest?.requestName && currentRequest?.requestName.length > 255)
+    ) {
       setLoading(false)
       return setError(ERROR_TITLE)
     }
