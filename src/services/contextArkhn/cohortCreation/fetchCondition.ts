@@ -1,4 +1,4 @@
-import { CONDITION_HIERARCHY, CONDITION_STATUS } from '../../../constants'
+import { CONDITION_HIERARCHY, CONDITION_STATUS, VALUE_SET_SIZE } from '../../../constants'
 import apiRequest from 'services/apiRequest'
 import { codeSort } from 'utils/alphabeticalSort'
 
@@ -44,7 +44,9 @@ export const fetchCim10Diagnostic = async (searchValue?: string, noStar?: boolea
     ? `&_text=${encodeURIComponent(searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line
     : ''
 
-  const res = await apiRequest.get<any>(`/ValueSet?url=${CONDITION_HIERARCHY}${_searchValue}&size=0`)
+  const res = await apiRequest.get<any>(
+    `/ValueSet?url=${CONDITION_HIERARCHY}${_searchValue}&size=${VALUE_SET_SIZE ?? 9999}`
+  )
 
   let cim10List =
     res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'

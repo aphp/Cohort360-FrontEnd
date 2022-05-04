@@ -15,7 +15,7 @@ import { Document, Page, pdfjs } from 'react-pdf'
 import { FHIR_API_URL } from '../../constants'
 import services from 'services'
 
-import Watermark from 'assets/images/watermark.svg'
+import Watermark from 'assets/images/watermark_pseudo.svg'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 
