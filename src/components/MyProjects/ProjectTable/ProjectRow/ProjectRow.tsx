@@ -78,7 +78,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
             <Tooltip title={'Ajouter une requête'}>
               <IconButton
                 onClick={handleAddRequest}
-                className={classes.smallAddButon}
+                className={classes.smallAddButton}
                 size="small"
                 disabled={maintenanceIsActive}
               >
@@ -89,7 +89,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
           <Tooltip title={'Modifier le projet'}>
             <IconButton
               onClick={() => handleClickAddOrEditProject(row.uuid)}
-              className={classes.editButon}
+              className={classes.editButton}
               size="small"
               disabled={maintenanceIsActive}
             >

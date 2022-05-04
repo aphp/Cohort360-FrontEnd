@@ -16,9 +16,6 @@ const useStyles = makeStyles(() => ({
   filter: {
     marginBottom: '24px'
   },
-  autocomplete: {
-    marginTop: '16px'
-  },
   datePickers: {
     margin: '1em 0 1em 1em'
   },

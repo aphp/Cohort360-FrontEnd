@@ -6,13 +6,14 @@ import { Checkbox, Collapse, IconButton, Link, Table, TableBody, TableCell, Tabl
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import EditIcon from '@material-ui/icons/Edit'
+import ShareIcon from '@material-ui/icons/Share'
 
 import VersionRow from '../VersionRow/VersionRow'
 
 import { RequestType, Cohort } from 'types'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { setSelectedRequest } from 'state/request'
+import { setSelectedRequest, setSelectedRequestShare } from 'state/request'
 import { MeState } from 'state/me'
 import useStyles from '../styles'
 
@@ -37,6 +38,10 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
 
   const onEditRequest = (requestId: string) => {
     dispatch<any>(setSelectedRequest({ uuid: requestId, name: '' }))
+  }
+
+  const onShareRequest = (requestId: string) => {
+    dispatch<any>(setSelectedRequestShare({ uuid: requestId, name: '' }))
   }
 
   useEffect(() => {
@@ -73,10 +78,17 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
             </IconButton>
           </TableCell>
           <TableCell className={classes.tdName}>
-            <Link href={`/cohort/new/${row.uuid}`}>{row.name}</Link>
+            {row?.shared_by?.displayed_name ? (
+              <Link href={`/cohort/new/${row.uuid}`}>{`${row.name} - Envoyée par : ${
+                row?.shared_by?.firstname
+              } ${row?.shared_by?.lastname?.toUpperCase()}`}</Link>
+            ) : (
+              <Link href={`/cohort/new/${row.uuid}`}>{row.name}</Link>
+            )}
+
             <Tooltip title="Modifier la requête">
               <IconButton
-                className={classes.editButon}
+                className={classes.editButton}
                 size="small"
                 onClick={() => onEditRequest(row.uuid)}
                 disabled={maintenanceIsActive}
@@ -84,7 +96,18 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
                 <EditIcon />
               </IconButton>
             </Tooltip>
+            <Tooltip title="Partager la requête">
+              <IconButton
+                className={classes.editButton}
+                size="small"
+                onClick={() => onShareRequest(row.uuid)}
+                disabled={maintenanceIsActive}
+              >
+                <ShareIcon />
+              </IconButton>
+            </Tooltip>
           </TableCell>
+
           <TableCell className={classes.dateCell} align="center">
             {moment(row.modified_at).format('DD/MM/YYYY [à] HH:mm')}
           </TableCell>

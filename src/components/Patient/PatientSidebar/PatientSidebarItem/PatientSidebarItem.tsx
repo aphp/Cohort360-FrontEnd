@@ -35,9 +35,9 @@ const VitalStatusChip: React.FC<VitalStatusChipTypes> = ({ deceased }) => {
   const classes = useStyles()
 
   if (deceased) {
-    return <Chip className={classes.deceasedChip} label="D." />
+    return <Chip className={classes.chip} style={{ backgroundColor: '#D0D7D8' }} label="D." />
   } else {
-    return <Chip className={classes.aliveChip} label="V." />
+    return <Chip className={classes.chip} style={{ backgroundColor: '#5BC5F2' }} label="V." />
   }
 }
 

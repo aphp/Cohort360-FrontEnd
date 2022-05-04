@@ -14,7 +14,7 @@ const InputSearchDocumentButton: React.FC<InputSearchDocumentButtonProps> = ({ c
   const classes = useStyle()
 
   return (
-    <ButtonGroup className={classes.buttonContainer} size="small" variant="contained">
+    <ButtonGroup disableElevation className={classes.buttonContainer} size="small" variant="contained">
       <Button
         onClick={() => onChangeMode('simple')}
         className={clsx({

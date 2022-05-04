@@ -3,6 +3,36 @@ import apiBack from '../apiBackend'
 
 import { CohortCreationCounterType } from 'types'
 
+import {
+  fetchAdmissionModes,
+  fetchEntryModes,
+  fetchExitModes,
+  fetchPriseEnChargeType,
+  fetchTypeDeSejour,
+  fetchFileStatus,
+  fetchReason,
+  fetchDestination,
+  fetchProvenance,
+  fetchAdmission
+} from './cohortCreation/fetchEncounter'
+import { fetchGender, fetchStatus } from './cohortCreation/fetchDemographic'
+import {
+  fetchStatusDiagnostic,
+  fetchDiagnosticTypes,
+  fetchCim10Diagnostic,
+  fetchCim10Hierarchy
+} from './cohortCreation/fetchCondition'
+import { fetchCcamData, fetchCcamHierarchy } from './cohortCreation/fetchProcedure'
+import { fetchGhmData, fetchGhmHierarchy } from './cohortCreation/fetchClaim'
+import { fetchDocTypes } from './cohortCreation/fetchComposition'
+import {
+  fetchAtcData,
+  fetchAtcHierarchy,
+  fetchPrescriptionTypes,
+  fetchAdministrations
+} from './cohortCreation/fetchMedication'
+import { fetchBiologyData, fetchBiologyHierarchy } from './cohortCreation/fetchObservation'
+
 export interface IServiceCohortCreation {
   /**
    * Cette fornction permet de créer une cohorte à partir d'une requete dans le requeteur
@@ -31,6 +61,34 @@ export interface IServiceCohortCreation {
    * Permet de récupérer toutes les informations utiles pour l'utilisation du requeteur
    */
   fetchRequest: (requestId: string, snapshotId?: string) => Promise<any>
+
+  fetchAdmissionModes: () => Promise<any>
+  fetchEntryModes: () => Promise<any>
+  fetchExitModes: () => Promise<any>
+  fetchPriseEnChargeType: () => Promise<any>
+  fetchTypeDeSejour: () => Promise<any>
+  fetchFileStatus: () => Promise<any>
+  fetchReason: () => Promise<any>
+  fetchDestination: () => Promise<any>
+  fetchProvenance: () => Promise<any>
+  fetchAdmission: () => Promise<any>
+  fetchGender: () => Promise<any>
+  fetchStatus: () => Promise<any>
+  fetchStatusDiagnostic: () => Promise<any>
+  fetchDiagnosticTypes: () => Promise<any>
+  fetchCim10Diagnostic: () => Promise<any>
+  fetchCim10Hierarchy: (cim10Parent: string) => Promise<any>
+  fetchCcamData: () => Promise<any>
+  fetchCcamHierarchy: (ccamParent: string) => Promise<any>
+  fetchGhmData: () => Promise<any>
+  fetchGhmHierarchy: (ghmParent: string) => Promise<any>
+  fetchDocTypes: () => { id: string; label: string; type: string }[]
+  fetchAtcData: () => Promise<any>
+  fetchAtcHierarchy: (atcParent: string) => Promise<any>
+  fetchPrescriptionTypes: () => Promise<any>
+  fetchAdministrations: () => Promise<any>
+  fetchBiologyData: () => Promise<any>
+  fetchBiologyHierarchy: (biologyParent?: string) => Promise<any>
 }
 
 const servicesCohortCreation: IServiceCohortCreation = {
@@ -175,7 +233,35 @@ const servicesCohortCreation: IServiceCohortCreation = {
       count: currentSnapshot ? currentSnapshot.dated_measures[0] : {}
     }
     return result
-  }
+  },
+
+  fetchAdmissionModes: fetchAdmissionModes,
+  fetchEntryModes: fetchEntryModes,
+  fetchExitModes: fetchExitModes,
+  fetchPriseEnChargeType: fetchPriseEnChargeType,
+  fetchTypeDeSejour: fetchTypeDeSejour,
+  fetchFileStatus: fetchFileStatus,
+  fetchReason: fetchReason,
+  fetchDestination: fetchDestination,
+  fetchProvenance: fetchProvenance,
+  fetchAdmission: fetchAdmission,
+  fetchGender: fetchGender,
+  fetchStatus: fetchStatus,
+  fetchStatusDiagnostic: fetchStatusDiagnostic,
+  fetchDiagnosticTypes: fetchDiagnosticTypes,
+  fetchCim10Diagnostic: fetchCim10Diagnostic,
+  fetchCim10Hierarchy: fetchCim10Hierarchy,
+  fetchCcamData: fetchCcamData,
+  fetchCcamHierarchy: fetchCcamHierarchy,
+  fetchGhmData: fetchGhmData,
+  fetchGhmHierarchy: fetchGhmHierarchy,
+  fetchDocTypes: fetchDocTypes,
+  fetchAtcData: fetchAtcData,
+  fetchAtcHierarchy: fetchAtcHierarchy,
+  fetchPrescriptionTypes: fetchPrescriptionTypes,
+  fetchAdministrations: fetchAdministrations,
+  fetchBiologyData: fetchBiologyData,
+  fetchBiologyHierarchy: fetchBiologyHierarchy
 }
 
 export default servicesCohortCreation

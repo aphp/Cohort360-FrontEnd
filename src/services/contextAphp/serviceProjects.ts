@@ -107,6 +107,17 @@ export interface IServiceProjects {
   editRequest: (editedRequest: RequestType) => Promise<RequestType>
 
   /**
+   * Cette fonction partage une requete á un autre utilisateur
+   *
+   * Argument:
+   *  - sharedRequest: Requete á partager
+   *
+   * Retourne:
+   *  - Requete partagée
+   */
+  shareRequest: (sharedRequest: RequestType) => Promise<any>
+
+  /**
    * Cette fonction supprime un requete existant
    *
    * Argument:
@@ -310,6 +321,25 @@ const servicesProjects: IServiceProjects = {
       return editProjectResponse.data as ProjectType
     } else {
       throw new Error('Impossible de modifier la requête')
+    }
+  },
+  shareRequest: async (sharedRequest) => {
+    const usersToShareId = sharedRequest.usersToShare?.map((userToshareId) => userToshareId.provider_username)
+    const shared_query_snapshot_id = sharedRequest.shared_query_snapshot
+      ? sharedRequest.shared_query_snapshot
+      : sharedRequest.currentSnapshot
+    const shared_query_snapshot_name = sharedRequest.name ? sharedRequest.name : sharedRequest.requestName
+    const shareProjectResponse = (await apiBack.post(
+      `/cohort/request-query-snapshots/${shared_query_snapshot_id}/share/`,
+      {
+        name: shared_query_snapshot_name,
+        recipients: usersToShareId?.join()
+      }
+    )) ?? { status: 400 }
+    if (shareProjectResponse.status === 201) {
+      return shareProjectResponse.data as ProjectType
+    } else {
+      throw new Error('Impossible de partager la requête')
     }
   },
   deleteRequest: async (deletedRequest) => {

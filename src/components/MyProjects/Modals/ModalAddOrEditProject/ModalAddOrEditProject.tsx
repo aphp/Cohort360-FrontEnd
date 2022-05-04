@@ -111,22 +111,6 @@ const ModalAddOrEditProject: React.FC<{
               helperText={error === ERROR_TITLE ? 'Le nom est trop long (255 caractère max.)' : ''}
             />
           </Grid>
-
-          {/* <Grid container direction="column" className={classes.inputContainer}>
-            <Typography variant="h3">Description :</Typography>
-            <TextField
-              placeholder="Description"
-              value={modalProjectState.description}
-              onChange={(e: any) => onChangeValue('description', e.target.value)}
-              id="description"
-              margin="normal"
-              variant="outlined"
-              fullWidth
-              multiline
-              minRows={5}
-              maxRows={8}
-            />
-          </Grid> */}
         </DialogContent>
 
         <DialogActions style={{ position: 'relative' }}>

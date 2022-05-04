@@ -20,7 +20,7 @@ import TopBar from 'components/TopBar/TopBar'
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPatientInfo } from 'state/patient'
 
-import { ODD_BIOLOGY } from '../../constants'
+import { ODD_BIOLOGY, ODD_MEDICATION } from '../../constants'
 
 import useStyles from './styles'
 
@@ -132,14 +132,16 @@ const Patient = () => {
               component={Link}
               to={`/patients/${patientId}/pmsi${groupId ? `?groupId=${groupId}` : ''}`}
             />
-            <Tab
-              className={classes.tabTitle}
-              label="Médicaments"
-              value="medication"
-              component={Link}
-              to={`/patients/${patientId}/medication${groupId ? `?groupId=${groupId}` : ''}`}
-            />
-            {!!ODD_BIOLOGY && (
+            {ODD_MEDICATION && (
+              <Tab
+                className={classes.tabTitle}
+                label="Médicaments"
+                value="medication"
+                component={Link}
+                to={`/patients/${patientId}/medication${groupId ? `?groupId=${groupId}` : ''}`}
+              />
+            )}
+            {ODD_BIOLOGY && (
               <Tab
                 className={classes.tabTitle}
                 label="Biologie"
@@ -166,8 +168,8 @@ const Patient = () => {
           )}
           {selectedTab === 'documents-cliniques' && <PatientDocs groupId={groupId} />}
           {selectedTab === 'pmsi' && <PatientPMSI groupId={groupId} />}
-          {selectedTab === 'medication' && <PatientMedication groupId={groupId} />}
-          {!!ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology groupId={groupId} />}
+          {ODD_MEDICATION && selectedTab === 'medication' && <PatientMedication groupId={groupId} />}
+          {ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology groupId={groupId} />}
         </Grid>
 
         <PatientSidebar
