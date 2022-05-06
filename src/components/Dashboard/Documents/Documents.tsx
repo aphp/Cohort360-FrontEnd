@@ -49,24 +49,22 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     orderDirection: 'asc'
   })
 
-  const onSearchDocument = async (sortBy: string, sortDirection: 'asc' | 'desc', input?: string, page = 1) => {
-    if (input) {
+  const onSearchDocument = async (newPage: number) => {
+    if (searchInput) {
       setSearchMode(true)
     } else {
       setSearchMode(false)
     }
     setLoadingStatus(true)
     // Clean regex mode
-    setSearchInput(input ? input.replace(/^\/|\/$/gi, '') : '')
-
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
 
     const result = await services.cohorts.fetchDocuments(
       !!deidentifiedBoolean,
-      sortBy,
-      sortDirection,
-      page,
-      input ?? '',
+      order.orderBy,
+      order.orderDirection,
+      newPage,
+      searchInput ?? '',
       selectedDocTypesCodes,
       filters.nda,
       filters.ipp ?? '',
@@ -95,18 +93,14 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     setLoadingStatus(false)
   }
 
+  const handleChangePage = (newPage = 1) => {
+    setPage(newPage)
+    onSearchDocument(newPage)
+  }
+
   useEffect(() => {
-    onSearchDocument(order.orderBy, order.orderDirection, searchInput)
-  }, [
-    !!deidentifiedBoolean,
-    filters.selectedDocTypes,
-    filters.nda,
-    filters.ipp,
-    filters.startDate,
-    filters.endDate,
-    order.orderBy,
-    order.orderDirection
-  ]) // eslint-disable-line
+    handleChangePage(1)
+  }, [!!deidentifiedBoolean, filters, order, searchInput]) // eslint-disable-line
 
   const handleOpenDialog = () => {
     setOpenFilter(true)
@@ -162,9 +156,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
             results={[documentsResult, patientsResult]}
             searchBar={{
               type: 'document',
-              value: searchInput,
-              onSearch: (newSearchInput: string) =>
-                onSearchDocument(order.orderBy, order.orderDirection, newSearchInput)
+              value: searchInput ? searchInput.replace(/^\/|\/$/gi, '') : '',
+              onSearch: (newSearchInput: string) => setSearchInput(newSearchInput)
             }}
             buttons={[
               {
@@ -200,7 +193,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
             order={order}
             setOrder={setOrder}
             page={page}
-            setPage={setPage}
+            setPage={(newPage: number) => handleChangePage(newPage)}
             total={documentsResult.nb}
           />
         </Grid>
