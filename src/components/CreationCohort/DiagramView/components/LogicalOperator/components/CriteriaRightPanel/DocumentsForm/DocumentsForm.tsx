@@ -123,10 +123,10 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               <KeyboardBackspaceIcon />
             </IconButton>
             <Divider className={classes.divider} orientation="vertical" flexItem />
-            <Typography className={classes.titleLabel}>Ajouter un critère de document médicaux</Typography>
+            <Typography className={classes.titleLabel}>Ajouter un critère de documents médicaux</Typography>
           </>
         ) : (
-          <Typography className={classes.titleLabel}>Modifier un critère de document médicaux</Typography>
+          <Typography className={classes.titleLabel}>Modifier un critère de documents médicaux</Typography>
         )}
       </Grid>
 

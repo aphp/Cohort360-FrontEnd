@@ -1,6 +1,5 @@
 import { CohortPatient } from 'types'
 import moment from 'moment'
-import { CONTEXT } from '../constants'
 
 export const getAgeArkhn = (birthDate: Date, deathOrTodayDate = new Date()) => {
   const monthDifference = deathOrTodayDate.getMonth() - birthDate.getMonth()
@@ -36,22 +35,13 @@ export const getAgeAphp = (ageObj: any, momentUnit: 'days' | 'months') => {
 }
 
 export const getAge = (patient: CohortPatient): string => {
-  if (CONTEXT === 'aphp') {
-    if (patient.extension) {
-      const totalDays = patient.extension.find((item) => item.url?.includes('Age(TotalDays)'))
-      if (totalDays) {
-        return getAgeAphp(totalDays, 'days')
-      } else {
-        const totalMonths = patient.extension.find((item) => item.url?.includes('Age(TotalMonths)'))
-        return getAgeAphp(totalMonths, 'months')
-      }
-    }
-  } else if (CONTEXT === 'arkhn') {
-    if (patient.birthDate) {
-      return getAgeArkhn(
-        new Date(patient.birthDate),
-        patient.deceasedDateTime ? new Date(patient.deceasedDateTime) : new Date()
-      ).toString()
+  if (patient.extension) {
+    const totalDays = patient.extension.find((item) => item.url?.includes('Age(TotalDays)'))
+    if (totalDays) {
+      return getAgeAphp(totalDays, 'days')
+    } else {
+      const totalMonths = patient.extension.find((item) => item.url?.includes('Age(TotalMonths)'))
+      return getAgeAphp(totalMonths, 'months')
     }
   }
   return 'Âge inconnu'
