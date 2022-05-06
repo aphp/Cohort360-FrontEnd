@@ -9,7 +9,7 @@ import {
   TemporalConstraintsType
 } from 'types'
 
-import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
+import { buildRequest, unbuildRequest, joinRequest } from 'utils/cohortCreation'
 
 import { logout, login } from './me'
 import { addRequest, deleteRequest } from './request'
@@ -345,27 +345,39 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
  */
 type AddRequestToCohortReturn = {
   json: string
-  currentSnapshot: string
-  selectedPopulation: (ScopeTreeRow | undefined)[] | null
   selectedCriteria: SelectedCriteriaType[]
   criteriaGroup: CriteriaGroupType[]
   nextCriteriaId: number
   nextGroupId: number
 }
-type AddRequestToCohortParams = { selectedRequestId: string }
+type AddRequestToCohortParams = { selectedRequestId: string; parentId: number | null }
 
 const addRequestToCohortCreation = createAsyncThunk<
   AddRequestToCohortReturn,
   AddRequestToCohortParams,
   { state: RootState }
->('cohortCreation/addRequestToCohort', async ({ selectedRequestId }, { getState, dispatch }) => {
+>('cohortCreation/addRequestToCohort', async ({ selectedRequestId, parentId }, { getState, dispatch }) => {
   try {
     const state = getState()
-    const { json, population, criteria, criteriaGroup } = await joinRequest()
+    const newRequestResult = await services.cohortCreation.fetchRequest(selectedRequestId)
+
+    const { json, criteria, criteriaGroup } = await joinRequest(
+      state?.cohortCreation?.request?.json,
+      newRequestResult.json,
+      parentId
+    )
+
+    const saveJsonResponse = await dispatch<any>(saveJson({ newJson: json }))
+    await dispatch<any>(
+      countCohortCreation({
+        json: json,
+        snapshotId: saveJsonResponse.payload.currentSnapshot,
+        requestId: saveJsonResponse.payload.requestId
+      })
+    )
 
     return {
       json: json,
-      selectedPopulation: population,
       selectedCriteria: criteria,
       criteriaGroup: criteriaGroup,
       nextCriteriaId: criteria.length + 1,
@@ -601,8 +613,7 @@ const cohortCreationSlice = createSlice({
     builder.addCase(fetchRequestCohortCreation.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(fetchRequestCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
-      ...payload,
-      loading: false
+      ...payload
     }))
     builder.addCase(fetchRequestCohortCreation.rejected, (state) => ({ ...state, loading: false }))
     // addRequestToCohortCreation

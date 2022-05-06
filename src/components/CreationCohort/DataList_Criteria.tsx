@@ -17,6 +17,7 @@ import services from 'services'
 import { ODD_BIOLOGY, ODD_MEDICATION } from '../../constants'
 
 // ├── Mes variables
+// ├── Mes requêtes
 // ├── Patients
 // ├── Visites
 // ├── Documents cliniques
@@ -42,7 +43,7 @@ const criteriaList: CriteriaItemType[] = [
   },
   {
     id: 'Request',
-    title: 'Mes requête',
+    title: 'Mes requêtes',
     color: '#0063AF',
     components: RequestForm
   },

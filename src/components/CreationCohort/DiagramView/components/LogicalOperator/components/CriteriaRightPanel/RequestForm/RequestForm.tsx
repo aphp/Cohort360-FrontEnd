@@ -13,10 +13,11 @@ import { addRequestToCohortCreation } from 'state/cohortCreation'
 import useStyles from './styles'
 
 type RequestFormProps = {
+  parentId: number | null
   goBack: (data: any) => void
 }
 
-const RequestForm: React.FC<RequestFormProps> = ({ goBack }) => {
+const RequestForm: React.FC<RequestFormProps> = ({ parentId, goBack }) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
@@ -37,7 +38,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ goBack }) => {
       return setError(true)
     }
 
-    dispatch<any>(addRequestToCohortCreation({ selectedRequestId }))
+    dispatch<any>(addRequestToCohortCreation({ parentId, selectedRequestId }))
   }
 
   return (
