@@ -461,12 +461,12 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               <List id="research-collapse">
                 <ListItem>
                   <Link id="savedResearch-link" href="/recherche_sauvegarde" className={classes.nestedTitle}>
-                    Mes cohortes sauvegardées
+                    Mes cohortes
                   </Link>
                 </ListItem>
                 <ListItem>
                   <Link id="myProject-link" href="/mes_projets" className={classes.nestedTitle}>
-                    Mes projets de recherche
+                    Mes requêtes
                   </Link>
                 </ListItem>
               </List>
