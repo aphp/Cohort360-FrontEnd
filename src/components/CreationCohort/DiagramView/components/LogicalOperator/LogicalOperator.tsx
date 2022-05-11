@@ -258,6 +258,7 @@ const LogicalOperator: React.FC = () => {
       />
 
       <CriteriaRightPanel
+        parentId={parentId}
         criteria={criteria}
         selectedCriteria={selectedCriteria}
         onChangeSelectedCriteria={_onConfirmAddOrEditCriteria}

@@ -1,6 +1,7 @@
 import { CriteriaItemType } from 'types'
 
 // Components
+import RequestForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/RequestForm/RequestForm'
 import DemographicFrom from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicFrom/DemographicFrom'
 import DocumentsForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DocumentsForm/DocumentsForm'
 import SupportedForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/SupportedForm/SupportedForm'
@@ -16,6 +17,7 @@ import services from 'services'
 import { ODD_BIOLOGY, ODD_MEDICATION } from '../../constants'
 
 // ├── Mes variables
+// ├── Mes requêtes
 // ├── Patients
 // ├── Visites
 // ├── Documents cliniques
@@ -38,6 +40,12 @@ const criteriaList: CriteriaItemType[] = [
     disabled: true,
     data: null,
     components: null
+  },
+  {
+    id: 'Request',
+    title: 'Mes requêtes',
+    color: '#0063AF',
+    components: RequestForm
   },
   {
     id: 'Patient',
