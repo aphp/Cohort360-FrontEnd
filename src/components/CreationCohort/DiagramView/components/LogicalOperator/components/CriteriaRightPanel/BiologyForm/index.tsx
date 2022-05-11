@@ -5,6 +5,7 @@ import useStyles from './styles'
 
 import BiologyForm from './components/Form/BiologyForm'
 import BiologyHierarchy from './components/Hierarchy/BiologyHierarchy'
+import BiologySearch from './components/BiologySearch/BiologySearch'
 
 const defaultBiology = {
   type: 'Observation',
@@ -23,12 +24,13 @@ const defaultBiology = {
 
 const Index = (props: any) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const [selectedTab, onChangeTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
+  const [selectedTab, onChangeTab] = useState<'form' | 'hierarchy' | 'search'>(selectedCriteria ? 'form' : 'hierarchy')
   const [defaultValues, onChangeDefaultValues] = useState(selectedCriteria || defaultBiology)
 
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onChangeSelectedHierarchy = (code: any) => {
+    console.log('code', code)
     onChangeDefaultValues({
       ...defaultValues,
       code
@@ -49,11 +51,12 @@ const Index = (props: any) => {
       <div>
         <Tabs className={classes.tabs} value={selectedTab} onChange={(e, tab) => onChangeTab(tab)}>
           <Tab label="Hiérarchie" value="hierarchy" />
+          <Tab label="Recherche" value="search" />
           <Tab label="Formulaire" value="form" />
         </Tabs>
       </div>
 
-      {selectedTab === 'form' ? (
+      {selectedTab === 'form' && (
         <BiologyForm
           isEdition={isEdition}
           criteria={criteria}
@@ -62,7 +65,18 @@ const Index = (props: any) => {
           onChangeSelectedCriteria={onChangeSelectedCriteria}
           goBack={goBack}
         />
-      ) : (
+      )}
+      {selectedTab === 'search' && (
+        <BiologySearch
+          isEdition={isEdition}
+          criteria={criteria}
+          goBack={goBack}
+          // onChangeValue={_onChangeValue}
+          onChangeSelectedCriteria={_onChangeSelectedHierarchy}
+          // selectedCriteria={defaultValues}
+        />
+      )}
+      {selectedTab === 'hierarchy' && (
         <BiologyHierarchy
           isEdition={isEdition}
           selectedCriteria={selectedCriteria}

@@ -163,7 +163,8 @@ const criteriaList: CriteriaItemType[] = [
         data: { biologyData: 'loading', biologyHierarchy: 'loading' },
         fetch: {
           fetchBiologyData: services.cohortCreation.fetchBiologyData,
-          fetchBiologyHierarchy: services.cohortCreation.fetchBiologyHierarchy
+          fetchBiologyHierarchy: services.cohortCreation.fetchBiologyHierarchy,
+          fetchBiologySearch: services.cohortCreation.fetchBiologySearch
         }
       },
       {
