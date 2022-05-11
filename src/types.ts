@@ -1,3 +1,4 @@
+import { ReactNode, ReactElement } from 'react'
 import {
   IComposition,
   IPatient,
@@ -10,11 +11,11 @@ import {
   IBundle_Entry,
   IResourceList,
   IOperationOutcome,
-  PatientGenderKind,
   IObservation,
   IDocumentReference,
   IMedicationRequest,
-  IMedicationAdministration
+  IMedicationAdministration,
+  PatientGenderKind
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 export interface TypedEntry<T extends IResourceList> extends IBundle_Entry {
@@ -32,13 +33,27 @@ export type Back_API_Response<T> = {
   count?: number
 }
 
-export type Cohort_Creation_API_Response = {
-  status: number
-  data: {
-    jobId: string
-    result: { _type: 'count'; 'group.id': string; 'group.count': number; source: 'from-cache' | 'from-cache' }[]
-  }
-  count?: number
+export type Provider = {
+  birth_date?: string
+  cdm_source?: string
+  delete_datetime?: string
+  displayed_name?: string
+  email?: string
+  firstname?: string
+  gender_concept_id?: number
+  gender_source_concept_id?: number
+  gender_source_value?: string
+  insert_datetime?: string
+  lastname?: string
+  provider_username?: string
+  provider_id?: number
+  provider_name?: string
+  provider_source_value?: string
+  specialty_concept_id?: number
+  specialty_source_concept_id?: number
+  specialty_source_value?: string
+  update_datetime?: string
+  year_of_birth?: number
 }
 
 export type CohortComposition = IComposition & {
@@ -111,6 +126,49 @@ export type CohortFilters = {
   endDate: null | string
 }
 
+export type DocumentFilters = {
+  ipp?: string
+  nda: string
+  selectedDocTypes: { code: string; label: string; type: string }[]
+  startDate: string | null
+  endDate: string | null
+}
+
+export type MedicationsFilters = {
+  nda: string
+  startDate: string | null
+  endDate: string | null
+  selectedPrescriptionTypes: { id: string; label: string }[]
+  selectedAdministrationRoutes: { id: string; label: string }[]
+}
+
+export type PMSIFilters = {
+  nda: string
+  code: string
+  startDate: string | null
+  endDate: string | null
+  selectedDiagnosticTypes: { id: string; label: string }[]
+}
+
+export type PatientFilters = {
+  gender: PatientGenderKind
+  birthdates: [string, string]
+  vitalStatus: VitalStatus
+}
+
+export type ObservationFilters = {
+  nda: string
+  loinc: string
+  anabio: string
+  startDate: string | null
+  endDate: string | null
+}
+
+export type Sort = {
+  sortBy: string
+  sortDirection: 'asc' | 'desc'
+}
+
 export type CohortGroup = IGroup & {
   id: string
   name: string
@@ -134,12 +192,6 @@ export enum Month {
   december = 'Decembre'
 }
 
-export enum InclusionCriteriaTypes {
-  medicalDocument = 'Document médical',
-  patientDemography = 'Démographie patient',
-  CIMDiagnostic = 'Diagnostic CIM'
-}
-
 export enum SearchByTypes {
   text = '_text',
   family = 'family',
@@ -153,37 +205,21 @@ export enum VitalStatus {
   all = 'all'
 }
 
-export type InclusionCriteria =
-  | MedicalDocumentInclusionCriteria
-  | PatientDemographyInclusionCriteria
-  | CIMDiagnosticInclusionCriteria
+export type Column =
+  | {
+      label: string | ReactNode
+      code?: string
+      align: 'inherit' | 'left' | 'center' | 'right' | 'justify'
+      sortableColumn?: boolean
+      multiple?: undefined
+    }
+  | {
+      multiple: Column[]
+    }
 
-export type MedicalDocumentInclusionCriteria = {
-  type: InclusionCriteriaTypes.medicalDocument
-  name: string
-  searchValue: string
-  searchFieldCode: string
-}
-
-export type PatientDemographyInclusionCriteria = {
-  type: InclusionCriteriaTypes.patientDemography
-  name: string
-  gender: PatientGenderKind
-  ageMin: number
-  ageMax: number
-}
-
-export type CIMDiagnosticInclusionCriteria = {
-  type: InclusionCriteriaTypes.CIMDiagnostic
-  name: string
-  CIMTypeId: string
-  CIMDiagnosis: {
-    'DIAGNOSIS CODE': string
-    'LONG DESCRIPTION': string
-    'SHORT DESCRIPTION': string
-    FIELD4: string
-    FIELD5: string
-  }
+export type Order = {
+  orderBy: string
+  orderDirection: 'asc' | 'desc'
 }
 
 export type ScopeTreeRow = {
@@ -203,7 +239,6 @@ export type SimpleChartDataType = {
   color: string
   size?: number
 }
-export type ComplexChartDataType<T, V = { [key: string]: number }> = Map<T, V>
 
 export type GenderRepartitionType = {
   female: { deceased: number; alive: number }
@@ -499,6 +534,13 @@ export type RequestType = {
   favorite?: boolean
   created_at?: string
   modified_at?: string
+  query_snapshots?: string[]
+  shared_query_snapshot?: string[]
+  usersToShare?: Provider[]
+  shared_by?: Provider
+  currentSnapshot?: string
+  requestId?: string
+  requestName?: string
 }
 
 export type ContactSubmitForm = FormData
@@ -557,6 +599,11 @@ export type IPatientPmsi<T extends IProcedure | ICondition | IClaim> = {
   }
 }
 
+export type CohortMedication<T extends IMedicationRequest | IMedicationAdministration> = T & {
+  serviceProvider?: string
+  NDA?: string
+}
+
 export type IPatientMedication<T extends IMedicationRequest | IMedicationAdministration> = {
   loading: boolean
   count: number
@@ -605,4 +652,32 @@ export type IPatientObservation<T extends CohortObservation> = {
       direction: string
     }
   }
+}
+
+// DataTableTopBarProps
+export type DTTB_TabsType = {
+  value: any
+  onChange: (event: any, newValue?: any) => void
+  list: {
+    label: string
+    value: any
+    icon?: ReactElement
+    wrapped?: boolean
+  }[]
+}
+export type DTTB_ResultsType = {
+  nb: number
+  total: number
+  label?: string
+}
+export type DTTB_SearchBarType = {
+  type: 'simple' | 'patient' | 'document'
+  value: string
+  onSearch: (newSearch: string, newSearchBy?: SearchByTypes) => void
+  searchBy?: any
+}
+export type DTTB_ButtonType = {
+  label: string
+  icon?: ReactElement
+  onClick: (args?: any) => void
 }

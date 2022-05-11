@@ -5,7 +5,6 @@ import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstrai
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { docTypes } from 'assets/docTypes.json'
-import { fetchBiologyHierarchy } from 'services/cohortCreation/fetchObservation'
 
 const REQUETEUR_VERSION = 'v1.2.1'
 
@@ -584,8 +583,8 @@ export function buildRequest(
       ? undefined
       : {
           _id: 0,
-          _type: 'andGroup',
-          isInclusive: true,
+          _type: mainCriteriaGroups.type === 'orGroup' ? 'orGroup' : 'andGroup',
+          isInclusive: !!mainCriteriaGroups.isInclusive,
           criteria: exploreCriteriaGroup(mainCriteriaGroups.criteriaIds),
           temporalConstraints: temporalConstraints.filter(({ constraintType }) => constraintType !== 'none')
         }
@@ -688,7 +687,6 @@ export async function unbuildRequest(_json: string) {
                   { id: 'day', label: 'jours' }
                 ]
 
-                //inverser ici
                 if (value?.search('le') === 0) {
                   const date = value?.replace('le', '') ? moment().subtract(value?.replace('le', ''), 'days') : null
                   const diff = date ? moment().diff(date, 'days') : 0
@@ -703,7 +701,6 @@ export async function unbuildRequest(_json: string) {
                   const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
                   currentCriterion.ageType = foundAgeType
                   if (date) currentCriterion.years[1] = moment().diff(date, currentAgeType) || 130
-                  // inverser ici aussi
                 } else if (value?.search('ge') === 0) {
                   const date = value?.replace('ge', '')
                     ? moment().subtract(+value?.replace('ge', '') + 1, 'days')
@@ -1308,7 +1305,9 @@ export async function unbuildRequest(_json: string) {
                 // TODO: pas propre vvvv
                 if (currentCriterion.code.length === 1) {
                   try {
-                    const checkChildrenResp = await fetchBiologyHierarchy(currentCriterion.code?.[0].id)
+                    const checkChildrenResp = await services.cohortCreation.fetchBiologyHierarchy(
+                      currentCriterion.code?.[0].id
+                    )
 
                     if (checkChildrenResp.length === 0) {
                       currentCriterion.isLeaf = true

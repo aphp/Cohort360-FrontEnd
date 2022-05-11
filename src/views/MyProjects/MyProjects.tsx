@@ -1,31 +1,39 @@
 import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
 
-import { Button, IconButton, CircularProgress, Grid, Hidden, Tooltip, Typography } from '@material-ui/core'
+import { Button, IconButton, CircularProgress, Grid, Hidden, Tooltip, Typography, Snackbar } from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 import DeleteIcon from '@material-ui/icons/Delete'
+import { Alert } from '@material-ui/lab'
+
 import { ReactComponent as DriveFileMoveIcon } from 'assets/icones/drive-file-move.svg'
 
 import ProjectTable from 'components/MyProjects/ProjectTable/ProjectTable'
 import ProjectSearchBar from 'components/MyProjects/ProjectSearchBar/ProjectSearchBar'
 
 import ModalAddOrEditProject from 'components/MyProjects/Modals/ModalAddOrEditProject/ModalAddOrEditProject'
-import ModalAddOrEditRequest from 'components/Cohort/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
+import ModalAddOrEditRequest from 'components/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
 import ModalMoveRequests from 'components/MyProjects/Modals/ModalMoveRequest/ModalMoveRequest'
 import ModalDeleteRequests from 'components/MyProjects/Modals/ModalDeleteRequests/ModalDeleteRequests'
+import ModalShareRequest from 'components/MyProjects/Modals/ModalShareRequest/ModalShareRequest'
 
 import { RequestType } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { ProjectState, fetchProjects as fetchProjectsList, setSelectedProject } from 'state/project'
-import { RequestState, fetchRequests as fetchRequestsList, setSelectedRequest } from 'state/request'
+import {
+  RequestState,
+  fetchRequests as fetchRequestsList,
+  setSelectedRequest,
+  setSelectedRequestShare
+} from 'state/request'
 import { CohortState, fetchCohorts as fetchCohortsList, setSelectedCohort } from 'state/cohort'
 import { MeState } from 'state/me'
 
 import useStyles from './styles'
 
-const MyProjects = () => {
+const MyProjects: React.FC<{}> = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
@@ -47,7 +55,7 @@ const MyProjects = () => {
     meState: state.me
   }))
   const { selectedProject } = projectState
-  const { selectedRequest, requestsList } = requestState
+  const { selectedRequest, selectedRequestShare, requestsList } = requestState
   const { selectedCohort } = cohortState
   const maintenanceIsActive = meState?.maintenance?.active
 
@@ -223,6 +231,27 @@ const MyProjects = () => {
       />
 
       {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch<any>(setSelectedRequest(null))} />}
+
+      {selectedRequestShare !== null &&
+        selectedRequestShare?.shared_query_snapshot !== undefined &&
+        selectedRequestShare?.shared_query_snapshot?.length > 0 && (
+          <ModalShareRequest onClose={() => dispatch<any>(setSelectedRequestShare(null))} />
+        )}
+
+      {selectedRequestShare !== null &&
+        selectedRequestShare?.shared_query_snapshot !== undefined &&
+        selectedRequestShare?.shared_query_snapshot?.length === 0 && (
+          <Snackbar
+            open
+            onClose={() => dispatch<any>(setSelectedRequestShare(null))}
+            autoHideDuration={5000}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          >
+            <Alert severity="error" onClose={() => dispatch<any>(setSelectedRequestShare(null))}>
+              Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
+            </Alert>
+          </Snackbar>
+        )}
 
       <ModalEditCohort open={selectedCohort !== null} onClose={() => dispatch<any>(setSelectedCohort(null))} />
 

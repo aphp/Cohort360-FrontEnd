@@ -1,5 +1,5 @@
 import { makeStyles } from '@material-ui/core/styles'
-import { smallDrawerWidth, largeDrawerWidth } from 'components/LeftSideBar/LeftSideBar'
+import { smallDrawerWidth, largeDrawerWidth } from 'components/Routes/LeftSideBar/LeftSideBar'
 
 export default makeStyles((theme) => ({
   appBar: {
@@ -17,15 +17,6 @@ export default makeStyles((theme) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen
     })
-  },
-  tabTitle: {
-    minWidth: 0,
-    color: '#43425D',
-    textTransform: 'none'
-  },
-  selectedTabTitle: {
-    color: '#43425D',
-    textDecoration: 'underline'
   },
   mainContainer: {
     width: '100%',

@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios'
+import axios from 'axios'
 
 import { BACK_API_URL } from '../../constants'
 
@@ -51,13 +51,23 @@ export interface IServicePractitioner {
 
 const servicePractitioner: IServicePractitioner = {
   authenticate: async (username, password) => {
-    getCsrfToken(username, password)
+    const formData = new FormData()
+    formData.append('username', username.toString())
+    formData.append('password', password)
 
     return axios({
       method: 'POST',
-      url: '/api/jwt/',
-      data: { username: username, password: password }
+      url: `${BACK_API_URL}/accounts/login/`,
+      data: formData
     })
+
+    // getCsrfToken(username, password)
+
+    // return axios({
+    //   method: 'POST',
+    //   url: '/api/jwt/',
+    //   data: { username: username, password: password }
+    // })
   },
 
   logout: async () => {
@@ -107,14 +117,14 @@ const servicePractitioner: IServicePractitioner = {
 
 export default servicePractitioner
 
-export const getCsrfToken = (username: string, password: string): Promise<AxiosResponse<any>> => {
-  const formData = new FormData()
-  formData.append('username', username.toString())
-  formData.append('password', password)
+// export const getCsrfToken = (username: string, password: string): Promise<AxiosResponse<any>> => {
+//   const formData = new FormData()
+//   formData.append('username', username.toString())
+//   formData.append('password', password)
 
-  return axios({
-    method: 'POST',
-    url: `${BACK_API_URL}/accounts/login/`,
-    data: formData
-  })
-}
+//   return axios({
+//     method: 'POST',
+//     url: `${BACK_API_URL}/accounts/login/`,
+//     data: formData
+//   })
+// }

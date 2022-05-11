@@ -20,20 +20,26 @@ import {
   TableSortLabel,
   TableRow,
   Typography,
-  Hidden
+  Hidden,
+  Snackbar
 } from '@material-ui/core'
+
+import { Alert } from '@material-ui/lab'
 
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
 
 import EditIcon from '@material-ui/icons/Edit'
+import ShareIcon from '@material-ui/icons/Share'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 
-import ModalAddOrEditRequest from 'components/Cohort/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
+import ModalAddOrEditRequest from 'components/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
+import ModalShareRequest from 'components/MyProjects/Modals/ModalShareRequest/ModalShareRequest'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import {
   RequestState,
   setSelectedRequest as setSelectedRequestState,
+  setSelectedRequestShare as setSelectedRequestShareState,
   deleteRequest as deleteRequestState
 } from 'state/request'
 
@@ -68,6 +74,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
     requestState: state.request
   }))
   const selectedRequestState = requestState.selectedRequest
+  const selectedRequestShareState = requestState.selectedRequestShare
 
   const { meState } = useAppSelector<{
     meState: MeState
@@ -182,6 +189,19 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                               size="small"
                               onClick={(event) => {
                                 event.stopPropagation()
+                                dispatch(setSelectedRequestShareState(row ?? null))
+                              }}
+                              disabled={maintenanceIsActive}
+                            >
+                              <ShareIcon />
+                            </IconButton>
+                          </Grid>
+
+                          <Grid item>
+                            <IconButton
+                              size="small"
+                              onClick={(event) => {
+                                event.stopPropagation()
                                 handleClickOpenDialog()
                                 setSelectedRequest(row.uuid)
                               }}
@@ -273,6 +293,26 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
       </Dialog>
 
       {selectedRequestState && <ModalAddOrEditRequest onClose={() => dispatch<any>(setSelectedRequestState(null))} />}
+      {selectedRequestShareState !== null &&
+        selectedRequestShareState?.shared_query_snapshot !== undefined &&
+        selectedRequestShareState?.shared_query_snapshot?.length > 0 && (
+          <ModalShareRequest onClose={() => dispatch<any>(setSelectedRequestShareState(null))} />
+        )}
+
+      {selectedRequestShareState !== null &&
+        selectedRequestShareState?.shared_query_snapshot !== undefined &&
+        selectedRequestShareState?.shared_query_snapshot?.length === 0 && (
+          <Snackbar
+            open
+            onClose={() => dispatch<any>(setSelectedRequestShareState(null))}
+            autoHideDuration={5000}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          >
+            <Alert severity="error" onClose={() => dispatch<any>(setSelectedRequestShareState(null))}>
+              Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
+            </Alert>
+          </Snackbar>
+        )}
     </>
   )
 }

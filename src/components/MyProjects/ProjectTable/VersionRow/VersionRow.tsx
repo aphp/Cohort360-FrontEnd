@@ -21,7 +21,7 @@ import ExportIcon from '@material-ui/icons/GetApp'
 import { ReactComponent as Star } from 'assets/icones/star.svg'
 import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
 
-import ExportModal from 'components/Cohort/ExportModal/ExportModal'
+import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 
 import { useAppDispatch } from 'state'
 import { setSelectedCohort, setFavoriteCohort } from 'state/cohort'
@@ -126,7 +126,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                       </Typography>
                     )}
                     <IconButton
-                      className={classes.editButon}
+                      className={classes.editButton}
                       size="small"
                       onClick={() => _handleEditCohort(historyRow.uuid)}
                     >

@@ -10,6 +10,7 @@ export type RequestState = {
   loading: boolean
   count: number
   selectedRequest: RequestType | null
+  selectedRequestShare: RequestType | null
   requestsList: RequestType[]
 }
 
@@ -17,6 +18,7 @@ const defaultInitialState: RequestState = {
   loading: false,
   count: 0,
   selectedRequest: null,
+  selectedRequestShare: null,
   requestsList: []
 }
 
@@ -142,6 +144,7 @@ const editRequest = createAsyncThunk<EditRequestReturn, EditRequestParams, { sta
     }
   }
 )
+
 /**
  * deleteRequest
  *
@@ -302,6 +305,36 @@ const setRequestSlice = createSlice({
           }
         }
       }
+    },
+    setSelectedRequestShare: (state: RequestState, action: PayloadAction<RequestType | null>) => {
+      const requestsList: RequestType[] = state.requestsList ?? []
+      const selectedRequestShare = action.payload
+      const selectedRequestShareId = selectedRequestShare?.uuid
+
+      if (selectedRequestShare === null) {
+        return {
+          ...state,
+          selectedRequestShare: null
+        }
+      } else {
+        if (selectedRequestShareId) {
+          const foundItem = requestsList.find(({ uuid }) => uuid === selectedRequestShareId)
+          if (!foundItem) {
+            return state
+          } else {
+            const index = requestsList.indexOf(foundItem)
+            return {
+              ...state,
+              selectedRequestShare: {
+                uuid: requestsList[index].uuid,
+                name: requestsList[index].name,
+                query_snapshots: requestsList[index].query_snapshots,
+                shared_query_snapshot: requestsList[index].query_snapshots?.slice(-1)
+              }
+            }
+          }
+        }
+      }
     }
   },
   extraReducers: (builder) => {
@@ -336,4 +369,4 @@ const setRequestSlice = createSlice({
 
 export default setRequestSlice.reducer
 export { fetchRequests, addRequest, editRequest, deleteRequest, moveRequests, deleteRequests }
-export const { clearRequest, setSelectedRequest } = setRequestSlice.actions
+export const { clearRequest, setSelectedRequest, setSelectedRequestShare } = setRequestSlice.actions

@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { useDispatch } from 'react-redux'
 import clsx from 'clsx'
 
 import Button from '@material-ui/core/Button'
@@ -11,6 +9,7 @@ import Typography from '@material-ui/core/Typography'
 
 import ScopeTree from 'components/ScopeTree/ScopeTree'
 
+import { useAppSelector, useAppDispatch } from 'state'
 import { closeAllOpenedPopulation } from 'state/scope'
 import { filterScopeTree } from 'utils/scopeTree'
 
@@ -19,10 +18,10 @@ import useStyles from './styles'
 const Scope = () => {
   const classes = useStyles()
   const history = useHistory()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const [selectedItems, onChangeSelectedItem] = useState([])
-  const open = useSelector((state) => state.drawer)
+  const open = useAppSelector((state) => state.drawer)
 
   useEffect(() => {
     dispatch(closeAllOpenedPopulation())
@@ -46,7 +45,7 @@ const Scope = () => {
       container
       direction="column"
       position="fixed"
-      className={clsx(classes.root, classes.appBar, {
+      className={clsx(classes.appBar, {
         [classes.appBarShift]: open
       })}
     >

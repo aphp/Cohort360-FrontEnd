@@ -21,9 +21,6 @@ const useStyles = makeStyles(() => ({
     display: 'flex',
     alignItems: 'center'
   },
-  filterAndSort: {
-    width: 'auto'
-  },
   radioGroup: {
     flexDirection: 'row',
     margin: '6px 6px 0 6px'
