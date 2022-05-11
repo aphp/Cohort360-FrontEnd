@@ -1,6 +1,9 @@
 import { BIOLOGY_HIERARCHY_ITM_ANABIO, BIOLOGY_HIERARCHY_ITM_LOINC, VALUE_SET_SIZE } from '../../../constants'
 import apiRequest from 'services/apiRequest'
 import { cleanValueSet } from 'utils/cleanValueSet'
+import { ValueSet } from 'types'
+import { capitalizeFirstLetter } from 'utils/capitalize'
+import { displaySort } from 'utils/alphabeticalSort'
 // import apiFhir from 'services/apiFhir'
 // import { getApiResponseResources } from 'utils/apiHelpers'
 // import { targetDisplaySort } from 'utils/alphabeticalSort'
@@ -111,12 +114,16 @@ export const fetchBiologyHierarchy = async (biologyParent?: string) => {
   if (!biologyParent) {
     const res = await apiRequest.get<any>(`/ValueSet?url=${BIOLOGY_HIERARCHY_ITM_ANABIO}`)
 
-    const data =
+    const observationList =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
         : []
 
-    return cleanValueSet(data)
+    return observationList.sort(displaySort).map((observationItem: ValueSet) => ({
+      id: observationItem.code,
+      label: `${capitalizeFirstLetter(observationItem.display)}`,
+      subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
+    }))
   } else {
     const json = {
       resourceType: 'ValueSet',
@@ -137,11 +144,15 @@ export const fetchBiologyHierarchy = async (biologyParent?: string) => {
 
     const res = await apiRequest.post<any>(`/ValueSet/$expand`, JSON.stringify(json))
 
-    const data =
+    const observationList =
       res && res.data && res.data.expansion && res.data.expansion.contains && res.data.resourceType === 'ValueSet'
         ? res.data.expansion.contains
         : []
 
-    return cleanValueSet(data)
+    return observationList.sort(displaySort).map((observationItem: ValueSet) => ({
+      id: observationItem.code,
+      label: `${capitalizeFirstLetter(observationItem.display)}`,
+      subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
+    }))
   }
 }
