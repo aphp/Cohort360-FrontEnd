@@ -1,10 +1,9 @@
 #!/bin/sh
 set -e
 
-sed -i "s@{REACT_APP_JWT_URL}@$REACT_APP_JWT_URL@g" /etc/nginx/conf.d/nginx.conf
-sed -i "s@{REACT_APP_FHIR_URL}@$REACT_APP_FHIR_URL@g" /etc/nginx/conf.d/nginx.conf
-sed -i "s@{REACT_APP_BACK_URL}@$REACT_APP_BACK_URL@g" /etc/nginx/conf.d/nginx.conf
-sed -i "s@{REACT_APP_DISPOSE_URL}@$REACT_APP_DISPOSE_URL@g" /etc/nginx/conf.d/nginx.conf
+sed -i "s@{FHIR_URL}@$FHIR_URL@g" /etc/nginx/conf.d/nginx.conf
+sed -i "s@{BACK_URL}@$BACK_URL@g" /etc/nginx/conf.d/nginx.conf
+sed -i "s@{DISPOSE_URL}@$DISPOSE_URL@g" /etc/nginx/conf.d/nginx.conf
 
 sed -i "s@{REACT_APP_BACK_API_URL}@$REACT_APP_BACK_API_URL@g" /app/build/static/js/*.js
 sed -i "s@{REACT_APP_REQUEST_API_URL}@$REACT_APP_REQUEST_API_URL@g" /app/build/static/js/*.js
