@@ -21,7 +21,7 @@ const FirstNews = () => {
         • Il est maintenant possible de filtrer les documents des patients par IPP
       </Typography>
       <Typography color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
-        • La mise à disposition da la recherche par expression régulière
+        • La mise à disposition de la recherche par expression régulière
       </Typography>
 
       <Typography color="textSecondary" style={{ paddingTop: 6 }}>
