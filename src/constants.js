@@ -111,15 +111,18 @@ export const BIOLOGY_HIERARCHY_ITM_LOINC =
     : process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_LOINC
 
 export const ODD_BIOLOGY =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_BIOLOGY}' == 'true' : process.env.REACT_APP_ODD_BIOLOGY
+  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_BIOLOGY}' : process.env.REACT_APP_ODD_BIOLOGY
 
-console.log('ODD_BIOLOGY', ODD_BIOLOGY)
+console.log('NODE_ENV', process.env.NODE_ENV)
 console.log('true', typeof 'true')
+console.log('ODD_BIOLOGY', ODD_BIOLOGY)
 console.log('{REACT_APP_ODD_BIOLOGY}', typeof '{REACT_APP_ODD_BIOLOGY}')
 console.log('{REACT_APP_ODD_BIOLOGY}' == 'true')
-console.log('NODE_ENV', process.env.NODE_ENV)
 console.log('process.env.REACT_APP_ODD_BIOLOGY', process.env.REACT_APP_ODD_BIOLOGY)
-
+console.log('ODD_CONTACT', ODD_CONTACT)
+console.log('{REACT_APP_ODD_CONTACT}', typeof '{REACT_APP_ODD_CONTACT}')
+console.log('{REACT_APP_ODD_CONTACT}' == 'true')
+console.log('process.env.REACT_APP_ODD_CONTACT', process.env.REACT_APP_ODD_CONTACT)
 export const ODD_COMPOSITION =
   process.env.NODE_ENV !== 'development'
     ? '{REACT_APP_ODD_COMPOSITION}' == 'true'
@@ -137,7 +140,7 @@ export const ODD_OBSERVATION =
 export const ODD_MEDICATION =
   process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_MEDICATION}' == 'true' : process.env.REACT_APP_ODD_MEDICATION
 export const ODD_CONTACT =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_CONTACT}' == 'true' : process.env.REACT_APP_ODD_CONTACT
+  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_CONTACT}' : process.env.REACT_APP_ODD_CONTACT
 export const ODD_EXPORT =
   process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_EXPORT}' == 'true' : process.env.REACT_APP_ODD_EXPORT
 
