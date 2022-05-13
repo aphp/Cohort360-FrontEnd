@@ -79,7 +79,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     setSearchMode(!!searchInput)
   }
 
-  const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
+  const handleChangePage = (value?: number) => {
     setPage(value || 1)
     fetchDocumentsList(value || 1)
   }
@@ -106,13 +106,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   const handleDeleteChip = (filterName: string, value?: string) => {
     switch (filterName) {
       case 'nda':
-        onChangeOptions(
-          filterName,
-          filters.nda
-            .split(',')
-            .filter((item: string) => item !== value)
-            .join()
-        )
+        onChangeOptions(filterName, value)
         break
       case 'selectedDocTypes': {
         const typesName = docTypes
@@ -120,6 +114,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
           .filter((item, index, array) => array.indexOf(item) === index)
         const isGroupItem = typesName.find((typeName) => typeName === value)
 
+        console.log('value :>> ', value)
         if (!isGroupItem) {
           onChangeOptions(
             filterName,
@@ -134,8 +129,6 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         break
       }
       case 'startDate':
-        onChangeOptions(filterName, null)
-        break
       case 'endDate':
         onChangeOptions(filterName, null)
         break
@@ -177,7 +170,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         order={order}
         setOrder={setOrder}
         page={page}
-        setPage={setPage}
+        setPage={(newPage: number) => handleChangePage(newPage)}
         total={totalDocs}
       />
 

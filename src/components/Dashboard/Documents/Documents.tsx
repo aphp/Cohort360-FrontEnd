@@ -56,7 +56,6 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
       setSearchMode(false)
     }
     setLoadingStatus(true)
-    // Clean regex mode
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
 
     const result = await services.cohorts.fetchDocuments(
@@ -85,7 +84,6 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         nb: totalPatientDocs,
         total: totalAllPatientDocs
       }))
-      setPage(page)
       setDocuments(documentsList)
     } else {
       setDocuments([])
