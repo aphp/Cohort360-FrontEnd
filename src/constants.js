@@ -111,22 +111,30 @@ export const BIOLOGY_HIERARCHY_ITM_LOINC =
     : process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_LOINC
 
 export const ODD_BIOLOGY =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_BIOLOGY}' : process.env.REACT_APP_ODD_BIOLOGY
+  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_BIOLOGY}' === 'true' : process.env.REACT_APP_ODD_BIOLOGY
 export const ODD_COMPOSITION =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_COMPOSITION}' : process.env.REACT_APP_ODD_COMPOSITION
+  process.env.NODE_ENV !== 'development'
+    ? '{REACT_APP_ODD_COMPOSITION}' === 'true'
+    : process.env.REACT_APP_ODD_COMPOSITION
 export const ODD_PROCEDURE =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_OODD_PROCEDURE}' : process.env.REACT_APP_OODD_PROCEDURE
+  process.env.NODE_ENV !== 'development'
+    ? '{REACT_APP_OODD_PROCEDURE}' === 'true'
+    : process.env.REACT_APP_OODD_PROCEDURE
 export const ODD_CLAIM =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_CLAIM}' : process.env.REACT_APP_ODD_CLAIM
+  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_CLAIM}' === 'true' : process.env.REACT_APP_ODD_CLAIM
 export const ODD_CONDITION =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_CONDITION}' : process.env.REACT_APP_ODD_CONDITION
+  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_CONDITION}' === 'true' : process.env.REACT_APP_ODD_CONDITION
 export const ODD_OBSERVATION =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_OBSERVATION}' : process.env.REACT_APP_ODD_OBSERVATION
+  process.env.NODE_ENV !== 'development'
+    ? '{REACT_APP_ODD_OBSERVATION}' === 'true'
+    : process.env.REACT_APP_ODD_OBSERVATION
 export const ODD_MEDICATION =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_MEDICATION}' : process.env.REACT_APP_ODD_MEDICATION
+  process.env.NODE_ENV !== 'development'
+    ? '{REACT_APP_ODD_MEDICATION}' === 'true'
+    : process.env.REACT_APP_ODD_MEDICATION
 export const ODD_CONTACT =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_CONTACT}' : process.env.REACT_APP_ODD_CONTACT
+  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_CONTACT}' === 'true' : process.env.REACT_APP_ODD_CONTACT
 export const ODD_EXPORT =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_EXPORT}' : process.env.REACT_APP_ODD_EXPORT
+  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_EXPORT}' === 'true' : process.env.REACT_APP_ODD_EXPORT
 
 export const VALUE_SET_SIZE = '9999'
