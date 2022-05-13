@@ -111,7 +111,7 @@ export const BIOLOGY_HIERARCHY_ITM_LOINC =
     : process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_LOINC
 
 export const ODD_BIOLOGY =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_BIOLOGY}' == 'true' : process.env.REACT_APP_ODD_BIOLOGY
+  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_BIOLOGY}' : process.env.REACT_APP_ODD_BIOLOGY
 
 console.log('ODD_BIOLOGY', ODD_BIOLOGY)
 console.log('true', typeof 'true')
