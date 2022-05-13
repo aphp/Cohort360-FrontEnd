@@ -99,37 +99,18 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   const handleDeleteChip = (filterName: string, value?: any) => {
     switch (filterName) {
       case 'nda':
-        value &&
-          onChangeOptions(
-            filterName,
-            filters.nda
-              .split(',')
-              .filter((item) => item !== value)
-              .join()
-          )
-        break
       case 'code':
-        value &&
-          onChangeOptions(
-            filterName,
-            filters.code
-              .split(',')
-              .filter((item) => item !== value)
-              .join()
-          )
+        onChangeOptions(filterName, value)
         break
       case 'startDate':
-        onChangeOptions(filterName, null)
-        break
       case 'endDate':
         onChangeOptions(filterName, null)
         break
       case 'selectedDiagnosticTypes':
-        value &&
-          onChangeOptions(
-            filterName,
-            filters.selectedDiagnosticTypes.filter((item) => item.id !== value.id)
-          )
+        onChangeOptions(
+          filterName,
+          filters.selectedDiagnosticTypes.filter((item) => item.id !== value.id)
+        )
         break
     }
   }
