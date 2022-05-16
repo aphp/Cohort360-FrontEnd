@@ -1,6 +1,6 @@
 {
   "name": "cohort360_react",
-  "version": "2.14.1",
+  "version": "2.14.2",
   "private": true,
   "dependencies": {
     "@apollo/react-hooks": "^4.0.0",
@@ -53,7 +53,8 @@
     "set-value": "^4.1.0",
     "url-parse": "^1.5.8",
     "follow-redirects": "^1.14.8",
-    "nanoid": "^3.1.31"
+    "nanoid": "^3.1.31",
+    "ejs": "^3.1.7"
   },
   "scripts": {
     "fix-packages": "npx npm-force-resolutions",
