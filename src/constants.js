@@ -136,15 +136,20 @@ export const ODD_EXPORT =
 
 export const VALUE_SET_SIZE = '9999'
 
+export let booleanTrue = 'true'
+
 console.log('NODE_ENV', process.env.NODE_ENV)
 console.log('true', typeof 'true')
 console.log('ODD_BIOLOGY', ODD_BIOLOGY)
 console.log('{REACT_APP_ODD_BIOLOGY}', typeof '{REACT_APP_ODD_BIOLOGY}')
-console.log(`|${ODD_BIOLOGY}| === 'true'`, '{REACT_APP_ODD_BIOLOGY}' == 'true')
+//prettier-ignore
+console.log(`|${ODD_BIOLOGY}| === 'true'`, '{REACT_APP_ODD_BIOLOGY}' == "true")
+console.log(`|${ODD_BIOLOGY}| === 'true'`, '{REACT_APP_ODD_BIOLOGY}' == `${booleanTrue}`)
 console.log('process.env.REACT_APP_ODD_BIOLOGY', process.env.REACT_APP_ODD_BIOLOGY)
 console.log('ODD_CONTACT', ODD_CONTACT)
 console.log('{REACT_APP_ODD_CONTACT}', typeof '{REACT_APP_ODD_CONTACT}')
-console.log('{REACT_APP_ODD_CONTACT}' == 'true')
+console.log('{REACT_APP_ODD_CONTACT}' == 'false')
 console.log('process.env.REACT_APP_ODD_CONTACT', process.env.REACT_APP_ODD_CONTACT)
 console.log('`|${{ REACT_APP_ODD_BIOLOGY }}|`', `|${'{REACT_APP_ODD_BIOLOGY}'}|`)
 console.log('`${ODD_BIOLOGY}`', `|${ODD_BIOLOGY}|`)
+console.log('process.env', process.env)
