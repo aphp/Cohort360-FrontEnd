@@ -149,11 +149,3 @@ export const ODD_EXPORT =
     : process.env.REACT_APP_ODD_EXPORT
 
 export const VALUE_SET_SIZE = '9999'
-
-console.log('{|REACT_APP_ODD_EXPORT|}', '{REACT_APP_ODD_EXPORT}')
-console.log('true', typeof 'true')
-console.log('BOOLEANTRUE', BOOLEANTRUE, typeof BOOLEANTRUE)
-console.log('`${BOOLEANTRUE}`', `${BOOLEANTRUE}`, typeof `${BOOLEANTRUE}`)
-console.log('equivalence avec la string {REACT_APP_ODD_EXPORT}', '{REACT_APP_ODD_EXPORT}' == 'true')
-console.log('equivalence avec le let sans les back quote', '{REACT_APP_ODD_EXPORT}' == BOOLEANTRUE)
-console.log('equivalence avec le let {REACT_APP_ODD_EXPORT}', '{REACT_APP_ODD_EXPORT}' == `${BOOLEANTRUE}`)
