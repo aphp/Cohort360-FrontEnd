@@ -9,7 +9,7 @@ import moment from 'moment'
 
 import { MuiPickersUtilsProvider } from '@material-ui/pickers'
 
-import AppNavigation from 'components/Routes/AppNavigation/AppNavigation'
+import AppNavigation from './components/Routes/AppNavigation/AppNavigation'
 
 import { store, persistor } from './state/store'
 

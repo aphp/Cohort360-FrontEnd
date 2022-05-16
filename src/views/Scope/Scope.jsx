@@ -37,7 +37,7 @@ const Scope = () => {
         ? (_selected.extension.find((extension) => extension.url === 'cohort-id') ?? { valueInteger: 0 }).valueInteger
         : null
     )
-    history.push(`/perimetres?${perimetresIds}`)
+    history.push(`/perimeters?${perimetresIds}`)
   }
 
   return (

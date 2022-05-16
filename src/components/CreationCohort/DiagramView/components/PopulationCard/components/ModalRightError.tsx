@@ -22,7 +22,7 @@ const ModalRightError: React.FC<ModalRightErrorProps> = ({ open, handleClose }) 
   const history = useHistory()
 
   const _handleReturnHome = () => {
-    history.push(`/accueil`)
+    history.push(`/home`)
   }
 
   return (

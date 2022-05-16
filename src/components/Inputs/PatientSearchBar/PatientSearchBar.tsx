@@ -62,8 +62,8 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
     if (event.key === 'Enter') {
       event.preventDefault()
       if (!_searchInput) return
-      if (location.pathname === '/accueil') {
-        history.push(`/rechercher_patient/${_searchInput}`)
+      if (location.pathname === '/home') {
+        history.push(`/patient-research/${_searchInput}`)
       } else {
         performQueries && performQueries(page, _searchInput, searchBy)
       }
@@ -72,8 +72,8 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
 
   const onSearchPatient = async () => {
     if (!_searchInput) return
-    if (location.pathname === '/accueil') {
-      history.push(`/rechercher_patient/${_searchInput}`)
+    if (location.pathname === '/home') {
+      history.push(`/patient-research/${_searchInput}`)
     } else {
       performQueries && performQueries(page, _searchInput, searchBy)
     }

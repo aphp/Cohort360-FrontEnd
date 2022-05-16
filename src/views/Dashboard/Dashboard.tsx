@@ -47,9 +47,9 @@ const Dashboard: React.FC<{
       case 'patients':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'apercu', to: '/mes_patients/apercu', disabled: false },
-          { label: 'Patients', value: 'patients', to: '/mes_patients/patients', disabled: false },
-          { label: 'Documents', value: 'documents', to: '/mes_patients/documents', disabled: false }
+          { label: 'Aperçu', value: 'apercu', to: '/my-patients/apercu', disabled: false },
+          { label: 'Patients', value: 'patients', to: '/my-patients/patients', disabled: false },
+          { label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false }
         ])
         break
       case 'cohort':
@@ -76,17 +76,17 @@ const Dashboard: React.FC<{
       case 'perimeters':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'apercu', to: `/perimetres/apercu${location.search}`, disabled: false },
+          { label: 'Aperçu', value: 'apercu', to: `/perimeters/apercu${location.search}`, disabled: false },
           {
             label: 'Données patient',
             value: 'patients',
-            to: `/perimetres/patients${location.search}`,
+            to: `/perimeters/patients${location.search}`,
             disabled: false
           },
           {
             label: 'Documents cliniques',
             value: 'documents',
-            to: `/perimetres/documents${location.search}`,
+            to: `/perimeters/documents${location.search}`,
             disabled: false
           }
         ])

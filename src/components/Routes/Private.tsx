@@ -8,8 +8,8 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, B
 
 import { ACCES_TOKEN } from '../../constants'
 
-import { useAppSelector, useAppDispatch } from 'state'
-import { login } from 'state/me'
+import { useAppSelector, useAppDispatch } from '../../state'
+import { login } from '../../state/me'
 
 const ME = gql`
   query me {
