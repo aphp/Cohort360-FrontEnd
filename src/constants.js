@@ -9,6 +9,8 @@ export const TOKEN_URL = 'irrelevant'
 export const REVOKE_URL = 'irrelevant'
 export const LOGIN_REDIRECT_URL = 'irrelevant'
 
+export let BOOLEANTRUE = 'true'
+
 export const CONTEXT = process.env.NODE_ENV !== 'development' ? '{REACT_APP_CONTEXT}' : process.env.REACT_APP_CONTEXT
 
 export const ACCES_TOKEN = 'access'
@@ -111,46 +113,46 @@ export const BIOLOGY_HIERARCHY_ITM_LOINC =
     : process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_LOINC
 
 export const ODD_BIOLOGY =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_BIOLOGY}' : process.env.REACT_APP_ODD_BIOLOGY
+  process.env.NODE_ENV !== 'development'
+    ? '{REACT_APP_ODD_BIOLOGY}' == `${BOOLEANTRUE}`
+    : process.env.REACT_APP_ODD_BIOLOGY
 
 export const ODD_COMPOSITION =
   process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_ODD_COMPOSITION}' == 'true'
+    ? '{REACT_APP_ODD_COMPOSITION}' == `${BOOLEANTRUE}`
     : process.env.REACT_APP_ODD_COMPOSITION
 export const ODD_PROCEDURE =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_OODD_PROCEDURE}' == 'true' : process.env.REACT_APP_OODD_PROCEDURE
+  process.env.NODE_ENV !== 'development'
+    ? '{REACT_APP_OODD_PROCEDURE}' == `${BOOLEANTRUE}`
+    : process.env.REACT_APP_OODD_PROCEDURE
 export const ODD_CLAIM =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_CLAIM}' == 'true' : process.env.REACT_APP_ODD_CLAIM
+  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_CLAIM}' == `${BOOLEANTRUE}` : process.env.REACT_APP_ODD_CLAIM
 export const ODD_CONDITION =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_CONDITION}' == 'true' : process.env.REACT_APP_ODD_CONDITION
+  process.env.NODE_ENV !== 'development'
+    ? '{REACT_APP_ODD_CONDITION}' == `${BOOLEANTRUE}`
+    : process.env.REACT_APP_ODD_CONDITION
 export const ODD_OBSERVATION =
   process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_ODD_OBSERVATION}' == 'true'
+    ? '{REACT_APP_ODD_OBSERVATION}' == `${BOOLEANTRUE}`
     : process.env.REACT_APP_ODD_OBSERVATION
 export const ODD_MEDICATION =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_MEDICATION}' == 'true' : process.env.REACT_APP_ODD_MEDICATION
+  process.env.NODE_ENV !== 'development'
+    ? '{REACT_APP_ODD_MEDICATION}' == `${BOOLEANTRUE}`
+    : process.env.REACT_APP_ODD_MEDICATION
 export const ODD_CONTACT =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_CONTACT}' : process.env.REACT_APP_ODD_CONTACT
+  process.env.NODE_ENV !== 'development'
+    ? '{REACT_APP_ODD_CONTACT}' == `${BOOLEANTRUE}`
+    : process.env.REACT_APP_ODD_CONTACT
 export const ODD_EXPORT =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_EXPORT}' == 'true' : process.env.REACT_APP_ODD_EXPORT
+  process.env.NODE_ENV !== 'development'
+    ? '{REACT_APP_ODD_EXPORT}' == `${BOOLEANTRUE}`
+    : process.env.REACT_APP_ODD_EXPORT
 
 export const VALUE_SET_SIZE = '9999'
 
-export let booleanTrue = 'true'
-export let booleanFalse = 'false'
-
-console.log('NODE_ENV', process.env.NODE_ENV)
+console.log('{|REACT_APP_ODD_EXPORT|}', '{REACT_APP_ODD_EXPORT}')
 console.log('true', typeof 'true')
-console.log('ODD_BIOLOGY', ODD_BIOLOGY)
-console.log('{REACT_APP_ODD_BIOLOGY}', typeof '{REACT_APP_ODD_BIOLOGY}')
-console.log('verif condition de ODD_BIOLOGY', ODD_BIOLOGY == `${booleanTrue}`)
-console.log(`|${ODD_BIOLOGY}| === 'true'`, '{REACT_APP_ODD_BIOLOGY}' === `${booleanTrue}`)
-console.log('process.env.REACT_APP_ODD_BIOLOGY', process.env.REACT_APP_ODD_BIOLOGY)
-console.log('ODD_CONTACT', ODD_CONTACT)
-console.log('{REACT_APP_ODD_CONTACT}', typeof '{REACT_APP_ODD_CONTACT}')
-console.log('Verif de la condition pour ODD_CONTACTE', '{REACT_APP_ODD_CONTACT}' == 'false')
-console.log('Verif de la condition pour ODD_CONTACTE', '{REACT_APP_ODD_CONTACT}' == `${booleanFalse}`)
-console.log('process.env.REACT_APP_ODD_CONTACT', process.env.REACT_APP_ODD_CONTACT)
-console.log('`|${{ REACT_APP_ODD_BIOLOGY }}|`', `|${'{REACT_APP_ODD_BIOLOGY}'}|`)
-console.log('`${ODD_BIOLOGY}`', `|${ODD_BIOLOGY}|`)
-console.log('process.env', process.env)
+console.log('BOOLEANTRUE', BOOLEANTRUE, typeof BOOLEANTRUE)
+console.log('`${BOOLEANTRUE}`', `${BOOLEANTRUE}`, typeof `${BOOLEANTRUE}`)
+console.log('equivalence avec la string {REACT_APP_ODD_EXPORT}', '{REACT_APP_ODD_EXPORT}' == 'true')
+console.log('equivalence avec le let {REACT_APP_ODD_EXPORT}', '{REACT_APP_ODD_EXPORT}' == `${BOOLEANTRUE}`)
