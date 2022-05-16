@@ -473,7 +473,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             </Collapse>
           </List>
 
-          {ODD_CONTACT == 'true' &&
+          {ODD_CONTACT &&
             (open ? (
               <Button
                 onClick={() => history.push('/contact')}

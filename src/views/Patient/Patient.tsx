@@ -141,7 +141,7 @@ const Patient = () => {
                 to={`/patients/${patientId}/medication${groupId ? `?groupId=${groupId}` : ''}`}
               />
             )}
-            {ODD_BIOLOGY == 'true' && (
+            {ODD_BIOLOGY && (
               <Tab
                 className={classes.tabTitle}
                 label="Biologie"
