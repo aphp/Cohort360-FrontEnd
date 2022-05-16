@@ -115,37 +115,39 @@ export const BIOLOGY_HIERARCHY_ITM_LOINC =
 export const ODD_BIOLOGY =
   process.env.NODE_ENV !== 'development'
     ? '{REACT_APP_ODD_BIOLOGY}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_BIOLOGY
+    : process.env.REACT_APP_ODD_BIOLOGY == `${BOOLEANTRUE}`
 
 export const ODD_COMPOSITION =
   process.env.NODE_ENV !== 'development'
     ? '{REACT_APP_ODD_COMPOSITION}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_COMPOSITION
+    : process.env.REACT_APP_ODD_COMPOSITION == `${BOOLEANTRUE}`
 export const ODD_PROCEDURE =
   process.env.NODE_ENV !== 'development'
     ? '{REACT_APP_OODD_PROCEDURE}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_OODD_PROCEDURE
+    : process.env.REACT_APP_OODD_PROCEDURE == `${BOOLEANTRUE}`
 export const ODD_CLAIM =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_ODD_CLAIM}' == `${BOOLEANTRUE}` : process.env.REACT_APP_ODD_CLAIM
+  process.env.NODE_ENV !== 'development'
+    ? '{REACT_APP_ODD_CLAIM}' == `${BOOLEANTRUE}`
+    : process.env.REACT_APP_ODD_CLAIM == `${BOOLEANTRUE}`
 export const ODD_CONDITION =
   process.env.NODE_ENV !== 'development'
     ? '{REACT_APP_ODD_CONDITION}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_CONDITION
+    : process.env.REACT_APP_ODD_CONDITION == `${BOOLEANTRUE}`
 export const ODD_OBSERVATION =
   process.env.NODE_ENV !== 'development'
     ? '{REACT_APP_ODD_OBSERVATION}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_OBSERVATION
+    : process.env.REACT_APP_ODD_OBSERVATION == `${BOOLEANTRUE}`
 export const ODD_MEDICATION =
   process.env.NODE_ENV !== 'development'
     ? '{REACT_APP_ODD_MEDICATION}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_MEDICATION
+    : process.env.REACT_APP_ODD_MEDICATION == `${BOOLEANTRUE}`
 export const ODD_CONTACT =
   process.env.NODE_ENV !== 'development'
     ? '{REACT_APP_ODD_CONTACT}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_CONTACT
+    : process.env.REACT_APP_ODD_CONTACT == `${BOOLEANTRUE}`
 export const ODD_EXPORT =
   process.env.NODE_ENV !== 'development'
     ? '{REACT_APP_ODD_EXPORT}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_EXPORT
+    : process.env.REACT_APP_ODD_EXPORT == `${BOOLEANTRUE}`
 
 export const VALUE_SET_SIZE = '9999'
