@@ -32,7 +32,7 @@ Le point d'entrée du Requeteur se trouve dans ce fichier. Il permet l'appel des
 | `_onUndo`        | Lorsque l'utilisateur appuie sur le bouton `Annuler`, nous allons récupérer l'état précédent (si disponible) grâce aux informations présentes dans le store Redux                                           |
 | `_onRedo`        | Lorsque l'utilisateur appuie sur le bouton `Rétablir`, nous allons récupérer l'état suivant (si disponible) grâce aux informations présentes dans le store Redux                                            |
 
-> Ce composant n'a pas de props. (propriétés), l'appel de ce composant ce fait de la manière suivante :
+> Ce composant n'a pas de props. (propriétés), l'appel de ce composant se fait de la manière suivante :
 
 ```jsx
 import Requeteur from 'components/Cohort/CreationCohort/Requeteur';
@@ -77,7 +77,7 @@ return (
 
 ##### DiagramView.tsx
 
-Ce composant permet d'appeler les composant suivant : `CohortCreationBreadcrumbs`, `PopulationCard`, `TemporalConstraintCard` et `LogicalOperator`. Il n'a pas d'aspect fonctionnel, juste de dispatcher les differents composant.
+Ce composant permet d'appeler les composants suivants : `CohortCreationBreadcrumbs`, `PopulationCard`, `TemporalConstraintCard` et `LogicalOperator`. Il n'a pas d'aspect fonctionnel, juste de dispatcher les différents composants.
 
 > Ce composant n'a pas de props. (propriétés), l'appel de ce composant se fait de la manière suivante :
 
@@ -95,9 +95,9 @@ return (
 
 ##### CohortCreationBreadcrumbs.tsx
 
-Ce composant permet d'afficher le dossier, la requête ainsi que le numero de snapshot.
+Ce composant permet d'afficher le dossier, la requête ainsi que le numéro de snapshot.
 
-> TODO: Rendre cliquable les éléments afin de changer le dossier, la requête ou le snapshot.
+> TODO: Rendre cliquables les éléments afin de changer le dossier, la requête ou le snapshot.
 
 ```jsx
 import CohortCreationBreadcrumbs from 'components/Cohort/CreationCohort/DiagramView/components/Breadcrumbs/Breadcrumbs'
@@ -120,7 +120,7 @@ Ce composant contient 2 états :
 
 En plus de ça il y a un lien vers le composant `PopulationRightPanel` qui permet d'ouvrir un panneau latéral contenant la liste des périmètres de l’utilsateur.
 
-> Ce composant n'a pas de props. (propriétés), l'appel de ce composant ce fait de la manière suivante :
+> Ce composant n'a pas de props. (propriétés), l'appel de ce composant se fait de la manière suivante :
 
 ```jsx
 import PopulationCard from 'components/Cohort/CreationCohort/DiagramView/components/PopulationCard/PopulationCard';
@@ -136,7 +136,7 @@ return (
 
 ##### LogicalOperator.tsx
 
-Ce composant est un composant relativement important pour le Requêteur, il permet de créer les groupes de critères avec le composant `OperatorItem` mais également le composant `CriteriaRightPanel` qui permet quand a lui d'avoir le panneau latéral contenant la liste des types de critères ainsi que des formulaires.
+Ce composant est un composant relativement important pour le Requêteur, il permet de créer les groupes de critères avec le composant `OperatorItem` mais également le composant `CriteriaRightPanel` qui permet quant à lui d'avoir le panneau latéral contenant la liste des types de critères ainsi que des formulaires.
 
 > Ces groupes de critères sont générés de manière récursive, donc les groupes de critères créent les cartes des critères, mais également des groupes de critères.
 
