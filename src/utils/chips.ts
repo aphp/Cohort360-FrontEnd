@@ -279,8 +279,8 @@ export const buildCohortFiltersChips = (
         label:
           filters.favorite && filters.favorite !== 'all'
             ? filters.favorite === 'True'
-              ? 'Cohortes favories'
-              : 'Cohortes non favories'
+              ? 'Cohortes favorites'
+              : 'Cohortes non favorites'
             : '',
         onDelete: () => handleDeleteChip('favorite')
       },

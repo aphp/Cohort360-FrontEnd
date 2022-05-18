@@ -106,7 +106,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner un champs</Alert>}
+        {error && <Alert severity="error">Merci de renseigner un champ</Alert>}
 
         {!error && !multiFields && (
           <Alert
