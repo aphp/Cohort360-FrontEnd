@@ -34,7 +34,7 @@ const Dashboard: React.FC<{
 
   const perimetreIds = location.search.substr(1)
 
-  const [selectedTab, selectTab] = useState(tabName || 'apercu')
+  const [selectedTab, selectTab] = useState(tabName || 'preview')
   const [tabs, setTabs] = useState<Tabs[]>([])
 
   const { open, dashboard } = useAppSelector((state) => ({
@@ -47,7 +47,7 @@ const Dashboard: React.FC<{
       case 'patients':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'apercu', to: '/my-patients/apercu', disabled: false },
+          { label: 'Aperçu', value: 'preview', to: '/my-patients/preview', disabled: false },
           { label: 'Patients', value: 'patients', to: '/my-patients/patients', disabled: false },
           { label: 'Documents', value: 'documents', to: '/my-patients/documents', disabled: false }
         ])
@@ -60,7 +60,7 @@ const Dashboard: React.FC<{
             to: `/cohort/new/${dashboard.requestId}`,
             disabled: false
           },
-          { label: 'Aperçu cohorte', value: 'apercu', to: `/cohort/${cohortId}/apercu`, disabled: false },
+          { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/${cohortId}/preview`, disabled: false },
           { label: 'Données patient', value: 'patients', to: `/cohort/${cohortId}/patients`, disabled: false },
           { label: 'Documents cliniques', value: 'documents', to: `/cohort/${cohortId}/documents`, disabled: false }
         ])
@@ -68,7 +68,7 @@ const Dashboard: React.FC<{
       case 'new_cohort':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu cohorte', value: 'apercu', to: `/cohort/new/apercu`, disabled: true },
+          { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/new/preview`, disabled: true },
           { label: 'Données patient', value: 'patients', to: `/cohort/new/patients`, disabled: true },
           { label: 'Documents cliniques', value: 'documents', to: `/cohort/new/documents`, disabled: true }
         ])
@@ -76,7 +76,7 @@ const Dashboard: React.FC<{
       case 'perimeters':
         setTabs([
           // { label: 'Création cohorte', value: 'creation', to: `/cohort/new`, disabled: true },
-          { label: 'Aperçu', value: 'apercu', to: `/perimeters/apercu${location.search}`, disabled: false },
+          { label: 'Aperçu', value: 'preview', to: `/perimeters/preview${location.search}`, disabled: false },
           {
             label: 'Données patient',
             value: 'patients',
@@ -175,7 +175,7 @@ const Dashboard: React.FC<{
         </Grid>
       </Grid>
       <div>
-        {selectedTab === 'apercu' && (
+        {selectedTab === 'preview' && (
           <CohortPreview
             total={dashboard.totalPatients}
             agePyramidData={dashboard.agePyramidData}
