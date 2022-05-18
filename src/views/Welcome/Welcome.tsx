@@ -46,7 +46,7 @@ const Welcome: React.FC = () => {
   const [lastRequest, setLastRequest] = useState<RequestType[]>([])
 
   const lastConnection = practitioner?.lastConnection
-    ? moment(practitioner.lastConnection).format('[Dernière connexion: ]ddd DD MMMM YYYY[, à ]HH:mm')
+    ? moment(practitioner.lastConnection).format('[Dernière connexion : ]ddd DD MMMM YYYY[, à ]HH:mm')
     : ''
 
   useEffect(() => {
