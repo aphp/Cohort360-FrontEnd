@@ -1,4 +1,4 @@
-image: harbor.eds.aphp.fr/cohort360/selenium-chrome:dev
+image: harbor.eds.aphp.fr/cohort360/selenium-chrome:1.0.0
 
 stages: # List of stages for jobs in their order of execution
   - test
@@ -33,7 +33,7 @@ stages: # List of stages for jobs in their order of execution
 #       - node_modules/
 
 build-job:
-  image: node:16.13.2
+  image: harbor.eds.aphp.fr/cohort360/node:16.13.2
   stage: build
   script:
     - npm install
@@ -51,7 +51,7 @@ build-job:
     policy: pull
 
 deploy-job:
-  image: gcr.io/kaniko-project/executor:debug
+  image: harbor.eds.aphp.fr/cohort360/kaniko:debug
   stage: deploy
   needs:
     - job: build-job
