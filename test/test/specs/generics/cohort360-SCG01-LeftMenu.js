@@ -191,17 +191,17 @@ describe('Cohort360 - SCG01 - Menu gauche', () => {
 		await LeftMenu.reduce()
 	})
 
-	it('Mes recherches > Mes projets de recherche', async () => {
+	it('Mes recherches > Mes requêtes', async () => {
 		
 		await LeftMenu.open()
 		await LeftMenu.openMyResearchMenu()
 
-		Logger.log('Affichage du lien "Mes projets de recherche"')
-		expect(await LeftMenu.myResearchProjectLink.isDisplayed() /*&& await LeftMenu.myResearchProjectLink.isClickable()*/).withContext('@ Affichage du lien "Mes projets de recherche"').toBe(true)		
+		Logger.log('Affichage du lien "Mes requêtes"')
+		expect(await LeftMenu.myResearchProjectLink.isDisplayed() /*&& await LeftMenu.myResearchProjectLink.isClickable()*/).withContext('@ Affichage du lien "Mes requêtes"').toBe(true)		
 		
-		Logger.log('Accès à la page "Mes projets de recherche"')
+		Logger.log('Accès à la page "Mes requêtes"')
 		await LeftMenu.myResearchProjectLink.click()
-		expect(await browser.getUrl()).withContext('@ L\'URL de la page "Mes projets de recherche" doit être : ' + MyResearchProjectsPage.getUrl()).toBe(MyResearchProjectsPage.getUrl())
+		expect(await browser.getUrl()).withContext('@ L\'URL de la page "Mes requêtes" doit être : ' + MyResearchProjectsPage.getUrl()).toBe(MyResearchProjectsPage.getUrl())
 		
 		Logger.log('Le titre de la page est : "' + MyResearchProjectsPage.titleValue + '"')
         expect(await MyResearchProjectsPage.title.waitForDisplayed()).withContext('@ Le titre de la page est : "' + MyResearchProjectsPage.titleValue + '"').toBe(true)

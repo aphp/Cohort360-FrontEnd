@@ -40,7 +40,7 @@ const PatientSearchCard = () => {
       <Grid container direction="column" justifyContent="space-evenly" style={{ height: '100%', marginTop: 8 }}>
         <Button
           id="patients-research-button"
-          href="/mes_patients"
+          href="/my-patients"
           size="small"
           variant="contained"
           disableElevation
@@ -50,7 +50,7 @@ const PatientSearchCard = () => {
         </Button>
         <Button
           id="scope-research-button"
-          href="/perimetre"
+          href="/perimeter"
           size="small"
           variant="contained"
           disableElevation

@@ -3,15 +3,15 @@ const Logger = require('../../objects/Logger')
 
 const Page = MyResearchProjectsPage
 
-describe('Cohort360 - SCP06 - Page "Mes projets de recherche"', () => {
+describe('Cohort360 - SCP06 - Page "Mes requêtes"', () => {
 
-    // Accès à la page "Mes projets de recherche"
+    // Accès à la page "Mes requêtes"
 	// ----------------------------------
-	it('Accès à la page "Mes projets de recherche"', async () => {
+	it('Accès à la page "Mes requêtes"', async () => {
 		await Page.login()
 
-		Logger.log('L\'URL de la page "Mes projets de recherche" doit être : ' + Page.getUrl())
-		expect(await browser.getUrl()).withContext('@ L\'URL de la page "Mes projets de recherche" doit être : ' + Page.getUrl()).toBe(Page.getUrl())
+		Logger.log('L\'URL de la page "Mes requêtes" doit être : ' + Page.getUrl())
+		expect(await browser.getUrl()).withContext('@ L\'URL de la page "Mes requêtes" doit être : ' + Page.getUrl()).toBe(Page.getUrl())
 
         Logger.log('Le titre de la page est : "' + Page.titleValue + '"')
         expect(await Page.title.waitForDisplayed()).withContext('@ Le titre de la page est : "' + Page.titleValue + '"').toBe(true)
