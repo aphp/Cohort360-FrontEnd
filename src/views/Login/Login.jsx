@@ -130,7 +130,7 @@ const Login = () => {
 
       const oldPath = localStorage.getItem('old-path')
       localStorage.removeItem('old-path')
-      history.push(oldPath ?? '/accueil')
+      history.push(oldPath ?? '/home')
     } else {
       setLoading(false)
       setErrorLogin(true)

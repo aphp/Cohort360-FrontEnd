@@ -158,7 +158,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
 
   const handleConfirmDeletion = () => {
     dispatch<any>(deleteCohort({ deletedCohort: dashboard as Cohort }))
-    history.push('/accueil')
+    history.push('/home')
   }
 
   return (

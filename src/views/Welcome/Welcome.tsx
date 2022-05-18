@@ -170,7 +170,7 @@ const Welcome: React.FC = () => {
               <ResearchCard
                 title={'Mes cohortes favorites'}
                 linkLabel={'Voir toutes mes cohortes favorites'}
-                onClickLink={() => history.push('/recherche_sauvegarde?fav=true')}
+                onClickLink={() => history.push('/my-cohorts?fav=true')}
                 loading={loadingCohort}
                 cohorts={favoriteCohorts}
                 isFav
@@ -184,7 +184,7 @@ const Welcome: React.FC = () => {
               <ResearchCard
                 title={'Mes dernières cohortes créées'}
                 linkLabel={'Voir toutes mes cohortes'}
-                onClickLink={() => history.push('/recherche_sauvegarde')}
+                onClickLink={() => history.push('/my-cohorts')}
                 loading={loadingCohort}
                 cohorts={lastCohorts}
               />
@@ -197,7 +197,7 @@ const Welcome: React.FC = () => {
               <ResearchCard
                 title={'Mes dernières requêtes créées'}
                 linkLabel={'Voir toutes mes requêtes'}
-                onClickLink={() => history.push('/mes_projets')}
+                onClickLink={() => history.push('/my-requests')}
                 loading={loadingRequest}
                 requests={lastRequest}
               />

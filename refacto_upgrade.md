@@ -9,8 +9,8 @@
   - [ ] Ajouter redux à la tab `Document`
 - [ ] Patient : ~OK
 - [ ] Requêteur : ~OK
-- [ ] Mes cohortes sauvegardées :
-- [ ] Mes projets de recherche :
+- [ ] Mes cohortes :
+- [ ] Mes requêtes :
 
 ### Components :
 

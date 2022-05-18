@@ -10,7 +10,7 @@ class MyResearchProjectsPage extends Page {
 
     get path () { return COHORT360_PARAMS.MY_RESEARCH_PROJECTS_PAGE_PATH }
 
-    get titleValue () { return 'Mes projets de recherche' }
+    get titleValue () { return 'Mes requêtes' }
     get addProjectButtonLib () { return 'Ajouter un projet' }
 
     get title () { return $('#myProject-title') }
