@@ -95,25 +95,25 @@ import serviceProjects, { IServiceProjects } from './serviceProjects'
 
 // Type de votre interface
 export interface IService... {
-	// Ensemble des fonctions liés à l'exploration d'une cohorte
+	// Ensemble des fonctions liées à l'exploration d'une cohorte
 	cohorts: IServiceCohorts
 
-	// Explble des fonctions lié à l'utilisation du requêteur
+	// Ensemble des fonctions liées à l'utilisation du requêteur
 	cohortCreation: IServiceCohortCreation
 
-	// Ensemble des fonctions liés à la page de contact
+	// Ensemble des fonctions liées à la page de contact
 	contact: IServiceContact
 
-	// Ensemble des fonctions liés aux patients
+	// Ensemble des fonctions liées aux patients
 	patients: IServicePatients
 
-	// Ensemble des fonctions liés aux périmètres
+	// Ensemble des fonctions liées aux périmètres
 	perimeters: IServicePerimeters
 
-	// Ensemble des fonctions liés à l'utilisateur courant
+	// Ensemble des fonctions liées à l'utilisateur courant
 	practitioner: IServicePractitioner
 
-	// Ensemble des fonctions liés aux projets de recherches
+	// Ensemble des fonctions liées aux projets de recherches
 	projects: IServiceProjects
 }
 
@@ -238,7 +238,7 @@ export interface IServicePatients {
 
 > Pour l'ensemble des fonctions définies dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définis dans un premier temps pour éviter tous problèmes de typage.
 
-Ce fichier définit l'ensemble des fonctions de récupération de données liées à un périmètre et définit l'interface suivante :
+Ce fichier définit l'ensemble des fonction liées à la récupération de données liées à un périmètre, et définit l'interface suivante :
 
 ```ts
 export interface IServicePerimeters {
@@ -396,9 +396,9 @@ export interface IServiceCohorts {
 
 ##### serviceContact.ts
 
-> Pour l'ensemble des fonctions définies dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définie dans un premier temps pour éviter tous problèmes de typage.
+> Pour l'ensemble des fonctions définies dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définis dans un premier temps pour éviter tous problèmes de typage.
 
-Ce fichier définit l'ensemble des fonctions liées à la fonctionnalité de prise de contact et définit l'interface suivante :
+Ce fichier définit l'ensemble des fonctions liées à la fonctionnalité de prise de contact, et définit l'interface suivante :
 
 ```ts
 export interface IServiceContact {
