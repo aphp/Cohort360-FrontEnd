@@ -83,6 +83,7 @@ const AutoLogoutContainer = () => {
 
   useEffect(() => {
     if (me !== null) {
+      refreshToken()
       setRefreshInterval(
         setInterval(() => {
           refreshToken()
