@@ -141,9 +141,8 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         results={{ nb: totalDocs, total: totalAllDoc, label: 'document(s)' }}
         searchBar={{
           type: 'document',
-          value: searchInput,
-          onSearch: (newSearchInput: string) =>
-            setSearchInput(newSearchInput ? newSearchInput.replace(/^\/|\/$/gi, '') : '')
+          value: searchInput ? searchInput.replace(/^\/|\/$/gi, '') : '',
+          onSearch: (newSearchInput: string) => setSearchInput(newSearchInput)
         }}
         buttons={[
           {
