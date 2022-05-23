@@ -65,5 +65,7 @@ deploy-job:
       --context ${CI_PROJECT_DIR}
       --dockerfile ${CI_PROJECT_DIR}/Dockerfile
       --destination harbor.eds.aphp.fr/cohort360/front:${VERSION}
-  rules:
-    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+  only :
+    - tags
+    - develop
+    - ^feat_deploy_(\w*|\d*)
