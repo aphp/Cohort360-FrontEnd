@@ -18,6 +18,7 @@ const AutoLogoutContainer = () => {
   const classes = useStyles()
 
   const [dialogIsOpen, setDialogIsOpen] = useState(false)
+  const [refreshInterval, setRefreshInterval] = useState()
   const dispatch = useAppDispatch()
   const history = useHistory()
   const inactifTimerRef = useRef(null)
@@ -32,6 +33,7 @@ const AutoLogoutContainer = () => {
     localStorage.clear()
     dispatch(logoutAction())
     clearTimeout(sessionInactifTimerRef.current)
+    clearTimeout(inactifTimerRef)
   }
 
   const onIdle = () => {
@@ -50,6 +52,7 @@ const AutoLogoutContainer = () => {
         setDialogIsOpen(false)
         // console.log('User est resté connecté')
         clearTimeout(sessionInactifTimerRef.current)
+        clearTimeout(inactifTimerRef)
       } else {
         logout()
       }
@@ -79,14 +82,17 @@ const AutoLogoutContainer = () => {
   }
 
   useEffect(() => {
-    if (me) {
+    if (me !== null) {
       refreshToken()
-
-      setInterval(() => {
-        refreshToken()
-      }, 5 * 60 * 1000)
+      setRefreshInterval(
+        setInterval(() => {
+          refreshToken()
+        }, 3 * 60 * 1000)
+      )
+    } else if (me == null) {
+      clearInterval(refreshInterval)
     }
-  }, [])
+  }, [me])
 
   if (!me) return <></>
 
