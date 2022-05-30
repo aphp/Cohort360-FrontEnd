@@ -42,8 +42,10 @@ build-job:
     paths:
       - build/
     expire_in: 1 day
-  rules:
-    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+  only:
+    - tags
+    - develop
+    - ^feat_deploy_(\w*|\d*)
   cache:
     key: cohort360_nodemodules_cache
     paths:
@@ -65,7 +67,7 @@ deploy-job:
       --context ${CI_PROJECT_DIR}
       --dockerfile ${CI_PROJECT_DIR}/Dockerfile
       --destination harbor.eds.aphp.fr/cohort360/front:${VERSION}
-  only :
+  only:
     - tags
     - develop
     - ^feat_deploy_(\w*|\d*)
