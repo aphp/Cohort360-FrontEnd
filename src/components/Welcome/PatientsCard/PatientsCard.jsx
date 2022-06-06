@@ -7,25 +7,28 @@ import useStyles from './styles'
 
 import Typography from '@material-ui/core/Typography'
 import CircularProgress from '@material-ui/core/CircularProgress'
-import services from 'services'
+// import services from 'services'
 
 import displayDigit from 'utils/displayDigit'
+import apiFhir from 'services/apiFhir'
 
 const PatientSearchCard = () => {
-  const [patientNb, setPatientNb] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const [patientNb, setPatientNb] = useState(null)
+  const [loading, setLoading] = useState(false)
   const classes = useStyles()
 
   useEffect(() => {
     const _fetchPatientsCount = async () => {
-      if (typeof services.patients.fetchPatientsCount !== 'function') return
-
       setLoading(true)
-      const patientNumber = await services.patients.fetchPatientsCount()
-      setPatientNb(patientNumber)
-      setLoading(false)
+      const response = await apiFhir.get(`/Patient?size=0`)
+      if (response.status === 200) {
+        setPatientNb(response.data.total)
+        setLoading(false)
+      } else {
+        setPatientNb(null)
+        setLoading(false)
+      }
     }
-
     _fetchPatientsCount()
   }, [])
 
@@ -33,7 +36,13 @@ const PatientSearchCard = () => {
     <>
       <div id="patients-card-title">
         <Typography component="h2" variant="h2" color="primary" gutterBottom>
-          {loading ? <CircularProgress size={20} /> : displayDigit(patientNb)} patients pris en charge
+          {loading ? (
+            <CircularProgress size={20} />
+          ) : patientNb ? (
+            displayDigit(patientNb) + ' patients pris en charge'
+          ) : (
+            '- patients pris en charge'
+          )}
         </Typography>
       </div>
       <Divider />
