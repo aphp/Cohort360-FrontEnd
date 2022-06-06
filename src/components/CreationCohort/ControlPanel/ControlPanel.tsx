@@ -283,6 +283,24 @@ const ControlPanel: React.FC<{
           </Grid>
         </Grid>
 
+        {!status && !includePatient && (
+          <Alert className={classes.errorAlert} severity="info">
+            Votre requête ne contient pas nombre de patient. Veuillez
+            <br />
+            <br />
+            <Button
+              onClick={() => _relaunchCount(false)}
+              variant="outlined"
+              color="primary"
+              size="small"
+              style={{ marginTop: -14 }}
+              disabled={maintenanceIsActive}
+            >
+              Relancer la requête
+            </Button>
+          </Alert>
+        )}
+
         {!!includePatient && includePatient > 20000 && (
           <Alert className={classes.errorAlert} severity="error">
             Il est pour le moment impossible de créer des cohortes de plus de 20 000 patients
