@@ -1,10 +1,12 @@
 #!/bin/sh
 set -e
 
+# Replace all URLs in nginx.conf by environment variables
 sed -i "s@{FHIR_URL}@$FHIR_URL@g" /etc/nginx/conf.d/nginx.conf
 sed -i "s@{BACK_URL}@$BACK_URL@g" /etc/nginx/conf.d/nginx.conf
 sed -i "s@{DISPOSE_URL}@$DISPOSE_URL@g" /etc/nginx/conf.d/nginx.conf
 
+# Replace all {MY_ENV_VAR} with the real MY_ENV_VAR defined in CI/CD.
 sed -i "s@{REACT_APP_BACK_API_URL}@$REACT_APP_BACK_API_URL@g" /app/build/static/js/*.js
 sed -i "s@{REACT_APP_REQUEST_API_URL}@$REACT_APP_REQUEST_API_URL@g" /app/build/static/js/*.js
 sed -i "s@{REACT_APP_FHIR_API_URL}@$REACT_APP_FHIR_API_URL@g" /app/build/static/js/*.js
@@ -39,6 +41,8 @@ sed -i "s@{REACT_APP_ODD_MEDICATION}@$REACT_APP_ODD_MEDICATION@g" /app/build/sta
 sed -i "s@{REACT_APP_ODD_CONTACT}@$REACT_APP_ODD_CONTACT@g" /app/build/static/js/*.js
 sed -i "s@{REACT_APP_ODD_EXPORT}@$REACT_APP_ODD_EXPORT@g" /app/build/static/js/*.js
 
+# Restart nginx to apply changes
 service nginx restart
 
+# Sleep infinity so the container will run forever
 sleep infinity
