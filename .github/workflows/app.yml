@@ -1,53 +1,19 @@
-name: cohort360-front
+name: cohort360-front-run-tests
 
 on: [push]
 
 jobs:
   dependencies:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
           node-version: 16.x
-
-      - name: Cache node modules
-        uses: actions/cache@v1
-        with:
-          path: node_modules
-          key: ${{ runner.OS }}-node-modules-${{ hashFiles('yarn.lock') }}
-
+          cache: 'npm'
       - name: Install Dependencies
-        run: yarn
-
-  build:
-    runs-on: ubuntu-18.04
-    needs: dependencies
-    steps:
-      - uses: actions/checkout@v1
-
-      - name: Cache node modules
-        uses: actions/cache@v1
-        with:
-          path: node_modules
-          key: ${{ runner.OS }}-node-modules-${{ hashFiles('yarn.lock') }}
-
+        run: npm install
       - name: Build
-        run: yarn build
-
-  lint:
-    runs-on: ubuntu-18.04
-    needs: dependencies
-    steps:
-      - uses: actions/checkout@v1
-
-      - name: Cache node modules
-        uses: actions/cache@v1
-        with:
-          path: node_modules
-          key: ${{ runner.OS }}-node-modules-${{ hashFiles('yarn.lock') }}
-
+        run: npm run test
       - name: Lint
-        run: yarn lint
+        run: npm run lint
