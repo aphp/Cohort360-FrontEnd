@@ -60,14 +60,6 @@ const servicePractitioner: IServicePractitioner = {
       url: `${BACK_API_URL}/accounts/login/`,
       data: formData
     })
-
-    // getCsrfToken(username, password)
-
-    // return axios({
-    //   method: 'POST',
-    //   url: '/api/jwt/',
-    //   data: { username: username, password: password }
-    // })
   },
 
   logout: async () => {
@@ -88,6 +80,7 @@ const servicePractitioner: IServicePractitioner = {
     const practitioner = await fetchPractitioner({
       identifier: username
     })
+
     if (
       !practitioner ||
       (practitioner && !practitioner.data) ||
@@ -104,27 +97,17 @@ const servicePractitioner: IServicePractitioner = {
     const firstName = resource.name[0].given.join(' ')
     const lastName = resource.name[0].family
     const displayName = `${lastName} ${firstName}`
+    const response = practitioner
 
     return {
       id,
       userName,
       displayName,
       firstName,
-      lastName
+      lastName,
+      response
     }
   }
 }
 
 export default servicePractitioner
-
-// export const getCsrfToken = (username: string, password: string): Promise<AxiosResponse<any>> => {
-//   const formData = new FormData()
-//   formData.append('username', username.toString())
-//   formData.append('password', password)
-
-//   return axios({
-//     method: 'POST',
-//     url: `${BACK_API_URL}/accounts/login/`,
-//     data: formData
-//   })
-// }
