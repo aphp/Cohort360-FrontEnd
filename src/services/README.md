@@ -390,8 +390,6 @@ export interface IServiceCohorts {
     cohortId: number
     motivation: string
     tables: string[]
-    nominative?: boolean
-    output_format?: string
   }) => Promise<any>
 }
 ```
