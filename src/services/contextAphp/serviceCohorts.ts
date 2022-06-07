@@ -177,11 +177,7 @@ export interface IServiceCohorts {
    *   - motivation: Raison de l'export
    *   - tables: Liste de table demandé dans l'export
    */
-  createExport: (args: {
-    cohortId: number
-    motivation: string
-    tables: string[]
-  }) => Promise<any>
+  createExport: (args: { cohortId: number; motivation: string; tables: string[] }) => Promise<any>
 }
 
 const servicesCohorts: IServiceCohorts = {
