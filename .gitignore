@@ -32,6 +32,6 @@ yarn-error.log*
 .mp4
 
 # CI/CD
-gitlab-ci.yml
+.gitlab-ci.yml
 .gitlab
 docker
