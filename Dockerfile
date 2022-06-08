@@ -10,7 +10,7 @@ COPY build build
 RUN apt-get update -y && apt-get install -y curl
 
 # Configure the nginx inside the docker image
-COPY YOUR_REPOSITORY/nginx.conf /etc/nginx/conf.d/
+COPY .templates/nginx.conf /etc/nginx/conf.d/
 
 # Entrypoint script is used to replace environment variables
 COPY ./docker-entrypoint.sh /app
