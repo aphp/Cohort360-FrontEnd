@@ -1,4 +1,5 @@
 import Login from 'views/Login/Login'
+import { HealthCheck } from 'views/HealthCheck/HealthCheck'
 import Welcome from 'views/Welcome/Welcome'
 import SearchPatient from 'views/SearchPatient/SearchPatient'
 import SavedResearch from 'views/SavedResearch/SavedResearch'
@@ -31,6 +32,12 @@ export default [
     name: 'home',
     isPrivate: true,
     component: Welcome
+  },
+  {
+    exact: true,
+    path: '/health-check',
+    name: 'health-check',
+    component: HealthCheck
   },
   /**
    * Cohort360: Research Patient Page
