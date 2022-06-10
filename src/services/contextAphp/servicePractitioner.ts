@@ -62,7 +62,7 @@ const servicePractitioner: IServicePractitioner = {
         data: formData
       })
     } catch (error) {
-      console.error(error)
+      console.error("erreur lors de l'éxécution de la fonction authenticate", error)
       return error
     }
   },
@@ -81,7 +81,7 @@ const servicePractitioner: IServicePractitioner = {
         url: `${BACK_API_URL}/maintenance/`
       })
     } catch (error) {
-      console.error(error)
+      console.error("erreur lors de l'éxécution de la fonction maintenance", error)
       return error
     }
   },
@@ -119,7 +119,7 @@ const servicePractitioner: IServicePractitioner = {
         response
       }
     } catch (error: any) {
-      console.error(error)
+      console.error("erreur lors de l'éxécution de la fonction fetchPractitioner", error)
       return error
     }
   }
