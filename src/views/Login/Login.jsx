@@ -2,18 +2,23 @@ import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import localforage from 'localforage'
 
-import Button from '@material-ui/core/Button'
-import TextField from '@material-ui/core/TextField'
-import Grid from '@material-ui/core/Grid'
-import Box from '@material-ui/core/Box'
-import Typography from '@material-ui/core/Typography'
-import Link from '@material-ui/core/Link'
-import Dialog from '@material-ui/core/Dialog'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogActions from '@material-ui/core/DialogActions'
-import CircularProgress from '@material-ui/core/CircularProgress'
+import {
+  Button,
+  TextField,
+  Grid,
+  Box,
+  Typography,
+  Link,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  CircularProgress,
+  Snackbar
+} from '@material-ui/core'
+
+import { Alert } from '@material-ui/lab'
 
 import NoRights from 'components/ErrorView/NoRights'
 
@@ -28,22 +33,23 @@ import services from 'services'
 
 import useStyles from './styles'
 
-const ErrorDialog = ({ open, setErrorLogin }) => {
-  const _setErrorLogin = () => {
-    if (setErrorLogin && typeof setErrorLogin === 'function') {
-      setErrorLogin(false)
+const ErrorSnackBarAlert = ({ open, setError, errorMessage }) => {
+  const _setError = () => {
+    if (setError && typeof setError === 'function') {
+      setError(false)
     }
   }
-
   return (
-    <Dialog open={open}>
-      <DialogContent>
-        <DialogContentText>Votre code APH ou votre mot de passe est incorrect</DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={_setErrorLogin}>Ok</Button>
-      </DialogActions>
-    </Dialog>
+    <Snackbar
+      open={open}
+      onClose={_setError}
+      autoHideDuration={5000}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+    >
+      <Alert severity="error" onClose={_setError}>
+        {errorMessage}
+      </Alert>
+    </Snackbar>
   )
 }
 
@@ -89,7 +95,8 @@ const Login = () => {
   const [username, setUsername] = useState(undefined)
   const [password, setPassword] = useState(undefined)
   const [noRights, setNoRights] = useState(false)
-  const [errorLogin, setErrorLogin] = useState(false)
+  const [error, setError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const [open, setOpen] = useState(false)
 
   React.useEffect(() => {
@@ -99,6 +106,17 @@ const Login = () => {
   const getPractitionerData = async (practitioner, lastConnection, maintenance) => {
     if (practitioner) {
       const practitionerPerimeters = await services.perimeters.getPerimeters()
+
+      if (practitionerPerimeters.error) {
+        setLoading(false)
+        return (
+          setError(true),
+          setErrorMessage(
+            'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+          )
+        )
+      }
+
       if (practitionerPerimeters.length === 0) {
         // setTimeout(() => services.practitioner.logout(), 2500)
         localStorage.clear()
@@ -133,44 +151,90 @@ const Login = () => {
       history.push(oldPath ?? '/home')
     } else {
       setLoading(false)
-      setErrorLogin(true)
+      setError(true)
     }
   }
 
   const login = async () => {
-    try {
-      if (loading) return
-      setLoading(true)
+    if (loading) return
+    setLoading(true)
 
-      if (!username || !password) {
-        setLoading(false)
-        return setErrorLogin(true)
-      }
-
-      const response = await services.practitioner.authenticate(username, password)
-      if (!response) {
-        setLoading(false)
-        return setErrorLogin(true)
-      }
-      const { status, data = {} } = response
-
-      if (status === 200) {
-        localStorage.setItem(ACCES_TOKEN, data.jwt.access)
-        localStorage.setItem(REFRESH_TOKEN, data.jwt.refresh)
-
-        const practitioner = await services.practitioner.fetchPractitioner(username)
-        const lastConnection = data.jwt.last_connection ? data.jwt.last_connection.modified_at : undefined
-
-        const maintenanceResponse = await services.practitioner.maintenance()
-        const maintenance = maintenanceResponse.data
-        getPractitionerData(practitioner, lastConnection, maintenance)
-      } else {
-        setLoading(false)
-        return setErrorLogin(true)
-      }
-    } catch (err) {
+    if (!username || !password) {
       setLoading(false)
-      setErrorLogin(true)
+      return setError(true), setErrorMessage("L'un des champs nom d'utilisateur ou mot de passe est vide.")
+    }
+
+    const response = await services.practitioner.authenticate(username, password)
+    console.log('response', response)
+    if (!response) {
+      setLoading(false)
+      return (
+        setError(true),
+        setErrorMessage(
+          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+        )
+      )
+    }
+
+    if (response.error) {
+      setLoading(false)
+      return (
+        setError(true),
+        setErrorMessage(
+          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+        )
+      )
+    }
+
+    if (!response.data.jwt) {
+      setLoading(false)
+      return setError(true), setErrorMessage("Votre nom d'utilisateur ou votre mot de passe est incorrect.")
+    }
+
+    const { status, data = {} } = response
+
+    if (status === 200) {
+      localStorage.setItem(ACCES_TOKEN, data.jwt.access)
+      localStorage.setItem(REFRESH_TOKEN, data.jwt.refresh)
+
+      const practitioner = await services.practitioner.fetchPractitioner(username)
+
+      console.log('practitioner.response', practitioner.response)
+
+      if (practitioner.error || practitioner.response.status !== 200) {
+        setLoading(false)
+        return (
+          setError(true),
+          setErrorMessage(
+            'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+          )
+        )
+      }
+
+      const lastConnection = data.jwt.last_connection ? data.jwt.last_connection.modified_at : undefined
+
+      const maintenanceResponse = await services.practitioner.maintenance()
+
+      if (maintenanceResponse.error || maintenanceResponse.status !== 200) {
+        setLoading(false)
+        return (
+          setError(true),
+          setErrorMessage(
+            'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+          )
+        )
+      }
+
+      const maintenance = maintenanceResponse.data
+      getPractitionerData(practitioner, lastConnection, maintenance)
+    } else {
+      setLoading(false)
+      return (
+        setError(true),
+        setErrorMessage(
+          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+        )
+      )
     }
   }
 
@@ -263,7 +327,7 @@ const Login = () => {
         </Grid>
       </Grid>
 
-      <ErrorDialog open={errorLogin !== false} setErrorLogin={setErrorLogin} />
+      <ErrorSnackBarAlert open={error !== false} setError={setError} errorMessage={errorMessage} />
 
       <LegalMentionDialog open={open} setOpen={setOpen} />
     </>

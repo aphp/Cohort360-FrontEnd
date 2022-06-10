@@ -108,12 +108,21 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     setOpenFilter(false)
   }
 
+  const onChangeOptions = (key: string, value: any) => {
+    setFilters((prevState) => ({
+      ...prevState,
+      [key]: value
+    }))
+  }
+
   const handleDeleteChip = (
     filterName: 'nda' | 'ipp' | 'selectedDocTypes' | 'startDate' | 'endDate',
     value?: string
   ) => {
     switch (filterName) {
       case 'nda':
+        onChangeOptions(filterName, value)
+        break
       case 'ipp':
         setFilters((prevFilters) => ({
           ...prevFilters,
