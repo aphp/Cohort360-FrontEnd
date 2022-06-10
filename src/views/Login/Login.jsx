@@ -105,45 +105,48 @@ const Login = () => {
 
   const getPractitionerData = async (practitioner, lastConnection, maintenance) => {
     if (practitioner) {
-      try {
-        const practitionerPerimeters = await services.perimeters.getPerimeters()
-        if (practitionerPerimeters.length === 0) {
-          // setTimeout(() => services.practitioner.logout(), 2500)
-          localStorage.clear()
-          setLoading(false)
-          return setNoRights(true)
-        }
+      const practitionerPerimeters = await services.perimeters.getPerimeters()
 
-        const nominativeGroupsIds = practitionerPerimeters
-          .filter(({ extension }) =>
-            extension.some(({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_NOMINATIVE')
-          )
-          .map((practitionerPerimeter) => {
-            const groupId = practitionerPerimeter.extension?.find(({ url }) => url === 'cohort-id')
-              ? `${practitionerPerimeter.extension?.find(({ url }) => url === 'cohort-id').valueInteger}`
-              : ''
-            return groupId
-          })
-          .filter((item) => item)
-
-        dispatch(
-          loginAction({
-            ...practitioner,
-            nominativeGroupsIds,
-            deidentified: nominativeGroupsIds.length === 0,
-            lastConnection,
-            maintenance
-          })
+      if (practitionerPerimeters.error) {
+        setLoading(false)
+        return (
+          setError(true),
+          setErrorMessage('Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au:.s')
         )
-
-        const oldPath = localStorage.getItem('old-path')
-        localStorage.removeItem('old-path')
-        history.push(oldPath ?? '/home')
-      } catch (err) {
-        console.error(err)
-        setError(true)
-        setErrorMessage('Une erreur FHIR est survenue. Si elle persiste veuillez contacter le support au:.')
       }
+
+      if (practitionerPerimeters.length === 0) {
+        // setTimeout(() => services.practitioner.logout(), 2500)
+        localStorage.clear()
+        setLoading(false)
+        return setNoRights(true)
+      }
+
+      const nominativeGroupsIds = practitionerPerimeters
+        .filter(({ extension }) =>
+          extension.some(({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_NOMINATIVE')
+        )
+        .map((practitionerPerimeter) => {
+          const groupId = practitionerPerimeter.extension?.find(({ url }) => url === 'cohort-id')
+            ? `${practitionerPerimeter.extension?.find(({ url }) => url === 'cohort-id').valueInteger}`
+            : ''
+          return groupId
+        })
+        .filter((item) => item)
+
+      dispatch(
+        loginAction({
+          ...practitioner,
+          nominativeGroupsIds,
+          deidentified: nominativeGroupsIds.length === 0,
+          lastConnection,
+          maintenance
+        })
+      )
+
+      const oldPath = localStorage.getItem('old-path')
+      localStorage.removeItem('old-path')
+      history.push(oldPath ?? '/home')
     } else {
       setLoading(false)
       setError(true)
@@ -151,51 +154,75 @@ const Login = () => {
   }
 
   const login = async () => {
-    try {
-      if (loading) return
-      setLoading(true)
+    if (loading) return
+    setLoading(true)
 
-      if (!username || !password) {
+    if (!username || !password) {
+      setLoading(false)
+      return setError(true), setErrorMessage("L'un des champs nom d'utilisateur ou mot de passe est vide")
+    }
+
+    const response = await services.practitioner.authenticate(username, password)
+    console.log('response', response)
+    if (!response) {
+      setLoading(false)
+      return (
+        setError(true),
+        setErrorMessage('Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:.')
+      )
+    }
+
+    if (response.error) {
+      setLoading(false)
+      return (
+        setError(true),
+        setErrorMessage('Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:.')
+      )
+    }
+
+    if (!response.data.jwt) {
+      setLoading(false)
+      return setError(true), setErrorMessage("Votre nom d'utilisateur ou votre mot de passe est incorrect")
+    }
+
+    const { status, data = {} } = response
+
+    if (status === 200) {
+      localStorage.setItem(ACCES_TOKEN, data.jwt.access)
+      localStorage.setItem(REFRESH_TOKEN, data.jwt.refresh)
+
+      const practitioner = await services.practitioner.fetchPractitioner(username)
+
+      console.log('practitioner.response', practitioner.response)
+
+      if (practitioner.error || practitioner.response.status !== 200) {
         setLoading(false)
-        return setError(true)
+        return (
+          setError(true),
+          setErrorMessage('Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au:.')
+        )
       }
 
-      const response = await services.practitioner.authenticate(username, password)
-      if (!response) {
-        setLoading(false)
-        return setError(true), setErrorMessage("Votre nom d'utilisateur ou votre mot de passe est incorrect")
-      }
-      const { status, data = {} } = response
+      const lastConnection = data.jwt.last_connection ? data.jwt.last_connection.modified_at : undefined
 
-      if (status === 200) {
-        localStorage.setItem(ACCES_TOKEN, data.jwt.access)
-        localStorage.setItem(REFRESH_TOKEN, data.jwt.refresh)
-        try {
-          const practitioner = await services.practitioner.fetchPractitioner(username)
-          const lastConnection = data.jwt.last_connection ? data.jwt.last_connection.modified_at : undefined
-          try {
-            const maintenanceResponse = await services.practitioner.maintenance()
-            const maintenance = maintenanceResponse.data
-            getPractitionerData(practitioner, lastConnection, maintenance)
-          } catch (err) {
-            console.error(err)
-            setErrorMessage('une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:.')
-          }
-        } catch (err) {
-          console.error(err)
-          setErrorMessage('une erreur FHIR est survenue. Si elle persiste veuillez contacter le support au:.')
-        }
-      } else {
+      const maintenanceResponse = await services.practitioner.maintenance()
+
+      if (maintenanceResponse.error || maintenanceResponse.status !== 200) {
         setLoading(false)
         return (
           setError(true),
           setErrorMessage('Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:.')
         )
       }
-    } catch (err) {
+
+      const maintenance = maintenanceResponse.data
+      getPractitionerData(practitioner, lastConnection, maintenance)
+    } else {
       setLoading(false)
-      setError(true)
-      setErrorMessage("Votre nom d'utilisateur ou votre mot de passe est incorrect")
+      return (
+        setError(true),
+        setErrorMessage('Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:.')
+      )
     }
   }
 

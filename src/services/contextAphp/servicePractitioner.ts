@@ -51,15 +51,20 @@ export interface IServicePractitioner {
 
 const servicePractitioner: IServicePractitioner = {
   authenticate: async (username, password) => {
-    const formData = new FormData()
-    formData.append('username', username.toString())
-    formData.append('password', password)
+    try {
+      const formData = new FormData()
+      formData.append('username', username.toString())
+      formData.append('password', password)
 
-    return axios({
-      method: 'POST',
-      url: `${BACK_API_URL}/accounts/login/`,
-      data: formData
-    })
+      return axios({
+        method: 'POST',
+        url: `${BACK_API_URL}/accounts/login/`,
+        data: formData
+      })
+    } catch (error) {
+      console.error(error)
+      return error
+    }
   },
 
   logout: async () => {
@@ -70,42 +75,52 @@ const servicePractitioner: IServicePractitioner = {
   },
 
   maintenance: async () => {
-    return axios({
-      method: 'GET',
-      url: `${BACK_API_URL}/maintenance/`
-    })
+    try {
+      return axios({
+        method: 'GET',
+        url: `${BACK_API_URL}/maintenance/`
+      })
+    } catch (error) {
+      console.error(error)
+      return error
+    }
   },
 
   fetchPractitioner: async (username) => {
-    const practitioner = await fetchPractitioner({
-      identifier: username
-    })
+    try {
+      const practitioner = await fetchPractitioner({
+        identifier: username
+      })
 
-    if (
-      !practitioner ||
-      (practitioner && !practitioner.data) ||
+      if (
+        !practitioner ||
+        (practitioner && !practitioner.data) ||
+        // @ts-ignore
+        (practitioner && practitioner.data && !practitioner.data.entry)
+      ) {
+        return null
+      }
+
       // @ts-ignore
-      (practitioner && practitioner.data && !practitioner.data.entry)
-    ) {
-      return null
-    }
+      const { resource } = practitioner.data.entry[0]
+      const id = resource.id
+      const userName = resource.identifier[0].value
+      const firstName = resource.name[0].given.join(' ')
+      const lastName = resource.name[0].family
+      const displayName = `${lastName} ${firstName}`
+      const response = practitioner
 
-    // @ts-ignore
-    const { resource } = practitioner.data.entry[0]
-    const id = resource.id
-    const userName = resource.identifier[0].value
-    const firstName = resource.name[0].given.join(' ')
-    const lastName = resource.name[0].family
-    const displayName = `${lastName} ${firstName}`
-    const response = practitioner
-
-    return {
-      id,
-      userName,
-      displayName,
-      firstName,
-      lastName,
-      response
+      return {
+        id,
+        userName,
+        displayName,
+        firstName,
+        lastName,
+        response
+      }
+    } catch (error: any) {
+      console.error(error)
+      return error
     }
   }
 }
