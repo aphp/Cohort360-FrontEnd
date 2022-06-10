@@ -243,9 +243,10 @@ const servicesPerimeters: IServicePerimeters = {
         })
       }
       return organizationList
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error (getPerimeters) :', error)
-      return []
+      // return []
+      return error
     }
   },
 

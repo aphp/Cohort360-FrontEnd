@@ -869,9 +869,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 {startDate
                   ? endDate
                     ? `Entre le ${startDate} et le ${endDate}`
-                    : `Avant le ${startDate}`
+                    : `Après le ${startDate}`
                   : endDate
-                  ? `Après le ${endDate}`
+                  ? `Avant le ${endDate}`
                   : ''}
               </Typography>
             }
