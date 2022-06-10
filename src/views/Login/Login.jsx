@@ -111,7 +111,9 @@ const Login = () => {
         setLoading(false)
         return (
           setError(true),
-          setErrorMessage('Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au:.s')
+          setErrorMessage(
+            'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au:dsi-id-recherche-support-cohort360@aphp.fr.s'
+          )
         )
       }
 
@@ -168,7 +170,9 @@ const Login = () => {
       setLoading(false)
       return (
         setError(true),
-        setErrorMessage('Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:.')
+        setErrorMessage(
+          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:dsi-id-recherche-support-cohort360@aphp.fr.'
+        )
       )
     }
 
@@ -176,7 +180,9 @@ const Login = () => {
       setLoading(false)
       return (
         setError(true),
-        setErrorMessage('Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:.')
+        setErrorMessage(
+          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:dsi-id-recherche-support-cohort360@aphp.fr.'
+        )
       )
     }
 
@@ -199,7 +205,9 @@ const Login = () => {
         setLoading(false)
         return (
           setError(true),
-          setErrorMessage('Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au:.')
+          setErrorMessage(
+            'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au:dsi-id-recherche-support-cohort360@aphp.fr.'
+          )
         )
       }
 
@@ -211,7 +219,9 @@ const Login = () => {
         setLoading(false)
         return (
           setError(true),
-          setErrorMessage('Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:.')
+          setErrorMessage(
+            'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:dsi-id-recherche-support-cohort360@aphp.fr.'
+          )
         )
       }
 
@@ -221,7 +231,9 @@ const Login = () => {
       setLoading(false)
       return (
         setError(true),
-        setErrorMessage('Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:.')
+        setErrorMessage(
+          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:dsi-id-recherche-support-cohort360@aphp.fr.'
+        )
       )
     }
   }
