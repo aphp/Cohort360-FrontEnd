@@ -161,7 +161,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                     <TableCell onClick={() => _onClickRow(row)}>
                       {row.shared_by?.displayed_name ? (
                         <>
-                          {row.name} - Envoyée par : {row.shared_by.firstname} {row.shared_by.lastname}
+                          {row.name} - Envoyée par : {row.shared_by.firstname} {row.shared_by.lastname?.toUpperCase()}
                         </>
                       ) : (
                         <>{row.name}</>
