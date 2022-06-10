@@ -285,7 +285,7 @@ const ControlPanel: React.FC<{
 
         {!status && !includePatient && (
           <Alert className={classes.errorAlert} severity="info">
-            Votre requête ne contient pas nombre de patient. Veuillez
+            Votre requête ne contient pas nombre de patient.
             <br />
             <br />
             <Button

@@ -121,8 +121,16 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   ) => {
     switch (filterName) {
       case 'nda':
-      case 'ipp':
         onChangeOptions(filterName, value)
+        break
+      case 'ipp':
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          [filterName]: (prevFilters[filterName] ?? '')
+            .split(',')
+            .filter((item) => item !== value)
+            .join(',')
+        }))
         break
       case 'selectedDocTypes': {
         const typesName = docTypes

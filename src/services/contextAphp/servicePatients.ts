@@ -291,9 +291,14 @@ export interface IServicePatients {
 
 const servicesPatients: IServicePatients = {
   fetchPatientsCount: async () => {
-    const response = await fetchPatient({ size: 0 })
-    if (response?.data?.resourceType === 'OperationOutcome') return 0
-    return response.data.total ?? 0
+    try {
+      const response = await fetchPatient({ size: 0 })
+      if (response?.data?.resourceType === 'OperationOutcome') return null as any
+      return response.data.total ?? 0
+    } catch (error: any) {
+      console.error(error)
+      return null as any
+    }
   },
 
   fetchMyPatients: async () => {
