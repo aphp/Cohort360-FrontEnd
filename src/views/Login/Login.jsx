@@ -112,7 +112,7 @@ const Login = () => {
         return (
           setError(true),
           setErrorMessage(
-            'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au:dsi-id-recherche-support-cohort360@aphp.fr.s'
+            'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
           )
         )
       }
@@ -161,7 +161,7 @@ const Login = () => {
 
     if (!username || !password) {
       setLoading(false)
-      return setError(true), setErrorMessage("L'un des champs nom d'utilisateur ou mot de passe est vide")
+      return setError(true), setErrorMessage("L'un des champs nom d'utilisateur ou mot de passe est vide.")
     }
 
     const response = await services.practitioner.authenticate(username, password)
@@ -171,7 +171,7 @@ const Login = () => {
       return (
         setError(true),
         setErrorMessage(
-          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:dsi-id-recherche-support-cohort360@aphp.fr.'
+          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
         )
       )
     }
@@ -181,14 +181,14 @@ const Login = () => {
       return (
         setError(true),
         setErrorMessage(
-          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:dsi-id-recherche-support-cohort360@aphp.fr.'
+          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
         )
       )
     }
 
     if (!response.data.jwt) {
       setLoading(false)
-      return setError(true), setErrorMessage("Votre nom d'utilisateur ou votre mot de passe est incorrect")
+      return setError(true), setErrorMessage("Votre nom d'utilisateur ou votre mot de passe est incorrect.")
     }
 
     const { status, data = {} } = response
@@ -206,7 +206,7 @@ const Login = () => {
         return (
           setError(true),
           setErrorMessage(
-            'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au:dsi-id-recherche-support-cohort360@aphp.fr.'
+            'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
           )
         )
       }
@@ -220,7 +220,7 @@ const Login = () => {
         return (
           setError(true),
           setErrorMessage(
-            'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:dsi-id-recherche-support-cohort360@aphp.fr.'
+            'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
           )
         )
       }
@@ -232,7 +232,7 @@ const Login = () => {
       return (
         setError(true),
         setErrorMessage(
-          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au:dsi-id-recherche-support-cohort360@aphp.fr.'
+          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
         )
       )
     }
