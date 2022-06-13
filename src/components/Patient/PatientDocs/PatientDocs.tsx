@@ -114,7 +114,6 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
           .filter((item, index, array) => array.indexOf(item) === index)
         const isGroupItem = typesName.find((typeName) => typeName === value)
 
-        console.log('value :>> ', value)
         if (!isGroupItem) {
           onChangeOptions(
             filterName,
