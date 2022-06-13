@@ -165,7 +165,6 @@ const Login = () => {
     }
 
     const response = await services.practitioner.authenticate(username, password)
-    console.log('response', response)
 
     if (!response) {
       setLoading(false)
@@ -209,8 +208,6 @@ const Login = () => {
       localStorage.setItem(REFRESH_TOKEN, data.jwt.refresh)
 
       const practitioner = await services.practitioner.fetchPractitioner(username)
-
-      console.log('practitioner.response', practitioner.response)
 
       if (practitioner.error || practitioner.response.status !== 200) {
         setLoading(false)
