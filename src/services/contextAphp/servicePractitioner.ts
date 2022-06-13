@@ -56,7 +56,7 @@ const servicePractitioner: IServicePractitioner = {
       formData.append('username', username.toString())
       formData.append('password', password)
 
-      return axios({
+      return await axios({
         method: 'POST',
         url: `${BACK_API_URL}/accounts/login/`,
         data: formData
@@ -68,7 +68,7 @@ const servicePractitioner: IServicePractitioner = {
   },
 
   logout: async () => {
-    axios({
+    await axios({
       method: 'POST',
       url: `${BACK_API_URL}/accounts/logout/`
     })
@@ -76,7 +76,7 @@ const servicePractitioner: IServicePractitioner = {
 
   maintenance: async () => {
     try {
-      return axios({
+      return await axios({
         method: 'GET',
         url: `${BACK_API_URL}/maintenance/`
       })

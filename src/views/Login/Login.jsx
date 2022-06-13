@@ -166,6 +166,7 @@ const Login = () => {
 
     const response = await services.practitioner.authenticate(username, password)
     console.log('response', response)
+
     if (!response) {
       setLoading(false)
       return (
@@ -177,6 +178,16 @@ const Login = () => {
     }
 
     if (response.error) {
+      setLoading(false)
+      return (
+        setError(true),
+        setErrorMessage(
+          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+        )
+      )
+    }
+
+    if (response.status !== 200) {
       setLoading(false)
       return (
         setError(true),
