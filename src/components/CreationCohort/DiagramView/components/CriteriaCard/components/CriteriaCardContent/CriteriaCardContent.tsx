@@ -72,11 +72,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         ? moment(_currentCriteria.endOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
     }
-    if (
-      _currentCriteria.type !== 'Patient' &&
-      _currentCriteria.type !== 'MedicationRequest' &&
-      _currentCriteria.type !== 'MedicationAdministration'
-    ) {
+    if (_currentCriteria.type !== 'Patient') {
       encounterStartDate = _currentCriteria.encounterStartDate
         ? moment(_currentCriteria.encounterStartDate, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
@@ -824,12 +820,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         break
     }
 
-    if (
-      _currentCriteria.type !== 'Patient' &&
-      _currentCriteria.type !== 'MedicationRequest' &&
-      _currentCriteria.type !== 'MedicationAdministration' &&
-      (encounterStartDate || encounterEndDate)
-    ) {
+    if (_currentCriteria.type !== 'Patient' && (encounterStartDate || encounterEndDate)) {
       content = [
         ...content,
         <Chip

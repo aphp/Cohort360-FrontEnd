@@ -320,7 +320,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       filterFhir = [
         `status=final&type:not=doc-impor&empty=false`,
         `${criterion.search ? `${COMPOSITION_TEXT}=${encodeURIComponent(criterion.search)}` : ''}`,
-        `${criterion.regex_search ? `${COMPOSITION_TEXT}=${encodeURIComponent(`/${criterion.regex_search}/`)}` : ''}`,
+        `${
+          criterion.regex_search
+            ? `${COMPOSITION_TEXT}=${encodeURIComponent(`/(.)*${criterion.regex_search}(.)*/`)}`
+            : ''
+        }`,
         `${
           criterion.docType && criterion.docType.length > 0
             ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: any) => docType.id).reduce(searchReducer)}`
@@ -1211,6 +1215,11 @@ export async function unbuildRequest(_json: string) {
         if (element.dateRangeList) {
           currentCriterion.startOccurrence = element.dateRangeList[0].minDate?.replace('T00:00:00Z', '') ?? null
           currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
+        }
+
+        if (element.encounterDateRange) {
+          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
         if (element.filterFhir) {
