@@ -206,7 +206,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             getOptionSelected={(option, value) => option.id === value.id}
             value={selectedCriteriaAdministration}
             onChange={(e, value) => onChangeValue('administration', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Voie d'aministration" />}
+            renderInput={(params) => <TextField {...params} variant="outlined" label="Voie d'administration" />}
           />
 
           <AdvancedInputs form="medication" selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
