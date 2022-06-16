@@ -45,7 +45,18 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, search
 
   const onSearch = (newInput = search) => {
     if (searchBar && searchBar.onSearch && typeof searchBar.onSearch === 'function') {
-      if (newInput && inputMode === 'regex') newInput = `/${newInput}/`
+      if (newInput && inputMode === 'regex') {
+        newInput = newInput.replace(/[/"]/g, function (m) {
+          switch (m) {
+            case '/':
+              return '\\/'
+            case '"':
+              return '\\"'
+          }
+          return m
+        })
+        newInput = `/(.)*${newInput}(.)*/`
+      }
       searchBar.onSearch(newInput, searchBy)
     }
   }

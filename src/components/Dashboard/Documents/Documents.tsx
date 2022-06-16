@@ -115,6 +115,23 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     }))
   }
 
+  const onFiltreValue = (newInput: string = searchInput) => {
+    if (newInput) {
+      const newInput1 = newInput.replace(/^\/\(\.\)\*|\(\.\)\*\/$/gi, '')
+      const newInput2 = newInput1.replace(new RegExp('\\\\/|\\\\"', 'g'), function (m) {
+        switch (m) {
+          case '\\/':
+            return '/'
+          case '\\"':
+            return '"'
+        }
+
+        return m
+      })
+      return newInput2
+    }
+  }
+
   const handleDeleteChip = (
     filterName: 'nda' | 'ipp' | 'selectedDocTypes' | 'startDate' | 'endDate',
     value?: string
@@ -163,7 +180,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
             results={[documentsResult, patientsResult]}
             searchBar={{
               type: 'document',
-              value: searchInput ? searchInput.replace(/^\/|\/$/gi, '') : '',
+              value: searchInput ? onFiltreValue() : '',
               onSearch: (newSearchInput: string) => setSearchInput(newSearchInput)
             }}
             buttons={[
