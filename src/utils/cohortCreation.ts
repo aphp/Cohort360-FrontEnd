@@ -322,7 +322,17 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
         `${criterion.search ? `${COMPOSITION_TEXT}=${encodeURIComponent(criterion.search)}` : ''}`,
         `${
           criterion.regex_search
-            ? `${COMPOSITION_TEXT}=${encodeURIComponent(`/(.)*${criterion.regex_search}(.)*/`)}`
+            ? `${COMPOSITION_TEXT}=${encodeURIComponent(
+                `/(.)*${criterion.regex_search.replace(/[/"]/g, function (m) {
+                  switch (m) {
+                    case '/':
+                      return '\\/'
+                    case '"':
+                      return '\\"'
+                  }
+                  return m
+                })}(.)*/`
+              )}`
             : ''
         }`,
         `${
