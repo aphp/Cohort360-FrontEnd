@@ -36,7 +36,7 @@ const ModalRightError: React.FC<ModalRightErrorProps> = ({ open, handleClose }) 
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           Vous tentez d'accéder à une requête dont la population source ne fait pas partie de votre périmètre d'accès.
-          Veuillez choisir une nouvelle une population source.
+          Veuillez choisir une nouvelle population source.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
