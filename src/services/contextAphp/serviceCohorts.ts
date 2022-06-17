@@ -361,7 +361,7 @@ const servicesCohorts: IServiceCohorts = {
         _sort: sortBy,
         sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
         status: 'final',
-        _elements: searchInput ? [] : ['status', 'type', 'subject', 'encounter', 'date', 'title'],
+        _elements: searchInput ? [] : ['status', 'type', 'subject', 'encounter', 'date', 'title', 'event'],
         _list: groupId ? [groupId] : [],
         _text: searchInput,
         type: selectedDocTypes.length > 0 ? selectedDocTypes.join(',') : '',
