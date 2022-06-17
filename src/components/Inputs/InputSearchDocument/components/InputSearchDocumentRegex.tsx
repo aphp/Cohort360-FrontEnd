@@ -38,7 +38,7 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
   const [error, setError] = useState<string | null>(null)
 
   const _onSearchDocument = (newInputText: string) => {
-    // if (error === ERROR_REGEX) return
+    if (error === ERROR_REGEX) return
     onSearchDocument(newInputText)
   }
 

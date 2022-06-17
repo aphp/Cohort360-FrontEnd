@@ -462,8 +462,8 @@ export type MedicationDataType = {
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   startOccurrence: Date | ''
   endOccurrence: Date | ''
-  encounterEndDate?: Date | null
-  encounterStartDate?: Date | null
+  encounterEndDate: Date | null
+  encounterStartDate: Date | null
   isInclusive?: boolean
 } & (
   | {
