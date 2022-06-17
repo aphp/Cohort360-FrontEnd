@@ -115,7 +115,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     }))
   }
 
-  const onFiltreValue = (newInput: string = searchInput) => {
+  const onFilterValue = (newInput: string = searchInput) => {
     if (newInput) {
       const newInput1 = newInput.replace(/^\/\(\.\)\*|\(\.\)\*\/$/gi, '')
       const newInput2 = newInput1.replace(new RegExp('\\\\/|\\\\"', 'g'), function (m) {
@@ -180,7 +180,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
             results={[documentsResult, patientsResult]}
             searchBar={{
               type: 'document',
-              value: searchInput ? onFiltreValue() : '',
+              value: searchInput ? onFilterValue() : '',
               onSearch: (newSearchInput: string) => setSearchInput(newSearchInput)
             }}
             buttons={[
