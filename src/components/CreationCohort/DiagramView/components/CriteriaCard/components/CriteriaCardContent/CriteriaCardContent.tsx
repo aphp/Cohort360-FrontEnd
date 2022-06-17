@@ -323,10 +323,32 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               className={classes.criteriaChip}
               label={
                 <Tooltip
-                  title={`Qui suit l'expression régulière suivante /${_currentCriteria.regex_search}/ dans le document`}
+                  title={`Qui suit l'expression régulière suivante /${_currentCriteria.regex_search
+                    .replace(/^\(\.\)\*|\(\.\)\*$/gi, '')
+                    .replace(new RegExp('\\\\/|\\\\"', 'g'), function (m) {
+                      switch (m) {
+                        case '\\/':
+                          return '/'
+                        case '\\"':
+                          return '"'
+                      }
+                      return m
+                    })}/ dans le document`}
                 >
                   <Typography style={{ maxWidth: 500 }} noWrap>
-                    Qui suit l'expression régulière suivante /{_currentCriteria.regex_search}/ dans le document
+                    Qui suit l'expression régulière suivante /
+                    {_currentCriteria.regex_search
+                      .replace(/^\(\.\)\*|\(\.\)\*$/gi, '')
+                      .replace(new RegExp('\\\\/|\\\\"', 'g'), function (m) {
+                        switch (m) {
+                          case '\\/':
+                            return '/'
+                          case '\\"':
+                            return '"'
+                        }
+                        return m
+                      })}
+                    / dans le document
                   </Typography>
                 </Tooltip>
               }
