@@ -462,6 +462,8 @@ export type MedicationDataType = {
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   startOccurrence: Date | ''
   endOccurrence: Date | ''
+  encounterEndDate: Date | null
+  encounterStartDate: Date | null
   isInclusive?: boolean
 } & (
   | {
@@ -672,7 +674,7 @@ export type DTTB_ResultsType = {
 }
 export type DTTB_SearchBarType = {
   type: 'simple' | 'patient' | 'document'
-  value: string
+  value: string | undefined
   onSearch: (newSearch: string, newSearchBy?: SearchByTypes) => void
   searchBy?: any
 }

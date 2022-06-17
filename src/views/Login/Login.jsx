@@ -165,7 +165,7 @@ const Login = () => {
     }
 
     const response = await services.practitioner.authenticate(username, password)
-    console.log('response', response)
+
     if (!response) {
       setLoading(false)
       return (
@@ -177,6 +177,16 @@ const Login = () => {
     }
 
     if (response.error) {
+      setLoading(false)
+      return (
+        setError(true),
+        setErrorMessage(
+          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+        )
+      )
+    }
+
+    if (response.status !== 200) {
       setLoading(false)
       return (
         setError(true),
@@ -198,8 +208,6 @@ const Login = () => {
       localStorage.setItem(REFRESH_TOKEN, data.jwt.refresh)
 
       const practitioner = await services.practitioner.fetchPractitioner(username)
-
-      console.log('practitioner.response', practitioner.response)
 
       if (practitioner.error || practitioner.response.status !== 200) {
         setLoading(false)
