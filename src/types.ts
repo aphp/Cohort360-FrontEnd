@@ -63,6 +63,7 @@ export type CohortComposition = IComposition & {
   encounterStatus?: string
   serviceProvider?: string
   NDA?: string
+  event?: {}
 }
 
 export type CohortEncounter = IEncounter & {
