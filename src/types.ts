@@ -12,7 +12,6 @@ import {
   IResourceList,
   IOperationOutcome,
   IObservation,
-  IDocumentReference,
   IMedicationRequest,
   IMedicationAdministration,
   PatientGenderKind
@@ -83,13 +82,13 @@ export type CohortPatient = IPatient & {
 }
 
 export type PMSIEntry<T extends IProcedure | ICondition | IClaim> = T & {
-  documents?: (CohortComposition | IDocumentReference)[]
+  documents?: CohortComposition[]
   serviceProvider?: string
   NDA?: string
 }
 
 export type MedicationEntry<T extends IMedicationRequest | IMedicationAdministration> = T & {
-  documents?: (CohortComposition | IDocumentReference)[]
+  documents?: CohortComposition[]
   serviceProvider?: string
   NDA?: string
 }
@@ -281,7 +280,7 @@ export type CohortData = {
   totalPatients?: number
   originalPatients?: CohortPatient[]
   totalDocs?: number
-  documentsList?: (CohortComposition | IDocumentReference)[]
+  documentsList?: CohortComposition[]
   wordcloudData?: any
   encounters?: IEncounter[]
   genderRepartitionMap?: GenderRepartitionType
@@ -296,7 +295,7 @@ export type CohortData = {
 export type PatientData = {
   patient?: CohortPatient
   hospit?: (CohortEncounter | IEncounter)[]
-  documents?: (CohortComposition | IDocumentReference)[]
+  documents?: CohortComposition[]
   documentsTotal?: number
   consult?: PMSIEntry<IProcedure>[]
   consultTotal?: number
