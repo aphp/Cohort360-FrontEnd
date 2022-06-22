@@ -588,7 +588,7 @@ const servicesPatients: IServicePatients = {
       size: documentLines,
       offset: page ? (page - 1) * documentLines : 0,
       status: 'final',
-      _elements: !searchInput ? ['status', 'type', 'encounter', 'date', 'title'] : [],
+      _elements: !searchInput ? ['status', 'type', 'encounter', 'date', 'title', 'event'] : [],
       _text: searchInput,
       type: selectedDocTypes.join(','),
       'encounter.identifier': nda,
@@ -735,7 +735,7 @@ export const getEncounterDocuments = async (
 
   const documentsResp = await fetchComposition({
     encounter: encountersIdList.join(','),
-    _elements: ['status', 'type', 'subject', 'encounter', 'date', 'title'],
+    _elements: ['status', 'type', 'subject', 'encounter', 'date', 'title', 'event'],
     status: 'final',
     _list: groupId ? groupId.split(',') : []
   })
