@@ -38,6 +38,7 @@ sed -i "s@{REACT_APP_ODD_OBSERVATION}@$REACT_APP_ODD_OBSERVATION@g" /app/build/s
 sed -i "s@{REACT_APP_ODD_MEDICATION}@$REACT_APP_ODD_MEDICATION@g" /app/build/static/js/*.js
 sed -i "s@{REACT_APP_ODD_CONTACT}@$REACT_APP_ODD_CONTACT@g" /app/build/static/js/*.js
 sed -i "s@{REACT_APP_ODD_EXPORT}@$REACT_APP_ODD_EXPORT@g" /app/build/static/js/*.js
+sed -i "s@{REACT_APP_ODD_REGEX}@$REACT_APP_ODD_REGEX@g" /app/build/static/js/*.js
 
 service nginx restart
 
