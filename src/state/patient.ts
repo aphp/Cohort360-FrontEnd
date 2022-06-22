@@ -373,8 +373,6 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
         groupId
       )
 
-      console.log('docuemntsResponse', documentsResponse)
-
       const documentsList: any[] = linkElementWithEncounter(
         documentsResponse.docsList as IComposition[],
         hospits,
@@ -599,7 +597,6 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
       if (fetchPatientResponse === undefined) return null
 
       const { patientInfo, hospits } = fetchPatientResponse
-      console.log('fetchPatientResponse', fetchPatientResponse)
       let deidentifiedBoolean = true
 
       if (groupId) {
