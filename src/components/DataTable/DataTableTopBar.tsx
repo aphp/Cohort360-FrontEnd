@@ -29,6 +29,7 @@ import {
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from './styles'
+import { ODD_REGEX } from '../../constants'
 
 type DataTableTopBarProps = {
   tabs?: TabsType
@@ -180,7 +181,7 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, search
                     </Button>
                   ))}
 
-                {searchBar && searchBar.type === 'document' && (
+                {searchBar && searchBar.type === 'document' && !!ODD_REGEX && (
                   <InputSearchDocumentButton currentMode={inputMode} onChangeMode={setDefaultInputMode} />
                 )}
               </Grid>
