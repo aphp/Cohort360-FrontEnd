@@ -21,10 +21,6 @@ const FirstNews = () => {
         • Il est maintenant possible de <b>filtrer les documents des patients par IPP.</b>
       </Typography>
       <Typography color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
-        • La mise à disposition de la <b>recherche par expression régulière</b> dans les documents médicaux lors de la
-        sélection de patients et dans la visualisation des données.
-      </Typography>
-      <Typography color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
         • La nouvelle fonctionnalité <b>"Partager la requête"</b> dans le requêteur permet de créer une requête et de
         l'envoyer à un ou plusieurs autres utilisateurs de Cohort360. Un dossier "Mes requêtes reçues" a été ajouté sur
         la page Mes requêtes.
