@@ -12,8 +12,8 @@ import {
   TableRow,
   TableSortLabel,
   Typography
-} from '@material-ui/core'
-import Pagination from '@material-ui/lab/Pagination'
+} from '@mui/material'
+import Pagination from '@mui/lab/Pagination'
 
 import useStyles from './styles'
 import { Column, Order } from 'types'

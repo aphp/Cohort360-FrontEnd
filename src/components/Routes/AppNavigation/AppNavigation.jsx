@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 
 import Snackbar from 'components/Snackbar/Snackbar'
 
@@ -25,7 +25,7 @@ const AppNavigation = () => (
   <Router>
     <AutoLogoutContainer />
 
-    <Switch>
+    <Routes>
       {Config.map((route, index) => {
         const MyComponent = route.component
 
@@ -58,10 +58,8 @@ const AppNavigation = () => (
         )
       })}
       {/* 404 not found */}
-      <Route>
-        <Redirect to="/" />
-      </Route>
-    </Switch>
+      <Route render={() => <Navigate to="/" />} />
+    </Routes>
   </Router>
 )
 

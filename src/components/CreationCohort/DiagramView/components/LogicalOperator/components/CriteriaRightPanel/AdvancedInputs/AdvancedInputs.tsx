@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
-import { Collapse, Typography, Grid, IconButton } from '@material-ui/core'
+import { Collapse, Typography, Grid, IconButton } from '@mui/material'
 
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import OccurrencesInputs from './OccurrencesInputs/OccurrencesInputs'
 import VisitInputs from './VisitInputs/VisitInputs'

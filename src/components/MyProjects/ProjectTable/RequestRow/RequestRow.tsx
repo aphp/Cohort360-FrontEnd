@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import moment from 'moment'
 
-import { Checkbox, Collapse, IconButton, Link, Table, TableBody, TableCell, TableRow, Tooltip } from '@material-ui/core'
+import { Checkbox, Collapse, IconButton, Link, Table, TableBody, TableCell, TableRow, Tooltip } from '@mui/material'
 
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
-import EditIcon from '@material-ui/icons/Edit'
-import ShareIcon from '@material-ui/icons/Share'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import EditIcon from '@mui/icons-material/Edit'
+import ShareIcon from '@mui/icons-material/Share'
 
 import VersionRow from '../VersionRow/VersionRow'
 

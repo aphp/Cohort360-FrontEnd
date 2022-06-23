@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  TextField,
-  Typography
-} from '@material-ui/core'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from '@mui/material'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { ProjectState, addProject, editProject, deleteProject } from 'state/project'

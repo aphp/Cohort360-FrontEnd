@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import { KeyboardDatePicker } from '@material-ui/pickers'
+import DatePicker from '@mui/lab/DatePicker'
 
 import {
   Button,
@@ -14,10 +14,10 @@ import {
   IconButton,
   TextField,
   Typography
-} from '@material-ui/core'
-import { Autocomplete } from '@material-ui/lab'
+} from '@mui/material'
+import { Autocomplete } from '@mui/lab'
 
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 
 import services from 'services'
 import { capitalizeFirstLetter } from 'utils/capitalize'
@@ -192,7 +192,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
             <FormLabel component="legend" className={classes.dateLabel}>
               Après le :
             </FormLabel>
-            <KeyboardDatePicker
+            <DatePicker
               clearable
               error={dateError}
               style={{ width: 'calc(100% - 120px)' }}
@@ -216,7 +216,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
             <FormLabel component="legend" className={classes.dateLabel}>
               Avant le :
             </FormLabel>
-            <KeyboardDatePicker
+            <DatePicker
               clearable
               error={dateError}
               style={{ width: 'calc(100% - 120px)' }}

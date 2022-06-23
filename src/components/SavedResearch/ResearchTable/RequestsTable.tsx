@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 
 import {
@@ -22,15 +22,15 @@ import {
   Typography,
   Hidden,
   Snackbar
-} from '@material-ui/core'
+} from '@mui/material'
 
-import { Alert } from '@material-ui/lab'
+import { Alert } from '@mui/lab'
 
-import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 
-import EditIcon from '@material-ui/icons/Edit'
-import ShareIcon from '@material-ui/icons/Share'
-import MoreVertIcon from '@material-ui/icons/MoreVert'
+import EditIcon from '@mui/icons-material/Edit'
+import ShareIcon from '@mui/icons-material/Share'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 
 import ModalAddOrEditRequest from 'components/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 import ModalShareRequest from 'components/MyProjects/Modals/ModalShareRequest/ModalShareRequest'
@@ -66,7 +66,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
 }) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const { requestState } = useAppSelector<{
     requestState: RequestState
@@ -89,7 +89,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
   const openMenuItem = Boolean(anchorEl)
 
   const _onClickRow = (row: any) => {
-    return !row.uuid ? null : onClickRow ? onClickRow(row) : history.push(`/cohort/new/${row.uuid}`)
+    return !row.uuid ? null : onClickRow ? onClickRow(row) : navigate(`/cohort/new/${row.uuid}`)
   }
 
   const handleClickOpenDialog = () => {

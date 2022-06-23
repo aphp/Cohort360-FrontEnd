@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 import moment from 'moment'
 import clsx from 'clsx'
 
-import { Grid, Paper, Container, Typography } from '@material-ui/core'
-import Alert from '@material-ui/lab/Alert'
+import { Grid, Paper, Container, Typography } from '@mui/material'
+import Alert from '@mui/lab/Alert'
 
 import NewsCard from 'components/Welcome/NewsCard/NewsCard'
 import PatientsCard from 'components/Welcome/PatientsCard/PatientsCard'
@@ -28,7 +28,7 @@ import useStyles from './styles'
 const Welcome: React.FC = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const { practitioner, open, cohortState, requestState, meState } = useAppSelector((state) => ({
     practitioner: state.me,
     open: state.drawer,
@@ -170,7 +170,7 @@ const Welcome: React.FC = () => {
               <ResearchCard
                 title={'Mes cohortes favorites'}
                 linkLabel={'Voir toutes mes cohortes favorites'}
-                onClickLink={() => history.push('/my-cohorts?fav=true')}
+                onClickLink={() => navigate('/my-cohorts?fav=true')}
                 loading={loadingCohort}
                 cohorts={favoriteCohorts}
                 isFav
@@ -184,7 +184,7 @@ const Welcome: React.FC = () => {
               <ResearchCard
                 title={'Mes dernières cohortes créées'}
                 linkLabel={'Voir toutes mes cohortes'}
-                onClickLink={() => history.push('/my-cohorts')}
+                onClickLink={() => navigate('/my-cohorts')}
                 loading={loadingCohort}
                 cohorts={lastCohorts}
               />
@@ -197,7 +197,7 @@ const Welcome: React.FC = () => {
               <ResearchCard
                 title={'Mes dernières requêtes créées'}
                 linkLabel={'Voir toutes mes requêtes'}
-                onClickLink={() => history.push('/my-requests')}
+                onClickLink={() => navigate('/my-requests')}
                 loading={loadingRequest}
                 requests={lastRequest}
               />

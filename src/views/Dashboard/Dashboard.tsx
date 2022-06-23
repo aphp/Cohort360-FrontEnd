@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import clsx from 'clsx'
 import { Link, useParams, useLocation } from 'react-router-dom'
-import { Grid, Tabs, Tab } from '@material-ui/core'
+import { Grid, Tabs, Tab } from '@mui/material'
 
 import CohortPreview from 'components/Dashboard/Preview/Preview'
 import PatientList from 'components/Dashboard/PatientList/PatientList'

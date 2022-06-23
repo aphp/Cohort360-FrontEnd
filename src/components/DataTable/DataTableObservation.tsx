@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { CircularProgress, Grid, Typography, TableRow, TableCell } from '@material-ui/core'
+import { CircularProgress, Grid, Typography, TableRow, TableCell } from '@mui/material'
 
 import DataTable from 'components/DataTable/DataTable'
 

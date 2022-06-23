@@ -11,7 +11,7 @@ import {
   Grid,
   TextField,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import useStyles from './styles'
 

@@ -14,10 +14,10 @@ import {
   TableRow,
   Tooltip,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
-import EditIcon from '@material-ui/icons/Edit'
-import ExportIcon from '@material-ui/icons/GetApp'
+import EditIcon from '@mui/icons-material/Edit'
+import ExportIcon from '@mui/icons-material/GetApp'
 import { ReactComponent as Star } from 'assets/icones/star.svg'
 import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
 

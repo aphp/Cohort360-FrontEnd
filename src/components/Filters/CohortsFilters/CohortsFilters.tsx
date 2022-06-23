@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import { KeyboardDatePicker } from '@material-ui/pickers'
+import DatePicker from '@mui/lab/DatePicker'
 
 import {
   Button,
@@ -17,10 +17,10 @@ import {
   RadioGroup,
   TextField,
   Typography
-} from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+} from '@mui/material'
+import Autocomplete from '@mui/lab/Autocomplete'
 
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 
 import { CohortFilters, ValueSet } from 'types'
 
@@ -212,7 +212,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
             <FormLabel component="legend" className={classes.label}>
               Après le :
             </FormLabel>
-            <KeyboardDatePicker
+            <DatePicker
               clearable
               error={dateError}
               style={{ width: 'calc(100% - 120px)' }}
@@ -236,7 +236,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
             <FormLabel component="legend" className={classes.label}>
               Avant le :
             </FormLabel>
-            <KeyboardDatePicker
+            <DatePicker
               clearable
               error={dateError}
               style={{ width: 'calc(100% - 120px)' }}

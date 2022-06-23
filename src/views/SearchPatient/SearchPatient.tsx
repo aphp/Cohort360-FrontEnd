@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import { useAppSelector } from 'state'
 import { useParams } from 'react-router'
 
-import { CircularProgress, Grid, Typography } from '@material-ui/core'
+import { CircularProgress, Grid, Typography } from '@mui/material'
 
 import PatientSearchBar from 'components/Inputs/PatientSearchBar/PatientSearchBar'
 import DataTablePatient from 'components/DataTable/DataTablePatient'

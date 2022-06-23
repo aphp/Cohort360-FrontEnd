@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 
-import { Autocomplete } from '@material-ui/lab'
-import { Collapse, Grid, IconButton, Typography, TextField } from '@material-ui/core'
+import { Autocomplete } from '@mui/lab'
+import { Collapse, Grid, IconButton, Typography, TextField } from '@mui/material'
 
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import useStyles from '../../styles'
 

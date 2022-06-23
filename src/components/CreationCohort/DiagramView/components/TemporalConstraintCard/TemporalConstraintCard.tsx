@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Grid, Select, MenuItem } from '@material-ui/core'
+import { Grid, Select, MenuItem } from '@mui/material'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { buildCohortCreation, updateTemporalConstraint } from 'state/cohortCreation'

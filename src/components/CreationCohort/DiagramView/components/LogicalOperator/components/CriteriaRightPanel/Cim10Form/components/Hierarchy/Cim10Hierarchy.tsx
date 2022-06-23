@@ -13,12 +13,12 @@ import {
   Collapse,
   List,
   Tooltip
-} from '@material-ui/core'
-import Skeleton from '@material-ui/lab/Skeleton'
+} from '@mui/material'
+import Skeleton from '@mui/lab/Skeleton'
 
-import ExpandLess from '@material-ui/icons/ExpandLess'
-import ExpandMore from '@material-ui/icons/ExpandMore'
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import ExpandLess from '@mui/icons-material/ExpandLess'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { PmsiListType, fetchCondition, expandPmsiElement } from 'state/pmsi'

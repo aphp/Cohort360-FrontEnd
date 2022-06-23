@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 
-import { CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core'
+import { CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
 import DocumentTable from 'components/Patient/PatientTimeline/HospitDialog/DocumentTable/DocumentTable'
 
-import Pagination from '@material-ui/lab/Pagination'
+import Pagination from '@mui/lab/Pagination'
 
 import { CohortComposition } from 'types'
 

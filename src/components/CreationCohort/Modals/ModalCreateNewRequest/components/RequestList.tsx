@@ -10,10 +10,10 @@ import {
   ListItemText,
   Typography,
   Radio
-} from '@material-ui/core'
+} from '@mui/material'
 
-import ExpandLessIcon from '@material-ui/icons/ExpandLess'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import { RequestType, ProjectType } from 'types'
 

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { CircularProgress } from '@material-ui/core'
-import { useHistory, useParams } from 'react-router-dom'
+import { CircularProgress } from '@mui/material'
+import { useNavigate, useParams } from 'react-router-dom'
 
-import Grid from '@material-ui/core/Grid'
+import Grid from '@mui/material/Grid'
 
 import ControlPanel from './ControlPanel/ControlPanel'
 import DiagramView from './DiagramView/DiagramView'
@@ -48,7 +48,7 @@ const Requeteur = () => {
   const requestIdFromUrl = params.requestId
   const snapshotIdFromUrl = params.snapshotId
 
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const classes = useStyles()
 
@@ -65,7 +65,7 @@ const Requeteur = () => {
           snapshotId: snapshotIdFromUrl
         })
       )
-      history.replace('/cohort/new')
+      navigate('/cohort/new')
     }
     setRequestLoading(false)
   }, [dispatch, requestIdFromUrl, snapshotIdFromUrl])
@@ -106,7 +106,7 @@ const Requeteur = () => {
 
       if (createCohortResult && createCohortResult.status === 201) {
         dispatch<any>(resetCohortCreation())
-        history.push(`/home`)
+        navigate(`/home`)
       }
     }
 

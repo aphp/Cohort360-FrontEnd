@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
 import BackgroundLogin from 'assets/images/background-login.png'
 
 const useStyles = makeStyles((theme) => ({

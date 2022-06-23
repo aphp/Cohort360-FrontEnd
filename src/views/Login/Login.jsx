@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import localforage from 'localforage'
 
 import {
@@ -16,9 +16,9 @@ import {
   DialogActions,
   CircularProgress,
   Snackbar
-} from '@material-ui/core'
+} from '@mui/material'
 
-import { Alert } from '@material-ui/lab'
+import { Alert } from '@mui/lab'
 
 import NoRights from 'components/ErrorView/NoRights'
 
@@ -88,7 +88,7 @@ const LegalMentionDialog = ({ open, setOpen }) => {
 }
 
 const Login = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const classes = useStyles()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
@@ -148,7 +148,7 @@ const Login = () => {
 
       const oldPath = localStorage.getItem('old-path')
       localStorage.removeItem('old-path')
-      history.push(oldPath ?? '/home')
+      navigate(oldPath ?? '/home')
     } else {
       setLoading(false)
       setError(true)

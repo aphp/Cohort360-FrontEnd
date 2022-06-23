@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 
-import { Button, IconButton, Chip, CircularProgress, Typography } from '@material-ui/core'
+import { Button, IconButton, Chip, CircularProgress, Typography } from '@mui/material'
 
-import EditIcon from '@material-ui/icons/Edit'
-import CloseIcon from '@material-ui/icons/Close'
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
+import EditIcon from '@mui/icons-material/Edit'
+import CloseIcon from '@mui/icons-material/Close'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
 import ModalRightError from './components/ModalRightError'
 import PopulationRightPanel from './components/PopulationRightPanel'

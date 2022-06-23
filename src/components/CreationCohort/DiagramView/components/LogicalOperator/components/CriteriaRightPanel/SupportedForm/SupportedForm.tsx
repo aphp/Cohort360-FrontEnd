@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 
-import { Alert, Autocomplete } from '@material-ui/lab'
-import { Button, Divider, FormLabel, Grid, IconButton, Slider, Switch, Typography, TextField } from '@material-ui/core'
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import { Alert, Autocomplete } from '@mui/lab'
+import { Button, Divider, FormLabel, Grid, IconButton, Slider, Switch, Typography, TextField } from '@mui/material'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import AdmissionInputs from './SupportedInputs/AdmissionInputs'
 import EntryExitInputs from './SupportedInputs/EntryExitInputs'

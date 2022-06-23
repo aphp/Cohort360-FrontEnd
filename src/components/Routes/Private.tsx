@@ -4,7 +4,7 @@ import { Redirect, useLocation } from 'react-router-dom'
 import { useQuery } from '@apollo/react-hooks'
 import { gql } from 'apollo-boost'
 
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core'
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material'
 
 import { ACCES_TOKEN } from '../../constants'
 

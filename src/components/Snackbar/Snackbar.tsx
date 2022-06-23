@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
-import { Snackbar } from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
+import { Snackbar } from '@mui/material'
+import { Alert } from '@mui/lab'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { clearMessage, MessageState } from 'state/message'

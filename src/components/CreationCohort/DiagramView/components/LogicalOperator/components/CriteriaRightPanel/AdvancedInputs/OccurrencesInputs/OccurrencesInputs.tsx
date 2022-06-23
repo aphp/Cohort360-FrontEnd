@@ -11,10 +11,10 @@ import {
   Tooltip,
   TextField,
   Select
-} from '@material-ui/core'
+} from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
-import InfoIcon from '@material-ui/icons/Info'
+import ClearIcon from '@mui/icons-material/Clear'
+import InfoIcon from '@mui/icons-material/Info'
 
 import useStyles from './styles'
 

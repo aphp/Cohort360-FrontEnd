@@ -13,7 +13,7 @@ import {
   RadioGroup,
   Select,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { Sort } from 'types'
 

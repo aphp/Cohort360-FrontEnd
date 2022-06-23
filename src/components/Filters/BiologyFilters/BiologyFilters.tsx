@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import { KeyboardDatePicker } from '@material-ui/pickers'
+import DatePicker from '@mui/lab/DatePicker'
 
 import {
   Button,
@@ -14,9 +14,9 @@ import {
   IconButton,
   TextField,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 
 import useStyles from './styles'
 
@@ -108,7 +108,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
             <FormLabel component="legend" className={classes.dateLabel}>
               Après le :
             </FormLabel>
-            <KeyboardDatePicker
+            <DatePicker
               clearable
               error={dateError}
               style={{ width: 'calc(100% - 120px)' }}
@@ -132,7 +132,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
             <FormLabel component="legend" className={classes.dateLabel}>
               Avant le :
             </FormLabel>
-            <KeyboardDatePicker
+            <DatePicker
               clearable
               error={dateError}
               style={{ width: 'calc(100% - 120px)' }}

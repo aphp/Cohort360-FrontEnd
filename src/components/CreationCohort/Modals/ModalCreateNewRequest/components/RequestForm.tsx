@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Grid, MenuItem, Select, TextField, Typography } from '@material-ui/core'
+import { Grid, MenuItem, Select, TextField, Typography } from '@mui/material'
 
 import useStyles from '../styles'
 

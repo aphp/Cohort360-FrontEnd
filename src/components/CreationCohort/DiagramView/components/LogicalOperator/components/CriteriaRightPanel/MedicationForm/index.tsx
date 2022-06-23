@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Tabs, Tab } from '@material-ui/core'
+import { Tabs, Tab } from '@mui/material'
 
 import MedicationForm from './components/Form/MedicationForm'
 import MedicationHierarchy from './components/Hierarchy/MedicationHierarchy'

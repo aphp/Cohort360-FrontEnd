@@ -15,7 +15,7 @@ import {
   TableHead,
   TableRow,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { ReactComponent as CancelIcon } from 'assets/icones/times.svg'
 import { ReactComponent as CheckIcon } from 'assets/icones/check.svg'

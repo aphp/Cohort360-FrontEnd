@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import clsx from 'clsx'
 
-import { Grid, IconButton, InputAdornment, InputBase, Typography, Tooltip } from '@material-ui/core'
+import { Grid, IconButton, InputAdornment, InputBase, Typography, Tooltip } from '@mui/material'
 
-import InfoIcon from '@material-ui/icons/Info'
-import ClearIcon from '@material-ui/icons/Clear'
+import InfoIcon from '@mui/icons-material/Info'
+import ClearIcon from '@mui/icons-material/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
 import { debounce } from 'utils/debounce'

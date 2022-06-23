@@ -11,7 +11,7 @@ import {
   TableSortLabel,
   Paper,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import ProjectRow from './ProjectRow/ProjectRow'
 

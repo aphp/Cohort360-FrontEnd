@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import { KeyboardDatePicker } from '@material-ui/pickers'
+import DatePicker from '@mui/lab/DatePicker'
 
 import {
   Button,
@@ -15,12 +15,12 @@ import {
   IconButton,
   TextField,
   Typography
-} from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+} from '@mui/material'
+import Autocomplete from '@mui/lab/Autocomplete'
 
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 
-import { docTypes } from 'assets/docTypes.json'
+import docTypes from 'assets/docTypes.json'
 import { DocumentFilters } from 'types'
 
 import useStyles from './styles'
@@ -103,13 +103,13 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
             multiple
             onChange={_onChangeSelectedDocTypes}
             groupBy={(doctype) => doctype.type}
-            options={docTypesList}
+            options={docTypesList.docTypes}
             value={_selectedDocTypes}
             disableCloseOnSelect
             getOptionLabel={(docType: any) => docType.label}
             renderGroup={(docType: any) => {
               const currentDocTypeList = docTypesList
-                ? docTypesList.filter((doc: any) => doc.type === docType.group)
+                ? docTypesList.docTypes.filter((doc: any) => doc.type === docType.group)
                 : []
               const currentSelectedDocTypeList = _selectedDocTypes
                 ? _selectedDocTypes.filter((doc: any) => doc.type === docType.group)
@@ -186,7 +186,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
             <FormLabel component="legend" className={classes.dateLabel}>
               Après le :
             </FormLabel>
-            <KeyboardDatePicker
+            <DatePicker
               clearable
               error={dateError}
               style={{ width: 'calc(100% - 120px)' }}
@@ -210,7 +210,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
             <FormLabel component="legend" className={classes.dateLabel}>
               Avant le :
             </FormLabel>
-            <KeyboardDatePicker
+            <DatePicker
               clearable
               error={dateError}
               style={{ width: 'calc(100% - 120px)' }}

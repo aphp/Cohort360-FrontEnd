@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { useHistory, useLocation, useParams } from 'react-router-dom'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
 
-import { Grid, IconButton, InputAdornment, InputBase, MenuItem, Select } from '@material-ui/core'
+import { Grid, IconButton, InputAdornment, InputBase, MenuItem, Select } from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
 import { SearchByTypes } from 'types'
@@ -28,7 +28,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   onChangeSearchBy
 }) => {
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
   const location = useLocation()
   const { search } = useParams<{ search: string }>()
 
@@ -63,7 +63,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
       event.preventDefault()
       if (!_searchInput) return
       if (location.pathname === '/home') {
-        history.push(`/patient-search/${_searchInput}`)
+        navigate(`/patient-search/${_searchInput}`)
       } else {
         performQueries && performQueries(page, _searchInput, searchBy)
       }
@@ -73,7 +73,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   const onSearchPatient = async () => {
     if (!_searchInput) return
     if (location.pathname === '/home') {
-      history.push(`/patient-search/${_searchInput}`)
+      navigate(`/patient-search/${_searchInput}`)
     } else {
       performQueries && performQueries(page, _searchInput, searchBy)
     }

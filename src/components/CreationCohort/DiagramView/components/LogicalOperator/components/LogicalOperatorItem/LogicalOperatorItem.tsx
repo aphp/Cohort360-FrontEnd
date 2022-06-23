@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 
-import { Box, IconButton, MenuItem, Select, Typography, TextField } from '@material-ui/core'
+import { Box, IconButton, MenuItem, Select, Typography, TextField } from '@mui/material'
 
-import DeleteIcon from '@material-ui/icons/Delete'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { editCriteriaGroup, deleteCriteriaGroup, buildCohortCreation } from 'state/cohortCreation'

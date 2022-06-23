@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Grid, Typography } from '@material-ui/core'
+import { Grid, Typography } from '@mui/material'
 
 import { ReactComponent as FemaleIcon } from 'assets/icones/venus.svg'
 import { ReactComponent as MaleIcon } from 'assets/icones/mars.svg'

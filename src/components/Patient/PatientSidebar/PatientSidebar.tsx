@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import moment from 'moment'
 
-import { CircularProgress, Divider, Drawer, Grid, IconButton, List, Typography } from '@material-ui/core'
-import Pagination from '@material-ui/lab/Pagination'
+import { CircularProgress, Divider, Drawer, Grid, IconButton, List, Typography } from '@mui/material'
+import Pagination from '@mui/lab/Pagination'
 
 import PatientSidebarHeader from './PatientSidebarHeader/PatientSidebarHeader'
 import PatientSidebarItem from './PatientSidebarItem/PatientSidebarItem'
 
-import ChevronRightIcon from '@material-ui/icons/ChevronRight'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 
 import { getAge } from 'utils/age'
 import services from 'services'

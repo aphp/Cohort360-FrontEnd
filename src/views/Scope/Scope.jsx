@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
 
-import Button from '@material-ui/core/Button'
-import Grid from '@material-ui/core/Grid'
-import Paper from '@material-ui/core/Paper'
-import Typography from '@material-ui/core/Typography'
+import Button from '@mui/material/Button'
+import Grid from '@mui/material/Grid'
+import Paper from '@mui/material/Paper'
+import Typography from '@mui/material/Typography'
 
 import ScopeTree from 'components/ScopeTree/ScopeTree'
 
@@ -17,7 +17,7 @@ import useStyles from './styles'
 
 const Scope = () => {
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
   const [selectedItems, onChangeSelectedItem] = useState([])
@@ -37,7 +37,7 @@ const Scope = () => {
         ? (_selected.extension.find((extension) => extension.url === 'cohort-id') ?? { valueInteger: 0 }).valueInteger
         : null
     )
-    history.push(`/perimeters?${perimetresIds}`)
+    navigate(`/perimeters?${perimetresIds}`)
   }
 
   return (

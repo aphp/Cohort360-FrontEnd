@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   Button,
@@ -10,7 +10,7 @@ import {
   DialogTitle,
   Grid,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import RequestForm from './components/RequestForm'
 import RequestList from './components/RequestList'
@@ -35,7 +35,7 @@ const ModalCreateNewRequest: React.FC<{
   onClose?: () => void
 }> = ({ onClose }) => {
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { projectState, requestState } = useAppSelector<{
     projectState: ProjectState
@@ -118,7 +118,7 @@ const ModalCreateNewRequest: React.FC<{
     if (onClose && typeof onClose === 'function') {
       onClose()
     } else {
-      history.push(`/home`)
+      navigate(`/home`)
     }
   }
 

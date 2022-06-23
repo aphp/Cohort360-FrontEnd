@@ -12,11 +12,11 @@ import {
   TextField,
   Tooltip,
   Typography
-} from '@material-ui/core'
-import Alert from '@material-ui/lab/Alert'
+} from '@mui/material'
+import Alert from '@mui/lab/Alert'
 
-import InfoIcon from '@material-ui/icons/Info'
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import InfoIcon from '@mui/icons-material/Info'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 

@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
-import { Alert } from '@material-ui/lab'
-import { Button, Divider, FormLabel, Grid, IconButton, Typography } from '@material-ui/core'
+import { Alert } from '@mui/lab'
+import { Button, Divider, FormLabel, Grid, IconButton, Typography } from '@mui/material'
 
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import RequestList from 'components/CreationCohort/Modals/ModalCreateNewRequest/components/RequestList'
 

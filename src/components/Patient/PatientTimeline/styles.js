@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
 const marginNextCentralLine = 10
 const fontSize = 16
 const dotSize = 16

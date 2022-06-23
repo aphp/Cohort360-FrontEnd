@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
 import { Link, useLocation, useParams } from 'react-router-dom'
 
-import { IconButton, Grid, Tabs, Tab, CircularProgress } from '@material-ui/core'
+import { IconButton, Grid, Tabs, Tab, CircularProgress } from '@mui/material'
 
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 
 import PatientNotExist from 'components/ErrorView/PatientNotExist'
 import PatientDocs from 'components/Patient/PatientDocs/PatientDocs'

@@ -1,8 +1,8 @@
 import React from 'react'
 import useStyles from './styles'
 
-import Typography from '@material-ui/core/Typography'
-import Divider from '@material-ui/core/Divider'
+import Typography from '@mui/material/Typography'
+import Divider from '@mui/material/Divider'
 
 import FirstNews from './News/FirstNews'
 import SecondNews from './News/SecondNews'

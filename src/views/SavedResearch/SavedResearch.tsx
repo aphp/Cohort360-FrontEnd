@@ -1,7 +1,7 @@
 import React from 'react'
 import { useAppSelector } from 'state'
 
-import { CssBaseline, Grid, Typography } from '@material-ui/core'
+import { CssBaseline, Grid, Typography } from '@mui/material'
 
 import Research from 'components/SavedResearch/ResearchCard'
 

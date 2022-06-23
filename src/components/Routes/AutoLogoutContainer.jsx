@@ -1,11 +1,11 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
-import IdleTimer from 'react-idle-timer'
-import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogActions from '@material-ui/core/DialogActions'
-import Button from '@material-ui/core/Button'
-import { DialogContentText } from '@material-ui/core'
+import { useNavigate } from 'react-router-dom'
+import { IdleTimer } from 'react-idle-timer'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
+import Button from '@mui/material/Button'
+import { DialogContentText } from '@mui/material'
 import axios from 'axios'
 
 import { ACCES_TOKEN, REFRESH_TOKEN, /* CONTEXT,*/ BACK_API_URL } from '../../constants'
@@ -20,7 +20,7 @@ const AutoLogoutContainer = () => {
   const [dialogIsOpen, setDialogIsOpen] = useState(false)
   const [refreshInterval, setRefreshInterval] = useState()
   const dispatch = useAppDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const inactifTimerRef = useRef(null)
   const sessionInactifTimerRef = useRef(null)
 
@@ -28,7 +28,7 @@ const AutoLogoutContainer = () => {
 
   const logout = () => {
     setDialogIsOpen(false)
-    history.push('/')
+    navigate('/')
     localStorage.clear()
     dispatch(logoutAction())
     clearTimeout(sessionInactifTimerRef.current)

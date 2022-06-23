@@ -11,7 +11,7 @@ import {
   Radio,
   RadioGroup,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { InputAgeRange } from 'components/Inputs'
 

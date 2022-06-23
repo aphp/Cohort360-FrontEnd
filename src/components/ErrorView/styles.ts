@@ -1,7 +1,7 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
 import { smallDrawerWidth, largeDrawerWidth } from 'components/Routes/LeftSideBar/LeftSideBar'
 
-export default makeStyles((theme) => ({
+export default makeStyles((theme: any) => ({
   appBar: {
     height: '100vh',
     marginLeft: smallDrawerWidth,

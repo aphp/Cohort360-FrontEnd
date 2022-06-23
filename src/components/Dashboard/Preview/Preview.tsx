@@ -13,10 +13,10 @@ import {
   TableContainer,
   CircularProgress,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
-// import CloseIcon from '@material-ui/icons/Close'
-// import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
+// import CloseIcon from '@mui/icons-material/Close'
+// import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
 import PieChart from './Charts/PieChart'
 import BarChart from './Charts/BarChart'
@@ -30,7 +30,7 @@ import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import displayDigit from 'utils/displayDigit'
 
 import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
-// import { Skeleton } from '@material-ui/lab'
+// import { Skeleton } from '@mui/lab'
 
 type RepartitionTableProps = {
   genderRepartitionMap?: GenderRepartitionType

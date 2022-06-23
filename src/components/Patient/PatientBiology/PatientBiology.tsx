@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
-import { Grid } from '@material-ui/core'
-import Alert from '@material-ui/lab/Alert'
+import { Grid } from '@mui/material'
+import Alert from '@mui/lab/Alert'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 

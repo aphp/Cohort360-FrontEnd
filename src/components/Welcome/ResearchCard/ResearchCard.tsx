@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid, Link, CircularProgress, Typography } from '@material-ui/core'
+import { Grid, Link, CircularProgress, Typography } from '@mui/material'
 
 import ResearchTable from 'components/SavedResearch/ResearchTable/ResearchTable'
 import RequestsTable from 'components/SavedResearch/ResearchTable/RequestsTable'

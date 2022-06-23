@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import { Grid, Slider, TextField, Typography } from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+import { Grid, Slider, TextField, Typography } from '@mui/material'
+import Autocomplete from '@mui/lab/Autocomplete'
 
 import useStyle from './styles'
 

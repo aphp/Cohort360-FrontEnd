@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 
-import { Button, CircularProgress, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
+import { Button, CircularProgress, Grid, IconButton, InputAdornment, InputBase, Typography } from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 

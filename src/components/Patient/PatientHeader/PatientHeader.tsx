@@ -2,7 +2,7 @@ import React from 'react'
 
 import { CohortPatient, IPatientDetails } from 'types'
 
-import Grid from '@material-ui/core/Grid'
+import Grid from '@mui/material/Grid'
 
 import PatientTitle from './PatientTitle/PatientTitle'
 import PatientInfo from './PatientInfo/PatientInfo'

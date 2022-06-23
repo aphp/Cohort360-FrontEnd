@@ -1,20 +1,10 @@
 import React, { useState, useMemo } from 'react'
 
-import { Alert } from '@material-ui/lab'
-import {
-  Button,
-  Divider,
-  FormLabel,
-  Grid,
-  IconButton,
-  Switch,
-  Typography,
-  TextField,
-  Checkbox
-} from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+import { Alert } from '@mui/lab'
+import { Button, Divider, FormLabel, Grid, IconButton, Switch, Typography, TextField, Checkbox } from '@mui/material'
+import Autocomplete from '@mui/lab/Autocomplete'
 
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 

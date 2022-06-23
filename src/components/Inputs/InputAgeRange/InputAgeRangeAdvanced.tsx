@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import { Grid, TextField, Typography } from '@material-ui/core'
+import { Grid, TextField, Typography } from '@mui/material'
 
 type InputAgeRangeAdvancedProps = {
   birthdates: [string, string]

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react'
 
-import { Grid, TextField, Typography, CircularProgress } from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+import { Grid, TextField, Typography, CircularProgress } from '@mui/material'
+import Autocomplete from '@mui/lab/Autocomplete'
 
 import { RequestType, Provider, Order } from 'types'
 

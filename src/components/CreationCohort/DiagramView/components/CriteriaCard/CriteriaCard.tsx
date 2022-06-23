@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { IconButton, Typography } from '@material-ui/core'
+import { IconButton, Typography } from '@mui/material'
 
-import DeleteIcon from '@material-ui/icons/Delete'
-import EditIcon from '@material-ui/icons/Edit'
-import WarningIcon from '@material-ui/icons/Warning'
-import LibraryAddIcon from '@material-ui/icons/LibraryAdd'
+import DeleteIcon from '@mui/icons-material/Delete'
+import EditIcon from '@mui/icons-material/Edit'
+import WarningIcon from '@mui/icons-material/Warning'
+import LibraryAddIcon from '@mui/icons-material/LibraryAdd'
 
 import CriteriaCardContent from './components/CriteriaCardContent/CriteriaCardContent'
 

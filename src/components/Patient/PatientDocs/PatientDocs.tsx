@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
-import Grid from '@material-ui/core/Grid'
-import { Alert } from '@material-ui/lab'
+import Grid from '@mui/material/Grid'
+import { Alert } from '@mui/lab'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
@@ -16,7 +16,7 @@ import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'
 
 import { buildDocumentFiltersChips } from 'utils/chips'
-import { docTypes } from 'assets/docTypes.json'
+import docTypes from 'assets/docTypes.json'
 
 import useStyles from './styles'
 
@@ -109,7 +109,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         onChangeOptions(filterName, value)
         break
       case 'selectedDocTypes': {
-        const typesName = docTypes
+        const typesName = docTypes.docTypes
           .map((docType: any) => docType.type)
           .filter((item, index, array) => array.indexOf(item) === index)
         const isGroupItem = typesName.find((typeName) => typeName === value)

@@ -2,25 +2,15 @@ import React, { useState, useEffect } from 'react'
 import clsx from 'clsx'
 import moment from 'moment'
 
-import {
-  Button,
-  CircularProgress,
-  Divider,
-  Grid,
-  List,
-  ListItem,
-  Tooltip,
-  Typography,
-  Snackbar
-} from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
+import { Button, CircularProgress, Divider, Grid, List, ListItem, Tooltip, Typography, Snackbar } from '@mui/material'
+import { Alert } from '@mui/lab'
 
-import ArrowBackIcon from '@material-ui/icons/ArrowBack'
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
-import UpdateSharpIcon from '@material-ui/icons/UpdateSharp'
-import HighlightOffIcon from '@material-ui/icons/HighlightOff'
-import InfoIcon from '@material-ui/icons/Info'
-import ShareIcon from '@material-ui/icons/Share'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import UpdateSharpIcon from '@mui/icons-material/UpdateSharp'
+import HighlightOffIcon from '@mui/icons-material/HighlightOff'
+import InfoIcon from '@mui/icons-material/Info'
+import ShareIcon from '@mui/icons-material/Share'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 import ModalShareRequest from 'components/MyProjects/Modals/ModalShareRequest/ModalShareRequest'

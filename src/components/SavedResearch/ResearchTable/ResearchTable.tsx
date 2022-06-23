@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   Button,
@@ -22,16 +22,16 @@ import {
   Tooltip,
   Typography,
   Hidden
-} from '@material-ui/core'
+} from '@mui/material'
 
-import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
-import InfoIcon from '@material-ui/icons/Info'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import InfoIcon from '@mui/icons-material/Info'
 
 import { ReactComponent as Star } from 'assets/icones/star.svg'
 import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
-import EditIcon from '@material-ui/icons/Edit'
-import ExportIcon from '@material-ui/icons/GetApp'
-import MoreVertIcon from '@material-ui/icons/MoreVert'
+import EditIcon from '@mui/icons-material/Edit'
+import ExportIcon from '@mui/icons-material/GetApp'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
@@ -88,7 +88,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
 }) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const [dialogOpen, setOpenDialog] = useState(false)
   const [selectedCohort, setSelectedCohort] = useState<Cohort | undefined>()
@@ -112,7 +112,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   const maintenanceIsActive = meState?.maintenance?.active
 
   const _onClickRow = (row: any) => {
-    return !row.fhir_group_id ? null : onClickRow ? onClickRow(row) : history.push(`/cohort/${row.fhir_group_id}`)
+    return !row.fhir_group_id ? null : onClickRow ? onClickRow(row) : navigate(`/cohort/${row.fhir_group_id}`)
   }
 
   const removeCohort = () => {

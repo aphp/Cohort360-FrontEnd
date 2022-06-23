@@ -1,16 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  TextField,
-  Typography
-} from '@material-ui/core'
-import { Autocomplete } from '@material-ui/lab'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from '@mui/material'
+import { Autocomplete } from '@mui/lab'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 

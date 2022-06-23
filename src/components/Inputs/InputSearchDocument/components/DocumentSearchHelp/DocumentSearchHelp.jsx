@@ -17,7 +17,7 @@ import {
   TableHead,
   TableRow,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import useStyles from './styles.js'
 

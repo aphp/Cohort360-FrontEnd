@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 
-import { CssBaseline, Grid } from '@material-ui/core'
+import { CssBaseline, Grid } from '@mui/material'
 
 import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
 import DataTablePatient from 'components/DataTable/DataTablePatient'

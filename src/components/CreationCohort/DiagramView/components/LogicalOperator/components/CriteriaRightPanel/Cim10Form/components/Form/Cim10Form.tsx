@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
-import { Autocomplete, Alert } from '@material-ui/lab'
-import { Button, Divider, FormLabel, Grid, IconButton, Switch, Typography, TextField } from '@material-ui/core'
+import { Autocomplete, Alert } from '@mui/lab'
+import { Button, Divider, FormLabel, Grid, IconButton, Switch, Typography, TextField } from '@mui/material'
 
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 

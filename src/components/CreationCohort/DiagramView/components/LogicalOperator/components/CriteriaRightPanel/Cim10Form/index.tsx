@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Tabs, Tab } from '@material-ui/core'
+import { Tabs, Tab } from '@mui/material'
 
 import Cim10Form from './components/Form/Cim10Form'
 import Cim10Hierarchy from './components/Hierarchy/Cim10Hierarchy'

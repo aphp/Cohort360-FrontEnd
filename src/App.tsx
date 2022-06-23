@@ -1,5 +1,5 @@
 import React from 'react'
-import CssBaseline from '@material-ui/core/CssBaseline'
+import CssBaseline from '@mui/material/CssBaseline'
 import { ApolloProvider } from '@apollo/react-hooks'
 import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { Provider } from 'react-redux'
@@ -7,9 +7,9 @@ import { PersistGate } from 'redux-persist/es/integration/react'
 import MomentUtils from '@date-io/moment'
 import moment from 'moment'
 
-import { MuiPickersUtilsProvider } from '@material-ui/pickers'
+import { LocalizationProvider } from '@mui/lab'
 
-import AppNavigation from 'components/Routes/AppNavigation/AppNavigation'
+import AppNavigation from './components/Routes/AppNavigation/AppNavigation'
 
 import { store, persistor } from './state/store'
 
@@ -25,7 +25,7 @@ const authClient = new ApolloClient({
 moment.locale('fr')
 
 const App = () => (
-  <MuiPickersUtilsProvider utils={MomentUtils}>
+  <LocalizationProvider dateAdapter={MomentUtils}>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <ApolloProvider client={authClient}>
@@ -35,7 +35,7 @@ const App = () => (
         </ApolloProvider>
       </PersistGate>
     </Provider>
-  </MuiPickersUtilsProvider>
+  </LocalizationProvider>
 )
 
 export default App

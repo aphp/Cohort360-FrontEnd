@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
-import { CssBaseline, Grid } from '@material-ui/core'
-import Alert from '@material-ui/lab/Alert'
+import { CssBaseline, Grid } from '@mui/material'
+import Alert from '@mui/lab/Alert'
 
 import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
@@ -16,7 +16,7 @@ import services from 'services'
 
 import { buildDocumentFiltersChips } from 'utils/chips'
 
-import { docTypes } from 'assets/docTypes.json'
+import docTypes from 'assets/docTypes.json'
 
 type DocumentsProps = {
   groupId?: string
@@ -152,7 +152,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         }))
         break
       case 'selectedDocTypes': {
-        const typesName = docTypes
+        const typesName = docTypes.docTypes
           .map((docType: any) => docType.type)
           .filter((item, index, array) => array.indexOf(item) === index)
         const isGroupItem = typesName.find((typeName) => typeName === value)

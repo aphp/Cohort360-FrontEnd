@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { Button, Grid } from '@material-ui/core'
+import { Button, Grid } from '@mui/material'
 
 import InputAgeRangeSlider from './InputAgeRangeSlider'
 import InputAgeRangeAdvanced from './InputAgeRangeAdvanced'

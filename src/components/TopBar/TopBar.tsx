@@ -1,36 +1,36 @@
 import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
-import Avatar from '@material-ui/core/Avatar'
-import Button from '@material-ui/core/Button'
-import Chip from '@material-ui/core/Chip'
-import Dialog from '@material-ui/core/Dialog'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import Divider from '@material-ui/core/Divider'
-import Grid from '@material-ui/core/Grid'
-import IconButton from '@material-ui/core/IconButton'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import Menu from '@material-ui/core/Menu'
-import MenuItem from '@material-ui/core/MenuItem'
-import Paper from '@material-ui/core/Paper'
-import Tooltip from '@material-ui/core/Tooltip'
-import Typography from '@material-ui/core/Typography'
+import Avatar from '@mui/material/Avatar'
+import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import Paper from '@mui/material/Paper'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
 
-import Skeleton from '@material-ui/lab/Skeleton'
+import Skeleton from '@mui/lab/Skeleton'
 
-import GroupIcon from '@material-ui/icons/Group'
-import BusinessIcon from '@material-ui/icons/Business'
-import ViewListIcon from '@material-ui/icons/ViewList'
-import FaceIcon from '@material-ui/icons/Face'
-import CloseIcon from '@material-ui/icons/Close'
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
+import GroupIcon from '@mui/icons-material/Group'
+import BusinessIcon from '@mui/icons-material/Business'
+import ViewListIcon from '@mui/icons-material/ViewList'
+import FaceIcon from '@mui/icons-material/Face'
+import CloseIcon from '@mui/icons-material/Close'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
 import { ReactComponent as StarIcon } from 'assets/icones/star.svg'
 import { ReactComponent as StarFullIcon } from 'assets/icones/star full.svg'
-import MoreButton from '@material-ui/icons/MoreVert'
+import MoreButton from '@mui/icons-material/MoreVert'
 
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
@@ -60,7 +60,7 @@ type TopBarProps = {
 const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit }) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active
@@ -158,7 +158,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
 
   const handleConfirmDeletion = () => {
     dispatch<any>(deleteCohort({ deletedCohort: dashboard as Cohort }))
-    history.push('/home')
+    navigate('/home')
   }
 
   return (
