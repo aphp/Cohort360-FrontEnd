@@ -609,7 +609,7 @@ export type CohortMedication<T extends IMedicationRequest | IMedicationAdministr
 export type IPatientMedication<T extends IMedicationRequest | IMedicationAdministration> = {
   loading: boolean
   count: number
-  total: number
+  total: number | null
   list: T[]
   page: number
   options?: {
