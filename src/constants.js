@@ -63,8 +63,8 @@ export const ENCOUNTER_EXIT_MODE =
     : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_EXIT_MODE
 export const ENCOUNTER_VISIT_TYPE =
   process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_ENCOUNTER_VISIT_TYP}'
-    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_VISIT_TYP
+    ? '{REACT_APP_VALUE_SET_URL_ENCOUNTER_VISIT_TYPE}'
+    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_VISIT_TYPE
 export const ENCOUNTER_SEJOUR_TYPE =
   process.env.NODE_ENV !== 'development'
     ? '{REACT_APP_VALUE_SET_URL_ENCOUNTER_SEJOUR_TYPE}'
@@ -149,5 +149,9 @@ export const ODD_EXPORT =
   process.env.NODE_ENV !== 'development'
     ? '{REACT_APP_ODD_EXPORT}' == `${BOOLEANTRUE}`
     : process.env.REACT_APP_ODD_EXPORT == `${BOOLEANTRUE}`
+export const ODD_REGEX =
+  process.env.NODE_ENV !== 'development'
+    ? '{REACT_APP_ODD_REGEX}' == `${BOOLEANTRUE}`
+    : process.env.REACT_APP_ODD_REGEX == `${BOOLEANTRUE}`
 
 export const VALUE_SET_SIZE = '9999'

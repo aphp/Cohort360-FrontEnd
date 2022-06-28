@@ -325,7 +325,21 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       filterFhir = [
         `status=final&type:not=doc-impor&empty=false`,
         `${criterion.search ? `${COMPOSITION_TEXT}=${encodeURIComponent(criterion.search)}` : ''}`,
-        `${criterion.regex_search ? `${COMPOSITION_TEXT}=${encodeURIComponent(`/${criterion.regex_search}/`)}` : ''}`,
+        `${
+          criterion.regex_search
+            ? `${COMPOSITION_TEXT}=${encodeURIComponent(
+                `/(.)*${criterion.regex_search.replace(/[/"]/g, function (m) {
+                  switch (m) {
+                    case '/':
+                      return '\\/'
+                    case '"':
+                      return '\\"'
+                  }
+                  return m
+                })}(.)*/`
+              )}`
+            : ''
+        }`,
         `${
           criterion.docType && criterion.docType.length > 0
             ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: any) => docType.id).reduce(searchReducer)}`

@@ -46,11 +46,11 @@ const Patient = () => {
     tabName: string
   }>()
 
-  const [selectedTab, selectTab] = useState('apercu')
+  const [selectedTab, selectTab] = useState('preview')
   const [isSidebarOpened, setSidebarOpened] = useState(false)
 
   useEffect(() => {
-    selectTab(tabName || 'apercu')
+    selectTab(tabName || 'preview')
   }, [tabName])
 
   useEffect(() => {
@@ -107,23 +107,23 @@ const Patient = () => {
             <Tab
               className={classes.tabTitle}
               label="Aperçu patient"
-              value="apercu"
+              value="preview"
               component={Link}
-              to={`/patients/${patientId}/apercu${groupId ? `?groupId=${groupId}` : ''}`}
+              to={`/patients/${patientId}/preview${groupId ? `?groupId=${groupId}` : ''}`}
             />
             <Tab
               className={classes.tabTitle}
               label="Parcours patient"
-              value="parcours"
+              value="timeline"
               component={Link}
-              to={`/patients/${patientId}/parcours${groupId ? `?groupId=${groupId}` : ''}`}
+              to={`/patients/${patientId}/timeline${groupId ? `?groupId=${groupId}` : ''}`}
             />
             <Tab
               className={classes.tabTitle}
               label="Documents cliniques"
-              value="documents-cliniques"
+              value="clinical-documents"
               component={Link}
-              to={`/patients/${patientId}/documents-cliniques${groupId ? `?groupId=${groupId}` : ''}`}
+              to={`/patients/${patientId}/clinical-documents${groupId ? `?groupId=${groupId}` : ''}`}
             />
             <Tab
               className={classes.tabTitle}
@@ -153,10 +153,10 @@ const Patient = () => {
           </Tabs>
         </Grid>
         <Grid className={classes.tabContainer}>
-          {selectedTab === 'apercu' && (
+          {selectedTab === 'preview' && (
             <PatientPreview patient={patient?.patientInfo} deidentifiedBoolean={deidentified} />
           )}
-          {selectedTab === 'parcours' && (
+          {selectedTab === 'timeline' && (
             <PatientTimeline
               loadingPmsi={(patient?.pmsi?.ccam?.loading || patient?.pmsi?.diagnostic?.loading) ?? false}
               documents={patient?.documents?.list ?? []}
@@ -166,7 +166,7 @@ const Patient = () => {
               deidentified={deidentified}
             />
           )}
-          {selectedTab === 'documents-cliniques' && <PatientDocs groupId={groupId} />}
+          {selectedTab === 'clinical-documents' && <PatientDocs groupId={groupId} />}
           {selectedTab === 'pmsi' && <PatientPMSI groupId={groupId} />}
           {ODD_MEDICATION && selectedTab === 'medication' && <PatientMedication groupId={groupId} />}
           {ODD_BIOLOGY && selectedTab === 'biology' && <PatientBiology groupId={groupId} />}

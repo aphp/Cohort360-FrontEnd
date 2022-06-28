@@ -12,7 +12,6 @@ import {
   IResourceList,
   IOperationOutcome,
   IObservation,
-  IDocumentReference,
   IMedicationRequest,
   IMedicationAdministration,
   PatientGenderKind
@@ -63,6 +62,7 @@ export type CohortComposition = IComposition & {
   encounterStatus?: string
   serviceProvider?: string
   NDA?: string
+  event?: {}
 }
 
 export type CohortEncounter = IEncounter & {
@@ -82,13 +82,13 @@ export type CohortPatient = IPatient & {
 }
 
 export type PMSIEntry<T extends IProcedure | ICondition | IClaim> = T & {
-  documents?: (CohortComposition | IDocumentReference)[]
+  documents?: CohortComposition[]
   serviceProvider?: string
   NDA?: string
 }
 
 export type MedicationEntry<T extends IMedicationRequest | IMedicationAdministration> = T & {
-  documents?: (CohortComposition | IDocumentReference)[]
+  documents?: CohortComposition[]
   serviceProvider?: string
   NDA?: string
 }
@@ -280,7 +280,7 @@ export type CohortData = {
   totalPatients?: number
   originalPatients?: CohortPatient[]
   totalDocs?: number
-  documentsList?: (CohortComposition | IDocumentReference)[]
+  documentsList?: CohortComposition[]
   wordcloudData?: any
   encounters?: IEncounter[]
   genderRepartitionMap?: GenderRepartitionType
@@ -295,7 +295,7 @@ export type CohortData = {
 export type PatientData = {
   patient?: CohortPatient
   hospit?: (CohortEncounter | IEncounter)[]
-  documents?: (CohortComposition | IDocumentReference)[]
+  documents?: CohortComposition[]
   documentsTotal?: number
   consult?: PMSIEntry<IProcedure>[]
   consultTotal?: number
@@ -462,8 +462,8 @@ export type MedicationDataType = {
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   startOccurrence: Date | ''
   endOccurrence: Date | ''
-  encounterEndDate?: Date | null
-  encounterStartDate?: Date | null
+  encounterEndDate: Date | null
+  encounterStartDate: Date | null
   isInclusive?: boolean
 } & (
   | {
@@ -674,7 +674,7 @@ export type DTTB_ResultsType = {
 }
 export type DTTB_SearchBarType = {
   type: 'simple' | 'patient' | 'document'
-  value: string
+  value: string | undefined
   onSearch: (newSearch: string, newSearchBy?: SearchByTypes) => void
   searchBy?: any
 }

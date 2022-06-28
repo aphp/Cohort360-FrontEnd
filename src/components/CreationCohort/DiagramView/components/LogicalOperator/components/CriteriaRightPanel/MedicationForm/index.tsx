@@ -18,6 +18,8 @@ const defaultMedication: MedicationDataType = {
   occurrenceComparator: '>=',
   startOccurrence: '',
   endOccurrence: '',
+  encounterEndDate: null,
+  encounterStartDate: null,
   isInclusive: true
 }
 

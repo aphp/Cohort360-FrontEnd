@@ -158,7 +158,15 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
               <TableBody>
                 {researchData?.map((row: RequestType) => (
                   <TableRow className={classes.pointerHover} hover key={row.uuid}>
-                    <TableCell onClick={() => _onClickRow(row)}>{row.name}</TableCell>
+                    <TableCell onClick={() => _onClickRow(row)}>
+                      {row.shared_by?.displayed_name ? (
+                        <>
+                          {row.name} - Envoyée par : {row.shared_by.firstname} {row.shared_by.lastname?.toUpperCase()}
+                        </>
+                      ) : (
+                        <>{row.name}</>
+                      )}
+                    </TableCell>
                     <TableCell onClick={() => _onClickRow(row)} align="center">
                       {moment(row.modified_at).format('DD/MM/YYYY [à] HH:mm')}
                     </TableCell>

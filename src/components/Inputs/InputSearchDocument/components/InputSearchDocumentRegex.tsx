@@ -47,8 +47,8 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
       try {
         // Try to create regex
         new RegExp(query)
-        if (query.search(/\//) !== -1 && query.search(/\\\//) === -1) {
-          // If query contain '/' but no '\/', set error variable
+        if (query.search(/\\$/) !== -1 && query.search(/\\\\$/) === -1) {
+          // If query contain '\' but no '\\', set error variable
           setError(ERROR_REGEX)
           return
         }
@@ -108,11 +108,12 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
           onKeyDown={onKeyDown}
           startAdornment={
             <InputAdornment position="start">
-              <Grid className={classes.slash}>/</Grid>
+              <Grid className={classes.slash}>/(.)*</Grid>
             </InputAdornment>
           }
           endAdornment={
             <InputAdornment position="end">
+              <Grid className={classes.slash}>(.)*/</Grid>
               {!props.noInfoIcon && (
                 <Tooltip
                   open={tooltip}
@@ -122,6 +123,13 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
                       <Typography>
                         Vous pouvez les tester ici : https://regex101.com/ avec la configuration FLAVOR = 'Java 8'
                       </Typography>
+                      <Typography style={{ marginTop: 8 }}>
+                        Particularité : Les symboles suivants sont des opérateurs d'expression régulière. Si vous
+                        souhaitez les utiliser comme caractères, veuillez les échapper avec un anti-slash (\)
+                      </Typography>
+                      {/*eslint-disable-next-line prettier/prettier*/}
+                      {/*prettier-ignore*/}
+                      <Typography style={{ marginLeft: 16 }}>. ? | & * ( ) { } [ ] + ~ : \</Typography>
                       <Typography style={{ marginTop: 8 }}>Quelques exemples :</Typography>
                       <Typography style={{ marginLeft: 16 }}>[a-z] : Lettres minuscules de a à z</Typography>
                       <Typography style={{ marginLeft: 16 }}>[A-Z] : Lettres majuscules de A à Z</Typography>
@@ -154,7 +162,6 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
                   <SearchIcon fill="#ED6D91" height="17px" />
                 </IconButton>
               )}
-              <Grid className={classes.slash}>/</Grid>
             </InputAdornment>
           }
         />

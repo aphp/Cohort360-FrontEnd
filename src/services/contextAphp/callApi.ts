@@ -235,7 +235,7 @@ type fetchCompositionProps = {
   'patient.identifier'?: string
   facet?: ('class' | 'visit-year-month-gender-facet')[]
   uniqueFacet?: 'patient'[]
-  _elements?: ('status' | 'type' | 'subject' | 'encounter' | 'date' | 'title')[]
+  _elements?: ('status' | 'type' | 'subject' | 'encounter' | 'date' | 'title' | 'event')[]
 }
 export const fetchComposition = async (args: fetchCompositionProps) => {
   const { _id, size, offset, _sort, sortDirection, type, _text, status, patient, encounter, minDate, maxDate } = args
