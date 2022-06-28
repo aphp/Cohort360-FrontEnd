@@ -175,10 +175,9 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
       <ModalDocumentFilters
         open={open === 'filter'}
         onClose={() => setOpen(null)}
-        showIpp
         filters={filters}
         onChangeFilters={setFilters}
-        deidentified={false}
+        deidentified={deidentified}
       />
     </Grid>
   )

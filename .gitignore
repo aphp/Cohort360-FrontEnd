@@ -34,4 +34,4 @@ yarn-error.log*
 # CI/CD
 .gitlab-ci.yml
 .gitlab
-docker
+docker/

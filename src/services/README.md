@@ -41,15 +41,14 @@ Au départ du dossier de services, vous trouverez 4 fichiers TypeScript `apiBack
 Ces fichiers servent à faire le lien avec différents services et à régler les `Headers` et créer des `Interceptors`.
 
 | Fichier       | Fonctionnalités                                                                                           | Variable d'environnement lié à l'URL |
-| ------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+|---------------|-----------------------------------------------------------------------------------------------------------|--------------------------------------|
 | apiBackend.ts | Permet le lien avec `cohort-back`                                                                         | `BACK_API_URL`                       |
 | apiFhir.ts    | Permet le lien avec `FHIR`                                                                                | `FHIR_API_URL`                       |
-| apiPortail.ts | Permet le lien avec `portail-back`                                                                        | `PORTAIL_API_URL`                    |
 | apiRequest.ts | Permet le lien avec `FHIR` (uniquement pour les `ValueSet` présents dans la partie `Création de requête`) | `REQUEST_API_URL`                    |
 
 ### Point d'entrée :
 
-À la racine du dossier `services`, vous trouverez le fichier `index.ts` qui va vous permettre de créer votre propre `context`, de la même manière suivante :
+À la racine du dossier `services`, vous trouverez le fichier `index.ts` qui va vous permettre de créer votre propre `context`, de la manière suivante :
 
 ##### index.ts
 
@@ -73,7 +72,7 @@ export default services
 
 De la même manière que le service `servicesAphp`, vous devrez créer votre propre dossier `context...` qui contiendra l'ensemble des fonctions liées à la récupération de vos données et le lier au `switch/case` à la variable d’environnement `CONTEXT`
 
-> Pour le moment, toutes les fonctions sont obligatoires et aucune protection n'est effectuée. Nous vous conseillons donc de dupliquer le dossier `contextAphp` et de l'adapter à vos besoin.
+> Pour le moment, toutes les fonctions sont obligatoires et aucune protection n'est effectuée. Nous vous conseillons donc de dupliquer le dossier `contextAphp` et de l'adapter à vos besoins.
 
 ### Dossier de context :
 
@@ -134,7 +133,7 @@ export default service...
 
 ##### callApi.ts
 
-Pour un souci de clarté dans le code, nous avons créé ce fichier `callApi.ts` qui nous permet d'avoir un ensemble de fonctions permettant le lien avec FHIR. Les fonctions présentes sont les suivantes :
+Dans un souci de clarté de code, nous avons créé ce fichier `callApi.ts` qui nous permet d'avoir un ensemble de fonctions permettant le lien avec FHIR. Les fonctions présentes sont les suivantes :
 
 - fetchOrganization
 - fetchGroup
@@ -264,7 +263,7 @@ export interface IServicePerimeters {
 
 > Pour l'ensemble des fonctions définies dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définis dans un premier temps pour éviter tous problèmes de typage.
 
-Ce fichier définit l'ensemble des fonction liées à la récupération de données liées à un practitioner (utilisateur de cohort360), et définit l'interface suivante :
+Ce fichier définit l'ensemble des fonctions liées à la récupération de données liées à un practitioner (utilisateur de cohort360), et définit l'interface suivante :
 
 ```ts
 export interface IServicePractitioner {
@@ -396,7 +395,7 @@ export interface IServiceCohorts {
 
 ##### serviceContact.ts
 
-> Pour l'ensemble des fonctions définie dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définis dans un premier temps pour éviter tous problèmes de typage.
+> Pour l'ensemble des fonctions définies dans l'interface, nous utilisons TypeScript, nous vous demandons de bien vouloir vous adapter aux types définis dans un premier temps pour éviter tous problèmes de typage.
 
 Ce fichier définit l'ensemble des fonctions liées à la fonctionnalité de prise de contact, et définit l'interface suivante :
 
