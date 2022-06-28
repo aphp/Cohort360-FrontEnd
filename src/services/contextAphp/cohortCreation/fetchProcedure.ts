@@ -9,6 +9,11 @@ export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
   if (!searchValue) {
     return []
   }
+
+  if (searchValue === '*') {
+    return [{ id: '*', label: `Toute la hiérarchie`, subItems: [{ id: 'loading', label: 'loading', subItems: [] }] }]
+  }
+
   const _searchValue = noStar
     ? searchValue
       ? `&code=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
@@ -52,7 +57,14 @@ export const fetchCcamHierarchy = async (ccamParent: string) => {
             subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
           }))
         : []
-    return CCAMList
+
+    return [
+      {
+        id: '*',
+        label: 'Toute la hiérarchie CCAM',
+        subItems: [...CCAMList]
+      }
+    ]
   } else {
     const json = {
       resourceType: 'ValueSet',

@@ -36,6 +36,11 @@ export const fetchCim10Diagnostic = async (searchValue?: string, noStar?: boolea
   if (!searchValue) {
     return []
   }
+
+  if (searchValue === '*') {
+    return [{ id: '*', label: 'Toute la hiérarchie', subItems: [{ id: 'loading', label: 'loading', subItems: [] }] }]
+  }
+
   const _searchValue = noStar
     ? searchValue
       ? `&code=${searchValue.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
@@ -60,6 +65,7 @@ export const fetchCim10Diagnostic = async (searchValue?: string, noStar?: boolea
           label: `${cimData.code} - ${cimData.display}`
         }))
       : []
+
   return cim10List
 }
 
@@ -80,7 +86,8 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
             subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
           }))
         : []
-    return cim10List
+
+    return [{ id: '*', label: 'Toute la hiérarchie CIM10', subItems: [...cim10List] }]
   } else {
     const json = {
       resourceType: 'ValueSet',
