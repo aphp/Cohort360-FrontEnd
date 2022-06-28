@@ -291,9 +291,14 @@ export interface IServicePatients {
 
 const servicesPatients: IServicePatients = {
   fetchPatientsCount: async () => {
-    const response = await fetchPatient({ size: 0 })
-    if (response?.data?.resourceType === 'OperationOutcome') return 0
-    return response.data.total ?? 0
+    try {
+      const response = await fetchPatient({ size: 0 })
+      if (response?.data?.resourceType === 'OperationOutcome') return null as any
+      return response.data.total ?? 0
+    } catch (error: any) {
+      console.error(error)
+      return null as any
+    }
   },
 
   fetchMyPatients: async () => {
@@ -583,7 +588,7 @@ const servicesPatients: IServicePatients = {
       size: documentLines,
       offset: page ? (page - 1) * documentLines : 0,
       status: 'final',
-      _elements: !searchInput ? ['status', 'type', 'encounter', 'date', 'title'] : [],
+      _elements: !searchInput ? ['status', 'type', 'encounter', 'date', 'title', 'event'] : [],
       _text: searchInput,
       type: selectedDocTypes.join(','),
       'encounter.identifier': nda,
@@ -730,7 +735,7 @@ export const getEncounterDocuments = async (
 
   const documentsResp = await fetchComposition({
     encounter: encountersIdList.join(','),
-    _elements: ['status', 'type', 'subject', 'encounter', 'date', 'title'],
+    _elements: ['status', 'type', 'subject', 'encounter', 'date', 'title', 'event'],
     status: 'final',
     _list: groupId ? groupId.split(',') : []
   })

@@ -176,14 +176,8 @@ export interface IServiceCohorts {
    *   - cohortId: Identifiant de la cohorte
    *   - motivation: Raison de l'export
    *   - tables: Liste de table demandé dans l'export
-   *   - output_format: Format de l'export ('csv' ou 'jupiter', par défaut = 'csv')
    */
-  createExport: (args: {
-    cohortId: number
-    motivation: string
-    tables: string[]
-    output_format?: string
-  }) => Promise<any>
+  createExport: (args: { cohortId: number; motivation: string; tables: string[] }) => Promise<any>
 }
 
 const servicesCohorts: IServiceCohorts = {
@@ -367,7 +361,7 @@ const servicesCohorts: IServiceCohorts = {
         _sort: sortBy,
         sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
         status: 'final',
-        _elements: searchInput ? [] : ['status', 'type', 'subject', 'encounter', 'date', 'title'],
+        _elements: searchInput ? [] : ['status', 'type', 'subject', 'encounter', 'date', 'title', 'event'],
         _list: groupId ? [groupId] : [],
         _text: searchInput,
         type: selectedDocTypes.length > 0 ? selectedDocTypes.join(',') : '',
@@ -628,7 +622,7 @@ const servicesCohorts: IServiceCohorts = {
 
   createExport: async (args) => {
     try {
-      const { cohortId, motivation, tables, output_format = 'csv' } = args
+      const { cohortId, motivation, tables } = args
 
       const exportResponse = await new Promise((resolve) => {
         resolve(
@@ -638,7 +632,8 @@ const servicesCohorts: IServiceCohorts = {
             tables: tables.map((table: string) => ({
               omop_table_name: table
             })),
-            output_format
+            nominative: true, // Nominative should always be true when exporting a CSV (see issue #1113)
+            output_format: 'csv'
           })
         )
       })

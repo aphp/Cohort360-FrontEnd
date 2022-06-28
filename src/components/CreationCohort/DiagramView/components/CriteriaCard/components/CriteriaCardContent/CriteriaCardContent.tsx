@@ -72,11 +72,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         ? moment(_currentCriteria.endOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
     }
-    if (
-      _currentCriteria.type !== 'Patient' &&
-      _currentCriteria.type !== 'MedicationRequest' &&
-      _currentCriteria.type !== 'MedicationAdministration'
-    ) {
+    if (_currentCriteria.type !== 'Patient') {
       encounterStartDate = _currentCriteria.encounterStartDate
         ? moment(_currentCriteria.encounterStartDate, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
@@ -327,10 +323,32 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               className={classes.criteriaChip}
               label={
                 <Tooltip
-                  title={`Qui suit l'expression régulière suivante /${_currentCriteria.regex_search}/ dans le document`}
+                  title={`Qui suit l'expression régulière suivante /${_currentCriteria.regex_search
+                    .replace(/^\(\.\)\*|\(\.\)\*$/gi, '')
+                    .replace(new RegExp('\\\\/|\\\\"', 'g'), function (m) {
+                      switch (m) {
+                        case '\\/':
+                          return '/'
+                        case '\\"':
+                          return '"'
+                      }
+                      return m
+                    })}/ dans le document`}
                 >
                   <Typography style={{ maxWidth: 500 }} noWrap>
-                    Qui suit l'expression régulière suivante /{_currentCriteria.regex_search}/ dans le document
+                    Qui suit l'expression régulière suivante /
+                    {_currentCriteria.regex_search
+                      .replace(/^\(\.\)\*|\(\.\)\*$/gi, '')
+                      .replace(new RegExp('\\\\/|\\\\"', 'g'), function (m) {
+                        switch (m) {
+                          case '\\/':
+                            return '/'
+                          case '\\"':
+                            return '"'
+                        }
+                        return m
+                      })}
+                    / dans le document
                   </Typography>
                 </Tooltip>
               }
@@ -824,12 +842,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         break
     }
 
-    if (
-      _currentCriteria.type !== 'Patient' &&
-      _currentCriteria.type !== 'MedicationRequest' &&
-      _currentCriteria.type !== 'MedicationAdministration' &&
-      (encounterStartDate || encounterEndDate)
-    ) {
+    if (_currentCriteria.type !== 'Patient' && (encounterStartDate || encounterEndDate)) {
       content = [
         ...content,
         <Chip
@@ -869,9 +882,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 {startDate
                   ? endDate
                     ? `Entre le ${startDate} et le ${endDate}`
-                    : `Avant le ${startDate}`
+                    : `Après le ${startDate}`
                   : endDate
-                  ? `Après le ${endDate}`
+                  ? `Avant le ${endDate}`
                   : ''}
               </Typography>
             }

@@ -79,7 +79,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     setSearchMode(!!searchInput)
   }
 
-  const handleChangePage = (event?: React.ChangeEvent<unknown>, value?: number) => {
+  const handleChangePage = (value?: number) => {
     setPage(value || 1)
     fetchDocumentsList(value || 1)
   }
@@ -106,13 +106,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   const handleDeleteChip = (filterName: string, value?: string) => {
     switch (filterName) {
       case 'nda':
-        onChangeOptions(
-          filterName,
-          filters.nda
-            .split(',')
-            .filter((item: string) => item !== value)
-            .join()
-        )
+        onChangeOptions(filterName, value)
         break
       case 'selectedDocTypes': {
         const typesName = docTypes
@@ -134,8 +128,6 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         break
       }
       case 'startDate':
-        onChangeOptions(filterName, null)
-        break
       case 'endDate':
         onChangeOptions(filterName, null)
         break
@@ -148,9 +140,8 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         results={{ nb: totalDocs, total: totalAllDoc, label: 'document(s)' }}
         searchBar={{
           type: 'document',
-          value: searchInput,
-          onSearch: (newSearchInput: string) =>
-            setSearchInput(newSearchInput ? newSearchInput.replace(/^\/|\/$/gi, '') : '')
+          value: searchInput ? searchInput.replace(/^\/\(\.\)\*|\(\.\)\*\/$/gi, '') : '',
+          onSearch: (newSearchInput: string) => setSearchInput(newSearchInput)
         }}
         buttons={[
           {
@@ -177,17 +168,16 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         order={order}
         setOrder={setOrder}
         page={page}
-        setPage={setPage}
+        setPage={(newPage: number) => handleChangePage(newPage)}
         total={totalDocs}
       />
 
       <ModalDocumentFilters
         open={open === 'filter'}
         onClose={() => setOpen(null)}
-        showIpp
         filters={filters}
         onChangeFilters={setFilters}
-        deidentified={false}
+        deidentified={deidentified}
       />
     </Grid>
   )

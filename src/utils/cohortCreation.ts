@@ -320,7 +320,21 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       filterFhir = [
         `status=final&type:not=doc-impor&empty=false`,
         `${criterion.search ? `${COMPOSITION_TEXT}=${encodeURIComponent(criterion.search)}` : ''}`,
-        `${criterion.regex_search ? `${COMPOSITION_TEXT}=${encodeURIComponent(`/${criterion.regex_search}/`)}` : ''}`,
+        `${
+          criterion.regex_search
+            ? `${COMPOSITION_TEXT}=${encodeURIComponent(
+                `/(.)*${criterion.regex_search.replace(/[/"]/g, function (m) {
+                  switch (m) {
+                    case '/':
+                      return '\\/'
+                    case '"':
+                      return '\\"'
+                  }
+                  return m
+                })}(.)*/`
+              )}`
+            : ''
+        }`,
         `${
           criterion.docType && criterion.docType.length > 0
             ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: any) => docType.id).reduce(searchReducer)}`
@@ -516,11 +530,7 @@ export function buildRequest(
                 ]
               : undefined,
           encounterDateRange:
-            item.type !== RESSOURCE_TYPE_PATIENT &&
-            item.type !== RESSOURCE_TYPE_MEDICATION_ADMINISTRATION &&
-            item.type !== RESSOURCE_TYPE_MEDICATION_REQUEST &&
-            item.type !== RESSOURCE_TYPE_OBSERVATION &&
-            (item.encounterStartDate || item.encounterEndDate)
+            item.type !== RESSOURCE_TYPE_PATIENT && (item.encounterStartDate || item.encounterEndDate)
               ? {
                   minDate: item.encounterStartDate
                     ? moment(item.encounterStartDate).format('YYYY-MM-DD[T00:00:00Z]')
@@ -1213,6 +1223,11 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
+        if (element.encounterDateRange) {
+          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+        }
+
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
@@ -1384,23 +1399,26 @@ export async function unbuildRequest(_json: string) {
     _criteriaGroup
   ) =>
     _criteriaGroup && _criteriaGroup.length > 0
-      ? _criteriaGroup.map((groupItem: any) => ({
-          id: groupItem._id,
-          title: 'Groupe de critère',
-          criteriaIds:
-            groupItem.criteria && groupItem.criteria.length > 0
-              ? groupItem.criteria.map((criteria: RequeteurCriteriaType | RequeteurGroupType) => criteria._id)
-              : [],
-          isSubGroup: groupItem.isSubItem,
-          isInclusive: groupItem.isInclusive,
-          type: groupItem._type
-        }))
+      ? _criteriaGroup
+          .map((groupItem: any) => ({
+            id: groupItem._id,
+            title: 'Groupe de critère',
+            criteriaIds:
+              groupItem.criteria && groupItem.criteria.length > 0
+                ? groupItem.criteria.map((criteria: RequeteurCriteriaType | RequeteurGroupType) => criteria._id)
+                : [],
+            isSubGroup: groupItem.isSubItem,
+            isInclusive: groupItem.isInclusive,
+            type: groupItem._type
+          }))
+          .sort((prev, next) => next.id - prev.id)
       : []
 
   let _criteriaGroup = convertJsonObjectsToCriteriaGroup(criteriaGroup)
   const criteriaGroupSaved = [..._criteriaGroup]
   // Reset Group criteriaIds
   _criteriaGroup = _criteriaGroup.map((item) => ({ ...item, criteriaIds: [] }))
+
   criteriaItems = criteriaItems.map((_criteria, index) => {
     // Get the parent of current critria
     const parentGroup = criteriaGroupSaved.find((itemGroup) =>
@@ -1418,15 +1436,41 @@ export async function unbuildRequest(_json: string) {
     }
     return { ..._criteria, _id: index + 1 }
   })
-  // Re-assign groups
-  _criteriaGroup = _criteriaGroup.map((itemGroup) => {
-    const foundGroupSaved = criteriaGroupSaved.find(({ id }) => id === itemGroup.id)
-    const oldGroupsChildren = foundGroupSaved ? foundGroupSaved.criteriaIds.filter((criteriaId) => +criteriaId < 0) : []
-    return {
-      ...itemGroup,
-      criteriaIds: [...itemGroup.criteriaIds, ...oldGroupsChildren]
+
+  // // Re-assign id and criteria to groups
+  for (let index = 0; index < _criteriaGroup.length; index++) {
+    const _criteriaGroupItem = _criteriaGroup[index]
+    const newId = index * -1
+
+    // Search parent
+    const parentGroup = criteriaGroupSaved.find((itemGroup) =>
+      itemGroup.criteriaIds.find((criteriaId) => criteriaId === _criteriaGroupItem.id)
+    )
+    if (parentGroup) {
+      // Get index
+      const indexOfParent = criteriaGroupSaved.indexOf(parentGroup)
+
+      // Assign the new criteria group identifier to it group parent
+      if (indexOfParent !== -1) {
+        let newCriteriaIds =
+          _criteriaGroup[indexOfParent] && _criteriaGroup[indexOfParent].criteriaIds?.length > 0
+            ? _criteriaGroup[indexOfParent].criteriaIds
+            : criteriaGroupSaved[indexOfParent].criteriaIds
+
+        // Delete old assignment
+        // If ID changes, delete it
+        if (newId !== _criteriaGroupItem.id)
+          newCriteriaIds = newCriteriaIds.filter((elem) => elem !== _criteriaGroupItem.id)
+
+        // Assign new id and filter doublon (parent group)
+        newCriteriaIds = [...newCriteriaIds, newId].filter((item, index, array) => array.indexOf(item) === index)
+        _criteriaGroup[indexOfParent].criteriaIds = newCriteriaIds
+      }
     }
-  })
+
+    // Assign new id (current group)
+    _criteriaGroup[index].id = newId
+  }
 
   // End of unbuild
   return {
@@ -1436,6 +1480,10 @@ export async function unbuildRequest(_json: string) {
   }
 }
 
+/**
+ * This function call all functions for fetch data contains inside `src/components/CreationCohort/DataList_Criteria` list
+ *
+ */
 export const getDataFromFetch = async (
   _criteria: any,
   selectedCriteria: SelectedCriteriaType[],
@@ -1520,4 +1568,64 @@ export const getDataFromFetch = async (
         : []
   }
   return _criteria
+}
+
+export const joinRequest = async (oldJson: string, newJson: string, parentId: number | null) => {
+  const oldRequest = JSON.parse(oldJson) as RequeteurSearchType
+  const newRequest = JSON.parse(newJson) as RequeteurSearchType
+
+  const changeIdOfRequest = (request: any) => {
+    const { criteria } = request
+
+    for (const criterion of criteria) {
+      if (criterion._type === 'basicResource') {
+        criterion._id += 128
+      } else {
+        criterion._id -= 128
+        if (criterion && criterion.criteria && criterion.criteria.length > 0) {
+          criterion.criteria = changeIdOfRequest(criterion)
+        }
+      }
+    }
+    return criteria
+  }
+
+  const criteriaGroupFromNewRequest: RequeteurGroupType = {
+    _id: (newRequest?.request?._id ?? 0) - 128,
+    _type: newRequest.request?._type === 'andGroup' ? 'andGroup' : 'orGroup',
+    isInclusive: true,
+    criteria: changeIdOfRequest(newRequest.request)
+  }
+
+  const fillRequestWithNewRequest = (criterionGroup?: RequeteurGroupType) => {
+    if (!criterionGroup) return criterionGroup
+
+    if (criterionGroup._id === parentId) {
+      criterionGroup.criteria = [...criterionGroup.criteria, criteriaGroupFromNewRequest]
+    }
+
+    if (!criterionGroup.criteria) return criterionGroup
+    const { criteria = [] } = criterionGroup
+    for (let criterion of criteria) {
+      // @ts-ignore
+      if (criterion?._type === 'orGroup' || criterion?._type === 'andGroup') {
+        // @ts-ignore
+        criterion = fillRequestWithNewRequest(criterion)
+      }
+    }
+    return criterionGroup
+  }
+
+  const newJoinedRequest = {
+    ...oldRequest,
+    request: fillRequestWithNewRequest(oldRequest.request)
+  }
+
+  const { population, criteria, criteriaGroup } = await unbuildRequest(JSON.stringify(newJoinedRequest))
+
+  return {
+    json: buildRequest(population, criteria, criteriaGroup, []),
+    criteria,
+    criteriaGroup
+  }
 }

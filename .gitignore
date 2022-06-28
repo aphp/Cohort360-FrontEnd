@@ -30,3 +30,8 @@ yarn-error.log*
 .env*
 !.env.example
 .mp4
+
+# CI/CD
+.gitlab-ci.yml
+.gitlab
+docker/

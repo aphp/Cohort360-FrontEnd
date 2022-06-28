@@ -120,7 +120,7 @@ const MyProjects: React.FC<{}> = () => {
         <Grid container justifyContent="center" alignItems="center">
           <Grid container item xs={11}>
             <Typography id="myProject-title" variant="h1" color="primary" className={classes.title}>
-              Mes projets de recherche
+              Mes requêtes
             </Typography>
           </Grid>
 

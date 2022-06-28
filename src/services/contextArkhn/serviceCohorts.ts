@@ -628,7 +628,7 @@ const servicesCohorts: IServiceCohorts = {
 
   createExport: async (args) => {
     try {
-      const { cohortId, motivation, tables, output_format = 'csv' } = args
+      const { cohortId, motivation, tables } = args
 
       const exportResponse = await new Promise((resolve) => {
         resolve(
@@ -638,7 +638,8 @@ const servicesCohorts: IServiceCohorts = {
             tables: tables.map((table: string) => ({
               omop_table_name: table
             })),
-            output_format
+            nominative: true, // Nominative should always be true when exporting a CSV (see issue #1113)
+            output_format: 'csv'
           })
         )
       })

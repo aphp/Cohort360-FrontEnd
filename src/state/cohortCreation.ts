@@ -9,7 +9,7 @@ import {
   TemporalConstraintsType
 } from 'types'
 
-import { buildRequest, unbuildRequest } from 'utils/cohortCreation'
+import { buildRequest, unbuildRequest, joinRequest } from 'utils/cohortCreation'
 
 import { logout, login } from './me'
 import { addRequest, deleteRequest } from './request'
@@ -339,6 +339,56 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
   }
 )
 
+/** addRequestToCohortCreation
+ *
+ *
+ */
+type AddRequestToCohortReturn = {
+  json: string
+  selectedCriteria: SelectedCriteriaType[]
+  criteriaGroup: CriteriaGroupType[]
+  nextCriteriaId: number
+  nextGroupId: number
+}
+type AddRequestToCohortParams = { selectedRequestId: string; parentId: number | null }
+
+const addRequestToCohortCreation = createAsyncThunk<
+  AddRequestToCohortReturn,
+  AddRequestToCohortParams,
+  { state: RootState }
+>('cohortCreation/addRequestToCohort', async ({ selectedRequestId, parentId }, { getState, dispatch }) => {
+  try {
+    const state = getState()
+    const newRequestResult = await services.cohortCreation.fetchRequest(selectedRequestId)
+
+    const { json, criteria, criteriaGroup } = await joinRequest(
+      state?.cohortCreation?.request?.json,
+      newRequestResult.json,
+      parentId
+    )
+
+    const saveJsonResponse = await dispatch<any>(saveJson({ newJson: json }))
+    await dispatch<any>(
+      countCohortCreation({
+        json: json,
+        snapshotId: saveJsonResponse.payload.currentSnapshot,
+        requestId: saveJsonResponse.payload.requestId
+      })
+    )
+
+    return {
+      json: json,
+      selectedCriteria: criteria,
+      criteriaGroup: criteriaGroup,
+      nextCriteriaId: criteria.length + 1,
+      nextGroupId: -(criteriaGroup.length + 1)
+    }
+  } catch (error) {
+    console.error(error)
+    throw error
+  }
+})
+
 const cohortCreationSlice = createSlice({
   name: 'cohortCreation',
   initialState: defaultInitialState,
@@ -552,7 +602,7 @@ const cohortCreationSlice = createSlice({
     builder.addCase(countCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
-      countLoading: payload?.count?.status === 'pending' || payload?.count?.status === 'started' ? true : false
+      countLoading: payload?.count?.status === 'pending' || payload?.count?.status === 'started'
     }))
     builder.addCase(countCohortCreation.rejected, (state) => ({
       ...state,
@@ -566,6 +616,14 @@ const cohortCreationSlice = createSlice({
       ...payload
     }))
     builder.addCase(fetchRequestCohortCreation.rejected, (state) => ({ ...state, loading: false }))
+    // addRequestToCohortCreation
+    builder.addCase(addRequestToCohortCreation.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(addRequestToCohortCreation.fulfilled, (state, { payload }) => ({
+      ...state,
+      ...payload,
+      loading: false
+    }))
+    builder.addCase(addRequestToCohortCreation.rejected, (state) => ({ ...state, loading: false }))
     // Create new request
     builder.addCase(addRequest.fulfilled, (state, { payload }) => {
       const newRequestId = payload.requestsList ? payload.requestsList[payload.requestsList.length - 1].uuid : ''
@@ -579,7 +637,14 @@ const cohortCreationSlice = createSlice({
 })
 
 export default cohortCreationSlice.reducer
-export { buildCohortCreation, unbuildCohortCreation, saveJson, countCohortCreation, fetchRequestCohortCreation }
+export {
+  buildCohortCreation,
+  unbuildCohortCreation,
+  saveJson,
+  countCohortCreation,
+  fetchRequestCohortCreation,
+  addRequestToCohortCreation
+}
 export const {
   resetCohortCreation,
   //

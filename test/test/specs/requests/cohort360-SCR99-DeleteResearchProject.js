@@ -4,13 +4,13 @@ const Logger = require('../../objects/Logger')
 
 describe('Cohort360 - SCR99 - Suppression du projet de recherche "' + COHORT360_PARAMS.REQUEST_SEARCH_PROJECT_TEST_LIB + '"', () => {
 
-    // Accès à la page "Mes projets de recherche"
+    // Accès à la page "Mes requêtes"
 	// ------------------------------------------
-	it('Accès à la page "Mes projets de recherche"', () => {
+	it('Accès à la page "Mes requêtes"', () => {
 		MyResearchProjectsPage.login()
 
-		Logger.log('L\'URL de la page "Mes projets de recherche" doit être : ' + MyResearchProjectsPage.getUrl())
-		expect(browser.getUrl()).withContext('@ L\'URL de la page "Mes projets de recherche" doit être : ' + MyResearchProjectsPage.getUrl()).toBe(MyResearchProjectsPage.getUrl())
+		Logger.log('L\'URL de la page "Mes requêtes" doit être : ' + MyResearchProjectsPage.getUrl())
+		expect(browser.getUrl()).withContext('@ L\'URL de la page "Mes requêtes" doit être : ' + MyResearchProjectsPage.getUrl()).toBe(MyResearchProjectsPage.getUrl())
 
         Logger.log('Le titre de la page est : "' + MyResearchProjectsPage.titleValue + '"')
         expect(MyResearchProjectsPage.title.waitForDisplayed()).withContext('@ Le titre de la page est : "' + MyResearchProjectsPage.titleValue + '"').toBe(true)

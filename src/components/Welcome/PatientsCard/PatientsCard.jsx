@@ -33,14 +33,20 @@ const PatientSearchCard = () => {
     <>
       <div id="patients-card-title">
         <Typography component="h2" variant="h2" color="primary" gutterBottom>
-          {loading ? <CircularProgress size={20} /> : displayDigit(patientNb)} patients pris en charge
+          {loading ? (
+            <CircularProgress size={20} />
+          ) : patientNb ? (
+            displayDigit(patientNb) + ' patients pris en charge'
+          ) : (
+            '- patients pris en charge'
+          )}
         </Typography>
       </div>
       <Divider />
       <Grid container direction="column" justifyContent="space-evenly" style={{ height: '100%', marginTop: 8 }}>
         <Button
           id="patients-research-button"
-          href="/mes_patients"
+          href="/my-patients"
           size="small"
           variant="contained"
           disableElevation
@@ -50,7 +56,7 @@ const PatientSearchCard = () => {
         </Button>
         <Button
           id="scope-research-button"
-          href="/perimetre"
+          href="/perimeter"
           size="small"
           variant="contained"
           disableElevation

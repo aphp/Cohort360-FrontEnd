@@ -59,6 +59,7 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
 }
 
 type CriteriaRightPanelProps = {
+  parentId: number | null
   criteria: CriteriaItemType[]
   selectedCriteria: SelectedCriteriaType | null
   onChangeSelectedCriteria: (item: SelectedCriteriaType) => void
@@ -67,7 +68,7 @@ type CriteriaRightPanelProps = {
 }
 
 const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
-  const { open, onClose, criteria, selectedCriteria, onChangeSelectedCriteria } = props
+  const { open, onClose, parentId, criteria, selectedCriteria, onChangeSelectedCriteria } = props
 
   const classes = useStyles()
   const [action, setAction] = useState<CriteriaItemType | null>(null)
@@ -113,6 +114,7 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
         {/* DrawerComponent = action.components */}
         {DrawerComponent ? (
           <DrawerComponent
+            parentId={parentId}
             criteria={action}
             selectedCriteria={selectedCriteria}
             onChangeSelectedCriteria={_onChangeSelectedCriteria}

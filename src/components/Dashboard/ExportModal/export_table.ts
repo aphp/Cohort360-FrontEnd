@@ -15,16 +15,16 @@ const exportTable: ExportTableType[] = [
     id: 'observation',
     table_name: 'Patient - Données démographiques',
     table_id: 'observation',
-    table_subtitle: '⚠️ Attention cette table concerne des données identifiantes'
+    table_subtitle: '⚠️ Attention cette table comporte des données identifiantes'
   },
   {
     id: 'drug_exposure_prescription',
-    table_name: 'Patient - Médicaments - Prescription',
+    table_name: 'Fait - Médicaments - Prescription',
     table_id: 'drug_exposure_prescription'
   },
   {
     id: 'drug_exposure_administration',
-    table_name: 'Patient - Médicaments - Administration',
+    table_name: 'Fait - Médicaments - Administration',
     table_id: 'drug_exposure_administration'
   },
   {

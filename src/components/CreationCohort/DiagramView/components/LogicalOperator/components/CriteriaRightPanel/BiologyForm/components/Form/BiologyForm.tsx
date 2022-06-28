@@ -106,7 +106,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner un champs</Alert>}
+        {error && <Alert severity="error">Merci de renseigner un champ</Alert>}
 
         {!error && !multiFields && (
           <Alert
@@ -121,9 +121,9 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
         )}
 
         <Alert severity="warning">
-          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondant aux analyses les
+          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondants aux analyses les
           plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses
-          quantitatives enregistrées sur GLIMS, qui ont été validés et mis à jour depuis mars 2020.
+          quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020.
         </Alert>
 
         <Grid className={classes.inputContainer} container>
