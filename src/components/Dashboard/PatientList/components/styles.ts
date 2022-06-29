@@ -1,12 +1,13 @@
 import { makeStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   chartOverlay: {
     display: 'flex',
     flexDirection: 'column',
     margin: theme.spacing(2),
     padding: '0.7rem',
-    backgroundColor: theme.palette.white,
+    backgroundColor: '#FFF',
     height: '300px',
     width: '100%',
     borderRadius: '8px',

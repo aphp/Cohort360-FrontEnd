@@ -79,7 +79,7 @@ const EntryExitInputs: React.FC<EntryExitInputsProps> = ({ criteria, selectedCri
             className={classes.inputItem}
             options={criteria?.data?.entryModes || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesEntryModes}
             onChange={(e, value) => onChangeValue('entryMode', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Mode entrée" />}
@@ -91,7 +91,7 @@ const EntryExitInputs: React.FC<EntryExitInputsProps> = ({ criteria, selectedCri
             className={classes.inputItem}
             options={criteria?.data?.exitModes || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesExitModes}
             onChange={(e, value) => onChangeValue('exitMode', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Mode sortie" />}
@@ -103,7 +103,7 @@ const EntryExitInputs: React.FC<EntryExitInputsProps> = ({ criteria, selectedCri
             className={classes.inputItem}
             options={criteria?.data?.reason || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesReason}
             onChange={(e, value) => onChangeValue('reason', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Type sortie" />}

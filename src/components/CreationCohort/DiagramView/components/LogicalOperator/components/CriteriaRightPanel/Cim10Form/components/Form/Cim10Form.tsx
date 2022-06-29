@@ -145,7 +145,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             className={classes.inputItem}
             options={criteria?.data?.diagnosticTypes || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option: any, value: any) => option.id === value.id}
             value={defaultValuesType}
             onChange={(e, value) => onChangeValue('diagnosticType', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Type de diagnostic" />}

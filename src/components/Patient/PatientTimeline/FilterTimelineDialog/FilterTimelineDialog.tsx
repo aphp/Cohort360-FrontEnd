@@ -53,7 +53,7 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
             onChange={_onChangeSelectedDiagnosticTypes}
             options={diagnosticTypesList}
             value={currentSelectedTypes}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             disableCloseOnSelect
             getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.label)}
             renderOption={(diagnosticType: any) => (

@@ -80,7 +80,7 @@ const ProvenanceDestinationInputs: React.FC<AdmissionInputsProps> = ({ criteria,
             className={classes.inputItem}
             options={criteria?.data?.priseEnChargeType || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesPriseEnChargeType}
             onChange={(e, value) => onChangeValue('priseEnChargeType', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Type de prise en charge" />}
@@ -92,7 +92,7 @@ const ProvenanceDestinationInputs: React.FC<AdmissionInputsProps> = ({ criteria,
             className={classes.inputItem}
             options={criteria?.data?.typeDeSejour || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesTypeDeSejours}
             onChange={(e, value) => onChangeValue('typeDeSejour', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Type séjour" />}
@@ -104,7 +104,7 @@ const ProvenanceDestinationInputs: React.FC<AdmissionInputsProps> = ({ criteria,
             className={classes.inputItem}
             options={criteria?.data?.fileStatus || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesFileStatus}
             onChange={(e, value) => onChangeValue('fileStatus', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Statut dossier" />}

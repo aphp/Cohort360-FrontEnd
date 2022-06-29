@@ -10,6 +10,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 import InputBase from '@mui/material/InputBase'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
+import { SelectChangeEvent } from '@mui/material'
 
 import ClearIcon from '@mui/icons-material/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
@@ -63,9 +64,9 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, search
   }
 
   const handleChangeSelect = (
-    event: React.ChangeEvent<{
+    event: SelectChangeEvent<{
       name?: string | undefined
-      value: unknown
+      value: SearchByTypes
     }>
   ) => {
     setSearchBy(event.target.value as SearchByTypes)
@@ -133,7 +134,7 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, search
             {searchBar && searchBar.type !== 'document' && (
               <Grid id="DTTB_search" container alignItems="center" direction="row" wrap="nowrap">
                 {searchBar.type === 'patient' && (
-                  <Select value={searchBy} onChange={handleChangeSelect} className={classes.select}>
+                  <Select value={searchBy as any} onChange={handleChangeSelect} className={classes.select}>
                     <MenuItem value={SearchByTypes.text}>Tous les champs</MenuItem>
                     <MenuItem value={SearchByTypes.family}>Nom</MenuItem>
                     <MenuItem value={SearchByTypes.given}>Prénom</MenuItem>

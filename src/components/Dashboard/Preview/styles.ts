@@ -1,6 +1,7 @@
 import { makeStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     backgroundColor: '#E6F1FD'
   },
@@ -28,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
   nbPatientsOverlay: {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: theme.palette.white,
+    backgroundColor: '#FFF',
     padding: theme.spacing(2),
     margin: theme.spacing(1),
     height: '148px',
@@ -50,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
   chartOverlay: {
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: theme.palette.white,
+    backgroundColor: '#FFF',
     padding: theme.spacing(2),
     margin: theme.spacing(1),
     height: '300px',

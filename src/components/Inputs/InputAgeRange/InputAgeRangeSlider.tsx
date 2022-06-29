@@ -162,7 +162,7 @@ const InputAgeRangeSlider: React.FC<InputAgeRangeSliderProps> = ({ birthdates, o
           className={classes.inputItem}
           options={ageTypeList}
           getOptionLabel={(option) => option.label}
-          getOptionSelected={(option, value) => option.id === value.id}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
           value={currentAgeType}
           onChange={(e, value) => _onChangeAgeType((value?.id ?? 'year') as 'year' | 'month' | 'days')}
           renderInput={(params) => <TextField {...params} variant="outlined" />}

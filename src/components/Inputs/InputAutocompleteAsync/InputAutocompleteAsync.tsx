@@ -85,7 +85,7 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
       value={autocompleteValue}
       onChange={onChange}
       options={options ?? []}
-      getOptionSelected={(option, value) => option.id === value.id}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
       getOptionLabel={(option) => option.label}
       renderInput={(params) => (
         <TextField

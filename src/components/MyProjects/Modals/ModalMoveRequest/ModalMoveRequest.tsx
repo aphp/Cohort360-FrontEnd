@@ -75,7 +75,7 @@ const ModalMoveRequest: React.FunctionComponent<IModalMoveRequestProps> = ({ ope
               id="move-folder-autocomplete"
               options={projectsList}
               getOptionLabel={(option) => option.name}
-              getOptionSelected={(option, value) => option.uuid === value.uuid}
+              isOptionEqualToValue={(option, value) => option.uuid === value.uuid}
               value={currentFolder}
               onChange={(e, value) => onChangeCurrentFolder(value ? value : null)}
               renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Déplacer vers" />}

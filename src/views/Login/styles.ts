@@ -1,7 +1,8 @@
 import { makeStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 import BackgroundLogin from 'assets/images/background-login.png'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     height: '100vh'
   },

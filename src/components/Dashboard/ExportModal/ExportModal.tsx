@@ -147,8 +147,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
 
   return (
     <Dialog open={loading || open} onClose={handleClose} aria-labelledby="form-dialog-title-export">
-      <DialogTitle id="form-dialog-export-title" disableTypography>
-        <Typography>Demande d'export</Typography>
+      <DialogTitle id="form-dialog-export-title">
+        <Typography component="span">Demande d'export</Typography>
       </DialogTitle>
 
       {exportResponse !== null ? (

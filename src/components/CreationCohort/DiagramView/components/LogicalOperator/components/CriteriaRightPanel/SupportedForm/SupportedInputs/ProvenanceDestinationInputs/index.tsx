@@ -69,7 +69,7 @@ const ProvenanceDestinationInputs: React.FC<AdmissionInputsProps> = ({ criteria,
             className={classes.inputItem}
             options={criteria?.data?.destination || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesDestination}
             onChange={(e, value) => onChangeValue('destination', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Destination" />}
@@ -81,7 +81,7 @@ const ProvenanceDestinationInputs: React.FC<AdmissionInputsProps> = ({ criteria,
             className={classes.inputItem}
             options={criteria?.data?.provenance || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesProvenance}
             onChange={(e, value) => onChangeValue('provenance', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Provenance" />}

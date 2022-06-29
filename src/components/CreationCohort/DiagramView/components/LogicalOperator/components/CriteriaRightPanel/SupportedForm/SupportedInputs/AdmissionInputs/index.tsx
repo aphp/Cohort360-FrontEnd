@@ -69,7 +69,7 @@ const AdmissionInputs: React.FC<AdmissionInputsProps> = ({ criteria, selectedCri
             className={classes.inputItem}
             options={criteria?.data?.admissionModes || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesAdmissionModes}
             onChange={(e, value) => onChangeValue('admissionMode', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Motif Admission" />}
@@ -81,7 +81,7 @@ const AdmissionInputs: React.FC<AdmissionInputsProps> = ({ criteria, selectedCri
             className={classes.inputItem}
             options={criteria?.data?.admission || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesAdmission}
             onChange={(e, value) => onChangeValue('admission', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Type Admission" />}

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Route } from 'react-router'
-import { Redirect, useLocation } from 'react-router-dom'
+import { Route, Navigate, useLocation } from 'react-router-dom'
 import { useQuery } from '@apollo/react-hooks'
 import { gql } from 'apollo-boost'
 
@@ -8,8 +7,8 @@ import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, B
 
 import { ACCES_TOKEN } from '../../constants'
 
-import { useAppSelector, useAppDispatch } from 'state'
-import { login } from 'state/me'
+import { useAppSelector, useAppDispatch } from '../../state'
+import { login } from '../../state/me'
 
 const ME = gql`
   query me {
@@ -47,15 +46,7 @@ const PrivateRoute: React.FC<Props> = (props) => {
   }, [me, data, dispatch])
 
   if (!me || (!me && !authToken) || error || (authToken && !loading && data && !data.me)) {
-    if (allowRedirect === true)
-      return (
-        <Redirect
-          to={{
-            pathname: '/',
-            state: { from: location }
-          }}
-        />
-      )
+    if (allowRedirect === true) return <Route element={<Navigate to="/" replace />} />
 
     return (
       <Dialog open aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">

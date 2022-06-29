@@ -4,7 +4,7 @@ import services from 'services'
 import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType } from 'types'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
-import { docTypes } from 'assets/docTypes.json'
+import docTypes from 'assets/docTypes.json'
 
 const REQUETEUR_VERSION = 'v1.2.1'
 
@@ -1026,7 +1026,7 @@ export async function unbuildRequest(_json: string) {
               }
               case COMPOSITION_TYPE: {
                 const docTypeIds = value?.split(',')
-                const newDocTypeIds = docTypes
+                const newDocTypeIds = docTypes.docTypes
                   .filter((docType: { code: string; label: string; type: string }) =>
                     docTypeIds?.find((docTypeId) => docTypeId === docType.code)
                   )

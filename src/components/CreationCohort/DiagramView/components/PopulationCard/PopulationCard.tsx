@@ -117,7 +117,10 @@ const PopulationCard: React.FC = () => {
                     selectedPopulation.map((pop: any, index: number) => (
                       <Chip className={classes.populationChip} key={`${index}-${pop.name}`} label={pop.name} />
                     ))}
-                  <IconButton size="small" classes={{ label: classes.populationLabel }} onClick={() => onExtend(false)}>
+                  <IconButton
+                    size="small"
+                    /*classes={{ label: classes.populationLabel }}*/ onClick={() => onExtend(false)}
+                  >
                     <CloseIcon />
                   </IconButton>
                 </>
@@ -136,7 +139,7 @@ const PopulationCard: React.FC = () => {
                   {selectedPopulation && selectedPopulation.length > 4 && (
                     <IconButton
                       size="small"
-                      classes={{ label: classes.populationLabel }}
+                      /*classes={{ label: classes.populationLabel }}*/
                       onClick={() => onExtend(true)}
                     >
                       <MoreHorizIcon />

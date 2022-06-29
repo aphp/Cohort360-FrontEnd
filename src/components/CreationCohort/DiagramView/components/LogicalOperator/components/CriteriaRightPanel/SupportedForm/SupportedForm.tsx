@@ -220,7 +220,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                 { id: 'day', label: 'jours' }
               ]}
               getOptionLabel={(option) => option.label}
-              getOptionSelected={(option, value) => option.id === value.id}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               value={defaultValues.ageType}
               onChange={(e, value) => _onChangeValue('ageType', value)}
               renderInput={(params) => <TextField {...params} variant="outlined" />}
@@ -280,7 +280,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                 { id: 'day', label: 'jours' }
               ]}
               getOptionLabel={(option) => option.label}
-              getOptionSelected={(option, value) => option.id === value.id}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               value={defaultValues.durationType}
               onChange={(e, value) => _onChangeValue('durationType', value)}
               renderInput={(params) => <TextField {...params} variant="outlined" />}

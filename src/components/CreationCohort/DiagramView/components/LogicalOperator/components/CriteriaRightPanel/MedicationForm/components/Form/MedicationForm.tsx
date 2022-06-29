@@ -190,7 +190,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               className={classes.inputItem}
               options={criteria?.data?.prescriptionTypes || []}
               getOptionLabel={(option) => option.label}
-              getOptionSelected={(option, value) => option.id === value.id}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               value={selectedCriteriaPrescriptionType}
               onChange={(e, value) => onChangeValue('prescriptionType', value)}
               renderInput={(params) => <TextField {...params} variant="outlined" label="Type de prescription" />}
@@ -203,7 +203,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             className={classes.inputItem}
             options={criteria?.data?.administrations || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={selectedCriteriaAdministration}
             onChange={(e, value) => onChangeValue('administration', value)}
             renderInput={(params) => <TextField {...params} variant="outlined" label="Voie d'administration" />}

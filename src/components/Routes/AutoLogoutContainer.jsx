@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { IdleTimer } from 'react-idle-timer'
+// import { IdleTimer } from 'react-idle-timer'
+import { IdleTimerProvider, IdleTimerConsumer } from 'react-idle-timer'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
@@ -97,6 +98,9 @@ const AutoLogoutContainer = () => {
           <DialogContentText variant="button" className={classes.title}>
             Vous allez être déconnecté car vous avez été inactif pendant 14 minutes.
           </DialogContentText>
+          <DialogContentText>
+            <IdleTimerConsumer>{(idleTimer) => <h1>{idleTimer.isIdle()}</h1>}</IdleTimerConsumer>
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={stayActive} className={classes.validateButton}>
@@ -105,7 +109,8 @@ const AutoLogoutContainer = () => {
           <Button onClick={logout}>Déconnexion</Button>
         </DialogActions>
       </Dialog>
-      <IdleTimer ref={inactifTimerRef} timeout={13 * 60 * 1000} onIdle={onIdle}></IdleTimer>
+      <IdleTimerProvider ref={inactifTimerRef} timeout={10 * 1000} onIdle={onIdle} />
+      {/* <IdleTimer ref={inactifTimerRef} timeout={13 * 60 * 1000} onIdle={onIdle}></IdleTimer> */}
     </div>
   )
 }
