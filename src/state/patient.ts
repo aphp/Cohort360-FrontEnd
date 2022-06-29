@@ -693,7 +693,22 @@ const patientSlice = createSlice({
             hospits: action.payload.hospits,
             documents: undefined,
             pmsi: undefined,
-            medication: undefined,
+            medication: {
+              administration: {
+                loading: false,
+                count: 0,
+                total: null,
+                list: [],
+                page: 0
+              },
+              prescription: {
+                loading: false,
+                count: 0,
+                total: null,
+                list: [],
+                page: 0
+              }
+            },
             biology: undefined
           }
     )
