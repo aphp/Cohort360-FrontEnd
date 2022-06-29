@@ -15,6 +15,11 @@ export const fetchAtcData = async (searchValue?: string, noStar?: boolean) => {
   if (!searchValue) {
     return []
   }
+
+  if (searchValue === '*') {
+    return [{ id: '*', label: 'Toute la hiérarchie', subItems: [{ id: 'loading', label: 'loading', subItems: [] }] }]
+  }
+
   const _searchValue = noStar
     ? searchValue
       ? `&code=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
@@ -43,23 +48,26 @@ export const fetchAtcHierarchy = async (atcParent: string) => {
   if (!atcParent) {
     const res = await apiRequest.get<any>(`/ValueSet?url=${MEDICATION_ATC}`)
 
-    const data =
+    let atcList =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
         : []
 
-    return data && data.length > 0
-      ? data
-          .sort(codeSort)
-          .map((atcData: any) => ({
-            id: atcData.code,
-            label: `${atcData.code} - ${atcData.display}`,
-            subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
-          }))
-          // V--[ @TODO: This is a hot fix, remove this after a clean of data ]--V
-          .filter((atcData: any) => atcData.label.search(new RegExp(/^[A-Z] - /, 'gi')) !== -1)
-          .filter((atcData: any) => atcData.label.search(new RegExp(/^[X-Y] - /, 'gi')) !== 0)
-      : []
+    atcList =
+      atcList && atcList.length > 0
+        ? atcList
+            .sort(codeSort)
+            .map((atcData: any) => ({
+              id: atcData.code,
+              label: `${atcData.code} - ${atcData.display}`,
+              subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
+            }))
+            // V--[ @TODO: This is a hot fix, remove this after a clean of data ]--V
+            .filter((atcData: any) => atcData.label.search(new RegExp(/^[A-Z] - /, 'gi')) !== -1)
+            .filter((atcData: any) => atcData.label.search(new RegExp(/^[X-Y] - /, 'gi')) !== 0)
+        : []
+
+    return [{ id: '*', label: 'Toute la hiérarchie Médicament', subItems: [...atcList] }]
   } else {
     const json = {
       resourceType: 'ValueSet',

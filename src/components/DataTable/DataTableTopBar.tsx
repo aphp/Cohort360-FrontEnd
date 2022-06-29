@@ -150,7 +150,12 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, search
                     endAdornment={
                       <InputAdornment position="end">
                         {search && (
-                          <IconButton onClick={() => setSearch('')}>
+                          <IconButton
+                            onClick={() => {
+                              setSearch('')
+                              onSearch('')
+                            }}
+                          >
                             <ClearIcon />
                           </IconButton>
                         )}

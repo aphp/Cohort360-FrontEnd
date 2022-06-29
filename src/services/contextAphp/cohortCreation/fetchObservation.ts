@@ -15,6 +15,10 @@ export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) =
     return []
   }
 
+  if (searchValue === '*') {
+    return [{ id: '*', label: 'Toute la hiérarchie', subItems: [{ id: 'loading', label: 'loading', subItems: [] }] }]
+  }
+
   const _searchValue = noStar
     ? searchValue
       ? `&code=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
@@ -120,16 +124,21 @@ export const fetchBiologyHierarchy = async (biologyParent?: string) => {
   if (!biologyParent) {
     const res = await apiRequest.get<any>(`/ValueSet?url=${BIOLOGY_HIERARCHY_ITM_ANABIO}`)
 
-    const observationList =
+    let observationList =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
         : []
 
-    return observationList.sort(displaySort).map((observationItem: ValueSet) => ({
-      id: observationItem.code,
-      label: `${capitalizeFirstLetter(observationItem.display)}`,
-      subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
-    }))
+    observationList =
+      observationList && observationList.length > 0
+        ? observationList.sort(displaySort).map((observationItem: ValueSet) => ({
+            id: observationItem.code,
+            label: `${capitalizeFirstLetter(observationItem.display)}`,
+            subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
+          }))
+        : []
+
+    return [{ id: '*', label: 'Toute la hiérarchie de Biologie', subItems: [...observationList] }]
   } else {
     const json = {
       resourceType: 'ValueSet',
