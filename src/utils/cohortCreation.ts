@@ -30,12 +30,15 @@ const ENCOUNTER_ADMISSION = 'reason-code' // ok
 
 const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
 const CLAIM_CODE = 'codeList' // ok
+const CLAIM_CODE_ALL_HIERARCHY = 'code'
 
 const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
 const PROCEDURE_CODE = 'codeList' // ok
+const PROCEDURE_CODE_ALL_HIERARCHY = 'code'
 
 const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition' // ok
 const CONDITION_CODE = 'codeList' // ok
+const CONDITION_CODE_ALL_HIERARCHY = 'code'
 const CONDITION_TYPE = 'type' // ok
 
 const RESSOURCE_TYPE_COMPOSITION: 'Composition' = 'Composition'
@@ -45,12 +48,14 @@ const COMPOSITION_TYPE = 'type' // ok
 const RESSOURCE_TYPE_MEDICATION_REQUEST: 'MedicationRequest' = 'MedicationRequest' // = Prescription
 const RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: 'MedicationAdministration' = 'MedicationAdministration' // = Administration
 const MEDICATION_CODE = 'hierarchy-ATC' // ok
+const MEDICATION_CODE_ALL_HIERARCHY = 'medication-simple'
 // const MEDICATION_UCD = 'code_id' // ok
 const MEDICATION_PRESCRIPTION_TYPE = 'type' // ok
 const MEDICATION_ADMINISTRATION = 'route' // ok
 
 const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
 const OBSERVATION_CODE = 'codeList'
+const OBSERVATION_CODE_ALL_HIERARCHY = 'code'
 const OBSERVATION_VALUE = 'value-quantity-value'
 
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
@@ -350,7 +355,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
-            ? `${CONDITION_CODE}=${criterion.code.map((code: any) => code.id).reduce(searchReducer)}`
+            ? criterion.code.find((code) => code.id === '*')
+              ? `${CONDITION_CODE_ALL_HIERARCHY}=*`
+              : `${CONDITION_CODE}=${criterion.code.map((code: any) => code.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
@@ -370,9 +377,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
-            ? `${PROCEDURE_CODE}=${criterion.code
-                .map((diagnosticType: any) => diagnosticType.id)
-                .reduce(searchReducer)}`
+            ? criterion.code.find((code) => code.id === '*')
+              ? `${PROCEDURE_CODE_ALL_HIERARCHY}=*`
+              : `${PROCEDURE_CODE}=${criterion.code
+                  .map((diagnosticType: any) => diagnosticType.id)
+                  .reduce(searchReducer)}`
             : ''
         }`
       ]
@@ -385,7 +394,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
-            ? `${CLAIM_CODE}=${criterion.code.map((diagnosticType: any) => diagnosticType.id).reduce(searchReducer)}`
+            ? criterion.code.find((code) => code.id === '*')
+              ? `${CLAIM_CODE_ALL_HIERARCHY}=*`
+              : `${CLAIM_CODE}=${criterion.code.map((diagnosticType: any) => diagnosticType.id).reduce(searchReducer)}`
             : ''
         }`
       ]
@@ -399,9 +410,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
-            ? `${MEDICATION_CODE}=${criterion.code
-                .map((diagnosticType: any) => diagnosticType.id)
-                .reduce(searchReducer)}`
+            ? criterion.code.find((code) => code.id === '*')
+              ? `${MEDICATION_CODE_ALL_HIERARCHY}=*`
+              : `${MEDICATION_CODE}=${criterion.code
+                  .map((diagnosticType: any) => diagnosticType.id)
+                  .reduce(searchReducer)}`
             : ''
         }`,
         `${
@@ -454,9 +467,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
-            ? `${OBSERVATION_CODE}=${criterion.code
-                .map((diagnosticType: any) => diagnosticType.id)
-                .reduce(searchReducer)}`
+            ? criterion.code.find((code) => code.id === '*')
+              ? `${OBSERVATION_CODE_ALL_HIERARCHY}=*`
+              : `${OBSERVATION_CODE}=${criterion.code
+                  .map((diagnosticType: any) => diagnosticType.id)
+                  .reduce(searchReducer)}`
             : ''
         }`,
         `${
@@ -1085,6 +1100,7 @@ export async function unbuildRequest(_json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
+              case CONDITION_CODE_ALL_HIERARCHY:
               case CONDITION_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
@@ -1141,6 +1157,7 @@ export async function unbuildRequest(_json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
+              case PROCEDURE_CODE_ALL_HIERARCHY:
               case PROCEDURE_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
@@ -1186,6 +1203,7 @@ export async function unbuildRequest(_json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
+              case CLAIM_CODE_ALL_HIERARCHY:
               case CLAIM_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
@@ -1235,6 +1253,7 @@ export async function unbuildRequest(_json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
+              case MEDICATION_CODE_ALL_HIERARCHY:
               case MEDICATION_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
@@ -1310,6 +1329,7 @@ export async function unbuildRequest(_json: string) {
             const value = filter ? filter[1] : null
 
             switch (key) {
+              case OBSERVATION_CODE_ALL_HIERARCHY:
               case OBSERVATION_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))

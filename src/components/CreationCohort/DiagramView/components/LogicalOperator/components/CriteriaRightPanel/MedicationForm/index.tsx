@@ -50,7 +50,7 @@ const Index = (props: any) => {
     <>
       <div>
         <Tabs className={classes.tabs} value={seletedTab} onChange={(e, tab) => onChangeTab(tab)}>
-          <Tab label="Hierarchie" value="hierarchy" />
+          <Tab label="Hiérarchie" value="hierarchy" />
           <Tab label="Formulaire" value="form" />
         </Tabs>
       </div>

@@ -9,6 +9,11 @@ export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
   if (!searchValue) {
     return []
   }
+
+  if (searchValue === '*') {
+    return [{ id: '*', label: 'Toute la hiérarchie', subItems: [{ id: 'loading', label: 'loading', subItems: [] }] }]
+  }
+
   const _searchValue = noStar
     ? searchValue
       ? `&code=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
@@ -52,7 +57,14 @@ export const fetchGhmHierarchy = async (ghmParent: string) => {
             subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
           }))
         : []
-    return GHMList
+
+    return [
+      {
+        id: '*',
+        label: 'Toute la hiérarchie GHM',
+        subItems: [...GHMList]
+      }
+    ]
   } else {
     const json = {
       resourceType: 'ValueSet',

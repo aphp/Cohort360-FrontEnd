@@ -31,26 +31,25 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   const [selectedTab, selectTab] = useState<'prescription' | 'administration'>('prescription')
 
   const medicationPatient = patient?.medication ?? {}
-  const currrentMedication = medicationPatient[selectedTab] ?? {
+  const currentMedication = medicationPatient[selectedTab] ?? {
     loading: false,
     count: 0,
     total: 0,
     list: []
   }
 
-  const loading = currrentMedication.loading ?? false
+  const loading = currentMedication.loading ?? false
   const deidentifiedBoolean = patient?.deidentified ?? false
-  const totalMedication = currrentMedication.count ?? 0
-  const totalAllMedication = currrentMedication.total ?? 0
+  const totalMedication = currentMedication.count ?? 0
+  const totalAllMedication = currentMedication.total ?? 0
 
   const [patientMedicationList, setPatientMedicationList] = useState<any[]>([])
-
-  const [searchInput, setSearchInput] = useState('')
 
   const [open, setOpen] = useState<string | null>(null)
   const [page, setPage] = useState(1)
 
-  const [filter, setFilter] = useState<MedicationsFilters>({
+  const [filters, setFilters] = useState<MedicationsFilters & { searchInput: string }>({
+    searchInput: '',
     nda: '',
     selectedPrescriptionTypes: [],
     selectedAdministrationRoutes: [],
@@ -70,14 +69,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
             by: order.orderBy,
             direction: order.orderDirection
           },
-          filters: {
-            searchInput,
-            nda: filter.nda,
-            selectedPrescriptionTypes: filter.selectedPrescriptionTypes,
-            selectedAdministrationRoutes: filter.selectedAdministrationRoutes,
-            startDate: filter.startDate,
-            endDate: filter.endDate
-          }
+          filters: filters
         }
       })
     )
@@ -98,36 +90,38 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
       case 'nda':
       case 'startDate':
       case 'endDate':
-        setFilter((prevState) => ({ ...prevState, [filterName]: value }))
+        setFilters((prevState) => ({ ...prevState, [filterName]: value }))
         break
     }
   }
 
   useEffect(() => {
     handleChangePage()
-  }, [filter, order, searchInput]) // eslint-disable-line
+  }, [filters, order]) // eslint-disable-line
 
   useEffect(() => {
-    setSearchInput('')
-    setFilter({
+    setPage(1)
+    setFilters({
+      searchInput: '',
       nda: '',
       selectedPrescriptionTypes: [],
       selectedAdministrationRoutes: [],
       startDate: null,
       endDate: null
     })
+    setOrder({ orderBy: 'Period-start', orderDirection: 'asc' })
   }, [selectedTab]) // eslint-disable-line
 
   useEffect(() => {
     const medicationPatient = patient?.medication ?? {}
-    const currrentMedication = medicationPatient[selectedTab] ?? {
+    const currentMedication = medicationPatient[selectedTab] ?? {
       loading: false,
       count: 0,
       total: 0,
       list: []
     }
-    setPatientMedicationList(currrentMedication.list)
-  }, [currrentMedication, currrentMedication?.list]) // eslint-disable-line
+    setPatientMedicationList(currentMedication.list)
+  }, [currentMedication, currentMedication?.list]) // eslint-disable-line
 
   return (
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
@@ -147,8 +141,8 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
         }}
         searchBar={{
           type: 'simple',
-          value: searchInput,
-          onSearch: (newSearchInput: string) => setSearchInput(newSearchInput)
+          value: filters.searchInput,
+          onSearch: (newSearchInput: string) => setFilters({ ...filters, ['searchInput']: newSearchInput })
         }}
         buttons={[
           {
@@ -159,7 +153,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
         ]}
       />
 
-      <MasterChips chips={buildMedicationFiltersChips(filter, handleDeleteChip)} />
+      <MasterChips chips={buildMedicationFiltersChips(filters, handleDeleteChip)} />
 
       <DataTableMedication
         loading={loading}
@@ -170,7 +164,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
         setOrder={setOrder}
         page={page}
         setPage={(newPage) => handleChangePage(newPage)}
-        total={totalMedication}
+        total={totalAllMedication}
       />
 
       <MedicationFilters
@@ -179,8 +173,8 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
         deidentified={deidentifiedBoolean}
         showPrescriptionTypes={selectedTab === 'prescription'}
         showAdministrationRoutes={selectedTab === 'administration'}
-        filters={filter}
-        setFilters={setFilter}
+        filters={filters}
+        setFilters={(newFilters) => setFilters({ searchInput: filters.searchInput, ...newFilters })}
       />
     </Grid>
   )
