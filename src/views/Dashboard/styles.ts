@@ -1,7 +1,8 @@
 import { makeStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 import { smallDrawerWidth, largeDrawerWidth } from 'components/Routes/LeftSideBar/LeftSideBar'
 
-export default makeStyles((theme) => ({
+export default makeStyles((theme: Theme) => ({
   appBar: {
     marginLeft: smallDrawerWidth,
     width: `calc(100% - ${smallDrawerWidth}px)`,

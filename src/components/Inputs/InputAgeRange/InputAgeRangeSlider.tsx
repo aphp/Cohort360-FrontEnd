@@ -70,7 +70,7 @@ const InputAgeRangeSlider: React.FC<InputAgeRangeSliderProps> = ({ birthdates, o
     return [date1, date2] as [string, string]
   }
 
-  const _onChangeAge = (event: React.ChangeEvent<{}>, value: number | number[]) => {
+  const _onChangeAge = (event: any, value: number | number[]) => {
     if (Array.isArray(value) && value.length === 2) {
       setAge([value[0], value[1]])
       if (onChangeBirthdates && typeof onChangeBirthdates === 'function') {

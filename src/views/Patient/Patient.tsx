@@ -57,6 +57,7 @@ const Patient = () => {
     const _fetchPatient = async () => {
       dispatch<any>(
         fetchPatientInfo({
+          // @ts-ignore
           patientId,
           groupId
         })

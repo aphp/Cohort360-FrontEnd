@@ -192,7 +192,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
             <FormLabel component="legend" className={classes.dateLabel}>
               Après le :
             </FormLabel>
-            <DatePicker
+            {/* <DatePicker
               clearable
               error={dateError}
               style={{ width: 'calc(100% - 120px)' }}
@@ -200,10 +200,10 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
               format="DD/MM/YYYY"
               onChange={(date) => setStartDate(date ?? null)}
               value={_startDate}
-            />
+            /> */}
             {_startDate !== null && (
               <IconButton
-                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
+                classes={{ root: classes.clearDate /*label: classes.buttonLabel*/ }}
                 color="primary"
                 onClick={() => setStartDate(null)}
               >
@@ -216,7 +216,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
             <FormLabel component="legend" className={classes.dateLabel}>
               Avant le :
             </FormLabel>
-            <DatePicker
+            {/* <DatePicker
               clearable
               error={dateError}
               style={{ width: 'calc(100% - 120px)' }}
@@ -224,10 +224,10 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
               format="DD/MM/YYYY"
               onChange={(date) => setEndDate(date ?? null)}
               value={_endDate}
-            />
+            /> */}
             {_endDate !== null && (
               <IconButton
-                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
+                classes={{ root: classes.clearDate /*label: classes.buttonLabel*/ }}
                 color="primary"
                 onClick={() => setEndDate(null)}
               >

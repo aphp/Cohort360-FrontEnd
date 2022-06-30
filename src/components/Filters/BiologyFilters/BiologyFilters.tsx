@@ -108,7 +108,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
             <FormLabel component="legend" className={classes.dateLabel}>
               Après le :
             </FormLabel>
-            <DatePicker
+            {/* <DatePicker
               clearable
               error={dateError}
               style={{ width: 'calc(100% - 120px)' }}
@@ -116,7 +116,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
               format="DD/MM/YYYY"
               onChange={(date) => _onChangeValue('startDate', date ?? null)}
               value={_filters.startDate}
-            />
+            /> */}
             {_filters.startDate !== null && (
               <IconButton
                 classes={{ root: classes.clearDate /*, label: classes.buttonLabel*/ }}
@@ -132,7 +132,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
             <FormLabel component="legend" className={classes.dateLabel}>
               Avant le :
             </FormLabel>
-            <DatePicker
+            {/* <DatePicker
               clearable
               error={dateError}
               style={{ width: 'calc(100% - 120px)' }}
@@ -140,7 +140,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
               format="DD/MM/YYYY"
               onChange={(date) => _onChangeValue('endDate', date ?? null)}
               value={_filters.endDate}
-            />
+            /> */}
             {_filters.endDate !== null && (
               <IconButton
                 classes={{ root: classes.clearDate /*, label: classes.buttonLabel*/ }}

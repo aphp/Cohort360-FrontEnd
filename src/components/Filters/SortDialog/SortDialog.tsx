@@ -12,6 +12,7 @@ import {
   Radio,
   RadioGroup,
   Select,
+  SelectChangeEvent,
   Typography
 } from '@mui/material'
 
@@ -49,9 +50,9 @@ const SortDialog: React.FC<SortDialogProps> = ({ open, onClose, onSubmit, sort, 
       <DialogContent className={classes.dialog}>
         <Grid container direction="row" justifyContent="space-between">
           <Select
-            value={_sort.sortBy}
+            value={_sort.sortBy as any}
             onChange={(
-              event: React.ChangeEvent<{
+              event: SelectChangeEvent<{
                 name?: string | undefined
                 value: unknown
               }>

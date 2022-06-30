@@ -212,7 +212,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
             <FormLabel component="legend" className={classes.label}>
               Après le :
             </FormLabel>
-            <DatePicker
+            {/* <DatePicker
               clearable
               error={dateError}
               style={{ width: 'calc(100% - 120px)' }}
@@ -220,10 +220,10 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
               format="DD/MM/YYYY"
               onChange={(date) => setStartDate(date ?? null)}
               value={_startDate}
-            />
+            /> */}
             {_startDate !== null && (
               <IconButton
-                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
+                classes={{ root: classes.clearDate /*label: classes.buttonLabel*/ }}
                 color="primary"
                 onClick={() => setStartDate(null)}
               >
@@ -236,7 +236,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
             <FormLabel component="legend" className={classes.label}>
               Avant le :
             </FormLabel>
-            <DatePicker
+            {/* <DatePicker
               clearable
               error={dateError}
               style={{ width: 'calc(100% - 120px)' }}
@@ -244,10 +244,10 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
               format="DD/MM/YYYY"
               onChange={setEndDate}
               value={_endDate}
-            />
+            /> */}
             {_endDate !== null && (
               <IconButton
-                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
+                classes={{ root: classes.clearDate /*label: classes.buttonLabel*/ }}
                 color="primary"
                 onClick={() => setEndDate(null)}
               >

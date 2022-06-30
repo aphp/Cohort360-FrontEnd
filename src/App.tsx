@@ -7,7 +7,7 @@ import { PersistGate } from 'redux-persist/es/integration/react'
 import MomentUtils from '@date-io/moment'
 import moment from 'moment'
 
-import { LocalizationProvider } from '@mui/lab'
+import { LocalizationProvider } from '@mui/x-date-pickers'
 
 import AppNavigation from './components/Routes/AppNavigation/AppNavigation'
 

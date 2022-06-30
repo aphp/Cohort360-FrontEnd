@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 
-import { Grid, IconButton, InputAdornment, InputBase, MenuItem, Select } from '@mui/material'
+import { Grid, IconButton, InputAdornment, InputBase, MenuItem, Select, SelectChangeEvent } from '@mui/material'
 
 import ClearIcon from '@mui/icons-material/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
@@ -37,7 +37,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   const page = 1
 
   const handleChangeSelect = (
-    event: React.ChangeEvent<{
+    event: SelectChangeEvent<{
       name?: string | undefined
       value: unknown
     }>
@@ -83,7 +83,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
     <Grid container alignItems="center" className={classes.component}>
       {showSelect && (
         <Grid container item xs={2} justifyContent="center">
-          <Select style={{ width: '90%' }} value={searchBy} onChange={handleChangeSelect}>
+          <Select style={{ width: '90%' }} value={searchBy as any} onChange={handleChangeSelect}>
             <MenuItem value={SearchByTypes.text}>Tous les champs</MenuItem>
             <MenuItem value={SearchByTypes.family}>Nom</MenuItem>
             <MenuItem value={SearchByTypes.given}>Prénom</MenuItem>

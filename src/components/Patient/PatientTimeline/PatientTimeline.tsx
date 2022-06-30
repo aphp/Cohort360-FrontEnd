@@ -165,6 +165,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   useEffect(() => {
     dispatch<any>(
       fetchAllProcedures({
+        // @ts-ignore
         patientId,
         groupId
       })

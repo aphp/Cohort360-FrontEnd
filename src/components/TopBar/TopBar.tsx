@@ -222,7 +222,11 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                               ))}
                             <IconButton
                               size="small"
-                              classes={{ label: classes.populationLabel }}
+                              classes={
+                                {
+                                  /*label: classes.populationLabel*/
+                                }
+                              }
                               onClick={() => onExtend(false)}
                             >
                               <CloseIcon />
@@ -239,7 +243,11 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                             {cohort.perimeters && cohort.perimeters.length > 4 && (
                               <IconButton
                                 size="small"
-                                classes={{ label: classes.populationLabel }}
+                                classes={
+                                  {
+                                    /*label: classes.populationLabel*/
+                                  }
+                                }
                                 onClick={() => onExtend(true)}
                               >
                                 <MoreHorizIcon />

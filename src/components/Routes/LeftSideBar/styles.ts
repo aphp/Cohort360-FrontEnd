@@ -1,4 +1,5 @@
-import { makeStyles, Theme, createStyles } from '@mui/styles'
+import { makeStyles, createStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
 const drawerWidth = 260
 
