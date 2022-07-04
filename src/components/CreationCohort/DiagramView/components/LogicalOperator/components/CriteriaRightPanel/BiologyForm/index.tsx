@@ -30,7 +30,6 @@ const Index = (props: any) => {
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onChangeSelectedHierarchy = (code: any) => {
-    console.log('code', code)
     onChangeDefaultValues({
       ...defaultValues,
       code
@@ -69,11 +68,10 @@ const Index = (props: any) => {
       {selectedTab === 'search' && (
         <BiologySearch
           isEdition={isEdition}
+          selectedCriteria={defaultValues}
           criteria={criteria}
-          goBack={goBack}
-          // onChangeValue={_onChangeValue}
           onChangeSelectedCriteria={_onChangeSelectedHierarchy}
-          // selectedCriteria={defaultValues}
+          goBack={goBack}
         />
       )}
       {selectedTab === 'hierarchy' && (

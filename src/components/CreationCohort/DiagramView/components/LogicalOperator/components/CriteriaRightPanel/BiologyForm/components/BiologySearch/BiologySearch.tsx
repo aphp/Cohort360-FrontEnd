@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import {
   Breadcrumbs,
   Button,
+  CircularProgress,
   Divider,
   Grid,
   IconButton,
@@ -16,7 +17,6 @@ import {
   ListItemText,
   Tab,
   Tabs,
-  TextField,
   Tooltip,
   Typography
 } from '@material-ui/core'
@@ -26,11 +26,7 @@ import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
 import useStyles from './styles'
-import { useAppSelector } from 'state'
-import { checkIfIndeterminated } from 'utils/pmsi'
-import { BiologyListType } from 'state/biology'
-import { setSelectedCriteria } from 'state/cohortCreation'
-import PatientSearchBar from 'components/Inputs/PatientSearchBar/PatientSearchBar'
+import { useDebounce } from 'utils/debounce'
 
 type BiologySearchListItemProps = {
   label: string
@@ -42,19 +38,14 @@ type BiologySearchListItemProps = {
 
 const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
   const { label, biologyItem, selectedItems, handleClick } = props
-  // const { id, label, subItems } = biologyItem
 
   const classes = useStyles()
-
-  // const biologyState = useAppSelector((state) => state.biology || {})
-  // const biologyHierarchy = biologyState.list
 
   // const isSelected = selectedItems ? selectedItems.find(({ code }) => code === biologyItem.target[0].code) : false
   const isSelected = selectedItems
     ? selectedItems.find((item) => item.target[0].code === biologyItem.target[0].code)
     : false
   // const isSelected = selectedItems ? selectedItems.code === biologyItem.code : false
-  const isIndeterminated = checkIfIndeterminated(biologyItem, selectedItems)
 
   const handleClickOnList = (biologyItem: any) => {
     const _selectedItems = selectedItems ? [...selectedItems] : []
@@ -74,8 +65,7 @@ const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
         <div
           onClick={() => handleClickOnList(biologyItem)}
           className={clsx(classes.indicator, {
-            [classes.selectedIndicator]: isSelected,
-            [classes.indeterminateIndicator]: isIndeterminated
+            [classes.selectedIndicator]: isSelected
           })}
           style={{ color: '#0063af', cursor: 'pointer' }}
         />
@@ -91,7 +81,6 @@ const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
             />
           ))}
         </Breadcrumbs>
-        {/* <ListItemText onClick={() => handleClickOnList(biologyItem)} className={classes.label} primary={label} /> */}
       </Tooltip>
     </ListItem>
   )
@@ -101,24 +90,24 @@ type BiologySearchProps = {
   isEdition?: boolean
   criteria: any
   goBack: (data: any) => void
-  // onChangeValue:
   onChangeSelectedCriteria: (data: any) => void
+  selectedCriteria: any
 }
 
 const BiologySearch: React.FC<BiologySearchProps> = (props) => {
-  const { isEdition, criteria, goBack, onChangeSelectedCriteria } = props
+  const { isEdition, criteria, goBack, onChangeSelectedCriteria, selectedCriteria } = props
   const classes = useStyles()
 
   const [selectedTab, setSelectedTab] = useState<'anabio' | 'loinc'>('anabio')
   const [searchInput, setSearchInput] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
   const [biologySearchResults, setBiologySearchResults] = useState<{ anabio: any[]; loinc: any[] }>({
     anabio: [],
     loinc: []
   })
-  // TODO: mettre le bon type vvvv
-  // TODO: mettre la bonne valeur par défaut vvvv
-  // TODO: d'où sort setSelectedCriteria?
-  const [selectedItems, setSelectedItems] = useState<any>(isEdition ? setSelectedCriteria.code : [])
+  const [selectedItems, setSelectedItems] = useState<[]>([])
+
+  const debouncedSearchItem = useDebounce(500, searchInput)
 
   const onKeyDown = async (e: any) => {
     if (e.keyCode === 13 && !e.shiftKey) {
@@ -127,10 +116,8 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
     }
   }
 
-  // TODO: vvvv super important, prendre de biology hierarchy
   const _onSubmit = () => {
-    // ici convertir les data en BiologyListType
-    console.log('selectedItems', selectedItems)
+    // ici, conversion des data en BiologyListType
     const formattedData = selectedItems?.map((item: any) => {
       if (item.code === item.target[0].code) {
         return {
@@ -144,17 +131,20 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
         }
       }
     })
-    console.log('formattedData', formattedData)
-    // if (selectedCriteria?.code?.length === 0) {
-    //   return setError(true)
-    // }
-    onChangeSelectedCriteria(formattedData)
+
+    const formattedSelectedItems =
+      formattedData && formattedData.length > 0
+        ? [...selectedCriteria.code, formattedData].flat()
+        : [...selectedCriteria.code]
+
+    onChangeSelectedCriteria(formattedSelectedItems)
   }
 
   const getBiologySearchResults = async () => {
-    if (searchInput.length >= 3) {
+    if (debouncedSearchItem && debouncedSearchItem.length >= 3) {
       try {
-        const biologySearchResults = await criteria.fetch.fetchBiologySearch(searchInput)
+        setLoading(true)
+        const biologySearchResults = await criteria.fetch.fetchBiologySearch(debouncedSearchItem)
 
         setBiologySearchResults(
           biologySearchResults ?? {
@@ -162,17 +152,26 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
             anabio: []
           }
         )
+        setLoading(false)
       } catch (error) {
         console.error('Erreur lors de la recherche avec Concept Map', error)
         setBiologySearchResults({
           loinc: [],
           anabio: []
         })
+        setLoading(false)
       }
+    } else if (debouncedSearchItem === '') {
+      setBiologySearchResults({
+        loinc: [],
+        anabio: []
+      })
     }
   }
 
-  console.log('biologySearchResults', biologySearchResults)
+  useEffect(() => {
+    getBiologySearchResults()
+  }, [debouncedSearchItem])
 
   return (
     <Grid className={classes.root}>
@@ -191,7 +190,6 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {/* TODO: remplacer par InputSearchDocumentSimple */}
         <Grid item container xs={12} alignItems="center" className={classes.searchBar}>
           <InputBase
             placeholder="Recherche dans les collections de biologie"
@@ -201,21 +199,12 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
             onKeyDown={onKeyDown}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton
-                // onClick={handleClearInput}
-                >
-                  {searchInput && <ClearIcon />}
-                </IconButton>
+                <IconButton onClick={() => setSearchInput('')}>{searchInput && <ClearIcon />}</IconButton>
               </InputAdornment>
             }
           />
 
-          <IconButton
-            type="submit"
-            aria-label="search"
-            // onClick={onSearchPatient}
-            onClick={onKeyDown}
-          >
+          <IconButton type="submit" aria-label="search" onClick={onKeyDown}>
             <SearchIcon fill="#ED6D91" height="15px" />
           </IconButton>
         </Grid>
@@ -227,40 +216,46 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
           </Tabs>
         </Grid>
 
-        <List className={classes.drawerContentContainer}>
-          {selectedTab === 'anabio' &&
-            biologySearchResults.anabio.length > 0 &&
-            biologySearchResults.anabio.map((anabioItem, index) => {
-              const label = anabioItem?.target?.[0].display
+        {loading ? (
+          <Grid container direction="column" justifyContent="center" alignItems="center">
+            <CircularProgress size={50} />
+          </Grid>
+        ) : (
+          <List className={classes.drawerContentContainer}>
+            {selectedTab === 'anabio' &&
+              biologySearchResults.anabio.length > 0 &&
+              biologySearchResults.anabio.map((anabioItem, index) => {
+                const label = anabioItem?.target?.[0].display
 
-              return (
-                <BiologySearchListItem
-                  key={index}
-                  label={label}
-                  selectedItems={selectedItems}
-                  handleClick={setSelectedItems}
-                  biologyItem={anabioItem}
-                />
-              )
-            })}
+                return (
+                  <BiologySearchListItem
+                    key={index}
+                    label={label}
+                    selectedItems={selectedItems}
+                    handleClick={setSelectedItems}
+                    biologyItem={anabioItem}
+                  />
+                )
+              })}
 
-          {selectedTab === 'loinc' &&
-            biologySearchResults.loinc.length > 0 &&
-            biologySearchResults.loinc.map((loincItem, index) => {
-              const loincObject = loincItem?.target?.[0]
-              const label = `${loincObject?.code} - ${loincObject?.display}`
+            {selectedTab === 'loinc' &&
+              biologySearchResults.loinc.length > 0 &&
+              biologySearchResults.loinc.map((loincItem, index) => {
+                const loincObject = loincItem?.target?.[0]
+                const label = `${loincObject?.code} - ${loincObject?.display}`
 
-              return (
-                <BiologySearchListItem
-                  key={index}
-                  label={label}
-                  selectedItems={selectedItems}
-                  handleClick={setSelectedItems}
-                  biologyItem={loincItem}
-                />
-              )
-            })}
-        </List>
+                return (
+                  <BiologySearchListItem
+                    key={index}
+                    label={label}
+                    selectedItems={selectedItems}
+                    handleClick={setSelectedItems}
+                    biologyItem={loincItem}
+                  />
+                )
+              })}
+          </List>
+        )}
       </Grid>
 
       <Grid className={classes.criteriaActionContainer}>
