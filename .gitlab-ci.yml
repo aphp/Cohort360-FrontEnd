@@ -5,11 +5,16 @@ stages: # List of stages for jobs in their order of execution
   - build
   - deploy
 
+
+
+include: # Variables needed for Selenium tests
+  project: dev/cohort360/frontend
+  file: '/.gitlab/selenium_variables.yml'
+  rules:
+    - if: $CI_JOB_STAGE == "test"
+
 test-e2e-chrome-job:
   stage: test
-  include: # Variables needed for Selenium tests
-    project: dev/cohort360/frontend
-    file: '/.gitlab/selenium_variables.yml'
   artifacts:
     when: always
     paths:
@@ -27,6 +32,7 @@ test-e2e-chrome-job:
     key: cohort360_nodemodules_cache
     paths:
       - node_modules/
+
 
 build-job:
   image: harbor.eds.aphp.fr/cohort360/node:16.13.2
