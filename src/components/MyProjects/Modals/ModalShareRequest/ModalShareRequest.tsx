@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, CircularProgress } from '@material-ui/core'
@@ -17,8 +17,10 @@ const ERROR_USER_SHARE_LIST = 'error_user_share_list'
 
 const ModalShareRequest: React.FC<{
   requestShare?: RequestType | null
+  shareSuccessOrFailMessage?: 'success' | 'error' | null
+  parentStateSetter: (val: any) => void
   onClose: () => void
-}> = ({ requestShare, onClose }) => {
+}> = ({ requestShare, onClose, parentStateSetter }) => {
   const { requestState } = useAppSelector<{ requestState: RequestState }>((state) => ({ requestState: state.request }))
   const history = useHistory()
   const classes = useStyles()
@@ -29,6 +31,11 @@ const ModalShareRequest: React.FC<{
   const [currentRequest, setCurrentRequest] = useState<RequestType | null | undefined>(selectedCurrentRequest)
   const [currentUserToShare, setCurrentUserToShare] = useState<Provider[] | null>(null)
   const [error, setError] = useState<'error_title' | 'error_user_share_list' | null>(null)
+  const [shareMessage, setShareMessage] = useState<'success' | 'error' | null>(null)
+
+  useEffect(() => {
+    parentStateSetter(shareMessage)
+  }, [parentStateSetter, shareMessage])
 
   const _onChangeValue = (key: 'name' | 'requestName' | 'usersToShare', value: string | string | Provider[]) => {
     if (value && typeof value !== 'string') {
@@ -56,7 +63,13 @@ const ModalShareRequest: React.FC<{
       setLoading(false)
       return setError(ERROR_USER_SHARE_LIST)
     }
-    await services.projects.shareRequest(currentRequest)
+
+    const shareRequestResponse = await services.projects.shareRequest(currentRequest)
+    if (shareRequestResponse.status === 201) {
+      setShareMessage('success')
+    } else {
+      setShareMessage('error')
+    }
     onClose()
   }
 
