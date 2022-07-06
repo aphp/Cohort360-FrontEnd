@@ -65,7 +65,6 @@ const ModalShareRequest: React.FC<{
     }
 
     const shareRequestResponse = await services.projects.shareRequest(currentRequest)
-    console.log('shareRequestResponse', shareRequestResponse)
     if (shareRequestResponse.status === 201) {
       setShareMessage('success')
     } else {
