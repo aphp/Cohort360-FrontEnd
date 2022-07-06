@@ -134,6 +134,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
 
   const handleClearInput = async () => {
     setSearchInput('')
+    onFetchCohorts(sortBy, sortDirection, '')
   }
 
   const onKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
