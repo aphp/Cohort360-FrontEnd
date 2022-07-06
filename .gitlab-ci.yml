@@ -59,12 +59,12 @@ deploy-job:
   script:
     - export VERSION=$(cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
     - mkdir -p /kaniko/.docker
-    - echo "{\"auths\":{\"harbor.eds.aphp.fr\":{\"username\":\"${BOT_NAME}\",\"password\":\"${BOT_TOKEN}\"}}}" > /kaniko/.docker/config.json
+    - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"username\":\"${BOT_NAME}\",\"password\":\"${BOT_TOKEN}\"}}}" > /kaniko/.docker/config.json
     - >-
       /kaniko/executor
       --context ${CI_PROJECT_DIR}
       --dockerfile ${CI_PROJECT_DIR}/Dockerfile
-      --destination harbor.eds.aphp.fr/cohort360/front:${VERSION}
+      --destination ${CI_REGISTRY_IMAGE}:${VERSION}
   only :
     - tags
     - develop
