@@ -32,7 +32,7 @@ exports.config = {
     // './test/test/specs/generics/cohort360-SCG01-LeftMenu.js' //ok
     // './test/test/specs/generics/cohort360-SCG02-PatientContextBar.js' //ok
     // ],
-    // HomePage: ['./test/test/specs/pages/cohort360-SCP01-HomePage.js //ok']
+    // HomePage: ['./test/test/specs/pages/cohort360-SCP01-HomePage.js'] //ok
     MyPatients: [
       './test/test/specs/pages/cohort360-SCP02-MyPatientsPage.js'
       // './test/test/specs/pages/cohort360-SCP03-MyPatientDatasPage.js',
