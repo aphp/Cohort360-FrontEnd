@@ -21,10 +21,11 @@ test-e2e-chrome-job:
   allow_failure: true
   script:
     - npm install
-    - mkdir /etc/nginx/templates
-    - cp .gitlab/nginx-test.conf /etc/nginx/templates/nginx.conf.template
+    - cp .gitlab/nginx-test.conf /etc/nginx/conf.d/nginx.conf.template
+    - envsubst < /etc/nginx/conf.d/nginx.conf > /etc/nginx/conf.d/nginx.conf
+    - rm /etc/nginx/conf.d/nginx.conf.template
     - service nginx restart
-    - ls /etc/nginx/conf.d/
+    - cat /etc/nginx/conf.d/nginx.conf
     - npm run start > file.log 2>&1 &
     - sleep 30 # Wait until application is started
     - npm run test
