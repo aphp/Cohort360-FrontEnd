@@ -22,7 +22,7 @@ test-e2e-chrome-job:
   script:
     - npm install
     - cp .gitlab/nginx-test.conf /etc/nginx/conf.d/nginx.conf.template
-    - envsubst < /etc/nginx/conf.d/nginx.conf > /etc/nginx/conf.d/nginx.conf
+    - envsubst < /etc/nginx/conf.d/nginx.conf.template > /etc/nginx/conf.d/nginx.conf
     - rm /etc/nginx/conf.d/nginx.conf.template
     - service nginx restart
     - cat /etc/nginx/conf.d/nginx.conf
