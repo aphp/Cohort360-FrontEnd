@@ -1,5 +1,3 @@
-image: harbor.eds.aphp.fr/cohort360/selenium-chrome:1.0.0
-
 stages: # List of stages for jobs in their order of execution
   - test
   - build
@@ -12,6 +10,7 @@ include: # Variables needed for Selenium tests
     - if: $CI_JOB_STAGE == "test"
 
 test-e2e-chrome-job:
+  image: harbor.eds.aphp.fr/cohort360/selenium-chrome:1.1.0
   stage: test
   artifacts:
     when: always
