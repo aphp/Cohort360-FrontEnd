@@ -16,7 +16,18 @@ const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0,
 
 export interface IServicePerimeters {
   /**
-   * Cette fonction retourne les informations lié à un (ou plusieur) périmètre(s)
+   * Cette fonction récupère le droit de faire une recherche par IPP lié à un (ou plusieurs) périmètre(s)
+   *
+   * Argument:
+   *   - selectedPopulation: Array composé des périmètres selectionnés pour une requête
+   *
+   * Retour:
+   *   - booléen
+   */
+  allowSearchIpp: (selectedPopulation: ScopeTreeRow[]) => Promise<boolean>
+
+  /**
+   * Cette fonction retourne les informations lié à un (ou plusieurs) périmètre(s)
    *
    * Argument:
    *   - perimetersId: ID du périmètre (liste d'ID séparé par des virgules)
@@ -39,7 +50,7 @@ export interface IServicePerimeters {
   fetchPerimeterInfoForRequeteur: (perimeterId: string) => Promise<ScopeTreeRow | undefined>
 
   /**
-   * Cette fonction retroune l'ensemble des perimetres auquels un practitioner a le droit
+   * Cette fonction retourne l'ensemble des perimetres auquels un practitioner a le droit
    *
    * Argument:
    *   - practitionerId: Identifiant technique du practitioner
@@ -82,6 +93,30 @@ export interface IServicePerimeters {
 }
 
 const servicesPerimeters: IServicePerimeters = {
+  allowSearchIpp: async (selectedPopulation) => {
+    if (!selectedPopulation) {
+      return false
+    }
+
+    const caresiteIds = selectedPopulation
+      .map((perimeter) => perimeter.id)
+      .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
+      .join(',')
+
+    const rightResponse = await apiBackend.get(`accesses/my-rights/?care-site-ids=${caresiteIds}`)
+    const rightsData = (rightResponse.data as any[]) ?? []
+
+    let allowSearchIpp = false
+
+    rightsData.forEach((right) => {
+      if (right.right_search_patient_with_ipp) {
+        allowSearchIpp = true
+      }
+    })
+
+    return allowSearchIpp
+  },
+
   fetchPerimetersInfos: async (perimetersId) => {
     const [perimetersResp, patientsResp, encountersResp] = await Promise.all([
       fetchGroup({
@@ -152,19 +187,19 @@ const servicesPerimeters: IServicePerimeters = {
         _id: perimeterId
       })
 
-      // Construct an `orgazationId`
-      let organiszationId =
+      // Construct an `organizationId`
+      let organizationId =
         groupResults && groupResults.data && groupResults.data.resourceType === 'Bundle'
           ? groupResults.data.entry && groupResults.data.entry.length > 0
             ? groupResults.data.entry[0].resource?.managingEntity?.display ?? ''
             : ''
           : ''
-      organiszationId = organiszationId ? organiszationId.replace('Organization/', '') : ''
-      if (!organiszationId) return undefined
+      organizationId = organizationId ? organizationId.replace('Organization/', '') : ''
+      if (!organizationId) return undefined
 
-      // Get perimeter info with `organiszationId`
+      // Get perimeter info with `organizationId`
       const organizationResult = await fetchOrganization({
-        _id: organiszationId,
+        _id: organizationId,
         _elements: ['name', 'extension', 'alias']
       })
 
