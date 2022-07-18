@@ -22,7 +22,6 @@ test-e2e-chrome-job:
     - npm install
     - envsubst < .gitlab/nginx-test.conf > /etc/nginx/conf.d/nginx.conf
     - service nginx restart
-    - cat /etc/nginx/conf.d/nginx.conf
     - npm run start > file.log 2>&1 &
     - sleep 30 # Wait until application is started
     - npm run test
