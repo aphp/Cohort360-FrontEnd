@@ -5,8 +5,6 @@ stages: # List of stages for jobs in their order of execution
   - build
   - deploy
 
-
-
 include: # Variables needed for Selenium tests
   project: dev/cohort360/frontend
   file: '/.gitlab/selenium_variables.yml'
@@ -23,7 +21,7 @@ test-e2e-chrome-job:
   allow_failure: true
   script:
     - npm install
-    - cp .gitlab/nginx-test.conf /etc/nginx/conf.d/nginx.conf
+    - cp .gitlab/nginx-test.conf /etc/nginx/templates/nginx.conf.template
     - service nginx restart
     - npm run start > file.log 2>&1 &
     - sleep 30 # Wait until application is started
