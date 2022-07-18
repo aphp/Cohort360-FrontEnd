@@ -329,17 +329,18 @@ const servicesProjects: IServiceProjects = {
       ? sharedRequest.shared_query_snapshot
       : sharedRequest.currentSnapshot
     const shared_query_snapshot_name = sharedRequest.name ? sharedRequest.name : sharedRequest.requestName
-    const shareProjectResponse = (await apiBack.post(
+    const shareRequestResponse = (await apiBack.post(
       `/cohort/request-query-snapshots/${shared_query_snapshot_id}/share/`,
       {
         name: shared_query_snapshot_name,
         recipients: usersToShareId?.join()
       }
     )) ?? { status: 400 }
-    if (shareProjectResponse.status === 201) {
-      return shareProjectResponse.data as ProjectType
+    if (shareRequestResponse.status === 201) {
+      return shareRequestResponse.data as ProjectType, shareRequestResponse
     } else {
-      throw new Error('Impossible de partager la requête')
+      console.error('Impossible de partager la requête')
+      return shareRequestResponse
     }
   },
   deleteRequest: async (deletedRequest) => {
