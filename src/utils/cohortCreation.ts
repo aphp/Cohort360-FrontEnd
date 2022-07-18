@@ -54,11 +54,7 @@ const MEDICATION_PRESCRIPTION_TYPE = 'type' // ok
 const MEDICATION_ADMINISTRATION = 'route' // ok
 
 const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
-<<<<<<< HEAD
-const OBSERVATION_CODE = 'codeList'
-=======
 const OBSERVATION_CODE = 'part-of'
->>>>>>> 3ab4d2664d13149844bc3bb219f3153b10f6ca2e
 const OBSERVATION_CODE_ALL_HIERARCHY = 'code'
 const OBSERVATION_VALUE = 'value-quantity-value'
 
