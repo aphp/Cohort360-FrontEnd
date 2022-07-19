@@ -30,7 +30,6 @@ test-e2e-chrome-job:
     paths:
       - node_modules/
 
-
 build-job:
   image: harbor.eds.aphp.fr/cohort360/node:16.13.2
   stage: build
@@ -41,8 +40,11 @@ build-job:
     paths:
       - build/
     expire_in: 1 day
-  rules:
-    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+  only:
+    - tags
+    - develop
+    - ^feat_deploy_(\w*|\d*)
+
   cache:
     key: cohort360_nodemodules_cache
     paths:
@@ -64,7 +66,7 @@ deploy-job:
       --context ${CI_PROJECT_DIR}
       --dockerfile ${CI_PROJECT_DIR}/Dockerfile
       --destination ${CI_REGISTRY_IMAGE}:${VERSION}
-  only :
+  only:
     - tags
     - develop
     - ^feat_deploy_(\w*|\d*)
