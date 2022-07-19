@@ -21,7 +21,7 @@ export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) =
 
   const _searchValue = noStar
     ? searchValue
-      ? `&code=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
+      ? `&code=${searchValue.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
       : ''
     : searchValue
     ? `&_text=${encodeURIComponent(searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line
@@ -49,10 +49,22 @@ export const fetchBiologySearch = async (searchInput: string) => {
     }
   }
 
+  const lowerCaseTrimmedSearchInput = searchInput.toLowerCase().trim()
+
   const res = await apiFhir.get<any>(
     `/ConceptMap?size=2000&context=Maps%20to,Hierarchy%20Concat%20Parents&source-uri=${BIOLOGY_HIERARCHY_ITM_ANABIO}&target-uri=${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}&_text=${encodeURIComponent(
-      searchInput.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') // eslint-disable-line
-    )}*`
+      lowerCaseTrimmedSearchInput.replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') // eslint-disable-line
+    )},${encodeURIComponent(
+      `/(.)*${lowerCaseTrimmedSearchInput.replace(/[/"]/g, function (m) {
+        switch (m) {
+          case '/':
+            return '\\/'
+          case '"':
+            return '\\"'
+        }
+        return m
+      })}(.)*/`
+    )}`
   )
 
   const data = getApiResponseResources(res)
@@ -100,24 +112,36 @@ const getUniqueLoincResults = (loincResults: any[]) => {
 
 const getCleanAnabioResults = (anabioResults: any[]) => {
   return anabioResults.map((anabioResult) => {
-    const values = anabioResult.target[0].display.split('|')
-
-    const lastValues = values[values.length - 1].split('-')
-    const cleanAnabio = `${lastValues[1]}-${lastValues[2]}}`
-    values.pop()
-    values.push(cleanAnabio)
-    const anabioHierarchy = values.join('|')
+    const cleanAnabioHierarchy = anabioResult.target?.[0]?.display.replaceAll(/\d+-|\w\d+-/g, '')
 
     return {
       ...anabioResult,
       target: [
         {
           code: anabioResult.target[0].code,
-          display: anabioHierarchy
+          display: cleanAnabioHierarchy
         }
       ]
     }
   })
+}
+
+const filterUnwantedData = (biologyHierarchy: any) => {
+  if (!biologyHierarchy) {
+    return []
+  }
+  return biologyHierarchy.filter(
+    (biologyItem: any) =>
+      biologyItem.id !== '527941' &&
+      biologyItem.id !== '547289' &&
+      biologyItem.id !== '528247' &&
+      biologyItem.id !== '981945' &&
+      biologyItem.id !== '834019' &&
+      biologyItem.id !== '528310' &&
+      biologyItem.id !== '528049' &&
+      biologyItem.id !== '527570' &&
+      biologyItem.id !== '527614'
+  )
 }
 
 export const fetchBiologyHierarchy = async (biologyParent?: string) => {
@@ -138,7 +162,9 @@ export const fetchBiologyHierarchy = async (biologyParent?: string) => {
           }))
         : []
 
-    return [{ id: '*', label: 'Toute la hiérarchie de Biologie', subItems: [...observationList] }]
+    const cleanObservationList = filterUnwantedData(observationList)
+
+    return [{ id: '*', label: 'Toute la hiérarchie de Biologie', subItems: [...cleanObservationList] }]
   } else {
     const json = {
       resourceType: 'ValueSet',

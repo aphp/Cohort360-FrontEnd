@@ -49,10 +49,22 @@ export const fetchBiologySearch = async (searchInput: string) => {
     }
   }
 
+  const lowerCaseTrimmedSearchInput = searchInput.toLowerCase().trim()
+
   const res = await apiFhir.get<any>(
     `/ConceptMap?size=2000&context=Maps%20to,Hierarchy%20Concat%20Parents&source-uri=${BIOLOGY_HIERARCHY_ITM_ANABIO}&target-uri=${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}&_text=${encodeURIComponent(
-      searchInput.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') // eslint-disable-line
-    )}*`
+      lowerCaseTrimmedSearchInput.replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') // eslint-disable-line
+    )},${encodeURIComponent(
+      `/(.)*${lowerCaseTrimmedSearchInput.replace(/[/"]/g, function (m) {
+        switch (m) {
+          case '/':
+            return '\\/'
+          case '"':
+            return '\\"'
+        }
+        return m
+      })}(.)*/`
+    )}`
   )
 
   const data = getApiResponseResources(res)
@@ -114,6 +126,24 @@ const getCleanAnabioResults = (anabioResults: any[]) => {
   })
 }
 
+const filterUnwantedData = (biologyHierarchy: any) => {
+  if (!biologyHierarchy) {
+    return []
+  }
+  return biologyHierarchy.filter(
+    (biologyItem: any) =>
+      biologyItem.id !== '527941' &&
+      biologyItem.id !== '547289' &&
+      biologyItem.id !== '528247' &&
+      biologyItem.id !== '981945' &&
+      biologyItem.id !== '834019' &&
+      biologyItem.id !== '528310' &&
+      biologyItem.id !== '528049' &&
+      biologyItem.id !== '527570' &&
+      biologyItem.id !== '527614'
+  )
+}
+
 export const fetchBiologyHierarchy = async (biologyParent?: string) => {
   if (!biologyParent) {
     const res = await apiRequest.get<any>(`/ValueSet?url=${BIOLOGY_HIERARCHY_ITM_ANABIO}`)
@@ -132,7 +162,9 @@ export const fetchBiologyHierarchy = async (biologyParent?: string) => {
           }))
         : []
 
-    return [{ id: '*', label: 'Toute la hiérarchie de Biologie', subItems: [...observationList] }]
+    const cleanObservationList = filterUnwantedData(observationList)
+
+    return [{ id: '*', label: 'Toute la hiérarchie de Biologie', subItems: [...cleanObservationList] }]
   } else {
     const json = {
       resourceType: 'ValueSet',
