@@ -9,7 +9,7 @@ class LoginPage extends Page {
     get legalNoticeBlock () { return LegalNoticeBlock }
     
     get invalidCredentialsErrorMessageValue () { return 'Votre code APH ou votre mot de passe est incorrect' }
-    get invalidCredentialsErrorMessage () { return $('p=' + this.invalidCredentialsErrorMessageValue) }
+    get invalidCredentialsErrorMessage () { return $('#error-login-message') }
 
     get loginField () { return LoginLogout.loginField }
     get passwordField () { return LoginLogout.passwordField }
