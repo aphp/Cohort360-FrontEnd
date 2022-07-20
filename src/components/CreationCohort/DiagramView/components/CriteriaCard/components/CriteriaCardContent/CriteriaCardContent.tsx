@@ -63,7 +63,13 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     let encounterStartDate = null
     let encounterEndDate = null
 
-    if (!(_currentCriteria.type === 'Patient' || _currentCriteria.type === 'Encounter')) {
+    if (
+      !(
+        _currentCriteria.type === 'Patient' ||
+        _currentCriteria.type === 'Encounter' ||
+        _currentCriteria.type === 'IPPList'
+      )
+    ) {
       startDate = _currentCriteria.startOccurrence
         ? moment(_currentCriteria.startOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
@@ -72,7 +78,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         ? moment(_currentCriteria.endOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
     }
-    if (_currentCriteria.type !== 'Patient') {
+    if (!(_currentCriteria.type === 'Patient' || _currentCriteria.type === 'IPPList')) {
       encounterStartDate = _currentCriteria.encounterStartDate
         ? moment(_currentCriteria.encounterStartDate, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
@@ -863,6 +869,27 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         }
         break
 
+      case 'IPPList': {
+        const displayIPPList = (searchInput: string) => {
+          return searchInput.split(',').reduce(reducer)
+        }
+        content = [
+          _currentCriteria.search && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Tooltip title={`Contient les patients : ${displayIPPList(_currentCriteria.search)}`}>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    Contient les patients : {displayIPPList(_currentCriteria.search)}
+                  </Typography>
+                </Tooltip>
+              }
+            />
+          )
+        ]
+        break
+      }
+
       default:
         break
     }
@@ -888,7 +915,11 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       ]
     }
 
-    if (_currentCriteria.type !== 'Patient' && _currentCriteria.type !== 'Encounter') {
+    if (
+      _currentCriteria.type !== 'Patient' &&
+      _currentCriteria.type !== 'Encounter' &&
+      _currentCriteria.type !== 'IPPList'
+    ) {
       content = [
         ...content,
         +_currentCriteria?.occurrence !== 1 && (

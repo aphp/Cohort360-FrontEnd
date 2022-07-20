@@ -192,7 +192,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               onSearchDocument={() => null}
               noClearIcon
               noSearchIcon
-              sqareInput
+              squareInput
             />
           </Grid>
 
