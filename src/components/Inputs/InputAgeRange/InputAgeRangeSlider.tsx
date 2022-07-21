@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
+import { useAppSelector } from 'state'
+
 import { Grid, Slider, TextField, Typography } from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
@@ -13,6 +15,8 @@ type InputAgeRangeSliderProps = {
 
 const InputAgeRangeSlider: React.FC<InputAgeRangeSliderProps> = ({ birthdates, onChangeBirthdates }) => {
   const classes = useStyle()
+  const { deidentifiedBoolean = true } = useAppSelector((state) => state.exploredCohort)
+
   const [_age, setAge] = useState<[number, number]>([0, 130])
   const [_ageType, setAgeType] = useState<'year' | 'month' | 'days'>('year')
 
@@ -106,11 +110,17 @@ const InputAgeRangeSlider: React.FC<InputAgeRangeSliderProps> = ({ birthdates, o
     }
   }
 
-  const ageTypeList = [
-    { id: 'year', label: 'années' },
-    { id: 'month', label: 'mois' },
-    { id: 'days', label: 'jours' }
-  ]
+  const ageTypeList = deidentifiedBoolean
+    ? [
+        { id: 'year', label: 'années' },
+        { id: 'month', label: 'mois' }
+      ]
+    : [
+        { id: 'year', label: 'années' },
+        { id: 'month', label: 'mois' },
+        { id: 'days', label: 'jours' }
+      ]
+
   const currentAgeType = ageTypeList.find(({ id }) => id === _ageType)
 
   return (
