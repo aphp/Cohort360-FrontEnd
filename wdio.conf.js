@@ -28,11 +28,11 @@ exports.config = {
 
   suites: {
     Generics: [
-      './test/test/specs/generics/cohort360-SCG00-LoginLogout.js', //ok
-      './test/test/specs/generics/cohort360-SCG01-LeftMenu.js', //ok
-      './test/test/specs/generics/cohort360-SCG02-PatientContextBar.js' //ok
-    ],
-    HomePage: ['./test/test/specs/pages/cohort360-SCP01-HomePage.js'] //ok
+      // './test/test/specs/generics/cohort360-SCG00-LoginLogout.js', //ok
+      './test/test/specs/generics/cohort360-SCG01-LeftMenu.js' //ok
+      // './test/test/specs/generics/cohort360-SCG02-PatientContextBar.js' //ok
+    ]
+    // HomePage: ['./test/test/specs/pages/cohort360-SCP01-HomePage.js'] //ok
     // MyPatients: [
     // './test/test/specs/pages/cohort360-SCP02-MyPatientsPage.js'
     // './test/test/specs/pages/cohort360-SCP03-MyPatientDatasPage.js',
@@ -90,8 +90,8 @@ exports.config = {
       // browserName: 'firefox',
       acceptInsecureCerts: true,
       'goog:chromeOptions': {
-        args: ['--no-sandbox', '--disable-infobars', '--headless', '--disable-gpu', '--window-size=1440,735']
-        // args: ['--no-sandbox', '--disable-infobars', /*'--headless',*/ '--disable-gpu', '--window-size=1440,735']
+        // args: ['--no-sandbox', '--disable-infobars', '--headless', '--disable-gpu', '--window-size=1440,735']
+        args: ['--no-sandbox', '--disable-infobars', /*'--headless',*/ '--disable-gpu', '--window-size=1440,735']
       }
       // If outputDir is provided WebdriverIO can capture driver session logs
       // it is possible to configure which logTypes to include/exclude.
