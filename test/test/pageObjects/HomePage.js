@@ -6,6 +6,7 @@ const NewsBlock = require('../blockObjects/News')
 const TutorialBlock = require('../blockObjects/Tutorial')
 const FavoriteCohortsBlock = require('../blockObjects/FavoriteCohorts')
 const LastCreatedCohortsBlock = require('../blockObjects/LastCreatedCohorts')
+const LastCreatedRequestsBlock = require('../blockObjects/LastCreatedRequests')
 
 class HomePage extends Page {
     
@@ -34,6 +35,9 @@ class HomePage extends Page {
     
     // Bloc "Mes dernières cohortes créées"
     get lastCreatedCohortsBlock () { return LastCreatedCohortsBlock } 
+
+    // Bloc "Mes dernières requêtes créées"
+    get lastCreatedRequestsBlock () { return LastCreatedRequestsBlock } 
     
     open () {
         return super.open(this.path)

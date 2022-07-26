@@ -103,11 +103,11 @@ describe("Cohort360 - SCP01 - Page d'accueil", () => {
   // ------------------------------------
   it('Bloc "Mes dernières cohortes créées"', async () => {
 
-  	Logger.log('Le titre du bloc doit être "' + HomePage.lastCreatedCohortsBlock.titleValue + '"')
-  	expect(await HomePage.lastCreatedCohortsBlock.title.isDisplayed()).withContext('@ Le titre du bloc doit être "' + HomePage.lastCreatedCohortsBlock.titleValue + '"').toBe(true)
-  	expect(await HomePage.lastCreatedCohortsBlock.title.getText()).withContext('@ Le titre du bloc doit être "' + HomePage.lastCreatedCohortsBlock.titleValue + '"').toBe(HomePage.lastCreatedCohortsBlock.titleValue)
+  	Logger.log('Le titre du bloc doit être "' + HomePage.lastCreatedRequestsBlock.titleValue + '"')
+  	expect(await HomePage.lastCreatedRequestsBlock.title.isDisplayed()).withContext('@ Le titre du bloc doit être "' + HomePage.lastCreatedRequestsBlock.titleValue + '"').toBe(true)
+  	expect(await HomePage.lastCreatedRequestsBlock.title.getText()).withContext('@ Le titre du bloc doit être "' + HomePage.lastCreatedRequestsBlock.titleValue + '"').toBe(HomePage.lastCreatedRequestsBlock.titleValue)
 
-  	Logger.log('Le lien "' + HomePage.lastCreatedCohortsBlock.allCohortsLinkValue + '" est clickable')
+  	Logger.log('Le lien "' + HomePage.lastCreatedRequestsBlock.allCohortsLinkValue + '" est clickable')
   	expect(await HomePage.lastCreatedCohortsBlock.allCohortsLink.isClickable()).withContext('@ Le lien "' + HomePage.lastCreatedCohortsBlock.allCohortsLinkValue + '" est clickable').toBe(true)
 
   	if (await HomePage.lastCreatedCohortsBlock.table.isDisplayed()) {
@@ -116,8 +116,8 @@ describe("Cohort360 - SCP01 - Page d'accueil", () => {
 
   		Logger.log('Test 1ère ligne : la ligne est clickable')
   		expect(await HomePage.lastCreatedCohortsBlock.tableFirstLine.isClickable()).withContext('@ Test 1ère ligne : la ligne est clickable').toBe(true)
-      // HomePage.lastCreatedCohortsBlock.tableFirstLine.click()
-      // browser.url(HomePage.getUrl())
+      HomePage.lastCreatedCohortsBlock.tableFirstLine.click()
+      browser.url(HomePage.getUrl())
 
   		Logger.log('Test 1ère ligne : le bouton "favoris" est clickable')
   		expect(await HomePage.lastCreatedCohortsBlock.tableFirstLineFavoritesButton.isClickable()).withContext('@ Test 1ère ligne : le bouton "favoris" est clickable').toBe(true)
@@ -126,6 +126,36 @@ describe("Cohort360 - SCP01 - Page d'accueil", () => {
   		expect(await HomePage.lastCreatedCohortsBlock.noCohortMessage.isDisplayed()).withContext('@ Le tableau des dernières cohortes crées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedCohortsBlock.noCohortMessageValue + '"').toBe(true)
   		expect(await HomePage.lastCreatedCohortsBlock.noCohortMessage.getText()).withContext('@ Le tableau des dernières cohortes crées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedCohortsBlock.noCohortMessageValue + '"').toBe(HomePage.lastCreatedCohortsBlock.noCohortMessageValue)
   	}
+  })
+
+  // Bloc "Mes dernières requêtes créées"
+  // ------------------------------------
+  it('Bloc "Mes dernières requêtes créées"', async () => {
+
+    Logger.log('Le titre du bloc doit être "' + HomePage.lastCreatedRequestsBlock.titleValue + '"')
+  	expect(await HomePage.lastCreatedRequestsBlock.title.isDisplayed()).withContext('@ Le titre du bloc doit être "' + HomePage.lastCreatedRequestsBlock.titleValue + '"').toBe(true)
+  	expect(await HomePage.lastCreatedRequestsBlock.title.getText()).withContext('@ Le titre du bloc doit être "' + HomePage.lastCreatedRequestsBlock.titleValue + '"').toBe(HomePage.lastCreatedRequestsBlock.titleValue)
+
+    Logger.log('Le lien "' + HomePage.lastCreatedRequestsBlock.allRequestsLinkValue + '" est clickable')
+  	expect(await HomePage.lastCreatedRequestsBlock.allRequestsLink.isClickable()).withContext('@ Le lien "' + HomePage.lastCreatedRequestsBlock.allCohortsLinkValue + '" est clickable').toBe(true)
+
+  	if (await HomePage.lastCreatedRequestsBlock.table.isDisplayed()) {
+  		Logger.log('Les colonnes du tableau doivent être : ' + HomePage.lastCreatedRequestsBlock.tableHeaderValue.toUpperCase())
+  		expect(await HomePage.lastCreatedRequestsBlock.tableHeader()).withContext('@ Les colonnes du tableau doivent être : ' + HomePage.lastCreatedRequestsBlock.tableHeaderValue.toUpperCase()).toBe(HomePage.lastCreatedRequestsBlock.tableHeaderValue.toUpperCase())
+
+  		Logger.log('Test 1ère ligne : la ligne est clickable')
+  		expect(await HomePage.lastCreatedRequestsBlock.tableFirstLine.isClickable()).withContext('@ Test 1ère ligne : la ligne est clickable').toBe(true)
+      HomePage.lastCreatedRequestsBlock.tableFirstLine.click()
+      browser.url(HomePage.getUrl())
+
+  		Logger.log('Test 1ère ligne : le bouton "edition" est clickable')
+  		expect(await HomePage.lastCreatedRequestsBlock.tableFirstLineEditButton.isClickable()).withContext('@ Test 1ère ligne : le bouton "favoris" est clickable').toBe(true)
+  	} else {
+  		Logger.log('Le tableau des dernières cohortes crées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedRequestsBlock.noCohortMessageValue + '"')
+  		expect(await HomePage.lastCreatedRequestsBlock.noCohortMessage.isDisplayed()).withContext('@ Le tableau des dernières cohortes crées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedRequestsBlock.noCohortMessageValue + '"').toBe(true)
+  		expect(await HomePage.lastCreatedRequestsBlock.noCohortMessage.getText()).withContext('@ Le tableau des dernières cohortes crées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedRequestsBlock.noCohortMessageValue + '"').toBe(HomePage.lastCreatedRequestsBlock.noCohortMessageValue)
+  	}
+
   })
 
   // Déconnexion
