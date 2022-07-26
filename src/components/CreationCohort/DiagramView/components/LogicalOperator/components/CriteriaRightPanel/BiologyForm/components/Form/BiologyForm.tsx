@@ -157,7 +157,13 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                   <Chip
                     key={index}
                     style={{ margin: 3 }}
-                    label={valueCode.label}
+                    label={
+                      <Tooltip title={valueCode.label}>
+                        <Typography style={{ maxWidth: 500 }} noWrap>
+                          {valueCode.label}
+                        </Typography>
+                      </Tooltip>
+                    }
                     onDelete={() =>
                       onChangeValue(
                         'code',
