@@ -8,16 +8,28 @@ import InputAgeRangeAdvanced from './InputAgeRangeAdvanced'
 type InputAgeRangeProps = {
   birthdates: [string, string]
   onChangeBirthdates: (newAge: [string, string]) => void
+  error: boolean
+  setError: (error: boolean) => void
 }
-const InputAgeRange: React.FC<InputAgeRangeProps> = ({ birthdates, onChangeBirthdates }) => {
+const InputAgeRange: React.FC<InputAgeRangeProps> = ({ birthdates, onChangeBirthdates, error, setError }) => {
   const [mode, setMode] = useState<'simple' | 'advanced'>('simple')
 
   return (
     <>
       {mode === 'simple' ? (
-        <InputAgeRangeSlider birthdates={birthdates} onChangeBirthdates={onChangeBirthdates} />
+        <InputAgeRangeSlider
+          birthdates={birthdates}
+          onChangeBirthdates={onChangeBirthdates}
+          error={error}
+          setError={setError}
+        />
       ) : (
-        <InputAgeRangeAdvanced birthdates={birthdates} onChangeBirthdates={onChangeBirthdates} />
+        <InputAgeRangeAdvanced
+          birthdates={birthdates}
+          onChangeBirthdates={onChangeBirthdates}
+          error={error}
+          setError={setError}
+        />
       )}
 
       <Grid container justifyContent="flex-end">

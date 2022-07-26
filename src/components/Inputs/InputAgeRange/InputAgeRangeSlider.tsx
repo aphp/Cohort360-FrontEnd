@@ -11,9 +11,16 @@ import useStyle from './styles'
 type InputAgeRangeSliderProps = {
   birthdates: [string, string]
   onChangeBirthdates: (newAge: [string, string]) => void
+  error: boolean
+  setError: (error: boolean) => void
 }
 
-const InputAgeRangeSlider: React.FC<InputAgeRangeSliderProps> = ({ birthdates, onChangeBirthdates }) => {
+const InputAgeRangeSlider: React.FC<InputAgeRangeSliderProps> = ({
+  birthdates,
+  onChangeBirthdates,
+  error,
+  setError
+}) => {
   const classes = useStyle()
   const { deidentifiedBoolean = true } = useAppSelector((state) => state.exploredCohort)
 
@@ -29,6 +36,14 @@ const InputAgeRangeSlider: React.FC<InputAgeRangeSliderProps> = ({ birthdates, o
     setLimits(limits)
   }, [birthdates])
 
+  useEffect(() => {
+    if (_age[0] === 0 && _age[1] === 0) {
+      setError(true)
+    } else {
+      setError(false)
+    }
+  }, [_age])
+
   const convertToAgeAndType = (_birthdates: [string, string]) => {
     // newAge: [number, number], newAgeType: 'year' | 'month' | 'days'
     const result: { age: [number, number]; ageType: 'year' | 'month' | 'days'; limits: [number, number] } = {
@@ -42,8 +57,10 @@ const InputAgeRangeSlider: React.FC<InputAgeRangeSliderProps> = ({ birthdates, o
     const date2 = moment(_birthdates[1])
 
     // Si date1 && date2 au dessus de 31 jours => ageType = 'month'
-    if (current.diff(date1, 'days') <= 31 && current.diff(date2, 'days') <= 31) {
-      result.ageType = 'days'
+    if (!deidentifiedBoolean) {
+      if (current.diff(date1, 'days') <= 31 && current.diff(date2, 'days') <= 31) {
+        result.ageType = 'days'
+      }
     }
     // Sinon si date1 && date2 au dessus de 24 mois =< ageType = 'year'
     else if (current.diff(date1, 'month') <= 24 && current.diff(date2, 'month') <= 24) {
@@ -155,6 +172,7 @@ const InputAgeRangeSlider: React.FC<InputAgeRangeSliderProps> = ({ birthdates, o
             <Grid item style={{ flex: 0.5, margin: '0 4px' }}>
               <TextField
                 value={_age[1]}
+                InputProps={{ inputProps: { min: 1 } }}
                 type="number"
                 onChange={(e) =>
                   _onChangeAge({} as React.ChangeEvent<{}>, [
@@ -162,6 +180,7 @@ const InputAgeRangeSlider: React.FC<InputAgeRangeSliderProps> = ({ birthdates, o
                     +e.target.value >= limits[0] && +e.target.value <= limits[1] ? +e.target.value : _age[1]
                   ])
                 }
+                error={error}
               />
             </Grid>
           </Grid>
@@ -178,6 +197,8 @@ const InputAgeRangeSlider: React.FC<InputAgeRangeSliderProps> = ({ birthdates, o
           renderInput={(params) => <TextField {...params} variant="outlined" />}
         />
       </Grid>
+
+      {error && <Typography style={{ color: '#f44336' }}>La valeur maximale ne peut pas être égale à 0.</Typography>}
     </>
   )
 }

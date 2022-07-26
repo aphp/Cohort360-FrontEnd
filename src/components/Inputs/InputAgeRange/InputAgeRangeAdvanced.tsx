@@ -8,13 +8,20 @@ import { Grid, TextField, Typography } from '@material-ui/core'
 type InputAgeRangeAdvancedProps = {
   birthdates: [string, string]
   onChangeBirthdates: (newAge: [string, string]) => void
+  error: boolean
+  setError: (error: boolean) => void
 }
 type InputsStateType = {
   year?: number
   month?: number
   days?: number
 }
-const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdates, onChangeBirthdates }) => {
+const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({
+  birthdates,
+  onChangeBirthdates,
+  error,
+  setError
+}) => {
   const { deidentifiedBoolean = true } = useAppSelector((state) => state.exploredCohort)
 
   const [minState, setMinState] = useState<InputsStateType>({
@@ -57,6 +64,14 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
     setMinState(newMinDate)
     setMaxState(newMaxDate)
   }, [birthdates])
+
+  useEffect(() => {
+    if (maxState.days === 0 && maxState.month === 0 && maxState.year === 0) {
+      setError(true)
+    } else {
+      setError(false)
+    }
+  }, [maxState])
 
   const _onChangeState = (stateName: 'minState' | 'maxState', key: 'year' | 'month' | 'days', value?: number) => {
     const _minState = minState
@@ -160,6 +175,12 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
           </Grid>
         )}
       </Grid>
+
+      {error && (
+        <Typography style={{ color: '#f44336', marginTop: 4 }}>
+          Au moins une des valeurs maximales ne doit pas être égale à 0.
+        </Typography>
+      )}
     </>
   )
 }
