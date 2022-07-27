@@ -41,6 +41,7 @@ const ErrorSnackBarAlert = ({ open, setError, errorMessage }) => {
   }
   return (
     <Snackbar
+      id="error-login-message"
       open={open}
       onClose={_setError}
       autoHideDuration={5000}

@@ -1,18 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
+import { useAppSelector } from 'state'
+
 import { Grid, TextField, Typography } from '@material-ui/core'
 
 type InputAgeRangeAdvancedProps = {
   birthdates: [string, string]
   onChangeBirthdates: (newAge: [string, string]) => void
+  error: boolean
+  setError: (error: boolean) => void
 }
 type InputsStateType = {
   year?: number
   month?: number
   days?: number
 }
-const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdates, onChangeBirthdates }) => {
+const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({
+  birthdates,
+  onChangeBirthdates,
+  error,
+  setError
+}) => {
+  const { deidentifiedBoolean = true } = useAppSelector((state) => state.exploredCohort)
+
   const [minState, setMinState] = useState<InputsStateType>({
     year: 0,
     month: 0,
@@ -54,6 +65,14 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
     setMaxState(newMaxDate)
   }, [birthdates])
 
+  useEffect(() => {
+    if (maxState.days === 0 && maxState.month === 0 && maxState.year === 0) {
+      setError(true)
+    } else {
+      setError(false)
+    }
+  }, [maxState])
+
   const _onChangeState = (stateName: 'minState' | 'maxState', key: 'year' | 'month' | 'days', value?: number) => {
     const _minState = minState
     const _maxState = maxState
@@ -87,7 +106,7 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
 
       <Grid container alignItems="center">
         <Typography style={{ width: 35, margin: '0 4px' }}>De : </Typography>
-        <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
+        <Grid item style={{ flex: 0.3, margin: `0 ${deidentifiedBoolean ? '12px' : '4px'}` }}>
           <TextField
             InputProps={{
               endAdornment: <Typography>an(s)</Typography>
@@ -97,7 +116,7 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
             onChange={(e) => _onChangeState('minState', 'year', e.target.value ? +e.target.value : undefined)}
           />
         </Grid>
-        <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
+        <Grid item style={{ flex: 0.3, margin: `0 ${deidentifiedBoolean ? '12px' : '4px'}` }}>
           <TextField
             InputProps={{
               endAdornment: <Typography>mois</Typography>
@@ -107,21 +126,23 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
             onChange={(e) => _onChangeState('minState', 'month', e.target.value ? +e.target.value : undefined)}
           />
         </Grid>
-        <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
-          <TextField
-            InputProps={{
-              endAdornment: <Typography>jour(s)</Typography>
-            }}
-            value={minState.days}
-            type="number"
-            onChange={(e) => _onChangeState('minState', 'days', e.target.value ? +e.target.value : undefined)}
-          />
-        </Grid>
+        {!deidentifiedBoolean && (
+          <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
+            <TextField
+              InputProps={{
+                endAdornment: <Typography>jour(s)</Typography>
+              }}
+              value={minState.days}
+              type="number"
+              onChange={(e) => _onChangeState('minState', 'days', e.target.value ? +e.target.value : undefined)}
+            />
+          </Grid>
+        )}
       </Grid>
 
       <Grid container alignItems="center">
         <Typography style={{ width: 35, margin: '0 4px' }}>À : </Typography>
-        <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
+        <Grid item style={{ flex: 0.3, margin: `0 ${deidentifiedBoolean ? '12px' : '4px'}` }}>
           <TextField
             InputProps={{
               endAdornment: <Typography>an(s)</Typography>
@@ -131,7 +152,7 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
             onChange={(e) => _onChangeState('maxState', 'year', e.target.value ? +e.target.value : undefined)}
           />
         </Grid>
-        <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
+        <Grid item style={{ flex: 0.3, margin: `0 ${deidentifiedBoolean ? '12px' : '4px'}` }}>
           <TextField
             InputProps={{
               endAdornment: <Typography>mois</Typography>
@@ -141,17 +162,25 @@ const InputAgeRangeAdvanced: React.FC<InputAgeRangeAdvancedProps> = ({ birthdate
             onChange={(e) => _onChangeState('maxState', 'month', e.target.value ? +e.target.value : undefined)}
           />
         </Grid>
-        <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
-          <TextField
-            InputProps={{
-              endAdornment: <Typography>jour(s)</Typography>
-            }}
-            value={maxState.days}
-            type="number"
-            onChange={(e) => _onChangeState('maxState', 'days', e.target.value ? +e.target.value : undefined)}
-          />
-        </Grid>
+        {!deidentifiedBoolean && (
+          <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
+            <TextField
+              InputProps={{
+                endAdornment: <Typography>jour(s)</Typography>
+              }}
+              value={maxState.days}
+              type="number"
+              onChange={(e) => _onChangeState('maxState', 'days', e.target.value ? +e.target.value : undefined)}
+            />
+          </Grid>
+        )}
       </Grid>
+
+      {error && (
+        <Typography style={{ color: '#f44336', marginTop: 4 }}>
+          Au moins une des valeurs maximales ne doit pas être égale à 0.
+        </Typography>
+      )}
     </>
   )
 }

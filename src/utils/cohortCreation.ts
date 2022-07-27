@@ -8,6 +8,10 @@ import { docTypes } from 'assets/docTypes.json'
 
 const REQUETEUR_VERSION = 'v1.2.1'
 
+// TODO: à changer quand ticket fhir ok vvvvv
+const RESSOURCE_TYPE_IPP_LIST: 'IPPList' = 'IPPList'
+const IPP_LIST_FHIR = 'identifier-simple'
+
 const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
 const PATIENT_GENDER = 'gender' // ok
 const PATIENT_BIRTHDATE = 'age-day' // ok
@@ -91,6 +95,7 @@ type RequeteurCriteriaType = {
     | typeof RESSOURCE_TYPE_MEDICATION_REQUEST
     | typeof RESSOURCE_TYPE_MEDICATION_ADMINISTRATION
     | typeof RESSOURCE_TYPE_OBSERVATION
+    | typeof RESSOURCE_TYPE_IPP_LIST
   filterFhir: string
   occurrence?: {
     n: number
@@ -491,6 +496,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       break
     }
 
+    case RESSOURCE_TYPE_IPP_LIST: {
+      filterFhir = [`${criterion.search ? `${IPP_LIST_FHIR}=${criterion.search}` : ''}`]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
+      break
+    }
+
     default:
       break
   }
@@ -524,14 +536,22 @@ export function buildRequest(
           resourceType: item.type ?? RESSOURCE_TYPE_PATIENT,
           filterFhir: constructFilterFhir(item),
           occurrence:
-            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_ENCOUNTER) && item.occurrence
+            !(
+              item.type === RESSOURCE_TYPE_PATIENT ||
+              item.type === RESSOURCE_TYPE_ENCOUNTER ||
+              item.type === RESSOURCE_TYPE_IPP_LIST
+            ) && item.occurrence
               ? {
                   n: item.occurrence,
                   operator: item?.occurrenceComparator
                 }
               : undefined,
           dateRangeList:
-            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_ENCOUNTER) &&
+            !(
+              item.type === RESSOURCE_TYPE_PATIENT ||
+              item.type === RESSOURCE_TYPE_ENCOUNTER ||
+              item.type === RESSOURCE_TYPE_IPP_LIST
+            ) &&
             (item.startOccurrence || item.endOccurrence)
               ? [
                   {
@@ -545,7 +565,8 @@ export function buildRequest(
                 ]
               : undefined,
           encounterDateRange:
-            item.type !== RESSOURCE_TYPE_PATIENT && (item.encounterStartDate || item.encounterEndDate)
+            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_IPP_LIST) &&
+            (item.encounterStartDate || item.encounterEndDate)
               ? {
                   minDate: item.encounterStartDate
                     ? moment(item.encounterStartDate).format('YYYY-MM-DD[T00:00:00Z]')
@@ -638,7 +659,7 @@ export async function unbuildRequest(_json: string) {
   } = json
 
   /**
-   * Retrieve popultion
+   * Retrieve population
    */
   if (typeof services.perimeters.fetchPerimeterInfoForRequeteur !== 'function') {
     return {
@@ -1020,7 +1041,7 @@ export async function unbuildRequest(_json: string) {
 
         if (element.filterFhir) {
           const filters = element.filterFhir
-            // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
+            // This `replaceAll` is necessary because if a user searches `_text=first && second` we have a bug with filterFhir.split('&')
             .split('&')
             .map((elem) => elem.split('='))
 
@@ -1397,9 +1418,35 @@ export async function unbuildRequest(_json: string) {
         }
         break
       }
+      case RESSOURCE_TYPE_IPP_LIST: {
+        currentCriterion.title = 'Critère de liste IPP'
+        currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
+
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+
+          for (const filter of filters) {
+            const key = filter ? filter[0] : null
+            const value = filter ? filter[1] : null
+
+            switch (key) {
+              case IPP_LIST_FHIR: {
+                currentCriterion.search = value ?? ''
+                break
+              }
+              default:
+                currentCriterion.error = true
+                break
+            }
+          }
+        }
+        break
+      }
+
       default:
         break
     }
+
     return currentCriterion
   }
 
@@ -1501,7 +1548,7 @@ export async function unbuildRequest(_json: string) {
 }
 
 /**
- * This function call all functions for fetch data contains inside `src/components/CreationCohort/DataList_Criteria` list
+ * This function calls all functions to fetch data contained inside `src/components/CreationCohort/DataList_Criteria` list
  *
  */
 export const getDataFromFetch = async (
@@ -1542,6 +1589,7 @@ export const getDataFromFetch = async (
                   !(
                     currentcriterion.type === RESSOURCE_TYPE_PATIENT ||
                     currentcriterion.type === RESSOURCE_TYPE_ENCOUNTER ||
+                    currentcriterion.type === RESSOURCE_TYPE_IPP_LIST ||
                     currentcriterion.type === RESSOURCE_TYPE_COMPOSITION
                   ) &&
                   currentcriterion.code &&

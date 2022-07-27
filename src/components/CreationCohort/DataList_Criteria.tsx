@@ -2,6 +2,7 @@ import { CriteriaItemType } from 'types'
 
 // Components
 import RequestForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/RequestForm/RequestForm'
+import IPPForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/IPPForm/IPPForm'
 import DemographicFrom from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DemographicFrom/DemographicFrom'
 import DocumentsForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/DocumentsForm/DocumentsForm'
 import SupportedForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/SupportedForm/SupportedForm'
@@ -18,6 +19,7 @@ import { ODD_BIOLOGY, ODD_MEDICATION } from '../../constants'
 
 // ├── Mes variables
 // ├── Mes requêtes
+// ├── Liste d'IPP
 // ├── Patients
 // ├── Visites
 // ├── Documents cliniques
@@ -46,6 +48,13 @@ const criteriaList: CriteriaItemType[] = [
     title: 'Mes requêtes',
     color: '#0063AF',
     components: RequestForm
+  },
+  {
+    id: 'IPPList',
+    title: "Liste d'IPP",
+    color: '#0063AF',
+    components: IPPForm,
+    disabled: true
   },
   {
     id: 'Patient',
