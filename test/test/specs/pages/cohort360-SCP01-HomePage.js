@@ -103,11 +103,11 @@ describe("Cohort360 - SCP01 - Page d'accueil", () => {
   // ------------------------------------
   it('Bloc "Mes dernières cohortes créées"', async () => {
 
-  	Logger.log('Le titre du bloc doit être "' + HomePage.lastCreatedRequestsBlock.titleValue + '"')
-  	expect(await HomePage.lastCreatedRequestsBlock.title.isDisplayed()).withContext('@ Le titre du bloc doit être "' + HomePage.lastCreatedRequestsBlock.titleValue + '"').toBe(true)
-  	expect(await HomePage.lastCreatedRequestsBlock.title.getText()).withContext('@ Le titre du bloc doit être "' + HomePage.lastCreatedRequestsBlock.titleValue + '"').toBe(HomePage.lastCreatedRequestsBlock.titleValue)
+  	Logger.log('Le titre du bloc doit être "' + HomePage.lastCreatedCohortsBlock.titleValue + '"')
+  	expect(await HomePage.lastCreatedCohortsBlock.title.isDisplayed()).withContext('@ Le titre du bloc doit être "' + HomePage.lastCreatedCohortsBlock.titleValue + '"').toBe(true)
+  	expect(await HomePage.lastCreatedCohortsBlock.title.getText()).withContext('@ Le titre du bloc doit être "' + HomePage.lastCreatedCohortsBlock.titleValue + '"').toBe(HomePage.lastCreatedCohortsBlock.titleValue)
 
-  	Logger.log('Le lien "' + HomePage.lastCreatedRequestsBlock.allCohortsLinkValue + '" est clickable')
+  	Logger.log('Le lien "' + HomePage.lastCreatedCohortsBlock.allCohortsLinkValue + '" est clickable')
   	expect(await HomePage.lastCreatedCohortsBlock.allCohortsLink.isClickable()).withContext('@ Le lien "' + HomePage.lastCreatedCohortsBlock.allCohortsLinkValue + '" est clickable').toBe(true)
 
   	if (await HomePage.lastCreatedCohortsBlock.table.isDisplayed()) {
