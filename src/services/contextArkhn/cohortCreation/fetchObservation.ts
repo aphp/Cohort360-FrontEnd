@@ -4,9 +4,9 @@ import { cleanValueSet } from 'utils/cleanValueSet'
 import { ValueSet } from 'types'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { displaySort } from 'utils/alphabeticalSort'
-// import apiFhir from 'services/apiFhir'
-// import { getApiResponseResources } from 'utils/apiHelpers'
-// import { targetDisplaySort } from 'utils/alphabeticalSort'
+import apiFhir from 'services/apiFhir'
+import { getApiResponseResources } from 'utils/apiHelpers'
+import { targetDisplaySort } from 'utils/alphabeticalSort'
 
 export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) => {
   noStar = noStar === undefined ? true : noStar
@@ -21,7 +21,7 @@ export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) =
 
   const _searchValue = noStar
     ? searchValue
-      ? `&code=${searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
+      ? `&code=${searchValue.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}` //eslint-disable-line
       : ''
     : searchValue
     ? `&_text=${encodeURIComponent(searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line
@@ -41,78 +41,108 @@ export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) =
   return cleanValueSet(data)
 }
 
-// export const fetchBiologySearch = async (searchInput: string) => {
-//   const _searchInput = searchInput ?? 'gly'
-//   const res = await apiFhir.get<any>(
-//     `/ConceptMap?size=2000&context=Maps%20to,Hierarchy%20Concat%20Parents&source-uri=${BIOLOGY_HIERARCHY_ITM_ANABIO}&target-uri=${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}&_text=${encodeURIComponent(
-//       _searchInput.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') // eslint-disable-line
-//     )}*`
-//   )
+export const fetchBiologySearch = async (searchInput: string) => {
+  if (!searchInput) {
+    return {
+      anabio: [],
+      loinc: []
+    }
+  }
 
-//   const data = getApiResponseResources(res)
+  const lowerCaseTrimmedSearchInput = searchInput.toLowerCase().trim()
 
-//   const loincResults = getSourceData('Maps to', data).sort(targetDisplaySort)
-//   const uniqueLoincResults = getUniqueLoincResults(loincResults)
-//   const anabioResults = getSourceData('Hierarchy Concat Parents', data).sort(targetDisplaySort)
-//   const cleanAnabioResults = getCleanAnabioResults(anabioResults)
+  const res = await apiFhir.get<any>(
+    `/ConceptMap?size=2000&context=Maps%20to,Hierarchy%20Concat%20Parents&source-uri=${BIOLOGY_HIERARCHY_ITM_ANABIO}&target-uri=${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}&_text=${encodeURIComponent(
+      lowerCaseTrimmedSearchInput.replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') // eslint-disable-line
+    )},${encodeURIComponent(
+      `/(.)*${lowerCaseTrimmedSearchInput.replace(/[/"]/g, function (m) {
+        switch (m) {
+          case '/':
+            return '\\/'
+          case '"':
+            return '\\"'
+        }
+        return m
+      })}(.)*/`
+    )}`
+  )
 
-//   return {
-//     anabio: cleanAnabioResults ?? [],
-//     loinc: uniqueLoincResults ?? []
-//   }
-// }
+  const data = getApiResponseResources(res)
+
+  const loincResults = getSourceData('Maps to', data).sort(targetDisplaySort)
+  const uniqueLoincResults = getUniqueLoincResults(loincResults)
+  const anabioResults = getSourceData('Hierarchy Concat Parents', data).sort(targetDisplaySort)
+  const cleanAnabioResults = getCleanAnabioResults(anabioResults)
+
+  return {
+    anabio: cleanAnabioResults ?? [],
+    loinc: uniqueLoincResults ?? []
+  }
+}
 
 // TODO: change type any
-// const getSourceData = (context: string, data: any) => {
-//   if (data.length === 0) {
-//     return []
-//   }
+const getSourceData = (context: string, data: any) => {
+  if (data.length === 0) {
+    return []
+  }
 
-//   const sourceData =
-//     data
-//       .filter((element: any) => element.description === context)
-//       .map((element: any) => element.group?.[0].element?.[0]) ?? []
+  const sourceData =
+    data
+      .filter((element: any) => element.description === context)
+      .map((element: any) => element.group?.[0].element?.[0]) ?? []
 
-//   return sourceData
-// }
+  return sourceData
+}
 
-// // TODO: change type any
-// const getUniqueLoincResults = (loincResults: any[]) => {
-//   if (loincResults.length === 0) {
-//     return []
-//   }
+// TODO: change type any
+const getUniqueLoincResults = (loincResults: any[]) => {
+  if (loincResults.length === 0) {
+    return []
+  }
 
-//   const loincUniqueResults = loincResults.filter(
-//     (
-//       (set) => (f: any) =>
-//         !set.has(f.target[0].code) && set.add(f.target[0].code)
-//     )(new Set())
-//   )
+  const loincUniqueResults = loincResults.filter(
+    (
+      (set) => (f: any) =>
+        !set.has(f.target[0].code) && set.add(f.target[0].code)
+    )(new Set())
+  )
 
-//   return loincUniqueResults
-// }
+  return loincUniqueResults
+}
 
-// const getCleanAnabioResults = (anabioResults: any[]) => {
-//   return anabioResults.map((anabioResult) => {
-//     const values = anabioResult.target[0].display.split('|')
+const getCleanAnabioResults = (anabioResults: any[]) => {
+  return anabioResults.map((anabioResult) => {
+    const cleanAnabioHierarchy = anabioResult.target?.[0]?.display.replaceAll(/\d+-|\w\d+-/g, '')
 
-//     const lastValues = values[values.length - 1].split('-')
-//     const cleanAnabio = `${lastValues[1]}-${lastValues[2]}}`
-//     values.pop()
-//     values.push(cleanAnabio)
-//     const anabioHierarchy = values.join('|')
+    return {
+      ...anabioResult,
+      target: [
+        {
+          code: anabioResult.target[0].code,
+          display: cleanAnabioHierarchy
+        }
+      ]
+    }
+  })
+}
 
-//     return {
-//       ...anabioResult,
-//       target: [
-//         {
-//           code: anabioResult.target[0].code,
-//           display: anabioHierarchy
-//         }
-//       ]
-//     }
-//   })
-// }
+const filterUnwantedData = (biologyHierarchy: any) => {
+  if (!biologyHierarchy) {
+    return []
+  }
+  return biologyHierarchy.filter(
+    (biologyItem: any) =>
+      biologyItem.id !== '527941' &&
+      biologyItem.id !== '547289' &&
+      biologyItem.id !== '528247' &&
+      biologyItem.id !== '981945' &&
+      biologyItem.id !== '834019' &&
+      biologyItem.id !== '528310' &&
+      biologyItem.id !== '528049' &&
+      biologyItem.id !== '527570' &&
+      biologyItem.id !== '527614'
+  )
+}
 
 export const fetchBiologyHierarchy = async (biologyParent?: string) => {
   if (!biologyParent) {
@@ -132,7 +162,9 @@ export const fetchBiologyHierarchy = async (biologyParent?: string) => {
           }))
         : []
 
-    return [{ id: '*', label: 'Toute la hiérarchie de Biologie', subItems: [...observationList] }]
+    const cleanObservationList = filterUnwantedData(observationList)
+
+    return [{ id: '*', label: 'Toute la hiérarchie de Biologie', subItems: [...cleanObservationList] }]
   } else {
     const json = {
       resourceType: 'ValueSet',
