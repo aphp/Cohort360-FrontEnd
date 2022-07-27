@@ -1,4 +1,4 @@
-module.exports = class CommonCohorts {
+module.exports = class CommonRequests {
 
     // Blocs "Mes requêtes" & "Mes dernières requêtes créées"
     // ----------------------------------------------------------------
