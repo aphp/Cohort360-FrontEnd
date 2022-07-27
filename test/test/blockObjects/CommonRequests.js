@@ -6,5 +6,5 @@ module.exports = class CommonRequests {
     get tableHeaderTitleValue () { return 'Titre' }
     get tableHeaderModificationDateValue () { return 'Date de modification' }
     get tableHeaderValue () { return this.tableHeaderTitleValue + ' | ' + this.tableHeaderModificationDateValue}
-    get noRequestMessageValue () { return 'Aucune requêtes à afficher' }
+    get noRequestMessageValue () { return 'Aucune requête à afficher' }
 }
