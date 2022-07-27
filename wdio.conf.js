@@ -90,8 +90,8 @@ exports.config = {
       // browserName: 'firefox',
       acceptInsecureCerts: true,
       'goog:chromeOptions': {
-        // args: ['--no-sandbox', '--disable-infobars', '--headless', '--disable-gpu', '--window-size=1440,735']
-        args: ['--no-sandbox', '--disable-infobars', /*'--headless',*/ '--disable-gpu', '--window-size=1440,735']
+        args: ['--no-sandbox', '--disable-infobars', '--headless', '--disable-gpu', '--window-size=1440,735']
+        // args: ['--no-sandbox', '--disable-infobars', /*'--headless',*/ '--disable-gpu', '--window-size=1440,735']
       }
       // If outputDir is provided WebdriverIO can capture driver session logs
       // it is possible to configure which logTypes to include/exclude.
