@@ -122,9 +122,9 @@ describe("Cohort360 - SCP01 - Page d'accueil", () => {
   		Logger.log('Test 1ère ligne : le bouton "favoris" est clickable')
   		expect(await HomePage.lastCreatedCohortsBlock.tableFirstLineFavoritesButton.isClickable()).withContext('@ Test 1ère ligne : le bouton "favoris" est clickable').toBe(true)
   	} else {
-  		Logger.log('Le tableau des dernières cohortes crées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedCohortsBlock.noCohortMessageValue + '"')
-  		expect(await HomePage.lastCreatedCohortsBlock.noCohortMessage.isDisplayed()).withContext('@ Le tableau des dernières cohortes crées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedCohortsBlock.noCohortMessageValue + '"').toBe(true)
-  		expect(await HomePage.lastCreatedCohortsBlock.noCohortMessage.getText()).withContext('@ Le tableau des dernières cohortes crées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedCohortsBlock.noCohortMessageValue + '"').toBe(HomePage.lastCreatedCohortsBlock.noCohortMessageValue)
+  		Logger.log('Le tableau des dernières cohortes créées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedCohortsBlock.noCohortMessageValue + '"')
+  		expect(await HomePage.lastCreatedCohortsBlock.noCohortMessage.isDisplayed()).withContext('@ Le tableau des dernières cohortes créées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedCohortsBlock.noCohortMessageValue + '"').toBe(true)
+  		expect(await HomePage.lastCreatedCohortsBlock.noCohortMessage.getText()).withContext('@ Le tableau des dernières cohortes créées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedCohortsBlock.noCohortMessageValue + '"').toBe(HomePage.lastCreatedCohortsBlock.noCohortMessageValue)
   	}
   })
 
@@ -152,8 +152,8 @@ describe("Cohort360 - SCP01 - Page d'accueil", () => {
   		expect(await HomePage.lastCreatedRequestsBlock.tableFirstLineEditButton.isClickable()).withContext('@ Test 1ère ligne : le bouton "favoris" est clickable').toBe(true)
   	} else {
   		Logger.log('Le tableau des dernières cohortes crées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedRequestsBlock.noCohortMessageValue + '"')
-  		expect(await HomePage.lastCreatedRequestsBlock.noCohortMessage.isDisplayed()).withContext('@ Le tableau des dernières cohortes crées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedRequestsBlock.noCohortMessageValue + '"').toBe(true)
-  		expect(await HomePage.lastCreatedRequestsBlock.noCohortMessage.getText()).withContext('@ Le tableau des dernières cohortes crées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedRequestsBlock.noCohortMessageValue + '"').toBe(HomePage.lastCreatedRequestsBlock.noCohortMessageValue)
+  		expect(await HomePage.lastCreatedRequestsBlock.noCohortMessage.isDisplayed()).withContext('@ Le tableau des dernières cohortes créées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedRequestsBlock.noCohortMessageValue + '"').toBe(true)
+  		expect(await HomePage.lastCreatedRequestsBlock.noCohortMessage.getText()).withContext('@ Le tableau des dernières cohortes créées n\'est pas affiché, affichage du message "' + HomePage.lastCreatedRequestsBlock.noCohortMessageValue + '"').toBe(HomePage.lastCreatedRequestsBlock.noCohortMessageValue)
   	}
 
   })
