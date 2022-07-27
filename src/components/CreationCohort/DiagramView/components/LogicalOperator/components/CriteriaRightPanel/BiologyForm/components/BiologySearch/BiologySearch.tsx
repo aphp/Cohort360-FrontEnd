@@ -32,7 +32,6 @@ type BiologySearchListItemProps = {
   label: string
   biologyItem: any
   selectedItems?: any[] | null
-  // handleClick: (biologyItem: { id: string; label: string }[] | null) => void
   handleClick: (biologyItem: any) => void
 }
 
@@ -41,11 +40,9 @@ const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
 
   const classes = useStyles()
 
-  // const isSelected = selectedItems ? selectedItems.find(({ code }) => code === biologyItem.target[0].code) : false
   const isSelected = selectedItems
     ? selectedItems.find((item) => item.target[0].code === biologyItem.target[0].code)
     : false
-  // const isSelected = selectedItems ? selectedItems.code === biologyItem.code : false
 
   const handleClickOnList = (biologyItem: any) => {
     const _selectedItems = selectedItems ? [...selectedItems] : []
