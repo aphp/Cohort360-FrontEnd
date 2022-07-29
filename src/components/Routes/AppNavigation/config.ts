@@ -9,6 +9,7 @@ import Scope from 'views/Scope/Scope'
 import Dashboard from 'views/Dashboard/Dashboard'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 import Contact from 'views/Contact/Contact'
+import PageNotFound from 'views/PageNotFound/PageNotFound'
 
 import { ODD_CONTACT } from '../../../constants'
 
@@ -193,6 +194,15 @@ export default [
     name: 'patients/:patientId',
     isPrivate: true,
     component: Patient
+  },
+  /**
+   * Cohort360: 404 - Page Not Found
+   */
+  {
+    path: '*',
+    name: 'page-not-found',
+    isPrivate: false,
+    component: PageNotFound
   },
   /**
    * Cohort360: Contact Page

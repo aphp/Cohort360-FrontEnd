@@ -57,7 +57,6 @@ const AppNavigation = () => (
           />
         )
       })}
-      {/* 404 not found */}
       <Route>
         <Redirect to="/" />
       </Route>
