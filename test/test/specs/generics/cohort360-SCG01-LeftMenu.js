@@ -158,8 +158,11 @@ describe('Cohort360 - SCG01 - Menu gauche', () => {
 		await LeftMenu.open()
 		await LeftMenu.openMyPatientsMenu()
 
+		console.log('await LeftMenu.myPatientsExplorePerimeterLink.isDisplayed()', await LeftMenu.myPatientsExplorePerimeterLink.isDisplayed())
+		console.log('await LeftMenu.myPatientsExplorePerimeterLink.isClickable()', await LeftMenu.myPatientsExplorePerimeterLink.isClickable())
+
 		Logger.log('Affichage du lien "Explorer un périmètre"')
-		expect(await LeftMenu.myPatientsAllLink.isDisplayed() && await LeftMenu.myPatientsAllLink.isClickable()).withContext().toBe(true, '@ Affichage du lien "Explorer un périmètre"')		
+		expect(await LeftMenu.myPatientsExplorePerimeterLink.isDisplayed() && await LeftMenu.myPatientsExplorePerimeterLink.isClickable()).withContext().toBe(true, '@ Affichage du lien "Explorer un périmètre"')		
 		
 		Logger.log('Accès à la page "Explorer un périmètre"')
 		await LeftMenu.myPatientsExplorePerimeterLink.click()

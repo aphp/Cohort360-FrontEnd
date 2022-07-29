@@ -31,7 +31,7 @@ import {
   fetchPrescriptionTypes,
   fetchAdministrations
 } from './cohortCreation/fetchMedication'
-import { fetchBiologyData, fetchBiologyHierarchy } from './cohortCreation/fetchObservation'
+import { fetchBiologySearch, fetchBiologyData, fetchBiologyHierarchy } from './cohortCreation/fetchObservation'
 
 export interface IServiceCohortCreation {
   /**
@@ -89,6 +89,7 @@ export interface IServiceCohortCreation {
   fetchAdministrations: () => Promise<any>
   fetchBiologyData: () => Promise<any>
   fetchBiologyHierarchy: (biologyParent?: string) => Promise<any>
+  fetchBiologySearch: (searchInput: string) => Promise<{ anabio: any; loinc: any }>
 }
 
 const servicesCohortCreation: IServiceCohortCreation = {
@@ -261,7 +262,8 @@ const servicesCohortCreation: IServiceCohortCreation = {
   fetchPrescriptionTypes: fetchPrescriptionTypes,
   fetchAdministrations: fetchAdministrations,
   fetchBiologyData: fetchBiologyData,
-  fetchBiologyHierarchy: fetchBiologyHierarchy
+  fetchBiologyHierarchy: fetchBiologyHierarchy,
+  fetchBiologySearch: fetchBiologySearch
 }
 
 export default servicesCohortCreation

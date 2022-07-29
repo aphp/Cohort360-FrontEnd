@@ -102,10 +102,17 @@ const Welcome: React.FC = () => {
       })}
     >
       <Container maxWidth="lg" className={classes.container}>
-        <Typography component="h1" variant="h1" color="inherit" noWrap className={classes.title}>
+        <Typography id="homePage-title" component="h1" variant="h1" color="inherit" noWrap className={classes.title}>
           Bienvenue {practitioner.displayName}
         </Typography>
-        <Typography component="h6" variant="h6" color="inherit" noWrap className={classes.subtitle}>
+        <Typography
+          id="last-connection"
+          component="h6"
+          variant="h6"
+          color="inherit"
+          noWrap
+          className={classes.subtitle}
+        >
           {lastConnection}
         </Typography>
       </Container>

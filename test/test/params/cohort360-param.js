@@ -5,17 +5,17 @@ const URL = process.env.COHORT360_URL_TEST
 const LOGIN = process.env.COHORT360_LOGIN
 const PASSWORD = process.env.COHORT360_PASSWORD
 
-const HOME_PAGE_PATH = 'accueil'
-const EXPLORE_PERIMETER_PAGE_PATH = 'perimetre'
-const MY_PATIENTS_PAGE_PATH = 'mes_patients'
+const HOME_PAGE_PATH = 'home'
+const EXPLORE_PERIMETER_PAGE_PATH = 'perimeter'
+const MY_PATIENTS_PAGE_PATH = 'my-patients'
 const NEW_COHORT_PAGE_PATH = 'cohort/new'
-const SAVED_COHORTS_PAGE_PATH = 'recherche_sauvegarde'
-const SEARCH_PATIENT_PAGE_PATH = 'rechercher_patient'
-const PATIENT_DATAS_PAGE_PATH = 'mes_patients/patients'
-const PATIENT_DOCUMENTS_PAGE_PATH = 'mes_patients/documents'
+const SAVED_COHORTS_PAGE_PATH = 'my-cohorts'
+const SEARCH_PATIENT_PAGE_PATH = 'patient-search'
+const PATIENT_DATAS_PAGE_PATH = 'my_patients/patients'
+const PATIENT_DOCUMENTS_PAGE_PATH = 'my_patients/documents'
 const PATIENT_DETAIL_PAGE_PATH = 'patients'
-const EXPLORE_PERIMETER_PATIENT_DATAS_PAGE_PATH = 'perimetres/patients'
-const MY_RESEARCH_PROJECTS_PAGE_PATH = 'mes_projets'
+const EXPLORE_PERIMETER_PATIENT_DATAS_PAGE_PATH = 'perimeters/patients'
+const MY_RESEARCH_PROJECTS_PAGE_PATH = 'my-requests'
 // const _PAGE_PATH = ''
 
 const MAX_LINE = 20
