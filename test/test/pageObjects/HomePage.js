@@ -6,13 +6,14 @@ const NewsBlock = require('../blockObjects/News')
 const TutorialBlock = require('../blockObjects/Tutorial')
 const FavoriteCohortsBlock = require('../blockObjects/FavoriteCohorts')
 const LastCreatedCohortsBlock = require('../blockObjects/LastCreatedCohorts')
+const LastCreatedRequestsBlock = require('../blockObjects/LastCreatedRequests')
 
 class HomePage extends Page {
     
     get path () { return COHORT360_PARAMS.HOME_PAGE_PATH }
 
-    get welcomeMessage () { return $('h1*=Bienvenue') }
-    get lastConnectionMessage () { return $('h6.MuiTypography-root') }
+    get welcomeMessage () { return $('#homePage-title') }
+    get lastConnectionMessage () { return $('#last-connection') }
     
     // Bloc "Patients pris en charge"
     get patientBlock () { return PatientBlock }
@@ -34,6 +35,9 @@ class HomePage extends Page {
     
     // Bloc "Mes dernières cohortes créées"
     get lastCreatedCohortsBlock () { return LastCreatedCohortsBlock } 
+
+    // Bloc "Mes dernières requêtes créées"
+    get lastCreatedRequestsBlock () { return LastCreatedRequestsBlock } 
     
     open () {
         return super.open(this.path)

@@ -102,10 +102,17 @@ const Welcome: React.FC = () => {
       })}
     >
       <Container maxWidth="lg" className={classes.container}>
-        <Typography component="h1" variant="h1" color="inherit" noWrap className={classes.title}>
+        <Typography id="homePage-title" component="h1" variant="h1" color="inherit" noWrap className={classes.title}>
           Bienvenue {practitioner.displayName}
         </Typography>
-        <Typography component="h6" variant="h6" color="inherit" noWrap className={classes.subtitle}>
+        <Typography
+          id="last-connection"
+          component="h6"
+          variant="h6"
+          color="inherit"
+          noWrap
+          className={classes.subtitle}
+        >
           {lastConnection}
         </Typography>
       </Container>
@@ -118,8 +125,8 @@ const Welcome: React.FC = () => {
         <Grid container spacing={1}>
           {maintenanceIsActive && (
             <Alert severity="warning" style={{ marginTop: '-12px', width: '100%' }}>
-              Une maintenance est en cours. Seule la consultation des cohorts, requetes et données patients est activée.
-              Toute création, édition et suppression de cohort/requete est desactivées.
+              Une maintenance est en cours. Seule la consultation des cohortes, requêtes et données patients est
+              activée. Toute création, édition et suppression de cohorte/requête est desactivée.
             </Alert>
           )}
 

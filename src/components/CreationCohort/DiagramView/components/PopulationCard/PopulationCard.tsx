@@ -16,6 +16,7 @@ import { MeState } from 'state/me'
 
 import { ScopeTreeRow } from 'types'
 import { getSelectedScopes, filterScopeTree } from 'utils/scopeTree'
+import servicesPerimeters from 'services/contextAphp/servicePerimeters'
 
 import useStyles from './styles'
 
@@ -46,7 +47,7 @@ const PopulationCard: React.FC = () => {
   const [openDrawer, onChangeOpenDrawer] = useState(false)
   const [rightError, setRightError] = useState(false)
 
-  const submitPopulation = (_selectedPopulations: ScopeTreeRow[] | null) => {
+  const submitPopulation = async (_selectedPopulations: ScopeTreeRow[] | null) => {
     if (_selectedPopulations === null) return
 
     _selectedPopulations = filterScopeTree(_selectedPopulations)
@@ -55,7 +56,9 @@ const PopulationCard: React.FC = () => {
       subItems: []
     }))
 
-    dispatch<any>(buildCohortCreation({ selectedPopulation: _selectedPopulations }))
+    const allowSearchIpp = await servicesPerimeters.allowSearchIpp(_selectedPopulations)
+
+    dispatch<any>(buildCohortCreation({ selectedPopulation: _selectedPopulations, allowSearchIpp: allowSearchIpp }))
     onChangeOpenDrawer(false)
   }
 

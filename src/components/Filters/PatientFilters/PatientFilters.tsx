@@ -34,6 +34,8 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit
   const [_birthdates, setBirthdates] = useState<[string, string]>(filters.birthdates)
   const [_vitalStatus, setVitalStatus] = useState<VitalStatus>(filters.vitalStatus)
 
+  const [error, setError] = useState(false)
+
   useEffect(() => {
     setGender(filters.gender)
     setBirthdates(filters.birthdates)
@@ -73,6 +75,8 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit
         </Grid>
         <Grid container direction="column" className={classes.filter}>
           <InputAgeRange
+            error={error}
+            setError={setError}
             birthdates={_birthdates}
             onChangeBirthdates={(newBirthdates: [string, string]) => setBirthdates(newBirthdates)}
           />
@@ -91,7 +95,7 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit
         <Button onClick={onClose} color="primary">
           Annuler
         </Button>
-        <Button onClick={_onSubmit} color="primary">
+        <Button onClick={_onSubmit} color="primary" disabled={error}>
           Valider
         </Button>
       </DialogActions>

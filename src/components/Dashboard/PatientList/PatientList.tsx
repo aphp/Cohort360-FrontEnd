@@ -109,6 +109,7 @@ const PatientList: React.FC<PatientListProps> = ({
       filters.vitalStatus,
       order.orderBy,
       order.orderDirection,
+      deidentified ?? true,
       groupId,
       includeFacets
     )

@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 import {
   CohortComposition,
   CohortData,
@@ -71,6 +73,7 @@ export interface IServiceCohorts {
    *   - vitalStatus: Permet le filtre par status vital
    *   - sortBy: Permet le tri
    *   - sortDirection: Permet le tri dans l'ordre croissant ou décroissant
+   *   - deidentified: savoir si la liste de patients est pseudonymisée ou non
    *   - groupId: (optionnel) Périmètre auquel la cohorte est lié
    *   - includeFacets: = true si vous voulez inclure les graphique
    *
@@ -89,6 +92,7 @@ export interface IServiceCohorts {
     vitalStatus: VitalStatus,
     sortBy: string,
     sortDirection: string,
+    deidentified: boolean,
     groupId?: string,
     includeFacets?: boolean
   ) => Promise<
@@ -293,6 +297,7 @@ const servicesCohorts: IServiceCohorts = {
     vitalStatus,
     sortBy,
     sortDirection,
+    deidentified,
     groupId,
     includeFacets
   ) => {
@@ -305,6 +310,10 @@ const servicesCohorts: IServiceCohorts = {
       _searchInput = _searchInput ? `${_searchInput} AND "${_search}"` : `"${_search}"`
     }
 
+    // convert birthdates into days or months depending of if it's a deidentified perimeter or not
+    const minBirthdate = Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
+    const maxBirthdate = Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
+
     const patientsResp = await fetchPatient({
       size: 20,
       offset: page ? (page - 1) * 20 : 0,
@@ -316,9 +325,10 @@ const servicesCohorts: IServiceCohorts = {
         gender === PatientGenderKind._unknown ? '' : gender === PatientGenderKind._other ? `other,unknown` : gender,
       searchBy,
       _text: _searchInput,
-      minBirthdate: birthdates[0],
-      maxBirthdate: birthdates[1],
-      deceased: vitalStatus !== VitalStatus.all ? (vitalStatus === VitalStatus.deceased ? true : false) : undefined
+      minBirthdate: minBirthdate,
+      maxBirthdate: maxBirthdate,
+      deceased: vitalStatus !== VitalStatus.all ? (vitalStatus === VitalStatus.deceased ? true : false) : undefined,
+      deidentified: deidentified
     })
 
     const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0

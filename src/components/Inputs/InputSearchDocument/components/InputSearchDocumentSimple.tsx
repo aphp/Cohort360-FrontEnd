@@ -18,7 +18,8 @@ type InputSearchDocumentSimpleProps = {
   noInfoIcon?: boolean
   noClearIcon?: boolean
   noSearchIcon?: boolean
-  sqareInput?: boolean
+  squareInput?: boolean
+  minRows?: number
 }
 const InputSearchDocumentSimple: React.FC<InputSearchDocumentSimpleProps> = ({
   placeholder,
@@ -60,13 +61,18 @@ const InputSearchDocumentSimple: React.FC<InputSearchDocumentSimpleProps> = ({
 
   return (
     <>
-      <Grid container item className={props.sqareInput ? classes.gridAdvancedSearchSqared : classes.gridAdvancedSearch}>
+      <Grid
+        container
+        item
+        className={props.squareInput ? classes.gridAdvancedSearchSqared : classes.gridAdvancedSearch}
+      >
         <InputBase
           fullWidth
           placeholder={placeholder ?? 'Recherche dans les documents'}
           value={searchInput}
           onChange={handleChangeInput}
           multiline
+          minRows={props.minRows ?? 1}
           onKeyDown={onKeyDown}
           endAdornment={
             <InputAdornment position="end">

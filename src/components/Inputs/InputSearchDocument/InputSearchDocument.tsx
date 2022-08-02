@@ -17,7 +17,7 @@ type InputSearchDocumentProps = {
   noInfoIcon?: boolean
   noClearIcon?: boolean
   noSearchIcon?: boolean
-  sqareInput?: boolean
+  squareInput?: boolean
 }
 const InputSearchDocument: React.FC<InputSearchDocumentProps> = ({ ...props }) => {
   return (

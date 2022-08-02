@@ -14,7 +14,8 @@ import {
   IObservation,
   IMedicationRequest,
   IMedicationAdministration,
-  PatientGenderKind
+  PatientGenderKind,
+  IExtension
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 export interface TypedEntry<T extends IResourceList> extends IBundle_Entry {
@@ -230,6 +231,7 @@ export type ScopeTreeRow = {
   quantity: number
   parentId?: string
   subItems: ScopeTreeRow[]
+  extension?: IExtension[]
   managingEntity?: any | undefined
 }
 
@@ -359,6 +361,7 @@ export type SelectedCriteriaType = {
   | DocumentDataType
   | MedicationDataType
   | ObservationDataType
+  | IPPListDataType
 )
 
 export type CcamDataType = {
@@ -398,6 +401,13 @@ export type DemographicDataType = {
   vitalStatus: { id: string; label: string }[] | null
   ageType: { id: string; label: string } | null
   years: [number, number]
+  isInclusive?: boolean
+}
+
+export type IPPListDataType = {
+  title: string
+  type: 'IPPList'
+  search: string
   isInclusive?: boolean
 }
 
