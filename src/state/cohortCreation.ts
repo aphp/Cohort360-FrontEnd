@@ -245,7 +245,7 @@ type BuildCohortParams = {
 }
 const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParams, { state: RootState }>(
   'cohortCreation/build',
-  async ({ selectedPopulation, allowSearchIpp }, { getState, dispatch }) => {
+  async ({ selectedPopulation }, { getState, dispatch }) => {
     try {
       const state: any = getState()
 
@@ -272,6 +272,11 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
             requestId: saveJsonResponse.payload.requestId
           })
         )
+      }
+
+      let allowSearchIpp = false
+      if (_selectedPopulation) {
+        allowSearchIpp = await services.perimeters.allowSearchIpp(_selectedPopulation as ScopeTreeRow[])
       }
 
       return {
