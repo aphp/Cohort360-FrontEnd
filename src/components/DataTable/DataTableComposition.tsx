@@ -133,6 +133,7 @@ const DataTableCompositionLine: React.FC<{
   const documentId = document.id
   const title = document.title
   const status = document.status
+  const event = document.event
   const ipp = deidentified ? document.idPatient : document.IPP
   const nda = document.NDA ?? '-'
   const serviceProvider = document.serviceProvider ?? 'Non renseigné'
@@ -198,8 +199,8 @@ const DataTableCompositionLine: React.FC<{
         </TableCell>
 
         <TableCell>
-          <IconButton onClick={() => setOpen(documentId ?? '')}>
-            <PdfIcon height="30px" fill="#ED6D91" />
+          <IconButton onClick={() => setOpen(documentId ?? '')} disabled={event === undefined}>
+            <PdfIcon height="30px" fill={event === undefined ? '#CBCFCF' : '#ED6D91'} />
           </IconButton>
 
           <DocumentViewer

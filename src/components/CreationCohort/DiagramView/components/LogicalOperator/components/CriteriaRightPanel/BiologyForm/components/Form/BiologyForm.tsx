@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import {
   Button,
+  Chip,
   Divider,
   FormLabel,
   Grid,
@@ -17,8 +18,6 @@ import Alert from '@material-ui/lab/Alert'
 
 import InfoIcon from '@material-ui/icons/Info'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
-
-import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
@@ -49,12 +48,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
     onChangeSelectedCriteria(selectedCriteria)
   }
 
-  const getBiologyOptions = async (searchValue: string) => {
-    const biologyOptions = await criteria.fetch.fetchBiologyData(searchValue, false)
-
-    return biologyOptions && biologyOptions.length > 0 ? biologyOptions : []
-  }
-
   const defaultValuesCode = selectedCriteria.code
     ? selectedCriteria.code.map((code: any) => {
         const criteriaCode = criteria.data.biologyData
@@ -82,7 +75,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       }
     }
 
-    if (selectedCriteria.code.length === 1) {
+    if (selectedCriteria?.code.length === 1) {
       checkChildren()
     } else {
       onChangeValue('isLeaf', false)
@@ -106,7 +99,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner un champs</Alert>}
+        {error && <Alert severity="error">Merci de renseigner un champ</Alert>}
 
         {!error && !multiFields && (
           <Alert
@@ -121,9 +114,9 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
         )}
 
         <Alert severity="warning">
-          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondant aux analyses les
+          Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondants aux analyses les
           plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses
-          quantitatives enregistrées sur GLIMS, qui ont été validés et mis à jour depuis mars 2020.
+          quantitatives enregistrées sur GLIMS, qui ont été validées et mises à jour depuis mars 2020.
         </Alert>
 
         <Grid className={classes.inputContainer} container>
@@ -155,19 +148,37 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             />
           </Grid>
 
-          <AutocompleteAsync
-            multiple
-            label="Codes de biologie"
-            variant="outlined"
-            noOptionsText="Veuillez entrer un code ou un libellé"
-            className={classes.inputItem}
-            autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteria?.data?.biologyData || []}
-            getAutocompleteOptions={getBiologyOptions}
-            onChange={(e, value) => onChangeValue('code', value)}
-          />
-
           <Grid className={classes.inputContainer}>
+            <Typography variant="h6">Codes de biologie</Typography>
+
+            <Grid container item style={{ margin: '1em 0px', width: 'calc(100%-2em)' }}>
+              {defaultValuesCode.length > 0 ? (
+                defaultValuesCode.map((valueCode: any, index: number) => (
+                  <Chip
+                    key={index}
+                    style={{ margin: 3 }}
+                    label={
+                      <Tooltip title={valueCode.label}>
+                        <Typography style={{ maxWidth: 500 }} noWrap>
+                          {valueCode.label}
+                        </Typography>
+                      </Tooltip>
+                    }
+                    onDelete={() =>
+                      onChangeValue(
+                        'code',
+                        defaultValuesCode.filter((code: any) => code !== valueCode)
+                      )
+                    }
+                  />
+                ))
+              ) : (
+                <FormLabel style={{ margin: 'auto 1em' }} component="legend">
+                  Veuillez ajouter des codes de biologie via les onglets Hiérarchie ou Recherche.
+                </FormLabel>
+              )}
+            </Grid>
+
             <Grid item container direction="row" alignItems="center">
               <Typography variant="h6">Recherche par valeur</Typography>
               <Tooltip
@@ -182,7 +193,8 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
               style={{
                 display: 'grid',
                 gridTemplateColumns: selectedCriteria.valueComparator === '<x>' ? '100px 1fr 1fr' : '100px 1fr',
-                alignItems: 'center'
+                alignItems: 'center',
+                marginTop: '1em'
               }}
             >
               <Select

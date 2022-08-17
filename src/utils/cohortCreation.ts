@@ -8,6 +8,10 @@ import { docTypes } from 'assets/docTypes.json'
 
 const REQUETEUR_VERSION = 'v1.2.1'
 
+// TODO: à changer quand ticket fhir ok vvvvv
+const RESSOURCE_TYPE_IPP_LIST: 'IPPList' = 'IPPList'
+const IPP_LIST_FHIR = 'identifier-simple'
+
 const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
 const PATIENT_GENDER = 'gender' // ok
 const PATIENT_BIRTHDATE = 'age-day' // ok
@@ -30,12 +34,15 @@ const ENCOUNTER_ADMISSION = 'reason-code' // ok
 
 const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
 const CLAIM_CODE = 'codeList' // ok
+const CLAIM_CODE_ALL_HIERARCHY = 'code'
 
 const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
 const PROCEDURE_CODE = 'codeList' // ok
+const PROCEDURE_CODE_ALL_HIERARCHY = 'code'
 
 const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition' // ok
 const CONDITION_CODE = 'codeList' // ok
+const CONDITION_CODE_ALL_HIERARCHY = 'code'
 const CONDITION_TYPE = 'type' // ok
 
 const RESSOURCE_TYPE_COMPOSITION: 'Composition' = 'Composition'
@@ -45,12 +52,14 @@ const COMPOSITION_TYPE = 'type' // ok
 const RESSOURCE_TYPE_MEDICATION_REQUEST: 'MedicationRequest' = 'MedicationRequest' // = Prescription
 const RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: 'MedicationAdministration' = 'MedicationAdministration' // = Administration
 const MEDICATION_CODE = 'hierarchy-ATC' // ok
+const MEDICATION_CODE_ALL_HIERARCHY = 'medication-simple'
 // const MEDICATION_UCD = 'code_id' // ok
 const MEDICATION_PRESCRIPTION_TYPE = 'type' // ok
 const MEDICATION_ADMINISTRATION = 'route' // ok
 
 const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
-const OBSERVATION_CODE = 'codeList'
+const OBSERVATION_CODE = 'part-of'
+const OBSERVATION_CODE_ALL_HIERARCHY = 'code'
 const OBSERVATION_VALUE = 'value-quantity-value'
 
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
@@ -86,6 +95,7 @@ type RequeteurCriteriaType = {
     | typeof RESSOURCE_TYPE_MEDICATION_REQUEST
     | typeof RESSOURCE_TYPE_MEDICATION_ADMINISTRATION
     | typeof RESSOURCE_TYPE_OBSERVATION
+    | typeof RESSOURCE_TYPE_IPP_LIST
   filterFhir: string
   occurrence?: {
     n: number
@@ -320,7 +330,21 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       filterFhir = [
         `status=final&type:not=doc-impor&empty=false`,
         `${criterion.search ? `${COMPOSITION_TEXT}=${encodeURIComponent(criterion.search)}` : ''}`,
-        `${criterion.regex_search ? `${COMPOSITION_TEXT}=${encodeURIComponent(`/${criterion.regex_search}/`)}` : ''}`,
+        `${
+          criterion.regex_search
+            ? `${COMPOSITION_TEXT}=${encodeURIComponent(
+                `/(.)*${criterion.regex_search.replace(/[/"]/g, function (m) {
+                  switch (m) {
+                    case '/':
+                      return '\\/'
+                    case '"':
+                      return '\\"'
+                  }
+                  return m
+                })}(.)*/`
+              )}`
+            : ''
+        }`,
         `${
           criterion.docType && criterion.docType.length > 0
             ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: any) => docType.id).reduce(searchReducer)}`
@@ -336,7 +360,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
-            ? `${CONDITION_CODE}=${criterion.code.map((code: any) => code.id).reduce(searchReducer)}`
+            ? criterion.code.find((code) => code.id === '*')
+              ? `${CONDITION_CODE_ALL_HIERARCHY}=*`
+              : `${CONDITION_CODE}=${criterion.code.map((code: any) => code.id).reduce(searchReducer)}`
             : ''
         }`,
         `${
@@ -356,9 +382,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
-            ? `${PROCEDURE_CODE}=${criterion.code
-                .map((diagnosticType: any) => diagnosticType.id)
-                .reduce(searchReducer)}`
+            ? criterion.code.find((code) => code.id === '*')
+              ? `${PROCEDURE_CODE_ALL_HIERARCHY}=*`
+              : `${PROCEDURE_CODE}=${criterion.code
+                  .map((diagnosticType: any) => diagnosticType.id)
+                  .reduce(searchReducer)}`
             : ''
         }`
       ]
@@ -371,7 +399,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
-            ? `${CLAIM_CODE}=${criterion.code.map((diagnosticType: any) => diagnosticType.id).reduce(searchReducer)}`
+            ? criterion.code.find((code) => code.id === '*')
+              ? `${CLAIM_CODE_ALL_HIERARCHY}=*`
+              : `${CLAIM_CODE}=${criterion.code.map((diagnosticType: any) => diagnosticType.id).reduce(searchReducer)}`
             : ''
         }`
       ]
@@ -385,9 +415,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
-            ? `${MEDICATION_CODE}=${criterion.code
-                .map((diagnosticType: any) => diagnosticType.id)
-                .reduce(searchReducer)}`
+            ? criterion.code.find((code) => code.id === '*')
+              ? `${MEDICATION_CODE_ALL_HIERARCHY}=*`
+              : `${MEDICATION_CODE}=${criterion.code
+                  .map((diagnosticType: any) => diagnosticType.id)
+                  .reduce(searchReducer)}`
             : ''
         }`,
         `${
@@ -440,9 +472,11 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       filterFhir = [
         `${
           criterion.code && criterion.code.length > 0
-            ? `${OBSERVATION_CODE}=${criterion.code
-                .map((diagnosticType: any) => diagnosticType.id)
-                .reduce(searchReducer)}`
+            ? criterion.code.find((code) => code.id === '*')
+              ? `${OBSERVATION_CODE_ALL_HIERARCHY}=*`
+              : `${OBSERVATION_CODE}=${criterion.code
+                  .map((diagnosticType: any) => diagnosticType.id)
+                  .reduce(searchReducer)}`
             : ''
         }`,
         `${
@@ -457,6 +491,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
             : ''
         }`
       ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
+      break
+    }
+
+    case RESSOURCE_TYPE_IPP_LIST: {
+      filterFhir = [`${criterion.search ? `${IPP_LIST_FHIR}=${criterion.search}` : ''}`]
         .filter((elem) => elem)
         .reduce(filterReducer)
       break
@@ -495,14 +536,22 @@ export function buildRequest(
           resourceType: item.type ?? RESSOURCE_TYPE_PATIENT,
           filterFhir: constructFilterFhir(item),
           occurrence:
-            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_ENCOUNTER) && item.occurrence
+            !(
+              item.type === RESSOURCE_TYPE_PATIENT ||
+              item.type === RESSOURCE_TYPE_ENCOUNTER ||
+              item.type === RESSOURCE_TYPE_IPP_LIST
+            ) && item.occurrence
               ? {
                   n: item.occurrence,
                   operator: item?.occurrenceComparator
                 }
               : undefined,
           dateRangeList:
-            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_ENCOUNTER) &&
+            !(
+              item.type === RESSOURCE_TYPE_PATIENT ||
+              item.type === RESSOURCE_TYPE_ENCOUNTER ||
+              item.type === RESSOURCE_TYPE_IPP_LIST
+            ) &&
             (item.startOccurrence || item.endOccurrence)
               ? [
                   {
@@ -516,10 +565,7 @@ export function buildRequest(
                 ]
               : undefined,
           encounterDateRange:
-            item.type !== RESSOURCE_TYPE_PATIENT &&
-            item.type !== RESSOURCE_TYPE_MEDICATION_ADMINISTRATION &&
-            item.type !== RESSOURCE_TYPE_MEDICATION_REQUEST &&
-            item.type !== RESSOURCE_TYPE_OBSERVATION &&
+            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_IPP_LIST) &&
             (item.encounterStartDate || item.encounterEndDate)
               ? {
                   minDate: item.encounterStartDate
@@ -613,7 +659,7 @@ export async function unbuildRequest(_json: string) {
   } = json
 
   /**
-   * Retrieve popultion
+   * Retrieve population
    */
   if (typeof services.perimeters.fetchPerimeterInfoForRequeteur !== 'function') {
     return {
@@ -995,7 +1041,7 @@ export async function unbuildRequest(_json: string) {
 
         if (element.filterFhir) {
           const filters = element.filterFhir
-            // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
+            // This `replaceAll` is necessary because if a user searches `_text=first && second` we have a bug with filterFhir.split('&')
             .split('&')
             .map((elem) => elem.split('='))
 
@@ -1075,6 +1121,7 @@ export async function unbuildRequest(_json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
+              case CONDITION_CODE_ALL_HIERARCHY:
               case CONDITION_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
@@ -1131,6 +1178,7 @@ export async function unbuildRequest(_json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
+              case PROCEDURE_CODE_ALL_HIERARCHY:
               case PROCEDURE_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
@@ -1176,6 +1224,7 @@ export async function unbuildRequest(_json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
+              case CLAIM_CODE_ALL_HIERARCHY:
               case CLAIM_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
@@ -1213,6 +1262,11 @@ export async function unbuildRequest(_json: string) {
           currentCriterion.endOccurrence = element.dateRangeList[0].maxDate?.replace('T00:00:00Z', '') ?? null
         }
 
+        if (element.encounterDateRange) {
+          currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null
+          currentCriterion.encounterEndDate = element.encounterDateRange.maxDate?.replace('T00:00:00Z', '') ?? null
+        }
+
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
@@ -1220,6 +1274,7 @@ export async function unbuildRequest(_json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
+              case MEDICATION_CODE_ALL_HIERARCHY:
               case MEDICATION_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
@@ -1295,6 +1350,7 @@ export async function unbuildRequest(_json: string) {
             const value = filter ? filter[1] : null
 
             switch (key) {
+              case OBSERVATION_CODE_ALL_HIERARCHY:
               case OBSERVATION_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
@@ -1362,9 +1418,35 @@ export async function unbuildRequest(_json: string) {
         }
         break
       }
+      case RESSOURCE_TYPE_IPP_LIST: {
+        currentCriterion.title = 'Critère de liste IPP'
+        currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
+
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+
+          for (const filter of filters) {
+            const key = filter ? filter[0] : null
+            const value = filter ? filter[1] : null
+
+            switch (key) {
+              case IPP_LIST_FHIR: {
+                currentCriterion.search = value ?? ''
+                break
+              }
+              default:
+                currentCriterion.error = true
+                break
+            }
+          }
+        }
+        break
+      }
+
       default:
         break
     }
+
     return currentCriterion
   }
 
@@ -1384,23 +1466,26 @@ export async function unbuildRequest(_json: string) {
     _criteriaGroup
   ) =>
     _criteriaGroup && _criteriaGroup.length > 0
-      ? _criteriaGroup.map((groupItem: any) => ({
-          id: groupItem._id,
-          title: 'Groupe de critère',
-          criteriaIds:
-            groupItem.criteria && groupItem.criteria.length > 0
-              ? groupItem.criteria.map((criteria: RequeteurCriteriaType | RequeteurGroupType) => criteria._id)
-              : [],
-          isSubGroup: groupItem.isSubItem,
-          isInclusive: groupItem.isInclusive,
-          type: groupItem._type
-        }))
+      ? _criteriaGroup
+          .map((groupItem: any) => ({
+            id: groupItem._id,
+            title: 'Groupe de critère',
+            criteriaIds:
+              groupItem.criteria && groupItem.criteria.length > 0
+                ? groupItem.criteria.map((criteria: RequeteurCriteriaType | RequeteurGroupType) => criteria._id)
+                : [],
+            isSubGroup: groupItem.isSubItem,
+            isInclusive: groupItem.isInclusive,
+            type: groupItem._type
+          }))
+          .sort((prev, next) => next.id - prev.id)
       : []
 
   let _criteriaGroup = convertJsonObjectsToCriteriaGroup(criteriaGroup)
   const criteriaGroupSaved = [..._criteriaGroup]
   // Reset Group criteriaIds
   _criteriaGroup = _criteriaGroup.map((item) => ({ ...item, criteriaIds: [] }))
+
   criteriaItems = criteriaItems.map((_criteria, index) => {
     // Get the parent of current critria
     const parentGroup = criteriaGroupSaved.find((itemGroup) =>
@@ -1418,15 +1503,41 @@ export async function unbuildRequest(_json: string) {
     }
     return { ..._criteria, _id: index + 1 }
   })
-  // Re-assign groups
-  _criteriaGroup = _criteriaGroup.map((itemGroup) => {
-    const foundGroupSaved = criteriaGroupSaved.find(({ id }) => id === itemGroup.id)
-    const oldGroupsChildren = foundGroupSaved ? foundGroupSaved.criteriaIds.filter((criteriaId) => +criteriaId < 0) : []
-    return {
-      ...itemGroup,
-      criteriaIds: [...itemGroup.criteriaIds, ...oldGroupsChildren]
+
+  // // Re-assign id and criteria to groups
+  for (let index = 0; index < _criteriaGroup.length; index++) {
+    const _criteriaGroupItem = _criteriaGroup[index]
+    const newId = index * -1
+
+    // Search parent
+    const parentGroup = criteriaGroupSaved.find((itemGroup) =>
+      itemGroup.criteriaIds.find((criteriaId) => criteriaId === _criteriaGroupItem.id)
+    )
+    if (parentGroup) {
+      // Get index
+      const indexOfParent = criteriaGroupSaved.indexOf(parentGroup)
+
+      // Assign the new criteria group identifier to it group parent
+      if (indexOfParent !== -1) {
+        let newCriteriaIds =
+          _criteriaGroup[indexOfParent] && _criteriaGroup[indexOfParent].criteriaIds?.length > 0
+            ? _criteriaGroup[indexOfParent].criteriaIds
+            : criteriaGroupSaved[indexOfParent].criteriaIds
+
+        // Delete old assignment
+        // If ID changes, delete it
+        if (newId !== _criteriaGroupItem.id)
+          newCriteriaIds = newCriteriaIds.filter((elem) => elem !== _criteriaGroupItem.id)
+
+        // Assign new id and filter doublon (parent group)
+        newCriteriaIds = [...newCriteriaIds, newId].filter((item, index, array) => array.indexOf(item) === index)
+        _criteriaGroup[indexOfParent].criteriaIds = newCriteriaIds
+      }
     }
-  })
+
+    // Assign new id (current group)
+    _criteriaGroup[index].id = newId
+  }
 
   // End of unbuild
   return {
@@ -1436,6 +1547,10 @@ export async function unbuildRequest(_json: string) {
   }
 }
 
+/**
+ * This function calls all functions to fetch data contained inside `src/components/CreationCohort/DataList_Criteria` list
+ *
+ */
 export const getDataFromFetch = async (
   _criteria: any,
   selectedCriteria: SelectedCriteriaType[],
@@ -1474,6 +1589,7 @@ export const getDataFromFetch = async (
                   !(
                     currentcriterion.type === RESSOURCE_TYPE_PATIENT ||
                     currentcriterion.type === RESSOURCE_TYPE_ENCOUNTER ||
+                    currentcriterion.type === RESSOURCE_TYPE_IPP_LIST ||
                     currentcriterion.type === RESSOURCE_TYPE_COMPOSITION
                   ) &&
                   currentcriterion.code &&
@@ -1520,4 +1636,64 @@ export const getDataFromFetch = async (
         : []
   }
   return _criteria
+}
+
+export const joinRequest = async (oldJson: string, newJson: string, parentId: number | null) => {
+  const oldRequest = JSON.parse(oldJson) as RequeteurSearchType
+  const newRequest = JSON.parse(newJson) as RequeteurSearchType
+
+  const changeIdOfRequest = (request: any) => {
+    const { criteria } = request
+
+    for (const criterion of criteria) {
+      if (criterion._type === 'basicResource') {
+        criterion._id += 128
+      } else {
+        criterion._id -= 128
+        if (criterion && criterion.criteria && criterion.criteria.length > 0) {
+          criterion.criteria = changeIdOfRequest(criterion)
+        }
+      }
+    }
+    return criteria
+  }
+
+  const criteriaGroupFromNewRequest: RequeteurGroupType = {
+    _id: (newRequest?.request?._id ?? 0) - 128,
+    _type: newRequest.request?._type === 'andGroup' ? 'andGroup' : 'orGroup',
+    isInclusive: true,
+    criteria: changeIdOfRequest(newRequest.request)
+  }
+
+  const fillRequestWithNewRequest = (criterionGroup?: RequeteurGroupType) => {
+    if (!criterionGroup) return criterionGroup
+
+    if (criterionGroup._id === parentId) {
+      criterionGroup.criteria = [...criterionGroup.criteria, criteriaGroupFromNewRequest]
+    }
+
+    if (!criterionGroup.criteria) return criterionGroup
+    const { criteria = [] } = criterionGroup
+    for (let criterion of criteria) {
+      // @ts-ignore
+      if (criterion?._type === 'orGroup' || criterion?._type === 'andGroup') {
+        // @ts-ignore
+        criterion = fillRequestWithNewRequest(criterion)
+      }
+    }
+    return criterionGroup
+  }
+
+  const newJoinedRequest = {
+    ...oldRequest,
+    request: fillRequestWithNewRequest(oldRequest.request)
+  }
+
+  const { population, criteria, criteriaGroup } = await unbuildRequest(JSON.stringify(newJoinedRequest))
+
+  return {
+    json: buildRequest(population, criteria, criteriaGroup, []),
+    criteria,
+    criteriaGroup
+  }
 }

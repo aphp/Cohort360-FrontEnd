@@ -5,6 +5,7 @@ import Grid from '@material-ui/core/Grid'
 import InputSearchDocumentButton from './components/InputSearchDocumentButton'
 import InputSearchDocumentRegex from './components/InputSearchDocumentRegex'
 import InputSearchDocumentSimple from './components/InputSearchDocumentSimple'
+import { ODD_REGEX } from '../../../constants'
 
 type InputSearchDocumentProps = {
   placeholder?: string
@@ -16,7 +17,7 @@ type InputSearchDocumentProps = {
   noInfoIcon?: boolean
   noClearIcon?: boolean
   noSearchIcon?: boolean
-  sqareInput?: boolean
+  squareInput?: boolean
 }
 const InputSearchDocument: React.FC<InputSearchDocumentProps> = ({ ...props }) => {
   return (
@@ -28,10 +29,14 @@ const InputSearchDocument: React.FC<InputSearchDocumentProps> = ({ ...props }) =
 
             {props.defaultInputMode === 'regex' && <InputSearchDocumentRegex {...props} />}
           </Grid>
-
-          <Grid item>
-            <InputSearchDocumentButton currentMode={props.defaultInputMode} onChangeMode={props.setdefaultInputMode} />
-          </Grid>
+          {!!ODD_REGEX && (
+            <Grid item>
+              <InputSearchDocumentButton
+                currentMode={props.defaultInputMode}
+                onChangeMode={props.setdefaultInputMode}
+              />
+            </Grid>
+          )}
         </>
       )}
     </Grid>

@@ -118,7 +118,7 @@ const ModalCreateNewRequest: React.FC<{
     if (onClose && typeof onClose === 'function') {
       onClose()
     } else {
-      history.push(`/accueil`)
+      history.push(`/home`)
     }
   }
 

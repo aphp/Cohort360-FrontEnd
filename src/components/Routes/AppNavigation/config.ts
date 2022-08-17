@@ -1,4 +1,5 @@
 import Login from 'views/Login/Login'
+import { HealthCheck } from 'views/HealthCheck/HealthCheck'
 import Welcome from 'views/Welcome/Welcome'
 import SearchPatient from 'views/SearchPatient/SearchPatient'
 import SavedResearch from 'views/SavedResearch/SavedResearch'
@@ -8,6 +9,7 @@ import Scope from 'views/Scope/Scope'
 import Dashboard from 'views/Dashboard/Dashboard'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 import Contact from 'views/Contact/Contact'
+import PageNotFound from 'views/PageNotFound/PageNotFound'
 
 import { ODD_CONTACT } from '../../../constants'
 
@@ -27,10 +29,16 @@ export default [
   {
     exact: true,
     displaySideBar: true,
-    path: '/accueil',
-    name: 'accueil',
+    path: '/home',
+    name: 'home',
     isPrivate: true,
     component: Welcome
+  },
+  {
+    exact: true,
+    path: '/health-check',
+    name: 'health-check',
+    component: HealthCheck
   },
   /**
    * Cohort360: Research Patient Page
@@ -38,16 +46,16 @@ export default [
   {
     exact: true,
     displaySideBar: true,
-    path: '/rechercher_patient/:search',
-    name: 'rechercher_patient/:search',
+    path: '/patient-search/:search',
+    name: 'patient-search/:search',
     isPrivate: true,
     component: SearchPatient
   },
   {
     exact: true,
     displaySideBar: true,
-    path: '/rechercher_patient',
-    name: 'rechercher_patient',
+    path: '/patient-search',
+    name: 'patient-search',
     isPrivate: true,
     component: SearchPatient
   },
@@ -57,8 +65,8 @@ export default [
   {
     exact: true,
     displaySideBar: true,
-    path: '/perimetre',
-    name: 'perimetre',
+    path: '/perimeter',
+    name: 'perimeter',
     isPrivate: true,
     component: Scope
   },
@@ -68,8 +76,8 @@ export default [
   {
     exact: true,
     displaySideBar: true,
-    path: '/recherche_sauvegarde',
-    name: 'recherche_sauvegarde',
+    path: '/my-cohorts',
+    name: 'my-cohorts',
     isPrivate: true,
     component: SavedResearch
   },
@@ -79,8 +87,8 @@ export default [
   {
     exact: true,
     displaySideBar: true,
-    path: '/mes_projets',
-    name: 'mes_projects',
+    path: '/my-requests',
+    name: 'my-requests',
     isPrivate: true,
     component: MyProjects
   },
@@ -137,16 +145,16 @@ export default [
    */
   {
     displaySideBar: true,
-    path: '/perimetres/:tabName',
-    name: 'perimetres/:tabName',
+    path: '/perimeters/:tabName',
+    name: 'perimeters/:tabName',
     isPrivate: true,
     component: Dashboard,
     context: 'perimeters'
   },
   {
     displaySideBar: true,
-    path: '/perimetres',
-    name: 'perimetres',
+    path: '/perimeters',
+    name: 'perimeters',
     isPrivate: true,
     component: Dashboard,
     context: 'perimeters'
@@ -156,16 +164,16 @@ export default [
    */
   {
     displaySideBar: true,
-    path: '/mes_patients/:tabName',
-    name: 'mes_patients/:tabName',
+    path: '/my-patients/:tabName',
+    name: 'my-patients/:tabName',
     isPrivate: true,
     component: Dashboard,
     context: 'patients'
   },
   {
     displaySideBar: true,
-    path: '/mes_patients',
-    name: 'mes_patients',
+    path: '/my-patients',
+    name: 'my-patients',
     isPrivate: true,
     component: Dashboard,
     context: 'patients'
@@ -186,6 +194,15 @@ export default [
     name: 'patients/:patientId',
     isPrivate: true,
     component: Patient
+  },
+  /**
+   * Cohort360: 404 - Page Not Found
+   */
+  {
+    path: '*',
+    name: 'page-not-found',
+    isPrivate: false,
+    component: PageNotFound
   },
   /**
    * Cohort360: Contact Page

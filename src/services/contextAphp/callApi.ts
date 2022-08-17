@@ -104,8 +104,8 @@ type fetchPatientProps = {
   _sort?: string
   sortDirection?: 'asc' | 'desc'
   gender?: string
-  minBirthdate?: string
-  maxBirthdate?: string
+  minBirthdate?: number
+  maxBirthdate?: number
   searchBy?: string
   _text?: string
   family?: string
@@ -114,6 +114,7 @@ type fetchPatientProps = {
   deceased?: boolean
   pivotFacet?: ('age_gender' | 'deceased_gender')[]
   _elements?: ('id' | 'gender' | 'name' | 'birthDate' | 'deceased' | 'identifier' | 'extension')[]
+  deidentified?: boolean
 }
 export const fetchPatient = async (args: fetchPatientProps) => {
   const {
@@ -130,7 +131,8 @@ export const fetchPatient = async (args: fetchPatientProps) => {
     identifier,
     deceased,
     minBirthdate,
-    maxBirthdate
+    maxBirthdate,
+    deidentified
   } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list, pivotFacet, _elements } = args
@@ -150,8 +152,8 @@ export const fetchPatient = async (args: fetchPatientProps) => {
   if (given)                                       options = [...options, `given=${given}`]                                                     // eslint-disable-line
   if (identifier)                                  options = [...options, `identifier=${identifier}`]                                           // eslint-disable-line
   if (deceased !== undefined)                      options = [...options, `deceased=${deceased}`]                                               // eslint-disable-line
-  if (minBirthdate)                                options = [...options, `birthdate=ge${minBirthdate}`]                                        // eslint-disable-line
-  if (maxBirthdate)                                options = [...options, `birthdate=le${maxBirthdate}`]                                        // eslint-disable-line
+  if (minBirthdate)                                options = [...options, `${deidentified ? 'age-month' : 'age-day'}=le${minBirthdate}`]        // eslint-disable-line
+  if (maxBirthdate)                                options = [...options, `${deidentified ? 'age-month' : 'age-day'}=ge${maxBirthdate}`]        // eslint-disable-line
 
   if (_list && _list.length > 0)                   options = [...options, `_list=${_list.reduce(reducer)}`]                                     // eslint-disable-line
   if (pivotFacet && pivotFacet.length > 0)         options = [...options, `pivotFacet=${pivotFacet.reduce(reducer)}`]                           // eslint-disable-line
@@ -235,7 +237,7 @@ type fetchCompositionProps = {
   'patient.identifier'?: string
   facet?: ('class' | 'visit-year-month-gender-facet')[]
   uniqueFacet?: 'patient'[]
-  _elements?: ('status' | 'type' | 'subject' | 'encounter' | 'date' | 'title')[]
+  _elements?: ('status' | 'type' | 'subject' | 'encounter' | 'date' | 'title' | 'event')[]
 }
 export const fetchComposition = async (args: fetchCompositionProps) => {
   const { _id, size, offset, _sort, sortDirection, type, _text, status, patient, encounter, minDate, maxDate } = args

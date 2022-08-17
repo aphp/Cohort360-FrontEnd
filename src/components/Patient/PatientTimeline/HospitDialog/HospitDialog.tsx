@@ -5,10 +5,6 @@ import DocumentTable from 'components/Patient/PatientTimeline/HospitDialog/Docum
 
 import Pagination from '@material-ui/lab/Pagination'
 
-import {
-  IDocumentReference
-  // IEncounter
-} from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortComposition } from 'types'
 
 import useStyles from './styles'
@@ -17,7 +13,7 @@ type HospitDialogTypes = {
   deidentified: boolean
   open: boolean
   onClose: () => void
-  documents?: (CohortComposition | IDocumentReference)[]
+  documents?: CohortComposition[]
   loading: boolean
 }
 const HospitDialog: React.FC<HospitDialogTypes> = ({ deidentified, open, onClose, documents, loading }) => {

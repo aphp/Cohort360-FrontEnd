@@ -158,8 +158,11 @@ describe('Cohort360 - SCG01 - Menu gauche', () => {
 		await LeftMenu.open()
 		await LeftMenu.openMyPatientsMenu()
 
+		console.log('await LeftMenu.myPatientsExplorePerimeterLink.isDisplayed()', await LeftMenu.myPatientsExplorePerimeterLink.isDisplayed())
+		console.log('await LeftMenu.myPatientsExplorePerimeterLink.isClickable()', await LeftMenu.myPatientsExplorePerimeterLink.isClickable())
+
 		Logger.log('Affichage du lien "Explorer un périmètre"')
-		expect(await LeftMenu.myPatientsAllLink.isDisplayed() && await LeftMenu.myPatientsAllLink.isClickable()).withContext().toBe(true, '@ Affichage du lien "Explorer un périmètre"')		
+		expect(await LeftMenu.myPatientsExplorePerimeterLink.isDisplayed() && await LeftMenu.myPatientsExplorePerimeterLink.isClickable()).withContext().toBe(true, '@ Affichage du lien "Explorer un périmètre"')		
 		
 		Logger.log('Accès à la page "Explorer un périmètre"')
 		await LeftMenu.myPatientsExplorePerimeterLink.click()
@@ -191,17 +194,17 @@ describe('Cohort360 - SCG01 - Menu gauche', () => {
 		await LeftMenu.reduce()
 	})
 
-	it('Mes recherches > Mes projets de recherche', async () => {
+	it('Mes recherches > Mes requêtes', async () => {
 		
 		await LeftMenu.open()
 		await LeftMenu.openMyResearchMenu()
 
-		Logger.log('Affichage du lien "Mes projets de recherche"')
-		expect(await LeftMenu.myResearchProjectLink.isDisplayed() /*&& await LeftMenu.myResearchProjectLink.isClickable()*/).withContext('@ Affichage du lien "Mes projets de recherche"').toBe(true)		
+		Logger.log('Affichage du lien "Mes requêtes"')
+		expect(await LeftMenu.myResearchProjectLink.isDisplayed() /*&& await LeftMenu.myResearchProjectLink.isClickable()*/).withContext('@ Affichage du lien "Mes requêtes"').toBe(true)		
 		
-		Logger.log('Accès à la page "Mes projets de recherche"')
+		Logger.log('Accès à la page "Mes requêtes"')
 		await LeftMenu.myResearchProjectLink.click()
-		expect(await browser.getUrl()).withContext('@ L\'URL de la page "Mes projets de recherche" doit être : ' + MyResearchProjectsPage.getUrl()).toBe(MyResearchProjectsPage.getUrl())
+		expect(await browser.getUrl()).withContext('@ L\'URL de la page "Mes requêtes" doit être : ' + MyResearchProjectsPage.getUrl()).toBe(MyResearchProjectsPage.getUrl())
 		
 		Logger.log('Le titre de la page est : "' + MyResearchProjectsPage.titleValue + '"')
         expect(await MyResearchProjectsPage.title.waitForDisplayed()).withContext('@ Le titre de la page est : "' + MyResearchProjectsPage.titleValue + '"').toBe(true)

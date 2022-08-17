@@ -45,7 +45,7 @@ const CohortRightOrNotExist = () => {
       </Grid>
 
       <Grid item>
-        <Button variant="outlined" style={{ borderColor: 'currentColor' }} onClick={() => history.push('/accueil')}>
+        <Button variant="outlined" style={{ borderColor: 'currentColor' }} onClick={() => history.push('/home')}>
           Retour à l'accueil
         </Button>
       </Grid>

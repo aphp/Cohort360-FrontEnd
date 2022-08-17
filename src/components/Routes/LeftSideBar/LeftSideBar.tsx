@@ -117,7 +117,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           }}
         >
           <div className={classes.toolbar}>
-            <Link href="/accueil">
+            <Link href="/home">
               <img src={cohortLogo} alt="Cohort360 logo" className={open ? undefined : classes.hide} />
             </Link>
 
@@ -392,7 +392,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               </>
             )}
 
-            <ListItem id="accueil" className={classes.listItem} button onClick={() => history.push('/accueil')}>
+            <ListItem id="accueil" className={classes.listItem} button onClick={() => history.push('/home')}>
               <Tooltip title={!open ? 'Accueil' : ''}>
                 <ListItemIcon className={classes.listIcon}>
                   <HomeIcon width="20px" fill="#FFF" />
@@ -422,18 +422,18 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               <List id="patients-collapse">
                 {!practitioner?.deidentified && (
                   <ListItem>
-                    <Link id="patientResearch-link" href="/rechercher_patient" className={classes.nestedTitle}>
+                    <Link id="patientResearch-link" href="/patient-search" className={classes.nestedTitle}>
                       Rechercher un patient
                     </Link>
                   </ListItem>
                 )}
                 <ListItem>
-                  <Link id="myPatient-link" href="/mes_patients" className={classes.nestedTitle}>
+                  <Link id="myPatient-link" href="/my-patients" className={classes.nestedTitle}>
                     Tous mes patients
                   </Link>
                 </ListItem>
                 <ListItem>
-                  <Link id="scoopeTree-link" href="/perimetre" className={classes.nestedTitle}>
+                  <Link id="scoopeTree-link" href="/perimeter" className={classes.nestedTitle}>
                     Explorer un périmètre
                   </Link>
                 </ListItem>
@@ -460,20 +460,20 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             >
               <List id="research-collapse">
                 <ListItem>
-                  <Link id="savedResearch-link" href="/recherche_sauvegarde" className={classes.nestedTitle}>
-                    Mes cohortes sauvegardées
+                  <Link id="savedResearch-link" href="/my-cohorts" className={classes.nestedTitle}>
+                    Mes cohortes
                   </Link>
                 </ListItem>
                 <ListItem>
-                  <Link id="myProject-link" href="/mes_projets" className={classes.nestedTitle}>
-                    Mes projets de recherche
+                  <Link id="myProject-link" href="/my-requests" className={classes.nestedTitle}>
+                    Mes requêtes
                   </Link>
                 </ListItem>
               </List>
             </Collapse>
           </List>
 
-          {!!ODD_CONTACT &&
+          {ODD_CONTACT &&
             (open ? (
               <Button
                 onClick={() => history.push('/contact')}

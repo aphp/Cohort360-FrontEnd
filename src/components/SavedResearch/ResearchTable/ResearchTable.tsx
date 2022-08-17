@@ -228,7 +228,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                   </TableCell>
                   <TableCell className={classes.tableHeadCell} align="center">
                     Estimation du nombre de patients APHP
-                    <Tooltip title="Cet interval correspond à une estimation du nombre de patients correspondant aux critères de votre requête avec comme population source tous les hopitaux de l'APHP">
+                    <Tooltip title="Cet intervalle correspond à une estimation du nombre de patients correspondant aux critères de votre requête avec comme population source tous les hôpitaux de l'APHP.">
                       <IconButton size="small" className={classes.infoButton}>
                         <InfoIcon />
                       </IconButton>

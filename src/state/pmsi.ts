@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 import { RootState } from 'state'
+import { login, logout } from 'state/me'
 
 import services from 'services'
 
@@ -231,6 +232,8 @@ const pmsiSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
+    builder.addCase(login, () => defaultInitialState)
+    builder.addCase(logout.fulfilled, () => defaultInitialState)
     // initPmsiHierarchy
     builder.addCase(initPmsiHierarchy.pending, (state) => ({
       ...state,

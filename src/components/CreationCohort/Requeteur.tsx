@@ -32,7 +32,9 @@ const Requeteur = () => {
       criteriaGroup = [],
       snapshotsHistory = [],
       count = {},
-      json = ''
+      json = '',
+      allowSearchIpp = false,
+      selectedPopulation = []
     },
     criteriaList
   } = useAppSelector((state) => ({
@@ -76,10 +78,18 @@ const Requeteur = () => {
   const _fetchCriteria = useCallback(async () => {
     setCriteriaLoading(true)
     let _criteria = constructCriteriaList()
+
+    _criteria.forEach((criterion) => {
+      if (criterion.id === 'IPPList') {
+        criterion.color = allowSearchIpp ? '#0063AF' : '#808080'
+        criterion.disabled = !allowSearchIpp
+      }
+    })
+
     _criteria = await getDataFromFetch(Object.freeze(_criteria), selectedCriteria, criteriaList)
     dispatch<any>(setCriteriaList(_criteria))
     setCriteriaLoading(false)
-  }, [dispatch, criteriaGroup, selectedCriteria]) // eslint-disable-line
+  }, [dispatch, criteriaGroup, selectedCriteria, selectedPopulation]) // eslint-disable-line
 
   const _unbuildRequest = async (newCurrentSnapshot: CohortCreationSnapshotType) => {
     dispatch<any>(unbuildCohortCreation({ newCurrentSnapshot }))
@@ -106,7 +116,7 @@ const Requeteur = () => {
 
       if (createCohortResult && createCohortResult.status === 201) {
         dispatch<any>(resetCohortCreation())
-        history.push(`/accueil`)
+        history.push(`/home`)
       }
     }
 

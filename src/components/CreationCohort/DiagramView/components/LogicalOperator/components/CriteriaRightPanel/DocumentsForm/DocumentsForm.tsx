@@ -78,8 +78,8 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
       try {
         // Try to create regex
         new RegExp(query)
-        if (query.search(/\//) !== -1 && query.search(/\\\//) === -1) {
-          // If query contain '/' but no '\/', set error variable
+        if (query.search(/\\$/) !== -1 && query.search(/\\\\$/) === -1) {
+          // If query contain '\' but no '\\', set error variable
           setErrorRegex(true)
           return
         }
@@ -192,7 +192,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               onSearchDocument={() => null}
               noClearIcon
               noSearchIcon
-              sqareInput
+              squareInput
             />
           </Grid>
 

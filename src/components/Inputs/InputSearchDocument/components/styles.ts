@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 4
   },
   slash: {
-    fontSize: 25,
+    fontSize: 18,
     color: 'currentColor'
   },
   activeButton: {

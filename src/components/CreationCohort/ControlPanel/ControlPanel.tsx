@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import clsx from 'clsx'
 import moment from 'moment'
 
@@ -52,6 +52,13 @@ const ControlPanel: React.FC<{
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
   const [oldCount, setOldCount] = useState<any | null>(null)
   const [openShareRequestModal, setOpenShareRequestModal] = useState<boolean>(false)
+  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<'success' | 'error' | null>(null)
+  const wrapperSetShareSuccessOrFailMessage = useCallback(
+    (val) => {
+      setShareSuccessOrFailMessage(val)
+    },
+    [setShareSuccessOrFailMessage]
+  )
 
   const {
     loading = false,
@@ -283,6 +290,24 @@ const ControlPanel: React.FC<{
           </Grid>
         </Grid>
 
+        {!status && !includePatient && (
+          <Alert className={classes.errorAlert} severity="info">
+            Votre requête ne contient pas de nombre de patient.
+            <br />
+            <br />
+            <Button
+              onClick={() => _relaunchCount(false)}
+              variant="outlined"
+              color="primary"
+              size="small"
+              style={{ marginTop: -14 }}
+              disabled={maintenanceIsActive}
+            >
+              Relancer la requête
+            </Button>
+          </Alert>
+        )}
+
         {!!includePatient && includePatient > 20000 && (
           <Alert className={classes.errorAlert} severity="error">
             Il est pour le moment impossible de créer des cohortes de plus de 20 000 patients
@@ -347,7 +372,12 @@ const ControlPanel: React.FC<{
       )}
 
       {openShareRequestModal && requestShare !== null && requestShare?.currentSnapshot !== undefined && (
-        <ModalShareRequest requestShare={requestShare} onClose={() => handleCloseSharedModal()} />
+        <ModalShareRequest
+          shareSuccessOrFailMessage={shareSuccessOrFailMessage}
+          parentStateSetter={wrapperSetShareSuccessOrFailMessage}
+          requestShare={requestShare}
+          onClose={() => handleCloseSharedModal()}
+        />
       )}
 
       {openShareRequestModal && requestShare?.currentSnapshot === undefined && (
@@ -359,6 +389,32 @@ const ControlPanel: React.FC<{
         >
           <Alert severity="error" onClose={() => handleCloseSharedModal()}>
             Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
+          </Alert>
+        </Snackbar>
+      )}
+
+      {shareSuccessOrFailMessage === 'success' && (
+        <Snackbar
+          open
+          onClose={() => setShareSuccessOrFailMessage(null)}
+          autoHideDuration={5000}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert severity="success" onClose={() => setShareSuccessOrFailMessage(null)}>
+            Votre requête a été partagée.
+          </Alert>
+        </Snackbar>
+      )}
+
+      {shareSuccessOrFailMessage === 'error' && (
+        <Snackbar
+          open
+          onClose={() => setShareSuccessOrFailMessage(null)}
+          autoHideDuration={5000}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert severity="error" onClose={() => setShareSuccessOrFailMessage(null)}>
+            Une erreur est survenue, votre requête n'a pas pu être partagée.
           </Alert>
         </Snackbar>
       )}

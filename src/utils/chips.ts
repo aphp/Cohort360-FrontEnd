@@ -23,9 +23,17 @@ export const buildDocumentFiltersChips = (
   return (
     [
       !!filters.nda &&
-        filters.nda
-          .split(',')
-          .map((nda) => ({ label: nda ? `NDA : ${nda}` : '', onDelete: () => handleDeleteChip('nda', nda) })),
+        filters.nda.split(',').map((nda) => ({
+          label: nda ? `NDA : ${nda}` : '',
+          onDelete: () =>
+            handleDeleteChip(
+              'nda',
+              filters.nda
+                .split(',')
+                .filter((elem) => elem !== nda)
+                .join(',')
+            )
+        })),
       !!filters.ipp &&
         filters.ipp
           .split(',')
@@ -78,18 +86,40 @@ export const buildObservationFiltersChips = (
   return (
     [
       filters.nda &&
-        filters.nda
-          .split(',')
-          .map((nda) => ({ label: nda ? `NDA : ${nda}` : '', onDelete: () => handleDeleteChip('nda', nda) })),
+        filters.nda.split(',').map((nda) => ({
+          label: nda ? `NDA : ${nda}` : '',
+          onDelete: () =>
+            handleDeleteChip(
+              'nda',
+              filters.nda
+                .split(',')
+                .filter((elem) => elem !== nda)
+                .join(',')
+            )
+        })),
       filters.loinc &&
         filters.loinc.split(',').map((loinc) => ({
           label: loinc ? `Code LOINC : ${loinc}` : '',
-          onDelete: () => handleDeleteChip('loinc', loinc)
+          onDelete: () =>
+            handleDeleteChip(
+              'loinc',
+              filters.loinc
+                .split(',')
+                .filter((elem) => elem !== loinc)
+                .join(',')
+            )
         })),
       filters.anabio &&
         filters.anabio.split(',').map((anabio) => ({
           label: anabio ? `Code ANABIO : ${anabio}` : '',
-          onDelete: () => handleDeleteChip('anabio', anabio)
+          onDelete: () =>
+            handleDeleteChip(
+              'anabio',
+              filters.anabio
+                .split(',')
+                .filter((elem) => elem !== anabio)
+                .join(',')
+            )
         })),
       {
         label: filters.startDate ? `Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}` : '',
@@ -119,9 +149,17 @@ export const buildMedicationFiltersChips = (
   return (
     [
       filters.nda &&
-        filters.nda
-          .split(',')
-          .map((nda) => ({ label: nda ? `NDA : ${nda}` : '', onDelete: () => handleDeleteChip('nda', nda) })),
+        filters.nda.split(',').map((nda) => ({
+          label: nda ? `NDA : ${nda}` : '',
+          onDelete: () =>
+            handleDeleteChip(
+              'nda',
+              filters.nda
+                .split(',')
+                .filter((elem) => elem !== nda)
+                .join(',')
+            )
+        })),
       filters.selectedPrescriptionTypes?.length > 0 &&
         filters.selectedPrescriptionTypes.map(({ label, ...prescriptionType }) => ({
           label: label ? `Type de prescription : ${label}` : '',
@@ -168,13 +206,29 @@ export const buildPmsiFiltersChips = (
   return (
     [
       filters.nda &&
-        filters.nda
-          .split(',')
-          .map((nda) => ({ label: nda ? `NDA : ${nda}` : '', onDelete: () => handleDeleteChip('nda', nda) })),
+        filters.nda.split(',').map((nda) => ({
+          label: nda ? `NDA : ${nda}` : '',
+          onDelete: () =>
+            handleDeleteChip(
+              'nda',
+              filters.nda
+                .split(',')
+                .filter((elem) => elem !== nda)
+                .join(',')
+            )
+        })),
       filters.code &&
-        filters.code
-          .split(',')
-          .map((code) => ({ label: code ? `Code : ${code}` : '', onDelete: () => handleDeleteChip('code', code) })),
+        filters.code.split(',').map((code) => ({
+          label: code ? `Code : ${code}` : '',
+          onDelete: () =>
+            handleDeleteChip(
+              'code',
+              filters.code
+                .split(',')
+                .filter((elem) => elem !== code)
+                .join(',')
+            )
+        })),
       filters.selectedDiagnosticTypes?.length > 0 &&
         filters.selectedDiagnosticTypes.map(({ label, ...selectedDiagnosticType }) => ({
           label: label ? `Type : ${capitalizeFirstLetter(label)}` : '',
@@ -225,8 +279,8 @@ export const buildCohortFiltersChips = (
         label:
           filters.favorite && filters.favorite !== 'all'
             ? filters.favorite === 'True'
-              ? 'Cohortes favories'
-              : 'Cohortes non favories'
+              ? 'Cohortes favorites'
+              : 'Cohortes non favorites'
             : '',
         onDelete: () => handleDeleteChip('favorite')
       },

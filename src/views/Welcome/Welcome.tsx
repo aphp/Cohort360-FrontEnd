@@ -46,7 +46,7 @@ const Welcome: React.FC = () => {
   const [lastRequest, setLastRequest] = useState<RequestType[]>([])
 
   const lastConnection = practitioner?.lastConnection
-    ? moment(practitioner.lastConnection).format('[Dernière connexion: ]ddd DD MMMM YYYY[, à ]HH:mm')
+    ? moment(practitioner.lastConnection).format('[Dernière connexion : ]ddd DD MMMM YYYY[, à ]HH:mm')
     : ''
 
   useEffect(() => {
@@ -102,10 +102,17 @@ const Welcome: React.FC = () => {
       })}
     >
       <Container maxWidth="lg" className={classes.container}>
-        <Typography component="h1" variant="h1" color="inherit" noWrap className={classes.title}>
+        <Typography id="homePage-title" component="h1" variant="h1" color="inherit" noWrap className={classes.title}>
           Bienvenue {practitioner.displayName}
         </Typography>
-        <Typography component="h6" variant="h6" color="inherit" noWrap className={classes.subtitle}>
+        <Typography
+          id="last-connection"
+          component="h6"
+          variant="h6"
+          color="inherit"
+          noWrap
+          className={classes.subtitle}
+        >
           {lastConnection}
         </Typography>
       </Container>
@@ -118,8 +125,8 @@ const Welcome: React.FC = () => {
         <Grid container spacing={1}>
           {maintenanceIsActive && (
             <Alert severity="warning" style={{ marginTop: '-12px', width: '100%' }}>
-              Une maintenance est en cours. Seule la consultation des cohorts, requetes et données patients est activée.
-              Toute création, édition et suppression de cohort/requete est desactivées.
+              Une maintenance est en cours. Seule la consultation des cohortes, requêtes et données patients est
+              activée. Toute création, édition et suppression de cohorte/requête est desactivée.
             </Alert>
           )}
 
@@ -170,7 +177,7 @@ const Welcome: React.FC = () => {
               <ResearchCard
                 title={'Mes cohortes favorites'}
                 linkLabel={'Voir toutes mes cohortes favorites'}
-                onClickLink={() => history.push('/recherche_sauvegarde?fav=true')}
+                onClickLink={() => history.push('/my-cohorts?fav=true')}
                 loading={loadingCohort}
                 cohorts={favoriteCohorts}
                 isFav
@@ -184,7 +191,7 @@ const Welcome: React.FC = () => {
               <ResearchCard
                 title={'Mes dernières cohortes créées'}
                 linkLabel={'Voir toutes mes cohortes'}
-                onClickLink={() => history.push('/recherche_sauvegarde')}
+                onClickLink={() => history.push('/my-cohorts')}
                 loading={loadingCohort}
                 cohorts={lastCohorts}
               />
@@ -197,7 +204,7 @@ const Welcome: React.FC = () => {
               <ResearchCard
                 title={'Mes dernières requêtes créées'}
                 linkLabel={'Voir toutes mes requêtes'}
-                onClickLink={() => history.push('/mes_projets')}
+                onClickLink={() => history.push('/my-requests')}
                 loading={loadingRequest}
                 requests={lastRequest}
               />

@@ -20,6 +20,16 @@ export const displaySort = (a: any, b: any) => {
   return 0
 }
 
+export const targetDisplaySort = (a: any, b: any) => {
+  if (a.target?.[0].display < b.target?.[0].display) {
+    return -1
+  }
+  if (a.target?.[0].display > b.target?.[0].display) {
+    return 1
+  }
+  return 0
+}
+
 export const descendingComparator = (a: any, b: any, orderBy: any) => {
   const dateA = moment(new Date(a[orderBy]))
   const dateB = moment(new Date(b[orderBy]))

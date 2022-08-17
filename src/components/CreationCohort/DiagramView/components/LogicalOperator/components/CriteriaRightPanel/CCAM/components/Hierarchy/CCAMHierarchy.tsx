@@ -107,9 +107,10 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
         <Tooltip title={label} enterDelay={2500}>
           <ListItemText onClick={() => _onExpand(id)} className={classes.label} primary={label} />
         </Tooltip>
-        {open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => _onExpand(id)} />}
+        {id !== '*' &&
+          (open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => _onExpand(id)} />)}
       </ListItem>
-      <Collapse in={open} timeout="auto" unmountOnExit>
+      <Collapse in={id === '*' ? true : open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding className={classes.subItemsContainer}>
           <div className={classes.subItemsContainerIndicator} />
           {subItems &&

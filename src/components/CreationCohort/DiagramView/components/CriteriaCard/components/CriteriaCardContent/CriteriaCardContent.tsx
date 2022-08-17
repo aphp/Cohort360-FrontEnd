@@ -63,7 +63,13 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     let encounterStartDate = null
     let encounterEndDate = null
 
-    if (!(_currentCriteria.type === 'Patient' || _currentCriteria.type === 'Encounter')) {
+    if (
+      !(
+        _currentCriteria.type === 'Patient' ||
+        _currentCriteria.type === 'Encounter' ||
+        _currentCriteria.type === 'IPPList'
+      )
+    ) {
       startDate = _currentCriteria.startOccurrence
         ? moment(_currentCriteria.startOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
@@ -72,11 +78,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         ? moment(_currentCriteria.endOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
     }
-    if (
-      _currentCriteria.type !== 'Patient' &&
-      _currentCriteria.type !== 'MedicationRequest' &&
-      _currentCriteria.type !== 'MedicationAdministration'
-    ) {
+    if (!(_currentCriteria.type === 'Patient' || _currentCriteria.type === 'IPPList')) {
       encounterStartDate = _currentCriteria.encounterStartDate
         ? moment(_currentCriteria.encounterStartDate, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
@@ -87,16 +89,20 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
     switch (_currentCriteria.type) {
       case 'Claim': {
-        const displaySelectedCode = (codes: { id: string; label: string }[]) => {
+        const displaySelectedCode = (codes: { id: string; label: string }[], tooltip?: boolean) => {
           let currentCode: string[] = []
-          for (const code of codes) {
-            const selectedCodeData =
-              data?.ghmData && data?.ghmData !== 'loading'
-                ? data.ghmData.find((codeElement: any) => codeElement && codeElement.id === code.id)
-                : null
-            currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+          if (codes && codes.find((code) => code.id === '*')) {
+            return 'Toute la hiérarchie'
+          } else {
+            for (const code of codes) {
+              const selectedCodeData =
+                data?.ghmData && data?.ghmData !== 'loading'
+                  ? data.ghmData.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                  : null
+              currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+            }
+            return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltip ? tooltipReducer : reducer) : ''
           }
-          return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltipReducer) : ''
         }
 
         content = [
@@ -104,9 +110,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             <Chip
               className={classes.criteriaChip}
               label={
-                <Tooltip title={displaySelectedCode(_currentCriteria?.code)}>
+                <Tooltip title={displaySelectedCode(_currentCriteria?.code, true)}>
                   <Typography style={{ maxWidth: 500 }} noWrap>
-                    {_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
+                    {displaySelectedCode(_currentCriteria?.code)}
                   </Typography>
                 </Tooltip>
               }
@@ -117,25 +123,29 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Procedure': {
-        const displaySelectedCode = (codes: { id: string; label: string }[]) => {
+        const displaySelectedCode = (codes: { id: string; label: string }[], tooltip?: boolean) => {
           let currentCode: string[] = []
-          for (const code of codes) {
-            const selectedCodeData =
-              data?.ccamData && data?.ccamData !== 'loading'
-                ? data.ccamData.find((codeElement: any) => codeElement && codeElement.id === code.id)
-                : null
-            currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+          if (codes && codes.find((code) => code.id === '*')) {
+            return 'Toute la hiérarchie'
+          } else {
+            for (const code of codes) {
+              const selectedCodeData =
+                data?.ccamData && data?.ccamData !== 'loading'
+                  ? data.ccamData.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                  : null
+              currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+            }
+            return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltip ? tooltipReducer : reducer) : ''
           }
-          return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltipReducer) : ''
         }
         content = [
           _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
             <Chip
               className={classes.criteriaChip}
               label={
-                <Tooltip title={displaySelectedCode(_currentCriteria?.code)}>
+                <Tooltip title={displaySelectedCode(_currentCriteria?.code, true)}>
                   <Typography style={{ maxWidth: 500 }} noWrap>
-                    {_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
+                    {displaySelectedCode(_currentCriteria?.code)}
                   </Typography>
                 </Tooltip>
               }
@@ -146,16 +156,20 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Condition': {
-        const displaySelectedCode = (codes: { id: string; label: string }[]) => {
+        const displaySelectedCode = (codes: { id: string; label: string }[], tooltip?: boolean) => {
           let currentCode: string[] = []
-          for (const code of codes) {
-            const selectedCodeData =
-              data?.cim10Diagnostic && data?.cim10Diagnostic !== 'loading'
-                ? data.cim10Diagnostic.find((codeElement: any) => codeElement && codeElement.id === code.id)
-                : null
-            currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+          if (codes && codes.find((code) => code.id === '*')) {
+            return 'Toute la hiérarchie'
+          } else {
+            for (const code of codes) {
+              const selectedCodeData =
+                data?.cim10Diagnostic && data?.cim10Diagnostic !== 'loading'
+                  ? data.cim10Diagnostic.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                  : null
+              currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+            }
+            return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltip ? tooltipReducer : reducer) : ''
           }
-          return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltipReducer) : ''
         }
         const displaySelectedDiagTypes = (diagnosticTypes: { id: string; label: string }[]) => {
           let currentStatus: string[] = []
@@ -176,9 +190,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             <Chip
               className={classes.criteriaChip}
               label={
-                <Tooltip title={displaySelectedCode(_currentCriteria?.code)}>
+                <Tooltip title={displaySelectedCode(_currentCriteria?.code, true)}>
                   <Typography style={{ maxWidth: 500 }} noWrap>
-                    {_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
+                    {displaySelectedCode(_currentCriteria?.code)}
                   </Typography>
                 </Tooltip>
               }
@@ -327,10 +341,32 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               className={classes.criteriaChip}
               label={
                 <Tooltip
-                  title={`Qui suit l'expression régulière suivante /${_currentCriteria.regex_search}/ dans le document`}
+                  title={`Qui suit l'expression régulière suivante /${_currentCriteria.regex_search
+                    .replace(/^\(\.\)\*|\(\.\)\*$/gi, '')
+                    .replace(new RegExp('\\\\/|\\\\"', 'g'), function (m) {
+                      switch (m) {
+                        case '\\/':
+                          return '/'
+                        case '\\"':
+                          return '"'
+                      }
+                      return m
+                    })}/ dans le document`}
                 >
                   <Typography style={{ maxWidth: 500 }} noWrap>
-                    Qui suit l'expression régulière suivante /{_currentCriteria.regex_search}/ dans le document
+                    Qui suit l'expression régulière suivante /
+                    {_currentCriteria.regex_search
+                      .replace(/^\(\.\)\*|\(\.\)\*$/gi, '')
+                      .replace(new RegExp('\\\\/|\\\\"', 'g'), function (m) {
+                        switch (m) {
+                          case '\\/':
+                            return '/'
+                          case '\\"':
+                            return '"'
+                        }
+                        return m
+                      })}
+                    / dans le document
                   </Typography>
                 </Tooltip>
               }
@@ -691,17 +727,21 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           }
         }
 
-        const displaySelectedCode = (codes: { id: string; label: string }[]) => {
+        const displaySelectedCode = (codes: { id: string; label: string }[], tooltip?: boolean) => {
           let currentCode: string[] = []
-          for (const code of codes) {
-            const selectedCodeData =
-              data?.atcData && data?.atcData !== 'loading'
-                ? data.atcData.find((codeElement: any) => codeElement && codeElement.id === code.id)
-                : null
-            currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
-          }
+          if (codes && codes.find((code) => code.id === '*')) {
+            return 'Toute la hiérarchie'
+          } else {
+            for (const code of codes) {
+              const selectedCodeData =
+                data?.atcData && data?.atcData !== 'loading'
+                  ? data.atcData.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                  : null
+              currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+            }
 
-          return currentCode && currentCode.length > 0 ? currentCode.reduce(reducer) : ''
+            return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltip ? tooltipReducer : reducer) : ''
+          }
         }
 
         const displaySelectedPrescriptionType = (prescriptionTypes: { id: string; label: string }[]) => {
@@ -752,7 +792,13 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
             <Chip
               className={classes.criteriaChip}
-              label={<Typography>{displaySelectedCode(_currentCriteria?.code)}</Typography>}
+              label={
+                <Tooltip title={displaySelectedCode(_currentCriteria?.code, true)}>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    {displaySelectedCode(_currentCriteria?.code)}
+                  </Typography>
+                </Tooltip>
+              }
             />
           ),
           _currentCriteria &&
@@ -776,26 +822,29 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
       case 'Observation':
         {
-          const displaySelectedCode = (codes: { id: string; label: string }[]) => {
+          const displaySelectedCode = (codes: { id: string; label: string }[], tooltip?: boolean) => {
             let currentCode: string[] = []
-            for (const code of codes) {
-              const selectedCodeData =
-                data?.biologyData && data?.biologyData !== 'loading'
-                  ? data.biologyData.find((codeElement: any) => codeElement && codeElement.id === code.id)
-                  : null
-              currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+            if (codes && codes.find((code) => code.id === '*')) {
+              return 'Toute la hiérarchie'
+            } else {
+              for (const code of codes) {
+                const selectedCodeData =
+                  data?.biologyData && data?.biologyData !== 'loading'
+                    ? data.biologyData.find((codeElement: any) => codeElement && codeElement.id === code.id)
+                    : null
+                currentCode = selectedCodeData ? [...currentCode, selectedCodeData.label] : currentCode
+              }
+              return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltip ? tooltipReducer : reducer) : ''
             }
-            return currentCode && currentCode.length > 0 ? currentCode.reduce(tooltipReducer) : ''
           }
-
           content = [
             _currentCriteria && _currentCriteria?.code && _currentCriteria?.code.length > 0 && (
               <Chip
                 className={classes.criteriaChip}
                 label={
-                  <Tooltip title={displaySelectedCode(_currentCriteria?.code)}>
+                  <Tooltip title={displaySelectedCode(_currentCriteria?.code, true)}>
                     <Typography style={{ maxWidth: 500 }} noWrap>
-                      {_currentCriteria?.code?.map((code) => code.id).reduce(reducer)}
+                      {displaySelectedCode(_currentCriteria?.code)}
                     </Typography>
                   </Tooltip>
                 }
@@ -820,16 +869,32 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         }
         break
 
+      case 'IPPList': {
+        const displayIPPList = (searchInput: string) => {
+          return searchInput.split(',').reduce(reducer)
+        }
+        content = [
+          _currentCriteria.search && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Tooltip title={`Contient les patients : ${displayIPPList(_currentCriteria.search)}`}>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    Contient les patients : {displayIPPList(_currentCriteria.search)}
+                  </Typography>
+                </Tooltip>
+              }
+            />
+          )
+        ]
+        break
+      }
+
       default:
         break
     }
 
-    if (
-      _currentCriteria.type !== 'Patient' &&
-      _currentCriteria.type !== 'MedicationRequest' &&
-      _currentCriteria.type !== 'MedicationAdministration' &&
-      (encounterStartDate || encounterEndDate)
-    ) {
+    if (_currentCriteria.type !== 'Patient' && (encounterStartDate || encounterEndDate)) {
       content = [
         ...content,
         <Chip
@@ -850,7 +915,11 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       ]
     }
 
-    if (_currentCriteria.type !== 'Patient' && _currentCriteria.type !== 'Encounter') {
+    if (
+      _currentCriteria.type !== 'Patient' &&
+      _currentCriteria.type !== 'Encounter' &&
+      _currentCriteria.type !== 'IPPList'
+    ) {
       content = [
         ...content,
         +_currentCriteria?.occurrence !== 1 && (
@@ -869,9 +938,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 {startDate
                   ? endDate
                     ? `Entre le ${startDate} et le ${endDate}`
-                    : `Avant le ${startDate}`
+                    : `Après le ${startDate}`
                   : endDate
-                  ? `Après le ${endDate}`
+                  ? `Avant le ${endDate}`
                   : ''}
               </Typography>
             }

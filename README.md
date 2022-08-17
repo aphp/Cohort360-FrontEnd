@@ -7,14 +7,9 @@
 
 # Cohort360
 
+## Architecture
 
-Develop: [![pipeline status](https://gitlab.eds.aphp.fr/dev/cohort360/source-code/badges/develop/pipeline.svg)](https://gitlab.eds.aphp.fr/dev/cohort360/source-code/-/commits/develop)
-
-Master: [![pipeline status](https://gitlab.eds.aphp.fr/dev/cohort360/source-code/badges/master/pipeline.svg)](https://gitlab.eds.aphp.fr/dev/cohort360/source-code/-/commits/master)
-
-Cohort360 is a web application for knowledge discovery in clinical data warehouses. It provides tools for clinicians and researchers to find patients, build cohorts and visualize data. Cohort360 has been initiated by Greater Paris University Hospital (AP-HP) and it is now an open-source project being developed collaboratively by a community of contributors and partners, working together to unleash research on clinical data.
-
-## Architecture 
+- [ ] Add Architecture schema 
 
 Cohort360 consists of a React front-end and a Django back-end (REST API).
 
@@ -23,15 +18,14 @@ This repository hosts the front-end, while the back-end is available here: [gith
 Both the front-end and the back-end depend on a third, possibly custom, party: an endpoint to query medical data and to create cohorts.
 This third endpoint can be a FHIR API for example. This is the case for the first creators of Cohort360.
 
-## Installation of the front-end
+## Installation
 
 ### Requirements:
 
 * A running back-end server
 * A running third party endpoint (FHIR API for example)
 * An authentication server
-
-* Node.js installed (tested with version>=14)
+* Node.js (16 or higher) installed
 
 ### Running the front-end
 
@@ -42,47 +36,16 @@ This third endpoint can be a FHIR API for example. This is the case for the firs
 
 This will generate files in the `build` directory that can be exposed via a web server like Nginx, or a node server.
 
-An example configuration with Nginx would be: 
+An example configuration with Nginx can be found [here](.templates/nginx.conf)
 
-```nginx
-server {
-    server_name cohort360.myinstance.org;
-    listen 80;
-    listen [::]:80;
+## CI
 
-    ...
+A [gitlab-ci.yml](.templates/.gitlab-ci.yml) is available in the `.templates` folder, alongside
+a [nginx configuration](.templates/nginx.conf) example (useful for deployment).
 
-    location / {
-        root /path/to/build;
-        index index.html;
+## Deployment
 
-        add_header Last-Modified $date_gmt;
-        add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
-        if_modified_since off;
-        expires off;
-        etag off;
-
-        if (!-e $request_filename){
-            rewrite ^(.*)$ /index.html break;
-        }
-
-    }
-
-    location /static/ {
-        alias /path/to/build/static/;
-        add_header Last-Modified $date_gmt;
-        if_modified_since before;
-        expires 1d;
-
-        add_header Pragma public;
-        add_header Cache-Control "public";
-        etag on;
-    }
-    ...
-}
-```
-
-
+A docker image is available to build via the [Dockerfile](Dockerfile). You only need to update the location of your nginx conf. 
 
 ## Start Contributing
 

@@ -76,6 +76,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       filters.vitalStatus,
       sort.sortBy,
       sort.sortDirection,
+      deidentifiedBoolean,
       groupId.join(',')
     )
     setPatientsList(patientsResp?.originalPatients ?? [])

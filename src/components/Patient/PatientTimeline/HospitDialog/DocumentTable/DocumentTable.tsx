@@ -1,11 +1,7 @@
 import React, { useState } from 'react'
 
 import { CohortComposition } from 'types'
-import {
-  CompositionStatusKind,
-  DocumentReferenceStatusKind,
-  IDocumentReference
-} from '@ahryman40k/ts-fhir-types/lib/R4'
+import { CompositionStatusKind, DocumentReferenceStatusKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import {
   Chip,
@@ -33,7 +29,7 @@ import useStyles from './styles'
 
 type DocumentRowTypes = {
   deidentified: boolean
-  document: CohortComposition | IDocumentReference
+  document: CohortComposition
   groupId: string
 }
 const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, groupId }) => {
@@ -42,12 +38,10 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
 
   const row = {
     ...document,
-    NDA:
-      document.resourceType === 'Composition'
-        ? document.NDA
-        : document.securityLabel?.[0].coding?.[0].display ?? document.securityLabel?.[0].coding?.[0].code ?? '-',
-    title: document.resourceType === 'Composition' ? document.title ?? '-' : document.description ?? '-',
-    serviceProvider: document.resourceType === 'Composition' ? document.serviceProvider : '-',
+    NDA: document.NDA,
+    title: document.title ?? '-',
+    serviceProvider: document.serviceProvider ?? '-',
+    event: document.event,
     type: document.type?.coding?.[0].display ?? document.type?.coding?.[0].code ?? '-'
   }
 
@@ -85,8 +79,8 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
         <TableCell align="center">{row.serviceProvider}</TableCell>
         <TableCell align="center">{getStatusShip(row.status)}</TableCell>
         <TableCell align="center">
-          <IconButton onClick={() => setDocumentDialogOpen(true)}>
-            <PdfIcon height="30px" fill="#ED6D91" />
+          <IconButton disabled={row.event === undefined} onClick={() => setDocumentDialogOpen(true)}>
+            <PdfIcon height="30px" fill={row.event === undefined ? '#CBCFCF' : '#ED6D91'} />
           </IconButton>
         </TableCell>
       </TableRow>
@@ -104,7 +98,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
 
 type DocumentTableTypes = {
   deidentified: boolean
-  documents?: (CohortComposition | IDocumentReference)[]
+  documents?: CohortComposition[]
   page: number
   documentLines: number
 }

@@ -36,7 +36,7 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBo
       : patient.mainDiagnosis
           .slice(0, 3)
           .map((diag: any) => diag.code?.coding?.[0].display)
-          .join(' - ')
+          .join(', ')
     : 'Pas de diagnostic principal'
 
   const lastEncounter =
@@ -71,7 +71,7 @@ const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBo
             fieldName={deidentifiedBoolean ? 'Âge' : 'Date de naissance'}
             fieldValue={deidentifiedBoolean ? age : `${birthDate} (${age})`}
           />
-          <PatientField fieldName="Diagnostics principaux" fieldValue={mainDiagnosis} />
+          <PatientField fieldName="Trois derniers diagnostics principaux" fieldValue={mainDiagnosis} />
           <PatientField fieldName="Dernière prise en charge" fieldValue={lastEncounter} />
           <PatientField fieldName="Durée de prise en charge" fieldValue={lastEncounterDuration} />
           <PatientField fieldName="Dernier acte" fieldValue={lastProcedure} />
