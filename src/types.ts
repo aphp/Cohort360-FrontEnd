@@ -64,6 +64,7 @@ export type CohortComposition = IComposition & {
   serviceProvider?: string
   NDA?: string
   event?: {}
+  parameter?: any[]
 }
 
 export type CohortEncounter = IEncounter & {
@@ -666,6 +667,17 @@ export type IPatientObservation<T extends CohortObservation> = {
   }
 }
 
+export type searchInputError = {
+  isError: boolean
+  errorsDetails?: errorDetails[]
+}
+
+export type errorDetails = {
+  errorName?: string
+  errorPositions?: number[]
+  errorSolution?: string
+}
+
 // DataTableTopBarProps
 export type DTTB_TabsType = {
   value: any
@@ -687,6 +699,7 @@ export type DTTB_SearchBarType = {
   value: string | undefined
   onSearch: (newSearch: string, newSearchBy?: SearchByTypes) => void
   searchBy?: any
+  error?: searchInputError
 }
 export type DTTB_ButtonType = {
   label: string

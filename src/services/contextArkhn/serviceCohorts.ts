@@ -8,7 +8,9 @@ import {
   Back_API_Response,
   Cohort,
   AgeRepartitionType,
-  GenderRepartitionType
+  GenderRepartitionType,
+  searchInputError,
+  errorDetails
 } from 'types'
 import {
   IPatient,
@@ -31,7 +33,8 @@ import {
   fetchEncounter,
   fetchComposition,
   fetchCompositionContent,
-  fetchBinary
+  fetchBinary,
+  fetchCheckDocumentSearchInput
 } from './callApi'
 
 import { ODD_EXPORT } from '../../constants'
@@ -141,24 +144,35 @@ export interface IServiceCohorts {
   }>
 
   /**
-   * Permet de récupérer le contenue d'un document
+   * Permet de vérifier si le champ de recherche textuelle est correct
+   *
+   * Argument:
+   *   - searchInput: champ de recherche textuelle
+   *
+   * Retourne:
+   *   - searchInputError: objet décrivant la ou les erreurs du champ de recherche s'il y en a
+   */
+  checkDocumentSearchInput: (searchInput: string) => Promise<searchInputError>
+
+  /**
+   * Permet de récupérer le contenu d'un document
    *
    * Argument:
    *   - compositionId: Identifiant du documents
    *
-   * Retoune:
-   *   - IComposition_Section: Contenue du document
+   * Retourne:
+   *   - IComposition_Section: Contenu du document
    */
   fetchDocumentContent: (compositionId: string) => Promise<IComposition_Section[]>
 
   /**
-   * Permet de recuperer le contenue d'un document (/Binary)
+   * Permet de recuperer le contenu d'un document (/Binary)
    *
    * Argument:
    *   - documentId: Identifiant du documents
    *
-   * Retoune:
-   *   - IComposition_Section: Contenue du document
+   * Retourne:
+   *   - IComposition_Section: Contenu du document
    */
   fetchBinary: (documentId: string, list?: string[]) => Promise<any>
 
@@ -168,7 +182,7 @@ export interface IServiceCohorts {
    * Argument:
    *   - cohorts: Tableau de cohortes de type `Cohort[]`
    *
-   * Retoune:
+   * Retourne:
    *   - La liste de cohortes avec une extension lié au droit d'accès + export
    */
   fetchCohortsRights: (cohorts: Cohort[]) => Promise<Cohort[]>
@@ -180,14 +194,8 @@ export interface IServiceCohorts {
    *   - cohortId: Identifiant de la cohorte
    *   - motivation: Raison de l'export
    *   - tables: Liste de table demandé dans l'export
-   *   - output_format: Format de l'export ('csv' ou 'jupiter', par défaut = 'csv')
    */
-  createExport: (args: {
-    cohortId: number
-    motivation: string
-    tables: string[]
-    output_format?: string
-  }) => Promise<any>
+  createExport: (args: { cohortId: number; motivation: string; tables: string[] }) => Promise<any>
 }
 
 const servicesCohorts: IServiceCohorts = {
@@ -426,6 +434,60 @@ const servicesCohorts: IServiceCohorts = {
       totalPatientDocs: totalPatientDocs ?? 0,
       totalAllPatientDocs: totalAllPatientDocs ?? 0,
       documentsList
+    }
+  },
+
+  checkDocumentSearchInput: async (searchInput) => {
+    if (!searchInput) {
+      return {
+        isError: false
+      }
+    }
+
+    const checkDocumentSearchInput = await fetchCheckDocumentSearchInput(searchInput)
+
+    if (checkDocumentSearchInput) {
+      // @ts-ignore
+      const errors = checkDocumentSearchInput.find((parameter: any) => parameter.name === 'WARNING')?.part ?? []
+
+      const parsedErrors: errorDetails[] = []
+
+      errors.forEach((error: any) => {
+        const splitError = error.valueString.split(';')
+
+        const errorPositions = splitError.find((errorPart: any) => errorPart.includes('Positions'))
+
+        const cleanedErrorPositions = errorPositions
+          ? errorPositions.replaceAll(' ', '').replace('Positions:', '').split('char:').slice(1)
+          : []
+
+        const errorSolution = splitError.find((errorPart: any) => errorPart.includes('Solution'))
+        const cleanedErrorSolution = errorSolution ? errorSolution.replace(' Solution: ', '') : ''
+
+        const errorObject = {
+          errorName: error.name,
+          errorPositions: cleanedErrorPositions,
+          errorSolution: cleanedErrorSolution
+        }
+
+        parsedErrors.push(errorObject)
+      })
+
+      return {
+        // @ts-ignore
+        isError: checkDocumentSearchInput.find((parameter: any) => parameter.name === 'VALIDÉ') ? false : true,
+        errorsDetails: parsedErrors
+      }
+    } else {
+      return {
+        isError: true,
+        errorsDetails: [
+          {
+            errorName: 'Erreur du serveur',
+            errorSolution: 'Veuillez refaire votre recherche.'
+          }
+        ]
+      }
     }
   },
 

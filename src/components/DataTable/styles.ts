@@ -129,6 +129,13 @@ const useStyles = makeStyles((theme) =>
         color: 'white'
       }
     },
+    errorContainer: {
+      maxHeight: 100,
+      overflow: 'scroll',
+      color: '#f44336',
+      width: '100%',
+      padding: '0 16px'
+    },
     select: {
       marginRight: '4px'
     }

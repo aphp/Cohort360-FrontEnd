@@ -1,6 +1,6 @@
 import apiFhir from '../apiFhir'
 
-import { FHIR_API_Response } from 'types'
+import { CohortComposition, FHIR_API_Response } from 'types'
 import {
   IOrganization,
   IGroup,
@@ -275,6 +275,14 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   const response = await apiFhir.get<FHIR_API_Response<IComposition>>(`/Composition?${options.reduce(optionsReducer)}`)
 
   return response
+}
+
+export const fetchCheckDocumentSearchInput = async (searchInput: string) => {
+  const checkDocumentSearchInput = await apiFhir.get<CohortComposition>(
+    `/Composition/$text?_text=${encodeURIComponent(searchInput)}`
+  )
+
+  return checkDocumentSearchInput.data.parameter ?? null
 }
 
 export const fetchCompositionContent = async (compositionId: string) => {

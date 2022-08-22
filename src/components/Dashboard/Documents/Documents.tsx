@@ -10,7 +10,7 @@ import MasterChips from 'components/MasterChips/MasterChips'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import { CohortComposition, DocumentFilters, Order, DTTB_ResultsType as ResultsType } from 'types'
+import { CohortComposition, DocumentFilters, Order, DTTB_ResultsType as ResultsType, searchInputError } from 'types'
 
 import services from 'services'
 
@@ -48,6 +48,16 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     orderBy: 'date',
     orderDirection: 'asc'
   })
+
+  const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
+
+  const checkDocumentSearch = async () => {
+    const checkDocumentSearch = await services.cohorts.checkDocumentSearchInput(searchInput)
+
+    setSearchInputError(checkDocumentSearch)
+
+    return checkDocumentSearch
+  }
 
   const onSearchDocument = async (newPage: number) => {
     if (searchInput) {
@@ -91,9 +101,15 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     setLoadingStatus(false)
   }
 
-  const handleChangePage = (newPage = 1) => {
+  const handleChangePage = async (newPage = 1) => {
     setPage(newPage)
-    onSearchDocument(newPage)
+
+    const searchInputError = await checkDocumentSearch()
+    if (searchInputError && !searchInputError?.isError) {
+      onSearchDocument(newPage)
+    } else {
+      setDocuments([])
+    }
   }
 
   useEffect(() => {
@@ -183,7 +199,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
             searchBar={{
               type: 'document',
               value: searchInput ? onFilterValue() : '',
-              onSearch: (newSearchInput: string) => setSearchInput(newSearchInput)
+              onSearch: (newSearchInput: string) => setSearchInput(newSearchInput),
+              error: searchInputError
             }}
             buttons={[
               {
