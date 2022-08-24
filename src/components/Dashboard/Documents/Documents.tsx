@@ -66,6 +66,14 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
       setSearchMode(false)
     }
     setLoadingStatus(true)
+
+    const searchInputError = await checkDocumentSearch()
+    if (searchInputError && searchInputError.isError) {
+      setDocuments([])
+      setLoadingStatus(false)
+      return
+    }
+
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
 
     const result = await services.cohorts.fetchDocuments(
@@ -101,15 +109,10 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     setLoadingStatus(false)
   }
 
-  const handleChangePage = async (newPage = 1) => {
+  const handleChangePage = (newPage = 1) => {
     setPage(newPage)
 
-    const searchInputError = await checkDocumentSearch()
-    if (searchInputError && !searchInputError?.isError) {
-      onSearchDocument(newPage)
-    } else {
-      setDocuments([])
-    }
+    onSearchDocument(newPage)
   }
 
   useEffect(() => {
@@ -133,8 +136,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const onFilterValue = (newInput: string = searchInput) => {
     if (newInput) {
-      // check if /(.)* exist at the begining of the string and erase it
-      //check if (.)*/ exist at the end of the string and erase it
+      // check if /(.)* exist at the beginning of the string and erase it
+      // check if (.)*/ exist at the end of the string and erase it
       const newInput1 = newInput.replace(/^\/\(\.\)\*|\(\.\)\*\/$/gi, '')
       const newInput2 = newInput1.replace(new RegExp('\\\\/|\\\\"', 'g'), function (m) {
         switch (m) {
