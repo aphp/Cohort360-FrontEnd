@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 
 import {
   Button,
-  Checkbox,
   Chip,
   Divider,
   FormLabel,
@@ -39,7 +38,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   const classes = useStyles()
 
   const [error, setError] = useState(false)
-  const [allowSearchByValue, setAllowSearchByValue] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const _onSubmit = () => {
@@ -77,7 +75,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       }
     }
 
-    if (selectedCriteria?.code.length === 1 && selectedCriteria?.code[0].id !== '*') {
+    if (selectedCriteria?.code.length === 1) {
       checkChildren()
     } else {
       onChangeValue('isLeaf', false)
@@ -194,25 +192,18 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             <Grid
               style={{
                 display: 'grid',
-                gridTemplateColumns: selectedCriteria.valueComparator === '<x>' ? '50px 1fr 1fr 1fr' : '50px 1fr 1fr',
+                gridTemplateColumns: selectedCriteria.valueComparator === '<x>' ? '100px 1fr 1fr' : '100px 1fr',
                 alignItems: 'center',
                 marginTop: '1em'
               }}
             >
-              <Checkbox
-                color="primary"
-                checked={allowSearchByValue}
-                onClick={() => setAllowSearchByValue(!allowSearchByValue)}
-                disabled={!selectedCriteria.isLeaf}
-              />
-
               <Select
                 style={{ marginRight: '1em' }}
                 id="biology-value-comparator-select"
                 value={selectedCriteria.valueComparator}
                 onChange={(event) => onChangeValue('valueComparator', event.target.value as string)}
                 variant="outlined"
-                disabled={!allowSearchByValue}
+                disabled={!selectedCriteria.isLeaf}
               >
                 <MenuItem value={'<='}>{'<='}</MenuItem>
                 <MenuItem value={'<'}>{'<'}</MenuItem>
@@ -233,7 +224,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 value={selectedCriteria.valueMin}
                 onChange={(e) => onChangeValue('valueMin', e.target.value)}
                 placeholder={selectedCriteria.valueComparator === '<x>' ? 'Valeur minimale' : ''}
-                disabled={!allowSearchByValue}
+                disabled={!selectedCriteria.isLeaf}
               />
               {selectedCriteria.valueComparator === '<x>' && (
                 <TextField
@@ -247,7 +238,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                   value={selectedCriteria.valueMax}
                   onChange={(e) => onChangeValue('valueMax', e.target.value)}
                   placeholder="Valeur maximale"
-                  disabled={!allowSearchByValue}
+                  disabled={!selectedCriteria.isLeaf}
                 />
               )}
 
