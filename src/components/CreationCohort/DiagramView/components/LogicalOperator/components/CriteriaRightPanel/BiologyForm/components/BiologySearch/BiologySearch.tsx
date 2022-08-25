@@ -138,7 +138,7 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
   }
 
   const getBiologySearchResults = async () => {
-    if (debouncedSearchItem && debouncedSearchItem.length >= 3) {
+    if (debouncedSearchItem && debouncedSearchItem.length >= 2) {
       try {
         setLoading(true)
         const biologySearchResults = await criteria.fetch.fetchBiologySearch(debouncedSearchItem)
