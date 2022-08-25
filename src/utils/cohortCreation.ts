@@ -449,7 +449,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       if (criterion.valueComparator) {
         switch (criterion.valueComparator) {
           case '<':
-            valueComparatorFilter = 'l'
+            valueComparatorFilter = 'lt'
             break
           case '<=':
             valueComparatorFilter = 'le'
@@ -458,7 +458,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
             valueComparatorFilter = ''
             break
           case '>':
-            valueComparatorFilter = 'g'
+            valueComparatorFilter = 'gt'
             break
           case '>=':
             valueComparatorFilter = 'ge'
@@ -1052,7 +1052,7 @@ export async function unbuildRequest(_json: string) {
               case COMPOSITION_TEXT: {
                 const isRegex: boolean = value ? decodeURIComponent(value).search(/\/.*\//) === 0 : false
 
-                // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
+                // This `replaceAll` is necessary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
                 if (isRegex) {
                   currentCriterion.regex_search = value ? decodeURIComponent(value).replaceAll('/', '') : ''
                 } else {
@@ -1384,9 +1384,9 @@ export async function unbuildRequest(_json: string) {
                 if (value?.search('le') === 0) {
                   valueComparator = '<='
                   valueMin = parseInt(value?.replace('le', '')) ?? 0
-                } else if (value?.search('l') === 0) {
+                } else if (value?.search('lt') === 0) {
                   valueComparator = '<'
-                  valueMin = parseInt(value?.replace('l', '')) ?? 0
+                  valueMin = parseInt(value?.replace('lt', '')) ?? 0
                 } else if (value?.search('ge') === 0) {
                   if (nbValueComparators === 2) {
                     valueComparator = '<x>'
@@ -1395,9 +1395,9 @@ export async function unbuildRequest(_json: string) {
                     valueComparator = '>='
                     valueMin = parseInt(value?.replace('ge', '')) ?? 0
                   }
-                } else if (value?.search('g') === 0) {
+                } else if (value?.search('gt') === 0) {
                   valueComparator = '>'
-                  valueMin = parseInt(value?.replace('g', '')) ?? 0
+                  valueMin = parseInt(value?.replace('gt', '')) ?? 0
                 } else {
                   valueComparator = '='
                   valueMin = parseInt(value ?? '0')
