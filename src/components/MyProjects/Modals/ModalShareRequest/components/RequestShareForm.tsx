@@ -97,7 +97,7 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
         <Typography variant="h3">Utilisateur à qui partager la requête:</Typography>
         <div style={{ display: 'flex', flexDirection: 'column', margin: '1em' }}>
           <Autocomplete
-            noOptionsText="Recherchez un utilisateur"
+            noOptionsText="Rechercher un utilisateur"
             clearOnEscape
             options={providersSearchResults ?? []}
             loading={loadingOnSearch}
@@ -108,8 +108,8 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
             inputValue={searchInput}
             onInputChange={() => setSearchInput('')}
             getOptionLabel={(option) =>
-              `${option.provider_source_value} - ${option.lastname?.toLocaleUpperCase()} ${option.firstname} - ${
-                option.email
+              `${option.provider_source_value} - ${option.lastname?.toLocaleUpperCase()} ${option.firstname} ${
+                option.email ? `- ${option.email}` : ''
               }` ?? ''
             }
             renderInput={(params) => (
