@@ -23,7 +23,8 @@ import {
   DTTB_TabsType as TabsType,
   DTTB_ResultsType as ResultsType,
   DTTB_SearchBarType as SearchBarType,
-  DTTB_ButtonType as ButtonType
+  DTTB_ButtonType as ButtonType,
+  errorDetails
 } from 'types'
 
 import displayDigit from 'utils/displayDigit'
@@ -200,7 +201,28 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, search
           defaultSearchInput={search}
           setDefaultSearchInput={(newSearchInput: string) => setSearch(newSearchInput)}
           onSearchDocument={(newInputText: string) => onSearch(newInputText)}
+          error={searchBar.error?.isError}
         />
+      )}
+
+      {searchBar && searchBar.error?.isError && (
+        <Grid className={classes.errorContainer}>
+          <Typography style={{ fontWeight: 'bold' }}>Des erreurs ont été détectées dans votre recherche :</Typography>
+          {searchBar.error?.errorsDetails &&
+            searchBar.error?.errorsDetails.map((detail: errorDetails, count: number) => (
+              <Typography key={count}>
+                {`- ${
+                  detail.errorPositions && detail.errorPositions.length > 0
+                    ? detail.errorPositions.length === 1
+                      ? `Au caractère ${detail.errorPositions[0]} : `
+                      : `Aux caractères ${detail.errorPositions.join(', ')} : `
+                    : ''
+                }
+              ${detail.errorName ? `${detail.errorName}.` : ''}
+              ${detail.errorSolution ? `${detail.errorSolution}.` : ''}`}
+              </Typography>
+            ))}
+        </Grid>
       )}
 
       {searchBar && searchBar.type === 'document' && inputMode === 'regex' && (
