@@ -30,9 +30,8 @@ const IPPForm: React.FC<IPPFormProps> = (props) => {
   const classes = useStyles()
 
   const [error, setError] = useState(false)
-  const [formatError, setFormatError] = useState(false)
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultIPPList)
-  const [ippCount, setIppCount] = useState(0)
+  const [ippList, setIppList] = useState<string[]>([])
 
   const isEdition = selectedCriteria !== null ? true : false
 
@@ -46,23 +45,23 @@ const IPPForm: React.FC<IPPFormProps> = (props) => {
     if (defaultValues && defaultValues.search?.length === 0) {
       return setError(true)
     }
-    const cleanSearch = defaultValues.search.replace(/\s+/g, '')
-    const _defaultValues = { ...defaultValues, search: cleanSearch }
+
+    const _defaultValues = { ...defaultValues, search: ippList.join() }
     onChangeSelectedCriteria(_defaultValues)
   }
 
   useEffect(() => {
-    // check if no forbidden character
-    if (defaultValues.search.match(/[^0-9,\s]/g)) {
-      setFormatError(true)
-    } else {
-      setFormatError(false)
+    const ippMatches = (defaultValues.search || '').matchAll(/(?:^|\D+)*(8\d{9})(?:\D+|$)/gm) || []
+
+    const ippList = []
+
+    for (const match of ippMatches) {
+      ippList.push(match[1])
     }
 
-    const ippCount = ((defaultValues.search || '').match(/\d{10,13}/g) || []).length
-    setIppCount(ippCount)
+    setIppList(ippList)
 
-    if (ippCount > 0) {
+    if (ippList.length > 0) {
       setError(false)
     }
   }, [defaultValues.search])
@@ -85,10 +84,6 @@ const IPPForm: React.FC<IPPFormProps> = (props) => {
 
       <Grid className={classes.formContainer}>
         {error && <Alert severity="error">Merci de renseigner au moins un IPP</Alert>}
-
-        <Alert severity="info">Merci de bien vouloir entrer une liste d'IPP séparée par des virgules</Alert>
-
-        {formatError && <Alert severity="error">La liste d'IPP contient des caractères non autorisés</Alert>}
 
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">Liste d'IPP</Typography>
@@ -119,12 +114,12 @@ const IPPForm: React.FC<IPPFormProps> = (props) => {
           </Grid>
 
           <Typography className={classes.inputItem} style={{ fontWeight: 'bold' }}>
-            {ippCount} IPP détectés.
+            {ippList.length} IPP détectés.
           </Typography>
 
           <Grid className={classes.inputItem}>
             <InputSearchDocumentSimple
-              placeholder="Ajouter une liste d'IPP séparés par des virgules"
+              placeholder="Ajouter une liste d'IPP"
               defaultSearchInput={defaultValues.search}
               setDefaultSearchInput={(newSearchInput: string) => _onChangeValue('search', newSearchInput)}
               onSearchDocument={() => null}
@@ -145,7 +140,7 @@ const IPPForm: React.FC<IPPFormProps> = (props) => {
           )}
           <Button
             onClick={_onSubmit}
-            disabled={error || formatError}
+            disabled={error}
             type="submit"
             form="ipp-form"
             color="primary"
