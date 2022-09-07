@@ -32,7 +32,6 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
 
   const cohortState = useAppSelector((state) => state.cohort)
 
-  const total = cohortState.count
   const loadingStatus = cohortState.loading
 
   const [researches, setResearches] = useState<Cohort[]>([])
@@ -42,6 +41,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   const search = new URLSearchParams(location.search)
   const favInUrl = (search.get('fav') ?? 'false') === 'true'
 
+  const [total, setTotal] = useState(cohortState.count)
   const [sortBy, setSortBy] = useState(favInUrl ? 'favorite' : 'fhir_datetime')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
@@ -118,6 +118,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
 
     const sortedCohortsList = stableSort(cohortsList, getComparator(sortDirection, sortBy))
     setResearches(sortedCohortsList)
+    setTotal(sortedCohortsList.length)
   }
 
   const onDeleteCohort = async (cohort: Cohort) => {
