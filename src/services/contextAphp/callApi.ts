@@ -234,13 +234,28 @@ type fetchCompositionProps = {
   patient?: string
   encounter?: string
   'encounter.identifier'?: string
+  onlyPdfAvailable?: boolean
   'patient.identifier'?: string
   facet?: ('class' | 'visit-year-month-gender-facet')[]
   uniqueFacet?: 'patient'[]
   _elements?: ('status' | 'type' | 'subject' | 'encounter' | 'date' | 'title' | 'event')[]
 }
 export const fetchComposition = async (args: fetchCompositionProps) => {
-  const { _id, size, offset, _sort, sortDirection, type, _text, status, patient, encounter, minDate, maxDate } = args
+  const {
+    _id,
+    size,
+    offset,
+    _sort,
+    sortDirection,
+    type,
+    _text,
+    status,
+    patient,
+    encounter,
+    onlyPdfAvailable,
+    minDate,
+    maxDate
+  } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list, facet, uniqueFacet, _elements } = args
   const encounterIdentifier = args['encounter.identifier']
@@ -264,6 +279,7 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   if (patientIdentifier)                           options = [...options, `patient.identifier=${patientIdentifier}`]                            // eslint-disable-line
   if (encounter)                                   options = [...options, `encounter=${encounter}`]                                             // eslint-disable-line
   if (encounterIdentifier)                         options = [...options, `encounter.identifier=${encounterIdentifier}`]                        // eslint-disable-line
+  if (onlyPdfAvailable)                            options = [...options, `is_pdf_available=${onlyPdfAvailable}`]                               // eslint-disable-line
   if (minDate)                                     options = [...options, `date=ge${minDate}`]                                                  // eslint-disable-line
   if (maxDate)                                     options = [...options, `date=le${maxDate}`]                                                  // eslint-disable-line
 

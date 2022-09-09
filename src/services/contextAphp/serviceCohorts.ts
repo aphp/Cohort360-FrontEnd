@@ -54,37 +54,37 @@ export interface IServiceCohorts {
    *   - cohort: Objet Cohort lié a FHIR
    *   - totalPatients: Nombre total de la cohorte
    *   - originalPatients: Liste de patients de la cohorte
-   *   - genderRepartitionMap: Données lié au graphique de la répartition par genre
-   *   - visitTypeRepartitionData: Données lié au graphique de la répartition des visites
-   *   - agePyramidData: Données lié au graphique de la pyramide des ages
-   *   - monthlyVisitData: Données lié au graphique des visites par mois
-   *   - requestId: Identifiant de la requete lié à la cohorte
+   *   - genderRepartitionMap: Données liées au graphique de la répartition par genre
+   *   - visitTypeRepartitionData: Données liées au graphique de la répartition des visites
+   *   - agePyramidData: Données liées au graphique de la pyramide des ages
+   *   - monthlyVisitData: Données liées au graphique des visites par mois
+   *   - requestId: Identifiant de la requête liée à la cohorte
    *   - favorite: = true si la cohorte est une cohorte favorite
-   *   - uuid: Identifiant de la cohorte lié au back-end
+   *   - uuid: Identifiant de la cohorte liée au back-end
    */
   fetchCohort: (cohortId: string) => Promise<CohortData | undefined>
 
   /**
-   * Retourne la liste de patient lié à une cohorte
+   * Retourne la liste de patients liés à une cohorte
    *
    * Argument:
-   *   - page: Permet la pagination (definie un offset + limit)
+   *   - page: Permet la pagination (definit un offset + limit)
    *   - searchBy: Permet la recherche sur un champs précis (_text, family, given, identifier)
    *   - searchInput: Permet la recherche textuelle
    *   - gender: Permet le filtre par genre
-   *   - birthdates: Permet le filtre par date de naissances
-   *   - vitalStatus: Permet le filtre par status vital
+   *   - birthdates: Permet le filtre par date de naissance
+   *   - vitalStatus: Permet le filtre par statut vital
    *   - sortBy: Permet le tri
    *   - sortDirection: Permet le tri dans l'ordre croissant ou décroissant
    *   - deidentified: savoir si la liste de patients est pseudonymisée ou non
-   *   - groupId: (optionnel) Périmètre auquel la cohorte est lié
+   *   - groupId: (optionnel) Périmètre auquel la cohorte est liée
    *   - includeFacets: = true si vous voulez inclure les graphique
    *
    * Retourne:
-   *   - totalPatients: Nombre de patient (dépend des filtres)
+   *   - totalPatients: Nombre de patients (dépend des filtres)
    *   - originalPatients: Liste de patients
-   *   - agePyramidData: Données lié au graphique de la pyramide des ages
-   *   - genderRepartitionMap: Données lié au graphique de la répartition par genre
+   *   - agePyramidData: Données liées au graphique de la pyramide des ages
+   *   - genderRepartitionMap: Données liées au graphique de la répartition par genre
    */
   fetchPatientList: (
     page: number,
@@ -109,19 +109,20 @@ export interface IServiceCohorts {
   >
 
   /**
-   * Retourne la liste de documents lié à une cohorte
+   * Retourne la liste de documents liés à une cohorte
    *
    * Argument:
-   *   - deidentifiedBoolean: = true si la cohorte est pseudo. (permet un traitement particulié des éléments)
+   *   - deidentifiedBoolean: = true si la cohorte est pseudo. (permet un traitement particulier des éléments)
    *   - sortBy: Permet le tri
    *   - sortDirection: Permet le tri dans l'ordre croissant ou décroissant
-   *   - page: Permet la pagination (definie un offset + limit)
+   *   - page: Permet la pagination (definit un offset + limit)
    *   - searchInput: Permet la recherche textuelle
    *   - selectedDocTypes: Permet de filtrer sur le type de documents
-   *   - nda: Permet de filtrer les documents sur un NDA particulié (uniquement en nominatif)
+   *   - nda: Permet de filtrer les documents sur un NDA particulier (uniquement en nominatif)
+   *   - onlyPdfAvailable: permet d'afficher ou non seulement les documents dont le PDF est disponible
    *   - startDate: Permet de filtrer sur une date
    *   - endDate: Permet de filtrer sur une date
-   *   - groupId: (optionnel) Périmètre auquel la cohorte est lié
+   *   - groupId: (optionnel) Périmètre auquel la cohorte est liée
    */
   fetchDocuments: (
     deidentifiedBoolean: boolean,
@@ -132,6 +133,7 @@ export interface IServiceCohorts {
     selectedDocTypes: string[],
     nda: string,
     ipp: string,
+    onlyPdfAvailable: boolean,
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string
@@ -158,7 +160,7 @@ export interface IServiceCohorts {
    * Permet de récupérer le contenu d'un document
    *
    * Argument:
-   *   - compositionId: Identifiant du documents
+   *   - compositionId: Identifiant du document
    *
    * Retourne:
    *   - IComposition_Section: Contenu du document
@@ -166,10 +168,10 @@ export interface IServiceCohorts {
   fetchDocumentContent: (compositionId: string) => Promise<IComposition_Section[]>
 
   /**
-   * Permet de recuperer le contenu d'un document (/Binary)
+   * Permet de récupérer le contenu d'un document (/Binary)
    *
    * Argument:
-   *   - documentId: Identifiant du documents
+   *   - documentId: Identifiant du document
    *
    * Retourne:
    *   - IComposition_Section: Contenu du document
@@ -177,13 +179,13 @@ export interface IServiceCohorts {
   fetchBinary: (documentId: string, list?: string[]) => Promise<any>
 
   /**
-   * Permet la récupération des droits lié a plusieurs cohortes
+   * Permet la récupération des droits liés à plusieurs cohortes
    *
    * Argument:
    *   - cohorts: Tableau de cohortes de type `Cohort[]`
    *
    * Retourne:
-   *   - La liste de cohortes avec une extension lié au droit d'accès + export
+   *   - La liste de cohortes avec une extension liée au droit d'accès + export
    */
   fetchCohortsRights: (cohorts: Cohort[]) => Promise<Cohort[]>
 
@@ -193,7 +195,7 @@ export interface IServiceCohorts {
    * Argument:
    *   - cohortId: Identifiant de la cohorte
    *   - motivation: Raison de l'export
-   *   - tables: Liste de table demandé dans l'export
+   *   - tables: Liste de tables demandées dans l'export
    */
   createExport: (args: { cohortId: number; motivation: string; tables: string[] }) => Promise<any>
 }
@@ -374,6 +376,7 @@ const servicesCohorts: IServiceCohorts = {
     selectedDocTypes,
     nda,
     ipp,
+    onlyPdfAvailable,
     startDate,
     endDate,
     groupId
@@ -391,6 +394,7 @@ const servicesCohorts: IServiceCohorts = {
         type: selectedDocTypes.length > 0 ? selectedDocTypes.join(',') : '',
         'encounter.identifier': nda,
         'patient.identifier': ipp,
+        onlyPdfAvailable: onlyPdfAvailable,
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
         uniqueFacet: ['patient']
@@ -596,7 +600,7 @@ const servicesCohorts: IServiceCohorts = {
                 .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
             : []
 
-        // Pour les récupérer les informations du périmètre de la cohorte
+        // Pour récupérer les informations du périmètre de la cohorte
         const parentGroupsResponse = await Promise.all(
           parentGroupsId.map((parentGroupId: string) =>
             new Promise((resolve) => {
@@ -611,7 +615,7 @@ const servicesCohorts: IServiceCohorts = {
           )
         )
 
-        // Et faire le liens avec les organisations, donc ...
+        // Et faire le lien avec les organisations, donc ...
         // On crée un dictionnaire pour faire le lien entre les Groups et les Organisations (Dictionnaire 2)
         organizationLinkList = parentGroupsResponse
           .filter((parentGroupResponse: any) => parentGroupResponse.error !== true)
@@ -626,7 +630,7 @@ const servicesCohorts: IServiceCohorts = {
 
         if (!organizationLinkList || organizationLinkList?.length === 0) return cohorts
 
-        // On crée une liste des Organisations lié au périmètre (caresiteIds = string)
+        // On crée une liste des Organisations liées au périmètre (caresiteIds = string)
         caresiteIds = organizationLinkList
           .map(
             (currentParentItem: any) =>

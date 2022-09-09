@@ -226,6 +226,7 @@ export interface IServicePatients {
    **   - searchInput: permet la recherche textuelle
    **   - selectedDocTypes: permet de filtrer par un type de documents
    **   - nda: permet de filtrer sur un NDA précis
+   **   - onlyPdfAvailable: permet d'afficher ou non seulement les documents dont le PDF est disponible
    **   - startDate: (optionnel) permet le filtre par date
    **   - endDate: (optionnel) permet le filtre par date
    **   - groupId: (optionnel) Périmètre auquel le patient est lié
@@ -242,6 +243,7 @@ export interface IServicePatients {
     searchInput: string,
     selectedDocTypes: string[],
     nda: string,
+    onlyPdfAvailable: boolean,
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string
@@ -574,6 +576,7 @@ const servicesPatients: IServicePatients = {
     searchInput: string,
     selectedDocTypes: string[],
     nda: string,
+    onlyPdfAvailable?: boolean,
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string
@@ -592,6 +595,7 @@ const servicesPatients: IServicePatients = {
       _text: searchInput,
       type: selectedDocTypes.join(','),
       'encounter.identifier': nda,
+      onlyPdfAvailable: onlyPdfAvailable,
       minDate: startDate ?? '',
       maxDate: endDate ?? ''
     })

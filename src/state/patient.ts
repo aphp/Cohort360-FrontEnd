@@ -330,6 +330,7 @@ type FetchDocumentsParams = {
       selectedDocTypes: string[]
       startDate: string | null
       endDate: string | null
+      onlyPdfAvailable: boolean
     }
     sort?: {
       by: string
@@ -359,6 +360,7 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
       const nda = options?.filters?.nda ?? ''
       const startDate = options?.filters?.startDate ?? null
       const endDate = options?.filters?.endDate ?? null
+      const onlyPdfAvailable = options?.filters?.onlyPdfAvailable ?? false
 
       const documentsResponse = await services.patients.fetchDocuments(
         sortBy,
@@ -368,6 +370,7 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
         searchInput,
         selectedDocTypes,
         nda,
+        onlyPdfAvailable,
         startDate,
         endDate,
         groupId
