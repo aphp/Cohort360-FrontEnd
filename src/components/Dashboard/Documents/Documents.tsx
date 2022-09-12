@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { CssBaseline, Grid } from '@material-ui/core'
+import { Checkbox, CssBaseline, Grid, Typography } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
 
 import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
@@ -40,6 +40,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     nda: '',
     ipp: '',
     selectedDocTypes: [],
+    onlyPdfAvailable: deidentifiedBoolean ? false : true,
     startDate: null,
     endDate: null
   })
@@ -85,6 +86,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
       selectedDocTypesCodes,
       filters.nda,
       filters.ipp ?? '',
+      filters.onlyPdfAvailable,
       filters.startDate,
       filters.endDate,
       groupId
@@ -227,6 +229,17 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
               remplacées par des informations fictives). Vous retrouverez les données personnelles de votre patient en
               cliquant sur l'aperçu.
             </Alert>
+          )}
+
+          {!deidentifiedBoolean && (
+            <Grid container item alignItems="center" justifyContent="flex-end">
+              <Checkbox
+                checked={filters.onlyPdfAvailable}
+                onChange={() => onChangeOptions('onlyPdfAvailable', !filters.onlyPdfAvailable)}
+                color="primary"
+              />
+              <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
+            </Grid>
           )}
 
           <DataTableComposition

@@ -112,16 +112,17 @@ export interface IServiceCohorts {
    * Retourne la liste de documents lié à une cohorte
    *
    * Argument:
-   *   - deidentifiedBoolean: = true si la cohorte est pseudo. (permet un traitement particulié des éléments)
+   *   - deidentifiedBoolean: = true si la cohorte est pseudo. (permet un traitement particulier des éléments)
    *   - sortBy: Permet le tri
    *   - sortDirection: Permet le tri dans l'ordre croissant ou décroissant
    *   - page: Permet la pagination (definie un offset + limit)
    *   - searchInput: Permet la recherche textuelle
    *   - selectedDocTypes: Permet de filtrer sur le type de documents
-   *   - nda: Permet de filtrer les documents sur un NDA particulié (uniquement en nominatif)
+   *   - nda: Permet de filtrer les documents sur un NDA particulier (uniquement en nominatif)
+   *   - onlyPdfAvailable: permet d'afficher ou non seulement les documents dont le PDF est disponible
    *   - startDate: Permet de filtrer sur une date
    *   - endDate: Permet de filtrer sur une date
-   *   - groupId: (optionnel) Périmètre auquel la cohorte est lié
+   *   - groupId: (optionnel) Périmètre auquel la cohorte est liée
    */
   fetchDocuments: (
     deidentifiedBoolean: boolean,
@@ -132,6 +133,7 @@ export interface IServiceCohorts {
     selectedDocTypes: string[],
     nda: string,
     ipp: string,
+    onlyPdfAvailable: boolean,
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string
@@ -374,6 +376,7 @@ const servicesCohorts: IServiceCohorts = {
     selectedDocTypes,
     nda,
     ipp,
+    onlyPdfAvailable,
     startDate,
     endDate,
     groupId
@@ -385,12 +388,13 @@ const servicesCohorts: IServiceCohorts = {
         _sort: sortBy,
         sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
         status: 'final',
-        _elements: searchInput ? [] : ['status', 'type', 'subject', 'encounter', 'date', 'title'],
+        _elements: searchInput ? [] : ['status', 'type', 'subject', 'encounter', 'date', 'title', 'event'],
         _list: groupId ? [groupId] : [],
         _text: searchInput,
         type: selectedDocTypes.length > 0 ? selectedDocTypes.join(',') : '',
         'encounter.identifier': nda,
         'patient.identifier': ipp,
+        onlyPdfAvailable: onlyPdfAvailable,
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
         uniqueFacet: ['patient']

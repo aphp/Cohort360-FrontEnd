@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import Grid from '@material-ui/core/Grid'
+import { Checkbox, Grid, Typography } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
@@ -44,7 +44,8 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     nda: '',
     selectedDocTypes: [],
     startDate: null,
-    endDate: null
+    endDate: null,
+    onlyPdfAvailable: deidentified ? false : true
   })
 
   const [searchInput, setSearchInput] = useState('')
@@ -88,6 +89,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     handleChangePage()
   }, [
     searchInput,
+    filters.onlyPdfAvailable,
     filters.nda,
     filters.selectedDocTypes,
     filters.startDate,
@@ -158,6 +160,17 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         Attention : La recherche est pseudonymisée pour la prévisualisation des documents. Vous pouvez donc trouver des
         incohérences entre les informations de votre patient et celles du document prévisualisé.
       </Alert>
+
+      {!deidentified && (
+        <Grid container item alignItems="center" justifyContent="flex-end">
+          <Checkbox
+            checked={filters.onlyPdfAvailable}
+            onChange={() => onChangeOptions('onlyPdfAvailable', !filters.onlyPdfAvailable)}
+            color="primary"
+          />
+          <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
+        </Grid>
+      )}
 
       <DataTableComposition
         loading={loading}

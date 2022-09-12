@@ -134,6 +134,7 @@ export type DocumentFilters = {
   selectedDocTypes: { code: string; label: string; type: string }[]
   startDate: string | null
   endDate: string | null
+  onlyPdfAvailable: boolean
 }
 
 export type MedicationsFilters = {
