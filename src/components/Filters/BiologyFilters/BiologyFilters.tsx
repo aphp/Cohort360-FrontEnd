@@ -50,6 +50,10 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
   }
 
   useEffect(() => {
+    setFilters(filters)
+  }, [open])
+
+  useEffect(() => {
     if (moment(_filters.startDate).isAfter(_filters.endDate)) {
       setDateError(true)
     } else {
