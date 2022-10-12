@@ -108,7 +108,12 @@ const Login = () => {
     if (practitioner) {
       const practitionerPerimeters = await services.perimeters.getPerimeters()
 
-      if (practitionerPerimeters.error) {
+      if (
+        !practitionerPerimeters ||
+        practitionerPerimeters.error ||
+        !practitionerPerimeters.length ||
+        practitionerPerimeters.length == 0
+      ) {
         setLoading(false)
         return (
           setError(true),

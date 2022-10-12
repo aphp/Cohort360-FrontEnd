@@ -256,6 +256,10 @@ const servicesPerimeters: IServicePerimeters = {
           _id: perimetersIds.join(','),
           _elements: ['name', 'extension', 'alias']
         })
+        if (!organisationResult || !organisationResult.data) {
+          console.error('Error (getPerimeters) while fetching organizations ! perimeters = ', perimetersIds)
+          return []
+        }
 
         organizationList = getApiResponseResources(organisationResult) ?? []
         organizationList = organizationList.map((organizationItem) => {
