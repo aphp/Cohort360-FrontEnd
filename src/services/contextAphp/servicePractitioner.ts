@@ -78,7 +78,7 @@ const servicePractitioner: IServicePractitioner = {
     try {
       return await axios({
         method: 'GET',
-        url: `${BACK_API_URL}/maintenance/`
+        url: `${BACK_API_URL}/maintenances/`
       })
     } catch (error) {
       console.error("erreur lors de l'éxécution de la fonction maintenance", error)

@@ -103,7 +103,7 @@ const servicesPerimeters: IServicePerimeters = {
       .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
       .join(',')
 
-    const rightResponse = await apiBackend.get(`accesses/my-rights/?care-site-ids=${caresiteIds}`)
+    const rightResponse = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${caresiteIds}`)
     const rightsData = (rightResponse.data as any[]) ?? []
 
     let allowSearchIpp = false
@@ -384,7 +384,7 @@ const servicesPerimeters: IServicePerimeters = {
       .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
       .join(',')
 
-    const rightResponse = await apiBackend.get(`accesses/my-rights/?care-site-ids=${caresiteIds}`)
+    const rightResponse = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${caresiteIds}`)
     const rightsData = (rightResponse.data as any[]) ?? []
 
     return perimeters.map((perimeter) => {

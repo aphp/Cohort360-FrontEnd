@@ -6,7 +6,7 @@ export const getProviders = async (order: Order, page?: number, searchInput?: st
   const searchFilter = searchInput ? `&search=${searchInput}` : ''
 
   const providersResp = await apiBack.get<any>(
-    `/providers/?manual_only=true&page=${page}&ordering=${order.orderDirection === 'desc' ? '-' : ''}${
+    `/users/?manual_only=true&page=${page}&ordering=${order.orderDirection === 'desc' ? '-' : ''}${
       order.orderBy
     }${searchFilter}`
   )
