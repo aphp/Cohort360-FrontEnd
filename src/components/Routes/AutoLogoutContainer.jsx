@@ -1,58 +1,65 @@
-import React, { useRef, useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
-import IdleTimer from 'react-idle-timer'
-import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogActions from '@material-ui/core/DialogActions'
-import Button from '@material-ui/core/Button'
 import { DialogContentText } from '@material-ui/core'
+import Button from '@material-ui/core/Button'
+import Dialog from '@material-ui/core/Dialog'
+import DialogActions from '@material-ui/core/DialogActions'
+import DialogContent from '@material-ui/core/DialogContent'
 import axios from 'axios'
-
-import { ACCES_TOKEN, REFRESH_TOKEN, /* CONTEXT,*/ BACK_API_URL } from '../../constants'
-
-import { useAppSelector, useAppDispatch } from 'state'
+import React, { useEffect, useState } from 'react'
+import { useIdleTimer } from 'react-idle-timer'
+import { useHistory } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from 'state'
+import { close as closeAction, open as openAction } from 'state/autoLogout'
 import { logout as logoutAction } from 'state/me'
+import { ACCES_TOKEN, BACK_API_URL, REFRESH_TOKEN, REFRESH_TOKEN_INTERVAL, SESSION_TIMEOUT } from '../../constants'
 import useStyles from './styles'
 
 const AutoLogoutContainer = () => {
   const classes = useStyles()
-
-  const [dialogIsOpen, setDialogIsOpen] = useState(false)
   const [refreshInterval, setRefreshInterval] = useState()
   const dispatch = useAppDispatch()
   const history = useHistory()
-  const inactifTimerRef = useRef(null)
-  const sessionInactifTimerRef = useRef(null)
-
   const { me } = useAppSelector((state) => ({ me: state.me }))
+  const { isOpen } = useAppSelector((state) => ({
+    isOpen: state.autoLogout.isOpen
+  }))
+
+  const handleOnIdle = () => {
+    logout()
+  }
+  const handleOnPrompt = () => {
+    dispatch(openAction())
+  }
+  const handleOnActive = () => {
+    dispatch(closeAction())
+    reset()
+  }
+  const handleOnAction = () => {
+    reset()
+  }
+  const { reset, pause, start } = useIdleTimer({
+    crossTab: true,
+    syncTimers: 0,
+    timeout: SESSION_TIMEOUT,
+    promptTimeout: 1 * 60 * 1000,
+    throttle: 1 * 60 * 1000,
+    onPrompt: handleOnPrompt,
+    onIdle: handleOnIdle,
+    onActive: handleOnActive,
+    onAction: handleOnAction
+  })
 
   const logout = () => {
-    setDialogIsOpen(false)
+    dispatch(closeAction())
     history.push('/')
     localStorage.clear()
     dispatch(logoutAction())
-    clearTimeout(sessionInactifTimerRef.current)
-    clearTimeout(inactifTimerRef)
-  }
-
-  const onIdle = () => {
-    setDialogIsOpen(true)
-    sessionInactifTimerRef.current = setTimeout(logout, 2 * 30 * 1000)
+    pause()
   }
 
   const stayActive = async () => {
     try {
-      const res = await axios.post(`${BACK_API_URL}/accounts/refresh/`)
-
-      if (res.status === 200) {
-        localStorage.setItem(ACCES_TOKEN, res.data.access)
-        localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
-        setDialogIsOpen(false)
-        clearTimeout(sessionInactifTimerRef.current)
-        clearTimeout(inactifTimerRef)
-      } else {
-        logout()
-      }
+      reset()
+      dispatch(closeAction())
     } catch (error) {
       console.error(error)
       logout()
@@ -77,22 +84,23 @@ const AutoLogoutContainer = () => {
 
   useEffect(() => {
     if (me !== null) {
+      start()
       refreshToken()
       setRefreshInterval(
         setInterval(() => {
           refreshToken()
-        }, 3 * 60 * 1000)
+        }, REFRESH_TOKEN_INTERVAL)
       )
     } else if (me == null) {
       clearInterval(refreshInterval)
+      pause()
     }
   }, [me])
 
   if (!me) return <></>
-
   return (
     <div>
-      <Dialog open={dialogIsOpen}>
+      <Dialog open={isOpen}>
         <DialogContent>
           <DialogContentText variant="button" className={classes.title}>
             Vous allez être déconnecté car vous avez été inactif pendant 14 minutes.
@@ -105,9 +113,7 @@ const AutoLogoutContainer = () => {
           <Button onClick={logout}>Déconnexion</Button>
         </DialogActions>
       </Dialog>
-      <IdleTimer ref={inactifTimerRef} timeout={13 * 60 * 1000} onIdle={onIdle}></IdleTimer>
     </div>
   )
 }
-
 export default AutoLogoutContainer

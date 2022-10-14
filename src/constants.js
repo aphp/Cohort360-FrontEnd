@@ -154,4 +154,11 @@ export const ODD_REGEX =
     ? '{REACT_APP_ODD_REGEX}' == `${BOOLEANTRUE}`
     : process.env.REACT_APP_ODD_REGEX == `${BOOLEANTRUE}`
 
+export const SESSION_TIMEOUT = process.env.REACT_APP_SESSION_TIMEOUT
+  ? process.env.REACT_APP_SESSION_TIMEOUT
+  : 780000 /* 13 * 60 * 1000 ms*/
+export const REFRESH_TOKEN_INTERVAL = process.env.REACT_APP_REFRESH_TOKEN_INTERVAL
+  ? process.env.REACT_APP_REFRESH_TOKEN_INTERVAL
+  : 180000 /* 3 * 60 * 1000 ms*/
+
 export const VALUE_SET_SIZE = '9999'
