@@ -1,9 +1,8 @@
 import moment from 'moment'
 
 import services from 'services'
-import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType } from 'types'
+import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType, DocType } from 'types'
 
-import { capitalizeFirstLetter } from 'utils/capitalize'
 import { docTypes } from 'assets/docTypes.json'
 
 const REQUETEUR_VERSION = 'v1.2.1'
@@ -347,7 +346,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
         }`,
         `${
           criterion.docType && criterion.docType.length > 0
-            ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: any) => docType.id).reduce(searchReducer)}`
+            ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: DocType) => docType.code).reduce(searchReducer)}`
             : ''
         }`
       ]
@@ -1062,15 +1061,9 @@ export async function unbuildRequest(_json: string) {
               }
               case COMPOSITION_TYPE: {
                 const docTypeIds = value?.split(',')
-                const newDocTypeIds = docTypes
-                  .filter((docType: { code: string; label: string; type: string }) =>
-                    docTypeIds?.find((docTypeId) => docTypeId === docType.code)
-                  )
-                  .map((_docType: { code: string; label: string; type: string }) => ({
-                    id: _docType.code,
-                    label: capitalizeFirstLetter(_docType.label),
-                    type: _docType.type
-                  }))
+                const newDocTypeIds = docTypes.filter((docType: DocType) =>
+                  docTypeIds?.find((docTypeId) => docTypeId === docType.code)
+                )
 
                 if (!newDocTypeIds) continue
 

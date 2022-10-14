@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios'
 import apiBack from '../apiBackend'
 
-import { CohortCreationCounterType } from 'types'
+import { CohortCreationCounterType, DocType } from 'types'
 
 import {
   fetchAdmissionModes,
@@ -82,7 +82,7 @@ export interface IServiceCohortCreation {
   fetchCcamHierarchy: (ccamParent: string) => Promise<any>
   fetchGhmData: () => Promise<any>
   fetchGhmHierarchy: (ghmParent: string) => Promise<any>
-  fetchDocTypes: () => { id: string; label: string; type: string }[]
+  fetchDocTypes: () => DocType[]
   fetchAtcData: () => Promise<any>
   fetchAtcHierarchy: (atcParent: string) => Promise<any>
   fetchPrescriptionTypes: () => Promise<any>
