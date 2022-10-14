@@ -189,23 +189,6 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       'Favoris'
                     )}
                   </TableCell>
-                  <TableCell
-                    className={classes.tableHeadCell}
-                    align="center"
-                    sortDirection={sortBy === 'type' ? sortDirection : false}
-                  >
-                    {sortDirection ? (
-                      <TableSortLabel
-                        active={sortBy === 'type'}
-                        direction={sortBy === 'type' ? sortDirection : 'asc'}
-                        onClick={createSortHandler('type')}
-                      >
-                        Type
-                      </TableSortLabel>
-                    ) : (
-                      'Type'
-                    )}
-                  </TableCell>
                   <TableCell className={classes.tableHeadCell} align="center">
                     Statut
                   </TableCell>
@@ -287,9 +270,6 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                             <FavStar favorite={row.favorite} />
                           )}
                         </IconButton>
-                      </TableCell>
-                      <TableCell onClick={() => _onClickRow(row)} className={classes.status} align="center">
-                        {row.type === 'MY_COHORTS' ? 'Cohort360' : 'Cohort I2B2'}
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} align="center">
                         {row.fhir_group_id ? (
