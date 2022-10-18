@@ -109,7 +109,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
     submit && setShowFilterChip(true)
   }
 
-  const handleCloseSortDialog = () => () => {
+  const handleCloseSortDialog = () => {
     setOpenSort(false)
   }
 
@@ -150,7 +150,6 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
         onClickSortButton={() => setOpenSort(true)}
         openSort={openSort}
         onCloseSort={handleCloseSortDialog}
-        onSubmitSort={handleCloseSortDialog}
         sort={sort}
         onChangeSort={setSort}
       />
