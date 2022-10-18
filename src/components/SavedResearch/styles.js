@@ -2,7 +2,7 @@ import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme) => ({
   documentTable: {
-    marginTop: '24px'
+    margin: '24px 0'
   },
   tableButtons: {
     display: 'flex',

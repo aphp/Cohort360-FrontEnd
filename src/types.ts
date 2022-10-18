@@ -120,7 +120,6 @@ export type Cohort = {
 
 export type CohortFilters = {
   status: ValueSet[]
-  type: string
   favorite: string
   minPatients: null | string
   maxPatients: null | string

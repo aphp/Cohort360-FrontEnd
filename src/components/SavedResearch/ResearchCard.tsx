@@ -49,7 +49,6 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
 
   const [filters, setFilters] = useState<CohortFilters>({
     status: [],
-    type: 'all',
     favorite: 'all',
     minPatients: null,
     maxPatients: null,
@@ -78,12 +77,6 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
     }
     if (filters.maxPatients) {
       cohortsList = cohortsList.filter(({ result_size }) => (result_size ?? 0) <= parseInt(filters.maxPatients ?? '0'))
-    }
-
-    if (filters.type && filters.type !== 'all') {
-      cohortsList = cohortsList.filter(({ type }) =>
-        filters.type === 'IMPORT_I2B2' ? type !== 'MY_COHORTS' : type === 'MY_COHORTS'
-      )
     }
 
     if (filters.favorite && filters.favorite !== 'all') {
@@ -163,7 +156,6 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
             status: filters.status.filter((item) => item.code !== value.code)
           })
         break
-      case 'type':
       case 'favorite':
         setFilters({ ...filters, [filterName]: 'all' })
         break
