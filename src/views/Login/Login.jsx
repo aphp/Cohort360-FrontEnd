@@ -108,7 +108,12 @@ const Login = () => {
     if (practitioner) {
       const practitionerPerimeters = await services.perimeters.getPerimeters()
 
-      if (practitionerPerimeters.error) {
+      if (
+        !practitionerPerimeters ||
+        practitionerPerimeters.error ||
+        !practitionerPerimeters.length ||
+        practitionerPerimeters.length == 0
+      ) {
         setLoading(false)
         return (
           setError(true),
@@ -210,7 +215,7 @@ const Login = () => {
 
       const practitioner = await services.practitioner.fetchPractitioner(username)
 
-      if (practitioner.error || practitioner.response.status !== 200) {
+      if (!practitioner || practitioner.error || !practitioner.response || practitioner.response.status !== 200) {
         setLoading(false)
         return (
           setError(true),
