@@ -1,41 +1,47 @@
-import { DialogContentText } from '@material-ui/core'
-import Button from '@material-ui/core/Button'
-import Dialog from '@material-ui/core/Dialog'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useIdleTimer } from 'react-idle-timer'
 import { useHistory } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from 'state'
+import axios from 'axios'
+
+import { DialogContentText, Dialog, DialogActions, DialogContent, Button } from '@material-ui/core'
+
 import { close as closeAction, open as openAction } from 'state/autoLogout'
+import { useAppDispatch, useAppSelector } from 'state'
 import { logout as logoutAction } from 'state/me'
+
 import { ACCES_TOKEN, BACK_API_URL, REFRESH_TOKEN, REFRESH_TOKEN_INTERVAL, SESSION_TIMEOUT } from '../../constants'
+
 import useStyles from './styles'
 
 const AutoLogoutContainer = () => {
   const classes = useStyles()
-  const [refreshInterval, setRefreshInterval] = useState()
   const dispatch = useAppDispatch()
   const history = useHistory()
+
   const { me } = useAppSelector((state) => ({ me: state.me }))
   const { isOpen } = useAppSelector((state) => ({
     isOpen: state.autoLogout.isOpen
   }))
 
+  const [refreshInterval, setRefreshInterval] = useState()
+
   const handleOnIdle = () => {
     logout()
   }
+
   const handleOnPrompt = () => {
     dispatch(openAction())
   }
+
   const handleOnActive = () => {
     dispatch(closeAction())
     reset()
   }
+
   const handleOnAction = () => {
     reset()
   }
+
   const { reset, pause, start } = useIdleTimer({
     crossTab: true,
     syncTimers: 0,
@@ -98,6 +104,7 @@ const AutoLogoutContainer = () => {
   }, [me])
 
   if (!me) return <></>
+
   return (
     <div>
       <Dialog open={isOpen}>

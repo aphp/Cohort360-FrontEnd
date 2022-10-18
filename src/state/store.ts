@@ -1,27 +1,26 @@
-import { applyMiddleware, combineReducers, createStore } from 'redux'
-import logger from 'redux-logger'
+import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync'
+import { createStore, applyMiddleware, combineReducers } from 'redux'
+import { persistReducer, persistStore } from 'redux-persist'
 import thunkMiddleware from 'redux-thunk'
+import logger from 'redux-logger'
 
 import localforage from 'localforage'
-import { persistReducer, persistStore } from 'redux-persist'
 
-import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync'
-
-import autoLogout from './autoLogout'
-import biology from './biology'
-import cohort from './cohort'
 import cohortCreation from './cohortCreation'
-import criteria from './criteria'
-import drawer from './drawer'
 import exploredCohort from './exploredCohort'
-import me from './me'
+import autoLogout from './autoLogout'
 import medication from './medication'
+import criteria from './criteria'
 import message from './message'
 import patient from './patient'
-import pmsi from './pmsi'
 import project from './project'
 import request from './request'
+import biology from './biology'
+import cohort from './cohort'
+import drawer from './drawer'
 import scope from './scope'
+import pmsi from './pmsi'
+import me from './me'
 
 const cohortCreationReducer = combineReducers({
   criteria,
