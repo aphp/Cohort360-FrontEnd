@@ -94,6 +94,7 @@
     "@types/d3": "^6.3.0",
     "@types/d3-cloud": "^1.2.3",
     "@types/jest": "^27.0.2",
+    "@types/lodash": "^4.14.186",
     "@types/node": "^16.10.9",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",

@@ -10,7 +10,7 @@ import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 
 import { useAppSelector } from 'state'
-import { SelectedCriteriaType } from 'types'
+import { DocType, SelectedCriteriaType } from 'types'
 
 import { docTypes } from 'assets/docTypes.json'
 
@@ -295,9 +295,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Composition': {
-        const displaySelectedDocType = (selectedDocTypes: { id: string; label: string; type?: string }[]) => {
+        const displaySelectedDocType = (selectedDocTypes: DocType[]) => {
           let displayingSelectedDocTypes: any[] = []
-          const allTypes = docTypes.map((docType: any) => docType.type)
+          const allTypes = docTypes.map((docType: DocType) => docType.type)
 
           for (const selectedDocType of selectedDocTypes) {
             const numberOfElementFromGroup = (allTypes.filter((type) => type === selectedDocType.type) || []).length

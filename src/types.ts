@@ -413,12 +413,18 @@ export type IPPListDataType = {
   isInclusive?: boolean
 }
 
+export type DocType = {
+  code: string
+  label: string
+  type: string
+}
+
 export type DocumentDataType = {
   title: string
   type: 'Composition'
   search: string
   regex_search: string
-  docType: { id: string; label: string }[] | null
+  docType: DocType[] | null
   encounterEndDate: Date | ''
   encounterStartDate: Date | ''
   occurrence: number
