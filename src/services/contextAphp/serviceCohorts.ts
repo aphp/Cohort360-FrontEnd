@@ -642,7 +642,7 @@ const servicesCohorts: IServiceCohorts = {
       }
 
       // On appelle le back-end pour avoir la liste des droits
-      const rightsResponse = await apiBackend.get(`accesses/my-rights/?care-site-ids=${caresiteIds}`)
+      const rightsResponse = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${caresiteIds}`)
       const rightsData: any = rightsResponse.data ?? []
 
       return cohorts.map((cohort) => {
