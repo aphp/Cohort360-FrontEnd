@@ -239,7 +239,7 @@ const servicesPerimeters: IServicePerimeters = {
 
   getPerimeters: async () => {
     try {
-      const rightResponse = await apiBackend.get('accesses/my-rights/?pop-children')
+      const rightResponse = await apiBackend.get('accesses/accesses/my-rights/?pop-children')
       const rightsData: any[] = rightResponse.status === 200 ? (rightResponse?.data as any[]) : []
 
       let perimetersIds = []
