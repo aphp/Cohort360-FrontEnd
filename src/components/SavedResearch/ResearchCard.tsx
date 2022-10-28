@@ -20,6 +20,7 @@ import { buildCohortFiltersChips } from 'utils/chips'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchCohorts, deleteCohort, setFavoriteCohort } from 'state/cohort'
+import { Pagination } from '@material-ui/lab'
 
 type ResearchProps = {
   simplified?: boolean
@@ -42,6 +43,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   const favInUrl = (search.get('fav') ?? 'false') === 'true'
 
   const [total, setTotal] = useState(cohortState.count)
+  const [page, setPage] = useState(1)
   const [sortBy, setSortBy] = useState(favInUrl ? 'favorite' : 'fhir_datetime')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
 
@@ -57,61 +59,63 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   })
 
   useEffect(() => {
-    dispatch<any>(fetchCohorts())
-  }, [])
+    dispatch<any>(fetchCohorts({ limit: 2, page }))
+  }, [dispatch])
 
   useEffect(() => {
     onFetchCohorts(sortBy, sortDirection)
-  }, [cohortState, filters]) // eslint-disable-line
+  }, [cohortState, filters, page]) // eslint-disable-line
 
   const onFetchCohorts = async (sortBy = 'given', sortDirection = 'asc', input = searchInput) => {
-    let cohortsList = cohortState.cohortsList
+    const cohortsList = cohortState.cohortsList
+    console.log('cohortState', cohortState)
 
-    if (input) {
-      const regexp = new RegExp(`${(input || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}`, 'gi') // eslint-disable-line
-      cohortsList = cohortsList.filter(({ name }) => name?.search(regexp) !== -1)
-    }
+    // if (input) {
+    //   const regexp = new RegExp(`${(input || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}`, 'gi') // eslint-disable-line
+    //   cohortsList = cohortsList.filter(({ name }) => name?.search(regexp) !== -1)
+    // }
 
-    if (filters.minPatients) {
-      cohortsList = cohortsList.filter(({ result_size }) => (result_size ?? 0) >= parseInt(filters.minPatients ?? '0'))
-    }
-    if (filters.maxPatients) {
-      cohortsList = cohortsList.filter(({ result_size }) => (result_size ?? 0) <= parseInt(filters.maxPatients ?? '0'))
-    }
+    // if (filters.minPatients) {
+    //   cohortsList = cohortsList.filter(({ result_size }) => (result_size ?? 0) >= parseInt(filters.minPatients ?? '0'))
+    // }
+    // if (filters.maxPatients) {
+    //   cohortsList = cohortsList.filter(({ result_size }) => (result_size ?? 0) <= parseInt(filters.maxPatients ?? '0'))
+    // }
 
-    if (filters.favorite && filters.favorite !== 'all') {
-      cohortsList = cohortsList.filter(({ favorite }) =>
-        filters.favorite === 'True' ? favorite === true : favorite === false
-      )
-    }
+    // if (filters.favorite && filters.favorite !== 'all') {
+    //   cohortsList = cohortsList.filter(({ favorite }) =>
+    //     filters.favorite === 'True' ? favorite === true : favorite === false
+    //   )
+    // }
 
-    if (filters.startDate || filters.endDate) {
-      cohortsList = cohortsList.filter(({ modified_at }) =>
-        filters.startDate && filters.endDate
-          ? // Filtrer les deux
-            moment(modified_at).isAfter(moment(filters.startDate)) &&
-            moment(modified_at).isBefore(moment(filters.endDate))
-          : filters.startDate
-          ? // Filtrer par rapport à startDate
-            moment(modified_at).isAfter(moment(filters.startDate))
-          : // Filtrer par rapport à endDate
-            moment(modified_at).isBefore(moment(filters.endDate))
-      )
-    }
+    // if (filters.startDate || filters.endDate) {
+    //   cohortsList = cohortsList.filter(({ modified_at }) =>
+    //     filters.startDate && filters.endDate
+    //       ? // Filtrer les deux
+    //         moment(modified_at).isAfter(moment(filters.startDate)) &&
+    //         moment(modified_at).isBefore(moment(filters.endDate))
+    //       : filters.startDate
+    //       ? // Filtrer par rapport à startDate
+    //         moment(modified_at).isAfter(moment(filters.startDate))
+    //       : // Filtrer par rapport à endDate
+    //         moment(modified_at).isBefore(moment(filters.endDate))
+    //   )
+    // }
 
-    if (filters.status && filters.status.length > 0) {
-      cohortsList = cohortsList.filter(({ request_job_status }) =>
-        filters.status.find((status) => {
-          return status.code === 'pending,started'
-            ? request_job_status === 'pending' || request_job_status === 'started'
-            : request_job_status === status.code
-        })
-      )
-    }
+    // if (filters.status && filters.status.length > 0) {
+    //   cohortsList = cohortsList.filter(({ request_job_status }) =>
+    //     filters.status.find((status) => {
+    //       return status.code === 'pending,started'
+    //         ? request_job_status === 'pending' || request_job_status === 'started'
+    //         : request_job_status === status.code
+    //     })
+    //   )
+    // }
 
-    const sortedCohortsList = stableSort(cohortsList, getComparator(sortDirection, sortBy))
-    setResearches(sortedCohortsList)
-    setTotal(sortedCohortsList.length)
+    // const sortedCohortsList = stableSort(cohortsList, getComparator(sortDirection, sortBy))
+    // setResearches(sortedCohortsList)
+    setResearches(cohortsList)
+    setTotal(cohortState.count)
   }
 
   const onDeleteCohort = async (cohort: Cohort) => {
@@ -214,16 +218,26 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
           <CircularProgress />
         </Grid>
       ) : (
-        <ResearchTable
-          simplified={simplified}
-          researchData={researches}
-          onDeleteCohort={onDeleteCohort}
-          onSetCohortFavorite={onSetCohortFavorite}
-          onClickRow={onClickRow}
-          sortBy={sortBy}
-          sortDirection={sortDirection}
-          onRequestSort={handleRequestSort}
-        />
+        <>
+          <ResearchTable
+            simplified={simplified}
+            researchData={researches}
+            onDeleteCohort={onDeleteCohort}
+            onSetCohortFavorite={onSetCohortFavorite}
+            onClickRow={onClickRow}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            onRequestSort={handleRequestSort}
+          />
+
+          <Pagination
+            // className={classes.pagination}
+            count={Math.ceil((total ?? 0) / 20)}
+            shape="rounded"
+            onChange={(event, page: number) => setPage && setPage(page)}
+            page={page}
+          />
+        </>
       )}
 
       <CohortsFilter open={open} onClose={() => setOpen(false)} filters={filters} onChangeFilters={setFilters} />

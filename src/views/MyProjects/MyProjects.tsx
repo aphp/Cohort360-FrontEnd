@@ -82,7 +82,7 @@ const MyProjects: React.FC<{}> = () => {
   }
 
   const _fetchCohortsList = async () => {
-    dispatch<any>(fetchCohortsList())
+    dispatch<any>(fetchCohortsList({}))
   }
 
   const _fetch = async () => {

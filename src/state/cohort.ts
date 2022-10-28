@@ -26,16 +26,22 @@ type FetchCohortListReturn = {
   cohortsList: Cohort[]
 }
 
-const fetchCohorts = createAsyncThunk<FetchCohortListReturn, void, { state: RootState }>(
+type FetchCohortsParams = {
+  limit?: number
+  page?: number
+}
+const fetchCohorts = createAsyncThunk<FetchCohortListReturn, FetchCohortsParams, { state: RootState }>(
   'cohort/fetchCohorts',
-  async (DO_NOT_USE, { getState, dispatch }) => {
+  async ({ limit, page = 1 }, { getState, dispatch }) => {
     try {
       const state = getState().cohort
       const providerId = getState().me?.id ?? '0'
 
+      console.log('tes la quand meme? non parce que je me demande! state, providerId', state, providerId)
       const oldProjectList = state.cohortsList || []
-      const cohorts = (await services.projects.fetchCohortsList((+providerId).toString(), 100, 0)) || {}
-
+      const cohorts =
+        (await services.projects.fetchCohortsList((+providerId).toString(), limit, ((page ?? 1) - 1) * 2 ?? 0)) || {}
+      console.log('cohorts', cohorts)
       let forceRefresh =
         oldProjectList.some(
           (cohort) =>
@@ -47,8 +53,10 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, void, { state: Root
             !cohort.fhir_group_id &&
             (cohort.request_job_status === 'pending' || cohort.request_job_status === 'started')
         )
+      console.log('forceRefresh', forceRefresh)
 
-      if (state.count === cohorts.count && !forceRefresh) {
+      if (state.count === cohorts.results.length && !forceRefresh) {
+        console.log('aaaaaaah ok')
         return {
           count: state.count,
           selectedCohort: null,

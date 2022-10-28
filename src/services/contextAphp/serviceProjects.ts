@@ -396,6 +396,9 @@ const servicesProjects: IServiceProjects = {
   },
 
   fetchCohortsList: async (providerId, limit, offset) => {
+    console.log('providerId', providerId)
+    console.log('limit', limit)
+    console.log('offset', offset)
     let search = `?`
     if (limit) {
       search += `limit=${limit}`

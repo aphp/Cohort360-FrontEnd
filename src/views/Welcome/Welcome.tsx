@@ -53,7 +53,7 @@ const Welcome: React.FC = () => {
     // fetchProjectData
     dispatch<any>(fetchProjects())
     dispatch<any>(fetchRequests())
-    dispatch<any>(fetchCohorts())
+    dispatch<any>(fetchCohorts({}))
 
     // fetchPmsiData
     dispatch<any>(initPmsiHierarchy())

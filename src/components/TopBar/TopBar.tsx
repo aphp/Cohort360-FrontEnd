@@ -299,7 +299,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                       onClick={async () => {
                         setAnchorEl(null)
                         if (!cohortList || (cohortList && cohortList.length === 0)) {
-                          await dispatch<any>(fetchCohortsList())
+                          await dispatch<any>(fetchCohortsList({}))
                         }
                         await dispatch<any>(setSelectedCohort(dashboard.uuid ?? null))
                         setOpenModal('edit')
