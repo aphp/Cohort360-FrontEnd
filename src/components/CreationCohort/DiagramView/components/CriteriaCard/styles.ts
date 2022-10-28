@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
     position: 'relative',
     '&::before': {
       width: 38,
-      height: 3,
+      height: 4,
       content: "''",
       position: 'absolute',
       background: '#19235A',
