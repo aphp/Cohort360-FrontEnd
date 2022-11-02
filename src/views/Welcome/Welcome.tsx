@@ -3,7 +3,7 @@ import { useHistory } from 'react-router'
 import moment from 'moment'
 import clsx from 'clsx'
 
-import { Grid, Paper, Container, Typography } from '@material-ui/core'
+import { Container, Grid, Paper, Typography } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
 
 import NewsCard from 'components/Welcome/NewsCard/NewsCard'
@@ -12,14 +12,12 @@ import ResearchCard from 'components/Welcome/ResearchCard/ResearchCard'
 import SearchPatientCard from 'components/Welcome/SearchPatientCard/SearchPatientCard'
 import TutorialsCard from 'components/Welcome/TutorialsCard/TutorialsCard'
 
-import { useAppSelector, useAppDispatch } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProjects } from 'state/project'
 import { fetchRequests } from 'state/request'
-import { fetchCohorts } from 'state/cohort'
 import { initPmsiHierarchy } from 'state/pmsi'
 import { initMedicationHierarchy } from 'state/medication'
 import { initBiologyHierarchy } from 'state/biology'
-import { fetchScopesList } from 'state/scope'
 
 import { Cohort, RequestType } from 'types'
 
@@ -53,7 +51,6 @@ const Welcome: React.FC = () => {
     // fetchProjectData
     dispatch<any>(fetchProjects())
     dispatch<any>(fetchRequests())
-    dispatch<any>(fetchCohorts())
 
     // fetchPmsiData
     dispatch<any>(initPmsiHierarchy())
@@ -63,9 +60,6 @@ const Welcome: React.FC = () => {
 
     // fetchBiologyData
     dispatch<any>(initBiologyHierarchy())
-
-    // fetchScope
-    dispatch<any>(fetchScopesList())
   }, [dispatch])
 
   useEffect(() => {
