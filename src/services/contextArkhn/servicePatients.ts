@@ -226,6 +226,7 @@ export interface IServicePatients {
    **   - searchInput: permet la recherche textuelle
    **   - selectedDocTypes: permet de filtrer par un type de documents
    **   - nda: permet de filtrer sur un NDA précis
+   **   - onlyPdfAvailable: permet d'afficher ou non seulement les documents dont le PDF est disponible
    **   - startDate: (optionnel) permet le filtre par date
    **   - endDate: (optionnel) permet le filtre par date
    **   - groupId: (optionnel) Périmètre auquel le patient est lié
@@ -242,6 +243,7 @@ export interface IServicePatients {
     searchInput: string,
     selectedDocTypes: string[],
     nda: string,
+    onlyPdfAvailable: boolean,
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string
@@ -291,9 +293,14 @@ export interface IServicePatients {
 
 const servicesPatients: IServicePatients = {
   fetchPatientsCount: async () => {
-    const response = await fetchPatient({ size: 0 })
-    if (response?.data?.resourceType === 'OperationOutcome') return 0
-    return response.data.total ?? 0
+    try {
+      const response = await fetchPatient({ size: 0 })
+      if (response?.data?.resourceType === 'OperationOutcome') return null as any
+      return response.data.total ?? 0
+    } catch (error: any) {
+      console.error(error)
+      return null as any
+    }
   },
 
   fetchMyPatients: async () => {
@@ -569,6 +576,7 @@ const servicesPatients: IServicePatients = {
     searchInput: string,
     selectedDocTypes: string[],
     nda: string,
+    onlyPdfAvailable?: boolean,
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string
@@ -583,10 +591,11 @@ const servicesPatients: IServicePatients = {
       size: documentLines,
       offset: page ? (page - 1) * documentLines : 0,
       status: 'final',
-      _elements: !searchInput ? ['status', 'type', 'encounter', 'date', 'title'] : [],
+      _elements: !searchInput ? ['status', 'type', 'encounter', 'date', 'title', 'event'] : [],
       _text: searchInput,
       type: selectedDocTypes.join(','),
       'encounter.identifier': nda,
+      onlyPdfAvailable: onlyPdfAvailable,
       minDate: startDate ?? '',
       maxDate: endDate ?? ''
     })
@@ -730,7 +739,7 @@ export const getEncounterDocuments = async (
 
   const documentsResp = await fetchComposition({
     encounter: encountersIdList.join(','),
-    _elements: ['status', 'type', 'subject', 'encounter', 'date', 'title'],
+    _elements: ['status', 'type', 'subject', 'encounter', 'date', 'title', 'event'],
     status: 'final',
     _list: groupId ? groupId.split(',') : []
   })

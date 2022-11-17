@@ -1,24 +1,26 @@
-import { combineReducers, createStore, applyMiddleware } from 'redux'
+import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync'
+import { createStore, applyMiddleware, combineReducers } from 'redux'
+import { persistReducer, persistStore } from 'redux-persist'
 import thunkMiddleware from 'redux-thunk'
 import logger from 'redux-logger'
 
-import { persistStore, persistReducer } from 'redux-persist'
 import localforage from 'localforage'
 
 import cohortCreation from './cohortCreation'
-import criteria from './criteria'
 import exploredCohort from './exploredCohort'
-import me from './me'
-import drawer from './drawer'
+import autoLogout from './autoLogout'
+import medication from './medication'
+import criteria from './criteria'
 import message from './message'
+import patient from './patient'
 import project from './project'
 import request from './request'
+import biology from './biology'
 import cohort from './cohort'
+import drawer from './drawer'
 import scope from './scope'
 import pmsi from './pmsi'
-import medication from './medication'
-import biology from './biology'
-import patient from './patient'
+import me from './me'
 
 const cohortCreationReducer = combineReducers({
   criteria,
@@ -38,7 +40,8 @@ const rootReducer = combineReducers({
   pmsi,
   medication,
   biology,
-  patient
+  patient,
+  autoLogout
 })
 
 const persistConfig = {
@@ -48,5 +51,15 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 
-export const store = createStore(persistedReducer, applyMiddleware(thunkMiddleware, logger))
+export const store = createStore(
+  persistedReducer,
+  applyMiddleware(
+    thunkMiddleware,
+    logger,
+    createStateSyncMiddleware({
+      predicate: (action) => action.type == 'autoLogout/open' || action.type == 'autoLogout/close'
+    })
+  )
+)
+initStateWithPrevTab(store)
 export const persistor = persistStore(store)

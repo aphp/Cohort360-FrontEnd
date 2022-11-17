@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react'
+import _ from 'lodash'
 
 import { Alert } from '@material-ui/lab'
 import {
@@ -24,7 +25,7 @@ import { debounce } from 'utils/debounce'
 
 import useStyles from './styles'
 
-import { DocumentDataType } from 'types'
+import { DocType, DocumentDataType } from 'types'
 
 type TestGeneratedFormProps = {
   criteria: any
@@ -100,19 +101,6 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
       checkRegex(value)
     }
   }
-
-  const defaultValuesDocType = defaultValues.docType
-    ? defaultValues.docType.map((docType: any) => {
-        const criteriaDocType = criteria.data.docTypes
-          ? criteria.data.docTypes.find((g: any) => g.id === docType.id)
-          : null
-        return {
-          id: docType.id,
-          label: docType.label ? docType.label : criteriaDocType?.label ?? '?',
-          type: docType.type
-        }
-      })
-    : []
 
   return (
     <Grid className={classes.root}>
@@ -202,33 +190,29 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             className={classes.inputItem}
             options={criteria?.data?.docTypes || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
-            value={defaultValuesDocType}
+            getOptionSelected={(option, value) => _.isEqual(option, value)}
+            value={defaultValues.docType}
             onChange={(e, value) => _onChangeValue('docType', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Type de document" />}
+            renderInput={(params) => <TextField {...params} variant="outlined" label="Types de documents" />}
             groupBy={(doctype) => doctype.type}
             disableCloseOnSelect
             renderGroup={(docType: any) => {
               const currentDocTypeList = criteria?.data?.docTypes
-                ? criteria?.data?.docTypes.filter((doc: any) => doc.type === docType.group)
+                ? criteria?.data?.docTypes.filter((doc: DocType) => doc.type === docType.group)
                 : []
-              const currentSelectedDocTypeList = defaultValuesDocType
-                ? defaultValuesDocType.filter((doc: any) => doc.type === docType.group)
+
+              const currentSelectedDocTypeList = defaultValues.docType
+                ? defaultValues.docType.filter((doc: DocType) => doc.type === docType.group)
                 : []
 
               const onClick = () => {
                 if (currentDocTypeList.length === currentSelectedDocTypeList.length) {
                   _onChangeValue(
                     'docType',
-                    defaultValuesDocType.filter((doc: any) => doc.type !== docType.group)
+                    defaultValues.docType.filter((doc: DocType) => doc.type !== docType.group)
                   )
                 } else {
-                  _onChangeValue(
-                    'docType',
-                    [...defaultValuesDocType, ...currentDocTypeList].filter(
-                      (item, index, array) => array.indexOf(item) === index
-                    )
-                  )
+                  _onChangeValue('docType', _.uniqWith([...defaultValues.docType, ...currentDocTypeList], _.isEqual))
                 }
               }
 

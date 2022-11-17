@@ -255,7 +255,7 @@ export const buildPmsiFiltersChips = (
 export const buildCohortFiltersChips = (
   filters: CohortFiltersType,
   handleDeleteChip: (
-    filterName: 'status' | 'type' | 'favorite' | 'minPatients' | 'maxPatients' | 'startDate' | 'endDate',
+    filterName: 'status' | 'favorite' | 'minPatients' | 'maxPatients' | 'startDate' | 'endDate',
     value?: any
   ) => void
 ) => {
@@ -266,15 +266,6 @@ export const buildCohortFiltersChips = (
           label: display ? `Statut : ${capitalizeFirstLetter(display)}` : '',
           onDelete: () => handleDeleteChip('status', { display, code })
         })),
-      {
-        label:
-          filters.type && filters.type !== 'all'
-            ? filters.type === 'IMPORT_I2B2'
-              ? 'Cohorte I2B2'
-              : 'Cohorte Cohort360'
-            : '',
-        onDelete: () => handleDeleteChip('type')
-      },
       {
         label:
           filters.favorite && filters.favorite !== 'all'

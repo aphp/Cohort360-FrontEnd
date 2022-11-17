@@ -103,7 +103,7 @@ const servicesPerimeters: IServicePerimeters = {
       .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
       .join(',')
 
-    const rightResponse = await apiBackend.get(`accesses/my-rights/?care-site-ids=${caresiteIds}`)
+    const rightResponse = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${caresiteIds}`)
     const rightsData = (rightResponse.data as any[]) ?? []
 
     let allowSearchIpp = false
@@ -239,7 +239,7 @@ const servicesPerimeters: IServicePerimeters = {
 
   getPerimeters: async () => {
     try {
-      const rightResponse = await apiBackend.get('accesses/my-rights/?pop-children')
+      const rightResponse = await apiBackend.get('accesses/accesses/my-rights/?pop-children')
       const rightsData: any[] = rightResponse.status === 200 ? (rightResponse?.data as any[]) : []
 
       let perimetersIds = []
@@ -256,6 +256,10 @@ const servicesPerimeters: IServicePerimeters = {
           _id: perimetersIds.join(','),
           _elements: ['name', 'extension', 'alias']
         })
+        if (!organisationResult || !organisationResult.data) {
+          console.error('Error (getPerimeters) while fetching organizations ! perimeters = ', perimetersIds)
+          return []
+        }
 
         organizationList = getApiResponseResources(organisationResult) ?? []
         organizationList = organizationList.map((organizationItem) => {
@@ -384,7 +388,7 @@ const servicesPerimeters: IServicePerimeters = {
       .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
       .join(',')
 
-    const rightResponse = await apiBackend.get(`accesses/my-rights/?care-site-ids=${caresiteIds}`)
+    const rightResponse = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${caresiteIds}`)
     const rightsData = (rightResponse.data as any[]) ?? []
 
     return perimeters.map((perimeter) => {

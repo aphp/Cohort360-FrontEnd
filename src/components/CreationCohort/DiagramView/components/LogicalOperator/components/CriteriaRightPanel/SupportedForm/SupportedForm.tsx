@@ -1,7 +1,19 @@
 import React, { useState } from 'react'
 
 import { Alert, Autocomplete } from '@material-ui/lab'
-import { Button, Divider, FormLabel, Grid, IconButton, Slider, Switch, Typography, TextField } from '@material-ui/core'
+import {
+  Button,
+  Divider,
+  FormLabel,
+  Grid,
+  IconButton,
+  Slider,
+  Switch,
+  Tooltip,
+  Typography,
+  TextField
+} from '@material-ui/core'
+import InfoIcon from '@material-ui/icons/Info'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import AdmissionInputs from './SupportedInputs/AdmissionInputs'
@@ -167,8 +179,11 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
             />
           </Grid>
 
-          <FormLabel style={{ padding: '1em' }} component="legend">
+          <FormLabel style={{ padding: '1em', display: 'flex', alignItems: 'center' }} component="legend">
             Âge au moment de la prise en charge
+            <Tooltip title="La valeur par défaut sera prise en compte si le sélecteur d'âge n'a pas été modifié.">
+              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+            </Tooltip>
           </FormLabel>
 
           <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 180px', alignItems: 'center', margin: '0 1em' }}>

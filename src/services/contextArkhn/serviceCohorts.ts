@@ -8,7 +8,9 @@ import {
   Back_API_Response,
   Cohort,
   AgeRepartitionType,
-  GenderRepartitionType
+  GenderRepartitionType,
+  searchInputError,
+  errorDetails
 } from 'types'
 import {
   IPatient,
@@ -31,7 +33,8 @@ import {
   fetchEncounter,
   fetchComposition,
   fetchCompositionContent,
-  fetchBinary
+  fetchBinary,
+  fetchCheckDocumentSearchInput
 } from './callApi'
 
 import { ODD_EXPORT } from '../../constants'
@@ -109,16 +112,17 @@ export interface IServiceCohorts {
    * Retourne la liste de documents lié à une cohorte
    *
    * Argument:
-   *   - deidentifiedBoolean: = true si la cohorte est pseudo. (permet un traitement particulié des éléments)
+   *   - deidentifiedBoolean: = true si la cohorte est pseudo. (permet un traitement particulier des éléments)
    *   - sortBy: Permet le tri
    *   - sortDirection: Permet le tri dans l'ordre croissant ou décroissant
    *   - page: Permet la pagination (definie un offset + limit)
    *   - searchInput: Permet la recherche textuelle
    *   - selectedDocTypes: Permet de filtrer sur le type de documents
-   *   - nda: Permet de filtrer les documents sur un NDA particulié (uniquement en nominatif)
+   *   - nda: Permet de filtrer les documents sur un NDA particulier (uniquement en nominatif)
+   *   - onlyPdfAvailable: permet d'afficher ou non seulement les documents dont le PDF est disponible
    *   - startDate: Permet de filtrer sur une date
    *   - endDate: Permet de filtrer sur une date
-   *   - groupId: (optionnel) Périmètre auquel la cohorte est lié
+   *   - groupId: (optionnel) Périmètre auquel la cohorte est liée
    */
   fetchDocuments: (
     deidentifiedBoolean: boolean,
@@ -129,6 +133,7 @@ export interface IServiceCohorts {
     selectedDocTypes: string[],
     nda: string,
     ipp: string,
+    onlyPdfAvailable: boolean,
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string
@@ -141,24 +146,35 @@ export interface IServiceCohorts {
   }>
 
   /**
-   * Permet de récupérer le contenue d'un document
+   * Permet de vérifier si le champ de recherche textuelle est correct
+   *
+   * Argument:
+   *   - searchInput: champ de recherche textuelle
+   *
+   * Retourne:
+   *   - searchInputError: objet décrivant la ou les erreurs du champ de recherche s'il y en a
+   */
+  checkDocumentSearchInput: (searchInput: string) => Promise<searchInputError>
+
+  /**
+   * Permet de récupérer le contenu d'un document
    *
    * Argument:
    *   - compositionId: Identifiant du documents
    *
-   * Retoune:
-   *   - IComposition_Section: Contenue du document
+   * Retourne:
+   *   - IComposition_Section: Contenu du document
    */
   fetchDocumentContent: (compositionId: string) => Promise<IComposition_Section[]>
 
   /**
-   * Permet de recuperer le contenue d'un document (/Binary)
+   * Permet de recuperer le contenu d'un document (/Binary)
    *
    * Argument:
    *   - documentId: Identifiant du documents
    *
-   * Retoune:
-   *   - IComposition_Section: Contenue du document
+   * Retourne:
+   *   - IComposition_Section: Contenu du document
    */
   fetchBinary: (documentId: string, list?: string[]) => Promise<any>
 
@@ -168,7 +184,7 @@ export interface IServiceCohorts {
    * Argument:
    *   - cohorts: Tableau de cohortes de type `Cohort[]`
    *
-   * Retoune:
+   * Retourne:
    *   - La liste de cohortes avec une extension lié au droit d'accès + export
    */
   fetchCohortsRights: (cohorts: Cohort[]) => Promise<Cohort[]>
@@ -180,14 +196,8 @@ export interface IServiceCohorts {
    *   - cohortId: Identifiant de la cohorte
    *   - motivation: Raison de l'export
    *   - tables: Liste de table demandé dans l'export
-   *   - output_format: Format de l'export ('csv' ou 'jupiter', par défaut = 'csv')
    */
-  createExport: (args: {
-    cohortId: number
-    motivation: string
-    tables: string[]
-    output_format?: string
-  }) => Promise<any>
+  createExport: (args: { cohortId: number; motivation: string; tables: string[] }) => Promise<any>
 }
 
 const servicesCohorts: IServiceCohorts = {
@@ -366,6 +376,7 @@ const servicesCohorts: IServiceCohorts = {
     selectedDocTypes,
     nda,
     ipp,
+    onlyPdfAvailable,
     startDate,
     endDate,
     groupId
@@ -377,12 +388,13 @@ const servicesCohorts: IServiceCohorts = {
         _sort: sortBy,
         sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
         status: 'final',
-        _elements: searchInput ? [] : ['status', 'type', 'subject', 'encounter', 'date', 'title'],
+        _elements: searchInput ? [] : ['status', 'type', 'subject', 'encounter', 'date', 'title', 'event'],
         _list: groupId ? [groupId] : [],
         _text: searchInput,
         type: selectedDocTypes.length > 0 ? selectedDocTypes.join(',') : '',
         'encounter.identifier': nda,
         'patient.identifier': ipp,
+        onlyPdfAvailable: onlyPdfAvailable,
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
         uniqueFacet: ['patient']
@@ -426,6 +438,60 @@ const servicesCohorts: IServiceCohorts = {
       totalPatientDocs: totalPatientDocs ?? 0,
       totalAllPatientDocs: totalAllPatientDocs ?? 0,
       documentsList
+    }
+  },
+
+  checkDocumentSearchInput: async (searchInput) => {
+    if (!searchInput) {
+      return {
+        isError: false
+      }
+    }
+
+    const checkDocumentSearchInput = await fetchCheckDocumentSearchInput(searchInput)
+
+    if (checkDocumentSearchInput) {
+      // @ts-ignore
+      const errors = checkDocumentSearchInput.find((parameter: any) => parameter.name === 'WARNING')?.part ?? []
+
+      const parsedErrors: errorDetails[] = []
+
+      errors.forEach((error: any) => {
+        const splitError = error.valueString.split(';')
+
+        const errorPositions = splitError.find((errorPart: any) => errorPart.includes('Positions'))
+
+        const cleanedErrorPositions = errorPositions
+          ? errorPositions.replaceAll(' ', '').replace('Positions:', '').split('char:').slice(1)
+          : []
+
+        const errorSolution = splitError.find((errorPart: any) => errorPart.includes('Solution'))
+        const cleanedErrorSolution = errorSolution ? errorSolution.replace(' Solution: ', '') : ''
+
+        const errorObject = {
+          errorName: error.name,
+          errorPositions: cleanedErrorPositions,
+          errorSolution: cleanedErrorSolution
+        }
+
+        parsedErrors.push(errorObject)
+      })
+
+      return {
+        // @ts-ignore
+        isError: checkDocumentSearchInput.find((parameter: any) => parameter.name === 'VALIDÉ') ? false : true,
+        errorsDetails: parsedErrors
+      }
+    } else {
+      return {
+        isError: true,
+        errorsDetails: [
+          {
+            errorName: 'Erreur du serveur',
+            errorSolution: 'Veuillez refaire votre recherche.'
+          }
+        ]
+      }
     }
   },
 
@@ -578,7 +644,7 @@ const servicesCohorts: IServiceCohorts = {
       }
 
       // On appelle le back-end pour avoir la liste des droits
-      const rightsResponse = await apiBackend.get(`accesses/my-rights/?care-site-ids=${caresiteIds}`)
+      const rightsResponse = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${caresiteIds}`)
       const rightsData: any = rightsResponse.data ?? []
 
       return cohorts.map((cohort) => {

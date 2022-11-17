@@ -21,7 +21,7 @@ type InputSearchDocumentRegexProps = {
   noInfoIcon?: boolean
   noClearIcon?: boolean
   noSearchIcon?: boolean
-  sqareInput?: boolean
+  squareInput?: boolean
 }
 const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
   placeholder,
@@ -96,8 +96,8 @@ const InputSearchDocumentRegex: React.FC<InputSearchDocumentRegexProps> = ({
         item
         className={clsx({
           [classes.error]: error === ERROR_REGEX,
-          [classes.gridAdvancedSearchSqared]: props.sqareInput,
-          [classes.gridAdvancedSearch]: !props.sqareInput
+          [classes.gridAdvancedSearchSquared]: props.squareInput,
+          [classes.gridAdvancedSearch]: !props.squareInput
         })}
       >
         <InputBase

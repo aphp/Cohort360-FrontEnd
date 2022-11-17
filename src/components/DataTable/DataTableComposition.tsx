@@ -218,7 +218,6 @@ const DataTableCompositionLine: React.FC<{
           <TableCell colSpan={6} style={{ backgroundImage: `url(${Watermark})`, backgroundSize: 'contain' }}>
             {section.map((section) => (
               <Grid key={section.title} container item direction="column">
-                <Typography variant="h6">{section.title}</Typography>
                 <Typography dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }} />
               </Grid>
             ))}

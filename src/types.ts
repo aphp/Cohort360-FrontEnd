@@ -64,6 +64,7 @@ export type CohortComposition = IComposition & {
   serviceProvider?: string
   NDA?: string
   event?: {}
+  parameter?: any[]
 }
 
 export type CohortEncounter = IEncounter & {
@@ -119,7 +120,6 @@ export type Cohort = {
 
 export type CohortFilters = {
   status: ValueSet[]
-  type: string
   favorite: string
   minPatients: null | string
   maxPatients: null | string
@@ -133,6 +133,7 @@ export type DocumentFilters = {
   selectedDocTypes: { code: string; label: string; type: string }[]
   startDate: string | null
   endDate: string | null
+  onlyPdfAvailable: boolean
 }
 
 export type MedicationsFilters = {
@@ -411,12 +412,18 @@ export type IPPListDataType = {
   isInclusive?: boolean
 }
 
+export type DocType = {
+  code: string
+  label: string
+  type: string
+}
+
 export type DocumentDataType = {
   title: string
   type: 'Composition'
   search: string
   regex_search: string
-  docType: { id: string; label: string }[] | null
+  docType: DocType[] | null
   encounterEndDate: Date | ''
   encounterStartDate: Date | ''
   occurrence: number
@@ -666,6 +673,17 @@ export type IPatientObservation<T extends CohortObservation> = {
   }
 }
 
+export type searchInputError = {
+  isError: boolean
+  errorsDetails?: errorDetails[]
+}
+
+export type errorDetails = {
+  errorName?: string
+  errorPositions?: number[]
+  errorSolution?: string
+}
+
 // DataTableTopBarProps
 export type DTTB_TabsType = {
   value: any
@@ -687,6 +705,7 @@ export type DTTB_SearchBarType = {
   value: string | undefined
   onSearch: (newSearch: string, newSearchBy?: SearchByTypes) => void
   searchBy?: any
+  error?: searchInputError
 }
 export type DTTB_ButtonType = {
   label: string
