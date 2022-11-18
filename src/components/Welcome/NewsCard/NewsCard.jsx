@@ -4,12 +4,6 @@ import useStyles from './styles'
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
 
-// import FirstNews from './News/FirstNews'
-// import SecondNews from './News/SecondNews'
-// import ThirdNews from './News/ThirdNews'
-// import FourthNews from './News/FourthNews'
-// import FifthNews from './News/FifthNews'
-
 import news from './News/news.json'
 
 export default function TutorialsCard() {
@@ -33,9 +27,11 @@ export default function TutorialsCard() {
               <Typography color="textSecondary" style={{ paddingBottom: 14 }}>
                 <b>{entry.news.title}</b>
               </Typography>
-              <Typography color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
-                {entry.news.message}
-              </Typography>
+              {entry.news.message.map((item, index) => (
+                <Typography key={index} color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
+                  {item}
+                </Typography>
+              ))}
               <Typography color="textSecondary" style={{ paddingTop: 6 }}>
                 {entry.news.footer}
               </Typography>
