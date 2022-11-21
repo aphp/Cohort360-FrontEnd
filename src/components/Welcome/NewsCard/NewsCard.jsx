@@ -9,6 +9,7 @@ import SecondNews from './News/SecondNews'
 import ThirdNews from './News/ThirdNews'
 import FourthNews from './News/FourthNews'
 import FifthNews from './News/FifthNews'
+import SixthNews from './News/SixthNews'
 
 export default function TutorialsCard() {
   const classes = useStyles()
@@ -22,9 +23,13 @@ export default function TutorialsCard() {
 
       <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
 
+      <SixthNews />
+
+      <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
+
       <FifthNews />
 
-      <Divider className={classes.divider} />
+      <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
 
       <FourthNews />
 
