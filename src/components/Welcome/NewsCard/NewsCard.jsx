@@ -10,6 +10,7 @@ import ThirdNews from './News/ThirdNews'
 import FourthNews from './News/FourthNews'
 import FifthNews from './News/FifthNews'
 import SixthNews from './News/SixthNews'
+import SeventhNews from './News/SeventhNews'
 
 export default function TutorialsCard() {
   const classes = useStyles()
@@ -20,6 +21,10 @@ export default function TutorialsCard() {
           Actualités
         </Typography>
       </div>
+
+      <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
+
+      <SeventhNews />
 
       <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
 
