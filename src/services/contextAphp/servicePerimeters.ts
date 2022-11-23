@@ -245,7 +245,12 @@ const servicesPerimeters: IServicePerimeters = {
       let perimetersIds = []
       let organizationList: IOrganization[] = []
 
-      if (rightResponse.status !== 200 || (rightsData && rightsData.length === 0)) {
+      if (rightResponse.status !== 200) {
+        const backError: any = {
+          errorType: 'back'
+        }
+        return backError
+      } else if (rightsData && rightsData.length === 0) {
         return []
       }
 
@@ -283,9 +288,10 @@ const servicesPerimeters: IServicePerimeters = {
       }
       return organizationList
     } catch (error: any) {
-      console.error('Error (getPerimeters) :', error)
-      // return []
-      return error
+      const fhirError: any = {
+        errorType: 'fhir'
+      }
+      return fhirError
     }
   },
 
