@@ -20,7 +20,7 @@ export default function TutorialsCard() {
       <>
         {news?.entry?.map((entry, index) => (
           <>
-            <div id="je suis la" key={index}>
+            <div key={index}>
               <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
               <Typography color="textSecondary" style={{ paddingBottom: 14 }}>
                 <b>{entry.news.title}</b>
