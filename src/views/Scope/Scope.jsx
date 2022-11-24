@@ -58,7 +58,14 @@ const Scope = () => {
             <ScopeTree defaultSelectedItems={selectedItems} onChangeSelectedItem={onChangeSelectedItem} />
           </Paper>
         </Grid>
-        <Grid container item justifyContent="center" className={classes.bottomBar}>
+        <Grid
+          container
+          item
+          justifyContent="center"
+          className={clsx(classes.bottomBar, {
+            [classes.bottomBarShift]: open
+          })}
+        >
           <Grid container item justifyContent="flex-end" xs={11} className={classes.buttons}>
             <Button
               variant="contained"

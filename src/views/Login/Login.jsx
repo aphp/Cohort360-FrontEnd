@@ -108,23 +108,25 @@ const Login = () => {
     if (practitioner) {
       const practitionerPerimeters = await services.perimeters.getPerimeters()
 
-      if (
-        !practitionerPerimeters ||
-        practitionerPerimeters.error ||
-        !practitionerPerimeters.length ||
-        practitionerPerimeters.length == 0
-      ) {
-        setLoading(false)
-        return (
-          setError(true),
-          setErrorMessage(
-            'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+      if (practitionerPerimeters && practitionerPerimeters.errorType) {
+        if (practitionerPerimeters.errorType === 'fhir') {
+          setLoading(false)
+          return (
+            setError(true),
+            setErrorMessage(
+              'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+            )
           )
-        )
-      }
-
-      if (practitionerPerimeters.length === 0) {
-        // setTimeout(() => services.practitioner.logout(), 2500)
+        } else if (practitionerPerimeters.errorType === 'back') {
+          setLoading(false)
+          return (
+            setError(true),
+            setErrorMessage(
+              'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+            )
+          )
+        }
+      } else if (!practitionerPerimeters || !practitionerPerimeters.length || practitionerPerimeters.length === 0) {
         localStorage.clear()
         setLoading(false)
         return setNoRights(true)
@@ -177,7 +179,7 @@ const Login = () => {
       return (
         setError(true),
         setErrorMessage(
-          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+          'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
         )
       )
     }
@@ -187,7 +189,7 @@ const Login = () => {
       return (
         setError(true),
         setErrorMessage(
-          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+          'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
         )
       )
     }
@@ -197,7 +199,7 @@ const Login = () => {
       return (
         setError(true),
         setErrorMessage(
-          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+          'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
         )
       )
     }
@@ -234,7 +236,7 @@ const Login = () => {
         return (
           setError(true),
           setErrorMessage(
-            'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+            'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
           )
         )
       }
@@ -246,7 +248,7 @@ const Login = () => {
       return (
         setError(true),
         setErrorMessage(
-          'Une erreur serveur est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+          'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
         )
       )
     }
