@@ -32,7 +32,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
 
   const deidentified = patient?.deidentified ?? true
 
-  const loading = patient?.documents?.loading ?? false
+  const loading = patient?.documents?.loading ?? true
   const totalDocs = patient?.documents?.count ?? 0
   const totalAllDoc = patient?.documents?.total ?? 0
 
