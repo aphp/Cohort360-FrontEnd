@@ -9,8 +9,6 @@ import news from './news.json'
 export default function TutorialsCard() {
   const classes = useStyles()
 
-  console.log('news', news)
-
   return (
     <>
       <div id="news-card-title">
