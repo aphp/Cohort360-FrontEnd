@@ -33,7 +33,7 @@ export default function TutorialsCard() {
                 </Typography>
               ))}
               <Typography color="textSecondary" style={{ paddingTop: 6 }}>
-                {entry.news.footer}
+                <b>{entry.news.footer}</b>
               </Typography>
             </div>
           </>
