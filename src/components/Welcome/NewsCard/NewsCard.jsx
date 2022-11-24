@@ -4,7 +4,7 @@ import useStyles from './styles'
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
 
-import news from './News/news.json'
+import news from './news.json'
 
 export default function TutorialsCard() {
   const classes = useStyles()

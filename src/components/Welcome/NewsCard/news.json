@@ -1,0 +1,95 @@
+{
+  "entry": [
+    {
+      "news": {
+        "title": "Nouvelles fonctionnalités - 11/2022",
+        "message": [
+          "• Le menu latéral reste déplié par défaut.",
+          "• Dans le critère de biologie, la recherche par valeur est désormais optionnelle.",
+          "• Il est maintenant possible de filtrer les documents selon la disponibilité du PDF.",
+          "• La deconnexion automatique est dorénavant effective sur tous les onglets ouverts de Cohort360.",
+          "• Les cohortes d'I2B2 n'étant plus remontées dans Cohort360, la colonne \"type de cohorte\" a été retirée du tableau des cohortes.",
+          "• Divers correctifs de bugs et d'anomalies ont été réalisés."
+        ],
+        "footer": "L'équipe Cohort360"
+      }
+    },
+    {
+      "news": {
+        "title": "Nouvelles fonctionnalités - 10/2022",
+        "message": [
+          "• La liste d'IPP à été rajoutée à la liste de critère dans le requêteur.",
+          "• Il est possible d'afficher des éléments ANABIO associés au code LOINC.",
+          "• Le champs \"Valeur de références\" a été ajouté dans l'onglet \"Biologie\" de l'exploration d'un patient",
+          "• Une page 404 à été ajoutée quand on se rend sur une page inexistante.",
+          "• Diverses corrections ont été apportées aux filtres ainsi que sur les tris."
+        ],
+        "footer": "L'équipe Cohort360"
+      }
+    },
+    {
+      "news": {
+        "title": "Nouvelles fonctionnalités - 07/2022",
+        "message": [
+          "• L'option \"Mes requêtes\" dans le menu de paramétrage du requêteur permet d'ajouter les critères d'une requête dans une autre. Cela fonctionne avec les anciennes requêtes créées et les requêtes partagées avec vous.",
+          "• Dans le paramétrage des requêtes, pour les critères qui possèdent une hiérarchie (biologie, PMSI et médicaments) il est possible de sélectionner toute la hiérarchie en un seul clic."
+        ],
+        "footer": "L'équipe Cohort360"
+      }
+    },
+    {
+      "news": {
+        "title": "Nouvelles fonctionnalités - 06/2022",
+        "message": [
+          "• Les résultats de <b>biologie</b> sont disponibles dans le requêteur et la fiche patient. Attention, pour l'instant, <b>la biologie est restreinte aux 3870 codes ANABIO les plus utilisés</b>.",
+          "• L'unité exécutrice dans la fiche patient affiche maintenant les Unités Fonctionnelles dans lesquelle les patients ont réalisé un séjour.",
+          "• Il est maintenant possible de filtrer les documents des patients par IPP",
+          "• La nouvelle fonctionnalité \"Partager la requête\" dans le requêteur permet de créer une requête et de l'envoyer à un ou plusieurs autres utilisateurs de Cohort360. Un dossier \"Mes requêtes reçues\" a été ajouté sur la page Mes requêtes."
+        ],
+        "footer": "L'équipe Cohort360"
+      }
+    },
+    {
+      "news": {
+        "title": "Nouvelles fonctionnalités - 02/2022",
+        "message": [
+          "• Informations: des infobulles ont été ajoutées pour vous accompagner",
+          "• Dans l'utilisation de l'estimation du nombre de patients AP-HP au moment de la création de votre cohorte.",
+          "• Dans le calcul du delta de nombre de patients par rapport à une ancienne requête.",
+          "• Un filtre sur les types de diagnostics affichés sur le parcours patient a été ajouté.",
+          "• Le design de la timelime du parcours patient a été amélioré.",
+          "• L'anomalie concernant la visualisation des pdf des documents médicaux a été corrigée."
+        ],
+        "footer": "L'équipe Cohort360"
+      }
+    },
+    {
+      "news": {
+        "title": "Nouvelles fonctionnalités - 12/2021",
+        "message": [
+          "• Potentiel d'inclusion AP-HP",
+          "• Lors de la création d'une cohorte, une option peut être activée pour demander une estimation du nombre de patients inclus si les critères étaient appliqués à toute l'AP-HP.",
+          "• Mise à jour d'une requête",
+          "• Vous pouvez retourner sur une ancienne requête pour mettre à jour l'estimation du nombre de patients inclus. Le delta (différence de nombre de patients entre la date d'exécution de la requête et la date du jour) est mis en avant.",
+          "• Option Ouvrir dans Nouvelle Requête",
+          "• Le menu de création d'une nouvelle requête permet d'ouvrir une requête anciennement sauvegardée.",
+          "• Nombre de patients dans les Documents cliniques",
+          "• Sur l'onglet Documents cliniques, le nombre de patients qui possèdent des documents est affiché et se met à jour en fonction de la recherche textuelle et des filtres choisis."
+        ],
+        "footer": "L'équipe Cohort360"
+      }
+    },
+    {
+      "news": {
+        "title": "Nouvelle mise en production de fonctionnalités ! - 11/2021",
+        "message": [
+          "• La fonctionnalité d'export est disponible pour les utilisateurs avec un accès périmètre équipe de soins !",
+          "• Un tutoriel vous expliquant la démarche à suivre pour demander un export est disponible dans l'encart dédié.",
+          "• Les données de prescription et d'administration des médicaments ORBIS ont été intégrées dans Cohort360.",
+          "• Vous pouvez créer des cohortes de patients à partir de critères de médicaments, explorer ces données et exporter au format OMOP si vous avez accès à l'export csv."
+        ],
+        "footer": "L'équipe Cohort360"
+      }
+    }
+  ]
+}
