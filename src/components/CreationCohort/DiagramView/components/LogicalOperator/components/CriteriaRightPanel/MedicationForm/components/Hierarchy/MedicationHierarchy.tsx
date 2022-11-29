@@ -45,7 +45,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === medicationItem.id) : false
+  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === '*' || id === medicationItem.id) : false
   const isIndeterminated = checkIfIndeterminated(medicationItem, selectedItem)
 
   const _onExpand = async (medicationCode: string) => {

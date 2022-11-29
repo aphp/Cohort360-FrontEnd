@@ -45,7 +45,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === cimItem.id) : false
+  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === '*' || id === cimItem.id) : false
   const isIndeterminated = checkIfIndeterminated(cimItem, selectedItem)
 
   const _onExpand = async (cimCode: string) => {

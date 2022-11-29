@@ -45,7 +45,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === ghmItem.id) : false
+  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === '*' || id === ghmItem.id) : false
   const isIndeterminated = checkIfIndeterminated(ghmItem, selectedItem)
 
   const _onExpand = async (ghmCode: string) => {

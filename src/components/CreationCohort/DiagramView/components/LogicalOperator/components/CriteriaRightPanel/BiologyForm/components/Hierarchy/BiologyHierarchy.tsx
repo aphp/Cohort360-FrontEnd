@@ -45,7 +45,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === biologyItem.id) : false
+  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === '*' || id === biologyItem.id) : false
   const isIndeterminated = checkIfIndeterminated(biologyItem, selectedItem)
 
   const _onExpand = async (biologyCode: string) => {

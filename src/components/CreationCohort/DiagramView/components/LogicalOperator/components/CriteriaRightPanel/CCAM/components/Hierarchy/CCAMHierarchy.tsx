@@ -45,7 +45,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === procedureItem.id) : false
+  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === '*' || id === procedureItem.id) : false
   const isIndeterminated = checkIfIndeterminated(procedureItem, selectedItem)
 
   const _onExpand = async (procedureCode: string) => {
