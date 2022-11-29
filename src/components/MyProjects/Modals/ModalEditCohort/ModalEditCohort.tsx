@@ -12,11 +12,12 @@ import {
 } from '@material-ui/core'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { CohortState, addCohort, editCohort, deleteCohort } from 'state/cohort'
+import { CohortState, addCohort } from 'state/cohort'
 
 import { Cohort } from 'types'
 
 import useStyles from './styles'
+import services from 'services'
 
 const ERROR_TITLE = 'error_title'
 const ERROR_DESCRIPTION = 'error_description'
@@ -63,7 +64,7 @@ const ModalEditCohort: React.FC<{
 
   const handleClose = () => onClose()
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (loading) return
     setLoading(true)
 
@@ -74,19 +75,19 @@ const ModalEditCohort: React.FC<{
 
     if (!selectedCohort) return
     if (isEdition) {
-      dispatch<any>(editCohort({ editedCohort: modalCohortState }))
+      await services.projects.editCohort(modalCohortState)
     } else {
       dispatch<any>(addCohort({ newCohort: modalCohortState }))
     }
     onClose()
   }
 
-  const handleConfirmDeletion = () => {
+  const handleConfirmDeletion = async () => {
     if (loading) return
     setLoading(true)
 
     if (isEdition && selectedCohort !== null) {
-      dispatch<any>(deleteCohort({ deletedCohort: selectedCohort }))
+      await services.projects.deleteCohort(selectedCohort)
     }
     onClose()
   }

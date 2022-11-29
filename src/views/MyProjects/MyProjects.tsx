@@ -82,7 +82,7 @@ const MyProjects: React.FC<{}> = () => {
   }
 
   const _fetchCohortsList = async () => {
-    dispatch<any>(fetchCohortsList({}))
+    dispatch<any>(fetchCohortsList({ limit: 100 }))
   }
 
   const _fetch = async () => {
@@ -144,11 +144,11 @@ const MyProjects: React.FC<{}> = () => {
                           color="primary"
                           disabled={maintenanceIsActive}
                         >
-                          Deplacer {selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}
+                          Déplacer {selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}
                         </Button>
                       </Hidden>
                       <Hidden only={['lg', 'xl']}>
-                        <Tooltip title={`Deplacer ${selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}`}>
+                        <Tooltip title={`Déplacer ${selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}`}>
                           <IconButton
                             onClick={() => setOpenModal('move_to_folder')}
                             color="primary"

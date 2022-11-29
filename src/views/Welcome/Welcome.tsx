@@ -53,7 +53,21 @@ const Welcome: React.FC = () => {
     // fetchProjectData
     dispatch<any>(fetchProjects())
     dispatch<any>(fetchRequests())
-    dispatch<any>(fetchCohorts({}))
+    dispatch<any>(
+      fetchCohorts({
+        listType: 'FavoriteCohorts',
+        sort: { sortBy: 'modified_at', sortDirection: 'desc' },
+        filters: { status: [], favorite: 'True', minPatients: null, maxPatients: null, startDate: null, endDate: null },
+        limit: 5
+      })
+    )
+    dispatch<any>(
+      fetchCohorts({
+        listType: 'LastCohorts',
+        sort: { sortBy: 'modified_at', sortDirection: 'desc' },
+        limit: 5
+      })
+    )
 
     // fetchPmsiData
     dispatch<any>(initPmsiHierarchy())
@@ -66,31 +80,17 @@ const Welcome: React.FC = () => {
 
     // fetchScope
     dispatch<any>(fetchScopesList())
-  }, [dispatch])
+  }, [])
 
   useEffect(() => {
-    const _favoriteCohorts =
-      cohortState.cohortsList?.length > 0
-        ? [...cohortState.cohortsList]
-            .sort((a, b) => +moment(b?.modified_at).format('X') - +moment(a.modified_at).format('X'))
-            .filter((cohortItem) => cohortItem.favorite)
-            .splice(0, 5)
-        : []
-    const _lastCohorts =
-      cohortState.cohortsList?.length > 0
-        ? [...cohortState.cohortsList]
-            .sort((a, b) => +moment(b?.modified_at).format('X') - +moment(a.modified_at).format('X'))
-            .splice(0, 5)
-        : []
     const _lastRequest =
       requestState.requestsList?.length > 0
         ? [...requestState.requestsList]
             .sort((a, b) => +moment(b?.modified_at).format('X') - +moment(a.modified_at).format('X'))
             .splice(0, 5)
         : []
-
-    setFavoriteCohorts(_favoriteCohorts)
-    setLastCohorts(_lastCohorts)
+    setFavoriteCohorts(cohortState.favoriteCohortsList ?? [])
+    setLastCohorts(cohortState.lastCohorts ?? [])
     setLastRequest(_lastRequest)
   }, [cohortState, requestState])
 
@@ -180,7 +180,7 @@ const Welcome: React.FC = () => {
                 onClickLink={() => history.push('/my-cohorts?fav=true')}
                 loading={loadingCohort}
                 cohorts={favoriteCohorts}
-                isFav
+                listType={'FavoriteCohorts'}
               />
             </Paper>
           </Grid>
@@ -194,6 +194,7 @@ const Welcome: React.FC = () => {
                 onClickLink={() => history.push('/my-cohorts')}
                 loading={loadingCohort}
                 cohorts={lastCohorts}
+                listType={'LastCohorts'}
               />
             </Paper>
           </Grid>

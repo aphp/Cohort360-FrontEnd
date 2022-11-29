@@ -11,7 +11,7 @@ import {
 import { addProject, editProject, deleteProject, fetchProjects } from './project'
 import { addRequest, editRequest, deleteRequest, fetchRequests, moveRequests, deleteRequests } from './request'
 import { expandBiologyElement, fetchBiology, initBiologyHierarchy } from './biology'
-import { addCohort, deleteCohort, editCohort, fetchCohorts, setFavoriteCohort } from './cohort'
+import { addCohort, fetchCohorts } from './cohort'
 import { favoriteExploredCohort, fetchExploredCohort } from './exploredCohort'
 import { expandMedicationElement, fetchMedication, initMedicationHierarchy } from './medication'
 import {
@@ -161,18 +161,18 @@ const setMessageSlice = createSlice({
       type: 'error',
       content: 'Une erreur est survenue lors de la création de la cohorte'
     }))
-    builder.addCase(editCohort.rejected, () => ({
-      type: 'error',
-      content: "Une erreur est survenue lors de l'édition de la cohorte"
-    }))
-    builder.addCase(deleteCohort.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la suppression de la cohorte'
-    }))
-    builder.addCase(setFavoriteCohort.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la mise en favori de la cohorte'
-    }))
+    // builder.addCase(editCohort.rejected, () => ({
+    //   type: 'error',
+    //   content: "Une erreur est survenue lors de l'édition de la cohorte"
+    // }))
+    // builder.addCase(deleteCohort.rejected, () => ({
+    //   type: 'error',
+    //   content: 'Une erreur est survenue lors de la suppression de la cohorte'
+    // }))
+    // builder.addCase(setFavoriteCohort.rejected, () => ({
+    //   type: 'error',
+    //   content: 'Une erreur est survenue lors de la mise en favori de la cohorte'
+    // }))
     builder.addCase(fetchRequestCohortCreation.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la récupération de la requête'

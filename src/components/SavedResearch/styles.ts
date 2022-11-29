@@ -34,6 +34,17 @@ const useStyles = makeStyles((theme) => ({
     '&:last-child': {
       marginRight: 0
     }
+  },
+  pagination: {
+    float: 'right',
+    '& button': {
+      backgroundColor: '#fff',
+      color: '#5BC5F2'
+    },
+    '& .MuiPaginationItem-page.Mui-selected': {
+      color: '#0063AF',
+      backgroundColor: '#FFF'
+    }
   }
 }))
 
