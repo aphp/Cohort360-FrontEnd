@@ -26,6 +26,7 @@ import { BiologyListType, fetchBiology, expandBiologyElement } from 'state/biolo
 import { getSelectedPmsi, filterSelectedPmsi, checkIfIndeterminated } from 'utils/pmsi'
 
 import useStyles from './styles'
+import { findItem } from '../../../../../../../../../../utils/cohortCreation'
 
 type BiologyListItemProps = {
   biologyItem: BiologyListType
@@ -45,7 +46,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === biologyItem.id) : false
+  const isSelected = findItem(selectedItem ? selectedItem : [], biologyItem)
   const isIndeterminated = checkIfIndeterminated(biologyItem, selectedItem)
 
   const _onExpand = async (biologyCode: string) => {

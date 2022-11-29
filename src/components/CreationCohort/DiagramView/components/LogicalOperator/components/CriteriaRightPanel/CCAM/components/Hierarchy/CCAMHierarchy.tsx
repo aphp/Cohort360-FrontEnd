@@ -26,6 +26,7 @@ import { PmsiListType, fetchProcedure, expandPmsiElement } from 'state/pmsi'
 import { getSelectedPmsi, filterSelectedPmsi, checkIfIndeterminated } from 'utils/pmsi'
 
 import useStyles from './styles'
+import { findItem } from '../../../../../../../../../../utils/cohortCreation'
 
 type ProcedureListItemProps = {
   procedureItem: PmsiListType
@@ -45,7 +46,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === procedureItem.id) : false
+  const isSelected = findItem(selectedItem ? selectedItem : [], procedureItem)
   const isIndeterminated = checkIfIndeterminated(procedureItem, selectedItem)
 
   const _onExpand = async (procedureCode: string) => {

@@ -1,9 +1,17 @@
 import moment from 'moment'
 
 import services from 'services'
-import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType, DocType } from 'types'
+import {
+  ScopeTreeRow,
+  SelectedCriteriaType,
+  CriteriaGroupType,
+  TemporalConstraintsType,
+  DocType,
+  HierarchyType
+} from 'types'
 
 import { docTypes } from 'assets/docTypes.json'
+import { PmsiListType } from '../state/pmsi'
 
 const REQUETEUR_VERSION = 'v1.2.1'
 
@@ -1687,4 +1695,14 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
     criteria,
     criteriaGroup
   }
+}
+export const findItem = (items: HierarchyType[], searchedItem: HierarchyType): boolean => {
+  return items?.find((item) => {
+    if (item.id === searchedItem.id) {
+      return true
+    }
+    return item.subItems ? findItem(item.subItems, searchedItem) : false
+  })
+    ? true
+    : false
 }
