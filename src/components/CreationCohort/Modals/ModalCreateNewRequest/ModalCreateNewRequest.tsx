@@ -92,7 +92,9 @@ const ModalCreateNewRequest: React.FC<{
     if (isEdition) return
 
     if (requestState && requestState.requestsList && requestState.requestsList.length > 0) {
-      _onChangeValue('name', `Nouvelle requête ${(requestState?.count || 0) + 1}`)
+      console.log('requestState?.count', requestState?.count)
+      _onChangeValue('name', `Nouvelle requête ${(requestState?.requestsList.length || 0) + 1}`)
+      console.log('requestState?.count', requestState?.count)
     } else {
       const requestResponse = await dispatch<any>(fetchRequests())
       if (!requestResponse) return
