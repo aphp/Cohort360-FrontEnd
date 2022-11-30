@@ -270,7 +270,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                             event.stopPropagation()
                             onSetCohortFavorite(row)
                           }}
-                          disabled={maintenanceIsActive}
+                          disabled={maintenanceIsActive || !row.fhir_group_id}
                         >
                           {maintenanceIsActive ? (
                             <DisabledFavStar favorite={row.favorite} />

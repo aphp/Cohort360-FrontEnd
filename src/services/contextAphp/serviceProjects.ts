@@ -407,12 +407,13 @@ const servicesProjects: IServiceProjects = {
 
     let options: string[] = []
     const { status, favorite, minPatients, maxPatients, startDate, endDate } = filters
+    const _status = status.map((stat) => stat.code)
 
     if (limit) options = [...options, `limit=${limit}`]
     if (offset) options = [...options, `offset=${offset}`]
     if (sort) options = [...options, `ordering=${_sortDirection}${sort.sortBy}`]
     if (searchInput !== '') options = [...options, `search=${searchInput}`]
-    if (status.length > 0) options = [...options, `status=${status.join()}`]
+    if (_status.length > 0) options = [...options, `status=${_status.join()}`]
     if (minPatients) options = [...options, `min_result_size=${minPatients}`]
     if (maxPatients) options = [...options, `max_result_size=${maxPatients}`]
     if (startDate) options = [...options, `min_fhir_datetime=${startDate}`]

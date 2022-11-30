@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useHistory } from 'react-router'
 
 import { Button, CircularProgress, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
 
@@ -29,6 +30,7 @@ type ResearchProps = {
 }
 const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   const classes = useStyles()
+  const history = useHistory()
   const dispatch = useAppDispatch()
 
   const cohortState = useAppSelector((state) => state.cohort)
@@ -117,6 +119,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
         break
       case 'favorite':
         setFilters({ ...filters, [filterName]: 'all' })
+        history.replace({ pathname: location.pathname })
         break
       case 'minPatients':
       case 'maxPatients':

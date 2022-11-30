@@ -44,7 +44,8 @@ const useStyles = makeStyles((theme) => ({
     '& .MuiPaginationItem-page.Mui-selected': {
       color: '#0063AF',
       backgroundColor: '#FFF'
-    }
+    },
+    margin: '12px 0'
   }
 }))
 
