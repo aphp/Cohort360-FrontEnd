@@ -4,16 +4,11 @@ import useStyles from './styles'
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
 
-import FirstNews from './News/FirstNews'
-import SecondNews from './News/SecondNews'
-import ThirdNews from './News/ThirdNews'
-import FourthNews from './News/FourthNews'
-import FifthNews from './News/FifthNews'
-import SixthNews from './News/SixthNews'
-import SeventhNews from './News/SeventhNews'
+import news from './news.json'
 
 export default function TutorialsCard() {
   const classes = useStyles()
+
   return (
     <>
       <div id="news-card-title">
@@ -22,33 +17,26 @@ export default function TutorialsCard() {
         </Typography>
       </div>
 
-      <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
-
-      <SeventhNews />
-
-      <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
-
-      <SixthNews />
-
-      <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
-
-      <FifthNews />
-
-      <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
-
-      <FourthNews />
-
-      <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
-
-      <ThirdNews />
-
-      <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
-
-      <SecondNews />
-
-      <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
-
-      <FirstNews />
+      <>
+        {news?.entry?.map((entry, index) => (
+          <>
+            <div key={index}>
+              <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
+              <Typography color="textSecondary" style={{ paddingBottom: 14 }}>
+                <b>{entry.news.title}</b>
+              </Typography>
+              {entry.news.message.map((item, index) => (
+                <Typography key={index} color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
+                  {item}
+                </Typography>
+              ))}
+              <Typography color="textSecondary" style={{ paddingTop: 6 }}>
+                <b>{entry.news.footer}</b>
+              </Typography>
+            </div>
+          </>
+        ))}
+      </>
     </>
   )
 }

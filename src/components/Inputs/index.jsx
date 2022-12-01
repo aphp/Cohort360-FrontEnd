@@ -7,10 +7,7 @@ import InputSearchDocumentButton from './InputSearchDocument/components/InputSea
 import InputSearchDocumentExtend from './InputSearchDocument/components/InputSearchDocumentExtend'
 import InputSearchDocumentRegex from './InputSearchDocument/components/InputSearchDocumentRegex'
 import InputSearchDocumentSimple from './InputSearchDocument/components/InputSearchDocumentSimple'
-
-import InputAgeRange from './InputAgeRange'
-import InputAgeRangeSlider from './InputAgeRange/InputAgeRangeSlider'
-import InputAgeRangeAdvanced from './InputAgeRange/InputAgeRangeAdvanced'
+import InputAgeRange from './InputAgeRange/InputAgeRange'
 
 export {
   InputNumber,
@@ -21,7 +18,5 @@ export {
   InputSearchDocumentExtend,
   InputSearchDocumentRegex,
   InputSearchDocumentSimple,
-  InputAgeRange,
-  InputAgeRangeSlider,
-  InputAgeRangeAdvanced
+  InputAgeRange
 }
