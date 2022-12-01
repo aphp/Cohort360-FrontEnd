@@ -518,7 +518,7 @@ const servicesCohorts: IServiceCohorts = {
 
       // On crée un dictionnaire pour faire le lien entre les cohortes et les périmètres (Dictionnaire 1)
       const cohortLinkList = cohortsResponse?.data?.entry.map((cohortResponse: any) => {
-        return cohortResponse
+        return cohortResponse.resource
       })
 
       // On cherche la liste des Organisations présente dans l'objet `member`
