@@ -18,10 +18,8 @@ import displayDigit from 'utils/displayDigit'
 import { buildCohortFiltersChips } from 'utils/chips'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { fetchCohorts } from 'state/cohort'
+import { deleteCohort, editCohort, fetchCohorts } from 'state/cohort'
 import { Pagination } from '@material-ui/lab'
-
-import services from 'services'
 
 type ResearchProps = {
   simplified?: boolean
@@ -78,12 +76,12 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   }, [filters, sort, page, searchInput]) // eslint-disable-line
 
   const onDeleteCohort = async (cohort: Cohort) => {
-    await services.projects.deleteCohort(cohort)
+    await dispatch<any>(deleteCohort({ deletedCohort: cohort }))
     onFetchCohorts()
   }
 
   const onSetCohortFavorite = async (cohort: Cohort) => {
-    await services.projects.editCohort({ ...cohort, favorite: !cohort.favorite })
+    await dispatch<any>(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
     onFetchCohorts()
   }
 
@@ -188,7 +186,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
             sortBy={sort.sortBy}
             sortDirection={sort.sortDirection}
             onRequestSort={handleRequestSort}
-            onUpdateCohorts={() => onFetchCohorts()}
+            onUpdateCohorts={onFetchCohorts}
           />
 
           <Pagination

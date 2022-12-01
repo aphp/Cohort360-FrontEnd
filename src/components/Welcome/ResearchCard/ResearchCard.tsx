@@ -6,10 +6,9 @@ import RequestsTable from 'components/SavedResearch/ResearchTable/RequestsTable'
 
 import { Cohort, RequestType } from 'types'
 import { useAppDispatch } from 'state'
-import { fetchCohorts } from 'state/cohort'
+import { deleteCohort, editCohort, fetchCohorts } from 'state/cohort'
 
 import useStyles from './styles'
-import services from 'services'
 
 type ResearchCardProps = {
   simplified?: boolean
@@ -38,12 +37,12 @@ const ResearchCard: React.FC<ResearchCardProps> = ({
   const dispatch = useAppDispatch()
 
   const onDeleteCohort = async (cohort: Cohort) => {
-    await services.projects.deleteCohort(cohort)
+    await dispatch<any>(deleteCohort({ deletedCohort: cohort }))
     updateCohorts()
   }
 
   const onSetCohortFavorite = async (cohort: Cohort) => {
-    await services.projects.editCohort({ ...cohort, favorite: !cohort.favorite })
+    await dispatch<any>(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
     updateCohorts()
   }
 
