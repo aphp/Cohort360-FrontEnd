@@ -507,34 +507,19 @@ const servicesCohorts: IServiceCohorts = {
 
   fetchCohortsRights: async (cohorts) => {
     try {
-      // On recupère les info d'une cohorte pour avoir les IDs des groupes
-      const cohortsResponse = await Promise.all(
-        cohorts.map(({ fhir_group_id }) =>
-          new Promise((resolve) => {
-            resolve(fetchGroup({ _id: fhir_group_id }))
-          })
-            .then((values) => {
-              return values
-            })
-            .catch((error) => {
-              return { error: true, ...error }
-            })
-        )
-      )
+      // On recupère tous les ids de notre liste de cohort
+      const ids = cohorts.map((cohort) => {
+        return cohort.fhir_group_id
+      })
+
+      const cohortsResponse: any = await fetchGroup({ _id: ids })
       let caresiteIds = ''
       let organizationLinkList: any[] = []
 
       // On crée un dictionnaire pour faire le lien entre les cohortes et les périmètres (Dictionnaire 1)
-      const cohortLinkList = cohortsResponse
-        .filter((cohortResponse: any) => cohortResponse.error !== true)
-        .map(
-          (cohortResponse: any) =>
-            cohortResponse.data &&
-            cohortResponse.data.resourceType === 'Bundle' &&
-            cohortResponse.data.entry &&
-            cohortResponse.data.entry[0] &&
-            cohortResponse.data.entry[0].resource
-        )
+      const cohortLinkList = cohortsResponse?.data?.entry.map((cohortResponse: any) => {
+        return cohortResponse.resource
+      })
 
       // On cherche la liste des Organisations présente dans l'objet `member`
       caresiteIds =

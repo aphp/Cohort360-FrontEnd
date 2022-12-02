@@ -59,7 +59,7 @@ export const fetchOrganization = async (args: fetchOrganizationProps) => {
  */
 
 type fetchGroupProps = {
-  _id?: string // ID of Group
+  _id?: string | (string | undefined)[] // ID of Group
   _list?: string[] // ID List of Groups
   provider?: string // Provider ID
   'managing-entity'?: string[] // ID List of organization
