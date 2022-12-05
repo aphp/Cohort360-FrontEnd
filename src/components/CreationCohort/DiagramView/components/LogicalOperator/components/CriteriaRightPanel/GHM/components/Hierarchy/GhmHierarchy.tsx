@@ -26,6 +26,7 @@ import { PmsiListType, fetchClaim, expandPmsiElement } from 'state/pmsi'
 import { getSelectedPmsi, filterSelectedPmsi, checkIfIndeterminated } from 'utils/pmsi'
 
 import useStyles from './styles'
+import { findItem } from '../../../../../../../../../../utils/cohortCreation'
 
 type GhmListItemProps = {
   ghmItem: PmsiListType
@@ -45,7 +46,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === ghmItem.id) : false
+  const isSelected = findItem(selectedItem ? selectedItem : [], ghmItem)
   const isIndeterminated = checkIfIndeterminated(ghmItem, selectedItem)
 
   const _onExpand = async (ghmCode: string) => {

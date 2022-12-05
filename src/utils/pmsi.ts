@@ -1,4 +1,5 @@
 import { PmsiListType } from 'state/pmsi'
+import { findItem } from './cohortCreation'
 
 /**
  * This function is called when a user select an element of pmsi hierarchy
@@ -7,8 +8,7 @@ import { PmsiListType } from 'state/pmsi'
 export const getSelectedPmsi = (row: PmsiListType, selectedItems: PmsiListType[] | null, rootRows: PmsiListType[]) => {
   let savedSelectedItems = selectedItems ? [...selectedItems] : []
 
-  const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
-  const index = foundItem ? savedSelectedItems.indexOf(foundItem) : -1
+  const isFound = findItem(savedSelectedItems, row)
 
   const getRowAndChildren = (parent: PmsiListType) => {
     const getChild: (subItem: PmsiListType) => PmsiListType[] = (subItem: PmsiListType) => {
@@ -51,7 +51,7 @@ export const getSelectedPmsi = (row: PmsiListType, selectedItems: PmsiListType[]
     return savedSelectedItems
   }
 
-  if (index !== -1) {
+  if (isFound) {
     savedSelectedItems = deleteRowAndChildren(row)
   } else {
     savedSelectedItems = [...savedSelectedItems, ...getRowAndChildren(row)]
