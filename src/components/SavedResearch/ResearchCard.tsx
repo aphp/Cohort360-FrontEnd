@@ -20,6 +20,7 @@ import { buildCohortFiltersChips } from 'utils/chips'
 import { useAppSelector, useAppDispatch } from 'state'
 import { deleteCohort, editCohort, fetchCohorts } from 'state/cohort'
 import { Pagination } from '@material-ui/lab'
+import { useDebounce } from 'utils/debounce'
 
 type ResearchProps = {
   simplified?: boolean
@@ -49,6 +50,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   const [open, setOpen] = useState(false)
 
   const rowsPerPage = 20
+  const debouncedSearchItem = useDebounce(500, searchInput)
 
   const [filters, setFilters] = useState<CohortFilters>({
     status: [],
@@ -59,21 +61,29 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
     endDate: null
   })
 
-  const onFetchCohorts = async () => {
+  const onFetchCohorts = async (_page?: number) => {
     dispatch<any>(
       fetchCohorts({
         filters,
         sort,
         searchInput,
         limit: rowsPerPage,
-        page
+        page: _page ? _page : page
       })
     )
   }
 
   useEffect(() => {
     onFetchCohorts()
-  }, [filters, sort, page, searchInput]) // eslint-disable-line
+  }, [filters, sort, page, debouncedSearchItem]) // eslint-disable-line
+
+  const onEditCohort = () => {
+    if (sort.sortBy === 'modified_at' && sort.sortDirection === 'desc') {
+      onFetchCohorts(1)
+    } else {
+      onFetchCohorts()
+    }
+  }
 
   const onDeleteCohort = async (cohort: Cohort) => {
     await dispatch<any>(deleteCohort({ deletedCohort: cohort }))
@@ -82,7 +92,11 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
 
   const onSetCohortFavorite = async (cohort: Cohort) => {
     await dispatch<any>(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
-    onFetchCohorts()
+    if (sort.sortBy === 'modified_at' && sort.sortDirection === 'desc') {
+      onFetchCohorts(1)
+    } else {
+      onFetchCohorts()
+    }
   }
 
   const handleChangeInput = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -186,7 +200,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
             sortBy={sort.sortBy}
             sortDirection={sort.sortDirection}
             onRequestSort={handleRequestSort}
-            onUpdateCohorts={onFetchCohorts}
+            onUpdateCohorts={onEditCohort}
           />
 
           <Pagination
