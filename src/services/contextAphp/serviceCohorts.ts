@@ -517,9 +517,14 @@ const servicesCohorts: IServiceCohorts = {
       let organizationLinkList: any[] = []
 
       // On crée un dictionnaire pour faire le lien entre les cohortes et les périmètres (Dictionnaire 1)
-      const cohortLinkList = cohortsResponse?.data?.entry.map((cohortResponse: any) => {
-        return cohortResponse.resource
-      })
+      const cohortLinkList =
+        cohortsResponse &&
+        cohortsResponse.data &&
+        cohortsResponse.data.entry &&
+        cohortsResponse.data.entry[0] &&
+        cohortsResponse.data.entry[0].resource
+          ? cohortsResponse.data.entry.map((cohortsResponse: any) => cohortsResponse.resource)
+          : []
 
       // On cherche la liste des Organisations présente dans l'objet `member`
       caresiteIds =
