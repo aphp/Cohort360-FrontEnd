@@ -512,7 +512,15 @@ const servicesCohorts: IServiceCohorts = {
         return cohort.fhir_group_id
       })
 
-      const cohortsResponse: any = await fetchGroup({ _id: ids })
+      const cohortsResponse: any = await new Promise((resolve) => {
+        resolve(fetchGroup({ _id: ids }))
+      })
+        .then((values) => {
+          return values
+        })
+        .catch((error) => {
+          return { error: true, ...error }
+        })
       let caresiteIds = ''
       let organizationLinkList: any[] = []
 
