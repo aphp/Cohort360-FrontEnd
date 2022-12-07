@@ -185,17 +185,12 @@ const addCohort = createAsyncThunk<AddCohortReturn, AddCohortParams, { state: Ro
 type EditCohortParams = {
   editedCohort: Cohort
 }
-type EditCohortReturn = {
-  modifiedCohort: Cohort
-}
 
-const editCohort = createAsyncThunk<EditCohortReturn, EditCohortParams, { state: RootState }>(
+const editCohort = createAsyncThunk<void, EditCohortParams, { state: RootState }>(
   'cohort/editCohort',
   async ({ editedCohort }) => {
     try {
-      const modifiedCohort = await services.projects.editCohort(editedCohort)
-
-      return { modifiedCohort: modifiedCohort }
+      await services.projects.editCohort(editedCohort)
     } catch (error) {
       console.error(error)
       throw error
@@ -209,19 +204,12 @@ const editCohort = createAsyncThunk<EditCohortReturn, EditCohortParams, { state:
 type DeleteCohortParams = {
   deletedCohort: Cohort
 }
-type DeleteCohortReturn = {
-  deletedCohort: Cohort
-}
 
-const deleteCohort = createAsyncThunk<DeleteCohortReturn, DeleteCohortParams, { state: RootState }>(
+const deleteCohort = createAsyncThunk<void, DeleteCohortParams, { state: RootState }>(
   'cohort/deleteCohort',
   async ({ deletedCohort }) => {
     try {
-      const _deletedCohort = await services.projects.deleteCohort(deletedCohort)
-
-      return {
-        deletedCohort: _deletedCohort
-      }
+      await services.projects.deleteCohort(deletedCohort)
     } catch (error) {
       console.error(error)
       throw error
@@ -276,11 +264,11 @@ const setCohortSlice = createSlice({
     builder.addCase(addCohort.rejected, (state) => ({ ...state, loading: false }))
     // editCohort
     builder.addCase(editCohort.pending, (state) => ({ ...state, loading: true }))
-    builder.addCase(editCohort.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
+    builder.addCase(editCohort.fulfilled, (state) => ({ ...state, loading: false }))
     builder.addCase(editCohort.rejected, (state) => ({ ...state, loading: false }))
     // deleteCohort
     builder.addCase(deleteCohort.pending, (state) => ({ ...state, loading: true }))
-    builder.addCase(deleteCohort.fulfilled, (state, action) => ({ ...state, ...action.payload, loading: false }))
+    builder.addCase(deleteCohort.fulfilled, (state) => ({ ...state, loading: false }))
     builder.addCase(deleteCohort.rejected, (state) => ({ ...state, loading: false }))
     // fetchCohortInBackGround
     builder.addCase(fetchCohortInBackGround.pending, (state) => ({
