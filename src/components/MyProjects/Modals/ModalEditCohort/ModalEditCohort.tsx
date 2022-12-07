@@ -12,7 +12,13 @@ import {
 } from '@material-ui/core'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { CohortState, addCohort, editCohort, deleteCohort } from 'state/cohort'
+import {
+  CohortState,
+  addCohort,
+  editCohort,
+  deleteCohort,
+  setSelectedCohort as setSelectedCohortState
+} from 'state/cohort'
 
 import { Cohort } from 'types'
 
@@ -61,7 +67,9 @@ const ModalEditCohort: React.FC<{
     onChangeCohortState(_cohort)
   }
 
-  const handleClose = () => onClose()
+  const handleClose = async () => {
+    await dispatch<any>(setSelectedCohortState(null))
+  }
 
   const handleConfirm = async () => {
     if (loading) return

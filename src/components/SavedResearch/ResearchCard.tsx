@@ -79,6 +79,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
 
   const onEditCohort = () => {
     if (sort.sortBy === 'modified_at' && sort.sortDirection === 'desc') {
+      setPage(1)
       onFetchCohorts(1)
     } else {
       onFetchCohorts()
@@ -93,6 +94,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   const onSetCohortFavorite = async (cohort: Cohort) => {
     await dispatch<any>(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
     if (sort.sortBy === 'modified_at' && sort.sortDirection === 'desc') {
+      setPage(1)
       onFetchCohorts(1)
     } else {
       onFetchCohorts()
