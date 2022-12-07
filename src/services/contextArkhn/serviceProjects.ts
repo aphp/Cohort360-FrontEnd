@@ -1,6 +1,6 @@
 import apiBack from '../apiBackend'
 
-import { ProjectType, RequestType, Cohort } from 'types'
+import { ProjectType, RequestType, Cohort, CohortFilters, Sort } from 'types'
 
 import servicesCohorts from './serviceCohorts'
 
@@ -12,7 +12,7 @@ export interface IServiceProjects {
    *   - limit: Determine une limite de projet demandé
    *   - offset: Determine un index de départ
    *
-   * Retoune:
+   * Retourne:
    *   - count: Nombre total de projet de recherche
    *   - next: URL d'appel pour récupérer les projet de recherche suivant
    *   - previous: URL d'appel pour récupérer les projet de recherche précédent
@@ -68,7 +68,7 @@ export interface IServiceProjects {
    *   - limit: Determine une limite de requete demandé
    *   - offset: Determine un index de départ
    *
-   * Retoune:
+   * Retourne:
    *   - count: Nombre total de requete
    *   - next: URL d'appel pour récupérer les requete suivant
    *   - previous: URL d'appel pour récupérer les requete précédent
@@ -115,7 +115,7 @@ export interface IServiceProjects {
    * Retourne:
    *  - Requete partagée
    */
-  shareRequest: (sharedRequest: RequestType) => Promise<RequestType>
+  shareRequest: (sharedRequest: RequestType) => Promise<any>
 
   /**
    * Cette fonction supprime un requete existant
@@ -126,7 +126,6 @@ export interface IServiceProjects {
    * Retourne:
    *   - Requete supprimée
    */
-
   deleteRequest: (deletedRequest: RequestType) => Promise<RequestType>
 
   /**
@@ -156,17 +155,22 @@ export interface IServiceProjects {
    * Retourne la liste de Cohort d'un practitioner
    *
    * Argument:
+   *   - filters: Indique les filtres choisis sur les cohortes
+   *   - searchInput: Indique la chaîne de caractère recherchée par l'utilisateur
+   *   - sort: Indique l'ordre dans lequel les cohortes seront affichées
    *   - limit: Determine une limite de cohorte demandé
    *   - offset: Determine un index de départ
    *
-   * Retoune:
+   * Retourne:
    *   - count: Nombre total de cohortes
-   *   - next: URL d'appel pour récupérer les cohortes suivant
-   *   - previous: URL d'appel pour récupérer les cohortes précédent
+   *   - next: URL d'appel pour récupérer les cohortes suivantes
+   *   - previous: URL d'appel pour récupérer les cohortes précédentes
    *   - results: Liste de cohortes récupérées
    */
   fetchCohortsList: (
-    providerId: string,
+    filters: CohortFilters,
+    searchInput: string,
+    sort: Sort,
     limit?: number,
     offset?: number
   ) => Promise<{
@@ -325,13 +329,23 @@ const servicesProjects: IServiceProjects = {
     }
   },
   shareRequest: async (sharedRequest) => {
-    const shareProjectResponse = (await apiBack.post(`/cohort/requests/${sharedRequest.uuid}/`)) ?? {
-      status: 400
-    }
-    if (shareProjectResponse.status === 204) {
-      return shareProjectResponse.data as ProjectType
+    const usersToShareId = sharedRequest.usersToShare?.map((userToshareId) => userToshareId.provider_username)
+    const shared_query_snapshot_id = sharedRequest.shared_query_snapshot
+      ? sharedRequest.shared_query_snapshot
+      : sharedRequest.currentSnapshot
+    const shared_query_snapshot_name = sharedRequest.name ? sharedRequest.name : sharedRequest.requestName
+    const shareRequestResponse = (await apiBack.post(
+      `/cohort/request-query-snapshots/${shared_query_snapshot_id}/share/`,
+      {
+        name: shared_query_snapshot_name,
+        recipients: usersToShareId?.join()
+      }
+    )) ?? { status: 400 }
+    if (shareRequestResponse.status === 201) {
+      return shareRequestResponse.data as ProjectType, shareRequestResponse
     } else {
-      throw new Error('Impossible de partager la requête')
+      console.error('Impossible de partager la requête')
+      return shareRequestResponse
     }
   },
   deleteRequest: async (deletedRequest) => {
@@ -386,13 +400,25 @@ const servicesProjects: IServiceProjects = {
     return checkResponse.length === deletedRequests.length ? deletedRequests : []
   },
 
-  fetchCohortsList: async (providerId, limit, offset) => {
-    let search = `?`
-    if (limit) {
-      search += `limit=${limit}`
-    }
-    if (offset) {
-      search += search === '?' ? `offset=${offset}` : `&offset=${offset}`
+  fetchCohortsList: async (filters, searchInput, sort, limit, offset) => {
+    const _sortDirection = sort.sortDirection === 'desc' ? '-' : ''
+    const optionsReducer = (accumulator: any, currentValue: any) =>
+      accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
+
+    let options: string[] = []
+    const { status, favorite, minPatients, maxPatients, startDate, endDate } = filters
+
+    if (limit) options = [...options, `limit=${limit}`]
+    if (offset) options = [...options, `offset=${offset}`]
+    if (sort) options = [...options, `ordering=${_sortDirection}${sort.sortBy}`] // eslint-disable-line
+    if (searchInput !== '') options = [...options, `search=${searchInput}`]
+    if (status.length > 0) options = [...options, `status=${status.join()}`]
+    if (minPatients) options = [...options, `min_result_size=${minPatients}`]
+    if (maxPatients) options = [...options, `max_result_size=${maxPatients}`]
+    if (startDate) options = [...options, `min_fhir_datetime=${startDate}`]
+    if (endDate) options = [...options, `max_fhir_datetime=${endDate}`]
+    if (favorite !== 'all') {
+      if (favorite === 'True') options = [...options, `favorite=${favorite === 'True' ? 'true' : 'false'}`]
     }
 
     const { data } = (await apiBack.get<{
@@ -400,7 +426,7 @@ const servicesProjects: IServiceProjects = {
       next: string | null
       previous: string | null
       results: Cohort[]
-    }>(`/cohort/cohorts/${search}`)) ?? { data: { results: [] } }
+    }>(`/cohort/cohorts/?${options.reduce(optionsReducer)}`)) ?? { data: { results: [] } }
 
     // Recupere les droits
     const cohortList = await servicesCohorts.fetchCohortsRights(data.results)

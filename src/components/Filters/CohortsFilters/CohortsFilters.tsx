@@ -107,8 +107,8 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
   }
 
   const _onSubmit = () => {
-    const newStartDate = moment(_startDate).isValid() ? moment(_startDate).format('YYYY-MM-DD') : null
-    const newEndDate = moment(_endDate).isValid() ? moment(_endDate).format('YYYY-MM-DD') : null
+    const newStartDate = moment(_startDate).isValid() ? moment(_startDate).format('YYYY-MM-DD h:mm:ss') : null
+    const newEndDate = moment(_endDate).isValid() ? moment(_endDate).format('YYYY-MM-DD h:mm:ss') : null
 
     onChangeFilters({
       ...filters,
@@ -164,7 +164,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
               inputProps={{ min: 0 }}
             />
             <FormLabel component="legend" className={classes.patientsLabel}>
-              patients.
+              patient(s).
             </FormLabel>
           </Grid>
 
@@ -180,7 +180,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
               inputProps={{ min: 0 }}
             />
             <FormLabel component="legend" className={classes.patientsLabel}>
-              patients.
+              patient(s).
             </FormLabel>
           </Grid>
           {nbPatientsError && (
