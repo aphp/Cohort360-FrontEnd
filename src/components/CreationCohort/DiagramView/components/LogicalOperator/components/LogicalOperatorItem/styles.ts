@@ -30,7 +30,7 @@ const useStyles = makeStyles(() => ({
       position: 'absolute',
       content: "''",
       height: 12,
-      width: 3,
+      width: 4,
       background: '#19235a',
       top: 'calc(100% + 3px)',
       left: 20
@@ -53,7 +53,7 @@ const useStyles = makeStyles(() => ({
     '&::before': {
       position: 'absolute',
       content: "''",
-      height: 3,
+      height: 4,
       width: 36,
       background: '#19235a',
       top: 12,
@@ -63,7 +63,7 @@ const useStyles = makeStyles(() => ({
       position: 'absolute',
       content: "''",
       height: 12,
-      width: 3,
+      width: 4,
       background: '#19235a',
       top: 'calc(100% + 3px)',
       left: 20
