@@ -508,9 +508,11 @@ const servicesCohorts: IServiceCohorts = {
   fetchCohortsRights: async (cohorts) => {
     try {
       // On recupère tous les ids de notre liste de cohort
-      const ids = cohorts.map((cohort) => {
-        return cohort.fhir_group_id
-      })
+      const ids = cohorts
+        .map((cohort) => {
+          return cohort.fhir_group_id
+        })
+        .filter((id) => id !== '')
 
       const cohortsResponse: any = await new Promise((resolve) => {
         resolve(fetchGroup({ _id: ids }))
