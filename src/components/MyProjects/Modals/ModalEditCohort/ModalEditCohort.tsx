@@ -67,8 +67,8 @@ const ModalEditCohort: React.FC<{
     onChangeCohortState(_cohort)
   }
 
-  const handleClose = async () => {
-    await dispatch<any>(setSelectedCohortState(null))
+  const handleClose = () => {
+    dispatch<any>(setSelectedCohortState(null))
   }
 
   const handleConfirm = async () => {
@@ -84,7 +84,7 @@ const ModalEditCohort: React.FC<{
     if (isEdition) {
       await dispatch<any>(editCohort({ editedCohort: modalCohortState }))
     } else {
-      dispatch<any>(addCohort({ newCohort: modalCohortState }))
+      await dispatch<any>(addCohort({ newCohort: modalCohortState }))
     }
     onClose()
   }
