@@ -45,6 +45,13 @@ const useStyles = makeStyles(() => ({
     '& > button': {
       margin: '12px 8px'
     }
+  },
+  errorContainer: {
+    maxHeight: 100,
+    overflow: 'scroll',
+    color: '#f44336',
+    width: '100%',
+    padding: '0 16px'
   }
 }))
 
