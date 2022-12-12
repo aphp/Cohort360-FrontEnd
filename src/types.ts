@@ -594,6 +594,7 @@ export type IPatientDocuments = {
       direction: string
     }
   }
+  searchInputError?: searchInputError
 }
 
 export type IPatientPmsi<T extends IProcedure | ICondition | IClaim> = {
