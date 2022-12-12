@@ -47,8 +47,6 @@ const useStyles = makeStyles(() => ({
     }
   },
   errorContainer: {
-    maxHeight: 100,
-    overflow: 'scroll',
     color: '#f44336',
     width: '100%',
     padding: '0 16px'
