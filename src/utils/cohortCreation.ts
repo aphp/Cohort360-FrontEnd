@@ -1,7 +1,14 @@
 import moment from 'moment'
 
 import services from 'services'
-import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType, DocType } from 'types'
+import {
+  CriteriaGroupType,
+  DocType,
+  HierarchyType,
+  ScopeTreeRow,
+  SelectedCriteriaType,
+  TemporalConstraintsType
+} from 'types'
 
 import { docTypes } from 'assets/docTypes.json'
 
@@ -1687,4 +1694,16 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
     criteria,
     criteriaGroup
   }
+}
+export const findItemInListAndSubItems = (items: HierarchyType[], searchedItem: HierarchyType): boolean => {
+  const foundItem = items?.find((item) => {
+    if (item.id === searchedItem.id || item.id == '*') {
+      return true
+    }
+    return item.subItems ? findItemInListAndSubItems(item.subItems, searchedItem) : false
+  })
+  if (foundItem) {
+    return true
+  }
+  return false
 }

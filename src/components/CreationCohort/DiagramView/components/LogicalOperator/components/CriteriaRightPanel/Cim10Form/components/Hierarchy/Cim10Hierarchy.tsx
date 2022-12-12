@@ -1,18 +1,18 @@
-import React, { useEffect, useState, Fragment } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import clsx from 'clsx'
 
 import {
   Button,
+  Collapse,
   Divider,
   Grid,
   IconButton,
-  Typography,
+  List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Collapse,
-  List,
-  Tooltip
+  Tooltip,
+  Typography
 } from '@material-ui/core'
 import Skeleton from '@material-ui/lab/Skeleton'
 
@@ -20,12 +20,13 @@ import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import { useAppSelector, useAppDispatch } from 'state'
-import { PmsiListType, fetchCondition, expandPmsiElement } from 'state/pmsi'
+import { useAppDispatch, useAppSelector } from 'state'
+import { expandPmsiElement, fetchCondition, PmsiListType } from 'state/pmsi'
 
-import { getSelectedPmsi, filterSelectedPmsi, checkIfIndeterminated } from 'utils/pmsi'
+import { checkIfIndeterminated, filterSelectedPmsi, getSelectedPmsi } from 'utils/pmsi'
 
 import useStyles from './styles'
+import { findItemInListAndSubItems } from 'utils/cohortCreation'
 
 type CimListItemProps = {
   cimItem: PmsiListType
@@ -45,7 +46,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
 
   const [open, setOpen] = useState(false)
 
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === cimItem.id) : false
+  const isSelected = findItemInListAndSubItems(selectedItem ? selectedItem : [], cimItem)
   const isIndeterminated = checkIfIndeterminated(cimItem, selectedItem)
 
   const _onExpand = async (cimCode: string) => {

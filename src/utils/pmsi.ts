@@ -5,10 +5,24 @@ import { PmsiListType } from 'state/pmsi'
  * return selected items that should be saved
  */
 export const getSelectedPmsi = (row: PmsiListType, selectedItems: PmsiListType[] | null, rootRows: PmsiListType[]) => {
-  let savedSelectedItems = selectedItems ? [...selectedItems] : []
-
-  const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
-  const index = foundItem ? savedSelectedItems.indexOf(foundItem) : -1
+  const flattedSelectedItems: PmsiListType[] = []
+  const selectedIds: string[] = []
+  const flatItems = (items: PmsiListType[] | null) => {
+    if (!items) return
+    items.forEach((item) => {
+      if (item.id === 'loading') {
+        return
+      }
+      if (selectedIds.indexOf(item.id) === -1) {
+        selectedIds.push(item.id)
+        flattedSelectedItems.push(item)
+      }
+      if (item.subItems) flatItems(item.subItems)
+    })
+  }
+  flatItems(selectedItems)
+  let savedSelectedItems = flattedSelectedItems
+  const isFound = savedSelectedItems?.find((item) => item.id === row.id)
 
   const getRowAndChildren = (parent: PmsiListType) => {
     const getChild: (subItem: PmsiListType) => PmsiListType[] = (subItem: PmsiListType) => {
@@ -34,24 +48,11 @@ export const getSelectedPmsi = (row: PmsiListType, selectedItems: PmsiListType[]
     const elemToDelete = getRowAndChildren(parent)
 
     savedSelectedItems = savedSelectedItems.filter((row) => !elemToDelete.some(({ id }) => id === row.id))
-    savedSelectedItems = savedSelectedItems.filter((row) => {
-      // Remove if one child is not checked
-      if (row.subItems && row.subItems.length > 0 && row.subItems[0].id === 'loading') {
-        return true
-      }
-      const numberOfSubItemsSelected = row?.subItems?.filter((subItem: any) =>
-        savedSelectedItems.find(({ id }) => id === subItem.id)
-      )?.length
-      if (numberOfSubItemsSelected && numberOfSubItemsSelected !== row?.subItems?.length) {
-        return false
-      }
-      return true
-    })
 
     return savedSelectedItems
   }
 
-  if (index !== -1) {
+  if (isFound) {
     savedSelectedItems = deleteRowAndChildren(row)
   } else {
     savedSelectedItems = [...savedSelectedItems, ...getRowAndChildren(row)]
@@ -81,7 +82,7 @@ export const getSelectedPmsi = (row: PmsiListType, selectedItems: PmsiListType[]
         row &&
         row.subItems &&
         row.subItems.length > 0 &&
-        selectedChildren.length > 0 &&
+        selectedChildren &&
         selectedChildren.length !== row.subItems.length
       ) {
         savedSelectedItems = savedSelectedItems.filter(({ id }) => id !== row.id)

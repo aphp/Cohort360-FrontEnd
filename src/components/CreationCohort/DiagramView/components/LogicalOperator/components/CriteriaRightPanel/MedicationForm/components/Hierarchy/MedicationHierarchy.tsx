@@ -1,18 +1,18 @@
-import React, { useEffect, useState, Fragment } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import clsx from 'clsx'
 
 import {
   Button,
+  Collapse,
   Divider,
   Grid,
   IconButton,
-  Typography,
+  List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Collapse,
-  List,
-  Tooltip
+  Tooltip,
+  Typography
 } from '@material-ui/core'
 import Skeleton from '@material-ui/lab/Skeleton'
 
@@ -20,12 +20,13 @@ import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import { useAppSelector, useAppDispatch } from 'state'
-import { MedicationListType, fetchMedication, expandMedicationElement } from 'state/medication'
+import { useAppDispatch, useAppSelector } from 'state'
+import { expandMedicationElement, fetchMedication, MedicationListType } from 'state/medication'
 
-import { getSelectedPmsi, filterSelectedPmsi, checkIfIndeterminated } from 'utils/pmsi'
+import { checkIfIndeterminated, filterSelectedPmsi, getSelectedPmsi } from 'utils/pmsi'
 
 import useStyles from './styles'
+import { findItemInListAndSubItems } from 'utils/cohortCreation'
 
 type MedicationListItemProps = {
   medicationItem: MedicationListType
@@ -44,8 +45,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
   const medicationHierarchy = medicationState.list
 
   const [open, setOpen] = useState(false)
-
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === medicationItem.id) : false
+  const isSelected = findItemInListAndSubItems(selectedItem ? selectedItem : [], medicationItem)
   const isIndeterminated = checkIfIndeterminated(medicationItem, selectedItem)
 
   const _onExpand = async (medicationCode: string) => {

@@ -713,3 +713,8 @@ export type DTTB_ButtonType = {
   icon?: ReactElement
   onClick: (args?: any) => void
 }
+export type HierarchyType = {
+  id: string
+  label: string
+  subItems?: any[]
+}
