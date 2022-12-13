@@ -330,21 +330,6 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
         `status=final&type:not=doc-impor&empty=false`,
         `${criterion.search ? `${COMPOSITION_TEXT}=${encodeURIComponent(criterion.search)}` : ''}`,
         `${
-          criterion.regex_search
-            ? `${COMPOSITION_TEXT}=${encodeURIComponent(
-                `/(.)*${criterion.regex_search.replace(/[/"]/g, function (m) {
-                  switch (m) {
-                    case '/':
-                      return '\\/'
-                    case '"':
-                      return '\\"'
-                  }
-                  return m
-                })}(.)*/`
-              )}`
-            : ''
-        }`,
-        `${
           criterion.docType && criterion.docType.length > 0
             ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: DocType) => docType.code).reduce(searchReducer)}`
             : ''
@@ -1049,14 +1034,7 @@ export async function unbuildRequest(_json: string) {
             const value = filter ? filter[1] : null
             switch (key) {
               case COMPOSITION_TEXT: {
-                const isRegex: boolean = value ? decodeURIComponent(value).search(/\/.*\//) === 0 : false
-
-                // This `replaceAll` is necessary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
-                if (isRegex) {
-                  currentCriterion.regex_search = value ? decodeURIComponent(value).replaceAll('/', '') : ''
-                } else {
-                  currentCriterion.search = value ? decodeURIComponent(value) : ''
-                }
+                currentCriterion.search = value ? decodeURIComponent(value) : ''
                 break
               }
               case COMPOSITION_TYPE: {

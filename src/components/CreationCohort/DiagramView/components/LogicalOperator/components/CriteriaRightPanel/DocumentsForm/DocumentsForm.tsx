@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import _ from 'lodash'
 
 import { Alert } from '@material-ui/lab'
@@ -21,8 +21,6 @@ import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
 import { InputSearchDocument } from 'components/Inputs'
 
-import { debounce } from 'utils/debounce'
-
 import useStyles from './styles'
 
 import { DocType, DocumentDataType } from 'types'
@@ -38,7 +36,6 @@ const defaultComposition: DocumentDataType = {
   type: 'Composition',
   title: 'Critère de document',
   search: '',
-  regex_search: '',
   docType: [],
   occurrence: 1,
   occurrenceComparator: '>=',
@@ -57,49 +54,20 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
   const [error, setError] = useState(false)
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
-  const [inputMode, setInputMode] = useState<'simple' | 'regex'>(defaultValues.regex_search ? 'regex' : 'simple')
-  const [errorRegex, setErrorRegex] = useState(false)
 
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = () => {
-    if (
-      defaultValues &&
-      defaultValues.search?.length === 0 &&
-      defaultValues.regex_search?.length === 0 &&
-      defaultValues.docType?.length === 0
-    ) {
+    if (defaultValues && defaultValues.search?.length === 0 && defaultValues.docType?.length === 0) {
       return setError(true)
     }
     onChangeSelectedCriteria(defaultValues)
   }
 
-  const checkRegex = useMemo(() => {
-    return debounce((query: string) => {
-      try {
-        // Try to create regex
-        new RegExp(query)
-        if (query.search(/\\$/) !== -1 && query.search(/\\\\$/) === -1) {
-          // If query contain '\' but no '\\', set error variable
-          setErrorRegex(true)
-          return
-        }
-        setErrorRegex(false)
-      } catch (error) {
-        // If error, set error variable
-        setErrorRegex(true)
-      }
-    }, 750)
-  }, [])
-
   const _onChangeValue = (key: string, value: any) => {
     const _defaultValues = defaultValues ? { ...defaultValues } : {}
     _defaultValues[key] = value
     setDefaultValues(_defaultValues)
-
-    if (key === 'regex_search' && inputMode === 'regex') {
-      checkRegex(value)
-    }
   }
 
   return (
@@ -164,19 +132,8 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
           <Grid className={classes.inputItem}>
             <InputSearchDocument
               placeholder="Recherche dans les documents"
-              defaultSearchInput={inputMode === 'simple' ? defaultValues.search : defaultValues.regex_search}
-              setDefaultSearchInput={(newSearchInput: string) =>
-                _onChangeValue(inputMode === 'simple' ? 'search' : 'regex_search', newSearchInput)
-              }
-              defaultInputMode={inputMode}
-              setdefaultInputMode={(newInputMode: 'simple' | 'regex') => {
-                setInputMode(newInputMode)
-                setDefaultValues((prevState: any) => ({
-                  ...prevState,
-                  search: newInputMode !== 'simple' ? '' : prevState.regex_search,
-                  regex_search: newInputMode === 'simple' ? '' : prevState.search
-                }))
-              }}
+              defaultSearchInput={defaultValues.search}
+              setDefaultSearchInput={(newSearchInput: string) => _onChangeValue('search', newSearchInput)}
               onSearchDocument={() => null}
               noClearIcon
               noSearchIcon
@@ -247,14 +204,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button
-            onClick={_onSubmit}
-            disabled={errorRegex}
-            type="submit"
-            form="documents-form"
-            color="primary"
-            variant="contained"
-          >
+          <Button onClick={_onSubmit} type="submit" form="documents-form" color="primary" variant="contained">
             Confirmer
           </Button>
         </Grid>

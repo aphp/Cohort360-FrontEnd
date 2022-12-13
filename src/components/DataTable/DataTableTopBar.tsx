@@ -14,9 +14,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
-import InputSearchDocumentButton from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentButton'
 import InputSearchDocumentSimple from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentSimple'
-import InputSearchDocumentRegex from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentRegex'
 
 import {
   SearchByTypes,
@@ -30,7 +28,6 @@ import {
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from './styles'
-import { ODD_REGEX } from '../../constants'
 
 type DataTableTopBarProps = {
   tabs?: TabsType
@@ -43,22 +40,9 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, search
 
   const [search, setSearch] = useState(searchBar?.value ?? '')
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
-  const [inputMode, setDefaultInputMode] = useState<'simple' | 'regex'>('simple')
 
   const onSearch = (newInput = search) => {
     if (searchBar && searchBar.onSearch && typeof searchBar.onSearch === 'function') {
-      if (newInput && inputMode === 'regex') {
-        newInput = newInput.replace(/[/"]/g, function (m) {
-          switch (m) {
-            case '/':
-              return '\\/'
-            case '"':
-              return '\\"'
-          }
-          return m
-        })
-        newInput = `/(.)*${newInput}(.)*/`
-      }
       searchBar.onSearch(newInput, searchBy)
     }
   }
@@ -186,17 +170,13 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, search
                       {button.label}
                     </Button>
                   ))}
-
-                {searchBar && searchBar.type === 'document' && !!ODD_REGEX && (
-                  <InputSearchDocumentButton currentMode={inputMode} onChangeMode={setDefaultInputMode} />
-                )}
               </Grid>
             )}
           </Grid>
         )}
       </Grid>
 
-      {searchBar && searchBar.type === 'document' && inputMode === 'simple' && (
+      {searchBar && searchBar.type === 'document' && (
         <InputSearchDocumentSimple
           defaultSearchInput={search}
           setDefaultSearchInput={(newSearchInput: string) => setSearch(newSearchInput)}
@@ -223,14 +203,6 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, search
               </Typography>
             ))}
         </Grid>
-      )}
-
-      {searchBar && searchBar.type === 'document' && inputMode === 'regex' && (
-        <InputSearchDocumentRegex
-          defaultSearchInput={search}
-          setDefaultSearchInput={(newSearchInput: string) => setSearch(newSearchInput)}
-          onSearchDocument={(newInputText: string) => onSearch(newInputText)}
-        />
       )}
     </>
   )

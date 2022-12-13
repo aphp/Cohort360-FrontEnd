@@ -422,7 +422,6 @@ export type DocumentDataType = {
   title: string
   type: 'Composition'
   search: string
-  regex_search: string
   docType: DocType[] | null
   encounterEndDate: Date | ''
   encounterStartDate: Date | ''
