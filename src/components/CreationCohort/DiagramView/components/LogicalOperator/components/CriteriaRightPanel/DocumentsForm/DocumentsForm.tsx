@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import _ from 'lodash'
 
 import { Alert } from '@material-ui/lab'
@@ -11,7 +11,8 @@ import {
   Switch,
   Typography,
   TextField,
-  Checkbox
+  Checkbox,
+  CircularProgress
 } from '@material-ui/core'
 import Autocomplete from '@material-ui/lab/Autocomplete'
 
@@ -23,7 +24,9 @@ import { InputSearchDocument } from 'components/Inputs'
 
 import useStyles from './styles'
 
-import { DocType, DocumentDataType } from 'types'
+import { DocType, DocumentDataType, errorDetails, searchInputError } from 'types'
+import services from 'services'
+import { useDebounce } from 'utils/debounce'
 
 type TestGeneratedFormProps = {
   criteria: any
@@ -55,6 +58,12 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
+  const [searchCheckingLoading, setSearchCheckingLoading] = useState(false)
+
+  const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
+
+  const debouncedSearchItem = useDebounce(500, defaultValues.search)
+
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = () => {
@@ -69,6 +78,24 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
     _defaultValues[key] = value
     setDefaultValues(_defaultValues)
   }
+
+  useEffect(() => {
+    const checkDocumentSearch = async () => {
+      try {
+        setSearchCheckingLoading(true)
+        setSearchInputError({ ...searchInputError, isError: true })
+        const checkDocumentSearch = await services.cohorts.checkDocumentSearchInput(defaultValues.search)
+
+        setSearchInputError(checkDocumentSearch)
+        setSearchCheckingLoading(false)
+      } catch (error) {
+        console.error('Erreur lors de la vérification du champ de recherche', error)
+        setSearchCheckingLoading(false)
+      }
+    }
+
+    checkDocumentSearch()
+  }, [debouncedSearchItem])
 
   return (
     <Grid className={classes.root}>
@@ -139,6 +166,36 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               noSearchIcon
               squareInput
             />
+            {searchCheckingLoading && (
+              <Grid container item alignItems="center" direction="column" justifyContent="center">
+                <CircularProgress />
+                <Typography>Vérification du champ de recherche en cours...</Typography>
+              </Grid>
+            )}
+            {!searchCheckingLoading && searchInputError && searchInputError.isError && (
+              <Grid className={classes.errorContainer}>
+                <Typography style={{ fontWeight: 'bold' }}>
+                  Des erreurs ont été détectées dans votre recherche :
+                </Typography>
+                {!searchInputError.errorsDetails && (
+                  <Typography>Vérifiez que le champ de recherche contient au moins une lettre.</Typography>
+                )}
+                {searchInputError.errorsDetails &&
+                  searchInputError.errorsDetails.map((detail: errorDetails, count: number) => (
+                    <Typography key={count}>
+                      {`- ${
+                        detail.errorPositions && detail.errorPositions.length > 0
+                          ? detail.errorPositions.length === 1
+                            ? `Au caractère ${detail.errorPositions[0]} : `
+                            : `Aux caractères ${detail.errorPositions.join(', ')} : `
+                          : ''
+                      }
+              ${detail.errorName ? `${detail.errorName}.` : ''}
+              ${detail.errorSolution ? `${detail.errorSolution}.` : ''}`}
+                    </Typography>
+                  ))}
+              </Grid>
+            )}
           </Grid>
 
           <Autocomplete
@@ -204,7 +261,14 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="documents-form" color="primary" variant="contained">
+          <Button
+            onClick={_onSubmit}
+            disabled={searchInputError?.isError}
+            type="submit"
+            form="documents-form"
+            color="primary"
+            variant="contained"
+          >
             Confirmer
           </Button>
         </Grid>
