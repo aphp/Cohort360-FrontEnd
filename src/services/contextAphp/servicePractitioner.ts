@@ -40,9 +40,8 @@ export interface IServicePractitioner {
    *  - firstName: Prénom du practitioner
    *  - lastName: Nom du practitioner
    */
-  fetchPractitioner: (username: string) => Promise<{
+  fetchPractitioner: () => Promise<{
     id: number
-    userName: number
     displayName: string
     firstName: string
     lastName: string
@@ -62,7 +61,7 @@ const servicePractitioner: IServicePractitioner = {
         data: formData
       })
     } catch (error) {
-      console.error("erreur lors de l'éxécution de la fonction authenticate", error)
+      console.error("erreur lors de l'exécution de la fonction authenticate", error)
       return error
     }
   },
@@ -86,11 +85,9 @@ const servicePractitioner: IServicePractitioner = {
     }
   },
 
-  fetchPractitioner: async (username) => {
+  fetchPractitioner: async () => {
     try {
-      const practitioner = await fetchPractitioner({
-        identifier: username
-      })
+      const practitioner = await fetchPractitioner()
 
       if (
         !practitioner ||

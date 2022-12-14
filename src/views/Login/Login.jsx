@@ -215,7 +215,7 @@ const Login = () => {
       localStorage.setItem(ACCES_TOKEN, data.jwt.access)
       localStorage.setItem(REFRESH_TOKEN, data.jwt.refresh)
 
-      const practitioner = await services.practitioner.fetchPractitioner(username)
+      const practitioner = await services.practitioner.fetchPractitioner()
 
       if (!practitioner || practitioner.error || !practitioner.response || practitioner.response.status !== 200) {
         setLoading(false)
