@@ -149,10 +149,6 @@ export const ODD_EXPORT =
   process.env.NODE_ENV !== 'development'
     ? '{REACT_APP_ODD_EXPORT}' == `${BOOLEANTRUE}`
     : process.env.REACT_APP_ODD_EXPORT == `${BOOLEANTRUE}`
-export const ODD_REGEX =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_ODD_REGEX}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_REGEX == `${BOOLEANTRUE}`
 
 export const SESSION_TIMEOUT = process.env.REACT_APP_SESSION_TIMEOUT
   ? process.env.REACT_APP_SESSION_TIMEOUT
