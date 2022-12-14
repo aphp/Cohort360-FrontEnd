@@ -116,7 +116,7 @@ const servicePractitioner: IServicePractitioner = {
         response
       }
     } catch (error: any) {
-      console.error("erreur lors de l'éxécution de la fonction fetchPractitioner", error)
+      console.error("Erreur lors de l'éxécution de la fonction fetchPractitioner", error)
       return error
     }
   }
