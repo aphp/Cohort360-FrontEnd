@@ -642,6 +642,10 @@ const servicesCohorts: IServiceCohorts = {
       }
 
       // On appelle le back-end pour avoir la liste des droits
+      console.log(
+        'await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${caresiteIds}`)',
+        await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${caresiteIds}`)
+      )
       const rightsResponse = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${caresiteIds}`)
       const rightsData: any = rightsResponse.data ?? []
 

@@ -157,34 +157,34 @@ type DeleteRequestReturn = {
   requestsList: RequestType[]
 }
 
-const deleteRequest = createAsyncThunk<DeleteRequestReturn, DeleteRequestParams, { state: RootState }>(
-  'request/deleteRequest',
-  async ({ deletedRequest }, { getState, dispatch }) => {
-    try {
-      const state = getState().request
-      // eslint-disable-next-line
-      let requestsList: RequestType[] = state.requestsList ? [...state.requestsList] : []
-      const foundItem = requestsList.find(({ uuid }) => uuid === deletedRequest.uuid)
-      const index = foundItem ? requestsList.indexOf(foundItem) : -1
-      if (index !== -1) {
-        // delete item at index
-        await services.projects.deleteRequest(deletedRequest)
+// const deleteRequest = createAsyncThunk<DeleteRequestReturn, DeleteRequestParams, { state: RootState }>(
+//   'request/deleteRequest',
+//   async ({ deletedRequest }, { getState, dispatch }) => {
+//     try {
+//       const state = getState().request
+//       // eslint-disable-next-line
+//       let requestsList: RequestType[] = state.requestsList ? [...state.requestsList] : []
+//       const foundItem = requestsList.find(({ uuid }) => uuid === deletedRequest.uuid)
+//       const index = foundItem ? requestsList.indexOf(foundItem) : -1
+//       if (index !== -1) {
+//         // delete item at index
+//         await services.projects.deleteRequest(deletedRequest)
 
-        requestsList.splice(index, 1)
-      }
+//         requestsList.splice(index, 1)
+//       }
 
-      dispatch<any>(fetchRequests())
+//       dispatch<any>(fetchRequests())
 
-      return {
-        selectedRequest: null,
-        requestsList: requestsList
-      }
-    } catch (error) {
-      console.error(error)
-      throw error
-    }
-  }
-)
+//       return {
+//         selectedRequest: null,
+//         requestsList: requestsList
+//       }
+//     } catch (error) {
+//       console.error(error)
+//       throw error
+//     }
+//   }
+// )
 
 /**
  * moveRequests
@@ -256,6 +256,34 @@ const deleteRequests = createAsyncThunk<DeleteRequestsReturn, DeleteRequestsPara
         const foundItem = results.find((result) => result.uuid === requestItem.uuid)
         return foundItem === undefined
       })
+
+      return {
+        selectedRequest: null,
+        requestsList: requestsList
+      }
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  }
+)
+const deleteRequest = createAsyncThunk<DeleteRequestReturn, DeleteRequestParams, { state: RootState }>(
+  'request/deleteRequest',
+  async ({ deletedRequest }, { getState, dispatch }) => {
+    try {
+      const state = getState().request
+      // eslint-disable-next-line
+      let requestsList: RequestType[] = state.requestsList ? [...state.requestsList] : []
+      const foundItem = requestsList.find(({ uuid }) => uuid === deletedRequest.uuid)
+      const index = foundItem ? requestsList.indexOf(foundItem) : -1
+      if (index !== -1) {
+        // delete item at index
+        await services.projects.deleteRequest(deletedRequest)
+
+        requestsList.splice(index, 1)
+      }
+
+      dispatch<any>(fetchRequests())
 
       return {
         selectedRequest: null,

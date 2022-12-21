@@ -136,8 +136,10 @@ const servicesPerimeters: IServicePerimeters = {
         type: 'VISIT'
       })
     ])
+    console.log('[perimetersResp, patientsResp, encountesrResp]', [perimetersResp, patientsResp, encountersResp])
 
     const cohort = await servicesPerimeters.fetchPerimetersRights(getApiResponseResources(perimetersResp) ?? [])
+    console.log('cohort', cohort)
 
     const totalPatients = patientsResp?.data?.resourceType === 'Bundle' ? patientsResp.data.total : 0
 

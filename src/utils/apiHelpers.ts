@@ -5,7 +5,10 @@ import { AxiosResponse } from 'axios'
 export function getApiResponseResources<T extends IResourceList>(
   response: AxiosResponse<FHIR_API_Response<T>>
 ): T[] | undefined {
+  console.log('response', response)
   if (!response || !(response && response.data) || response.data.resourceType === 'OperationOutcome') return undefined
 
-  return response.data.entry ? response.data.entry.map((r) => r.resource).filter((r): r is T => undefined !== r) : []
+  const a = response.data.entry ? response.data.entry.map((r) => r.resource).filter((r): r is T => undefined !== r) : []
+  console.log('a', a)
+  return a
 }
