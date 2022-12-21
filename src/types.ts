@@ -198,7 +198,8 @@ export enum SearchByTypes {
   text = '_text',
   family = 'family',
   given = 'given',
-  identifier = 'identifier'
+  identifier = 'identifier',
+  title = 'title'
 }
 
 export enum VitalStatus {
@@ -422,6 +423,7 @@ export type DocumentDataType = {
   title: string
   type: 'Composition'
   search: string
+  searchBy: SearchByTypes.text | SearchByTypes.title
   docType: DocType[] | null
   encounterEndDate: Date | ''
   encounterStartDate: Date | ''
@@ -703,7 +705,7 @@ export type DTTB_ResultsType = {
 export type DTTB_SearchBarType = {
   type: 'simple' | 'patient' | 'document'
   value: string | undefined
-  onSearch: (newSearch: string, newSearchBy?: SearchByTypes) => void
+  onSearch: (newSearch: string, newSearchBy: SearchByTypes) => void
   searchBy?: any
   error?: searchInputError
 }

@@ -1,7 +1,14 @@
 import moment from 'moment'
 
 import services from 'services'
-import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType, DocType } from 'types'
+import {
+  ScopeTreeRow,
+  SelectedCriteriaType,
+  CriteriaGroupType,
+  TemporalConstraintsType,
+  DocType,
+  SearchByTypes
+} from 'types'
 
 import { docTypes } from 'assets/docTypes.json'
 
@@ -46,6 +53,7 @@ const CONDITION_TYPE = 'type' // ok
 
 const RESSOURCE_TYPE_COMPOSITION: 'Composition' = 'Composition'
 const COMPOSITION_TEXT = '_text' // ok
+const COMPOSITION_TITLE = 'title'
 const COMPOSITION_TYPE = 'type' // ok
 
 const RESSOURCE_TYPE_MEDICATION_REQUEST: 'MedicationRequest' = 'MedicationRequest' // = Prescription
@@ -328,7 +336,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
     case RESSOURCE_TYPE_COMPOSITION: {
       filterFhir = [
         `status=final&type:not=doc-impor&empty=false`,
-        `${criterion.search ? `${COMPOSITION_TEXT}=${encodeURIComponent(criterion.search)}` : ''}`,
+        `${
+          criterion.search
+            ? `${criterion.searchBy === SearchByTypes.text ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
+                criterion.search
+              )}`
+            : ''
+        }`,
         `${
           criterion.docType && criterion.docType.length > 0
             ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: DocType) => docType.code).reduce(searchReducer)}`
@@ -1033,8 +1047,13 @@ export async function unbuildRequest(_json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
+              case COMPOSITION_TITLE:
+                currentCriterion.search = value ? decodeURIComponent(value) : ''
+                currentCriterion.searchBy = SearchByTypes.title
+                break
               case COMPOSITION_TEXT: {
                 currentCriterion.search = value ? decodeURIComponent(value) : ''
+                currentCriterion.searchBy = SearchByTypes.text
                 break
               }
               case COMPOSITION_TYPE: {

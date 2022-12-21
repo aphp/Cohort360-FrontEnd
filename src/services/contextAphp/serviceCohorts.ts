@@ -113,6 +113,7 @@ export interface IServiceCohorts {
    *
    * Argument:
    *   - deidentifiedBoolean: = true si la cohorte est pseudo. (permet un traitement particulier des éléments)
+   *   - searchBy: Détermine si l'on recherche par contenu ou titre du document
    *   - sortBy: Permet le tri
    *   - sortDirection: Permet le tri dans l'ordre croissant ou décroissant
    *   - page: Permet la pagination (definit un offset + limit)
@@ -126,6 +127,7 @@ export interface IServiceCohorts {
    */
   fetchDocuments: (
     deidentifiedBoolean: boolean,
+    searchBy: SearchByTypes,
     sortBy: string,
     sortDirection: string,
     page: number,
@@ -369,6 +371,7 @@ const servicesCohorts: IServiceCohorts = {
 
   fetchDocuments: async (
     deidentifiedBoolean,
+    searchBy,
     sortBy,
     sortDirection,
     page,
@@ -385,6 +388,7 @@ const servicesCohorts: IServiceCohorts = {
       fetchComposition({
         size: 20,
         offset: page ? (page - 1) * 20 : 0,
+        searchBy: searchBy,
         _sort: sortBy,
         sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
         status: 'final',

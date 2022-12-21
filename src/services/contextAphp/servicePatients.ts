@@ -221,6 +221,7 @@ export interface IServicePatients {
    **   - deidentified: permet certaine anonymisation de la donnée
    **   - sortBy: permet le tri
    **   - sortDirection: permet le tri dans l'ordre croissant ou décroissant
+   **   - searchBy: Détermine si l'on recherche par contenu ou titre du document
    **   - page: permet la pagination des éléments
    **   - patientId: identifiant technique d'un patient
    **   - searchInput: permet la recherche textuelle
@@ -233,11 +234,12 @@ export interface IServicePatients {
    **
    ** Retour:
    **   - docsList: Liste de 20 éléments de Composition lié à un patient
-   **   - docsTotal: Nombre d'élément totale par rapport au filtre indiqué
+   **   - docsTotal: Nombre d'élément total par rapport au filtre indiqué
    */
   fetchDocuments: (
     sortBy: string,
     sortDirection: string,
+    searchBy: SearchByTypes,
     page: number,
     patientId: string,
     searchInput: string,
@@ -571,6 +573,7 @@ const servicesPatients: IServicePatients = {
   fetchDocuments: async (
     sortBy: string,
     sortDirection: string,
+    searchBy: SearchByTypes,
     page: number,
     patientId: string,
     searchInput: string,
@@ -586,6 +589,7 @@ const servicesPatients: IServicePatients = {
     const docsList = await fetchComposition({
       patient: patientId,
       _list: groupId ? [groupId] : [],
+      searchBy: searchBy,
       _sort: sortBy,
       sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
       size: documentLines,

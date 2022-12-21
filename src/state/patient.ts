@@ -21,7 +21,8 @@ import {
   IPatientDocuments,
   IPatientPmsi,
   IPatientMedication,
-  IPatientObservation
+  IPatientObservation,
+  SearchByTypes
 } from 'types'
 
 import { logout } from './me'
@@ -324,6 +325,7 @@ type FetchDocumentsParams = {
   groupId?: string
   options?: {
     page?: number
+    searchBy?: SearchByTypes
     filters?: {
       searchInput: string
       nda: string
@@ -356,6 +358,7 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
       const sortDirection = options?.sort?.direction ?? ''
       const page = options?.page ?? 1
       const searchInput = options?.filters?.searchInput ?? ''
+      const searchBy = options?.searchBy ?? SearchByTypes.text
       const selectedDocTypes = options?.filters?.selectedDocTypes ?? []
       const nda = options?.filters?.nda ?? ''
       const startDate = options?.filters?.startDate ?? null
@@ -383,6 +386,7 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
       const documentsResponse = await services.patients.fetchDocuments(
         sortBy,
         sortDirection,
+        searchBy,
         page,
         patientId,
         searchInput,

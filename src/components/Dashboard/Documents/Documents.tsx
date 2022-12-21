@@ -10,7 +10,14 @@ import MasterChips from 'components/MasterChips/MasterChips'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import { CohortComposition, DocumentFilters, Order, DTTB_ResultsType as ResultsType, searchInputError } from 'types'
+import {
+  CohortComposition,
+  DocumentFilters,
+  Order,
+  DTTB_ResultsType as ResultsType,
+  searchInputError,
+  SearchByTypes
+} from 'types'
 
 import services from 'services'
 
@@ -33,6 +40,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const [searchInput, setSearchInput] = useState('')
   const [searchMode, setSearchMode] = useState(false)
+  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
 
   const [openFilter, setOpenFilter] = useState(false)
 
@@ -79,6 +87,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
     const result = await services.cohorts.fetchDocuments(
       !!deidentifiedBoolean,
+      searchBy,
       order.orderBy,
       order.orderDirection,
       newPage,
@@ -119,7 +128,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   useEffect(() => {
     handleChangePage(1)
-  }, [!!deidentifiedBoolean, filters, order, searchInput]) // eslint-disable-line
+  }, [!!deidentifiedBoolean, filters, order, searchInput, searchBy]) // eslint-disable-line
 
   const handleOpenDialog = () => {
     setOpenFilter(true)
@@ -194,6 +203,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     }
   }
 
+  const onSearch = (inputSearch: string, _searchBy: SearchByTypes) => {
+    setSearchInput(inputSearch)
+    setSearchBy(_searchBy)
+  }
+
   return (
     <>
       <Grid container direction="column" alignItems="center">
@@ -204,7 +218,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
             searchBar={{
               type: 'document',
               value: searchInput ? onFilterValue() : '',
-              onSearch: (newSearchInput: string) => setSearchInput(newSearchInput),
+              searchBy: searchBy,
+              onSearch: (newSearchInput: string, newSearchBy: SearchByTypes) => onSearch(newSearchInput, newSearchBy),
               error: searchInputError
             }}
             buttons={[

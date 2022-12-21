@@ -113,6 +113,7 @@ export interface IServiceCohorts {
    *
    * Argument:
    *   - deidentifiedBoolean: = true si la cohorte est pseudo. (permet un traitement particulier des éléments)
+   *   - searchBy: Détermine si l'on recherche par contenu ou titre du document
    *   - sortBy: Permet le tri
    *   - sortDirection: Permet le tri dans l'ordre croissant ou décroissant
    *   - page: Permet la pagination (definit un offset + limit)
@@ -126,6 +127,7 @@ export interface IServiceCohorts {
    */
   fetchDocuments: (
     deidentifiedBoolean: boolean,
+    searchBy: SearchByTypes,
     sortBy: string,
     sortDirection: string,
     page: number,
@@ -369,6 +371,7 @@ const servicesCohorts: IServiceCohorts = {
 
   fetchDocuments: async (
     deidentifiedBoolean,
+    searchBy,
     sortBy,
     sortDirection,
     page,
@@ -385,6 +388,7 @@ const servicesCohorts: IServiceCohorts = {
       fetchComposition({
         size: 20,
         offset: page ? (page - 1) * 20 : 0,
+        searchBy: searchBy,
         _sort: sortBy,
         sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
         status: 'final',
@@ -508,11 +512,21 @@ const servicesCohorts: IServiceCohorts = {
   fetchCohortsRights: async (cohorts) => {
     try {
       // On recupère tous les ids de notre liste de cohort
-      const ids = cohorts.map((cohort) => {
-        return cohort.fhir_group_id
-      })
+      const ids = cohorts
+        .map((cohort) => {
+          return cohort.fhir_group_id
+        })
+        .filter((id) => id !== '')
 
-      const cohortsResponse: any = await fetchGroup({ _id: ids })
+      const cohortsResponse: any = await new Promise((resolve) => {
+        resolve(fetchGroup({ _id: ids }))
+      })
+        .then((values) => {
+          return values
+        })
+        .catch((error) => {
+          return { error: true, ...error }
+        })
       let caresiteIds = ''
       let organizationLinkList: any[] = []
 

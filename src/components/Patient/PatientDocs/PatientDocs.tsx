@@ -10,7 +10,7 @@ import DataTableComposition from 'components/DataTable/DataTableComposition'
 import DataTableTopBar from 'components/DataTable/DataTableTopBar'
 import MasterChips from 'components/MasterChips/MasterChips'
 
-import { Order, DocumentFilters } from 'types'
+import { Order, DocumentFilters, SearchByTypes } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'
@@ -56,6 +56,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   })
 
   const [searchMode, setSearchMode] = useState(false)
+  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
   const [open, setOpen] = useState<'filter' | null>(null)
 
   const fetchDocumentsList = async (page: number) => {
@@ -65,6 +66,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         groupId,
         options: {
           page,
+          searchBy: searchBy,
           sort: {
             by: order.orderBy,
             direction: order.orderDirection
@@ -96,7 +98,8 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     filters.startDate,
     filters.endDate,
     order.orderBy,
-    order.orderDirection
+    order.orderDirection,
+    searchBy
   ]) // eslint-disable-line
 
   const onChangeOptions = (key: string, value: any) => {
@@ -137,6 +140,11 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     }
   }
 
+  const onSearch = (inputSearch: string, _searchBy: SearchByTypes) => {
+    setSearchInput(inputSearch)
+    setSearchBy(_searchBy)
+  }
+
   return (
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
@@ -144,8 +152,9 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         searchBar={{
           type: 'document',
           value: searchInput ? searchInput.replace(/^\/\(\.\)\*|\(\.\)\*\/$/gi, '') : '',
-          onSearch: (newSearchInput: string) => setSearchInput(newSearchInput),
-          error: searchInputError
+          error: searchInputError,
+          searchBy: searchBy,
+          onSearch: (newSearchInput: string, newSearchBy: SearchByTypes) => onSearch(newSearchInput, newSearchBy)
         }}
         buttons={[
           {
