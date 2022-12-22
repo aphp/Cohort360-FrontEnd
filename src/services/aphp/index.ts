@@ -16,7 +16,7 @@ export interface IServiceAphp {
   projects: IServiceProjects
 }
 
-const serviceAphp: IServiceAphp = {
+const services: IServiceAphp = {
   cohorts: servicesCohorts,
   cohortCreation: servicesCohortCreation,
   contact: servicesContact,
@@ -26,4 +26,4 @@ const serviceAphp: IServiceAphp = {
   projects: serviceProjects
 }
 
-export default serviceAphp
+export default services

@@ -16,7 +16,7 @@ import { MeState } from 'state/me'
 
 import { ScopeTreeRow } from 'types'
 import { getSelectedScopes, filterScopeTree } from 'utils/scopeTree'
-import servicesPerimeters from 'services/contextAphp/servicePerimeters'
+import servicesPerimeters from 'services/aphp/servicePerimeters'
 
 import useStyles from './styles'
 
