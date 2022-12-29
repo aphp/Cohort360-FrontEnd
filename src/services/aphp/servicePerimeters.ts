@@ -1,14 +1,14 @@
 import { CohortData, ScopeTreeRow } from 'types'
-import { IGroup, IOrganization, IExtension } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IExtension, IGroup, IOrganization } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
-  getGenderRepartitionMapAphp,
   getAgeRepartitionMapAphp,
   getEncounterRepartitionMapAphp,
+  getGenderRepartitionMapAphp,
   getVisitRepartitionMapAphp
 } from 'utils/graphUtils'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
-import { fetchGroup, fetchPatient, fetchEncounter, fetchOrganization } from './callApi'
+import { fetchEncounter, fetchGroup, fetchOrganization, fetchPatient } from './callApi'
 
 import apiBackend from '../apiBackend'
 
@@ -424,7 +424,7 @@ const servicesPerimeters: IServicePerimeters = {
 
 export default servicesPerimeters
 
-const getScopeName = (perimeter: any) => {
+export const getScopeName = (perimeter: any) => {
   const perimeterID = perimeter ? perimeter.alias?.[0] : false
   if (!perimeterID) {
     return perimeter ? perimeter.name : ''

@@ -15,42 +15,87 @@ import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 import EnhancedTable from 'components/ScopeTree/ScopeTreeTable'
 import { ScopeTreeRow } from 'types'
 
-import { useAppSelector, useAppDispatch } from 'state'
-import { ScopeState, fetchScopesList, expandScopeElement } from 'state/scope'
+import { useAppDispatch, useAppSelector } from 'state'
+import { expandScopeElement, fetchScopesList, ScopeState } from 'state/scope'
 
 import displayDigit from 'utils/displayDigit'
 import { getSelectedScopes } from 'utils/scopeTree'
 
 import useStyles from './styles'
+import { Breadcrumbs } from '@material-ui/core'
+import { useDebounce } from 'utils/debounce'
+import apiBackend from 'services/apiBackend'
 
 type ScopeTreeProps = {
   defaultSelectedItems: ScopeTreeRow[]
   onChangeSelectedItem: (selectedItems: ScopeTreeRow[]) => void
+  searchInput?: string
 }
 
-const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSelectedItem }) => {
+const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSelectedItem, searchInput }) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
   const [selectedItems, setSelectedItem] = useState(defaultSelectedItems)
+  const [loading, setLoading] = useState(true)
 
   const { scopeState } = useAppSelector<{
     scopeState: ScopeState
   }>((state) => ({
     scopeState: state.scope || {}
   }))
-  const { loading = false, openPopulation = [], scopesList = [] } = scopeState
+
+  const { openPopulation = [], scopesList = [] } = scopeState
+  const [rootRows, setRootRows] = useState<ScopeTreeRow[]>(scopesList)
+  const debouncedSearchTerm = useDebounce(700, searchInput)
 
   const fetchScopeTree = async () => {
     dispatch<any>(fetchScopesList())
   }
+  const _init = async () => {
+    setLoading(true)
+    await fetchScopeTree()
+    setRootRows(scopesList)
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    const _searchInPerimeters = async () => {
+      setLoading(true)
+      const backCohortResponse = await apiBackend.get(`accesses/perimeters/read-patient/?search=${searchInput}`)
+      const newPerimetersList = parsePerimeters(backCohortResponse)
+      setRootRows(newPerimetersList)
+      setLoading(false)
+    }
+
+    if (debouncedSearchTerm && debouncedSearchTerm?.length > 2) {
+      _searchInPerimeters()
+    } else if (!debouncedSearchTerm) {
+      _init()
+    }
+  }, [debouncedSearchTerm])
 
   useEffect(() => {
     fetchScopeTree()
   }, [])
 
   useEffect(() => setSelectedItem(defaultSelectedItems), [defaultSelectedItems])
+  useEffect(() => {
+    setRootRows(scopesList)
+  }, [scopesList])
 
+  const parsePerimeters = (backCohortResponse: any) => {
+    return backCohortResponse && backCohortResponse.data
+      ? backCohortResponse.data.map((item: any) => {
+          return {
+            id: item.perimeter.id,
+            name: item.perimeter.full_path,
+            quantity: item.perimeter.cohort_size,
+            access: item.right_read_patient_nominative ? 'Nominatif' : 'Pseudonymisé'
+          }
+        })
+      : []
+  }
   /**
    * This function is called when a user click on chevron
    *
@@ -146,12 +191,12 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
 
   return (
     <div className={classes.container}>
-      {loading && scopesList.length === 0 ? (
+      {loading ? (
         <Grid container justifyContent="center">
           <CircularProgress size={50} />
         </Grid>
       ) : (
-        <EnhancedTable noCheckbox noPagination rows={scopesList} headCells={headCells}>
+        <EnhancedTable noCheckbox noPagination rows={rootRows} headCells={headCells}>
           {(row: any, index: number) => {
             if (!row) return <></>
             const labelId = `enhanced-table-checkbox-${index}`
@@ -197,8 +242,21 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                       />
                     </TableCell>
 
-                    <TableCell style={{ cursor: 'pointer' }} onClick={() => _clickToSelect(_row)}>
-                      <Typography>{_row.name}</Typography>
+                    <TableCell>
+                      {searchInput && _row.name ? (
+                        <Breadcrumbs maxItems={2}>
+                          {_row.name
+                            .split('/')
+                            .slice(1)
+                            .map((name: any, index: number) => (
+                              <Typography key={index} style={{ color: '#153D8A' }}>
+                                {name}
+                              </Typography>
+                            ))}
+                        </Breadcrumbs>
+                      ) : (
+                        <Typography>{_row.name}</Typography>
+                      )}
                     </TableCell>
 
                     <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => _clickToSelect(_row)}>
@@ -229,7 +287,9 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                 {_displayLine(row, 0, row.access)}
                 {openPopulation.find((id) => row.id === id) &&
                   row.subItems &&
-                  row.subItems.map((subItem: any) => _displayChildren(subItem, 1, row.access))}
+                  row.subItems.map((subItem: any) => {
+                    return _displayChildren(subItem, 1, row.access)
+                  })}
               </React.Fragment>
             )
           }}

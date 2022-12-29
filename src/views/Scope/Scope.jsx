@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import clsx from 'clsx'
 
@@ -8,8 +8,9 @@ import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 
 import ScopeTree from 'components/ScopeTree/ScopeTree'
+import SearchBar from 'components/SearchBar/SearchBar'
 
-import { useAppSelector, useAppDispatch } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import { closeAllOpenedPopulation } from 'state/scope'
 import { filterScopeTree } from 'utils/scopeTree'
 
@@ -21,6 +22,7 @@ const Scope = () => {
   const dispatch = useAppDispatch()
 
   const [selectedItems, onChangeSelectedItem] = useState([])
+  const [searchInput, setSearchInput] = useState('')
   const open = useAppSelector((state) => state.drawer)
 
   useEffect(() => {
@@ -54,8 +56,15 @@ const Scope = () => {
           <Typography variant="h1" color="primary" className={classes.title}>
             Explorer un perimètre
           </Typography>
+          <div className={classes.searchBar}>
+            <SearchBar searchInput={searchInput} onChangeInput={setSearchInput} />
+          </div>
           <Paper className={classes.paper}>
-            <ScopeTree defaultSelectedItems={selectedItems} onChangeSelectedItem={onChangeSelectedItem} />
+            <ScopeTree
+              searchInput={searchInput}
+              defaultSelectedItems={selectedItems}
+              onChangeSelectedItem={onChangeSelectedItem}
+            />
           </Paper>
         </Grid>
         <Grid

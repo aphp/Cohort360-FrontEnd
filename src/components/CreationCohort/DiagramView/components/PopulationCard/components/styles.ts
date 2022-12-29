@@ -32,6 +32,9 @@ const useStyles = makeStyles(() => ({
     '& > button': {
       margin: '12px 8px'
     }
+  },
+  searchBar: {
+    marginBottom: '0px'
   }
 }))
 
