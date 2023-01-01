@@ -1,7 +1,3 @@
-export const ID_TOKEN_STORAGE_KEY = 'ARKHN_ID_TOKEN'
-export const TOKEN_DATA_STORAGE_KEY = 'ARKHN_TOKEN_DATA'
-export const STATE_STORAGE_KEY = 'ARKHN_AUTH_STATE'
-
 export let BOOLEANTRUE = 'true'
 
 export const ACCES_TOKEN = 'access'
