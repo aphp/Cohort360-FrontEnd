@@ -25,7 +25,7 @@ import { InputSearchDocument } from 'components/Inputs'
 import useStyles from './styles'
 
 import { DocType, DocumentDataType, errorDetails, searchInputError } from 'types'
-import services from 'services'
+import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
 
 type TestGeneratedFormProps = {

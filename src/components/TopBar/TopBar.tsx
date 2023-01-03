@@ -40,7 +40,7 @@ import { favoriteExploredCohort } from 'state/exploredCohort'
 import { deleteCohort, fetchCohorts as fetchCohortsList, setSelectedCohort } from 'state/cohort'
 import { MeState } from 'state/me'
 
-import services from 'services'
+import services from 'services/aphp'
 
 import displayDigit from 'utils/displayDigit'
 

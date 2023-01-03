@@ -4,7 +4,7 @@ import { RequestType } from 'types'
 
 import { logout, login } from './me'
 
-import services from 'services'
+import services from 'services/aphp'
 
 export type RequestState = {
   loading: boolean

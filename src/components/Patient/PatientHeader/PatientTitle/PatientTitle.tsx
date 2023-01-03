@@ -1,12 +1,10 @@
 import React, { useState } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-import { CONTEXT } from '../../../../constants'
 import { useAppSelector } from 'state'
 
 import { IconButton, Grid, Menu, MenuItem, Typography } from '@material-ui/core'
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack'
-import { ReactComponent as MoreIcon } from 'assets/icones/ellipsis-v.svg'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
@@ -29,7 +27,6 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
   }))
   const [anchorEl, setAnchorEl] = useState(null)
 
-  const handleMenuOpen = (event: any) => setAnchorEl(event.currentTarget)
   const handleMenuClose = () => setAnchorEl(null)
 
   const goBacktoCohort = () => {
@@ -53,11 +50,6 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
       <Typography variant="h2" color="primary" className={classes.patientName}>
         {capitalizeFirstLetter(firstName) ?? ''} {lastName ?? ''}
       </Typography>
-      {CONTEXT === 'arkhn' && (
-        <IconButton onClick={handleMenuOpen}>
-          <MoreIcon className={classes.iconButtons} fill="#5BC5F2" />
-        </IconButton>
-      )}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={handleMenuClose}>Inclure dans une cohorte</MenuItem>
         <MenuItem onClick={handleMenuClose}>Exclure d&apos;une cohorte</MenuItem>

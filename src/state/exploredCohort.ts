@@ -6,7 +6,7 @@ import { RootState } from 'state'
 
 import { ODD_EXPORT } from '../constants'
 
-import services from 'services'
+import services from 'services/aphp'
 
 export type ExploredCohortState = {
   importedPatients: any[]
