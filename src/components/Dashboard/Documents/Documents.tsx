@@ -19,7 +19,7 @@ import {
   SearchByTypes
 } from 'types'
 
-import services from 'services'
+import services from 'services/aphp'
 
 import { buildDocumentFiltersChips } from 'utils/chips'
 

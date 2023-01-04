@@ -3,7 +3,7 @@ import { RootState } from 'state'
 import { Cohort, CohortFilters, Sort } from 'types'
 
 import { logout, login } from './me'
-import services from 'services'
+import services from 'services/aphp'
 
 export type CohortState = {
   loading: boolean

@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-import services from 'services'
+import services from 'services/aphp'
 import {
   ScopeTreeRow,
   SelectedCriteriaType,
