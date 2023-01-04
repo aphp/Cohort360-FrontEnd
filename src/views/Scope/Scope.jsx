@@ -8,7 +8,7 @@ import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 
 import ScopeTree from 'components/ScopeTree/ScopeTree'
-import SearchBar from 'components/SearchBar/SearchBar'
+import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { closeAllOpenedPopulation } from 'state/scope'
@@ -56,9 +56,7 @@ const Scope = () => {
           <Typography variant="h1" color="primary" className={classes.title}>
             Explorer un perimètre
           </Typography>
-          <div className={classes.searchBar}>
-            <SearchBar searchInput={searchInput} onChangeInput={setSearchInput} />
-          </div>
+          <ScopeSearchBar searchInput={searchInput} onChangeInput={setSearchInput} />
           <Paper className={classes.paper}>
             <ScopeTree
               searchInput={searchInput}
