@@ -2,13 +2,11 @@ import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles((theme) => ({
   searchBar: {
-    width: '100%',
+    minWidth: 250,
     backgroundColor: '#FFF',
-    border: '1px solid #c4c4c4',
-    borderRadius: '25px',
-    padding: '4px',
+    border: '1px solid #D0D7D8',
     boxShadow: '0px 1px 16px #0000000A',
-    marginLeft: 4
+    borderRadius: '25px'
   },
   input: {
     marginLeft: theme.spacing(1),

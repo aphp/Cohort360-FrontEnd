@@ -108,6 +108,6 @@ export default makeStyles((theme) => ({
   },
   searchBar: {
     marginBottom: '12px',
-    width: '40%'
+    minWidth: '250px'
   }
 }))

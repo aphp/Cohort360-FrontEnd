@@ -10,7 +10,7 @@ import { ScopeTreeRow } from 'types'
 import { useAppSelector } from 'state'
 
 import useStyles from './styles'
-import SearchBar from 'components/SearchBar/SearchBar'
+import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
 
 type PopulationRightPanelProps = {
   open: boolean
@@ -45,7 +45,7 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
 
         <div className={classes.drawerContentContainer}>
           <div className={classes.searchBar}>
-            <SearchBar searchInput={searchInput} onChangeInput={setSearchInput} />
+            <ScopeSearchBar searchInput={searchInput} onChangeInput={setSearchInput} />
           </div>
           <ScopeTree
             searchInput={searchInput}
