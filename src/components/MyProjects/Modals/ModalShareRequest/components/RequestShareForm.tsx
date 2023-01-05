@@ -5,7 +5,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete'
 
 import { RequestType, Provider, Order } from 'types'
 
-import { getProviders } from 'services/contextAphp/serviceProviders'
+import { getProviders } from 'services/aphp/serviceProviders'
 
 import ProvidersTable from './providersTable'
 import useStyles from '../styles'

@@ -29,7 +29,7 @@ import { useAppDispatch } from 'state'
 import { login as loginAction } from 'state/me'
 import { ACCES_TOKEN, REFRESH_TOKEN } from '../../constants'
 
-import services from 'services'
+import services from 'services/aphp'
 
 import useStyles from './styles'
 
@@ -215,7 +215,7 @@ const Login = () => {
       localStorage.setItem(ACCES_TOKEN, data.jwt.access)
       localStorage.setItem(REFRESH_TOKEN, data.jwt.refresh)
 
-      const practitioner = await services.practitioner.fetchPractitioner(username)
+      const practitioner = await services.practitioner.fetchPractitioner()
 
       if (!practitioner || practitioner.error || !practitioner.response || practitioner.response.status !== 200) {
         setLoading(false)

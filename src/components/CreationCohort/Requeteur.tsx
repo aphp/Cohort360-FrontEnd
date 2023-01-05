@@ -18,9 +18,8 @@ import constructCriteriaList from './DataList_Criteria'
 
 import { getDataFromFetch } from 'utils/cohortCreation'
 
-import services from 'services'
-
 import useStyles from './styles'
+import services from 'services/aphp'
 
 const Requeteur = () => {
   const {

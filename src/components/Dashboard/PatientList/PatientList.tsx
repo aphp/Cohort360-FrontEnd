@@ -13,7 +13,7 @@ import MasterChips from 'components/MasterChips/MasterChips'
 
 import PatientCharts from './components/PatientCharts'
 
-import services from 'services'
+import services from 'services/aphp'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   AgeRepartitionType,

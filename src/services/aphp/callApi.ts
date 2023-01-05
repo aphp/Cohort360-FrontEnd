@@ -2,20 +2,20 @@ import apiFhir from '../apiFhir'
 
 import { CohortComposition, FHIR_API_Response } from 'types'
 import {
-  IOrganization,
-  IGroup,
-  IPatient,
-  IEncounter,
+  IBinary,
+  IClaim,
   IComposition,
+  ICondition,
+  IEncounter,
+  IGroup,
+  IMedicationAdministration,
+  IMedicationRequest,
+  IObservation,
+  IOrganization,
+  IPatient,
   IPractitioner,
   IPractitionerRole,
-  IProcedure,
-  IClaim,
-  ICondition,
-  IMedicationRequest,
-  IMedicationAdministration,
-  IBinary,
-  IObservation
+  IProcedure
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 const reducer = (accumulator: any, currentValue: any) =>
@@ -59,7 +59,7 @@ export const fetchOrganization = async (args: fetchOrganizationProps) => {
  */
 
 type fetchGroupProps = {
-  _id?: string // ID of Group
+  _id?: string | (string | undefined)[] // ID of Group
   _list?: string[] // ID List of Groups
   provider?: string // Provider ID
   'managing-entity'?: string[] // ID List of organization
@@ -328,25 +328,8 @@ export const fetchBinary = async (args: fetchBinaryProps) => {
   return documentResp.data ?? []
 }
 
-/**
- * Practitioner Resource
- *
- */
-
-type fetchPractitionerProps = {
-  identifier: string
-}
-export const fetchPractitioner = async (args: fetchPractitionerProps) => {
-  const { identifier } = args
-
-  let options: string[] = []
-  if (identifier)                                  options = [...options, `identifier=${identifier}`]                                           // eslint-disable-line
-
-  const response = await apiFhir.get<FHIR_API_Response<IPractitioner>>(
-    `/Practitioner?${options.reduce(optionsReducer)}`
-  )
-
-  return response
+export const fetchPractitioner = async () => {
+  return await apiFhir.get<FHIR_API_Response<IPractitioner>>(`/Practitioner`)
 }
 
 /**
@@ -369,11 +352,7 @@ export const fetchPractitionerRole = async (args: fetchPractitionerRoleProps) =>
 
   if (_elements && _elements.length > 0)           options = [...options, `_elements=${_elements.reduce(reducer)}`]                             // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<IPractitionerRole>>(
-    `/PractitionerRole?${options.reduce(optionsReducer)}`
-  )
-
-  return response
+  return await apiFhir.get<FHIR_API_Response<IPractitionerRole>>(`/PractitionerRole?${options.reduce(optionsReducer)}`)
 }
 
 /**

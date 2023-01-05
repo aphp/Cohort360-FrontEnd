@@ -32,9 +32,10 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
 
   const deidentified = patient?.deidentified ?? true
 
-  const loading = patient?.documents?.loading ?? false
+  const loading = patient?.documents?.loading ?? true
   const totalDocs = patient?.documents?.count ?? 0
   const totalAllDoc = patient?.documents?.total ?? 0
+  const searchInputError = patient?.documents?.searchInputError ?? undefined
 
   const patientDocumentsList = patient?.documents?.list ?? []
 
@@ -143,7 +144,8 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         searchBar={{
           type: 'document',
           value: searchInput ? searchInput.replace(/^\/\(\.\)\*|\(\.\)\*\/$/gi, '') : '',
-          onSearch: (newSearchInput: string) => setSearchInput(newSearchInput)
+          onSearch: (newSearchInput: string) => setSearchInput(newSearchInput),
+          error: searchInputError
         }}
         buttons={[
           {

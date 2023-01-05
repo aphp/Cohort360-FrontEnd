@@ -1,16 +1,6 @@
 import { CohortPatient } from 'types'
 import moment from 'moment'
 
-export const getAgeArkhn = (birthDate: Date, deathOrTodayDate = new Date()) => {
-  const monthDifference = deathOrTodayDate.getMonth() - birthDate.getMonth()
-
-  const age = deathOrTodayDate.getFullYear() - birthDate.getFullYear()
-  if (monthDifference < 0 || (monthDifference === 0 && deathOrTodayDate.getDate() < birthDate.getDate())) {
-    return age - 1
-  }
-  return age
-}
-
 export const getAgeAphp = (ageObj: any, momentUnit: 'days' | 'months') => {
   if (!ageObj) return 'Âge inconnu'
   let ageUnit: 'year' | 'month' | 'day' = 'year'

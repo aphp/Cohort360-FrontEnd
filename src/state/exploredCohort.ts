@@ -1,13 +1,12 @@
-import { CohortData } from 'types'
+import { Cohort, CohortData } from 'types'
 import { IGroup_Member } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { login, logout } from './me'
 import { RootState } from 'state'
 
-import { setFavoriteCohort } from 'state/cohort'
 import { ODD_EXPORT } from '../constants'
 
-import services from 'services'
+import services from 'services/aphp'
 
 export type ExploredCohortState = {
   importedPatients: any[]
@@ -47,24 +46,16 @@ const defaultInitialState = {
   deidentifiedBoolean: undefined
 }
 
-const favoriteExploredCohort = createAsyncThunk<CohortData, { id: string }, { state: RootState }>(
+const favoriteExploredCohort = createAsyncThunk<CohortData, { exploredCohort: Cohort }, { state: RootState }>(
   'exploredCohort/favoriteExploredCohort',
-  async ({ id }, { getState, dispatch }) => {
+  async ({ exploredCohort }, { getState }) => {
     const state = getState()
-    const cohortState = state.cohort
-    const cohortList = cohortState ? cohortState.cohortsList : []
 
-    const foundItem = cohortList.find(({ uuid }) => uuid === id)
-    if (!foundItem) return state.exploredCohort
-
-    const favoriteResult = await dispatch(setFavoriteCohort({ favCohort: foundItem }))
+    const favoriteResult = await services.projects.editCohort({ ...exploredCohort, favorite: !exploredCohort.favorite })
 
     return {
       ...state.exploredCohort,
-      favorite:
-        favoriteResult.meta.requestStatus === 'fulfilled'
-          ? !state.exploredCohort.favorite
-          : state.exploredCohort.favorite
+      favorite: favoriteResult.favorite
     }
   }
 )

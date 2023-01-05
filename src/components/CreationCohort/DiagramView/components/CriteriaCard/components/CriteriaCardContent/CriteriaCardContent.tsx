@@ -336,42 +336,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               }
             />
           ),
-          _currentCriteria.regex_search && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Tooltip
-                  title={`Qui suit l'expression régulière suivante /${_currentCriteria.regex_search
-                    .replace(/^\(\.\)\*|\(\.\)\*$/gi, '')
-                    .replace(new RegExp('\\\\/|\\\\"', 'g'), function (m) {
-                      switch (m) {
-                        case '\\/':
-                          return '/'
-                        case '\\"':
-                          return '"'
-                      }
-                      return m
-                    })}/ dans le document`}
-                >
-                  <Typography style={{ maxWidth: 500 }} noWrap>
-                    Qui suit l'expression régulière suivante /
-                    {_currentCriteria.regex_search
-                      .replace(/^\(\.\)\*|\(\.\)\*$/gi, '')
-                      .replace(new RegExp('\\\\/|\\\\"', 'g'), function (m) {
-                        switch (m) {
-                          case '\\/':
-                            return '/'
-                          case '\\"':
-                            return '"'
-                        }
-                        return m
-                      })}
-                    / dans le document
-                  </Typography>
-                </Tooltip>
-              }
-            />
-          ),
           _currentCriteria && _currentCriteria.docType && _currentCriteria?.docType?.length > 0 && (
             <Chip
               className={classes.criteriaChip}
