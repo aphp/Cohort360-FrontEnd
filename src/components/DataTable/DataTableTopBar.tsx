@@ -28,14 +28,16 @@ import {
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from './styles'
+import { CircularProgress } from '@material-ui/core'
 
 type DataTableTopBarProps = {
+  loading: boolean
   tabs?: TabsType
   results?: ResultsType | ResultsType[]
   searchBar?: SearchBarType
   buttons?: ButtonType[]
 }
-const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, searchBar, buttons }) => {
+const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, results, searchBar, buttons }) => {
   const classes = useStyles()
 
   const [search, setSearch] = useState(searchBar?.value ?? '')
@@ -94,23 +96,27 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, search
             </Tabs>
           </Grid>
         )}
-        {results && (
-          <Grid id="DTTB_result" item container direction="column" style={{ width: 'fit-content' }}>
-            {Array.isArray(results) && results.length > 0 ? (
-              <>
-                {results.map((result, index) => (
-                  <Typography key={index} variant="button">
-                    {displayDigit(result.nb ?? 0)} / {displayDigit(result.total ?? 0)} {result.label}
-                  </Typography>
-                ))}
-              </>
-            ) : (
-              <Typography variant="button">
-                {/* @ts-ignore */}
-                {displayDigit(results.nb ?? 0)} / {displayDigit(results.total ?? 0)} {results.label}
-              </Typography>
-            )}
-          </Grid>
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          results && (
+            <Grid id="DTTB_result" item container direction="column" style={{ width: 'fit-content' }}>
+              {Array.isArray(results) && results.length > 0 ? (
+                <>
+                  {results.map((result, index) => (
+                    <Typography key={index} variant="button">
+                      {displayDigit(result.nb ?? 0)} / {displayDigit(result.total ?? 0)} {result.label}
+                    </Typography>
+                  ))}
+                </>
+              ) : (
+                <Typography variant="button">
+                  {/* @ts-ignore */}
+                  {displayDigit(results.nb ?? 0)} / {displayDigit(results.total ?? 0)} {results.label}
+                </Typography>
+              )}
+            </Grid>
+          )
         )}
 
         {((searchBar && searchBar.type !== 'document') || (buttons && buttons?.length > 0)) && (
