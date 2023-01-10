@@ -2,17 +2,28 @@
   "entry": [
     {
       "news": {
-        "title": "Nouvelles fonctionnalités - 11/2022",
+        "title": "Nouvelles fonctionnalités - 01/2023",
         "message": [
-          "• Le menu latéral reste déplié par défaut.",
-          "• Dans le critère de biologie, la recherche par valeur est désormais optionnelle.",
-          "• Il est maintenant possible de filtrer les documents selon la disponibilité du PDF.",
-          "• La deconnexion automatique est dorénavant effective sur tous les onglets ouverts de Cohort360.",
-          "• Les cohortes d'I2B2 n'étant plus remontées dans Cohort360, la colonne \"type de cohorte\" a été retirée du tableau des cohortes.",
+          "• Ajout d'une pagination au tableau des cohortes.",
+          "• Ajout d'un loading lors du chargement des documents.",
           "• Divers correctifs de bugs et d'anomalies ont été réalisés."
         ],
         "footer": "L'équipe Cohort360."
       }
+    },
+    {
+    "news": {
+      "title": "Nouvelles fonctionnalités - 11/2022",
+      "message": [
+        "• Le menu latéral reste déplié par défaut.",
+        "• Dans le critère de biologie, la recherche par valeur est désormais optionnelle.",
+        "• Il est maintenant possible de filtrer les documents selon la disponibilité du PDF.",
+        "• La deconnexion automatique est dorénavant effective sur tous les onglets ouverts de Cohort360.",
+        "• Les cohortes d'I2B2 n'étant plus remontées dans Cohort360, la colonne \"type de cohorte\" a été retirée du tableau des cohortes.",
+        "• Divers correctifs de bugs et d'anomalies ont été réalisés."
+      ],
+      "footer": "L'équipe Cohort360."
+    }
     },
     {
       "news": {
