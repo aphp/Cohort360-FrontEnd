@@ -121,7 +121,7 @@ const Dashboard: React.FC<{
     return <CohortCreation />
   }
 
-  if (dashboard.loading === false && dashboard.cohort === undefined) {
+  if (dashboard.loading === false && dashboard.cohort === undefined && dashboard.totalPatients === undefined) {
     return <CohortRightOrNotExist />
   } else if (dashboard.loading === false && dashboard.totalPatients === 0) {
     return <CohortNoPatient />

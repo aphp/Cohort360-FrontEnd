@@ -41,7 +41,7 @@ const defaultInitialState = {
   importedPatients: [],
   includedPatients: [],
   excludedPatients: [],
-  loading: false,
+  loading: true,
   canMakeExport: false,
   deidentifiedBoolean: undefined
 }
@@ -324,20 +324,20 @@ const exploredCohortSlice = createSlice({
     builder.addCase(logout.fulfilled, () => defaultInitialState)
     builder.addCase(fetchExploredCohort.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(fetchExploredCohort.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
-    builder.addCase(fetchExploredCohort.rejected, () => ({ ...defaultInitialState }))
+    builder.addCase(fetchExploredCohort.rejected, () => ({ ...defaultInitialState, loading: false }))
     builder.addCase(fetchExploredCohortInBackground.pending, (state) => ({ ...state, loading: true }))
     builder.addCase(fetchExploredCohortInBackground.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
       loading: false
     }))
-    builder.addCase(fetchExploredCohortInBackground.rejected, () => ({ ...defaultInitialState }))
+    builder.addCase(fetchExploredCohortInBackground.rejected, () => ({ ...defaultInitialState, loading: false }))
     builder.addCase(favoriteExploredCohort.pending, (state) => ({ ...state }))
     builder.addCase(favoriteExploredCohort.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload
     }))
-    builder.addCase(favoriteExploredCohort.rejected, () => ({ ...defaultInitialState }))
+    builder.addCase(favoriteExploredCohort.rejected, () => ({ ...defaultInitialState, loading: false }))
   }
 })
 
