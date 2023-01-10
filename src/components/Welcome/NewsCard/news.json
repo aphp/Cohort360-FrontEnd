@@ -2,10 +2,9 @@
   "entry": [
     {
       "news": {
-        "title": "Nouvelles fonctionnalités - 06/01/2023",
+        "title": "Nouvelles fonctionnalités - 01/2023",
         "message": [
           "• Ajout d'une pagination au tableau des cohortes.",
-          "• Ajout de la recherche textuelle à la population source.",
           "• Ajout d'un loading lors du chargement des documents.",
           "• Divers correctifs de bugs et d'anomalies ont été réalisés."
         ],
