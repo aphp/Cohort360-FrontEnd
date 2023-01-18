@@ -4,7 +4,7 @@ import {
   MEDICATION_ADMINISTRATIONS,
   VALUE_SET_SIZE
 } from '../../../constants'
-import apiRequest from 'services/apiRequest'
+import apiFhir from 'services/apiFhir'
 import { cleanValueSet } from 'utils/cleanValueSet'
 import { codeSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
@@ -28,7 +28,7 @@ export const fetchAtcData = async (searchValue?: string, noStar?: boolean) => {
     ? `&_text=${encodeURIComponent(searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line
     : ''
 
-  const res = await apiRequest.get<any>(`/ValueSet?url=${MEDICATION_ATC}${_searchValue}&size=${VALUE_SET_SIZE ?? 9999}`)
+  const res = await apiFhir.get<any>(`/ValueSet?url=${MEDICATION_ATC}${_searchValue}&size=${VALUE_SET_SIZE ?? 9999}`)
 
   const data =
     res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -46,7 +46,7 @@ export const fetchAtcData = async (searchValue?: string, noStar?: boolean) => {
 
 export const fetchAtcHierarchy = async (atcParent: string) => {
   if (!atcParent) {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${MEDICATION_ATC}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${MEDICATION_ATC}`)
 
     let atcList =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -86,7 +86,7 @@ export const fetchAtcHierarchy = async (atcParent: string) => {
       }
     }
 
-    const res = await apiRequest.post<any>(`/ValueSet/$expand`, JSON.stringify(json))
+    const res = await apiFhir.post<any>(`/ValueSet/$expand`, JSON.stringify(json))
 
     const data =
       res && res.data && res.data.expansion && res.data.expansion.contains && res.data.resourceType === 'ValueSet'
@@ -105,7 +105,7 @@ export const fetchAtcHierarchy = async (atcParent: string) => {
 
 export const fetchPrescriptionTypes = async () => {
   try {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${MEDICATION_PRESCRIPTION_TYPES}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${MEDICATION_PRESCRIPTION_TYPES}`)
     const data =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
@@ -119,7 +119,7 @@ export const fetchPrescriptionTypes = async () => {
 
 export const fetchAdministrations = async () => {
   try {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${MEDICATION_ADMINISTRATIONS}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${MEDICATION_ADMINISTRATIONS}`)
     const data =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept

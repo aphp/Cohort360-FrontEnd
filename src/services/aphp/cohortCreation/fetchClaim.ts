@@ -1,5 +1,5 @@
 import { CLAIM_HIERARCHY, VALUE_SET_SIZE } from '../../../constants'
-import apiRequest from 'services/apiRequest'
+import apiFhir from 'services/apiFhir'
 import { codeSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
@@ -22,9 +22,7 @@ export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
     ? `&_text=${encodeURIComponent(searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line
     : ''
 
-  const res = await apiRequest.get<any>(
-    `/ValueSet?url=${CLAIM_HIERARCHY}${_searchValue}&size=${VALUE_SET_SIZE ?? 9999}`
-  )
+  const res = await apiFhir.get<any>(`/ValueSet?url=${CLAIM_HIERARCHY}${_searchValue}&size=${VALUE_SET_SIZE ?? 9999}`)
 
   const data =
     res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -42,7 +40,7 @@ export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
 
 export const fetchGhmHierarchy = async (ghmParent: string) => {
   if (!ghmParent) {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${CLAIM_HIERARCHY}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${CLAIM_HIERARCHY}`)
 
     let GHMList =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -83,7 +81,7 @@ export const fetchGhmHierarchy = async (ghmParent: string) => {
       }
     }
 
-    const res = await apiRequest.post<any>(`/ValueSet/$expand`, JSON.stringify(json))
+    const res = await apiFhir.post<any>(`/ValueSet/$expand`, JSON.stringify(json))
 
     let GHMList =
       res && res.data && res.data.expansion && res.data.expansion.contains && res.data.resourceType === 'ValueSet'

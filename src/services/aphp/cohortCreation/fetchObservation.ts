@@ -1,12 +1,10 @@
 import { BIOLOGY_HIERARCHY_ITM_ANABIO, BIOLOGY_HIERARCHY_ITM_LOINC, VALUE_SET_SIZE } from '../../../constants'
-import apiRequest from 'services/apiRequest'
 import { cleanValueSet } from 'utils/cleanValueSet'
 import { ValueSet } from 'types'
 import { capitalizeFirstLetter } from 'utils/capitalize'
-import { displaySort } from 'utils/alphabeticalSort'
+import { displaySort, targetDisplaySort } from 'utils/alphabeticalSort'
 import apiFhir from 'services/apiFhir'
 import { getApiResponseResources } from 'utils/apiHelpers'
-import { targetDisplaySort } from 'utils/alphabeticalSort'
 
 export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) => {
   noStar = noStar === undefined ? true : noStar
@@ -27,7 +25,7 @@ export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) =
     ? `&_text=${encodeURIComponent(searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line
     : ''
 
-  const res = await apiRequest.get<any>(
+  const res = await apiFhir.get<any>(
     `/ValueSet?url=${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}${_searchValue}&size=${
       VALUE_SET_SIZE ?? 9999
     }`
@@ -86,12 +84,11 @@ const getSourceData = (context: string, data: any) => {
     return []
   }
 
-  const sourceData =
+  return (
     data
       .filter((element: any) => element.description === context)
       .map((element: any) => element.group?.[0].element?.[0]) ?? []
-
-  return sourceData
+  )
 }
 
 // TODO: change type any
@@ -100,14 +97,12 @@ const getUniqueLoincResults = (loincResults: any[]) => {
     return []
   }
 
-  const loincUniqueResults = loincResults.filter(
+  return loincResults.filter(
     (
       (set) => (f: any) =>
         !set.has(f.target[0].code) && set.add(f.target[0].code)
     )(new Set())
   )
-
-  return loincUniqueResults
 }
 
 const getCleanAnabioResults = (anabioResults: any[]) => {
@@ -146,7 +141,7 @@ const filterUnwantedData = (biologyHierarchy: any) => {
 
 export const fetchBiologyHierarchy = async (biologyParent?: string) => {
   if (!biologyParent) {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${BIOLOGY_HIERARCHY_ITM_ANABIO}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${BIOLOGY_HIERARCHY_ITM_ANABIO}`)
 
     let observationList =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -183,7 +178,7 @@ export const fetchBiologyHierarchy = async (biologyParent?: string) => {
       }
     }
 
-    const res = await apiRequest.post<any>(`/ValueSet/$expand`, JSON.stringify(json))
+    const res = await apiFhir.post<any>(`/ValueSet/$expand`, JSON.stringify(json))
 
     const observationList =
       res && res.data && res.data.expansion && res.data.expansion.contains && res.data.resourceType === 'ValueSet'
