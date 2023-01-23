@@ -200,6 +200,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         <CssBaseline />
         <Grid container item xs={11} justifyContent="space-between">
           <DataTableTopBar
+            loading={loadingStatus}
             results={[documentsResult, patientsResult]}
             searchBar={{
               type: 'document',

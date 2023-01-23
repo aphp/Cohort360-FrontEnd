@@ -173,6 +173,7 @@ const PatientList: React.FC<PatientListProps> = ({
 
         {/* <Grid id="patient-data-grid" container item justifyContent="flex-end" className={classes.tableGrid}> */}
         <DataTableTopBar
+          loading={loadingStatus}
           results={patientsResult}
           searchBar={
             deidentified
