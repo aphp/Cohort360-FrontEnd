@@ -393,8 +393,8 @@ export const fetchProcedure = async (args: fetchProcedureProps) => {
   if (_text)                                       options = [...options, `_text=${encodeURIComponent(_text)}`]                                 // eslint-disable-line
   if (status)                                      options = [...options, `status=${status}`]                                                   // eslint-disable-line
   if (encounterIdentifier)                         options = [...options, `encounter.identifier=${encounterIdentifier}`]                        // eslint-disable-line
-  if (minDate)                                      options = [...options, `date=ge${minDate}`]                                                 // eslint-disable-line
-  if (maxDate)                                      options = [...options, `date=le${maxDate}`]                                                 // eslint-disable-line
+  if (minDate)                                     options = [...options, `date=ge${minDate}`]                                                 // eslint-disable-line
+  if (maxDate)                                     options = [...options, `date=le${maxDate}`]                                                 // eslint-disable-line
 
   if (_list && _list.length > 0)                   options = [...options, `_list=${_list.reduce(reducer)}`]                                     // eslint-disable-line
 
@@ -542,7 +542,7 @@ export const fetchObservation = async (args: fetchObservationProps) => {
   if (minDate)                                      options = [...options, `effectiveDatetime=ge${minDate}`]                                           // eslint-disable-line
   if (maxDate)                                      options = [...options, `effectiveDatetime=le${maxDate}`]                                           // eslint-disable-line
 
-  if (_list && _list.length > 0)                   options = [...options, `_list=${_list.reduce(reducer)}`]                                            // eslint-disable-line
+  if (_list && _list.length > 0)                    options = [...options, `_list=${_list.reduce(reducer)}`]                                            // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<IObservation>>(`/Observation?${options.reduce(optionsReducer)}`)
 
