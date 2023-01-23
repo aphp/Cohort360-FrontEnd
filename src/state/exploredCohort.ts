@@ -353,7 +353,7 @@ const exploredCohortSlice = createSlice({
       ...state,
       ...payload
     }))
-    builder.addCase(favoriteExploredCohort.rejected, () => ({ ...defaultInitialState, rightToExplore: false }))
+    builder.addCase(favoriteExploredCohort.rejected, () => ({ ...defaultInitialState }))
   }
 })
 
