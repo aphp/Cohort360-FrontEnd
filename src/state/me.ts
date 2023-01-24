@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 
-import services from 'services/aphp'
+import services from 'services'
 
 export type MeState = null | {
   id: string

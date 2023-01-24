@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-import services from 'services/aphp'
+import services from 'services'
 import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType, DocType } from 'types'
 
 import { docTypes } from 'assets/docTypes.json'

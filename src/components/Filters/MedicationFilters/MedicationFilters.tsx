@@ -19,7 +19,7 @@ import { Autocomplete } from '@material-ui/lab'
 
 import ClearIcon from '@material-ui/icons/Clear'
 
-import services from 'services/aphp'
+import services from 'services'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import { MedicationsFilters } from 'types'

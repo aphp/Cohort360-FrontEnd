@@ -12,7 +12,7 @@ import GhmForm from './DiagramView/components/LogicalOperator/components/Criteri
 import MedicationForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/MedicationForm'
 import BiologyForm from './DiagramView/components/LogicalOperator/components/CriteriaRightPanel/BiologyForm'
 
-import services from 'services/aphp'
+import services from 'services'
 
 import { ODD_BIOLOGY, ODD_MEDICATION } from '../../constants'
 

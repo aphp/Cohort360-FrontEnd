@@ -29,7 +29,7 @@ import { useAppDispatch } from 'state'
 import { login as loginAction } from 'state/me'
 import { ACCES_TOKEN, REFRESH_TOKEN } from '../../constants'
 
-import services from 'services/aphp'
+import services from 'services'
 
 import useStyles from './styles'
 

@@ -8,7 +8,7 @@ import { CircularProgress, Grid, Typography } from '@material-ui/core'
 import PatientSearchBar from 'components/Inputs/PatientSearchBar/PatientSearchBar'
 import DataTablePatient from 'components/DataTable/DataTablePatient'
 
-import services from 'services/aphp'
+import services from 'services'
 
 import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { SearchByTypes, Order } from 'types'

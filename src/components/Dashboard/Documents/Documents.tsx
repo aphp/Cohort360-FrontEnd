@@ -12,7 +12,7 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import { CohortComposition, DocumentFilters, Order, DTTB_ResultsType as ResultsType, searchInputError } from 'types'
 
-import services from 'services/aphp'
+import services from 'services'
 
 import { buildDocumentFiltersChips } from 'utils/chips'
 

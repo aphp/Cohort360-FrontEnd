@@ -26,7 +26,7 @@ import {
 
 import { logout } from './me'
 
-import services from 'services/aphp'
+import services from 'services'
 
 export type PatientState = null | {
   loading: boolean

@@ -32,7 +32,7 @@ import InfoIcon from '@material-ui/icons/Info'
 import useStyles from './styles'
 
 import export_table from './export_table'
-import services from 'services/aphp'
+import services from 'services'
 
 const initialState = {
   motif: '',

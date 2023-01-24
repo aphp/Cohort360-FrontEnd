@@ -25,7 +25,7 @@ import { capitalizeFirstLetter } from 'utils/capitalize'
 import { useAppDispatch } from 'state'
 import { fetchAllProcedures } from 'state/patient'
 
-import services from 'services/aphp'
+import services from 'services'
 
 import useStyles from './styles'
 

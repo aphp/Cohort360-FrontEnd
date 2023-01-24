@@ -15,7 +15,7 @@ import { logout, login } from './me'
 import { addRequest, deleteRequest } from './request'
 import { deleteProject } from './project'
 
-import services from 'services/aphp'
+import services from 'services'
 
 export type CohortCreationState = {
   loading: boolean

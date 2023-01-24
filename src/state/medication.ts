@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 import { login, logout } from 'state/me'
 
-import services from 'services/aphp'
+import services from 'services'
 
 export type MedicationListType = {
   id: string

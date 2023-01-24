@@ -3,7 +3,7 @@ import { RootState } from 'state'
 
 import { logout, login } from './me'
 
-import services from 'services/aphp'
+import services from 'services'
 
 import { ScopeTreeRow } from 'types'
 
