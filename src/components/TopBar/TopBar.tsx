@@ -140,7 +140,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         description: '',
         perimeters:
           dashboard.cohort && Array.isArray(dashboard.cohort)
-            ? dashboard.cohort.map((p: any) => p.name.replace('Patients passés par: ', ''))
+            ? dashboard.cohort.map((p: any) => (p.name ? p.name.replace('Patients passés par: ', '') : '-'))
             : [],
         icon: <BusinessIcon />,
         showActionButton: false
