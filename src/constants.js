@@ -3,6 +3,8 @@ export let BOOLEANTRUE = 'true'
 export const ACCES_TOKEN = 'access'
 export const REFRESH_TOKEN = 'refresh'
 
+export const CONTEXT = process.env.REACT_APP_CONTEXT ?? 'aphp'
+
 export const BACK_API_URL =
   process.env.NODE_ENV !== 'development' ? '{REACT_APP_BACK_API_URL}' : process.env.REACT_APP_BACK_API_URL
 export const REQUEST_API_URL =
