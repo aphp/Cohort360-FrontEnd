@@ -19,10 +19,10 @@ import {
   Tabs,
   Tooltip,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import ClearIcon from '@mui/icons-material/Clear'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
 import useStyles from './styles'
@@ -175,7 +175,7 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
       <Grid className={classes.actionContainer}>
         {!isEdition ? (
           <>
-            <IconButton className={classes.backButton} onClick={goBack}>
+            <IconButton className={classes.backButton} onClick={goBack} size="large">
               <KeyboardBackspaceIcon />
             </IconButton>
             <Divider className={classes.divider} orientation="vertical" flexItem />
@@ -196,12 +196,14 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
             onKeyDown={onKeyDown}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton onClick={() => setSearchInput('')}>{searchInput && <ClearIcon />}</IconButton>
+                <IconButton onClick={() => setSearchInput('')} size="large">
+                  {searchInput && <ClearIcon />}
+                </IconButton>
               </InputAdornment>
             }
           />
 
-          <IconButton type="submit" aria-label="search" onClick={onKeyDown}>
+          <IconButton type="submit" aria-label="search" onClick={onKeyDown} size="large">
             <SearchIcon fill="#ED6D91" height="15px" />
           </IconButton>
         </Grid>

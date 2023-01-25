@@ -42,7 +42,7 @@ const MyProjects: React.FC<{}> = () => {
   const [openModal, setOpenModal] = useState<'move_to_folder' | 'delete_items' | null>(null)
   const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<'success' | 'error' | null>(null)
   const wrapperSetShareSuccessOrFailMessage = useCallback(
-    (val) => {
+    (val: any) => {
       setShareSuccessOrFailMessage(val)
     },
     [setShareSuccessOrFailMessage]
@@ -117,202 +117,202 @@ const MyProjects: React.FC<{}> = () => {
 
   return (
     <>
-      <Grid
-        container
-        direction="column"
-        className={clsx(classes.appBar, {
-          [classes.appBarShift]: open
-        })}
-      >
-        <Grid container justifyContent="center" alignItems="center">
-          <Grid container item xs={11}>
-            <Typography id="myProject-title" variant="h1" color="primary" className={classes.title}>
-              Mes requêtes
-            </Typography>
-          </Grid>
+    <Grid
+      container
+      direction="column"
+      className={clsx(classes.appBar, {
+        [classes.appBarShift]: open
+      })}
+    >
+      <Grid container justifyContent="center" alignItems="center">
+        <Grid container item xs={11}>
+          <Typography id="myProject-title" variant="h1" color="primary" className={classes.title}>
+            Mes requêtes
+          </Typography>
+        </Grid>
 
-          <Grid item xs={11}>
-            <Grid container justifyContent="space-between">
-              <Grid className={classes.secondaryContainer}>
-                {selectedRequests.length > 0 && (
-                  <>
-                    <Grid container direction="row">
-                      <Hidden only={['xs', 'sm', 'md']}>
-                        <Button
-                          startIcon={<DriveFileMoveIcon />}
+        <Grid item xs={11}>
+          <Grid container justifyContent="space-between">
+            <Grid className={classes.secondaryContainer}>
+              {selectedRequests.length > 0 && (
+                <>
+                  <Grid container direction="row">
+                    <Hidden only={['xs', 'sm', 'md']}>
+                      <Button
+                        startIcon={<DriveFileMoveIcon />}
+                        onClick={() => setOpenModal('move_to_folder')}
+                        color="primary"
+                        disabled={maintenanceIsActive}
+                      >
+                        Déplacer {selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}
+                      </Button>
+                    </Hidden>
+                    <Hidden only={['lg', 'xl']}>
+                      <Tooltip title={`Déplacer ${selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}`}>
+                        <IconButton
                           onClick={() => setOpenModal('move_to_folder')}
                           color="primary"
                           disabled={maintenanceIsActive}
-                        >
-                          Déplacer {selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}
-                        </Button>
-                      </Hidden>
-                      <Hidden only={['lg', 'xl']}>
-                        <Tooltip title={`Déplacer ${selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}`}>
-                          <IconButton
-                            onClick={() => setOpenModal('move_to_folder')}
-                            color="primary"
-                            disabled={maintenanceIsActive}
-                          >
-                            <DriveFileMoveIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </Hidden>
+                          size="large">
+                          <DriveFileMoveIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Hidden>
 
-                      <Hidden only={['xs', 'sm', 'md']}>
-                        <Button
-                          startIcon={<DeleteIcon />}
+                    <Hidden only={['xs', 'sm', 'md']}>
+                      <Button
+                        startIcon={<DeleteIcon />}
+                        onClick={() => setOpenModal('delete_items')}
+                        color="secondary"
+                        disabled={maintenanceIsActive}
+                      >
+                        Supprimer {selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}
+                      </Button>
+                    </Hidden>
+                    <Hidden only={['lg', 'xl']}>
+                      <Tooltip title={`Supprimer ${selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}`}>
+                        <IconButton
                           onClick={() => setOpenModal('delete_items')}
                           color="secondary"
                           disabled={maintenanceIsActive}
-                        >
-                          Supprimer {selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}
-                        </Button>
-                      </Hidden>
-                      <Hidden only={['lg', 'xl']}>
-                        <Tooltip title={`Supprimer ${selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}`}>
-                          <IconButton
-                            onClick={() => setOpenModal('delete_items')}
-                            color="secondary"
-                            disabled={maintenanceIsActive}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </Hidden>
-                    </Grid>
-                  </>
-                )}
-              </Grid>
-              <Grid className={classes.actionContainer}>
-                <ProjectSearchBar setSearchInput={(newValue: string) => setSearchInput(newValue)} />
-
-                <Hidden only={['xs', 'sm', 'md']}>
-                  <Button
-                    id="new-project-button"
-                    startIcon={<AddIcon />}
-                    onClick={() => handleClickAddProject()}
-                    className={classes.addButton}
-                    disabled={maintenanceIsActive}
-                  >
-                    Ajouter un projet
-                  </Button>
-                </Hidden>
-
-                <Hidden only={['lg', 'xl']}>
-                  <Tooltip title={'Ajouter un projet'}>
-                    <IconButton
-                      onClick={() => handleClickAddProject()}
-                      className={classes.addIconButton}
-                      disabled={maintenanceIsActive}
-                    >
-                      <AddIcon />
-                    </IconButton>
-                  </Tooltip>
-                </Hidden>
-              </Grid>
+                          size="large">
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </Hidden>
+                  </Grid>
+                </>
+              )}
             </Grid>
+            <Grid className={classes.actionContainer}>
+              <ProjectSearchBar setSearchInput={(newValue: string) => setSearchInput(newValue)} />
 
-            <Typography style={{ height: 20 }}>
-              {selectedRequests.length > 0 &&
-                `${selectedRequests.length} selectionnée${selectedRequests.length === 1 ? '' : 's'} / ${
-                  requestsList.length
-                } requête${requestsList.length === 1 ? '' : 's'}`}
-            </Typography>
+              <Hidden only={['xs', 'sm', 'md']}>
+                <Button
+                  id="new-project-button"
+                  startIcon={<AddIcon />}
+                  onClick={() => handleClickAddProject()}
+                  className={classes.addButton}
+                  disabled={maintenanceIsActive}
+                >
+                  Ajouter un projet
+                </Button>
+              </Hidden>
+
+              <Hidden only={['lg', 'xl']}>
+                <Tooltip title={'Ajouter un projet'}>
+                  <IconButton
+                    onClick={() => handleClickAddProject()}
+                    className={classes.addIconButton}
+                    disabled={maintenanceIsActive}
+                    size="large">
+                    <AddIcon />
+                  </IconButton>
+                </Tooltip>
+              </Hidden>
+            </Grid>
           </Grid>
 
-          <Grid container item xs={11}>
-            <ProjectTable
-              searchInput={searchInput}
-              selectedRequests={selectedRequests}
-              setSelectedRequests={setSelectedRequests}
-            />
-          </Grid>
+          <Typography style={{ height: 20 }}>
+            {selectedRequests.length > 0 &&
+              `${selectedRequests.length} selectionnée${selectedRequests.length === 1 ? '' : 's'} / ${
+                requestsList.length
+              } requête${requestsList.length === 1 ? '' : 's'}`}
+          </Typography>
+        </Grid>
+
+        <Grid container item xs={11}>
+          <ProjectTable
+            searchInput={searchInput}
+            selectedRequests={selectedRequests}
+            setSelectedRequests={setSelectedRequests}
+          />
         </Grid>
       </Grid>
+    </Grid>
 
-      <ModalAddOrEditProject
-        open={selectedProject !== null}
-        onClose={() => dispatch<any>(setSelectedProject(null))}
-        selectedProject={selectedProject}
-      />
+    <ModalAddOrEditProject
+      open={selectedProject !== null}
+      onClose={() => dispatch<any>(setSelectedProject(null))}
+      selectedProject={selectedProject}
+    />
 
-      {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch<any>(setSelectedRequest(null))} />}
+    {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch<any>(setSelectedRequest(null))} />}
 
-      {selectedRequestShare !== null &&
-        selectedRequestShare?.shared_query_snapshot !== undefined &&
-        selectedRequestShare?.shared_query_snapshot?.length > 0 && (
-          <ModalShareRequest
-            shareSuccessOrFailMessage={shareSuccessOrFailMessage}
-            parentStateSetter={wrapperSetShareSuccessOrFailMessage}
-            onClose={() => dispatch<any>(setSelectedRequestShare(null))}
-          />
-        )}
+    {selectedRequestShare !== null &&
+      selectedRequestShare?.shared_query_snapshot !== undefined &&
+      selectedRequestShare?.shared_query_snapshot?.length > 0 && (
+        <ModalShareRequest
+          shareSuccessOrFailMessage={shareSuccessOrFailMessage}
+          parentStateSetter={wrapperSetShareSuccessOrFailMessage}
+          onClose={() => dispatch<any>(setSelectedRequestShare(null))}
+        />
+      )}
 
-      {selectedRequestShare !== null &&
-        selectedRequestShare?.shared_query_snapshot !== undefined &&
-        selectedRequestShare?.shared_query_snapshot?.length === 0 && (
-          <Snackbar
-            open
-            onClose={() => dispatch<any>(setSelectedRequestShare(null))}
-            autoHideDuration={5000}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          >
-            <Alert severity="error" onClose={() => dispatch<any>(setSelectedRequestShare(null))}>
-              Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
-            </Alert>
-          </Snackbar>
-        )}
-
-      {shareSuccessOrFailMessage === 'success' && (
+    {selectedRequestShare !== null &&
+      selectedRequestShare?.shared_query_snapshot !== undefined &&
+      selectedRequestShare?.shared_query_snapshot?.length === 0 && (
         <Snackbar
           open
-          onClose={() => setShareSuccessOrFailMessage(null)}
+          onClose={() => dispatch<any>(setSelectedRequestShare(null))}
           autoHideDuration={5000}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         >
-          <Alert severity="success" onClose={() => setShareSuccessOrFailMessage(null)}>
-            Votre requête a été partagée.
+          <Alert severity="error" onClose={() => dispatch<any>(setSelectedRequestShare(null))}>
+            Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
           </Alert>
         </Snackbar>
       )}
 
-      {shareSuccessOrFailMessage === 'error' && (
-        <Snackbar
-          open
-          onClose={() => setShareSuccessOrFailMessage(null)}
-          autoHideDuration={5000}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert severity="error" onClose={() => setShareSuccessOrFailMessage(null)}>
-            Une erreur est survenue, votre requête n'a pas pu être partagée.
-          </Alert>
-        </Snackbar>
-      )}
+    {shareSuccessOrFailMessage === 'success' && (
+      <Snackbar
+        open
+        onClose={() => setShareSuccessOrFailMessage(null)}
+        autoHideDuration={5000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert severity="success" onClose={() => setShareSuccessOrFailMessage(null)}>
+          Votre requête a été partagée.
+        </Alert>
+      </Snackbar>
+    )}
 
-      <ModalEditCohort open={selectedCohort !== null} onClose={() => dispatch<any>(setSelectedCohort(null))} />
+    {shareSuccessOrFailMessage === 'error' && (
+      <Snackbar
+        open
+        onClose={() => setShareSuccessOrFailMessage(null)}
+        autoHideDuration={5000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert severity="error" onClose={() => setShareSuccessOrFailMessage(null)}>
+          Une erreur est survenue, votre requête n'a pas pu être partagée.
+        </Alert>
+      </Snackbar>
+    )}
 
-      <ModalMoveRequests
-        open={openModal === 'move_to_folder'}
-        onClose={(onConfirm?: boolean) => {
-          setOpenModal(null)
-          if (onConfirm) {
-            setSelectedRequests([])
-          }
-        }}
-        selectedRequests={selectedRequests}
-      />
+    <ModalEditCohort open={selectedCohort !== null} onClose={() => dispatch<any>(setSelectedCohort(null))} />
 
-      <ModalDeleteRequests
-        open={openModal === 'delete_items'}
-        onClose={(onConfirm?: boolean) => {
-          setOpenModal(null)
-          if (onConfirm) {
-            setSelectedRequests([])
-          }
-        }}
-        selectedRequests={selectedRequests}
-      />
+    <ModalMoveRequests
+      open={openModal === 'move_to_folder'}
+      onClose={(onConfirm?: boolean) => {
+        setOpenModal(null)
+        if (onConfirm) {
+          setSelectedRequests([])
+        }
+      }}
+      selectedRequests={selectedRequests}
+    />
+
+    <ModalDeleteRequests
+      open={openModal === 'delete_items'}
+      onClose={(onConfirm?: boolean) => {
+        setOpenModal(null)
+        if (onConfirm) {
+          setSelectedRequests([])
+        }
+      }}
+      selectedRequests={selectedRequests}
+    />
     </>
   )
 }

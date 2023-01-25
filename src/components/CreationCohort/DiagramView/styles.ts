@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     flexWrap: 'wrap',
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       flexDirection: 'column',
       flexWrap: 'nowrap'
     }

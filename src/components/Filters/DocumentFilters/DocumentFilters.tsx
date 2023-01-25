@@ -201,7 +201,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
                 classes={{ root: classes.clearDate /*label: classes.buttonLabel*/ }}
                 color="primary"
                 onClick={() => setStartDate(null)}
-              >
+                size="large">
                 <ClearIcon />
               </IconButton>
             )}
@@ -225,7 +225,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
                 classes={{ root: classes.clearDate /*label: classes.buttonLabel*/ }}
                 color="primary"
                 onClick={() => setEndDate(null)}
-              >
+                size="large">
                 <ClearIcon />
               </IconButton>
             )}

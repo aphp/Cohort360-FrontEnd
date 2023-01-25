@@ -7,7 +7,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: 0,
     flexWrap: 'wrap',
     overflow: 'hidden',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       width: '100%'
     },
     [theme.breakpoints.up('md')]: {

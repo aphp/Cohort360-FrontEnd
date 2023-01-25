@@ -3,7 +3,7 @@ import moment from 'moment'
 
 import { useAppSelector } from 'state'
 
-import { Grid, TextField, Typography } from '@material-ui/core'
+import { Grid, TextField, Typography } from '@mui/material'
 import useStyles from './styles'
 
 type InputAgeRangeAdvancedProps = {

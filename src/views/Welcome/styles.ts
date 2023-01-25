@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   newsGrid: {
     flexDirection: 'column',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       flexDirection: 'column-reverse'
     }
   }

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Grid, Link, Typography } from '@material-ui/core'
+import { Button, Grid, Link, Typography } from '@mui/material'
 
 import JohnTravolta from 'assets/images/johntravolta.gif'
 import cohortLogo from 'assets/images/logo-login.png'

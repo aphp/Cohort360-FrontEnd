@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
-import { Button, Divider, FormLabel, Grid, IconButton, Switch, Typography, TextField } from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
+import { Alert, Button, Divider, FormLabel, Grid, IconButton, Switch, Typography, TextField } from '@mui/material'
 
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import InputSearchDocumentSimple from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentSimple'
 
@@ -71,7 +70,7 @@ const IPPForm: React.FC<IPPFormProps> = (props) => {
       <Grid className={classes.actionContainer}>
         {!isEdition ? (
           <>
-            <IconButton className={classes.backButton} onClick={goBack}>
+            <IconButton className={classes.backButton} onClick={goBack} size="large">
               <KeyboardBackspaceIcon />
             </IconButton>
             <Divider className={classes.divider} orientation="vertical" flexItem />

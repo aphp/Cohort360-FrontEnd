@@ -8,7 +8,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginLeft: 12,
     alignSelf: 'center',
     padding: '4px 8px',
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       alignSelf: 'flex-end'
     }
   },

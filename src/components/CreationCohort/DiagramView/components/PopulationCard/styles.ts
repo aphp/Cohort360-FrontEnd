@@ -23,13 +23,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   leftDiv: {
     display: 'flex',
     alignItems: 'center',
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       flexWrap: 'wrap'
     }
   },
   editButton: {
     color: 'currentcolor',
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       position: 'absolute',
       right: 5,
       top: 8

@@ -170,6 +170,7 @@ const DataTableCompositionLine: React.FC<{
               <IconButton
                 onClick={() => navigate(`/patients/${document.idPatient}${groupId ? `?groupId=${groupId}` : ''}`)}
                 className={classes.searchIcon}
+                size="large"
               >
                 <SearchIcon height="15px" fill="#ED6D91" className={classes.iconMargin} />
               </IconButton>
@@ -199,7 +200,11 @@ const DataTableCompositionLine: React.FC<{
         </TableCell>
 
         <TableCell>
-          <IconButton onClick={() => setOpen(documentId ?? '')} disabled={event === undefined}>
+          <IconButton
+            onClick={() => setOpen(documentId ?? '')}
+            disabled={event === undefined}
+            size="large"
+          >
             <PdfIcon height="30px" fill={event === undefined ? '#CBCFCF' : '#ED6D91'} />
           </IconButton>
 

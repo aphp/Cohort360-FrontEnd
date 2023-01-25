@@ -125,7 +125,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   return (
     <Drawer anchor="right" classes={{ paper: classes.paper }} variant="persistent" open={openDrawer}>
       <div className={classes.openLeftBar}>
-        <IconButton onClick={onClose}>
+        <IconButton onClick={onClose} size="large">
           <ChevronRightIcon color="action" width="20px" />
         </IconButton>
       </div>

@@ -171,7 +171,7 @@ const DataTableMedicationLine: React.FC<{
       {medication.resourceType === 'MedicationAdministration' && deidentified === false && (
         <>
           <TableCell align="center">
-            <IconButton onClick={() => setOpen(comment ?? '')}>
+            <IconButton onClick={() => setOpen(comment ?? '')} size="large">
               <CommentIcon />
             </IconButton>
           </TableCell>

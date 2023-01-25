@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginLeft: 4
     },
     iconMargin: {
-      margin: `0 ${theme.spacing(1)}px`
+      margin: `0 ${theme.spacing(1)}`
     },
     multiple: {
       '&::after': {

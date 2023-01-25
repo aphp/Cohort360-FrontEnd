@@ -165,7 +165,7 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
       <Grid className={classes.actionContainer}>
         {!isEdition ? (
           <>
-            <IconButton className={classes.backButton} onClick={goBack}>
+            <IconButton className={classes.backButton} onClick={goBack} size="large">
               <KeyboardBackspaceIcon />
             </IconButton>
             <Divider className={classes.divider} orientation="vertical" flexItem />

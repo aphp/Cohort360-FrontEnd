@@ -126,7 +126,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
                 classes={{ root: classes.clearDate /*, label: classes.buttonLabel*/ }}
                 color="primary"
                 onClick={() => _onChangeValue('startDate', null)}
-              >
+                size="large">
                 <ClearIcon />
               </IconButton>
             )}
@@ -150,7 +150,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
                 classes={{ root: classes.clearDate /*, label: classes.buttonLabel*/ }}
                 color="primary"
                 onClick={() => _onChangeValue('endDate', null)}
-              >
+                size="large">
                 <ClearIcon />
               </IconButton>
             )}

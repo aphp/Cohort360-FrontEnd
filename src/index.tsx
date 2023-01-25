@@ -1,7 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { createTheme, ThemeProvider, Theme, StyledEngineProvider, adaptV4Theme } from '@mui/material/styles';
 import App from './App'
+
+
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
+
 
 // import { Theme } from '@mui/material/styles'
 
@@ -10,7 +17,7 @@ import App from './App'
 //   interface DefaultTheme extends Theme {}
 // }
 
-const theme = createTheme({
+const theme = createTheme(adaptV4Theme({
   palette: {
     common: {
       black: '#153D8A'
@@ -75,12 +82,14 @@ const theme = createTheme({
       textTransform: 'none'
     }
   }
-})
+}))
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 
 root.render(
-  <ThemeProvider theme={theme}>
-    <App />
-  </ThemeProvider>
+  <StyledEngineProvider injectFirst>
+    <ThemeProvider theme={theme}>
+      <App />
+    </ThemeProvider>
+  </StyledEngineProvider>
 )

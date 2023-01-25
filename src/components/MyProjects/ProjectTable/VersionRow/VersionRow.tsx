@@ -85,7 +85,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
             <TableCell align="center" style={{ width: 125 }}>
               Nombre de patients
             </TableCell>
-            <Hidden mdDown>
+            <Hidden lgDown>
               <TableCell align="center" style={{ width: 175 }}>
                 Date
               </TableCell>
@@ -134,7 +134,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                     </IconButton>
                   </TableCell>
                   <TableCell align="center">
-                    <IconButton onClick={() => onSetCohortFavorite(historyRow)}>
+                    <IconButton onClick={() => onSetCohortFavorite(historyRow)} size="large">
                       <FavStar favorite={historyRow.favorite} />
                     </IconButton>
                   </TableCell>
@@ -160,7 +160,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                     </Link>
                   </TableCell>
                   <TableCell align="center">{displayDigit(historyRow.result_size ?? 0)}</TableCell>
-                  <Hidden mdDown>
+                  <Hidden lgDown>
                     <TableCell align="center">
                       {moment(historyRow.modified_at).format('DD/MM/YYYY [à] HH:mm')}
                     </TableCell>
@@ -174,7 +174,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                             ? () => setSelectedExportableCohort(historyRow.fhir_group_id ?? '')
                             : () => null
                         }
-                      >
+                        size="large">
                         <ExportIcon />
                       </IconButton>
                     </TableCell>

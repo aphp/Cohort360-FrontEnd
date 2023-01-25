@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     alignItems: 'center',
     width: 'calc(100% - 80px)',
     position: 'relative',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       flexWrap: 'wrap'
     }
   },

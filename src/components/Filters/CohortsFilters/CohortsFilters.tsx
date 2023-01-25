@@ -210,7 +210,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
                 classes={{ root: classes.clearDate /*label: classes.buttonLabel*/ }}
                 color="primary"
                 onClick={() => setStartDate(null)}
-              >
+                size="large">
                 <ClearIcon />
               </IconButton>
             )}
@@ -234,7 +234,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
                 classes={{ root: classes.clearDate /*label: classes.buttonLabel*/ }}
                 color="primary"
                 onClick={() => setEndDate(null)}
-              >
+                size="large">
                 <ClearIcon />
               </IconButton>
             )}
