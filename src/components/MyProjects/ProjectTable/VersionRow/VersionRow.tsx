@@ -174,7 +174,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                             ? () => setSelectedExportableCohort(historyRow.fhir_group_id ?? '')
                             : () => null
                         }
-                        size="large">
+                        size="large"
+                      >
                         <ExportIcon />
                       </IconButton>
                     </TableCell>

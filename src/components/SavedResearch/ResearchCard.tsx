@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { Button, CircularProgress, Grid, IconButton, InputAdornment, InputBase, Pagination, Typography } from '@mui/material'
+import {
+  Button,
+  CircularProgress,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputBase,
+  Pagination,
+  Typography
+} from '@mui/material'
 
 import ClearIcon from '@mui/icons-material/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
@@ -167,11 +176,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
                 </InputAdornment>
               }
             />
-            <IconButton
-              type="submit"
-              aria-label="search"
-              onClick={() => onFetchCohorts()}
-              size="large">
+            <IconButton type="submit" aria-label="search" onClick={() => onFetchCohorts()} size="large">
               <SearchIcon fill="#ED6D91" height="15px" />
             </IconButton>
           </Grid>

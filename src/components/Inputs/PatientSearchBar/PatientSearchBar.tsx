@@ -101,7 +101,9 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
           onKeyDown={onKeyDown}
           endAdornment={
             <InputAdornment position="end">
-              <IconButton onClick={handleClearInput} size="large">{_searchInput && <ClearIcon />}</IconButton>
+              <IconButton onClick={handleClearInput} size="large">
+                {_searchInput && <ClearIcon />}
+              </IconButton>
             </InputAdornment>
           }
         />

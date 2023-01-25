@@ -39,18 +39,15 @@ const ProjectSearchBar: React.FC<ProjectSearchBarProps> = ({ setSearchInput }) =
                   setSearch('')
                   setSearchInput('')
                 }}
-                size="large">
+                size="large"
+              >
                 <ClearIcon />
               </IconButton>
             </InputAdornment>
           )
         }
       />
-      <IconButton
-        onClick={() => setSearchInput(search)}
-        aria-label="search"
-        color="secondary"
-        size="large">
+      <IconButton onClick={() => setSearchInput(search)} aria-label="search" color="secondary" size="large">
         <SearchIcon fill="#ED6D91" height="15px" />
       </IconButton>
     </Grid>

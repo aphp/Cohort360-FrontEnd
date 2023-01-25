@@ -67,34 +67,31 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
 
   return (
     <>
-    <TableRow key={row.id} className={classes.tableBodyRows}>
-      <TableCell align="left">{row.NDA}</TableCell>
-      <TableCell align="left">
-        {row.date ? new Date(row.date).toLocaleDateString('fr-FR') : 'Date inconnue'}
-      </TableCell>
-      <TableCell align="left">{row.type}</TableCell>
-      <TableCell align="left" className={classes.description}>
-        {row.title}
-      </TableCell>
-      <TableCell align="center">{row.serviceProvider}</TableCell>
-      <TableCell align="center">{getStatusShip(row.status)}</TableCell>
-      <TableCell align="center">
-        <IconButton
-          disabled={row.event === undefined}
-          onClick={() => setDocumentDialogOpen(true)}
-          size="large">
-          <PdfIcon height="30px" fill={row.event === undefined ? '#CBCFCF' : '#ED6D91'} />
-        </IconButton>
-      </TableCell>
-    </TableRow>
+      <TableRow key={row.id} className={classes.tableBodyRows}>
+        <TableCell align="left">{row.NDA}</TableCell>
+        <TableCell align="left">
+          {row.date ? new Date(row.date).toLocaleDateString('fr-FR') : 'Date inconnue'}
+        </TableCell>
+        <TableCell align="left">{row.type}</TableCell>
+        <TableCell align="left" className={classes.description}>
+          {row.title}
+        </TableCell>
+        <TableCell align="center">{row.serviceProvider}</TableCell>
+        <TableCell align="center">{getStatusShip(row.status)}</TableCell>
+        <TableCell align="center">
+          <IconButton disabled={row.event === undefined} onClick={() => setDocumentDialogOpen(true)} size="large">
+            <PdfIcon height="30px" fill={row.event === undefined ? '#CBCFCF' : '#ED6D91'} />
+          </IconButton>
+        </TableCell>
+      </TableRow>
 
-    <DocumentViewer
-      deidentified={deidentified ?? false}
-      open={documentDialogOpen}
-      handleClose={() => setDocumentDialogOpen(false)}
-      documentId={row.id ?? ''}
-      list={groupId ? groupId.split(',') : undefined}
-    />
+      <DocumentViewer
+        deidentified={deidentified ?? false}
+        open={documentDialogOpen}
+        handleClose={() => setDocumentDialogOpen(false)}
+        documentId={row.id ?? ''}
+        list={groupId ? groupId.split(',') : undefined}
+      />
     </>
   )
 }

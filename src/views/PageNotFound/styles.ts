@@ -1,4 +1,4 @@
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from '@mui/styles/makeStyles'
 
 const skyBlue = '#5BC5F2'
 const bgColor = '#E6F1FD'

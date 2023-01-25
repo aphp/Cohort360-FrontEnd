@@ -200,11 +200,7 @@ const DataTableCompositionLine: React.FC<{
         </TableCell>
 
         <TableCell>
-          <IconButton
-            onClick={() => setOpen(documentId ?? '')}
-            disabled={event === undefined}
-            size="large"
-          >
+          <IconButton onClick={() => setOpen(documentId ?? '')} disabled={event === undefined} size="large">
             <PdfIcon height="30px" fill={event === undefined ? '#CBCFCF' : '#ED6D91'} />
           </IconButton>
 

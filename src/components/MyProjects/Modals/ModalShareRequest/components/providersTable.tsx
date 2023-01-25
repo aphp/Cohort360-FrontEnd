@@ -98,24 +98,25 @@ const ProvidersTable: React.FC<ProvidersTableProps> = ({
             providersList.map((provider: Provider) => {
               return (
                 provider && (
-                <TableRow key={provider.provider_id} className={classes.tableBodyRows} hover>
-                  <TableCell align="center">{provider.provider_source_value}</TableCell>
-                  <TableCell align="center">{provider.lastname?.toLocaleUpperCase()}</TableCell>
-                  <TableCell align="center">{provider.firstname}</TableCell>
-                  <TableCell align="center">{provider.email ?? '-'}</TableCell>
-                  <TableCell align="center">
-                    <Tooltip title="Supprimer l'utilisateur" style={{ padding: '0 12px' }}>
-                      <IconButton
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          deleteItem(provider)
-                        }}
-                        size="large">
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
+                  <TableRow key={provider.provider_id} className={classes.tableBodyRows} hover>
+                    <TableCell align="center">{provider.provider_source_value}</TableCell>
+                    <TableCell align="center">{provider.lastname?.toLocaleUpperCase()}</TableCell>
+                    <TableCell align="center">{provider.firstname}</TableCell>
+                    <TableCell align="center">{provider.email ?? '-'}</TableCell>
+                    <TableCell align="center">
+                      <Tooltip title="Supprimer l'utilisateur" style={{ padding: '0 12px' }}>
+                        <IconButton
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            deleteItem(provider)
+                          }}
+                          size="large"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
                 )
               )
             })

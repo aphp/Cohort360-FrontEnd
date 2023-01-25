@@ -206,7 +206,8 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
                 classes={{ root: classes.clearDate /*label: classes.buttonLabel*/ }}
                 color="primary"
                 onClick={() => setStartDate(null)}
-                size="large">
+                size="large"
+              >
                 <ClearIcon />
               </IconButton>
             )}
@@ -230,7 +231,8 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
                 classes={{ root: classes.clearDate /*label: classes.buttonLabel*/ }}
                 color="primary"
                 onClick={() => setEndDate(null)}
-                size="large">
+                size="large"
+              >
                 <ClearIcon />
               </IconButton>
             )}
