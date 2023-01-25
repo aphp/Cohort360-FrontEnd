@@ -44,7 +44,7 @@ const ControlPanel: React.FC<{
   const [openShareRequestModal, setOpenShareRequestModal] = useState<boolean>(false)
   const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<'success' | 'error' | null>(null)
   const wrapperSetShareSuccessOrFailMessage = useCallback(
-    (val) => {
+    (val: any) => {
       setShareSuccessOrFailMessage(val)
     },
     [setShareSuccessOrFailMessage]
