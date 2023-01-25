@@ -1,7 +1,19 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
+import _ from 'lodash'
 
 import { Alert } from '@mui/lab'
-import { Button, Divider, FormLabel, Grid, IconButton, Switch, Typography, TextField, Checkbox } from '@mui/material'
+import {
+  Button,
+  Divider,
+  FormLabel,
+  Grid,
+  IconButton,
+  Switch,
+  Typography,
+  TextField,
+  Checkbox,
+  CircularProgress
+} from '@mui/material'
 import Autocomplete from '@mui/lab/Autocomplete'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
@@ -10,11 +22,11 @@ import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
 import { InputSearchDocument } from 'components/Inputs'
 
-import { debounce } from 'utils/debounce'
-
 import useStyles from './styles'
 
-import { DocumentDataType } from 'types'
+import { DocType, DocumentDataType, errorDetails, searchInputError } from 'types'
+import services from 'services/aphp'
+import { useDebounce } from 'utils/debounce'
 
 type TestGeneratedFormProps = {
   criteria: any
@@ -27,7 +39,6 @@ const defaultComposition: DocumentDataType = {
   type: 'Composition',
   title: 'Critère de document',
   search: '',
-  regex_search: '',
   docType: [],
   occurrence: 1,
   occurrenceComparator: '>=',
@@ -46,63 +57,45 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
   const [error, setError] = useState(false)
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
-  const [inputMode, setInputMode] = useState<'simple' | 'regex'>(defaultValues.regex_search ? 'regex' : 'simple')
-  const [errorRegex, setErrorRegex] = useState(false)
+
+  const [searchCheckingLoading, setSearchCheckingLoading] = useState(false)
+
+  const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
+
+  const debouncedSearchItem = useDebounce(500, defaultValues.search)
 
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = () => {
-    if (
-      defaultValues &&
-      defaultValues.search?.length === 0 &&
-      defaultValues.regex_search?.length === 0 &&
-      defaultValues.docType?.length === 0
-    ) {
+    if (defaultValues && defaultValues.search?.length === 0 && defaultValues.docType?.length === 0) {
       return setError(true)
     }
     onChangeSelectedCriteria(defaultValues)
   }
 
-  const checkRegex = useMemo(() => {
-    return debounce((query: string) => {
-      try {
-        // Try to create regex
-        new RegExp(query)
-        if (query.search(/\\$/) !== -1 && query.search(/\\\\$/) === -1) {
-          // If query contain '\' but no '\\', set error variable
-          setErrorRegex(true)
-          return
-        }
-        setErrorRegex(false)
-      } catch (error) {
-        // If error, set error variable
-        setErrorRegex(true)
-      }
-    }, 750)
-  }, [])
-
   const _onChangeValue = (key: string, value: any) => {
     const _defaultValues = defaultValues ? { ...defaultValues } : {}
     _defaultValues[key] = value
     setDefaultValues(_defaultValues)
-
-    if (key === 'regex_search' && inputMode === 'regex') {
-      checkRegex(value)
-    }
   }
 
-  const defaultValuesDocType = defaultValues.docType
-    ? defaultValues.docType.map((docType: any) => {
-        const criteriaDocType = criteria.data.docTypes
-          ? criteria.data.docTypes.find((g: any) => g.id === docType.id)
-          : null
-        return {
-          id: docType.id,
-          label: docType.label ? docType.label : criteriaDocType?.label ?? '?',
-          type: docType.type
-        }
-      })
-    : []
+  useEffect(() => {
+    const checkDocumentSearch = async () => {
+      try {
+        setSearchCheckingLoading(true)
+        setSearchInputError({ ...searchInputError, isError: true })
+        const checkDocumentSearch = await services.cohorts.checkDocumentSearchInput(defaultValues.search)
+
+        setSearchInputError(checkDocumentSearch)
+        setSearchCheckingLoading(false)
+      } catch (error) {
+        console.error('Erreur lors de la vérification du champ de recherche', error)
+        setSearchCheckingLoading(false)
+      }
+    }
+
+    checkDocumentSearch()
+  }, [debouncedSearchItem])
 
   return (
     <Grid className={classes.root}>
@@ -166,24 +159,43 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
           <Grid className={classes.inputItem}>
             <InputSearchDocument
               placeholder="Recherche dans les documents"
-              defaultSearchInput={inputMode === 'simple' ? defaultValues.search : defaultValues.regex_search}
-              setDefaultSearchInput={(newSearchInput: string) =>
-                _onChangeValue(inputMode === 'simple' ? 'search' : 'regex_search', newSearchInput)
-              }
-              defaultInputMode={inputMode}
-              setdefaultInputMode={(newInputMode: 'simple' | 'regex') => {
-                setInputMode(newInputMode)
-                setDefaultValues((prevState: any) => ({
-                  ...prevState,
-                  search: newInputMode !== 'simple' ? '' : prevState.regex_search,
-                  regex_search: newInputMode === 'simple' ? '' : prevState.search
-                }))
-              }}
+              defaultSearchInput={defaultValues.search}
+              setDefaultSearchInput={(newSearchInput: string) => _onChangeValue('search', newSearchInput)}
               onSearchDocument={() => null}
               noClearIcon
               noSearchIcon
-              sqareInput
+              squareInput
             />
+            {searchCheckingLoading && (
+              <Grid container item alignItems="center" direction="column" justifyContent="center">
+                <CircularProgress />
+                <Typography>Vérification du champ de recherche en cours...</Typography>
+              </Grid>
+            )}
+            {!searchCheckingLoading && searchInputError && searchInputError.isError && (
+              <Grid className={classes.errorContainer}>
+                <Typography style={{ fontWeight: 'bold' }}>
+                  Des erreurs ont été détectées dans votre recherche :
+                </Typography>
+                {!searchInputError.errorsDetails && (
+                  <Typography>Vérifiez que le champ de recherche contient au moins une lettre.</Typography>
+                )}
+                {searchInputError.errorsDetails &&
+                  searchInputError.errorsDetails.map((detail: errorDetails, count: number) => (
+                    <Typography key={count}>
+                      {`- ${
+                        detail.errorPositions && detail.errorPositions.length > 0
+                          ? detail.errorPositions.length === 1
+                            ? `Au caractère ${detail.errorPositions[0]} : `
+                            : `Aux caractères ${detail.errorPositions.join(', ')} : `
+                          : ''
+                      }
+              ${detail.errorName ? `${detail.errorName}.` : ''}
+              ${detail.errorSolution ? `${detail.errorSolution}.` : ''}`}
+                    </Typography>
+                  ))}
+              </Grid>
+            )}
           </Grid>
 
           <Autocomplete
@@ -192,33 +204,30 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             className={classes.inputItem}
             options={criteria?.data?.docTypes || []}
             getOptionLabel={(option) => option.label}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
-            value={defaultValuesDocType}
+            isOptionEqualToValue={(option, value) => _.isEqual(option, value)}
+            // value={defaultValuesDocType}
+            value={defaultValues.docType}
             onChange={(e, value) => _onChangeValue('docType', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Type de document" />}
+            renderInput={(params) => <TextField {...params} variant="outlined" label="Types de documents" />}
             groupBy={(doctype) => doctype.type}
             disableCloseOnSelect
             renderGroup={(docType: any) => {
               const currentDocTypeList = criteria?.data?.docTypes
-                ? criteria?.data?.docTypes.filter((doc: any) => doc.type === docType.group)
+                ? criteria?.data?.docTypes.filter((doc: DocType) => doc.type === docType.group)
                 : []
-              const currentSelectedDocTypeList = defaultValuesDocType
-                ? defaultValuesDocType.filter((doc: any) => doc.type === docType.group)
+
+              const currentSelectedDocTypeList = defaultValues.docType
+                ? defaultValues.docType.filter((doc: DocType) => doc.type === docType.group)
                 : []
 
               const onClick = () => {
                 if (currentDocTypeList.length === currentSelectedDocTypeList.length) {
                   _onChangeValue(
                     'docType',
-                    defaultValuesDocType.filter((doc: any) => doc.type !== docType.group)
+                    defaultValues.docType.filter((doc: DocType) => doc.type !== docType.group)
                   )
                 } else {
-                  _onChangeValue(
-                    'docType',
-                    [...defaultValuesDocType, ...currentDocTypeList].filter(
-                      (item, index, array) => array.indexOf(item) === index
-                    )
-                  )
+                  _onChangeValue('docType', _.uniqWith([...defaultValues.docType, ...currentDocTypeList], _.isEqual))
                 }
               }
 
@@ -255,7 +264,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
           )}
           <Button
             onClick={_onSubmit}
-            disabled={errorRegex}
+            disabled={searchInputError?.isError}
             type="submit"
             form="documents-form"
             color="primary"

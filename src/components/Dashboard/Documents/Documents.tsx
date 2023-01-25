@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { CssBaseline, Grid } from '@mui/material'
+import { Checkbox, CssBaseline, Grid, Typography } from '@mui/material'
 import Alert from '@mui/lab/Alert'
 
 import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
@@ -10,9 +10,9 @@ import MasterChips from 'components/MasterChips/MasterChips'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import { CohortComposition, DocumentFilters, Order, DTTB_ResultsType as ResultsType } from 'types'
+import { CohortComposition, DocumentFilters, Order, DTTB_ResultsType as ResultsType, searchInputError } from 'types'
 
-import services from 'services'
+import services from 'services/aphp'
 
 import { buildDocumentFiltersChips } from 'utils/chips'
 
@@ -40,6 +40,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     nda: '',
     ipp: '',
     selectedDocTypes: [],
+    onlyPdfAvailable: deidentifiedBoolean ? false : true,
     startDate: null,
     endDate: null
   })
@@ -49,6 +50,16 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     orderDirection: 'asc'
   })
 
+  const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
+
+  const checkDocumentSearch = async () => {
+    const checkDocumentSearch = await services.cohorts.checkDocumentSearchInput(searchInput)
+
+    setSearchInputError(checkDocumentSearch)
+
+    return checkDocumentSearch
+  }
+
   const onSearchDocument = async (newPage: number) => {
     if (searchInput) {
       setSearchMode(true)
@@ -56,6 +67,14 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
       setSearchMode(false)
     }
     setLoadingStatus(true)
+
+    const searchInputError = await checkDocumentSearch()
+    if (searchInputError && searchInputError.isError) {
+      setDocuments([])
+      setLoadingStatus(false)
+      return
+    }
+
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
 
     const result = await services.cohorts.fetchDocuments(
@@ -67,6 +86,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
       selectedDocTypesCodes,
       filters.nda,
       filters.ipp ?? '',
+      filters.onlyPdfAvailable,
       filters.startDate,
       filters.endDate,
       groupId
@@ -93,6 +113,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const handleChangePage = (newPage = 1) => {
     setPage(newPage)
+
     onSearchDocument(newPage)
   }
 
@@ -117,8 +138,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const onFilterValue = (newInput: string = searchInput) => {
     if (newInput) {
-      // check if /(.)* exist at the begining of the string and erase it
-      //check if (.)*/ exist at the end of the string and erase it
+      // check if /(.)* exist at the beginning of the string and erase it
+      // check if (.)*/ exist at the end of the string and erase it
       const newInput1 = newInput.replace(/^\/\(\.\)\*|\(\.\)\*\/$/gi, '')
       const newInput2 = newInput1.replace(new RegExp('\\\\/|\\\\"', 'g'), function (m) {
         switch (m) {
@@ -179,11 +200,13 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         <CssBaseline />
         <Grid container item xs={11} justifyContent="space-between">
           <DataTableTopBar
+            loading={loadingStatus}
             results={[documentsResult, patientsResult]}
             searchBar={{
               type: 'document',
               value: searchInput ? onFilterValue() : '',
-              onSearch: (newSearchInput: string) => setSearchInput(newSearchInput)
+              onSearch: (newSearchInput: string) => setSearchInput(newSearchInput),
+              error: searchInputError
             }}
             buttons={[
               {
@@ -207,6 +230,17 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
               remplacées par des informations fictives). Vous retrouverez les données personnelles de votre patient en
               cliquant sur l'aperçu.
             </Alert>
+          )}
+
+          {!deidentifiedBoolean && (
+            <Grid container item alignItems="center" justifyContent="flex-end">
+              <Checkbox
+                checked={filters.onlyPdfAvailable}
+                onChange={() => onChangeOptions('onlyPdfAvailable', !filters.onlyPdfAvailable)}
+                color="primary"
+              />
+              <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
+            </Grid>
           )}
 
           <DataTableComposition

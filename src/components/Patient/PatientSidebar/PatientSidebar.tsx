@@ -11,7 +11,7 @@ import PatientSidebarItem from './PatientSidebarItem/PatientSidebarItem'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 
 import { getAge } from 'utils/age'
-import services from 'services'
+import services from 'services/aphp'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortPatient, PatientFilters as PatientFiltersType, SearchByTypes, Sort, VitalStatus } from 'types'
 
@@ -76,6 +76,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       filters.vitalStatus,
       sort.sortBy,
       sort.sortDirection,
+      deidentifiedBoolean,
       groupId.join(',')
     )
     setPatientsList(patientsResp?.originalPatients ?? [])
@@ -108,7 +109,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
     submit && setShowFilterChip(true)
   }
 
-  const handleCloseSortDialog = () => () => {
+  const handleCloseSortDialog = () => {
     setOpenSort(false)
   }
 
@@ -149,7 +150,6 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
         onClickSortButton={() => setOpenSort(true)}
         openSort={openSort}
         onCloseSort={handleCloseSortDialog}
-        onSubmitSort={handleCloseSortDialog}
         sort={sort}
         onChangeSort={setSort}
       />

@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography'
 
 import { Document, Page, pdfjs } from 'react-pdf'
 import { FHIR_API_URL } from '../../constants'
-import services from 'services'
+import services from 'services/aphp'
 
 import Watermark from 'assets/images/watermark_pseudo.svg'
 

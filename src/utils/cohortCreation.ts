@@ -1,12 +1,15 @@
 import moment from 'moment'
 
-import services from 'services'
-import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType } from 'types'
+import services from 'services/aphp'
+import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType, DocType } from 'types'
 
-import { capitalizeFirstLetter } from 'utils/capitalize'
-import docTypes from 'assets/docTypes.json'
+import { docTypes } from 'assets/docTypes.json'
 
 const REQUETEUR_VERSION = 'v1.2.1'
+
+// TODO: à changer quand ticket fhir ok vvvvv
+const RESSOURCE_TYPE_IPP_LIST: 'IPPList' = 'IPPList'
+const IPP_LIST_FHIR = 'identifier-simple'
 
 const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
 const PATIENT_GENDER = 'gender' // ok
@@ -54,7 +57,7 @@ const MEDICATION_PRESCRIPTION_TYPE = 'type' // ok
 const MEDICATION_ADMINISTRATION = 'route' // ok
 
 const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
-const OBSERVATION_CODE = 'codeList'
+const OBSERVATION_CODE = 'part-of'
 const OBSERVATION_CODE_ALL_HIERARCHY = 'code'
 const OBSERVATION_VALUE = 'value-quantity-value'
 
@@ -91,6 +94,7 @@ type RequeteurCriteriaType = {
     | typeof RESSOURCE_TYPE_MEDICATION_REQUEST
     | typeof RESSOURCE_TYPE_MEDICATION_ADMINISTRATION
     | typeof RESSOURCE_TYPE_OBSERVATION
+    | typeof RESSOURCE_TYPE_IPP_LIST
   filterFhir: string
   occurrence?: {
     n: number
@@ -326,23 +330,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
         `status=final&type:not=doc-impor&empty=false`,
         `${criterion.search ? `${COMPOSITION_TEXT}=${encodeURIComponent(criterion.search)}` : ''}`,
         `${
-          criterion.regex_search
-            ? `${COMPOSITION_TEXT}=${encodeURIComponent(
-                `/(.)*${criterion.regex_search.replace(/[/"]/g, function (m) {
-                  switch (m) {
-                    case '/':
-                      return '\\/'
-                    case '"':
-                      return '\\"'
-                  }
-                  return m
-                })}(.)*/`
-              )}`
-            : ''
-        }`,
-        `${
           criterion.docType && criterion.docType.length > 0
-            ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: any) => docType.id).reduce(searchReducer)}`
+            ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: DocType) => docType.code).reduce(searchReducer)}`
             : ''
         }`
       ]
@@ -444,7 +433,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       if (criterion.valueComparator) {
         switch (criterion.valueComparator) {
           case '<':
-            valueComparatorFilter = 'l'
+            valueComparatorFilter = 'lt'
             break
           case '<=':
             valueComparatorFilter = 'le'
@@ -453,7 +442,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
             valueComparatorFilter = ''
             break
           case '>':
-            valueComparatorFilter = 'g'
+            valueComparatorFilter = 'gt'
             break
           case '>=':
             valueComparatorFilter = 'ge'
@@ -486,6 +475,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
             : ''
         }`
       ]
+        .filter((elem) => elem)
+        .reduce(filterReducer)
+      break
+    }
+
+    case RESSOURCE_TYPE_IPP_LIST: {
+      filterFhir = [`${criterion.search ? `${IPP_LIST_FHIR}=${criterion.search}` : ''}`]
         .filter((elem) => elem)
         .reduce(filterReducer)
       break
@@ -524,14 +520,22 @@ export function buildRequest(
           resourceType: item.type ?? RESSOURCE_TYPE_PATIENT,
           filterFhir: constructFilterFhir(item),
           occurrence:
-            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_ENCOUNTER) && item.occurrence
+            !(
+              item.type === RESSOURCE_TYPE_PATIENT ||
+              item.type === RESSOURCE_TYPE_ENCOUNTER ||
+              item.type === RESSOURCE_TYPE_IPP_LIST
+            ) && item.occurrence
               ? {
                   n: item.occurrence,
                   operator: item?.occurrenceComparator
                 }
               : undefined,
           dateRangeList:
-            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_ENCOUNTER) &&
+            !(
+              item.type === RESSOURCE_TYPE_PATIENT ||
+              item.type === RESSOURCE_TYPE_ENCOUNTER ||
+              item.type === RESSOURCE_TYPE_IPP_LIST
+            ) &&
             (item.startOccurrence || item.endOccurrence)
               ? [
                   {
@@ -545,7 +549,8 @@ export function buildRequest(
                 ]
               : undefined,
           encounterDateRange:
-            item.type !== RESSOURCE_TYPE_PATIENT && (item.encounterStartDate || item.encounterEndDate)
+            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_IPP_LIST) &&
+            (item.encounterStartDate || item.encounterEndDate)
               ? {
                   minDate: item.encounterStartDate
                     ? moment(item.encounterStartDate).format('YYYY-MM-DD[T00:00:00Z]')
@@ -638,7 +643,7 @@ export async function unbuildRequest(_json: string) {
   } = json
 
   /**
-   * Retrieve popultion
+   * Retrieve population
    */
   if (typeof services.perimeters.fetchPerimeterInfoForRequeteur !== 'function') {
     return {
@@ -1020,7 +1025,7 @@ export async function unbuildRequest(_json: string) {
 
         if (element.filterFhir) {
           const filters = element.filterFhir
-            // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
+            // This `replaceAll` is necessary because if a user searches `_text=first && second` we have a bug with filterFhir.split('&')
             .split('&')
             .map((elem) => elem.split('='))
 
@@ -1029,27 +1034,14 @@ export async function unbuildRequest(_json: string) {
             const value = filter ? filter[1] : null
             switch (key) {
               case COMPOSITION_TEXT: {
-                const isRegex: boolean = value ? decodeURIComponent(value).search(/\/.*\//) === 0 : false
-
-                // This `replaceAll` is necesary because if an user search `_text=first && second` we have a bug with filterFhir.split('&')
-                if (isRegex) {
-                  currentCriterion.regex_search = value ? decodeURIComponent(value).replaceAll('/', '') : ''
-                } else {
-                  currentCriterion.search = value ? decodeURIComponent(value) : ''
-                }
+                currentCriterion.search = value ? decodeURIComponent(value) : ''
                 break
               }
               case COMPOSITION_TYPE: {
                 const docTypeIds = value?.split(',')
-                const newDocTypeIds = docTypes.docTypes
-                  .filter((docType: { code: string; label: string; type: string }) =>
-                    docTypeIds?.find((docTypeId) => docTypeId === docType.code)
-                  )
-                  .map((_docType: { code: string; label: string; type: string }) => ({
-                    id: _docType.code,
-                    label: capitalizeFirstLetter(_docType.label),
-                    type: _docType.type
-                  }))
+                const newDocTypeIds = docTypes.filter((docType: DocType) =>
+                  docTypeIds?.find((docTypeId) => docTypeId === docType.code)
+                )
 
                 if (!newDocTypeIds) continue
 
@@ -1363,9 +1355,9 @@ export async function unbuildRequest(_json: string) {
                 if (value?.search('le') === 0) {
                   valueComparator = '<='
                   valueMin = parseInt(value?.replace('le', '')) ?? 0
-                } else if (value?.search('l') === 0) {
+                } else if (value?.search('lt') === 0) {
                   valueComparator = '<'
-                  valueMin = parseInt(value?.replace('l', '')) ?? 0
+                  valueMin = parseInt(value?.replace('lt', '')) ?? 0
                 } else if (value?.search('ge') === 0) {
                   if (nbValueComparators === 2) {
                     valueComparator = '<x>'
@@ -1374,9 +1366,9 @@ export async function unbuildRequest(_json: string) {
                     valueComparator = '>='
                     valueMin = parseInt(value?.replace('ge', '')) ?? 0
                   }
-                } else if (value?.search('g') === 0) {
+                } else if (value?.search('gt') === 0) {
                   valueComparator = '>'
-                  valueMin = parseInt(value?.replace('g', '')) ?? 0
+                  valueMin = parseInt(value?.replace('gt', '')) ?? 0
                 } else {
                   valueComparator = '='
                   valueMin = parseInt(value ?? '0')
@@ -1397,9 +1389,35 @@ export async function unbuildRequest(_json: string) {
         }
         break
       }
+      case RESSOURCE_TYPE_IPP_LIST: {
+        currentCriterion.title = 'Critère de liste IPP'
+        currentCriterion.search = currentCriterion.search ? currentCriterion.search : null
+
+        if (element.filterFhir) {
+          const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
+
+          for (const filter of filters) {
+            const key = filter ? filter[0] : null
+            const value = filter ? filter[1] : null
+
+            switch (key) {
+              case IPP_LIST_FHIR: {
+                currentCriterion.search = value ?? ''
+                break
+              }
+              default:
+                currentCriterion.error = true
+                break
+            }
+          }
+        }
+        break
+      }
+
       default:
         break
     }
+
     return currentCriterion
   }
 
@@ -1501,7 +1519,7 @@ export async function unbuildRequest(_json: string) {
 }
 
 /**
- * This function call all functions for fetch data contains inside `src/components/CreationCohort/DataList_Criteria` list
+ * This function calls all functions to fetch data contained inside `src/components/CreationCohort/DataList_Criteria` list
  *
  */
 export const getDataFromFetch = async (
@@ -1542,6 +1560,7 @@ export const getDataFromFetch = async (
                   !(
                     currentcriterion.type === RESSOURCE_TYPE_PATIENT ||
                     currentcriterion.type === RESSOURCE_TYPE_ENCOUNTER ||
+                    currentcriterion.type === RESSOURCE_TYPE_IPP_LIST ||
                     currentcriterion.type === RESSOURCE_TYPE_COMPOSITION
                   ) &&
                   currentcriterion.code &&
@@ -1568,14 +1587,12 @@ export const getDataFromFetch = async (
           }
           default:
             if (
-              !oldCriterion ||
-              !oldCriterion?.data ||
-              !oldCriterion?.data?.[dataKey] ||
+              oldCriterion &&
+              oldCriterion?.data &&
+              oldCriterion?.data?.[dataKey] &&
               oldCriterion?.data?.[dataKey] === 'loading'
             ) {
               _criterion.data[dataKey] = await _criterion.fetch[fetchKey]()
-            } else {
-              _criterion.data[dataKey] = oldCriterion?.data?.[dataKey]
             }
             break
         }

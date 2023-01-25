@@ -156,6 +156,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   return (
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
+        loading={loading}
         tabs={{
           list: [
             { label: 'Diagnostics CIM10', value: 'diagnostic' },

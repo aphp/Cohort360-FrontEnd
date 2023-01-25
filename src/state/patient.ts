@@ -26,7 +26,7 @@ import {
 
 import { logout } from './me'
 
-import services from 'services'
+import services from 'services/aphp'
 
 export type PatientState = null | {
   loading: boolean
@@ -330,6 +330,7 @@ type FetchDocumentsParams = {
       selectedDocTypes: string[]
       startDate: string | null
       endDate: string | null
+      onlyPdfAvailable: boolean
     }
     sort?: {
       by: string
@@ -359,6 +360,25 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
       const nda = options?.filters?.nda ?? ''
       const startDate = options?.filters?.startDate ?? null
       const endDate = options?.filters?.endDate ?? null
+      const onlyPdfAvailable = options?.filters?.onlyPdfAvailable ?? false
+
+      if (searchInput) {
+        const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput)
+
+        if (searchInputError && searchInputError.isError) {
+          return {
+            documents: {
+              loading: false,
+              count: 0,
+              total: 0,
+              list: [],
+              page: 1,
+              options,
+              searchInputError: searchInputError
+            } as IPatientDocuments
+          }
+        }
+      }
 
       const documentsResponse = await services.patients.fetchDocuments(
         sortBy,
@@ -368,6 +388,7 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
         searchInput,
         selectedDocTypes,
         nda,
+        onlyPdfAvailable,
         startDate,
         endDate,
         groupId

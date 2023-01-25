@@ -6,9 +6,6 @@ COPY src src
 COPY public public
 COPY build build
 
-# Curl is needed inside the pod to check liveness
-RUN apt-get update -y && apt-get install -y curl
-
 # Configure the nginx inside the docker image
 COPY .templates/nginx.conf /etc/nginx/conf.d/
 

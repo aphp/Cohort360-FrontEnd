@@ -36,7 +36,6 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
   const classes = useStyles()
 
   const [_status, setStatus] = useState<ValueSet[]>(filters.status)
-  const [_type, setType] = useState<string>(filters.type)
   const [_favorite, setFavorite] = useState<string>(filters.favorite)
   const [_minPatients, setMinPatients] = useState<null | string>(filters.minPatients)
   const [_maxPatients, setMaxPatients] = useState<null | string>(filters.maxPatients)
@@ -62,7 +61,6 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
 
   useEffect(() => {
     setStatus(filters.status)
-    setType(filters.type)
     setFavorite(filters.favorite)
     setMinPatients(filters.minPatients)
     setMaxPatients(filters.maxPatients)
@@ -96,10 +94,6 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
     if (value) setStatus(value)
   }
 
-  const _onChangeType = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setType(value)
-  }
-
   const _onChangeFavorite = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setFavorite(value)
   }
@@ -113,13 +107,12 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
   }
 
   const _onSubmit = () => {
-    const newStartDate = moment(_startDate).isValid() ? moment(_startDate).format('YYYY-MM-DD') : null
-    const newEndDate = moment(_endDate).isValid() ? moment(_endDate).format('YYYY-MM-DD') : null
+    const newStartDate = moment(_startDate).isValid() ? moment(_startDate).format('YYYY-MM-DD h:mm:ss') : null
+    const newEndDate = moment(_endDate).isValid() ? moment(_endDate).format('YYYY-MM-DD h:mm:ss') : null
 
     onChangeFilters({
       ...filters,
       status: _status,
-      type: _type,
       favorite: _favorite,
       minPatients: _minPatients,
       maxPatients: _maxPatients,
@@ -149,15 +142,6 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
         </Grid>
 
         <Grid container direction="column" className={classes.filter}>
-          <Typography variant="h3">Type de cohortes :</Typography>
-          <RadioGroup name="cohortType" value={_type} onChange={_onChangeType} row={true}>
-            <FormControlLabel value="all" control={<Radio />} label="Toutes les cohortes" />
-            <FormControlLabel value="MY_COHORTS" control={<Radio />} label="Cohort360" />
-            <FormControlLabel value="IMPORT_I2B2" control={<Radio />} label="Cohortes I2B2" />
-          </RadioGroup>
-        </Grid>
-
-        <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Favoris :</Typography>
           <RadioGroup name="favorite" value={_favorite} onChange={_onChangeFavorite} row={true}>
             <FormControlLabel value="all" control={<Radio />} label="Toutes les cohortes" />
@@ -180,7 +164,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
               inputProps={{ min: 0 }}
             />
             <FormLabel component="legend" className={classes.patientsLabel}>
-              patients.
+              patient(s).
             </FormLabel>
           </Grid>
 
@@ -196,7 +180,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
               inputProps={{ min: 0 }}
             />
             <FormLabel component="legend" className={classes.patientsLabel}>
-              patients.
+              patient(s).
             </FormLabel>
           </Grid>
           {nbPatientsError && (

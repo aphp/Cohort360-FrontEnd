@@ -6,12 +6,11 @@ import RequestsTable from 'components/SavedResearch/ResearchTable/RequestsTable'
 
 import { Cohort, RequestType } from 'types'
 import { useAppDispatch } from 'state'
-import { deleteCohort, setFavoriteCohort } from 'state/cohort'
+import { deleteCohort, editCohort, fetchCohorts } from 'state/cohort'
 
 import useStyles from './styles'
 
 type ResearchCardProps = {
-  isFav?: boolean
   simplified?: boolean
   onClickLink?: (props: any) => void
   onClickRow?: (props: any) => void
@@ -20,6 +19,7 @@ type ResearchCardProps = {
   cohorts?: Cohort[]
   requests?: RequestType[]
   loading?: boolean
+  listType?: 'FavoriteCohorts' | 'LastCohorts'
 }
 
 const ResearchCard: React.FC<ResearchCardProps> = ({
@@ -30,17 +30,48 @@ const ResearchCard: React.FC<ResearchCardProps> = ({
   linkLabel,
   cohorts,
   requests,
-  loading
+  loading,
+  listType
 }) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
   const onDeleteCohort = async (cohort: Cohort) => {
-    dispatch<any>(deleteCohort({ deletedCohort: cohort }))
+    await dispatch<any>(deleteCohort({ deletedCohort: cohort }))
+    updateCohorts()
   }
 
-  const onSetCohortFavorite = (cohort: Cohort) => {
-    dispatch<any>(setFavoriteCohort({ favCohort: cohort }))
+  const onSetCohortFavorite = async (cohort: Cohort) => {
+    await dispatch<any>(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
+    updateCohorts()
+  }
+
+  const updateCohorts = async () => {
+    if (listType === 'FavoriteCohorts' || listType === 'LastCohorts') {
+      await dispatch<any>(
+        fetchCohorts({
+          listType: 'FavoriteCohorts',
+          sort: { sortBy: 'modified_at', sortDirection: 'desc' },
+          filters: {
+            status: [],
+            favorite: 'True',
+            minPatients: null,
+            maxPatients: null,
+            startDate: null,
+            endDate: null
+          },
+          limit: 5
+        })
+      )
+
+      await dispatch<any>(
+        fetchCohorts({
+          listType: 'LastCohorts',
+          sort: { sortBy: 'modified_at', sortDirection: 'desc' },
+          limit: 5
+        })
+      )
+    }
   }
 
   return (
@@ -59,7 +90,9 @@ const ResearchCard: React.FC<ResearchCardProps> = ({
       </Grid>
       <Grid item xs={12} className={classes.tableContainer}>
         {loading ? (
-          <CircularProgress />
+          <Grid container item justifyContent="center">
+            <CircularProgress />
+          </Grid>
         ) : (
           <>
             {requests && <RequestsTable simplified={simplified} researchData={requests} />}
@@ -70,6 +103,7 @@ const ResearchCard: React.FC<ResearchCardProps> = ({
                 onDeleteCohort={onDeleteCohort}
                 onSetCohortFavorite={onSetCohortFavorite}
                 onClickRow={onClickRow}
+                onUpdateCohorts={updateCohorts}
               />
             )}
           </>

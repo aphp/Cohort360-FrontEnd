@@ -37,12 +37,10 @@ import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalE
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { favoriteExploredCohort } from 'state/exploredCohort'
-import { fetchCohorts as fetchCohortsList, setSelectedCohort, deleteCohort } from 'state/cohort'
+import { deleteCohort, fetchCohorts as fetchCohortsList, setSelectedCohort } from 'state/cohort'
 import { MeState } from 'state/me'
 
-import { Cohort } from 'types'
-
-import services from 'services'
+import services from 'services/aphp'
 
 import displayDigit from 'utils/displayDigit'
 
@@ -142,7 +140,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         description: '',
         perimeters:
           dashboard.cohort && Array.isArray(dashboard.cohort)
-            ? dashboard.cohort.map((p: any) => p.name.replace('Patients passés par: ', ''))
+            ? dashboard.cohort.map((p: any) => (p.name ? p.name.replace('Patients passés par: ', '') : '-'))
             : [],
         icon: <BusinessIcon />,
         showActionButton: false
@@ -153,11 +151,11 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   }
 
   const handleFavorite = () => {
-    dispatch<any>(favoriteExploredCohort({ id: dashboard.uuid ?? '' }))
+    dispatch<any>(favoriteExploredCohort({ exploredCohort: dashboard }))
   }
 
   const handleConfirmDeletion = () => {
-    dispatch<any>(deleteCohort({ deletedCohort: dashboard as Cohort }))
+    dispatch<any>(deleteCohort({ deletedCohort: dashboard }))
     navigate('/home')
   }
 
@@ -307,9 +305,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                       onClick={async () => {
                         setAnchorEl(null)
                         if (!cohortList || (cohortList && cohortList.length === 0)) {
-                          await dispatch<any>(fetchCohortsList())
+                          await dispatch<any>(fetchCohortsList({}))
                         }
-                        await dispatch<any>(setSelectedCohort(dashboard.uuid ?? null))
+                        await dispatch<any>(setSelectedCohort(dashboard ?? null))
                         setOpenModal('edit')
                       }}
                     >

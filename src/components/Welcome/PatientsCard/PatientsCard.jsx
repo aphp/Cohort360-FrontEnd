@@ -7,7 +7,7 @@ import useStyles from './styles'
 
 import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
-import services from 'services'
+import services from 'services/aphp'
 
 import displayDigit from 'utils/displayDigit'
 

@@ -126,6 +126,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   return (
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
+        loading={loading}
         tabs={{
           list: [
             { label: 'Prescription', value: 'prescription' },

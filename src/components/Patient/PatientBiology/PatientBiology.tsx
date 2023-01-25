@@ -98,6 +98,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   return (
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
+        loading={loading}
         results={{
           nb: totalBiology,
           total: totalAllBiology,

@@ -10,7 +10,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import { useAppSelector } from 'state'
-import { SelectedCriteriaType } from 'types'
+import { DocType, SelectedCriteriaType } from 'types'
 
 import docTypes from 'assets/docTypes.json'
 
@@ -63,7 +63,13 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     let encounterStartDate = null
     let encounterEndDate = null
 
-    if (!(_currentCriteria.type === 'Patient' || _currentCriteria.type === 'Encounter')) {
+    if (
+      !(
+        _currentCriteria.type === 'Patient' ||
+        _currentCriteria.type === 'Encounter' ||
+        _currentCriteria.type === 'IPPList'
+      )
+    ) {
       startDate = _currentCriteria.startOccurrence
         ? moment(_currentCriteria.startOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
@@ -72,7 +78,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         ? moment(_currentCriteria.endOccurrence, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
     }
-    if (_currentCriteria.type !== 'Patient') {
+    if (!(_currentCriteria.type === 'Patient' || _currentCriteria.type === 'IPPList')) {
       encounterStartDate = _currentCriteria.encounterStartDate
         ? moment(_currentCriteria.encounterStartDate, 'YYYY-MM-DD').format('ddd DD MMMM YYYY')
         : null
@@ -289,9 +295,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Composition': {
-        const displaySelectedDocType = (selectedDocTypes: { id: string; label: string; type?: string }[]) => {
+        const displaySelectedDocType = (selectedDocTypes: DocType[]) => {
           let displayingSelectedDocTypes: any[] = []
-          const allTypes = docTypes.docTypes.map((docType: any) => docType.type)
+          const allTypes = docTypes.docTypes.map((docType: DocType) => docType.type)
 
           for (const selectedDocType of selectedDocTypes) {
             const numberOfElementFromGroup = (allTypes.filter((type: any) => type === selectedDocType.type) || [])
@@ -326,42 +332,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 <Tooltip title={`Contient ${_currentCriteria.search} dans le document`}>
                   <Typography style={{ maxWidth: 500 }} noWrap>
                     Contient "{_currentCriteria.search}" dans le document
-                  </Typography>
-                </Tooltip>
-              }
-            />
-          ),
-          _currentCriteria.regex_search && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Tooltip
-                  title={`Qui suit l'expression régulière suivante /${_currentCriteria.regex_search
-                    .replace(/^\(\.\)\*|\(\.\)\*$/gi, '')
-                    .replace(new RegExp('\\\\/|\\\\"', 'g'), function (m) {
-                      switch (m) {
-                        case '\\/':
-                          return '/'
-                        case '\\"':
-                          return '"'
-                      }
-                      return m
-                    })}/ dans le document`}
-                >
-                  <Typography style={{ maxWidth: 500 }} noWrap>
-                    Qui suit l'expression régulière suivante /
-                    {_currentCriteria.regex_search
-                      .replace(/^\(\.\)\*|\(\.\)\*$/gi, '')
-                      .replace(new RegExp('\\\\/|\\\\"', 'g'), function (m) {
-                        switch (m) {
-                          case '\\/':
-                            return '/'
-                          case '\\"':
-                            return '"'
-                        }
-                        return m
-                      })}
-                    / dans le document
                   </Typography>
                 </Tooltip>
               }
@@ -864,6 +834,27 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         }
         break
 
+      case 'IPPList': {
+        const displayIPPList = (searchInput: string) => {
+          return searchInput.split(',').reduce(reducer)
+        }
+        content = [
+          _currentCriteria.search && (
+            <Chip
+              className={classes.criteriaChip}
+              label={
+                <Tooltip title={`Contient les patients : ${displayIPPList(_currentCriteria.search)}`}>
+                  <Typography style={{ maxWidth: 500 }} noWrap>
+                    Contient les patients : {displayIPPList(_currentCriteria.search)}
+                  </Typography>
+                </Tooltip>
+              }
+            />
+          )
+        ]
+        break
+      }
+
       default:
         break
     }
@@ -889,7 +880,11 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       ]
     }
 
-    if (_currentCriteria.type !== 'Patient' && _currentCriteria.type !== 'Encounter') {
+    if (
+      _currentCriteria.type !== 'Patient' &&
+      _currentCriteria.type !== 'Encounter' &&
+      _currentCriteria.type !== 'IPPList'
+    ) {
       content = [
         ...content,
         +_currentCriteria?.occurrence !== 1 && (

@@ -25,8 +25,8 @@ const DiagramView: React.FC = () => {
       <div style={{ minWidth: 500, paddingRight: 24 }}>
         {maintenanceIsActive && (
           <Alert severity="warning" style={{ marginTop: '-12px', width: '100%', marginBottom: '10px' }}>
-            Une maintenance est en cours. Seule la consultation des cohorts, requetes et données patients est activée.
-            Toute création, édition et suppression de cohort/requete est desactivées.
+            Une maintenance est en cours. Seules les consultations de cohortes, requêtes et données patients sont
+            activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
           </Alert>
         )}
         <CohortCreationBreadcrumbs />

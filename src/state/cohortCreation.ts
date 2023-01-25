@@ -15,7 +15,7 @@ import { logout, login } from './me'
 import { addRequest, deleteRequest } from './request'
 import { deleteProject } from './project'
 
-import services from 'services'
+import services from 'services/aphp'
 
 export type CohortCreationState = {
   loading: boolean
@@ -28,6 +28,7 @@ export type CohortCreationState = {
   snapshotsHistory: CohortCreationSnapshotType[]
   count: CohortCreationCounterType
   selectedPopulation: (ScopeTreeRow | undefined)[] | null
+  allowSearchIpp: boolean
   selectedCriteria: SelectedCriteriaType[]
   criteriaGroup: CriteriaGroupType[]
   temporalConstraints: TemporalConstraintsType[]
@@ -48,6 +49,7 @@ const defaultInitialState: CohortCreationState = {
   snapshotsHistory: [],
   count: {},
   selectedPopulation: null,
+  allowSearchIpp: false,
   selectedCriteria: [],
   criteriaGroup: [
     {
@@ -239,12 +241,13 @@ type BuildCohortReturn = {
 }
 type BuildCohortParams = {
   selectedPopulation?: ScopeTreeRow[] | null
+  allowSearchIpp?: boolean
 }
 const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParams, { state: RootState }>(
   'cohortCreation/build',
   async ({ selectedPopulation }, { getState, dispatch }) => {
     try {
-      const state = getState()
+      const state: any = getState()
 
       const _selectedPopulation = selectedPopulation
         ? selectedPopulation
@@ -271,9 +274,15 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
         )
       }
 
+      let allowSearchIpp = false
+      if (_selectedPopulation) {
+        allowSearchIpp = await services.perimeters.allowSearchIpp(_selectedPopulation as ScopeTreeRow[])
+      }
+
       return {
         json,
-        selectedPopulation: _selectedPopulation
+        selectedPopulation: _selectedPopulation,
+        allowSearchIpp: allowSearchIpp
       }
     } catch (error) {
       console.error(error)
@@ -304,6 +313,11 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
       const state = getState()
       const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot?.json)
 
+      let allowSearchIpp = false
+      if (population) {
+        allowSearchIpp = await services.perimeters.allowSearchIpp(population as ScopeTreeRow[])
+      }
+
       const dated_measures = newCurrentSnapshot.dated_measures ? newCurrentSnapshot.dated_measures[0] : null
       const countId = dated_measures ? dated_measures.uuid : null
 
@@ -327,6 +341,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
         json: newCurrentSnapshot.json,
         currentSnapshot: newCurrentSnapshot.uuid,
         selectedPopulation: population,
+        allowSearchIpp: allowSearchIpp,
         selectedCriteria: criteria,
         criteriaGroup: criteriaGroup,
         nextCriteriaId: criteria.length + 1,

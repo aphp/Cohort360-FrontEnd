@@ -1,17 +1,4 @@
-export const ID_TOKEN_STORAGE_KEY = 'ARKHN_ID_TOKEN'
-export const TOKEN_DATA_STORAGE_KEY = 'ARKHN_TOKEN_DATA'
-export const STATE_STORAGE_KEY = 'ARKHN_AUTH_STATE'
-
-export const CLIENT_ID = 'irrelevant'
-export const CLIENT_SECRET = 'irrelevant'
-export const FILES_URL = 'irrelevant'
-export const TOKEN_URL = 'irrelevant'
-export const REVOKE_URL = 'irrelevant'
-export const LOGIN_REDIRECT_URL = 'irrelevant'
-
 export let BOOLEANTRUE = 'true'
-
-export const CONTEXT = process.env.NODE_ENV !== 'development' ? '{REACT_APP_CONTEXT}' : process.env.REACT_APP_CONTEXT
 
 export const ACCES_TOKEN = 'access'
 export const REFRESH_TOKEN = 'refresh'
@@ -149,9 +136,12 @@ export const ODD_EXPORT =
   process.env.NODE_ENV !== 'development'
     ? '{REACT_APP_ODD_EXPORT}' == `${BOOLEANTRUE}`
     : process.env.REACT_APP_ODD_EXPORT == `${BOOLEANTRUE}`
-export const ODD_REGEX =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_ODD_REGEX}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_REGEX == `${BOOLEANTRUE}`
+
+export const SESSION_TIMEOUT = process.env.REACT_APP_SESSION_TIMEOUT
+  ? process.env.REACT_APP_SESSION_TIMEOUT
+  : 780000 /* 13 * 60 * 1000 ms*/
+export const REFRESH_TOKEN_INTERVAL = process.env.REACT_APP_REFRESH_TOKEN_INTERVAL
+  ? process.env.REACT_APP_REFRESH_TOKEN_INTERVAL
+  : 180000 /* 3 * 60 * 1000 ms*/
 
 export const VALUE_SET_SIZE = '9999'

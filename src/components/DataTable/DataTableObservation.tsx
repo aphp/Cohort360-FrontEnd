@@ -36,6 +36,7 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
     { label: 'ANABIO', code: 'codeSimple-anabio', align: 'center', sortableColumn: true },
     { label: 'LOINC', code: 'codeSimple-loinc', align: 'center', sortableColumn: true },
     { label: 'Résultat', code: '', align: 'center', sortableColumn: false },
+    { label: 'Valeurs de référence', code: '', align: 'center', sortableColumn: false },
     { label: 'Unité exécutrice', code: '', align: 'center', sortableColumn: false }
   ]
 
@@ -89,7 +90,12 @@ const DataTableObservationLine: React.FC<{
       ? `${observation.valueQuantity.value} ${observation.valueQuantity.unit}`
       : '-'
     : '-'
+  const valueUnit = observation.valueQuantity?.unit ?? ''
   const serviceProvider = observation.serviceProvider
+  const referenceRangeArray = observation.referenceRange?.[0]
+  const referenceRange = `${referenceRangeArray?.low?.value ?? '-'}${valueUnit} - ${
+    referenceRangeArray?.high?.value ?? '-'
+  }${valueUnit}`
 
   return (
     <TableRow className={classes.tableBodyRows} key={observation.id}>
@@ -107,6 +113,7 @@ const DataTableObservationLine: React.FC<{
         </Typography>
       </TableCell>
       <TableCell align="center">{result}</TableCell>
+      <TableCell align="center">{referenceRange}</TableCell>
       <TableCell align="center">{serviceProvider ?? '-'}</TableCell>
     </TableRow>
   )

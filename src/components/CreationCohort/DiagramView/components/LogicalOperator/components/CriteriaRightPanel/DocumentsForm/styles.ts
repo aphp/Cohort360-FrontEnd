@@ -45,6 +45,11 @@ const useStyles = makeStyles(() => ({
     '& > button': {
       margin: '12px 8px'
     }
+  },
+  errorContainer: {
+    color: '#f44336',
+    width: '100%',
+    padding: '0 16px'
   }
 }))
 

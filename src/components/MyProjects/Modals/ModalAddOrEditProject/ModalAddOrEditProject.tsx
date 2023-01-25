@@ -99,7 +99,13 @@ const ModalAddOrEditProject: React.FC<{
               variant="outlined"
               fullWidth
               error={error === ERROR_TITLE}
-              helperText={error === ERROR_TITLE ? 'Le nom est trop long (255 caractère max.)' : ''}
+              helperText={
+                error === ERROR_TITLE
+                  ? modalProjectState.name.length === 0
+                    ? 'Le nom du projet doit comporter au moins un caractère.'
+                    : 'Le nom est trop long (255 caractères max.)'
+                  : ''
+              }
             />
           </Grid>
         </DialogContent>

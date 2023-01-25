@@ -3,7 +3,13 @@ import React, { useState, useEffect } from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from '@mui/material'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { CohortState, addCohort, editCohort, deleteCohort } from 'state/cohort'
+import {
+  CohortState,
+  addCohort,
+  editCohort,
+  deleteCohort,
+  setSelectedCohort as setSelectedCohortState
+} from 'state/cohort'
 
 import { Cohort } from 'types'
 
@@ -52,9 +58,11 @@ const ModalEditCohort: React.FC<{
     onChangeCohortState(_cohort)
   }
 
-  const handleClose = () => onClose()
+  const handleClose = () => {
+    dispatch<any>(setSelectedCohortState(null))
+  }
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (loading) return
     setLoading(true)
 
@@ -65,19 +73,19 @@ const ModalEditCohort: React.FC<{
 
     if (!selectedCohort) return
     if (isEdition) {
-      dispatch<any>(editCohort({ editedCohort: modalCohortState }))
+      await dispatch<any>(editCohort({ editedCohort: modalCohortState }))
     } else {
-      dispatch<any>(addCohort({ newCohort: modalCohortState }))
+      await dispatch<any>(addCohort({ newCohort: modalCohortState }))
     }
     onClose()
   }
 
-  const handleConfirmDeletion = () => {
+  const handleConfirmDeletion = async () => {
     if (loading) return
     setLoading(true)
 
     if (isEdition && selectedCohort !== null) {
-      dispatch<any>(deleteCohort({ deletedCohort: selectedCohort }))
+      await dispatch<any>(deleteCohort({ deletedCohort: selectedCohort }))
     }
     onClose()
   }
@@ -100,7 +108,13 @@ const ModalEditCohort: React.FC<{
               variant="outlined"
               fullWidth
               error={error === ERROR_TITLE}
-              helperText={error === ERROR_TITLE ? 'Le nom est trop long (255 caractère max.)' : ''}
+              helperText={
+                error === ERROR_TITLE
+                  ? !modalCohortState.name || modalCohortState.name.length === 0
+                    ? 'Le nom de la cohorte doit comporter au moins un caractère.'
+                    : 'Le nom est trop long (255 caractères max.)'
+                  : ''
+              }
             />
           </Grid>
 

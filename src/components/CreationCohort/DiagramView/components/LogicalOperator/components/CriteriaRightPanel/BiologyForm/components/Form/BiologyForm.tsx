@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 
 import {
   Button,
+  Checkbox,
+  Chip,
   Divider,
   FormLabel,
   Grid,
@@ -17,8 +19,6 @@ import Alert from '@mui/lab/Alert'
 
 import InfoIcon from '@mui/icons-material/Info'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
-
-import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
@@ -39,6 +39,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   const classes = useStyles()
 
   const [error, setError] = useState(false)
+  const [allowSearchByValue, setAllowSearchByValue] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const _onSubmit = () => {
@@ -47,12 +48,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
     }
 
     onChangeSelectedCriteria(selectedCriteria)
-  }
-
-  const getBiologyOptions = async (searchValue: string) => {
-    const biologyOptions = await criteria.fetch.fetchBiologyData(searchValue, false)
-
-    return biologyOptions && biologyOptions.length > 0 ? biologyOptions : []
   }
 
   const defaultValuesCode = selectedCriteria.code
@@ -82,7 +77,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       }
     }
 
-    if (selectedCriteria.code.length === 1) {
+    if (selectedCriteria?.code.length === 1 && selectedCriteria?.code[0].id !== '*') {
       checkChildren()
     } else {
       onChangeValue('isLeaf', false)
@@ -155,19 +150,37 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             />
           </Grid>
 
-          <AutocompleteAsync
-            multiple
-            label="Codes de biologie"
-            variant="outlined"
-            noOptionsText="Veuillez entrer un code ou un libellé"
-            className={classes.inputItem}
-            autocompleteValue={defaultValuesCode}
-            autocompleteOptions={criteria?.data?.biologyData || []}
-            getAutocompleteOptions={getBiologyOptions}
-            onChange={(e, value) => onChangeValue('code', value)}
-          />
-
           <Grid className={classes.inputContainer}>
+            <Typography variant="h6">Codes de biologie</Typography>
+
+            <Grid container item style={{ margin: '1em 0px', width: 'calc(100%-2em)' }}>
+              {defaultValuesCode.length > 0 ? (
+                defaultValuesCode.map((valueCode: any, index: number) => (
+                  <Chip
+                    key={index}
+                    style={{ margin: 3 }}
+                    label={
+                      <Tooltip title={valueCode.label}>
+                        <Typography style={{ maxWidth: 500 }} noWrap>
+                          {valueCode.label}
+                        </Typography>
+                      </Tooltip>
+                    }
+                    onDelete={() =>
+                      onChangeValue(
+                        'code',
+                        defaultValuesCode.filter((code: any) => code !== valueCode)
+                      )
+                    }
+                  />
+                ))
+              ) : (
+                <FormLabel style={{ margin: 'auto 1em' }} component="legend">
+                  Veuillez ajouter des codes de biologie via les onglets Hiérarchie ou Recherche.
+                </FormLabel>
+              )}
+            </Grid>
+
             <Grid item container direction="row" alignItems="center">
               <Typography variant="h6">Recherche par valeur</Typography>
               <Tooltip
@@ -181,17 +194,25 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             <Grid
               style={{
                 display: 'grid',
-                gridTemplateColumns: selectedCriteria.valueComparator === '<x>' ? '100px 1fr 1fr' : '100px 1fr',
-                alignItems: 'center'
+                gridTemplateColumns: selectedCriteria.valueComparator === '<x>' ? '50px 1fr 1fr 1fr' : '50px 1fr 1fr',
+                alignItems: 'center',
+                marginTop: '1em'
               }}
             >
+              <Checkbox
+                color="primary"
+                checked={allowSearchByValue}
+                onClick={() => setAllowSearchByValue(!allowSearchByValue)}
+                disabled={!selectedCriteria.isLeaf}
+              />
+
               <Select
                 style={{ marginRight: '1em' }}
                 id="biology-value-comparator-select"
                 value={selectedCriteria.valueComparator}
                 onChange={(event) => onChangeValue('valueComparator', event.target.value as string)}
                 variant="outlined"
-                disabled={!selectedCriteria.isLeaf}
+                disabled={!allowSearchByValue}
               >
                 <MenuItem value={'<='}>{'<='}</MenuItem>
                 <MenuItem value={'<'}>{'<'}</MenuItem>
@@ -212,7 +233,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 value={selectedCriteria.valueMin}
                 onChange={(e) => onChangeValue('valueMin', e.target.value)}
                 placeholder={selectedCriteria.valueComparator === '<x>' ? 'Valeur minimale' : ''}
-                disabled={!selectedCriteria.isLeaf}
+                disabled={!allowSearchByValue}
               />
               {selectedCriteria.valueComparator === '<x>' && (
                 <TextField
@@ -226,7 +247,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                   value={selectedCriteria.valueMax}
                   onChange={(e) => onChangeValue('valueMax', e.target.value)}
                   placeholder="Valeur maximale"
-                  disabled={!selectedCriteria.isLeaf}
+                  disabled={!allowSearchByValue}
                 />
               )}
 

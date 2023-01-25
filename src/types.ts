@@ -14,7 +14,8 @@ import {
   IObservation,
   IMedicationRequest,
   IMedicationAdministration,
-  PatientGenderKind
+  PatientGenderKind,
+  IExtension
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 export interface TypedEntry<T extends IResourceList> extends IBundle_Entry {
@@ -63,6 +64,7 @@ export type CohortComposition = IComposition & {
   serviceProvider?: string
   NDA?: string
   event?: {}
+  parameter?: any[]
 }
 
 export type CohortEncounter = IEncounter & {
@@ -118,7 +120,6 @@ export type Cohort = {
 
 export type CohortFilters = {
   status: ValueSet[]
-  type: string
   favorite: string
   minPatients: null | string
   maxPatients: null | string
@@ -132,6 +133,7 @@ export type DocumentFilters = {
   selectedDocTypes: { code: string; label: string; type: string }[]
   startDate: string | null
   endDate: string | null
+  onlyPdfAvailable: boolean
 }
 
 export type MedicationsFilters = {
@@ -230,6 +232,7 @@ export type ScopeTreeRow = {
   quantity: number
   parentId?: string
   subItems: ScopeTreeRow[]
+  extension?: IExtension[]
   managingEntity?: any | undefined
 }
 
@@ -359,6 +362,7 @@ export type SelectedCriteriaType = {
   | DocumentDataType
   | MedicationDataType
   | ObservationDataType
+  | IPPListDataType
 )
 
 export type CcamDataType = {
@@ -401,12 +405,24 @@ export type DemographicDataType = {
   isInclusive?: boolean
 }
 
+export type IPPListDataType = {
+  title: string
+  type: 'IPPList'
+  search: string
+  isInclusive?: boolean
+}
+
+export type DocType = {
+  code: string
+  label: string
+  type: string
+}
+
 export type DocumentDataType = {
   title: string
   type: 'Composition'
   search: string
-  regex_search: string
-  docType: { id: string; label: string }[] | null
+  docType: DocType[] | null
   encounterEndDate: Date | ''
   encounterStartDate: Date | ''
   occurrence: number
@@ -577,6 +593,7 @@ export type IPatientDocuments = {
       direction: string
     }
   }
+  searchInputError?: searchInputError
 }
 
 export type IPatientPmsi<T extends IProcedure | ICondition | IClaim> = {
@@ -656,6 +673,17 @@ export type IPatientObservation<T extends CohortObservation> = {
   }
 }
 
+export type searchInputError = {
+  isError: boolean
+  errorsDetails?: errorDetails[]
+}
+
+export type errorDetails = {
+  errorName?: string
+  errorPositions?: number[]
+  errorSolution?: string
+}
+
 // DataTableTopBarProps
 export type DTTB_TabsType = {
   value: any
@@ -677,6 +705,7 @@ export type DTTB_SearchBarType = {
   value: string | undefined
   onSearch: (newSearch: string, newSearchBy?: SearchByTypes) => void
   searchBy?: any
+  error?: searchInputError
 }
 export type DTTB_ButtonType = {
   label: string

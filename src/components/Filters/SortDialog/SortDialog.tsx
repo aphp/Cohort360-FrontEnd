@@ -23,7 +23,6 @@ import useStyles from './styles'
 type SortDialogProps = {
   open: boolean
   onClose: () => void
-  onSubmit: () => void
   sort: Sort
   onChangeSort: (sort: Sort) => void
 }
@@ -35,13 +34,13 @@ const sortOptions = [
   { label: 'Date de Naissance', code: 'birthdate' }
 ]
 
-const SortDialog: React.FC<SortDialogProps> = ({ open, onClose, onSubmit, sort, onChangeSort }) => {
+const SortDialog: React.FC<SortDialogProps> = ({ open, onClose, sort, onChangeSort }) => {
   const classes = useStyles()
   const [_sort, setSort] = useState(sort)
 
   const _onSubmit = () => {
     onChangeSort(_sort)
-    onSubmit()
+    onClose()
   }
 
   return (

@@ -3,7 +3,7 @@ import { Theme } from '@mui/material/styles'
 
 const useStyles = makeStyles((theme: Theme) => ({
   documentTable: {
-    marginTop: '24px'
+    margin: '24px 0'
   },
   tableButtons: {
     display: 'flex',
@@ -35,6 +35,18 @@ const useStyles = makeStyles((theme: Theme) => ({
     '&:last-child': {
       marginRight: 0
     }
+  },
+  pagination: {
+    float: 'right',
+    '& button': {
+      backgroundColor: '#fff',
+      color: '#5BC5F2'
+    },
+    '& .MuiPaginationItem-page.Mui-selected': {
+      color: '#0063AF',
+      backgroundColor: '#FFF'
+    },
+    margin: '12px 0'
   }
 }))
 

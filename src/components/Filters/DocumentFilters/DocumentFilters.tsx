@@ -84,6 +84,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
     const newEndDate = moment(_endDate).isValid() ? moment(_endDate).format('YYYY-MM-DD') : null
 
     onChangeFilters({
+      ...filters,
       nda: _nda,
       ipp: _ipp,
       selectedDocTypes: _selectedDocTypes,

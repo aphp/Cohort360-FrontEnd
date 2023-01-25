@@ -8,9 +8,9 @@ import ControlPanel from './ControlPanel/ControlPanel'
 import DiagramView from './DiagramView/DiagramView'
 import ModalCreateNewRequest from './Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 
-import { useAppSelector, useAppDispatch } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
+import { fetchRequestCohortCreation, resetCohortCreation, unbuildCohortCreation } from 'state/cohortCreation'
 import { setCriteriaList } from 'state/criteria'
-import { fetchRequestCohortCreation, unbuildCohortCreation, resetCohortCreation } from 'state/cohortCreation'
 
 import { CohortCreationSnapshotType } from 'types'
 
@@ -18,9 +18,8 @@ import constructCriteriaList from './DataList_Criteria'
 
 import { getDataFromFetch } from 'utils/cohortCreation'
 
-import services from 'services'
-
 import useStyles from './styles'
+import services from 'services/aphp'
 
 const Requeteur = () => {
   const {
@@ -32,7 +31,9 @@ const Requeteur = () => {
       criteriaGroup = [],
       snapshotsHistory = [],
       count = {},
-      json = ''
+      json = '',
+      allowSearchIpp = false,
+      selectedPopulation = []
     },
     criteriaList
   } = useAppSelector((state) => ({
@@ -52,34 +53,49 @@ const Requeteur = () => {
   const dispatch = useAppDispatch()
   const classes = useStyles()
 
-  const [requestLoading, setRequestLoading] = useState(true)
-  const [criteriaLoading, setCriteriaLoading] = useState(true)
+  const [requestLoading, setRequestLoading] = useState(0)
+  const [criteriaLoading, setCriteriaLoading] = useState(0)
+  let _criteria = constructCriteriaList()
 
   const _fetchRequest = useCallback(async () => {
-    setRequestLoading(true)
-    if (requestIdFromUrl) {
-      dispatch<any>(resetCohortCreation())
-      dispatch<any>(
-        fetchRequestCohortCreation({
-          requestId: requestIdFromUrl,
-          snapshotId: snapshotIdFromUrl
-        })
-      )
-      navigate('/cohort/new')
+    setRequestLoading((requestLoading) => requestLoading + 1)
+    try {
+      if (requestIdFromUrl) {
+        dispatch<any>(resetCohortCreation())
+        dispatch<any>(
+          fetchRequestCohortCreation({
+            requestId: requestIdFromUrl,
+            snapshotId: snapshotIdFromUrl
+          })
+        )
+        navigate('/cohort/new')
+      }
+    } catch (error) {
+      console.error(error)
     }
-    setRequestLoading(false)
+    setRequestLoading((requestLoading) => requestLoading - 1)
   }, [dispatch, requestIdFromUrl, snapshotIdFromUrl])
 
   /**
    * Fetch all criteria to display list + retrieve all data from fetcher
    */
   const _fetchCriteria = useCallback(async () => {
-    setCriteriaLoading(true)
-    let _criteria = constructCriteriaList()
-    _criteria = await getDataFromFetch(Object.freeze(_criteria), selectedCriteria, criteriaList)
-    dispatch<any>(setCriteriaList(_criteria))
-    setCriteriaLoading(false)
-  }, [dispatch, criteriaGroup, selectedCriteria]) // eslint-disable-line
+    setCriteriaLoading((criteriaLoading) => criteriaLoading + 1)
+    try {
+      _criteria.forEach((criterion) => {
+        if (criterion.id === 'IPPList') {
+          criterion.color = allowSearchIpp ? '#0063AF' : '#808080'
+          criterion.disabled = !allowSearchIpp
+        }
+      })
+
+      _criteria = await getDataFromFetch(Object.freeze(_criteria), selectedCriteria, criteriaList)
+      dispatch<any>(setCriteriaList(_criteria))
+    } catch (error) {
+      console.error(error)
+    }
+    setCriteriaLoading((criteriaLoading) => criteriaLoading - 1)
+  }, [dispatch, criteriaGroup, selectedCriteria, selectedPopulation]) // eslint-disable-line
 
   const _unbuildRequest = async (newCurrentSnapshot: CohortCreationSnapshotType) => {
     dispatch<any>(unbuildCohortCreation({ newCurrentSnapshot }))
@@ -169,15 +185,21 @@ const Requeteur = () => {
   }
 
   // Initial useEffect
-  useEffect(() => {
-    _fetchCriteria()
-  }, [_fetchCriteria])
 
   useEffect(() => {
     _fetchRequest()
   }, [_fetchRequest])
 
-  if (loading || criteriaLoading || requestLoading || (!!requestIdFromUrl && requestId !== requestIdFromUrl)) {
+  useEffect(() => {
+    _fetchCriteria()
+  }, [_fetchCriteria])
+
+  if (
+    loading ||
+    criteriaLoading != 0 ||
+    requestLoading != 0 ||
+    (!!requestIdFromUrl && requestId !== requestIdFromUrl)
+  ) {
     return (
       <Grid className={classes.grid} container justifyContent="center" alignItems="center">
         <CircularProgress />

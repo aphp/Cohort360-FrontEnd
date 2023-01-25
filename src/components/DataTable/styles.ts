@@ -130,6 +130,11 @@ const useStyles = makeStyles((theme: Theme) =>
         color: 'white'
       }
     },
+    errorContainer: {
+      color: '#f44336',
+      width: '100%',
+      padding: '0 16px'
+    },
     select: {
       marginRight: '4px'
     }

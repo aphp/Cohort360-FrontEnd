@@ -1,0 +1,44 @@
+stages: # List of stages for jobs in their order of execution
+  - build
+  - deploy
+
+build-job:
+  image: harbor.eds.aphp.fr/cohort360/node:16.13.2
+  stage: build
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - build/
+    expire_in: 1 day
+  only:
+    - tags
+    - develop
+    - ^feat_deploy_(\w*|\d*)
+
+  cache:
+    key: cohort360_nodemodules_cache
+    paths:
+      - node_modules/
+    policy: pull
+
+deploy-job:
+  image: harbor.eds.aphp.fr/cohort360/kaniko:debug
+  stage: deploy
+  needs:
+    - job: build-job
+      artifacts: true
+  script:
+    - export VERSION=$(cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]')
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"username\":\"${BOT_NAME}\",\"password\":\"${BOT_TOKEN}\"}}}" > /kaniko/.docker/config.json
+    - >-
+      /kaniko/executor
+      --context ${CI_PROJECT_DIR}
+      --dockerfile ${CI_PROJECT_DIR}/Dockerfile
+      --destination ${CI_REGISTRY_IMAGE}:${VERSION}
+  only:
+    - tags
+    - develop
+    - ^feat_deploy_(\w*|\d*)

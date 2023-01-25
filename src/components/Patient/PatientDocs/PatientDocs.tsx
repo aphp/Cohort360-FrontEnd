@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import Grid from '@mui/material/Grid'
+import { Checkbox, Grid, Typography } from '@mui/material'
 import { Alert } from '@mui/lab'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
@@ -32,9 +32,10 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
 
   const deidentified = patient?.deidentified ?? true
 
-  const loading = patient?.documents?.loading ?? false
+  const loading = patient?.documents?.loading ?? true
   const totalDocs = patient?.documents?.count ?? 0
   const totalAllDoc = patient?.documents?.total ?? 0
+  const searchInputError = patient?.documents?.searchInputError ?? undefined
 
   const patientDocumentsList = patient?.documents?.list ?? []
 
@@ -44,7 +45,8 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     nda: '',
     selectedDocTypes: [],
     startDate: null,
-    endDate: null
+    endDate: null,
+    onlyPdfAvailable: deidentified ? false : true
   })
 
   const [searchInput, setSearchInput] = useState('')
@@ -88,6 +90,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     handleChangePage()
   }, [
     searchInput,
+    filters.onlyPdfAvailable,
     filters.nda,
     filters.selectedDocTypes,
     filters.startDate,
@@ -137,11 +140,13 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   return (
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
+        loading={loading}
         results={{ nb: totalDocs, total: totalAllDoc, label: 'document(s)' }}
         searchBar={{
           type: 'document',
           value: searchInput ? searchInput.replace(/^\/\(\.\)\*|\(\.\)\*\/$/gi, '') : '',
-          onSearch: (newSearchInput: string) => setSearchInput(newSearchInput)
+          onSearch: (newSearchInput: string) => setSearchInput(newSearchInput),
+          error: searchInputError
         }}
         buttons={[
           {
@@ -158,6 +163,17 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         Attention : La recherche est pseudonymisée pour la prévisualisation des documents. Vous pouvez donc trouver des
         incohérences entre les informations de votre patient et celles du document prévisualisé.
       </Alert>
+
+      {!deidentified && (
+        <Grid container item alignItems="center" justifyContent="flex-end">
+          <Checkbox
+            checked={filters.onlyPdfAvailable}
+            onChange={() => onChangeOptions('onlyPdfAvailable', !filters.onlyPdfAvailable)}
+            color="primary"
+          />
+          <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
+        </Grid>
+      )}
 
       <DataTableComposition
         loading={loading}

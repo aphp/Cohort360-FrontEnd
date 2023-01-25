@@ -53,7 +53,21 @@ const Welcome: React.FC = () => {
     // fetchProjectData
     dispatch<any>(fetchProjects())
     dispatch<any>(fetchRequests())
-    dispatch<any>(fetchCohorts())
+    dispatch<any>(
+      fetchCohorts({
+        listType: 'FavoriteCohorts',
+        sort: { sortBy: 'modified_at', sortDirection: 'desc' },
+        filters: { status: [], favorite: 'True', minPatients: null, maxPatients: null, startDate: null, endDate: null },
+        limit: 5
+      })
+    )
+    dispatch<any>(
+      fetchCohorts({
+        listType: 'LastCohorts',
+        sort: { sortBy: 'modified_at', sortDirection: 'desc' },
+        limit: 5
+      })
+    )
 
     // fetchPmsiData
     dispatch<any>(initPmsiHierarchy())
@@ -66,31 +80,17 @@ const Welcome: React.FC = () => {
 
     // fetchScope
     dispatch<any>(fetchScopesList())
-  }, [dispatch])
+  }, [])
 
   useEffect(() => {
-    const _favoriteCohorts =
-      cohortState.cohortsList?.length > 0
-        ? [...cohortState.cohortsList]
-            .sort((a, b) => +moment(b?.modified_at).format('X') - +moment(a.modified_at).format('X'))
-            .filter((cohortItem) => cohortItem.favorite)
-            .splice(0, 5)
-        : []
-    const _lastCohorts =
-      cohortState.cohortsList?.length > 0
-        ? [...cohortState.cohortsList]
-            .sort((a, b) => +moment(b?.modified_at).format('X') - +moment(a.modified_at).format('X'))
-            .splice(0, 5)
-        : []
     const _lastRequest =
       requestState.requestsList?.length > 0
         ? [...requestState.requestsList]
             .sort((a, b) => +moment(b?.modified_at).format('X') - +moment(a.modified_at).format('X'))
             .splice(0, 5)
         : []
-
-    setFavoriteCohorts(_favoriteCohorts)
-    setLastCohorts(_lastCohorts)
+    setFavoriteCohorts(cohortState.favoriteCohortsList ?? [])
+    setLastCohorts(cohortState.lastCohorts ?? [])
     setLastRequest(_lastRequest)
   }, [cohortState, requestState])
 
@@ -102,10 +102,17 @@ const Welcome: React.FC = () => {
       })}
     >
       <Container maxWidth="lg" className={classes.container}>
-        <Typography component="h1" variant="h1" color="inherit" noWrap className={classes.title}>
+        <Typography id="homePage-title" component="h1" variant="h1" color="inherit" noWrap className={classes.title}>
           Bienvenue {practitioner.displayName}
         </Typography>
-        <Typography component="h6" variant="h6" color="inherit" noWrap className={classes.subtitle}>
+        <Typography
+          id="last-connection"
+          component="h6"
+          variant="h6"
+          color="inherit"
+          noWrap
+          className={classes.subtitle}
+        >
           {lastConnection}
         </Typography>
       </Container>
@@ -118,8 +125,8 @@ const Welcome: React.FC = () => {
         <Grid container spacing={1}>
           {maintenanceIsActive && (
             <Alert severity="warning" style={{ marginTop: '-12px', width: '100%' }}>
-              Une maintenance est en cours. Seule la consultation des cohorts, requetes et données patients est activée.
-              Toute création, édition et suppression de cohort/requete est desactivées.
+              Une maintenance est en cours. Seules les consultations de cohortes, requêtes et données patients sont
+              activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
             </Alert>
           )}
 
@@ -173,7 +180,7 @@ const Welcome: React.FC = () => {
                 onClickLink={() => navigate('/my-cohorts?fav=true')}
                 loading={loadingCohort}
                 cohorts={favoriteCohorts}
-                isFav
+                listType={'FavoriteCohorts'}
               />
             </Paper>
           </Grid>
@@ -187,6 +194,7 @@ const Welcome: React.FC = () => {
                 onClickLink={() => navigate('/my-cohorts')}
                 loading={loadingCohort}
                 cohorts={lastCohorts}
+                listType={'LastCohorts'}
               />
             </Paper>
           </Grid>

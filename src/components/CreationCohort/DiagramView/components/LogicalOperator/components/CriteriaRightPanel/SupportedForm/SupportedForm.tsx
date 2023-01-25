@@ -1,8 +1,20 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { Alert, Autocomplete } from '@mui/lab'
-import { Button, Divider, FormLabel, Grid, IconButton, Slider, Switch, Typography, TextField } from '@mui/material'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
+import {
+  Button,
+  Divider,
+  FormLabel,
+  Grid,
+  IconButton,
+  Slider,
+  Switch,
+  Tooltip,
+  Typography,
+  TextField
+} from '@mui/material'
+import InfoIcon from '@mui/icons-material/Info'
 
 import AdmissionInputs from './SupportedInputs/AdmissionInputs'
 import EntryExitInputs from './SupportedInputs/EntryExitInputs'
@@ -54,6 +66,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
   const classes = useStyles()
 
   const [error, setError] = useState(false)
+  const [sliderError, setSliderError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const isEdition = selectedCriteria !== null ? true : false
@@ -107,6 +120,19 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
   ) {
     return <></>
   }
+
+  useEffect(() => {
+    if (
+      !Number.isInteger(defaultValues.years[0]) ||
+      !Number.isInteger(defaultValues.years[1]) ||
+      !Number.isInteger(defaultValues.duration[0]) ||
+      !Number.isInteger(defaultValues.duration[1])
+    ) {
+      setSliderError(true)
+    } else {
+      setSliderError(false)
+    }
+  }, [defaultValues.years, defaultValues.duration])
 
   return (
     <Grid className={classes.root}>
@@ -167,8 +193,11 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
             />
           </Grid>
 
-          <FormLabel style={{ padding: '1em' }} component="legend">
+          <FormLabel style={{ padding: '1em', display: 'flex', alignItems: 'center' }} component="legend">
             Âge au moment de la prise en charge
+            <Tooltip title="La valeur par défaut sera prise en compte si le sélecteur d'âge n'a pas été modifié.">
+              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+            </Tooltip>
           </FormLabel>
 
           <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 180px', alignItems: 'center', margin: '0 1em' }}>
@@ -194,6 +223,8 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                         defaultValues.years[1]
                       ])
                     }
+                    error={!Number.isInteger(defaultValues.years[0])}
+                    helperText={!Number.isInteger(defaultValues.years[0]) && 'Pas de valeur décimale autorisée.'}
                   />
                 </Grid>
                 <Grid item>
@@ -206,6 +237,8 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                         +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : defaultValues.years[1]
                       ])
                     }
+                    error={!Number.isInteger(defaultValues.years[1])}
+                    helperText={!Number.isInteger(defaultValues.years[1]) && 'Pas de valeur décimale autorisée.'}
                   />
                 </Grid>
               </Grid>
@@ -254,6 +287,8 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                         defaultValues.duration[1]
                       ])
                     }
+                    error={!Number.isInteger(defaultValues.duration[0])}
+                    helperText={!Number.isInteger(defaultValues.duration[0]) && 'Pas de valeur décimale autorisée.'}
                   />
                 </Grid>
                 <Grid item>
@@ -266,6 +301,8 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                         +e.target.value >= 0 && +e.target.value <= 100 ? +e.target.value : +defaultValues.duration[1]
                       ])
                     }
+                    error={!Number.isInteger(defaultValues.duration[1])}
+                    helperText={!Number.isInteger(defaultValues.duration[1]) && 'Pas de valeur décimale autorisée.'}
                   />
                 </Grid>
               </Grid>
@@ -308,7 +345,14 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="supported-form" color="primary" variant="contained">
+          <Button
+            onClick={_onSubmit}
+            type="submit"
+            form="supported-form"
+            color="primary"
+            variant="contained"
+            disabled={sliderError}
+          >
             Confirmer
           </Button>
         </Grid>

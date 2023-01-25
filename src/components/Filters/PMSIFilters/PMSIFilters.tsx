@@ -19,7 +19,7 @@ import { Autocomplete } from '@mui/lab'
 
 import ClearIcon from '@mui/icons-material/Clear'
 
-import services from 'services'
+import services from 'services/aphp'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 

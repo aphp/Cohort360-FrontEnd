@@ -5,7 +5,7 @@ import Autocomplete from '@mui/lab/Autocomplete'
 
 import { RequestType, Provider, Order } from 'types'
 
-import { getProviders } from 'services/contextAphp/serviceProviders'
+import { getProviders } from 'services/aphp/serviceProviders'
 
 import ProvidersTable from './providersTable'
 import useStyles from '../styles'
@@ -89,7 +89,13 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
           variant="outlined"
           fullWidth
           error={error === ERROR_TITLE}
-          helperText={error === ERROR_TITLE ? 'Le nom est trop long (255 caractère max.)' : ''}
+          helperText={
+            error === ERROR_TITLE
+              ? currentRequest?.name.length === 0
+                ? 'Le nom de la requête doit comporter au moins un caractère.'
+                : 'Le nom est trop long (255 caractères max.)'
+              : ''
+          }
         />
       </Grid>
 
@@ -97,7 +103,7 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
         <Typography variant="h3">Utilisateur à qui partager la requête:</Typography>
         <div style={{ display: 'flex', flexDirection: 'column', margin: '1em' }}>
           <Autocomplete
-            noOptionsText="Recherchez un utilisateur"
+            noOptionsText="Rechercher un utilisateur"
             clearOnEscape
             options={providersSearchResults ?? []}
             loading={loadingOnSearch}
@@ -108,8 +114,8 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
             inputValue={searchInput}
             onInputChange={() => setSearchInput('')}
             getOptionLabel={(option) =>
-              `${option.provider_source_value} - ${option.lastname?.toLocaleUpperCase()} ${option.firstname} - ${
-                option.email
+              `${option.provider_source_value} - ${option.lastname?.toLocaleUpperCase()} ${option.firstname} ${
+                option.email ? `- ${option.email}` : ''
               }` ?? ''
             }
             renderInput={(params) => (

@@ -5,7 +5,6 @@ import {
   IExtension
   // IReference
 } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { getAgeArkhn } from './age'
 import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
 import { getStringMonth, getStringMonthAphp } from './formatDate'
 
@@ -217,39 +216,6 @@ export const getAgeRepartitionMapAphp = (facet?: IExtension[]): AgeRepartitionTy
               repartitionMap[age].other = genderValue.valueDecimal ?? 0
           }
         })
-      }
-    }
-  })
-
-  return repartitionMap
-}
-
-export const getAgeRepartitionMap = (patients: IPatient[]): AgeRepartitionType => {
-  const repartitionMap = new Array(130).map(() => ({ male: 0, female: 0, other: 0 }))
-
-  patients.forEach((patient) => {
-    if (patient.birthDate) {
-      const age = getAgeArkhn(
-        new Date(patient.birthDate),
-        patient.deceasedDateTime ? new Date(patient.deceasedDateTime) : new Date()
-      )
-      if (!repartitionMap[age]) {
-        repartitionMap[age] = { male: 0, female: 0, other: 0 }
-      }
-
-      switch (patient.gender) {
-        case 'female':
-          if (!repartitionMap[age].female) repartitionMap[age].female = 0
-          repartitionMap[age].female += 1
-          break
-        case 'male':
-          if (!repartitionMap[age].male) repartitionMap[age].male = 0
-          repartitionMap[age].male += 1
-          break
-        default:
-          if (!repartitionMap[age].other) repartitionMap[age].other = 0
-          repartitionMap[age].other += 1
-          break
       }
     }
   })

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import clsx from 'clsx'
 
 import { Grid, IconButton, InputAdornment, InputBase } from '@mui/material'
 
@@ -15,10 +16,12 @@ type InputSearchDocumentSimpleProps = {
   defaultSearchInput?: string
   setDefaultSearchInput?: (newSearchInput: string) => void
   onSearchDocument: (newInputText: string) => void
+  error?: boolean
   noInfoIcon?: boolean
   noClearIcon?: boolean
   noSearchIcon?: boolean
-  sqareInput?: boolean
+  squareInput?: boolean
+  minRows?: number
 }
 const InputSearchDocumentSimple: React.FC<InputSearchDocumentSimpleProps> = ({
   placeholder,
@@ -60,13 +63,23 @@ const InputSearchDocumentSimple: React.FC<InputSearchDocumentSimpleProps> = ({
 
   return (
     <>
-      <Grid container item className={props.sqareInput ? classes.gridAdvancedSearchSqared : classes.gridAdvancedSearch}>
+      <Grid
+        container
+        item
+        className={clsx({
+          [classes.gridAdvancedSearchSquared]: props.squareInput,
+          [classes.gridAdvancedSearch]: !props.squareInput,
+          [classes.error]: props.error
+        })}
+      >
         <InputBase
           fullWidth
+          error={props.error}
           placeholder={placeholder ?? 'Recherche dans les documents'}
           value={searchInput}
           onChange={handleChangeInput}
           multiline
+          minRows={props.minRows ?? 1}
           onKeyDown={onKeyDown}
           endAdornment={
             <InputAdornment position="end">

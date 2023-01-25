@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 
 import { Button, IconButton, CircularProgress, Grid, Hidden, Tooltip, Typography, Snackbar } from '@mui/material'
@@ -40,6 +40,13 @@ const MyProjects: React.FC<{}> = () => {
   const [searchInput, setSearchInput] = useState('')
   const [selectedRequests, setSelectedRequests] = useState<RequestType[]>([])
   const [openModal, setOpenModal] = useState<'move_to_folder' | 'delete_items' | null>(null)
+  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<'success' | 'error' | null>(null)
+  const wrapperSetShareSuccessOrFailMessage = useCallback(
+    (val) => {
+      setShareSuccessOrFailMessage(val)
+    },
+    [setShareSuccessOrFailMessage]
+  )
 
   const { open, projectState, requestState, cohortState, meState } = useAppSelector<{
     open: boolean
@@ -75,7 +82,7 @@ const MyProjects: React.FC<{}> = () => {
   }
 
   const _fetchCohortsList = async () => {
-    dispatch<any>(fetchCohortsList())
+    dispatch<any>(fetchCohortsList({ limit: 100 }))
   }
 
   const _fetch = async () => {
@@ -137,11 +144,11 @@ const MyProjects: React.FC<{}> = () => {
                           color="primary"
                           disabled={maintenanceIsActive}
                         >
-                          Deplacer {selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}
+                          Déplacer {selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}
                         </Button>
                       </Hidden>
                       <Hidden only={['lg', 'xl']}>
-                        <Tooltip title={`Deplacer ${selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}`}>
+                        <Tooltip title={`Déplacer ${selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}`}>
                           <IconButton
                             onClick={() => setOpenModal('move_to_folder')}
                             color="primary"
@@ -235,7 +242,11 @@ const MyProjects: React.FC<{}> = () => {
       {selectedRequestShare !== null &&
         selectedRequestShare?.shared_query_snapshot !== undefined &&
         selectedRequestShare?.shared_query_snapshot?.length > 0 && (
-          <ModalShareRequest onClose={() => dispatch<any>(setSelectedRequestShare(null))} />
+          <ModalShareRequest
+            shareSuccessOrFailMessage={shareSuccessOrFailMessage}
+            parentStateSetter={wrapperSetShareSuccessOrFailMessage}
+            onClose={() => dispatch<any>(setSelectedRequestShare(null))}
+          />
         )}
 
       {selectedRequestShare !== null &&
@@ -252,6 +263,32 @@ const MyProjects: React.FC<{}> = () => {
             </Alert>
           </Snackbar>
         )}
+
+      {shareSuccessOrFailMessage === 'success' && (
+        <Snackbar
+          open
+          onClose={() => setShareSuccessOrFailMessage(null)}
+          autoHideDuration={5000}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert severity="success" onClose={() => setShareSuccessOrFailMessage(null)}>
+            Votre requête a été partagée.
+          </Alert>
+        </Snackbar>
+      )}
+
+      {shareSuccessOrFailMessage === 'error' && (
+        <Snackbar
+          open
+          onClose={() => setShareSuccessOrFailMessage(null)}
+          autoHideDuration={5000}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert severity="error" onClose={() => setShareSuccessOrFailMessage(null)}>
+            Une erreur est survenue, votre requête n'a pas pu être partagée.
+          </Alert>
+        </Snackbar>
+      )}
 
       <ModalEditCohort open={selectedCohort !== null} onClose={() => dispatch<any>(setSelectedCohort(null))} />
 

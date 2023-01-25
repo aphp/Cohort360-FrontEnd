@@ -39,7 +39,6 @@ type PatientSidebarHeaderTypes = {
   onClickSortButton: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   openSort: boolean
   onCloseSort: () => void
-  onSubmitSort: () => void
   sort: Sort
   onChangeSort: (sort: Sort) => void
 }
@@ -172,7 +171,6 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
         <SortDialog
           open={props.openSort}
           onClose={props.onCloseSort}
-          onSubmit={props.onSubmitSort}
           sort={props.sort}
           onChangeSort={props.onChangeSort}
         />

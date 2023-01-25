@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderRadius: 25,
     marginBlock: 4
   },
-  gridAdvancedSearchSqared: {
+  gridAdvancedSearchSquared: {
     backgroundColor: '#FFF',
     border: '1px solid #c4c4c4',
     padding: 8,

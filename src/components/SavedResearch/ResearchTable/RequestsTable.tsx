@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 
@@ -86,6 +86,13 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
   const [dialogOpen, setOpenDialog] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<string | undefined>()
   const [anchorEl, setAnchorEl] = React.useState(null)
+  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<'success' | 'error' | null>(null)
+  const wrapperSetShareSuccessOrFailMessage = useCallback(
+    (val : any) => {
+      setShareSuccessOrFailMessage(val)
+    },
+    [setShareSuccessOrFailMessage]
+  )
   const openMenuItem = Boolean(anchorEl)
 
   const _onClickRow = (row: any) => {
@@ -304,7 +311,11 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
       {selectedRequestShareState !== null &&
         selectedRequestShareState?.shared_query_snapshot !== undefined &&
         selectedRequestShareState?.shared_query_snapshot?.length > 0 && (
-          <ModalShareRequest onClose={() => dispatch<any>(setSelectedRequestShareState(null))} />
+          <ModalShareRequest
+            shareSuccessOrFailMessage={shareSuccessOrFailMessage}
+            parentStateSetter={wrapperSetShareSuccessOrFailMessage}
+            onClose={() => dispatch<any>(setSelectedRequestShareState(null))}
+          />
         )}
 
       {selectedRequestShareState !== null &&
@@ -321,6 +332,32 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
             </Alert>
           </Snackbar>
         )}
+
+      {shareSuccessOrFailMessage === 'success' && (
+        <Snackbar
+          open
+          onClose={() => setShareSuccessOrFailMessage(null)}
+          autoHideDuration={5000}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert severity="success" onClose={() => setShareSuccessOrFailMessage(null)}>
+            Votre requête a été partagée.
+          </Alert>
+        </Snackbar>
+      )}
+
+      {shareSuccessOrFailMessage === 'error' && (
+        <Snackbar
+          open
+          onClose={() => setShareSuccessOrFailMessage(null)}
+          autoHideDuration={5000}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert severity="error" onClose={() => setShareSuccessOrFailMessage(null)}>
+            Une erreur est survenue, votre requête n'a pas pu être partagée.
+          </Alert>
+        </Snackbar>
+      )}
     </>
   )
 }

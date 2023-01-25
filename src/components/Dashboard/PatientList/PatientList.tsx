@@ -13,7 +13,7 @@ import MasterChips from 'components/MasterChips/MasterChips'
 
 import PatientCharts from './components/PatientCharts'
 
-import services from 'services'
+import services from 'services/aphp'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   AgeRepartitionType,
@@ -109,6 +109,7 @@ const PatientList: React.FC<PatientListProps> = ({
       filters.vitalStatus,
       order.orderBy,
       order.orderDirection,
+      deidentified ?? true,
       groupId,
       includeFacets
     )
@@ -172,6 +173,7 @@ const PatientList: React.FC<PatientListProps> = ({
 
         {/* <Grid id="patient-data-grid" container item justifyContent="flex-end" className={classes.tableGrid}> */}
         <DataTableTopBar
+          loading={loadingStatus}
           results={patientsResult}
           searchBar={
             deidentified
