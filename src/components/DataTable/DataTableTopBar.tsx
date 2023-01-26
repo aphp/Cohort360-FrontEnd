@@ -46,7 +46,7 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, search
   const [search, setSearch] = useState(searchBar?.value ?? '')
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
 
-  const debouncedSearchItem = useDebounce(500, search)
+  const debouncedSearchItem = useDebounce(0, search)
 
   const onSearch = (newInput = search) => {
     if (searchBar && searchBar.onSearch && typeof searchBar.onSearch === 'function') {

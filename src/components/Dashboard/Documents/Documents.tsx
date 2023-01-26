@@ -60,74 +60,87 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
 
-  const checkDocumentSearch = async () => {
-    const checkDocumentSearch = await services.cohorts.checkDocumentSearchInput(searchInput)
+  const checkDocumentSearch = async (controller: any) => {
+    const checkDocumentSearch = await services.cohorts.checkDocumentSearchInput(searchInput, controller.signal)
 
     setSearchInputError(checkDocumentSearch)
 
     return checkDocumentSearch
   }
 
-  const onSearchDocument = async (newPage: number) => {
-    if (searchInput) {
-      setSearchMode(true)
-    } else {
-      setSearchMode(false)
-    }
-    setLoadingStatus(true)
+  const onSearchDocument = async (newPage: number, controller: any) => {
+    try {
+      if (searchInput) {
+        setSearchMode(true)
+      } else {
+        setSearchMode(false)
+      }
+      setLoadingStatus(true)
 
-    const searchInputError = await checkDocumentSearch()
-    if (searchInputError && searchInputError.isError) {
-      setDocuments([])
+      const searchInputError = await checkDocumentSearch(controller)
+      if (searchInputError && searchInputError.isError) {
+        setDocuments([])
+        setLoadingStatus(false)
+        return
+      }
+
+      setLoadingStatus(true)
+
+      const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
+
+      const result = await services.cohorts.fetchDocuments(
+        !!deidentifiedBoolean,
+        searchBy,
+        order.orderBy,
+        order.orderDirection,
+        newPage,
+        searchInput ?? '',
+        selectedDocTypesCodes,
+        filters.nda,
+        filters.ipp ?? '',
+        filters.onlyPdfAvailable,
+        controller.signal,
+        filters.startDate,
+        filters.endDate,
+        groupId
+      )
+
+      if (result) {
+        const { totalDocs, totalAllDocs, documentsList, totalPatientDocs, totalAllPatientDocs } = result
+        setDocumentsResult((prevState) => ({
+          ...prevState,
+          nb: totalDocs,
+          total: totalAllDocs
+        }))
+        setPatientsResult((prevState) => ({
+          ...prevState,
+          nb: totalPatientDocs,
+          total: totalAllPatientDocs
+        }))
+        setDocuments(documentsList)
+      } else {
+        setDocuments([])
+      }
       setLoadingStatus(false)
-      return
-    }
-
-    const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
-
-    const result = await services.cohorts.fetchDocuments(
-      !!deidentifiedBoolean,
-      searchBy,
-      order.orderBy,
-      order.orderDirection,
-      newPage,
-      searchInput ?? '',
-      selectedDocTypesCodes,
-      filters.nda,
-      filters.ipp ?? '',
-      filters.onlyPdfAvailable,
-      filters.startDate,
-      filters.endDate,
-      groupId
-    )
-
-    if (result) {
-      const { totalDocs, totalAllDocs, documentsList, totalPatientDocs, totalAllPatientDocs } = result
-      setDocumentsResult((prevState) => ({
-        ...prevState,
-        nb: totalDocs,
-        total: totalAllDocs
-      }))
-      setPatientsResult((prevState) => ({
-        ...prevState,
-        nb: totalPatientDocs,
-        total: totalAllPatientDocs
-      }))
-      setDocuments(documentsList)
-    } else {
+    } catch (error) {
+      console.error('Erreur lors de la récupération des documents', error)
+      setLoadingStatus(false)
       setDocuments([])
     }
-    setLoadingStatus(false)
   }
 
-  const handleChangePage = (newPage = 1) => {
+  const handleChangePage = (newPage = 1, controller?: any) => {
     setPage(newPage)
 
-    onSearchDocument(newPage)
+    onSearchDocument(newPage, controller)
   }
 
   useEffect(() => {
-    handleChangePage(1)
+    const controller = new AbortController()
+
+    handleChangePage(1, controller)
+
+    return () => controller.abort()
   }, [!!deidentifiedBoolean, filters, order, searchInput, searchBy]) // eslint-disable-line
 
   const handleOpenDialog = () => {

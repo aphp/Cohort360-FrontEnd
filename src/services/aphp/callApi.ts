@@ -17,6 +17,7 @@ import {
   IPractitionerRole,
   IProcedure
 } from '@ahryman40k/ts-fhir-types/lib/R4'
+import axios, { AxiosResponse } from 'axios'
 
 const reducer = (accumulator: any, currentValue: any) =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -220,6 +221,7 @@ export const fetchEncounter = async (args: fetchEncounterProps) => {
  */
 
 type fetchCompositionProps = {
+  signal?: any
   _id?: string
   _list?: string[]
   size?: number
@@ -243,6 +245,7 @@ type fetchCompositionProps = {
 }
 export const fetchComposition = async (args: fetchCompositionProps) => {
   const {
+    signal,
     _id,
     size,
     offset,
@@ -258,6 +261,7 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
     minDate,
     maxDate
   } = args
+  console.log('args', args)
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list, facet, uniqueFacet, _elements } = args
   const encounterIdentifier = args['encounter.identifier']
@@ -291,17 +295,42 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   if (uniqueFacet && uniqueFacet.length > 0) options = [...options, `uniqueFacet=${uniqueFacet.reduce(reducer)}`] // eslint-disable-line
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<IComposition>>(`/Composition?${options.reduce(optionsReducer)}`)
+  let config = undefined
+  if (signal) config = { signal: signal }
+  console.log('configlooooo', config)
 
-  return response
+  try {
+    const response = await apiFhir.get<FHIR_API_Response<IComposition>>(
+      `/Composition?${options.reduce(optionsReducer)}`,
+      config
+    )
+
+    return response
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.error('axios cancelled de composition frerot', error)
+    }
+    console.error('Erreur lors de la récupération des documents', error)
+    return {} as AxiosResponse<FHIR_API_Response<IComposition>>
+  }
 }
 
-export const fetchCheckDocumentSearchInput = async (searchInput: string) => {
-  const checkDocumentSearchInput = await apiFhir.get<CohortComposition>(
-    `/Composition/$text?_text=${encodeURIComponent(searchInput)}`
-  )
-
-  return checkDocumentSearchInput.data.parameter ?? null
+export const fetchCheckDocumentSearchInput = async (searchInput: string, signal?: any) => {
+  const config = signal ? { signal: signal } : undefined
+  try {
+    console.log('config', config)
+    const checkDocumentSearchInput = await apiFhir.get<CohortComposition>(
+      `/Composition/$text?_text=${encodeURIComponent(searchInput)}`,
+      config
+    )
+    return checkDocumentSearchInput.data.parameter ?? null
+  } catch (error) {
+    console.error('Erreur lors de la vérification du champ de recherche', error)
+    if (axios.isCancel(error)) {
+      console.error('axios cancelled du check frerot', error)
+    }
+    return null
+  }
 }
 
 export const fetchCompositionContent = async (compositionId: string) => {

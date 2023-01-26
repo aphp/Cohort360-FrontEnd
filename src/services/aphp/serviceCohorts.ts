@@ -136,6 +136,7 @@ export interface IServiceCohorts {
     nda: string,
     ipp: string,
     onlyPdfAvailable: boolean,
+    signal?: any,
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string
@@ -156,7 +157,7 @@ export interface IServiceCohorts {
    * Retourne:
    *   - searchInputError: objet décrivant la ou les erreurs du champ de recherche s'il y en a
    */
-  checkDocumentSearchInput: (searchInput: string) => Promise<searchInputError>
+  checkDocumentSearchInput: (searchInput: string, signal?: any) => Promise<searchInputError>
 
   /**
    * Permet de récupérer le contenu d'un document
@@ -380,6 +381,7 @@ const servicesCohorts: IServiceCohorts = {
     nda,
     ipp,
     onlyPdfAvailable,
+    signal,
     startDate,
     endDate,
     groupId
@@ -399,12 +401,14 @@ const servicesCohorts: IServiceCohorts = {
         'encounter.identifier': nda,
         'patient.identifier': ipp,
         onlyPdfAvailable: onlyPdfAvailable,
+        signal: signal,
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
         uniqueFacet: ['patient']
       }),
       !!searchInput || selectedDocTypes.length > 0 || !!nda || !!ipp || !!startDate || !!endDate
         ? fetchComposition({
+            signal: signal,
             status: 'final',
             _list: groupId ? [groupId] : [],
             size: 0,
@@ -445,14 +449,14 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
-  checkDocumentSearchInput: async (searchInput) => {
+  checkDocumentSearchInput: async (searchInput, signal) => {
     if (!searchInput) {
       return {
         isError: false
       }
     }
 
-    const checkDocumentSearchInput = await fetchCheckDocumentSearchInput(searchInput)
+    const checkDocumentSearchInput = await fetchCheckDocumentSearchInput(searchInput, signal)
 
     if (checkDocumentSearchInput) {
       const errors = checkDocumentSearchInput.find((parameter: any) => parameter.name === 'WARNING')?.part ?? []
@@ -490,7 +494,7 @@ const servicesCohorts: IServiceCohorts = {
         errorsDetails: [
           {
             errorName: 'Erreur du serveur',
-            errorSolution: 'Veuillez refaire votre recherche.'
+            errorSolution: 'Veuillez refaire votre recherche'
           }
         ]
       }
@@ -749,7 +753,7 @@ const getDocumentInfos: (
   documents?: IComposition[],
   groupId?: string
 ) => Promise<CohortComposition[]> = async (deidentifiedBoolean: boolean, documents, groupId) => {
-  const cohortDocuments = documents as CohortComposition[]
+  const cohortDocuments = (documents as CohortComposition[]) ?? []
 
   const listePatientsIds = cohortDocuments
     .map((e) => e.subject?.display?.substring(8))
