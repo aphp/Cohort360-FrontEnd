@@ -29,7 +29,8 @@ import {
   fetchAtcData,
   fetchAtcHierarchy,
   fetchPrescriptionTypes,
-  fetchAdministrations
+  fetchAdministrations,
+  fetchSignleCode
 } from './cohortCreation/fetchMedication'
 import { fetchBiologySearch, fetchBiologyData, fetchBiologyHierarchy } from './cohortCreation/fetchObservation'
 
@@ -84,6 +85,7 @@ export interface IServiceCohortCreation {
   fetchGhmHierarchy: (ghmParent: string) => Promise<any>
   fetchDocTypes: () => DocType[]
   fetchAtcData: () => Promise<any>
+  fetchSingleMedication: (code: string) => Promise<string[]>
   fetchAtcHierarchy: (atcParent: string) => Promise<any>
   fetchPrescriptionTypes: () => Promise<any>
   fetchAdministrations: () => Promise<any>
@@ -258,6 +260,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
   fetchGhmHierarchy: fetchGhmHierarchy,
   fetchDocTypes: fetchDocTypes,
   fetchAtcData: fetchAtcData,
+  fetchSingleMedication: fetchSignleCode,
   fetchAtcHierarchy: fetchAtcHierarchy,
   fetchPrescriptionTypes: fetchPrescriptionTypes,
   fetchAdministrations: fetchAdministrations,

@@ -1,13 +1,14 @@
 import {
+  MEDICATION_ADMINISTRATIONS,
   MEDICATION_ATC,
   MEDICATION_PRESCRIPTION_TYPES,
-  MEDICATION_ADMINISTRATIONS,
   VALUE_SET_SIZE
 } from '../../../constants'
-import apiFhir from 'services/apiFhir'
 import { cleanValueSet } from 'utils/cleanValueSet'
 import { codeSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
+import apiFhir from '../../apiFhir'
+import { getApiResponseConceptMap } from 'utils/apiHelpers'
 
 export const fetchAtcData = async (searchValue?: string, noStar?: boolean) => {
   noStar = noStar === undefined ? true : noStar
@@ -101,6 +102,22 @@ export const fetchAtcHierarchy = async (atcParent: string) => {
         }))
       : []
   }
+}
+
+export const fetchSignleCode: (code: string) => Promise<string[]> = async (code: string) => {
+  if (!code) return []
+  const response = await apiFhir.get<any>(`/ConceptMap?size=100&context=Descendant-leaf&source-code=${code}`)
+
+  const data = getApiResponseConceptMap(response)
+  const codeList: string[] = []
+  data?.forEach((resource: any) =>
+    resource?.group?.forEach((group: { element: any[] }) =>
+      group.element?.forEach((element) =>
+        element?.target?.forEach((target: { code: any }) => codeList.push(target.code))
+      )
+    )
+  )
+  return codeList
 }
 
 export const fetchPrescriptionTypes = async () => {

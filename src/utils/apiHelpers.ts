@@ -9,3 +9,10 @@ export function getApiResponseResources<T extends IResourceList>(
 
   return response.data.entry ? response.data.entry.map((r) => r.resource).filter((r): r is T => undefined !== r) : []
 }
+export function getApiResponseConceptMap(response: any) {
+  if (!response || !(response && response.data) || response.data.resourceType === 'OperationOutcome') return undefined
+
+  return response.data.entry
+    ? response.data.entry.map((r: { resource: any }) => r.resource).filter((r: any) => undefined !== r)
+    : []
+}

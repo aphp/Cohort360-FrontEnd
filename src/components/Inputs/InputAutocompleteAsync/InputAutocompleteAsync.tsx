@@ -94,7 +94,9 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
           variant={variant}
           value={searchValue}
           helperText={helperText}
-          onChange={(e) => setSearchValue(e.target.value)}
+          onChange={(e) => {
+            setSearchValue(e.target.value)
+          }}
           InputProps={{
             ...params.InputProps,
             endAdornment: (
