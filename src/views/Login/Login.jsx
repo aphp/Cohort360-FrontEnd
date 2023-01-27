@@ -288,7 +288,6 @@ const Login = () => {
             <form className={classes.form} noValidate onSubmit={_onSubmit}>
               <Grid container item direction="column" alignItems="center">
                 <TextField
-                  variant="outlined"
                   margin="normal"
                   required
                   fullWidth
@@ -301,7 +300,6 @@ const Login = () => {
                 />
 
                 <TextField
-                  variant="outlined"
                   margin="normal"
                   required
                   fullWidth

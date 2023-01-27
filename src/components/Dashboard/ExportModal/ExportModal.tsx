@@ -218,7 +218,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               maxRows={5}
               value={settings.motif}
               helperText="Le motif doit comporter au moins 10 caractères"
-              variant="outlined"
               label="Motif de l'export"
               onChange={(e) => handleChangeSettings('motif', e.target.value)}
             />

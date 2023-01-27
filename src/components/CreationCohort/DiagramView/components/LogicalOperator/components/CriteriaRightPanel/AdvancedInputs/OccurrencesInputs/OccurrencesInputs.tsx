@@ -75,7 +75,6 @@ const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
           }}
           type="number"
           id="criteria-occurrence-required"
-          variant="outlined"
           value={selectedCriteria.occurrence}
           onChange={(e) => onChangeValue('occurrence', e.target.value)}
         />

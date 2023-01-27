@@ -57,7 +57,6 @@ const ModalCohortTitle: React.FC<{
             autoFocus
             id="title"
             margin="normal"
-            variant="outlined"
             fullWidth
             error={error === ERROR_TITLE}
             helperText={
@@ -78,7 +77,6 @@ const ModalCohortTitle: React.FC<{
             onChange={(e: any) => onChangeDescription(e.target.value)}
             id="description"
             margin="normal"
-            variant="outlined"
             fullWidth
             multiline
             minRows={5}

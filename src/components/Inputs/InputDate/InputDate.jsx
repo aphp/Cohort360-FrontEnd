@@ -95,7 +95,7 @@ const InputDate = (props) => {
           options={monthList}
           getOptionLabel={({ key }) => key}
           renderInput={(params) => (
-            <TextField {...params} variant="outlined" placeholder="Mois" classes={{ error: classes.inputTextError }} />
+            <TextField {...params} placeholder="Mois" classes={{ error: classes.inputTextError }} />
           )}
           onChange={(e, v) => _onChangeValue('month', v?.value)}
         />

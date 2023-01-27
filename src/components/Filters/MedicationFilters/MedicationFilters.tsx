@@ -123,7 +123,6 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
           <Grid container direction="column" className={classes.filter}>
             <Typography variant="h3">NDA :</Typography>
             <TextField
-              variant="outlined"
               margin="normal"
               fullWidth
               autoFocus
@@ -150,7 +149,6 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  variant="outlined"
                   label="Voie d'administration"
                   placeholder="Sélectionner une ou plusieurs voie d'arministration"
                 />
@@ -176,7 +174,6 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  variant="outlined"
                   label="Types de prescriptions"
                   placeholder="Sélectionner type(s) de prescriptions"
                 />

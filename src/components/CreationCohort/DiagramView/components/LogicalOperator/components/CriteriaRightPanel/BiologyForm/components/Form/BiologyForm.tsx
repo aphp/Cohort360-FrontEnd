@@ -130,7 +130,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             id="criteria-name-required"
             placeholder="Nom du critère"
             defaultValue="Critères de biologie"
-            variant="outlined"
             value={selectedCriteria.title}
             onChange={(e) => onChangeValue('title', e.target.value)}
           />
@@ -229,7 +228,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 }}
                 type="number"
                 id="criteria-value"
-                variant="outlined"
                 value={selectedCriteria.valueMin}
                 onChange={(e) => onChangeValue('valueMin', e.target.value)}
                 placeholder={selectedCriteria.valueComparator === '<x>' ? 'Valeur minimale' : ''}
@@ -243,7 +241,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                   }}
                   type="number"
                   id="criteria-value"
-                  variant="outlined"
                   value={selectedCriteria.valueMax}
                   onChange={(e) => onChangeValue('valueMax', e.target.value)}
                   placeholder="Valeur maximale"

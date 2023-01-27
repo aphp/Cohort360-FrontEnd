@@ -136,7 +136,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
             disableCloseOnSelect
             getOptionLabel={(status: any) => status.display}
             renderOption={(status: any) => <React.Fragment>{status.display}</React.Fragment>}
-            renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Statut de la cohorte" />}
+            renderInput={(params) => <TextField {...params} placeholder="Statut de la cohorte" />}
             className={classes.autocomplete}
           />
         </Grid>
@@ -156,13 +156,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
             <FormLabel component="legend" className={classes.label}>
               Au moins :
             </FormLabel>
-            <TextField
-              type="number"
-              value={_minPatients}
-              onChange={_onChangeMinPatients}
-              variant="outlined"
-              inputProps={{ min: 0 }}
-            />
+            <TextField type="number" value={_minPatients} onChange={_onChangeMinPatients} inputProps={{ min: 0 }} />
             <FormLabel component="legend" className={classes.patientsLabel}>
               patient(s).
             </FormLabel>
@@ -172,13 +166,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
             <FormLabel component="legend" className={classes.label}>
               Jusque :
             </FormLabel>
-            <TextField
-              type="number"
-              value={_maxPatients}
-              onChange={_onChangeMaxPatients}
-              variant="outlined"
-              inputProps={{ min: 0 }}
-            />
+            <TextField type="number" value={_maxPatients} onChange={_onChangeMaxPatients} inputProps={{ min: 0 }} />
             <FormLabel component="legend" className={classes.patientsLabel}>
               patient(s).
             </FormLabel>

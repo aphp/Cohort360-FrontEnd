@@ -42,7 +42,6 @@ const RequestForm: React.FC<RequestFormProps> = ({
           autoFocus
           id="title"
           margin="normal"
-          variant="outlined"
           fullWidth
           error={error === ERROR_TITLE}
           helperText={
@@ -81,7 +80,6 @@ const RequestForm: React.FC<RequestFormProps> = ({
             onChange={(e: any) => onChangeProjectName(e.target.value)}
             id="project_name"
             margin="normal"
-            variant="outlined"
             fullWidth
             error={error === ERROR_PROJECT_NAME}
           />
@@ -96,7 +94,6 @@ const RequestForm: React.FC<RequestFormProps> = ({
           onChange={(e: any) => onChangeValue('description', e.target.value)}
           id="description"
           margin="normal"
-          variant="outlined"
           fullWidth
           multiline
           minRows={5}

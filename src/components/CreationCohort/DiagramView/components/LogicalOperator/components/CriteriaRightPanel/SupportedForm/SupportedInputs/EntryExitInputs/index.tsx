@@ -82,7 +82,7 @@ const EntryExitInputs: React.FC<EntryExitInputsProps> = ({ criteria, selectedCri
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesEntryModes}
             onChange={(e, value) => onChangeValue('entryMode', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Mode entrée" />}
+            renderInput={(params) => <TextField {...params} label="Mode entrée" />}
           />
 
           <Autocomplete
@@ -94,7 +94,7 @@ const EntryExitInputs: React.FC<EntryExitInputsProps> = ({ criteria, selectedCri
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesExitModes}
             onChange={(e, value) => onChangeValue('exitMode', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Mode sortie" />}
+            renderInput={(params) => <TextField {...params} label="Mode sortie" />}
           />
 
           <Autocomplete
@@ -106,7 +106,7 @@ const EntryExitInputs: React.FC<EntryExitInputsProps> = ({ criteria, selectedCri
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesReason}
             onChange={(e, value) => onChangeValue('reason', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Type sortie" />}
+            renderInput={(params) => <TextField {...params} label="Type sortie" />}
           />
         </Collapse>
       </Grid>

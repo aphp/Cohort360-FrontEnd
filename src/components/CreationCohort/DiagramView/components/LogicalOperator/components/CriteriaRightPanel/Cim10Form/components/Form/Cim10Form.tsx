@@ -107,7 +107,6 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            variant="outlined"
             value={selectedCriteria.title}
             onChange={(e) => onChangeValue('title', e.target.value)}
           />
@@ -148,7 +147,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             isOptionEqualToValue={(option: any, value: any) => option.id === value.id}
             value={defaultValuesType}
             onChange={(e, value) => onChangeValue('diagnosticType', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Type de diagnostic" />}
+            renderInput={(params) => <TextField {...params} label="Type de diagnostic" />}
           />
 
           <AdvancedInputs form="cim10" selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />

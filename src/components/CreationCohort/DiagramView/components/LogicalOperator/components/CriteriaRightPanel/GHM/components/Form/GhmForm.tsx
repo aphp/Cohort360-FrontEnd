@@ -87,7 +87,6 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            variant="outlined"
             value={selectedCriteria.title}
             onChange={(e) => onChangeValue('title', e.target.value)}
           />

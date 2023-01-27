@@ -96,7 +96,6 @@ const ModalAddOrEditProject: React.FC<{
               autoFocus
               id="title"
               margin="normal"
-              variant="outlined"
               fullWidth
               error={error === ERROR_TITLE}
               helperText={

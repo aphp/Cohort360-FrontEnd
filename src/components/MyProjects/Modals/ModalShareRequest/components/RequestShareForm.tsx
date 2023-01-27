@@ -86,7 +86,6 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
           autoFocus
           id="title"
           margin="normal"
-          variant="outlined"
           fullWidth
           error={error === ERROR_TITLE}
           helperText={
@@ -124,7 +123,6 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
                 error={error === ERROR_USER_SHARE_LIST}
                 helperText={error === ERROR_USER_SHARE_LIST ? 'Veuillez ajouter au moins un utilisateur' : ''}
                 label="Rechercher un utilisateur"
-                variant="outlined"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 InputProps={{

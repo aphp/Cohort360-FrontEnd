@@ -151,7 +151,6 @@ const Contact: React.FC = () => {
                   value={contactRequest.object}
                   onChange={(event) => _onChangeValue('object', event.target.value)}
                   margin="normal"
-                  variant="outlined"
                   fullWidth
                   style={{ marginBottom: 24, backgroundColor: 'white' }}
                   error={error === ERROR_OBJECT}
@@ -165,7 +164,6 @@ const Contact: React.FC = () => {
                       value={contactRequest.url}
                       onChange={(event) => _onChangeValue('url', event.target.value)}
                       margin="normal"
-                      variant="outlined"
                       fullWidth
                       style={{ marginBottom: 24, backgroundColor: 'white' }}
                     />
@@ -179,7 +177,6 @@ const Contact: React.FC = () => {
                   value={contactRequest.message}
                   onChange={(event) => _onChangeValue('message', event.target.value)}
                   margin="normal"
-                  variant="outlined"
                   fullWidth
                   multiline
                   minRows={5}

@@ -92,7 +92,6 @@ const IPPForm: React.FC<IPPFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            variant="outlined"
             value={defaultValues.title}
             onChange={(e) => _onChangeValue('title', e.target.value)}
           />

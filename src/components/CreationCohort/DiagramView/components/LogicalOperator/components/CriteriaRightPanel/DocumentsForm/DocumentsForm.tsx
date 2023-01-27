@@ -136,7 +136,6 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            variant="outlined"
             value={defaultValues.title}
             onChange={(e) => _onChangeValue('title', e.target.value)}
           />
@@ -208,7 +207,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             // value={defaultValuesDocType}
             value={defaultValues.docType}
             onChange={(e, value) => _onChangeValue('docType', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Types de documents" />}
+            renderInput={(params) => <TextField {...params} label="Types de documents" />}
             groupBy={(doctype) => doctype.type}
             disableCloseOnSelect
             renderGroup={(docType: any) => {

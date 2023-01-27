@@ -69,7 +69,6 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
           <Grid container direction="column" className={classes.filter}>
             <Typography variant="h3">NDA :</Typography>
             <TextField
-              variant="outlined"
               margin="normal"
               fullWidth
               autoFocus
@@ -83,7 +82,6 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Code ANABIO :</Typography>
           <TextField
-            variant="outlined"
             margin="normal"
             fullWidth
             autoFocus
@@ -96,7 +94,6 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Code LOINC :</Typography>
           <TextField
-            variant="outlined"
             margin="normal"
             fullWidth
             autoFocus

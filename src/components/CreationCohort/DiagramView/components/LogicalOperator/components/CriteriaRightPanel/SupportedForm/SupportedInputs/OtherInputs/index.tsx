@@ -83,7 +83,7 @@ const ProvenanceDestinationInputs: React.FC<AdmissionInputsProps> = ({ criteria,
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesPriseEnChargeType}
             onChange={(e, value) => onChangeValue('priseEnChargeType', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Type de prise en charge" />}
+            renderInput={(params) => <TextField {...params} label="Type de prise en charge" />}
           />
 
           <Autocomplete
@@ -95,7 +95,7 @@ const ProvenanceDestinationInputs: React.FC<AdmissionInputsProps> = ({ criteria,
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesTypeDeSejours}
             onChange={(e, value) => onChangeValue('typeDeSejour', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Type séjour" />}
+            renderInput={(params) => <TextField {...params} label="Type séjour" />}
           />
 
           <Autocomplete
@@ -107,7 +107,7 @@ const ProvenanceDestinationInputs: React.FC<AdmissionInputsProps> = ({ criteria,
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesFileStatus}
             onChange={(e, value) => onChangeValue('fileStatus', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Statut dossier" />}
+            renderInput={(params) => <TextField {...params} label="Statut dossier" />}
           />
         </Collapse>
       </Grid>

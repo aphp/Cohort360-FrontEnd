@@ -60,12 +60,7 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
               <React.Fragment>{capitalizeFirstLetter(diagnosticType.label)}</React.Fragment>
             )}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="outlined"
-                label="Types de diagnostics"
-                placeholder="Sélectionner type(s) de diagnostics"
-              />
+              <TextField {...params} label="Types de diagnostics" placeholder="Sélectionner type(s) de diagnostics" />
             )}
             className={classes.autocomplete}
           />

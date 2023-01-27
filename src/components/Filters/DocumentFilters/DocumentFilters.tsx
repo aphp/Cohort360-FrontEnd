@@ -149,7 +149,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
               )
             }}
             renderOption={(docType: any) => <React.Fragment>{docType.label}</React.Fragment>}
-            renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Types de documents" />}
+            renderInput={(params) => <TextField {...params} placeholder="Types de documents" />}
             className={classes.autocomplete}
           />
         </Grid>
@@ -157,7 +157,6 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
           <Grid container direction="column" className={classes.filter}>
             <Typography variant="h3">NDA :</Typography>
             <TextField
-              variant="outlined"
               margin="normal"
               fullWidth
               label="NDA"
@@ -171,7 +170,6 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
           <Grid container direction="column" className={classes.filter}>
             <Typography variant="h3">IPP :</Typography>
             <TextField
-              variant="outlined"
               margin="normal"
               fullWidth
               label="IPP"

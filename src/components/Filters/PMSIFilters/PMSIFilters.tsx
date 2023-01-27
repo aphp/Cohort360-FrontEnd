@@ -113,7 +113,6 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
           <Grid container direction="column" className={classes.filter}>
             <Typography variant="h3">NDA :</Typography>
             <TextField
-              variant="outlined"
               margin="normal"
               fullWidth
               autoFocus
@@ -126,7 +125,6 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Code :</Typography>
           <TextField
-            variant="outlined"
             margin="normal"
             fullWidth
             autoFocus
@@ -149,12 +147,7 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
                 <React.Fragment>{capitalizeFirstLetter(diagnosticType.label)}</React.Fragment>
               )}
               renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant="outlined"
-                  label="Types de diagnostics"
-                  placeholder="Sélectionner type(s) de diagnostics"
-                />
+                <TextField {...params} label="Types de diagnostics" placeholder="Sélectionner type(s) de diagnostics" />
               )}
               className={classes.autocomplete}
             />

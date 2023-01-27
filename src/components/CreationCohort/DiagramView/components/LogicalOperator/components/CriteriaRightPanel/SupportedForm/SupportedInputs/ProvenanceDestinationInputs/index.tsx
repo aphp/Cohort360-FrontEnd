@@ -72,7 +72,7 @@ const ProvenanceDestinationInputs: React.FC<AdmissionInputsProps> = ({ criteria,
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesDestination}
             onChange={(e, value) => onChangeValue('destination', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Destination" />}
+            renderInput={(params) => <TextField {...params} label="Destination" />}
           />
 
           <Autocomplete
@@ -84,7 +84,7 @@ const ProvenanceDestinationInputs: React.FC<AdmissionInputsProps> = ({ criteria,
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesProvenance}
             onChange={(e, value) => onChangeValue('provenance', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Provenance" />}
+            renderInput={(params) => <TextField {...params} label="Provenance" />}
           />
         </Collapse>
       </Grid>

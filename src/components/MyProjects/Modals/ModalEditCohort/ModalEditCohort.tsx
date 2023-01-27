@@ -105,7 +105,6 @@ const ModalEditCohort: React.FC<{
               autoFocus
               id="title"
               margin="normal"
-              variant="outlined"
               fullWidth
               error={error === ERROR_TITLE}
               helperText={
@@ -126,7 +125,6 @@ const ModalEditCohort: React.FC<{
               onChange={(e: any) => onChangeValue('description', e.target.value)}
               id="description"
               margin="normal"
-              variant="outlined"
               fullWidth
               multiline
               minRows={5}

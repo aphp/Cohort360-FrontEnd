@@ -72,7 +72,7 @@ const AdmissionInputs: React.FC<AdmissionInputsProps> = ({ criteria, selectedCri
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesAdmissionModes}
             onChange={(e, value) => onChangeValue('admissionMode', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Motif Admission" />}
+            renderInput={(params) => <TextField {...params} label="Motif Admission" />}
           />
 
           <Autocomplete
@@ -84,7 +84,7 @@ const AdmissionInputs: React.FC<AdmissionInputsProps> = ({ criteria, selectedCri
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesAdmission}
             onChange={(e, value) => onChangeValue('admission', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Type Admission" />}
+            renderInput={(params) => <TextField {...params} label="Type Admission" />}
           />
         </Collapse>
       </Grid>

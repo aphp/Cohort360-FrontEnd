@@ -78,7 +78,7 @@ const ModalMoveRequest: React.FunctionComponent<IModalMoveRequestProps> = ({ ope
               isOptionEqualToValue={(option, value) => option.uuid === value.uuid}
               value={currentFolder}
               onChange={(e, value) => onChangeCurrentFolder(value ? value : null)}
-              renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Déplacer vers" />}
+              renderInput={(params) => <TextField {...params} placeholder="Déplacer vers" />}
             />
           </Grid>
         </DialogContentText>
