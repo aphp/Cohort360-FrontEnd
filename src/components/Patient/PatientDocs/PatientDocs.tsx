@@ -168,7 +168,6 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
           <Checkbox
             checked={filters.onlyPdfAvailable}
             onChange={() => onChangeOptions('onlyPdfAvailable', !filters.onlyPdfAvailable)}
-            color="primary"
           />
           <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
         </Grid>

@@ -70,6 +70,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
                   onSelectedRow([...selectedRequests, row])
                 }
               }}
+              color="secondary"
             />
           </TableCell>
           <TableCell style={{ width: 62 }}>

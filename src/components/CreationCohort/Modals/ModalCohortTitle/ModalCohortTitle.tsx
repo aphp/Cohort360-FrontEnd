@@ -88,7 +88,13 @@ const ModalCohortTitle: React.FC<{
         <Grid container direction="column" className={classes.inputContainer}>
           <FormControlLabel
             labelPlacement="start"
-            control={<Checkbox checked={globalCount} onChange={(event) => onCheckGlobalCount(event.target.checked)} />}
+            control={
+              <Checkbox
+                checked={globalCount}
+                onChange={(event) => onCheckGlobalCount(event.target.checked)}
+                color="secondary"
+              />
+            }
             label={
               <Typography variant="h3">
                 Estimer le nombre de patients répondant à vos critères sur le périmètre de l'APHP

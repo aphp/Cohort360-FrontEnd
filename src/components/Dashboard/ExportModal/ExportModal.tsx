@@ -261,6 +261,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
                     <Checkbox
                       checked={!!settings.tables.find((tableId) => tableId === table_id)}
                       onChange={() => handleChangeTables(table_id)}
+                      color="secondary"
                     />
                   </ListItemSecondaryAction>
                 </ListItem>
@@ -316,6 +317,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
                   name="conditions"
                   checked={settings.conditions}
                   onChange={() => handleChangeSettings('conditions', !settings.conditions)}
+                  color="secondary"
                 />
               }
               labelPlacement="end"

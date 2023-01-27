@@ -29,7 +29,6 @@ function EnhancedTableHead(props) {
         {!props.noCheckbox && (
           <TableCell align="center" padding="checkbox">
             <Checkbox
-              color="primary"
               indeterminate={numSelected > 0 && numSelected < rowCount}
               indeterminateIcon={<IndeterminateCheckBoxIcon color="primary" />}
               checked={rowCount > 0 && numSelected === rowCount}

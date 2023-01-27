@@ -199,7 +199,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
               }}
             >
               <Checkbox
-                color="primary"
                 checked={allowSearchByValue}
                 onClick={() => setAllowSearchByValue(!allowSearchByValue)}
                 disabled={!selectedCriteria.isLeaf}

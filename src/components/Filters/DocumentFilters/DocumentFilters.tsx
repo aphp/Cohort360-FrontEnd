@@ -136,7 +136,6 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
                         currentDocTypeList.length !== currentSelectedDocTypeList.length &&
                         currentSelectedDocTypeList.length > 0
                       }
-                      color="primary"
                       checked={currentDocTypeList.length === currentSelectedDocTypeList.length}
                       onClick={onClick}
                     />
