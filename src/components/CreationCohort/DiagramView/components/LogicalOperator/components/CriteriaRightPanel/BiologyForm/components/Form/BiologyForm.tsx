@@ -210,7 +210,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 id="biology-value-comparator-select"
                 value={selectedCriteria.valueComparator}
                 onChange={(event) => onChangeValue('valueComparator', event.target.value as string)}
-                variant="outlined"
                 disabled={!allowSearchByValue}
               >
                 <MenuItem value={'<='}>{'<='}</MenuItem>

@@ -59,7 +59,6 @@ const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
           id="criteria-occurrenceComparator-select"
           value={selectedCriteria.occurrenceComparator}
           onChange={(event) => onChangeValue('occurrenceComparator', event.target.value as string)}
-          variant="outlined"
         >
           <MenuItem value={'<='}>{'<='}</MenuItem>
           <MenuItem value={'<'}>{'<'}</MenuItem>

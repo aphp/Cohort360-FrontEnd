@@ -61,7 +61,6 @@ const RequestForm: React.FC<RequestFormProps> = ({
           id="criteria-occurrenceComparator-select"
           value={currentRequest.parent_folder}
           onChange={(event) => onChangeValue('parent_folder', event.target.value as string)}
-          variant="outlined"
           error={error === ERROR_PROJECT}
           style={{ marginTop: 16, marginBottom: 8 }}
         >

@@ -133,7 +133,6 @@ const Contact: React.FC = () => {
                   required
                   value={contactRequest.requestType}
                   onChange={(event) => _onChangeValue('requestType', event.target.value as string)}
-                  variant="outlined"
                   style={{ marginTop: 16, marginBottom: 24, backgroundColor: 'white' }}
                   error={error === ERROR_REQUEST_TYPE}
                 >
