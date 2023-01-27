@@ -29,7 +29,7 @@ const PageNotFound: React.FC = () => {
             Si vous pensez qu'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante :
             dsi-id-recherche-support-cohort360@aphp.fr.
           </Typography>
-          <Button href="/home" variant="contained" color="primary" className={classes.button}>
+          <Button href="/home" variant="contained" className={classes.button}>
             Accueil
           </Button>
         </Grid>

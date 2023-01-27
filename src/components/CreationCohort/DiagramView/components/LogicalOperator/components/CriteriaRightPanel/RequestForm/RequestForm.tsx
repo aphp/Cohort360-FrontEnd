@@ -71,11 +71,11 @@ const RequestForm: React.FC<RequestFormProps> = ({ parentId, goBack }) => {
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
-          <Button onClick={goBack} color="primary" variant="outlined">
+          <Button onClick={goBack} variant="outlined">
             Annuler
           </Button>
 
-          <Button onClick={_onSubmit} type="submit" form="demographic-form" color="primary" variant="contained">
+          <Button onClick={_onSubmit} type="submit" form="demographic-form" variant="contained">
             Confirmer
           </Button>
         </Grid>

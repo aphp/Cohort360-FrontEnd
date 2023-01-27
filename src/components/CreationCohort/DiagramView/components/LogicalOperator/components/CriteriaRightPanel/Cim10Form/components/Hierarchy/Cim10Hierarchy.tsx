@@ -190,7 +190,7 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
 
       <Grid className={classes.cimHierarchyActionContainer}>
         {!isEdition && (
-          <Button onClick={goBack} color="primary" variant="outlined">
+          <Button onClick={goBack} variant="outlined">
             Annuler
           </Button>
         )}
@@ -198,7 +198,6 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
           onClick={() => onChangeSelectedHierarchy(filterSelectedPmsi(selectedHierarchy || [], cimHierarchy))}
           type="submit"
           form="cim10-form"
-          color="primary"
           variant="contained"
         >
           Confirmer

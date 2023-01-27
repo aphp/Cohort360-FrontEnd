@@ -62,7 +62,6 @@
 //               localStorage.setItem('old-path', location.pathname + location.search)
 //               setRedirection(true)
 //             }}
-//             color="primary"
 //             autoFocus
 //           >
 //             Ok
@@ -139,7 +138,6 @@ const PrivateRoute: React.FC = () => {
               localStorage.setItem('old-path', location.pathname + location.search)
               setRedirection(true)
             }}
-            color="primary"
             autoFocus
           >
             Ok

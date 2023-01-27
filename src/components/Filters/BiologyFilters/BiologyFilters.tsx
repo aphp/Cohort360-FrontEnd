@@ -163,10 +163,8 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Annuler
-        </Button>
-        <Button disabled={dateError} onClick={_onSubmit} color="primary">
+        <Button onClick={onClose}>Annuler</Button>
+        <Button disabled={dateError} onClick={_onSubmit}>
           Valider
         </Button>
       </DialogActions>

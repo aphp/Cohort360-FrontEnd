@@ -145,7 +145,7 @@ const ModalEditCohort: React.FC<{
             Annuler
           </Button>
 
-          <Button disabled={loading} onClick={handleConfirm} color="primary">
+          <Button disabled={loading} onClick={handleConfirm}>
             {isEdition ? 'Modifier' : 'Créer'}
           </Button>
         </DialogActions>
@@ -165,7 +165,7 @@ const ModalEditCohort: React.FC<{
         </DialogContent>
 
         <DialogActions>
-          <Button disabled={loading} onClick={handleClose} color="primary">
+          <Button disabled={loading} onClick={handleClose}>
             Annuler
           </Button>
 

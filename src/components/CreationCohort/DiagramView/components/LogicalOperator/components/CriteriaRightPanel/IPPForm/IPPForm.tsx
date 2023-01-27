@@ -132,18 +132,11 @@ const IPPForm: React.FC<IPPFormProps> = (props) => {
 
         <Grid className={classes.criteriaActionContainer}>
           {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
+            <Button onClick={goBack} variant="outlined">
               Annuler
             </Button>
           )}
-          <Button
-            onClick={_onSubmit}
-            disabled={error}
-            type="submit"
-            form="ipp-form"
-            color="primary"
-            variant="contained"
-          >
+          <Button onClick={_onSubmit} disabled={error} type="submit" form="ipp-form" variant="contained">
             Confirmer
           </Button>
         </Grid>

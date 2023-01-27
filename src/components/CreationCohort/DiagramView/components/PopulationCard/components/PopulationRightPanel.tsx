@@ -46,13 +46,12 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
         </div>
 
         <div className={classes.drawerActionContainer}>
-          <Button onClick={onClose} color="primary" variant="outlined">
+          <Button onClick={onClose} variant="outlined">
             Annuler
           </Button>
           <Button
             disabled={!_selectedPopulation || (_selectedPopulation && _selectedPopulation.length === 0)}
             onClick={() => onConfirm(_selectedPopulation)}
-            color="primary"
             variant="contained"
           >
             Confirmer

@@ -92,10 +92,8 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Annuler
-        </Button>
-        <Button onClick={_onSubmit} color="primary" disabled={error}>
+        <Button onClick={onClose}>Annuler</Button>
+        <Button onClick={_onSubmit} disabled={error}>
           Valider
         </Button>
       </DialogActions>

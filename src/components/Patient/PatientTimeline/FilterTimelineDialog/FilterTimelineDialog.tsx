@@ -67,12 +67,8 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Annuler
-        </Button>
-        <Button onClick={_onSubmit} color="primary">
-          Valider
-        </Button>
+        <Button onClick={onClose}>Annuler</Button>
+        <Button onClick={_onSubmit}>Valider</Button>
       </DialogActions>
     </Dialog>
   )

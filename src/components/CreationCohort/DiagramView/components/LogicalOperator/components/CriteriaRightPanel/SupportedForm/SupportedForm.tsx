@@ -341,18 +341,11 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
 
         <Grid className={classes.criteriaActionContainer}>
           {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
+            <Button onClick={goBack} variant="outlined">
               Annuler
             </Button>
           )}
-          <Button
-            onClick={_onSubmit}
-            type="submit"
-            form="supported-form"
-            color="primary"
-            variant="contained"
-            disabled={sliderError}
-          >
+          <Button onClick={_onSubmit} type="submit" form="supported-form" variant="contained" disabled={sliderError}>
             Confirmer
           </Button>
         </Grid>

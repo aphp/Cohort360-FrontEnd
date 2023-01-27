@@ -237,10 +237,8 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Annuler
-        </Button>
-        <Button onClick={_onSubmit} color="primary" disabled={nbPatientsError || dateError}>
+        <Button onClick={onClose}>Annuler</Button>
+        <Button onClick={_onSubmit} disabled={nbPatientsError || dateError}>
           Valider
         </Button>
       </DialogActions>

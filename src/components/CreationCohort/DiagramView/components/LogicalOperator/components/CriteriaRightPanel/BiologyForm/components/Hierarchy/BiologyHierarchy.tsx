@@ -193,7 +193,7 @@ const BiologyHierarchy: React.FC<BiologyHierarchyProps> = (props) => {
 
       <Grid className={classes.biologyHierarchyActionContainer}>
         {!isEdition && (
-          <Button onClick={goBack} color="primary" variant="outlined">
+          <Button onClick={goBack} variant="outlined">
             Annuler
           </Button>
         )}
@@ -201,7 +201,6 @@ const BiologyHierarchy: React.FC<BiologyHierarchyProps> = (props) => {
           onClick={() => onChangeSelectedHierarchy(filterSelectedPmsi(selectedHierarchy || [], biologyHierarchy))}
           type="submit"
           form="biology-form"
-          color="primary"
           variant="contained"
         >
           Confirmer

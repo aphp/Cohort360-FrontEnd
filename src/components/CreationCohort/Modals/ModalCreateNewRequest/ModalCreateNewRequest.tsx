@@ -220,12 +220,7 @@ const ModalCreateNewRequest: React.FC<{
               Supprimer
             </Button>
           ) : (
-            <Button
-              variant="contained"
-              color="primary"
-              disabled={loading}
-              onClick={() => setTab(tab === 'form' ? 'open' : 'form')}
-            >
+            <Button variant="contained" disabled={loading} onClick={() => setTab(tab === 'form' ? 'open' : 'form')}>
               {tab === 'form' ? 'Ouvrir' : 'Nouvelle requête'}
             </Button>
           )}
@@ -236,11 +231,11 @@ const ModalCreateNewRequest: React.FC<{
             Annuler
           </Button>
           {tab === 'form' ? (
-            <Button disabled={loading} onClick={handleConfirm} color="primary">
+            <Button disabled={loading} onClick={handleConfirm}>
               {isEdition ? 'Modifier' : 'Créer'}
             </Button>
           ) : (
-            <Button disabled={loading || openRequest === null} onClick={handleConfirmOpen} color="primary">
+            <Button disabled={loading || openRequest === null} onClick={handleConfirmOpen}>
               Ouvrir
             </Button>
           )}
@@ -262,7 +257,7 @@ const ModalCreateNewRequest: React.FC<{
           </DialogContent>
 
           <DialogActions>
-            <Button disabled={loading} onClick={handleClose} color="primary">
+            <Button disabled={loading} onClick={handleClose}>
               Annuler
             </Button>
 

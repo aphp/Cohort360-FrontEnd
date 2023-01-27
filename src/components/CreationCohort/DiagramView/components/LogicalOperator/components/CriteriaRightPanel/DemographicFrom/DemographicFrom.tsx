@@ -258,18 +258,11 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
 
         <Grid className={classes.criteriaActionContainer}>
           {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
+            <Button onClick={goBack} variant="outlined">
               Annuler
             </Button>
           )}
-          <Button
-            onClick={_onSubmit}
-            type="submit"
-            form="demographic-form"
-            color="primary"
-            variant="contained"
-            disabled={ageError}
-          >
+          <Button onClick={_onSubmit} type="submit" form="demographic-form" variant="contained" disabled={ageError}>
             Confirmer
           </Button>
         </Grid>

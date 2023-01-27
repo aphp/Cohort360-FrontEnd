@@ -298,7 +298,6 @@ const ControlPanel: React.FC<{
             <Button
               onClick={() => _relaunchCount(false)}
               variant="outlined"
-              color="primary"
               size="small"
               style={{ marginTop: -14 }}
               disabled={maintenanceIsActive}
@@ -356,7 +355,6 @@ const ControlPanel: React.FC<{
             <Button
               onClick={() => _relaunchCount(true)}
               variant="outlined"
-              color="primary"
               size="small"
               style={{ marginTop: 8 }}
               disabled={maintenanceIsActive}

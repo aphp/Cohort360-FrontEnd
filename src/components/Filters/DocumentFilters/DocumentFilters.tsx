@@ -238,10 +238,8 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Annuler
-        </Button>
-        <Button onClick={_onSubmit} color="primary" disabled={dateError}>
+        <Button onClick={onClose}>Annuler</Button>
+        <Button onClick={_onSubmit} disabled={dateError}>
           Valider
         </Button>
       </DialogActions>

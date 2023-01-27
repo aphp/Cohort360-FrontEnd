@@ -101,7 +101,7 @@ const ModalCohortTitle: React.FC<{
         <Button disabled={loading} onClick={handleClose} color="secondary">
           Annuler
         </Button>
-        <Button disabled={loading} onClick={handleConfirm} color="primary">
+        <Button disabled={loading} onClick={handleConfirm}>
           Créer
         </Button>
       </DialogActions>

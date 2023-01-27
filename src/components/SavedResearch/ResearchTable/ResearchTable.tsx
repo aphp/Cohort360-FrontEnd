@@ -449,9 +449,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
         >
           <DialogTitle id="alert-dialog-slide-title">Etes-vous sûr de vouloir supprimer la cohorte ?</DialogTitle>
           <DialogActions>
-            <Button onClick={handleCloseDialog} color="primary">
-              Non
-            </Button>
+            <Button onClick={handleCloseDialog}>Non</Button>
             <Button
               onClick={() => {
                 handleCloseDialog()

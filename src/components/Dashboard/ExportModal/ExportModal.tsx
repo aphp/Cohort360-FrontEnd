@@ -336,7 +336,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
           <Button
             disabled={loading || !cohortId || !settings.motif || !settings.conditions || !settings.tables.length}
             onClick={handleSubmit}
-            color="primary"
           >
             {loading ? <CircularProgress size={20} /> : 'Exporter les données'}
           </Button>

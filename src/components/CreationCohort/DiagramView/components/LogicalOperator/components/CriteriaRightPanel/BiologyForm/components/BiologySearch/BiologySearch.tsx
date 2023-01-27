@@ -259,11 +259,11 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
 
       <Grid className={classes.criteriaActionContainer}>
         {!isEdition && (
-          <Button onClick={goBack} color="primary" variant="outlined">
+          <Button onClick={goBack} variant="outlined">
             Annuler
           </Button>
         )}
-        <Button onClick={_onSubmit} type="submit" form="biology-form" color="primary" variant="contained">
+        <Button onClick={_onSubmit} type="submit" form="biology-form" variant="contained">
           Confirmer
         </Button>
       </Grid>

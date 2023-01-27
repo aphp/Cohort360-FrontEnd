@@ -616,9 +616,7 @@ const DocumentSearchHelp = ({ open, onClose }) => {
       </DialogContent>
 
       <DialogActions className={classes.dialog}>
-        <Button onClick={onClose} color="primary">
-          Fermer
-        </Button>
+        <Button onClick={onClose}>Fermer</Button>
       </DialogActions>
     </Dialog>
   )

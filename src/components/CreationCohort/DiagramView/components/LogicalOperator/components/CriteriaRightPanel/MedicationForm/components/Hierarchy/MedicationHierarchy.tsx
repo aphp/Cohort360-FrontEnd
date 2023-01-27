@@ -197,7 +197,7 @@ const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
 
       <Grid className={classes.medicationHierarchyActionContainer}>
         {!isEdition && (
-          <Button onClick={goBack} color="primary" variant="outlined">
+          <Button onClick={goBack} variant="outlined">
             Annuler
           </Button>
         )}
@@ -205,7 +205,6 @@ const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
           onClick={() => onChangeSelectedHierarchy(filterSelectedPmsi(selectedHierarchy || [], medicationHierarchy))}
           type="submit"
           form="medication10-form"
-          color="primary"
           variant="contained"
         >
           Confirmer

@@ -290,9 +290,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
       >
         <DialogTitle id="alert-dialog-slide-title">Etes-vous sûr de vouloir supprimer la requête ?</DialogTitle>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            Non
-          </Button>
+          <Button onClick={handleCloseDialog}>Non</Button>
           <Button
             onClick={() => {
               handleCloseDialog()

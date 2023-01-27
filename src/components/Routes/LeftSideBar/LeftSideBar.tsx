@@ -481,7 +481,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               <Button
                 onClick={() => navigate('/contact')}
                 variant="contained"
-                color="primary"
                 size="small"
                 startIcon={<HelpIcon />}
                 style={{ position: 'fixed', bottom: 0, width: 'inherit' }}

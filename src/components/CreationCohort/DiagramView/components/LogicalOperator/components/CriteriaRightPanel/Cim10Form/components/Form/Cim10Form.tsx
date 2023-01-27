@@ -165,11 +165,11 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
 
         <Grid className={classes.criteriaActionContainer}>
           {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
+            <Button onClick={goBack} variant="outlined">
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="cim10-form" color="primary" variant="contained">
+          <Button onClick={_onSubmit} type="submit" form="cim10-form" variant="contained">
             Confirmer
           </Button>
         </Grid>

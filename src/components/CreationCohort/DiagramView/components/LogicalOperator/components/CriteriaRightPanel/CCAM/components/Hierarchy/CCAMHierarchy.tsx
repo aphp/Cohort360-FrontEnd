@@ -198,7 +198,7 @@ const ProcedureHierarchy: React.FC<ProcedureHierarchyProps> = (props) => {
 
       <Grid className={classes.procedureHierarchyActionContainer}>
         {!isEdition && (
-          <Button onClick={goBack} color="primary" variant="outlined">
+          <Button onClick={goBack} variant="outlined">
             Annuler
           </Button>
         )}
@@ -206,7 +206,6 @@ const ProcedureHierarchy: React.FC<ProcedureHierarchyProps> = (props) => {
           onClick={() => onChangeSelectedHierarchy(filterSelectedPmsi(selectedHierarchy || [], procedureHierarchy))}
           type="submit"
           form="procedure-form"
-          color="primary"
           variant="contained"
         >
           Confirmer

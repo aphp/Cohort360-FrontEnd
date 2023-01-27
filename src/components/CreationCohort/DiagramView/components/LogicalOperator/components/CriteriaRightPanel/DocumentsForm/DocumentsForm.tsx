@@ -257,7 +257,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
 
         <Grid className={classes.criteriaActionContainer}>
           {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
+            <Button onClick={goBack} variant="outlined">
               Annuler
             </Button>
           )}
@@ -266,7 +266,6 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             disabled={searchInputError?.isError}
             type="submit"
             form="documents-form"
-            color="primary"
             variant="contained"
           >
             Confirmer

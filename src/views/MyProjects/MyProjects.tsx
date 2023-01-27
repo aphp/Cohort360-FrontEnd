@@ -140,7 +140,6 @@ const MyProjects: React.FC<{}> = () => {
                         <Button
                           startIcon={<DriveFileMoveIcon />}
                           onClick={() => setOpenModal('move_to_folder')}
-                          color="primary"
                           disabled={maintenanceIsActive}
                         >
                           Déplacer {selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}

@@ -190,7 +190,7 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
 
       <Grid className={classes.ghmHierarchyActionContainer}>
         {!isEdition && (
-          <Button onClick={goBack} color="primary" variant="outlined">
+          <Button onClick={goBack} variant="outlined">
             Annuler
           </Button>
         )}
@@ -198,7 +198,6 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
           onClick={() => onChangeSelectedHierarchy(filterSelectedPmsi(selectedHierarchy || [], ghmHierarchy))}
           type="submit"
           form="ghm10-form"
-          color="primary"
           variant="contained"
         >
           Confirmer

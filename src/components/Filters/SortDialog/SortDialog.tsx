@@ -78,12 +78,8 @@ const SortDialog: React.FC<SortDialogProps> = ({ open, onClose, sort, onChangeSo
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Annuler
-        </Button>
-        <Button onClick={_onSubmit} color="primary">
-          Valider
-        </Button>
+        <Button onClick={onClose}>Annuler</Button>
+        <Button onClick={_onSubmit}>Valider</Button>
       </DialogActions>
     </Dialog>
   )

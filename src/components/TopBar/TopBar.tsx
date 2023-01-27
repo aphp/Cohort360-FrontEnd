@@ -372,9 +372,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
           </DialogContent>
 
           <DialogActions>
-            <Button onClick={handleClose} color="primary">
-              Annuler
-            </Button>
+            <Button onClick={handleClose}>Annuler</Button>
 
             <Button onClick={handleConfirmDeletion} style={{ color: '#dc3545' }}>
               Supprimer
