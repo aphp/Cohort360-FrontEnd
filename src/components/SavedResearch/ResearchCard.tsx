@@ -216,7 +216,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
           <Pagination
             className={classes.pagination}
             count={Math.ceil((cohortState.count ?? 0) / rowsPerPage)}
-            shape="rounded"
+            shape="circular"
             onChange={(event, page: number) => setPage && setPage(page)}
             page={page}
           />

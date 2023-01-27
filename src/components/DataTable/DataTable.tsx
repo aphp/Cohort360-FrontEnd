@@ -3,6 +3,7 @@ import clsx from 'clsx'
 
 import {
   Grid,
+  Pagination,
   Paper,
   Table,
   TableBody,
@@ -13,7 +14,6 @@ import {
   TableSortLabel,
   Typography
 } from '@mui/material'
-import Pagination from '@mui/lab/Pagination'
 
 import useStyles from './styles'
 import { Column, Order } from 'types'
@@ -118,7 +118,7 @@ const DataTable: React.FC<DataTableProps> = ({
         <Pagination
           className={classes.pagination}
           count={Math.ceil((total ?? 0) / (rowsPerPage ?? 100))}
-          shape="rounded"
+          shape="circular"
           onChange={(event, page: number) => setPage && setPage(page)}
           page={page}
         />

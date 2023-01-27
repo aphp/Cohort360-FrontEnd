@@ -83,7 +83,7 @@ const ResearchCard: React.FC<ResearchCardProps> = ({
           </Typography>
         </Grid>
         <Grid item container xs={3} justifyContent="flex-end">
-          <Link underline="always" className={classes.link} onClick={onClickLink}>
+          <Link className={classes.link} onClick={onClickLink}>
             {linkLabel}
           </Link>
         </Grid>

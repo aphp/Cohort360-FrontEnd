@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import moment from 'moment'
 
-import { CircularProgress, Divider, Drawer, Grid, IconButton, List, Typography } from '@mui/material'
-import Pagination from '@mui/lab/Pagination'
+import { CircularProgress, Divider, Drawer, Grid, IconButton, List, Pagination, Typography } from '@mui/material'
 
 import PatientSidebarHeader from './PatientSidebarHeader/PatientSidebarHeader'
 import PatientSidebarItem from './PatientSidebarItem/PatientSidebarItem'
@@ -189,7 +188,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       <Pagination
         className={classes.pagination}
         count={Math.ceil(totalPatients / numberOfRows)}
-        shape="rounded"
+        shape="circular"
         onChange={handleChangePage}
         page={page}
       />
