@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import Grid from '@mui/material/Grid'
-import CircularProgress from '@mui/material/CircularProgress'
-import IconButton from '@mui/material/IconButton'
-import Checkbox from '@mui/material/Checkbox'
-import TableRow from '@mui/material/TableRow'
-import TableCell from '@mui/material/TableCell'
-import Typography from '@mui/material/Typography'
-import Skeleton from '@mui/lab/Skeleton'
+import { Checkbox, CircularProgress, Grid, IconButton, Skeleton, TableCell, TableRow, Typography } from '@mui/material'
 
 import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'

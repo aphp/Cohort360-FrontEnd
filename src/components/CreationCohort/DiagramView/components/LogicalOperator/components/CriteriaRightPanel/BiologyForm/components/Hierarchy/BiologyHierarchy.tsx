@@ -3,18 +3,18 @@ import clsx from 'clsx'
 
 import {
   Button,
+  Collapse,
   Divider,
   Grid,
   IconButton,
-  Typography,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Collapse,
   List,
-  Tooltip
+  Skeleton,
+  Tooltip,
+  Typography
 } from '@mui/material'
-import Skeleton from '@mui/lab/Skeleton'
 
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'

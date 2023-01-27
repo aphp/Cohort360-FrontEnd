@@ -1,25 +1,26 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import Avatar from '@mui/material/Avatar'
-import Button from '@mui/material/Button'
-import Chip from '@mui/material/Chip'
-import Dialog from '@mui/material/Dialog'
-import DialogActions from '@mui/material/DialogActions'
-import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
-import Divider from '@mui/material/Divider'
-import Grid from '@mui/material/Grid'
-import IconButton from '@mui/material/IconButton'
-import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
-import Paper from '@mui/material/Paper'
-import Tooltip from '@mui/material/Tooltip'
-import Typography from '@mui/material/Typography'
-
-import Skeleton from '@mui/lab/Skeleton'
+import {
+  Avatar,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  Menu,
+  MenuItem,
+  Paper,
+  Skeleton,
+  Tooltip,
+  Typography
+} from '@mui/material'
 
 import GroupIcon from '@mui/icons-material/Group'
 import BusinessIcon from '@mui/icons-material/Business'

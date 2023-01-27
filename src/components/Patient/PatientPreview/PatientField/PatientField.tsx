@@ -1,7 +1,6 @@
 import React from 'react'
 
-import { Grid, Typography } from '@mui/material'
-import Skeleton from '@mui/lab/Skeleton'
+import { Grid, Skeleton, Typography } from '@mui/material'
 
 import useStyles from './styles'
 import clsx from 'clsx'
