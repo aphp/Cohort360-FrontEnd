@@ -27,7 +27,7 @@ const Layout = (props) => {
 
       {props.children}
 
-      <Snackbar />
+      <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} />
     </>
   )
 }
