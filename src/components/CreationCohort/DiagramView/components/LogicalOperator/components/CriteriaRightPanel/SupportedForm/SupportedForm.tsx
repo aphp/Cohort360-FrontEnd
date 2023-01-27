@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 
-import { Alert, Autocomplete } from '@mui/lab'
+import { Autocomplete } from '@mui/lab'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import {
+  Alert,
   Button,
   Divider,
   FormLabel,
@@ -173,7 +174,6 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            variant="outlined"
             value={defaultValues.title}
             onChange={(e) => _onChangeValue('title', e.target.value)}
           />
@@ -256,7 +256,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={defaultValues.ageType}
               onChange={(e, value) => _onChangeValue('ageType', value)}
-              renderInput={(params) => <TextField {...params} variant="outlined" />}
+              renderInput={(params) => <TextField {...params} />}
             />
           </Grid>
 
@@ -320,7 +320,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={defaultValues.durationType}
               onChange={(e, value) => _onChangeValue('durationType', value)}
-              renderInput={(params) => <TextField {...params} variant="outlined" />}
+              renderInput={(params) => <TextField {...params} />}
             />
           </Grid>
 

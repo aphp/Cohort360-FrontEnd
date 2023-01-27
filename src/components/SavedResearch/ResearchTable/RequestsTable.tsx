@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 
 import {
+  Alert,
   Button,
   Dialog,
   DialogActions,
@@ -23,8 +24,6 @@ import {
   Hidden,
   Snackbar
 } from '@mui/material'
-
-import { Alert } from '@mui/lab'
 
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 

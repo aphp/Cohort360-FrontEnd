@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { Checkbox, CssBaseline, Grid, Typography } from '@mui/material'
-import Alert from '@mui/lab/Alert'
+import { Alert, Checkbox, CssBaseline, Grid, Typography } from '@mui/material'
 
 import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
 import DataTableComposition from 'components/DataTable/DataTableComposition'

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import {
+  Alert,
   Button,
   Checkbox,
   Chip,
@@ -15,7 +16,6 @@ import {
   Tooltip,
   Typography
 } from '@mui/material'
-import Alert from '@mui/lab/Alert'
 
 import InfoIcon from '@mui/icons-material/Info'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'

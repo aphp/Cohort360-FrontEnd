@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from 'react'
 
-import { Alert } from '@mui/lab'
-import { Button, Divider, FormLabel, Grid, IconButton, Typography, TextField, Switch, Slider } from '@mui/material'
+import {
+  Alert,
+  Button,
+  Divider,
+  FormLabel,
+  Grid,
+  IconButton,
+  Typography,
+  TextField,
+  Switch,
+  Slider
+} from '@mui/material'
 import Autocomplete from '@mui/lab/Autocomplete'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
@@ -139,7 +149,6 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            variant="outlined"
             value={defaultValues.title}
             onChange={(e) => _onChangeValue('title', e.target.value)}
           />
@@ -168,7 +177,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesGender}
             onChange={(e, value) => _onChangeValue('gender', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Genre" />}
+            renderInput={(params) => <TextField {...params} label="Genre" />}
           />
 
           <Autocomplete
@@ -180,7 +189,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesVitalStatus}
             onChange={(e, value) => _onChangeValue('vitalStatus', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Statut vital" />}
+            renderInput={(params) => <TextField {...params} label="Statut vital" />}
           />
 
           <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
@@ -242,7 +251,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={defaultValues.ageType}
               onChange={(e, value) => _onChangeValue('ageType', value)}
-              renderInput={(params) => <TextField {...params} variant="outlined" />}
+              renderInput={(params) => <TextField {...params} />}
             />
           </Grid>
         </Grid>

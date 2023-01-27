@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router'
 import moment from 'moment'
 import clsx from 'clsx'
 
-import { Grid, Paper, Container, Typography } from '@mui/material'
-import Alert from '@mui/lab/Alert'
+import { Alert, Grid, Paper, Container, Typography } from '@mui/material'
 
 import NewsCard from 'components/Welcome/NewsCard/NewsCard'
 import PatientsCard from 'components/Welcome/PatientsCard/PatientsCard'

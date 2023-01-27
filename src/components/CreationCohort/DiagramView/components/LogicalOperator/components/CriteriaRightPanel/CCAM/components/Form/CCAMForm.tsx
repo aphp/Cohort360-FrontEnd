@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 
-import { Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@mui/material'
-import Alert from '@mui/lab/Alert'
+import { Alert, Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@mui/material'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import localforage from 'localforage'
 
 import {
+  Alert,
   Button,
   TextField,
   Grid,
@@ -17,8 +18,6 @@ import {
   CircularProgress,
   Snackbar
 } from '@mui/material'
-
-import { Alert } from '@mui/lab'
 
 import NoRights from 'components/ErrorView/NoRights'
 

@@ -1,6 +1,5 @@
 import React from 'react'
-import { Grid } from '@mui/material'
-import Alert from '@mui/lab/Alert'
+import { Alert, Grid } from '@mui/material'
 
 import PopulationCard from './components/PopulationCard/PopulationCard'
 import LogicalOperator from './components/LogicalOperator/LogicalOperator'

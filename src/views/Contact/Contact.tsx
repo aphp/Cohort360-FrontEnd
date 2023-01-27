@@ -3,6 +3,7 @@ import { useAppSelector } from 'state'
 import clsx from 'clsx'
 
 import {
+  Alert,
   Button,
   CircularProgress,
   CssBaseline,
@@ -13,7 +14,6 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import { Alert } from '@mui/lab'
 
 import services from 'services/aphp'
 
