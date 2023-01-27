@@ -101,14 +101,12 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
           onKeyDown={onKeyDown}
           endAdornment={
             <InputAdornment position="end">
-              <IconButton onClick={handleClearInput} size="large">
-                {_searchInput && <ClearIcon />}
-              </IconButton>
+              <IconButton onClick={handleClearInput}>{_searchInput && <ClearIcon />}</IconButton>
             </InputAdornment>
           }
         />
 
-        <IconButton type="submit" aria-label="search" onClick={onSearchPatient} size="large">
+        <IconButton type="submit" aria-label="search" onClick={onSearchPatient}>
           <SearchIcon fill="#ED6D91" height="15px" />
         </IconButton>
       </Grid>

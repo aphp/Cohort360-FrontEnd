@@ -44,7 +44,7 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
 
   return (
     <Grid container alignItems="center" className={classes.root}>
-      <IconButton onClick={() => goBacktoCohort()} size="large">
+      <IconButton onClick={() => goBacktoCohort()}>
         <ArrowBackIcon className={classes.iconButtons} />
       </IconButton>
       <Typography variant="h2" color="primary" className={classes.patientName}>

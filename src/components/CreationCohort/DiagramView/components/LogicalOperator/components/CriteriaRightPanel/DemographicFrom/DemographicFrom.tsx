@@ -115,7 +115,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
       <Grid className={classes.actionContainer}>
         {!isEdition ? (
           <>
-            <IconButton className={classes.backButton} onClick={goBack} size="large">
+            <IconButton className={classes.backButton} onClick={goBack}>
               <KeyboardBackspaceIcon />
             </IconButton>
             <Divider className={classes.divider} orientation="vertical" flexItem />

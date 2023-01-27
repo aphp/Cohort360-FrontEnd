@@ -151,7 +151,6 @@ const MyProjects: React.FC<{}> = () => {
                             onClick={() => setOpenModal('move_to_folder')}
                             color="primary"
                             disabled={maintenanceIsActive}
-                            size="large"
                           >
                             <DriveFileMoveIcon />
                           </IconButton>
@@ -174,7 +173,6 @@ const MyProjects: React.FC<{}> = () => {
                             onClick={() => setOpenModal('delete_items')}
                             color="secondary"
                             disabled={maintenanceIsActive}
-                            size="large"
                           >
                             <DeleteIcon />
                           </IconButton>
@@ -205,7 +203,6 @@ const MyProjects: React.FC<{}> = () => {
                       onClick={() => handleClickAddProject()}
                       className={classes.addIconButton}
                       disabled={maintenanceIsActive}
-                      size="large"
                     >
                       <AddIcon />
                     </IconButton>

@@ -169,14 +169,14 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
               endAdornment={
                 <InputAdornment position="end">
                   {searchInput && (
-                    <IconButton onClick={handleClearInput} size="large">
+                    <IconButton onClick={handleClearInput}>
                       <ClearIcon />
                     </IconButton>
                   )}
                 </InputAdornment>
               }
             />
-            <IconButton type="submit" aria-label="search" onClick={() => onFetchCohorts()} size="large">
+            <IconButton type="submit" aria-label="search" onClick={() => onFetchCohorts()}>
               <SearchIcon fill="#ED6D91" height="15px" />
             </IconButton>
           </Grid>

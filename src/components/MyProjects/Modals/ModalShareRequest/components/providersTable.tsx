@@ -110,7 +110,6 @@ const ProvidersTable: React.FC<ProvidersTableProps> = ({
                             event.stopPropagation()
                             deleteItem(provider)
                           }}
-                          size="large"
                         >
                           <DeleteIcon />
                         </IconButton>

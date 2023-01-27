@@ -175,7 +175,7 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
       <Grid className={classes.actionContainer}>
         {!isEdition ? (
           <>
-            <IconButton className={classes.backButton} onClick={goBack} size="large">
+            <IconButton className={classes.backButton} onClick={goBack}>
               <KeyboardBackspaceIcon />
             </IconButton>
             <Divider className={classes.divider} orientation="vertical" flexItem />
@@ -196,14 +196,12 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
             onKeyDown={onKeyDown}
             endAdornment={
               <InputAdornment position="end">
-                <IconButton onClick={() => setSearchInput('')} size="large">
-                  {searchInput && <ClearIcon />}
-                </IconButton>
+                <IconButton onClick={() => setSearchInput('')}>{searchInput && <ClearIcon />}</IconButton>
               </InputAdornment>
             }
           />
 
-          <IconButton type="submit" aria-label="search" onClick={onKeyDown} size="large">
+          <IconButton type="submit" aria-label="search" onClick={onKeyDown}>
             <SearchIcon fill="#ED6D91" height="15px" />
           </IconButton>
         </Grid>

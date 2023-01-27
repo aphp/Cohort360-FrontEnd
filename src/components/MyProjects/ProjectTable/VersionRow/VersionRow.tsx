@@ -134,7 +134,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                     </IconButton>
                   </TableCell>
                   <TableCell align="center">
-                    <IconButton onClick={() => onSetCohortFavorite(historyRow)} size="large">
+                    <IconButton onClick={() => onSetCohortFavorite(historyRow)}>
                       <FavStar favorite={historyRow.favorite} />
                     </IconButton>
                   </TableCell>
@@ -174,7 +174,6 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                             ? () => setSelectedExportableCohort(historyRow.fhir_group_id ?? '')
                             : () => null
                         }
-                        size="large"
                       >
                         <ExportIcon />
                       </IconButton>

@@ -52,7 +52,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
       <Grid className={classes.actionContainer}>
         {!isEdition ? (
           <>
-            <IconButton className={classes.backButton} onClick={goBack} size="large">
+            <IconButton className={classes.backButton} onClick={goBack}>
               <KeyboardBackspaceIcon />
             </IconButton>
             <Divider className={classes.divider} orientation="vertical" flexItem />

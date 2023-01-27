@@ -137,7 +137,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
             onChange={props.onChangeSearchInput}
             onKeyDown={props.onKeyDownSearchInput}
           />
-          <IconButton type="submit" aria-label="search" onClick={props.onSearchPatient} size="large">
+          <IconButton type="submit" aria-label="search" onClick={props.onSearchPatient}>
             <SearchIcon fill="#ED6D91" height="15px" />
           </IconButton>
         </Grid>

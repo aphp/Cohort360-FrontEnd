@@ -239,7 +239,6 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                             setAnchorEl(event.currentTarget)
                             setSelectedRequest(row.uuid)
                           }}
-                          size="large"
                         >
                           <MoreVertIcon />
                         </IconButton>

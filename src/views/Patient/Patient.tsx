@@ -95,7 +95,7 @@ const Patient = () => {
       >
         {!isSidebarOpened && (
           <div className={classes.openLeftBar}>
-            <IconButton onClick={() => setSidebarOpened(true)} size="large">
+            <IconButton onClick={() => setSidebarOpened(true)}>
               <ChevronLeftIcon color="action" width="20px" />
             </IconButton>
           </div>

@@ -178,7 +178,6 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                         <IconButton
                           onClick={() => _clickToDeploy(_row.id)}
                           style={{ marginLeft: level * 35, padding: 0, marginRight: -30 }}
-                          size="large"
                         >
                           {openPopulation.find((id) => _row.id === id) ? (
                             <KeyboardArrowDownIcon />

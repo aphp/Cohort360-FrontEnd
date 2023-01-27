@@ -284,7 +284,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
 
               {cohort.showActionButton && !dashboard.loading && (
                 <Grid container item justifyContent="flex-end" style={{ width: 120 }}>
-                  <IconButton onClick={handleFavorite} color="secondary" disabled={maintenanceIsActive} size="large">
+                  <IconButton onClick={handleFavorite} color="secondary" disabled={maintenanceIsActive}>
                     {dashboard.favorite ? (
                       <StarFullIcon height={18} fill="currentColor" />
                     ) : (
@@ -297,7 +297,6 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                     aria-haspopup="true"
                     onClick={handleClick}
                     disabled={maintenanceIsActive}
-                    size="large"
                   >
                     <MoreButton />
                   </IconButton>

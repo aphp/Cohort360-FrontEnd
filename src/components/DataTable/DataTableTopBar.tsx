@@ -149,7 +149,6 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
                               setSearch('')
                               onSearch('')
                             }}
-                            size="large"
                           >
                             <ClearIcon />
                           </IconButton>
@@ -157,7 +156,7 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
                       </InputAdornment>
                     }
                   />
-                  <IconButton type="submit" aria-label="search" onClick={() => onSearch()} size="large">
+                  <IconButton type="submit" aria-label="search" onClick={() => onSearch()}>
                     <SearchIcon fill="#ED6D91" height="15px" />
                   </IconButton>
                 </Grid>

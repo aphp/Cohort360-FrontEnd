@@ -271,7 +271,6 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                             onSetCohortFavorite(row)
                           }}
                           disabled={maintenanceIsActive || !row.fhir_group_id}
-                          size="large"
                         >
                           {maintenanceIsActive ? (
                             <DisabledFavStar favorite={row.favorite} />
@@ -383,7 +382,6 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                               setAnchorEl(event.currentTarget)
                               setSelectedCohort(row)
                             }}
-                            size="large"
                           >
                             <MoreVertIcon />
                           </IconButton>

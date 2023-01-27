@@ -129,7 +129,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 [classes.closeDrawerButton]: open,
                 [classes.menuButton]: !open
               })}
-              size="large"
             >
               {open ? <ChevronLeftIcon color="action" width="20px" /> : <MenuIcon width="20px" fill="#FFF" />}
             </IconButton>
@@ -162,7 +161,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                         dispatch<any>(logoutAction())
                         navigate('/')
                       }}
-                      size="large"
                     >
                       <LogoutIcon className={classes.logoutIcon} />
                     </IconButton>
@@ -182,7 +180,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                           dispatch<any>(logoutAction())
                           navigate('/')
                         }}
-                        size="large"
                       >
                         <LogoutIcon className={classes.logoutIcon} />
                       </IconButton>
@@ -493,7 +490,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   navigate('/contact')
                 }}
                 style={{ position: 'fixed', bottom: 0 }}
-                size="large"
               >
                 <HelpIcon style={{ color: '#FFF' }} />
               </IconButton>
