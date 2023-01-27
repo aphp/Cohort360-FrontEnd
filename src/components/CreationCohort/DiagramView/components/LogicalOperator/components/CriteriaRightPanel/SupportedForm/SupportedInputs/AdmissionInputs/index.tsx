@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 
-import { Autocomplete } from '@mui/lab'
-import { Collapse, Grid, IconButton, Typography, TextField } from '@mui/material'
+import { Autocomplete, Collapse, Grid, IconButton, Typography, TextField } from '@mui/material'
 
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'

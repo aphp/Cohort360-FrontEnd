@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 
-import { Autocomplete } from '@mui/lab'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import {
   Alert,
+  Autocomplete,
   Button,
   Divider,
   FormLabel,

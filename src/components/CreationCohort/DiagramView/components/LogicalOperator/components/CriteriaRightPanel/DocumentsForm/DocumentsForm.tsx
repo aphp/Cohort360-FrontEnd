@@ -3,6 +3,7 @@ import _ from 'lodash'
 
 import {
   Alert,
+  Autocomplete,
   Button,
   Divider,
   FormLabel,
@@ -14,7 +15,6 @@ import {
   Checkbox,
   CircularProgress
 } from '@mui/material'
-import Autocomplete from '@mui/lab/Autocomplete'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 

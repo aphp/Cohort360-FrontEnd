@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useState, Fragment } from 'react'
 
-import { TextField, CircularProgress } from '@mui/material'
-import { Autocomplete } from '@mui/lab'
+import { Autocomplete, CircularProgress, TextField } from '@mui/material'
 
 interface ElementType {
   id: string

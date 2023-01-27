@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 
-import { FormControl, FormLabel, Grid, TextField, Typography } from '@mui/material'
-import Autocomplete from '@mui/lab/Autocomplete'
+import { Autocomplete, FormControl, FormLabel, Grid, TextField, Typography } from '@mui/material'
 
 import InputNumber from '../InputNumber/InputNumber'
 

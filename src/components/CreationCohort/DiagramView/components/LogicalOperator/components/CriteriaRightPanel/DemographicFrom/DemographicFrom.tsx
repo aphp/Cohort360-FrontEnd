@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import {
   Alert,
+  Autocomplete,
   Button,
   Divider,
   FormLabel,
@@ -12,7 +13,6 @@ import {
   Switch,
   Slider
 } from '@mui/material'
-import Autocomplete from '@mui/lab/Autocomplete'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
