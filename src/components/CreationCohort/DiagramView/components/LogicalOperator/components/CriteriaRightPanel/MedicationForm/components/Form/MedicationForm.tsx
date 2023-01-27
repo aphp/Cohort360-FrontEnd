@@ -165,9 +165,13 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               value={selectedCriteria.type}
               onChange={(e, value) => onChangeValue('type', value)}
             >
-              <FormControlLabel value="MedicationRequest" control={<Radio />} label="Prescription" />
-              {/* <FormControlLabel value="dispensation" control={<Radio />} label="Dispensation" /> */}
-              <FormControlLabel value="MedicationAdministration" control={<Radio />} label="Administration" />
+              <FormControlLabel value="MedicationRequest" control={<Radio color="secondary" />} label="Prescription" />
+              {/* <FormControlLabel value="dispensation" control={<Radio color="secondary"/>} label="Dispensation" /> */}
+              <FormControlLabel
+                value="MedicationAdministration"
+                control={<Radio color="secondary" />}
+                label="Administration"
+              />
             </RadioGroup>
           </Grid>
 

@@ -71,8 +71,8 @@ const SortDialog: React.FC<SortDialogProps> = ({ open, onClose, sort, onChangeSo
               onChange={(event, value) => setSort({ ..._sort, sortDirection: value as 'asc' | 'desc' })}
               classes={{ root: classes.radioGroup }}
             >
-              <FormControlLabel value="asc" control={<Radio />} label="Croissant" />
-              <FormControlLabel value="desc" control={<Radio />} label="Décroissant" />
+              <FormControlLabel value="asc" control={<Radio color="secondary" />} label="Croissant" />
+              <FormControlLabel value="desc" control={<Radio color="secondary" />} label="Décroissant" />
             </RadioGroup>
           </div>
         </Grid>

@@ -67,6 +67,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
                   <Radio
                     checked={selectedItem === request.uuid}
                     onChange={() => onSelectedItem(request.uuid as string)}
+                    color="secondary"
                   />
                 </ListItemSecondaryAction>
               </ListItem>

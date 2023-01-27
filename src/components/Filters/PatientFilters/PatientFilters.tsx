@@ -67,10 +67,14 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Genre :</Typography>
           <RadioGroup name="Gender" value={_gender} onChange={_onChangeGender} row={true}>
-            <FormControlLabel value={PatientGenderKind._male} control={<Radio />} label="Hommes" />
-            <FormControlLabel value={PatientGenderKind._female} control={<Radio />} label="Femmes" />
-            <FormControlLabel value={PatientGenderKind._other} control={<Radio />} label="Autres" />
-            <FormControlLabel value={PatientGenderKind._unknown} control={<Radio />} label="Tous les genres" />
+            <FormControlLabel value={PatientGenderKind._male} control={<Radio color="secondary" />} label="Hommes" />
+            <FormControlLabel value={PatientGenderKind._female} control={<Radio color="secondary" />} label="Femmes" />
+            <FormControlLabel value={PatientGenderKind._other} control={<Radio color="secondary" />} label="Autres" />
+            <FormControlLabel
+              value={PatientGenderKind._unknown}
+              control={<Radio color="secondary" />}
+              label="Tous les genres"
+            />
           </RadioGroup>
         </Grid>
         <Grid container direction="column" className={classes.filter}>
@@ -85,9 +89,9 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Statut vital :</Typography>
           <RadioGroup name="VitalStatus" value={_vitalStatus} onChange={_onChangeVitalStatus} row={true}>
-            <FormControlLabel value="alive" control={<Radio />} label="Patients vivants" />
-            <FormControlLabel value="deceased" control={<Radio />} label="Patients décédés" />
-            <FormControlLabel value="all" control={<Radio />} label="Tous les patients" />
+            <FormControlLabel value="alive" control={<Radio color="secondary" />} label="Patients vivants" />
+            <FormControlLabel value="deceased" control={<Radio color="secondary" />} label="Patients décédés" />
+            <FormControlLabel value="all" control={<Radio color="secondary" />} label="Tous les patients" />
           </RadioGroup>
         </Grid>
       </DialogContent>

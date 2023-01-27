@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
-import { CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
+import { CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Pagination } from '@mui/material'
 import DocumentTable from 'components/Patient/PatientTimeline/HospitDialog/DocumentTable/DocumentTable'
-
-import Pagination from '@mui/lab/Pagination'
 
 import { CohortComposition } from 'types'
 
@@ -59,7 +57,7 @@ const HospitDialog: React.FC<HospitDialogTypes> = ({ deidentified, open, onClose
           className={classes.pagination}
           count={Math.ceil((documents?.length ?? 0) / documentLines)}
           variant="outlined"
-          shape="rounded"
+          shape="circular"
           onChange={handleChange}
         />
       </DialogActions>
