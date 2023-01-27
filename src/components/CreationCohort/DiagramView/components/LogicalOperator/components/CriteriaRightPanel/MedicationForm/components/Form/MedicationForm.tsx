@@ -152,6 +152,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               id="criteria-inclusive"
               checked={!selectedCriteria.isInclusive}
               onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
+              color="secondary"
             />
           </Grid>
 

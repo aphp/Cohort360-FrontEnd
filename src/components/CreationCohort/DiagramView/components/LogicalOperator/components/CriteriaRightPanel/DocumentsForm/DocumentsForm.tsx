@@ -152,6 +152,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               id="criteria-inclusive"
               checked={!defaultValues.isInclusive}
               onChange={(event) => _onChangeValue('isInclusive', !event.target.checked)}
+              color="secondary"
             />
           </Grid>
 

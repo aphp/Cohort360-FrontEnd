@@ -146,6 +146,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
               id="criteria-inclusive"
               checked={!selectedCriteria.isInclusive}
               onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
+              color="secondary"
             />
           </Grid>
 
