@@ -56,8 +56,8 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
             isOptionEqualToValue={(option, value) => option.id === value.id}
             disableCloseOnSelect
             getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.label)}
-            renderOption={(diagnosticType: any) => (
-              <React.Fragment>{capitalizeFirstLetter(diagnosticType.label)}</React.Fragment>
+            renderOption={(props, diagnosticType: any) => (
+              <li {...props}>{capitalizeFirstLetter(diagnosticType.label)}</li>
             )}
             renderInput={(params) => (
               <TextField {...params} label="Types de diagnostics" placeholder="Sélectionner type(s) de diagnostics" />

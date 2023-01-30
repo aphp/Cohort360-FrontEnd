@@ -143,8 +143,8 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
               value={_selectedAdministrationRoutes}
               disableCloseOnSelect
               getOptionLabel={(administrationRoute: any) => capitalizeFirstLetter(administrationRoute.label)}
-              renderOption={(administrationRoute: any) => (
-                <React.Fragment>{capitalizeFirstLetter(administrationRoute.label)}</React.Fragment>
+              renderOption={(props, administrationRoute: any) => (
+                <li {...props}>{capitalizeFirstLetter(administrationRoute.label)}</li>
               )}
               renderInput={(params) => (
                 <TextField
@@ -168,8 +168,8 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
               value={_selectedPrescriptionTypes}
               disableCloseOnSelect
               getOptionLabel={(prescriptionType: any) => capitalizeFirstLetter(prescriptionType.label)}
-              renderOption={(prescriptionType: any) => (
-                <React.Fragment>{capitalizeFirstLetter(prescriptionType.label)}</React.Fragment>
+              renderOption={(props, prescriptionType: any) => (
+                <li {...props}>{capitalizeFirstLetter(prescriptionType.label)}</li>
               )}
               renderInput={(params) => (
                 <TextField

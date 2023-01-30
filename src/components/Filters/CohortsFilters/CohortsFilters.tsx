@@ -135,7 +135,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
             value={_status}
             disableCloseOnSelect
             getOptionLabel={(status: any) => status.display}
-            renderOption={(status: any) => <React.Fragment>{status.display}</React.Fragment>}
+            renderOption={(props, status: any) => <li {...props}>{status.display}</li>}
             renderInput={(params) => <TextField {...params} placeholder="Statut de la cohorte" />}
             className={classes.autocomplete}
           />

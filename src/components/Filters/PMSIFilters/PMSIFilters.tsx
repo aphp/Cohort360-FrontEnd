@@ -143,8 +143,8 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
               value={_selectedDiagnosticTypes}
               disableCloseOnSelect
               getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.label)}
-              renderOption={(diagnosticType: any) => (
-                <React.Fragment>{capitalizeFirstLetter(diagnosticType.label)}</React.Fragment>
+              renderOption={(props, diagnosticType: any) => (
+                <li {...props}>{capitalizeFirstLetter(diagnosticType.label)}</li>
               )}
               renderInput={(params) => (
                 <TextField {...params} label="Types de diagnostics" placeholder="Sélectionner type(s) de diagnostics" />

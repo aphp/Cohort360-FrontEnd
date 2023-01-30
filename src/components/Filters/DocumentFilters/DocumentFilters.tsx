@@ -147,7 +147,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
                 </React.Fragment>
               )
             }}
-            renderOption={(docType: any) => <React.Fragment>{docType.label}</React.Fragment>}
+            renderOption={(props, docType: any) => <li {...props}>{docType.label}</li>}
             renderInput={(params) => <TextField {...params} placeholder="Types de documents" />}
             className={classes.autocomplete}
           />

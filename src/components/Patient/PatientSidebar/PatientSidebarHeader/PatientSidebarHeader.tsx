@@ -125,7 +125,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
           options={searchByNames}
           getOptionLabel={(option) => option.label}
           value={searchByNames.find((value) => value.code === props.searchBy)}
-          renderInput={(params) => <TextField {...params} />}
+          renderInput={(params) => <TextField {...params} variant="standard" />}
           onChange={_onChangeSelect}
           className={classes.autocomplete}
         />
