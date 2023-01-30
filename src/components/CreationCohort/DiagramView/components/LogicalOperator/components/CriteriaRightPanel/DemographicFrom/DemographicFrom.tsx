@@ -207,6 +207,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
                 valueLabelFormat={(value) => (value === 130 ? '130+' : value)}
                 min={0}
                 max={130}
+                size="small"
               />
               <Grid container justifyContent="space-around">
                 <Grid item>

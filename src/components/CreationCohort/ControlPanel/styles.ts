@@ -65,10 +65,7 @@ const useStyles = makeStyles(() =>
       color: '#fc1847'
     },
     iconBorder: {
-      color: 'currentColor',
-      position: 'absolute',
-      top: 0,
-      left: 10
+      color: 'currentColor'
     },
     patientTypo: {
       margin: '10px'

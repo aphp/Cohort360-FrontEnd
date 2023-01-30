@@ -207,9 +207,19 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
         </Grid>
 
         <Grid container item>
-          <Tabs value={selectedTab} onChange={(event, value) => setSelectedTab(value)} textColor="primary">
-            <Tab label={`ANABIO (${biologySearchResults.anabio.length ?? 0})`} value="anabio" component={Link} />
-            <Tab label={`LOINC (${biologySearchResults.loinc.length ?? 0})`} value="loinc" component={Link} />
+          <Tabs value={selectedTab} onChange={(event, value) => setSelectedTab(value)} indicatorColor="secondary">
+            <Tab
+              label={`ANABIO (${biologySearchResults.anabio.length ?? 0})`}
+              value="anabio"
+              component={Link}
+              style={{ minWidth: 160 }}
+            />
+            <Tab
+              label={`LOINC (${biologySearchResults.loinc.length ?? 0})`}
+              value="loinc"
+              component={Link}
+              style={{ minWidth: 160 }}
+            />
           </Tabs>
         </Grid>
 

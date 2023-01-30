@@ -211,6 +211,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                 valueLabelFormat={(value) => (value === 130 ? '130+' : value)}
                 min={0}
                 max={130}
+                size="small"
               />
 
               <Grid container justifyContent="space-around">
@@ -275,6 +276,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                 valueLabelFormat={(value) => (value === 100 ? '100+' : value)}
                 min={0}
                 max={100}
+                size="small"
               />
 
               <Grid container justifyContent="space-around">

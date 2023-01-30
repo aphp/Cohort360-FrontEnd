@@ -54,6 +54,7 @@ const TemporalConstraintView: React.FC = () => {
         value={mainTemporalConstraint ? mainTemporalConstraint.constraintType : 'none'}
         onChange={(e: any) => onChangeTemporalConstraint(e.target.value)}
         disabled={maintenanceIsActive || disableTemporalConstraint}
+        variant="standard"
       >
         <MenuItem value={'sameEncounter'}>Tous les critères ont lieu au cours du même séjour</MenuItem>
         {/* <MenuItem value={'differentEncounter'}>Tous les critères ont lieu au cours de séjours différents</MenuItem> */}
