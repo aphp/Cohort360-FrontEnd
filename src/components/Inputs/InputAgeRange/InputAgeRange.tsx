@@ -106,6 +106,7 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({ birthdates, onCha
           <Typography style={{ width: 35, margin: '0 4px' }}>De : </Typography>
           <Grid item style={{ flex: 0.3, margin: `0 ${deidentifiedBoolean ? '12px' : '4px'}` }}>
             <TextField
+              variant="standard"
               InputProps={{
                 endAdornment: <Typography>an(s)</Typography>
               }}
@@ -116,6 +117,7 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({ birthdates, onCha
           </Grid>
           <Grid item style={{ flex: 0.3, margin: `0 ${deidentifiedBoolean ? '12px' : '4px'}` }}>
             <TextField
+              variant="standard"
               InputProps={{
                 endAdornment: <Typography>mois</Typography>
               }}
@@ -127,6 +129,7 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({ birthdates, onCha
           {!deidentifiedBoolean && (
             <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
               <TextField
+                variant="standard"
                 InputProps={{
                   endAdornment: <Typography>jour(s)</Typography>
                 }}
@@ -142,6 +145,7 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({ birthdates, onCha
           <Typography style={{ width: 35, margin: '0 4px' }}>À : </Typography>
           <Grid item style={{ flex: 0.3, margin: `0 ${deidentifiedBoolean ? '12px' : '4px'}` }}>
             <TextField
+              variant="standard"
               InputProps={{
                 endAdornment: <Typography>an(s)</Typography>
               }}
@@ -152,6 +156,7 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({ birthdates, onCha
           </Grid>
           <Grid item style={{ flex: 0.3, margin: `0 ${deidentifiedBoolean ? '12px' : '4px'}` }}>
             <TextField
+              variant="standard"
               InputProps={{
                 endAdornment: <Typography>mois</Typography>
               }}
@@ -163,6 +168,7 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({ birthdates, onCha
           {!deidentifiedBoolean && (
             <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
               <TextField
+                variant="standard"
                 InputProps={{
                   endAdornment: <Typography>jour(s)</Typography>
                 }}

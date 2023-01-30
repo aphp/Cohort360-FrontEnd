@@ -83,7 +83,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
     <Grid container alignItems="center" className={classes.component}>
       {showSelect && (
         <Grid container item xs={2} justifyContent="center">
-          <Select style={{ width: '90%' }} value={searchBy as any} onChange={handleChangeSelect}>
+          <Select style={{ width: '90%' }} value={searchBy as any} onChange={handleChangeSelect} variant="standard">
             <MenuItem value={SearchByTypes.text}>Tous les champs</MenuItem>
             <MenuItem value={SearchByTypes.family}>Nom</MenuItem>
             <MenuItem value={SearchByTypes.given}>Prénom</MenuItem>

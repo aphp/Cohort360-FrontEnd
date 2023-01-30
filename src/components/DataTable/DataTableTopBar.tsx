@@ -127,7 +127,12 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
             {searchBar && searchBar.type !== 'document' && (
               <Grid id="DTTB_search" container alignItems="center" direction="row" wrap="nowrap">
                 {searchBar.type === 'patient' && (
-                  <Select value={searchBy as any} onChange={handleChangeSelect} className={classes.select}>
+                  <Select
+                    value={searchBy as any}
+                    onChange={handleChangeSelect}
+                    className={classes.select}
+                    variant="standard"
+                  >
                     <MenuItem value={SearchByTypes.text}>Tous les champs</MenuItem>
                     <MenuItem value={SearchByTypes.family}>Nom</MenuItem>
                     <MenuItem value={SearchByTypes.given}>Prénom</MenuItem>
