@@ -88,9 +88,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
       case 'selectedAdministrationRoutes':
       case 'selectedPrescriptionTypes':
       case 'nda':
+        setFilters((prevState) => ({ ...prevState, [filterName]: value }))
+        break
       case 'startDate':
       case 'endDate':
-        setFilters((prevState) => ({ ...prevState, [filterName]: value }))
+        setFilters((prevState) => ({ ...prevState, [filterName]: null }))
         break
     }
   }

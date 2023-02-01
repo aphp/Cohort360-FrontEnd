@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import DatePicker from '@mui/lab/DatePicker'
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import 'moment/locale/fr'
 
 import {
   Autocomplete,
@@ -180,49 +182,53 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
         )}
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Date :</Typography>
-          <Grid container alignItems="baseline" className={classes.datePickers}>
+          <Grid container alignItems="center" className={classes.datePickers}>
             <FormLabel component="legend" className={classes.dateLabel}>
               Après le :
             </FormLabel>
-            {/* <DatePicker
-              clearable
-              error={dateError}
-              style={{ width: 'calc(100% - 120px)' }}
-              invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
-              format="DD/MM/YYYY"
-              onChange={(date) => setStartDate(date ?? null)}
-              value={_startDate}
-            /> */}
+            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+              <DatePicker
+                onChange={(date) => setStartDate(date ?? null)}
+                value={_startDate}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    variant="standard"
+                    error={dateError}
+                    helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
+                    style={{ width: 'calc(100% - 120px)' }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
             {_startDate !== null && (
-              <IconButton
-                classes={{ root: classes.clearDate /*label: classes.buttonLabel*/ }}
-                color="primary"
-                onClick={() => setStartDate(null)}
-              >
+              <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setStartDate(null)}>
                 <ClearIcon />
               </IconButton>
             )}
           </Grid>
 
-          <Grid container alignItems="baseline" className={classes.datePickers}>
+          <Grid container alignItems="center" className={classes.datePickers}>
             <FormLabel component="legend" className={classes.dateLabel}>
               Avant le :
             </FormLabel>
-            {/* <DatePicker
-              clearable
-              error={dateError}
-              style={{ width: 'calc(100% - 120px)' }}
-              invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
-              format="DD/MM/YYYY"
-              onChange={setEndDate}
-              value={_endDate}
-            /> */}
+            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+              <DatePicker
+                onChange={(date) => setEndDate(date ?? null)}
+                value={_endDate}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    variant="standard"
+                    error={dateError}
+                    helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
+                    style={{ width: 'calc(100% - 120px)' }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
             {_endDate !== null && (
-              <IconButton
-                classes={{ root: classes.clearDate /*label: classes.buttonLabel*/ }}
-                color="primary"
-                onClick={() => setEndDate(null)}
-              >
+              <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setEndDate(null)}>
                 <ClearIcon />
               </IconButton>
             )}

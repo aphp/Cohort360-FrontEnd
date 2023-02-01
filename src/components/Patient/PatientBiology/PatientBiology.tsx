@@ -83,9 +83,11 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
       case 'nda':
       case 'loinc':
       case 'anabio':
+        setFilters((prevState) => ({ ...prevState, [filterName]: value }))
+        break
       case 'startDate':
       case 'endDate':
-        setFilters((prevState) => ({ ...prevState, [filterName]: value }))
+        setFilters((prevState) => ({ ...prevState, [filterName]: null }))
         break
     }
   }
