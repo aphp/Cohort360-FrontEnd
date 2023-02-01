@@ -97,7 +97,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   }, [searchInput, filters, order])
 
   return (
-    <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
+    <Grid container justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
         loading={loading}
         results={{

@@ -103,8 +103,8 @@ const Patient = () => {
 
         <PatientHeader patient={patient?.patientInfo} deidentifiedBoolean={deidentified} />
 
-        <Grid container item md={11}>
-          <Tabs value={selectedTab} onChange={handleChangeTabs} textColor="primary">
+        <Grid container md={11}>
+          <Tabs value={selectedTab} onChange={handleChangeTabs} textColor="primary" indicatorColor="secondary">
             <Tab
               className={classes.tabTitle}
               label="Aperçu patient"
@@ -153,7 +153,7 @@ const Patient = () => {
             )}
           </Tabs>
         </Grid>
-        <Grid className={classes.tabContainer}>
+        <Grid container sm={11} className={classes.tabContainer}>
           {selectedTab === 'preview' && (
             <PatientPreview patient={patient?.patientInfo} deidentifiedBoolean={deidentified} />
           )}

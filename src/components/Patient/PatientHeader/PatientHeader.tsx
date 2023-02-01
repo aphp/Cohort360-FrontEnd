@@ -34,7 +34,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
       }`
 
   return (
-    <Grid container direction="row" justifyContent="center" alignItems="center" className={classes.root}>
+    <Grid container justifyContent="center" alignItems="center" className={classes.root}>
       <Grid container item xs={11} justifyContent="center" alignItems="center">
         <Grid container item xs={9}>
           <PatientTitle firstName={firstName} lastName={lastName} />

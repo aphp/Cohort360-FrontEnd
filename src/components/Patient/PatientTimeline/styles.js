@@ -7,16 +7,11 @@ const emptyYearHeight = '0.7em'
 const useStyles = makeStyles({
   centeredTimeline: {
     position: 'relative',
-    marginRight: '5%',
-    marginLeft: '5%',
     overflow: 'hidden',
-    height: '100%',
-    width: 'auto'
+    height: '100%'
   },
   verticalBar: {
     textAlign: 'center',
-    marginLeft: 'auto',
-    marginRight: 'auto',
     '&:before': {
       position: 'absolute',
       content: '""',

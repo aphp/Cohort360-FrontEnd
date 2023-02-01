@@ -137,7 +137,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   }
 
   return (
-    <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
+    <Grid container justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
         loading={loading}
         results={{ nb: totalDocs, total: totalAllDoc, label: 'document(s)' }}

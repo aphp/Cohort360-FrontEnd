@@ -351,7 +351,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
             onClose={() => setOpenFilter(false)}
           />
 
-          <Grid container alignItems="center" justifyContent="flex-end" xs={11} style={{ margin: 'auto' }}>
+          <Grid container alignItems="center" justifyContent="flex-end" style={{ margin: 'auto' }}>
             <Button
               variant="contained"
               disableElevation
@@ -363,7 +363,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
             </Button>
           </Grid>
 
-          <Grid container alignItems="center" justifyContent="flex-end" xs={11} style={{ margin: 'auto' }}>
+          <Grid container alignItems="center" justifyContent="flex-end" style={{ margin: 'auto' }}>
             {selectedTypes.length > 0 &&
               selectedTypes.map((diagnosticType) => (
                 <Chip
