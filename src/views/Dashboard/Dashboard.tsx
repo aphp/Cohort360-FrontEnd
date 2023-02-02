@@ -131,6 +131,7 @@ const Dashboard: React.FC<{
     <Grid
       container
       direction="column"
+      alignItems="center"
       className={clsx(classes.appBar, {
         [classes.appBarShift]: open
       })}
@@ -169,7 +170,7 @@ const Dashboard: React.FC<{
           </Tabs>
         </Grid>
       </Grid>
-      <div>
+      <Grid container xs={11} alignItems="center" direction="column">
         {selectedTab === 'preview' && (
           <CohortPreview
             total={dashboard.totalPatients}
@@ -193,7 +194,7 @@ const Dashboard: React.FC<{
         {selectedTab === 'documents' && (
           <Documents groupId={cohortId || perimetreIds} deidentifiedBoolean={dashboard.deidentifiedBoolean ?? false} />
         )}
-      </div>
+      </Grid>
     </Grid>
   )
 }

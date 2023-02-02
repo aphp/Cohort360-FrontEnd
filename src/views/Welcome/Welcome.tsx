@@ -170,8 +170,8 @@ const Welcome: React.FC = () => {
           </Grid>
         </Grid>
 
-        <Grid container spacing={3} style={{ paddingTop: 8 }}>
-          <Grid item xs={12} md={12} lg={12}>
+        <Grid container item style={{ paddingTop: 12 }}>
+          <Grid item xs={12}>
             <Paper id="favorite-cohort-research-card" className={classes.paper}>
               <ResearchCard
                 title={'Mes cohortes favorites'}
@@ -184,8 +184,8 @@ const Welcome: React.FC = () => {
             </Paper>
           </Grid>
         </Grid>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={12} lg={12}>
+        <Grid container item style={{ paddingTop: 12 }}>
+          <Grid item xs={12}>
             <Paper id="last-created-cohort-research-card" className={classes.paper}>
               <ResearchCard
                 title={'Mes dernières cohortes créées'}
@@ -198,8 +198,8 @@ const Welcome: React.FC = () => {
             </Paper>
           </Grid>
         </Grid>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={12} lg={12}>
+        <Grid container item style={{ paddingTop: 12 }}>
+          <Grid item xs={12}>
             <Paper id="last-created-request-research-card" className={classes.paper}>
               <ResearchCard
                 title={'Mes dernières requêtes créées'}

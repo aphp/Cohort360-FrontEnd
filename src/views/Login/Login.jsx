@@ -5,18 +5,17 @@ import localforage from 'localforage'
 import {
   Alert,
   Button,
-  TextField,
+  CircularProgress,
   Grid,
-  Box,
-  Typography,
-  Link,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
-  CircularProgress,
-  Snackbar
+  DialogTitle,
+  Link,
+  Snackbar,
+  TextField,
+  Typography
 } from '@mui/material'
 
 import NoRights from 'components/ErrorView/NoRights'
@@ -277,65 +276,60 @@ const Login = () => {
           alignItems="center"
           className={classes.rightPanel}
         >
-          <Grid container item xs={8} lg={6} direction="column" alignItems="center">
+          <Grid container xs={8} lg={6} direction="column" alignItems="center" justifyContent="center">
             <img className={classes.logo} src={logo} alt="Logo Cohort360" />
 
             <Typography color="primary" className={classes.bienvenue}>
               Bienvenue ! Connectez-vous.
             </Typography>
 
-            <form className={classes.form} noValidate onSubmit={_onSubmit}>
-              <Grid container item direction="column" alignItems="center">
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="identifiant"
-                  label="Identifiant"
-                  name="Identifiant"
-                  autoComplete="Identifiant"
-                  autoFocus
-                  onChange={(event) => setUsername(event.target.value)}
-                />
+            <Grid container direction="column" alignItems="center" justifyContent="center" className={classes.form}>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="identifiant"
+                label="Identifiant"
+                name="Identifiant"
+                autoComplete="Identifiant"
+                autoFocus
+                onChange={(event) => setUsername(event.target.value)}
+              />
 
-                <TextField
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="Votre mot de passe"
-                  label="Votre mot de passe"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  onChange={(event) => setPassword(event.target.value)}
-                />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="Votre mot de passe"
+                label="Votre mot de passe"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                onChange={(event) => setPassword(event.target.value)}
+              />
 
-                <Typography align="center" className={classes.mention}>
-                  <Link href="#" onClick={() => setOpen(true)}>
-                    En cliquant sur &quot;connexion&quot;, vous acceptez la mention légale.
-                  </Link>
-                </Typography>
+              <Typography align="center" className={classes.mention}>
+                <Link href="#" onClick={() => setOpen(true)} underline="hover">
+                  En cliquant sur &quot;connexion&quot;, vous acceptez la mention légale.
+                </Link>
+              </Typography>
 
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  className={classes.submit}
-                  id="connection-button-submit"
-                >
-                  {loading ? <CircularProgress /> : 'Connexion'}
-                </Button>
-              </Grid>
-
-              <Box mt={10} align="center">
-                <Grid container justifyContent="center">
-                  <Link href="https://eds.aphp.fr">
-                    <img className={classes.logoAPHP} src={logoAPHP} alt="Footer" />
-                  </Link>
-                </Grid>
-              </Box>
-            </form>
+              <Button
+                type="submit"
+                onClick={_onSubmit}
+                variant="contained"
+                className={classes.submit}
+                id="connection-button-submit"
+              >
+                {loading ? <CircularProgress /> : 'Connexion'}
+              </Button>
+            </Grid>
           </Grid>
+          {/* <Grid container justifyContent="center"> */}
+          <Link href="https://eds.aphp.fr">
+            <img className={classes.logoAPHP} src={logoAPHP} alt="Footer" />
+          </Link>
+          {/* </Grid> */}
         </Grid>
       </Grid>
 

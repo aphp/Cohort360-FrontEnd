@@ -91,21 +91,24 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: '#153D8A',
       borderRadius: '8px',
       color: 'white',
-      minHeight: 41
+      minHeight: 41,
+      '& .Mui-selected': { color: 'white' }
     },
     indicator: {
-      backgroundColor: '#5BC5F2',
+      backgroundColor: '#ED6D91',
       height: '4px'
     },
     selected: {
-      backgroundColor: '#0063AF'
+      backgroundColor: '#0063AF',
+      color: 'white'
     },
     tabTitle: {
-      minWidth: 0,
+      minWidth: 160,
       color: 'white',
       fontWeight: 400,
       borderBottom: '#255CA1 inset 4px',
-      minHeight: 41
+      minHeight: 41,
+      padding: '6px 12px'
     },
     searchBar: {
       minWidth: 250,
@@ -120,7 +123,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     searchButton: {
       minWidth: 150,
-      height: 41,
+      height: 32,
       backgroundColor: '#5BC5F2',
       color: 'white',
       borderRadius: '25px',

@@ -21,10 +21,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundSize: 'cover',
     backgroundPosition: 'center'
   },
-  form: {
-    width: '100%',
-    margin: theme.spacing(5, 0, 1)
-  },
   submit: {
     margin: theme.spacing(2, 0, 5),
     backgroundColor: '#5BC5F2',

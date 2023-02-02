@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { Alert, Checkbox, CssBaseline, Grid, Typography } from '@mui/material'
+import { Alert, Checkbox, Grid, Typography } from '@mui/material'
 
 import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
@@ -196,65 +196,62 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   return (
     <>
       <Grid container direction="column" alignItems="center">
-        <CssBaseline />
-        <Grid container item xs={11} justifyContent="space-between">
-          <DataTableTopBar
-            loading={loadingStatus}
-            results={[documentsResult, patientsResult]}
-            searchBar={{
-              type: 'document',
-              value: searchInput ? onFilterValue() : '',
-              onSearch: (newSearchInput: string) => setSearchInput(newSearchInput),
-              error: searchInputError
-            }}
-            buttons={[
-              {
-                label: 'Filtrer',
-                icon: <FilterList height="15px" fill="#FFF" />,
-                onClick: handleOpenDialog
-              }
-            ]}
-          />
+        <DataTableTopBar
+          loading={loadingStatus}
+          results={[documentsResult, patientsResult]}
+          searchBar={{
+            type: 'document',
+            value: searchInput ? onFilterValue() : '',
+            onSearch: (newSearchInput: string) => setSearchInput(newSearchInput),
+            error: searchInputError
+          }}
+          buttons={[
+            {
+              label: 'Filtrer',
+              icon: <FilterList height="15px" fill="#FFF" />,
+              onClick: handleOpenDialog
+            }
+          ]}
+        />
 
-          <MasterChips chips={buildDocumentFiltersChips(filters, handleDeleteChip)} />
+        <MasterChips chips={buildDocumentFiltersChips(filters, handleDeleteChip)} />
 
-          {deidentifiedBoolean ? (
-            <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
-              Attention : Les données identifiantes des patients sont remplacées par des informations fictives dans les
-              résultats de la recherche et dans les documents prévisualisés.
-            </Alert>
-          ) : (
-            <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
-              Attention : La recherche textuelle est pseudonymisée (les données identifiantes des patients sont
-              remplacées par des informations fictives). Vous retrouverez les données personnelles de votre patient en
-              cliquant sur l'aperçu.
-            </Alert>
-          )}
+        {deidentifiedBoolean ? (
+          <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
+            Attention : Les données identifiantes des patients sont remplacées par des informations fictives dans les
+            résultats de la recherche et dans les documents prévisualisés.
+          </Alert>
+        ) : (
+          <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
+            Attention : La recherche textuelle est pseudonymisée (les données identifiantes des patients sont remplacées
+            par des informations fictives). Vous retrouverez les données personnelles de votre patient en cliquant sur
+            l'aperçu.
+          </Alert>
+        )}
 
-          {!deidentifiedBoolean && (
-            <Grid container item alignItems="center" justifyContent="flex-end">
-              <Checkbox
-                checked={filters.onlyPdfAvailable}
-                onChange={() => onChangeOptions('onlyPdfAvailable', !filters.onlyPdfAvailable)}
-              />
-              <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
-            </Grid>
-          )}
+        {!deidentifiedBoolean && (
+          <Grid container item alignItems="center" justifyContent="flex-end">
+            <Checkbox
+              checked={filters.onlyPdfAvailable}
+              onChange={() => onChangeOptions('onlyPdfAvailable', !filters.onlyPdfAvailable)}
+            />
+            <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
+          </Grid>
+        )}
 
-          <DataTableComposition
-            showIpp
-            loading={loadingStatus ?? false}
-            deidentified={deidentifiedBoolean ?? true}
-            searchMode={searchMode}
-            groupId={groupId}
-            documentsList={documents ?? []}
-            order={order}
-            setOrder={setOrder}
-            page={page}
-            setPage={(newPage: number) => handleChangePage(newPage)}
-            total={documentsResult.nb}
-          />
-        </Grid>
+        <DataTableComposition
+          showIpp
+          loading={loadingStatus ?? false}
+          deidentified={deidentifiedBoolean ?? true}
+          searchMode={searchMode}
+          groupId={groupId}
+          documentsList={documents ?? []}
+          order={order}
+          setOrder={setOrder}
+          page={page}
+          setPage={(newPage: number) => handleChangePage(newPage)}
+          total={documentsResult.nb}
+        />
       </Grid>
 
       <ModalDocumentFilters

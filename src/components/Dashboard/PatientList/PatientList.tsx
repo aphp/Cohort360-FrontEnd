@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 
-import { CssBaseline, Grid } from '@mui/material'
+import Grid from '@mui/material/Grid'
 
 import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
 import DataTablePatient from 'components/DataTable/DataTablePatient'
@@ -167,56 +167,52 @@ const PatientList: React.FC<PatientListProps> = ({
 
   return (
     <Grid container direction="column" alignItems="center">
-      <CssBaseline />
-      <Grid container item xs={11} justifyContent="space-between">
-        <PatientCharts agePyramid={agePyramid} patientData={patientData} />
+      <PatientCharts agePyramid={agePyramid} patientData={patientData} />
 
-        {/* <Grid id="patient-data-grid" container item justifyContent="flex-end" className={classes.tableGrid}> */}
-        <DataTableTopBar
-          loading={loadingStatus}
-          results={patientsResult}
-          searchBar={
-            deidentified
-              ? undefined
-              : {
-                  type: 'patient',
-                  value: searchInput,
-                  searchBy: searchBy,
-                  onSearch: (newSearchInput: string, newSearchBy?: SearchByTypes) =>
-                    onSearchPatient(newSearchInput, newSearchBy)
-                }
+      <DataTableTopBar
+        loading={loadingStatus}
+        results={patientsResult}
+        searchBar={
+          deidentified
+            ? undefined
+            : {
+                type: 'patient',
+                value: searchInput,
+                searchBy: searchBy,
+                onSearch: (newSearchInput: string, newSearchBy?: SearchByTypes) =>
+                  onSearchPatient(newSearchInput, newSearchBy)
+              }
+        }
+        buttons={[
+          {
+            label: 'Filtrer',
+            icon: <FilterList height="15px" fill="#FFF" />,
+            onClick: () => setOpen(true)
           }
-          buttons={[
-            {
-              label: 'Filtrer',
-              icon: <FilterList height="15px" fill="#FFF" />,
-              onClick: () => setOpen(true)
-            }
-          ]}
-        />
+        ]}
+      />
 
-        <MasterChips chips={buildPatientFiltersChips(filters, handleDeleteChip)} />
+      <MasterChips chips={buildPatientFiltersChips(filters, handleDeleteChip)} />
 
-        <DataTablePatient
-          loading={loadingStatus}
-          groupId={groupId}
-          deidentified={deidentified ?? false}
-          patientsList={patientsList ?? []}
-          order={order}
-          setOrder={setOrder}
-          page={page}
-          setPage={(newPage) => handleChangePage(newPage)}
-          total={patientsResult.nb}
-        />
+      <DataTablePatient
+        loading={loadingStatus}
+        groupId={groupId}
+        deidentified={deidentified ?? false}
+        patientsList={patientsList ?? []}
+        order={order}
+        setOrder={setOrder}
+        page={page}
+        setPage={(newPage) => handleChangePage(newPage)}
+        total={patientsResult.nb}
+      />
 
-        <PatientFilters
-          open={open}
-          onClose={() => setOpen(false)}
-          onSubmit={() => setOpen(false)}
-          filters={filters}
-          onChangeFilters={setFilters}
-        />
-      </Grid>
+      <PatientFilters
+        open={open}
+        onClose={() => setOpen(false)}
+        onSubmit={() => setOpen(false)}
+        filters={filters}
+        onChangeFilters={setFilters}
+      />
     </Grid>
   )
 }

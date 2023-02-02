@@ -28,7 +28,8 @@ export default makeStyles((theme) =>
     tabTitle: {
       minWidth: 0,
       color: 'rgba(0, 99, 175, 0.4)',
-      borderBottom: '#CFE4FD 2px inset'
+      borderBottom: '#CFE4FD 2px inset',
+      padding: '6px 12px'
     },
     tabContainer: {
       paddingTop: theme.spacing(3),

@@ -31,7 +31,7 @@ const BarChart: React.FC<BarChartProps> = memo(({ data, height = 250, width = 30
 
     const x = d3
       .scaleBand()
-      .domain(d3.range(data.length).map((n) => n.toString()))
+      .domain(d3.range(data.length).map((n) => n))
       .range([margin.left, width - margin.right])
       .padding(0.1)
 
@@ -87,7 +87,7 @@ const BarChart: React.FC<BarChartProps> = memo(({ data, height = 250, width = 30
     svg.append('g').call(yAxis)
   }, [node, data, height, width])
 
-  return <svg id="gender-repartition-card-svg" ref={node}></svg>
+  return <svg id="gender-repartition-card-svg" ref={node} />
 })
 
 export default BarChart
