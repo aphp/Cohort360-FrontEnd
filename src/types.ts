@@ -712,3 +712,5 @@ export type DTTB_ButtonType = {
   icon?: ReactElement
   onClick: (args?: any) => void
 }
+
+export type TreeElement = { id: string; subItems: TreeElement[] }

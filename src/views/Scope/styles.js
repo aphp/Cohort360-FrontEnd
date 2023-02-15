@@ -86,25 +86,12 @@ export default makeStyles((theme) => ({
   bottomBar: {
     position: 'fixed',
     bottom: 0,
-    backgroundColor: '#E6F1FD',
-    marginLeft: smallDrawerWidth,
-    width: `calc(100% - ${smallDrawerWidth}px)`,
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    })
+    backgroundColor: '#E6F1FD'
   },
   bottomBarShift: {
     position: 'fixed',
     bottom: 0,
-    backgroundColor: '#E6F1FD',
-    marginLeft: largeDrawerWidth,
-    width: `calc(100% - 450px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
-    })
+    backgroundColor: '#E6F1FD'
   },
   searchBar: {
     marginBottom: '12px',

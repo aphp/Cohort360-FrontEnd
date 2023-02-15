@@ -1,4 +1,5 @@
 import { PmsiListType } from 'state/pmsi'
+import { TreeElement } from '../types'
 
 /**
  * This function is called when a user select an element of pmsi hierarchy
@@ -211,4 +212,190 @@ export const checkIfIndeterminated: (_row: any, selectedItems: any) => boolean |
     }
   }
   return checkChild(_row)
+}
+export const findSelectedInListAndSubItems = (
+  selectedItems: TreeElement[],
+  searchedItem: TreeElement | undefined,
+  pmsiHierarchy: TreeElement[]
+): boolean => {
+  if (!searchedItem || !selectedItems || selectedItems.length === 0) return false
+  selectedItems = selectedItems?.filter(({ id }) => id !== 'loading')
+  const foundItem = selectedItems.find((selectedItem) => {
+    if (selectedItem.id === searchedItem.id || selectedItem.id == '*') {
+      return true
+    }
+    return selectedItem.subItems
+      ? findSelectedInListAndSubItems(selectedItem.subItems, searchedItem, pmsiHierarchy)
+      : false
+  })
+  if (foundItem) {
+    return true
+  }
+  if (
+    searchedItem.subItems &&
+    searchedItem.subItems.length > 0 &&
+    !(searchedItem.subItems.length === 1 && searchedItem.subItems[0].id === 'loading')
+  ) {
+    const numberOfSubItemsSelected = searchedItem.subItems?.filter((searchedSubItem: any) =>
+      selectedItems.find((selectedItem) => selectedItem.id === searchedSubItem.id)
+    )?.length
+    if (searchedItem.subItems?.length === numberOfSubItemsSelected) {
+      return true
+    }
+    const isSingleItemNotSelected = (searchedItem.subItems?.length ?? 0 - (numberOfSubItemsSelected ?? 0)) === 1
+    if (numberOfSubItemsSelected && isSingleItemNotSelected) {
+      const singleItemNotSelected = searchedItem.subItems?.find((searchedSubItem: any) =>
+        selectedItems.find((selectedItem) => selectedItem.id !== searchedSubItem.id)
+      )
+      return findSelectedInListAndSubItems(selectedItems, singleItemNotSelected, pmsiHierarchy)
+    }
+  }
+  return false
+}
+export const findEquivalentRowInItemAndSubItems: (
+  item: TreeElement,
+  rows: TreeElement[] | undefined
+) => { equivalentRow: TreeElement | undefined; parentsList: TreeElement[] } = (
+  item: TreeElement,
+  rows: TreeElement[] | undefined
+) => {
+  let equivalentRow: TreeElement | undefined = undefined
+  const parentsList: TreeElement[] = []
+  if (!rows) return { equivalentRow: equivalentRow, parentsList: parentsList }
+  for (const row of rows) {
+    if (row.id === item.id) {
+      parentsList.push(row)
+      equivalentRow = row
+      break
+    } else {
+      const { equivalentRow: lastNode, parentsList: newParentsList } = findEquivalentRowInItemAndSubItems(
+        item,
+        row.subItems
+      )
+      if (lastNode) {
+        equivalentRow = lastNode
+        parentsList.push(...newParentsList)
+        break
+      }
+    }
+  }
+  return { equivalentRow: equivalentRow, parentsList: parentsList }
+}
+export const getNewSelectedItems = (
+  row: TreeElement,
+  selectedItems: TreeElement[] | undefined,
+  rootRows: TreeElement[]
+) => {
+  selectedItems = (selectedItems ?? []).map(
+    (selectedItem) => findEquivalentRowInItemAndSubItems(selectedItem, rootRows).equivalentRow ?? selectedItem
+  )
+  const { flattedSelectedItems } = flatItems(selectedItems)
+  let savedSelectedItems = flattedSelectedItems
+  const isFound = savedSelectedItems?.find((item) => item.id === row.id)
+
+  const getRowAndChildren = (parent: TreeElement) => {
+    const getChild: (subItem: TreeElement) => TreeElement[] = (subItem: TreeElement) => {
+      if (subItem?.id === 'loading') return []
+
+      return [
+        subItem,
+        ...(subItem.subItems ? subItem.subItems.map((subItem: TreeElement) => getChild(subItem)) : [])
+      ].flat()
+    }
+
+    return [
+      parent,
+      ...(parent.subItems
+        ? parent.id === 'loading'
+          ? []
+          : parent.subItems.map((subItem: TreeElement) => getChild(subItem))
+        : [])
+    ].flat()
+  }
+
+  const deleteRowAndChildren = (parent: TreeElement) => {
+    const elemToDelete = getRowAndChildren(parent)
+
+    savedSelectedItems = savedSelectedItems.filter((row) => !elemToDelete.some(({ id }) => id === row.id))
+
+    return savedSelectedItems
+  }
+
+  if (isFound) {
+    savedSelectedItems = deleteRowAndChildren(row)
+  } else {
+    savedSelectedItems = [...savedSelectedItems, ...getRowAndChildren(row)]
+  }
+
+  let _savedSelectedItems: any[] = []
+  const checkIfParentIsChecked = (rows: TreeElement[]) => {
+    for (let index = 0; index < rows.length; index++) {
+      const row = rows[index]
+      if (
+        !row.subItems ||
+        (row && row.subItems.length === 0) ||
+        (row && row.subItems.length === 1 && row.subItems[0].id === 'loading')
+      ) {
+        continue
+      }
+
+      const selectedChildren = row.subItems
+        ? // eslint-disable-next-line
+          row.subItems.filter((child) => savedSelectedItems.find((selectedChild) => selectedChild.id === child.id))
+        : []
+      const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
+
+      if (row && row.subItems && selectedChildren.length === row.subItems.length && !foundItem) {
+        savedSelectedItems = [...savedSelectedItems, row]
+      } else if (
+        row &&
+        row.subItems &&
+        row.subItems.length > 0 &&
+        selectedChildren &&
+        selectedChildren.length !== row.subItems.length
+      ) {
+        savedSelectedItems = savedSelectedItems.filter(({ id }) => id !== row.id)
+      }
+
+      // Need a real fix .. 🥲
+      // // Protection:
+      // // When the user select a scope, reload, select and unselect a subitems the parent have subitems = []
+      // // So, replace the parent and the condition `selectedChildren.length !== foundItem.subItems.length` can be validated
+
+      const indexOfItem = foundItem && savedSelectedItems ? savedSelectedItems.indexOf(foundItem) : -1
+      if (indexOfItem !== -1) {
+        savedSelectedItems[indexOfItem] = row
+      }
+
+      if (row.subItems) checkIfParentIsChecked(row.subItems)
+    }
+  }
+
+  while (savedSelectedItems.length !== _savedSelectedItems.length) {
+    _savedSelectedItems = savedSelectedItems
+    checkIfParentIsChecked(rootRows)
+  }
+
+  savedSelectedItems = savedSelectedItems.filter((item, index, array) => array.indexOf(item) === index)
+
+  return savedSelectedItems
+}
+export const flatItems = (items: TreeElement[] | undefined) => {
+  const selectedIds: string[] | undefined = []
+  const flattedSelectedItems: TreeElement[] | undefined = []
+  const flat = (items: TreeElement[] | undefined) => {
+    if (!items) return
+    items.forEach((item) => {
+      if (item.id === 'loading') {
+        return
+      }
+      if (selectedIds?.indexOf(item.id) === -1) {
+        selectedIds.push(item.id)
+        flattedSelectedItems?.push(item)
+      }
+      if (item.subItems) flat(item.subItems)
+    })
+  }
+  flat(items)
+  return { flattedSelectedItems: flattedSelectedItems, selectedIds: selectedIds }
 }

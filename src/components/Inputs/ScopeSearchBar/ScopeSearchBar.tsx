@@ -6,13 +6,15 @@ import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import ClearIcon from '@material-ui/icons/Clear'
 
 import useStyles from './styles'
+import Alert from '@material-ui/lab/Alert'
 
 type ScopeSearchBarProps = {
   searchInput: string
   onChangeInput: (searchInput: string) => void
+  alertMessage?: string
 }
 
-const ScopeSearchBar: React.FC<ScopeSearchBarProps> = ({ searchInput, onChangeInput }) => {
+const ScopeSearchBar: React.FC<ScopeSearchBarProps> = ({ searchInput, onChangeInput, alertMessage }) => {
   const classes = useStyles()
 
   const handleChangeInput = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -45,6 +47,11 @@ const ScopeSearchBar: React.FC<ScopeSearchBarProps> = ({ searchInput, onChangeIn
           <SearchIcon fill="#ED6D91" height="15px" />
         </IconButton>
       </Grid>
+      {alertMessage && (
+        <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
+          {alertMessage}
+        </Alert>
+      )}
     </Grid>
   )
 }

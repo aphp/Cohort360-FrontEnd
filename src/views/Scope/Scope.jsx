@@ -56,7 +56,9 @@ const Scope = () => {
           <Typography variant="h1" color="primary" className={classes.title}>
             Explorer un perimètre
           </Typography>
-          <ScopeSearchBar searchInput={searchInput} onChangeInput={setSearchInput} />
+          <Grid container direction="row">
+            <ScopeSearchBar searchInput={searchInput} onChangeInput={setSearchInput} />
+          </Grid>
           <Paper className={classes.paper}>
             <ScopeTree
               searchInput={searchInput}
@@ -68,12 +70,13 @@ const Scope = () => {
         <Grid
           container
           item
+          xs={10}
           justifyContent="center"
           className={clsx(classes.bottomBar, {
             [classes.bottomBarShift]: open
           })}
         >
-          <Grid container item justifyContent="flex-end" xs={11} className={classes.buttons}>
+          <Grid container item justifyContent="flex-end" className={classes.buttons}>
             <Button
               variant="contained"
               disableElevation
