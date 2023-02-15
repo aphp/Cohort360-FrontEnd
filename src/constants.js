@@ -12,6 +12,8 @@ export const FHIR_API_URL =
 export const AUTH_API_URL =
   process.env.NODE_ENV !== 'development' ? '{REACT_APP_AUTH_API_URL}' : process.env.REACT_APP_AUTH_API_URL
 
+export const SHORT_COHORT_LIMIT = 20000
+
 export const CLAIM_HIERARCHY =
   process.env.NODE_ENV !== 'development'
     ? '{REACT_APP_VALUE_SET_URL_CLAIM_HIERARCHY}'

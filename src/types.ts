@@ -116,6 +116,7 @@ export type Cohort = {
   request_job_duration?: string
   request_query_snapshot?: string
   extension?: any[]
+  exportable?: boolean
 }
 
 export type CohortFilters = {
@@ -518,6 +519,8 @@ export type CohortCreationCounterType = {
   unknownPatient?: number
   jobFailMsg?: string
   date?: string
+  cohort_limit?: number
+  count_outdated?: boolean
 }
 
 export type CohortCreationSnapshotType = {

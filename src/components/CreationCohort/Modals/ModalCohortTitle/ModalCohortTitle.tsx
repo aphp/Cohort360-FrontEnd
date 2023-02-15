@@ -12,6 +12,7 @@ import {
   TextField,
   Typography
 } from '@material-ui/core'
+import { Alert } from '@material-ui/lab'
 
 import useStyles from './styles'
 
@@ -21,7 +22,9 @@ const ERROR_DESCRIPTION = 'error_description'
 const ModalCohortTitle: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
   onClose: () => void
-}> = ({ onExecute, onClose }) => {
+  longCohort: boolean
+  cohortLimit: number
+}> = ({ onExecute, onClose, longCohort, cohortLimit }) => {
   const classes = useStyles()
 
   const [title, onChangeTitle] = useState('')
@@ -47,7 +50,7 @@ const ModalCohortTitle: React.FC<{
   return (
     <Dialog fullWidth maxWidth="sm" open onClose={handleClose} aria-labelledby="form-dialog-title">
       <DialogTitle className={classes.title}>Création de la cohorte</DialogTitle>
-      <DialogContent>
+      <DialogContent style={{ overflowY: 'unset' }}>
         <Grid container direction="column" className={classes.inputContainer}>
           <Typography variant="h3">Nom de la cohorte :</Typography>
           <TextField
@@ -99,6 +102,14 @@ const ModalCohortTitle: React.FC<{
           />
         </Grid>
       </DialogContent>
+
+      {longCohort && (
+        <Alert severity="warning" style={{ alignItems: 'center' }}>
+          Cette cohorte contenant plus de {cohortLimit} patients, sa création est plus complexe et nécessite d'être
+          placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.
+        </Alert>
+      )}
+
       <DialogActions>
         <Button disabled={loading} onClick={handleClose} color="secondary">
           Annuler

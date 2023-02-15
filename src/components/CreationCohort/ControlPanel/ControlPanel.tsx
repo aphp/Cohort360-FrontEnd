@@ -39,8 +39,7 @@ import { RequestType } from 'types'
 import useStyle from './styles'
 
 import displayDigit from 'utils/displayDigit'
-
-const DISPLAY_ESTIMATE_LIMIT = 24
+import { SHORT_COHORT_LIMIT } from '../../../constants'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -71,7 +70,9 @@ const ControlPanel: React.FC<{
     currentSnapshot,
     requestId,
     requestName,
-    json
+    json,
+    shortCohortLimit,
+    count_outdated
   } = useAppSelector((state) => state.cohortCreation.request || {})
   const { includePatient, status, jobFailMsg /*byrequest, alive, deceased, female, male, unknownPatient */ } = count
 
@@ -85,6 +86,8 @@ const ControlPanel: React.FC<{
 
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active
+
+  const cohortLimit = shortCohortLimit ?? SHORT_COHORT_LIMIT
 
   const accessIsPseudonymize: boolean | null =
     selectedPopulation === null
@@ -161,15 +164,8 @@ const ControlPanel: React.FC<{
       <Grid className={classes.rightPanelContainerStyle}>
         <Grid className={classes.container}>
           <Button
-            disabled={
-              itLoads ||
-              typeof onExecute !== 'function' ||
-              (includePatient ? includePatient > 20000 : false) ||
-              maintenanceIsActive
-            }
-            onClick={
-              includePatient && includePatient > 20000 ? undefined : () => onSetOpenModal('executeCohortConfirmation')
-            }
+            disabled={itLoads || typeof onExecute !== 'function' || maintenanceIsActive || count_outdated}
+            onClick={() => onSetOpenModal('executeCohortConfirmation')}
             className={classes.requestExecution}
           >
             {itLoads ? (
@@ -259,12 +255,7 @@ const ControlPanel: React.FC<{
               />
             ) : (
               <Grid container alignItems="center" style={{ width: 'fit-content' }}>
-                <Typography
-                  className={clsx(classes.boldText, classes.patientTypo, {
-                    [classes.blueText]: includePatient ? includePatient <= 20000 : true,
-                    [classes.redText]: includePatient ? includePatient > 20000 : false
-                  })}
-                >
+                <Typography className={clsx(classes.boldText, classes.patientTypo, classes.blueText)}>
                   {includePatient !== undefined && includePatient !== null ? displayDigit(includePatient) : '-'}
                   {oldCount !== null
                     ? (includePatient ?? 0) - oldCount?.includePatient > 0
@@ -308,12 +299,6 @@ const ControlPanel: React.FC<{
           </Alert>
         )}
 
-        {!!includePatient && includePatient > 20000 && (
-          <Alert className={classes.errorAlert} severity="error">
-            Il est pour le moment impossible de créer des cohortes de plus de 20 000 patients
-          </Alert>
-        )}
-
         {(status === 'failed' || status === 'error') && (
           <Alert className={classes.errorAlert} severity="error">
             Une erreur est survenue lors du calcul du nombre de patients de votre requête.
@@ -349,14 +334,15 @@ const ControlPanel: React.FC<{
           </Alert>
         )}
 
-        {moment().diff(lastUpdated, 'hours') > DISPLAY_ESTIMATE_LIMIT && (
-          <Alert className={classes.errorAlert} severity="info">
-            Attention l'estimation du nombre de patients correspondant à votre requête effectuée le{' '}
-            {lastUpdated.format('DD/MM/YYYY')} est peut être dépassée, voulez vous la recalculer ?
+        {count_outdated && (
+          <Alert className={classes.errorAlert} severity="error">
+            Attention, l'estimation du nombre de patients correspondant à votre requête effectuée le{' '}
+            {lastUpdated.format('DD/MM/YYYY')} est dépassée, vous devez la recalculer avant de pouvoir créer une
+            cohorte.
             <Button
               onClick={() => _relaunchCount(true)}
               variant="outlined"
-              color="primary"
+              color="secondary"
               size="small"
               style={{ marginTop: 8 }}
               disabled={maintenanceIsActive}
@@ -368,7 +354,12 @@ const ControlPanel: React.FC<{
       </Grid>
 
       {openModal === 'executeCohortConfirmation' && (
-        <ModalCohortTitle onExecute={onExecute} onClose={() => onSetOpenModal(null)} />
+        <ModalCohortTitle
+          onExecute={onExecute}
+          onClose={() => onSetOpenModal(null)}
+          longCohort={includePatient ? includePatient > cohortLimit : false}
+          cohortLimit={cohortLimit}
+        />
       )}
 
       {openShareRequestModal && requestShare !== null && requestShare?.currentSnapshot !== undefined && (
@@ -388,7 +379,7 @@ const ControlPanel: React.FC<{
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         >
           <Alert severity="error" onClose={() => handleCloseSharedModal()}>
-            Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
+            Votre requête ne possède aucun critère. Elle ne peut donc pas être partagée.
           </Alert>
         </Snackbar>
       )}
