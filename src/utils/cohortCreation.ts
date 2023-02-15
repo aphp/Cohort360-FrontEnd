@@ -1,17 +1,9 @@
 import moment from 'moment'
 
 import services from 'services/aphp'
-import {
-  CriteriaGroupType,
-  DocType,
-  HierarchyElement,
-  ScopeTreeRow,
-  SelectedCriteriaType,
-  TemporalConstraintsType
-} from 'types'
+import { CriteriaGroupType, DocType, ScopeTreeRow, SelectedCriteriaType, TemporalConstraintsType } from 'types'
 
 import { docTypes } from 'assets/docTypes.json'
-import { PmsiListType } from '../state/pmsi'
 
 const REQUETEUR_VERSION = 'v1.2.1'
 
@@ -1682,9 +1674,9 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
   }
 }
 export const findSelectedInListAndSubItems = (
-  selectedItems: HierarchyElement[],
-  searchedItem: HierarchyElement,
-  pmsiHierarchy: PmsiListType[]
+  selectedItems: any[],
+  searchedItem: any,
+  pmsiHierarchy: any[]
 ): boolean => {
   if (!searchedItem || !selectedItems || selectedItems.length === 0) return false
   selectedItems = selectedItems?.filter(({ id }) => id !== 'loading')

@@ -26,5 +26,17 @@ export default makeStyles(() => ({
     fontWeight: 'bold',
     color: '#0063AF',
     padding: '0 20px'
+  },
+  pagination: {
+    float: 'right',
+    '& button': {
+      backgroundColor: '#fff',
+      color: '#5BC5F2'
+    },
+    '& .MuiPaginationItem-page.Mui-selected': {
+      color: '#0063AF',
+      backgroundColor: '#FFF'
+    },
+    margin: '12px 0'
   }
 }))

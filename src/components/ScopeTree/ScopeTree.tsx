@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react'
 
 import {
-  Grid,
-  CircularProgress,
-  IconButton,
+  Breadcrumbs,
   Checkbox,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
+  CircularProgress,
+  Grid,
+  IconButton,
   Paper,
-  Typography,
-  Breadcrumbs
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
 } from '@material-ui/core'
 
 import Skeleton from '@material-ui/lab/Skeleton'
@@ -21,7 +21,7 @@ import KeyboardArrowRightIcon from '@material-ui/icons/ChevronRight'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 
 import EnhancedTable from 'components/ScopeTree/ScopeTreeTable'
-import { ScopeTreeRow } from 'types'
+import { ScopeTreeRow, TreeElement } from 'types'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { expandScopeElement, fetchScopesList, ScopeState } from 'state/scope'
@@ -29,10 +29,118 @@ import { expandScopeElement, fetchScopesList, ScopeState } from 'state/scope'
 import apiBackend from 'services/apiBackend'
 
 import displayDigit from 'utils/displayDigit'
-import { getSelectedScopes } from 'utils/scopeTree'
 import { useDebounce } from 'utils/debounce'
 
 import useStyles from './styles'
+import { findEquivalentRowInItemAndSubItems, getSelectedPmsi } from '../../utils/pmsi'
+import { Pagination } from '@material-ui/lab'
+import { findSelectedInListAndSubItems } from '../../utils/cohortCreation'
+
+type ScopeTreeListItemProps = {
+  row: any
+  level: number
+  parentAccess: string
+  selectedItems: ScopeTreeRow[]
+  rootRows: ScopeTreeRow[]
+  debouncedSearchTerm: string | undefined
+  labelId: string
+  onExpand: (rowId: number) => void
+  onSelect: (row: ScopeTreeRow) => void
+  isIndeterminated: (row: any) => boolean | undefined
+  isSelected: (searchedItem: TreeElement, selectedItems: ScopeTreeRow[], allItems: ScopeTreeRow[]) => boolean
+}
+
+const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
+  const {
+    row,
+    level,
+    parentAccess,
+    selectedItems,
+    rootRows,
+    debouncedSearchTerm,
+    labelId,
+    onExpand,
+    onSelect,
+    isIndeterminated,
+    isSelected
+  } = props
+
+  const classes = useStyles()
+  const { scopeState } = useAppSelector<{
+    scopeState: ScopeState
+  }>((state) => ({
+    scopeState: state.scope || {}
+  }))
+
+  const { openPopulation = [] } = scopeState
+
+  return (
+    <>
+      {row.id === 'loading' ? (
+        <TableRow hover key={Math.random()}>
+          <TableCell colSpan={5}>
+            <Skeleton animation="wave" />
+          </TableCell>
+        </TableRow>
+      ) : (
+        <TableRow
+          hover
+          key={row.id}
+          classes={{
+            root: level % 2 === 0 ? classes.mainRow : classes.secondRow
+          }}
+        >
+          <TableCell>
+            {row.subItems && row.subItems.length > 0 && (
+              <IconButton
+                onClick={() => onExpand(row.id)}
+                style={{ marginLeft: level * 35, padding: 0, marginRight: -30 }}
+              >
+                {openPopulation.find((id) => row.id === id) ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+              </IconButton>
+            )}
+          </TableCell>
+
+          <TableCell align="center" padding="checkbox">
+            <Checkbox
+              color="secondary"
+              onClick={() => {
+                onSelect(row)
+              }}
+              indeterminate={isIndeterminated(row)}
+              checked={isSelected(row, selectedItems, rootRows) ? true : false}
+              inputProps={{ 'aria-labelledby': labelId }}
+            />
+          </TableCell>
+
+          <TableCell>
+            {debouncedSearchTerm && row.name ? (
+              <Breadcrumbs maxItems={2}>
+                {(row.name.split('/').length > 1 ? row.name.split('/').slice(1) : row.name.split('/').slice(0)).map(
+                  (name: any, index: number) => (
+                    <Typography key={index} style={{ color: '#153D8A' }}>
+                      {name}
+                    </Typography>
+                  )
+                )}
+              </Breadcrumbs>
+            ) : (
+              <Typography>{row.name}</Typography>
+            )}
+          </TableCell>
+
+          <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
+            <Typography>{displayDigit(row.quantity)}</Typography>
+          </TableCell>
+
+          <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
+            <Typography>{row.access ?? parentAccess}</Typography>
+          </TableCell>
+        </TableRow>
+      )}
+    </>
+  )
+}
 
 type ScopeTreeProps = {
   defaultSelectedItems: ScopeTreeRow[]
@@ -44,7 +152,6 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
-  const [selectedItems, setSelectedItem] = useState(defaultSelectedItems)
   const [searchLoading, setSearchLoading] = useState<boolean>(false)
   const [isEmpty, setIsEmpty] = useState<boolean>(false)
 
@@ -54,9 +161,16 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     scopeState: state.scope || {}
   }))
 
-  const { openPopulation = [], scopesList = [] } = scopeState
+  const { scopesList = [] } = scopeState
+  const [openPopulation, setOpenPopulations] = useState<any[]>(scopeState.openPopulation)
   const [rootRows, setRootRows] = useState<ScopeTreeRow[]>(scopesList)
+  const [selectedItems, setSelectedItem] = useState<any>(
+    defaultSelectedItems.map((item) => findEquivalentRowInItemAndSubItems(item, rootRows).equivalentRow ?? item)
+  )
   const debouncedSearchTerm = useDebounce(700, searchInput)
+  const [page, setPage] = useState(1)
+  const [count, setCount] = useState(0)
+  const [isAllSelected, setIsAllSelected] = useState(false)
 
   const fetchScopeTree = async () => {
     dispatch<any>(fetchScopesList())
@@ -70,53 +184,97 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     setIsEmpty(false)
   }
 
-  useEffect(() => {
-    const _searchInPerimeters = async () => {
-      setSearchLoading(true)
-      const backCohortResponse = await apiBackend.get(`accesses/perimeters/read-patient/?search=${searchInput}`)
-      const newPerimetersList = parsePerimeters(backCohortResponse)
-      setRootRows(newPerimetersList)
-      setSearchLoading(false)
-    }
+  const _searchInPerimeters = async () => {
+    setSearchLoading(true)
+    const pageParam = page > 1 ? '&page=' + page : ''
+    const backCohortResponse = await apiBackend.get(
+      `accesses/perimeters/read-patient/?search=${searchInput}${pageParam}`
+    )
+    const { data: newPerimetersList, count: newCount } = parsePerimeters(backCohortResponse)
+    setRootRows(newPerimetersList)
+    setCount(newCount)
 
-    if (debouncedSearchTerm && debouncedSearchTerm?.length > 2) {
+    setSearchLoading(false)
+    return newPerimetersList
+  }
+  const _onChangePage = async () => {
+    if (debouncedSearchTerm) {
+      const newPerimetersList: any[] = await _searchInPerimeters()
+      const _selectedItems = [...selectedItems, ...newPerimetersList]
+      onChangeSelectedItem(_selectedItems)
+    }
+  }
+
+  useEffect(() => {
+    if (debouncedSearchTerm) {
       _searchInPerimeters()
+      onChangeSelectedItem([])
     } else if (!debouncedSearchTerm) {
       _init()
     }
   }, [debouncedSearchTerm])
 
   useEffect(() => {
+    _onChangePage()
+  }, [page])
+
+  useEffect(() => {
     fetchScopeTree()
   }, [])
 
-  useEffect(() => setSelectedItem(defaultSelectedItems), [defaultSelectedItems])
+  useEffect(() => {
+    const _selectedItems: TreeElement[] = defaultSelectedItems.map(
+      (item) => findEquivalentRowInItemAndSubItems(item, rootRows).equivalentRow ?? item
+    )
+    setSelectedItem(_selectedItems)
+  }, [defaultSelectedItems])
   useEffect(() => {
     setRootRows(scopesList)
   }, [scopesList])
 
   const parsePerimeters = (backCohortResponse: any) => {
-    return backCohortResponse && backCohortResponse.data
-      ? backCohortResponse.data.map((item: any) => {
+    let result: { data: any[]; count: 0 } = { data: [], count: 0 }
+    if (backCohortResponse && backCohortResponse.data && backCohortResponse.data.results) {
+      result = {
+        data: backCohortResponse.data.results.map((item: any) => {
           return {
             id: item.perimeter.id,
             name: item.perimeter.full_path,
             quantity: item.perimeter.cohort_size,
             access: item.right_read_patient_nominative ? 'Nominatif' : 'Pseudonymisé'
           }
-        })
-      : setIsEmpty(true)
+        }),
+        count: backCohortResponse.data.count
+      }
+    } else {
+      setIsEmpty(true)
+    }
+    return result
   }
 
   /**
    * This function is called when a user click on chevron
    *
    */
-  const _clickToDeploy = async (rowId: number) => {
-    const expandResponse = await dispatch<any>(expandScopeElement({ rowId, selectedItems }))
-    if (expandResponse && expandResponse.payload) {
-      const _selectedItems = expandResponse.payload.selectedItems ?? []
-      onChangeSelectedItem(_selectedItems)
+  const _onExpand = async (rowId: number) => {
+    let _openPopulation = openPopulation ? openPopulation : []
+    let _rootRows = rootRows ? [...rootRows] : []
+    const index = _openPopulation.indexOf(rowId)
+
+    if (index !== -1) {
+      _openPopulation = _openPopulation.filter((perimeter_id) => perimeter_id !== rowId)
+      setOpenPopulations(_openPopulation)
+    } else {
+      _openPopulation = [..._openPopulation, rowId]
+      setOpenPopulations(_openPopulation)
+
+      const expandResponse = await dispatch<any>(expandScopeElement({ rowId, selectedItems }))
+      if (expandResponse && expandResponse.payload) {
+        const _selectedItems = expandResponse.payload.selectedItems ?? []
+        _rootRows = expandResponse.payload.rootRows ?? _rootRows
+        setRootRows(_rootRows)
+        onChangeSelectedItem(_selectedItems)
+      }
     }
   }
 
@@ -124,37 +282,51 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
    * This function is called when a user click on checkbox
    *
    */
-  const _clickToSelect = (row: ScopeTreeRow) => {
-    const savedSelectedItems: ScopeTreeRow[] = getSelectedScopes(row, selectedItems, scopesList)
+  const isSelected = (searchedItem: TreeElement, selectedItems: TreeElement[], allItems: TreeElement[] = rootRows) => {
+    selectedItems = selectedItems.map(
+      (item) => findEquivalentRowInItemAndSubItems(item, allItems).equivalentRow ?? item
+    )
+    return findSelectedInListAndSubItems(selectedItems, searchedItem, allItems)
+  }
+  const _onSelect = (row: ScopeTreeRow) => {
+    const savedSelectedItems: any[] = getSelectedPmsi(row, selectedItems, scopesList)
 
     onChangeSelectedItem(savedSelectedItems)
     return savedSelectedItems
   }
 
-  const _clickToSelectAll = () => {
+  const _onSelectAll = () => {
     let results: any[] = []
-    if (
-      scopesList.filter((row) => selectedItems.find(({ id }) => id === row.id) !== undefined).length ===
+    const newIsAllSelected = !isAllSelected
+    if (debouncedSearchTerm) {
+      setIsAllSelected(newIsAllSelected)
+      if (newIsAllSelected) {
+        results = rootRows
+      } else {
+        results = []
+      }
+    } else if (
+      scopesList.filter((row) => selectedItems.find((item: { id: any }) => item.id === row.id) !== undefined).length ===
       scopesList.length
     ) {
       results = []
     } else {
       for (const rootRow of scopesList) {
-        const rowsAndChildren = _clickToSelect(rootRow)
+        const rowsAndChildren = _onSelect(rootRow)
         results = [...results, ...rowsAndChildren]
       }
     }
     onChangeSelectedItem(results)
   }
 
-  const _checkIfIndeterminated: (_row: any) => boolean | undefined = (_row) => {
+  const _isIndeterminated: (_row: any) => boolean | undefined = (_row) => {
     // Si que un loading => false
     if (_row.subItems && _row.subItems.length > 0 && _row.subItems[0].id === 'loading') {
       return false
     }
     const checkChild: (item: any) => boolean = (item) => {
       const numberOfSubItemsSelected = item.subItems?.filter((subItem: any) =>
-        selectedItems.find(({ id }) => id === subItem.id)
+        selectedItems.find((item: { id: any }) => item.id === subItem.id)
       )?.length
 
       if (numberOfSubItemsSelected && numberOfSubItemsSelected !== item.subItems.length) {
@@ -187,11 +359,12 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
         <div style={{ padding: '0 0 0 4px' }}>
           <Checkbox
             color="secondary"
+            indeterminate={selectedItems && selectedItems.length > 0}
             checked={
-              scopesList.filter((row) => selectedItems.find(({ id }) => id === row.id) !== undefined).length ===
-              scopesList.length
+              scopesList.filter((row) => selectedItems.find((item: { id: any }) => item.id === row.id) !== undefined)
+                .length === scopesList.length
             }
-            onClick={_clickToSelectAll}
+            onClick={_onSelectAll}
           />
         </div>
       )
@@ -233,80 +406,22 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                   if (!row) return <></>
                   const labelId = `enhanced-table-checkbox-${index}`
 
-                  const _displayLine = (_row: any, level: number, parentAccess: string) => (
-                    <>
-                      {_row.id === 'loading' ? (
-                        <TableRow hover key={Math.random()}>
-                          <TableCell colSpan={5}>
-                            <Skeleton animation="wave" />
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        <TableRow
-                          hover
-                          key={_row.id}
-                          classes={{
-                            root: level % 2 === 0 ? classes.mainRow : classes.secondRow
-                          }}
-                        >
-                          <TableCell>
-                            {_row.subItems && _row.subItems.length > 0 && (
-                              <IconButton
-                                onClick={() => _clickToDeploy(_row.id)}
-                                style={{ marginLeft: level * 35, padding: 0, marginRight: -30 }}
-                              >
-                                {openPopulation.find((id) => _row.id === id) ? (
-                                  <KeyboardArrowDownIcon />
-                                ) : (
-                                  <KeyboardArrowRightIcon />
-                                )}
-                              </IconButton>
-                            )}
-                          </TableCell>
-
-                          <TableCell align="center" padding="checkbox">
-                            <Checkbox
-                              color="secondary"
-                              onClick={() => _clickToSelect(_row)}
-                              indeterminate={_checkIfIndeterminated(_row)}
-                              checked={selectedItems.some(({ id }) => id === _row.id) ? true : false}
-                              inputProps={{ 'aria-labelledby': labelId }}
-                            />
-                          </TableCell>
-
-                          <TableCell>
-                            {searchInput && _row.name ? (
-                              <Breadcrumbs maxItems={2}>
-                                {_row.name
-                                  .split('/')
-                                  .slice(1)
-                                  .map((name: any, index: number) => (
-                                    <Typography key={index} style={{ color: '#153D8A' }}>
-                                      {name}
-                                    </Typography>
-                                  ))}
-                              </Breadcrumbs>
-                            ) : (
-                              <Typography>{_row.name}</Typography>
-                            )}
-                          </TableCell>
-
-                          <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => _clickToSelect(_row)}>
-                            <Typography>{displayDigit(_row.quantity)}</Typography>
-                          </TableCell>
-
-                          <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => _clickToSelect(_row)}>
-                            <Typography>{_row.access ?? parentAccess}</Typography>
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </>
-                  )
-
                   const _displayChildren = (_row: any, level: number, parentAccess: string) => {
                     return (
                       <React.Fragment key={Math.random()}>
-                        {_displayLine(_row, level, parentAccess)}
+                        <ScopeTreeListItem
+                          row={_row}
+                          level={level}
+                          parentAccess={parentAccess}
+                          selectedItems={selectedItems}
+                          rootRows={rootRows}
+                          debouncedSearchTerm={debouncedSearchTerm}
+                          labelId={labelId}
+                          onExpand={_onExpand}
+                          onSelect={_onSelect}
+                          isIndeterminated={_isIndeterminated}
+                          isSelected={isSelected}
+                        />
                         {openPopulation.find((id) => _row.id === id) &&
                           _row.subItems &&
                           _row.subItems.map((subItem: any) => _displayChildren(subItem, level + 1, parentAccess))}
@@ -316,7 +431,19 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
 
                   return (
                     <React.Fragment key={Math.random()}>
-                      {_displayLine(row, 0, row.access)}
+                      <ScopeTreeListItem
+                        row={row}
+                        level={0}
+                        parentAccess={row.access}
+                        selectedItems={selectedItems}
+                        rootRows={rootRows}
+                        debouncedSearchTerm={debouncedSearchTerm}
+                        labelId={labelId}
+                        onExpand={_onExpand}
+                        onSelect={_onSelect}
+                        isIndeterminated={_isIndeterminated}
+                        isSelected={isSelected}
+                      />
                       {openPopulation.find((id) => row.id === id) &&
                         row.subItems &&
                         row.subItems.map((subItem: any) => {
@@ -328,6 +455,13 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
               </EnhancedTable>
             </>
           )}
+          <Pagination
+            className={classes.pagination}
+            count={Math.ceil((count ?? 0) / 100)}
+            shape="rounded"
+            onChange={(event, page: number) => setPage && setPage(page)}
+            page={page}
+          />
         </>
       )}
     </div>
