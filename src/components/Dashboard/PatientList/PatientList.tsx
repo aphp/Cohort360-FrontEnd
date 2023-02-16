@@ -68,7 +68,7 @@ const PatientList: React.FC<PatientListProps> = ({
   })
 
   const [order, setOrder] = useState<Order>({
-    orderBy: 'given',
+    orderBy: 'family',
     orderDirection: 'asc'
   })
 
