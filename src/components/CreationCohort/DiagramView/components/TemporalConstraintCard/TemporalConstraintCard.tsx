@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { Grid, Button, Badge } from '@material-ui/core'
+import { Button, Badge } from '@material-ui/core'
 
 import { useAppSelector } from 'state'
 
@@ -34,15 +34,17 @@ const TemporalConstraint: React.FC = () => {
 
   return (
     <>
-      <Grid
-        className={classes.root}
-        style={{
-          backgroundColor: temporalConstraintExist ? '#FFE2A9' : '#DEDEDE'
-        }}
-      >
-        <Badge badgeContent={temporalConstraints.length} color="secondary" />
-        <Button onClick={handleOnClick}>Contrainte Temporelle</Button>
-      </Grid>
+      <Badge badgeContent={temporalConstraints.length} color="secondary" style={{ height: 'fit-content' }}>
+        <Button
+          onClick={handleOnClick}
+          className={classes.root}
+          style={{
+            backgroundColor: temporalConstraintExist ? '#FFE2A9' : '#DEDEDE'
+          }}
+        >
+          Contraintes temporelles
+        </Button>
+      </Badge>
       {modalIsOpen && <TemporalConstraintModal open={modalIsOpen} onClose={handleOnClose} />}
     </>
   )

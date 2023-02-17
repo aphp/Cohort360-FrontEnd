@@ -1,6 +1,17 @@
 import React, { useState } from 'react'
 
-import { Grid, Typography, Select, MenuItem, Checkbox, InputBase, Button } from '@material-ui/core'
+import {
+  Button,
+  Checkbox,
+  Grid,
+  MenuItem,
+  InputBase,
+  InputLabel,
+  Select,
+  Typography,
+  FormControl
+} from '@material-ui/core'
+import AddIcon from '@material-ui/icons/Add'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { buildCohortCreation, addTemporalConstraint } from 'state/cohortCreation'
@@ -33,8 +44,8 @@ const TemporalConstraintConfig: React.FC = () => {
   const [secondCriteriaValue, setSecondCriteriaValue] = useState<number>(0)
   const [isFirstTimeValueChecked, setIsFirstTimeValueChecked] = useState<boolean>(false)
   const [isSecondTimeValueChecked, setIsSecondTimeValueChecked] = useState<boolean>(false)
-  const [minTimeMesurement, setMinTimeMesurement] = useState<string | null>(null)
-  const [maxTimeMesurement, setMaxTimeMesurement] = useState<string | null>(null)
+  const [minTimeMesurement, setMinTimeMesurement] = useState<string>('days')
+  const [maxTimeMesurement, setMaxTimeMesurement] = useState<string>('days')
   const [minTime, setMinTime] = useState<number>(0)
   const [maxTime, setMaxTime] = useState<number>(0)
   const [minYearsTimeValue, setMinYearsTimeValue] = useState<number>(0)
@@ -129,54 +140,54 @@ const TemporalConstraintConfig: React.FC = () => {
   }
 
   return (
-    <Grid container>
-      <Grid>
-        <Select
-          value={firstCriteriaValue}
-          onChange={(e) => {
-            setFirstCriteriaValue(e.target.value as number)
-          }}
-        >
-          {/**TODO: gestion d'erreur a faire si le critere est deja selection dans le deuxieme select mettre le champ en rouge demandant de changer de critere */}
-          {selectedCriteria.map((selectValue, index) => (
-            <MenuItem key={index} value={selectValue.id}>
-              {`(${selectValue.id}) - ${selectValue.title}`}
-            </MenuItem>
-          ))}
-        </Select>
+    <Grid
+      container
+      justifyContent="center"
+      alignItems="center"
+      style={{ margin: '1em', backgroundColor: 'rgba(209,226,244,0.2)', padding: '1em' }}
+    >
+      <Grid container alignItems="baseline" justifyContent="center">
+        <FormControl style={{ margin: '0 8px', minWidth: 200 }}>
+          <InputLabel>Le critère X</InputLabel>
+          <Select
+            value={firstCriteriaValue === 0 ? null : firstCriteriaValue}
+            onChange={(e) => {
+              setFirstCriteriaValue(e.target.value as number)
+            }}
+          >
+            {/**TODO: gestion d'erreur a faire si le critere est deja selection dans le deuxieme select mettre le champ en rouge demandant de changer de critere */}
+            {selectedCriteria.map((selectValue, index) => (
+              <MenuItem key={index} value={selectValue.id}>
+                {`(${selectValue.id}) - ${selectValue.title}`}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Typography style={{ fontWeight: 700 }}>s'est produit avant</Typography>
+        <FormControl style={{ margin: '0 12px', minWidth: 200 }}>
+          <InputLabel>le critère Y</InputLabel>
+          <Select
+            value={secondCriteriaValue === 0 ? null : secondCriteriaValue}
+            onChange={(e) => {
+              setSecondCriteriaValue(e.target.value as number)
+            }}
+          >
+            {/**TODO: gestion d'erreur a faire si le critere est deja selection dans le premier select mettre le champ en rouge demandant de changer de critere */}
+            {selectedCriteria.map((selectValue, index) => (
+              <MenuItem key={index} value={selectValue.id}>
+                {`(${selectValue.id}) - ${selectValue.title}`}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Grid>
-      <Grid>
-        <Typography>s'est produit avant</Typography>
-      </Grid>
-      <Grid>
-        <Select
-          value={secondCriteriaValue}
-          onChange={(e) => {
-            setSecondCriteriaValue(e.target.value as number)
-          }}
-        >
-          {/**TODO: gestion d'erreur a faire si le critere est deja selection dans le premier select mettre le champ en rouge demandant de changer de critere */}
-          {selectedCriteria.map((selectValue, index) => (
-            <MenuItem key={index} value={selectValue.id}>
-              {`(${selectValue.id}) - ${selectValue.title}`}
-            </MenuItem>
-          ))}
-        </Select>
-      </Grid>
-      <Grid>
-        <Typography>separer</Typography>
-      </Grid>
-      <Grid>
+      <Grid container alignItems="center" justifyContent="center">
         <Checkbox
           value={isFirstTimeValueChecked}
           onChange={() => setIsFirstTimeValueChecked(!isFirstTimeValueChecked)}
         />
+        <Typography style={{ fontWeight: 700 }}>séparé de moins de </Typography>
         {console.log('test isFirstTimeValueChecked', isFirstTimeValueChecked)}
-      </Grid>
-      <Grid>
-        <Typography>de moins de</Typography>
-      </Grid>
-      <Grid>
         {/** TODO: Faire la gestion d'erreur si le select est a null mettre le champ en rouge demandant a selectionner une unite */}
         {/** TODO: le champ input ne peux pas etre superieur au deuxieme champ d'input */}
         <InputBase
@@ -186,8 +197,6 @@ const TemporalConstraintConfig: React.FC = () => {
           value={minTime}
           onChange={onChangeMinTime}
         />
-      </Grid>
-      <Grid>
         <Select disabled={!isFirstTimeValueChecked} value={minTimeMesurement} onChange={onChangeMinTimeMesurement}>
           {timeMesurements.map((timeMesurement, index) => (
             <MenuItem key={index} value={timeMesurement.id}>
@@ -196,20 +205,13 @@ const TemporalConstraintConfig: React.FC = () => {
           ))}
         </Select>
       </Grid>
-      <Grid>
-        <Typography>et</Typography>
-      </Grid>
-      <Grid>
+      <Grid container alignItems="center" justifyContent="center">
         <Checkbox
           value={isSecondTimeValueChecked}
           onChange={() => setIsSecondTimeValueChecked(!isSecondTimeValueChecked)}
         />
         {console.log('test isSecondTimeValueChecked', isSecondTimeValueChecked)}
-      </Grid>
-      <Grid>
-        <Typography>de plus de</Typography>
-      </Grid>
-      <Grid>
+        <Typography style={{ fontWeight: 700 }}>et de plus de</Typography>
         {/** TODO: Faire la gestion d'erreur si le select est a null mettre le champ en rouge demandant a selectionner une unite */}
         {/** TODO: le champ input ne peux pas etre inferieur au premier champ d'input */}
         <InputBase
@@ -219,8 +221,6 @@ const TemporalConstraintConfig: React.FC = () => {
           value={maxTime}
           onChange={onChangeMaxTime}
         />
-      </Grid>
-      <Grid>
         <Select disabled={!isSecondTimeValueChecked} value={maxTimeMesurement} onChange={onChangeMaxTimeMesurement}>
           {timeMesurements.map((timeMesurement, index) => (
             <MenuItem key={index} value={timeMesurement.id}>
@@ -229,9 +229,9 @@ const TemporalConstraintConfig: React.FC = () => {
           ))}
         </Select>
       </Grid>
-      <Grid>
-        <Button onClick={onConfirm}>Valider</Button>
-      </Grid>
+      <Button onClick={onConfirm} startIcon={<AddIcon />}>
+        Ajouter
+      </Button>
     </Grid>
   )
 }

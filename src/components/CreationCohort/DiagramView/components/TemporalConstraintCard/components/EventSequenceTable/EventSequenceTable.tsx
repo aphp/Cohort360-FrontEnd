@@ -133,10 +133,10 @@ const EventSequenceTable: React.FC = () => {
                     <TableCell align="center"> {`(${temporalConstraint.idList[0]}) - ${criteriaTitle1}`}</TableCell>
                     <TableCell align="center">s'est produit avant</TableCell>
                     <TableCell align="center">{`(${temporalConstraint.idList[1]}) - ${criteriaTitle2}`}</TableCell>
-                    <TableCell align="center">{`${minDuration.values} ${minDuration.keys}`}</TableCell>
-                    <TableCell align="center">{`${maxDuration.values} ${maxDuration.keys}`}</TableCell>
+                    <TableCell align="center">{`${minDuration.values ?? '-'} ${minDuration.keys ?? ''}`}</TableCell>
+                    <TableCell align="center">{`${maxDuration.values ?? '-'} ${maxDuration.keys ?? ''}`}</TableCell>
                     <TableCell align="center">
-                      <Tooltip title="Supprimer la sequence temporelle" style={{ padding: '0 12px' }}>
+                      <Tooltip title="Supprimer la séquence temporelle" style={{ padding: '0 12px' }}>
                         <IconButton
                           onClick={(event) => {
                             event.stopPropagation()

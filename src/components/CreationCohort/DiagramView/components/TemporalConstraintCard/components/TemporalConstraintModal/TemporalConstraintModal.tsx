@@ -6,7 +6,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
   Grid,
   Typography,
   Button,
@@ -58,12 +57,17 @@ const TemporalConstraint: React.FC<{
     <Dialog fullWidth maxWidth="lg" open onClose={handleClose} aria-labelledby="form-dialog-title">
       {console.log('radioValues', radioValues)}
       <DialogTitle>
-        <Typography variant="h3">Contrainte Temporelle</Typography>
+        <Typography variant="h3">Contraintes temporelles</Typography>
       </DialogTitle>
       <DialogContent>
         <Grid>
-          <Typography variant="h3">Contrainte globale sur tous les criteres</Typography>
-          <RadioGroup row value={radioValues} onChange={(e: any) => onChangeValue(e.target.value)}>
+          <Typography variant="h3">Contrainte globale sur tous les critères</Typography>
+          <RadioGroup
+            row
+            value={radioValues}
+            onChange={(e: any) => onChangeValue(e.target.value)}
+            style={{ margin: '1em', justifyContent: 'space-between' }}
+          >
             <FormControlLabel value="none" control={<Radio />} label="Aucune contrainte sur les séjours" />
             <FormControlLabel
               value="sameEncounter"
@@ -77,20 +81,15 @@ const TemporalConstraint: React.FC<{
             />
           </RadioGroup>
         </Grid>
-        <Divider />
         <Grid>
-          <Grid>
-            <Divider />
-            <Typography variant="h3">Sequence d'evenement entre deux criteres</Typography>
-            <TemporalConstraintConfig />
-            <Divider />
-            <EventSequenceTable />
-          </Grid>
+          <Typography variant="h3">Séquence d'évènements entre deux critères</Typography>
+          <TemporalConstraintConfig />
+          <EventSequenceTable />
         </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="secondary">
-          fermer
+          Annuler
         </Button>
         <Button onClick={handleConfirm} color="primary">
           Valider
