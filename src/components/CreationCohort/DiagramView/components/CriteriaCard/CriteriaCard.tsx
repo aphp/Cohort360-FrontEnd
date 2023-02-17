@@ -39,7 +39,7 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
       style={{ backgroundColor: currentCriterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
     >
       <div className={classes.criteriaTitleAndChips}>
-        <Typography className={classes.title}>{currentCriterion.title} :</Typography>
+        <Typography className={classes.title}>{`(${currentCriterion.id}) - ${currentCriterion.title} :`}</Typography>
         <CriteriaCardContent currentCriteria={currentCriterion} />
       </div>
       <div className={classes.actionContainer}>

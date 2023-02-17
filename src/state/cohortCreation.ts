@@ -311,8 +311,11 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
   async ({ newCurrentSnapshot }, { getState, dispatch }) => {
     try {
       const state = getState()
-      const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot?.json)
+      const { population, criteria, criteriaGroup, temporalConstraints } = await unbuildRequest(
+        newCurrentSnapshot?.json
+      )
 
+      console.log('test temporalConstraints dans state/CohortCreation', temporalConstraints)
       let allowSearchIpp = false
       if (population) {
         allowSearchIpp = await services.perimeters.allowSearchIpp(population as ScopeTreeRow[])
@@ -342,6 +345,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
         currentSnapshot: newCurrentSnapshot.uuid,
         selectedPopulation: population,
         allowSearchIpp: allowSearchIpp,
+        temporalConstraints: temporalConstraints,
         selectedCriteria: criteria,
         criteriaGroup: criteriaGroup,
         nextCriteriaId: criteria.length + 1,
@@ -571,7 +575,25 @@ const cohortCreationSlice = createSlice({
       })
       state.nextCriteriaId += 1
     },
+    // create function addTemporalConstraint that will add a temporal constraint to the state
+    //c'est fonctionelle
+    addTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
+      state.temporalConstraints = [...state.temporalConstraints, action.payload]
+    },
+    // create function removeTemporalConstraint that will remove a temporal constraint from the state
+    //TODO : Revoir cette fonction car elle ne fonctionne pas.
+    deleteTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
+      state.temporalConstraints = state.temporalConstraints.filter(
+        ({ idList, timeRelationMaxDuration, timeRelationMinDuration }) =>
+          idList[0] !== action.payload.idList[0] &&
+          idList[1] !== action.payload.idList[1] &&
+          timeRelationMaxDuration !== action.payload.timeRelationMaxDuration &&
+          timeRelationMinDuration !== action.payload.timeRelationMinDuration
+      )
+    },
+    // create function updateTemporalConstraint that will update a temporal constraint from the state
     updateTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
+      //TODO: Il faut comparer idListe a all et changer cette contrainte par la nouvelle constraintType
       const foundItem = state.temporalConstraints.find(({ idList }) => {
         const equals = (a: any[], b: any[]) => a.length === b.length && a.every((v, i) => v === b[i])
         return equals(idList, action.payload.idList)
@@ -678,7 +700,9 @@ export const {
   //
   duplicateSelectedCriteria,
   //
+  addTemporalConstraint,
   updateTemporalConstraint,
+  deleteTemporalConstraint,
   suspendCount,
   unsuspendCount
 } = cohortCreationSlice.actions

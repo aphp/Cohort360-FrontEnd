@@ -627,6 +627,7 @@ export async function unbuildRequest(_json: string) {
   let population: (ScopeTreeRow | undefined)[] | null = null
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
+  let temporalConstraints: TemporalConstraintsType[] = []
 
   if (!_json) {
     return {
@@ -660,6 +661,13 @@ export async function unbuildRequest(_json: string) {
     // if (!newPopulation) continue
     population = population ? [...population, newPopulation] : [newPopulation]
   }
+
+  // retrieve temporal constraints
+  if (request && request.temporalConstraints) {
+    temporalConstraints = request.temporalConstraints
+  }
+
+  console.log('test temporalConstraints dans utils/cohortCreation', temporalConstraints)
 
   /**
    * Retrieve criteria + groups
@@ -1514,7 +1522,8 @@ export async function unbuildRequest(_json: string) {
   return {
     population,
     criteria: await convertJsonObjectsToCriteria(criteriaItems),
-    criteriaGroup: _criteriaGroup
+    criteriaGroup: _criteriaGroup,
+    temporalConstraints: temporalConstraints
   }
 }
 
