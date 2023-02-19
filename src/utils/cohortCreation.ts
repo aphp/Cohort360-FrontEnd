@@ -667,8 +667,6 @@ export async function unbuildRequest(_json: string) {
     temporalConstraints = request.temporalConstraints
   }
 
-  console.log('test temporalConstraints dans utils/cohortCreation', temporalConstraints)
-
   /**
    * Retrieve criteria + groups
    *

@@ -161,7 +161,6 @@ const EventSequenceTable: React.FC = () => {
                           onClick={(event) => {
                             event.stopPropagation()
                             onDeleteTemporalConstraint(temporalConstraint)
-                            console.log('temporalConstraint lie a la corbeille', temporalConstraint)
                           }}
                         >
                           <DeleteIcon />

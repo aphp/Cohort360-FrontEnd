@@ -38,7 +38,7 @@ const timeMesurements = [
 ]
 
 const TemporalConstraintConfig: React.FC = () => {
-  const { selectedCriteria, temporalConstraints } = useAppSelector((state) => state.cohortCreation.request)
+  const { selectedCriteria } = useAppSelector((state) => state.cohortCreation.request)
 
   const [firstCriteriaValue, setFirstCriteriaValue] = useState<number>(0)
   const [secondCriteriaValue, setSecondCriteriaValue] = useState<number>(0)
@@ -59,8 +59,6 @@ const TemporalConstraintConfig: React.FC = () => {
 
   const classes = useStyles()
   const dispatch = useAppDispatch()
-
-  console.log('test temporalConstraints in temporalConstraintConfig', temporalConstraints)
 
   const onChangeMinTimeMesurement = (event: React.ChangeEvent<{ value: any }>) => {
     setMinTimeMesurement(event.target.value as string)
@@ -118,7 +116,6 @@ const TemporalConstraintConfig: React.FC = () => {
 
   const onConfirm = () => {
     if (!isFirstTimeValueChecked && !isSecondTimeValueChecked) {
-      console.log('aucune date preciser')
       dispatch<any>(
         addTemporalConstraint({
           idList: [firstCriteriaValue, secondCriteriaValue],
@@ -126,7 +123,6 @@ const TemporalConstraintConfig: React.FC = () => {
         })
       )
     } else if (!isFirstTimeValueChecked && isSecondTimeValueChecked) {
-      console.log('le premier n est pas preciser')
       dispatch<any>(
         addTemporalConstraint({
           idList: [firstCriteriaValue, secondCriteriaValue],
@@ -140,7 +136,6 @@ const TemporalConstraintConfig: React.FC = () => {
         })
       )
     } else if (!isSecondTimeValueChecked && isFirstTimeValueChecked) {
-      console.log('le deuxieme est pas preciser')
       dispatch<any>(
         addTemporalConstraint({
           idList: [firstCriteriaValue, secondCriteriaValue],
@@ -154,7 +149,6 @@ const TemporalConstraintConfig: React.FC = () => {
         })
       )
     } else {
-      console.log('les deux sont preciser')
       dispatch<any>(
         addTemporalConstraint({
           idList: [firstCriteriaValue, secondCriteriaValue],
@@ -225,7 +219,6 @@ const TemporalConstraintConfig: React.FC = () => {
           onChange={() => setIsFirstTimeValueChecked(!isFirstTimeValueChecked)}
         />
         <Typography style={{ fontWeight: 700 }}>séparé de moins de </Typography>
-        {console.log('test isFirstTimeValueChecked', isFirstTimeValueChecked)}
         {/** TODO: Faire la gestion d'erreur si le select est a null mettre le champ en rouge demandant a selectionner une unite */}
         {/** TODO: le champ input ne peux pas etre superieur au deuxieme champ d'input */}
         <InputBase
@@ -248,7 +241,6 @@ const TemporalConstraintConfig: React.FC = () => {
           value={isSecondTimeValueChecked}
           onChange={() => setIsSecondTimeValueChecked(!isSecondTimeValueChecked)}
         />
-        {console.log('test isSecondTimeValueChecked', isSecondTimeValueChecked)}
         <Typography style={{ fontWeight: 700 }}>et de plus de</Typography>
         {/** TODO: Faire la gestion d'erreur si le select est a null mettre le champ en rouge demandant a selectionner une unite */}
         {/** TODO: le champ input ne peux pas etre inferieur au premier champ d'input */}
