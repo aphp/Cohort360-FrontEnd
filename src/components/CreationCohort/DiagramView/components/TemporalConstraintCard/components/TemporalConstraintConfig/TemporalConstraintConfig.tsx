@@ -60,7 +60,7 @@ const TemporalConstraintConfig: React.FC = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
-  console.log('test temporalConstraints', temporalConstraints)
+  console.log('test temporalConstraints in temporalConstraintConfig', temporalConstraints)
 
   const onChangeMinTimeMesurement = (event: React.ChangeEvent<{ value: any }>) => {
     setMinTimeMesurement(event.target.value as string)

@@ -59,8 +59,6 @@ const EventSequenceTable: React.FC = () => {
     dispatch<any>(buildCohortCreation({}))
   }
 
-  console.log('selectedCriteria', selectedCriteria)
-
   const findCriteriaTitle = (id: any) => {
     const criteria = selectedCriteria.find((criteria) => criteria.id === id)
     return criteria?.title
@@ -70,17 +68,18 @@ const EventSequenceTable: React.FC = () => {
     const minDuration = temporalConstraint.timeRelationMinDuration
     let nonZeroMinDuration: any = {}
 
-    for (const [key, value] of Object.entries(minDuration)) {
-      if (value !== 0) {
-        const keys = key
-        const values = value
-        nonZeroMinDuration = {
-          keys: keys,
-          values: values
+    if (temporalConstraint.constraintType === 'directChronologicalOrdering') {
+      for (const [key, value] of Object.entries(minDuration)) {
+        if (value !== 0) {
+          const keys = key
+          const values = value
+          nonZeroMinDuration = {
+            keys: keys,
+            values: values
+          }
         }
       }
     }
-
     return nonZeroMinDuration
   }
 
@@ -88,17 +87,18 @@ const EventSequenceTable: React.FC = () => {
     const maxDuration = temporalConstraint.timeRelationMaxDuration
     let nonZeroMaxDuration: any = {}
 
-    for (const [key, value] of Object.entries(maxDuration)) {
-      if (value !== 0) {
-        const keys = key
-        const values = value
-        nonZeroMaxDuration = {
-          keys: keys,
-          values: values
+    if (temporalConstraint.constraintType === 'directChronologicalOrdering') {
+      for (const [key, value] of Object.entries(maxDuration)) {
+        if (value !== 0) {
+          const keys = key
+          const values = value
+          nonZeroMaxDuration = {
+            keys: keys,
+            values: values
+          }
         }
       }
     }
-
     return nonZeroMaxDuration
   }
 
@@ -118,7 +118,9 @@ const EventSequenceTable: React.FC = () => {
           {!temporalConstraints || temporalConstraints?.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7}>
-                <Typography className={classes.loadingSpinnerContainer}>Aucun résultat à afficher</Typography>
+                <Typography className={classes.loadingSpinnerContainer}>
+                  Aucune séquence d'évènements à afficher
+                </Typography>
               </TableCell>
             </TableRow>
           ) : (
@@ -128,7 +130,7 @@ const EventSequenceTable: React.FC = () => {
               const minDuration = storeNonZeroMinDuration(temporalConstraint)
               const maxDuration = storeNonZeroMaxDuration(temporalConstraint)
               return (
-                temporalConstraint && (
+                temporalConstraint.constraintType === 'directChronologicalOrdering' && (
                   <TableRow key={index} className={classes.tableBodyRows} hover>
                     <TableCell align="center"> {`(${temporalConstraint.idList[0]}) - ${criteriaTitle1}`}</TableCell>
                     <TableCell align="center">s'est produit avant</TableCell>

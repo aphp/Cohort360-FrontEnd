@@ -14,18 +14,25 @@ import {
   FormControlLabel
 } from '@material-ui/core'
 
-import { useAppDispatch } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import { buildCohortCreation, updateTemporalConstraint } from 'state/cohortCreation'
 
 import EventSequenceTable from '../EventSequenceTable/EventSequenceTable'
 import TemporalConstraintConfig from '../TemporalConstraintConfig/TemporalConstraintConfig'
+
 // import useStyles from '../../styles'
 
 const TemporalConstraint: React.FC<{
   open: boolean
   onClose?: () => void
 }> = ({ onClose }) => {
-  const [radioValues, setRadioValues] = useState<'none' | 'sameEncounter' | 'differentEncounter'>('none')
+  const { temporalConstraints = [] } = useAppSelector((state) => state.cohortCreation.request)
+
+  const findInitialStateRadio = temporalConstraints.find(({ idList }) => idList[0] === 'All')
+  const initialStateRadio = findInitialStateRadio ? findInitialStateRadio.constraintType : 'none'
+  const [radioValues, setRadioValues] = useState<
+    'none' | 'sameEncounter' | 'differentEncounter' | 'directChronologicalOrdering'
+  >(initialStateRadio)
 
   // const classes = useStyles()
   const history = useHistory()
@@ -55,7 +62,6 @@ const TemporalConstraint: React.FC<{
 
   return (
     <Dialog fullWidth maxWidth="lg" open onClose={handleClose} aria-labelledby="form-dialog-title">
-      {console.log('radioValues', radioValues)}
       <DialogTitle>
         <Typography variant="h3">Contraintes temporelles</Typography>
       </DialogTitle>
