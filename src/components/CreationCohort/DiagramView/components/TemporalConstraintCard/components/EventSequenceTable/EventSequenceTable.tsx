@@ -64,6 +64,22 @@ const EventSequenceTable: React.FC = () => {
     return criteria?.title
   }
 
+  const durationMesurementInFrench = (key: any) => {
+    let keyInFrench
+    if (key === 'days') {
+      keyInFrench = 'jours'
+    } else if (key === 'weeks') {
+      keyInFrench = 'semaines'
+    } else if (key === 'months') {
+      keyInFrench = 'mois'
+    } else if (key === 'years') {
+      keyInFrench = 'ans'
+    } else if (key === 'hours') {
+      keyInFrench = 'heures'
+    }
+    return keyInFrench
+  }
+
   const storeNonZeroMinDuration = (temporalConstraint: any) => {
     const minDuration = temporalConstraint.timeRelationMinDuration
     let nonZeroMinDuration: any = {}
@@ -71,7 +87,7 @@ const EventSequenceTable: React.FC = () => {
     if (temporalConstraint.constraintType === 'directChronologicalOrdering') {
       for (const [key, value] of Object.entries(minDuration)) {
         if (value !== 0) {
-          const keys = key
+          const keys = durationMesurementInFrench(key)
           const values = value
           nonZeroMinDuration = {
             keys: keys,
@@ -90,7 +106,7 @@ const EventSequenceTable: React.FC = () => {
     if (temporalConstraint.constraintType === 'directChronologicalOrdering') {
       for (const [key, value] of Object.entries(maxDuration)) {
         if (value !== 0) {
-          const keys = key
+          const keys = durationMesurementInFrench(key)
           const values = value
           nonZeroMaxDuration = {
             keys: keys,
