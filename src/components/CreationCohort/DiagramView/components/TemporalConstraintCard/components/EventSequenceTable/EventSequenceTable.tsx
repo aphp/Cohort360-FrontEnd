@@ -84,7 +84,7 @@ const EventSequenceTable: React.FC = () => {
     const minDuration = temporalConstraint.timeRelationMinDuration
     let nonZeroMinDuration: any = {}
 
-    if (temporalConstraint.constraintType === 'directChronologicalOrdering') {
+    if (temporalConstraint.constraintType === 'directChronologicalOrdering' && minDuration) {
       for (const [key, value] of Object.entries(minDuration)) {
         if (value !== 0) {
           const keys = durationMesurementInFrench(key)
@@ -103,7 +103,7 @@ const EventSequenceTable: React.FC = () => {
     const maxDuration = temporalConstraint.timeRelationMaxDuration
     let nonZeroMaxDuration: any = {}
 
-    if (temporalConstraint.constraintType === 'directChronologicalOrdering') {
+    if (temporalConstraint.constraintType === 'directChronologicalOrdering' && maxDuration) {
       for (const [key, value] of Object.entries(maxDuration)) {
         if (value !== 0) {
           const keys = durationMesurementInFrench(key)
@@ -131,7 +131,9 @@ const EventSequenceTable: React.FC = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {!temporalConstraints || temporalConstraints?.length === 0 ? (
+          {!temporalConstraints ||
+          temporalConstraints?.length === 0 ||
+          (temporalConstraints.length === 1 && temporalConstraints.find(({ idList }) => idList[0] === 'All')) ? (
             <TableRow>
               <TableCell colSpan={7}>
                 <Typography className={classes.loadingSpinnerContainer}>

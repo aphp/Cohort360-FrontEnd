@@ -334,6 +334,7 @@ export type CriteriaGroupType = {
 )
 
 export type TemporalConstraintsType = {
+  id?: number
   idList: ['All'] | number[]
   constraintType: 'none' | 'sameEncounter' | 'differentEncounter' | 'directChronologicalOrdering'
   timeRelationMinDuration?: {

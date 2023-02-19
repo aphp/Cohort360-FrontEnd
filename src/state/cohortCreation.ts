@@ -63,6 +63,7 @@ const defaultInitialState: CohortCreationState = {
   ],
   temporalConstraints: [
     {
+      id: 1,
       idList: ['All'],
       constraintType: 'none'
     }
@@ -279,10 +280,36 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
         allowSearchIpp = await services.perimeters.allowSearchIpp(_selectedPopulation as ScopeTreeRow[])
       }
 
+      let _temporalConstraintsInitialState
+
+      console.log('_temporalConstraints dans le state dans la fonction buildCohortCreation', _temporalConstraints)
+
+      if (_temporalConstraints && _temporalConstraints?.length === 0) {
+        console.log('est ce que je rentre dans le if qui est dans le build')
+        _temporalConstraintsInitialState = defaultInitialState.temporalConstraints
+      } else {
+        _temporalConstraintsInitialState = _temporalConstraints
+      }
+
+      // console.log('test _temporalConstraints dans le state', _temporalConstraints)
+      // let temporalConstraintsID
+      // if (_temporalConstraints && _temporalConstraints?.length > 0) {
+      //   temporalConstraintsID = _temporalConstraints.map(
+      //     (temporalConstraint: TemporalConstraintsType, index: number) => {
+      //       return {
+      //         ...temporalConstraint,
+      //         id: index + 1
+      //       }
+      //     }
+      //   )
+      // }
+
       return {
         json,
         selectedPopulation: _selectedPopulation,
-        allowSearchIpp: allowSearchIpp
+        allowSearchIpp: allowSearchIpp,
+        // temporalConstraints: temporalConstraintsID
+        temporalConstraints: _temporalConstraintsInitialState
       }
     } catch (error) {
       console.error(error)
@@ -314,8 +341,23 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
       const { population, criteria, criteriaGroup, temporalConstraints } = await unbuildRequest(
         newCurrentSnapshot?.json
       )
+      let _temporalConstraints
 
       console.log('test temporalConstraints dans state/CohortCreation', temporalConstraints)
+      // todo CE N'EST PAS LA BONNE SOLUTION CAR SI IL Y A DES CONTRAINTE NE VAS PAS APPILIQUER LE ELSE
+      if (temporalConstraints && temporalConstraints?.length > 0) {
+        console.log('je rentre dans le if')
+        _temporalConstraints = temporalConstraints.map((temporalConstraint: TemporalConstraintsType, index) => {
+          return {
+            ...temporalConstraint,
+            id: index + 1
+          }
+        })
+      } else {
+        console.log('je rentre dans le else')
+        _temporalConstraints = defaultInitialState.temporalConstraints
+      }
+
       let allowSearchIpp = false
       if (population) {
         allowSearchIpp = await services.perimeters.allowSearchIpp(population as ScopeTreeRow[])
@@ -345,7 +387,8 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
         currentSnapshot: newCurrentSnapshot.uuid,
         selectedPopulation: population,
         allowSearchIpp: allowSearchIpp,
-        temporalConstraints: temporalConstraints,
+        temporalConstraints: _temporalConstraints,
+        // temporalConstraints: temporalConstraints,
         selectedCriteria: criteria,
         criteriaGroup: criteriaGroup,
         nextCriteriaId: criteria.length + 1,

@@ -42,23 +42,32 @@ const TemporalConstraint: React.FC = () => {
     } else {
       setTemporalConstraintExist(false)
     }
-  }, [temporalConstraints])
+  }, [])
+
+  const defaultTemporalConstraints = {
+    idList: ['All'],
+    constraintType: 'none'
+  }
 
   useEffect(() => {
     if (criteriaGroup && criteriaGroup.length > 0) {
       const mainCriteriaGroup = criteriaGroup.find(({ id }) => id === 0)
       if (!disableTemporalConstraint && mainCriteriaGroup && mainCriteriaGroup.type !== 'andGroup') {
-        if (checkTemporalConstraint.map((temporalConstraint) => temporalConstraint !== undefined)) {
+        if (
+          checkTemporalConstraint &&
+          checkTemporalConstraint.length > 1 &&
+          checkTemporalConstraint.map((temporalConstraint) => temporalConstraint !== defaultTemporalConstraints)
+        ) {
           temporalConstraints?.map((temporalConstraint) => {
             dispatch<any>(deleteTemporalConstraint(temporalConstraint))
             dispatch<any>(buildCohortCreation({}))
           })
         }
         setDisableTemporalConstraint(true)
-        setAlert(true)
+        // setAlert(true)
       }
     }
-  }, [criteriaGroup])
+  }, [])
 
   const handleOnClose = () => void setModalIsOpen(false)
   const handleClose = () => void setAlert(false)
@@ -89,18 +98,32 @@ const TemporalConstraint: React.FC = () => {
 
   return (
     <>
-      <Badge badgeContent={temporalConstraints?.length} color="secondary" style={{ height: 'fit-content' }}>
+      {!disableTemporalConstraint ? (
+        <Badge badgeContent={temporalConstraints?.length} color="secondary" style={{ height: 'fit-content' }}>
+          <Button
+            onClick={handleOnClick}
+            className={classes.root}
+            style={{
+              backgroundColor: temporalConstraintExist && !disableTemporalConstraint ? '#FFE2A9' : '#DEDEDE'
+            }}
+            disabled={maintenanceIsActive || disableTemporalConstraint}
+          >
+            Contraintes temporelles
+          </Button>
+        </Badge>
+      ) : (
         <Button
           onClick={handleOnClick}
           className={classes.root}
           style={{
-            backgroundColor: temporalConstraintExist ? '#FFE2A9' : '#DEDEDE'
+            backgroundColor: temporalConstraintExist && !disableTemporalConstraint ? '#FFE2A9' : '#DEDEDE'
           }}
           disabled={maintenanceIsActive || disableTemporalConstraint}
         >
           Contraintes temporelles
         </Button>
-      </Badge>
+      )}
+
       {modalIsOpen && <TemporalConstraintModal open={modalIsOpen} onClose={handleOnClose} />}
       {alert && <AlertDisplay />}
     </>

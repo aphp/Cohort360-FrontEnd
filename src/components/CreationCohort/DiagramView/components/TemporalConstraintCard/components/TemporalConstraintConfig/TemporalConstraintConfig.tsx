@@ -117,25 +117,63 @@ const TemporalConstraintConfig: React.FC = () => {
   }
 
   const onConfirm = () => {
-    //TODO : Il manque a gerer si l'une des deux checkbox n'est pas coché il faut pas dispatch l'action correspondante sinon sa fausse le json
-    dispatch<any>(
-      addTemporalConstraint({
-        idList: [firstCriteriaValue, secondCriteriaValue],
-        constraintType: 'directChronologicalOrdering',
-        timeRelationMinDuration: {
-          years: minYearsTimeValue,
-          months: minMonthsTimeValue,
-          days: minDaysTimeValue,
-          hours: minHoursTimeValue
-        },
-        timeRelationMaxDuration: {
-          years: maxYearsTimeValue,
-          months: maxMonthsTimeValue,
-          days: maxDaysTimeValue,
-          hours: maxHoursTimeValue
-        }
-      })
-    )
+    if (!isFirstTimeValueChecked && !isSecondTimeValueChecked) {
+      console.log('aucune date preciser')
+      dispatch<any>(
+        addTemporalConstraint({
+          idList: [firstCriteriaValue, secondCriteriaValue],
+          constraintType: 'directChronologicalOrdering'
+        })
+      )
+    } else if (!isFirstTimeValueChecked && isSecondTimeValueChecked) {
+      console.log('le premier n est pas preciser')
+      dispatch<any>(
+        addTemporalConstraint({
+          idList: [firstCriteriaValue, secondCriteriaValue],
+          constraintType: 'directChronologicalOrdering',
+          timeRelationMaxDuration: {
+            years: maxYearsTimeValue,
+            months: maxMonthsTimeValue,
+            days: maxDaysTimeValue,
+            hours: maxHoursTimeValue
+          }
+        })
+      )
+    } else if (!isSecondTimeValueChecked && isFirstTimeValueChecked) {
+      console.log('le deuxieme est pas preciser')
+      dispatch<any>(
+        addTemporalConstraint({
+          idList: [firstCriteriaValue, secondCriteriaValue],
+          constraintType: 'directChronologicalOrdering',
+          timeRelationMinDuration: {
+            years: minYearsTimeValue,
+            months: minMonthsTimeValue,
+            days: minDaysTimeValue,
+            hours: minHoursTimeValue
+          }
+        })
+      )
+    } else {
+      console.log('les deux sont preciser')
+      dispatch<any>(
+        addTemporalConstraint({
+          idList: [firstCriteriaValue, secondCriteriaValue],
+          constraintType: 'directChronologicalOrdering',
+          timeRelationMinDuration: {
+            years: minYearsTimeValue,
+            months: minMonthsTimeValue,
+            days: minDaysTimeValue,
+            hours: minHoursTimeValue
+          },
+          timeRelationMaxDuration: {
+            years: maxYearsTimeValue,
+            months: maxMonthsTimeValue,
+            days: maxDaysTimeValue,
+            hours: maxHoursTimeValue
+          }
+        })
+      )
+    }
     dispatch<any>(buildCohortCreation({}))
   }
 
