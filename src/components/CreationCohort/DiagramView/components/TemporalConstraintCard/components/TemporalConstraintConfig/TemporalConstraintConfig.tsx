@@ -81,37 +81,37 @@ const TemporalConstraintConfig: React.FC = () => {
   }
 
   const onChangeMinTime = (event: React.ChangeEvent<{ value: any }>) => {
-    setMinTime(event.target.value as number)
+    setMinTime(+event.target.value)
     switch (minTimeMesurement) {
       case 'years':
-        setMinYearsTimeValue(event.target.value as number)
+        setMinYearsTimeValue(+event.target.value)
         break
       case 'months':
-        setMinMonthsTimeValue(event.target.value as number)
+        setMinMonthsTimeValue(+event.target.value)
         break
       case 'days':
-        setMinDaysTimeValue(event.target.value as number)
+        setMinDaysTimeValue(+event.target.value)
         break
       case 'hours':
-        setMinHoursTimeValue(event.target.value as number)
+        setMinHoursTimeValue(+event.target.value)
         break
     }
   }
 
   const onChangeMaxTime = (event: React.ChangeEvent<{ value: any }>) => {
-    setMaxTime(event.target.value as number)
+    setMaxTime(+event.target.value)
     switch (maxTimeMesurement) {
       case 'years':
-        setMaxYearsTimeValue(event.target.value as number)
+        setMaxYearsTimeValue(+event.target.value)
         break
       case 'months':
-        setMaxMonthsTimeValue(event.target.value as number)
+        setMaxMonthsTimeValue(+event.target.value)
         break
       case 'days':
-        setMaxDaysTimeValue(event.target.value as number)
+        setMaxDaysTimeValue(+event.target.value)
         break
       case 'hours':
-        setMaxHoursTimeValue(event.target.value as number)
+        setMaxHoursTimeValue(+event.target.value)
         break
     }
   }
