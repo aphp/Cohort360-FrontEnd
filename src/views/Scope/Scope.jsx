@@ -32,11 +32,7 @@ const Scope = () => {
 
     _selectedItems = filterScopeTree(_selectedItems)
 
-    const perimetresIds = _selectedItems.map((_selected) =>
-      _selected.extension
-        ? (_selected.extension.find((extension) => extension.url === 'cohort-id') ?? { valueInteger: 0 }).valueInteger
-        : null
-    )
+    const perimetresIds = _selectedItems.map((_selected) => _selected.cohort_id ?? null)
     history.push(`/perimeters?${perimetresIds}`)
   }
 

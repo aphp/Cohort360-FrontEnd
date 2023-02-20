@@ -598,15 +598,7 @@ export function buildRequest(
     _type: 'request',
     sourcePopulation: {
       caresiteCohortList: selectedPopulation
-        ?.map((_selectedPopulation: any) =>
-          _selectedPopulation.extension
-            ? (
-                _selectedPopulation.extension.find((extension: any) => extension.url === 'cohort-id') ?? {
-                  valueInteger: null
-                }
-              ).valueInteger
-            : null
-        )
+        ?.map((_selectedPopulation: any) => _selectedPopulation.cohort_id)
         .filter((item) => !!item && item !== 'loading')
     },
     request: !mainCriteriaGroups
