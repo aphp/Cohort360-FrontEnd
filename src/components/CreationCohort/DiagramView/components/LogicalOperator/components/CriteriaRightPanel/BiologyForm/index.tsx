@@ -92,6 +92,7 @@ const Index = (props: any) => {
           selectedCriteria={defaultCriteria}
           criteria={criteria}
           onChangeSelectedCriteria={_onChangeSelectedHierarchy}
+          onConfirm={() => setSelectedTab('form')}
           goBack={goBack}
         />
       )}
@@ -101,7 +102,7 @@ const Index = (props: any) => {
           isEdition={isEdition}
           selectedCriteria={defaultCriteria}
           onChangeSelectedHierarchy={_onChangeSelectedHierarchy}
-          onConfirm={() => setSelectedTab('form')}
+          onConfirm={() => setSelectedTab('search')}
           goBack={goBack}
         />
       }

@@ -293,14 +293,12 @@ export const initSyncHierarchyTableEffect = async (
   selectedCodes: PmsiListType[],
   fetchResource: AsyncThunk<any, void, { state: RootState }>,
   resourceType: string,
-  dispatch: Dispatch<any>
+  dispatch: Dispatch<any>,
+  isFetchedResource?: boolean
 ) => {
-  const loadHierarchy = async () => {
-    if (!resourceHierarchy || (resourceHierarchy && resourceHierarchy.length === 0)) {
-      await dispatch<any>(fetchResource())
-    }
+  if (!isFetchedResource) {
+    await dispatch<any>(fetchResource())
   }
-  await loadHierarchy()
   if (!selectedCriteria) {
     await dispatch<any>(pushSyncHierarchyTable({ code: [] }))
   } else {

@@ -9,7 +9,7 @@ import { MedicationDataType } from 'types'
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { initSyncHierarchyTableEffect, MEDICATION_REQUEST, syncOnChangeFormValue } from 'utils/pmsi'
-import { fetchMedication } from 'state/medication'
+import { initMedicationHierarchy } from 'state/medication'
 import { PmsiListType } from 'state/pmsi'
 
 export const defaultMedication: MedicationDataType = {
@@ -58,9 +58,10 @@ const Index = (props: any) => {
       medicationHierarchy,
       selectedCriteria,
       defaultCriteria && defaultCriteria.code ? defaultCriteria.code : [],
-      fetchMedication,
+      initMedicationHierarchy,
       defaultMedication.type,
-      dispatch
+      dispatch,
+      criteria && criteria.data?.atcHierarchy !== 'loading'
     )
   }
   useEffect(() => {

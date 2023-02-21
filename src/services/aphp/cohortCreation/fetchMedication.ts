@@ -8,7 +8,7 @@ import { cleanValueSet } from 'utils/cleanValueSet'
 import { codeSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import apiFhir from '../../apiFhir'
-import { getApiResponseConceptMap } from 'utils/apiHelpers'
+import { getApiResponseResources } from 'utils/apiHelpers'
 
 export const fetchAtcData = async (searchValue?: string, noStar?: boolean) => {
   noStar = noStar === undefined ? true : noStar
@@ -108,7 +108,7 @@ export const fetchSignleCode: (code: string) => Promise<string[]> = async (code:
   if (!code) return []
   const response = await apiFhir.get<any>(`/ConceptMap?size=100&context=Descendant-leaf&source-code=${code}`)
 
-  const data = getApiResponseConceptMap(response)
+  const data = getApiResponseResources(response)
   const codeList: string[] = []
   data?.forEach((resource: any) =>
     resource?.group?.forEach((group: { element: any[] }) =>
