@@ -95,6 +95,11 @@ export interface IServicePerimeters {
    *   - perimetersId: ID du périmètre (liste d'ID séparé par des virgules)
    */
   fetchPerimetersRights: (perimeters: IGroup[]) => Promise<IGroup[]>
+  /**
+   * effectuer une recherche textuelle dans la liste des périmètres
+   * @param page : le numéro de la page qu'on veut récupérer, par défaut c'est la 1ière page.
+   */
+  findScope: (searchInput: string | undefined, page?: number | undefined) => Promise<any>
 }
 
 const servicesPerimeters: IServicePerimeters = {
@@ -296,6 +301,21 @@ const servicesPerimeters: IServicePerimeters = {
         ]
       }
     })
+  },
+  findScope: async (searchInput: string | undefined, page?: number | undefined) => {
+    let result: { scopeTreeRows: ScopeTreeRow[]; count: 0 } = { scopeTreeRows: [], count: 0 }
+    if (!searchInput) {
+      return result
+    }
+    const pageParam = page && page > 1 ? '&page=' + page : ''
+    const backCohortResponse: any = await apiBackend.get(
+      `accesses/perimeters/read-patient/?search=${searchInput}${pageParam}`
+    )
+    if (backCohortResponse && backCohortResponse.data && backCohortResponse.data.results) {
+      const newPerimetersList: ScopeTreeRow[] = await buildScopeTreeRow(backCohortResponse.data.results)
+      result = { scopeTreeRows: newPerimetersList, count: backCohortResponse.data.count }
+    }
+    return result
   }
 }
 

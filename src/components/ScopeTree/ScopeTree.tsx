@@ -26,18 +26,13 @@ import { ScopeTreeRow, TreeElement } from 'types'
 import { useAppDispatch, useAppSelector } from 'state'
 import { expandScopeElement, fetchScopesList, ScopeState } from 'state/scope'
 
-import apiBackend from 'services/apiBackend'
-
 import displayDigit from 'utils/displayDigit'
 import { useDebounce } from 'utils/debounce'
 
 import useStyles from './styles'
-import {
-  findEquivalentRowInItemAndSubItems,
-  findSelectedInListAndSubItems,
-  getNewSelectedItems
-} from '../../utils/pmsi'
+import { findEquivalentRowInItemAndSubItems, findSelectedInListAndSubItems, getNewSelectedItems } from 'utils/pmsi'
 import { Pagination } from '@material-ui/lab'
+import servicesPerimeters from '../../services/aphp/servicePerimeters'
 
 type ScopeTreeListItemProps = {
   row: any
@@ -187,43 +182,37 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     setIsEmpty(false)
   }
 
-  const _searchInPerimeters = async () => {
+  const _searchInPerimeters = async (_isAllSelected?: boolean) => {
     setSearchLoading(true)
-    const pageParam = page > 1 ? '&page=' + page : ''
-    const backCohortResponse = await apiBackend.get(
-      `accesses/perimeters/read-patient/?search=${searchInput}${pageParam}`
-    )
-    const { data: newPerimetersList, count: newCount } = parsePerimeters(backCohortResponse)
+    const { scopeTreeRows: newPerimetersList, count: newCount } = await servicesPerimeters.findScope(searchInput, page)
+    if (!newPerimetersList || newPerimetersList.length < 1) {
+      setIsEmpty(true)
+    }
+    if (_isAllSelected) {
+      const _newSelectedItems = [...selectedItems, ...newPerimetersList]
+      onChangeSelectedItem(_newSelectedItems)
+    }
     setRootRows(newPerimetersList)
     setCount(newCount)
-
     setSearchLoading(false)
     return newPerimetersList
-  }
-  const _onChangePage = async () => {
-    if (debouncedSearchTerm) {
-      const newPerimetersList: any[] = await _searchInPerimeters()
-      const _selectedItems = [...selectedItems, ...newPerimetersList]
-      onChangeSelectedItem(_selectedItems)
-    }
   }
 
   useEffect(() => {
     if (debouncedSearchTerm) {
-      _searchInPerimeters()
       onChangeSelectedItem([])
+      setIsAllSelected(false)
+      _searchInPerimeters(false)
     } else if (!debouncedSearchTerm) {
       _init()
     }
   }, [debouncedSearchTerm])
 
   useEffect(() => {
-    _onChangePage()
+    if (debouncedSearchTerm) {
+      _searchInPerimeters(isAllSelected)
+    }
   }, [page])
-
-  useEffect(() => {
-    fetchScopeTree()
-  }, [])
 
   useEffect(() => {
     const _selectedItems: TreeElement[] = defaultSelectedItems.map(
@@ -231,29 +220,10 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     )
     setSelectedItem(_selectedItems)
   }, [defaultSelectedItems])
+
   useEffect(() => {
     setRootRows(scopesList)
   }, [scopesList])
-
-  const parsePerimeters = (backCohortResponse: any) => {
-    let result: { data: any[]; count: 0 } = { data: [], count: 0 }
-    if (backCohortResponse && backCohortResponse.data && backCohortResponse.data.results) {
-      result = {
-        data: backCohortResponse.data.results.map((item: any) => {
-          return {
-            id: item.perimeter.id,
-            name: item.perimeter.full_path,
-            quantity: item.perimeter.cohort_size,
-            access: item.right_read_patient_nominative ? 'Nominatif' : 'Pseudonymisé'
-          }
-        }),
-        count: backCohortResponse.data.count
-      }
-    } else {
-      setIsEmpty(true)
-    }
-    return result
-  }
 
   /**
    * This function is called when a user click on chevron
@@ -301,8 +271,8 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
   const _onSelectAll = () => {
     let results: any[] = []
     const newIsAllSelected = !isAllSelected
+    setIsAllSelected(newIsAllSelected)
     if (debouncedSearchTerm) {
-      setIsAllSelected(newIsAllSelected)
       if (newIsAllSelected) {
         results = rootRows
       } else {
@@ -362,8 +332,15 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
         <div style={{ padding: '0 0 0 4px' }}>
           <Checkbox
             color="secondary"
-            indeterminate={selectedItems && selectedItems.length > 0}
+            indeterminate={
+              !isAllSelected &&
+              selectedItems &&
+              selectedItems.length > 0 &&
+              rootRows &&
+              selectedItems.length !== rootRows.length
+            }
             checked={
+              isAllSelected ||
               scopesList.filter((row) => selectedItems.find((item: { id: any }) => item.id === row.id) !== undefined)
                 .length === scopesList.length
             }
