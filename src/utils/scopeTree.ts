@@ -160,3 +160,26 @@ export const filterScopeTree = (_selectedItems: any[]) => {
     }
   })
 }
+
+export const sortByQuantityAndName = (scopeRows: ScopeTreeRow[]) => {
+  // Sort by quantity
+  scopeRows = scopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
+    if (a.quantity > b.quantity) {
+      return 1
+    } else if (a.quantity < b.quantity) {
+      return -1
+    }
+    return 0
+  })
+  // Sort by name
+  scopeRows = scopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
+    if (b.quantity === 0) return -1
+    if (a.name > b.name) {
+      return 1
+    } else if (a.name < b.name) {
+      return -1
+    }
+    return 0
+  })
+  return scopeRows
+}
