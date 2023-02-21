@@ -21,7 +21,7 @@ const Scope = () => {
   const history = useHistory()
   const dispatch = useAppDispatch()
 
-  const [selectedItems, onChangeSelectedItem] = useState([])
+  const [selectedItems, setSelectedItem] = useState([])
   const [searchInput, setSearchInput] = useState('')
   const open = useAppSelector((state) => state.drawer)
 
@@ -29,6 +29,9 @@ const Scope = () => {
     dispatch(closeAllOpenedPopulation())
   }, [])
 
+  const onChangeSelectedItem = (newSelectedItems: any) => {
+    setSelectedItem(newSelectedItems)
+  }
   const trimItems = () => {
     let _selectedItems = selectedItems ? selectedItems : []
 
