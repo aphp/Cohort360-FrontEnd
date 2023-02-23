@@ -16,11 +16,14 @@ import { addRequest, deleteRequest } from './request'
 import { deleteProject } from './project'
 
 import services from 'services/aphp'
+import { SHORT_COHORT_LIMIT } from '../constants'
 
 export type CohortCreationState = {
   loading: boolean
   saveLoading: boolean
   countLoading: boolean
+  count_outdated: boolean
+  shortCohortLimit: number
   requestId: string
   cohortName: string
   json: string
@@ -42,6 +45,8 @@ const defaultInitialState: CohortCreationState = {
   loading: false,
   saveLoading: false,
   countLoading: false,
+  count_outdated: false,
+  shortCohortLimit: SHORT_COHORT_LIMIT,
   requestId: '',
   cohortName: '',
   json: '',
@@ -97,7 +102,8 @@ const fetchRequestCohortCreation = createAsyncThunk<
     const requestResult = await services.cohortCreation.fetchRequest(requestId, snapshotId)
     if (!requestResult) return {}
 
-    const { requestName, json, currentSnapshot, snapshotsHistory, count } = requestResult
+    const { requestName, json, currentSnapshot, shortCohortLimit, snapshotsHistory, count, count_outdated } =
+      requestResult
 
     dispatch<any>(
       unbuildCohortCreation({
@@ -113,6 +119,8 @@ const fetchRequestCohortCreation = createAsyncThunk<
       requestId,
       snapshotsHistory,
       currentSnapshot,
+      shortCohortLimit,
+      count_outdated,
       count
     }
   } catch (error) {
@@ -158,7 +166,12 @@ const countCohortCreation = createAsyncThunk<
       newSnapshotsHistory[index].dated_measures = [...newSnapshotsHistory[index].dated_measures, countResult]
     }
 
-    return { count: countResult, snapshotsHistory: newSnapshotsHistory }
+    return {
+      count: countResult,
+      snapshotsHistory: newSnapshotsHistory,
+      count_outdated: countResult.count_outdated,
+      shortCohortLimit: countResult.shortCohortLimit
+    }
   } catch (error) {
     console.error(error)
     throw error

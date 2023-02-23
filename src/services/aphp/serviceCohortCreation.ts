@@ -32,6 +32,7 @@ import {
   fetchAdministrations
 } from './cohortCreation/fetchMedication'
 import { fetchBiologySearch, fetchBiologyData, fetchBiologyHierarchy } from './cohortCreation/fetchObservation'
+import { SHORT_COHORT_LIMIT } from '../../constants'
 
 export interface IServiceCohortCreation {
   /**
@@ -132,7 +133,9 @@ const servicesCohortCreation: IServiceCohortCreation = {
         deceased: measureResult?.data?.measure_deceased,
         female: measureResult?.data?.measure_female,
         male: measureResult?.data?.measure_male,
-        unknownPatient: measureResult?.data?.measure_unknown
+        unknownPatient: measureResult?.data?.measure_unknown,
+        count_outdated: measureResult?.data?.count_outdated,
+        shortCohortLimit: measureResult?.data?.cohort_limit
       }
     } else {
       if (!requeteurJson || !snapshotId || !requestId) return null
@@ -145,7 +148,9 @@ const servicesCohortCreation: IServiceCohortCreation = {
       return {
         date: measureResult?.data?.updated_at,
         status: measureResult?.data?.request_job_status ?? 'error',
-        uuid: measureResult?.data?.uuid
+        uuid: measureResult?.data?.uuid,
+        count_outdated: measureResult?.data?.count_outdated,
+        shortCohortLimit: measureResult?.data?.cohort_limit
       }
     }
   },
@@ -182,6 +187,8 @@ const servicesCohortCreation: IServiceCohortCreation = {
       previous_snapshot: string
       dated_measures: CohortCreationCounterType[]
       created_at: string
+      cohort_limit: number
+      count_outdated: boolean
     }[] = query_snapshots
 
     snapshotsHistoryFromQuery = snapshotsHistoryFromQuery.sort(
@@ -195,6 +202,8 @@ const servicesCohortCreation: IServiceCohortCreation = {
       : null
     let result = null
     let snapshotsHistory: any[] = []
+    let shortCohortLimit = SHORT_COHORT_LIMIT
+    let count_outdated = false
 
     if (currentSnapshot) {
       // clean Global count
@@ -224,6 +233,12 @@ const servicesCohortCreation: IServiceCohortCreation = {
           }
         })
         .filter(({ uuid }) => uuid !== undefined)
+
+      shortCohortLimit =
+        currentSnapshot.dated_measures.length > 0 ? currentSnapshot.dated_measures[0].cohort_limit ?? 0 : 0
+
+      count_outdated =
+        currentSnapshot.dated_measures.length > 0 ? currentSnapshot.dated_measures[0].count_outdated ?? false : false
     }
 
     result = {
@@ -231,7 +246,9 @@ const servicesCohortCreation: IServiceCohortCreation = {
       snapshotsHistory: snapshotsHistory ? snapshotsHistory.reverse() : [],
       json: currentSnapshot ? currentSnapshot.serialized_query : '',
       currentSnapshot: currentSnapshot ? currentSnapshot.uuid : '',
-      count: currentSnapshot ? currentSnapshot.dated_measures[0] : {}
+      count: currentSnapshot ? currentSnapshot.dated_measures[0] : {},
+      shortCohortLimit,
+      count_outdated
     }
     return result
   },
