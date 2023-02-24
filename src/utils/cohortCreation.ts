@@ -1593,6 +1593,13 @@ export const getDataFromFetch = async (
               oldCriterion?.data?.[dataKey] === 'loading'
             ) {
               _criterion.data[dataKey] = await _criterion.fetch[fetchKey]()
+            } else if (
+              oldCriterion &&
+              oldCriterion?.data &&
+              oldCriterion?.data?.[dataKey] &&
+              oldCriterion?.data?.[dataKey] !== 'loading'
+            ) {
+              _criterion.data[dataKey] = oldCriterion.data[dataKey]
             }
             break
         }
