@@ -12,6 +12,7 @@ export type MedicationListType = {
 }
 
 export type MedicationState = {
+  syncLoading?: number
   loading: boolean
   list: MedicationListType[]
   openedElement: string[]
@@ -150,8 +151,16 @@ const medicationSlice = createSlice({
     builder.addCase(fetchMedication.fulfilled, (state, action) => ({ ...state, ...action.payload }))
     builder.addCase(fetchMedication.rejected, (state) => ({ ...state }))
     // expandMedicationElement
-    builder.addCase(expandMedicationElement.pending, (state) => ({ ...state, loading: true }))
-    builder.addCase(expandMedicationElement.fulfilled, (state, action) => ({ ...state, ...action.payload }))
+    builder.addCase(expandMedicationElement.pending, (state) => ({
+      ...state,
+      loading: true,
+      syncLoading: (state.syncLoading ?? 0) + 1
+    }))
+    builder.addCase(expandMedicationElement.fulfilled, (state, action) => ({
+      ...state,
+      ...action.payload,
+      syncLoading: (state.syncLoading ?? 0) - 1
+    }))
     builder.addCase(expandMedicationElement.rejected, (state) => ({ ...state }))
   }
 })

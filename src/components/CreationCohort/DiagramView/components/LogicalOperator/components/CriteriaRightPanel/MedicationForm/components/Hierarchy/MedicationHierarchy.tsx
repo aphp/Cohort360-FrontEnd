@@ -1,18 +1,19 @@
-import React, { useEffect, useState, Fragment } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import clsx from 'clsx'
 
 import {
   Button,
+  Collapse,
   Divider,
   Grid,
   IconButton,
-  Typography,
+  LinearProgress,
+  List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Collapse,
-  List,
-  Tooltip
+  Tooltip,
+  Typography
 } from '@material-ui/core'
 import Skeleton from '@material-ui/lab/Skeleton'
 
@@ -20,50 +21,65 @@ import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import { useAppSelector, useAppDispatch } from 'state'
-import { MedicationListType, fetchMedication, expandMedicationElement } from 'state/medication'
+import { useAppDispatch, useAppSelector } from 'state'
+import { MedicationListType } from 'state/medication'
 
-import { getSelectedPmsi, filterSelectedPmsi, checkIfIndeterminated } from 'utils/pmsi'
+import { checkIfIndeterminated, expandItem, findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
 
 import useStyles from './styles'
+import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
+import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
+import { defaultMedication } from '../../index'
+import { PmsiListType } from 'state/pmsi'
+import { HierarchyTree } from 'types'
 
 type MedicationListItemProps = {
   medicationItem: MedicationListType
-  selectedItem?: MedicationListType[] | null
-  handleClick: (medicationItem: { id: string; label: string }[] | null) => void
+  selectedItems?: MedicationListType[] | null
+  handleClick: (medicationItem: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
+  setLoading: (isLoading: boolean) => void
 }
 
 const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
-  const { medicationItem, selectedItem, handleClick } = props
+  const { medicationItem, selectedItems, handleClick, setLoading } = props
   const { id, label, subItems } = medicationItem
 
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
-  const medicationState = useAppSelector((state) => state.medication || {})
-  const medicationHierarchy = medicationState.list
+  const medicationHierarchy = useAppSelector((state) => state.medication.list || {})
+  const isLoadingsyncHierarchyTable = useAppSelector((state) => state.syncHierarchyTable.loading || 0)
+  const isLoadingMedication = useAppSelector((state) => state.medication.syncLoading || 0)
 
   const [open, setOpen] = useState(false)
-
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === medicationItem.id) : false
-  const isIndeterminated = checkIfIndeterminated(medicationItem, selectedItem)
+  const isSelected = findSelectedInListAndSubItems(
+    selectedItems ? selectedItems : [],
+    medicationItem,
+    medicationHierarchy
+  )
+  const isIndeterminated = checkIfIndeterminated(medicationItem, selectedItems)
 
   const _onExpand = async (medicationCode: string) => {
+    if (isLoadingsyncHierarchyTable > 0 || isLoadingMedication > 0) return
+    dispatch<any>(incrementLoadingSyncHierarchyTable())
     setOpen(!open)
-    const expandResult = await dispatch<any>(
-      expandMedicationElement({
-        rowId: medicationCode,
-        selectedItems: selectedItem || []
-      })
+    const newHierarchy = await expandItem(
+      medicationCode,
+      selectedItems || [],
+      medicationHierarchy,
+      defaultMedication.type,
+      dispatch
     )
-    if (expandResult.payload.savedSelectedItems) {
-      handleClick(expandResult.payload.savedSelectedItems)
-    }
+    await handleClick(selectedItems, newHierarchy)
+    dispatch<any>(decrementLoadingSyncHierarchyTable())
   }
 
   const handleClickOnHierarchy = (medicationItem: MedicationListType) => {
-    const newSelectedItems = getSelectedPmsi(medicationItem, selectedItem || [], medicationHierarchy)
+    if (isLoadingsyncHierarchyTable > 0 || isLoadingMedication > 0) return
+    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    const newSelectedItems = getSelectedPmsi(medicationItem, selectedItems || [], medicationHierarchy)
     handleClick(newSelectedItems)
+    dispatch<any>(decrementLoadingSyncHierarchyTable())
   }
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
@@ -74,7 +90,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
             onClick={() => handleClickOnHierarchy(medicationItem)}
             className={clsx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
-              [classes.indeterminateIndicator]: isIndeterminated
+              [classes.indeterminateIndicator]: isSelected ? false : isIndeterminated
             })}
             style={{ color: '#0063af', cursor: 'pointer' }}
           />
@@ -98,7 +114,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
             onClick={() => handleClickOnHierarchy(medicationItem)}
             className={clsx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
-              [classes.indeterminateIndicator]: isIndeterminated
+              [classes.indeterminateIndicator]: isSelected ? false : isIndeterminated
             })}
             style={{ color: '#0063af', cursor: 'pointer' }}
           />
@@ -124,8 +140,9 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
                   <div className={classes.subItemsIndicator} />
                   <MedicationListItem
                     medicationItem={medicationHierarchySubItem}
-                    selectedItem={selectedItem}
+                    selectedItems={selectedItems}
                     handleClick={handleClick}
+                    setLoading={setLoading}
                   />
                 </Fragment>
               )
@@ -137,37 +154,49 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
 }
 
 type MedicationHierarchyProps = {
+  isOpen: boolean
   selectedCriteria: any
   goBack: (data: any) => void
-  onChangeSelectedHierarchy: (data: any) => void
+  onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
+  onConfirm: () => void
   isEdition?: boolean
 }
 
 const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
-  const { selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
+  const { isOpen = false, selectedCriteria, onChangeSelectedHierarchy, onConfirm, goBack, isEdition } = props
 
   const classes = useStyles()
-  const dispatch = useAppDispatch()
+  const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
+  const isLoadingSyncHierarchyTable: number = initialState?.loading ?? 0
+  const isLoadingMedication: number = useAppSelector((state) => state.medication.syncLoading || 0)
+  const [currentState, setCurrentState] = useState({ ...selectedCriteria, ...initialState })
+  const [loading, setLoading] = useState(isLoadingSyncHierarchyTable > 0 || isLoadingMedication > 0)
+  const medicationHierarchy = useAppSelector((state) => state.medication.list || {})
 
-  const medicationState = useAppSelector((state) => state.medication || {})
-  const medicationHierarchy = medicationState.list
+  const _handleClick = async (newSelectedItems: PmsiListType[] | null | undefined, hierarchy?: PmsiListType[]) => {
+    onChangeSelectedHierarchy(newSelectedItems, hierarchy)
+  }
 
-  const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
-    isEdition ? selectedCriteria.code : []
-  )
-
-  // Init
   useEffect(() => {
-    const _init = async () => {
-      if (!medicationHierarchy || (medicationHierarchy && medicationHierarchy.length === 0)) {
-        dispatch<any>(fetchMedication())
-      }
+    const newList = { ...selectedCriteria, ...initialState } ?? {}
+    if (!newList.code) {
+      newList.code = selectedCriteria.code
     }
+    newList.code.map(
+      (item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, medicationHierarchy).equivalentRow
+    )
+    setCurrentState(newList)
+  }, [initialState, medicationHierarchy])
 
-    _init()
-  }, []) // eslint-disable-line
+  useEffect(() => {
+    if (!loading && (isLoadingSyncHierarchyTable > 0 || isLoadingMedication > 0)) {
+      setLoading(true)
+    } else if (loading && isLoadingSyncHierarchyTable === 0 && isLoadingMedication === 0) {
+      setLoading(false)
+    }
+  }, [isLoadingSyncHierarchyTable, isLoadingMedication])
 
-  return (
+  return isOpen ? (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
         {!isEdition ? (
@@ -183,14 +212,16 @@ const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
         )}
       </Grid>
 
+      <div className={classes.loader}>{loading && <LinearProgress />}</div>
       <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
         {medicationHierarchy &&
           medicationHierarchy.map((medicationItem, index) => (
             <MedicationListItem
               key={index}
               medicationItem={medicationItem}
-              selectedItem={selectedHierarchy}
-              handleClick={onSetSelectedHierarchy}
+              selectedItems={currentState.code}
+              handleClick={_handleClick}
+              setLoading={setLoading}
             />
           ))}
       </List>
@@ -201,17 +232,13 @@ const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
             Annuler
           </Button>
         )}
-        <Button
-          onClick={() => onChangeSelectedHierarchy(filterSelectedPmsi(selectedHierarchy || [], medicationHierarchy))}
-          type="submit"
-          form="medication10-form"
-          color="primary"
-          variant="contained"
-        >
-          Confirmer
+        <Button onClick={() => onConfirm()} type="submit" form="medication10-form" color="primary" variant="contained">
+          Suivant
         </Button>
       </Grid>
     </Grid>
+  ) : (
+    <></>
   )
 }
 

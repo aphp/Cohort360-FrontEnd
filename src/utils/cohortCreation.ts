@@ -1,9 +1,17 @@
 import moment from 'moment'
 
 import services from 'services/aphp'
-import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType, DocType } from 'types'
+import {
+  CriteriaGroupType,
+  DocType,
+  HierarchyElement,
+  ScopeTreeRow,
+  SelectedCriteriaType,
+  TemporalConstraintsType
+} from 'types'
 
 import { docTypes } from 'assets/docTypes.json'
+import { PmsiListType } from '../state/pmsi'
 
 const REQUETEUR_VERSION = 'v1.2.1'
 
@@ -1672,4 +1680,43 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
     criteria,
     criteriaGroup
   }
+}
+export const findSelectedInListAndSubItems = (
+  selectedItems: HierarchyElement[],
+  searchedItem: HierarchyElement,
+  pmsiHierarchy: PmsiListType[]
+): boolean => {
+  if (!searchedItem || !selectedItems || selectedItems.length === 0) return false
+  selectedItems = selectedItems?.filter(({ id }) => id !== 'loading')
+  const foundItem = selectedItems.find((selectedItem) => {
+    if (selectedItem.id === searchedItem.id || selectedItem.id == '*') {
+      return true
+    }
+    return selectedItem.subItems
+      ? findSelectedInListAndSubItems(selectedItem.subItems, searchedItem, pmsiHierarchy)
+      : false
+  })
+  if (foundItem) {
+    return true
+  }
+  if (
+    searchedItem.subItems &&
+    searchedItem.subItems.length > 0 &&
+    !(searchedItem.subItems.length === 1 && searchedItem.subItems[0].id === 'loading')
+  ) {
+    const numberOfSubItemsSelected = searchedItem.subItems?.filter((searchedSubItem: any) =>
+      selectedItems.find((selectedItem) => selectedItem.id === searchedSubItem.id)
+    )?.length
+    if (searchedItem.subItems?.length === numberOfSubItemsSelected) {
+      return true
+    }
+    const isSingleItemNotSelected = (searchedItem.subItems?.length ?? 0 - (numberOfSubItemsSelected ?? 0)) === 1
+    if (numberOfSubItemsSelected && isSingleItemNotSelected) {
+      const singleItemNotSelected = searchedItem.subItems?.find((searchedSubItem: any) =>
+        selectedItems.find((selectedItem) => selectedItem.id !== searchedSubItem.id)
+      )
+      return findSelectedInListAndSubItems(selectedItems, singleItemNotSelected, pmsiHierarchy)
+    }
+  }
+  return false
 }

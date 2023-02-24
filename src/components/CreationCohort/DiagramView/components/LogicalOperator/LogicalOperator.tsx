@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { ButtonGroup, Button, IconButton, CircularProgress } from '@material-ui/core'
+import { Button, ButtonGroup, CircularProgress, IconButton } from '@material-ui/core'
 
 import AddIcon from '@material-ui/icons/Add'
 
@@ -10,15 +10,15 @@ import CriteriaCardItem from '../CriteriaCard/CriteriaCard'
 
 import { CriteriaGroupType, SelectedCriteriaType } from 'types'
 
-import { useAppSelector, useAppDispatch } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import {
-  buildCohortCreation,
   addNewCriteriaGroup,
-  editCriteriaGroup,
   addNewSelectedCriteria,
-  editSelectedCriteria,
+  buildCohortCreation,
   deleteSelectedCriteria,
   duplicateSelectedCriteria,
+  editCriteriaGroup,
+  editSelectedCriteria,
   suspendCount,
   unsuspendCount
 } from 'state/cohortCreation'

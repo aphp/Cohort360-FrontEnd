@@ -21,6 +21,7 @@ import drawer from './drawer'
 import scope from './scope'
 import pmsi from './pmsi'
 import me from './me'
+import syncHierarchyTable from './syncHierarchyTable'
 
 const cohortCreationReducer = combineReducers({
   criteria,
@@ -41,7 +42,8 @@ const rootReducer = combineReducers({
   medication,
   biology,
   patient,
-  autoLogout
+  autoLogout,
+  syncHierarchyTable
 })
 
 const persistConfig = {

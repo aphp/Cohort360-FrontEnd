@@ -39,7 +39,6 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
   }>((state) => ({
     scopeState: state.scope || {}
   }))
-
   const { loading = false, openPopulation = [], scopesList = [] } = scopeState
 
   const fetchScopeTree = async () => {
