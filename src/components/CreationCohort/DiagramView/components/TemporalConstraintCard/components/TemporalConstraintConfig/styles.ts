@@ -19,6 +19,17 @@ const useStyles = makeStyles(() => ({
     '&:hover': {
       backgroundColor: '#499cbf'
     }
+  },
+  avatar: {
+    backgroundColor: '#5BC5F2',
+    width: 20,
+    height: 20,
+    fontSize: 12,
+    marginRight: 4
+  },
+  flexBaseline: {
+    display: 'flex',
+    alignItems: 'baseline'
   }
 }))
 

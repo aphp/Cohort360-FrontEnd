@@ -1,21 +1,23 @@
 import React, { useState } from 'react'
 
 import {
+  Avatar,
   Button,
   Checkbox,
+  FormControl,
+  FormHelperText,
   Grid,
-  MenuItem,
   InputBase,
   InputLabel,
+  MenuItem,
   Select,
-  Typography,
-  FormControl
+  Typography
 } from '@material-ui/core'
 
 import { useAppSelector } from 'state'
+import { TemporalConstraintsType } from 'types'
 
 import useStyles from './styles'
-import { TemporalConstraintsType } from 'types'
 
 const timeMeasurements = [
   {
@@ -40,10 +42,12 @@ const TemporalConstraintConfig: React.FC<{
   newConstraintsList: TemporalConstraintsType[]
   onChangeNewConstraintsList: any
 }> = ({ newConstraintsList, onChangeNewConstraintsList }) => {
-  const { selectedCriteria } = useAppSelector((state) => state.cohortCreation.request)
+  const classes = useStyles()
 
-  const [firstCriteriaValue, setFirstCriteriaValue] = useState<number>(0)
-  const [secondCriteriaValue, setSecondCriteriaValue] = useState<number>(0)
+  const { selectedCriteria, criteriaGroup } = useAppSelector((state) => state.cohortCreation.request)
+
+  const [firstCriteriaValue, setFirstCriteriaValue] = useState<number | null>(null)
+  const [secondCriteriaValue, setSecondCriteriaValue] = useState<number | null>(null)
 
   const [isFirstTimeValueChecked, setIsFirstTimeValueChecked] = useState<boolean>(false)
   const [minTime, setMinTime] = useState<number>(1)
@@ -53,7 +57,10 @@ const TemporalConstraintConfig: React.FC<{
   const [maxTime, setMaxTime] = useState<number>(1)
   const [maxTimeMeasurement, setMaxTimeMeasurement] = useState<string>('days')
 
-  const classes = useStyles()
+  const [noSelectedConstraintError, setNoSelectedConstraintError] = useState<boolean>(false)
+
+  const mainGroupCriteriaIds = criteriaGroup[0].criteriaIds
+  const mainGroupCriteria = selectedCriteria.filter((criteria) => mainGroupCriteriaIds.includes(criteria.id))
 
   const onChangeMinTimeMeasurement = (event: React.ChangeEvent<{ value: any }>) => {
     setMinTimeMeasurement(event.target.value as string)
@@ -66,24 +73,30 @@ const TemporalConstraintConfig: React.FC<{
   }
 
   const onConfirm = () => {
-    const newConstraint: TemporalConstraintsType = {
-      idList: [firstCriteriaValue, secondCriteriaValue],
-      constraintType: 'directChronologicalOrdering',
-      ...(isFirstTimeValueChecked && {
-        timeRelationMinDuration: {
-          [minTimeMeasurement]: minTime
-        }
-      }),
-      ...(isSecondTimeValueChecked && {
-        timeRelationMaxDuration: {
-          [maxTimeMeasurement]: maxTime
-        }
-      })
-    }
+    if (firstCriteriaValue === null || secondCriteriaValue === null) {
+      setNoSelectedConstraintError(true)
+    } else {
+      setNoSelectedConstraintError(false)
 
-    onChangeNewConstraintsList([...newConstraintsList, newConstraint])
+      const newConstraint: TemporalConstraintsType = {
+        idList: [firstCriteriaValue, secondCriteriaValue],
+        constraintType: 'directChronologicalOrdering',
+        ...(isFirstTimeValueChecked && {
+          timeRelationMinDuration: {
+            [minTimeMeasurement]: minTime
+          }
+        }),
+        ...(isSecondTimeValueChecked && {
+          timeRelationMaxDuration: {
+            [maxTimeMeasurement]: maxTime
+          }
+        })
+      }
+
+      onChangeNewConstraintsList([...newConstraintsList, newConstraint])
+    }
   }
-  console.log('selectedCriteria', selectedCriteria)
+
   return (
     <Grid
       container
@@ -92,48 +105,65 @@ const TemporalConstraintConfig: React.FC<{
       style={{ margin: '1em', backgroundColor: '#F6F9FD', padding: '1em' }}
     >
       <Grid container alignItems="baseline" justifyContent="center">
-        <FormControl style={{ margin: '0 8px', minWidth: 200 }}>
+        <FormControl
+          style={{ margin: '0 8px', minWidth: 200 }}
+          error={noSelectedConstraintError && firstCriteriaValue === null}
+        >
           <InputLabel>Le critère X</InputLabel>
           <Select
             value={firstCriteriaValue === 0 ? null : firstCriteriaValue}
             onChange={(e) => {
               setFirstCriteriaValue(e.target.value as number)
             }}
+            classes={{ select: classes.flexBaseline }}
           >
-            {selectedCriteria
+            {mainGroupCriteria
               .filter((criteria) => criteria.id !== secondCriteriaValue)
               .map((selectValue, index) => (
                 <MenuItem key={index} value={selectValue.id}>
-                  {`(${selectValue.id}) - ${selectValue.title}`}
+                  <Avatar className={classes.avatar}>{selectValue.id}</Avatar>
+                  {` - ${selectValue.title}`}
                 </MenuItem>
               ))}
           </Select>
+          {noSelectedConstraintError && firstCriteriaValue === null && (
+            <FormHelperText>Veuillez sélectionner un critère.</FormHelperText>
+          )}
         </FormControl>
         <Typography style={{ fontWeight: 700 }}>s'est produit avant</Typography>
-        <FormControl style={{ margin: '0 12px', minWidth: 200 }}>
+        <FormControl
+          style={{ margin: '0 12px', minWidth: 200 }}
+          error={noSelectedConstraintError && secondCriteriaValue === null}
+        >
           <InputLabel>le critère Y</InputLabel>
           <Select
             value={secondCriteriaValue === 0 ? null : secondCriteriaValue}
             onChange={(e) => {
               setSecondCriteriaValue(e.target.value as number)
             }}
+            classes={{ select: classes.flexBaseline }}
           >
-            {selectedCriteria
+            {mainGroupCriteria
               .filter((criteria) => criteria.id !== firstCriteriaValue)
               .map((selectValue, index) => (
                 <MenuItem key={index} value={selectValue.id}>
-                  {`(${selectValue.id}) - ${selectValue.title}`}
+                  <Avatar className={classes.avatar}>{selectValue.id}</Avatar>
+                  {` - ${selectValue.title}`}
                 </MenuItem>
               ))}
           </Select>
+          {noSelectedConstraintError && secondCriteriaValue === null && (
+            <FormHelperText>Veuillez sélectionner un critère.</FormHelperText>
+          )}
         </FormControl>
       </Grid>
       <Grid container alignItems="center" justifyContent="center">
+        <Typography style={{ fontWeight: 700 }}>dans une intervalle de </Typography>
         <Checkbox
           value={isFirstTimeValueChecked}
           onChange={() => setIsFirstTimeValueChecked(!isFirstTimeValueChecked)}
         />
-        <Typography style={{ fontWeight: 700 }}>séparé au moins de </Typography>
+        <Typography style={{ fontWeight: 700 }}>plus de </Typography>
         {/** TODO: Faire la gestion d'erreur si le select est a null mettre le champ en rouge demandant a selectionner une unite */}
         {/** TODO: le champ input ne peux pas etre superieur au deuxieme champ d'input */}
         <InputBase
@@ -153,13 +183,11 @@ const TemporalConstraintConfig: React.FC<{
             </MenuItem>
           ))}
         </Select>
-      </Grid>
-      <Grid container alignItems="center" justifyContent="center">
         <Checkbox
           value={isSecondTimeValueChecked}
           onChange={() => setIsSecondTimeValueChecked(!isSecondTimeValueChecked)}
         />
-        <Typography style={{ fontWeight: 700 }}>et de moins de</Typography>
+        <Typography style={{ fontWeight: 700 }}>moins de</Typography>
         {/** TODO: Faire la gestion d'erreur si le select est a null mettre le champ en rouge demandant a selectionner une unite */}
         {/** TODO: le champ input ne peux pas etre inferieur au premier champ d'input */}
         <InputBase
