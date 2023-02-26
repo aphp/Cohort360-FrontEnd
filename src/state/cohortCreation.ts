@@ -61,13 +61,7 @@ const defaultInitialState: CohortCreationState = {
       isInclusive: true
     }
   ],
-  temporalConstraints: [
-    {
-      id: 1,
-      idList: ['All'],
-      constraintType: 'none'
-    }
-  ],
+  temporalConstraints: [],
   nextCriteriaId: 1,
   nextGroupId: -1
 }
@@ -609,21 +603,11 @@ const cohortCreationSlice = createSlice({
       })
       state.nextCriteriaId += 1
     },
-    // create function addTemporalConstraint that will add a temporal constraint to the state
-    //c'est fonctionelle
-    addTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
-      state.temporalConstraints = [...state.temporalConstraints, action.payload]
+    addTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType[]>) => {
+      state.temporalConstraints = action.payload
     },
-    // create function removeTemporalConstraint that will remove a temporal constraint from the state
-    //TODO : Revoir cette fonction car elle ne fonctionne pas.
     deleteTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
-      state.temporalConstraints = state.temporalConstraints.filter(
-        ({ idList, timeRelationMaxDuration, timeRelationMinDuration }) =>
-          idList[0] !== action.payload.idList[0] &&
-          idList[1] !== action.payload.idList[1] &&
-          timeRelationMaxDuration !== action.payload.timeRelationMaxDuration &&
-          timeRelationMinDuration !== action.payload.timeRelationMinDuration
-      )
+      state.temporalConstraints = state.temporalConstraints.filter((constraint) => constraint.id !== action.payload.id)
     },
     // create function updateTemporalConstraint that will update a temporal constraint from the state
     updateTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
@@ -632,7 +616,9 @@ const cohortCreationSlice = createSlice({
         const equals = (a: any[], b: any[]) => a.length === b.length && a.every((v, i) => v === b[i])
         return equals(idList, action.payload.idList)
       })
+      console.log('foundItem', foundItem)
       const index = foundItem ? state.temporalConstraints.indexOf(foundItem) : -1
+      console.log('index', index)
       if (index !== -1) state.temporalConstraints[index] = action.payload
     },
     suspendCount: (state: CohortCreationState) => {

@@ -1,21 +1,21 @@
 import React from 'react'
 
 import {
+  Avatar,
   IconButton,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
-  Paper,
-  Tooltip
+  Tooltip,
+  Typography
 } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 
-import { useAppDispatch, useAppSelector } from 'state'
-import { buildCohortCreation, deleteTemporalConstraint } from 'state/cohortCreation'
+import { useAppSelector } from 'state'
 
 import { TemporalConstraintsType } from 'types'
 
@@ -47,16 +47,17 @@ const columns = [
   }
 ]
 
-const EventSequenceTable: React.FC = () => {
-  const { temporalConstraints } = useAppSelector((state) => state.cohortCreation.request)
+const EventSequenceTable: React.FC<{ temporalConstraints: TemporalConstraintsType[]; onChangeConstraints: any }> = ({
+  temporalConstraints,
+  onChangeConstraints
+}) => {
   const { selectedCriteria } = useAppSelector((state) => state.cohortCreation.request)
 
-  const dispatch = useAppDispatch()
   const classes = useStyles()
 
   const onDeleteTemporalConstraint = (temporalConstraint: TemporalConstraintsType) => {
-    dispatch<any>(deleteTemporalConstraint(temporalConstraint))
-    dispatch<any>(buildCohortCreation({}))
+    const remainingConstraints = temporalConstraints.filter((constraint) => constraint !== temporalConstraint)
+    onChangeConstraints(remainingConstraints)
   }
 
   const findCriteriaTitle = (id: any) => {
@@ -64,7 +65,7 @@ const EventSequenceTable: React.FC = () => {
     return criteria?.title
   }
 
-  const durationMesurementInFrench = (key: any) => {
+  const durationMeasurementInFrench = (key: any) => {
     let keyInFrench
     if (key === 'days') {
       keyInFrench = 'jours'
@@ -87,7 +88,7 @@ const EventSequenceTable: React.FC = () => {
     if (temporalConstraint.constraintType === 'directChronologicalOrdering' && minDuration) {
       for (const [key, value] of Object.entries(minDuration)) {
         if (value !== 0) {
-          const keys = durationMesurementInFrench(key)
+          const keys = durationMeasurementInFrench(key)
           const values = value
           nonZeroMinDuration = {
             keys: keys,
@@ -106,7 +107,7 @@ const EventSequenceTable: React.FC = () => {
     if (temporalConstraint.constraintType === 'directChronologicalOrdering' && maxDuration) {
       for (const [key, value] of Object.entries(maxDuration)) {
         if (value !== 0) {
-          const keys = durationMesurementInFrench(key)
+          const keys = durationMeasurementInFrench(key)
           const values = value
           nonZeroMaxDuration = {
             keys: keys,
@@ -131,9 +132,7 @@ const EventSequenceTable: React.FC = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {!temporalConstraints ||
-          temporalConstraints?.length === 0 ||
-          (temporalConstraints.length === 1 && temporalConstraints.find(({ idList }) => idList[0] === 'All')) ? (
+          {!temporalConstraints || temporalConstraints?.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7}>
                 <Typography className={classes.loadingSpinnerContainer}>
@@ -150,9 +149,15 @@ const EventSequenceTable: React.FC = () => {
               return (
                 temporalConstraint.constraintType === 'directChronologicalOrdering' && (
                   <TableRow key={index} className={classes.tableBodyRows} hover>
-                    <TableCell align="center"> {`(${temporalConstraint.idList[0]}) - ${criteriaTitle1}`}</TableCell>
+                    <TableCell align="center" className={classes.flexCenter}>
+                      <Avatar className={classes.avatar}>{temporalConstraint.idList[0]}</Avatar>
+                      <Typography style={{ width: 'fit-content', marginLeft: 4 }}> - {criteriaTitle1}</Typography>
+                    </TableCell>
                     <TableCell align="center">s'est produit avant</TableCell>
-                    <TableCell align="center">{`(${temporalConstraint.idList[1]}) - ${criteriaTitle2}`}</TableCell>
+                    <TableCell align="center" className={classes.flexCenter}>
+                      <Avatar className={classes.avatar}>{temporalConstraint.idList[1]}</Avatar>
+                      <Typography style={{ width: 'fit-content', marginLeft: 4 }}> - {criteriaTitle2}</Typography>
+                    </TableCell>
                     <TableCell align="center">{`${minDuration.values ?? '-'} ${minDuration.keys ?? ''}`}</TableCell>
                     <TableCell align="center">{`${maxDuration.values ?? '-'} ${maxDuration.keys ?? ''}`}</TableCell>
                     <TableCell align="center">

@@ -9,6 +9,16 @@ const useStyles = makeStyles(() => ({
     borderRadius: '25px',
     margin: '0 8px',
     padding: '0 8px'
+  },
+  button: {
+    backgroundColor: '#5bc5f2',
+    color: '#FFF',
+    borderRadius: 25,
+    padding: '4px 12px',
+    marginTop: 8,
+    '&:hover': {
+      backgroundColor: '#499cbf'
+    }
   }
 }))
 

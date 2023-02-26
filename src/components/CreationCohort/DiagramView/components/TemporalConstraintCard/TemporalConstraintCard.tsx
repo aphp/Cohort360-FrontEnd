@@ -19,13 +19,6 @@ const TemporalConstraint: React.FC = () => {
   const { criteriaGroup = [], temporalConstraints } = useAppSelector((state) => state.cohortCreation.request)
 
   const maintenanceIsActive = meState?.maintenance?.active || false
-  const checkTemporalConstraint = temporalConstraints
-    ? temporalConstraints.map((temporalConstraint) => {
-        if (temporalConstraint.constraintType !== 'none') {
-          return temporalConstraint
-        }
-      })
-    : []
 
   const dispatch = useAppDispatch()
   const classes = useStyles()
@@ -38,20 +31,12 @@ const TemporalConstraint: React.FC = () => {
     }
   }, [])
 
-  const defaultTemporalConstraints = {
-    idList: ['All'],
-    constraintType: 'none'
-  }
-
   useEffect(() => {
+    //TODO: c'est quoi ça?????
     if (criteriaGroup && criteriaGroup.length > 0) {
       const mainCriteriaGroup = criteriaGroup.find(({ id }) => id === 0)
       if (!disableTemporalConstraint && mainCriteriaGroup && mainCriteriaGroup.type !== 'andGroup') {
-        if (
-          checkTemporalConstraint &&
-          checkTemporalConstraint.length > 1 &&
-          checkTemporalConstraint.map((temporalConstraint) => temporalConstraint !== defaultTemporalConstraints)
-        ) {
+        if (temporalConstraints && temporalConstraints.length > 1) {
           temporalConstraints?.map((temporalConstraint) => {
             dispatch<any>(deleteTemporalConstraint(temporalConstraint))
             dispatch<any>(buildCohortCreation({}))
@@ -71,14 +56,19 @@ const TemporalConstraint: React.FC = () => {
   return (
     <>
       {!disableTemporalConstraint ? (
-        <Badge badgeContent={temporalConstraints?.length} color="secondary" style={{ height: 'fit-content' }}>
+        <Badge
+          badgeContent={temporalConstraints?.length}
+          color="secondary"
+          overlap="rectangular"
+          style={{ height: 'fit-content' }}
+        >
           <Button
             onClick={handleOnClick}
             className={classes.root}
             style={{
-              backgroundColor: temporalConstraintExist && !disableTemporalConstraint ? '#FFE2A9' : '#DEDEDE'
+              backgroundColor: !maintenanceIsActive ? '#FFE2A9' : '#DEDEDE'
             }}
-            disabled={maintenanceIsActive || disableTemporalConstraint}
+            disabled={maintenanceIsActive}
           >
             Contraintes temporelles
           </Button>

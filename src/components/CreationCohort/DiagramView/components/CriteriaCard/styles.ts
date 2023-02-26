@@ -31,7 +31,8 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   title: {
-    whiteSpace: 'nowrap'
+    whiteSpace: 'nowrap',
+    marginLeft: 4
   },
   actionContainer: {
     display: 'flex',

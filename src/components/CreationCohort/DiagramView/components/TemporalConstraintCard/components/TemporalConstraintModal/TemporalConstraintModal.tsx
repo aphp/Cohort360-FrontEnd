@@ -2,25 +2,24 @@ import React, { useState } from 'react'
 import { useHistory } from 'react-router'
 
 import {
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   Grid,
-  Typography,
-  Button,
   Radio,
   RadioGroup,
-  FormControlLabel
+  Typography
 } from '@material-ui/core'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { buildCohortCreation, updateTemporalConstraint } from 'state/cohortCreation'
+import { buildCohortCreation, addTemporalConstraint } from 'state/cohortCreation'
 
 import EventSequenceTable from '../EventSequenceTable/EventSequenceTable'
 import TemporalConstraintConfig from '../TemporalConstraintConfig/TemporalConstraintConfig'
-
-// import useStyles from '../../styles'
+import { TemporalConstraintsType } from 'types'
 
 const TemporalConstraint: React.FC<{
   open: boolean
@@ -33,18 +32,13 @@ const TemporalConstraint: React.FC<{
   const [radioValues, setRadioValues] = useState<
     'none' | 'sameEncounter' | 'differentEncounter' | 'directChronologicalOrdering'
   >(initialStateRadio)
+  const [newConstraintsList, setNewConstraintsList] = useState<TemporalConstraintsType[]>([...temporalConstraints])
 
-  // const classes = useStyles()
   const history = useHistory()
   const dispatch = useAppDispatch()
 
   const handleConfirm = () => {
-    dispatch<any>(
-      updateTemporalConstraint({
-        idList: ['All'],
-        constraintType: radioValues
-      })
-    )
+    dispatch<any>(addTemporalConstraint(newConstraintsList))
     dispatch<any>(buildCohortCreation({}))
   }
 
@@ -89,8 +83,11 @@ const TemporalConstraint: React.FC<{
         </Grid>
         <Grid>
           <Typography variant="h3">Séquence d'évènements entre deux critères</Typography>
-          <TemporalConstraintConfig />
-          <EventSequenceTable />
+          <TemporalConstraintConfig
+            newConstraintsList={newConstraintsList}
+            onChangeNewConstraintsList={setNewConstraintsList}
+          />
+          <EventSequenceTable temporalConstraints={newConstraintsList} onChangeConstraints={setNewConstraintsList} />
         </Grid>
       </DialogContent>
       <DialogActions>

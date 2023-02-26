@@ -11,14 +11,13 @@ import {
   Typography,
   FormControl
 } from '@material-ui/core'
-import AddIcon from '@material-ui/icons/Add'
 
-import { useAppSelector, useAppDispatch } from 'state'
-import { buildCohortCreation, addTemporalConstraint } from 'state/cohortCreation'
+import { useAppSelector } from 'state'
 
 import useStyles from './styles'
+import { TemporalConstraintsType } from 'types'
 
-const timeMesurements = [
+const timeMeasurements = [
   {
     id: 'years',
     display: 'années'
@@ -37,146 +36,60 @@ const timeMesurements = [
   }
 ]
 
-const TemporalConstraintConfig: React.FC = () => {
+const TemporalConstraintConfig: React.FC<{
+  newConstraintsList: TemporalConstraintsType[]
+  onChangeNewConstraintsList: any
+}> = ({ newConstraintsList, onChangeNewConstraintsList }) => {
   const { selectedCriteria } = useAppSelector((state) => state.cohortCreation.request)
 
   const [firstCriteriaValue, setFirstCriteriaValue] = useState<number>(0)
   const [secondCriteriaValue, setSecondCriteriaValue] = useState<number>(0)
+
   const [isFirstTimeValueChecked, setIsFirstTimeValueChecked] = useState<boolean>(false)
+  const [minTime, setMinTime] = useState<number>(1)
+  const [minTimeMeasurement, setMinTimeMeasurement] = useState<string>('days')
+
   const [isSecondTimeValueChecked, setIsSecondTimeValueChecked] = useState<boolean>(false)
-  const [minTimeMesurement, setMinTimeMesurement] = useState<string>('days')
-  const [maxTimeMesurement, setMaxTimeMesurement] = useState<string>('days')
-  const [minTime, setMinTime] = useState<number>(0)
-  const [maxTime, setMaxTime] = useState<number>(0)
-  const [minYearsTimeValue, setMinYearsTimeValue] = useState<number>(0)
-  const [maxYearsTimeValue, setMaxYearsTimeValue] = useState<number>(0)
-  const [minMonthsTimeValue, setMinMonthsTimeValue] = useState<number>(0)
-  const [maxMonthsTimeValue, setMaxMonthsTimeValue] = useState<number>(0)
-  const [minDaysTimeValue, setMinDaysTimeValue] = useState<number>(0)
-  const [maxDaysTimeValue, setMaxDaysTimeValue] = useState<number>(0)
-  const [minHoursTimeValue, setMinHoursTimeValue] = useState<number>(0)
-  const [maxHoursTimeValue, setMaxHoursTimeValue] = useState<number>(0)
+  const [maxTime, setMaxTime] = useState<number>(1)
+  const [maxTimeMeasurement, setMaxTimeMeasurement] = useState<string>('days')
 
   const classes = useStyles()
-  const dispatch = useAppDispatch()
 
-  const onChangeMinTimeMesurement = (event: React.ChangeEvent<{ value: any }>) => {
-    setMinTimeMesurement(event.target.value as string)
-    setMinYearsTimeValue(0)
-    setMinMonthsTimeValue(0)
-    setMinDaysTimeValue(0)
-    setMinHoursTimeValue(0)
-    setMinTime(0)
+  const onChangeMinTimeMeasurement = (event: React.ChangeEvent<{ value: any }>) => {
+    setMinTimeMeasurement(event.target.value as string)
+    setMinTime(1)
   }
 
-  const onChangeMaxTimeMesurement = (event: React.ChangeEvent<{ value: any }>) => {
-    setMaxTimeMesurement(event.target.value as string)
-    setMaxYearsTimeValue(0)
-    setMaxMonthsTimeValue(0)
-    setMaxDaysTimeValue(0)
-    setMaxHoursTimeValue(0)
-    setMaxTime(0)
-  }
-
-  const onChangeMinTime = (event: React.ChangeEvent<{ value: any }>) => {
-    setMinTime(+event.target.value)
-    switch (minTimeMesurement) {
-      case 'years':
-        setMinYearsTimeValue(+event.target.value)
-        break
-      case 'months':
-        setMinMonthsTimeValue(+event.target.value)
-        break
-      case 'days':
-        setMinDaysTimeValue(+event.target.value)
-        break
-      case 'hours':
-        setMinHoursTimeValue(+event.target.value)
-        break
-    }
-  }
-
-  const onChangeMaxTime = (event: React.ChangeEvent<{ value: any }>) => {
-    setMaxTime(+event.target.value)
-    switch (maxTimeMesurement) {
-      case 'years':
-        setMaxYearsTimeValue(+event.target.value)
-        break
-      case 'months':
-        setMaxMonthsTimeValue(+event.target.value)
-        break
-      case 'days':
-        setMaxDaysTimeValue(+event.target.value)
-        break
-      case 'hours':
-        setMaxHoursTimeValue(+event.target.value)
-        break
-    }
+  const onChangeMaxTimeMeasurement = (event: React.ChangeEvent<{ value: any }>) => {
+    setMaxTimeMeasurement(event.target.value as string)
+    setMaxTime(1)
   }
 
   const onConfirm = () => {
-    if (!isFirstTimeValueChecked && !isSecondTimeValueChecked) {
-      dispatch<any>(
-        addTemporalConstraint({
-          idList: [firstCriteriaValue, secondCriteriaValue],
-          constraintType: 'directChronologicalOrdering'
-        })
-      )
-    } else if (!isFirstTimeValueChecked && isSecondTimeValueChecked) {
-      dispatch<any>(
-        addTemporalConstraint({
-          idList: [firstCriteriaValue, secondCriteriaValue],
-          constraintType: 'directChronologicalOrdering',
-          timeRelationMaxDuration: {
-            years: maxYearsTimeValue,
-            months: maxMonthsTimeValue,
-            days: maxDaysTimeValue,
-            hours: maxHoursTimeValue
-          }
-        })
-      )
-    } else if (!isSecondTimeValueChecked && isFirstTimeValueChecked) {
-      dispatch<any>(
-        addTemporalConstraint({
-          idList: [firstCriteriaValue, secondCriteriaValue],
-          constraintType: 'directChronologicalOrdering',
-          timeRelationMinDuration: {
-            years: minYearsTimeValue,
-            months: minMonthsTimeValue,
-            days: minDaysTimeValue,
-            hours: minHoursTimeValue
-          }
-        })
-      )
-    } else {
-      dispatch<any>(
-        addTemporalConstraint({
-          idList: [firstCriteriaValue, secondCriteriaValue],
-          constraintType: 'directChronologicalOrdering',
-          timeRelationMinDuration: {
-            years: minYearsTimeValue,
-            months: minMonthsTimeValue,
-            days: minDaysTimeValue,
-            hours: minHoursTimeValue
-          },
-          timeRelationMaxDuration: {
-            years: maxYearsTimeValue,
-            months: maxMonthsTimeValue,
-            days: maxDaysTimeValue,
-            hours: maxHoursTimeValue
-          }
-        })
-      )
+    const newConstraint: TemporalConstraintsType = {
+      idList: [firstCriteriaValue, secondCriteriaValue],
+      constraintType: 'directChronologicalOrdering',
+      ...(isFirstTimeValueChecked && {
+        timeRelationMinDuration: {
+          [minTimeMeasurement]: minTime
+        }
+      }),
+      ...(isSecondTimeValueChecked && {
+        timeRelationMaxDuration: {
+          [maxTimeMeasurement]: maxTime
+        }
+      })
     }
-    dispatch<any>(buildCohortCreation({}))
-  }
 
+    onChangeNewConstraintsList([...newConstraintsList, newConstraint])
+  }
+  console.log('selectedCriteria', selectedCriteria)
   return (
     <Grid
       container
       justifyContent="center"
       alignItems="center"
-      style={{ margin: '1em', backgroundColor: 'rgba(209,226,244,0.2)', padding: '1em' }}
+      style={{ margin: '1em', backgroundColor: '#F6F9FD', padding: '1em' }}
     >
       <Grid container alignItems="baseline" justifyContent="center">
         <FormControl style={{ margin: '0 8px', minWidth: 200 }}>
@@ -187,12 +100,13 @@ const TemporalConstraintConfig: React.FC = () => {
               setFirstCriteriaValue(e.target.value as number)
             }}
           >
-            {/**TODO: gestion d'erreur a faire si le critere est deja selection dans le deuxieme select mettre le champ en rouge demandant de changer de critere */}
-            {selectedCriteria.map((selectValue, index) => (
-              <MenuItem key={index} value={selectValue.id}>
-                {`(${selectValue.id}) - ${selectValue.title}`}
-              </MenuItem>
-            ))}
+            {selectedCriteria
+              .filter((criteria) => criteria.id !== secondCriteriaValue)
+              .map((selectValue, index) => (
+                <MenuItem key={index} value={selectValue.id}>
+                  {`(${selectValue.id}) - ${selectValue.title}`}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
         <Typography style={{ fontWeight: 700 }}>s'est produit avant</Typography>
@@ -204,12 +118,13 @@ const TemporalConstraintConfig: React.FC = () => {
               setSecondCriteriaValue(e.target.value as number)
             }}
           >
-            {/**TODO: gestion d'erreur a faire si le critere est deja selection dans le premier select mettre le champ en rouge demandant de changer de critere */}
-            {selectedCriteria.map((selectValue, index) => (
-              <MenuItem key={index} value={selectValue.id}>
-                {`(${selectValue.id}) - ${selectValue.title}`}
-              </MenuItem>
-            ))}
+            {selectedCriteria
+              .filter((criteria) => criteria.id !== firstCriteriaValue)
+              .map((selectValue, index) => (
+                <MenuItem key={index} value={selectValue.id}>
+                  {`(${selectValue.id}) - ${selectValue.title}`}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
       </Grid>
@@ -218,7 +133,7 @@ const TemporalConstraintConfig: React.FC = () => {
           value={isFirstTimeValueChecked}
           onChange={() => setIsFirstTimeValueChecked(!isFirstTimeValueChecked)}
         />
-        <Typography style={{ fontWeight: 700 }}>séparé de moins de </Typography>
+        <Typography style={{ fontWeight: 700 }}>séparé au moins de </Typography>
         {/** TODO: Faire la gestion d'erreur si le select est a null mettre le champ en rouge demandant a selectionner une unite */}
         {/** TODO: le champ input ne peux pas etre superieur au deuxieme champ d'input */}
         <InputBase
@@ -226,12 +141,15 @@ const TemporalConstraintConfig: React.FC = () => {
           disabled={!isFirstTimeValueChecked}
           type="number"
           value={minTime}
-          onChange={onChangeMinTime}
+          onChange={(event) => setMinTime(+event.target.value)}
+          inputProps={{
+            min: 1
+          }}
         />
-        <Select disabled={!isFirstTimeValueChecked} value={minTimeMesurement} onChange={onChangeMinTimeMesurement}>
-          {timeMesurements.map((timeMesurement, index) => (
-            <MenuItem key={index} value={timeMesurement.id}>
-              {timeMesurement.display}
+        <Select disabled={!isFirstTimeValueChecked} value={minTimeMeasurement} onChange={onChangeMinTimeMeasurement}>
+          {timeMeasurements.map((timeMeasurement, index) => (
+            <MenuItem key={index} value={timeMeasurement.id}>
+              {timeMeasurement.display}
             </MenuItem>
           ))}
         </Select>
@@ -241,7 +159,7 @@ const TemporalConstraintConfig: React.FC = () => {
           value={isSecondTimeValueChecked}
           onChange={() => setIsSecondTimeValueChecked(!isSecondTimeValueChecked)}
         />
-        <Typography style={{ fontWeight: 700 }}>et de plus de</Typography>
+        <Typography style={{ fontWeight: 700 }}>et de moins de</Typography>
         {/** TODO: Faire la gestion d'erreur si le select est a null mettre le champ en rouge demandant a selectionner une unite */}
         {/** TODO: le champ input ne peux pas etre inferieur au premier champ d'input */}
         <InputBase
@@ -249,18 +167,21 @@ const TemporalConstraintConfig: React.FC = () => {
           disabled={!isSecondTimeValueChecked}
           type="number"
           value={maxTime}
-          onChange={onChangeMaxTime}
+          onChange={(event) => setMaxTime(+event.target.value)}
+          inputProps={{
+            min: 1
+          }}
         />
-        <Select disabled={!isSecondTimeValueChecked} value={maxTimeMesurement} onChange={onChangeMaxTimeMesurement}>
-          {timeMesurements.map((timeMesurement, index) => (
-            <MenuItem key={index} value={timeMesurement.id}>
-              {timeMesurement.display}
+        <Select disabled={!isSecondTimeValueChecked} value={maxTimeMeasurement} onChange={onChangeMaxTimeMeasurement}>
+          {timeMeasurements.map((timeMeasurement, index) => (
+            <MenuItem key={index} value={timeMeasurement.id}>
+              {timeMeasurement.display}
             </MenuItem>
           ))}
         </Select>
       </Grid>
-      <Button onClick={onConfirm} startIcon={<AddIcon />}>
-        Ajouter
+      <Button className={classes.button} onClick={onConfirm}>
+        Ajouter critère
       </Button>
     </Grid>
   )
