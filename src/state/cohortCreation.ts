@@ -603,23 +603,11 @@ const cohortCreationSlice = createSlice({
       })
       state.nextCriteriaId += 1
     },
-    addTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType[]>) => {
-      state.temporalConstraints = action.payload
-    },
     deleteTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
       state.temporalConstraints = state.temporalConstraints.filter((constraint) => constraint.id !== action.payload.id)
     },
-    // create function updateTemporalConstraint that will update a temporal constraint from the state
-    updateTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
-      //TODO: Il faut comparer idListe a all et changer cette contrainte par la nouvelle constraintType
-      const foundItem = state.temporalConstraints.find(({ idList }) => {
-        const equals = (a: any[], b: any[]) => a.length === b.length && a.every((v, i) => v === b[i])
-        return equals(idList, action.payload.idList)
-      })
-      console.log('foundItem', foundItem)
-      const index = foundItem ? state.temporalConstraints.indexOf(foundItem) : -1
-      console.log('index', index)
-      if (index !== -1) state.temporalConstraints[index] = action.payload
+    updateTemporalConstraints: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType[]>) => {
+      state.temporalConstraints = action.payload
     },
     suspendCount: (state: CohortCreationState) => {
       state.count = {
@@ -720,8 +708,7 @@ export const {
   //
   duplicateSelectedCriteria,
   //
-  addTemporalConstraint,
-  updateTemporalConstraint,
+  updateTemporalConstraints,
   deleteTemporalConstraint,
   suspendCount,
   unsuspendCount
