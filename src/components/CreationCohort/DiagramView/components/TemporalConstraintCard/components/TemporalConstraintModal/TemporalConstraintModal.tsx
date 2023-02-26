@@ -17,7 +17,7 @@ import {
 import InfoIcon from '@material-ui/icons/Info'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { buildCohortCreation, addTemporalConstraint } from 'state/cohortCreation'
+import { buildCohortCreation, updateTemporalConstraints } from 'state/cohortCreation'
 
 import EventSequenceTable from '../EventSequenceTable/EventSequenceTable'
 import TemporalConstraintConfig from '../TemporalConstraintConfig/TemporalConstraintConfig'
@@ -40,7 +40,7 @@ const TemporalConstraint: React.FC<{
   const dispatch = useAppDispatch()
 
   const handleConfirm = () => {
-    dispatch<any>(addTemporalConstraint(newConstraintsList))
+    dispatch<any>(updateTemporalConstraints(newConstraintsList))
     dispatch<any>(buildCohortCreation({}))
   }
 
