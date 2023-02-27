@@ -23,10 +23,13 @@ import EventSequenceTable from '../EventSequenceTable/EventSequenceTable'
 import TemporalConstraintConfig from '../TemporalConstraintConfig/TemporalConstraintConfig'
 import { TemporalConstraintsType } from 'types'
 
+import useStyles from './styles'
+
 const TemporalConstraint: React.FC<{
   open: boolean
   onClose?: () => void
 }> = ({ onClose }) => {
+  const classes = useStyles()
   const { temporalConstraints = [] } = useAppSelector((state) => state.cohortCreation.request)
 
   const findInitialStateRadio = temporalConstraints.find(({ idList }) => idList[0] === 'All')
@@ -58,9 +61,7 @@ const TemporalConstraint: React.FC<{
 
   return (
     <Dialog fullWidth maxWidth="lg" open onClose={handleClose} aria-labelledby="form-dialog-title">
-      <DialogTitle>
-        <Typography variant="h3">Contraintes temporelles</Typography>
-      </DialogTitle>
+      <DialogTitle className={classes.title}>Contraintes temporelles</DialogTitle>
       <DialogContent>
         <Grid>
           <Typography variant="h3">Contrainte globale sur tous les critères</Typography>
