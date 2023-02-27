@@ -16,11 +16,7 @@ import { expandBiologyElement } from '../state/biology'
  * This function is called when a user select an element of pmsi hierarchy
  * return selected items that should be saved
  */
-export const getSelectedPmsi = (
-  row: PmsiListType,
-  selectedItems: PmsiListType[] | undefined,
-  rootRows: PmsiListType[]
-) => {
+export const getSelectedPmsi = (row: any, selectedItems: any[] | undefined, rootRows: any[]) => {
   selectedItems = (selectedItems ?? []).map(
     (selectedItem) => findEquivalentRowInItemAndSubItems(selectedItem, rootRows).equivalentRow ?? selectedItem
   )
@@ -28,14 +24,11 @@ export const getSelectedPmsi = (
   let savedSelectedItems = flattedSelectedItems
   const isFound = savedSelectedItems?.find((item) => item.id === row.id)
 
-  const getRowAndChildren = (parent: PmsiListType) => {
-    const getChild: (subItem: PmsiListType) => PmsiListType[] = (subItem: PmsiListType) => {
+  const getRowAndChildren = (parent: any) => {
+    const getChild: (subItem: any) => any[] = (subItem: any) => {
       if (subItem?.id === 'loading') return []
 
-      return [
-        subItem,
-        ...(subItem.subItems ? subItem.subItems.map((subItem: PmsiListType) => getChild(subItem)) : [])
-      ].flat()
+      return [subItem, ...(subItem.subItems ? subItem.subItems.map((subItem: any) => getChild(subItem)) : [])].flat()
     }
 
     return [
@@ -43,12 +36,12 @@ export const getSelectedPmsi = (
       ...(parent.subItems
         ? parent.id === 'loading'
           ? []
-          : parent.subItems.map((subItem: PmsiListType) => getChild(subItem))
+          : parent.subItems.map((subItem: any) => getChild(subItem))
         : [])
     ].flat()
   }
 
-  const deleteRowAndChildren = (parent: PmsiListType) => {
+  const deleteRowAndChildren = (parent: any) => {
     const elemToDelete = getRowAndChildren(parent)
 
     savedSelectedItems = savedSelectedItems.filter((row) => !elemToDelete.some(({ id }) => id === row.id))
@@ -63,7 +56,7 @@ export const getSelectedPmsi = (
   }
 
   let _savedSelectedItems: any[] = []
-  const checkIfParentIsChecked = (rows: PmsiListType[]) => {
+  const checkIfParentIsChecked = (rows: any[]) => {
     for (let index = 0; index < rows.length; index++) {
       const row = rows[index]
       if (
@@ -76,7 +69,7 @@ export const getSelectedPmsi = (
 
       const selectedChildren = row.subItems
         ? // eslint-disable-next-line
-          row.subItems.filter((child) => savedSelectedItems.find((selectedChild) => selectedChild.id === child.id))
+          row.subItems.filter((child: { id: any }) => savedSelectedItems.find((selectedChild) => selectedChild.id === child.id))
         : []
       const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
 
@@ -239,14 +232,11 @@ export const checkIfIndeterminated: (_row: any, selectedItems: any) => boolean |
   return checkChild(_row)
 }
 export const findEquivalentRowInItemAndSubItems: (
-  item: PmsiListType,
-  rows: PmsiListType[] | undefined
-) => { equivalentRow: PmsiListType | undefined; parentsList: PmsiListType[] } = (
-  item: PmsiListType,
-  rows: PmsiListType[] | undefined
-) => {
-  let equivalentRow: PmsiListType | undefined = undefined
-  const parentsList: PmsiListType[] = []
+  item: any,
+  rows: any[] | undefined
+) => { equivalentRow: any | undefined; parentsList: any[] } = (item: any, rows: any[] | undefined) => {
+  let equivalentRow: any | undefined = undefined
+  const parentsList: any[] = []
   if (!rows) return { equivalentRow: equivalentRow, parentsList: parentsList }
   for (const row of rows) {
     if (row.id === item.id) {
@@ -267,10 +257,10 @@ export const findEquivalentRowInItemAndSubItems: (
   }
   return { equivalentRow: equivalentRow, parentsList: parentsList }
 }
-export const flatItems = (items: PmsiListType[] | undefined) => {
+export const flatItems = (items: any[] | undefined) => {
   const selectedIds: string[] | undefined = []
-  const flattedSelectedItems: PmsiListType[] | undefined = []
-  const flat = (items: PmsiListType[] | undefined) => {
+  const flattedSelectedItems: any[] | undefined = []
+  const flat = (items: any[] | undefined) => {
     if (!items) return
     items.forEach((item) => {
       if (item.id === 'loading') {

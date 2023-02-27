@@ -1,65 +1,254 @@
 import React, { useEffect, useState } from 'react'
 
-import Grid from '@material-ui/core/Grid'
-import CircularProgress from '@material-ui/core/CircularProgress'
-import IconButton from '@material-ui/core/IconButton'
-import Checkbox from '@material-ui/core/Checkbox'
-import TableRow from '@material-ui/core/TableRow'
-import TableCell from '@material-ui/core/TableCell'
-import Typography from '@material-ui/core/Typography'
-import Skeleton from '@material-ui/lab/Skeleton'
+import {
+  Breadcrumbs,
+  Checkbox,
+  CircularProgress,
+  Grid,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
+} from '@material-ui/core'
 
+import Skeleton from '@material-ui/lab/Skeleton'
 import KeyboardArrowRightIcon from '@material-ui/icons/ChevronRight'
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
 
 import EnhancedTable from 'components/ScopeTree/ScopeTreeTable'
-import { ScopeTreeRow } from 'types'
+import { ScopeTreeRow, TreeElement } from 'types'
 
-import { useAppSelector, useAppDispatch } from 'state'
-import { ScopeState, fetchScopesList, expandScopeElement } from 'state/scope'
+import { useAppDispatch, useAppSelector } from 'state'
+import { expandScopeElement, fetchScopesList, ScopeState } from 'state/scope'
 
 import displayDigit from 'utils/displayDigit'
-import { getSelectedScopes } from 'utils/scopeTree'
+import { useDebounce } from 'utils/debounce'
 
 import useStyles from './styles'
+import { findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
+import { Pagination } from '@material-ui/lab'
+import servicesPerimeters from '../../services/aphp/servicePerimeters'
+import { findSelectedInListAndSubItems } from '../../utils/cohortCreation'
+
+type ScopeTreeListItemProps = {
+  row: any
+  level: number
+  parentAccess: string
+  selectedItems: ScopeTreeRow[]
+  rootRows: ScopeTreeRow[]
+  debouncedSearchTerm: string | undefined
+  labelId: string
+  onExpand: (rowId: number) => void
+  onSelect: (row: ScopeTreeRow) => void
+  isIndeterminated: (row: any) => boolean | undefined
+  isSelected: (searchedItem: TreeElement, selectedItems: ScopeTreeRow[], allItems: ScopeTreeRow[]) => boolean
+}
+
+const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
+  const {
+    row,
+    level,
+    parentAccess,
+    selectedItems,
+    rootRows,
+    debouncedSearchTerm,
+    labelId,
+    onExpand,
+    onSelect,
+    isIndeterminated,
+    isSelected
+  } = props
+
+  const classes = useStyles()
+  const { scopeState } = useAppSelector<{
+    scopeState: ScopeState
+  }>((state) => ({
+    scopeState: state.scope || {}
+  }))
+
+  const { openPopulation = [] } = scopeState
+
+  return (
+    <>
+      {row.id === 'loading' ? (
+        <TableRow hover key={Math.random()}>
+          <TableCell colSpan={5}>
+            <Skeleton animation="wave" />
+          </TableCell>
+        </TableRow>
+      ) : (
+        <TableRow
+          hover
+          key={row.id}
+          classes={{
+            root: level % 2 === 0 ? classes.mainRow : classes.secondRow
+          }}
+        >
+          <TableCell>
+            {row.subItems && row.subItems.length > 0 && (
+              <IconButton
+                onClick={() => onExpand(row.id)}
+                style={{ marginLeft: level * 35, padding: 0, marginRight: -30 }}
+              >
+                {openPopulation.find((id) => row.id === id) ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+              </IconButton>
+            )}
+          </TableCell>
+
+          <TableCell align="center" padding="checkbox">
+            <Checkbox
+              color="secondary"
+              onClick={() => {
+                onSelect(row)
+              }}
+              indeterminate={isIndeterminated(row)}
+              checked={isSelected(row, selectedItems, rootRows) ? true : false}
+              inputProps={{ 'aria-labelledby': labelId }}
+            />
+          </TableCell>
+
+          <TableCell>
+            {debouncedSearchTerm && row.name ? (
+              <Breadcrumbs maxItems={2}>
+                {(row.name.split('/').length > 1 ? row.name.split('/').slice(1) : row.name.split('/').slice(0)).map(
+                  (name: any, index: number) => (
+                    <Typography key={index} style={{ color: '#153D8A' }}>
+                      {name}
+                    </Typography>
+                  )
+                )}
+              </Breadcrumbs>
+            ) : (
+              <Typography>{row.name}</Typography>
+            )}
+          </TableCell>
+
+          <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
+            <Typography>{displayDigit(row.quantity)}</Typography>
+          </TableCell>
+
+          <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
+            <Typography>{row.access ?? parentAccess}</Typography>
+          </TableCell>
+        </TableRow>
+      )}
+    </>
+  )
+}
 
 type ScopeTreeProps = {
   defaultSelectedItems: ScopeTreeRow[]
   onChangeSelectedItem: (selectedItems: ScopeTreeRow[]) => void
+  searchInput?: string
 }
 
-const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSelectedItem }) => {
+const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSelectedItem, searchInput }) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
-  const [selectedItems, setSelectedItem] = useState(defaultSelectedItems)
+  const [searchLoading, setSearchLoading] = useState<boolean>(false)
+  const [isEmpty, setIsEmpty] = useState<boolean>(false)
 
   const { scopeState } = useAppSelector<{
     scopeState: ScopeState
   }>((state) => ({
     scopeState: state.scope || {}
   }))
-  const { loading = false, openPopulation = [], scopesList = [] } = scopeState
+
+  const { scopesList = [] } = scopeState
+  const [openPopulation, setOpenPopulations] = useState<any[]>(scopeState.openPopulation)
+  const [rootRows, setRootRows] = useState<ScopeTreeRow[]>(scopesList)
+  const [selectedItems, setSelectedItem] = useState<any>(
+    defaultSelectedItems.map((item) => findEquivalentRowInItemAndSubItems(item, rootRows).equivalentRow ?? item)
+  )
+  const debouncedSearchTerm = useDebounce(700, searchInput)
+  const [page, setPage] = useState(1)
+  const [count, setCount] = useState(0)
+  const [isAllSelected, setIsAllSelected] = useState(false)
 
   const fetchScopeTree = async () => {
     dispatch<any>(fetchScopesList())
   }
 
-  useEffect(() => {
-    fetchScopeTree()
-  }, [])
+  const _init = async () => {
+    setSearchLoading(true)
+    await fetchScopeTree()
+    setRootRows(scopesList)
+    setSearchLoading(false)
+    setIsEmpty(false)
+  }
 
-  useEffect(() => setSelectedItem(defaultSelectedItems), [defaultSelectedItems])
+  const _searchInPerimeters = async (_isAllSelected?: boolean) => {
+    setSearchLoading(true)
+    const { scopeTreeRows: newPerimetersList, count: newCount } = await servicesPerimeters.findScope(searchInput, page)
+    if (!newPerimetersList || newPerimetersList.length < 1) {
+      setIsEmpty(true)
+    }
+    if (_isAllSelected) {
+      const _newSelectedItems = [...selectedItems, ...newPerimetersList]
+      onChangeSelectedItem(_newSelectedItems)
+    }
+    setRootRows(newPerimetersList)
+    setCount(newCount)
+    setSearchLoading(false)
+    return newPerimetersList
+  }
+
+  useEffect(() => {
+    if (debouncedSearchTerm) {
+      onChangeSelectedItem([])
+      setIsAllSelected(false)
+      _searchInPerimeters(false)
+    } else if (!debouncedSearchTerm) {
+      _init()
+    }
+  }, [debouncedSearchTerm])
+
+  useEffect(() => {
+    if (debouncedSearchTerm) {
+      _searchInPerimeters(isAllSelected)
+    }
+  }, [page])
+
+  useEffect(() => {
+    const _selectedItems: TreeElement[] = defaultSelectedItems.map(
+      (item) => findEquivalentRowInItemAndSubItems(item, rootRows).equivalentRow ?? item
+    )
+    setSelectedItem(_selectedItems)
+  }, [defaultSelectedItems])
+
+  useEffect(() => {
+    setRootRows(scopesList)
+  }, [scopesList])
 
   /**
    * This function is called when a user click on chevron
    *
    */
-  const _clickToDeploy = async (rowId: number) => {
-    const expandResponse = await dispatch<any>(expandScopeElement({ rowId, selectedItems }))
-    if (expandResponse && expandResponse.payload) {
-      const _selectedItems = expandResponse.payload.selectedItems ?? []
-      onChangeSelectedItem(_selectedItems)
+  const _onExpand = async (rowId: number) => {
+    let _openPopulation = openPopulation ? openPopulation : []
+    let _rootRows = rootRows ? [...rootRows] : []
+    const index = _openPopulation.indexOf(rowId)
+
+    if (index !== -1) {
+      _openPopulation = _openPopulation.filter((perimeter_id) => perimeter_id !== rowId)
+      setOpenPopulations(_openPopulation)
+    } else {
+      _openPopulation = [..._openPopulation, rowId]
+      setOpenPopulations(_openPopulation)
+
+      const expandResponse = await dispatch<any>(expandScopeElement({ rowId, selectedItems }))
+      if (expandResponse && expandResponse.payload) {
+        const _selectedItems = expandResponse.payload.selectedItems ?? []
+        _rootRows = expandResponse.payload.rootRows ?? _rootRows
+        setRootRows(_rootRows)
+        onChangeSelectedItem(_selectedItems)
+      }
     }
   }
 
@@ -67,37 +256,51 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
    * This function is called when a user click on checkbox
    *
    */
-  const _clickToSelect = (row: ScopeTreeRow) => {
-    const savedSelectedItems: ScopeTreeRow[] = getSelectedScopes(row, selectedItems, scopesList)
+  const isSelected = (searchedItem: TreeElement, selectedItems: TreeElement[], allItems: TreeElement[] = rootRows) => {
+    selectedItems = selectedItems.map(
+      (item) => findEquivalentRowInItemAndSubItems(item, allItems).equivalentRow ?? item
+    )
+    return findSelectedInListAndSubItems(selectedItems, searchedItem, allItems)
+  }
+  const _onSelect = (row: ScopeTreeRow) => {
+    const savedSelectedItems: any[] = getSelectedPmsi(row, selectedItems, scopesList)
 
     onChangeSelectedItem(savedSelectedItems)
     return savedSelectedItems
   }
 
-  const _clickToSelectAll = () => {
+  const _onSelectAll = () => {
     let results: any[] = []
-    if (
-      scopesList.filter((row) => selectedItems.find(({ id }) => id === row.id) !== undefined).length ===
+    const newIsAllSelected = !isAllSelected
+    setIsAllSelected(newIsAllSelected)
+    if (debouncedSearchTerm) {
+      if (newIsAllSelected) {
+        results = rootRows
+      } else {
+        results = []
+      }
+    } else if (
+      scopesList.filter((row) => selectedItems.find((item: { id: any }) => item.id === row.id) !== undefined).length ===
       scopesList.length
     ) {
       results = []
     } else {
       for (const rootRow of scopesList) {
-        const rowsAndChildren = _clickToSelect(rootRow)
+        const rowsAndChildren = _onSelect(rootRow)
         results = [...results, ...rowsAndChildren]
       }
     }
     onChangeSelectedItem(results)
   }
 
-  const _checkIfIndeterminated: (_row: any) => boolean | undefined = (_row) => {
+  const _isIndeterminated: (_row: any) => boolean | undefined = (_row) => {
     // Si que un loading => false
     if (_row.subItems && _row.subItems.length > 0 && _row.subItems[0].id === 'loading') {
       return false
     }
     const checkChild: (item: any) => boolean = (item) => {
       const numberOfSubItemsSelected = item.subItems?.filter((subItem: any) =>
-        selectedItems.find(({ id }) => id === subItem.id)
+        selectedItems.find((item: { id: any }) => item.id === subItem.id)
       )?.length
 
       if (numberOfSubItemsSelected && numberOfSubItemsSelected !== item.subItems.length) {
@@ -130,11 +333,19 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
         <div style={{ padding: '0 0 0 4px' }}>
           <Checkbox
             color="secondary"
-            checked={
-              scopesList.filter((row) => selectedItems.find(({ id }) => id === row.id) !== undefined).length ===
-              scopesList.length
+            indeterminate={
+              !isAllSelected &&
+              selectedItems &&
+              selectedItems.length > 0 &&
+              rootRows &&
+              selectedItems.length !== rootRows.length
             }
-            onClick={_clickToSelectAll}
+            checked={
+              isAllSelected ||
+              scopesList.filter((row) => selectedItems.find((item: { id: any }) => item.id === row.id) !== undefined)
+                .length === scopesList.length
+            }
+            onClick={_onSelectAll}
           />
         </div>
       )
@@ -146,94 +357,93 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
 
   return (
     <div className={classes.container}>
-      {loading && scopesList.length === 0 ? (
+      {searchLoading ? (
         <Grid container justifyContent="center">
           <CircularProgress size={50} />
         </Grid>
       ) : (
-        <EnhancedTable noCheckbox noPagination rows={scopesList} headCells={headCells}>
-          {(row: any, index: number) => {
-            if (!row) return <></>
-            const labelId = `enhanced-table-checkbox-${index}`
-
-            const _displayLine = (_row: any, level: number, parentAccess: string) => (
-              <>
-                {_row.id === 'loading' ? (
-                  <TableRow hover key={Math.random()}>
-                    <TableCell colSpan={5}>
-                      <Skeleton animation="wave" />
+        <>
+          {isEmpty ? (
+            <TableContainer component={Paper}>
+              <Table className={classes.table}>
+                <TableHead>
+                  <TableRow className={classes.tableHead}>
+                    <TableCell align="center" className={classes.tableHeadCell} />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell colSpan={7}>
+                      <Typography className={classes.loadingSpinnerContainer}>Aucun résultat à afficher</Typography>
                     </TableCell>
                   </TableRow>
-                ) : (
-                  <TableRow
-                    hover
-                    key={_row.id}
-                    classes={{
-                      root: level % 2 === 0 ? classes.mainRow : classes.secondRow
-                    }}
-                  >
-                    <TableCell>
-                      {_row.subItems && _row.subItems.length > 0 && (
-                        <IconButton
-                          onClick={() => _clickToDeploy(_row.id)}
-                          style={{ marginLeft: level * 35, padding: 0, marginRight: -30 }}
-                        >
-                          {openPopulation.find((id) => _row.id === id) ? (
-                            <KeyboardArrowDownIcon />
-                          ) : (
-                            <KeyboardArrowRightIcon />
-                          )}
-                        </IconButton>
-                      )}
-                    </TableCell>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <>
+              <EnhancedTable noCheckbox noPagination rows={rootRows} headCells={headCells}>
+                {(row: any, index: number) => {
+                  if (!row) return <></>
+                  const labelId = `enhanced-table-checkbox-${index}`
 
-                    <TableCell align="center" padding="checkbox">
-                      <Checkbox
-                        color="secondary"
-                        onClick={() => _clickToSelect(_row)}
-                        indeterminate={_checkIfIndeterminated(_row)}
-                        checked={selectedItems.some(({ id }) => id === _row.id) ? true : false}
-                        inputProps={{ 'aria-labelledby': labelId }}
+                  const _displayChildren = (_row: any, level: number, parentAccess: string) => {
+                    return (
+                      <React.Fragment key={Math.random()}>
+                        <ScopeTreeListItem
+                          row={_row}
+                          level={level}
+                          parentAccess={parentAccess}
+                          selectedItems={selectedItems}
+                          rootRows={rootRows}
+                          debouncedSearchTerm={debouncedSearchTerm}
+                          labelId={labelId}
+                          onExpand={_onExpand}
+                          onSelect={_onSelect}
+                          isIndeterminated={_isIndeterminated}
+                          isSelected={isSelected}
+                        />
+                        {openPopulation.find((id) => _row.id === id) &&
+                          _row.subItems &&
+                          _row.subItems.map((subItem: any) => _displayChildren(subItem, level + 1, parentAccess))}
+                      </React.Fragment>
+                    )
+                  }
+
+                  return (
+                    <React.Fragment key={Math.random()}>
+                      <ScopeTreeListItem
+                        row={row}
+                        level={0}
+                        parentAccess={row.access}
+                        selectedItems={selectedItems}
+                        rootRows={rootRows}
+                        debouncedSearchTerm={debouncedSearchTerm}
+                        labelId={labelId}
+                        onExpand={_onExpand}
+                        onSelect={_onSelect}
+                        isIndeterminated={_isIndeterminated}
+                        isSelected={isSelected}
                       />
-                    </TableCell>
-
-                    <TableCell style={{ cursor: 'pointer' }} onClick={() => _clickToSelect(_row)}>
-                      <Typography>{_row.name}</Typography>
-                    </TableCell>
-
-                    <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => _clickToSelect(_row)}>
-                      <Typography>{displayDigit(_row.quantity)}</Typography>
-                    </TableCell>
-
-                    <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => _clickToSelect(_row)}>
-                      <Typography>{_row.access ?? parentAccess}</Typography>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </>
-            )
-
-            const _displayChildren = (_row: any, level: number, parentAccess: string) => {
-              return (
-                <React.Fragment key={Math.random()}>
-                  {_displayLine(_row, level, parentAccess)}
-                  {openPopulation.find((id) => _row.id === id) &&
-                    _row.subItems &&
-                    _row.subItems.map((subItem: any) => _displayChildren(subItem, level + 1, parentAccess))}
-                </React.Fragment>
-              )
-            }
-
-            return (
-              <React.Fragment key={Math.random()}>
-                {_displayLine(row, 0, row.access)}
-                {openPopulation.find((id) => row.id === id) &&
-                  row.subItems &&
-                  row.subItems.map((subItem: any) => _displayChildren(subItem, 1, row.access))}
-              </React.Fragment>
-            )
-          }}
-        </EnhancedTable>
+                      {openPopulation.find((id) => row.id === id) &&
+                        row.subItems &&
+                        row.subItems.map((subItem: any) => {
+                          return _displayChildren(subItem, 1, row.access)
+                        })}
+                    </React.Fragment>
+                  )
+                }}
+              </EnhancedTable>
+            </>
+          )}
+          <Pagination
+            className={classes.pagination}
+            count={Math.ceil((count ?? 0) / 100)}
+            shape="rounded"
+            onChange={(event, page: number) => setPage && setPage(page)}
+            page={page}
+          />
+        </>
       )}
     </div>
   )
