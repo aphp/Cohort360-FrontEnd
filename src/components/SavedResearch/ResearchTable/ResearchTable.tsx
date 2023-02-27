@@ -281,7 +281,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                         </IconButton>
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} align="center">
-                        {row.fhir_group_id ? (
+                        {row.request_job_status === 'finished' ? (
                           <Chip label="Terminé" size="small" style={{ backgroundColor: '#28a745', color: 'white' }} />
                         ) : row.request_job_status === 'pending' || row.request_job_status === 'started' ? (
                           <Chip label="En cours" size="small" style={{ backgroundColor: '#ffc107', color: 'black' }} />
