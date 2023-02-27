@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import moment from 'moment'
 
 import {
   Avatar,
@@ -58,6 +59,7 @@ const TemporalConstraintConfig: React.FC<{
   const [maxTimeMeasurement, setMaxTimeMeasurement] = useState<string>('days')
 
   const [noSelectedConstraintError, setNoSelectedConstraintError] = useState<boolean>(false)
+  const [incorrectTimingError, setIncorrectTimingError] = useState<boolean>(false)
 
   const mainGroupCriteriaIds = criteriaGroup[0].criteriaIds
   const mainGroupCriteria = selectedCriteria.filter((criteria) => mainGroupCriteriaIds.includes(criteria.id))
@@ -96,6 +98,21 @@ const TemporalConstraintConfig: React.FC<{
       onChangeNewConstraintsList([...newConstraintsList, newConstraint])
     }
   }
+
+  useEffect(() => {
+    if (isFirstTimeValueChecked && isSecondTimeValueChecked) {
+      //@ts-ignore
+      const minDuration = moment.duration(minTime, minTimeMeasurement).asHours()
+      //@ts-ignore
+      const maxDuration = moment.duration(maxTime, maxTimeMeasurement).asHours()
+
+      if (minDuration > maxDuration) {
+        setIncorrectTimingError(true)
+      } else {
+        setIncorrectTimingError(false)
+      }
+    }
+  }, [isFirstTimeValueChecked, minTime, minTimeMeasurement, isSecondTimeValueChecked, maxTime, maxTimeMeasurement])
 
   return (
     <Grid
@@ -164,10 +181,8 @@ const TemporalConstraintConfig: React.FC<{
           onChange={() => setIsFirstTimeValueChecked(!isFirstTimeValueChecked)}
         />
         <Typography style={{ fontWeight: 700 }}>plus de </Typography>
-        {/** TODO: Faire la gestion d'erreur si le select est a null mettre le champ en rouge demandant a selectionner une unite */}
-        {/** TODO: le champ input ne peux pas etre superieur au deuxieme champ d'input */}
         <InputBase
-          className={classes.input}
+          classes={{ root: classes.input, error: classes.inputError }}
           disabled={!isFirstTimeValueChecked}
           type="number"
           value={minTime}
@@ -175,23 +190,28 @@ const TemporalConstraintConfig: React.FC<{
           inputProps={{
             min: 1
           }}
+          error={incorrectTimingError}
         />
-        <Select disabled={!isFirstTimeValueChecked} value={minTimeMeasurement} onChange={onChangeMinTimeMeasurement}>
+        <Select
+          disabled={!isFirstTimeValueChecked}
+          value={minTimeMeasurement}
+          onChange={onChangeMinTimeMeasurement}
+          error={incorrectTimingError}
+        >
           {timeMeasurements.map((timeMeasurement, index) => (
             <MenuItem key={index} value={timeMeasurement.id}>
               {timeMeasurement.display}
             </MenuItem>
           ))}
         </Select>
+
         <Checkbox
           value={isSecondTimeValueChecked}
           onChange={() => setIsSecondTimeValueChecked(!isSecondTimeValueChecked)}
         />
         <Typography style={{ fontWeight: 700 }}>moins de</Typography>
-        {/** TODO: Faire la gestion d'erreur si le select est a null mettre le champ en rouge demandant a selectionner une unite */}
-        {/** TODO: le champ input ne peux pas etre inferieur au premier champ d'input */}
         <InputBase
-          className={classes.input}
+          classes={{ root: classes.input, error: classes.inputError }}
           disabled={!isSecondTimeValueChecked}
           type="number"
           value={maxTime}
@@ -199,8 +219,14 @@ const TemporalConstraintConfig: React.FC<{
           inputProps={{
             min: 1
           }}
+          error={incorrectTimingError}
         />
-        <Select disabled={!isSecondTimeValueChecked} value={maxTimeMeasurement} onChange={onChangeMaxTimeMeasurement}>
+        <Select
+          disabled={!isSecondTimeValueChecked}
+          value={maxTimeMeasurement}
+          onChange={onChangeMaxTimeMeasurement}
+          error={incorrectTimingError}
+        >
           {timeMeasurements.map((timeMeasurement, index) => (
             <MenuItem key={index} value={timeMeasurement.id}>
               {timeMeasurement.display}
@@ -208,7 +234,12 @@ const TemporalConstraintConfig: React.FC<{
           ))}
         </Select>
       </Grid>
-      <Button className={classes.button} onClick={onConfirm}>
+      {incorrectTimingError && (
+        <Typography align="center" style={{ color: '#F44336', fontSize: 12, width: '100%', margin: 4 }}>
+          La valeur minimale ne peut pas être supérieure à la valeur maximale.
+        </Typography>
+      )}
+      <Button className={classes.button} onClick={onConfirm} disabled={incorrectTimingError}>
         Ajouter critère
       </Button>
     </Grid>

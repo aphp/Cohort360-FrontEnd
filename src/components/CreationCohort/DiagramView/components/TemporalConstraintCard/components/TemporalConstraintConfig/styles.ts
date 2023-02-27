@@ -30,6 +30,9 @@ const useStyles = makeStyles(() => ({
   flexBaseline: {
     display: 'flex',
     alignItems: 'baseline'
+  },
+  inputError: {
+    border: '1px solid red'
   }
 }))
 

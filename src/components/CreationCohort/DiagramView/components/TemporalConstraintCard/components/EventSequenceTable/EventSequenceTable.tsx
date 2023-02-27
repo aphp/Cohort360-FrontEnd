@@ -35,11 +35,11 @@ const columns = [
     code: 'secondCriteria'
   },
   {
-    label: 'de moins de',
+    label: 'de plus de',
     code: 'minDuration'
   },
   {
-    label: 'de plus de',
+    label: 'de moins de',
     code: 'maxDuration'
   },
   {
@@ -68,15 +68,15 @@ const EventSequenceTable: React.FC<{ temporalConstraints: TemporalConstraintsTyp
   const durationMeasurementInFrench = (key: any) => {
     let keyInFrench
     if (key === 'days') {
-      keyInFrench = 'jours'
+      keyInFrench = 'jour(s)'
     } else if (key === 'weeks') {
-      keyInFrench = 'semaines'
+      keyInFrench = 'semaine(s)'
     } else if (key === 'months') {
       keyInFrench = 'mois'
     } else if (key === 'years') {
-      keyInFrench = 'ans'
+      keyInFrench = 'an(s)'
     } else if (key === 'hours') {
-      keyInFrench = 'heures'
+      keyInFrench = 'heure(s)'
     }
     return keyInFrench
   }
