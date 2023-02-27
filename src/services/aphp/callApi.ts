@@ -1,6 +1,6 @@
 import apiFhir from '../apiFhir'
 
-import { CohortComposition, FHIR_API_Response } from 'types'
+import { CohortComposition, FHIR_API_Response, IScope } from 'types'
 import {
   IBinary,
   IClaim,
@@ -11,12 +11,13 @@ import {
   IMedicationAdministration,
   IMedicationRequest,
   IObservation,
-  IOrganization,
   IPatient,
   IPractitioner,
   IPractitionerRole,
   IProcedure
 } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { AxiosResponse } from 'axios'
+import apiBackend from '../apiBackend'
 
 const reducer = (accumulator: any, currentValue: any) =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -25,34 +26,6 @@ const optionsReducer = (accumulator: any, currentValue: any) =>
 
 const uniq = (item: any, index: number, array: any[]) => array.indexOf(item) === index && item
 
-/**
- * Organization Resource
- *
- */
-
-type fetchOrganizationProps = {
-  _id?: string
-  partof?: string
-  _elements: ('name' | 'extension' | 'alias')[]
-}
-export const fetchOrganization = async (args: fetchOrganizationProps) => {
-  const { _id, partof } = args
-  let { _elements } = args
-
-  _elements = _elements ? _elements.filter(uniq) : []
-
-  let options: string[] = []
-  if (_id)                                         options = [...options, `_id=${_id}`]                                                         // eslint-disable-line
-  if (partof)                                      options = [...options, `partof=${partof}`]                                                   // eslint-disable-line
-
-  if (_elements && _elements.length > 0)           options = [...options, `_elements=${_elements.reduce(reducer)}`]                             // eslint-disable-line
-
-  const response = await apiFhir.get<FHIR_API_Response<IOrganization>>(
-    `/Organization?${options.reduce(optionsReducer)}`
-  )
-
-  return response
-}
 /**
  * Group Resource
  *
@@ -630,5 +603,22 @@ export const fetchMedicationAdministration = async (args: fetchMedicationAdminis
     `/MedicationAdministration?${options.reduce(optionsReducer)}`
   )
 
+  return response
+}
+
+type fetchScopeProps = {
+  perimetersIds?: string[]
+  cohortIds?: string[]
+}
+export const fetchScope: (args: fetchScopeProps) => Promise<AxiosResponse<IScope | unknown>> = async (
+  args: fetchScopeProps
+) => {
+  const { perimetersIds, cohortIds } = args
+
+  let options: string[] = []
+  if (perimetersIds && perimetersIds.length > 0) options = [...options, `local_id=${perimetersIds.join(',')}`] // eslint-disable-line
+  if (cohortIds && cohortIds.length > 0) options = [...options, `cohort_id=${cohortIds.join(',')}`] // eslint-disable-line
+
+  const response: AxiosResponse<IScope | unknown> = await apiBackend.get(`accesses/perimeters/read-patient/?${options}`)
   return response
 }

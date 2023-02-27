@@ -10,12 +10,12 @@ import {
   ENCOUNTER_PROVENANCE,
   ENCOUNTER_ADMISSION
 } from '../../../constants'
-import apiRequest from 'services/apiRequest'
+import apiFhir from 'services/apiFhir'
 import { cleanValueSet } from 'utils/cleanValueSet'
 
 export const fetchAdmissionModes = async () => {
   try {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_ADMISSION_MODE}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${ENCOUNTER_ADMISSION_MODE}`)
     const data =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
@@ -29,7 +29,7 @@ export const fetchAdmissionModes = async () => {
 
 export const fetchEntryModes = async () => {
   try {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_ENTRY_MODE}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${ENCOUNTER_ENTRY_MODE}`)
     const data =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
@@ -43,7 +43,7 @@ export const fetchEntryModes = async () => {
 
 export const fetchExitModes = async () => {
   try {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_EXIT_MODE}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${ENCOUNTER_EXIT_MODE}`)
     const data =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
@@ -57,7 +57,7 @@ export const fetchExitModes = async () => {
 
 export const fetchPriseEnChargeType = async () => {
   try {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_VISIT_TYPE}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${ENCOUNTER_VISIT_TYPE}`)
     const data =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
@@ -77,7 +77,7 @@ export const fetchPriseEnChargeType = async () => {
 
 export const fetchTypeDeSejour = async () => {
   try {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_SEJOUR_TYPE}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${ENCOUNTER_SEJOUR_TYPE}`)
     const data =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
@@ -91,7 +91,7 @@ export const fetchTypeDeSejour = async () => {
 
 export const fetchFileStatus = async () => {
   try {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_FILE_STATUS}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${ENCOUNTER_FILE_STATUS}`)
     const data =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
@@ -105,7 +105,7 @@ export const fetchFileStatus = async () => {
 
 export const fetchReason = async () => {
   try {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_EXIT_TYPE}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${ENCOUNTER_EXIT_TYPE}`)
     const data =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
@@ -119,7 +119,7 @@ export const fetchReason = async () => {
 
 export const fetchDestination = async () => {
   try {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_DESTINATION}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${ENCOUNTER_DESTINATION}`)
     const data =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
@@ -133,7 +133,7 @@ export const fetchDestination = async () => {
 
 export const fetchProvenance = async () => {
   try {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_PROVENANCE}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${ENCOUNTER_PROVENANCE}`)
     const data =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept
@@ -147,7 +147,7 @@ export const fetchProvenance = async () => {
 
 export const fetchAdmission = async () => {
   try {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${ENCOUNTER_ADMISSION}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${ENCOUNTER_ADMISSION}`)
     const data =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept

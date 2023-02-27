@@ -1,7 +1,7 @@
 import moment from 'moment'
 
 import services from 'services/aphp'
-import { ScopeTreeRow, SelectedCriteriaType, CriteriaGroupType, TemporalConstraintsType, DocType } from 'types'
+import { CriteriaGroupType, DocType, ScopeTreeRow, SelectedCriteriaType, TemporalConstraintsType } from 'types'
 
 import { docTypes } from 'assets/docTypes.json'
 
@@ -598,15 +598,7 @@ export function buildRequest(
     _type: 'request',
     sourcePopulation: {
       caresiteCohortList: selectedPopulation
-        ?.map((_selectedPopulation: any) =>
-          _selectedPopulation.extension
-            ? (
-                _selectedPopulation.extension.find((extension: any) => extension.url === 'cohort-id') ?? {
-                  valueInteger: null
-                }
-              ).valueInteger
-            : null
-        )
+        ?.map((_selectedPopulation: any) => _selectedPopulation.cohort_id)
         .filter((item) => !!item && item !== 'loading')
     },
     request: !mainCriteriaGroups
@@ -1593,6 +1585,13 @@ export const getDataFromFetch = async (
               oldCriterion?.data?.[dataKey] === 'loading'
             ) {
               _criterion.data[dataKey] = await _criterion.fetch[fetchKey]()
+            } else if (
+              oldCriterion &&
+              oldCriterion?.data &&
+              oldCriterion?.data?.[dataKey] &&
+              oldCriterion?.data?.[dataKey] !== 'loading'
+            ) {
+              _criterion.data[dataKey] = oldCriterion.data[dataKey]
             }
             break
         }
@@ -1665,4 +1664,43 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
     criteria,
     criteriaGroup
   }
+}
+export const findSelectedInListAndSubItems = (
+  selectedItems: any[],
+  searchedItem: any,
+  pmsiHierarchy: any[]
+): boolean => {
+  if (!searchedItem || !selectedItems || selectedItems.length === 0) return false
+  selectedItems = selectedItems?.filter(({ id }) => id !== 'loading')
+  const foundItem = selectedItems.find((selectedItem) => {
+    if (selectedItem.id === searchedItem.id || selectedItem.id == '*') {
+      return true
+    }
+    return selectedItem.subItems
+      ? findSelectedInListAndSubItems(selectedItem.subItems, searchedItem, pmsiHierarchy)
+      : false
+  })
+  if (foundItem) {
+    return true
+  }
+  if (
+    searchedItem.subItems &&
+    searchedItem.subItems.length > 0 &&
+    !(searchedItem.subItems.length === 1 && searchedItem.subItems[0].id === 'loading')
+  ) {
+    const numberOfSubItemsSelected = searchedItem.subItems?.filter((searchedSubItem: any) =>
+      selectedItems.find((selectedItem) => selectedItem.id === searchedSubItem.id)
+    )?.length
+    if (searchedItem.subItems?.length === numberOfSubItemsSelected) {
+      return true
+    }
+    const isSingleItemNotSelected = (searchedItem.subItems?.length ?? 0 - (numberOfSubItemsSelected ?? 0)) === 1
+    if (numberOfSubItemsSelected && isSingleItemNotSelected) {
+      const singleItemNotSelected = searchedItem.subItems?.find((searchedSubItem: any) =>
+        selectedItems.find((selectedItem) => selectedItem.id !== searchedSubItem.id)
+      )
+      return findSelectedInListAndSubItems(selectedItems, singleItemNotSelected, pmsiHierarchy)
+    }
+  }
+  return false
 }

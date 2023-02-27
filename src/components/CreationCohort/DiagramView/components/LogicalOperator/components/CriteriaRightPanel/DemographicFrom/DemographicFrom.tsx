@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { Alert } from '@material-ui/lab'
 import { Button, Divider, FormLabel, Grid, IconButton, Typography, TextField, Switch, Slider } from '@material-ui/core'
@@ -34,6 +34,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
   const classes = useStyles()
 
   const [error, setError] = useState(false)
+  const [ageError, setAgeError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const isEdition = selectedCriteria !== null ? true : false
@@ -90,6 +91,14 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
           }
         })
       : []
+
+  useEffect(() => {
+    if (!Number.isInteger(defaultValues.years[0]) || !Number.isInteger(defaultValues.years[1])) {
+      setAgeError(true)
+    } else {
+      setAgeError(false)
+    }
+  }, [defaultValues.years])
 
   return (
     <Grid className={classes.root}>
@@ -200,6 +209,8 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
                         defaultValues.years[1]
                       ])
                     }
+                    error={!Number.isInteger(defaultValues.years[0])}
+                    helperText={!Number.isInteger(defaultValues.years[0]) && 'Pas de valeur décimale autorisée.'}
                   />
                 </Grid>
                 <Grid item>
@@ -212,6 +223,8 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
                         +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : defaultValues.years[1]
                       ])
                     }
+                    error={!Number.isInteger(defaultValues.years[1])}
+                    helperText={!Number.isInteger(defaultValues.years[1]) && 'Pas de valeur décimale autorisée.'}
                   />
                 </Grid>
               </Grid>
@@ -240,7 +253,14 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="demographic-form" color="primary" variant="contained">
+          <Button
+            onClick={_onSubmit}
+            type="submit"
+            form="demographic-form"
+            color="primary"
+            variant="contained"
+            disabled={ageError}
+          >
             Confirmer
           </Button>
         </Grid>

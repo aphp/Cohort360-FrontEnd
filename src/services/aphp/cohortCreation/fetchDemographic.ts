@@ -1,10 +1,10 @@
 import { DEMOGRAPHIC_GENDER } from '../../../constants'
-import apiRequest from 'services/apiRequest'
+import apiFhir from 'services/apiFhir'
 import { cleanValueSet } from 'utils/cleanValueSet'
 
 export const fetchGender = async () => {
   try {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${DEMOGRAPHIC_GENDER}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${DEMOGRAPHIC_GENDER}`)
     const data =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
         ? res.data.entry[0].resource?.compose?.include[0].concept

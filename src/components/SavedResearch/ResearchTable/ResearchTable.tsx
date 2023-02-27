@@ -32,6 +32,7 @@ import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
 import EditIcon from '@material-ui/icons/Edit'
 import ExportIcon from '@material-ui/icons/GetApp'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
+import UpdateIcon from '@material-ui/icons/Update'
 
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
@@ -280,10 +281,19 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                         </IconButton>
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} align="center">
-                        {row.fhir_group_id ? (
+                        {row.request_job_status === 'finished' ? (
                           <Chip label="Terminé" size="small" style={{ backgroundColor: '#28a745', color: 'white' }} />
                         ) : row.request_job_status === 'pending' || row.request_job_status === 'started' ? (
                           <Chip label="En cours" size="small" style={{ backgroundColor: '#ffc107', color: 'black' }} />
+                        ) : row.request_job_status === 'long_pending' ? (
+                          <Tooltip title="Cohorte volumineuse: sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.">
+                            <Chip
+                              label="En cours"
+                              size="small"
+                              style={{ backgroundColor: '#ffc107', color: 'black' }}
+                              icon={<UpdateIcon />}
+                            />
+                          </Tooltip>
                         ) : row.request_job_fail_msg ? (
                           <Tooltip title={row.request_job_fail_msg}>
                             <Chip label="Erreur" size="small" style={{ backgroundColor: '#dc3545', color: 'black' }} />
@@ -324,7 +334,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                             justifyContent="center"
                             style={{ width: 'max-content', margin: 'auto' }}
                           >
-                            {canExportThisCohort && (
+                            {canExportThisCohort && row.exportable && (
                               <Grid item>
                                 <IconButton
                                   size="small"
@@ -336,6 +346,24 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                 >
                                   <ExportIcon />
                                 </IconButton>
+                              </Grid>
+                            )}
+                            {canExportThisCohort && !row.exportable && (
+                              <Grid item>
+                                <Tooltip title="Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé.">
+                                  <div>
+                                    <IconButton
+                                      size="small"
+                                      onClick={(event) => {
+                                        event.stopPropagation()
+                                        setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
+                                      }}
+                                      disabled={maintenanceIsActive || !row.exportable}
+                                    >
+                                      <ExportIcon />
+                                    </IconButton>
+                                  </div>
+                                </Tooltip>
                               </Grid>
                             )}
 
@@ -390,7 +418,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                             open={openMenuItem && row.uuid === selectedCohort?.uuid}
                             onClose={() => setAnchorEl(null)}
                           >
-                            {canExportThisCohort && (
+                            {canExportThisCohort && row.exportable && (
                               <MenuItem
                                 className={classes.menuItem}
                                 onClick={(event) => {
@@ -402,6 +430,25 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                               >
                                 <ExportIcon /> Exporter
                               </MenuItem>
+                            )}
+                            {canExportThisCohort && !row.exportable && (
+                              <Tooltip title="Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé.">
+                                <span>
+                                  <MenuItem
+                                    className={classes.menuItem}
+                                    onClick={(event) => {
+                                      event.stopPropagation()
+                                      setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
+                                      setAnchorEl(null)
+                                    }}
+                                    disabled={maintenanceIsActive || !row.exportable}
+                                  >
+                                    <>
+                                      <ExportIcon /> Exporter
+                                    </>
+                                  </MenuItem>
+                                </span>
+                              </Tooltip>
                             )}
                             <MenuItem
                               className={classes.menuItem}

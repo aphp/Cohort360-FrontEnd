@@ -4,14 +4,13 @@ Dans le dossier `src` présent à la racine du projet, vous allez trouver un dos
 
 ### Différentes API:
 
-Au départ du dossier de services, vous trouverez 4 fichiers TypeScript `apiBackend.ts`, `apiFhir.ts`, `apiPortail.ts`, `apiRequest.ts`.
+Au départ du dossier de services, vous trouverez 2 fichiers TypeScript `apiBackend.ts`, `apiFhir.ts`
 Ces fichiers servent à faire le lien avec différents services et à régler les `Headers` et créer des `Interceptors`.
 
 | Fichier       | Fonctionnalités                                                                                           | Variable d'environnement lié à l'URL |
 |---------------|-----------------------------------------------------------------------------------------------------------|--------------------------------------|
 | apiBackend.ts | Permet le lien avec `cohort-back`                                                                         | `BACK_API_URL`                       |
 | apiFhir.ts    | Permet le lien avec `FHIR`                                                                                | `FHIR_API_URL`                       |
-| apiRequest.ts | Permet le lien avec `FHIR` (uniquement pour les `ValueSet` présents dans la partie `Création de requête`) | `REQUEST_API_URL`                    |
 
 ### Point d'entrée :
 

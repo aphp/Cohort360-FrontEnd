@@ -68,7 +68,7 @@ const PatientList: React.FC<PatientListProps> = ({
   })
 
   const [order, setOrder] = useState<Order>({
-    orderBy: 'given',
+    orderBy: 'family',
     orderDirection: 'asc'
   })
 
@@ -173,6 +173,7 @@ const PatientList: React.FC<PatientListProps> = ({
 
         {/* <Grid id="patient-data-grid" container item justifyContent="flex-end" className={classes.tableGrid}> */}
         <DataTableTopBar
+          loading={loadingStatus}
           results={patientsResult}
           searchBar={
             deidentified
