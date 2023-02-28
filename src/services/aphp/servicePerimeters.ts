@@ -99,11 +99,23 @@ export interface IServicePerimeters {
    * effectuer une recherche textuelle dans la liste des périmètres
    * @param page : le numéro de la page qu'on veut récupérer, par défaut c'est la 1ière page.
    */
-  findScope: (
-    searchInput: string | undefined,
-    page?: number | undefined,
-    config?: { signal: AbortSignal }
-  ) => Promise<any>
+  findScope: (searchInput: string | undefined, page?: number | undefined, signal?: AbortSignal) => Promise<any>
+  /**
+   * construire une liste de ScopeTreeRow à travers une liste de ScopePage
+   */
+  buildScopeTreeRow: (subScopes: ScopePage[], getSubItem?: boolean | undefined) => Promise<ScopeTreeRow[]>
+
+  /**
+   * à travers un ScopePage on retourne 'Nominatif' ou 'Pseudonymisé' selon les droits d'accès
+   * @param perimeterItem
+   */
+  getAccessFromScope: (perimeterItem: ScopePage) => string
+
+  /**
+   * constuire le nom du périmètre à travers l'id, le nom et la source_value
+   * @param perimeter
+   */
+  getScopeName: (perimeter: any) => string
 }
 
 const servicesPerimeters: IServicePerimeters = {
@@ -196,7 +208,7 @@ const servicesPerimeters: IServicePerimeters = {
     try {
       if (!cohortId) return undefined
       const scopeItemList: ScopePage[] = (await servicesPerimeters.getPerimeters(undefined, [cohortId], true)) ?? []
-      const scopeTreeRowList: ScopeTreeRow[] = await buildScopeTreeRow(scopeItemList)
+      const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(scopeItemList)
       return scopeTreeRowList && scopeTreeRowList.length > 0 ? scopeTreeRowList[0] : undefined
     } catch (error) {
       return undefined
@@ -259,14 +271,14 @@ const servicesPerimeters: IServicePerimeters = {
     if (!practitionerId) return []
 
     const scopeItemList: ScopePage[] = (await servicesPerimeters.getPerimeters()) ?? []
-    const scopeTreeRowList: ScopeTreeRow[] = await buildScopeTreeRow(scopeItemList)
+    const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(scopeItemList)
     return scopeTreeRowList
   },
 
   getScopeSubItems: async (subScopesIds: string | null | undefined, getSubItem?: boolean) => {
     if (!subScopesIds) return []
     const subScopes: ScopePage[] = await servicesPerimeters.getPerimeters(subScopesIds.trim().split(','))
-    const scopeRowList: ScopeTreeRow[] = await buildScopeTreeRow(subScopes, getSubItem)
+    const scopeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(subScopes, getSubItem)
     return scopeRowList
   },
 
@@ -306,7 +318,8 @@ const servicesPerimeters: IServicePerimeters = {
       }
     })
   },
-  findScope: async (searchInput: string | undefined, page?: number | undefined, config?: { signal: AbortSignal }) => {
+
+  findScope: async (searchInput: string | undefined, page?: number | undefined, signal?: AbortSignal) => {
     let result: { scopeTreeRows: ScopeTreeRow[]; count: 0 } = { scopeTreeRows: [], count: 0 }
     if (!searchInput) {
       return result
@@ -314,49 +327,50 @@ const servicesPerimeters: IServicePerimeters = {
     const pageParam = page && page > 1 ? '&page=' + page : ''
     const backCohortResponse: any = await apiBackend.get(
       `accesses/perimeters/read-patient/?search=${searchInput}${pageParam}`,
-      config
+      { signal: signal }
     )
     if (backCohortResponse && backCohortResponse.data && backCohortResponse.data.results) {
-      const newPerimetersList: ScopeTreeRow[] = await buildScopeTreeRow(backCohortResponse.data.results)
+      const newPerimetersList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(
+        backCohortResponse.data.results
+      )
       result = { scopeTreeRows: newPerimetersList, count: backCohortResponse.data.count }
     }
     return result
+  },
+
+  buildScopeTreeRow: async (subScopes: ScopePage[], getSubItem?: boolean | undefined) => {
+    let scopeRowList: ScopeTreeRow[] = []
+    for (const scopeItem of subScopes) {
+      const scopeRowItem: ScopeTreeRow = { id: '', name: '', quantity: 0, subItems: [] }
+      scopeRowItem.id = '' + scopeItem.perimeter.id
+      scopeRowItem.cohort_id = scopeItem.perimeter.cohort_id
+      scopeRowItem.name = servicesPerimeters.getScopeName(scopeItem.perimeter)
+      scopeRowItem.quantity = +scopeItem.perimeter.cohort_size
+      scopeRowItem.access = servicesPerimeters.getAccessFromScope(scopeItem)
+      scopeRowItem.inferior_levels_ids = scopeItem.perimeter.inferior_levels_ids
+      scopeRowItem.subItems =
+        getSubItem === true
+          ? await servicesPerimeters.getScopeSubItems(scopeItem.perimeter.inferior_levels_ids)
+          : [loadingItem]
+      scopeRowList = [...scopeRowList, scopeRowItem]
+    }
+    scopeRowList = sortByQuantityAndName(scopeRowList)
+    return scopeRowList
+  },
+
+  getAccessFromScope: (perimeterItem: ScopePage) => {
+    return perimeterItem.read_access === 'DATA_NOMINATIVE' || perimeterItem.right_read_patient_nominative === true
+      ? 'Nominatif'
+      : 'Pseudonymisé'
+  },
+
+  getScopeName: (perimeter: any) => {
+    const perimeterID = perimeter ? perimeter.source_value : false
+    if (!perimeterID) {
+      return perimeter ? perimeter.name : ''
+    }
+    return `${perimeterID} - ${perimeter.name}`
   }
 }
 
 export default servicesPerimeters
-
-export const getScopeName = (perimeter: any) => {
-  const perimeterID = perimeter ? perimeter.source_value : false
-  if (!perimeterID) {
-    return perimeter ? perimeter.name : ''
-  }
-  return `${perimeterID} - ${perimeter.name}`
-}
-export const getAccessFromScope = (perimeterItem: ScopePage) => {
-  return perimeterItem.read_access === 'DATA_NOMINATIVE' || perimeterItem.right_read_patient_nominative === true
-    ? 'Nominatif'
-    : 'Pseudonymisé'
-}
-export const buildScopeTreeRow: (
-  subScopes: ScopePage[],
-  getSubItem?: boolean | undefined
-) => Promise<ScopeTreeRow[]> = async (subScopes: ScopePage[], getSubItem?: boolean | undefined) => {
-  let scopeRowList: ScopeTreeRow[] = []
-  for (const scopeItem of subScopes) {
-    const scopeRowItem: ScopeTreeRow = { id: '', name: '', quantity: 0, subItems: [] }
-    scopeRowItem.id = '' + scopeItem.perimeter.id
-    scopeRowItem.cohort_id = scopeItem.perimeter.cohort_id
-    scopeRowItem.name = getScopeName(scopeItem.perimeter)
-    scopeRowItem.quantity = +scopeItem.perimeter.cohort_size
-    scopeRowItem.access = getAccessFromScope(scopeItem)
-    scopeRowItem.inferior_levels_ids = scopeItem.perimeter.inferior_levels_ids
-    scopeRowItem.subItems =
-      getSubItem === true
-        ? await servicesPerimeters.getScopeSubItems(scopeItem.perimeter.inferior_levels_ids)
-        : [loadingItem]
-    scopeRowList = [...scopeRowList, scopeRowItem]
-  }
-  scopeRowList = sortByQuantityAndName(scopeRowList)
-  return scopeRowList
-}

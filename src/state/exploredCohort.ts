@@ -7,7 +7,7 @@ import { RootState } from 'state'
 import { ODD_EXPORT } from '../constants'
 
 import services from 'services/aphp'
-import { getAccessFromScope } from '../services/aphp/servicePerimeters'
+import servicesPerimeters from '../services/aphp/servicePerimeters'
 
 export type ExploredCohortState = {
   importedPatients: any[]
@@ -140,7 +140,9 @@ const fetchExploredCohort = createAsyncThunk<
           cohort.favorite = false
           cohort.uuid = ''
           cohort.canMakeExport = false
-          cohort.deidentifiedBoolean = perimeters.some((perimeter) => getAccessFromScope(perimeter) === 'Pseudonymisé')
+          cohort.deidentifiedBoolean = perimeters.some(
+            (perimeter) => servicesPerimeters.getAccessFromScope(perimeter) === 'Pseudonymisé'
+          )
         }
         break
       }
@@ -215,7 +217,9 @@ const fetchExploredCohortInBackground = createAsyncThunk<
         cohort.favorite = false
         cohort.uuid = ''
         cohort.canMakeExport = false
-        cohort.deidentifiedBoolean = perimeters.some((perimeter) => getAccessFromScope(perimeter) === 'Pseudonymisé')
+        cohort.deidentifiedBoolean = perimeters.some(
+          (perimeter) => servicesPerimeters.getAccessFromScope(perimeter) === 'Pseudonymisé'
+        )
       }
       break
     }

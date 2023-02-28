@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import {
   Breadcrumbs,
@@ -167,10 +167,10 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     defaultSelectedItems.map((item) => findEquivalentRowInItemAndSubItems(item, rootRows).equivalentRow ?? item)
   )
   const debouncedSearchTerm = useDebounce(700, searchInput)
-  const debouncedSearchLoading = useDebounce(700, searchLoading)
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
   const [isAllSelected, setIsAllSelected] = useState(false)
+  const controllerRef = useRef<AbortController | null>()
 
   const fetchScopeTree = async () => {
     dispatch<any>(fetchScopesList())
@@ -184,13 +184,17 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     setIsEmpty(false)
   }
 
-  const _searchInPerimeters = async (abortController: AbortController, _isAllSelected?: boolean) => {
+  const _searchInPerimeters = async (_isAllSelected?: boolean) => {
     setSearchLoading(true)
-    abortController.abort()
+    if (controllerRef.current) {
+      controllerRef.current.abort()
+    }
+    const controller = new AbortController()
+    controllerRef.current = controller
     const { scopeTreeRows: newPerimetersList, count: newCount } = await servicesPerimeters.findScope(
       searchInput,
       page,
-      { signal: abortController.signal }
+      controllerRef.current?.signal
     )
     if (!newPerimetersList || newPerimetersList.length < 1) {
       setIsEmpty(true)
@@ -202,24 +206,26 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     setRootRows(newPerimetersList)
     setCount(newCount)
     setSearchLoading(false)
+    controllerRef.current = null
     return newPerimetersList
   }
 
   useEffect(() => {
-    const abortController: AbortController = new AbortController()
     if (debouncedSearchTerm) {
       onChangeSelectedItem([])
       setIsAllSelected(false)
-      _searchInPerimeters(abortController, false)
+      _searchInPerimeters(false)
     } else if (!debouncedSearchTerm) {
       _init()
+    }
+    return () => {
+      controllerRef.current?.abort()
     }
   }, [debouncedSearchTerm])
 
   useEffect(() => {
-    const abortController: AbortController = new AbortController()
     if (debouncedSearchTerm) {
-      _searchInPerimeters(abortController, isAllSelected)
+      _searchInPerimeters(isAllSelected)
     }
   }, [page])
 

@@ -14,17 +14,4 @@ apiBackend.interceptors.request.use((config) => {
   return config
 })
 
-apiBackend.interceptors.response.use(
-  (response) => {
-    return response
-  },
-  function (error) {
-    if ((401 || 400 || 403) === error.response.status) {
-      localStorage.clear()
-      window.location = '/'
-    }
-    return error
-  }
-)
-
 export default apiBackend
