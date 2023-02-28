@@ -29,7 +29,7 @@ const Scope = () => {
     dispatch(closeAllOpenedPopulation())
   }, [])
 
-  const onChangeSelectedItem = (newSelectedItems: any) => {
+  const onChangeSelectedItem = (newSelectedItems) => {
     setSelectedItem(newSelectedItems)
   }
   const trimItems = () => {
