@@ -57,7 +57,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const [openSort, setOpenSort] = useState(false)
   const [sort, setSort] = useState<Sort>({
-    sortBy: 'given',
+    sortBy: 'family',
     sortDirection: 'asc'
   })
 

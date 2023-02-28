@@ -136,7 +136,7 @@ const servicesPerimeters: IServicePerimeters = {
         pivotFacet: ['age_gender', 'deceased_gender'],
         _list: perimetersId.split(','),
         size: 20,
-        _sort: 'given',
+        _sort: 'family',
         _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
       }),
       fetchEncounter({
