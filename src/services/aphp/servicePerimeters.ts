@@ -99,7 +99,11 @@ export interface IServicePerimeters {
    * effectuer une recherche textuelle dans la liste des périmètres
    * @param page : le numéro de la page qu'on veut récupérer, par défaut c'est la 1ière page.
    */
-  findScope: (searchInput: string | undefined, page?: number | undefined) => Promise<any>
+  findScope: (
+    searchInput: string | undefined,
+    page?: number | undefined,
+    config?: { signal: AbortSignal }
+  ) => Promise<any>
 }
 
 const servicesPerimeters: IServicePerimeters = {
@@ -302,14 +306,15 @@ const servicesPerimeters: IServicePerimeters = {
       }
     })
   },
-  findScope: async (searchInput: string | undefined, page?: number | undefined) => {
+  findScope: async (searchInput: string | undefined, page?: number | undefined, config?: { signal: AbortSignal }) => {
     let result: { scopeTreeRows: ScopeTreeRow[]; count: 0 } = { scopeTreeRows: [], count: 0 }
     if (!searchInput) {
       return result
     }
     const pageParam = page && page > 1 ? '&page=' + page : ''
     const backCohortResponse: any = await apiBackend.get(
-      `accesses/perimeters/read-patient/?search=${searchInput}${pageParam}`
+      `accesses/perimeters/read-patient/?search=${searchInput}${pageParam}`,
+      config
     )
     if (backCohortResponse && backCohortResponse.data && backCohortResponse.data.results) {
       const newPerimetersList: ScopeTreeRow[] = await buildScopeTreeRow(backCohortResponse.data.results)

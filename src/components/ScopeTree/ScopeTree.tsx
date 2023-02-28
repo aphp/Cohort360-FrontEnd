@@ -167,6 +167,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     defaultSelectedItems.map((item) => findEquivalentRowInItemAndSubItems(item, rootRows).equivalentRow ?? item)
   )
   const debouncedSearchTerm = useDebounce(700, searchInput)
+  const debouncedSearchLoading = useDebounce(700, searchLoading)
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
   const [isAllSelected, setIsAllSelected] = useState(false)
@@ -183,9 +184,14 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     setIsEmpty(false)
   }
 
-  const _searchInPerimeters = async (_isAllSelected?: boolean) => {
+  const _searchInPerimeters = async (abortController: AbortController, _isAllSelected?: boolean) => {
     setSearchLoading(true)
-    const { scopeTreeRows: newPerimetersList, count: newCount } = await servicesPerimeters.findScope(searchInput, page)
+    abortController.abort()
+    const { scopeTreeRows: newPerimetersList, count: newCount } = await servicesPerimeters.findScope(
+      searchInput,
+      page,
+      { signal: abortController.signal }
+    )
     if (!newPerimetersList || newPerimetersList.length < 1) {
       setIsEmpty(true)
     }
@@ -200,18 +206,20 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
   }
 
   useEffect(() => {
+    const abortController: AbortController = new AbortController()
     if (debouncedSearchTerm) {
       onChangeSelectedItem([])
       setIsAllSelected(false)
-      _searchInPerimeters(false)
+      _searchInPerimeters(abortController, false)
     } else if (!debouncedSearchTerm) {
       _init()
     }
   }, [debouncedSearchTerm])
 
   useEffect(() => {
+    const abortController: AbortController = new AbortController()
     if (debouncedSearchTerm) {
-      _searchInPerimeters(isAllSelected)
+      _searchInPerimeters(abortController, isAllSelected)
     }
   }, [page])
 
@@ -396,7 +404,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                           parentAccess={parentAccess}
                           selectedItems={selectedItems}
                           rootRows={rootRows}
-                          debouncedSearchTerm={debouncedSearchTerm}
+                          debouncedSearchTerm={debouncedSearchTerm as string}
                           labelId={labelId}
                           onExpand={_onExpand}
                           onSelect={_onSelect}
@@ -418,7 +426,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                         parentAccess={row.access}
                         selectedItems={selectedItems}
                         rootRows={rootRows}
-                        debouncedSearchTerm={debouncedSearchTerm}
+                        debouncedSearchTerm={debouncedSearchTerm as string}
                         labelId={labelId}
                         onExpand={_onExpand}
                         onSelect={_onSelect}
