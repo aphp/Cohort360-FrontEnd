@@ -198,6 +198,8 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     )
     if (!newPerimetersList || newPerimetersList.length < 1) {
       setIsEmpty(true)
+    } else {
+      setIsEmpty(false)
     }
     if (_isAllSelected) {
       const _newSelectedItems = [...selectedItems, ...newPerimetersList]
