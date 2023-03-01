@@ -257,21 +257,20 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     } else {
       _openPopulation = [..._openPopulation, rowId]
       setOpenPopulations(_openPopulation)
-
-      const expandResponse = await dispatch<any>(
-        expandScopeElement({
-          rowId: rowId,
-          selectedItems: selectedItems,
-          scopesList: _rootRows,
-          openPopulation: openPopulation
-        })
-      )
-      if (expandResponse && expandResponse.payload) {
-        const _selectedItems = expandResponse.payload.selectedItems ?? []
-        _rootRows = expandResponse.payload.rootRows ?? _rootRows
-        setRootRows(_rootRows)
-        onChangeSelectedItem(_selectedItems)
-      }
+    }
+    const expandResponse = await dispatch<any>(
+      expandScopeElement({
+        rowId: rowId,
+        selectedItems: selectedItems,
+        scopesList: _rootRows,
+        openPopulation: openPopulation
+      })
+    )
+    if (expandResponse && expandResponse.payload) {
+      const _selectedItems = expandResponse.payload.selectedItems ?? []
+      _rootRows = expandResponse.payload.rootRows ?? _rootRows
+      setRootRows(_rootRows)
+      onChangeSelectedItem(_selectedItems)
     }
   }
 
