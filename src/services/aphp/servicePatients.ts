@@ -308,7 +308,7 @@ const servicesPatients: IServicePatients = {
       fetchPatient({
         pivotFacet: ['age_gender', 'deceased_gender'],
         size: 20,
-        _sort: 'given',
+        _sort: 'family',
         _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
       }),
       fetchEncounter({

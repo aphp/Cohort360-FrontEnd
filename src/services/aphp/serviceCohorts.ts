@@ -210,7 +210,7 @@ const servicesCohorts: IServiceCohorts = {
           pivotFacet: ['age_gender', 'deceased_gender'],
           _list: [cohortId],
           size: 20,
-          _sort: 'given',
+          _sort: 'family',
           _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
         }),
         fetchEncounter({
