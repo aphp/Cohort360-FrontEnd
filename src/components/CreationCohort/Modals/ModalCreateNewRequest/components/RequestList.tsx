@@ -43,11 +43,11 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
         <ListItemSecondaryAction>
           {!open ? (
             <IconButton onClick={() => setOpen(!open)}>
-              <ExpandLessIcon />
+              <ExpandMoreIcon />
             </IconButton>
           ) : (
             <IconButton onClick={() => setOpen(!open)}>
-              <ExpandMoreIcon />
+              <ExpandLessIcon />
             </IconButton>
           )}
         </ListItemSecondaryAction>
