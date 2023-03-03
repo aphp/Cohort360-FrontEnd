@@ -61,7 +61,18 @@ const fetchScopesListinBackground = createAsyncThunk<FetchScopeListReturn, void,
       return {
         scopesList: scopes.map((scope) => ({
           ...scope,
-          subItems: (scopesList.find(({ id }) => id === scope.id) || { subItems: [] }).subItems
+          subItems: (
+            scopesList.find((item) => item.id === scope.id && item.subItems?.length) ?? {
+              subItems: [
+                {
+                  id: 'loading',
+                  name: 'loading',
+                  quantity: 0,
+                  subItems: []
+                }
+              ]
+            }
+          ).subItems
         }))
       }
     } catch (error) {
