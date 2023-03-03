@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Tabs, Tab } from '@material-ui/core'
+import React, { useEffect, useState } from 'react'
+import { Tab, Tabs } from '@material-ui/core'
 
 import MedicationForm from './components/Form/MedicationForm'
 import MedicationHierarchy from './components/Hierarchy/MedicationHierarchy'
@@ -7,9 +7,13 @@ import MedicationHierarchy from './components/Hierarchy/MedicationHierarchy'
 import { MedicationDataType } from 'types'
 
 import useStyles from './styles'
+import { useAppDispatch, useAppSelector } from 'state'
+import { initSyncHierarchyTableEffect, MEDICATION_REQUEST, syncOnChangeFormValue } from 'utils/pmsi'
+import { initMedicationHierarchy } from 'state/medication'
+import { PmsiListType } from 'state/pmsi'
 
-const defaultMedication: MedicationDataType = {
-  type: 'MedicationRequest',
+export const defaultMedication: MedicationDataType = {
+  type: MEDICATION_REQUEST,
   title: 'Critère de médicament',
   code: [],
   prescriptionType: [],
@@ -25,53 +29,74 @@ const defaultMedication: MedicationDataType = {
 
 const Index = (props: any) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const [seletedTab, onChangeTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
-  const [defaultValues, onChangeDefaultValues] = useState(selectedCriteria || defaultMedication)
+  const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy'>(selectedCriteria ? 'form' : 'hierarchy')
+  const [defaultCriteria, setDefaultCriteria] = useState(selectedCriteria || defaultMedication)
 
-  const isEdition = selectedCriteria !== null ? true : false
-
-  const _onChangeSelectedHierarchy = (code: any) => {
-    onChangeDefaultValues({
-      ...defaultValues,
-      code
-    })
-    onChangeTab('form')
-  }
-
-  const _onChangeValue = (key: string, value: any) => {
-    const _defaultValues = defaultValues ? { ...defaultValues } : {}
-    _defaultValues[key] = value
-    onChangeDefaultValues(_defaultValues)
-  }
+  const isEdition = selectedCriteria !== null
+  const dispatch = useAppDispatch()
+  const medicationHierarchy = useAppSelector((state) => state.medication.list || {})
 
   const classes = useStyles()
+
+  const _onChangeSelectedHierarchy = (newSelectedItems: any, newHierarchy?: PmsiListType[]) => {
+    _onChangeFormValue('code', newSelectedItems, newHierarchy)
+  }
+  const _onChangeFormValue = (key: string, value: any, hierarchy: PmsiListType[] = medicationHierarchy) =>
+    syncOnChangeFormValue(
+      key,
+      value,
+      defaultCriteria,
+      hierarchy,
+      setDefaultCriteria,
+      selectedTab,
+      defaultMedication.type,
+      dispatch
+    )
+
+  const _initSyncHierarchyTableEffect = async () => {
+    await initSyncHierarchyTableEffect(
+      medicationHierarchy,
+      selectedCriteria,
+      defaultCriteria && defaultCriteria.code ? defaultCriteria.code : [],
+      initMedicationHierarchy,
+      defaultMedication.type,
+      dispatch,
+      criteria && criteria.data?.atcHierarchy !== 'loading'
+    )
+  }
+  useEffect(() => {
+    _initSyncHierarchyTableEffect()
+  }, [])
 
   return (
     <>
       <div>
-        <Tabs className={classes.tabs} value={seletedTab} onChange={(e, tab) => onChangeTab(tab)}>
+        <Tabs className={classes.tabs} value={selectedTab} onChange={(e, tab) => setSelectedTab(tab)}>
           <Tab label="Hiérarchie" value="hierarchy" />
           <Tab label="Formulaire" value="form" />
         </Tabs>
       </div>
-
-      {seletedTab === 'form' ? (
+      {
         <MedicationForm
+          isOpen={selectedTab === 'form'}
           isEdition={isEdition}
           criteria={criteria}
-          selectedCriteria={defaultValues}
-          onChangeValue={_onChangeValue}
+          selectedCriteria={defaultCriteria}
+          onChangeValue={_onChangeFormValue}
           onChangeSelectedCriteria={onChangeSelectedCriteria}
           goBack={goBack}
         />
-      ) : (
+      }
+      {
         <MedicationHierarchy
+          isOpen={selectedTab === 'hierarchy'}
           isEdition={isEdition}
-          selectedCriteria={selectedCriteria}
+          selectedCriteria={defaultCriteria}
           onChangeSelectedHierarchy={_onChangeSelectedHierarchy}
+          onConfirm={() => setSelectedTab('form')}
           goBack={goBack}
         />
-      )}
+      }
     </>
   )
 }

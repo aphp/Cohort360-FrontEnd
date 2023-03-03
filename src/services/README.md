@@ -2,49 +2,15 @@
 
 Dans le dossier `src` présent à la racine du projet, vous allez trouver un dossier `services` qui contient l'ensemble des fonctions qui servent à appeler les différents services d'API et récupérer vos données.
 
-### Hiérarchie :
-
-```
-services
-├── cohortCreation
-│   ├── fetchClaim.ts
-│   ├── fetchComposition.ts
-│   ├── fetchCondition.ts
-│   ├── fetchDemographic.ts
-│   ├── fetchEncounter.ts
-│   ├── fetchMedication.ts
-│   ├── fetchProcedure.ts
-│   └── index.ts
-├── contextAphp
-│   ├── callApi.ts
-│   ├── serviceCohorts.ts
-│   ├── serviceCohortCreation.ts
-│   ├── serviceContact.ts
-│   ├── servicePatients.ts
-│   ├── servicePerimeters.ts
-│   ├── servicePractitioner.ts
-│   ├── serviceProjects.ts
-│   └── index.ts
-├── context...
-│   └── ...
-├── apiBackend.ts
-├── apiFhir.ts
-├── apiPortail.ts
-├── apiRequest.ts
-├── index.ts
-└── README.md
-```
-
 ### Différentes API:
 
-Au départ du dossier de services, vous trouverez 4 fichiers TypeScript `apiBackend.ts`, `apiFhir.ts`, `apiPortail.ts`, `apiRequest.ts`.
+Au départ du dossier de services, vous trouverez 2 fichiers TypeScript `apiBackend.ts`, `apiFhir.ts`
 Ces fichiers servent à faire le lien avec différents services et à régler les `Headers` et créer des `Interceptors`.
 
 | Fichier       | Fonctionnalités                                                                                           | Variable d'environnement lié à l'URL |
 |---------------|-----------------------------------------------------------------------------------------------------------|--------------------------------------|
 | apiBackend.ts | Permet le lien avec `cohort-back`                                                                         | `BACK_API_URL`                       |
 | apiFhir.ts    | Permet le lien avec `FHIR`                                                                                | `FHIR_API_URL`                       |
-| apiRequest.ts | Permet le lien avec `FHIR` (uniquement pour les `ValueSet` présents dans la partie `Création de requête`) | `REQUEST_API_URL`                    |
 
 ### Point d'entrée :
 
@@ -54,7 +20,7 @@ Ces fichiers servent à faire le lien avec différents services et à régler le
 
 ```ts
 import { CONTEXT } from './../constants'
-import servicesAphp, { IServiceAphp } from './contextAphp'
+import servicesAphp, { IServiceAphp } from './aphp'
 
 ...
 

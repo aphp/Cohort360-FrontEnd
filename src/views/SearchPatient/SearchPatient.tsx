@@ -8,7 +8,7 @@ import { CircularProgress, Grid, Typography } from '@material-ui/core'
 import PatientSearchBar from 'components/Inputs/PatientSearchBar/PatientSearchBar'
 import DataTablePatient from 'components/DataTable/DataTablePatient'
 
-import services from 'services'
+import services from 'services/aphp'
 
 import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { SearchByTypes, Order } from 'types'
@@ -30,7 +30,7 @@ const SearchPatient: React.FC<{}> = () => {
   const [searchInput, setSearchInput] = useState(search ?? '')
 
   const [order, setOrder] = useState<Order>({
-    orderBy: 'given',
+    orderBy: 'family',
     orderDirection: 'asc'
   })
 

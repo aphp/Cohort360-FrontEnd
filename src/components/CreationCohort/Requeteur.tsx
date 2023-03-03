@@ -1,5 +1,5 @@
 import { CircularProgress } from '@material-ui/core'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 
 import Grid from '@material-ui/core/Grid'
@@ -18,9 +18,8 @@ import constructCriteriaList from './DataList_Criteria'
 
 import { getDataFromFetch } from 'utils/cohortCreation'
 
-import services from 'services'
-
 import useStyles from './styles'
+import services from 'services/aphp'
 
 const Requeteur = () => {
   const {
@@ -57,6 +56,7 @@ const Requeteur = () => {
   const [requestLoading, setRequestLoading] = useState(0)
   const [criteriaLoading, setCriteriaLoading] = useState(0)
   let _criteria = constructCriteriaList()
+  const isRendered = useRef<boolean>(false)
 
   const _fetchRequest = useCallback(async () => {
     setRequestLoading((requestLoading) => requestLoading + 1)
@@ -81,7 +81,9 @@ const Requeteur = () => {
    * Fetch all criteria to display list + retrieve all data from fetcher
    */
   const _fetchCriteria = useCallback(async () => {
-    setCriteriaLoading((criteriaLoading) => criteriaLoading + 1)
+    if (isRendered.current) {
+      setCriteriaLoading((criteriaLoading) => criteriaLoading + 1)
+    }
     try {
       _criteria.forEach((criterion) => {
         if (criterion.id === 'IPPList') {
@@ -95,7 +97,9 @@ const Requeteur = () => {
     } catch (error) {
       console.error(error)
     }
-    setCriteriaLoading((criteriaLoading) => criteriaLoading - 1)
+    if (isRendered.current) {
+      setCriteriaLoading((criteriaLoading) => criteriaLoading - 1)
+    }
   }, [dispatch, criteriaGroup, selectedCriteria, selectedPopulation]) // eslint-disable-line
 
   const _unbuildRequest = async (newCurrentSnapshot: CohortCreationSnapshotType) => {
@@ -192,7 +196,11 @@ const Requeteur = () => {
   }, [_fetchRequest])
 
   useEffect(() => {
+    isRendered.current = true
     _fetchCriteria()
+    return () => {
+      isRendered.current = false
+    }
   }, [_fetchCriteria])
 
   if (

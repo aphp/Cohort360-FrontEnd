@@ -13,7 +13,7 @@ const useStyles = makeStyles(() => ({
     width: 'fit-content',
     position: 'relative',
     '&::before': {
-      width: 3,
+      width: 4,
       height: 16,
       content: "''",
       position: 'absolute',
@@ -45,7 +45,7 @@ const useStyles = makeStyles(() => ({
     maxWidth: 34,
     position: 'relative',
     '&::before': {
-      width: 3,
+      width: 4,
       height: 16,
       content: "''",
       position: 'absolute',
@@ -58,7 +58,7 @@ const useStyles = makeStyles(() => ({
   },
   operatorChild: {
     marginLeft: 23,
-    borderLeft: '3px solid #19235a',
+    borderLeft: '4px solid #19235a',
     paddingLeft: 35
   }
 }))

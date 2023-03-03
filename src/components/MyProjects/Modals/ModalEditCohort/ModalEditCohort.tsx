@@ -12,7 +12,13 @@ import {
 } from '@material-ui/core'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { CohortState, addCohort, editCohort, deleteCohort } from 'state/cohort'
+import {
+  CohortState,
+  addCohort,
+  editCohort,
+  deleteCohort,
+  setSelectedCohort as setSelectedCohortState
+} from 'state/cohort'
 
 import { Cohort } from 'types'
 
@@ -61,9 +67,11 @@ const ModalEditCohort: React.FC<{
     onChangeCohortState(_cohort)
   }
 
-  const handleClose = () => onClose()
+  const handleClose = () => {
+    dispatch<any>(setSelectedCohortState(null))
+  }
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (loading) return
     setLoading(true)
 
@@ -74,19 +82,19 @@ const ModalEditCohort: React.FC<{
 
     if (!selectedCohort) return
     if (isEdition) {
-      dispatch<any>(editCohort({ editedCohort: modalCohortState }))
+      await dispatch<any>(editCohort({ editedCohort: modalCohortState }))
     } else {
-      dispatch<any>(addCohort({ newCohort: modalCohortState }))
+      await dispatch<any>(addCohort({ newCohort: modalCohortState }))
     }
     onClose()
   }
 
-  const handleConfirmDeletion = () => {
+  const handleConfirmDeletion = async () => {
     if (loading) return
     setLoading(true)
 
     if (isEdition && selectedCohort !== null) {
-      dispatch<any>(deleteCohort({ deletedCohort: selectedCohort }))
+      await dispatch<any>(deleteCohort({ deletedCohort: selectedCohort }))
     }
     onClose()
   }

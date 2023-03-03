@@ -26,7 +26,8 @@ import {
 
 import { logout } from './me'
 
-import services from 'services'
+import services from 'services/aphp'
+import { getAccessFromScope } from '../services/aphp/servicePerimeters'
 
 export type PatientState = null | {
   loading: boolean
@@ -362,6 +363,24 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
       const endDate = options?.filters?.endDate ?? null
       const onlyPdfAvailable = options?.filters?.onlyPdfAvailable ?? false
 
+      if (searchInput) {
+        const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput)
+
+        if (searchInputError && searchInputError.isError) {
+          return {
+            documents: {
+              loading: false,
+              count: 0,
+              total: 0,
+              list: [],
+              page: 1,
+              options,
+              searchInputError: searchInputError
+            } as IPatientDocuments
+          }
+        }
+      }
+
       const documentsResponse = await services.patients.fetchDocuments(
         sortBy,
         sortDirection,
@@ -606,11 +625,7 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
         deidentifiedBoolean = (await services.patients.fetchRights(groupId)) ?? {}
       } else {
         const perimeters = await services.perimeters.getPerimeters()
-        deidentifiedBoolean = perimeters.some((perimeter) =>
-          perimeter.extension?.some(
-            (extension) => extension.url === 'READ_ACCESS' && extension.valueString === 'DATA_PSEUDOANONYMISED'
-          )
-        )
+        deidentifiedBoolean = perimeters.some((perimeter) => getAccessFromScope(perimeter) === 'Pseudonymisé')
       }
       if (
         patientState?.patientInfo?.id !== patientId ||

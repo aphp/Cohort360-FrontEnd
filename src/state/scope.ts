@@ -3,7 +3,7 @@ import { RootState } from 'state'
 
 import { logout, login } from './me'
 
-import services from 'services'
+import services from 'services/aphp'
 
 import { ScopeTreeRow } from 'types'
 
@@ -102,7 +102,10 @@ const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScop
           if (+item.id === +rowId) {
             const foundItem = item.subItems ? item.subItems.find((i: any) => i.id === 'loading') : true
             if (foundItem) {
-              const subItems: ScopeTreeRow[] = await services.perimeters.getScopeSubItems(item, true)
+              const subItems: ScopeTreeRow[] = await services.perimeters.getScopeSubItems(
+                item.inferior_levels_ids,
+                true
+              )
               item = { ...item, subItems: subItems }
             }
           } else if (item.subItems && item.subItems.length !== 0) {

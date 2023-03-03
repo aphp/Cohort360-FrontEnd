@@ -1,9 +1,9 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 import { RootState } from 'state'
 import { login, logout } from 'state/me'
 
-import services from 'services'
+import services from 'services/aphp'
 
 export type PmsiListType = {
   id: string
@@ -21,6 +21,7 @@ type PmsiState = {
   claim: PmsiElementType
   condition: PmsiElementType
   procedure: PmsiElementType
+  syncLoading?: number
 }
 
 const defaultInitialState: PmsiState = {
@@ -38,7 +39,8 @@ const defaultInitialState: PmsiState = {
     loading: false,
     list: [],
     openedElement: []
-  }
+  },
+  syncLoading: 0
 }
 
 const initPmsiHierarchy = createAsyncThunk<PmsiState, void, { state: RootState }>(
@@ -278,10 +280,18 @@ const pmsiSlice = createSlice({
       ...state,
       claim: { ...state.claim, loading: true },
       condition: { ...state.condition, loading: true },
-      procedure: { ...state.procedure, loading: true }
+      procedure: { ...state.procedure, loading: true },
+      syncLoading: (state.syncLoading ?? 0) + 1
     }))
-    builder.addCase(expandPmsiElement.fulfilled, (state, action) => ({ ...state, ...action.payload }))
-    builder.addCase(expandPmsiElement.rejected, (state) => ({ ...state }))
+    builder.addCase(expandPmsiElement.fulfilled, (state, action) => ({
+      ...state,
+      ...action.payload,
+      ...{ syncLoading: (state.syncLoading ?? 0) - 1 }
+    }))
+    builder.addCase(expandPmsiElement.rejected, (state) => ({
+      ...state,
+      ...{ syncLoading: (state.syncLoading ?? 0) - 1 }
+    }))
   }
 })
 

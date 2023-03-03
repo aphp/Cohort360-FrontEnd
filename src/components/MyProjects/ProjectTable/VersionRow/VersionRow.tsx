@@ -24,7 +24,7 @@ import { ReactComponent as StarFull } from 'assets/icones/star full.svg'
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 
 import { useAppDispatch } from 'state'
-import { setSelectedCohort, setFavoriteCohort } from 'state/cohort'
+import { editCohort, setSelectedCohort } from 'state/cohort'
 
 import { Cohort } from 'types'
 
@@ -44,8 +44,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
       .filter(({ request }) => request === requestId)
       .sort((a, b) => +moment(a.created_at).format('x') - +moment(b.created_at).format('x')) || []
 
-  const _handleEditCohort = (cohortId?: string) => {
-    dispatch<any>(setSelectedCohort(cohortId ?? null))
+  const _handleEditCohort = (cohort: Cohort) => {
+    dispatch<any>(setSelectedCohort(cohort ?? null))
   }
 
   // You can make an export if you got 1 cohort with: EXPORT_ACCESS = 'DATA_NOMINATIVE'
@@ -63,7 +63,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
     )
 
   const onSetCohortFavorite = async (cohort: Cohort) => {
-    await dispatch<any>(setFavoriteCohort({ favCohort: cohort }))
+    await dispatch<any>(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
   }
 
   return (
@@ -128,7 +128,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                     <IconButton
                       className={classes.editButton}
                       size="small"
-                      onClick={() => _handleEditCohort(historyRow.uuid)}
+                      onClick={() => _handleEditCohort(historyRow)}
                     >
                       <EditIcon />
                     </IconButton>

@@ -10,7 +10,7 @@ import { RequestState } from 'state/request'
 
 import RequestShareForm from './components/RequestShareForm'
 import useStyles from './styles'
-import services from 'services'
+import services from 'services/aphp'
 
 const ERROR_TITLE = 'error_title'
 const ERROR_USER_SHARE_LIST = 'error_user_share_list'

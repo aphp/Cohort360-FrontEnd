@@ -13,12 +13,12 @@ import {
   Typography
 } from '@material-ui/core'
 
-import { InputAgeRange } from 'components/Inputs'
-
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { PatientFilters as PatientFiltersType, VitalStatus } from 'types'
 
 import useStyles from './styles'
+import { InputAgeRange } from '../../Inputs'
+
 type PatientFiltersProps = {
   open: boolean
   onClose: () => void

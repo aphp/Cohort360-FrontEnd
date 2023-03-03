@@ -16,7 +16,7 @@ import RequestForm from './components/RequestForm'
 import RequestList from './components/RequestList'
 
 import { RequestType } from 'types'
-import services from 'services'
+import services from 'services/aphp'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { ProjectState, fetchProjects } from 'state/project'

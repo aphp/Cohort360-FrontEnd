@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import moment from 'moment'
+import { useHistory } from 'react-router'
 
 import { Button, CircularProgress, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
 
@@ -12,14 +12,15 @@ import CohortsFilter from 'components/Filters/CohortsFilters/CohortsFilters'
 import MasterChips from 'components/MasterChips/MasterChips'
 
 import useStyles from './styles'
-import { Cohort, CohortFilters } from 'types'
+import { Cohort, CohortFilters, Sort } from 'types'
 
 import displayDigit from 'utils/displayDigit'
-import { stableSort, getComparator } from 'utils/alphabeticalSort'
 import { buildCohortFiltersChips } from 'utils/chips'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { fetchCohorts, deleteCohort, setFavoriteCohort } from 'state/cohort'
+import { deleteCohort, editCohort, fetchCohorts } from 'state/cohort'
+import { Pagination } from '@material-ui/lab'
+import { useDebounce } from 'utils/debounce'
 
 type ResearchProps = {
   simplified?: boolean
@@ -28,98 +29,76 @@ type ResearchProps = {
 }
 const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   const classes = useStyles()
+  const history = useHistory()
   const dispatch = useAppDispatch()
 
   const cohortState = useAppSelector((state) => state.cohort)
 
   const loadingStatus = cohortState.loading
 
-  const [researches, setResearches] = useState<Cohort[]>([])
-
   const [searchInput, setSearchInput] = useState('')
 
   const search = new URLSearchParams(location.search)
   const favInUrl = (search.get('fav') ?? 'false') === 'true'
 
-  const [total, setTotal] = useState(cohortState.count)
-  const [sortBy, setSortBy] = useState(favInUrl ? 'favorite' : 'fhir_datetime')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+  const [page, setPage] = useState(1)
+  const [sort, setSort] = useState<Sort>({
+    sortBy: 'modified_at',
+    sortDirection: 'desc'
+  })
 
   const [open, setOpen] = useState(false)
 
+  const rowsPerPage = 20
+  const debouncedSearchItem = useDebounce(500, searchInput)
+
   const [filters, setFilters] = useState<CohortFilters>({
     status: [],
-    favorite: 'all',
+    favorite: favInUrl ? 'True' : 'all',
     minPatients: null,
     maxPatients: null,
     startDate: null,
     endDate: null
   })
 
-  useEffect(() => {
-    dispatch<any>(fetchCohorts())
-  }, [])
+  const onFetchCohorts = async (_page?: number) => {
+    dispatch<any>(
+      fetchCohorts({
+        filters,
+        sort,
+        searchInput,
+        limit: rowsPerPage,
+        page: _page ? _page : page
+      })
+    )
+  }
 
   useEffect(() => {
-    onFetchCohorts(sortBy, sortDirection)
-  }, [cohortState, filters]) // eslint-disable-line
+    onFetchCohorts()
+  }, [filters, sort, page, debouncedSearchItem]) // eslint-disable-line
 
-  const onFetchCohorts = async (sortBy = 'given', sortDirection = 'asc', input = searchInput) => {
-    let cohortsList = cohortState.cohortsList
-
-    if (input) {
-      const regexp = new RegExp(`${(input || '').replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&')}`, 'gi') // eslint-disable-line
-      cohortsList = cohortsList.filter(({ name }) => name?.search(regexp) !== -1)
+  const onEditCohort = () => {
+    if (sort.sortBy === 'modified_at' && sort.sortDirection === 'desc') {
+      setPage(1)
+      onFetchCohorts(1)
+    } else {
+      onFetchCohorts()
     }
-
-    if (filters.minPatients) {
-      cohortsList = cohortsList.filter(({ result_size }) => (result_size ?? 0) >= parseInt(filters.minPatients ?? '0'))
-    }
-    if (filters.maxPatients) {
-      cohortsList = cohortsList.filter(({ result_size }) => (result_size ?? 0) <= parseInt(filters.maxPatients ?? '0'))
-    }
-
-    if (filters.favorite && filters.favorite !== 'all') {
-      cohortsList = cohortsList.filter(({ favorite }) =>
-        filters.favorite === 'True' ? favorite === true : favorite === false
-      )
-    }
-
-    if (filters.startDate || filters.endDate) {
-      cohortsList = cohortsList.filter(({ modified_at }) =>
-        filters.startDate && filters.endDate
-          ? // Filtrer les deux
-            moment(modified_at).isAfter(moment(filters.startDate)) &&
-            moment(modified_at).isBefore(moment(filters.endDate))
-          : filters.startDate
-          ? // Filtrer par rapport à startDate
-            moment(modified_at).isAfter(moment(filters.startDate))
-          : // Filtrer par rapport à endDate
-            moment(modified_at).isBefore(moment(filters.endDate))
-      )
-    }
-
-    if (filters.status && filters.status.length > 0) {
-      cohortsList = cohortsList.filter(({ request_job_status }) =>
-        filters.status.find((status) => {
-          return status.code === 'pending,started'
-            ? request_job_status === 'pending' || request_job_status === 'started'
-            : request_job_status === status.code
-        })
-      )
-    }
-
-    const sortedCohortsList = stableSort(cohortsList, getComparator(sortDirection, sortBy))
-    setResearches(sortedCohortsList)
-    setTotal(sortedCohortsList.length)
   }
 
   const onDeleteCohort = async (cohort: Cohort) => {
-    dispatch<any>(deleteCohort({ deletedCohort: cohort }))
+    await dispatch<any>(deleteCohort({ deletedCohort: cohort }))
+    onFetchCohorts()
   }
 
   const onSetCohortFavorite = async (cohort: Cohort) => {
-    await dispatch<any>(setFavoriteCohort({ favCohort: cohort }))
+    await dispatch<any>(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
+    if (sort.sortBy === 'modified_at' && sort.sortDirection === 'desc') {
+      setPage(1)
+      onFetchCohorts(1)
+    } else {
+      onFetchCohorts()
+    }
   }
 
   const handleChangeInput = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -128,23 +107,19 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
 
   const handleClearInput = async () => {
     setSearchInput('')
-    onFetchCohorts(sortBy, sortDirection, '')
   }
 
   const onKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault()
-      onFetchCohorts(sortBy, sortDirection)
     }
   }
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: any) => {
-    const isAsc: boolean = sortBy === property && sortDirection === 'asc'
+    const isAsc: boolean = sort.sortBy === property && sort.sortDirection === 'asc'
     const _sortDirection = isAsc ? 'desc' : 'asc'
 
-    setSortDirection(_sortDirection)
-    setSortBy(property)
-    onFetchCohorts(property, _sortDirection)
+    setSort({ sortBy: property, sortDirection: _sortDirection })
   }
 
   const handleDeleteChip = (filterName: string, value?: any) => {
@@ -158,6 +133,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
         break
       case 'favorite':
         setFilters({ ...filters, [filterName]: 'all' })
+        history.replace({ pathname: location.pathname })
         break
       case 'minPatients':
       case 'maxPatients':
@@ -170,8 +146,10 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
-      <Grid item container justifyContent="space-between">
-        <Typography variant="button">{displayDigit(total ?? 0)} cohorte(s)</Typography>
+      <Grid item container justifyContent="space-between" alignItems="center">
+        <Typography variant="button">
+          {displayDigit(cohortState.count ?? 0)} cohorte{cohortState.count > 1 ? 's' : ''}
+        </Typography>
         <div className={classes.tableButtons}>
           <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
             <InputBase
@@ -190,7 +168,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
                 </InputAdornment>
               }
             />
-            <IconButton type="submit" aria-label="search" onClick={() => onFetchCohorts(sortBy, sortDirection)}>
+            <IconButton type="submit" aria-label="search" onClick={() => onFetchCohorts()}>
               <SearchIcon fill="#ED6D91" height="15px" />
             </IconButton>
           </Grid>
@@ -214,16 +192,27 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
           <CircularProgress />
         </Grid>
       ) : (
-        <ResearchTable
-          simplified={simplified}
-          researchData={researches}
-          onDeleteCohort={onDeleteCohort}
-          onSetCohortFavorite={onSetCohortFavorite}
-          onClickRow={onClickRow}
-          sortBy={sortBy}
-          sortDirection={sortDirection}
-          onRequestSort={handleRequestSort}
-        />
+        <>
+          <ResearchTable
+            simplified={simplified}
+            researchData={cohortState.cohortsList}
+            onDeleteCohort={onDeleteCohort}
+            onSetCohortFavorite={onSetCohortFavorite}
+            onClickRow={onClickRow}
+            sortBy={sort.sortBy}
+            sortDirection={sort.sortDirection}
+            onRequestSort={handleRequestSort}
+            onUpdateCohorts={onEditCohort}
+          />
+
+          <Pagination
+            className={classes.pagination}
+            count={Math.ceil((cohortState.count ?? 0) / rowsPerPage)}
+            shape="rounded"
+            onChange={(event, page: number) => setPage && setPage(page)}
+            page={page}
+          />
+        </>
       )}
 
       <CohortsFilter open={open} onClose={() => setOpen(false)} filters={filters} onChangeFilters={setFilters} />

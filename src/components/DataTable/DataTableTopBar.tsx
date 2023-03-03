@@ -14,9 +14,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
-import InputSearchDocumentButton from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentButton'
 import InputSearchDocumentSimple from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentSimple'
-import InputSearchDocumentRegex from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentRegex'
 
 import {
   SearchByTypes,
@@ -30,35 +28,23 @@ import {
 import displayDigit from 'utils/displayDigit'
 
 import useStyles from './styles'
-import { ODD_REGEX } from '../../constants'
+import { CircularProgress } from '@material-ui/core'
 
 type DataTableTopBarProps = {
+  loading: boolean
   tabs?: TabsType
   results?: ResultsType | ResultsType[]
   searchBar?: SearchBarType
   buttons?: ButtonType[]
 }
-const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, searchBar, buttons }) => {
+const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, results, searchBar, buttons }) => {
   const classes = useStyles()
 
   const [search, setSearch] = useState(searchBar?.value ?? '')
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
-  const [inputMode, setDefaultInputMode] = useState<'simple' | 'regex'>('simple')
 
   const onSearch = (newInput = search) => {
     if (searchBar && searchBar.onSearch && typeof searchBar.onSearch === 'function') {
-      if (newInput && inputMode === 'regex') {
-        newInput = newInput.replace(/[/"]/g, function (m) {
-          switch (m) {
-            case '/':
-              return '\\/'
-            case '"':
-              return '\\"'
-          }
-          return m
-        })
-        newInput = `/(.)*${newInput}(.)*/`
-      }
       searchBar.onSearch(newInput, searchBy)
     }
   }
@@ -110,23 +96,27 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, search
             </Tabs>
           </Grid>
         )}
-        {results && (
-          <Grid id="DTTB_result" item container direction="column" style={{ width: 'fit-content' }}>
-            {Array.isArray(results) && results.length > 0 ? (
-              <>
-                {results.map((result, index) => (
-                  <Typography key={index} variant="button">
-                    {displayDigit(result.nb ?? 0)} / {displayDigit(result.total ?? 0)} {result.label}
-                  </Typography>
-                ))}
-              </>
-            ) : (
-              <Typography variant="button">
-                {/* @ts-ignore */}
-                {displayDigit(results.nb ?? 0)} / {displayDigit(results.total ?? 0)} {results.label}
-              </Typography>
-            )}
-          </Grid>
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          results && (
+            <Grid id="DTTB_result" item container direction="column" style={{ width: 'fit-content' }}>
+              {Array.isArray(results) && results.length > 0 ? (
+                <>
+                  {results.map((result, index) => (
+                    <Typography key={index} variant="button">
+                      {displayDigit(result.nb ?? 0)} / {displayDigit(result.total ?? 0)} {result.label}
+                    </Typography>
+                  ))}
+                </>
+              ) : (
+                <Typography variant="button">
+                  {/* @ts-ignore */}
+                  {displayDigit(results.nb ?? 0)} / {displayDigit(results.total ?? 0)} {results.label}
+                </Typography>
+              )}
+            </Grid>
+          )
         )}
 
         {((searchBar && searchBar.type !== 'document') || (buttons && buttons?.length > 0)) && (
@@ -186,17 +176,13 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, search
                       {button.label}
                     </Button>
                   ))}
-
-                {searchBar && searchBar.type === 'document' && !!ODD_REGEX && (
-                  <InputSearchDocumentButton currentMode={inputMode} onChangeMode={setDefaultInputMode} />
-                )}
               </Grid>
             )}
           </Grid>
         )}
       </Grid>
 
-      {searchBar && searchBar.type === 'document' && inputMode === 'simple' && (
+      {searchBar && searchBar.type === 'document' && (
         <InputSearchDocumentSimple
           defaultSearchInput={search}
           setDefaultSearchInput={(newSearchInput: string) => setSearch(newSearchInput)}
@@ -223,14 +209,6 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ tabs, results, search
               </Typography>
             ))}
         </Grid>
-      )}
-
-      {searchBar && searchBar.type === 'document' && inputMode === 'regex' && (
-        <InputSearchDocumentRegex
-          defaultSearchInput={search}
-          setDefaultSearchInput={(newSearchInput: string) => setSearch(newSearchInput)}
-          onSearchDocument={(newInputText: string) => onSearch(newInputText)}
-        />
       )}
     </>
   )

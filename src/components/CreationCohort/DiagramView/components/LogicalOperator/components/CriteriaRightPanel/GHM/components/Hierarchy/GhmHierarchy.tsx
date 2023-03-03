@@ -1,18 +1,19 @@
-import React, { useEffect, useState, Fragment } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import clsx from 'clsx'
 
 import {
   Button,
+  Collapse,
   Divider,
   Grid,
   IconButton,
-  Typography,
+  LinearProgress,
+  List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Collapse,
-  List,
-  Tooltip
+  Tooltip,
+  Typography
 } from '@material-ui/core'
 import Skeleton from '@material-ui/lab/Skeleton'
 
@@ -20,51 +21,52 @@ import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import { useAppSelector, useAppDispatch } from 'state'
-import { PmsiListType, fetchClaim, expandPmsiElement } from 'state/pmsi'
+import { useAppDispatch, useAppSelector } from 'state'
+import { PmsiListType } from 'state/pmsi'
 
-import { getSelectedPmsi, filterSelectedPmsi, checkIfIndeterminated } from 'utils/pmsi'
+import { checkIfIndeterminated, expandItem, findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
 
 import useStyles from './styles'
+import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
+import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
+import { defaultDemographic } from '../../index'
+import { HierarchyTree } from 'types'
 
 type GhmListItemProps = {
   ghmItem: PmsiListType
-  selectedItem?: PmsiListType[] | null
-  handleClick: (ghmItem: { id: string; label: string }[] | null) => void
+  selectedItems?: PmsiListType[] | null
+  handleClick: (ghmItem: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
 }
 
 const GhmListItem: React.FC<GhmListItemProps> = (props) => {
-  const { ghmItem, selectedItem, handleClick } = props
+  const { ghmItem, selectedItems, handleClick } = props
   const { id, label, subItems } = ghmItem
 
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
-  const claimState = useAppSelector((state) => state.pmsi.claim || {})
-  const ghmHierarchy = claimState.list
+  const ghmHierarchy = useAppSelector((state) => state.pmsi.claim.list || {})
+  const isLoadingsyncHierarchyTable = useAppSelector((state) => state.syncHierarchyTable.loading || 0)
+  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)
 
   const [open, setOpen] = useState(false)
-
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === ghmItem.id) : false
-  const isIndeterminated = checkIfIndeterminated(ghmItem, selectedItem)
-
+  const isSelected = findSelectedInListAndSubItems(selectedItems ? selectedItems : [], ghmItem, ghmHierarchy)
+  const isIndeterminated = checkIfIndeterminated(ghmItem, selectedItems)
   const _onExpand = async (ghmCode: string) => {
+    if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
+    dispatch<any>(incrementLoadingSyncHierarchyTable())
     setOpen(!open)
-    const expandResult = await dispatch<any>(
-      expandPmsiElement({
-        keyElement: 'claim',
-        rowId: ghmCode,
-        selectedItems: selectedItem || []
-      })
-    )
-    if (expandResult.payload.savedSelectedItems) {
-      handleClick(expandResult.payload.savedSelectedItems)
-    }
+    const newHierarchy = await expandItem(ghmCode, selectedItems || [], ghmHierarchy, defaultDemographic.type, dispatch)
+    await handleClick(selectedItems, newHierarchy)
+    dispatch<any>(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = (ghmItem: PmsiListType) => {
-    const newSelectedItems = getSelectedPmsi(ghmItem, selectedItem || [], ghmHierarchy)
-    handleClick(newSelectedItems)
+  const handleClickOnHierarchy = async (ghmItem: PmsiListType) => {
+    if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
+    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    const newSelectedItems = getSelectedPmsi(ghmItem, selectedItems || [], ghmHierarchy)
+    await handleClick(newSelectedItems)
+    dispatch<any>(decrementLoadingSyncHierarchyTable())
   }
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
@@ -119,7 +121,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
-                  <GhmListItem ghmItem={ghmHierarchySubItem} selectedItem={selectedItem} handleClick={handleClick} />
+                  <GhmListItem ghmItem={ghmHierarchySubItem} selectedItems={selectedItems} handleClick={handleClick} />
                 </Fragment>
               )
             )}
@@ -130,81 +132,85 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
 }
 
 type GhmHierarchyProps = {
+  isOpen: boolean
   selectedCriteria: any
   goBack: (data: any) => void
-  onChangeSelectedHierarchy: (data: any) => void
+  onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
+  onConfirm: () => void
   isEdition?: boolean
 }
 
 const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
-  const { selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
+  const { isOpen = false, selectedCriteria, onChangeSelectedHierarchy, onConfirm, goBack, isEdition } = props
 
   const classes = useStyles()
-  const dispatch = useAppDispatch()
+  const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
+  const isLoadingSyncHierarchyTable = initialState?.loading ?? 0
+  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)
+  const [currentState, setCurrentState] = useState({ ...selectedCriteria, ...initialState })
+  const [loading, setLoading] = useState(isLoadingSyncHierarchyTable > 0 || isLoadingPmsi > 0)
 
-  const claimState = useAppSelector((state) => state.pmsi.claim || {})
-  const ghmHierarchy = claimState.list
+  const ghmHierarchy = useAppSelector((state) => state.pmsi.claim.list || {})
 
-  const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
-    isEdition ? selectedCriteria.code : []
-  )
+  const _handleClick = (newSelectedItems: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => {
+    onChangeSelectedHierarchy(newSelectedItems, newHierarchy)
+  }
 
-  // Init
   useEffect(() => {
-    const _init = async () => {
-      if (!ghmHierarchy || (ghmHierarchy && ghmHierarchy.length === 0)) {
-        dispatch<any>(fetchClaim())
-      }
+    const newList = { ...selectedCriteria, ...initialState } ?? {}
+    if (!newList.code) {
+      newList.code = selectedCriteria.code
     }
+    newList.code.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, ghmHierarchy).equivalentRow)
+    setCurrentState(newList)
+  }, [initialState, ghmHierarchy])
 
-    _init()
-  }, []) // eslint-disable-line
+  useEffect(() => {
+    if (!loading && (isLoadingSyncHierarchyTable > 0 || isLoadingPmsi > 0)) {
+      setLoading(true)
+    } else if (loading && isLoadingSyncHierarchyTable === 0 && isLoadingPmsi === 0) {
+      setLoading(false)
+    }
+  }, [isLoadingSyncHierarchyTable, isLoadingPmsi])
 
-  return (
-    <Grid className={classes.root}>
-      <Grid className={classes.actionContainer}>
-        {!isEdition ? (
-          <>
-            <IconButton className={classes.backButton} onClick={goBack}>
-              <KeyboardBackspaceIcon />
-            </IconButton>
-            <Divider className={classes.divider} orientation="vertical" flexItem />
-            <Typography className={classes.titleLabel}>Ajouter un critère de GHM</Typography>
-          </>
-        ) : (
-          <Typography className={classes.titleLabel}>Modifier un critère de GHM</Typography>
-        )}
-      </Grid>
+  return isOpen ? (
+    <>
+      <Grid className={classes.root}>
+        <Grid className={classes.actionContainer}>
+          {!isEdition ? (
+            <>
+              <IconButton className={classes.backButton} onClick={goBack}>
+                <KeyboardBackspaceIcon />
+              </IconButton>
+              <Divider className={classes.divider} orientation="vertical" flexItem />
+              <Typography className={classes.titleLabel}>Ajouter un critère de GHM</Typography>
+            </>
+          ) : (
+            <Typography className={classes.titleLabel}>Modifier un critère de GHM</Typography>
+          )}
+        </Grid>
+        <div className={classes.loader}>{loading && <LinearProgress />}</div>
+        <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
+          {ghmHierarchy &&
+            ghmHierarchy.map((ghmItem, index) => (
+              <GhmListItem key={index} ghmItem={ghmItem} selectedItems={currentState.code} handleClick={_handleClick} />
+            ))}
+        </List>
 
-      <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-        {ghmHierarchy &&
-          ghmHierarchy.map((ghmItem, index) => (
-            <GhmListItem
-              key={index}
-              ghmItem={ghmItem}
-              selectedItem={selectedHierarchy}
-              handleClick={onSetSelectedHierarchy}
-            />
-          ))}
-      </List>
-
-      <Grid className={classes.ghmHierarchyActionContainer}>
-        {!isEdition && (
-          <Button onClick={goBack} color="primary" variant="outlined">
-            Annuler
+        <Grid className={classes.ghmHierarchyActionContainer}>
+          {!isEdition && (
+            <Button onClick={goBack} color="primary" variant="outlined">
+              Annuler
+            </Button>
+          )}
+          <Button onClick={() => onConfirm()} type="submit" form="ghm10-form" color="primary" variant="contained">
+            Suivant
           </Button>
-        )}
-        <Button
-          onClick={() => onChangeSelectedHierarchy(filterSelectedPmsi(selectedHierarchy || [], ghmHierarchy))}
-          type="submit"
-          form="ghm10-form"
-          color="primary"
-          variant="contained"
-        >
-          Confirmer
-        </Button>
+        </Grid>
       </Grid>
-    </Grid>
+    </>
+  ) : (
+    <></>
   )
 }
 

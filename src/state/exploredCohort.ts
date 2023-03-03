@@ -1,19 +1,20 @@
-import { CohortData } from 'types'
+import { Cohort, CohortData } from 'types'
 import { IGroup_Member } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { login, logout } from './me'
 import { RootState } from 'state'
 
-import { setFavoriteCohort } from 'state/cohort'
 import { ODD_EXPORT } from '../constants'
 
-import services from 'services'
+import services from 'services/aphp'
+import { getAccessFromScope } from '../services/aphp/servicePerimeters'
 
 export type ExploredCohortState = {
   importedPatients: any[]
   includedPatients: any[]
   excludedPatients: any[]
   loading: boolean
+  rightToExplore: boolean | undefined
   requestId?: string
   cohortId?: string
   canMakeExport?: boolean
@@ -43,28 +44,21 @@ const defaultInitialState = {
   includedPatients: [],
   excludedPatients: [],
   loading: false,
+  rightToExplore: undefined,
   canMakeExport: false,
   deidentifiedBoolean: undefined
 }
 
-const favoriteExploredCohort = createAsyncThunk<CohortData, { id: string }, { state: RootState }>(
+const favoriteExploredCohort = createAsyncThunk<CohortData, { exploredCohort: Cohort }, { state: RootState }>(
   'exploredCohort/favoriteExploredCohort',
-  async ({ id }, { getState, dispatch }) => {
+  async ({ exploredCohort }, { getState }) => {
     const state = getState()
-    const cohortState = state.cohort
-    const cohortList = cohortState ? cohortState.cohortsList : []
 
-    const foundItem = cohortList.find(({ uuid }) => uuid === id)
-    if (!foundItem) return state.exploredCohort
-
-    const favoriteResult = await dispatch(setFavoriteCohort({ favCohort: foundItem }))
+    const favoriteResult = await services.projects.editCohort({ ...exploredCohort, favorite: !exploredCohort.favorite })
 
     return {
       ...state.exploredCohort,
-      favorite:
-        favoriteResult.meta.requestStatus === 'fulfilled'
-          ? !state.exploredCohort.favorite
-          : state.exploredCohort.favorite
+      favorite: favoriteResult.favorite
     }
   }
 )
@@ -118,16 +112,20 @@ const fetchExploredCohort = createAsyncThunk<
             cohort.cohortId = id
             const cohortRights = await services.cohorts.fetchCohortsRights([{ fhir_group_id: id }])
             const cohortRight = cohortRights && cohortRights[0]
-            cohort.canMakeExport =
-              (!!ODD_EXPORT &&
+            if (cohortRights && cohortRights[0] && cohortRights[0].extension) {
+              cohort.canMakeExport =
+                (!!ODD_EXPORT &&
+                  cohortRight?.extension?.some(
+                    ({ url, valueString }) => url === 'EXPORT_ACCESS' && valueString === 'DATA_NOMINATIVE'
+                  )) ??
+                false
+              cohort.deidentifiedBoolean =
                 cohortRight?.extension?.some(
-                  ({ url, valueString }) => url === 'EXPORT_ACCESS' && valueString === 'DATA_NOMINATIVE'
-                )) ??
-              false
-            cohort.deidentifiedBoolean =
-              cohortRight?.extension?.some(
-                ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
-              ) ?? true
+                  ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
+                ) ?? true
+            } else {
+              throw new Error("You don't have any rights on this cohort")
+            }
           }
         }
         break
@@ -142,11 +140,7 @@ const fetchExploredCohort = createAsyncThunk<
           cohort.favorite = false
           cohort.uuid = ''
           cohort.canMakeExport = false
-          cohort.deidentifiedBoolean = perimeters.some((perimeter) =>
-            perimeter.extension?.some(
-              (extension) => extension.url === 'READ_ACCESS' && extension.valueString === 'DATA_PSEUDOANONYMISED'
-            )
-          )
+          cohort.deidentifiedBoolean = perimeters.some((perimeter) => getAccessFromScope(perimeter) === 'Pseudonymisé')
         }
         break
       }
@@ -221,11 +215,7 @@ const fetchExploredCohortInBackground = createAsyncThunk<
         cohort.favorite = false
         cohort.uuid = ''
         cohort.canMakeExport = false
-        cohort.deidentifiedBoolean = perimeters.some((perimeter) =>
-          perimeter.extension?.some(
-            (extension) => extension.url === 'READ_ACCESS' && extension.valueString === 'DATA_PSEUDOANONYMISED'
-          )
-        )
+        cohort.deidentifiedBoolean = perimeters.some((perimeter) => getAccessFromScope(perimeter) === 'Pseudonymisé')
       }
       break
     }
@@ -331,16 +321,26 @@ const exploredCohortSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(login, () => defaultInitialState)
     builder.addCase(logout.fulfilled, () => defaultInitialState)
-    builder.addCase(fetchExploredCohort.pending, (state) => ({ ...state, loading: true }))
-    builder.addCase(fetchExploredCohort.fulfilled, (state, { payload }) => ({ ...state, ...payload, loading: false }))
-    builder.addCase(fetchExploredCohort.rejected, () => ({ ...defaultInitialState }))
-    builder.addCase(fetchExploredCohortInBackground.pending, (state) => ({ ...state, loading: true }))
+    builder.addCase(fetchExploredCohort.pending, (state) => ({ ...state, loading: true, rightToExplore: undefined }))
+    builder.addCase(fetchExploredCohort.fulfilled, (state, { payload }) => ({
+      ...state,
+      ...payload,
+      loading: false,
+      rightToExplore: true
+    }))
+    builder.addCase(fetchExploredCohort.rejected, () => ({ ...defaultInitialState, rightToExplore: false }))
+    builder.addCase(fetchExploredCohortInBackground.pending, (state) => ({
+      ...state,
+      loading: true,
+      rightToExplore: undefined
+    }))
     builder.addCase(fetchExploredCohortInBackground.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
-      loading: false
+      loading: false,
+      rightToExplore: true
     }))
-    builder.addCase(fetchExploredCohortInBackground.rejected, () => ({ ...defaultInitialState }))
+    builder.addCase(fetchExploredCohortInBackground.rejected, () => ({ ...defaultInitialState, rightToExplore: false }))
     builder.addCase(favoriteExploredCohort.pending, (state) => ({ ...state }))
     builder.addCase(favoriteExploredCohort.fulfilled, (state, { payload }) => ({
       ...state,

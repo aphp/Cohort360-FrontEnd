@@ -23,8 +23,12 @@ import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
+import { useAppDispatch, useAppSelector } from 'state'
+import { fetchBiology } from 'state/biology'
+import { HierarchyTree } from 'types'
 
 type BiologyFormProps = {
+  isOpen: boolean
   isEdition: boolean
   criteria: any
   selectedCriteria: any
@@ -34,24 +38,27 @@ type BiologyFormProps = {
 }
 
 const BiologyForm: React.FC<BiologyFormProps> = (props) => {
-  const { isEdition, criteria, selectedCriteria, onChangeValue, goBack, onChangeSelectedCriteria } = props
+  const { isOpen, isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
   const classes = useStyles()
+  const dispatch = useAppDispatch()
+  const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
+  const [currentState, setCurrentState] = useState({ ...selectedCriteria, ...initialState })
 
   const [error, setError] = useState(false)
-  const [allowSearchByValue, setAllowSearchByValue] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
+  const [allowSearchByValue, setAllowSearchByValue] = useState(false)
 
   const _onSubmit = () => {
-    if (selectedCriteria?.code?.length === 0) {
+    if (currentState?.code?.length === 0) {
       return setError(true)
     }
-
-    onChangeSelectedCriteria(selectedCriteria)
+    onChangeSelectedCriteria(currentState)
+    dispatch<any>(fetchBiology())
   }
 
-  const defaultValuesCode = selectedCriteria.code
-    ? selectedCriteria.code.map((code: any) => {
+  const defaultValuesCode = currentState.code
+    ? currentState.code.map((code: any) => {
         const criteriaCode = criteria.data.biologyData
           ? criteria.data.biologyData.find((g: any) => g.id === code.id)
           : null
@@ -63,28 +70,38 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
     : []
 
   useEffect(() => {
+    setCurrentState({ ...selectedCriteria, ...initialState })
+  }, [initialState])
+
+  useEffect(() => {
     const checkChildren = async () => {
       try {
-        const getChildrenResp = await criteria.fetch.fetchBiologyHierarchy(selectedCriteria.code[0].id)
+        const getChildrenResp = await criteria.fetch.fetchBiologyHierarchy(currentState.code[0].id)
 
         if (getChildrenResp.length > 0) {
-          onChangeValue('isLeaf', false)
+          if (currentState.isLeaf !== false) {
+            onChangeValue('isLeaf', false)
+          }
         } else {
-          onChangeValue('isLeaf', true)
+          if (currentState.isLeaf !== true) {
+            onChangeValue('isLeaf', true)
+          }
         }
       } catch (error) {
         console.error('Erreur lors du check des enfants du code de biologie sélectionné', error)
       }
     }
 
-    if (selectedCriteria?.code.length === 1 && selectedCriteria?.code[0].id !== '*') {
+    if (currentState?.code.length === 1 && currentState?.code[0].id !== '*') {
       checkChildren()
     } else {
-      onChangeValue('isLeaf', false)
+      if (currentState.isLeaf !== false) {
+        onChangeValue('isLeaf', false)
+      }
     }
-  }, [selectedCriteria.code])
+  }, [currentState])
 
-  return (
+  return isOpen ? (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
         {!isEdition ? (
@@ -131,13 +148,13 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             placeholder="Nom du critère"
             defaultValue="Critères de biologie"
             variant="outlined"
-            value={selectedCriteria.title}
+            value={currentState.title}
             onChange={(e) => onChangeValue('title', e.target.value)}
           />
 
           <Grid style={{ display: 'flex' }}>
             <FormLabel
-              onClick={() => onChangeValue('isInclusive', !selectedCriteria.isInclusive)}
+              onClick={() => onChangeValue('isInclusive', !currentState.isInclusive)}
               style={{ margin: 'auto 1em' }}
               component="legend"
             >
@@ -145,7 +162,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             </FormLabel>
             <Switch
               id="criteria-inclusive"
-              checked={!selectedCriteria.isInclusive}
+              checked={!currentState.isInclusive}
               onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
             />
           </Grid>
@@ -194,7 +211,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             <Grid
               style={{
                 display: 'grid',
-                gridTemplateColumns: selectedCriteria.valueComparator === '<x>' ? '50px 1fr 1fr 1fr' : '50px 1fr 1fr',
+                gridTemplateColumns: currentState.valueComparator === '<x>' ? '50px 1fr 1fr 1fr' : '50px 1fr 1fr',
                 alignItems: 'center',
                 marginTop: '1em'
               }}
@@ -203,13 +220,13 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 color="primary"
                 checked={allowSearchByValue}
                 onClick={() => setAllowSearchByValue(!allowSearchByValue)}
-                disabled={!selectedCriteria.isLeaf}
+                disabled={!currentState.isLeaf}
               />
 
               <Select
                 style={{ marginRight: '1em' }}
                 id="biology-value-comparator-select"
-                value={selectedCriteria.valueComparator}
+                value={currentState.valueComparator}
                 onChange={(event) => onChangeValue('valueComparator', event.target.value as string)}
                 variant="outlined"
                 disabled={!allowSearchByValue}
@@ -230,12 +247,12 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 type="number"
                 id="criteria-value"
                 variant="outlined"
-                value={selectedCriteria.valueMin}
+                value={currentState.valueMin}
                 onChange={(e) => onChangeValue('valueMin', e.target.value)}
-                placeholder={selectedCriteria.valueComparator === '<x>' ? 'Valeur minimale' : ''}
+                placeholder={currentState.valueComparator === '<x>' ? 'Valeur minimale' : ''}
                 disabled={!allowSearchByValue}
               />
-              {selectedCriteria.valueComparator === '<x>' && (
+              {currentState.valueComparator === '<x>' && (
                 <TextField
                   required
                   inputProps={{
@@ -244,7 +261,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                   type="number"
                   id="criteria-value"
                   variant="outlined"
-                  value={selectedCriteria.valueMax}
+                  value={currentState.valueMax}
                   onChange={(e) => onChangeValue('valueMax', e.target.value)}
                   placeholder="Valeur maximale"
                   disabled={!allowSearchByValue}
@@ -255,7 +272,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             </Grid>
           </Grid>
 
-          <AdvancedInputs form="biology" selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
+          <AdvancedInputs form="biology" selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
@@ -270,6 +287,8 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
         </Grid>
       </Grid>
     </Grid>
+  ) : (
+    <></>
   )
 }
 

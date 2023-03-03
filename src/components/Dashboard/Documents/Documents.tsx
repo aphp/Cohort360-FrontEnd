@@ -12,7 +12,7 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import { CohortComposition, DocumentFilters, Order, DTTB_ResultsType as ResultsType, searchInputError } from 'types'
 
-import services from 'services'
+import services from 'services/aphp'
 
 import { buildDocumentFiltersChips } from 'utils/chips'
 
@@ -200,6 +200,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         <CssBaseline />
         <Grid container item xs={11} justifyContent="space-between">
           <DataTableTopBar
+            loading={loadingStatus}
             results={[documentsResult, patientsResult]}
             searchBar={{
               type: 'document',

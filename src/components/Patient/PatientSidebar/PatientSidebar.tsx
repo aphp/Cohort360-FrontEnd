@@ -11,7 +11,7 @@ import PatientSidebarItem from './PatientSidebarItem/PatientSidebarItem'
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 
 import { getAge } from 'utils/age'
-import services from 'services'
+import services from 'services/aphp'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortPatient, PatientFilters as PatientFiltersType, SearchByTypes, Sort, VitalStatus } from 'types'
 
@@ -57,7 +57,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const [openSort, setOpenSort] = useState(false)
   const [sort, setSort] = useState<Sort>({
-    sortBy: 'given',
+    sortBy: 'family',
     sortDirection: 'asc'
   })
 
