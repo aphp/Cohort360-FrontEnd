@@ -104,7 +104,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
 
       <TableRow>
         <TableCell style={{ padding: 0, borderBottomWidth: open ? 1 : 0 }} colSpan={4}>
-          <Collapse in={open} timeout="auto" unmountOnExit style={{ width: '100%' }}>
+          <Collapse in={open} timeout="auto" unmountOnExit style={{ width: '100%', minHeight: 'fit-content' }}>
             {requestOfProject && requestOfProject.length > 0 ? (
               requestOfProject.map((request) => (
                 <RequestRow
