@@ -11,12 +11,14 @@ export type ScopeState = {
   loading: boolean
   scopesList: ScopeTreeRow[]
   openPopulation: number[]
+  aborted?: boolean
 }
 
 const defaultInitialState: ScopeState = {
   loading: false,
   scopesList: [],
-  openPopulation: []
+  openPopulation: [],
+  aborted: false
 }
 
 type FetchScopeListReturn = {
@@ -74,11 +76,13 @@ type ExpandScopeElementParams = {
   scopesList?: ScopeTreeRow[]
   selectedItems?: ScopeTreeRow[]
   openPopulation?: number[]
+  signal?: AbortSignal
 }
 type ExpandScopeElementReturn = {
   scopesList: ScopeTreeRow[]
   selectedItems: ScopeTreeRow[]
   openPopulation: number[]
+  aborted?: boolean
 }
 
 const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScopeElementParams, { state: RootState }>(
@@ -113,7 +117,8 @@ const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScop
             if (foundItem) {
               const subItems: ScopeTreeRow[] = await services.perimeters.getScopeSubItems(
                 item.inferior_levels_ids,
-                true
+                true,
+                params.signal
               )
               item = { ...item, subItems: subItems }
             }
@@ -139,7 +144,8 @@ const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScop
     return {
       scopesList: _rootRows,
       selectedItems: savedSelectedItems,
-      openPopulation: _openPopulation
+      openPopulation: _openPopulation,
+      aborted: params.signal?.aborted
     }
   }
 )
@@ -181,7 +187,8 @@ const scopeSlice = createSlice({
     builder.addCase(expandScopeElement.fulfilled, (state, action) => ({
       ...state,
       scopesList: action.payload.scopesList,
-      openPopulation: action.payload.openPopulation
+      openPopulation: action.payload.openPopulation,
+      aborted: action.payload.aborted ?? false
     }))
     builder.addCase(expandScopeElement.rejected, (state) => ({ ...state }))
   }

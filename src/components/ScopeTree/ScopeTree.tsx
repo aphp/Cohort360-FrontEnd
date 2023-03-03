@@ -215,41 +215,13 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     return newPerimetersList
   }
 
-  useEffect(() => {
-    if (debouncedSearchTerm) {
-      onChangeSelectedItem([])
-      setIsAllSelected(false)
-      _searchInPerimeters(false)
-    } else if (!debouncedSearchTerm) {
-      _init()
-    }
-    return () => {
-      controllerRef.current?.abort()
-    }
-  }, [debouncedSearchTerm])
-
-  useEffect(() => {
-    if (debouncedSearchTerm) {
-      _searchInPerimeters(isAllSelected)
-    }
-  }, [page])
-
-  useEffect(() => {
-    const _selectedItems: TreeElement[] = defaultSelectedItems.map(
-      (item) => findEquivalentRowInItemAndSubItems(item, rootRows).equivalentRow ?? item
-    )
-    setSelectedItem(_selectedItems)
-  }, [defaultSelectedItems])
-
-  useEffect(() => {
-    setRootRows(scopesList)
-  }, [scopesList])
-
   /**
    * This function is called when a user click on chevron
    *
    */
   const _onExpand = async (rowId: number) => {
+    const controller = controllerRef.current ?? new AbortController()
+    controllerRef.current = controller
     let _openPopulation = openPopulation ? openPopulation : []
     let _rootRows = rootRows ? [...rootRows] : []
     const index = _openPopulation.indexOf(rowId)
@@ -266,14 +238,17 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
         rowId: rowId,
         selectedItems: selectedItems,
         scopesList: _rootRows,
-        openPopulation: openPopulation
+        openPopulation: openPopulation,
+        signal: controllerRef.current?.signal
       })
     )
     if (expandResponse && expandResponse.payload) {
-      const _selectedItems = expandResponse.payload.selectedItems ?? []
-      _rootRows = expandResponse.payload.rootRows ?? _rootRows
-      setRootRows(_rootRows)
-      onChangeSelectedItem(_selectedItems)
+      if (!expandResponse.payload.aborted) {
+        const _selectedItems = expandResponse.payload.selectedItems ?? []
+        _rootRows = expandResponse.payload.rootRows ?? _rootRows
+        setRootRows(_rootRows)
+        onChangeSelectedItem(_selectedItems)
+      }
     }
   }
 
@@ -346,6 +321,38 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     }
     return checkChild(_row)
   }
+
+  useEffect(() => {
+    if (debouncedSearchTerm) {
+      onChangeSelectedItem([])
+      setIsAllSelected(false)
+      _searchInPerimeters(false)
+    } else if (!debouncedSearchTerm) {
+      _init()
+    }
+    return () => {
+      controllerRef.current?.abort()
+    }
+  }, [debouncedSearchTerm])
+
+  useEffect(() => {
+    if (debouncedSearchTerm) {
+      _searchInPerimeters(isAllSelected)
+    }
+  }, [page])
+
+  useEffect(() => {
+    const _selectedItems: TreeElement[] = defaultSelectedItems.map(
+      (item) => findEquivalentRowInItemAndSubItems(item, rootRows).equivalentRow ?? item
+    )
+    setSelectedItem(_selectedItems)
+  }, [defaultSelectedItems])
+
+  useEffect(() => {
+    if (!scopeState.aborted) {
+      setRootRows(scopesList)
+    }
+  }, [scopesList])
 
   const headCells = [
     { id: '', align: 'left', disablePadding: true, disableOrderBy: true, label: '' },

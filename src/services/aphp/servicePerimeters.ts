@@ -62,7 +62,8 @@ export interface IServicePerimeters {
   getPerimeters: (
     defaultPerimetersIds?: string[],
     cohortIds?: string[],
-    noPerimetersIdsFetch?: boolean
+    noPerimetersIdsFetch?: boolean,
+    signal?: AbortSignal
   ) => Promise<ScopePage[]>
 
   /**
@@ -86,7 +87,11 @@ export interface IServicePerimeters {
    * Retour:
    *   - ScopeTreeRow[]
    */
-  getScopeSubItems: (subScopesIds: string | null | undefined, getSubItem?: boolean) => Promise<ScopeTreeRow[]>
+  getScopeSubItems: (
+    subScopesIds: string | null | undefined,
+    getSubItem?: boolean,
+    signal?: AbortSignal
+  ) => Promise<ScopeTreeRow[]>
 
   /**
    * Cette fonction retourne les droits de lecture d'un périmetre
@@ -103,7 +108,11 @@ export interface IServicePerimeters {
   /**
    * construire une liste de ScopeTreeRow à travers une liste de ScopePage
    */
-  buildScopeTreeRow: (subScopes: ScopePage[], getSubItem?: boolean | undefined) => Promise<ScopeTreeRow[]>
+  buildScopeTreeRow: (
+    subScopes: ScopePage[],
+    getSubItem?: boolean | undefined,
+    signal?: AbortSignal
+  ) => Promise<ScopeTreeRow[]>
 
   /**
    * à travers un ScopePage on retourne 'Nominatif' ou 'Pseudonymisé' selon les droits d'accès
@@ -215,13 +224,18 @@ const servicesPerimeters: IServicePerimeters = {
     }
   },
 
-  getPerimeters: async (defaultPerimetersIds?: string[], cohortIds?: string[], noPerimetersIdsFetch?: boolean) => {
+  getPerimeters: async (
+    defaultPerimetersIds?: string[],
+    cohortIds?: string[],
+    noPerimetersIdsFetch?: boolean,
+    signal?: AbortSignal
+  ) => {
     try {
       let perimetersIds: string[] | undefined = []
       let perimetersList: ScopePage[] = []
       let rightsData: any[] = []
       if (!defaultPerimetersIds && !noPerimetersIdsFetch) {
-        const rightResponse = await apiBackend.get('accesses/accesses/my-rights/?pop-children')
+        const rightResponse = await apiBackend.get('accesses/accesses/my-rights/?pop-children', { signal: signal })
         rightsData = rightResponse.status === 200 ? (rightResponse?.data as any[]) : []
 
         if (rightResponse.status !== 200) {
@@ -275,10 +289,15 @@ const servicesPerimeters: IServicePerimeters = {
     return scopeTreeRowList
   },
 
-  getScopeSubItems: async (subScopesIds: string | null | undefined, getSubItem?: boolean) => {
+  getScopeSubItems: async (subScopesIds: string | null | undefined, getSubItem?: boolean, signal?: AbortSignal) => {
     if (!subScopesIds) return []
-    const subScopes: ScopePage[] = await servicesPerimeters.getPerimeters(subScopesIds.trim().split(','))
-    const scopeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(subScopes, getSubItem)
+    const subScopes: ScopePage[] = await servicesPerimeters.getPerimeters(
+      subScopesIds.trim().split(','),
+      undefined,
+      undefined,
+      signal
+    )
+    const scopeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(subScopes, getSubItem, signal)
     return scopeRowList
   },
 
@@ -346,7 +365,7 @@ const servicesPerimeters: IServicePerimeters = {
     return result
   },
 
-  buildScopeTreeRow: async (subScopes: ScopePage[], getSubItem?: boolean | undefined) => {
+  buildScopeTreeRow: async (subScopes: ScopePage[], getSubItem?: boolean | undefined, signal?: AbortSignal) => {
     let scopeRowList: ScopeTreeRow[] = []
     for (const scopeItem of subScopes) {
       const scopeRowItem: ScopeTreeRow = { id: '', name: '', quantity: 0, subItems: [] }
@@ -358,7 +377,7 @@ const servicesPerimeters: IServicePerimeters = {
       scopeRowItem.inferior_levels_ids = scopeItem.perimeter.inferior_levels_ids
       scopeRowItem.subItems =
         getSubItem === true
-          ? await servicesPerimeters.getScopeSubItems(scopeItem.perimeter.inferior_levels_ids)
+          ? await servicesPerimeters.getScopeSubItems(scopeItem.perimeter.inferior_levels_ids, undefined, signal)
           : [loadingItem]
       scopeRowList = [...scopeRowList, scopeRowItem]
     }
