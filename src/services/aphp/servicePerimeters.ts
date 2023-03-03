@@ -320,7 +320,11 @@ const servicesPerimeters: IServicePerimeters = {
   },
 
   findScope: async (searchInput: string | undefined, page?: number | undefined, signal?: AbortSignal) => {
-    let result: { scopeTreeRows: ScopeTreeRow[]; count: 0 } = { scopeTreeRows: [], count: 0 }
+    let result: { scopeTreeRows: ScopeTreeRow[]; count: number; aborted?: boolean } = {
+      scopeTreeRows: [],
+      count: 0,
+      aborted: false
+    }
     if (!searchInput) {
       return result
     }
@@ -333,8 +337,12 @@ const servicesPerimeters: IServicePerimeters = {
       const newPerimetersList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(
         backCohortResponse.data.results
       )
-      result = { scopeTreeRows: newPerimetersList, count: backCohortResponse.data.count }
+      result = {
+        scopeTreeRows: newPerimetersList,
+        count: backCohortResponse.data.count
+      }
     }
+    result.aborted = signal?.aborted
     return result
   },
 

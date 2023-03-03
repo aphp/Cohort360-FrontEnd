@@ -180,6 +180,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     setSearchLoading(true)
     await fetchScopeTree()
     setRootRows(scopesList)
+    setCount(scopesList?.length)
     setSearchLoading(false)
     setIsEmpty(false)
   }
@@ -191,23 +192,25 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     }
     const controller = new AbortController()
     controllerRef.current = controller
-    const { scopeTreeRows: newPerimetersList, count: newCount } = await servicesPerimeters.findScope(
-      searchInput,
-      page,
-      controllerRef.current?.signal
-    )
-    if (!newPerimetersList || newPerimetersList.length < 1) {
-      setIsEmpty(true)
-    } else {
-      setIsEmpty(false)
+    const {
+      scopeTreeRows: newPerimetersList,
+      count: newCount,
+      aborted: aborted
+    } = await servicesPerimeters.findScope(searchInput, page, controllerRef.current?.signal)
+    if (!aborted) {
+      if (!newPerimetersList || newPerimetersList.length < 1) {
+        setIsEmpty(true)
+      } else {
+        setIsEmpty(false)
+      }
+      if (_isAllSelected) {
+        const _newSelectedItems = [...selectedItems, ...newPerimetersList]
+        onChangeSelectedItem(_newSelectedItems)
+      }
+      setRootRows(newPerimetersList)
+      setCount(newCount)
+      setSearchLoading(false)
     }
-    if (_isAllSelected) {
-      const _newSelectedItems = [...selectedItems, ...newPerimetersList]
-      onChangeSelectedItem(_newSelectedItems)
-    }
-    setRootRows(newPerimetersList)
-    setCount(newCount)
-    setSearchLoading(false)
     controllerRef.current = null
     return newPerimetersList
   }
