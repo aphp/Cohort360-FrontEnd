@@ -47,7 +47,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const [order, setOrder] = useState<Order>({
     orderBy: 'date',
-    orderDirection: 'asc'
+    orderDirection: 'desc'
   })
 
   const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
