@@ -303,7 +303,6 @@ const MyProjects: React.FC<{}> = () => {
         selectedRequests={selectedRequests}
       />
 
-      {console.log('selectedRequests', selectedRequests)}
       <ModalDeleteRequests
         open={openModal === 'delete_items'}
         onClose={(onConfirm?: boolean) => {

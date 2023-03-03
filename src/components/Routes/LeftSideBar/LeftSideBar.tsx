@@ -56,7 +56,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
     cohortCreation: state.cohortCreation
   }))
   const maintenanceIsActive = practitioner?.maintenance?.active
-  console.log('cohortCreation', cohortCreation)
   // v-- just for zoom transition..
   const [allreadyOpen, setAllreadyOpen] = useState(false)
 
@@ -71,14 +70,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
       dispatch<any>(closeAction())
     }
   }, [props.open, cohortCreation]) // eslint-disable-line
-
-  // useEffect(() => {
-  //   const { practitioner, open, cohortCreation } = useAppSelector((state) => ({
-  //     practitioner: state.me,
-  //     open: state.drawer,
-  //     cohortCreation: state.cohortCreation
-  //   }))
-  // }, [cohortCreation])
 
   const handleDrawerOpenOrClose = (value: boolean) => {
     setAllreadyOpen(true)
@@ -314,7 +305,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     >
                       <Typography variant="h5">Requête en cours</Typography>
                       <Typography noWrap style={{ width: 200 }}>
-                        {console.log('cohortCreation.request.requestName', cohortCreation.request.requestName)}
                         {cohortCreation.request.requestName}
                       </Typography>
                     </Button>
