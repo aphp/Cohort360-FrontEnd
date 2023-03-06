@@ -372,6 +372,7 @@ const servicesPerimeters: IServicePerimeters = {
       scopeRowItem.id = '' + scopeItem.perimeter.id
       scopeRowItem.cohort_id = scopeItem.perimeter.cohort_id
       scopeRowItem.name = servicesPerimeters.getScopeName(scopeItem.perimeter)
+      scopeRowItem.full_path = scopeItem.perimeter.full_path
       scopeRowItem.quantity = +scopeItem.perimeter.cohort_size
       scopeRowItem.access = servicesPerimeters.getAccessFromScope(scopeItem)
       scopeRowItem.inferior_levels_ids = scopeItem.perimeter.inferior_levels_ids
@@ -394,9 +395,9 @@ const servicesPerimeters: IServicePerimeters = {
   getScopeName: (perimeter: any) => {
     const perimeterID = perimeter ? perimeter.source_value : false
     if (!perimeterID) {
-      return perimeter ? perimeter.full_path : ''
+      return perimeter ? perimeter.name : ''
     }
-    return `${perimeterID} - ${perimeter.full_path}`
+    return `${perimeterID} - ${perimeter.name}`
   }
 }
 

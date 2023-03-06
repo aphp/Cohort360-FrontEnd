@@ -108,15 +108,16 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
           </TableCell>
 
           <TableCell>
-            {debouncedSearchTerm && row.name ? (
+            {debouncedSearchTerm && row.full_path ? (
               <Breadcrumbs maxItems={2}>
-                {(row.name.split('/').length > 1 ? row.name.split('/').slice(1) : row.name.split('/').slice(0)).map(
-                  (name: any, index: number) => (
-                    <Typography key={index} style={{ color: '#153D8A' }}>
-                      {name}
-                    </Typography>
-                  )
-                )}
+                {(row.full_path.split('/').length > 1
+                  ? row.full_path.split('/').slice(1)
+                  : row.full_path.split('/').slice(0)
+                ).map((full_path: any, index: number) => (
+                  <Typography key={index} style={{ color: '#153D8A' }}>
+                    {full_path}
+                  </Typography>
+                ))}
               </Breadcrumbs>
             ) : (
               <Typography>{row.name}</Typography>
