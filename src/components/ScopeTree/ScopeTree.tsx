@@ -41,6 +41,7 @@ type ScopeTreeListItemProps = {
   parentAccess: string
   selectedItems: ScopeTreeRow[]
   rootRows: ScopeTreeRow[]
+  openPopulation: ScopeTreeRow[]
   debouncedSearchTerm: string | undefined
   labelId: string
   onExpand: (rowId: number) => void
@@ -56,6 +57,7 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
     parentAccess,
     selectedItems,
     rootRows,
+    openPopulation,
     debouncedSearchTerm,
     labelId,
     onExpand,
@@ -65,13 +67,6 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
   } = props
 
   const classes = useStyles()
-  const { scopeState } = useAppSelector<{
-    scopeState: ScopeState
-  }>((state) => ({
-    scopeState: state.scope || {}
-  }))
-
-  const { openPopulation = [] } = scopeState
 
   return (
     <>
@@ -180,6 +175,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     setSearchLoading(true)
     await fetchScopeTree()
     setRootRows(scopesList)
+    setOpenPopulations([])
     setCount(scopesList?.length)
     setSearchLoading(false)
     setIsEmpty(false)
@@ -428,6 +424,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                           parentAccess={parentAccess}
                           selectedItems={selectedItems}
                           rootRows={rootRows}
+                          openPopulation={openPopulation}
                           debouncedSearchTerm={debouncedSearchTerm as string}
                           labelId={labelId}
                           onExpand={_onExpand}
@@ -450,6 +447,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                         parentAccess={row.access}
                         selectedItems={selectedItems}
                         rootRows={rootRows}
+                        openPopulation={openPopulation}
                         debouncedSearchTerm={debouncedSearchTerm as string}
                         labelId={labelId}
                         onExpand={_onExpand}
