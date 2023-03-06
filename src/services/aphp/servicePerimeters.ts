@@ -394,9 +394,9 @@ const servicesPerimeters: IServicePerimeters = {
   getScopeName: (perimeter: any) => {
     const perimeterID = perimeter ? perimeter.source_value : false
     if (!perimeterID) {
-      return perimeter ? perimeter.name : ''
+      return perimeter ? perimeter.full_path : ''
     }
-    return `${perimeterID} - ${perimeter.name}`
+    return `${perimeterID} - ${perimeter.full_path}`
   }
 }
 

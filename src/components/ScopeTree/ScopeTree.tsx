@@ -204,6 +204,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
         onChangeSelectedItem(_newSelectedItems)
       }
       setRootRows(newPerimetersList)
+      setOpenPopulations([])
       setCount(newCount)
       setSearchLoading(false)
     }
