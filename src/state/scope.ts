@@ -11,12 +11,14 @@ export type ScopeState = {
   loading: boolean
   scopesList: ScopeTreeRow[]
   openPopulation: number[]
+  aborted?: boolean
 }
 
 const defaultInitialState: ScopeState = {
   loading: false,
   scopesList: [],
-  openPopulation: []
+  openPopulation: [],
+  aborted: false
 }
 
 type FetchScopeListReturn = {
@@ -59,7 +61,18 @@ const fetchScopesListinBackground = createAsyncThunk<FetchScopeListReturn, void,
       return {
         scopesList: scopes.map((scope) => ({
           ...scope,
-          subItems: (scopesList.find(({ id }) => id === scope.id) || { subItems: [] }).subItems
+          subItems: (
+            scopesList.find((item) => item.id === scope.id && item.subItems?.length) ?? {
+              subItems: [
+                {
+                  id: 'loading',
+                  name: 'loading',
+                  quantity: 0,
+                  subItems: []
+                }
+              ]
+            }
+          ).subItems
         }))
       }
     } catch (error) {
@@ -71,40 +84,52 @@ const fetchScopesListinBackground = createAsyncThunk<FetchScopeListReturn, void,
 
 type ExpandScopeElementParams = {
   rowId: number
+  scopesList?: ScopeTreeRow[]
   selectedItems?: ScopeTreeRow[]
+  openPopulation?: number[]
+  signal?: AbortSignal
 }
 type ExpandScopeElementReturn = {
   scopesList: ScopeTreeRow[]
   selectedItems: ScopeTreeRow[]
   openPopulation: number[]
+  aborted?: boolean
 }
 
 const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScopeElementParams, { state: RootState }>(
   'scope/expandScopeElement',
-  async ({ rowId, selectedItems }, { getState }) => {
-    const state = getState().scope
-    const { scopesList, openPopulation } = state
-
+  async (params, { getState }) => {
+    let scopesList
+    let openPopulation
+    if (params.scopesList && params.openPopulation) {
+      scopesList = params.scopesList
+      openPopulation = params.openPopulation
+    } else {
+      const state = getState().scope
+      scopesList = state.scopesList
+      openPopulation = state.openPopulation
+    }
     let _rootRows = scopesList ? [...scopesList] : []
-    let savedSelectedItems = selectedItems ? [...selectedItems] : []
+    let savedSelectedItems = params.selectedItems ? [...params.selectedItems] : []
     let _openPopulation = openPopulation ? [...openPopulation] : []
 
-    const index = _openPopulation.indexOf(rowId)
+    const index = _openPopulation.indexOf(params.rowId)
     if (index !== -1) {
-      _openPopulation = _openPopulation.filter((id) => id !== rowId)
+      _openPopulation = _openPopulation.filter((id) => id !== params.rowId)
     } else {
-      _openPopulation = [..._openPopulation, rowId]
+      _openPopulation = [..._openPopulation, params.rowId]
 
       const replaceSubItems = async (items: ScopeTreeRow[]) => {
         let _items: ScopeTreeRow[] = []
         for (let item of items) {
           // Replace sub items element by response of back-end
-          if (+item.id === +rowId) {
+          if (+item.id === +params.rowId) {
             const foundItem = item.subItems ? item.subItems.find((i: any) => i.id === 'loading') : true
             if (foundItem) {
               const subItems: ScopeTreeRow[] = await services.perimeters.getScopeSubItems(
                 item.inferior_levels_ids,
-                true
+                true,
+                params.signal
               )
               item = { ...item, subItems: subItems }
             }
@@ -130,7 +155,8 @@ const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScop
     return {
       scopesList: _rootRows,
       selectedItems: savedSelectedItems,
-      openPopulation: _openPopulation
+      openPopulation: _openPopulation,
+      aborted: params.signal?.aborted
     }
   }
 )
@@ -172,7 +198,8 @@ const scopeSlice = createSlice({
     builder.addCase(expandScopeElement.fulfilled, (state, action) => ({
       ...state,
       scopesList: action.payload.scopesList,
-      openPopulation: action.payload.openPopulation
+      openPopulation: action.payload.openPopulation,
+      aborted: action.payload.aborted ?? false
     }))
     builder.addCase(expandScopeElement.rejected, (state) => ({ ...state }))
   }

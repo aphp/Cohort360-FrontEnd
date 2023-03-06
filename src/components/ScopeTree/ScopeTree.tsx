@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import {
   Breadcrumbs,
@@ -41,6 +41,7 @@ type ScopeTreeListItemProps = {
   parentAccess: string
   selectedItems: ScopeTreeRow[]
   rootRows: ScopeTreeRow[]
+  openPopulation: ScopeTreeRow[]
   debouncedSearchTerm: string | undefined
   labelId: string
   onExpand: (rowId: number) => void
@@ -56,6 +57,7 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
     parentAccess,
     selectedItems,
     rootRows,
+    openPopulation,
     debouncedSearchTerm,
     labelId,
     onExpand,
@@ -65,13 +67,6 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
   } = props
 
   const classes = useStyles()
-  const { scopeState } = useAppSelector<{
-    scopeState: ScopeState
-  }>((state) => ({
-    scopeState: state.scope || {}
-  }))
-
-  const { openPopulation = [] } = scopeState
 
   return (
     <>
@@ -113,15 +108,16 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
           </TableCell>
 
           <TableCell>
-            {debouncedSearchTerm && row.name ? (
+            {debouncedSearchTerm && row.full_path ? (
               <Breadcrumbs maxItems={2}>
-                {(row.name.split('/').length > 1 ? row.name.split('/').slice(1) : row.name.split('/').slice(0)).map(
-                  (name: any, index: number) => (
-                    <Typography key={index} style={{ color: '#153D8A' }}>
-                      {name}
-                    </Typography>
-                  )
-                )}
+                {(row.full_path.split('/').length > 1
+                  ? row.full_path.split('/').slice(1)
+                  : row.full_path.split('/').slice(0)
+                ).map((full_path: any, index: number) => (
+                  <Typography key={index} style={{ color: '#153D8A' }}>
+                    {full_path}
+                  </Typography>
+                ))}
               </Breadcrumbs>
             ) : (
               <Typography>{row.name}</Typography>
@@ -170,6 +166,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
   const [isAllSelected, setIsAllSelected] = useState(false)
+  const controllerRef = useRef<AbortController | null>()
 
   const fetchScopeTree = async () => {
     dispatch<any>(fetchScopesList())
@@ -179,58 +176,50 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     setSearchLoading(true)
     await fetchScopeTree()
     setRootRows(scopesList)
+    setOpenPopulations([])
+    setCount(scopesList?.length)
     setSearchLoading(false)
     setIsEmpty(false)
   }
 
   const _searchInPerimeters = async (_isAllSelected?: boolean) => {
     setSearchLoading(true)
-    const { scopeTreeRows: newPerimetersList, count: newCount } = await servicesPerimeters.findScope(searchInput, page)
-    if (!newPerimetersList || newPerimetersList.length < 1) {
-      setIsEmpty(true)
+    if (controllerRef.current) {
+      controllerRef.current.abort()
     }
-    if (_isAllSelected) {
-      const _newSelectedItems = [...selectedItems, ...newPerimetersList]
-      onChangeSelectedItem(_newSelectedItems)
+    const controller = new AbortController()
+    controllerRef.current = controller
+    const {
+      scopeTreeRows: newPerimetersList,
+      count: newCount,
+      aborted: aborted
+    } = await servicesPerimeters.findScope(searchInput, page, controllerRef.current?.signal)
+    if (!aborted) {
+      if (!newPerimetersList || newPerimetersList.length < 1) {
+        setIsEmpty(true)
+      } else {
+        setIsEmpty(false)
+      }
+      if (_isAllSelected) {
+        const _newSelectedItems = [...selectedItems, ...newPerimetersList]
+        onChangeSelectedItem(_newSelectedItems)
+      }
+      setRootRows(newPerimetersList)
+      setOpenPopulations([])
+      setCount(newCount)
+      setSearchLoading(false)
     }
-    setRootRows(newPerimetersList)
-    setCount(newCount)
-    setSearchLoading(false)
+    controllerRef.current = null
     return newPerimetersList
   }
-
-  useEffect(() => {
-    if (debouncedSearchTerm) {
-      onChangeSelectedItem([])
-      setIsAllSelected(false)
-      _searchInPerimeters(false)
-    } else if (!debouncedSearchTerm) {
-      _init()
-    }
-  }, [debouncedSearchTerm])
-
-  useEffect(() => {
-    if (debouncedSearchTerm) {
-      _searchInPerimeters(isAllSelected)
-    }
-  }, [page])
-
-  useEffect(() => {
-    const _selectedItems: TreeElement[] = defaultSelectedItems.map(
-      (item) => findEquivalentRowInItemAndSubItems(item, rootRows).equivalentRow ?? item
-    )
-    setSelectedItem(_selectedItems)
-  }, [defaultSelectedItems])
-
-  useEffect(() => {
-    setRootRows(scopesList)
-  }, [scopesList])
 
   /**
    * This function is called when a user click on chevron
    *
    */
   const _onExpand = async (rowId: number) => {
+    const controller = controllerRef.current ?? new AbortController()
+    controllerRef.current = controller
     let _openPopulation = openPopulation ? openPopulation : []
     let _rootRows = rootRows ? [...rootRows] : []
     const index = _openPopulation.indexOf(rowId)
@@ -241,9 +230,18 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     } else {
       _openPopulation = [..._openPopulation, rowId]
       setOpenPopulations(_openPopulation)
-
-      const expandResponse = await dispatch<any>(expandScopeElement({ rowId, selectedItems }))
-      if (expandResponse && expandResponse.payload) {
+    }
+    const expandResponse = await dispatch<any>(
+      expandScopeElement({
+        rowId: rowId,
+        selectedItems: selectedItems,
+        scopesList: _rootRows,
+        openPopulation: openPopulation,
+        signal: controllerRef.current?.signal
+      })
+    )
+    if (expandResponse && expandResponse.payload) {
+      if (!expandResponse.payload.aborted) {
         const _selectedItems = expandResponse.payload.selectedItems ?? []
         _rootRows = expandResponse.payload.rootRows ?? _rootRows
         setRootRows(_rootRows)
@@ -322,6 +320,38 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     return checkChild(_row)
   }
 
+  useEffect(() => {
+    if (debouncedSearchTerm) {
+      onChangeSelectedItem([])
+      setIsAllSelected(false)
+      _searchInPerimeters(false)
+    } else if (!debouncedSearchTerm) {
+      _init()
+    }
+    return () => {
+      controllerRef.current?.abort()
+    }
+  }, [debouncedSearchTerm])
+
+  useEffect(() => {
+    if (debouncedSearchTerm) {
+      _searchInPerimeters(isAllSelected)
+    }
+  }, [page])
+
+  useEffect(() => {
+    const _selectedItems: TreeElement[] = defaultSelectedItems.map(
+      (item) => findEquivalentRowInItemAndSubItems(item, rootRows).equivalentRow ?? item
+    )
+    setSelectedItem(_selectedItems)
+  }, [defaultSelectedItems])
+
+  useEffect(() => {
+    if (!scopeState.aborted) {
+      setRootRows(scopesList)
+    }
+  }, [scopesList])
+
   const headCells = [
     { id: '', align: 'left', disablePadding: true, disableOrderBy: true, label: '' },
     {
@@ -396,7 +426,8 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                           parentAccess={parentAccess}
                           selectedItems={selectedItems}
                           rootRows={rootRows}
-                          debouncedSearchTerm={debouncedSearchTerm}
+                          openPopulation={openPopulation}
+                          debouncedSearchTerm={debouncedSearchTerm as string}
                           labelId={labelId}
                           onExpand={_onExpand}
                           onSelect={_onSelect}
@@ -418,7 +449,8 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                         parentAccess={row.access}
                         selectedItems={selectedItems}
                         rootRows={rootRows}
-                        debouncedSearchTerm={debouncedSearchTerm}
+                        openPopulation={openPopulation}
+                        debouncedSearchTerm={debouncedSearchTerm as string}
                         labelId={labelId}
                         onExpand={_onExpand}
                         onSelect={_onSelect}
