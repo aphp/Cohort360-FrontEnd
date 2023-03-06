@@ -27,7 +27,7 @@ import {
 import { logout } from './me'
 
 import services from 'services/aphp'
-import { getAccessFromScope } from '../services/aphp/servicePerimeters'
+import servicesPerimeters from '../services/aphp/servicePerimeters'
 
 export type PatientState = null | {
   loading: boolean
@@ -625,7 +625,9 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
         deidentifiedBoolean = (await services.patients.fetchRights(groupId)) ?? {}
       } else {
         const perimeters = await services.perimeters.getPerimeters()
-        deidentifiedBoolean = perimeters.some((perimeter) => getAccessFromScope(perimeter) === 'Pseudonymisé')
+        deidentifiedBoolean = perimeters.some(
+          (perimeter) => servicesPerimeters.getAccessFromScope(perimeter) === 'Pseudonymisé'
+        )
       }
       if (
         patientState?.patientInfo?.id !== patientId ||

@@ -228,6 +228,7 @@ export type ScopeTreeRow = {
   resourceType?: string
   id: string
   name: string
+  full_path?: string
   quantity: number
   parentId?: string
   subItems: ScopeTreeRow[]
