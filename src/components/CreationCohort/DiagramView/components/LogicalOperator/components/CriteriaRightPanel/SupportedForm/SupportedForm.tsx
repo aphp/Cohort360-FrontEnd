@@ -205,6 +205,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
               title={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
               executiveUnits={defaultValues?.encounterService ?? []}
               isAcceptEmptySelection={true}
+              isDeleteIcon={true}
               onChangeExecutiveUnits={_onSubmitExecutiveUnits}
             />
           </Grid>

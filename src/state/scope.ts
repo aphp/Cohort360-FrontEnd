@@ -1,11 +1,11 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 
 import { logout, login } from './me'
 
 import services from 'services/aphp'
 
-import { ScopeTreeRow } from 'types'
+import { Cohort, ScopeTreeRow } from 'types'
 
 export type ScopeState = {
   loading: boolean
@@ -190,6 +190,12 @@ const scopeSlice = createSlice({
         ...state,
         openPopulation: []
       }
+    },
+    updateScopeList: (state, action: PayloadAction<ScopeTreeRow[]>) => {
+      return {
+        ...state,
+        scopesList: action.payload
+      }
     }
   },
   extraReducers: (builder) => {
@@ -224,4 +230,4 @@ const scopeSlice = createSlice({
 
 export default scopeSlice.reducer
 export { fetchScopesList, expandScopeElement }
-export const { clearScope, closeAllOpenedPopulation } = scopeSlice.actions
+export const { clearScope, closeAllOpenedPopulation, updateScopeList } = scopeSlice.actions

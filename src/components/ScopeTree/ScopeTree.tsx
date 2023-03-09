@@ -1,21 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import {
+  Breadcrumbs,
   Checkbox,
   CircularProgress,
   Grid,
   IconButton,
-  Skeleton,
-  TableCell,
-  TableRow,
-  Typography,
-  Breadcrumbs,
+  Pagination,
   Paper,
+  Skeleton,
   Table,
   TableBody,
+  TableCell,
   TableContainer,
   TableHead,
-  Pagination
+  TableRow,
+  Typography
 } from '@mui/material'
 
 import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'
@@ -24,14 +24,14 @@ import EnhancedTable from 'components/ScopeTree/ScopeTreeTable'
 import { ScopeTreeRow, TreeElement } from 'types'
 
 import { useAppDispatch, useAppSelector } from 'state'
-import { expandScopeElement, fetchScopesList, ScopeState } from 'state/scope'
+import { expandScopeElement, fetchScopesList, ScopeState, updateScopeList } from 'state/scope'
 
 import displayDigit from 'utils/displayDigit'
 import { useDebounce } from 'utils/debounce'
 
 import useStyles from './styles'
-import { findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
-import servicesPerimeters from '../../services/aphp/servicePerimeters'
+import { checkIfIndeterminated, findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
+import servicesPerimeters, { loadingItem } from '../../services/aphp/servicePerimeters'
 import { findSelectedInListAndSubItems } from '../../utils/cohortCreation'
 
 type ScopeTreeListItemProps = {
@@ -95,6 +95,7 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
               </IconButton>
             )}
           </TableCell>
+
           <TableCell align="center" padding="checkbox">
             <Checkbox
               color="secondary"
@@ -176,9 +177,15 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
   const [count, setCount] = useState(0)
   const [isAllSelected, setIsAllSelected] = useState(false)
   const controllerRef = useRef<AbortController | null>()
+  const isHeadChecked: boolean =
+    isAllSelected ||
+    scopesList.filter((row) => selectedItems.find((item: { id: any }) => item.id === row.id) !== undefined).length ===
+      scopesList.length
+  const isHeadIndetermined: boolean =
+    !isAllSelected && selectedItems && selectedItems.length > 0 && rootRows && !isHeadChecked
 
-  const fetchScopeTree = async (signal?: AbortSignal) => {
-    return dispatch(fetchScopesList(signal)).unwrap()
+  const fetchScopeTree = async (executiveUnitType?: string, signal?: AbortSignal) => {
+    return dispatch(fetchScopesList({ signal })).unwrap()
   }
 
   const _cancelPendingRequest = () => {
@@ -191,15 +198,106 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
   const _init = async () => {
     setSearchLoading(true)
     _cancelPendingRequest()
-    const fetchScopeTreeResponse = await fetchScopeTree(controllerRef.current?.signal)
+
+    let newPerimetersList: ScopeTreeRow[] = []
+    const fetchScopeTreeResponse = await fetchScopeTree(executiveUnitType, controllerRef.current?.signal)
     if (fetchScopeTreeResponse && !fetchScopeTreeResponse.aborted) {
-      const newPerimetersList = fetchScopeTreeResponse.scopesList
+      newPerimetersList = fetchScopeTreeResponse.scopesList
       setRootRows(newPerimetersList)
       setOpenPopulations([])
       setCount(newPerimetersList?.length)
       setIsEmpty(!newPerimetersList || newPerimetersList.length < 0)
     }
+    await _expandSelectedItems(newPerimetersList ?? rootRows)
     setSearchLoading(false)
+  }
+
+  const getFetchedSelectedItems = (selectedItems: ScopeTreeRow[], rootRows: ScopeTreeRow[]) => {
+    const fetchedSelectedItems: ScopeTreeRow[] = []
+    const notFetchedSelectedItemsIds: string[] = []
+    selectedItems.forEach((item: ScopeTreeRow) => {
+      if (findEquivalentRowInItemAndSubItems({ id: item.id }, rootRows).equivalentRow) {
+        fetchedSelectedItems.push(item)
+      } else {
+        notFetchedSelectedItemsIds.push(item.id)
+      }
+    })
+    return {
+      fetchedSelectedItems: fetchedSelectedItems,
+      notFetchedSelectedItemsIds: notFetchedSelectedItemsIds
+    }
+  }
+
+  const getAllParentsIds = async (selectedItems: ScopeTreeRow[], rootRows: ScopeTreeRow[]) => {
+    const { fetchedSelectedItems: fetchedSelectedItems, notFetchedSelectedItemsIds: notFetchedSelectedItemsIds } =
+      getFetchedSelectedItems(selectedItems, rootRows)
+
+    const notFetchedSelectedItems: ScopeTreeRow[] =
+      notFetchedSelectedItemsIds?.length > 0
+        ? await servicesPerimeters.buildScopeTreeRowList(
+            await servicesPerimeters.getPerimeters(notFetchedSelectedItemsIds)
+          )
+        : []
+    const allParentsIds: string[] = [...fetchedSelectedItems, ...notFetchedSelectedItems]
+      .map((item: ScopeTreeRow) => (item?.above_levels_ids ?? '').split(','))
+      .flat()
+      ?.filter((idValue, index, array) => {
+        return idValue && array.indexOf(idValue) === index
+      })
+    return allParentsIds
+  }
+
+  const getParents = async (allParentsIds: string[]) => {
+    const fetchedParents: ScopeTreeRow[] = []
+    const notFetchedSubItemsIds: string[] = []
+    const notFetchedParentsIds: string[] = allParentsIds.filter((parentId) => {
+      const foundItem = findEquivalentRowInItemAndSubItems({ id: parentId }, rootRows).equivalentRow
+      if (!foundItem) return true
+      fetchedParents.push(foundItem)
+      if (!foundItem.subItems || foundItem.subItems.length < 1 || foundItem.subItems[0]?.id === loadingItem.id) {
+        notFetchedSubItemsIds.push(foundItem?.inferior_levels_ids?.split(','))
+      }
+      return false
+    })
+    const notFetchedItems: string[] = [...notFetchedParentsIds, ...notFetchedSubItemsIds]?.filter(
+      (idValue, index, array) => {
+        return idValue && array.indexOf(idValue) === index
+      }
+    )
+    const notFetchedParents: ScopeTreeRow[] =
+      notFetchedItems?.length > 0
+        ? await servicesPerimeters.buildScopeTreeRowList(await servicesPerimeters.getPerimeters(notFetchedItems))
+        : []
+    return [...fetchedParents, ...notFetchedParents]
+  }
+
+  const _updateRootRows = (newRootRows: ScopeTreeRow[], parents: ScopeTreeRow[]) => {
+    for (let i = 0; i < newRootRows.length; i++) {
+      const updatedSubItems: ScopeTreeRow[] = parents?.filter((item) => newRootRows[i].id === item.parentId)
+      if (updatedSubItems?.length > 0) {
+        const newSubItems = newRootRows[i].subItems?.filter(
+          (item) => item.id !== loadingItem.id && !updatedSubItems?.map((item) => item.id).includes(item?.id)
+        )
+        newRootRows[i] = { ...newRootRows[i], subItems: [...newSubItems, ...updatedSubItems] }
+      }
+      if (newRootRows[i]?.subItems?.length > 0 && newRootRows[i]?.subItems[0]?.id !== 'loading') {
+        _updateRootRows(newRootRows[i].subItems, parents)
+      }
+    }
+  }
+
+  const _expandSelectedItems = async (rootRows: ScopeTreeRow[]) => {
+    if (!selectedItems || selectedItems.length < 1) return
+
+    const allParentsIds: string[] = await getAllParentsIds(selectedItems, rootRows)
+
+    const parents: ScopeTreeRow[] = await getParents(allParentsIds)
+    parents.push(...selectedItems)
+
+    const newRootRows: ScopeTreeRow[] = [...rootRows]
+
+    _updateRootRows(newRootRows, parents)
+    dispatch(updateScopeList(newRootRows))
   }
 
   const _searchInPerimeters = async (_isAllSelected?: boolean) => {
@@ -304,34 +402,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
     onChangeSelectedItem(results)
   }
 
-  const _isIndeterminated: (_row: any) => boolean | undefined = (_row) => {
-    // Si que un loading => false
-    if (_row.subItems && _row.subItems.length > 0 && _row.subItems[0].id === 'loading') {
-      return false
-    }
-    const checkChild: (item: any) => boolean = (item) => {
-      const numberOfSubItemsSelected = item.subItems?.filter((subItem: any) =>
-        selectedItems.find((item: { id: any }) => item.id === subItem.id)
-      )?.length
-
-      if (numberOfSubItemsSelected && numberOfSubItemsSelected !== item.subItems.length) {
-        // Si un des sub elem qui est check => true
-        return true
-      } else if (item.subItems?.length >= numberOfSubItemsSelected) {
-        // Si un des sub-sub (ou sub-sub-sub ...) elem qui est check => true
-        let isCheck = false
-        for (const child of item.subItems) {
-          if (isCheck) continue
-          isCheck = !!checkChild(child)
-        }
-        return isCheck
-      } else {
-        // Sinon => false
-        return false
-      }
-    }
-    return checkChild(_row)
-  }
+  const _isIndeterminated: (_row: any) => boolean | undefined = (_row) => checkIfIndeterminated(_row, selectedItems)
 
   useEffect(() => {
     if (debouncedSearchTerm) {
@@ -376,18 +447,8 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
         <div style={{ padding: '0 0 0 4px' }}>
           <Checkbox
             color="secondary"
-            indeterminate={
-              !isAllSelected &&
-              selectedItems &&
-              selectedItems.length > 0 &&
-              rootRows &&
-              selectedItems.length !== rootRows.length
-            }
-            checked={
-              isAllSelected ||
-              scopesList.filter((row) => selectedItems.find((item: { id: any }) => item.id === row.id) !== undefined)
-                .length === scopesList.length
-            }
+            checked={isHeadChecked}
+            indeterminate={isHeadIndetermined}
             onClick={_onSelectAll}
           />
         </div>
