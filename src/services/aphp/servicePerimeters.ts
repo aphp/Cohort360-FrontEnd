@@ -233,10 +233,10 @@ const servicesPerimeters: IServicePerimeters = {
     try {
       let perimetersIds: string[] | undefined = []
       let perimetersList: ScopePage[] = []
-      let rightsData: any[] = []
+      let rightsData: any = []
       if (!defaultPerimetersIds && !noPerimetersIdsFetch) {
-        const rightResponse = await apiBackend.get('accesses/accesses/my-rights/?pop-children', { signal: signal })
-        rightsData = rightResponse.status === 200 ? (rightResponse?.data as any[]) : []
+        const rightResponse = await apiBackend.get('accesses/perimeters/read-patient/', { signal: signal })
+        rightsData = rightResponse.status === 200 ? (rightResponse?.data as any) : ''
 
         if (rightResponse.status !== 200) {
           const backError: any = {
@@ -247,7 +247,7 @@ const servicesPerimeters: IServicePerimeters = {
           return []
         }
 
-        perimetersIds = rightsData.map((rightData) => rightData.care_site_id)
+        perimetersIds = rightsData.results.map((rightData: any) => rightData.perimeter.id)
       } else {
         perimetersIds = defaultPerimetersIds
       }
@@ -264,8 +264,8 @@ const servicesPerimeters: IServicePerimeters = {
       perimetersList = perimetersListReponse.data.results.map((perimeterItem: any) => {
         let read_access = undefined
         if (!defaultPerimetersIds) {
-          const foundRight = rightsData.find(
-            (rightData) => rightData.care_site_id === +(perimeterItem.perimeter.id ?? '0')
+          const foundRight = rightsData.results.find(
+            (rightData: any) => rightData.perimeter.id === +(perimeterItem.perimeter.id ?? '0')
           )
           read_access = foundRight?.right_read_patient_nominative ? 'DATA_NOMINATIVE' : 'DATA_PSEUDOANONYMISED'
         }
