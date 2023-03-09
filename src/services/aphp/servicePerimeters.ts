@@ -1,4 +1,4 @@
-import { CohortData, ScopePage, ScopeTreeRow } from 'types'
+import { CohortData, ScopeElement, ScopePage, ScopeTreeRow } from 'types'
 import { IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   getAgeRepartitionMapAphp,
@@ -14,7 +14,7 @@ import apiBackend from '../apiBackend'
 import { sortByQuantityAndName } from 'utils/scopeTree'
 import scopeType from '../../data/scope_type.json'
 
-const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
+export const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
 export interface IServicePerimeters {
   /**
@@ -111,12 +111,14 @@ export interface IServicePerimeters {
   /**
    * construire une liste de ScopeTreeRow à travers une liste de ScopePage
    */
-  buildScopeTreeRow: (
+  buildScopeTreeRowList: (
     subScopes: ScopePage[],
     getSubItem?: boolean | undefined,
     type?: string,
     signal?: AbortSignal
   ) => Promise<ScopeTreeRow[]>
+
+  buildScopeTreeRowItem: (scopeElement: ScopeElement, type?: string) => ScopeTreeRow
 
   /**
    * à travers un ScopePage on retourne 'Nominatif' ou 'Pseudonymisé' selon les droits d'accès
@@ -227,7 +229,7 @@ const servicesPerimeters: IServicePerimeters = {
     try {
       if (!cohortId) return undefined
       const scopeItemList: ScopePage[] = (await servicesPerimeters.getPerimeters(undefined, [cohortId], true)) ?? []
-      const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(scopeItemList)
+      const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(scopeItemList)
       return scopeTreeRowList && scopeTreeRowList.length > 0 ? scopeTreeRowList[0] : undefined
     } catch (error) {
       return undefined
@@ -303,7 +305,7 @@ const servicesPerimeters: IServicePerimeters = {
 
     const scopeItemList: ScopePage[] =
       (await servicesPerimeters.getPerimeters(undefined, undefined, undefined, type, signal)) ?? []
-    const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(
+    const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
       scopeItemList,
       undefined,
       type,
@@ -326,7 +328,12 @@ const servicesPerimeters: IServicePerimeters = {
       type,
       signal
     )
-    const scopeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(subScopes, getSubItem, type, signal)
+    const scopeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
+      subScopes,
+      getSubItem,
+      type,
+      signal
+    )
     return scopeRowList
   },
 
@@ -382,7 +389,7 @@ const servicesPerimeters: IServicePerimeters = {
       { signal: signal }
     )
     if (backCohortResponse && backCohortResponse.data && backCohortResponse.data.results) {
-      const newPerimetersList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(
+      const newPerimetersList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
         backCohortResponse.data.results
       )
       result = {
@@ -394,7 +401,7 @@ const servicesPerimeters: IServicePerimeters = {
     return result
   },
 
-  buildScopeTreeRow: async (
+  buildScopeTreeRowList: async (
     subScopes: ScopePage[],
     getSubItem?: boolean | undefined,
     type?: string,
@@ -402,14 +409,8 @@ const servicesPerimeters: IServicePerimeters = {
   ) => {
     let scopeRowList: ScopeTreeRow[] = []
     for (const scopeItem of subScopes) {
-      const scopeRowItem: ScopeTreeRow = { id: '', name: '', quantity: 0, subItems: [] }
-      scopeRowItem.id = '' + scopeItem.perimeter.id
-      scopeRowItem.cohort_id = scopeItem.perimeter.cohort_id
-      scopeRowItem.name = servicesPerimeters.getScopeName(scopeItem.perimeter)
-      scopeRowItem.full_path = scopeItem.perimeter.full_path
-      scopeRowItem.quantity = +scopeItem.perimeter.cohort_size
+      const scopeRowItem = servicesPerimeters.buildScopeTreeRowItem(scopeItem.perimeter)
       scopeRowItem.access = servicesPerimeters.getAccessFromScope(scopeItem)
-      scopeRowItem.inferior_levels_ids = scopeItem.perimeter.inferior_levels_ids
       scopeRowItem.subItems =
         getSubItem === true
           ? await servicesPerimeters.getScopesWithSubItems(
@@ -419,11 +420,24 @@ const servicesPerimeters: IServicePerimeters = {
               signal
             )
           : [loadingItem]
-      scopeRowItem.type = scopeItem.perimeter.type
-      scopeRowList = [...scopeRowList, scopeRowItem]
+      scopeRowList.push(scopeRowItem)
     }
     scopeRowList = sortByQuantityAndName(scopeRowList)
     return scopeRowList
+  },
+
+  buildScopeTreeRowItem: (scopeElement: ScopeElement) => {
+    const scopeRowItem: ScopeTreeRow = { id: '', name: '', quantity: 0, subItems: [loadingItem] }
+    scopeRowItem.id = '' + scopeElement.id
+    scopeRowItem.cohort_id = scopeElement.cohort_id
+    scopeRowItem.name = servicesPerimeters.getScopeName(scopeElement)
+    scopeRowItem.full_path = scopeElement.full_path
+    scopeRowItem.quantity = +scopeElement.cohort_size
+    scopeRowItem.above_levels_ids = scopeElement.above_levels_ids
+    scopeRowItem.inferior_levels_ids = scopeElement.inferior_levels_ids
+    scopeRowItem.type = scopeElement.type
+    scopeRowItem.parentId = scopeElement.parent_id
+    return scopeRowItem
   },
 
   getAccessFromScope: (perimeterItem: ScopePage) => {

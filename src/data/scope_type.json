@@ -8,5 +8,5 @@
     "document": "Hôpital",
     "supported": "AP-HP"
   },
-  "typeLevel": [["AP-HP"], ["GH", "GHU"], ["Hôpital"], ["Pôle/DMU"], ["Unité Fonctionnelle (UF)"]]
+  "typeLevel": [["AP-HP"], ["Groupe hospitalier (GH)", "GHU"], ["Hôpital"], ["Pôle/DMU"], ["Unité Fonctionnelle (UF)"]]
 }
