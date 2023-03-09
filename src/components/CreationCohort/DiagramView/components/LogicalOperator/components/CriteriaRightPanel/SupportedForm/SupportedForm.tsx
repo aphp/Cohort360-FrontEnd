@@ -11,9 +11,9 @@ import {
   IconButton,
   Slider,
   Switch,
+  TextField,
   Tooltip,
-  Typography,
-  TextField
+  Typography
 } from '@mui/material'
 import InfoIcon from '@mui/icons-material/Info'
 
@@ -23,11 +23,11 @@ import ProvenanceDestinationInputs from './SupportedInputs/ProvenanceDestination
 import OtherInputs from './SupportedInputs/OtherInputs'
 
 import VisitInputs from '../AdvancedInputs/VisitInputs/VisitInputs'
-// import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
-
 import useStyles from './styles'
 
-import { EncounterDataType } from 'types'
+import { EncounterDataType, ScopeTreeRow } from 'types'
+import PopulationCard from '../../../../PopulationCard/PopulationCard'
+import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE } from 'utils/cohortCreation'
 
 type SupportedFormProps = {
   criteria: any
@@ -104,6 +104,10 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
     const _defaultValues = defaultValues ? { ...defaultValues } : {}
     _defaultValues[key] = value
     setDefaultValues(_defaultValues)
+  }
+
+  const _onSubmitExecutiveUnits = (_selectedExecutiveUnits: ScopeTreeRow[] | undefined) => {
+    _onChangeValue('encounterService', _selectedExecutiveUnits)
   }
 
   if (
@@ -191,6 +195,17 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
               checked={!defaultValues.isInclusive}
               onChange={(event) => _onChangeValue('isInclusive', !event.target.checked)}
               color="secondary"
+            />
+          </Grid>
+
+          <Grid style={{ display: 'grid', alignItems: 'center', margin: '0 1em' }}>
+            <PopulationCard
+              form={'supported'}
+              label={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
+              title={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
+              executiveUnits={defaultValues?.encounterService ?? []}
+              isAcceptEmptySelection={true}
+              onChangeExecutiveUnits={_onSubmitExecutiveUnits}
             />
           </Grid>
 

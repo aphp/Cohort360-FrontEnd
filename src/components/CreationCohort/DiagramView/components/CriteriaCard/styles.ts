@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: 8,
     marginTop: 12,
     minWidth: 400,
-    maxWidth: 800,
+    maxWidth: 850,
     position: 'relative',
     '&::before': {
       width: 38,
