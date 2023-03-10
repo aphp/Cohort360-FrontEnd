@@ -51,7 +51,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const [filters, setFilters] = useState<PatientFiltersType>({
     gender: PatientGenderKind._unknown,
-    birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
+    birthdatesRanges: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
     vitalStatus: VitalStatus.all
   })
 
@@ -72,7 +72,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       searchBy,
       searchInput,
       filters.gender,
-      filters.birthdates,
+      filters.birthdatesRanges,
       filters.vitalStatus,
       sort.sortBy,
       sort.sortDirection,
