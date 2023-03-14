@@ -218,7 +218,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
    *
    */
   const _onExpand = async (rowId: number) => {
-    const controller = controllerRef.current ?? new AbortController()
+    const controller = new AbortController()
     controllerRef.current = controller
     let _openPopulation = openPopulation ? openPopulation : []
     let _rootRows = rootRows ? [...rootRows] : []
