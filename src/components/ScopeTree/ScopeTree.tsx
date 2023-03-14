@@ -168,32 +168,40 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
   const [isAllSelected, setIsAllSelected] = useState(false)
   const controllerRef = useRef<AbortController | null>()
 
-  const fetchScopeTree = async () => {
-    dispatch<any>(fetchScopesList())
+  const fetchScopeTree = async (signal?: AbortSignal) => {
+    return dispatch<any>(fetchScopesList(signal))
+  }
+
+  const _cancelPendingRequest = () => {
+    if (controllerRef.current) {
+      controllerRef.current.abort()
+    }
+    controllerRef.current = new AbortController()
   }
 
   const _init = async () => {
     setSearchLoading(true)
-    await fetchScopeTree()
-    setRootRows(scopesList)
-    setOpenPopulations([])
-    setCount(scopesList?.length)
+    _cancelPendingRequest()
+    const fetchScopeTreeResponse = await fetchScopeTree(controllerRef.current?.signal)
+    if (fetchScopeTreeResponse && fetchScopeTreeResponse.payload && !fetchScopeTreeResponse.payload.aborted) {
+      const newPerimetersList = fetchScopeTreeResponse.payload.scopesList
+      setRootRows(newPerimetersList)
+      setOpenPopulations([])
+      setCount(newPerimetersList?.length)
+      setIsEmpty(!newPerimetersList || newPerimetersList.length < 0)
+    }
     setSearchLoading(false)
-    setIsEmpty(false)
   }
 
   const _searchInPerimeters = async (_isAllSelected?: boolean) => {
     setSearchLoading(true)
-    if (controllerRef.current) {
-      controllerRef.current.abort()
-    }
-    const controller = new AbortController()
-    controllerRef.current = controller
+    _cancelPendingRequest()
     const {
       scopeTreeRows: newPerimetersList,
       count: newCount,
       aborted: aborted
     } = await servicesPerimeters.findScope(searchInput, page, controllerRef.current?.signal)
+
     if (!aborted) {
       if (!newPerimetersList || newPerimetersList.length < 1) {
         setIsEmpty(true)
@@ -209,7 +217,6 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
       setCount(newCount)
       setSearchLoading(false)
     }
-    controllerRef.current = null
     return newPerimetersList
   }
 
@@ -239,13 +246,11 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
         signal: controllerRef.current?.signal
       })
     )
-    if (expandResponse && expandResponse.payload) {
-      if (!expandResponse.payload.aborted) {
-        const _selectedItems = expandResponse.payload.selectedItems ?? []
-        _rootRows = expandResponse.payload.rootRows ?? _rootRows
-        setRootRows(_rootRows)
-        onChangeSelectedItem(_selectedItems)
-      }
+    if (expandResponse && expandResponse.payload && !expandResponse.payload.aborted) {
+      const _selectedItems = expandResponse.payload.selectedItems ?? []
+      _rootRows = expandResponse.payload.rootRows ?? _rootRows
+      setRootRows(_rootRows)
+      onChangeSelectedItem(_selectedItems)
     }
   }
 
