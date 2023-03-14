@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import { Alert, Autocomplete } from '@material-ui/lab'
 import { Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@material-ui/core'
@@ -7,7 +7,7 @@ import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
-import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
+import AdvancedInputs from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
@@ -30,7 +30,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
-  const [currentState, setCurrentState] = useState({ ...selectedCriteria, ...initialState })
+  const currentState = { ...selectedCriteria, ...initialState }
 
   const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
@@ -42,10 +42,6 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     dispatch<any>(fetchCondition())
   }
   const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue, false)
-
-  useEffect(() => {
-    setCurrentState({ ...selectedCriteria, ...initialState })
-  }, [initialState, selectedCriteria])
 
   if (
     criteria?.data?.diagnosticTypes === 'loading' ||
