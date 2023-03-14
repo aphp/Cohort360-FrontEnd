@@ -71,7 +71,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
 
   useEffect(() => {
     setCurrentState({ ...selectedCriteria, ...initialState })
-  }, [initialState])
+  }, [initialState, selectedCriteria])
 
   useEffect(() => {
     const checkChildren = async () => {

@@ -50,7 +50,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
 
   useEffect(() => {
     setCurrentState({ ...selectedCriteria, ...initialState })
-  }, [initialState])
+  }, [initialState, selectedCriteria])
 
   const getAtcOptions = async (searchValue: string) => await criteria.fetch.fetchAtcData(searchValue, false)
   const _onSubmit = () => {
