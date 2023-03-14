@@ -37,7 +37,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
 
   useEffect(() => {
     setCurrentState({ ...selectedCriteria, ...initialState })
-  }, [initialState])
+  }, [initialState, selectedCriteria])
 
   const getGhmOptions = async (searchValue: string) => await criteria.fetch.fetchGhmData(searchValue, false)
   const _onSubmit = () => {

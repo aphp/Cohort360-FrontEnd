@@ -45,7 +45,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
 
   useEffect(() => {
     setCurrentState({ ...selectedCriteria, ...initialState })
-  }, [initialState])
+  }, [initialState, selectedCriteria])
 
   if (
     criteria?.data?.diagnosticTypes === 'loading' ||

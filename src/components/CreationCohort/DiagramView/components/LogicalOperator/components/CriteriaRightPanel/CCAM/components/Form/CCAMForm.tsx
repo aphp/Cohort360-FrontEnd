@@ -51,7 +51,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
 
   useEffect(() => {
     setCurrentState({ ...selectedCriteria, ...initialState })
-  }, [initialState])
+  }, [initialState, selectedCriteria])
 
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code: any) => {
