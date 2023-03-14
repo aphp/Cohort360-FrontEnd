@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import { Alert, Autocomplete } from '@material-ui/lab'
 import {
@@ -43,14 +43,10 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
   const dispatch = useAppDispatch()
 
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
-  const [currentState, setCurrentState] = useState({ ...selectedCriteria, ...initialState })
+  const currentState = { ...selectedCriteria, ...initialState }
 
   const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
-
-  useEffect(() => {
-    setCurrentState({ ...selectedCriteria, ...initialState })
-  }, [initialState])
 
   const getAtcOptions = async (searchValue: string) => await criteria.fetch.fetchAtcData(searchValue, false)
   const _onSubmit = () => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import { Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
@@ -30,14 +30,10 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
-  const [currentState, setCurrentState] = useState({ ...selectedCriteria, ...initialState })
+  const currentState = { ...selectedCriteria, ...initialState }
 
   const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
-
-  useEffect(() => {
-    setCurrentState({ ...selectedCriteria, ...initialState })
-  }, [initialState])
 
   const getGhmOptions = async (searchValue: string) => await criteria.fetch.fetchGhmData(searchValue, false)
   const _onSubmit = () => {
