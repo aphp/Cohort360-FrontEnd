@@ -66,6 +66,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#5BC5F2'
   },
   emptyRequestRow: {
+    margin: '1vh',
     height: '10vh',
     display: 'flex',
     alignItems: 'center',

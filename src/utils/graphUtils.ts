@@ -135,26 +135,15 @@ export const getGenderRepartitionMap = (patients: IPatient[]): GenderRepartition
 
 export const getEncounterRepartitionMapAphp = (extension?: IExtension[]): SimpleChartDataType[] => {
   const data: SimpleChartDataType[] = []
-  let otherVisits = 0
 
   extension?.forEach((visitType) => {
     const visitTypeUrl = visitType.extension?.[0].url
 
-    if (visitTypeUrl === 'ext' || visitTypeUrl === 'hosp' || visitTypeUrl === 'incomp' || visitTypeUrl === 'urg') {
-      data.push({
-        label: getVisitTypeName(visitTypeUrl),
-        value: visitType.extension?.[0].valueDecimal ?? 0,
-        color: getVisitTypeColor(visitTypeUrl)
-      })
-    } else {
-      otherVisits += visitType.extension?.[0].valueDecimal ?? 0
-    }
-  })
-
-  data.push({
-    label: getVisitTypeName('other'),
-    value: otherVisits,
-    color: getVisitTypeColor('other')
+    data.push({
+      label: getVisitTypeName(visitTypeUrl),
+      value: visitType.extension?.[0].valueDecimal ?? 0,
+      color: getVisitTypeColor(visitTypeUrl)
+    })
   })
 
   return data
