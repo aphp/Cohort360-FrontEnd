@@ -23,23 +23,28 @@ const defaultInitialState: ScopeState = {
 
 type FetchScopeListReturn = {
   scopesList: ScopeTreeRow[]
+  aborted?: boolean
 }
 
-const fetchScopesList = createAsyncThunk<FetchScopeListReturn, void, { state: RootState }>(
+const fetchScopesList = createAsyncThunk<FetchScopeListReturn, AbortSignal | undefined, { state: RootState }>(
   'scope/fetchScopesList',
-  async (DO_NOT_USE, { getState, dispatch }) => {
+  async (signal: AbortSignal | undefined, { getState, dispatch }) => {
     try {
       const state = getState()
       const { me, scope } = state
       const { scopesList } = scope
 
       if (scopesList.length) {
-        dispatch(fetchScopesListinBackground())
-        return { scopesList }
+        dispatch(fetchScopesListinBackground(signal))
+        return { scopesList: scopesList, aborted: signal?.aborted }
       } else {
-        if (!me) return { scopesList: [] }
-        const scopes = (await services.perimeters.getScopePerimeters(me.id)) || []
-        return { scopesList: scopes }
+        if (!me) return { scopesList: [], aborted: signal?.aborted }
+        const scopes = (await services.perimeters.getScopePerimeters(me.id, signal)) || []
+        if (signal?.aborted) {
+          return { scopesList: scopesList, aborted: signal?.aborted }
+        } else {
+          return { scopesList: scopes, aborted: signal?.aborted }
+        }
       }
     } catch (error) {
       console.error(error)
@@ -48,39 +53,41 @@ const fetchScopesList = createAsyncThunk<FetchScopeListReturn, void, { state: Ro
   }
 )
 
-const fetchScopesListinBackground = createAsyncThunk<FetchScopeListReturn, void, { state: RootState }>(
-  'scope/fetchScopesListinBackground',
-  async (DO_NOT_USE, { getState }) => {
-    try {
-      const state = getState()
-      const { me, scope } = state
-      const { scopesList } = scope
+const fetchScopesListinBackground = createAsyncThunk<
+  FetchScopeListReturn,
+  AbortSignal | undefined,
+  { state: RootState }
+>('scope/fetchScopesListinBackground', async (signal: AbortSignal | undefined, { getState }) => {
+  try {
+    const state = getState()
+    const { me, scope } = state
+    const { scopesList } = scope
 
-      if (!me) return { scopesList: [] }
-      const scopes = (await services.perimeters.getScopePerimeters(me.id)) || []
-      return {
-        scopesList: scopes.map((scope) => ({
-          ...scope,
-          subItems: (
-            scopesList.find((item) => item.id === scope.id && item.subItems?.length) ?? {
-              subItems: [
-                {
-                  id: 'loading',
-                  name: 'loading',
-                  quantity: 0,
-                  subItems: []
-                }
-              ]
-            }
-          ).subItems
-        }))
-      }
-    } catch (error) {
-      console.error(error)
-      throw error
+    if (!me) return { scopesList: [], aborted: signal?.aborted }
+    const scopes = (await services.perimeters.getScopePerimeters(me.id, signal)) || []
+    return {
+      scopesList: scopes.map((scope) => ({
+        ...scope,
+        subItems: (
+          scopesList.find((item) => item.id === scope.id && item.subItems?.length) ?? {
+            subItems: [
+              {
+                id: 'loading',
+                name: 'loading',
+                quantity: 0,
+                subItems: []
+              }
+            ]
+          }
+        ).subItems
+      })),
+      aborted: signal?.aborted
     }
+  } catch (error) {
+    console.error(error)
+    throw error
   }
-)
+})
 
 type ExpandScopeElementParams = {
   rowId: number
