@@ -263,7 +263,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
           )}
           <Button
             onClick={_onSubmit}
-            disabled={searchInputError?.isError}
+            disabled={searchInputError?.isError || searchCheckingLoading}
             type="submit"
             form="documents-form"
             color="primary"
