@@ -43,7 +43,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
-  const [currentState, setCurrentState] = useState({ ...selectedCriteria, ...initialState })
+  const currentState = { ...selectedCriteria, ...initialState }
 
   const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
@@ -68,10 +68,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
         }
       })
     : []
-
-  useEffect(() => {
-    setCurrentState({ ...selectedCriteria, ...initialState })
-  }, [initialState])
 
   useEffect(() => {
     const checkChildren = async () => {

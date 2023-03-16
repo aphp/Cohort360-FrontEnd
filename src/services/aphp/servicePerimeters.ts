@@ -75,7 +75,7 @@ export interface IServicePerimeters {
    * Retour:
    *   - ScopeTreeRow[]
    */
-  getScopePerimeters: (practitionerId: string) => Promise<ScopeTreeRow[]>
+  getScopePerimeters: (practitionerId: string, signal?: AbortSignal) => Promise<ScopeTreeRow[]>
 
   /**
    * Cette fonction retoune l'ensemble des périmètres enfant d'un périmètre passé en argument
@@ -281,11 +281,16 @@ const servicesPerimeters: IServicePerimeters = {
     }
   },
 
-  getScopePerimeters: async (practitionerId) => {
+  getScopePerimeters: async (practitionerId, signal?: AbortSignal) => {
     if (!practitionerId) return []
 
-    const scopeItemList: ScopePage[] = (await servicesPerimeters.getPerimeters()) ?? []
-    const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(scopeItemList)
+    const scopeItemList: ScopePage[] =
+      (await servicesPerimeters.getPerimeters(undefined, undefined, undefined, signal)) ?? []
+    const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(
+      scopeItemList,
+      undefined,
+      signal
+    )
     return scopeTreeRowList
   },
 
