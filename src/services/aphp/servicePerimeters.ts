@@ -264,7 +264,7 @@ const servicesPerimeters: IServicePerimeters = {
       perimetersList = perimetersListReponse.data.results.map((perimeterItem: any) => {
         let read_access = undefined
         if (!defaultPerimetersIds) {
-          const foundRight = rightsData.results.find(
+          const foundRight = rightsData?.results?.find(
             (rightData: any) => rightData.perimeter.id === +(perimeterItem.perimeter.id ?? '0')
           )
           read_access = foundRight?.right_read_patient_nominative ? 'DATA_NOMINATIVE' : 'DATA_PSEUDOANONYMISED'
