@@ -1,18 +1,19 @@
-import React, { useEffect, useState, Fragment } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import clsx from 'clsx'
 
 import {
   Button,
+  Collapse,
   Divider,
   Grid,
   IconButton,
-  Typography,
+  LinearProgress,
+  List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Collapse,
-  List,
-  Tooltip
+  Tooltip,
+  Typography
 } from '@material-ui/core'
 import Skeleton from '@material-ui/lab/Skeleton'
 
@@ -20,51 +21,58 @@ import ExpandLess from '@material-ui/icons/ExpandLess'
 import ExpandMore from '@material-ui/icons/ExpandMore'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
-import { useAppSelector, useAppDispatch } from 'state'
-import { PmsiListType, fetchCondition, expandPmsiElement } from 'state/pmsi'
+import { useAppDispatch, useAppSelector } from 'state'
+import { PmsiListType } from 'state/pmsi'
 
-import { getSelectedPmsi, filterSelectedPmsi, checkIfIndeterminated } from 'utils/pmsi'
+import { checkIfIndeterminated, expandItem, findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
 
 import useStyles from './styles'
+import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
+import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
+import { defaultCondition } from '../../index'
+import { HierarchyTree } from 'types'
 
 type CimListItemProps = {
-  cimItem: PmsiListType
-  selectedItem?: PmsiListType[] | null
-  handleClick: (cimItem: { id: string; label: string }[] | null) => void
+  cim10Item: PmsiListType
+  selectedItems?: PmsiListType[] | null
+  handleClick: (cimItem: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
 }
 
 const CimListItem: React.FC<CimListItemProps> = (props) => {
-  const { cimItem, selectedItem, handleClick } = props
-  const { id, label, subItems } = cimItem
+  const { cim10Item, selectedItems, handleClick } = props
+  const { id, label, subItems } = cim10Item
 
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
-  const conditionState = useAppSelector((state) => state.pmsi.condition || {})
-  const cimHierarchy = conditionState.list
+  const cim10Hierarchy = useAppSelector((state) => state.pmsi.condition.list || {})
+  const isLoadingsyncHierarchyTable = useAppSelector((state) => state.syncHierarchyTable.loading || 0)
+  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)
 
   const [open, setOpen] = useState(false)
-
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === cimItem.id) : false
-  const isIndeterminated = checkIfIndeterminated(cimItem, selectedItem)
-
-  const _onExpand = async (cimCode: string) => {
+  const isSelected = findSelectedInListAndSubItems(selectedItems ? selectedItems : [], cim10Item, cim10Hierarchy)
+  const isIndeterminated = checkIfIndeterminated(cim10Item, selectedItems)
+  const _onExpand = async (cim10Code: string) => {
+    if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
+    dispatch<any>(incrementLoadingSyncHierarchyTable())
     setOpen(!open)
-    const expandResult = await dispatch<any>(
-      expandPmsiElement({
-        keyElement: 'condition',
-        rowId: cimCode,
-        selectedItems: selectedItem || []
-      })
+    const newHierarchy = await expandItem(
+      cim10Code,
+      selectedItems || [],
+      cim10Hierarchy,
+      defaultCondition.type,
+      dispatch
     )
-    if (expandResult.payload.savedSelectedItems) {
-      handleClick(expandResult.payload.savedSelectedItems)
-    }
+    await handleClick(selectedItems, newHierarchy)
+    dispatch<any>(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = (cimItem: PmsiListType) => {
-    const newSelectedItems = getSelectedPmsi(cimItem, selectedItem || [], cimHierarchy)
-    handleClick(newSelectedItems)
+  const handleClickOnHierarchy = async (cim10Item: PmsiListType) => {
+    if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
+    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    const newSelectedItems = getSelectedPmsi(cim10Item, selectedItems || [], cim10Hierarchy)
+    await handleClick(newSelectedItems)
+    dispatch<any>(decrementLoadingSyncHierarchyTable())
   }
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
@@ -72,7 +80,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
       <ListItem className={classes.cimItem}>
         <ListItemIcon>
           <div
-            onClick={() => handleClickOnHierarchy(cimItem)}
+            onClick={() => handleClickOnHierarchy(cim10Item)}
             className={clsx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
@@ -81,7 +89,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
           />
         </ListItemIcon>
         <Tooltip title={label} enterDelay={2500}>
-          <ListItemText onClick={() => handleClickOnHierarchy(cimItem)} className={classes.label} primary={label} />
+          <ListItemText onClick={() => handleClickOnHierarchy(cim10Item)} className={classes.label} primary={label} />
         </Tooltip>
       </ListItem>
     )
@@ -92,7 +100,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
       <ListItem className={classes.cimItem}>
         <ListItemIcon>
           <div
-            onClick={() => handleClickOnHierarchy(cimItem)}
+            onClick={() => handleClickOnHierarchy(cim10Item)}
             className={clsx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
@@ -119,7 +127,11 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
               ) : (
                 <Fragment key={index}>
                   <div className={classes.subItemsIndicator} />
-                  <CimListItem cimItem={cimHierarchySubItem} selectedItem={selectedItem} handleClick={handleClick} />
+                  <CimListItem
+                    cim10Item={cimHierarchySubItem}
+                    selectedItems={selectedItems}
+                    handleClick={handleClick}
+                  />
                 </Fragment>
               )
             )}
@@ -130,81 +142,89 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
 }
 
 type Cim10HierarchyProps = {
+  isOpen: boolean
   selectedCriteria: any
   goBack: (data: any) => void
-  onChangeSelectedHierarchy: (data: any) => void
+  onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
   isEdition?: boolean
+  onConfirm: () => void
 }
 
 const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
-  const { selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
+  const { isOpen = false, selectedCriteria, onChangeSelectedHierarchy, onConfirm, goBack, isEdition } = props
 
   const classes = useStyles()
-  const dispatch = useAppDispatch()
+  const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
+  const isLoadingSyncHierarchyTable = initialState?.loading ?? 0
+  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)
+  const [currentState, setCurrentState] = useState({ ...selectedCriteria, ...initialState })
+  const [loading, setLoading] = useState(isLoadingSyncHierarchyTable > 0 || isLoadingPmsi > 0)
 
-  const conditionState = useAppSelector((state) => state.pmsi.condition || {})
-  const cimHierarchy = conditionState.list
+  const cim10Hierarchy = useAppSelector((state) => state.pmsi.condition.list || {})
 
-  const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
-    isEdition ? selectedCriteria.code : []
-  )
-
-  // Init
   useEffect(() => {
-    const _init = async () => {
-      if (!cimHierarchy || (cimHierarchy && cimHierarchy.length === 0)) {
-        dispatch<any>(fetchCondition())
-      }
+    const newList = { ...selectedCriteria, ...initialState } ?? {}
+    if (!newList.code) {
+      newList.code = selectedCriteria.code
     }
+    newList.code.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, cim10Hierarchy).equivalentRow)
+    setCurrentState(newList)
+  }, [initialState, cim10Hierarchy])
 
-    _init()
-  }, []) // eslint-disable-line
+  const _handleClick = (newSelectedItems: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => {
+    onChangeSelectedHierarchy(newSelectedItems, newHierarchy)
+  }
+  useEffect(() => {
+    if (!loading && (isLoadingSyncHierarchyTable > 0 || isLoadingPmsi > 0)) {
+      setLoading(true)
+    } else if (loading && isLoadingSyncHierarchyTable === 0 && isLoadingPmsi === 0) {
+      setLoading(false)
+    }
+  }, [isLoadingSyncHierarchyTable, isLoadingPmsi])
 
-  return (
-    <Grid className={classes.root}>
-      <Grid className={classes.actionContainer}>
-        {!isEdition ? (
-          <>
-            <IconButton className={classes.backButton} onClick={goBack}>
-              <KeyboardBackspaceIcon />
-            </IconButton>
-            <Divider className={classes.divider} orientation="vertical" flexItem />
-            <Typography className={classes.titleLabel}>Ajouter un critère de diagnostic</Typography>
-          </>
-        ) : (
-          <Typography className={classes.titleLabel}>Modifier un critère de diagnostic</Typography>
-        )}
-      </Grid>
+  return isOpen ? (
+    <>
+      <Grid className={classes.root}>
+        <Grid className={classes.actionContainer}>
+          {!isEdition ? (
+            <>
+              <IconButton className={classes.backButton} onClick={goBack}>
+                <KeyboardBackspaceIcon />
+              </IconButton>
+              <Divider className={classes.divider} orientation="vertical" flexItem />
+              <Typography className={classes.titleLabel}>Ajouter un critère de diagnostic</Typography>
+            </>
+          ) : (
+            <Typography className={classes.titleLabel}>Modifier un critère de diagnostic</Typography>
+          )}
+        </Grid>
+        <div className={classes.loader}>{loading && <LinearProgress />}</div>
+        <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
+          {cim10Hierarchy &&
+            cim10Hierarchy.map((cim10Item, index) => (
+              <CimListItem
+                key={index}
+                cim10Item={cim10Item}
+                selectedItems={currentState.code}
+                handleClick={_handleClick}
+              />
+            ))}
+        </List>
 
-      <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-        {cimHierarchy &&
-          cimHierarchy.map((cimItem, index) => (
-            <CimListItem
-              key={index}
-              cimItem={cimItem}
-              selectedItem={selectedHierarchy}
-              handleClick={onSetSelectedHierarchy}
-            />
-          ))}
-      </List>
-
-      <Grid className={classes.cimHierarchyActionContainer}>
-        {!isEdition && (
-          <Button onClick={goBack} color="primary" variant="outlined">
-            Annuler
+        <Grid className={classes.cimHierarchyActionContainer}>
+          {!isEdition && (
+            <Button onClick={goBack} color="primary" variant="outlined">
+              Annuler
+            </Button>
+          )}
+          <Button onClick={() => onConfirm()} type="submit" form="cim10-form" color="primary" variant="contained">
+            Suivant
           </Button>
-        )}
-        <Button
-          onClick={() => onChangeSelectedHierarchy(filterSelectedPmsi(selectedHierarchy || [], cimHierarchy))}
-          type="submit"
-          form="cim10-form"
-          color="primary"
-          variant="contained"
-        >
-          Confirmer
-        </Button>
+        </Grid>
       </Grid>
-    </Grid>
+    </>
+  ) : (
+    <></>
   )
 }
 

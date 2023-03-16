@@ -55,7 +55,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const [order, setOrder] = useState<Order>({
     orderBy: 'date',
-    orderDirection: 'asc'
+    orderDirection: 'desc'
   })
 
   const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
@@ -227,6 +227,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         <CssBaseline />
         <Grid container item xs={11} justifyContent="space-between">
           <DataTableTopBar
+            loading={loadingStatus}
             results={[documentsResult, patientsResult]}
             searchBar={{
               type: 'document',

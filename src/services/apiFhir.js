@@ -4,7 +4,8 @@ import { ACCES_TOKEN, FHIR_API_URL } from '../constants'
 const apiFhir = axios.create({
   baseURL: FHIR_API_URL,
   headers: {
-    Accept: 'application/fhir+json'
+    Accept: 'application/fhir+json',
+    'Content-Type': 'application/json'
   }
 })
 

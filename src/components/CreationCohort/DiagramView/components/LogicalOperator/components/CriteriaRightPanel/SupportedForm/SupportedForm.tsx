@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { Alert, Autocomplete } from '@material-ui/lab'
 import {
@@ -66,6 +66,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
   const classes = useStyles()
 
   const [error, setError] = useState(false)
+  const [sliderError, setSliderError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const isEdition = selectedCriteria !== null ? true : false
@@ -119,6 +120,19 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
   ) {
     return <></>
   }
+
+  useEffect(() => {
+    if (
+      !Number.isInteger(defaultValues.years[0]) ||
+      !Number.isInteger(defaultValues.years[1]) ||
+      !Number.isInteger(defaultValues.duration[0]) ||
+      !Number.isInteger(defaultValues.duration[1])
+    ) {
+      setSliderError(true)
+    } else {
+      setSliderError(false)
+    }
+  }, [defaultValues.years, defaultValues.duration])
 
   return (
     <Grid className={classes.root}>
@@ -209,6 +223,8 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                         defaultValues.years[1]
                       ])
                     }
+                    error={!Number.isInteger(defaultValues.years[0])}
+                    helperText={!Number.isInteger(defaultValues.years[0]) && 'Pas de valeur décimale autorisée.'}
                   />
                 </Grid>
                 <Grid item>
@@ -221,6 +237,8 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                         +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : defaultValues.years[1]
                       ])
                     }
+                    error={!Number.isInteger(defaultValues.years[1])}
+                    helperText={!Number.isInteger(defaultValues.years[1]) && 'Pas de valeur décimale autorisée.'}
                   />
                 </Grid>
               </Grid>
@@ -269,6 +287,8 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                         defaultValues.duration[1]
                       ])
                     }
+                    error={!Number.isInteger(defaultValues.duration[0])}
+                    helperText={!Number.isInteger(defaultValues.duration[0]) && 'Pas de valeur décimale autorisée.'}
                   />
                 </Grid>
                 <Grid item>
@@ -281,6 +301,8 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                         +e.target.value >= 0 && +e.target.value <= 100 ? +e.target.value : +defaultValues.duration[1]
                       ])
                     }
+                    error={!Number.isInteger(defaultValues.duration[1])}
+                    helperText={!Number.isInteger(defaultValues.duration[1]) && 'Pas de valeur décimale autorisée.'}
                   />
                 </Grid>
               </Grid>
@@ -323,7 +345,14 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="supported-form" color="primary" variant="contained">
+          <Button
+            onClick={_onSubmit}
+            type="submit"
+            form="supported-form"
+            color="primary"
+            variant="contained"
+            disabled={sliderError}
+          >
             Confirmer
           </Button>
         </Grid>

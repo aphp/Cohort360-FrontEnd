@@ -1,6 +1,6 @@
 import apiFhir from '../apiFhir'
 
-import { CohortComposition, SearchByTypes, FHIR_API_Response } from 'types'
+import { CohortComposition, SearchByTypes, FHIR_API_Response, IScope } from 'types'
 import {
   IBinary,
   IClaim,
@@ -11,13 +11,14 @@ import {
   IMedicationAdministration,
   IMedicationRequest,
   IObservation,
-  IOrganization,
   IPatient,
   IPractitioner,
   IPractitionerRole,
-  IProcedure
+  IProcedure,
+  IOrganization
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import axios, { AxiosResponse } from 'axios'
+import apiBackend from '../apiBackend'
 
 const reducer = (accumulator: any, currentValue: any) =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -416,17 +417,17 @@ export const fetchProcedure = async (args: fetchProcedureProps) => {
   _list = _list ? _list.filter(uniq) : []
 
   let options: string[] = []
-  if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
-  if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
-  if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
-  if (code) options = [...options, `code=${code}`] // eslint-disable-line
-  if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (status) options = [...options, `status=${status}`] // eslint-disable-line
-  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
-  if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line
-  if (maxDate) options = [...options, `date=le${maxDate}`] // eslint-disable-line
+  if (size !== undefined)                          options = [...options, `size=${size}`]                                                       // eslint-disable-line
+  if (offset)                                      options = [...options, `offset=${offset}`]                                                   // eslint-disable-line
+  if (_sort)                                       options = [...options, `_sort=${_sortDirection}${_sort},id`]                                 // eslint-disable-line
+  if (subject)                                     options = [...options, `subject=${subject}`]                                                 // eslint-disable-line
+  if (patient)                                     options = [...options, `patient=${patient}`]                                                 // eslint-disable-line
+  if (code)                                        options = [...options, `code=${code}`]                                                       // eslint-disable-line
+  if (_text)                                       options = [...options, `_text=${encodeURIComponent(_text)}`]                                 // eslint-disable-line
+  if (status)                                      options = [...options, `status=${status}`]                                                   // eslint-disable-line
+  if (encounterIdentifier)                         options = [...options, `encounter.identifier=${encounterIdentifier}`]                        // eslint-disable-line
+  if (minDate)                                     options = [...options, `date=ge${minDate}`]                                                 // eslint-disable-line
+  if (maxDate)                                     options = [...options, `date=le${maxDate}`]                                                 // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
@@ -574,7 +575,7 @@ export const fetchObservation = async (args: fetchObservationProps) => {
   if (minDate) options = [...options, `effectiveDatetime=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `effectiveDatetime=le${maxDate}`] // eslint-disable-line
 
-  if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
+  if (_list && _list.length > 0)                    options = [...options, `_list=${_list.reduce(reducer)}`]                                            // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<IObservation>>(`/Observation?${options.reduce(optionsReducer)}`)
 
@@ -662,5 +663,22 @@ export const fetchMedicationAdministration = async (args: fetchMedicationAdminis
     `/MedicationAdministration?${options.reduce(optionsReducer)}`
   )
 
+  return response
+}
+
+type fetchScopeProps = {
+  perimetersIds?: string[]
+  cohortIds?: string[]
+}
+export const fetchScope: (args: fetchScopeProps) => Promise<AxiosResponse<IScope | unknown>> = async (
+  args: fetchScopeProps
+) => {
+  const { perimetersIds, cohortIds } = args
+
+  let options: string[] = []
+  if (perimetersIds && perimetersIds.length > 0) options = [...options, `local_id=${perimetersIds.join(',')}`] // eslint-disable-line
+  if (cohortIds && cohortIds.length > 0) options = [...options, `cohort_id=${cohortIds.join(',')}`] // eslint-disable-line
+
+  const response: AxiosResponse<IScope | unknown> = await apiBackend.get(`accesses/perimeters/read-patient/?${options}`)
   return response
 }

@@ -1,17 +1,21 @@
 import React, { useState } from 'react'
 
-import { Autocomplete, Alert } from '@material-ui/lab'
-import { Button, Divider, FormLabel, Grid, IconButton, Switch, Typography, TextField } from '@material-ui/core'
+import { Alert, Autocomplete } from '@material-ui/lab'
+import { Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@material-ui/core'
 
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
-import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
+import AdvancedInputs from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
+import { useAppDispatch, useAppSelector } from 'state'
+import { fetchCondition } from 'state/pmsi'
+import { HierarchyTree } from 'types'
 
 type Cim10FormProps = {
+  isOpen: boolean
   isEdition?: boolean
   criteria: any
   selectedCriteria: any
@@ -21,20 +25,22 @@ type Cim10FormProps = {
 }
 
 const Cim10Form: React.FC<Cim10FormProps> = (props) => {
-  const { isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
+  const { isOpen, isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
   const classes = useStyles()
+  const dispatch = useAppDispatch()
+  const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
+  const currentState = { ...selectedCriteria, ...initialState }
 
   const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
-
   const _onSubmit = () => {
-    if (selectedCriteria?.code?.length === 0 && selectedCriteria?.diagnosticType?.length === 0) {
+    if (currentState?.code?.length === 0) {
       return setError(true)
     }
-    onChangeSelectedCriteria(selectedCriteria)
+    onChangeSelectedCriteria(currentState)
+    dispatch<any>(fetchCondition())
   }
-
   const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue, false)
 
   if (
@@ -45,8 +51,8 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     return <> </>
   }
 
-  const defaultValuesCode = selectedCriteria.code
-    ? selectedCriteria.code.map((code: any) => {
+  const defaultValuesCode = currentState.code
+    ? currentState.code.map((code: any) => {
         const criteriaCode = criteria.data.cim10Diagnostic
           ? criteria.data.cim10Diagnostic.find((c: any) => c.id === code.id)
           : null
@@ -56,8 +62,8 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
         }
       })
     : []
-  const defaultValuesType = selectedCriteria.diagnosticType
-    ? selectedCriteria.diagnosticType.map((diagnosticType: any) => {
+  const defaultValuesType = currentState.diagnosticType
+    ? currentState.diagnosticType.map((diagnosticType: any) => {
         const criteriaType = criteria.data.diagnosticTypes
           ? criteria.data.diagnosticTypes.find((g: any) => g.id === diagnosticType.id)
           : null
@@ -68,7 +74,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       })
     : []
 
-  return (
+  return isOpen ? (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
         {!isEdition ? (
@@ -108,13 +114,13 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             id="criteria-name-required"
             placeholder="Nom du critère"
             variant="outlined"
-            value={selectedCriteria.title}
+            value={currentState.title}
             onChange={(e) => onChangeValue('title', e.target.value)}
           />
 
           <Grid style={{ display: 'flex' }}>
             <FormLabel
-              onClick={() => onChangeValue('isInclusive', !selectedCriteria.isInclusive)}
+              onClick={() => onChangeValue('isInclusive', !currentState.isInclusive)}
               style={{ margin: 'auto 1em' }}
               component="legend"
             >
@@ -122,7 +128,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             </FormLabel>
             <Switch
               id="criteria-inclusive"
-              checked={!selectedCriteria.isInclusive}
+              checked={!currentState.isInclusive}
               onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
             />
           </Grid>
@@ -136,7 +142,9 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             autocompleteValue={defaultValuesCode}
             autocompleteOptions={criteria?.data?.cim10Diagnostic || []}
             getAutocompleteOptions={getDiagOptions}
-            onChange={(e, value) => onChangeValue('code', value)}
+            onChange={(e, value) => {
+              onChangeValue('code', value)
+            }}
           />
 
           <Autocomplete
@@ -151,7 +159,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             renderInput={(params) => <TextField {...params} variant="outlined" label="Type de diagnostic" />}
           />
 
-          <AdvancedInputs form="cim10" selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
+          <AdvancedInputs form="cim10" selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
@@ -166,6 +174,8 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
         </Grid>
       </Grid>
     </Grid>
+  ) : (
+    <></>
   )
 }
 

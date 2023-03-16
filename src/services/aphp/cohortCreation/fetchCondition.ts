@@ -1,5 +1,5 @@
 import { CONDITION_HIERARCHY, CONDITION_STATUS, VALUE_SET_SIZE } from '../../../constants'
-import apiRequest from 'services/apiRequest'
+import apiFhir from 'services/apiFhir'
 import { codeSort } from 'utils/alphabeticalSort'
 
 export const fetchStatusDiagnostic = async () => {
@@ -16,7 +16,7 @@ export const fetchStatusDiagnostic = async () => {
 }
 
 export const fetchDiagnosticTypes = async () => {
-  const res = await apiRequest.get<any>(`/ValueSet?url=${CONDITION_STATUS}`)
+  const res = await apiFhir.get<any>(`/ValueSet?url=${CONDITION_STATUS}`)
 
   const diagnosticKinds =
     res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -49,7 +49,7 @@ export const fetchCim10Diagnostic = async (searchValue?: string, noStar?: boolea
     ? `&_text=${encodeURIComponent(searchValue.trim().replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line
     : ''
 
-  const res = await apiRequest.get<any>(
+  const res = await apiFhir.get<any>(
     `/ValueSet?url=${CONDITION_HIERARCHY}${_searchValue}&size=${VALUE_SET_SIZE ?? 9999}`
   )
 
@@ -71,7 +71,7 @@ export const fetchCim10Diagnostic = async (searchValue?: string, noStar?: boolea
 
 export const fetchCim10Hierarchy = async (cim10Parent: string) => {
   if (!cim10Parent) {
-    const res = await apiRequest.get<any>(`/ValueSet?url=${CONDITION_HIERARCHY}`)
+    const res = await apiFhir.get<any>(`/ValueSet?url=${CONDITION_HIERARCHY}`)
 
     let cim10List =
       res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
@@ -106,7 +106,7 @@ export const fetchCim10Hierarchy = async (cim10Parent: string) => {
       }
     }
 
-    const res = await apiRequest.post<any>(`/ValueSet/$expand`, JSON.stringify(json))
+    const res = await apiFhir.post<any>(`/ValueSet/$expand`, JSON.stringify(json))
 
     let cim10List =
       res && res.data && res.data.expansion && res.data.expansion.contains && res.data.resourceType === 'ValueSet'

@@ -205,99 +205,115 @@ export interface IServiceCohorts {
 
 const servicesCohorts: IServiceCohorts = {
   fetchCohort: async (cohortId) => {
-    // eslint-disable-next-line
-    let fetchCohortsResults = await Promise.all([
-      apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?fhir_group_id=${cohortId}`),
-      fetchGroup({ _id: cohortId }),
-      fetchPatient({
-        pivotFacet: ['age_gender', 'deceased_gender'],
-        _list: [cohortId],
-        size: 20,
-        _sort: 'given',
-        _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
-      }),
-      fetchEncounter({
-        facet: ['class', 'visit-year-month-gender-facet'],
-        _list: [cohortId],
-        size: 0,
-        type: 'VISIT'
-      })
-    ])
+    try {
+      const fetchCohortsResults = await Promise.all([
+        apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?fhir_group_id=${cohortId}`),
+        fetchGroup({ _id: cohortId }),
+        fetchPatient({
+          pivotFacet: ['age_gender', 'deceased_gender'],
+          _list: [cohortId],
+          size: 20,
+          _sort: 'family',
+          _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
+        }),
+        fetchEncounter({
+          facet: ['class', 'visit-year-month-gender-facet'],
+          _list: [cohortId],
+          size: 0,
+          type: 'VISIT'
+        })
+      ])
 
-    const cohortInfo = fetchCohortsResults[0]
-    const cohortResp = fetchCohortsResults[1]
-    const patientsResp = fetchCohortsResults[2]
-    const encountersResp = fetchCohortsResults[3]
+      const cohortInfo = fetchCohortsResults[0]
+      const cohortResp = fetchCohortsResults[1]
+      const patientsResp = fetchCohortsResults[2]
+      const encountersResp = fetchCohortsResults[3]
 
-    let name = ''
-    let description = ''
-    let requestId = ''
-    let uuid = ''
-    let favorite = false
+      let name = ''
+      let description = ''
+      let requestId = ''
+      let uuid = ''
+      let favorite = false
 
-    if (cohortInfo.data.results && cohortInfo.data.results.length >= 1) {
-      name = cohortInfo.data.results[0].name ?? ''
-      description = cohortInfo.data.results[0].description ?? ''
-      requestId = cohortInfo.data.results[0].request ?? ''
-      favorite = cohortInfo.data.results[0].favorite ?? false
-      uuid = cohortInfo.data.results[0].uuid ?? ''
-    } else {
-      throw new Error('This cohort is not your or invalid')
-    }
+      if (cohortInfo.data.results && cohortInfo.data.results.length >= 1) {
+        name = cohortInfo.data.results[0].name ?? ''
+        description = cohortInfo.data.results[0].description ?? ''
+        requestId = cohortInfo.data.results[0].request ?? ''
+        favorite = cohortInfo.data.results[0].favorite ?? false
+        uuid = cohortInfo.data.results[0].uuid ?? ''
+      } else {
+        throw new Error('This cohort is not your or invalid')
+      }
 
-    if (!name) {
-      name = cohortResp.data.resourceType === 'Bundle' ? cohortResp.data.entry?.[0].resource?.name ?? '-' : '-'
-    }
+      if (!name) {
+        name = cohortResp.data.resourceType === 'Bundle' ? cohortResp.data.entry?.[0].resource?.name ?? '-' : '-'
+      }
 
-    const cohort = cohortResp.data.resourceType === 'Bundle' ? cohortResp.data.entry?.[0].resource : undefined
+      const cohort = cohortResp.data.resourceType === 'Bundle' ? cohortResp.data.entry?.[0].resource : undefined
 
-    const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
+      const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
 
-    const originalPatients = getApiResponseResources(patientsResp)
+      const originalPatients = getApiResponseResources(patientsResp)
 
-    const agePyramidData =
-      patientsResp.data.resourceType === 'Bundle'
-        ? getAgeRepartitionMapAphp(
-            patientsResp.data.meta?.extension?.find((facet: any) => facet.url === 'facet-age-month')?.extension
-          )
-        : undefined
+      const agePyramidData =
+        patientsResp.data.resourceType === 'Bundle'
+          ? getAgeRepartitionMapAphp(
+              patientsResp.data.meta?.extension?.find((facet: any) => facet.url === 'facet-age-month')?.extension
+            )
+          : undefined
 
-    const genderRepartitionMap =
-      patientsResp.data.resourceType === 'Bundle'
-        ? getGenderRepartitionMapAphp(
-            patientsResp.data.meta?.extension?.find((facet: any) => facet.url === 'facet-deceased')?.extension
-          )
-        : undefined
+      const genderRepartitionMap =
+        patientsResp.data.resourceType === 'Bundle'
+          ? getGenderRepartitionMapAphp(
+              patientsResp.data.meta?.extension?.find((facet: any) => facet.url === 'facet-deceased')?.extension
+            )
+          : undefined
 
-    const monthlyVisitData =
-      encountersResp.data.resourceType === 'Bundle'
-        ? getVisitRepartitionMapAphp(
-            encountersResp.data.meta?.extension?.find(
-              (facet: any) => facet.url === 'facet-visit-year-month-gender-facet'
-            )?.extension
-          )
-        : undefined
+      const monthlyVisitData =
+        encountersResp.data.resourceType === 'Bundle'
+          ? getVisitRepartitionMapAphp(
+              encountersResp.data.meta?.extension?.find(
+                (facet: any) => facet.url === 'facet-visit-year-month-gender-facet'
+              )?.extension
+            )
+          : undefined
 
-    const visitTypeRepartitionData =
-      encountersResp.data.resourceType === 'Bundle'
-        ? getEncounterRepartitionMapAphp(
-            encountersResp.data.meta?.extension?.find((facet: any) => facet.url === 'facet-class-simple')?.extension
-          )
-        : undefined
+      const visitTypeRepartitionData =
+        encountersResp.data.resourceType === 'Bundle'
+          ? getEncounterRepartitionMapAphp(
+              encountersResp.data.meta?.extension?.find((facet: any) => facet.url === 'facet-class-simple')?.extension
+            )
+          : undefined
 
-    return {
-      name,
-      description,
-      cohort,
-      totalPatients,
-      originalPatients,
-      genderRepartitionMap,
-      visitTypeRepartitionData,
-      agePyramidData,
-      monthlyVisitData,
-      requestId,
-      favorite,
-      uuid
+      return {
+        name,
+        description,
+        cohort,
+        totalPatients,
+        originalPatients,
+        genderRepartitionMap,
+        visitTypeRepartitionData,
+        agePyramidData,
+        monthlyVisitData,
+        requestId,
+        favorite,
+        uuid
+      }
+    } catch (error) {
+      return {
+        name: '',
+        description: '',
+        cohort: undefined,
+        totalPatients: undefined,
+        originalPatients: [],
+        genderRepartitionMap: undefined,
+        visitTypeRepartitionData: undefined,
+        monthlyVisitData: undefined,
+        agePyramidData: undefined,
+        requestId: '',
+        favorite: false,
+        uuid: ''
+      }
     }
   },
 

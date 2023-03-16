@@ -52,7 +52,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   const [searchInput, setSearchInput] = useState('')
   const [order, setOrder] = useState<Order>({
     orderBy: 'date',
-    orderDirection: 'asc'
+    orderDirection: 'desc'
   })
 
   const [searchMode, setSearchMode] = useState(false)
@@ -148,6 +148,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   return (
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
+        loading={loading}
         results={{ nb: totalDocs, total: totalAllDoc, label: 'document(s)' }}
         searchBar={{
           type: 'document',
