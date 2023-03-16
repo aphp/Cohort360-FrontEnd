@@ -52,7 +52,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   const [searchInput, setSearchInput] = useState('')
   const [order, setOrder] = useState<Order>({
     orderBy: 'date',
-    orderDirection: 'asc'
+    orderDirection: 'desc'
   })
 
   const [searchMode, setSearchMode] = useState(false)
