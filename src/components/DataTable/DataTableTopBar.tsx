@@ -30,8 +30,6 @@ import {
 } from 'types'
 
 import displayDigit from 'utils/displayDigit'
-import { useDebounce } from 'utils/debounce'
-
 import useStyles from './styles'
 import { CircularProgress } from '@material-ui/core'
 
@@ -47,8 +45,6 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
 
   const [search, setSearch] = useState(searchBar?.value ?? '')
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
-
-  const debouncedSearchItem = useDebounce(0, search)
 
   const onSearch = (newInput = search) => {
     if (searchBar && searchBar.onSearch && typeof searchBar.onSearch === 'function') {
@@ -77,12 +73,12 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
   }, [searchBar, searchBar && searchBar?.value])
 
   useEffect(() => {
-    onSearch(debouncedSearchItem)
-  }, [debouncedSearchItem])
+    onSearch(search)
+  }, [search])
 
   useEffect(() => {
-    if (debouncedSearchItem !== '') {
-      onSearch(debouncedSearchItem)
+    if (search !== '') {
+      onSearch(search)
     }
   }, [searchBy])
 

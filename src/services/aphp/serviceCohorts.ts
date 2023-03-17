@@ -136,7 +136,7 @@ export interface IServiceCohorts {
     nda: string,
     ipp: string,
     onlyPdfAvailable: boolean,
-    signal?: any,
+    signal?: AbortSignal,
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string
@@ -157,7 +157,7 @@ export interface IServiceCohorts {
    * Retourne:
    *   - searchInputError: objet décrivant la ou les erreurs du champ de recherche s'il y en a
    */
-  checkDocumentSearchInput: (searchInput: string, signal?: any) => Promise<searchInputError>
+  checkDocumentSearchInput: (searchInput: string, signal?: AbortSignal) => Promise<searchInputError>
 
   /**
    * Permet de récupérer le contenu d'un document
@@ -454,7 +454,12 @@ const servicesCohorts: IServiceCohorts = {
           ).valueDecimal
         : totalPatientDocs
 
-    const documentsList = await getDocumentInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
+    const documentsList = await getDocumentInfos(
+      deidentifiedBoolean,
+      getApiResponseResources(docsList),
+      groupId,
+      signal
+    )
 
     return {
       totalDocs: totalDocs ?? 0,
@@ -767,8 +772,9 @@ export default servicesCohorts
 const getDocumentInfos: (
   deidentifiedBoolean: boolean,
   documents?: IComposition[],
-  groupId?: string
-) => Promise<CohortComposition[]> = async (deidentifiedBoolean: boolean, documents, groupId) => {
+  groupId?: string,
+  signal?: AbortSignal
+) => Promise<CohortComposition[]> = async (deidentifiedBoolean: boolean, documents, groupId, signal) => {
   const cohortDocuments = (documents as CohortComposition[]) ?? []
 
   const listePatientsIds = cohortDocuments
@@ -784,14 +790,17 @@ const getDocumentInfos: (
     fetchPatient({
       _id: listePatientsIds,
       _list: groupId ? [groupId] : [],
-      _elements: ['extension', 'id', 'identifier']
+      _elements: ['extension', 'id', 'identifier'],
+      signal: signal
     }),
     fetchEncounter({
       _id: listeEncounterIds,
       _list: groupId ? [groupId] : [],
       type: 'VISIT',
-      _elements: ['status', 'serviceProvider', 'identifier']
-    })
+      _elements: ['status', 'serviceProvider', 'identifier'],
+      signal: signal
+    }),
+    signal
   ])
 
   if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {

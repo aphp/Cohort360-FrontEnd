@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 import { Checkbox, CssBaseline, Grid, Typography } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
@@ -24,6 +24,8 @@ import services from 'services/aphp'
 import { buildDocumentFiltersChips } from 'utils/chips'
 
 import { docTypes } from 'assets/docTypes.json'
+
+import { useDebounce } from 'utils/debounce'
 
 type DocumentsProps = {
   groupId?: string
@@ -59,16 +61,28 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   })
 
   const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
+  const controllerRef = useRef<AbortController | null>()
+  const debouncedSearchInput = useDebounce(200, searchInput)
 
-  const checkDocumentSearch = async (controller: any) => {
-    const checkDocumentSearch = await services.cohorts.checkDocumentSearchInput(searchInput, controller.signal)
+  const _cancelPendingRequest = () => {
+    if (controllerRef.current) {
+      controllerRef.current.abort()
+    }
+    controllerRef.current = new AbortController()
+  }
+
+  const checkDocumentSearch = async () => {
+    const checkDocumentSearch = await services.cohorts.checkDocumentSearchInput(
+      searchInput,
+      controllerRef.current?.signal
+    )
 
     setSearchInputError(checkDocumentSearch)
 
     return checkDocumentSearch
   }
 
-  const onSearchDocument = async (newPage: number, controller: any) => {
+  const onSearchDocument = async (newPage: number) => {
     try {
       if (searchInput) {
         setSearchMode(true)
@@ -77,7 +91,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
       }
       setLoadingStatus(true)
 
-      const searchInputError = await checkDocumentSearch(controller)
+      const searchInputError = await checkDocumentSearch()
       if (searchInputError && searchInputError.isError) {
         setDocuments([])
         setLoadingStatus(false)
@@ -99,7 +113,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         filters.nda,
         filters.ipp ?? '',
         filters.onlyPdfAvailable,
-        controller.signal,
+        controllerRef?.current?.signal,
         filters.startDate,
         filters.endDate,
         groupId
@@ -129,19 +143,19 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     }
   }
 
-  const handleChangePage = (newPage = 1, controller?: any) => {
+  const handleChangePage = (newPage = 1) => {
     setPage(newPage)
 
-    onSearchDocument(newPage, controller)
+    onSearchDocument(newPage)
   }
 
   useEffect(() => {
-    const controller = new AbortController()
+    // const controller = new AbortController()
+    _cancelPendingRequest()
+    handleChangePage(1)
 
-    handleChangePage(1, controller)
-
-    return () => controller.abort()
-  }, [!!deidentifiedBoolean, filters, order, searchInput, searchBy]) // eslint-disable-line
+    return () => _cancelPendingRequest()
+  }, [!!deidentifiedBoolean, filters, order,debouncedSearchInput, searchBy]) // eslint-disable-line
 
   const handleOpenDialog = () => {
     setOpenFilter(true)
