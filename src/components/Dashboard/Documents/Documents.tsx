@@ -62,7 +62,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
   const controllerRef = useRef<AbortController | null>()
-  const debouncedSearchInput = useDebounce(200, searchInput)
+  const debouncedSearchInput = useDebounce(500, searchInput)
 
   const _cancelPendingRequest = () => {
     if (controllerRef.current) {

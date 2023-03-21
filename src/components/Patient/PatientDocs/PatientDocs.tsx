@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 
 import { Checkbox, Grid, Typography } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
@@ -16,6 +16,7 @@ import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'
 
 import { buildDocumentFiltersChips } from 'utils/chips'
+import { useDebounce } from 'utils/debounce'
 import { docTypes } from 'assets/docTypes.json'
 
 import useStyles from './styles'
@@ -58,11 +59,21 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   const [searchMode, setSearchMode] = useState(false)
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
   const [open, setOpen] = useState<'filter' | null>(null)
+  const debouncedSearchInput = useDebounce(500, searchInput)
+  const controllerRef = useRef<AbortController | null>()
+
+  const _cancelPendingRequest = () => {
+    if (controllerRef.current) {
+      controllerRef.current.abort()
+    }
+    controllerRef.current = new AbortController()
+  }
 
   const fetchDocumentsList = async (page: number) => {
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
     dispatch<any>(
       fetchDocuments({
+        signal: controllerRef.current?.signal,
         groupId,
         options: {
           page,
@@ -89,9 +100,10 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   }
 
   useEffect(() => {
+    _cancelPendingRequest()
     handleChangePage()
   }, [
-    searchInput,
+    debouncedSearchInput,
     filters.onlyPdfAvailable,
     filters.nda,
     filters.selectedDocTypes,

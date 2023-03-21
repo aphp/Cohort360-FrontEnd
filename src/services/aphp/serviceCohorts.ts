@@ -97,7 +97,8 @@ export interface IServiceCohorts {
     sortDirection: string,
     deidentified: boolean,
     groupId?: string,
-    includeFacets?: boolean
+    includeFacets?: boolean,
+    signal?: AbortSignal
   ) => Promise<
     | {
         totalPatients: number
@@ -328,7 +329,8 @@ const servicesCohorts: IServiceCohorts = {
     sortDirection,
     deidentified,
     groupId,
-    includeFacets
+    includeFacets,
+    signal
   ) => {
     let _searchInput = ''
     const searches = searchInput
@@ -357,7 +359,8 @@ const servicesCohorts: IServiceCohorts = {
       minBirthdate: minBirthdate,
       maxBirthdate: maxBirthdate,
       deceased: vitalStatus !== VitalStatus.all ? (vitalStatus === VitalStatus.deceased ? true : false) : undefined,
-      deidentified: deidentified
+      deidentified: deidentified,
+      signal: signal
     })
 
     const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0

@@ -323,6 +323,7 @@ const fetchMedication = createAsyncThunk<FetchMedicationReturn, FetchMedicationP
  *
  */
 type FetchDocumentsParams = {
+  signal?: AbortSignal
   groupId?: string
   options?: {
     page?: number
@@ -344,7 +345,7 @@ type FetchDocumentsParams = {
 type FetchDocumentsReturn = { documents?: IPatientDocuments } | undefined
 const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsParams, { state: RootState }>(
   'patient/fetchDocuments',
-  async ({ groupId, options }, { getState }) => {
+  async ({ signal, groupId, options }, { getState }) => {
     try {
       const patientState = getState().patient
 
@@ -367,7 +368,7 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
       const onlyPdfAvailable = options?.filters?.onlyPdfAvailable ?? false
 
       if (searchInput) {
-        const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput)
+        const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)
 
         if (searchInputError && searchInputError.isError) {
           return {
@@ -396,7 +397,8 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
         onlyPdfAvailable,
         startDate,
         endDate,
-        groupId
+        groupId,
+        signal
       )
 
       const documentsList: any[] = linkElementWithEncounter(

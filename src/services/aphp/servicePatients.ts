@@ -248,7 +248,8 @@ export interface IServicePatients {
     onlyPdfAvailable: boolean,
     startDate?: string | null,
     endDate?: string | null,
-    groupId?: string
+    groupId?: string,
+    signal?: AbortSignal
   ) => Promise<{
     docsList: IComposition[]
     docsTotal: number
@@ -582,7 +583,8 @@ const servicesPatients: IServicePatients = {
     onlyPdfAvailable?: boolean,
     startDate?: string | null,
     endDate?: string | null,
-    groupId?: string
+    groupId?: string,
+    signal?: AbortSignal
   ) => {
     const documentLines = 20 // Number of desired lines in the document array
 
@@ -601,7 +603,8 @@ const servicesPatients: IServicePatients = {
       'encounter.identifier': nda,
       onlyPdfAvailable: onlyPdfAvailable,
       minDate: startDate ?? '',
-      maxDate: endDate ?? ''
+      maxDate: endDate ?? '',
+      signal: signal
     })
 
     if (docsList.data.resourceType !== 'Bundle' || !docsList.data.total) {
