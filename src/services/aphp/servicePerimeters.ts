@@ -23,6 +23,7 @@ import { sortByQuantityAndName } from 'utils/scopeTree'
 import { AxiosResponse } from 'axios'
 import { Group } from 'fhir/r4'
 import scopeTypes from '../../data/scope_type.json'
+import { BACK_API_LIMIT_PAGE_SIZE } from '../../constants'
 
 export const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
@@ -74,6 +75,7 @@ export interface IServicePerimeters {
     defaultPerimetersIds?: string[],
     cohortIds?: string[],
     noPerimetersIdsFetch?: boolean,
+    getAllPages?: boolean,
     type?: ScopeType,
     signal?: AbortSignal
   ) => Promise<ScopePage[]>
@@ -104,6 +106,7 @@ export interface IServicePerimeters {
   getScopesWithSubItems: (
     subScopesIds: string | null | undefined,
     getSubItem?: boolean,
+    getAllPages?: boolean,
     type?: ScopeType,
     signal?: AbortSignal
   ) => Promise<ScopeTreeRow[]>
@@ -131,6 +134,7 @@ export interface IServicePerimeters {
   buildScopeTreeRowList: (
     subScopes: ScopePage[],
     getSubItem?: boolean | undefined,
+    getAllPages?: boolean,
     type?: ScopeType,
     signal?: AbortSignal
   ) => Promise<ScopeTreeRow[]>
@@ -261,6 +265,7 @@ const servicesPerimeters: IServicePerimeters = {
     defaultPerimetersIds?: string[],
     cohortIds?: string[],
     noPerimetersIdsFetch?: boolean,
+    getAllPages?: boolean,
     type?: ScopeType,
     signal?: AbortSignal
   ) => {
@@ -298,6 +303,7 @@ const servicesPerimeters: IServicePerimeters = {
       const perimetersListReponse: any = await fetchScope({
         perimetersIds: perimetersIds,
         cohortIds: cohortIds,
+        getAllPages: getAllPages,
         type: higherTypes
       })
       if (!perimetersListReponse || !perimetersListReponse.data || !perimetersListReponse.data.results) {
@@ -347,9 +353,10 @@ const servicesPerimeters: IServicePerimeters = {
     if (!practitionerId) return []
 
     const scopeItemList: ScopePage[] =
-      (await servicesPerimeters.getPerimeters(undefined, undefined, undefined, type, signal)) ?? []
+      (await servicesPerimeters.getPerimeters(undefined, undefined, undefined, undefined, type, signal)) ?? []
     const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
       scopeItemList,
+      undefined,
       undefined,
       type,
       signal
@@ -360,6 +367,7 @@ const servicesPerimeters: IServicePerimeters = {
   getScopesWithSubItems: async (
     subScopesIds: string | null | undefined,
     getSubItem?: boolean,
+    getAllPages?: boolean,
     type?: ScopeType,
     signal?: AbortSignal
   ) => {
@@ -368,12 +376,14 @@ const servicesPerimeters: IServicePerimeters = {
       subScopesIds.trim().split(','),
       undefined,
       undefined,
+      undefined,
       type,
       signal
     )
     const scopeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
       subScopes,
       getSubItem,
+      getAllPages,
       type,
       signal
     )
@@ -457,6 +467,7 @@ const servicesPerimeters: IServicePerimeters = {
   buildScopeTreeRowList: async (
     subScopes: ScopePage[],
     getSubItem?: boolean | undefined,
+    getAllPages?: boolean,
     type?: ScopeType,
     signal?: AbortSignal
   ) => {
@@ -469,6 +480,7 @@ const servicesPerimeters: IServicePerimeters = {
           ? await servicesPerimeters.getScopesWithSubItems(
               scopeItem.perimeter.inferior_levels_ids,
               undefined,
+              getAllPages,
               type,
               signal
             )

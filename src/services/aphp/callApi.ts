@@ -20,6 +20,7 @@ import {
   Procedure
 } from 'fhir/r4'
 import { Observation } from 'fhir/r4'
+import { BACK_API_LIMIT_PAGE_SIZE } from '../../constants'
 
 const reducer = (accumulator: any, currentValue: any) =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -473,7 +474,8 @@ export const fetchClaim = async (args: fetchClaimProps) => {
   if (encounterIdentifier) options = [...options, `encounter-identifier=${encounterIdentifier}`] // eslint-disable-line
   if (minCreated) options = [...options, `created=ge${minCreated}`] // eslint-disable-line
   if (maxCreated) options = [...options, `created=le${maxCreated}`] // eslint-disable-line
-  if (executiveUnits && executiveUnits.length > 0) options = [...options, `encounter-service-provider=${executiveUnits}`] // eslint-disable-line
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `encounter-service-provider=${executiveUnits}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
@@ -531,7 +533,8 @@ export const fetchCondition = async (args: fetchConditionProps) => {
   if (encounterIdentifier) options = [...options, `encounter-identifier=${encounterIdentifier}`] // eslint-disable-line
   if (minRecordedDate) options = [...options, `recorded-date=ge${minRecordedDate}`] // eslint-disable-line
   if (maxRecordedDate) options = [...options, `recorded-date=le${maxRecordedDate}`] // eslint-disable-line
-  if (executiveUnits && executiveUnits.length > 0) options = [...options, `encounter-service-provider=${executiveUnits}`] // eslint-disable-line
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `encounter-service-provider=${executiveUnits}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
   if (type && type.length > 0) options = [...options, `type=${type.reduce(reducer)}`] // eslint-disable-line
@@ -600,7 +603,8 @@ export const fetchObservation = async (args: fetchObservationProps) => {
   if (minDate) options = [...options, `effectiveDatetime=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `effectiveDatetime=le${maxDate}`] // eslint-disable-line
   if (rowStatus) options = [...options, `row_status=${BiologyStatus.VALIDATED}`] // eslint-disable-line
-  if (executiveUnits && executiveUnits.length > 0) options = [...options, `encounter-service-provider=${executiveUnits}`] // eslint-disable-line
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `encounter-service-provider=${executiveUnits}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
@@ -660,7 +664,8 @@ export const fetchMedicationRequest = async (args: fetchMedicationRequestProps) 
   if (type) options = [...options, `type=${type}`] // eslint-disable-line
   if (minDate) options = [...options, `Period-start=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `Period-start=le${maxDate}`] // eslint-disable-line
-  if (executiveUnits && executiveUnits.length > 0) options = [...options, `encounter-service-provider=${executiveUnits}`] // eslint-disable-line
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `encounter-service-provider=${executiveUnits}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
@@ -723,7 +728,8 @@ export const fetchMedicationAdministration = async (args: fetchMedicationAdminis
   if (route) options = [...options, `route=${route}`] // eslint-disable-line
   if (minDate) options = [...options, `Period-start=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `Period-start=le${maxDate}`] // eslint-disable-line
-  if (executiveUnits && executiveUnits.length > 0) options = [...options, `encounter-service-provider=${executiveUnits}`] // eslint-disable-line
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `encounter-service-provider=${executiveUnits}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
@@ -742,17 +748,19 @@ type fetchScopeProps = {
   cohortIds?: string[]
   search?: string
   page?: number
+  getAllPages?: boolean
   type: string[]
 }
 export const fetchScope: (
   args: fetchScopeProps,
   signal?: AbortSignal
 ) => Promise<AxiosResponse<IScope | unknown>> = async (args: fetchScopeProps, signal?: AbortSignal) => {
-  const { perimetersIds, cohortIds, search, page, type } = args
+  const { perimetersIds, cohortIds, search, page, getAllPages, type } = args
 
   let options: string[] = []
   if (search) options = [...options, `search=${search}`] // eslint-disable-line
-  if (page) options = [...options, `page=${page}`] // eslint-disable-line
+  if (!getAllPages && page) options = [...options, `page=${page}`] // eslint-disable-line
+  if (getAllPages) options = [...options, `limit=-1`] // eslint-disable-line
   if (perimetersIds && perimetersIds.length > 0) options = [...options, `local_id=${perimetersIds.join(',')}`] // eslint-disable-line
   if (cohortIds && cohortIds.length > 0) options = [...options, `cohort_id=${cohortIds.join(',')}`] // eslint-disable-line
   if (type && type.length > 0) options = [...options, `type_source_value=${type.join(',')}`] // eslint-disable-line

@@ -48,7 +48,7 @@ const getAllParentsIds = async (selectedItems: ScopeTreeRow[], rootRows: ScopeTr
   const notFetchedSelectedItems: ScopeTreeRow[] =
     notFetchedSelectedItemsIds?.length > 0
       ? await servicesPerimeters.buildScopeTreeRowList(
-          await servicesPerimeters.getPerimeters(notFetchedSelectedItemsIds)
+          await servicesPerimeters.getPerimeters(notFetchedSelectedItemsIds, undefined, undefined, true)
         )
       : []
   const allParentsIds: string[] = [...fetchedSelectedItems, ...notFetchedSelectedItems]
@@ -79,7 +79,9 @@ const getParents = async (allParentsIds: string[], rootRows: ScopeTreeRow[]) => 
   )
   const notFetchedParents: ScopeTreeRow[] =
     notFetchedItems?.length > 0
-      ? await servicesPerimeters.buildScopeTreeRowList(await servicesPerimeters.getPerimeters(notFetchedItems))
+      ? await servicesPerimeters.buildScopeTreeRowList(
+          await servicesPerimeters.getPerimeters(notFetchedItems, undefined, undefined, true)
+        )
       : []
   return [...fetchedParents, ...notFetchedParents]
 }
@@ -95,7 +97,6 @@ const expandSelectedItems = async (
   const allParentsIds: string[] = await getAllParentsIds(selectedItems, rootRows)
 
   const parents: ScopeTreeRow[] = await getParents(allParentsIds, rootRows)
-  // parents.push(...selectedItems)
 
   const newRootRows: ScopeTreeRow[] = [...rootRows]
 
@@ -127,7 +128,7 @@ const updateRootRows = async (
     let subItems: ScopeTreeRow[] = removeDuplicates([...existingSubItems, ...updatedSubItems])
     if (subItems?.length < (newRootRows[i]?.inferior_levels_ids?.split(',')?.length ?? 0)) {
       const loadedItems: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
-        await servicesPerimeters.getPerimeters([newRootRows[i].id]),
+        await servicesPerimeters.getPerimeters([newRootRows[i].id], undefined, undefined, true),
         true
       )
       subItems = loadedItems[0].subItems
@@ -168,16 +169,23 @@ export const init = async (
   setIsSearchLoading(true)
   cancelPendingRequestByRef(controllerRef)
 
-  let newPerimetersList: ScopeTreeRow[] = []
-  const fetchScopeTreeResponse = await fetchScopeTree(dispatch, true, controllerRef.current?.signal, executiveUnitType)
-  if (fetchScopeTreeResponse && !fetchScopeTreeResponse.aborted) {
-    newPerimetersList = fetchScopeTreeResponse.scopesList
-    setRootRows(newPerimetersList)
-    setOpenPopulations([])
-    setCount(newPerimetersList?.length)
-    setIsEmpty(!newPerimetersList || newPerimetersList.length < 0)
+  let newPerimetersList: ScopeTreeRow[] = rootRows
+  if (rootRows?.length <= 0) {
+    const fetchScopeTreeResponse = await fetchScopeTree(
+      dispatch,
+      true,
+      controllerRef.current?.signal,
+      executiveUnitType
+    )
+    if (fetchScopeTreeResponse && !fetchScopeTreeResponse.aborted) {
+      newPerimetersList = fetchScopeTreeResponse.scopesList
+      setRootRows(newPerimetersList)
+      setOpenPopulations([])
+      setCount(newPerimetersList?.length)
+      setIsEmpty(!newPerimetersList || newPerimetersList.length < 0)
+    }
   }
-  await expandSelectedItems(newPerimetersList ?? rootRows, selectedItems, dispatch, setRootRows)
+  await expandSelectedItems(newPerimetersList, selectedItems, dispatch, setRootRows)
   setIsSearchLoading(false)
 }
 
