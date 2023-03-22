@@ -231,6 +231,7 @@ export interface IServicePatients {
    **   - startDate: (optionnel) permet le filtre par date
    **   - endDate: (optionnel) permet le filtre par date
    **   - groupId: (optionnel) Périmètre auquel le patient est lié
+   **   - signal: (optionnel) paramètre permettant d'identifier si une requête est déjà en cours et de l'annuler si besoin
    **
    ** Retour:
    **   - docsList: Liste de 20 éléments de Composition lié à un patient
