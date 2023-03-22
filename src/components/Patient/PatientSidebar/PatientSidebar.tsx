@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import moment from 'moment'
 
 import { CircularProgress, Divider, Drawer, Grid, IconButton, List, Typography } from '@material-ui/core'
 import Pagination from '@material-ui/lab/Pagination'
@@ -51,7 +50,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const [filters, setFilters] = useState<PatientFiltersType>({
     gender: PatientGenderKind._unknown,
-    birthdatesRanges: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
+    birthdatesRanges: ['', ''],
     vitalStatus: VitalStatus.all
   })
 

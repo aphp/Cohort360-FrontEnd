@@ -13,6 +13,16 @@ type InputAgeRangeAdvancedProps = {
   error: ErrorType
   onError: (isError: boolean, errorMessage?: string) => void
 }
+const defaultMinDate: AgeRangeType = {
+  year: 0,
+  month: 0,
+  days: 0
+}
+const defaultMaxDate: AgeRangeType = {
+  year: 130,
+  month: 0,
+  days: 0
+}
 const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({
   birthdatesRanges,
   onChangeBirthdatesRanges,
@@ -22,28 +32,12 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({
   const classes = useStyles()
   const { deidentifiedBoolean = true } = useAppSelector((state) => state.exploredCohort)
 
-  const [minState, setMinState] = useState<AgeRangeType>({
-    year: 0,
-    month: 0,
-    days: 0
-  })
-  const [maxState, setMaxState] = useState<AgeRangeType>({
-    year: 0,
-    month: 0,
-    days: 0
-  })
+  const [minState, setMinState] = useState<AgeRangeType>(defaultMinDate)
+  const [maxState, setMaxState] = useState<AgeRangeType>(defaultMaxDate)
 
   useEffect(() => {
-    const newMaxDate: AgeRangeType = convertStringToAgeRangeType(birthdatesRanges[0]) ?? {
-      year: 130,
-      month: 0,
-      days: 0
-    }
-    const newMinDate: AgeRangeType = convertStringToAgeRangeType(birthdatesRanges[1]) ?? {
-      year: 0,
-      month: 0,
-      days: 0
-    }
+    const newMaxDate: AgeRangeType = convertStringToAgeRangeType(birthdatesRanges[0]) ?? defaultMaxDate
+    const newMinDate: AgeRangeType = convertStringToAgeRangeType(birthdatesRanges[1]) ?? defaultMinDate
     setMinState(newMinDate)
     setMaxState(newMaxDate)
   }, [birthdatesRanges])
@@ -64,7 +58,6 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({
     const newMaxState: AgeRangeType = { ...maxState }
     let isError
     if (!checkRange(key, value)) {
-      onError(true, 'La valeur du mois (entre 0 et 12) ou la valeur du jour (entre 0 et 31) est incorrecte')
       isError = true
     } else {
       if (stateName === 'minState') {
