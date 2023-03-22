@@ -79,6 +79,7 @@ export interface IServiceCohorts {
    *   - deidentified: savoir si la liste de patients est pseudonymisée ou non
    *   - groupId: (optionnel) Périmètre auquel la cohorte est liée
    *   - includeFacets: = true si vous voulez inclure les graphique
+   *   - signal: (optionnel) paramètre permettant d'identifier si une requête est déjà en cours et de l'annuler si besoin
    *
    * Retourne:
    *   - totalPatients: Nombre de patients (dépend des filtres)
@@ -125,6 +126,7 @@ export interface IServiceCohorts {
    *   - startDate: Permet de filtrer sur une date
    *   - endDate: Permet de filtrer sur une date
    *   - groupId: (optionnel) Périmètre auquel la cohorte est liée
+   *   - signal: (optionnel) paramètre permettant d'identifier si une requête est déjà en cours et de l'annuler si besoin
    */
   fetchDocuments: (
     deidentifiedBoolean: boolean,
