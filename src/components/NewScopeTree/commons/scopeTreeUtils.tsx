@@ -124,7 +124,7 @@ const updateRootRows = async (
           !updatedSubItems?.map((updatedSubItem) => updatedSubItem.id).includes(subItem?.id)
       )
     }
-    let subItems: ScopeTreeRow[] = [...existingSubItems, ...updatedSubItems]
+    let subItems: ScopeTreeRow[] = removeDuplicates([...existingSubItems, ...updatedSubItems])
     if (subItems?.length < (newRootRows[i]?.inferior_levels_ids?.split(',')?.length ?? 0)) {
       const loadedItems: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
         await servicesPerimeters.getPerimeters([newRootRows[i].id]),
@@ -138,6 +138,19 @@ const updateRootRows = async (
       await updateRootRows(newRootRows[i].subItems, parentsAndSelectedItems, onlyParents)
     }
   }
+}
+
+export const removeDuplicates = (arr: ScopeTreeRow[]) => {
+  const uniqueIds = new Set()
+  const uniqueItems: ScopeTreeRow[] = []
+
+  arr.forEach((item) => {
+    if (!uniqueIds.has(item.id)) {
+      uniqueIds.add(item.id)
+      uniqueItems.push(item)
+    }
+  })
+  return uniqueItems
 }
 
 export const init = async (
