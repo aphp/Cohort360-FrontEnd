@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import CareSiteExploration from 'components/NewScopeTree/CareSiteExploration'
+import CareSiteExploration from 'components/ScopeTree/CareSiteExploration'
 import { Button, Grid } from '@mui/material'
 import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
-import CareSiteSearch from 'components/NewScopeTree/CareSiteSearch/index'
+import CareSiteSearch from 'components/ScopeTree/CareSiteSearch/index'
 import useStyles from './styles'
 import { useNavigate } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from '../../state'
-import { closeAllOpenedPopulation, ScopeState } from '../../state/scope'
+import { useAppDispatch, useAppSelector } from 'state'
+import { closeAllOpenedPopulation, ScopeState } from 'state/scope'
 import { ScopeTreeRow } from '../../types'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
-import CareSiteChipsets from '../../components/NewScopeTree/CareSiteChipsets/CareSiteChipsets'
-import { onSelect } from '../../components/NewScopeTree/commons/scopeTreeUtils'
+import CareSiteChipsets from '../../components/ScopeTree/CareSiteChipsets/CareSiteChipsets'
+import { onSelect } from '../../components/ScopeTree/commons/scopeTreeUtils'
+import ScopeTree from '../../components/ScopeTree'
 
 const CareSiteView = () => {
   const { classes, cx } = useStyles()
@@ -25,6 +26,7 @@ const CareSiteView = () => {
   }))
   const { scopesList = [] } = scopeState
   const [selectedItems, setSelectedItems] = useState<ScopeTreeRow[]>([])
+  const [searchedRows, setSearchedRows] = useState<ScopeTreeRow[]>([...scopesList])
   const [openPopulation, setOpenPopulations] = useState<number[]>([])
   const [searchInput, setSearchInput] = useState<string>('')
   const open = useAppSelector((state) => state.drawer)
@@ -65,29 +67,13 @@ const CareSiteView = () => {
           <Typography variant="h1" color="primary" className={classes.title}>
             Explorer un perimètre
           </Typography>
-          <Grid container direction="row">
-            <CareSiteChipsets
-              selectedItems={selectedItems}
-              onDelete={(item) => onSelect(item, selectedItems, setSelectedItems, scopesList)}
-            />
-            <ScopeSearchBar searchInput={searchInput} setSearchInput={handleSetSearchInput} />
-          </Grid>
-          <Paper className={classes.paper}>
-            {searchInput ? (
-              <CareSiteSearch
-                searchInput={searchInput}
-                selectedItems={selectedItems}
-                setSelectedItems={setSelectedItems}
-              />
-            ) : (
-              <CareSiteExploration
-                selectedItems={selectedItems}
-                setSelectedItems={setSelectedItems}
-                openPopulation={openPopulation}
-                setOpenPopulations={setOpenPopulations}
-              />
-            )}
-          </Paper>
+          <ScopeTree
+            selectedItems={selectedItems}
+            setSelectedItems={setSelectedItems}
+            openPopulation={openPopulation}
+            setOpenPopulations={setOpenPopulations}
+            executiveUnitType={undefined}
+          />
         </Grid>
         <Grid
           container

@@ -16,10 +16,6 @@ type ScopeSearchBarProps = {
 const ScopeSearchBar: React.FC<ScopeSearchBarProps> = ({ searchInput, setSearchInput, alertMessage }) => {
   const { classes } = useStyles()
 
-  const handleChangeInput = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    setSearchInput(event.target.value)
-  }
-
   const handleClearInput = () => {
     setSearchInput('')
   }
@@ -31,7 +27,7 @@ const ScopeSearchBar: React.FC<ScopeSearchBarProps> = ({ searchInput, setSearchI
           placeholder="Rechercher"
           className={classes.input}
           value={searchInput}
-          onChange={handleChangeInput}
+          onChange={(e) => setSearchInput(e.target.value)}
           endAdornment={
             searchInput && (
               <InputAdornment position="end">

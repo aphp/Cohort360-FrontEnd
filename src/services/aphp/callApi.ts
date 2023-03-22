@@ -752,7 +752,8 @@ export const fetchScope: (
 
   let options: string[] = []
   if (search) options = [...options, `search=${search}`] // eslint-disable-line
-  if (page) options = [...options, `page=${page}`] // eslint-disable-line
+  if (search && page) options = [...options, `page=${page}`] // eslint-disable-line
+  if (!search) options = [...options, `limit=-1`] // eslint-disable-line
   if (perimetersIds && perimetersIds.length > 0) options = [...options, `local_id=${perimetersIds.join(',')}`] // eslint-disable-line
   if (cohortIds && cohortIds.length > 0) options = [...options, `cohort_id=${cohortIds.join(',')}`] // eslint-disable-line
   if (type && type.length > 0) options = [...options, `type_source_value=${type.join(',')}`] // eslint-disable-line

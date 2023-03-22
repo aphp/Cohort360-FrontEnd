@@ -5,6 +5,7 @@ import { Checkbox, IconButton, Skeleton, TableCell, TableRow, Typography } from 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'
 import displayDigit from 'utils/displayDigit'
+import { LOADING } from 'services/aphp/servicePerimeters'
 
 type CareSiteRowProps = {
   row: ScopeTreeRow
@@ -13,8 +14,8 @@ type CareSiteRowProps = {
   openPopulation: number[]
   labelId: string
   onExpand: (rowId: number) => Promise<void>
-  onSelect: (row: ScopeTreeRow) => ScopeTreeRow[]
-  isIndeterminated: (row: ScopeTreeRow) => boolean | undefined
+  onSelect: (row: ScopeTreeRow) => Promise<ScopeTreeRow[]>
+  isIndeterminate: (row: ScopeTreeRow) => boolean | undefined
   isSelected: (row: ScopeTreeRow) => boolean
   executiveUnitType?: ScopeType
 }
@@ -28,7 +29,7 @@ const CareSiteExplorationRow: React.FC<CareSiteRowProps> = (props: CareSiteRowPr
     labelId,
     onExpand,
     onSelect,
-    isIndeterminated: isIndeterminate,
+    isIndeterminate,
     isSelected,
     executiveUnitType
   } = props
@@ -40,7 +41,7 @@ const CareSiteExplorationRow: React.FC<CareSiteRowProps> = (props: CareSiteRowPr
 
   return (
     <>
-      {row.id === 'loading' ? (
+      {row.id === LOADING.id ? (
         <TableRow hover key={Math.random()}>
           <TableCell colSpan={5}>
             <Skeleton animation="wave" />

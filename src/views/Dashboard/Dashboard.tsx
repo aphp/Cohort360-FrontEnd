@@ -169,7 +169,7 @@ const Dashboard: React.FC<{
           </Tabs>
         </Grid>
       </Grid>
-      <Grid container item xs={11} alignItems="center" direction="column">
+      <Grid container xs={11} alignItems="center" direction="column">
         {selectedTab === 'preview' && (
           <CohortPreview
             total={dashboard.totalPatients}
