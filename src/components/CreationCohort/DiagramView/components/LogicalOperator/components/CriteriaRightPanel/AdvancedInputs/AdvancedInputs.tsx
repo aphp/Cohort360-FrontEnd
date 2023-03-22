@@ -46,9 +46,8 @@ const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
       </Grid>
 
       <Collapse in={checked} unmountOnExit>
-        <VisitInputs selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
-
         <OccurrencesInputs form={form} selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
+        <VisitInputs selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
       </Collapse>
     </Grid>
   )

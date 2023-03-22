@@ -27,6 +27,7 @@ import VisitInputs from '../AdvancedInputs/VisitInputs/VisitInputs'
 import useStyles from './styles'
 
 import { EncounterDataType } from 'types'
+import OccurrencesInputs from '../AdvancedInputs/OccurrencesInputs/OccurrencesInputs'
 
 type SupportedFormProps = {
   criteria: any
@@ -55,6 +56,10 @@ const defaultEncounter: EncounterDataType = {
   admission: [],
   encounterStartDate: '',
   encounterEndDate: '',
+  occurrence: 1,
+  occurrenceComparator: '>=',
+  startOccurrence: '',
+  endOccurrence: '',
   isInclusive: true
 }
 
@@ -64,38 +69,12 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultEncounter)
 
   const classes = useStyles()
-
-  const [error, setError] = useState(false)
   const [sliderError, setSliderError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = () => {
-    if (
-      defaultValues.ageType?.id === 'year' &&
-      defaultValues.years[0] === 0 &&
-      defaultValues.years[1] === 130 &&
-      defaultValues.durationType?.id === 'day' &&
-      defaultValues.duration[0] === 0 &&
-      defaultValues.duration[1] === 100 &&
-      defaultValues.admissionMode?.length === 0 &&
-      defaultValues.entryMode?.length === 0 &&
-      defaultValues.exitMode?.length === 0 &&
-      defaultValues.priseEnChargeType?.length === 0 &&
-      defaultValues.typeDeSejour?.length === 0 &&
-      defaultValues.fileStatus?.length === 0 &&
-      defaultValues.discharge?.length === 0 &&
-      defaultValues.reason?.length === 0 &&
-      defaultValues.destination?.length === 0 &&
-      defaultValues.provenance?.length === 0 &&
-      defaultValues.admission?.length === 0 &&
-      !defaultValues.encounterStartDate &&
-      !defaultValues.encounterEndDate
-    ) {
-      return setError(true)
-    }
-
     onChangeSelectedCriteria(defaultValues)
   }
 
@@ -151,9 +130,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner un champ</Alert>}
-
-        {!error && !multiFields && (
+        {!multiFields && (
           <Alert
             severity="info"
             onClose={() => {
@@ -178,6 +155,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
             onChange={(e) => _onChangeValue('title', e.target.value)}
           />
 
+          <OccurrencesInputs form={'visitSupport'} selectedCriteria={defaultValues} onChangeValue={_onChangeValue} />
           <Grid style={{ display: 'flex' }}>
             <FormLabel
               onClick={() => _onChangeValue('isInclusive', !defaultValues.isInclusive)}
