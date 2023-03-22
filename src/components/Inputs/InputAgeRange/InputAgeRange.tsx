@@ -77,7 +77,7 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({
       const minDate: Date = substructAgeRangeType(newMaxState)
 
       if (minDate > maxDate) {
-        onError(true, 'La date maximale doit être supérieur à la date minimale.')
+        onError(true, 'La date maximale doit être supérieure à la date minimale.')
         isError = true
       } else if (newMaxState.days === 0 && newMaxState.month === 0 && newMaxState.year === 0) {
         onError(true, 'Au moins une des valeurs maximales ne doit pas être égale à 0')
