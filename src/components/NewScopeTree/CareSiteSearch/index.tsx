@@ -35,7 +35,7 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
   const [rootRows, setRootRows] = useState<ScopeTreeRow[]>([])
   const controllerRef = useRef<AbortController | null>(null)
   const [isEmpty, setIsEmpty] = useState<boolean>(true)
-  const debouncedSearchTerm = useDebounce(500, searchInput)
+  const [debouncedSearchTerm] = useDebounce(700, searchInput)
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false)
@@ -55,9 +55,9 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
     executiveUnitType
   )
 
-  const search = () =>
-    searchInPerimeters(
-      searchInput,
+  const search = async () =>
+    await searchInPerimeters(
+      debouncedSearchTerm,
       page,
       controllerRef,
       setIsSearchLoading,
@@ -71,13 +71,17 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
     )
 
   useEffect(() => {
+    // let delayTimer: string | number | NodeJS.Timeout | undefined = undefined
     if (debouncedSearchTerm) {
       search()
+      // delayTimer = setTimeout(search, 700)
+      // return () => clearTimeout(delayTimer)
     } else {
       setRootRows([])
     }
     return () => {
       controllerRef.current?.abort()
+      // clearTimeout(delayTimer)
     }
   }, [debouncedSearchTerm])
 

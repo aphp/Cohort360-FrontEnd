@@ -1,11 +1,11 @@
 import {
   AccessExpiration,
   AccessExpirationsProps,
+  ChartCode,
   CohortData,
+  ScopeElement,
   ScopePage,
   ScopeTreeRow,
-  ScopeElement,
-  ChartCode,
   ScopeType
 } from 'types'
 import {
@@ -16,14 +16,13 @@ import {
 } from 'utils/graphUtils'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
-import { fetchEncounter, fetchGroup, fetchPatient, fetchScope, fetchAccessExpirations } from './callApi'
+import { fetchAccessExpirations, fetchEncounter, fetchGroup, fetchPatient, fetchScope } from './callApi'
 
 import apiBackend from '../apiBackend'
 import { sortByQuantityAndName } from 'utils/scopeTree'
 import { AxiosResponse } from 'axios'
 import { Group } from 'fhir/r4'
 import scopeTypes from '../../data/scope_type.json'
-import { BACK_API_LIMIT_PAGE_SIZE } from '../../constants'
 
 export const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
