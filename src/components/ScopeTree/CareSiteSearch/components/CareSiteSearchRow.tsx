@@ -5,6 +5,7 @@ import { Breadcrumbs, Checkbox, IconButton, Skeleton, TableCell, TableRow, Typog
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'
 import displayDigit from 'utils/displayDigit'
+import { LOADING } from 'services/aphp/servicePerimeters'
 
 type CareSiteSearchResultRowProps = {
   row: ScopeTreeRow
@@ -13,8 +14,8 @@ type CareSiteSearchResultRowProps = {
   openPopulation: number[]
   labelId: string
   onExpand: (rowId: number) => Promise<void>
-  onSelect: (row: ScopeTreeRow) => ScopeTreeRow[]
-  isIndeterminated: (row: ScopeTreeRow) => boolean | undefined
+  onSelect: (row: ScopeTreeRow) => Promise<ScopeTreeRow[]>
+  isIndeterminate: (row: ScopeTreeRow) => boolean | undefined
   isSelected: (row: ScopeTreeRow) => boolean
   executiveUnitType?: ScopeType
 }
@@ -28,7 +29,7 @@ const CareSiteSearchRow: React.FC<CareSiteSearchResultRowProps> = (props: CareSi
     labelId,
     onExpand,
     onSelect,
-    isIndeterminated,
+    isIndeterminate,
     isSelected,
     executiveUnitType
   } = props
@@ -37,7 +38,7 @@ const CareSiteSearchRow: React.FC<CareSiteSearchResultRowProps> = (props: CareSi
 
   return (
     <>
-      {row.id === 'loading' ? (
+      {row.id === LOADING.id ? (
         <TableRow hover key={Math.random()}>
           <TableCell colSpan={5}>
             <Skeleton animation="wave" />
@@ -72,7 +73,7 @@ const CareSiteSearchRow: React.FC<CareSiteSearchResultRowProps> = (props: CareSi
               onClick={() => {
                 onSelect(row)
               }}
-              indeterminate={isIndeterminated(row)}
+              indeterminate={isIndeterminate(row)}
               checked={isSelected(row) ? true : false}
               inputProps={{ 'aria-labelledby': labelId }}
             />

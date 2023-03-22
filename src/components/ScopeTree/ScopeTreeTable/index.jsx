@@ -1,5 +1,5 @@
 import React from 'react'
-import useStyles from './styles'
+import useStyles from 'components/ScopeTree/ScopeTreeTable/styles'
 
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -8,7 +8,7 @@ import TableContainer from '@mui/material/TableContainer'
 import TablePagination from '@mui/material/TablePagination'
 import TableRow from '@mui/material/TableRow'
 
-import EnhancedTableHead from './components/TableHead'
+import EnhancedTableHead from 'components/ScopeTree/ScopeTreeTable/components/TableHead'
 import { getComparator, stableSort } from 'utils/alphabeticalSort'
 import { Typography } from '@mui/material'
 

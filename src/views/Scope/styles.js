@@ -84,7 +84,6 @@ export default makeStyles()((theme) => ({
     }
   },
   bottomBar: {
-    // position: 'fixed',
     position: 'sticky',
     bottom: 0,
     backgroundColor: '#E6F1FD'

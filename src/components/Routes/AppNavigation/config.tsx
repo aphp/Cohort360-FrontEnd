@@ -83,17 +83,6 @@ const configRoutes: configRoute[] = [
     element: <CareSiteView />
   },
   /**
-   * Cohort360: Choose Perimeter New Page
-   */
-  {
-    exact: true,
-    displaySideBar: true,
-    path: '/new-perimeter',
-    name: 'new-perimeter',
-    isPrivate: true,
-    element: <CareSiteView />
-  },
-  /**
    * Cohort360: Saved Cohorts Page
    */
   {

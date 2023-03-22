@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography'
 import { ScopeTreeRow, ScopeType } from 'types'
 
 import useStyles from './styles'
-import NewScopeTree from 'components/NewScopeTree'
+import ScopeTree from 'components/ScopeTree'
 
 type PopulationRightPanelProps = {
   open: boolean
@@ -26,7 +26,6 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
 
   const [_selectedPopulation, _setSelectedPopulation] = useState<ScopeTreeRow[]>(selectedPopulation)
   const [openPopulation, setOpenPopulations] = useState<number[]>([])
-  const [searchInput, setSearchInput] = useState('')
 
   /**
    * Render
@@ -37,10 +36,8 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
         <div className={classes.drawerTitleContainer}>
           <Typography className={classes.title}>{title ?? 'Structure hospitalière'}</Typography>
         </div>
-
         <div className={classes.drawerContentContainer}>
-          <NewScopeTree
-            searchInput={searchInput}
+          <ScopeTree
             selectedItems={_selectedPopulation}
             setSelectedItems={_setSelectedPopulation}
             openPopulation={openPopulation}
