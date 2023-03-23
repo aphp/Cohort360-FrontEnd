@@ -101,9 +101,17 @@ const PatientList: React.FC<PatientListProps> = ({
     if (inputSearch !== searchInput) setSearchInput(inputSearch)
     if (_searchBy !== searchBy) setSearchBy(_searchBy)
     const birthdates: [string, string] = [
-      substructAgeString(filters.birthdatesRanges[0]).toLocaleDateString(),
-      substructAgeString(filters.birthdatesRanges[1]).toLocaleDateString()
+      moment(substructAgeString(filters.birthdatesRanges[0])).format('MM/DD/YYYY'),
+      moment(substructAgeString(filters.birthdatesRanges[1])).format('MM/DD/YYYY')
     ]
+    // console.log(
+    //   'filters.birthdatesRanges[0]).toLocaleDateString() = ',
+    //   substructAgeString(filters.birthdatesRanges[0]).toLocaleDateString()
+    // )
+    // console.log(
+    //   'filters.birthdatesRanges[0]).toISOString() = ',
+    //   moment(substructAgeString(filters.birthdatesRanges[0])).format('MM/DD/YYYY')
+    // )
     console.log('birthdates from patientList', birthdates)
     const result = await services.cohorts.fetchPatientList(
       pageValue,

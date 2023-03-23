@@ -15,6 +15,7 @@ import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortPatient, PatientFilters as PatientFiltersType, SearchByTypes, Sort, VitalStatus } from 'types'
 
 import useStyles from './styles'
+import moment from 'moment/moment'
 
 type PatientSidebarTypes = {
   total: number
@@ -67,8 +68,8 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   const onSearchPatient = async (sort: Sort, page = 1) => {
     setLoadingStatus(true)
     const birthdates: [string, string] = [
-      substructAgeString(filters.birthdatesRanges[0]).toLocaleDateString(),
-      substructAgeString(filters.birthdatesRanges[1]).toLocaleDateString()
+      moment(substructAgeString(filters.birthdatesRanges[0])).format('MM/DD/YYYY'),
+      moment(substructAgeString(filters.birthdatesRanges[1])).format('MM/DD/YYYY')
     ]
     console.log('birthdates from PatientSidebar', birthdates)
     const patientsResp = await services.cohorts.fetchPatientList(
