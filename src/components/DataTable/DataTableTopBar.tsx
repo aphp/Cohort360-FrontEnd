@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react'
 
-import Button from '@material-ui/core/Button'
-import Grid from '@material-ui/core/Grid'
-import Tab from '@material-ui/core/Tab'
-import Tabs from '@material-ui/core/Tabs'
-import Typography from '@material-ui/core/Typography'
-import IconButton from '@material-ui/core/IconButton'
-import InputAdornment from '@material-ui/core/InputAdornment'
-import InputBase from '@material-ui/core/InputBase'
-import Select from '@material-ui/core/Select'
-import MenuItem from '@material-ui/core/MenuItem'
+import {
+  Button,
+  FormControl,
+  InputAdornment,
+  InputBase,
+  IconButton,
+  InputLabel,
+  Grid,
+  MenuItem,
+  Select,
+  Tab,
+  Tabs,
+  Typography
+} from '@material-ui/core'
 
 import ClearIcon from '@material-ui/icons/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
@@ -26,7 +30,6 @@ import {
 } from 'types'
 
 import displayDigit from 'utils/displayDigit'
-
 import useStyles from './styles'
 import { CircularProgress } from '@material-ui/core'
 
@@ -68,6 +71,16 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
   useEffect(() => {
     setSearch(searchBar?.value ?? '')
   }, [searchBar, searchBar && searchBar?.value])
+
+  useEffect(() => {
+    onSearch(search)
+  }, [search])
+
+  useEffect(() => {
+    if (search !== '') {
+      onSearch(search)
+    }
+  }, [searchBy])
 
   return (
     <>
@@ -124,12 +137,21 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
             {searchBar && searchBar.type !== 'document' && (
               <Grid id="DTTB_search" container alignItems="center" direction="row" wrap="nowrap">
                 {searchBar.type === 'patient' && (
-                  <Select value={searchBy} onChange={handleChangeSelect} className={classes.select}>
-                    <MenuItem value={SearchByTypes.text}>Tous les champs</MenuItem>
-                    <MenuItem value={SearchByTypes.family}>Nom</MenuItem>
-                    <MenuItem value={SearchByTypes.given}>Prénom</MenuItem>
-                    <MenuItem value={SearchByTypes.identifier}>IPP</MenuItem>
-                  </Select>
+                  <FormControl variant="outlined" style={{ width: 200 }}>
+                    <InputLabel>Rechercher dans :</InputLabel>
+                    <Select
+                      value={searchBy}
+                      onChange={handleChangeSelect}
+                      label="Rechercher dans :"
+                      style={{ height: 42 }}
+                      className={classes.select}
+                    >
+                      <MenuItem value={SearchByTypes.text}>Tous les champs</MenuItem>
+                      <MenuItem value={SearchByTypes.family}>Nom</MenuItem>
+                      <MenuItem value={SearchByTypes.given}>Prénom</MenuItem>
+                      <MenuItem value={SearchByTypes.identifier}>IPP</MenuItem>
+                    </Select>
+                  </FormControl>
                 )}
                 <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
                   <InputBase
@@ -183,12 +205,30 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
       </Grid>
 
       {searchBar && searchBar.type === 'document' && (
-        <InputSearchDocumentSimple
-          defaultSearchInput={search}
-          setDefaultSearchInput={(newSearchInput: string) => setSearch(newSearchInput)}
-          onSearchDocument={(newInputText: string) => onSearch(newInputText)}
-          error={searchBar.error?.isError}
-        />
+        <Grid container item direction="row" alignItems="center" wrap="nowrap">
+          {searchBar.type === 'document' && (
+            <FormControl variant="outlined" style={{ width: 200 }}>
+              <InputLabel>Rechercher dans :</InputLabel>
+              <Select
+                value={searchBy}
+                onChange={handleChangeSelect}
+                className={classes.select}
+                variant="outlined"
+                label="Rechercher dans :"
+                style={{ height: 42 }}
+              >
+                <MenuItem value={SearchByTypes.text}>Corps du document</MenuItem>
+                <MenuItem value={SearchByTypes.title}>Titre du document</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+          <InputSearchDocumentSimple
+            defaultSearchInput={search}
+            setDefaultSearchInput={(newSearchInput: string) => setSearch(newSearchInput)}
+            onSearchDocument={(newInputText: string) => onSearch(newInputText)}
+            error={searchBar.error?.isError}
+          />
+        </Grid>
       )}
 
       {searchBar && searchBar.error?.isError && (
