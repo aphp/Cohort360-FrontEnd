@@ -9,7 +9,7 @@ import PatientSidebarItem from './PatientSidebarItem/PatientSidebarItem'
 
 import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 
-import { getAge } from 'utils/age'
+import { getAge, substructAgeString } from 'utils/age'
 import services from 'services/aphp'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortPatient, PatientFilters as PatientFiltersType, SearchByTypes, Sort, VitalStatus } from 'types'
@@ -66,13 +66,17 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const onSearchPatient = async (sort: Sort, page = 1) => {
     setLoadingStatus(true)
-    console.log('birthdates from PatientSidebar', filters.birthdatesRanges)
+    const birthdates: [string, string] = [
+      substructAgeString(filters.birthdatesRanges[0]).toLocaleDateString(),
+      substructAgeString(filters.birthdatesRanges[1]).toLocaleDateString()
+    ]
+    console.log('birthdates from PatientSidebar', birthdates)
     const patientsResp = await services.cohorts.fetchPatientList(
       page,
       searchBy,
       searchInput,
       filters.gender,
-      filters.birthdatesRanges,
+      birthdates,
       filters.vitalStatus,
       sort.sortBy,
       sort.sortDirection,
