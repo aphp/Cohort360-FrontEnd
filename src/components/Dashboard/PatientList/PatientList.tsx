@@ -104,6 +104,7 @@ const PatientList: React.FC<PatientListProps> = ({
       substructAgeString(filters.birthdatesRanges[0]).toLocaleDateString(),
       substructAgeString(filters.birthdatesRanges[1]).toLocaleDateString()
     ]
+    console.log('birthdates from patientList', birthdates)
     const result = await services.cohorts.fetchPatientList(
       pageValue,
       _searchBy,

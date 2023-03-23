@@ -66,6 +66,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const onSearchPatient = async (sort: Sort, page = 1) => {
     setLoadingStatus(true)
+    console.log('birthdates from PatientSidebar', filters.birthdatesRanges)
     const patientsResp = await services.cohorts.fetchPatientList(
       page,
       searchBy,
