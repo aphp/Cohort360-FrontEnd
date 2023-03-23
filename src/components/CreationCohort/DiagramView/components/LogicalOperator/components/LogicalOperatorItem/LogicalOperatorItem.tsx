@@ -282,16 +282,17 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}
         >
           <WarningIcon style={{ fontSize: 40, color: '#ff9800', margin: 12 }} />
-          <Typography style={{ color: 'darkgoldenrod' }}>
+          <Typography>
             L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères <strong>ET</strong>,
             passer sur un groupe de critères <strong>OU</strong> vous fera perdre toutes vos précédentes contraintes
             temporelles.
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenConfirmationDialog(false)}>Annuler</Button>
+          <Button style={{ color: '#ED6D91' }} onClick={() => setOpenConfirmationDialog(false)}>
+            Annuler
+          </Button>
           <Button
-            style={{ color: '#ff9800' }}
             onClick={() => {
               dispatch<any>(updateTemporalConstraints([]))
               _handleChangeLogicalOperatorProps('groupType', 'orGroup')
