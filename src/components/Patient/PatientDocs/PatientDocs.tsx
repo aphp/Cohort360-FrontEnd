@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 
 import { Checkbox, Grid, Typography } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
@@ -10,12 +10,13 @@ import DataTableComposition from 'components/DataTable/DataTableComposition'
 import DataTableTopBar from 'components/DataTable/DataTableTopBar'
 import MasterChips from 'components/MasterChips/MasterChips'
 
-import { Order, DocumentFilters } from 'types'
+import { Order, DocumentFilters, SearchByTypes } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'
 
 import { buildDocumentFiltersChips } from 'utils/chips'
+import { useDebounce } from 'utils/debounce'
 import { docTypes } from 'assets/docTypes.json'
 
 import useStyles from './styles'
@@ -56,15 +57,27 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   })
 
   const [searchMode, setSearchMode] = useState(false)
+  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
   const [open, setOpen] = useState<'filter' | null>(null)
+  const debouncedSearchInput = useDebounce(500, searchInput)
+  const controllerRef = useRef<AbortController | null>()
+
+  const _cancelPendingRequest = () => {
+    if (controllerRef.current) {
+      controllerRef.current.abort()
+    }
+    controllerRef.current = new AbortController()
+  }
 
   const fetchDocumentsList = async (page: number) => {
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
     dispatch<any>(
       fetchDocuments({
+        signal: controllerRef.current?.signal,
         groupId,
         options: {
           page,
+          searchBy: searchBy,
           sort: {
             by: order.orderBy,
             direction: order.orderDirection
@@ -87,16 +100,18 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   }
 
   useEffect(() => {
+    _cancelPendingRequest()
     handleChangePage()
   }, [
-    searchInput,
+    debouncedSearchInput,
     filters.onlyPdfAvailable,
     filters.nda,
     filters.selectedDocTypes,
     filters.startDate,
     filters.endDate,
     order.orderBy,
-    order.orderDirection
+    order.orderDirection,
+    searchBy
   ]) // eslint-disable-line
 
   const onChangeOptions = (key: string, value: any) => {
@@ -137,6 +152,11 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     }
   }
 
+  const onSearch = (inputSearch: string, _searchBy: SearchByTypes) => {
+    setSearchInput(inputSearch)
+    setSearchBy(_searchBy)
+  }
+
   return (
     <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
@@ -145,8 +165,9 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         searchBar={{
           type: 'document',
           value: searchInput ? searchInput.replace(/^\/\(\.\)\*|\(\.\)\*\/$/gi, '') : '',
-          onSearch: (newSearchInput: string) => setSearchInput(newSearchInput),
-          error: searchInputError
+          error: searchInputError,
+          searchBy: searchBy,
+          onSearch: (newSearchInput: string, newSearchBy: SearchByTypes) => onSearch(newSearchInput, newSearchBy)
         }}
         buttons={[
           {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 import { Checkbox, CssBaseline, Grid, Typography } from '@material-ui/core'
 import Alert from '@material-ui/lab/Alert'
@@ -10,13 +10,22 @@ import MasterChips from 'components/MasterChips/MasterChips'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import { CohortComposition, DocumentFilters, Order, DTTB_ResultsType as ResultsType, searchInputError } from 'types'
+import {
+  CohortComposition,
+  DocumentFilters,
+  Order,
+  DTTB_ResultsType as ResultsType,
+  searchInputError,
+  SearchByTypes
+} from 'types'
 
 import services from 'services/aphp'
 
 import { buildDocumentFiltersChips } from 'utils/chips'
 
 import { docTypes } from 'assets/docTypes.json'
+
+import { useDebounce } from 'utils/debounce'
 
 type DocumentsProps = {
   groupId?: string
@@ -33,6 +42,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const [searchInput, setSearchInput] = useState('')
   const [searchMode, setSearchMode] = useState(false)
+  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
 
   const [openFilter, setOpenFilter] = useState(false)
 
@@ -51,9 +61,21 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   })
 
   const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
+  const controllerRef = useRef<AbortController | null>()
+  const debouncedSearchInput = useDebounce(500, searchInput)
+
+  const _cancelPendingRequest = () => {
+    if (controllerRef.current) {
+      controllerRef.current.abort()
+    }
+    controllerRef.current = new AbortController()
+  }
 
   const checkDocumentSearch = async () => {
-    const checkDocumentSearch = await services.cohorts.checkDocumentSearchInput(searchInput)
+    const checkDocumentSearch = await services.cohorts.checkDocumentSearchInput(
+      searchInput,
+      controllerRef.current?.signal
+    )
 
     setSearchInputError(checkDocumentSearch)
 
@@ -61,54 +83,64 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   }
 
   const onSearchDocument = async (newPage: number) => {
-    if (searchInput) {
-      setSearchMode(true)
-    } else {
-      setSearchMode(false)
-    }
-    setLoadingStatus(true)
+    try {
+      if (searchInput) {
+        setSearchMode(true)
+      } else {
+        setSearchMode(false)
+      }
+      setLoadingStatus(true)
 
-    const searchInputError = await checkDocumentSearch()
-    if (searchInputError && searchInputError.isError) {
-      setDocuments([])
+      const searchInputError = await checkDocumentSearch()
+      if (searchInputError && searchInputError.isError) {
+        setDocuments([])
+        setLoadingStatus(false)
+        return
+      }
+
+      setLoadingStatus(true)
+
+      const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
+
+      const result = await services.cohorts.fetchDocuments(
+        !!deidentifiedBoolean,
+        searchBy,
+        order.orderBy,
+        order.orderDirection,
+        newPage,
+        searchInput ?? '',
+        selectedDocTypesCodes,
+        filters.nda,
+        filters.ipp ?? '',
+        filters.onlyPdfAvailable,
+        controllerRef?.current?.signal,
+        filters.startDate,
+        filters.endDate,
+        groupId
+      )
+
+      if (result) {
+        const { totalDocs, totalAllDocs, documentsList, totalPatientDocs, totalAllPatientDocs } = result
+        setDocumentsResult((prevState) => ({
+          ...prevState,
+          nb: totalDocs,
+          total: totalAllDocs
+        }))
+        setPatientsResult((prevState) => ({
+          ...prevState,
+          nb: totalPatientDocs,
+          total: totalAllPatientDocs
+        }))
+        setDocuments(documentsList)
+      } else {
+        setDocuments([])
+      }
       setLoadingStatus(false)
-      return
-    }
-
-    const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
-
-    const result = await services.cohorts.fetchDocuments(
-      !!deidentifiedBoolean,
-      order.orderBy,
-      order.orderDirection,
-      newPage,
-      searchInput ?? '',
-      selectedDocTypesCodes,
-      filters.nda,
-      filters.ipp ?? '',
-      filters.onlyPdfAvailable,
-      filters.startDate,
-      filters.endDate,
-      groupId
-    )
-
-    if (result) {
-      const { totalDocs, totalAllDocs, documentsList, totalPatientDocs, totalAllPatientDocs } = result
-      setDocumentsResult((prevState) => ({
-        ...prevState,
-        nb: totalDocs,
-        total: totalAllDocs
-      }))
-      setPatientsResult((prevState) => ({
-        ...prevState,
-        nb: totalPatientDocs,
-        total: totalAllPatientDocs
-      }))
-      setDocuments(documentsList)
-    } else {
+    } catch (error) {
+      console.error('Erreur lors de la récupération des documents', error)
+      setLoadingStatus(false)
       setDocuments([])
     }
-    setLoadingStatus(false)
   }
 
   const handleChangePage = (newPage = 1) => {
@@ -118,8 +150,12 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   }
 
   useEffect(() => {
+    // const controller = new AbortController()
+    _cancelPendingRequest()
     handleChangePage(1)
-  }, [!!deidentifiedBoolean, filters, order, searchInput]) // eslint-disable-line
+
+    return () => _cancelPendingRequest()
+  }, [!!deidentifiedBoolean, filters, order,debouncedSearchInput, searchBy]) // eslint-disable-line
 
   const handleOpenDialog = () => {
     setOpenFilter(true)
@@ -194,6 +230,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     }
   }
 
+  const onSearch = (inputSearch: string, _searchBy: SearchByTypes) => {
+    setSearchInput(inputSearch)
+    setSearchBy(_searchBy)
+  }
+
   return (
     <>
       <Grid container direction="column" alignItems="center">
@@ -205,7 +246,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
             searchBar={{
               type: 'document',
               value: searchInput ? onFilterValue() : '',
-              onSearch: (newSearchInput: string) => setSearchInput(newSearchInput),
+              searchBy: searchBy,
+              onSearch: (newSearchInput: string, newSearchBy: SearchByTypes) => onSearch(newSearchInput, newSearchBy),
               error: searchInputError
             }}
             buttons={[

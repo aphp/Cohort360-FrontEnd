@@ -102,7 +102,7 @@ const InputSearchDocumentSimple: React.FC<InputSearchDocumentSimpleProps> = ({
                   aria-label="search"
                   onClick={() => onSearchDocument(searchInput)}
                 >
-                  <SearchIcon fill="#ED6D91" height="17px" />
+                  <SearchIcon fill="#ED6D91" height="15px" />
                 </IconButton>
               )}
             </InputAdornment>
