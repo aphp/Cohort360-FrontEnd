@@ -31,15 +31,17 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit
   const classes = useStyles()
 
   const [_gender, setGender] = useState<PatientGenderKind>(filters.gender)
-  const [_birthdates, setBirthdates] = useState<[string, string]>(filters.birthdates)
+  const [birthdatesRanges, setBirthdatesRanges] = useState<[string, string]>(filters.birthdatesRanges)
   const [_vitalStatus, setVitalStatus] = useState<VitalStatus>(filters.vitalStatus)
 
   const [error, setError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
     setGender(filters.gender)
-    setBirthdates(filters.birthdates)
+    setBirthdatesRanges(filters.birthdatesRanges)
     setVitalStatus(filters.vitalStatus)
+    _onError(false)
   }, [open]) // eslint-disable-line
 
   const _onChangeGender = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
@@ -53,11 +55,16 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit
   const _onSubmit = () => {
     onChangeFilters({
       gender: _gender,
-      birthdates: _birthdates,
+      birthdatesRanges: birthdatesRanges,
       vitalStatus: _vitalStatus
     })
 
     onSubmit()
+  }
+
+  const _onError = (isError: boolean, errorMessage = '') => {
+    setError(isError)
+    setErrorMessage(errorMessage)
   }
 
   return (
@@ -75,10 +82,12 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit
         </Grid>
         <Grid container direction="column" className={classes.filter}>
           <InputAgeRange
-            error={error}
-            setError={setError}
-            birthdates={_birthdates}
-            onChangeBirthdates={(newBirthdates: [string, string]) => setBirthdates(newBirthdates)}
+            error={{ isError: error, errorMessage: errorMessage }}
+            onError={_onError}
+            birthdatesRanges={birthdatesRanges}
+            onChangeBirthdatesRanges={(newBirthdatesRanges: [string, string]) =>
+              setBirthdatesRanges(newBirthdatesRanges)
+            }
           />
         </Grid>
 

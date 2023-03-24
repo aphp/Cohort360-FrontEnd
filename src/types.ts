@@ -153,7 +153,7 @@ export type PMSIFilters = {
 
 export type PatientFilters = {
   gender: PatientGenderKind
-  birthdates: [string, string]
+  birthdatesRanges: [string, string]
   vitalStatus: VitalStatus
 }
 
@@ -754,4 +754,10 @@ export type IScope = {
   next: string | null
   previous: string | null
   results: ScopePage[]
+}
+export type ErrorType = { isError: boolean; errorMessage?: string }
+export type AgeRangeType = {
+  year?: number
+  month?: number
+  days?: number
 }

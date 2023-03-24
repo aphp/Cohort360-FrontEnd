@@ -29,6 +29,7 @@ import {
 
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import { buildPatientFiltersChips } from 'utils/chips'
+import { substructAgeString } from 'utils/age'
 import { useDebounce } from 'utils/debounce'
 
 type PatientListProps = {
@@ -64,7 +65,7 @@ const PatientList: React.FC<PatientListProps> = ({
 
   const [filters, setFilters] = useState<PatientFiltersType>({
     gender: PatientGenderKind._unknown,
-    birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
+    birthdatesRanges: ['', ''],
     vitalStatus: VitalStatus.all
   })
 
@@ -110,13 +111,17 @@ const PatientList: React.FC<PatientListProps> = ({
     // Set search state
     if (inputSearch !== searchInput) setSearchInput(inputSearch)
     if (_searchBy !== searchBy) setSearchBy(_searchBy)
+    const birthdates: [string, string] = [
+      moment(substructAgeString(filters.birthdatesRanges[0])).format('MM/DD/YYYY'),
+      moment(substructAgeString(filters.birthdatesRanges[1])).format('MM/DD/YYYY')
+    ]
 
     const result = await services.cohorts.fetchPatientList(
       pageValue,
       _searchBy,
       inputSearch,
       filters.gender,
-      filters.birthdates,
+      birthdates,
       filters.vitalStatus,
       order.orderBy,
       order.orderDirection,
@@ -167,7 +172,7 @@ const PatientList: React.FC<PatientListProps> = ({
       case 'birthdates':
         setFilters((prevFilters) => ({
           ...prevFilters,
-          birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]
+          birthdatesRanges: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]
         }))
         break
       case 'vitalStatus':
