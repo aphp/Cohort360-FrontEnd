@@ -339,10 +339,6 @@ const servicesCohorts: IServiceCohorts = {
     // convert birthdates into days or months depending of if it's a deidentified perimeter or not
     const minBirthdate = Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
     const maxBirthdate = Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
-    console.log('birthdates = ' + birthdates)
-    console.log('test, moment(birthdates[0]) = ', moment(birthdates[0]).format('DD-MM-YYYY'))
-    console.log('minBirthdate in fetchPatientList', minBirthdate)
-    console.log('maxBirthdate in fetchPatientList', maxBirthdate)
 
     const patientsResp = await fetchPatient({
       size: 20,

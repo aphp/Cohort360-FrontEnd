@@ -71,7 +71,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       moment(substructAgeString(filters.birthdatesRanges[0])).format('MM/DD/YYYY'),
       moment(substructAgeString(filters.birthdatesRanges[1])).format('MM/DD/YYYY')
     ]
-    console.log('birthdates from PatientSidebar', birthdates)
+
     const patientsResp = await services.cohorts.fetchPatientList(
       page,
       searchBy,
