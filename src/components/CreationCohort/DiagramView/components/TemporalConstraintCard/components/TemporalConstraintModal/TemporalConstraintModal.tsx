@@ -34,9 +34,7 @@ const TemporalConstraint: React.FC<{
 
   const findInitialStateRadio = temporalConstraints.find(({ idList }) => idList[0] === 'All')
   const initialStateRadio = findInitialStateRadio ? findInitialStateRadio.constraintType : 'none'
-  const [radioValues, setRadioValues] = useState<
-    'none' | 'sameEncounter' | 'differentEncounter' | 'directChronologicalOrdering'
-  >(initialStateRadio)
+  const [radioValues, setRadioValues] = useState<TemporalConstraintsType['constraintType']>(initialStateRadio)
   const [newConstraintsList, setNewConstraintsList] = useState<TemporalConstraintsType[]>([...temporalConstraints])
 
   const history = useHistory()
@@ -55,8 +53,13 @@ const TemporalConstraint: React.FC<{
     }
   }
 
-  const onChangeValue = (value: 'none' | 'sameEncounter' | 'differentEncounter') => {
+  const onChangeValue = (value: TemporalConstraintsType['constraintType']) => {
     setRadioValues(value)
+
+    const globalConstraintId = newConstraintsList.findIndex((constraint) => constraint.idList[0] === 'All')
+    const _newConstraintsList = [...newConstraintsList]
+    _newConstraintsList[globalConstraintId] = { ..._newConstraintsList[globalConstraintId], constraintType: value }
+    setNewConstraintsList(_newConstraintsList)
   }
 
   return (

@@ -61,7 +61,12 @@ const defaultInitialState: CohortCreationState = {
       isInclusive: true
     }
   ],
-  temporalConstraints: [],
+  temporalConstraints: [
+    {
+      idList: ['All'],
+      constraintType: 'none'
+    }
+  ],
   nextCriteriaId: 1,
   nextGroupId: -1
 }
@@ -297,7 +302,6 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
         json,
         selectedPopulation: _selectedPopulation,
         allowSearchIpp: allowSearchIpp,
-        // temporalConstraints: temporalConstraintsID
         temporalConstraints: _initTemporalConstraints
       }
     } catch (error) {

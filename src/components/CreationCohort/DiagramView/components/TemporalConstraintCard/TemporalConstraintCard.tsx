@@ -20,6 +20,10 @@ const TemporalConstraint: React.FC = () => {
 
   const maintenanceIsActive = meState?.maintenance?.active || false
 
+  const findInitialStateRadio = temporalConstraints.find(({ idList }) => idList[0] === 'All')
+  const temporalConstraintsNumber =
+    findInitialStateRadio?.constraintType === 'none' ? temporalConstraints.length - 1 : temporalConstraints.length
+
   const dispatch = useAppDispatch()
   const classes = useStyles()
 
@@ -32,7 +36,6 @@ const TemporalConstraint: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    //TODO: c'est quoi ça?????
     if (criteriaGroup && criteriaGroup.length > 0) {
       const mainCriteriaGroup = criteriaGroup.find(({ id }) => id === 0)
       if (!disableTemporalConstraint && mainCriteriaGroup && mainCriteriaGroup.type !== 'andGroup') {
@@ -57,7 +60,7 @@ const TemporalConstraint: React.FC = () => {
     <>
       {!disableTemporalConstraint ? (
         <Badge
-          badgeContent={temporalConstraints?.length}
+          badgeContent={temporalConstraintsNumber}
           color="secondary"
           overlap="rectangular"
           style={{ height: 'fit-content' }}
