@@ -1,5 +1,6 @@
 stages: # List of stages for jobs in their order of execution
   - build
+  - dependency-check
   - deploy
 
 build-job:
@@ -22,6 +23,19 @@ build-job:
     paths:
       - node_modules/
     policy: pull
+
+dependency-check-job:
+  stage: dependency-check
+  image:
+    name: harbor.eds.aphp.fr/cohort360/dependency-check
+    entrypoint: [ "" ]
+  script:
+    # See https://jeremylong.github.io/DependencyCheck/dependency-check-cli/arguments.html
+    - /usr/share/dependency-check/bin/dependency-check.sh --project Portail --proxyserver $HOST_PROXY --proxyport $PORT_PROXY  --disableOssIndex --out . --scan . --failOnCVSS 7 --noupdate
+  artifacts:
+    paths:
+      - dependency-check-report.html
+  allow_failure: true
 
 deploy-job:
   image: harbor.eds.aphp.fr/cohort360/kaniko:debug
