@@ -30,6 +30,7 @@ import { ACCES_TOKEN, REFRESH_TOKEN } from '../../constants'
 import services from 'services/aphp'
 
 import useStyles from './styles'
+import { ScopePage } from 'types'
 
 const ErrorSnackBarAlert = ({ open, setError, errorMessage }) => {
   const _setError = () => {
@@ -104,7 +105,7 @@ const Login = () => {
 
   const getPractitionerData = async (practitioner, lastConnection, maintenance) => {
     if (practitioner) {
-      const practitionerPerimeters = await services.perimeters.getPerimeters()
+      const practitionerPerimeters: ScopePage[] | { errorType: string } = await services.perimeters.getPerimeters()
 
       if (practitionerPerimeters && practitionerPerimeters.errorType) {
         if (practitionerPerimeters.errorType === 'fhir') {
@@ -131,15 +132,8 @@ const Login = () => {
       }
 
       const nominativeGroupsIds = practitionerPerimeters
-        .filter(({ extension }) =>
-          extension.some(({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_NOMINATIVE')
-        )
-        .map((practitionerPerimeter) => {
-          const groupId = practitionerPerimeter.extension?.find(({ url }) => url === 'cohort-id')
-            ? `${practitionerPerimeter.extension?.find(({ url }) => url === 'cohort-id').valueInteger}`
-            : ''
-          return groupId
-        })
+        .filter((perimeterItem) => perimeterItem.read_access === 'DATA_NOMINATIVE')
+        .map((practitionerPerimeter) => practitionerPerimeter.perimeter.cohort_id)
         .filter((item) => item)
 
       dispatch(

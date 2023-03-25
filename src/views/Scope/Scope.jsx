@@ -8,8 +8,9 @@ import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 
 import ScopeTree from 'components/ScopeTree/ScopeTree'
+import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
 
-import { useAppSelector, useAppDispatch } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import { closeAllOpenedPopulation } from 'state/scope'
 import { filterScopeTree } from 'utils/scopeTree'
 
@@ -20,23 +21,23 @@ const Scope = () => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
-  const [selectedItems, onChangeSelectedItem] = useState([])
+  const [selectedItems, setSelectedItem] = useState([])
+  const [searchInput, setSearchInput] = useState('')
   const open = useAppSelector((state) => state.drawer)
 
   useEffect(() => {
     dispatch(closeAllOpenedPopulation())
   }, [])
 
+  const onChangeSelectedItem = (newSelectedItems) => {
+    setSelectedItem(newSelectedItems)
+  }
   const trimItems = () => {
     let _selectedItems = selectedItems ? selectedItems : []
 
     _selectedItems = filterScopeTree(_selectedItems)
 
-    const perimetresIds = _selectedItems.map((_selected) =>
-      _selected.extension
-        ? (_selected.extension.find((extension) => extension.url === 'cohort-id') ?? { valueInteger: 0 }).valueInteger
-        : null
-    )
+    const perimetresIds = _selectedItems.map((_selected) => _selected.cohort_id ?? null)
     navigate(`/perimeters?${perimetresIds}`)
   }
 
@@ -54,19 +55,27 @@ const Scope = () => {
           <Typography variant="h1" color="primary" className={classes.title}>
             Explorer un perimètre
           </Typography>
+          <Grid container direction="row">
+            <ScopeSearchBar searchInput={searchInput} onChangeInput={setSearchInput} />
+          </Grid>
           <Paper className={classes.paper}>
-            <ScopeTree defaultSelectedItems={selectedItems} onChangeSelectedItem={onChangeSelectedItem} />
+            <ScopeTree
+              searchInput={searchInput}
+              defaultSelectedItems={selectedItems}
+              onChangeSelectedItem={onChangeSelectedItem}
+            />
           </Paper>
         </Grid>
         <Grid
           container
           item
+          xs={10}
           justifyContent="center"
           className={clsx(classes.bottomBar, {
             [classes.bottomBarShift]: open
           })}
         >
-          <Grid container item justifyContent="flex-end" xs={11} className={classes.buttons}>
+          <Grid container item justifyContent="flex-end" className={classes.buttons}>
             <Button
               variant="contained"
               disableElevation

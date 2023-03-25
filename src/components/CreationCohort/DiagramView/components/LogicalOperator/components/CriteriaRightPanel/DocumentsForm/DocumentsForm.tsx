@@ -6,9 +6,13 @@ import {
   Autocomplete,
   Button,
   Divider,
+  FormControl,
   FormLabel,
   Grid,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
   Switch,
   Typography,
   TextField,
@@ -20,11 +24,11 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
-import { InputSearchDocument } from 'components/Inputs'
+import { InputSearchDocumentSimple } from 'components/Inputs'
 
 import useStyles from './styles'
 
-import { DocType, DocumentDataType, errorDetails, searchInputError } from 'types'
+import { DocType, DocumentDataType, errorDetails, SearchByTypes, searchInputError } from 'types'
 import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
 
@@ -39,6 +43,7 @@ const defaultComposition: DocumentDataType = {
   type: 'Composition',
   title: 'Critère de document',
   search: '',
+  searchBy: SearchByTypes.text,
   docType: [],
   occurrence: 1,
   occurrenceComparator: '>=',
@@ -156,8 +161,21 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             />
           </Grid>
 
+          <FormControl variant="outlined" className={classes.inputItem} style={{ marginBottom: 0 }}>
+            <InputLabel>Rechercher dans :</InputLabel>
+            <Select
+              value={defaultValues.searchBy}
+              onChange={(event) => _onChangeValue('searchBy', event.target.value)}
+              variant="outlined"
+              label="Rechercher dans :"
+            >
+              <MenuItem value={SearchByTypes.text}>Corps du document</MenuItem>
+              <MenuItem value={SearchByTypes.title}>Titre du document</MenuItem>
+            </Select>
+          </FormControl>
+
           <Grid className={classes.inputItem}>
-            <InputSearchDocument
+            <InputSearchDocumentSimple
               placeholder="Recherche dans les documents"
               defaultSearchInput={defaultValues.search}
               setDefaultSearchInput={(newSearchInput: string) => _onChangeValue('search', newSearchInput)}
@@ -263,7 +281,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
           )}
           <Button
             onClick={_onSubmit}
-            disabled={searchInputError?.isError}
+            disabled={searchInputError?.isError || searchCheckingLoading}
             type="submit"
             form="documents-form"
             variant="contained"

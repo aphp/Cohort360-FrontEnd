@@ -50,6 +50,10 @@ const useStyles = makeStyles(() => ({
     border: '2px solid currentColor',
     borderRadius: 10
   },
+  loader: {
+    height: '4px',
+    marginTop: '2px'
+  },
   selectedIndicator: {
     width: 20,
     height: 20,

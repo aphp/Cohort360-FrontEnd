@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import moment from 'moment'
 
 import Grid from '@mui/material/Grid'
@@ -29,6 +29,8 @@ import {
 
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import { buildPatientFiltersChips } from 'utils/chips'
+import { substructAgeString } from 'utils/age'
+import { useDebounce } from 'utils/debounce'
 
 type PatientListProps = {
   total: number
@@ -63,14 +65,24 @@ const PatientList: React.FC<PatientListProps> = ({
 
   const [filters, setFilters] = useState<PatientFiltersType>({
     gender: PatientGenderKind._unknown,
-    birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
+    birthdatesRanges: ['', ''],
     vitalStatus: VitalStatus.all
   })
 
   const [order, setOrder] = useState<Order>({
-    orderBy: 'given',
+    orderBy: 'family',
     orderDirection: 'asc'
   })
+
+  const debouncedSearchInput = useDebounce(500, searchInput)
+  const controllerRef = useRef<AbortController | null>()
+
+  const _cancelPendingRequest = () => {
+    if (controllerRef.current) {
+      controllerRef.current.abort()
+    }
+    controllerRef.current = new AbortController()
+  }
 
   useEffect(() => {
     setAgePyramid(agePyramidData)
@@ -99,19 +111,24 @@ const PatientList: React.FC<PatientListProps> = ({
     // Set search state
     if (inputSearch !== searchInput) setSearchInput(inputSearch)
     if (_searchBy !== searchBy) setSearchBy(_searchBy)
+    const birthdates: [string, string] = [
+      moment(substructAgeString(filters.birthdatesRanges[0])).format('MM/DD/YYYY'),
+      moment(substructAgeString(filters.birthdatesRanges[1])).format('MM/DD/YYYY')
+    ]
 
     const result = await services.cohorts.fetchPatientList(
       pageValue,
       _searchBy,
       inputSearch,
       filters.gender,
-      filters.birthdates,
+      birthdates,
       filters.vitalStatus,
       order.orderBy,
       order.orderDirection,
       deidentified ?? true,
       groupId,
-      includeFacets
+      includeFacets,
+      controllerRef.current?.signal
     )
     if (result) {
       const { totalPatients, originalPatients, genderRepartitionMap, agePyramidData } = result
@@ -126,13 +143,15 @@ const PatientList: React.FC<PatientListProps> = ({
   }
 
   const onSearchPatient = (inputSearch?: string, searchBy?: SearchByTypes) => {
-    setPage(1)
-    fetchPatients(1, true, inputSearch, searchBy)
+    setSearchInput(inputSearch ?? '')
+    setSearchBy(searchBy ?? SearchByTypes.text)
   }
 
   useEffect(() => {
-    onSearchPatient()
-  }, [filters, order, searchBy]) // eslint-disable-line
+    _cancelPendingRequest()
+    setPage(1)
+    fetchPatients(1, true, debouncedSearchInput, searchBy)
+  }, [filters, order, searchBy, debouncedSearchInput]) // eslint-disable-line
 
   const handleChangePage = (value?: number) => {
     setPage(value ?? 1)
@@ -153,7 +172,7 @@ const PatientList: React.FC<PatientListProps> = ({
       case 'birthdates':
         setFilters((prevFilters) => ({
           ...prevFilters,
-          birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]
+          birthdatesRanges: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]
         }))
         break
       case 'vitalStatus':

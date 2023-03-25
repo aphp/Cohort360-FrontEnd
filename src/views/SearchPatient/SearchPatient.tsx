@@ -30,7 +30,7 @@ const SearchPatient: React.FC<{}> = () => {
   const [searchInput, setSearchInput] = useState(search ?? '')
 
   const [order, setOrder] = useState<Order>({
-    orderBy: 'given',
+    orderBy: 'family',
     orderDirection: 'asc'
   })
 

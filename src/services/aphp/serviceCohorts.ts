@@ -79,6 +79,7 @@ export interface IServiceCohorts {
    *   - deidentified: savoir si la liste de patients est pseudonymisée ou non
    *   - groupId: (optionnel) Périmètre auquel la cohorte est liée
    *   - includeFacets: = true si vous voulez inclure les graphique
+   *   - signal: (optionnel) paramètre permettant d'identifier si une requête est déjà en cours et de l'annuler si besoin
    *
    * Retourne:
    *   - totalPatients: Nombre de patients (dépend des filtres)
@@ -97,7 +98,8 @@ export interface IServiceCohorts {
     sortDirection: string,
     deidentified: boolean,
     groupId?: string,
-    includeFacets?: boolean
+    includeFacets?: boolean,
+    signal?: AbortSignal
   ) => Promise<
     | {
         totalPatients: number
@@ -113,6 +115,7 @@ export interface IServiceCohorts {
    *
    * Argument:
    *   - deidentifiedBoolean: = true si la cohorte est pseudo. (permet un traitement particulier des éléments)
+   *   - searchBy: Détermine si l'on recherche par contenu ou titre du document
    *   - sortBy: Permet le tri
    *   - sortDirection: Permet le tri dans l'ordre croissant ou décroissant
    *   - page: Permet la pagination (definit un offset + limit)
@@ -123,9 +126,11 @@ export interface IServiceCohorts {
    *   - startDate: Permet de filtrer sur une date
    *   - endDate: Permet de filtrer sur une date
    *   - groupId: (optionnel) Périmètre auquel la cohorte est liée
+   *   - signal: (optionnel) paramètre permettant d'identifier si une requête est déjà en cours et de l'annuler si besoin
    */
   fetchDocuments: (
     deidentifiedBoolean: boolean,
+    searchBy: SearchByTypes,
     sortBy: string,
     sortDirection: string,
     page: number,
@@ -134,6 +139,7 @@ export interface IServiceCohorts {
     nda: string,
     ipp: string,
     onlyPdfAvailable: boolean,
+    signal?: AbortSignal,
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string
@@ -154,7 +160,7 @@ export interface IServiceCohorts {
    * Retourne:
    *   - searchInputError: objet décrivant la ou les erreurs du champ de recherche s'il y en a
    */
-  checkDocumentSearchInput: (searchInput: string) => Promise<searchInputError>
+  checkDocumentSearchInput: (searchInput: string, signal?: AbortSignal) => Promise<searchInputError>
 
   /**
    * Permet de récupérer le contenu d'un document
@@ -210,7 +216,7 @@ const servicesCohorts: IServiceCohorts = {
           pivotFacet: ['age_gender', 'deceased_gender'],
           _list: [cohortId],
           size: 20,
-          _sort: 'given',
+          _sort: 'family',
           _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
         }),
         fetchEncounter({
@@ -325,7 +331,8 @@ const servicesCohorts: IServiceCohorts = {
     sortDirection,
     deidentified,
     groupId,
-    includeFacets
+    includeFacets,
+    signal
   ) => {
     let _searchInput = ''
     const searches = searchInput
@@ -354,7 +361,8 @@ const servicesCohorts: IServiceCohorts = {
       minBirthdate: minBirthdate,
       maxBirthdate: maxBirthdate,
       deceased: vitalStatus !== VitalStatus.all ? (vitalStatus === VitalStatus.deceased ? true : false) : undefined,
-      deidentified: deidentified
+      deidentified: deidentified,
+      signal: signal
     })
 
     const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
@@ -385,6 +393,7 @@ const servicesCohorts: IServiceCohorts = {
 
   fetchDocuments: async (
     deidentifiedBoolean,
+    searchBy,
     sortBy,
     sortDirection,
     page,
@@ -393,6 +402,7 @@ const servicesCohorts: IServiceCohorts = {
     nda,
     ipp,
     onlyPdfAvailable,
+    signal,
     startDate,
     endDate,
     groupId
@@ -401,6 +411,7 @@ const servicesCohorts: IServiceCohorts = {
       fetchComposition({
         size: 20,
         offset: page ? (page - 1) * 20 : 0,
+        searchBy: searchBy,
         _sort: sortBy,
         sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
         status: 'final',
@@ -411,12 +422,14 @@ const servicesCohorts: IServiceCohorts = {
         'encounter.identifier': nda,
         'patient.identifier': ipp,
         onlyPdfAvailable: onlyPdfAvailable,
+        signal: signal,
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
         uniqueFacet: ['patient']
       }),
       !!searchInput || selectedDocTypes.length > 0 || !!nda || !!ipp || !!startDate || !!endDate
         ? fetchComposition({
+            signal: signal,
             status: 'final',
             _list: groupId ? [groupId] : [],
             size: 0,
@@ -446,7 +459,12 @@ const servicesCohorts: IServiceCohorts = {
           ).valueDecimal
         : totalPatientDocs
 
-    const documentsList = await getDocumentInfos(deidentifiedBoolean, getApiResponseResources(docsList), groupId)
+    const documentsList = await getDocumentInfos(
+      deidentifiedBoolean,
+      getApiResponseResources(docsList),
+      groupId,
+      signal
+    )
 
     return {
       totalDocs: totalDocs ?? 0,
@@ -457,14 +475,14 @@ const servicesCohorts: IServiceCohorts = {
     }
   },
 
-  checkDocumentSearchInput: async (searchInput) => {
+  checkDocumentSearchInput: async (searchInput, signal) => {
     if (!searchInput) {
       return {
         isError: false
       }
     }
 
-    const checkDocumentSearchInput = await fetchCheckDocumentSearchInput(searchInput)
+    const checkDocumentSearchInput = await fetchCheckDocumentSearchInput(searchInput, signal)
 
     if (checkDocumentSearchInput) {
       const errors = checkDocumentSearchInput.find((parameter: any) => parameter.name === 'WARNING')?.part ?? []
@@ -502,7 +520,7 @@ const servicesCohorts: IServiceCohorts = {
         errorsDetails: [
           {
             errorName: 'Erreur du serveur',
-            errorSolution: 'Veuillez refaire votre recherche.'
+            errorSolution: 'Veuillez refaire votre recherche'
           }
         ]
       }
@@ -759,9 +777,10 @@ export default servicesCohorts
 const getDocumentInfos: (
   deidentifiedBoolean: boolean,
   documents?: IComposition[],
-  groupId?: string
-) => Promise<CohortComposition[]> = async (deidentifiedBoolean: boolean, documents, groupId) => {
-  const cohortDocuments = documents as CohortComposition[]
+  groupId?: string,
+  signal?: AbortSignal
+) => Promise<CohortComposition[]> = async (deidentifiedBoolean: boolean, documents, groupId, signal) => {
+  const cohortDocuments = (documents as CohortComposition[]) ?? []
 
   const listePatientsIds = cohortDocuments
     .map((e) => e.subject?.display?.substring(8))
@@ -776,14 +795,17 @@ const getDocumentInfos: (
     fetchPatient({
       _id: listePatientsIds,
       _list: groupId ? [groupId] : [],
-      _elements: ['extension', 'id', 'identifier']
+      _elements: ['extension', 'id', 'identifier'],
+      signal: signal
     }),
     fetchEncounter({
       _id: listeEncounterIds,
       _list: groupId ? [groupId] : [],
       type: 'VISIT',
-      _elements: ['status', 'serviceProvider', 'identifier']
-    })
+      _elements: ['status', 'serviceProvider', 'identifier'],
+      signal: signal
+    }),
+    signal
   ])
 
   if (encounters.data.resourceType !== 'Bundle' || !encounters.data.entry) {

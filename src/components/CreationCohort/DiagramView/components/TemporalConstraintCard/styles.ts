@@ -3,11 +3,10 @@ import { Theme } from '@mui/material/styles'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    display: 'flex',
-    width: 'fit-content',
+    height: 42,
     marginLeft: 12,
-    alignSelf: 'center',
     padding: '4px 8px',
+    borderRadius: 4,
     [theme.breakpoints.down('lg')]: {
       alignSelf: 'flex-end'
     }

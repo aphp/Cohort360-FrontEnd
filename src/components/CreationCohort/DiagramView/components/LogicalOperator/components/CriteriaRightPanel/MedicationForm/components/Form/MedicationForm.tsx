@@ -20,11 +20,15 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
-import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
+import AdvancedInputs from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
+import { useAppDispatch, useAppSelector } from 'state'
+import { fetchMedication } from 'state/medication'
+import { HierarchyTree } from 'types'
 
 type MedicationFormProps = {
+  isOpen: boolean
   isEdition: boolean
   criteria: any
   selectedCriteria: any
@@ -34,37 +38,40 @@ type MedicationFormProps = {
 }
 
 const MedicationForm: React.FC<MedicationFormProps> = (props) => {
-  const { isEdition, criteria, selectedCriteria, onChangeValue, goBack, onChangeSelectedCriteria } = props
+  const { isOpen, isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
   const classes = useStyles()
+  const dispatch = useAppDispatch()
+
+  const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
+  const currentState = { ...selectedCriteria, ...initialState }
 
   const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const getAtcOptions = async (searchValue: string) => await criteria.fetch.fetchAtcData(searchValue, false)
-
   const _onSubmit = () => {
     if (
-      (selectedCriteria.type === 'MedicationRequest' &&
-        selectedCriteria.code.length === 0 &&
-        selectedCriteria.prescriptionType.length === 0 &&
-        selectedCriteria.administration.length === 0) ||
-      (selectedCriteria.type !== 'MedicationRequest' &&
-        selectedCriteria.code.length === 0 &&
-        selectedCriteria.administration.length === 0)
+      (currentState.type === 'MedicationRequest' &&
+        currentState.code.length === 0 &&
+        currentState.prescriptionType.length === 0 &&
+        currentState.administration.length === 0) ||
+      (currentState.type !== 'MedicationRequest' &&
+        currentState.code.length === 0 &&
+        currentState.administration.length === 0)
     ) {
       return setError(true)
     }
-
-    onChangeSelectedCriteria(selectedCriteria)
+    onChangeSelectedCriteria(currentState)
+    dispatch<any>(fetchMedication())
   }
 
   if (criteria?.data?.prescriptionTypes === 'loading' || criteria?.data?.administrations === 'loading') {
     return <></>
   }
 
-  const selectedCriteriaPrescriptionType = selectedCriteria.prescriptionType
-    ? selectedCriteria.prescriptionType.map((prescriptionType: any) => {
+  const selectedCriteriaPrescriptionType = currentState.prescriptionType
+    ? currentState.prescriptionType.map((prescriptionType: any) => {
         const criteriaPrescriptionType = criteria.data.prescriptionTypes
           ? criteria.data.prescriptionTypes.find((p: any) => p.id === prescriptionType.id)
           : null
@@ -75,8 +82,8 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
       })
     : []
 
-  const selectedCriteriaAdministration = selectedCriteria.administration
-    ? selectedCriteria.administration.map((administration: any) => {
+  const selectedCriteriaAdministration = currentState.administration
+    ? currentState.administration.map((administration: any) => {
         const criteriaAdministration = criteria.data.administrations
           ? criteria.data.administrations.find((p: any) => p.id === administration.id)
           : null
@@ -87,8 +94,8 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
       })
     : []
 
-  const defaultValuesCode = selectedCriteria.code
-    ? selectedCriteria.code.map((code: any) => {
+  const defaultValuesCode = currentState.code
+    ? currentState.code.map((code: any) => {
         const criteriaCode = criteria.data.atcData ? criteria.data.atcData.find((g: any) => g.id === code.id) : null
         return {
           id: code.id,
@@ -97,7 +104,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
       })
     : []
 
-  return (
+  return isOpen ? (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
         {!isEdition ? (
@@ -136,13 +143,14 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            value={selectedCriteria.title}
+            variant="outlined"
+            value={currentState.title}
             onChange={(e) => onChangeValue('title', e.target.value)}
           />
 
           <Grid style={{ display: 'flex' }}>
             <FormLabel
-              onClick={() => onChangeValue('isInclusive', !selectedCriteria.isInclusive)}
+              onClick={() => onChangeValue('isInclusive', !currentState.isInclusive)}
               style={{ margin: 'auto 1em' }}
               component="legend"
             >
@@ -150,7 +158,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             </FormLabel>
             <Switch
               id="criteria-inclusive"
-              checked={!selectedCriteria.isInclusive}
+              checked={!currentState.isInclusive}
               onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
               color="secondary"
             />
@@ -163,7 +171,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               className={classes.inputItem}
               aria-label="mode"
               name="criteria-mode-radio"
-              value={selectedCriteria.type}
+              value={currentState.type}
               onChange={(e, value) => onChangeValue('type', value)}
             >
               <FormControlLabel value="MedicationRequest" control={<Radio color="secondary" />} label="Prescription" />
@@ -185,10 +193,12 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             autocompleteValue={defaultValuesCode}
             autocompleteOptions={criteria?.data?.atcData || []}
             getAutocompleteOptions={getAtcOptions}
-            onChange={(e, value) => onChangeValue('code', value)}
+            onChange={(e, value) => {
+              onChangeValue('code', value)
+            }}
           />
 
-          {selectedCriteria.type === 'MedicationRequest' && (
+          {currentState.type === 'MedicationRequest' && (
             <Autocomplete
               multiple
               id="criteria-prescription-type-autocomplete"
@@ -214,7 +224,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             renderInput={(params) => <TextField {...params} label="Voie d'administration" />}
           />
 
-          <AdvancedInputs form="medication" selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
+          <AdvancedInputs form="medication" selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
@@ -229,6 +239,8 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
         </Grid>
       </Grid>
     </Grid>
+  ) : (
+    <></>
   )
 }
 

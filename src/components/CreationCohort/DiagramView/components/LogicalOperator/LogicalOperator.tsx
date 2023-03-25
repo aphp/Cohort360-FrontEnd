@@ -10,15 +10,15 @@ import CriteriaCardItem from '../CriteriaCard/CriteriaCard'
 
 import { CriteriaGroupType, SelectedCriteriaType } from 'types'
 
-import { useAppSelector, useAppDispatch } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import {
-  buildCohortCreation,
   addNewCriteriaGroup,
-  editCriteriaGroup,
   addNewSelectedCriteria,
-  editSelectedCriteria,
+  buildCohortCreation,
   deleteSelectedCriteria,
   duplicateSelectedCriteria,
+  editCriteriaGroup,
+  editSelectedCriteria,
   suspendCount,
   unsuspendCount
 } from 'state/cohortCreation'

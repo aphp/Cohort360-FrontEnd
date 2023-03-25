@@ -94,6 +94,7 @@ const addRequest = createAsyncThunk<AddRequestReturn, AddRequestParams, { state:
       const createdRequest = await services.projects.addRequest(newRequest)
 
       return {
+        count: state.count + 1,
         selectedRequest: null,
         requestsList: createdRequest !== null ? [...requestsList, createdRequest] : requestsList
       }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import clsx from 'clsx'
 
 import {
@@ -7,6 +7,7 @@ import {
   Divider,
   Grid,
   IconButton,
+  LinearProgress,
   ListItem,
   ListItemIcon,
   ListItemText,
@@ -20,50 +21,59 @@ import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
-import { useAppSelector, useAppDispatch } from 'state'
-import { BiologyListType, fetchBiology, expandBiologyElement } from 'state/biology'
+import { useAppDispatch, useAppSelector } from 'state'
+import { BiologyListType } from 'state/biology'
 
-import { getSelectedPmsi, filterSelectedPmsi, checkIfIndeterminated } from 'utils/pmsi'
+import { checkIfIndeterminated, expandItem, findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
 
 import useStyles from './styles'
+import { PmsiListType } from 'state/pmsi'
+import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
+import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
+import { defaultBiology } from '../../index'
+import { HierarchyTree } from 'types'
 
 type BiologyListItemProps = {
   biologyItem: BiologyListType
-  selectedItem?: BiologyListType[] | null
-  handleClick: (biologyItem: { id: string; label: string }[] | null) => void
+  selectedItems?: PmsiListType[] | null
+  handleClick: (biologyItem: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
 }
 
 const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
-  const { biologyItem, selectedItem, handleClick } = props
+  const { biologyItem, selectedItems, handleClick } = props
   const { id, label, subItems } = biologyItem
 
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
-  const biologyState = useAppSelector((state) => state.biology || {})
-  const biologyHierarchy = biologyState.list
+  const biologyHierarchy = useAppSelector((state) => state.biology.list || {})
+  const isLoadingsyncHierarchyTable = useAppSelector((state) => state.syncHierarchyTable.loading || 0)
+  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)
 
   const [open, setOpen] = useState(false)
-
-  const isSelected = selectedItem ? selectedItem.find(({ id }) => id === biologyItem.id) : false
-  const isIndeterminated = checkIfIndeterminated(biologyItem, selectedItem)
-
+  const isSelected = findSelectedInListAndSubItems(selectedItems ? selectedItems : [], biologyItem, biologyHierarchy)
+  const isIndeterminated = checkIfIndeterminated(biologyItem, selectedItems)
   const _onExpand = async (biologyCode: string) => {
+    if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
+    dispatch<any>(incrementLoadingSyncHierarchyTable())
     setOpen(!open)
-    const expandResult = await dispatch<any>(
-      expandBiologyElement({
-        rowId: biologyCode,
-        selectedItems: selectedItem || []
-      })
+    const newHierarchy = await expandItem(
+      biologyCode,
+      selectedItems || [],
+      biologyHierarchy,
+      defaultBiology.type,
+      dispatch
     )
-    if (expandResult.payload.savedSelectedItems) {
-      handleClick(expandResult.payload.savedSelectedItems)
-    }
+    await handleClick(selectedItems, newHierarchy)
+    dispatch<any>(decrementLoadingSyncHierarchyTable())
   }
 
-  const handleClickOnHierarchy = (biologyItem: BiologyListType) => {
-    const newSelectedItems = getSelectedPmsi(biologyItem, selectedItem || [], biologyHierarchy)
-    handleClick(newSelectedItems)
+  const handleClickOnHierarchy = async (biologyItem: PmsiListType) => {
+    if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
+    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    const newSelectedItems = getSelectedPmsi(biologyItem, selectedItems || [], biologyHierarchy)
+    await handleClick(newSelectedItems)
+    dispatch<any>(decrementLoadingSyncHierarchyTable())
   }
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
@@ -120,7 +130,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
                   <div className={classes.subItemsIndicator} />
                   <BiologyListItem
                     biologyItem={biologyHierarchySubItem}
-                    selectedItem={selectedItem}
+                    selectedItems={selectedItems}
                     handleClick={handleClick}
                   />
                 </Fragment>
@@ -133,80 +143,90 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
 }
 
 type BiologyHierarchyProps = {
+  isOpen: boolean
   selectedCriteria: any
   goBack: (data: any) => void
-  onChangeSelectedHierarchy: (data: any) => void
+  onChangeSelectedHierarchy: (data: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => void
   isEdition?: boolean
+  onConfirm: () => void
 }
 
 const BiologyHierarchy: React.FC<BiologyHierarchyProps> = (props) => {
-  const { selectedCriteria, onChangeSelectedHierarchy, goBack, isEdition } = props
-
+  const { isOpen = false, selectedCriteria, onChangeSelectedHierarchy, onConfirm, goBack, isEdition } = props
   const classes = useStyles()
-  const dispatch = useAppDispatch()
 
-  const biologyState = useAppSelector((state) => state.biology || {})
-  const biologyHierarchy = biologyState.list
+  const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
+  const isLoadingSyncHierarchyTable = initialState?.loading ?? 0
+  const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)
+  const [currentState, setCurrentState] = useState({ ...selectedCriteria, ...initialState })
+  const [loading, setLoading] = useState(isLoadingSyncHierarchyTable > 0 || isLoadingPmsi > 0)
 
-  const [selectedHierarchy, onSetSelectedHierarchy] = useState<{ id: string; label: string }[] | null>(
-    isEdition ? selectedCriteria.code : []
-  )
+  const biologyHierarchy = useAppSelector((state) => state.biology.list || {})
 
-  // Init
   useEffect(() => {
-    const _init = async () => {
-      if (!biologyHierarchy || (biologyHierarchy && biologyHierarchy.length === 0)) {
-        dispatch<any>(fetchBiology())
-      }
+    const newList = { ...selectedCriteria, ...initialState } ?? {}
+    if (!newList.code) {
+      newList.code = selectedCriteria.code
     }
+    newList.code.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, biologyHierarchy).equivalentRow)
+    setCurrentState(newList)
+  }, [initialState, biologyHierarchy])
 
-    _init()
-  }, []) // eslint-disable-line
+  const _handleClick = (newSelectedItems: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => {
+    onChangeSelectedHierarchy(newSelectedItems, newHierarchy)
+  }
+  useEffect(() => {
+    if (!loading && (isLoadingSyncHierarchyTable > 0 || isLoadingPmsi > 0)) {
+      setLoading(true)
+    } else if (loading && isLoadingSyncHierarchyTable === 0 && isLoadingPmsi === 0) {
+      setLoading(false)
+    }
+  }, [isLoadingSyncHierarchyTable, isLoadingPmsi])
 
-  return (
-    <Grid className={classes.root}>
-      <Grid className={classes.actionContainer}>
-        {!isEdition ? (
-          <>
-            <IconButton className={classes.backButton} onClick={goBack}>
-              <KeyboardBackspaceIcon />
-            </IconButton>
-            <Divider className={classes.divider} orientation="vertical" flexItem />
-            <Typography className={classes.titleLabel}>Ajouter un critère de biologie</Typography>
-          </>
-        ) : (
-          <Typography className={classes.titleLabel}>Modifier un critère de biologie</Typography>
-        )}
-      </Grid>
+  return isOpen ? (
+    <>
+      <Grid className={classes.root}>
+        <Grid className={classes.actionContainer}>
+          {!isEdition ? (
+            <>
+              <IconButton className={classes.backButton} onClick={goBack}>
+                <KeyboardBackspaceIcon />
+              </IconButton>
+              <Divider className={classes.divider} orientation="vertical" flexItem />
+              <Typography className={classes.titleLabel}>Ajouter un critère de biologie</Typography>
+            </>
+          ) : (
+            <Typography className={classes.titleLabel}>Modifier un critère de biologie</Typography>
+          )}
+        </Grid>
 
-      <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
-        {biologyHierarchy &&
-          biologyHierarchy.map((biologyItem, index) => (
-            <BiologyListItem
-              key={index}
-              biologyItem={biologyItem}
-              selectedItem={selectedHierarchy}
-              handleClick={onSetSelectedHierarchy}
-            />
-          ))}
-      </List>
+        <div className={classes.loader}>{loading && <LinearProgress />}</div>
+        <List component="nav" aria-labelledby="nested-list-subheader" className={classes.drawerContentContainer}>
+          {biologyHierarchy &&
+            biologyHierarchy.map((biologyItem, index) => (
+              <BiologyListItem
+                key={index}
+                biologyItem={biologyItem}
+                selectedItems={currentState.code}
+                handleClick={_handleClick}
+              />
+            ))}
+        </List>
 
-      <Grid className={classes.biologyHierarchyActionContainer}>
-        {!isEdition && (
-          <Button onClick={goBack} variant="outlined">
-            Annuler
+        <Grid className={classes.biologyHierarchyActionContainer}>
+          {!isEdition && (
+            <Button onClick={goBack} color="primary" variant="outlined">
+              Annuler
+            </Button>
+          )}
+          <Button onClick={() => onConfirm()} type="submit" form="biology-form" color="primary" variant="contained">
+            Suivant
           </Button>
-        )}
-        <Button
-          onClick={() => onChangeSelectedHierarchy(filterSelectedPmsi(selectedHierarchy || [], biologyHierarchy))}
-          type="submit"
-          form="biology-form"
-          variant="contained"
-        >
-          Confirmer
-        </Button>
+        </Grid>
       </Grid>
-    </Grid>
+    </>
+  ) : (
+    <></>
   )
 }
 

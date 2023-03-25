@@ -1,99 +1,101 @@
 import React, { useEffect, useState } from 'react'
-import moment from 'moment'
 
 import { useAppSelector } from 'state'
 
 import { Grid, TextField, Typography } from '@mui/material'
 import useStyles from './styles'
+import { AgeRangeType, ErrorType } from 'types'
+import { convertAgeRangeTypeToString, convertStringToAgeRangeType, substructAgeRangeType } from 'utils/age'
 
 type InputAgeRangeAdvancedProps = {
-  birthdates: [string, string]
-  onChangeBirthdates: (newAge: [string, string]) => void
-  error: boolean
-  setError: (error: boolean) => void
+  birthdatesRanges: [string, string]
+  onChangeBirthdatesRanges: (newAge: [string, string]) => void
+  error: ErrorType
+  onError: (isError: boolean, errorMessage?: string) => void
 }
-type InputsStateType = {
-  year?: number
-  month?: number
-  days?: number
+const defaultMinDate: AgeRangeType = {
+  year: 0,
+  month: 0,
+  days: 0
 }
-const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({ birthdates, onChangeBirthdates, error, setError }) => {
+const defaultMaxDate: AgeRangeType = {
+  year: 130,
+  month: 0,
+  days: 0
+}
+const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({
+  birthdatesRanges,
+  onChangeBirthdatesRanges,
+  error,
+  onError
+}) => {
   const classes = useStyles()
   const { deidentifiedBoolean = true } = useAppSelector((state) => state.exploredCohort)
 
-  const [minState, setMinState] = useState<InputsStateType>({
-    year: 0,
-    month: 0,
-    days: 0
-  })
-  const [maxState, setMaxState] = useState<InputsStateType>({
-    year: 0,
-    month: 0,
-    days: 0
-  })
+  const [minState, setMinState] = useState<AgeRangeType>(defaultMinDate)
+  const [maxState, setMaxState] = useState<AgeRangeType>(defaultMaxDate)
 
   useEffect(() => {
-    const newMaxDate: InputsStateType = {
-      year: 0,
-      month: 0,
-      days: 0
-    }
-    const newMinDate: InputsStateType = {
-      year: 0,
-      month: 0,
-      days: 0
-    }
-
-    newMaxDate.year = moment().diff(moment(birthdates[0], 'YYYY-MM-DD'), 'year') || 0
-    newMaxDate.month = moment().subtract(newMaxDate.year, 'year').diff(moment(birthdates[0], 'YYYY-MM-DD'), 'month')
-    newMaxDate.days = moment()
-      .subtract(newMaxDate.year, 'year')
-      .subtract(newMaxDate.month, 'month')
-      .diff(moment(birthdates[0], 'YYYY-MM-DD'), 'days')
-
-    newMinDate.year = moment().diff(moment(birthdates[1], 'YYYY-MM-DD'), 'year') || 0
-    newMinDate.month = moment().subtract(newMinDate.year, 'year').diff(moment(birthdates[1], 'YYYY-MM-DD'), 'month')
-    newMinDate.days = moment()
-      .subtract(newMinDate.year, 'year')
-      .subtract(newMinDate.month, 'month')
-      .diff(moment(birthdates[1], 'YYYY-MM-DD'), 'days')
-
+    const newMaxDate: AgeRangeType = convertStringToAgeRangeType(birthdatesRanges[0]) ?? defaultMaxDate
+    const newMinDate: AgeRangeType = convertStringToAgeRangeType(birthdatesRanges[1]) ?? defaultMinDate
     setMinState(newMinDate)
     setMaxState(newMaxDate)
-  }, [birthdates])
+  }, [birthdatesRanges])
 
-  useEffect(() => {
-    if (maxState.days === 0 && maxState.month === 0 && maxState.year === 0) {
-      setError(true)
-    } else {
-      setError(false)
+  const checkRange = (key: string, value: number) => {
+    if (key === 'days' && value <= 31 && value >= 0) {
+      return true
+    } else if (key === 'month' && value <= 12 && value >= 0) {
+      return true
+    } else if (key === 'year' && value >= 0) {
+      return true
     }
-  }, [maxState])
+    return false
+  }
 
-  const _onChangeState = (stateName: 'minState' | 'maxState', key: 'year' | 'month' | 'days', value?: number) => {
-    const _minState = minState
-    const _maxState = maxState
-
-    if (stateName === 'minState') {
-      _minState[key] = value
-      setMinState(_minState)
+  const _onChangeState = (stateName: 'minState' | 'maxState', key: 'year' | 'month' | 'days', value = 0) => {
+    const newMinState: AgeRangeType = { ...minState }
+    const newMaxState: AgeRangeType = { ...maxState }
+    let isError
+    if (!checkRange(key, value)) {
+      isError = true
     } else {
-      _maxState[key] = value
-      setMaxState(_maxState)
-    }
-    const newMinDate = moment()
-      .subtract(_minState.days, 'days')
-      .subtract(_minState.month, 'month')
-      .subtract(_minState.year, 'year')
-      .format('YYYY-MM-DD')
-    const newMaxDate = moment()
-      .subtract(_maxState.days, 'days')
-      .subtract(_maxState.month, 'month')
-      .subtract(_maxState.year, 'year')
-      .format('YYYY-MM-DD')
+      if (stateName === 'minState') {
+        newMinState[key] = value
+      } else {
+        newMaxState[key] = value
+      }
 
-    if (birthdates[1] !== newMinDate || birthdates[0] !== newMaxDate) {
-      onChangeBirthdates([newMaxDate, newMinDate] as [string, string])
+      const maxDate: Date = substructAgeRangeType(newMinState)
+      const minDate: Date = substructAgeRangeType(newMaxState)
+
+      if (minDate > maxDate) {
+        onError(true, 'La date maximale doit être supérieure à la date minimale.')
+        isError = true
+      } else if (newMaxState.days === 0 && newMaxState.month === 0 && newMaxState.year === 0) {
+        onError(true, 'Au moins une des valeurs maximales ne doit pas être égale à 0')
+        isError = true
+      }
+    }
+    const oldBirthdatesRanges: [string, string] = [
+      convertAgeRangeTypeToString(maxState),
+      convertAgeRangeTypeToString(minState)
+    ]
+    const newBirthdatesRanges: [string, string] = [
+      convertAgeRangeTypeToString(newMaxState),
+      convertAgeRangeTypeToString(newMinState)
+    ]
+
+    if (isError) {
+      onChangeBirthdatesRanges(oldBirthdatesRanges)
+    } else if (birthdatesRanges[1] !== newBirthdatesRanges[1] || birthdatesRanges[0] !== newBirthdatesRanges[0]) {
+      onError(false)
+      if (stateName === 'minState') {
+        setMinState(newMinState)
+      } else {
+        setMaxState(newMaxState)
+      }
+      onChangeBirthdatesRanges(newBirthdatesRanges)
     }
   }
 
@@ -180,10 +182,10 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({ birthdates, onCha
           )}
         </Grid>
 
-        {error && (
-          <Typography style={{ color: '#f44336', marginTop: 4 }}>
-            Au moins une des valeurs maximales ne doit pas être égale à 0.
-          </Typography>
+        {error.isError && (
+          <Grid direction={'column'}>
+            <Typography style={{ color: '#f44336', marginTop: 4 }}>{error.errorMessage}</Typography>
+          </Grid>
         )}
       </div>
     </>

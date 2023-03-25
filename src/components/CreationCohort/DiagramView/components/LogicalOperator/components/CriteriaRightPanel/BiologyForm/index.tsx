@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Tabs, Tab } from '@mui/material'
 
 import useStyles from './styles'
@@ -6,9 +6,12 @@ import useStyles from './styles'
 import BiologyForm from './components/Form/BiologyForm'
 import BiologyHierarchy from './components/Hierarchy/BiologyHierarchy'
 import BiologySearch from './components/BiologySearch/BiologySearch'
+import { initSyncHierarchyTableEffect, OBSERVATION, syncOnChangeFormValue } from 'utils/pmsi'
+import { fetchProcedure, PmsiListType } from 'state/pmsi'
+import { useAppDispatch, useAppSelector } from 'state'
 
-const defaultBiology = {
-  type: 'Observation',
+export const defaultBiology = {
+  type: OBSERVATION,
   title: 'Critères de biologie',
   code: [],
   isLeaf: false,
@@ -24,31 +27,48 @@ const defaultBiology = {
 
 const Index = (props: any) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
-  const [selectedTab, onChangeTab] = useState<'form' | 'hierarchy' | 'search'>(selectedCriteria ? 'form' : 'hierarchy')
-  const [defaultValues, onChangeDefaultValues] = useState(selectedCriteria || defaultBiology)
-
-  const isEdition = selectedCriteria !== null ? true : false
-
-  const _onChangeSelectedHierarchy = (code: any) => {
-    onChangeDefaultValues({
-      ...defaultValues,
-      code
-    })
-    onChangeTab('form')
-  }
-
-  const _onChangeValue = (key: string, value: any) => {
-    const _defaultValues = defaultValues ? { ...defaultValues } : {}
-    _defaultValues[key] = value
-    onChangeDefaultValues(_defaultValues)
-  }
 
   const classes = useStyles()
+  const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy' | 'search'>(
+    selectedCriteria ? 'form' : 'hierarchy'
+  )
+  const [defaultCriteria, setDefaultCriteria] = useState(selectedCriteria || defaultBiology)
 
+  const isEdition = selectedCriteria !== null
+  const dispatch = useAppDispatch()
+  const biologyHierarchy = useAppSelector((state) => state.biology.list || {})
+
+  const _onChangeSelectedHierarchy = (newSelectedItems: any, newHierarchy?: PmsiListType[]) => {
+    _onChangeFormValue('code', newSelectedItems, newHierarchy)
+  }
+  const _onChangeFormValue = async (key: string, value: any, newHierarchy: PmsiListType[] = biologyHierarchy) =>
+    await syncOnChangeFormValue(
+      key,
+      value,
+      defaultCriteria,
+      newHierarchy,
+      setDefaultCriteria,
+      selectedTab,
+      defaultBiology.type,
+      dispatch
+    )
+  const _initSyncHierarchyTableEffect = async () => {
+    await initSyncHierarchyTableEffect(
+      biologyHierarchy,
+      selectedCriteria,
+      defaultCriteria && defaultCriteria.code ? defaultCriteria.code : [],
+      fetchProcedure,
+      defaultBiology.type,
+      dispatch
+    )
+  }
+  useEffect(() => {
+    _initSyncHierarchyTableEffect()
+  }, [])
   return (
     <>
       <div>
-        <Tabs className={classes.tabs} value={selectedTab} onChange={(e, tab) => onChangeTab(tab)}>
+        <Tabs className={classes.tabs} value={selectedTab} onChange={(e, tab) => setSelectedTab(tab)}>
           <Tab label="Hiérarchie" value="hierarchy" />
           <Tab label="Recherche" value="search" />
           <Tab label="Formulaire" value="form" />
@@ -57,10 +77,11 @@ const Index = (props: any) => {
 
       {selectedTab === 'form' && (
         <BiologyForm
+          isOpen={selectedTab === 'form'}
           isEdition={isEdition}
           criteria={criteria}
-          selectedCriteria={defaultValues}
-          onChangeValue={_onChangeValue}
+          selectedCriteria={defaultCriteria}
+          onChangeValue={_onChangeFormValue}
           onChangeSelectedCriteria={onChangeSelectedCriteria}
           goBack={goBack}
         />
@@ -68,20 +89,23 @@ const Index = (props: any) => {
       {selectedTab === 'search' && (
         <BiologySearch
           isEdition={isEdition}
-          selectedCriteria={defaultValues}
+          selectedCriteria={defaultCriteria}
           criteria={criteria}
           onChangeSelectedCriteria={_onChangeSelectedHierarchy}
+          onConfirm={() => setSelectedTab('form')}
           goBack={goBack}
         />
       )}
-      {selectedTab === 'hierarchy' && (
+      {
         <BiologyHierarchy
+          isOpen={selectedTab === 'hierarchy'}
           isEdition={isEdition}
-          selectedCriteria={selectedCriteria}
+          selectedCriteria={defaultCriteria}
           onChangeSelectedHierarchy={_onChangeSelectedHierarchy}
+          onConfirm={() => setSelectedTab('search')}
           goBack={goBack}
         />
-      )}
+      }
     </>
   )
 }

@@ -84,7 +84,7 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
         </>
       ) : (
         <TableRow className={classes.emptyTableRow}>
-          <TableCell colSpan={5} align="left">
+          <TableCell colSpan={7} align="left">
             <Grid container justifyContent="center">
               {loading ? <CircularProgress /> : <Typography variant="button">Aucun patient à afficher</Typography>}
             </Grid>

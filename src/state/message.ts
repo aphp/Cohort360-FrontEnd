@@ -193,10 +193,10 @@ const setMessageSlice = createSlice({
       type: 'error',
       content: 'Une erreur est survenue lors de la récupération des PMSI du patient'
     }))
-    builder.addCase(fetchDocuments.rejected, () => ({
-      type: 'error',
-      content: 'Une erreur est survenue lors de la récupération des documents du patient'
-    }))
+    builder.addCase(fetchDocuments.rejected, (state, action) => {
+      if (action?.meta?.arg?.signal?.aborted) return null
+      return { type: 'error', content: 'Une erreur est survenue lors de la récupération des documents du patient' }
+    })
     builder.addCase(fetchPmsi.rejected, () => ({
       type: 'error',
       content: 'Une erreur est survenue lors de la récupération des PMSI du patient'

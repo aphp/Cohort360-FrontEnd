@@ -16,11 +16,14 @@ import { addRequest, deleteRequest } from './request'
 import { deleteProject } from './project'
 
 import services from 'services/aphp'
+import { SHORT_COHORT_LIMIT } from '../constants'
 
 export type CohortCreationState = {
   loading: boolean
   saveLoading: boolean
   countLoading: boolean
+  count_outdated: boolean
+  shortCohortLimit: number
   requestId: string
   cohortName: string
   json: string
@@ -42,6 +45,8 @@ const defaultInitialState: CohortCreationState = {
   loading: false,
   saveLoading: false,
   countLoading: false,
+  count_outdated: false,
+  shortCohortLimit: SHORT_COHORT_LIMIT,
   requestId: '',
   cohortName: '',
   json: '',
@@ -97,7 +102,8 @@ const fetchRequestCohortCreation = createAsyncThunk<
     const requestResult = await services.cohortCreation.fetchRequest(requestId, snapshotId)
     if (!requestResult) return {}
 
-    const { requestName, json, currentSnapshot, snapshotsHistory, count } = requestResult
+    const { requestName, json, currentSnapshot, shortCohortLimit, snapshotsHistory, count, count_outdated } =
+      requestResult
 
     dispatch<any>(
       unbuildCohortCreation({
@@ -113,6 +119,8 @@ const fetchRequestCohortCreation = createAsyncThunk<
       requestId,
       snapshotsHistory,
       currentSnapshot,
+      shortCohortLimit,
+      count_outdated,
       count
     }
   } catch (error) {
@@ -158,7 +166,12 @@ const countCohortCreation = createAsyncThunk<
       newSnapshotsHistory[index].dated_measures = [...newSnapshotsHistory[index].dated_measures, countResult]
     }
 
-    return { count: countResult, snapshotsHistory: newSnapshotsHistory }
+    return {
+      count: countResult,
+      snapshotsHistory: newSnapshotsHistory,
+      count_outdated: countResult.count_outdated,
+      shortCohortLimit: countResult.shortCohortLimit
+    }
   } catch (error) {
     console.error(error)
     throw error
@@ -279,10 +292,30 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
         allowSearchIpp = await services.perimeters.allowSearchIpp(_selectedPopulation as ScopeTreeRow[])
       }
 
+      let _initTemporalConstraints
+
+      if (_temporalConstraints && _temporalConstraints?.length === 0) {
+        _initTemporalConstraints = defaultInitialState.temporalConstraints
+      } else {
+        _initTemporalConstraints = _temporalConstraints
+      }
+
+      if (_temporalConstraints && _temporalConstraints?.length > 0) {
+        _initTemporalConstraints = _temporalConstraints.map(
+          (temporalConstraint: TemporalConstraintsType, index: number) => {
+            return {
+              ...temporalConstraint,
+              id: index + 1
+            }
+          }
+        )
+      }
+
       return {
         json,
         selectedPopulation: _selectedPopulation,
-        allowSearchIpp: allowSearchIpp
+        allowSearchIpp: allowSearchIpp,
+        temporalConstraints: _initTemporalConstraints
       }
     } catch (error) {
       console.error(error)
@@ -311,7 +344,21 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
   async ({ newCurrentSnapshot }, { getState, dispatch }) => {
     try {
       const state = getState()
-      const { population, criteria, criteriaGroup } = await unbuildRequest(newCurrentSnapshot?.json)
+      const { population, criteria, criteriaGroup, temporalConstraints } = await unbuildRequest(
+        newCurrentSnapshot?.json
+      )
+      let _temporalConstraints
+
+      if (temporalConstraints && temporalConstraints?.length > 0) {
+        _temporalConstraints = temporalConstraints.map((temporalConstraint: TemporalConstraintsType, index) => {
+          return {
+            ...temporalConstraint,
+            id: index + 1
+          }
+        })
+      } else {
+        _temporalConstraints = defaultInitialState.temporalConstraints
+      }
 
       let allowSearchIpp = false
       if (population) {
@@ -342,6 +389,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
         currentSnapshot: newCurrentSnapshot.uuid,
         selectedPopulation: population,
         allowSearchIpp: allowSearchIpp,
+        temporalConstraints: _temporalConstraints,
         selectedCriteria: criteria,
         criteriaGroup: criteriaGroup,
         nextCriteriaId: criteria.length + 1,
@@ -571,13 +619,11 @@ const cohortCreationSlice = createSlice({
       })
       state.nextCriteriaId += 1
     },
-    updateTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
-      const foundItem = state.temporalConstraints.find(({ idList }) => {
-        const equals = (a: any[], b: any[]) => a.length === b.length && a.every((v, i) => v === b[i])
-        return equals(idList, action.payload.idList)
-      })
-      const index = foundItem ? state.temporalConstraints.indexOf(foundItem) : -1
-      if (index !== -1) state.temporalConstraints[index] = action.payload
+    deleteTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
+      state.temporalConstraints = state.temporalConstraints.filter((constraint) => constraint.id !== action.payload.id)
+    },
+    updateTemporalConstraints: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType[]>) => {
+      state.temporalConstraints = action.payload
     },
     suspendCount: (state: CohortCreationState) => {
       state.count = {
@@ -678,7 +724,8 @@ export const {
   //
   duplicateSelectedCriteria,
   //
-  updateTemporalConstraint,
+  updateTemporalConstraints,
+  deleteTemporalConstraint,
   suspendCount,
   unsuspendCount
 } = cohortCreationSlice.actions

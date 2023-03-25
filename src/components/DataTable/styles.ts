@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
       fontWeight: 'bold'
     },
     genderIcon: {
-      height: '25px',
+      height: 25,
       fill: '#0063AF'
     },
     pagination: {
@@ -37,13 +37,13 @@ const useStyles = makeStyles((theme: Theme) =>
       }
     },
     validChip: {
-      fontSize: '11px',
+      fontSize: 11,
       backgroundColor: '#5BC5F2',
       color: '#FFF',
       fontWeight: 'bold'
     },
     cancelledChip: {
-      fontSize: '11px',
+      fontSize: 11,
       backgroundColor: '#D0D7D8',
       color: '#FFF',
       fontWeight: 'bold'
@@ -54,13 +54,13 @@ const useStyles = makeStyles((theme: Theme) =>
       maxHeight: `calc(100vh - 500px)`
     },
     tableBodyRows: {
-      height: '80px',
+      height: 80,
       '&:nth-of-type(even)': {
         backgroundColor: '#FAF9F9'
       }
     },
     iconSize: {
-      fontSize: '30px'
+      fontSize: 30
     },
     searchIcon: {
       padding: 0,
@@ -89,7 +89,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     tabsContainer: {
       backgroundColor: '#153D8A',
-      borderRadius: '8px',
+      borderRadius: 8,
       color: 'white',
       minHeight: 41,
       '& .Mui-selected': { color: 'white' }
@@ -115,7 +115,7 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: '#FFF',
       border: '1px solid #D0D7D8',
       boxShadow: '0px 1px 16px #0000000A',
-      borderRadius: '25px'
+      borderRadius: 25
     },
     input: {
       marginLeft: theme.spacing(1),
@@ -126,7 +126,7 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 32,
       backgroundColor: '#5BC5F2',
       color: 'white',
-      borderRadius: '25px',
+      borderRadius: 25,
       marginInline: 8,
       '&:hover': {
         backgroundColor: '#5BC5F2',
@@ -139,7 +139,12 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: '0 16px'
     },
     select: {
-      marginRight: '4px'
+      marginRight: 4,
+      borderRadius: 25,
+      backgroundColor: '#FFF',
+      '& .MuiSelect-select': {
+        borderRadius: 25
+      }
     }
   })
 )

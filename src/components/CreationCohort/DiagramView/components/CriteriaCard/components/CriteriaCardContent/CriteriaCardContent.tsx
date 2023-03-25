@@ -10,7 +10,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import { useAppSelector } from 'state'
-import { DocType, SelectedCriteriaType } from 'types'
+import { DocType, SearchByTypes, SelectedCriteriaType } from 'types'
 
 import docTypes from 'assets/docTypes.json'
 
@@ -329,9 +329,15 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
             <Chip
               className={classes.criteriaChip}
               label={
-                <Tooltip title={`Contient ${_currentCriteria.search} dans le document`}>
+                <Tooltip
+                  title={`Contient ${_currentCriteria.search} dans le ${
+                    _currentCriteria.searchBy === SearchByTypes.title && 'titre du'
+                  }
+                  document`}
+                >
                   <Typography style={{ maxWidth: 500 }} noWrap>
-                    Contient "{_currentCriteria.search}" dans le document
+                    Contient "{_currentCriteria.search}" dans le
+                    {_currentCriteria.searchBy === SearchByTypes.title && ' titre du'} document
                   </Typography>
                 </Tooltip>
               }

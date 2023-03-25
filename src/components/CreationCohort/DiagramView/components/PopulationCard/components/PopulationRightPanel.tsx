@@ -10,6 +10,7 @@ import { ScopeTreeRow } from 'types'
 import { useAppSelector } from 'state'
 
 import useStyles from './styles'
+import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
 
 type PopulationRightPanelProps = {
   open: boolean
@@ -24,6 +25,7 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
 
   const { selectedPopulation = [] } = useAppSelector((state) => state.cohortCreation.request || {})
   const [_selectedPopulation, onChangeSelectedPopulation] = useState<ScopeTreeRow[]>([])
+  const [searchInput, setSearchInput] = useState('')
 
   useEffect(() => {
     onChangeSelectedPopulation(
@@ -42,7 +44,14 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
         </div>
 
         <div className={classes.drawerContentContainer}>
-          <ScopeTree defaultSelectedItems={_selectedPopulation} onChangeSelectedItem={onChangeSelectedPopulation} />
+          <div className={classes.searchBar}>
+            <ScopeSearchBar searchInput={searchInput} onChangeInput={setSearchInput} />
+          </div>
+          <ScopeTree
+            searchInput={searchInput}
+            defaultSelectedItems={_selectedPopulation}
+            onChangeSelectedItem={onChangeSelectedPopulation}
+          />
         </div>
 
         <div className={classes.drawerActionContainer}>

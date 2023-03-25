@@ -3,13 +3,15 @@ import React, { useState, useEffect } from 'react'
 import {
   Button,
   CircularProgress,
-  Grid,
-  IconButton,
+  SelectChangeEvent,
+  FormControl,
   InputAdornment,
   InputBase,
+  IconButton,
+  InputLabel,
+  Grid,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Tab,
   Tabs,
   Typography
@@ -30,7 +32,6 @@ import {
 } from 'types'
 
 import displayDigit from 'utils/displayDigit'
-
 import useStyles from './styles'
 
 type DataTableTopBarProps = {
@@ -71,6 +72,16 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
   useEffect(() => {
     setSearch(searchBar?.value ?? '')
   }, [searchBar, searchBar && searchBar?.value])
+
+  useEffect(() => {
+    onSearch(search)
+  }, [search])
+
+  useEffect(() => {
+    if (search !== '') {
+      onSearch(search)
+    }
+  }, [searchBy])
 
   return (
     <>
@@ -191,12 +202,30 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
       </Grid>
 
       {searchBar && searchBar.type === 'document' && (
-        <InputSearchDocumentSimple
-          defaultSearchInput={search}
-          setDefaultSearchInput={(newSearchInput: string) => setSearch(newSearchInput)}
-          onSearchDocument={(newInputText: string) => onSearch(newInputText)}
-          error={searchBar.error?.isError}
-        />
+        <Grid container item direction="row" alignItems="center" wrap="nowrap">
+          {searchBar.type === 'document' && (
+            <FormControl variant="outlined" style={{ width: 200 }}>
+              <InputLabel>Rechercher dans :</InputLabel>
+              <Select
+                value={searchBy}
+                onChange={handleChangeSelect}
+                className={classes.select}
+                variant="outlined"
+                label="Rechercher dans :"
+                style={{ height: 42 }}
+              >
+                <MenuItem value={SearchByTypes.text}>Corps du document</MenuItem>
+                <MenuItem value={SearchByTypes.title}>Titre du document</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+          <InputSearchDocumentSimple
+            defaultSearchInput={search}
+            setDefaultSearchInput={(newSearchInput: string) => setSearch(newSearchInput)}
+            onSearchDocument={(newInputText: string) => onSearch(newInputText)}
+            error={searchBar.error?.isError}
+          />
+        </Grid>
       )}
 
       {searchBar && searchBar.error?.isError && (

@@ -21,12 +21,14 @@ import {
   IPatientDocuments,
   IPatientPmsi,
   IPatientMedication,
-  IPatientObservation
+  IPatientObservation,
+  SearchByTypes
 } from 'types'
 
 import { logout } from './me'
 
 import services from 'services/aphp'
+import servicesPerimeters from '../services/aphp/servicePerimeters'
 
 export type PatientState = null | {
   loading: boolean
@@ -321,9 +323,11 @@ const fetchMedication = createAsyncThunk<FetchMedicationReturn, FetchMedicationP
  *
  */
 type FetchDocumentsParams = {
+  signal?: AbortSignal
   groupId?: string
   options?: {
     page?: number
+    searchBy?: SearchByTypes
     filters?: {
       searchInput: string
       nda: string
@@ -341,7 +345,7 @@ type FetchDocumentsParams = {
 type FetchDocumentsReturn = { documents?: IPatientDocuments } | undefined
 const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsParams, { state: RootState }>(
   'patient/fetchDocuments',
-  async ({ groupId, options }, { getState }) => {
+  async ({ signal, groupId, options }, { getState }) => {
     try {
       const patientState = getState().patient
 
@@ -356,6 +360,7 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
       const sortDirection = options?.sort?.direction ?? ''
       const page = options?.page ?? 1
       const searchInput = options?.filters?.searchInput ?? ''
+      const searchBy = options?.searchBy ?? SearchByTypes.text
       const selectedDocTypes = options?.filters?.selectedDocTypes ?? []
       const nda = options?.filters?.nda ?? ''
       const startDate = options?.filters?.startDate ?? null
@@ -363,7 +368,7 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
       const onlyPdfAvailable = options?.filters?.onlyPdfAvailable ?? false
 
       if (searchInput) {
-        const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput)
+        const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)
 
         if (searchInputError && searchInputError.isError) {
           return {
@@ -383,6 +388,7 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
       const documentsResponse = await services.patients.fetchDocuments(
         sortBy,
         sortDirection,
+        searchBy,
         page,
         patientId,
         searchInput,
@@ -391,7 +397,8 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
         onlyPdfAvailable,
         startDate,
         endDate,
-        groupId
+        groupId,
+        signal
       )
 
       const documentsList: any[] = linkElementWithEncounter(
@@ -626,10 +633,8 @@ const fetchPatientInfo = createAsyncThunk<FetchPatientReturn, FetchPatientParams
         deidentifiedBoolean = (await services.patients.fetchRights(groupId)) ?? {}
       } else {
         const perimeters = await services.perimeters.getPerimeters()
-        deidentifiedBoolean = perimeters.some((perimeter) =>
-          perimeter.extension?.some(
-            (extension) => extension.url === 'READ_ACCESS' && extension.valueString === 'DATA_PSEUDOANONYMISED'
-          )
+        deidentifiedBoolean = perimeters.some(
+          (perimeter) => servicesPerimeters.getAccessFromScope(perimeter) === 'Pseudonymisé'
         )
       }
       if (

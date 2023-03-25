@@ -89,7 +89,7 @@ const InputSearchDocumentExtend: React.FC<InputSearchDocumentExtendProps> = ({
                   aria-label="search"
                   onClick={() => onSearchDocument(searchInput)}
                 >
-                  <SearchIcon fill="#ED6D91" height="17px" />
+                  <SearchIcon fill="#ED6D91" />
                 </IconButton>
               )}
             </InputAdornment>

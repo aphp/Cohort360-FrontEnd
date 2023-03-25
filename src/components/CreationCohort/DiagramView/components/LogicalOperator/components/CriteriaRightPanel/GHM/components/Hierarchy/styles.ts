@@ -50,6 +50,10 @@ const useStyles = makeStyles(() => ({
     border: '2px solid currentColor',
     borderRadius: 10
   },
+  loader: {
+    height: '4px',
+    marginTop: '2px'
+  },
   selectedIndicator: {
     width: 20,
     height: 20,
@@ -68,7 +72,7 @@ const useStyles = makeStyles(() => ({
     borderRadius: 10
   },
   drawerContentContainer: {
-    height: 'calc(100vh - 207px)',
+    height: 'calc(100vh - 207px - 4px)',
     overflow: 'auto',
     margin: 12
   },

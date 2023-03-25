@@ -89,10 +89,11 @@ type BiologySearchProps = {
   goBack: (data: any) => void
   onChangeSelectedCriteria: (data: any) => void
   selectedCriteria: any
+  onConfirm: () => void
 }
 
 const BiologySearch: React.FC<BiologySearchProps> = (props) => {
-  const { isEdition, criteria, goBack, onChangeSelectedCriteria, selectedCriteria } = props
+  const { isEdition, criteria, goBack, onChangeSelectedCriteria, onConfirm, selectedCriteria } = props
   const classes = useStyles()
 
   const [selectedTab, setSelectedTab] = useState<'anabio' | 'loinc'>('anabio')
@@ -113,7 +114,7 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
     }
   }
 
-  const _onSubmit = () => {
+  const _onNext = () => {
     // ici, conversion des data en BiologyListType
     const formattedData = selectedItems?.map((item: any) => {
       if (item.code === item.target[0].code) {
@@ -135,6 +136,7 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
         : [...selectedCriteria.code]
 
     onChangeSelectedCriteria(formattedSelectedItems)
+    onConfirm()
   }
 
   const getBiologySearchResults = async () => {
@@ -266,13 +268,8 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
       </Grid>
 
       <Grid className={classes.criteriaActionContainer}>
-        {!isEdition && (
-          <Button onClick={goBack} variant="outlined">
-            Annuler
-          </Button>
-        )}
-        <Button onClick={_onSubmit} type="submit" form="biology-form" variant="contained">
-          Confirmer
+        <Button onClick={() => _onNext()} type="submit" form="biology-search" color="primary" variant="contained">
+          Suivant
         </Button>
       </Grid>
     </Grid>

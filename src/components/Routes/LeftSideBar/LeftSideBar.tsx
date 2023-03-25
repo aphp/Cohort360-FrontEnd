@@ -56,7 +56,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
     cohortCreation: state.cohortCreation
   }))
   const maintenanceIsActive = practitioner?.maintenance?.active
-
   // v-- just for zoom transition..
   const [allreadyOpen, setAllreadyOpen] = useState(false)
 
@@ -70,7 +69,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
       setAllreadyOpen(true)
       dispatch<any>(closeAction())
     }
-  }, [props.open]) // eslint-disable-line
+  }, [props.open, cohortCreation]) // eslint-disable-line
 
   const handleDrawerOpenOrClose = (value: boolean) => {
     setAllreadyOpen(true)
@@ -105,12 +104,8 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
       <div className={classes.root}>
         <Drawer
           variant="permanent"
-          className={clsx(classes.drawer, {
-            [classes.drawerOpen]: open,
-            [classes.drawerClose]: !open
-          })}
           classes={{
-            paper: clsx({
+            paper: clsx(classes.drawer, {
               [classes.drawerOpen]: open,
               [classes.drawerClose]: !open
             })
@@ -213,11 +208,9 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                       })}
                       disabled={maintenanceIsActive}
                     >
-                      {maintenanceIsActive ? (
-                        <Typography variant="h6">Nouvelle requête désactivée</Typography>
-                      ) : (
-                        <Typography variant="h5">Nouvelle requête</Typography>
-                      )}
+                      <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
+                        {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
+                      </Typography>
                     </Button>
                   </Zoom>
                 ) : (
@@ -228,11 +221,9 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     })}
                     disabled={maintenanceIsActive}
                   >
-                    {maintenanceIsActive ? (
-                      <Typography variant="h6">Nouvelle requête désactivée</Typography>
-                    ) : (
-                      <Typography variant="h5">Nouvelle requête</Typography>
-                    )}
+                    <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
+                      {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
+                    </Typography>
                   </Button>
                 )}
               </ListItem>
@@ -259,11 +250,9 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                         })}
                         disabled={maintenanceIsActive}
                       >
-                        {maintenanceIsActive ? (
-                          <Typography variant="h6">Nouvelle requête désactivée</Typography>
-                        ) : (
-                          <Typography variant="h5">Nouvelle requête</Typography>
-                        )}
+                        <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
+                          {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
+                        </Typography>
                       </Button>
                     </Zoom>
                   ) : (
@@ -274,11 +263,9 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                       })}
                       disabled={maintenanceIsActive}
                     >
-                      {maintenanceIsActive ? (
-                        <Typography variant="h6">Nouvelle requête désactivée</Typography>
-                      ) : (
-                        <Typography variant="h5">Nouvelle requête</Typography>
-                      )}
+                      <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
+                        {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
+                      </Typography>
                     </Button>
                   )}
                 </ListItem>

@@ -1,21 +1,20 @@
-import { ReactNode, ReactElement } from 'react'
+import { ReactElement, ReactNode } from 'react'
 import {
-  IComposition,
-  IPatient,
-  IClaim,
-  IProcedure,
-  IEncounter,
-  ICondition,
-  IGroup,
   IBundle,
   IBundle_Entry,
-  IResourceList,
-  IOperationOutcome,
-  IObservation,
-  IMedicationRequest,
+  IClaim,
+  IComposition,
+  ICondition,
+  IEncounter,
+  IGroup,
   IMedicationAdministration,
-  PatientGenderKind,
-  IExtension
+  IMedicationRequest,
+  IObservation,
+  IOperationOutcome,
+  IPatient,
+  IProcedure,
+  IResourceList,
+  PatientGenderKind
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 export interface TypedEntry<T extends IResourceList> extends IBundle_Entry {
@@ -154,7 +153,7 @@ export type PMSIFilters = {
 
 export type PatientFilters = {
   gender: PatientGenderKind
-  birthdates: [string, string]
+  birthdatesRanges: [string, string]
   vitalStatus: VitalStatus
 }
 
@@ -198,7 +197,8 @@ export enum SearchByTypes {
   text = '_text',
   family = 'family',
   given = 'given',
-  identifier = 'identifier'
+  identifier = 'identifier',
+  title = 'title'
 }
 
 export enum VitalStatus {
@@ -229,11 +229,15 @@ export type ScopeTreeRow = {
   resourceType?: string
   id: string
   name: string
+  full_path?: string
   quantity: number
   parentId?: string
   subItems: ScopeTreeRow[]
-  extension?: IExtension[]
   managingEntity?: any | undefined
+  inferior_levels_ids?: string
+  cohort_id?: string
+  cohort_size?: string
+  cohort_tag?: string
 }
 
 export type SimpleChartDataType = {
@@ -334,8 +338,21 @@ export type CriteriaGroupType = {
 )
 
 export type TemporalConstraintsType = {
+  id?: number
   idList: ['All'] | number[]
   constraintType: 'none' | 'sameEncounter' | 'differentEncounter' | 'directChronologicalOrdering'
+  timeRelationMinDuration?: {
+    years?: number
+    months?: number
+    days?: number
+    hours?: number
+  }
+  timeRelationMaxDuration?: {
+    years?: number
+    months?: number
+    days?: number
+    hours?: number
+  }
 }
 
 export type CriteriaItemType = {
@@ -422,6 +439,7 @@ export type DocumentDataType = {
   title: string
   type: 'Composition'
   search: string
+  searchBy: SearchByTypes.text | SearchByTypes.title
   docType: DocType[] | null
   encounterEndDate: Date | ''
   encounterStartDate: Date | ''
@@ -518,6 +536,8 @@ export type CohortCreationCounterType = {
   unknownPatient?: number
   jobFailMsg?: string
   date?: string
+  cohort_limit?: number
+  count_outdated?: boolean
 }
 
 export type CohortCreationSnapshotType = {
@@ -703,7 +723,7 @@ export type DTTB_ResultsType = {
 export type DTTB_SearchBarType = {
   type: 'simple' | 'patient' | 'document'
   value: string | undefined
-  onSearch: (newSearch: string, newSearchBy?: SearchByTypes) => void
+  onSearch: (newSearch: string, newSearchBy: SearchByTypes) => void
   searchBy?: any
   error?: searchInputError
 }
@@ -711,4 +731,46 @@ export type DTTB_ButtonType = {
   label: string
   icon?: ReactElement
   onClick: (args?: any) => void
+}
+export type HierarchyTree = null | {
+  code?: HierarchyElement[]
+  loading?: number
+}
+export type HierarchyElement = {
+  id: string
+  label: string
+  subItems?: any[]
+}
+export type TreeElement = { id: string; subItems: TreeElement[] }
+export type ScopeElement = {
+  id: number
+  name: string
+  source_value: string
+  parent_id: string | null
+  type: string
+  inferior_levels_ids: string
+  cohort_id: string
+  cohort_size: string
+  full_path: string
+}
+export type ScopePage = {
+  perimeter: ScopeElement
+  read_role: string
+  right_read_patient_nominative: boolean
+  right_read_patient_pseudo_anonymised: boolean
+  right_search_patient_with_ipp: boolean
+  read_access?: string
+  read_export?: string
+}
+export type IScope = {
+  count: number
+  next: string | null
+  previous: string | null
+  results: ScopePage[]
+}
+export type ErrorType = { isError: boolean; errorMessage?: string }
+export type AgeRangeType = {
+  year?: number
+  month?: number
+  days?: number
 }

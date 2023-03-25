@@ -6,11 +6,15 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
-import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
+import AdvancedInputs from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
+import { useAppDispatch, useAppSelector } from 'state'
+import { fetchClaim } from 'state/pmsi'
+import { HierarchyTree } from 'types'
 
 type GHMFormProps = {
+  isOpen: boolean
   isEdition: boolean
   criteria: any
   selectedCriteria: any
@@ -20,25 +24,26 @@ type GHMFormProps = {
 }
 
 const GhmForm: React.FC<GHMFormProps> = (props) => {
-  const { isEdition, criteria, selectedCriteria, onChangeValue, goBack, onChangeSelectedCriteria } = props
+  const { isOpen, isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
   const classes = useStyles()
+  const dispatch = useAppDispatch()
+  const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
+  const currentState = { ...selectedCriteria, ...initialState }
 
   const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
+  const getGhmOptions = async (searchValue: string) => await criteria.fetch.fetchGhmData(searchValue, false)
   const _onSubmit = () => {
-    if (selectedCriteria?.code?.length === 0) {
+    if (currentState?.code?.length === 0) {
       return setError(true)
     }
-
-    onChangeSelectedCriteria(selectedCriteria)
+    onChangeSelectedCriteria(currentState)
+    dispatch<any>(fetchClaim())
   }
-
-  const getGhmOptions = async (searchValue: string) => await criteria.fetch.fetchGhmData(searchValue, false)
-
-  const defaultValuesCode = selectedCriteria.code
-    ? selectedCriteria.code.map((code: any) => {
+  const defaultValuesCode = currentState.code
+    ? currentState.code.map((code: any) => {
         const criteriaCode = criteria.data.ghmData ? criteria.data.ghmData.find((g: any) => g.id === code.id) : null
         return {
           id: code.id,
@@ -47,7 +52,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
       })
     : []
 
-  return (
+  return isOpen ? (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
         {!isEdition ? (
@@ -86,13 +91,14 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            value={selectedCriteria.title}
+            variant="outlined"
+            value={currentState.title}
             onChange={(e) => onChangeValue('title', e.target.value)}
           />
 
           <Grid style={{ display: 'flex' }}>
             <FormLabel
-              onClick={() => onChangeValue('isInclusive', !selectedCriteria.isInclusive)}
+              onClick={() => onChangeValue('isInclusive', !currentState.isInclusive)}
               style={{ margin: 'auto 1em' }}
               component="legend"
             >
@@ -100,7 +106,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             </FormLabel>
             <Switch
               id="criteria-inclusive"
-              checked={!selectedCriteria.isInclusive}
+              checked={!currentState.isInclusive}
               onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
               color="secondary"
             />
@@ -115,10 +121,12 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             autocompleteValue={defaultValuesCode}
             autocompleteOptions={criteria?.data?.ghmData || []}
             getAutocompleteOptions={getGhmOptions}
-            onChange={(e, value) => onChangeValue('code', value)}
+            onChange={(e, value) => {
+              onChangeValue('code', value)
+            }}
           />
 
-          <AdvancedInputs form="ghm" selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
+          <AdvancedInputs form="ghm" selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
@@ -133,6 +141,8 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
         </Grid>
       </Grid>
     </Grid>
+  ) : (
+    <></>
   )
 }
 

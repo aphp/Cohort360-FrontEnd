@@ -66,7 +66,7 @@ export const buildPatientFiltersChips = (
   handleDeleteChip: (filterName: 'gender' | 'birthdates' | 'vitalStatus') => void
 ) => {
   const gender = genderName(filters.gender)
-  const birthdates = ageName(filters.birthdates)
+  const birthdates = ageName(filters.birthdatesRanges)
   const vitalStatus = vitalStatusName(filters.vitalStatus)
 
   return [
