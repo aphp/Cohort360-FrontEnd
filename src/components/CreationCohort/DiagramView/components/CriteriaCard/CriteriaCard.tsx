@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { IconButton, Typography } from '@material-ui/core'
+import { Avatar, IconButton, Typography } from '@material-ui/core'
 
 import DeleteIcon from '@material-ui/icons/Delete'
 import EditIcon from '@material-ui/icons/Edit'
@@ -39,7 +39,10 @@ const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, 
       style={{ backgroundColor: currentCriterion.isInclusive ? '#D1E2F4' : '#F2B0B0' }}
     >
       <div className={classes.criteriaTitleAndChips}>
-        <Typography className={classes.title}>{currentCriterion.title} :</Typography>
+        <Avatar style={{ backgroundColor: '#5bc5f2', width: 24, height: 24, fontSize: 14 }}>
+          {currentCriterion.id}
+        </Avatar>
+        <Typography className={classes.title}>- {currentCriterion.title} :</Typography>
         <CriteriaCardContent currentCriteria={currentCriterion} />
       </div>
       <div className={classes.actionContainer}>

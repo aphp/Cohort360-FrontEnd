@@ -633,6 +633,7 @@ export async function unbuildRequest(_json: string) {
   let population: (ScopeTreeRow | undefined)[] | null = null
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
+  let temporalConstraints: TemporalConstraintsType[] = []
 
   if (!_json) {
     return {
@@ -665,6 +666,11 @@ export async function unbuildRequest(_json: string) {
     // you got a modal with the posibility to change your current source pop.
     // if (!newPopulation) continue
     population = population ? [...population, newPopulation] : [newPopulation]
+  }
+
+  // retrieve temporal constraints
+  if (request && request.temporalConstraints) {
+    temporalConstraints = request.temporalConstraints
   }
 
   /**
@@ -1525,7 +1531,8 @@ export async function unbuildRequest(_json: string) {
   return {
     population,
     criteria: await convertJsonObjectsToCriteria(criteriaItems),
-    criteriaGroup: _criteriaGroup
+    criteriaGroup: _criteriaGroup,
+    temporalConstraints: temporalConstraints
   }
 }
 

@@ -1,15 +1,11 @@
 import { makeStyles } from '@material-ui/core/styles'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
-    display: 'flex',
-    width: 'fit-content',
+    height: 42,
     marginLeft: 12,
-    alignSelf: 'center',
     padding: '4px 8px',
-    [theme.breakpoints.down('md')]: {
-      alignSelf: 'flex-end'
-    }
+    borderRadius: 4
   },
   temporalConstraintSelect: {
     height: '25px',

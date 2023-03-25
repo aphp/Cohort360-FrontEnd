@@ -338,8 +338,21 @@ export type CriteriaGroupType = {
 )
 
 export type TemporalConstraintsType = {
+  id?: number
   idList: ['All'] | number[]
   constraintType: 'none' | 'sameEncounter' | 'differentEncounter' | 'directChronologicalOrdering'
+  timeRelationMinDuration?: {
+    years?: number
+    months?: number
+    days?: number
+    hours?: number
+  }
+  timeRelationMaxDuration?: {
+    years?: number
+    months?: number
+    days?: number
+    hours?: number
+  }
 }
 
 export type CriteriaItemType = {
