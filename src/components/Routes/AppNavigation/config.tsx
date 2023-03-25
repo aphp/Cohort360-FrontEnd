@@ -1,3 +1,6 @@
+import React from 'react'
+import { RouteObject } from 'react-router'
+
 import Login from 'views/Login/Login'
 import HealthCheck from 'views/HealthCheck/HealthCheck'
 import Welcome from 'views/Welcome/Welcome'
@@ -8,12 +11,21 @@ import Patient from 'views/Patient/Patient'
 import Scope from 'views/Scope/Scope'
 import Dashboard from 'views/Dashboard/Dashboard'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
-import Contact from 'views/Contact/Contact'
+// import Contact from 'views/Contact/Contact'
 import PageNotFound from 'views/PageNotFound/PageNotFound'
 
-import { ODD_CONTACT } from '../../../constants'
+// import { ODD_CONTACT } from '../../../constants'
 
-export default [
+type configRoute =
+  | (RouteObject & {
+      exact?: boolean
+      displaySideBar?: boolean
+      isPrivate?: boolean
+      name?: string
+    })
+  | boolean
+
+const configRoutes: configRoute[] = [
   /**
    * Cohort360 Login Page
    */
@@ -21,7 +33,7 @@ export default [
     exact: true,
     path: '/',
     name: 'main',
-    component: Login
+    element: <Login />
   },
   /**
    * Cohort360: Main Page
@@ -32,13 +44,13 @@ export default [
     path: '/home',
     name: 'home',
     isPrivate: true,
-    component: Welcome
+    element: <Welcome />
   },
   {
     exact: true,
     path: '/health-check',
     name: 'health-check',
-    component: HealthCheck
+    element: <HealthCheck />
   },
   /**
    * Cohort360: Research Patient Page
@@ -46,18 +58,18 @@ export default [
   {
     exact: true,
     displaySideBar: true,
-    path: '/patient-search/:search',
-    name: 'patient-search/:search',
+    path: '/patient-search',
+    name: 'patient-search',
     isPrivate: true,
-    component: SearchPatient
+    element: <SearchPatient />
   },
   {
     exact: true,
     displaySideBar: true,
-    path: '/patient-search',
-    name: 'patient-search',
+    path: '/patient-search/:search',
+    name: 'patient-search/:search',
     isPrivate: true,
-    component: SearchPatient
+    element: <SearchPatient />
   },
   /**
    * Cohort360: Choose Perimeter Page
@@ -68,7 +80,7 @@ export default [
     path: '/perimeter',
     name: 'perimeter',
     isPrivate: true,
-    component: Scope
+    element: <Scope />
   },
   /**
    * Cohort360: Saved Cohorts Page
@@ -79,7 +91,7 @@ export default [
     path: '/my-cohorts',
     name: 'my-cohorts',
     isPrivate: true,
-    component: SavedResearch
+    element: <SavedResearch />
   },
   /**
    * Cohort360: My Projects + Cohort List Page
@@ -90,7 +102,7 @@ export default [
     path: '/my-requests',
     name: 'my-requests',
     isPrivate: true,
-    component: MyProjects
+    element: <MyProjects />
   },
   /**
    * Cohort360: Cohorts Creation Page
@@ -101,24 +113,24 @@ export default [
     path: '/cohort/new',
     name: 'cohort/new',
     isPrivate: true,
-    component: CohortCreation
+    element: <CohortCreation />
   },
-  {
-    exact: true,
-    displaySideBar: true,
-    path: '/cohort/new/:requestId',
-    name: 'cohort/new/:requestId',
-    isPrivate: true,
-    component: CohortCreation
-  },
-  {
-    exact: true,
-    displaySideBar: true,
-    path: '/cohort/new/:requestId/:snapshotId',
-    name: 'cohort/new/:requestId/:snapshotId',
-    isPrivate: true,
-    component: CohortCreation
-  },
+  // {
+  //   exact: true,
+  //   displaySideBar: true,
+  //   path: '/cohort/new/:requestId',
+  //   name: 'cohort/new/:requestId',
+  //   isPrivate: true,
+  //   element: <CohortCreation />
+  // },
+  // {
+  //   exact: true,
+  //   displaySideBar: true,
+  //   path: '/cohort/new/:requestId/:snapshotId',
+  //   name: 'cohort/new/:requestId/:snapshotId',
+  //   isPrivate: true,
+  //   element: <CohortCreation />
+  // },
   /**
    * Cohort360: Explore Cohort
    */
@@ -128,8 +140,7 @@ export default [
     path: '/cohort/:cohortId/:tabName',
     name: 'cohort/:cohortId/:tabName',
     isPrivate: true,
-    component: Dashboard,
-    context: 'cohort'
+    element: <Dashboard context={'cohort'} />
   },
   {
     exact: true,
@@ -137,63 +148,58 @@ export default [
     path: '/cohort/:cohortId',
     name: 'cohort/:cohortId',
     isPrivate: true,
-    component: Dashboard,
-    context: 'cohort'
+    element: <Dashboard context={'cohort'} />
   },
-  /**
-   * Cohort360: Explore Perimeter
-   */
-  {
-    displaySideBar: true,
-    path: '/perimeters/:tabName',
-    name: 'perimeters/:tabName',
-    isPrivate: true,
-    component: Dashboard,
-    context: 'perimeters'
-  },
+  // /**
+  //  * Cohort360: Explore Perimeter
+  //  */
   {
     displaySideBar: true,
     path: '/perimeters',
     name: 'perimeters',
     isPrivate: true,
-    component: Dashboard,
-    context: 'perimeters'
+    element: <Dashboard context={'perimeters'} />
   },
-  /**
-   * Cohort360: All Patients Page
-   */
   {
     displaySideBar: true,
-    path: '/my-patients/:tabName',
-    name: 'my-patients/:tabName',
+    path: '/perimeters/:tabName',
+    name: 'perimeters/:tabName',
     isPrivate: true,
-    component: Dashboard,
-    context: 'patients'
+    element: <Dashboard context={'perimeters'} />
   },
+  // /**
+  //  * Cohort360: All Patients Page
+  //  */
   {
     displaySideBar: true,
     path: '/my-patients',
     name: 'my-patients',
     isPrivate: true,
-    component: Dashboard,
-    context: 'patients'
+    element: <Dashboard context={'patients'} />
   },
-  /**
-   * Cohort360: Patient Page
-   */
   {
     displaySideBar: true,
-    path: '/patients/:patientId/:tabName',
-    name: 'patients/:patientId/:tabName',
+    path: '/my-patients/:tabName',
+    name: 'my-patients/:tabName',
     isPrivate: true,
-    component: Patient
+    element: <Dashboard context={'patients'} />
   },
+  // /**
+  //  * Cohort360: Patient Page
+  //  */
   {
     displaySideBar: true,
     path: '/patients/:patientId',
     name: 'patients/:patientId',
     isPrivate: true,
-    component: Patient
+    element: <Patient />
+  },
+  {
+    displaySideBar: true,
+    path: '/patients/:patientId/:tabName',
+    name: 'patients/:patientId/:tabName',
+    isPrivate: true,
+    element: <Patient />
   },
   /**
    * Cohort360: 404 - Page Not Found
@@ -202,16 +208,18 @@ export default [
     path: '*',
     name: 'page-not-found',
     isPrivate: false,
-    component: PageNotFound
-  },
+    element: <PageNotFound />
+  }
   /**
    * Cohort360: Contact Page
    */
-  !!ODD_CONTACT && {
-    displaySideBar: true,
-    path: '/contact',
-    name: 'contact',
-    isPrivate: true,
-    component: Contact
-  }
+  // !!ODD_CONTACT && {
+  //   displaySideBar: true,
+  //   path: '/contact',
+  //   name: 'contact',
+  //   isPrivate: true,
+  //   element: <Contact />
+  // }
 ]
+
+export default configRoutes
