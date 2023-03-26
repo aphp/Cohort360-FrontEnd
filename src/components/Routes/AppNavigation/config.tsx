@@ -115,22 +115,22 @@ const configRoutes: configRoute[] = [
     isPrivate: true,
     element: <CohortCreation />
   },
-  // {
-  //   exact: true,
-  //   displaySideBar: true,
-  //   path: '/cohort/new/:requestId',
-  //   name: 'cohort/new/:requestId',
-  //   isPrivate: true,
-  //   element: <CohortCreation />
-  // },
-  // {
-  //   exact: true,
-  //   displaySideBar: true,
-  //   path: '/cohort/new/:requestId/:snapshotId',
-  //   name: 'cohort/new/:requestId/:snapshotId',
-  //   isPrivate: true,
-  //   element: <CohortCreation />
-  // },
+  {
+    exact: true,
+    displaySideBar: true,
+    path: '/cohort/new/:requestId',
+    name: 'cohort/new/:requestId',
+    isPrivate: true,
+    element: <CohortCreation />
+  },
+  {
+    exact: true,
+    displaySideBar: true,
+    path: '/cohort/new/:requestId/:snapshotId',
+    name: 'cohort/new/:requestId/:snapshotId',
+    isPrivate: true,
+    element: <CohortCreation />
+  },
   /**
    * Cohort360: Explore Cohort
    */
