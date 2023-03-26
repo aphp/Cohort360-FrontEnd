@@ -139,7 +139,7 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
 type ScopeTreeProps = {
   defaultSelectedItems: ScopeTreeRow[]
   onChangeSelectedItem: (selectedItems: ScopeTreeRow[]) => void
-  searchInput?: string
+  searchInput: string
 }
 
 const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSelectedItem, searchInput }) => {

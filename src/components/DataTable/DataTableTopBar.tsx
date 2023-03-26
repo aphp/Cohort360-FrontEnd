@@ -207,7 +207,7 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
             <FormControl variant="outlined" style={{ width: 200 }}>
               <InputLabel>Rechercher dans :</InputLabel>
               <Select
-                value={searchBy}
+                value={searchBy as any}
                 onChange={handleChangeSelect}
                 className={classes.select}
                 variant="outlined"

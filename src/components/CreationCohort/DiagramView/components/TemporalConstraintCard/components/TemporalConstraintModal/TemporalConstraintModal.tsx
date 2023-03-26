@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 
 import {
   Button,
@@ -13,8 +13,8 @@ import {
   RadioGroup,
   Tooltip,
   Typography
-} from '@material-ui/core'
-import InfoIcon from '@material-ui/icons/Info'
+} from '@mui/material'
+import InfoIcon from '@mui/icons-material/Info'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { buildCohortCreation, updateTemporalConstraints } from 'state/cohortCreation'
@@ -37,7 +37,7 @@ const TemporalConstraint: React.FC<{
   const [radioValues, setRadioValues] = useState<TemporalConstraintsType['constraintType']>(initialStateRadio)
   const [newConstraintsList, setNewConstraintsList] = useState<TemporalConstraintsType[]>([...temporalConstraints])
 
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
   const handleConfirm = () => {
@@ -49,7 +49,7 @@ const TemporalConstraint: React.FC<{
     if (onClose && typeof onClose === 'function') {
       onClose()
     } else {
-      history.push(`/home`)
+      navigate(`/home`)
     }
   }
 

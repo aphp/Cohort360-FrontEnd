@@ -13,7 +13,7 @@ import {
   MenuItem,
   Select,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { useAppSelector } from 'state'
 import { TemporalConstraintsType } from 'types'
@@ -195,7 +195,7 @@ const TemporalConstraintConfig: React.FC<{
         <Select
           disabled={!isFirstTimeValueChecked}
           value={minTimeMeasurement}
-          onChange={onChangeMinTimeMeasurement}
+          onChange={onChangeMinTimeMeasurement as any}
           error={incorrectTimingError}
         >
           {timeMeasurements.map((timeMeasurement, index) => (
@@ -224,7 +224,7 @@ const TemporalConstraintConfig: React.FC<{
         <Select
           disabled={!isSecondTimeValueChecked}
           value={maxTimeMeasurement}
-          onChange={onChangeMaxTimeMeasurement}
+          onChange={onChangeMaxTimeMeasurement as any}
           error={incorrectTimingError}
         >
           {timeMeasurements.map((timeMeasurement, index) => (

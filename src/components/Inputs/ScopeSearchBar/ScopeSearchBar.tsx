@@ -1,12 +1,11 @@
 import React from 'react'
 
-import { Grid, IconButton, InputAdornment, InputBase } from '@material-ui/core'
+import { Grid, IconButton, InputAdornment, InputBase, Alert } from '@mui/material'
 
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 
 import useStyles from './styles'
-import Alert from '@material-ui/lab/Alert'
 
 type ScopeSearchBarProps = {
   searchInput: string

@@ -115,6 +115,7 @@ export type Cohort = {
   request_job_duration?: string
   request_query_snapshot?: string
   extension?: any[]
+  exportable?: boolean
 }
 
 export type CohortFilters = {

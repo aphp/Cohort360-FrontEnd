@@ -47,7 +47,7 @@ const AutoLogoutContainer = () => {
     crossTab: true,
     syncTimers: 0,
     timeout: SESSION_TIMEOUT,
-    promptTimeout: 1 * 60 * 1000,
+    promptBeforeIdle: 1 * 60 * 1000,
     throttle: 1 * 60 * 1000,
     onPrompt: handleOnPrompt,
     onIdle: handleOnIdle,

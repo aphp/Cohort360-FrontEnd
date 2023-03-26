@@ -27,22 +27,21 @@ const AppNavigation = () => (
     <Routes>
       {configRoutes.map((route, index) => {
         return route.isPrivate ? (
-          <Route element={<PrivateRoute />}>
+          <Route key={index} element={<PrivateRoute />}>
             <Route
-              index={index}
+              key={index}
               path={route.path}
               element={<Layout displaySideBar={route.displaySideBar}>{route.element}</Layout>}
             />
           </Route>
         ) : (
           <Route
-            index={index}
+            key={index}
             path={route.path}
             element={<Layout displaySideBar={route.displaySideBar}>{route.element}</Layout>}
           />
         )
       })}
-      {/* <Route path="*" element={<PageNotFound />} /> */}
     </Routes>
   </Router>
 )
