@@ -12,7 +12,7 @@ jobs:
           node-version: 16.x
           cache: 'npm'
       - name: Install Dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
       - name: Test
 #        run: npm run test
         run: echo "No tests ATM"
