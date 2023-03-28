@@ -32,7 +32,6 @@ import { ACCES_TOKEN, REFRESH_TOKEN } from '../../constants'
 import services from 'services/aphp'
 
 import useStyles from './styles'
-import { ScopePage } from 'types'
 
 const ErrorSnackBarAlert = ({ open, setError, errorMessage }) => {
   const _setError = () => {
@@ -107,7 +106,7 @@ const Login = () => {
 
   const getPractitionerData = async (practitioner, lastConnection, maintenance) => {
     if (practitioner) {
-      const practitionerPerimeters: ScopePage[] | { errorType: string } = await services.perimeters.getPerimeters()
+      const practitionerPerimeters = await services.perimeters.getPerimeters()
 
       if (practitionerPerimeters && practitionerPerimeters.errorType) {
         if (practitionerPerimeters.errorType === 'fhir') {
