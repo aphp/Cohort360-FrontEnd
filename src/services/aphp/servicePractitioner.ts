@@ -1,8 +1,5 @@
-import axios from 'axios'
-
-import { BACK_API_URL } from '../../constants'
-
-import { fetchPractitioner } from './callApi'
+import { AxiosResponse } from 'axios'
+import apiBackend from 'services/apiBackend'
 
 export interface IServicePractitioner {
   /**
@@ -40,7 +37,7 @@ export interface IServicePractitioner {
    *  - firstName: Prénom du practitioner
    *  - lastName: Nom du practitioner
    */
-  fetchPractitioner: () => Promise<{
+  fetchPractitioner: (username: string) => Promise<{
     id: number
     displayName: string
     firstName: string
@@ -55,11 +52,7 @@ const servicePractitioner: IServicePractitioner = {
       formData.append('username', username.toString())
       formData.append('password', password)
 
-      return await axios({
-        method: 'POST',
-        url: `${BACK_API_URL}/accounts/login/`,
-        data: formData
-      })
+      return await apiBackend.post(`/accounts/login/`, formData)
     } catch (error) {
       console.error("erreur lors de l'exécution de la fonction authenticate", error)
       return error
@@ -67,44 +60,31 @@ const servicePractitioner: IServicePractitioner = {
   },
 
   logout: async () => {
-    await axios({
-      method: 'POST',
-      url: `${BACK_API_URL}/accounts/logout/`
-    })
+    await apiBackend.post(`/accounts/logout/`)
   },
 
   maintenance: async () => {
     try {
-      return await axios({
-        method: 'GET',
-        url: `${BACK_API_URL}/maintenances/next/`
-      })
+      return await apiBackend.get(`/maintenance/`)
     } catch (error) {
       console.error("erreur lors de l'éxécution de la fonction maintenance", error)
       return error
     }
   },
 
-  fetchPractitioner: async () => {
+  fetchPractitioner: async (username) => {
     try {
-      const practitioner = await fetchPractitioner()
+      const practitioner: any = await apiBackend.get<AxiosResponse>(`/users/${username}/`)
 
-      if (
-        !practitioner ||
-        (practitioner && !practitioner.data) ||
-        // @ts-ignore
-        (practitioner && practitioner.data && !practitioner.data.entry)
-      ) {
+      if (!practitioner || (practitioner && !practitioner.data)) {
         return null
       }
 
-      // @ts-ignore
-      const { resource } = practitioner.data.entry[0]
-      const id = resource.id
-      const userName = resource.identifier[0].value
-      const firstName = resource.name[0].given.join(' ')
-      const lastName = resource.name[0].family
-      const displayName = `${lastName} ${firstName}`
+      const id = practitioner.data.provider_id
+      const userName = practitioner.data.provider_username
+      const firstName = practitioner.data.firstname
+      const lastName = practitioner.data.lastname
+      const displayName = `${firstName} ${lastName}`
       const response = practitioner
 
       return {

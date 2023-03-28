@@ -12,8 +12,6 @@ import {
   IMedicationRequest,
   IObservation,
   IPatient,
-  IPractitioner,
-  IPractitionerRole,
   IProcedure,
   IOrganization
 } from '@ahryman40k/ts-fhir-types/lib/R4'
@@ -328,6 +326,7 @@ export const fetchCompositionContent = async (compositionId: string) => {
  * Binary Resource
  *
  */
+
 type fetchBinaryProps = { _id?: string; _list?: string[] }
 export const fetchBinary = async (args: fetchBinaryProps) => {
   const { _id } = args
@@ -343,33 +342,6 @@ export const fetchBinary = async (args: fetchBinaryProps) => {
   const documentResp = await apiFhir.get<IBinary>(`/Binary?${options.reduce(optionsReducer)}`)
 
   return documentResp.data ?? []
-}
-
-export const fetchPractitioner = async () => {
-  return await apiFhir.get<FHIR_API_Response<IPractitioner>>(`/Practitioner`)
-}
-
-/**
- * PractitionerRole Resource
- *
- */
-
-type fetchPractitionerRoleProps = {
-  practitioner?: string
-  _elements?: ('extension' | 'organization')[]
-}
-export const fetchPractitionerRole = async (args: fetchPractitionerRoleProps) => {
-  const { practitioner } = args
-  let { _elements } = args
-
-  _elements = _elements ? _elements.filter(uniq) : []
-
-  let options: string[] = []
-  if (practitioner) options = [...options, `practitioner=${practitioner}`] // eslint-disable-line
-
-  if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(reducer)}`] // eslint-disable-line
-
-  return await apiFhir.get<FHIR_API_Response<IPractitionerRole>>(`/PractitionerRole?${options.reduce(optionsReducer)}`)
 }
 
 /**
