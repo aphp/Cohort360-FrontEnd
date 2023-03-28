@@ -108,8 +108,6 @@ Dans un souci de clarté de code, nous avons créé ce fichier `callApi.ts` qui 
 - fetchEncounter
 - fetchComposition
 - fetchCompositionContent
-- fetchPractitioner
-- fetchPractitionerRole
 - fetchProcedure
 - fetchClaim
 - fetchCondition
@@ -242,8 +240,6 @@ export interface IServicePractitioner {
     firstName: string
     lastName: string
   } | null>
-
-  fetchPractitionerRole: (practionerId: string) => Promise<any>
 }
 ```
 
