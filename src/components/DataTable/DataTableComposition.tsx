@@ -208,7 +208,6 @@ const DataTableCompositionLine: React.FC<{
             open={open === documentId}
             handleClose={() => setOpen(null)}
             documentId={documentId ?? ''}
-            list={groupId ? groupId.split(',') : undefined}
           />
         </TableCell>
       </TableRow>
