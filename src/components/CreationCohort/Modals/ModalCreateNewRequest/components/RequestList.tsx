@@ -58,9 +58,16 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
             return (
               <ListItem key={request.uuid} className={classes.requestItem}>
                 <ListItemText onClick={() => onSelectedItem(request.uuid as string)}>
-                  <Typography noWrap style={{ marginLeft: 8 }}>
-                    {request.name}
-                  </Typography>
+                  {request.shared_by?.displayed_name ? (
+                    <Typography noWrap style={{ marginLeft: 8 }}>
+                      {request.name} - Envoyée par : {request.shared_by.firstname}{' '}
+                      {request.shared_by.lastname?.toUpperCase()}
+                    </Typography>
+                  ) : (
+                    <Typography noWrap style={{ marginLeft: 8 }}>
+                      {request.name}
+                    </Typography>
+                  )}
                 </ListItemText>
 
                 <ListItemSecondaryAction>
