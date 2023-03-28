@@ -65,7 +65,7 @@ const servicePractitioner: IServicePractitioner = {
 
   maintenance: async () => {
     try {
-      return await apiBackend.get(`/maintenance/`)
+      return await apiBackend.get(`/maintenances/next/`)
     } catch (error) {
       console.error("erreur lors de l'éxécution de la fonction maintenance", error)
       return error
