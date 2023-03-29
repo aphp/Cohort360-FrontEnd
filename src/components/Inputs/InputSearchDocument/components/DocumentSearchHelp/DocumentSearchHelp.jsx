@@ -26,7 +26,7 @@ const DocumentSearchHelp = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle className={classes.title}>Aide à la recherche textuelle</DialogTitle>
+      <DialogTitle>Aide à la recherche textuelle</DialogTitle>
       <DialogContent className={classes.dialog}>
         <Grid container direction="column">
           <Typography>Les opérateurs ci-dessous vous aideront à affiner la recherche textuelle.</Typography>

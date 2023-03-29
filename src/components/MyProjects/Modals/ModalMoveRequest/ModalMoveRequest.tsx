@@ -8,8 +8,6 @@ import { useAppSelector, useAppDispatch } from 'state'
 import { ProjectState } from 'state/project'
 import { moveRequests } from 'state/request'
 
-import useStyles from './styles'
-
 interface IModalMoveRequestProps {
   open: boolean
   onClose: (onConfirm?: boolean) => void
@@ -17,7 +15,6 @@ interface IModalMoveRequestProps {
 }
 
 const ModalMoveRequest: React.FunctionComponent<IModalMoveRequestProps> = ({ open, onClose, selectedRequests }) => {
-  const classes = useStyles()
   const dispatch = useAppDispatch()
 
   const [currentFolder, onChangeCurrentFolder] = useState<ProjectType | null>(null)
@@ -56,7 +53,7 @@ const ModalMoveRequest: React.FunctionComponent<IModalMoveRequestProps> = ({ ope
       fullWidth
       maxWidth="sm"
     >
-      <DialogTitle id="move-request-title" className={classes.title}>
+      <DialogTitle id="move-request-title">
         {selectedRequests.length === 1 ? 'Deplacer une requête' : 'Deplacer des requêtes'}
       </DialogTitle>
       <DialogContent id="move-request-description">

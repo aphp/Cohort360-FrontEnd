@@ -45,7 +45,7 @@ const SortDialog: React.FC<SortDialogProps> = ({ open, onClose, sort, onChangeSo
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle className={classes.title}>Trier par :</DialogTitle>
+      <DialogTitle>Trier par :</DialogTitle>
       <DialogContent className={classes.dialog}>
         <Grid container direction="row" justifyContent="space-between">
           <Select

@@ -22,7 +22,7 @@ const ModalAdministrationComment: React.FC<ModalAdministrationCommentProps> = ({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <DialogTitle id="alert-dialog-title">{'Commentaire'}</DialogTitle>
+      <DialogTitle id="alert-dialog-title">Commentaire</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           {comment && comment.length > 0

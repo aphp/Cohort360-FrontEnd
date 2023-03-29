@@ -288,7 +288,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle className={classes.title}>Supprimer une requête</DialogTitle>
+        <DialogTitle>Supprimer une requête</DialogTitle>
 
         <DialogContent>
           <Typography>Êtes-vous sûr(e) de vouloir supprimer cette requête ?</Typography>

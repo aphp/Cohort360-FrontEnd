@@ -69,7 +69,7 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle className={classes.title}>Filtrer les patients :</DialogTitle>
+      <DialogTitle>Filtrer les patients :</DialogTitle>
       <DialogContent className={classes.dialog}>
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Genre :</Typography>

@@ -109,7 +109,7 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle className={classes.title}>Filtrer par :</DialogTitle>
+      <DialogTitle>Filtrer par :</DialogTitle>
       <DialogContent className={classes.dialog}>
         {!deidentified && (
           <Grid container direction="column" className={classes.filter}>

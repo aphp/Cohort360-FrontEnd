@@ -4,13 +4,6 @@ const useStyles = makeStyles(() => ({
   dialog: {
     width: '400px'
   },
-  title: {
-    fontSize: '18px',
-    fontFamily: "'Montserrat', sans-serif",
-    color: '#0063AF',
-    textTransform: 'none',
-    lineHeight: 2
-  },
   filter: {
     marginBottom: '24px'
   }

@@ -31,12 +31,5 @@ export default makeStyles((theme) => ({
   populationLabel: {
     color: '#19235A',
     textDecoration: 'underline'
-  },
-  deleteModalTitle: {
-    fontSize: '18px',
-    fontFamily: "'Montserrat', sans-serif",
-    color: '#0063AF',
-    textTransform: 'none',
-    lineHeight: 2
   }
 }))

@@ -93,7 +93,7 @@ const ModalEditCohort: React.FC<{
   return (
     <>
       <Dialog fullWidth maxWidth="sm" open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-        <DialogTitle className={classes.title}>{isEdition ? 'Modifier ' : 'Créer '} une cohorte</DialogTitle>
+        <DialogTitle>{isEdition ? 'Modifier ' : 'Créer '} une cohorte</DialogTitle>
 
         <DialogContent>
           <Grid container direction="column" className={classes.inputContainer}>
@@ -158,7 +158,7 @@ const ModalEditCohort: React.FC<{
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle className={classes.title}>Supprimer une cohorte</DialogTitle>
+        <DialogTitle>Supprimer une cohorte</DialogTitle>
 
         <DialogContent>
           <Typography>Êtes-vous sûr(e) de vouloir supprimer cette cohorte ?</Typography>

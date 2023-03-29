@@ -362,7 +362,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
 
       {openModal === 'delete' && (
         <Dialog fullWidth maxWidth="xs" open onClose={handleClose} aria-labelledby="form-dialog-title">
-          <DialogTitle className={classes.deleteModalTitle}>Supprimer une cohorte</DialogTitle>
+          <DialogTitle>Supprimer une cohorte</DialogTitle>
 
           <DialogContent>
             <Typography>Êtes-vous sûr(e) de vouloir supprimer cette cohorte ?</Typography>

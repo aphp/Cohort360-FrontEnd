@@ -73,6 +73,19 @@ const theme = createTheme({
       fontSize: '15px',
       textTransform: 'none'
     }
+  },
+  components: {
+    MuiDialogTitle: {
+      styleOverrides: {
+        root: {
+          fontSize: '18px',
+          fontFamily: "'Montserrat', sans-serif",
+          color: '#0063AF',
+          textTransform: 'none',
+          lineHeight: 2
+        }
+      }
+    }
   }
 })
 

@@ -5,13 +5,6 @@ const useStyles = makeStyles(() => ({
     marginTop: 10,
     float: 'right'
   },
-  title: {
-    fontSize: '18px',
-    fontFamily: "'Montserrat', sans-serif",
-    color: '#0063AF',
-    textTransform: 'none',
-    lineHeight: 2
-  },
   dialogContent: {
     minWidth: 650
   },

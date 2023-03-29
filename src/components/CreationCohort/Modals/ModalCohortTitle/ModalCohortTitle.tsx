@@ -49,7 +49,7 @@ const ModalCohortTitle: React.FC<{
 
   return (
     <Dialog fullWidth maxWidth="sm" open onClose={handleClose} aria-labelledby="form-dialog-title">
-      <DialogTitle className={classes.title}>Création de la cohorte</DialogTitle>
+      <DialogTitle>Création de la cohorte</DialogTitle>
       <DialogContent style={{ overflowY: 'unset' }}>
         <Grid container direction="column" className={classes.inputContainer}>
           <Typography variant="h3">Nom de la cohorte :</Typography>

@@ -493,9 +493,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
           aria-labelledby="alert-dialog-slide-title"
           aria-describedby="alert-dialog-slide-description"
         >
-          <DialogTitle id="alert-dialog-slide-title" className={classes.title}>
-            Supprimer une cohorte
-          </DialogTitle>
+          <DialogTitle id="alert-dialog-slide-title">Supprimer une cohorte</DialogTitle>
 
           <DialogContent>Êtes-vous sûr(e) de vouloir supprimer la cohorte ?</DialogContent>
           <DialogActions>

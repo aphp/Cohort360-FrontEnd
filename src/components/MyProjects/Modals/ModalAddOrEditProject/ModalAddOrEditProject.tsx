@@ -84,7 +84,7 @@ const ModalAddOrEditProject: React.FC<{
   return (
     <>
       <Dialog fullWidth maxWidth="sm" open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-        <DialogTitle className={classes.title}>{isEdition ? 'Modifier ' : 'Créer '} un projet de recherche</DialogTitle>
+        <DialogTitle>{isEdition ? 'Modifier ' : 'Créer '} un projet de recherche</DialogTitle>
 
         <DialogContent>
           <Grid container direction="column">
@@ -133,7 +133,7 @@ const ModalAddOrEditProject: React.FC<{
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle className={classes.title}>Supprimer un projet de recherche</DialogTitle>
+        <DialogTitle>Supprimer un projet de recherche</DialogTitle>
 
         <DialogContent>
           <Typography>

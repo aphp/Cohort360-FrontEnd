@@ -178,9 +178,9 @@ const ModalCreateNewRequest: React.FC<{
         aria-labelledby="form-dialog-title"
       >
         {tab === 'form' ? (
-          <DialogTitle className={classes.title}>{isEdition ? 'Modification' : 'Création'} d'une requête</DialogTitle>
+          <DialogTitle>{isEdition ? 'Modification' : 'Création'} d'une requête</DialogTitle>
         ) : (
-          <DialogTitle className={classes.title}>Ouvrir une requête</DialogTitle>
+          <DialogTitle>Ouvrir une requête</DialogTitle>
         )}
         <DialogContent>
           {loading || currentRequest === null ? (
@@ -250,7 +250,7 @@ const ModalCreateNewRequest: React.FC<{
           onClose={handleClose}
           aria-labelledby="form-dialog-title"
         >
-          <DialogTitle className={classes.title}>Supprimer une requête</DialogTitle>
+          <DialogTitle>Supprimer une requête</DialogTitle>
 
           <DialogContent>
             <Typography>Êtes-vous sûr(e) de vouloir supprimer cette requête ?</Typography>

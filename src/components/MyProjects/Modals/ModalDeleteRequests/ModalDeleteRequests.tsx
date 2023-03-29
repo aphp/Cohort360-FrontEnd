@@ -40,7 +40,7 @@ const ModalMoveRequest: React.FunctionComponent<IModalMoveRequestProps> = ({ ope
       fullWidth
       maxWidth="sm"
     >
-      <DialogTitle id="move-request-title" className={classes.title}>
+      <DialogTitle id="move-request-title">
         {selectedRequests.length === 1 ? 'Supprimer une requête' : 'Supprimer des requêtes'}
       </DialogTitle>
       <DialogContent>
