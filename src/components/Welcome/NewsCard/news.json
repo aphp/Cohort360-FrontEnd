@@ -5,11 +5,10 @@
         "title": "Nouvelles fonctionnalités - 03/2023",
         "message": [
           "• Possibilité de réaliser des cohortes de plus de 20 000 patients",
-          "• Possibilité d'exporter des cohortes de patient vers un environnement JUPYTER",
           "• Ajout de la recherche textuelle pour la population source",
           "• Mise en place d'un tri par défaut sur le nom des patients",
           "• Mise en place d'un loading lors du chargement des documents",
-          "• Divers correctifs de bugs et d'anomalie ont été réalisés"
+          "• Divers correctifs de bugs et d'anomalies ont été réalisés"
         ],
         "footer": "L'équipe Cohort360."
       }
