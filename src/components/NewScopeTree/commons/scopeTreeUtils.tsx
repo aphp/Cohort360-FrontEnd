@@ -130,7 +130,6 @@ export const init = async (
   setOpenPopulations: (newOpenPopulation: number[]) => void,
   setCount: (newCount: number) => void,
   setIsEmpty: (isEmpty: boolean) => void,
-  selectedItems: ScopeTreeRow[],
   dispatch: AppDispatch,
   executiveUnitType?: ScopeType
 ) => {
@@ -153,7 +152,6 @@ export const init = async (
       setIsEmpty(!newPerimetersList || newPerimetersList.length < 0)
     }
   }
-  // await expandSelectedItems(newPerimetersList, selectedItems, dispatch, setRootRows)
   setIsSearchLoading(false)
 }
 
