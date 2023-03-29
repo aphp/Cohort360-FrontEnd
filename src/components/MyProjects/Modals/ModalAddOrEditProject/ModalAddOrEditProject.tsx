@@ -87,7 +87,7 @@ const ModalAddOrEditProject: React.FC<{
         <DialogTitle className={classes.title}>{isEdition ? 'Modifier ' : 'Créer '} un projet de recherche</DialogTitle>
 
         <DialogContent>
-          <Grid container direction="column" className={classes.inputContainer}>
+          <Grid container direction="column">
             <Typography variant="h3">Nom du projet :</Typography>
             <TextField
               placeholder="Nom du projet"
@@ -137,8 +137,8 @@ const ModalAddOrEditProject: React.FC<{
 
         <DialogContent>
           <Typography>
-            Êtes-vous sur de vouloir supprimer ce projet de recherche ? L'ensemble des requêtes liées à ce projet vont
-            être supprimées également
+            Êtes-vous sûr(e) de vouloir supprimer ce projet de recherche ? L'ensemble des requêtes lié à ce projet va
+            également être supprimé.
           </Typography>
         </DialogContent>
 

@@ -89,9 +89,11 @@ export default makeStyles((theme) => ({
     backgroundColor: '#E6F1FD'
   },
   bottomBarShift: {
-    position: 'fixed',
-    bottom: 0,
-    backgroundColor: '#E6F1FD'
+    width: `calc(100% - ${largeDrawerWidth}px)`,
+    transition: theme.transitions.create(['width', 'margin'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen
+    })
   },
   searchBar: {
     marginBottom: '12px',

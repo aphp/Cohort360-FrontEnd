@@ -117,7 +117,7 @@ const ModalEditCohort: React.FC<{
             />
           </Grid>
 
-          <Grid container direction="column" className={classes.inputContainer}>
+          <Grid container direction="column">
             <Typography variant="h3">Description :</Typography>
             <TextField
               placeholder="Description"
@@ -161,7 +161,7 @@ const ModalEditCohort: React.FC<{
         <DialogTitle className={classes.title}>Supprimer une cohorte</DialogTitle>
 
         <DialogContent>
-          <Typography>Êtes-vous sur de vouloir supprimer cette cohorte ?</Typography>
+          <Typography>Êtes-vous sûr(e) de vouloir supprimer cette cohorte ?</Typography>
         </DialogContent>
 
         <DialogActions>

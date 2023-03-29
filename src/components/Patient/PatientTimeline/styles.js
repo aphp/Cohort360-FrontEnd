@@ -8,7 +8,9 @@ const useStyles = makeStyles({
   centeredTimeline: {
     position: 'relative',
     overflow: 'hidden',
-    height: '100%'
+    height: '100%',
+    margin: '0 auto',
+    width: '100%'
   },
   verticalBar: {
     textAlign: 'center',

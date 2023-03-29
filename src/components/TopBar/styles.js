@@ -33,12 +33,10 @@ export default makeStyles((theme) => ({
     textDecoration: 'underline'
   },
   deleteModalTitle: {
-    ' & h2': {
-      fontSize: '18px',
-      fontFamily: "'Montserrat', sans-serif",
-      color: '#0063AF',
-      textTransform: 'none',
-      lineHeight: 2
-    }
+    fontSize: '18px',
+    fontFamily: "'Montserrat', sans-serif",
+    color: '#0063AF',
+    textTransform: 'none',
+    lineHeight: 2
   }
 }))

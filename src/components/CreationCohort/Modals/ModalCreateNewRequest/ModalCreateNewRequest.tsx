@@ -253,7 +253,7 @@ const ModalCreateNewRequest: React.FC<{
           <DialogTitle className={classes.title}>Supprimer une requête</DialogTitle>
 
           <DialogContent>
-            <Typography>Êtes-vous sur de vouloir supprimer cette requête ?</Typography>
+            <Typography>Êtes-vous sûr(e) de vouloir supprimer cette requête ?</Typography>
           </DialogContent>
 
           <DialogActions>

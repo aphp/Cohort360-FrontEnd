@@ -39,6 +39,13 @@ const useStyles = makeStyles(() => ({
     '& svg': {
       fontSize: 20
     }
+  },
+  title: {
+    fontSize: '18px',
+    fontFamily: "'Montserrat', sans-serif",
+    color: '#0063AF',
+    textTransform: 'none',
+    lineHeight: 2
   }
 }))
 

@@ -88,7 +88,7 @@ const ModalCohortTitle: React.FC<{
           />
         </Grid>
 
-        <Grid container direction="column" className={classes.inputContainer}>
+        <Grid container direction="column">
           <FormControlLabel
             labelPlacement="start"
             control={

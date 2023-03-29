@@ -6,8 +6,10 @@ import {
   Chip,
   Dialog,
   DialogActions,
+  DialogContent,
   DialogTitle,
   Grid,
+  Hidden,
   IconButton,
   Paper,
   Menu,
@@ -20,8 +22,7 @@ import {
   TableSortLabel,
   TableRow,
   Tooltip,
-  Typography,
-  Hidden
+  Typography
 } from '@mui/material'
 
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
@@ -492,7 +493,11 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
           aria-labelledby="alert-dialog-slide-title"
           aria-describedby="alert-dialog-slide-description"
         >
-          <DialogTitle id="alert-dialog-slide-title">Etes-vous sûr de vouloir supprimer la cohorte ?</DialogTitle>
+          <DialogTitle id="alert-dialog-slide-title" className={classes.title}>
+            Supprimer une cohorte
+          </DialogTitle>
+
+          <DialogContent>Êtes-vous sûr(e) de vouloir supprimer la cohorte ?</DialogContent>
           <DialogActions>
             <Button onClick={handleCloseDialog}>Non</Button>
             <Button

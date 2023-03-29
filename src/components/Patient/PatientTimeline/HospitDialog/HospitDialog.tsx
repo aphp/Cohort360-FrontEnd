@@ -35,7 +35,9 @@ const HospitDialog: React.FC<HospitDialogTypes> = ({ deidentified, open, onClose
       maxWidth={'lg'}
       className={classes.dialogContent}
     >
-      <DialogTitle id="simple-dialog-title">Documents</DialogTitle>
+      <DialogTitle id="simple-dialog-title" className={classes.title}>
+        Documents
+      </DialogTitle>
       <DialogContent className={classes.dialogContent}>
         {loading ? (
           <CircularProgress className={classes.loading} />

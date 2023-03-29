@@ -95,7 +95,7 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit
           />
         </Grid>
 
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column">
           <Typography variant="h3">Statut vital :</Typography>
           <RadioGroup name="VitalStatus" value={_vitalStatus} onChange={_onChangeVitalStatus} row={true}>
             <FormControlLabel value="alive" control={<Radio color="secondary" />} label="Patients vivants" />

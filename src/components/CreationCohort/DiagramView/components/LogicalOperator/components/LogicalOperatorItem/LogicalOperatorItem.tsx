@@ -211,6 +211,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               className={classes.inputSelect}
               onChange={(event) => _handleChangeLogicalOperatorProps('isInclusive', event.target.value === 'true')}
               style={{ color: 'currentColor', marginLeft: 8 }}
+              variant="standard"
             >
               <MenuItem value={'true'}>Inclure</MenuItem>
               <MenuItem value={'false'}>Exclure</MenuItem>
@@ -234,6 +235,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
                 }
               }}
               style={{ color: 'currentColor' }}
+              variant="standard"
             >
               <MenuItem value={'andGroup'}>tous les</MenuItem>
               <MenuItem value={'orGroup'}>un des</MenuItem>

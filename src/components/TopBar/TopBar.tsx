@@ -365,7 +365,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
           <DialogTitle className={classes.deleteModalTitle}>Supprimer une cohorte</DialogTitle>
 
           <DialogContent>
-            <Typography>Êtes-vous sur de vouloir supprimer cette cohorte ?</Typography>
+            <Typography>Êtes-vous sûr(e) de vouloir supprimer cette cohorte ?</Typography>
           </DialogContent>
 
           <DialogActions>

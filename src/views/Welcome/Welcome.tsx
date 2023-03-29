@@ -100,7 +100,11 @@ const Welcome: React.FC = () => {
         [classes.appBarShift]: open
       })}
     >
-      <Container maxWidth="lg" className={classes.container}>
+      <Container
+        maxWidth="lg"
+        className={classes.container}
+        style={{ minHeight: 'calc(100vh - 70px)', marginBottom: 8 }}
+      >
         <Typography id="homePage-title" component="h1" variant="h1" color="inherit" noWrap className={classes.title}>
           Bienvenue {practitioner.displayName}
         </Typography>
@@ -114,13 +118,6 @@ const Welcome: React.FC = () => {
         >
           {lastConnection}
         </Typography>
-      </Container>
-
-      <Container
-        maxWidth="lg"
-        className={classes.container}
-        style={{ minHeight: 'calc(100vh - 70px)', marginBottom: 8 }}
-      >
         <Grid container spacing={1}>
           {maintenanceIsActive && (
             <Alert severity="warning" style={{ marginTop: '-12px', width: '100%' }}>

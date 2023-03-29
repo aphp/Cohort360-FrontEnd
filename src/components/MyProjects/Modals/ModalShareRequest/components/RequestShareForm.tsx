@@ -97,9 +97,9 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
         />
       </Grid>
 
-      <Grid container direction="column" className={classes.inputContainer}>
+      <Grid container direction="column">
         <Typography variant="h3">Utilisateur à qui partager la requête:</Typography>
-        <div style={{ display: 'flex', flexDirection: 'column', margin: '1em' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', margin: '1em 0 0 0' }}>
           <Autocomplete
             noOptionsText="Rechercher un utilisateur"
             clearOnEscape

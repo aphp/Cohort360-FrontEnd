@@ -1,16 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import {
-  Autocomplete,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Grid,
-  TextField
-} from '@mui/material'
+import { Autocomplete, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material'
 
 import { ProjectType, RequestType } from 'types'
 
@@ -69,20 +59,16 @@ const ModalMoveRequest: React.FunctionComponent<IModalMoveRequestProps> = ({ ope
       <DialogTitle id="move-request-title" className={classes.title}>
         {selectedRequests.length === 1 ? 'Deplacer une requête' : 'Deplacer des requêtes'}
       </DialogTitle>
-      <DialogContent>
-        <DialogContentText id="move-request-description">
-          <Grid container direction="column" className={classes.inputContainer}>
-            <Autocomplete
-              id="move-folder-autocomplete"
-              options={projectsList}
-              getOptionLabel={(option) => option.name}
-              isOptionEqualToValue={(option, value) => option.uuid === value.uuid}
-              value={currentFolder}
-              onChange={(e, value) => onChangeCurrentFolder(value ? value : null)}
-              renderInput={(params) => <TextField {...params} placeholder="Déplacer vers" />}
-            />
-          </Grid>
-        </DialogContentText>
+      <DialogContent id="move-request-description">
+        <Autocomplete
+          id="move-folder-autocomplete"
+          options={projectsList}
+          getOptionLabel={(option) => option.name}
+          isOptionEqualToValue={(option, value) => option.uuid === value.uuid}
+          value={currentFolder}
+          onChange={(e, value) => onChangeCurrentFolder(value ? value : null)}
+          renderInput={(params) => <TextField {...params} placeholder="Déplacer vers" />}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={() => onClose()}>Annuler</Button>

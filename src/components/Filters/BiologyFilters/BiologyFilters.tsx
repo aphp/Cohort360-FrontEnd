@@ -105,7 +105,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
           />
         </Grid>
 
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column">
           <Typography variant="h3">Date :</Typography>
           <Grid container alignItems="center" className={classes.datePickers}>
             <FormLabel component="legend" className={classes.dateLabel}>

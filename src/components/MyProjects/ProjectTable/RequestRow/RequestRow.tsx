@@ -80,11 +80,13 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
           </TableCell>
           <TableCell className={classes.tdName}>
             {row?.shared_by?.displayed_name ? (
-              <Link href={`/cohort/new/${row.uuid}`}>{`${row.name} - Envoyée par : ${
-                row?.shared_by?.firstname
-              } ${row?.shared_by?.lastname?.toUpperCase()}`}</Link>
+              <Link href={`/cohort/new/${row.uuid}`} underline="hover">
+                {`${row.name} - Envoyée par : ${row?.shared_by?.firstname} ${row?.shared_by?.lastname?.toUpperCase()}`}
+              </Link>
             ) : (
-              <Link href={`/cohort/new/${row.uuid}`}>{row.name}</Link>
+              <Link href={`/cohort/new/${row.uuid}`} underline="hover">
+                {row.name}
+              </Link>
             )}
 
             <Tooltip title="Modifier la requête">

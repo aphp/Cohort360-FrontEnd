@@ -46,7 +46,7 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
     <Dialog open={open} onClose={onClose}>
       <DialogTitle className={classes.title}>Filtrer par :</DialogTitle>
       <DialogContent className={classes.dialog}>
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column">
           <Typography variant="h3">Type de diagnostics :</Typography>
           <Autocomplete
             multiple

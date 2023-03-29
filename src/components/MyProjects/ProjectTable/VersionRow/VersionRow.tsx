@@ -119,7 +119,9 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                 <TableRow key={historyRow.uuid}>
                   <TableCell className={classes.tdName}>
                     {historyRow.fhir_group_id ? (
-                      <Link href={`/cohort/${historyRow.fhir_group_id}`}>{historyRow.name}</Link>
+                      <Link href={`/cohort/${historyRow.fhir_group_id}`} underline="hover">
+                        {historyRow.name}
+                      </Link>
                     ) : (
                       <Typography component="span" className={classes.notAllowed}>
                         {historyRow.name}

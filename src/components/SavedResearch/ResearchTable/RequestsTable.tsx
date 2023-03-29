@@ -7,6 +7,7 @@ import {
   Button,
   Dialog,
   DialogActions,
+  DialogContent,
   DialogTitle,
   Grid,
   IconButton,
@@ -287,7 +288,11 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle id="alert-dialog-slide-title">Etes-vous sûr de vouloir supprimer la requête ?</DialogTitle>
+        <DialogTitle className={classes.title}>Supprimer une requête</DialogTitle>
+
+        <DialogContent>
+          <Typography>Êtes-vous sûr(e) de vouloir supprimer cette requête ?</Typography>
+        </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Non</Button>
           <Button

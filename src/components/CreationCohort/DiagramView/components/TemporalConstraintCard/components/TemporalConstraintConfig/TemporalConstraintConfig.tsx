@@ -126,13 +126,15 @@ const TemporalConstraintConfig: React.FC<{
           style={{ margin: '0 8px', minWidth: 200 }}
           error={noSelectedConstraintError && firstCriteriaValue === null}
         >
-          <InputLabel>Le critère X</InputLabel>
+          <InputLabel style={{ marginLeft: -12 }}>Le critère X</InputLabel>
           <Select
             value={firstCriteriaValue === 0 ? null : firstCriteriaValue}
             onChange={(e) => {
               setFirstCriteriaValue(e.target.value as number)
             }}
             classes={{ select: classes.flexBaseline }}
+            variant="standard"
+            style={{ marginTop: 4 }}
           >
             {mainGroupCriteria
               .filter((criteria) => criteria.id !== secondCriteriaValue)
@@ -152,13 +154,15 @@ const TemporalConstraintConfig: React.FC<{
           style={{ margin: '0 12px', minWidth: 200 }}
           error={noSelectedConstraintError && secondCriteriaValue === null}
         >
-          <InputLabel>le critère Y</InputLabel>
+          <InputLabel style={{ marginLeft: -12 }}>le critère Y</InputLabel>
           <Select
             value={secondCriteriaValue === 0 ? null : secondCriteriaValue}
             onChange={(e) => {
               setSecondCriteriaValue(e.target.value as number)
             }}
             classes={{ select: classes.flexBaseline }}
+            variant="standard"
+            style={{ marginTop: 4 }}
           >
             {mainGroupCriteria
               .filter((criteria) => criteria.id !== firstCriteriaValue)
@@ -197,6 +201,7 @@ const TemporalConstraintConfig: React.FC<{
           value={minTimeMeasurement}
           onChange={onChangeMinTimeMeasurement as any}
           error={incorrectTimingError}
+          variant="standard"
         >
           {timeMeasurements.map((timeMeasurement, index) => (
             <MenuItem key={index} value={timeMeasurement.id}>
@@ -226,6 +231,7 @@ const TemporalConstraintConfig: React.FC<{
           value={maxTimeMeasurement}
           onChange={onChangeMaxTimeMeasurement as any}
           error={incorrectTimingError}
+          variant="standard"
         >
           {timeMeasurements.map((timeMeasurement, index) => (
             <MenuItem key={index} value={timeMeasurement.id}>

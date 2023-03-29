@@ -152,7 +152,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
                 <TextField
                   {...params}
                   label="Voie d'administration"
-                  placeholder="Sélectionner une ou plusieurs voie d'arministration"
+                  placeholder="Sélectionner une ou plusieurs voie d'administration"
                 />
               )}
               className={classes.autocomplete}
@@ -185,7 +185,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
           </Grid>
         )}
 
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column">
           <Typography variant="h3">Date :</Typography>
           <Grid container alignItems="center" className={classes.datePickers}>
             <FormLabel component="legend" className={classes.dateLabel}>

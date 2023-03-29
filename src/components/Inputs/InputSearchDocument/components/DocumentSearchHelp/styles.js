@@ -9,13 +9,11 @@ const useStyles = makeStyles(() => ({
     fontWeight: 'bold'
   },
   title: {
-    ' & h2': {
-      fontSize: '18px',
-      fontFamily: "'Montserrat', sans-serif",
-      color: '#0063AF',
-      textTransform: 'none',
-      lineHeight: 2
-    }
+    fontSize: '18px',
+    fontFamily: "'Montserrat', sans-serif",
+    color: '#0063AF',
+    textTransform: 'none',
+    lineHeight: 2
   },
   subtitle: {
     margin: '8px 0px'

@@ -69,7 +69,7 @@ const Scope = () => {
         <Grid
           container
           item
-          xs={10}
+          xs={11}
           justifyContent="center"
           className={clsx(classes.bottomBar, {
             [classes.bottomBarShift]: open

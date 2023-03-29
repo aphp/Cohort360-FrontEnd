@@ -58,7 +58,7 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
         </>
       ) : (
         <TableRow className={classes.emptyTableRow}>
-          <TableCell colSpan={6} align="left">
+          <TableCell colSpan={7} align="left">
             <Grid container justifyContent="center">
               {loading ? (
                 <CircularProgress />

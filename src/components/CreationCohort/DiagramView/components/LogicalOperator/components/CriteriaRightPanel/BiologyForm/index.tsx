@@ -67,13 +67,16 @@ const Index = (props: any) => {
   }, [])
   return (
     <>
-      <div>
-        <Tabs className={classes.tabs} value={selectedTab} onChange={(e, tab) => setSelectedTab(tab)}>
-          <Tab label="Hiérarchie" value="hierarchy" />
-          <Tab label="Recherche" value="search" />
-          <Tab label="Formulaire" value="form" />
-        </Tabs>
-      </div>
+      <Tabs
+        indicatorColor="secondary"
+        className={classes.tabs}
+        value={selectedTab}
+        onChange={(e, tab) => setSelectedTab(tab)}
+      >
+        <Tab label="Hiérarchie" value="hierarchy" />
+        <Tab label="Recherche" value="search" />
+        <Tab label="Formulaire" value="form" />
+      </Tabs>
 
       {selectedTab === 'form' && (
         <BiologyForm
