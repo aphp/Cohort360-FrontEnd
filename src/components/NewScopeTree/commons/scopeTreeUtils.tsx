@@ -514,12 +514,13 @@ export const onSearchSelect = async (
     rowsToAdd.push(row)
   }
   const uniqueRowsToDelete: string[] = [...new Set(rowsToDelete)]
-  let newSelectedItems: ScopeTreeRow[] = []
+  let newSelectedItems: ScopeTreeRow[] = selectedItems
 
   const uniqueRowsToAdd: ScopeTreeRow[] = removeDuplicates(rowsToAdd)
 
   for (const rowToAdd of uniqueRowsToAdd) {
-    newSelectedItems = [...selectedItems, ...uniqueRowsToAdd].filter((row) => !uniqueRowsToDelete.includes(row.id))
+    newSelectedItems = [...newSelectedItems, ...uniqueRowsToAdd].filter((row) => !uniqueRowsToDelete.includes(row.id))
+    newSelectedItems = squashItems(newSelectedItems)
     await addToSelectedItems(
       rowToAdd,
       newSelectedItems,
@@ -529,7 +530,8 @@ export const onSearchSelect = async (
       explorationRootRows
     )
   }
-  newSelectedItems = [...selectedItems, ...uniqueRowsToAdd].filter((row) => !uniqueRowsToDelete.includes(row.id))
+  newSelectedItems = [...newSelectedItems, ...uniqueRowsToAdd].filter((row) => !uniqueRowsToDelete.includes(row.id))
+  newSelectedItems = squashItems(newSelectedItems)
 
   if (setSelectedItems) setSelectedItems(newSelectedItems)
   return newSelectedItems
@@ -546,7 +548,17 @@ export const onExplorationSelectAll = async (
     setSelectedItems(rootRows)
   }
 }
-
+const squashItems = (rootRows: ScopeTreeRow[]) => {
+  let uniqueRows: ScopeTreeRow[] = []
+  const rootRowsIds: string[] = rootRows.map((row) => row.id)
+  rootRows.forEach((rootRow) => {
+    if (!rootRowsIds.find((rootRowId) => rootRow.above_levels_ids?.split(',').includes(rootRowId))) {
+      uniqueRows.push(rootRow)
+    }
+  })
+  uniqueRows = removeDuplicates(uniqueRows)
+  return uniqueRows
+}
 export const onSearchSelectAll = async (
   rootRows: ScopeTreeRow[],
   selectedItems: ScopeTreeRow[],
@@ -555,15 +567,17 @@ export const onSearchSelectAll = async (
   searchRootRows: ScopeTreeRow[],
   explorationRootRows: ScopeTreeRow[]
 ) => {
+  const uniqueRootRows: ScopeTreeRow[] = squashItems(rootRows)
   let newSelectedItems: ScopeTreeRow[] = [...selectedItems]
-  for (const rootRow of rootRows) {
-    if (!isHeaderSelected && isIncludedInListAndSubItems(rootRow, selectedItems, searchRootRows)) {
+  for (const rootRow of uniqueRootRows) {
+    if (!isHeaderSelected && isIncludedInListAndSubItems(rootRow, newSelectedItems, searchRootRows)) {
       newSelectedItems = await onSearchSelect(rootRow, newSelectedItems, searchRootRows, explorationRootRows, undefined)
     }
   }
-  for (const rootRow of rootRows) {
+  for (const rootRow of uniqueRootRows) {
     newSelectedItems = await onSearchSelect(rootRow, newSelectedItems, searchRootRows, explorationRootRows, undefined)
   }
+
   setSelectedItems(newSelectedItems)
 }
 
