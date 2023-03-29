@@ -130,7 +130,7 @@ const Index = (props: CareSiteExplorationProps) => {
                         executiveUnitType
                       ),
                     (row: ScopeTreeRow) =>
-                      onSearchSelect(row, selectedItems, setSelectedItems, searchedRows, scopesList),
+                      onSearchSelect(row, selectedItems, searchedRows, scopesList, setSelectedItems),
                     (row: ScopeTreeRow) => isSearchIndeterminate(row, selectedItems),
                     (row: ScopeTreeRow) => isSearchSelected(row, selectedItems),
                     executiveUnitType

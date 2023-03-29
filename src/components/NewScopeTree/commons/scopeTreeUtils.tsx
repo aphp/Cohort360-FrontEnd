@@ -615,10 +615,9 @@ const selectOrUnSelectParent = async (
 export const onSearchSelect = async (
   row: ScopeTreeRow,
   selectedItems: ScopeTreeRow[],
-  setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void,
   searchRootRows: ScopeTreeRow[],
   explorationRootRows: ScopeTreeRow[],
-  isOnlyRemovingItemOperation?: boolean
+  setSelectedItems?: (newSelectedItems: ScopeTreeRow[]) => void
 ): Promise<ScopeTreeRow[]> => {
   const rowsToDelete: string[] = []
   const rowsToAdd: ScopeTreeRow[] = []
@@ -646,7 +645,7 @@ export const onSearchSelect = async (
       }
     }
   } else {
-    if (!isOnlyRemovingItemOperation) rowsToAdd.push(row)
+    rowsToAdd.push(row)
   }
   const uniqueRowsToDelete: string[] = [...new Set(rowsToDelete)]
   let newSelectedItems: ScopeTreeRow[] = []
@@ -666,8 +665,32 @@ export const onSearchSelect = async (
   }
   newSelectedItems = [...selectedItems, ...uniqueRowsToAdd].filter((row) => !uniqueRowsToDelete.includes(row.id))
 
-  setSelectedItems(newSelectedItems)
+  if (setSelectedItems) setSelectedItems(newSelectedItems)
   return newSelectedItems
+}
+
+// const squashItems = (rootRows: ScopeTreeRow[]) => {
+//   let uniqueRows: ScopeTreeRow[] = []
+//   const rootRowsIds: string[] = rootRows.map((row) => row.id)
+//   rootRows.forEach((rootRow) => {
+//     if (!rootRowsIds.find((rootRowId) => rootRow.above_levels_ids?.split(',').includes(rootRowId))) {
+//       uniqueRows.push(rootRow)
+//     }
+//   })
+//   uniqueRows = removeDuplicates(uniqueRows)
+//   return uniqueRows
+// }
+
+export const onExplorationSelectAll = async (
+  rootRows: ScopeTreeRow[],
+  setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void,
+  isHeaderSelected: boolean
+) => {
+  if (isHeaderSelected) {
+    setSelectedItems([])
+  } else {
+    setSelectedItems(rootRows)
+  }
 }
 
 export const onSearchSelectAll = async (
@@ -678,21 +701,53 @@ export const onSearchSelectAll = async (
   searchRootRows: ScopeTreeRow[],
   explorationRootRows: ScopeTreeRow[]
 ) => {
-  // const selectedIds: string[] = selectedItems.map((row) => row.id)
   let newSelectedItems: ScopeTreeRow[] = [...selectedItems]
-  const rootRowsIds: string[] = rootRows.map((row) => row.id)
-  const uniqueRowsToAdd: ScopeTreeRow[] = []
-  const newRowsToAdd: ScopeTreeRow[] = []
-  const uniqueRowsToDelete: string[] = []
-
-  rootRows.forEach((rootRow) => {
-    if (!rootRowsIds.find((rootRowId) => rootRow.above_levels_ids?.split(',').includes(rootRowId))) {
-      uniqueRowsToAdd.push(rootRow)
+  for (const rootRow of rootRows) {
+    if (!isHeaderSelected && isIncludedInListAndSubItems(rootRow, selectedItems, searchRootRows)) {
+      newSelectedItems = await onSearchSelect(rootRow, newSelectedItems, searchRootRows, explorationRootRows, undefined)
     }
-  })
+  }
+  for (const rootRow of rootRows) {
+    newSelectedItems = await onSearchSelect(rootRow, newSelectedItems, searchRootRows, explorationRootRows, undefined)
+  }
+  setSelectedItems(newSelectedItems)
+  // rootRows.forEach((rowToRemove: ScopeTreeRow) =>
+  //   onSearchSelect(rowToRemove, selectedItems, setSelectedItems, searchRootRows, explorationRootRows)
+  // )
+  //
+  // // const selectedIds: string[] = selectedItems.map((row) => row.id)
+  // let newSelectedItems: ScopeTreeRow[] = [...selectedItems]
+  // const rootRowsIds: string[] = rootRows.map((row) => row.id)
+  // let uniqueRows: ScopeTreeRow[] = []
+  // const newRowsToAdd: ScopeTreeRow[] = []
+  // const uniqueRowsToDelete: string[] = []
+  //
+  // // rootRows.forEach((rootRow) => {
+  // //   if (!rootRowsIds.find((rootRowId) => rootRow.above_levels_ids?.split(',').includes(rootRowId))) {
+  // //     uniqueRows.push(rootRow)
+  // //   }
+  // // })
+  // // uniqueRows = removeDuplicates(uniqueRows)
+  // // uniqueRows = squashItems(rootRows)
+  // // uniqueRows = squashItems([...rootRows, ...selectedItems])
+  // if (!isHeaderSelected) {
+  //   const alreadySelectedItems: ScopeTreeRow[] = rootRows.filter((rootRow) =>
+  //     isIncludedInListAndSubItems(rootRow, selectedItems, searchRootRows)
+  //   )
+  //   uniqueRows = squashItems([...rootRows, ...notSelectedItems])
+  //   uniqueRows.forEach((rowToRemove: ScopeTreeRow) =>
+  //     onSearchSelect(rowToRemove, selectedItems, setSelectedItems, searchRootRows, explorationRootRows, true)
+  //   )
+  //   setSelectedItems(uniqueRows)
+  // } else {
+  //   uniqueRows = squashItems([...rootRows, ...selectedItems])
+  //   uniqueRows.forEach((rowToRemove: ScopeTreeRow) =>
+  //     onSearchSelect(rowToRemove, selectedItems, setSelectedItems, searchRootRows, explorationRootRows, true)
+  //   )
+  // }
   // rootRows.forEach((rootRow) => {
   //   if (!rootRowsIds.find((rootRowId) => rootRow.above_levels_ids?.split(',').includes(rootRowId))) {
-  //     uniqueRowsToAdd.push(rootRow)
+  //     uniqueRows.push(rootRow)
   //   }
   // })
 
@@ -700,27 +755,27 @@ export const onSearchSelectAll = async (
   //   (rootRow) => !isIncludedInListAndSubItems(rootRow, selectedItems, searchRootRows)
   // )
 
-  if (!isHeaderSelected) {
-    newRowsToAdd.push(...uniqueRowsToAdd)
-    for (const rowToAdd of uniqueRowsToAdd) {
-      await addToSelectedItems(
-        rowToAdd,
-        selectedItems,
-        newRowsToAdd,
-        uniqueRowsToDelete,
-        searchRootRows,
-        explorationRootRows
-      )
-    }
-    newSelectedItems.push(...newRowsToAdd)
-  } else {
-    uniqueRowsToAdd.forEach((rowToRemove: ScopeTreeRow) =>
-      onSearchSelect(rowToRemove, selectedItems, setSelectedItems, searchRootRows, explorationRootRows, true)
-    )
-  }
-  newSelectedItems = newSelectedItems.filter((item) => !uniqueRowsToDelete.includes(item.id))
-  newSelectedItems = removeDuplicates(newSelectedItems)
-  setSelectedItems(newSelectedItems)
+  // if (!isHeaderSelected) {
+  //   newRowsToAdd.push(...uniqueRows)
+  //   for (const rowToAdd of uniqueRows) {
+  //     await addToSelectedItems(
+  //       rowToAdd,
+  //       selectedItems,
+  //       newRowsToAdd,
+  //       uniqueRowsToDelete,
+  //       searchRootRows,
+  //       explorationRootRows
+  //     )
+  //   }
+  //   newSelectedItems.push(...newRowsToAdd)
+  // } else {
+  //   uniqueRows.forEach((rowToRemove: ScopeTreeRow) =>
+  //     onSearchSelect(rowToRemove, selectedItems, setSelectedItems, searchRootRows, explorationRootRows, true)
+  //   )
+  // }
+  // newSelectedItems = newSelectedItems.filter((item) => !uniqueRowsToDelete.includes(item.id))
+  // newSelectedItems = removeDuplicates(newSelectedItems)
+  // setSelectedItems(newSelectedItems)
 }
 
 export const isSearchIndeterminate = (row: ScopeTreeRow, selectedItems: ScopeTreeRow[]): boolean => {
