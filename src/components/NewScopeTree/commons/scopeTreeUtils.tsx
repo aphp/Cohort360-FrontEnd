@@ -25,32 +25,7 @@ const fetchScopeTree = async (
   return dispatch(fetchScopesList({ isScopeList: isScopeList, type: executiveUnitType, signal: signal })).unwrap()
 }
 
-const getFetchedSelectedItems = (selectedItems: ScopeTreeRow[], rootRows: ScopeTreeRow[]) => {
-  const fetchedSelectedItems: ScopeTreeRow[] = []
-  const notFetchedSelectedItemsIds: string[] = []
-  selectedItems.forEach((item: ScopeTreeRow) => {
-    if (findEquivalentRowInItemAndSubItems({ id: item.id }, rootRows).equivalentRow) {
-      fetchedSelectedItems.push(item)
-    } else {
-      notFetchedSelectedItemsIds.push(item.id)
-    }
-  })
-  return {
-    fetchedSelectedItems: fetchedSelectedItems,
-    notFetchedSelectedItemsIds: notFetchedSelectedItemsIds
-  }
-}
-
 const getAllParentsIds = async (selectedItems: ScopeTreeRow[]) => {
-  // const { fetchedSelectedItems: fetchedSelectedItems, notFetchedSelectedItemsIds: notFetchedSelectedItemsIds } =
-  //   getFetchedSelectedItems(selectedItems, rootRows)
-  //
-  // const notFetchedSelectedItems: ScopeTreeRow[] =
-  //   notFetchedSelectedItemsIds?.length > 0
-  //     ? await servicesPerimeters.buildScopeTreeRowList(
-  //         await servicesPerimeters.getPerimeters(notFetchedSelectedItemsIds)
-  //       )
-  //     : []
   const allParentsIds: string[] = selectedItems
     .map((item: ScopeTreeRow) => (item?.above_levels_ids ?? '').split(','))
     .flat()
@@ -282,31 +257,6 @@ export const displayCareSiteSearchResultRow = (
   )
 }
 
-export const onSelectAll = (
-  rootRows: ScopeTreeRow[],
-  selectedItems: ScopeTreeRow[],
-  setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void
-) => {
-  let newSelectedItems: ScopeTreeRow[]
-  const diffList1: ScopeTreeRow[] = selectedItems.filter(
-    (selected) => !findEquivalentRowInItemAndSubItems(selected, rootRows).equivalentRow
-  )
-  const diffList2: ScopeTreeRow[] = rootRows.filter(
-    (root) => !findEquivalentRowInItemAndSubItems(root, selectedItems).equivalentRow
-  )
-  const diffList: ScopeTreeRow[] = [...diffList1, ...diffList2]
-  if (
-    rootRows.filter((row) => selectedItems.find((item: { id: string }) => item.id === row.id) !== undefined).length ===
-      rootRows.length &&
-    rootRows.length > 0
-  ) {
-    newSelectedItems = selectedItems.filter((selected) => diffList.find((diff) => diff.id === selected.id))
-  } else {
-    newSelectedItems = [...selectedItems, ...diffList]
-  }
-  setSelectedItems(newSelectedItems)
-}
-
 export const onExpand = async (
   rowId: number,
   controllerRef: React.MutableRefObject<AbortController | null | undefined>,
@@ -363,29 +313,6 @@ export const onSelect = (
   return optimizedHierarchySelection
 }
 
-// export const buildFictiveRootRows = (rootRows: ScopeTreeRow[]) => {
-//   for (let i = 0; i < rootRows.length; i++) {
-//     const rootRowIds: string[] = (rootRows[i]?.inferior_levels_ids ?? '').split(',')
-//     if (
-//       rootRowIds.length === rootRows[i]?.subItems.length &&
-//       !rootRows[i].subItems.map((rootItem) => rootItem.id).includes(LOADING.id)
-//     ) {
-//       continue
-//     }
-//     if (!rootRows[i].subItems || (rootRows[i].subItems.length === 1 && rootRows[i].subItems[0].id === LOADING.id)) {
-//       rootRows[i] = { ...rootRows[i], subItems: [] }
-//     }
-//     rootRowIds.forEach((id) => {
-//       const newSubItem: ScopeTreeRow = LOADING
-//       newSubItem.id = id
-//       newSubItem.subItems = [{ ...LOADING }]
-//       if (!rootRows[i].subItems.map((rootItem) => rootItem.id).includes(newSubItem.id)) {
-//         rootRows[i].subItems.push(newSubItem)
-//       }
-//     })
-//   }
-// }
-
 export const isIncludedInListAndSubItems = (
   searchedItem: ScopeTreeRow,
   selectedItems: ScopeTreeRow[],
@@ -425,11 +352,7 @@ export const isIncludedInListAndSubItems = (
   }
   return false
 }
-// const createScopeTree = (ids: string[]): ScopeTreeRow[] => {
-//   const scopeTreeList: ScopeTreeRow[] = []
-//   ids.forEach((id) => scopeTreeList.push({ ...LOADING, ...{ id: id } }))
-//   return scopeTreeList
-// }
+
 const getScopeTree = async (
   id: string | null | undefined,
   searchRootRows: ScopeTreeRow[],
@@ -469,61 +392,6 @@ const getScopeTreeList = async (
     scopeTreeList.push(...postLoadedRows)
   }
   return scopeTreeList
-}
-// const getScopeTreeList = (
-//   ids: string[],
-//   searchRootRows: ScopeTreeRow[],
-//   explorationRootRows: ScopeTreeRow[]
-// ): ScopeTreeRow[] => {
-//   const promiseArray: Promise<ScopeTreeRow | undefined>[] = ids.map(async (id) => {
-//     const equivalentRow: ScopeTreeRow | undefined = await getScopeTree(id, searchRootRows, explorationRootRows)
-//     return equivalentRow
-//   })
-//
-//   const t1: Promise<Awaited<ScopeTreeRow | undefined>[]> = Promise.all(promiseArray)
-//   const resolvedRows: (ScopeTreeRow | undefined)[] = t1
-//     .then((resolvedRows: (ScopeTreeRow | undefined)[]) => resolvedRows.filter((row) => row !== undefined))
-//     .then((filteredRows: (ScopeTreeRow | undefined)[]) => filteredRows.map((row) => ({ ...row })))
-//
-//   Promise.all(promiseArray)
-//     .then((resolvedRows: (ScopeTreeRow | undefined)[]) => resolvedRows.filter((row) => row !== undefined))
-//     .then((filteredRows: (ScopeTreeRow | undefined)[]) => filteredRows.map((row) => ({ ...row })))
-//   return resolvedRows
-// }
-
-// const getScopeTreeList = async (
-//   ids: string[],
-//   searchRootRows: ScopeTreeRow[],
-//   explorationRootRows: ScopeTreeRow[]
-// ): Promise<ScopeTreeRow[]> => {
-//   const scopeTreeList: ScopeTreeRow[] = []
-//   const promiseArray: Promise<void>[] = ids.map(async (id) => {
-//     const equivalentRow: ScopeTreeRow | undefined = await getScopeTree(id, searchRootRows, explorationRootRows)
-//     if (equivalentRow) {
-//       scopeTreeList.push({ ...equivalentRow })
-//     }
-//   })
-//   await Promise.all(promiseArray)
-//   return scopeTreeList
-// }
-
-const squashSelectedItems = async (
-  squashedItems: ScopeTreeRow[],
-  selectedItems: ScopeTreeRow[],
-  searchRootRows: ScopeTreeRow[],
-  explorationRootRows: ScopeTreeRow[]
-) => {
-  const squashedIds = squashedItems.map((row) => row.id)
-  for (const selectedItem of selectedItems) {
-    if (
-      squashedIds.includes(selectedItem.id) ||
-      (selectedItem.parentId && squashedIds.includes(selectedItem.parentId))
-    ) {
-      continue
-    } else {
-      const parent = await getScopeTree(selectedItem.parentId, searchRootRows, explorationRootRows)
-    }
-  }
 }
 
 const addToSelectedItems = async (
@@ -669,18 +537,6 @@ export const onSearchSelect = async (
   return newSelectedItems
 }
 
-// const squashItems = (rootRows: ScopeTreeRow[]) => {
-//   let uniqueRows: ScopeTreeRow[] = []
-//   const rootRowsIds: string[] = rootRows.map((row) => row.id)
-//   rootRows.forEach((rootRow) => {
-//     if (!rootRowsIds.find((rootRowId) => rootRow.above_levels_ids?.split(',').includes(rootRowId))) {
-//       uniqueRows.push(rootRow)
-//     }
-//   })
-//   uniqueRows = removeDuplicates(uniqueRows)
-//   return uniqueRows
-// }
-
 export const onExplorationSelectAll = async (
   rootRows: ScopeTreeRow[],
   setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void,
@@ -711,71 +567,6 @@ export const onSearchSelectAll = async (
     newSelectedItems = await onSearchSelect(rootRow, newSelectedItems, searchRootRows, explorationRootRows, undefined)
   }
   setSelectedItems(newSelectedItems)
-  // rootRows.forEach((rowToRemove: ScopeTreeRow) =>
-  //   onSearchSelect(rowToRemove, selectedItems, setSelectedItems, searchRootRows, explorationRootRows)
-  // )
-  //
-  // // const selectedIds: string[] = selectedItems.map((row) => row.id)
-  // let newSelectedItems: ScopeTreeRow[] = [...selectedItems]
-  // const rootRowsIds: string[] = rootRows.map((row) => row.id)
-  // let uniqueRows: ScopeTreeRow[] = []
-  // const newRowsToAdd: ScopeTreeRow[] = []
-  // const uniqueRowsToDelete: string[] = []
-  //
-  // // rootRows.forEach((rootRow) => {
-  // //   if (!rootRowsIds.find((rootRowId) => rootRow.above_levels_ids?.split(',').includes(rootRowId))) {
-  // //     uniqueRows.push(rootRow)
-  // //   }
-  // // })
-  // // uniqueRows = removeDuplicates(uniqueRows)
-  // // uniqueRows = squashItems(rootRows)
-  // // uniqueRows = squashItems([...rootRows, ...selectedItems])
-  // if (!isHeaderSelected) {
-  //   const alreadySelectedItems: ScopeTreeRow[] = rootRows.filter((rootRow) =>
-  //     isIncludedInListAndSubItems(rootRow, selectedItems, searchRootRows)
-  //   )
-  //   uniqueRows = squashItems([...rootRows, ...notSelectedItems])
-  //   uniqueRows.forEach((rowToRemove: ScopeTreeRow) =>
-  //     onSearchSelect(rowToRemove, selectedItems, setSelectedItems, searchRootRows, explorationRootRows, true)
-  //   )
-  //   setSelectedItems(uniqueRows)
-  // } else {
-  //   uniqueRows = squashItems([...rootRows, ...selectedItems])
-  //   uniqueRows.forEach((rowToRemove: ScopeTreeRow) =>
-  //     onSearchSelect(rowToRemove, selectedItems, setSelectedItems, searchRootRows, explorationRootRows, true)
-  //   )
-  // }
-  // rootRows.forEach((rootRow) => {
-  //   if (!rootRowsIds.find((rootRowId) => rootRow.above_levels_ids?.split(',').includes(rootRowId))) {
-  //     uniqueRows.push(rootRow)
-  //   }
-  // })
-
-  // filter(
-  //   (rootRow) => !isIncludedInListAndSubItems(rootRow, selectedItems, searchRootRows)
-  // )
-
-  // if (!isHeaderSelected) {
-  //   newRowsToAdd.push(...uniqueRows)
-  //   for (const rowToAdd of uniqueRows) {
-  //     await addToSelectedItems(
-  //       rowToAdd,
-  //       selectedItems,
-  //       newRowsToAdd,
-  //       uniqueRowsToDelete,
-  //       searchRootRows,
-  //       explorationRootRows
-  //     )
-  //   }
-  //   newSelectedItems.push(...newRowsToAdd)
-  // } else {
-  //   uniqueRows.forEach((rowToRemove: ScopeTreeRow) =>
-  //     onSearchSelect(rowToRemove, selectedItems, setSelectedItems, searchRootRows, explorationRootRows, true)
-  //   )
-  // }
-  // newSelectedItems = newSelectedItems.filter((item) => !uniqueRowsToDelete.includes(item.id))
-  // newSelectedItems = removeDuplicates(newSelectedItems)
-  // setSelectedItems(newSelectedItems)
 }
 
 export const isSearchIndeterminate = (row: ScopeTreeRow, selectedItems: ScopeTreeRow[]): boolean => {
@@ -799,11 +590,6 @@ export const isSearchSelected = (row: ScopeTreeRow, selectedItems: ScopeTreeRow[
     return !!selectedItems.find((selected) => aboveLevelsIds.includes(selected.id))
   }
 }
-
-export const isIndeterminated: (_row: ScopeTreeRow, selectedItems: ScopeTreeRow[]) => boolean | undefined = (
-  _row,
-  selectedItems: ScopeTreeRow[]
-) => checkIfIndeterminated(_row, selectedItems)
 
 export const isSelected = (searchedItem: TreeElement, selectedItems: TreeElement[], allItems: TreeElement[]) => {
   selectedItems = selectedItems.map((item) => findEquivalentRowInItemAndSubItems(item, allItems).equivalentRow ?? item)
