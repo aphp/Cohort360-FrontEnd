@@ -98,9 +98,9 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
 
   useEffect(() => {
     let _rightError = false
-
-    const populationWithRightError = selectedItems
-      ? selectedItems.filter((selectedPopulation) => selectedPopulation === undefined)
+    const _selectedPopulation = executiveUnits ?? selectedPopulation ?? []
+    const populationWithRightError = _selectedPopulation
+      ? _selectedPopulation.filter((selectedPopulation) => selectedPopulation === undefined)
       : []
     if (populationWithRightError && populationWithRightError.length > 0) {
       _rightError = true
@@ -134,7 +134,7 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
             <CircularProgress />
           </div>
         </div>
-      ) : selectedItems !== null ? (
+      ) : selectedItems?.length !== 0 ? (
         <div className={classes.populationCard}>
           <div className={classes.leftDiv}>
             <Typography className={classes.typography} variant={form ? undefined : 'h6'} align="left">
@@ -212,7 +212,13 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
         </div>
       )}
 
-      <ModalRightError open={rightError} handleClose={() => onChangeOpenDrawer(true)} />
+      <ModalRightError
+        open={rightError}
+        handleClose={() => {
+          onChangeOpenDrawer(true)
+          setRightError(false)
+        }}
+      />
 
       <PopulationRightPanel
         open={openDrawer}
