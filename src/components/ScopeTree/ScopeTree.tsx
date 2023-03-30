@@ -229,7 +229,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
   const _onExpand = async (rowId: number) => {
     controllerRef.current = new AbortController()
     let _openPopulation = openPopulation ? openPopulation : []
-    let _rootRows = rootRows ? [...rootRows] : []
+    const _rootRows = rootRows ? [...rootRows] : []
     const index = _openPopulation.indexOf(rowId)
 
     if (index !== -1) {
@@ -248,13 +248,10 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
         signal: controllerRef.current?.signal
       })
     )
-    console.log('expandResponse', expandResponse)
     if (expandResponse && expandResponse.payload && !expandResponse.payload.aborted) {
       const _selectedItems = expandResponse.payload.selectedItems ?? []
-      _rootRows = expandResponse.payload.rootRows ?? _rootRows
-      setRootRows(_rootRows)
+      setRootRows(expandResponse.payload.scopesList ?? [])
       onChangeSelectedItem(_selectedItems)
-      console.log('helloooooooooo')
     }
   }
 
@@ -476,13 +473,15 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
               </EnhancedTable>
             </>
           )}
-          <Pagination
-            className={classes.pagination}
-            count={Math.ceil((count ?? 0) / 100)}
-            shape="rounded"
-            onChange={(event, page: number) => setPage && setPage(page)}
-            page={page}
-          />
+          {searchInput && !isEmpty && (
+            <Pagination
+              className={classes.pagination}
+              count={Math.ceil((count ?? 0) / 100)}
+              shape="rounded"
+              onChange={(event, page: number) => setPage && setPage(page)}
+              page={page}
+            />
+          )}
         </>
       )}
     </div>
