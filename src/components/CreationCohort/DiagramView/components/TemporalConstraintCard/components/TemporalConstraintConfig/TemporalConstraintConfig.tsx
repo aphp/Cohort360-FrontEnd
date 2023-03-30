@@ -184,7 +184,7 @@ const TemporalConstraintConfig: React.FC<{
           value={isFirstTimeValueChecked}
           onChange={() => setIsFirstTimeValueChecked(!isFirstTimeValueChecked)}
         />
-        <Typography style={{ fontWeight: 700 }}>plus de </Typography>
+        <Typography style={{ fontWeight: 700 }}>au moins </Typography>
         <InputBase
           classes={{ root: classes.input, error: classes.inputError }}
           disabled={!isFirstTimeValueChecked}
@@ -246,7 +246,7 @@ const TemporalConstraintConfig: React.FC<{
         </Typography>
       )}
       <Button className={classes.button} onClick={onConfirm} disabled={incorrectTimingError}>
-        Ajouter critère
+        Ajouter une séquence
       </Button>
     </Grid>
   )
