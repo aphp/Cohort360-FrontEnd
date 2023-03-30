@@ -49,6 +49,7 @@ const Scope = () => {
       className={clsx(classes.appBar, {
         [classes.appBarShift]: open
       })}
+      style={{ height: '100%', overflow: 'scroll' }}
     >
       <Grid container justifyContent="center" alignItems="center">
         <Grid container item xs={11} direction="column">
