@@ -15,7 +15,7 @@ const MasterChips: React.FC<MasterChipsProps> = ({ chips }) => {
   const classes = useStyles()
 
   return (
-    <Grid>
+    <Grid container>
       {chips?.length > 0 &&
         chips.map(({ label, onDelete }, index) => (
           <Chip

@@ -172,7 +172,7 @@ const PatientList: React.FC<PatientListProps> = ({
       case 'birthdates':
         setFilters((prevFilters) => ({
           ...prevFilters,
-          birthdatesRanges: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]
+          birthdatesRanges: ['', '']
         }))
         break
       case 'vitalStatus':

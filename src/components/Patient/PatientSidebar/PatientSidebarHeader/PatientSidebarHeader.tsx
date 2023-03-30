@@ -1,5 +1,4 @@
 import React from 'react'
-import moment from 'moment'
 
 import { Button, Grid, IconButton, InputBase, TextField, Typography } from '@mui/material'
 import { Autocomplete } from '@mui/lab'
@@ -104,7 +103,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
         // @ts-ignore
         props.onChangeFilters((prevFilters) => ({
           ...prevFilters,
-          birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]
+          birthdatesRanges: ['', '']
         }))
         break
       case 'vitalStatus':
