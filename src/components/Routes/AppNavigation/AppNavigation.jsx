@@ -15,7 +15,7 @@ const Layout = (props) => {
     <>
       {me && <AutoLogoutContainer />}
 
-      {props.displaySideBar && <LeftSideBar />}
+      {props.displaySideBar && <LeftSideBar open />}
 
       {props.children}
     </>
