@@ -68,6 +68,7 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
   const classes = useStyles()
 
   console.log('row.id', row.id)
+  console.log('rootRows', rootRows)
 
   return (
     <>
@@ -247,11 +248,13 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
         signal: controllerRef.current?.signal
       })
     )
+    console.log('expandResponse', expandResponse)
     if (expandResponse && expandResponse.payload && !expandResponse.payload.aborted) {
       const _selectedItems = expandResponse.payload.selectedItems ?? []
       _rootRows = expandResponse.payload.rootRows ?? _rootRows
       setRootRows(_rootRows)
       onChangeSelectedItem(_selectedItems)
+      console.log('helloooooooooo')
     }
   }
 
