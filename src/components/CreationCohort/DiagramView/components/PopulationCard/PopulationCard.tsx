@@ -57,9 +57,13 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
   const [isExtended, onExtend] = useState(false)
   const [openDrawer, onChangeOpenDrawer] = useState(false)
   const [rightError, setRightError] = useState(false)
+
+  const selection = executiveUnits ?? selectedPopulation ?? []
   const [selectedItems, setSelectedItems] = useState<ScopeTreeRow[]>(
-    (executiveUnits ?? selectedPopulation ?? []).filter((item): item is ScopeTreeRow => item !== undefined)
+    selection.filter((item): item is ScopeTreeRow => item !== undefined)
   )
+  const populationWithRightError = selection.filter((item) => item === undefined)
+  const selectionAndPopulationWithRightError = [...selectedItems, ...populationWithRightError]
 
   const _onChangePopulation = async (selectedPopulations: ScopeTreeRow[]) => {
     dispatch<any>(buildCohortCreation({ selectedPopulation: selectedPopulations }))
@@ -98,14 +102,9 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
 
   useEffect(() => {
     let _rightError = false
-    const _selectedPopulation = executiveUnits ?? selectedPopulation ?? []
-    const populationWithRightError = _selectedPopulation
-      ? _selectedPopulation.filter((selectedPopulation) => selectedPopulation === undefined)
-      : []
     if (populationWithRightError && populationWithRightError.length > 0) {
       _rightError = true
     }
-
     setRightError(_rightError)
   }, [selectedItems])
 
@@ -134,7 +133,7 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
             <CircularProgress />
           </div>
         </div>
-      ) : selectedItems?.length !== 0 ? (
+      ) : selectionAndPopulationWithRightError?.length !== 0 ? (
         <div className={classes.populationCard}>
           <div className={classes.leftDiv}>
             <Typography className={classes.typography} variant={form ? undefined : 'h6'} align="left">
@@ -144,8 +143,8 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
             <div className={classes.chipContainer}>
               {isExtended ? (
                 <>
-                  {selectedItems &&
-                    selectedItems.map((pop: any, index: number) => (
+                  {selectionAndPopulationWithRightError &&
+                    selectionAndPopulationWithRightError.map((pop: any, index: number) => (
                       <Chip
                         className={classes.populationChip}
                         key={`${index}-${pop.name}`}
@@ -162,8 +161,8 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
                 </>
               ) : (
                 <>
-                  {selectedItems &&
-                    selectedItems
+                  {selectionAndPopulationWithRightError &&
+                    selectionAndPopulationWithRightError
                       .slice(0, 4)
                       .map((pop: any, index: number) =>
                         pop ? (
@@ -182,7 +181,7 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
                           />
                         )
                       )}
-                  {selectedItems && selectedItems.length > 4 && (
+                  {selectionAndPopulationWithRightError && selectionAndPopulationWithRightError.length > 4 && (
                     <IconButton
                       size="small"
                       /*classes={{ label: classes.populationLabel }}*/
