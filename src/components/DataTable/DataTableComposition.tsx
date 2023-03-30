@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
 
-import { CircularProgress, Chip, Grid, IconButton, Typography, TableRow, TableCell } from '@material-ui/core'
+import { CircularProgress, Chip, Grid, IconButton, Typography, TableRow, TableCell } from '@mui/material'
 
-import FolderSharedIcon from '@material-ui/icons/FolderShared'
-import DescriptionIcon from '@material-ui/icons/Description'
-import LocalHospitalIcon from '@material-ui/icons/LocalHospital'
+import FolderSharedIcon from '@mui/icons-material/FolderShared'
+import DescriptionIcon from '@mui/icons-material/Description'
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import { ReactComponent as PdfIcon } from 'assets/icones/file-pdf.svg'
 import { ReactComponent as CheckIcon } from 'assets/icones/check.svg'
 import { ReactComponent as CancelIcon } from 'assets/icones/times.svg'
@@ -16,7 +16,7 @@ import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import DataTable from 'components/DataTable/DataTable'
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 
-import { docTypes } from 'assets/docTypes.json'
+import docTypes from 'assets/docTypes.json'
 import Watermark from 'assets/images/watermark_pseudo.svg'
 
 import { getDocumentStatus } from 'utils/documentsFormatter'
@@ -126,7 +126,7 @@ const DataTableCompositionLine: React.FC<{
   groupId?: string
 }> = ({ document, deidentified, showIpp, searchMode, groupId }) => {
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const [open, setOpen] = useState<string | null>(null)
 
@@ -137,7 +137,7 @@ const DataTableCompositionLine: React.FC<{
   const ipp = deidentified ? document.idPatient : document.IPP
   const nda = document.NDA ?? '-'
   const serviceProvider = document.serviceProvider ?? 'Non renseigné'
-  const docType = docTypes.find(
+  const docType = docTypes.docTypes.find(
     ({ code }) => code === (document.type?.coding && document.type?.coding[0] ? document.type?.coding[0].code : '-')
   )
   const section = searchMode ? document.section : []
@@ -168,7 +168,7 @@ const DataTableCompositionLine: React.FC<{
               <Typography>{ipp}</Typography>
 
               <IconButton
-                onClick={() => history.push(`/patients/${document.idPatient}${groupId ? `?groupId=${groupId}` : ''}`)}
+                onClick={() => navigate(`/patients/${document.idPatient}${groupId ? `?groupId=${groupId}` : ''}`)}
                 className={classes.searchIcon}
               >
                 <SearchIcon height="15px" fill="#ED6D91" className={classes.iconMargin} />

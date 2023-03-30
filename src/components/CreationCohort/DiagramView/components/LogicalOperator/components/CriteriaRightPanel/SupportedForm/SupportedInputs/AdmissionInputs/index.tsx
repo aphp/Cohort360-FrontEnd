@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 
-import { Autocomplete } from '@material-ui/lab'
-import { Collapse, Grid, IconButton, Typography, TextField } from '@material-ui/core'
+import { Autocomplete, Collapse, Grid, IconButton, Typography, TextField } from '@mui/material'
 
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import useStyles from '../../styles'
 
@@ -69,10 +68,10 @@ const AdmissionInputs: React.FC<AdmissionInputsProps> = ({ criteria, selectedCri
             className={classes.inputItem}
             options={criteria?.data?.admissionModes || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesAdmissionModes}
             onChange={(e, value) => onChangeValue('admissionMode', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Motif Admission" />}
+            renderInput={(params) => <TextField {...params} label="Motif Admission" />}
           />
 
           <Autocomplete
@@ -81,10 +80,10 @@ const AdmissionInputs: React.FC<AdmissionInputsProps> = ({ criteria, selectedCri
             className={classes.inputItem}
             options={criteria?.data?.admission || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesAdmission}
             onChange={(e, value) => onChangeValue('admission', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Type Admission" />}
+            renderInput={(params) => <TextField {...params} label="Type Admission" />}
           />
         </Collapse>
       </Grid>

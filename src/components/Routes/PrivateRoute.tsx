@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { Route } from 'react-router'
-import { Redirect, useLocation } from 'react-router-dom'
+import { Outlet, Navigate, useLocation } from 'react-router-dom'
 import { useQuery } from '@apollo/react-hooks'
 import { gql } from 'apollo-boost'
 
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@material-ui/core'
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material'
 
 import { ACCES_TOKEN } from '../../constants'
 
-import { useAppSelector, useAppDispatch } from 'state'
-import { login } from 'state/me'
+import { useAppSelector, useAppDispatch } from '../../state'
+import { login } from '../../state/me'
 
 const ME = gql`
   query me {
@@ -21,9 +20,7 @@ const ME = gql`
   }
 `
 
-type Props = React.ComponentProps<typeof Route>
-
-const PrivateRoute: React.FC<Props> = (props) => {
+const PrivateRoute: React.FC = () => {
   const me = useAppSelector((state) => state.me)
   const dispatch = useAppDispatch()
   const location = useLocation()
@@ -47,15 +44,7 @@ const PrivateRoute: React.FC<Props> = (props) => {
   }, [me, data, dispatch])
 
   if (!me || (!me && !authToken) || error || (authToken && !loading && data && !data.me)) {
-    if (allowRedirect === true)
-      return (
-        <Redirect
-          to={{
-            pathname: '/',
-            state: { from: location }
-          }}
-        />
-      )
+    if (allowRedirect === true) return <Navigate to="/" replace />
 
     return (
       <Dialog open aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
@@ -71,7 +60,6 @@ const PrivateRoute: React.FC<Props> = (props) => {
               localStorage.setItem('old-path', location.pathname + location.search)
               setRedirection(true)
             }}
-            color="primary"
             autoFocus
           >
             Ok
@@ -79,9 +67,9 @@ const PrivateRoute: React.FC<Props> = (props) => {
         </DialogActions>
       </Dialog>
     )
+  } else {
+    return <Outlet />
   }
-
-  return <Route {...props} />
 }
 
 export default PrivateRoute

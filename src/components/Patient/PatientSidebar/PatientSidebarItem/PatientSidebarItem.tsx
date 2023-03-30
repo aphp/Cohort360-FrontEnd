@@ -1,7 +1,7 @@
 import React from 'react'
-import { useHistory, useParams, useLocation } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 
-import { Chip, ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
+import { Chip, ListItem, ListItemIcon, ListItemText } from '@mui/material'
 
 import { ReactComponent as FemaleIcon } from 'assets/icones/venus.svg'
 import { ReactComponent as MaleIcon } from 'assets/icones/mars.svg'
@@ -67,7 +67,7 @@ const PatientSidebarItem: React.FC<PatientSidebarItemTypes> = ({
   }>()
 
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
   const location = useLocation()
   const { search } = location
 
@@ -75,7 +75,7 @@ const PatientSidebarItem: React.FC<PatientSidebarItemTypes> = ({
     <ListItem
       divider
       onClick={() => {
-        history.push(`/patients/${id}${tabName ? `/${tabName}` : ''}${search}`)
+        navigate(`/patients/${id}${tabName ? `/${tabName}` : ''}${search}`)
         closeDialog(false)
       }}
       className={patientId === id ? classes.selectedListItem : classes.listItem}

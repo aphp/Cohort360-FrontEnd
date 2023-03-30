@@ -1,12 +1,12 @@
 import React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
-import Button from '@material-ui/core/Button'
-import Dialog from '@material-ui/core/Dialog'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogTitle from '@material-ui/core/DialogTitle'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
 
 import { useAppSelector } from 'state'
 import { MeState } from 'state/me'
@@ -19,10 +19,10 @@ const ModalRightError: React.FC<ModalRightErrorProps> = ({ open, handleClose }) 
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const _handleReturnHome = () => {
-    history.push(`/home`)
+    navigate(`/home`)
   }
 
   return (

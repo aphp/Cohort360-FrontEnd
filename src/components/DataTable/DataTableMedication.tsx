@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 
-import { CircularProgress, Grid, IconButton, Typography, TableRow, TableCell } from '@material-ui/core'
+import { CircularProgress, Grid, IconButton, Typography, TableRow, TableCell } from '@mui/material'
 
-import CommentIcon from '@material-ui/icons/Comment'
+import CommentIcon from '@mui/icons-material/Comment'
 
 import DataTable from 'components/DataTable/DataTable'
 import ModalAdministrationComment from 'components/Patient/PatientMedication/ModalAdministrationComment/ModalAdministrationComment'

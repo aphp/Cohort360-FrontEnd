@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import Grid from '@material-ui/core/Grid'
+import Grid from '@mui/material/Grid'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
@@ -88,9 +88,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
       case 'selectedAdministrationRoutes':
       case 'selectedPrescriptionTypes':
       case 'nda':
+        setFilters((prevState) => ({ ...prevState, [filterName]: value }))
+        break
       case 'startDate':
       case 'endDate':
-        setFilters((prevState) => ({ ...prevState, [filterName]: value }))
+        setFilters((prevState) => ({ ...prevState, [filterName]: null }))
         break
     }
   }
@@ -124,7 +126,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   }, [currentMedication, currentMedication?.list]) // eslint-disable-line
 
   return (
-    <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
+    <Grid container justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
         loading={loading}
         tabs={{

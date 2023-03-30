@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import { useAppSelector } from 'state'
 
-import { Grid, TextField, Typography } from '@material-ui/core'
+import { Grid, TextField, Typography } from '@mui/material'
 import useStyles from './styles'
 import { AgeRangeType, ErrorType } from 'types'
 import { convertAgeRangeTypeToString, convertStringToAgeRangeType, substructAgeRangeType } from 'utils/age'
@@ -108,6 +108,7 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({
           <Typography style={{ width: 35, margin: '0 4px' }}>De : </Typography>
           <Grid item style={{ flex: 0.3, margin: `0 ${deidentifiedBoolean ? '12px' : '4px'}` }}>
             <TextField
+              variant="standard"
               InputProps={{
                 endAdornment: <Typography>an(s)</Typography>
               }}
@@ -118,6 +119,7 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({
           </Grid>
           <Grid item style={{ flex: 0.3, margin: `0 ${deidentifiedBoolean ? '12px' : '4px'}` }}>
             <TextField
+              variant="standard"
               InputProps={{
                 endAdornment: <Typography>mois</Typography>
               }}
@@ -129,6 +131,7 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({
           {!deidentifiedBoolean && (
             <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
               <TextField
+                variant="standard"
                 InputProps={{
                   endAdornment: <Typography>jour(s)</Typography>
                 }}
@@ -144,6 +147,7 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({
           <Typography style={{ width: 35, margin: '0 4px' }}>À : </Typography>
           <Grid item style={{ flex: 0.3, margin: `0 ${deidentifiedBoolean ? '12px' : '4px'}` }}>
             <TextField
+              variant="standard"
               InputProps={{
                 endAdornment: <Typography>an(s)</Typography>
               }}
@@ -154,6 +158,7 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({
           </Grid>
           <Grid item style={{ flex: 0.3, margin: `0 ${deidentifiedBoolean ? '12px' : '4px'}` }}>
             <TextField
+              variant="standard"
               InputProps={{
                 endAdornment: <Typography>mois</Typography>
               }}
@@ -165,6 +170,7 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({
           {!deidentifiedBoolean && (
             <Grid item style={{ flex: 0.3, margin: '0 4px' }}>
               <TextField
+                variant="standard"
                 InputProps={{
                   endAdornment: <Typography>jour(s)</Typography>
                 }}

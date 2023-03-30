@@ -12,8 +12,9 @@ import {
   Radio,
   RadioGroup,
   Select,
+  SelectChangeEvent,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { Sort } from 'types'
 
@@ -44,13 +45,13 @@ const SortDialog: React.FC<SortDialogProps> = ({ open, onClose, sort, onChangeSo
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle className={classes.title}>Trier par :</DialogTitle>
+      <DialogTitle>Trier par :</DialogTitle>
       <DialogContent className={classes.dialog}>
         <Grid container direction="row" justifyContent="space-between">
           <Select
-            value={_sort.sortBy}
+            value={_sort.sortBy as any}
             onChange={(
-              event: React.ChangeEvent<{
+              event: SelectChangeEvent<{
                 name?: string | undefined
                 value: unknown
               }>
@@ -70,19 +71,15 @@ const SortDialog: React.FC<SortDialogProps> = ({ open, onClose, sort, onChangeSo
               onChange={(event, value) => setSort({ ..._sort, sortDirection: value as 'asc' | 'desc' })}
               classes={{ root: classes.radioGroup }}
             >
-              <FormControlLabel value="asc" control={<Radio />} label="Croissant" />
-              <FormControlLabel value="desc" control={<Radio />} label="Décroissant" />
+              <FormControlLabel value="asc" control={<Radio color="secondary" />} label="Croissant" />
+              <FormControlLabel value="desc" control={<Radio color="secondary" />} label="Décroissant" />
             </RadioGroup>
           </div>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Annuler
-        </Button>
-        <Button onClick={_onSubmit} color="primary">
-          Valider
-        </Button>
+        <Button onClick={onClose}>Annuler</Button>
+        <Button onClick={_onSubmit}>Valider</Button>
       </DialogActions>
     </Dialog>
   )

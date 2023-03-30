@@ -1,33 +1,34 @@
 import React, { useState, useEffect, useRef } from 'react'
 
-import Alert from '@material-ui/lab/Alert'
-import Button from '@material-ui/core/Button'
-import Checkbox from '@material-ui/core/Checkbox'
-import CircularProgress from '@material-ui/core/CircularProgress'
-import Dialog from '@material-ui/core/Dialog'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import FormGroup from '@material-ui/core/FormGroup'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import Grid from '@material-ui/core/Grid'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemText from '@material-ui/core/ListItemText'
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
-import IconButton from '@material-ui/core/IconButton'
-import TextField from '@material-ui/core/TextField'
-import Typography from '@material-ui/core/Typography'
-import Accordion from '@material-ui/core/Accordion'
-import AccordionSummary from '@material-ui/core/AccordionSummary'
-import AccordionDetails from '@material-ui/core/AccordionDetails'
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Alert,
+  Button,
+  Checkbox,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormGroup,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  TextField,
+  Typography
+} from '@mui/material'
 
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import CancelIcon from '@material-ui/icons/Cancel'
-
-import InfoIcon from '@material-ui/icons/Info'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import CancelIcon from '@mui/icons-material/Cancel'
+import InfoIcon from '@mui/icons-material/Info'
 
 import useStyles from './styles'
 
@@ -147,9 +148,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
 
   return (
     <Dialog open={loading || open} onClose={handleClose} aria-labelledby="form-dialog-title-export">
-      <DialogTitle id="form-dialog-export-title" disableTypography>
-        <Typography>Demande d'export</Typography>
-      </DialogTitle>
+      <DialogTitle id="form-dialog-export-title">Demande d'export</DialogTitle>
 
       {exportResponse !== null ? (
         <DialogContent ref={dialogRef}>
@@ -218,7 +217,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               maxRows={5}
               value={settings.motif}
               helperText="Le motif doit comporter au moins 10 caractères"
-              variant="outlined"
               label="Motif de l'export"
               onChange={(e) => handleChangeSettings('motif', e.target.value)}
             />
@@ -261,6 +259,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
                     <Checkbox
                       checked={!!settings.tables.find((tableId) => tableId === table_id)}
                       onChange={() => handleChangeTables(table_id)}
+                      color="secondary"
                     />
                   </ListItemSecondaryAction>
                 </ListItem>
@@ -316,6 +315,7 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
                   name="conditions"
                   checked={settings.conditions}
                   onChange={() => handleChangeSettings('conditions', !settings.conditions)}
+                  color="secondary"
                 />
               }
               labelPlacement="end"
@@ -336,7 +336,6 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
           <Button
             disabled={loading || !cohortId || !settings.motif || !settings.conditions || !settings.tables.length}
             onClick={handleSubmit}
-            color="primary"
           >
             {loading ? <CircularProgress size={20} /> : 'Exporter les données'}
           </Button>

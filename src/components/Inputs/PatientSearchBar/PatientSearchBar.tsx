@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { useHistory, useLocation, useParams } from 'react-router-dom'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
 
-import { Grid, IconButton, InputAdornment, InputBase, MenuItem, Select } from '@material-ui/core'
+import { Grid, IconButton, InputAdornment, InputBase, MenuItem, Select, SelectChangeEvent } from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
 import { SearchByTypes } from 'types'
@@ -28,7 +28,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   onChangeSearchBy
 }) => {
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
   const location = useLocation()
   const { search } = useParams<{ search: string }>()
 
@@ -37,7 +37,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   const page = 1
 
   const handleChangeSelect = (
-    event: React.ChangeEvent<{
+    event: SelectChangeEvent<{
       name?: string | undefined
       value: unknown
     }>
@@ -63,7 +63,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
       event.preventDefault()
       if (!_searchInput) return
       if (location.pathname === '/home') {
-        history.push(`/patient-search/${_searchInput}`)
+        navigate(`/patient-search/${_searchInput}`)
       } else {
         performQueries && performQueries(page, _searchInput, searchBy)
       }
@@ -73,7 +73,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   const onSearchPatient = async () => {
     if (!_searchInput) return
     if (location.pathname === '/home') {
-      history.push(`/patient-search/${_searchInput}`)
+      navigate(`/patient-search/${_searchInput}`)
     } else {
       performQueries && performQueries(page, _searchInput, searchBy)
     }
@@ -83,7 +83,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
     <Grid container alignItems="center" className={classes.component}>
       {showSelect && (
         <Grid container item xs={2} justifyContent="center">
-          <Select style={{ width: '90%' }} value={searchBy} onChange={handleChangeSelect}>
+          <Select style={{ width: '90%' }} value={searchBy as any} onChange={handleChangeSelect} variant="standard">
             <MenuItem value={SearchByTypes.text}>Tous les champs</MenuItem>
             <MenuItem value={SearchByTypes.family}>Nom</MenuItem>
             <MenuItem value={SearchByTypes.given}>Prénom</MenuItem>

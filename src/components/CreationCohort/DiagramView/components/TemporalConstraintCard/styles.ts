@@ -1,11 +1,15 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     height: 42,
     marginLeft: 12,
     padding: '4px 8px',
-    borderRadius: 4
+    borderRadius: 4,
+    [theme.breakpoints.down('lg')]: {
+      alignSelf: 'flex-end'
+    }
   },
   temporalConstraintSelect: {
     height: '25px',

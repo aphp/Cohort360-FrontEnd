@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 
-import { FormControl, FormLabel, Grid, TextField, Typography } from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+import { Autocomplete, FormControl, FormLabel, Grid, TextField, Typography } from '@mui/material'
 
 import InputNumber from '../InputNumber/InputNumber'
 
@@ -95,7 +94,7 @@ const InputDate = (props) => {
           options={monthList}
           getOptionLabel={({ key }) => key}
           renderInput={(params) => (
-            <TextField {...params} variant="outlined" placeholder="Mois" classes={{ error: classes.inputTextError }} />
+            <TextField {...params} placeholder="Mois" classes={{ error: classes.inputTextError }} />
           )}
           onChange={(e, v) => _onChangeValue('month', v?.value)}
         />

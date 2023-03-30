@@ -10,7 +10,7 @@ import {
   SearchByTypes
 } from 'types'
 
-import { docTypes } from 'assets/docTypes.json'
+import docTypes from 'assets/docTypes.json'
 
 const REQUETEUR_VERSION = 'v1.2.1'
 
@@ -1056,7 +1056,7 @@ export async function unbuildRequest(_json: string) {
               }
               case COMPOSITION_TYPE: {
                 const docTypeIds = value?.split(',')
-                const newDocTypeIds = docTypes.filter((docType: DocType) =>
+                const newDocTypeIds = docTypes.docTypes.filter((docType: DocType) =>
                   docTypeIds?.find((docTypeId) => docTypeId === docType.code)
                 )
 

@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import clsx from 'clsx'
 
-import { Button, IconButton, CircularProgress, Grid, Hidden, Tooltip, Typography, Snackbar } from '@material-ui/core'
-import AddIcon from '@material-ui/icons/Add'
-import DeleteIcon from '@material-ui/icons/Delete'
-import { Alert } from '@material-ui/lab'
+import { Alert, Button, IconButton, CircularProgress, Grid, Hidden, Tooltip, Typography, Snackbar } from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 import { ReactComponent as DriveFileMoveIcon } from 'assets/icones/drive-file-move.svg'
 
@@ -42,7 +41,7 @@ const MyProjects: React.FC<{}> = () => {
   const [openModal, setOpenModal] = useState<'move_to_folder' | 'delete_items' | null>(null)
   const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<'success' | 'error' | null>(null)
   const wrapperSetShareSuccessOrFailMessage = useCallback(
-    (val) => {
+    (val: any) => {
       setShareSuccessOrFailMessage(val)
     },
     [setShareSuccessOrFailMessage]
@@ -141,7 +140,6 @@ const MyProjects: React.FC<{}> = () => {
                         <Button
                           startIcon={<DriveFileMoveIcon />}
                           onClick={() => setOpenModal('move_to_folder')}
-                          color="primary"
                           disabled={maintenanceIsActive}
                         >
                           Déplacer {selectedRequests.length > 1 ? 'des requêtes' : 'une  requête'}

@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  TextField,
-  Typography
-} from '@material-ui/core'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from '@mui/material'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import {
@@ -102,7 +93,7 @@ const ModalEditCohort: React.FC<{
   return (
     <>
       <Dialog fullWidth maxWidth="sm" open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-        <DialogTitle className={classes.title}>{isEdition ? 'Modifier ' : 'Créer '} une cohorte</DialogTitle>
+        <DialogTitle>{isEdition ? 'Modifier ' : 'Créer '} une cohorte</DialogTitle>
 
         <DialogContent>
           <Grid container direction="column" className={classes.inputContainer}>
@@ -114,7 +105,6 @@ const ModalEditCohort: React.FC<{
               autoFocus
               id="title"
               margin="normal"
-              variant="outlined"
               fullWidth
               error={error === ERROR_TITLE}
               helperText={
@@ -127,7 +117,7 @@ const ModalEditCohort: React.FC<{
             />
           </Grid>
 
-          <Grid container direction="column" className={classes.inputContainer}>
+          <Grid container direction="column">
             <Typography variant="h3">Description :</Typography>
             <TextField
               placeholder="Description"
@@ -135,7 +125,6 @@ const ModalEditCohort: React.FC<{
               onChange={(e: any) => onChangeValue('description', e.target.value)}
               id="description"
               margin="normal"
-              variant="outlined"
               fullWidth
               multiline
               minRows={5}
@@ -156,7 +145,7 @@ const ModalEditCohort: React.FC<{
             Annuler
           </Button>
 
-          <Button disabled={loading} onClick={handleConfirm} color="primary">
+          <Button disabled={loading} onClick={handleConfirm}>
             {isEdition ? 'Modifier' : 'Créer'}
           </Button>
         </DialogActions>
@@ -169,14 +158,14 @@ const ModalEditCohort: React.FC<{
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle className={classes.title}>Supprimer une cohorte</DialogTitle>
+        <DialogTitle>Supprimer une cohorte</DialogTitle>
 
         <DialogContent>
-          <Typography>Êtes-vous sur de vouloir supprimer cette cohorte ?</Typography>
+          <Typography>Êtes-vous sûr(e) de vouloir supprimer cette cohorte ?</Typography>
         </DialogContent>
 
         <DialogActions>
-          <Button disabled={loading} onClick={handleClose} color="primary">
+          <Button disabled={loading} onClick={handleClose}>
             Annuler
           </Button>
 

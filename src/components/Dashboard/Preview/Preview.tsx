@@ -1,22 +1,16 @@
 import React from 'react'
 import {
-  CssBaseline,
-  // Chip,
+  CircularProgress,
   Grid,
   Paper,
-  // IconButton,
   TableCell,
   TableRow,
   TableHead,
   Table,
   TableBody,
   TableContainer,
-  CircularProgress,
   Typography
-} from '@material-ui/core'
-
-// import CloseIcon from '@material-ui/icons/Close'
-// import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
+} from '@mui/material'
 
 import PieChart from './Charts/PieChart'
 import BarChart from './Charts/BarChart'
@@ -30,7 +24,6 @@ import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import displayDigit from 'utils/displayDigit'
 
 import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
-// import { Skeleton } from '@material-ui/lab'
 
 type RepartitionTableProps = {
   genderRepartitionMap?: GenderRepartitionType
@@ -125,57 +118,112 @@ const Preview: React.FC<PreviewProps> = ({
 
   return (
     <Grid container direction="column" alignItems="center" className={classes.root}>
-      <CssBaseline />
-      <Grid container direction="column" xs={11} item justifyContent="space-between">
-        <Grid container item justifyContent="space-between" alignItems="center">
-          <Grid container item xs={12} sm={6} md={4} justifyContent="center">
-            <Paper id="patient-number-card" className={classes.nbPatientsOverlay}>
+      <Grid container item justifyContent="space-between" alignItems="center">
+        <Grid container item xs={12} sm={6} md={4} justifyContent="center">
+          <Paper id="patient-number-card" className={classes.nbPatientsOverlay}>
+            <Grid container item className={classes.chartTitle}>
+              <Typography id="patient-number-card-title" variant="h3" color="primary">
+                Nombre de patients
+              </Typography>
+            </Grid>
+
+            {loading || !total ? (
+              <Grid className={classes.progressContainer}>
+                <CircularProgress />
+              </Grid>
+            ) : (
+              <Typography id="patient-number-card-value" variant="h4" className={classes.nbPatients}>
+                {displayDigit(total)} patients
+              </Typography>
+            )}
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={8}>
+          <RepartitionTable genderRepartitionMap={genderRepartitionMap} loading={loading} />
+        </Grid>
+      </Grid>
+
+      <Grid container>
+        <Grid container item xs={12} sm={6} lg={4} justifyContent="center">
+          <Paper id="vital-repartition-card" className={classes.chartOverlay}>
+            <Grid container item className={classes.chartTitle}>
+              <Typography id="vital-repartition-card-title" variant="h3" color="primary">
+                Répartition par statut vital
+              </Typography>
+            </Grid>
+
+            {loading || !vitalStatusData ? (
+              <Grid className={classes.progressContainer}>
+                <CircularProgress />
+              </Grid>
+            ) : (
+              <PieChart data={vitalStatusData ?? []} />
+            )}
+          </Paper>
+        </Grid>
+
+        <Grid container item xs={12} sm={6} lg={4} justifyContent="center">
+          <Paper id="visit-type-repartition-card" className={classes.chartOverlay}>
+            <Grid container item className={classes.chartTitle}>
+              <Typography id="visit-type-repartition-card-title" variant="h3" color="primary">
+                Répartition par type de visite
+              </Typography>
+            </Grid>
+
+            {loading ? (
+              <Grid className={classes.progressContainer}>
+                <CircularProgress />
+              </Grid>
+            ) : (
+              <DonutChart data={visitTypeRepartitionData} />
+            )}
+          </Paper>
+        </Grid>
+
+        <Grid container item xs={12} sm={12} lg={4} justifyContent="center">
+          <Paper id="gender-repartition-card" className={classes.chartOverlay}>
+            <Grid container item className={classes.chartTitle}>
+              <Typography id="gender-repartition-card-title" variant="h3" color="primary">
+                Répartition par genre
+              </Typography>
+            </Grid>
+
+            {loading ? (
+              <Grid className={classes.progressContainer}>
+                <CircularProgress />
+              </Grid>
+            ) : (
+              <BarChart data={genderData} />
+            )}
+          </Paper>
+        </Grid>
+
+        <Grid container item md={12} lg={6} justifyContent="center">
+          <Grid container item justifyContent="center">
+            <Paper id="age-structure-card" className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
-                <Typography id="patient-number-card-title" variant="h3" color="primary">
-                  Nombre de patients
+                <Typography id="age-structure-card-title" variant="h3" color="primary">
+                  Pyramide des âges
                 </Typography>
               </Grid>
 
-              {loading || !total ? (
+              {loading ? (
                 <Grid className={classes.progressContainer}>
                   <CircularProgress />
                 </Grid>
               ) : (
-                <Typography id="patient-number-card-value" variant="h4" className={classes.nbPatients}>
-                  {displayDigit(total)} patients
-                </Typography>
+                <PyramidChart data={agePyramidData} />
               )}
             </Paper>
-          </Grid>
-          <Grid item xs={12} sm={6} md={8}>
-            <RepartitionTable genderRepartitionMap={genderRepartitionMap} loading={loading} />
           </Grid>
         </Grid>
 
-        <Grid container>
-          <Grid container item xs={12} sm={6} lg={4} justifyContent="center">
-            <Paper id="vital-repartition-card" className={classes.chartOverlay}>
+        <Grid container item md={12} lg={6} justifyContent="center">
+          <Grid container item justifyContent="center">
+            <Paper id="month-repartition-visit-card" className={classes.chartOverlay}>
               <Grid container item className={classes.chartTitle}>
-                <Typography id="vital-repartition-card-title" variant="h3" color="primary">
-                  Répartition par statut vital
-                </Typography>
-              </Grid>
-
-              {loading || !vitalStatusData ? (
-                <Grid className={classes.progressContainer}>
-                  <CircularProgress />
-                </Grid>
-              ) : (
-                <PieChart data={vitalStatusData ?? []} />
-              )}
-            </Paper>
-          </Grid>
-
-          <Grid container item xs={12} sm={6} lg={4} justifyContent="center">
-            <Paper id="visit-type-repartition-card" className={classes.chartOverlay}>
-              <Grid container item className={classes.chartTitle}>
-                <Typography id="visit-type-repartition-card-title" variant="h3" color="primary">
-                  Répartition par type de visite
+                <Typography id="month-repartition-visit-card-title" variant="h3" color="primary">
+                  Répartition des visites par mois
                 </Typography>
               </Grid>
 
@@ -184,67 +232,9 @@ const Preview: React.FC<PreviewProps> = ({
                   <CircularProgress />
                 </Grid>
               ) : (
-                <DonutChart data={visitTypeRepartitionData} />
+                <GroupedBarChart data={monthlyVisitData} />
               )}
             </Paper>
-          </Grid>
-
-          <Grid container item xs={12} sm={12} lg={4} justifyContent="center">
-            <Paper id="gender-repartition-card" className={classes.chartOverlay}>
-              <Grid container item className={classes.chartTitle}>
-                <Typography id="gender-repartition-card-title" variant="h3" color="primary">
-                  Répartition par genre
-                </Typography>
-              </Grid>
-
-              {loading ? (
-                <Grid className={classes.progressContainer}>
-                  <CircularProgress />
-                </Grid>
-              ) : (
-                <BarChart data={genderData} />
-              )}
-            </Paper>
-          </Grid>
-
-          <Grid container item md={12} lg={6} justifyContent="center">
-            <Grid container item justifyContent="center">
-              <Paper id="age-structure-card" className={classes.chartOverlay}>
-                <Grid container item className={classes.chartTitle}>
-                  <Typography id="age-structure-card-title" variant="h3" color="primary">
-                    Pyramide des âges
-                  </Typography>
-                </Grid>
-
-                {loading ? (
-                  <Grid className={classes.progressContainer}>
-                    <CircularProgress />
-                  </Grid>
-                ) : (
-                  <PyramidChart data={agePyramidData} />
-                )}
-              </Paper>
-            </Grid>
-          </Grid>
-
-          <Grid container item md={12} lg={6} justifyContent="center">
-            <Grid container item justifyContent="center">
-              <Paper id="month-repartition-visit-card" className={classes.chartOverlay}>
-                <Grid container item className={classes.chartTitle}>
-                  <Typography id="month-repartition-visit-card-title" variant="h3" color="primary">
-                    Répartition des visites par mois
-                  </Typography>
-                </Grid>
-
-                {loading ? (
-                  <Grid className={classes.progressContainer}>
-                    <CircularProgress />
-                  </Grid>
-                ) : (
-                  <GroupedBarChart data={monthlyVisitData} />
-                )}
-              </Paper>
-            </Grid>
           </Grid>
         </Grid>
       </Grid>

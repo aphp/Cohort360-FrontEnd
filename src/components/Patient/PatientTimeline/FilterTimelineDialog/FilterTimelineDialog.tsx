@@ -1,16 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  TextField,
-  Typography
-} from '@material-ui/core'
-import { Autocomplete } from '@material-ui/lab'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from '@mui/material'
+import { Autocomplete } from '@mui/lab'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
@@ -53,40 +44,31 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle className={classes.title}>Filtrer par :</DialogTitle>
+      <DialogTitle>Filtrer par :</DialogTitle>
       <DialogContent className={classes.dialog}>
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column">
           <Typography variant="h3">Type de diagnostics :</Typography>
           <Autocomplete
             multiple
             onChange={_onChangeSelectedDiagnosticTypes}
             options={diagnosticTypesList}
             value={currentSelectedTypes}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             disableCloseOnSelect
             getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.label)}
-            renderOption={(diagnosticType: any) => (
-              <React.Fragment>{capitalizeFirstLetter(diagnosticType.label)}</React.Fragment>
+            renderOption={(props, diagnosticType: any) => (
+              <li {...props}>{capitalizeFirstLetter(diagnosticType.label)}</li>
             )}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="outlined"
-                label="Types de diagnostics"
-                placeholder="Sélectionner type(s) de diagnostics"
-              />
+              <TextField {...params} label="Types de diagnostics" placeholder="Sélectionner type(s) de diagnostics" />
             )}
             className={classes.autocomplete}
           />
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Annuler
-        </Button>
-        <Button onClick={_onSubmit} color="primary">
-          Valider
-        </Button>
+        <Button onClick={onClose}>Annuler</Button>
+        <Button onClick={_onSubmit}>Valider</Button>
       </DialogActions>
     </Dialog>
   )

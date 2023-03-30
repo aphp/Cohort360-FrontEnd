@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 
-import { Checkbox, CssBaseline, Grid, Typography } from '@material-ui/core'
-import Alert from '@material-ui/lab/Alert'
+import { Alert, Checkbox, Grid, Typography } from '@mui/material'
 
 import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
@@ -23,7 +22,7 @@ import services from 'services/aphp'
 
 import { buildDocumentFiltersChips } from 'utils/chips'
 
-import { docTypes } from 'assets/docTypes.json'
+import docTypes from 'assets/docTypes.json'
 
 import { useDebounce } from 'utils/debounce'
 
@@ -209,7 +208,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         }))
         break
       case 'selectedDocTypes': {
-        const typesName = docTypes
+        const typesName = docTypes.docTypes
           .map((docType: any) => docType.type)
           .filter((item, index, array) => array.indexOf(item) === index)
         const isGroupItem = typesName.find((typeName) => typeName === value)
@@ -238,67 +237,63 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   return (
     <>
       <Grid container direction="column" alignItems="center">
-        <CssBaseline />
-        <Grid container item xs={11} justifyContent="space-between">
-          <DataTableTopBar
-            loading={loadingStatus}
-            results={[documentsResult, patientsResult]}
-            searchBar={{
-              type: 'document',
-              value: searchInput ? onFilterValue() : '',
-              searchBy: searchBy,
-              onSearch: (newSearchInput: string, newSearchBy: SearchByTypes) => onSearch(newSearchInput, newSearchBy),
-              error: searchInputError
-            }}
-            buttons={[
-              {
-                label: 'Filtrer',
-                icon: <FilterList height="15px" fill="#FFF" />,
-                onClick: handleOpenDialog
-              }
-            ]}
-          />
+        <DataTableTopBar
+          loading={loadingStatus}
+          results={[documentsResult, patientsResult]}
+          searchBar={{
+            type: 'document',
+            value: searchInput ? onFilterValue() : '',
+            searchBy: searchBy,
+            onSearch: (newSearchInput: string, newSearchBy: SearchByTypes) => onSearch(newSearchInput, newSearchBy),
+            error: searchInputError
+          }}
+          buttons={[
+            {
+              label: 'Filtrer',
+              icon: <FilterList height="15px" fill="#FFF" />,
+              onClick: handleOpenDialog
+            }
+          ]}
+        />
 
-          <MasterChips chips={buildDocumentFiltersChips(filters, handleDeleteChip)} />
+        <MasterChips chips={buildDocumentFiltersChips(filters, handleDeleteChip)} />
 
-          {deidentifiedBoolean ? (
-            <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
-              Attention : Les données identifiantes des patients sont remplacées par des informations fictives dans les
-              résultats de la recherche et dans les documents prévisualisés.
-            </Alert>
-          ) : (
-            <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
-              Attention : La recherche textuelle est pseudonymisée (les données identifiantes des patients sont
-              remplacées par des informations fictives). Vous retrouverez les données personnelles de votre patient en
-              cliquant sur l'aperçu.
-            </Alert>
-          )}
+        {deidentifiedBoolean ? (
+          <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
+            Attention : Les données identifiantes des patients sont remplacées par des informations fictives dans les
+            résultats de la recherche et dans les documents prévisualisés.
+          </Alert>
+        ) : (
+          <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
+            Attention : La recherche textuelle est pseudonymisée (les données identifiantes des patients sont remplacées
+            par des informations fictives). Vous retrouverez les données personnelles de votre patient en cliquant sur
+            l'aperçu.
+          </Alert>
+        )}
 
-          {!deidentifiedBoolean && (
-            <Grid container item alignItems="center" justifyContent="flex-end">
-              <Checkbox
-                checked={filters.onlyPdfAvailable}
-                onChange={() => onChangeOptions('onlyPdfAvailable', !filters.onlyPdfAvailable)}
-                color="primary"
-              />
-              <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
-            </Grid>
-          )}
+        {!deidentifiedBoolean && (
+          <Grid container item alignItems="center" justifyContent="flex-end">
+            <Checkbox
+              checked={filters.onlyPdfAvailable}
+              onChange={() => onChangeOptions('onlyPdfAvailable', !filters.onlyPdfAvailable)}
+            />
+            <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
+          </Grid>
+        )}
 
-          <DataTableComposition
-            showIpp
-            loading={loadingStatus ?? false}
-            deidentified={deidentifiedBoolean ?? true}
-            searchMode={searchMode}
-            groupId={groupId}
-            documentsList={documents ?? []}
-            order={order}
-            setOrder={setOrder}
-            page={page}
-            setPage={(newPage: number) => handleChangePage(newPage)}
-            total={documentsResult.nb}
-          />
-        </Grid>
+        <DataTableComposition
+          showIpp
+          loading={loadingStatus ?? false}
+          deidentified={deidentifiedBoolean ?? true}
+          searchMode={searchMode}
+          groupId={groupId}
+          documentsList={documents ?? []}
+          order={order}
+          setOrder={setOrder}
+          page={page}
+          setPage={(newPage: number) => handleChangePage(newPage)}
+          total={documentsResult.nb}
+        />
       </Grid>
 
       <ModalDocumentFilters

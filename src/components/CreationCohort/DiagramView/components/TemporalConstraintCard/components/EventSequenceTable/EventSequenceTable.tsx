@@ -12,8 +12,8 @@ import {
   TableRow,
   Tooltip,
   Typography
-} from '@material-ui/core'
-import DeleteIcon from '@material-ui/icons/Delete'
+} from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 import { useAppSelector } from 'state'
 
@@ -132,7 +132,7 @@ const EventSequenceTable: React.FC<{ temporalConstraints: TemporalConstraintsTyp
           </TableRow>
         </TableHead>
         <TableBody>
-          {!temporalConstraints || temporalConstraints?.length === 0 ? (
+          {!temporalConstraints || temporalConstraints?.length === 1 ? (
             <TableRow>
               <TableCell colSpan={7}>
                 <Typography className={classes.loadingSpinnerContainer}>

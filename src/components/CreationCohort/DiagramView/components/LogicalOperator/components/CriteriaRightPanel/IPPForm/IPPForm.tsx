@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
-import { Button, Divider, FormLabel, Grid, IconButton, Switch, Typography, TextField } from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
+import { Alert, Button, Divider, FormLabel, Grid, IconButton, Switch, Typography, TextField } from '@mui/material'
 
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import InputSearchDocumentSimple from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentSimple'
 
@@ -93,7 +92,6 @@ const IPPForm: React.FC<IPPFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            variant="outlined"
             value={defaultValues.title}
             onChange={(e) => _onChangeValue('title', e.target.value)}
           />
@@ -110,6 +108,7 @@ const IPPForm: React.FC<IPPFormProps> = (props) => {
               id="criteria-inclusive"
               checked={!defaultValues.isInclusive}
               onChange={(event) => _onChangeValue('isInclusive', !event.target.checked)}
+              color="secondary"
             />
           </Grid>
 
@@ -134,18 +133,11 @@ const IPPForm: React.FC<IPPFormProps> = (props) => {
 
         <Grid className={classes.criteriaActionContainer}>
           {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
+            <Button onClick={goBack} variant="outlined">
               Annuler
             </Button>
           )}
-          <Button
-            onClick={_onSubmit}
-            disabled={error}
-            type="submit"
-            form="ipp-form"
-            color="primary"
-            variant="contained"
-          >
+          <Button onClick={_onSubmit} disabled={error} type="submit" form="ipp-form" variant="contained">
             Confirmer
           </Button>
         </Grid>

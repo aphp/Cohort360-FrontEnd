@@ -1,6 +1,7 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   criteriaItem: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -26,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     width: 'calc(100% - 80px)',
     position: 'relative',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       flexWrap: 'wrap'
     }
   },

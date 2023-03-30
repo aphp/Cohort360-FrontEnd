@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
 
-import Button from '@material-ui/core/Button'
-import Grid from '@material-ui/core/Grid'
-import Paper from '@material-ui/core/Paper'
-import Typography from '@material-ui/core/Typography'
+import Button from '@mui/material/Button'
+import Grid from '@mui/material/Grid'
+import Paper from '@mui/material/Paper'
+import Typography from '@mui/material/Typography'
 
 import ScopeTree from 'components/ScopeTree/ScopeTree'
 import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
@@ -18,7 +18,7 @@ import useStyles from './styles'
 
 const Scope = () => {
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
   const [selectedItems, setSelectedItem] = useState([])
@@ -38,7 +38,7 @@ const Scope = () => {
     _selectedItems = filterScopeTree(_selectedItems)
 
     const perimetresIds = _selectedItems.map((_selected) => _selected.cohort_id ?? null)
-    history.push(`/perimeters?${perimetresIds}`)
+    navigate(`/perimeters?${perimetresIds}`)
   }
 
   return (
@@ -49,6 +49,7 @@ const Scope = () => {
       className={clsx(classes.appBar, {
         [classes.appBarShift]: open
       })}
+      style={{ height: '100%', overflow: 'auto' }}
     >
       <Grid container justifyContent="center" alignItems="center">
         <Grid container item xs={11} direction="column">
@@ -69,7 +70,7 @@ const Scope = () => {
         <Grid
           container
           item
-          xs={10}
+          xs={11}
           justifyContent="center"
           className={clsx(classes.bottomBar, {
             [classes.bottomBarShift]: open

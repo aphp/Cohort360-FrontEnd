@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 
-import Button from '@material-ui/core/Button'
-import Divider from '@material-ui/core/Divider'
-import Grid from '@material-ui/core/Grid'
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
 import useStyles from './styles'
 
-import Typography from '@material-ui/core/Typography'
-import CircularProgress from '@material-ui/core/CircularProgress'
+import Typography from '@mui/material/Typography'
+import CircularProgress from '@mui/material/CircularProgress'
 import services from 'services/aphp'
 
 import displayDigit from 'utils/displayDigit'

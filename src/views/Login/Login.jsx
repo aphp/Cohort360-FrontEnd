@@ -1,24 +1,22 @@
 import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import localforage from 'localforage'
 
 import {
+  Alert,
   Button,
-  TextField,
+  CircularProgress,
   Grid,
-  Box,
-  Typography,
-  Link,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
   DialogContentText,
-  DialogActions,
-  CircularProgress,
-  Snackbar
-} from '@material-ui/core'
-
-import { Alert } from '@material-ui/lab'
+  DialogTitle,
+  Link,
+  Snackbar,
+  TextField,
+  Typography
+} from '@mui/material'
 
 import NoRights from 'components/ErrorView/NoRights'
 
@@ -89,7 +87,7 @@ const LegalMentionDialog = ({ open, setOpen }) => {
 }
 
 const Login = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const classes = useStyles()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
@@ -149,7 +147,7 @@ const Login = () => {
 
       const oldPath = localStorage.getItem('old-path')
       localStorage.removeItem('old-path')
-      history.push(oldPath ?? '/home')
+      navigate(oldPath ?? '/home')
     } else {
       setLoading(false)
       setError(true)
@@ -271,68 +269,60 @@ const Login = () => {
           alignItems="center"
           className={classes.rightPanel}
         >
-          <Grid container item xs={8} lg={6} direction="column" alignItems="center">
+          <Grid container xs={8} lg={6} direction="column" alignItems="center" justifyContent="center">
             <img className={classes.logo} src={logo} alt="Logo Cohort360" />
 
             <Typography color="primary" className={classes.bienvenue}>
               Bienvenue ! Connectez-vous.
             </Typography>
 
-            <form className={classes.form} noValidate onSubmit={_onSubmit}>
-              <Grid container item direction="column" alignItems="center">
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  id="identifiant"
-                  label="Identifiant"
-                  name="Identifiant"
-                  autoComplete="Identifiant"
-                  autoFocus
-                  onChange={(event) => setUsername(event.target.value)}
-                />
+            <Grid container direction="column" alignItems="center" justifyContent="center" className={classes.form}>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="identifiant"
+                label="Identifiant"
+                name="Identifiant"
+                autoComplete="Identifiant"
+                autoFocus
+                onChange={(event) => setUsername(event.target.value)}
+              />
 
-                <TextField
-                  variant="outlined"
-                  margin="normal"
-                  required
-                  fullWidth
-                  name="Votre mot de passe"
-                  label="Votre mot de passe"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  onChange={(event) => setPassword(event.target.value)}
-                />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="Votre mot de passe"
+                label="Votre mot de passe"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                onChange={(event) => setPassword(event.target.value)}
+              />
 
-                <Typography align="center" className={classes.mention}>
-                  <Link href="#" onClick={() => setOpen(true)}>
-                    En cliquant sur &quot;connexion&quot;, vous acceptez la mention légale.
-                  </Link>
-                </Typography>
+              <Typography align="center" className={classes.mention}>
+                <Link href="#" onClick={() => setOpen(true)} underline="hover">
+                  En cliquant sur &quot;connexion&quot;, vous acceptez la mention légale.
+                </Link>
+              </Typography>
 
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                  id="connection-button-submit"
-                >
-                  {loading ? <CircularProgress /> : 'Connexion'}
-                </Button>
-              </Grid>
-
-              <Box mt={10} align="center">
-                <Grid container justifyContent="center">
-                  <Link href="https://eds.aphp.fr">
-                    <img className={classes.logoAPHP} src={logoAPHP} alt="Footer" />
-                  </Link>
-                </Grid>
-              </Box>
-            </form>
+              <Button
+                type="submit"
+                onClick={_onSubmit}
+                variant="contained"
+                className={classes.submit}
+                id="connection-button-submit"
+              >
+                {loading ? <CircularProgress /> : 'Connexion'}
+              </Button>
+            </Grid>
           </Grid>
+          {/* <Grid container justifyContent="center"> */}
+          <Link href="https://eds.aphp.fr">
+            <img className={classes.logoAPHP} src={logoAPHP} alt="Footer" />
+          </Link>
+          {/* </Grid> */}
         </Grid>
       </Grid>
 

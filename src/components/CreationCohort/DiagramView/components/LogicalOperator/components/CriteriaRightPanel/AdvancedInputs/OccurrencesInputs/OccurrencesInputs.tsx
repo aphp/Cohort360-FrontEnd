@@ -11,10 +11,10 @@ import {
   Tooltip,
   TextField,
   Select
-} from '@material-ui/core'
+} from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
-import InfoIcon from '@material-ui/icons/Info'
+import ClearIcon from '@mui/icons-material/Clear'
+import InfoIcon from '@mui/icons-material/Info'
 
 import useStyles from './styles'
 
@@ -59,7 +59,6 @@ const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
           id="criteria-occurrenceComparator-select"
           value={selectedCriteria.occurrenceComparator}
           onChange={(event) => onChangeValue('occurrenceComparator', event.target.value as string)}
-          variant="outlined"
         >
           <MenuItem value={'<='}>{'<='}</MenuItem>
           <MenuItem value={'<'}>{'<'}</MenuItem>
@@ -75,7 +74,6 @@ const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
           }}
           type="number"
           id="criteria-occurrence-required"
-          variant="outlined"
           value={selectedCriteria.occurrence}
           onChange={(e) => onChangeValue('occurrence', e.target.value)}
         />

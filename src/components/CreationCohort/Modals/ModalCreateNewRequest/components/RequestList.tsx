@@ -10,10 +10,10 @@ import {
   ListItemText,
   Typography,
   Radio
-} from '@material-ui/core'
+} from '@mui/material'
 
-import ExpandLessIcon from '@material-ui/icons/ExpandLess'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import { RequestType, ProjectType } from 'types'
 
@@ -74,6 +74,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
                   <Radio
                     checked={selectedItem === request.uuid}
                     onChange={() => onSelectedItem(request.uuid as string)}
+                    color="secondary"
                   />
                 </ListItemSecondaryAction>
               </ListItem>

@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import { KeyboardDatePicker } from '@material-ui/pickers'
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import 'moment/locale/fr'
 
 import {
+  Autocomplete,
   Button,
   Dialog,
   DialogActions,
@@ -14,10 +17,9 @@ import {
   IconButton,
   TextField,
   Typography
-} from '@material-ui/core'
-import { Autocomplete } from '@material-ui/lab'
+} from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 
 import services from 'services/aphp'
 
@@ -107,13 +109,12 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle className={classes.title}>Filtrer par :</DialogTitle>
+      <DialogTitle>Filtrer par :</DialogTitle>
       <DialogContent className={classes.dialog}>
         {!deidentified && (
           <Grid container direction="column" className={classes.filter}>
             <Typography variant="h3">NDA :</Typography>
             <TextField
-              variant="outlined"
               margin="normal"
               fullWidth
               autoFocus
@@ -126,7 +127,6 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Code :</Typography>
           <TextField
-            variant="outlined"
             margin="normal"
             fullWidth
             autoFocus
@@ -145,67 +145,66 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
               value={_selectedDiagnosticTypes}
               disableCloseOnSelect
               getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.label)}
-              renderOption={(diagnosticType: any) => (
-                <React.Fragment>{capitalizeFirstLetter(diagnosticType.label)}</React.Fragment>
+              renderOption={(props, diagnosticType: any) => (
+                <li {...props}>{capitalizeFirstLetter(diagnosticType.label)}</li>
               )}
               renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant="outlined"
-                  label="Types de diagnostics"
-                  placeholder="Sélectionner type(s) de diagnostics"
-                />
+                <TextField {...params} label="Types de diagnostics" placeholder="Sélectionner type(s) de diagnostics" />
               )}
               className={classes.autocomplete}
             />
           </Grid>
         )}
 
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column">
           <Typography variant="h3">Date :</Typography>
-          <Grid container alignItems="baseline" className={classes.datePickers}>
+          <Grid container alignItems="center" className={classes.datePickers}>
             <FormLabel component="legend" className={classes.dateLabel}>
               Après le :
             </FormLabel>
-            <KeyboardDatePicker
-              clearable
-              error={dateError}
-              style={{ width: 'calc(100% - 120px)' }}
-              invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
-              format="DD/MM/YYYY"
-              onChange={(date) => setStartDate(date ?? null)}
-              value={_startDate}
-            />
+            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+              <DatePicker
+                onChange={(date) => setStartDate(date ?? null)}
+                value={_startDate}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    variant="standard"
+                    error={dateError}
+                    helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
+                    style={{ width: 'calc(100% - 120px)' }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
             {_startDate !== null && (
-              <IconButton
-                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
-                color="primary"
-                onClick={() => setStartDate(null)}
-              >
+              <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setStartDate(null)}>
                 <ClearIcon />
               </IconButton>
             )}
           </Grid>
 
-          <Grid container alignItems="baseline" className={classes.datePickers}>
+          <Grid container alignItems="center" className={classes.datePickers}>
             <FormLabel component="legend" className={classes.dateLabel}>
               Avant le :
             </FormLabel>
-            <KeyboardDatePicker
-              clearable
-              error={dateError}
-              style={{ width: 'calc(100% - 120px)' }}
-              invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
-              format="DD/MM/YYYY"
-              onChange={setEndDate}
-              value={_endDate}
-            />
+            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+              <DatePicker
+                onChange={(date) => setEndDate(date ?? null)}
+                value={_endDate}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    variant="standard"
+                    error={dateError}
+                    helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
+                    style={{ width: 'calc(100% - 120px)' }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
             {_endDate !== null && (
-              <IconButton
-                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
-                color="primary"
-                onClick={() => setEndDate(null)}
-              >
+              <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setEndDate(null)}>
                 <ClearIcon />
               </IconButton>
             )}
@@ -218,10 +217,8 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Annuler
-        </Button>
-        <Button onClick={_onSubmit} color="primary" disabled={dateError}>
+        <Button onClick={onClose}>Annuler</Button>
+        <Button onClick={_onSubmit} disabled={dateError}>
           Valider
         </Button>
       </DialogActions>

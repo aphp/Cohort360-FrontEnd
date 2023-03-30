@@ -2,7 +2,7 @@ import React from 'react'
 
 import { CohortPatient, IPatientDetails } from 'types'
 
-import Grid from '@material-ui/core/Grid'
+import Grid from '@mui/material/Grid'
 
 import PatientTitle from './PatientTitle/PatientTitle'
 import PatientInfo from './PatientInfo/PatientInfo'
@@ -34,7 +34,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
       }`
 
   return (
-    <Grid container direction="row" justifyContent="center" alignItems="center" className={classes.root}>
+    <Grid container justifyContent="center" alignItems="center" className={classes.root}>
       <Grid container item xs={11} justifyContent="center" alignItems="center">
         <Grid container item xs={9}>
           <PatientTitle firstName={firstName} lastName={lastName} />

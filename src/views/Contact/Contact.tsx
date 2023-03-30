@@ -3,6 +3,7 @@ import { useAppSelector } from 'state'
 import clsx from 'clsx'
 
 import {
+  Alert,
   Button,
   CircularProgress,
   CssBaseline,
@@ -12,8 +13,7 @@ import {
   Snackbar,
   TextField,
   Typography
-} from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
+} from '@mui/material'
 
 import services from 'services/aphp'
 
@@ -133,7 +133,6 @@ const Contact: React.FC = () => {
                   required
                   value={contactRequest.requestType}
                   onChange={(event) => _onChangeValue('requestType', event.target.value as string)}
-                  variant="outlined"
                   style={{ marginTop: 16, marginBottom: 24, backgroundColor: 'white' }}
                   error={error === ERROR_REQUEST_TYPE}
                 >
@@ -151,7 +150,6 @@ const Contact: React.FC = () => {
                   value={contactRequest.object}
                   onChange={(event) => _onChangeValue('object', event.target.value)}
                   margin="normal"
-                  variant="outlined"
                   fullWidth
                   style={{ marginBottom: 24, backgroundColor: 'white' }}
                   error={error === ERROR_OBJECT}
@@ -165,7 +163,6 @@ const Contact: React.FC = () => {
                       value={contactRequest.url}
                       onChange={(event) => _onChangeValue('url', event.target.value)}
                       margin="normal"
-                      variant="outlined"
                       fullWidth
                       style={{ marginBottom: 24, backgroundColor: 'white' }}
                     />
@@ -179,7 +176,6 @@ const Contact: React.FC = () => {
                   value={contactRequest.message}
                   onChange={(event) => _onChangeValue('message', event.target.value)}
                   margin="normal"
-                  variant="outlined"
                   fullWidth
                   multiline
                   minRows={5}

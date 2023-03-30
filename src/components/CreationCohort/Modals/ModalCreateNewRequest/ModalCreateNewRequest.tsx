@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   Button,
@@ -10,7 +10,7 @@ import {
   DialogTitle,
   Grid,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import RequestForm from './components/RequestForm'
 import RequestList from './components/RequestList'
@@ -35,7 +35,7 @@ const ModalCreateNewRequest: React.FC<{
   onClose?: () => void
 }> = ({ onClose }) => {
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { projectState, requestState } = useAppSelector<{
     projectState: ProjectState
@@ -118,7 +118,7 @@ const ModalCreateNewRequest: React.FC<{
     if (onClose && typeof onClose === 'function') {
       onClose()
     } else {
-      history.push(`/home`)
+      navigate(`/home`)
     }
   }
 
@@ -178,9 +178,9 @@ const ModalCreateNewRequest: React.FC<{
         aria-labelledby="form-dialog-title"
       >
         {tab === 'form' ? (
-          <DialogTitle className={classes.title}>{isEdition ? 'Modification' : 'Création'} d'une requête</DialogTitle>
+          <DialogTitle>{isEdition ? 'Modification' : 'Création'} d'une requête</DialogTitle>
         ) : (
-          <DialogTitle className={classes.title}>Ouvrir une requête</DialogTitle>
+          <DialogTitle>Ouvrir une requête</DialogTitle>
         )}
         <DialogContent>
           {loading || currentRequest === null ? (
@@ -220,12 +220,7 @@ const ModalCreateNewRequest: React.FC<{
               Supprimer
             </Button>
           ) : (
-            <Button
-              variant="contained"
-              color="primary"
-              disabled={loading}
-              onClick={() => setTab(tab === 'form' ? 'open' : 'form')}
-            >
+            <Button variant="contained" disabled={loading} onClick={() => setTab(tab === 'form' ? 'open' : 'form')}>
               {tab === 'form' ? 'Ouvrir' : 'Nouvelle requête'}
             </Button>
           )}
@@ -236,11 +231,11 @@ const ModalCreateNewRequest: React.FC<{
             Annuler
           </Button>
           {tab === 'form' ? (
-            <Button disabled={loading} onClick={handleConfirm} color="primary">
+            <Button disabled={loading} onClick={handleConfirm}>
               {isEdition ? 'Modifier' : 'Créer'}
             </Button>
           ) : (
-            <Button disabled={loading || openRequest === null} onClick={handleConfirmOpen} color="primary">
+            <Button disabled={loading || openRequest === null} onClick={handleConfirmOpen}>
               Ouvrir
             </Button>
           )}
@@ -255,14 +250,14 @@ const ModalCreateNewRequest: React.FC<{
           onClose={handleClose}
           aria-labelledby="form-dialog-title"
         >
-          <DialogTitle className={classes.title}>Supprimer une requête</DialogTitle>
+          <DialogTitle>Supprimer une requête</DialogTitle>
 
           <DialogContent>
-            <Typography>Êtes-vous sur de vouloir supprimer cette requête ?</Typography>
+            <Typography>Êtes-vous sûr(e) de vouloir supprimer cette requête ?</Typography>
           </DialogContent>
 
           <DialogActions>
-            <Button disabled={loading} onClick={handleClose} color="primary">
+            <Button disabled={loading} onClick={handleClose}>
               Annuler
             </Button>
 

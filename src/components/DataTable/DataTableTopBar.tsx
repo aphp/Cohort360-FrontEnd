@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 
 import {
   Button,
+  CircularProgress,
+  SelectChangeEvent,
   FormControl,
   InputAdornment,
   InputBase,
@@ -13,9 +15,9 @@ import {
   Tab,
   Tabs,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
 import InputSearchDocumentSimple from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentSimple'
@@ -31,7 +33,6 @@ import {
 
 import displayDigit from 'utils/displayDigit'
 import useStyles from './styles'
-import { CircularProgress } from '@material-ui/core'
 
 type DataTableTopBarProps = {
   loading: boolean
@@ -53,9 +54,9 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
   }
 
   const handleChangeSelect = (
-    event: React.ChangeEvent<{
+    event: SelectChangeEvent<{
       name?: string | undefined
-      value: unknown
+      value: SearchByTypes
     }>
   ) => {
     setSearchBy(event.target.value as SearchByTypes)
@@ -140,11 +141,12 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
                   <FormControl variant="outlined" style={{ width: 200 }}>
                     <InputLabel>Rechercher dans :</InputLabel>
                     <Select
-                      value={searchBy}
+                      value={searchBy as any}
                       onChange={handleChangeSelect}
+                      className={classes.select}
+                      variant="outlined"
                       label="Rechercher dans :"
                       style={{ height: 42 }}
-                      className={classes.select}
                     >
                       <MenuItem value={SearchByTypes.text}>Tous les champs</MenuItem>
                       <MenuItem value={SearchByTypes.family}>Nom</MenuItem>
@@ -210,7 +212,7 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
             <FormControl variant="outlined" style={{ width: 200 }}>
               <InputLabel>Rechercher dans :</InputLabel>
               <Select
-                value={searchBy}
+                value={searchBy as any}
                 onChange={handleChangeSelect}
                 className={classes.select}
                 variant="outlined"
@@ -244,8 +246,8 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
                       : `Aux caractères ${detail.errorPositions.join(', ')} : `
                     : ''
                 }
-              ${detail.errorName ? `${detail.errorName}.` : ''}
-              ${detail.errorSolution ? `${detail.errorSolution}.` : ''}`}
+            ${detail.errorName ? `${detail.errorName}.` : ''}
+            ${detail.errorSolution ? `${detail.errorSolution}.` : ''}`}
               </Typography>
             ))}
         </Grid>

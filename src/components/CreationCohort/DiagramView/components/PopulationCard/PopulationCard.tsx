@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 
-import { Button, IconButton, Chip, CircularProgress, Typography } from '@material-ui/core'
+import { Button, IconButton, Chip, CircularProgress, Typography } from '@mui/material'
 
-import EditIcon from '@material-ui/icons/Edit'
-import CloseIcon from '@material-ui/icons/Close'
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz'
+import EditIcon from '@mui/icons-material/Edit'
+import CloseIcon from '@mui/icons-material/Close'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
 import ModalRightError from './components/ModalRightError'
 import PopulationRightPanel from './components/PopulationRightPanel'
@@ -120,7 +120,10 @@ const PopulationCard: React.FC = () => {
                     selectedPopulation.map((pop: any, index: number) => (
                       <Chip className={classes.populationChip} key={`${index}-${pop.name}`} label={pop.name} />
                     ))}
-                  <IconButton size="small" classes={{ label: classes.populationLabel }} onClick={() => onExtend(false)}>
+                  <IconButton
+                    size="small"
+                    /*classes={{ label: classes.populationLabel }}*/ onClick={() => onExtend(false)}
+                  >
                     <CloseIcon />
                   </IconButton>
                 </>
@@ -139,7 +142,7 @@ const PopulationCard: React.FC = () => {
                   {selectedPopulation && selectedPopulation.length > 4 && (
                     <IconButton
                       size="small"
-                      classes={{ label: classes.populationLabel }}
+                      /*classes={{ label: classes.populationLabel }}*/
                       onClick={() => onExtend(true)}
                     >
                       <MoreHorizIcon />

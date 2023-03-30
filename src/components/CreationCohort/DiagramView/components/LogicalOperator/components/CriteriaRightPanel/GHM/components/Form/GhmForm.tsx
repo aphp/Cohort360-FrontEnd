@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 
-import { Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@material-ui/core'
-import Alert from '@material-ui/lab/Alert'
+import { Alert, Button, Divider, FormLabel, Grid, IconButton, Switch, Typography, TextField } from '@mui/material'
 
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
@@ -109,6 +108,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
               id="criteria-inclusive"
               checked={!currentState.isInclusive}
               onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
+              color="secondary"
             />
           </Grid>
 
@@ -131,11 +131,11 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
 
         <Grid className={classes.criteriaActionContainer}>
           {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
+            <Button onClick={goBack} variant="outlined">
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="cim10-form" color="primary" variant="contained">
+          <Button onClick={_onSubmit} type="submit" form="cim10-form" variant="contained">
             Confirmer
           </Button>
         </Grid>

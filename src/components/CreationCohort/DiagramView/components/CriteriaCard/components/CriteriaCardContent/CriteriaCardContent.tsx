@@ -1,18 +1,18 @@
 import React, { Fragment, useState, useEffect, useRef } from 'react'
 import moment from 'moment'
 
-import Chip from '@material-ui/core/Chip'
-import IconButton from '@material-ui/core/IconButton'
-import Tooltip from '@material-ui/core/Tooltip'
-import Typography from '@material-ui/core/Typography'
+import Chip from '@mui/material/Chip'
+import IconButton from '@mui/material/IconButton'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
 
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import { useAppSelector } from 'state'
 import { DocType, SearchByTypes, SelectedCriteriaType } from 'types'
 
-import { docTypes } from 'assets/docTypes.json'
+import docTypes from 'assets/docTypes.json'
 
 import useStyles from './styles'
 
@@ -297,10 +297,11 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       case 'Composition': {
         const displaySelectedDocType = (selectedDocTypes: DocType[]) => {
           let displayingSelectedDocTypes: any[] = []
-          const allTypes = docTypes.map((docType: DocType) => docType.type)
+          const allTypes = docTypes.docTypes.map((docType: DocType) => docType.type)
 
           for (const selectedDocType of selectedDocTypes) {
-            const numberOfElementFromGroup = (allTypes.filter((type) => type === selectedDocType.type) || []).length
+            const numberOfElementFromGroup = (allTypes.filter((type: any) => type === selectedDocType.type) || [])
+              .length
             const numberOfElementSelected = (
               selectedDocTypes.filter((selectedDoc) => selectedDoc.type === selectedDocType.type) || []
             ).length

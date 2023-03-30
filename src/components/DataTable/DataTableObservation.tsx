@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { CircularProgress, Grid, Typography, TableRow, TableCell } from '@material-ui/core'
+import { CircularProgress, Grid, Typography, TableRow, TableCell } from '@mui/material'
 
 import DataTable from 'components/DataTable/DataTable'
 
@@ -58,7 +58,7 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
         </>
       ) : (
         <TableRow className={classes.emptyTableRow}>
-          <TableCell colSpan={6} align="left">
+          <TableCell colSpan={7} align="left">
             <Grid container justifyContent="center">
               {loading ? (
                 <CircularProgress />

@@ -1,10 +1,9 @@
 import React from 'react'
 
-import { Grid, Typography } from '@material-ui/core'
-import Skeleton from '@material-ui/lab/Skeleton'
+import { Grid, Skeleton, Typography } from '@mui/material'
 
 import useStyles from './styles'
-import classNames from 'classnames'
+import clsx from 'clsx'
 
 type PatientFieldProps = {
   fieldName: string
@@ -15,14 +14,7 @@ const PatientField: React.FC<PatientFieldProps> = ({ fieldName, fieldValue }) =>
 
   return (
     <Grid container>
-      <Grid
-        item
-        container
-        xs={3}
-        lg={2}
-        alignItems="center"
-        className={classNames(classes.gridItem, classes.fieldName)}
-      >
+      <Grid item container xs={3} lg={2} alignItems="center" className={clsx(classes.gridItem, classes.fieldName)}>
         <Typography variant="h6">{fieldName}</Typography>
       </Grid>
       <Grid item container xs={9} lg={10} alignItems="center" className={classes.gridItem}>

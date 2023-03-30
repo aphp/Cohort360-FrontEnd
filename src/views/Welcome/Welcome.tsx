@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router'
 import moment from 'moment'
 import clsx from 'clsx'
 
-import { Grid, Paper, Container, Typography } from '@material-ui/core'
-import Alert from '@material-ui/lab/Alert'
+import { Alert, Grid, Paper, Container, Typography } from '@mui/material'
 
 import NewsCard from 'components/Welcome/NewsCard/NewsCard'
 import PatientsCard from 'components/Welcome/PatientsCard/PatientsCard'
@@ -28,7 +27,7 @@ import useStyles from './styles'
 const Welcome: React.FC = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const { practitioner, open, cohortState, requestState, meState } = useAppSelector((state) => ({
     practitioner: state.me,
     open: state.drawer,
@@ -101,7 +100,11 @@ const Welcome: React.FC = () => {
         [classes.appBarShift]: open
       })}
     >
-      <Container maxWidth="lg" className={classes.container}>
+      <Container
+        maxWidth="lg"
+        className={classes.container}
+        style={{ minHeight: 'calc(100vh - 70px)', marginBottom: 8 }}
+      >
         <Typography id="homePage-title" component="h1" variant="h1" color="inherit" noWrap className={classes.title}>
           Bienvenue {practitioner.displayName}
         </Typography>
@@ -115,13 +118,6 @@ const Welcome: React.FC = () => {
         >
           {lastConnection}
         </Typography>
-      </Container>
-
-      <Container
-        maxWidth="lg"
-        className={classes.container}
-        style={{ minHeight: 'calc(100vh - 70px)', marginBottom: 8 }}
-      >
         <Grid container spacing={1}>
           {maintenanceIsActive && (
             <Alert severity="warning" style={{ marginTop: '-12px', width: '100%' }}>
@@ -171,13 +167,13 @@ const Welcome: React.FC = () => {
           </Grid>
         </Grid>
 
-        <Grid container spacing={3} style={{ paddingTop: 8 }}>
-          <Grid item xs={12} md={12} lg={12}>
+        <Grid container item style={{ paddingTop: 12 }}>
+          <Grid item xs={12}>
             <Paper id="favorite-cohort-research-card" className={classes.paper}>
               <ResearchCard
                 title={'Mes cohortes favorites'}
                 linkLabel={'Voir toutes mes cohortes favorites'}
-                onClickLink={() => history.push('/my-cohorts?fav=true')}
+                onClickLink={() => navigate('/my-cohorts?fav=true')}
                 loading={loadingCohort}
                 cohorts={favoriteCohorts}
                 listType={'FavoriteCohorts'}
@@ -185,13 +181,13 @@ const Welcome: React.FC = () => {
             </Paper>
           </Grid>
         </Grid>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={12} lg={12}>
+        <Grid container item style={{ paddingTop: 12 }}>
+          <Grid item xs={12}>
             <Paper id="last-created-cohort-research-card" className={classes.paper}>
               <ResearchCard
                 title={'Mes dernières cohortes créées'}
                 linkLabel={'Voir toutes mes cohortes'}
-                onClickLink={() => history.push('/my-cohorts')}
+                onClickLink={() => navigate('/my-cohorts')}
                 loading={loadingCohort}
                 cohorts={lastCohorts}
                 listType={'LastCohorts'}
@@ -199,13 +195,13 @@ const Welcome: React.FC = () => {
             </Paper>
           </Grid>
         </Grid>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={12} lg={12}>
+        <Grid container item style={{ paddingTop: 12 }}>
+          <Grid item xs={12}>
             <Paper id="last-created-request-research-card" className={classes.paper}>
               <ResearchCard
                 title={'Mes dernières requêtes créées'}
                 linkLabel={'Voir toutes mes requêtes'}
-                onClickLink={() => history.push('/my-requests')}
+                onClickLink={() => navigate('/my-requests')}
                 loading={loadingRequest}
                 requests={lastRequest}
               />

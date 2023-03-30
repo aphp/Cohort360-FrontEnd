@@ -13,7 +13,7 @@ import {
   MenuItem,
   Select,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { useAppSelector } from 'state'
 import { TemporalConstraintsType } from 'types'
@@ -126,13 +126,15 @@ const TemporalConstraintConfig: React.FC<{
           style={{ margin: '0 8px', minWidth: 200 }}
           error={noSelectedConstraintError && firstCriteriaValue === null}
         >
-          <InputLabel>Le critère X</InputLabel>
+          <InputLabel style={{ marginLeft: -12 }}>Le critère X</InputLabel>
           <Select
             value={firstCriteriaValue === 0 ? null : firstCriteriaValue}
             onChange={(e) => {
               setFirstCriteriaValue(e.target.value as number)
             }}
             classes={{ select: classes.flexBaseline }}
+            variant="standard"
+            style={{ marginTop: 4 }}
           >
             {mainGroupCriteria
               .filter((criteria) => criteria.id !== secondCriteriaValue)
@@ -152,13 +154,15 @@ const TemporalConstraintConfig: React.FC<{
           style={{ margin: '0 12px', minWidth: 200 }}
           error={noSelectedConstraintError && secondCriteriaValue === null}
         >
-          <InputLabel>le critère Y</InputLabel>
+          <InputLabel style={{ marginLeft: -12 }}>le critère Y</InputLabel>
           <Select
             value={secondCriteriaValue === 0 ? null : secondCriteriaValue}
             onChange={(e) => {
               setSecondCriteriaValue(e.target.value as number)
             }}
             classes={{ select: classes.flexBaseline }}
+            variant="standard"
+            style={{ marginTop: 4 }}
           >
             {mainGroupCriteria
               .filter((criteria) => criteria.id !== firstCriteriaValue)
@@ -180,7 +184,7 @@ const TemporalConstraintConfig: React.FC<{
           value={isFirstTimeValueChecked}
           onChange={() => setIsFirstTimeValueChecked(!isFirstTimeValueChecked)}
         />
-        <Typography style={{ fontWeight: 700 }}>plus de </Typography>
+        <Typography style={{ fontWeight: 700 }}>au moins </Typography>
         <InputBase
           classes={{ root: classes.input, error: classes.inputError }}
           disabled={!isFirstTimeValueChecked}
@@ -195,8 +199,9 @@ const TemporalConstraintConfig: React.FC<{
         <Select
           disabled={!isFirstTimeValueChecked}
           value={minTimeMeasurement}
-          onChange={onChangeMinTimeMeasurement}
+          onChange={onChangeMinTimeMeasurement as any}
           error={incorrectTimingError}
+          variant="standard"
         >
           {timeMeasurements.map((timeMeasurement, index) => (
             <MenuItem key={index} value={timeMeasurement.id}>
@@ -224,8 +229,9 @@ const TemporalConstraintConfig: React.FC<{
         <Select
           disabled={!isSecondTimeValueChecked}
           value={maxTimeMeasurement}
-          onChange={onChangeMaxTimeMeasurement}
+          onChange={onChangeMaxTimeMeasurement as any}
           error={incorrectTimingError}
+          variant="standard"
         >
           {timeMeasurements.map((timeMeasurement, index) => (
             <MenuItem key={index} value={timeMeasurement.id}>
@@ -240,7 +246,7 @@ const TemporalConstraintConfig: React.FC<{
         </Typography>
       )}
       <Button className={classes.button} onClick={onConfirm} disabled={incorrectTimingError}>
-        Ajouter critère
+        Ajouter une séquence
       </Button>
     </Grid>
   )

@@ -1,4 +1,5 @@
-import { makeStyles, Theme, createStyles } from '@material-ui/core/styles'
+import { makeStyles, createStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
 const drawerWidth = 260
 
@@ -107,19 +108,15 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     miniButton: {
       borderRadius: 14,
-      minHeight: 23,
-      maxHeight: 23,
       height: 23,
-      minWidth: 23,
-      maxWidth: 23,
       width: 23,
-      margin: 0,
       marginLeft: -2,
-      padding: 0,
       backgroundColor: '#fff',
+      color: '#153D8A',
       '& svg': {
         fontSize: 18
-      }
+      },
+      '&:hover': { backgroundColor: '#d5d5d5' }
     },
     linkHover: {
       color: 'white',

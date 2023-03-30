@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-
-import { Button, Badge } from '@material-ui/core'
+import { Button, Badge } from '@mui/material'
 
 import { buildCohortCreation, deleteTemporalConstraint } from 'state/cohortCreation'
 import { useAppSelector, useAppDispatch } from 'state'

@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import clsx from 'clsx'
 import { Link, useLocation, useParams } from 'react-router-dom'
 
-import { IconButton, Grid, Tabs, Tab, CircularProgress } from '@material-ui/core'
+import { IconButton, Grid, Tabs, Tab, CircularProgress } from '@mui/material'
 
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 
 import PatientNotExist from 'components/ErrorView/PatientNotExist'
 import PatientDocs from 'components/Patient/PatientDocs/PatientDocs'
@@ -57,6 +57,7 @@ const Patient = () => {
     const _fetchPatient = async () => {
       dispatch<any>(
         fetchPatientInfo({
+          // @ts-ignore
           patientId,
           groupId
         })
@@ -102,8 +103,8 @@ const Patient = () => {
 
         <PatientHeader patient={patient?.patientInfo} deidentifiedBoolean={deidentified} />
 
-        <Grid container item md={11}>
-          <Tabs value={selectedTab} onChange={handleChangeTabs} textColor="primary">
+        <Grid container md={11}>
+          <Tabs value={selectedTab} onChange={handleChangeTabs} textColor="primary" indicatorColor="secondary">
             <Tab
               className={classes.tabTitle}
               label="Aperçu patient"
@@ -152,7 +153,7 @@ const Patient = () => {
             )}
           </Tabs>
         </Grid>
-        <Grid className={classes.tabContainer}>
+        <Grid container sm={11} className={classes.tabContainer}>
           {selectedTab === 'preview' && (
             <PatientPreview patient={patient?.patientInfo} deidentifiedBoolean={deidentified} />
           )}

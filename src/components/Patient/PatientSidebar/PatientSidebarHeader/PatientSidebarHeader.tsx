@@ -1,13 +1,12 @@
 import React from 'react'
-import moment from 'moment'
 
-import { Button, Grid, IconButton, InputBase, TextField, Typography } from '@material-ui/core'
-import { Autocomplete } from '@material-ui/lab'
+import { Button, Grid, IconButton, InputBase, TextField, Typography } from '@mui/material'
+import { Autocomplete } from '@mui/lab'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
-import LockIcon from '@material-ui/icons/Lock'
-import SortIcon from '@material-ui/icons/Sort'
+import LockIcon from '@mui/icons-material/Lock'
+import SortIcon from '@mui/icons-material/Sort'
 
 import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
 import SortDialog from 'components/Filters/SortDialog/SortDialog'
@@ -104,7 +103,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
         // @ts-ignore
         props.onChangeFilters((prevFilters) => ({
           ...prevFilters,
-          birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]
+          birthdatesRanges: ['', '']
         }))
         break
       case 'vitalStatus':
@@ -125,7 +124,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
           options={searchByNames}
           getOptionLabel={(option) => option.label}
           value={searchByNames.find((value) => value.code === props.searchBy)}
-          renderInput={(params) => <TextField {...params} />}
+          renderInput={(params) => <TextField {...params} variant="standard" />}
           onChange={_onChangeSelect}
           className={classes.autocomplete}
         />

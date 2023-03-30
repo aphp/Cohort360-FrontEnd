@@ -1,17 +1,17 @@
 import React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
-import Button from '@material-ui/core/Button'
-import Grid from '@material-ui/core/Grid'
-import Link from '@material-ui/core/Link'
-import Typography from '@material-ui/core/Typography'
-import WarningIcon from '@material-ui/icons/Report'
+import Button from '@mui/material/Button'
+import Grid from '@mui/material/Grid'
+import Link from '@mui/material/Link'
+import Typography from '@mui/material/Typography'
+import WarningIcon from '@mui/icons-material/Report'
 
 import useStyles from './styles'
 
 const NoRights = () => {
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <Grid
@@ -49,7 +49,7 @@ const NoRights = () => {
       </Grid>
 
       <Grid item>
-        <Button variant="outlined" style={{ borderColor: 'currentColor' }} onClick={() => history.go(0)}>
+        <Button variant="outlined" style={{ borderColor: 'currentColor' }} onClick={() => navigate(0)}>
           Retour à la connexion
         </Button>
       </Grid>

@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 
-import { Checkbox, Grid, Typography } from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
+import { Alert, Checkbox, Grid, Typography } from '@mui/material'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
@@ -16,8 +15,8 @@ import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'
 
 import { buildDocumentFiltersChips } from 'utils/chips'
+import docTypes from 'assets/docTypes.json'
 import { useDebounce } from 'utils/debounce'
-import { docTypes } from 'assets/docTypes.json'
 
 import useStyles from './styles'
 
@@ -127,7 +126,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         onChangeOptions(filterName, value)
         break
       case 'selectedDocTypes': {
-        const typesName = docTypes
+        const typesName = docTypes.docTypes
           .map((docType: any) => docType.type)
           .filter((item, index, array) => array.indexOf(item) === index)
         const isGroupItem = typesName.find((typeName) => typeName === value)
@@ -158,7 +157,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   }
 
   return (
-    <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
+    <Grid container justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
         loading={loading}
         results={{ nb: totalDocs, total: totalAllDoc, label: 'document(s)' }}
@@ -190,7 +189,6 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
           <Checkbox
             checked={filters.onlyPdfAvailable}
             onChange={() => onChangeOptions('onlyPdfAvailable', !filters.onlyPdfAvailable)}
-            color="primary"
           />
           <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
         </Grid>

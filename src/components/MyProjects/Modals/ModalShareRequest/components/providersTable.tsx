@@ -12,9 +12,9 @@ import {
   Paper,
   Tooltip,
   CircularProgress
-} from '@material-ui/core'
+} from '@mui/material'
 
-import DeleteIcon from '@material-ui/icons/Delete'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 import useStyles from './styles'
 import { Provider } from 'types'

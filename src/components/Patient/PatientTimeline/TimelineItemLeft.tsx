@@ -1,6 +1,6 @@
 import React from 'react'
-import Card from '@material-ui/core/Card'
-import { Chip } from '@material-ui/core'
+import Card from '@mui/material/Card'
+import { Chip } from '@mui/material'
 
 import useStyles from './styles'
 import { IEncounter } from '@ahryman40k/ts-fhir-types/lib/R4'

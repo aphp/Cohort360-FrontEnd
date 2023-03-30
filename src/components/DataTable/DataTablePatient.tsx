@@ -1,7 +1,7 @@
 import React from 'react'
 import moment from 'moment'
 
-import { CircularProgress, Grid, TableCell, TableRow, Typography, Chip } from '@material-ui/core'
+import { CircularProgress, Grid, TableCell, TableRow, Typography, Chip } from '@mui/material'
 
 import { ReactComponent as FemaleIcon } from 'assets/icones/venus.svg'
 import { ReactComponent as MaleIcon } from 'assets/icones/mars.svg'

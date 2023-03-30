@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -14,7 +14,7 @@ const useStyles = makeStyles(() => ({
     backgroundColor: '#317EAA',
     color: 'white',
     // not default
-    marginBottom: 48
+    marginBottom: 46
   },
   backButton: { color: 'white' },
   divider: { background: 'white' },

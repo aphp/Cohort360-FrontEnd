@@ -12,14 +12,14 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Skeleton,
   Tooltip,
   Typography
-} from '@material-ui/core'
-import Skeleton from '@material-ui/lab/Skeleton'
+} from '@mui/material'
 
-import ExpandLess from '@material-ui/icons/ExpandLess'
-import ExpandMore from '@material-ui/icons/ExpandMore'
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import ExpandLess from '@mui/icons-material/ExpandLess'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { PmsiListType } from 'state/pmsi'
@@ -166,9 +166,9 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
   }, [initialState, ghmHierarchy])
 
   useEffect(() => {
-    if (!loading && (isLoadingSyncHierarchyTable > 0 || isLoadingPmsi > 0)) {
+    if (isLoadingSyncHierarchyTable > 0 || isLoadingPmsi > 0) {
       setLoading(true)
-    } else if (loading && isLoadingSyncHierarchyTable === 0 && isLoadingPmsi === 0) {
+    } else if (isLoadingSyncHierarchyTable === 0 && isLoadingPmsi === 0) {
       setLoading(false)
     }
   }, [isLoadingSyncHierarchyTable, isLoadingPmsi])

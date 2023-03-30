@@ -1,6 +1,7 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   populationCard: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -22,13 +23,13 @@ const useStyles = makeStyles((theme) => ({
   leftDiv: {
     display: 'flex',
     alignItems: 'center',
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       flexWrap: 'wrap'
     }
   },
   editButton: {
     color: 'currentcolor',
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       position: 'absolute',
       right: 5,
       top: 8

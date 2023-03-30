@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
 
 const useStyles = makeStyles(() => ({
   input: {
@@ -29,7 +29,7 @@ const useStyles = makeStyles(() => ({
   },
   flexBaseline: {
     display: 'flex',
-    alignItems: 'baseline'
+    marginTop: 8
   },
   inputError: {
     border: '1px solid red'

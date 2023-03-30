@@ -1,7 +1,6 @@
 import React, { useState, useEffect, Fragment } from 'react'
 
-import { Grid, TextField, Typography, CircularProgress } from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+import { Autocomplete, CircularProgress, Grid, TextField, Typography } from '@mui/material'
 
 import { RequestType, Provider, Order } from 'types'
 
@@ -86,7 +85,6 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
           autoFocus
           id="title"
           margin="normal"
-          variant="outlined"
           fullWidth
           error={error === ERROR_TITLE}
           helperText={
@@ -99,9 +97,9 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
         />
       </Grid>
 
-      <Grid container direction="column" className={classes.inputContainer}>
+      <Grid container direction="column">
         <Typography variant="h3">Utilisateur à qui partager la requête:</Typography>
-        <div style={{ display: 'flex', flexDirection: 'column', margin: '1em' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', margin: '1em 0 0 0' }}>
           <Autocomplete
             noOptionsText="Rechercher un utilisateur"
             clearOnEscape
@@ -124,7 +122,6 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
                 error={error === ERROR_USER_SHARE_LIST}
                 helperText={error === ERROR_USER_SHARE_LIST ? 'Veuillez ajouter au moins un utilisateur' : ''}
                 label="Rechercher un utilisateur"
-                variant="outlined"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 InputProps={{

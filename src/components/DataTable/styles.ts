@@ -1,6 +1,7 @@
-import { makeStyles, createStyles } from '@material-ui/core/styles'
+import { makeStyles, createStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     table: {
       minWidth: 650
@@ -66,7 +67,7 @@ const useStyles = makeStyles((theme) =>
       marginLeft: 4
     },
     iconMargin: {
-      margin: `0 ${theme.spacing(1)}px`
+      margin: `0 ${theme.spacing(1)}`
     },
     multiple: {
       '&::after': {
@@ -90,21 +91,24 @@ const useStyles = makeStyles((theme) =>
       backgroundColor: '#153D8A',
       borderRadius: 8,
       color: 'white',
-      minHeight: 41
+      minHeight: 41,
+      '& .Mui-selected': { color: 'white' }
     },
     indicator: {
-      backgroundColor: '#5BC5F2',
+      backgroundColor: '#ED6D91',
       height: '4px'
     },
     selected: {
-      backgroundColor: '#0063AF'
+      backgroundColor: '#0063AF',
+      color: 'white'
     },
     tabTitle: {
-      minWidth: 0,
+      minWidth: 160,
       color: 'white',
       fontWeight: 400,
       borderBottom: '#255CA1 inset 4px',
-      minHeight: 41
+      minHeight: 41,
+      padding: '6px 12px'
     },
     searchBar: {
       minWidth: 250,
@@ -119,7 +123,7 @@ const useStyles = makeStyles((theme) =>
     },
     searchButton: {
       minWidth: 150,
-      height: 41,
+      height: 32,
       backgroundColor: '#5BC5F2',
       color: 'white',
       borderRadius: 25,

@@ -2,19 +2,20 @@ import React, { useState, useEffect } from 'react'
 
 import {
   Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
   IconButton,
   MenuItem,
   Select,
   Typography,
-  TextField
-} from '@material-ui/core'
-import WarningIcon from '@material-ui/icons/Warning'
+  TextField,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent
+} from '@mui/material'
 
-import DeleteIcon from '@material-ui/icons/Delete'
+import WarningIcon from '@mui/icons-material/Warning'
+
+import DeleteIcon from '@mui/icons-material/Delete'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import {
@@ -210,6 +211,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               className={classes.inputSelect}
               onChange={(event) => _handleChangeLogicalOperatorProps('isInclusive', event.target.value === 'true')}
               style={{ color: 'currentColor', marginLeft: 8 }}
+              variant="standard"
             >
               <MenuItem value={'true'}>Inclure</MenuItem>
               <MenuItem value={'false'}>Exclure</MenuItem>
@@ -233,6 +235,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
                 }
               }}
               style={{ color: 'currentColor' }}
+              variant="standard"
             >
               <MenuItem value={'andGroup'}>tous les</MenuItem>
               <MenuItem value={'orGroup'}>un des</MenuItem>

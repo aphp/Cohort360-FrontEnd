@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react'
 import moment from 'moment'
 
-import { Checkbox, Collapse, IconButton, Link, Table, TableBody, TableCell, TableRow, Tooltip } from '@material-ui/core'
+import { Checkbox, Collapse, IconButton, Link, Table, TableBody, TableCell, TableRow, Tooltip } from '@mui/material'
 
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
-import EditIcon from '@material-ui/icons/Edit'
-import ShareIcon from '@material-ui/icons/Share'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import EditIcon from '@mui/icons-material/Edit'
+import ShareIcon from '@mui/icons-material/Share'
 
 import VersionRow from '../VersionRow/VersionRow'
 
@@ -70,6 +70,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
                   onSelectedRow([...selectedRequests, row])
                 }
               }}
+              color="secondary"
             />
           </TableCell>
           <TableCell style={{ width: 62 }}>
@@ -79,11 +80,13 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
           </TableCell>
           <TableCell className={classes.tdName}>
             {row?.shared_by?.displayed_name ? (
-              <Link href={`/cohort/new/${row.uuid}`}>{`${row.name} - Envoyée par : ${
-                row?.shared_by?.firstname
-              } ${row?.shared_by?.lastname?.toUpperCase()}`}</Link>
+              <Link href={`/cohort/new/${row.uuid}`} underline="hover">
+                {`${row.name} - Envoyée par : ${row?.shared_by?.firstname} ${row?.shared_by?.lastname?.toUpperCase()}`}
+              </Link>
             ) : (
-              <Link href={`/cohort/new/${row.uuid}`}>{row.name}</Link>
+              <Link href={`/cohort/new/${row.uuid}`} underline="hover">
+                {row.name}
+              </Link>
             )}
 
             <Tooltip title="Modifier la requête">

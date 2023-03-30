@@ -468,6 +468,7 @@ const fetchAllProcedures = createAsyncThunk<FetchAllProceduresReturn, FetchAllPr
       let ccamList: IProcedure[] = ccamResponses
         ? linkElementWithEncounter(ccamResponses as IProcedure[], hospits, deidentified)
         : []
+      // eslint-disable-next-line no-unsafe-optional-chaining
       ccamList = patientState?.pmsi?.ccam?.list ? [...patientState?.pmsi?.ccam?.list, ...ccamList] : ccamList
       ccamCount = ccamList.length
 
@@ -476,7 +477,8 @@ const fetchAllProcedures = createAsyncThunk<FetchAllProceduresReturn, FetchAllPr
         ? linkElementWithEncounter(diagnosticResponses as ICondition[], hospits, deidentified)
         : []
       diagnosticList = patientState?.pmsi?.diagnostic?.list
-        ? [...patientState?.pmsi?.diagnostic?.list, ...diagnosticList]
+        ? // eslint-disable-next-line no-unsafe-optional-chaining
+          [...patientState?.pmsi?.diagnostic?.list, ...diagnosticList]
         : diagnosticList
       diagnosticCount = diagnosticList.length
 

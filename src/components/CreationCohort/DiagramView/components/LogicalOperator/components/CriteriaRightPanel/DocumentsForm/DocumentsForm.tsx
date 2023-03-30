@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import _ from 'lodash'
 
-import { Alert } from '@material-ui/lab'
 import {
+  Alert,
+  Autocomplete,
   Button,
-  Checkbox,
-  CircularProgress,
   Divider,
   FormControl,
   FormLabel,
@@ -16,11 +15,12 @@ import {
   Select,
   Switch,
   Typography,
-  TextField
-} from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+  TextField,
+  Checkbox,
+  CircularProgress
+} from '@mui/material'
 
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
@@ -141,7 +141,6 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            variant="outlined"
             value={defaultValues.title}
             onChange={(e) => _onChangeValue('title', e.target.value)}
           />
@@ -158,6 +157,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               id="criteria-inclusive"
               checked={!defaultValues.isInclusive}
               onChange={(event) => _onChangeValue('isInclusive', !event.target.checked)}
+              color="secondary"
             />
           </Grid>
 
@@ -222,10 +222,11 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             className={classes.inputItem}
             options={criteria?.data?.docTypes || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => _.isEqual(option, value)}
+            isOptionEqualToValue={(option, value) => _.isEqual(option, value)}
+            // value={defaultValuesDocType}
             value={defaultValues.docType}
             onChange={(e, value) => _onChangeValue('docType', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Types de documents" />}
+            renderInput={(params) => <TextField {...params} label="Types de documents" />}
             groupBy={(doctype) => doctype.type}
             disableCloseOnSelect
             renderGroup={(docType: any) => {
@@ -256,7 +257,6 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
                         currentDocTypeList.length !== currentSelectedDocTypeList.length &&
                         currentSelectedDocTypeList.length > 0
                       }
-                      color="primary"
                       checked={currentDocTypeList.length === currentSelectedDocTypeList.length}
                       onClick={onClick}
                     />
@@ -275,7 +275,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
 
         <Grid className={classes.criteriaActionContainer}>
           {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
+            <Button onClick={goBack} variant="outlined">
               Annuler
             </Button>
           )}
@@ -284,7 +284,6 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             disabled={searchInputError?.isError || searchCheckingLoading}
             type="submit"
             form="documents-form"
-            color="primary"
             variant="contained"
           >
             Confirmer

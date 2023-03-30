@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, CircularProgress } from '@material-ui/core'
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, CircularProgress } from '@mui/material'
 
 import { RequestType, Provider } from 'types'
 
@@ -22,7 +22,7 @@ const ModalShareRequest: React.FC<{
   onClose: () => void
 }> = ({ requestShare, onClose, parentStateSetter }) => {
   const { requestState } = useAppSelector<{ requestState: RequestState }>((state) => ({ requestState: state.request }))
-  const history = useHistory()
+  const navigate = useNavigate()
   const classes = useStyles()
   const { selectedRequestShare } = requestState
 
@@ -77,7 +77,7 @@ const ModalShareRequest: React.FC<{
     if (onClose && typeof onClose === 'function') {
       onClose()
     } else {
-      history.push('/home')
+      navigate('/home')
     }
   }
 
