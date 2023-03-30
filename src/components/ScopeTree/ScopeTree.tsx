@@ -477,7 +477,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
             <Pagination
               className={classes.pagination}
               count={Math.ceil((count ?? 0) / 100)}
-              shape="rounded"
+              shape="circular"
               onChange={(event, page: number) => setPage && setPage(page)}
               page={page}
             />
