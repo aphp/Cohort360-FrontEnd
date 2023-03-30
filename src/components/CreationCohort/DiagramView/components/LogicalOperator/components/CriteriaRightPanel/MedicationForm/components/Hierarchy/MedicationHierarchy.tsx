@@ -189,9 +189,9 @@ const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
   }, [initialState, medicationHierarchy])
 
   useEffect(() => {
-    if (!loading && (isLoadingSyncHierarchyTable > 0 || isLoadingMedication > 0)) {
+    if (isLoadingSyncHierarchyTable > 0 || isLoadingMedication > 0) {
       setLoading(true)
-    } else if (loading && isLoadingSyncHierarchyTable === 0 && isLoadingMedication === 0) {
+    } else if (isLoadingSyncHierarchyTable === 0 && isLoadingMedication === 0) {
       setLoading(false)
     }
   }, [isLoadingSyncHierarchyTable, isLoadingMedication])

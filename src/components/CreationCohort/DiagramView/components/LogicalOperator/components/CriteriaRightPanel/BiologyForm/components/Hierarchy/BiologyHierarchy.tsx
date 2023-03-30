@@ -176,9 +176,9 @@ const BiologyHierarchy: React.FC<BiologyHierarchyProps> = (props) => {
     onChangeSelectedHierarchy(newSelectedItems, newHierarchy)
   }
   useEffect(() => {
-    if (!loading && (isLoadingSyncHierarchyTable > 0 || isLoadingPmsi > 0)) {
+    if (isLoadingSyncHierarchyTable > 0 || isLoadingPmsi > 0) {
       setLoading(true)
-    } else if (loading && isLoadingSyncHierarchyTable === 0 && isLoadingPmsi === 0) {
+    } else if (isLoadingSyncHierarchyTable === 0 && isLoadingPmsi === 0) {
       setLoading(false)
     }
   }, [isLoadingSyncHierarchyTable, isLoadingPmsi])

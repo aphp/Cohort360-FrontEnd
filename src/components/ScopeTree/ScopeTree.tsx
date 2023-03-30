@@ -67,6 +67,8 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
 
   const classes = useStyles()
 
+  console.log('row.id', row.id)
+
   return (
     <>
       {row.id === 'loading' ? (
