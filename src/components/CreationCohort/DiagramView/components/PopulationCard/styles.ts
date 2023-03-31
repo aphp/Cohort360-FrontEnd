@@ -1,5 +1,6 @@
 import { makeStyles } from '@mui/styles'
 import { Theme } from '@mui/material/styles'
+import { populationCardPropsType } from './PopulationCard'
 
 const useStyles = makeStyles((theme: Theme) => ({
   populationCard: {
@@ -9,10 +10,18 @@ const useStyles = makeStyles((theme: Theme) => ({
     'border-radius': 4,
     backgroundColor: '#FFFFFF',
     padding: '8px 16px',
-    border: '3px solid #D3DEE8',
+    border: (props: populationCardPropsType) => (props.form ? '1px solid #D0D7D8' : '3px solid #D3DEE8'),
+    '&:hover': {
+      'border-color': (props: populationCardPropsType) => (props.form ? 'rgb(21,61,138)' : '')
+    },
     flex: 1,
     margin: '12px 0',
     position: 'relative'
+  },
+  typography: {
+    padding: (props: populationCardPropsType) => (props.form ? '0 0em 0px' : '0 1em 8px'),
+    display: 'flex',
+    alignItems: 'center'
   },
   centerContainer: {
     width: '100%',

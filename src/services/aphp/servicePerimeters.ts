@@ -12,6 +12,7 @@ import { fetchEncounter, fetchGroup, fetchPatient, fetchScope } from './callApi'
 
 import apiBackend from '../apiBackend'
 import { sortByQuantityAndName } from 'utils/scopeTree'
+import scopeType from '../../data/scope_type.json'
 
 const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
@@ -63,8 +64,8 @@ export interface IServicePerimeters {
     defaultPerimetersIds?: string[],
     cohortIds?: string[],
     noPerimetersIdsFetch?: boolean,
-    signal?: AbortSignal,
-    types?: string[]
+    type?: string,
+    signal?: AbortSignal
   ) => Promise<ScopePage[]>
 
   /**
@@ -76,7 +77,7 @@ export interface IServicePerimeters {
    * Retour:
    *   - ScopeTreeRow[]
    */
-  getScopePerimeters: (practitionerId: string, signal?: AbortSignal) => Promise<ScopeTreeRow[]>
+  getScopePerimeters: (practitionerId: string, type?: string, signal?: AbortSignal) => Promise<ScopeTreeRow[]>
 
   /**
    * Cette fonction retoune l'ensemble des périmètres enfant d'un périmètre passé en argument
@@ -88,9 +89,10 @@ export interface IServicePerimeters {
    * Retour:
    *   - ScopeTreeRow[]
    */
-  getScopeSubItems: (
+  getScopesWithSubItems: (
     subScopesIds: string | null | undefined,
     getSubItem?: boolean,
+    type?: string,
     signal?: AbortSignal
   ) => Promise<ScopeTreeRow[]>
 
@@ -112,6 +114,7 @@ export interface IServicePerimeters {
   buildScopeTreeRow: (
     subScopes: ScopePage[],
     getSubItem?: boolean | undefined,
+    type?: string,
     signal?: AbortSignal
   ) => Promise<ScopeTreeRow[]>
 
@@ -126,6 +129,12 @@ export interface IServicePerimeters {
    * @param perimeter
    */
   getScopeName: (perimeter: any) => string
+
+  /**
+   * construire la liste des types des périmètres en haut du type. Sinon tous les types.
+   * @param type
+   */
+  getHigherTypes: (type?: string) => string[]
 }
 
 const servicesPerimeters: IServicePerimeters = {
@@ -229,8 +238,8 @@ const servicesPerimeters: IServicePerimeters = {
     defaultPerimetersIds?: string[],
     cohortIds?: string[],
     noPerimetersIdsFetch?: boolean,
-    signal?: AbortSignal,
-    types?: string[]
+    type?: string,
+    signal?: AbortSignal
   ) => {
     try {
       let perimetersIds: string[] | undefined = []
@@ -254,10 +263,12 @@ const servicesPerimeters: IServicePerimeters = {
         perimetersIds = defaultPerimetersIds
       }
 
+      const higherTypes: string[] = servicesPerimeters.getHigherTypes(type)
+
       const perimetersListReponse: any = await fetchScope({
         perimetersIds: perimetersIds,
         cohortIds: cohortIds,
-        types: types
+        type: higherTypes
       })
       if (!perimetersListReponse || !perimetersListReponse.data || !perimetersListReponse.data.results) {
         console.error(
@@ -287,32 +298,35 @@ const servicesPerimeters: IServicePerimeters = {
     }
   },
 
-  getScopePerimeters: async (practitionerId, signal?: AbortSignal) => {
+  getScopePerimeters: async (practitionerId, type?: string, signal?: AbortSignal) => {
     if (!practitionerId) return []
 
     const scopeItemList: ScopePage[] =
-      (await servicesPerimeters.getPerimeters(undefined, undefined, undefined, signal)) ?? []
+      (await servicesPerimeters.getPerimeters(undefined, undefined, undefined, type, signal)) ?? []
     const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(
       scopeItemList,
       undefined,
+      type,
       signal
     )
     return scopeTreeRowList
   },
 
-  getScopeSubItems: async (subScopesIds: string | null | undefined, getSubItem?: boolean, signal?: AbortSignal) => {
+  getScopesWithSubItems: async (
+    subScopesIds: string | null | undefined,
+    getSubItem?: boolean,
+    type?: string,
+    signal?: AbortSignal
+  ) => {
     if (!subScopesIds) return []
-
-    const types = ['AP-HP', 'GHU', 'Hôpital', 'Groupe hospitalier (GH)', 'Pôle/DMU', 'Unité Fonctionnelle (UF)']
-
     const subScopes: ScopePage[] = await servicesPerimeters.getPerimeters(
       subScopesIds.trim().split(','),
       undefined,
       undefined,
-      signal,
-      types
+      type,
+      signal
     )
-    const scopeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(subScopes, getSubItem, signal)
+    const scopeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(subScopes, getSubItem, type, signal)
     return scopeRowList
   },
 
@@ -380,7 +394,12 @@ const servicesPerimeters: IServicePerimeters = {
     return result
   },
 
-  buildScopeTreeRow: async (subScopes: ScopePage[], getSubItem?: boolean | undefined, signal?: AbortSignal) => {
+  buildScopeTreeRow: async (
+    subScopes: ScopePage[],
+    getSubItem?: boolean | undefined,
+    type?: string,
+    signal?: AbortSignal
+  ) => {
     let scopeRowList: ScopeTreeRow[] = []
     for (const scopeItem of subScopes) {
       const scopeRowItem: ScopeTreeRow = { id: '', name: '', quantity: 0, subItems: [] }
@@ -393,8 +412,14 @@ const servicesPerimeters: IServicePerimeters = {
       scopeRowItem.inferior_levels_ids = scopeItem.perimeter.inferior_levels_ids
       scopeRowItem.subItems =
         getSubItem === true
-          ? await servicesPerimeters.getScopeSubItems(scopeItem.perimeter.inferior_levels_ids, undefined, signal)
+          ? await servicesPerimeters.getScopesWithSubItems(
+              scopeItem.perimeter.inferior_levels_ids,
+              undefined,
+              type,
+              signal
+            )
           : [loadingItem]
+      scopeRowItem.type = scopeItem.perimeter.type
       scopeRowList = [...scopeRowList, scopeRowItem]
     }
     scopeRowList = sortByQuantityAndName(scopeRowList)
@@ -413,6 +438,24 @@ const servicesPerimeters: IServicePerimeters = {
       return perimeter ? perimeter.name : ''
     }
     return `${perimeterID} - ${perimeter.name}`
+  },
+
+  getHigherTypes: (type?: string) => {
+    const higherTypes: string[] = []
+    if (type) {
+      let isFoundValue = false
+      for (const currentLevel of [...scopeType.typeLevel].reverse()) {
+        for (const valueInTheSameLevel of currentLevel) {
+          if (valueInTheSameLevel === type) {
+            isFoundValue = true
+          }
+          if (isFoundValue) {
+            higherTypes.push(valueInTheSameLevel)
+          }
+        }
+      }
+    }
+    return higherTypes.length > 0 ? higherTypes : scopeType.typeLevel.flat()
   }
 }
 

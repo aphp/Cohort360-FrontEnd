@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
-import { Button, IconButton, Chip, CircularProgress, Typography } from '@mui/material'
+import { Button, Chip, CircularProgress, IconButton, Tooltip, Typography } from '@mui/material'
 
 import EditIcon from '@mui/icons-material/Edit'
 import CloseIcon from '@mui/icons-material/Close'
@@ -9,19 +9,32 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import ModalRightError from './components/ModalRightError'
 import PopulationRightPanel from './components/PopulationRightPanel'
 
-import { useAppSelector, useAppDispatch } from 'state'
-import { CohortCreationState, buildCohortCreation } from 'state/cohortCreation'
-import { ScopeState, fetchScopesList } from 'state/scope'
+import { useAppDispatch, useAppSelector } from 'state'
+import { buildCohortCreation, CohortCreationState } from 'state/cohortCreation'
+import { fetchScopesList, ScopeState } from 'state/scope'
 import { MeState } from 'state/me'
 
 import { ScopeTreeRow } from 'types'
-import { getSelectedScopes, filterScopeTree } from 'utils/scopeTree'
+import { filterScopeTree, getSelectedScopes } from 'utils/scopeTree'
 import servicesPerimeters from 'services/aphp/servicePerimeters'
 
 import useStyles from './styles'
+import InfoIcon from '@mui/icons-material/Info'
+import scopeType from 'data/scope_type.json'
 
-const PopulationCard: React.FC = () => {
-  const classes = useStyles()
+export type populationCardPropsType = {
+  label?: string
+  title?: string
+  form?: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication' | 'biology' | 'supported'
+  executiveUnits?: (ScopeTreeRow | undefined)[]
+  isAcceptEmptySelection?: boolean
+  isDeleteIcon?: boolean
+  onChangeExecutiveUnits?: (_selectedPopulations: ScopeTreeRow[] | undefined) => void
+}
+
+const PopulationCard: React.FC<populationCardPropsType> = (props) => {
+  const { label, title, form, executiveUnits, onChangeExecutiveUnits, isAcceptEmptySelection, isDeleteIcon } = props
+  const classes = useStyles(props)
   const dispatch = useAppDispatch()
 
   const {
@@ -46,25 +59,40 @@ const PopulationCard: React.FC = () => {
   const [isExtended, onExtend] = useState(false)
   const [openDrawer, onChangeOpenDrawer] = useState(false)
   const [rightError, setRightError] = useState(false)
+  const [selectedItems, setSelectedItems] = useState<ScopeTreeRow[]>(
+    (executiveUnits ?? selectedPopulation ?? []).filter((item): item is ScopeTreeRow => item !== undefined)
+  )
 
-  const submitPopulation = async (_selectedPopulations: ScopeTreeRow[] | null) => {
-    if (_selectedPopulations === null) return
+  const _onChangePopulation = async (selectedPopulations: ScopeTreeRow[]) => {
+    const allowSearchIpp = await servicesPerimeters.allowSearchIpp(selectedPopulations)
+    dispatch<any>(buildCohortCreation({ selectedPopulation: selectedPopulations, allowSearchIpp: allowSearchIpp }))
+  }
 
-    _selectedPopulations = filterScopeTree(_selectedPopulations)
-    _selectedPopulations = _selectedPopulations.map((_selectedPopulation: ScopeTreeRow) => ({
-      ..._selectedPopulation,
+  const setUpdatedItems = (updatedSelection: ScopeTreeRow[]) => {
+    setSelectedItems(updatedSelection)
+    onChangeExecutiveUnits ? onChangeExecutiveUnits(updatedSelection) : _onChangePopulation(updatedSelection)
+  }
+
+  const _onSubmit = async (updatedSelection: ScopeTreeRow[] | null) => {
+    if (updatedSelection === null && !executiveUnits) return
+    updatedSelection = filterScopeTree(updatedSelection ?? [])
+    updatedSelection = updatedSelection.map((selectedPopulations: ScopeTreeRow) => ({
+      ...selectedPopulations,
       subItems: []
     }))
-
-    const allowSearchIpp = await servicesPerimeters.allowSearchIpp(_selectedPopulations)
-
-    dispatch<any>(buildCohortCreation({ selectedPopulation: _selectedPopulations, allowSearchIpp: allowSearchIpp }))
+    setUpdatedItems(updatedSelection)
     onChangeOpenDrawer(false)
+  }
+
+  const _onDelete = (index: number) => {
+    const updatedSelection: ScopeTreeRow[] = [...selectedItems]
+    updatedSelection.splice(index, 1)
+    setUpdatedItems(updatedSelection)
   }
 
   const fetchScopeTree = () => {
     if (scopesList && scopesList.length === 0) {
-      dispatch<any>(fetchScopesList())
+      dispatch<any>(fetchScopesList({}))
     }
   }
 
@@ -72,29 +100,35 @@ const PopulationCard: React.FC = () => {
     fetchScopeTree()
   }, [])
 
+  // useEffect(() => {
+  //   // setSelectedHospitals(executiveUnits?.filter((item): item is ScopeTreeRow => item !== undefined) ?? [])
+  //   console.log('executiveUnits = ' + executiveUnits)
+  // }, [executiveUnits])
+
   useEffect(() => {
     let _rightError = false
 
-    const populationWithRightError = selectedPopulation
-      ? selectedPopulation.filter((selectedPopulation) => selectedPopulation === undefined)
+    const populationWithRightError = selectedItems
+      ? selectedItems.filter((selectedPopulation) => selectedPopulation === undefined)
       : []
     if (populationWithRightError && populationWithRightError.length > 0) {
       _rightError = true
     }
 
     setRightError(_rightError)
-  }, [selectedPopulation])
+  }, [selectedItems])
 
   useEffect(() => {
     if (
+      !executiveUnits &&
       !openDrawer &&
       scopesList &&
       scopesList.length === 1 &&
       requestState.requestId &&
-      (selectedPopulation === null || (selectedPopulation && selectedPopulation.length === 0))
+      (selectedItems === null || (selectedItems && selectedItems.length === 0))
     ) {
       const savedSelectedItems: ScopeTreeRow[] = getSelectedScopes(scopesList[0], [], scopesList)
-      submitPopulation(savedSelectedItems)
+      _onSubmit(savedSelectedItems)
     }
   }, [scopesList, requestState])
 
@@ -106,19 +140,41 @@ const PopulationCard: React.FC = () => {
             <CircularProgress />
           </div>
         </div>
-      ) : selectedPopulation !== null ? (
+      ) : selectedItems !== null ? (
         <div className={classes.populationCard}>
           <div className={classes.leftDiv}>
-            <Typography variant="h6" align="left" style={{ whiteSpace: 'nowrap' }}>
-              Population source :
+            <Typography className={classes.typography} variant={form ? undefined : 'h6'} align="left">
+              {label ?? 'Population source'}
+              {form && (
+                <>
+                  <Tooltip
+                    title={
+                      <>
+                        {'- Le niveau hiérarchique de associé est : ' + scopeType?.criteriaType[form] + '.'}
+                        <br />
+                        {
+                          '- En utilisant ce filtre, seuls les patients qui ont visité au moins un des services sélectionnés sont conservés.'
+                        }
+                      </>
+                    }
+                  >
+                    <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+                  </Tooltip>
+                </>
+              )}
             </Typography>
 
             <div className={classes.chipContainer}>
               {isExtended ? (
                 <>
-                  {selectedPopulation &&
-                    selectedPopulation.map((pop: any, index: number) => (
-                      <Chip className={classes.populationChip} key={`${index}-${pop.name}`} label={pop.name} />
+                  {selectedItems &&
+                    selectedItems.map((pop: any, index: number) => (
+                      <Chip
+                        className={classes.populationChip}
+                        key={`${index}-${pop.name}`}
+                        label={pop.name}
+                        onDelete={isDeleteIcon ? () => _onDelete(index) : undefined}
+                      />
                     ))}
                   <IconButton
                     size="small"
@@ -129,17 +185,27 @@ const PopulationCard: React.FC = () => {
                 </>
               ) : (
                 <>
-                  {selectedPopulation &&
-                    selectedPopulation
+                  {selectedItems &&
+                    selectedItems
                       .slice(0, 4)
                       .map((pop: any, index: number) =>
                         pop ? (
-                          <Chip className={classes.populationChip} key={`${index}-${pop.name}`} label={pop.name} />
+                          <Chip
+                            className={classes.populationChip}
+                            key={`${index}-${pop.name}`}
+                            label={pop.name}
+                            onDelete={isDeleteIcon ? () => _onDelete(index) : undefined}
+                          />
                         ) : (
-                          <Chip className={classes.populationChip} key={index} label={'?'} />
+                          <Chip
+                            className={classes.populationChip}
+                            key={index}
+                            label={'?'}
+                            onDelete={isDeleteIcon ? () => _onDelete(index) : undefined}
+                          />
                         )
                       )}
-                  {selectedPopulation && selectedPopulation.length > 4 && (
+                  {selectedItems && selectedItems.length > 4 && (
                     <IconButton
                       size="small"
                       /*classes={{ label: classes.populationLabel }}*/
@@ -164,14 +230,22 @@ const PopulationCard: React.FC = () => {
       ) : (
         <div className={classes.centerContainer}>
           <Button className={classes.actionButton} onClick={() => onChangeOpenDrawer(true)}>
-            Choisir une population source
+            {title ?? 'Choisir une population source'}
           </Button>
         </div>
       )}
 
       <ModalRightError open={rightError} handleClose={() => onChangeOpenDrawer(true)} />
 
-      <PopulationRightPanel open={openDrawer} onConfirm={submitPopulation} onClose={() => onChangeOpenDrawer(false)} />
+      <PopulationRightPanel
+        open={openDrawer}
+        title={title}
+        isAcceptEmptySelection={isAcceptEmptySelection}
+        selectedPopulation={selectedItems}
+        executiveUnitType={form ?? undefined}
+        onConfirm={_onSubmit}
+        onClose={() => onChangeOpenDrawer(false)}
+      />
     </>
   )
 }

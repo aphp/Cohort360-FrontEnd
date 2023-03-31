@@ -78,7 +78,7 @@ const Welcome: React.FC = () => {
     dispatch<any>(initBiologyHierarchy())
 
     // fetchScope
-    dispatch<any>(fetchScopesList())
+    dispatch<any>(fetchScopesList({}))
   }, [])
 
   useEffect(() => {
