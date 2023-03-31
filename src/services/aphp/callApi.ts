@@ -26,34 +26,6 @@ const optionsReducer = (accumulator: any, currentValue: any) =>
 const uniq = (item: any, index: number, array: any[]) => array.indexOf(item) === index && item
 
 /**
- * Organization Resource
- *
- */
-
-type fetchOrganizationProps = {
-  _id?: string
-  partof?: string
-  _elements: ('name' | 'extension' | 'alias')[]
-}
-export const fetchOrganization = async (args: fetchOrganizationProps) => {
-  const { _id, partof } = args
-  let { _elements } = args
-
-  _elements = _elements ? _elements.filter(uniq) : []
-
-  let options: string[] = []
-  if (_id) options = [...options, `_id=${_id}`] // eslint-disable-line
-  if (partof) options = [...options, `partof=${partof}`] // eslint-disable-line
-
-  if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(reducer)}`] // eslint-disable-line
-
-  const response = await apiFhir.get<FHIR_API_Response<IOrganization>>(
-    `/Organization?${options.reduce(optionsReducer)}`
-  )
-
-  return response
-}
-/**
  * Group Resource
  *
  */
@@ -144,7 +116,8 @@ export const fetchPatient = async (args: fetchPatientProps) => {
   pivotFacet = pivotFacet ? pivotFacet.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
 
-  let options: string[] = []
+  // By default, all the calls to `/Patient` will have 'active=true' in parameter
+  let options: string[] = ['active=true']
   if (_id) options = [...options, `_id=${_id}`] // eslint-disable-line
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
@@ -200,7 +173,8 @@ export const fetchEncounter = async (args: fetchEncounterProps) => {
   _elements = _elements ? _elements.filter(uniq) : []
   facet = facet ? facet.filter(uniq) : []
 
-  let options: string[] = []
+  // By default, all the calls to `/Encounter` will have 'patient.active=true' in parameter
+  let options: string[] = ['patient.active=true']
   if (_id) options = [...options, `_id=${_id}`] // eslint-disable-line
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
@@ -277,8 +251,8 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
 
-  // By default, all the calls to `/Composition` will have `type:not=doc-impor` in parameter
-  let options: string[] = ['type:not=doc-impor', 'empty=false']
+  // By default, all the calls to `/Composition` will have `type:not=doc-impor`, empty=false, and patient.active=true in parameter
+  let options: string[] = ['type:not=doc-impor', 'empty=false', 'patient.active=true']
   if (_id) options = [...options, `_id=${_id}`] // eslint-disable-line
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`]
@@ -372,7 +346,8 @@ export const fetchProcedure = async (args: fetchProcedureProps) => {
 
   _list = _list ? _list.filter(uniq) : []
 
-  let options: string[] = []
+  // By default, all the calls to `/Procedure` will have 'patient.active=true' in parameter
+  let options: string[] = ['patient.active=true']
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
@@ -420,7 +395,8 @@ export const fetchClaim = async (args: fetchClaimProps) => {
 
   _list = _list ? _list.filter(uniq) : []
 
-  let options: string[] = []
+  // By default, all the calls to `/Claim` will have 'patient.active=true' in parameter
+  let options: string[] = ['patient.active=true']
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
@@ -472,7 +448,8 @@ export const fetchCondition = async (args: fetchConditionProps) => {
   _list = _list ? _list.filter(uniq) : []
   type = type ? type.filter(uniq) : []
 
-  let options: string[] = []
+  // By default, all the calls to `/Condition` will have 'patient.active=true' in parameter
+  let options: string[] = ['patient.active=true']
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
@@ -517,8 +494,8 @@ export const fetchObservation = async (args: fetchObservationProps) => {
 
   _list = _list ? _list.filter(uniq) : []
 
-  // By default, all the calls to `/Observation` will have 'value-quantity-value=ge0,le0' in the parameters
-  let options: string[] = ['value-quantity-value=ge0,le0']
+  // By default, all the calls to `/Observation` will have 'value-quantity-value=ge0,le0' and 'patient.active=true' in the parameters
+  let options: string[] = ['value-quantity-value=ge0,le0', 'patient.active=true']
   if (id) options = [...options, `id=${id}`] // eslint-disable-line
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
@@ -559,7 +536,8 @@ export const fetchMedicationRequest = async (args: fetchMedicationRequestProps) 
 
   _list = _list ? _list.filter(uniq) : []
 
-  let options: string[] = []
+  // By default, all the calls to `/MedicationRequest` will have 'patient.active=true' in parameter
+  let options: string[] = ['patient.active=true']
   if (id) options = [...options, `id=${id}`] // eslint-disable-line
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
@@ -601,7 +579,8 @@ export const fetchMedicationAdministration = async (args: fetchMedicationAdminis
 
   _list = _list ? _list.filter(uniq) : []
 
-  let options: string[] = []
+  // By default, all the calls to `/MedicationAdministration` will have 'patient.active=true' in parameter
+  let options: string[] = ['patient.active=true']
   if (id) options = [...options, `id=${id}`] // eslint-disable-line
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
