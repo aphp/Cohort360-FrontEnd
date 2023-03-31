@@ -186,6 +186,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       }
 
       filterFhir = [
+        'active=true',
         `${
           criterion.gender && criterion.gender.length > 0
             ? `${PATIENT_GENDER}=${criterion.gender.map((gender: any) => gender.id).reduce(searchReducer)}`
@@ -253,6 +254,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       // Ignore TypeScript because we need to check if array is not empty
       // @ts-ignore
       filterFhir = [
+        'patient.active=true',
         `${
           criterion.admissionMode && criterion.admissionMode.length > 0
             ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode
@@ -335,7 +337,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 
     case RESSOURCE_TYPE_COMPOSITION: {
       filterFhir = [
-        `status=final&type:not=doc-impor&empty=false`,
+        `status=final&type:not=doc-impor&empty=false&patient.active=true`,
         `${
           criterion.search
             ? `${criterion.searchBy === SearchByTypes.text ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
@@ -356,6 +358,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 
     case RESSOURCE_TYPE_CONDITION: {
       filterFhir = [
+        'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -378,6 +381,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 
     case RESSOURCE_TYPE_PROCEDURE: {
       filterFhir = [
+        'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -395,6 +399,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 
     case RESSOURCE_TYPE_CLAIM: {
       filterFhir = [
+        'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -411,6 +416,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
     case RESSOURCE_TYPE_MEDICATION_REQUEST:
     case RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: {
       filterFhir = [
+        'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -468,6 +474,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       }
 
       filterFhir = [
+        'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -789,6 +796,8 @@ export async function unbuildRequest(_json: string) {
                   : newVitalStatusIds
                 break
               }
+              case 'active':
+                break
               default:
                 currentCriterion.error = true
                 break
@@ -1001,6 +1010,8 @@ export async function unbuildRequest(_json: string) {
                   : newAdmissionIds
                 break
               }
+              case 'patient.active':
+                break
               default:
                 currentCriterion.error = true
                 break
@@ -1067,6 +1078,7 @@ export async function unbuildRequest(_json: string) {
                   : newDocTypeIds
                 break
               }
+              case 'patient.active':
               case 'status':
               case 'type:not':
               case 'empty':
@@ -1128,6 +1140,8 @@ export async function unbuildRequest(_json: string) {
                   : newDiagnosticType
                 break
               }
+              case 'patient.active':
+                break
               default:
                 currentCriterion.error = true
                 break
@@ -1175,6 +1189,8 @@ export async function unbuildRequest(_json: string) {
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
                 break
               }
+              case 'patient.active':
+                break
               default:
                 currentCriterion.error = true
                 break
@@ -1221,6 +1237,8 @@ export async function unbuildRequest(_json: string) {
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
                 break
               }
+              case 'patient.active':
+                break
               default:
                 currentCriterion.error = true
                 break
@@ -1293,6 +1311,8 @@ export async function unbuildRequest(_json: string) {
                   : newAdministration
                 break
               }
+              case 'patient.active':
+                break
               default:
                 currentCriterion.error = true
                 break
@@ -1397,7 +1417,8 @@ export async function unbuildRequest(_json: string) {
 
                 break
               }
-
+              case 'patient.active':
+                break
               default:
                 currentCriterion.error = true
                 break
