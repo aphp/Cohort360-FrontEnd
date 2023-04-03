@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react'
 
 import { IComposition_Section } from '@ahryman40k/ts-fhir-types/lib/R4'
 
-import Button from '@material-ui/core/Button'
-import CircularProgress from '@material-ui/core/CircularProgress'
-import Dialog from '@material-ui/core/Dialog'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
 
 import { Document, Page, pdfjs } from 'react-pdf'
 import { FHIR_API_URL } from '../../constants'
@@ -27,7 +27,7 @@ type DocumentViewerProps = {
   list?: string[]
 }
 
-const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, handleClose, documentId, list }) => {
+const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, handleClose, documentId }) => {
   const [documentContent, setDocumentContent] = useState<IComposition_Section[] | null>(null)
   const [numPages, setNumPages] = useState(1)
   const [loading, setLoading] = useState(false)
@@ -89,7 +89,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
               error={'Le document est introuvable.'}
               loading={'PDF en cours de chargement...'}
               file={{
-                url: `${FHIR_API_URL}/Binary/${documentId}${list ? `:${list}` : ''}`,
+                url: `${FHIR_API_URL}/Binary/${documentId}`,
                 httpHeaders: {
                   Accept: 'application/pdf',
                   Authorization: `Bearer ${localStorage.getItem('access')}`

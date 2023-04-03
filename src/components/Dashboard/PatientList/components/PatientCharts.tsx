@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { CircularProgress, Grid, Paper, Typography } from '@material-ui/core'
+import { CircularProgress, Grid, Paper, Typography } from '@mui/material'
 
 import PieChart from '../../Preview/Charts/PieChart'
 import BarChart from '../../Preview/Charts/BarChart'

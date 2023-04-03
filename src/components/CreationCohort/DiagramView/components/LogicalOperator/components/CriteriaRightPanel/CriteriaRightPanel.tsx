@@ -1,9 +1,9 @@
 import React, { useState, useEffect, Fragment } from 'react'
 
-import { Drawer, ListItem, ListItemIcon, ListItemText, Collapse, List, Grid, Typography } from '@material-ui/core'
+import { Drawer, ListItem, ListItemIcon, ListItemText, Collapse, List, Grid, Typography } from '@mui/material'
 
-import ExpandLess from '@material-ui/icons/ExpandLess'
-import ExpandMore from '@material-ui/icons/ExpandMore'
+import ExpandLess from '@mui/icons-material/ExpandLess'
+import ExpandMore from '@mui/icons-material/ExpandMore'
 
 import { CriteriaItemType, SelectedCriteriaType } from 'types'
 import useStyles from './styles'

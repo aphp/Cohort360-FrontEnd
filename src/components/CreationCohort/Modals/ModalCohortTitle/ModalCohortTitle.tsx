@@ -10,9 +10,9 @@ import {
   DialogTitle,
   Grid,
   TextField,
-  Typography
-} from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
+  Typography,
+  Alert
+} from '@mui/material'
 
 import useStyles from './styles'
 
@@ -49,7 +49,7 @@ const ModalCohortTitle: React.FC<{
 
   return (
     <Dialog fullWidth maxWidth="sm" open onClose={handleClose} aria-labelledby="form-dialog-title">
-      <DialogTitle className={classes.title}>Création de la cohorte</DialogTitle>
+      <DialogTitle>Création de la cohorte</DialogTitle>
       <DialogContent style={{ overflowY: 'unset' }}>
         <Grid container direction="column" className={classes.inputContainer}>
           <Typography variant="h3">Nom de la cohorte :</Typography>
@@ -60,7 +60,6 @@ const ModalCohortTitle: React.FC<{
             autoFocus
             id="title"
             margin="normal"
-            variant="outlined"
             fullWidth
             error={error === ERROR_TITLE}
             helperText={
@@ -81,7 +80,6 @@ const ModalCohortTitle: React.FC<{
             onChange={(e: any) => onChangeDescription(e.target.value)}
             id="description"
             margin="normal"
-            variant="outlined"
             fullWidth
             multiline
             minRows={5}
@@ -90,10 +88,16 @@ const ModalCohortTitle: React.FC<{
           />
         </Grid>
 
-        <Grid container direction="column" className={classes.inputContainer}>
+        <Grid container direction="column">
           <FormControlLabel
             labelPlacement="start"
-            control={<Checkbox checked={globalCount} onChange={(event) => onCheckGlobalCount(event.target.checked)} />}
+            control={
+              <Checkbox
+                checked={globalCount}
+                onChange={(event) => onCheckGlobalCount(event.target.checked)}
+                color="secondary"
+              />
+            }
             label={
               <Typography variant="h3">
                 Estimer le nombre de patients répondant à vos critères sur le périmètre de l'APHP
@@ -114,7 +118,7 @@ const ModalCohortTitle: React.FC<{
         <Button disabled={loading} onClick={handleClose} color="secondary">
           Annuler
         </Button>
-        <Button disabled={loading} onClick={handleConfirm} color="primary">
+        <Button disabled={loading} onClick={handleConfirm}>
           Créer
         </Button>
       </DialogActions>

@@ -115,6 +115,7 @@ export type Cohort = {
   request_job_duration?: string
   request_query_snapshot?: string
   extension?: any[]
+  exportable?: boolean
 }
 
 export type CohortFilters = {
@@ -153,7 +154,7 @@ export type PMSIFilters = {
 
 export type PatientFilters = {
   gender: PatientGenderKind
-  birthdates: [string, string]
+  birthdatesRanges: [string, string]
   vitalStatus: VitalStatus
 }
 
@@ -197,7 +198,8 @@ export enum SearchByTypes {
   text = '_text',
   family = 'family',
   given = 'given',
-  identifier = 'identifier'
+  identifier = 'identifier',
+  title = 'title'
 }
 
 export enum VitalStatus {
@@ -337,8 +339,21 @@ export type CriteriaGroupType = {
 )
 
 export type TemporalConstraintsType = {
+  id?: number
   idList: ['All'] | number[]
   constraintType: 'none' | 'sameEncounter' | 'differentEncounter' | 'directChronologicalOrdering'
+  timeRelationMinDuration?: {
+    years?: number
+    months?: number
+    days?: number
+    hours?: number
+  }
+  timeRelationMaxDuration?: {
+    years?: number
+    months?: number
+    days?: number
+    hours?: number
+  }
 }
 
 export type CriteriaItemType = {
@@ -425,6 +440,7 @@ export type DocumentDataType = {
   title: string
   type: 'Composition'
   search: string
+  searchBy: SearchByTypes.text | SearchByTypes.title
   docType: DocType[] | null
   encounterEndDate: Date | ''
   encounterStartDate: Date | ''
@@ -708,7 +724,7 @@ export type DTTB_ResultsType = {
 export type DTTB_SearchBarType = {
   type: 'simple' | 'patient' | 'document'
   value: string | undefined
-  onSearch: (newSearch: string, newSearchBy?: SearchByTypes) => void
+  onSearch: (newSearch: string, newSearchBy: SearchByTypes) => void
   searchBy?: any
   error?: searchInputError
 }
@@ -752,4 +768,10 @@ export type IScope = {
   next: string | null
   previous: string | null
   results: ScopePage[]
+}
+export type ErrorType = { isError: boolean; errorMessage?: string }
+export type AgeRangeType = {
+  year?: number
+  month?: number
+  days?: number
 }

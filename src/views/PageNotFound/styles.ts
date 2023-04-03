@@ -1,9 +1,10 @@
-import { makeStyles } from '@material-ui/core/styles'
+import makeStyles from '@mui/styles/makeStyles'
+import { Theme } from '@mui/material/styles'
 
 const skyBlue = '#5BC5F2'
 const bgColor = '#E6F1FD'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   logo: {
     position: 'fixed',
     top: 12,

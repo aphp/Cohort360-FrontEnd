@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react'
 import { useAppSelector } from 'state'
 
-import { Divider, Grid, Typography } from '@material-ui/core'
+import { Divider, Grid, Typography } from '@mui/material'
 
 import PatientSearchBar from 'components/Inputs/PatientSearchBar/PatientSearchBar'
 
-import LockIcon from '@material-ui/icons/Lock'
+import LockIcon from '@mui/icons-material/Lock'
 
 import useStyles from './styles'
 

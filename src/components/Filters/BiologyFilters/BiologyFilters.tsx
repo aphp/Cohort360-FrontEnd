@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import { KeyboardDatePicker } from '@material-ui/pickers'
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import 'moment/locale/fr'
 
 import {
   Button,
@@ -14,9 +16,9 @@ import {
   IconButton,
   TextField,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 
 import useStyles from './styles'
 
@@ -63,13 +65,12 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle className={classes.title}>Filtrer par :</DialogTitle>
+      <DialogTitle>Filtrer par :</DialogTitle>
       <DialogContent className={classes.dialog}>
         {!deidentified && (
           <Grid container direction="column" className={classes.filter}>
             <Typography variant="h3">NDA :</Typography>
             <TextField
-              variant="outlined"
               margin="normal"
               fullWidth
               autoFocus
@@ -83,7 +84,6 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Code ANABIO :</Typography>
           <TextField
-            variant="outlined"
             margin="normal"
             fullWidth
             autoFocus
@@ -96,7 +96,6 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Code LOINC :</Typography>
           <TextField
-            variant="outlined"
             margin="normal"
             fullWidth
             autoFocus
@@ -106,24 +105,30 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
           />
         </Grid>
 
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column">
           <Typography variant="h3">Date :</Typography>
-          <Grid container alignItems="baseline" className={classes.datePickers}>
+          <Grid container alignItems="center" className={classes.datePickers}>
             <FormLabel component="legend" className={classes.dateLabel}>
               Après le :
             </FormLabel>
-            <KeyboardDatePicker
-              clearable
-              error={dateError}
-              style={{ width: 'calc(100% - 120px)' }}
-              invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
-              format="DD/MM/YYYY"
-              onChange={(date) => _onChangeValue('startDate', date ?? null)}
-              value={_filters.startDate}
-            />
+            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+              <DatePicker
+                onChange={(date) => _onChangeValue('startDate', date ?? null)}
+                value={_filters.startDate}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    variant="standard"
+                    error={dateError}
+                    helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
+                    style={{ width: 'calc(100% - 120px)' }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
             {_filters.startDate !== null && (
               <IconButton
-                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
+                classes={{ root: classes.clearDate }}
                 color="primary"
                 onClick={() => _onChangeValue('startDate', null)}
               >
@@ -132,22 +137,28 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
             )}
           </Grid>
 
-          <Grid container alignItems="baseline" className={classes.datePickers}>
+          <Grid container alignItems="center" className={classes.datePickers}>
             <FormLabel component="legend" className={classes.dateLabel}>
               Avant le :
             </FormLabel>
-            <KeyboardDatePicker
-              clearable
-              error={dateError}
-              style={{ width: 'calc(100% - 120px)' }}
-              invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
-              format="DD/MM/YYYY"
-              onChange={(date) => _onChangeValue('endDate', date ?? null)}
-              value={_filters.endDate}
-            />
+            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+              <DatePicker
+                onChange={(date) => _onChangeValue('endDate', date ?? null)}
+                value={_filters.endDate}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    variant="standard"
+                    error={dateError}
+                    helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
+                    style={{ width: 'calc(100% - 120px)' }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
             {_filters.endDate !== null && (
               <IconButton
-                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
+                classes={{ root: classes.clearDate }}
                 color="primary"
                 onClick={() => _onChangeValue('endDate', null)}
               >
@@ -164,10 +175,8 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Annuler
-        </Button>
-        <Button disabled={dateError} onClick={_onSubmit} color="primary">
+        <Button onClick={onClose}>Annuler</Button>
+        <Button disabled={dateError} onClick={_onSubmit}>
           Valider
         </Button>
       </DialogActions>

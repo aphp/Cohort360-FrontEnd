@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
-import { Checkbox, CssBaseline, Grid, Typography } from '@material-ui/core'
-import Alert from '@material-ui/lab/Alert'
+import { Alert, Checkbox, Grid, Typography } from '@mui/material'
 
 import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
@@ -10,13 +9,22 @@ import MasterChips from 'components/MasterChips/MasterChips'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import { CohortComposition, DocumentFilters, Order, DTTB_ResultsType as ResultsType, searchInputError } from 'types'
+import {
+  CohortComposition,
+  DocumentFilters,
+  Order,
+  DTTB_ResultsType as ResultsType,
+  searchInputError,
+  SearchByTypes
+} from 'types'
 
 import services from 'services/aphp'
 
 import { buildDocumentFiltersChips } from 'utils/chips'
 
-import { docTypes } from 'assets/docTypes.json'
+import docTypes from 'assets/docTypes.json'
+
+import { useDebounce } from 'utils/debounce'
 
 type DocumentsProps = {
   groupId?: string
@@ -33,6 +41,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const [searchInput, setSearchInput] = useState('')
   const [searchMode, setSearchMode] = useState(false)
+  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
 
   const [openFilter, setOpenFilter] = useState(false)
 
@@ -47,13 +56,25 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const [order, setOrder] = useState<Order>({
     orderBy: 'date',
-    orderDirection: 'asc'
+    orderDirection: 'desc'
   })
 
   const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
+  const controllerRef = useRef<AbortController | null>()
+  const debouncedSearchInput = useDebounce(500, searchInput)
+
+  const _cancelPendingRequest = () => {
+    if (controllerRef.current) {
+      controllerRef.current.abort()
+    }
+    controllerRef.current = new AbortController()
+  }
 
   const checkDocumentSearch = async () => {
-    const checkDocumentSearch = await services.cohorts.checkDocumentSearchInput(searchInput)
+    const checkDocumentSearch = await services.cohorts.checkDocumentSearchInput(
+      searchInput,
+      controllerRef.current?.signal
+    )
 
     setSearchInputError(checkDocumentSearch)
 
@@ -61,54 +82,64 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   }
 
   const onSearchDocument = async (newPage: number) => {
-    if (searchInput) {
-      setSearchMode(true)
-    } else {
-      setSearchMode(false)
-    }
-    setLoadingStatus(true)
+    try {
+      if (searchInput) {
+        setSearchMode(true)
+      } else {
+        setSearchMode(false)
+      }
+      setLoadingStatus(true)
 
-    const searchInputError = await checkDocumentSearch()
-    if (searchInputError && searchInputError.isError) {
-      setDocuments([])
+      const searchInputError = await checkDocumentSearch()
+      if (searchInputError && searchInputError.isError) {
+        setDocuments([])
+        setLoadingStatus(false)
+        return
+      }
+
+      setLoadingStatus(true)
+
+      const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
+
+      const result = await services.cohorts.fetchDocuments(
+        !!deidentifiedBoolean,
+        searchBy,
+        order.orderBy,
+        order.orderDirection,
+        newPage,
+        searchInput ?? '',
+        selectedDocTypesCodes,
+        filters.nda,
+        filters.ipp ?? '',
+        filters.onlyPdfAvailable,
+        controllerRef?.current?.signal,
+        filters.startDate,
+        filters.endDate,
+        groupId
+      )
+
+      if (result) {
+        const { totalDocs, totalAllDocs, documentsList, totalPatientDocs, totalAllPatientDocs } = result
+        setDocumentsResult((prevState) => ({
+          ...prevState,
+          nb: totalDocs,
+          total: totalAllDocs
+        }))
+        setPatientsResult((prevState) => ({
+          ...prevState,
+          nb: totalPatientDocs,
+          total: totalAllPatientDocs
+        }))
+        setDocuments(documentsList)
+      } else {
+        setDocuments([])
+      }
       setLoadingStatus(false)
-      return
-    }
-
-    const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
-
-    const result = await services.cohorts.fetchDocuments(
-      !!deidentifiedBoolean,
-      order.orderBy,
-      order.orderDirection,
-      newPage,
-      searchInput ?? '',
-      selectedDocTypesCodes,
-      filters.nda,
-      filters.ipp ?? '',
-      filters.onlyPdfAvailable,
-      filters.startDate,
-      filters.endDate,
-      groupId
-    )
-
-    if (result) {
-      const { totalDocs, totalAllDocs, documentsList, totalPatientDocs, totalAllPatientDocs } = result
-      setDocumentsResult((prevState) => ({
-        ...prevState,
-        nb: totalDocs,
-        total: totalAllDocs
-      }))
-      setPatientsResult((prevState) => ({
-        ...prevState,
-        nb: totalPatientDocs,
-        total: totalAllPatientDocs
-      }))
-      setDocuments(documentsList)
-    } else {
+    } catch (error) {
+      console.error('Erreur lors de la récupération des documents', error)
+      setLoadingStatus(false)
       setDocuments([])
     }
-    setLoadingStatus(false)
   }
 
   const handleChangePage = (newPage = 1) => {
@@ -118,8 +149,12 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   }
 
   useEffect(() => {
+    // const controller = new AbortController()
+    _cancelPendingRequest()
     handleChangePage(1)
-  }, [!!deidentifiedBoolean, filters, order, searchInput]) // eslint-disable-line
+
+    return () => _cancelPendingRequest()
+  }, [!!deidentifiedBoolean, filters, order,debouncedSearchInput, searchBy]) // eslint-disable-line
 
   const handleOpenDialog = () => {
     setOpenFilter(true)
@@ -173,7 +208,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         }))
         break
       case 'selectedDocTypes': {
-        const typesName = docTypes
+        const typesName = docTypes.docTypes
           .map((docType: any) => docType.type)
           .filter((item, index, array) => array.indexOf(item) === index)
         const isGroupItem = typesName.find((typeName) => typeName === value)
@@ -194,69 +229,71 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     }
   }
 
+  const onSearch = (inputSearch: string, _searchBy: SearchByTypes) => {
+    setSearchInput(inputSearch)
+    setSearchBy(_searchBy)
+  }
+
   return (
     <>
       <Grid container direction="column" alignItems="center">
-        <CssBaseline />
-        <Grid container item xs={11} justifyContent="space-between">
-          <DataTableTopBar
-            loading={loadingStatus}
-            results={[documentsResult, patientsResult]}
-            searchBar={{
-              type: 'document',
-              value: searchInput ? onFilterValue() : '',
-              onSearch: (newSearchInput: string) => setSearchInput(newSearchInput),
-              error: searchInputError
-            }}
-            buttons={[
-              {
-                label: 'Filtrer',
-                icon: <FilterList height="15px" fill="#FFF" />,
-                onClick: handleOpenDialog
-              }
-            ]}
-          />
+        <DataTableTopBar
+          loading={loadingStatus}
+          results={[documentsResult, patientsResult]}
+          searchBar={{
+            type: 'document',
+            value: searchInput ? onFilterValue() : '',
+            searchBy: searchBy,
+            onSearch: (newSearchInput: string, newSearchBy: SearchByTypes) => onSearch(newSearchInput, newSearchBy),
+            error: searchInputError
+          }}
+          buttons={[
+            {
+              label: 'Filtrer',
+              icon: <FilterList height="15px" fill="#FFF" />,
+              onClick: handleOpenDialog
+            }
+          ]}
+        />
 
-          <MasterChips chips={buildDocumentFiltersChips(filters, handleDeleteChip)} />
+        <MasterChips chips={buildDocumentFiltersChips(filters, handleDeleteChip)} />
 
-          {deidentifiedBoolean ? (
-            <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
-              Attention : Les données identifiantes des patients sont remplacées par des informations fictives dans les
-              résultats de la recherche et dans les documents prévisualisés.
-            </Alert>
-          ) : (
-            <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
-              Attention : La recherche textuelle est pseudonymisée (les données identifiantes des patients sont
-              remplacées par des informations fictives). Vous retrouverez les données personnelles de votre patient en
-              cliquant sur l'aperçu.
-            </Alert>
-          )}
+        {deidentifiedBoolean ? (
+          <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
+            Attention : Les données identifiantes des patients sont remplacées par des informations fictives dans les
+            résultats de la recherche et dans les documents prévisualisés.
+          </Alert>
+        ) : (
+          <Alert severity="info" style={{ backgroundColor: 'transparent' }}>
+            Attention : La recherche textuelle est pseudonymisée (les données identifiantes des patients sont remplacées
+            par des informations fictives). Vous retrouverez les données personnelles de votre patient en cliquant sur
+            l'aperçu.
+          </Alert>
+        )}
 
-          {!deidentifiedBoolean && (
-            <Grid container item alignItems="center" justifyContent="flex-end">
-              <Checkbox
-                checked={filters.onlyPdfAvailable}
-                onChange={() => onChangeOptions('onlyPdfAvailable', !filters.onlyPdfAvailable)}
-                color="primary"
-              />
-              <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
-            </Grid>
-          )}
+        {!deidentifiedBoolean && (
+          <Grid container item alignItems="center" justifyContent="flex-end">
+            <Checkbox
+              checked={filters.onlyPdfAvailable}
+              onChange={() => onChangeOptions('onlyPdfAvailable', !filters.onlyPdfAvailable)}
+            />
+            <Typography>N'afficher que les documents dont les PDF sont disponibles</Typography>
+          </Grid>
+        )}
 
-          <DataTableComposition
-            showIpp
-            loading={loadingStatus ?? false}
-            deidentified={deidentifiedBoolean ?? true}
-            searchMode={searchMode}
-            groupId={groupId}
-            documentsList={documents ?? []}
-            order={order}
-            setOrder={setOrder}
-            page={page}
-            setPage={(newPage: number) => handleChangePage(newPage)}
-            total={documentsResult.nb}
-          />
-        </Grid>
+        <DataTableComposition
+          showIpp
+          loading={loadingStatus ?? false}
+          deidentified={deidentifiedBoolean ?? true}
+          searchMode={searchMode}
+          groupId={groupId}
+          documentsList={documents ?? []}
+          order={order}
+          setOrder={setOrder}
+          page={page}
+          setPage={(newPage: number) => handleChangePage(newPage)}
+          total={documentsResult.nb}
+        />
       </Grid>
 
       <ModalDocumentFilters

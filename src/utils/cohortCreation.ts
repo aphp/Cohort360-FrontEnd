@@ -1,9 +1,16 @@
 import moment from 'moment'
 
 import services from 'services/aphp'
-import { CriteriaGroupType, DocType, ScopeTreeRow, SelectedCriteriaType, TemporalConstraintsType } from 'types'
+import {
+  ScopeTreeRow,
+  SelectedCriteriaType,
+  CriteriaGroupType,
+  TemporalConstraintsType,
+  DocType,
+  SearchByTypes
+} from 'types'
 
-import { docTypes } from 'assets/docTypes.json'
+import docTypes from 'assets/docTypes.json'
 
 const REQUETEUR_VERSION = 'v1.2.1'
 
@@ -46,6 +53,7 @@ const CONDITION_TYPE = 'type' // ok
 
 const RESSOURCE_TYPE_COMPOSITION: 'Composition' = 'Composition'
 const COMPOSITION_TEXT = '_text' // ok
+const COMPOSITION_TITLE = 'title'
 const COMPOSITION_TYPE = 'type' // ok
 
 const RESSOURCE_TYPE_MEDICATION_REQUEST: 'MedicationRequest' = 'MedicationRequest' // = Prescription
@@ -178,6 +186,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       }
 
       filterFhir = [
+        'active=true',
         `${
           criterion.gender && criterion.gender.length > 0
             ? `${PATIENT_GENDER}=${criterion.gender.map((gender: any) => gender.id).reduce(searchReducer)}`
@@ -245,6 +254,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       // Ignore TypeScript because we need to check if array is not empty
       // @ts-ignore
       filterFhir = [
+        'patient.active=true',
         `${
           criterion.admissionMode && criterion.admissionMode.length > 0
             ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode
@@ -327,8 +337,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 
     case RESSOURCE_TYPE_COMPOSITION: {
       filterFhir = [
-        `status=final&type:not=doc-impor&empty=false`,
-        `${criterion.search ? `${COMPOSITION_TEXT}=${encodeURIComponent(criterion.search)}` : ''}`,
+        `status=final&type:not=doc-impor&empty=false&patient.active=true`,
+        `${
+          criterion.search
+            ? `${criterion.searchBy === SearchByTypes.text ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
+                criterion.search
+              )}`
+            : ''
+        }`,
         `${
           criterion.docType && criterion.docType.length > 0
             ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: DocType) => docType.code).reduce(searchReducer)}`
@@ -342,6 +358,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 
     case RESSOURCE_TYPE_CONDITION: {
       filterFhir = [
+        'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -364,6 +381,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 
     case RESSOURCE_TYPE_PROCEDURE: {
       filterFhir = [
+        'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -381,6 +399,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
 
     case RESSOURCE_TYPE_CLAIM: {
       filterFhir = [
+        'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -397,6 +416,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
     case RESSOURCE_TYPE_MEDICATION_REQUEST:
     case RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: {
       filterFhir = [
+        'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -454,6 +474,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
       }
 
       filterFhir = [
+        'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -619,6 +640,7 @@ export async function unbuildRequest(_json: string) {
   let population: (ScopeTreeRow | undefined)[] | null = null
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
+  let temporalConstraints: TemporalConstraintsType[] = []
 
   if (!_json) {
     return {
@@ -651,6 +673,11 @@ export async function unbuildRequest(_json: string) {
     // you got a modal with the posibility to change your current source pop.
     // if (!newPopulation) continue
     population = population ? [...population, newPopulation] : [newPopulation]
+  }
+
+  // retrieve temporal constraints
+  if (request && request.temporalConstraints) {
+    temporalConstraints = request.temporalConstraints
   }
 
   /**
@@ -769,6 +796,8 @@ export async function unbuildRequest(_json: string) {
                   : newVitalStatusIds
                 break
               }
+              case 'active':
+                break
               default:
                 currentCriterion.error = true
                 break
@@ -981,6 +1010,8 @@ export async function unbuildRequest(_json: string) {
                   : newAdmissionIds
                 break
               }
+              case 'patient.active':
+                break
               default:
                 currentCriterion.error = true
                 break
@@ -1025,13 +1056,18 @@ export async function unbuildRequest(_json: string) {
             const key = filter ? filter[0] : null
             const value = filter ? filter[1] : null
             switch (key) {
+              case COMPOSITION_TITLE:
+                currentCriterion.search = value ? decodeURIComponent(value) : ''
+                currentCriterion.searchBy = SearchByTypes.title
+                break
               case COMPOSITION_TEXT: {
                 currentCriterion.search = value ? decodeURIComponent(value) : ''
+                currentCriterion.searchBy = SearchByTypes.text
                 break
               }
               case COMPOSITION_TYPE: {
                 const docTypeIds = value?.split(',')
-                const newDocTypeIds = docTypes.filter((docType: DocType) =>
+                const newDocTypeIds = docTypes.docTypes.filter((docType: DocType) =>
                   docTypeIds?.find((docTypeId) => docTypeId === docType.code)
                 )
 
@@ -1042,6 +1078,7 @@ export async function unbuildRequest(_json: string) {
                   : newDocTypeIds
                 break
               }
+              case 'patient.active':
               case 'status':
               case 'type:not':
               case 'empty':
@@ -1103,6 +1140,8 @@ export async function unbuildRequest(_json: string) {
                   : newDiagnosticType
                 break
               }
+              case 'patient.active':
+                break
               default:
                 currentCriterion.error = true
                 break
@@ -1150,6 +1189,8 @@ export async function unbuildRequest(_json: string) {
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
                 break
               }
+              case 'patient.active':
+                break
               default:
                 currentCriterion.error = true
                 break
@@ -1196,6 +1237,8 @@ export async function unbuildRequest(_json: string) {
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
                 break
               }
+              case 'patient.active':
+                break
               default:
                 currentCriterion.error = true
                 break
@@ -1268,6 +1311,8 @@ export async function unbuildRequest(_json: string) {
                   : newAdministration
                 break
               }
+              case 'patient.active':
+                break
               default:
                 currentCriterion.error = true
                 break
@@ -1372,7 +1417,8 @@ export async function unbuildRequest(_json: string) {
 
                 break
               }
-
+              case 'patient.active':
+                break
               default:
                 currentCriterion.error = true
                 break
@@ -1506,7 +1552,8 @@ export async function unbuildRequest(_json: string) {
   return {
     population,
     criteria: await convertJsonObjectsToCriteria(criteriaItems),
-    criteriaGroup: _criteriaGroup
+    criteriaGroup: _criteriaGroup,
+    temporalConstraints: temporalConstraints
   }
 }
 

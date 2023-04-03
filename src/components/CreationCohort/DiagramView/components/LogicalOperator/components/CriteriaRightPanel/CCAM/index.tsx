@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Tab, Tabs } from '@material-ui/core'
+import React, { useState, useEffect } from 'react'
+import { Tabs, Tab } from '@mui/material'
 
 import useStyles from './styles'
 
@@ -63,12 +63,15 @@ const Index = (props: any) => {
 
   return (
     <>
-      <div>
-        <Tabs className={classes.tabs} value={selectedTab} onChange={(e, tab) => setSelectedTab(tab)}>
-          <Tab label="Hiérarchie" value="hierarchy" />
-          <Tab label="Formulaire" value="form" />
-        </Tabs>
-      </div>
+      <Tabs
+        indicatorColor="secondary"
+        className={classes.tabs}
+        value={selectedTab}
+        onChange={(e, tab) => setSelectedTab(tab)}
+      >
+        <Tab label="Hiérarchie" value="hierarchy" />
+        <Tab label="Formulaire" value="form" />
+      </Tabs>
 
       {
         <CcamForm

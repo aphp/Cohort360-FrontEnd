@@ -1,13 +1,13 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
-    display: 'flex',
-    width: 'fit-content',
+    height: 42,
     marginLeft: 12,
-    alignSelf: 'center',
     padding: '4px 8px',
-    [theme.breakpoints.down('md')]: {
+    borderRadius: 4,
+    [theme.breakpoints.down('lg')]: {
       alignSelf: 'flex-end'
     }
   },

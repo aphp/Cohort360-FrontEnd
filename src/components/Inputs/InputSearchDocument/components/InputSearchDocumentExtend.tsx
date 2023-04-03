@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 
-import { Grid, IconButton, InputAdornment, InputBase } from '@material-ui/core'
+import { Grid, IconButton, InputAdornment, InputBase } from '@mui/material'
 
-import InfoIcon from '@material-ui/icons/Info'
-import ClearIcon from '@material-ui/icons/Clear'
+import InfoIcon from '@mui/icons-material/Info'
+import ClearIcon from '@mui/icons-material/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 
 import DocumentSearchHelp from 'components/Inputs/InputSearchDocument/components/DocumentSearchHelp/DocumentSearchHelp'
@@ -89,7 +89,7 @@ const InputSearchDocumentExtend: React.FC<InputSearchDocumentExtendProps> = ({
                   aria-label="search"
                   onClick={() => onSearchDocument(searchInput)}
                 >
-                  <SearchIcon fill="#ED6D91" height="17px" />
+                  <SearchIcon fill="#ED6D91" />
                 </IconButton>
               )}
             </InputAdornment>

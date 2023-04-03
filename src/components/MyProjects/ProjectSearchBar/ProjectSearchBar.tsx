@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
-import { Grid, InputBase, InputAdornment, IconButton } from '@material-ui/core'
+import { Grid, InputBase, InputAdornment, IconButton } from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
-import SearchIcon from '@material-ui/icons/Search'
+import ClearIcon from '@mui/icons-material/Clear'
+import SearchIcon from '@mui/icons-material/Search'
 
 import useStyles from './styles'
 

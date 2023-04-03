@@ -1,15 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  TextField,
-  Typography
-} from '@material-ui/core'
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from '@mui/material'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { ProjectState, addProject, editProject, deleteProject } from 'state/project'
@@ -93,10 +84,10 @@ const ModalAddOrEditProject: React.FC<{
   return (
     <>
       <Dialog fullWidth maxWidth="sm" open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-        <DialogTitle className={classes.title}>{isEdition ? 'Modifier ' : 'Créer '} un projet de recherche</DialogTitle>
+        <DialogTitle>{isEdition ? 'Modifier ' : 'Créer '} un projet de recherche</DialogTitle>
 
         <DialogContent>
-          <Grid container direction="column" className={classes.inputContainer}>
+          <Grid container direction="column">
             <Typography variant="h3">Nom du projet :</Typography>
             <TextField
               placeholder="Nom du projet"
@@ -105,7 +96,6 @@ const ModalAddOrEditProject: React.FC<{
               autoFocus
               id="title"
               margin="normal"
-              variant="outlined"
               fullWidth
               error={error === ERROR_TITLE}
               helperText={
@@ -130,7 +120,7 @@ const ModalAddOrEditProject: React.FC<{
             Annuler
           </Button>
 
-          <Button disabled={loading} onClick={handleConfirm} color="primary">
+          <Button disabled={loading} onClick={handleConfirm}>
             {isEdition ? 'Modifier' : 'Créer'}
           </Button>
         </DialogActions>
@@ -143,17 +133,17 @@ const ModalAddOrEditProject: React.FC<{
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle className={classes.title}>Supprimer un projet de recherche</DialogTitle>
+        <DialogTitle>Supprimer un projet de recherche</DialogTitle>
 
         <DialogContent>
           <Typography>
-            Êtes-vous sur de vouloir supprimer ce projet de recherche ? L'ensemble des requêtes liées à ce projet vont
-            être supprimées également
+            Êtes-vous sûr(e) de vouloir supprimer ce projet de recherche ? L'ensemble des requêtes lié à ce projet va
+            également être supprimé.
           </Typography>
         </DialogContent>
 
         <DialogActions>
-          <Button disabled={loading} onClick={handleClose} color="primary">
+          <Button disabled={loading} onClick={handleClose}>
             Annuler
           </Button>
 

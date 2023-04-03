@@ -12,14 +12,14 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Skeleton,
   Tooltip,
   Typography
-} from '@material-ui/core'
-import Skeleton from '@material-ui/lab/Skeleton'
+} from '@mui/material'
 
-import ExpandLess from '@material-ui/icons/ExpandLess'
-import ExpandMore from '@material-ui/icons/ExpandMore'
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import ExpandLess from '@mui/icons-material/ExpandLess'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { MedicationListType } from 'state/medication'
@@ -189,9 +189,9 @@ const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
   }, [initialState, medicationHierarchy])
 
   useEffect(() => {
-    if (!loading && (isLoadingSyncHierarchyTable > 0 || isLoadingMedication > 0)) {
+    if (isLoadingSyncHierarchyTable > 0 || isLoadingMedication > 0) {
       setLoading(true)
-    } else if (loading && isLoadingSyncHierarchyTable === 0 && isLoadingMedication === 0) {
+    } else if (isLoadingSyncHierarchyTable === 0 && isLoadingMedication === 0) {
       setLoading(false)
     }
   }, [isLoadingSyncHierarchyTable, isLoadingMedication])
@@ -228,7 +228,7 @@ const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
 
       <Grid className={classes.medicationHierarchyActionContainer}>
         {!isEdition && (
-          <Button onClick={goBack} color="primary" variant="outlined">
+          <Button onClick={goBack} variant="outlined">
             Annuler
           </Button>
         )}

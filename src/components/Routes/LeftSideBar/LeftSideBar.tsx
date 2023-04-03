@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
 
 import {
@@ -17,14 +17,14 @@ import {
   Typography,
   Tooltip,
   Zoom
-} from '@material-ui/core'
+} from '@mui/material'
 
-import AddIcon from '@material-ui/icons/Add'
-import EditIcon from '@material-ui/icons/Edit'
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
-import ExpandLess from '@material-ui/icons/ExpandLess'
-import ExpandMore from '@material-ui/icons/ExpandMore'
-import HelpIcon from '@material-ui/icons/Help'
+import AddIcon from '@mui/icons-material/Add'
+import EditIcon from '@mui/icons-material/Edit'
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
+import ExpandLess from '@mui/icons-material/ExpandLess'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import HelpIcon from '@mui/icons-material/Help'
 
 import cohortLogo from 'assets/images/logo_v3.1_ld.png'
 import { ReactComponent as HomeIcon } from 'assets/icones/home-lg.svg'
@@ -47,7 +47,7 @@ export { smallDrawerWidth, largeDrawerWidth }
 
 const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
   const { practitioner, open, cohortCreation } = useAppSelector((state) => ({
@@ -56,7 +56,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
     cohortCreation: state.cohortCreation
   }))
   const maintenanceIsActive = practitioner?.maintenance?.active
-
   // v-- just for zoom transition..
   const [allreadyOpen, setAllreadyOpen] = useState(false)
 
@@ -70,7 +69,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
       setAllreadyOpen(true)
       dispatch<any>(closeAction())
     }
-  }, [props.open]) // eslint-disable-line
+  }, [props.open, cohortCreation]) // eslint-disable-line
 
   const handleDrawerOpenOrClose = (value: boolean) => {
     setAllreadyOpen(true)
@@ -97,7 +96,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
 
   const handleNewRequest = () => {
     dispatch<any>(resetCohortCreation())
-    history.push('/cohort/new')
+    navigate('/cohort/new')
   }
 
   return (
@@ -105,12 +104,8 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
       <div className={classes.root}>
         <Drawer
           variant="permanent"
-          className={clsx(classes.drawer, {
-            [classes.drawerOpen]: open,
-            [classes.drawerClose]: !open
-          })}
           classes={{
-            paper: clsx({
+            paper: clsx(classes.drawer, {
               [classes.drawerOpen]: open,
               [classes.drawerClose]: !open
             })
@@ -159,7 +154,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                       onClick={() => {
                         localStorage.clear()
                         dispatch<any>(logoutAction())
-                        history.push('/')
+                        navigate('/')
                       }}
                     >
                       <LogoutIcon className={classes.logoutIcon} />
@@ -172,13 +167,13 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             {!open && (
               <ListItem>
                 <Grid container item>
-                  <ListItemIcon className={classes.logoutButton} style={{ marginLeft: -10 }}>
+                  <ListItemIcon className={classes.logoutButton} style={{ marginLeft: -6 }}>
                     <Tooltip title="Se déconnecter">
                       <IconButton
                         onClick={() => {
                           localStorage.clear()
                           dispatch<any>(logoutAction())
-                          history.push('/')
+                          navigate('/')
                         }}
                       >
                         <LogoutIcon className={classes.logoutIcon} />
@@ -195,61 +190,40 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               <ListItem>
                 {!open && (
                   <Tooltip title="Nouvelle requête">
-                    <Button
-                      variant="contained"
+                    <IconButton
                       onClick={handleNewRequest}
-                      className={
-                        maintenanceIsActive
-                          ? clsx(classes.miniButton, classes.button)
-                          : clsx(classes.miniButton, classes.button)
-                      }
+                      className={clsx(classes.miniButton, classes.button)}
                       disabled={maintenanceIsActive}
                     >
                       <AddIcon />
-                    </Button>
+                    </IconButton>
                   </Tooltip>
                 )}
                 {allreadyOpen ? (
                   <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
                     <Button
                       onClick={handleNewRequest}
-                      className={
-                        maintenanceIsActive
-                          ? clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                              [classes.hide]: !open
-                            })
-                          : clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                              [classes.hide]: !open
-                            })
-                      }
+                      className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                        [classes.hide]: !open
+                      })}
                       disabled={maintenanceIsActive}
                     >
-                      {maintenanceIsActive ? (
-                        <Typography variant="h6">Nouvelle requête désactivée</Typography>
-                      ) : (
-                        <Typography variant="h5">Nouvelle requête</Typography>
-                      )}
+                      <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
+                        {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
+                      </Typography>
                     </Button>
                   </Zoom>
                 ) : (
                   <Button
                     onClick={handleNewRequest}
-                    className={
-                      maintenanceIsActive
-                        ? clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                            [classes.hide]: !open
-                          })
-                        : clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                            [classes.hide]: !open
-                          })
-                    }
+                    className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                      [classes.hide]: !open
+                    })}
                     disabled={maintenanceIsActive}
                   >
-                    {maintenanceIsActive ? (
-                      <Typography variant="h6">Nouvelle requête désactivée</Typography>
-                    ) : (
-                      <Typography variant="h5">Nouvelle requête</Typography>
-                    )}
+                    <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
+                      {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
+                    </Typography>
                   </Button>
                 )}
               </ListItem>
@@ -258,141 +232,89 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 <ListItem>
                   {!open && (
                     <Tooltip title="Nouvelle requête">
-                      <Button
-                        variant="contained"
+                      <IconButton
                         onClick={handleNewRequest}
-                        className={
-                          maintenanceIsActive
-                            ? clsx(classes.miniButton, classes.button)
-                            : clsx(classes.miniButton, classes.button)
-                        }
+                        className={clsx(classes.miniButton, classes.button)}
                         disabled={maintenanceIsActive}
                       >
                         <AddIcon />
-                      </Button>
+                      </IconButton>
                     </Tooltip>
                   )}
                   {allreadyOpen ? (
                     <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
                       <Button
                         onClick={handleNewRequest}
-                        className={
-                          maintenanceIsActive
-                            ? clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                                [classes.hide]: !open
-                              })
-                            : clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                                [classes.hide]: !open
-                              })
-                        }
+                        className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                          [classes.hide]: !open
+                        })}
                         disabled={maintenanceIsActive}
                       >
-                        {maintenanceIsActive ? (
-                          <Typography variant="h6">Nouvelle requête désactivée</Typography>
-                        ) : (
-                          <Typography variant="h5">Nouvelle requête</Typography>
-                        )}
+                        <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
+                          {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
+                        </Typography>
                       </Button>
                     </Zoom>
                   ) : (
                     <Button
                       onClick={handleNewRequest}
-                      className={
-                        maintenanceIsActive
-                          ? clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                              [classes.hide]: !open
-                            })
-                          : clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
-                              [classes.hide]: !open
-                            })
-                      }
+                      className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                        [classes.hide]: !open
+                      })}
                       disabled={maintenanceIsActive}
                     >
-                      {maintenanceIsActive ? (
-                        <Typography variant="h6">Nouvelle requête désactivée</Typography>
-                      ) : (
-                        <Typography variant="h5">Nouvelle requête</Typography>
-                      )}
+                      <Typography variant={maintenanceIsActive ? 'h6' : 'h5'}>
+                        {maintenanceIsActive ? 'Nouvelle requête désactivée' : 'Nouvelle requête'}
+                      </Typography>
                     </Button>
                   )}
                 </ListItem>
                 <ListItem style={{ padding: !open ? '0 16px' : undefined }}>
                   {!open && (
                     <Tooltip title="Modifier la requête en cours">
-                      <Button
-                        variant="contained"
-                        onClick={() => history.push('/cohort/new')}
-                        className={
-                          maintenanceIsActive
-                            ? clsx(classes.miniButton, classes.button)
-                            : clsx(classes.miniButton, classes.button)
-                        }
+                      <IconButton
+                        onClick={() => navigate('/cohort/new')}
+                        className={clsx(classes.miniButton, classes.button)}
                         disabled={maintenanceIsActive}
                       >
                         <EditIcon />
-                      </Button>
+                      </IconButton>
                     </Tooltip>
                   )}
                   {allreadyOpen ? (
                     <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
                       <Button
-                        onClick={() => history.push('/cohort/new')}
-                        className={
-                          maintenanceIsActive
-                            ? clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)
-                            : clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)
-                        }
+                        onClick={() => navigate('/cohort/new')}
+                        className={clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
                         disabled={maintenanceIsActive}
                       >
-                        {maintenanceIsActive ? (
-                          <>
-                            <Typography variant="h5">Requête en cours</Typography>
-                            <Typography noWrap style={{ width: 200 }}>
-                              {cohortCreation.request.requestName}
-                            </Typography>
-                          </>
-                        ) : (
-                          <>
-                            <Typography variant="h5">Requête en cours</Typography>
-                            <Typography noWrap style={{ width: 200 }}>
-                              {cohortCreation.request.requestName}
-                            </Typography>
-                          </>
-                        )}
+                        <>
+                          <Typography variant="h5">Requête en cours</Typography>
+                          <Typography noWrap style={{ width: 200 }}>
+                            {cohortCreation.request.requestName}
+                          </Typography>
+                        </>
                       </Button>
                     </Zoom>
                   ) : (
                     <Button
-                      onClick={() => history.push('/cohort/new')}
-                      className={
-                        maintenanceIsActive
-                          ? clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)
-                          : clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)
-                      }
+                      onClick={() => navigate('/cohort/new')}
+                      className={clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
                       disabled={maintenanceIsActive}
                     >
-                      {maintenanceIsActive ? (
-                        <>
-                          <Typography variant="h5">Requête en cours</Typography>
-                          <Typography noWrap style={{ width: 200 }}>
-                            {cohortCreation.request.requestName}
-                          </Typography>
-                        </>
-                      ) : (
-                        <>
-                          <Typography variant="h5">Requête en cours</Typography>
-                          <Typography noWrap style={{ width: 200 }}>
-                            {cohortCreation.request.requestName}
-                          </Typography>
-                        </>
-                      )}
+                      <>
+                        <Typography variant="h5">Requête en cours</Typography>
+                        <Typography noWrap style={{ width: 200 }}>
+                          {cohortCreation.request.requestName}
+                        </Typography>
+                      </>
                     </Button>
                   )}
                 </ListItem>
               </>
             )}
 
-            <ListItem id="accueil" className={classes.listItem} button onClick={() => history.push('/home')}>
+            <ListItem id="accueil" className={classes.listItem} button onClick={() => navigate('/home')}>
               <Tooltip title={!open ? 'Accueil' : ''}>
                 <ListItemIcon className={classes.listIcon}>
                   <HomeIcon width="20px" fill="#FFF" />
@@ -422,18 +344,23 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               <List id="patients-collapse">
                 {!practitioner?.deidentified && (
                   <ListItem>
-                    <Link id="patientResearch-link" href="/patient-search" className={classes.nestedTitle}>
+                    <Link
+                      id="patientResearch-link"
+                      href="/patient-search"
+                      underline="hover"
+                      className={classes.nestedTitle}
+                    >
                       Rechercher un patient
                     </Link>
                   </ListItem>
                 )}
                 <ListItem>
-                  <Link id="myPatient-link" href="/my-patients" className={classes.nestedTitle}>
+                  <Link id="myPatient-link" href="/my-patients" underline="hover" className={classes.nestedTitle}>
                     Tous mes patients
                   </Link>
                 </ListItem>
                 <ListItem>
-                  <Link id="scoopeTree-link" href="/perimeter" className={classes.nestedTitle}>
+                  <Link id="scoopeTree-link" href="/perimeter" underline="hover" className={classes.nestedTitle}>
                     Explorer un périmètre
                   </Link>
                 </ListItem>
@@ -460,12 +387,12 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             >
               <List id="research-collapse">
                 <ListItem>
-                  <Link id="savedResearch-link" href="/my-cohorts" className={classes.nestedTitle}>
+                  <Link id="savedResearch-link" href="/my-cohorts" underline="hover" className={classes.nestedTitle}>
                     Mes cohortes
                   </Link>
                 </ListItem>
                 <ListItem>
-                  <Link id="myProject-link" href="/my-requests" className={classes.nestedTitle}>
+                  <Link id="myProject-link" href="/my-requests" underline="hover" className={classes.nestedTitle}>
                     Mes requêtes
                   </Link>
                 </ListItem>
@@ -476,9 +403,8 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           {ODD_CONTACT &&
             (open ? (
               <Button
-                onClick={() => history.push('/contact')}
+                onClick={() => navigate('/contact')}
                 variant="contained"
-                color="primary"
                 size="small"
                 startIcon={<HelpIcon />}
                 style={{ position: 'fixed', bottom: 0, width: 'inherit' }}
@@ -488,7 +414,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             ) : (
               <IconButton
                 onClick={() => {
-                  history.push('/contact')
+                  navigate('/contact')
                 }}
                 style={{ position: 'fixed', bottom: 0 }}
               >

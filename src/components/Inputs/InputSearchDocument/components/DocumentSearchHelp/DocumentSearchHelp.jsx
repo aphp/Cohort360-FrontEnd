@@ -17,7 +17,7 @@ import {
   TableHead,
   TableRow,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import useStyles from './styles.js'
 
@@ -26,7 +26,7 @@ const DocumentSearchHelp = ({ open, onClose }) => {
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle className={classes.title}>Aide à la recherche textuelle</DialogTitle>
+      <DialogTitle>Aide à la recherche textuelle</DialogTitle>
       <DialogContent className={classes.dialog}>
         <Grid container direction="column">
           <Typography>Les opérateurs ci-dessous vous aideront à affiner la recherche textuelle.</Typography>
@@ -616,9 +616,7 @@ const DocumentSearchHelp = ({ open, onClose }) => {
       </DialogContent>
 
       <DialogActions className={classes.dialog}>
-        <Button onClick={onClose} color="primary">
-          Fermer
-        </Button>
+        <Button onClick={onClose}>Fermer</Button>
       </DialogActions>
     </Dialog>
   )

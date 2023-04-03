@@ -1,6 +1,7 @@
-import { makeStyles } from '@material-ui/core/styles'
+import makeStyles from '@mui/styles/makeStyles'
+import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
@@ -15,7 +16,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#317EAA',
     color: 'white',
     // Not default
-    marginBottom: 48
+    marginBottom: 46
   },
   backButton: { color: 'white' },
   divider: { background: 'white' },

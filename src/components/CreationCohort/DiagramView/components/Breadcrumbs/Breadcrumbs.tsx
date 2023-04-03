@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { Breadcrumbs, Grid, Typography } from '@material-ui/core'
+import { Breadcrumbs, Grid, Typography } from '@mui/material'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchProjects as fetchProjectsList } from 'state/project'

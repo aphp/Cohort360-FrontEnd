@@ -1,6 +1,7 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   table: {
     minWidth: 650
   },
@@ -29,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 4
   },
   iconMargin: {
-    margin: `0 ${theme.spacing(1)}px`
+    margin: `0 ${theme.spacing(1)}`
   },
   description: {
     fontWeight: 'bold'

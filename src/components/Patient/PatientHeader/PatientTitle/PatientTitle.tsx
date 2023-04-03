@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAppSelector } from 'state'
 
-import { IconButton, Grid, Menu, MenuItem, Typography } from '@material-ui/core'
+import { IconButton, Grid, Menu, MenuItem, Typography } from '@mui/material'
 
-import ArrowBackIcon from '@material-ui/icons/ArrowBack'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
@@ -16,7 +16,7 @@ type PatientTitleProps = {
 }
 const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const location = useLocation()
   const search = new URLSearchParams(location.search)
@@ -39,7 +39,7 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
         ? `/perimeters/patients?${groupId}`
         : '/my-patients/patients'
 
-    history.push(path)
+    navigate(path)
   }
 
   return (

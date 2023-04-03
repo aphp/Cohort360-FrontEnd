@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 
-import { Alert, Autocomplete } from '@material-ui/lab'
 import {
+  Alert,
+  Autocomplete,
   Button,
   Divider,
   FormControlLabel,
@@ -11,11 +12,11 @@ import {
   Radio,
   RadioGroup,
   Switch,
-  TextField,
-  Typography
-} from '@material-ui/core'
+  Typography,
+  TextField
+} from '@mui/material'
 
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
@@ -159,6 +160,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               id="criteria-inclusive"
               checked={!currentState.isInclusive}
               onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
+              color="secondary"
             />
           </Grid>
 
@@ -172,9 +174,13 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               value={currentState.type}
               onChange={(e, value) => onChangeValue('type', value)}
             >
-              <FormControlLabel value="MedicationRequest" control={<Radio />} label="Prescription" />
-              {/* <FormControlLabel value="dispensation" control={<Radio />} label="Dispensation" /> */}
-              <FormControlLabel value="MedicationAdministration" control={<Radio />} label="Administration" />
+              <FormControlLabel value="MedicationRequest" control={<Radio color="secondary" />} label="Prescription" />
+              {/* <FormControlLabel value="dispensation" control={<Radio color="secondary"/>} label="Dispensation" /> */}
+              <FormControlLabel
+                value="MedicationAdministration"
+                control={<Radio color="secondary" />}
+                label="Administration"
+              />
             </RadioGroup>
           </Grid>
 
@@ -199,10 +205,10 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               className={classes.inputItem}
               options={criteria?.data?.prescriptionTypes || []}
               getOptionLabel={(option) => option.label}
-              getOptionSelected={(option, value) => option.id === value.id}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               value={selectedCriteriaPrescriptionType}
               onChange={(e, value) => onChangeValue('prescriptionType', value)}
-              renderInput={(params) => <TextField {...params} variant="outlined" label="Type de prescription" />}
+              renderInput={(params) => <TextField {...params} label="Type de prescription" />}
             />
           )}
 
@@ -212,10 +218,10 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             className={classes.inputItem}
             options={criteria?.data?.administrations || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={selectedCriteriaAdministration}
             onChange={(e, value) => onChangeValue('administration', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Voie d'administration" />}
+            renderInput={(params) => <TextField {...params} label="Voie d'administration" />}
           />
 
           <AdvancedInputs form="medication" selectedCriteria={currentState} onChangeValue={onChangeValue} />
@@ -223,11 +229,11 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
 
         <Grid className={classes.criteriaActionContainer}>
           {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
+            <Button onClick={goBack} variant="outlined">
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="supported-form" color="primary" variant="contained">
+          <Button onClick={_onSubmit} type="submit" form="supported-form" variant="contained">
             Confirmer
           </Button>
         </Grid>

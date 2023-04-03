@@ -1,11 +1,29 @@
 import React, { useState, useEffect } from 'react'
 
-import { Box, IconButton, MenuItem, Select, Typography, TextField } from '@material-ui/core'
+import {
+  Box,
+  IconButton,
+  MenuItem,
+  Select,
+  Typography,
+  TextField,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent
+} from '@mui/material'
 
-import DeleteIcon from '@material-ui/icons/Delete'
+import WarningIcon from '@mui/icons-material/Warning'
+
+import DeleteIcon from '@mui/icons-material/Delete'
 
 import { useAppSelector, useAppDispatch } from 'state'
-import { editCriteriaGroup, deleteCriteriaGroup, buildCohortCreation } from 'state/cohortCreation'
+import {
+  editCriteriaGroup,
+  deleteCriteriaGroup,
+  buildCohortCreation,
+  updateTemporalConstraints
+} from 'state/cohortCreation'
 
 import useStyles from './styles'
 
@@ -23,6 +41,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
 
   const [isOpen, setOpen] = useState<boolean>(false)
   const [groupType, setGroupType] = useState('andGroup')
+  const [openConfirmationDialog, setOpenConfirmationDialog] = useState<boolean>(false)
 
   const { request } = useAppSelector((state) => state.cohortCreation || {})
   const { criteriaGroup } = request
@@ -192,6 +211,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               className={classes.inputSelect}
               onChange={(event) => _handleChangeLogicalOperatorProps('isInclusive', event.target.value === 'true')}
               style={{ color: 'currentColor', marginLeft: 8 }}
+              variant="standard"
             >
               <MenuItem value={'true'}>Inclure</MenuItem>
               <MenuItem value={'false'}>Exclure</MenuItem>
@@ -207,8 +227,15 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
               value={groupType}
               classes={{ icon: classes.selectIcon }}
               className={classes.inputSelect}
-              onChange={(event) => _handleChangeLogicalOperatorProps('groupType', event.target.value)}
+              onChange={(event) => {
+                if (isMainOperator && event.target.value !== 'andGroup') {
+                  setOpenConfirmationDialog(true)
+                } else {
+                  _handleChangeLogicalOperatorProps('groupType', event.target.value)
+                }
+              }}
               style={{ color: 'currentColor' }}
+              variant="standard"
             >
               <MenuItem value={'andGroup'}>tous les</MenuItem>
               <MenuItem value={'orGroup'}>un des</MenuItem>
@@ -252,6 +279,32 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
           </Typography>
         )}
       </Box>
+
+      <Dialog open={openConfirmationDialog} onClose={() => setOpenConfirmationDialog(false)}>
+        <DialogContent
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}
+        >
+          <WarningIcon style={{ fontSize: 40, color: '#ff9800', margin: 12 }} />
+          <Typography>
+            L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères <strong>ET</strong>,
+            passer sur un groupe de critères <strong>OU</strong> vous fera perdre toutes vos précédentes contraintes
+            temporelles.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button style={{ color: '#ED6D91' }} onClick={() => setOpenConfirmationDialog(false)}>
+            Annuler
+          </Button>
+          <Button
+            onClick={() => {
+              dispatch<any>(updateTemporalConstraints([]))
+              _handleChangeLogicalOperatorProps('groupType', 'orGroup')
+            }}
+          >
+            Confirmer
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }

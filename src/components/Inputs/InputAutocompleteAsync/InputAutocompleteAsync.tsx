@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useState, Fragment } from 'react'
 
-import { TextField, CircularProgress } from '@material-ui/core'
-import { Autocomplete } from '@material-ui/lab'
+import { Autocomplete, CircularProgress, TextField } from '@mui/material'
 
 interface ElementType {
   id: string
@@ -85,7 +84,7 @@ const InputAutocompleteAsync: FC<InputAutocompleteAsyncProps> = (props) => {
       value={autocompleteValue}
       onChange={onChange}
       options={options ?? []}
-      getOptionSelected={(option, value) => option.id === value.id}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
       getOptionLabel={(option) => option.label}
       renderInput={(params) => (
         <TextField

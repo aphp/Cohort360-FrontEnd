@@ -1,25 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import {
-  Breadcrumbs,
   Checkbox,
   CircularProgress,
   Grid,
   IconButton,
+  Skeleton,
+  TableCell,
+  TableRow,
+  Typography,
+  Breadcrumbs,
   Paper,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
   TableHead,
-  TableRow,
-  Typography
-} from '@material-ui/core'
+  Pagination
+} from '@mui/material'
 
-import Skeleton from '@material-ui/lab/Skeleton'
-import KeyboardArrowRightIcon from '@material-ui/icons/ChevronRight'
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
-
+import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import EnhancedTable from 'components/ScopeTree/ScopeTreeTable'
 import { ScopeTreeRow, TreeElement } from 'types'
 
@@ -31,7 +31,6 @@ import { useDebounce } from 'utils/debounce'
 
 import useStyles from './styles'
 import { findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
-import { Pagination } from '@material-ui/lab'
 import servicesPerimeters from '../../services/aphp/servicePerimeters'
 import { findSelectedInListAndSubItems } from '../../utils/cohortCreation'
 
@@ -140,7 +139,7 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
 type ScopeTreeProps = {
   defaultSelectedItems: ScopeTreeRow[]
   onChangeSelectedItem: (selectedItems: ScopeTreeRow[]) => void
-  searchInput?: string
+  searchInput: string
 }
 
 const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSelectedItem, searchInput }) => {
@@ -227,7 +226,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
   const _onExpand = async (rowId: number) => {
     controllerRef.current = new AbortController()
     let _openPopulation = openPopulation ? openPopulation : []
-    let _rootRows = rootRows ? [...rootRows] : []
+    const _rootRows = rootRows ? [...rootRows] : []
     const index = _openPopulation.indexOf(rowId)
 
     if (index !== -1) {
@@ -248,8 +247,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     )
     if (expandResponse && expandResponse.payload && !expandResponse.payload.aborted) {
       const _selectedItems = expandResponse.payload.selectedItems ?? []
-      _rootRows = expandResponse.payload.rootRows ?? _rootRows
-      setRootRows(_rootRows)
+      setRootRows(expandResponse.payload.scopesList ?? [])
       onChangeSelectedItem(_selectedItems)
     }
   }
@@ -472,13 +470,15 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
               </EnhancedTable>
             </>
           )}
-          <Pagination
-            className={classes.pagination}
-            count={Math.ceil((count ?? 0) / 100)}
-            shape="rounded"
-            onChange={(event, page: number) => setPage && setPage(page)}
-            page={page}
-          />
+          {searchInput && !isEmpty && (
+            <Pagination
+              className={classes.pagination}
+              count={Math.ceil((count ?? 0) / 100)}
+              shape="circular"
+              onChange={(event, page: number) => setPage && setPage(page)}
+              page={page}
+            />
+          )}
         </>
       )}
     </div>

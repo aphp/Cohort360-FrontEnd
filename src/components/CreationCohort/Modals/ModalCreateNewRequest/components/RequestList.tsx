@@ -10,10 +10,10 @@ import {
   ListItemText,
   Typography,
   Radio
-} from '@material-ui/core'
+} from '@mui/material'
 
-import ExpandLessIcon from '@material-ui/icons/ExpandLess'
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 import { RequestType, ProjectType } from 'types'
 
@@ -43,11 +43,11 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
         <ListItemSecondaryAction>
           {!open ? (
             <IconButton onClick={() => setOpen(!open)}>
-              <ExpandLessIcon />
+              <ExpandMoreIcon />
             </IconButton>
           ) : (
             <IconButton onClick={() => setOpen(!open)}>
-              <ExpandMoreIcon />
+              <ExpandLessIcon />
             </IconButton>
           )}
         </ListItemSecondaryAction>
@@ -58,15 +58,23 @@ const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selected
             return (
               <ListItem key={request.uuid} className={classes.requestItem}>
                 <ListItemText onClick={() => onSelectedItem(request.uuid as string)}>
-                  <Typography noWrap style={{ marginLeft: 8 }}>
-                    {request.name}
-                  </Typography>
+                  {request.shared_by?.displayed_name ? (
+                    <Typography noWrap style={{ marginLeft: 8 }}>
+                      {request.name} - Envoyée par : {request.shared_by.firstname}{' '}
+                      {request.shared_by.lastname?.toUpperCase()}
+                    </Typography>
+                  ) : (
+                    <Typography noWrap style={{ marginLeft: 8 }}>
+                      {request.name}
+                    </Typography>
+                  )}
                 </ListItemText>
 
                 <ListItemSecondaryAction>
                   <Radio
                     checked={selectedItem === request.uuid}
                     onChange={() => onSelectedItem(request.uuid as string)}
+                    color="secondary"
                   />
                 </ListItemSecondaryAction>
               </ListItem>
