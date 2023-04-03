@@ -36,7 +36,6 @@
     "react-redux": "^8.0.5",
     "react-router": "^6.9.0",
     "react-router-dom": "^6.9.0",
-    "react-scripts": "^5.0.1",
     "redux": "^4.2.1",
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
@@ -48,10 +47,9 @@
   "scripts": {
     "fix-packages": "npx npm-force-resolutions",
     "start": "react-app-rewired start",
-    "build": "react-scripts build",
+    "build": "react-app-rewired build",
     "lint": "eslint --ext .jsx,.js,.ts,.tsx src/",
-    "test": "wdio wdio.conf.js --suite Generics --suite HomePage --suite MyPatients --suite Requests",
-    "start:aphp": "env $(cat .env.aphp) react-scripts start"
+    "test": "wdio wdio.conf.js --suite Generics --suite HomePage --suite MyPatients --suite Requests"
   },
   "browserslist": {
     "production": [
