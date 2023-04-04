@@ -603,16 +603,20 @@ export const fetchMedicationAdministration = async (args: fetchMedicationAdminis
 type fetchScopeProps = {
   perimetersIds?: string[]
   cohortIds?: string[]
+  types?: string[]
 }
 export const fetchScope: (args: fetchScopeProps) => Promise<AxiosResponse<IScope | unknown>> = async (
   args: fetchScopeProps
 ) => {
-  const { perimetersIds, cohortIds } = args
+  const { perimetersIds, cohortIds, types } = args
 
   let options: string[] = []
   if (perimetersIds && perimetersIds.length > 0) options = [...options, `local_id=${perimetersIds.join(',')}`] // eslint-disable-line
   if (cohortIds && cohortIds.length > 0) options = [...options, `cohort_id=${cohortIds.join(',')}`] // eslint-disable-line
+  if (types && types.length > 0) options = [...options, `type_source_value=${types.join(',')}`] // eslint-disable-line
 
-  const response: AxiosResponse<IScope | unknown> = await apiBackend.get(`accesses/perimeters/read-patient/?${options}`)
+  const response: AxiosResponse<IScope | unknown> = await apiBackend.get(
+    `accesses/perimeters/read-patient/?${options.reduce(optionsReducer)}`
+  )
   return response
 }
