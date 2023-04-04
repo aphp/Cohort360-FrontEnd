@@ -23,7 +23,7 @@ import {
   IMedicationRequest,
   IMedicationAdministration,
   IEncounter,
-  IComposition,
+  IDocumentReference,
   IObservation
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
@@ -252,7 +252,7 @@ export interface IServicePatients {
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<{
-    docsList: IComposition[]
+    docsList: IDocumentReference[]
     docsTotal: number
   }>
 
@@ -747,7 +747,19 @@ export const getEncounterDocuments = async (
 
   const documentsResp = await fetchComposition({
     encounter: encountersIdList.join(','),
-    _elements: ['status', 'type', 'subject', 'encounter', 'date', 'title', 'event'],
+    _elements: [
+      'docstatus',
+      'status',
+      'type',
+      'subject',
+      'encounter',
+      'date',
+      'title',
+      'event',
+      'content',
+      'context',
+      'text'
+    ],
     status: 'final',
     _list: groupId ? groupId.split(',') : []
   })
@@ -756,7 +768,7 @@ export const getEncounterDocuments = async (
 
   for (const encounter of _encounters) {
     const currentDocuments = documents?.filter(
-      (document) => encounter.id === document.encounter?.display?.replace('Encounter/', '')
+      (document) => encounter.id === document.context?.encounter?.[0].reference?.replace('Encounter/', '')
     )
     const currentDetails = encountersDetail?.filter(
       (encounterDetail) => encounter.id === encounterDetail?.partOf?.reference?.replace('Encounter/', '')

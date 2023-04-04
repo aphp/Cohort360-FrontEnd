@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { IComposition_Section } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -28,7 +28,7 @@ type DocumentViewerProps = {
 }
 
 const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, handleClose, documentId }) => {
-  const [documentContent, setDocumentContent] = useState<IComposition_Section[] | null>(null)
+  const [documentContent, setDocumentContent] = useState<IDocumentReference | null>(null)
   const [numPages, setNumPages] = useState(1)
   const [loading, setLoading] = useState(false)
 
@@ -62,7 +62,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
 
   return (
     <Dialog open={open} fullWidth maxWidth="xl" onClose={handleClose}>
-      <DialogTitle id="document-viewer-dialog-title"></DialogTitle>
+      {/* <DialogTitle id="document-viewer-dialog-title"></DialogTitle>
       <DialogContent id="document-viewer-dialog-content">
         {deidentified ? (
           loading ? (
@@ -113,7 +113,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
         <Button autoFocus onClick={handleClose}>
           Fermer
         </Button>
-      </DialogActions>
+      </DialogActions> */}
     </Dialog>
   )
 }

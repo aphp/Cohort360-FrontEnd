@@ -3,8 +3,8 @@ import {
   IBundle,
   IBundle_Entry,
   IClaim,
-  IComposition,
   ICondition,
+  IDocumentReference,
   IEncounter,
   IGroup,
   IMedicationAdministration,
@@ -55,7 +55,7 @@ export type Provider = {
   year_of_birth?: number
 }
 
-export type CohortComposition = IComposition & {
+export type CohortComposition = IDocumentReference & {
   deidentified?: boolean
   idPatient?: string
   IPP?: string
@@ -64,6 +64,16 @@ export type CohortComposition = IComposition & {
   NDA?: string
   event?: {}
   parameter?: any[]
+  title?: string
+  encounter?: {
+    id?: string
+    status?: string
+    serviceProvider?: string
+    NDA?: string
+    event?: {}
+    parameter?: any[]
+    title?: string
+  }[]
 }
 
 export type CohortEncounter = IEncounter & {

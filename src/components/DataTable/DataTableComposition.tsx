@@ -140,7 +140,7 @@ const DataTableCompositionLine: React.FC<{
   const docType = docTypes.docTypes.find(
     ({ code }) => code === (document.type?.coding && document.type?.coding[0] ? document.type?.coding[0].code : '-')
   )
-  const section = searchMode ? document.section : []
+  // const section = searchMode ? document.section : []
   const date = document.date ? new Date(document.date).toLocaleDateString('fr-FR') : ''
   const hour = document.date
     ? new Date(document.date).toLocaleTimeString('fr-FR', {
@@ -212,7 +212,7 @@ const DataTableCompositionLine: React.FC<{
         </TableCell>
       </TableRow>
 
-      {section && section.length > 0 && (
+      {/* {section && section.length > 0 && (
         <TableRow className={classes.tableBodyRows}>
           <TableCell colSpan={6} style={{ backgroundImage: `url(${Watermark})`, backgroundSize: 'contain' }}>
             {section.map((section) => (
@@ -222,7 +222,7 @@ const DataTableCompositionLine: React.FC<{
             ))}
           </TableCell>
         </TableRow>
-      )}
+      )} */}
     </React.Fragment>
   )
 }
