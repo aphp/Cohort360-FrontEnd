@@ -63,7 +63,8 @@ export interface IServicePerimeters {
     defaultPerimetersIds?: string[],
     cohortIds?: string[],
     noPerimetersIdsFetch?: boolean,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    types?: string[]
   ) => Promise<ScopePage[]>
 
   /**
@@ -228,7 +229,8 @@ const servicesPerimeters: IServicePerimeters = {
     defaultPerimetersIds?: string[],
     cohortIds?: string[],
     noPerimetersIdsFetch?: boolean,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    types?: string[]
   ) => {
     try {
       let perimetersIds: string[] | undefined = []
@@ -252,7 +254,11 @@ const servicesPerimeters: IServicePerimeters = {
         perimetersIds = defaultPerimetersIds
       }
 
-      const perimetersListReponse: any = await fetchScope({ perimetersIds: perimetersIds, cohortIds: cohortIds })
+      const perimetersListReponse: any = await fetchScope({
+        perimetersIds: perimetersIds,
+        cohortIds: cohortIds,
+        types: types
+      })
       if (!perimetersListReponse || !perimetersListReponse.data || !perimetersListReponse.data.results) {
         console.error(
           'Error (getPerimeters) while fetching perimeter (from back) ! perimeters = {}, cohortIds = {}',
@@ -296,11 +302,15 @@ const servicesPerimeters: IServicePerimeters = {
 
   getScopeSubItems: async (subScopesIds: string | null | undefined, getSubItem?: boolean, signal?: AbortSignal) => {
     if (!subScopesIds) return []
+
+    const types = ['AP-HP', 'GHU', 'Hôpital', 'Groupe hospitalier (GH)', 'Pôle/DMU', 'Unité Fonctionnelle (UF)']
+
     const subScopes: ScopePage[] = await servicesPerimeters.getPerimeters(
       subScopesIds.trim().split(','),
       undefined,
       undefined,
-      signal
+      signal,
+      types
     )
     const scopeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(subScopes, getSubItem, signal)
     return scopeRowList
