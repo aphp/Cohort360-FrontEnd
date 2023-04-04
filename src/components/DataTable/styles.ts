@@ -1,6 +1,7 @@
-import { makeStyles, createStyles } from '@material-ui/core/styles'
+import { makeStyles, createStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     table: {
       minWidth: 650
@@ -20,7 +21,7 @@ const useStyles = makeStyles((theme) =>
       fontWeight: 'bold'
     },
     genderIcon: {
-      height: '25px',
+      height: 25,
       fill: '#0063AF'
     },
     pagination: {
@@ -36,13 +37,13 @@ const useStyles = makeStyles((theme) =>
       }
     },
     validChip: {
-      fontSize: '11px',
+      fontSize: 11,
       backgroundColor: '#5BC5F2',
       color: '#FFF',
       fontWeight: 'bold'
     },
     cancelledChip: {
-      fontSize: '11px',
+      fontSize: 11,
       backgroundColor: '#D0D7D8',
       color: '#FFF',
       fontWeight: 'bold'
@@ -53,20 +54,20 @@ const useStyles = makeStyles((theme) =>
       maxHeight: `calc(100vh - 500px)`
     },
     tableBodyRows: {
-      height: '80px',
+      height: 80,
       '&:nth-of-type(even)': {
         backgroundColor: '#FAF9F9'
       }
     },
     iconSize: {
-      fontSize: '30px'
+      fontSize: 30
     },
     searchIcon: {
       padding: 0,
       marginLeft: 4
     },
     iconMargin: {
-      margin: `0 ${theme.spacing(1)}px`
+      margin: `0 ${theme.spacing(1)}`
     },
     multiple: {
       '&::after': {
@@ -88,30 +89,33 @@ const useStyles = makeStyles((theme) =>
     },
     tabsContainer: {
       backgroundColor: '#153D8A',
-      borderRadius: '8px',
+      borderRadius: 8,
       color: 'white',
-      minHeight: 41
+      minHeight: 41,
+      '& .Mui-selected': { color: 'white' }
     },
     indicator: {
-      backgroundColor: '#5BC5F2',
+      backgroundColor: '#ED6D91',
       height: '4px'
     },
     selected: {
-      backgroundColor: '#0063AF'
+      backgroundColor: '#0063AF',
+      color: 'white'
     },
     tabTitle: {
-      minWidth: 0,
+      minWidth: 160,
       color: 'white',
       fontWeight: 400,
       borderBottom: '#255CA1 inset 4px',
-      minHeight: 41
+      minHeight: 41,
+      padding: '6px 12px'
     },
     searchBar: {
       minWidth: 250,
       backgroundColor: '#FFF',
       border: '1px solid #D0D7D8',
       boxShadow: '0px 1px 16px #0000000A',
-      borderRadius: '25px'
+      borderRadius: 25
     },
     input: {
       marginLeft: theme.spacing(1),
@@ -119,10 +123,10 @@ const useStyles = makeStyles((theme) =>
     },
     searchButton: {
       minWidth: 150,
-      height: 41,
+      height: 32,
       backgroundColor: '#5BC5F2',
       color: 'white',
-      borderRadius: '25px',
+      borderRadius: 25,
       marginInline: 8,
       '&:hover': {
         backgroundColor: '#5BC5F2',
@@ -135,7 +139,12 @@ const useStyles = makeStyles((theme) =>
       padding: '0 16px'
     },
     select: {
-      marginRight: '4px'
+      marginRight: 4,
+      borderRadius: 25,
+      backgroundColor: '#FFF',
+      '& .MuiSelect-select': {
+        borderRadius: 25
+      }
     }
   })
 )

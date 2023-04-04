@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { Grid } from '@material-ui/core'
-import Alert from '@material-ui/lab/Alert'
+import { Alert, Grid } from '@mui/material'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
@@ -84,9 +83,11 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
       case 'nda':
       case 'loinc':
       case 'anabio':
+        setFilters((prevState) => ({ ...prevState, [filterName]: value }))
+        break
       case 'startDate':
       case 'endDate':
-        setFilters((prevState) => ({ ...prevState, [filterName]: value }))
+        setFilters((prevState) => ({ ...prevState, [filterName]: null }))
         break
     }
   }
@@ -96,7 +97,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   }, [searchInput, filters, order])
 
   return (
-    <Grid container item xs={11} justifyContent="flex-end" className={classes.documentTable}>
+    <Grid container justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
         loading={loading}
         results={{

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 
-import Button from '@material-ui/core/Button'
-import Drawer from '@material-ui/core/Drawer'
-import Typography from '@material-ui/core/Typography'
+import Button from '@mui/material/Button'
+import Drawer from '@mui/material/Drawer'
+import Typography from '@mui/material/Typography'
 
 import ScopeTree from 'components/ScopeTree/ScopeTree'
 import { ScopeTreeRow } from 'types'
@@ -55,13 +55,12 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
         </div>
 
         <div className={classes.drawerActionContainer}>
-          <Button onClick={onClose} color="primary" variant="outlined">
+          <Button onClick={onClose} variant="outlined">
             Annuler
           </Button>
           <Button
             disabled={!_selectedPopulation || (_selectedPopulation && _selectedPopulation.length === 0)}
             onClick={() => onConfirm(_selectedPopulation)}
-            color="primary"
             variant="contained"
           >
             Confirmer

@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 
-import { Alert } from '@material-ui/lab'
-import { Button, Divider, FormLabel, Grid, IconButton, Typography } from '@material-ui/core'
+import { Alert, Button, Divider, FormLabel, Grid, IconButton, Typography } from '@mui/material'
 
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import RequestList from 'components/CreationCohort/Modals/ModalCreateNewRequest/components/RequestList'
 
@@ -72,11 +71,11 @@ const RequestForm: React.FC<RequestFormProps> = ({ parentId, goBack }) => {
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
-          <Button onClick={goBack} color="primary" variant="outlined">
+          <Button onClick={goBack} variant="outlined">
             Annuler
           </Button>
 
-          <Button onClick={_onSubmit} type="submit" form="demographic-form" color="primary" variant="contained">
+          <Button onClick={_onSubmit} type="submit" form="demographic-form" variant="contained">
             Confirmer
           </Button>
         </Grid>

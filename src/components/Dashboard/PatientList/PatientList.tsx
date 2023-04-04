@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import moment from 'moment'
 
-import { CssBaseline, Grid } from '@material-ui/core'
+import Grid from '@mui/material/Grid'
 
 import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
 import DataTablePatient from 'components/DataTable/DataTablePatient'
@@ -29,6 +29,8 @@ import {
 
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import { buildPatientFiltersChips } from 'utils/chips'
+import { substructAgeString } from 'utils/age'
+import { useDebounce } from 'utils/debounce'
 
 type PatientListProps = {
   total: number
@@ -63,7 +65,7 @@ const PatientList: React.FC<PatientListProps> = ({
 
   const [filters, setFilters] = useState<PatientFiltersType>({
     gender: PatientGenderKind._unknown,
-    birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
+    birthdatesRanges: ['', ''],
     vitalStatus: VitalStatus.all
   })
 
@@ -71,6 +73,16 @@ const PatientList: React.FC<PatientListProps> = ({
     orderBy: 'family',
     orderDirection: 'asc'
   })
+
+  const debouncedSearchInput = useDebounce(500, searchInput)
+  const controllerRef = useRef<AbortController | null>()
+
+  const _cancelPendingRequest = () => {
+    if (controllerRef.current) {
+      controllerRef.current.abort()
+    }
+    controllerRef.current = new AbortController()
+  }
 
   useEffect(() => {
     setAgePyramid(agePyramidData)
@@ -99,19 +111,24 @@ const PatientList: React.FC<PatientListProps> = ({
     // Set search state
     if (inputSearch !== searchInput) setSearchInput(inputSearch)
     if (_searchBy !== searchBy) setSearchBy(_searchBy)
+    const birthdates: [string, string] = [
+      moment(substructAgeString(filters.birthdatesRanges[0])).format('MM/DD/YYYY'),
+      moment(substructAgeString(filters.birthdatesRanges[1])).format('MM/DD/YYYY')
+    ]
 
     const result = await services.cohorts.fetchPatientList(
       pageValue,
       _searchBy,
       inputSearch,
       filters.gender,
-      filters.birthdates,
+      birthdates,
       filters.vitalStatus,
       order.orderBy,
       order.orderDirection,
       deidentified ?? true,
       groupId,
-      includeFacets
+      includeFacets,
+      controllerRef.current?.signal
     )
     if (result) {
       const { totalPatients, originalPatients, genderRepartitionMap, agePyramidData } = result
@@ -126,13 +143,15 @@ const PatientList: React.FC<PatientListProps> = ({
   }
 
   const onSearchPatient = (inputSearch?: string, searchBy?: SearchByTypes) => {
-    setPage(1)
-    fetchPatients(1, true, inputSearch, searchBy)
+    setSearchInput(inputSearch ?? '')
+    setSearchBy(searchBy ?? SearchByTypes.text)
   }
 
   useEffect(() => {
-    onSearchPatient()
-  }, [filters, order, searchBy]) // eslint-disable-line
+    _cancelPendingRequest()
+    setPage(1)
+    fetchPatients(1, true, debouncedSearchInput, searchBy)
+  }, [filters, order, searchBy, debouncedSearchInput]) // eslint-disable-line
 
   const handleChangePage = (value?: number) => {
     setPage(value ?? 1)
@@ -153,7 +172,7 @@ const PatientList: React.FC<PatientListProps> = ({
       case 'birthdates':
         setFilters((prevFilters) => ({
           ...prevFilters,
-          birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]
+          birthdatesRanges: ['', '']
         }))
         break
       case 'vitalStatus':
@@ -167,56 +186,52 @@ const PatientList: React.FC<PatientListProps> = ({
 
   return (
     <Grid container direction="column" alignItems="center">
-      <CssBaseline />
-      <Grid container item xs={11} justifyContent="space-between">
-        <PatientCharts agePyramid={agePyramid} patientData={patientData} />
+      <PatientCharts agePyramid={agePyramid} patientData={patientData} />
 
-        {/* <Grid id="patient-data-grid" container item justifyContent="flex-end" className={classes.tableGrid}> */}
-        <DataTableTopBar
-          loading={loadingStatus}
-          results={patientsResult}
-          searchBar={
-            deidentified
-              ? undefined
-              : {
-                  type: 'patient',
-                  value: searchInput,
-                  searchBy: searchBy,
-                  onSearch: (newSearchInput: string, newSearchBy?: SearchByTypes) =>
-                    onSearchPatient(newSearchInput, newSearchBy)
-                }
+      <DataTableTopBar
+        loading={loadingStatus}
+        results={patientsResult}
+        searchBar={
+          deidentified
+            ? undefined
+            : {
+                type: 'patient',
+                value: searchInput,
+                searchBy: searchBy,
+                onSearch: (newSearchInput: string, newSearchBy?: SearchByTypes) =>
+                  onSearchPatient(newSearchInput, newSearchBy)
+              }
+        }
+        buttons={[
+          {
+            label: 'Filtrer',
+            icon: <FilterList height="15px" fill="#FFF" />,
+            onClick: () => setOpen(true)
           }
-          buttons={[
-            {
-              label: 'Filtrer',
-              icon: <FilterList height="15px" fill="#FFF" />,
-              onClick: () => setOpen(true)
-            }
-          ]}
-        />
+        ]}
+      />
 
-        <MasterChips chips={buildPatientFiltersChips(filters, handleDeleteChip)} />
+      <MasterChips chips={buildPatientFiltersChips(filters, handleDeleteChip)} />
 
-        <DataTablePatient
-          loading={loadingStatus}
-          groupId={groupId}
-          deidentified={deidentified ?? false}
-          patientsList={patientsList ?? []}
-          order={order}
-          setOrder={setOrder}
-          page={page}
-          setPage={(newPage) => handleChangePage(newPage)}
-          total={patientsResult.nb}
-        />
+      <DataTablePatient
+        loading={loadingStatus}
+        groupId={groupId}
+        deidentified={deidentified ?? false}
+        patientsList={patientsList ?? []}
+        order={order}
+        setOrder={setOrder}
+        page={page}
+        setPage={(newPage) => handleChangePage(newPage)}
+        total={patientsResult.nb}
+      />
 
-        <PatientFilters
-          open={open}
-          onClose={() => setOpen(false)}
-          onSubmit={() => setOpen(false)}
-          filters={filters}
-          onChangeFilters={setFilters}
-        />
-      </Grid>
+      <PatientFilters
+        open={open}
+        onClose={() => setOpen(false)}
+        onSubmit={() => setOpen(false)}
+        filters={filters}
+        onChangeFilters={setFilters}
+      />
     </Grid>
   )
 }

@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from 'react'
 
-import { Alert } from '@material-ui/lab'
-import { Button, Divider, FormLabel, Grid, IconButton, Typography, TextField, Switch, Slider } from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+import {
+  Alert,
+  Autocomplete,
+  Button,
+  Divider,
+  FormLabel,
+  Grid,
+  IconButton,
+  Typography,
+  TextField,
+  Switch,
+  Slider
+} from '@mui/material'
 
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
 
@@ -139,7 +149,6 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            variant="outlined"
             value={defaultValues.title}
             onChange={(e) => _onChangeValue('title', e.target.value)}
           />
@@ -156,6 +165,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
               id="criteria-inclusive"
               checked={!defaultValues.isInclusive}
               onChange={(event) => _onChangeValue('isInclusive', !event.target.checked)}
+              color="secondary"
             />
           </Grid>
 
@@ -165,10 +175,10 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             className={classes.inputItem}
             options={criteria?.data?.gender !== 'loading' ? criteria?.data?.gender : []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesGender}
             onChange={(e, value) => _onChangeValue('gender', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Genre" />}
+            renderInput={(params) => <TextField {...params} label="Genre" />}
           />
 
           <Autocomplete
@@ -177,10 +187,10 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
             className={classes.inputItem}
             options={criteria?.data?.status !== 'loading' ? criteria?.data?.status : []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesVitalStatus}
             onChange={(e, value) => _onChangeValue('vitalStatus', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Statut vital" />}
+            renderInput={(params) => <TextField {...params} label="Statut vital" />}
           />
 
           <FormLabel style={{ padding: '0 1em 8px' }} component="legend">
@@ -197,6 +207,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
                 valueLabelFormat={(value) => (value === 130 ? '130+' : value)}
                 min={0}
                 max={130}
+                size="small"
               />
               <Grid container justifyContent="space-around">
                 <Grid item>
@@ -239,28 +250,21 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
                 { id: 'day', label: 'jours' }
               ]}
               getOptionLabel={(option) => option.label}
-              getOptionSelected={(option, value) => option.id === value.id}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               value={defaultValues.ageType}
               onChange={(e, value) => _onChangeValue('ageType', value)}
-              renderInput={(params) => <TextField {...params} variant="outlined" />}
+              renderInput={(params) => <TextField {...params} />}
             />
           </Grid>
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
           {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
+            <Button onClick={goBack} variant="outlined">
               Annuler
             </Button>
           )}
-          <Button
-            onClick={_onSubmit}
-            type="submit"
-            form="demographic-form"
-            color="primary"
-            variant="contained"
-            disabled={ageError}
-          >
+          <Button onClick={_onSubmit} type="submit" form="demographic-form" variant="contained" disabled={ageError}>
             Confirmer
           </Button>
         </Grid>

@@ -1,6 +1,7 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   grid: {
     marginBottom: theme.spacing(2)
   },
@@ -66,6 +67,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#5BC5F2'
   },
   emptyRequestRow: {
+    margin: '1vh',
     height: '10vh',
     display: 'flex',
     alignItems: 'center',

@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
 
 const useStyles = makeStyles(() => ({
   dialog: {
@@ -7,15 +7,6 @@ const useStyles = makeStyles(() => ({
   },
   bold: {
     fontWeight: 'bold'
-  },
-  title: {
-    ' & h2': {
-      fontSize: '18px',
-      fontFamily: "'Montserrat', sans-serif",
-      color: '#0063AF',
-      textTransform: 'none',
-      lineHeight: 2
-    }
   },
   subtitle: {
     margin: '8px 0px'

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import {
+  Alert,
   Button,
   Checkbox,
   Chip,
@@ -14,11 +15,10 @@ import {
   TextField,
   Tooltip,
   Typography
-} from '@material-ui/core'
-import Alert from '@material-ui/lab/Alert'
+} from '@mui/material'
 
-import InfoIcon from '@material-ui/icons/Info'
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import InfoIcon from '@mui/icons-material/Info'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
@@ -160,6 +160,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
               id="criteria-inclusive"
               checked={!currentState.isInclusive}
               onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
+              color="secondary"
             />
           </Grid>
 
@@ -213,7 +214,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
               }}
             >
               <Checkbox
-                color="primary"
                 checked={allowSearchByValue}
                 onClick={() => setAllowSearchByValue(!allowSearchByValue)}
                 disabled={!currentState.isLeaf}
@@ -224,7 +224,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
                 id="biology-value-comparator-select"
                 value={currentState.valueComparator}
                 onChange={(event) => onChangeValue('valueComparator', event.target.value as string)}
-                variant="outlined"
                 disabled={!allowSearchByValue}
               >
                 <MenuItem value={'<='}>{'<='}</MenuItem>
@@ -273,11 +272,11 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
 
         <Grid className={classes.criteriaActionContainer}>
           {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
+            <Button onClick={goBack} variant="outlined">
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="biology-form" color="primary" variant="contained">
+          <Button onClick={_onSubmit} type="submit" form="biology-form" variant="contained">
             Confirmer
           </Button>
         </Grid>

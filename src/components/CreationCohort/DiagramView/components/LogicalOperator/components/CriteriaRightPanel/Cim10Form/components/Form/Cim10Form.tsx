@@ -1,9 +1,19 @@
 import React, { useState } from 'react'
 
-import { Alert, Autocomplete } from '@material-ui/lab'
-import { Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@material-ui/core'
+import {
+  Alert,
+  Autocomplete,
+  Button,
+  Divider,
+  FormLabel,
+  Grid,
+  IconButton,
+  Switch,
+  Typography,
+  TextField
+} from '@mui/material'
 
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
@@ -130,6 +140,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               id="criteria-inclusive"
               checked={!currentState.isInclusive}
               onChange={(event) => onChangeValue('isInclusive', !event.target.checked)}
+              color="secondary"
             />
           </Grid>
 
@@ -153,10 +164,10 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             className={classes.inputItem}
             options={criteria?.data?.diagnosticTypes || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option: any, value: any) => option.id === value.id}
             value={defaultValuesType}
             onChange={(e, value) => onChangeValue('diagnosticType', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Type de diagnostic" />}
+            renderInput={(params) => <TextField {...params} label="Type de diagnostic" />}
           />
 
           <AdvancedInputs form="cim10" selectedCriteria={currentState} onChangeValue={onChangeValue} />
@@ -164,11 +175,11 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
 
         <Grid className={classes.criteriaActionContainer}>
           {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
+            <Button onClick={goBack} variant="outlined">
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="cim10-form" color="primary" variant="contained">
+          <Button onClick={_onSubmit} type="submit" form="cim10-form" variant="contained">
             Confirmer
           </Button>
         </Grid>

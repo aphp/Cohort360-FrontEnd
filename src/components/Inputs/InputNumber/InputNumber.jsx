@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 
-import { FormControl, FormLabel, Grid, IconButton, InputBase, Typography } from '@material-ui/core'
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
+import { FormControl, FormLabel, Grid, IconButton, InputBase, Typography } from '@mui/material'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import useStyles from './styles'
 

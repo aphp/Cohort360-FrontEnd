@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import moment from 'moment'
 
-import Chip from '@material-ui/core/Chip'
-import Button from '@material-ui/core/Button'
-import CircularProgress from '@material-ui/core/CircularProgress'
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
+import Chip from '@mui/material/Chip'
+import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
 
 import TimelineItemRightProcedure from './TimelineItemRightProcedure'
 import TimelineItemRightCondition from './TimelineItemRightCondition'
@@ -14,7 +14,7 @@ import TimelineItemLeft from './TimelineItemLeft'
 import HospitDialog from './HospitDialog/HospitDialog'
 import FilterTimelineDialog from './FilterTimelineDialog/FilterTimelineDialog'
 
-import MoreVertIcon from '@material-ui/icons/MoreVert'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import { CohortComposition, CohortEncounter, PMSIEntry } from 'types'
@@ -165,6 +165,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   useEffect(() => {
     dispatch<any>(
       fetchAllProcedures({
+        // @ts-ignore
         patientId,
         groupId
       })
@@ -350,7 +351,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
             onClose={() => setOpenFilter(false)}
           />
 
-          <Grid container alignItems="center" justifyContent="flex-end" xs={11} style={{ margin: 'auto' }}>
+          <Grid container alignItems="center" justifyContent="flex-end" style={{ margin: 'auto' }}>
             <Button
               variant="contained"
               disableElevation
@@ -362,7 +363,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
             </Button>
           </Grid>
 
-          <Grid container alignItems="center" justifyContent="flex-end" xs={11} style={{ margin: 'auto' }}>
+          <Grid container alignItems="center" justifyContent="flex-end" style={{ margin: 'auto' }}>
             {selectedTypes.length > 0 &&
               selectedTypes.map((diagnosticType) => (
                 <Chip

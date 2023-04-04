@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useIdleTimer } from 'react-idle-timer'
-import { useHistory } from 'react-router-dom'
-import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
 
-import { DialogContentText, Dialog, DialogActions, DialogContent, Button } from '@material-ui/core'
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material'
+
+import axios from 'axios'
 
 import { close as closeAction, open as openAction } from 'state/autoLogout'
 import { useAppDispatch, useAppSelector } from 'state'
@@ -16,7 +17,7 @@ import useStyles from './styles'
 const AutoLogoutContainer = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const { me } = useAppSelector((state) => ({ me: state.me }))
   const { isOpen } = useAppSelector((state) => ({
@@ -46,7 +47,7 @@ const AutoLogoutContainer = () => {
     crossTab: true,
     syncTimers: 0,
     timeout: SESSION_TIMEOUT,
-    promptTimeout: 1 * 60 * 1000,
+    promptBeforeIdle: 1 * 60 * 1000,
     throttle: 1 * 60 * 1000,
     onPrompt: handleOnPrompt,
     onIdle: handleOnIdle,
@@ -56,7 +57,7 @@ const AutoLogoutContainer = () => {
 
   const logout = () => {
     dispatch(closeAction())
-    history.push('/')
+    navigate('/')
     localStorage.clear()
     dispatch(logoutAction())
     pause()

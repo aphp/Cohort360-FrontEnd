@@ -1,4 +1,4 @@
-import { CohortPatient } from 'types'
+import { AgeRangeType, CohortPatient } from 'types'
 import moment from 'moment'
 
 export const getAgeAphp = (ageObj: any, momentUnit: 'days' | 'months') => {
@@ -38,30 +38,16 @@ export const getAge = (patient: CohortPatient): string => {
 }
 
 export const ageName = (dates: [string, string]) => {
-  const minDate: any = {}
-  const maxDate: any = {}
-
-  maxDate.year = moment().diff(moment(dates[0], 'YYYY-MM-DD'), 'year') || 0
-  maxDate.month = moment().subtract(maxDate.year, 'year').diff(moment(dates[0], 'YYYY-MM-DD'), 'month')
-  maxDate.days = moment()
-    .subtract(maxDate.year, 'year')
-    .subtract(maxDate.month, 'month')
-    .diff(moment(dates[0], 'YYYY-MM-DD'), 'days')
-
-  minDate.year = moment().diff(moment(dates[1], 'YYYY-MM-DD'), 'year') || 0
-  minDate.month = moment().subtract(minDate.year, 'year').diff(moment(dates[1], 'YYYY-MM-DD'), 'month')
-  minDate.days = moment()
-    .subtract(minDate.year, 'year')
-    .subtract(minDate.month, 'month')
-    .diff(moment(dates[1], 'YYYY-MM-DD'), 'days')
+  const minDate: AgeRangeType = convertStringToAgeRangeType(dates[1]) ?? { year: 0, month: 0, days: 0 }
+  const maxDate: AgeRangeType = convertStringToAgeRangeType(dates[0]) ?? { year: 0, month: 0, days: 0 }
 
   if (
-    minDate.year === 0 &&
-    minDate.month === 0 &&
-    minDate.days === 0 &&
-    maxDate.year === 130 &&
-    maxDate.month === 0 &&
-    maxDate.days === 0
+    !minDate.year &&
+    !minDate.month &&
+    !minDate.days &&
+    (maxDate.year === 130 || !maxDate.year) &&
+    !maxDate.month &&
+    !maxDate.days
   ) {
     return ''
   }
@@ -69,13 +55,46 @@ export const ageName = (dates: [string, string]) => {
   return `Age entre
     ${
       minDate.year || minDate.month || minDate.days
-        ? `${minDate.year > 0 ? `${minDate.year} an(s) ` : ``}
-          ${minDate.month > 0 ? `${minDate.month} mois ` : ``}
-          ${minDate.days > 0 ? `${minDate.days} jour(s) ` : ``}`
+        ? `${(minDate.year ?? 0) > 0 ? `${minDate.year} an(s) ` : ``}
+          ${(minDate.month ?? 0) > 0 ? `${minDate.month} mois ` : ``}
+          ${(minDate.days ?? 0) > 0 ? `${minDate.days} jour(s) ` : ``}`
         : 0
     }
   et
-    ${maxDate.year > 0 ? `${maxDate.year} an(s) ` : ``}
-    ${maxDate.month > 0 ? `${maxDate.month} mois ` : ``}
-    ${maxDate.days > 0 ? `${maxDate.days} jour(s) ` : ``}`
+    ${(maxDate.year ?? 0) > 0 ? `${maxDate.year} an(s) ` : ``}
+    ${(maxDate.month ?? 0) > 0 ? `${maxDate.month} mois ` : ``}
+    ${(maxDate.days ?? 0) > 0 ? `${maxDate.days} jour(s) ` : ``}`
+}
+
+export const substructAgeRangeType = (ageDate: AgeRangeType) => {
+  if (!ageDate) return new Date()
+  const today: Date = new Date()
+  const newDate: Date = new Date(
+    new Date().getUTCFullYear() - (ageDate.year ?? 0),
+    today.getUTCMonth() - (ageDate.month ?? 0),
+    today.getUTCDate() - (ageDate.days ?? 0),
+    0,
+    0,
+    0
+  )
+  return newDate
+}
+
+export const substructAgeString = (range: string) => {
+  const ageRangeType: AgeRangeType = convertStringToAgeRangeType(range) ?? { year: 0, month: 0, days: 0 }
+  return substructAgeRangeType(ageRangeType)
+}
+
+export const convertStringToAgeRangeType = (age: string) => {
+  if (!age) return undefined
+  const newAge: AgeRangeType = {
+    year: Number(age.split('/')[2]),
+    month: Number(age.split('/')[1]),
+    days: Number(age.split('/')[0])
+  }
+  return newAge
+}
+
+export const convertAgeRangeTypeToString = (ageDate: AgeRangeType) => {
+  return ageDate.days + '/' + ageDate.month + '/' + ageDate.year
 }

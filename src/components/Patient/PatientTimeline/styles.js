@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
 const marginNextCentralLine = 10
 const fontSize = 16
 const dotSize = 16
@@ -7,16 +7,13 @@ const emptyYearHeight = '0.7em'
 const useStyles = makeStyles({
   centeredTimeline: {
     position: 'relative',
-    marginRight: '5%',
-    marginLeft: '5%',
     overflow: 'hidden',
     height: '100%',
-    width: 'auto'
+    margin: '0 auto',
+    width: '100%'
   },
   verticalBar: {
     textAlign: 'center',
-    marginLeft: 'auto',
-    marginRight: 'auto',
     '&:before': {
       position: 'absolute',
       content: '""',

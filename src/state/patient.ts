@@ -21,7 +21,8 @@ import {
   IPatientDocuments,
   IPatientPmsi,
   IPatientMedication,
-  IPatientObservation
+  IPatientObservation,
+  SearchByTypes
 } from 'types'
 
 import { logout } from './me'
@@ -322,9 +323,11 @@ const fetchMedication = createAsyncThunk<FetchMedicationReturn, FetchMedicationP
  *
  */
 type FetchDocumentsParams = {
+  signal?: AbortSignal
   groupId?: string
   options?: {
     page?: number
+    searchBy?: SearchByTypes
     filters?: {
       searchInput: string
       nda: string
@@ -342,7 +345,7 @@ type FetchDocumentsParams = {
 type FetchDocumentsReturn = { documents?: IPatientDocuments } | undefined
 const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsParams, { state: RootState }>(
   'patient/fetchDocuments',
-  async ({ groupId, options }, { getState }) => {
+  async ({ signal, groupId, options }, { getState }) => {
     try {
       const patientState = getState().patient
 
@@ -357,6 +360,7 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
       const sortDirection = options?.sort?.direction ?? ''
       const page = options?.page ?? 1
       const searchInput = options?.filters?.searchInput ?? ''
+      const searchBy = options?.searchBy ?? SearchByTypes.text
       const selectedDocTypes = options?.filters?.selectedDocTypes ?? []
       const nda = options?.filters?.nda ?? ''
       const startDate = options?.filters?.startDate ?? null
@@ -364,7 +368,7 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
       const onlyPdfAvailable = options?.filters?.onlyPdfAvailable ?? false
 
       if (searchInput) {
-        const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput)
+        const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)
 
         if (searchInputError && searchInputError.isError) {
           return {
@@ -384,6 +388,7 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
       const documentsResponse = await services.patients.fetchDocuments(
         sortBy,
         sortDirection,
+        searchBy,
         page,
         patientId,
         searchInput,
@@ -392,7 +397,8 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
         onlyPdfAvailable,
         startDate,
         endDate,
-        groupId
+        groupId,
+        signal
       )
 
       const documentsList: any[] = linkElementWithEncounter(
@@ -462,6 +468,7 @@ const fetchAllProcedures = createAsyncThunk<FetchAllProceduresReturn, FetchAllPr
       let ccamList: IProcedure[] = ccamResponses
         ? linkElementWithEncounter(ccamResponses as IProcedure[], hospits, deidentified)
         : []
+      // eslint-disable-next-line no-unsafe-optional-chaining
       ccamList = patientState?.pmsi?.ccam?.list ? [...patientState?.pmsi?.ccam?.list, ...ccamList] : ccamList
       ccamCount = ccamList.length
 
@@ -470,7 +477,8 @@ const fetchAllProcedures = createAsyncThunk<FetchAllProceduresReturn, FetchAllPr
         ? linkElementWithEncounter(diagnosticResponses as ICondition[], hospits, deidentified)
         : []
       diagnosticList = patientState?.pmsi?.diagnostic?.list
-        ? [...patientState?.pmsi?.diagnostic?.list, ...diagnosticList]
+        ? // eslint-disable-next-line no-unsafe-optional-chaining
+          [...patientState?.pmsi?.diagnostic?.list, ...diagnosticList]
         : diagnosticList
       diagnosticCount = diagnosticList.length
 

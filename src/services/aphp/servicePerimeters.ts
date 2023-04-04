@@ -135,7 +135,7 @@ const servicesPerimeters: IServicePerimeters = {
     }
 
     const caresiteIds = selectedPopulation
-      .map((perimeter) => perimeter.id)
+      .map((perimeter) => perimeter?.id)
       .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
       .join(',')
 

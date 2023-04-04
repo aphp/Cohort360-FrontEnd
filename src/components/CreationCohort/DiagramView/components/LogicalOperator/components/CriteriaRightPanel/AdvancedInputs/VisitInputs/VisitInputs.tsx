@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { FormControl, FormLabel, Grid, Input, InputLabel, IconButton } from '@material-ui/core'
+import { FormControl, FormLabel, Grid, Input, InputLabel, IconButton } from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 
 import useStyles from './styles'
 

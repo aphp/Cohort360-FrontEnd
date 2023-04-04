@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 
-import { Autocomplete } from '@material-ui/lab'
-import { Collapse, Grid, IconButton, Typography, TextField } from '@material-ui/core'
+import { Autocomplete, Collapse, Grid, IconButton, Typography, TextField } from '@mui/material'
 
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import useStyles from '../../styles'
 
@@ -79,10 +78,10 @@ const EntryExitInputs: React.FC<EntryExitInputsProps> = ({ criteria, selectedCri
             className={classes.inputItem}
             options={criteria?.data?.entryModes || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesEntryModes}
             onChange={(e, value) => onChangeValue('entryMode', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Mode entrée" />}
+            renderInput={(params) => <TextField {...params} label="Mode entrée" />}
           />
 
           <Autocomplete
@@ -91,10 +90,10 @@ const EntryExitInputs: React.FC<EntryExitInputsProps> = ({ criteria, selectedCri
             className={classes.inputItem}
             options={criteria?.data?.exitModes || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesExitModes}
             onChange={(e, value) => onChangeValue('exitMode', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Mode sortie" />}
+            renderInput={(params) => <TextField {...params} label="Mode sortie" />}
           />
 
           <Autocomplete
@@ -103,10 +102,10 @@ const EntryExitInputs: React.FC<EntryExitInputsProps> = ({ criteria, selectedCri
             className={classes.inputItem}
             options={criteria?.data?.reason || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesReason}
             onChange={(e, value) => onChangeValue('reason', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Type sortie" />}
+            renderInput={(params) => <TextField {...params} label="Type sortie" />}
           />
         </Collapse>
       </Grid>

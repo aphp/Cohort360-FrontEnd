@@ -1,12 +1,13 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   cardContent: {
     display: 'flex',
     padding: 0,
     flexWrap: 'wrap',
     overflow: 'hidden',
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       width: '100%'
     },
     [theme.breakpoints.up('md')]: {

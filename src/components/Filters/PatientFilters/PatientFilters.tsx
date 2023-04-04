@@ -11,7 +11,7 @@ import {
   Radio,
   RadioGroup,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { PatientFilters as PatientFiltersType, VitalStatus } from 'types'
@@ -31,15 +31,17 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit
   const classes = useStyles()
 
   const [_gender, setGender] = useState<PatientGenderKind>(filters.gender)
-  const [_birthdates, setBirthdates] = useState<[string, string]>(filters.birthdates)
+  const [birthdatesRanges, setBirthdatesRanges] = useState<[string, string]>(filters.birthdatesRanges)
   const [_vitalStatus, setVitalStatus] = useState<VitalStatus>(filters.vitalStatus)
 
   const [error, setError] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
     setGender(filters.gender)
-    setBirthdates(filters.birthdates)
+    setBirthdatesRanges(filters.birthdatesRanges)
     setVitalStatus(filters.vitalStatus)
+    _onError(false)
   }, [open]) // eslint-disable-line
 
   const _onChangeGender = (event: React.ChangeEvent<HTMLInputElement>, value: string) => {
@@ -53,49 +55,58 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit
   const _onSubmit = () => {
     onChangeFilters({
       gender: _gender,
-      birthdates: _birthdates,
+      birthdatesRanges: birthdatesRanges,
       vitalStatus: _vitalStatus
     })
 
     onSubmit()
   }
 
+  const _onError = (isError: boolean, errorMessage = '') => {
+    setError(isError)
+    setErrorMessage(errorMessage)
+  }
+
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle className={classes.title}>Filtrer les patients :</DialogTitle>
+      <DialogTitle>Filtrer les patients :</DialogTitle>
       <DialogContent className={classes.dialog}>
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Genre :</Typography>
           <RadioGroup name="Gender" value={_gender} onChange={_onChangeGender} row={true}>
-            <FormControlLabel value={PatientGenderKind._male} control={<Radio />} label="Hommes" />
-            <FormControlLabel value={PatientGenderKind._female} control={<Radio />} label="Femmes" />
-            <FormControlLabel value={PatientGenderKind._other} control={<Radio />} label="Autres" />
-            <FormControlLabel value={PatientGenderKind._unknown} control={<Radio />} label="Tous les genres" />
+            <FormControlLabel value={PatientGenderKind._male} control={<Radio color="secondary" />} label="Hommes" />
+            <FormControlLabel value={PatientGenderKind._female} control={<Radio color="secondary" />} label="Femmes" />
+            <FormControlLabel value={PatientGenderKind._other} control={<Radio color="secondary" />} label="Autres" />
+            <FormControlLabel
+              value={PatientGenderKind._unknown}
+              control={<Radio color="secondary" />}
+              label="Tous les genres"
+            />
           </RadioGroup>
         </Grid>
         <Grid container direction="column" className={classes.filter}>
           <InputAgeRange
-            error={error}
-            setError={setError}
-            birthdates={_birthdates}
-            onChangeBirthdates={(newBirthdates: [string, string]) => setBirthdates(newBirthdates)}
+            error={{ isError: error, errorMessage: errorMessage }}
+            onError={_onError}
+            birthdatesRanges={birthdatesRanges}
+            onChangeBirthdatesRanges={(newBirthdatesRanges: [string, string]) =>
+              setBirthdatesRanges(newBirthdatesRanges)
+            }
           />
         </Grid>
 
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column">
           <Typography variant="h3">Statut vital :</Typography>
           <RadioGroup name="VitalStatus" value={_vitalStatus} onChange={_onChangeVitalStatus} row={true}>
-            <FormControlLabel value="alive" control={<Radio />} label="Patients vivants" />
-            <FormControlLabel value="deceased" control={<Radio />} label="Patients décédés" />
-            <FormControlLabel value="all" control={<Radio />} label="Tous les patients" />
+            <FormControlLabel value="alive" control={<Radio color="secondary" />} label="Patients vivants" />
+            <FormControlLabel value="deceased" control={<Radio color="secondary" />} label="Patients décédés" />
+            <FormControlLabel value="all" control={<Radio color="secondary" />} label="Tous les patients" />
           </RadioGroup>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Annuler
-        </Button>
-        <Button onClick={_onSubmit} color="primary" disabled={error}>
+        <Button onClick={onClose}>Annuler</Button>
+        <Button onClick={_onSubmit} disabled={error}>
           Valider
         </Button>
       </DialogActions>

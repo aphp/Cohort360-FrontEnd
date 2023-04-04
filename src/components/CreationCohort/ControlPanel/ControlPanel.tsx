@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import moment from 'moment'
 
 import {
+  Alert,
   Button,
   CircularProgress,
   Divider,
@@ -12,15 +13,14 @@ import {
   Tooltip,
   Typography,
   Snackbar
-} from '@material-ui/core'
-import { Alert } from '@material-ui/lab'
+} from '@mui/material'
 
-import ArrowBackIcon from '@material-ui/icons/ArrowBack'
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
-import UpdateSharpIcon from '@material-ui/icons/UpdateSharp'
-import HighlightOffIcon from '@material-ui/icons/HighlightOff'
-import InfoIcon from '@material-ui/icons/Info'
-import ShareIcon from '@material-ui/icons/Share'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
+import UpdateSharpIcon from '@mui/icons-material/UpdateSharp'
+import HighlightOffIcon from '@mui/icons-material/HighlightOff'
+import InfoIcon from '@mui/icons-material/Info'
+import ShareIcon from '@mui/icons-material/Share'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 import ModalShareRequest from 'components/MyProjects/Modals/ModalShareRequest/ModalShareRequest'
@@ -53,7 +53,7 @@ const ControlPanel: React.FC<{
   const [openShareRequestModal, setOpenShareRequestModal] = useState<boolean>(false)
   const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<'success' | 'error' | null>(null)
   const wrapperSetShareSuccessOrFailMessage = useCallback(
-    (val) => {
+    (val: any) => {
       setShareSuccessOrFailMessage(val)
     },
     [setShareSuccessOrFailMessage]
@@ -289,7 +289,6 @@ const ControlPanel: React.FC<{
             <Button
               onClick={() => _relaunchCount(false)}
               variant="outlined"
-              color="primary"
               size="small"
               style={{ marginTop: -14 }}
               disabled={maintenanceIsActive}

@@ -1,17 +1,17 @@
 import React, { useState } from 'react'
 import clsx from 'clsx'
 
-import Divider from '@material-ui/core/Divider'
-import Typography from '@material-ui/core/Typography'
-import Paper from '@material-ui/core/Paper'
-import Grid from '@material-ui/core/Grid'
-import IconButton from '@material-ui/core/IconButton'
+import Divider from '@mui/material/Divider'
+import Typography from '@mui/material/Typography'
+import Paper from '@mui/material/Paper'
+import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
 
-import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft'
-import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight'
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 
-import RadioButtonCheckedIcon from '@material-ui/icons/RadioButtonChecked'
-import RadioButtonUncheckedIcon from '@material-ui/icons/RadioButtonUnchecked'
+import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked'
 
 import useStyles from './styles'
 

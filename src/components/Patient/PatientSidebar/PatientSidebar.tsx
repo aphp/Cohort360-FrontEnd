@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import moment from 'moment'
 
-import { CircularProgress, Divider, Drawer, Grid, IconButton, List, Typography } from '@material-ui/core'
-import Pagination from '@material-ui/lab/Pagination'
+import { CircularProgress, Divider, Drawer, Grid, IconButton, List, Pagination, Typography } from '@mui/material'
 
 import PatientSidebarHeader from './PatientSidebarHeader/PatientSidebarHeader'
 import PatientSidebarItem from './PatientSidebarItem/PatientSidebarItem'
 
-import ChevronRightIcon from '@material-ui/icons/ChevronRight'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 
-import { getAge } from 'utils/age'
+import { getAge, substructAgeString } from 'utils/age'
 import services from 'services/aphp'
 import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortPatient, PatientFilters as PatientFiltersType, SearchByTypes, Sort, VitalStatus } from 'types'
 
 import useStyles from './styles'
+import moment from 'moment/moment'
 
 type PatientSidebarTypes = {
   total: number
@@ -51,7 +50,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const [filters, setFilters] = useState<PatientFiltersType>({
     gender: PatientGenderKind._unknown,
-    birthdates: [moment().subtract(130, 'years').format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
+    birthdatesRanges: ['', ''],
     vitalStatus: VitalStatus.all
   })
 
@@ -67,12 +66,17 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const onSearchPatient = async (sort: Sort, page = 1) => {
     setLoadingStatus(true)
+    const birthdates: [string, string] = [
+      moment(substructAgeString(filters.birthdatesRanges[0])).format('MM/DD/YYYY'),
+      moment(substructAgeString(filters.birthdatesRanges[1])).format('MM/DD/YYYY')
+    ]
+
     const patientsResp = await services.cohorts.fetchPatientList(
       page,
       searchBy,
       searchInput,
       filters.gender,
-      filters.birthdates,
+      birthdates,
       filters.vitalStatus,
       sort.sortBy,
       sort.sortDirection,
@@ -189,7 +193,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       <Pagination
         className={classes.pagination}
         count={Math.ceil(totalPatients / numberOfRows)}
-        shape="rounded"
+        shape="circular"
         onChange={handleChangePage}
         page={page}
       />

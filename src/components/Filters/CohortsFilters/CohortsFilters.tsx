@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import { KeyboardDatePicker } from '@material-ui/pickers'
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import 'moment/locale/fr'
 
 import {
+  Autocomplete,
   Button,
   Dialog,
   DialogActions,
@@ -17,10 +20,9 @@ import {
   RadioGroup,
   TextField,
   Typography
-} from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+} from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 
 import { CohortFilters, ValueSet } from 'types'
 
@@ -124,7 +126,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle className={classes.title}>Filtrer par :</DialogTitle>
+      <DialogTitle>Filtrer par :</DialogTitle>
       <DialogContent className={classes.dialog}>
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Statut :</Typography>
@@ -135,8 +137,8 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
             value={_status}
             disableCloseOnSelect
             getOptionLabel={(status: any) => status.display}
-            renderOption={(status: any) => <React.Fragment>{status.display}</React.Fragment>}
-            renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Statut de la cohorte" />}
+            renderOption={(props, status: any) => <li {...props}>{status.display}</li>}
+            renderInput={(params) => <TextField {...params} placeholder="Statut de la cohorte" />}
             className={classes.autocomplete}
           />
         </Grid>
@@ -144,9 +146,9 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Favoris :</Typography>
           <RadioGroup name="favorite" value={_favorite} onChange={_onChangeFavorite} row={true}>
-            <FormControlLabel value="all" control={<Radio />} label="Toutes les cohortes" />
-            <FormControlLabel value="True" control={<Radio />} label="Cohortes favorites" />
-            <FormControlLabel value="False" control={<Radio />} label="Cohortes non favorites" />
+            <FormControlLabel value="all" control={<Radio color="secondary" />} label="Toutes les cohortes" />
+            <FormControlLabel value="True" control={<Radio color="secondary" />} label="Cohortes favorites" />
+            <FormControlLabel value="False" control={<Radio color="secondary" />} label="Cohortes non favorites" />
           </RadioGroup>
         </Grid>
 
@@ -156,13 +158,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
             <FormLabel component="legend" className={classes.label}>
               Au moins :
             </FormLabel>
-            <TextField
-              type="number"
-              value={_minPatients}
-              onChange={_onChangeMinPatients}
-              variant="outlined"
-              inputProps={{ min: 0 }}
-            />
+            <TextField type="number" value={_minPatients} onChange={_onChangeMinPatients} inputProps={{ min: 0 }} />
             <FormLabel component="legend" className={classes.patientsLabel}>
               patient(s).
             </FormLabel>
@@ -172,13 +168,7 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
             <FormLabel component="legend" className={classes.label}>
               Jusque :
             </FormLabel>
-            <TextField
-              type="number"
-              value={_maxPatients}
-              onChange={_onChangeMaxPatients}
-              variant="outlined"
-              inputProps={{ min: 0 }}
-            />
+            <TextField type="number" value={_maxPatients} onChange={_onChangeMaxPatients} inputProps={{ min: 0 }} />
             <FormLabel component="legend" className={classes.patientsLabel}>
               patient(s).
             </FormLabel>
@@ -190,51 +180,55 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
           )}
         </Grid>
 
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column">
           <Typography variant="h3">Date :</Typography>
-          <Grid container alignItems="baseline" className={classes.datePickers}>
+          <Grid container alignItems="center" className={classes.datePickers}>
             <FormLabel component="legend" className={classes.label}>
               Après le :
             </FormLabel>
-            <KeyboardDatePicker
-              clearable
-              error={dateError}
-              style={{ width: 'calc(100% - 120px)' }}
-              invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
-              format="DD/MM/YYYY"
-              onChange={(date) => setStartDate(date ?? null)}
-              value={_startDate}
-            />
+            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+              <DatePicker
+                onChange={(date) => setStartDate(date ?? null)}
+                value={_startDate}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    variant="standard"
+                    error={dateError}
+                    helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
+                    style={{ width: 'calc(100% - 120px)' }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
             {_startDate !== null && (
-              <IconButton
-                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
-                color="primary"
-                onClick={() => setStartDate(null)}
-              >
+              <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setStartDate(null)}>
                 <ClearIcon />
               </IconButton>
             )}
           </Grid>
 
-          <Grid container alignItems="baseline" className={classes.datePickers}>
+          <Grid container alignItems="center" className={classes.datePickers}>
             <FormLabel component="legend" className={classes.label}>
               Avant le :
             </FormLabel>
-            <KeyboardDatePicker
-              clearable
-              error={dateError}
-              style={{ width: 'calc(100% - 120px)' }}
-              invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
-              format="DD/MM/YYYY"
-              onChange={setEndDate}
-              value={_endDate}
-            />
+            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+              <DatePicker
+                onChange={(date) => setEndDate(date ?? null)}
+                value={_endDate}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    variant="standard"
+                    error={dateError}
+                    helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
+                    style={{ width: 'calc(100% - 120px)' }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
             {_endDate !== null && (
-              <IconButton
-                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
-                color="primary"
-                onClick={() => setEndDate(null)}
-              >
+              <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setEndDate(null)}>
                 <ClearIcon />
               </IconButton>
             )}
@@ -247,10 +241,8 @@ const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Annuler
-        </Button>
-        <Button onClick={_onSubmit} color="primary" disabled={nbPatientsError || dateError}>
+        <Button onClick={onClose}>Annuler</Button>
+        <Button onClick={_onSubmit} disabled={nbPatientsError || dateError}>
           Valider
         </Button>
       </DialogActions>

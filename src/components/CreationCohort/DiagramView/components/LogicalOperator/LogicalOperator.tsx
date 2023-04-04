@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 
-import { Button, ButtonGroup, CircularProgress, IconButton } from '@material-ui/core'
+import { ButtonGroup, Button, IconButton, CircularProgress } from '@mui/material'
 
-import AddIcon from '@material-ui/icons/Add'
+import AddIcon from '@mui/icons-material/Add'
 
 import LogicalOperatorItem from './components/LogicalOperatorItem/LogicalOperatorItem'
 import CriteriaRightPanel from './components/CriteriaRightPanel/CriteriaRightPanel'

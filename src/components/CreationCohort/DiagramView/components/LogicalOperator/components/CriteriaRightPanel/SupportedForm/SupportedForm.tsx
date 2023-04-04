@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
 
-import { Alert, Autocomplete } from '@material-ui/lab'
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import {
+  Alert,
+  Autocomplete,
   Button,
   Divider,
   FormLabel,
@@ -12,9 +14,8 @@ import {
   Tooltip,
   Typography,
   TextField
-} from '@material-ui/core'
-import InfoIcon from '@material-ui/icons/Info'
-import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+} from '@mui/material'
+import InfoIcon from '@mui/icons-material/Info'
 
 import AdmissionInputs from './SupportedInputs/AdmissionInputs'
 import EntryExitInputs from './SupportedInputs/EntryExitInputs'
@@ -173,7 +174,6 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
             className={classes.inputItem}
             id="criteria-name-required"
             placeholder="Nom du critère"
-            variant="outlined"
             value={defaultValues.title}
             onChange={(e) => _onChangeValue('title', e.target.value)}
           />
@@ -190,6 +190,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
               id="criteria-inclusive"
               checked={!defaultValues.isInclusive}
               onChange={(event) => _onChangeValue('isInclusive', !event.target.checked)}
+              color="secondary"
             />
           </Grid>
 
@@ -210,6 +211,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                 valueLabelFormat={(value) => (value === 130 ? '130+' : value)}
                 min={0}
                 max={130}
+                size="small"
               />
 
               <Grid container justifyContent="space-around">
@@ -253,10 +255,10 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                 { id: 'day', label: 'jours' }
               ]}
               getOptionLabel={(option) => option.label}
-              getOptionSelected={(option, value) => option.id === value.id}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               value={defaultValues.ageType}
               onChange={(e, value) => _onChangeValue('ageType', value)}
-              renderInput={(params) => <TextField {...params} variant="outlined" />}
+              renderInput={(params) => <TextField {...params} />}
             />
           </Grid>
 
@@ -274,6 +276,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                 valueLabelFormat={(value) => (value === 100 ? '100+' : value)}
                 min={0}
                 max={100}
+                size="small"
               />
 
               <Grid container justifyContent="space-around">
@@ -317,10 +320,10 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                 { id: 'day', label: 'jours' }
               ]}
               getOptionLabel={(option) => option.label}
-              getOptionSelected={(option, value) => option.id === value.id}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               value={defaultValues.durationType}
               onChange={(e, value) => _onChangeValue('durationType', value)}
-              renderInput={(params) => <TextField {...params} variant="outlined" />}
+              renderInput={(params) => <TextField {...params} />}
             />
           </Grid>
 
@@ -341,18 +344,11 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
 
         <Grid className={classes.criteriaActionContainer}>
           {!isEdition && (
-            <Button onClick={goBack} color="primary" variant="outlined">
+            <Button onClick={goBack} variant="outlined">
               Annuler
             </Button>
           )}
-          <Button
-            onClick={_onSubmit}
-            type="submit"
-            form="supported-form"
-            color="primary"
-            variant="contained"
-            disabled={sliderError}
-          >
+          <Button onClick={_onSubmit} type="submit" form="supported-form" variant="contained" disabled={sliderError}>
             Confirmer
           </Button>
         </Grid>

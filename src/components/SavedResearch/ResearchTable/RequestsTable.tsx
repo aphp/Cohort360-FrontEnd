@@ -1,11 +1,13 @@
 import React, { useState, useCallback } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 
 import {
+  Alert,
   Button,
   Dialog,
   DialogActions,
+  DialogContent,
   DialogTitle,
   Grid,
   IconButton,
@@ -22,15 +24,13 @@ import {
   Typography,
   Hidden,
   Snackbar
-} from '@material-ui/core'
+} from '@mui/material'
 
-import { Alert } from '@material-ui/lab'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 
-import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline'
-
-import EditIcon from '@material-ui/icons/Edit'
-import ShareIcon from '@material-ui/icons/Share'
-import MoreVertIcon from '@material-ui/icons/MoreVert'
+import EditIcon from '@mui/icons-material/Edit'
+import ShareIcon from '@mui/icons-material/Share'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 
 import ModalAddOrEditRequest from 'components/CreationCohort/Modals/ModalCreateNewRequest/ModalCreateNewRequest'
 import ModalShareRequest from 'components/MyProjects/Modals/ModalShareRequest/ModalShareRequest'
@@ -66,7 +66,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
 }) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const { requestState } = useAppSelector<{
     requestState: RequestState
@@ -88,7 +88,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
   const [anchorEl, setAnchorEl] = React.useState(null)
   const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<'success' | 'error' | null>(null)
   const wrapperSetShareSuccessOrFailMessage = useCallback(
-    (val) => {
+    (val: any) => {
       setShareSuccessOrFailMessage(val)
     },
     [setShareSuccessOrFailMessage]
@@ -96,7 +96,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
   const openMenuItem = Boolean(anchorEl)
 
   const _onClickRow = (row: any) => {
-    return !row.uuid ? null : onClickRow ? onClickRow(row) : history.push(`/cohort/new/${row.uuid}`)
+    return !row.uuid ? null : onClickRow ? onClickRow(row) : navigate(`/cohort/new/${row.uuid}`)
   }
 
   const handleClickOpenDialog = () => {
@@ -178,7 +178,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
                       {moment(row.modified_at).format('DD/MM/YYYY [à] HH:mm')}
                     </TableCell>
                     <TableCell align="center">
-                      <Hidden mdDown>
+                      <Hidden lgDown>
                         <Grid
                           container
                           direction="row"
@@ -288,11 +288,13 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle id="alert-dialog-slide-title">Etes-vous sûr de vouloir supprimer la requête ?</DialogTitle>
+        <DialogTitle>Supprimer une requête</DialogTitle>
+
+        <DialogContent>
+          <Typography>Êtes-vous sûr(e) de vouloir supprimer cette requête ?</Typography>
+        </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
-            Non
-          </Button>
+          <Button onClick={handleCloseDialog}>Non</Button>
           <Button
             onClick={() => {
               handleCloseDialog()

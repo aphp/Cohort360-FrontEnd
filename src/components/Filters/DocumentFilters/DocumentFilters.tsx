@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
-import { KeyboardDatePicker } from '@material-ui/pickers'
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import 'moment/locale/fr'
 
 import {
+  Autocomplete,
   Button,
   Checkbox,
   Dialog,
@@ -15,12 +18,11 @@ import {
   IconButton,
   TextField,
   Typography
-} from '@material-ui/core'
-import Autocomplete from '@material-ui/lab/Autocomplete'
+} from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 
-import { docTypes } from 'assets/docTypes.json'
+import docTypes from 'assets/docTypes.json'
 import { DocumentFilters } from 'types'
 
 import useStyles from './styles'
@@ -96,7 +98,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle className={classes.title}>Filtrer par :</DialogTitle>
+      <DialogTitle>Filtrer par :</DialogTitle>
       <DialogContent className={classes.dialog}>
         <Grid container direction="column" className={classes.filter}>
           <Typography variant="h3">Type de documents :</Typography>
@@ -104,13 +106,13 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
             multiple
             onChange={_onChangeSelectedDocTypes}
             groupBy={(doctype) => doctype.type}
-            options={docTypesList}
+            options={docTypesList.docTypes}
             value={_selectedDocTypes}
             disableCloseOnSelect
             getOptionLabel={(docType: any) => docType.label}
             renderGroup={(docType: any) => {
               const currentDocTypeList = docTypesList
-                ? docTypesList.filter((doc: any) => doc.type === docType.group)
+                ? docTypesList.docTypes.filter((doc: any) => doc.type === docType.group)
                 : []
               const currentSelectedDocTypeList = _selectedDocTypes
                 ? _selectedDocTypes.filter((doc: any) => doc.type === docType.group)
@@ -136,7 +138,6 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
                         currentDocTypeList.length !== currentSelectedDocTypeList.length &&
                         currentSelectedDocTypeList.length > 0
                       }
-                      color="primary"
                       checked={currentDocTypeList.length === currentSelectedDocTypeList.length}
                       onClick={onClick}
                     />
@@ -148,8 +149,8 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
                 </React.Fragment>
               )
             }}
-            renderOption={(docType: any) => <React.Fragment>{docType.label}</React.Fragment>}
-            renderInput={(params) => <TextField {...params} variant="outlined" placeholder="Types de documents" />}
+            renderOption={(props, docType: any) => <li {...props}>{docType.label}</li>}
+            renderInput={(params) => <TextField {...params} placeholder="Types de documents" />}
             className={classes.autocomplete}
           />
         </Grid>
@@ -157,7 +158,6 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
           <Grid container direction="column" className={classes.filter}>
             <Typography variant="h3">NDA :</Typography>
             <TextField
-              variant="outlined"
               margin="normal"
               fullWidth
               label="NDA"
@@ -171,7 +171,6 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
           <Grid container direction="column" className={classes.filter}>
             <Typography variant="h3">IPP :</Typography>
             <TextField
-              variant="outlined"
               margin="normal"
               fullWidth
               label="IPP"
@@ -181,51 +180,55 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
             />
           </Grid>
         )}
-        <Grid container direction="column" className={classes.filter}>
+        <Grid container direction="column">
           <Typography variant="h3">Date :</Typography>
-          <Grid container alignItems="baseline" className={classes.datePickers}>
+          <Grid container alignItems="center" className={classes.datePickers}>
             <FormLabel component="legend" className={classes.dateLabel}>
               Après le :
             </FormLabel>
-            <KeyboardDatePicker
-              clearable
-              error={dateError}
-              style={{ width: 'calc(100% - 120px)' }}
-              invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
-              format="DD/MM/YYYY"
-              onChange={(date) => setStartDate(date ?? null)}
-              value={_startDate}
-            />
+            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+              <DatePicker
+                onChange={(date) => setStartDate(date ?? null)}
+                value={_startDate}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    variant="standard"
+                    error={dateError}
+                    helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
+                    style={{ width: 'calc(100% - 120px)' }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
             {_startDate !== null && (
-              <IconButton
-                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
-                color="primary"
-                onClick={() => setStartDate(null)}
-              >
+              <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setStartDate(null)}>
                 <ClearIcon />
               </IconButton>
             )}
           </Grid>
 
-          <Grid container alignItems="baseline" className={classes.datePickers}>
+          <Grid container alignItems="center" className={classes.datePickers}>
             <FormLabel component="legend" className={classes.dateLabel}>
               Avant le :
             </FormLabel>
-            <KeyboardDatePicker
-              clearable
-              error={dateError}
-              style={{ width: 'calc(100% - 120px)' }}
-              invalidDateMessage='La date doit être au format "JJ/MM/AAAA"'
-              format="DD/MM/YYYY"
-              onChange={setEndDate}
-              value={_endDate}
-            />
+            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+              <DatePicker
+                onChange={(date) => setEndDate(date ?? null)}
+                value={_endDate}
+                renderInput={(params: any) => (
+                  <TextField
+                    {...params}
+                    variant="standard"
+                    error={dateError}
+                    helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
+                    style={{ width: 'calc(100% - 120px)' }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
             {_endDate !== null && (
-              <IconButton
-                classes={{ root: classes.clearDate, label: classes.buttonLabel }}
-                color="primary"
-                onClick={() => setEndDate(null)}
-              >
+              <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setEndDate(null)}>
                 <ClearIcon />
               </IconButton>
             )}
@@ -238,10 +241,8 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Annuler
-        </Button>
-        <Button onClick={_onSubmit} color="primary" disabled={dateError}>
+        <Button onClick={onClose}>Annuler</Button>
+        <Button onClick={_onSubmit} disabled={dateError}>
           Valider
         </Button>
       </DialogActions>

@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 
-import { Autocomplete } from '@material-ui/lab'
-import { Collapse, Grid, IconButton, Typography, TextField } from '@material-ui/core'
+import { Autocomplete, Collapse, Grid, IconButton, Typography, TextField } from '@mui/material'
 
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import useStyles from '../../styles'
 
@@ -80,10 +79,10 @@ const ProvenanceDestinationInputs: React.FC<AdmissionInputsProps> = ({ criteria,
             className={classes.inputItem}
             options={criteria?.data?.priseEnChargeType || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesPriseEnChargeType}
             onChange={(e, value) => onChangeValue('priseEnChargeType', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Type de prise en charge" />}
+            renderInput={(params) => <TextField {...params} label="Type de prise en charge" />}
           />
 
           <Autocomplete
@@ -92,10 +91,10 @@ const ProvenanceDestinationInputs: React.FC<AdmissionInputsProps> = ({ criteria,
             className={classes.inputItem}
             options={criteria?.data?.typeDeSejour || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesTypeDeSejours}
             onChange={(e, value) => onChangeValue('typeDeSejour', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Type séjour" />}
+            renderInput={(params) => <TextField {...params} label="Type séjour" />}
           />
 
           <Autocomplete
@@ -104,10 +103,10 @@ const ProvenanceDestinationInputs: React.FC<AdmissionInputsProps> = ({ criteria,
             className={classes.inputItem}
             options={criteria?.data?.fileStatus || []}
             getOptionLabel={(option) => option.label}
-            getOptionSelected={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={defaultValuesFileStatus}
             onChange={(e, value) => onChangeValue('fileStatus', value)}
-            renderInput={(params) => <TextField {...params} variant="outlined" label="Statut dossier" />}
+            renderInput={(params) => <TextField {...params} label="Statut dossier" />}
           />
         </Collapse>
       </Grid>

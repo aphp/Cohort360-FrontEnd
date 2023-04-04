@@ -4,7 +4,7 @@ import {
   EncounterStatusKind
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 
-import { docTypes } from 'assets/docTypes.json'
+import docTypes from 'assets/docTypes.json'
 
 export const getDocumentStatus = (status?: CompositionStatusKind | DocumentReferenceStatusKind): string => {
   switch (status) {
@@ -61,7 +61,7 @@ export const getProcedureStatus = (status?: string): string => {
 
 export const getDisplayingSelectedDocTypes = (selectedDocTypes: any[]) => {
   let displayingSelectedDocTypes: any[] = []
-  const allTypes = docTypes.map((docType: any) => docType.type)
+  const allTypes = docTypes.docTypes.map((docType: any) => docType.type)
 
   for (const selectedDocType of selectedDocTypes) {
     const numberOfElementFromGroup = (allTypes.filter((type) => type === selectedDocType.type) || []).length

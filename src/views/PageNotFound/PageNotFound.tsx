@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Grid, Link, Typography } from '@material-ui/core'
+import { Button, Grid, Link, Typography } from '@mui/material'
 
 import JohnTravolta from 'assets/images/johntravolta.gif'
 import cohortLogo from 'assets/images/logo-login.png'
@@ -29,7 +29,7 @@ const PageNotFound: React.FC = () => {
             Si vous pensez qu'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante :
             dsi-id-recherche-support-cohort360@aphp.fr.
           </Typography>
-          <Button href="/home" variant="contained" color="primary" className={classes.button}>
+          <Button href="/home" variant="contained" className={classes.button}>
             Accueil
           </Button>
         </Grid>

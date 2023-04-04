@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 
-import { Button, CircularProgress, Grid, IconButton, InputAdornment, InputBase, Typography } from '@material-ui/core'
+import {
+  Button,
+  CircularProgress,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputBase,
+  Pagination,
+  Typography
+} from '@mui/material'
 
-import ClearIcon from '@material-ui/icons/Clear'
+import ClearIcon from '@mui/icons-material/Clear'
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
@@ -19,7 +28,6 @@ import { buildCohortFiltersChips } from 'utils/chips'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { deleteCohort, editCohort, fetchCohorts } from 'state/cohort'
-import { Pagination } from '@material-ui/lab'
 import { useDebounce } from 'utils/debounce'
 
 type ResearchProps = {
@@ -29,7 +37,7 @@ type ResearchProps = {
 }
 const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   const classes = useStyles()
-  const history = useHistory()
+  const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
   const cohortState = useAppSelector((state) => state.cohort)
@@ -133,7 +141,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
         break
       case 'favorite':
         setFilters({ ...filters, [filterName]: 'all' })
-        history.replace({ pathname: location.pathname })
+        navigate({ pathname: location.pathname })
         break
       case 'minPatients':
       case 'maxPatients':
@@ -208,7 +216,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
           <Pagination
             className={classes.pagination}
             count={Math.ceil((cohortState.count ?? 0) / rowsPerPage)}
-            shape="rounded"
+            shape="circular"
             onChange={(event, page: number) => setPage && setPage(page)}
             page={page}
           />

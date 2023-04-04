@@ -1,6 +1,7 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   documentButtons: {
     display: 'flex',
     justifyContent: 'flex-end'
@@ -25,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
   gridAdvancedSearch: {
     backgroundColor: '#FFF',
     border: '1px solid #c4c4c4',
-    padding: 8,
+    padding: '5px 12px',
     borderRadius: 25,
     marginBlock: 4
   },

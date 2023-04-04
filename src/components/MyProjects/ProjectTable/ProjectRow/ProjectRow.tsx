@@ -1,12 +1,12 @@
 import React from 'react'
 // import moment from 'moment'
 
-import { Button, Collapse, IconButton, TableCell, TableRow, Typography, Tooltip } from '@material-ui/core'
+import { Button, Collapse, IconButton, TableCell, TableRow, Typography, Tooltip } from '@mui/material'
 
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown'
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp'
-import EditIcon from '@material-ui/icons/Edit'
-import AddIcon from '@material-ui/icons/Add'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import EditIcon from '@mui/icons-material/Edit'
+import AddIcon from '@mui/icons-material/Add'
 
 import RequestRow from '../RequestRow/RequestRow'
 
@@ -104,7 +104,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
 
       <TableRow>
         <TableCell style={{ padding: 0, borderBottomWidth: open ? 1 : 0 }} colSpan={4}>
-          <Collapse in={open} timeout="auto" unmountOnExit style={{ width: '100%' }}>
+          <Collapse in={open} timeout="auto" unmountOnExit style={{ width: '100%', minHeight: 'fit-content' }}>
             {requestOfProject && requestOfProject.length > 0 ? (
               requestOfProject.map((request) => (
                 <RequestRow

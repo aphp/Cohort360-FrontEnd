@@ -1,7 +1,8 @@
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 import BackgroundLogin from 'assets/images/background-login.png'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     height: '100vh'
   },
@@ -19,10 +20,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundRepeat: 'no-repeat',
     backgroundSize: 'cover',
     backgroundPosition: 'center'
-  },
-  form: {
-    width: '100%',
-    margin: theme.spacing(5, 0, 1)
   },
   submit: {
     margin: theme.spacing(2, 0, 5),

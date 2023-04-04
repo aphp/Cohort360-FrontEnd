@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Grid, MenuItem, Select, TextField, Typography } from '@material-ui/core'
+import { Grid, MenuItem, Select, TextField, Typography } from '@mui/material'
 
 import useStyles from '../styles'
 
@@ -42,7 +42,6 @@ const RequestForm: React.FC<RequestFormProps> = ({
           autoFocus
           id="title"
           margin="normal"
-          variant="outlined"
           fullWidth
           error={error === ERROR_TITLE}
           helperText={
@@ -62,7 +61,6 @@ const RequestForm: React.FC<RequestFormProps> = ({
           id="criteria-occurrenceComparator-select"
           value={currentRequest.parent_folder}
           onChange={(event) => onChangeValue('parent_folder', event.target.value as string)}
-          variant="outlined"
           error={error === ERROR_PROJECT}
           style={{ marginTop: 16, marginBottom: 8 }}
         >
@@ -81,7 +79,6 @@ const RequestForm: React.FC<RequestFormProps> = ({
             onChange={(e: any) => onChangeProjectName(e.target.value)}
             id="project_name"
             margin="normal"
-            variant="outlined"
             fullWidth
             error={error === ERROR_PROJECT_NAME}
           />
@@ -96,7 +93,6 @@ const RequestForm: React.FC<RequestFormProps> = ({
           onChange={(e: any) => onChangeValue('description', e.target.value)}
           id="description"
           margin="normal"
-          variant="outlined"
           fullWidth
           multiline
           minRows={5}

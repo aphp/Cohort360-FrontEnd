@@ -11,7 +11,7 @@ import {
   TableSortLabel,
   Paper,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 
 import ProjectRow from './ProjectRow/ProjectRow'
 
@@ -170,6 +170,7 @@ const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, setSelectedReq
                     setSelectedRequests([])
                   }
                 }}
+                color="secondary"
               />
             </TableCell>
             <TableCell className={classes.tableHeadCell} align="center" style={{ width: 62 }} />
