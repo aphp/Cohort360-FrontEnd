@@ -232,6 +232,7 @@ type fetchCompositionProps = {
     | 'content'
     | 'context'
     | 'text'
+    | 'description'
   )[]
 }
 export const fetchComposition = async (args: fetchCompositionProps) => {

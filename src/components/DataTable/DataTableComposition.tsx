@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
+import { Buffer } from 'buffer'
 
 import { CircularProgress, Chip, Grid, IconButton, Typography, TableRow, TableCell } from '@mui/material'
 
@@ -131,16 +132,25 @@ const DataTableCompositionLine: React.FC<{
   const [open, setOpen] = useState<string | null>(null)
 
   const documentId = document.id
-  const title = document.title
+  const title = document.description
   const status = document.status
-  const event = document.event
+  const event = document.content[0].attachment.url
   const ipp = deidentified ? document.idPatient : document.IPP
   const nda = document.NDA ?? '-'
   const serviceProvider = document.serviceProvider ?? 'Non renseigné'
   const docType = docTypes.docTypes.find(
     ({ code }) => code === (document.type?.coding && document.type?.coding[0] ? document.type?.coding[0].code : '-')
   )
-  // const section = searchMode ? document.section : []
+
+  const documentContent =
+    document &&
+    document.content &&
+    document.content[1] &&
+    document.content[1].attachment &&
+    document.content[1].attachment.data
+      ? Buffer.from(document.content[1].attachment.data, 'base64').toString('utf-8')
+      : ''
+
   const date = document.date ? new Date(document.date).toLocaleDateString('fr-FR') : ''
   const hour = document.date
     ? new Date(document.date).toLocaleTimeString('fr-FR', {
@@ -212,17 +222,13 @@ const DataTableCompositionLine: React.FC<{
         </TableCell>
       </TableRow>
 
-      {/* {section && section.length > 0 && (
+      {documentContent && searchMode && (
         <TableRow className={classes.tableBodyRows}>
           <TableCell colSpan={6} style={{ backgroundImage: `url(${Watermark})`, backgroundSize: 'contain' }}>
-            {section.map((section) => (
-              <Grid key={section.title} container item direction="column">
-                <Typography dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }} />
-              </Grid>
-            ))}
+            <Typography>{documentContent}</Typography>
           </TableCell>
         </TableRow>
-      )} */}
+      )}
     </React.Fragment>
   )
 }

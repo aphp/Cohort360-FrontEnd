@@ -598,7 +598,21 @@ const servicesPatients: IServicePatients = {
       size: documentLines,
       offset: page ? (page - 1) * documentLines : 0,
       status: 'final',
-      _elements: !searchInput ? ['status', 'type', 'encounter', 'date', 'title', 'event'] : [],
+      _elements: !searchInput
+        ? [
+            'docstatus',
+            'status',
+            'type',
+            'encounter',
+            'date',
+            'title',
+            'event',
+            'content',
+            'context',
+            'text',
+            'description'
+          ]
+        : [],
       _text: searchInput,
       type: selectedDocTypes.join(','),
       'encounter.identifier': nda,
@@ -758,7 +772,9 @@ export const getEncounterDocuments = async (
       'event',
       'content',
       'context',
-      'text'
+      'text',
+      'description',
+      'title'
     ],
     status: 'final',
     _list: groupId ? groupId.split(',') : []

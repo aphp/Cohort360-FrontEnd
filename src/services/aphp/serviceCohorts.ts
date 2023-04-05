@@ -422,7 +422,8 @@ const servicesCohorts: IServiceCohorts = {
               'event',
               'context',
               'content',
-              'text'
+              'text',
+              'description'
             ],
         _list: groupId ? [groupId] : [],
         _text: searchInput,

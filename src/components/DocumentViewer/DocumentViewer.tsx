@@ -60,9 +60,18 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
     margin: 'auto'
   }
 
+  const documentContentDecode =
+    documentContent &&
+    documentContent.content &&
+    documentContent.content[1] &&
+    documentContent.content[1].attachment &&
+    documentContent.content[1].attachment.data
+      ? Buffer.from(documentContent.content[1].attachment.data, 'base64').toString('utf-8')
+      : ''
+
   return (
     <Dialog open={open} fullWidth maxWidth="xl" onClose={handleClose}>
-      {/* <DialogTitle id="document-viewer-dialog-title"></DialogTitle>
+      <DialogTitle id="document-viewer-dialog-title"></DialogTitle>
       <DialogContent id="document-viewer-dialog-content">
         {deidentified ? (
           loading ? (
@@ -71,13 +80,8 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
             </DialogContent>
           ) : (
             <div style={{ backgroundImage: `url(${Watermark})` }}>
-              {documentContent && documentContent.length > 0 ? (
-                documentContent.map((section: any) => (
-                  <>
-                    <Typography variant="h6">{section.title}</Typography>
-                    <Typography key={section.title} dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }} />
-                  </>
-                ))
+              {documentContentDecode ? (
+                <Typography>{documentContentDecode}</Typography>
               ) : (
                 <Typography>Le contenu du document est introuvable.</Typography>
               )}
@@ -113,7 +117,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
         <Button autoFocus onClick={handleClose}>
           Fermer
         </Button>
-      </DialogActions> */}
+      </DialogActions>
     </Dialog>
   )
 }
