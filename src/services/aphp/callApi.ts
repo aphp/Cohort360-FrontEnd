@@ -4,8 +4,8 @@ import { CohortComposition, SearchByTypes, FHIR_API_Response, IScope } from 'typ
 import {
   IBinary,
   IClaim,
-  IComposition,
   ICondition,
+  IDocumentReference,
   IEncounter,
   IGroup,
   IMedicationAdministration,
@@ -220,7 +220,20 @@ type fetchCompositionProps = {
   'patient.identifier'?: string
   facet?: ('class' | 'visit-year-month-gender-facet')[]
   uniqueFacet?: 'patient'[]
-  _elements?: ('status' | 'type' | 'subject' | 'encounter' | 'date' | 'title' | 'event')[]
+  _elements?: (
+    | 'docstatus'
+    | 'status'
+    | 'type'
+    | 'subject'
+    | 'encounter'
+    | 'date'
+    | 'title'
+    | 'event'
+    | 'content'
+    | 'context'
+    | 'text'
+    | 'description'
+  )[]
 }
 export const fetchComposition = async (args: fetchCompositionProps) => {
   const {
@@ -258,8 +271,8 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (type) options = [...options, `type=${type}`] // eslint-disable-line
   if (_text)
-    options = [...options, `${searchBy === SearchByTypes.text ? `_text` : 'title'}=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (status) options = [...options, `status=${status}`] // eslint-disable-line
+    options = [...options, `${searchBy === SearchByTypes.text ? `_text` : 'description'}=${encodeURIComponent(_text)}`] // eslint-disable-line
+  if (status) options = [...options, `docstatus=${status}`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
   if (patientIdentifier) options = [...options, `patient.identifier=${patientIdentifier}`] // eslint-disable-line
   if (encounter) options = [...options, `encounter=${encounter}`] // eslint-disable-line
@@ -273,8 +286,8 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   if (uniqueFacet && uniqueFacet.length > 0) options = [...options, `uniqueFacet=${uniqueFacet.reduce(reducer)}`] // eslint-disable-line
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<IComposition>>(
-    `/Composition?${options.reduce(optionsReducer)}`,
+  const response = await apiFhir.get<FHIR_API_Response<IDocumentReference>>(
+    `/DocumentReference?${options.reduce(optionsReducer)}`,
     { signal: signal }
   )
 
@@ -290,9 +303,9 @@ export const fetchCheckDocumentSearchInput = async (searchInput: string, signal?
 }
 
 export const fetchCompositionContent = async (compositionId: string) => {
-  const documentResp = await apiFhir.get<IComposition>(`/Composition/${compositionId}`)
+  const documentResp = await apiFhir.get<IDocumentReference>(`/DocumentReference/${compositionId}`)
 
-  return documentResp.data.section ?? []
+  return documentResp.data ?? []
 }
 
 /**

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
+import { Buffer } from 'buffer'
 
-import { IComposition_Section } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -28,7 +29,7 @@ type DocumentViewerProps = {
 }
 
 const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, handleClose, documentId }) => {
-  const [documentContent, setDocumentContent] = useState<IComposition_Section[] | null>(null)
+  const [documentContent, setDocumentContent] = useState<IDocumentReference | null>(null)
   const [numPages, setNumPages] = useState(1)
   const [loading, setLoading] = useState(false)
 
@@ -60,6 +61,15 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
     margin: 'auto'
   }
 
+  const documentContentDecode =
+    documentContent &&
+    documentContent.content &&
+    documentContent.content[1] &&
+    documentContent.content[1].attachment &&
+    documentContent.content[1].attachment.data
+      ? Buffer.from(documentContent.content[1].attachment.data, 'base64').toString('utf-8')
+      : ''
+
   return (
     <Dialog open={open} fullWidth maxWidth="xl" onClose={handleClose}>
       <DialogTitle id="document-viewer-dialog-title"></DialogTitle>
@@ -71,13 +81,8 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
             </DialogContent>
           ) : (
             <div style={{ backgroundImage: `url(${Watermark})` }}>
-              {documentContent && documentContent.length > 0 ? (
-                documentContent.map((section: any) => (
-                  <>
-                    <Typography variant="h6">{section.title}</Typography>
-                    <Typography key={section.title} dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }} />
-                  </>
-                ))
+              {documentContentDecode ? (
+                <Typography>{documentContentDecode}</Typography>
               ) : (
                 <Typography>Le contenu du document est introuvable.</Typography>
               )}

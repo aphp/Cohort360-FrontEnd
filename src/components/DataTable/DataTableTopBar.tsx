@@ -220,7 +220,7 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
                 style={{ height: 42 }}
               >
                 <MenuItem value={SearchByTypes.text}>Corps du document</MenuItem>
-                <MenuItem value={SearchByTypes.title}>Titre du document</MenuItem>
+                <MenuItem value={SearchByTypes.description}>Titre du document</MenuItem>
               </Select>
             </FormControl>
           )}

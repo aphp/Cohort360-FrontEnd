@@ -5,7 +5,7 @@ import { RootState } from 'state'
 import {
   IPatient,
   IClaim,
-  IComposition,
+  IDocumentReference,
   IProcedure,
   IEncounter,
   ICondition,
@@ -402,7 +402,7 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
       )
 
       const documentsList: any[] = linkElementWithEncounter(
-        documentsResponse.docsList as IComposition[],
+        documentsResponse.docsList as IDocumentReference[],
         hospits,
         deidentified
       )
@@ -1106,7 +1106,7 @@ function linkElementWithEncounter<
     | IProcedure
     | ICondition
     | IClaim
-    | IComposition
+    | IDocumentReference
     | IMedicationRequest
     | IMedicationAdministration
     | IObservation
@@ -1134,8 +1134,8 @@ function linkElementWithEncounter<
       case 'Condition':
         encounterId = (entry as IProcedure | ICondition).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
-      case 'Composition':
-        encounterId = (entry as IComposition).encounter?.display?.replace(/^Encounter\//, '') ?? ''
+      case 'DocumentReference':
+        encounterId = (entry as IDocumentReference).context?.encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
         break
       case 'MedicationRequest':
         encounterId = (entry as IMedicationRequest).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
@@ -1172,7 +1172,7 @@ function fillElementInformation<
     | IProcedure
     | ICondition
     | IClaim
-    | IComposition
+    | IDocumentReference
     | IMedicationRequest
     | IMedicationAdministration
     | IObservation

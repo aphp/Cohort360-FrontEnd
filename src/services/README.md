@@ -340,7 +340,7 @@ export interface IServiceCohorts {
   ) => Promise<{
     totalDocs: number
     totalAllDocs: number
-    documentsList: IComposition[]
+    documentsList: IDocumentReference[]
   }>
 
   fetchDocumentContent: (compositionId: string) => Promise<IComposition_Section[]>

@@ -23,7 +23,7 @@ import {
   IMedicationRequest,
   IMedicationAdministration,
   IEncounter,
-  IComposition,
+  IDocumentReference,
   IObservation
 } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
@@ -252,7 +252,7 @@ export interface IServicePatients {
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<{
-    docsList: IComposition[]
+    docsList: IDocumentReference[]
     docsTotal: number
   }>
 
@@ -598,7 +598,21 @@ const servicesPatients: IServicePatients = {
       size: documentLines,
       offset: page ? (page - 1) * documentLines : 0,
       status: 'final',
-      _elements: !searchInput ? ['status', 'type', 'encounter', 'date', 'title', 'event'] : [],
+      _elements: !searchInput
+        ? [
+            'docstatus',
+            'status',
+            'type',
+            'encounter',
+            'date',
+            'title',
+            'event',
+            'content',
+            'context',
+            'text',
+            'description'
+          ]
+        : [],
       _text: searchInput,
       type: selectedDocTypes.join(','),
       'encounter.identifier': nda,
@@ -747,7 +761,21 @@ export const getEncounterDocuments = async (
 
   const documentsResp = await fetchComposition({
     encounter: encountersIdList.join(','),
-    _elements: ['status', 'type', 'subject', 'encounter', 'date', 'title', 'event'],
+    _elements: [
+      'docstatus',
+      'status',
+      'type',
+      'subject',
+      'encounter',
+      'date',
+      'title',
+      'event',
+      'content',
+      'context',
+      'text',
+      'description',
+      'title'
+    ],
     status: 'final',
     _list: groupId ? groupId.split(',') : []
   })
@@ -756,7 +784,7 @@ export const getEncounterDocuments = async (
 
   for (const encounter of _encounters) {
     const currentDocuments = documents?.filter(
-      (document) => encounter.id === document.encounter?.display?.replace('Encounter/', '')
+      (document) => encounter.id === document.context?.encounter?.[0].reference?.replace('Encounter/', '')
     )
     const currentDetails = encountersDetail?.filter(
       (encounterDetail) => encounter.id === encounterDetail?.partOf?.reference?.replace('Encounter/', '')

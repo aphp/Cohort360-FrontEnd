@@ -53,7 +53,7 @@ const CONDITION_TYPE = 'type' // ok
 
 const RESSOURCE_TYPE_COMPOSITION: 'Composition' = 'Composition'
 const COMPOSITION_TEXT = '_text' // ok
-const COMPOSITION_TITLE = 'title'
+const COMPOSITION_TITLE = 'description' // ok
 const COMPOSITION_TYPE = 'type' // ok
 
 const RESSOURCE_TYPE_MEDICATION_REQUEST: 'MedicationRequest' = 'MedicationRequest' // = Prescription
@@ -1058,7 +1058,7 @@ export async function unbuildRequest(_json: string) {
             switch (key) {
               case COMPOSITION_TITLE:
                 currentCriterion.search = value ? decodeURIComponent(value) : ''
-                currentCriterion.searchBy = SearchByTypes.title
+                currentCriterion.searchBy = SearchByTypes.description
                 break
               case COMPOSITION_TEXT: {
                 currentCriterion.search = value ? decodeURIComponent(value) : ''

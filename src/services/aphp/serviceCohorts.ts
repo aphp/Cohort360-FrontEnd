@@ -12,13 +12,7 @@ import {
   searchInputError,
   errorDetails
 } from 'types'
-import {
-  IPatient,
-  IComposition,
-  IComposition_Section,
-  PatientGenderKind,
-  IIdentifier
-} from '@ahryman40k/ts-fhir-types/lib/R4'
+import { IPatient, PatientGenderKind, IIdentifier, IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   getGenderRepartitionMapAphp,
   getEncounterRepartitionMapAphp,
@@ -148,7 +142,7 @@ export interface IServiceCohorts {
     totalAllDocs: number
     totalPatientDocs: number
     totalAllPatientDocs: number
-    documentsList: IComposition[]
+    documentsList: IDocumentReference[]
   }>
 
   /**
@@ -171,7 +165,7 @@ export interface IServiceCohorts {
    * Retourne:
    *   - IComposition_Section: Contenu du document
    */
-  fetchDocumentContent: (compositionId: string) => Promise<IComposition_Section[]>
+  fetchDocumentContent: (compositionId: string) => Promise<IDocumentReference>
 
   /**
    * Permet de récupérer le contenu d'un document (/Binary)
@@ -415,7 +409,22 @@ const servicesCohorts: IServiceCohorts = {
         _sort: sortBy,
         sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
         status: 'final',
-        _elements: searchInput ? [] : ['status', 'type', 'subject', 'encounter', 'date', 'title', 'event'],
+        _elements: searchInput
+          ? []
+          : [
+              'docstatus',
+              'status',
+              'type',
+              'subject',
+              'encounter',
+              'date',
+              'title',
+              'event',
+              'context',
+              'content',
+              'text',
+              'description'
+            ],
         _list: groupId ? [groupId] : [],
         _text: searchInput,
         type: selectedDocTypes.length > 0 ? selectedDocTypes.join(',') : '',
@@ -776,18 +785,18 @@ export default servicesCohorts
 
 const getDocumentInfos: (
   deidentifiedBoolean: boolean,
-  documents?: IComposition[],
+  documents?: IDocumentReference[],
   groupId?: string,
   signal?: AbortSignal
 ) => Promise<CohortComposition[]> = async (deidentifiedBoolean: boolean, documents, groupId, signal) => {
   const cohortDocuments = (documents as CohortComposition[]) ?? []
 
   const listePatientsIds = cohortDocuments
-    .map((e) => e.subject?.display?.substring(8))
+    .map((e) => e.subject?.reference?.substring(8))
     .filter((item, index, array) => array.indexOf(item) === index)
     .join()
   const listeEncounterIds = cohortDocuments
-    .map((e) => e.encounter?.display?.substring(10))
+    .map((e) => e.context?.encounter?.[0]?.reference?.substring(10))
     .filter((item, index, array) => array.indexOf(item) === index)
     .join()
 
@@ -821,7 +830,7 @@ const getDocumentInfos: (
 
   for (const document of cohortDocuments) {
     for (const patient of listePatients) {
-      if (document.subject?.display?.substring(8) === patient.id) {
+      if (document.subject?.reference?.substring(8) === patient.id) {
         document.idPatient = patient.id
 
         document.IPP = patient.id ?? 'Inconnu'
@@ -835,7 +844,7 @@ const getDocumentInfos: (
     }
 
     for (const encounter of listeEncounters) {
-      if (document.encounter?.display?.substring(10) === encounter.id) {
+      if (document.context?.encounter?.[0].reference?.substring(10) === encounter.id) {
         document.encounterStatus = encounter.status
 
         if (encounter.serviceProvider) {
