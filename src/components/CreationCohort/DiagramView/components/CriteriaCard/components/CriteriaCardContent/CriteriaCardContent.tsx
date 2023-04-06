@@ -331,13 +331,13 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               label={
                 <Tooltip
                   title={`Contient ${_currentCriteria.search} dans le ${
-                    _currentCriteria.searchBy === SearchByTypes.title && 'titre du'
+                    _currentCriteria.searchBy === SearchByTypes.description && 'titre du'
                   }
                   document`}
                 >
                   <Typography style={{ maxWidth: 500 }} noWrap>
                     Contient "{_currentCriteria.search}" dans le
-                    {_currentCriteria.searchBy === SearchByTypes.title && ' titre du'} document
+                    {_currentCriteria.searchBy === SearchByTypes.description && ' titre du'} document
                   </Typography>
                 </Tooltip>
               }

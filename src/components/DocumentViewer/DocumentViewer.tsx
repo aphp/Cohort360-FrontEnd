@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Buffer } from 'buffer'
 
 import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 

@@ -209,7 +209,7 @@ export enum SearchByTypes {
   family = 'family',
   given = 'given',
   identifier = 'identifier',
-  title = 'title'
+  description = 'description'
 }
 
 export enum VitalStatus {
@@ -450,7 +450,7 @@ export type DocumentDataType = {
   title: string
   type: 'Composition'
   search: string
-  searchBy: SearchByTypes.text | SearchByTypes.title
+  searchBy: SearchByTypes.text | SearchByTypes.description
   docType: DocType[] | null
   encounterEndDate: Date | ''
   encounterStartDate: Date | ''

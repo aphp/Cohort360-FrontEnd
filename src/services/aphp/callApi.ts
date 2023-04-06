@@ -271,7 +271,7 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (type) options = [...options, `type=${type}`] // eslint-disable-line
   if (_text)
-    options = [...options, `${searchBy === SearchByTypes.text ? `_text` : 'title'}=${encodeURIComponent(_text)}`] // eslint-disable-line
+    options = [...options, `${searchBy === SearchByTypes.text ? `_text` : 'description'}=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (status) options = [...options, `docstatus=${status}`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
   if (patientIdentifier) options = [...options, `patient.identifier=${patientIdentifier}`] // eslint-disable-line
@@ -290,8 +290,6 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
     `/DocumentReference?${options.reduce(optionsReducer)}`,
     { signal: signal }
   )
-
-  console.log('response', response)
 
   return response
 }

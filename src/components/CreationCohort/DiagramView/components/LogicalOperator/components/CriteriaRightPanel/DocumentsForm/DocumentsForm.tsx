@@ -170,7 +170,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               label="Rechercher dans :"
             >
               <MenuItem value={SearchByTypes.text}>Corps du document</MenuItem>
-              <MenuItem value={SearchByTypes.title}>Titre du document</MenuItem>
+              <MenuItem value={SearchByTypes.description}>Titre du document</MenuItem>
             </Select>
           </FormControl>
 
