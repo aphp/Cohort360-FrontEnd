@@ -35,11 +35,11 @@ const columns = [
     code: 'secondCriteria'
   },
   {
-    label: 'de plus de',
+    label: "d'au moins",
     code: 'minDuration'
   },
   {
-    label: 'de moins de',
+    label: "d'au plus",
     code: 'maxDuration'
   },
   {

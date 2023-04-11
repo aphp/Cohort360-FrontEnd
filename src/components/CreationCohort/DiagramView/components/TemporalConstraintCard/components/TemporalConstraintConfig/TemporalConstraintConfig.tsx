@@ -62,7 +62,12 @@ const TemporalConstraintConfig: React.FC<{
   const [incorrectTimingError, setIncorrectTimingError] = useState<boolean>(false)
 
   const mainGroupCriteriaIds = criteriaGroup[0].criteriaIds
-  const mainGroupCriteria = selectedCriteria.filter((criteria) => mainGroupCriteriaIds.includes(criteria.id))
+  const selectableCriteria = selectedCriteria.filter(
+    (criteria) =>
+      mainGroupCriteriaIds.includes(criteria.id) && criteria.type !== 'Patient' && criteria.type !== 'IPPList'
+  )
+  console.log('selectableCriteria', selectableCriteria)
+  console.log('newConstraintsList', newConstraintsList)
 
   const onChangeMinTimeMeasurement = (event: React.ChangeEvent<{ value: any }>) => {
     setMinTimeMeasurement(event.target.value as string)
@@ -79,6 +84,17 @@ const TemporalConstraintConfig: React.FC<{
       setNoSelectedConstraintError(true)
     } else {
       setNoSelectedConstraintError(false)
+
+      setFirstCriteriaValue(null)
+      setSecondCriteriaValue(null)
+
+      setIsFirstTimeValueChecked(false)
+      setMinTime(1)
+      setMinTimeMeasurement('days')
+
+      setIsSecondTimeValueChecked(false)
+      setMaxTime(1)
+      setMaxTimeMeasurement('days')
 
       const newConstraint: TemporalConstraintsType = {
         idList: [firstCriteriaValue, secondCriteriaValue],
@@ -136,7 +152,8 @@ const TemporalConstraintConfig: React.FC<{
             variant="standard"
             style={{ marginTop: 4 }}
           >
-            {mainGroupCriteria
+            {selectableCriteria
+              // enlever le critère Y de la liste s'il existe
               .filter((criteria) => criteria.id !== secondCriteriaValue)
               .map((selectValue, index) => (
                 <MenuItem key={index} value={selectValue.id}>
@@ -164,8 +181,18 @@ const TemporalConstraintConfig: React.FC<{
             variant="standard"
             style={{ marginTop: 4 }}
           >
-            {mainGroupCriteria
+            {selectableCriteria
+              // enlever le critère X de la liste s'il existe
               .filter((criteria) => criteria.id !== firstCriteriaValue)
+              // .filter((criteria) => {
+              //   let possibleIDs
+              //   for (const constraint of newConstraintsList) {
+              //     if (constraint.idList.includes(firstCriteriaValue)) {
+              //       possibleIDs = possibleIDs.filter((id: number) => !constraint.idList.includes(id))
+              //     }
+              //   }
+              //   return possibleIDs
+              // })
               .map((selectValue, index) => (
                 <MenuItem key={index} value={selectValue.id}>
                   <Avatar className={classes.avatar}>{selectValue.id}</Avatar>
@@ -179,66 +206,77 @@ const TemporalConstraintConfig: React.FC<{
         </FormControl>
       </Grid>
       <Grid container alignItems="center" justifyContent="center">
-        <Typography style={{ fontWeight: 700 }}>dans une intervalle de </Typography>
-        <Checkbox
-          value={isFirstTimeValueChecked}
-          onChange={() => setIsFirstTimeValueChecked(!isFirstTimeValueChecked)}
-        />
-        <Typography style={{ fontWeight: 700 }}>au moins </Typography>
-        <InputBase
-          classes={{ root: classes.input, error: classes.inputError }}
-          disabled={!isFirstTimeValueChecked}
-          type="number"
-          value={minTime}
-          onChange={(event) => setMinTime(+event.target.value)}
-          inputProps={{
-            min: 1
-          }}
-          error={incorrectTimingError}
-        />
-        <Select
-          disabled={!isFirstTimeValueChecked}
-          value={minTimeMeasurement}
-          onChange={onChangeMinTimeMeasurement as any}
-          error={incorrectTimingError}
-          variant="standard"
-        >
-          {timeMeasurements.map((timeMeasurement, index) => (
-            <MenuItem key={index} value={timeMeasurement.id}>
-              {timeMeasurement.display}
-            </MenuItem>
-          ))}
-        </Select>
-
-        <Checkbox
-          value={isSecondTimeValueChecked}
-          onChange={() => setIsSecondTimeValueChecked(!isSecondTimeValueChecked)}
-        />
-        <Typography style={{ fontWeight: 700 }}>moins de</Typography>
-        <InputBase
-          classes={{ root: classes.input, error: classes.inputError }}
-          disabled={!isSecondTimeValueChecked}
-          type="number"
-          value={maxTime}
-          onChange={(event) => setMaxTime(+event.target.value)}
-          inputProps={{
-            min: 1
-          }}
-          error={incorrectTimingError}
-        />
-        <Select
-          disabled={!isSecondTimeValueChecked}
-          value={maxTimeMeasurement}
-          onChange={onChangeMaxTimeMeasurement as any}
-          error={incorrectTimingError}
-          variant="standard"
-        >
-          {timeMeasurements.map((timeMeasurement, index) => (
-            <MenuItem key={index} value={timeMeasurement.id}>
-              {timeMeasurement.display}
-            </MenuItem>
-          ))}
-        </Select>
+        <Grid container xs={6} justifyContent="flex-end">
+          <Typography style={{ fontWeight: 700 }}>dans un intervalle </Typography>
+        </Grid>
+        <Grid container xs={6} alignItems="center">
+          <Checkbox
+            checked={isFirstTimeValueChecked}
+            onChange={() => setIsFirstTimeValueChecked(!isFirstTimeValueChecked)}
+          />
+          <Typography style={{ fontWeight: 700, color: isFirstTimeValueChecked ? '#153D8A' : '#9E9E9E' }}>
+            d'au moins
+          </Typography>
+          <InputBase
+            classes={{ root: classes.input, error: classes.inputError }}
+            disabled={!isFirstTimeValueChecked}
+            type="number"
+            value={minTime}
+            onChange={(event) => setMinTime(+event.target.value)}
+            inputProps={{
+              min: 1
+            }}
+            error={incorrectTimingError}
+          />
+          <Select
+            disabled={!isFirstTimeValueChecked}
+            value={minTimeMeasurement}
+            onChange={onChangeMinTimeMeasurement as any}
+            error={incorrectTimingError}
+            variant="standard"
+          >
+            {timeMeasurements.map((timeMeasurement, index) => (
+              <MenuItem key={index} value={timeMeasurement.id}>
+                {timeMeasurement.display}
+              </MenuItem>
+            ))}
+          </Select>
+        </Grid>
+      </Grid>
+      <Grid container alignItems="center" justifyContent="flex-end">
+        <Grid container xs={6} alignItems="center">
+          <Checkbox
+            checked={isSecondTimeValueChecked}
+            onChange={() => setIsSecondTimeValueChecked(!isSecondTimeValueChecked)}
+          />
+          <Typography style={{ fontWeight: 700, color: isSecondTimeValueChecked ? '#153D8A' : '#9E9E9E' }}>
+            d'au plus
+          </Typography>
+          <InputBase
+            classes={{ root: classes.input, error: classes.inputError }}
+            disabled={!isSecondTimeValueChecked}
+            type="number"
+            value={maxTime}
+            onChange={(event) => setMaxTime(+event.target.value)}
+            inputProps={{
+              min: 1
+            }}
+            error={incorrectTimingError}
+          />
+          <Select
+            disabled={!isSecondTimeValueChecked}
+            value={maxTimeMeasurement}
+            onChange={onChangeMaxTimeMeasurement as any}
+            error={incorrectTimingError}
+            variant="standard"
+          >
+            {timeMeasurements.map((timeMeasurement, index) => (
+              <MenuItem key={index} value={timeMeasurement.id}>
+                {timeMeasurement.display}
+              </MenuItem>
+            ))}
+          </Select>
+        </Grid>
       </Grid>
       {incorrectTimingError && (
         <Typography align="center" style={{ color: '#F44336', fontSize: 12, width: '100%', margin: 4 }}>

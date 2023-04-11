@@ -163,13 +163,24 @@ const PopulationCard: React.FC = () => {
         </div>
       ) : (
         <div className={classes.centerContainer}>
-          <Button className={classes.actionButton} onClick={() => onChangeOpenDrawer(true)}>
+          <Button
+            className={classes.actionButton}
+            onClick={() => {
+              onChangeOpenDrawer(true)
+            }}
+          >
             Choisir une population source
           </Button>
         </div>
       )}
 
-      <ModalRightError open={rightError} handleClose={() => onChangeOpenDrawer(true)} />
+      <ModalRightError
+        open={rightError}
+        handleClose={() => {
+          onChangeOpenDrawer(true)
+          setRightError(false)
+        }}
+      />
 
       <PopulationRightPanel open={openDrawer} onConfirm={submitPopulation} onClose={() => onChangeOpenDrawer(false)} />
     </>
