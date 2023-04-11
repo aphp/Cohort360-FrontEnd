@@ -1,5 +1,6 @@
 import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync'
 import { createStore, applyMiddleware, combineReducers } from 'redux'
+import { composeWithDevTools } from 'redux-devtools-extension'
 import { persistReducer, persistStore } from 'redux-persist'
 import thunkMiddleware from 'redux-thunk'
 import logger from 'redux-logger'
@@ -55,12 +56,14 @@ const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 export const store = createStore(
   persistedReducer,
-  applyMiddleware(
-    thunkMiddleware,
-    logger,
-    createStateSyncMiddleware({
-      predicate: (action) => action.type == 'autoLogout/open' || action.type == 'autoLogout/close'
-    })
+  composeWithDevTools(
+    applyMiddleware(
+      thunkMiddleware,
+      logger,
+      createStateSyncMiddleware({
+        predicate: (action) => action.type == 'autoLogout/open' || action.type == 'autoLogout/close'
+      })
+    )
   )
 )
 initStateWithPrevTab(store)
