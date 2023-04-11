@@ -1,6 +1,9 @@
-name: cohort360-front-run-tests
+name: cohort360-main-pipeline
 
-on: [push]
+on: 
+  push:
+    branches:
+      - '**'
 
 jobs:
   dependencies:
