@@ -254,7 +254,6 @@ type BuildCohortReturn = {
 }
 type BuildCohortParams = {
   selectedPopulation?: ScopeTreeRow[] | null
-  allowSearchIpp?: boolean
 }
 const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParams, { state: RootState }>(
   'cohortCreation/build',
@@ -287,10 +286,9 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
         )
       }
 
-      let allowSearchIpp = false
-      if (_selectedPopulation) {
-        allowSearchIpp = await services.perimeters.allowSearchIpp(_selectedPopulation as ScopeTreeRow[])
-      }
+      const allowSearchIpp = _selectedPopulation
+        ? await services.perimeters.allowSearchIpp(_selectedPopulation as ScopeTreeRow[])
+        : false
 
       let _initTemporalConstraints
 
