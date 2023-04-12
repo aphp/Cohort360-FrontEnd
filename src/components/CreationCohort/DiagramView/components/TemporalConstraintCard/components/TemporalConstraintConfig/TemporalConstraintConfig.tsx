@@ -61,13 +61,34 @@ const TemporalConstraintConfig: React.FC<{
   const [noSelectedConstraintError, setNoSelectedConstraintError] = useState<boolean>(false)
   const [incorrectTimingError, setIncorrectTimingError] = useState<boolean>(false)
 
-  const mainGroupCriteriaIds = criteriaGroup[0].criteriaIds
-  const selectableCriteria = selectedCriteria.filter(
-    (criteria) =>
-      mainGroupCriteriaIds.includes(criteria.id) && criteria.type !== 'Patient' && criteria.type !== 'IPPList'
-  )
-  console.log('selectableCriteria', selectableCriteria)
-  console.log('newConstraintsList', newConstraintsList)
+  const getSelectableCriteria = (firstCriteriaSelected: any) => {
+    const mainGroupCriteriaIds = criteriaGroup[0].criteriaIds
+
+    // remove criteria types that cannot be part of a temporal constraint
+    const selectableCriteriaTypes = selectedCriteria.filter(
+      (criteria) =>
+        mainGroupCriteriaIds.includes(criteria.id) && criteria.type !== 'Patient' && criteria.type !== 'IPPList'
+    )
+
+    // get constraints that contain the firstCriteriaSelected
+    const constraintsWithCriteriaSelected = newConstraintsList.filter((constraint) =>
+      constraint.idList.includes(firstCriteriaSelected as never)
+    )
+
+    // get an array with all the ids that are already in a constraint with the firstCriteriaSelected
+    const forbiddenCriteriaIds = constraintsWithCriteriaSelected.reduce((acc, obj) => {
+      const idList = obj.idList as number[]
+      return acc.concat(idList)
+    }, [] as number[])
+
+    // retrieves criteria that are not forbidden
+    const selectableCriteria = selectableCriteriaTypes.filter((criteria) => !forbiddenCriteriaIds.includes(criteria.id))
+
+    return selectableCriteria
+  }
+
+  const selectableCriteria1 = getSelectableCriteria(secondCriteriaValue)
+  const selectableCriteria2 = getSelectableCriteria(firstCriteriaValue)
 
   const onChangeMinTimeMeasurement = (event: React.ChangeEvent<{ value: any }>) => {
     setMinTimeMeasurement(event.target.value as string)
@@ -152,15 +173,12 @@ const TemporalConstraintConfig: React.FC<{
             variant="standard"
             style={{ marginTop: 4 }}
           >
-            {selectableCriteria
-              // enlever le critère Y de la liste s'il existe
-              .filter((criteria) => criteria.id !== secondCriteriaValue)
-              .map((selectValue, index) => (
-                <MenuItem key={index} value={selectValue.id}>
-                  <Avatar className={classes.avatar}>{selectValue.id}</Avatar>
-                  {` - ${selectValue.title}`}
-                </MenuItem>
-              ))}
+            {selectableCriteria1.map((selectValue, index) => (
+              <MenuItem key={index} value={selectValue.id}>
+                <Avatar className={classes.avatar}>{selectValue.id}</Avatar>
+                {` - ${selectValue.title}`}
+              </MenuItem>
+            ))}
           </Select>
           {noSelectedConstraintError && firstCriteriaValue === null && (
             <FormHelperText>Veuillez sélectionner un critère.</FormHelperText>
@@ -181,24 +199,12 @@ const TemporalConstraintConfig: React.FC<{
             variant="standard"
             style={{ marginTop: 4 }}
           >
-            {selectableCriteria
-              // enlever le critère X de la liste s'il existe
-              .filter((criteria) => criteria.id !== firstCriteriaValue)
-              // .filter((criteria) => {
-              //   let possibleIDs
-              //   for (const constraint of newConstraintsList) {
-              //     if (constraint.idList.includes(firstCriteriaValue)) {
-              //       possibleIDs = possibleIDs.filter((id: number) => !constraint.idList.includes(id))
-              //     }
-              //   }
-              //   return possibleIDs
-              // })
-              .map((selectValue, index) => (
-                <MenuItem key={index} value={selectValue.id}>
-                  <Avatar className={classes.avatar}>{selectValue.id}</Avatar>
-                  {` - ${selectValue.title}`}
-                </MenuItem>
-              ))}
+            {selectableCriteria2.map((selectValue, index) => (
+              <MenuItem key={index} value={selectValue.id}>
+                <Avatar className={classes.avatar}>{selectValue.id}</Avatar>
+                {` - ${selectValue.title}`}
+              </MenuItem>
+            ))}
           </Select>
           {noSelectedConstraintError && secondCriteriaValue === null && (
             <FormHelperText>Veuillez sélectionner un critère.</FormHelperText>
