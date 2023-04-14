@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 import { Button, IconButton, Chip, CircularProgress, Typography } from '@mui/material'
 
@@ -16,13 +16,13 @@ import { MeState } from 'state/me'
 
 import { ScopeTreeRow } from 'types'
 import { getSelectedScopes, filterScopeTree } from 'utils/scopeTree'
-import servicesPerimeters from 'services/aphp/servicePerimeters'
 
 import useStyles from './styles'
 
 const PopulationCard: React.FC = () => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
+  const isRendered = useRef<boolean>(false)
 
   const {
     request: { selectedPopulation = [], ...requestState },
@@ -56,9 +56,7 @@ const PopulationCard: React.FC = () => {
       subItems: []
     }))
 
-    const allowSearchIpp = await servicesPerimeters.allowSearchIpp(_selectedPopulations)
-
-    dispatch<any>(buildCohortCreation({ selectedPopulation: _selectedPopulations, allowSearchIpp: allowSearchIpp }))
+    dispatch<any>(buildCohortCreation({ selectedPopulation: _selectedPopulations }))
     onChangeOpenDrawer(false)
   }
 
@@ -87,14 +85,17 @@ const PopulationCard: React.FC = () => {
 
   useEffect(() => {
     if (
+      !isRendered.current &&
       !openDrawer &&
-      scopesList &&
-      scopesList.length === 1 &&
-      requestState.requestId &&
-      (selectedPopulation === null || (selectedPopulation && selectedPopulation.length === 0))
+      scopesList?.length === 1 &&
+      requestState?.requestId &&
+      (selectedPopulation === null || selectedPopulation?.length === 0)
     ) {
       const savedSelectedItems: ScopeTreeRow[] = getSelectedScopes(scopesList[0], [], scopesList)
       submitPopulation(savedSelectedItems)
+      isRendered.current = true
+    } else {
+      isRendered.current = false
     }
   }, [scopesList, requestState])
 
@@ -163,13 +164,24 @@ const PopulationCard: React.FC = () => {
         </div>
       ) : (
         <div className={classes.centerContainer}>
-          <Button className={classes.actionButton} onClick={() => onChangeOpenDrawer(true)}>
+          <Button
+            className={classes.actionButton}
+            onClick={() => {
+              onChangeOpenDrawer(true)
+            }}
+          >
             Choisir une population source
           </Button>
         </div>
       )}
 
-      <ModalRightError open={rightError} handleClose={() => onChangeOpenDrawer(true)} />
+      <ModalRightError
+        open={rightError}
+        handleClose={() => {
+          onChangeOpenDrawer(true)
+          setRightError(false)
+        }}
+      />
 
       <PopulationRightPanel open={openDrawer} onConfirm={submitPopulation} onClose={() => onChangeOpenDrawer(false)} />
     </>

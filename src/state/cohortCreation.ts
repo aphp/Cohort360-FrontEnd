@@ -254,7 +254,6 @@ type BuildCohortReturn = {
 }
 type BuildCohortParams = {
   selectedPopulation?: ScopeTreeRow[] | null
-  allowSearchIpp?: boolean
 }
 const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParams, { state: RootState }>(
   'cohortCreation/build',
@@ -287,9 +286,27 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
         )
       }
 
-      let allowSearchIpp = false
-      if (_selectedPopulation) {
-        allowSearchIpp = await services.perimeters.allowSearchIpp(_selectedPopulation as ScopeTreeRow[])
+      const allowSearchIpp = _selectedPopulation
+        ? await services.perimeters.allowSearchIpp(_selectedPopulation as ScopeTreeRow[])
+        : false
+
+      let _initTemporalConstraints
+
+      if (_temporalConstraints && _temporalConstraints?.length === 0) {
+        _initTemporalConstraints = defaultInitialState.temporalConstraints
+      } else {
+        _initTemporalConstraints = _temporalConstraints
+      }
+
+      if (_temporalConstraints && _temporalConstraints?.length > 0) {
+        _initTemporalConstraints = _temporalConstraints.map(
+          (temporalConstraint: TemporalConstraintsType, index: number) => {
+            return {
+              ...temporalConstraint,
+              id: index + 1
+            }
+          }
+        )
       }
 
       let _initTemporalConstraints
@@ -471,12 +488,15 @@ const cohortCreationSlice = createSlice({
     deleteSelectedCriteria: (state: CohortCreationState, action: PayloadAction<number>) => {
       const criteriaId = action.payload
       const criteriaGroupSaved = [...state.criteriaGroup]
+      const idMap: { [key: number]: number } = {} // Object to hold previous and new IDs mapping
+
       // Reset Group criteriaIds
       state.criteriaGroup = state.criteriaGroup.map((item) => ({ ...item, criteriaIds: [] }))
+
       state.selectedCriteria = state.selectedCriteria
         .filter(({ id }) => id !== criteriaId)
         .map((selectedCriteria, index) => {
-          // Get the parent of current critria
+          // Get the parent of current criteria
           const parentGroup = criteriaGroupSaved.find((criteriaGroup) =>
             criteriaGroup.criteriaIds.find((criteriaId) => criteriaId === selectedCriteria.id)
           )
@@ -490,8 +510,10 @@ const cohortCreationSlice = createSlice({
               }
             }
           }
+          idMap[selectedCriteria.id] = index + 1
           return { ...selectedCriteria, id: index + 1 }
         })
+
       // Re-assign groups
       state.criteriaGroup = state.criteriaGroup.map((criteriaGroup) => {
         const foundGroupSaved = criteriaGroupSaved.find(({ id }) => id === criteriaGroup.id)
@@ -503,7 +525,19 @@ const cohortCreationSlice = createSlice({
           criteriaIds: [...criteriaGroup.criteriaIds, ...oldGroupsChildren]
         }
       })
+
       state.nextCriteriaId += 1
+
+      // Delete temporalConstraints containing deletedCriteria and reassign criteriaIds
+      const remainingConstraints = state.temporalConstraints
+        .filter((constraint) => !constraint.idList.includes(criteriaId as never))
+        .map((constraint) => {
+          const oldIds = constraint.idList as number[]
+          const newIds = oldIds.map((id) => idMap[id] ?? id)
+          return { ...constraint, idList: newIds }
+        })
+
+      state.temporalConstraints = remainingConstraints
     },
     deleteCriteriaGroup: (state: CohortCreationState, action: PayloadAction<number>) => {
       const groupId = action.payload
