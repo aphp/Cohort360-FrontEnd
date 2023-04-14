@@ -35,11 +35,11 @@ const columns = [
     code: 'secondCriteria'
   },
   {
-    label: 'de plus de',
+    label: "d'au moins",
     code: 'minDuration'
   },
   {
-    label: 'de moins de',
+    label: "d'au plus",
     code: 'maxDuration'
   },
   {
@@ -132,7 +132,7 @@ const EventSequenceTable: React.FC<{ temporalConstraints: TemporalConstraintsTyp
           </TableRow>
         </TableHead>
         <TableBody>
-          {!temporalConstraints || temporalConstraints?.length === 1 ? (
+          {!temporalConstraints || temporalConstraints.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7}>
                 <Typography className={classes.loadingSpinnerContainer}>

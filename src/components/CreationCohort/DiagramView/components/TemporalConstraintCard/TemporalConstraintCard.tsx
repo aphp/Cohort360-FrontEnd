@@ -15,7 +15,11 @@ const TemporalConstraint: React.FC = () => {
   const [disableTemporalConstraint, setDisableTemporalConstraint] = useState(false)
 
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
-  const { criteriaGroup = [], temporalConstraints } = useAppSelector((state) => state.cohortCreation.request)
+  const {
+    criteriaGroup = [],
+    temporalConstraints,
+    selectedCriteria
+  } = useAppSelector((state) => state.cohortCreation.request)
 
   const maintenanceIsActive = meState?.maintenance?.active || false
 
@@ -25,6 +29,12 @@ const TemporalConstraint: React.FC = () => {
 
   const dispatch = useAppDispatch()
   const classes = useStyles()
+
+  const mainGroupCriteriaIds = criteriaGroup[0].criteriaIds
+  const selectableCriteria = selectedCriteria.filter(
+    (criteria) =>
+      mainGroupCriteriaIds.includes(criteria.id) && criteria.type !== 'Patient' && criteria.type !== 'IPPList'
+  )
 
   useEffect(() => {
     if (temporalConstraints?.length > 0) {
@@ -37,7 +47,10 @@ const TemporalConstraint: React.FC = () => {
   useEffect(() => {
     if (criteriaGroup && criteriaGroup.length > 0) {
       const mainCriteriaGroup = criteriaGroup.find(({ id }) => id === 0)
-      if (!disableTemporalConstraint && mainCriteriaGroup && mainCriteriaGroup.type !== 'andGroup') {
+      if (
+        (!disableTemporalConstraint && mainCriteriaGroup && mainCriteriaGroup.type !== 'andGroup') ||
+        selectableCriteria.length < 2
+      ) {
         if (temporalConstraints && temporalConstraints.length > 1) {
           temporalConstraints?.map((temporalConstraint) => {
             dispatch<any>(deleteTemporalConstraint(temporalConstraint))

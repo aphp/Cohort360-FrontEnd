@@ -1492,6 +1492,8 @@ export async function unbuildRequest(_json: string) {
 
   let _criteriaGroup = convertJsonObjectsToCriteriaGroup(criteriaGroup)
   const criteriaGroupSaved = [..._criteriaGroup]
+  const idMap: { [key: number]: number } = {} // Object to hold previous and new IDs mapping
+
   // Reset Group criteriaIds
   _criteriaGroup = _criteriaGroup.map((item) => ({ ...item, criteriaIds: [] }))
 
@@ -1510,6 +1512,7 @@ export async function unbuildRequest(_json: string) {
         }
       }
     }
+    idMap[_criteria._id] = index + 1
     return { ..._criteria, _id: index + 1 }
   })
 
@@ -1548,12 +1551,18 @@ export async function unbuildRequest(_json: string) {
     _criteriaGroup[index].id = newId
   }
 
+  const updatedConstraintsIds = temporalConstraints.map((constraint) => {
+    const oldIds = constraint.idList as number[]
+    const newIds = oldIds.map((id) => idMap[id] ?? id)
+    return { ...constraint, idList: newIds }
+  })
+
   // End of unbuild
   return {
     population,
     criteria: await convertJsonObjectsToCriteria(criteriaItems),
     criteriaGroup: _criteriaGroup,
-    temporalConstraints: temporalConstraints
+    temporalConstraints: updatedConstraintsIds
   }
 }
 
