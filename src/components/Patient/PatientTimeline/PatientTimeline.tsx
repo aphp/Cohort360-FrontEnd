@@ -302,19 +302,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
     <React.Fragment>
       {timelineData[year]
         ? Object.keys(timelineData[year]).map((month) => (
-            <ul
-              className={classes.timeline}
-              key={'ul' + year + month}
-              // ref={(el) => {
-              //   // Setting component size in monthComponentSize
-              //   if (!el) return
-              //   monthComponentSize[year] = monthComponentSize[year] || []
-
-              //   monthComponentSize[year][
-              //     month
-              //   ] = el.getBoundingClientRect().height
-              // }}
-            >
+            <ul className={classes.timeline} key={'ul' + year + month}>
               {getMonthComponent(timelineData[year][month])}
             </ul>
           ))

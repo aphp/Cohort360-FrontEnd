@@ -427,6 +427,7 @@ const servicesCohorts: IServiceCohorts = {
             ],
         _list: groupId ? [groupId] : [],
         _text: searchInput,
+        highlight_search_results: true,
         type: selectedDocTypes.length > 0 ? selectedDocTypes.join(',') : '',
         'encounter.identifier': nda,
         'patient.identifier': ipp,
@@ -569,22 +570,16 @@ const servicesCohorts: IServiceCohorts = {
       let caresiteIds = ''
       let organizationLinkList: any[] = []
 
-      // On crée un dictionnaire pour faire le lien entre les cohortes et les périmètres (Dictionnaire 1)
-      const cohortLinkList =
-        cohortsResponse &&
-        cohortsResponse.data &&
-        cohortsResponse.data.entry &&
-        cohortsResponse.data.entry[0] &&
-        cohortsResponse.data.entry[0].resource
-          ? cohortsResponse.data.entry.map((cohortsResponse: any) => cohortsResponse.resource)
-          : []
+      const cohortLinkList = cohortsResponse?.data?.entry?.[0]?.resource
+        ? cohortsResponse.data.entry.map((cohortsResponse: any) => cohortsResponse.resource)
+        : []
 
       // On cherche la liste des Organisations présente dans l'objet `member`
       caresiteIds =
-        cohortLinkList && cohortLinkList.length > 0
+        cohortLinkList?.length > 0
           ? cohortLinkList
               .map((cohortLinkItem: any) =>
-                cohortLinkItem && cohortLinkItem.member && cohortLinkItem.member.length > 0
+                cohortLinkItem?.member?.length > 0
                   ? cohortLinkItem.member.map((member: any) =>
                       member.entity.display?.search('Organization/') !== -1
                         ? member.entity.display?.replace('Organization/', '')
@@ -601,7 +596,7 @@ const servicesCohorts: IServiceCohorts = {
         // Si une liste d'Organisation est présente dans l'objet `member`
         // On crée un dictionnaire pour faire le lien entre les Groups et les Organisations (Dictionnaire 2)
         organizationLinkList =
-          cohortLinkList && cohortLinkList.length > 0
+          cohortLinkList?.length > 0
             ? cohortLinkList
                 .map((cohortLinkItem: any) => {
                   const members = cohortLinkItem?.member ?? []
@@ -628,10 +623,10 @@ const servicesCohorts: IServiceCohorts = {
         // Sinon
         // On cherche les Group ID
         const parentGroupsId =
-          cohortLinkList && cohortLinkList.length > 0
+          cohortLinkList?.length > 0
             ? cohortLinkList
                 .map((cohortLinkItem: any) =>
-                  cohortLinkItem && cohortLinkItem.member && cohortLinkItem.member.length > 0
+                  cohortLinkItem?.member?.length > 0
                     ? cohortLinkItem.member.map((member: any) =>
                         member.entity.display?.search('Group/') !== -1
                           ? member.entity.display?.replace('Group/', '')
@@ -664,22 +659,14 @@ const servicesCohorts: IServiceCohorts = {
           .filter((parentGroupResponse: any) => parentGroupResponse.error !== true)
           .map(
             (parentGroupResponse: any) =>
-              parentGroupResponse.data &&
-              parentGroupResponse.data.resourceType === 'Bundle' &&
-              parentGroupResponse.data.entry &&
-              parentGroupResponse.data.entry[0] &&
-              parentGroupResponse.data.entry[0].resource
+              parentGroupResponse?.data?.resourceType === 'Bundle' && parentGroupResponse?.data?.entry?.[0]?.resource
           )
 
         if (!organizationLinkList || organizationLinkList?.length === 0) return cohorts
 
         // On crée une liste des Organisations liées au périmètre (caresiteIds = string)
         caresiteIds = organizationLinkList
-          .map(
-            (currentParentItem: any) =>
-              currentParentItem.managingEntity?.display &&
-              currentParentItem.managingEntity?.display.replace('Organization/', '')
-          )
+          .map((currentParentItem: any) => currentParentItem?.managingEntity?.display?.replace('Organization/', ''))
           .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
           .join(',')
       }
@@ -693,7 +680,7 @@ const servicesCohorts: IServiceCohorts = {
         const organizationLinkItems = !cohortLinkItem
           ? undefined
           : organizationLinkList.filter((organizationLink: any) =>
-              cohortLinkItem && cohortLinkItem.member && cohortLinkItem.member.length > 0
+              cohortLinkItem?.member?.length > 0
                 ? cohortLinkItem.member?.find(
                     (member: any) => member.entity.display?.replace('Group/', '') === organizationLink.id
                   )

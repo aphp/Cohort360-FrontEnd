@@ -691,8 +691,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               return 'Prescription'
             case 'MedicationAdministration':
               return 'Administration'
-            // case 'dispensation':
-            //   return 'Dispensation'
             default:
               return '?'
           }

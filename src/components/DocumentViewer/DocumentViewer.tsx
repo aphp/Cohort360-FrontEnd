@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Buffer } from 'buffer'
+import ReactHtmlParser from 'react-html-parser'
 
 import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 
@@ -61,14 +62,9 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
     margin: 'auto'
   }
 
-  const documentContentDecode =
-    documentContent &&
-    documentContent.content &&
-    documentContent.content[1] &&
-    documentContent.content[1].attachment &&
-    documentContent.content[1].attachment.data
-      ? Buffer.from(documentContent.content[1].attachment.data, 'base64').toString('utf-8')
-      : ''
+  const documentContentDecode = documentContent?.content?.[1].attachment?.data
+    ? Buffer.from(documentContent.content[1].attachment.data, 'base64').toString('utf-8')
+    : ''
 
   return (
     <Dialog open={open} fullWidth maxWidth="xl" onClose={handleClose}>
@@ -82,7 +78,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
           ) : (
             <div style={{ backgroundImage: `url(${Watermark})` }}>
               {documentContentDecode ? (
-                <Typography>{documentContentDecode}</Typography>
+                <Typography>{ReactHtmlParser(documentContentDecode)}</Typography>
               ) : (
                 <Typography>Le contenu du document est introuvable.</Typography>
               )}

@@ -614,6 +614,7 @@ const servicesPatients: IServicePatients = {
           ]
         : [],
       _text: searchInput,
+      highlight_search_results: true,
       type: selectedDocTypes.join(','),
       'encounter.identifier': nda,
       onlyPdfAvailable: onlyPdfAvailable,

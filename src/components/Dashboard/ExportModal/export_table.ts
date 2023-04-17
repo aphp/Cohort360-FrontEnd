@@ -57,11 +57,6 @@ const exportTable: ExportTableType[] = [
     table_name: 'Fait - PMSI - GHM',
     table_id: 'cost'
   },
-  // {
-  //   id: 'note',
-  //   table_name: 'Fait - Documents médicaux',
-  //   table_id: 'note'
-  // },
   {
     id: 'care_site',
     table_name: 'Référentiel - Structure hospitalière',

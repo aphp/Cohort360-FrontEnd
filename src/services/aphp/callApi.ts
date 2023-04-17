@@ -212,6 +212,7 @@ type fetchCompositionProps = {
   minDate?: string
   maxDate?: string
   _text?: string
+  highlight_search_results?: boolean
   status?: string
   patient?: string
   encounter?: string
@@ -246,6 +247,7 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
     sortDirection,
     type,
     _text,
+    highlight_search_results,
     status,
     patient,
     encounter,
@@ -272,6 +274,7 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   if (type) options = [...options, `type=${type}`] // eslint-disable-line
   if (_text)
     options = [...options, `${searchBy === SearchByTypes.text ? `_text` : 'description'}=${encodeURIComponent(_text)}`] // eslint-disable-line
+  if (highlight_search_results) options = [...options, `${searchBy === SearchByTypes.text ? `highlight_search_results=true` : 'highlight_search_results=false'}`] // eslint-disable-line
   if (status) options = [...options, `docstatus=${status}`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
   if (patientIdentifier) options = [...options, `patient.identifier=${patientIdentifier}`] // eslint-disable-line
