@@ -61,7 +61,7 @@ const TemporalConstraintConfig: React.FC<{
   const [noSelectedConstraintError, setNoSelectedConstraintError] = useState<boolean>(false)
   const [incorrectTimingError, setIncorrectTimingError] = useState<boolean>(false)
 
-  const getSelectableCriteria = (firstCriteriaSelected: any) => {
+  const getSelectableCriteria = (firstCriteriaSelected: number | null) => {
     const mainGroupCriteriaIds = criteriaGroup[0].criteriaIds
 
     // remove criteria types that cannot be part of a temporal constraint
@@ -82,7 +82,9 @@ const TemporalConstraintConfig: React.FC<{
     }, [] as number[])
 
     // retrieves criteria that are not forbidden
-    const selectableCriteria = selectableCriteriaTypes.filter((criteria) => !forbiddenCriteriaIds.includes(criteria.id))
+    const selectableCriteria = selectableCriteriaTypes
+      .filter((criteria) => !forbiddenCriteriaIds.includes(criteria.id))
+      .filter((criteria) => criteria.id !== firstCriteriaSelected)
 
     return selectableCriteria
   }
