@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Button, Badge } from '@mui/material'
+import { Button, Badge, Tooltip } from '@mui/material'
 
 import { buildCohortCreation, deleteTemporalConstraint } from 'state/cohortCreation'
 import { useAppSelector, useAppDispatch } from 'state'
@@ -89,16 +89,20 @@ const TemporalConstraint: React.FC = () => {
           </Button>
         </Badge>
       ) : (
-        <Button
-          onClick={handleOnClick}
-          className={classes.root}
-          style={{
-            backgroundColor: temporalConstraintExist && !disableTemporalConstraint ? '#FFE2A9' : '#DEDEDE'
-          }}
-          disabled={maintenanceIsActive || disableTemporalConstraint}
-        >
-          Contraintes temporelles
-        </Button>
+        <Tooltip title="Les contraintes temporelles ne peuvent être ajoutées que sur les critères simples du groupe ET principal, hors critères démographiques et d'IPP.">
+          <span>
+            <Button
+              onClick={handleOnClick}
+              className={classes.root}
+              style={{
+                backgroundColor: temporalConstraintExist && !disableTemporalConstraint ? '#FFE2A9' : '#DEDEDE'
+              }}
+              disabled={maintenanceIsActive || disableTemporalConstraint}
+            >
+              Contraintes temporelles
+            </Button>
+          </span>
+        </Tooltip>
       )}
 
       {modalIsOpen && <TemporalConstraintModal open={modalIsOpen} onClose={handleOnClose} />}

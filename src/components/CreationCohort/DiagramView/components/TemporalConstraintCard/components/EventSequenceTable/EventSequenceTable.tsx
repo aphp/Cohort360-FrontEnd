@@ -132,7 +132,8 @@ const EventSequenceTable: React.FC<{ temporalConstraints: TemporalConstraintsTyp
           </TableRow>
         </TableHead>
         <TableBody>
-          {!temporalConstraints || temporalConstraints.length === 0 ? (
+          {!temporalConstraints ||
+          temporalConstraints.filter((constraints) => !constraints.idList.includes('All' as never)).length === 0 ? (
             <TableRow>
               <TableCell colSpan={7}>
                 <Typography className={classes.loadingSpinnerContainer}>
