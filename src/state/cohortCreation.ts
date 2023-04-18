@@ -292,32 +292,13 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
 
       let _initTemporalConstraints
 
-      if (_temporalConstraints && _temporalConstraints?.length === 0) {
+      if (_temporalConstraints?.length === 0) {
         _initTemporalConstraints = defaultInitialState.temporalConstraints
       } else {
         _initTemporalConstraints = _temporalConstraints
       }
 
-      if (_temporalConstraints && _temporalConstraints?.length > 0) {
-        _initTemporalConstraints = _temporalConstraints.map(
-          (temporalConstraint: TemporalConstraintsType, index: number) => {
-            return {
-              ...temporalConstraint,
-              id: index + 1
-            }
-          }
-        )
-      }
-
-      let _initTemporalConstraints
-
-      if (_temporalConstraints && _temporalConstraints?.length === 0) {
-        _initTemporalConstraints = defaultInitialState.temporalConstraints
-      } else {
-        _initTemporalConstraints = _temporalConstraints
-      }
-
-      if (_temporalConstraints && _temporalConstraints?.length > 0) {
+      if (_temporalConstraints?.length > 0) {
         _initTemporalConstraints = _temporalConstraints.map(
           (temporalConstraint: TemporalConstraintsType, index: number) => {
             return {
