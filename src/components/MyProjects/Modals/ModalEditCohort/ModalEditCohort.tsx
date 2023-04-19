@@ -60,6 +60,7 @@ const ModalEditCohort: React.FC<{
 
   const handleClose = () => {
     dispatch<any>(setSelectedCohortState(null))
+    onClose()
   }
 
   const handleConfirm = async () => {
