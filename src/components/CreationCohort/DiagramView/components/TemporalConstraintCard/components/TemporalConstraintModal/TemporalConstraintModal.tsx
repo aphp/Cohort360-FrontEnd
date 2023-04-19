@@ -69,7 +69,7 @@ const TemporalConstraint: React.FC<{
             row
             value={radioValues}
             onChange={(e: any) => onChangeValue(e.target.value)}
-            style={{ margin: '1em', justifyContent: 'space-between' }}
+            style={{ margin: '1em', justifyContent: 'space-around' }}
           >
             <FormControlLabel value="none" control={<Radio />} label="Aucune contrainte sur les séjours" />
             <FormControlLabel
@@ -77,11 +77,11 @@ const TemporalConstraint: React.FC<{
               control={<Radio />}
               label="Tous les critères ont lieu au cours du même séjour"
             />
-            <FormControlLabel
+            {/* <FormControlLabel
               value="differentEncounter"
               control={<Radio />}
               label="Tous les critères ont lieu au cours de séjours différents"
-            />
+            /> */}
           </RadioGroup>
         </Grid>
         <Grid>
