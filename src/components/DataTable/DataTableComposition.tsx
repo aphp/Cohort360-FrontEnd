@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import clsx from 'clsx'
 import { Buffer } from 'buffer'
+import ReactHtmlParser from 'react-html-parser'
 
 import { CircularProgress, Chip, Grid, IconButton, Typography, TableRow, TableCell } from '@mui/material'
 
@@ -137,17 +138,12 @@ const DataTableCompositionLine: React.FC<{
   const nda = document.NDA ?? '-'
   const serviceProvider = document.serviceProvider ?? 'Non renseigné'
   const docType = docTypes.docTypes.find(
-    ({ code }) => code === (document.type?.coding && document.type?.coding[0] ? document.type?.coding[0].code : '-')
+    ({ code }) => code === (document?.type?.coding?.[0] ? document.type.coding[0].code : '-')
   )
 
-  const documentContent =
-    document &&
-    document.content &&
-    document.content[1] &&
-    document.content[1].attachment &&
-    document.content[1].attachment.data
-      ? Buffer.from(document.content[1].attachment.data, 'base64').toString('utf-8')
-      : ''
+  const documentContent = document?.content?.[1]?.attachment?.data
+    ? Buffer.from(document.content[1].attachment.data, 'base64').toString('utf-8')
+    : ''
 
   const date = document.date ? new Date(document.date).toLocaleDateString('fr-FR') : ''
   const hour = document.date
@@ -225,7 +221,7 @@ const DataTableCompositionLine: React.FC<{
       {documentContent && searchMode && (
         <TableRow className={classes.tableBodyRows}>
           <TableCell colSpan={6} style={{ backgroundImage: `url(${Watermark})`, backgroundSize: 'contain' }}>
-            <Typography>{documentContent}</Typography>
+            <Typography>{ReactHtmlParser(documentContent)}</Typography>
           </TableCell>
         </TableRow>
       )}

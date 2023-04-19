@@ -223,7 +223,6 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             options={criteria?.data?.docTypes || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => _.isEqual(option, value)}
-            // value={defaultValuesDocType}
             value={defaultValues.docType}
             onChange={(e, value) => _onChangeValue('docType', value)}
             renderInput={(params) => <TextField {...params} label="Types de documents" />}

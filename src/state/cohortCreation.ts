@@ -569,7 +569,6 @@ const cohortCreationSlice = createSlice({
       }
       state.nextGroupId = -(state.criteriaGroup.length + 1)
     },
-    //
     addNewSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
       state.selectedCriteria = [...state.selectedCriteria, action.payload]
       state.nextCriteriaId++
@@ -578,7 +577,6 @@ const cohortCreationSlice = createSlice({
       state.criteriaGroup = [...state.criteriaGroup, action.payload]
       state.nextGroupId--
     },
-    //
     editSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
       const foundItem = state.selectedCriteria.find(({ id }) => id === action.payload.id)
       const index = foundItem ? state.selectedCriteria.indexOf(foundItem) : -1
@@ -723,22 +721,16 @@ export {
 }
 export const {
   resetCohortCreation,
-  //
   setCohortName,
   setPopulationSource,
   setSelectedCriteria,
-  //
   deleteSelectedCriteria,
   deleteCriteriaGroup,
-  //
   addNewSelectedCriteria,
   addNewCriteriaGroup,
-  //
   editSelectedCriteria,
   editCriteriaGroup,
-  //
   duplicateSelectedCriteria,
-  //
   updateTemporalConstraints,
   deleteTemporalConstraint,
   suspendCount,

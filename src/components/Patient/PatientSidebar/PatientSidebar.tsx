@@ -143,14 +143,12 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
         onChangeSelect={setSearchBy}
         onSearchPatient={() => onSearchPatient(sort)}
         showFilterChip={showFilterChip}
-        // filter dialog props
         onClickFilterButton={() => setOpen(true)}
         open={open}
         onCloseFilterDialog={handleCloseDialog(false)}
         onSubmitDialog={handleCloseDialog(true)}
         filters={filters}
         onChangeFilters={setFilters}
-        // sort dialog props
         onClickSortButton={() => setOpenSort(true)}
         openSort={openSort}
         onCloseSort={handleCloseSortDialog}

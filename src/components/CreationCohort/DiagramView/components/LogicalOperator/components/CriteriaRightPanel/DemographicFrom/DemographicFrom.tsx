@@ -75,10 +75,6 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
     setDefaultValues(_defaultValues)
   }
 
-  // if (criteria.data.gender === 'loading' || criteria.data.status === 'loading') {
-  //   return <></>
-  // }
-
   const defaultValuesGender =
     defaultValues.gender && criteria.data.gender !== 'loading'
       ? defaultValues.gender.map((gender: any) => {

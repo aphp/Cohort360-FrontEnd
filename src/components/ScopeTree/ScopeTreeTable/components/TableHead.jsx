@@ -6,14 +6,6 @@ import TableRow from '@mui/material/TableRow'
 import TableSortLabel from '@mui/material/TableSortLabel'
 import Checkbox from '@mui/material/Checkbox'
 import IndeterminateCheckBoxIcon from '@mui/icons-material/IndeterminateCheckBox'
-// Example:
-// const headCells = [
-//   { id: 'name',     numeric: false, disablePadding: true,  label: 'Dessert (100g serving)' },
-//   { id: 'calories', numeric: true,  disablePadding: false, label: 'Calories' },
-//   { id: 'fat',      numeric: true,  disablePadding: false, label: 'Fat (g)' },
-//   { id: 'carbs',    numeric: true,  disablePadding: false, label: 'Carbs (g)' },
-//   { id: 'protein',  numeric: true,  disablePadding: false, label: 'Protein (g)' },
-// ];
 
 function EnhancedTableHead(props) {
   const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props
