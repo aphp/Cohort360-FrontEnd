@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
 import { Buffer } from 'buffer'
 
@@ -127,7 +126,6 @@ const DataTableCompositionLine: React.FC<{
   groupId?: string
 }> = ({ document, deidentified, showIpp, searchMode, groupId }) => {
   const classes = useStyles()
-  const navigate = useNavigate()
 
   const [open, setOpen] = useState<string | null>(null)
 
@@ -178,7 +176,9 @@ const DataTableCompositionLine: React.FC<{
               <Typography>{ipp}</Typography>
 
               <IconButton
-                onClick={() => navigate(`/patients/${document.idPatient}${groupId ? `?groupId=${groupId}` : ''}`)}
+                onClick={() =>
+                  window.open(`/patients/${document.idPatient}${groupId ? `?groupId=${groupId}` : ''}`, '_blank')
+                }
                 className={classes.searchIcon}
               >
                 <SearchIcon height="15px" fill="#ED6D91" className={classes.iconMargin} />
