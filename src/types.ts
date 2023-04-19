@@ -391,6 +391,7 @@ export type SelectedCriteriaType = {
   | MedicationDataType
   | ObservationDataType
   | IPPListDataType
+  | EncounterDataType
 )
 
 export type CcamDataType = {
@@ -495,6 +496,10 @@ export type EncounterDataType = {
   admission: { id: string; label: string }[] | null
   encounterStartDate: Date | ''
   encounterEndDate: Date | ''
+  occurrence: number
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
+  startOccurrence: Date | ''
+  endOccurrence: Date | ''
   isInclusive?: boolean
 }
 

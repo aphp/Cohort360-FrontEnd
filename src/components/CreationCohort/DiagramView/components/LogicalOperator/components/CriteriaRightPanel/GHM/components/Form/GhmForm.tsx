@@ -30,15 +30,10 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
   const dispatch = useAppDispatch()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const currentState = { ...selectedCriteria, ...initialState }
-
-  const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const getGhmOptions = async (searchValue: string) => await criteria.fetch.fetchGhmData(searchValue, false)
   const _onSubmit = () => {
-    if (currentState?.code?.length === 0) {
-      return setError(true)
-    }
     onChangeSelectedCriteria(currentState)
     dispatch<any>(fetchClaim())
   }
@@ -69,9 +64,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner un code GHM</Alert>}
-
-        {!error && !multiFields && (
+        {!multiFields && (
           <Alert
             severity="info"
             onClose={() => {

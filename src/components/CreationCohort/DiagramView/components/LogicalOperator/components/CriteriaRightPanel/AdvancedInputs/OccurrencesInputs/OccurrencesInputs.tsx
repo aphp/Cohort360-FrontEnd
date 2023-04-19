@@ -4,13 +4,13 @@ import {
   FormControl,
   FormLabel,
   Grid,
+  IconButton,
   Input,
   InputLabel,
-  IconButton,
   MenuItem,
-  Tooltip,
+  Select,
   TextField,
-  Select
+  Tooltip
 } from '@mui/material'
 
 import ClearIcon from '@mui/icons-material/Clear'
@@ -18,14 +18,28 @@ import InfoIcon from '@mui/icons-material/Info'
 
 import useStyles from './styles'
 
+const defaultOccurrencesInputs = {
+  code: [],
+  isLeaf: false,
+  valueMin: 0,
+  valueMax: 0,
+  valueComparator: '>=',
+  occurrence: 1,
+  occurrenceComparator: '>=',
+  startOccurrence: '',
+  endOccurrence: '',
+  isInclusive: true
+}
+
 type OccurrenceInputsProps = {
-  form: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication' | 'biology'
+  form: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication' | 'biology' | 'visitSupport'
   selectedCriteria: any
   onChangeValue: (key: string, value: any) => void
 }
 
 const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
-  const { form, selectedCriteria, onChangeValue } = props
+  const { form, onChangeValue } = props
+  const selectedCriteria = { ...defaultOccurrencesInputs, ...props.selectedCriteria }
 
   const classes = useStyles()
 
@@ -33,7 +47,7 @@ const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
     <>
       <FormLabel style={{ padding: '0 1em 8px', display: 'flex', alignItems: 'center' }} component="legend">
         Nombre d'occurrence
-        {(form == 'ccam' || form === 'cim10' || form === 'ghm' || form == 'biology') && (
+        {(form == 'ccam' || form === 'cim10' || form === 'ghm' || form == 'biology' || 'visitSupport') && (
           <Tooltip
             title={
               <>

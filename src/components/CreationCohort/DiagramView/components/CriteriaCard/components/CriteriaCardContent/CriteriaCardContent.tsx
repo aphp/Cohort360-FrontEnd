@@ -884,21 +884,16 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       ]
     }
 
-    if (
-      _currentCriteria.type !== 'Patient' &&
-      _currentCriteria.type !== 'Encounter' &&
-      _currentCriteria.type !== 'IPPList'
-    ) {
+    if (_currentCriteria.type !== 'Patient' && _currentCriteria.type !== 'IPPList') {
       content = [
         ...content,
-        +_currentCriteria?.occurrence !== 1 && (
-          <Chip
-            className={classes.criteriaChip}
-            label={
-              <Typography>{`Nombre d'occurrence ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
-            }
-          />
-        ),
+        <Chip
+          key={_currentCriteria.id}
+          className={classes.criteriaChip}
+          label={
+            <Typography>{`Nombre d'occurrence ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
+          }
+        />,
         (startDate || endDate) && (
           <Chip
             className={classes.criteriaChip}

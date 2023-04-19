@@ -58,8 +58,6 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const classes = useStyles()
-
-  const [error, setError] = useState(false)
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
@@ -72,9 +70,6 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = () => {
-    if (defaultValues && defaultValues.search?.length === 0 && defaultValues.docType?.length === 0) {
-      return setError(true)
-    }
     onChangeSelectedCriteria(defaultValues)
   }
 
@@ -119,9 +114,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner au moins une recherche, ou un type de document</Alert>}
-
-        {!error && !multiFields && (
+        {!multiFields && (
           <Alert
             severity="info"
             onClose={() => {

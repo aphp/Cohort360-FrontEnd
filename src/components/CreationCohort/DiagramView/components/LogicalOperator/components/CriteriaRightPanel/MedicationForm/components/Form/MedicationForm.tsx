@@ -45,23 +45,10 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
 
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const currentState = { ...selectedCriteria, ...initialState }
-
-  const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const getAtcOptions = async (searchValue: string) => await criteria.fetch.fetchAtcData(searchValue, false)
   const _onSubmit = () => {
-    if (
-      (currentState.type === 'MedicationRequest' &&
-        currentState.code.length === 0 &&
-        currentState.prescriptionType.length === 0 &&
-        currentState.administration.length === 0) ||
-      (currentState.type !== 'MedicationRequest' &&
-        currentState.code.length === 0 &&
-        currentState.administration.length === 0)
-    ) {
-      return setError(true)
-    }
     onChangeSelectedCriteria(currentState)
     dispatch<any>(fetchMedication())
   }
@@ -121,9 +108,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner un champ</Alert>}
-
-        {!error && !multiFields && (
+        {!multiFields && (
           <Alert
             severity="info"
             onClose={() => {
