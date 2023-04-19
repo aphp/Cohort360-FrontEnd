@@ -167,7 +167,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
         setOrder={setOrder}
         page={page}
         setPage={(newPage) => handleChangePage(newPage)}
-        total={totalAllMedication}
+        total={totalMedication}
       />
 
       <MedicationFilters
