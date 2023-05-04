@@ -45,7 +45,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
       .sort((a, b) => +moment(a.created_at).format('x') - +moment(b.created_at).format('x')) || []
 
   const _handleEditCohort = (cohort: Cohort) => {
-    dispatch<any>(setSelectedCohort(cohort ?? null))
+    dispatch(setSelectedCohort(cohort ?? null))
   }
 
   // You can make an export if you got 1 cohort with: EXPORT_ACCESS = 'DATA_NOMINATIVE'
@@ -63,7 +63,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
     )
 
   const onSetCohortFavorite = async (cohort: Cohort) => {
-    await dispatch<any>(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
+    await dispatch(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
   }
 
   return (

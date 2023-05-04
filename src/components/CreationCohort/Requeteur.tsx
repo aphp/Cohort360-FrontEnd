@@ -62,8 +62,8 @@ const Requeteur = () => {
     setRequestLoading((requestLoading) => requestLoading + 1)
     try {
       if (requestIdFromUrl) {
-        dispatch<any>(resetCohortCreation())
-        dispatch<any>(
+        dispatch(resetCohortCreation())
+        dispatch(
           fetchRequestCohortCreation({
             requestId: requestIdFromUrl,
             snapshotId: snapshotIdFromUrl
@@ -93,7 +93,7 @@ const Requeteur = () => {
       })
 
       _criteria = await getDataFromFetch(Object.freeze(_criteria), selectedCriteria, criteriaList)
-      dispatch<any>(setCriteriaList(_criteria))
+      dispatch(setCriteriaList(_criteria))
     } catch (error) {
       console.error(error)
     }
@@ -103,7 +103,7 @@ const Requeteur = () => {
   }, [dispatch, criteriaGroup, selectedCriteria, selectedPopulation]) // eslint-disable-line
 
   const _unbuildRequest = async (newCurrentSnapshot: CohortCreationSnapshotType) => {
-    dispatch<any>(unbuildCohortCreation({ newCurrentSnapshot }))
+    dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
   }
 
   /**
@@ -126,7 +126,7 @@ const Requeteur = () => {
       )
 
       if (createCohortResult && createCohortResult.status === 201) {
-        dispatch<any>(resetCohortCreation())
+        dispatch(resetCohortCreation())
         navigate(`/home`)
       }
     }

@@ -55,7 +55,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
   const isIndeterminated = checkIfIndeterminated(biologyItem, selectedItems)
   const _onExpand = async (biologyCode: string) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
-    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    dispatch(incrementLoadingSyncHierarchyTable())
     setOpen(!open)
     const newHierarchy = await expandItem(
       biologyCode,
@@ -65,15 +65,15 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
       dispatch
     )
     await handleClick(selectedItems, newHierarchy)
-    dispatch<any>(decrementLoadingSyncHierarchyTable())
+    dispatch(decrementLoadingSyncHierarchyTable())
   }
 
   const handleClickOnHierarchy = async (biologyItem: PmsiListType) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
-    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getSelectedPmsi(biologyItem, selectedItems || [], biologyHierarchy)
     await handleClick(newSelectedItems)
-    dispatch<any>(decrementLoadingSyncHierarchyTable())
+    dispatch(decrementLoadingSyncHierarchyTable())
   }
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {

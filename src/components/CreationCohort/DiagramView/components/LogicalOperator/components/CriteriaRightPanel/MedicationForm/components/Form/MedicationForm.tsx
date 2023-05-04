@@ -63,7 +63,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
       return setError(true)
     }
     onChangeSelectedCriteria(currentState)
-    dispatch<any>(fetchMedication())
+    dispatch(fetchMedication())
   }
 
   if (criteria?.data?.prescriptionTypes === 'loading' || criteria?.data?.administrations === 'loading') {

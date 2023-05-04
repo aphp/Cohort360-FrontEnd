@@ -168,7 +168,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
   const controllerRef = useRef<AbortController | null>()
 
   const fetchScopeTree = async (signal?: AbortSignal) => {
-    return dispatch<any>(fetchScopesList(signal))
+    return dispatch(fetchScopesList(signal)).unwrap()
   }
 
   const _cancelPendingRequest = () => {
@@ -182,8 +182,8 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     setSearchLoading(true)
     _cancelPendingRequest()
     const fetchScopeTreeResponse = await fetchScopeTree(controllerRef.current?.signal)
-    if (fetchScopeTreeResponse && fetchScopeTreeResponse.payload && !fetchScopeTreeResponse.payload.aborted) {
-      const newPerimetersList = fetchScopeTreeResponse.payload.scopesList
+    if (fetchScopeTreeResponse && !fetchScopeTreeResponse.aborted) {
+      const newPerimetersList = fetchScopeTreeResponse.scopesList
       setRootRows(newPerimetersList)
       setOpenPopulations([])
       setCount(newPerimetersList?.length)
@@ -236,7 +236,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
       _openPopulation = [..._openPopulation, rowId]
       setOpenPopulations(_openPopulation)
     }
-    const expandResponse = await dispatch<any>(
+    const expandResponse = await dispatch(
       expandScopeElement({
         rowId: rowId,
         selectedItems: selectedItems,
@@ -244,10 +244,10 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
         openPopulation: openPopulation,
         signal: controllerRef.current?.signal
       })
-    )
-    if (expandResponse && expandResponse.payload && !expandResponse.payload.aborted) {
-      const _selectedItems = expandResponse.payload.selectedItems ?? []
-      setRootRows(expandResponse.payload.scopesList ?? [])
+    ).unwrap()
+    if (expandResponse && !expandResponse.aborted) {
+      const _selectedItems = expandResponse.selectedItems ?? []
+      setRootRows(expandResponse.scopesList ?? [])
       onChangeSelectedItem(_selectedItems)
     }
   }

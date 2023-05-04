@@ -100,7 +100,7 @@ const Dashboard: React.FC<{
     const id = context === 'cohort' ? cohortId : context === 'perimeters' ? perimetreIds : undefined
 
     if (context !== 'new_cohort') {
-      dispatch<any>(fetchExploredCohort({ context, id }))
+      dispatch(fetchExploredCohort({ context, id }))
     }
   }, [context, cohortId]) // eslint-disable-line
 
@@ -110,7 +110,7 @@ const Dashboard: React.FC<{
 
   const forceReload = () => {
     const id = context === 'cohort' ? cohortId : context === 'perimeters' ? perimetreIds : undefined
-    dispatch<any>(fetchExploredCohort({ context, id, forceReload: true }))
+    dispatch(fetchExploredCohort({ context, id, forceReload: true }))
   }
 
   const handleChangeTabs = (event: any, newTab: string) => {

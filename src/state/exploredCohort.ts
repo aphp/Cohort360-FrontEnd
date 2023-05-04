@@ -173,7 +173,7 @@ const fetchExploredCohort = createAsyncThunk<
         break
     }
   } else {
-    dispatch<any>(fetchExploredCohortInBackground({ context, id }))
+    dispatch(fetchExploredCohortInBackground({ context, id }))
   }
   return cohort ?? state.exploredCohort
 })

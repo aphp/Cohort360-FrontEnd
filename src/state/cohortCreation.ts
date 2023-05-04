@@ -105,7 +105,7 @@ const fetchRequestCohortCreation = createAsyncThunk<
     const { requestName, json, currentSnapshot, shortCohortLimit, snapshotsHistory, count, count_outdated } =
       requestResult
 
-    dispatch<any>(
+    dispatch(
       unbuildCohortCreation({
         newCurrentSnapshot: snapshotsHistory[
           snapshotsHistory.length ? snapshotsHistory.length - 1 : 0
@@ -183,7 +183,7 @@ const countCohortCreation = createAsyncThunk<
  *
  *
  */
-type SaveJsonReturn = {
+export type SaveJsonReturn = {
   requestId: string
   snapshotsHistory: CohortCreationSnapshotType[]
   currentSnapshot: string
@@ -275,13 +275,13 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
       const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
 
       if (json !== state?.cohortCreation?.request?.json) {
-        const saveJsonResponse = await dispatch<any>(saveJson({ newJson: json }))
+        const saveJsonResponse = await dispatch(saveJson({ newJson: json })).unwrap()
 
-        await dispatch<any>(
+        await dispatch(
           countCohortCreation({
             json: json,
-            snapshotId: saveJsonResponse.payload.currentSnapshot,
-            requestId: saveJsonResponse.payload.requestId
+            snapshotId: saveJsonResponse.currentSnapshot,
+            requestId: saveJsonResponse.requestId
           })
         )
       }
@@ -367,13 +367,13 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
       const countId = dated_measures ? dated_measures.uuid : null
 
       if (countId) {
-        dispatch<any>(
+        dispatch(
           countCohortCreation({
             uuid: countId
           })
         )
       } else {
-        dispatch<any>(
+        dispatch(
           countCohortCreation({
             json: newCurrentSnapshot.json,
             snapshotId: newCurrentSnapshot.uuid,
@@ -428,12 +428,12 @@ const addRequestToCohortCreation = createAsyncThunk<
       parentId
     )
 
-    const saveJsonResponse = await dispatch<any>(saveJson({ newJson: json }))
-    await dispatch<any>(
+    const saveJsonResponse = await dispatch(saveJson({ newJson: json })).unwrap()
+    await dispatch(
       countCohortCreation({
         json: json,
-        snapshotId: saveJsonResponse.payload.currentSnapshot,
-        requestId: saveJsonResponse.payload.requestId
+        snapshotId: saveJsonResponse.currentSnapshot,
+        requestId: saveJsonResponse.requestId
       })
     )
 

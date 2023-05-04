@@ -39,7 +39,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
       return setError(true)
     }
     onChangeSelectedCriteria(currentState)
-    dispatch<any>(fetchProcedure())
+    dispatch(fetchProcedure())
   }
 
   const getCCAMOptions = async (searchValue: string) => {

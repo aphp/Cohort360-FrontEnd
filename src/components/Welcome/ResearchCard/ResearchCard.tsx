@@ -37,18 +37,18 @@ const ResearchCard: React.FC<ResearchCardProps> = ({
   const dispatch = useAppDispatch()
 
   const onDeleteCohort = async (cohort: Cohort) => {
-    await dispatch<any>(deleteCohort({ deletedCohort: cohort }))
+    await dispatch(deleteCohort({ deletedCohort: cohort }))
     updateCohorts()
   }
 
   const onSetCohortFavorite = async (cohort: Cohort) => {
-    await dispatch<any>(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
+    await dispatch(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
     updateCohorts()
   }
 
   const updateCohorts = async () => {
     if (listType === 'FavoriteCohorts' || listType === 'LastCohorts') {
-      await dispatch<any>(
+      await dispatch(
         fetchCohorts({
           listType: 'FavoriteCohorts',
           sort: { sortBy: 'modified_at', sortDirection: 'desc' },
@@ -64,7 +64,7 @@ const ResearchCard: React.FC<ResearchCardProps> = ({
         })
       )
 
-      await dispatch<any>(
+      await dispatch(
         fetchCohorts({
           listType: 'LastCohorts',
           sort: { sortBy: 'modified_at', sortDirection: 'desc' },

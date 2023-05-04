@@ -61,7 +61,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
 
   const _onExpand = async (medicationCode: string) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingMedication > 0) return
-    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    dispatch(incrementLoadingSyncHierarchyTable())
     setOpen(!open)
     const newHierarchy = await expandItem(
       medicationCode,
@@ -71,15 +71,15 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
       dispatch
     )
     await handleClick(selectedItems, newHierarchy)
-    dispatch<any>(decrementLoadingSyncHierarchyTable())
+    dispatch(decrementLoadingSyncHierarchyTable())
   }
 
   const handleClickOnHierarchy = (medicationItem: MedicationListType) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingMedication > 0) return
-    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getSelectedPmsi(medicationItem, selectedItems || [], medicationHierarchy)
     handleClick(newSelectedItems)
-    dispatch<any>(decrementLoadingSyncHierarchyTable())
+    dispatch(decrementLoadingSyncHierarchyTable())
   }
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {

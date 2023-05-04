@@ -26,7 +26,7 @@ const ModalMoveRequest: React.FunctionComponent<IModalMoveRequestProps> = ({ ope
   const dispatch = useAppDispatch()
 
   const _onConfirm = async () => {
-    await dispatch<any>(deleteRequests({ deletedRequests: selectedRequests }))
+    await dispatch(deleteRequests({ deletedRequests: selectedRequests }))
 
     onClose(true)
   }
