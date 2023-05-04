@@ -24,7 +24,7 @@
     ],
     "max-statements": [
       1, {
-        "max": 25
+        "max": 20
       }
     ],
     "react/no-unknown-property":0,
