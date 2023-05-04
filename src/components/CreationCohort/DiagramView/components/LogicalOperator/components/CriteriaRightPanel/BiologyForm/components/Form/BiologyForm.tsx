@@ -54,7 +54,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       return setError(true)
     }
     onChangeSelectedCriteria(currentState)
-    dispatch<any>(fetchBiology())
+    dispatch(fetchBiology())
   }
 
   const defaultValuesCode = currentState.code

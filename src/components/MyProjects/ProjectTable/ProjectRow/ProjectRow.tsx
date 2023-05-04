@@ -49,15 +49,15 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
   const handleClickAddOrEditProject = (selectedProjectId: string | null) => {
     onSelectedRow([])
     if (selectedProjectId) {
-      dispatch<any>(setSelectedProject(selectedProjectId))
+      dispatch(setSelectedProject(selectedProjectId))
     } else {
-      dispatch<any>(setSelectedProject(null))
+      dispatch(setSelectedProject(null))
     }
   }
 
   const handleAddRequest = () => {
     onSelectedRow([])
-    dispatch<any>(setSelectedRequest({ uuid: '', name: '', parent_folder: row.uuid }))
+    dispatch(setSelectedRequest({ uuid: '', name: '', parent_folder: row.uuid }))
   }
 
   // eslint-disable-next-line

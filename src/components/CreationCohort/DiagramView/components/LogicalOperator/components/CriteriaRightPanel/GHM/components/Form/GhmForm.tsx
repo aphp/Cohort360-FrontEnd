@@ -40,7 +40,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
       return setError(true)
     }
     onChangeSelectedCriteria(currentState)
-    dispatch<any>(fetchClaim())
+    dispatch(fetchClaim())
   }
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code: any) => {

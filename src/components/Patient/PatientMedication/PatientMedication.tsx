@@ -59,7 +59,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   const [order, setOrder] = useState<Order>({ orderBy: 'Period-start', orderDirection: 'asc' })
 
   const _fetchMedication = async (page: number) => {
-    dispatch<any>(
+    dispatch(
       fetchMedication({
         selectedTab,
         groupId,

@@ -55,7 +55,7 @@ const Patient = () => {
 
   useEffect(() => {
     const _fetchPatient = async () => {
-      dispatch<any>(
+      dispatch(
         fetchPatientInfo({
           // @ts-ignore
           patientId,

@@ -151,11 +151,11 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   }
 
   const handleFavorite = () => {
-    dispatch<any>(favoriteExploredCohort({ exploredCohort: dashboard }))
+    dispatch(favoriteExploredCohort({ exploredCohort: dashboard }))
   }
 
   const handleConfirmDeletion = () => {
-    dispatch<any>(deleteCohort({ deletedCohort: dashboard }))
+    dispatch(deleteCohort({ deletedCohort: dashboard }))
     navigate('/home')
   }
 
@@ -304,9 +304,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                     onClick={async () => {
                       setAnchorEl(null)
                       if (!cohortList || (cohortList && cohortList.length === 0)) {
-                        await dispatch<any>(fetchCohortsList({}))
+                        await dispatch(fetchCohortsList({}))
                       }
-                      await dispatch<any>(setSelectedCohort(dashboard ?? null))
+                      await dispatch(setSelectedCohort(dashboard ?? null))
                       setOpenModal('edit')
                     }}
                   >

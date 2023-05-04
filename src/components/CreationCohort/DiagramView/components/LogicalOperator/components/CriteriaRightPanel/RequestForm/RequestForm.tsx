@@ -37,7 +37,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ parentId, goBack }) => {
       return setError(true)
     }
 
-    dispatch<any>(addRequestToCohortCreation({ parentId, selectedRequestId }))
+    dispatch(addRequestToCohortCreation({ parentId, selectedRequestId }))
   }
 
   return (

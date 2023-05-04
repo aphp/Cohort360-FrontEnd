@@ -65,7 +65,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
 
   const _fetchPMSI = async (page: number) => {
     const selectedDiagnosticTypesCodes = filters.selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
-    dispatch<any>(
+    dispatch(
       fetchPmsi({
         selectedTab,
         groupId,

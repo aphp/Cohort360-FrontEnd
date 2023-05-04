@@ -51,7 +51,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   })
 
   const _fetchBiology = async (page: number) => {
-    dispatch<any>(
+    dispatch(
       fetchBiology({
         groupId,
         options: {

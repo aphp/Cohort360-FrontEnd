@@ -54,7 +54,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
   const isIndeterminated = checkIfIndeterminated(cim10Item, selectedItems)
   const _onExpand = async (cim10Code: string) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
-    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    dispatch(incrementLoadingSyncHierarchyTable())
     setOpen(!open)
     const newHierarchy = await expandItem(
       cim10Code,
@@ -64,15 +64,15 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
       dispatch
     )
     await handleClick(selectedItems, newHierarchy)
-    dispatch<any>(decrementLoadingSyncHierarchyTable())
+    dispatch(decrementLoadingSyncHierarchyTable())
   }
 
   const handleClickOnHierarchy = async (cim10Item: PmsiListType) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
-    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getSelectedPmsi(cim10Item, selectedItems || [], cim10Hierarchy)
     await handleClick(newSelectedItems)
-    dispatch<any>(decrementLoadingSyncHierarchyTable())
+    dispatch(decrementLoadingSyncHierarchyTable())
   }
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {

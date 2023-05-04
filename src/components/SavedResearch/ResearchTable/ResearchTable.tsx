@@ -136,7 +136,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   }
 
   const editCohort = async () => {
-    await dispatch<any>(setSelectedCohortState(null))
+    await dispatch(setSelectedCohortState(null))
 
     onUpdateCohorts()
   }

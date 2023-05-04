@@ -54,19 +54,19 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
   const isIndeterminated = checkIfIndeterminated(ghmItem, selectedItems)
   const _onExpand = async (ghmCode: string) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
-    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    dispatch(incrementLoadingSyncHierarchyTable())
     setOpen(!open)
     const newHierarchy = await expandItem(ghmCode, selectedItems || [], ghmHierarchy, defaultDemographic.type, dispatch)
     await handleClick(selectedItems, newHierarchy)
-    dispatch<any>(decrementLoadingSyncHierarchyTable())
+    dispatch(decrementLoadingSyncHierarchyTable())
   }
 
   const handleClickOnHierarchy = async (ghmItem: PmsiListType) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
-    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getSelectedPmsi(ghmItem, selectedItems || [], ghmHierarchy)
     await handleClick(newSelectedItems)
-    dispatch<any>(decrementLoadingSyncHierarchyTable())
+    dispatch(decrementLoadingSyncHierarchyTable())
   }
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {

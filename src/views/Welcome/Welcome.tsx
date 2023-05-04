@@ -50,9 +50,9 @@ const Welcome: React.FC = () => {
 
   useEffect(() => {
     // fetchProjectData
-    dispatch<any>(fetchProjects())
-    dispatch<any>(fetchRequests())
-    dispatch<any>(
+    dispatch(fetchProjects())
+    dispatch(fetchRequests())
+    dispatch(
       fetchCohorts({
         listType: 'FavoriteCohorts',
         sort: { sortBy: 'modified_at', sortDirection: 'desc' },
@@ -60,7 +60,7 @@ const Welcome: React.FC = () => {
         limit: 5
       })
     )
-    dispatch<any>(
+    dispatch(
       fetchCohorts({
         listType: 'LastCohorts',
         sort: { sortBy: 'modified_at', sortDirection: 'desc' },
@@ -69,16 +69,16 @@ const Welcome: React.FC = () => {
     )
 
     // fetchPmsiData
-    dispatch<any>(initPmsiHierarchy())
+    dispatch(initPmsiHierarchy())
 
     // fetchMedicationData
-    dispatch<any>(initMedicationHierarchy())
+    dispatch(initMedicationHierarchy())
 
     // fetchBiologyData
-    dispatch<any>(initBiologyHierarchy())
+    dispatch(initBiologyHierarchy())
 
     // fetchScope
-    dispatch<any>(fetchScopesList())
+    dispatch(fetchScopesList())
   }, [])
 
   useEffect(() => {

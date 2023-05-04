@@ -70,7 +70,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
 
   const fetchDocumentsList = async (page: number) => {
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
-    dispatch<any>(
+    dispatch(
       fetchDocuments({
         signal: controllerRef.current?.signal,
         groupId,
