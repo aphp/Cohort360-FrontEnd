@@ -40,6 +40,7 @@ import useStyle from './styles'
 
 import displayDigit from 'utils/displayDigit'
 import { SHORT_COHORT_LIMIT } from '../../../constants'
+import { JobStatus } from '../../../utils/constants'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -150,7 +151,7 @@ const ControlPanel: React.FC<{
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (count && count.status && (count.status === 'pending' || count.status === 'started')) {
+      if (count && count.status && (count.status === JobStatus.pending || count.status === JobStatus.new)) {
         dispatch(countCohortCreation({ uuid: count.uuid }))
       } else {
         clearInterval(interval)

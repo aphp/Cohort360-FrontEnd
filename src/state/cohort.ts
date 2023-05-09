@@ -4,6 +4,7 @@ import { Cohort, CohortFilters, Sort } from 'types'
 
 import { logout, login } from './me'
 import services from 'services/aphp'
+import { JobStatus } from '../utils/constants'
 
 export type CohortState = {
   loading: boolean
@@ -65,7 +66,7 @@ const fetchCohorts = createAsyncThunk<FetchCohortListReturn, FetchCohortsParams,
       const forceRefresh = cohorts?.results?.some(
         (cohortList) =>
           !cohortList.fhir_group_id &&
-          (cohortList.request_job_status === 'pending' || cohortList.request_job_status === 'started')
+          (cohortList.request_job_status === JobStatus.pending || cohortList.request_job_status === JobStatus.new)
       )
 
       if (forceRefresh) {
@@ -122,7 +123,7 @@ const fetchCohortInBackGround = createAsyncThunk<
         cohortsList?.some(
           (cohort) =>
             !cohort.fhir_group_id &&
-            (cohort.request_job_status === 'pending' || cohort.request_job_status === 'started')
+            (cohort.request_job_status === JobStatus.pending || cohort.request_job_status === JobStatus.new)
         )
       ) {
         const newResult = await services.projects.fetchCohortsList(filters, searchInput, sort, limit, offset)
