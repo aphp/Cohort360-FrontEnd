@@ -33,6 +33,7 @@ import displayDigit from 'utils/displayDigit'
 import { ODD_EXPORT } from '../../../../constants'
 
 import useStyles from '../styles'
+import { JobStatus } from '../../../../utils/constants'
 
 const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
   const classes = useStyles()
@@ -104,8 +105,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
 
               const isError =
                 !historyRow.fhir_group_id ||
-                historyRow.request_job_status === 'pending' ||
-                historyRow.request_job_status === 'started' ||
+                historyRow.request_job_status === JobStatus.pending ||
+                historyRow.request_job_status === JobStatus.new ||
                 !!historyRow.request_job_fail_msg
 
               const canExportThisCohort =
@@ -143,7 +144,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                   <TableCell align="center">
                     {historyRow.fhir_group_id ? (
                       <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                    ) : historyRow.request_job_status === 'pending' || historyRow.request_job_status === 'started' ? (
+                    ) : historyRow.request_job_status === JobStatus.pending ||
+                      historyRow.request_job_status === JobStatus.new ? (
                       <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
                     ) : historyRow.request_job_fail_msg ? (
                       <Tooltip title={historyRow.request_job_fail_msg}>

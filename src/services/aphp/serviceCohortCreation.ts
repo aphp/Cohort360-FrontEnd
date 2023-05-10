@@ -142,7 +142,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
     } else {
       if (!requeteurJson || !snapshotId || !requestId) return null
 
-      const measureResult = await apiBack.post<any>('/cohort/dated-measures/create-unique/', {
+      const measureResult = await apiBack.post('/cohort/dated-measures/', {
         request_query_snapshot_id: snapshotId,
         request_id: requestId
       })

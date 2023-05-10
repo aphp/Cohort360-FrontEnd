@@ -17,6 +17,7 @@ import { deleteProject } from './project'
 
 import services from 'services/aphp'
 import { SHORT_COHORT_LIMIT } from '../constants'
+import { JobStatus } from '../utils/constants'
 
 export type CohortCreationState = {
   loading: boolean
@@ -642,8 +643,8 @@ const cohortCreationSlice = createSlice({
       state.count = {
         ...(state.count || {}),
         status:
-          (state.count || {}).status === 'pending' ||
-          (state.count || {}).status === 'started' ||
+          (state.count || {}).status === JobStatus.pending ||
+          (state.count || {}).status === JobStatus.new ||
           (state.count || {}).status === 'suspended'
             ? 'suspended'
             : (state.count || {}).status
@@ -652,7 +653,7 @@ const cohortCreationSlice = createSlice({
     unsuspendCount: (state: CohortCreationState) => {
       state.count = {
         ...state.count,
-        status: 'pending'
+        status: JobStatus.pending
       }
     }
   },
@@ -672,11 +673,15 @@ const cohortCreationSlice = createSlice({
     builder.addCase(saveJson.fulfilled, (state, { payload }) => ({ ...state, ...payload, saveLoading: false }))
     builder.addCase(saveJson.rejected, (state) => ({ ...state, saveLoading: false }))
     // countCohortCreation
-    builder.addCase(countCohortCreation.pending, (state) => ({ ...state, status: 'pending', countLoading: true }))
+    builder.addCase(countCohortCreation.pending, (state) => ({
+      ...state,
+      status: JobStatus.pending,
+      countLoading: true
+    }))
     builder.addCase(countCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
-      countLoading: payload?.count?.status === 'pending' || payload?.count?.status === 'started'
+      countLoading: payload?.count?.status === JobStatus.pending || payload?.count?.status === JobStatus.new
     }))
     builder.addCase(countCohortCreation.rejected, (state) => ({
       ...state,
