@@ -2,6 +2,17 @@
   "entry": [
     {
       "news": {
+        "title": "Nouvelles fonctionnalités - 05/2023",
+        "message": [
+          "• Ajout de contraintes temporelles",
+          "• Possibilité de rechercher dans les titres des documents",
+          "• Divers correctifs techniques et fonctionnels ont été réalisés"
+        ],
+        "footer": "L'équipe Cohort360."
+      }
+    },
+    {
+      "news": {
         "title": "Nouvelles fonctionnalités - 03/2023",
         "message": [
           "• Possibilité de réaliser des cohortes de plus de 20 000 patients",
