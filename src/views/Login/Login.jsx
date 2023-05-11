@@ -1,17 +1,16 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import localforage from 'localforage'
-
 import {
   Alert,
   Button,
   CircularProgress,
-  Grid,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Grid,
   Link,
   Snackbar,
   TextField,
@@ -30,6 +29,7 @@ import { ACCES_TOKEN, REFRESH_TOKEN } from '../../constants'
 import services from 'services/aphp'
 
 import useStyles from './styles'
+import { getDaysLeft } from '../../utils/formatDate'
 
 const ErrorSnackBarAlert = ({ open, setError, errorMessage }) => {
   const _setError = () => {
@@ -102,7 +102,7 @@ const Login = () => {
     localforage.setItem('persist:root', '')
   }, [])
 
-  const getPractitionerData = async (practitioner, lastConnection, maintenance) => {
+  const getPractitionerData = async (practitioner, lastConnection, maintenance, accessExpirations = []) => {
     if (practitioner) {
       const practitionerPerimeters = await services.perimeters.getPerimeters()
 
@@ -141,7 +141,8 @@ const Login = () => {
           nominativeGroupsIds,
           deidentified: nominativeGroupsIds.length === 0,
           lastConnection,
-          maintenance
+          maintenance,
+          accessExpirations
         })
       )
 
@@ -154,6 +155,16 @@ const Login = () => {
     }
   }
 
+  const setLeftDays = (accessExpirations) => {
+    return accessExpirations
+      ?.map((item) => {
+        item.leftDays = getDaysLeft(item.end_datetime)
+        return item
+      })
+      .sort((a, b) => {
+        return a.leftDays - b.leftDays
+      })
+  }
   const login = async () => {
     if (loading) return
     setLoading(true)
@@ -233,7 +244,12 @@ const Login = () => {
       }
 
       const maintenance = maintenanceResponse.data
-      getPractitionerData(practitioner, lastConnection, maintenance)
+
+      const accessExpirations = await services.perimeters
+        .getAccessExpirations({ expiring: true })
+        .then((values) => setLeftDays(values))
+
+      getPractitionerData(practitioner, lastConnection, maintenance, accessExpirations)
     } else {
       setLoading(false)
       return (

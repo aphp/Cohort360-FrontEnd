@@ -1,4 +1,4 @@
-import { CohortData, ScopePage, ScopeTreeRow } from 'types'
+import { AccessExpiration, AccessExpirationsProps, CohortData, ScopePage, ScopeTreeRow } from 'types'
 import { IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   getAgeRepartitionMapAphp,
@@ -8,10 +8,11 @@ import {
 } from 'utils/graphUtils'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
-import { fetchEncounter, fetchGroup, fetchPatient, fetchScope } from './callApi'
+import { fetchEncounter, fetchGroup, fetchPatient, fetchScope, fetchAccessExpirations } from './callApi'
 
 import apiBackend from '../apiBackend'
 import { sortByQuantityAndName } from 'utils/scopeTree'
+import { AxiosResponse } from 'axios'
 
 const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
@@ -66,6 +67,8 @@ export interface IServicePerimeters {
     signal?: AbortSignal,
     types?: string[]
   ) => Promise<ScopePage[]>
+
+  getAccessExpirations: (accessExpirationsProps: AccessExpirationsProps) => Promise<AccessExpiration[]>
 
   /**
    * Cette fonction se base sur la fonction `getPerimeters` du service, et ré-organise la donnée sous forme d'un ScopeTreeRow[]
@@ -284,6 +287,21 @@ const servicesPerimeters: IServicePerimeters = {
         errorType: 'fhir'
       }
       return fhirError
+    }
+  },
+
+  getAccessExpirations: async (accessExpirationsProps: AccessExpirationsProps) => {
+    let response: AxiosResponse<AccessExpiration[]> | undefined = undefined
+    try {
+      response = await fetchAccessExpirations(accessExpirationsProps)
+    } catch (error) {
+      console.error(error)
+    }
+    if (response?.data && response.data.length > 0) {
+      return response?.data
+    } else {
+      console.error('Error while fetching access expirations (from Back)')
+      return []
     }
   },
 
