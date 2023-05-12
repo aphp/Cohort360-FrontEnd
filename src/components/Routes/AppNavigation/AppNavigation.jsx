@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
-import { useAppSelector } from 'state/index.ts'
+import { useAppSelector } from 'state/index'
 
 import configRoutes from './config'
 import PrivateRoute from '../PrivateRoute'
