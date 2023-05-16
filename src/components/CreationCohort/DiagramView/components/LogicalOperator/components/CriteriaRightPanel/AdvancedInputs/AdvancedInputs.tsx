@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { Collapse, Grid, IconButton, Typography } from '@mui/material'
+import { Collapse, Grid, IconButton, Typography, FormLabel, Tooltip } from '@mui/material'
 
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
@@ -8,8 +8,9 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import OccurrencesInputs from './OccurrencesInputs/OccurrencesInputs'
 import VisitInputs from './VisitInputs/VisitInputs'
 import PopulationCard from '../../../../PopulationCard/PopulationCard'
-import { UNITE_EXECUTRICE } from 'utils/cohortCreation'
 import { ScopeTreeRow } from 'types'
+import InfoIcon from '@mui/icons-material/Info'
+import scopeType from 'data/scope_type.json'
 
 type AdvancedInputsProps = {
   form: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication' | 'biology'
@@ -28,6 +29,7 @@ const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
     !!selectedCriteria.encounterEndDate
 
   const [checked, setCheck] = useState(optionsIsUsed)
+  const label = 'Séléctionnez une unité exécutrice'
 
   const _onSubmitExecutiveUnits = (_selectedExecutiveUnits: ScopeTreeRow[] | undefined) => {
     onChangeValue('encounterService', _selectedExecutiveUnits)
@@ -53,11 +55,26 @@ const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
       </Grid>
 
       <Collapse in={checked} unmountOnExit>
-        <Grid item container direction="row" alignItems="center" style={{ padding: '1em' }}>
+        <FormLabel style={{ padding: '1em 1em 0 1em', display: 'flex', alignItems: 'center' }} component="legend">
+          Unité exécutrice
+          <Tooltip
+            title={
+              <>
+                {'- Le niveau hiérarchique de rattachement est : ' + scopeType?.criteriaType[form] + '.'}
+                <br />
+                {"- L'unité exécutrice" +
+                  ' est la structure élémentaire de prise en charge des malades par une équipe soignante ou médico-technique identifiées par leurs fonctions et leur organisation.'}
+              </>
+            }
+          >
+            <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+          </Tooltip>
+        </FormLabel>
+        <Grid item container direction="row" alignItems="center">
           <PopulationCard
             form={form}
-            label={UNITE_EXECUTRICE}
-            title={UNITE_EXECUTRICE}
+            label={label}
+            title={label}
             executiveUnits={selectedCriteria?.encounterService ?? []}
             isAcceptEmptySelection={true}
             isDeleteIcon={true}

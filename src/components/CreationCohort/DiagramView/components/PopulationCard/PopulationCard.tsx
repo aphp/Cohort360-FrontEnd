@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import { Button, Chip, CircularProgress, IconButton, Tooltip, Typography } from '@mui/material'
+import { Button, Chip, CircularProgress, IconButton, Typography } from '@mui/material'
 
 import EditIcon from '@mui/icons-material/Edit'
 import CloseIcon from '@mui/icons-material/Close'
@@ -18,8 +18,6 @@ import { ScopeTreeRow } from 'types'
 import { filterScopeTree, getSelectedScopes } from 'utils/scopeTree'
 
 import useStyles from './styles'
-import InfoIcon from '@mui/icons-material/Info'
-import scopeType from 'data/scope_type.json'
 
 export type populationCardPropsType = {
   label?: string
@@ -142,24 +140,6 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
           <div className={classes.leftDiv}>
             <Typography className={classes.typography} variant={form ? undefined : 'h6'} align="left">
               {label ?? 'Population source'}
-              {form && (
-                <>
-                  <Tooltip
-                    title={
-                      <>
-                        {'- Le niveau hiérarchique de rattachement est : ' + scopeType?.criteriaType[form] + '.'}
-                        <br />
-                        {(form === 'supported'
-                          ? '- La structure hospitalière de prise en charge'
-                          : "- L'unité exécutrice") +
-                          ' est la structure élémentaire de prise en charge des malades par une équipe soignante ou médico-technique identifiées par leurs fonctions et leur organisation.'}
-                      </>
-                    }
-                  >
-                    <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-                  </Tooltip>
-                </>
-              )}
             </Typography>
 
             <div className={classes.chipContainer}>
