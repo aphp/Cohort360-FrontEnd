@@ -31,6 +31,7 @@ const defaultInitialState = {
   totalDocs: 0,
   documentsList: [],
   wordcloudData: [],
+
   encounters: [],
   genderRepartitionMap: undefined,
   visitTypeRepartitionData: undefined,

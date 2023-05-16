@@ -3,147 +3,122 @@ export let BOOLEANTRUE = 'true'
 export const ACCES_TOKEN = 'access'
 export const REFRESH_TOKEN = 'refresh'
 
-export const BACK_API_URL =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_BACK_API_URL}' : process.env.REACT_APP_BACK_API_URL
-export const REQUEST_API_URL =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_REQUEST_API_URL}' : process.env.REACT_APP_REQUEST_API_URL
-export const FHIR_API_URL =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_FHIR_API_URL}' : process.env.REACT_APP_FHIR_API_URL
-export const AUTH_API_URL =
-  process.env.NODE_ENV !== 'development' ? '{REACT_APP_AUTH_API_URL}' : process.env.REACT_APP_AUTH_API_URL
+export const BACK_API_URL = import.meta.env.DEV ? import.meta.env.VITE_BACK_API_URL : '{VITE_BACK_API_URL}'
+export const REQUEST_API_URL = import.meta.env.DEV ? import.meta.env.VITE_REQUEST_API_URL : '{VITE_REQUEST_API_URL}'
+export const FHIR_API_URL = import.meta.env.DEV ? import.meta.env.VITE_FHIR_API_URL : '{VITE_FHIR_API_URL}'
+export const AUTH_API_URL = import.meta.env.DEV ? import.meta.env.VITE_AUTH_API_URL : '{VITE_AUTH_API_URL}'
 
 export const SHORT_COHORT_LIMIT = 20000
 
-export const CLAIM_HIERARCHY =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_CLAIM_HIERARCHY}'
-    : process.env.REACT_APP_VALUE_SET_URL_CLAIM_HIERARCHY
+export const CLAIM_HIERARCHY = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_CLAIM_HIERARCHY
+  : '{VITE_VALUE_SET_URL_CLAIM_HIERARCHY}'
+export const CONDITION_HIERARCHY = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_CONDITION_HIERARCHY
+  : '{VITE_VALUE_SET_URL_CONDITION_HIERARCHY}'
+export const CONDITION_STATUS = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_CONDITION_STATUS
+  : '{VITE_VALUE_SET_URL_CONDITION_STATUS}'
 
-export const CONDITION_HIERARCHY =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_CONDITION_HIERARCHY}'
-    : process.env.REACT_APP_VALUE_SET_URL_CONDITION_HIERARCHY
-export const CONDITION_STATUS =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_CONDITION_STATUS}'
-    : process.env.REACT_APP_VALUE_SET_URL_CONDITION_STATUS
+export const PROCEDURE_HIERARCHY = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_PROCEDURE_HIERARCHY
+  : '{VITE_VALUE_SET_URL_PROCEDURE_HIERARCHY}'
 
-export const PROCEDURE_HIERARCHY =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_PROCEDURE_HIERARCHY}'
-    : process.env.REACT_APP_VALUE_SET_URL_PROCEDURE_HIERARCHY
+export const DEMOGRAPHIC_GENDER = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_DEMOGRAPHIC_GENDER
+  : '{VITE_VALUE_SET_URL_DEMOGRAPHIC_GENDER}'
 
-export const DEMOGRAPHIC_GENDER =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_DEMOGRAPHIC_GENDER}'
-    : process.env.REACT_APP_VALUE_SET_URL_DEMOGRAPHIC_GENDER
+export const ENCOUNTER_ADMISSION_MODE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_ADMISSION_MODE
+  : '{VITE_VALUE_SET_URL_ENCOUNTER_ADMISSION_MODE}'
 
-export const ENCOUNTER_ADMISSION_MODE =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_ENCOUNTER_ADMISSION_MODE}'
-    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_ADMISSION_MODE
-export const ENCOUNTER_ENTRY_MODE =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_ENCOUNTER_ENTRY_MODE}'
-    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_ENTRY_MODE
-export const ENCOUNTER_EXIT_MODE =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_ENCOUNTER_EXIT_MODE}'
-    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_EXIT_MODE
-export const ENCOUNTER_VISIT_TYPE =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_ENCOUNTER_VISIT_TYPE}'
-    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_VISIT_TYPE
-export const ENCOUNTER_SEJOUR_TYPE =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_ENCOUNTER_SEJOUR_TYPE}'
-    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_SEJOUR_TYPE
-export const ENCOUNTER_FILE_STATUS =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_ENCOUNTER_FILE_STATUS}'
-    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_FILE_STATUS
-export const ENCOUNTER_EXIT_TYPE =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_ENCOUNTER_EXIT_TYPE}'
-    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_EXIT_TYPE
-export const ENCOUNTER_DESTINATION =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_ENCOUNTER_DESTINATION}'
-    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_DESTINATION
-export const ENCOUNTER_PROVENANCE =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_ENCOUNTER_PROVENANCE}'
-    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_PROVENANCE
-export const ENCOUNTER_ADMISSION =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_ENCOUNTER_ADMISSION}'
-    : process.env.REACT_APP_VALUE_SET_URL_ENCOUNTER_ADMISSION
+export const ENCOUNTER_ENTRY_MODE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_ENTRY_MODE
+  : '{VITE_VALUE_SET_URL_ENCOUNTER_ENTRY_MODE}'
 
-export const MEDICATION_ATC =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_MEDICATION_ATC}'
-    : process.env.REACT_APP_VALUE_SET_URL_MEDICATION_ATC
-export const MEDICATION_PRESCRIPTION_TYPES =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_MEDICATION_PRESCRIPTION_TYPES}'
-    : process.env.REACT_APP_VALUE_SET_URL_MEDICATION_PRESCRIPTION_TYPES
-export const MEDICATION_ADMINISTRATIONS =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_MEDICATION_ADMINISTRATIONS}'
-    : process.env.REACT_APP_VALUE_SET_URL_MEDICATION_ADMINISTRATIONS
+export const ENCOUNTER_EXIT_MODE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_EXIT_MODE
+  : '{VITE_VALUE_SET_URL_ENCOUNTER_EXIT_MODE}'
 
-export const BIOLOGY_HIERARCHY_ITM_ANABIO =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_BIOLOGY_ANABIO}'
-    : process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_ANABIO
-export const BIOLOGY_HIERARCHY_ITM_LOINC =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_VALUE_SET_URL_BIOLOGY_LOINC}'
-    : process.env.REACT_APP_VALUE_SET_URL_BIOLOGY_LOINC
+export const ENCOUNTER_VISIT_TYPE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_VISIT_TYPE
+  : '{VITE_VALUE_SET_URL_ENCOUNTER_VISIT_TYPE}'
 
-export const ODD_BIOLOGY =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_ODD_BIOLOGY}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_BIOLOGY == `${BOOLEANTRUE}`
+export const ENCOUNTER_SEJOUR_TYPE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_SEJOUR_TYPE
+  : '{VITE_VALUE_SET_URL_ENCOUNTER_SEJOUR_TYPE}'
 
-export const ODD_COMPOSITION =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_ODD_COMPOSITION}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_COMPOSITION == `${BOOLEANTRUE}`
-export const ODD_PROCEDURE =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_OODD_PROCEDURE}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_OODD_PROCEDURE == `${BOOLEANTRUE}`
-export const ODD_CLAIM =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_ODD_CLAIM}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_CLAIM == `${BOOLEANTRUE}`
-export const ODD_CONDITION =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_ODD_CONDITION}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_CONDITION == `${BOOLEANTRUE}`
-export const ODD_OBSERVATION =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_ODD_OBSERVATION}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_OBSERVATION == `${BOOLEANTRUE}`
-export const ODD_MEDICATION =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_ODD_MEDICATION}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_MEDICATION == `${BOOLEANTRUE}`
-export const ODD_CONTACT =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_ODD_CONTACT}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_CONTACT == `${BOOLEANTRUE}`
-export const ODD_EXPORT =
-  process.env.NODE_ENV !== 'development'
-    ? '{REACT_APP_ODD_EXPORT}' == `${BOOLEANTRUE}`
-    : process.env.REACT_APP_ODD_EXPORT == `${BOOLEANTRUE}`
+export const ENCOUNTER_FILE_STATUS = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_FILE_STATUS
+  : '{VITE_VALUE_SET_URL_ENCOUNTER_FILE_STATUS}'
+export const ENCOUNTER_EXIT_TYPE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_EXIT_TYPE
+  : '{VITE_VALUE_SET_URL_ENCOUNTER_EXIT_TYPE}'
+export const ENCOUNTER_DESTINATION = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_DESTINATION
+  : '{VITE_VALUE_SET_URL_ENCOUNTER_DESTINATION}'
 
-export const SESSION_TIMEOUT = process.env.REACT_APP_SESSION_TIMEOUT
-  ? process.env.REACT_APP_SESSION_TIMEOUT
+export const ENCOUNTER_PROVENANCE = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_PROVENANCE
+  : '{VITE_VALUE_SET_URL_ENCOUNTER_PROVENANCE}'
+
+export const ENCOUNTER_ADMISSION = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_ENCOUNTER_ADMISSION
+  : '{VITE_VALUE_SET_URL_ENCOUNTER_ADMISSION}'
+
+export const MEDICATION_ATC = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_MEDICATION_ATC
+  : '{VITE_VALUE_SET_URL_MEDICATION_ATC}'
+
+export const MEDICATION_PRESCRIPTION_TYPES = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_MEDICATION_PRESCRIPTION_TYPES
+  : '{VITE_VALUE_SET_URL_MEDICATION_PRESCRIPTION_TYPES}'
+
+export const MEDICATION_ADMINISTRATIONS = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_MEDICATION_ADMINISTRATIONS
+  : '{VITE_VALUE_SET_URL_MEDICATION_ADMINISTRATIONS}'
+
+export const BIOLOGY_HIERARCHY_ITM_ANABIO = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_BIOLOGY_ANABIO
+  : '{VITE_VALUE_SET_URL_BIOLOGY_ANABIO}'
+export const BIOLOGY_HIERARCHY_ITM_LOINC = import.meta.env.DEV
+  ? import.meta.env.VITE_VALUE_SET_URL_BIOLOGY_LOINC
+  : '{VITE_VALUE_SET_URL_BIOLOGY_LOINC}'
+
+export const ODD_BIOLOGY = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_BIOLOGY == `${BOOLEANTRUE}`
+  : '{VITE_ODD_BIOLOGY}' == `${BOOLEANTRUE}`
+
+export const ODD_COMPOSITION = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_COMPOSITION == `${BOOLEANTRUE}`
+  : '{VITE_ODD_COMPOSITION}' == `${BOOLEANTRUE}`
+export const ODD_PROCEDURE = import.meta.env.DEV
+  ? import.meta.env.VITE_OODD_PROCEDURE == `${BOOLEANTRUE}`
+  : '{VITE_OODD_PROCEDURE}' == `${BOOLEANTRUE}`
+export const ODD_CLAIM = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_CLAIM == `${BOOLEANTRUE}`
+  : '{VITE_ODD_CLAIM}' == `${BOOLEANTRUE}`
+export const ODD_CONDITION = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_CONDITION == `${BOOLEANTRUE}`
+  : '{VITE_ODD_CONDITION}' == `${BOOLEANTRUE}`
+export const ODD_OBSERVATION = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_OBSERVATION == `${BOOLEANTRUE}`
+  : '{VITE_ODD_OBSERVATION}' == `${BOOLEANTRUE}`
+export const ODD_MEDICATION = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_MEDICATION == `${BOOLEANTRUE}`
+  : '{VITE_ODD_MEDICATION}' == `${BOOLEANTRUE}`
+export const ODD_CONTACT = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_CONTACT == `${BOOLEANTRUE}`
+  : '{VITE_ODD_CONTACT}' == `${BOOLEANTRUE}`
+export const ODD_EXPORT = import.meta.env.DEV
+  ? import.meta.env.VITE_ODD_EXPORT == `${BOOLEANTRUE}`
+  : '{VITE_ODD_EXPORT}' == `${BOOLEANTRUE}`
+
+export const SESSION_TIMEOUT = import.meta.env.VITE_SESSION_TIMEOUT
+  ? import.meta.env.VITE_SESSION_TIMEOUT
   : 780000 /* 13 * 60 * 1000 ms*/
-export const REFRESH_TOKEN_INTERVAL = process.env.REACT_APP_REFRESH_TOKEN_INTERVAL
-  ? process.env.REACT_APP_REFRESH_TOKEN_INTERVAL
+export const REFRESH_TOKEN_INTERVAL = import.meta.env.VITE_REFRESH_TOKEN_INTERVAL
+  ? import.meta.env.VITE_REFRESH_TOKEN_INTERVAL
   : 180000 /* 3 * 60 * 1000 ms*/
 
 export const VALUE_SET_SIZE = '9999'
