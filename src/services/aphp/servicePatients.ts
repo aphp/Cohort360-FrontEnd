@@ -310,7 +310,7 @@ const servicesPatients: IServicePatients = {
   fetchMyPatients: async () => {
     const [myPatientsResp, myPatientsEncounters] = await Promise.all([
       fetchPatient({
-        pivotFacet: ['age_gender', 'deceased_gender'],
+        pivotFacet: ['extension.age-month_gender', 'deceased_gender'],
         size: 20,
         _sort: 'family',
         _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']

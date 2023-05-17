@@ -207,7 +207,7 @@ const servicesCohorts: IServiceCohorts = {
         apiBackend.get<Back_API_Response<Cohort>>(`/cohort/cohorts/?fhir_group_id=${cohortId}`),
         fetchGroup({ _id: cohortId }),
         fetchPatient({
-          pivotFacet: ['age_gender', 'deceased_gender'],
+          pivotFacet: ['extension.age-month_gender', 'deceased_gender'],
           _list: [cohortId],
           size: 20,
           _sort: 'family',
@@ -346,7 +346,7 @@ const servicesCohorts: IServiceCohorts = {
       offset: page ? (page - 1) * 20 : 0,
       _sort: sortBy,
       sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
-      pivotFacet: includeFacets ? ['age_gender', 'deceased_gender'] : [],
+      pivotFacet: includeFacets ? ['extension.age-month_gender', 'deceased_gender'] : [],
       _list: groupId ? [groupId] : [],
       gender:
         gender === PatientGenderKind._unknown ? '' : gender === PatientGenderKind._other ? `other,unknown` : gender,

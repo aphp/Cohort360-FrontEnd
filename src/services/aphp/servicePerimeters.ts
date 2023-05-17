@@ -159,7 +159,7 @@ const servicesPerimeters: IServicePerimeters = {
         _id: perimetersId
       }),
       fetchPatient({
-        pivotFacet: ['age_gender', 'deceased_gender'],
+        pivotFacet: ['extension.age-month_gender', 'deceased_gender'],
         _list: perimetersId.split(','),
         size: 20,
         _sort: 'family',

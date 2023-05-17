@@ -84,7 +84,7 @@ type fetchPatientProps = {
   given?: string
   identifier?: string
   deceased?: boolean
-  pivotFacet?: ('age_gender' | 'deceased_gender')[]
+  pivotFacet?: ('extension.age-month_gender' | 'deceased_gender')[]
   _elements?: ('id' | 'gender' | 'name' | 'birthDate' | 'deceased' | 'identifier' | 'extension')[]
   deidentified?: boolean
   signal?: AbortSignal
@@ -118,8 +118,8 @@ export const fetchPatient = async (args: fetchPatientProps) => {
   // By default, all the calls to `/Patient` will have 'active=true' in parameter
   let options: string[] = ['active=true']
   if (_id) options = [...options, `_id=${_id}`] // eslint-disable-line
-  if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
+  if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
+  if (offset) options = [...options, `_offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort}`] // eslint-disable-line
   if (gender) options = [...options, `gender=${gender}`] // eslint-disable-line
   if (_text) options = [...options, `${searchBy ? searchBy : '_text'}=${encodeURIComponent(_text)}`] // eslint-disable-line
@@ -131,7 +131,7 @@ export const fetchPatient = async (args: fetchPatientProps) => {
   if (maxBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=ge${maxBirthdate}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
-  if (pivotFacet && pivotFacet.length > 0) options = [...options, `pivotFacet=${pivotFacet.reduce(reducer)}`] // eslint-disable-line
+  if (pivotFacet && pivotFacet.length > 0) options = [...options, `pivot-facet=${pivotFacet.reduce(reducer)}`] // eslint-disable-line
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(reducer)}`] // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<IPatient>>(`/Patient?${options.reduce(optionsReducer)}`, {
@@ -274,7 +274,11 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   if (type) options = [...options, `type=${type}`] // eslint-disable-line
   if (_text)
     options = [...options, `${searchBy === SearchByTypes.text ? `_text` : 'description'}=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (highlight_search_results) options = [...options, `${searchBy === SearchByTypes.text ? `highlight_search_results=true` : 'highlight_search_results=false'}`] // eslint-disable-line
+  if (highlight_search_results)
+    options = [
+      ...options,
+      `${searchBy === SearchByTypes.text ? `highlight_search_results=true` : 'highlight_search_results=false'}`
+    ] // eslint-disable-line
   if (status) options = [...options, `docstatus=${status}`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
   if (patientIdentifier) options = [...options, `patient.identifier=${patientIdentifier}`] // eslint-disable-line
