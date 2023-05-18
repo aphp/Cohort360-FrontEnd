@@ -242,9 +242,10 @@ export type ScopeTreeRow = {
   name: string
   full_path?: string
   quantity: number
-  parentId?: string
+  parentId?: string | null
   subItems: ScopeTreeRow[]
   managingEntity?: any | undefined
+  above_levels_ids?: string
   inferior_levels_ids?: string
   cohort_id?: string
   cohort_size?: string
@@ -761,6 +762,7 @@ export type ScopeElement = {
   source_value: string
   parent_id: string | null
   type: string
+  above_levels_ids: string
   inferior_levels_ids: string
   cohort_id: string
   cohort_size: string

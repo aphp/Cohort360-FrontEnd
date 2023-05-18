@@ -79,8 +79,7 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
       ...selectedPopulations,
       subItems: []
     }))
-
-    dispatch(buildCohortCreation({ selectedPopulation: _selectedPopulations }))
+    setUpdatedItems(updatedSelection)
     onChangeOpenDrawer(false)
   }
 

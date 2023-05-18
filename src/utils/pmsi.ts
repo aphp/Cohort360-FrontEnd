@@ -16,7 +16,7 @@ import { expandBiologyElement } from '../state/biology'
  * This function is called when a user select an element of pmsi hierarchy
  * return selected items that should be saved
  */
-export const getSelectedPmsi = (row: any, selectedItems: any[] | undefined, rootRows: any[]) => {
+export const getHierarchySelection = (row: any, selectedItems: any[] | undefined, rootRows: any[]) => {
   selectedItems = (selectedItems ?? []).map(
     (selectedItem) => findEquivalentRowInItemAndSubItems(selectedItem, rootRows).equivalentRow ?? selectedItem
   )
@@ -69,7 +69,9 @@ export const getSelectedPmsi = (row: any, selectedItems: any[] | undefined, root
 
       const selectedChildren = row.subItems
         ? // eslint-disable-next-line
-          row.subItems.filter((child: { id: any }) => savedSelectedItems.find((selectedChild) => selectedChild.id === child.id))
+          row.subItems.filter((child: { id: any }) =>
+            savedSelectedItems.find((selectedChild) => selectedChild.id === child.id)
+          )
         : []
       const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
 
@@ -109,12 +111,12 @@ export const getSelectedPmsi = (row: any, selectedItems: any[] | undefined, root
   return savedSelectedItems
 }
 
-export const optimizeHierarchySelection = (selectedItems: PmsiListType[], rootRows: PmsiListType[]) => {
+export const optimizeHierarchySelection = (selectedItems: any[], rootRows: any[]) => {
   // If you chenge this code, change it too inside: PopulationCard.tsx:31 and Scope.jsx:25
   selectedItems = selectedItems.map(
     (selectedItem) => findEquivalentRowInItemAndSubItems(selectedItem, rootRows).equivalentRow ?? selectedItem
   )
-  const updatedRows: PmsiListType[] = []
+  const updatedRows: any[] = []
   const newSelectedItems = selectedItems.filter((item, index, array) => {
     // reemove double item
     const foundItem = array.find(({ id }) => item.id === id)
@@ -126,11 +128,11 @@ export const optimizeHierarchySelection = (selectedItems: PmsiListType[], rootRo
         updatedRows.push({ ...item })
       }
     }
-    const returnParentElement: (
-      _array: PmsiListType[],
-      parentArray: PmsiListType | undefined
-    ) => PmsiListType | undefined = (_array, parentArray) => {
-      let parentElement: PmsiListType | undefined = undefined
+    const returnParentElement: (_array: any[], parentArray: any | undefined) => any | undefined = (
+      _array,
+      parentArray
+    ) => {
+      let parentElement: any | undefined = undefined
       if (!_array) return
       for (const element of _array) {
         if (parentElement) continue
@@ -152,12 +154,12 @@ export const optimizeHierarchySelection = (selectedItems: PmsiListType[], rootRo
       return parentElement
     }
 
-    const parentItem: PmsiListType | undefined = returnParentElement(rootRows, undefined)
+    const parentItem: any | undefined = returnParentElement(rootRows, undefined)
 
     if (parentItem !== undefined) {
       const selectedChildren =
         parentItem.subItems && parentItem.subItems.length > 0
-          ? parentItem.subItems.filter((subItem) => !!array.find(({ id }) => id === subItem.id))
+          ? parentItem.subItems.filter((subItem: { id: any }) => !!array.find(({ id }) => id === subItem.id))
           : []
 
       if (
