@@ -47,6 +47,7 @@ type ScopeTreeListItemProps = {
   onSelect: (row: ScopeTreeRow) => void
   isIndeterminated: (row: any) => boolean | undefined
   isSelected: (searchedItem: TreeElement, selectedItems: ScopeTreeRow[], allItems: ScopeTreeRow[]) => boolean
+  executiveUnitType?: string
 }
 
 const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
@@ -62,7 +63,8 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
     onExpand,
     onSelect,
     isIndeterminated,
-    isSelected
+    isSelected,
+    executiveUnitType
   } = props
 
   const classes = useStyles()
@@ -93,7 +95,6 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
               </IconButton>
             )}
           </TableCell>
-
           <TableCell align="center" padding="checkbox">
             <Checkbox
               color="secondary"
@@ -105,7 +106,6 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
               inputProps={{ 'aria-labelledby': labelId }}
             />
           </TableCell>
-
           <TableCell>
             {debouncedSearchTerm && row.full_path ? (
               <Breadcrumbs maxItems={2}>
@@ -122,14 +122,18 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
               <Typography>{row.name}</Typography>
             )}
           </TableCell>
-
           <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
             <Typography>{displayDigit(row.quantity)}</Typography>
           </TableCell>
-
-          <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
-            <Typography>{row.access ?? parentAccess}</Typography>
-          </TableCell>
+          {executiveUnitType ? (
+            <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
+              <Typography>{row.type ?? '-'}</Typography>
+            </TableCell>
+          ) : (
+            <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
+              <Typography>{row.access ?? parentAccess}</Typography>
+            </TableCell>
+          )}
         </TableRow>
       )}
     </>
@@ -140,9 +144,15 @@ type ScopeTreeProps = {
   defaultSelectedItems: ScopeTreeRow[]
   onChangeSelectedItem: (selectedItems: ScopeTreeRow[]) => void
   searchInput: string
+  executiveUnitType?: string
 }
 
-const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSelectedItem, searchInput }) => {
+const ScopeTree: React.FC<ScopeTreeProps> = ({
+  defaultSelectedItems,
+  onChangeSelectedItem,
+  searchInput,
+  executiveUnitType
+}) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
 
@@ -242,6 +252,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
         selectedItems: selectedItems,
         scopesList: _rootRows,
         openPopulation: openPopulation,
+        type: executiveUnitType,
         signal: controllerRef.current?.signal
       })
     ).unwrap()
@@ -384,7 +395,21 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
     },
     { id: 'name', align: 'left', disablePadding: false, disableOrderBy: true, label: 'Nom' },
     { id: 'quantity', align: 'center', disablePadding: false, disableOrderBy: true, label: 'Nombre de patients' },
-    { id: 'deidentified', align: 'center', disablePadding: false, disableOrderBy: true, label: 'Accès' }
+    executiveUnitType
+      ? {
+          id: 'deidentified',
+          align: 'center',
+          disablePadding: false,
+          disableOrderBy: true,
+          label: 'Type'
+        }
+      : {
+          id: 'type',
+          align: 'center',
+          disablePadding: false,
+          disableOrderBy: true,
+          label: 'Accès'
+        }
   ]
 
   return (
@@ -435,6 +460,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                           onSelect={_onSelect}
                           isIndeterminated={_isIndeterminated}
                           isSelected={isSelected}
+                          executiveUnitType={executiveUnitType}
                         />
                         {openPopulation.find((id) => _row.id === id) &&
                           _row.subItems &&
@@ -458,6 +484,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSel
                         onSelect={_onSelect}
                         isIndeterminated={_isIndeterminated}
                         isSelected={isSelected}
+                        executiveUnitType={executiveUnitType}
                       />
                       {openPopulation.find((id) => row.id === id) &&
                         row.subItems &&

@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect, useRef } from 'react'
+import React, { Fragment, useEffect, useRef, useState } from 'react'
 import moment from 'moment'
 
 import Chip from '@mui/material/Chip'
@@ -10,11 +10,12 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import { useAppSelector } from 'state'
-import { DocType, SearchByTypes, SelectedCriteriaType } from 'types'
+import { DocType, ScopeTreeRow, SearchByTypes, SelectedCriteriaType } from 'types'
 
 import docTypes from 'assets/docTypes.json'
 
 import useStyles from './styles'
+import { RESSOURCE_TYPE_PATIENT } from 'utils/cohortCreation'
 
 type CriteriaCardContentProps = {
   currentCriteria: SelectedCriteriaType
@@ -912,6 +913,29 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   ? `Avant le ${endDate}`
                   : ''}
               </Typography>
+            }
+          />
+        )
+      ]
+    }
+    const displaySelectedExecutiveUnits = (hospitalList: ScopeTreeRow[], tooltip?: boolean) => {
+      return hospitalList && hospitalList.length > 0
+        ? hospitalList.map((item) => item.name).reduce(tooltip ? tooltipReducer : reducer)
+        : ''
+    }
+
+    if (_currentCriteria.type !== RESSOURCE_TYPE_PATIENT) {
+      content = [
+        ...content,
+        _currentCriteria && _currentCriteria?.encounterService && _currentCriteria?.encounterService.length > 0 && (
+          <Chip
+            className={classes.criteriaChip}
+            label={
+              <Tooltip title={displaySelectedExecutiveUnits(_currentCriteria?.encounterService)}>
+                <Typography style={{ maxWidth: 500 }} noWrap>
+                  {displaySelectedExecutiveUnits(_currentCriteria?.encounterService)}
+                </Typography>
+              </Tooltip>
             }
           />
         )

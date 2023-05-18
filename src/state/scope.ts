@@ -26,20 +26,25 @@ type FetchScopeListReturn = {
   aborted?: boolean
 }
 
-const fetchScopesList = createAsyncThunk<FetchScopeListReturn, AbortSignal | undefined, { state: RootState }>(
+type FetchScopeListArgs = {
+  type?: string
+  signal?: AbortSignal | undefined
+}
+
+const fetchScopesList = createAsyncThunk<FetchScopeListReturn, FetchScopeListArgs, { state: RootState }>(
   'scope/fetchScopesList',
-  async (signal: AbortSignal | undefined, { getState, dispatch }) => {
+  async ({ type, signal }, { getState, dispatch }) => {
     try {
       const state = getState()
       const { me, scope } = state
       const { scopesList } = scope
 
       if (scopesList.length) {
-        dispatch(fetchScopesListinBackground(signal))
+        dispatch(fetchScopesListinBackground({ type, signal }))
         return { scopesList: scopesList, aborted: signal?.aborted }
       } else {
         if (!me) return { scopesList: [], aborted: signal?.aborted }
-        const scopes = (await services.perimeters.getScopePerimeters(me.id, signal)) || []
+        const scopes = (await services.perimeters.getScopePerimeters(me.id, type, signal)) || []
         if (signal?.aborted) {
           return { scopesList: scopesList, aborted: signal?.aborted }
         } else {
@@ -52,19 +57,22 @@ const fetchScopesList = createAsyncThunk<FetchScopeListReturn, AbortSignal | und
     }
   }
 )
-
+type fetchScopesListinBackgroundArgs = {
+  type?: string
+  signal?: AbortSignal | undefined
+}
 const fetchScopesListinBackground = createAsyncThunk<
   FetchScopeListReturn,
-  AbortSignal | undefined,
+  fetchScopesListinBackgroundArgs,
   { state: RootState }
->('scope/fetchScopesListinBackground', async (signal: AbortSignal | undefined, { getState }) => {
+>('scope/fetchScopesListinBackground', async ({ type, signal }, { getState }) => {
   try {
     const state = getState()
     const { me, scope } = state
     const { scopesList } = scope
 
     if (!me) return { scopesList: [], aborted: signal?.aborted }
-    const scopes = (await services.perimeters.getScopePerimeters(me.id, signal)) || []
+    const scopes = (await services.perimeters.getScopePerimeters(me.id, type, signal)) || []
     return {
       scopesList: scopes.map((scope) => ({
         ...scope,
@@ -94,6 +102,7 @@ type ExpandScopeElementParams = {
   scopesList?: ScopeTreeRow[]
   selectedItems?: ScopeTreeRow[]
   openPopulation?: number[]
+  type?: string
   signal?: AbortSignal
 }
 type ExpandScopeElementReturn = {
@@ -126,22 +135,23 @@ const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScop
     } else {
       _openPopulation = [..._openPopulation, params.rowId]
 
-      const replaceSubItems = async (items: ScopeTreeRow[]) => {
+      const replaceSubItems = async (items: ScopeTreeRow[], type?: string) => {
         let _items: ScopeTreeRow[] = []
         for (let item of items) {
           // Replace sub items element by response of back-end
           if (+item.id === +params.rowId) {
             const foundItem = item.subItems ? item.subItems.find((i: any) => i.id === 'loading') : true
             if (foundItem) {
-              const subItems: ScopeTreeRow[] = await services.perimeters.getScopeSubItems(
+              const subItems: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(
                 item.inferior_levels_ids,
-                true,
+                false,
+                type,
                 params.signal
               )
               item = { ...item, subItems: subItems }
             }
           } else if (item.subItems && item.subItems.length !== 0) {
-            item = { ...item, subItems: await replaceSubItems(item.subItems) }
+            item = { ...item, subItems: await replaceSubItems(item.subItems, type) }
           }
           _items = [..._items, item]
 
@@ -156,7 +166,7 @@ const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScop
         return _items
       }
 
-      _rootRows = await replaceSubItems(scopesList)
+      _rootRows = await replaceSubItems(scopesList, params.type)
     }
 
     return {
