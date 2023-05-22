@@ -1,6 +1,13 @@
 import apiFhir from '../apiFhir'
 
-import { CohortComposition, SearchByTypes, FHIR_API_Response, IScope } from 'types'
+import {
+  CohortComposition,
+  SearchByTypes,
+  FHIR_API_Response,
+  IScope,
+  AccessExpiration,
+  AccessExpirationsProps
+} from 'types'
 import {
   IBinary,
   IClaim,
@@ -274,7 +281,11 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   if (type) options = [...options, `type=${type}`] // eslint-disable-line
   if (_text)
     options = [...options, `${searchBy === SearchByTypes.text ? `_text` : 'description'}=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (highlight_search_results) options = [...options, `${searchBy === SearchByTypes.text ? `highlight_search_results=true` : 'highlight_search_results=false'}`] // eslint-disable-line
+  if (highlight_search_results)
+    options = [
+      ...options,
+      `${searchBy === SearchByTypes.text ? `highlight_search_results=true` : 'highlight_search_results=false'}`
+    ] // eslint-disable-line
   if (status) options = [...options, `docstatus=${status}`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
   if (patientIdentifier) options = [...options, `patient.identifier=${patientIdentifier}`] // eslint-disable-line
@@ -633,6 +644,20 @@ export const fetchScope: (args: fetchScopeProps) => Promise<AxiosResponse<IScope
 
   const response: AxiosResponse<IScope | unknown> = await apiBackend.get(
     `accesses/perimeters/read-patient/?${options.reduce(optionsReducer)}`
+  )
+  return response
+}
+
+export const fetchAccessExpirations: (
+  args: AccessExpirationsProps
+) => Promise<AxiosResponse<AccessExpiration[]>> = async (args: AccessExpirationsProps) => {
+  const { expiring } = args
+
+  let options: string[] = []
+  if (expiring === true || expiring === false) options = [...options, `expiring=${expiring}`] // eslint-disable-line
+
+  const response: AxiosResponse<AccessExpiration[]> = await apiBackend.get(
+    `accesses/accesses/my-accesses/?${options.reduce(optionsReducer)}`
   )
   return response
 }
