@@ -105,58 +105,49 @@ const Welcome: React.FC = () => {
         className={classes.container}
         style={{ minHeight: 'calc(100vh - 70px)', marginBottom: 8 }}
       >
-        <Grid item xs={12}>
-          <Grid item>
-            <Typography
-              id="homePage-title"
-              component="h1"
-              variant="h1"
-              color="inherit"
-              noWrap
-              className={classes.title}
-            >
-              Bienvenue {practitioner.displayName}
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Typography
-              id="last-connection"
-              component="h6"
-              variant="h6"
-              color="inherit"
-              noWrap
-              className={classes.subtitle}
-            >
-              {lastConnection}
-            </Typography>
-          </Grid>
-          <Grid item>
-            {maintenanceIsActive && (
-              <Alert severity="warning" className={classes.alert}>
-                Une maintenance est en cours. Seules les consultations de cohortes, requêtes et données patients sont
-                activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
-              </Alert>
-            )}
-            {accessExpirations?.map(
-              (item: AccessExpiration) =>
-                item.leftDays &&
-                item.leftDays <= 30 && (
-                  <Alert
-                    key={item.perimeter + '-' + item.leftDays && item.leftDays}
-                    severity="warning"
-                    className={classes.alert}
-                  >
-                    Attention, vos accès au périmetre suivant: {item.perimeter}, arriveront à expiration dans{' '}
-                    {item.leftDays} jour{item.leftDays > 1 ? 's' : ''}. Veuillez vous rapprocher de votre référent EDS
-                    pour faire renouveler vos accès à l'application.
-                  </Alert>
-                )
-            )}
-          </Grid>
+        <Grid item>
+          <Typography id="homePage-title" component="h1" variant="h1" color="inherit" noWrap className={classes.title}>
+            Bienvenue {practitioner.displayName}
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Typography
+            id="last-connection"
+            component="h6"
+            variant="h6"
+            color="inherit"
+            noWrap
+            className={classes.subtitle}
+          >
+            {lastConnection}
+          </Typography>
+        </Grid>
+        <Grid item>
+          {maintenanceIsActive && (
+            <Alert severity="warning" className={classes.alert}>
+              Une maintenance est en cours. Seules les consultations de cohortes, requêtes et données patients sont
+              activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
+            </Alert>
+          )}
+          {accessExpirations?.map(
+            (item: AccessExpiration) =>
+              item.leftDays &&
+              item.leftDays <= 30 && (
+                <Alert
+                  key={item.perimeter + '-' + item.leftDays && item.leftDays}
+                  severity="warning"
+                  className={classes.alert}
+                >
+                  Attention, votre accès au périmetre suivant: {item.perimeter}, arrivera à expiration dans{' '}
+                  {item.leftDays} jour{item.leftDays > 1 ? 's' : ''}. Veuillez vous rapprocher de votre référent EDS
+                  pour faire renouveler vos accès à l'application.
+                </Alert>
+              )
+          )}
         </Grid>
 
         <Grid container xs={12} spacing={1}>
-          <Grid container className={classes.newsGrid} item xs={6} md={6} lg={6}>
+          <Grid container className={classes.newsGrid} item xs={12} md={6}>
             <Grid item className={classes.pt3}>
               <Paper
                 id="patients-card"
@@ -174,8 +165,8 @@ const Welcome: React.FC = () => {
             </Grid>
           </Grid>
 
-          <Grid container item xs={6} md={6} lg={6}>
-            <Grid item xs={12} md={12} lg={12} className={classes.pt3}>
+          <Grid container item xs={12} md={6}>
+            <Grid item xs={12} className={classes.pt3}>
               <Paper
                 id="search-patient-card"
                 className={classes.paper}
@@ -185,7 +176,7 @@ const Welcome: React.FC = () => {
               </Paper>
             </Grid>
 
-            <Grid item xs={12} md={12} lg={12} className={classes.pt3}>
+            <Grid item xs={12} className={classes.pt3}>
               <Paper
                 id="tutorials-card"
                 className={classes.paper}
