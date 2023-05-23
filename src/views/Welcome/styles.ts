@@ -47,7 +47,8 @@ const useStyles = makeStyles((theme: Theme) => ({
     [theme.breakpoints.down('md')]: {
       flexDirection: 'column-reverse'
     }
-  }
+  },
+  alert: { marginTop: '5px', width: '100%' }
 }))
 
 export default useStyles

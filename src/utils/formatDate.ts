@@ -1,4 +1,5 @@
 import { Month } from 'types'
+import moment from 'moment/moment'
 
 const getFormatedDate = (date: Date) => {
   const mm = date.getMonth() + 1 // getMonth() is zero-based
@@ -71,4 +72,8 @@ const getStringMonthAphp = (monthNumber: number): Month | undefined => {
   }
 }
 
-export { getFormatedDate, getStringMonth, getStringMonthAphp }
+const getDaysLeft = (date: Date): number => {
+  return moment(date).diff(new Date(), 'days')
+}
+
+export { getFormatedDate, getStringMonth, getStringMonthAphp, getDaysLeft }

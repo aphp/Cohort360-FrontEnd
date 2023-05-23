@@ -785,3 +785,15 @@ export type AgeRangeType = {
   month?: number
   days?: number
 }
+
+export type AccessExpirationsProps = {
+  expiring?: boolean
+}
+
+export type AccessExpiration = {
+  leftDays?: number
+  start_datetime: Date
+  end_datetime: Date
+  profile: string
+  perimeter: string
+}
