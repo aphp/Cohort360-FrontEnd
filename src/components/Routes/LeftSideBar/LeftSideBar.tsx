@@ -64,38 +64,38 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
 
   useEffect(() => {
     if (props.open) {
-      dispatch<any>(openAction())
+      dispatch(openAction())
     } else {
       setAllreadyOpen(true)
-      dispatch<any>(closeAction())
+      dispatch(closeAction())
     }
   }, [props.open, cohortCreation]) // eslint-disable-line
 
   const handleDrawerOpenOrClose = (value: boolean) => {
     setAllreadyOpen(true)
     if (value) {
-      dispatch<any>(openAction())
+      dispatch(openAction())
     } else {
-      dispatch<any>(closeAction())
+      dispatch(closeAction())
     }
   }
 
   const handleDisplayPatientList = () => {
-    dispatch<any>(openAction())
+    dispatch(openAction())
     if (open) {
       setDisplayPatientList(!displayPatientList)
     }
   }
 
   const handleDisplaySearchList = () => {
-    dispatch<any>(openAction())
+    dispatch(openAction())
     if (open) {
       setDisplaySearchList(!displaySearchList)
     }
   }
 
   const handleNewRequest = () => {
-    dispatch<any>(resetCohortCreation())
+    dispatch(resetCohortCreation())
     navigate('/cohort/new')
   }
 
@@ -153,7 +153,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     <IconButton
                       onClick={() => {
                         localStorage.clear()
-                        dispatch<any>(logoutAction())
+                        dispatch(logoutAction())
                         navigate('/')
                       }}
                     >
@@ -172,7 +172,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                       <IconButton
                         onClick={() => {
                           localStorage.clear()
-                          dispatch<any>(logoutAction())
+                          dispatch(logoutAction())
                           navigate('/')
                         }}
                       >

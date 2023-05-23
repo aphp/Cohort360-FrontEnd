@@ -39,6 +39,7 @@ const initBiologyHierarchy = createAsyncThunk<BiologyState, void, { state: RootS
       return {
         ...state,
         loading: false,
+
         list: biologyList || []
       }
     } catch (error) {

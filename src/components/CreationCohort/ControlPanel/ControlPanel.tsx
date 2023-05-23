@@ -40,6 +40,7 @@ import useStyle from './styles'
 
 import displayDigit from 'utils/displayDigit'
 import { SHORT_COHORT_LIMIT } from '../../../constants'
+import { JobStatus } from '../../../utils/constants'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -117,15 +118,15 @@ const ControlPanel: React.FC<{
     if (logicalOperatorNeedToBeErase && logicalOperatorNeedToBeErase.length > 0) {
       for (const logicalOperator of logicalOperatorNeedToBeErase) {
         const { id } = logicalOperator
-        dispatch<any>(deleteCriteriaGroup(id))
+        dispatch(deleteCriteriaGroup(id))
       }
     }
-    dispatch<any>(buildCohortCreation({}))
+    dispatch(buildCohortCreation({}))
   }
 
   const _relaunchCount = (keepCount: boolean) => {
     if (keepCount) setOldCount(count ?? null)
-    dispatch<any>(
+    dispatch(
       countCohortCreation({
         json,
         snapshotId: currentSnapshot,
@@ -150,8 +151,8 @@ const ControlPanel: React.FC<{
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (count && count.status && (count.status === 'pending' || count.status === 'started')) {
-        dispatch<any>(countCohortCreation({ uuid: count.uuid }))
+      if (count && count.status && (count.status === JobStatus.pending || count.status === JobStatus.new)) {
+        dispatch(countCohortCreation({ uuid: count.uuid }))
       } else {
         clearInterval(interval)
       }
@@ -198,7 +199,7 @@ const ControlPanel: React.FC<{
 
           <Button
             onClick={() => {
-              dispatch<any>(resetCohortCreation())
+              dispatch(resetCohortCreation())
             }}
             className={classes.actionButton}
             startIcon={<UpdateSharpIcon color="action" className={classes.iconBorder} />}

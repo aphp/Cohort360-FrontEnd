@@ -16,7 +16,7 @@ build-job:
   only:
     - tags
     - develop
-    - ^feat_deploy_(\w*|\d*)
+    - /^feat_deploy_(\w*|\d*)/
 
   cache:
     key: cohort360_nodemodules_cache
@@ -55,4 +55,4 @@ deploy-job:
   only:
     - tags
     - develop
-    - ^feat_deploy_(\w*|\d*)
+    - /^feat_deploy_(\w*|\d*)/

@@ -17,6 +17,7 @@ import { deleteProject } from './project'
 
 import services from 'services/aphp'
 import { SHORT_COHORT_LIMIT } from '../constants'
+import { JobStatus } from '../utils/constants'
 
 export type CohortCreationState = {
   loading: boolean
@@ -105,7 +106,7 @@ const fetchRequestCohortCreation = createAsyncThunk<
     const { requestName, json, currentSnapshot, shortCohortLimit, snapshotsHistory, count, count_outdated } =
       requestResult
 
-    dispatch<any>(
+    dispatch(
       unbuildCohortCreation({
         newCurrentSnapshot: snapshotsHistory[
           snapshotsHistory.length ? snapshotsHistory.length - 1 : 0
@@ -183,7 +184,7 @@ const countCohortCreation = createAsyncThunk<
  *
  *
  */
-type SaveJsonReturn = {
+export type SaveJsonReturn = {
   requestId: string
   snapshotsHistory: CohortCreationSnapshotType[]
   currentSnapshot: string
@@ -275,13 +276,13 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
       const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
 
       if (json !== state?.cohortCreation?.request?.json) {
-        const saveJsonResponse = await dispatch<any>(saveJson({ newJson: json }))
+        const saveJsonResponse = await dispatch(saveJson({ newJson: json })).unwrap()
 
-        await dispatch<any>(
+        await dispatch(
           countCohortCreation({
             json: json,
-            snapshotId: saveJsonResponse.payload.currentSnapshot,
-            requestId: saveJsonResponse.payload.requestId
+            snapshotId: saveJsonResponse.currentSnapshot,
+            requestId: saveJsonResponse.requestId
           })
         )
       }
@@ -367,13 +368,13 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
       const countId = dated_measures ? dated_measures.uuid : null
 
       if (countId) {
-        dispatch<any>(
+        dispatch(
           countCohortCreation({
             uuid: countId
           })
         )
       } else {
-        dispatch<any>(
+        dispatch(
           countCohortCreation({
             json: newCurrentSnapshot.json,
             snapshotId: newCurrentSnapshot.uuid,
@@ -428,12 +429,12 @@ const addRequestToCohortCreation = createAsyncThunk<
       parentId
     )
 
-    const saveJsonResponse = await dispatch<any>(saveJson({ newJson: json }))
-    await dispatch<any>(
+    const saveJsonResponse = await dispatch(saveJson({ newJson: json })).unwrap()
+    await dispatch(
       countCohortCreation({
         json: json,
-        snapshotId: saveJsonResponse.payload.currentSnapshot,
-        requestId: saveJsonResponse.payload.requestId
+        snapshotId: saveJsonResponse.currentSnapshot,
+        requestId: saveJsonResponse.requestId
       })
     )
 
@@ -642,8 +643,8 @@ const cohortCreationSlice = createSlice({
       state.count = {
         ...(state.count || {}),
         status:
-          (state.count || {}).status === 'pending' ||
-          (state.count || {}).status === 'started' ||
+          (state.count || {}).status === JobStatus.pending ||
+          (state.count || {}).status === JobStatus.new ||
           (state.count || {}).status === 'suspended'
             ? 'suspended'
             : (state.count || {}).status
@@ -652,7 +653,7 @@ const cohortCreationSlice = createSlice({
     unsuspendCount: (state: CohortCreationState) => {
       state.count = {
         ...state.count,
-        status: 'pending'
+        status: JobStatus.pending
       }
     }
   },
@@ -672,11 +673,15 @@ const cohortCreationSlice = createSlice({
     builder.addCase(saveJson.fulfilled, (state, { payload }) => ({ ...state, ...payload, saveLoading: false }))
     builder.addCase(saveJson.rejected, (state) => ({ ...state, saveLoading: false }))
     // countCohortCreation
-    builder.addCase(countCohortCreation.pending, (state) => ({ ...state, status: 'pending', countLoading: true }))
+    builder.addCase(countCohortCreation.pending, (state) => ({
+      ...state,
+      status: JobStatus.pending,
+      countLoading: true
+    }))
     builder.addCase(countCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
-      countLoading: payload?.count?.status === 'pending' || payload?.count?.status === 'started'
+      countLoading: payload?.count?.status === JobStatus.pending || payload?.count?.status === JobStatus.new
     }))
     builder.addCase(countCohortCreation.rejected, (state) => ({
       ...state,

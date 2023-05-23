@@ -35,7 +35,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
   const getGhmOptions = async (searchValue: string) => await criteria.fetch.fetchGhmData(searchValue, false)
   const _onSubmit = () => {
     onChangeSelectedCriteria(currentState)
-    dispatch<any>(fetchClaim())
+    dispatch(fetchClaim())
   }
   const defaultValuesCode = currentState.code
     ? currentState.code.map((code: any) => {

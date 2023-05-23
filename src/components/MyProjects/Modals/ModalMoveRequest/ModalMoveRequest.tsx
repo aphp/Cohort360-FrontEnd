@@ -34,7 +34,7 @@ const ModalMoveRequest: React.FunctionComponent<IModalMoveRequestProps> = ({ ope
   }, [open])
 
   const _onConfirm = async () => {
-    await dispatch<any>(
+    await dispatch(
       moveRequests({
         selectedRequests,
         parent_folder: currentFolder !== null ? currentFolder.uuid : undefined

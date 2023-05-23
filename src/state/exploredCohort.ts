@@ -31,6 +31,7 @@ const defaultInitialState = {
   totalDocs: 0,
   documentsList: [],
   wordcloudData: [],
+
   encounters: [],
   genderRepartitionMap: undefined,
   visitTypeRepartitionData: undefined,
@@ -173,7 +174,7 @@ const fetchExploredCohort = createAsyncThunk<
         break
     }
   } else {
-    dispatch<any>(fetchExploredCohortInBackground({ context, id }))
+    dispatch(fetchExploredCohortInBackground({ context, id }))
   }
   return cohort ?? state.exploredCohort
 })

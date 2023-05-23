@@ -174,7 +174,7 @@ const deleteRequest = createAsyncThunk<DeleteRequestReturn, DeleteRequestParams,
         requestsList.splice(index, 1)
       }
 
-      dispatch<any>(fetchRequests())
+      dispatch(fetchRequests())
 
       return {
         selectedRequest: null,

@@ -58,7 +58,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
   const isIndeterminated = checkIfIndeterminated(procedureItem, selectedItems)
   const _onExpand = async (procedureCode: string) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
-    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    dispatch(incrementLoadingSyncHierarchyTable())
     setOpen(!open)
     const newHierarchy = await expandItem(
       procedureCode,
@@ -68,15 +68,15 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
       dispatch
     )
     await handleClick(selectedItems, newHierarchy)
-    dispatch<any>(decrementLoadingSyncHierarchyTable())
+    dispatch(decrementLoadingSyncHierarchyTable())
   }
 
   const handleClickOnHierarchy = async (procedureItem: PmsiListType) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
-    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    dispatch(incrementLoadingSyncHierarchyTable())
     const newSelectedItems = getSelectedPmsi(procedureItem, selectedItems || [], procedureHierarchy)
     await handleClick(newSelectedItems)
-    dispatch<any>(decrementLoadingSyncHierarchyTable())
+    dispatch(decrementLoadingSyncHierarchyTable())
   }
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {

@@ -49,7 +49,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
 
   const _onSubmit = () => {
     onChangeSelectedCriteria(currentState)
-    dispatch<any>(fetchBiology())
+    dispatch(fetchBiology())
   }
 
   const defaultValuesCode = currentState.code

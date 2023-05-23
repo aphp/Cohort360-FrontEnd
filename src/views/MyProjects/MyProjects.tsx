@@ -71,17 +71,17 @@ const MyProjects: React.FC<{}> = () => {
   const loading = loadingProject || loadingRequest || loadingCohort
 
   const _fetchProjectsList = async () => {
-    dispatch<any>(setSelectedProject(null))
-    dispatch<any>(fetchProjectsList())
+    dispatch(setSelectedProject(null))
+    dispatch(fetchProjectsList())
   }
 
   const _fetchRequestsList = async () => {
-    dispatch<any>(setSelectedRequest(null))
-    dispatch<any>(fetchRequestsList())
+    dispatch(setSelectedRequest(null))
+    dispatch(fetchRequestsList())
   }
 
   const _fetchCohortsList = async () => {
-    dispatch<any>(fetchCohortsList({ limit: 100 }))
+    dispatch(fetchCohortsList({ limit: 100 }))
   }
 
   const _fetch = async () => {
@@ -95,7 +95,7 @@ const MyProjects: React.FC<{}> = () => {
   }, [])
 
   const handleClickAddProject = () => {
-    dispatch<any>(setSelectedProject(''))
+    dispatch(setSelectedProject(''))
   }
 
   if (loading) {
@@ -231,11 +231,11 @@ const MyProjects: React.FC<{}> = () => {
 
       <ModalAddOrEditProject
         open={selectedProject !== null}
-        onClose={() => dispatch<any>(setSelectedProject(null))}
+        onClose={() => dispatch(setSelectedProject(null))}
         selectedProject={selectedProject}
       />
 
-      {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch<any>(setSelectedRequest(null))} />}
+      {selectedRequest !== null && <ModalAddOrEditRequest onClose={() => dispatch(setSelectedRequest(null))} />}
 
       {selectedRequestShare !== null &&
         selectedRequestShare?.shared_query_snapshot !== undefined &&
@@ -243,7 +243,7 @@ const MyProjects: React.FC<{}> = () => {
           <ModalShareRequest
             shareSuccessOrFailMessage={shareSuccessOrFailMessage}
             parentStateSetter={wrapperSetShareSuccessOrFailMessage}
-            onClose={() => dispatch<any>(setSelectedRequestShare(null))}
+            onClose={() => dispatch(setSelectedRequestShare(null))}
           />
         )}
 
@@ -252,11 +252,11 @@ const MyProjects: React.FC<{}> = () => {
         selectedRequestShare?.shared_query_snapshot?.length === 0 && (
           <Snackbar
             open
-            onClose={() => dispatch<any>(setSelectedRequestShare(null))}
+            onClose={() => dispatch(setSelectedRequestShare(null))}
             autoHideDuration={5000}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           >
-            <Alert severity="error" onClose={() => dispatch<any>(setSelectedRequestShare(null))}>
+            <Alert severity="error" onClose={() => dispatch(setSelectedRequestShare(null))}>
               Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
             </Alert>
           </Snackbar>
@@ -288,7 +288,7 @@ const MyProjects: React.FC<{}> = () => {
         </Snackbar>
       )}
 
-      <ModalEditCohort open={selectedCohort !== null} onClose={() => dispatch<any>(setSelectedCohort(null))} />
+      <ModalEditCohort open={selectedCohort !== null} onClose={() => dispatch(setSelectedCohort(null))} />
 
       <ModalMoveRequests
         open={openModal === 'move_to_folder'}

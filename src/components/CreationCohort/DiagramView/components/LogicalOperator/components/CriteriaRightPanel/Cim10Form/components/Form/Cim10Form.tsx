@@ -44,7 +44,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const _onSubmit = () => {
     onChangeSelectedCriteria(currentState)
-    dispatch<any>(fetchCondition())
+    dispatch(fetchCondition())
   }
   const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue, false)
 

@@ -50,6 +50,7 @@ import displayDigit from 'utils/displayDigit'
 import { ODD_EXPORT } from '../../../constants'
 
 import useStyles from './styles'
+import { JobStatus } from '../../../utils/constants'
 
 type FavStarProps = {
   favorite?: boolean
@@ -136,7 +137,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   }
 
   const editCohort = async () => {
-    await dispatch<any>(setSelectedCohortState(null))
+    await dispatch(setSelectedCohortState(null))
 
     onUpdateCohorts()
   }
@@ -284,7 +285,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       <TableCell onClick={() => _onClickRow(row)} align="center">
                         {row.request_job_status === 'finished' ? (
                           <Chip label="Terminé" size="small" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                        ) : row.request_job_status === 'pending' || row.request_job_status === 'started' ? (
+                        ) : row.request_job_status === JobStatus.pending || row.request_job_status === JobStatus.new ? (
                           <Chip label="En cours" size="small" style={{ backgroundColor: '#ffc107', color: 'black' }} />
                         ) : row.request_job_status === 'long_pending' ? (
                           <Tooltip title="Cohorte volumineuse: sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.">

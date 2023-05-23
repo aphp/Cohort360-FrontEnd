@@ -72,8 +72,8 @@ const ModalCreateNewRequest: React.FC<{
     if (projectState && projectState.projectsList && projectState.projectsList.length > 0) {
       projectsList = projectState.projectsList
     } else {
-      const myProjects = (await dispatch<any>(fetchProjects())) || []
-      projectsList = myProjects.payload.results
+      const myProjects = (await dispatch(fetchProjects()).unwrap()) || []
+      projectsList = myProjects.projectsList
     }
     // Auto select newset project folder
     // + Auto set the new project folder with 'Projet de recherche ...'
@@ -94,9 +94,9 @@ const ModalCreateNewRequest: React.FC<{
     if (requestState && requestState.requestsList) {
       _onChangeValue('name', `Nouvelle requête ${(requestState?.requestsList.length || 0) + 1}`)
     } else {
-      const requestResponse = await dispatch<any>(fetchRequests())
+      const requestResponse = await dispatch(fetchRequests()).unwrap()
       if (!requestResponse) return
-      _onChangeValue('name', `Nouvelle requête ${(requestResponse?.payload?.count || 0) + 1}`)
+      _onChangeValue('name', `Nouvelle requête ${(requestResponse?.count || 0) + 1}`)
     }
   }
 
@@ -145,19 +145,19 @@ const ModalCreateNewRequest: React.FC<{
       if (newProject) {
         currentRequest.parent_folder = newProject.uuid
       }
-      dispatch<any>(fetchProjects())
+      dispatch(fetchProjects())
     }
 
     if (isEdition) {
-      dispatch<any>(editRequest({ editedRequest: currentRequest }))
+      dispatch(editRequest({ editedRequest: currentRequest }))
     } else {
-      dispatch<any>(addRequest({ newRequest: currentRequest }))
+      dispatch(addRequest({ newRequest: currentRequest }))
     }
   }
 
   const handleConfirmOpen = () => {
     if (tab === 'open' && openRequest !== null) {
-      dispatch<any>(fetchRequestCohortCreation({ requestId: openRequest }))
+      dispatch(fetchRequestCohortCreation({ requestId: openRequest }))
     }
   }
 
@@ -165,7 +165,7 @@ const ModalCreateNewRequest: React.FC<{
     if (loading || !isEdition || !selectedRequest) return
     setLoading(true)
 
-    dispatch<any>(deleteRequest({ deletedRequest: selectedRequest }))
+    dispatch(deleteRequest({ deletedRequest: selectedRequest }))
   }
 
   return (

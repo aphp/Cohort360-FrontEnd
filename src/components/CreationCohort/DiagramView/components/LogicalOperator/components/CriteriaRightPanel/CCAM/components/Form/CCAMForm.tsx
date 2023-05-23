@@ -34,7 +34,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
 
   const _onSubmit = () => {
     onChangeSelectedCriteria(currentState)
-    dispatch<any>(fetchProcedure())
+    dispatch(fetchProcedure())
   }
 
   const getCCAMOptions = async (searchValue: string) => {

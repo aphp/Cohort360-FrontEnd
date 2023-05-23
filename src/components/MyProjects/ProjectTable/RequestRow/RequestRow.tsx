@@ -37,11 +37,11 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
   const maintenanceIsActive = meState?.maintenance?.active
 
   const onEditRequest = (requestId: string) => {
-    dispatch<any>(setSelectedRequest({ uuid: requestId, name: '' }))
+    dispatch(setSelectedRequest({ uuid: requestId, name: '' }))
   }
 
   const onShareRequest = (requestId: string) => {
-    dispatch<any>(setSelectedRequestShare({ uuid: requestId, name: '' }))
+    dispatch(setSelectedRequestShare({ uuid: requestId, name: '' }))
   }
 
   useEffect(() => {

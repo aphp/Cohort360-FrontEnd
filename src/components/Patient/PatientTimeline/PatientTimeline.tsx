@@ -163,7 +163,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   const { patientId } = useParams<{ patientId: string }>()
 
   useEffect(() => {
-    dispatch<any>(
+    dispatch(
       fetchAllProcedures({
         // @ts-ignore
         patientId,

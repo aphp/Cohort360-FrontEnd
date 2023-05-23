@@ -56,13 +56,13 @@ const PopulationCard: React.FC = () => {
       subItems: []
     }))
 
-    dispatch<any>(buildCohortCreation({ selectedPopulation: _selectedPopulations }))
+    dispatch(buildCohortCreation({ selectedPopulation: _selectedPopulations }))
     onChangeOpenDrawer(false)
   }
 
   const fetchScopeTree = () => {
     if (scopesList && scopesList.length === 0) {
-      dispatch<any>(fetchScopesList())
+      dispatch(fetchScopesList())
     }
   }
 

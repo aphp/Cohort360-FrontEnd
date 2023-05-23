@@ -38,8 +38,8 @@ const TemporalConstraint: React.FC<{
   const dispatch = useAppDispatch()
 
   const handleConfirm = () => {
-    dispatch<any>(updateTemporalConstraints(newConstraintsList))
-    dispatch<any>(buildCohortCreation({}))
+    dispatch(updateTemporalConstraints(newConstraintsList))
+    dispatch(buildCohortCreation({}))
   }
 
   const handleClose = () => {
