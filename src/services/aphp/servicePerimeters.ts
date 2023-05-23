@@ -1,5 +1,4 @@
 import { AccessExpiration, AccessExpirationsProps, CohortData, ScopePage, ScopeTreeRow } from 'types'
-import { IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   getAgeRepartitionMapAphp,
   getEncounterRepartitionMapAphp,
@@ -13,6 +12,7 @@ import { fetchEncounter, fetchGroup, fetchPatient, fetchScope, fetchAccessExpira
 import apiBackend from '../apiBackend'
 import { sortByQuantityAndName } from 'utils/scopeTree'
 import { AxiosResponse } from 'axios'
+import { Group } from 'fhir/r4'
 
 const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
@@ -103,7 +103,7 @@ export interface IServicePerimeters {
    * Arguments:
    *   - perimetersId: ID du périmètre (liste d'ID séparé par des virgules)
    */
-  fetchPerimetersRights: (perimeters: IGroup[]) => Promise<IGroup[]>
+  fetchPerimetersRights: (perimeters: Group[]) => Promise<Group[]>
   /**
    * effectuer une recherche textuelle dans la liste des périmètres
    * @param page : le numéro de la page qu'on veut récupérer, par défaut c'est la 1ière page.

@@ -10,9 +10,9 @@ import {
   AgeRepartitionType,
   GenderRepartitionType,
   searchInputError,
-  errorDetails
+  errorDetails,
+  PatientGenderKind
 } from 'types'
-import { IPatient, PatientGenderKind, IIdentifier, IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   getGenderRepartitionMapAphp,
   getEncounterRepartitionMapAphp,
@@ -34,6 +34,7 @@ import {
 import { ODD_EXPORT } from '../../constants'
 
 import apiBackend from '../apiBackend'
+import { DocumentReference, Identifier } from 'fhir/r4'
 
 export interface IServiceCohorts {
   /**
@@ -97,7 +98,7 @@ export interface IServiceCohorts {
   ) => Promise<
     | {
         totalPatients: number
-        originalPatients: IPatient[] | undefined
+        originalPatients: Patient[] | undefined
         agePyramidData?: AgeRepartitionType
         genderRepartitionMap?: GenderRepartitionType
       }
@@ -142,7 +143,7 @@ export interface IServiceCohorts {
     totalAllDocs: number
     totalPatientDocs: number
     totalAllPatientDocs: number
-    documentsList: IDocumentReference[]
+    documentsList: DocumentReference[]
   }>
 
   /**
@@ -165,7 +166,7 @@ export interface IServiceCohorts {
    * Retourne:
    *   - IComposition_Section: Contenu du document
    */
-  fetchDocumentContent: (compositionId: string) => Promise<IDocumentReference>
+  fetchDocumentContent: (compositionId: string) => Promise<DocumentReference>
 
   /**
    * Permet de récupérer le contenu d'un document (/Binary)
@@ -772,7 +773,7 @@ export default servicesCohorts
 
 const getDocumentInfos: (
   deidentifiedBoolean: boolean,
-  documents?: IDocumentReference[],
+  documents?: DocumentReference[],
   groupId?: string,
   signal?: AbortSignal
 ) => Promise<CohortComposition[]> = async (deidentifiedBoolean: boolean, documents, groupId, signal) => {
@@ -822,7 +823,7 @@ const getDocumentInfos: (
 
         document.IPP = patient.id ?? 'Inconnu'
         if (patient.identifier) {
-          const ipp = patient.identifier.find((identifier: IIdentifier) => {
+          const ipp = patient.identifier.find((identifier: Identifier) => {
             return identifier.type?.coding?.[0].code === 'IPP'
           })
           document.IPP = ipp?.value ?? 'Inconnu'
@@ -842,7 +843,7 @@ const getDocumentInfos: (
 
         document.NDA = encounter.id ?? 'Inconnu'
         if (encounter.identifier) {
-          const nda = encounter.identifier.find((identifier: IIdentifier) => {
+          const nda = encounter.identifier.find((identifier: Identifier) => {
             return identifier.type?.coding?.[0].code === 'NDA'
           })
           document.NDA = nda?.value ?? 'Inconnu'

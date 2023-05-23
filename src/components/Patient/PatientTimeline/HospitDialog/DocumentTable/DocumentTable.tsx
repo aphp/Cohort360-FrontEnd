@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 
-import { CohortComposition } from 'types'
-import { CompositionStatusKind, DocumentReferenceStatusKind } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { CohortComposition, CompositionStatusKind, DocumentReferenceStatusKind } from 'types'
 
 import {
   Chip,

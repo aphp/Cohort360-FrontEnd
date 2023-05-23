@@ -1,5 +1,4 @@
 import { Cohort, CohortData } from 'types'
-import { IGroup_Member } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { login, logout } from './me'
 import { RootState } from 'state'
@@ -8,6 +7,7 @@ import { ODD_EXPORT } from '../constants'
 
 import services from 'services/aphp'
 import servicesPerimeters from '../services/aphp/servicePerimeters'
+import { GroupMember } from 'fhir/r4'
 
 export type ExploredCohortState = {
   importedPatients: any[]
@@ -307,7 +307,7 @@ const exploredCohortSlice = createSlice({
       state.originalPatients = originalPatients
       state.excludedPatients = excludedPatients
     },
-    updateCohort: (state: ExploredCohortState, action: PayloadAction<IGroup_Member[]>) => {
+    updateCohort: (state: ExploredCohortState, action: PayloadAction<GroupMember[]>) => {
       return {
         ...state,
         cohort:

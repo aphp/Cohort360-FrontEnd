@@ -4,16 +4,16 @@ import { CircularProgress, Grid, Typography, TableRow, TableCell } from '@mui/ma
 
 import DataTable from 'components/DataTable/DataTable'
 
-import { IClaim, IProcedure, ICondition } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { Column, Order, PMSIEntry } from 'types'
 
 import useStyles from './styles'
+import { Claim, Condition, Procedure } from 'fhir/r4'
 
 type DataTablePmsiProps = {
   loading: boolean
   deidentified: boolean
   selectedTab: 'diagnostic' | 'ghm' | 'ccam'
-  pmsiList: PMSIEntry<IProcedure | ICondition | IClaim>[]
+  pmsiList: PMSIEntry<Procedure | Condition | Claim>[]
   order: Order
   setOrder?: (order: Order) => void
   page?: number
@@ -78,7 +78,7 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
 }
 
 const DataTablePmsiLine: React.FC<{
-  pmsi: PMSIEntry<IProcedure | ICondition | IClaim>
+  pmsi: PMSIEntry<Procedure | Condition | Claim>
   selectedTab: 'diagnostic' | 'ghm' | 'ccam'
 }> = ({ pmsi, selectedTab }) => {
   const classes = useStyles()

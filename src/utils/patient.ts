@@ -1,5 +1,4 @@
-import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { VitalStatus } from 'types'
+import { PatientGenderKind, VitalStatus } from 'types'
 
 export const genderName = (gender: PatientGenderKind) => {
   switch (gender) {

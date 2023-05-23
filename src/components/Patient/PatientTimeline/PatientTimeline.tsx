@@ -18,7 +18,6 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import { CohortComposition, CohortEncounter, PMSIEntry } from 'types'
-import { IEncounter, IProcedure, IDocumentReference, IPeriod, ICondition } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
@@ -28,6 +27,7 @@ import { fetchAllProcedures } from 'state/patient'
 import services from 'services/aphp'
 
 import useStyles from './styles'
+import { Condition, DocumentReference, Encounter, Period, Procedure } from 'fhir/r4'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -35,12 +35,12 @@ type MonthVisit = {
   hospit: {
     start?: string
     end?: string
-    data: IEncounter | CohortEncounter
+    data: Encounter | CohortEncounter
   }[]
   pmsi: {
     start?: string
     end?: string
-    data: PMSIEntry<IProcedure | ICondition>
+    data: PMSIEntry<Procedure | Condition>
   }[]
 }
 
@@ -50,7 +50,7 @@ type TimelineData = {
   }
 }
 
-const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<IProcedure> | PMSIEntry<ICondition>) => {
+const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<Procedure> | PMSIEntry<Condition>) => {
   const dataItem: {
     start?: string
     end?: string
@@ -74,8 +74,8 @@ const getTimelineFormattedDataItem = (item: CohortEncounter | PMSIEntry<IProcedu
 
 const generateTimelineFormattedData = (
   hospits?: CohortEncounter[],
-  consults?: PMSIEntry<IProcedure>[],
-  diagnostics?: PMSIEntry<ICondition>[],
+  consults?: PMSIEntry<Procedure>[],
+  diagnostics?: PMSIEntry<Condition>[],
   selectedTypes?: { id: string; label: string }[]
 ): TimelineData => {
   const data: TimelineData = {}
@@ -132,10 +132,10 @@ const generateTimelineFormattedData = (
 type PatientTimelineTypes = {
   loadingPmsi: boolean
   deidentified: boolean
-  documents?: (CohortComposition | IDocumentReference)[]
+  documents?: (CohortComposition | DocumentReference)[]
   hospits?: CohortEncounter[]
-  consults?: IProcedure[]
-  diagnostics?: ICondition[]
+  consults?: Procedure[]
+  diagnostics?: Condition[]
 }
 const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   loadingPmsi,
@@ -210,7 +210,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
     ).reverse()
   }
 
-  const handleClickOpenHospitDialog = async (hospitOrConsult?: CohortEncounter | PMSIEntry<IProcedure>) => {
+  const handleClickOpenHospitDialog = async (hospitOrConsult?: CohortEncounter | PMSIEntry<Procedure>) => {
     if (hospitOrConsult) {
       setLoading(true)
       setOpenHospitDialog(true)
@@ -245,7 +245,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   }
 
   const getMonthComponent = (monthVisits: MonthVisit) => {
-    const getComponentSize = (period?: IPeriod) => {
+    const getComponentSize = (period?: Period) => {
       // get the size of the hospit dot
       if (period) {
         if (period.end) {
