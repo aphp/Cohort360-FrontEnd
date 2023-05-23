@@ -146,7 +146,7 @@ const Welcome: React.FC = () => {
                     severity="warning"
                     className={classes.alert}
                   >
-                    Attention, vos accès au périmetre suivant: {item.perimeter}, arriveront à expiration dans{' '}
+                    Attention, votre accès au périmetre suivant: {item.perimeter}, arrivera à expiration dans{' '}
                     {item.leftDays} jour{item.leftDays > 1 ? 's' : ''}. Veuillez vous rapprocher de votre référent EDS
                     pour faire renouveler vos accès à l'application.
                   </Alert>
