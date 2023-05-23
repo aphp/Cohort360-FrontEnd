@@ -360,9 +360,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
       })
     ).unwrap()
     if (expandResponse && !expandResponse.aborted) {
-      const _selectedItems = expandResponse.selectedItems ?? []
       setRootRows(expandResponse.scopesList ?? [])
-      onChangeSelectedItem(_selectedItems)
     }
   }
 

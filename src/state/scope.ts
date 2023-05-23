@@ -126,7 +126,7 @@ const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScop
       openPopulation = state.openPopulation
     }
     let _rootRows = scopesList ? [...scopesList] : []
-    let savedSelectedItems = params.selectedItems ? [...params.selectedItems] : []
+    const savedSelectedItems = params.selectedItems ? [...params.selectedItems] : []
     let _openPopulation = openPopulation ? [...openPopulation] : []
 
     const index = _openPopulation.indexOf(params.rowId)
@@ -154,14 +154,6 @@ const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScop
             item = { ...item, subItems: await replaceSubItems(item.subItems, type) }
           }
           _items = [..._items, item]
-
-          // Check if element is selected, if true => add sub items to savedSelectedItems
-          const isSelected = savedSelectedItems.find(
-            (savedSelectedItem: ScopeTreeRow) => savedSelectedItem.id === item.id
-          )
-          if (isSelected !== undefined && item.subItems && item.subItems.length > 0) {
-            savedSelectedItems = [...savedSelectedItems, ...item.subItems]
-          }
         }
         return _items
       }
