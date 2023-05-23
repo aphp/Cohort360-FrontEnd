@@ -895,7 +895,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           <Chip
             className={classes.criteriaChip}
             label={
-              <Typography>{`Nombre d'occurrence ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
+              <Typography>{`Nombre d'occurrences ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
             }
           />
         ),

@@ -26,13 +26,16 @@ type OccurrenceInputsProps = {
 
 const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
   const { form, selectedCriteria, onChangeValue } = props
-
   const classes = useStyles()
+
+  const allowOnlyPositiveIntegers = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (Number.isNaN(+event.key) && event.key !== 'Backspace') event.preventDefault()
+  }
 
   return (
     <>
       <FormLabel style={{ padding: '0 1em 8px', display: 'flex', alignItems: 'center' }} component="legend">
-        Nombre d'occurrence
+        Nombre d'occurrences
         {(form == 'ccam' || form === 'cim10' || form === 'ghm' || form == 'biology') && (
           <Tooltip
             title={
@@ -70,11 +73,12 @@ const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
         <TextField
           required
           inputProps={{
-            min: 1
+            min: 0
           }}
           type="number"
           id="criteria-occurrence-required"
           value={selectedCriteria.occurrence}
+          onKeyDown={(e) => allowOnlyPositiveIntegers(e)}
           onChange={(e) => onChangeValue('occurrence', e.target.value)}
         />
       </Grid>
