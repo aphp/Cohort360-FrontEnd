@@ -24,7 +24,16 @@ import logoAPHP from 'assets/images/logo-aphp.png'
 
 import { useAppDispatch } from 'state'
 import { login as loginAction } from 'state/me'
-import { ACCES_TOKEN, REFRESH_TOKEN } from '../../constants'
+import {
+  ACCES_TOKEN,
+  REFRESH_TOKEN,
+  OIDC_CLIENT_ID,
+  OIDC_PROVIDER_URL,
+  OIDC_REDIRECT_URI,
+  OIDC_RESPONSE_TYPE,
+  OIDC_SCOPE,
+  OIDC_STATE
+} from '../../constants'
 
 import services from 'services/aphp'
 
