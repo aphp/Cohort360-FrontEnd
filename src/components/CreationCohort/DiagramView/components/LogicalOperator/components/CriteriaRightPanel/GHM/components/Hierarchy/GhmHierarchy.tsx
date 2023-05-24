@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import clsx from 'clsx'
 
 import {
   Button,
@@ -42,7 +41,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
   const { ghmItem, selectedItems, handleClick } = props
   const { id, label, subItems } = ghmItem
 
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
 
   const ghmHierarchy = useAppSelector((state) => state.pmsi.claim.list || {})
@@ -75,7 +74,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(ghmItem)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}
@@ -95,7 +94,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(ghmItem)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}

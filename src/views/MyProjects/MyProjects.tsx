@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import clsx from 'clsx'
 
 import { Alert, Button, IconButton, CircularProgress, Grid, Hidden, Tooltip, Typography, Snackbar } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
@@ -33,7 +32,7 @@ import { MeState } from 'state/me'
 import useStyles from './styles'
 
 const MyProjects: React.FC<{}> = () => {
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
 
   const [searchInput, setSearchInput] = useState('')
@@ -103,7 +102,7 @@ const MyProjects: React.FC<{}> = () => {
       <Grid
         container
         direction="column"
-        className={clsx(classes.appBar, {
+        className={cx(classes.appBar, {
           [classes.appBarShift]: open
         })}
       >
@@ -119,7 +118,7 @@ const MyProjects: React.FC<{}> = () => {
       <Grid
         container
         direction="column"
-        className={clsx(classes.appBar, {
+        className={cx(classes.appBar, {
           [classes.appBarShift]: open
         })}
       >

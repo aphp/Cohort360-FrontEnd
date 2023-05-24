@@ -3,18 +3,17 @@ import React from 'react'
 import { Grid, Skeleton, Typography } from '@mui/material'
 
 import useStyles from './styles'
-import clsx from 'clsx'
 
 type PatientFieldProps = {
   fieldName: string
   fieldValue?: string | number | string[]
 }
 const PatientField: React.FC<PatientFieldProps> = ({ fieldName, fieldValue }) => {
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
 
   return (
     <Grid container>
-      <Grid item container xs={3} lg={2} alignItems="center" className={clsx(classes.gridItem, classes.fieldName)}>
+      <Grid item container xs={3} lg={2} alignItems="center" className={cx(classes.gridItem, classes.fieldName)}>
         <Typography variant="h6">{fieldName}</Typography>
       </Grid>
       <Grid item container xs={9} lg={10} alignItems="center" className={classes.gridItem}>

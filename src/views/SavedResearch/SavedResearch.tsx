@@ -6,17 +6,16 @@ import { CssBaseline, Grid, Typography } from '@mui/material'
 import Research from 'components/SavedResearch/ResearchCard'
 
 import useStyles from './styles'
-import clsx from 'clsx'
 
 const SavedResearches = () => {
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
   const open = useAppSelector((state) => state.drawer)
 
   return (
     <Grid
       container
       direction="column"
-      className={clsx(classes.appBar, {
+      className={cx(classes.appBar, {
         [classes.appBarShift]: open
       })}
     >

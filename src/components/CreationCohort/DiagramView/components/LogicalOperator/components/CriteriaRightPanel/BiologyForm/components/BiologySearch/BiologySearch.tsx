@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import clsx from 'clsx'
 
 import {
   Breadcrumbs,
@@ -38,7 +37,7 @@ type BiologySearchListItemProps = {
 const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
   const { label, biologyItem, selectedItems, handleClick } = props
 
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
 
   const isSelected = selectedItems
     ? selectedItems.find((item) => item.target[0].code === biologyItem.target[0].code)
@@ -61,7 +60,7 @@ const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
       <ListItemIcon>
         <div
           onClick={() => handleClickOnList(biologyItem)}
-          className={clsx(classes.indicator, {
+          className={cx(classes.indicator, {
             [classes.selectedIndicator]: isSelected
           })}
           style={{ color: '#0063af', cursor: 'pointer' }}

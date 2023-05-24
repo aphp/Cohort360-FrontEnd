@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import clsx from 'clsx'
 import { useAppSelector } from 'state'
 import { useParams } from 'react-router'
 
@@ -16,7 +15,7 @@ import { SearchByTypes, Order } from 'types'
 import useStyles from './styles'
 
 const SearchPatient: React.FC<{}> = () => {
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
   const practitioner = useAppSelector((state) => state.me)
   const { search } = useParams<{ search: string }>()
 
@@ -72,7 +71,7 @@ const SearchPatient: React.FC<{}> = () => {
     <Grid
       container
       direction="column"
-      className={clsx(classes.appBar, {
+      className={cx(classes.appBar, {
         [classes.appBarShift]: open
       })}
     >

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import clsx from 'clsx'
 
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
@@ -17,7 +16,7 @@ import { filterScopeTree } from 'utils/scopeTree'
 import useStyles from './styles'
 
 const Scope = () => {
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
@@ -46,7 +45,7 @@ const Scope = () => {
       container
       direction="column"
       position="fixed"
-      className={clsx(classes.appBar, {
+      className={cx(classes.appBar, {
         [classes.appBarShift]: open
       })}
       style={{ height: '100%', overflow: 'auto' }}
@@ -72,7 +71,7 @@ const Scope = () => {
           item
           xs={11}
           justifyContent="center"
-          className={clsx(classes.bottomBar, {
+          className={cx(classes.bottomBar, {
             [classes.bottomBarShift]: open
           })}
         >

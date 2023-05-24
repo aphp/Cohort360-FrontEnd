@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import clsx from 'clsx'
 
 import {
   Button,
@@ -43,7 +42,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
   const { biologyItem, selectedItems, handleClick } = props
   const { id, label, subItems } = biologyItem
 
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
 
   const biologyHierarchy = useAppSelector((state) => state.biology.list || {})
@@ -82,7 +81,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(biologyItem)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}
@@ -102,7 +101,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(biologyItem)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}

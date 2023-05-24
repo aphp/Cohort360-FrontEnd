@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import clsx from 'clsx'
 
 import {
   Button,
@@ -46,7 +45,7 @@ const largeDrawerWidth = 260
 export { smallDrawerWidth, largeDrawerWidth }
 
 const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
@@ -105,7 +104,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
         <Drawer
           variant="permanent"
           classes={{
-            paper: clsx(classes.drawer, {
+            paper: cx(classes.drawer, {
               [classes.drawerOpen]: open,
               [classes.drawerClose]: !open
             })
@@ -120,7 +119,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               disableRipple
               disableFocusRipple
               onClick={() => handleDrawerOpenOrClose(!open)}
-              className={clsx({
+              className={cx({
                 [classes.closeDrawerButton]: open,
                 [classes.menuButton]: !open
               })}
@@ -146,7 +145,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 </Grid>
                 <Grid container xs={2} item>
                   <ListItemIcon
-                    className={clsx(classes.logoutButton, {
+                    className={cx(classes.logoutButton, {
                       [classes.hide]: !open
                     })}
                   >
@@ -192,7 +191,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   <Tooltip title="Nouvelle requête">
                     <IconButton
                       onClick={handleNewRequest}
-                      className={clsx(classes.miniButton, classes.button)}
+                      className={cx(classes.miniButton, classes.button)}
                       disabled={maintenanceIsActive}
                     >
                       <AddIcon />
@@ -203,7 +202,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
                     <Button
                       onClick={handleNewRequest}
-                      className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                      className={cx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
                         [classes.hide]: !open
                       })}
                       disabled={maintenanceIsActive}
@@ -216,7 +215,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                 ) : (
                   <Button
                     onClick={handleNewRequest}
-                    className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                    className={cx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
                       [classes.hide]: !open
                     })}
                     disabled={maintenanceIsActive}
@@ -234,7 +233,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     <Tooltip title="Nouvelle requête">
                       <IconButton
                         onClick={handleNewRequest}
-                        className={clsx(classes.miniButton, classes.button)}
+                        className={cx(classes.miniButton, classes.button)}
                         disabled={maintenanceIsActive}
                       >
                         <AddIcon />
@@ -245,7 +244,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
                       <Button
                         onClick={handleNewRequest}
-                        className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                        className={cx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
                           [classes.hide]: !open
                         })}
                         disabled={maintenanceIsActive}
@@ -258,7 +257,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   ) : (
                     <Button
                       onClick={handleNewRequest}
-                      className={clsx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
+                      className={cx(classes.linkHover, classes.newCohortButton, classes.searchButton, {
                         [classes.hide]: !open
                       })}
                       disabled={maintenanceIsActive}
@@ -274,7 +273,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     <Tooltip title="Modifier la requête en cours">
                       <IconButton
                         onClick={() => navigate('/cohort/new')}
-                        className={clsx(classes.miniButton, classes.button)}
+                        className={cx(classes.miniButton, classes.button)}
                         disabled={maintenanceIsActive}
                       >
                         <EditIcon />
@@ -285,7 +284,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     <Zoom in={open} timeout={{ appear: 1000, enter: 500, exit: 0 }}>
                       <Button
                         onClick={() => navigate('/cohort/new')}
-                        className={clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
+                        className={cx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
                         disabled={maintenanceIsActive}
                       >
                         <>
@@ -299,7 +298,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   ) : (
                     <Button
                       onClick={() => navigate('/cohort/new')}
-                      className={clsx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
+                      className={cx(classes.editCohortButton, classes.linkHover, classes.searchButton)}
                       disabled={maintenanceIsActive}
                     >
                       <>
@@ -336,7 +335,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             </ListItem>
 
             <Collapse
-              className={clsx(classes.nestedList, { [classes.hide]: !open })}
+              className={cx(classes.nestedList, { [classes.hide]: !open })}
               in={displayPatientList}
               timeout="auto"
               unmountOnExit
@@ -383,7 +382,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
               in={displaySearchList}
               timeout="auto"
               unmountOnExit
-              className={clsx(classes.nestedList, { [classes.hide]: !open })}
+              className={cx(classes.nestedList, { [classes.hide]: !open })}
             >
               <List id="research-collapse">
                 <ListItem>

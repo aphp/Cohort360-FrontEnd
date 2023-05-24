@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react'
-import clsx from 'clsx'
 
 import {
   Grid,
@@ -40,7 +39,7 @@ const DataTable: React.FC<DataTableProps> = ({
   total,
   ...props
 }) => {
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
 
   const createSortHandler = (property: any) => () => {
     if (setOrder) {
@@ -97,7 +96,7 @@ const DataTable: React.FC<DataTableProps> = ({
                               </TableSortLabel>
                             ) : (
                               <Typography
-                                className={clsx([classes.multiple, classes.tableHeadCell, classes.tableHeadLabel])}
+                                className={cx([classes.multiple, classes.tableHeadCell, classes.tableHeadLabel])}
                               >
                                 {subColumn.label}
                               </Typography>

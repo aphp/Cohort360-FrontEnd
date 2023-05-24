@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useAppSelector } from 'state'
-import clsx from 'clsx'
 
 import {
   Alert,
@@ -47,7 +46,7 @@ const ERROR_OBJECT = 'error_object'
 const ERROR_MESSAGE = 'error_message'
 
 const Contact: React.FC = () => {
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
   const { open } = useAppSelector((state) => ({
     open: state.drawer
   }))
@@ -116,7 +115,7 @@ const Contact: React.FC = () => {
 
   return (
     <>
-      <Grid container direction="column" className={clsx(classes.appBar, { [classes.appBarShift]: open })}>
+      <Grid container direction="column" className={cx(classes.appBar, { [classes.appBarShift]: open })}>
         <Grid container direction="column" alignItems="center">
           <CssBaseline />
           <Grid container item direction="column" xs={11}>
