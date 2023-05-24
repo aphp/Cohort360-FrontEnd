@@ -84,7 +84,7 @@ type fetchPatientProps = {
   given?: string
   identifier?: string
   deceased?: boolean
-  pivotFacet?: ('extension.age-month_gender' | 'deceased_gender')[]
+  pivotFacet?: ('age-month_gender' | 'deceased_gender')[]
   _elements?: ('id' | 'gender' | 'name' | 'birthDate' | 'deceased' | 'identifier' | 'extension')[]
   deidentified?: boolean
   signal?: AbortSignal
