@@ -21,7 +21,7 @@ const FilterTimelineDialog: React.FC<FilterTimelineDialogProps> = ({
   selectedDiagnosticTypes,
   onChangeSelectedDiagnosticTypes
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>(selectedDiagnosticTypes)
 

@@ -10,7 +10,7 @@ import clsx from 'clsx'
 import useStyles from './styles'
 
 const PageNotFound: React.FC = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <>

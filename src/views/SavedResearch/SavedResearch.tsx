@@ -9,7 +9,7 @@ import useStyles from './styles'
 import clsx from 'clsx'
 
 const SavedResearches = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const open = useAppSelector((state) => state.drawer)
 
   return (

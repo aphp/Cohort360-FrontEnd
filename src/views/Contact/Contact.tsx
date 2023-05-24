@@ -47,7 +47,7 @@ const ERROR_OBJECT = 'error_object'
 const ERROR_MESSAGE = 'error_message'
 
 const Contact: React.FC = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const { open } = useAppSelector((state) => ({
     open: state.drawer
   }))

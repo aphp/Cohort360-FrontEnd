@@ -36,7 +36,7 @@ import useStyles from '../styles'
 import { JobStatus } from '../../../../utils/constants'
 
 const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<null | string>(null)
 

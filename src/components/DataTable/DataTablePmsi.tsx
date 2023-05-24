@@ -31,7 +31,7 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
   setPage,
   total
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const columns = [
     { label: `NDA${deidentified ? ' chiffré' : ''}`, code: '', align: 'left', sortableColumn: false },
@@ -81,7 +81,7 @@ const DataTablePmsiLine: React.FC<{
   pmsi: PMSIEntry<IProcedure | ICondition | IClaim>
   selectedTab: 'diagnostic' | 'ghm' | 'ccam'
 }> = ({ pmsi, selectedTab }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const nda = pmsi.NDA
   const date =

@@ -29,7 +29,7 @@ const Dashboard: React.FC<{
   }>()
 
   const dispatch = useAppDispatch()
-  const classes = useStyles()
+  const { classes } = useStyles()
   const location = useLocation()
 
   const perimetreIds = location.search.substr(1)

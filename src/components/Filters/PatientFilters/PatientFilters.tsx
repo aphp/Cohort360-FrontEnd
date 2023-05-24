@@ -28,7 +28,7 @@ type PatientFiltersProps = {
 }
 
 const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit, filters, onChangeFilters }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [_gender, setGender] = useState<PatientGenderKind>(filters.gender)
   const [birthdatesRanges, setBirthdatesRanges] = useState<[string, string]>(filters.birthdatesRanges)

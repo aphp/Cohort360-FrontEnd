@@ -21,7 +21,7 @@ type PopulationRightPanelProps = {
 const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
   const { open, onConfirm, onClose } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const { selectedPopulation = [] } = useAppSelector((state) => state.cohortCreation.request || {})
   const [_selectedPopulation, onChangeSelectedPopulation] = useState<ScopeTreeRow[]>([])

@@ -46,7 +46,7 @@ const largeDrawerWidth = 260
 export { smallDrawerWidth, largeDrawerWidth }
 
 const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 

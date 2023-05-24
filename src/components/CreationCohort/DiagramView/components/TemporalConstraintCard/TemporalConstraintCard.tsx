@@ -28,7 +28,7 @@ const TemporalConstraint: React.FC = () => {
     findInitialStateRadio?.constraintType === 'none' ? temporalConstraints.length - 1 : temporalConstraints.length
 
   const dispatch = useAppDispatch()
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const mainGroupCriteriaIds = criteriaGroup[0].criteriaIds
   const selectableCriteria = selectedCriteria.filter(

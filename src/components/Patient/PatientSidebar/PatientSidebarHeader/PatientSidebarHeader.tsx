@@ -42,7 +42,7 @@ type PatientSidebarHeaderTypes = {
   onChangeSort: (sort: Sort) => void
 }
 const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const _onChangeSelect = (
     event: React.ChangeEvent<{}>,

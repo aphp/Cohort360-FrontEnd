@@ -56,7 +56,7 @@ type TopBarProps = {
 }
 
 const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 

@@ -14,7 +14,7 @@ type PatientPreviewProps = {
   deidentifiedBoolean: boolean
 }
 const PatientPreview: React.FC<PatientPreviewProps> = ({ patient, deidentifiedBoolean }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   if (!patient) return <></>
 

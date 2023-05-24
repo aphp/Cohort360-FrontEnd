@@ -20,7 +20,7 @@ import { getSelectedScopes, filterScopeTree } from 'utils/scopeTree'
 import useStyles from './styles'
 
 const PopulationCard: React.FC = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const isRendered = useRef<boolean>(false)
 

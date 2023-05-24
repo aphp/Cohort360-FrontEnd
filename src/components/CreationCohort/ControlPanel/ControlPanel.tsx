@@ -47,7 +47,7 @@ const ControlPanel: React.FC<{
   onUndo?: () => void
   onRedo?: () => void
 }> = ({ onExecute, onUndo, onRedo }) => {
-  const classes = useStyle()
+  const { classes } = useStyle()
   const dispatch = useAppDispatch()
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
   const [oldCount, setOldCount] = useState<any | null>(null)

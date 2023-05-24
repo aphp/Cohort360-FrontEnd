@@ -17,7 +17,7 @@ type RequestFormProps = {
 }
 
 const RequestForm: React.FC<RequestFormProps> = ({ parentId, goBack }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
   const { projectState, requestState } = useAppSelector((state) => ({

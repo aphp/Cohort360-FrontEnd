@@ -28,7 +28,7 @@ const YoutubeEmbed = ({ embedId }) => (
 )
 
 const TutorialsCard = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [currentIndex, setCurrentIndex] = useState(0)
 

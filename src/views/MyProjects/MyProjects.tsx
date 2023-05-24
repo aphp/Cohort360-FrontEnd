@@ -33,7 +33,7 @@ import { MeState } from 'state/me'
 import useStyles from './styles'
 
 const MyProjects: React.FC<{}> = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
   const [searchInput, setSearchInput] = useState('')

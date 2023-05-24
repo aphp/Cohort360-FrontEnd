@@ -43,7 +43,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   duplicateCriteria,
   editCriteria
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const { request } = useAppSelector((state) => state.cohortCreation || {})
   const { loading = false, criteriaGroup = [], selectedCriteria = [] } = request

@@ -7,7 +7,7 @@ import Divider from '@mui/material/Divider'
 import news from './news.json'
 
 export default function TutorialsCard() {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <>

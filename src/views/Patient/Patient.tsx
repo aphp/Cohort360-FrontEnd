@@ -27,7 +27,7 @@ import useStyles from './styles'
 const Patient = () => {
   const dispatch = useAppDispatch()
   const location = useLocation()
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const { open, cohort, patient } = useAppSelector((state) => ({
     open: state.drawer,

@@ -41,7 +41,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultDemographic)
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [error, setError] = useState(false)
   const [ageError, setAgeError] = useState(false)

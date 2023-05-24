@@ -17,7 +17,7 @@ const DiagramView: React.FC = () => {
 
   const maintenanceIsActive = meState?.maintenance?.active
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <Grid container className={classes.root}>

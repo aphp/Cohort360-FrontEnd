@@ -42,7 +42,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
   const { ghmItem, selectedItems, handleClick } = props
   const { id, label, subItems } = ghmItem
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
   const ghmHierarchy = useAppSelector((state) => state.pmsi.claim.list || {})
@@ -143,7 +143,7 @@ type GhmHierarchyProps = {
 const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
   const { isOpen = false, selectedCriteria, onChangeSelectedHierarchy, onConfirm, goBack, isEdition } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const isLoadingSyncHierarchyTable = initialState?.loading ?? 0
   const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)

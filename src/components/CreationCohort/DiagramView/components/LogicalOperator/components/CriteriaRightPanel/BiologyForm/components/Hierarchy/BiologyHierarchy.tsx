@@ -43,7 +43,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
   const { biologyItem, selectedItems, handleClick } = props
   const { id, label, subItems } = biologyItem
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
   const biologyHierarchy = useAppSelector((state) => state.biology.list || {})
@@ -153,7 +153,7 @@ type BiologyHierarchyProps = {
 
 const BiologyHierarchy: React.FC<BiologyHierarchyProps> = (props) => {
   const { isOpen = false, selectedCriteria, onChangeSelectedHierarchy, onConfirm, goBack, isEdition } = props
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const isLoadingSyncHierarchyTable = initialState?.loading ?? 0

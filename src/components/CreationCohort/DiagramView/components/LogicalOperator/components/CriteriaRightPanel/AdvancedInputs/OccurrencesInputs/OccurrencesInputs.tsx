@@ -27,7 +27,7 @@ type OccurrenceInputsProps = {
 const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
   const { form, selectedCriteria, onChangeValue } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <>

@@ -42,7 +42,7 @@ export default function EnhancedTable(props) {
   const onClickRow = props.onClickRow ? props.onClickRow : () => null
   const noPagination = props.noPagination ? props.noPagination : false
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [order, setOrder] = React.useState('desc')
   const [orderBy, setOrderBy] = React.useState(props.defaultSort || '_id')
   const [page, setPage] = React.useState(0)

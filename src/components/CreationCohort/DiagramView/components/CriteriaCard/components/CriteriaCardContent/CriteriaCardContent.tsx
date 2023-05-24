@@ -922,7 +922,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     return content
   }
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const criteria = useAppSelector((state) => state.cohortCreation.criteria)
 

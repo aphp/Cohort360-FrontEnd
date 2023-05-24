@@ -57,7 +57,7 @@ const defaultComposition: DocumentDataType = {
 const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [error, setError] = useState(false)
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)

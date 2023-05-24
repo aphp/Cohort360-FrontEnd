@@ -25,7 +25,7 @@ import { AccessExpiration, Cohort, RequestType } from 'types'
 import useStyles from './styles'
 
 const Welcome: React.FC = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { practitioner, open, cohortState, requestState, meState } = useAppSelector((state) => ({

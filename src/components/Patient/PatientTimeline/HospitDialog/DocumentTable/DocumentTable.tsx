@@ -33,7 +33,7 @@ type DocumentRowTypes = {
   groupId: string
 }
 const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, groupId }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [documentDialogOpen, setDocumentDialogOpen] = useState(false)
 
   const row = {
@@ -103,7 +103,7 @@ type DocumentTableTypes = {
   documentLines: number
 }
 const DocumentTable: React.FC<DocumentTableTypes> = ({ deidentified, documents, page, documentLines }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const search = new URLSearchParams(location.search)
   const groupId = search.get('groupId') ?? ''

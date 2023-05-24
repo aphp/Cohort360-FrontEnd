@@ -14,7 +14,7 @@ import displayDigit from 'utils/displayDigit'
 const PatientSearchCard = () => {
   const [patientNb, setPatientNb] = useState(0)
   const [loading, setLoading] = useState(true)
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   useEffect(() => {
     const _fetchPatientsCount = async () => {

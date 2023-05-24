@@ -15,7 +15,7 @@ type PatientChartsProps = {
   patientData?: { vitalStatusData?: SimpleChartDataType[]; genderData?: SimpleChartDataType[] }
 }
 const PatientCharts: React.FC<PatientChartsProps> = ({ agePyramid, patientData }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <Grid container>

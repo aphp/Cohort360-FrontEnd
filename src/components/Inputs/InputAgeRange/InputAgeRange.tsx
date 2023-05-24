@@ -29,7 +29,7 @@ const InputAgeRange: React.FC<InputAgeRangeAdvancedProps> = ({
   error,
   onError
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const { deidentifiedBoolean = true } = useAppSelector((state) => state.exploredCohort)
 
   const [minState, setMinState] = useState<AgeRangeType>(defaultMinDate)

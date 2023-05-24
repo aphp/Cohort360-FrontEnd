@@ -40,7 +40,7 @@ const DataTable: React.FC<DataTableProps> = ({
   total,
   ...props
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const createSortHandler = (property: any) => () => {
     if (setOrder) {

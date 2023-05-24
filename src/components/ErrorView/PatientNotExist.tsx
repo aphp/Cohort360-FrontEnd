@@ -13,7 +13,7 @@ import { useAppSelector } from 'state'
 import useStyles from './styles'
 
 const PatientNotExist = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const navigate = useNavigate()
 
   const { openDrawer } = useAppSelector((state) => ({ openDrawer: state.drawer }))

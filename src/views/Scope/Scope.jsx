@@ -17,7 +17,7 @@ import { filterScopeTree } from 'utils/scopeTree'
 import useStyles from './styles'
 
 const Scope = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 

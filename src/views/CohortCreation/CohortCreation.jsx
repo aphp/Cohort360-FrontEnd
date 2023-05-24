@@ -6,7 +6,7 @@ import Requeteur from 'components/CreationCohort/Requeteur'
 import useStyles from './styles'
 
 const CohortCreation = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const open = useSelector((state) => state.drawer)
 

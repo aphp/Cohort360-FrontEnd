@@ -28,7 +28,7 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
   setPage,
   total
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const columns: Column[] = [
     { label: `NDA${deidentified ? ' chiffré' : ''}`, code: '', align: 'left', sortableColumn: false },
@@ -76,7 +76,7 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
 const DataTableObservationLine: React.FC<{
   observation: CohortObservation
 }> = ({ observation }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const nda = observation.NDA
   const date = observation.effectiveDateTime

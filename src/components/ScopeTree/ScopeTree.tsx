@@ -65,7 +65,7 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
     isSelected
   } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <>
@@ -143,7 +143,7 @@ type ScopeTreeProps = {
 }
 
 const ScopeTree: React.FC<ScopeTreeProps> = ({ defaultSelectedItems, onChangeSelectedItem, searchInput }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
   const [searchLoading, setSearchLoading] = useState<boolean>(false)

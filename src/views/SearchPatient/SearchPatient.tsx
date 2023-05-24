@@ -16,7 +16,7 @@ import { SearchByTypes, Order } from 'types'
 import useStyles from './styles'
 
 const SearchPatient: React.FC<{}> = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const practitioner = useAppSelector((state) => state.me)
   const { search } = useParams<{ search: string }>()
 

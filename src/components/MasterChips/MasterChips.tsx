@@ -12,7 +12,7 @@ export type MasterChipsProps = {
   }[]
 }
 const MasterChips: React.FC<MasterChipsProps> = ({ chips }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <Grid container>

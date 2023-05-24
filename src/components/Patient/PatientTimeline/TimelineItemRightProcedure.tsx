@@ -34,7 +34,7 @@ const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
       break
   }
 
-  const classes = useStyles({ color: color })
+  const { classes } = useStyles({ color: color })
   return (
     <li className={classes.timelineItem}>
       <div className={classes.timelineRightContent}>

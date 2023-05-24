@@ -30,7 +30,7 @@ const InputSearchDocumentSimple: React.FC<InputSearchDocumentSimpleProps> = ({
   onSearchDocument,
   ...props
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [searchInput, setSearchInput] = useState<string>(defaultSearchInput ?? '')
   const [helpOpen, setHelpOpen] = useState(false)

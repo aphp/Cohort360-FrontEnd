@@ -53,7 +53,7 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
   setPage,
   total
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const columns = [
     {
@@ -126,7 +126,7 @@ const DataTableCompositionLine: React.FC<{
   searchMode: boolean
   groupId?: string
 }> = ({ document, deidentified, showIpp, searchMode, groupId }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [open, setOpen] = useState<string | null>(null)
 
@@ -230,7 +230,7 @@ const DataTableCompositionLine: React.FC<{
 }
 
 const getStatusShip = (type?: CompositionStatusKind | DocumentReferenceStatusKind) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   if (type === 'final' || type === 'current') {
     return (

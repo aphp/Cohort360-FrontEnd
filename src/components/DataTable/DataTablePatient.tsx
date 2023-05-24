@@ -41,7 +41,7 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
   setPage,
   total
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const columns: Column[] = [
     { label: `Sexe`, code: 'gender', align: 'center', sortableColumn: true },
@@ -101,7 +101,7 @@ const DataTablePatientLine: React.FC<{
   groupId?: string
   search?: string
 }> = ({ deidentified, patient, groupId, search }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <TableRow
@@ -177,7 +177,7 @@ type StatusShipProps = {
 }
 
 const StatusShip: React.FC<StatusShipProps> = ({ type }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   if (type === 'Vivant') {
     return <Chip className={classes.validChip} label={type} />
   } else {

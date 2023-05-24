@@ -64,7 +64,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
   sortDirection,
   onRequestSort
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 

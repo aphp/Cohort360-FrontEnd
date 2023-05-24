@@ -10,7 +10,7 @@ type PatientFieldProps = {
   fieldValue?: string | number | string[]
 }
 const PatientField: React.FC<PatientFieldProps> = ({ fieldName, fieldValue }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <Grid container>

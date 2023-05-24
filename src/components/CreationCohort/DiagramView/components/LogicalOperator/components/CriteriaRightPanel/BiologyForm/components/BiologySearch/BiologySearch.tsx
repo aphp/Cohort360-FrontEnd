@@ -38,7 +38,7 @@ type BiologySearchListItemProps = {
 const BiologySearchListItem: React.FC<BiologySearchListItemProps> = (props) => {
   const { label, biologyItem, selectedItems, handleClick } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const isSelected = selectedItems
     ? selectedItems.find((item) => item.target[0].code === biologyItem.target[0].code)
@@ -94,7 +94,7 @@ type BiologySearchProps = {
 
 const BiologySearch: React.FC<BiologySearchProps> = (props) => {
   const { isEdition, criteria, goBack, onChangeSelectedCriteria, onConfirm, selectedCriteria } = props
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [selectedTab, setSelectedTab] = useState<'anabio' | 'loinc'>('anabio')
   const [searchInput, setSearchInput] = useState<string>('')
