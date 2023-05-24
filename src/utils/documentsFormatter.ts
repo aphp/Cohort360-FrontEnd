@@ -1,10 +1,5 @@
-import {
-  CompositionStatusKind,
-  DocumentReferenceStatusKind,
-  EncounterStatusKind
-} from '@ahryman40k/ts-fhir-types/lib/R4'
-
 import docTypes from 'assets/docTypes.json'
+import { CompositionStatusKind, DocumentReferenceStatusKind, EncounterStatusKind } from 'types'
 
 export const getDocumentStatus = (status?: CompositionStatusKind | DocumentReferenceStatusKind): string => {
   switch (status) {

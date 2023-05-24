@@ -1,8 +1,8 @@
-import { IResourceList } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { FHIR_API_Response } from 'types'
 import { AxiosResponse } from 'axios'
+import { FhirResource } from 'fhir/r4'
+import { FHIR_API_Response } from 'types'
 
-export function getApiResponseResources<T extends IResourceList>(
+export function getApiResponseResources<T extends FhirResource>(
   response: AxiosResponse<FHIR_API_Response<T>>
 ): T[] | undefined {
   if (!response || !(response && response.data) || response.data.resourceType === 'OperationOutcome') return undefined

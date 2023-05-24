@@ -10,7 +10,6 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 
 import { getAge, substructAgeString } from 'utils/age'
 import services from 'services/aphp'
-import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortPatient, PatientFilters as PatientFiltersType, SearchByTypes, Sort, VitalStatus } from 'types'
 
 import useStyles from './styles'

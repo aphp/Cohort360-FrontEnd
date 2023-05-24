@@ -8,21 +8,21 @@ import {
   AccessExpiration,
   AccessExpirationsProps
 } from 'types'
-import {
-  IBinary,
-  IClaim,
-  ICondition,
-  IDocumentReference,
-  IEncounter,
-  IGroup,
-  IMedicationAdministration,
-  IMedicationRequest,
-  IObservation,
-  IPatient,
-  IProcedure
-} from '@ahryman40k/ts-fhir-types/lib/R4'
 import { AxiosResponse } from 'axios'
 import apiBackend from '../apiBackend'
+import {
+  Binary,
+  Claim,
+  Condition,
+  DocumentReference,
+  Encounter,
+  Group,
+  MedicationAdministration,
+  MedicationRequest,
+  Patient,
+  Procedure
+} from 'fhir/r4'
+import { Observation } from 'fhir/r4'
 
 const reducer = (accumulator: any, currentValue: any) =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -61,7 +61,7 @@ export const fetchGroup = async (args: fetchGroupProps) => {
   if (managingEntity && managingEntity.length > 0)
     options = [...options, `managing-entity=${managingEntity.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<IGroup>>(`/Group?${options.reduce(optionsReducer)}`)
+  const response = await apiFhir.get<FHIR_API_Response<Group>>(`/Group?${options.reduce(optionsReducer)}`)
 
   return response
 }
@@ -141,7 +141,7 @@ export const fetchPatient = async (args: fetchPatientProps) => {
   if (pivotFacet && pivotFacet.length > 0) options = [...options, `pivotFacet=${pivotFacet.reduce(reducer)}`] // eslint-disable-line
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<IPatient>>(`/Patient?${options.reduce(optionsReducer)}`, {
+  const response = await apiFhir.get<FHIR_API_Response<Patient>>(`/Patient?${options.reduce(optionsReducer)}`, {
     signal: signal
   })
 
@@ -194,7 +194,7 @@ export const fetchEncounter = async (args: fetchEncounterProps) => {
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(reducer)}`] // eslint-disable-line
   if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<IEncounter>>(`/Encounter?${options.reduce(optionsReducer)}`, {
+  const response = await apiFhir.get<FHIR_API_Response<Encounter>>(`/Encounter?${options.reduce(optionsReducer)}`, {
     signal: signal
   })
 
@@ -300,7 +300,7 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   if (uniqueFacet && uniqueFacet.length > 0) options = [...options, `uniqueFacet=${uniqueFacet.reduce(reducer)}`] // eslint-disable-line
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<IDocumentReference>>(
+  const response = await apiFhir.get<FHIR_API_Response<DocumentReference>>(
     `/DocumentReference?${options.reduce(optionsReducer)}`,
     { signal: signal }
   )
@@ -317,7 +317,7 @@ export const fetchCheckDocumentSearchInput = async (searchInput: string, signal?
 }
 
 export const fetchCompositionContent = async (compositionId: string) => {
-  const documentResp = await apiFhir.get<IDocumentReference>(`/DocumentReference/${compositionId}`)
+  const documentResp = await apiFhir.get<DocumentReference>(`/DocumentReference/${compositionId}`)
 
   return documentResp.data ?? []
 }
@@ -339,7 +339,7 @@ export const fetchBinary = async (args: fetchBinaryProps) => {
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
-  const documentResp = await apiFhir.get<IBinary>(`/Binary?${options.reduce(optionsReducer)}`)
+  const documentResp = await apiFhir.get<FHIR_API_Response<Binary>>(`/Binary?${options.reduce(optionsReducer)}`)
 
   return documentResp.data ?? []
 }
@@ -388,7 +388,7 @@ export const fetchProcedure = async (args: fetchProcedureProps) => {
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<IProcedure>>(`/Procedure?${options.reduce(optionsReducer)}`)
+  const response = await apiFhir.get<FHIR_API_Response<Procedure>>(`/Procedure?${options.reduce(optionsReducer)}`)
 
   return response
 }
@@ -437,7 +437,7 @@ export const fetchClaim = async (args: fetchClaimProps) => {
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<IClaim>>(`/Claim?${options.reduce(optionsReducer)}`)
+  const response = await apiFhir.get<FHIR_API_Response<Claim>>(`/Claim?${options.reduce(optionsReducer)}`)
 
   return response
 }
@@ -491,7 +491,7 @@ export const fetchCondition = async (args: fetchConditionProps) => {
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
   if (type && type.length > 0) options = [...options, `type=${type.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<ICondition>>(`/Condition?${options.reduce(optionsReducer)}`)
+  const response = await apiFhir.get<FHIR_API_Response<Condition>>(`/Condition?${options.reduce(optionsReducer)}`)
 
   return response
 }
@@ -536,7 +536,7 @@ export const fetchObservation = async (args: fetchObservationProps) => {
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<IObservation>>(`/Observation?${options.reduce(optionsReducer)}`)
+  const response = await apiFhir.get<FHIR_API_Response<Observation>>(`/Observation?${options.reduce(optionsReducer)}`)
 
   return response
 }
@@ -577,7 +577,7 @@ export const fetchMedicationRequest = async (args: fetchMedicationRequestProps) 
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<IMedicationRequest>>(
+  const response = await apiFhir.get<FHIR_API_Response<MedicationRequest>>(
     `/MedicationRequest?${options.reduce(optionsReducer)}`
   )
 
@@ -620,7 +620,7 @@ export const fetchMedicationAdministration = async (args: fetchMedicationAdminis
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<IMedicationAdministration>>(
+  const response = await apiFhir.get<FHIR_API_Response<MedicationAdministration>>(
     `/MedicationAdministration?${options.reduce(optionsReducer)}`
   )
 
