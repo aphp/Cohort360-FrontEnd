@@ -11,7 +11,7 @@ import TableRow from '@mui/material/TableRow'
 import EnhancedTableHead from './components/TableHead'
 import { getComparator, stableSort } from 'utils/alphabeticalSort'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   root: {
     width: '100%'
   },

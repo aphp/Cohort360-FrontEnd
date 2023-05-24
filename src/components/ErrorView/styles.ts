@@ -1,7 +1,7 @@
 import { makeStyles } from 'tss-react/mui'
 import { smallDrawerWidth, largeDrawerWidth } from 'components/Routes/LeftSideBar/LeftSideBar'
 
-export default makeStyles((theme: any) => ({
+export default makeStyles()((theme: any) => ({
   appBar: {
     height: '100vh',
     marginLeft: smallDrawerWidth,

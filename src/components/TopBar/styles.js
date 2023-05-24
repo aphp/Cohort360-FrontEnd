@@ -1,6 +1,6 @@
 import { makeStyles } from 'tss-react/mui'
 
-export default makeStyles((theme) => ({
+export default makeStyles()((theme) => ({
   root: {
     minHeight: '72px',
     display: 'flex',

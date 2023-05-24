@@ -1,6 +1,6 @@
 import { makeStyles } from 'tss-react/mui'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   chips: {
     margin: '12px 6px',
     '&:last-child': {

@@ -1,14 +1,12 @@
-import { createStyles, makeStyles } from 'tss-react/mui'
+import { makeStyles } from 'tss-react/mui'
 
-const useStyles = makeStyles(() =>
-  createStyles({
-    divider: {
-      marginBottom: '15px'
-    },
-    lockIcon: {
-      margin: '0 8px'
-    }
-  })
-)
+const useStyles = makeStyles()(() => ({
+  divider: {
+    marginBottom: '15px'
+  },
+  lockIcon: {
+    margin: '0 8px'
+  }
+}))
 
 export default useStyles

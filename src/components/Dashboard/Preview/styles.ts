@@ -1,7 +1,7 @@
 import { makeStyles } from 'tss-react/mui'
 import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme: Theme) => ({
   root: {
     backgroundColor: '#E6F1FD'
   },

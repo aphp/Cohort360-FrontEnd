@@ -1,6 +1,6 @@
 import { makeStyles } from 'tss-react/mui'
 
-export default makeStyles((theme) => ({
+export default makeStyles()((theme) => ({
   root: {
     display: 'flex',
     padding: '0 8px',

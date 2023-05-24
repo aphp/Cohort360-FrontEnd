@@ -32,7 +32,7 @@ export const itemStyles = {
   }
 }
 
-export default makeStyles((theme) => ({
+export default makeStyles()((theme) => ({
   appBar: {
     marginLeft: smallDrawerWidth,
     width: `calc(100% - ${smallDrawerWidth}px)`,

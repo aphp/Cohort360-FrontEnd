@@ -1,6 +1,6 @@
 import { makeStyles } from 'tss-react/mui'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   formControl: { margin: '1em' },
   inputContainer: {
     display: 'flex',

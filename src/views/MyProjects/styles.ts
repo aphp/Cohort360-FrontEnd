@@ -2,7 +2,7 @@ import { makeStyles } from 'tss-react/mui'
 import { Theme } from '@mui/material/styles'
 import { smallDrawerWidth, largeDrawerWidth } from 'components/Routes/LeftSideBar/LeftSideBar'
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme: Theme) => ({
   appBar: {
     marginLeft: smallDrawerWidth,
     width: `calc(100% - ${smallDrawerWidth}px)`,
