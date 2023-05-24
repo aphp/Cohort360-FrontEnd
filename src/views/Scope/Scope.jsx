@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
 
@@ -12,7 +12,6 @@ import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { closeAllOpenedPopulation } from 'state/scope'
-import { filterScopeTree } from 'utils/scopeTree'
 
 import useStyles from './styles'
 
@@ -34,8 +33,6 @@ const Scope = () => {
   }
   const trimItems = () => {
     let _selectedItems = selectedItems ? selectedItems : []
-
-    _selectedItems = filterScopeTree(_selectedItems)
 
     const perimetresIds = _selectedItems.map((_selected) => _selected.cohort_id ?? null)
     navigate(`/perimeters?${perimetresIds}`)

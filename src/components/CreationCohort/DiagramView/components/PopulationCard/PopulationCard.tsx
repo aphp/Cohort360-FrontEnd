@@ -72,8 +72,7 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
 
   const _onSubmit = async (updatedSelection: ScopeTreeRow[] | null) => {
     if (updatedSelection === null && !executiveUnits) return
-    updatedSelection = filterScopeTree(updatedSelection ?? [])
-    updatedSelection = updatedSelection.map((selectedPopulations: ScopeTreeRow) => ({
+    updatedSelection = (updatedSelection ?? []).map((selectedPopulations: ScopeTreeRow) => ({
       ...selectedPopulations,
       subItems: []
     }))

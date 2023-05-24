@@ -28,12 +28,6 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
   const [_selectedPopulation, _setSelectedPopulation] = useState<ScopeTreeRow[]>(selectedPopulation)
   const [searchInput, setSearchInput] = useState('')
 
-  // useEffect(() => {
-  //   _setSelectedPopulation(
-  //     selectedPopulation !== null ? (selectedPopulation?.filter((elem) => elem !== undefined) as ScopeTreeRow[]) : []
-  //   )
-  // }, [open]) // eslint-disable-line
-
   /**
    * Render
    */
