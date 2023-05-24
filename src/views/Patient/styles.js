@@ -1,4 +1,4 @@
-import { createStyles, makeStyles } from '@mui/styles'
+import { createStyles, makeStyles } from 'tss-react/mui'
 import { smallDrawerWidth, largeDrawerWidth } from 'components/Routes/LeftSideBar/LeftSideBar'
 
 export const sidebarWidth = '350px'

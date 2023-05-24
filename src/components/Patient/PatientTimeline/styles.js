@@ -1,4 +1,4 @@
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 const marginNextCentralLine = 10
 const fontSize = 16
 const dotSize = 16

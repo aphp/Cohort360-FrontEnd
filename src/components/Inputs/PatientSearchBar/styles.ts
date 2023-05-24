@@ -1,4 +1,4 @@
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 import { Theme } from '@mui/material/styles'
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -20,6 +20,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   input: {
     marginLeft: theme.spacing(1),
     flex: 1
+  },
+  select: {
+    marginRight: 4,
+    borderRadius: 25,
+    backgroundColor: '#FFF',
+    '& .MuiSelect-select': {
+      borderRadius: 25
+    }
   }
 }))
 

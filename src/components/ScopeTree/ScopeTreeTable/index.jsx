@@ -1,5 +1,5 @@
 import React from 'react'
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'

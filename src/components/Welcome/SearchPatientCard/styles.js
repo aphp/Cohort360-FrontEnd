@@ -1,4 +1,4 @@
-import { createStyles, makeStyles } from '@mui/styles'
+import { createStyles, makeStyles } from 'tss-react/mui'
 
 const useStyles = makeStyles(() =>
   createStyles({
