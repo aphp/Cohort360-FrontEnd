@@ -159,10 +159,12 @@ export type CohortFilters = {
   endDate: null | string
 }
 
+export type SimpleCodeType = { code: string; label: string; type: string }
+
 export type DocumentFilters = {
   ipp?: string
   nda: string
-  selectedDocTypes: { code: string; label: string; type: string }[]
+  selectedDocTypes: SimpleCodeType[]
   startDate: string | null
   endDate: string | null
   onlyPdfAvailable: boolean

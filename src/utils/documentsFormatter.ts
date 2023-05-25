@@ -1,5 +1,5 @@
 import docTypes from 'assets/docTypes.json'
-import { CompositionStatusKind, DocumentReferenceStatusKind, EncounterStatusKind } from 'types'
+import { CompositionStatusKind, DocumentReferenceStatusKind, EncounterStatusKind, SimpleCodeType } from 'types'
 
 export const getDocumentStatus = (status?: CompositionStatusKind | DocumentReferenceStatusKind): string => {
   switch (status) {
@@ -54,9 +54,9 @@ export const getProcedureStatus = (status?: string): string => {
   }
 }
 
-export const getDisplayingSelectedDocTypes = (selectedDocTypes: any[]) => {
-  let displayingSelectedDocTypes: any[] = []
-  const allTypes = docTypes.docTypes.map((docType: any) => docType.type)
+export const getDisplayingSelectedDocTypes = (selectedDocTypes: SimpleCodeType[]): SimpleCodeType[] => {
+  let displayingSelectedDocTypes: SimpleCodeType[] = []
+  const allTypes = docTypes.docTypes.map((docType: SimpleCodeType) => docType.type)
 
   for (const selectedDocType of selectedDocTypes) {
     const numberOfElementFromGroup = (allTypes.filter((type) => type === selectedDocType.type) || []).length

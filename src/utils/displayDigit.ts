@@ -1,4 +1,4 @@
-export default function (number: number) {
+export default function (number: number): string {
   const _number: string = number?.toString().split('').reverse().join('')
   let result = ''
   for (let i = _number?.length - 1; i >= 0; i--) {

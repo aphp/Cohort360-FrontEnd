@@ -8,7 +8,7 @@ import {
 import { getStringMonth, getStringMonthAphp } from './formatDate'
 import { Encounter, Extension, Patient } from 'fhir/r4'
 
-function getRandomColor() {
+function getRandomColor(): string {
   const letters = '0123456789ABCDEF'
   let color = '#'
   for (let i = 0; i < 6; i++) {
@@ -17,7 +17,7 @@ function getRandomColor() {
   return color
 }
 
-const getVisitTypeName = (visitType?: string) => {
+const getVisitTypeName = (visitType?: string): string => {
   let name = ''
 
   switch (visitType) {
@@ -40,7 +40,7 @@ const getVisitTypeName = (visitType?: string) => {
   return name
 }
 
-const getVisitTypeColor = (visitType?: string) => {
+const getVisitTypeColor = (visitType?: string): string => {
   let color = ''
 
   switch (visitType) {

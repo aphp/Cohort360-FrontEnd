@@ -34,7 +34,7 @@ import {
 } from 'state/cohortCreation'
 import { MeState } from 'state/me'
 
-import { RequestType, SimpleStatus } from 'types'
+import { CohortCreationCounterType, RequestType, SimpleStatus } from 'types'
 
 import useStyle from './styles'
 
@@ -50,7 +50,7 @@ const ControlPanel: React.FC<{
   const classes = useStyle()
   const dispatch = useAppDispatch()
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
-  const [oldCount, setOldCount] = useState<any | null>(null)
+  const [oldCount, setOldCount] = useState<CohortCreationCounterType | null>(null)
   const [openShareRequestModal, setOpenShareRequestModal] = useState<boolean>(false)
   const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
   const wrapperSetShareSuccessOrFailMessage = useCallback(
@@ -94,7 +94,7 @@ const ControlPanel: React.FC<{
     selectedPopulation === null
       ? null
       : selectedPopulation
-          .map((population: any) => population && population.access)
+          .map((population) => population && population.access)
           .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
 
   const checkIfLogicalOperatorIsEmpty = () => {
@@ -258,18 +258,18 @@ const ControlPanel: React.FC<{
               <Grid container alignItems="center" style={{ width: 'fit-content' }}>
                 <Typography className={clsx(classes.boldText, classes.patientTypo, classes.blueText)}>
                   {includePatient !== undefined && includePatient !== null ? displayDigit(includePatient) : '-'}
-                  {oldCount !== null
-                    ? (includePatient ?? 0) - oldCount?.includePatient > 0
-                      ? ` (+${(includePatient ?? 0) - oldCount?.includePatient})`
-                      : ` (${(includePatient ?? 0) - oldCount?.includePatient})`
+                  {oldCount !== null && !!oldCount.includePatient
+                    ? (includePatient ?? 0) - oldCount.includePatient > 0
+                      ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`
+                      : ` (${(includePatient ?? 0) - oldCount.includePatient})`
                     : ''}
                 </Typography>
-                {oldCount !== null && (
+                {oldCount !== null && !!oldCount.includePatient && (
                   <Tooltip
                     title={`Le delta ${
-                      (includePatient ?? 0) - oldCount?.includePatient > 0
-                        ? ` (+${(includePatient ?? 0) - oldCount?.includePatient})`
-                        : ` (${(includePatient ?? 0) - oldCount?.includePatient})`
+                      (includePatient ?? 0) - oldCount.includePatient > 0
+                        ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`
+                        : ` (${(includePatient ?? 0) - oldCount.includePatient})`
                     } est la différence de patient entre le ${lastUpdatedOldCount?.format(
                       'DD/MM/YYYY'
                     )} et la date du jour.`}

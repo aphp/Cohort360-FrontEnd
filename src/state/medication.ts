@@ -91,7 +91,7 @@ const expandMedicationElement = createAsyncThunk<MedicationState, ExpandMedicati
         for (let item of items) {
           // Replace sub items element by response of back-end
           if (item.id === rowId) {
-            const foundItem = item.subItems ? item.subItems.find((i: any) => i.id === 'loading') : true
+            const foundItem = item.subItems ? item.subItems.find((i) => i.id === 'loading') : true
             if (foundItem) {
               let subItems: MedicationListType[] = []
               subItems = await services.cohortCreation.fetchAtcHierarchy(item.id)
@@ -122,7 +122,7 @@ const expandMedicationElement = createAsyncThunk<MedicationState, ExpandMedicati
       loading: false,
       list: _rootRows,
       openedElement: _openedElement,
-      savedSelectedItems: savedSelectedItems.filter((savedSelectedItem: any) => savedSelectedItem.id !== 'loading')
+      savedSelectedItems: savedSelectedItems.filter((savedSelectedItem) => savedSelectedItem.id !== 'loading')
     }
   }
 )
