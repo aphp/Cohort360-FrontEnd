@@ -113,7 +113,7 @@ const Dashboard: React.FC<{
     dispatch(fetchExploredCohort({ context, id, forceReload: true }))
   }
 
-  const handleChangeTabs = (event: any, newTab: string) => {
+  const handleChangeTabs = (event: React.SyntheticEvent<Element, Event>, newTab: string) => {
     selectTab(newTab)
   }
 

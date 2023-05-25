@@ -34,7 +34,7 @@ import {
 } from 'state/cohortCreation'
 import { MeState } from 'state/me'
 
-import { RequestType } from 'types'
+import { RequestType, SimpleStatus } from 'types'
 
 import useStyle from './styles'
 
@@ -52,9 +52,9 @@ const ControlPanel: React.FC<{
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
   const [oldCount, setOldCount] = useState<any | null>(null)
   const [openShareRequestModal, setOpenShareRequestModal] = useState<boolean>(false)
-  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<'success' | 'error' | null>(null)
+  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
   const wrapperSetShareSuccessOrFailMessage = useCallback(
-    (val: any) => {
+    (val: SimpleStatus) => {
       setShareSuccessOrFailMessage(val)
     },
     [setShareSuccessOrFailMessage]
