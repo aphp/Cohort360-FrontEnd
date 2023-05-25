@@ -112,7 +112,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           }}
         >
           <div className={classes.toolbar}>
-            <Link href="/home">
+            <Link onClick={() => navigate('/home')}>
               <img src={cohortLogo} alt="Cohort360 logo" className={open ? undefined : classes.hide} />
             </Link>
 
@@ -346,7 +346,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   <ListItem>
                     <Link
                       id="patientResearch-link"
-                      href="/patient-search"
+                      onClick={() => navigate('/patient-search')}
                       underline="hover"
                       className={classes.nestedTitle}
                     >
@@ -355,12 +355,22 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   </ListItem>
                 )}
                 <ListItem>
-                  <Link id="myPatient-link" href="/my-patients" underline="hover" className={classes.nestedTitle}>
+                  <Link
+                    id="myPatient-link"
+                    onClick={() => navigate('/my-patients')}
+                    underline="hover"
+                    className={classes.nestedTitle}
+                  >
                     Tous mes patients
                   </Link>
                 </ListItem>
                 <ListItem>
-                  <Link id="scoopeTree-link" href="/perimeter" underline="hover" className={classes.nestedTitle}>
+                  <Link
+                    id="scoopeTree-link"
+                    onClick={() => navigate('/perimeter')}
+                    underline="hover"
+                    className={classes.nestedTitle}
+                  >
                     Explorer un périmètre
                   </Link>
                 </ListItem>
@@ -387,12 +397,22 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
             >
               <List id="research-collapse">
                 <ListItem>
-                  <Link id="savedResearch-link" href="/my-cohorts" underline="hover" className={classes.nestedTitle}>
+                  <Link
+                    id="savedResearch-link"
+                    onClick={() => navigate('/my-cohorts')}
+                    underline="hover"
+                    className={classes.nestedTitle}
+                  >
                     Mes cohortes
                   </Link>
                 </ListItem>
                 <ListItem>
-                  <Link id="myProject-link" href="/my-requests" underline="hover" className={classes.nestedTitle}>
+                  <Link
+                    id="myProject-link"
+                    onClick={() => navigate('/my-requests')}
+                    underline="hover"
+                    className={classes.nestedTitle}
+                  >
                     Mes requêtes
                   </Link>
                 </ListItem>

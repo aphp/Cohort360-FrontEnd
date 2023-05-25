@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 
 import {
@@ -38,6 +39,8 @@ import { JobStatus } from '../../../../utils/constants'
 const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
   const classes = useStyles()
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+
   const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<null | string>(null)
 
   const cohorts: Cohort[] =
@@ -120,7 +123,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                 <TableRow key={historyRow.uuid}>
                   <TableCell className={classes.tdName}>
                     {historyRow.fhir_group_id ? (
-                      <Link href={`/cohort/${historyRow.fhir_group_id}`} underline="hover">
+                      <Link onClick={() => navigate(`/cohort/${historyRow.fhir_group_id}`)} underline="hover">
                         {historyRow.name}
                       </Link>
                     ) : (
@@ -158,7 +161,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                   <TableCell align="center">
                     <Link
                       className={classes.versionLabel}
-                      href={`/cohort/new/${requestId}/${historyRow.request_query_snapshot}`}
+                      onClick={() => navigate(`/cohort/new/${requestId}/${historyRow.request_query_snapshot}`)}
                     >
                       {historyRow.request_query_snapshot?.split('-')[0]}
                     </Link>
@@ -193,7 +196,10 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                   Aucune cohorte n'est liée à cette requête
                   <br />
                   Veuillez vous rendre sur la page de création en{' '}
-                  <Link style={{ display: 'contents', fontWeight: 900 }} href={`/cohort/new/${requestId}`}>
+                  <Link
+                    style={{ display: 'contents', fontWeight: 900 }}
+                    onClick={() => navigate(`/cohort/new/${requestId}`)}
+                  >
                     cliquant ici
                   </Link>{' '}
                   et appuyer sur le bouton "Créer la cohorte"

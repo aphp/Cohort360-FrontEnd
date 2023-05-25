@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router'
 
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
@@ -15,6 +16,7 @@ const PatientSearchCard = () => {
   const [patientNb, setPatientNb] = useState(0)
   const [loading, setLoading] = useState(true)
   const classes = useStyles()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const _fetchPatientsCount = async () => {
@@ -46,7 +48,7 @@ const PatientSearchCard = () => {
       <Grid container direction="column" justifyContent="space-evenly" style={{ height: '100%', marginTop: 8 }}>
         <Button
           id="patients-research-button"
-          href="/my-patients"
+          onClick={() => navigate('/my-patients')}
           size="small"
           variant="contained"
           disableElevation
@@ -56,7 +58,7 @@ const PatientSearchCard = () => {
         </Button>
         <Button
           id="scope-research-button"
-          href="/perimeter"
+          onClick={() => navigate('/perimeter')}
           size="small"
           variant="contained"
           disableElevation
