@@ -275,7 +275,7 @@ const Login = () => {
     login()
   }
 
-  const oidc_login = (e) => {
+  const oidcLogin = (e) => {
     e.preventDefault()
     window.location = `${OIDC_PROVIDER_URL}?state=${OIDC_STATE}&client_id=${OIDC_CLIENT_ID}&redirect_uri=${OIDC_REDIRECT_URI}&response_type=${OIDC_RESPONSE_TYPE}&scope=${OIDC_SCOPE}`
   }
@@ -346,13 +346,7 @@ const Login = () => {
               >
                 {loading ? <CircularProgress /> : 'Connexion'}
               </Button>
-              <Button
-                type="submit"
-                onClick={oidc_login}
-                variant="contained"
-                className={classes.submit}
-                id="oidc-login"
-              >
+              <Button type="submit" onClick={oidcLogin} variant="contained" className={classes.submit} id="oidc-login">
                 {loading ? <CircularProgress /> : 'Login via Keycloak'}
               </Button>
             </Grid>
