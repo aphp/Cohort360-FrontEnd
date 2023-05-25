@@ -11,7 +11,8 @@ import {
   GenderRepartitionType,
   searchInputError,
   errorDetails,
-  PatientGenderKind
+  PatientGenderKind,
+  GroupRights
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -19,7 +20,7 @@ import {
   getAgeRepartitionMapAphp,
   getVisitRepartitionMapAphp
 } from 'utils/graphUtils'
-import { getApiResponseResources } from 'utils/apiHelpers'
+import { getApiResponseResources, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 
 import {
   fetchGroup,
@@ -34,7 +35,17 @@ import {
 import { ODD_EXPORT } from '../../constants'
 
 import apiBackend from '../apiBackend'
-import { DocumentReference, Identifier, Patient } from 'fhir/r4'
+import {
+  BundleEntry,
+  DocumentReference,
+  Encounter,
+  Extension,
+  Group,
+  GroupMember,
+  Identifier,
+  ParametersParameter,
+  Patient
+} from 'fhir/r4'
 
 export interface IServiceCohorts {
   /**
@@ -279,7 +290,8 @@ const servicesCohorts: IServiceCohorts = {
       const visitTypeRepartitionData =
         encountersResp.data.resourceType === 'Bundle'
           ? getEncounterRepartitionMapAphp(
-              encountersResp.data.meta?.extension?.find((facet: any) => facet.url === 'facet-class-simple')?.extension
+              encountersResp.data.meta?.extension?.find((facet: Extension) => facet.url === 'facet-class-simple')
+                ?.extension
             )
           : undefined
 
@@ -367,14 +379,14 @@ const servicesCohorts: IServiceCohorts = {
     const agePyramidData =
       patientsResp.data.resourceType === 'Bundle'
         ? getAgeRepartitionMapAphp(
-            patientsResp.data.meta?.extension?.find((facet: any) => facet.url === 'facet-age-month')?.extension
+            patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === 'facet-age-month')?.extension
           )
         : undefined
 
     const genderRepartitionMap =
       patientsResp.data.resourceType === 'Bundle'
         ? getGenderRepartitionMapAphp(
-            patientsResp.data.meta?.extension?.find((facet: any) => facet.url === 'facet-deceased')?.extension
+            patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === 'facet-deceased')?.extension
           )
         : undefined
 
@@ -496,33 +508,44 @@ const servicesCohorts: IServiceCohorts = {
     const checkDocumentSearchInput = await fetchCheckDocumentSearchInput(searchInput, signal)
 
     if (checkDocumentSearchInput) {
-      const errors = checkDocumentSearchInput.find((parameter: any) => parameter.name === 'WARNING')?.part ?? []
+      const errors = checkDocumentSearchInput.find((parameter) => parameter.name === 'WARNING')?.part ?? []
 
       const parsedErrors: errorDetails[] = []
 
-      errors.forEach((error: any) => {
-        const splitError = error.valueString.split(';')
+      errors.forEach((error: ParametersParameter) => {
+        try {
+          if (error.valueString) {
+            const splitError = error.valueString.split(';')
 
-        const errorPositions = splitError.find((errorPart: any) => errorPart.includes('Positions'))
+            const errorPositions = splitError.find((errorPart) => errorPart.includes('Positions'))
 
-        const cleanedErrorPositions = errorPositions
-          ? errorPositions.replaceAll(' ', '').replace('Positions:', '').split('char:').slice(1)
-          : []
+            const cleanedErrorPositions = errorPositions
+              ? errorPositions
+                  .replaceAll(' ', '')
+                  .replace('Positions:', '')
+                  .split('char:')
+                  .slice(1)
+                  .map((el) => parseInt(el))
+              : []
 
-        const errorSolution = splitError.find((errorPart: any) => errorPart.includes('Solution'))
-        const cleanedErrorSolution = errorSolution ? errorSolution.replace(' Solution: ', '') : ''
+            const errorSolution = splitError.find((errorPart) => errorPart.includes('Solution'))
+            const cleanedErrorSolution = errorSolution ? errorSolution.replace(' Solution: ', '') : ''
 
-        const errorObject = {
-          errorName: error.name,
-          errorPositions: cleanedErrorPositions,
-          errorSolution: cleanedErrorSolution
+            const errorObject = {
+              errorName: error.name,
+              errorPositions: cleanedErrorPositions,
+              errorSolution: cleanedErrorSolution
+            }
+
+            parsedErrors.push(errorObject)
+          }
+        } catch (e) {
+          console.log('failed to parse int', e)
         }
-
-        parsedErrors.push(errorObject)
       })
 
       return {
-        isError: checkDocumentSearchInput.find((parameter: any) => parameter.name === 'VALIDÉ') ? false : true,
+        isError: checkDocumentSearchInput.find((parameter) => parameter.name === 'VALIDÉ') ? false : true,
         errorsDetails: parsedErrors
       }
     } else {
@@ -559,39 +582,22 @@ const servicesCohorts: IServiceCohorts = {
         })
         .filter((id) => id !== '')
 
-      const cohortsResponse: any = await new Promise((resolve) => {
-        resolve(fetchGroup({ _id: ids }))
-      })
-        .then((values) => {
-          return values
-        })
-        .catch((error) => {
-          return { error: true, ...error }
-        })
-      let caresiteIds = ''
-      let organizationLinkList: any[] = []
+      const cohortLinkList: Group[] = getApiResponseResourcesOrThrow(await fetchGroup({ _id: ids }))
 
-      const cohortLinkList = cohortsResponse?.data?.entry?.[0]?.resource
-        ? cohortsResponse.data.entry.map((cohortsResponse: any) => cohortsResponse.resource)
-        : []
+      let caresiteIds = ''
+      let organizationLinkList: Group[] = []
 
       // On cherche la liste des Organisations présente dans l'objet `member`
-      caresiteIds =
-        cohortLinkList?.length > 0
-          ? cohortLinkList
-              .map((cohortLinkItem: any) =>
-                cohortLinkItem?.member?.length > 0
-                  ? cohortLinkItem.member.map((member: any) =>
-                      member.entity.display?.search('Organization/') !== -1
-                        ? member.entity.display?.replace('Organization/', '')
-                        : ''
-                    )
-                  : ''
-              )
-              .flat()
-              .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
-              .join(',')
-          : ''
+      caresiteIds = cohortLinkList
+        .flatMap((cohortLinkItem) =>
+          cohortLinkItem.member?.map((member) =>
+            member.entity.display?.search('Organization/') !== -1
+              ? member.entity.display?.replace('Organization/', '')
+              : ''
+          )
+        )
+        .filter((el) => !!el)
+        .join(',')
 
       if (caresiteIds) {
         // Si une liste d'Organisation est présente dans l'objet `member`
@@ -599,9 +605,9 @@ const servicesCohorts: IServiceCohorts = {
         organizationLinkList =
           cohortLinkList?.length > 0
             ? cohortLinkList
-                .map((cohortLinkItem: any) => {
+                .map((cohortLinkItem: Group) => {
                   const members = cohortLinkItem?.member ?? []
-                  let organizationLinks: any[] = []
+                  let organizationLinks: Group[] = []
 
                   for (let index = 0; index < members.length; index += 2) {
                     const group = members[index] || null
@@ -609,8 +615,11 @@ const servicesCohorts: IServiceCohorts = {
                     organizationLinks = [
                       ...organizationLinks,
                       {
-                        id: group.entity.display.replace('Group/', ''),
-                        managingEntity: organization.entity
+                        id: group?.entity?.display?.replace('Group/', ''),
+                        managingEntity: organization.entity,
+                        resourceType: 'Group',
+                        type: 'person',
+                        actual: true
                       }
                     ]
                   }
@@ -618,81 +627,58 @@ const servicesCohorts: IServiceCohorts = {
                   return organizationLinks
                 })
                 .flat()
-                .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
+                .filter((el) => !!el)
             : []
       } else {
         // Sinon
         // On cherche les Group ID
-        const parentGroupsId =
-          cohortLinkList?.length > 0
-            ? cohortLinkList
-                .map((cohortLinkItem: any) =>
-                  cohortLinkItem?.member?.length > 0
-                    ? cohortLinkItem.member.map((member: any) =>
-                        member.entity.display?.search('Group/') !== -1
-                          ? member.entity.display?.replace('Group/', '')
-                          : ''
-                      )
-                    : ''
-                )
-                .flat()
-                .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
-            : []
+        const parentGroupsId: string[] = cohortLinkList
+          .flatMap((cohortLinkItem) =>
+            cohortLinkItem.member?.map((member) =>
+              member.entity.display?.search('Group/') !== -1 ? member.entity.display?.replace('Group/', '') : ''
+            )
+          )
+          .filter((el): el is string => !!el)
 
         // Pour récupérer les informations du périmètre de la cohorte
-        const parentGroupsResponse = await Promise.all(
-          parentGroupsId.map((parentGroupId: string) =>
-            new Promise((resolve) => {
-              resolve(fetchGroup({ _id: parentGroupId }))
-            })
-              .then((values) => {
-                return values
-              })
-              .catch((error) => {
-                return { error: true, ...error }
-              })
-          )
-        )
+        organizationLinkList = (
+          await Promise.all(parentGroupsId.map((parentGroupId: string) => fetchGroup({ _id: parentGroupId })))
+        ).flatMap((res) => getApiResponseResourcesOrThrow(res))
 
         // Et faire le lien avec les organisations, donc ...
         // On crée un dictionnaire pour faire le lien entre les Groups et les Organisations (Dictionnaire 2)
-        organizationLinkList = parentGroupsResponse
-          .filter((parentGroupResponse: any) => parentGroupResponse.error !== true)
-          .map(
-            (parentGroupResponse: any) =>
-              parentGroupResponse?.data?.resourceType === 'Bundle' && parentGroupResponse?.data?.entry?.[0]?.resource
-          )
 
         if (!organizationLinkList || organizationLinkList?.length === 0) return cohorts
 
         // On crée une liste des Organisations liées au périmètre (caresiteIds = string)
         caresiteIds = organizationLinkList
-          .map((currentParentItem: any) => currentParentItem?.managingEntity?.display?.replace('Organization/', ''))
-          .filter((item: any, index: number, array: any[]) => item && array.indexOf(item) === index)
+          .map((currentParentItem: Group) => currentParentItem?.managingEntity?.display?.replace('Organization/', ''))
+          .filter((el) => !!el)
           .join(',')
       }
 
       // On appelle le back-end pour avoir la liste des droits
       const rightsResponse = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${caresiteIds}`)
-      const rightsData: any = rightsResponse.data ?? []
+      const rightsData: GroupRights[] = rightsResponse.data ?? []
 
       return cohorts.map((cohort) => {
-        const cohortLinkItem = cohortLinkList.find((cohortLink: any) => cohortLink?.id === cohort.fhir_group_id)
+        const cohortLinkItem = cohortLinkList.find((cohortLink: Group) => cohortLink?.id === cohort.fhir_group_id)
         const organizationLinkItems = !cohortLinkItem
           ? undefined
-          : organizationLinkList.filter((organizationLink: any) =>
-              cohortLinkItem?.member?.length > 0
+          : organizationLinkList.filter((organizationLink: Group) =>
+              (cohortLinkItem?.member?.length || 0) > 0
                 ? cohortLinkItem.member?.find(
-                    (member: any) => member.entity.display?.replace('Group/', '') === organizationLink.id
+                    (member: GroupMember) => member.entity.display?.replace('Group/', '') === organizationLink.id
                   )
                 : false
             )
         const allRightOfCohort = !organizationLinkItems
           ? []
-          : rightsData.filter((rightData: any) =>
+          : rightsData.filter((rightData: GroupRights) =>
               organizationLinkItems.find(
                 (organizationLinkItem) =>
-                  +organizationLinkItem.managingEntity.display.replace('Organization/', '') === rightData.care_site_id
+                  (organizationLinkItem?.managingEntity?.display || '').replace('Organization/', '') ===
+                  String(rightData.care_site_id)
               )
             )
 
@@ -702,7 +688,7 @@ const servicesCohorts: IServiceCohorts = {
             valueString:
               !!ODD_EXPORT &&
               allRightOfCohort.filter(
-                (rightOfCohort: any) =>
+                (rightOfCohort: GroupRights) =>
                   rightOfCohort.right_export_csv_nominative === true &&
                   rightOfCohort.right_read_patient_nominative === true
               ).length === allRightOfCohort.length
@@ -713,7 +699,7 @@ const servicesCohorts: IServiceCohorts = {
             url: 'READ_ACCESS',
             valueString:
               allRightOfCohort.filter(
-                (rightOfCohort: any) => rightOfCohort.right_read_patient_nominative === true // eslint-disabled-line
+                (rightOfCohort: GroupRights) => rightOfCohort.right_read_patient_nominative === true // eslint-disabled-line
               ).length === allRightOfCohort.length
                 ? 'DATA_NOMINATIVE'
                 : 'DATA_PSEUDOANONYMISED'
@@ -809,11 +795,11 @@ const getDocumentInfos: (
     return []
   }
 
-  const listeEncounters = encounters.data.entry.map((e: any) => e.resource)
+  const listeEncounters = encounters.data.entry.map((e: BundleEntry<Encounter>) => e.resource) as Encounter[]
 
-  let listePatients = []
+  let listePatients: Array<Patient> = []
   if (patients.data.resourceType === 'Bundle' && patients.data.entry) {
-    listePatients = patients?.data?.entry.map((e: any) => e.resource)
+    listePatients = patients?.data?.entry.map((e: BundleEntry<Patient>) => e.resource).filter((e): e is Patient => !!e)
   }
 
   for (const document of cohortDocuments) {

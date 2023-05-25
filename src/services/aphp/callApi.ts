@@ -19,10 +19,14 @@ import {
   Group,
   MedicationAdministration,
   MedicationRequest,
+  OperationOutcome,
+  Parameters,
+  ParametersParameter,
   Patient,
   Procedure
 } from 'fhir/r4'
 import { Observation } from 'fhir/r4'
+import { getApiResponseResources, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 
 const reducer = (accumulator: any, currentValue: any) =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -43,7 +47,8 @@ type fetchGroupProps = {
   'managing-entity'?: string[] // ID List of organization
   _elements?: ('name' | 'managingEntity')[]
 }
-export const fetchGroup = async (args: fetchGroupProps) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const fetchGroup = async (args: fetchGroupProps): Promise<AxiosResponse<FHIR_API_Response<Group>, any>> => {
   const { _id, provider } = args
   let { _list, _elements } = args
   let managingEntity = args['managing-entity']
@@ -308,12 +313,17 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   return response
 }
 
-export const fetchCheckDocumentSearchInput = async (searchInput: string, signal?: AbortSignal) => {
-  const checkDocumentSearchInput = await apiFhir.get<CohortComposition>(
+export const fetchCheckDocumentSearchInput = async (
+  searchInput: string,
+  signal?: AbortSignal
+): Promise<ParametersParameter[] | undefined> => {
+  const checkDocumentSearchInput = await apiFhir.get<Parameters | OperationOutcome>(
     `/Composition/$text?_text=${encodeURIComponent(searchInput)}`,
     { signal: signal }
   )
-  return checkDocumentSearchInput.data.parameter ?? null
+  return checkDocumentSearchInput.data.resourceType === 'OperationOutcome'
+    ? undefined
+    : (checkDocumentSearchInput.data as Parameters).parameter
 }
 
 export const fetchCompositionContent = async (compositionId: string) => {
