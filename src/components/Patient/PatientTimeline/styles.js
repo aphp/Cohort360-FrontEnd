@@ -4,7 +4,7 @@ const fontSize = 16
 const dotSize = 16
 const emptyYearHeight = '0.7em'
 
-const useStyles = makeStyles({
+const useStyles = makeStyles()(() => ({
   centeredTimeline: {
     position: 'relative',
     overflow: 'hidden',
@@ -50,7 +50,7 @@ const useStyles = makeStyles({
     display: 'flex',
 
     '& before': {
-      content: '',
+      content: '""',
       position: 'absolute',
       top: 0,
       bottom: -10,
@@ -74,7 +74,7 @@ const useStyles = makeStyles({
     padding: '8px 10px'
   },
   timelineRightContent: {
-    content: '',
+    content: '""',
     display: 'flex',
     padding: 3,
     alignItems: 'center'
@@ -227,5 +227,6 @@ const useStyles = makeStyles({
   emptyYear: {
     height: emptyYearHeight
   }
-})
+}))
+
 export default useStyles

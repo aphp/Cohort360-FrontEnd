@@ -1,5 +1,6 @@
 import { makeStyles } from 'tss-react/mui'
 import { Theme } from '@mui/material/styles'
+import { CSSProperties } from 'react'
 
 const drawerWidth = 260
 
@@ -60,7 +61,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     justifyContent: 'space-between',
     padding: theme.spacing(0, 1),
     // necessary for content to be below app bar
-    ...theme.mixins.toolbar
+    ...(theme.mixins.toolbar as CSSProperties)
   },
   logoutButton: {
     marginLeft: '6px'
@@ -118,7 +119,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     '&:hover': { backgroundColor: '#d5d5d5' }
   },
   linkHover: {
-    color: 'white',
     '&:hover': { cursor: 'pointer', textDecoration: 'None' }
   },
   newCohortButton: {
@@ -126,9 +126,10 @@ const useStyles = makeStyles()((theme: Theme) => ({
     borderRadius: 25,
     border: 'none',
     height: 45,
+    color: '#FFF',
+    width: '100%',
     '&:hover': {
-      backgroundColor: '#499cbf',
-      color: '#FFF'
+      backgroundColor: '#499cbf'
     }
   },
   editCohortButton: {

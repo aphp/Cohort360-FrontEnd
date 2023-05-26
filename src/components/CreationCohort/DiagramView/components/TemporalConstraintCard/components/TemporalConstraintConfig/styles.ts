@@ -28,8 +28,8 @@ const useStyles = makeStyles()(() => ({
     marginRight: 4
   },
   flexBaseline: {
-    display: 'flex',
-    marginTop: 8
+    display: 'flex !important',
+    marginTop: '8px !important'
   },
   inputError: {
     border: '1px solid red'

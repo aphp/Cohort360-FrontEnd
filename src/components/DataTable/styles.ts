@@ -99,7 +99,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
   },
   selected: {
     backgroundColor: '#0063AF',
-    color: 'white'
+    color: 'white !important'
   },
   tabTitle: {
     minWidth: 160,
