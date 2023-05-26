@@ -34,7 +34,7 @@ import {
 import { ODD_EXPORT } from '../../constants'
 
 import apiBackend from '../apiBackend'
-import { DocumentReference, Identifier } from 'fhir/r4'
+import { DocumentReference, Identifier, Patient } from 'fhir/r4'
 
 export interface IServiceCohorts {
   /**
