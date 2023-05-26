@@ -56,7 +56,7 @@ const ModalCohortTitle: React.FC<{
           <TextField
             placeholder="Nom de la cohorte"
             value={title}
-            onChange={(e: any) => onChangeTitle(e.target.value)}
+            onChange={(e) => onChangeTitle(e.target.value)}
             autoFocus
             id="title"
             margin="normal"
@@ -77,7 +77,7 @@ const ModalCohortTitle: React.FC<{
           <TextField
             placeholder="Description"
             value={description}
-            onChange={(e: any) => onChangeDescription(e.target.value)}
+            onChange={(e) => onChangeDescription(e.target.value)}
             id="description"
             margin="normal"
             fullWidth

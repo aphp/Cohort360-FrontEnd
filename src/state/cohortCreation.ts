@@ -260,7 +260,7 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
   'cohortCreation/build',
   async ({ selectedPopulation }, { getState, dispatch }) => {
     try {
-      const state: any = getState()
+      const state = getState()
 
       const _selectedPopulation = selectedPopulation
         ? selectedPopulation
@@ -349,7 +349,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
       let _temporalConstraints
 
       if (temporalConstraints && temporalConstraints?.length > 0) {
-        _temporalConstraints = temporalConstraints.map((temporalConstraint: TemporalConstraintsType, index) => {
+        _temporalConstraints = temporalConstraints.map((temporalConstraint: TemporalConstraintsType, index: number) => {
           return {
             ...temporalConstraint,
             id: index + 1

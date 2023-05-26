@@ -29,7 +29,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
   const ipp = deidentifiedBoolean
     ? `IPP chiffré: ${patient.id ?? '-'}`
     : `IPP: ${
-        patient.identifier?.find((item: any) => item.type?.coding?.[0].code === 'IPP')?.value ??
+        patient.identifier?.find((item) => item.type?.coding?.[0].code === 'IPP')?.value ??
         patient.identifier?.[0].value
       }`
 

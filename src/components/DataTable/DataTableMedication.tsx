@@ -122,7 +122,7 @@ const DataTableMedicationLine: React.FC<{
 
   const prescriptionType =
     medication.resourceType === 'MedicationRequest' &&
-    (medication.extension?.find((extension: any) => extension.url === 'type') || {}).valueString
+    (medication.extension?.find((extension) => extension.url === 'type') || {}).valueString
   const administrationRoute =
     medication.resourceType === 'MedicationRequest'
       ? medication.dosageInstruction?.[0]?.route?.text

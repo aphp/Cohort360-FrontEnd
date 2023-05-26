@@ -24,7 +24,9 @@ const PatientSearchCard = () => {
 
       setLoading(true)
       const patientNumber = await services.patients.fetchPatientsCount()
-      setPatientNb(patientNumber)
+      if (patientNumber !== null) {
+        setPatientNb(patientNumber)
+      }
       setLoading(false)
     }
 
