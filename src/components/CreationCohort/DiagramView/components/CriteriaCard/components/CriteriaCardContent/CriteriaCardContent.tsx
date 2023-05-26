@@ -15,6 +15,7 @@ import { DocType, SearchByTypes, SelectedCriteriaType } from 'types'
 import docTypes from 'assets/docTypes.json'
 
 import useStyles from './styles'
+import { ReactJSXElement } from '@emotion/react/types/jsx-namespace'
 
 type CriteriaCardContentProps = {
   currentCriteria: SelectedCriteriaType
@@ -23,7 +24,7 @@ type CriteriaCardContentProps = {
 const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriteria }) => {
   const _displayCardContent = (_currentCriteria: SelectedCriteriaType) => {
     if (!_currentCriteria) return []
-    let content: any[] = []
+    let content: Array<ReactJSXElement | string | number | boolean | null> = []
 
     const reducer = (accumulator: any, currentValue: any) =>
       accumulator ? `${accumulator} - ${currentValue}` : currentValue ? currentValue : accumulator
@@ -42,7 +43,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       )
 
     let _data: any = null
-    const _searchDataFromCriteria = (_criteria: any[], type: string) => {
+    const _searchDataFromCriteria = (_criteria: CriteriaItemType[], type: string) => {
       for (const _criterion of _criteria) {
         if (_criterion.id === 'Medication' && ('MedicationRequest' === type || 'MedicationAdministration' === type)) {
           _data = _criterion.data
