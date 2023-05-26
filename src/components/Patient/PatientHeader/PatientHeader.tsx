@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { CohortPatient, IPatientDetails } from 'types'
+import { CohortPatient, IPatientDetails, PatientGenderKind } from 'types'
 
 import Grid from '@mui/material/Grid'
 
@@ -40,7 +40,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
           <PatientTitle firstName={firstName} lastName={lastName} />
         </Grid>
         <Grid container item justifyContent="flex-end" xs={3}>
-          <PatientInfo age={age} ipp={ipp} gender={patient.gender} />
+          <PatientInfo age={age} ipp={ipp} gender={patient.gender as PatientGenderKind} />
         </Grid>
       </Grid>
     </Grid>

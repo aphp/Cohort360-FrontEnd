@@ -22,8 +22,10 @@ import {
   Condition,
   DocumentReference,
   Encounter,
+  Identifier,
   MedicationAdministration,
   MedicationRequest,
+  Observation,
   Patient,
   Procedure
 } from 'fhir/r4'
@@ -1195,7 +1197,7 @@ function fillElementInformation<
   newElement.NDA = encounter?.id ?? 'Inconnu'
 
   if (!deidentifiedBoolean && encounter?.identifier) {
-    const nda = encounter.identifier.find((identifier: IIdentifier) => identifier.type?.coding?.[0].code === 'NDA')
+    const nda = encounter.identifier.find((identifier: Identifier) => identifier.type?.coding?.[0].code === 'NDA')
     if (nda) {
       newElement.NDA = nda?.value ?? 'Inconnu'
     }
