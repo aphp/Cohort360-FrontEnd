@@ -131,7 +131,7 @@ const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScop
         for (let item of items) {
           // Replace sub items element by response of back-end
           if (+item.id === +params.rowId) {
-            const foundItem = item.subItems ? item.subItems.find((i: any) => i.id === 'loading') : true
+            const foundItem = item.subItems ? item.subItems.find((i) => i.id === 'loading') : true
             if (foundItem) {
               const subItems: ScopeTreeRow[] = await services.perimeters.getScopeSubItems(
                 item.inferior_levels_ids,

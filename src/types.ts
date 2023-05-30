@@ -159,10 +159,12 @@ export type CohortFilters = {
   endDate: null | string
 }
 
+export type SimpleCodeType = { code: string; label: string; type: string }
+
 export type DocumentFilters = {
   ipp?: string
   nda: string
-  selectedDocTypes: { code: string; label: string; type: string }[]
+  selectedDocTypes: SimpleCodeType[]
   startDate: string | null
   endDate: string | null
   onlyPdfAvailable: boolean
@@ -801,6 +803,22 @@ export type IScope = {
   previous: string | null
   results: ScopePage[]
 }
+
+export type GroupRights = {
+  perimeter_id: string
+  care_site_id: number
+  provider_id: string
+  care_site_history_ids: number[]
+  access_ids: number[]
+  right_read_patient_nominative: boolean
+  right_read_patient_pseudo_anonymised: boolean
+  right_search_patient_with_ipp: boolean
+  right_export_csv_nominative: boolean
+  right_export_csv_pseudo_anonymised: boolean
+  right_transfer_jupyter_nominative: boolean
+  right_transfer_jupyter_pseudo_anonymised: boolean
+}
+
 export type ErrorType = { isError: boolean; errorMessage?: string }
 export type AgeRangeType = {
   year?: number
@@ -811,6 +829,8 @@ export type AgeRangeType = {
 export type AccessExpirationsProps = {
   expiring?: boolean
 }
+
+export type SimpleStatus = 'success' | 'error' | null
 
 export type AccessExpiration = {
   leftDays?: number

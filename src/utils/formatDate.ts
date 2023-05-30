@@ -1,7 +1,7 @@
 import { Month } from 'types'
 import moment from 'moment/moment'
 
-const getFormatedDate = (date: Date) => {
+const getFormatedDate = (date: Date): string => {
   const mm = date.getMonth() + 1 // getMonth() is zero-based
   const dd = date.getDate()
 

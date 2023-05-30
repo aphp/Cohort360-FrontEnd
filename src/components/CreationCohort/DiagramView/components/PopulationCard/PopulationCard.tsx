@@ -51,6 +51,7 @@ const PopulationCard: React.FC = () => {
     if (_selectedPopulations === null) return
 
     _selectedPopulations = filterScopeTree(_selectedPopulations)
+    if (_selectedPopulations === null) return
     _selectedPopulations = _selectedPopulations.map((_selectedPopulation: ScopeTreeRow) => ({
       ..._selectedPopulation,
       subItems: []
@@ -118,8 +119,8 @@ const PopulationCard: React.FC = () => {
               {isExtended ? (
                 <>
                   {selectedPopulation &&
-                    selectedPopulation.map((pop: any, index: number) => (
-                      <Chip className={classes.populationChip} key={`${index}-${pop.name}`} label={pop.name} />
+                    selectedPopulation.map((pop, index: number) => (
+                      <Chip className={classes.populationChip} key={`${index}-${pop?.name}`} label={pop?.name} />
                     ))}
                   <IconButton
                     size="small"
@@ -133,7 +134,7 @@ const PopulationCard: React.FC = () => {
                   {selectedPopulation &&
                     selectedPopulation
                       .slice(0, 4)
-                      .map((pop: any, index: number) =>
+                      .map((pop, index: number) =>
                         pop ? (
                           <Chip className={classes.populationChip} key={`${index}-${pop.name}`} label={pop.name} />
                         ) : (

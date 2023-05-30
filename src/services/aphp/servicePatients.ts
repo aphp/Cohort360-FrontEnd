@@ -48,7 +48,7 @@ export interface IServicePatients {
    **
    ** Elle ne prend aucun argument, et un nombre de patient
    */
-  fetchPatientsCount: () => Promise<number>
+  fetchPatientsCount: () => Promise<number | null>
 
   /*
    ** Cette fonction permet de récupérer l'ensemble des patients lié à un utilisateur
@@ -299,11 +299,11 @@ const servicesPatients: IServicePatients = {
   fetchPatientsCount: async () => {
     try {
       const response = await fetchPatient({ size: 0 })
-      if (response?.data?.resourceType === 'OperationOutcome') return null as any
+      if (response?.data?.resourceType === 'OperationOutcome') return null
       return response.data.total ?? 0
-    } catch (error: any) {
+    } catch (error) {
       console.error(error)
-      return null as any
+      return null
     }
   },
 

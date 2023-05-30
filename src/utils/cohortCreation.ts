@@ -158,12 +158,12 @@ type RequeteurSearchType = {
   request: RequeteurGroupType | undefined
 }
 
-const constructFilterFhir = (criterion: SelectedCriteriaType) => {
+const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
   let filterFhir = ''
 
-  const filterReducer = (accumulator: any, currentValue: any) =>
+  const filterReducer = (accumulator: any, currentValue: any): string =>
     accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
-  const searchReducer = (accumulator: any, currentValue: any) =>
+  const searchReducer = (accumulator: any, currentValue: any): string =>
     accumulator || accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 
   switch (criterion.type) {
@@ -520,11 +520,11 @@ export function buildRequest(
   selectedCriteria: SelectedCriteriaType[],
   criteriaGroup: CriteriaGroupType[],
   temporalConstraints: TemporalConstraintsType[]
-) {
+): string {
   if (!selectedPopulation) return ''
   selectedPopulation = selectedPopulation.filter((elem) => elem !== undefined)
 
-  const exploreCriteriaGroup = (itemIds: number[]) => {
+  const exploreCriteriaGroup = (itemIds: number[]): (RequeteurCriteriaType | RequeteurGroupType)[] => {
     let children: (RequeteurCriteriaType | RequeteurGroupType)[] = []
 
     for (const itemId of itemIds) {
@@ -636,7 +636,7 @@ export function buildRequest(
   return JSON.stringify(json)
 }
 
-export async function unbuildRequest(_json: string) {
+export async function unbuildRequest(_json: string): Promise<any> {
   let population: (ScopeTreeRow | undefined)[] | null = null
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
@@ -684,7 +684,7 @@ export async function unbuildRequest(_json: string) {
    * Retrieve criteria + groups
    *
    */
-  const exploreRequest = (currentItem: any) => {
+  const exploreRequest = (currentItem: any): void => {
     const { criteria } = currentItem
 
     for (const criterion of criteria) {
@@ -706,7 +706,7 @@ export async function unbuildRequest(_json: string) {
     return { population, criteria: [], criteriaGroup: [] }
   }
 
-  const _retrieveInformationFromJson = async (element: RequeteurCriteriaType) => {
+  const _retrieveInformationFromJson = async (element: RequeteurCriteriaType): Promise<any> => {
     const currentCriterion: any = {
       id: element._id,
       type: element.resourceType,
@@ -1574,7 +1574,7 @@ export const getDataFromFetch = async (
   _criteria: any,
   selectedCriteria: SelectedCriteriaType[],
   oldCriteriaList?: any
-) => {
+): Promise<any> => {
   for (const _criterion of _criteria) {
     const oldCriterion = oldCriteriaList
       ? oldCriteriaList?.find((oldCriterionItem: any) => oldCriterionItem.id === _criterion.id)
@@ -1662,11 +1662,11 @@ export const getDataFromFetch = async (
   return _criteria
 }
 
-export const joinRequest = async (oldJson: string, newJson: string, parentId: number | null) => {
+export const joinRequest = async (oldJson: string, newJson: string, parentId: number | null): Promise<any> => {
   const oldRequest = JSON.parse(oldJson) as RequeteurSearchType
   const newRequest = JSON.parse(newJson) as RequeteurSearchType
 
-  const changeIdOfRequest = (request: any) => {
+  const changeIdOfRequest = (request: any): any => {
     const { criteria } = request
 
     for (const criterion of criteria) {
@@ -1689,7 +1689,7 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
     criteria: changeIdOfRequest(newRequest.request)
   }
 
-  const fillRequestWithNewRequest = (criterionGroup?: RequeteurGroupType) => {
+  const fillRequestWithNewRequest = (criterionGroup?: RequeteurGroupType): RequeteurGroupType | undefined => {
     if (!criterionGroup) return criterionGroup
 
     if (criterionGroup._id === parentId) {

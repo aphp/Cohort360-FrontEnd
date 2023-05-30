@@ -8,13 +8,13 @@ export const getSelectedScopes = (
   row: ScopeTreeRow,
   selectedItems: ScopeTreeRow[] | undefined,
   rootRows: ScopeTreeRow[]
-) => {
+): ScopeTreeRow[] => {
   let savedSelectedItems = selectedItems ? [...selectedItems] : []
 
   const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
   const index = foundItem ? savedSelectedItems.indexOf(foundItem) : -1
 
-  const getRowAndChildren = (parent: ScopeTreeRow) => {
+  const getRowAndChildren = (parent: ScopeTreeRow): ScopeTreeRow[] => {
     const getChild: (subItem: ScopeTreeRow) => ScopeTreeRow[] = (subItem: ScopeTreeRow) => {
       if (subItem?.id === 'loading') return []
 
@@ -34,7 +34,7 @@ export const getSelectedScopes = (
     ].flat()
   }
 
-  const deleteRowAndChildren = (parent: ScopeTreeRow) => {
+  const deleteRowAndChildren = (parent: ScopeTreeRow): ScopeTreeRow[] => {
     const elemToDelete = getRowAndChildren(parent)
 
     savedSelectedItems = savedSelectedItems.filter((row) => !elemToDelete.some(({ id }) => id === row.id))
@@ -43,7 +43,7 @@ export const getSelectedScopes = (
       if (row.subItems && row.subItems.length > 0 && row.subItems[0].id === 'loading') {
         return true
       }
-      const numberOfSubItemsSelected = row?.subItems?.filter((subItem: any) =>
+      const numberOfSubItemsSelected = row?.subItems?.filter((subItem) =>
         savedSelectedItems.find(({ id }) => id === subItem.id)
       )?.length
       if (numberOfSubItemsSelected && numberOfSubItemsSelected !== row?.subItems?.length) {
@@ -62,7 +62,7 @@ export const getSelectedScopes = (
   }
 
   let _savedSelectedItems: any[] = []
-  const checkIfParentIsChecked = (rows: ScopeTreeRow[]) => {
+  const checkIfParentIsChecked = (rows: ScopeTreeRow[]): void => {
     for (let index = 0; index < rows.length; index++) {
       const row = rows[index]
       if (
@@ -113,7 +113,7 @@ export const getSelectedScopes = (
   return savedSelectedItems
 }
 
-export const filterScopeTree = (_selectedItems: any[]) => {
+export const filterScopeTree = (_selectedItems: any[]): any => {
   // If you chenge this code, change it too inside: PopulationCard.tsx:31
   return _selectedItems.filter((item, index, array) => {
     // reemove double item
@@ -161,7 +161,7 @@ export const filterScopeTree = (_selectedItems: any[]) => {
   })
 }
 
-export const sortByQuantityAndName = (scopeRows: ScopeTreeRow[]) => {
+export const sortByQuantityAndName = (scopeRows: ScopeTreeRow[]): ScopeTreeRow[] => {
   // Sort by quantity
   scopeRows = scopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
     if (a.quantity > b.quantity) {
