@@ -51,6 +51,7 @@ const PopulationCard: React.FC = () => {
     if (_selectedPopulations === null) return
 
     _selectedPopulations = filterScopeTree(_selectedPopulations)
+    if (_selectedPopulations === null) return
     _selectedPopulations = _selectedPopulations.map((_selectedPopulation: ScopeTreeRow) => ({
       ..._selectedPopulation,
       subItems: []
