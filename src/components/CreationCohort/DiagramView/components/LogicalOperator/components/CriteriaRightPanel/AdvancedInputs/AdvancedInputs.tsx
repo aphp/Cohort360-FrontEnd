@@ -1,16 +1,17 @@
 import React, { useState } from 'react'
 
 import { Collapse, Grid, IconButton, Typography, FormLabel, Tooltip } from '@mui/material'
-
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import InfoIcon from '@mui/icons-material/Info'
 
+import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
 import OccurrencesInputs from './OccurrencesInputs/OccurrencesInputs'
 import VisitInputs from './VisitInputs/VisitInputs'
-import PopulationCard from '../../../../PopulationCard/PopulationCard'
-import { ScopeTreeRow } from 'types'
-import InfoIcon from '@mui/icons-material/Info'
+
 import scopeType from 'data/scope_type.json'
+
+import { ScopeTreeRow } from 'types'
 
 type AdvancedInputsProps = {
   form: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication' | 'biology'
