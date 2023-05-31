@@ -21,11 +21,11 @@
         "trailingComma": "none",
         "printWidth": 120
       }
-    ],
-    "max-statements": [
-      1, {
-        "max": 20
-      }
+    // ],
+    // "max-statements": [
+    //   1, {
+    //     "max": 20
+    //   }
     ],
     "react/no-unknown-property":0,
     "react/prop-types": 0,

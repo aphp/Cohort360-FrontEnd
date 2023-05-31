@@ -15,7 +15,7 @@ import { fetchScopesList, ScopeState } from 'state/scope'
 import { MeState } from 'state/me'
 
 import { ScopeTreeRow } from 'types'
-import { filterScopeTree, getSelectedScopes } from 'utils/scopeTree'
+import { getSelectedScopes } from 'utils/scopeTree'
 
 import useStyles from './styles'
 
