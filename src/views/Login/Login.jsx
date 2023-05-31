@@ -303,10 +303,12 @@ const Login = () => {
   if (noRights === true) return <NoRights />
 
   return code ? (
-    <div>
-      Authenticating...
+    <Grid className={classes.oidcAuthenticating}>
+      <Typography variant="h2" color="primary">
+        Authenticating...
+      </Typography>
       <CircularProgress />
-    </div>
+    </Grid>
   ) : authCode ? (
     <Welcome />
   ) : (

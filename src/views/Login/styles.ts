@@ -31,6 +31,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   mention: {
     marginTop: '8px'
+  },
+  oidcAuthenticating: {
+    margin: '10%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    rowGap: '30px'
   }
 }))
 
