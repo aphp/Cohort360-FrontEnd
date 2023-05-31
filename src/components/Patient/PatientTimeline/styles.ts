@@ -4,7 +4,7 @@ const fontSize = 16
 const dotSize = 16
 const emptyYearHeight = '0.7em'
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles<{ dotHeight?: number; color?: string }>()((_theme, params) => ({
   centeredTimeline: {
     position: 'relative',
     overflow: 'hidden',
@@ -36,7 +36,7 @@ const useStyles = makeStyles()(() => ({
     height: 41,
     backgroundColor: '#5BC5F2',
     color: '#FFF',
-    borderRadius: '25px',
+    borderRadius: 25,
     marginLeft: 8
   },
   chips: {
@@ -48,17 +48,6 @@ const useStyles = makeStyles()(() => ({
 
   timeline: {
     display: 'flex',
-
-    '& before': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      bottom: -10,
-      width: 2,
-      background: '#3498db',
-      left: 32,
-      bordeRadius: 2
-    },
 
     position: 'relative',
     margin: '0 0 0 0',
@@ -91,7 +80,7 @@ const useStyles = makeStyles()(() => ({
     display: 'block',
     textAlign: 'center',
     fontWeight: 600,
-    backgroundColor: 'rgba(230, 241, 253, .8)', //'#E6F1FD'
+    backgroundColor: '#E6F1FD',
     color: 'black',
     zIndex: 5,
     lineHeight: 1
@@ -125,32 +114,32 @@ const useStyles = makeStyles()(() => ({
     position: 'absolute',
     width: `calc(100% + ${marginNextCentralLine}px)`,
     height: '100%',
-    top: '15px',
+    top: 15,
     zIndex: -1
   },
-  dotLeft: ({ dotHeight, color }) => ({
+  dotLeft: {
     position: 'absolute',
     width: dotSize,
-    height: dotHeight,
+    height: params.dotHeight,
     borderRadius: 50,
-    backgroundColor: color,
+    backgroundColor: params.color,
     display: 'inline-block',
     transform: 'translateX(50%) translateY(-100%) translateY(10px)',
     border: '1px solid #3B3B51',
     zIndex: 1,
     right: 0
-  }),
-  dotRight: ({ color }) => ({
+  },
+  dotRight: {
     position: 'relative',
     width: dotSize,
     height: dotSize,
     borderRadius: 50,
-    backgroundColor: color,
+    backgroundColor: params.color,
     display: 'inline-block',
     transform: 'translateX(-50%)',
     border: '1px solid #3B3B51',
     zIndex: 1
-  }),
+  },
   lineLeft: {
     position: 'absolute',
     height: 1,
@@ -168,15 +157,14 @@ const useStyles = makeStyles()(() => ({
   },
   chip: {
     fontSize: fontSize,
-    borderRadius: '5px',
+    borderRadius: 5,
     margin: 8
   },
   timelineRight: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    width: '100%',
-    fontSize: '50'
+    width: '100%'
   },
   hospitDates: {
     fontFamily: 'Roboto',
@@ -217,13 +205,13 @@ const useStyles = makeStyles()(() => ({
     marginLeft: `${marginNextCentralLine}px`,
     top: 3
   },
-  leftHospitCard: ({ color }) => ({
-    border: `1px solid ${color}`,
-    borderLeft: `7px solid ${color}`,
+  leftHospitCard: {
+    border: `1px solid ${params.color}`,
+    borderLeft: `7px solid ${params.color}`,
     padding: '.4rem',
     paddingTop: '.2rem',
-    borderRadius: '5px'
-  }),
+    borderRadius: 5
+  },
   emptyYear: {
     height: emptyYearHeight
   }

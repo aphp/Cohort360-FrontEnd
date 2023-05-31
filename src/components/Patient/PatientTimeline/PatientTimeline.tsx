@@ -145,7 +145,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
   diagnostics
 }) => {
   const dispatch = useAppDispatch()
-  const { classes } = useStyles()
+  const { classes } = useStyles({})
   const [timelineData, setTimelineData] = useState<TimelineData>({})
   const [openHospitDialog, setOpenHospitDialog] = useState(false)
   const [dialogDocuments, setDialogDocuments] = useState<CohortComposition[] | undefined>([])
