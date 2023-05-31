@@ -32,6 +32,7 @@ export type CohortCreationState = {
   snapshotsHistory: CohortCreationSnapshotType[]
   count: CohortCreationCounterType
   selectedPopulation: (ScopeTreeRow | undefined)[] | null
+  executiveUnits: (ScopeTreeRow | undefined)[] | null
   allowSearchIpp: boolean
   selectedCriteria: SelectedCriteriaType[]
   criteriaGroup: CriteriaGroupType[]
@@ -55,6 +56,7 @@ const defaultInitialState: CohortCreationState = {
   snapshotsHistory: [],
   count: {},
   selectedPopulation: null,
+  executiveUnits: null,
   allowSearchIpp: false,
   selectedCriteria: [],
   criteriaGroup: [

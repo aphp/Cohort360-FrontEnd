@@ -1,0 +1,12 @@
+{
+  "criteriaType": {
+    "biology": "Hôpital",
+    "ccam": "Unité Fonctionnelle (UF)",
+    "cim10": "Unité Fonctionnelle (UF)",
+    "ghm": "Hôpital",
+    "medication": "Hôpital",
+    "document": "Hôpital",
+    "supported": "AP-HP"
+  },
+  "typeLevel": [["AP-HP"], ["Groupe hospitalier (GH)", "GHU"], ["Hôpital"], ["Pôle/DMU"], ["Unité Fonctionnelle (UF)"]]
+}

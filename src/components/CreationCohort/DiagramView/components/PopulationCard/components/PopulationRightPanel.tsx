@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Button from '@mui/material/Button'
 import Drawer from '@mui/material/Drawer'
@@ -7,31 +7,26 @@ import Typography from '@mui/material/Typography'
 import ScopeTree from 'components/ScopeTree/ScopeTree'
 import { ScopeTreeRow } from 'types'
 
-import { useAppSelector } from 'state'
-
 import useStyles from './styles'
 import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
 
 type PopulationRightPanelProps = {
   open: boolean
-  onConfirm: (selectedPopulation: ScopeTreeRow[] | null) => void
+  title?: string
+  executiveUnitType?: string
+  selectedPopulation: ScopeTreeRow[]
+  isAcceptEmptySelection?: boolean
+  onConfirm: (selectedPopulation: ScopeTreeRow[]) => void
   onClose: () => void
 }
 
 const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
-  const { open, onConfirm, onClose } = props
+  const { open, title, executiveUnitType, selectedPopulation, isAcceptEmptySelection, onConfirm, onClose } = props
 
   const classes = useStyles()
 
-  const { selectedPopulation = [] } = useAppSelector((state) => state.cohortCreation.request || {})
-  const [_selectedPopulation, onChangeSelectedPopulation] = useState<ScopeTreeRow[]>([])
+  const [_selectedPopulation, _setSelectedPopulation] = useState<ScopeTreeRow[]>(selectedPopulation)
   const [searchInput, setSearchInput] = useState('')
-
-  useEffect(() => {
-    onChangeSelectedPopulation(
-      selectedPopulation !== null ? (selectedPopulation.filter((elem) => elem !== undefined) as ScopeTreeRow[]) : []
-    )
-  }, [open]) // eslint-disable-line
 
   /**
    * Render
@@ -40,7 +35,7 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
     <Drawer anchor="right" open={open} onClose={onClose}>
       <div className={classes.root}>
         <div className={classes.drawerTitleContainer}>
-          <Typography className={classes.title}>Structure hospitalière</Typography>
+          <Typography className={classes.title}>{title ?? 'Structure hospitalière'}</Typography>
         </div>
 
         <div className={classes.drawerContentContainer}>
@@ -48,9 +43,10 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
             <ScopeSearchBar searchInput={searchInput} onChangeInput={setSearchInput} />
           </div>
           <ScopeTree
+            executiveUnitType={executiveUnitType}
             searchInput={searchInput}
             defaultSelectedItems={_selectedPopulation}
-            onChangeSelectedItem={onChangeSelectedPopulation}
+            onChangeSelectedItem={_setSelectedPopulation}
           />
         </div>
 
@@ -59,7 +55,10 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
             Annuler
           </Button>
           <Button
-            disabled={!_selectedPopulation || (_selectedPopulation && _selectedPopulation.length === 0)}
+            disabled={
+              !isAcceptEmptySelection &&
+              (!_selectedPopulation || (_selectedPopulation && _selectedPopulation.length === 0))
+            }
             onClick={() => onConfirm(_selectedPopulation)}
             variant="contained"
           >

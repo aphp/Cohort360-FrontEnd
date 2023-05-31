@@ -113,55 +113,7 @@ export const getSelectedScopes = (
   return savedSelectedItems
 }
 
-export const filterScopeTree = (_selectedItems: any[]): any => {
-  // If you chenge this code, change it too inside: PopulationCard.tsx:31
-  return _selectedItems.filter((item, index, array) => {
-    // reemove double item
-    const foundItem = array.find(({ id }) => item.id === id)
-    const currentIndex = foundItem ? array.indexOf(foundItem) : -1
-    if (index !== currentIndex) return false
-
-    const parentItem = array.find(({ subItems }) => !!subItems?.find((subItem: any) => subItem.id === item.id))
-    if (parentItem !== undefined) {
-      const selectedChildren =
-        parentItem.subItems && parentItem.subItems.length > 0
-          ? parentItem.subItems.filter((subItem: any) => !!array.find(({ id }) => id === subItem.id))
-          : []
-
-      if (selectedChildren.length === parentItem.subItems.length) {
-        // Si item + TOUS LES AUTRES child sont select. => Delete it
-        return false
-      } else {
-        // Sinon => Keep it
-        return true
-      }
-    } else {
-      if (
-        !item.subItems ||
-        (item.subItems && item.subItems.length === 0) ||
-        (item.subItems && item.subItems.length > 0 && item.subItems[0].id === 'loading')
-      ) {
-        // Si pas d'enfant, pas de check => Keep it
-        return true
-      }
-
-      const selectedChildren =
-        item.subItems && item.subItems.length > 0
-          ? item.subItems.filter((subItem: any) => !!array.find(({ id }) => id === subItem.id))
-          : []
-
-      if (selectedChildren.length === item.subItems.length) {
-        // Si tous les enfants sont check => Keep it
-        return true
-      } else {
-        // Sinon => Delete it
-        return false
-      }
-    }
-  })
-}
-
-export const sortByQuantityAndName = (scopeRows: ScopeTreeRow[]): ScopeTreeRow[] => {
+export const sortByQuantityAndName = (scopeRows: ScopeTreeRow[]) => {
   // Sort by quantity
   scopeRows = scopeRows.sort((a: ScopeTreeRow, b: ScopeTreeRow) => {
     if (a.quantity > b.quantity) {

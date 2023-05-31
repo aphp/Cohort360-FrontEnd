@@ -266,13 +266,15 @@ export type ScopeTreeRow = {
   name: string
   full_path?: string
   quantity: number
-  parentId?: string
+  parentId?: string | null
   subItems: ScopeTreeRow[]
   managingEntity?: any | undefined
+  above_levels_ids?: string
   inferior_levels_ids?: string
   cohort_id?: string
   cohort_size?: string
   cohort_tag?: string
+  type?: string
 }
 
 export type SimpleChartDataType = {
@@ -405,6 +407,7 @@ export type CriteriaItemType = {
 export type SelectedCriteriaType = {
   id: number
   error?: boolean
+  encounterService?: ScopeTreeRow[]
 } & (
   | CcamDataType
   | Cim10DataType
@@ -783,6 +786,7 @@ export type ScopeElement = {
   source_value: string
   parent_id: string | null
   type: string
+  above_levels_ids: string
   inferior_levels_ids: string
   cohort_id: string
   cohort_size: string
