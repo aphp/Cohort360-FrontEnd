@@ -133,7 +133,7 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
             <CircularProgress />
           </div>
         </div>
-      ) : selectionAndPopulationWithRightError?.length !== 0 ? (
+      ) : selectionAndPopulationWithRightError?.length !== 0 || form ? (
         <div className={classes.populationCard}>
           <div className={classes.leftDiv}>
             <Typography className={classes.typography} variant={form ? undefined : 'h6'} align="left">
