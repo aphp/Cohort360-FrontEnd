@@ -13,7 +13,6 @@ import Dashboard from 'views/Dashboard/Dashboard'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 // import Contact from 'views/Contact/Contact'
 import PageNotFound from 'views/PageNotFound/PageNotFound'
-import OIDCCallbackHandler from '../../../views/OidcAuth/OIDCCallbackHandler'
 
 // import { ODD_CONTACT } from '../../../constants'
 
@@ -201,12 +200,6 @@ const configRoutes: configRoute[] = [
     name: 'patients/:patientId/:tabName',
     isPrivate: true,
     element: <Patient />
-  },
-  {
-    path: '/auth/oidc/callback',
-    name: '/auth/oidc/callback',
-    isPrivate: false,
-    element: <OIDCCallbackHandler />
   },
   /**
    * Cohort360: 404 - Page Not Found

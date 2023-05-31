@@ -1,5 +1,6 @@
 import { AxiosResponse } from 'axios'
 import apiBackend from 'services/apiBackend'
+import { ACCES_TOKEN, REFRESH_TOKEN } from '../../constants'
 
 export interface IServicePractitioner {
   /**
@@ -12,6 +13,7 @@ export interface IServicePractitioner {
    * Retourne la reponse de Axios
    */
   authenticate: (username: string, password: string) => Promise<any>
+  authenticateCode: (code: string) => Promise<any>
 
   /**
    * Cette fonction permet d'appeler la route de logout
@@ -54,12 +56,27 @@ const servicePractitioner: IServicePractitioner = {
 
       return await apiBackend.post(`/accounts/login/`, formData)
     } catch (error) {
-      console.error("erreur lors de l'exécution de la fonction authenticate", error)
+      console.error('Error authenticating with credentials', error)
+      return error
+    }
+  },
+
+  authenticateCode: async (authCode: string) => {
+    try {
+      const res = await apiBackend.post(`/auth/oidc/login`, { auth_code: authCode })
+      if (res.status === 200) {
+        localStorage.setItem(ACCES_TOKEN, res.data.jwt.access)
+        localStorage.setItem(REFRESH_TOKEN, res.data.jwt.refresh)
+      }
+      return res
+    } catch (error) {
+      console.error('Error authenticating with an authorization code', error)
       return error
     }
   },
 
   logout: async () => {
+    localStorage.clear()
     await apiBackend.post(`/accounts/logout/`)
   },
 

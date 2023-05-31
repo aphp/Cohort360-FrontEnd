@@ -39,6 +39,7 @@ import services from 'services/aphp'
 
 import useStyles from './styles'
 import { getDaysLeft } from '../../utils/formatDate'
+import Welcome from '../Welcome/Welcome'
 
 const ErrorSnackBarAlert = ({ open, setError, errorMessage }) => {
   const _setError = () => {
@@ -106,10 +107,18 @@ const Login = () => {
   const [error, setError] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [open, setOpen] = useState(false)
+  const [authCode, setAuthCode] = useState(undefined)
+  const urlParams = new URLSearchParams(window.location.search)
+  const code = urlParams.get('code')
 
   React.useEffect(() => {
     localforage.setItem('persist:root', '')
+    if (code) setAuthCode(code)
   }, [])
+
+  React.useEffect(() => {
+    if (authCode) login()
+  }, [authCode])
 
   const getPractitionerData = async (practitioner, lastConnection, maintenance, accessExpirations = []) => {
     if (practitioner) {
@@ -178,12 +187,19 @@ const Login = () => {
     if (loading) return
     setLoading(true)
 
-    if (!username || !password) {
-      setLoading(false)
-      return setError(true), setErrorMessage("L'un des champs nom d'utilisateur ou mot de passe est vide.")
-    }
+    let response = null
 
-    const response = await services.practitioner.authenticate(username, password)
+    if (authCode) {
+      response = await services.practitioner.authenticateCode(authCode)
+    } else {
+      if (!username || !password) {
+        setLoading(false)
+        return setError(true), setErrorMessage("L'un des champs nom d'utilisateur ou mot de passe est vide.")
+      }
+      if (username && password) {
+        response = await services.practitioner.authenticateCredentials(username, password)
+      }
+    }
 
     if (!response) {
       setLoading(false)
@@ -226,7 +242,7 @@ const Login = () => {
       localStorage.setItem(ACCES_TOKEN, data.jwt.access)
       localStorage.setItem(REFRESH_TOKEN, data.jwt.refresh)
 
-      const practitioner = await services.practitioner.fetchPractitioner(username)
+      const practitioner = await services.practitioner.fetchPractitioner(data.user.provider_username)
 
       if (!practitioner || practitioner.error || !practitioner.response || practitioner.response.status !== 200) {
         setLoading(false)
@@ -277,12 +293,23 @@ const Login = () => {
 
   const oidcLogin = (e) => {
     e.preventDefault()
-    window.location = `${OIDC_PROVIDER_URL}?state=${OIDC_STATE}&client_id=${OIDC_CLIENT_ID}&redirect_uri=${OIDC_REDIRECT_URI}&response_type=${OIDC_RESPONSE_TYPE}&scope=${OIDC_SCOPE}`
+    window.location = `${OIDC_PROVIDER_URL}?state=${OIDC_STATE}&` +                   // eslint-disable-line
+                                           `client_id=${OIDC_CLIENT_ID}&` +           // eslint-disable-line
+                                           `redirect_uri=${OIDC_REDIRECT_URI}&` +     // eslint-disable-line
+                                           `response_type=${OIDC_RESPONSE_TYPE}&` +   // eslint-disable-line
+                                           `scope=${OIDC_SCOPE}`                      // eslint-disable-line
   }
 
   if (noRights === true) return <NoRights />
 
-  return (
+  return code ? (
+    <div>
+      Authenticating...
+      <CircularProgress />
+    </div>
+  ) : authCode ? (
+    <Welcome />
+  ) : (
     <>
       <Grid container component="main" className={classes.root}>
         <Grid item xs={false} sm={6} md={6} className={classes.image} />
