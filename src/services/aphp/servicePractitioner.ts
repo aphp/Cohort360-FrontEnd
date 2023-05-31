@@ -12,8 +12,8 @@ export interface IServicePractitioner {
    *
    * Retourne la reponse de Axios
    */
-  authenticate: (username: string, password: string) => Promise<any>
-  authenticateCode: (code: string) => Promise<any>
+  authenticateWithCredentials: (username: string, password: string) => Promise<any>
+  authenticateWithCode: (code: string) => Promise<any>
 
   /**
    * Cette fonction permet d'appeler la route de logout
@@ -48,7 +48,7 @@ export interface IServicePractitioner {
 }
 
 const servicePractitioner: IServicePractitioner = {
-  authenticate: async (username, password) => {
+  authenticateWithCredentials: async (username, password) => {
     try {
       const formData = new FormData()
       formData.append('username', username.toString())
@@ -61,7 +61,7 @@ const servicePractitioner: IServicePractitioner = {
     }
   },
 
-  authenticateCode: async (authCode: string) => {
+  authenticateWithCode: async (authCode: string) => {
     try {
       const res = await apiBackend.post(`/auth/oidc/login`, { auth_code: authCode })
       if (res.status === 200) {

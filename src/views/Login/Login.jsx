@@ -190,14 +190,14 @@ const Login = () => {
     let response = null
 
     if (authCode) {
-      response = await services.practitioner.authenticateCode(authCode)
+      response = await services.practitioner.authenticateWithCode(authCode)
     } else {
       if (!username || !password) {
         setLoading(false)
         return setError(true), setErrorMessage("L'un des champs nom d'utilisateur ou mot de passe est vide.")
       }
       if (username && password) {
-        response = await services.practitioner.authenticateCredentials(username, password)
+        response = await services.practitioner.authenticateWithCredentials(username, password)
       }
     }
 
