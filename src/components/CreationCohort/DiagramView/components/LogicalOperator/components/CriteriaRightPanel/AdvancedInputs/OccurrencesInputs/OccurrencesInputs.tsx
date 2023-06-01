@@ -17,6 +17,7 @@ import ClearIcon from '@mui/icons-material/Clear'
 import InfoIcon from '@mui/icons-material/Info'
 
 import useStyles from './styles'
+import { CriteriaName, CriteriaNameType } from 'types'
 
 const defaultOccurrencesInputs = {
   code: [],
@@ -32,7 +33,7 @@ const defaultOccurrencesInputs = {
 }
 
 type OccurrenceInputsProps = {
-  form: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication' | 'biology' | 'visitSupport'
+  form: CriteriaNameType
   selectedCriteria: any
   onChangeValue: (key: string, value: any) => void
 }
@@ -47,7 +48,11 @@ const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
     <>
       <FormLabel style={{ padding: '0 1em 8px', display: 'flex', alignItems: 'center' }} component="legend">
         Nombre d'occurrence
-        {(form == 'ccam' || form === 'cim10' || form === 'ghm' || form == 'biology' || 'visitSupport') && (
+        {(form == CriteriaName.Ccam ||
+          form === CriteriaName.Cim10 ||
+          form === CriteriaName.Ghm ||
+          form == CriteriaName.Biology ||
+          CriteriaName.VisitSupport) && (
           <Tooltip
             title={
               <>

@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import _ from 'lodash'
 
 import {
   Alert,
   Autocomplete,
   Button,
+  Checkbox,
+  CircularProgress,
   Divider,
   FormControl,
   FormLabel,
@@ -14,10 +16,8 @@ import {
   MenuItem,
   Select,
   Switch,
-  Typography,
   TextField,
-  Checkbox,
-  CircularProgress
+  Typography
 } from '@mui/material'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
@@ -28,9 +28,10 @@ import { InputSearchDocumentSimple } from 'components/Inputs'
 
 import useStyles from './styles'
 
-import { DocType, DocumentDataType, errorDetails, SearchByTypes, searchInputError } from 'types'
+import { CriteriaName, DocType, DocumentDataType, errorDetails, SearchByTypes, searchInputError } from 'types'
 import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
+import OccurrencesInputs from '../AdvancedInputs/OccurrencesInputs/OccurrencesInputs'
 
 type TestGeneratedFormProps = {
   criteria: any
@@ -154,6 +155,12 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             />
           </Grid>
 
+          <OccurrencesInputs
+            form={CriteriaName.Document}
+            selectedCriteria={defaultValues}
+            onChangeValue={_onChangeValue}
+          />
+
           <FormControl variant="outlined" className={classes.inputItem} style={{ marginBottom: 0 }}>
             <InputLabel>Rechercher dans :</InputLabel>
             <Select
@@ -262,7 +269,11 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             }}
           />
 
-          <AdvancedInputs form="document" selectedCriteria={defaultValues} onChangeValue={_onChangeValue} />
+          <AdvancedInputs
+            form={CriteriaName.Document}
+            selectedCriteria={defaultValues}
+            onChangeValue={_onChangeValue}
+          />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

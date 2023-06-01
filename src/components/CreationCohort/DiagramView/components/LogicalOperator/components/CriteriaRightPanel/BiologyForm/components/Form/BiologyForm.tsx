@@ -20,12 +20,11 @@ import {
 import InfoIcon from '@mui/icons-material/Info'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
-import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
-
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchBiology } from 'state/biology'
-import { HierarchyTree } from 'types'
+import { CriteriaName, HierarchyTree } from 'types'
+import OccurrencesInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrencesInputs'
 
 type BiologyFormProps = {
   isOpen: boolean
@@ -157,6 +156,12 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             />
           </Grid>
 
+          <OccurrencesInputs
+            form={CriteriaName.Biology}
+            selectedCriteria={currentState}
+            onChangeValue={onChangeValue}
+          />
+
           <Grid className={classes.inputContainer}>
             <Typography variant="h6">Codes de biologie</Typography>
 
@@ -259,8 +264,6 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
               {/* TODO: gérer l'erreur si valumin > valuemax */}
             </Grid>
           </Grid>
-
-          <AdvancedInputs form="biology" selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

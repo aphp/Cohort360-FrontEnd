@@ -11,7 +11,8 @@ import AdvancedInputs from 'components/CreationCohort/DiagramView/components/Log
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProcedure } from 'state/pmsi'
-import { HierarchyTree } from 'types'
+import { CriteriaName, HierarchyTree } from 'types'
+import OccurrencesInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrencesInputs'
 
 type CcamFormProps = {
   isOpen: boolean
@@ -111,6 +112,12 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             />
           </Grid>
 
+          <OccurrencesInputs
+            form={CriteriaName.Ccam}
+            selectedCriteria={selectedCriteria}
+            onChangeValue={onChangeValue}
+          />
+
           <AutocompleteAsync
             multiple
             label="Codes d'actes CCAM"
@@ -123,7 +130,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             onChange={(e, value) => onChangeValue('code', value)}
           />
 
-          <AdvancedInputs form="ccam" selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs form={CriteriaName.Ccam} selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

@@ -1,21 +1,20 @@
 import React, { useState } from 'react'
 
-import { Collapse, Typography, Grid, IconButton } from '@mui/material'
+import { Collapse, Grid, IconButton, Typography } from '@mui/material'
 
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
-
-import OccurrencesInputs from './OccurrencesInputs/OccurrencesInputs'
 import VisitInputs from './VisitInputs/VisitInputs'
+import { CriteriaNameType } from 'types'
 
 type AdvancedInputsProps = {
-  form: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication' | 'biology'
+  form: CriteriaNameType
   selectedCriteria: any
   onChangeValue: (key: string, value: any) => void
 }
 
 const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
-  const { form, selectedCriteria = {}, onChangeValue } = props
+  const { selectedCriteria = {}, onChangeValue } = props
   const optionsIsUsed =
     +selectedCriteria.occurrence !== 1 ||
     selectedCriteria.occurrenceComparator !== '>=' ||
@@ -46,7 +45,6 @@ const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
       </Grid>
 
       <Collapse in={checked} unmountOnExit>
-        <OccurrencesInputs form={form} selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
         <VisitInputs selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
       </Collapse>
     </Grid>

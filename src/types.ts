@@ -790,3 +790,21 @@ export type AgeRangeType = {
   month?: number
   days?: number
 }
+
+export enum CriteriaName {
+  Cim10 = 'cim10',
+  Ccam = 'ccam',
+  Ghm = 'ghm',
+  Document = 'document',
+  Medication = 'medication',
+  Biology = 'biology',
+  VisitSupport = 'visitSupport'
+}
+export type CriteriaNameType =
+  | CriteriaName.Cim10
+  | CriteriaName.Ccam
+  | CriteriaName.Ghm
+  | CriteriaName.Document
+  | CriteriaName.Medication
+  | CriteriaName.Biology
+  | CriteriaName.VisitSupport

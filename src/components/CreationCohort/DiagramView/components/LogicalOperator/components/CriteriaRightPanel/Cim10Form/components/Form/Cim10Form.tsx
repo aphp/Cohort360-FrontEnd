@@ -9,8 +9,8 @@ import {
   Grid,
   IconButton,
   Switch,
-  Typography,
-  TextField
+  TextField,
+  Typography
 } from '@mui/material'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
@@ -22,7 +22,8 @@ import AdvancedInputs from 'components/CreationCohort/DiagramView/components/Log
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition } from 'state/pmsi'
-import { HierarchyTree } from 'types'
+import { CriteriaName, HierarchyTree } from 'types'
+import OccurrencesInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrencesInputs'
 
 type Cim10FormProps = {
   isOpen: boolean
@@ -137,6 +138,12 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             />
           </Grid>
 
+          <OccurrencesInputs
+            form={CriteriaName.Cim10}
+            selectedCriteria={selectedCriteria}
+            onChangeValue={onChangeValue}
+          />
+
           <AutocompleteAsync
             multiple
             label="Code CIM10"
@@ -163,7 +170,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             renderInput={(params) => <TextField {...params} label="Type de diagnostic" />}
           />
 
-          <AdvancedInputs form="cim10" selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs form={CriteriaName.Cim10} selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

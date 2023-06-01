@@ -11,9 +11,9 @@ import {
   IconButton,
   Slider,
   Switch,
+  TextField,
   Tooltip,
-  Typography,
-  TextField
+  Typography
 } from '@mui/material'
 import InfoIcon from '@mui/icons-material/Info'
 
@@ -24,10 +24,9 @@ import OtherInputs from './SupportedInputs/OtherInputs'
 
 import VisitInputs from '../AdvancedInputs/VisitInputs/VisitInputs'
 // import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
-
 import useStyles from './styles'
 
-import { EncounterDataType } from 'types'
+import { CriteriaName, EncounterDataType } from 'types'
 import OccurrencesInputs from '../AdvancedInputs/OccurrencesInputs/OccurrencesInputs'
 
 type SupportedFormProps = {
@@ -155,7 +154,11 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
             onChange={(e) => _onChangeValue('title', e.target.value)}
           />
 
-          <OccurrencesInputs form={'visitSupport'} selectedCriteria={defaultValues} onChangeValue={_onChangeValue} />
+          <OccurrencesInputs
+            form={CriteriaName.VisitSupport}
+            selectedCriteria={defaultValues}
+            onChangeValue={_onChangeValue}
+          />
           <Grid style={{ display: 'flex' }}>
             <FormLabel
               onClick={() => _onChangeValue('isInclusive', !defaultValues.isInclusive)}

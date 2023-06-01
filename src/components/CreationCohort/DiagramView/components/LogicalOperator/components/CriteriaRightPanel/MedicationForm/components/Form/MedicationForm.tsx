@@ -12,8 +12,8 @@ import {
   Radio,
   RadioGroup,
   Switch,
-  Typography,
-  TextField
+  TextField,
+  Typography
 } from '@mui/material'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
@@ -25,7 +25,8 @@ import AdvancedInputs from 'components/CreationCohort/DiagramView/components/Log
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchMedication } from 'state/medication'
-import { HierarchyTree } from 'types'
+import { CriteriaName, HierarchyTree } from 'types'
+import OccurrencesInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrencesInputs'
 
 type MedicationFormProps = {
   isOpen: boolean
@@ -149,6 +150,12 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             />
           </Grid>
 
+          <OccurrencesInputs
+            form={CriteriaName.Medication}
+            selectedCriteria={currentState}
+            onChangeValue={onChangeValue}
+          />
+
           <Grid style={{ display: 'flex' }}>
             <RadioGroup
               row
@@ -209,7 +216,11 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             renderInput={(params) => <TextField {...params} label="Voie d'administration" />}
           />
 
-          <AdvancedInputs form="medication" selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs
+            form={CriteriaName.Medication}
+            selectedCriteria={currentState}
+            onChangeValue={onChangeValue}
+          />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

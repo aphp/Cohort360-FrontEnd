@@ -1,17 +1,16 @@
 import React, { useState } from 'react'
 
-import { Alert, Button, Divider, FormLabel, Grid, IconButton, Switch, Typography, TextField } from '@mui/material'
+import { Alert, Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@mui/material'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
-import AdvancedInputs from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AdvancedInputs/AdvancedInputs'
-
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchClaim } from 'state/pmsi'
-import { HierarchyTree } from 'types'
+import { CriteriaName, HierarchyTree } from 'types'
+import OccurrencesInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrencesInputs'
 
 type GHMFormProps = {
   isOpen: boolean
@@ -105,6 +104,12 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             />
           </Grid>
 
+          <OccurrencesInputs
+            form={CriteriaName.Ghm}
+            selectedCriteria={selectedCriteria}
+            onChangeValue={onChangeValue}
+          />
+
           <AutocompleteAsync
             multiple
             label="Codes GHM"
@@ -118,8 +123,6 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
               onChangeValue('code', value)
             }}
           />
-
-          <AdvancedInputs form="ghm" selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

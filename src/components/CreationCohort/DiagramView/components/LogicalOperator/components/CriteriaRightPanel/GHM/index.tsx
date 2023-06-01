@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Tabs, Tab } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import { Tab, Tabs } from '@mui/material'
 
 import GHMForm from './components/Form/GhmForm'
 import GHMHierarchy from './components/Hierarchy/GhmHierarchy'
