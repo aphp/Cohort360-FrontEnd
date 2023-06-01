@@ -88,7 +88,7 @@ type fetchPatientProps = {
   offset?: number
   _sort?: string
   sortDirection?: 'asc' | 'desc'
-  gender?: string
+  gender?: string | null
   minBirthdate?: number
   maxBirthdate?: number
   searchBy?: string

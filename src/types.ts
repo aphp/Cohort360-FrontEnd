@@ -187,9 +187,9 @@ export type PMSIFilters = {
 }
 
 export type PatientFilters = {
-  gender: PatientGenderKind
+  gender: PatientGenderKind | null
   birthdatesRanges: [string, string]
-  vitalStatus: VitalStatus
+  vitalStatus: VitalStatus | null
 }
 
 export type ObservationFilters = {

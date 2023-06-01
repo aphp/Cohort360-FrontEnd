@@ -64,9 +64,9 @@ const PatientList: React.FC<PatientListProps> = ({
   const [open, setOpen] = useState(false)
 
   const [filters, setFilters] = useState<PatientFiltersType>({
-    gender: PatientGenderKind._unknown,
+    gender: null,
     birthdatesRanges: ['', ''],
-    vitalStatus: VitalStatus.all
+    vitalStatus: null
   })
 
   const [order, setOrder] = useState<Order>({
@@ -166,7 +166,7 @@ const PatientList: React.FC<PatientListProps> = ({
       case 'gender':
         setFilters((prevFilters) => ({
           ...prevFilters,
-          gender: PatientGenderKind._unknown
+          gender: null
         }))
         break
       case 'birthdates':
