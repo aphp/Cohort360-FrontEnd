@@ -6,6 +6,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import VisitInputs from './VisitInputs/VisitInputs'
 import { CriteriaNameType } from 'types'
+import OccurrencesDateInputs from './OccurrencesInputs/OccurrencesDateInputs'
 
 type AdvancedInputsProps = {
   form: CriteriaNameType
@@ -46,6 +47,7 @@ const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
 
       <Collapse in={checked} unmountOnExit>
         <VisitInputs selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
+        <OccurrencesDateInputs selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
       </Collapse>
     </Grid>
   )

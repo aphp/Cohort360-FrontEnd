@@ -10,7 +10,8 @@ import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchClaim } from 'state/pmsi'
 import { CriteriaName, HierarchyTree } from 'types'
-import OccurrencesInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrencesInputs'
+import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
+import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 type GHMFormProps = {
   isOpen: boolean
@@ -104,7 +105,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             />
           </Grid>
 
-          <OccurrencesInputs
+          <OccurrencesNumberInputs
             form={CriteriaName.Ghm}
             selectedCriteria={selectedCriteria}
             onChangeValue={onChangeValue}
@@ -123,6 +124,8 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
               onChangeValue('code', value)
             }}
           />
+
+          <AdvancedInputs form={CriteriaName.Cim10} selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

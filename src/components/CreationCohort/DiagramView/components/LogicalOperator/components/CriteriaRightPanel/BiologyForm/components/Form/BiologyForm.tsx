@@ -24,7 +24,8 @@ import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchBiology } from 'state/biology'
 import { CriteriaName, HierarchyTree } from 'types'
-import OccurrencesInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrencesInputs'
+import OccurrencesNumberInputs from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
+import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 type BiologyFormProps = {
   isOpen: boolean
@@ -156,7 +157,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             />
           </Grid>
 
-          <OccurrencesInputs
+          <OccurrencesNumberInputs
             form={CriteriaName.Biology}
             selectedCriteria={currentState}
             onChangeValue={onChangeValue}
@@ -264,6 +265,8 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
               {/* TODO: gérer l'erreur si valumin > valuemax */}
             </Grid>
           </Grid>
+
+          <AdvancedInputs form={CriteriaName.Biology} selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

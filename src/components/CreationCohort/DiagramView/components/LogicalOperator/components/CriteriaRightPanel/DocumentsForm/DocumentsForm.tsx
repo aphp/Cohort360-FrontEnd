@@ -31,7 +31,7 @@ import useStyles from './styles'
 import { CriteriaName, DocType, DocumentDataType, errorDetails, SearchByTypes, searchInputError } from 'types'
 import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
-import OccurrencesInputs from '../AdvancedInputs/OccurrencesInputs/OccurrencesInputs'
+import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 
 type TestGeneratedFormProps = {
   criteria: any
@@ -155,7 +155,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             />
           </Grid>
 
-          <OccurrencesInputs
+          <OccurrencesNumberInputs
             form={CriteriaName.Document}
             selectedCriteria={defaultValues}
             onChangeValue={_onChangeValue}

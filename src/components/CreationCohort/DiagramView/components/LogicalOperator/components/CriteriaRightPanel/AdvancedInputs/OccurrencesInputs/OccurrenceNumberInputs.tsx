@@ -1,25 +1,12 @@
 import React from 'react'
 
-import {
-  FormControl,
-  FormLabel,
-  Grid,
-  IconButton,
-  Input,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Tooltip
-} from '@mui/material'
-
-import ClearIcon from '@mui/icons-material/Clear'
+import { FormLabel, Grid, MenuItem, Select, TextField, Tooltip } from '@mui/material'
 import InfoIcon from '@mui/icons-material/Info'
 
 import useStyles from './styles'
 import { CriteriaName, CriteriaNameType } from 'types'
 
-const defaultOccurrencesInputs = {
+const defaultOccurrencesNumberInputs = {
   code: [],
   isLeaf: false,
   valueMin: 0,
@@ -32,17 +19,15 @@ const defaultOccurrencesInputs = {
   isInclusive: true
 }
 
-type OccurrenceInputsProps = {
+type OccurrencesNumberInputsProps = {
   form: CriteriaNameType
   selectedCriteria: any
   onChangeValue: (key: string, value: any) => void
 }
 
-const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
+const OccurrencesNumberInputs: React.FC<OccurrencesNumberInputsProps> = (props) => {
   const { form, onChangeValue } = props
-  const selectedCriteria = { ...defaultOccurrencesInputs, ...props.selectedCriteria }
-
-  const classes = useStyles()
+  const selectedCriteria = { ...defaultOccurrencesNumberInputs, ...props.selectedCriteria }
 
   return (
     <>
@@ -97,48 +82,8 @@ const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
           onChange={(e) => onChangeValue('occurrence', e.target.value)}
         />
       </Grid>
-
-      <FormLabel style={{ padding: '1em 1em 0 1em' }} component="legend">
-        Date d'occurrence
-      </FormLabel>
-
-      <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-        <FormControl className={classes.inputItem}>
-          <InputLabel shrink htmlFor="date-start-occurrence">
-            Après le
-          </InputLabel>
-          <Input
-            id="date-start-occurrence"
-            type="date"
-            value={selectedCriteria.startOccurrence}
-            endAdornment={
-              <IconButton size="small" onClick={() => onChangeValue('startOccurrence', '')}>
-                <ClearIcon />
-              </IconButton>
-            }
-            onChange={(e) => onChangeValue('startOccurrence', e.target.value)}
-          />
-        </FormControl>
-
-        <FormControl className={classes.inputItem}>
-          <InputLabel shrink htmlFor="date-end-occurrence">
-            Avant le
-          </InputLabel>
-          <Input
-            id="date-end-occurrence"
-            type="date"
-            value={selectedCriteria.endOccurrence}
-            endAdornment={
-              <IconButton size="small" onClick={() => onChangeValue('endOccurrence', '')}>
-                <ClearIcon />
-              </IconButton>
-            }
-            onChange={(e) => onChangeValue('endOccurrence', e.target.value)}
-          />
-        </FormControl>
-      </Grid>
     </>
   )
 }
 
-export default OccurrenceInputs
+export default OccurrencesNumberInputs

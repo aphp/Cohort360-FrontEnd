@@ -23,11 +23,10 @@ import ProvenanceDestinationInputs from './SupportedInputs/ProvenanceDestination
 import OtherInputs from './SupportedInputs/OtherInputs'
 
 import VisitInputs from '../AdvancedInputs/VisitInputs/VisitInputs'
-// import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 import useStyles from './styles'
 
 import { CriteriaName, EncounterDataType } from 'types'
-import OccurrencesInputs from '../AdvancedInputs/OccurrencesInputs/OccurrencesInputs'
+import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 
 type SupportedFormProps = {
   criteria: any
@@ -154,7 +153,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
             onChange={(e) => _onChangeValue('title', e.target.value)}
           />
 
-          <OccurrencesInputs
+          <OccurrencesNumberInputs
             form={CriteriaName.VisitSupport}
             selectedCriteria={defaultValues}
             onChangeValue={_onChangeValue}

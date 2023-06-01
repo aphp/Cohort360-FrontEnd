@@ -17,13 +17,14 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
-import AdvancedInputs from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AdvancedInputs/AdvancedInputs'
+import AdvancedInputs
+  from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition } from 'state/pmsi'
 import { CriteriaName, HierarchyTree } from 'types'
-import OccurrencesInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrencesInputs'
+import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 
 type Cim10FormProps = {
   isOpen: boolean
@@ -138,7 +139,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             />
           </Grid>
 
-          <OccurrencesInputs
+          <OccurrencesNumberInputs
             form={CriteriaName.Cim10}
             selectedCriteria={selectedCriteria}
             onChangeValue={onChangeValue}

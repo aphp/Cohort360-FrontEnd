@@ -12,7 +12,7 @@ import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProcedure } from 'state/pmsi'
 import { CriteriaName, HierarchyTree } from 'types'
-import OccurrencesInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrencesInputs'
+import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 
 type CcamFormProps = {
   isOpen: boolean
@@ -112,7 +112,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             />
           </Grid>
 
-          <OccurrencesInputs
+          <OccurrencesNumberInputs
             form={CriteriaName.Ccam}
             selectedCriteria={selectedCriteria}
             onChangeValue={onChangeValue}
