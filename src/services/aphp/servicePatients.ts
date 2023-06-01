@@ -202,6 +202,7 @@ export interface IServicePatients {
     sortDirection: string,
     page: number,
     patientId: string,
+    rowStatus: boolean,
     searchInput: string,
     nda: string,
     loinc: string,
@@ -541,6 +542,7 @@ const servicesPatients: IServicePatients = {
     sortDirection: string,
     page: number,
     patientId: string,
+    rowStatus: boolean,
     searchInput: string,
     nda: string,
     loinc: string,
@@ -561,7 +563,8 @@ const servicesPatients: IServicePatients = {
       loinc: loinc,
       anabio: anabio,
       minDate: startDate ?? '',
-      maxDate: endDate ?? ''
+      maxDate: endDate ?? '',
+      rowStatus
     })
 
     const biologyTotal = observationResp.data.resourceType === 'Bundle' ? observationResp.data.total : 0

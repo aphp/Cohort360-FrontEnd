@@ -704,6 +704,10 @@ export type IPatientMedication<T extends MedicationRequest | MedicationAdministr
   }
 }
 
+export enum BiologyStatus {
+  VALIDATED = 'Validé'
+}
+
 export type CohortObservation = Observation & {
   serviceProvider?: string
   NDA?: string

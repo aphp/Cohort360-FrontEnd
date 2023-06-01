@@ -1,4 +1,5 @@
 import apiFhir from '../apiFhir'
+import { BiologyStatus } from 'types'
 
 import {
   CohortComposition,
@@ -521,10 +522,25 @@ type fetchObservationProps = {
   minDate?: string
   maxDate?: string
   _list?: string[]
+  rowStatus: boolean
 }
 export const fetchObservation = async (args: fetchObservationProps) => {
-  const { id, size, offset, _sort, sortDirection, _text, encounter, loinc, anabio, patient, type, minDate, maxDate } =
-    args
+  const {
+    id,
+    size,
+    offset,
+    _sort,
+    sortDirection,
+    _text,
+    encounter,
+    loinc,
+    anabio,
+    patient,
+    type,
+    minDate,
+    maxDate,
+    rowStatus
+  } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
 
@@ -543,6 +559,7 @@ export const fetchObservation = async (args: fetchObservationProps) => {
   if (type) options = [...options, `type=${type}`] // eslint-disable-line
   if (minDate) options = [...options, `effectiveDatetime=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `effectiveDatetime=le${maxDate}`] // eslint-disable-line
+  if (rowStatus) options = [...options, `row_status=${BiologyStatus.VALIDATED}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
