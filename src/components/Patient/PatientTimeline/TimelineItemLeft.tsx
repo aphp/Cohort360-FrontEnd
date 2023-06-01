@@ -3,8 +3,8 @@ import Card from '@mui/material/Card'
 import { Chip } from '@mui/material'
 
 import useStyles from './styles'
-import { IEncounter } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { CohortEncounter } from 'types'
+import { Encounter } from 'fhir/r4'
 
 /**
  * @usage
@@ -13,7 +13,7 @@ import { CohortEncounter } from 'types'
 
 type TimelineItemLeftTypes = {
   data: CohortEncounter
-  open: (encounter?: IEncounter) => void
+  open: (encounter?: Encounter) => void
   dotHeight: number
 }
 const TimelineItemLeft: React.FC<TimelineItemLeftTypes> = ({ data, open, dotHeight }) => {

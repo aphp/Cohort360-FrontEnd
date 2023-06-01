@@ -45,7 +45,7 @@ import {
 
 import { MeState } from 'state/me'
 
-import { RequestType } from 'types'
+import { RequestType, SimpleStatus } from 'types'
 
 import useStyles from './styles'
 
@@ -86,9 +86,9 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
   const [dialogOpen, setOpenDialog] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<string | undefined>()
   const [anchorEl, setAnchorEl] = React.useState(null)
-  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<'success' | 'error' | null>(null)
+  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
   const wrapperSetShareSuccessOrFailMessage = useCallback(
-    (val: any) => {
+    (val: SimpleStatus) => {
       setShareSuccessOrFailMessage(val)
     },
     [setShareSuccessOrFailMessage]

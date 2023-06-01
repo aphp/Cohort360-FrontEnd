@@ -14,7 +14,6 @@ import MasterChips from 'components/MasterChips/MasterChips'
 import PatientCharts from './components/PatientCharts'
 
 import services from 'services/aphp'
-import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   AgeRepartitionType,
   CohortPatient,
@@ -24,7 +23,8 @@ import {
   SearchByTypes,
   SimpleChartDataType,
   VitalStatus,
-  DTTB_ResultsType as ResultsType
+  DTTB_ResultsType as ResultsType,
+  PatientGenderKind
 } from 'types'
 
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'

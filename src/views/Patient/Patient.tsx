@@ -70,7 +70,7 @@ const Patient = () => {
     return <PatientNotExist />
   }
 
-  const handleChangeTabs = (event: any, newTab: string) => {
+  const handleChangeTabs = (event: React.SyntheticEvent<Element, Event>, newTab: string) => {
     selectTab(newTab)
   }
 

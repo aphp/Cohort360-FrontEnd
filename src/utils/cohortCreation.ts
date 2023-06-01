@@ -18,7 +18,7 @@ const REQUETEUR_VERSION = 'v1.2.1'
 const RESSOURCE_TYPE_IPP_LIST: 'IPPList' = 'IPPList'
 const IPP_LIST_FHIR = 'identifier-simple'
 
-const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
+export const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
 const PATIENT_GENDER = 'gender' // ok
 const PATIENT_BIRTHDATE = 'age-day' // ok
 const PATIENT_DECEASED = 'deceased' // ok
@@ -38,15 +38,15 @@ const ENCOUNTER_DESTINATION = 'destination' // ok
 const ENCOUNTER_PROVENANCE = 'provenance' // ok
 const ENCOUNTER_ADMISSION = 'reason-code' // ok
 
-const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
+export const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
 const CLAIM_CODE = 'codeList' // ok
 const CLAIM_CODE_ALL_HIERARCHY = 'code'
 
-const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
+export const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
 const PROCEDURE_CODE = 'codeList' // ok
 const PROCEDURE_CODE_ALL_HIERARCHY = 'code'
 
-const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition' // ok
+export const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition' // ok
 const CONDITION_CODE = 'codeList' // ok
 const CONDITION_CODE_ALL_HIERARCHY = 'code'
 const CONDITION_TYPE = 'type' // ok
@@ -68,6 +68,11 @@ const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
 const OBSERVATION_CODE = 'part-of'
 const OBSERVATION_CODE_ALL_HIERARCHY = 'code'
 const OBSERVATION_VALUE = 'value-quantity-value'
+const ENCOUNTER_SERVICE_PROVIDER = 'encounter.service-provider'
+const SERVICE_PROVIDER = 'service-provider'
+
+export const UNITE_EXECUTRICE = 'Unité exécutrice'
+export const STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE = 'Structure hospitalière de prise en charge'
 
 const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   id: 0,
@@ -158,12 +163,12 @@ type RequeteurSearchType = {
   request: RequeteurGroupType | undefined
 }
 
-const constructFilterFhir = (criterion: SelectedCriteriaType) => {
+const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
   let filterFhir = ''
 
-  const filterReducer = (accumulator: any, currentValue: any) =>
+  const filterReducer = (accumulator: any, currentValue: any): string =>
     accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
-  const searchReducer = (accumulator: any, currentValue: any) =>
+  const searchReducer = (accumulator: any, currentValue: any): string =>
     accumulator || accumulator === false ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
 
   switch (criterion.type) {
@@ -321,6 +326,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
                 .reduce(searchReducer)}`
             : ''
         }`,
+        `${
+          criterion.encounterService && criterion.encounterService.length > 0
+            ? `${SERVICE_PROVIDER}=${criterion.encounterService
+                .map((encounterServiceItem: any) => encounterServiceItem.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
         `${lengthFilter ? `${lengthFilter}` : ''}`,
         `${ageFilter ? `${ageFilter}` : ''}`
       ].filter((elem) => elem)
@@ -349,6 +361,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
           criterion.docType && criterion.docType.length > 0
             ? `${COMPOSITION_TYPE}=${criterion.docType.map((docType: DocType) => docType.code).reduce(searchReducer)}`
             : ''
+        }`,
+        `${
+          criterion.encounterService && criterion.encounterService.length > 0
+            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
+                .map((encounterServiceItem: any) => encounterServiceItem.id)
+                .reduce(searchReducer)}`
+            : ''
         }`
       ]
         .filter((elem) => elem)
@@ -372,6 +391,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
                 .map((diagnosticType: any) => diagnosticType.id)
                 .reduce(searchReducer)}`
             : ''
+        }`,
+        `${
+          criterion.encounterService && criterion.encounterService.length > 0
+            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
+                .map((encounterServiceItem: any) => encounterServiceItem.id)
+                .reduce(searchReducer)}`
+            : ''
         }`
       ]
         .filter((elem) => elem)
@@ -390,6 +416,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
                   .map((diagnosticType: any) => diagnosticType.id)
                   .reduce(searchReducer)}`
             : ''
+        }`,
+        `${
+          criterion.encounterService && criterion.encounterService.length > 0
+            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
+                .map((encounterServiceItem: any) => encounterServiceItem.id)
+                .reduce(searchReducer)}`
+            : ''
         }`
       ]
         .filter((elem) => elem)
@@ -405,6 +438,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
             ? criterion.code.find((code) => code.id === '*')
               ? `${CLAIM_CODE_ALL_HIERARCHY}=*`
               : `${CLAIM_CODE}=${criterion.code.map((diagnosticType: any) => diagnosticType.id).reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
+          criterion.encounterService && criterion.encounterService.length > 0
+            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
+                .map((encounterServiceItem: any) => encounterServiceItem.id)
+                .reduce(searchReducer)}`
             : ''
         }`
       ]
@@ -439,6 +479,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
           criterion.administration && criterion.administration.length > 0
             ? `${MEDICATION_ADMINISTRATION}=${criterion.administration
                 .map((administration: any) => administration.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
+          criterion.encounterService && criterion.encounterService.length > 0
+            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
+                .map((encounterServiceItem: any) => encounterServiceItem.id)
                 .reduce(searchReducer)}`
             : ''
         }`
@@ -485,6 +532,13 @@ const constructFilterFhir = (criterion: SelectedCriteriaType) => {
             : ''
         }`,
         `${
+          criterion.encounterService && criterion.encounterService.length > 0
+            ? `${ENCOUNTER_SERVICE_PROVIDER}=${criterion.encounterService
+                .map((encounterServiceItem: any) => encounterServiceItem.id)
+                .reduce(searchReducer)}`
+            : ''
+        }`,
+        `${
           criterion.isLeaf &&
           criterion.code &&
           criterion.code.length === 1 &&
@@ -520,11 +574,11 @@ export function buildRequest(
   selectedCriteria: SelectedCriteriaType[],
   criteriaGroup: CriteriaGroupType[],
   temporalConstraints: TemporalConstraintsType[]
-) {
+): string {
   if (!selectedPopulation) return ''
   selectedPopulation = selectedPopulation.filter((elem) => elem !== undefined)
 
-  const exploreCriteriaGroup = (itemIds: number[]) => {
+  const exploreCriteriaGroup = (itemIds: number[]): (RequeteurCriteriaType | RequeteurGroupType)[] => {
     let children: (RequeteurCriteriaType | RequeteurGroupType)[] = []
 
     for (const itemId of itemIds) {
@@ -636,7 +690,7 @@ export function buildRequest(
   return JSON.stringify(json)
 }
 
-export async function unbuildRequest(_json: string) {
+export async function unbuildRequest(_json: string): Promise<any> {
   let population: (ScopeTreeRow | undefined)[] | null = null
   let criteriaItems: RequeteurCriteriaType[] = []
   let criteriaGroup: RequeteurGroupType[] = []
@@ -684,7 +738,7 @@ export async function unbuildRequest(_json: string) {
    * Retrieve criteria + groups
    *
    */
-  const exploreRequest = (currentItem: any) => {
+  const exploreRequest = (currentItem: any): void => {
     const { criteria } = currentItem
 
     for (const criterion of criteria) {
@@ -706,7 +760,7 @@ export async function unbuildRequest(_json: string) {
     return { population, criteria: [], criteriaGroup: [] }
   }
 
-  const _retrieveInformationFromJson = async (element: RequeteurCriteriaType) => {
+  const _retrieveInformationFromJson = async (element: RequeteurCriteriaType): Promise<any> => {
     const currentCriterion: any = {
       id: element._id,
       type: element.resourceType,
@@ -1012,6 +1066,16 @@ export async function unbuildRequest(_json: string) {
               }
               case 'patient.active':
                 break
+              case SERVICE_PROVIDER: {
+                if (!value) continue
+
+                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
+
+                currentCriterion.encounterService = currentCriterion.encounterService
+                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
+                  : updatedEncounterServices
+                break
+              }
               default:
                 currentCriterion.error = true
                 break
@@ -1078,6 +1142,16 @@ export async function unbuildRequest(_json: string) {
                   : newDocTypeIds
                 break
               }
+              case ENCOUNTER_SERVICE_PROVIDER: {
+                if (!value) continue
+
+                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
+
+                currentCriterion.encounterService = currentCriterion.encounterService
+                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
+                  : updatedEncounterServices
+                break
+              }
               case 'patient.active':
               case 'status':
               case 'type:not':
@@ -1140,8 +1214,20 @@ export async function unbuildRequest(_json: string) {
                   : newDiagnosticType
                 break
               }
+              case ENCOUNTER_SERVICE_PROVIDER: {
+                if (!value) continue
+
+                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
+
+                currentCriterion.encounterService = currentCriterion.encounterService
+                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
+                  : updatedEncounterServices
+                break
+              }
+
               case 'patient.active':
                 break
+
               default:
                 currentCriterion.error = true
                 break
@@ -1187,6 +1273,17 @@ export async function unbuildRequest(_json: string) {
                 if (!newCode) continue
 
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
+                break
+              }
+              case ENCOUNTER_SERVICE_PROVIDER: {
+                if (!value) continue
+
+                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
+
+                currentCriterion.encounterService = currentCriterion.encounterService
+                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
+                  : updatedEncounterServices
+
                 break
               }
               case 'patient.active':
@@ -1235,6 +1332,16 @@ export async function unbuildRequest(_json: string) {
                 if (!newCode) continue
 
                 currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, ...newCode] : newCode
+                break
+              }
+              case ENCOUNTER_SERVICE_PROVIDER: {
+                if (!value) continue
+
+                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
+
+                currentCriterion.encounterService = currentCriterion.encounterService
+                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
+                  : updatedEncounterServices
                 break
               }
               case 'patient.active':
@@ -1313,6 +1420,16 @@ export async function unbuildRequest(_json: string) {
               }
               case 'patient.active':
                 break
+              case ENCOUNTER_SERVICE_PROVIDER: {
+                if (!value) continue
+
+                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
+
+                currentCriterion.encounterService = currentCriterion.encounterService
+                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
+                  : updatedEncounterServices
+                break
+              }
               default:
                 currentCriterion.error = true
                 break
@@ -1414,6 +1531,18 @@ export async function unbuildRequest(_json: string) {
                 currentCriterion.valueComparator = valueComparator
                 currentCriterion.valueMin = valueMin
                 currentCriterion.valueMax = valueMax
+
+                break
+              }
+
+              case ENCOUNTER_SERVICE_PROVIDER: {
+                if (!value) continue
+
+                const updatedEncounterServices: ScopeTreeRow[] = await services.perimeters.getScopesWithSubItems(value)
+
+                currentCriterion.encounterService = currentCriterion.encounterService
+                  ? [...currentCriterion.encounterService, ...updatedEncounterServices]
+                  : updatedEncounterServices
 
                 break
               }
@@ -1574,7 +1703,7 @@ export const getDataFromFetch = async (
   _criteria: any,
   selectedCriteria: SelectedCriteriaType[],
   oldCriteriaList?: any
-) => {
+): Promise<any> => {
   for (const _criterion of _criteria) {
     const oldCriterion = oldCriteriaList
       ? oldCriteriaList?.find((oldCriterionItem: any) => oldCriterionItem.id === _criterion.id)
@@ -1662,11 +1791,11 @@ export const getDataFromFetch = async (
   return _criteria
 }
 
-export const joinRequest = async (oldJson: string, newJson: string, parentId: number | null) => {
+export const joinRequest = async (oldJson: string, newJson: string, parentId: number | null): Promise<any> => {
   const oldRequest = JSON.parse(oldJson) as RequeteurSearchType
   const newRequest = JSON.parse(newJson) as RequeteurSearchType
 
-  const changeIdOfRequest = (request: any) => {
+  const changeIdOfRequest = (request: any): any => {
     const { criteria } = request
 
     for (const criterion of criteria) {
@@ -1689,7 +1818,7 @@ export const joinRequest = async (oldJson: string, newJson: string, parentId: nu
     criteria: changeIdOfRequest(newRequest.request)
   }
 
-  const fillRequestWithNewRequest = (criterionGroup?: RequeteurGroupType) => {
+  const fillRequestWithNewRequest = (criterionGroup?: RequeteurGroupType): RequeteurGroupType | undefined => {
     if (!criterionGroup) return criterionGroup
 
     if (criterionGroup._id === parentId) {

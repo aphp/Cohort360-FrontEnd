@@ -21,8 +21,7 @@ import Watermark from 'assets/images/watermark_pseudo.svg'
 
 import { getDocumentStatus } from 'utils/documentsFormatter'
 
-import { Column, Order, CohortComposition } from 'types'
-import { CompositionStatusKind, DocumentReferenceStatusKind } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { Column, Order, CohortComposition, CompositionStatusKind, DocumentReferenceStatusKind } from 'types'
 
 import useStyles from './styles'
 

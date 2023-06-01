@@ -1,16 +1,15 @@
 import React from 'react'
 
-import { ICondition } from '@ahryman40k/ts-fhir-types/lib/R4'
-
 import useStyles from './styles'
 import { PMSIEntry } from 'types'
+import { Condition } from 'fhir/r4'
 
 /**
  * @usage
  * <TimelineItemRight time={time} text={text} />
  */
 type TimelineItemRightTypes = {
-  data: PMSIEntry<ICondition>
+  data: PMSIEntry<Condition>
 }
 const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
   const { classes } = useStyles({ color: '#b7c3d9' })

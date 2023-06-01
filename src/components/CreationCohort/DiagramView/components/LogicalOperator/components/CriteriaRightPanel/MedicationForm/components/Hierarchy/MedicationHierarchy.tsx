@@ -23,7 +23,12 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import { useAppDispatch, useAppSelector } from 'state'
 import { MedicationListType } from 'state/medication'
 
-import { checkIfIndeterminated, expandItem, findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
+import {
+  checkIfIndeterminated,
+  expandItem,
+  findEquivalentRowInItemAndSubItems,
+  getHierarchySelection
+} from 'utils/pmsi'
 
 import useStyles from './styles'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
@@ -76,7 +81,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
   const handleClickOnHierarchy = (medicationItem: MedicationListType) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingMedication > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
-    const newSelectedItems = getSelectedPmsi(medicationItem, selectedItems || [], medicationHierarchy)
+    const newSelectedItems = getHierarchySelection(medicationItem, selectedItems || [], medicationHierarchy)
     handleClick(newSelectedItems)
     dispatch(decrementLoadingSyncHierarchyTable())
   }

@@ -38,7 +38,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
         <TextField
           placeholder="Nom de la requête"
           value={currentRequest.name}
-          onChange={(e: any) => onChangeValue('name', e.target.value)}
+          onChange={(e) => onChangeValue('name', e.target.value)}
           autoFocus
           id="title"
           margin="normal"
@@ -76,7 +76,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
           <TextField
             placeholder="Nom du nouveau projet"
             value={projectName}
-            onChange={(e: any) => onChangeProjectName(e.target.value)}
+            onChange={(e) => onChangeProjectName(e.target.value)}
             id="project_name"
             margin="normal"
             fullWidth
@@ -90,7 +90,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
         <TextField
           placeholder="Description"
           value={currentRequest.description}
-          onChange={(e: any) => onChangeValue('description', e.target.value)}
+          onChange={(e) => onChangeValue('description', e.target.value)}
           id="description"
           margin="normal"
           fullWidth

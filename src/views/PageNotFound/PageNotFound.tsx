@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import { Button, Grid, Link, Typography } from '@mui/material'
 
@@ -9,10 +10,11 @@ import useStyles from './styles'
 
 const PageNotFound: React.FC = () => {
   const { classes, cx } = useStyles()
+  const navigate = useNavigate()
 
   return (
     <>
-      <Link href="/home" className={classes.logo}>
+      <Link onClick={() => navigate('/home')} className={classes.logo}>
         <img src={cohortLogo} alt="Cohort360 logo" style={{ height: 50 }} />
       </Link>
       <Grid container direction="column" className={classes.megaContainer} alignItems="center">
@@ -27,7 +29,7 @@ const PageNotFound: React.FC = () => {
             Si vous pensez qu'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante :
             dsi-id-recherche-support-cohort360@aphp.fr.
           </Typography>
-          <Button href="/home" variant="contained" className={classes.button}>
+          <Button onClick={() => navigate('/home')} variant="contained" className={classes.button}>
             Accueil
           </Button>
         </Grid>

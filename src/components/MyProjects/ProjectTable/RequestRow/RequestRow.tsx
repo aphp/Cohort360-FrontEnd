@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 
 import { Checkbox, Collapse, IconButton, Link, Table, TableBody, TableCell, TableRow, Tooltip } from '@mui/material'
@@ -28,6 +29,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
   const [open, setOpen] = React.useState(false)
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
 
   const { meState } = useAppSelector<{
     meState: MeState
@@ -80,11 +82,11 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
           </TableCell>
           <TableCell className={classes.tdName}>
             {row?.shared_by?.displayed_name ? (
-              <Link href={`/cohort/new/${row.uuid}`} underline="hover">
+              <Link onClick={() => navigate(`/cohort/new/${row.uuid}`)} underline="hover">
                 {`${row.name} - Envoyée par : ${row?.shared_by?.firstname} ${row?.shared_by?.lastname?.toUpperCase()}`}
               </Link>
             ) : (
-              <Link href={`/cohort/new/${row.uuid}`} underline="hover">
+              <Link onClick={() => navigate(`/cohort/new/${row.uuid}`)} underline="hover">
                 {row.name}
               </Link>
             )}

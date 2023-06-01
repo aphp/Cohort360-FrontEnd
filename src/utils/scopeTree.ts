@@ -8,13 +8,13 @@ export const getSelectedScopes = (
   row: ScopeTreeRow,
   selectedItems: ScopeTreeRow[] | undefined,
   rootRows: ScopeTreeRow[]
-) => {
+): ScopeTreeRow[] => {
   let savedSelectedItems = selectedItems ? [...selectedItems] : []
 
   const foundItem = savedSelectedItems.find(({ id }) => id === row.id)
   const index = foundItem ? savedSelectedItems.indexOf(foundItem) : -1
 
-  const getRowAndChildren = (parent: ScopeTreeRow) => {
+  const getRowAndChildren = (parent: ScopeTreeRow): ScopeTreeRow[] => {
     const getChild: (subItem: ScopeTreeRow) => ScopeTreeRow[] = (subItem: ScopeTreeRow) => {
       if (subItem?.id === 'loading') return []
 
@@ -34,7 +34,7 @@ export const getSelectedScopes = (
     ].flat()
   }
 
-  const deleteRowAndChildren = (parent: ScopeTreeRow) => {
+  const deleteRowAndChildren = (parent: ScopeTreeRow): ScopeTreeRow[] => {
     const elemToDelete = getRowAndChildren(parent)
 
     savedSelectedItems = savedSelectedItems.filter((row) => !elemToDelete.some(({ id }) => id === row.id))
@@ -43,7 +43,7 @@ export const getSelectedScopes = (
       if (row.subItems && row.subItems.length > 0 && row.subItems[0].id === 'loading') {
         return true
       }
-      const numberOfSubItemsSelected = row?.subItems?.filter((subItem: any) =>
+      const numberOfSubItemsSelected = row?.subItems?.filter((subItem) =>
         savedSelectedItems.find(({ id }) => id === subItem.id)
       )?.length
       if (numberOfSubItemsSelected && numberOfSubItemsSelected !== row?.subItems?.length) {
@@ -62,7 +62,7 @@ export const getSelectedScopes = (
   }
 
   let _savedSelectedItems: any[] = []
-  const checkIfParentIsChecked = (rows: ScopeTreeRow[]) => {
+  const checkIfParentIsChecked = (rows: ScopeTreeRow[]): void => {
     for (let index = 0; index < rows.length; index++) {
       const row = rows[index]
       if (
@@ -111,54 +111,6 @@ export const getSelectedScopes = (
   savedSelectedItems = savedSelectedItems.filter((item, index, array) => array.indexOf(item) === index)
 
   return savedSelectedItems
-}
-
-export const filterScopeTree = (_selectedItems: any[]) => {
-  // If you chenge this code, change it too inside: PopulationCard.tsx:31
-  return _selectedItems.filter((item, index, array) => {
-    // reemove double item
-    const foundItem = array.find(({ id }) => item.id === id)
-    const currentIndex = foundItem ? array.indexOf(foundItem) : -1
-    if (index !== currentIndex) return false
-
-    const parentItem = array.find(({ subItems }) => !!subItems?.find((subItem: any) => subItem.id === item.id))
-    if (parentItem !== undefined) {
-      const selectedChildren =
-        parentItem.subItems && parentItem.subItems.length > 0
-          ? parentItem.subItems.filter((subItem: any) => !!array.find(({ id }) => id === subItem.id))
-          : []
-
-      if (selectedChildren.length === parentItem.subItems.length) {
-        // Si item + TOUS LES AUTRES child sont select. => Delete it
-        return false
-      } else {
-        // Sinon => Keep it
-        return true
-      }
-    } else {
-      if (
-        !item.subItems ||
-        (item.subItems && item.subItems.length === 0) ||
-        (item.subItems && item.subItems.length > 0 && item.subItems[0].id === 'loading')
-      ) {
-        // Si pas d'enfant, pas de check => Keep it
-        return true
-      }
-
-      const selectedChildren =
-        item.subItems && item.subItems.length > 0
-          ? item.subItems.filter((subItem: any) => !!array.find(({ id }) => id === subItem.id))
-          : []
-
-      if (selectedChildren.length === item.subItems.length) {
-        // Si tous les enfants sont check => Keep it
-        return true
-      } else {
-        // Sinon => Delete it
-        return false
-      }
-    }
-  })
 }
 
 export const sortByQuantityAndName = (scopeRows: ScopeTreeRow[]) => {

@@ -23,7 +23,12 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import { useAppDispatch, useAppSelector } from 'state'
 import { BiologyListType } from 'state/biology'
 
-import { checkIfIndeterminated, expandItem, findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
+import {
+  checkIfIndeterminated,
+  expandItem,
+  findEquivalentRowInItemAndSubItems,
+  getHierarchySelection
+} from 'utils/pmsi'
 
 import useStyles from './styles'
 import { PmsiListType } from 'state/pmsi'
@@ -70,7 +75,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
   const handleClickOnHierarchy = async (biologyItem: PmsiListType) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
-    const newSelectedItems = getSelectedPmsi(biologyItem, selectedItems || [], biologyHierarchy)
+    const newSelectedItems = getHierarchySelection(biologyItem, selectedItems || [], biologyHierarchy)
     await handleClick(newSelectedItems)
     dispatch(decrementLoadingSyncHierarchyTable())
   }

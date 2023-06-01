@@ -16,7 +16,7 @@ import ModalMoveRequests from 'components/MyProjects/Modals/ModalMoveRequest/Mod
 import ModalDeleteRequests from 'components/MyProjects/Modals/ModalDeleteRequests/ModalDeleteRequests'
 import ModalShareRequest from 'components/MyProjects/Modals/ModalShareRequest/ModalShareRequest'
 
-import { RequestType } from 'types'
+import { RequestType, SimpleStatus } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { ProjectState, fetchProjects as fetchProjectsList, setSelectedProject } from 'state/project'
@@ -38,9 +38,9 @@ const MyProjects: React.FC<{}> = () => {
   const [searchInput, setSearchInput] = useState('')
   const [selectedRequests, setSelectedRequests] = useState<RequestType[]>([])
   const [openModal, setOpenModal] = useState<'move_to_folder' | 'delete_items' | null>(null)
-  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<'success' | 'error' | null>(null)
+  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
   const wrapperSetShareSuccessOrFailMessage = useCallback(
-    (val: any) => {
+    (val: SimpleStatus) => {
       setShareSuccessOrFailMessage(val)
     },
     [setShareSuccessOrFailMessage]

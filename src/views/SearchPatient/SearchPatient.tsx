@@ -9,10 +9,10 @@ import DataTablePatient from 'components/DataTable/DataTablePatient'
 
 import services from 'services/aphp'
 
-import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { SearchByTypes, Order } from 'types'
 
 import useStyles from './styles'
+import { Patient } from 'fhir/r4'
 
 const SearchPatient: React.FC<{}> = () => {
   const { classes, cx } = useStyles()
@@ -21,7 +21,7 @@ const SearchPatient: React.FC<{}> = () => {
 
   const [loading, setLoading] = useState(false)
   const [showTable, setShowTable] = useState(false)
-  const [patientResults, setPatientResults] = useState<IPatient[]>([])
+  const [patientResults, setPatientResults] = useState<Patient[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
 

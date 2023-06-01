@@ -21,9 +21,15 @@
         "trailingComma": "none",
         "printWidth": 120
       }
+    // ],
+    // "max-statements": [
+    //   1, {
+    //     "max": 20
+    //   }
     ],
-    "react/no-unknown-property": 0,
+    "react/no-unknown-property":0,
     "react/prop-types": 0,
+    // TODO set this rule to 2 and fix all the errors
     "@typescript-eslint/no-explicit-any": 0,
     "@typescript-eslint/camelcase": 0,
     "@typescript-eslint/explicit-function-return-type": 0,

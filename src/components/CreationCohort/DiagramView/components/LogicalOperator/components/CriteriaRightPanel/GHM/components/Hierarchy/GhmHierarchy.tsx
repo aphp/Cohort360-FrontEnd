@@ -23,7 +23,12 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import { useAppDispatch, useAppSelector } from 'state'
 import { PmsiListType } from 'state/pmsi'
 
-import { checkIfIndeterminated, expandItem, findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
+import {
+  checkIfIndeterminated,
+  expandItem,
+  findEquivalentRowInItemAndSubItems,
+  getHierarchySelection
+} from 'utils/pmsi'
 
 import useStyles from './styles'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
@@ -63,7 +68,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
   const handleClickOnHierarchy = async (ghmItem: PmsiListType) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
-    const newSelectedItems = getSelectedPmsi(ghmItem, selectedItems || [], ghmHierarchy)
+    const newSelectedItems = getHierarchySelection(ghmItem, selectedItems || [], ghmHierarchy)
     await handleClick(newSelectedItems)
     dispatch(decrementLoadingSyncHierarchyTable())
   }

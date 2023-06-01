@@ -7,10 +7,10 @@ import { ReactComponent as FemaleIcon } from 'assets/icones/venus.svg'
 import { ReactComponent as MaleIcon } from 'assets/icones/mars.svg'
 import { ReactComponent as UnknownIcon } from 'assets/icones/autre-inconnu.svg'
 
-import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
+import { PatientGenderKind } from 'types'
 
 type GenderIconTypes = {
   gender?: PatientGenderKind
