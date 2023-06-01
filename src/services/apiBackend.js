@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ACCES_TOKEN, BACK_API_URL } from '../constants'
+import { ACCESS_TOKEN, BACK_API_URL } from '../constants'
 
 const apiBackend = axios.create({
   baseURL: BACK_API_URL,
@@ -9,7 +9,7 @@ const apiBackend = axios.create({
 })
 
 apiBackend.interceptors.request.use((config) => {
-  const token = localStorage.getItem(ACCES_TOKEN)
+  const token = localStorage.getItem(ACCESS_TOKEN)
   config.headers.Authorization = `Bearer ${token}`
   return config
 })

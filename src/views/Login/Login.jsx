@@ -25,7 +25,7 @@ import logoAPHP from 'assets/images/logo-aphp.png'
 import { useAppDispatch } from 'state'
 import { login as loginAction } from 'state/me'
 import {
-  ACCES_TOKEN,
+  ACCESS_TOKEN,
   REFRESH_TOKEN,
   OIDC_CLIENT_ID,
   OIDC_PROVIDER_URL,
@@ -239,7 +239,7 @@ const Login = () => {
     const { status, data = {} } = response
 
     if (status === 200) {
-      localStorage.setItem(ACCES_TOKEN, data.jwt.access)
+      localStorage.setItem(ACCESS_TOKEN, data.jwt.access)
       localStorage.setItem(REFRESH_TOKEN, data.jwt.refresh)
 
       const practitioner = await services.practitioner.fetchPractitioner(data.user.provider_username)

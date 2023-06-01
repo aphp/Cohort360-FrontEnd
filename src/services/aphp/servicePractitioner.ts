@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
 import apiBackend from 'services/apiBackend'
-import { ACCES_TOKEN, REFRESH_TOKEN } from '../../constants'
+import { ACCESS_TOKEN, REFRESH_TOKEN } from '../../constants'
 
 export interface IServicePractitioner {
   /**
@@ -65,7 +65,7 @@ const servicePractitioner: IServicePractitioner = {
     try {
       const res = await apiBackend.post(`/auth/oidc/login`, { auth_code: authCode })
       if (res.status === 200) {
-        localStorage.setItem(ACCES_TOKEN, res.data.jwt.access)
+        localStorage.setItem(ACCESS_TOKEN, res.data.jwt.access)
         localStorage.setItem(REFRESH_TOKEN, res.data.jwt.refresh)
       }
       return res

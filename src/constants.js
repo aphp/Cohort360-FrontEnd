@@ -1,6 +1,6 @@
 export let BOOLEANTRUE = 'true'
 
-export const ACCES_TOKEN = 'access'
+export const ACCESS_TOKEN = 'access'
 export const REFRESH_TOKEN = 'refresh'
 
 export const OIDC_PROVIDER_URL = import.meta.env.DEV
