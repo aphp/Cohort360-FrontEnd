@@ -137,20 +137,20 @@ const Welcome: React.FC = () => {
                 activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
               </Alert>
             )}
-            {accessExpirations?.map(
-              (item: AccessExpiration) =>
-                item.leftDays &&
-                item.leftDays <= 30 && (
-                  <Alert
-                    key={item.perimeter + '-' + item.leftDays && item.leftDays}
-                    severity="warning"
-                    className={classes.alert}
-                  >
-                    Attention, votre accès au périmetre suivant: {item.perimeter}, arrivera à expiration dans{' '}
-                    {item.leftDays} jour{item.leftDays > 1 ? 's' : ''}. Veuillez vous rapprocher de votre référent EDS
-                    pour faire renouveler vos accès à l'application.
-                  </Alert>
-                )
+            {accessExpirations?.map((item: AccessExpiration) =>
+              item.leftDays && !Number.isNaN(item.leftDays) && item.leftDays <= 30 ? (
+                <Alert
+                  key={item.perimeter + '-' + item.leftDays && item.leftDays}
+                  severity="warning"
+                  className={classes.alert}
+                >
+                  Attention, votre accès au périmetre suivant: {item.perimeter}, arrivera à expiration dans{' '}
+                  {item.leftDays} jour{item.leftDays > 1 ? 's' : ''}. Veuillez vous rapprocher de votre référent EDS
+                  pour faire renouveler vos accès à l'application.
+                </Alert>
+              ) : (
+                <></>
+              )
             )}
           </Grid>
         </Grid>
