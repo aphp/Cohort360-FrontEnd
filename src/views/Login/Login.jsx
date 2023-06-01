@@ -376,7 +376,7 @@ const Login = () => {
                 {loading ? <CircularProgress /> : 'Connexion'}
               </Button>
               <Button type="submit" onClick={oidcLogin} variant="contained" className={classes.submit} id="oidc-login">
-                {loading ? <CircularProgress /> : 'Login via Keycloak'}
+                Login via Keycloak
               </Button>
             </Grid>
           </Grid>
