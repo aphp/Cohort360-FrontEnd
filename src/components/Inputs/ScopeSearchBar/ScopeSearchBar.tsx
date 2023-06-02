@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Grid, IconButton, InputAdornment, InputBase, Alert } from '@mui/material'
+import { Alert, Grid, IconButton, InputAdornment, InputBase } from '@mui/material'
 
 import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import ClearIcon from '@mui/icons-material/Clear'
@@ -9,19 +9,19 @@ import useStyles from './styles'
 
 type ScopeSearchBarProps = {
   searchInput: string
-  onChangeInput: (searchInput: string) => void
+  setSearchInput: (searchInput: string) => void
   alertMessage?: string
 }
 
-const ScopeSearchBar: React.FC<ScopeSearchBarProps> = ({ searchInput, onChangeInput, alertMessage }) => {
+const ScopeSearchBar: React.FC<ScopeSearchBarProps> = ({ searchInput, setSearchInput, alertMessage }) => {
   const { classes } = useStyles()
 
   const handleChangeInput = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    onChangeInput(event.target.value)
+    setSearchInput(event.target.value)
   }
 
   const handleClearInput = () => {
-    onChangeInput('')
+    setSearchInput('')
   }
 
   return (
