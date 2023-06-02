@@ -13,6 +13,7 @@ import Dashboard from 'views/Dashboard/Dashboard'
 import CohortCreation from 'views/CohortCreation/CohortCreation'
 // import Contact from 'views/Contact/Contact'
 import PageNotFound from 'views/PageNotFound/PageNotFound'
+import NewExplorationCareSite from 'views/Scope/NewExplorationCareSite'
 
 // import { ODD_CONTACT } from '../../../constants'
 
@@ -81,6 +82,17 @@ const configRoutes: configRoute[] = [
     name: 'perimeter',
     isPrivate: true,
     element: <Scope />
+  },
+  /**
+   * Cohort360: Choose Perimeter New Page
+   */
+  {
+    exact: true,
+    displaySideBar: true,
+    path: '/new-perimeter',
+    name: 'new-perimeter',
+    isPrivate: true,
+    element: <NewExplorationCareSite />
   },
   /**
    * Cohort360: Saved Cohorts Page
