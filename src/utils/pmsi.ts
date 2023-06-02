@@ -8,6 +8,7 @@ import {
   pushSyncHierarchyTable
 } from '../state/syncHierarchyTable'
 import { AbstractTree, SelectedCriteriaType } from '../types'
+import { ScopeTreeRow, SelectedCriteriaType } from '../types'
 import { expandMedicationElement } from '../state/medication'
 import { fetchSignleCode } from '../services/aphp/cohortCreation/fetchMedication'
 import { expandBiologyElement } from '../state/biology'
