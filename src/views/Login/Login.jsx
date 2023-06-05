@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import localforage from 'localforage'
 import {
@@ -21,6 +21,7 @@ import NoRights from 'components/ErrorView/NoRights'
 
 import logo from 'assets/images/logo-login.png'
 import logoAPHP from 'assets/images/logo-aphp.png'
+import { ReactComponent as Keycloak } from 'assets/icones/keycloak.svg'
 
 import { useAppDispatch } from 'state'
 import { login as loginAction } from 'state/me'
@@ -40,6 +41,7 @@ import services from 'services/aphp'
 import useStyles from './styles'
 import { getDaysLeft } from '../../utils/formatDate'
 import Welcome from '../Welcome/Welcome'
+import clsx from 'clsx'
 
 const ErrorSnackBarAlert = ({ open, setError, errorMessage }) => {
   const _setError = () => {
@@ -111,12 +113,12 @@ const Login = () => {
   const urlParams = new URLSearchParams(window.location.search)
   const code = urlParams.get('code')
 
-  React.useEffect(() => {
+  useEffect(() => {
     localforage.setItem('persist:root', '')
     if (code) setAuthCode(code)
   }, [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (authCode) login()
   }, [authCode])
 
@@ -293,11 +295,12 @@ const Login = () => {
 
   const oidcLogin = (e) => {
     e.preventDefault()
-    window.location = `${OIDC_PROVIDER_URL}?state=${OIDC_STATE}&` +                   // eslint-disable-line
-                                           `client_id=${OIDC_CLIENT_ID}&` +           // eslint-disable-line
-                                           `redirect_uri=${OIDC_REDIRECT_URI}&` +     // eslint-disable-line
-                                           `response_type=${OIDC_RESPONSE_TYPE}&` +   // eslint-disable-line
-                                           `scope=${OIDC_SCOPE}`                      // eslint-disable-line
+    window.location =
+      `${OIDC_PROVIDER_URL}?state=${OIDC_STATE}&` + // eslint-disable-line
+      `client_id=${OIDC_CLIENT_ID}&` + // eslint-disable-line
+      `redirect_uri=${OIDC_REDIRECT_URI}&` + // eslint-disable-line
+      `response_type=${OIDC_RESPONSE_TYPE}&` + // eslint-disable-line
+      `scope=${OIDC_SCOPE}` // eslint-disable-line
   }
 
   if (noRights === true) return <NoRights />
@@ -375,8 +378,16 @@ const Login = () => {
               >
                 {loading ? <CircularProgress /> : 'Connexion'}
               </Button>
-              <Button type="submit" onClick={oidcLogin} variant="contained" className={classes.submit} id="oidc-login">
-                Login via Keycloak
+              <Button
+                type="submit"
+                onClick={oidcLogin}
+                variant="contained"
+                className={clsx(classes.submit, classes.oidcButton)}
+                style={{ marginBottom: 40 }}
+                id="oidc-login"
+                startIcon={<Keycloak height="25px" />}
+              >
+                Connexion via Keycloak
               </Button>
             </Grid>
           </Grid>

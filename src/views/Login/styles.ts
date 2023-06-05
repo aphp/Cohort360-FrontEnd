@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginBottom: theme.spacing(2)
   },
   bienvenue: {
-    fontSize: '15px'
+    fontSize: 15
   },
   image: {
     backgroundImage: `url(${BackgroundLogin})`,
@@ -22,22 +22,26 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundPosition: 'center'
   },
   submit: {
-    margin: theme.spacing(2, 0, 5),
+    margin: theme.spacing(2, 0, 0),
     backgroundColor: '#5BC5F2',
     color: 'white',
-    height: '50px',
-    width: '185px',
-    borderRadius: '25px'
+    height: 50,
+    width: 185,
+    borderRadius: 25
+  },
+  oidcButton: {
+    backgroundColor: '#153D8A',
+    width: 250
   },
   mention: {
-    marginTop: '8px'
+    marginTop: 8
   },
   oidcAuthenticating: {
     margin: '10%',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    rowGap: '30px'
+    rowGap: 30
   }
 }))
 
