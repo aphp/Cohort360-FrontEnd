@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   mention: {
     marginTop: 8
   },
-  oidcAuthenticating: {
+  oidcConnexionProgress: {
     margin: '10%',
     display: 'flex',
     flexDirection: 'column',

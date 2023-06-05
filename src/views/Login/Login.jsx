@@ -306,9 +306,9 @@ const Login = () => {
   if (noRights === true) return <NoRights />
 
   return code ? (
-    <Grid className={classes.oidcAuthenticating}>
+    <Grid className={classes.oidcConnexionProgress}>
       <Typography variant="h2" color="primary">
-        Authenticating...
+        Connexion...
       </Typography>
       <CircularProgress />
     </Grid>
