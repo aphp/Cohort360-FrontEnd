@@ -24,7 +24,7 @@ import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchBiology } from 'state/biology'
 import { CriteriaName, HierarchyTree } from 'types'
-import OccurrencesNumberInputs from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
+import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 type BiologyFormProps = {

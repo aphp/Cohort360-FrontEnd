@@ -17,8 +17,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
-import AdvancedInputs
-  from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AdvancedInputs/AdvancedInputs'
+import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'

@@ -3,7 +3,6 @@ import React from 'react'
 import { FormLabel, Grid, MenuItem, Select, TextField, Tooltip } from '@mui/material'
 import InfoIcon from '@mui/icons-material/Info'
 
-import useStyles from './styles'
 import { CriteriaName, CriteriaNameType } from 'types'
 
 const defaultOccurrencesNumberInputs = {

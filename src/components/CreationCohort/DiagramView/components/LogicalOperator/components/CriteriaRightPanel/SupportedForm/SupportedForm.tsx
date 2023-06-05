@@ -153,11 +153,6 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
             onChange={(e) => _onChangeValue('title', e.target.value)}
           />
 
-          <OccurrencesNumberInputs
-            form={CriteriaName.VisitSupport}
-            selectedCriteria={defaultValues}
-            onChangeValue={_onChangeValue}
-          />
           <Grid style={{ display: 'flex' }}>
             <FormLabel
               onClick={() => _onChangeValue('isInclusive', !defaultValues.isInclusive)}
@@ -173,6 +168,11 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
               color="secondary"
             />
           </Grid>
+          <OccurrencesNumberInputs
+            form={CriteriaName.VisitSupport}
+            selectedCriteria={defaultValues}
+            onChangeValue={_onChangeValue}
+          />
 
           <FormLabel style={{ padding: '1em', display: 'flex', alignItems: 'center' }} component="legend">
             Âge au moment de la prise en charge

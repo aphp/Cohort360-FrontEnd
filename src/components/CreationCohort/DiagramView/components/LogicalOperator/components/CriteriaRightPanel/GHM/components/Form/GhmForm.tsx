@@ -125,7 +125,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             }}
           />
 
-          <AdvancedInputs form={CriteriaName.Cim10} selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs form={CriteriaName.Ghm} selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
@@ -134,7 +134,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="cim10-form" variant="contained">
+          <Button onClick={_onSubmit} type="submit" form="ghm-form" variant="contained">
             Confirmer
           </Button>
         </Grid>
