@@ -846,7 +846,7 @@ export enum CriteriaName {
   Document = 'document',
   Medication = 'medication',
   Biology = 'biology',
-  VisitSupport = 'visitSupport'
+  VisitSupport = 'supported'
 }
 export type CriteriaNameType =
   | CriteriaName.Cim10

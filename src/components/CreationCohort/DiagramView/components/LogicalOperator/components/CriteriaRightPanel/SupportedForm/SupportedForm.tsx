@@ -182,7 +182,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
 
           <Grid style={{ display: 'grid', alignItems: 'center', margin: '0 1em' }}>
             <PopulationCard
-              form={'supported'}
+              form={CriteriaName.VisitSupport}
               label={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
               title={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
               executiveUnits={defaultValues?.encounterService ?? []}

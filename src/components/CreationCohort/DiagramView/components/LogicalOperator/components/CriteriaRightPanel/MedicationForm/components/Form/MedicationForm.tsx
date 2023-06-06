@@ -229,7 +229,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="supported-form" variant="contained">
+          <Button onClick={_onSubmit} type="submit" form="medication-form" variant="contained">
             Confirmer
           </Button>
         </Grid>

@@ -893,7 +893,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
           key={_currentCriteria.id}
           className={classes.criteriaChip}
           label={
-            <Typography>{`Nombre d'occurrence ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
+            <Typography>{`Nombre d'occurrences ${_currentCriteria.occurrenceComparator} ${_currentCriteria.occurrence}`}</Typography>
           }
         />,
         (startDate || endDate) && (

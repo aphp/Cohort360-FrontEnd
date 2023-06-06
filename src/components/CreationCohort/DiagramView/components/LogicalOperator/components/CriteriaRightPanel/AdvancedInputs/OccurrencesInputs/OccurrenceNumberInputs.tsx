@@ -28,10 +28,14 @@ const OccurrencesNumberInputs: React.FC<OccurrencesNumberInputsProps> = (props) 
   const { form, onChangeValue } = props
   const selectedCriteria = { ...defaultOccurrencesNumberInputs, ...props.selectedCriteria }
 
+  const allowOnlyPositiveIntegers = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (Number.isNaN(+event.key) && event.key !== 'Backspace') event.preventDefault()
+  }
+
   return (
     <>
       <FormLabel style={{ padding: '0 1em 8px', display: 'flex', alignItems: 'center' }} component="legend">
-        Nombre d'occurrence
+        Nombre d'occurrences
         {(form == CriteriaName.Ccam ||
           form === CriteriaName.Cim10 ||
           form === CriteriaName.Ghm ||
@@ -41,7 +45,7 @@ const OccurrencesNumberInputs: React.FC<OccurrencesNumberInputsProps> = (props) 
             title={
               <>
                 {
-                  "Si vous choisissez un chapitre, le nombre d'occurrence ne s'applique pas sur un unique élément de ce chapitre, mais sur l'ensemble des éléments de ce chapitre."
+                  "Si vous choisissez un chapitre, le nombre d'occurrences ne s'applique pas sur un unique élément de ce chapitre, mais sur l'ensemble des éléments de ce chapitre."
                 }
                 <br />
                 <br />
@@ -73,11 +77,12 @@ const OccurrencesNumberInputs: React.FC<OccurrencesNumberInputsProps> = (props) 
         <TextField
           required
           inputProps={{
-            min: 1
+            min: 0
           }}
           type="number"
           id="criteria-occurrence-required"
           value={selectedCriteria.occurrence}
+          onKeyDown={(e) => allowOnlyPositiveIntegers(e)}
           onChange={(e) => onChangeValue('occurrence', e.target.value)}
         />
       </Grid>
