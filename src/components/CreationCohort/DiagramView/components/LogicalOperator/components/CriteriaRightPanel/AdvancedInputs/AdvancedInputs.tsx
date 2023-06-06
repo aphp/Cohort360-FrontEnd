@@ -1,12 +1,19 @@
 import React, { useState } from 'react'
 
-import { Collapse, Grid, IconButton, Typography } from '@mui/material'
+import { Collapse, FormLabel, Grid, IconButton, Tooltip, Typography } from '@mui/material'
 
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import InfoIcon from '@mui/icons-material/Info'
+
+import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
 import VisitInputs from './VisitInputs/VisitInputs'
 import { CriteriaNameType } from 'types'
 import OccurrencesDateInputs from './OccurrencesInputs/OccurrencesDateInputs'
+
+import scopeType from 'data/scope_type.json'
+
+import { ScopeTreeRow } from 'types'
 
 type AdvancedInputsProps = {
   form: CriteriaNameType
@@ -15,7 +22,7 @@ type AdvancedInputsProps = {
 }
 
 const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
-  const { selectedCriteria = {}, onChangeValue } = props
+  const { form, selectedCriteria = {}, onChangeValue } = props
   const optionsIsUsed =
     +selectedCriteria.occurrence !== 1 ||
     selectedCriteria.occurrenceComparator !== '>=' ||
@@ -25,6 +32,11 @@ const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
     !!selectedCriteria.encounterEndDate
 
   const [checked, setCheck] = useState(optionsIsUsed)
+  const label = 'Séléctionnez une unité exécutrice'
+
+  const _onSubmitExecutiveUnits = (_selectedExecutiveUnits: ScopeTreeRow[] | undefined) => {
+    onChangeValue('encounterService', _selectedExecutiveUnits)
+  }
 
   return (
     <Grid container direction="column">
@@ -46,6 +58,33 @@ const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
       </Grid>
 
       <Collapse in={checked} unmountOnExit>
+        <FormLabel style={{ padding: '1em 1em 0 1em', display: 'flex', alignItems: 'center' }} component="legend">
+          Unité exécutrice
+          <Tooltip
+            title={
+              <>
+                {'- Le niveau hiérarchique de rattachement est : ' + scopeType?.criteriaType[form] + '.'}
+                <br />
+                {"- L'unité exécutrice" +
+                  ' est la structure élémentaire de prise en charge des malades par une équipe soignante ou médico-technique identifiées par leurs fonctions et leur organisation.'}
+              </>
+            }
+          >
+            <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+          </Tooltip>
+        </FormLabel>
+        <Grid item container direction="row" alignItems="center">
+          <PopulationCard
+            form={form}
+            label={label}
+            title={label}
+            executiveUnits={selectedCriteria?.encounterService ?? []}
+            isAcceptEmptySelection={true}
+            isDeleteIcon={true}
+            onChangeExecutiveUnits={_onSubmitExecutiveUnits}
+          />
+        </Grid>
+
         <VisitInputs selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
         <OccurrencesDateInputs selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
       </Collapse>

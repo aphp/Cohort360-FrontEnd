@@ -9,8 +9,7 @@ import { ReactComponent as UnknownIcon } from 'assets/icones/autre-inconnu.svg'
 
 import DataTable from 'components/DataTable/DataTable'
 
-import { CohortPatient, Column, Order } from 'types'
-import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { CohortPatient, Column, Order, PatientGenderKind } from 'types'
 
 import { getAge } from 'utils/age'
 import { capitalizeFirstLetter } from 'utils/capitalize'
@@ -116,7 +115,9 @@ const DataTablePatientLine: React.FC<{
       }
     >
       <TableCell align="center">
-        {patient.gender && <PatientGender gender={patient.gender} className={classes.genderIcon} />}
+        {patient.gender && (
+          <PatientGender gender={patient.gender as PatientGenderKind} className={classes.genderIcon} />
+        )}
       </TableCell>
       <TableCell>{deidentified ? 'Prénom' : capitalizeFirstLetter(patient.name?.[0].given?.[0])}</TableCell>
       <TableCell>{deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ')}</TableCell>
@@ -155,7 +156,7 @@ const DataTablePatientLine: React.FC<{
 export default DataTablePatient
 
 type PatientGenderProps = {
-  gender: PatientGenderKind
+  gender?: PatientGenderKind
   className?: string
 }
 

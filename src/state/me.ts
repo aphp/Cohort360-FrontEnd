@@ -2,6 +2,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 
 import services from 'services/aphp'
+import { AccessExpiration } from '../types'
 
 export type MeState = null | {
   id: string
@@ -10,6 +11,7 @@ export type MeState = null | {
   firstName: string
   lastName: string
   deidentified: boolean
+  accessExpirations: AccessExpiration[]
   nominativeGroupsIds?: any[]
   lastConnection?: string
   maintenance?: { active: boolean; maintenance_end: string; maintenance_start: string }

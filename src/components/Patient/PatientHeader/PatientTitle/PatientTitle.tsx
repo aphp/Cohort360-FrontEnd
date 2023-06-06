@@ -32,7 +32,7 @@ const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
   const goBacktoCohort = () => {
     const path =
       cohort.cohort && Array.isArray(cohort.cohort) && cohort.cohort.length > 0
-        ? `/perimeters/patients?${cohort.cohort.map((e: any) => e.id).join()}`
+        ? `/perimeters/patients?${cohort.cohort.map((e) => e.id).join()}`
         : !Array.isArray(cohort.cohort) && cohort.cohort?.id
         ? `/cohort/${cohort.cohort?.id}/patients`
         : groupId

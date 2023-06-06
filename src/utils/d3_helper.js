@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const getOptimalTicksCount = (maxTick) => {
   /*
     Function adapted from http://bl.ocks.org/tanykim/62462c396b37874ebd87

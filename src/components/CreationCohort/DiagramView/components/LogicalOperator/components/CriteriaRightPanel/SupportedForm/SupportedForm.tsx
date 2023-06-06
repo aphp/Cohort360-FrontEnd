@@ -25,8 +25,10 @@ import OtherInputs from './SupportedInputs/OtherInputs'
 import VisitInputs from '../AdvancedInputs/VisitInputs/VisitInputs'
 import useStyles from './styles'
 
-import { CriteriaName, EncounterDataType } from 'types'
+import { CriteriaName, EncounterDataType, ScopeTreeRow } from 'types'
 import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
+import PopulationCard from '../../../../PopulationCard/PopulationCard'
+import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE } from 'utils/cohortCreation'
 
 type SupportedFormProps = {
   criteria: any
@@ -81,6 +83,10 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
     const _defaultValues = defaultValues ? { ...defaultValues } : {}
     _defaultValues[key] = value
     setDefaultValues(_defaultValues)
+  }
+
+  const _onSubmitExecutiveUnits = (_selectedExecutiveUnits: ScopeTreeRow[] | undefined) => {
+    _onChangeValue('encounterService', _selectedExecutiveUnits)
   }
 
   if (
@@ -173,6 +179,18 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
             selectedCriteria={defaultValues}
             onChangeValue={_onChangeValue}
           />
+
+          <Grid style={{ display: 'grid', alignItems: 'center', margin: '0 1em' }}>
+            <PopulationCard
+              form={'supported'}
+              label={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
+              title={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
+              executiveUnits={defaultValues?.encounterService ?? []}
+              isAcceptEmptySelection={true}
+              isDeleteIcon={true}
+              onChangeExecutiveUnits={_onSubmitExecutiveUnits}
+            />
+          </Grid>
 
           <FormLabel style={{ padding: '1em', display: 'flex', alignItems: 'center' }} component="legend">
             Âge au moment de la prise en charge

@@ -32,6 +32,7 @@ export type CohortCreationState = {
   snapshotsHistory: CohortCreationSnapshotType[]
   count: CohortCreationCounterType
   selectedPopulation: (ScopeTreeRow | undefined)[] | null
+  executiveUnits: (ScopeTreeRow | undefined)[] | null
   allowSearchIpp: boolean
   selectedCriteria: SelectedCriteriaType[]
   criteriaGroup: CriteriaGroupType[]
@@ -55,6 +56,7 @@ const defaultInitialState: CohortCreationState = {
   snapshotsHistory: [],
   count: {},
   selectedPopulation: null,
+  executiveUnits: null,
   allowSearchIpp: false,
   selectedCriteria: [],
   criteriaGroup: [
@@ -260,7 +262,7 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
   'cohortCreation/build',
   async ({ selectedPopulation }, { getState, dispatch }) => {
     try {
-      const state: any = getState()
+      const state = getState()
 
       const _selectedPopulation = selectedPopulation
         ? selectedPopulation
@@ -349,7 +351,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
       let _temporalConstraints
 
       if (temporalConstraints && temporalConstraints?.length > 0) {
-        _temporalConstraints = temporalConstraints.map((temporalConstraint: TemporalConstraintsType, index) => {
+        _temporalConstraints = temporalConstraints.map((temporalConstraint: TemporalConstraintsType, index: number) => {
           return {
             ...temporalConstraint,
             id: index + 1

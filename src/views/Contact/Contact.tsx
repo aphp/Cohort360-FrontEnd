@@ -61,7 +61,10 @@ const Contact: React.FC = () => {
   const [createIssueSuccess, setCreateIssueSuccess] = useState(false)
   const [createIssueFail, setCreateIssueFail] = useState(false)
 
-  const _onChangeValue = (key: 'requestType' | 'object' | 'url' | 'files' | 'message', value: any) => {
+  const _onChangeValue = (
+    key: 'requestType' | 'object' | 'url' | 'files' | 'message',
+    value: string | FileList | null
+  ) => {
     const _contactRequest = { ...contactRequest }
     _contactRequest[key] = value
     setContactRequest(_contactRequest)

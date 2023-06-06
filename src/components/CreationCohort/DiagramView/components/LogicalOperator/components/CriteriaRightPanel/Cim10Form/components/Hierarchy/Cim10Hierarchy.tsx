@@ -24,7 +24,12 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import { useAppDispatch, useAppSelector } from 'state'
 import { PmsiListType } from 'state/pmsi'
 
-import { checkIfIndeterminated, expandItem, findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
+import {
+  checkIfIndeterminated,
+  expandItem,
+  findEquivalentRowInItemAndSubItems,
+  getHierarchySelection
+} from 'utils/pmsi'
 
 import useStyles from './styles'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
@@ -70,7 +75,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
   const handleClickOnHierarchy = async (cim10Item: PmsiListType) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
-    const newSelectedItems = getSelectedPmsi(cim10Item, selectedItems || [], cim10Hierarchy)
+    const newSelectedItems = getHierarchySelection(cim10Item, selectedItems || [], cim10Hierarchy)
     await handleClick(newSelectedItems)
     dispatch(decrementLoadingSyncHierarchyTable())
   }

@@ -1,31 +1,53 @@
 import { ReactElement, ReactNode } from 'react'
 import {
-  IBundle,
-  IBundle_Entry,
-  IClaim,
-  ICondition,
-  IDocumentReference,
-  IEncounter,
-  IGroup,
-  IMedicationAdministration,
-  IMedicationRequest,
-  IObservation,
-  IOperationOutcome,
-  IPatient,
-  IProcedure,
-  IResourceList,
-  PatientGenderKind
-} from '@ahryman40k/ts-fhir-types/lib/R4'
+  Bundle,
+  Claim,
+  Condition,
+  DocumentReference,
+  Encounter,
+  FhirResource,
+  Group,
+  MedicationAdministration,
+  MedicationRequest,
+  Observation,
+  OperationOutcome,
+  Patient,
+  Procedure
+} from 'fhir/r4'
 
-export interface TypedEntry<T extends IResourceList> extends IBundle_Entry {
-  resource?: T
+export enum DocumentReferenceStatusKind {
+  _current = 'current',
+  _superseded = 'superseded',
+  _enteredInError = 'entered-in-error'
 }
 
-export interface TypedBundle<T extends IResourceList> extends IBundle {
-  entry?: TypedEntry<T>[]
+export enum EncounterStatusKind {
+  _planned = 'planned',
+  _arrived = 'arrived',
+  _triaged = 'triaged',
+  _inProgress = 'in-progress',
+  _onleave = 'onleave',
+  _finished = 'finished',
+  _cancelled = 'cancelled',
+  _enteredInError = 'entered-in-error',
+  _unknown = 'unknown'
 }
 
-export type FHIR_API_Response<T extends IResourceList> = TypedBundle<T> | IOperationOutcome
+export enum PatientGenderKind {
+  _male = 'male',
+  _female = 'female',
+  _other = 'other',
+  _unknown = 'unknown'
+}
+
+export enum CompositionStatusKind {
+  _preliminary = 'preliminary',
+  _final = 'final',
+  _amended = 'amended',
+  _enteredInError = 'entered-in-error'
+}
+
+export type FHIR_API_Response<T extends FhirResource> = Bundle<T> | OperationOutcome
 
 export type Back_API_Response<T> = {
   results?: T[]
@@ -55,7 +77,7 @@ export type Provider = {
   year_of_birth?: number
 }
 
-export type CohortComposition = IDocumentReference & {
+export type CohortComposition = DocumentReference & {
   deidentified?: boolean
   idPatient?: string
   IPP?: string
@@ -76,29 +98,29 @@ export type CohortComposition = IDocumentReference & {
   }[]
 }
 
-export type CohortEncounter = IEncounter & {
+export type CohortEncounter = Encounter & {
   documents?: CohortComposition[]
-  details?: IEncounter[]
+  details?: Encounter[]
 }
 
-export type CohortPatient = IPatient & {
-  lastEncounter?: IEncounter
-  lastProcedure?: IProcedure
-  mainDiagnosis?: ICondition[]
-  labResults?: IObservation[]
+export type CohortPatient = Patient & {
+  lastEncounter?: Encounter
+  lastProcedure?: Procedure
+  mainDiagnosis?: Condition[]
+  labResults?: Observation[]
   inclusion?: boolean
-  lastGhm?: IClaim
-  associatedDiagnosis?: ICondition[]
-  lastLabResults?: IObservation
+  lastGhm?: Claim
+  associatedDiagnosis?: Condition[]
+  lastLabResults?: Observation
 }
 
-export type PMSIEntry<T extends IProcedure | ICondition | IClaim> = T & {
+export type PMSIEntry<T extends Procedure | Condition | Claim> = T & {
   documents?: CohortComposition[]
   serviceProvider?: string
   NDA?: string
 }
 
-export type MedicationEntry<T extends IMedicationRequest | IMedicationAdministration> = T & {
+export type MedicationEntry<T extends MedicationRequest | MedicationAdministration> = T & {
   documents?: CohortComposition[]
   serviceProvider?: string
   NDA?: string
@@ -137,10 +159,12 @@ export type CohortFilters = {
   endDate: null | string
 }
 
+export type SimpleCodeType = { code: string; label: string; type: string }
+
 export type DocumentFilters = {
   ipp?: string
   nda: string
-  selectedDocTypes: { code: string; label: string; type: string }[]
+  selectedDocTypes: SimpleCodeType[]
   startDate: string | null
   endDate: string | null
   onlyPdfAvailable: boolean
@@ -163,9 +187,9 @@ export type PMSIFilters = {
 }
 
 export type PatientFilters = {
-  gender: PatientGenderKind
+  gender: PatientGenderKind | null
   birthdatesRanges: [string, string]
-  vitalStatus: VitalStatus
+  vitalStatus: VitalStatus | null
 }
 
 export type ObservationFilters = {
@@ -181,7 +205,7 @@ export type Sort = {
   sortDirection: 'asc' | 'desc'
 }
 
-export type CohortGroup = IGroup & {
+export type CohortGroup = Group & {
   id: string
   name: string
   quantity: number
@@ -242,13 +266,15 @@ export type ScopeTreeRow = {
   name: string
   full_path?: string
   quantity: number
-  parentId?: string
+  parentId?: string | null
   subItems: ScopeTreeRow[]
   managingEntity?: any | undefined
+  above_levels_ids?: string
   inferior_levels_ids?: string
   cohort_id?: string
   cohort_size?: string
   cohort_tag?: string
+  type?: string
 }
 
 export type SimpleChartDataType = {
@@ -294,13 +320,13 @@ export type VisiteRepartitionType = {
 export type CohortData = {
   name?: string
   description?: string
-  cohort?: IGroup | IGroup[]
+  cohort?: Group | Group[]
   totalPatients?: number
   originalPatients?: CohortPatient[]
   totalDocs?: number
   documentsList?: CohortComposition[]
   wordcloudData?: any
-  encounters?: IEncounter[]
+  encounters?: Encounter[]
   genderRepartitionMap?: GenderRepartitionType
   visitTypeRepartitionData?: SimpleChartDataType[]
   monthlyVisitData?: VisiteRepartitionType
@@ -312,18 +338,18 @@ export type CohortData = {
 
 export type PatientData = {
   patient?: CohortPatient
-  hospit?: (CohortEncounter | IEncounter)[]
+  hospit?: (CohortEncounter | Encounter)[]
   documents?: CohortComposition[]
   documentsTotal?: number
-  consult?: PMSIEntry<IProcedure>[]
+  consult?: PMSIEntry<Procedure>[]
   consultTotal?: number
-  diagnostic?: PMSIEntry<ICondition>[]
+  diagnostic?: PMSIEntry<Condition>[]
   diagnosticTotal?: number
-  ghm?: PMSIEntry<IClaim>[]
+  ghm?: PMSIEntry<Claim>[]
   ghmTotal?: number
-  medicationRequest?: IMedicationRequest[]
+  medicationRequest?: MedicationRequest[]
   medicationRequestTotal?: number
-  medicationAdministration?: IMedicationAdministration[]
+  medicationAdministration?: MedicationAdministration[]
   medicationAdministrationTotal?: number
 }
 
@@ -381,6 +407,7 @@ export type CriteriaItemType = {
 export type SelectedCriteriaType = {
   id: number
   error?: boolean
+  encounterService?: ScopeTreeRow[]
 } & (
   | CcamDataType
   | Cim10DataType
@@ -603,11 +630,11 @@ export type ContactSubmitForm = FormData
  * Patient State Types
  */
 
-export type IPatientDetails = IPatient & {
-  lastEncounter?: IEncounter
-  lastGhm?: IClaim | 'loading'
-  lastProcedure?: IProcedure | 'loading'
-  mainDiagnosis?: ICondition[] | 'loading'
+export type IPatientDetails = Patient & {
+  lastEncounter?: Encounter
+  lastGhm?: Claim | 'loading'
+  lastProcedure?: Procedure | 'loading'
+  mainDiagnosis?: Condition[] | 'loading'
 }
 
 export type IPatientDocuments = {
@@ -632,7 +659,7 @@ export type IPatientDocuments = {
   searchInputError?: searchInputError
 }
 
-export type IPatientPmsi<T extends IProcedure | ICondition | IClaim> = {
+export type IPatientPmsi<T extends Procedure | Condition | Claim> = {
   loading: boolean
   count: number
   total: number
@@ -654,12 +681,12 @@ export type IPatientPmsi<T extends IProcedure | ICondition | IClaim> = {
   }
 }
 
-export type CohortMedication<T extends IMedicationRequest | IMedicationAdministration> = T & {
+export type CohortMedication<T extends MedicationRequest | MedicationAdministration> = T & {
   serviceProvider?: string
   NDA?: string
 }
 
-export type IPatientMedication<T extends IMedicationRequest | IMedicationAdministration> = {
+export type IPatientMedication<T extends MedicationRequest | MedicationAdministration> = {
   loading: boolean
   count: number
   total: number | null
@@ -682,7 +709,11 @@ export type IPatientMedication<T extends IMedicationRequest | IMedicationAdminis
   }
 }
 
-export type CohortObservation = IObservation & {
+export enum BiologyStatus {
+  VALIDATED = 'Validé'
+}
+
+export type CohortObservation = Observation & {
   serviceProvider?: string
   NDA?: string
 }
@@ -764,6 +795,7 @@ export type ScopeElement = {
   source_value: string
   parent_id: string | null
   type: string
+  above_levels_ids: string
   inferior_levels_ids: string
   cohort_id: string
   cohort_size: string
@@ -784,6 +816,22 @@ export type IScope = {
   previous: string | null
   results: ScopePage[]
 }
+
+export type GroupRights = {
+  perimeter_id: string
+  care_site_id: number
+  provider_id: string
+  care_site_history_ids: number[]
+  access_ids: number[]
+  right_read_patient_nominative: boolean
+  right_read_patient_pseudo_anonymised: boolean
+  right_search_patient_with_ipp: boolean
+  right_export_csv_nominative: boolean
+  right_export_csv_pseudo_anonymised: boolean
+  right_transfer_jupyter_nominative: boolean
+  right_transfer_jupyter_pseudo_anonymised: boolean
+}
+
 export type ErrorType = { isError: boolean; errorMessage?: string }
 export type AgeRangeType = {
   year?: number
@@ -808,3 +856,17 @@ export type CriteriaNameType =
   | CriteriaName.Medication
   | CriteriaName.Biology
   | CriteriaName.VisitSupport
+
+export type AccessExpirationsProps = {
+  expiring?: boolean
+}
+
+export type SimpleStatus = 'success' | 'error' | null
+
+export type AccessExpiration = {
+  leftDays?: number
+  start_datetime: Date
+  end_datetime: Date
+  profile: string
+  perimeter: string
+}

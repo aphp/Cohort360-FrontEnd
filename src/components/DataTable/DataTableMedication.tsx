@@ -10,15 +10,15 @@ import ModalAdministrationComment from 'components/Patient/PatientMedication/Mod
 import displayDigit from 'utils/displayDigit'
 
 import { Column, Order, CohortMedication } from 'types'
-import { IMedicationRequest, IMedicationAdministration } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import useStyles from './styles'
+import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
 
 type DataTableMedicationProps = {
   loading: boolean
   deidentified: boolean
   selectedTab: 'prescription' | 'administration'
-  medicationsList: CohortMedication<IMedicationRequest | IMedicationAdministration>[]
+  medicationsList: CohortMedication<MedicationRequest | MedicationAdministration>[]
   order?: Order
   setOrder?: (order: Order) => void
   page?: number
@@ -98,7 +98,7 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
 }
 
 const DataTableMedicationLine: React.FC<{
-  medication: CohortMedication<IMedicationRequest | IMedicationAdministration>
+  medication: CohortMedication<MedicationRequest | MedicationAdministration>
   deidentified: boolean
 }> = ({ medication, deidentified }) => {
   const classes = useStyles()
@@ -122,7 +122,7 @@ const DataTableMedicationLine: React.FC<{
 
   const prescriptionType =
     medication.resourceType === 'MedicationRequest' &&
-    (medication.extension?.find((extension: any) => extension.url === 'type') || {}).valueString
+    (medication.extension?.find((extension) => extension.url === 'type') || {}).valueString
   const administrationRoute =
     medication.resourceType === 'MedicationRequest'
       ? medication.dosageInstruction?.[0]?.route?.text
