@@ -10,7 +10,14 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import { useAppSelector } from 'state'
-import { DocType, ScopeTreeRow, SearchByTypes, SelectedCriteriaType, CriteriaItemType } from 'types'
+import {
+  DocType,
+  ScopeTreeRow,
+  SearchByTypes,
+  SelectedCriteriaType,
+  CriteriaItemType,
+  CalendarRequestLabel
+} from 'types'
 
 import docTypes from 'assets/docTypes.json'
 
@@ -58,6 +65,28 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     }
 
     const data: any = _searchDataFromCriteria(criteria, _currentCriteria.type)
+
+    const displayCalendarFields = (
+      criteriaLabel: string,
+      minValue: number,
+      minLabel: CalendarRequestLabel,
+      maxValue: number,
+      maxLabel: CalendarRequestLabel,
+      isMaxValueLimit = false
+    ): string => {
+      if (minValue === maxValue && minLabel === maxLabel) {
+        return `${criteriaLabel} : ${minValue} ${minLabel}`
+      }
+      if (minValue === 0) {
+        return `${criteriaLabel} : jusqu'à ${maxValue} ${maxLabel} ${isMaxValueLimit ? 'ou plus' : ''}`
+      }
+      if (isMaxValueLimit) {
+        return `${criteriaLabel} : à partir de ${minValue} ${minLabel}`
+      }
+      return `${criteriaLabel} : entre ${minValue} ${minLabel} et ${maxValue} ${maxLabel} ${
+        isMaxValueLimit ? 'ou plus' : ''
+      }`
+    }
 
     let startDate = null
     let endDate = null
@@ -360,16 +389,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Encounter': {
-        const ageType: any = _currentCriteria.ageType ? _currentCriteria.ageType.id : 'year'
-        let ageUnit = 'an(s)'
-        if (ageType === 'month') ageUnit = 'mois'
-        else if (ageType === 'day') ageUnit = 'jour(s)'
-
-        const durationType: any = _currentCriteria.durationType ? _currentCriteria.durationType.id : 'year'
-        let durationUnit = 'an(s)'
-        if (durationType === 'month') durationUnit = 'mois'
-        else if (durationType === 'day') durationUnit = 'jour(s)'
-
         const displaySelectedEntryModes = (entryModes: { id: string; label: string }[]) => {
           let currentEntryModes: string[] = []
           for (const entryMode of entryModes) {
@@ -528,59 +547,38 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         }
 
         content = [
-          _currentCriteria.years && _currentCriteria.years[0] === _currentCriteria.years[1] && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography style={{ maxWidth: 500 }} noWrap>
-                  {`${_currentCriteria.years?.[0]} ${ageUnit}
-                    ${_currentCriteria.years?.[0] === 130 ? ' ou plus' : ''}`}
-                </Typography>
-              }
-            />
-          ),
-          _currentCriteria.years &&
-            _currentCriteria.years[0] !== _currentCriteria.years[1] &&
-            !(_currentCriteria.years[0] === 0 && _currentCriteria.years[1] === 130 && ageUnit === 'an(s)') && (
-              <Chip
-                className={classes.criteriaChip}
-                label={
-                  <Typography style={{ maxWidth: 500 }} noWrap>
-                    {`Entre ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit}
-                    ${_currentCriteria.years[1] === 130 ? ' ou plus' : ''}`}
-                  </Typography>
-                }
-              />
-            ),
-          _currentCriteria.duration && _currentCriteria.duration[0] === _currentCriteria.duration[1] && (
-            <Chip
-              className={classes.criteriaChip}
-              label={
-                <Typography style={{ maxWidth: 500 }} noWrap>
-                  {`Prise en charge : ${_currentCriteria.duration?.[0]} ${durationUnit}
-                  ${_currentCriteria.duration?.[0] === 100 ? ' ou plus' : ''}`}
-                </Typography>
-              }
-            />
-          ),
-          _currentCriteria.duration &&
-            _currentCriteria.duration[0] !== _currentCriteria.duration[1] &&
-            !(
-              durationUnit === 'jour(s)' &&
-              _currentCriteria.duration[0] === 0 &&
-              _currentCriteria.duration[1] === 100
-            ) && (
-              <Chip
-                className={classes.criteriaChip}
-                label={
-                  <Typography style={{ maxWidth: 500 }} noWrap>
-                    {`Prise en charge : ${_currentCriteria.duration[0]} et ${_currentCriteria.duration[1]}
-                    ${durationUnit}
-                    ${_currentCriteria.duration[1] === 100 ? ' ou plus' : ''}`}
-                  </Typography>
-                }
-              />
-            ),
+          <Chip
+            key={0}
+            className={classes.criteriaChip}
+            label={
+              <Typography style={{ maxWidth: 500 }} noWrap>
+                {displayCalendarFields(
+                  'Âge',
+                  _currentCriteria.age[0],
+                  _currentCriteria.ageType[0].requestLabel,
+                  _currentCriteria.age[1],
+                  _currentCriteria.ageType[1].requestLabel,
+                  _currentCriteria.age[1] === 130
+                )}
+              </Typography>
+            }
+          />,
+          <Chip
+            key={1}
+            className={classes.criteriaChip}
+            label={
+              <Typography style={{ maxWidth: 500 }} noWrap>
+                {displayCalendarFields(
+                  'Prise en charge',
+                  _currentCriteria.duration[0],
+                  _currentCriteria.durationType[0].requestLabel,
+                  _currentCriteria.duration[1],
+                  _currentCriteria.durationType[1].requestLabel,
+                  _currentCriteria.duration[1] === 100
+                )}
+              </Typography>
+            }
+          />,
           _currentCriteria && _currentCriteria.priseEnChargeType && _currentCriteria?.priseEnChargeType?.length > 0 && (
             <Chip
               className={classes.criteriaChip}

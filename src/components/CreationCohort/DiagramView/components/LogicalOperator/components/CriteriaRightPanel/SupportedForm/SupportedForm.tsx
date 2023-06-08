@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import {
@@ -9,7 +9,6 @@ import {
   FormLabel,
   Grid,
   IconButton,
-  Slider,
   Switch,
   TextField,
   Tooltip,
@@ -22,12 +21,12 @@ import EntryExitInputs from './SupportedInputs/EntryExitInputs'
 import ProvenanceDestinationInputs from './SupportedInputs/ProvenanceDestinationInputs'
 import OtherInputs from './SupportedInputs/OtherInputs'
 
-import VisitInputs from '../AdvancedInputs/VisitInputs/VisitInputs'
 import useStyles from './styles'
 
-import { EncounterDataType, ScopeTreeRow } from 'types'
+import { EncounterDataType, ScopeTreeRow, CalendarLabel, Calendar, CalendarRequestLabel } from 'types'
 import PopulationCard from '../../../../PopulationCard/PopulationCard'
 import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE } from 'utils/cohortCreation'
+import VisitInputs from '../AdvancedInputs/VisitInputs/VisitInputs'
 
 type SupportedFormProps = {
   criteria: any
@@ -39,10 +38,16 @@ type SupportedFormProps = {
 const defaultEncounter: EncounterDataType = {
   type: 'Encounter',
   title: 'Critère de prise en charge',
-  ageType: { id: 'year', label: 'années' },
-  years: [0, 130],
-  durationType: { id: 'day', label: 'jours' },
+  age: [0, 130],
+  ageType: [
+    { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY },
+    { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR }
+  ],
   duration: [0, 100],
+  durationType: [
+    { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY },
+    { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR }
+  ],
   admissionMode: [],
   entryMode: [],
   exitMode: [],
@@ -66,37 +71,11 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
 
   const classes = useStyles()
 
-  const [error, setError] = useState(false)
-  const [sliderError, setSliderError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = () => {
-    if (
-      defaultValues.ageType?.id === 'year' &&
-      defaultValues.years[0] === 0 &&
-      defaultValues.years[1] === 130 &&
-      defaultValues.durationType?.id === 'day' &&
-      defaultValues.duration[0] === 0 &&
-      defaultValues.duration[1] === 100 &&
-      defaultValues.admissionMode?.length === 0 &&
-      defaultValues.entryMode?.length === 0 &&
-      defaultValues.exitMode?.length === 0 &&
-      defaultValues.priseEnChargeType?.length === 0 &&
-      defaultValues.typeDeSejour?.length === 0 &&
-      defaultValues.fileStatus?.length === 0 &&
-      defaultValues.discharge?.length === 0 &&
-      defaultValues.reason?.length === 0 &&
-      defaultValues.destination?.length === 0 &&
-      defaultValues.provenance?.length === 0 &&
-      defaultValues.admission?.length === 0 &&
-      !defaultValues.encounterStartDate &&
-      !defaultValues.encounterEndDate
-    ) {
-      return setError(true)
-    }
-
     onChangeSelectedCriteria(defaultValues)
   }
 
@@ -126,19 +105,6 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
     return <></>
   }
 
-  useEffect(() => {
-    if (
-      !Number.isInteger(defaultValues.years[0]) ||
-      !Number.isInteger(defaultValues.years[1]) ||
-      !Number.isInteger(defaultValues.duration[0]) ||
-      !Number.isInteger(defaultValues.duration[1])
-    ) {
-      setSliderError(true)
-    } else {
-      setSliderError(false)
-    }
-  }, [defaultValues.years, defaultValues.duration])
-
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
@@ -156,9 +122,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner un champ</Alert>}
-
-        {!error && !multiFields && (
+        {!multiFields && (
           <Alert
             severity="info"
             onClose={() => {
@@ -171,7 +135,9 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
         )}
 
         <Grid className={classes.inputContainer} container>
-          <Typography variant="h6">Prise en charge</Typography>
+          <Typography className={classes.categoryTitle} variant="h6">
+            Prise en charge
+          </Typography>
 
           <TextField
             required
@@ -210,141 +176,228 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
             />
           </Grid>
 
-          <FormLabel style={{ padding: '1em', display: 'flex', alignItems: 'center' }} component="legend">
-            Âge au moment de la prise en charge
-            <Tooltip title="La valeur par défaut sera prise en compte si le sélecteur d'âge n'a pas été modifié.">
-              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-            </Tooltip>
-          </FormLabel>
+          <Grid container className={classes.durationContainer}>
+            <FormLabel component="legend" className={classes.durationTitle}>
+              Âge au moment de la prise en charge
+              <Tooltip title="La valeur par défaut sera prise en compte si le sélecteur d'âge n'a pas été modifié.">
+                <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+              </Tooltip>
+            </FormLabel>
 
-          <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 180px', alignItems: 'center', margin: '0 1em' }}>
-            <Grid>
-              <Slider
-                value={defaultValues.years}
-                onChange={(e, value) => _onChangeValue('years', value)}
-                aria-labelledby="range-slider"
-                valueLabelDisplay="off"
-                valueLabelFormat={(value) => (value === 130 ? '130+' : value)}
-                min={0}
-                max={130}
-                size="small"
-              />
-
-              <Grid container justifyContent="space-around">
-                <Grid item>
-                  <TextField
-                    value={defaultValues.years[0]}
-                    type="number"
-                    onChange={(e) =>
-                      _onChangeValue('years', [
-                        +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : defaultValues.years[0],
-                        defaultValues.years[1]
-                      ])
-                    }
-                    error={!Number.isInteger(defaultValues.years[0])}
-                    helperText={!Number.isInteger(defaultValues.years[0]) && 'Pas de valeur décimale autorisée.'}
-                  />
+            <Grid container justifyContent="space-around">
+              <Grid item container xs={12} justifyContent="space-between">
+                <Grid item container xs={6} alignItems="stretch">
+                  <Grid item xs={3} container direction="column" justifyContent="flex-end">
+                    <Typography variant="subtitle2" className={classes.durationLegend}>
+                      Min
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={2} container direction="column" justifyContent="flex-end">
+                    <TextField
+                      value={defaultValues.age[0]}
+                      className={classes.textField}
+                      variant="standard"
+                      size="small"
+                      type="number"
+                      onChange={(e) =>
+                        _onChangeValue('age', [
+                          +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : defaultValues.age[0],
+                          defaultValues.age[1]
+                        ])
+                      }
+                      error={!Number.isInteger(defaultValues.age[0])}
+                      helperText={!Number.isInteger(defaultValues.age[0]) && 'Pas de valeur décimale autorisée.'}
+                    />
+                  </Grid>
+                  <Grid item xs={7} container direction="column" justifyContent="flex-end">
+                    <Autocomplete
+                      id="criteria-ageType-autocomplete"
+                      size="small"
+                      className={classes.inputItem}
+                      options={[
+                        {
+                          id: Calendar.YEAR,
+                          criteriaLabel: CalendarLabel.YEAR,
+                          requestLabel: CalendarRequestLabel.YEAR
+                        },
+                        {
+                          id: Calendar.MONTH,
+                          criteriaLabel: CalendarLabel.MONTH,
+                          requestLabel: CalendarRequestLabel.MONTH
+                        },
+                        { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
+                      ]}
+                      getOptionLabel={(option) => option.criteriaLabel}
+                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                      value={defaultValues.ageType[0]}
+                      onChange={(e, value) => _onChangeValue('ageType', [value, defaultValues.ageType[1]])}
+                      renderInput={(params) => <TextField variant="standard" {...params} />}
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item>
-                  <TextField
-                    value={defaultValues.years[1]}
-                    type="number"
-                    onChange={(e) =>
-                      _onChangeValue('years', [
-                        defaultValues.years[0],
-                        +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : defaultValues.years[1]
-                      ])
-                    }
-                    error={!Number.isInteger(defaultValues.years[1])}
-                    helperText={!Number.isInteger(defaultValues.years[1]) && 'Pas de valeur décimale autorisée.'}
-                  />
+                <Grid item container xs={6} alignItems="stretch">
+                  <Grid item xs={3} container direction="column" justifyContent="flex-end">
+                    <Typography variant="subtitle2" className={classes.durationLegend}>
+                      Max
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={2} container direction="column" justifyContent="flex-end">
+                    <TextField
+                      value={defaultValues.age[1]}
+                      className={classes.textField}
+                      variant="standard"
+                      size="small"
+                      type="number"
+                      onChange={(e) =>
+                        _onChangeValue('age', [
+                          defaultValues.age[0],
+                          +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : defaultValues.age[1]
+                        ])
+                      }
+                      error={!Number.isInteger(defaultValues.age[1])}
+                      helperText={!Number.isInteger(defaultValues.age[1]) && 'Pas de valeur décimale autorisée.'}
+                    />
+                  </Grid>
+                  <Grid item xs={7} container direction="column" justifyContent="flex-end">
+                    <Autocomplete
+                      id="criteria-ageType-autocomplete"
+                      size="small"
+                      className={classes.inputItem}
+                      options={[
+                        {
+                          id: Calendar.YEAR,
+                          criteriaLabel: CalendarLabel.YEAR,
+                          requestLabel: CalendarRequestLabel.YEAR
+                        },
+                        {
+                          id: Calendar.MONTH,
+                          criteriaLabel: CalendarLabel.MONTH,
+                          requestLabel: CalendarRequestLabel.MONTH
+                        },
+                        { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
+                      ]}
+                      getOptionLabel={(option) => option.criteriaLabel}
+                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                      value={defaultValues.ageType[1]}
+                      onChange={(e, value) => _onChangeValue('ageType', [defaultValues.ageType[0], value])}
+                      renderInput={(params) => <TextField variant="standard" {...params} />}
+                    />
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
-
-            <Autocomplete
-              id="criteria-ageType-autocomplete"
-              className={classes.inputItem}
-              options={[
-                { id: 'year', label: 'années' },
-                { id: 'month', label: 'mois' },
-                { id: 'day', label: 'jours' }
-              ]}
-              getOptionLabel={(option) => option.label}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={defaultValues.ageType}
-              onChange={(e, value) => _onChangeValue('ageType', value)}
-              renderInput={(params) => <TextField {...params} />}
-            />
           </Grid>
 
-          <FormLabel style={{ padding: '0 1em 1em 1em' }} component="legend">
-            Durée de la prise en charge
-          </FormLabel>
+          <Grid container className={classes.durationContainer}>
+            <FormLabel component="legend" className={classes.durationTitle}>
+              Durée de la prise en charge
+            </FormLabel>
 
-          <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 180px', alignItems: 'center', margin: '0 1em' }}>
-            <Grid>
-              <Slider
-                value={defaultValues.duration}
-                onChange={(e, value) => _onChangeValue('duration', value)}
-                aria-labelledby="range-slider"
-                valueLabelDisplay="off"
-                valueLabelFormat={(value) => (value === 100 ? '100+' : value)}
-                min={0}
-                max={100}
-                size="small"
-              />
-
-              <Grid container justifyContent="space-around">
-                <Grid item>
-                  <TextField
-                    value={defaultValues.duration[0]}
-                    type="number"
-                    onChange={(e) =>
-                      _onChangeValue('duration', [
-                        +e.target.value >= 0 && +e.target.value <= 100 ? +e.target.value : +defaultValues.duration[0],
-                        defaultValues.duration[1]
-                      ])
-                    }
-                    error={!Number.isInteger(defaultValues.duration[0])}
-                    helperText={!Number.isInteger(defaultValues.duration[0]) && 'Pas de valeur décimale autorisée.'}
-                  />
+            <Grid container justifyContent="space-around">
+              <Grid item container xs={12} justifyContent="space-between">
+                <Grid item container xs={6} alignItems="stretch">
+                  <Grid xs={3} container direction="column" justifyContent="flex-end">
+                    <Typography variant="subtitle2" className={classes.durationLegend}>
+                      Min
+                    </Typography>
+                  </Grid>
+                  <Grid xs={2} container direction="column" justifyContent="flex-end">
+                    <TextField
+                      value={defaultValues.duration[0]}
+                      className={classes.textField}
+                      variant="standard"
+                      size="small"
+                      type="number"
+                      onChange={(e) =>
+                        _onChangeValue('duration', [
+                          +e.target.value >= 0 && +e.target.value <= 100 ? +e.target.value : +defaultValues.duration[0],
+                          defaultValues.duration[1]
+                        ])
+                      }
+                      error={!Number.isInteger(defaultValues.duration[0])}
+                      helperText={!Number.isInteger(defaultValues.duration[0]) && 'Pas de valeur décimale autorisée.'}
+                    />
+                  </Grid>
+                  <Grid xs={7} container direction="column" justifyContent="flex-end">
+                    <Autocomplete
+                      id="criteria-ageType-autocomplete"
+                      size="small"
+                      className={classes.inputItem}
+                      options={[
+                        {
+                          id: Calendar.YEAR,
+                          criteriaLabel: CalendarLabel.YEAR,
+                          requestLabel: CalendarRequestLabel.YEAR
+                        },
+                        {
+                          id: Calendar.MONTH,
+                          criteriaLabel: CalendarLabel.MONTH,
+                          requestLabel: CalendarRequestLabel.MONTH
+                        },
+                        { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
+                      ]}
+                      getOptionLabel={(option) => option.criteriaLabel}
+                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                      value={defaultValues.durationType[0]}
+                      onChange={(e, value) => _onChangeValue('durationType', [value, defaultValues.durationType[1]])}
+                      renderInput={(params) => <TextField variant="standard" {...params} />}
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item>
-                  <TextField
-                    value={defaultValues.duration[1]}
-                    type="number"
-                    onChange={(e) =>
-                      _onChangeValue('duration', [
-                        defaultValues.duration[0],
-                        +e.target.value >= 0 && +e.target.value <= 100 ? +e.target.value : +defaultValues.duration[1]
-                      ])
-                    }
-                    error={!Number.isInteger(defaultValues.duration[1])}
-                    helperText={!Number.isInteger(defaultValues.duration[1]) && 'Pas de valeur décimale autorisée.'}
-                  />
+                <Grid item container xs={6} alignItems="stretch">
+                  <Grid item xs={3} container direction="column" justifyContent="flex-end">
+                    <Typography variant="subtitle2" className={classes.durationLegend}>
+                      Max
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={2} container direction="column" justifyContent="flex-end">
+                    <TextField
+                      value={defaultValues.duration[1]}
+                      className={classes.textField}
+                      size="small"
+                      variant="standard"
+                      type="number"
+                      onChange={(e) =>
+                        _onChangeValue('duration', [
+                          defaultValues.duration[0],
+                          +e.target.value >= 0 && +e.target.value <= 100 ? +e.target.value : +defaultValues.duration[1]
+                        ])
+                      }
+                      error={!Number.isInteger(defaultValues.duration[1])}
+                      helperText={!Number.isInteger(defaultValues.duration[1]) && 'Pas de valeur décimale autorisée.'}
+                    />
+                  </Grid>
+                  <Grid item xs={7} container direction="column" justifyContent="flex-end">
+                    <Autocomplete
+                      id="criteria-ageType-autocomplete"
+                      size="small"
+                      className={classes.inputItem}
+                      options={[
+                        {
+                          id: Calendar.YEAR,
+                          criteriaLabel: CalendarLabel.YEAR,
+                          requestLabel: CalendarRequestLabel.YEAR
+                        },
+                        {
+                          id: Calendar.MONTH,
+                          criteriaLabel: CalendarLabel.MONTH,
+                          requestLabel: CalendarRequestLabel.MONTH
+                        },
+                        { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
+                      ]}
+                      getOptionLabel={(option) => option.criteriaLabel}
+                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                      value={defaultValues.durationType[1]}
+                      onChange={(e, value) => _onChangeValue('durationType', [defaultValues.durationType[0], value])}
+                      renderInput={(params) => <TextField variant="standard" {...params} />}
+                    />
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
-
-            <Autocomplete
-              id="criteria-ageType-autocomplete"
-              className={classes.inputItem}
-              options={[
-                { id: 'year', label: 'années' },
-                { id: 'month', label: 'mois' },
-                { id: 'day', label: 'jours' }
-              ]}
-              getOptionLabel={(option) => option.label}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              value={defaultValues.durationType}
-              onChange={(e, value) => _onChangeValue('durationType', value)}
-              renderInput={(params) => <TextField {...params} />}
-            />
           </Grid>
 
           <VisitInputs selectedCriteria={defaultValues} onChangeValue={_onChangeValue} />
-
           <OtherInputs criteria={criteria} selectedCriteria={defaultValues} onChangeValue={_onChangeValue} />
 
           <AdmissionInputs criteria={criteria} selectedCriteria={defaultValues} onChangeValue={_onChangeValue} />
@@ -364,7 +417,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="supported-form" variant="contained" disabled={sliderError}>
+          <Button onClick={_onSubmit} type="submit" form="supported-form" variant="contained">
             Confirmer
           </Button>
         </Grid>
