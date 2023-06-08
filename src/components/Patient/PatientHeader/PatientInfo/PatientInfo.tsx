@@ -13,7 +13,7 @@ type GenderIconTypes = {
   gender?: PatientGenderKind
 }
 const GenderIcon: React.FC<GenderIconTypes> = ({ gender }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   switch (gender) {
     case PatientGenderKind._female:
@@ -31,7 +31,7 @@ type PatientInfoTypes = {
   ipp?: string
 }
 const PatientInfo: React.FC<PatientInfoTypes> = ({ gender, age, ipp }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <Grid className={classes.root} container direction="column">

@@ -14,7 +14,7 @@ type VisitInputsProps = {
 const VisitInputs: React.FC<VisitInputsProps> = (props) => {
   const { selectedCriteria, onChangeValue } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <>

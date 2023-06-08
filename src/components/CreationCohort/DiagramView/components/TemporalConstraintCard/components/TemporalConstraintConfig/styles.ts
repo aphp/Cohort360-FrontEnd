@@ -1,6 +1,6 @@
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   input: {
     width: 80,
     backgroundColor: '#FFF',
@@ -28,8 +28,8 @@ const useStyles = makeStyles(() => ({
     marginRight: 4
   },
   flexBaseline: {
-    display: 'flex',
-    marginTop: 8
+    display: 'flex !important',
+    marginTop: '8px !important'
   },
   inputError: {
     border: '1px solid red'

@@ -88,7 +88,7 @@ const LegalMentionDialog = ({ open, setOpen }) => {
 
 const Login = () => {
   const navigate = useNavigate()
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
   const [username, setUsername] = useState(undefined)

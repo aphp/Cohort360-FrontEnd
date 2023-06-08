@@ -23,7 +23,7 @@ type CriteriaCardProps = {
 }
 
 const CriteriaCard: React.FC<CriteriaCardProps> = ({ itemId, duplicateCriteria, editCriteria, deleteCriteria }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const { meState } = useAppSelector<{ meState: MeState }>((state) => ({ meState: state.me }))
   const maintenanceIsActive = meState?.maintenance?.active

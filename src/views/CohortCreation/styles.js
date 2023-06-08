@@ -1,7 +1,7 @@
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 import { smallDrawerWidth, largeDrawerWidth } from 'components/Routes/LeftSideBar/LeftSideBar'
 
-export default makeStyles((theme) => ({
+export default makeStyles()((theme) => ({
   appBar: {
     marginLeft: smallDrawerWidth,
     zIndex: theme.zIndex.drawer + 1,

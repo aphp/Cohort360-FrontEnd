@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import clsx from 'clsx'
 
 import {
   Button,
@@ -49,7 +48,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
   const { medicationItem, selectedItems, handleClick, setLoading } = props
   const { id, label, subItems } = medicationItem
 
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
 
   const medicationHierarchy = useAppSelector((state) => state.medication.list || {})
@@ -93,7 +92,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(medicationItem)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isSelected ? false : isIndeterminated
             })}
@@ -117,7 +116,7 @@ const MedicationListItem: React.FC<MedicationListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(medicationItem)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isSelected ? false : isIndeterminated
             })}
@@ -170,7 +169,7 @@ type MedicationHierarchyProps = {
 const MedicationHierarchy: React.FC<MedicationHierarchyProps> = (props) => {
   const { isOpen = false, selectedCriteria, onChangeSelectedHierarchy, onConfirm, goBack, isEdition } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const isLoadingSyncHierarchyTable: number = initialState?.loading ?? 0
   const isLoadingMedication: number = useAppSelector((state) => state.medication.syncLoading || 0)

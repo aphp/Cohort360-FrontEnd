@@ -51,7 +51,7 @@ type ExportModalProps = {
 }
 
 const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [loading, setLoading] = useState(false)
   const [settings, setSettings] = useState(initialState)
   const [exportResponse, setExportResponse] = useState<{ status: 'error' | 'finish'; detail: any } | null>(null)

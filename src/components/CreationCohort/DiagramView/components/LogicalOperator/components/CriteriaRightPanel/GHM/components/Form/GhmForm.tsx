@@ -26,7 +26,7 @@ type GHMFormProps = {
 const GhmForm: React.FC<GHMFormProps> = (props) => {
   const { isOpen, isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const currentState = { ...selectedCriteria, ...initialState }

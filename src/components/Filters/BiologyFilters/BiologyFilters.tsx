@@ -31,7 +31,7 @@ type BiologyFiltersProps = {
 }
 
 const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters, onChangeFilters, deidentified }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [_filters, setFilters] = useState(filters)
   const [dateError, setDateError] = useState(false)

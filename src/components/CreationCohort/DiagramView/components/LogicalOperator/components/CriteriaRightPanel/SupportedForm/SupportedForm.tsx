@@ -68,8 +68,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultEncounter)
-
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [sliderError, setSliderError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 

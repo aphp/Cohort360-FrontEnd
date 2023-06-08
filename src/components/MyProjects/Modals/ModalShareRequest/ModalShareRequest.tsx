@@ -23,7 +23,7 @@ const ModalShareRequest: React.FC<{
 }> = ({ requestShare, onClose, parentStateSetter }) => {
   const { requestState } = useAppSelector<{ requestState: RequestState }>((state) => ({ requestState: state.request }))
   const navigate = useNavigate()
-  const classes = useStyles()
+  const { classes } = useStyles()
   const { selectedRequestShare } = requestState
 
   const selectedCurrentRequest = selectedRequestShare || requestShare

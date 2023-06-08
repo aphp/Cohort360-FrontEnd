@@ -1,10 +1,10 @@
-import makeStyles from '@mui/styles/makeStyles'
+import { makeStyles } from 'tss-react/mui'
 import { Theme } from '@mui/material/styles'
 
 const skyBlue = '#5BC5F2'
 const bgColor = '#E6F1FD'
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles()((theme: Theme) => ({
   logo: {
     position: 'fixed',
     top: 12,

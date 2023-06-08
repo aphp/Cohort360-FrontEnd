@@ -28,7 +28,7 @@ const OccurrenceDateInputs: React.FC<OccurrenceDateInputsProps> = (props) => {
   const { onChangeValue } = props
   const selectedCriteria = { ...defaultOccurrenceInputs, ...props.selectedCriteria }
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <>

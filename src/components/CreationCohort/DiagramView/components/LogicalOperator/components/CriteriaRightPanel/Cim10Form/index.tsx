@@ -30,7 +30,7 @@ const Index = (props: any) => {
   const dispatch = useAppDispatch()
   const cim10Hierarchy = useAppSelector((state) => state.pmsi.condition.list || {})
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const _onChangeSelectedHierarchy = (
     newSelectedItems: PmsiListType[] | null | undefined,
     newHierarchy?: PmsiListType[]

@@ -35,7 +35,7 @@ type CohortsFiltersProps = {
   onChangeFilters: (filters: CohortFilters) => void
 }
 const DocumentFilters: React.FC<CohortsFiltersProps> = ({ open, onClose, filters, onChangeFilters }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [_status, setStatus] = useState<ValueSet[]>(filters.status)
   const [_favorite, setFavorite] = useState<string>(filters.favorite)

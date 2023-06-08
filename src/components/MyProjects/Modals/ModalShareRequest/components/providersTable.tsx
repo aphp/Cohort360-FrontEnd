@@ -32,7 +32,7 @@ const ProvidersTable: React.FC<ProvidersTableProps> = ({
   usersAssociated,
   onChangeUsersAssociated
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const columns = [
     {

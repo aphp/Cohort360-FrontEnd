@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import clsx from 'clsx'
 import { Buffer } from 'buffer'
 import ReactHtmlParser from 'react-html-parser'
 
@@ -52,7 +51,7 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
   setPage,
   total
 }) => {
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
 
   const columns = [
     {
@@ -125,7 +124,7 @@ const DataTableCompositionLine: React.FC<{
   searchMode: boolean
   groupId?: string
 }> = ({ document, deidentified, showIpp, searchMode, groupId }) => {
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
 
   const [open, setOpen] = useState<string | null>(null)
 
@@ -184,21 +183,21 @@ const DataTableCompositionLine: React.FC<{
 
         <TableCell>
           <Grid container alignItems="center" wrap="nowrap">
-            <FolderSharedIcon htmlColor="#5BC5F2" className={clsx(classes.iconSize, classes.iconMargin)} />
+            <FolderSharedIcon htmlColor="#5BC5F2" className={cx(classes.iconSize, classes.iconMargin)} />
             <Typography>{nda}</Typography>
           </Grid>
         </TableCell>
 
         <TableCell>
           <Grid container alignItems="center" wrap="nowrap">
-            <LocalHospitalIcon htmlColor="#5BC5F2" className={clsx(classes.iconSize, classes.iconMargin)} />
+            <LocalHospitalIcon htmlColor="#5BC5F2" className={cx(classes.iconSize, classes.iconMargin)} />
             <Typography>{serviceProvider}</Typography>
           </Grid>
         </TableCell>
 
         <TableCell>
           <Grid container alignItems="center" wrap="nowrap">
-            <DescriptionIcon htmlColor="#5BC5F2" className={clsx(classes.iconSize, classes.iconMargin)} />
+            <DescriptionIcon htmlColor="#5BC5F2" className={cx(classes.iconSize, classes.iconMargin)} />
             <Typography>{docType?.label ?? '-'}</Typography>
           </Grid>
         </TableCell>
@@ -229,7 +228,7 @@ const DataTableCompositionLine: React.FC<{
 }
 
 const getStatusShip = (type?: CompositionStatusKind | DocumentReferenceStatusKind) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   if (type === 'final' || type === 'current') {
     return (

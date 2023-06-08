@@ -26,7 +26,7 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
   const [loadingOnSearch, setLoadingOnSearch] = useState(false)
   const [usersToShare] = useState<Provider[]>([])
   const [searchInput, setSearchInput] = useState('')
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const debouncedSearchTerm = useDebounce(700, searchInput)
 

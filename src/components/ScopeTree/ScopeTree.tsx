@@ -72,7 +72,7 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
     executiveUnitType
   } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <>
@@ -159,7 +159,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
   searchInput,
   executiveUnitType
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
   const [searchLoading, setSearchLoading] = useState<boolean>(false)

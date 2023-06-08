@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import clsx from 'clsx'
 
 import {
   Button,
@@ -48,7 +47,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
   const { biologyItem, selectedItems, handleClick } = props
   const { id, label, subItems } = biologyItem
 
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
 
   const biologyHierarchy = useAppSelector((state) => state.biology.list || {})
@@ -87,7 +86,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(biologyItem)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}
@@ -107,7 +106,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(biologyItem)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}
@@ -158,7 +157,7 @@ type BiologyHierarchyProps = {
 
 const BiologyHierarchy: React.FC<BiologyHierarchyProps> = (props) => {
   const { isOpen = false, selectedCriteria, onChangeSelectedHierarchy, onConfirm, goBack, isEdition } = props
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const isLoadingSyncHierarchyTable = initialState?.loading ?? 0

@@ -27,7 +27,7 @@ const PatientSearchBar: React.FC<PatientSearchBarProps> = ({
   searchBy = SearchByTypes.text,
   onChangeSearchBy
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const navigate = useNavigate()
   const location = useLocation()
   const { search } = useParams<{ search: string }>()

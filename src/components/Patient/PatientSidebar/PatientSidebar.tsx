@@ -37,7 +37,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   onClose,
   deidentifiedBoolean
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const location = useLocation()
 
   const { search } = location

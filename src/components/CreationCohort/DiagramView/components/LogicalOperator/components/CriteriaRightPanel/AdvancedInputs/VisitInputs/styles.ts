@@ -1,6 +1,6 @@
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   inputItem: {
     margin: '1em',
     width: 'calc(100% - 2em)'

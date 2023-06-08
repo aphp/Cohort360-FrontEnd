@@ -15,7 +15,7 @@ type PieChartProps = {
 }
 
 const PieChart: React.FC<PieChartProps> = memo(({ data, height = 250, width = 250 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const node = useRef<SVGSVGElement | null>(null)
   const [legendHtml, setLegend] = useState()

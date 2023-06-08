@@ -58,14 +58,11 @@ const defaultComposition: DocumentDataType = {
 const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
-
   const [searchCheckingLoading, setSearchCheckingLoading] = useState(false)
-
   const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
-
   const debouncedSearchItem = useDebounce(500, defaultValues.search)
 
   const isEdition = selectedCriteria !== null ? true : false

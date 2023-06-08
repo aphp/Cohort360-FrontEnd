@@ -15,7 +15,7 @@ import { ACCES_TOKEN, BACK_API_URL, REFRESH_TOKEN, REFRESH_TOKEN_INTERVAL, SESSI
 import useStyles from './styles'
 
 const AutoLogoutContainer = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
