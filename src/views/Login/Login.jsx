@@ -41,7 +41,6 @@ import services from 'services/aphp'
 import useStyles from './styles'
 import { getDaysLeft } from '../../utils/formatDate'
 import Welcome from '../Welcome/Welcome'
-import clsx from 'clsx'
 
 const ErrorSnackBarAlert = ({ open, setError, errorMessage }) => {
   const _setError = () => {
@@ -100,7 +99,7 @@ const LegalMentionDialog = ({ open, setOpen }) => {
 
 const Login = () => {
   const navigate = useNavigate()
-  const { classes } = useStyles()
+  const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
   const [loading, setLoading] = useState(false)
   const [username, setUsername] = useState(undefined)
@@ -382,7 +381,7 @@ const Login = () => {
                 type="submit"
                 onClick={oidcLogin}
                 variant="contained"
-                className={clsx(classes.submit, classes.oidcButton)}
+                className={cx(classes.submit, classes.oidcButton)}
                 style={{ marginBottom: 40 }}
                 id="oidc-login"
                 startIcon={<Keycloak height="25px" />}
