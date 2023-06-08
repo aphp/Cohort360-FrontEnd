@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import clsx from 'clsx'
 import moment from 'moment'
 
 import {
@@ -47,7 +46,7 @@ const ControlPanel: React.FC<{
   onUndo?: () => void
   onRedo?: () => void
 }> = ({ onExecute, onUndo, onRedo }) => {
-  const classes = useStyle()
+  const { classes, cx } = useStyle()
   const dispatch = useAppDispatch()
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
   const [oldCount, setOldCount] = useState<CohortCreationCounterType | null>(null)
@@ -238,8 +237,8 @@ const ControlPanel: React.FC<{
 
         <Grid className={classes.container}>
           <Grid container justifyContent="space-between">
-            <Typography className={clsx(classes.boldText, classes.patientTypo)}>ACCÈS:</Typography>
-            <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
+            <Typography className={cx(classes.boldText, classes.patientTypo)}>ACCÈS:</Typography>
+            <Typography className={cx(classes.blueText, classes.boldText, classes.patientTypo)}>
               {accessIsPseudonymize === null ? '-' : accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
             </Typography>
           </Grid>
@@ -247,16 +246,16 @@ const ControlPanel: React.FC<{
 
         <Grid className={classes.container}>
           <Grid container justifyContent="space-between">
-            <Typography className={clsx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS</Typography>
+            <Typography className={cx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS</Typography>
             {itLoads ? (
               <CircularProgress
                 size={12}
                 style={{ marginTop: 14 }}
-                className={clsx(classes.blueText, classes.sidesMargin)}
+                className={cx(classes.blueText, classes.sidesMargin)}
               />
             ) : (
               <Grid container alignItems="center" style={{ width: 'fit-content' }}>
-                <Typography className={clsx(classes.boldText, classes.patientTypo, classes.blueText)}>
+                <Typography className={cx(classes.boldText, classes.patientTypo, classes.blueText)}>
                   {includePatient !== undefined && includePatient !== null ? displayDigit(includePatient) : '-'}
                   {oldCount !== null && !!oldCount.includePatient
                     ? (includePatient ?? 0) - oldCount.includePatient > 0

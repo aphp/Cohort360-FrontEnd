@@ -1,8 +1,8 @@
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 import { Theme } from '@mui/material/styles'
 import { populationCardPropsType } from './PopulationCard'
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles<populationCardPropsType>()((theme: Theme, params) => ({
   populationCard: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -10,16 +10,16 @@ const useStyles = makeStyles((theme: Theme) => ({
     'border-radius': 4,
     backgroundColor: '#FFFFFF',
     padding: '8px 16px',
-    border: (props: populationCardPropsType) => (props.form ? '1px solid #D0D7D8' : '3px solid #D3DEE8'),
+    border: params.form ? '1px solid #D0D7D8' : '3px solid #D3DEE8',
     '&:hover': {
-      'border-color': (props: populationCardPropsType) => (props.form ? 'rgb(21,61,138)' : '')
+      'border-color': params.form ? 'rgb(21,61,138)' : ''
     },
     flex: 1,
     margin: '12px 0',
     position: 'relative'
   },
   typography: {
-    padding: (props: populationCardPropsType) => (props.form ? '0 0em 0px' : '0 1em 8px'),
+    padding: params.form ? '0px' : '0 1em 8px',
     display: 'flex',
     alignItems: 'center'
   },

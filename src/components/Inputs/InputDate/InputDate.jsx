@@ -25,7 +25,7 @@ const InputDate = (props) => {
     { key: 'Décembre', value: 12 }
   ]
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [day, onChangeDay] = useState(null)
   const [month, onChangeMonth] = useState(null)
   const [year, onChangeYear] = useState(null)

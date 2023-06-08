@@ -25,7 +25,7 @@ const ModalCohortTitle: React.FC<{
   longCohort: boolean
   cohortLimit: number
 }> = ({ onExecute, onClose, longCohort, cohortLimit }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [title, onChangeTitle] = useState('')
   const [description, onChangeDescription] = useState('')

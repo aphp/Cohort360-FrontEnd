@@ -29,7 +29,7 @@ const RequestForm: React.FC<RequestFormProps> = ({
   onChangeProjectName,
   projectList
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <>

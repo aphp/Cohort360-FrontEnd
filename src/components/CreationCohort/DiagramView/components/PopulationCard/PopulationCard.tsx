@@ -31,7 +31,7 @@ export type populationCardPropsType = {
 
 const PopulationCard: React.FC<populationCardPropsType> = (props) => {
   const { label, title, form, executiveUnits, onChangeExecutiveUnits, isAcceptEmptySelection, isDeleteIcon } = props
-  const classes = useStyles(props)
+  const { classes } = useStyles(props)
   const dispatch = useAppDispatch()
   const isRendered = useRef<boolean>(false)
 
@@ -152,10 +152,7 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
                         onDelete={isDeleteIcon ? () => _onDelete(index) : undefined}
                       />
                     ))}
-                  <IconButton
-                    size="small"
-                    /*classes={{ label: classes.populationLabel }}*/ onClick={() => onExtend(false)}
-                  >
+                  <IconButton size="small" onClick={() => onExtend(false)}>
                     <CloseIcon />
                   </IconButton>
                 </>

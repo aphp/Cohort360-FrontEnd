@@ -28,7 +28,7 @@ export const defaultBiology = {
 const Index = (props: any) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [selectedTab, setSelectedTab] = useState<'form' | 'hierarchy' | 'search'>(
     selectedCriteria ? 'form' : 'hierarchy'
   )

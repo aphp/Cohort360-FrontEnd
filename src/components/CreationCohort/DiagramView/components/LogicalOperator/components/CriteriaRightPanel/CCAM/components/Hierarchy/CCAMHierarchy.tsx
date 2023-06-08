@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import clsx from 'clsx'
 
 import {
   Button,
@@ -47,7 +46,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
   const { procedureItem, selectedItems, handleClick } = props
   const { id, label, subItems } = procedureItem
 
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
 
   const procedureHierarchy = useAppSelector((state) => state.pmsi.procedure.list || {})
@@ -90,7 +89,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(procedureItem)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}
@@ -114,7 +113,7 @@ const ProcedureListItem: React.FC<ProcedureListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(procedureItem)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}
@@ -166,7 +165,7 @@ type ProcedureHierarchyProps = {
 const ProcedureHierarchy: React.FC<ProcedureHierarchyProps> = (props) => {
   const { isOpen = false, selectedCriteria, onChangeSelectedHierarchy, onConfirm, goBack, isEdition } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const isLoadingSyncHierarchyTable = initialState?.loading ?? 0
   const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)

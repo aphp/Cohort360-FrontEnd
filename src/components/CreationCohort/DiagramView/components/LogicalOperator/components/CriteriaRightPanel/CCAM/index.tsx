@@ -28,7 +28,7 @@ const Index = (props: any) => {
   const isEdition = selectedCriteria !== null
   const dispatch = useAppDispatch()
   const ccamHierarchy = useAppSelector((state) => state.pmsi.procedure.list || {})
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const _onChangeSelectedHierarchy = (
     newSelectedItems: PmsiListType[] | null | undefined,

@@ -20,7 +20,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
   patient = { resourceType: 'Patient' },
   deidentifiedBoolean
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const age = getAge(patient as CohortPatient)
   const firstName = deidentifiedBoolean ? 'Prénom' : patient.name?.[0].given?.[0]

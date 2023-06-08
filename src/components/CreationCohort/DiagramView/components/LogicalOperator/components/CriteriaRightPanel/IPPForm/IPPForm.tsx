@@ -26,7 +26,7 @@ const defaultIPPList: IPPListDataType = {
 const IPPForm: React.FC<IPPFormProps> = (props) => {
   const { selectedCriteria, goBack, onChangeSelectedCriteria } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [error, setError] = useState(false)
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultIPPList)

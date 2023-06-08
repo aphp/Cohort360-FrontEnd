@@ -34,7 +34,7 @@ const NEW_PROJECT_ID = 'new'
 const ModalCreateNewRequest: React.FC<{
   onClose?: () => void
 }> = ({ onClose }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { projectState, requestState } = useAppSelector<{

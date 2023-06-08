@@ -35,7 +35,7 @@ const TimelineItemLeft: React.FC<TimelineItemLeftTypes> = ({ data, open, dotHeig
       color = '#A7E5FF'
   }
 
-  const classes = useStyles({ dotHeight: dotHeight, color: color })
+  const { classes } = useStyles({ dotHeight: dotHeight, color: color })
   return (
     <>
       <div className={classes.timelineElementsLeft}>

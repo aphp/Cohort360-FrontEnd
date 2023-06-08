@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import clsx from 'clsx'
 
 import {
   Button,
@@ -47,7 +46,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
   const { cim10Item, selectedItems, handleClick } = props
   const { id, label, subItems } = cim10Item
 
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
 
   const cim10Hierarchy = useAppSelector((state) => state.pmsi.condition.list || {})
@@ -86,7 +85,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(cim10Item)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}
@@ -106,7 +105,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(cim10Item)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}
@@ -158,7 +157,7 @@ type Cim10HierarchyProps = {
 const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
   const { isOpen = false, selectedCriteria, onChangeSelectedHierarchy, onConfirm, goBack, isEdition } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const isLoadingSyncHierarchyTable = initialState?.loading ?? 0
   const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)

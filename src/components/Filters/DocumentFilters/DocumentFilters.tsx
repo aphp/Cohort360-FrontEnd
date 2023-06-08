@@ -43,7 +43,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
   showIpp,
   deidentified
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [_nda, setNda] = useState<string>(filters.nda)
   const [_ipp, setIpp] = useState<string>(filters.ipp ?? '')

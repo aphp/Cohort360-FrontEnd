@@ -15,7 +15,7 @@ type PatientTitleProps = {
   lastName: string | undefined
 }
 const PatientTitle: React.FC<PatientTitleProps> = ({ firstName, lastName }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const navigate = useNavigate()
 
   const location = useLocation()

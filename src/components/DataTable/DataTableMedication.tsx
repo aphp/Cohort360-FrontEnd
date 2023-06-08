@@ -36,7 +36,7 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
   setPage,
   total
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const columns = [
     {
@@ -101,7 +101,7 @@ const DataTableMedicationLine: React.FC<{
   medication: CohortMedication<MedicationRequest | MedicationAdministration>
   deidentified: boolean
 }> = ({ medication, deidentified }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [open, setOpen] = useState<string | null>(null)
 

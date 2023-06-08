@@ -91,7 +91,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   onRequestSort,
   onUpdateCohorts
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 

@@ -27,7 +27,7 @@ type RequestRowProps = {
 }
 const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedRequests, onSelectedRow, isSearch }) => {
   const [open, setOpen] = React.useState(false)
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 

@@ -11,7 +11,6 @@
     "@mui/icons-material": "^5.11.11",
     "@mui/lab": "^5.0.0-alpha.124",
     "@mui/material": "^5.11.14",
-    "@mui/styles": "^5.11.13",
     "@mui/x-date-pickers": "^5.0.20",
     "@reduxjs/toolkit": "^1.9.3",
     "@types/redux-state-sync": "^3.1.5",
@@ -42,7 +41,8 @@
     "redux-devtools-extension": "^2.13.9",
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
-    "redux-state-sync": "^3.1.4"
+    "redux-state-sync": "^3.1.4",
+    "tss-react": "^4.8.4"
   },
   "resolutions": {
     "nth-check": "^2.0.1"

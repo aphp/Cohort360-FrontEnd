@@ -16,7 +16,7 @@ type GenderIconTypes = {
   gender?: PatientGenderKind
 }
 const GenderIcon: React.FC<GenderIconTypes> = ({ gender }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   switch (gender) {
     case PatientGenderKind._female:
@@ -32,7 +32,7 @@ type VitalStatusChipTypes = {
   deceased?: string | boolean
 }
 const VitalStatusChip: React.FC<VitalStatusChipTypes> = ({ deceased }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   if (deceased) {
     return <Chip className={classes.chip} style={{ backgroundColor: '#D0D7D8' }} label="D." />
@@ -66,7 +66,7 @@ const PatientSidebarItem: React.FC<PatientSidebarItemTypes> = ({
     tabName: string
   }>()
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const navigate = useNavigate()
   const location = useLocation()
   const { search } = location

@@ -64,7 +64,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
 
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultEncounter)
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [error, setError] = useState(false)
   const [sliderError, setSliderError] = useState(false)

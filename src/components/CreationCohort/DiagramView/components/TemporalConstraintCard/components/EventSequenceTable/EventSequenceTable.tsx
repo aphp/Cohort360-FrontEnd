@@ -53,7 +53,7 @@ const EventSequenceTable: React.FC<{
 }> = ({ temporalConstraints, onChangeConstraints }) => {
   const { selectedCriteria } = useAppSelector((state) => state.cohortCreation.request)
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const onDeleteTemporalConstraint = (temporalConstraint: TemporalConstraintsType) => {
     const remainingConstraints = temporalConstraints.filter((constraint) => constraint !== temporalConstraint)

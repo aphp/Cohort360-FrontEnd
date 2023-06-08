@@ -30,7 +30,7 @@ const Index = (props: any) => {
   const ghmState = useAppSelector((state) => state.pmsi.claim || {})
   const ghmHierarchy = ghmState.list
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const _onChangeSelectedHierarchy = (
     newSelectedItems: PmsiListType[] | null | undefined,

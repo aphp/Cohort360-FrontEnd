@@ -33,7 +33,7 @@ const ResearchCard: React.FC<ResearchCardProps> = ({
   loading,
   listType
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
   const onDeleteCohort = async (cohort: Cohort) => {

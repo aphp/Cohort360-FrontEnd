@@ -51,7 +51,7 @@ const Requeteur = () => {
 
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [requestLoading, setRequestLoading] = useState(0)
   const [criteriaLoading, setCriteriaLoading] = useState(0)

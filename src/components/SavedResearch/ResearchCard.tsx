@@ -36,7 +36,7 @@ type ResearchProps = {
   filteredIds?: string[]
 }
 const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 

@@ -26,7 +26,8 @@ type OccurrenceInputsProps = {
 
 const OccurrenceInputs: React.FC<OccurrenceInputsProps> = (props) => {
   const { form, selectedCriteria, onChangeValue } = props
-  const classes = useStyles()
+
+  const { classes } = useStyles()
 
   const allowOnlyPositiveIntegers = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (Number.isNaN(+event.key) && event.key !== 'Backspace') event.preventDefault()

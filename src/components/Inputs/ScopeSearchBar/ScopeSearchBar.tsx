@@ -14,7 +14,7 @@ type ScopeSearchBarProps = {
 }
 
 const ScopeSearchBar: React.FC<ScopeSearchBarProps> = ({ searchInput, onChangeInput, alertMessage }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const handleChangeInput = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     onChangeInput(event.target.value)

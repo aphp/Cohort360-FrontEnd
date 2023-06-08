@@ -25,7 +25,7 @@ type PatientBiologyTypes = {
 const filtersDefault = { nda: '', loinc: '', anabio: '', startDate: null, endDate: null }
 
 const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const { patient } = useAppSelector((state) => ({
     patient: state.patient
