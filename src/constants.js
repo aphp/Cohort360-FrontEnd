@@ -1,7 +1,20 @@
 export let BOOLEANTRUE = 'true'
 
-export const ACCES_TOKEN = 'access'
+export const ACCESS_TOKEN = 'access'
 export const REFRESH_TOKEN = 'refresh'
+
+export const OIDC_PROVIDER_URL = import.meta.env.DEV
+  ? import.meta.env.VITE_OIDC_PROVIDER_URL
+  : '{VITE_OIDC_PROVIDER_URL}'
+export const OIDC_REDIRECT_URI = import.meta.env.DEV
+  ? import.meta.env.VITE_OIDC_REDIRECT_URI
+  : '{VITE_OIDC_REDIRECT_URI}'
+export const OIDC_RESPONSE_TYPE = import.meta.env.DEV
+  ? import.meta.env.VITE_OIDC_RESPONSE_TYPE
+  : '{VITE_OIDC_RESPONSE_TYPE}'
+export const OIDC_CLIENT_ID = import.meta.env.DEV ? import.meta.env.VITE_OIDC_CLIENT_ID : '{VITE_OIDC_CLIENT_ID}'
+export const OIDC_SCOPE = import.meta.env.DEV ? import.meta.env.VITE_OIDC_SCOPE : '{VITE_OIDC_SCOPE}'
+export const OIDC_STATE = import.meta.env.DEV ? import.meta.env.VITE_OIDC_STATE : '{VITE_OIDC_STATE}'
 
 export const BACK_API_URL = import.meta.env.DEV ? import.meta.env.VITE_BACK_API_URL : '{VITE_BACK_API_URL}'
 export const REQUEST_API_URL = import.meta.env.DEV ? import.meta.env.VITE_REQUEST_API_URL : '{VITE_REQUEST_API_URL}'

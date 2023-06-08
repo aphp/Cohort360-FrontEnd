@@ -151,7 +151,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                   >
                     <IconButton
                       onClick={() => {
-                        localStorage.clear()
                         dispatch(logoutAction())
                         navigate('/')
                       }}
@@ -170,7 +169,6 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
                     <Tooltip title="Se déconnecter">
                       <IconButton
                         onClick={() => {
-                          localStorage.clear()
                           dispatch(logoutAction())
                           navigate('/')
                         }}
