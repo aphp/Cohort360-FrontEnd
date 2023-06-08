@@ -418,6 +418,7 @@ export type SelectedCriteriaType = {
   | MedicationDataType
   | ObservationDataType
   | IPPListDataType
+  | EncounterDataType
 )
 
 export type CcamDataType = {
@@ -522,6 +523,10 @@ export type EncounterDataType = {
   admission: { id: string; label: string }[] | null
   encounterStartDate: Date | ''
   encounterEndDate: Date | ''
+  occurrence: number
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
+  startOccurrence: Date | ''
+  endOccurrence: Date | ''
   isInclusive?: boolean
 }
 
@@ -833,6 +838,24 @@ export type AgeRangeType = {
   month?: number
   days?: number
 }
+
+export enum CriteriaName {
+  Cim10 = 'cim10',
+  Ccam = 'ccam',
+  Ghm = 'ghm',
+  Document = 'document',
+  Medication = 'medication',
+  Biology = 'biology',
+  VisitSupport = 'supported'
+}
+export type CriteriaNameType =
+  | CriteriaName.Cim10
+  | CriteriaName.Ccam
+  | CriteriaName.Ghm
+  | CriteriaName.Document
+  | CriteriaName.Medication
+  | CriteriaName.Biology
+  | CriteriaName.VisitSupport
 
 export type AccessExpirationsProps = {
   expiring?: boolean

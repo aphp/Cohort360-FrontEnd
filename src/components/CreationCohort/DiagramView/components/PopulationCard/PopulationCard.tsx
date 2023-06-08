@@ -14,7 +14,7 @@ import { buildCohortCreation, CohortCreationState } from 'state/cohortCreation'
 import { fetchScopesList, ScopeState } from 'state/scope'
 import { MeState } from 'state/me'
 
-import { ScopeTreeRow } from 'types'
+import { CriteriaNameType, ScopeTreeRow } from 'types'
 import { getSelectedScopes } from 'utils/scopeTree'
 
 import useStyles from './styles'
@@ -22,7 +22,7 @@ import useStyles from './styles'
 export type populationCardPropsType = {
   label?: string
   title?: string
-  form?: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication' | 'biology' | 'supported'
+  form?: CriteriaNameType
   executiveUnits?: (ScopeTreeRow | undefined)[]
   isAcceptEmptySelection?: boolean
   isDeleteIcon?: boolean

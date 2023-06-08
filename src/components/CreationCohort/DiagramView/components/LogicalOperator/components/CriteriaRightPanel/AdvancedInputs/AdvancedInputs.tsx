@@ -1,20 +1,22 @@
 import React, { useState } from 'react'
 
-import { Collapse, Grid, IconButton, Typography, FormLabel, Tooltip } from '@mui/material'
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import { Collapse, FormLabel, Grid, IconButton, Tooltip, Typography } from '@mui/material'
+
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import InfoIcon from '@mui/icons-material/Info'
 
 import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
-import OccurrencesInputs from './OccurrencesInputs/OccurrencesInputs'
 import VisitInputs from './VisitInputs/VisitInputs'
+import { CriteriaNameType } from 'types'
+import OccurrencesDateInputs from './OccurrencesInputs/OccurrencesDateInputs'
 
 import scopeType from 'data/scope_type.json'
 
 import { ScopeTreeRow } from 'types'
 
 type AdvancedInputsProps = {
-  form: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication' | 'biology'
+  form: CriteriaNameType
   selectedCriteria: any
   onChangeValue: (key: string, value: any) => void
 }
@@ -84,8 +86,7 @@ const AdvancedInputs: React.FC<AdvancedInputsProps> = (props) => {
         </Grid>
 
         <VisitInputs selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
-
-        <OccurrencesInputs form={form} selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
+        <OccurrencesDateInputs selectedCriteria={selectedCriteria} onChangeValue={onChangeValue} />
       </Collapse>
     </Grid>
   )

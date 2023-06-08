@@ -12,20 +12,21 @@ import {
   Radio,
   RadioGroup,
   Switch,
-  Typography,
-  TextField
+  TextField,
+  Typography
 } from '@mui/material'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
-import AdvancedInputs from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AdvancedInputs/AdvancedInputs'
+import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchMedication } from 'state/medication'
-import { HierarchyTree } from 'types'
+import { CriteriaName, HierarchyTree } from 'types'
+import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 
 type MedicationFormProps = {
   isOpen: boolean
@@ -45,23 +46,10 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
 
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const currentState = { ...selectedCriteria, ...initialState }
-
-  const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const getAtcOptions = async (searchValue: string) => await criteria.fetch.fetchAtcData(searchValue, false)
   const _onSubmit = () => {
-    if (
-      (currentState.type === 'MedicationRequest' &&
-        currentState.code.length === 0 &&
-        currentState.prescriptionType.length === 0 &&
-        currentState.administration.length === 0) ||
-      (currentState.type !== 'MedicationRequest' &&
-        currentState.code.length === 0 &&
-        currentState.administration.length === 0)
-    ) {
-      return setError(true)
-    }
     onChangeSelectedCriteria(currentState)
     dispatch(fetchMedication())
   }
@@ -121,9 +109,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner un champ</Alert>}
-
-        {!error && !multiFields && (
+        {!multiFields && (
           <Alert
             severity="info"
             onClose={() => {
@@ -163,6 +149,12 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               color="secondary"
             />
           </Grid>
+
+          <OccurrencesNumberInputs
+            form={CriteriaName.Medication}
+            selectedCriteria={currentState}
+            onChangeValue={onChangeValue}
+          />
 
           <Grid style={{ display: 'flex' }}>
             <RadioGroup
@@ -224,7 +216,11 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
             renderInput={(params) => <TextField {...params} label="Voie d'administration" />}
           />
 
-          <AdvancedInputs form="medication" selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs
+            form={CriteriaName.Medication}
+            selectedCriteria={currentState}
+            onChangeValue={onChangeValue}
+          />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
@@ -233,7 +229,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="supported-form" variant="contained">
+          <Button onClick={_onSubmit} type="submit" form="medication-form" variant="contained">
             Confirmer
           </Button>
         </Grid>
