@@ -1,5 +1,4 @@
 import React from 'react'
-import clsx from 'clsx'
 import { useNavigate } from 'react-router-dom'
 
 import Button from '@mui/material/Button'
@@ -13,7 +12,7 @@ import { useAppSelector } from 'state'
 import useStyles from './styles'
 
 const CohortRightOrNotExist = () => {
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
   const navigate = useNavigate()
 
   const { openDrawer } = useAppSelector((state) => ({ openDrawer: state.drawer }))
@@ -25,7 +24,7 @@ const CohortRightOrNotExist = () => {
       justifyContent="center"
       alignItems="center"
       spacing={2}
-      className={clsx(classes.appBar, { [classes.appBarShift]: openDrawer })}
+      className={cx(classes.appBar, { [classes.appBarShift]: openDrawer })}
     >
       <Grid item className={classes.item}>
         <Grid container direction="column" justifyContent="center" alignItems="center">

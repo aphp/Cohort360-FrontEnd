@@ -36,7 +36,7 @@ const ProjectRow: React.FC<ProjectRowProps> = ({
   onSelectedRow
 }) => {
   const [open, setOpen] = React.useState(true)
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
   const { meState } = useAppSelector<{

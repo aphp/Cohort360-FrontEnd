@@ -15,7 +15,7 @@ type HospitDialogTypes = {
   loading: boolean
 }
 const HospitDialog: React.FC<HospitDialogTypes> = ({ deidentified, open, onClose, documents, loading }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const documentLines = 4 // Number of desired lines in the document array
   const [page, setPage] = useState(1)
 

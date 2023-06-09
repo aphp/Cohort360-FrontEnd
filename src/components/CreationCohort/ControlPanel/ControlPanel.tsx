@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import clsx from 'clsx'
 import moment from 'moment'
 
 import {
@@ -34,7 +33,7 @@ import {
 } from 'state/cohortCreation'
 import { MeState } from 'state/me'
 
-import { RequestType } from 'types'
+import { CohortCreationCounterType, RequestType, SimpleStatus } from 'types'
 
 import useStyle from './styles'
 
@@ -47,14 +46,14 @@ const ControlPanel: React.FC<{
   onUndo?: () => void
   onRedo?: () => void
 }> = ({ onExecute, onUndo, onRedo }) => {
-  const classes = useStyle()
+  const { classes, cx } = useStyle()
   const dispatch = useAppDispatch()
   const [openModal, onSetOpenModal] = useState<'executeCohortConfirmation' | null>(null)
-  const [oldCount, setOldCount] = useState<any | null>(null)
+  const [oldCount, setOldCount] = useState<CohortCreationCounterType | null>(null)
   const [openShareRequestModal, setOpenShareRequestModal] = useState<boolean>(false)
-  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<'success' | 'error' | null>(null)
+  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
   const wrapperSetShareSuccessOrFailMessage = useCallback(
-    (val: any) => {
+    (val: SimpleStatus) => {
       setShareSuccessOrFailMessage(val)
     },
     [setShareSuccessOrFailMessage]
@@ -94,7 +93,7 @@ const ControlPanel: React.FC<{
     selectedPopulation === null
       ? null
       : selectedPopulation
-          .map((population: any) => population && population.access)
+          .map((population) => population && population.access)
           .filter((elem) => elem && elem === 'Pseudonymisé').length > 0
 
   const checkIfLogicalOperatorIsEmpty = () => {
@@ -238,8 +237,8 @@ const ControlPanel: React.FC<{
 
         <Grid className={classes.container}>
           <Grid container justifyContent="space-between">
-            <Typography className={clsx(classes.boldText, classes.patientTypo)}>ACCÈS:</Typography>
-            <Typography className={clsx(classes.blueText, classes.boldText, classes.patientTypo)}>
+            <Typography className={cx(classes.boldText, classes.patientTypo)}>ACCÈS:</Typography>
+            <Typography className={cx(classes.blueText, classes.boldText, classes.patientTypo)}>
               {accessIsPseudonymize === null ? '-' : accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
             </Typography>
           </Grid>
@@ -247,29 +246,29 @@ const ControlPanel: React.FC<{
 
         <Grid className={classes.container}>
           <Grid container justifyContent="space-between">
-            <Typography className={clsx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS</Typography>
+            <Typography className={cx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS</Typography>
             {itLoads ? (
               <CircularProgress
                 size={12}
                 style={{ marginTop: 14 }}
-                className={clsx(classes.blueText, classes.sidesMargin)}
+                className={cx(classes.blueText, classes.sidesMargin)}
               />
             ) : (
               <Grid container alignItems="center" style={{ width: 'fit-content' }}>
-                <Typography className={clsx(classes.boldText, classes.patientTypo, classes.blueText)}>
+                <Typography className={cx(classes.boldText, classes.patientTypo, classes.blueText)}>
                   {includePatient !== undefined && includePatient !== null ? displayDigit(includePatient) : '-'}
-                  {oldCount !== null
-                    ? (includePatient ?? 0) - oldCount?.includePatient > 0
-                      ? ` (+${(includePatient ?? 0) - oldCount?.includePatient})`
-                      : ` (${(includePatient ?? 0) - oldCount?.includePatient})`
+                  {oldCount !== null && !!oldCount.includePatient
+                    ? (includePatient ?? 0) - oldCount.includePatient > 0
+                      ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`
+                      : ` (${(includePatient ?? 0) - oldCount.includePatient})`
                     : ''}
                 </Typography>
-                {oldCount !== null && (
+                {oldCount !== null && !!oldCount.includePatient && (
                   <Tooltip
                     title={`Le delta ${
-                      (includePatient ?? 0) - oldCount?.includePatient > 0
-                        ? ` (+${(includePatient ?? 0) - oldCount?.includePatient})`
-                        : ` (${(includePatient ?? 0) - oldCount?.includePatient})`
+                      (includePatient ?? 0) - oldCount.includePatient > 0
+                        ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`
+                        : ` (${(includePatient ?? 0) - oldCount.includePatient})`
                     } est la différence de patient entre le ${lastUpdatedOldCount?.format(
                       'DD/MM/YYYY'
                     )} et la date du jour.`}

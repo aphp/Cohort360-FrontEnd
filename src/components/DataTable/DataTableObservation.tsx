@@ -28,7 +28,7 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
   setPage,
   total
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const columns: Column[] = [
     { label: `NDA${deidentified ? ' chiffré' : ''}`, code: '', align: 'left', sortableColumn: false },
@@ -76,13 +76,13 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
 const DataTableObservationLine: React.FC<{
   observation: CohortObservation
 }> = ({ observation }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const nda = observation.NDA
   const date = observation.effectiveDateTime
-  const libelleANABIO = observation.code?.coding?.find((code: any) => code.id === 'CODE ANABIO')?.display
-  const codeLOINC = observation.code?.coding?.find((code: any) => code.id === 'CODE LOINC')?.code
-  const libelleLOINC = observation.code?.coding?.find((code: any) => code.id === 'CODE LOINC')?.display
+  const libelleANABIO = observation.code?.coding?.find((code) => code.id === 'CODE ANABIO')?.display
+  const codeLOINC = observation.code?.coding?.find((code) => code.id === 'CODE LOINC')?.code
+  const libelleLOINC = observation.code?.coding?.find((code) => code.id === 'CODE LOINC')?.display
   const result = observation.valueQuantity
     ? observation.valueQuantity.code
       ? observation.valueQuantity.code

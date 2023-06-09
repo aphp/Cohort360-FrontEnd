@@ -22,7 +22,7 @@ type PatientMedicationTypes = {
   groupId?: string
 }
 const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const { patient } = useAppSelector((state) => ({
     patient: state.patient

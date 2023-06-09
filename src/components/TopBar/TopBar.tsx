@@ -56,7 +56,7 @@ type TopBarProps = {
 }
 
 const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -70,9 +70,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   const [isExtended, onExtend] = useState(false)
   const [openModal, setOpenModal] = useState<'' | 'edit' | 'export' | 'delete'>('')
   const [patientsNumber, setPatientsNumber] = useState<number>(patientsNb ?? 0)
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
 
-  const handleClick = (event: any) => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
 
@@ -84,8 +84,9 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
   React.useEffect(() => {
     const _fetchPatientNumber = async () => {
       const _patientNumber = await services.patients.fetchPatientsCount()
-
-      setPatientsNumber(_patientNumber)
+      if (_patientNumber !== null) {
+        setPatientsNumber(_patientNumber)
+      }
     }
 
     if (dashboard.totalPatients === undefined) {
@@ -140,7 +141,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
         description: '',
         perimeters:
           dashboard.cohort && Array.isArray(dashboard.cohort)
-            ? dashboard.cohort.map((p: any) => (p.name ? p.name.replace('Patients passés par: ', '') : '-'))
+            ? dashboard.cohort.map((p) => (p.name ? p.name.replace('Patients passés par: ', '') : '-'))
             : [],
         icon: <BusinessIcon />,
         showActionButton: false
@@ -212,7 +213,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                       {isExtended ? (
                         <>
                           {cohort.perimeters &&
-                            cohort.perimeters.map((perimeter: any) => (
+                            cohort.perimeters.map((perimeter) => (
                               <ListItem key={perimeter} className={classes.item}>
                                 <Chip className={classes.perimetersChip} label={perimeter} />
                               </ListItem>

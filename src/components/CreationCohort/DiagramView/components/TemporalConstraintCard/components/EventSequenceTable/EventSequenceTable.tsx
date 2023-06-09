@@ -47,25 +47,25 @@ const columns = [
   }
 ]
 
-const EventSequenceTable: React.FC<{ temporalConstraints: TemporalConstraintsType[]; onChangeConstraints: any }> = ({
-  temporalConstraints,
-  onChangeConstraints
-}) => {
+const EventSequenceTable: React.FC<{
+  temporalConstraints: TemporalConstraintsType[]
+  onChangeConstraints: (c: TemporalConstraintsType[]) => void
+}> = ({ temporalConstraints, onChangeConstraints }) => {
   const { selectedCriteria } = useAppSelector((state) => state.cohortCreation.request)
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const onDeleteTemporalConstraint = (temporalConstraint: TemporalConstraintsType) => {
     const remainingConstraints = temporalConstraints.filter((constraint) => constraint !== temporalConstraint)
     onChangeConstraints(remainingConstraints)
   }
 
-  const findCriteriaTitle = (id: any) => {
+  const findCriteriaTitle = (id: number | 'All') => {
     const criteria = selectedCriteria.find((criteria) => criteria.id === id)
     return criteria?.title
   }
 
-  const durationMeasurementInFrench = (key: any) => {
+  const durationMeasurementInFrench = (key: string) => {
     let keyInFrench
     if (key === 'days') {
       keyInFrench = 'jour(s)'
@@ -81,9 +81,9 @@ const EventSequenceTable: React.FC<{ temporalConstraints: TemporalConstraintsTyp
     return keyInFrench
   }
 
-  const storeNonZeroMinDuration = (temporalConstraint: any) => {
+  const storeNonZeroMinDuration = (temporalConstraint: TemporalConstraintsType) => {
     const minDuration = temporalConstraint.timeRelationMinDuration
-    let nonZeroMinDuration: any = {}
+    let nonZeroMinDuration: { keys?: string; values?: number } = {}
 
     if (temporalConstraint.constraintType === 'directChronologicalOrdering' && minDuration) {
       for (const [key, value] of Object.entries(minDuration)) {
@@ -100,9 +100,9 @@ const EventSequenceTable: React.FC<{ temporalConstraints: TemporalConstraintsTyp
     return nonZeroMinDuration
   }
 
-  const storeNonZeroMaxDuration = (temporalConstraint: any) => {
+  const storeNonZeroMaxDuration = (temporalConstraint: TemporalConstraintsType) => {
     const maxDuration = temporalConstraint.timeRelationMaxDuration
-    let nonZeroMaxDuration: any = {}
+    let nonZeroMaxDuration: { keys?: string; values?: number } = {}
 
     if (temporalConstraint.constraintType === 'directChronologicalOrdering' && maxDuration) {
       for (const [key, value] of Object.entries(maxDuration)) {

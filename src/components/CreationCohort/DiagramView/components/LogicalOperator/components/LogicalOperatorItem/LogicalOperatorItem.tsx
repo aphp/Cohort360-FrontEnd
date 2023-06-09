@@ -32,10 +32,10 @@ type LogicalOperatorItemProps = {
 }
 
 const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
-  let timeout: any = null
+  let timeout: NodeJS.Timeout | null = null
 
   const isMainOperator = itemId === 0
 

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import clsx from 'clsx'
 import { useAppSelector } from 'state'
 import { useParams } from 'react-router'
 
@@ -10,19 +9,19 @@ import DataTablePatient from 'components/DataTable/DataTablePatient'
 
 import services from 'services/aphp'
 
-import { IPatient } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { SearchByTypes, Order } from 'types'
 
 import useStyles from './styles'
+import { Patient } from 'fhir/r4'
 
 const SearchPatient: React.FC<{}> = () => {
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
   const practitioner = useAppSelector((state) => state.me)
   const { search } = useParams<{ search: string }>()
 
   const [loading, setLoading] = useState(false)
   const [showTable, setShowTable] = useState(false)
-  const [patientResults, setPatientResults] = useState<IPatient[]>([])
+  const [patientResults, setPatientResults] = useState<Patient[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
 
@@ -72,7 +71,7 @@ const SearchPatient: React.FC<{}> = () => {
     <Grid
       container
       direction="column"
-      className={clsx(classes.appBar, {
+      className={cx(classes.appBar, {
         [classes.appBarShift]: open
       })}
     >

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import clsx from 'clsx'
 import { Link, useParams, useLocation } from 'react-router-dom'
 import { Grid, Tabs, Tab } from '@mui/material'
 
@@ -29,7 +28,7 @@ const Dashboard: React.FC<{
   }>()
 
   const dispatch = useAppDispatch()
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
   const location = useLocation()
 
   const perimetreIds = location.search.substr(1)
@@ -113,7 +112,7 @@ const Dashboard: React.FC<{
     dispatch(fetchExploredCohort({ context, id, forceReload: true }))
   }
 
-  const handleChangeTabs = (event: any, newTab: string) => {
+  const handleChangeTabs = (event: React.SyntheticEvent<Element, Event>, newTab: string) => {
     selectTab(newTab)
   }
 
@@ -132,7 +131,7 @@ const Dashboard: React.FC<{
       container
       direction="column"
       alignItems="center"
-      className={clsx(classes.appBar, {
+      className={cx(classes.appBar, {
         [classes.appBarShift]: open
       })}
     >

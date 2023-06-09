@@ -36,7 +36,7 @@ const Index = (props: any) => {
   const dispatch = useAppDispatch()
   const medicationHierarchy = useAppSelector((state) => state.medication.list || {})
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const _onChangeSelectedHierarchy = (newSelectedItems: any, newHierarchy?: PmsiListType[]) => {
     _onChangeFormValue('code', newSelectedItems, newHierarchy)

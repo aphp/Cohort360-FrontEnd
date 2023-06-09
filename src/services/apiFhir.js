@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ACCES_TOKEN, FHIR_API_URL } from '../constants'
+import { ACCESS_TOKEN, FHIR_API_URL } from '../constants'
 
 const apiFhir = axios.create({
   baseURL: FHIR_API_URL,
@@ -10,7 +10,7 @@ const apiFhir = axios.create({
 })
 
 apiFhir.interceptors.request.use((config) => {
-  const token = localStorage.getItem(ACCES_TOKEN)
+  const token = localStorage.getItem(ACCESS_TOKEN)
   config.headers.Authorization = `Bearer ${token}`
   return config
 })

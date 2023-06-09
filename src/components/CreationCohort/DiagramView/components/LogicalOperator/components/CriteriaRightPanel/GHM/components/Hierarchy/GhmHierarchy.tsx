@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import clsx from 'clsx'
 
 import {
   Button,
@@ -24,7 +23,12 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import { useAppDispatch, useAppSelector } from 'state'
 import { PmsiListType } from 'state/pmsi'
 
-import { checkIfIndeterminated, expandItem, findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
+import {
+  checkIfIndeterminated,
+  expandItem,
+  findEquivalentRowInItemAndSubItems,
+  getHierarchySelection
+} from 'utils/pmsi'
 
 import useStyles from './styles'
 import { decrementLoadingSyncHierarchyTable, incrementLoadingSyncHierarchyTable } from 'state/syncHierarchyTable'
@@ -42,7 +46,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
   const { ghmItem, selectedItems, handleClick } = props
   const { id, label, subItems } = ghmItem
 
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
 
   const ghmHierarchy = useAppSelector((state) => state.pmsi.claim.list || {})
@@ -64,7 +68,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
   const handleClickOnHierarchy = async (ghmItem: PmsiListType) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
-    const newSelectedItems = getSelectedPmsi(ghmItem, selectedItems || [], ghmHierarchy)
+    const newSelectedItems = getHierarchySelection(ghmItem, selectedItems || [], ghmHierarchy)
     await handleClick(newSelectedItems)
     dispatch(decrementLoadingSyncHierarchyTable())
   }
@@ -75,7 +79,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(ghmItem)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}
@@ -95,7 +99,7 @@ const GhmListItem: React.FC<GhmListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(ghmItem)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}
@@ -143,7 +147,7 @@ type GhmHierarchyProps = {
 const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
   const { isOpen = false, selectedCriteria, onChangeSelectedHierarchy, onConfirm, goBack, isEdition } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const isLoadingSyncHierarchyTable = initialState?.loading ?? 0
   const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)

@@ -5,7 +5,7 @@ import { gql } from 'apollo-boost'
 
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material'
 
-import { ACCES_TOKEN } from '../../constants'
+import { ACCESS_TOKEN } from '../../constants'
 
 import { useAppSelector, useAppDispatch } from '../../state'
 import { login } from '../../state/me'
@@ -24,7 +24,7 @@ const PrivateRoute: React.FC = () => {
   const me = useAppSelector((state) => state.me)
   const dispatch = useAppDispatch()
   const location = useLocation()
-  const authToken = localStorage.getItem(ACCES_TOKEN)
+  const authToken = localStorage.getItem(ACCESS_TOKEN)
 
   const [allowRedirect, setRedirection] = useState(false)
 

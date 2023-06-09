@@ -43,7 +43,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
   duplicateCriteria,
   editCriteria
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const { request } = useAppSelector((state) => state.cohortCreation || {})
   const { loading = false, criteriaGroup = [], selectedCriteria = [] } = request
@@ -53,7 +53,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
   const displayingItem = criteriaGroup.filter((_criteriaGroup: CriteriaGroupType) => _criteriaGroup.id === itemId)
 
-  let timeout: any = null
+  let timeout: NodeJS.Timeout | null = null
 
   const [isExpanded, onExpand] = useState(false)
 

@@ -13,8 +13,7 @@ import {
   Typography
 } from '@mui/material'
 
-import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { PatientFilters as PatientFiltersType, VitalStatus } from 'types'
+import { PatientFilters as PatientFiltersType, PatientGenderKind, VitalStatus } from 'types'
 
 import useStyles from './styles'
 import { InputAgeRange } from '../../Inputs'
@@ -28,7 +27,7 @@ type PatientFiltersProps = {
 }
 
 const PatientFilters: React.FC<PatientFiltersProps> = ({ open, onClose, onSubmit, filters, onChangeFilters }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [_gender, setGender] = useState<PatientGenderKind>(filters.gender)
   const [birthdatesRanges, setBirthdatesRanges] = useState<[string, string]>(filters.birthdatesRanges)

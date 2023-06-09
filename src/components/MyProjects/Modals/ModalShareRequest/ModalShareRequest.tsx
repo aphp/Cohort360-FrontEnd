@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, CircularProgress } from '@mui/material'
 
-import { RequestType, Provider } from 'types'
+import { RequestType, Provider, SimpleStatus } from 'types'
 
 import { useAppSelector } from 'state'
 import { RequestState } from 'state/request'
@@ -17,13 +17,13 @@ const ERROR_USER_SHARE_LIST = 'error_user_share_list'
 
 const ModalShareRequest: React.FC<{
   requestShare?: RequestType | null
-  shareSuccessOrFailMessage?: 'success' | 'error' | null
-  parentStateSetter: (val: any) => void
+  shareSuccessOrFailMessage?: SimpleStatus
+  parentStateSetter: (val: SimpleStatus) => void
   onClose: () => void
 }> = ({ requestShare, onClose, parentStateSetter }) => {
   const { requestState } = useAppSelector<{ requestState: RequestState }>((state) => ({ requestState: state.request }))
   const navigate = useNavigate()
-  const classes = useStyles()
+  const { classes } = useStyles()
   const { selectedRequestShare } = requestState
 
   const selectedCurrentRequest = selectedRequestShare || requestShare
@@ -31,7 +31,7 @@ const ModalShareRequest: React.FC<{
   const [currentRequest, setCurrentRequest] = useState<RequestType | null | undefined>(selectedCurrentRequest)
   const [currentUserToShare, setCurrentUserToShare] = useState<Provider[] | null>(null)
   const [error, setError] = useState<'error_title' | 'error_user_share_list' | null>(null)
-  const [shareMessage, setShareMessage] = useState<'success' | 'error' | null>(null)
+  const [shareMessage, setShareMessage] = useState<SimpleStatus>(null)
 
   useEffect(() => {
     parentStateSetter(shareMessage)

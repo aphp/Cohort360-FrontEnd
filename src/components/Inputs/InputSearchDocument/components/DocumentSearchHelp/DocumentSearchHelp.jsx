@@ -22,7 +22,7 @@ import {
 import useStyles from './styles.js'
 
 const DocumentSearchHelp = ({ open, onClose }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">

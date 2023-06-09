@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import clsx from 'clsx'
 
 import { Grid, IconButton, InputAdornment, InputBase } from '@mui/material'
 
@@ -30,7 +29,7 @@ const InputSearchDocumentSimple: React.FC<InputSearchDocumentSimpleProps> = ({
   onSearchDocument,
   ...props
 }) => {
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
 
   const [searchInput, setSearchInput] = useState<string>(defaultSearchInput ?? '')
   const [helpOpen, setHelpOpen] = useState(false)
@@ -66,7 +65,7 @@ const InputSearchDocumentSimple: React.FC<InputSearchDocumentSimpleProps> = ({
       <Grid
         container
         item
-        className={clsx({
+        className={cx({
           [classes.gridAdvancedSearchSquared]: props.squareInput,
           [classes.gridAdvancedSearch]: !props.squareInput,
           [classes.error]: props.error

@@ -15,7 +15,7 @@ import { store, persistor } from './state/store'
 
 import { AUTH_API_URL } from './constants'
 
-import 'moment/locale/fr'
+import 'moment/dist/locale/fr'
 
 const authClient = new ApolloClient({
   cache: new InMemoryCache(),

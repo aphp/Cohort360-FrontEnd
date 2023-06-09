@@ -16,7 +16,7 @@ const ModalAddOrEditProject: React.FC<{
   selectedProject: any
   onClose: () => void
 }> = ({ open, onClose }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const { projectState } = useAppSelector<{
     projectState: ProjectState

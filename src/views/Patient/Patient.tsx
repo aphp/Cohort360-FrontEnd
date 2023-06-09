@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import clsx from 'clsx'
 import { Link, useLocation, useParams } from 'react-router-dom'
 
 import { IconButton, Grid, Tabs, Tab, CircularProgress } from '@mui/material'
@@ -27,7 +26,7 @@ import useStyles from './styles'
 const Patient = () => {
   const dispatch = useAppDispatch()
   const location = useLocation()
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
 
   const { open, cohort, patient } = useAppSelector((state) => ({
     open: state.drawer,
@@ -71,7 +70,7 @@ const Patient = () => {
     return <PatientNotExist />
   }
 
-  const handleChangeTabs = (event: any, newTab: string) => {
+  const handleChangeTabs = (event: React.SyntheticEvent<Element, Event>, newTab: string) => {
     selectTab(newTab)
   }
 
@@ -81,7 +80,7 @@ const Patient = () => {
     <Grid
       container
       direction="column"
-      className={clsx(classes.appBar, {
+      className={cx(classes.appBar, {
         [classes.appBarShift]: open
       })}
     >
@@ -91,7 +90,7 @@ const Patient = () => {
         container
         direction="column"
         alignItems="center"
-        className={clsx(isSidebarOpened ? classes.contentShift : null)}
+        className={cx(isSidebarOpened ? classes.contentShift : null)}
       >
         {!isSidebarOpened && (
           <div className={classes.openLeftBar}>

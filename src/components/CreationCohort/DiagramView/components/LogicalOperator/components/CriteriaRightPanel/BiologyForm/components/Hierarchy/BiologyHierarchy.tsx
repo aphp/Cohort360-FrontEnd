@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import clsx from 'clsx'
 
 import {
   Button,
@@ -24,7 +23,12 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import { useAppDispatch, useAppSelector } from 'state'
 import { BiologyListType } from 'state/biology'
 
-import { checkIfIndeterminated, expandItem, findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
+import {
+  checkIfIndeterminated,
+  expandItem,
+  findEquivalentRowInItemAndSubItems,
+  getHierarchySelection
+} from 'utils/pmsi'
 
 import useStyles from './styles'
 import { PmsiListType } from 'state/pmsi'
@@ -43,7 +47,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
   const { biologyItem, selectedItems, handleClick } = props
   const { id, label, subItems } = biologyItem
 
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
 
   const biologyHierarchy = useAppSelector((state) => state.biology.list || {})
@@ -71,7 +75,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
   const handleClickOnHierarchy = async (biologyItem: PmsiListType) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
     dispatch(incrementLoadingSyncHierarchyTable())
-    const newSelectedItems = getSelectedPmsi(biologyItem, selectedItems || [], biologyHierarchy)
+    const newSelectedItems = getHierarchySelection(biologyItem, selectedItems || [], biologyHierarchy)
     await handleClick(newSelectedItems)
     dispatch(decrementLoadingSyncHierarchyTable())
   }
@@ -82,7 +86,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(biologyItem)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}
@@ -102,7 +106,7 @@ const BiologyListItem: React.FC<BiologyListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(biologyItem)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}
@@ -153,7 +157,7 @@ type BiologyHierarchyProps = {
 
 const BiologyHierarchy: React.FC<BiologyHierarchyProps> = (props) => {
   const { isOpen = false, selectedCriteria, onChangeSelectedHierarchy, onConfirm, goBack, isEdition } = props
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const isLoadingSyncHierarchyTable = initialState?.loading ?? 0

@@ -1,17 +1,17 @@
 import React, { useState } from 'react'
 
-import { Alert, Button, Divider, FormLabel, Grid, IconButton, Switch, Typography, TextField } from '@mui/material'
+import { Alert, Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@mui/material'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
-import AdvancedInputs from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AdvancedInputs/AdvancedInputs'
-
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchClaim } from 'state/pmsi'
-import { HierarchyTree } from 'types'
+import { CriteriaName, HierarchyTree } from 'types'
+import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
+import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 type GHMFormProps = {
   isOpen: boolean
@@ -26,19 +26,14 @@ type GHMFormProps = {
 const GhmForm: React.FC<GHMFormProps> = (props) => {
   const { isOpen, isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const currentState = { ...selectedCriteria, ...initialState }
-
-  const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const getGhmOptions = async (searchValue: string) => await criteria.fetch.fetchGhmData(searchValue, false)
   const _onSubmit = () => {
-    if (currentState?.code?.length === 0) {
-      return setError(true)
-    }
     onChangeSelectedCriteria(currentState)
     dispatch(fetchClaim())
   }
@@ -69,9 +64,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner un code GHM</Alert>}
-
-        {!error && !multiFields && (
+        {!multiFields && (
           <Alert
             severity="info"
             onClose={() => {
@@ -112,6 +105,12 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             />
           </Grid>
 
+          <OccurrencesNumberInputs
+            form={CriteriaName.Ghm}
+            selectedCriteria={selectedCriteria}
+            onChangeValue={onChangeValue}
+          />
+
           <AutocompleteAsync
             multiple
             label="Codes GHM"
@@ -126,7 +125,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
             }}
           />
 
-          <AdvancedInputs form="ghm" selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs form={CriteriaName.Ghm} selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>
@@ -135,7 +134,7 @@ const GhmForm: React.FC<GHMFormProps> = (props) => {
               Annuler
             </Button>
           )}
-          <Button onClick={_onSubmit} type="submit" form="cim10-form" variant="contained">
+          <Button onClick={_onSubmit} type="submit" form="ghm-form" variant="contained">
             Confirmer
           </Button>
         </Grid>

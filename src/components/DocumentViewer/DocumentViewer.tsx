@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { Buffer } from 'buffer'
 import ReactHtmlParser from 'react-html-parser'
 
-import { IDocumentReference } from '@ahryman40k/ts-fhir-types/lib/R4'
-
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import Dialog from '@mui/material/Dialog'
@@ -18,6 +16,7 @@ import { FHIR_API_URL } from '../../constants'
 import services from 'services/aphp'
 
 import Watermark from 'assets/images/watermark_pseudo.svg'
+import { DocumentReference } from 'fhir/r4'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 
@@ -30,7 +29,7 @@ type DocumentViewerProps = {
 }
 
 const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, handleClose, documentId }) => {
-  const [documentContent, setDocumentContent] = useState<IDocumentReference | null>(null)
+  const [documentContent, setDocumentContent] = useState<DocumentReference | null>(null)
   const [numPages, setNumPages] = useState(1)
   const [loading, setLoading] = useState(false)
 

@@ -12,7 +12,7 @@ type ProjectSearchBarProps = {
 }
 
 const ProjectSearchBar: React.FC<ProjectSearchBarProps> = ({ setSearchInput }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [search, setSearch] = useState('')
 

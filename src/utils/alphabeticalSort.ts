@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-export const codeSort = (a: any, b: any) => {
+export const codeSort = (a: any, b: any): number => {
   if (a.code < b.code) {
     return -1
   }
@@ -10,7 +10,7 @@ export const codeSort = (a: any, b: any) => {
   return 0
 }
 
-export const displaySort = (a: any, b: any) => {
+export const displaySort = (a: any, b: any): number => {
   if (a.display < b.display) {
     return -1
   }
@@ -20,7 +20,7 @@ export const displaySort = (a: any, b: any) => {
   return 0
 }
 
-export const targetDisplaySort = (a: any, b: any) => {
+export const targetDisplaySort = (a: any, b: any): number => {
   if (a.target?.[0].display < b.target?.[0].display) {
     return -1
   }
@@ -30,7 +30,7 @@ export const targetDisplaySort = (a: any, b: any) => {
   return 0
 }
 
-export const descendingComparator = (a: any, b: any, orderBy: any) => {
+export const descendingComparator = (a: any, b: any, orderBy: any): number => {
   const dateA = moment(new Date(a[orderBy]))
   const dateB = moment(new Date(b[orderBy]))
 
@@ -46,13 +46,13 @@ export const descendingComparator = (a: any, b: any, orderBy: any) => {
   return 0
 }
 
-export const getComparator = (order: any, orderBy: any) => {
+export const getComparator = (order: any, orderBy: any): ((a: any, b: any) => number) => {
   return order === 'desc'
-    ? (a: any, b: any) => descendingComparator(a, b, orderBy)
-    : (a: any, b: any) => -descendingComparator(a, b, orderBy)
+    ? (a: any, b: any): number => descendingComparator(a, b, orderBy)
+    : (a: any, b: any): number => -descendingComparator(a, b, orderBy)
 }
 
-export const stableSort = (array: any[], comparator: any) => {
+export const stableSort = (array: any[], comparator: any): any[] => {
   const stabilizedThis = array.map((el, index) => [el, index])
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0])

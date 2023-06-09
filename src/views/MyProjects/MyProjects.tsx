@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import clsx from 'clsx'
 
 import { Alert, Button, IconButton, CircularProgress, Grid, Hidden, Tooltip, Typography, Snackbar } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
@@ -17,7 +16,7 @@ import ModalMoveRequests from 'components/MyProjects/Modals/ModalMoveRequest/Mod
 import ModalDeleteRequests from 'components/MyProjects/Modals/ModalDeleteRequests/ModalDeleteRequests'
 import ModalShareRequest from 'components/MyProjects/Modals/ModalShareRequest/ModalShareRequest'
 
-import { RequestType } from 'types'
+import { RequestType, SimpleStatus } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { ProjectState, fetchProjects as fetchProjectsList, setSelectedProject } from 'state/project'
@@ -33,15 +32,15 @@ import { MeState } from 'state/me'
 import useStyles from './styles'
 
 const MyProjects: React.FC<{}> = () => {
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
 
   const [searchInput, setSearchInput] = useState('')
   const [selectedRequests, setSelectedRequests] = useState<RequestType[]>([])
   const [openModal, setOpenModal] = useState<'move_to_folder' | 'delete_items' | null>(null)
-  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<'success' | 'error' | null>(null)
+  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
   const wrapperSetShareSuccessOrFailMessage = useCallback(
-    (val: any) => {
+    (val: SimpleStatus) => {
       setShareSuccessOrFailMessage(val)
     },
     [setShareSuccessOrFailMessage]
@@ -103,7 +102,7 @@ const MyProjects: React.FC<{}> = () => {
       <Grid
         container
         direction="column"
-        className={clsx(classes.appBar, {
+        className={cx(classes.appBar, {
           [classes.appBarShift]: open
         })}
       >
@@ -119,7 +118,7 @@ const MyProjects: React.FC<{}> = () => {
       <Grid
         container
         direction="column"
-        className={clsx(classes.appBar, {
+        className={cx(classes.appBar, {
           [classes.appBarShift]: open
         })}
       >

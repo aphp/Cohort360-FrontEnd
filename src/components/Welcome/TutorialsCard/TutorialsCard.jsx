@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import clsx from 'clsx'
 
 import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
@@ -28,7 +27,7 @@ const YoutubeEmbed = ({ embedId }) => (
 )
 
 const TutorialsCard = () => {
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
 
   const [currentIndex, setCurrentIndex] = useState(0)
 
@@ -64,14 +63,14 @@ const TutorialsCard = () => {
 
         {/* Pagination Items (Left/Right Chevron + indicator) */}
         {currentIndex > 0 && (
-          <Grid className={clsx(classes.indicator, classes.leftIndicator)}>
+          <Grid className={cx(classes.indicator, classes.leftIndicator)}>
             <IconButton size="small" onClick={() => _onChangeCurrentIndex(currentIndex - 1)}>
               <KeyboardArrowLeftIcon fontSize="medium" />
             </IconButton>
           </Grid>
         )}
         {currentIndex < youtubeIds.length - 1 && (
-          <Grid className={clsx(classes.indicator, classes.rightIndicator)}>
+          <Grid className={cx(classes.indicator, classes.rightIndicator)}>
             <IconButton size="small" onClick={() => _onChangeCurrentIndex(currentIndex + 1)}>
               <KeyboardArrowRightIcon fontSize="medium" />
             </IconButton>
