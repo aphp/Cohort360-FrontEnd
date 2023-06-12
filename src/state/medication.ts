@@ -4,12 +4,9 @@ import { RootState } from 'state'
 import { login, logout } from 'state/me'
 
 import services from 'services/aphp'
+import { AbstractTree } from 'types'
 
-export type MedicationListType = {
-  id: string
-  label: string
-  subItems?: MedicationListType[]
-}
+export type MedicationListType = AbstractTree<{ label: string }>
 
 export type MedicationState = {
   syncLoading?: number
