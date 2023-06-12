@@ -4,12 +4,9 @@ import { RootState } from 'state'
 import { login, logout } from 'state/me'
 
 import services from 'services/aphp'
+import { AbstractTree } from 'types'
 
-export type PmsiListType = {
-  id: string
-  label: string
-  subItems?: PmsiListType[]
-}
+export type PmsiListType = AbstractTree<{ label: string }>
 
 export type PmsiElementType = {
   loading: boolean

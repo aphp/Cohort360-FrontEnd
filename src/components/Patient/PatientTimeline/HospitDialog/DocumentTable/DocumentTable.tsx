@@ -76,7 +76,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
           {row.title}
         </TableCell>
         <TableCell align="center">{row.serviceProvider}</TableCell>
-        <TableCell align="center">{getStatusShip(row.status)}</TableCell>
+        <TableCell align="center">{getStatusShip(row.status as DocumentReferenceStatusKind)}</TableCell>
         <TableCell align="center">
           <IconButton disabled={row.event === undefined} onClick={() => setDocumentDialogOpen(true)}>
             <PdfIcon height="30px" fill={row.event === undefined ? '#CBCFCF' : '#ED6D91'} />
