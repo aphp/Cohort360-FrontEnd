@@ -51,7 +51,7 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
   setPage,
   total
 }) => {
-  const { classes, cx } = useStyles()
+  const { classes } = useStyles()
 
   const columns = [
     {
@@ -130,7 +130,7 @@ const DataTableCompositionLine: React.FC<{
 
   const documentId = document.id
   const title = document.description
-  const status = document.status
+  const status = document.status as DocumentReferenceStatusKind
   const event = document.content[0].attachment.url
   const ipp = deidentified ? document.idPatient : document.IPP
   const nda = document.NDA ?? '-'

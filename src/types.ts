@@ -236,6 +236,11 @@ export enum SearchByTypes {
   description = 'description'
 }
 
+export type AbstractTree<T> = T & {
+  id: string
+  subItems: AbstractTree<T>[]
+}
+
 export enum VitalStatus {
   alive = 'alive',
   deceased = 'deceased',
@@ -259,15 +264,13 @@ export type Order = {
   orderDirection: 'asc' | 'desc'
 }
 
-export type ScopeTreeRow = {
+export type ScopeTreeRow = AbstractTree<{
   access?: string
   resourceType?: string
-  id: string
   name: string
   full_path?: string
   quantity: number
   parentId?: string | null
-  subItems: ScopeTreeRow[]
   managingEntity?: any | undefined
   above_levels_ids?: string
   inferior_levels_ids?: string
@@ -275,7 +278,7 @@ export type ScopeTreeRow = {
   cohort_size?: string
   cohort_tag?: string
   type?: string
-}
+}>
 
 export type SimpleChartDataType = {
   label: string
