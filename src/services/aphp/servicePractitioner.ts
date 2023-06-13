@@ -63,12 +63,14 @@ const servicePractitioner: IServicePractitioner = {
 
   authenticateWithCode: async (authCode: string) => {
     try {
-      const res = await apiBackend.post(`/auth/oidc/login`, { auth_code: authCode })
-      if (res.status === 200) {
-        localStorage.setItem(ACCESS_TOKEN, res.data.jwt.access)
-        localStorage.setItem(REFRESH_TOKEN, res.data.jwt.refresh)
+      const formData = new FormData()
+      formData.append('auth_code', authCode)
+      const response = await apiBackend.post(`/auth/oidc/login`, formData)
+      if (response.status === 200) {
+        localStorage.setItem(ACCESS_TOKEN, response.data.jwt.access)
+        localStorage.setItem(REFRESH_TOKEN, response.data.jwt.refresh)
       }
-      return res
+      return response
     } catch (error) {
       console.error('Error authenticating with an authorization code', error)
       return error
