@@ -1,14 +1,7 @@
 import apiFhir from '../apiFhir'
 import { BiologyStatus } from 'types'
 
-import {
-  CohortComposition,
-  SearchByTypes,
-  FHIR_API_Response,
-  IScope,
-  AccessExpiration,
-  AccessExpirationsProps
-} from 'types'
+import { SearchByTypes, FHIR_API_Response, IScope, AccessExpiration, AccessExpirationsProps } from 'types'
 import { AxiosResponse } from 'axios'
 import apiBackend from '../apiBackend'
 import {
@@ -27,7 +20,6 @@ import {
   Procedure
 } from 'fhir/r4'
 import { Observation } from 'fhir/r4'
-import { getApiResponseResources, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
 
 const reducer = (accumulator: any, currentValue: any) =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -139,7 +131,7 @@ export const fetchPatient = async (args: fetchPatientProps) => {
   if (family) options = [...options, `family=${family}`] // eslint-disable-line
   if (given) options = [...options, `given=${given}`] // eslint-disable-line
   if (identifier) options = [...options, `identifier=${identifier}`] // eslint-disable-line
-  if (deceased !== undefined) options = [...options, `deceased=${deceased}`] // eslint-disable-line
+  if (deceased && deceased !== undefined) options = [...options, `deceased=${deceased}`] // eslint-disable-line
   if (minBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=le${minBirthdate}`] // eslint-disable-line
   if (maxBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=ge${maxBirthdate}`] // eslint-disable-line
 
@@ -185,13 +177,13 @@ export const fetchEncounter = async (args: fetchEncounterProps) => {
   _elements = _elements ? _elements.filter(uniq) : []
   facet = facet ? facet.filter(uniq) : []
 
-  // By default, all the calls to `/Encounter` will have 'patient.active=true' in parameter
-  let options: string[] = ['patient.active=true']
+  // By default, all the calls to `/Encounter` will have '_has:Patient:encounter:active=true' in parameter
+  let options: string[] = ['_has:Patient:encounter:active=true']
   if (_id) options = [...options, `_id=${_id}`] // eslint-disable-line
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
-  if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
+  if (patient) options = [...options, `subject=${patient}`] // eslint-disable-line
   if (type) options = [...options, `type=${type}`] // eslint-disable-line
   if (typeNot) options = [...options, `type:not=${typeNot}`] // eslint-disable-line
 

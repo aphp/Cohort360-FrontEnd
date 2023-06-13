@@ -379,7 +379,8 @@ const servicesCohorts: IServiceCohorts = {
     const agePyramidData =
       patientsResp.data.resourceType === 'Bundle'
         ? getAgeRepartitionMapAphp(
-            patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === 'facet-age-month')?.extension
+            patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === 'facet-extension.age-month')
+              ?.extension
           )
         : undefined
 

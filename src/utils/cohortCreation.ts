@@ -27,16 +27,16 @@ const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
 const ENCOUNTER_LENGTH = 'length' // ok
 const ENCOUNTER_MIN_BIRTHDATE = 'start-age-visit' // ok
 const ENCOUNTER_MAX_BIRTHDATE = 'end-age-visit' // ok
-const ENCOUNTER_ENTRYMODE = 'admitted-from' // ok
-const ENCOUNTER_EXITMODE = 'discharge' // ok
+const ENCOUNTER_ENTRYMODE = 'admission-mode' // ok
+const ENCOUNTER_EXITMODE = 'discharge-disposition' // ok
 const ENCOUNTER_PRISENCHARGETYPE = 'class' // ok
 const ENCOUNTER_TYPEDESEJOUR = 'stay' // ok
 const ENCOUNTER_FILESTATUS = 'status' // ok
-const ENCOUNTER_ADMISSIONMODE = 'reason' // ok
-const ENCOUNTER_REASON = 'discharge-type' // ok
+const ENCOUNTER_ADMISSIONMODE = 'reason-code' // ok
+const ENCOUNTER_REASON = 'destination-type' // ok
 const ENCOUNTER_DESTINATION = 'destination' // ok
-const ENCOUNTER_PROVENANCE = 'provenance' // ok
-const ENCOUNTER_ADMISSION = 'reason-code' // ok
+const ENCOUNTER_PROVENANCE = 'admit-source' // ok
+const ENCOUNTER_ADMISSION = 'admission-type' // ok
 
 export const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
 const CLAIM_CODE = 'codeList' // ok
@@ -259,7 +259,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       // Ignore TypeScript because we need to check if array is not empty
       // @ts-ignore
       filterFhir = [
-        'patient.active=true',
+        '_has:Patient:encounter:active=true',
         `${
           criterion.admissionMode && criterion.admissionMode.length > 0
             ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode

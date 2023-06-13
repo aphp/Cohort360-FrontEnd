@@ -23,8 +23,7 @@ import {
   SearchByTypes,
   SimpleChartDataType,
   VitalStatus,
-  DTTB_ResultsType as ResultsType,
-  PatientGenderKind
+  DTTB_ResultsType as ResultsType
 } from 'types'
 
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'

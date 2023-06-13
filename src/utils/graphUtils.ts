@@ -77,7 +77,7 @@ export const getGenderRepartitionMapAphp = (facet?: Extension[]): GenderRepartit
     })[0].url
 
     const genderData = extension.extension?.filter((extension) => {
-      return extension.url === 'gender-simple'
+      return extension.url === 'gender.display'
     })[0].extension
 
     if (isDeceased === 'true') {
@@ -176,11 +176,11 @@ export const getAgeRepartitionMapAphp = (facet?: Extension[]): AgeRepartitionTyp
 
   facet?.forEach((extension) => {
     const ageObj = extension.extension?.filter((object) => {
-      return object.url !== 'gender-simple'
+      return object.url !== 'gender.display'
     })?.[0].url
 
     const genderValuesObj = extension.extension?.filter((object) => {
-      return object.url === 'gender-simple'
+      return object.url === 'gender.display'
     })?.[0]
 
     if (ageObj) {

@@ -132,8 +132,8 @@ const DataTablePatientLine: React.FC<{
         )}
       </TableCell>
       <TableCell>
-        {patient.extension && patient.extension.find((extension) => extension.url === 'last-visit-service-provider')
-          ? patient.extension.find((extension) => extension.url === 'last-visit-service-provider')?.valueString
+        {patient.extension && patient.extension.find((extension) => extension.url.includes('last-encounter'))
+          ? patient.extension.find((extension) => extension.url.includes('last-encounter'))?.valueReference?.display
           : 'Non renseigné'}
       </TableCell>
       <TableCell align="center">
