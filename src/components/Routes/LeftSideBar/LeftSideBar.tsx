@@ -111,7 +111,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
           }}
         >
           <div className={classes.toolbar}>
-            <Link onClick={() => navigate('/home')}>
+            <Link onClick={() => navigate('/home')} style={{ cursor: 'pointer' }}>
               <img src={cohortLogo} alt="Cohort360 logo" className={open ? undefined : classes.hide} />
             </Link>
 
