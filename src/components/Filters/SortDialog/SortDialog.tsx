@@ -29,7 +29,7 @@ type SortDialogProps = {
 
 const sortOptions = [
   { label: 'Sexe', code: 'gender' },
-  { label: 'Prénom', code: 'given' },
+  { label: 'Prénom', code: 'name' },
   { label: 'Nom', code: 'family' },
   { label: 'Date de Naissance', code: 'birthdate' }
 ]

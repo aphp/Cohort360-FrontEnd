@@ -101,7 +101,8 @@ const useStyles = makeStyles()((theme: Theme) => ({
   nestedTitle: {
     color: '#D0D7D8',
     fontSize: 13,
-    lineHeight: '25px'
+    lineHeight: '25px',
+    cursor: 'pointer'
   },
   button: {
     marginLeft: 7

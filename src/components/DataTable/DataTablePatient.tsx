@@ -44,7 +44,7 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
 
   const columns: Column[] = [
     { label: `Sexe`, code: 'gender', align: 'center', sortableColumn: true },
-    { label: 'Prénom', code: 'given', align: 'center', sortableColumn: !deidentified },
+    { label: 'Prénom', code: 'name', align: 'center', sortableColumn: !deidentified },
     { label: 'Nom', code: 'family', align: 'left', sortableColumn: !deidentified },
     {
       label: !deidentified ? 'Date de naissance' : 'Âge',
@@ -132,8 +132,8 @@ const DataTablePatientLine: React.FC<{
         )}
       </TableCell>
       <TableCell>
-        {patient.extension && patient.extension.find((extension) => extension.url === 'last-visit-service-provider')
-          ? patient.extension.find((extension) => extension.url === 'last-visit-service-provider')?.valueString
+        {patient.extension && patient.extension.find((extension) => extension.url.includes('last-encounter'))
+          ? patient.extension.find((extension) => extension.url.includes('last-encounter'))?.valueReference?.display
           : 'Non renseigné'}
       </TableCell>
       <TableCell align="center">
