@@ -23,7 +23,7 @@ type PopulationRightPanelProps = {
 const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
   const { open, title, executiveUnitType, selectedPopulation, isAcceptEmptySelection, onConfirm, onClose } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [_selectedPopulation, _setSelectedPopulation] = useState<ScopeTreeRow[]>(selectedPopulation)
   const [searchInput, setSearchInput] = useState('')

@@ -22,7 +22,7 @@ const ModalEditCohort: React.FC<{
   open: boolean
   onClose: () => void
 }> = ({ open, onClose }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const { cohortState } = useAppSelector<{
     cohortState: CohortState

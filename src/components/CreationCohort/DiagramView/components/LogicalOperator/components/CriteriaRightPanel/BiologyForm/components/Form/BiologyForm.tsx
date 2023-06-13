@@ -20,12 +20,12 @@ import {
 import InfoIcon from '@mui/icons-material/Info'
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
-import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
-
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchBiology } from 'state/biology'
-import { HierarchyTree } from 'types'
+import { CriteriaName, HierarchyTree } from 'types'
+import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
+import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 type BiologyFormProps = {
   isOpen: boolean
@@ -40,19 +40,14 @@ type BiologyFormProps = {
 const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   const { isOpen, isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const currentState = { ...selectedCriteria, ...initialState }
-
-  const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const [allowSearchByValue, setAllowSearchByValue] = useState(false)
 
   const _onSubmit = () => {
-    if (currentState?.code?.length === 0) {
-      return setError(true)
-    }
     onChangeSelectedCriteria(currentState)
     dispatch(fetchBiology())
   }
@@ -114,9 +109,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner un champ</Alert>}
-
-        {!error && !multiFields && (
+        {!multiFields && (
           <Alert
             severity="info"
             onClose={() => {
@@ -163,6 +156,12 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
               color="secondary"
             />
           </Grid>
+
+          <OccurrencesNumberInputs
+            form={CriteriaName.Biology}
+            selectedCriteria={currentState}
+            onChangeValue={onChangeValue}
+          />
 
           <Grid className={classes.inputContainer}>
             <Typography variant="h6">Codes de biologie</Typography>
@@ -267,7 +266,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
             </Grid>
           </Grid>
 
-          <AdvancedInputs form="biology" selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs form={CriteriaName.Biology} selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

@@ -187,9 +187,9 @@ export type PMSIFilters = {
 }
 
 export type PatientFilters = {
-  gender: PatientGenderKind
+  gender: PatientGenderKind | null
   birthdatesRanges: [string, string]
-  vitalStatus: VitalStatus
+  vitalStatus: VitalStatus | null
 }
 
 export type ObservationFilters = {
@@ -236,6 +236,11 @@ export enum SearchByTypes {
   description = 'description'
 }
 
+export type AbstractTree<T> = T & {
+  id: string
+  subItems: AbstractTree<T>[]
+}
+
 export enum VitalStatus {
   alive = 'alive',
   deceased = 'deceased',
@@ -259,15 +264,13 @@ export type Order = {
   orderDirection: 'asc' | 'desc'
 }
 
-export type ScopeTreeRow = {
+export type ScopeTreeRow = AbstractTree<{
   access?: string
   resourceType?: string
-  id: string
   name: string
   full_path?: string
   quantity: number
   parentId?: string | null
-  subItems: ScopeTreeRow[]
   managingEntity?: any | undefined
   above_levels_ids?: string
   inferior_levels_ids?: string
@@ -275,7 +278,7 @@ export type ScopeTreeRow = {
   cohort_size?: string
   cohort_tag?: string
   type?: string
-}
+}>
 
 export type SimpleChartDataType = {
   label: string
@@ -418,6 +421,7 @@ export type SelectedCriteriaType = {
   | MedicationDataType
   | ObservationDataType
   | IPPListDataType
+  | EncounterDataType
 )
 
 export type CcamDataType = {
@@ -546,6 +550,10 @@ export type EncounterDataType = {
   admission: { id: string; label: string }[] | null
   encounterStartDate: Date | ''
   encounterEndDate: Date | ''
+  occurrence: number
+  occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
+  startOccurrence: Date | ''
+  endOccurrence: Date | ''
   isInclusive?: boolean
 }
 
@@ -728,6 +736,10 @@ export type IPatientMedication<T extends MedicationRequest | MedicationAdministr
   }
 }
 
+export enum BiologyStatus {
+  VALIDATED = 'Validé'
+}
+
 export type CohortObservation = Observation & {
   serviceProvider?: string
   NDA?: string
@@ -853,6 +865,24 @@ export type AgeRangeType = {
   month?: number
   days?: number
 }
+
+export enum CriteriaName {
+  Cim10 = 'cim10',
+  Ccam = 'ccam',
+  Ghm = 'ghm',
+  Document = 'document',
+  Medication = 'medication',
+  Biology = 'biology',
+  VisitSupport = 'supported'
+}
+export type CriteriaNameType =
+  | CriteriaName.Cim10
+  | CriteriaName.Ccam
+  | CriteriaName.Ghm
+  | CriteriaName.Document
+  | CriteriaName.Medication
+  | CriteriaName.Biology
+  | CriteriaName.VisitSupport
 
 export type AccessExpirationsProps = {
   expiring?: boolean

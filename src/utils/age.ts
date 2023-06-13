@@ -26,8 +26,8 @@ export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'm
 
 export const getAge = (patient: CohortPatient): string => {
   if (patient.extension) {
-    const totalDays = patient.extension.find((item) => item.url?.includes('Age(TotalDays)'))
-    const totalMonths = patient.extension.find((item) => item.url?.includes('Age(TotalMonths)'))
+    const totalDays = patient.extension.find((item) => item.url?.includes('total-age-day'))
+    const totalMonths = patient.extension.find((item) => item.url?.includes('total-age-month'))
     if (totalDays) {
       return getAgeAphp(totalDays.valueInteger, 'days')
     } else if (totalMonths) {

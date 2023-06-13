@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import moment from 'moment'
-import clsx from 'clsx'
 
 import { Alert, Container, Grid, Paper, Typography } from '@mui/material'
 
@@ -25,7 +24,7 @@ import { AccessExpiration, Cohort, RequestType } from 'types'
 import useStyles from './styles'
 
 const Welcome: React.FC = () => {
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { practitioner, open, cohortState, requestState, meState } = useAppSelector((state) => ({
@@ -96,7 +95,7 @@ const Welcome: React.FC = () => {
   return practitioner ? (
     <Grid
       container
-      className={clsx(classes.root, classes.appBar, {
+      className={cx(classes.root, classes.appBar, {
         [classes.appBarShift]: open
       })}
     >
@@ -137,20 +136,20 @@ const Welcome: React.FC = () => {
                 activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
               </Alert>
             )}
-            {accessExpirations?.map(
-              (item: AccessExpiration) =>
-                item.leftDays &&
-                item.leftDays <= 30 && (
-                  <Alert
-                    key={item.perimeter + '-' + item.leftDays && item.leftDays}
-                    severity="warning"
-                    className={classes.alert}
-                  >
-                    Attention, votre accès au périmetre suivant: {item.perimeter}, arrivera à expiration dans{' '}
-                    {item.leftDays} jour{item.leftDays > 1 ? 's' : ''}. Veuillez vous rapprocher de votre référent EDS
-                    pour faire renouveler vos accès à l'application.
-                  </Alert>
-                )
+            {accessExpirations?.map((item: AccessExpiration) =>
+              item.leftDays && !Number.isNaN(item.leftDays) && item.leftDays <= 30 ? (
+                <Alert
+                  key={item.perimeter + '-' + item.leftDays && item.leftDays}
+                  severity="warning"
+                  className={classes.alert}
+                >
+                  Attention, votre accès au périmetre suivant: {item.perimeter}, arrivera à expiration dans{' '}
+                  {item.leftDays} jour{item.leftDays > 1 ? 's' : ''}. Veuillez vous rapprocher de votre référent EDS
+                  pour faire renouveler vos accès à l'application.
+                </Alert>
+              ) : (
+                <></>
+              )
             )}
           </Grid>
         </Grid>

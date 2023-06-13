@@ -27,7 +27,7 @@ type RequestRowProps = {
 }
 const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedRequests, onSelectedRow, isSearch }) => {
   const [open, setOpen] = React.useState(false)
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -82,11 +82,11 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
           </TableCell>
           <TableCell className={classes.tdName}>
             {row?.shared_by?.displayed_name ? (
-              <Link onClick={() => navigate(`/cohort/new/${row.uuid}`)} underline="hover">
+              <Link onClick={() => navigate(`/cohort/new/${row.uuid}`)} underline="hover" style={{ cursor: 'pointer' }}>
                 {`${row.name} - Envoyée par : ${row?.shared_by?.firstname} ${row?.shared_by?.lastname?.toUpperCase()}`}
               </Link>
             ) : (
-              <Link onClick={() => navigate(`/cohort/new/${row.uuid}`)} underline="hover">
+              <Link onClick={() => navigate(`/cohort/new/${row.uuid}`)} underline="hover" style={{ cursor: 'pointer' }}>
                 {row.name}
               </Link>
             )}

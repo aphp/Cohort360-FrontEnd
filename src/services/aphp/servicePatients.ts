@@ -202,6 +202,7 @@ export interface IServicePatients {
     sortDirection: string,
     page: number,
     patientId: string,
+    rowStatus: boolean,
     searchInput: string,
     nda: string,
     loinc: string,
@@ -310,7 +311,7 @@ const servicesPatients: IServicePatients = {
   fetchMyPatients: async () => {
     const [myPatientsResp, myPatientsEncounters] = await Promise.all([
       fetchPatient({
-        pivotFacet: ['age_gender', 'deceased_gender'],
+        pivotFacet: ['age-month_gender', 'deceased_gender'],
         size: 20,
         _sort: 'family',
         _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
@@ -329,7 +330,8 @@ const servicesPatients: IServicePatients = {
     const agePyramidData =
       myPatientsResp.data.resourceType === 'Bundle'
         ? await getAgeRepartitionMapAphp(
-            myPatientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-age-month')?.[0].extension
+            myPatientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-extension.age-month')?.[0]
+              .extension
           )
         : undefined
 
@@ -344,7 +346,7 @@ const servicesPatients: IServicePatients = {
       myPatientsEncounters.data.resourceType === 'Bundle'
         ? await getVisitRepartitionMapAphp(
             myPatientsEncounters.data.meta?.extension?.filter(
-              (facet: any) => facet.url === 'facet-visit-year-month-gender-facet'
+              (facet: any) => facet.url === 'facet-facet.period.start-gender'
             )?.[0].extension
           )
         : undefined
@@ -352,8 +354,9 @@ const servicesPatients: IServicePatients = {
     const visitTypeRepartitionData =
       myPatientsEncounters.data.resourceType === 'Bundle'
         ? await getEncounterRepartitionMapAphp(
-            myPatientsEncounters.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-class-simple')?.[0]
-              .extension
+            myPatientsEncounters.data.meta?.extension?.filter(
+              (facet: any) => facet.url === 'facet-class.coding.display'
+            )?.[0].extension
           )
         : undefined
 
@@ -541,6 +544,7 @@ const servicesPatients: IServicePatients = {
     sortDirection: string,
     page: number,
     patientId: string,
+    rowStatus: boolean,
     searchInput: string,
     nda: string,
     loinc: string,
@@ -561,7 +565,8 @@ const servicesPatients: IServicePatients = {
       loinc: loinc,
       anabio: anabio,
       minDate: startDate ?? '',
-      maxDate: endDate ?? ''
+      maxDate: endDate ?? '',
+      rowStatus
     })
 
     const biologyTotal = observationResp.data.resourceType === 'Bundle' ? observationResp.data.total : 0
@@ -643,14 +648,14 @@ const servicesPatients: IServicePatients = {
         patient: patientId,
         type: 'VISIT',
         status: ['arrived', 'triaged', 'in-progress', 'onleave', 'finished', 'unknown'],
-        _sort: 'start-date',
+        _sort: 'period-start',
         sortDirection: 'desc',
         _list: groupId ? [groupId] : []
       }),
       fetchEncounter({
         patient: patientId,
         'type:not': 'VISIT',
-        _sort: 'start-date',
+        _sort: 'period-start',
         sortDirection: 'desc',
         _list: groupId ? [groupId] : []
       })

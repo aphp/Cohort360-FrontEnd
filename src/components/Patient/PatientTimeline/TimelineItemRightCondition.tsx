@@ -12,7 +12,7 @@ type TimelineItemRightTypes = {
   data: PMSIEntry<Condition>
 }
 const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
-  const classes = useStyles({ color: '#b7c3d9' })
+  const { classes } = useStyles({ color: '#b7c3d9' })
 
   return (
     <li className={classes.timelineItem}>

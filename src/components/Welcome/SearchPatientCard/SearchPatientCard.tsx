@@ -10,7 +10,7 @@ import LockIcon from '@mui/icons-material/Lock'
 import useStyles from './styles'
 
 const SearchPatientCard = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const deidentifiedBoolean = useAppSelector((state) => state.me?.deidentified ?? true)
 
   return (

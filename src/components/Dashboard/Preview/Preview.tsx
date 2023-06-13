@@ -31,7 +31,7 @@ type RepartitionTableProps = {
 }
 
 const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMap, loading }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   let femaleAlive, maleAlive, femaleDeceased, maleDeceased
   if (loading) {
     return (
@@ -112,7 +112,7 @@ const Preview: React.FC<PreviewProps> = ({
   agePyramidData,
   loading
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const { vitalStatusData, genderData } = getGenderRepartitionSimpleData(genderRepartitionMap)
 

@@ -44,7 +44,7 @@ const TemporalConstraintConfig: React.FC<{
   newConstraintsList: TemporalConstraintsType[]
   onChangeNewConstraintsList: (c: TemporalConstraintsType[]) => void
 }> = ({ newConstraintsList, onChangeNewConstraintsList }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const { selectedCriteria, criteriaGroup } = useAppSelector((state) => state.cohortCreation.request)
 

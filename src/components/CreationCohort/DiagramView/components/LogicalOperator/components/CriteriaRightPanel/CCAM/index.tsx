@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Tabs, Tab } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import { Tab, Tabs } from '@mui/material'
 
 import useStyles from './styles'
 
@@ -28,7 +28,7 @@ const Index = (props: any) => {
   const isEdition = selectedCriteria !== null
   const dispatch = useAppDispatch()
   const ccamHierarchy = useAppSelector((state) => state.pmsi.procedure.list || {})
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const _onChangeSelectedHierarchy = (
     newSelectedItems: PmsiListType[] | null | undefined,

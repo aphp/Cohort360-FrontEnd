@@ -149,8 +149,9 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
  * fetchBiology
  *
  */
-type FetchBiologyParams = {
+export type FetchBiologyParams = {
   groupId?: string
+  rowStatus: boolean
   options?: {
     page?: number
     filters?: {
@@ -170,7 +171,7 @@ type FetchBiologyParams = {
 type FetchBiologyReturn = undefined | { biology: IPatientObservation<CohortObservation> }
 const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { state: RootState }>(
   'patient/fetchBiology',
-  async ({ groupId, options }, { getState }) => {
+  async ({ groupId, options, rowStatus }, { getState }) => {
     try {
       const patientState = getState().patient
 
@@ -197,6 +198,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
         sortDirection,
         page,
         patientId,
+        rowStatus,
         searchInput,
         nda,
         loinc,

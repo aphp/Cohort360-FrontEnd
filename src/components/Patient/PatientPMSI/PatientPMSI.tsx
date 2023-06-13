@@ -22,7 +22,7 @@ type PatientPMSITypes = {
   groupId?: string
 }
 const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const { patient } = useAppSelector((state) => ({
     patient: state.patient

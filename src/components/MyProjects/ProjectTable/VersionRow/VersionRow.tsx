@@ -37,7 +37,7 @@ import useStyles from '../styles'
 import { JobStatus } from '../../../../utils/constants'
 
 const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -197,7 +197,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                   <br />
                   Veuillez vous rendre sur la page de création en{' '}
                   <Link
-                    style={{ display: 'contents', fontWeight: 900 }}
+                    style={{ display: 'contents', fontWeight: 900, cursor: 'pointer' }}
                     onClick={() => navigate(`/cohort/new/${requestId}`)}
                   >
                     cliquant ici

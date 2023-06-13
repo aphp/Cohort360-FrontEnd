@@ -45,7 +45,7 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
   filters,
   setFilters
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [_nda, setNda] = useState<string>(filters.nda)
   const [_code, setCode] = useState<string>(filters.code)

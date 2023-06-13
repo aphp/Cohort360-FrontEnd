@@ -32,7 +32,7 @@ type DocumentRowTypes = {
   groupId: string
 }
 const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, groupId }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [documentDialogOpen, setDocumentDialogOpen] = useState(false)
 
   const row = {
@@ -76,7 +76,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
           {row.title}
         </TableCell>
         <TableCell align="center">{row.serviceProvider}</TableCell>
-        <TableCell align="center">{getStatusShip(row.status)}</TableCell>
+        <TableCell align="center">{getStatusShip(row.status as DocumentReferenceStatusKind)}</TableCell>
         <TableCell align="center">
           <IconButton disabled={row.event === undefined} onClick={() => setDocumentDialogOpen(true)}>
             <PdfIcon height="30px" fill={row.event === undefined ? '#CBCFCF' : '#ED6D91'} />
@@ -102,7 +102,7 @@ type DocumentTableTypes = {
   documentLines: number
 }
 const DocumentTable: React.FC<DocumentTableTypes> = ({ deidentified, documents, page, documentLines }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const search = new URLSearchParams(location.search)
   const groupId = search.get('groupId') ?? ''

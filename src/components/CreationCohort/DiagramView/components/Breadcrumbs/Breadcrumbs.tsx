@@ -9,7 +9,7 @@ import { fetchRequests as fetchRequestsList } from 'state/request'
 import useStyles from './styles'
 
 const CohortCreationBreadcrumbs: React.FC = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
   const {

@@ -10,14 +10,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 
 import { getAge, substructAgeString } from 'utils/age'
 import services from 'services/aphp'
-import {
-  CohortPatient,
-  PatientFilters as PatientFiltersType,
-  PatientGenderKind,
-  SearchByTypes,
-  Sort,
-  VitalStatus
-} from 'types'
+import { CohortPatient, PatientFilters as PatientFiltersType, PatientGenderKind, SearchByTypes, Sort } from 'types'
 
 import useStyles from './styles'
 import moment from 'moment/moment'
@@ -37,7 +30,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   onClose,
   deidentifiedBoolean
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const location = useLocation()
 
   const { search } = location
@@ -55,9 +48,9 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   const [loadingStatus, setLoadingStatus] = useState(false)
 
   const [filters, setFilters] = useState<PatientFiltersType>({
-    gender: PatientGenderKind._unknown,
+    gender: null,
     birthdatesRanges: ['', ''],
-    vitalStatus: VitalStatus.all
+    vitalStatus: null
   })
 
   const [openSort, setOpenSort] = useState(false)

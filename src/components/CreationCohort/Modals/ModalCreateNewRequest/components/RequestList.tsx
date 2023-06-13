@@ -27,7 +27,7 @@ interface ProjectRowProps {
 }
 
 const ProjectRow: React.FC<ProjectRowProps> = ({ project, requestsList, selectedItem, onSelectedItem }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [open, setOpen] = useState(true)
 
   const folderRequestsList = requestsList.filter(({ parent_folder }) => parent_folder === project.uuid)
@@ -96,7 +96,7 @@ interface RequestListProps {
 }
 
 const RequestList: React.FC<RequestListProps> = ({ projectList, requestsList, selectedItem, onSelectedItem }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <>

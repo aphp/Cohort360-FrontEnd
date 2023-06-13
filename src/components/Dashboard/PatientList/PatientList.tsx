@@ -23,8 +23,7 @@ import {
   SearchByTypes,
   SimpleChartDataType,
   VitalStatus,
-  DTTB_ResultsType as ResultsType,
-  PatientGenderKind
+  DTTB_ResultsType as ResultsType
 } from 'types'
 
 import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
@@ -64,9 +63,9 @@ const PatientList: React.FC<PatientListProps> = ({
   const [open, setOpen] = useState(false)
 
   const [filters, setFilters] = useState<PatientFiltersType>({
-    gender: PatientGenderKind._unknown,
+    gender: null,
     birthdatesRanges: ['', ''],
-    vitalStatus: VitalStatus.all
+    vitalStatus: null
   })
 
   const [order, setOrder] = useState<Order>({
@@ -166,7 +165,7 @@ const PatientList: React.FC<PatientListProps> = ({
       case 'gender':
         setFilters((prevFilters) => ({
           ...prevFilters,
-          gender: PatientGenderKind._unknown
+          gender: null
         }))
         break
       case 'birthdates':

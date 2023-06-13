@@ -14,7 +14,7 @@ type AdmissionInputsProps = {
 }
 
 const AdmissionInputs: React.FC<AdmissionInputsProps> = ({ criteria, selectedCriteria, onChangeValue }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [checked, setCheck] = useState(true)
 
   const defaultValuesAdmissionModes = selectedCriteria.admissionMode

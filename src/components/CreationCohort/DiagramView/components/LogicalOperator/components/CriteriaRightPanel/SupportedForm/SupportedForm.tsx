@@ -23,7 +23,8 @@ import OtherInputs from './SupportedInputs/OtherInputs'
 
 import useStyles from './styles'
 
-import { EncounterDataType, ScopeTreeRow, CalendarLabel, Calendar, CalendarRequestLabel } from 'types'
+import { CriteriaName, EncounterDataType, ScopeTreeRow, CalendarLabel, Calendar, CalendarRequestLabel } from 'types'
+import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import PopulationCard from '../../../../PopulationCard/PopulationCard'
 import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE } from 'utils/cohortCreation'
 import VisitInputs from '../AdvancedInputs/VisitInputs/VisitInputs'
@@ -61,6 +62,10 @@ const defaultEncounter: EncounterDataType = {
   admission: [],
   encounterStartDate: '',
   encounterEndDate: '',
+  occurrence: 1,
+  occurrenceComparator: '>=',
+  startOccurrence: '',
+  endOccurrence: '',
   isInclusive: true
 }
 
@@ -68,9 +73,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultEncounter)
-
-  const classes = useStyles()
-
+  const { classes } = useStyles()
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const isEdition = selectedCriteria !== null ? true : false
@@ -163,10 +166,15 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
               color="secondary"
             />
           </Grid>
+          <OccurrencesNumberInputs
+            form={CriteriaName.VisitSupport}
+            selectedCriteria={defaultValues}
+            onChangeValue={_onChangeValue}
+          />
 
           <Grid style={{ display: 'grid', alignItems: 'center', margin: '0 1em' }}>
             <PopulationCard
-              form={'supported'}
+              form={CriteriaName.VisitSupport}
               label={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
               title={STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE}
               executiveUnits={defaultValues?.encounterService ?? []}

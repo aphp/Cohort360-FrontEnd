@@ -14,7 +14,7 @@ import { buildCohortCreation, CohortCreationState } from 'state/cohortCreation'
 import { fetchScopesList, ScopeState } from 'state/scope'
 import { MeState } from 'state/me'
 
-import { ScopeTreeRow } from 'types'
+import { CriteriaNameType, ScopeTreeRow } from 'types'
 import { getSelectedScopes } from 'utils/scopeTree'
 
 import useStyles from './styles'
@@ -22,7 +22,7 @@ import useStyles from './styles'
 export type populationCardPropsType = {
   label?: string
   title?: string
-  form?: 'cim10' | 'ccam' | 'ghm' | 'document' | 'medication' | 'biology' | 'supported'
+  form?: CriteriaNameType
   executiveUnits?: (ScopeTreeRow | undefined)[]
   isAcceptEmptySelection?: boolean
   isDeleteIcon?: boolean
@@ -31,7 +31,7 @@ export type populationCardPropsType = {
 
 const PopulationCard: React.FC<populationCardPropsType> = (props) => {
   const { label, title, form, executiveUnits, onChangeExecutiveUnits, isAcceptEmptySelection, isDeleteIcon } = props
-  const classes = useStyles(props)
+  const { classes } = useStyles(props)
   const dispatch = useAppDispatch()
   const isRendered = useRef<boolean>(false)
 
@@ -152,10 +152,7 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
                         onDelete={isDeleteIcon ? () => _onDelete(index) : undefined}
                       />
                     ))}
-                  <IconButton
-                    size="small"
-                    /*classes={{ label: classes.populationLabel }}*/ onClick={() => onExtend(false)}
-                  >
+                  <IconButton size="small" onClick={() => onExtend(false)}>
                     <CloseIcon />
                   </IconButton>
                 </>

@@ -1,25 +1,39 @@
 import React from 'react'
 
-import { FormControl, FormLabel, Grid, Input, InputLabel, IconButton } from '@mui/material'
+import { FormControl, FormLabel, Grid, IconButton, Input, InputLabel } from '@mui/material'
 
 import ClearIcon from '@mui/icons-material/Clear'
 
 import useStyles from './styles'
 
-type VisitInputsProps = {
+const defaultOccurrenceInputs = {
+  code: [],
+  isLeaf: false,
+  valueMin: 0,
+  valueMax: 0,
+  valueComparator: '>=',
+  occurrence: 1,
+  occurrenceComparator: '>=',
+  startOccurrence: '',
+  endOccurrence: '',
+  isInclusive: true
+}
+
+type OccurrenceDateInputsProps = {
   selectedCriteria: any
   onChangeValue: (key: string, value: any) => void
 }
 
-const VisitInputs: React.FC<VisitInputsProps> = (props) => {
-  const { selectedCriteria, onChangeValue } = props
+const OccurrenceDateInputs: React.FC<OccurrenceDateInputsProps> = (props) => {
+  const { onChangeValue } = props
+  const selectedCriteria = { ...defaultOccurrenceInputs, ...props.selectedCriteria }
 
   const { classes } = useStyles()
 
   return (
     <>
       <FormLabel style={{ padding: '1em 1em 0 1em' }} component="legend">
-        Date de prise en charge
+        Date d'occurrence
       </FormLabel>
 
       <Grid style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
@@ -30,13 +44,13 @@ const VisitInputs: React.FC<VisitInputsProps> = (props) => {
           <Input
             id="date-start-occurrence"
             type="date"
-            value={selectedCriteria.encounterStartDate}
+            value={selectedCriteria.startOccurrence}
             endAdornment={
-              <IconButton size="small" onClick={() => onChangeValue('encounterStartDate', '')}>
+              <IconButton size="small" onClick={() => onChangeValue('startOccurrence', '')}>
                 <ClearIcon />
               </IconButton>
             }
-            onChange={(e) => onChangeValue('encounterStartDate', e.target.value)}
+            onChange={(e) => onChangeValue('startOccurrence', e.target.value)}
           />
         </FormControl>
 
@@ -47,13 +61,13 @@ const VisitInputs: React.FC<VisitInputsProps> = (props) => {
           <Input
             id="date-end-occurrence"
             type="date"
-            value={selectedCriteria.encounterEndDate}
+            value={selectedCriteria.endOccurrence}
             endAdornment={
-              <IconButton size="small" onClick={() => onChangeValue('encounterEndDate', '')}>
+              <IconButton size="small" onClick={() => onChangeValue('endOccurrence', '')}>
                 <ClearIcon />
               </IconButton>
             }
-            onChange={(e) => onChangeValue('encounterEndDate', e.target.value)}
+            onChange={(e) => onChangeValue('endOccurrence', e.target.value)}
           />
         </FormControl>
       </Grid>
@@ -61,4 +75,4 @@ const VisitInputs: React.FC<VisitInputsProps> = (props) => {
   )
 }
 
-export default VisitInputs
+export default OccurrenceDateInputs

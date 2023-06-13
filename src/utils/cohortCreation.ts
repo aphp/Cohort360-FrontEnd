@@ -29,16 +29,16 @@ const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
 const ENCOUNTER_LENGTH = 'length' // ok
 const ENCOUNTER_MIN_BIRTHDATE = 'start-age-visit' // ok
 const ENCOUNTER_MAX_BIRTHDATE = 'end-age-visit' // ok
-const ENCOUNTER_ENTRYMODE = 'admitted-from' // ok
-const ENCOUNTER_EXITMODE = 'discharge' // ok
+const ENCOUNTER_ENTRYMODE = 'admission-mode' // ok
+const ENCOUNTER_EXITMODE = 'discharge-disposition' // ok
 const ENCOUNTER_PRISENCHARGETYPE = 'class' // ok
 const ENCOUNTER_TYPEDESEJOUR = 'stay' // ok
 const ENCOUNTER_FILESTATUS = 'status' // ok
-const ENCOUNTER_ADMISSIONMODE = 'reason' // ok
-const ENCOUNTER_REASON = 'discharge-type' // ok
+const ENCOUNTER_ADMISSIONMODE = 'reason-code' // ok
+const ENCOUNTER_REASON = 'destination-type' // ok
 const ENCOUNTER_DESTINATION = 'destination' // ok
-const ENCOUNTER_PROVENANCE = 'provenance' // ok
-const ENCOUNTER_ADMISSION = 'reason-code' // ok
+const ENCOUNTER_PROVENANCE = 'admit-source' // ok
+const ENCOUNTER_ADMISSION = 'admission-type' // ok
 
 export const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
 const CLAIM_CODE = 'codeList' // ok
@@ -247,7 +247,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       // Ignore TypeScript because we need to check if array is not empty
       // @ts-ignore
       filterFhir = [
-        'patient.active=true',
+        '_has:Patient:encounter:active=true',
         `${
           criterion.admissionMode && criterion.admissionMode.length > 0
             ? `${ENCOUNTER_ADMISSIONMODE}=${criterion.admissionMode
@@ -336,7 +336,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
     }
 
     case RESSOURCE_TYPE_COMPOSITION: {
-      filterFhir = [
+      const unreducedFilterFhir = [
         `status=final&type:not=doc-impor&empty=false&patient.active=true`,
         `${
           criterion.search
@@ -357,14 +357,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
                 .reduce(searchReducer)}`
             : ''
         }`
-      ]
-        .filter((elem) => elem)
-        .reduce(filterReducer)
+      ].filter((elem) => elem)
+      filterFhir =
+        unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
       break
     }
 
     case RESSOURCE_TYPE_CONDITION: {
-      filterFhir = [
+      const unreducedFilterFhir = [
         'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
@@ -387,14 +387,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
                 .reduce(searchReducer)}`
             : ''
         }`
-      ]
-        .filter((elem) => elem)
-        .reduce(filterReducer)
+      ].filter((elem) => elem)
+      filterFhir =
+        unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
       break
     }
 
     case RESSOURCE_TYPE_PROCEDURE: {
-      filterFhir = [
+      const unreducedFilterFhir = [
         'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
@@ -412,14 +412,14 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
                 .reduce(searchReducer)}`
             : ''
         }`
-      ]
-        .filter((elem) => elem)
-        .reduce(filterReducer)
+      ].filter((elem) => elem)
+      filterFhir =
+        unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
       break
     }
 
     case RESSOURCE_TYPE_CLAIM: {
-      filterFhir = [
+      const unreducedFilterFhir = [
         'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
@@ -435,15 +435,15 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
                 .reduce(searchReducer)}`
             : ''
         }`
-      ]
-        .filter((elem) => elem)
-        .reduce(filterReducer)
+      ].filter((elem) => elem)
+      filterFhir =
+        unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
       break
     }
 
     case RESSOURCE_TYPE_MEDICATION_REQUEST:
     case RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: {
-      filterFhir = [
+      const unreducedFilterFhir = [
         'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
@@ -477,9 +477,9 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
                 .reduce(searchReducer)}`
             : ''
         }`
-      ]
-        .filter((elem) => elem)
-        .reduce(filterReducer)
+      ].filter((elem) => elem)
+      filterFhir =
+        unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
       break
     }
 
@@ -508,7 +508,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         }
       }
 
-      filterFhir = [
+      const unreducedFilterFhir = [
         'patient.active=true',
         `${
           criterion.code && criterion.code.length > 0
@@ -537,16 +537,18 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
               : `${OBSERVATION_VALUE}=${valueComparatorFilter}${criterion.valueMin}`
             : ''
         }`
-      ]
-        .filter((elem) => elem)
-        .reduce(filterReducer)
+      ].filter((elem) => elem)
+      filterFhir =
+        unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
       break
     }
 
     case RESSOURCE_TYPE_IPP_LIST: {
-      filterFhir = [`${criterion.search ? `${IPP_LIST_FHIR}=${criterion.search}` : ''}`]
-        .filter((elem) => elem)
-        .reduce(filterReducer)
+      const unreducedFilterFhir = [`${criterion.search ? `${IPP_LIST_FHIR}=${criterion.search}` : ''}`].filter(
+        (elem) => elem
+      )
+      filterFhir =
+        unreducedFilterFhir && unreducedFilterFhir.length > 0 ? unreducedFilterFhir.reduce(filterReducer) : ''
       break
     }
 
@@ -583,22 +585,14 @@ export function buildRequest(
           resourceType: item.type ?? RESSOURCE_TYPE_PATIENT,
           filterFhir: constructFilterFhir(item),
           occurrence:
-            !(
-              item.type === RESSOURCE_TYPE_PATIENT ||
-              item.type === RESSOURCE_TYPE_ENCOUNTER ||
-              item.type === RESSOURCE_TYPE_IPP_LIST
-            ) && item.occurrence
+            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_IPP_LIST) && item.occurrence
               ? {
                   n: item.occurrence,
                   operator: item?.occurrenceComparator
                 }
               : undefined,
           dateRangeList:
-            !(
-              item.type === RESSOURCE_TYPE_PATIENT ||
-              item.type === RESSOURCE_TYPE_ENCOUNTER ||
-              item.type === RESSOURCE_TYPE_IPP_LIST
-            ) &&
+            !(item.type === RESSOURCE_TYPE_PATIENT || item.type === RESSOURCE_TYPE_IPP_LIST) &&
             (item.startOccurrence || item.endOccurrence)
               ? [
                   {
@@ -894,6 +888,14 @@ export async function unbuildRequest(_json: string): Promise<any> {
           currentCriterion.provenance = currentCriterion.provenance ? currentCriterion.provenance : []
           currentCriterion.admission = currentCriterion.admission ? currentCriterion.admission : []
           currentCriterion.discharge = currentCriterion.discharge ? currentCriterion.discharge : []
+          currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
+          currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
+          currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
+
+          if (element.occurrence) {
+            currentCriterion.occurrence = element.occurrence ? element.occurrence.n : null
+            currentCriterion.occurrenceComparator = element.occurrence ? element.occurrence.operator : null
+          }
 
           if (element.encounterDateRange) {
             currentCriterion.encounterStartDate = element.encounterDateRange.minDate?.replace('T00:00:00Z', '') ?? null

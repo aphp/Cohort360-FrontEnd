@@ -10,7 +10,7 @@ const InputNumber = (props) => {
   const { label, placeholder, value, onChange, error, errorMessage, minValue, maxValue, className } = props
   const step = props.step ? props.step : 1
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [_value, onChangeValue] = useState(value)
 
   useEffect(() => onChangeValue(value), [value])
