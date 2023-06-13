@@ -63,9 +63,7 @@ const servicePractitioner: IServicePractitioner = {
 
   authenticateWithCode: async (authCode: string) => {
     try {
-      const formData = new FormData()
-      formData.append('auth_code', authCode)
-      const response = await apiBackend.post(`/auth/oidc/login`, formData)
+      const response = await apiBackend.post(`/auth/oidc/login`, { auth_code: authCode })
       if (response.status === 200) {
         localStorage.setItem(ACCESS_TOKEN, response.data.jwt.access)
         localStorage.setItem(REFRESH_TOKEN, response.data.jwt.refresh)
