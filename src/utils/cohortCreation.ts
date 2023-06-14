@@ -1066,7 +1066,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   : newAdmissionIds
                 break
               }
-              case 'patient.active':
+              case '_has:Patient:encounter:active':
                 break
               case SERVICE_PROVIDER: {
                 if (!value) continue
