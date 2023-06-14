@@ -15,16 +15,36 @@ export enum GenderStatusLabel {
   UNKNOWN = 'Inconnu',
   OTHER_UNKNOWN = 'Autres'
 }
-export enum VitalStatus {
-  ALIVE = 'ALIVE',
-  DECEASED = 'DECEASED',
-  ALL = 'ALL'
-}
-
 export enum VitalStatusLabel {
   ALIVE = 'Patients vivants',
   DECEASED = 'Patients décédés',
   ALL = 'ALL'
+}
+
+export enum VitalStatusOptions {
+  birth = 'birth',
+  age = 'age',
+  deceasedAge = 'deceasedAge',
+  deceasedDate = 'deceasedDate'
+}
+
+export enum VitalStatusOptionsLabel {
+  birth = 'Date de naissance',
+  age = 'Âge actuel',
+  deceasedAge = 'Âge au décès',
+  deceasedDate = 'Date de décès'
+}
+
+export enum VitalStatus {
+  ALIVE = 'alive',
+  DECEASED = 'deceased',
+  ALL = 'all'
+}
+
+export enum VitalStatusLabel {
+  alive = 'Vivant(e)',
+  deceased = 'Décédé(e)',
+  all = 'Tous les patients'
 }
 export enum Direction {
   ASC = 'asc',

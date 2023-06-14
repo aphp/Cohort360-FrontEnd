@@ -137,6 +137,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
         <Grid container direction="column">
           <Typography variant="h3">Date :</Typography>
           <Grid container alignItems="center" className={classes.datePickers}>
+            {/*<InputCalendar label="Après le :" date={_filters.startDate} error={dateError} onclick={_onChangeValue} />*/}
             <FormLabel component="legend" className={classes.dateLabel}>
               Après le :
             </FormLabel>

@@ -212,11 +212,6 @@ export enum Month {
   december = 'Decembre'
 }
 
-export type AbstractTree<T> = T & {
-  id: string
-  subItems: AbstractTree<T>[]
-}
-
 export type Column =
   | {
       label: string | ReactNode
@@ -228,6 +223,11 @@ export type Column =
   | {
       multiple: Column[]
     }
+
+export type AbstractTree<T> = T & {
+  id: string
+  subItems: AbstractTree<T>[]
+}
 
 export type ScopeTreeRow = AbstractTree<{
   access?: string
