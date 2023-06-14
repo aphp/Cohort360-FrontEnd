@@ -9,7 +9,8 @@ import {
   DocType,
   SearchByTypes,
   Calendar,
-  CalendarRequestLabel
+  CalendarRequestLabel,
+  CalendarLabel
 } from 'types'
 
 import docTypes from 'assets/docTypes.json'
@@ -754,12 +755,12 @@ export async function unbuildRequest(_json: string): Promise<any> {
 
   const getCalendarType = (value: number) => {
     if (value % 365 === 0) {
-      return { id: Calendar.YEAR, requestLabel: CalendarRequestLabel.YEAR }
+      return { id: Calendar.YEAR, requestLabel: CalendarRequestLabel.YEAR, criteriaLabel: CalendarLabel.YEAR }
     }
     if (value % 31 === 0) {
-      return { id: Calendar.MONTH, requestLabel: CalendarRequestLabel.MONTH }
+      return { id: Calendar.MONTH, requestLabel: CalendarRequestLabel.MONTH, criteriaLabel: CalendarLabel.MONTH }
     }
-    return { id: Calendar.DAY, requestLabel: CalendarRequestLabel.DAY }
+    return { id: Calendar.DAY, requestLabel: CalendarRequestLabel.DAY, critieriaLabel: CalendarLabel.DAY }
   }
 
   const _retrieveInformationFromJson = async (element: RequeteurCriteriaType): Promise<any> => {
@@ -870,10 +871,10 @@ export async function unbuildRequest(_json: string): Promise<any> {
           currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [0, 100]
           currentCriterion.durationType = currentCriterion.durationType
             ? currentCriterion.durationType
-            : { id: Calendar.DAY, requestLabel: CalendarRequestLabel.DAY }
+            : { id: Calendar.DAY, requestLabel: CalendarRequestLabel.DAY, criteriaLabel: CalendarLabel.DAY }
           currentCriterion.ageType = currentCriterion.ageType
             ? currentCriterion.ageType
-            : { id: Calendar.YEAR, requestLabel: CalendarRequestLabel.YEAR }
+            : { id: Calendar.YEAR, requestLabel: CalendarRequestLabel.YEAR, criteriaLabel: CalendarLabel.YEAR }
           currentCriterion.age = currentCriterion.age ? currentCriterion.age : [0, 130]
           currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : []
           currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : []
