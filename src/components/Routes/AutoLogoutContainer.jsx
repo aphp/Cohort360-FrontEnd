@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useIdleTimer } from 'react-idle-timer'
 import { useNavigate } from 'react-router-dom'
 
@@ -23,8 +23,6 @@ const AutoLogoutContainer = () => {
   const { isOpen } = useAppSelector((state) => ({
     isOpen: state.autoLogout.isOpen
   }))
-
-  const [refreshInterval, setRefreshInterval] = useState()
 
   const handleOnIdle = () => {
     logout()
@@ -90,16 +88,12 @@ const AutoLogoutContainer = () => {
   }
 
   useEffect(() => {
-    if (me !== null) {
-      start()
+    start()
+    const intervall = setInterval(() => {
       refreshToken()
-      setRefreshInterval(
-        setInterval(() => {
-          refreshToken()
-        }, REFRESH_TOKEN_INTERVAL)
-      )
-    } else if (me == null) {
-      clearInterval(refreshInterval)
+    }, REFRESH_TOKEN_INTERVAL)
+    return () => {
+      clearInterval(intervall)
       pause()
     }
   }, [me])
