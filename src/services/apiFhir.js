@@ -11,7 +11,7 @@ const apiFhir = axios.create({
 
 apiFhir.interceptors.request.use((config) => {
   const oidcAuthState = localStorage.getItem('oidcAuth')
-  const resultat = oidcAuthState === 'true' ? 'OIDC' : 'JWT'
+  const resultat = oidcAuthState === true ? 'OIDC' : 'JWT'
   console.log('oidcAuthState', oidcAuthState)
   console.log('resultat', resultat)
   const token = localStorage.getItem(ACCESS_TOKEN)
