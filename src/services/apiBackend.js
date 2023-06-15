@@ -9,8 +9,10 @@ const apiBackend = axios.create({
 })
 
 apiBackend.interceptors.request.use((config) => {
+  const oidcAuthState = localStorage.getItem('oidcAuth')
   const token = localStorage.getItem(ACCESS_TOKEN)
   config.headers.Authorization = `Bearer ${token}`
+  config.headers['authorizationMehtod'] = oidcAuthState === true ? 'OIDC' : 'JWT'
   return config
 })
 
@@ -20,7 +22,8 @@ apiBackend.interceptors.response.use(
   },
   function (error) {
     if (error.response) {
-      if ((401 || 400 || 403) === error.response.status) {
+      console.log('window.location.path', window.location.pathname)
+      if ((401 || 400 || 403) === error.response.status && window.location.pathname !== '/') {
         localStorage.clear()
         window.location = '/'
       }

@@ -118,7 +118,12 @@ const Login = () => {
   }, [])
 
   useEffect(() => {
-    if (authCode) login()
+    if (authCode) {
+      login()
+      localStorage.setItem('oidcAuth', true)
+    } else {
+      localStorage.setItem('oidcAuth', false)
+    }
   }, [authCode])
 
   const getPractitionerData = async (practitioner, lastConnection, maintenance, accessExpirations = []) => {
