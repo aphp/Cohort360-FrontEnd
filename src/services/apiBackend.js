@@ -22,7 +22,6 @@ apiBackend.interceptors.response.use(
   },
   function (error) {
     if (error.response) {
-      console.log('window.location.path', window.location.pathname)
       if ((401 || 400 || 403) === error.response.status && window.location.pathname !== '/') {
         localStorage.clear()
         window.location = '/'
