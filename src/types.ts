@@ -776,6 +776,7 @@ export type DTTB_SearchBarType = {
   onSearch: (newSearch: string, newSearchBy: SearchByTypes) => void
   searchBy?: any
   error?: searchInputError
+  fullWidth?: boolean
 }
 export type DTTB_ButtonType = {
   label: string
