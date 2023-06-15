@@ -527,12 +527,12 @@ export enum CalendarRequestLabel {
 export type EncounterDataType = {
   type: 'Encounter'
   title: string
-  age: [number, number]
+  age: [number | null, number | null]
   ageType: [
     { id: Calendar; criteriaLabel?: CalendarLabel; requestLabel: CalendarRequestLabel },
     { id: Calendar; criteriaLabel?: CalendarLabel; requestLabel: CalendarRequestLabel }
   ]
-  duration: [number, number]
+  duration: [number | null, number | null]
   durationType: [
     { id: Calendar; criteriaLabel?: CalendarLabel; requestLabel: CalendarRequestLabel },
     { id: Calendar; criteriaLabel?: CalendarLabel; requestLabel: CalendarRequestLabel }

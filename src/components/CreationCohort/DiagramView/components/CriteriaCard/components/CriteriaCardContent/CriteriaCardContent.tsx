@@ -68,24 +68,21 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
 
     const displayCalendarFields = (
       criteriaLabel: string,
-      minValue: number,
+      minValue: number | null,
       minLabel: CalendarRequestLabel,
-      maxValue: number,
-      maxLabel: CalendarRequestLabel,
-      isMaxValueLimit = false
+      maxValue: number | null,
+      maxLabel: CalendarRequestLabel
     ): string => {
       if (minValue === maxValue && minLabel === maxLabel) {
         return `${criteriaLabel} : ${minValue} ${minLabel}`
       }
-      if (minValue === 0) {
-        return `${criteriaLabel} : jusqu'à ${maxValue} ${maxLabel} ${isMaxValueLimit ? 'ou plus' : ''}`
+      if (minValue === null || +minValue === 0) {
+        return `${criteriaLabel} : jusqu'à ${maxValue} ${maxLabel}`
       }
-      if (isMaxValueLimit) {
+      if (maxValue === null) {
         return `${criteriaLabel} : à partir de ${minValue} ${minLabel}`
       }
-      return `${criteriaLabel} : entre ${minValue} ${minLabel} et ${maxValue} ${maxLabel} ${
-        isMaxValueLimit ? 'ou plus' : ''
-      }`
+      return `${criteriaLabel} : entre ${minValue} ${minLabel} et ${maxValue} ${maxLabel}`
     }
 
     let startDate = null
@@ -557,8 +554,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   _currentCriteria.age[0],
                   _currentCriteria.ageType[0].requestLabel,
                   _currentCriteria.age[1],
-                  _currentCriteria.ageType[1].requestLabel,
-                  _currentCriteria.age[1] === 130
+                  _currentCriteria.ageType[1].requestLabel
                 )}
               </Typography>
             }
@@ -573,8 +569,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                   _currentCriteria.duration[0],
                   _currentCriteria.durationType[0].requestLabel,
                   _currentCriteria.duration[1],
-                  _currentCriteria.durationType[1].requestLabel,
-                  _currentCriteria.duration[1] === 100
+                  _currentCriteria.durationType[1].requestLabel
                 )}
               </Typography>
             }

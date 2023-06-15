@@ -228,21 +228,26 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
     case RESSOURCE_TYPE_ENCOUNTER: {
       let lengthFilter = ''
       let ageFilter = ''
-      if (criterion) {
-        if (criterion.duration && (criterion.duration[0] !== 0 || criterion.duration[1] !== 100)) {
-          lengthFilter = `${ENCOUNTER_LENGTH}=ge${
-            +criterion.duration[0] * getCalendarMultiplicator(criterion.durationType[0].id)
-          }&${ENCOUNTER_LENGTH}=le${+criterion.duration[1] * getCalendarMultiplicator(criterion.durationType[1].id)}`
-        }
-        if (criterion.ageType) {
-          if (criterion.age && (criterion.age[0] !== 0 || criterion.age[1] !== 100)) {
-            ageFilter = `${ENCOUNTER_MIN_BIRTHDATE}=ge${
-              +criterion.age[0] * getCalendarMultiplicator(criterion.ageType[0].id)
-            }&${ENCOUNTER_MAX_BIRTHDATE}=le${
-              +criterion.age[1] * getCalendarMultiplicator(criterion.durationType[1].id)
-            }`
-          }
-        }
+
+      if (criterion?.duration?.[0] !== null) {
+        lengthFilter = `${ENCOUNTER_LENGTH}=ge${
+          +criterion.duration[0] * getCalendarMultiplicator(criterion.durationType[0].id)
+        }`
+      }
+      if (criterion?.duration?.[1] !== null) {
+        lengthFilter += `&${ENCOUNTER_LENGTH}=le${
+          +criterion.duration[1] * getCalendarMultiplicator(criterion.durationType[1].id)
+        }`
+      }
+      if (criterion?.age?.[0] !== null) {
+        ageFilter = `${ENCOUNTER_MIN_BIRTHDATE}=ge${
+          +criterion.age[0] * getCalendarMultiplicator(criterion.ageType[0].id)
+        }`
+      }
+      if (criterion?.age?.[1] !== null) {
+        ageFilter += `&${ENCOUNTER_MAX_BIRTHDATE}=le${
+          +criterion.age[1] * getCalendarMultiplicator(criterion.durationType[1].id)
+        }`
       }
 
       // Ignore TypeScript because we need to check if array is not empty
@@ -868,14 +873,14 @@ export async function unbuildRequest(_json: string): Promise<any> {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
 
           currentCriterion.title = 'Critère de prise en charge'
-          currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [0, 100]
+          currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [null, null]
           currentCriterion.durationType = currentCriterion.durationType
             ? currentCriterion.durationType
             : { id: Calendar.DAY, requestLabel: CalendarRequestLabel.DAY, criteriaLabel: CalendarLabel.DAY }
           currentCriterion.ageType = currentCriterion.ageType
             ? currentCriterion.ageType
             : { id: Calendar.YEAR, requestLabel: CalendarRequestLabel.YEAR, criteriaLabel: CalendarLabel.YEAR }
-          currentCriterion.age = currentCriterion.age ? currentCriterion.age : [0, 130]
+          currentCriterion.age = currentCriterion.age ? currentCriterion.age : [null, null]
           currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : []
           currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : []
           currentCriterion.exitMode = currentCriterion.exitMode ? currentCriterion.exitMode : []

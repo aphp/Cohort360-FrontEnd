@@ -36,18 +36,27 @@ type SupportedFormProps = {
   onChangeSelectedCriteria: (data: any) => void
 }
 
+enum Error {
+  EMPTY_FORM,
+  EMPTY_DURATION_ERROR,
+  EMPTY_AGE_ERROR,
+  MIN_MAX_AGE_ERROR,
+  MIN_MAX_DURATION_ERROR,
+  NO_ERROR
+}
+
 const defaultEncounter: EncounterDataType = {
   type: 'Encounter',
   title: 'Critère de prise en charge',
-  age: [0, 130],
+  age: [null, null],
   ageType: [
     { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY },
-    { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR }
+    { id: Calendar.YEAR, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
   ],
-  duration: [0, 100],
+  duration: [null, null],
   durationType: [
     { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY },
-    { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR }
+    { id: Calendar.YEAR, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
   ],
   admissionMode: [],
   entryMode: [],
@@ -75,11 +84,53 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultEncounter)
   const { classes } = useStyles()
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
+  const [error, setError] = useState(Error.NO_ERROR)
 
   const isEdition = selectedCriteria !== null ? true : false
 
+  const onCheckFormError = () => {
+    if (
+      defaultValues.age[0] === null &&
+      defaultValues.age[1] === null &&
+      defaultValues.duration[0] === null &&
+      defaultValues.duration[1] === null &&
+      defaultValues.admissionMode?.length === 0 &&
+      defaultValues.entryMode?.length === 0 &&
+      defaultValues.exitMode?.length === 0 &&
+      defaultValues.priseEnChargeType?.length === 0 &&
+      defaultValues.typeDeSejour?.length === 0 &&
+      defaultValues.fileStatus?.length === 0 &&
+      defaultValues.discharge?.length === 0 &&
+      defaultValues.reason?.length === 0 &&
+      defaultValues.destination?.length === 0 &&
+      defaultValues.provenance?.length === 0 &&
+      defaultValues.admission?.length === 0 &&
+      !defaultValues.encounterStartDate &&
+      !defaultValues.encounterEndDate
+    ) {
+      return Error.EMPTY_FORM
+    }
+    if (
+      (defaultValues.age[0] !== null || defaultValues.age[1] !== null) &&
+      ((defaultValues.age[0] < 1 && (defaultValues.age[1] < 1 || defaultValues.age[1] === null)) ||
+        (defaultValues.age[1] < 1 && (defaultValues.age[0] < 1 || defaultValues.age[0] === null)))
+    ) {
+      return Error.EMPTY_AGE_ERROR
+    }
+    if (
+      (defaultValues.duration[0] !== null || defaultValues.duration[1] !== null) &&
+      ((defaultValues.duration[0] < 1 && (defaultValues.duration[1] < 1 || defaultValues.duration[1] === null)) ||
+        (defaultValues.duration[1] < 1 && (defaultValues.duration[0] < 1 || defaultValues.duration[0] === null)))
+    ) {
+      return Error.EMPTY_DURATION_ERROR
+    }
+    return Error.NO_ERROR
+  }
+
   const _onSubmit = () => {
-    onChangeSelectedCriteria(defaultValues)
+    const errorType = onCheckFormError()
+    setError(errorType)
+    if (errorType === Error.NO_ERROR) onChangeSelectedCriteria(defaultValues)
   }
 
   const _onChangeValue = (key: string, value: any) => {
@@ -90,6 +141,10 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
 
   const _onSubmitExecutiveUnits = (_selectedExecutiveUnits: ScopeTreeRow[] | undefined) => {
     _onChangeValue('encounterService', _selectedExecutiveUnits)
+  }
+
+  const allowOnlyPositiveIntegers = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (Number.isNaN(+event.key) && event.key !== 'Backspace') event.preventDefault()
   }
 
   if (
@@ -107,7 +162,6 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
   ) {
     return <></>
   }
-
   return (
     <Grid className={classes.root}>
       <Grid className={classes.actionContainer}>
@@ -125,7 +179,19 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {!multiFields && (
+        {error === Error.EMPTY_DURATION_ERROR && (
+          <Alert severity="error">
+            Merci de renseigner au moins une <b>Durée de prise en charge</b> avec une valeur supérieure à zéro.
+          </Alert>
+        )}
+        {error === Error.EMPTY_AGE_ERROR && (
+          <Alert severity="error">
+            {' '}
+            Merci de renseigner au moins un <b>Âge de prise en charge</b> avec une valeur supérieure à zéro.
+          </Alert>
+        )}
+        {error === Error.EMPTY_FORM && <Alert severity="error">Merci de renseigner un champ</Alert>}
+        {error === Error.NO_ERROR && !multiFields && (
           <Alert
             severity="info"
             onClose={() => {
@@ -136,7 +202,6 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
             Tous les éléments des champs multiples sont liés par une contrainte OU
           </Alert>
         )}
-
         <Grid className={classes.inputContainer} container>
           <Typography className={classes.categoryTitle} variant="h6">
             Prise en charge
@@ -202,25 +267,22 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                   </Grid>
                   <Grid item xs={2} container direction="column" justifyContent="flex-end">
                     <TextField
-                      value={defaultValues.age[0]}
+                      value={defaultValues.age[0] === null ? undefined : defaultValues.age[0]}
+                      placeholder={defaultValues.age[0] === null ? '0' : undefined}
                       className={classes.textField}
                       variant="standard"
                       size="small"
-                      type="number"
-                      onChange={(e) =>
-                        _onChangeValue('age', [
-                          +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : defaultValues.age[0],
-                          defaultValues.age[1]
-                        ])
-                      }
-                      error={!Number.isInteger(defaultValues.age[0])}
-                      helperText={!Number.isInteger(defaultValues.age[0]) && 'Pas de valeur décimale autorisée.'}
+                      onKeyDown={(e) => allowOnlyPositiveIntegers(e)}
+                      onChange={(e) => {
+                        _onChangeValue('age', [e.target.value === '' ? null : e.target.value, defaultValues.age[1]])
+                      }}
                     />
                   </Grid>
                   <Grid item xs={7} container direction="column" justifyContent="flex-end">
                     <Autocomplete
                       id="criteria-ageType-autocomplete"
                       size="small"
+                      disabled={defaultValues.age[0] === null}
                       className={classes.inputItem}
                       options={[
                         {
@@ -251,24 +313,21 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                   </Grid>
                   <Grid item xs={2} container direction="column" justifyContent="flex-end">
                     <TextField
-                      value={defaultValues.age[1]}
+                      value={defaultValues.age[1] === null ? undefined : defaultValues.age[1]}
+                      placeholder={defaultValues.age[1] === null ? '0' : undefined}
                       className={classes.textField}
                       variant="standard"
                       size="small"
-                      type="number"
-                      onChange={(e) =>
-                        _onChangeValue('age', [
-                          defaultValues.age[0],
-                          +e.target.value >= 0 && +e.target.value <= 130 ? +e.target.value : defaultValues.age[1]
-                        ])
-                      }
-                      error={!Number.isInteger(defaultValues.age[1])}
-                      helperText={!Number.isInteger(defaultValues.age[1]) && 'Pas de valeur décimale autorisée.'}
+                      onKeyDown={(e) => allowOnlyPositiveIntegers(e)}
+                      onChange={(e) => {
+                        _onChangeValue('age', [defaultValues.age[0], e.target.value === '' ? null : e.target.value])
+                      }}
                     />
                   </Grid>
                   <Grid item xs={7} container direction="column" justifyContent="flex-end">
                     <Autocomplete
                       id="criteria-ageType-autocomplete"
+                      disabled={defaultValues.age[1] === null}
                       size="small"
                       className={classes.inputItem}
                       options={[
@@ -311,24 +370,24 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                   </Grid>
                   <Grid xs={2} container direction="column" justifyContent="flex-end">
                     <TextField
-                      value={defaultValues.duration[0]}
+                      value={defaultValues.duration[0] === null ? undefined : defaultValues.duration[0]}
+                      placeholder={defaultValues.duration[0] === null ? '0' : undefined}
                       className={classes.textField}
                       variant="standard"
                       size="small"
-                      type="number"
-                      onChange={(e) =>
+                      onKeyDown={(e) => allowOnlyPositiveIntegers(e)}
+                      onChange={(e) => {
                         _onChangeValue('duration', [
-                          +e.target.value >= 0 && +e.target.value <= 100 ? +e.target.value : +defaultValues.duration[0],
+                          e.target.value === '' ? null : e.target.value,
                           defaultValues.duration[1]
                         ])
-                      }
-                      error={!Number.isInteger(defaultValues.duration[0])}
-                      helperText={!Number.isInteger(defaultValues.duration[0]) && 'Pas de valeur décimale autorisée.'}
+                      }}
                     />
                   </Grid>
                   <Grid xs={7} container direction="column" justifyContent="flex-end">
                     <Autocomplete
                       id="criteria-ageType-autocomplete"
+                      disabled={defaultValues.duration[0] === null}
                       size="small"
                       className={classes.inputItem}
                       options={[
@@ -360,24 +419,24 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                   </Grid>
                   <Grid item xs={2} container direction="column" justifyContent="flex-end">
                     <TextField
-                      value={defaultValues.duration[1]}
+                      value={defaultValues.duration[1] === null ? undefined : defaultValues.duration[1]}
+                      placeholder={defaultValues.duration[1] === null ? '0' : undefined}
                       className={classes.textField}
                       size="small"
                       variant="standard"
-                      type="number"
-                      onChange={(e) =>
+                      onKeyDown={(e) => allowOnlyPositiveIntegers(e)}
+                      onChange={(e) => {
                         _onChangeValue('duration', [
                           defaultValues.duration[0],
-                          +e.target.value >= 0 && +e.target.value <= 100 ? +e.target.value : +defaultValues.duration[1]
+                          e.target.value === '' ? null : e.target.value
                         ])
-                      }
-                      error={!Number.isInteger(defaultValues.duration[1])}
-                      helperText={!Number.isInteger(defaultValues.duration[1]) && 'Pas de valeur décimale autorisée.'}
+                      }}
                     />
                   </Grid>
                   <Grid item xs={7} container direction="column" justifyContent="flex-end">
                     <Autocomplete
                       id="criteria-ageType-autocomplete"
+                      disabled={defaultValues.duration[1] === null}
                       size="small"
                       className={classes.inputItem}
                       options={[
@@ -418,7 +477,6 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
             onChangeValue={_onChangeValue}
           />
         </Grid>
-
         <Grid className={classes.criteriaActionContainer}>
           {!isEdition && (
             <Button onClick={goBack} variant="outlined">
