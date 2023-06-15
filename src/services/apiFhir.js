@@ -14,7 +14,7 @@ apiFhir.interceptors.request.use((config) => {
   console.log('oidcAuthState', oidcAuthState)
   const token = localStorage.getItem(ACCESS_TOKEN)
   config.headers.Authorization = `Bearer ${token}`
-  config.headers['authorizationMehtod'] = oidcAuthState === true ? 'OIDC' : 'JWT'
+  config.headers.authorizationMethod = oidcAuthState === true ? 'OIDC' : 'JWT'
   return config
 })
 
