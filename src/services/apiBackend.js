@@ -12,7 +12,7 @@ apiBackend.interceptors.request.use((config) => {
   const oidcAuthState = localStorage.getItem('oidcAuth')
   const token = localStorage.getItem(ACCESS_TOKEN)
   config.headers.Authorization = `Bearer ${token}`
-  config.headers['authorizationMehtod'] = oidcAuthState === true ? 'OIDC' : 'JWT'
+  config.headers.authorizationMethod = oidcAuthState === true ? 'OIDC' : 'JWT'
   return config
 })
 
