@@ -194,7 +194,7 @@ const Login = () => {
 
     if (authCode) {
       response = await services.practitioner.authenticateWithCode(authCode)
-      localStorage.setItem('oidcAuth', true)
+      localStorage.setItem('oidcAuth', 'true')
     } else {
       if (!username || !password) {
         setLoading(false)
@@ -202,7 +202,7 @@ const Login = () => {
       }
       if (username && password) {
         response = await services.practitioner.authenticateWithCredentials(username, password)
-        localStorage.setItem('oidcAuth', false)
+        localStorage.setItem('oidcAuth', 'false')
       }
     }
 

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ACCESS_TOKEN, BACK_API_URL } from '../constants'
+import { ACCESS_TOKEN, BACK_API_URL, BOOLEANTRUE } from '../constants'
 
 const apiBackend = axios.create({
   baseURL: BACK_API_URL,
@@ -12,7 +12,7 @@ apiBackend.interceptors.request.use((config) => {
   const oidcAuthState = localStorage.getItem('oidcAuth')
   const token = localStorage.getItem(ACCESS_TOKEN)
   config.headers.Authorization = `Bearer ${token}`
-  config.headers.authorizationMethod = oidcAuthState === true ? 'OIDC' : 'JWT'
+  config.headers.authorizationMethod = oidcAuthState === `${BOOLEANTRUE}` ? 'OIDC' : 'JWT'
   return config
 })
 
