@@ -286,7 +286,7 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
     ] // eslint-disable-line
   if (status) options = [...options, `docstatus=${status}`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
-  if (patientIdentifier) options = [...options, `patient.identifier=${patientIdentifier}`] // eslint-disable-line
+  if (patientIdentifier) options = [...options, `patient-identifier=${patientIdentifier}`] // eslint-disable-line
   if (encounter) options = [...options, `encounter=${encounter}`] // eslint-disable-line
   if (encounterIdentifier) options = [...options, `encounter-identifier=${encounterIdentifier}`] // eslint-disable-line
   if (onlyPdfAvailable) options = [...options, `is_pdf_available=${onlyPdfAvailable}`] // eslint-disable-line
