@@ -94,7 +94,7 @@ const criteriaList: CriteriaItemType[] = [
     }
   },
   {
-    id: 'Composition',
+    id: 'DocumentReference',
     title: 'Documents cliniques',
     color: '#0063AF',
     components: DocumentsForm,
