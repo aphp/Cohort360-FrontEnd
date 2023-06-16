@@ -41,7 +41,7 @@ type TestGeneratedFormProps = {
 }
 
 const defaultComposition: DocumentDataType = {
-  type: 'Composition',
+  type: 'DocumentReference',
   title: 'Critère de document',
   search: '',
   searchBy: SearchByTypes.text,

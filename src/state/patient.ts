@@ -1205,7 +1205,7 @@ function fillElementInformation<
     }
   }
 
-  if (resourceType !== 'Composition' && encounter?.documents && encounter.documents.length > 0) {
+  if (resourceType !== 'DocumentReference' && encounter?.documents && encounter.documents.length > 0) {
     newElement.documents = encounter.documents
   }
 
