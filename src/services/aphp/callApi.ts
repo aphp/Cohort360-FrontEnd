@@ -221,9 +221,9 @@ type fetchCompositionProps = {
   status?: string
   patient?: string
   encounter?: string
-  'encounter.identifier'?: string
+  'encounter-identifier'?: string
   onlyPdfAvailable?: boolean
-  'patient.identifier'?: string
+  'patient-identifier'?: string
   facet?: ('class' | 'visit-year-month-gender-facet')[]
   uniqueFacet?: 'patient'[]
   _elements?: (
@@ -262,16 +262,16 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list, facet, uniqueFacet, _elements } = args
-  const encounterIdentifier = args['encounter.identifier']
-  const patientIdentifier = args['patient.identifier']
+  const encounterIdentifier = args['encounter-identifier']
+  const patientIdentifier = args['patient-identifier']
 
   _list = _list ? _list.filter(uniq) : []
   facet = facet ? facet.filter(uniq) : []
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
 
-  // By default, all the calls to `/Composition` will have `type:not=doc-impor`, empty=false, and patient.active=true in parameter
-  let options: string[] = ['type:not=doc-impor', 'empty=false', 'patient.active=true']
+  // By default, all the calls to `/DocumentReference` will have `type:not=doc-impor`, empty=false, and patient.active=true in parameter
+  let options: string[] = ['type:not=doc-impor', 'empty=false', 'patient-active=true']
   if (_id) options = [...options, `_id=${_id}`] // eslint-disable-line
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`]
@@ -288,7 +288,7 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
   if (patientIdentifier) options = [...options, `patient.identifier=${patientIdentifier}`] // eslint-disable-line
   if (encounter) options = [...options, `encounter=${encounter}`] // eslint-disable-line
-  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
+  if (encounterIdentifier) options = [...options, `encounter-identifier=${encounterIdentifier}`] // eslint-disable-line
   if (onlyPdfAvailable) options = [...options, `is_pdf_available=${onlyPdfAvailable}`] // eslint-disable-line
   if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `date=le${maxDate}`] // eslint-disable-line
@@ -365,18 +365,18 @@ type fetchProcedureProps = {
   maxDate?: string
   _text?: string
   status?: string
-  'encounter.identifier'?: string
+  'encounter-identifier'?: string
 }
 export const fetchProcedure = async (args: fetchProcedureProps) => {
   const { size, offset, _sort, sortDirection, subject, patient, code, _text, status, minDate, maxDate } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
-  const encounterIdentifier = args['encounter.identifier']
+  const encounterIdentifier = args['encounter-identifier']
 
   _list = _list ? _list.filter(uniq) : []
 
-  // By default, all the calls to `/Procedure` will have 'patient.active=true' in parameter
-  let options: string[] = ['patient.active=true']
+  // By default, all the calls to `/Procedure` will have 'patient-active=true' in parameter
+  let options: string[] = ['patient-active=true']
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
@@ -385,7 +385,7 @@ export const fetchProcedure = async (args: fetchProcedureProps) => {
   if (code) options = [...options, `code=${code}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (status) options = [...options, `status=${status}`] // eslint-disable-line
-  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
+  if (encounterIdentifier) options = [...options, `encounter-identifier=${encounterIdentifier}`] // eslint-disable-line
   if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `date=le${maxDate}`] // eslint-disable-line
 
@@ -413,19 +413,19 @@ type fetchClaimProps = {
   maxCreated?: string
   _text?: string
   status?: string
-  'encounter.identifier'?: string
+  'encounter-identifier'?: string
 }
 export const fetchClaim = async (args: fetchClaimProps) => {
   const { size, offset, _sort, sortDirection, subject, patient, diagnosis, _text, status, minCreated, maxCreated } =
     args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
-  const encounterIdentifier = args['encounter.identifier']
+  const encounterIdentifier = args['encounter-identifier']
 
   _list = _list ? _list.filter(uniq) : []
 
-  // By default, all the calls to `/Claim` will have 'patient.active=true' in parameter
-  let options: string[] = ['patient.active=true']
+  // By default, all the calls to `/Claim` will have 'patient-active=true' in parameter
+  let options: string[] = ['patient-active=true']
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
@@ -434,7 +434,7 @@ export const fetchClaim = async (args: fetchClaimProps) => {
   if (diagnosis) options = [...options, `diagnosis=${diagnosis}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (status) options = [...options, `status=${status}`] // eslint-disable-line
-  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
+  if (encounterIdentifier) options = [...options, `encounter-identifier=${encounterIdentifier}`] // eslint-disable-line
   if (minCreated) options = [...options, `created=ge${minCreated}`] // eslint-disable-line
   if (maxCreated) options = [...options, `created=le${maxCreated}`] // eslint-disable-line
 
@@ -464,21 +464,21 @@ type fetchConditionProps = {
   status?: string
   'min-recorded-date'?: string
   'max-recorded-date'?: string
-  'encounter.identifier'?: string
+  'encounter-identifier'?: string
 }
 export const fetchCondition = async (args: fetchConditionProps) => {
   const { size, offset, _sort, sortDirection, subject, patient, code, _text, status } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list, type } = args
-  const encounterIdentifier = args['encounter.identifier']
+  const encounterIdentifier = args['encounter-identifier']
   const minRecordedDate = args['min-recorded-date']
   const maxRecordedDate = args['max-recorded-date']
 
   _list = _list ? _list.filter(uniq) : []
   type = type ? type.filter(uniq) : []
 
-  // By default, all the calls to `/Condition` will have 'patient.active=true' in parameter
-  let options: string[] = ['patient.active=true']
+  // By default, all the calls to `/Condition` will have 'patient-active=true' in parameter
+  let options: string[] = ['patient-active=true']
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
@@ -487,7 +487,7 @@ export const fetchCondition = async (args: fetchConditionProps) => {
   if (code) options = [...options, `code=${code}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (status) options = [...options, `status=${status}`] // eslint-disable-line
-  if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
+  if (encounterIdentifier) options = [...options, `encounter-identifier=${encounterIdentifier}`] // eslint-disable-line
   if (minRecordedDate) options = [...options, `recorded-date=ge${minRecordedDate}`] // eslint-disable-line
   if (maxRecordedDate) options = [...options, `recorded-date=le${maxRecordedDate}`] // eslint-disable-line
 
@@ -538,14 +538,14 @@ export const fetchObservation = async (args: fetchObservationProps) => {
 
   _list = _list ? _list.filter(uniq) : []
 
-  // By default, all the calls to `/Observation` will have 'value-quantity-value=ge0,le0' and 'patient.active=true' in the parameters
-  let options: string[] = ['value-quantity-value=ge0,le0', 'patient.active=true']
+  // By default, all the calls to `/Observation` will have 'value-quantity-value=ge0,le0' and 'patient-active=true' in the parameters
+  let options: string[] = ['value-quantity-value=ge0,le0', 'patient-active=true']
   if (id) options = [...options, `id=${id}`] // eslint-disable-line
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort},id`}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (encounter) options = [...options, `encounter.identifier=${encounter}`] // eslint-disable-line
+  if (encounter) options = [...options, `encounter-identifier=${encounter}`] // eslint-disable-line
   if (anabio || loinc) options = [...options, `code=${anabio ? `${anabio},` : ''}${loinc}`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
   if (type) options = [...options, `type=${type}`] // eslint-disable-line
@@ -581,14 +581,14 @@ export const fetchMedicationRequest = async (args: fetchMedicationRequestProps) 
 
   _list = _list ? _list.filter(uniq) : []
 
-  // By default, all the calls to `/MedicationRequest` will have 'patient.active=true' in parameter
-  let options: string[] = ['patient.active=true']
+  // By default, all the calls to `/MedicationRequest` will have 'patient-active=true' in parameter
+  let options: string[] = ['patient-active=true']
   if (id) options = [...options, `id=${id}`] // eslint-disable-line
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
-  if (encounter) options = [...options, `encounter.identifier=${encounter}`] // eslint-disable-line
+  if (encounter) options = [...options, `encounter-identifier=${encounter}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (type) options = [...options, `type=${type}`] // eslint-disable-line
   if (minDate) options = [...options, `Period-start=ge${minDate}`] // eslint-disable-line
@@ -624,14 +624,14 @@ export const fetchMedicationAdministration = async (args: fetchMedicationAdminis
 
   _list = _list ? _list.filter(uniq) : []
 
-  // By default, all the calls to `/MedicationAdministration` will have 'patient.active=true' in parameter
-  let options: string[] = ['patient.active=true']
+  // By default, all the calls to `/MedicationAdministration` will have 'patient-active=true' in parameter
+  let options: string[] = ['patient-active=true']
   if (id) options = [...options, `id=${id}`] // eslint-disable-line
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
-  if (encounter) options = [...options, `encounter.identifier=${encounter}`] // eslint-disable-line
+  if (encounter) options = [...options, `encounter-identifier=${encounter}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (route) options = [...options, `route=${route}`] // eslint-disable-line
   if (minDate) options = [...options, `Period-start=ge${minDate}`] // eslint-disable-line

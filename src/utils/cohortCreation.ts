@@ -51,7 +51,7 @@ const CONDITION_CODE = 'codeList' // ok
 const CONDITION_CODE_ALL_HIERARCHY = 'code'
 const CONDITION_TYPE = 'type' // ok
 
-const RESSOURCE_TYPE_COMPOSITION: 'Composition' = 'Composition'
+const RESSOURCE_TYPE_COMPOSITION: 'DocumentReference' = 'DocumentReference'
 const COMPOSITION_TEXT = '_text' // ok
 const COMPOSITION_TITLE = 'description' // ok
 const COMPOSITION_TYPE = 'type' // ok
@@ -68,7 +68,7 @@ const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
 const OBSERVATION_CODE = 'part-of'
 const OBSERVATION_CODE_ALL_HIERARCHY = 'code'
 const OBSERVATION_VALUE = 'value-quantity-value'
-const ENCOUNTER_SERVICE_PROVIDER = 'encounter.service-provider'
+const ENCOUNTER_SERVICE_PROVIDER = 'encounter-service-provider'
 const SERVICE_PROVIDER = 'service-provider'
 
 export const UNITE_EXECUTRICE = 'Unité exécutrice'
@@ -349,7 +349,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
     case RESSOURCE_TYPE_COMPOSITION: {
       const unreducedFilterFhir = [
-        `status=final&type:not=doc-impor&empty=false&patient.active=true`,
+        `status=final&type:not=doc-impor&empty=false&patient-active=true`,
         `${
           criterion.search
             ? `${criterion.searchBy === SearchByTypes.text ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
@@ -377,7 +377,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
     case RESSOURCE_TYPE_CONDITION: {
       const unreducedFilterFhir = [
-        'patient.active=true',
+        'patient-active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -407,7 +407,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
     case RESSOURCE_TYPE_PROCEDURE: {
       const unreducedFilterFhir = [
-        'patient.active=true',
+        'patient-active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -432,7 +432,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
     case RESSOURCE_TYPE_CLAIM: {
       const unreducedFilterFhir = [
-        'patient.active=true',
+        'patient-active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -456,7 +456,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
     case RESSOURCE_TYPE_MEDICATION_REQUEST:
     case RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: {
       const unreducedFilterFhir = [
-        'patient.active=true',
+        'patient-active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -521,7 +521,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       }
 
       const unreducedFilterFhir = [
-        'patient.active=true',
+        'patient-active=true',
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -1154,7 +1154,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   : updatedEncounterServices
                 break
               }
-              case 'patient.active':
+              case 'patient-active':
               case 'status':
               case 'type:not':
               case 'empty':
@@ -1227,7 +1227,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 break
               }
 
-              case 'patient.active':
+              case 'patient-active':
                 break
 
               default:
@@ -1288,7 +1288,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
 
                 break
               }
-              case 'patient.active':
+              case 'patient-active':
                 break
               default:
                 currentCriterion.error = true
@@ -1346,7 +1346,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   : updatedEncounterServices
                 break
               }
-              case 'patient.active':
+              case 'patient-active':
                 break
               default:
                 currentCriterion.error = true
@@ -1420,7 +1420,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   : newAdministration
                 break
               }
-              case 'patient.active':
+              case 'patient-active':
                 break
               case ENCOUNTER_SERVICE_PROVIDER: {
                 if (!value) continue
@@ -1548,7 +1548,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
 
                 break
               }
-              case 'patient.active':
+              case 'patient-active':
                 break
               default:
                 currentCriterion.error = true

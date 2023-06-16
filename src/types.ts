@@ -479,7 +479,7 @@ export type DocType = {
 
 export type DocumentDataType = {
   title: string
-  type: 'Composition'
+  type: 'DocumentReference'
   search: string
   searchBy: SearchByTypes.text | SearchByTypes.description
   docType: DocType[] | null
