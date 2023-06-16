@@ -270,7 +270,7 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   uniqueFacet = uniqueFacet ? uniqueFacet.filter(uniq) : []
   _elements = _elements ? _elements.filter(uniq) : []
 
-  // By default, all the calls to `/DocumentReference` will have `type:not=doc-impor`, empty=false, and patient.active=true in parameter
+  // By default, all the calls to `/DocumentReference` will have `type:not=doc-impor`, empty=false, and patient-active=true in parameter
   let options: string[] = ['type:not=doc-impor', 'empty=false', 'patient-active=true']
   if (_id) options = [...options, `_id=${_id}`] // eslint-disable-line
   if (size !== undefined) options = [...options, `size=${size}`] // eslint-disable-line
