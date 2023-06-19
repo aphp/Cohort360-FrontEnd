@@ -21,7 +21,6 @@ const SearchPatient: React.FC<{}> = () => {
   const { search } = useParams<{ search: string }>()
 
   const [loading, setLoading] = useState(false)
-  const [showTable, setShowTable] = useState(false)
   const [patientResults, setPatientResults] = useState<Patient[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
@@ -60,7 +59,6 @@ const SearchPatient: React.FC<{}> = () => {
       if (results) {
         setPatientResults(results.patientList ?? [])
         setTotal(results.totalPatients ?? 0)
-        setShowTable(true)
       }
     }
     setLoading(false)
@@ -111,20 +109,18 @@ const SearchPatient: React.FC<{}> = () => {
             />
           </Grid>
 
-          {!loading && showTable && (
-            <DataTablePatient
-              loading={loading}
-              groupId={practitioner?.nominativeGroupsIds ? practitioner?.nominativeGroupsIds.join(',') : undefined}
-              search={searchInput}
-              deidentified={practitioner?.deidentified ?? true}
-              patientsList={patientResults ?? []}
-              order={order}
-              setOrder={setOrder}
-              page={page}
-              setPage={(newPage) => handleChangePage(newPage)}
-              total={total}
-            />
-          )}
+          <DataTablePatient
+            loading={loading}
+            groupId={practitioner?.nominativeGroupsIds ? practitioner?.nominativeGroupsIds.join(',') : undefined}
+            search={searchInput}
+            deidentified={practitioner?.deidentified ?? true}
+            patientsList={patientResults ?? []}
+            order={order}
+            setOrder={setOrder}
+            page={page}
+            setPage={(newPage) => handleChangePage(newPage)}
+            total={total}
+          />
         </Grid>
       </Grid>
     </Grid>
