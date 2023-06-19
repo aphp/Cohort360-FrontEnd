@@ -17,6 +17,7 @@ import services from 'services/aphp'
 
 import Watermark from 'assets/images/watermark_pseudo.svg'
 import { DocumentReference } from 'fhir/r4'
+import { getAuthorizationMethod } from 'services/apiFhir'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 
@@ -92,7 +93,8 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
                 url: `${FHIR_API_URL}/Binary/${documentId}`,
                 httpHeaders: {
                   Accept: 'application/pdf',
-                  Authorization: `Bearer ${localStorage.getItem('access')}`
+                  Authorization: `Bearer ${localStorage.getItem('access')}`,
+                  authorizationMethod: getAuthorizationMethod()
                 }
               }}
               onLoadSuccess={({ numPages }) => setNumPages(numPages)}

@@ -9,11 +9,15 @@ const apiFhir = axios.create({
   }
 })
 
-apiFhir.interceptors.request.use((config) => {
+export const getAuthorizationMethod = () => {
   const oidcAuthState = localStorage.getItem('oidcAuth')
+  return oidcAuthState === `${BOOLEANTRUE}` ? 'OIDC' : 'JWT'
+}
+
+apiFhir.interceptors.request.use((config) => {
   const token = localStorage.getItem(ACCESS_TOKEN)
   config.headers.Authorization = `Bearer ${token}`
-  config.headers.authorizationMethod = oidcAuthState === `${BOOLEANTRUE}` ? 'OIDC' : 'JWT'
+  config.headers.authorizationMethod = getAuthorizationMethod()
   return config
 })
 
