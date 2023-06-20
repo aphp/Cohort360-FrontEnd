@@ -118,7 +118,9 @@ const Login = () => {
   }, [])
 
   useEffect(() => {
-    if (authCode) login()
+    if (authCode) {
+      login()
+    }
   }, [authCode])
 
   const getPractitionerData = async (practitioner, lastConnection, maintenance, accessExpirations = []) => {
@@ -192,6 +194,7 @@ const Login = () => {
 
     if (authCode) {
       response = await services.practitioner.authenticateWithCode(authCode)
+      localStorage.setItem('oidcAuth', 'true')
     } else {
       if (!username || !password) {
         setLoading(false)
@@ -199,6 +202,7 @@ const Login = () => {
       }
       if (username && password) {
         response = await services.practitioner.authenticateWithCredentials(username, password)
+        localStorage.setItem('oidcAuth', 'false')
       }
     }
 

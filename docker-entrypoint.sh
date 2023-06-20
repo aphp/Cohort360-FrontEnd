@@ -10,7 +10,13 @@ sed -i "s@{DISPOSE_URL}@$DISPOSE_URL@g" /etc/nginx/conf.d/nginx.conf
 sed -i "s@{VITE_BACK_API_URL}@$VITE_BACK_API_URL@g" /app/build/assets/*.js
 sed -i "s@{VITE_REQUEST_API_URL}@$VITE_REQUEST_API_URL@g" /app/build/assets/*.js
 sed -i "s@{VITE_FHIR_API_URL}@$VITE_FHIR_API_URL@g" /app/build/assets/*.js
-sed -i "s@{VITE_CONTEXT}@$VITE_CONTEXT@g" /app/build/assets/*.js
+sed -i "s@{VITE_OIDC_PROVIDER_URL}@$VITE_OIDC_PROVIDER_URL@g" /app/build/assets/*.js
+sed -i "s@{VITE_OIDC_REDIRECT_URI}@$VITE_OIDC_REDIRECT_URI@g" /app/build/assets/*.js
+sed -i "s@{VITE_OIDC_RESPONSE_TYPE}@$VITE_OIDC_RESPONSE_TYPE@g" /app/build/assets/*.js
+sed -i "s@{VITE_OIDC_CLIENT_ID}@$VITE_OIDC_CLIENT_ID@g" /app/build/assets/*.js
+sed -i "s@{VITE_OIDC_SCOPE}@$VITE_OIDC_SCOPE@g" /app/build/assets/*.js
+sed -i "s@{VITE_OIDC_STATE}@$VITE_OIDC_STATE@g" /app/build/assets/*.js
+sed -i "s@{VITE_AUTH_API_URL}@$VITE_AUTH_API_URL@g" /app/build/assets/*.js
 sed -i "s@{VITE_VALUE_SET_URL_CLAIM_HIERARCHY}@$VITE_VALUE_SET_URL_CLAIM_HIERARCHY@g" /app/build/assets/*.js
 sed -i "s@{VITE_VALUE_SET_URL_CONDITION_HIERARCHY}@$VITE_VALUE_SET_URL_CONDITION_HIERARCHY@g" /app/build/assets/*.js
 sed -i "s@{VITE_VALUE_SET_URL_CONDITION_STATUS}@$VITE_VALUE_SET_URL_CONDITION_STATUS@g" /app/build/assets/*.js

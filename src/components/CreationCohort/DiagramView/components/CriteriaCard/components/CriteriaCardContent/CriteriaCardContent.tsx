@@ -322,7 +322,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
         break
       }
 
-      case 'Composition': {
+      case 'DocumentReference': {
         const displaySelectedDocType = (selectedDocTypes: DocType[]) => {
           let displayingSelectedDocTypes: any[] = []
           const allTypes = docTypes.docTypes.map((docType: DocType) => docType.type)

@@ -516,7 +516,7 @@ export const syncOnChangeFormValue = async (
     if (selectedTab === 'form') {
       if (
         selectedCriteria.type !== 'IPPList' &&
-        selectedCriteria.type !== 'Composition' &&
+        selectedCriteria.type !== 'DocumentReference' &&
         selectedCriteria.type !== 'Encounter' &&
         selectedCriteria.type !== 'Patient'
       ) {
