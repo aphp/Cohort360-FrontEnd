@@ -37,6 +37,7 @@ export enum DirectionLabel {
 export enum Order {
   CODE = 'code',
   RECORDED_DATE = 'recorded-date',
+  FAMILY = 'family',
   DATE = 'date',
   EFFECTIVE_DATETIME = 'effectiveDatetime',
   PERIOD_START = 'Period-start',

@@ -8,16 +8,16 @@ import DataTablePatient from 'components/DataTable/DataTablePatient'
 
 import services from 'services/aphp'
 
+import useStyles from './styles'
 import { Patient } from 'fhir/r4'
 import { _cancelPendingRequest } from 'utils/abortController'
-import { ActionTypes, SearchByTypes, searchByListPatients } from 'types/searchCriterias'
+import { SearchByTypes, searchByListPatients } from 'types/searchCriterias'
 import { BlockWrapper } from 'components/ui/Layout'
 import Searchbar from 'components/ui/Searchbar'
 import { DTTB_ResultsType as ResultsType, LoadingStatus } from 'types'
 import Select from 'components/ui/Searchbar/Select'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import { CanceledError } from 'axios'
-import useStyles from './styles'
 import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/searchCriteriasReducer'
 
 const SearchPatient: React.FC<{}> = () => {

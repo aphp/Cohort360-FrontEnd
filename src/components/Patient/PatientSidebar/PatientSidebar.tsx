@@ -46,7 +46,7 @@ import OrderDirectionFilter from 'components/Filters/OrderDirectionFilter/OrderD
 import DisplayLocked from 'components/ui/Display/DisplayLocked'
 import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/searchCriteriasReducer'
 
-type PatientSidebarTypes = {
+type PatientSidebarProps = {
   total: number
   patients?: CohortPatient[]
   openDrawer: boolean
@@ -54,13 +54,7 @@ type PatientSidebarTypes = {
   deidentifiedBoolean: boolean
 }
 
-const PatientSidebar: React.FC<PatientSidebarTypes> = ({
-  total,
-  patients,
-  openDrawer,
-  onClose,
-  deidentifiedBoolean
-}) => {
+const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBoolean }: PatientSidebarProps) => {
   const { classes } = useStyles()
   const [toggleFiltersModal, setToggleFiltersModal] = useState(false)
   const [toggleSortModal, setToggleSortModal] = useState(false)

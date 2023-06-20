@@ -1,14 +1,16 @@
 import apiFhir from '../apiFhir'
 import {
+  AccessExpiration,
+  AccessExpirationsProps,
   BiologyStatus,
   FHIR_API_Promise_Response,
   FHIR_API_Response,
   FHIR_Bundle_Promise_Response,
-  HierarchyElement
+  HierarchyElement,
+  IScope
 } from 'types'
 
 import { FHIR_Bundle_Response } from 'types'
-import { IScope, AccessExpiration, AccessExpirationsProps } from 'types'
 import { AxiosResponse } from 'axios'
 import apiBackend from '../apiBackend'
 import {
