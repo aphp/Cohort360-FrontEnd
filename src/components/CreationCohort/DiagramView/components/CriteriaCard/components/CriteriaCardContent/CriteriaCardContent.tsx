@@ -552,9 +552,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 {displayCalendarFields(
                   'Âge',
                   _currentCriteria.age[0],
-                  _currentCriteria.ageType[0].requestLabel,
+                  _currentCriteria.ageType?.[0]?.requestLabel,
                   _currentCriteria.age[1],
-                  _currentCriteria.ageType[1].requestLabel
+                  _currentCriteria.ageType?.[1]?.requestLabel
                 )}
               </Typography>
             }
@@ -567,9 +567,9 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
                 {displayCalendarFields(
                   'Prise en charge',
                   _currentCriteria.duration[0],
-                  _currentCriteria.durationType[0].requestLabel,
+                  _currentCriteria.durationType?.[0]?.requestLabel,
                   _currentCriteria.duration[1],
-                  _currentCriteria.durationType[1].requestLabel
+                  _currentCriteria.durationType?.[1]?.requestLabel
                 )}
               </Typography>
             }
