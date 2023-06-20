@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import { Button, Chip, CircularProgress, IconButton, Typography } from '@mui/material'
+import { Button, Chip, CircularProgress, Grid, IconButton, Typography } from '@mui/material'
 
 import EditIcon from '@mui/icons-material/Edit'
 import CloseIcon from '@mui/icons-material/Close'
@@ -20,17 +20,17 @@ import scopeTypes from 'data/scope_type.json'
 
 import useStyles from './styles'
 
-export type populationCardPropsType = {
+export type PopulationCardPropsType = {
   label?: string
   title?: string
   form?: CriteriaNameType
-  executiveUnits?: (ScopeTreeRow | undefined)[]
+  executiveUnits?: ScopeTreeRow[]
   isAcceptEmptySelection?: boolean
   isDeleteIcon?: boolean
-  onChangeExecutiveUnits?: (_selectedPopulations: ScopeTreeRow[] | undefined) => void
+  onChangeExecutiveUnits?: (_selectedPopulations: ScopeTreeRow[]) => void
 }
 
-const PopulationCard: React.FC<populationCardPropsType> = (props) => {
+const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
   const { label, title, form, executiveUnits, onChangeExecutiveUnits, isAcceptEmptySelection, isDeleteIcon } = props
   const { classes } = useStyles(props)
   const dispatch = useAppDispatch()
@@ -135,7 +135,7 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
           </div>
         </div>
       ) : selectionAndPopulationWithRightError?.length !== 0 || form ? (
-        <div className={classes.populationCard}>
+        <Grid container justifyContent="space-between" alignItems="center" className={classes.populationCard}>
           <div className={classes.leftDiv}>
             <Typography className={classes.typography} variant={form ? undefined : 'h6'} align="left">
               {label ?? 'Population source :'}
@@ -200,7 +200,7 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
           >
             <EditIcon />
           </IconButton>
-        </div>
+        </Grid>
       ) : (
         <div className={classes.centerContainer}>
           <Button className={classes.actionButton} onClick={() => onChangeOpenDrawer(true)}>

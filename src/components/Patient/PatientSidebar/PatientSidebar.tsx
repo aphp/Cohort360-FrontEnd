@@ -1,21 +1,50 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-
-import { CircularProgress, Divider, Drawer, Grid, IconButton, List, Pagination, Typography } from '@mui/material'
-
-import PatientSidebarHeader from './PatientSidebarHeader/PatientSidebarHeader'
-import PatientSidebarItem from './PatientSidebarItem/PatientSidebarItem'
-
-import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-
-import { getAge, substructAgeString } from 'utils/age'
-import services from 'services/aphp'
-import { CohortPatient, PatientFilters as PatientFiltersType, GenderStatus, SearchByTypes, Sort } from 'types'
-
-import useStyles from './styles'
 import moment from 'moment/moment'
 
-type PatientSidebarTypes = {
+import { Divider, Drawer, Grid, IconButton, Typography } from '@mui/material'
+import { ChevronRight, Sort } from '@mui/icons-material'
+import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
+
+import { substructAgeString } from 'utils/age'
+import { selectFiltersAsArray } from 'utils/filters'
+import { _cancelPendingRequest } from 'utils/abortController'
+import services from 'services/aphp'
+import { CohortPatient, DTTB_ResultsType as ResultsType, LoadingStatus } from 'types'
+
+import {
+  Direction,
+  FilterKeys,
+  Order,
+  OrderBy,
+  OrderByKeys,
+  SearchByTypes,
+  orderByListPatients,
+  orderByListPatientsDeidentified,
+  searchByListPatients
+} from 'types/searchCriterias'
+
+import Button from 'components/ui/Button'
+import Chip from 'components/ui/Chip'
+import { BlockWrapper } from 'components/ui/Layout'
+import Modal from 'components/ui/Modal'
+import Searchbar from 'components/ui/Searchbar'
+import SearchInput from 'components/ui/Searchbar/SearchInput'
+import Select from 'components/ui/Searchbar/Select'
+
+import { CanceledError } from 'axios'
+
+import useStyles from './styles'
+import ListPatient from 'components/DataTable/ListPatient'
+import DisplayLocked from 'components/ui/Display/DisplayLocked'
+import useSearchCriterias, { initPatientsSearchCriterias } from 'reducers/searchCriteriasReducer'
+import BirthdatesRangesFilter from 'components/Filters/BirthdatesRangesFilters'
+import GendersFilter from 'components/Filters/GendersFilter'
+import OrderByFilter from 'components/Filters/OrderByFilter'
+import OrderDirectionFilter from 'components/Filters/OrderDirectionFilter'
+import VitalStatusesFilter from 'components/Filters/VitalStatusesFilter'
+
+type PatientSidebarProps = {
   total: number
   patients?: CohortPatient[]
   openDrawer: boolean
@@ -23,177 +52,184 @@ type PatientSidebarTypes = {
   deidentifiedBoolean: boolean
 }
 
-const PatientSidebar: React.FC<PatientSidebarTypes> = ({
-  total,
-  patients,
-  openDrawer,
-  onClose,
-  deidentifiedBoolean
-}) => {
+const PatientSidebar = ({ total, patients, openDrawer, onClose, deidentifiedBoolean }: PatientSidebarProps) => {
   const { classes } = useStyles()
-  const location = useLocation()
-
-  const { search } = location
-  const params = new URLSearchParams(search)
-  const _searchInput = params.get('search')
-  const groupId = params.get('groupId')?.split(',') ?? []
-
+  const [toggleFiltersModal, setToggleFiltersModal] = useState(false)
+  const [toggleSortModal, setToggleSortModal] = useState(false)
   const [page, setPage] = useState(1)
-  const [totalPatients, setTotalPatients] = useState(total)
-  const [patientsList, setPatientsList] = useState(patients)
+  const [patientsResult, setPatientsResult] = useState<ResultsType>({ nb: 0, total })
+  const [patientsList, setPatientsList] = useState<CohortPatient[]>(patients ?? [])
+  const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
 
-  const [open, setOpen] = useState(false)
-  const [searchInput, setSearchInput] = useState(_searchInput ?? '')
-  const [searchBy, setSearchBy] = useState(SearchByTypes.text)
-  const [loadingStatus, setLoadingStatus] = useState(false)
-
-  const [filters, setFilters] = useState<PatientFiltersType>({
-    gender: [],
-    birthdatesRanges: ['', ''],
-    vitalStatus: []
-  })
-
-  const [openSort, setOpenSort] = useState(false)
-  const [sort, setSort] = useState<Sort>({
-    sortBy: 'family',
-    sortDirection: 'asc'
-  })
-
-  const [showFilterChip, setShowFilterChip] = useState(false)
-
-  const numberOfRows = 20 // Number of desired lines in the document array
-
-  const onSearchPatient = async (sort: Sort, page = 1) => {
-    setLoadingStatus(true)
-    const birthdates: [string, string] = [
-      moment(substructAgeString(filters.birthdatesRanges[0])).format('MM/DD/YYYY'),
-      moment(substructAgeString(filters.birthdatesRanges[1])).format('MM/DD/YYYY')
-    ]
-
-    const patientsResp = await services.cohorts.fetchPatientList(
-      page,
+  const [
+    {
+      orderBy,
       searchBy,
       searchInput,
-      filters.gender,
-      birthdates,
-      filters.vitalStatus,
-      sort.sortBy,
-      sort.sortDirection,
-      deidentifiedBoolean,
-      groupId.join(',')
-    )
-    setPatientsList(patientsResp?.originalPatients ?? [])
-    setTotalPatients(patientsResp?.totalPatients ?? 0)
-    setPage(page)
-    setLoadingStatus(false)
-  }
+      filters,
+      filters: { genders, birthdatesRanges, vitalStatuses }
+    },
+    { changeOrderBy, changeSearchInput, changeSearchBy, addFilters, removeFilter }
+  ] = useSearchCriterias(initPatientsSearchCriterias)
 
-  const handleChangeSearchInput = (event: { target: { value: React.SetStateAction<string> } }) => {
-    setSearchInput(event.target.value)
-  }
+  const filtersAsArray = useMemo(() => {
+    return selectFiltersAsArray({ genders, vitalStatuses, birthdatesRanges })
+  }, [genders, vitalStatuses, birthdatesRanges])
 
-  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      onSearchPatient(sort)
+  const controllerRef = useRef<AbortController | null>(null)
+
+  const location = useLocation()
+  const { search } = location
+  const groupId = new URLSearchParams(search).get('groupId') ?? ''
+
+  const fetchPatients = async () => {
+    try {
+      const includeFacets = false
+      const birthdates: [string, string] = [
+        moment(substructAgeString(filters.birthdatesRanges[0] || '')).format('MM/DD/YYYY'),
+        moment(substructAgeString(filters.birthdatesRanges[1] || '')).format('MM/DD/YYYY')
+      ]
+
+      setLoadingStatus(LoadingStatus.FETCHING)
+      const result = await services.cohorts.fetchPatientList(
+        {
+          page,
+          searchCriterias: {
+            orderBy,
+            searchInput,
+            searchBy,
+            filters: { genders, vitalStatuses, birthdatesRanges: birthdates }
+          }
+        },
+        deidentifiedBoolean ?? true,
+        groupId,
+        includeFacets,
+        controllerRef.current?.signal
+      )
+
+      if (result) {
+        const { totalPatients, originalPatients } = result
+        if (originalPatients) setPatientsList(originalPatients)
+        setPatientsResult((ps) => ({ ...ps, nb: totalPatients, label: 'patient(s)' }))
+      }
+      setLoadingStatus(LoadingStatus.SUCCESS)
+    } catch (error) {
+      if (error instanceof CanceledError) {
+        setLoadingStatus(LoadingStatus.FETCHING)
+      }
     }
-  }
-
-  const handleChangePage = (event: React.ChangeEvent<unknown>, page: number) => {
-    if (patientsList && patientsList.length < totalPatients) {
-      onSearchPatient(sort, page)
-    } else {
-      setPage(page)
-    }
-  }
-
-  const handleCloseDialog = (submit: boolean) => () => {
-    setOpen(false)
-    submit && setShowFilterChip(true)
-  }
-
-  const handleCloseSortDialog = () => {
-    setOpenSort(false)
   }
 
   useEffect(() => {
-    onSearchPatient(sort)
-  }, [filters, sort]) // eslint-disable-line
+    setLoadingStatus(LoadingStatus.IDDLE)
+    setPage(1)
+  }, [genders, vitalStatuses, birthdatesRanges, orderBy, searchBy, searchInput])
 
-  const patientsToDisplay =
-    patientsList?.length === totalPatients
-      ? patientsList.slice((page - 1) * numberOfRows, page * numberOfRows)
-      : patientsList
+  useEffect(() => {
+    setLoadingStatus(LoadingStatus.IDDLE)
+  }, [page])
+
+  useEffect(() => {
+    if (loadingStatus === LoadingStatus.IDDLE) {
+      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      fetchPatients()
+    }
+  }, [loadingStatus])
 
   return (
-    <Drawer anchor="right" classes={{ paper: classes.paper }} variant="persistent" open={openDrawer}>
+    <Drawer anchor="right" classes={{ paper: classes.paper }} open={openDrawer} onClose={onClose}>
       <div className={classes.openLeftBar}>
         <IconButton onClick={onClose}>
-          <ChevronRightIcon color="action" width="20px" />
+          <ChevronRight color="action" width="20px" />
         </IconButton>
       </div>
-      <PatientSidebarHeader
-        deidentified={deidentifiedBoolean}
-        onCloseButtonClick={onClose}
-        searchInput={searchInput}
-        onChangeSearchInput={handleChangeSearchInput}
-        onKeyDownSearchInput={onKeyDown}
-        searchBy={searchBy}
-        onChangeSelect={setSearchBy}
-        onSearchPatient={() => onSearchPatient(sort)}
-        showFilterChip={showFilterChip}
-        onClickFilterButton={() => setOpen(true)}
-        open={open}
-        onCloseFilterDialog={handleCloseDialog(false)}
-        onSubmitDialog={handleCloseDialog(true)}
-        filters={filters}
-        onChangeFilters={setFilters}
-        onClickSortButton={() => setOpenSort(true)}
-        openSort={openSort}
-        onCloseSort={handleCloseSortDialog}
-        sort={sort}
-        onChangeSort={setSort}
-      />
+      <BlockWrapper item margin={'4px'}>
+        <Searchbar wrap>
+          <Typography variant="button" style={{ marginBottom: '8px' }}>
+            Rechercher par :
+          </Typography>
+          <Grid container item justifyContent="flex-end">
+            {!deidentifiedBoolean && (
+              <Select
+                selectedValue={searchBy || SearchByTypes.TEXT}
+                label="Rechercher dans :"
+                width={'40%'}
+                items={searchByListPatients}
+                onchange={(newValue: SearchByTypes) => changeSearchBy(newValue)}
+              />
+            )}
+            {deidentifiedBoolean ? (
+              <DisplayLocked />
+            ) : (
+              <SearchInput
+                value={searchInput}
+                placeholder="Rechercher"
+                width="60%"
+                onchange={(newValue) => changeSearchInput(newValue)}
+              />
+            )}
+          </Grid>
+          <Grid container item alignItems="center" justifyContent="space-between">
+            <Button
+              width={'45%'}
+              icon={<FilterList height="15px" fill="#FFF" />}
+              onClick={() => setToggleFiltersModal(true)}
+            >
+              Filtrer
+            </Button>
+            <Modal
+              title="Filtrer les patients"
+              open={toggleFiltersModal}
+              onClose={() => setToggleFiltersModal(false)}
+              onSubmit={(newFilters) => addFilters({ ...filters, ...newFilters })}
+            >
+              <GendersFilter name={FilterKeys.GENDERS} value={genders} />
+              <VitalStatusesFilter name={FilterKeys.VITAL_STATUSES} value={vitalStatuses} />
+              <BirthdatesRangesFilter name={FilterKeys.BIRTHDATES} value={birthdatesRanges} />
+            </Modal>
+
+            <Button width={'45%'} icon={<Sort height="15px" fill="#FFF" />} onClick={() => setToggleSortModal(true)}>
+              Trier
+            </Button>
+            <Modal
+              title="Tri des patients"
+              open={toggleSortModal}
+              onClose={() => setToggleSortModal(false)}
+              width="600px"
+              onSubmit={(newOrder: OrderBy) => changeOrderBy(newOrder)}
+            >
+              <Grid container direction="row" justifyContent="space-between" alignItems="center">
+                <OrderByFilter
+                  orderByValue={orderBy.orderBy || Order.FAMILY}
+                  name={OrderByKeys.ORDER_BY}
+                  items={deidentifiedBoolean ? orderByListPatientsDeidentified : orderByListPatients}
+                />
+                <OrderDirectionFilter
+                  orderDirectionValue={orderBy.orderDirection || Direction.ASC}
+                  name={OrderByKeys.ORDER_DIRECTION}
+                />
+              </Grid>
+            </Modal>
+          </Grid>
+        </Searchbar>
+      </BlockWrapper>
+      <Grid item style={{ margin: '0 4px' }}>
+        {filtersAsArray.map((filter, index) => (
+          <Chip key={index} label={filter.label} onDelete={() => removeFilter(filter.category, filter.value)} />
+        ))}
+      </Grid>
       <Divider />
-      <List className={classes.patientList} disablePadding>
-        {loadingStatus ? (
-          <Grid container justifyContent="center" className={classes.loading}>
-            <CircularProgress />
-          </Grid>
-        ) : patientsToDisplay ? (
-          patientsToDisplay.map((patient) => (
-            <PatientSidebarItem
-              key={patient.id}
-              closeDialog={onClose}
-              firstName={deidentifiedBoolean ? 'Prénom' : patient.name?.[0].given?.[0] ?? ''}
-              lastName={deidentifiedBoolean ? 'Nom' : patient.name?.map((e) => e.family).join(' ') ?? ''}
-              age={getAge(patient)}
-              gender={patient.gender as GenderStatus}
-              deceased={patient.deceasedDateTime ?? patient.deceasedBoolean}
-              ipp={
-                deidentifiedBoolean
-                  ? `IPP chiffré: ${patient.id}`
-                  : `IPP: ${
-                      patient.identifier?.find((identifier) => identifier.type?.coding?.[0].code === 'IPP')?.value ??
-                      'inconnu'
-                    }`
-              }
-              id={patient.id}
-            />
-          ))
-        ) : (
-          <Grid container justifyContent="center">
-            <Typography variant="h6">Aucun patient à afficher</Typography>
-          </Grid>
-        )}
-      </List>
-      <Pagination
-        className={classes.pagination}
-        count={Math.ceil(totalPatients / numberOfRows)}
-        shape="circular"
-        onChange={handleChangePage}
-        page={page}
-      />
+      <Grid item xs={12}>
+        <ListPatient
+          loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
+          deidentified={deidentifiedBoolean ?? false}
+          patientsList={patientsList ?? []}
+          page={page}
+          setPage={(newPage) => setPage(newPage)}
+          total={patientsResult.nb}
+          onCloseDrawer={onClose}
+        />
+      </Grid>
     </Drawer>
   )
 }

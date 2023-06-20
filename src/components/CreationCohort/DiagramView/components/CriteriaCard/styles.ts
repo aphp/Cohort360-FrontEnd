@@ -3,10 +3,6 @@ import { Theme } from '@mui/material/styles'
 
 const useStyles = makeStyles()((theme: Theme) => ({
   criteriaItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#D1E2F4',
     borderRadius: 4,
     padding: 8,
     marginTop: 12,
@@ -23,10 +19,7 @@ const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   criteriaTitleAndChips: {
-    display: 'flex',
-    alignItems: 'center',
     width: 'calc(100% - 80px)',
-    position: 'relative',
     [theme.breakpoints.down('md')]: {
       flexWrap: 'wrap'
     }
@@ -38,6 +31,12 @@ const useStyles = makeStyles()((theme: Theme) => ({
   actionContainer: {
     display: 'flex',
     flexWrap: 'nowrap'
+  },
+  secondItem: {
+    overflow: 'hidden',
+    [theme.breakpoints.down('xl')]: {
+      order: 2
+    }
   }
 }))
 

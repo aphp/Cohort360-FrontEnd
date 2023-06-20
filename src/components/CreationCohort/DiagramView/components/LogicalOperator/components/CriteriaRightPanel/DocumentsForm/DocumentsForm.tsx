@@ -24,32 +24,27 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
-import { InputSearchDocumentSimple } from 'components/Inputs'
-
 import useStyles from './styles'
 
-import {
-  CriteriaDrawerComponentProps,
-  CriteriaName,
-  DocType,
-  DocumentDataType,
-  errorDetails,
-  SearchByTypes,
-  searchInputError
-} from 'types'
+import { CriteriaDrawerComponentProps, CriteriaName } from 'types'
 import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
 import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
+import { SearchByTypes } from 'types/searchCriterias'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
+import { SearchInputError } from 'types/error'
+import { Comparators, DocType, DocumentDataType, RessourceType } from 'types/requestCriterias'
+import Searchbar from 'components/ui/Searchbar'
+import SearchInput from 'components/ui/Searchbar/SearchInput'
 
 const defaultComposition: DocumentDataType = {
-  type: 'DocumentReference',
+  type: RessourceType.DOCUMENTS,
   title: 'Critère de document',
   search: '',
-  searchBy: SearchByTypes.text,
+  searchBy: SearchByTypes.TEXT,
   docType: [],
   occurrence: 1,
-  occurrenceComparator: '>=',
+  occurrenceComparator: Comparators.GREATER_OR_EQUAL,
   encounterEndDate: '',
   encounterStartDate: '',
   startOccurrence: '',
@@ -64,7 +59,7 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const [searchCheckingLoading, setSearchCheckingLoading] = useState(false)
-  const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
+  const [searchInputError, setSearchInputError] = useState<SearchInputError | undefined>(undefined)
   const debouncedSearchItem = useDebounce(500, defaultValues.search)
 
   const isEdition = selectedCriteria !== null ? true : false
@@ -160,7 +155,7 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
             onChangeValue={_onChangeValue}
           />
 
-          <FormControl variant="outlined" className={classes.inputItem} style={{ marginBottom: 0 }}>
+          <FormControl variant="outlined" className={classes.inputItem}>
             <InputLabel>Rechercher dans :</InputLabel>
             <Select
               value={defaultValues.searchBy}
@@ -168,49 +163,27 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               variant="outlined"
               label="Rechercher dans :"
             >
-              <MenuItem value={SearchByTypes.text}>Corps du document</MenuItem>
-              <MenuItem value={SearchByTypes.description}>Titre du document</MenuItem>
+              <MenuItem value={SearchByTypes.TEXT}>Corps du document</MenuItem>
+              <MenuItem value={SearchByTypes.DESCRIPTION}>Titre du document</MenuItem>
             </Select>
           </FormControl>
 
           <Grid className={classes.inputItem}>
-            <InputSearchDocumentSimple
-              placeholder="Recherche dans les documents"
-              defaultSearchInput={defaultValues.search}
-              setDefaultSearchInput={(newSearchInput: string) => _onChangeValue('search', newSearchInput)}
-              onSearchDocument={() => null}
-              noClearIcon
-              noSearchIcon
-              squareInput
-            />
+            <Searchbar>
+              <Grid item xs={12} className={classes.searchInput}>
+                <SearchInput
+                  value={defaultValues.search}
+                  displayHelpIcon
+                  placeholder="Rechercher dans les documents"
+                  error={searchInputError?.isError ? searchInputError : undefined}
+                  onchange={(newValue) => _onChangeValue('search', newValue)}
+                />
+              </Grid>
+            </Searchbar>
             {searchCheckingLoading && (
               <Grid container item alignItems="center" direction="column" justifyContent="center">
                 <CircularProgress />
                 <Typography>Vérification du champ de recherche en cours...</Typography>
-              </Grid>
-            )}
-            {!searchCheckingLoading && searchInputError && searchInputError.isError && (
-              <Grid className={classes.errorContainer}>
-                <Typography style={{ fontWeight: 'bold' }}>
-                  Des erreurs ont été détectées dans votre recherche :
-                </Typography>
-                {!searchInputError.errorsDetails && (
-                  <Typography>Vérifiez que le champ de recherche contient au moins une lettre.</Typography>
-                )}
-                {searchInputError.errorsDetails &&
-                  searchInputError.errorsDetails.map((detail: errorDetails, count: number) => (
-                    <Typography key={count}>
-                      {`- ${
-                        detail.errorPositions && detail.errorPositions.length > 0
-                          ? detail.errorPositions.length === 1
-                            ? `Au caractère ${detail.errorPositions[0]} : `
-                            : `Aux caractères ${detail.errorPositions.join(', ')} : `
-                          : ''
-                      }
-              ${detail.errorName ? `${detail.errorName}.` : ''}
-              ${detail.errorSolution ? `${detail.errorSolution}.` : ''}`}
-                    </Typography>
-                  ))}
               </Grid>
             )}
           </Grid>

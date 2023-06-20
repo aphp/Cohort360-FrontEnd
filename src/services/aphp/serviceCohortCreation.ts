@@ -3,7 +3,6 @@ import apiBack from '../apiBackend'
 
 import {
   DatedMeasure,
-  DocType,
   HierarchyElement,
   HierarchyElementWithSystem,
   QuerySnapshotInfo,
@@ -37,10 +36,12 @@ import {
   SHORT_COHORT_LIMIT
 } from '../../constants'
 import { fetchSingleCodeHierarchy, fetchValueSet } from './callApi'
+import { DocType } from 'types/requestCriterias'
+import { VitalStatusLabel } from 'types/searchCriterias'
 
 export interface IServiceCohortCreation {
   /**
-   * Cette fornction permet de créer une cohorte à partir d'une requete dans le requeteur
+   * Cette fonction permet de créer une cohorte à partir d'une requete dans le requeteur
    */
   createCohort: (
     requeteurJson?: string,
@@ -80,7 +81,7 @@ export interface IServiceCohortCreation {
   fetchProvenance: () => Promise<Array<HierarchyElement>>
   fetchAdmission: () => Promise<Array<HierarchyElement>>
   fetchGender: () => Promise<Array<HierarchyElement>>
-  fetchStatus: () => Promise<Array<{ id: boolean; label: string }>>
+  fetchStatus: () => Promise<Array<HierarchyElement>>
   fetchStatusDiagnostic: () => Promise<Array<HierarchyElement>>
   fetchDiagnosticTypes: () => Promise<Array<HierarchyElement>>
   fetchCim10Diagnostic: () => Promise<Array<HierarchyElement>>
@@ -245,12 +246,12 @@ const servicesCohortCreation: IServiceCohortCreation = {
   fetchStatus: async () => {
     return [
       {
-        id: false,
-        label: 'Vivant(e)'
+        id: 'false',
+        label: VitalStatusLabel.ALIVE
       },
       {
-        id: true,
-        label: 'Décédé(e)'
+        id: 'true',
+        label: VitalStatusLabel.DECEASED
       }
     ]
   },

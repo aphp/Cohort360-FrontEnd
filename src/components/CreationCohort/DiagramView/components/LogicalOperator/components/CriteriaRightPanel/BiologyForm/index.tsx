@@ -6,16 +6,16 @@ import useStyles from './styles'
 import BiologyForm from './components/Form/BiologyForm'
 import BiologyHierarchy from './components/Hierarchy/BiologyHierarchy'
 import BiologySearch from './components/BiologySearch/BiologySearch'
-import { initSyncHierarchyTableEffect, OBSERVATION, syncOnChangeFormValue } from 'utils/pmsi'
+import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { PmsiListType } from 'state/pmsi'
 import { fetchBiology } from 'state/biology'
 import { useAppDispatch, useAppSelector } from 'state'
 import { EXPLORATION } from 'utils/constants'
-
-import { Comparators, CriteriaDrawerComponentProps } from 'types'
+import { Comparators, RessourceType } from 'types/requestCriterias'
+import { CriteriaDrawerComponentProps } from 'types'
 
 export const defaultBiology = {
-  type: OBSERVATION,
+  type: RessourceType.OBSERVATION,
   title: 'Critères de biologie',
   code: [],
   isLeaf: false,
