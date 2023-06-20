@@ -1,0 +1,48 @@
+import { styled } from '@mui/material/styles'
+
+type CustomProps = {
+  width: string
+}
+
+export const StyledSearchbar = styled('div')(() => ({
+  display: 'flex',
+  flexWrap: 'wrap-reverse',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  marginTop: 20,
+  '& > div': {
+    marginBottom: 20
+  }
+}))
+
+export const SelectWrapper = styled('div')<CustomProps>(({ width }) => ({
+  width: width,
+  '.MuiFormControl-root': {
+    width: '100%',
+    height: 30
+  }
+}))
+
+export const SelectInput = styled('div')(() => ({
+  width: '100%',
+  height: 'inherit',
+  '.MuiInputBase-root': {
+    width: 'inherit',
+    height: 'inherit',
+    borderRadius: 25,
+    backgroundColor: '#FFF'
+  }
+}))
+
+export const SearchInputWrapper = styled('div')<CustomProps>(({ width }) => ({
+  width: width,
+  height: 30,
+  backgroundColor: '#FFF',
+  border: '1px solid #D0D7D8',
+  boxShadow: '0px 1px 16px #0000000A',
+  borderRadius: 25,
+  '.MuiInputBase-root': {
+    marginLeft: '5%',
+    width: '95%'
+  }
+}))

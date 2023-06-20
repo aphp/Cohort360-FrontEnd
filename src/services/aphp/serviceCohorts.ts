@@ -3,15 +3,12 @@ import moment from 'moment'
 import {
   CohortComposition,
   CohortData,
-  SearchByTypes,
-  VitalStatus,
   Back_API_Response,
   Cohort,
   AgeRepartitionType,
   GenderRepartitionType,
   searchInputError,
   errorDetails,
-  GenderStatus,
   ChartCode
 } from 'types'
 import {
@@ -44,6 +41,7 @@ import {
   Patient
 } from 'fhir/r4'
 import { CanceledError } from 'axios'
+import { SearchByTypes, VitalStatus, SearchCriterias, PatientsFilters } from 'types/searchCriterias'
 
 export interface IServiceCohorts {
   /**
@@ -92,14 +90,10 @@ export interface IServiceCohorts {
    *   - genderRepartitionMap: Données liées au graphique de la répartition par genre
    */
   fetchPatientList: (
-    page: number,
-    searchBy: SearchByTypes,
-    searchInput: string,
-    gender: GenderStatus[],
-    birthdates: [string, string],
-    vitalStatus: VitalStatus[],
-    sortBy: string,
-    sortDirection: string,
+    options: {
+      page: number
+      searchCriterias: SearchCriterias<PatientsFilters>
+    },
     deidentified: boolean,
     groupId?: string,
     includeFacets?: boolean,
@@ -332,14 +326,15 @@ const servicesCohorts: IServiceCohorts = {
   },
 
   fetchPatientList: async (
-    page,
-    searchBy,
-    searchInput,
-    gender,
-    birthdates,
-    vitalStatus,
-    sortBy,
-    sortDirection,
+    {
+      page,
+      searchCriterias: {
+        orderBy,
+        searchBy,
+        searchInput,
+        filters: { genders, birthdatesRanges, vitalStatuses }
+      }
+    },
     deidentified,
     groupId,
     includeFacets,
@@ -361,22 +356,22 @@ const servicesCohorts: IServiceCohorts = {
       }
 
       // convert birthdates into days or months depending of if it's a deidentified perimeter or not
-      const minBirthdate = Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
-      const maxBirthdate = Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
-
+      const minBirthdate = Math.abs(moment(birthdatesRanges[0]).diff(moment(), deidentified ? 'months' : 'days'))
+      const maxBirthdate = Math.abs(moment(birthdatesRanges[1]).diff(moment(), deidentified ? 'months' : 'days'))
       const patientsResp = await fetchPatient({
         size: 20,
         offset: page ? (page - 1) * 20 : 0,
-        _sort: sortBy,
-        sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+        _sort: orderBy.orderBy,
+        sortDirection: orderBy.orderDirection,
         pivotFacet: includeFacets ? ['age-month_gender', 'deceased_gender'] : [],
         _list: groupId ? [groupId] : [],
-        gender: gender.join(',') + ``,
+        gender: genders.join(',') + ``,
         searchBy,
         _text: _searchInput,
         minBirthdate: minBirthdate,
         maxBirthdate: maxBirthdate,
-        deceased: vitalStatus.length === 1 ? (vitalStatus.includes(VitalStatus.DECEASED) ? true : false) : undefined,
+        deceased:
+          vitalStatuses.length === 1 ? (vitalStatuses.includes(VitalStatus.DECEASED) ? true : false) : undefined,
         deidentified: deidentified,
         signal: signal
       })

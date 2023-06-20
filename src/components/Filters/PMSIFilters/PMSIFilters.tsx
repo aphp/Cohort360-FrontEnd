@@ -33,6 +33,7 @@ import { CriteriaName, CriteriaNameType, PMSIFilters, ScopeTreeRow } from 'types
 
 import useStyles from './styles'
 import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
+import { PMSI } from 'types/patient'
 
 type ModalPMSIFiltersProps = {
   open: boolean
@@ -41,7 +42,7 @@ type ModalPMSIFiltersProps = {
   showDiagnosticTypes: boolean
   filters: PMSIFilters
   setFilters: (filters: PMSIFilters) => void
-  pmsiType: string
+  pmsiType: PMSI
 }
 
 const mapToCriteriaName = (criteria: string): CriteriaNameType => {
