@@ -1,12 +1,9 @@
 import { makeStyles } from 'tss-react/mui'
 import { Theme } from '@mui/material/styles'
-import { populationCardPropsType } from './PopulationCard'
+import { PopulationCardPropsType } from './PopulationCard'
 
-const useStyles = makeStyles<populationCardPropsType>()((theme: Theme, params) => ({
+const useStyles = makeStyles<PopulationCardPropsType>()((theme: Theme, params) => ({
   populationCard: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     borderRadius: 4,
     backgroundColor: '#FFFFFF',
     padding: '8px 16px',
@@ -15,7 +12,6 @@ const useStyles = makeStyles<populationCardPropsType>()((theme: Theme, params) =
       borderColor: params.form ? 'rgb(21,61,138)' : ''
     },
     flex: 1,
-    margin: '12px 0',
     position: 'relative'
   },
   typography: {
@@ -37,12 +33,7 @@ const useStyles = makeStyles<populationCardPropsType>()((theme: Theme, params) =
     }
   },
   editButton: {
-    color: 'currentcolor',
-    [theme.breakpoints.down('lg')]: {
-      position: 'absolute',
-      right: 5,
-      top: 8
-    }
+    color: 'currentcolor'
   },
   chipContainer: {
     marginLeft: 12

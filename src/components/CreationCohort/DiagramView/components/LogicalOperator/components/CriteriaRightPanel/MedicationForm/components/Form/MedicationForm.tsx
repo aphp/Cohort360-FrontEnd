@@ -19,8 +19,6 @@ import {
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
-import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
-
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
@@ -28,6 +26,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchMedication } from 'state/medication'
 import { CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
+import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
 
 type MedicationFormProps = {
   isOpen: boolean
@@ -189,7 +188,8 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               />
             </RadioGroup>
           </Grid>
-          <AutocompleteAsync
+
+          <InputAutocompleteAsync
             multiple
             label="Code(s) sélectionné(s)"
             variant="outlined"

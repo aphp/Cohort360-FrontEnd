@@ -1,20 +1,21 @@
 import React from 'react'
 import moment from 'moment'
 
-import { CircularProgress, Grid, TableCell, TableRow, Typography, Chip } from '@mui/material'
-
-import { ReactComponent as FemaleIcon } from 'assets/icones/venus.svg'
-import { ReactComponent as MaleIcon } from 'assets/icones/mars.svg'
-import { ReactComponent as UnknownIcon } from 'assets/icones/autre-inconnu.svg'
+import { CircularProgress, Grid, TableCell, TableRow, Typography } from '@mui/material'
 
 import DataTable from 'components/DataTable/DataTable'
 
-import { CohortPatient, Column, Order, GenderStatus } from 'types'
+import { CohortPatient, Column } from 'types'
 
 import { getAge } from 'utils/age'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
+import { GenderStatus, Order, OrderBy } from 'types/searchCriterias'
+import { PatientTableLabels } from 'types/patient'
+import GenderIcon from 'components/ui/GenderIcon'
+import StatusChip, { ChipStyles } from 'components/ui/StatusChip'
+import { VitalStatusLabel } from 'types/requestCriterias'
 
 type DataTablePatientProps = {
   loading: boolean
@@ -22,8 +23,8 @@ type DataTablePatientProps = {
   search?: string
   deidentified: boolean
   patientsList: CohortPatient[]
-  order: Order
-  setOrder?: (order: Order) => void
+  orderBy: OrderBy
+  setOrderBy?: (order: OrderBy) => void
   page?: number
   setPage?: (page: number) => void
   total?: number
@@ -34,8 +35,8 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
   search,
   deidentified,
   patientsList,
-  order,
-  setOrder,
+  orderBy,
+  setOrderBy,
   page,
   setPage,
   total
@@ -43,20 +44,20 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
   const { classes } = useStyles()
 
   const columns: Column[] = [
-    { label: `Sexe`, code: 'gender,id', align: 'center', sortableColumn: true },
-    { label: 'Prénom', code: 'name', align: 'center', sortableColumn: !deidentified },
-    { label: 'Nom', code: 'family', align: 'left', sortableColumn: !deidentified },
+    { label: PatientTableLabels.GENDER, code: `${Order.GENDER},${Order.ID}`, align: 'center', sortableColumn: true },
+    { label: PatientTableLabels.FIRSTNAME, code: Order.FIRSTNAME, align: 'center', sortableColumn: !deidentified },
+    { label: PatientTableLabels.LASTNAME, code: Order.FAMILY, align: 'left', sortableColumn: !deidentified },
     {
-      label: !deidentified ? 'Date de naissance' : 'Âge',
-      code: 'birthdate,id',
+      label: !deidentified ? PatientTableLabels.BIRTHDATE : PatientTableLabels.AGE,
+      code: `${Order.BIRTHDATE},${Order.ID}`,
       align: 'center',
       sortableColumn: !deidentified
     },
-    { label: 'Dernier lieu de prise en charge', code: '', align: 'left', sortableColumn: false },
-    { label: 'Statut vital', code: '', align: 'left', sortableColumn: false },
+    { label: PatientTableLabels.LAST_ENCOUNTER, align: 'left', sortableColumn: false },
+    { label: PatientTableLabels.VITAL_STATUS, align: 'left', sortableColumn: false },
     {
-      label: `IPP${!deidentified ? '' : ' chiffré'}`,
-      code: 'identifier',
+      label: `${PatientTableLabels.IPP}${!deidentified ? '' : ' chiffré'}`,
+      code: Order.IPP,
       align: 'center',
       sortableColumn: !deidentified
     }
@@ -65,8 +66,8 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
   return (
     <DataTable
       columns={columns}
-      order={order}
-      setOrder={setOrder}
+      order={orderBy}
+      setOrder={setOrderBy}
       rowsPerPage={20}
       page={page}
       setPage={setPage}
@@ -106,7 +107,6 @@ const DataTablePatientLine: React.FC<{
   search?: string
 }> = ({ deidentified, patient, groupId, search }) => {
   const { classes } = useStyles()
-
   return (
     <TableRow
       key={patient.id}
@@ -120,7 +120,9 @@ const DataTablePatientLine: React.FC<{
       }
     >
       <TableCell align="center">
-        {patient.gender && <PatientGender gender={patient.gender as GenderStatus} className={classes.genderIcon} />}
+        {patient.gender && (
+          <GenderIcon gender={patient.gender.toLocaleUpperCase() as GenderStatus} className={classes.genderIcon} />
+        )}
       </TableCell>
       <TableCell>{deidentified ? 'Prénom' : capitalizeFirstLetter(patient.name?.[0].given?.[0])}</TableCell>
       <TableCell>{deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ')}</TableCell>
@@ -140,7 +142,12 @@ const DataTablePatientLine: React.FC<{
           : 'Non renseigné'}
       </TableCell>
       <TableCell align="center">
-        <StatusShip type={patient.deceasedDateTime ? 'Décédé' : 'Vivant'} />
+        <StatusChip
+          status={patient.deceasedDateTime || patient.deceasedBoolean ? ChipStyles.CANCELLED : ChipStyles.VALID}
+          label={
+            patient.deceasedDateTime || patient.deceasedBoolean ? VitalStatusLabel.DECEASED : VitalStatusLabel.ALIVE
+          }
+        />
       </TableCell>
 
       <TableCell align="center">
@@ -157,34 +164,3 @@ const DataTablePatientLine: React.FC<{
 }
 
 export default DataTablePatient
-
-type PatientGenderProps = {
-  gender?: GenderStatus
-  className?: string
-}
-
-const PatientGender: React.FC<PatientGenderProps> = ({ gender, className }) => {
-  switch (gender) {
-    case GenderStatus.MALE:
-      return <MaleIcon className={className} />
-
-    case GenderStatus.FEMALE:
-      return <FemaleIcon className={className} />
-
-    default:
-      return <UnknownIcon className={className} />
-  }
-}
-
-type StatusShipProps = {
-  type: 'Vivant' | 'Décédé'
-}
-
-const StatusShip: React.FC<StatusShipProps> = ({ type }) => {
-  const { classes } = useStyles()
-  if (type === 'Vivant') {
-    return <Chip className={classes.validChip} label={type} />
-  } else {
-    return <Chip className={classes.cancelledChip} label={type} />
-  }
-}

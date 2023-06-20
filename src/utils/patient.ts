@@ -1,4 +1,4 @@
-import { GenderStatus, VitalStatus } from 'types'
+import { GenderStatus, VitalStatus } from 'types/searchCriterias'
 
 export const genderName = (gender: GenderStatus | null): string | null => {
   switch (gender) {

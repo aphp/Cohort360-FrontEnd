@@ -16,8 +16,6 @@ import {
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
-import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
-
 import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
@@ -25,6 +23,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition } from 'state/pmsi'
 import { CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
+import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
 
 type Cim10FormProps = {
   isOpen: boolean
@@ -55,7 +54,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
     criteria?.data?.statusDiagnostic === 'loading' ||
     criteria?.data?.cim10Diagnostic === 'loading'
   ) {
-    return <> </>
+    return <></>
   }
 
   const defaultValuesCode = currentState.code
@@ -124,7 +123,6 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
 
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">Diagnostic</Typography>
-
           <TextField
             required
             className={classes.inputItem}
@@ -134,7 +132,6 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             value={currentState.title}
             onChange={(e) => onChangeValue('title', e.target.value)}
           />
-
           <Grid style={{ display: 'flex' }}>
             <FormLabel
               onClick={() => onChangeValue('isInclusive', !currentState.isInclusive)}
@@ -150,14 +147,13 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               color="secondary"
             />
           </Grid>
-
           <OccurrencesNumberInputs
             form={CriteriaName.Cim10}
             selectedCriteria={selectedCriteria}
             onChangeValue={onChangeValue}
           />
 
-          <AutocompleteAsync
+          <InputAutocompleteAsync
             multiple
             label="Code CIM10"
             variant="outlined"
@@ -170,7 +166,6 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
               onChangeValue('code', value)
             }}
           />
-
           <Autocomplete
             multiple
             id="criteria-cim10-type-autocomplete"
@@ -182,7 +177,6 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             onChange={(e, value) => onChangeValue('diagnosticType', value)}
             renderInput={(params) => <TextField {...params} label="Type de diagnostic" />}
           />
-
           <AdvancedInputs form={CriteriaName.Cim10} selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 

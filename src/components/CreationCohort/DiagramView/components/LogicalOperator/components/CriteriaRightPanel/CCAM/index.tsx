@@ -5,15 +5,16 @@ import useStyles from './styles'
 
 import CcamForm from './components/Form/CCAMForm'
 import CcamHierarchy from './components/Hierarchy/CCAMHierarchy'
-import { initSyncHierarchyTableEffect, PROCEDURE, syncOnChangeFormValue } from 'utils/pmsi'
+import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProcedure, PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
 
 import { CriteriaDrawerComponentProps } from 'types'
+import { RessourceType } from 'types/requestCriterias'
 
 export const defaultProcedure = {
-  type: PROCEDURE,
+  type: RessourceType.PROCEDURE,
   title: "Critères d'actes CCAM",
   code: [],
   occurrence: 1,

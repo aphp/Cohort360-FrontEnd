@@ -4,8 +4,6 @@ import { Alert, Button, Divider, FormLabel, Grid, IconButton, Link, Switch, Text
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
-import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
-
 import AdvancedInputs from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
@@ -13,6 +11,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProcedure } from 'state/pmsi'
 import { CriteriaName, HierarchyTree } from 'types'
 import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
+import InputAutocompleteAsync from 'components/Inputs/InputAutocompleteAsync/InputAutocompleteAsync'
 
 type CcamFormProps = {
   isOpen: boolean
@@ -130,7 +129,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             onChangeValue={onChangeValue}
           />
 
-          <AutocompleteAsync
+          <InputAutocompleteAsync
             multiple
             label="Codes d'actes CCAM"
             variant="outlined"

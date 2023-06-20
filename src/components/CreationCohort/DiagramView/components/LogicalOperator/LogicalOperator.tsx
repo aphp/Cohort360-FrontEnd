@@ -6,10 +6,10 @@ import AddIcon from '@mui/icons-material/Add'
 
 import LogicalOperatorItem from './components/LogicalOperatorItem/LogicalOperatorItem'
 import CriteriaRightPanel from './components/CriteriaRightPanel/CriteriaRightPanel'
-import CriteriaCardItem from '../CriteriaCard/CriteriaCard'
 import Avatar from 'components/ui/Avatar/Avatar'
+import CriteriaCardItem from '../CriteriaCard'
 
-import { CriteriaGroupType, SelectedCriteriaType } from 'types'
+import { CriteriaGroupType } from 'types'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import {
@@ -26,6 +26,7 @@ import {
 import { MeState } from 'state/me'
 
 import useStyles from './styles'
+import { SelectedCriteriaType } from 'types/requestCriterias'
 
 type OperatorItemProps = {
   itemId: number
@@ -95,10 +96,10 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
               return child?.id > 0 ? (
                 <CriteriaCardItem
                   key={child?.id}
+                  criterion={child as SelectedCriteriaType}
                   duplicateCriteria={duplicateCriteria}
                   deleteCriteria={deleteCriteria}
                   editCriteria={(item: SelectedCriteriaType) => editCriteria(item, itemId)}
-                  itemId={child.id}
                 />
               ) : (
                 <OperatorItem

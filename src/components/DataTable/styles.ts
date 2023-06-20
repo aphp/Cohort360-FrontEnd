@@ -35,18 +35,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
       backgroundColor: '#FFF'
     }
   },
-  validChip: {
-    fontSize: 11,
-    backgroundColor: '#5BC5F2',
-    color: '#FFF',
-    fontWeight: 'bold'
-  },
-  cancelledChip: {
-    fontSize: 11,
-    backgroundColor: '#D0D7D8',
-    color: '#FFF',
-    fontWeight: 'bold'
-  },
   emptyTableRow: {
     minHeight: `calc(100vh - 500px)`,
     height: `calc(100vh - 500px)`,
@@ -108,17 +96,6 @@ const useStyles = makeStyles()((theme: Theme) => ({
     borderBottom: '#255CA1 inset 4px',
     minHeight: 41,
     padding: '6px 12px'
-  },
-  searchBar: {
-    minWidth: 250,
-    backgroundColor: '#FFF',
-    border: '1px solid #D0D7D8',
-    boxShadow: '0px 1px 16px #0000000A',
-    borderRadius: 25
-  },
-  input: {
-    marginLeft: theme.spacing(1),
-    flex: 1
   },
   searchButton: {
     minWidth: 150,
