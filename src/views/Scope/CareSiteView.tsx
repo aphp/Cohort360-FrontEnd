@@ -38,7 +38,7 @@ const CareSiteView = () => {
       style={{ height: '100%', overflow: 'auto' }}
     >
       <Grid container justifyContent="center" alignItems="center">
-        <Grid container item xs={11} direction="column">
+        <Grid container item xs={11}>
           <Typography variant="h1" color="primary" className={classes.title}>
             Explorer un périmètre
           </Typography>

@@ -32,6 +32,7 @@ const AppNavigation = () => (
               key={index}
               path={route.path}
               element={<Layout displaySideBar={route.displaySideBar}>{route.element}</Layout>}
+              param
             />
           </Route>
         ) : (

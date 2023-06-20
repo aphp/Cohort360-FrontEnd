@@ -1,8 +1,10 @@
 import apiBack from '../apiBackend'
 
-import { ProjectType, RequestType, Cohort, CohortFilters, Sort } from 'types'
+import { ProjectType, RequestType, Cohort } from 'types'
 
 import servicesCohorts from './serviceCohorts'
+import { CohortsFilters, Direction, OrderBy } from 'types/searchCriterias'
+import { CohortsType } from 'types/cohorts'
 
 export interface IServiceProjects {
   /**
@@ -168,11 +170,12 @@ export interface IServiceProjects {
    *   - results: Liste de cohortes récupérées
    */
   fetchCohortsList: (
-    filters: CohortFilters,
+    filters: CohortsFilters,
     searchInput: string,
-    sort: Sort,
+    orderBy: OrderBy,
     limit?: number,
-    offset?: number
+    offset?: number,
+    signal?: AbortSignal
   ) => Promise<{
     count: number
     next: string | null
@@ -401,8 +404,8 @@ const servicesProjects: IServiceProjects = {
     return checkResponse.length === deletedRequests.length ? deletedRequests : []
   },
 
-  fetchCohortsList: async (filters, searchInput, sort, limit, offset) => {
-    const _sortDirection = sort.sortDirection === 'desc' ? '-' : ''
+  fetchCohortsList: async (filters, searchInput, orderBy, limit, offset, signal) => {
+    const _sortDirection = orderBy.orderDirection === Direction.DESC ? '-' : ''
     const optionsReducer = (accumulator: any, currentValue: any) =>
       accumulator ? `${accumulator}&${currentValue}` : currentValue ? currentValue : accumulator
 
@@ -412,21 +415,24 @@ const servicesProjects: IServiceProjects = {
 
     if (limit) options = [...options, `limit=${limit}`]
     if (offset) options = [...options, `offset=${offset}`]
-    if (sort) options = [...options, `ordering=${_sortDirection}${sort.sortBy}`]
+    if (orderBy) options = [...options, `ordering=${_sortDirection}${orderBy.orderBy}`]
     if (searchInput !== '') options = [...options, `search=${searchInput}`]
     if (_status.length > 0) options = [...options, `status=${_status.join()}`]
     if (minPatients) options = [...options, `min_result_size=${minPatients}`]
     if (maxPatients) options = [...options, `max_result_size=${maxPatients}`]
     if (startDate) options = [...options, `min_fhir_datetime=${startDate}`]
     if (endDate) options = [...options, `max_fhir_datetime=${endDate}`]
-    if (favorite !== 'all') options = [...options, `favorite=${favorite === 'True' ? 'true' : 'false'}`]
+    if (favorite !== CohortsType.ALL)
+      options = [...options, `favorite=${favorite === CohortsType.FAVORITE ? 'true' : 'false'}`]
 
     const { data } = (await apiBack.get<{
       count: number
       next: string | null
       previous: string | null
       results: Cohort[]
-    }>(`/cohort/cohorts/?${options.reduce(optionsReducer)}`)) ?? { data: { results: [] } }
+    }>(`/cohort/cohorts/?${options.reduce(optionsReducer)}`, {
+      signal: signal
+    })) ?? { data: { results: [] } }
 
     // Récupère les droits
     const cohortList = await servicesCohorts.fetchCohortsRights(data.results)

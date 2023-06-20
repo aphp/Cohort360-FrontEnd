@@ -4,23 +4,24 @@ import { Tabs, Tab } from '@mui/material'
 import MedicationForm from './components/Form/MedicationForm'
 import MedicationExploration from './components/Hierarchy/MedicationHierarchy'
 
-import { CriteriaDrawerComponentProps, MedicationDataType } from 'types'
+import { CriteriaDrawerComponentProps } from 'types'
 
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
-import { initSyncHierarchyTableEffect, MEDICATION_REQUEST, syncOnChangeFormValue } from 'utils/pmsi'
+import { initSyncHierarchyTableEffect, syncOnChangeFormValue } from 'utils/pmsi'
 import { fetchMedication } from 'state/medication'
 import { PmsiListType } from 'state/pmsi'
 import { EXPLORATION } from 'utils/constants'
+import { Comparators, MedicationDataType, RessourceType } from 'types/requestCriterias'
 
 export const defaultMedication: MedicationDataType = {
-  type: MEDICATION_REQUEST,
+  type: RessourceType.MEDICATION_REQUEST,
   title: 'Critère de médicament',
   code: [],
   prescriptionType: [],
   administration: [],
   occurrence: 1,
-  occurrenceComparator: '>=',
+  occurrenceComparator: Comparators.GREATER_OR_EQUAL,
   startOccurrence: '',
   endOccurrence: '',
   encounterEndDate: null,

@@ -4,18 +4,20 @@ import { CircularProgress, Grid, Typography, TableRow, TableCell } from '@mui/ma
 
 import DataTable from 'components/DataTable/DataTable'
 
-import { Column, Order, PMSIEntry } from 'types'
+import { Column, PMSIEntry } from 'types'
 
 import useStyles from './styles'
 import { Claim, Condition, Procedure } from 'fhir/r4'
+import { Order, OrderBy } from 'types/searchCriterias'
+import { PMSI } from 'types/patient'
 
 type DataTablePmsiProps = {
   loading: boolean
   deidentified: boolean
-  selectedTab: 'diagnostic' | 'ghm' | 'ccam'
+  selectedTab: PMSI
   pmsiList: PMSIEntry<Procedure | Condition | Claim>[]
-  order: Order
-  setOrder?: (order: Order) => void
+  orderBy: OrderBy
+  setOrderBy?: (order: OrderBy) => void
   page?: number
   setPage?: (page: number) => void
   total?: number
@@ -25,8 +27,8 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
   deidentified,
   selectedTab,
   pmsiList,
-  order,
-  setOrder,
+  orderBy,
+  setOrderBy,
   page,
   setPage,
   total
@@ -35,18 +37,18 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
 
   const columns = [
     { label: `NDA${deidentified ? ' chiffré' : ''}`, code: '', align: 'left', sortableColumn: false },
-    { label: 'Codage le', code: 'date', align: 'center', sortableColumn: true },
-    { label: 'Code', code: 'code', align: 'center', sortableColumn: true },
+    { label: 'Codage le', code: Order.DATE, align: 'center', sortableColumn: true },
+    { label: 'Code', code: Order.CODE, align: 'center', sortableColumn: true },
     { label: 'Libellé', code: '', align: 'center', sortableColumn: false },
-    selectedTab === 'diagnostic' ? { label: 'Type', code: '', align: 'center', sortableColumn: false } : null,
+    selectedTab === PMSI.DIAGNOSTIC ? { label: 'Type', code: '', align: 'center', sortableColumn: false } : null,
     { label: 'Unité exécutrice', code: '', align: 'center', sortableColumn: false }
   ].filter((elem) => elem !== null) as Column[]
 
   return (
     <DataTable
       columns={columns}
-      order={order}
-      setOrder={setOrder}
+      order={orderBy}
+      setOrder={setOrderBy}
       rowsPerPage={20}
       page={page}
       setPage={setPage}
@@ -63,13 +65,9 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
         <TableRow className={classes.emptyTableRow}>
           <TableCell colSpan={6} align="left">
             <Grid container justifyContent="center">
-              {loading ? (
-                <CircularProgress />
-              ) : (
-                <Typography variant="button">{`Aucun ${
-                  selectedTab !== 'diagnostic' ? (selectedTab !== 'ccam' ? 'ghm' : 'acte') : 'diagnostic'
-                } à afficher`}</Typography>
-              )}
+              <Typography variant="button">{`Aucun ${
+                selectedTab !== PMSI.DIAGNOSTIC ? (selectedTab !== PMSI.CCAM ? PMSI.GHM : 'acte') : PMSI.DIAGNOSTIC
+              } à afficher`}</Typography>
             </Grid>
           </TableCell>
         </TableRow>
@@ -79,9 +77,6 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
           <TableCell colSpan={6} align="left">
             <Grid container justifyContent="center">
               <CircularProgress />
-              <Typography variant="button">{`Aucun ${
-                selectedTab !== 'diagnostic' ? (selectedTab !== 'ccam' ? 'ghm' : 'acte') : 'diagnostic'
-              } à afficher`}</Typography>
             </Grid>
           </TableCell>
         </TableRow>
@@ -92,7 +87,7 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
 
 const DataTablePmsiLine: React.FC<{
   pmsi: PMSIEntry<Procedure | Condition | Claim>
-  selectedTab: 'diagnostic' | 'ghm' | 'ccam'
+  selectedTab: PMSI
 }> = ({ pmsi, selectedTab }) => {
   const { classes } = useStyles()
 
@@ -129,7 +124,7 @@ const DataTablePmsiLine: React.FC<{
       <TableCell align="center">
         <Typography className={classes.libelle}>{libelle}</Typography>
       </TableCell>
-      {selectedTab === 'diagnostic' && <TableCell align="center">{type}</TableCell>}
+      {selectedTab === PMSI.DIAGNOSTIC && <TableCell align="center">{type}</TableCell>}
       <TableCell align="center">{serviceProvider ?? '-'}</TableCell>
     </TableRow>
   )

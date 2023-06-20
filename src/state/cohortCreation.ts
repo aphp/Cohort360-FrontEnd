@@ -3,7 +3,6 @@ import { RootState } from 'state'
 import {
   CohortCreationCounterType,
   ScopeTreeRow,
-  SelectedCriteriaType,
   CriteriaGroupType,
   TemporalConstraintsType,
   TemporalConstraintsKind,
@@ -20,6 +19,7 @@ import { deleteProject } from './project'
 import services from 'services/aphp'
 import { SHORT_COHORT_LIMIT } from '../constants'
 import { JobStatus } from '../utils/constants'
+import { SelectedCriteriaType } from 'types/requestCriterias'
 
 export type CohortCreationState = {
   loading: boolean

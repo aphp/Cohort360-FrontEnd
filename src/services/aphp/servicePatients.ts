@@ -1,13 +1,5 @@
 import { AxiosResponse } from 'axios'
-import {
-  CohortData,
-  FHIR_Bundle_Response,
-  CohortEncounter,
-  CohortComposition,
-  SearchByTypes,
-  MedicationEntry,
-  ChartCode
-} from 'types'
+import { CohortData, FHIR_Bundle_Response, CohortEncounter, CohortComposition, MedicationEntry, ChartCode } from 'types'
 import {
   getGenderRepartitionMapAphp,
   getEncounterRepartitionMapAphp,
@@ -42,6 +34,8 @@ import {
   Patient,
   Procedure
 } from 'fhir/r4'
+import { Direction, Order, SearchByTypes } from 'types/searchCriterias'
+import { Medication, PMSI } from 'types/patient'
 
 export interface IServicePatients {
   /*
@@ -107,18 +101,18 @@ export interface IServicePatients {
   fetchPMSI: (
     page: number,
     patientId: string,
-    selectedTab: 'diagnostic' | 'ccam' | 'ghm',
+    selectedTab: PMSI,
     searchInput: string,
     nda: string,
     code: string,
     diagnosticTypes: string[],
-    sortBy: string,
-    sortDirection: string,
+    sortBy: Order,
+    sortDirection: Direction,
+    startDate: string | null,
+    endDate: string | null,
+    executiveUnits?: string[],
     groupId?: string,
-    startDate?: string | null,
-    endDate?: string | null,
-    signal?: AbortSignal,
-    executiveUnits?: string[]
+    signal?: AbortSignal
   ) => Promise<{
     pmsiData?: (Claim | Condition | Procedure)[]
     pmsiTotal?: number
@@ -164,18 +158,18 @@ export interface IServicePatients {
   fetchMedication: (
     page: number,
     patientId: string,
-    selectedTab: 'prescription' | 'administration',
-    sortBy: string,
-    sortDirection: string,
+    selectedTab: Medication,
+    sortBy: Order,
+    sortDirection: Direction,
     searchInput: string,
     nda: string,
     selectedPrescriptionTypeIds: string,
     selectedAdministrationRouteIds: string,
+    startDate: string | null,
+    endDate: string | null,
+    executiveUnits?: string[],
     groupId?: string,
-    startDate?: string,
-    endDate?: string,
-    signal?: AbortSignal,
-    executiveUnits?: string[]
+    signal?: AbortSignal
   ) => Promise<{
     medicationData?: MedicationEntry<MedicationAdministration | MedicationRequest>[]
     medicationTotal?: number
@@ -203,8 +197,8 @@ export interface IServicePatients {
    **   - biologyTotal: Nombre d'élément total par rapport au filtre indiqué
    */
   fetchObservation: (
-    sortBy: string,
-    sortDirection: string,
+    sortBy: Order,
+    sortDirection: Direction,
     page: number,
     patientId: string,
     rowStatus: boolean,
@@ -246,8 +240,8 @@ export interface IServicePatients {
    **   - docsTotal: Nombre d'élément total par rapport au filtre indiqué
    */
   fetchDocuments: (
-    sortBy: string,
-    sortDirection: string,
+    sortBy: Order,
+    sortDirection: Direction,
     searchBy: SearchByTypes,
     page: number,
     patientId: string,
@@ -263,34 +257,6 @@ export interface IServicePatients {
   ) => Promise<{
     docsList: DocumentReference[]
     docsTotal: number
-  }>
-
-  /*
-   ** Cette fonction permet de chercher un patient grâce à une barre de recherche
-   **
-   ** Argument:
-   **   - nominativeGroupsIds: permet certaine anonymisation de la donnée
-   **   - page: permet la pagination des éléments
-   **   - sortBy: permet le tri
-   **   - sortDirection: permet le tri dans l'ordre croissant ou décroissant
-   **   - input: permet la recherche d'un patient
-   **   - searchBy: permet la recherche sur un élément précis (nom, prénom ou indeterminé)
-   **
-   ** Retour:
-   **   - patientList: Liste de 20 patients liée à la recherche
-   **   - totalPatients: Nombre d'élément totale par rapport au filtre indiqué
-   */
-  searchPatient: (
-    nominativeGroupsIds: string[] | undefined,
-    page: number,
-    sortBy: string,
-    sortDirection: string,
-    input: string,
-    searchBy: SearchByTypes,
-    signal?: AbortSignal
-  ) => Promise<{
-    patientList: Patient[]
-    totalPatients: number
   }>
 
   /**
@@ -391,24 +357,24 @@ const servicesPatients: IServicePatients = {
     diagnosticTypes,
     sortBy,
     sortDirection,
-    groupId,
     startDate,
     endDate,
-    signal,
-    executiveUnits
+    executiveUnits,
+    groupId,
+    signal
   ) => {
     let pmsiResp: AxiosResponse<FHIR_Bundle_Response<Condition | Procedure | Claim>> | null = null
 
     switch (selectedTab) {
-      case 'diagnostic':
+      case PMSI.DIAGNOSTIC:
         pmsiResp = await fetchCondition({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
           _list: groupId ? [groupId] : [],
           subject: patientId,
           _text: searchInput,
-          _sort: sortBy === 'code' ? 'code' : 'recorded-date',
-          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+          _sort: sortBy === Order.CODE ? Order.CODE : Order.RECORDED_DATE,
+          sortDirection: sortDirection,
           'encounter-identifier': nda,
           code: code,
           type: diagnosticTypes,
@@ -418,15 +384,15 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case 'ccam':
+      case PMSI.CCAM:
         pmsiResp = await fetchProcedure({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
           _list: groupId ? [groupId] : [],
           subject: patientId,
           _text: searchInput,
-          _sort: sortBy === 'code' ? 'code' : 'date',
-          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+          _sort: sortBy === Order.CODE ? Order.CODE : Order.DATE,
+          sortDirection: sortDirection,
           'encounter-identifier': nda,
           code: code,
           minDate: startDate ?? '',
@@ -435,15 +401,15 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case 'ghm':
+      case PMSI.GHM:
         pmsiResp = await fetchClaim({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
           _list: groupId ? [groupId] : [],
           patient: patientId,
           _text: searchInput,
-          _sort: sortBy === 'code' ? 'diagnosis' : 'created',
-          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+          _sort: sortBy === Order.CODE ? Order.DIAGNOSIS : Order.CREATED,
+          sortDirection: sortDirection,
           'encounter-identifier': nda,
           diagnosis: code,
           minCreated: startDate ?? '',
@@ -488,8 +454,8 @@ const servicesPatients: IServicePatients = {
       size,
       _list: groupId ? [groupId] : [],
       subject: patientId,
-      _sort: 'recorded-date',
-      sortDirection: 'desc'
+      _sort: Order.RECORDED_DATE,
+      sortDirection: Direction.DESC
     })
 
     const diagnosticsData: Condition[] = getApiResponseResources(diagnosticsResp) ?? []
@@ -506,16 +472,16 @@ const servicesPatients: IServicePatients = {
     nda,
     selectedPrescriptionTypeIds,
     selectedAdministrationRouteIds,
-    groupId,
     startDate,
     endDate,
-    signal,
-    executiveUnits
+    executiveUnits,
+    groupId,
+    signal
   ) => {
     let medicationResp: AxiosResponse<FHIR_Bundle_Response<MedicationRequest | MedicationAdministration>> | null = null
 
     switch (selectedTab) {
-      case 'prescription':
+      case Medication.PRESCRIPTION:
         medicationResp = await fetchMedicationRequest({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -524,7 +490,7 @@ const servicesPatients: IServicePatients = {
           subject: patientId,
           _text: searchInput,
           _sort: sortBy,
-          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+          sortDirection,
           type: selectedPrescriptionTypeIds,
           minDate: startDate,
           maxDate: endDate,
@@ -532,7 +498,7 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case 'administration':
+      case Medication.ADMINISTRATION:
         medicationResp = await fetchMedicationAdministration({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
@@ -541,7 +507,7 @@ const servicesPatients: IServicePatients = {
           subject: patientId,
           _text: searchInput,
           _sort: sortBy,
-          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+          sortDirection,
           route: selectedAdministrationRouteIds,
           minDate: startDate,
           maxDate: endDate,
@@ -564,8 +530,8 @@ const servicesPatients: IServicePatients = {
   },
 
   fetchObservation: async (
-    sortBy: string,
-    sortDirection: string,
+    sortBy: Order,
+    sortDirection: Direction,
     page: number,
     patientId: string,
     rowStatus: boolean,
@@ -583,7 +549,7 @@ const servicesPatients: IServicePatients = {
       subject: patientId,
       _list: groupId ? [groupId] : [],
       _sort: sortBy,
-      sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+      sortDirection,
       size: 20,
       offset: page ? (page - 1) * 20 : 0,
       _text: searchInput,
@@ -606,8 +572,8 @@ const servicesPatients: IServicePatients = {
   },
 
   fetchDocuments: async (
-    sortBy: string,
-    sortDirection: string,
+    sortBy: Order,
+    sortDirection: Direction,
     searchBy: SearchByTypes,
     page: number,
     patientId: string,
@@ -628,7 +594,7 @@ const servicesPatients: IServicePatients = {
       _list: groupId ? [groupId] : [],
       searchBy: searchBy,
       _sort: sortBy,
-      sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+      sortDirection,
       size: documentLines,
       offset: page ? (page - 1) * documentLines : 0,
       status: 'final',
@@ -693,39 +659,6 @@ const servicesPatients: IServicePatients = {
     return {
       patientInfo,
       hospits
-    }
-  },
-
-  searchPatient: async (nominativeGroupsIds, page, sortBy, sortDirection, input, searchBy, signal) => {
-    let _searchInput: string | string[] = ''
-    _searchInput = input
-      .trim() // Remove space before/after search
-      .split(' ') // Split by space (= ['mot1', 'mot2' ...])
-      .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
-
-    if (searchBy === SearchByTypes.identifier) {
-      _searchInput = _searchInput.join()
-    }
-
-    const patientResp = await fetchPatient({
-      _list: nominativeGroupsIds,
-      size: 20,
-      offset: page ? (page - 1) * 20 : 0,
-      _sort: sortBy,
-      sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
-      searchBy: searchBy,
-      _text: _searchInput,
-      _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension'],
-      signal
-    })
-
-    const patientList = getApiResponseResources(patientResp)
-
-    const totalPatients = patientResp.data.resourceType === 'Bundle' ? patientResp.data.total : 0
-
-    return {
-      patientList: patientList ?? [],
-      totalPatients: totalPatients ?? 0
     }
   },
 

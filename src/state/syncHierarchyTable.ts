@@ -1,6 +1,7 @@
 import { AsyncThunk, createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { RootState } from './index'
-import { HierarchyTree, SelectedCriteriaType } from '../types'
+import { HierarchyTree } from '../types'
+import { SelectedCriteriaType } from 'types/requestCriterias'
 
 const initialState: HierarchyTree = {
   code: undefined,
