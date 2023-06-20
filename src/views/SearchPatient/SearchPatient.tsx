@@ -9,12 +9,11 @@ import DataTablePatient from 'components/DataTable/DataTablePatient'
 
 import services from 'services/aphp'
 
-import { SearchByTypes, Order } from 'types'
-
 import useStyles from './styles'
 import { Patient } from 'fhir/r4'
 import { useDebounce } from 'utils/debounce'
 import { _cancelPendingRequest } from 'utils/abortController'
+import { Direction, Order, OrderBy, SearchByTypes } from 'types/searchCriterias'
 
 const SearchPatient: React.FC<{}> = () => {
   const { classes, cx } = useStyles()
@@ -26,12 +25,12 @@ const SearchPatient: React.FC<{}> = () => {
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
 
-  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
+  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.TEXT)
   const [searchInput, setSearchInput] = useState(search ?? '')
 
-  const [order, setOrder] = useState<Order>({
-    orderBy: 'family',
-    orderDirection: 'asc'
+  const [order, setOrder] = useState<OrderBy>({
+    orderBy: Order.FAMILY,
+    orderDirection: Direction.ASC
   })
 
   const debouncedSearchInput = useDebounce(500, searchInput)
@@ -66,7 +65,7 @@ const SearchPatient: React.FC<{}> = () => {
 
   const onSearchPatient = (inputSearch?: string, searchBy?: SearchByTypes) => {
     setSearchInput(inputSearch ?? '')
-    setSearchBy(searchBy ?? SearchByTypes.text)
+    setSearchBy(searchBy ?? SearchByTypes.TEXT)
   }
 
   useEffect(() => {

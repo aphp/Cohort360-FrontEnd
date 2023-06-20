@@ -7,7 +7,6 @@ import {
   CriteriaGroupType,
   TemporalConstraintsType,
   DocType,
-  SearchByTypes,
   Calendar,
   CalendarRequestLabel,
   CalendarLabel,
@@ -23,6 +22,7 @@ import {
   MEDICATION_ATC,
   PROCEDURE_HIERARCHY
 } from '../constants'
+import { SearchByTypes } from 'types/searchCriterias'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
@@ -340,7 +340,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         `${COMPOSITION_STATUS}=final&type:not=doc-impor&contenttype='http://terminology.hl7.org/CodeSystem/v3-mediatypes|text/plain'&subject.active=true`,
         `${
           criterion.search
-            ? `${criterion.searchBy === SearchByTypes.text ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
+            ? `${criterion.searchBy === SearchByTypes.TEXT ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
                 criterion.search
               )}`
             : ''

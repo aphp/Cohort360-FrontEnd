@@ -10,13 +10,12 @@ import SortIcon from '@mui/icons-material/Sort'
 
 import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
 import SortDialog from 'components/Filters/SortDialog/SortDialog'
-import MasterChips from 'components/MasterChips/MasterChips'
-
-import { PatientFilters as PatientFiltersType, SearchByTypes, Sort } from 'types'
+import MasterChips from 'components/ui/Chips/Chips'
 
 import { buildPatientFiltersChips } from 'utils/chips'
 
 import useStyles from './styles'
+import { Filters, OrderBy, SearchByTypes } from 'types/searchCriterias'
 
 type PatientSidebarHeaderTypes = {
   showFilterChip: boolean
@@ -27,8 +26,8 @@ type PatientSidebarHeaderTypes = {
   open: boolean
   onCloseFilterDialog: () => void
   onSubmitDialog: () => void
-  filters: PatientFiltersType
-  onChangeFilters: (newFilters: PatientFiltersType) => void
+  filters: Filters
+  onChangeFilters: (newFilters: Filters) => void
   searchInput: string
   onChangeSearchInput: (event: { target: { value: React.SetStateAction<string> } }) => void
   onKeyDownSearchInput: (e: React.KeyboardEvent<HTMLTextAreaElement | HTMLInputElement>) => void
@@ -37,8 +36,8 @@ type PatientSidebarHeaderTypes = {
   onClickSortButton: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   openSort: boolean
   onCloseSort: () => void
-  sort: Sort
-  onChangeSort: (sort: Sort) => void
+  sort: OrderBy
+  onChangeSort: (sort: OrderBy) => void
 }
 const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
   const { classes } = useStyles()
@@ -84,10 +83,10 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
   }
 
   const searchByNames = [
-    { label: 'Tous les champs', code: SearchByTypes.text },
-    { label: 'Nom', code: SearchByTypes.family },
-    { label: 'Prénom', code: SearchByTypes.given },
-    { label: 'IPP', code: SearchByTypes.identifier }
+    { label: 'Tous les champs', code: SearchByTypes.TEXT },
+    { label: 'Nom', code: SearchByTypes.FAMILY },
+    { label: 'Prénom', code: SearchByTypes.GIVEN },
+    { label: 'IPP', code: SearchByTypes.IDENTIFIER }
   ]
 
   const handleDeleteChip = <S extends string, T>(filterName: S, value?: T) => {
@@ -175,7 +174,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
           onChangeSort={props.onChangeSort}
         />
       </Grid>
-      <MasterChips chips={buildPatientFiltersChips(props.filters, handleDeleteChip)} />
+      {/*<MasterChips chips={buildPatientFiltersChips(props.filters, handleDeleteChip)} />*/}
     </div>
   )
 }

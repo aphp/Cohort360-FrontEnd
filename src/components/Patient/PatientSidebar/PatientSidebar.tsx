@@ -10,10 +10,11 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 
 import { getAge, substructAgeString } from 'utils/age'
 import services from 'services/aphp'
-import { CohortPatient, PatientFilters as PatientFiltersType, GenderStatus, SearchByTypes, Sort } from 'types'
+import { CohortPatient } from 'types'
 
 import useStyles from './styles'
 import moment from 'moment/moment'
+import { Direction, GenderStatus, Order, OrderBy, PMSIFilters, SearchByTypes } from 'types/searchCriterias'
 
 type PatientSidebarTypes = {
   total: number
@@ -44,26 +45,26 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
 
   const [open, setOpen] = useState(false)
   const [searchInput, setSearchInput] = useState(_searchInput ?? '')
-  const [searchBy, setSearchBy] = useState(SearchByTypes.text)
+  const [searchBy, setSearchBy] = useState(SearchByTypes.TEXT)
   const [loadingStatus, setLoadingStatus] = useState(false)
 
-  const [filters, setFilters] = useState<PatientFiltersType>({
-    gender: [],
+  const [filters, setFilters] = useState<PMSIFilters>({
+    genders: [],
     birthdatesRanges: ['', ''],
-    vitalStatus: []
+    vitalStatuses: []
   })
 
   const [openSort, setOpenSort] = useState(false)
-  const [sort, setSort] = useState<Sort>({
-    sortBy: 'family',
-    sortDirection: 'asc'
+  const [sort, setSort] = useState<OrderBy>({
+    orderBy: Order.FAMILY,
+    orderDirection: Direction.ASC
   })
 
   const [showFilterChip, setShowFilterChip] = useState(false)
 
   const numberOfRows = 20 // Number of desired lines in the document array
 
-  const onSearchPatient = async (sort: Sort, page = 1) => {
+  const onSearchPatient = async (sort: OrderBy, page = 1) => {
     setLoadingStatus(true)
     const birthdates: [string, string] = [
       moment(substructAgeString(filters.birthdatesRanges[0])).format('MM/DD/YYYY'),
@@ -74,11 +75,11 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
       page,
       searchBy,
       searchInput,
-      filters.gender,
+      filters.genders,
       birthdates,
-      filters.vitalStatus,
-      sort.sortBy,
-      sort.sortDirection,
+      filters.vitalStatuses,
+      sort.orderBy,
+      sort.orderDirection,
       deidentifiedBoolean,
       groupId.join(',')
     )

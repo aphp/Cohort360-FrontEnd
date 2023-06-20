@@ -16,15 +16,14 @@ import {
   Typography
 } from '@mui/material'
 
-import { Sort } from 'types'
-
 import useStyles from './styles'
+import { Direction, Order, OrderBy } from 'types/searchCriterias'
 
 type SortDialogProps = {
   open: boolean
   onClose: () => void
-  sort: Sort
-  onChangeSort: (sort: Sort) => void
+  sort: OrderBy
+  onChangeSort: (sort: OrderBy) => void
 }
 
 const sortOptions = [
@@ -49,13 +48,13 @@ const SortDialog: React.FC<SortDialogProps> = ({ open, onClose, sort, onChangeSo
       <DialogContent className={classes.dialog}>
         <Grid container direction="row" justifyContent="space-between">
           <Select
-            value={_sort.sortBy as any}
+            value={_sort.orderBy as any}
             onChange={(
               event: SelectChangeEvent<{
                 name?: string | undefined
                 value: unknown
               }>
-            ) => setSort({ ..._sort, sortBy: event.target.value as string })}
+            ) => setSort({ ..._sort, orderBy: event.target.value as Order })}
             className={classes.autocomplete}
           >
             {sortOptions.map((option) => (
@@ -67,8 +66,8 @@ const SortDialog: React.FC<SortDialogProps> = ({ open, onClose, sort, onChangeSo
           <div className={classes.orderBy}>
             <Typography variant="button">Ordre :</Typography>
             <RadioGroup
-              value={_sort.sortDirection}
-              onChange={(event, value) => setSort({ ..._sort, sortDirection: value as 'asc' | 'desc' })}
+              value={_sort.orderDirection}
+              onChange={(event, value) => setSort({ ..._sort, orderDirection: value as Direction })}
               classes={{ root: classes.radioGroup }}
             >
               <FormControlLabel value="asc" control={<Radio color="secondary" />} label="Croissant" />

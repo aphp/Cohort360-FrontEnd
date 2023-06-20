@@ -7,7 +7,7 @@ import { ReactComponent as MaleIcon } from 'assets/icones/mars.svg'
 import { ReactComponent as UnknownIcon } from 'assets/icones/autre-inconnu.svg'
 
 import useStyles from './styles'
-import { GenderStatus } from 'types'
+import { GenderStatus } from 'types/searchCriterias'
 
 type GenderIconTypes = {
   gender?: GenderStatus

@@ -20,17 +20,17 @@ import scopeTypes from 'data/scope_type.json'
 
 import useStyles from './styles'
 
-export type populationCardPropsType = {
+export type PopulationCardPropsType = {
   label?: string
   title?: string
   form?: CriteriaNameType
-  executiveUnits?: (ScopeTreeRow | undefined)[]
+  executiveUnits?: ScopeTreeRow[]
   isAcceptEmptySelection?: boolean
   isDeleteIcon?: boolean
-  onChangeExecutiveUnits?: (_selectedPopulations: ScopeTreeRow[] | undefined) => void
+  onChangeExecutiveUnits?: (_selectedPopulations: ScopeTreeRow[]) => void
 }
 
-const PopulationCard: React.FC<populationCardPropsType> = (props) => {
+const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
   const { label, title, form, executiveUnits, onChangeExecutiveUnits, isAcceptEmptySelection, isDeleteIcon } = props
   const { classes } = useStyles(props)
   const dispatch = useAppDispatch()
