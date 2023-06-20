@@ -18,7 +18,7 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
 import ResearchTable from './ResearchTable/ResearchTable'
 import CohortsFilter from 'components/Filters/CohortsFilters/CohortsFilters'
-import MasterChips from 'components/MasterChips/MasterChips'
+import MasterChips from 'components/ui/Chips/Chips'
 
 import useStyles from './styles'
 import { Cohort, CohortFilters, Sort } from 'types'

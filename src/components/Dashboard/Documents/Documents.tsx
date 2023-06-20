@@ -5,18 +5,11 @@ import { Alert, Checkbox, Grid, Typography } from '@mui/material'
 import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
 import DataTableTopBar from 'components/DataTable/DataTableTopBar'
-import MasterChips from 'components/MasterChips/MasterChips'
+import MasterChips from 'components/ui/Chips/Chips'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import {
-  CohortComposition,
-  DocumentFilters,
-  Order,
-  DTTB_ResultsType as ResultsType,
-  searchInputError,
-  SearchByTypes
-} from 'types'
+import { CohortComposition, DocumentFilters, DTTB_ResultsType as ResultsType, searchInputError } from 'types'
 
 import services from 'services/aphp'
 
@@ -26,6 +19,7 @@ import docTypes from 'assets/docTypes.json'
 
 import { useDebounce } from 'utils/debounce'
 import { _cancelPendingRequest } from 'utils/abortController'
+import { Direction, Order, OrderBy, SearchByTypes } from 'types/searchCriterias'
 
 type DocumentsProps = {
   groupId?: string
@@ -42,7 +36,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
 
   const [searchInput, setSearchInput] = useState('')
   const [searchMode, setSearchMode] = useState(false)
-  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
+  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.TEXT)
 
   const [openFilter, setOpenFilter] = useState(false)
 
@@ -56,9 +50,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     executiveUnits: []
   })
 
-  const [order, setOrder] = useState<Order>({
-    orderBy: 'date',
-    orderDirection: 'desc'
+  const [order, setOrder] = useState<OrderBy>({
+    orderBy: Order.DATE,
+    orderDirection: Direction.DESC
   })
 
   const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)

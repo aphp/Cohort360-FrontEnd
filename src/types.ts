@@ -16,6 +16,7 @@ import {
   Resource
 } from 'fhir/r4'
 import { AxiosResponse } from 'axios'
+import { SearchByTypes } from 'types/searchCriterias'
 
 export enum CohortJobStatus {
   _long_pending = 'long_pending',
@@ -41,14 +42,6 @@ export enum EncounterStatusKind {
   _cancelled = 'cancelled',
   _enteredInError = 'entered-in-error',
   _unknown = 'unknown'
-}
-
-export enum GenderStatus {
-  MALE = 'male',
-  FEMALE = 'female',
-  OTHER = 'other',
-  UNKNOWN = 'unknown',
-  OTHER_UNKNOWN = 'other,unknown'
 }
 
 export enum LoadingStatus {
@@ -185,12 +178,6 @@ export type PMSIFilters = GenericFilter & {
   diagnosticTypes: { id: string; label: string }[]
 }
 
-export type PatientFilters = {
-  gender: GenderStatus[]
-  birthdatesRanges: [string, string]
-  vitalStatus: VitalStatus[]
-}
-
 export type ObservationFilters = GenericFilter & {
   loinc: string
   anabio: string
@@ -224,23 +211,9 @@ export enum Month {
   december = 'Decembre'
 }
 
-export enum SearchByTypes {
-  text = '_text',
-  family = 'family',
-  given = 'given',
-  identifier = 'identifier',
-  description = 'description'
-}
-
 export type AbstractTree<T> = T & {
   id: string
   subItems: AbstractTree<T>[]
-}
-
-export enum VitalStatus {
-  ALIVE = 'alive',
-  DECEASED = 'deceased',
-  ALL = 'all'
 }
 
 export type Column =
@@ -254,11 +227,6 @@ export type Column =
   | {
       multiple: Column[]
     }
-
-export type Order = {
-  orderBy: string
-  orderDirection: 'asc' | 'desc'
-}
 
 export type ScopeTreeRow = AbstractTree<{
   access?: string
@@ -510,7 +478,7 @@ export type DocumentDataType = {
   title: string
   type: 'DocumentReference'
   search: string
-  searchBy: SearchByTypes.text | SearchByTypes.description
+  searchBy: SearchByTypes.TEXT | SearchByTypes.DESCRIPTION
   docType: DocType[] | null
   encounterEndDate: Date | ''
   encounterStartDate: Date | ''
@@ -884,17 +852,13 @@ export type errorDetails = {
   errorSolution?: string
 }
 
-// DataTableTopBarProps
-export type DTTB_TabsType = {
-  value: any
-  onChange: (event: any, newValue?: any) => void
-  list: {
-    label: string
-    value: any
-    icon?: ReactElement
-    wrapped?: boolean
-  }[]
+export type TabType<T, TL> = {
+  label: TL
+  id: T
+  icon?: ReactElement
+  wrapped?: boolean
 }
+
 export type DTTB_ResultsType = {
   nb: number
   total: number

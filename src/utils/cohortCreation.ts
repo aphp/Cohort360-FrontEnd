@@ -7,7 +7,6 @@ import {
   CriteriaGroupType,
   TemporalConstraintsType,
   DocType,
-  SearchByTypes,
   Calendar,
   CalendarRequestLabel,
   CalendarLabel,
@@ -17,6 +16,7 @@ import {
 
 import docTypes from 'assets/docTypes.json'
 import { BIOLOGY_HIERARCHY_ITM_ANABIO, CLAIM_HIERARCHY, CONDITION_HIERARCHY, PROCEDURE_HIERARCHY } from '../constants'
+import { SearchByTypes } from 'types/searchCriterias'
 
 const REQUETEUR_VERSION = 'v1.4.0'
 
@@ -336,7 +336,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         )}&subject.active=true`,
         `${
           criterion.search
-            ? `${criterion.searchBy === SearchByTypes.text ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
+            ? `${criterion.searchBy === SearchByTypes.TEXT ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
                 criterion.search
               )}`
             : ''

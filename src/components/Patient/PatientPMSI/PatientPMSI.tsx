@@ -1,90 +1,95 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 
-import { Grid } from '@mui/material'
-
+import { CircularProgress, Grid, useMediaQuery, useTheme } from '@mui/material'
+import Chip from 'components/ui/Chips/Chip'
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import ModalPMSIFilters from 'components/Filters/PMSIFilters/PMSIFilters'
 import DataTablePmsi from 'components/DataTable/DataTablePmsi'
-import DataTableTopBar from 'components/DataTable/DataTableTopBar'
-import MasterChips from 'components/MasterChips/MasterChips'
-
-import { buildPmsiFiltersChips } from 'utils/chips'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPmsi } from 'state/patient'
 
-import { PMSIFilters, Order, LoadingStatus } from 'types'
+import { LoadingStatus, TabType } from 'types'
 
 import useStyles from './styles'
-import { useDebounce } from 'utils/debounce'
 import { _cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
-
-type PatientPMSITypes = {
-  groupId?: string
-}
-enum PMSI {
-  DIAGNOSTIC = 'diagnostic',
-  GMH = 'ghm',
-  CCAM = 'ccam'
-}
+import Searchbar from 'components/ui/Searchbar/Searchbar'
+import SearchInput from 'components/ui/Searchbar/SearchInput'
+import DisplayDigits from 'components/ui/Display/DisplayDigits'
+import Tabs from 'components/ui/Tabs/Tabs'
+import { ActionTypes, PMSIFilters } from 'types/searchCriterias'
+import Button from 'components/ui/Button/Button'
+import Modal from 'components/ui/Modal/Modal'
+import FiltersModal from 'components/Filters/FiltersModal'
+import services from 'services/aphp'
+import { mapToCriteriaName } from 'utils/mappers'
+import { PatientPMSITypes, PMSI, PMSILabel } from 'types/patient'
+import useSearchCriterias, { initPmsisSearchCriterias } from 'hooks/searchCriterias'
+import { selectFiltersAsArray } from 'utils/filters'
 
 const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   const { classes } = useStyles()
+  const theme = useTheme()
+  const isMd = useMediaQuery(theme.breakpoints.between('sm', 'lg'))
+  const isSm = useMediaQuery(theme.breakpoints.down('md'))
+  const [toggleModal, setToggleModal] = useState(false)
   const dispatch = useAppDispatch()
 
-  const [selectedTab, selectTab] = useState<PMSI>(PMSI.DIAGNOSTIC)
+  const [selectedTab, setSelectedTab] = useState<TabType<PMSI, PMSILabel>>({
+    id: PMSI.DIAGNOSTIC,
+    label: PMSILabel.DIAGNOSTIC
+  })
+  const PMSITabs: TabType<PMSI, PMSILabel>[] = [
+    { label: PMSILabel.DIAGNOSTIC, id: PMSI.DIAGNOSTIC },
+    { label: PMSILabel.CCAM, id: PMSI.CCAM },
+    { label: PMSILabel.GMH, id: PMSI.GMH }
+  ]
   const [page, setPage] = useState(1)
-  const [filters, setFilters] = useState<PMSIFilters & { searchInput: string }>({
-    searchInput: '',
-    nda: '',
-    code: '',
-    diagnosticTypes: [],
-    startDate: null,
-    endDate: null,
-    executiveUnits: []
-  })
-  const debouncedSearchValue = useDebounce(500, filters.searchInput)
-  const [order, setOrder] = useState<Order>({
-    orderBy: 'date',
-    orderDirection: 'desc'
-  })
-  const [open, setOpen] = useState(false)
+
+  const [
+    {
+      orderBy,
+      searchInput,
+      filters: { code, nda, diagnosticTypes, startDate, endDate, executiveUnits }
+    },
+    dispatchSearchCriteriasAction
+  ] = useSearchCriterias(initPmsisSearchCriterias)
+  const filtersAsArray = useMemo(() => {
+    return selectFiltersAsArray({ code, nda, diagnosticTypes, startDate, endDate, executiveUnits })
+  }, [code, nda, diagnosticTypes, startDate, endDate, executiveUnits])
+
+  const [allDiagnosticTypesList, setAllDiagnosticTypesList] = useState<string[]>([])
+  const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
 
   /* TODO => enlever l'appel de redux */
   const { patient } = useAppSelector((state) => ({
     patient: state.patient
   }))
-  const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
-
   const deidentifiedBoolean = patient?.deidentified ?? false
-  const totalPmsi = patient?.pmsi?.[selectedTab]?.count ?? 0
-  const totalAllPmsi = patient?.pmsi?.[selectedTab]?.total ?? 0
-  const patientPmsiList = patient?.pmsi?.[selectedTab]?.list || []
-
+  const searchResults = {
+    list: patient?.pmsi?.[selectedTab.id]?.list || [],
+    nb: patient?.pmsi?.[selectedTab.id]?.count ?? 0,
+    total: patient?.pmsi?.[selectedTab.id]?.total ?? 0,
+    label: selectedTab.id === PMSI.DIAGNOSTIC ? 'diagnostic(s)' : selectedTab.id === PMSI.CCAM ? PMSI.CCAM : 'ghm'
+  }
   const controllerRef = useRef<AbortController | null>(null)
 
   const _fetchPMSI = async () => {
     try {
-      const selectedDiagnosticTypesCodes = filters.diagnosticTypes.map((diagnosticType) => diagnosticType.id)
       setLoadingStatus(LoadingStatus.FETCHING)
       const response = await dispatch(
         fetchPmsi({
-          selectedTab,
-          groupId,
           options: {
+            selectedTab: selectedTab.id,
             page,
-            sort: {
-              by: order.orderBy,
-              direction: order.orderDirection
-            },
-            filters: {
-              ...filters,
-              diagnosticTypes: selectedDiagnosticTypesCodes,
-              executiveUnits: filters.executiveUnits.map((executiveUnit) => executiveUnit.id)
+            searchCriterias: {
+              orderBy,
+              searchInput,
+              filters: { code, nda, diagnosticTypes, startDate, endDate, executiveUnits }
             }
           },
+          groupId,
           signal: controllerRef.current?.signal
         })
       )
@@ -98,52 +103,22 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
       }
     }
   }
-
-  const onChangeOptions = (key: string, value: any) => {
-    setFilters((prevState) => ({
-      ...prevState,
-      [key]: value
-    }))
-  }
-
-  const handleDeleteChip = (filterName: string, value?: any) => {
-    switch (filterName) {
-      case 'nda':
-      case 'code':
-        onChangeOptions(filterName, value)
-        break
-      case 'startDate':
-      case 'endDate':
-        onChangeOptions(filterName, null)
-        break
-      case 'diagnosticTypes':
-        onChangeOptions(
-          filterName,
-          filters.diagnosticTypes.filter((item) => item.id !== value.id)
-        )
-        break
-      case 'executiveUnits':
-        onChangeOptions(
-          filterName,
-          filters.executiveUnits.filter((executiveUnit) => executiveUnit.name !== value)
-        )
-        break
+  useEffect(() => {
+    const _fetchDiagnosticTypes = async () => {
+      try {
+        const diagnosticTypes = await services.cohortCreation.fetchDiagnosticTypes()
+        setAllDiagnosticTypesList(diagnosticTypes)
+      } catch (e) {
+        /* empty */
+      }
     }
-  }
+    _fetchDiagnosticTypes()
+  }, [])
+
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
-  }, [
-    debouncedSearchValue,
-    filters.nda,
-    filters.code,
-    filters.startDate,
-    filters.endDate,
-    filters.diagnosticTypes,
-    filters.executiveUnits,
-    order.orderBy,
-    order.orderDirection
-  ])
+  }, [searchInput, nda, code, startDate, endDate, diagnosticTypes, orderBy, executiveUnits])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -158,78 +133,106 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
 
   useEffect(() => {
     setPage(1)
-    setFilters({
-      searchInput: '',
-      nda: '',
-      code: '',
-      diagnosticTypes: [],
-      startDate: null,
-      endDate: null,
-      executiveUnits: []
-    })
-    setOrder({ orderBy: 'date', orderDirection: 'desc' })
+    dispatchSearchCriteriasAction({ type: ActionTypes.REMOVE_SEARCH_CRITERIAS, payload: null })
+    setLoadingStatus(LoadingStatus.IDDLE)
   }, [selectedTab])
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
-      <DataTableTopBar
-        loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
-        tabs={{
-          list: [
-            { label: 'Diagnostics CIM10', value: PMSI.DIAGNOSTIC },
-            { label: 'Actes CCAM', value: PMSI.CCAM },
-            { label: 'GHM', value: PMSI.GMH }
-          ],
-          value: selectedTab,
-          onChange: (event: any, newTab?: any) => selectTab(newTab)
-        }}
-        results={{
-          nb: totalPmsi,
-          total: totalAllPmsi,
-          label: selectedTab === PMSI.DIAGNOSTIC ? 'diagnostic(s)' : selectedTab === PMSI.CCAM ? PMSI.CCAM : 'ghm'
-        }}
-        searchBar={{
-          type: 'simple',
-          value: filters.searchInput,
-          onSearch: (newSearchInput: string) => onChangeOptions('searchInput', newSearchInput)
-        }}
-        buttons={[
-          {
-            label: 'Filtrer',
-            icon: <FilterList height="15px" fill="#FFF" />,
-            onClick: () => setOpen(true)
-          }
-        ]}
-      />
+      <Grid item xs={12}>
+        <Searchbar>
+          <Grid container item xs={12} md={12} lg={8} xl={8} style={isSm ? { flexWrap: 'wrap-reverse' } : {}}>
+            <Grid item xs={12} md={6} lg={6} xl={6}>
+              <Tabs
+                values={PMSITabs}
+                active={selectedTab}
+                onchange={(value: TabType<PMSI, PMSILabel>) => setSelectedTab(value)}
+              />
+            </Grid>
+            <Grid
+              container
+              justifyContent={isSm ? 'flex-start' : isMd ? 'flex-end' : 'center'}
+              alignItems="center"
+              item
+              xs={12}
+              md={6}
+              lg={6}
+              xl={6}
+              style={isSm ? { marginBottom: 20 } : {}}
+            >
+              {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && (
+                <CircularProgress />
+              )}
+              {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
+                <DisplayDigits
+                  nb={searchResults.nb}
+                  total={searchResults.total}
+                  label={searchResults.label}
+                  color="#5BC5F2"
+                />
+              )}
+            </Grid>
+          </Grid>
 
-      <MasterChips chips={buildPmsiFiltersChips(filters as PMSIFilters, handleDeleteChip)} />
-
-      <DataTablePmsi
-        loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
-        selectedTab={selectedTab}
-        pmsiList={patientPmsiList}
-        deidentified={deidentifiedBoolean}
-        order={order}
-        setOrder={setOrder}
-        page={page}
-        setPage={(newPage) => setPage(newPage)}
-        total={totalPmsi}
-      />
-
-      <ModalPMSIFilters
-        open={open}
-        onClose={() => setOpen(false)}
-        deidentified={deidentifiedBoolean}
-        showDiagnosticTypes={selectedTab === PMSI.DIAGNOSTIC}
-        pmsiType={selectedTab}
-        filters={filters}
-        setFilters={(newFilters) =>
-          setFilters({
-            searchInput: filters.searchInput,
-            ...newFilters
-          })
-        }
-      />
+          <Grid container item xs={12} md={12} lg={4} xl={4} justifyContent="flex-end">
+            <SearchInput
+              value={searchInput}
+              placeholder={'Rechercher'}
+              width="70%"
+              onchange={(newValue) =>
+                dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_SEARCH_INPUT, payload: newValue })
+              }
+            />
+            <Button width={'30%'} icon={<FilterList height="15px" fill="#FFF" />} onClick={() => setToggleModal(true)}>
+              Filtrer
+            </Button>
+            {toggleModal && (
+              <Modal
+                data={{ nda, code, startDate, endDate, executiveUnits, diagnosticTypes }}
+                title="Filtrer les patients"
+                open={toggleModal}
+                width={'600px'}
+                onClose={() => setToggleModal(false)}
+                onSubmit={(newFilters: PMSIFilters) => {
+                  dispatchSearchCriteriasAction({ type: ActionTypes.ADD_FILTERS, payload: newFilters })
+                }}
+              >
+                <FiltersModal
+                  allDiagnosticTypesList={allDiagnosticTypesList}
+                  pmsiType={mapToCriteriaName(selectedTab.id)}
+                />
+              </Modal>
+            )}
+          </Grid>
+        </Searchbar>
+      </Grid>
+      <Grid item xs={12}>
+        {filtersAsArray.map((filter, index) => (
+          <Chip
+            key={index}
+            label={filter.label}
+            onDelete={() => {
+              dispatchSearchCriteriasAction({
+                type: ActionTypes.REMOVE_FILTER,
+                payload: { key: filter.category, value: filter.value }
+              })
+            }}
+          />
+        ))}
+      </Grid>
+      <Grid item xs={12}>
+        <DataTablePmsi
+          loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
+          selectedTab={selectedTab.id}
+          pmsiList={searchResults.list}
+          deidentified={deidentifiedBoolean}
+          order={orderBy}
+          setOrder={(order) => dispatchSearchCriteriasAction({ type: ActionTypes.CHANGE_ORDER_BY, payload: order })}
+          page={page}
+          setPage={(newPage) => setPage(newPage)}
+          total={searchResults.nb}
+        />
+      </Grid>
     </Grid>
   )
 }

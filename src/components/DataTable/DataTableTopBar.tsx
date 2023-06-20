@@ -23,8 +23,7 @@ import { ReactComponent as SearchIcon } from 'assets/icones/search.svg'
 import InputSearchDocumentSimple from 'components/Inputs/InputSearchDocument/components/InputSearchDocumentSimple'
 
 import {
-  SearchByTypes,
-  DTTB_TabsType as TabsType,
+  TabType,
   DTTB_ResultsType as ResultsType,
   DTTB_SearchBarType as SearchBarType,
   DTTB_ButtonType as ButtonType,
@@ -33,10 +32,11 @@ import {
 
 import displayDigit from 'utils/displayDigit'
 import useStyles from './styles'
+import { SearchByTypes } from 'types/searchCriterias'
 
 type DataTableTopBarProps = {
   loading: boolean
-  tabs?: TabsType
+  tabs?: TabType[]
   results?: ResultsType | ResultsType[]
   searchBar?: SearchBarType
   buttons?: ButtonType[]
@@ -45,7 +45,7 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
   const { classes } = useStyles()
 
   const [search, setSearch] = useState(searchBar?.value ?? '')
-  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
+  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.TEXT)
 
   const onSearch = (newInput = search) => {
     if (searchBar && searchBar.onSearch && typeof searchBar.onSearch === 'function') {
@@ -155,10 +155,10 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
                       label="Rechercher dans :"
                       style={{ height: 32 }}
                     >
-                      <MenuItem value={SearchByTypes.text}>Tous les champs</MenuItem>
-                      <MenuItem value={SearchByTypes.family}>Nom</MenuItem>
-                      <MenuItem value={SearchByTypes.given}>Prénom</MenuItem>
-                      <MenuItem value={SearchByTypes.identifier}>IPP</MenuItem>
+                      <MenuItem value={SearchByTypes.TEXT}>Tous les champs</MenuItem>
+                      <MenuItem value={SearchByTypes.FAMILY}>Nom</MenuItem>
+                      <MenuItem value={SearchByTypes.GIVEN}>Prénom</MenuItem>
+                      <MenuItem value={SearchByTypes.IDENTIFIER}>IPP</MenuItem>
                     </Select>
                   </FormControl>
                 )}
@@ -232,8 +232,8 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
                 label="Rechercher dans :"
                 style={{ height: 42 }}
               >
-                <MenuItem value={SearchByTypes.text}>Corps du document</MenuItem>
-                <MenuItem value={SearchByTypes.description}>Titre du document</MenuItem>
+                <MenuItem value={SearchByTypes.TEXT}>Corps du document</MenuItem>
+                <MenuItem value={SearchByTypes.DESCRIPTION}>Titre du document</MenuItem>
               </Select>
             </FormControl>
           )}
