@@ -5,23 +5,24 @@ import Chip from '@mui/material/Chip'
 
 import useStyles from './styles'
 
-export type MasterChipsProps = {
-  chips: {
-    label: string
-    onDelete?: () => void
+export type ChipsProps<T, TL> = {
+  value: {
+    id: T
+    label: TL
+    onDelete: (value: T) => void
   }[]
 }
-const MasterChips: React.FC<MasterChipsProps> = ({ chips }) => {
+const Chips = <T, TL>({ value }: ChipsProps<T, TL>) => {
   const { classes } = useStyles()
 
   return (
     <Grid container>
-      {chips?.length > 0 &&
-        chips.map(({ label, onDelete }, index) => (
+      {value?.length > 0 &&
+        value.map(({ label, id, onDelete }) => (
           <Chip
-            key={index}
+            key={id as string}
             className={classes.chips}
-            label={label}
+            label={label as string}
             onDelete={onDelete}
             color="primary"
             variant="outlined"
@@ -31,4 +32,4 @@ const MasterChips: React.FC<MasterChipsProps> = ({ chips }) => {
   )
 }
 
-export default MasterChips
+export default Chips

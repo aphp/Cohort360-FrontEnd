@@ -1,13 +1,5 @@
 import { AxiosResponse } from 'axios'
-import {
-  CohortData,
-  FHIR_Bundle_Response,
-  CohortEncounter,
-  CohortComposition,
-  SearchByTypes,
-  MedicationEntry,
-  ChartCode
-} from 'types'
+import { CohortData, FHIR_Bundle_Response, CohortEncounter, CohortComposition, MedicationEntry, ChartCode } from 'types'
 import {
   getGenderRepartitionMapAphp,
   getEncounterRepartitionMapAphp,
@@ -42,6 +34,8 @@ import {
   Patient,
   Procedure
 } from 'fhir/r4'
+import { Direction, Order, SearchByTypes } from 'types/searchCriterias'
+import { PMSI } from 'types/patient'
 
 export interface IServicePatients {
   /*
@@ -107,18 +101,18 @@ export interface IServicePatients {
   fetchPMSI: (
     page: number,
     patientId: string,
-    selectedTab: 'diagnostic' | 'ccam' | 'ghm',
+    selectedTab: PMSI,
     searchInput: string,
     nda: string,
     code: string,
     diagnosticTypes: string[],
-    sortBy: string,
-    sortDirection: string,
+    sortBy: Order,
+    sortDirection: Direction,
+    startDate: string | null,
+    endDate: string | null,
+    executiveUnits?: string[],
     groupId?: string,
-    startDate?: string | null,
-    endDate?: string | null,
-    signal?: AbortSignal,
-    executiveUnits?: string[]
+    signal?: AbortSignal
   ) => Promise<{
     pmsiData?: (Claim | Condition | Procedure)[]
     pmsiTotal?: number
@@ -391,24 +385,24 @@ const servicesPatients: IServicePatients = {
     diagnosticTypes,
     sortBy,
     sortDirection,
-    groupId,
     startDate,
     endDate,
-    signal,
-    executiveUnits
+    executiveUnits,
+    groupId,
+    signal
   ) => {
     let pmsiResp: AxiosResponse<FHIR_Bundle_Response<Condition | Procedure | Claim>> | null = null
 
     switch (selectedTab) {
-      case 'diagnostic':
+      case PMSI.DIAGNOSTIC:
         pmsiResp = await fetchCondition({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
           _list: groupId ? [groupId] : [],
           subject: patientId,
           _text: searchInput,
-          _sort: sortBy === 'code' ? 'code' : 'recorded-date',
-          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+          _sort: sortBy === Order.CODE ? Order.CODE : Order.RECORDED_DATE,
+          sortDirection: sortDirection,
           'encounter-identifier': nda,
           code: code,
           type: diagnosticTypes,
@@ -418,15 +412,15 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case 'ccam':
+      case PMSI.CCAM:
         pmsiResp = await fetchProcedure({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
           _list: groupId ? [groupId] : [],
           subject: patientId,
           _text: searchInput,
-          _sort: sortBy === 'code' ? 'code' : 'date',
-          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+          _sort: sortBy === Order.CODE ? Order.CODE : Order.DATE,
+          sortDirection: sortDirection,
           'encounter-identifier': nda,
           code: code,
           minDate: startDate ?? '',
@@ -435,15 +429,15 @@ const servicesPatients: IServicePatients = {
           executiveUnits
         })
         break
-      case 'ghm':
+      case PMSI.GMH:
         pmsiResp = await fetchClaim({
           offset: page ? (page - 1) * 20 : 0,
           size: 20,
           _list: groupId ? [groupId] : [],
           patient: patientId,
           _text: searchInput,
-          _sort: sortBy === 'code' ? 'diagnosis' : 'created',
-          sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+          _sort: sortBy === Order.CODE ? Order.DIAGNOSIS : Order.CREATED,
+          sortDirection: sortDirection,
           'encounter-identifier': nda,
           diagnosis: code,
           minCreated: startDate ?? '',
@@ -488,8 +482,8 @@ const servicesPatients: IServicePatients = {
       size,
       _list: groupId ? [groupId] : [],
       subject: patientId,
-      _sort: 'recorded-date',
-      sortDirection: 'desc'
+      _sort: Order.RECORDED_DATE,
+      sortDirection: Direction.DESC
     })
 
     const diagnosticsData: Condition[] = getApiResponseResources(diagnosticsResp) ?? []

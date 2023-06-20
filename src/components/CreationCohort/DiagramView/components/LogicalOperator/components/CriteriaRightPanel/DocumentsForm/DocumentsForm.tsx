@@ -25,28 +25,28 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import AdvancedInputs from '../AdvancedInputs/AdvancedInputs'
 
 import { InputSearchDocumentSimple } from 'components/Inputs'
+import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 import useStyles from './styles'
 
+import services from 'services/aphp'
+import { useDebounce } from 'utils/debounce'
+import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
+import { SearchByTypes } from 'types/searchCriterias'
 import {
   CriteriaDrawerComponentProps,
   CriteriaName,
   DocType,
   DocumentDataType,
   errorDetails,
-  SearchByTypes,
   searchInputError
 } from 'types'
-import services from 'services/aphp'
-import { useDebounce } from 'utils/debounce'
-import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
-import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
 
 const defaultComposition: DocumentDataType = {
   type: 'DocumentReference',
   title: 'Critère de document',
   search: '',
-  searchBy: SearchByTypes.text,
+  searchBy: SearchByTypes.TEXT,
   docType: [],
   occurrence: 1,
   occurrenceComparator: '>=',
@@ -168,8 +168,8 @@ const CompositionForm: React.FC<CriteriaDrawerComponentProps> = (props) => {
               variant="outlined"
               label="Rechercher dans :"
             >
-              <MenuItem value={SearchByTypes.text}>Corps du document</MenuItem>
-              <MenuItem value={SearchByTypes.description}>Titre du document</MenuItem>
+              <MenuItem value={SearchByTypes.TEXT}>Corps du document</MenuItem>
+              <MenuItem value={SearchByTypes.DESCRIPTION}>Titre du document</MenuItem>
             </Select>
           </FormControl>
 

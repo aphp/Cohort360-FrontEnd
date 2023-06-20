@@ -8,7 +8,8 @@ import {
   HierarchyElementWithSystem
 } from 'types'
 
-import { SearchByTypes, FHIR_Bundle_Response, IScope, AccessExpiration, AccessExpirationsProps } from 'types'
+import { FHIR_Bundle_Response } from 'types'
+import { IScope, AccessExpiration, AccessExpirationsProps } from 'types'
 import { AxiosResponse } from 'axios'
 import apiBackend from '../apiBackend'
 import {
@@ -33,6 +34,7 @@ import { getApiResponseResourceOrThrow, getApiResponseResourcesOrThrow } from 'u
 import { idSort, labelSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import { CODE_HIERARCHY_EXTENSION_NAME } from '../../constants'
+import { Direction, Order, SearchByTypes } from 'types/searchCriterias'
 
 const paramValuesReducerWithPrefix =
   (prefix: string): ((accumulator: string, currentValue: string) => string) =>
@@ -138,7 +140,8 @@ export const fetchPatient = async (args: fetchPatientProps): FHIR_Bundle_Promise
   if (maxBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=ge${maxBirthdate}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
-  if (pivotFacet && pivotFacet.length > 0) options = [...options, `pivot-facet=${pivotFacet.reduce(paramValuesReducer)}`] // eslint-disable-line
+  if (pivotFacet && pivotFacet.length > 0)
+    options = [...options, `pivot-facet=${pivotFacet.reduce(paramValuesReducer)}`] // eslint-disable-line
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer)}`] // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Patient>>(`/Patient?${options.reduce(paramsReducer)}`, {
@@ -291,22 +294,30 @@ export const fetchDocumentReference = async (
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (type) options = [...options, `type-name=${type}`] // eslint-disable-line
   if (_text)
-    options = [...options, `${searchBy === SearchByTypes.text ? `_text` : 'description'}=${encodeURIComponent(_text)}`] // eslint-disable-line
+    options = [...options, `${searchBy === SearchByTypes.TEXT ? `_text` : 'description'}=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (highlight_search_results)
     options = [
       ...options,
       `${
-        searchBy === SearchByTypes.text
+        searchBy === SearchByTypes.TEXT
           ? `_tag=${encodeURIComponent('https://terminology.eds.aphp.fr/misc|HIGHLIGHT_RESULTS')}`
           : ''
       }`
     ] // eslint-disable-line
-  if (status) options = [...options, `docstatus=${encodeURIComponent('http://hl7.org/fhir/CodeSystem/composition-status|')+status}`] // eslint-disable-line
+  if (status)
+    options = [
+      ...options,
+      `docstatus=${encodeURIComponent('http://hl7.org/fhir/CodeSystem/composition-status|') + status}`
+    ] // eslint-disable-line
   if (patient) options = [...options, `subject=${patient}`] // eslint-disable-line
   if (patientIdentifier) options = [...options, `subject.identifier=${patientIdentifier}`] // eslint-disable-line
   if (encounter) options = [...options, `encounter=${encounter}`] // eslint-disable-line
   if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
-  if (onlyPdfAvailable) options = [...options, `contenttype=${encodeURIComponent('http://terminology.hl7.org/CodeSystem/v3-mediatypes|application/pdf')}`] // eslint-disable-line
+  if (onlyPdfAvailable)
+    options = [
+      ...options,
+      `contenttype=${encodeURIComponent('http://terminology.hl7.org/CodeSystem/v3-mediatypes|application/pdf')}`
+    ] // eslint-disable-line
   if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `date=le${maxDate}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0)
@@ -314,7 +325,8 @@ export const fetchDocumentReference = async (
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
   if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(paramValuesReducer)}`] // eslint-disable-line
-  if (uniqueFacet && uniqueFacet.length > 0) options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer)}`] // eslint-disable-line
+  if (uniqueFacet && uniqueFacet.length > 0)
+    options = [...options, `unique-facet=${uniqueFacet.reduce(paramValuesReducer)}`] // eslint-disable-line
   if (_elements && _elements.length > 0) options = [...options, `_elements=${_elements.reduce(paramValuesReducer)}`] // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_Bundle_Response<DocumentReference>>(
@@ -396,9 +408,11 @@ export const fetchProcedure = async (args: fetchProcedureProps): FHIR_Bundle_Pro
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (code) options = [...options, `code=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-ccam|') + code}`] // eslint-disable-line
+  if (code)
+    options = [...options, `code=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-ccam|') + code}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (status) options = [...options, `status=${encodeURIComponent('http://hl7.org/fhir/CodeSystem/event-status|') + status}`] // eslint-disable-line
+  if (status)
+    options = [...options, `status=${encodeURIComponent('http://hl7.org/fhir/CodeSystem/event-status|') + status}`] // eslint-disable-line
   if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
   if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `date=le${maxDate}`] // eslint-disable-line
@@ -459,13 +473,22 @@ export const fetchClaim = async (args: fetchClaimProps): FHIR_Bundle_Promise_Res
   if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
-  if (diagnosis) options = [...options, `diagnosis=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-ghm|') + diagnosis}`] // eslint-disable-line
+  if (diagnosis)
+    options = [
+      ...options,
+      `diagnosis=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-ghm|') + diagnosis}`
+    ] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (status) options = [...options, `status=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-ghm-cost-status|') + status}`] // eslint-disable-line
+  if (status)
+    options = [
+      ...options,
+      `status=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-ghm-cost-status|') + status}`
+    ] // eslint-disable-line
   if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
   if (minCreated) options = [...options, `created=ge${minCreated}`] // eslint-disable-line
   if (maxCreated) options = [...options, `created=le${maxCreated}`] // eslint-disable-line
-  if (executiveUnits && executiveUnits.length > 0) options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
 
@@ -485,8 +508,8 @@ type fetchConditionProps = {
   _list?: string[]
   size?: number
   offset?: number
-  _sort?: string
-  sortDirection?: 'asc' | 'desc'
+  _sort?: Order
+  sortDirection?: Direction
   subject?: string
   code?: string
   type?: string[]
@@ -499,7 +522,7 @@ type fetchConditionProps = {
 }
 export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Promise_Response<Condition> => {
   const { size, offset, _sort, sortDirection, subject, code, _text, executiveUnits } = args
-  const _sortDirection = sortDirection === 'desc' ? '-' : ''
+  const _sortDirection = sortDirection === Direction.DESC ? '-' : ''
   let { _list, type } = args
   const encounterIdentifier = args['encounter-identifier']
   const minRecordedDate = args['min-recorded-date']
@@ -514,15 +537,23 @@ export const fetchCondition = async (args: fetchConditionProps): FHIR_Bundle_Pro
   if (offset !== undefined) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
-  if (code) options = [...options, `code=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-cim10|') + code}`] // eslint-disable-line
+  if (code)
+    options = [...options, `code=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-cim10|') + code}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (encounterIdentifier) options = [...options, `encounter.identifier=${encounterIdentifier}`] // eslint-disable-line
   if (minRecordedDate) options = [...options, `recorded-date=ge${minRecordedDate}`] // eslint-disable-line
   if (maxRecordedDate) options = [...options, `recorded-date=le${maxRecordedDate}`] // eslint-disable-line
-  if (executiveUnits && executiveUnits.length > 0) options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
-  if (type && type.length > 0) options = [...options, `orbis-status=${type.reduce(paramValuesReducerWithPrefix(encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-condition-status|')))}`] // eslint-disable-line
+  if (type && type.length > 0)
+    options = [
+      ...options,
+      `orbis-status=${type.reduce(
+        paramValuesReducerWithPrefix(encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-condition-status|'))
+      )}`
+    ] // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_Bundle_Response<Condition>>(`/Condition?${options.reduce(paramsReducer)}`, {
     signal: args.signal
@@ -580,12 +611,19 @@ export const fetchObservation = async (args: fetchObservationProps): FHIR_Bundle
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort.includes('code') ? _sort : `${_sort},id`}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
   if (encounter) options = [...options, `encounter.identifier=${encounter}`] // eslint-disable-line
-  if (anabio || loinc) options = [...options, `code=${anabio ? encodeURIComponent('https://terminology.eds.aphp.fr/aphp-itm-anabio|') + anabio + ',' : ''}${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-itm-loinc|') + loinc}`] // eslint-disable-line
+  if (anabio || loinc)
+    options = [
+      ...options,
+      `code=${anabio ? encodeURIComponent('https://terminology.eds.aphp.fr/aphp-itm-anabio|') + anabio + ',' : ''}${
+        encodeURIComponent('https://terminology.eds.aphp.fr/aphp-itm-loinc|') + loinc
+      }`
+    ] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `date=le${maxDate}`] // eslint-disable-line
   if (rowStatus) options = [...options, `status=${BiologyStatus.VALIDATED}`] // eslint-disable-line
-  if (executiveUnits && executiveUnits.length > 0) options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
 
@@ -650,7 +688,8 @@ export const fetchMedicationRequest = async (
   if (type) options = [...options, `category=*${encodeURIComponent('|')}${type}`] // eslint-disable-line
   if (minDate) options = [...options, `validity-period-start=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `validity-period-start=le${maxDate}`] // eslint-disable-line
-  if (executiveUnits && executiveUnits.length > 0) options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
+  if (executiveUnits && executiveUnits.length > 0)
+    options = [...options, `encounter.encounter-care-site=${executiveUnits}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(paramValuesReducer)}`] // eslint-disable-line
 
@@ -712,7 +751,13 @@ export const fetchMedicationAdministration = async (
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (encounter) options = [...options, `context.identifier=${encounter}`] // eslint-disable-line
   if (_text) options = [...options, `_text=${encodeURIComponent(_text)}`] // eslint-disable-line
-  if (route) options = [...options, `dosage-route=${encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-medicament-voie-administration|') + route}`] // eslint-disable-line
+  if (route)
+    options = [
+      ...options,
+      `dosage-route=${
+        encodeURIComponent('https://terminology.eds.aphp.fr/aphp-orbis-medicament-voie-administration|') + route
+      }`
+    ] // eslint-disable-line
   if (minDate) options = [...options, `effective-time=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `effective-time=le${maxDate}`] // eslint-disable-line
   if (executiveUnits && executiveUnits.length > 0) options = [...options, `context.encounter-care-site=${executiveUnits}`] // eslint-disable-line

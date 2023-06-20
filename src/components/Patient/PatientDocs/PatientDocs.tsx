@@ -7,9 +7,9 @@ import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
 import DataTableTopBar from 'components/DataTable/DataTableTopBar'
-import MasterChips from 'components/MasterChips/MasterChips'
+import MasterChips from 'components/ui/Chips/Chips'
 
-import { Order, DocumentFilters, SearchByTypes, LoadingStatus } from 'types'
+import { DocumentFilters, LoadingStatus } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'
@@ -21,6 +21,7 @@ import { useDebounce } from 'utils/debounce'
 import useStyles from './styles'
 import { _cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
+import { Direction, Order, OrderBy, SearchByTypes } from 'types/searchCriterias'
 
 type PatientDocsProps = {
   groupId?: string
@@ -50,11 +51,11 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     executiveUnits: []
   })
   const [searchInput, setSearchInput] = useState('')
-  const [order, setOrder] = useState<Order>({
-    orderBy: 'date',
-    orderDirection: 'desc'
+  const [order, setOrder] = useState<OrderBy>({
+    orderBy: Order.DATE,
+    orderDirection: Direction.DESC
   })
-  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
+  const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.TEXT)
   const [open, setOpen] = useState<'filter' | null>(null)
   const debouncedSearchInput = useDebounce(500, searchInput)
 
@@ -210,7 +211,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
       <DataTableComposition
         loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
         deidentified={deidentified}
-        searchMode={!!debouncedSearchInput && searchBy === SearchByTypes.text}
+        searchMode={!!debouncedSearchInput && searchBy === SearchByTypes.TEXT}
         groupId={groupId}
         documentsList={patientDocumentsList}
         order={order}

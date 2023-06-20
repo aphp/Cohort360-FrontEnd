@@ -9,12 +9,13 @@ import { ReactComponent as UnknownIcon } from 'assets/icones/autre-inconnu.svg'
 
 import DataTable from 'components/DataTable/DataTable'
 
-import { CohortPatient, Column, Order, GenderStatus } from 'types'
+import { CohortPatient, Column } from 'types'
 
 import { getAge } from 'utils/age'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
+import { GenderStatus, OrderBy } from 'types/searchCriterias'
 
 type DataTablePatientProps = {
   loading: boolean
@@ -22,8 +23,8 @@ type DataTablePatientProps = {
   search?: string
   deidentified: boolean
   patientsList: CohortPatient[]
-  order: Order
-  setOrder?: (order: Order) => void
+  order: OrderBy
+  setOrder?: (order: OrderBy) => void
   page?: number
   setPage?: (page: number) => void
   total?: number

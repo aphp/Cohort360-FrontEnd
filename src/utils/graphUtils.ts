@@ -1,12 +1,7 @@
-import {
-  SimpleChartDataType,
-  GenderRepartitionType,
-  AgeRepartitionType,
-  VisiteRepartitionType,
-  GenderStatus
-} from 'types'
+import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
 import { getStringMonth, getStringMonthAphp } from './formatDate'
 import { Encounter, Extension, Patient } from 'fhir/r4'
+import { GenderStatus } from 'types/searchCriterias'
 
 function getRandomColor(): string {
   const letters = '0123456789ABCDEF'
@@ -346,7 +341,7 @@ export const getGenderRepartitionSimpleData = (
 
   if (!genderRepartitionMap) return { vitalStatusData: undefined, genderData: undefined }
 
-  const keys: ['male', 'female', 'other', 'unknown'] = ['male', 'female', 'other', 'unknown']
+  const keys = [GenderStatus.MALE, GenderStatus.FEMALE, GenderStatus.OTHER, GenderStatus.UNKNOWN]
   if (keys && keys.length > 0) {
     let aliveCount = 0
     let deceasedCount = 0
@@ -355,7 +350,8 @@ export const getGenderRepartitionSimpleData = (
     let unknownCount = 0
     let otherCount = 0
     for (const gender of keys) {
-      const genderValues = genderRepartitionMap[gender] || { deceased: 0, alive: 0 }
+      const genderRepartitionKey = gender.toLowerCase() as keyof GenderRepartitionType
+      const genderValues = genderRepartitionMap[genderRepartitionKey] || { deceased: 0, alive: 0 }
       const genderTotal = genderValues.alive + genderValues.deceased
       aliveCount += genderValues.alive
       deceasedCount += genderValues.deceased

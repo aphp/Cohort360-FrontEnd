@@ -13,24 +13,23 @@ import {
   Typography
 } from '@mui/material'
 
-import { PatientFilters as PatientFiltersType, GenderStatus, VitalStatus } from 'types'
-
 import useStyles from './styles'
 import { InputAgeRange } from '../../Inputs'
+import { PatientsFilters, GenderStatus, VitalStatus } from 'types/searchCriterias'
 
 type PatientFiltersProps = {
   onClose: () => void
   onSubmit: () => void
-  filters: PatientFiltersType
-  onChangeFilters: (newFilters: PatientFiltersType) => void
+  filters: PatientsFilters
+  onChangeFilters: (newFilters: PatientsFilters) => void
 }
 
 const PatientFilters: React.FC<PatientFiltersProps> = ({ onClose, onSubmit, filters, onChangeFilters }) => {
   const { classes } = useStyles()
 
   const [birthdatesRanges, setBirthdatesRanges] = useState<[string, string]>(filters.birthdatesRanges)
-  const [gender, setGender] = useState<GenderStatus[]>(filters.gender)
-  const [vitalStatus, setVitalStatus] = useState<VitalStatus[]>(filters.vitalStatus)
+  const [gender, setGender] = useState<GenderStatus[]>(filters.genders)
+  const [vitalStatus, setVitalStatus] = useState<VitalStatus[]>(filters.vitalStatuses)
 
   const [error, setError] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
@@ -59,9 +58,9 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ onClose, onSubmit, filt
 
   const _onSubmit = () => {
     onChangeFilters({
-      gender: gender,
+      genders: gender,
       birthdatesRanges: birthdatesRanges,
-      vitalStatus: vitalStatus
+      vitalStatuses: vitalStatus
     })
 
     onSubmit()

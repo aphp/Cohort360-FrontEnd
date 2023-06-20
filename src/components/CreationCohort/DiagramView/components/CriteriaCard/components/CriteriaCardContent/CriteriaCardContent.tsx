@@ -10,15 +10,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 
 import { useAppSelector } from 'state'
-import {
-  DocType,
-  ScopeTreeRow,
-  SearchByTypes,
-  SelectedCriteriaType,
-  CriteriaItemType,
-  CalendarRequestLabel,
-  Comparators
-} from 'types'
+import { DocType, ScopeTreeRow, SelectedCriteriaType, CriteriaItemType, CalendarRequestLabel, Comparators } from 'types'
 
 import docTypes from 'assets/docTypes.json'
 import { displaySystem } from 'utils/displayValueSetSystem'
@@ -26,6 +18,7 @@ import { displaySystem } from 'utils/displayValueSetSystem'
 import useStyles from './styles'
 import { ReactJSXElement } from '@emotion/react/types/jsx-namespace'
 import { RESSOURCE_TYPE_PATIENT } from 'utils/cohortCreation'
+import { SearchByTypes } from 'types/searchCriterias'
 
 type CriteriaCardContentProps = {
   currentCriteria: SelectedCriteriaType
@@ -346,13 +339,13 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               label={
                 <Tooltip
                   title={`Contient "${_currentCriteria.search}" dans le ${
-                    _currentCriteria.searchBy === SearchByTypes.description ? 'titre du' : ''
+                    _currentCriteria.searchBy === SearchByTypes.DESCRIPTION ? 'titre du' : ''
                   }
                   document`}
                 >
                   <Typography style={{ maxWidth: 500 }} noWrap>
                     Contient "{_currentCriteria.search}" dans le
-                    {_currentCriteria.searchBy === SearchByTypes.description ? ' titre du' : ''} document
+                    {_currentCriteria.searchBy === SearchByTypes.DESCRIPTION ? ' titre du' : ''} document
                   </Typography>
                 </Tooltip>
               }
