@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
-import { Checkbox, CircularProgress, Grid, Typography } from '@mui/material'
+import { Checkbox, CircularProgress, Grid, Typography, Alert } from '@mui/material'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
@@ -16,9 +16,8 @@ import { CanceledError } from 'axios'
 import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Searchbar from 'components/ui/Searchbar'
-import { ActionTypes, FilterKeys } from 'types/searchCriterias'
+import { FilterKeys } from 'types/searchCriterias'
 import { selectFiltersAsArray } from 'utils/filters'
-import { PatientTypes } from 'types/patient'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
 import Chip from 'components/ui/Chips/Chip'
@@ -31,7 +30,11 @@ import { BlockWrapper } from 'components/ui/Layout'
 import { AlertWrapper } from 'components/ui/Alert'
 import useSearchCriterias, { initBioSearchCriterias } from 'reducers/searchCriteriasReducer'
 
-const PatientBiology: React.FC<PatientTypes> = ({ groupId }) => {
+type PatientBiologyProps = {
+  groupId?: string
+}
+
+const PatientBiology = ({ groupId }: PatientBiologyProps) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const { patient } = useAppSelector((state) => ({

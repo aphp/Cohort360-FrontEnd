@@ -21,9 +21,8 @@ import Tabs from 'components/ui/Tabs'
 import { FilterKeys } from 'types/searchCriterias'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
-import services from 'services/aphp'
 import { mapToCriteriaName } from 'utils/mappers'
-import { PatientTypes, PMSI, PMSILabel } from 'types/patient'
+import { PMSI, PMSILabel } from 'types/patient'
 import { selectFiltersAsArray } from 'utils/filters'
 import DatesRangeFilter from 'components/Filters/DatesRangeFilter/DatesRangeFilter'
 import ExecutiveUnitsFilter from 'components/Filters/ExecutiveUnitsFilter/ExecutiveUnitsFilter'
@@ -32,8 +31,13 @@ import CodeFilter from 'components/Filters/CodeFilter/CodeFilter'
 import DiagnosticTypesFilter from 'components/Filters/DiagnosticTypesFilter/DiagnosticTypesFilter'
 import { BlockWrapper } from 'components/ui/Layout'
 import useSearchCriterias, { initPmsiSearchCriterias } from 'reducers/searchCriteriasReducer'
+import services from 'services/aphp'
 
-const PatientPMSI: React.FC<PatientTypes> = ({ groupId }) => {
+export type PatientPMSIProps = {
+  groupId?: string
+}
+
+const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const { classes } = useStyles()
   const theme = useTheme()
   const isMd = useMediaQuery(theme.breakpoints.between('sm', 'lg'))

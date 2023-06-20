@@ -40,7 +40,13 @@ import {
   Patient
 } from 'fhir/r4'
 import { CanceledError } from 'axios'
-import { VitalStatus, SearchCriterias, PatientsFilters, AllDocumentsFilters } from 'types/searchCriterias'
+import {
+  VitalStatus,
+  SearchCriterias,
+  PatientsFilters,
+  AllDocumentsFilters,
+  SearchByTypes
+} from 'types/searchCriterias'
 import services from '.'
 import { ErrorDetails, SearchInputError } from 'types/error'
 
@@ -327,7 +333,7 @@ const servicesCohorts: IServiceCohorts = {
         .split(' ') // Split by space (= ['mot1', 'mot2' ...])
         .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
 
-      if (searchBy === SearchByTypes.identifier) {
+      if (searchBy === SearchByTypes.IDENTIFIER) {
         _searchInput = _searchInput.join()
       }
 

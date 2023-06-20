@@ -15,7 +15,7 @@ import allDocTypesList from 'assets/docTypes.json'
 
 import { _cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
-import { FilterKeys, SearchByTypes, searchByListDocuments } from 'types/searchCriterias'
+import { FilterKeys, searchByListDocuments, SearchByTypes } from 'types/searchCriterias'
 import { PatientTypes } from 'types/patient'
 import Modal from 'components/ui/Modal'
 import Button from 'components/ui/Button'

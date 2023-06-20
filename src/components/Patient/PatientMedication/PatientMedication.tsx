@@ -20,7 +20,6 @@ import DisplayDigits from 'components/ui/Display/DisplayDigits'
 import SearchInput from 'components/ui/Searchbar/SearchInput'
 import Tabs from 'components/ui/Tabs'
 import { FilterKeys } from 'types/searchCriterias'
-import { PatientTypes, MedicationLabel, Medication } from 'types/patient'
 import Button from 'components/ui/Button'
 import Modal from 'components/ui/Modal'
 import services from 'services/aphp'
@@ -34,7 +33,21 @@ import AdministrationTypesFilter from 'components/Filters/AdministrationTypesFil
 import { BlockWrapper } from 'components/ui/Layout'
 import useSearchCriterias, { initMedSearchCriterias } from 'reducers/searchCriteriasReducer'
 
-const PatientMedication: React.FC<PatientTypes> = ({ groupId }) => {
+type PatientMedicationProps = {
+  groupId?: string
+}
+
+enum Medication {
+  PRESCRIPTION = 'prescription',
+  ADMINISTRATION = 'administration'
+}
+
+enum MedicationLabel {
+  PRESCRIPTION = 'Prescription',
+  ADMINISTRATION = 'Administration'
+}
+
+const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   const { classes } = useStyles()
   const theme = useTheme()
   const isMd = useMediaQuery(theme.breakpoints.between('sm', 'lg'))
