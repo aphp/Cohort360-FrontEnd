@@ -54,7 +54,7 @@ const ProvenanceDestinationInputs: React.FC<AdmissionInputsProps> = ({ criteria,
     : []
   return (
     <>
-      <Grid container direction="column">
+      <Grid container direction="column" className={classes.supportedInputsRoot}>
         <Grid
           item
           container

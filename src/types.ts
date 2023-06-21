@@ -506,13 +506,37 @@ export type GhmDataType = {
   isInclusive?: boolean
 }
 
+export enum Calendar {
+  YEAR = 'year',
+  MONTH = 'month',
+  DAY = 'day'
+}
+
+export enum CalendarLabel {
+  YEAR = 'années',
+  MONTH = 'mois',
+  DAY = 'jours'
+}
+
+export enum CalendarRequestLabel {
+  YEAR = 'an(s)',
+  MONTH = 'mois',
+  DAY = 'jour(s)'
+}
+
 export type EncounterDataType = {
   type: 'Encounter'
   title: string
-  ageType: { id: string; label: string } | null
-  years: [number, number]
-  durationType: { id: string; label: string }
-  duration: [number, number]
+  age: [number | null, number | null]
+  ageType: [
+    { id: Calendar; criteriaLabel?: CalendarLabel; requestLabel: CalendarRequestLabel },
+    { id: Calendar; criteriaLabel?: CalendarLabel; requestLabel: CalendarRequestLabel }
+  ]
+  duration: [number | null, number | null]
+  durationType: [
+    { id: Calendar; criteriaLabel?: CalendarLabel; requestLabel: CalendarRequestLabel },
+    { id: Calendar; criteriaLabel?: CalendarLabel; requestLabel: CalendarRequestLabel }
+  ]
   admissionMode: { id: string; label: string }[] | null
   entryMode: { id: string; label: string }[] | null
   exitMode: { id: string; label: string }[] | null

@@ -7,7 +7,10 @@ import {
   CriteriaGroupType,
   TemporalConstraintsType,
   DocType,
-  SearchByTypes
+  SearchByTypes,
+  Calendar,
+  CalendarRequestLabel,
+  CalendarLabel
 } from 'types'
 
 import docTypes from 'assets/docTypes.json'
@@ -163,6 +166,17 @@ type RequeteurSearchType = {
   request: RequeteurGroupType | undefined
 }
 
+const getCalendarMultiplicator = (type: Calendar): number => {
+  switch (type) {
+    case Calendar.MONTH:
+      return 31
+    case Calendar.YEAR:
+      return 365
+    default:
+      return 1
+  }
+}
+
 const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
   let filterFhir = ''
 
@@ -212,50 +226,6 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
     }
 
     case RESSOURCE_TYPE_ENCOUNTER: {
-      let lengthFilter = ''
-      let ageFilter = ''
-      if (criterion.durationType) {
-        let multiplicator = 1
-        switch (criterion.durationType.id) {
-          case 'month':
-            multiplicator = 31
-            break
-          case 'year':
-            multiplicator = 365
-            break
-          default:
-            multiplicator = 1
-            break
-        }
-
-        if (criterion.duration && (criterion.duration[0] !== 0 || criterion.duration[1] !== 100)) {
-          lengthFilter = `${ENCOUNTER_LENGTH}=ge${+criterion.duration[0] * multiplicator}&${ENCOUNTER_LENGTH}=le${
-            +criterion.duration[1] * multiplicator
-          }`
-        }
-      }
-
-      if (criterion.ageType) {
-        let multiplicator = 1
-        switch (criterion.ageType.id) {
-          case 'month':
-            multiplicator = 31
-            break
-          case 'year':
-            multiplicator = 365
-            break
-          default:
-            multiplicator = 1
-            break
-        }
-
-        if (criterion.years && (criterion.years[0] !== 0 || criterion.years[1] !== 100)) {
-          ageFilter = `${ENCOUNTER_MIN_BIRTHDATE}=ge${
-            +criterion.years[0] * multiplicator
-          }&${ENCOUNTER_MAX_BIRTHDATE}=le${+criterion.years[1] * multiplicator}`
-        }
-      }
-
       // Ignore TypeScript because we need to check if array is not empty
       // @ts-ignore
       filterFhir = [
@@ -333,8 +303,26 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
                 .reduce(searchReducer)}`
             : ''
         }`,
-        `${lengthFilter ? `${lengthFilter}` : ''}`,
-        `${ageFilter ? `${ageFilter}` : ''}`
+        `${
+          criterion?.duration?.[0] !== null && criterion?.durationType?.[0] !== null
+            ? `${ENCOUNTER_LENGTH}=ge${+criterion.duration[0] * getCalendarMultiplicator(criterion.durationType[0].id)}`
+            : ''
+        }`,
+        `${
+          criterion?.duration?.[1] !== null && criterion?.durationType?.[1] !== null
+            ? `${ENCOUNTER_LENGTH}=le${+criterion.duration[1] * getCalendarMultiplicator(criterion.durationType[1].id)}`
+            : ''
+        }`,
+        `${
+          criterion?.age?.[0] !== null && criterion?.ageType?.[0] !== null
+            ? `${ENCOUNTER_MIN_BIRTHDATE}=ge${+criterion.age[0] * getCalendarMultiplicator(criterion.ageType[0].id)}`
+            : ''
+        }`,
+        `${
+          criterion?.age?.[1] !== null && criterion?.ageType?.[1] !== null
+            ? `${ENCOUNTER_MAX_BIRTHDATE}=le${+criterion.age[1] * getCalendarMultiplicator(criterion.ageType[1].id)}`
+            : ''
+        }`
       ].filter((elem) => elem)
 
       if (filterFhir && filterFhir.length > 0) {
@@ -754,6 +742,26 @@ export async function unbuildRequest(_json: string): Promise<any> {
     return { population, criteria: [], criteriaGroup: [] }
   }
 
+  const getValueFromCalendarType = (type: Calendar, value: number): number => {
+    if (type === Calendar.YEAR) {
+      return value / 365
+    }
+    if (type === Calendar.MONTH) {
+      return value / 31
+    }
+    return value
+  }
+
+  const getCalendarType = (value: number) => {
+    if (value % 365 === 0) {
+      return { id: Calendar.YEAR, requestLabel: CalendarRequestLabel.YEAR, criteriaLabel: CalendarLabel.YEAR }
+    }
+    if (value % 31 === 0) {
+      return { id: Calendar.MONTH, requestLabel: CalendarRequestLabel.MONTH, criteriaLabel: CalendarLabel.MONTH }
+    }
+    return { id: Calendar.DAY, requestLabel: CalendarRequestLabel.DAY, criteriaLabel: CalendarLabel.DAY }
+  }
+
   const _retrieveInformationFromJson = async (element: RequeteurCriteriaType): Promise<any> => {
     const currentCriterion: any = {
       id: element._id,
@@ -857,16 +865,11 @@ export async function unbuildRequest(_json: string): Promise<any> {
       case RESSOURCE_TYPE_ENCOUNTER: {
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
           currentCriterion.title = 'Critère de prise en charge'
-          currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [0, 100]
-          currentCriterion.durationType = currentCriterion.durationType
-            ? currentCriterion.durationType
-            : { id: 'day', label: 'jours' }
-          currentCriterion.ageType = currentCriterion.ageType
-            ? currentCriterion.ageType
-            : { id: 'year', label: 'années' }
-          currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
+          currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [null, null]
+          currentCriterion.durationType = currentCriterion.durationType ? currentCriterion.durationType : [null, null]
+          currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : [null, null]
+          currentCriterion.age = currentCriterion.age ? currentCriterion.age : [null, null]
           currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : []
           currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : []
           currentCriterion.exitMode = currentCriterion.exitMode ? currentCriterion.exitMode : []
@@ -895,59 +898,32 @@ export async function unbuildRequest(_json: string): Promise<any> {
           }
 
           for (const filter of filters) {
-            const key = filter ? filter[0] : null
-            const value = filter ? filter[1] : null
+            const key = filter[0]
+            const value = filter[1]
             switch (key) {
               case ENCOUNTER_LENGTH: {
-                const ageType = [
-                  { id: 'year', label: 'années' },
-                  { id: 'month', label: 'mois' },
-                  { id: 'day', label: 'jours' }
-                ]
-                if (value?.search('ge') === 0) {
-                  currentCriterion.duration[0] = +value?.replace('ge', '') || 0
-                } else if (value?.search('le') === 0) {
-                  currentCriterion.duration[1] = +value?.replace('le', '') || 100
-                }
-
-                if (currentCriterion.duration[1] % 31 === 0) {
-                  currentCriterion.durationType = ageType[1]
-                  currentCriterion.duration[0] = currentCriterion.duration[0] / 31
-                  currentCriterion.duration[1] = currentCriterion.duration[1] / 31
-                } else if (currentCriterion.duration[1] % 365 === 0) {
-                  currentCriterion.durationType = ageType[0]
-                  currentCriterion.duration[0] = currentCriterion.duration[0] / 365
-                  currentCriterion.duration[1] = currentCriterion.duration[1] / 365
-                } else {
-                  currentCriterion.durationType = ageType[2]
+                if (value.includes('ge')) {
+                  const min = value?.replace('ge', '') ?? 0
+                  currentCriterion.durationType[0] = getCalendarType(+min)
+                  currentCriterion.duration[0] = getValueFromCalendarType(currentCriterion.durationType[0].id, +min)
+                } else if (value.includes('le')) {
+                  const max = value?.replace('le', '') ?? 0
+                  currentCriterion.durationType[1] = getCalendarType(+max)
+                  currentCriterion.duration[1] = getValueFromCalendarType(currentCriterion.durationType[1].id, +max)
                 }
                 break
               }
-              case ENCOUNTER_MIN_BIRTHDATE:
+              case ENCOUNTER_MIN_BIRTHDATE: {
+                const min = value?.replace('ge', '') ?? 130
+                currentCriterion.ageType[0] = getCalendarType(+min)
+                currentCriterion.age[0] = getValueFromCalendarType(currentCriterion.ageType[0].id, +min)
+
+                break
+              }
               case ENCOUNTER_MAX_BIRTHDATE: {
-                const ageType = [
-                  { id: 'year', label: 'années' },
-                  { id: 'month', label: 'mois' },
-                  { id: 'day', label: 'jours' }
-                ]
-
-                if (value?.search('ge') === 0) {
-                  currentCriterion.years[0] = +value?.replace('ge', '') || 0
-                } else if (value?.search('le') === 0) {
-                  currentCriterion.years[1] = +value?.replace('le', '') || 130
-                }
-
-                if (currentCriterion.years[1] % 31 === 0) {
-                  currentCriterion.ageType = ageType[1]
-                  currentCriterion.years[0] = currentCriterion.years[0] / 31
-                  currentCriterion.years[1] = currentCriterion.years[1] / 31
-                } else if (currentCriterion.years[1] % 365 === 0) {
-                  currentCriterion.ageType = ageType[0]
-                  currentCriterion.years[0] = currentCriterion.years[0] / 365
-                  currentCriterion.years[1] = currentCriterion.years[1] / 365
-                } else {
-                  currentCriterion.ageType = ageType[2]
-                }
+                const max = value?.replace('le', '') ?? 130
+                currentCriterion.ageType[1] = getCalendarType(+max)
+                currentCriterion.age[1] = getValueFromCalendarType(currentCriterion.ageType[1].id, +max)
                 break
               }
               case ENCOUNTER_ENTRYMODE: {

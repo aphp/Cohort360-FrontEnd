@@ -43,7 +43,7 @@ const AdmissionInputs: React.FC<AdmissionInputsProps> = ({ criteria, selectedCri
 
   return (
     <>
-      <Grid container direction="column">
+      <Grid container direction="column" className={classes.supportedInputsRoot}>
         <Grid
           item
           container
