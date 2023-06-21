@@ -765,7 +765,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
     if (value % 31 === 0) {
       return { id: Calendar.MONTH, requestLabel: CalendarRequestLabel.MONTH, criteriaLabel: CalendarLabel.MONTH }
     }
-    return { id: Calendar.DAY, requestLabel: CalendarRequestLabel.DAY, critieriaLabel: CalendarLabel.DAY }
+    return { id: Calendar.DAY, requestLabel: CalendarRequestLabel.DAY, criteriaLabel: CalendarLabel.DAY }
   }
 
   const _retrieveInformationFromJson = async (element: RequeteurCriteriaType): Promise<any> => {
@@ -871,15 +871,10 @@ export async function unbuildRequest(_json: string): Promise<any> {
       case RESSOURCE_TYPE_ENCOUNTER: {
         if (element.filterFhir) {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
-
           currentCriterion.title = 'Critère de prise en charge'
           currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [null, null]
-          currentCriterion.durationType = currentCriterion.durationType
-            ? currentCriterion.durationType
-            : { id: Calendar.DAY, requestLabel: CalendarRequestLabel.DAY, criteriaLabel: CalendarLabel.DAY }
-          currentCriterion.ageType = currentCriterion.ageType
-            ? currentCriterion.ageType
-            : { id: Calendar.YEAR, requestLabel: CalendarRequestLabel.YEAR, criteriaLabel: CalendarLabel.YEAR }
+          currentCriterion.durationType = currentCriterion.durationType ? currentCriterion.durationType : [null, null]
+          currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : [null, null]
           currentCriterion.age = currentCriterion.age ? currentCriterion.age : [null, null]
           currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : []
           currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : []

@@ -51,12 +51,12 @@ const defaultEncounter: EncounterDataType = {
   age: [null, null],
   ageType: [
     { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY },
-    { id: Calendar.YEAR, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
+    { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
   ],
   duration: [null, null],
   durationType: [
     { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY },
-    { id: Calendar.YEAR, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
+    { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
   ],
   admissionMode: [],
   entryMode: [],
@@ -280,7 +280,8 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                   </Grid>
                   <Grid item xs={7} container direction="column" justifyContent="flex-end">
                     <Autocomplete
-                      id="criteria-ageType-autocomplete"
+                      id="criteria-ageType-min"
+                      disableClearable
                       size="small"
                       disabled={defaultValues.age[0] === null}
                       className={classes.inputItem}
@@ -326,7 +327,8 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                   </Grid>
                   <Grid item xs={7} container direction="column" justifyContent="flex-end">
                     <Autocomplete
-                      id="criteria-ageType-autocomplete"
+                      id="criteria-ageType-max"
+                      disableClearable
                       disabled={defaultValues.age[1] === null}
                       size="small"
                       className={classes.inputItem}
@@ -386,7 +388,8 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                   </Grid>
                   <Grid xs={7} container direction="column" justifyContent="flex-end">
                     <Autocomplete
-                      id="criteria-ageType-autocomplete"
+                      id="criteria-durationType-min"
+                      disableClearable
                       disabled={defaultValues.duration[0] === null}
                       size="small"
                       className={classes.inputItem}
@@ -435,9 +438,10 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
                   </Grid>
                   <Grid item xs={7} container direction="column" justifyContent="flex-end">
                     <Autocomplete
-                      id="criteria-ageType-autocomplete"
+                      id="criteria-durationType-max"
                       disabled={defaultValues.duration[1] === null}
                       size="small"
+                      disableClearable
                       className={classes.inputItem}
                       options={[
                         {
