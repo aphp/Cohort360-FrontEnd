@@ -7,12 +7,12 @@ const useStyles = makeStyles<populationCardPropsType>()((theme: Theme, params) =
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    'border-radius': 4,
+    borderRadius: 4,
     backgroundColor: '#FFFFFF',
     padding: '8px 16px',
     border: params.form ? '1px solid #D0D7D8' : '3px solid #D3DEE8',
     '&:hover': {
-      'border-color': params.form ? 'rgb(21,61,138)' : ''
+      borderColor: params.form ? 'rgb(21,61,138)' : ''
     },
     flex: 1,
     margin: '12px 0',

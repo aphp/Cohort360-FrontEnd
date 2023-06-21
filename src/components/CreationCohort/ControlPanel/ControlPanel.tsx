@@ -327,7 +327,7 @@ const ControlPanel: React.FC<{
             </List>
             <Typography>Merci de recréer ces critères avant de relancer la requête.</Typography>
             <Typography>
-              En effet, la nouvelle version du requeteur n'est pas compatible avec l'ancien paramétrage.
+              En effet, la nouvelle version du requêteur n'est pas compatible avec l'ancien paramétrage.
             </Typography>
             <Typography>Ce problème est temporaire. Une solution est en cours de développement.</Typography>
           </Alert>
