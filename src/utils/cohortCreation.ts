@@ -226,30 +226,6 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
     }
 
     case RESSOURCE_TYPE_ENCOUNTER: {
-      let lengthFilter = ''
-      let ageFilter = ''
-
-      if (criterion?.duration?.[0] !== null && criterion?.durationType?.[0] !== null) {
-        lengthFilter = `${ENCOUNTER_LENGTH}=ge${
-          +criterion.duration[0] * getCalendarMultiplicator(criterion.durationType[0].id)
-        }`
-      }
-      if (criterion?.duration?.[1] !== null && criterion?.durationType?.[1] !== null) {
-        lengthFilter += `&${ENCOUNTER_LENGTH}=le${
-          +criterion.duration[1] * getCalendarMultiplicator(criterion.durationType[1].id)
-        }`
-      }
-      if (criterion?.age?.[0] !== null && criterion?.ageType?.[0] !== null) {
-        ageFilter = `${ENCOUNTER_MIN_BIRTHDATE}=ge${
-          +criterion.age[0] * getCalendarMultiplicator(criterion.ageType[0].id)
-        }`
-      }
-      if (criterion?.age?.[1] !== null && criterion?.ageType?.[1] !== null) {
-        ageFilter += `&${ENCOUNTER_MAX_BIRTHDATE}=le${
-          +criterion.age[1] * getCalendarMultiplicator(criterion.ageType[1].id)
-        }`
-      }
-
       // Ignore TypeScript because we need to check if array is not empty
       // @ts-ignore
       filterFhir = [
@@ -327,8 +303,26 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
                 .reduce(searchReducer)}`
             : ''
         }`,
-        `${lengthFilter ? `${lengthFilter}` : ''}`,
-        `${ageFilter ? `${ageFilter}` : ''}`
+        `${
+          criterion?.duration?.[0] !== null && criterion?.durationType?.[0] !== null
+            ? `${ENCOUNTER_LENGTH}=ge${+criterion.duration[0] * getCalendarMultiplicator(criterion.durationType[0].id)}`
+            : ''
+        }`,
+        `${
+          criterion?.duration?.[1] !== null && criterion?.durationType?.[1] !== null
+            ? `${ENCOUNTER_LENGTH}=le${+criterion.duration[1] * getCalendarMultiplicator(criterion.durationType[1].id)}`
+            : ''
+        }`,
+        `${
+          criterion?.age?.[0] !== null && criterion?.ageType?.[0] !== null
+            ? `${ENCOUNTER_MIN_BIRTHDATE}=ge${+criterion.age[0] * getCalendarMultiplicator(criterion.ageType[0].id)}`
+            : ''
+        }`,
+        `${
+          criterion?.age?.[1] !== null && criterion?.ageType?.[1] !== null
+            ? `${ENCOUNTER_MAX_BIRTHDATE}=le${+criterion.age[1] * getCalendarMultiplicator(criterion.ageType[1].id)}`
+            : ''
+        }`
       ].filter((elem) => elem)
 
       if (filterFhir && filterFhir.length > 0) {

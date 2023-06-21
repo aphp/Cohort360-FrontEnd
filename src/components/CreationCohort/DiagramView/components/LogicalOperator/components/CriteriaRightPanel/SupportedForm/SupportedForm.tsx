@@ -37,7 +37,6 @@ type SupportedFormProps = {
 }
 
 enum Error {
-  EMPTY_FORM,
   EMPTY_DURATION_ERROR,
   EMPTY_AGE_ERROR,
   MIN_MAX_AGE_ERROR,
@@ -89,27 +88,6 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
   const isEdition = selectedCriteria !== null ? true : false
 
   const onCheckFormError = () => {
-    if (
-      defaultValues.age[0] === null &&
-      defaultValues.age[1] === null &&
-      defaultValues.duration[0] === null &&
-      defaultValues.duration[1] === null &&
-      defaultValues.admissionMode?.length === 0 &&
-      defaultValues.entryMode?.length === 0 &&
-      defaultValues.exitMode?.length === 0 &&
-      defaultValues.priseEnChargeType?.length === 0 &&
-      defaultValues.typeDeSejour?.length === 0 &&
-      defaultValues.fileStatus?.length === 0 &&
-      defaultValues.discharge?.length === 0 &&
-      defaultValues.reason?.length === 0 &&
-      defaultValues.destination?.length === 0 &&
-      defaultValues.provenance?.length === 0 &&
-      defaultValues.admission?.length === 0 &&
-      !defaultValues.encounterStartDate &&
-      !defaultValues.encounterEndDate
-    ) {
-      return Error.EMPTY_FORM
-    }
     if (
       (defaultValues.age[0] !== null || defaultValues.age[1] !== null) &&
       ((defaultValues.age[0] < 1 && (defaultValues.age[1] < 1 || defaultValues.age[1] === null)) ||
@@ -190,7 +168,6 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
             Merci de renseigner au moins un <b>Âge de prise en charge</b> avec une valeur supérieure à zéro.
           </Alert>
         )}
-        {error === Error.EMPTY_FORM && <Alert severity="error">Merci de renseigner un champ</Alert>}
         {error === Error.NO_ERROR && !multiFields && (
           <Alert
             severity="info"

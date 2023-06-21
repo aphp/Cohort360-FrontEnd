@@ -5,7 +5,7 @@ import { logout, login } from './me'
 
 import services from 'services/aphp'
 
-import { Cohort, ScopeTreeRow } from 'types'
+import { ScopeTreeRow } from 'types'
 
 export type ScopeState = {
   loading: boolean
