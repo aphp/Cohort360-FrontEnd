@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios'
 import apiBack from '../apiBackend'
 
-import { CohortCreationCounterType, DocType } from 'types'
+import { CohortCreationCounterType, DocType, QuerySnapshotInfo, RequestType } from 'types'
 
 import {
   fetchAdmissionModes,
@@ -167,14 +167,14 @@ const servicesCohortCreation: IServiceCohortCreation = {
   },
 
   fetchRequest: async (requestId, snapshotId) => {
-    const requestResponse = (await apiBack.get<any>(`/cohort/requests/${requestId}/`)) || {}
-    const requestData = requestResponse?.data ? requestResponse.data : {}
+    const requestResponse = (await apiBack.get<RequestType>(`/cohort/requests/${requestId}/`)) || {}
+    const requestData: RequestType = requestResponse.data
 
     const querySnapshotResponse: AxiosResponse[] =
       requestData.query_snapshots && requestData.query_snapshots.length > 0
         ? await Promise.all(
-            requestData.query_snapshots.map((query_snapshot: string) =>
-              apiBack.get<AxiosResponse>(`/cohort/request-query-snapshots/${query_snapshot}/`)
+            requestData.query_snapshots.map((query_snapshot: QuerySnapshotInfo) =>
+              apiBack.get<AxiosResponse>(`/cohort/request-query-snapshots/${query_snapshot.uuid}/`)
             )
           )
         : []
