@@ -632,6 +632,14 @@ export type ProjectType = {
   owner_id?: string
 }
 
+export type QuerySnapshotInfo = {
+  uuid: string
+  title: string
+  created_at: string
+  has_linked_cohorts: boolean
+  version: number
+}
+
 export type RequestType = {
   uuid: string
   name: string
@@ -642,7 +650,7 @@ export type RequestType = {
   favorite?: boolean
   created_at?: string
   modified_at?: string
-  query_snapshots?: string[]
+  query_snapshots?: QuerySnapshotInfo[]
   shared_query_snapshot?: string[]
   usersToShare?: Provider[]
   shared_by?: Provider
