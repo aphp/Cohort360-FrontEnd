@@ -2,6 +2,19 @@
   "entry": [
     {
       "news": {
+        "title": "Nouvelles fonctionnalités - 07/2023",
+        "message": [
+          "Ajout des unités exécutrices dans les filtres du requêteur",
+          "Notification des utilisateurs de l'expiration de leurs accès",
+          "Possibilité de dissocier l'unité de temps dans le critère de prise en charge",
+          "Ouverture d'un nouvel onglet à la sélection d'un patient après une recherche de document",
+          "Divers correctifs techniques et fonctionnels ont été réalisés"
+        ],
+        "footer": "L'équipe Cohort360."
+      }
+    },
+    {
+      "news": {
         "title": "Nouvelles fonctionnalités - 05/2023",
         "message": [
           "• Ajout de contraintes temporelles",
