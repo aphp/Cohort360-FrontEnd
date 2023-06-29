@@ -12,7 +12,8 @@ import {
   searchInputError,
   errorDetails,
   PatientGenderKind,
-  GroupRights
+  GroupRights,
+  ChartCode
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -267,31 +268,32 @@ const servicesCohorts: IServiceCohorts = {
       const agePyramidData =
         patientsResp.data.resourceType === 'Bundle'
           ? getAgeRepartitionMapAphp(
-              patientsResp.data.meta?.extension?.find((facet: any) => facet.url === 'facet-age-month')?.extension
+              patientsResp.data.meta?.extension?.find((facet: any) => facet.url === ChartCode.agePyramid)?.extension
             )
           : undefined
 
       const genderRepartitionMap =
         patientsResp.data.resourceType === 'Bundle'
           ? getGenderRepartitionMapAphp(
-              patientsResp.data.meta?.extension?.find((facet: any) => facet.url === 'facet-deceased')?.extension
+              patientsResp.data.meta?.extension?.find((facet: any) => facet.url === ChartCode.genderRepartition)
+                ?.extension
             )
           : undefined
 
       const monthlyVisitData =
         encountersResp.data.resourceType === 'Bundle'
           ? getVisitRepartitionMapAphp(
-              encountersResp.data.meta?.extension?.find(
-                (facet: any) => facet.url === 'facet-visit-year-month-gender-facet'
-              )?.extension
+              encountersResp.data.meta?.extension?.find((facet: any) => facet.url === ChartCode.monthlyVisits)
+                ?.extension
             )
           : undefined
 
       const visitTypeRepartitionData =
         encountersResp.data.resourceType === 'Bundle'
           ? getEncounterRepartitionMapAphp(
-              encountersResp.data.meta?.extension?.find((facet: Extension) => facet.url === 'facet-class-simple')
-                ?.extension
+              encountersResp.data.meta?.extension?.find(
+                (facet: Extension) => facet.url === ChartCode.visitTypeRepartition
+              )?.extension
             )
           : undefined
 

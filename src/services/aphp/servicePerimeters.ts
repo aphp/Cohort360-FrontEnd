@@ -1,4 +1,12 @@
-import { AccessExpiration, AccessExpirationsProps, CohortData, ScopePage, ScopeTreeRow, ScopeElement } from 'types'
+import {
+  AccessExpiration,
+  AccessExpirationsProps,
+  CohortData,
+  ScopePage,
+  ScopeTreeRow,
+  ScopeElement,
+  ChartCode
+} from 'types'
 import {
   getAgeRepartitionMapAphp,
   getEncounterRepartitionMapAphp,
@@ -193,12 +201,16 @@ const servicesPerimeters: IServicePerimeters = {
 
     const originalPatients = getApiResponseResources(patientsResp)
 
-    const ageFacet = patientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-age-month')
-    const deceasedFacet = patientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-deceased')
-    const visitFacet = encountersResp.data.meta?.extension?.filter(
-      (facet: any) => facet.url === 'facet-visit-year-month-gender-facet'
+    const ageFacet = patientsResp.data.meta?.extension?.filter((facet: any) => facet.url === ChartCode.agePyramid)
+    const deceasedFacet = patientsResp.data.meta?.extension?.filter(
+      (facet: any) => facet.url === ChartCode.genderRepartition
     )
-    const classFacet = encountersResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-class-simple')
+    const visitFacet = encountersResp.data.meta?.extension?.filter(
+      (facet: any) => facet.url === ChartCode.monthlyVisits
+    )
+    const classFacet = encountersResp.data.meta?.extension?.filter(
+      (facet: any) => facet.url === ChartCode.visitTypeRepartition
+    )
 
     const agePyramidData =
       patientsResp?.data?.resourceType === 'Bundle'

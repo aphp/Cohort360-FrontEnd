@@ -280,6 +280,13 @@ export type ScopeTreeRow = AbstractTree<{
   type?: string
 }>
 
+export enum ChartCode {
+  agePyramid = 'facet-extension.age-month',
+  genderRepartition = 'facet-deceased',
+  monthlyVisits = 'facet-facet.period.start-gender',
+  visitTypeRepartition = 'facet-class.coding.display'
+}
+
 export type SimpleChartDataType = {
   label: string
   value: number

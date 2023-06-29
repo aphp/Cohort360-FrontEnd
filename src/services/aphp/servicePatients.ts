@@ -5,7 +5,8 @@ import {
   CohortEncounter,
   CohortComposition,
   SearchByTypes,
-  MedicationEntry
+  MedicationEntry,
+  ChartCode
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -329,33 +330,34 @@ const servicesPatients: IServicePatients = {
 
     const agePyramidData =
       myPatientsResp.data.resourceType === 'Bundle'
-        ? await getAgeRepartitionMapAphp(
-            myPatientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-extension.age-month')?.[0]
+        ? getAgeRepartitionMapAphp(
+            myPatientsResp.data.meta?.extension?.filter((facet: any) => facet.url === ChartCode.agePyramid)?.[0]
               .extension
           )
         : undefined
 
     const genderRepartitionMap =
       myPatientsResp.data.resourceType === 'Bundle'
-        ? await getGenderRepartitionMapAphp(
-            myPatientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-deceased')?.[0].extension
+        ? getGenderRepartitionMapAphp(
+            myPatientsResp.data.meta?.extension?.filter((facet: any) => facet.url === ChartCode.genderRepartition)?.[0]
+              .extension
           )
         : undefined
 
     const monthlyVisitData =
       myPatientsEncounters.data.resourceType === 'Bundle'
-        ? await getVisitRepartitionMapAphp(
+        ? getVisitRepartitionMapAphp(
             myPatientsEncounters.data.meta?.extension?.filter(
-              (facet: any) => facet.url === 'facet-facet.period.start-gender'
+              (facet: any) => facet.url === ChartCode.monthlyVisits
             )?.[0].extension
           )
         : undefined
 
     const visitTypeRepartitionData =
       myPatientsEncounters.data.resourceType === 'Bundle'
-        ? await getEncounterRepartitionMapAphp(
+        ? getEncounterRepartitionMapAphp(
             myPatientsEncounters.data.meta?.extension?.filter(
-              (facet: any) => facet.url === 'facet-class.coding.display'
+              (facet: any) => facet.url === ChartCode.visitTypeRepartition
             )?.[0].extension
           )
         : undefined
