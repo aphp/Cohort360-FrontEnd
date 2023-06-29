@@ -287,7 +287,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               }
             />
           ),
-          !!_currentCriteria.years && _currentCriteria.years[0] === _currentCriteria.years[1] && (
+          (_currentCriteria.years?.[0] !== null || _currentCriteria.years?.[1] !== null) && (
             <Chip
               className={classes.criteriaChip}
               label={
