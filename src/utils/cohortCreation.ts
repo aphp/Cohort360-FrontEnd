@@ -337,7 +337,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
     case RESSOURCE_TYPE_COMPOSITION: {
       const unreducedFilterFhir = [
-        `status=final&type:not=doc-impor&empty=false&patient-active=true`,
+        `docstatus=final&type:not=doc-impor&empty=false&patient-active=true`,
         `${
           criterion.search
             ? `${criterion.searchBy === SearchByTypes.text ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
@@ -1131,7 +1131,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
                 break
               }
               case 'patient-active':
-              case 'status':
+              case 'docstatus':
               case 'type:not':
               case 'empty':
                 break
