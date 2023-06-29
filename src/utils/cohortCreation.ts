@@ -19,7 +19,7 @@ const REQUETEUR_VERSION = 'v1.2.1'
 
 // TODO: à changer quand ticket fhir ok vvvvv
 const RESSOURCE_TYPE_IPP_LIST: 'IPPList' = 'IPPList'
-const IPP_LIST_FHIR = 'identifier-simple'
+const IPP_LIST_FHIR = 'identifier.value'
 
 export const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
 const PATIENT_GENDER = 'gender' // ok
