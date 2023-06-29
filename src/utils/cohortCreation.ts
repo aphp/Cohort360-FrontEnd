@@ -85,7 +85,7 @@ const DEFAULT_CRITERIA_ERROR: SelectedCriteriaType = {
   gender: [],
   vitalStatus: [],
   years: [0, 130],
-  ageType: { id: 'year', label: 'En année' }
+  ageType: { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR }
 }
 
 const DEFAULT_GROUP_ERROR: CriteriaGroupType = {
@@ -187,21 +187,20 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
   switch (criterion.type) {
     case RESSOURCE_TYPE_PATIENT: {
-      let ageFilter = ''
-      if (criterion.years && (criterion.years[0] !== 0 || criterion.years[1] !== 130)) {
-        const today = moment()
-        //@ts-ignore
-        const date1 = moment()
-          .subtract(criterion.years[1] + 1, criterion?.ageType?.id || 'years')
-          .add(1, 'days')
-        //@ts-ignore
-        const date2 = moment().subtract(criterion.years[0], criterion?.ageType?.id || 'years')
+      let ageMin = ''
+      let ageMax = ''
 
-        ageFilter =
-          `${PATIENT_BIRTHDATE}=` +
-          `le${today.diff(date1, 'day')}` +
-          `&${PATIENT_BIRTHDATE}=` +
-          `ge${today.diff(date2, 'day')}`
+      if (
+        !(
+          criterion.years &&
+          criterion.years[0] === 0 &&
+          criterion.years[1] === 130 &&
+          criterion.ageType &&
+          criterion.ageType.id === Calendar.YEAR
+        )
+      ) {
+        ageMin = `${PATIENT_BIRTHDATE}=ge${+criterion.years[0] * getCalendarMultiplicator(criterion.ageType?.id)}`
+        ageMax = `${PATIENT_BIRTHDATE}=le${+criterion.years[1] * getCalendarMultiplicator(criterion.ageType?.id)}`
       }
 
       filterFhir = [
@@ -218,7 +217,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
                 .reduce(searchReducer)}`
             : ''
         }`,
-        `${ageFilter ? `${ageFilter}` : ''}`
+        `${ageMin ? `${ageMin}` : ''}`,
+        `${ageMax ? `${ageMax}` : ''}`
       ]
         .filter((elem) => elem)
         .reduce(filterReducer)
@@ -786,45 +786,15 @@ export async function unbuildRequest(_json: string): Promise<any> {
               case PATIENT_BIRTHDATE: {
                 currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : null
                 currentCriterion.years = currentCriterion.years ? currentCriterion.years : [0, 130]
-                const ageType = [
-                  { id: 'year', label: 'années' },
-                  { id: 'month', label: 'mois' },
-                  { id: 'day', label: 'jours' }
-                ]
 
-                if (value?.search('le') === 0) {
-                  const date = value?.replace('le', '') ? moment().subtract(value?.replace('le', ''), 'days') : null
-                  const diff = date ? moment().diff(date, 'days') : 0
-
-                  let currentAgeType: 'year' | 'month' | 'day' = 'year'
-                  if (diff >= 130 && diff <= 3000) {
-                    currentAgeType = 'month'
-                  } else if (diff <= 130) {
-                    currentAgeType = 'day'
-                  }
-
-                  const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
-                  currentCriterion.ageType = foundAgeType
-                  if (date) currentCriterion.years[1] = moment().diff(date, currentAgeType) || 130
-                } else if (value?.search('ge') === 0) {
-                  const date = value?.replace('ge', '')
-                    ? moment().subtract(+value?.replace('ge', '') + 1, 'days')
-                    : null
-                  const diff = date ? moment().diff(date, 'days') : 0
-
-                  let currentAgeType: 'year' | 'month' | 'day' = 'year'
-                  if (currentCriterion.ageType) {
-                    currentAgeType = currentCriterion.ageType.id
-                  } else {
-                    if (diff >= 130 && diff <= 3000) {
-                      currentAgeType = 'month'
-                    } else if (diff <= 130) {
-                      currentAgeType = 'day'
-                    }
-                    const foundAgeType = ageType.find(({ id }) => id === currentAgeType)
-                    currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : foundAgeType
-                  }
-                  currentCriterion.years[0] = moment().diff(date, currentAgeType) || 0
+                if (value?.includes('ge')) {
+                  const ageMin = value?.replace('ge', '')
+                  currentCriterion.ageType = getCalendarType(+ageMin)
+                  currentCriterion.years[0] = getValueFromCalendarType(currentCriterion.ageType?.id, +ageMin)
+                } else if (value?.includes('le')) {
+                  const ageMax = value?.replace('le', '')
+                  currentCriterion.ageType = getCalendarType(+ageMax)
+                  currentCriterion.years[1] = getValueFromCalendarType(currentCriterion.ageType?.id, +ageMax)
                 }
                 break
               }

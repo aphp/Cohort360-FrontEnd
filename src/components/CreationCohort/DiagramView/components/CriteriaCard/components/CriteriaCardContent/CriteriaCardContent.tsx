@@ -243,11 +243,6 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
       }
 
       case 'Patient': {
-        const ageType: any = _currentCriteria.ageType ? _currentCriteria.ageType.id : 'year'
-        let ageUnit: 'an(s)' | 'mois' | 'jour(s)' = 'an(s)'
-        if (ageType === 'month') ageUnit = 'mois'
-        else if (ageType === 'day') ageUnit = 'jour(s)'
-
         const displaySelectedGender = (genders: { id: string; label: string }[]) => {
           let currentGender: string[] = []
           for (const gender of genders) {
@@ -297,27 +292,17 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
               className={classes.criteriaChip}
               label={
                 <Typography style={{ maxWidth: 500 }} noWrap>
-                  {`
-                    ${_currentCriteria.years?.[0]} ${ageUnit}
-                      ${_currentCriteria.years?.[0] === 130 ? ' ou plus' : ''}
-                  `}
+                  {displayCalendarFields(
+                    'Âge',
+                    _currentCriteria.years?.[0],
+                    _currentCriteria.ageType?.requestLabel,
+                    _currentCriteria.years?.[1],
+                    _currentCriteria.ageType?.requestLabel
+                  )}
                 </Typography>
               }
             />
-          ),
-          !!_currentCriteria.years &&
-            _currentCriteria.years[0] !== _currentCriteria.years[1] &&
-            !(_currentCriteria.years[0] === 0 && _currentCriteria.years[1] === 130 && ageUnit === 'an(s)') && (
-              <Chip
-                className={classes.criteriaChip}
-                label={
-                  <Typography style={{ maxWidth: 500 }} noWrap>
-                    {`Entre ${_currentCriteria.years[0]} et ${_currentCriteria.years[1]} ${ageUnit}
-                    ${_currentCriteria.years[1] === 130 ? ' ou plus' : ''}`}
-                  </Typography>
-                }
-              />
-            )
+          )
         ]
         break
       }

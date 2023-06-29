@@ -459,7 +459,7 @@ export type DemographicDataType = {
   type: 'Patient'
   gender: { id: string; label: string }[] | null
   vitalStatus: { id: string; label: string }[] | null
-  ageType: { id: string; label: string } | null
+  ageType: { id: Calendar; criteriaLabel: CalendarLabel; requestLabel: CalendarRequestLabel }
   years: [number, number]
   isInclusive?: boolean
 }
