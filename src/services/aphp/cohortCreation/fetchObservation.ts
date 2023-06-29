@@ -26,7 +26,7 @@ export const fetchBiologyData = async (searchValue?: string, noStar?: boolean) =
     : ''
 
   const res = await apiFhir.get<any>(
-    `/ValueSet?url=${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}${_searchValue}&size=${
+    `/ValueSet?url=${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}${_searchValue}&_count=${
       VALUE_SET_SIZE ?? 9999
     }`
   )
@@ -50,7 +50,7 @@ export const fetchBiologySearch = async (searchInput: string) => {
   const lowerCaseTrimmedSearchInput = searchInput.toLowerCase().trim()
 
   const res = await apiFhir.get<any>(
-    `/ConceptMap?size=2000&context=Maps%20to,Hierarchy%20Concat%20Parents&source-uri=${BIOLOGY_HIERARCHY_ITM_ANABIO}&target-uri=${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}&_text=${encodeURIComponent(
+    `/ConceptMap?_count=2000&context=Maps%20to,Hierarchy%20Concat%20Parents&source-uri=${BIOLOGY_HIERARCHY_ITM_ANABIO}&target-uri=${BIOLOGY_HIERARCHY_ITM_ANABIO},${BIOLOGY_HIERARCHY_ITM_LOINC}&_text=${encodeURIComponent(
       lowerCaseTrimmedSearchInput.replace(/[\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&') // eslint-disable-line
     )},${encodeURIComponent(
       `/(.)*${lowerCaseTrimmedSearchInput.replace(/[/"]/g, function (m) {
