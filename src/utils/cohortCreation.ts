@@ -14,6 +14,7 @@ import {
 } from 'types'
 
 import docTypes from 'assets/docTypes.json'
+import { BIOLOGY_HIERARCHY_ITM_ANABIO, CLAIM_HIERARCHY, CONDITION_HIERARCHY, PROCEDURE_HIERARCHY } from '../constants'
 
 const REQUETEUR_VERSION = 'v1.2.1'
 
@@ -369,7 +370,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
-              ? `${CONDITION_CODE_ALL_HIERARCHY}=*`
+              ? `${CONDITION_CODE_ALL_HIERARCHY}=${CONDITION_HIERARCHY}|*`
               : `${CONDITION_CODE}=${criterion.code.map((code: any) => code.id).reduce(searchReducer)}`
             : ''
         }`,
@@ -399,7 +400,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
-              ? `${PROCEDURE_CODE_ALL_HIERARCHY}=*`
+              ? `${PROCEDURE_CODE_ALL_HIERARCHY}=${PROCEDURE_HIERARCHY}|*`
               : `${PROCEDURE_CODE}=${criterion.code
                   .map((diagnosticType: any) => diagnosticType.id)
                   .reduce(searchReducer)}`
@@ -424,7 +425,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
-              ? `${CLAIM_CODE_ALL_HIERARCHY}=*`
+              ? `${CLAIM_CODE_ALL_HIERARCHY}=${CLAIM_HIERARCHY}|*`
               : `${CLAIM_CODE}=${criterion.code.map((diagnosticType: any) => diagnosticType.id).reduce(searchReducer)}`
             : ''
         }`,
@@ -513,7 +514,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
-              ? `${OBSERVATION_CODE_ALL_HIERARCHY}=*`
+              ? `${OBSERVATION_CODE_ALL_HIERARCHY}=${BIOLOGY_HIERARCHY_ITM_ANABIO}|*`
               : `${OBSERVATION_CODE}=${criterion.code
                   .map((diagnosticType: any) => diagnosticType.id)
                   .reduce(searchReducer)}`
@@ -1144,6 +1145,8 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const value = filter ? filter[1] : null
             switch (key) {
               case CONDITION_CODE_ALL_HIERARCHY:
+                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, { id: '*' }] : { id: '*' }
+                break
               case CONDITION_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
@@ -1215,6 +1218,8 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const value = filter ? filter[1] : null
             switch (key) {
               case PROCEDURE_CODE_ALL_HIERARCHY:
+                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, { id: '*' }] : { id: '*' }
+                break
               case PROCEDURE_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
@@ -1274,6 +1279,8 @@ export async function unbuildRequest(_json: string): Promise<any> {
             const value = filter ? filter[1] : null
             switch (key) {
               case CLAIM_CODE_ALL_HIERARCHY:
+                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, { id: '*' }] : { id: '*' }
+                break
               case CLAIM_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
@@ -1424,6 +1431,8 @@ export async function unbuildRequest(_json: string): Promise<any> {
 
             switch (key) {
               case OBSERVATION_CODE_ALL_HIERARCHY:
+                currentCriterion.code = currentCriterion.code ? [...currentCriterion.code, { id: '*' }] : { id: '*' }
+                break
               case OBSERVATION_CODE: {
                 const codeIds = value?.split(',')
                 const newCode = codeIds?.map((codeId: any) => ({ id: codeId }))
