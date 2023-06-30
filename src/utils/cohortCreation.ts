@@ -16,7 +16,7 @@ import {
 import docTypes from 'assets/docTypes.json'
 import { BIOLOGY_HIERARCHY_ITM_ANABIO, CLAIM_HIERARCHY, CONDITION_HIERARCHY, PROCEDURE_HIERARCHY } from '../constants'
 
-const REQUETEUR_VERSION = 'v1.2.1'
+const REQUETEUR_VERSION = 'v1.3.0'
 
 // TODO: à changer quand ticket fhir ok vvvvv
 const RESSOURCE_TYPE_IPP_LIST: 'IPPList' = 'IPPList'
