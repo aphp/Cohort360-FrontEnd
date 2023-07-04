@@ -18,13 +18,13 @@ import {
 
 import { ReactComponent as CancelIcon } from 'assets/icones/times.svg'
 import { ReactComponent as CheckIcon } from 'assets/icones/check.svg'
-import { ReactComponent as PdfIcon } from 'assets/icones/file-pdf.svg'
 
 import DocumentViewer from 'components/DocumentViewer/DocumentViewer'
 
 import { getDocumentStatus } from 'utils/documentsFormatter'
 
 import useStyles from './styles'
+import { Visibility } from '@mui/icons-material'
 
 type DocumentRowTypes = {
   deidentified: boolean
@@ -78,8 +78,8 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
         <TableCell align="center">{row.serviceProvider}</TableCell>
         <TableCell align="center">{getStatusShip(row.status as DocumentReferenceStatusKind)}</TableCell>
         <TableCell align="center">
-          <IconButton disabled={row.event === undefined} onClick={() => setDocumentDialogOpen(true)}>
-            <PdfIcon height="30px" fill={row.event === undefined ? '#CBCFCF' : '#ED6D91'} />
+          <IconButton onClick={() => setDocumentDialogOpen(true)}>
+            <Visibility height="30px" />
           </IconButton>
         </TableCell>
       </TableRow>

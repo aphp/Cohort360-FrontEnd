@@ -7,7 +7,6 @@ import { CircularProgress, Chip, Grid, IconButton, Typography, TableRow, TableCe
 import FolderSharedIcon from '@mui/icons-material/FolderShared'
 import DescriptionIcon from '@mui/icons-material/Description'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
-import { ReactComponent as PdfIcon } from 'assets/icones/file-pdf.svg'
 import { ReactComponent as CheckIcon } from 'assets/icones/check.svg'
 import { ReactComponent as CancelIcon } from 'assets/icones/times.svg'
 import { ReactComponent as UserIcon } from 'assets/icones/user.svg'
@@ -204,10 +203,6 @@ const DataTableCompositionLine: React.FC<{
         </TableCell>
 
         <TableCell>
-          {/* <IconButton onClick={() => setOpen(documentId ?? '')} disabled={event === undefined}>
-            <PdfIcon height="30px" fill={event === undefined ? '#CBCFCF' : '#ED6D91'} />
-          </IconButton> */}
-
           <IconButton onClick={() => setOpen(documentId ?? '')}>
             <Visibility height="30px" />
           </IconButton>
