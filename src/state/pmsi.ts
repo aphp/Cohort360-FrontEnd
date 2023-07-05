@@ -47,36 +47,28 @@ const initPmsiHierarchy = createAsyncThunk<PmsiState, void, { state: RootState }
       const state = getState().pmsi
       const { claim, condition, procedure } = state
 
-      let claimList = []
-      let conditionList = []
-      let procedureList = []
-
-      if (claim && claim.list && claim.list.length === 0) {
-        claimList = await services.cohortCreation.fetchGhmHierarchy('')
-      }
-      if (condition && condition.list && condition.list.length === 0) {
-        conditionList = await services.cohortCreation.fetchCim10Hierarchy('')
-      }
-      if (procedure && procedure.list && procedure.list.length === 0) {
-        procedureList = await services.cohortCreation.fetchCcamHierarchy('')
-      }
+      const claimList = claim.list.length === 0 ? await services.cohortCreation.fetchGhmHierarchy('') : claim.list
+      const conditionList =
+        condition.list.length === 0 ? await services.cohortCreation.fetchCim10Hierarchy('') : condition.list
+      const procedureList =
+        procedure.list.length === 0 ? await services.cohortCreation.fetchCcamHierarchy('') : procedure.list
 
       return {
         ...state,
         claim: {
           ...state.claim,
           loading: false,
-          list: claimList || []
+          list: claimList
         },
         condition: {
           ...state.condition,
           loading: false,
-          list: conditionList || []
+          list: conditionList
         },
         procedure: {
           ...state.procedure,
           loading: false,
-          list: procedureList || []
+          list: procedureList
         }
       }
     } catch (error) {
