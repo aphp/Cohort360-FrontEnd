@@ -7,7 +7,8 @@ import BiologyForm from './components/Form/BiologyForm'
 import BiologyHierarchy from './components/Hierarchy/BiologyHierarchy'
 import BiologySearch from './components/BiologySearch/BiologySearch'
 import { initSyncHierarchyTableEffect, OBSERVATION, syncOnChangeFormValue } from 'utils/pmsi'
-import { fetchProcedure, PmsiListType } from 'state/pmsi'
+import { PmsiListType } from 'state/pmsi'
+import { fetchBiology } from 'state/biology'
 import { useAppDispatch, useAppSelector } from 'state'
 
 export const defaultBiology = {
@@ -57,7 +58,7 @@ const Index = (props: any) => {
       biologyHierarchy,
       selectedCriteria,
       defaultCriteria && defaultCriteria.code ? defaultCriteria.code : [],
-      fetchProcedure,
+      fetchBiology,
       defaultBiology.type,
       dispatch
     )
