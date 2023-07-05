@@ -336,36 +336,42 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                             justifyContent="center"
                             style={{ width: 'max-content', margin: 'auto' }}
                           >
-                            {canExportThisCohort && row.exportable && (
+                            {canExportThisCohort && (
                               <Grid item>
-                                <IconButton
-                                  size="small"
-                                  onClick={(event) => {
-                                    event.stopPropagation()
-                                    setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
-                                  }}
-                                  disabled={maintenanceIsActive}
-                                >
-                                  <ExportIcon />
-                                </IconButton>
-                              </Grid>
-                            )}
-                            {canExportThisCohort && !row.exportable && (
-                              <Grid item>
-                                <Tooltip title="Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé.">
-                                  <div>
-                                    <IconButton
-                                      size="small"
-                                      onClick={(event) => {
-                                        event.stopPropagation()
-                                        setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
-                                      }}
-                                      disabled={maintenanceIsActive || !row.exportable}
-                                    >
-                                      <ExportIcon />
-                                    </IconButton>
-                                  </div>
-                                </Tooltip>
+                                <>
+                                  {console.log(row.exportable)}
+                                  <Tooltip
+                                    title={
+                                      !row.exportable
+                                        ? 'Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé.'
+                                        : row.request_job_status === 'failed'
+                                        ? 'Cette cohorte ne peut pas être exportée car elle a échouée lors de sa création'
+                                        : row.request_job_status === 'pending'
+                                        ? 'Cette cohorte ne peut pas être exportée car elle est en cours de création'
+                                        : ''
+                                    }
+                                  >
+                                    <div>
+                                      <IconButton
+                                        size="small"
+                                        onClick={(event) => {
+                                          event.stopPropagation()
+                                          setSelectedExportableCohort(
+                                            row.fhir_group_id ? +row.fhir_group_id : undefined
+                                          )
+                                        }}
+                                        disabled={
+                                          maintenanceIsActive ||
+                                          row.request_job_status === 'long_pending' ||
+                                          row.request_job_status === 'failed' ||
+                                          row.request_job_status === 'pending'
+                                        }
+                                      >
+                                        <ExportIcon />
+                                      </IconButton>
+                                    </div>
+                                  </Tooltip>
+                                </>
                               </Grid>
                             )}
 
