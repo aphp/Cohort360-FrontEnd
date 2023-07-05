@@ -17,6 +17,7 @@ import { buildObservationFiltersChips } from 'utils/chips'
 
 import useStyles from './styles'
 import { Checkbox } from '@mui/material'
+import { useDebounce } from 'utils/debounce'
 
 type PatientBiologyTypes = {
   groupId?: string
@@ -42,6 +43,8 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
 
   const [searchInput, setSearchInput] = useState('')
 
+  const debouncedSearchValue = useDebounce(500, searchInput)
+
   const [open, setOpen] = useState<string | null>(null)
 
   const [filters, setFilters] = useState<ObservationFilters>(filtersDefault)
@@ -53,7 +56,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     orderDirection: 'asc'
   })
 
-  const _fetchBiology = async (page: number) => {
+  const _fetchBiology = async () => {
     dispatch(
       fetchBiology({
         groupId,
@@ -77,11 +80,6 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     )
   }
 
-  const handleChangePage = (value?: number) => {
-    setPage(value ? value : 1)
-    _fetchBiology(value ? value : 1)
-  }
-
   const handleChangeFilter = (filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate', value: any) => {
     switch (filterName) {
       case 'nda':
@@ -97,8 +95,8 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   }
 
   useEffect(() => {
-    handleChangePage()
-  }, [searchInput, filters, order, validatedStatus])
+    _fetchBiology()
+  }, [debouncedSearchValue, filters, order, validatedStatus, page])
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
@@ -146,7 +144,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
         order={order}
         setOrder={setOrder}
         page={page}
-        setPage={(newPage) => handleChangePage(newPage)}
+        setPage={(newPage) => setPage(newPage)}
         total={totalBiology}
       />
 
