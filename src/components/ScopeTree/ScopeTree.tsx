@@ -21,7 +21,7 @@ import {
 import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import EnhancedTable from 'components/ScopeTree/ScopeTreeTable'
-import { ScopeTreeRow, TreeElement } from 'types'
+import { CriteriaNameType, ScopeTreeRow, TreeElement } from 'types'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { expandScopeElement, fetchScopesList, ScopeState, updateScopeList } from 'state/scope'
@@ -150,7 +150,7 @@ type ScopeTreeProps = {
   defaultSelectedItems: ScopeTreeRow[]
   onChangeSelectedItem: (selectedItems: ScopeTreeRow[]) => void
   searchInput: string
-  executiveUnitType?: string
+  executiveUnitType?: CriteriaNameType
 }
 
 const ScopeTree: React.FC<ScopeTreeProps> = ({
@@ -189,8 +189,8 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
   const isHeadIndetermined: boolean =
     !isAllSelected && selectedItems && selectedItems.length > 0 && rootRows && !isHeadChecked
 
-  const fetchScopeTree = async (executiveUnitType?: string, signal?: AbortSignal) => {
-    return dispatch(fetchScopesList({ signal })).unwrap()
+  const fetchScopeTree = async (executiveUnitType?: CriteriaNameType, signal?: AbortSignal) => {
+    return dispatch(fetchScopesList({ signal, type: executiveUnitType })).unwrap()
   }
 
   const _cancelPendingRequest = () => {
