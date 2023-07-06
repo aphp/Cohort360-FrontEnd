@@ -881,6 +881,14 @@ export type AgeRangeType = {
   days?: number
 }
 
+export type ScopeType =
+  | 'AP-HP'
+  | 'Groupe hospitalier (GH)'
+  | 'GHU'
+  | 'Hôpital'
+  | 'Pôle/DMU'
+  | 'Unité Fonctionnelle (UF)'
+
 export enum CriteriaName {
   Cim10 = 'cim10',
   Ccam = 'ccam',

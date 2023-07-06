@@ -6,7 +6,7 @@ import {
   ScopeTreeRow,
   ScopeElement,
   ChartCode,
-  CriteriaNameType
+  ScopeType
 } from 'types'
 import {
   getAgeRepartitionMapAphp,
@@ -74,7 +74,7 @@ export interface IServicePerimeters {
     defaultPerimetersIds?: string[],
     cohortIds?: string[],
     noPerimetersIdsFetch?: boolean,
-    type?: CriteriaNameType,
+    type?: ScopeType,
     signal?: AbortSignal
   ) => Promise<ScopePage[]>
 
@@ -89,7 +89,7 @@ export interface IServicePerimeters {
    * Retour:
    *   - ScopeTreeRow[]
    */
-  getScopePerimeters: (practitionerId: string, type?: CriteriaNameType, signal?: AbortSignal) => Promise<ScopeTreeRow[]>
+  getScopePerimeters: (practitionerId: string, type?: ScopeType, signal?: AbortSignal) => Promise<ScopeTreeRow[]>
 
   /**
    * Cette fonction retoune l'ensemble des périmètres enfant d'un périmètre passé en argument
@@ -104,7 +104,7 @@ export interface IServicePerimeters {
   getScopesWithSubItems: (
     subScopesIds: string | null | undefined,
     getSubItem?: boolean,
-    type?: CriteriaNameType,
+    type?: ScopeType,
     signal?: AbortSignal
   ) => Promise<ScopeTreeRow[]>
 
@@ -126,7 +126,7 @@ export interface IServicePerimeters {
   buildScopeTreeRowList: (
     subScopes: ScopePage[],
     getSubItem?: boolean | undefined,
-    type?: CriteriaNameType,
+    type?: ScopeType,
     signal?: AbortSignal
   ) => Promise<ScopeTreeRow[]>
 
@@ -148,7 +148,7 @@ export interface IServicePerimeters {
    * construire la liste des types des périmètres en haut du type. Sinon tous les types.
    * @param type
    */
-  getHigherTypes: (type?: CriteriaNameType) => string[]
+  getHigherTypes: (type?: ScopeType) => string[]
 }
 
 const servicesPerimeters: IServicePerimeters = {
@@ -256,7 +256,7 @@ const servicesPerimeters: IServicePerimeters = {
     defaultPerimetersIds?: string[],
     cohortIds?: string[],
     noPerimetersIdsFetch?: boolean,
-    type?: CriteriaNameType,
+    type?: ScopeType,
     signal?: AbortSignal
   ) => {
     try {
@@ -331,7 +331,7 @@ const servicesPerimeters: IServicePerimeters = {
     }
   },
 
-  getScopePerimeters: async (practitionerId, type?: CriteriaNameType, signal?: AbortSignal) => {
+  getScopePerimeters: async (practitionerId, type?: ScopeType, signal?: AbortSignal) => {
     if (!practitionerId) return []
 
     const scopeItemList: ScopePage[] =
@@ -348,7 +348,7 @@ const servicesPerimeters: IServicePerimeters = {
   getScopesWithSubItems: async (
     subScopesIds: string | null | undefined,
     getSubItem?: boolean,
-    type?: CriteriaNameType,
+    type?: ScopeType,
     signal?: AbortSignal
   ) => {
     if (!subScopesIds) return []
@@ -435,7 +435,7 @@ const servicesPerimeters: IServicePerimeters = {
   buildScopeTreeRowList: async (
     subScopes: ScopePage[],
     getSubItem?: boolean | undefined,
-    type?: CriteriaNameType,
+    type?: ScopeType,
     signal?: AbortSignal
   ) => {
     let scopeRowList: ScopeTreeRow[] = []
@@ -485,18 +485,17 @@ const servicesPerimeters: IServicePerimeters = {
     return `${perimeterID} - ${perimeter.name}`
   },
 
-  getHigherTypes: (type?: CriteriaNameType) => {
+  getHigherTypes: (type?: ScopeType) => {
     if (!type) {
       return scopeTypes.typeLevel.flat()
     }
 
     const higherTypes: string[] = []
-    const scopeType = scopeTypes.criteriaType[type]
-    if (scopeType) {
+    if (type) {
       let isFoundValue = false
       for (const currentLevel of [...scopeTypes.typeLevel].reverse()) {
         for (const valueInTheSameLevel of currentLevel) {
-          if (valueInTheSameLevel === scopeType) {
+          if (valueInTheSameLevel === type) {
             isFoundValue = true
           }
           if (isFoundValue) {
