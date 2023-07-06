@@ -20,4 +20,4 @@ jobs:
 #        run: npm run test
         run: echo "No tests ATM"
       - name: Lint
-        run: npm run lint
+        run: npm run lint && npx tsc --noEmit
