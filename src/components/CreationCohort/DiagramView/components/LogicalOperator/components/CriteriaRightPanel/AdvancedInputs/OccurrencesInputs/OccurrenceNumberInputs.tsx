@@ -58,11 +58,9 @@ const OccurrencesNumberInputs: React.FC<OccurrencesNumberInputsProps> = (props) 
 
   useEffect(() => {
     if (selectedCriteria.occurrence < minValue) {
-      setInvalidOccurenceNumber(true)
       onChangeValue('occurrence', minValue)
       return
     }
-    setInvalidOccurenceNumber(false)
   }, [selectedCriteria.occurrenceComparator])
 
   return (
@@ -93,7 +91,7 @@ const OccurrencesNumberInputs: React.FC<OccurrencesNumberInputsProps> = (props) 
         )}
       </FormLabel>
 
-      <Grid style={{ display: 'grid', gridTemplateColumns: '100px 1fr', alignItems: 'center', margin: '0 1em' }}>
+      <Grid style={{ display: 'grid', gridTemplateColumns: '100px 1fr', alignItems: 'start', margin: '0 1em' }}>
         <Select
           style={{ marginRight: '1em' }}
           id="criteria-occurrenceComparator-select"
