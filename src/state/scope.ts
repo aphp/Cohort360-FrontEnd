@@ -5,7 +5,7 @@ import { logout, login } from './me'
 
 import services from 'services/aphp'
 
-import { CriteriaNameType, ScopeTreeRow } from 'types'
+import { ScopeType, ScopeTreeRow } from 'types'
 
 export type ScopeState = {
   loading: boolean
@@ -27,7 +27,7 @@ type FetchScopeListReturn = {
 }
 
 type FetchScopeListArgs = {
-  type?: CriteriaNameType
+  type?: ScopeType
   signal?: AbortSignal | undefined
 }
 
@@ -58,7 +58,7 @@ const fetchScopesList = createAsyncThunk<FetchScopeListReturn, FetchScopeListArg
   }
 )
 type fetchScopesListinBackgroundArgs = {
-  type?: CriteriaNameType
+  type?: ScopeType
   signal?: AbortSignal | undefined
 }
 const fetchScopesListinBackground = createAsyncThunk<
@@ -102,7 +102,7 @@ type ExpandScopeElementParams = {
   scopesList?: ScopeTreeRow[]
   selectedItems?: ScopeTreeRow[]
   openPopulation?: number[]
-  type?: CriteriaNameType
+  type?: ScopeType
   signal?: AbortSignal
 }
 type ExpandScopeElementReturn = {
@@ -135,7 +135,7 @@ const expandScopeElement = createAsyncThunk<ExpandScopeElementReturn, ExpandScop
     } else {
       _openPopulation = [..._openPopulation, params.rowId]
 
-      const replaceSubItems = async (items: ScopeTreeRow[], type?: CriteriaNameType) => {
+      const replaceSubItems = async (items: ScopeTreeRow[], type?: ScopeType) => {
         let _items: ScopeTreeRow[] = []
         for (let item of items) {
           // Replace sub items element by response of back-end
