@@ -5,7 +5,7 @@ import Drawer from '@mui/material/Drawer'
 import Typography from '@mui/material/Typography'
 
 import ScopeTree from 'components/ScopeTree/ScopeTree'
-import { ScopeTreeRow } from 'types'
+import { CriteriaNameType, ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
 import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
@@ -13,7 +13,7 @@ import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
 type PopulationRightPanelProps = {
   open: boolean
   title?: string
-  executiveUnitType?: string
+  executiveUnitType?: CriteriaNameType
   selectedPopulation: ScopeTreeRow[]
   isAcceptEmptySelection?: boolean
   onConfirm: (selectedPopulation: ScopeTreeRow[]) => void
