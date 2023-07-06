@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import { FormLabel, Grid, MenuItem, Select, TextField, Tooltip } from '@mui/material'
 import InfoIcon from '@mui/icons-material/Info'
@@ -8,14 +8,20 @@ import { CriteriaName, CriteriaNameType } from 'types'
 const defaultOccurrencesNumberInputs = {
   code: [],
   isLeaf: false,
-  valueMin: 0,
-  valueMax: 0,
+  valueMin: 1,
+  valueMax: 99999,
   valueComparator: '>=',
   occurrence: 1,
   occurrenceComparator: '>=',
   startOccurrence: '',
   endOccurrence: '',
   isInclusive: true
+}
+
+const getMinForComparatorType = (comparator: string) => {
+  console.log(comparator)
+  if (comparator === '<') return 2
+  return 1
 }
 
 type OccurrencesNumberInputsProps = {
@@ -26,11 +32,38 @@ type OccurrencesNumberInputsProps = {
 
 const OccurrencesNumberInputs: React.FC<OccurrencesNumberInputsProps> = (props) => {
   const { form, onChangeValue } = props
+  const [invalidOccurrenceNumber, setInvalidOccurenceNumber] = useState(false)
   const selectedCriteria = { ...defaultOccurrencesNumberInputs, ...props.selectedCriteria }
+  const minValue = useMemo(
+    () => getMinForComparatorType(selectedCriteria.occurrenceComparator),
+    [selectedCriteria.occurrenceComparator]
+  )
 
-  const allowOnlyPositiveIntegers = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (Number.isNaN(+event.key) && event.key !== 'Backspace') event.preventDefault()
+  const _onChangeOccurenceNumber = (value: string) => {
+    // this method prevent entering a number like "12" if the comparator is "<" since the first digit "1" is not valid
+    // but this use case won't happen often i guess
+    // also this can be got around by multiples ways (copy/paste, using the arrows, selecting comparator <= first, etc.)
+    try {
+      const occNumber = parseInt(value)
+      if (occNumber < minValue) {
+        setInvalidOccurenceNumber(true)
+        return
+      }
+      setInvalidOccurenceNumber(false)
+      onChangeValue('occurrence', occNumber)
+    } catch (error) {
+      // should never happen because of the input type and the keypress filter
+    }
   }
+
+  useEffect(() => {
+    if (selectedCriteria.occurrence < minValue) {
+      setInvalidOccurenceNumber(true)
+      onChangeValue('occurrence', minValue)
+      return
+    }
+    setInvalidOccurenceNumber(false)
+  }, [selectedCriteria.occurrenceComparator])
 
   return (
     <>
@@ -76,14 +109,17 @@ const OccurrencesNumberInputs: React.FC<OccurrencesNumberInputsProps> = (props) 
 
         <TextField
           required
-          inputProps={{
-            min: 0
+          error={invalidOccurrenceNumber}
+          InputProps={{
+            inputProps: {
+              min: minValue
+            }
           }}
+          helperText={invalidOccurrenceNumber && `Le nombre d’occurrences doit être supérieur ou égal à ${minValue}`}
           type="number"
           id="criteria-occurrence-required"
           value={selectedCriteria.occurrence}
-          onKeyDown={(e) => allowOnlyPositiveIntegers(e)}
-          onChange={(e) => onChangeValue('occurrence', e.target.value)}
+          onChange={(e) => _onChangeOccurenceNumber(e.target.value)}
         />
       </Grid>
     </>
