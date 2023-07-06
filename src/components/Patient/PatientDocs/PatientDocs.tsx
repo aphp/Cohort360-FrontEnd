@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react'
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 
 import { Checkbox, CircularProgress, Grid, Tooltip, Typography } from '@mui/material'
 
@@ -104,7 +104,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
     FilterByDocumentStatus.NOT_VALIDATED,
     FilterByDocumentStatus.CANCELED
   ]
-  const fetchDocumentsList = async () => {
+  const fetchDocumentsList = useCallback(async () => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
       const response = await dispatch(
@@ -131,7 +131,21 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
         setLoadingStatus(LoadingStatus.FETCHING)
       }
     }
-  }
+  }, [
+    dispatch,
+    docStatuses,
+    docTypes,
+    endDate,
+    executiveUnits,
+    groupId,
+    nda,
+    onlyPdfAvailable,
+    orderBy,
+    page,
+    searchBy,
+    searchInput,
+    startDate
+  ])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -147,7 +161,7 @@ const PatientDocs: React.FC<PatientTypes> = ({ groupId }) => {
       controllerRef.current = cancelPendingRequest(controllerRef.current)
       fetchDocumentsList()
     }
-  }, [loadingStatus])
+  }, [fetchDocumentsList, loadingStatus])
 
   return (
     <Grid container alignItems="center" gap="20px">

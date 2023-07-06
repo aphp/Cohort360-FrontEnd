@@ -50,7 +50,7 @@ const AsyncAutocomplete = ({
     return () => {
       active = false
     }
-  }, [searchValue])
+  }, [onFetch, searchValue])
 
   useEffect(() => {
     if (!open) {

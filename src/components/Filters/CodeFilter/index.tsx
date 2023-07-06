@@ -18,7 +18,7 @@ const CodeFilter = ({ name, value, disabled = false, onFetch }: CodeFilterProps)
 
   useEffect(() => {
     if (context?.updateFormData) context.updateFormData(name, code)
-  }, [code])
+  }, [code, context, name])
 
   return (
     <InputWrapper>

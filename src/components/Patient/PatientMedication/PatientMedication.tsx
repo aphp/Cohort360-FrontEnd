@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import Grid from '@mui/material/Grid'
 
@@ -121,7 +121,7 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
 
-  const _fetchMedication = async () => {
+  const _fetchMedication = useCallback(async () => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
       const response = await dispatch(
@@ -157,7 +157,20 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
         setLoadingStatus(LoadingStatus.SUCCESS)
       }
     }
-  }
+  }, [
+    administrationRoutes,
+    dispatch,
+    endDate,
+    executiveUnits,
+    groupId,
+    nda,
+    orderBy,
+    page,
+    prescriptionTypes,
+    searchInput,
+    selectedTab.id,
+    startDate
+  ])
 
   useEffect(() => {
     const fetch = async () => {
@@ -185,14 +198,14 @@ const PatientMedication = ({ groupId }: PatientMedicationProps) => {
       controllerRef.current = cancelPendingRequest(controllerRef.current)
       _fetchMedication()
     }
-  }, [loadingStatus])
+  }, [loadingStatus, _fetchMedication])
 
   useEffect(() => {
     setPage(1)
     removeSearchCriterias()
-    setTriggerClean(!triggerClean)
+    setTriggerClean((triggerClean) => !triggerClean)
     setLoadingStatus(LoadingStatus.IDDLE)
-  }, [selectedTab])
+  }, [removeSearchCriterias, selectedTab])
 
   useEffect(() => {
     const medicationIndex = mapToAttribute(selectedTab.id)

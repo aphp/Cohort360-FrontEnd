@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Tab, Tabs } from '@mui/material'
 
 import useStyles from './styles'
@@ -58,7 +58,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       defaultProcedure.type,
       dispatch
     )
-  const _initSyncHierarchyTableEffect = async () => {
+  const _initSyncHierarchyTableEffect = useCallback(async () => {
     await initSyncHierarchyTableEffect(
       ccamHierarchy,
       selectedCriteria,
@@ -67,10 +67,15 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       defaultProcedure.type,
       dispatch
     )
-  }
+    // TODO fix initSyncHierarchyTableEffect, because it's mess in there
+    // it shouldn't depends on the hierarchy or selectedCriteria or defaultCriteria since it's changing it everytime
+    // also PmsiListType type should be renamed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch])
+
   useEffect(() => {
     _initSyncHierarchyTableEffect()
-  }, [])
+  }, [_initSyncHierarchyTableEffect])
 
   return (
     <>

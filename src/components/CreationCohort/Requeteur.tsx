@@ -109,7 +109,9 @@ const Requeteur = () => {
     if (isRendered.current) {
       setCriteriaLoading((criteriaLoading) => criteriaLoading - 1)
     }
-  }, [dispatch, selectedCriteria, allowSearchIpp, selectedPopulation])
+    // ignored criteriaData.cache because it causes infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allowSearchIpp, dispatch, selectedCriteria, selectedPopulation, user?.nominativeGroupsIds])
 
   const _unbuildRequest = async (newCurrentSnapshot: CurrentSnapshot) => {
     dispatch(unbuildCohortCreation({ newCurrentSnapshot }))

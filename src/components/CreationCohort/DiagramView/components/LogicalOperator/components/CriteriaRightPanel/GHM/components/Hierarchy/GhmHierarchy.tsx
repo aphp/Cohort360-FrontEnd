@@ -168,7 +168,7 @@ const GhmHierarchy: React.FC<GhmHierarchyProps> = (props) => {
     }
     newList.code?.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, ghmHierarchy).equivalentRow)
     setCurrentState(newList)
-  }, [initialState, ghmHierarchy])
+  }, [initialState, ghmHierarchy, selectedCriteria])
 
   useEffect(() => {
     if (isLoadingSyncHierarchyTable > 0 || isLoadingPmsi > 0) {

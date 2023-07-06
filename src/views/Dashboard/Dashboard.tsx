@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Link, useParams, useLocation } from 'react-router-dom'
 import { Grid, Tabs, Tab } from '@mui/material'
 
@@ -41,7 +41,7 @@ const Dashboard: React.FC<{
   const open = useAppSelector((state) => state.drawer)
   const dashboard = useAppSelector((state) => state.exploredCohort)
 
-  const onChangeTabs = () => {
+  const onChangeTabs = useCallback(() => {
     switch (context) {
       case 'patients':
         setTabs([
@@ -101,7 +101,7 @@ const Dashboard: React.FC<{
       default:
         break
     }
-  }
+  }, [cohortId, context, dashboard.requestId, location.search])
 
   useEffect(() => {
     const id = context === 'cohort' ? cohortId : context === 'perimeters' ? perimetreIds : undefined
@@ -109,11 +109,11 @@ const Dashboard: React.FC<{
     if (context !== 'new_cohort') {
       dispatch(fetchExploredCohort({ context, id }))
     }
-  }, [context, cohortId]) // eslint-disable-line
+  }, [context, cohortId, perimetreIds, dispatch])
 
   useEffect(() => {
     onChangeTabs()
-  }, [dashboard])
+  }, [dashboard, onChangeTabs])
 
   const forceReload = () => {
     const id = context === 'cohort' ? cohortId : context === 'perimeters' ? perimetreIds : undefined

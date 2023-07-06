@@ -44,7 +44,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
   useEffect(() => {
     const _fetchDocumentContent = async () => {
       setLoading(true)
-      if (loading || !documentId || !open) return setLoading(false)
+      if (!documentId || !open) return setLoading(false)
 
       const documentContent = await services.cohorts.fetchDocumentContent(documentId)
       if (documentContent) {
@@ -59,7 +59,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
       setDocumentContent(null)
       setNumPages(1)
     }
-  }, [open, documentId])
+  }, [open, documentId, deidentified])
 
   const handleResize = () => {
     if (gridRef.current) {
@@ -78,7 +78,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
 
   useLayoutEffect(() => {
     handleResize()
-  }, [gridRef.current])
+  }, [])
 
   const pdfViewerContainerStyle = {
     width: '75%',

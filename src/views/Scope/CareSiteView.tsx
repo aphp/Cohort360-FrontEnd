@@ -16,6 +16,7 @@ const CareSiteView = () => {
   const [selectedItems, setSelectedItems] = useState<ScopeTreeRow[]>([])
   const [openPopulation, setOpenPopulations] = useState<number[]>([])
   const open = useAppSelector((state) => state.drawer)
+
   const trimItems = () => {
     const _selectedItems = selectedItems ? selectedItems : []
 
@@ -25,7 +26,7 @@ const CareSiteView = () => {
 
   useEffect(() => {
     dispatch(closeAllOpenedPopulation())
-  }, [])
+  }, [dispatch])
 
   return (
     <Grid

@@ -174,7 +174,7 @@ const BiologyHierarchy: React.FC<BiologyHierarchyProps> = (props) => {
     }
     newList.code.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, biologyHierarchy).equivalentRow)
     setCurrentState(newList)
-  }, [initialState, biologyHierarchy])
+  }, [initialState, biologyHierarchy, selectedCriteria])
 
   const _handleClick = (newSelectedItems: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => {
     onChangeSelectedHierarchy(newSelectedItems, newHierarchy)

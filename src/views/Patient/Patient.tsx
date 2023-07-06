@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 
 import { IconButton, Grid, Tabs, Tab, CircularProgress } from '@mui/material'
@@ -35,8 +35,8 @@ const Patient = () => {
   const loading = patient !== null ? patient.loading : false
   const deidentified = patient !== null ? patient.deidentified ?? false : false
 
-  const search = new URLSearchParams(location.search)
-  const groupId = search.get('groupId') ?? undefined
+  const search = useMemo(() => new URLSearchParams(location.search), [location.search])
+  const groupId = useMemo(() => search.get('groupId') ?? undefined, [search])
 
   const { patientId, tabName } = useParams<{
     patientId: string
@@ -62,7 +62,7 @@ const Patient = () => {
     }
 
     _fetchPatient()
-  }, [patientId, groupId])
+  }, [patientId, groupId, dispatch])
 
   if (patient === null && !loading) {
     return <PatientNotExist />

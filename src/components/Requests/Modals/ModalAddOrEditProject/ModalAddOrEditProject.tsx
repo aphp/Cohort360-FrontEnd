@@ -39,7 +39,7 @@ const ModalAddOrEditProject: React.FC<{
     setError(null)
     setLoading(false)
     setDeletionConfirmation(false)
-  }, [open])
+  }, [open, selectedProject])
 
   const onChangeValue = (key: 'name' | 'description', value: string) => {
     const _project = { ...modalProjectState }

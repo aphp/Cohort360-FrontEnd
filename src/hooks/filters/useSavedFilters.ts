@@ -1,6 +1,6 @@
 import { Item } from 'components/ui/List/ListItem'
 import { mapRequestParamsToSearchCriteria } from 'mappers/filters'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   deleteFiltersService,
   getFiltersService,
@@ -23,9 +23,28 @@ export const useSavedFilters = <T>(type: ResourceType) => {
   const [savedFiltersErrors, setSavedFiltersErrors] = useState<ErrorType>({ isError: false })
   const [selectedSavedFilter, setSelectedSavedFilter] = useState<SelectedFilter<T> | null>(null)
 
+  const getSavedFilters = useCallback(
+    async (next?: string | null) => {
+      try {
+        const response = await getFiltersService(type, next)
+        if (next) {
+          setAllSavedFilters({
+            ...response,
+            results: [...(allSavedFilters?.results || []), ...response.results]
+          } as SavedFiltersResults)
+        } else {
+          setAllSavedFilters(response)
+        }
+      } catch (err) {
+        setAllSavedFilters(null)
+      }
+    },
+    [allSavedFilters, type]
+  )
+
   useEffect(() => {
     getSavedFilters()
-  }, [type])
+  }, [getSavedFilters])
 
   useEffect(
     () =>
@@ -36,22 +55,6 @@ export const useSavedFilters = <T>(type: ResourceType) => {
       ),
     [allSavedFilters]
   )
-
-  const getSavedFilters = async (next?: string | null) => {
-    try {
-      const response = await getFiltersService(type, next)
-      if (next) {
-        setAllSavedFilters({
-          ...response,
-          results: [...(allSavedFilters?.results || []), ...response.results]
-        } as SavedFiltersResults)
-      } else {
-        setAllSavedFilters(response)
-      }
-    } catch (err) {
-      setAllSavedFilters(null)
-    }
-  }
 
   const postSavedFilter = async (name: string, searchCriterias: SearchCriterias<Filters>, deidentified: boolean) => {
     try {

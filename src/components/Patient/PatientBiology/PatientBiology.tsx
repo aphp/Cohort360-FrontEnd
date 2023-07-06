@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Checkbox, CircularProgress, Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material'
 
@@ -89,13 +89,13 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
   ] = useSearchCriterias(initBioSearchCriterias)
   const filtersAsArray = useMemo(() => {
     return selectFiltersAsArray({ nda, validatedStatus, loinc, anabio, startDate, endDate, executiveUnits })
-  }, [nda, loinc, anabio, startDate, endDate, executiveUnits])
+  }, [nda, validatedStatus, loinc, anabio, startDate, endDate, executiveUnits])
 
   const controllerRef = useRef<AbortController | null>(null)
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
 
-  const _fetchBiology = async () => {
+  const _fetchBiology = useCallback(async () => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
       const response = await dispatch(
@@ -123,7 +123,20 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
         setLoadingStatus(LoadingStatus.SUCCESS)
       }
     }
-  }
+  }, [
+    anabio,
+    dispatch,
+    endDate,
+    executiveUnits,
+    groupId,
+    loinc,
+    nda,
+    orderBy,
+    page,
+    searchInput,
+    startDate,
+    validatedStatus
+  ])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -139,7 +152,7 @@ const PatientBiology = ({ groupId }: PatientBiologyProps) => {
       controllerRef.current = cancelPendingRequest(controllerRef.current)
       _fetchBiology()
     }
-  }, [loadingStatus])
+  }, [loadingStatus, _fetchBiology])
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable} gap="20px">

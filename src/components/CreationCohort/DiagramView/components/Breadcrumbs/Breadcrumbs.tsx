@@ -32,7 +32,7 @@ const CohortCreationBreadcrumbs: React.FC = () => {
         }
       }
     }
-  }, [projects, requests])
+  }, [projects, requests, requestId, dispatch])
 
   return (
     <Grid container marginBottom={theme.spacing(2)}>

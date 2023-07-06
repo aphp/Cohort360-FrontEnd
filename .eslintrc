@@ -7,6 +7,7 @@
   },
   "extends": [
     "eslint:recommended",
+    "plugin:react-hooks/recommended",
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended"
@@ -38,6 +39,8 @@
     "@typescript-eslint/ban-ts-comment": 0,
     "@typescript-eslint/prefer-as-const": 0,
     "@typescript-eslint/explicit-module-boundary-types": 0,
+    "react-hooks/rules-of-hooks": 1,
+    "react-hooks/exhaustive-deps": 1,
     "ban-ts-ignore": 0,
     "react/display-name": 0,
     "no-extra-boolean-cast": 0,

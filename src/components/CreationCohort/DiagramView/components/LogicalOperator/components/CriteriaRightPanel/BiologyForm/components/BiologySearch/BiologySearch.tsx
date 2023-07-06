@@ -1,4 +1,4 @@
-import React, { KeyboardEvent, UIEvent, useEffect, useState } from 'react'
+import React, { KeyboardEvent, UIEvent, useCallback, useEffect, useState } from 'react'
 
 import {
   Breadcrumbs,
@@ -129,7 +129,7 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
     onConfirm()
   }
 
-  const getBiologySearchResults = async () => {
+  const getBiologySearchResults = useCallback(async () => {
     if (debouncedSearchItem && debouncedSearchItem.length >= 2) {
       try {
         setLoading(true)
@@ -156,11 +156,11 @@ const BiologySearch: React.FC<BiologySearchProps> = (props) => {
         anabio: []
       })
     }
-  }
+  }, [debouncedSearchItem])
 
   useEffect(() => {
     getBiologySearchResults()
-  }, [debouncedSearchItem])
+  }, [getBiologySearchResults])
 
   return (
     <Grid className={classes.root}>

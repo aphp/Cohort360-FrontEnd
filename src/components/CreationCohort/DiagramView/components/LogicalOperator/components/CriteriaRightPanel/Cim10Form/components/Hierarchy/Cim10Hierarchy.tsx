@@ -174,7 +174,7 @@ const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
     }
     newList.code?.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, cim10Hierarchy).equivalentRow)
     setCurrentState(newList)
-  }, [initialState, cim10Hierarchy])
+  }, [initialState, cim10Hierarchy, selectedCriteria])
 
   const _handleClick = (newSelectedItems: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => {
     onChangeSelectedHierarchy(newSelectedItems, newHierarchy)

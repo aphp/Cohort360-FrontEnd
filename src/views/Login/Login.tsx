@@ -1,4 +1,11 @@
-import React, { KeyboardEvent as ReactKeyboardEvent, SyntheticEvent, UIEvent, useEffect, useState } from 'react'
+import React, {
+  KeyboardEvent as ReactKeyboardEvent,
+  SyntheticEvent,
+  UIEvent,
+  useCallback,
+  useEffect,
+  useState
+} from 'react'
 import { useNavigate } from 'react-router-dom'
 import localforage from 'localforage'
 import {
@@ -131,45 +138,13 @@ const Login = () => {
   useEffect(() => {
     localforage.setItem('persist:root', '')
     if (oidcCode) setAuthCode(oidcCode)
-  }, [])
+  }, [oidcCode])
 
-  useEffect(() => {
-    if (authCode) {
-      login()
-    }
-  }, [authCode])
+  const loadBootstrapData = useCallback(
+    async (practitionerData: User, lastConnection: string) => {
+      const maintenanceResponse = await services.practitioner.maintenance()
 
-  const loadBootstrapData = async (practitionerData: User, lastConnection: string) => {
-    const maintenanceResponse = await services.practitioner.maintenance()
-
-    if (maintenanceResponse.status !== 200 || isAxiosError(maintenanceResponse)) {
-      setLoading(false)
-      return (
-        setError(true),
-        setErrorMessage(
-          'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
-        )
-      )
-    }
-
-    const maintenance = maintenanceResponse.data
-
-    const accessExpirations = await services.perimeters
-      .getAccessExpirations({ expiring: true })
-      .then((values) => setLeftDays(values))
-
-    const practitionerPerimeters = await services.perimeters.getPerimeters()
-
-    if (isCustomError(practitionerPerimeters)) {
-      if (practitionerPerimeters.errorType === 'fhir') {
-        setLoading(false)
-        return (
-          setError(true),
-          setErrorMessage(
-            'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
-          )
-        )
-      } else if (practitionerPerimeters.errorType === 'back') {
+      if (maintenanceResponse.status !== 200 || isAxiosError(maintenanceResponse)) {
         setLoading(false)
         return (
           setError(true),
@@ -177,37 +152,66 @@ const Login = () => {
             'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
           )
         )
-      } else if (practitionerPerimeters.errorType === 'noRight') {
-        localStorage.clear()
-        setLoading(false)
-        return setNoRights(true)
-      }
-    } else {
-      const nominativeGroupsIds = practitionerPerimeters
-        .filter((perimeterItem) => perimeterItem.read_access === 'DATA_NOMINATIVE')
-        .map((practitionerPerimeter) => practitionerPerimeter.perimeter.cohort_id)
-        .filter((item) => item)
-
-      const loginState: MeState = {
-        id: practitionerData.username || '',
-        userName: practitionerData.username || '',
-        displayName: `${practitionerData.firstname} ${practitionerData.lastname}`,
-        firstName: practitionerData.firstname || '',
-        lastName: practitionerData.lastname || '',
-        nominativeGroupsIds,
-        deidentified: nominativeGroupsIds.length === 0,
-        lastConnection,
-        maintenance,
-        accessExpirations
       }
 
-      dispatch(loginAction(loginState))
+      const maintenance = maintenanceResponse.data
 
-      const oldPath = localStorage.getItem('old-path')
-      localStorage.removeItem('old-path')
-      navigate(oldPath ?? '/home')
-    }
-  }
+      const accessExpirations = await services.perimeters
+        .getAccessExpirations({ expiring: true })
+        .then((values) => setLeftDays(values))
+
+      const practitionerPerimeters = await services.perimeters.getPerimeters()
+
+      if (isCustomError(practitionerPerimeters)) {
+        if (practitionerPerimeters.errorType === 'fhir') {
+          setLoading(false)
+          return (
+            setError(true),
+            setErrorMessage(
+              'Une erreur FHIR est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+            )
+          )
+        } else if (practitionerPerimeters.errorType === 'back') {
+          setLoading(false)
+          return (
+            setError(true),
+            setErrorMessage(
+              'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+            )
+          )
+        } else if (practitionerPerimeters.errorType === 'noRight') {
+          localStorage.clear()
+          setLoading(false)
+          return setNoRights(true)
+        }
+      } else {
+        const nominativeGroupsIds = practitionerPerimeters
+          .filter((perimeterItem) => perimeterItem.read_access === 'DATA_NOMINATIVE')
+          .map((practitionerPerimeter) => practitionerPerimeter.perimeter.cohort_id)
+          .filter((item) => item)
+
+        const loginState: MeState = {
+          id: practitionerData.username || '',
+          userName: practitionerData.username || '',
+          displayName: `${practitionerData.firstname} ${practitionerData.lastname}`,
+          firstName: practitionerData.firstname || '',
+          lastName: practitionerData.lastname || '',
+          nominativeGroupsIds,
+          deidentified: nominativeGroupsIds.length === 0,
+          lastConnection,
+          maintenance,
+          accessExpirations
+        }
+
+        dispatch(loginAction(loginState))
+
+        const oldPath = localStorage.getItem('old-path')
+        localStorage.removeItem('old-path')
+        navigate(oldPath ?? '/home')
+      }
+    },
+    [dispatch, navigate]
+  )
 
   const setLeftDays = (accessExpirations: AccessExpiration[]) => {
     return accessExpirations
@@ -219,7 +223,7 @@ const Login = () => {
         return a.leftDays - b.leftDays
       })
   }
-  const login = async () => {
+  const login = useCallback(async () => {
     if (loading) return
     setLoading(true)
 
@@ -262,7 +266,13 @@ const Login = () => {
       setLoading(false)
       return setError(true), setErrorMessage("Votre nom d'utilisateur ou mot de passe est incorrect.")
     }
-  }
+  }, [authCode, loadBootstrapData, loading, password, username])
+
+  useEffect(() => {
+    if (authCode) {
+      login()
+    }
+  }, [authCode, login])
 
   const _onSubmit = (event: UIEvent<HTMLElement>) => {
     event.preventDefault()

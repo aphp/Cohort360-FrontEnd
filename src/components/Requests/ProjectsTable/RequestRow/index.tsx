@@ -48,7 +48,7 @@ const RequestRow: React.FC<RequestRowProps> = ({ row, cohortsList, selectedReque
     } else {
       setOpen(open)
     }
-  }, [isSearch, cohortsList])
+  }, [isSearch, cohortsList, row.uuid, open])
 
   const rowIsSelected = selectedRequests.find((selectedRequest) => selectedRequest.uuid === row.uuid)
 

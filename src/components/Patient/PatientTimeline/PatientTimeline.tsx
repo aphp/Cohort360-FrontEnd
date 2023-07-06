@@ -170,7 +170,7 @@ const PatientTimeline: React.FC<PatientTimelineTypes> = ({
         groupId
       })
     )
-  }, [])
+  }, [dispatch, groupId, patientId])
 
   useEffect(() => {
     const _fetchDiagnosticTypes = async () => {

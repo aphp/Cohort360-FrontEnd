@@ -1,5 +1,5 @@
 import { removeFilter } from 'utils/filters'
-import { useReducer, Reducer, ReducerState } from 'react'
+import { useReducer, Reducer, ReducerState, useCallback } from 'react'
 import {
   ActionTypes,
   SearchCriterias,
@@ -236,7 +236,10 @@ const useSearchCriterias = <F>(
       addFilters: (filters: F) => dispatch({ type: ActionTypes.ADD_FILTERS, payload: filters }),
       removeFilter: (key: FilterKeys, value: FilterValue) =>
         dispatch({ type: ActionTypes.REMOVE_FILTER, payload: { key, value } }),
-      removeSearchCriterias: () => dispatch({ type: ActionTypes.REMOVE_SEARCH_CRITERIAS, payload: null }),
+      removeSearchCriterias: useCallback(
+        () => dispatch({ type: ActionTypes.REMOVE_SEARCH_CRITERIAS, payload: null }),
+        [dispatch]
+      ),
       addSearchCriterias: (searchCriterias: SearchCriterias<F>) =>
         dispatch({ type: ActionTypes.ADD_SEARCH_CRITERIAS, payload: searchCriterias })
     }

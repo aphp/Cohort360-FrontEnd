@@ -40,7 +40,7 @@ const ModalEditCohort: React.FC<{
     setError(null)
     setLoading(false)
     setDeletionConfirmation(false)
-  }, [open])
+  }, [open, selectedCohort])
 
   const onChangeValue = (key: 'name' | 'description', value: string) => {
     const _cohort = { ...modalCohortState }

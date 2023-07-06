@@ -117,7 +117,8 @@ const DataTableCompositionLine: React.FC<{
   searchMode: boolean
   groupId?: string
 }> = ({ document, deidentified, showIpp, searchMode, groupId }) => {
-  const { classes, cx } = useStyles()
+  const style = useStyles()
+  const { classes, cx } = style
 
   const [open, setOpen] = useState<string | null>(null)
 

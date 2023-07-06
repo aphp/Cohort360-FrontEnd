@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Tabs, Tab } from '@mui/material'
 
 import MedicationForm from './components/Form/MedicationForm'
@@ -63,7 +63,7 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       dispatch
     )
 
-  const _initSyncHierarchyTableEffect = async () => {
+  const _initSyncHierarchyTableEffect = useCallback(async () => {
     await initSyncHierarchyTableEffect(
       medicationHierarchy,
       selectedCriteria,
@@ -72,10 +72,15 @@ const Index = (props: CriteriaDrawerComponentProps) => {
       defaultMedication.type,
       dispatch
     )
-  }
+    // TODO fix initSyncHierarchyTableEffect, because it's mess in there
+    // it shouldn't depends on the hierarchy or selectedCriteria or defaultCriteria since it's changing it everytime
+    // also PmsiListType type should be renamed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch])
+
   useEffect(() => {
     _initSyncHierarchyTableEffect()
-  }, [])
+  }, [_initSyncHierarchyTableEffect])
 
   return (
     <>

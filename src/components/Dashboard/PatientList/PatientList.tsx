@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 
 import { CircularProgress, Grid, Tooltip } from '@mui/material'
 
@@ -105,7 +105,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
 
-  const fetchPatients = async () => {
+  const fetchPatients = useCallback(async () => {
     try {
       const includeFacets = page === 1
       setLoadingStatus(LoadingStatus.FETCHING)
@@ -140,11 +140,11 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
       }
       setLoadingStatus(LoadingStatus.SUCCESS)
     }
-  }
+  }, [birthdatesRanges, deidentified, genders, groupId, orderBy, page, searchBy, searchInput, vitalStatuses])
 
   useEffect(() => {
     getSavedFilters()
-  }, [])
+  }, [getSavedFilters])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -160,7 +160,7 @@ const PatientList = ({ groupId, total, deidentified }: PatientListProps) => {
       controllerRef.current = cancelPendingRequest(controllerRef.current)
       fetchPatients()
     }
-  }, [loadingStatus])
+  }, [fetchPatients, loadingStatus])
 
   return (
     <Grid container gap="25px">

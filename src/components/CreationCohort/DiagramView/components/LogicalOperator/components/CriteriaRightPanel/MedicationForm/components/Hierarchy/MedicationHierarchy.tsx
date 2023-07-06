@@ -200,11 +200,13 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
   const fetchPaginateData = () => {
     const nextPaginateData = medicationListUCD.slice((page - 1) * page_size, page * page_size)
     setPaginateData([...paginateData, ...nextPaginateData])
-    setPage(page + 1)
+    setPage((page) => page + 1)
   }
 
   useEffect(() => {
     fetchPaginateData()
+    // we want only to fetch the first page
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -216,7 +218,7 @@ const MedicationExploration: React.FC<MedicationExplorationProps> = (props) => {
       (item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, medicationHierarchy).equivalentRow
     )
     setCurrentState(newList)
-  }, [initialState, medicationHierarchy])
+  }, [initialState, medicationHierarchy, selectedCriteria])
 
   useEffect(() => {
     if (isLoadingSyncHierarchyTable > 0 || isLoadingMedication > 0) {

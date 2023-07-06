@@ -182,7 +182,7 @@ const ProcedureHierarchy: React.FC<ProcedureHierarchyProps> = (props) => {
     }
     newList.code?.map((item: PmsiListType) => findEquivalentRowInItemAndSubItems(item, ccamHierarchy).equivalentRow)
     setCurrentState(newList)
-  }, [initialState, ccamHierarchy])
+  }, [initialState, ccamHierarchy, selectedCriteria])
 
   const _handleClick = (newSelectedItems: PmsiListType[] | null | undefined, newHierarchy?: PmsiListType[]) => {
     onChangeSelectedHierarchy(newSelectedItems, newHierarchy)

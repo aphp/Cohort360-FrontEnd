@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import moment from 'moment'
 
@@ -44,7 +44,7 @@ const Welcome: React.FC = () => {
     ? moment(practitioner.lastConnection).format('[Dernière connexion : ]ddd DD MMMM YYYY[, à ]HH:mm')
     : ''
 
-  const fetchCohortsPreview = () => {
+  const fetchCohortsPreview = useCallback(() => {
     dispatch(
       fetchCohorts({
         options: {
@@ -71,7 +71,7 @@ const Welcome: React.FC = () => {
         }
       })
     )
-  }
+  }, [dispatch])
 
   useEffect(() => {
     dispatch(fetchProjects())
@@ -81,7 +81,7 @@ const Welcome: React.FC = () => {
     dispatch(initBiologyHierarchy())
     dispatch(fetchScopesList({}))
     fetchCohortsPreview()
-  }, [])
+  }, [dispatch, fetchCohortsPreview])
 
   useEffect(() => {
     const _lastRequest =

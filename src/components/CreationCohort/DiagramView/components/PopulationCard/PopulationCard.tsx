@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { Button, Chip, CircularProgress, Grid, IconButton, Typography } from '@mui/material'
 
@@ -51,40 +51,51 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
   const { selectedPopulation = [], ...requestState } = useAppSelector((state) => state.cohortCreation.request || {})
 
   const isExecutiveUnit: boolean = !!(form ? (scopeTypes.criteriaType[form] as ScopeType) : undefined) ?? false
-  const scopesList = getCurrentScopeList(scopeState.scopesList, isExecutiveUnit) ?? []
+  const scopesList = useMemo(
+    () => getCurrentScopeList(scopeState.scopesList, isExecutiveUnit) ?? [],
+    [scopeState, isExecutiveUnit]
+  )
   const loading = requestState.loading || scopeState.loading
 
   const [isExtended, onExtend] = useState(false)
   const [openDrawer, onChangeOpenDrawer] = useState(false)
   const [rightError, setRightError] = useState(false)
 
-  const selection = executiveUnits ?? selectedPopulation ?? []
+  const selection = useMemo(() => executiveUnits ?? selectedPopulation ?? [], [executiveUnits, selectedPopulation])
   const [selectedItems, setSelectedItems] = useState<ScopeTreeRow[]>(
     selection.filter((item): item is ScopeTreeRow => item !== undefined)
   )
-  const populationWithRightError = selection.filter((item) => item === undefined)
-  const selectionAndPopulationWithRightError = [...selectedItems, ...populationWithRightError]
+  const selectionAndPopulationWithRightError = [...selectedItems, ...selection.filter((item) => item === undefined)]
 
-  const _onChangePopulation = async (selectedPopulations: ScopeTreeRow[]) => {
-    dispatch(buildCohortCreation({ selectedPopulation: selectedPopulations }))
-  }
+  const _onChangePopulation = useCallback(
+    async (selectedPopulations: ScopeTreeRow[]) => {
+      dispatch(buildCohortCreation({ selectedPopulation: selectedPopulations }))
+    },
+    [dispatch]
+  )
 
-  const setUpdatedItems = (updatedSelection: ScopeTreeRow[]) => {
-    let _updatedSelection = updatedSelection
-    _updatedSelection = _updatedSelection.filter((item) => item.id)
-    setSelectedItems(_updatedSelection)
-    onChangeExecutiveUnits ? onChangeExecutiveUnits(_updatedSelection) : _onChangePopulation(_updatedSelection)
-  }
+  const setUpdatedItems = useCallback(
+    (updatedSelection: ScopeTreeRow[]) => {
+      let _updatedSelection = updatedSelection
+      _updatedSelection = _updatedSelection.filter((item) => item.id)
+      setSelectedItems(_updatedSelection)
+      onChangeExecutiveUnits ? onChangeExecutiveUnits(_updatedSelection) : _onChangePopulation(_updatedSelection)
+    },
+    [_onChangePopulation, onChangeExecutiveUnits]
+  )
 
-  const _onSubmit = async (updatedSelection: ScopeTreeRow[] | null) => {
-    if (updatedSelection === null && !executiveUnits) return
-    updatedSelection = (updatedSelection ?? []).map((selectedPopulations: ScopeTreeRow) => ({
-      ...selectedPopulations,
-      subItems: []
-    }))
-    setUpdatedItems(updatedSelection)
-    onChangeOpenDrawer(false)
-  }
+  const _onSubmit = useCallback(
+    async (updatedSelection: ScopeTreeRow[] | null) => {
+      if (updatedSelection === null && !executiveUnits) return
+      updatedSelection = (updatedSelection ?? []).map((selectedPopulations: ScopeTreeRow) => ({
+        ...selectedPopulations,
+        subItems: []
+      }))
+      setUpdatedItems(updatedSelection)
+      onChangeOpenDrawer(false)
+    },
+    [executiveUnits, setUpdatedItems]
+  )
 
   const _onDelete = (index: number) => {
     const updatedSelection: ScopeTreeRow[] = [...selectedItems]
@@ -92,27 +103,28 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
     setUpdatedItems(updatedSelection)
   }
 
-  const fetchScopeTree = () => {
+  const fetchScopeTree = useCallback(() => {
     if (scopesList && scopesList.length === 0) {
       dispatch(fetchScopesList({}))
     }
-  }
+  }, [dispatch, scopesList])
 
   useEffect(() => {
     fetchScopeTree()
-  }, [])
+  }, [fetchScopeTree])
 
   useEffect(() => {
     let _rightError = false
+    const populationWithRightError = selection.filter((item) => item === undefined)
     if (populationWithRightError && populationWithRightError.length > 0) {
       _rightError = true
     }
     setRightError(_rightError)
-  }, [selectedItems])
+  }, [selection, selectedItems])
 
   useEffect(() => {
     setSelectedItems(selection.filter((item): item is ScopeTreeRow => item !== undefined))
-  }, [executiveUnits])
+  }, [executiveUnits, selection])
 
   useEffect(() => {
     if (
@@ -131,7 +143,7 @@ const PopulationCard: React.FC<PopulationCardPropsType> = (props) => {
     } else {
       isRendered.current = false
     }
-  }, [scopesList, requestState])
+  }, [scopesList, requestState, executiveUnits, openDrawer, selectedItems, _onSubmit, selectedPopulation])
 
   return (
     <>

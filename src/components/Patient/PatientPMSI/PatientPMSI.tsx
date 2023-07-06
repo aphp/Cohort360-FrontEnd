@@ -121,7 +121,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
   const meState = useAppSelector((state) => state.me)
   const maintenanceIsActive = meState?.maintenance?.active
 
-  const _fetchPMSI = async () => {
+  const _fetchPMSI = useCallback(async () => {
     try {
       setLoadingStatus(LoadingStatus.FETCHING)
       const response = await dispatch(
@@ -150,7 +150,22 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
         setLoadingStatus(LoadingStatus.SUCCESS)
       }
     }
-  }
+  }, [
+    code,
+    diagnosticTypes,
+    dispatch,
+    endDate,
+    executiveUnits,
+    groupId,
+    nda,
+    orderBy,
+    page,
+    searchInput,
+    selectedTab.id,
+    source,
+    startDate
+  ])
+
   useEffect(() => {
     const _fetchDiagnosticTypes = async () => {
       try {
@@ -162,7 +177,7 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
     }
     getSavedFilters()
     _fetchDiagnosticTypes()
-  }, [])
+  }, [getSavedFilters])
 
   useEffect(() => {
     setLoadingStatus(LoadingStatus.IDDLE)
@@ -178,14 +193,14 @@ const PatientPMSI = ({ groupId }: PatientPMSIProps) => {
       controllerRef.current = cancelPendingRequest(controllerRef.current)
       _fetchPMSI()
     }
-  }, [loadingStatus])
+  }, [loadingStatus, _fetchPMSI])
 
   useEffect(() => {
     setPage(1)
     removeSearchCriterias()
-    setTriggerClean(!triggerClean)
+    setTriggerClean((triggerClean) => !triggerClean)
     setLoadingStatus(LoadingStatus.IDDLE)
-  }, [selectedTab])
+  }, [removeSearchCriterias, selectedTab])
 
   useEffect(() => {
     const pmsiIndex = mapToAttribute(selectedTab.id)

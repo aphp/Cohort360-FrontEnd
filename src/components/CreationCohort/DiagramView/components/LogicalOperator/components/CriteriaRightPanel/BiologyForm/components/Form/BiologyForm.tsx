@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import {
   Alert,
@@ -46,7 +46,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
-  const currentState = { ...selectedCriteria, ...initialState }
+  const currentState = useMemo(() => ({ ...selectedCriteria, ...initialState }), [selectedCriteria, initialState])
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const [allowSearchByValue, setAllowSearchByValue] = useState(
     typeof currentState.searchByValue[0] === 'number' || typeof currentState.searchByValue[1] === 'number'
@@ -87,7 +87,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
     currentState?.code?.length === 1 && currentState?.code[0].id !== '*'
       ? checkChildren()
       : onChangeValue('isLeaf', false)
-  }, [currentState?.code])
+  }, [currentState.code, onChangeValue])
 
   useEffect(() => {
     if (!currentState.isLeaf) {
@@ -99,7 +99,7 @@ const BiologyForm: React.FC<BiologyFormProps> = (props) => {
     if (!allowSearchByValue) {
       onChangeValue('searchByValue', [null, null])
     }
-  }, [allowSearchByValue])
+  }, [allowSearchByValue, onChangeValue])
 
   return isOpen ? (
     <Grid className={classes.root}>
