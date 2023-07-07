@@ -740,11 +740,11 @@ const servicesPatients: IServicePatients = {
       const cohortRights = await servicesCohorts.fetchCohortsRights(
         groupsData.map((groupData) => ({ fhir_group_id: groupData.id ?? '' }))
       )
-      return cohortRights.some((cohortRight) =>
-        cohortRight.extension?.some(
-          ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
-        )
-      )
+      return cohortRights?.[0]?.rights?.read_patient_pseudo
+        ? cohortRights?.[0]?.rights?.read_patient_nomi
+          ? false
+          : true
+        : false
     }
   }
 }

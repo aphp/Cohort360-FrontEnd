@@ -12,7 +12,6 @@ import {
   searchInputError,
   errorDetails,
   PatientGenderKind,
-  GroupRights,
   ChartCode
 } from 'types'
 import {
@@ -21,7 +20,7 @@ import {
   getAgeRepartitionMapAphp,
   getVisitRepartitionMapAphp
 } from 'utils/graphUtils'
-import { getApiResponseResources, getApiResponseResourcesOrThrow } from 'utils/apiHelpers'
+import { getApiResponseResources } from 'utils/apiHelpers'
 
 import {
   fetchGroup,
@@ -33,20 +32,8 @@ import {
   fetchCheckDocumentSearchInput
 } from './callApi'
 
-import { ODD_EXPORT } from '../../constants'
-
 import apiBackend from '../apiBackend'
-import {
-  BundleEntry,
-  DocumentReference,
-  Encounter,
-  Extension,
-  Group,
-  GroupMember,
-  Identifier,
-  ParametersParameter,
-  Patient
-} from 'fhir/r4'
+import { BundleEntry, DocumentReference, Encounter, Extension, Identifier, ParametersParameter, Patient } from 'fhir/r4'
 
 export interface IServiceCohorts {
   /**
@@ -578,140 +565,16 @@ const servicesCohorts: IServiceCohorts = {
 
   fetchCohortsRights: async (cohorts) => {
     try {
-      // On recupère tous les ids de notre liste de cohort
       const ids = cohorts
         .map((cohort) => {
           return cohort.fhir_group_id
         })
         .filter((id) => id !== '')
-
-      const cohortLinkList: Group[] = getApiResponseResourcesOrThrow(await fetchGroup({ _id: ids }))
-
-      let caresiteIds = ''
-      let organizationLinkList: Group[] = []
-
-      // On cherche la liste des Organisations présente dans l'objet `member`
-      caresiteIds = cohortLinkList
-        .flatMap((cohortLinkItem) =>
-          cohortLinkItem.member?.map((member) =>
-            member.entity.display?.search('Organization/') !== -1
-              ? member.entity.display?.replace('Organization/', '')
-              : ''
-          )
-        )
-        .filter((el) => !!el)
-        .join(',')
-
-      if (caresiteIds) {
-        // Si une liste d'Organisation est présente dans l'objet `member`
-        // On crée un dictionnaire pour faire le lien entre les Groups et les Organisations (Dictionnaire 2)
-        organizationLinkList =
-          cohortLinkList?.length > 0
-            ? cohortLinkList
-                .map((cohortLinkItem: Group) => {
-                  const members = cohortLinkItem?.member ?? []
-                  let organizationLinks: Group[] = []
-
-                  for (let index = 0; index < members.length; index += 2) {
-                    const group = members[index] || null
-                    const organization = members[index + 1] || null
-                    organizationLinks = [
-                      ...organizationLinks,
-                      {
-                        id: group?.entity?.display?.replace('Group/', ''),
-                        managingEntity: organization.entity,
-                        resourceType: 'Group',
-                        type: 'person',
-                        actual: true
-                      }
-                    ]
-                  }
-
-                  return organizationLinks
-                })
-                .flat()
-                .filter((el) => !!el)
-            : []
-      } else {
-        // Sinon
-        // On cherche les Group ID
-        const parentGroupsId: string[] = cohortLinkList
-          .flatMap((cohortLinkItem) =>
-            cohortLinkItem.member?.map((member) =>
-              member.entity.display?.search('Group/') !== -1 ? member.entity.display?.replace('Group/', '') : ''
-            )
-          )
-          .filter((el): el is string => !!el)
-
-        // Pour récupérer les informations du périmètre de la cohorte
-        organizationLinkList = (
-          await Promise.all(parentGroupsId.map((parentGroupId: string) => fetchGroup({ _id: parentGroupId })))
-        ).flatMap((res) => getApiResponseResourcesOrThrow(res))
-
-        // Et faire le lien avec les organisations, donc ...
-        // On crée un dictionnaire pour faire le lien entre les Groups et les Organisations (Dictionnaire 2)
-
-        if (!organizationLinkList || organizationLinkList?.length === 0) return cohorts
-
-        // On crée une liste des Organisations liées au périmètre (caresiteIds = string)
-        caresiteIds = organizationLinkList
-          .map((currentParentItem: Group) => currentParentItem?.managingEntity?.display?.replace('Organization/', ''))
-          .filter((el) => !!el)
-          .join(',')
-      }
-
-      // On appelle le back-end pour avoir la liste des droits
-      const rightsResponse = await apiBackend.get(`accesses/accesses/my-rights/?care-site-ids=${caresiteIds}`)
-      const rightsData: GroupRights[] = rightsResponse.data ?? []
-
+      const rightsResponse = await apiBackend.get(`cohort/cohorts/cohort-rights/?fhir_group_id=${ids}`)
       return cohorts.map((cohort) => {
-        const cohortLinkItem = cohortLinkList.find((cohortLink: Group) => cohortLink?.id === cohort.fhir_group_id)
-        const organizationLinkItems = !cohortLinkItem
-          ? undefined
-          : organizationLinkList.filter((organizationLink: Group) =>
-              (cohortLinkItem?.member?.length || 0) > 0
-                ? cohortLinkItem.member?.find(
-                    (member: GroupMember) => member.entity.display?.replace('Group/', '') === organizationLink.id
-                  )
-                : false
-            )
-        const allRightOfCohort = !organizationLinkItems
-          ? []
-          : rightsData.filter((rightData: GroupRights) =>
-              organizationLinkItems.find(
-                (organizationLinkItem) =>
-                  (organizationLinkItem?.managingEntity?.display || '').replace('Organization/', '') ===
-                  String(rightData.care_site_id)
-              )
-            )
-
-        const newExtension = [
-          {
-            url: 'EXPORT_ACCESS',
-            valueString:
-              !!ODD_EXPORT &&
-              allRightOfCohort.filter(
-                (rightOfCohort: GroupRights) =>
-                  rightOfCohort.right_export_csv_nominative === true &&
-                  rightOfCohort.right_read_patient_nominative === true
-              ).length === allRightOfCohort.length
-                ? 'DATA_NOMINATIVE'
-                : 'DATA_PSEUDOANONYMISED'
-          },
-          {
-            url: 'READ_ACCESS',
-            valueString:
-              allRightOfCohort.filter(
-                (rightOfCohort: GroupRights) => rightOfCohort.right_read_patient_nominative === true // eslint-disabled-line
-              ).length === allRightOfCohort.length
-                ? 'DATA_NOMINATIVE'
-                : 'DATA_PSEUDOANONYMISED'
-          }
-        ]
-
         return {
           ...cohort,
-          extension: cohort.extension ? [...cohort.extension, ...newExtension] : [...newExtension]
+          rights: rightsResponse.data.find((right: any) => right.cohort_id === cohort.fhir_group_id)?.rights
         }
       })
     } catch (error) {
