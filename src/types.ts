@@ -148,6 +148,7 @@ export type Cohort = {
   request_query_snapshot?: string
   extension?: any[]
   exportable?: boolean
+  rights?: GroupRights
 }
 
 export type CohortFilters = {
@@ -872,6 +873,12 @@ export type GroupRights = {
   right_export_csv_pseudo_anonymised: boolean
   right_transfer_jupyter_nominative: boolean
   right_transfer_jupyter_pseudo_anonymised: boolean
+  export_csv_nomi?: boolean
+  export_csv_pseudo?: boolean
+  export_jupyter_nomi?: boolean
+  export_jupyter_pseudo?: boolean
+  read_patient_nomi?: boolean
+  read_patient_pseudo?: boolean
 }
 
 export type ErrorType = { isError: boolean; errorMessage?: string }
