@@ -14,6 +14,7 @@ import { SearchByTypes, Order } from 'types'
 import useStyles from './styles'
 import { Patient } from 'fhir/r4'
 import { useDebounce } from 'utils/debounce'
+import { _cancelPendingRequest } from 'utils/abortController'
 
 const SearchPatient: React.FC<{}> = () => {
   const { classes, cx } = useStyles()
@@ -34,14 +35,14 @@ const SearchPatient: React.FC<{}> = () => {
   })
 
   const debouncedSearchInput = useDebounce(500, searchInput)
-  const controllerRef = useRef<AbortController | null>()
+  const controllerRef = useRef<AbortController>(new AbortController())
 
-  const _cancelPendingRequest = () => {
+  /*const _cancelPendingRequest = () => {
     if (controllerRef.current) {
       controllerRef.current.abort()
     }
     controllerRef.current = new AbortController()
-  }
+  }*/
 
   const performQueries = async (page: number) => {
     const nominativeGroupsIds = practitioner ? practitioner.nominativeGroupsIds : []
@@ -54,7 +55,8 @@ const SearchPatient: React.FC<{}> = () => {
         order.orderBy,
         order.orderDirection,
         searchInput,
-        searchBy
+        searchBy,
+        controllerRef.current.signal
       )
       if (results) {
         setPatientResults(results.patientList ?? [])
@@ -75,10 +77,10 @@ const SearchPatient: React.FC<{}> = () => {
   }
 
   useEffect(() => {
-    _cancelPendingRequest()
+    _cancelPendingRequest(controllerRef)
     setPage(1)
     performQueries(1)
-  }, [order, searchBy, debouncedSearchInput])
+  }, [order, searchBy, debouncedSearchInput, controllerRef])
 
   const open = useAppSelector((state) => state.drawer)
 

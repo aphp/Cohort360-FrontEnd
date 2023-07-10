@@ -25,6 +25,7 @@ import { buildDocumentFiltersChips } from 'utils/chips'
 import docTypes from 'assets/docTypes.json'
 
 import { useDebounce } from 'utils/debounce'
+import { _cancelPendingRequest } from 'utils/abortController'
 
 type DocumentsProps = {
   groupId?: string
@@ -62,13 +63,6 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
   const controllerRef = useRef<AbortController | null>()
   const debouncedSearchInput = useDebounce(500, searchInput)
-
-  const _cancelPendingRequest = () => {
-    if (controllerRef.current) {
-      controllerRef.current.abort()
-    }
-    controllerRef.current = new AbortController()
-  }
 
   const checkDocumentSearch = async () => {
     const checkDocumentSearch = await services.cohorts.checkDocumentSearchInput(
@@ -149,11 +143,11 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   }
 
   useEffect(() => {
-    _cancelPendingRequest()
+    if (controllerRef) _cancelPendingRequest(controllerRef)
     handleChangePage(1)
 
-    return () => _cancelPendingRequest()
-  }, [!!deidentifiedBoolean, filters, order,debouncedSearchInput, searchBy]) // eslint-disable-line
+    return () => _cancelPendingRequest(controllerRef)
+  }, [!!deidentifiedBoolean, filters, order, debouncedSearchInput, searchBy]) // eslint-disable-line
 
   const handleOpenDialog = () => {
     setOpenFilter(true)

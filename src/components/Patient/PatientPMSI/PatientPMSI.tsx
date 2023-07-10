@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { Grid } from '@mui/material'
 
@@ -57,6 +57,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   const totalPmsi = patient?.pmsi?.[selectedTab]?.count ?? 0
   const totalAllPmsi = patient?.pmsi?.[selectedTab]?.total ?? 0
   const patientPmsiList = patient?.pmsi?.[selectedTab]?.list || []
+
+  const controllerRef = useRef<AbortController | null>()
 
   const _fetchPMSI = async () => {
     const selectedDiagnosticTypesCodes = filters.selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
