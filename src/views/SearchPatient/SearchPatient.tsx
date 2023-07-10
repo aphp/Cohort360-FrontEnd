@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useAppSelector } from 'state'
 import { useParams } from 'react-router'
 
-import { CircularProgress, Grid, Typography } from '@mui/material'
+import { Grid, Typography } from '@mui/material'
 
-import PatientSearchBar from 'components/Inputs/PatientSearchBar/PatientSearchBar'
+import DataTableTopBar from 'components/DataTable/DataTableTopBar'
 import DataTablePatient from 'components/DataTable/DataTablePatient'
 
 import services from 'services/aphp'
@@ -13,6 +13,7 @@ import { SearchByTypes, Order } from 'types'
 
 import useStyles from './styles'
 import { Patient } from 'fhir/r4'
+import { useDebounce } from 'utils/debounce'
 
 const SearchPatient: React.FC<{}> = () => {
   const { classes, cx } = useStyles()
@@ -20,7 +21,6 @@ const SearchPatient: React.FC<{}> = () => {
   const { search } = useParams<{ search: string }>()
 
   const [loading, setLoading] = useState(false)
-  const [showTable, setShowTable] = useState(false)
   const [patientResults, setPatientResults] = useState<Patient[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
@@ -33,9 +33,18 @@ const SearchPatient: React.FC<{}> = () => {
     orderDirection: 'asc'
   })
 
+  const debouncedSearchInput = useDebounce(500, searchInput)
+  const controllerRef = useRef<AbortController | null>()
+
+  const _cancelPendingRequest = () => {
+    if (controllerRef.current) {
+      controllerRef.current.abort()
+    }
+    controllerRef.current = new AbortController()
+  }
+
   const performQueries = async (page: number) => {
     const nominativeGroupsIds = practitioner ? practitioner.nominativeGroupsIds : []
-    if (!searchInput) return
 
     setLoading(true)
     if (typeof services?.patients?.searchPatient === 'function') {
@@ -50,7 +59,6 @@ const SearchPatient: React.FC<{}> = () => {
       if (results) {
         setPatientResults(results.patientList ?? [])
         setTotal(results.totalPatients ?? 0)
-        setShowTable(true)
       }
     }
     setLoading(false)
@@ -61,9 +69,16 @@ const SearchPatient: React.FC<{}> = () => {
     performQueries(page)
   }
 
+  const onSearchPatient = (inputSearch?: string, searchBy?: SearchByTypes) => {
+    setSearchInput(inputSearch ?? '')
+    setSearchBy(searchBy ?? SearchByTypes.text)
+  }
+
   useEffect(() => {
-    performQueries(page)
-  }, [order.orderBy, order.orderDirection, searchBy]) // eslint-disable-line
+    _cancelPendingRequest()
+    setPage(1)
+    performQueries(1)
+  }, [order, searchBy, debouncedSearchInput])
 
   const open = useAppSelector((state) => state.drawer)
 
@@ -80,33 +95,32 @@ const SearchPatient: React.FC<{}> = () => {
           <Typography variant="h1" color="primary" className={classes.title}>
             Rechercher un patient
           </Typography>
-          <PatientSearchBar
-            showSelect
-            performQueries={performQueries}
-            searchInput={searchInput}
-            onChangeInput={setSearchInput}
-            searchBy={searchBy}
-            onChangeSearchBy={setSearchBy}
-          />
-          {loading && (
-            <Grid container item justifyContent="center">
-              <CircularProgress />
-            </Grid>
-          )}
-          {!loading && showTable && (
-            <DataTablePatient
-              loading={loading}
-              groupId={practitioner?.nominativeGroupsIds ? practitioner?.nominativeGroupsIds.join(',') : undefined}
-              search={searchInput}
-              deidentified={practitioner?.deidentified ?? true}
-              patientsList={patientResults ?? []}
-              order={order}
-              setOrder={setOrder}
-              page={page}
-              setPage={(newPage) => handleChangePage(newPage)}
-              total={total}
+          <Grid container style={{ marginBottom: 8 }}>
+            <DataTableTopBar
+              loading={false}
+              searchBar={{
+                type: 'patient',
+                value: searchInput,
+                searchBy: searchBy,
+                fullWidth: true,
+                onSearch: (newSearchInput: string, newSearchBy?: SearchByTypes) =>
+                  onSearchPatient(newSearchInput, newSearchBy)
+              }}
             />
-          )}
+          </Grid>
+
+          <DataTablePatient
+            loading={loading}
+            groupId={practitioner?.nominativeGroupsIds ? practitioner?.nominativeGroupsIds.join(',') : undefined}
+            search={searchInput}
+            deidentified={practitioner?.deidentified ?? true}
+            patientsList={patientResults ?? []}
+            order={order}
+            setOrder={setOrder}
+            page={page}
+            setPage={(newPage) => handleChangePage(newPage)}
+            total={total}
+          />
         </Grid>
       </Grid>
     </Grid>
