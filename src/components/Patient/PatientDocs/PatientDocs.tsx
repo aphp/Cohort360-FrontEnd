@@ -19,6 +19,7 @@ import docTypes from 'assets/docTypes.json'
 import { useDebounce } from 'utils/debounce'
 
 import useStyles from './styles'
+import { _cancelPendingRequest } from 'utils/abortController'
 
 type PatientDocsProps = {
   groupId?: string
@@ -59,14 +60,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
   const [open, setOpen] = useState<'filter' | null>(null)
   const debouncedSearchInput = useDebounce(500, searchInput)
-  const controllerRef = useRef<AbortController | null>()
-
-  const _cancelPendingRequest = () => {
-    if (controllerRef.current) {
-      controllerRef.current.abort()
-    }
-    controllerRef.current = new AbortController()
-  }
+  let controllerRef = useRef<AbortController | null>()
 
   const fetchDocumentsList = async (page: number) => {
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
@@ -99,7 +93,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   }
 
   useEffect(() => {
-    _cancelPendingRequest()
+    controllerRef = _cancelPendingRequest(controllerRef)
     handleChangePage()
   }, [
     debouncedSearchInput,

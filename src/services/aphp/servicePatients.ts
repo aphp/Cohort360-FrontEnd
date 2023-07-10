@@ -270,7 +270,7 @@ export interface IServicePatients {
    **   - searchBy: permet la recherche sur un élément précis (nom, prénom ou indeterminé)
    **
    ** Retour:
-   **   - patientList: Liste de 20 patients lié à la recherche
+   **   - patientList: Liste de 20 patients liée à la recherche
    **   - totalPatients: Nombre d'élément totale par rapport au filtre indiqué
    */
   searchPatient: (
@@ -279,7 +279,8 @@ export interface IServicePatients {
     sortBy: string,
     sortDirection: string,
     input: string,
-    searchBy: SearchByTypes
+    searchBy: SearchByTypes,
+    signal?: AbortSignal
   ) => Promise<{
     patientList: Patient[]
     totalPatients: number
@@ -683,7 +684,7 @@ const servicesPatients: IServicePatients = {
     }
   },
 
-  searchPatient: async (nominativeGroupsIds, page, sortBy, sortDirection, input, searchBy) => {
+  searchPatient: async (nominativeGroupsIds, page, sortBy, sortDirection, input, searchBy, signal) => {
     let search = ''
     // if (input.trim() !== '') {
     if (searchBy === '_text') {
@@ -708,7 +709,8 @@ const servicesPatients: IServicePatients = {
       sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
       searchBy: searchBy,
       _text: search,
-      _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
+      _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension'],
+      signal
     })
 
     const patientList = getApiResponseResources(patientResp)
