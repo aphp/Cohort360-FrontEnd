@@ -685,20 +685,20 @@ const servicesPatients: IServicePatients = {
 
   searchPatient: async (nominativeGroupsIds, page, sortBy, sortDirection, input, searchBy) => {
     let search = ''
-    if (input.trim() !== '') {
-      if (searchBy === '_text') {
-        const searches = input
-          .trim() // Remove space before/after search
-          .split(' ') // Split by space (= ['mot1', 'mot2' ...])
-          .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
+    // if (input.trim() !== '') {
+    if (searchBy === '_text') {
+      const searches = input
+        .trim() // Remove space before/after search
+        .split(' ') // Split by space (= ['mot1', 'mot2' ...])
+        .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
 
-        for (const _search of searches) {
-          search = search ? `${search} AND "${_search}"` : `"${_search}"`
-        }
-      } else {
-        search = input.trim()
+      for (const _search of searches) {
+        search = search ? `${search} AND "${_search}"` : `"${_search}"`
       }
+    } else {
+      search = input.trim()
     }
+    // }
 
     const patientResp = await fetchPatient({
       _list: nominativeGroupsIds,
