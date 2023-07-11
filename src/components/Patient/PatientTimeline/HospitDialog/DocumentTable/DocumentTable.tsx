@@ -40,7 +40,7 @@ const DocumentRow: React.FC<DocumentRowTypes> = ({ deidentified, document, group
     NDA: document.NDA,
     title: document.title ?? '-',
     serviceProvider: document.serviceProvider ?? '-',
-    event: document.event,
+    event: document.content[0].attachment.url,
     type: document.type?.coding?.[0].display ?? document.type?.coding?.[0].code ?? '-'
   }
 
