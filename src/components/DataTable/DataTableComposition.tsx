@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Buffer } from 'buffer'
-import ReactHtmlParser from 'react-html-parser'
+import Parse from 'html-react-parser'
 
 import { CircularProgress, Chip, Grid, IconButton, Typography, TableRow, TableCell } from '@mui/material'
 
@@ -219,7 +219,7 @@ const DataTableCompositionLine: React.FC<{
       {documentContent && searchMode && (
         <TableRow className={classes.tableBodyRows}>
           <TableCell colSpan={6} style={{ backgroundImage: `url(${Watermark})`, backgroundSize: 'contain' }}>
-            <Typography>{ReactHtmlParser(documentContent)}</Typography>
+            <Typography>{Parse(documentContent)}</Typography>
           </TableCell>
         </TableRow>
       )}

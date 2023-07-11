@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Buffer } from 'buffer'
-import ReactHtmlParser from 'react-html-parser'
+import Parse from 'html-react-parser'
 
 import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
@@ -91,7 +91,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
               {selectedTab === 'raw' && (
                 <div style={{ backgroundImage: `url(${Watermark})` }}>
                   {documentContentDecode ? (
-                    <Typography>{ReactHtmlParser(documentContentDecode)}</Typography>
+                    <Typography>{Parse(documentContentDecode)}</Typography>
                   ) : (
                     <Typography>Le contenu du document est introuvable.</Typography>
                   )}
