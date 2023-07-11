@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, MutableRefObject } from 'react'
 import moment from 'moment'
 
 import Grid from '@mui/material/Grid'
@@ -30,6 +30,7 @@ import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import { buildPatientFiltersChips } from 'utils/chips'
 import { substructAgeString } from 'utils/age'
 import { useDebounce } from 'utils/debounce'
+import { _cancelPendingRequest } from 'utils/abortController'
 
 type PatientListProps = {
   total: number
@@ -74,14 +75,7 @@ const PatientList: React.FC<PatientListProps> = ({
   })
 
   const debouncedSearchInput = useDebounce(500, searchInput)
-  const controllerRef = useRef<AbortController | null>()
-
-  const _cancelPendingRequest = () => {
-    if (controllerRef.current) {
-      controllerRef.current.abort()
-    }
-    controllerRef.current = new AbortController()
-  }
+  const controllerRef = useRef<AbortController>(new AbortController())
 
   useEffect(() => {
     setAgePyramid(agePyramidData)
@@ -147,9 +141,13 @@ const PatientList: React.FC<PatientListProps> = ({
   }
 
   useEffect(() => {
-    _cancelPendingRequest()
+    _cancelPendingRequest(controllerRef.current)
     setPage(1)
     fetchPatients(1, true, debouncedSearchInput, searchBy)
+
+    /*   return () => {
+     _cancelPendingRequest(controllerRef.current)
+    } */
   }, [filters, order, searchBy, debouncedSearchInput]) // eslint-disable-line
 
   const handleChangePage = (value?: number) => {

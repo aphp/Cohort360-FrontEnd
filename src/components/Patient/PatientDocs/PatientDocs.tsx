@@ -60,7 +60,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
   const [open, setOpen] = useState<'filter' | null>(null)
   const debouncedSearchInput = useDebounce(500, searchInput)
-  let controllerRef = useRef<AbortController | null>()
+  const controllerRef = useRef<AbortController>(new AbortController())
 
   const fetchDocumentsList = async (page: number) => {
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
@@ -93,8 +93,12 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   }
 
   useEffect(() => {
-    controllerRef = _cancelPendingRequest(controllerRef)
+    _cancelPendingRequest(controllerRef.current)
     handleChangePage()
+
+    /*   return () => {
+     _cancelPendingRequest(controllerRef.current)
+    } */
   }, [
     debouncedSearchInput,
     filters.onlyPdfAvailable,
