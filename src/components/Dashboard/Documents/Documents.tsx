@@ -61,7 +61,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   })
 
   const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
-  const controllerRef = useRef<AbortController | null>()
+  const controllerRef = useRef<AbortController>(new AbortController())
   const debouncedSearchInput = useDebounce(500, searchInput)
 
   const checkDocumentSearch = async () => {
@@ -143,10 +143,12 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   }
 
   useEffect(() => {
-    if (controllerRef) _cancelPendingRequest(controllerRef)
+    _cancelPendingRequest(controllerRef.current)
     handleChangePage(1)
 
-    return () => _cancelPendingRequest(controllerRef)
+    /*   return () => {
+     _cancelPendingRequest(controllerRef.current)
+    } */
   }, [!!deidentifiedBoolean, filters, order, debouncedSearchInput, searchBy]) // eslint-disable-line
 
   const handleOpenDialog = () => {

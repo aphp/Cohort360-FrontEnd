@@ -37,13 +37,6 @@ const SearchPatient: React.FC<{}> = () => {
   const debouncedSearchInput = useDebounce(500, searchInput)
   const controllerRef = useRef<AbortController>(new AbortController())
 
-  /*const _cancelPendingRequest = () => {
-    if (controllerRef.current) {
-      controllerRef.current.abort()
-    }
-    controllerRef.current = new AbortController()
-  }*/
-
   const performQueries = async (page: number) => {
     const nominativeGroupsIds = practitioner ? practitioner.nominativeGroupsIds : []
 
@@ -77,9 +70,12 @@ const SearchPatient: React.FC<{}> = () => {
   }
 
   useEffect(() => {
-    _cancelPendingRequest(controllerRef)
+    _cancelPendingRequest(controllerRef.current)
     setPage(1)
     performQueries(1)
+    /*   return () => {
+     _cancelPendingRequest(controllerRef.current)
+    } */
   }, [order, searchBy, debouncedSearchInput, controllerRef])
 
   const open = useAppSelector((state) => state.drawer)

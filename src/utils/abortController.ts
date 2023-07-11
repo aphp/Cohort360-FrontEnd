@@ -1,5 +1,3 @@
-import { MutableRefObject } from 'react'
-
-export const _cancelPendingRequest = (controllerRef: MutableRefObject<AbortController>) => {
-  controllerRef?.current.abort()
+export const _cancelPendingRequest = (controller: AbortController) => {
+  controller.abort()
 }
