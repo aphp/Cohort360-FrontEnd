@@ -21,7 +21,7 @@ import {
 import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import EnhancedTable from 'components/ScopeTree/ScopeTreeTable'
-import { ScopeTreeRow, TreeElement } from 'types'
+import { ScopeType, ScopeTreeRow, TreeElement } from 'types'
 
 import { useAppDispatch, useAppSelector } from 'state'
 import { expandScopeElement, fetchScopesList, ScopeState, updateScopeList } from 'state/scope'
@@ -91,7 +91,7 @@ const ScopeTreeListItem: React.FC<ScopeTreeListItemProps> = (props) => {
           }}
         >
           <TableCell>
-            {row.subItems && row.subItems.length > 0 && (
+            {row.subItems && row.subItems.length > 0 && row.type !== executiveUnitType && (
               <IconButton
                 onClick={() => onExpand(row.id)}
                 style={{ marginLeft: level * 35, padding: 0, marginRight: -30 }}
@@ -150,7 +150,7 @@ type ScopeTreeProps = {
   defaultSelectedItems: ScopeTreeRow[]
   onChangeSelectedItem: (selectedItems: ScopeTreeRow[]) => void
   searchInput: string
-  executiveUnitType?: string
+  executiveUnitType?: ScopeType
 }
 
 const ScopeTree: React.FC<ScopeTreeProps> = ({
@@ -189,8 +189,8 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
   const isHeadIndetermined: boolean =
     !isAllSelected && selectedItems && selectedItems.length > 0 && rootRows && !isHeadChecked
 
-  const fetchScopeTree = async (executiveUnitType?: string, signal?: AbortSignal) => {
-    return dispatch(fetchScopesList({ signal })).unwrap()
+  const fetchScopeTree = async (executiveUnitType?: ScopeType, signal?: AbortSignal) => {
+    return dispatch(fetchScopesList({ signal, type: executiveUnitType })).unwrap()
   }
 
   const _cancelPendingRequest = () => {

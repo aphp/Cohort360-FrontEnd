@@ -148,6 +148,7 @@ export type Cohort = {
   request_query_snapshot?: string
   extension?: any[]
   exportable?: boolean
+  rights?: GroupRights
 }
 
 export type CohortFilters = {
@@ -279,6 +280,13 @@ export type ScopeTreeRow = AbstractTree<{
   cohort_tag?: string
   type?: string
 }>
+
+export enum ChartCode {
+  agePyramid = 'facet-extension.age-month',
+  genderRepartition = 'facet-deceased',
+  monthlyVisits = 'facet-facet.period.start-gender',
+  visitTypeRepartition = 'facet-class.coding.display'
+}
 
 export type SimpleChartDataType = {
   label: string
@@ -459,7 +467,7 @@ export type DemographicDataType = {
   type: 'Patient'
   gender: { id: string; label: string }[] | null
   vitalStatus: { id: string; label: string }[] | null
-  ageType: { id: string; label: string } | null
+  ageType: { id: Calendar; criteriaLabel: CalendarLabel; requestLabel: CalendarRequestLabel }
   years: [number, number]
   isInclusive?: boolean
 }
@@ -632,6 +640,14 @@ export type ProjectType = {
   owner_id?: string
 }
 
+export type QuerySnapshotInfo = {
+  uuid: string
+  title: string
+  created_at: string
+  has_linked_cohorts: boolean
+  version: number
+}
+
 export type RequestType = {
   uuid: string
   name: string
@@ -642,7 +658,7 @@ export type RequestType = {
   favorite?: boolean
   created_at?: string
   modified_at?: string
-  query_snapshots?: string[]
+  query_snapshots?: QuerySnapshotInfo[]
   shared_query_snapshot?: string[]
   usersToShare?: Provider[]
   shared_by?: Provider
@@ -857,6 +873,12 @@ export type GroupRights = {
   right_export_csv_pseudo_anonymised: boolean
   right_transfer_jupyter_nominative: boolean
   right_transfer_jupyter_pseudo_anonymised: boolean
+  export_csv_nomi?: boolean
+  export_csv_pseudo?: boolean
+  export_jupyter_nomi?: boolean
+  export_jupyter_pseudo?: boolean
+  read_patient_nomi?: boolean
+  read_patient_pseudo?: boolean
 }
 
 export type ErrorType = { isError: boolean; errorMessage?: string }
@@ -865,6 +887,14 @@ export type AgeRangeType = {
   month?: number
   days?: number
 }
+
+export type ScopeType =
+  | 'AP-HP'
+  | 'Groupe hospitalier (GH)'
+  | 'GHU'
+  | 'Hôpital'
+  | 'Pôle/DMU'
+  | 'Unité Fonctionnelle (UF)'
 
 export enum CriteriaName {
   Cim10 = 'cim10',

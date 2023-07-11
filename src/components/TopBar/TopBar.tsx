@@ -273,7 +273,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                       Accès : {access}
                     </Typography>
                     {cohort.cohortId && (
-                      <Typography align="right" variant="subtitle2">
+                      <Typography align="right" noWrap>
                         Identifiant de la cohorte: {cohort.cohortId}
                       </Typography>
                     )}

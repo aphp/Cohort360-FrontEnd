@@ -14,8 +14,9 @@ import { buildCohortCreation, CohortCreationState } from 'state/cohortCreation'
 import { fetchScopesList, ScopeState } from 'state/scope'
 import { MeState } from 'state/me'
 
-import { CriteriaNameType, ScopeTreeRow } from 'types'
+import { CriteriaNameType, ScopeType, ScopeTreeRow } from 'types'
 import { getSelectedScopes } from 'utils/scopeTree'
+import scopeTypes from 'data/scope_type.json'
 
 import useStyles from './styles'
 
@@ -221,7 +222,7 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
         title={title}
         isAcceptEmptySelection={isAcceptEmptySelection}
         selectedPopulation={selectedItems}
-        executiveUnitType={form ?? undefined}
+        executiveUnitType={form ? (scopeTypes.criteriaType[form] as ScopeType) : undefined}
         onConfirm={_onSubmit}
         onClose={() => onChangeOpenDrawer(false)}
       />

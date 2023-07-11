@@ -46,7 +46,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
 
   const [filters, setFilters] = useState<ObservationFilters>(filtersDefault)
 
-  const [validatedStatus, setValidatedStatus] = useState(true)
+  const validatedStatus = true
 
   const [order, setOrder] = useState<Order>({
     orderBy: 'effectiveDatetime',
@@ -125,8 +125,10 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
 
       <MasterChips chips={buildObservationFiltersChips(filters, handleChangeFilter)} />
       <Grid container item alignItems="center" justifyContent="flex-end">
-        <Checkbox checked={validatedStatus} onChange={() => setValidatedStatus(!validatedStatus)} />
-        <Typography>N'afficher que les analyses dont les résultats ont été validés</Typography>
+        <Checkbox checked={validatedStatus} disabled />
+        <Typography style={{ color: '#505050' }}>
+          N'afficher que les analyses dont les résultats ont été validés
+        </Typography>
       </Grid>
 
       <Grid container item style={{ marginBottom: 8 }}>

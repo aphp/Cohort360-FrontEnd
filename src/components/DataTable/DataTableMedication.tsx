@@ -57,9 +57,9 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
       ? { label: 'Type de prescription', code: 'type', align: 'center', sortableColumn: true }
       : null,
     { label: "Voie d'administration", code: 'route', align: 'center', sortableColumn: true },
-    selectedTab === 'administration' ? { label: 'Quantité', code: '', align: 'center', sortableColumn: false } : null,
-    { label: 'Unité exécutrice', code: '', align: 'center', sortableColumn: true },
-    selectedTab === 'administration' ? { label: 'Commentaire', code: '', align: 'center', sortableColumn: false } : null
+    selectedTab === 'administration' ? { label: 'Quantité', align: 'center', sortableColumn: false } : null,
+    { label: 'Unité exécutrice', align: 'center', sortableColumn: false },
+    selectedTab === 'administration' ? { label: 'Commentaire', align: 'center', sortableColumn: false } : null
   ].filter((elem) => elem !== null) as Column[]
 
   return (

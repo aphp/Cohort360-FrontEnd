@@ -32,7 +32,7 @@ export const fetchAtcData = async (searchValue?: string, noStar?: boolean) => {
     : ''
 
   const res = await apiFhir.get<FHIR_API_Response<ValueSet>>(
-    `/ValueSet?url=${MEDICATION_ATC}${_searchValue}&size=${VALUE_SET_SIZE ?? 9999}`
+    `/ValueSet?url=${MEDICATION_ATC}${_searchValue}&_count=${VALUE_SET_SIZE ?? 9999}`
   )
 
   const resources = getApiResponseResources(res)
@@ -106,7 +106,7 @@ export const fetchAtcHierarchy = async (atcParent: string) => {
 
 export const fetchSignleCode: (code: string) => Promise<string[]> = async (code: string) => {
   if (!code) return []
-  const response = await apiFhir.get<any>(`/ConceptMap?size=100&context=Descendant-leaf&source-code=${code}`)
+  const response = await apiFhir.get<any>(`/ConceptMap?_count=100&context=Descendant-leaf&source-code=${code}`)
 
   const data = getApiResponseResources(response)
   const codeList: string[] = []

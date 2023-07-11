@@ -314,6 +314,7 @@ const Login = () => {
         Connexion...
       </Typography>
       <CircularProgress />
+      <ErrorSnackBarAlert open={error !== false} setError={setError} errorMessage={errorMessage} />
     </Grid>
   ) : authCode ? (
     <Welcome />

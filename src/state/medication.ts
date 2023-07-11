@@ -28,16 +28,13 @@ const initMedicationHierarchy = createAsyncThunk<MedicationState, void, { state:
       const state = getState().medication
       const { list } = state
 
-      let medicationList = []
-
-      if (list && list.length === 0) {
-        medicationList = await services.cohortCreation.fetchAtcHierarchy('')
-      }
+      const medicationList: MedicationListType[] =
+        list.length === 0 ? await services.cohortCreation.fetchAtcHierarchy('') : list
 
       return {
         ...state,
         loading: false,
-        list: medicationList || []
+        list: medicationList
       }
     } catch (error) {
       console.error(error)
