@@ -24,7 +24,7 @@ type PatientDocsProps = {
   groupId?: string
 }
 const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const { patient } = useAppSelector((state) => ({
     patient: state.patient
@@ -70,7 +70,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
 
   const fetchDocumentsList = async (page: number) => {
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
-    dispatch<any>(
+    dispatch(
       fetchDocuments({
         signal: controllerRef.current?.signal,
         groupId,

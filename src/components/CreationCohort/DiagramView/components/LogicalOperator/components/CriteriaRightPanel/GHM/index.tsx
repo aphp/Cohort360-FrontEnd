@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Tabs, Tab } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import { Tab, Tabs } from '@mui/material'
 
 import GHMForm from './components/Form/GhmForm'
 import GHMHierarchy from './components/Hierarchy/GhmHierarchy'
@@ -30,7 +30,7 @@ const Index = (props: any) => {
   const ghmState = useAppSelector((state) => state.pmsi.claim || {})
   const ghmHierarchy = ghmState.list
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const _onChangeSelectedHierarchy = (
     newSelectedItems: PmsiListType[] | null | undefined,

@@ -7,13 +7,13 @@ import { ReactComponent as MaleIcon } from 'assets/icones/mars.svg'
 import { ReactComponent as UnknownIcon } from 'assets/icones/autre-inconnu.svg'
 
 import useStyles from './styles'
-import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { PatientGenderKind } from 'types'
 
 type GenderIconTypes = {
   gender?: PatientGenderKind
 }
 const GenderIcon: React.FC<GenderIconTypes> = ({ gender }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   switch (gender) {
     case PatientGenderKind._female:
@@ -31,7 +31,7 @@ type PatientInfoTypes = {
   ipp?: string
 }
 const PatientInfo: React.FC<PatientInfoTypes> = ({ gender, age, ipp }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <Grid className={classes.root} container direction="column">

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Tabs, Tab } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import { Tab, Tabs } from '@mui/material'
 
 import Cim10Form from './components/Form/Cim10Form'
 import Cim10Hierarchy from './components/Hierarchy/Cim10Hierarchy'
@@ -30,7 +30,7 @@ const Index = (props: any) => {
   const dispatch = useAppDispatch()
   const cim10Hierarchy = useAppSelector((state) => state.pmsi.condition.list || {})
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const _onChangeSelectedHierarchy = (
     newSelectedItems: PmsiListType[] | null | undefined,
     newHierarchy?: PmsiListType[]

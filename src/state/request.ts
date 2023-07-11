@@ -174,7 +174,7 @@ const deleteRequest = createAsyncThunk<DeleteRequestReturn, DeleteRequestParams,
         requestsList.splice(index, 1)
       }
 
-      dispatch<any>(fetchRequests())
+      dispatch(fetchRequests())
 
       return {
         selectedRequest: null,
@@ -330,7 +330,7 @@ const setRequestSlice = createSlice({
                 uuid: requestsList[index].uuid,
                 name: requestsList[index].name,
                 query_snapshots: requestsList[index].query_snapshots,
-                shared_query_snapshot: requestsList[index].query_snapshots?.slice(-1)
+                shared_query_snapshot: requestsList[index].query_snapshots?.slice(-1).map((rqs) => rqs.uuid)
               }
             }
           }

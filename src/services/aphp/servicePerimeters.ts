@@ -1,5 +1,13 @@
-import { CohortData, ScopePage, ScopeTreeRow } from 'types'
-import { IGroup } from '@ahryman40k/ts-fhir-types/lib/R4'
+import {
+  AccessExpiration,
+  AccessExpirationsProps,
+  CohortData,
+  ScopePage,
+  ScopeTreeRow,
+  ScopeElement,
+  ChartCode,
+  ScopeType
+} from 'types'
 import {
   getAgeRepartitionMapAphp,
   getEncounterRepartitionMapAphp,
@@ -8,12 +16,15 @@ import {
 } from 'utils/graphUtils'
 import { getApiResponseResources } from 'utils/apiHelpers'
 
-import { fetchEncounter, fetchGroup, fetchPatient, fetchScope } from './callApi'
+import { fetchEncounter, fetchGroup, fetchPatient, fetchScope, fetchAccessExpirations } from './callApi'
 
 import apiBackend from '../apiBackend'
 import { sortByQuantityAndName } from 'utils/scopeTree'
+import { AxiosResponse } from 'axios'
+import { Group } from 'fhir/r4'
+import scopeTypes from '../../data/scope_type.json'
 
-const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
+export const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
 export interface IServicePerimeters {
   /**
@@ -63,9 +74,11 @@ export interface IServicePerimeters {
     defaultPerimetersIds?: string[],
     cohortIds?: string[],
     noPerimetersIdsFetch?: boolean,
-    signal?: AbortSignal,
-    types?: string[]
+    type?: ScopeType,
+    signal?: AbortSignal
   ) => Promise<ScopePage[]>
+
+  getAccessExpirations: (accessExpirationsProps: AccessExpirationsProps) => Promise<AccessExpiration[]>
 
   /**
    * Cette fonction se base sur la fonction `getPerimeters` du service, et ré-organise la donnée sous forme d'un ScopeTreeRow[]
@@ -76,7 +89,7 @@ export interface IServicePerimeters {
    * Retour:
    *   - ScopeTreeRow[]
    */
-  getScopePerimeters: (practitionerId: string, signal?: AbortSignal) => Promise<ScopeTreeRow[]>
+  getScopePerimeters: (practitionerId: string, type?: ScopeType, signal?: AbortSignal) => Promise<ScopeTreeRow[]>
 
   /**
    * Cette fonction retoune l'ensemble des périmètres enfant d'un périmètre passé en argument
@@ -88,9 +101,10 @@ export interface IServicePerimeters {
    * Retour:
    *   - ScopeTreeRow[]
    */
-  getScopeSubItems: (
+  getScopesWithSubItems: (
     subScopesIds: string | null | undefined,
     getSubItem?: boolean,
+    type?: ScopeType,
     signal?: AbortSignal
   ) => Promise<ScopeTreeRow[]>
 
@@ -100,7 +114,7 @@ export interface IServicePerimeters {
    * Arguments:
    *   - perimetersId: ID du périmètre (liste d'ID séparé par des virgules)
    */
-  fetchPerimetersRights: (perimeters: IGroup[]) => Promise<IGroup[]>
+  fetchPerimetersRights: (perimeters: Group[]) => Promise<Group[]>
   /**
    * effectuer une recherche textuelle dans la liste des périmètres
    * @param page : le numéro de la page qu'on veut récupérer, par défaut c'est la 1ière page.
@@ -109,11 +123,14 @@ export interface IServicePerimeters {
   /**
    * construire une liste de ScopeTreeRow à travers une liste de ScopePage
    */
-  buildScopeTreeRow: (
+  buildScopeTreeRowList: (
     subScopes: ScopePage[],
     getSubItem?: boolean | undefined,
+    type?: ScopeType,
     signal?: AbortSignal
   ) => Promise<ScopeTreeRow[]>
+
+  buildScopeTreeRowItem: (scopeElement: ScopeElement, type?: string) => ScopeTreeRow
 
   /**
    * à travers un ScopePage on retourne 'Nominatif' ou 'Pseudonymisé' selon les droits d'accès
@@ -126,6 +143,12 @@ export interface IServicePerimeters {
    * @param perimeter
    */
   getScopeName: (perimeter: any) => string
+
+  /**
+   * construire la liste des types des périmètres en haut du type. Sinon tous les types.
+   * @param type
+   */
+  getHigherTypes: (type?: ScopeType) => string[]
 }
 
 const servicesPerimeters: IServicePerimeters = {
@@ -159,7 +182,7 @@ const servicesPerimeters: IServicePerimeters = {
         _id: perimetersId
       }),
       fetchPatient({
-        pivotFacet: ['age_gender', 'deceased_gender'],
+        pivotFacet: ['age-month_gender', 'deceased_gender'],
         _list: perimetersId.split(','),
         size: 20,
         _sort: 'family',
@@ -179,12 +202,16 @@ const servicesPerimeters: IServicePerimeters = {
 
     const originalPatients = getApiResponseResources(patientsResp)
 
-    const ageFacet = patientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-age-month')
-    const deceasedFacet = patientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-deceased')
-    const visitFacet = encountersResp.data.meta?.extension?.filter(
-      (facet: any) => facet.url === 'facet-visit-year-month-gender-facet'
+    const ageFacet = patientsResp.data.meta?.extension?.filter((facet: any) => facet.url === ChartCode.agePyramid)
+    const deceasedFacet = patientsResp.data.meta?.extension?.filter(
+      (facet: any) => facet.url === ChartCode.genderRepartition
     )
-    const classFacet = encountersResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-class-simple')
+    const visitFacet = encountersResp.data.meta?.extension?.filter(
+      (facet: any) => facet.url === ChartCode.monthlyVisits
+    )
+    const classFacet = encountersResp.data.meta?.extension?.filter(
+      (facet: any) => facet.url === ChartCode.visitTypeRepartition
+    )
 
     const agePyramidData =
       patientsResp?.data?.resourceType === 'Bundle'
@@ -218,7 +245,7 @@ const servicesPerimeters: IServicePerimeters = {
     try {
       if (!cohortId) return undefined
       const scopeItemList: ScopePage[] = (await servicesPerimeters.getPerimeters(undefined, [cohortId], true)) ?? []
-      const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(scopeItemList)
+      const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(scopeItemList)
       return scopeTreeRowList && scopeTreeRowList.length > 0 ? scopeTreeRowList[0] : undefined
     } catch (error) {
       return undefined
@@ -229,8 +256,8 @@ const servicesPerimeters: IServicePerimeters = {
     defaultPerimetersIds?: string[],
     cohortIds?: string[],
     noPerimetersIdsFetch?: boolean,
-    signal?: AbortSignal,
-    types?: string[]
+    type?: ScopeType,
+    signal?: AbortSignal
   ) => {
     try {
       let perimetersIds: string[] | undefined = []
@@ -254,10 +281,12 @@ const servicesPerimeters: IServicePerimeters = {
         perimetersIds = defaultPerimetersIds
       }
 
+      const higherTypes: string[] = servicesPerimeters.getHigherTypes(type)
+
       const perimetersListReponse: any = await fetchScope({
         perimetersIds: perimetersIds,
         cohortIds: cohortIds,
-        types: types
+        type: higherTypes
       })
       if (!perimetersListReponse || !perimetersListReponse.data || !perimetersListReponse.data.results) {
         console.error(
@@ -287,32 +316,55 @@ const servicesPerimeters: IServicePerimeters = {
     }
   },
 
-  getScopePerimeters: async (practitionerId, signal?: AbortSignal) => {
+  getAccessExpirations: async (accessExpirationsProps: AccessExpirationsProps) => {
+    let response: AxiosResponse<AccessExpiration[]> | undefined = undefined
+    try {
+      response = await fetchAccessExpirations(accessExpirationsProps)
+    } catch (error) {
+      console.error(error)
+    }
+    if (response?.data && response.data.length > 0) {
+      return response?.data
+    } else {
+      console.error('Error while fetching access expirations (from Back)')
+      return []
+    }
+  },
+
+  getScopePerimeters: async (practitionerId, type?: ScopeType, signal?: AbortSignal) => {
     if (!practitionerId) return []
 
     const scopeItemList: ScopePage[] =
-      (await servicesPerimeters.getPerimeters(undefined, undefined, undefined, signal)) ?? []
-    const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(
+      (await servicesPerimeters.getPerimeters(undefined, undefined, undefined, type, signal)) ?? []
+    const scopeTreeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
       scopeItemList,
       undefined,
+      type,
       signal
     )
     return scopeTreeRowList
   },
 
-  getScopeSubItems: async (subScopesIds: string | null | undefined, getSubItem?: boolean, signal?: AbortSignal) => {
+  getScopesWithSubItems: async (
+    subScopesIds: string | null | undefined,
+    getSubItem?: boolean,
+    type?: ScopeType,
+    signal?: AbortSignal
+  ) => {
     if (!subScopesIds) return []
-
-    const types = ['AP-HP', 'GHU', 'Hôpital', 'Groupe hospitalier (GH)', 'Pôle/DMU', 'Unité Fonctionnelle (UF)']
-
     const subScopes: ScopePage[] = await servicesPerimeters.getPerimeters(
       subScopesIds.trim().split(','),
       undefined,
       undefined,
-      signal,
-      types
+      type,
+      signal
     )
-    const scopeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(subScopes, getSubItem, signal)
+    const scopeRowList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
+      subScopes,
+      getSubItem,
+      type,
+      signal
+    )
     return scopeRowList
   },
 
@@ -368,7 +420,7 @@ const servicesPerimeters: IServicePerimeters = {
       { signal: signal }
     )
     if (backCohortResponse && backCohortResponse.data && backCohortResponse.data.results) {
-      const newPerimetersList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRow(
+      const newPerimetersList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
         backCohortResponse.data.results
       )
       result = {
@@ -380,25 +432,43 @@ const servicesPerimeters: IServicePerimeters = {
     return result
   },
 
-  buildScopeTreeRow: async (subScopes: ScopePage[], getSubItem?: boolean | undefined, signal?: AbortSignal) => {
+  buildScopeTreeRowList: async (
+    subScopes: ScopePage[],
+    getSubItem?: boolean | undefined,
+    type?: ScopeType,
+    signal?: AbortSignal
+  ) => {
     let scopeRowList: ScopeTreeRow[] = []
     for (const scopeItem of subScopes) {
-      const scopeRowItem: ScopeTreeRow = { id: '', name: '', quantity: 0, subItems: [] }
-      scopeRowItem.id = '' + scopeItem.perimeter.id
-      scopeRowItem.cohort_id = scopeItem.perimeter.cohort_id
-      scopeRowItem.name = servicesPerimeters.getScopeName(scopeItem.perimeter)
-      scopeRowItem.full_path = scopeItem.perimeter.full_path
-      scopeRowItem.quantity = +scopeItem.perimeter.cohort_size
+      const scopeRowItem = servicesPerimeters.buildScopeTreeRowItem(scopeItem.perimeter)
       scopeRowItem.access = servicesPerimeters.getAccessFromScope(scopeItem)
-      scopeRowItem.inferior_levels_ids = scopeItem.perimeter.inferior_levels_ids
       scopeRowItem.subItems =
         getSubItem === true
-          ? await servicesPerimeters.getScopeSubItems(scopeItem.perimeter.inferior_levels_ids, undefined, signal)
+          ? await servicesPerimeters.getScopesWithSubItems(
+              scopeItem.perimeter.inferior_levels_ids,
+              undefined,
+              type,
+              signal
+            )
           : [loadingItem]
-      scopeRowList = [...scopeRowList, scopeRowItem]
+      scopeRowList.push(scopeRowItem)
     }
     scopeRowList = sortByQuantityAndName(scopeRowList)
     return scopeRowList
+  },
+
+  buildScopeTreeRowItem: (scopeElement: ScopeElement) => {
+    const scopeRowItem: ScopeTreeRow = { id: '', name: '', quantity: 0, subItems: [loadingItem] }
+    scopeRowItem.id = '' + scopeElement.id
+    scopeRowItem.cohort_id = scopeElement.cohort_id
+    scopeRowItem.name = servicesPerimeters.getScopeName(scopeElement)
+    scopeRowItem.full_path = scopeElement.full_path
+    scopeRowItem.quantity = +scopeElement.cohort_size
+    scopeRowItem.above_levels_ids = scopeElement.above_levels_ids
+    scopeRowItem.inferior_levels_ids = scopeElement.inferior_levels_ids
+    scopeRowItem.type = scopeElement.type
+    scopeRowItem.parentId = scopeElement.parent_id
+    return scopeRowItem
   },
 
   getAccessFromScope: (perimeterItem: ScopePage) => {
@@ -413,6 +483,28 @@ const servicesPerimeters: IServicePerimeters = {
       return perimeter ? perimeter.name : ''
     }
     return `${perimeterID} - ${perimeter.name}`
+  },
+
+  getHigherTypes: (type?: ScopeType) => {
+    if (!type) {
+      return scopeTypes.typeLevel.flat()
+    }
+
+    const higherTypes: string[] = []
+    if (type) {
+      let isFoundValue = false
+      for (const currentLevel of [...scopeTypes.typeLevel].reverse()) {
+        for (const valueInTheSameLevel of currentLevel) {
+          if (valueInTheSameLevel === type) {
+            isFoundValue = true
+          }
+          if (isFoundValue) {
+            higherTypes.push(valueInTheSameLevel)
+          }
+        }
+      }
+    }
+    return higherTypes.length > 0 ? higherTypes : scopeTypes.typeLevel.flat()
   }
 }
 

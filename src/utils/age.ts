@@ -1,11 +1,11 @@
 import { AgeRangeType, CohortPatient } from 'types'
 import moment from 'moment'
 
-export const getAgeAphp = (ageObj: any, momentUnit: 'days' | 'months') => {
-  if (!ageObj) return 'Âge inconnu'
+export const getAgeAphp = (ageValue: number | undefined, momentUnit: 'days' | 'months'): string => {
+  if (!ageValue) return 'Âge inconnu'
   let ageUnit: 'year' | 'month' | 'day' = 'year'
   let ageUnitDisplay = ''
-  const momentAge = moment().subtract(ageObj.valueInteger, momentUnit)
+  const momentAge = moment().subtract(ageValue, momentUnit)
   const today = moment()
 
   if (today.diff(momentAge, 'year') > 0) {
@@ -26,18 +26,18 @@ export const getAgeAphp = (ageObj: any, momentUnit: 'days' | 'months') => {
 
 export const getAge = (patient: CohortPatient): string => {
   if (patient.extension) {
-    const totalDays = patient.extension.find((item) => item.url?.includes('Age(TotalDays)'))
+    const totalDays = patient.extension.find((item) => item.url?.includes('total-age-day'))
+    const totalMonths = patient.extension.find((item) => item.url?.includes('total-age-month'))
     if (totalDays) {
-      return getAgeAphp(totalDays, 'days')
-    } else {
-      const totalMonths = patient.extension.find((item) => item.url?.includes('Age(TotalMonths)'))
-      return getAgeAphp(totalMonths, 'months')
+      return getAgeAphp(totalDays.valueInteger, 'days')
+    } else if (totalMonths) {
+      return getAgeAphp(totalMonths.valueInteger, 'months')
     }
   }
   return 'Âge inconnu'
 }
 
-export const ageName = (dates: [string, string]) => {
+export const ageName = (dates: [string, string]): string => {
   const minDate: AgeRangeType = convertStringToAgeRangeType(dates[1]) ?? { year: 0, month: 0, days: 0 }
   const maxDate: AgeRangeType = convertStringToAgeRangeType(dates[0]) ?? { year: 0, month: 0, days: 0 }
 
@@ -66,7 +66,7 @@ export const ageName = (dates: [string, string]) => {
     ${(maxDate.days ?? 0) > 0 ? `${maxDate.days} jour(s) ` : ``}`
 }
 
-export const substructAgeRangeType = (ageDate: AgeRangeType) => {
+export const substructAgeRangeType = (ageDate: AgeRangeType): Date => {
   if (!ageDate) return new Date()
   const today: Date = new Date()
   const newDate: Date = new Date(
@@ -80,12 +80,12 @@ export const substructAgeRangeType = (ageDate: AgeRangeType) => {
   return newDate
 }
 
-export const substructAgeString = (range: string) => {
+export const substructAgeString = (range: string): Date => {
   const ageRangeType: AgeRangeType = convertStringToAgeRangeType(range) ?? { year: 0, month: 0, days: 0 }
   return substructAgeRangeType(ageRangeType)
 }
 
-export const convertStringToAgeRangeType = (age: string) => {
+export const convertStringToAgeRangeType = (age: string): AgeRangeType | undefined => {
   if (!age) return undefined
   const newAge: AgeRangeType = {
     year: Number(age.split('/')[2]),
@@ -95,6 +95,6 @@ export const convertStringToAgeRangeType = (age: string) => {
   return newAge
 }
 
-export const convertAgeRangeTypeToString = (ageDate: AgeRangeType) => {
+export const convertAgeRangeTypeToString = (ageDate: AgeRangeType): string => {
   return ageDate.days + '/' + ageDate.month + '/' + ageDate.year
 }

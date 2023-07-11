@@ -5,7 +5,8 @@ import {
   CohortEncounter,
   CohortComposition,
   SearchByTypes,
-  MedicationEntry
+  MedicationEntry,
+  ChartCode
 } from 'types'
 import {
   getGenderRepartitionMapAphp,
@@ -14,18 +15,6 @@ import {
   getVisitRepartitionMapAphp
 } from 'utils/graphUtils'
 import { getApiResponseResources } from 'utils/apiHelpers'
-import {
-  IClaim,
-  ICondition,
-  IIdentifier,
-  IProcedure,
-  IPatient,
-  IMedicationRequest,
-  IMedicationAdministration,
-  IEncounter,
-  IComposition,
-  IObservation
-} from '@ahryman40k/ts-fhir-types/lib/R4'
 import {
   fetchGroup,
   fetchPatient,
@@ -41,6 +30,18 @@ import {
 
 import servicesPerimeters from './servicePerimeters'
 import servicesCohorts from './serviceCohorts'
+import {
+  Claim,
+  Condition,
+  DocumentReference,
+  Encounter,
+  Identifier,
+  MedicationAdministration,
+  MedicationRequest,
+  Observation,
+  Patient,
+  Procedure
+} from 'fhir/r4'
 
 export interface IServicePatients {
   /*
@@ -48,7 +49,7 @@ export interface IServicePatients {
    **
    ** Elle ne prend aucun argument, et un nombre de patient
    */
-  fetchPatientsCount: () => Promise<number>
+  fetchPatientsCount: () => Promise<number | null>
 
   /*
    ** Cette fonction permet de récupérer l'ensemble des patients lié à un utilisateur
@@ -71,13 +72,13 @@ export interface IServicePatients {
     groupId?: string
   ) => Promise<
     | {
-        patientInfo: IPatient & {
-          lastEncounter?: IEncounter
-          lastGhm?: IClaim
-          lastProcedure?: IProcedure
-          mainDiagnosis?: ICondition[]
+        patientInfo: Patient & {
+          lastEncounter?: Encounter
+          lastGhm?: Claim
+          lastProcedure?: Procedure
+          mainDiagnosis?: Condition[]
         }
-        hospits?: (CohortEncounter | IEncounter)[]
+        hospits?: (CohortEncounter | Encounter)[]
       }
     | undefined
   >
@@ -117,7 +118,7 @@ export interface IServicePatients {
     startDate?: string | null,
     endDate?: string | null
   ) => Promise<{
-    pmsiData?: (IClaim | ICondition | IProcedure)[]
+    pmsiData?: (Claim | Condition | Procedure)[]
     pmsiTotal?: number
   }>
 
@@ -126,14 +127,14 @@ export interface IServicePatients {
    *
    *
    */
-  fetchAllProcedures: (patientId: string, groupId: string, size?: number) => Promise<IProcedure[]>
+  fetchAllProcedures: (patientId: string, groupId: string, size?: number) => Promise<Procedure[]>
 
   /**
    * Cette fonction retourne la totalité des Conditions d'un patient donné
    *
    *
    */
-  fetchAllConditions: (patientId: string, groupId: string, size?: number) => Promise<ICondition[]>
+  fetchAllConditions: (patientId: string, groupId: string, size?: number) => Promise<Condition[]>
 
   /*
    ** Cette fonction permet de récupérer les élèments de Medication lié à un patient
@@ -172,7 +173,7 @@ export interface IServicePatients {
     startDate?: string,
     endDate?: string
   ) => Promise<{
-    medicationData?: MedicationEntry<IMedicationAdministration | IMedicationRequest>[]
+    medicationData?: MedicationEntry<MedicationAdministration | MedicationRequest>[]
     medicationTotal?: number
   }>
 
@@ -202,6 +203,7 @@ export interface IServicePatients {
     sortDirection: string,
     page: number,
     patientId: string,
+    rowStatus: boolean,
     searchInput: string,
     nda: string,
     loinc: string,
@@ -210,7 +212,7 @@ export interface IServicePatients {
     endDate?: string | null,
     groupId?: string
   ) => Promise<{
-    biologyList: IObservation[]
+    biologyList: Observation[]
     biologyTotal: number
   }>
 
@@ -252,7 +254,7 @@ export interface IServicePatients {
     groupId?: string,
     signal?: AbortSignal
   ) => Promise<{
-    docsList: IComposition[]
+    docsList: DocumentReference[]
     docsTotal: number
   }>
 
@@ -279,7 +281,7 @@ export interface IServicePatients {
     input: string,
     searchBy: SearchByTypes
   ) => Promise<{
-    patientList: IPatient[]
+    patientList: Patient[]
     totalPatients: number
   }>
 
@@ -299,18 +301,18 @@ const servicesPatients: IServicePatients = {
   fetchPatientsCount: async () => {
     try {
       const response = await fetchPatient({ size: 0 })
-      if (response?.data?.resourceType === 'OperationOutcome') return null as any
+      if (response?.data?.resourceType === 'OperationOutcome') return null
       return response.data.total ?? 0
-    } catch (error: any) {
+    } catch (error) {
       console.error(error)
-      return null as any
+      return null
     }
   },
 
   fetchMyPatients: async () => {
     const [myPatientsResp, myPatientsEncounters] = await Promise.all([
       fetchPatient({
-        pivotFacet: ['age_gender', 'deceased_gender'],
+        pivotFacet: ['age-month_gender', 'deceased_gender'],
         size: 20,
         _sort: 'family',
         _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
@@ -328,32 +330,35 @@ const servicesPatients: IServicePatients = {
 
     const agePyramidData =
       myPatientsResp.data.resourceType === 'Bundle'
-        ? await getAgeRepartitionMapAphp(
-            myPatientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-age-month')?.[0].extension
+        ? getAgeRepartitionMapAphp(
+            myPatientsResp.data.meta?.extension?.filter((facet: any) => facet.url === ChartCode.agePyramid)?.[0]
+              .extension
           )
         : undefined
 
     const genderRepartitionMap =
       myPatientsResp.data.resourceType === 'Bundle'
-        ? await getGenderRepartitionMapAphp(
-            myPatientsResp.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-deceased')?.[0].extension
+        ? getGenderRepartitionMapAphp(
+            myPatientsResp.data.meta?.extension?.filter((facet: any) => facet.url === ChartCode.genderRepartition)?.[0]
+              .extension
           )
         : undefined
 
     const monthlyVisitData =
       myPatientsEncounters.data.resourceType === 'Bundle'
-        ? await getVisitRepartitionMapAphp(
+        ? getVisitRepartitionMapAphp(
             myPatientsEncounters.data.meta?.extension?.filter(
-              (facet: any) => facet.url === 'facet-visit-year-month-gender-facet'
+              (facet: any) => facet.url === ChartCode.monthlyVisits
             )?.[0].extension
           )
         : undefined
 
     const visitTypeRepartitionData =
       myPatientsEncounters.data.resourceType === 'Bundle'
-        ? await getEncounterRepartitionMapAphp(
-            myPatientsEncounters.data.meta?.extension?.filter((facet: any) => facet.url === 'facet-class-simple')?.[0]
-              .extension
+        ? getEncounterRepartitionMapAphp(
+            myPatientsEncounters.data.meta?.extension?.filter(
+              (facet: any) => facet.url === ChartCode.visitTypeRepartition
+            )?.[0].extension
           )
         : undefined
 
@@ -382,7 +387,7 @@ const servicesPatients: IServicePatients = {
     startDate,
     endDate
   ) => {
-    let pmsiResp: AxiosResponse<FHIR_API_Response<ICondition | IProcedure | IClaim>> | null = null
+    let pmsiResp: AxiosResponse<FHIR_API_Response<Condition | Procedure | Claim>> | null = null
 
     switch (selectedTab) {
       case 'diagnostic':
@@ -394,7 +399,7 @@ const servicesPatients: IServicePatients = {
           _text: searchInput,
           _sort: sortBy === 'code' ? 'code' : 'recorded-date',
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
-          'encounter.identifier': nda,
+          'encounter-identifier': nda,
           code: code,
           type: diagnosticTypes,
           'min-recorded-date': startDate ?? '',
@@ -410,7 +415,7 @@ const servicesPatients: IServicePatients = {
           _text: searchInput,
           _sort: sortBy === 'code' ? 'code' : 'date',
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
-          'encounter.identifier': nda,
+          'encounter-identifier': nda,
           code: code,
           minDate: startDate ?? '',
           maxDate: endDate ?? ''
@@ -425,7 +430,7 @@ const servicesPatients: IServicePatients = {
           _text: searchInput,
           _sort: sortBy === 'code' ? 'diagnosis' : 'created',
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
-          'encounter.identifier': nda,
+          'encounter-identifier': nda,
           diagnosis: code,
           minCreated: startDate ?? '',
           maxCreated: endDate ?? ''
@@ -438,7 +443,7 @@ const servicesPatients: IServicePatients = {
 
     if (pmsiResp === null) return {}
 
-    const pmsiData: (IClaim | ICondition | IProcedure)[] | undefined = getApiResponseResources(pmsiResp)
+    const pmsiData: (Claim | Condition | Procedure)[] | undefined = getApiResponseResources(pmsiResp)
     const pmsiTotal = pmsiResp.data.resourceType === 'Bundle' ? pmsiResp.data.total : 0
 
     return {
@@ -457,7 +462,7 @@ const servicesPatients: IServicePatients = {
       sortDirection: 'desc'
     })
 
-    const proceduresData: IProcedure[] = getApiResponseResources(proceduresResp) ?? []
+    const proceduresData: Procedure[] = getApiResponseResources(proceduresResp) ?? []
     return proceduresData
   },
 
@@ -471,7 +476,7 @@ const servicesPatients: IServicePatients = {
       sortDirection: 'desc'
     })
 
-    const diagnosticsData: ICondition[] = getApiResponseResources(diagnosticsResp) ?? []
+    const diagnosticsData: Condition[] = getApiResponseResources(diagnosticsResp) ?? []
     return diagnosticsData
   },
 
@@ -489,7 +494,7 @@ const servicesPatients: IServicePatients = {
     startDate,
     endDate
   ) => {
-    let medicationResp: AxiosResponse<FHIR_API_Response<IMedicationRequest | IMedicationAdministration>> | null = null
+    let medicationResp: AxiosResponse<FHIR_API_Response<MedicationRequest | MedicationAdministration>> | null = null
 
     switch (selectedTab) {
       case 'prescription':
@@ -529,7 +534,7 @@ const servicesPatients: IServicePatients = {
 
     if (medicationResp === null) return {}
 
-    const medicationData: (IMedicationAdministration | IMedicationRequest)[] | undefined =
+    const medicationData: (MedicationAdministration | MedicationRequest)[] | undefined =
       getApiResponseResources(medicationResp)
     const medicationTotal = medicationResp.data.resourceType === 'Bundle' ? medicationResp.data.total : 0
 
@@ -541,6 +546,7 @@ const servicesPatients: IServicePatients = {
     sortDirection: string,
     page: number,
     patientId: string,
+    rowStatus: boolean,
     searchInput: string,
     nda: string,
     loinc: string,
@@ -561,7 +567,8 @@ const servicesPatients: IServicePatients = {
       loinc: loinc,
       anabio: anabio,
       minDate: startDate ?? '',
-      maxDate: endDate ?? ''
+      maxDate: endDate ?? '',
+      rowStatus
     })
 
     const biologyTotal = observationResp.data.resourceType === 'Bundle' ? observationResp.data.total : 0
@@ -598,10 +605,25 @@ const servicesPatients: IServicePatients = {
       size: documentLines,
       offset: page ? (page - 1) * documentLines : 0,
       status: 'final',
-      _elements: !searchInput ? ['status', 'type', 'encounter', 'date', 'title', 'event'] : [],
+      _elements: !searchInput
+        ? [
+            'docstatus',
+            'status',
+            'type',
+            'encounter',
+            'date',
+            'title',
+            'event',
+            'content',
+            'context',
+            'text',
+            'description'
+          ]
+        : [],
       _text: searchInput,
+      highlight_search_results: true,
       type: selectedDocTypes.join(','),
-      'encounter.identifier': nda,
+      'encounter-identifier': nda,
       onlyPdfAvailable: onlyPdfAvailable,
       minDate: startDate ?? '',
       maxDate: endDate ?? '',
@@ -628,14 +650,14 @@ const servicesPatients: IServicePatients = {
         patient: patientId,
         type: 'VISIT',
         status: ['arrived', 'triaged', 'in-progress', 'onleave', 'finished', 'unknown'],
-        _sort: 'start-date',
+        _sort: 'period-start',
         sortDirection: 'desc',
         _list: groupId ? [groupId] : []
       }),
       fetchEncounter({
         patient: patientId,
         'type:not': 'VISIT',
-        _sort: 'start-date',
+        _sort: 'period-start',
         sortDirection: 'desc',
         _list: groupId ? [groupId] : []
       })
@@ -645,8 +667,8 @@ const servicesPatients: IServicePatients = {
     if (patientDataList === undefined || (patientDataList && patientDataList.length === 0)) return undefined
     const patientData = patientDataList[0]
 
-    const encounters: IEncounter[] = getApiResponseResources(encounterResponse) || []
-    const encountersDetail: IEncounter[] = getApiResponseResources(encounterDetailResponse) || []
+    const encounters: Encounter[] = getApiResponseResources(encounterResponse) || []
+    const encountersDetail: Encounter[] = getApiResponseResources(encounterDetailResponse) || []
 
     const hospits = await getEncounterDocuments(encounters, encountersDetail, groupId)
 
@@ -718,11 +740,11 @@ const servicesPatients: IServicePatients = {
       const cohortRights = await servicesCohorts.fetchCohortsRights(
         groupsData.map((groupData) => ({ fhir_group_id: groupData.id ?? '' }))
       )
-      return cohortRights.some((cohortRight) =>
-        cohortRight.extension?.some(
-          ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
-        )
-      )
+      return cohortRights?.[0]?.rights?.read_patient_pseudo
+        ? cohortRights?.[0]?.rights?.read_patient_nomi
+          ? false
+          : true
+        : false
     }
   }
 }
@@ -747,7 +769,21 @@ export const getEncounterDocuments = async (
 
   const documentsResp = await fetchComposition({
     encounter: encountersIdList.join(','),
-    _elements: ['status', 'type', 'subject', 'encounter', 'date', 'title', 'event'],
+    _elements: [
+      'docstatus',
+      'status',
+      'type',
+      'subject',
+      'encounter',
+      'date',
+      'title',
+      'event',
+      'content',
+      'context',
+      'text',
+      'description',
+      'title'
+    ],
     status: 'final',
     _list: groupId ? groupId.split(',') : []
   })
@@ -756,7 +792,7 @@ export const getEncounterDocuments = async (
 
   for (const encounter of _encounters) {
     const currentDocuments = documents?.filter(
-      (document) => encounter.id === document.encounter?.display?.replace('Encounter/', '')
+      (document) => encounter.id === document.context?.encounter?.[0].reference?.replace('Encounter/', '')
     )
     const currentDetails = encountersDetail?.filter(
       (encounterDetail) => encounter.id === encounterDetail?.partOf?.reference?.replace('Encounter/', '')
@@ -772,7 +808,7 @@ export const getEncounterDocuments = async (
 
       currentDocument.NDA = encounter.id ?? 'Inconnu'
       if (encounter.identifier) {
-        const nda = encounter.identifier.find((identifier: IIdentifier) => {
+        const nda = encounter.identifier.find((identifier: Identifier) => {
           return identifier.type?.coding?.[0].code === 'NDA'
         })
         if (nda) {

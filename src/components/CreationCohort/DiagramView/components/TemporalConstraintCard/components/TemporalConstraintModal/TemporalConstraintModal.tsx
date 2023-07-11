@@ -38,8 +38,8 @@ const TemporalConstraint: React.FC<{
   const dispatch = useAppDispatch()
 
   const handleConfirm = () => {
-    dispatch<any>(updateTemporalConstraints(newConstraintsList))
-    dispatch<any>(buildCohortCreation({}))
+    dispatch(updateTemporalConstraints(newConstraintsList))
+    dispatch(buildCohortCreation({}))
   }
 
   const handleClose = () => {
@@ -68,7 +68,7 @@ const TemporalConstraint: React.FC<{
           <RadioGroup
             row
             value={radioValues}
-            onChange={(e: any) => onChangeValue(e.target.value)}
+            onChange={(e) => onChangeValue(e.target.value as unknown as TemporalConstraintsType['constraintType'])}
             style={{ margin: '1em', justifyContent: 'space-around' }}
           >
             <FormControlLabel value="none" control={<Radio />} label="Aucune contrainte sur les séjours" />

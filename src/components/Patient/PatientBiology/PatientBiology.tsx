@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { Alert, Grid } from '@mui/material'
+import { Alert, Grid, Typography } from '@mui/material'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
@@ -16,6 +16,7 @@ import { Order, ObservationFilters } from 'types'
 import { buildObservationFiltersChips } from 'utils/chips'
 
 import useStyles from './styles'
+import { Checkbox } from '@mui/material'
 
 type PatientBiologyTypes = {
   groupId?: string
@@ -24,7 +25,7 @@ type PatientBiologyTypes = {
 const filtersDefault = { nda: '', loinc: '', anabio: '', startDate: null, endDate: null }
 
 const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const { patient } = useAppSelector((state) => ({
     patient: state.patient
@@ -45,15 +46,18 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
 
   const [filters, setFilters] = useState<ObservationFilters>(filtersDefault)
 
+  const validatedStatus = true
+
   const [order, setOrder] = useState<Order>({
     orderBy: 'effectiveDatetime',
     orderDirection: 'asc'
   })
 
   const _fetchBiology = async (page: number) => {
-    dispatch<any>(
+    dispatch(
       fetchBiology({
         groupId,
+        rowStatus: validatedStatus,
         options: {
           page,
           sort: {
@@ -94,7 +98,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
 
   useEffect(() => {
     handleChangePage()
-  }, [searchInput, filters, order])
+  }, [searchInput, filters, order, validatedStatus])
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
@@ -120,6 +124,12 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
       />
 
       <MasterChips chips={buildObservationFiltersChips(filters, handleChangeFilter)} />
+      <Grid container item alignItems="center" justifyContent="flex-end">
+        <Checkbox checked={validatedStatus} disabled />
+        <Typography style={{ color: '#505050' }}>
+          N'afficher que les analyses dont les résultats ont été validés
+        </Typography>
+      </Grid>
 
       <Grid container item style={{ marginBottom: 8 }}>
         <Alert severity="warning">

@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from 'react'
-import clsx from 'clsx'
 
 import {
   Button,
@@ -24,7 +23,12 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 import { useAppDispatch, useAppSelector } from 'state'
 import { PmsiListType } from 'state/pmsi'
 
-import { checkIfIndeterminated, expandItem, findEquivalentRowInItemAndSubItems, getSelectedPmsi } from 'utils/pmsi'
+import {
+  checkIfIndeterminated,
+  expandItem,
+  findEquivalentRowInItemAndSubItems,
+  getHierarchySelection
+} from 'utils/pmsi'
 
 import useStyles from './styles'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
@@ -42,7 +46,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
   const { cim10Item, selectedItems, handleClick } = props
   const { id, label, subItems } = cim10Item
 
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
 
   const cim10Hierarchy = useAppSelector((state) => state.pmsi.condition.list || {})
@@ -54,7 +58,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
   const isIndeterminated = checkIfIndeterminated(cim10Item, selectedItems)
   const _onExpand = async (cim10Code: string) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
-    dispatch<any>(incrementLoadingSyncHierarchyTable())
+    dispatch(incrementLoadingSyncHierarchyTable())
     setOpen(!open)
     const newHierarchy = await expandItem(
       cim10Code,
@@ -64,15 +68,15 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
       dispatch
     )
     await handleClick(selectedItems, newHierarchy)
-    dispatch<any>(decrementLoadingSyncHierarchyTable())
+    dispatch(decrementLoadingSyncHierarchyTable())
   }
 
   const handleClickOnHierarchy = async (cim10Item: PmsiListType) => {
     if (isLoadingsyncHierarchyTable > 0 || isLoadingPmsi > 0) return
-    dispatch<any>(incrementLoadingSyncHierarchyTable())
-    const newSelectedItems = getSelectedPmsi(cim10Item, selectedItems || [], cim10Hierarchy)
+    dispatch(incrementLoadingSyncHierarchyTable())
+    const newSelectedItems = getHierarchySelection(cim10Item, selectedItems || [], cim10Hierarchy)
     await handleClick(newSelectedItems)
-    dispatch<any>(decrementLoadingSyncHierarchyTable())
+    dispatch(decrementLoadingSyncHierarchyTable())
   }
 
   if (!subItems || (subItems && Array.isArray(subItems) && subItems.length === 0)) {
@@ -81,7 +85,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(cim10Item)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}
@@ -101,7 +105,7 @@ const CimListItem: React.FC<CimListItemProps> = (props) => {
         <ListItemIcon>
           <div
             onClick={() => handleClickOnHierarchy(cim10Item)}
-            className={clsx(classes.indicator, {
+            className={cx(classes.indicator, {
               [classes.selectedIndicator]: isSelected,
               [classes.indeterminateIndicator]: isIndeterminated
             })}
@@ -153,7 +157,7 @@ type Cim10HierarchyProps = {
 const Cim10Hierarchy: React.FC<Cim10HierarchyProps> = (props) => {
   const { isOpen = false, selectedCriteria, onChangeSelectedHierarchy, onConfirm, goBack, isEdition } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const isLoadingSyncHierarchyTable = initialState?.loading ?? 0
   const isLoadingPmsi = useAppSelector((state) => state.pmsi.syncLoading || 0)

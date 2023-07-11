@@ -36,7 +36,7 @@ type ResearchProps = {
   filteredIds?: string[]
 }
 const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
@@ -70,7 +70,7 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   })
 
   const onFetchCohorts = async (_page?: number) => {
-    dispatch<any>(
+    dispatch(
       fetchCohorts({
         filters,
         sort,
@@ -95,12 +95,12 @@ const Research: React.FC<ResearchProps> = ({ simplified, onClickRow }) => {
   }
 
   const onDeleteCohort = async (cohort: Cohort) => {
-    await dispatch<any>(deleteCohort({ deletedCohort: cohort }))
+    await dispatch(deleteCohort({ deletedCohort: cohort }))
     onFetchCohorts()
   }
 
   const onSetCohortFavorite = async (cohort: Cohort) => {
-    await dispatch<any>(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
+    await dispatch(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
     if (sort.sortBy === 'modified_at' && sort.sortDirection === 'desc') {
       setPage(1)
       onFetchCohorts(1)

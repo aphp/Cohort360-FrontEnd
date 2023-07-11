@@ -1,5 +1,4 @@
 import { Cohort, CohortData } from 'types'
-import { IGroup_Member } from '@ahryman40k/ts-fhir-types/lib/R4'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { login, logout } from './me'
 import { RootState } from 'state'
@@ -8,6 +7,7 @@ import { ODD_EXPORT } from '../constants'
 
 import services from 'services/aphp'
 import servicesPerimeters from '../services/aphp/servicePerimeters'
+import { GroupMember } from 'fhir/r4'
 
 export type ExploredCohortState = {
   importedPatients: any[]
@@ -31,6 +31,7 @@ const defaultInitialState = {
   totalDocs: 0,
   documentsList: [],
   wordcloudData: [],
+
   encounters: [],
   genderRepartitionMap: undefined,
   visitTypeRepartitionData: undefined,
@@ -111,18 +112,21 @@ const fetchExploredCohort = createAsyncThunk<
           if (cohort) {
             cohort.cohortId = id
             const cohortRights = await services.cohorts.fetchCohortsRights([{ fhir_group_id: id }])
-            const cohortRight = cohortRights && cohortRights[0]
-            if (cohortRights && cohortRights[0] && cohortRights[0].extension) {
-              cohort.canMakeExport =
-                (!!ODD_EXPORT &&
-                  cohortRight?.extension?.some(
-                    ({ url, valueString }) => url === 'EXPORT_ACCESS' && valueString === 'DATA_NOMINATIVE'
-                  )) ??
-                false
-              cohort.deidentifiedBoolean =
-                cohortRight?.extension?.some(
-                  ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
-                ) ?? true
+            if (cohortRights?.[0].rights) {
+              if (
+                cohortRights?.[0]?.rights?.read_patient_pseudo === false &&
+                cohortRights?.[0]?.rights?.read_patient_nomi === false
+              ) {
+                throw new Error("You don't have any rights on this cohort")
+              } else {
+                cohort.canMakeExport = !!ODD_EXPORT ? cohortRights?.[0]?.rights?.export_csv_nomi : false
+
+                cohort.deidentifiedBoolean = cohortRights?.[0]?.rights?.read_patient_pseudo
+                  ? cohortRights?.[0]?.rights?.read_patient_nomi
+                    ? false
+                    : true
+                  : false
+              }
             } else {
               throw new Error("You don't have any rights on this cohort")
             }
@@ -173,7 +177,7 @@ const fetchExploredCohort = createAsyncThunk<
         break
     }
   } else {
-    dispatch<any>(fetchExploredCohortInBackground({ context, id }))
+    dispatch(fetchExploredCohortInBackground({ context, id }))
   }
   return cohort ?? state.exploredCohort
 })
@@ -306,7 +310,7 @@ const exploredCohortSlice = createSlice({
       state.originalPatients = originalPatients
       state.excludedPatients = excludedPatients
     },
-    updateCohort: (state: ExploredCohortState, action: PayloadAction<IGroup_Member[]>) => {
+    updateCohort: (state: ExploredCohortState, action: PayloadAction<GroupMember[]>) => {
       return {
         ...state,
         cohort:

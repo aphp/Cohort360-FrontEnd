@@ -4,12 +4,9 @@ import { RootState } from 'state'
 import { login, logout } from 'state/me'
 
 import services from 'services/aphp'
+import { AbstractTree } from 'types'
 
-export type PmsiListType = {
-  id: string
-  label: string
-  subItems?: PmsiListType[]
-}
+export type PmsiListType = AbstractTree<{ label: string }>
 
 export type PmsiElementType = {
   loading: boolean
@@ -50,36 +47,28 @@ const initPmsiHierarchy = createAsyncThunk<PmsiState, void, { state: RootState }
       const state = getState().pmsi
       const { claim, condition, procedure } = state
 
-      let claimList = []
-      let conditionList = []
-      let procedureList = []
-
-      if (claim && claim.list && claim.list.length === 0) {
-        claimList = await services.cohortCreation.fetchGhmHierarchy('')
-      }
-      if (condition && condition.list && condition.list.length === 0) {
-        conditionList = await services.cohortCreation.fetchCim10Hierarchy('')
-      }
-      if (procedure && procedure.list && procedure.list.length === 0) {
-        procedureList = await services.cohortCreation.fetchCcamHierarchy('')
-      }
+      const claimList = claim.list.length === 0 ? await services.cohortCreation.fetchGhmHierarchy('') : claim.list
+      const conditionList =
+        condition.list.length === 0 ? await services.cohortCreation.fetchCim10Hierarchy('') : condition.list
+      const procedureList =
+        procedure.list.length === 0 ? await services.cohortCreation.fetchCcamHierarchy('') : procedure.list
 
       return {
         ...state,
         claim: {
           ...state.claim,
           loading: false,
-          list: claimList || []
+          list: claimList
         },
         condition: {
           ...state.condition,
           loading: false,
-          list: conditionList || []
+          list: conditionList
         },
         procedure: {
           ...state.procedure,
           loading: false,
-          list: procedureList || []
+          list: procedureList
         }
       }
     } catch (error) {
@@ -162,7 +151,7 @@ const expandPmsiElement = createAsyncThunk<PmsiState, ExpandPmsiElementParams, {
         for (let item of items) {
           // Replace sub items element by response of back-end
           if (item.id === rowId) {
-            const foundItem = item.subItems ? item.subItems.find((i: any) => i.id === 'loading') : true
+            const foundItem = item.subItems ? item.subItems.find((i) => i.id === 'loading') : true
             if (foundItem) {
               let subItems: PmsiListType[] = []
               if (keyElement === 'claim') {
@@ -204,7 +193,7 @@ const expandPmsiElement = createAsyncThunk<PmsiState, ExpandPmsiElementParams, {
         openedElement: _openedElement,
         loading: false
       },
-      savedSelectedItems: savedSelectedItems.filter((savedSelectedItem: any) => savedSelectedItem.id !== 'loading')
+      savedSelectedItems: savedSelectedItems.filter((savedSelectedItem) => savedSelectedItem.id !== 'loading')
     }
   }
 )

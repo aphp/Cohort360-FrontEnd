@@ -50,7 +50,7 @@ export const fetchCim10Diagnostic = async (searchValue?: string, noStar?: boolea
     : ''
 
   const res = await apiFhir.get<any>(
-    `/ValueSet?url=${CONDITION_HIERARCHY}${_searchValue}&size=${VALUE_SET_SIZE ?? 9999}`
+    `/ValueSet?url=${CONDITION_HIERARCHY}${_searchValue}&_count=${VALUE_SET_SIZE ?? 9999}`
   )
 
   let cim10List =

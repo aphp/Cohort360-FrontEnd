@@ -14,7 +14,7 @@ type EntryExitInputsProps = {
 }
 
 const EntryExitInputs: React.FC<EntryExitInputsProps> = ({ criteria, selectedCriteria, onChangeValue }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [checked, setCheck] = useState(true)
 
   const defaultValuesEntryModes = selectedCriteria.entryMode
@@ -53,7 +53,7 @@ const EntryExitInputs: React.FC<EntryExitInputsProps> = ({ criteria, selectedCri
 
   return (
     <>
-      <Grid container direction="column">
+      <Grid container direction="column" className={classes.supportedInputsRoot}>
         <Grid
           item
           container

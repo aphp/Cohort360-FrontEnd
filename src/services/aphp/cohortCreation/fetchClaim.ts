@@ -22,7 +22,7 @@ export const fetchGhmData = async (searchValue?: string, noStar?: boolean) => {
     ? `&_text=${encodeURIComponent(searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line
     : ''
 
-  const res = await apiFhir.get<any>(`/ValueSet?url=${CLAIM_HIERARCHY}${_searchValue}&size=${VALUE_SET_SIZE ?? 9999}`)
+  const res = await apiFhir.get<any>(`/ValueSet?url=${CLAIM_HIERARCHY}${_searchValue}&_count=${VALUE_SET_SIZE ?? 9999}`)
 
   const data =
     res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'

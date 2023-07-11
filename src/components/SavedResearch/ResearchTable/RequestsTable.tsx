@@ -45,7 +45,7 @@ import {
 
 import { MeState } from 'state/me'
 
-import { RequestType } from 'types'
+import { RequestType, SimpleStatus } from 'types'
 
 import useStyles from './styles'
 
@@ -64,7 +64,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
   sortDirection,
   onRequestSort
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -86,9 +86,9 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
   const [dialogOpen, setOpenDialog] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<string | undefined>()
   const [anchorEl, setAnchorEl] = React.useState(null)
-  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<'success' | 'error' | null>(null)
+  const [shareSuccessOrFailMessage, setShareSuccessOrFailMessage] = useState<SimpleStatus>(null)
   const wrapperSetShareSuccessOrFailMessage = useCallback(
-    (val: any) => {
+    (val: SimpleStatus) => {
       setShareSuccessOrFailMessage(val)
     },
     [setShareSuccessOrFailMessage]
@@ -300,7 +300,7 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
               handleCloseDialog()
               const foundItem = researchData?.find(({ uuid }) => uuid === selectedRequest)
               if (!foundItem) return
-              dispatch<any>(deleteRequestState({ deletedRequest: foundItem }))
+              dispatch(deleteRequestState({ deletedRequest: foundItem }))
             }}
             color="secondary"
           >
@@ -309,14 +309,14 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
         </DialogActions>
       </Dialog>
 
-      {selectedRequestState && <ModalAddOrEditRequest onClose={() => dispatch<any>(setSelectedRequestState(null))} />}
+      {selectedRequestState && <ModalAddOrEditRequest onClose={() => dispatch(setSelectedRequestState(null))} />}
       {selectedRequestShareState !== null &&
         selectedRequestShareState?.shared_query_snapshot !== undefined &&
         selectedRequestShareState?.shared_query_snapshot?.length > 0 && (
           <ModalShareRequest
             shareSuccessOrFailMessage={shareSuccessOrFailMessage}
             parentStateSetter={wrapperSetShareSuccessOrFailMessage}
-            onClose={() => dispatch<any>(setSelectedRequestShareState(null))}
+            onClose={() => dispatch(setSelectedRequestShareState(null))}
           />
         )}
 
@@ -325,11 +325,11 @@ const RequestsTable: React.FC<RequestsTableProps> = ({
         selectedRequestShareState?.shared_query_snapshot?.length === 0 && (
           <Snackbar
             open
-            onClose={() => dispatch<any>(setSelectedRequestShareState(null))}
+            onClose={() => dispatch(setSelectedRequestShareState(null))}
             autoHideDuration={5000}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           >
-            <Alert severity="error" onClose={() => dispatch<any>(setSelectedRequestShareState(null))}>
+            <Alert severity="error" onClose={() => dispatch(setSelectedRequestShareState(null))}>
               Votre requête ne possède aucun critère. Elle ne peux donc pas être partagée.
             </Alert>
           </Snackbar>

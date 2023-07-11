@@ -50,6 +50,7 @@ import displayDigit from 'utils/displayDigit'
 import { ODD_EXPORT } from '../../../constants'
 
 import useStyles from './styles'
+import { JobStatus } from '../../../utils/constants'
 
 type FavStarProps = {
   favorite?: boolean
@@ -90,7 +91,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   onRequestSort,
   onUpdateCohorts
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -136,22 +137,10 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   }
 
   const editCohort = async () => {
-    await dispatch<any>(setSelectedCohortState(null))
+    await dispatch(setSelectedCohortState(null))
 
     onUpdateCohorts()
   }
-
-  // You can make an export if you got 1 cohort with: EXPORT_ACCESS = 'DATA_NOMINATIVE'
-  const canMakeExport = researchData
-    ? !!ODD_EXPORT &&
-      researchData.some((cohort) =>
-        cohort.extension && cohort.extension.length > 0
-          ? cohort.extension.find(
-              (extension) => extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
-            )
-          : false
-      )
-    : false
 
   return (
     <>
@@ -251,14 +240,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
               </TableHead>
               <TableBody>
                 {researchData?.map((row: Cohort) => {
-                  const canExportThisCohort =
-                    canMakeExport && row.extension
-                      ? row.extension.some(
-                          (extension) =>
-                            extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
-                        )
-                      : false
-
+                  const canExportThisCohort = !!ODD_EXPORT ? row?.rights?.export_csv_nomi : false
                   return (
                     <TableRow
                       className={!row.fhir_group_id ? classes.notAllow : classes.pointerHover}
@@ -284,7 +266,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       <TableCell onClick={() => _onClickRow(row)} align="center">
                         {row.request_job_status === 'finished' ? (
                           <Chip label="Terminé" size="small" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                        ) : row.request_job_status === 'pending' || row.request_job_status === 'started' ? (
+                        ) : row.request_job_status === JobStatus.pending || row.request_job_status === JobStatus.new ? (
                           <Chip label="En cours" size="small" style={{ backgroundColor: '#ffc107', color: 'black' }} />
                         ) : row.request_job_status === 'long_pending' ? (
                           <Tooltip title="Cohorte volumineuse: sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.">

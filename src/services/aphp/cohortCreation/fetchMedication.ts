@@ -9,6 +9,8 @@ import { codeSort } from 'utils/alphabeticalSort'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 import apiFhir from '../../apiFhir'
 import { getApiResponseResources } from 'utils/apiHelpers'
+import { FHIR_API_Response } from 'types'
+import { ValueSet, ValueSetComposeIncludeConcept } from 'fhir/r4'
 
 export const fetchAtcData = async (searchValue?: string, noStar?: boolean) => {
   noStar = noStar === undefined ? true : noStar
@@ -29,15 +31,15 @@ export const fetchAtcData = async (searchValue?: string, noStar?: boolean) => {
     ? `&_text=${encodeURIComponent(searchValue.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'))}*` //eslint-disable-line
     : ''
 
-  const res = await apiFhir.get<any>(`/ValueSet?url=${MEDICATION_ATC}${_searchValue}&size=${VALUE_SET_SIZE ?? 9999}`)
+  const res = await apiFhir.get<FHIR_API_Response<ValueSet>>(
+    `/ValueSet?url=${MEDICATION_ATC}${_searchValue}&_count=${VALUE_SET_SIZE ?? 9999}`
+  )
 
-  const data =
-    res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
-      ? res.data.entry[0].resource?.compose?.include[0].concept
-      : []
+  const resources = getApiResponseResources(res)
+  const data = resources?.length ? resources[0].compose?.include[0].concept || [] : []
 
   return data && data.length > 0
-    ? data.sort(codeSort).map((_data: { code: string; display: string }) => ({
+    ? data.sort(codeSort).map((_data: ValueSetComposeIncludeConcept) => ({
         id: _data.code,
         label: `${_data.code} - ${capitalizeFirstLetter(_data.display)}`,
         subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
@@ -47,18 +49,16 @@ export const fetchAtcData = async (searchValue?: string, noStar?: boolean) => {
 
 export const fetchAtcHierarchy = async (atcParent: string) => {
   if (!atcParent) {
-    const res = await apiFhir.get<any>(`/ValueSet?url=${MEDICATION_ATC}`)
+    const res = await apiFhir.get<FHIR_API_Response<ValueSet>>(`/ValueSet?url=${MEDICATION_ATC}`)
 
-    let atcList =
-      res && res.data && res.data.entry && res.data.entry[0] && res.data.resourceType === 'Bundle'
-        ? res.data.entry[0].resource?.compose?.include[0].concept
-        : []
+    const resources = getApiResponseResources(res)
+    const atcList = resources?.length ? resources[0].compose?.include[0].concept || [] : []
 
-    atcList =
+    const atcDataList =
       atcList && atcList.length > 0
         ? atcList
             .sort(codeSort)
-            .map((atcData: any) => ({
+            .map((atcData: ValueSetComposeIncludeConcept) => ({
               id: atcData.code,
               label: `${atcData.code} - ${atcData.display}`,
               subItems: [{ id: 'loading', label: 'loading', subItems: [] }]
@@ -68,7 +68,7 @@ export const fetchAtcHierarchy = async (atcParent: string) => {
             .filter((atcData: any) => atcData.label.search(new RegExp(/^[X-Y] - /, 'gi')) !== 0)
         : []
 
-    return [{ id: '*', label: 'Toute la hiérarchie Médicament', subItems: [...atcList] }]
+    return [{ id: '*', label: 'Toute la hiérarchie Médicament', subItems: [...atcDataList] }]
   } else {
     const json = {
       resourceType: 'ValueSet',
@@ -106,7 +106,7 @@ export const fetchAtcHierarchy = async (atcParent: string) => {
 
 export const fetchSignleCode: (code: string) => Promise<string[]> = async (code: string) => {
   if (!code) return []
-  const response = await apiFhir.get<any>(`/ConceptMap?size=100&context=Descendant-leaf&source-code=${code}`)
+  const response = await apiFhir.get<any>(`/ConceptMap?_count=100&context=Descendant-leaf&source-code=${code}`)
 
   const data = getApiResponseResources(response)
   const codeList: string[] = []

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { CohortPatient, IPatientDetails } from 'types'
+import { CohortPatient, IPatientDetails, PatientGenderKind } from 'types'
 
 import Grid from '@mui/material/Grid'
 
@@ -20,7 +20,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
   patient = { resourceType: 'Patient' },
   deidentifiedBoolean
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const age = getAge(patient as CohortPatient)
   const firstName = deidentifiedBoolean ? 'Prénom' : patient.name?.[0].given?.[0]
@@ -29,7 +29,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
   const ipp = deidentifiedBoolean
     ? `IPP chiffré: ${patient.id ?? '-'}`
     : `IPP: ${
-        patient.identifier?.find((item: any) => item.type?.coding?.[0].code === 'IPP')?.value ??
+        patient.identifier?.find((item) => item.type?.coding?.[0].code === 'IPP')?.value ??
         patient.identifier?.[0].value
       }`
 
@@ -40,7 +40,7 @@ const PatientHeader: React.FC<PatientHeaderProps> = ({
           <PatientTitle firstName={firstName} lastName={lastName} />
         </Grid>
         <Grid container item justifyContent="flex-end" xs={3}>
-          <PatientInfo age={age} ipp={ipp} gender={patient.gender} />
+          <PatientInfo age={age} ipp={ipp} gender={patient.gender as PatientGenderKind} />
         </Grid>
       </Grid>
     </Grid>

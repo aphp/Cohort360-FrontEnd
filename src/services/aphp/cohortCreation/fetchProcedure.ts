@@ -23,7 +23,7 @@ export const fetchCcamData = async (searchValue?: string, noStar?: boolean) => {
     : ''
 
   const res = await apiFhir.get<any>(
-    `/ValueSet?url=${PROCEDURE_HIERARCHY}${_searchValue}&size=${VALUE_SET_SIZE ?? 9999}`
+    `/ValueSet?url=${PROCEDURE_HIERARCHY}${_searchValue}&_count=${VALUE_SET_SIZE ?? 9999}`
   )
 
   const data =

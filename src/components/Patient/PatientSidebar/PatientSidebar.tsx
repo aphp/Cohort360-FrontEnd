@@ -10,8 +10,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 
 import { getAge, substructAgeString } from 'utils/age'
 import services from 'services/aphp'
-import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { CohortPatient, PatientFilters as PatientFiltersType, SearchByTypes, Sort, VitalStatus } from 'types'
+import { CohortPatient, PatientFilters as PatientFiltersType, PatientGenderKind, SearchByTypes, Sort } from 'types'
 
 import useStyles from './styles'
 import moment from 'moment/moment'
@@ -31,7 +30,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   onClose,
   deidentifiedBoolean
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const location = useLocation()
 
   const { search } = location
@@ -49,9 +48,9 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   const [loadingStatus, setLoadingStatus] = useState(false)
 
   const [filters, setFilters] = useState<PatientFiltersType>({
-    gender: PatientGenderKind._unknown,
+    gender: null,
     birthdatesRanges: ['', ''],
-    vitalStatus: VitalStatus.all
+    vitalStatus: null
   })
 
   const [openSort, setOpenSort] = useState(false)
@@ -143,14 +142,12 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
         onChangeSelect={setSearchBy}
         onSearchPatient={() => onSearchPatient(sort)}
         showFilterChip={showFilterChip}
-        // filter dialog props
         onClickFilterButton={() => setOpen(true)}
         open={open}
         onCloseFilterDialog={handleCloseDialog(false)}
         onSubmitDialog={handleCloseDialog(true)}
         filters={filters}
         onChangeFilters={setFilters}
-        // sort dialog props
         onClickSortButton={() => setOpenSort(true)}
         openSort={openSort}
         onCloseSort={handleCloseSortDialog}
@@ -171,7 +168,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
               firstName={deidentifiedBoolean ? 'Prénom' : patient.name?.[0].given?.[0] ?? ''}
               lastName={deidentifiedBoolean ? 'Nom' : patient.name?.map((e) => e.family).join(' ') ?? ''}
               age={getAge(patient)}
-              gender={patient.gender}
+              gender={patient.gender as PatientGenderKind}
               deceased={patient.deceasedDateTime ?? patient.deceasedBoolean}
               ipp={
                 deidentifiedBoolean

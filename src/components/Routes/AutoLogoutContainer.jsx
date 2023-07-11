@@ -1,21 +1,20 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useIdleTimer } from 'react-idle-timer'
 import { useNavigate } from 'react-router-dom'
 
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText } from '@mui/material'
 
-import axios from 'axios'
-
 import { close as closeAction, open as openAction } from 'state/autoLogout'
 import { useAppDispatch, useAppSelector } from 'state'
 import { logout as logoutAction } from 'state/me'
 
-import { ACCES_TOKEN, BACK_API_URL, REFRESH_TOKEN, REFRESH_TOKEN_INTERVAL, SESSION_TIMEOUT } from '../../constants'
+import { ACCESS_TOKEN, REFRESH_TOKEN, REFRESH_TOKEN_INTERVAL, SESSION_TIMEOUT } from '../../constants'
+import apiBackend from 'services/apiBackend'
 
 import useStyles from './styles'
 
 const AutoLogoutContainer = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -23,8 +22,6 @@ const AutoLogoutContainer = () => {
   const { isOpen } = useAppSelector((state) => ({
     isOpen: state.autoLogout.isOpen
   }))
-
-  const [refreshInterval, setRefreshInterval] = useState()
 
   const handleOnIdle = () => {
     logout()
@@ -75,10 +72,10 @@ const AutoLogoutContainer = () => {
 
   const refreshToken = async () => {
     try {
-      const res = await axios.post(`${BACK_API_URL}/accounts/refresh/`)
+      const res = await apiBackend.post(`/accounts/refresh/`)
 
       if (res.status === 200) {
-        localStorage.setItem(ACCES_TOKEN, res.data.access)
+        localStorage.setItem(ACCESS_TOKEN, res.data.access)
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh)
       } else {
         logout()
@@ -90,16 +87,12 @@ const AutoLogoutContainer = () => {
   }
 
   useEffect(() => {
-    if (me !== null) {
-      start()
+    start()
+    const intervall = setInterval(() => {
       refreshToken()
-      setRefreshInterval(
-        setInterval(() => {
-          refreshToken()
-        }, REFRESH_TOKEN_INTERVAL)
-      )
-    } else if (me == null) {
-      clearInterval(refreshInterval)
+    }, REFRESH_TOKEN_INTERVAL)
+    return () => {
+      clearInterval(intervall)
       pause()
     }
   }, [me])

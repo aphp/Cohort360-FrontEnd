@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import clsx from 'clsx'
+import { Buffer } from 'buffer'
+import ReactHtmlParser from 'react-html-parser'
 
 import { CircularProgress, Chip, Grid, IconButton, Typography, TableRow, TableCell } from '@mui/material'
 
@@ -21,8 +21,7 @@ import Watermark from 'assets/images/watermark_pseudo.svg'
 
 import { getDocumentStatus } from 'utils/documentsFormatter'
 
-import { Column, Order, CohortComposition } from 'types'
-import { CompositionStatusKind, DocumentReferenceStatusKind } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { Column, Order, CohortComposition, CompositionStatusKind, DocumentReferenceStatusKind } from 'types'
 
 import useStyles from './styles'
 
@@ -52,7 +51,7 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
   setPage,
   total
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const columns = [
     {
@@ -125,22 +124,25 @@ const DataTableCompositionLine: React.FC<{
   searchMode: boolean
   groupId?: string
 }> = ({ document, deidentified, showIpp, searchMode, groupId }) => {
-  const classes = useStyles()
-  const navigate = useNavigate()
+  const { classes, cx } = useStyles()
 
   const [open, setOpen] = useState<string | null>(null)
 
   const documentId = document.id
-  const title = document.title
-  const status = document.status
-  const event = document.event
+  const title = document.description
+  const status = document.status as DocumentReferenceStatusKind
+  const event = document.content[0].attachment.url
   const ipp = deidentified ? document.idPatient : document.IPP
   const nda = document.NDA ?? '-'
   const serviceProvider = document.serviceProvider ?? 'Non renseigné'
   const docType = docTypes.docTypes.find(
-    ({ code }) => code === (document.type?.coding && document.type?.coding[0] ? document.type?.coding[0].code : '-')
+    ({ code }) => code === (document?.type?.coding?.[0] ? document.type.coding[0].code : '-')
   )
-  const section = searchMode ? document.section : []
+
+  const documentContent = document?.content?.[1]?.attachment?.data
+    ? Buffer.from(document.content[1].attachment.data, 'base64').toString('utf-8')
+    : ''
+
   const date = document.date ? new Date(document.date).toLocaleDateString('fr-FR') : ''
   const hour = document.date
     ? new Date(document.date).toLocaleTimeString('fr-FR', {
@@ -168,7 +170,9 @@ const DataTableCompositionLine: React.FC<{
               <Typography>{ipp}</Typography>
 
               <IconButton
-                onClick={() => navigate(`/patients/${document.idPatient}${groupId ? `?groupId=${groupId}` : ''}`)}
+                onClick={() =>
+                  window.open(`/patients/${document.idPatient}${groupId ? `?groupId=${groupId}` : ''}`, '_blank')
+                }
                 className={classes.searchIcon}
               >
                 <SearchIcon height="15px" fill="#ED6D91" className={classes.iconMargin} />
@@ -179,21 +183,21 @@ const DataTableCompositionLine: React.FC<{
 
         <TableCell>
           <Grid container alignItems="center" wrap="nowrap">
-            <FolderSharedIcon htmlColor="#5BC5F2" className={clsx(classes.iconSize, classes.iconMargin)} />
+            <FolderSharedIcon htmlColor="#5BC5F2" className={cx(classes.iconSize, classes.iconMargin)} />
             <Typography>{nda}</Typography>
           </Grid>
         </TableCell>
 
         <TableCell>
           <Grid container alignItems="center" wrap="nowrap">
-            <LocalHospitalIcon htmlColor="#5BC5F2" className={clsx(classes.iconSize, classes.iconMargin)} />
+            <LocalHospitalIcon htmlColor="#5BC5F2" className={cx(classes.iconSize, classes.iconMargin)} />
             <Typography>{serviceProvider}</Typography>
           </Grid>
         </TableCell>
 
         <TableCell>
           <Grid container alignItems="center" wrap="nowrap">
-            <DescriptionIcon htmlColor="#5BC5F2" className={clsx(classes.iconSize, classes.iconMargin)} />
+            <DescriptionIcon htmlColor="#5BC5F2" className={cx(classes.iconSize, classes.iconMargin)} />
             <Typography>{docType?.label ?? '-'}</Typography>
           </Grid>
         </TableCell>
@@ -212,14 +216,10 @@ const DataTableCompositionLine: React.FC<{
         </TableCell>
       </TableRow>
 
-      {section && section.length > 0 && (
+      {documentContent && searchMode && (
         <TableRow className={classes.tableBodyRows}>
           <TableCell colSpan={6} style={{ backgroundImage: `url(${Watermark})`, backgroundSize: 'contain' }}>
-            {section.map((section) => (
-              <Grid key={section.title} container item direction="column">
-                <Typography dangerouslySetInnerHTML={{ __html: section.text?.div ?? '' }} />
-              </Grid>
-            ))}
+            <Typography>{ReactHtmlParser(documentContent)}</Typography>
           </TableCell>
         </TableRow>
       )}
@@ -228,7 +228,7 @@ const DataTableCompositionLine: React.FC<{
 }
 
 const getStatusShip = (type?: CompositionStatusKind | DocumentReferenceStatusKind) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   if (type === 'final' || type === 'current') {
     return (

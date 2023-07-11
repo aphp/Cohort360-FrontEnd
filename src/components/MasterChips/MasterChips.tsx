@@ -8,11 +8,11 @@ import useStyles from './styles'
 export type MasterChipsProps = {
   chips: {
     label: string
-    onDelete?: (id?: any) => void
+    onDelete?: () => void
   }[]
 }
 const MasterChips: React.FC<MasterChipsProps> = ({ chips }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <Grid container>

@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react'
-import clsx from 'clsx'
 
 import {
   Grid,
@@ -40,9 +39,9 @@ const DataTable: React.FC<DataTableProps> = ({
   total,
   ...props
 }) => {
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
 
-  const createSortHandler = (property: any) => () => {
+  const createSortHandler = (property: string) => () => {
     if (setOrder) {
       const isAsc: boolean = order?.orderBy === property && order?.orderDirection === 'asc'
       const _orderDirection = isAsc ? 'desc' : 'asc'
@@ -72,7 +71,7 @@ const DataTable: React.FC<DataTableProps> = ({
                       <TableSortLabel
                         active={order?.orderBy === column.code}
                         direction={order?.orderBy === column.code ? order?.orderDirection : 'asc'}
-                        onClick={createSortHandler(column.code)}
+                        onClick={createSortHandler(column.code || '')}
                       >
                         {column.label}
                       </TableSortLabel>
@@ -91,13 +90,13 @@ const DataTable: React.FC<DataTableProps> = ({
                                 className={classes.multiple}
                                 active={order?.orderBy === subColumn.code}
                                 direction={order?.orderBy === subColumn.code ? order?.orderDirection : 'asc'}
-                                onClick={createSortHandler(subColumn.code)}
+                                onClick={createSortHandler(subColumn.code || '')}
                               >
                                 {subColumn.label}
                               </TableSortLabel>
                             ) : (
                               <Typography
-                                className={clsx([classes.multiple, classes.tableHeadCell, classes.tableHeadLabel])}
+                                className={cx([classes.multiple, classes.tableHeadCell, classes.tableHeadLabel])}
                               >
                                 {subColumn.label}
                               </Typography>

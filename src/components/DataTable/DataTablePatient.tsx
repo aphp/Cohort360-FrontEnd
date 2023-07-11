@@ -9,8 +9,7 @@ import { ReactComponent as UnknownIcon } from 'assets/icones/autre-inconnu.svg'
 
 import DataTable from 'components/DataTable/DataTable'
 
-import { CohortPatient, Column, Order } from 'types'
-import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
+import { CohortPatient, Column, Order, PatientGenderKind } from 'types'
 
 import { getAge } from 'utils/age'
 import { capitalizeFirstLetter } from 'utils/capitalize'
@@ -41,11 +40,11 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
   setPage,
   total
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const columns: Column[] = [
     { label: `Sexe`, code: 'gender', align: 'center', sortableColumn: true },
-    { label: 'Prénom', code: 'given', align: 'center', sortableColumn: !deidentified },
+    { label: 'Prénom', code: 'name', align: 'center', sortableColumn: !deidentified },
     { label: 'Nom', code: 'family', align: 'left', sortableColumn: !deidentified },
     {
       label: !deidentified ? 'Date de naissance' : 'Âge',
@@ -101,7 +100,7 @@ const DataTablePatientLine: React.FC<{
   groupId?: string
   search?: string
 }> = ({ deidentified, patient, groupId, search }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <TableRow
@@ -116,7 +115,9 @@ const DataTablePatientLine: React.FC<{
       }
     >
       <TableCell align="center">
-        {patient.gender && <PatientGender gender={patient.gender} className={classes.genderIcon} />}
+        {patient.gender && (
+          <PatientGender gender={patient.gender as PatientGenderKind} className={classes.genderIcon} />
+        )}
       </TableCell>
       <TableCell>{deidentified ? 'Prénom' : capitalizeFirstLetter(patient.name?.[0].given?.[0])}</TableCell>
       <TableCell>{deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ')}</TableCell>
@@ -131,8 +132,8 @@ const DataTablePatientLine: React.FC<{
         )}
       </TableCell>
       <TableCell>
-        {patient.extension && patient.extension.find((extension) => extension.url === 'last-visit-service-provider')
-          ? patient.extension.find((extension) => extension.url === 'last-visit-service-provider')?.valueString
+        {patient.extension && patient.extension.find((extension) => extension.url.includes('last-encounter'))
+          ? patient.extension.find((extension) => extension.url.includes('last-encounter'))?.valueReference?.display
           : 'Non renseigné'}
       </TableCell>
       <TableCell align="center">
@@ -155,7 +156,7 @@ const DataTablePatientLine: React.FC<{
 export default DataTablePatient
 
 type PatientGenderProps = {
-  gender: PatientGenderKind
+  gender?: PatientGenderKind
   className?: string
 }
 
@@ -177,7 +178,7 @@ type StatusShipProps = {
 }
 
 const StatusShip: React.FC<StatusShipProps> = ({ type }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   if (type === 'Vivant') {
     return <Chip className={classes.validChip} label={type} />
   } else {

@@ -1,7 +1,8 @@
 import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync'
-import { createStore, applyMiddleware, combineReducers } from 'redux'
+import { combineReducers } from 'redux'
 import { persistReducer, persistStore } from 'redux-persist'
 import thunkMiddleware from 'redux-thunk'
+import { configureStore } from '@reduxjs/toolkit'
 import logger from 'redux-logger'
 
 import localforage from 'localforage'
@@ -53,15 +54,18 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 
-export const store = createStore(
-  persistedReducer,
-  applyMiddleware(
-    thunkMiddleware,
-    logger,
-    createStateSyncMiddleware({
-      predicate: (action) => action.type == 'autoLogout/open' || action.type == 'autoLogout/close'
-    })
-  )
-)
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware()
+      .prepend(
+        thunkMiddleware,
+        createStateSyncMiddleware({
+          predicate: (action) => action.type == 'autoLogout/open' || action.type == 'autoLogout/close'
+        })
+      )
+      .concat(logger)
+})
+
 initStateWithPrevTab(store)
 export const persistor = persistStore(store)

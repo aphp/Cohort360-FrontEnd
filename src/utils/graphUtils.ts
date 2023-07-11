@@ -1,14 +1,14 @@
 import {
-  PatientGenderKind,
-  IPatient,
-  IEncounter,
-  IExtension
-  // IReference
-} from '@ahryman40k/ts-fhir-types/lib/R4'
-import { SimpleChartDataType, GenderRepartitionType, AgeRepartitionType, VisiteRepartitionType } from 'types'
+  SimpleChartDataType,
+  GenderRepartitionType,
+  AgeRepartitionType,
+  VisiteRepartitionType,
+  PatientGenderKind
+} from 'types'
 import { getStringMonth, getStringMonthAphp } from './formatDate'
+import { Encounter, Extension, Patient } from 'fhir/r4'
 
-function getRandomColor() {
+function getRandomColor(): string {
   const letters = '0123456789ABCDEF'
   let color = '#'
   for (let i = 0; i < 6; i++) {
@@ -17,7 +17,7 @@ function getRandomColor() {
   return color
 }
 
-const getVisitTypeName = (visitType?: string) => {
+const getVisitTypeName = (visitType?: string): string => {
   let name = ''
 
   switch (visitType) {
@@ -40,7 +40,7 @@ const getVisitTypeName = (visitType?: string) => {
   return name
 }
 
-const getVisitTypeColor = (visitType?: string) => {
+const getVisitTypeColor = (visitType?: string): string => {
   let color = ''
 
   switch (visitType) {
@@ -63,7 +63,7 @@ const getVisitTypeColor = (visitType?: string) => {
   return color
 }
 
-export const getGenderRepartitionMapAphp = (facet?: IExtension[]): GenderRepartitionType => {
+export const getGenderRepartitionMapAphp = (facet?: Extension[]): GenderRepartitionType => {
   const repartitionMap = {
     female: { deceased: 0, alive: 0 },
     male: { deceased: 0, alive: 0 },
@@ -77,7 +77,7 @@ export const getGenderRepartitionMapAphp = (facet?: IExtension[]): GenderReparti
     })[0].url
 
     const genderData = extension.extension?.filter((extension) => {
-      return extension.url === 'gender-simple'
+      return extension.url === 'gender.display'
     })[0].extension
 
     if (isDeceased === 'true') {
@@ -112,7 +112,7 @@ export const getGenderRepartitionMapAphp = (facet?: IExtension[]): GenderReparti
   return repartitionMap
 }
 
-export const getGenderRepartitionMap = (patients: IPatient[]): GenderRepartitionType => {
+export const getGenderRepartitionMap = (patients: Patient[]): GenderRepartitionType => {
   const repartitionMap = {
     female: { deceased: 0, alive: 0 },
     male: { deceased: 0, alive: 0 },
@@ -133,7 +133,7 @@ export const getGenderRepartitionMap = (patients: IPatient[]): GenderRepartition
   return repartitionMap
 }
 
-export const getEncounterRepartitionMapAphp = (extension?: IExtension[]): SimpleChartDataType[] => {
+export const getEncounterRepartitionMapAphp = (extension?: Extension[]): SimpleChartDataType[] => {
   const data: SimpleChartDataType[] = []
 
   extension?.forEach((visitType) => {
@@ -149,7 +149,7 @@ export const getEncounterRepartitionMapAphp = (extension?: IExtension[]): Simple
   return data
 }
 
-export const getEncounterRepartitionMap = (encounters: IEncounter[]): SimpleChartDataType[] => {
+export const getEncounterRepartitionMap = (encounters: Encounter[]): SimpleChartDataType[] => {
   const data: SimpleChartDataType[] = []
 
   encounters.forEach((encounter) => {
@@ -171,16 +171,16 @@ export const getEncounterRepartitionMap = (encounters: IEncounter[]): SimpleChar
   return data
 }
 
-export const getAgeRepartitionMapAphp = (facet?: IExtension[]): AgeRepartitionType => {
+export const getAgeRepartitionMapAphp = (facet?: Extension[]): AgeRepartitionType => {
   const repartitionMap = new Array(130).map(() => ({ male: 0, female: 0, other: 0 }))
 
   facet?.forEach((extension) => {
     const ageObj = extension.extension?.filter((object) => {
-      return object.url !== 'gender-simple'
+      return object.url !== 'gender.display'
     })?.[0].url
 
     const genderValuesObj = extension.extension?.filter((object) => {
-      return object.url === 'gender-simple'
+      return object.url === 'gender.display'
     })?.[0]
 
     if (ageObj) {
@@ -212,7 +212,7 @@ export const getAgeRepartitionMapAphp = (facet?: IExtension[]): AgeRepartitionTy
   return repartitionMap
 }
 
-export const getVisitRepartitionMapAphp = (facet?: IExtension[]): VisiteRepartitionType => {
+export const getVisitRepartitionMapAphp = (facet?: Extension[]): VisiteRepartitionType => {
   const repartitionMap: VisiteRepartitionType = {
     Janvier: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
     Février: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
@@ -294,7 +294,7 @@ export const getVisitRepartitionMapAphp = (facet?: IExtension[]): VisiteRepartit
   return repartitionMap
 }
 
-export const getVisitRepartitionMap = (patients: IPatient[], encounters: IEncounter[]): VisiteRepartitionType => {
+export const getVisitRepartitionMap = (patients: Patient[], encounters: Encounter[]): VisiteRepartitionType => {
   const repartitionMap = {
     Janvier: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },
     Février: { male: 0, maleCount: 0, female: 0, femaleCount: 0, other: 0, otherCount: 0 },

@@ -14,7 +14,7 @@ type AdmissionInputsProps = {
 }
 
 const AdmissionInputs: React.FC<AdmissionInputsProps> = ({ criteria, selectedCriteria, onChangeValue }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [checked, setCheck] = useState(true)
 
   const defaultValuesAdmissionModes = selectedCriteria.admissionMode
@@ -43,7 +43,7 @@ const AdmissionInputs: React.FC<AdmissionInputsProps> = ({ criteria, selectedCri
 
   return (
     <>
-      <Grid container direction="column">
+      <Grid container direction="column" className={classes.supportedInputsRoot}>
         <Grid
           item
           container

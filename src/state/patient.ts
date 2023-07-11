@@ -3,18 +3,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 
 import {
-  IPatient,
-  IClaim,
-  IComposition,
-  IProcedure,
-  IEncounter,
-  ICondition,
-  IIdentifier,
-  IMedicationAdministration,
-  IMedicationRequest,
-  IObservation
-} from '@ahryman40k/ts-fhir-types/lib/R4'
-import {
   CohortEncounter,
   CohortObservation,
   IPatientDetails,
@@ -29,6 +17,18 @@ import { logout } from './me'
 
 import services from 'services/aphp'
 import servicesPerimeters from '../services/aphp/servicePerimeters'
+import {
+  Claim,
+  Condition,
+  DocumentReference,
+  Encounter,
+  Identifier,
+  MedicationAdministration,
+  MedicationRequest,
+  Observation,
+  Patient,
+  Procedure
+} from 'fhir/r4'
 
 export type PatientState = null | {
   loading: boolean
@@ -36,17 +36,17 @@ export type PatientState = null | {
   patientInfo?: IPatientDetails
   hospits?: {
     loading: boolean
-    list: (CohortEncounter | IEncounter)[]
+    list: (CohortEncounter | Encounter)[]
   }
   documents?: IPatientDocuments
   pmsi?: {
-    diagnostic?: IPatientPmsi<ICondition>
-    ghm?: IPatientPmsi<IClaim>
-    ccam?: IPatientPmsi<IProcedure>
+    diagnostic?: IPatientPmsi<Condition>
+    ghm?: IPatientPmsi<Claim>
+    ccam?: IPatientPmsi<Procedure>
   }
   medication?: {
-    administration?: IPatientMedication<IMedicationAdministration>
-    prescription?: IPatientMedication<IMedicationRequest>
+    administration?: IPatientMedication<MedicationAdministration>
+    prescription?: IPatientMedication<MedicationRequest>
   }
   biology?: IPatientObservation<CohortObservation>
 }
@@ -75,9 +75,9 @@ type FetchPmsiParams = {
   }
 }
 type FetchPmsiReturn =
-  | { diagnostic: IPatientPmsi<ICondition> }
-  | { ghm: IPatientPmsi<IClaim> }
-  | { ccam: IPatientPmsi<IProcedure> }
+  | { diagnostic: IPatientPmsi<Condition> }
+  | { ghm: IPatientPmsi<Claim> }
+  | { ccam: IPatientPmsi<Procedure> }
   | undefined
 const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: RootState }>(
   'patient/fetchPmsi',
@@ -120,7 +120,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
     if (pmsiResponse.pmsiData === undefined) return undefined
 
     const pmsiList: any[] = linkElementWithEncounter(
-      pmsiResponse.pmsiData as (IProcedure | ICondition | IClaim)[],
+      pmsiResponse.pmsiData as (Procedure | Condition | Claim)[],
       hospits,
       deidentified
     )
@@ -136,11 +136,11 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
 
     switch (selectedTab) {
       case 'diagnostic':
-        return { diagnostic: pmsiReturn as IPatientPmsi<ICondition> }
+        return { diagnostic: pmsiReturn as IPatientPmsi<Condition> }
       case 'ccam':
-        return { ccam: pmsiReturn as IPatientPmsi<IProcedure> }
+        return { ccam: pmsiReturn as IPatientPmsi<Procedure> }
       case 'ghm':
-        return { ghm: pmsiReturn as IPatientPmsi<IClaim> }
+        return { ghm: pmsiReturn as IPatientPmsi<Claim> }
     }
   }
 )
@@ -149,8 +149,9 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
  * fetchBiology
  *
  */
-type FetchBiologyParams = {
+export type FetchBiologyParams = {
   groupId?: string
+  rowStatus: boolean
   options?: {
     page?: number
     filters?: {
@@ -170,7 +171,7 @@ type FetchBiologyParams = {
 type FetchBiologyReturn = undefined | { biology: IPatientObservation<CohortObservation> }
 const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { state: RootState }>(
   'patient/fetchBiology',
-  async ({ groupId, options }, { getState }) => {
+  async ({ groupId, options, rowStatus }, { getState }) => {
     try {
       const patientState = getState().patient
 
@@ -197,6 +198,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
         sortDirection,
         page,
         patientId,
+        rowStatus,
         searchInput,
         nda,
         loinc,
@@ -249,8 +251,8 @@ type FetchMedicationParams = {
   }
 }
 type FetchMedicationReturn =
-  | { prescription: IPatientMedication<IMedicationRequest> }
-  | { administration: IPatientMedication<IMedicationAdministration> }
+  | { prescription: IPatientMedication<MedicationRequest> }
+  | { administration: IPatientMedication<MedicationAdministration> }
   | undefined
 const fetchMedication = createAsyncThunk<FetchMedicationReturn, FetchMedicationParams, { state: RootState }>(
   'patient/fetchMedication',
@@ -295,7 +297,7 @@ const fetchMedication = createAsyncThunk<FetchMedicationReturn, FetchMedicationP
     if (medicationResponse.medicationData === undefined) return undefined
 
     const medicationList: any[] = linkElementWithEncounter(
-      medicationResponse.medicationData as (IMedicationRequest | IMedicationAdministration)[],
+      medicationResponse.medicationData as (MedicationRequest | MedicationAdministration)[],
       hospits,
       deidentified
     )
@@ -311,9 +313,9 @@ const fetchMedication = createAsyncThunk<FetchMedicationReturn, FetchMedicationP
 
     switch (selectedTab) {
       case 'prescription':
-        return { prescription: medicationReturn as IPatientMedication<IMedicationRequest> }
+        return { prescription: medicationReturn as IPatientMedication<MedicationRequest> }
       case 'administration':
-        return { administration: medicationReturn as IPatientMedication<IMedicationAdministration> }
+        return { administration: medicationReturn as IPatientMedication<MedicationAdministration> }
     }
   }
 )
@@ -402,7 +404,7 @@ const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsPara
       )
 
       const documentsList: any[] = linkElementWithEncounter(
-        documentsResponse.docsList as IComposition[],
+        documentsResponse.docsList as DocumentReference[],
         hospits,
         deidentified
       )
@@ -434,8 +436,8 @@ type FetchAllProceduresParams = {
 }
 type FetchAllProceduresReturn =
   | {
-      ccam?: IPatientPmsi<IProcedure>
-      diagnostic?: IPatientPmsi<ICondition>
+      ccam?: IPatientPmsi<Procedure>
+      diagnostic?: IPatientPmsi<Condition>
     }
   | undefined
 const fetchAllProcedures = createAsyncThunk<FetchAllProceduresReturn, FetchAllProceduresParams, { state: RootState }>(
@@ -465,16 +467,16 @@ const fetchAllProcedures = createAsyncThunk<FetchAllProceduresReturn, FetchAllPr
       ])
 
       // CCAM List:
-      let ccamList: IProcedure[] = ccamResponses
-        ? linkElementWithEncounter(ccamResponses as IProcedure[], hospits, deidentified)
+      let ccamList: Procedure[] = ccamResponses
+        ? linkElementWithEncounter(ccamResponses as Procedure[], hospits, deidentified)
         : []
       // eslint-disable-next-line no-unsafe-optional-chaining
       ccamList = patientState?.pmsi?.ccam?.list ? [...patientState?.pmsi?.ccam?.list, ...ccamList] : ccamList
       ccamCount = ccamList.length
 
       // CIM10 List:
-      let diagnosticList: ICondition[] = diagnosticResponses
-        ? linkElementWithEncounter(diagnosticResponses as ICondition[], hospits, deidentified)
+      let diagnosticList: Condition[] = diagnosticResponses
+        ? linkElementWithEncounter(diagnosticResponses as Condition[], hospits, deidentified)
         : []
       diagnosticList = patientState?.pmsi?.diagnostic?.list
         ? // eslint-disable-next-line no-unsafe-optional-chaining
@@ -515,14 +517,14 @@ type FetchLastPmsiParams = {
 }
 type FetchLastPmsiReturn = {
   patientInfo: {
-    lastGhm?: IClaim | 'loading'
-    lastProcedure?: IProcedure | 'loading'
-    mainDiagnosis?: ICondition[] | 'loading'
+    lastGhm?: Claim | 'loading'
+    lastProcedure?: Procedure | 'loading'
+    mainDiagnosis?: Condition[] | 'loading'
   }
   pmsi?: {
-    diagnostic?: IPatientPmsi<ICondition>
-    ghm?: IPatientPmsi<IClaim>
-    ccam?: IPatientPmsi<IProcedure>
+    diagnostic?: IPatientPmsi<Condition>
+    ghm?: IPatientPmsi<Claim>
+    ccam?: IPatientPmsi<Procedure>
   }
 } | null
 
@@ -544,20 +546,20 @@ const fetchLastPmsiInfo = createAsyncThunk<FetchLastPmsiReturn, FetchLastPmsiPar
       if (fetchPatientResponse === undefined) return null
 
       const diagnosticList = linkElementWithEncounter(
-        fetchPatientResponse[0].pmsiData as ICondition[],
+        fetchPatientResponse[0].pmsiData as Condition[],
         hospits,
         deidentified
       )
-      const ccamList = linkElementWithEncounter(fetchPatientResponse[1].pmsiData as IProcedure[], hospits, deidentified)
-      const ghmList = linkElementWithEncounter(fetchPatientResponse[2].pmsiData as IClaim[], hospits, deidentified)
+      const ccamList = linkElementWithEncounter(fetchPatientResponse[1].pmsiData as Procedure[], hospits, deidentified)
+      const ghmList = linkElementWithEncounter(fetchPatientResponse[2].pmsiData as Claim[], hospits, deidentified)
 
       return {
         patientInfo: {
-          lastGhm: ghmList ? (ghmList[0] as IClaim) : undefined,
-          lastProcedure: ccamList ? (ccamList[0] as IProcedure) : undefined,
+          lastGhm: ghmList ? (ghmList[0] as Claim) : undefined,
+          lastProcedure: ccamList ? (ccamList[0] as Procedure) : undefined,
           mainDiagnosis: diagnosticList.filter(
             (diagnostic: any) => diagnostic.extension?.[0].valueString === 'dp'
-          ) as ICondition[]
+          ) as Condition[]
         },
         pmsi: {
           diagnostic: {
@@ -599,13 +601,13 @@ type FetchPatientParams = {
   groupId?: string
 }
 type FetchPatientReturn = {
-  patientInfo: IPatient & {
-    lastEncounter?: IEncounter
+  patientInfo: Patient & {
+    lastEncounter?: Encounter
   }
   deidentified?: boolean
   hospits?: {
     loading: boolean
-    list: (CohortEncounter | IEncounter)[]
+    list: (CohortEncounter | Encounter)[]
   }
 } | null
 
@@ -1103,13 +1105,13 @@ export const { clearPatient } = patientSlice.actions
 
 function linkElementWithEncounter<
   T extends
-    | IProcedure
-    | ICondition
-    | IClaim
-    | IComposition
-    | IMedicationRequest
-    | IMedicationAdministration
-    | IObservation
+    | Procedure
+    | Condition
+    | Claim
+    | DocumentReference
+    | MedicationRequest
+    | MedicationAdministration
+    | Observation
 >(elementEntries: T[], encounterList: any[], deidentifiedBoolean: any) {
   let elementList: (T & {
     serviceProvider?: string
@@ -1128,23 +1130,23 @@ function linkElementWithEncounter<
     // @ts-ignore
     switch (entry.resourceType) {
       case 'Claim':
-        encounterId = (entry as IClaim).item?.[0].encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
+        encounterId = (entry as Claim).item?.[0].encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
         break
       case 'Procedure':
       case 'Condition':
-        encounterId = (entry as IProcedure | ICondition).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
+        encounterId = (entry as Procedure | Condition).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
-      case 'Composition':
-        encounterId = (entry as IComposition).encounter?.display?.replace(/^Encounter\//, '') ?? ''
+      case 'DocumentReference':
+        encounterId = (entry as DocumentReference).context?.encounter?.[0].reference?.replace(/^Encounter\//, '') ?? ''
         break
       case 'MedicationRequest':
-        encounterId = (entry as IMedicationRequest).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
+        encounterId = (entry as MedicationRequest).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
       case 'MedicationAdministration':
-        encounterId = (entry as IMedicationAdministration).context?.reference?.replace(/^Encounter\//, '') ?? ''
+        encounterId = (entry as MedicationAdministration).context?.reference?.replace(/^Encounter\//, '') ?? ''
         break
       case 'Observation':
-        encounterId = (entry as IObservation).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
+        encounterId = (entry as Observation).encounter?.reference?.replace(/^Encounter\//, '') ?? ''
         break
     }
 
@@ -1169,13 +1171,13 @@ function linkElementWithEncounter<
 
 function fillElementInformation<
   T extends
-    | IProcedure
-    | ICondition
-    | IClaim
-    | IComposition
-    | IMedicationRequest
-    | IMedicationAdministration
-    | IObservation
+    | Procedure
+    | Condition
+    | Claim
+    | DocumentReference
+    | MedicationRequest
+    | MedicationAdministration
+    | Observation
 >(deidentifiedBoolean: boolean, element: T, encounter: any, encounterId: string, resourceType: string) {
   const newElement = element as T & {
     serviceProvider?: string
@@ -1197,13 +1199,13 @@ function fillElementInformation<
   newElement.NDA = encounter?.id ?? 'Inconnu'
 
   if (!deidentifiedBoolean && encounter?.identifier) {
-    const nda = encounter.identifier.find((identifier: IIdentifier) => identifier.type?.coding?.[0].code === 'NDA')
+    const nda = encounter.identifier.find((identifier: Identifier) => identifier.type?.coding?.[0].code === 'NDA')
     if (nda) {
       newElement.NDA = nda?.value ?? 'Inconnu'
     }
   }
 
-  if (resourceType !== 'Composition' && encounter?.documents && encounter.documents.length > 0) {
+  if (resourceType !== 'DocumentReference' && encounter?.documents && encounter.documents.length > 0) {
     newElement.documents = encounter.documents
   }
 

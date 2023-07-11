@@ -31,7 +31,7 @@ type ProjectTableProps = {
 }
 
 const ProjectTable: React.FC<ProjectTableProps> = ({ searchInput, setSelectedRequests, selectedRequests }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const { projectState, requestState, cohortState } = useAppSelector<{
     projectState: ProjectState
     requestState: RequestState

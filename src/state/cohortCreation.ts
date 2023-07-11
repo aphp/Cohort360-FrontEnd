@@ -17,6 +17,7 @@ import { deleteProject } from './project'
 
 import services from 'services/aphp'
 import { SHORT_COHORT_LIMIT } from '../constants'
+import { JobStatus } from '../utils/constants'
 
 export type CohortCreationState = {
   loading: boolean
@@ -31,6 +32,7 @@ export type CohortCreationState = {
   snapshotsHistory: CohortCreationSnapshotType[]
   count: CohortCreationCounterType
   selectedPopulation: (ScopeTreeRow | undefined)[] | null
+  executiveUnits: (ScopeTreeRow | undefined)[] | null
   allowSearchIpp: boolean
   selectedCriteria: SelectedCriteriaType[]
   criteriaGroup: CriteriaGroupType[]
@@ -54,6 +56,7 @@ const defaultInitialState: CohortCreationState = {
   snapshotsHistory: [],
   count: {},
   selectedPopulation: null,
+  executiveUnits: null,
   allowSearchIpp: false,
   selectedCriteria: [],
   criteriaGroup: [
@@ -105,7 +108,7 @@ const fetchRequestCohortCreation = createAsyncThunk<
     const { requestName, json, currentSnapshot, shortCohortLimit, snapshotsHistory, count, count_outdated } =
       requestResult
 
-    dispatch<any>(
+    dispatch(
       unbuildCohortCreation({
         newCurrentSnapshot: snapshotsHistory[
           snapshotsHistory.length ? snapshotsHistory.length - 1 : 0
@@ -183,7 +186,7 @@ const countCohortCreation = createAsyncThunk<
  *
  *
  */
-type SaveJsonReturn = {
+export type SaveJsonReturn = {
   requestId: string
   snapshotsHistory: CohortCreationSnapshotType[]
   currentSnapshot: string
@@ -259,7 +262,7 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
   'cohortCreation/build',
   async ({ selectedPopulation }, { getState, dispatch }) => {
     try {
-      const state: any = getState()
+      const state = getState()
 
       const _selectedPopulation = selectedPopulation
         ? selectedPopulation
@@ -275,13 +278,13 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
       const json = await buildRequest(_selectedPopulation, _selectedCriteria, _criteriaGroup, _temporalConstraints)
 
       if (json !== state?.cohortCreation?.request?.json) {
-        const saveJsonResponse = await dispatch<any>(saveJson({ newJson: json }))
+        const saveJsonResponse = await dispatch(saveJson({ newJson: json })).unwrap()
 
-        await dispatch<any>(
+        await dispatch(
           countCohortCreation({
             json: json,
-            snapshotId: saveJsonResponse.payload.currentSnapshot,
-            requestId: saveJsonResponse.payload.requestId
+            snapshotId: saveJsonResponse.currentSnapshot,
+            requestId: saveJsonResponse.requestId
           })
         )
       }
@@ -292,13 +295,13 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
 
       let _initTemporalConstraints
 
-      if (_temporalConstraints && _temporalConstraints?.length === 0) {
+      if (_temporalConstraints?.length === 0) {
         _initTemporalConstraints = defaultInitialState.temporalConstraints
       } else {
         _initTemporalConstraints = _temporalConstraints
       }
 
-      if (_temporalConstraints && _temporalConstraints?.length > 0) {
+      if (_temporalConstraints?.length > 0) {
         _initTemporalConstraints = _temporalConstraints.map(
           (temporalConstraint: TemporalConstraintsType, index: number) => {
             return {
@@ -348,7 +351,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
       let _temporalConstraints
 
       if (temporalConstraints && temporalConstraints?.length > 0) {
-        _temporalConstraints = temporalConstraints.map((temporalConstraint: TemporalConstraintsType, index) => {
+        _temporalConstraints = temporalConstraints.map((temporalConstraint: TemporalConstraintsType, index: number) => {
           return {
             ...temporalConstraint,
             id: index + 1
@@ -367,13 +370,13 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
       const countId = dated_measures ? dated_measures.uuid : null
 
       if (countId) {
-        dispatch<any>(
+        dispatch(
           countCohortCreation({
             uuid: countId
           })
         )
       } else {
-        dispatch<any>(
+        dispatch(
           countCohortCreation({
             json: newCurrentSnapshot.json,
             snapshotId: newCurrentSnapshot.uuid,
@@ -428,12 +431,12 @@ const addRequestToCohortCreation = createAsyncThunk<
       parentId
     )
 
-    const saveJsonResponse = await dispatch<any>(saveJson({ newJson: json }))
-    await dispatch<any>(
+    const saveJsonResponse = await dispatch(saveJson({ newJson: json })).unwrap()
+    await dispatch(
       countCohortCreation({
         json: json,
-        snapshotId: saveJsonResponse.payload.currentSnapshot,
-        requestId: saveJsonResponse.payload.requestId
+        snapshotId: saveJsonResponse.currentSnapshot,
+        requestId: saveJsonResponse.requestId
       })
     )
 
@@ -569,7 +572,6 @@ const cohortCreationSlice = createSlice({
       }
       state.nextGroupId = -(state.criteriaGroup.length + 1)
     },
-    //
     addNewSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
       state.selectedCriteria = [...state.selectedCriteria, action.payload]
       state.nextCriteriaId++
@@ -578,7 +580,6 @@ const cohortCreationSlice = createSlice({
       state.criteriaGroup = [...state.criteriaGroup, action.payload]
       state.nextGroupId--
     },
-    //
     editSelectedCriteria: (state: CohortCreationState, action: PayloadAction<SelectedCriteriaType>) => {
       const foundItem = state.selectedCriteria.find(({ id }) => id === action.payload.id)
       const index = foundItem ? state.selectedCriteria.indexOf(foundItem) : -1
@@ -644,8 +645,8 @@ const cohortCreationSlice = createSlice({
       state.count = {
         ...(state.count || {}),
         status:
-          (state.count || {}).status === 'pending' ||
-          (state.count || {}).status === 'started' ||
+          (state.count || {}).status === JobStatus.pending ||
+          (state.count || {}).status === JobStatus.new ||
           (state.count || {}).status === 'suspended'
             ? 'suspended'
             : (state.count || {}).status
@@ -654,7 +655,7 @@ const cohortCreationSlice = createSlice({
     unsuspendCount: (state: CohortCreationState) => {
       state.count = {
         ...state.count,
-        status: 'pending'
+        status: JobStatus.pending
       }
     }
   },
@@ -674,11 +675,15 @@ const cohortCreationSlice = createSlice({
     builder.addCase(saveJson.fulfilled, (state, { payload }) => ({ ...state, ...payload, saveLoading: false }))
     builder.addCase(saveJson.rejected, (state) => ({ ...state, saveLoading: false }))
     // countCohortCreation
-    builder.addCase(countCohortCreation.pending, (state) => ({ ...state, status: 'pending', countLoading: true }))
+    builder.addCase(countCohortCreation.pending, (state) => ({
+      ...state,
+      status: JobStatus.pending,
+      countLoading: true
+    }))
     builder.addCase(countCohortCreation.fulfilled, (state, { payload }) => ({
       ...state,
       ...payload,
-      countLoading: payload?.count?.status === 'pending' || payload?.count?.status === 'started'
+      countLoading: payload?.count?.status === JobStatus.pending || payload?.count?.status === JobStatus.new
     }))
     builder.addCase(countCohortCreation.rejected, (state) => ({
       ...state,
@@ -723,22 +728,16 @@ export {
 }
 export const {
   resetCohortCreation,
-  //
   setCohortName,
   setPopulationSource,
   setSelectedCriteria,
-  //
   deleteSelectedCriteria,
   deleteCriteriaGroup,
-  //
   addNewSelectedCriteria,
   addNewCriteriaGroup,
-  //
   editSelectedCriteria,
   editCriteriaGroup,
-  //
   duplicateSelectedCriteria,
-  //
   updateTemporalConstraints,
   deleteTemporalConstraint,
   suspendCount,

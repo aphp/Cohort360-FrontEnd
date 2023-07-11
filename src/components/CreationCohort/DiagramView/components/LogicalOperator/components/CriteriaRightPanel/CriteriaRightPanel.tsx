@@ -17,7 +17,7 @@ const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
   const { criteriaItem, handleClick } = props
   const { color, title, components, subItems, disabled } = criteriaItem
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [open, setOpen] = useState(true)
 
   const cursor = disabled ? 'not-allowed' : components ? 'pointer' : 'default'
@@ -70,7 +70,7 @@ type CriteriaRightPanelProps = {
 const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
   const { open, onClose, parentId, criteria, selectedCriteria, onChangeSelectedCriteria } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [action, setAction] = useState<CriteriaItemType | null>(null)
 
   const DrawerComponent = action ? action.components : null

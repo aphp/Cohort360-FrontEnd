@@ -12,6 +12,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  SelectChangeEvent,
   Typography
 } from '@mui/material'
 
@@ -41,9 +42,9 @@ const timeMeasurements = [
 
 const TemporalConstraintConfig: React.FC<{
   newConstraintsList: TemporalConstraintsType[]
-  onChangeNewConstraintsList: any
+  onChangeNewConstraintsList: (c: TemporalConstraintsType[]) => void
 }> = ({ newConstraintsList, onChangeNewConstraintsList }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const { selectedCriteria, criteriaGroup } = useAppSelector((state) => state.cohortCreation.request)
 
@@ -92,13 +93,13 @@ const TemporalConstraintConfig: React.FC<{
   const selectableCriteria1 = getSelectableCriteria(secondCriteriaValue)
   const selectableCriteria2 = getSelectableCriteria(firstCriteriaValue)
 
-  const onChangeMinTimeMeasurement = (event: React.ChangeEvent<{ value: any }>) => {
-    setMinTimeMeasurement(event.target.value as string)
+  const onChangeMinTimeMeasurement = (event: SelectChangeEvent) => {
+    setMinTimeMeasurement(event.target.value)
     setMinTime(1)
   }
 
-  const onChangeMaxTimeMeasurement = (event: React.ChangeEvent<{ value: any }>) => {
-    setMaxTimeMeasurement(event.target.value as string)
+  const onChangeMaxTimeMeasurement = (event: SelectChangeEvent) => {
+    setMaxTimeMeasurement(event.target.value)
     setMaxTime(1)
   }
 
@@ -239,7 +240,7 @@ const TemporalConstraintConfig: React.FC<{
           <Select
             disabled={!isFirstTimeValueChecked}
             value={minTimeMeasurement}
-            onChange={onChangeMinTimeMeasurement as any}
+            onChange={onChangeMinTimeMeasurement}
             error={incorrectTimingError}
             variant="standard"
           >
@@ -274,7 +275,7 @@ const TemporalConstraintConfig: React.FC<{
           <Select
             disabled={!isSecondTimeValueChecked}
             value={maxTimeMeasurement}
-            onChange={onChangeMaxTimeMeasurement as any}
+            onChange={onChangeMaxTimeMeasurement}
             error={incorrectTimingError}
             variant="standard"
           >

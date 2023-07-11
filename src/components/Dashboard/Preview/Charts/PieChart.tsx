@@ -15,7 +15,7 @@ type PieChartProps = {
 }
 
 const PieChart: React.FC<PieChartProps> = memo(({ data, height = 250, width = 250 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const node = useRef<SVGSVGElement | null>(null)
   const [legendHtml, setLegend] = useState()
@@ -30,7 +30,6 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 250, width = 25
       .attr('height', height)
       .attr('width', width)
       .attr('viewBox', [-width / 2, -height / 2, width, height])
-    // const radius = (Math.min(width, height) / 2 - 15) * 0.6
 
     const color = d3
       .scaleOrdinal()
@@ -39,17 +38,12 @@ const PieChart: React.FC<PieChartProps> = memo(({ data, height = 250, width = 25
 
     const radius = Math.min(width, height) / 2 - 25
 
-    const pie = d3
-      .pie<DataType>()
-      // .sort(null)
-      .value((d) => d.value)
+    const pie = d3.pie<DataType>().value((d) => d.value)
 
     const arc = d3
       .arc()
       .innerRadius(0)
       .outerRadius(radius - 1)
-
-    // const arcLabel = d3.arc().innerRadius(radius).outerRadius(radius)
 
     const arcs = pie(data)
 

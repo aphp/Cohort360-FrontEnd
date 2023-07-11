@@ -9,20 +9,21 @@ import {
   Grid,
   IconButton,
   Switch,
-  Typography,
-  TextField
+  TextField,
+  Typography
 } from '@mui/material'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import { InputAutocompleteAsync as AutocompleteAsync } from 'components/Inputs'
 
-import AdvancedInputs from 'components/CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/AdvancedInputs/AdvancedInputs'
+import AdvancedInputs from '../../../AdvancedInputs/AdvancedInputs'
 
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchCondition } from 'state/pmsi'
-import { HierarchyTree } from 'types'
+import { CriteriaName, HierarchyTree } from 'types'
+import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 
 type Cim10FormProps = {
   isOpen: boolean
@@ -37,19 +38,14 @@ type Cim10FormProps = {
 const Cim10Form: React.FC<Cim10FormProps> = (props) => {
   const { isOpen, isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const currentState = { ...selectedCriteria, ...initialState }
-
-  const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
   const _onSubmit = () => {
-    if (currentState?.code?.length === 0) {
-      return setError(true)
-    }
     onChangeSelectedCriteria(currentState)
-    dispatch<any>(fetchCondition())
+    dispatch(fetchCondition())
   }
   const getDiagOptions = async (searchValue: string) => await criteria.fetch.fetchCim10Diagnostic(searchValue, false)
 
@@ -101,9 +97,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner au moins un code ou un type de diagnostic</Alert>}
-
-        {!error && !multiFields && (
+        {!multiFields && (
           <Alert
             severity="info"
             onClose={() => {
@@ -144,6 +138,12 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             />
           </Grid>
 
+          <OccurrencesNumberInputs
+            form={CriteriaName.Cim10}
+            selectedCriteria={selectedCriteria}
+            onChangeValue={onChangeValue}
+          />
+
           <AutocompleteAsync
             multiple
             label="Code CIM10"
@@ -170,7 +170,7 @@ const Cim10Form: React.FC<Cim10FormProps> = (props) => {
             renderInput={(params) => <TextField {...params} label="Type de diagnostic" />}
           />
 
-          <AdvancedInputs form="cim10" selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs form={CriteriaName.Cim10} selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

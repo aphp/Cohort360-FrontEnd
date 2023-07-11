@@ -32,10 +32,10 @@ type LogicalOperatorItemProps = {
 }
 
 const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
-  let timeout: any = null
+  let timeout: NodeJS.Timeout | null = null
 
   const isMainOperator = itemId === 0
 
@@ -91,11 +91,11 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
   }
 
   const _buildCohortCreation = () => {
-    dispatch<any>(buildCohortCreation({}))
+    dispatch(buildCohortCreation({}))
   }
 
   const _deleteLogicalOperator = async () => {
-    await dispatch<any>(deleteCriteriaGroup(itemId))
+    await dispatch(deleteCriteriaGroup(itemId))
     _buildCohortCreation()
   }
 
@@ -107,7 +107,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
 
       switch (value) {
         case 'atLeast':
-          dispatch<any>(
+          dispatch(
             editCriteriaGroup({
               ..._currentLogicalOperator,
               type: 'NamongM',
@@ -121,7 +121,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
           )
           break
         case 'atMost':
-          dispatch<any>(
+          dispatch(
             editCriteriaGroup({
               ..._currentLogicalOperator,
               type: 'NamongM',
@@ -135,7 +135,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
           )
           break
         case 'exactly':
-          dispatch<any>(
+          dispatch(
             editCriteriaGroup({
               ..._currentLogicalOperator,
               type: 'NamongM',
@@ -151,7 +151,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         case 'andGroup':
         case 'orGroup':
         default:
-          dispatch<any>(
+          dispatch(
             editCriteriaGroup({
               ..._currentLogicalOperator,
               type: value
@@ -160,7 +160,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
           break
       }
     } else if (key === 'options.number') {
-      dispatch<any>(
+      dispatch(
         editCriteriaGroup({
           ..._currentLogicalOperator,
           type: 'NamongM',
@@ -173,7 +173,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         })
       )
     } else {
-      dispatch<any>(
+      dispatch(
         editCriteriaGroup({
           ..._currentLogicalOperator,
           [key]: value
@@ -297,7 +297,7 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
           </Button>
           <Button
             onClick={() => {
-              dispatch<any>(updateTemporalConstraints([]))
+              dispatch(updateTemporalConstraints([]))
               _handleChangeLogicalOperatorProps('groupType', 'orGroup')
             }}
           >

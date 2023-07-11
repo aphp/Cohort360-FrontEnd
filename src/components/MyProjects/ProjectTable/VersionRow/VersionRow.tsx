@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import moment from 'moment'
 
 import {
@@ -33,10 +34,13 @@ import displayDigit from 'utils/displayDigit'
 import { ODD_EXPORT } from '../../../../constants'
 
 import useStyles from '../styles'
+import { JobStatus } from '../../../../utils/constants'
 
 const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ requestId, cohortsList }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+
   const [selectedExportableCohort, setSelectedExportableCohort] = React.useState<null | string>(null)
 
   const cohorts: Cohort[] =
@@ -45,25 +49,11 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
       .sort((a, b) => +moment(a.created_at).format('x') - +moment(b.created_at).format('x')) || []
 
   const _handleEditCohort = (cohort: Cohort) => {
-    dispatch<any>(setSelectedCohort(cohort ?? null))
+    dispatch(setSelectedCohort(cohort ?? null))
   }
 
-  // You can make an export if you got 1 cohort with: EXPORT_ACCESS = 'DATA_NOMINATIVE'
-  const canMakeExport =
-    ODD_EXPORT &&
-    cohorts.some((cohort) =>
-      cohort.extension && cohort.extension.length > 0
-        ? cohort.extension.some(
-            (extension) => extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
-          ) &&
-          cohort.extension.some(
-            (extension) => extension.url === 'READ_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
-          )
-        : false
-    )
-
   const onSetCohortFavorite = async (cohort: Cohort) => {
-    await dispatch<any>(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
+    await dispatch(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
   }
 
   return (
@@ -90,11 +80,10 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                 Date
               </TableCell>
             </Hidden>
-            {canMakeExport && (
-              <TableCell align="center" style={{ width: 66 }}>
-                Exporter
-              </TableCell>
-            )}
+
+            <TableCell align="center" style={{ width: 66 }}>
+              Exporter
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -104,22 +93,17 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
 
               const isError =
                 !historyRow.fhir_group_id ||
-                historyRow.request_job_status === 'pending' ||
-                historyRow.request_job_status === 'started' ||
+                historyRow.request_job_status === JobStatus.pending ||
+                historyRow.request_job_status === JobStatus.new ||
                 !!historyRow.request_job_fail_msg
 
-              const canExportThisCohort =
-                canMakeExport && !isError && historyRow.extension
-                  ? historyRow.extension.some(
-                      (extension) => extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
-                    )
-                  : false
+              const canExportThisCohort = !!ODD_EXPORT && !isError ? historyRow.rights?.export_csv_nomi : false
 
               return (
                 <TableRow key={historyRow.uuid}>
                   <TableCell className={classes.tdName}>
                     {historyRow.fhir_group_id ? (
-                      <Link href={`/cohort/${historyRow.fhir_group_id}`} underline="hover">
+                      <Link onClick={() => navigate(`/cohort/${historyRow.fhir_group_id}`)} underline="hover">
                         {historyRow.name}
                       </Link>
                     ) : (
@@ -143,7 +127,8 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                   <TableCell align="center">
                     {historyRow.fhir_group_id ? (
                       <Chip label="Terminé" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                    ) : historyRow.request_job_status === 'pending' || historyRow.request_job_status === 'started' ? (
+                    ) : historyRow.request_job_status === JobStatus.pending ||
+                      historyRow.request_job_status === JobStatus.new ? (
                       <Chip label="En cours" style={{ backgroundColor: '#ffc107', color: 'black' }} />
                     ) : historyRow.request_job_fail_msg ? (
                       <Tooltip title={historyRow.request_job_fail_msg}>
@@ -156,7 +141,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                   <TableCell align="center">
                     <Link
                       className={classes.versionLabel}
-                      href={`/cohort/new/${requestId}/${historyRow.request_query_snapshot}`}
+                      onClick={() => navigate(`/cohort/new/${requestId}/${historyRow.request_query_snapshot}`)}
                     >
                       {historyRow.request_query_snapshot?.split('-')[0]}
                     </Link>
@@ -167,20 +152,19 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                       {moment(historyRow.modified_at).format('DD/MM/YYYY [à] HH:mm')}
                     </TableCell>
                   </Hidden>
-                  {canMakeExport && (
-                    <TableCell align="center">
-                      <IconButton
-                        disabled={!canExportThisCohort}
-                        onClick={
-                          canExportThisCohort
-                            ? () => setSelectedExportableCohort(historyRow.fhir_group_id ?? '')
-                            : () => null
-                        }
-                      >
-                        <ExportIcon />
-                      </IconButton>
-                    </TableCell>
-                  )}
+
+                  <TableCell align="center">
+                    <IconButton
+                      disabled={!canExportThisCohort}
+                      onClick={
+                        canExportThisCohort
+                          ? () => setSelectedExportableCohort(historyRow.fhir_group_id ?? '')
+                          : () => null
+                      }
+                    >
+                      <ExportIcon />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               )
             })
@@ -191,7 +175,10 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                   Aucune cohorte n'est liée à cette requête
                   <br />
                   Veuillez vous rendre sur la page de création en{' '}
-                  <Link style={{ display: 'contents', fontWeight: 900 }} href={`/cohort/new/${requestId}`}>
+                  <Link
+                    style={{ display: 'contents', fontWeight: 900, cursor: 'pointer' }}
+                    onClick={() => navigate(`/cohort/new/${requestId}`)}
+                  >
                     cliquant ici
                   </Link>{' '}
                   et appuyer sur le bouton "Créer la cohorte"

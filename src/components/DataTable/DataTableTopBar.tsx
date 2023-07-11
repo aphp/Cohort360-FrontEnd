@@ -42,7 +42,7 @@ type DataTableTopBarProps = {
   buttons?: ButtonType[]
 }
 const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, results, searchBar, buttons }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [search, setSearch] = useState(searchBar?.value ?? '')
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
@@ -220,7 +220,7 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
                 style={{ height: 42 }}
               >
                 <MenuItem value={SearchByTypes.text}>Corps du document</MenuItem>
-                <MenuItem value={SearchByTypes.title}>Titre du document</MenuItem>
+                <MenuItem value={SearchByTypes.description}>Titre du document</MenuItem>
               </Select>
             </FormControl>
           )}

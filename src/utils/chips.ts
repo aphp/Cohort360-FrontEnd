@@ -13,11 +13,12 @@ import {
   PMSIFilters as PMSIFiltersType,
   CohortFilters as CohortFiltersType
 } from 'types'
+import { MasterChipsProps } from 'components/MasterChips/MasterChips'
 
 export const buildDocumentFiltersChips = (
   filters: DocumentFiltersType,
   handleDeleteChip: (filterName: 'nda' | 'ipp' | 'selectedDocTypes' | 'startDate' | 'endDate', value?: string) => void
-) => {
+): MasterChipsProps['chips'] => {
   const displayingSelectedDocType: any[] = getDisplayingSelectedDocTypes(filters.selectedDocTypes)
 
   return (
@@ -54,17 +55,14 @@ export const buildDocumentFiltersChips = (
     ]
       .flat()
       // @ts-ignore
-      .filter((chip) => chip?.label) as {
-      label: string
-      onDelete?: (args: any) => void
-    }[]
+      .filter((chip) => chip?.label) as MasterChipsProps['chips']
   )
 }
 
 export const buildPatientFiltersChips = (
   filters: PatientFiltersType,
   handleDeleteChip: (filterName: 'gender' | 'birthdates' | 'vitalStatus') => void
-) => {
+): MasterChipsProps['chips'] => {
   const gender = genderName(filters.gender)
   const birthdates = ageName(filters.birthdatesRanges)
   const vitalStatus = vitalStatusName(filters.vitalStatus)
@@ -73,16 +71,13 @@ export const buildPatientFiltersChips = (
     { label: gender ? gender : '', onDelete: () => handleDeleteChip('gender') },
     { label: birthdates ? birthdates : '', onDelete: () => handleDeleteChip('birthdates') },
     { label: vitalStatus ? vitalStatus : '', onDelete: () => handleDeleteChip('vitalStatus') }
-  ].filter((chip) => chip?.label) as {
-    label: string
-    onDelete?: (args: any) => void
-  }[]
+  ].filter((chip) => chip?.label) as MasterChipsProps['chips']
 }
 
 export const buildObservationFiltersChips = (
   filters: ObservationFiltersType,
   handleDeleteChip: (filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate', value?: any) => void
-) => {
+): MasterChipsProps['chips'] => {
   return (
     [
       filters.nda &&
@@ -132,10 +127,7 @@ export const buildObservationFiltersChips = (
     ]
       .flat()
       // @ts-ignore
-      .filter((chip) => chip?.label) as {
-      label: string
-      onDelete?: (args: any) => void
-    }[]
+      .filter((chip) => chip?.label) as MasterChipsProps['chips']
   )
 }
 
@@ -145,7 +137,7 @@ export const buildMedicationFiltersChips = (
     filterName: 'nda' | 'selectedPrescriptionTypes' | 'selectedAdministrationRoutes' | 'startDate' | 'endDate',
     value?: any
   ) => void
-) => {
+): MasterChipsProps['chips'] => {
   return (
     [
       filters.nda &&
@@ -189,10 +181,7 @@ export const buildMedicationFiltersChips = (
     ]
       .flat()
       // @ts-ignore
-      .filter((chip) => chip?.label) as {
-      label: string
-      onDelete?: (args: any) => void
-    }[]
+      .filter((chip) => chip?.label) as MasterChipsProps['chips']
   )
 }
 
@@ -202,7 +191,7 @@ export const buildPmsiFiltersChips = (
     filterName: 'nda' | 'code' | 'selectedDiagnosticTypes' | 'startDate' | 'endDate',
     value?: any
   ) => void
-) => {
+): MasterChipsProps['chips'] => {
   return (
     [
       filters.nda &&
@@ -245,10 +234,7 @@ export const buildPmsiFiltersChips = (
     ]
       .flat()
       // @ts-ignore
-      .filter((chip) => chip?.label) as {
-      label: string
-      onDelete?: (args: any) => void
-    }[]
+      .filter((chip) => chip?.label) as MasterChipsProps['chips']
   )
 }
 
@@ -258,7 +244,7 @@ export const buildCohortFiltersChips = (
     filterName: 'status' | 'favorite' | 'minPatients' | 'maxPatients' | 'startDate' | 'endDate',
     value?: any
   ) => void
-) => {
+): MasterChipsProps['chips'] => {
   return (
     [
       filters.status?.length > 0 &&
@@ -294,9 +280,6 @@ export const buildCohortFiltersChips = (
     ]
       .flat()
       // @ts-ignore
-      .filter((chip) => chip?.label) as {
-      label: string
-      onDelete?: (args: any) => void
-    }[]
+      .filter((chip) => chip?.label) as MasterChipsProps['chips']
   )
 }

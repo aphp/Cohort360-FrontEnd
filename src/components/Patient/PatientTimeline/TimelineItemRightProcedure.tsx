@@ -1,16 +1,15 @@
 import React from 'react'
 
-import { IProcedure } from '@ahryman40k/ts-fhir-types/lib/R4'
-
 import useStyles from './styles'
 import { PMSIEntry } from 'types'
+import { Procedure } from 'fhir/r4'
 
 /**
  * @usage
  * <TimelineItemRight time={time} text={text} />
  */
 type TimelineItemRightTypes = {
-  data: PMSIEntry<IProcedure>
+  data: PMSIEntry<Procedure>
 }
 const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
   let color = 'red'
@@ -34,7 +33,7 @@ const TimelineItemRight: React.FC<TimelineItemRightTypes> = ({ data }) => {
       break
   }
 
-  const classes = useStyles({ color: color })
+  const { classes } = useStyles({ color: color })
   return (
     <li className={classes.timelineItem}>
       <div className={classes.timelineRightContent}>

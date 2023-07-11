@@ -22,7 +22,7 @@ const ModalEditCohort: React.FC<{
   open: boolean
   onClose: () => void
 }> = ({ open, onClose }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const { cohortState } = useAppSelector<{
     cohortState: CohortState
@@ -59,7 +59,8 @@ const ModalEditCohort: React.FC<{
   }
 
   const handleClose = () => {
-    dispatch<any>(setSelectedCohortState(null))
+    dispatch(setSelectedCohortState(null))
+    onClose()
   }
 
   const handleConfirm = async () => {
@@ -73,9 +74,9 @@ const ModalEditCohort: React.FC<{
 
     if (!selectedCohort) return
     if (isEdition) {
-      await dispatch<any>(editCohort({ editedCohort: modalCohortState }))
+      await dispatch(editCohort({ editedCohort: modalCohortState }))
     } else {
-      await dispatch<any>(addCohort({ newCohort: modalCohortState }))
+      await dispatch(addCohort({ newCohort: modalCohortState }))
     }
     onClose()
   }
@@ -85,7 +86,7 @@ const ModalEditCohort: React.FC<{
     setLoading(true)
 
     if (isEdition && selectedCohort !== null) {
-      await dispatch<any>(deleteCohort({ deletedCohort: selectedCohort }))
+      await dispatch(deleteCohort({ deletedCohort: selectedCohort }))
     }
     onClose()
   }

@@ -10,15 +10,15 @@ import ModalAdministrationComment from 'components/Patient/PatientMedication/Mod
 import displayDigit from 'utils/displayDigit'
 
 import { Column, Order, CohortMedication } from 'types'
-import { IMedicationRequest, IMedicationAdministration } from '@ahryman40k/ts-fhir-types/lib/R4'
 
 import useStyles from './styles'
+import { MedicationAdministration, MedicationRequest } from 'fhir/r4'
 
 type DataTableMedicationProps = {
   loading: boolean
   deidentified: boolean
   selectedTab: 'prescription' | 'administration'
-  medicationsList: CohortMedication<IMedicationRequest | IMedicationAdministration>[]
+  medicationsList: CohortMedication<MedicationRequest | MedicationAdministration>[]
   order?: Order
   setOrder?: (order: Order) => void
   page?: number
@@ -36,7 +36,7 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
   setPage,
   total
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const columns = [
     {
@@ -57,9 +57,9 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
       ? { label: 'Type de prescription', code: 'type', align: 'center', sortableColumn: true }
       : null,
     { label: "Voie d'administration", code: 'route', align: 'center', sortableColumn: true },
-    selectedTab === 'administration' ? { label: 'Quantité', code: '', align: 'center', sortableColumn: false } : null,
-    { label: 'Unité exécutrice', code: '', align: 'center', sortableColumn: true },
-    selectedTab === 'administration' ? { label: 'Commentaire', code: '', align: 'center', sortableColumn: false } : null
+    selectedTab === 'administration' ? { label: 'Quantité', align: 'center', sortableColumn: false } : null,
+    { label: 'Unité exécutrice', align: 'center', sortableColumn: false },
+    selectedTab === 'administration' ? { label: 'Commentaire', align: 'center', sortableColumn: false } : null
   ].filter((elem) => elem !== null) as Column[]
 
   return (
@@ -98,10 +98,10 @@ const DataTableMedication: React.FC<DataTableMedicationProps> = ({
 }
 
 const DataTableMedicationLine: React.FC<{
-  medication: CohortMedication<IMedicationRequest | IMedicationAdministration>
+  medication: CohortMedication<MedicationRequest | MedicationAdministration>
   deidentified: boolean
 }> = ({ medication, deidentified }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [open, setOpen] = useState<string | null>(null)
 
@@ -122,7 +122,7 @@ const DataTableMedicationLine: React.FC<{
 
   const prescriptionType =
     medication.resourceType === 'MedicationRequest' &&
-    (medication.extension?.find((extension: any) => extension.url === 'type') || {}).valueString
+    (medication.extension?.find((extension) => extension.url === 'type') || {}).valueString
   const administrationRoute =
     medication.resourceType === 'MedicationRequest'
       ? medication.dosageInstruction?.[0]?.route?.text

@@ -29,13 +29,13 @@ type SortDialogProps = {
 
 const sortOptions = [
   { label: 'Sexe', code: 'gender' },
-  { label: 'Prénom', code: 'given' },
+  { label: 'Prénom', code: 'name' },
   { label: 'Nom', code: 'family' },
   { label: 'Date de Naissance', code: 'birthdate' }
 ]
 
 const SortDialog: React.FC<SortDialogProps> = ({ open, onClose, sort, onChangeSort }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const [_sort, setSort] = useState(sort)
 
   const _onSubmit = () => {

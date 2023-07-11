@@ -1,5 +1,4 @@
 import React from 'react'
-import clsx from 'clsx'
 import { useNavigate } from 'react-router-dom'
 
 import Button from '@mui/material/Button'
@@ -13,7 +12,7 @@ import { useAppSelector } from 'state'
 import useStyles from './styles'
 
 const CohortRightOrNotExist = () => {
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
   const navigate = useNavigate()
 
   const { openDrawer } = useAppSelector((state) => ({ openDrawer: state.drawer }))
@@ -25,9 +24,9 @@ const CohortRightOrNotExist = () => {
       justifyContent="center"
       alignItems="center"
       spacing={2}
-      className={clsx(classes.appBar, { [classes.appBarShift]: openDrawer })}
+      className={cx(classes.appBar, { [classes.appBarShift]: openDrawer })}
     >
-      <Grid item className={classes.item}>
+      <Grid container item>
         <Grid container direction="column" justifyContent="center" alignItems="center">
           <Grid item style={{ padding: 16 }}>
             <WarningIcon style={{ fontSize: 60 }} />
@@ -37,8 +36,8 @@ const CohortRightOrNotExist = () => {
               Vous tentez d'accéder à des données qui n'existent pas, ou vous ne disposez pas de droits suffisants
             </Typography>
             <Typography style={{ marginBottom: 16 }} align="center">
-              S'il s'agit d'une erreur, vous pouvez contacter l'équipe Cohort360 via le formulaire de contact en bas à
-              gauche de l'interface
+              S'il s'agit d'une erreur, vous pouvez contacter le support Cohort360 à l'adresse suivante :
+              dsi-id-recherche-support-cohort360@aphp.fr.
             </Typography>
           </Grid>
         </Grid>

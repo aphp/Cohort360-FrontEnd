@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import _ from 'lodash'
 
 import {
   Alert,
   Autocomplete,
   Button,
+  Checkbox,
+  CircularProgress,
   Divider,
   FormControl,
   FormLabel,
@@ -14,10 +16,8 @@ import {
   MenuItem,
   Select,
   Switch,
-  Typography,
   TextField,
-  Checkbox,
-  CircularProgress
+  Typography
 } from '@mui/material'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
@@ -28,9 +28,10 @@ import { InputSearchDocumentSimple } from 'components/Inputs'
 
 import useStyles from './styles'
 
-import { DocType, DocumentDataType, errorDetails, SearchByTypes, searchInputError } from 'types'
+import { CriteriaName, DocType, DocumentDataType, errorDetails, SearchByTypes, searchInputError } from 'types'
 import services from 'services/aphp'
 import { useDebounce } from 'utils/debounce'
+import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 
 type TestGeneratedFormProps = {
   criteria: any
@@ -40,7 +41,7 @@ type TestGeneratedFormProps = {
 }
 
 const defaultComposition: DocumentDataType = {
-  type: 'Composition',
+  type: 'DocumentReference',
   title: 'Critère de document',
   search: '',
   searchBy: SearchByTypes.text,
@@ -57,24 +58,16 @@ const defaultComposition: DocumentDataType = {
 const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
 
-  const classes = useStyles()
-
-  const [error, setError] = useState(false)
+  const { classes } = useStyles()
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultComposition)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
-
   const [searchCheckingLoading, setSearchCheckingLoading] = useState(false)
-
   const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
-
   const debouncedSearchItem = useDebounce(500, defaultValues.search)
 
   const isEdition = selectedCriteria !== null ? true : false
 
   const _onSubmit = () => {
-    if (defaultValues && defaultValues.search?.length === 0 && defaultValues.docType?.length === 0) {
-      return setError(true)
-    }
     onChangeSelectedCriteria(defaultValues)
   }
 
@@ -119,9 +112,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner au moins une recherche, ou un type de document</Alert>}
-
-        {!error && !multiFields && (
+        {!multiFields && (
           <Alert
             severity="info"
             onClose={() => {
@@ -161,6 +152,12 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             />
           </Grid>
 
+          <OccurrencesNumberInputs
+            form={CriteriaName.Document}
+            selectedCriteria={defaultValues}
+            onChangeValue={_onChangeValue}
+          />
+
           <FormControl variant="outlined" className={classes.inputItem} style={{ marginBottom: 0 }}>
             <InputLabel>Rechercher dans :</InputLabel>
             <Select
@@ -170,7 +167,7 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
               label="Rechercher dans :"
             >
               <MenuItem value={SearchByTypes.text}>Corps du document</MenuItem>
-              <MenuItem value={SearchByTypes.title}>Titre du document</MenuItem>
+              <MenuItem value={SearchByTypes.description}>Titre du document</MenuItem>
             </Select>
           </FormControl>
 
@@ -223,7 +220,6 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             options={criteria?.data?.docTypes || []}
             getOptionLabel={(option) => option.label}
             isOptionEqualToValue={(option, value) => _.isEqual(option, value)}
-            // value={defaultValuesDocType}
             value={defaultValues.docType}
             onChange={(e, value) => _onChangeValue('docType', value)}
             renderInput={(params) => <TextField {...params} label="Types de documents" />}
@@ -270,7 +266,11 @@ const CompositionForm: React.FC<TestGeneratedFormProps> = (props) => {
             }}
           />
 
-          <AdvancedInputs form="document" selectedCriteria={defaultValues} onChangeValue={_onChangeValue} />
+          <AdvancedInputs
+            form={CriteriaName.Document}
+            selectedCriteria={defaultValues}
+            onChangeValue={_onChangeValue}
+          />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

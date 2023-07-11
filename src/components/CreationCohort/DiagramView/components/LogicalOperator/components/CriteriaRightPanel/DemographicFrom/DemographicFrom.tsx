@@ -18,7 +18,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
 import useStyles from './styles'
 
-import { DemographicDataType } from 'types'
+import { Calendar, CalendarLabel, CalendarRequestLabel, DemographicDataType } from 'types'
 
 type DemographicFormProps = {
   criteria: any
@@ -32,7 +32,7 @@ const defaultDemographic: DemographicDataType = {
   title: 'Critère démographique',
   vitalStatus: [],
   gender: [],
-  ageType: { id: 'year', label: 'années' },
+  ageType: { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR },
   years: [0, 130],
   isInclusive: true
 }
@@ -41,7 +41,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
   const { criteria, selectedCriteria, onChangeSelectedCriteria, goBack } = props
   const [defaultValues, setDefaultValues] = useState(selectedCriteria || defaultDemographic)
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [error, setError] = useState(false)
   const [ageError, setAgeError] = useState(false)
@@ -60,7 +60,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
       defaultValues.ageType &&
       +defaultValues.years[0] === 0 &&
       +defaultValues.years[1] === 130 &&
-      defaultValues.ageType.id === 'year'
+      defaultValues.ageType.id === Calendar.YEAR
     ) {
       // If no input has been set
       return setError(true)
@@ -74,10 +74,6 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
     _defaultValues[key] = value
     setDefaultValues(_defaultValues)
   }
-
-  // if (criteria.data.gender === 'loading' || criteria.data.status === 'loading') {
-  //   return <></>
-  // }
 
   const defaultValuesGender =
     defaultValues.gender && criteria.data.gender !== 'loading'
@@ -243,13 +239,14 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
 
             <Autocomplete
               id="criteria-ageType-autocomplete"
+              disableClearable
               className={classes.inputItem}
               options={[
-                { id: 'year', label: 'années' },
-                { id: 'month', label: 'mois' },
-                { id: 'day', label: 'jours' }
+                { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR },
+                { id: Calendar.MONTH, criteriaLabel: CalendarLabel.MONTH, requestLabel: CalendarRequestLabel.MONTH },
+                { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
               ]}
-              getOptionLabel={(option) => option.label}
+              getOptionLabel={(option) => option.criteriaLabel}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               value={defaultValues.ageType}
               onChange={(e, value) => _onChangeValue('ageType', value)}

@@ -1,6 +1,6 @@
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   backDrop: {
     height: '100vh',
     width: '100vw',
@@ -15,10 +15,6 @@ const useStyles = makeStyles(() => ({
     color: 'white',
     width: 50,
     height: 36,
-    // maxWidth: 50,
-    // maxHeight: 36,
-    // minWidth: 50,
-    // minHeight: 36,
     borderRadius: 18,
     textAlign: 'center',
     marginTop: 12,

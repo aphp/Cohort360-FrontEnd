@@ -9,7 +9,7 @@ import { fetchRequests as fetchRequestsList } from 'state/request'
 import useStyles from './styles'
 
 const CohortCreationBreadcrumbs: React.FC = () => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
   const {
@@ -33,9 +33,9 @@ const CohortCreationBreadcrumbs: React.FC = () => {
 
   useEffect(() => {
     if (!projects || (projects && projects.length === 0)) {
-      dispatch<any>(fetchProjectsList())
+      dispatch(fetchProjectsList())
     } else if (!requests || (requests && requests.length === 0)) {
-      dispatch<any>(fetchRequestsList())
+      dispatch(fetchRequestsList())
     } else {
       const foundItem = requests.find(({ uuid }) => uuid === requestId)
       if (foundItem) {

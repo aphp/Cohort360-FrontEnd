@@ -1,6 +1,6 @@
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles()(() => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
@@ -22,14 +22,20 @@ const useStyles = makeStyles(() => ({
     maxHeight: 'calc(100vh - 135px)'
   },
   inputContainer: {
-    padding: '1em',
-    display: 'flex',
-    flex: '1 1 0%',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    padding: '1em'
+  },
+  categoryTitle: {
+    padding: '1em'
   },
   inputItem: {
-    margin: '1em',
+    margin: '0px 1em 0px 1em',
     width: 'calc(100% - 2em)'
+  },
+  textField: {
+    '& input': {
+      padding: '2px 4px 3px 0'
+    }
   },
   criteriaActionContainer: {
     display: 'flex',
@@ -44,6 +50,25 @@ const useStyles = makeStyles(() => ({
     background: '#fff',
     '& > button': {
       margin: '12px 8px'
+    }
+  },
+  durationContainer: {
+    marginBottom: 20
+  },
+  durationLegend: {
+    color: '#5B5E63',
+    fontWeight: 900,
+    fontSize: 12,
+    textAlign: 'center'
+  },
+  durationTitle: {
+    padding: '1em',
+    display: 'flex',
+    alignItems: 'center'
+  },
+  supportedInputsRoot: {
+    '& div': {
+      marginBottom: 3
     }
   }
 }))

@@ -17,7 +17,7 @@ type RequestFormProps = {
 }
 
 const RequestForm: React.FC<RequestFormProps> = ({ parentId, goBack }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
   const { projectState, requestState } = useAppSelector((state) => ({
@@ -37,7 +37,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ parentId, goBack }) => {
       return setError(true)
     }
 
-    dispatch<any>(addRequestToCohortCreation({ parentId, selectedRequestId }))
+    dispatch(addRequestToCohortCreation({ parentId, selectedRequestId }))
   }
 
   return (
@@ -51,13 +51,13 @@ const RequestForm: React.FC<RequestFormProps> = ({ parentId, goBack }) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de selectionner une requête</Alert>}
+        {error && <Alert severity="error">Merci de sélectionner une requête</Alert>}
 
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">Mes requêtes</Typography>
 
           <FormLabel style={{ padding: '1em' }} component="legend">
-            Veuillez selectionner la requête que vous voulez integrer à votre requête actuelle :
+            Veuillez sélectionner la requête que vous voulez intégrer à votre requête actuelle :
           </FormLabel>
 
           <RequestList

@@ -11,11 +11,16 @@ const exportTable: ExportTableType[] = [
     table_name: 'Patient',
     table_id: 'person'
   },
+  // {
+  //   id: 'observation',
+  //   table_name: 'Patient - Données démographiques',
+  //   table_id: 'observation',
+  //   table_subtitle: '⚠️ Attention cette table comporte des données identifiantes'
+  // },
   {
-    id: 'observation',
-    table_name: 'Patient - Données démographiques',
-    table_id: 'observation',
-    table_subtitle: '⚠️ Attention cette table comporte des données identifiantes'
+    id: 'iris',
+    table_name: 'Patient - Données géographiques',
+    table_id: 'iris'
   },
   {
     id: 'drug_exposure_prescription',
@@ -57,11 +62,6 @@ const exportTable: ExportTableType[] = [
     table_name: 'Fait - PMSI - GHM',
     table_id: 'cost'
   },
-  // {
-  //   id: 'note',
-  //   table_name: 'Fait - Documents médicaux',
-  //   table_id: 'note'
-  // },
   {
     id: 'care_site',
     table_name: 'Référentiel - Structure hospitalière',

@@ -22,11 +22,11 @@ interface IModalMoveRequestProps {
 }
 
 const ModalMoveRequest: React.FunctionComponent<IModalMoveRequestProps> = ({ open, onClose, selectedRequests }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
   const _onConfirm = async () => {
-    await dispatch<any>(deleteRequests({ deletedRequests: selectedRequests }))
+    await dispatch(deleteRequests({ deletedRequests: selectedRequests }))
 
     onClose(true)
   }

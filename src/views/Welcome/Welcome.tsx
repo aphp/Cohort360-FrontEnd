@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import moment from 'moment'
-import clsx from 'clsx'
 
-import { Alert, Grid, Paper, Container, Typography } from '@mui/material'
+import { Alert, Container, Grid, Paper, Typography } from '@mui/material'
 
 import NewsCard from 'components/Welcome/NewsCard/NewsCard'
 import PatientsCard from 'components/Welcome/PatientsCard/PatientsCard'
@@ -11,7 +10,7 @@ import ResearchCard from 'components/Welcome/ResearchCard/ResearchCard'
 import SearchPatientCard from 'components/Welcome/SearchPatientCard/SearchPatientCard'
 import TutorialsCard from 'components/Welcome/TutorialsCard/TutorialsCard'
 
-import { useAppSelector, useAppDispatch } from 'state'
+import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProjects } from 'state/project'
 import { fetchRequests } from 'state/request'
 import { fetchCohorts } from 'state/cohort'
@@ -20,12 +19,12 @@ import { initMedicationHierarchy } from 'state/medication'
 import { initBiologyHierarchy } from 'state/biology'
 import { fetchScopesList } from 'state/scope'
 
-import { Cohort, RequestType } from 'types'
+import { AccessExpiration, Cohort, RequestType } from 'types'
 
 import useStyles from './styles'
 
 const Welcome: React.FC = () => {
-  const classes = useStyles()
+  const { classes, cx } = useStyles()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { practitioner, open, cohortState, requestState, meState } = useAppSelector((state) => ({
@@ -35,7 +34,7 @@ const Welcome: React.FC = () => {
     requestState: state.request,
     meState: state.me
   }))
-
+  const accessExpirations: AccessExpiration[] = meState?.accessExpirations ?? []
   const loadingCohort = cohortState.loading
   const loadingRequest = requestState.loading
   const maintenanceIsActive = meState?.maintenance?.active
@@ -50,9 +49,9 @@ const Welcome: React.FC = () => {
 
   useEffect(() => {
     // fetchProjectData
-    dispatch<any>(fetchProjects())
-    dispatch<any>(fetchRequests())
-    dispatch<any>(
+    dispatch(fetchProjects())
+    dispatch(fetchRequests())
+    dispatch(
       fetchCohorts({
         listType: 'FavoriteCohorts',
         sort: { sortBy: 'modified_at', sortDirection: 'desc' },
@@ -60,7 +59,7 @@ const Welcome: React.FC = () => {
         limit: 5
       })
     )
-    dispatch<any>(
+    dispatch(
       fetchCohorts({
         listType: 'LastCohorts',
         sort: { sortBy: 'modified_at', sortDirection: 'desc' },
@@ -69,16 +68,16 @@ const Welcome: React.FC = () => {
     )
 
     // fetchPmsiData
-    dispatch<any>(initPmsiHierarchy())
+    dispatch(initPmsiHierarchy())
 
     // fetchMedicationData
-    dispatch<any>(initMedicationHierarchy())
+    dispatch(initMedicationHierarchy())
 
     // fetchBiologyData
-    dispatch<any>(initBiologyHierarchy())
+    dispatch(initBiologyHierarchy())
 
     // fetchScope
-    dispatch<any>(fetchScopesList())
+    dispatch(fetchScopesList({}))
   }, [])
 
   useEffect(() => {
@@ -96,7 +95,7 @@ const Welcome: React.FC = () => {
   return practitioner ? (
     <Grid
       container
-      className={clsx(classes.root, classes.appBar, {
+      className={cx(classes.root, classes.appBar, {
         [classes.appBarShift]: open
       })}
     >
@@ -105,28 +104,58 @@ const Welcome: React.FC = () => {
         className={classes.container}
         style={{ minHeight: 'calc(100vh - 70px)', marginBottom: 8 }}
       >
-        <Typography id="homePage-title" component="h1" variant="h1" color="inherit" noWrap className={classes.title}>
-          Bienvenue {practitioner.displayName}
-        </Typography>
-        <Typography
-          id="last-connection"
-          component="h6"
-          variant="h6"
-          color="inherit"
-          noWrap
-          className={classes.subtitle}
-        >
-          {lastConnection}
-        </Typography>
-        <Grid container spacing={1}>
-          {maintenanceIsActive && (
-            <Alert severity="warning" style={{ marginTop: '-12px', width: '100%' }}>
-              Une maintenance est en cours. Seules les consultations de cohortes, requêtes et données patients sont
-              activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
-            </Alert>
-          )}
+        <Grid item xs={12}>
+          <Grid item>
+            <Typography
+              id="homePage-title"
+              component="h1"
+              variant="h1"
+              color="inherit"
+              noWrap
+              className={classes.title}
+            >
+              Bienvenue {practitioner.displayName}
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Typography
+              id="last-connection"
+              component="h6"
+              variant="h6"
+              color="inherit"
+              noWrap
+              className={classes.subtitle}
+            >
+              {lastConnection}
+            </Typography>
+          </Grid>
+          <Grid item>
+            {maintenanceIsActive && (
+              <Alert severity="warning" className={classes.alert}>
+                Une maintenance est en cours. Seules les consultations de cohortes, requêtes et données patients sont
+                activées. Les créations, éditions et suppressions de cohortes et de requêtes sont désactivées.
+              </Alert>
+            )}
+            {accessExpirations?.map((item: AccessExpiration) =>
+              item.leftDays && !Number.isNaN(item.leftDays) && item.leftDays <= 30 ? (
+                <Alert
+                  key={item.perimeter + '-' + item.leftDays && item.leftDays}
+                  severity="warning"
+                  className={classes.alert}
+                >
+                  Attention, votre accès au périmetre suivant: {item.perimeter}, arrivera à expiration dans{' '}
+                  {item.leftDays} jour{item.leftDays > 1 ? 's' : ''}. Veuillez vous rapprocher de votre référent EDS
+                  pour faire renouveler vos accès à l'application.
+                </Alert>
+              ) : (
+                <></>
+              )
+            )}
+          </Grid>
+        </Grid>
 
-          <Grid container className={classes.newsGrid} item xs={12} md={6} lg={6}>
+        <Grid container xs={12} spacing={1}>
+          <Grid container className={classes.newsGrid} item xs={12} md={6}>
             <Grid item className={classes.pt3}>
               <Paper
                 id="patients-card"
@@ -144,8 +173,8 @@ const Welcome: React.FC = () => {
             </Grid>
           </Grid>
 
-          <Grid container item xs={12} md={6} lg={6}>
-            <Grid item xs={12} md={12} lg={12} className={classes.pt3}>
+          <Grid container item xs={12} md={6}>
+            <Grid item xs={12} className={classes.pt3}>
               <Paper
                 id="search-patient-card"
                 className={classes.paper}
@@ -155,7 +184,7 @@ const Welcome: React.FC = () => {
               </Paper>
             </Grid>
 
-            <Grid item xs={12} md={12} lg={12} className={classes.pt3}>
+            <Grid item xs={12} className={classes.pt3}>
               <Paper
                 id="tutorials-card"
                 className={classes.paper}

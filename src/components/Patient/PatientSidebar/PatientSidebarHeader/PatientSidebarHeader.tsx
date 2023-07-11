@@ -12,8 +12,7 @@ import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
 import SortDialog from 'components/Filters/SortDialog/SortDialog'
 import MasterChips from 'components/MasterChips/MasterChips'
 
-import { PatientGenderKind } from '@ahryman40k/ts-fhir-types/lib/R4'
-import { PatientFilters as PatientFiltersType, SearchByTypes, Sort, VitalStatus } from 'types'
+import { PatientFilters as PatientFiltersType, PatientGenderKind, SearchByTypes, Sort, VitalStatus } from 'types'
 
 import { buildPatientFiltersChips } from 'utils/chips'
 
@@ -42,7 +41,7 @@ type PatientSidebarHeaderTypes = {
   onChangeSort: (sort: Sort) => void
 }
 const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const _onChangeSelect = (
     event: React.ChangeEvent<{}>,

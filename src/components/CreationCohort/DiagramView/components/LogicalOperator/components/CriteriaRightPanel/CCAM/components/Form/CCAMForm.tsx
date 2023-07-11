@@ -11,7 +11,8 @@ import AdvancedInputs from 'components/CreationCohort/DiagramView/components/Log
 import useStyles from './styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { fetchProcedure } from 'state/pmsi'
-import { HierarchyTree } from 'types'
+import { CriteriaName, HierarchyTree } from 'types'
+import OccurrencesNumberInputs from '../../../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 
 type CcamFormProps = {
   isOpen: boolean
@@ -26,20 +27,15 @@ type CcamFormProps = {
 const CcamForm: React.FC<CcamFormProps> = (props) => {
   const { isOpen, isEdition, criteria, selectedCriteria, onChangeValue, onChangeSelectedCriteria, goBack } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const initialState: HierarchyTree | null = useAppSelector((state) => state.syncHierarchyTable)
   const currentState = { ...selectedCriteria, ...initialState }
-
-  const [error, setError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const _onSubmit = () => {
-    if (currentState?.code?.length === 0) {
-      return setError(true)
-    }
     onChangeSelectedCriteria(currentState)
-    dispatch<any>(fetchProcedure())
+    dispatch(fetchProcedure())
   }
 
   const getCCAMOptions = async (searchValue: string) => {
@@ -75,9 +71,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner un acte CCAM</Alert>}
-
-        {!error && !multiFields && (
+        {!multiFields && (
           <Alert
             severity="info"
             onClose={() => {
@@ -118,6 +112,12 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             />
           </Grid>
 
+          <OccurrencesNumberInputs
+            form={CriteriaName.Ccam}
+            selectedCriteria={selectedCriteria}
+            onChangeValue={onChangeValue}
+          />
+
           <AutocompleteAsync
             multiple
             label="Codes d'actes CCAM"
@@ -130,7 +130,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             onChange={(e, value) => onChangeValue('code', value)}
           />
 
-          <AdvancedInputs form="ccam" selectedCriteria={currentState} onChangeValue={onChangeValue} />
+          <AdvancedInputs form={CriteriaName.Ccam} selectedCriteria={currentState} onChangeValue={onChangeValue} />
         </Grid>
 
         <Grid className={classes.criteriaActionContainer}>

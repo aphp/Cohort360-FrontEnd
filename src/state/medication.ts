@@ -4,12 +4,9 @@ import { RootState } from 'state'
 import { login, logout } from 'state/me'
 
 import services from 'services/aphp'
+import { AbstractTree } from 'types'
 
-export type MedicationListType = {
-  id: string
-  label: string
-  subItems?: MedicationListType[]
-}
+export type MedicationListType = AbstractTree<{ label: string }>
 
 export type MedicationState = {
   syncLoading?: number
@@ -31,16 +28,13 @@ const initMedicationHierarchy = createAsyncThunk<MedicationState, void, { state:
       const state = getState().medication
       const { list } = state
 
-      let medicationList = []
-
-      if (list && list.length === 0) {
-        medicationList = await services.cohortCreation.fetchAtcHierarchy('')
-      }
+      const medicationList: MedicationListType[] =
+        list.length === 0 ? await services.cohortCreation.fetchAtcHierarchy('') : list
 
       return {
         ...state,
         loading: false,
-        list: medicationList || []
+        list: medicationList
       }
     } catch (error) {
       console.error(error)
@@ -91,7 +85,7 @@ const expandMedicationElement = createAsyncThunk<MedicationState, ExpandMedicati
         for (let item of items) {
           // Replace sub items element by response of back-end
           if (item.id === rowId) {
-            const foundItem = item.subItems ? item.subItems.find((i: any) => i.id === 'loading') : true
+            const foundItem = item.subItems ? item.subItems.find((i) => i.id === 'loading') : true
             if (foundItem) {
               let subItems: MedicationListType[] = []
               subItems = await services.cohortCreation.fetchAtcHierarchy(item.id)
@@ -122,7 +116,7 @@ const expandMedicationElement = createAsyncThunk<MedicationState, ExpandMedicati
       loading: false,
       list: _rootRows,
       openedElement: _openedElement,
-      savedSelectedItems: savedSelectedItems.filter((savedSelectedItem: any) => savedSelectedItem.id !== 'loading')
+      savedSelectedItems: savedSelectedItems.filter((savedSelectedItem) => savedSelectedItem.id !== 'loading')
     }
   }
 )

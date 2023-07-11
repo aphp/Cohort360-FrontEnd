@@ -46,7 +46,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
   filters,
   setFilters
 }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const [_nda, setNda] = useState<string>(filters.nda)
   const [_startDate, setStartDate] = useState<any>(filters.startDate)

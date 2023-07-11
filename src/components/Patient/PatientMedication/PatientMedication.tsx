@@ -22,7 +22,7 @@ type PatientMedicationTypes = {
   groupId?: string
 }
 const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
-  const classes = useStyles()
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
   const { patient } = useAppSelector((state) => ({
     patient: state.patient
@@ -59,7 +59,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   const [order, setOrder] = useState<Order>({ orderBy: 'Period-start', orderDirection: 'asc' })
 
   const _fetchMedication = async (page: number) => {
-    dispatch<any>(
+    dispatch(
       fetchMedication({
         selectedTab,
         groupId,
@@ -167,7 +167,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
         setOrder={setOrder}
         page={page}
         setPage={(newPage) => handleChangePage(newPage)}
-        total={totalAllMedication}
+        total={totalMedication}
       />
 
       <MedicationFilters
