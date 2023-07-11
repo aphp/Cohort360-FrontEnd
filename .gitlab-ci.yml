@@ -7,7 +7,7 @@ build-job:
   image: harbor.eds.aphp.fr/cohort360/node:16.13.2
   stage: build
   script:
-    - npm install --legacy-peer-deps
+    - npm install
     - npm run build
   artifacts:
     paths:
