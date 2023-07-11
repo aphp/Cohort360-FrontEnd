@@ -839,8 +839,18 @@ export async function unbuildRequest(_json: string): Promise<any> {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
           currentCriterion.title = 'Critère de prise en charge'
           currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [null, null]
-          currentCriterion.durationType = currentCriterion.durationType ? currentCriterion.durationType : [null, null]
-          currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : [null, null]
+          currentCriterion.durationType = currentCriterion.durationType
+            ? currentCriterion.durationType
+            : [
+                { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY },
+                { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
+              ]
+          currentCriterion.ageType = currentCriterion.ageType
+            ? currentCriterion.ageType
+            : [
+                { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR },
+                { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR }
+              ]
           currentCriterion.age = currentCriterion.age ? currentCriterion.age : [null, null]
           currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : []
           currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : []
