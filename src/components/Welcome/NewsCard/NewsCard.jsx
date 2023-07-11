@@ -19,22 +19,20 @@ export default function TutorialsCard() {
 
       <>
         {news?.entry?.map((entry, index) => (
-          <>
-            <div key={index}>
-              <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
-              <Typography color="textSecondary" style={{ paddingBottom: 14 }}>
-                <b>{entry.news.title}</b>
+          <div key={index}>
+            <Divider className={classes.divider} style={{ marginTop: 16, marginBottom: 16 }} />
+            <Typography color="textSecondary" style={{ paddingBottom: 14 }}>
+              <b>{entry.news.title}</b>
+            </Typography>
+            {entry.news.message.map((item, midx) => (
+              <Typography key={midx} color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
+                {item}
               </Typography>
-              {entry.news.message.map((item, index) => (
-                <Typography key={index} color="textSecondary" style={{ paddingBottom: 8, paddingLeft: 16 }}>
-                  {item}
-                </Typography>
-              ))}
-              <Typography color="textSecondary" style={{ paddingTop: 6 }}>
-                <b>{entry.news.footer}</b>
-              </Typography>
-            </div>
-          </>
+            ))}
+            <Typography color="textSecondary" style={{ paddingTop: 6 }}>
+              <b>{entry.news.footer}</b>
+            </Typography>
+          </div>
         ))}
       </>
     </>
