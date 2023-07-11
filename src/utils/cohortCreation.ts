@@ -18,60 +18,61 @@ import { BIOLOGY_HIERARCHY_ITM_ANABIO, CLAIM_HIERARCHY, CONDITION_HIERARCHY, PRO
 
 const REQUETEUR_VERSION = 'v1.3.0'
 
-// TODO: à changer quand ticket fhir ok vvvvv
 const RESSOURCE_TYPE_IPP_LIST: 'IPPList' = 'IPPList'
 const IPP_LIST_FHIR = 'identifier.value'
 
 export const RESSOURCE_TYPE_PATIENT: 'Patient' = 'Patient'
-const PATIENT_GENDER = 'gender' // ok
-const PATIENT_BIRTHDATE = 'age-day' // ok
-const PATIENT_DECEASED = 'deceased' // ok
+const PATIENT_GENDER = 'gender'
+const PATIENT_BIRTHDATE = 'age-day'
+const PATIENT_DECEASED = 'deceased'
 
 const RESSOURCE_TYPE_ENCOUNTER: 'Encounter' = 'Encounter'
-const ENCOUNTER_LENGTH = 'length' // ok
-const ENCOUNTER_MIN_BIRTHDATE = 'start-age-visit' // ok
-const ENCOUNTER_MAX_BIRTHDATE = 'end-age-visit' // ok
-const ENCOUNTER_ENTRYMODE = 'admission-mode' // ok
-const ENCOUNTER_EXITMODE = 'discharge-disposition-mode' // ok
-const ENCOUNTER_PRISENCHARGETYPE = 'class' // ok
-const ENCOUNTER_TYPEDESEJOUR = 'stay' // ok
-const ENCOUNTER_FILESTATUS = 'status' // ok
-const ENCOUNTER_ADMISSIONMODE = 'reason-code' // ok
-const ENCOUNTER_REASON = 'destination-type' // ok
-const ENCOUNTER_DESTINATION = 'destination' // ok
-const ENCOUNTER_PROVENANCE = 'admit-source' // ok
-const ENCOUNTER_ADMISSION = 'admission-type' // ok
+const ENCOUNTER_LENGTH = 'length'
+const ENCOUNTER_MIN_BIRTHDATE = 'start-age-visit'
+const ENCOUNTER_MAX_BIRTHDATE = 'end-age-visit'
+const ENCOUNTER_ENTRYMODE = 'admission-mode'
+const ENCOUNTER_EXITMODE = 'discharge-disposition-mode'
+const ENCOUNTER_PRISENCHARGETYPE = 'class'
+const ENCOUNTER_TYPEDESEJOUR = 'stay'
+const ENCOUNTER_FILESTATUS = 'status'
+const ENCOUNTER_ADMISSIONMODE = 'reason-code'
+const ENCOUNTER_REASON = 'destination-type'
+const ENCOUNTER_DESTINATION = 'destination'
+const ENCOUNTER_PROVENANCE = 'admit-source'
+const ENCOUNTER_ADMISSION = 'admission-type'
 
 export const RESSOURCE_TYPE_CLAIM: 'Claim' = 'Claim'
-const CLAIM_CODE = 'codeList' // ok
+const CLAIM_CODE = 'codeList'
 const CLAIM_CODE_ALL_HIERARCHY = 'code'
 
 export const RESSOURCE_TYPE_PROCEDURE: 'Procedure' = 'Procedure'
-const PROCEDURE_CODE = 'codeList' // ok
+const PROCEDURE_CODE = 'codeList'
 const PROCEDURE_CODE_ALL_HIERARCHY = 'code'
 
-export const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition' // ok
-const CONDITION_CODE = 'codeList' // ok
+export const RESSOURCE_TYPE_CONDITION: 'Condition' = 'Condition'
+const CONDITION_CODE = 'codeList'
 const CONDITION_CODE_ALL_HIERARCHY = 'code'
-const CONDITION_TYPE = 'type' // ok
+const CONDITION_TYPE = 'type'
 
 const RESSOURCE_TYPE_COMPOSITION: 'DocumentReference' = 'DocumentReference'
-const COMPOSITION_TEXT = '_text' // ok
-const COMPOSITION_TITLE = 'description' // ok
-const COMPOSITION_TYPE = 'type' // ok
+const COMPOSITION_TEXT = '_text'
+const COMPOSITION_TITLE = 'description'
+const COMPOSITION_TYPE = 'type'
+const COMPOSITION_STATUS = 'docstatus'
 
 const RESSOURCE_TYPE_MEDICATION_REQUEST: 'MedicationRequest' = 'MedicationRequest' // = Prescription
 const RESSOURCE_TYPE_MEDICATION_ADMINISTRATION: 'MedicationAdministration' = 'MedicationAdministration' // = Administration
-const MEDICATION_CODE = 'hierarchy-ATC' // ok
+const MEDICATION_CODE = 'hierarchy-ATC'
 const MEDICATION_CODE_ALL_HIERARCHY = 'medication-simple'
-// const MEDICATION_UCD = 'code_id' // ok
-const MEDICATION_PRESCRIPTION_TYPE = 'type' // ok
-const MEDICATION_ADMINISTRATION = 'route' // ok
+// const MEDICATION_UCD = 'code_id'
+const MEDICATION_PRESCRIPTION_TYPE = 'type'
+const MEDICATION_ADMINISTRATION = 'route'
 
 const RESSOURCE_TYPE_OBSERVATION: 'Observation' = 'Observation'
 const OBSERVATION_CODE = 'part-of'
 const OBSERVATION_CODE_ALL_HIERARCHY = 'code'
 const OBSERVATION_VALUE = 'value-quantity-value'
+const OBSERVATION_STATUS = 'row_status'
 const ENCOUNTER_SERVICE_PROVIDER = 'encounter-service-provider'
 const SERVICE_PROVIDER = 'service-provider'
 
@@ -338,7 +339,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
 
     case RESSOURCE_TYPE_COMPOSITION: {
       const unreducedFilterFhir = [
-        `docstatus=final&type:not=doc-impor&empty=false&patient-active=true`,
+        `${COMPOSITION_STATUS}=final&type:not=doc-impor&empty=false&patient-active=true`,
         `${
           criterion.search
             ? `${criterion.searchBy === SearchByTypes.text ? COMPOSITION_TEXT : COMPOSITION_TITLE}=${encodeURIComponent(
@@ -510,7 +511,7 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       }
 
       const unreducedFilterFhir = [
-        'patient-active=true',
+        `patient-active=true&${OBSERVATION_STATUS}=Validé`,
         `${
           criterion.code && criterion.code.length > 0
             ? criterion.code.find((code) => code.id === '*')
@@ -838,8 +839,18 @@ export async function unbuildRequest(_json: string): Promise<any> {
           const filters = element.filterFhir.split('&').map((elem) => elem.split('='))
           currentCriterion.title = 'Critère de prise en charge'
           currentCriterion.duration = currentCriterion.duration ? currentCriterion.duration : [null, null]
-          currentCriterion.durationType = currentCriterion.durationType ? currentCriterion.durationType : [null, null]
-          currentCriterion.ageType = currentCriterion.ageType ? currentCriterion.ageType : [null, null]
+          currentCriterion.durationType = currentCriterion.durationType
+            ? currentCriterion.durationType
+            : [
+                { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY },
+                { id: Calendar.DAY, criteriaLabel: CalendarLabel.DAY, requestLabel: CalendarRequestLabel.DAY }
+              ]
+          currentCriterion.ageType = currentCriterion.ageType
+            ? currentCriterion.ageType
+            : [
+                { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR },
+                { id: Calendar.YEAR, criteriaLabel: CalendarLabel.YEAR, requestLabel: CalendarRequestLabel.YEAR }
+              ]
           currentCriterion.age = currentCriterion.age ? currentCriterion.age : [null, null]
           currentCriterion.admissionMode = currentCriterion.admissionMode ? currentCriterion.admissionMode : []
           currentCriterion.entryMode = currentCriterion.entryMode ? currentCriterion.entryMode : []
@@ -1101,8 +1112,8 @@ export async function unbuildRequest(_json: string): Promise<any> {
                   : updatedEncounterServices
                 break
               }
+              case COMPOSITION_STATUS:
               case 'patient-active':
-              case 'docstatus':
               case 'type:not':
               case 'empty':
                 break
@@ -1503,6 +1514,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
 
                 break
               }
+              case OBSERVATION_STATUS:
               case 'patient-active':
                 break
               default:

@@ -142,18 +142,6 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
     onUpdateCohorts()
   }
 
-  // You can make an export if you got 1 cohort with: EXPORT_ACCESS = 'DATA_NOMINATIVE'
-  const canMakeExport = researchData
-    ? !!ODD_EXPORT &&
-      researchData.some((cohort) =>
-        cohort.extension && cohort.extension.length > 0
-          ? cohort.extension.find(
-              (extension) => extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
-            )
-          : false
-      )
-    : false
-
   return (
     <>
       {
@@ -252,14 +240,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
               </TableHead>
               <TableBody>
                 {researchData?.map((row: Cohort) => {
-                  const canExportThisCohort =
-                    canMakeExport && row.extension
-                      ? row.extension.some(
-                          (extension) =>
-                            extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
-                        )
-                      : false
-
+                  const canExportThisCohort = !!ODD_EXPORT ? row?.rights?.export_csv_nomi : false
                   return (
                     <TableRow
                       className={!row.fhir_group_id ? classes.notAllow : classes.pointerHover}

@@ -27,17 +27,13 @@ const initBiologyHierarchy = createAsyncThunk<BiologyState, void, { state: RootS
       const state = getState().biology
       const { list } = state
 
-      let biologyList: BiologyListType[] = []
-
-      if (list && list.length === 0) {
-        biologyList = await services.cohortCreation.fetchBiologyHierarchy()
-      }
+      const biologyList: BiologyListType[] =
+        list.length === 0 ? await services.cohortCreation.fetchBiologyHierarchy() : list
 
       return {
         ...state,
         loading: false,
-
-        list: biologyList || []
+        list: biologyList
       }
     } catch (error) {
       console.error('Erreur lors de la récupération de la hierarchie de Biologie', error)

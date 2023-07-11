@@ -52,20 +52,6 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
     dispatch(setSelectedCohort(cohort ?? null))
   }
 
-  // You can make an export if you got 1 cohort with: EXPORT_ACCESS = 'DATA_NOMINATIVE'
-  const canMakeExport =
-    ODD_EXPORT &&
-    cohorts.some((cohort) =>
-      cohort.extension && cohort.extension.length > 0
-        ? cohort.extension.some(
-            (extension) => extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
-          ) &&
-          cohort.extension.some(
-            (extension) => extension.url === 'READ_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
-          )
-        : false
-    )
-
   const onSetCohortFavorite = async (cohort: Cohort) => {
     await dispatch(editCohort({ editedCohort: { ...cohort, favorite: !cohort.favorite } }))
   }
@@ -94,11 +80,10 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                 Date
               </TableCell>
             </Hidden>
-            {canMakeExport && (
-              <TableCell align="center" style={{ width: 66 }}>
-                Exporter
-              </TableCell>
-            )}
+
+            <TableCell align="center" style={{ width: 66 }}>
+              Exporter
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -112,12 +97,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                 historyRow.request_job_status === JobStatus.new ||
                 !!historyRow.request_job_fail_msg
 
-              const canExportThisCohort =
-                canMakeExport && !isError && historyRow.extension
-                  ? historyRow.extension.some(
-                      (extension) => extension.url === 'EXPORT_ACCESS' && extension.valueString === 'DATA_NOMINATIVE'
-                    )
-                  : false
+              const canExportThisCohort = !!ODD_EXPORT && !isError ? historyRow.rights?.export_csv_nomi : false
 
               return (
                 <TableRow key={historyRow.uuid}>
@@ -172,20 +152,19 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                       {moment(historyRow.modified_at).format('DD/MM/YYYY [à] HH:mm')}
                     </TableCell>
                   </Hidden>
-                  {canMakeExport && (
-                    <TableCell align="center">
-                      <IconButton
-                        disabled={!canExportThisCohort}
-                        onClick={
-                          canExportThisCohort
-                            ? () => setSelectedExportableCohort(historyRow.fhir_group_id ?? '')
-                            : () => null
-                        }
-                      >
-                        <ExportIcon />
-                      </IconButton>
-                    </TableCell>
-                  )}
+
+                  <TableCell align="center">
+                    <IconButton
+                      disabled={!canExportThisCohort}
+                      onClick={
+                        canExportThisCohort
+                          ? () => setSelectedExportableCohort(historyRow.fhir_group_id ?? '')
+                          : () => null
+                      }
+                    >
+                      <ExportIcon />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               )
             })

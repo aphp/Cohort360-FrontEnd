@@ -112,18 +112,21 @@ const fetchExploredCohort = createAsyncThunk<
           if (cohort) {
             cohort.cohortId = id
             const cohortRights = await services.cohorts.fetchCohortsRights([{ fhir_group_id: id }])
-            const cohortRight = cohortRights && cohortRights[0]
-            if (cohortRights && cohortRights[0] && cohortRights[0].extension) {
-              cohort.canMakeExport =
-                (!!ODD_EXPORT &&
-                  cohortRight?.extension?.some(
-                    ({ url, valueString }) => url === 'EXPORT_ACCESS' && valueString === 'DATA_NOMINATIVE'
-                  )) ??
-                false
-              cohort.deidentifiedBoolean =
-                cohortRight?.extension?.some(
-                  ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
-                ) ?? true
+            if (cohortRights?.[0].rights) {
+              if (
+                cohortRights?.[0]?.rights?.read_patient_pseudo === false &&
+                cohortRights?.[0]?.rights?.read_patient_nomi === false
+              ) {
+                throw new Error("You don't have any rights on this cohort")
+              } else {
+                cohort.canMakeExport = !!ODD_EXPORT ? cohortRights?.[0]?.rights?.export_csv_nomi : false
+
+                cohort.deidentifiedBoolean = cohortRights?.[0]?.rights?.read_patient_pseudo
+                  ? cohortRights?.[0]?.rights?.read_patient_nomi
+                    ? false
+                    : true
+                  : false
+              }
             } else {
               throw new Error("You don't have any rights on this cohort")
             }
