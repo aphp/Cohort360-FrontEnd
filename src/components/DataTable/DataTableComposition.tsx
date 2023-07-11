@@ -7,7 +7,6 @@ import { CircularProgress, Chip, Grid, IconButton, Typography, TableRow, TableCe
 import FolderSharedIcon from '@mui/icons-material/FolderShared'
 import DescriptionIcon from '@mui/icons-material/Description'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
-import { ReactComponent as PdfIcon } from 'assets/icones/file-pdf.svg'
 import { ReactComponent as CheckIcon } from 'assets/icones/check.svg'
 import { ReactComponent as CancelIcon } from 'assets/icones/times.svg'
 import { ReactComponent as UserIcon } from 'assets/icones/user.svg'
@@ -24,6 +23,7 @@ import { getDocumentStatus } from 'utils/documentsFormatter'
 import { Column, Order, CohortComposition, CompositionStatusKind, DocumentReferenceStatusKind } from 'types'
 
 import useStyles from './styles'
+import { Visibility } from '@mui/icons-material'
 
 type DataTableCompositionProps = {
   loading: boolean
@@ -131,7 +131,7 @@ const DataTableCompositionLine: React.FC<{
   const documentId = document.id
   const title = document.description
   const status = document.status as DocumentReferenceStatusKind
-  const event = document.content[0].attachment.url
+  // const event = document.content[0].attachment.url
   const ipp = deidentified ? document.idPatient : document.IPP
   const nda = document.NDA ?? '-'
   const serviceProvider = document.serviceProvider ?? 'Non renseigné'
@@ -203,8 +203,8 @@ const DataTableCompositionLine: React.FC<{
         </TableCell>
 
         <TableCell>
-          <IconButton onClick={() => setOpen(documentId ?? '')} disabled={event === undefined}>
-            <PdfIcon height="30px" fill={event === undefined ? '#CBCFCF' : '#ED6D91'} />
+          <IconButton onClick={() => setOpen(documentId ?? '')}>
+            <Visibility height="30px" />
           </IconButton>
 
           <DocumentViewer
