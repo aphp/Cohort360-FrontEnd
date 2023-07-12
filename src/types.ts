@@ -126,30 +126,6 @@ export type MedicationEntry<T extends MedicationRequest | MedicationAdministrati
   NDA?: string
 }
 
-export type Cohort = {
-  uuid?: string
-  fhir_group_id?: string
-  name?: string
-  description?: string
-  result_size?: number
-  dated_measure?: any
-  dated_measure_global?: any
-  created_at?: string
-  modified_at?: string
-  favorite?: boolean
-  type?: string
-  request?: string
-  request_job_status?: string
-  request_job_fail_msg?: string
-  create_task_id?: string
-  dated_measure_id?: string
-  owner_id?: string
-  request_job_duration?: string
-  request_query_snapshot?: string
-  extension?: any[]
-  exportable?: boolean
-}
-
 export type CohortFilters = {
   status: ValueSet[]
   favorite: string
@@ -601,29 +577,6 @@ export type ObservationDataType = {
   encounterEndDate: Date | null
 }
 
-export type CohortCreationCounterType = {
-  uuid?: string
-  status?: string
-  includePatient?: number
-  byrequest?: number
-  alive?: number
-  deceased?: number
-  female?: number
-  male?: number
-  unknownPatient?: number
-  jobFailMsg?: string
-  date?: string
-  cohort_limit?: number
-  count_outdated?: boolean
-}
-
-export type CohortCreationSnapshotType = {
-  uuid: string
-  json: string
-  date: string
-  dated_measures?: any[]
-}
-
 export type ValueSet = {
   code: string
   display: string
@@ -639,31 +592,115 @@ export type ProjectType = {
   owner_id?: string
 }
 
+export type RequestType = {
+  uuid: string
+  owner?: string
+  query_snapshots?: QuerySnapshotInfo[]
+  shared_by?: Provider
+  parent_folder?: string
+  deleted?: string
+  deleted_by_cascade?: boolean
+  created_at?: string
+  modified_at?: string
+  name: string
+  description?: string
+  favorite?: boolean
+  data_type_of_query?: 'PATIENT' | 'ENCOUNTER'
+  currentSnapshot?: Snapshot
+  requestId?: string
+  requestName?: string
+}
+
 export type QuerySnapshotInfo = {
   uuid: string
-  title: string
   created_at: string
-  has_linked_cohorts: boolean
+  title: string
+  has_linked_cohorts: string
   version: number
 }
 
-export type RequestType = {
+export type Snapshot = QuerySnapshotInfo & {
+  owner?: string
+  request?: string
+  previous_snapshot: string | null
+  dated_measures: DatedMeasure[]
+  cohort_results: Cohort[]
+  shared_by?: Provider
+  deleted?: boolean
+  deleted_by_cascade?: boolean
+  modified_at?: string
+  serialized_query: string
+  is_active_branch?: boolean
+  perimeters_ids?: string[]
+}
+
+export type DatedMeasure = {
   uuid: string
-  name: string
-  parent_folder?: string
-  description?: string
-  owner_id?: string
-  data_type_of_query?: string
-  favorite?: boolean
+  owner: string
+  request_query_snapshot: string
+  count_outdated: boolean
+  cohort_limit: number
+  deleted: string | null
+  deleted_by_cascade: boolean
+  request_job_id: string | null
+  request_job_status: string | null
+  request_job_fail_msg: string | null
+  request_job_duration: string | null
+  created_at: string
+  modified_at: string
+  fhir_datetime: string
+  measure: number | null
+  measure_min: number | null
+  measure_max: number | null
+  count_task_id: string
+  mode: 'Snapshot' | 'Global'
+}
+
+export type Cohort = {
+  uuid: string
+  owner?: string
+  result_size?: number
+  request?: string
+  request_query_snapshot: string
+  dated_measure: DatedMeasure
+  dated_measure_global?: DatedMeasure
+  global_estimate?: boolean
+  fhir_group_id?: string
+  exportable?: boolean
+  deleted?: string
+  deleted_by_cascade?: boolean
+  request_job_id?: string
+  request_job_status?: string
+  request_job_fail_msg?: string
+  request_job_duration?: string
   created_at?: string
   modified_at?: string
-  query_snapshots?: QuerySnapshotInfo[]
-  shared_query_snapshot?: string[]
-  usersToShare?: Provider[]
-  shared_by?: Provider
-  currentSnapshot?: string
-  requestId?: string
-  requestName?: string
+  name?: string
+  description?: string
+  favorite?: boolean
+  create_task_id?: string
+  type?: 'IMPORT_I2B2' | 'MY_ORGANIZATIONS' | 'MY_PATIENTS' | 'MY_COHORTS'
+  extension?: any[]
+  // query_snapshots?: QuerySnapshotInfo[]
+  // shared_query_snapshot?: string[]
+  // usersToShare?: Provider[]
+  // shared_by?: Provider
+}
+
+export type CohortCreationCounterType = {
+  uuid?: string
+  status?: string
+  includePatient?: number
+  byrequest?: number
+  alive?: number
+  deceased?: number
+  female?: number
+  male?: number
+  unknownPatient?: number
+  jobFailMsg?: string
+  date?: string
+  cohort_limit?: number
+  count_outdated?: boolean
 }
 
 export type ContactSubmitForm = FormData

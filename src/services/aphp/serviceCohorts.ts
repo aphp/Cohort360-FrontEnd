@@ -242,6 +242,7 @@ const servicesCohorts: IServiceCohorts = {
       let name = ''
       let description = ''
       let requestId = ''
+      let snapshotId = ''
       let uuid = ''
       let favorite = false
 
@@ -249,6 +250,7 @@ const servicesCohorts: IServiceCohorts = {
         name = cohortInfo.data.results[0].name ?? ''
         description = cohortInfo.data.results[0].description ?? ''
         requestId = cohortInfo.data.results[0].request ?? ''
+        snapshotId = cohortInfo.data.results[0].request_query_snapshot ?? ''
         favorite = cohortInfo.data.results[0].favorite ?? false
         uuid = cohortInfo.data.results[0].uuid ?? ''
       } else {
@@ -308,6 +310,7 @@ const servicesCohorts: IServiceCohorts = {
         agePyramidData,
         monthlyVisitData,
         requestId,
+        snapshotId,
         favorite,
         uuid
       }
@@ -323,6 +326,7 @@ const servicesCohorts: IServiceCohorts = {
         monthlyVisitData: undefined,
         agePyramidData: undefined,
         requestId: '',
+        snapshotId: '',
         favorite: false,
         uuid: ''
       }
