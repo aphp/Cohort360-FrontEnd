@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchRequestCohortCreation, resetCohortCreation, unbuildCohortCreation } from 'state/cohortCreation'
 import { setCriteriaList } from 'state/criteria'
 
-import { CohortCreationSnapshotType } from 'types'
+import { QuerySnapshotInfo, Snapshot } from 'types'
 
 import constructCriteriaList from './DataList_Criteria'
 
@@ -26,7 +26,7 @@ const Requeteur = () => {
     request: {
       loading = false,
       requestId = '',
-      currentSnapshot = '',
+      currentSnapshot = {} as Snapshot,
       selectedCriteria = [],
       criteriaGroup = [],
       snapshotsHistory = [],
@@ -49,6 +49,9 @@ const Requeteur = () => {
   const requestIdFromUrl = params.requestId
   const snapshotIdFromUrl = params.snapshotId
 
+  console.log('requestIdFromUrl', requestIdFromUrl)
+  console.log('snapshotIdFromUrl', snapshotIdFromUrl)
+
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { classes } = useStyles()
@@ -69,7 +72,7 @@ const Requeteur = () => {
             snapshotId: snapshotIdFromUrl
           })
         )
-        navigate('/cohort/new')
+        // navigate('/cohort/new')
       }
     } catch (error) {
       console.error(error)
@@ -102,9 +105,9 @@ const Requeteur = () => {
     }
   }, [dispatch, criteriaGroup, selectedCriteria, selectedPopulation]) // eslint-disable-line
 
-  const _unbuildRequest = async (newCurrentSnapshot: CohortCreationSnapshotType) => {
-    dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
-  }
+  // const _unbuildRequest = async (newCurrentSnapshot: QuerySnapshotInfo | Snapshot) => {
+  //   dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
+  // }
 
   /**
    * Execute query:
@@ -118,7 +121,7 @@ const Requeteur = () => {
       const createCohortResult = await services.cohortCreation.createCohort(
         json,
         count?.uuid,
-        currentSnapshot,
+        currentSnapshot?.uuid,
         requestId,
         cohortName,
         cohortDescription,
@@ -136,32 +139,30 @@ const Requeteur = () => {
 
   const _onUndo = async () => {
     const foundItem = snapshotsHistory.find(
-      (snapshotsHistory: CohortCreationSnapshotType) => snapshotsHistory.uuid === currentSnapshot
+      (snapshotsHistory: QuerySnapshotInfo) => snapshotsHistory.uuid === currentSnapshot.uuid
     )
     const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
     if (index !== -1) {
       const newCurrentSnapshot = snapshotsHistory[index - 1 > 0 ? index - 1 : 0]
-      await _unbuildRequest(newCurrentSnapshot)
+      // await _unbuildRequest(newCurrentSnapshot)
     }
   }
 
   const _onRedo = async () => {
     const foundItem = snapshotsHistory.find(
-      (snapshotsHistory: CohortCreationSnapshotType) => snapshotsHistory.uuid === currentSnapshot
+      (snapshotsHistory: QuerySnapshotInfo) => snapshotsHistory.uuid === currentSnapshot.uuid
     )
     const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
     if (index !== -1) {
       const newCurrentSnapshot =
         snapshotsHistory[index <= snapshotsHistory.length ? index + 1 : snapshotsHistory.length - 1]
-      await _unbuildRequest(newCurrentSnapshot)
+      // await _unbuildRequest(newCurrentSnapshot)
     }
   }
 
   const _canUndo: () => boolean = () => {
     const foundItem = snapshotsHistory
-      ? snapshotsHistory.find(
-          (snapshotsHistory: CohortCreationSnapshotType) => snapshotsHistory.uuid === currentSnapshot
-        )
+      ? snapshotsHistory.find((snapshotsHistory: QuerySnapshotInfo) => snapshotsHistory.uuid === currentSnapshot.uuid)
       : null
     const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
     return index !== 0 && index !== -1
@@ -169,7 +170,7 @@ const Requeteur = () => {
 
   const _canRedo: () => boolean = () => {
     const foundItem = snapshotsHistory.find(
-      (snapshotsHistory: CohortCreationSnapshotType) => snapshotsHistory.uuid === currentSnapshot
+      (snapshotsHistory: QuerySnapshotInfo) => snapshotsHistory.uuid === currentSnapshot.uuid
     )
     const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
     return index !== snapshotsHistory.length - 1 && index !== -1

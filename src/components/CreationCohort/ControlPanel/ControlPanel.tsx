@@ -7,6 +7,7 @@ import {
   CircularProgress,
   Divider,
   Grid,
+  Link,
   List,
   ListItem,
   Tooltip,
@@ -29,17 +30,19 @@ import {
   resetCohortCreation,
   countCohortCreation,
   deleteCriteriaGroup,
-  buildCohortCreation
+  buildCohortCreation,
+  unbuildCohortCreation
 } from 'state/cohortCreation'
 import { MeState } from 'state/me'
 
-import { CohortCreationCounterType, RequestType, SimpleStatus } from 'types'
+import { CohortCreationCounterType, RequestType, SimpleStatus, Snapshot } from 'types'
 
 import useStyle from './styles'
 
 import displayDigit from 'utils/displayDigit'
 import { SHORT_COHORT_LIMIT } from '../../../constants'
 import { JobStatus } from '../../../utils/constants'
+import services from 'services/aphp'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -72,9 +75,10 @@ const ControlPanel: React.FC<{
     requestName,
     json,
     shortCohortLimit,
-    count_outdated
+    count_outdated,
+    snapshotsHistory
   } = useAppSelector((state) => state.cohortCreation.request || {})
-  const { includePatient, status, jobFailMsg /*byrequest, alive, deceased, female, male, unknownPatient */ } = count
+  const { includePatient, status, jobFailMsg } = count
 
   const [requestShare, setRequestShare] = useState<RequestType | null>({
     currentSnapshot,
@@ -128,7 +132,7 @@ const ControlPanel: React.FC<{
     dispatch(
       countCohortCreation({
         json,
-        snapshotId: currentSnapshot,
+        snapshotId: currentSnapshot.uuid,
         requestId
       })
     )
@@ -141,6 +145,12 @@ const ControlPanel: React.FC<{
   const handleCloseSharedModal = () => {
     setRequestShare(null)
     setOpenShareRequestModal(false)
+  }
+  const handleSnapshotChange = async (snapshotId: string) => {
+    console.log('snapshotId', snapshotId)
+    const snapshot: Snapshot = await services.cohortCreation.fetchSnapshot(snapshotId)
+
+    dispatch(unbuildCohortCreation({ newCurrentSnapshot: snapshot }))
   }
 
   const itLoads = loading || countLoading || saveLoading
@@ -350,6 +360,28 @@ const ControlPanel: React.FC<{
             </Button>
           </Alert>
         )}
+
+        <Grid className={classes.container}>
+          <Grid container justifyContent="space-between">
+            <Typography className={cx(classes.boldText, classes.patientTypo)}>
+              Les versions suivantes sont associées à cette requête. Cliquez sur une des versions pour la consulter :
+            </Typography>
+            <div style={{ margin: '0 1em' }}>
+              {snapshotsHistory.map((snapshot, count) => (
+                <Link
+                  key={count}
+                  onClick={() => handleSnapshotChange(snapshot.uuid)}
+                  underline="hover"
+                  style={{ cursor: 'pointer' }}
+                >
+                  <Typography style={{ fontWeight: currentSnapshot.uuid === snapshot.uuid ? 'bold' : '' }}>
+                    Version {snapshot.version} - {moment(snapshot.created_at).format('DD/MM/YYYY - HH:mm:ss')}
+                  </Typography>
+                </Link>
+              ))}
+            </div>
+          </Grid>
+        </Grid>
       </Grid>
 
       {openModal === 'executeCohortConfirmation' && (

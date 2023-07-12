@@ -68,7 +68,7 @@ const LeftSideBar: React.FC<{ open?: boolean }> = (props) => {
       setAllreadyOpen(true)
       dispatch(closeAction())
     }
-  }, [props.open, cohortCreation]) // eslint-disable-line
+  }, [props.open]) // eslint-disable-line
 
   const handleDrawerOpenOrClose = (value: boolean) => {
     setAllreadyOpen(true)
