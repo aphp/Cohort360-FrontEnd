@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, CircularProgress } from '@mui/material'
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Grid,
+  CircularProgress,
+  Checkbox,
+  FormControlLabel
+} from '@mui/material'
 
 import { RequestType, Provider, SimpleStatus } from 'types'
 
@@ -32,6 +42,11 @@ const ModalShareRequest: React.FC<{
   const [currentUserToShare, setCurrentUserToShare] = useState<Provider[] | null>(null)
   const [error, setError] = useState<'error_title' | 'error_user_share_list' | null>(null)
   const [shareMessage, setShareMessage] = useState<SimpleStatus>(null)
+  const [notifyByEmail, setNotifyByEmail] = useState(false)
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNotifyByEmail(event.target.checked)
+  }
 
   useEffect(() => {
     parentStateSetter(shareMessage)
@@ -64,7 +79,7 @@ const ModalShareRequest: React.FC<{
       return setError(ERROR_USER_SHARE_LIST)
     }
 
-    const shareRequestResponse = await services.projects.shareRequest(currentRequest)
+    const shareRequestResponse = await services.projects.shareRequest(currentRequest, notifyByEmail)
     if (shareRequestResponse.status === 201) {
       setShareMessage('success')
     } else {
@@ -102,7 +117,12 @@ const ModalShareRequest: React.FC<{
             <CircularProgress />
           </Grid>
         ) : (
-          <RequestShareForm currentRequest={currentRequest} onChangeValue={_onChangeValue} error={error} />
+          <RequestShareForm currentRequest={currentRequest} onChangeValue={_onChangeValue} error={error}>
+            <FormControlLabel
+              control={<Checkbox checked={notifyByEmail} onChange={handleChange} />}
+              label="Envoyer un email au destinataire de la requête"
+            />
+          </RequestShareForm>
         )}
       </DialogContent>
       <DialogActions>
