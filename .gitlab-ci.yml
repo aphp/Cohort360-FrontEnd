@@ -18,6 +18,7 @@ build-job:
     - develop
     - /^feat_deploy_(\w*|\d*)/
     - /^release_(\w*|\d*|-*|_*|\.*)+$/
+    - /^hotfix_(\w*|\d*|-*|_*|\.*)+$/
 
   cache:
     key: cohort360_nodemodules_cache
@@ -58,3 +59,4 @@ deploy-job:
     - develop
     - /^feat_deploy_(\w*|\d*)/
     - /^release_(\w*|\d*|-*|_*|\.*)+$/
+    - /^hotfix_(\w*|\d*|-*|_*|\.*)+$/
