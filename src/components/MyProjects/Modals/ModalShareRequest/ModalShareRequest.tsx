@@ -121,6 +121,7 @@ const ModalShareRequest: React.FC<{
         )}
       </DialogContent>
       <FormControlLabel
+        style={{ marginLeft: '15px' }}
         control={<Checkbox checked={notifyByEmail} onChange={handleChange} />}
         label="Envoyer un email au destinataire de la requête"
       />
