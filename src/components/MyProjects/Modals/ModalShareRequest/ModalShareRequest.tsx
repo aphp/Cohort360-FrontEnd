@@ -117,14 +117,14 @@ const ModalShareRequest: React.FC<{
             <CircularProgress />
           </Grid>
         ) : (
-          <RequestShareForm currentRequest={currentRequest} onChangeValue={_onChangeValue} error={error} />
+          <RequestShareForm currentRequest={currentRequest} onChangeValue={_onChangeValue} error={error}>
+            <FormControlLabel
+              control={<Checkbox checked={notifyByEmail} onChange={handleChange} />}
+              label="Envoyer un email au destinataire de la requête"
+            />
+          </RequestShareForm>
         )}
       </DialogContent>
-      <FormControlLabel
-        style={{ marginLeft: '15px' }}
-        control={<Checkbox checked={notifyByEmail} onChange={handleChange} />}
-        label="Envoyer un email au destinataire de la requête"
-      />
       <DialogActions>
         <Button onClick={handleClose}>Annuler</Button>
         <Button onClick={handleConfirm}>Valider</Button>
