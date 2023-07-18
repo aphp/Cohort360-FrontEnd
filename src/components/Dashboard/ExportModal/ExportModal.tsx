@@ -28,6 +28,7 @@ import {
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import CancelIcon from '@mui/icons-material/Cancel'
+import WarningIcon from '@mui/icons-material/Warning'
 import InfoIcon from '@mui/icons-material/Info'
 
 import useStyles from './styles'
@@ -220,6 +221,16 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               label="Motif de l'export"
               onChange={(e) => handleChangeSettings('motif', e.target.value)}
             />
+
+            <Grid className={classes.warningInfo} container alignItems="center">
+              <WarningIcon className={classes.warningIcon} color="info" />
+              <Grid item xs={11}>
+                <Typography>
+                  <b>Note</b> : la biologie (table measurement) et les comptes-rendus (table note) ne sont pas
+                  disponibles à l’export csv.
+                </Typography>
+              </Grid>
+            </Grid>
 
             <Grid container justifyContent="space-between" alignItems="center">
               <Typography className={classes.tableTitle} variant="h6">
