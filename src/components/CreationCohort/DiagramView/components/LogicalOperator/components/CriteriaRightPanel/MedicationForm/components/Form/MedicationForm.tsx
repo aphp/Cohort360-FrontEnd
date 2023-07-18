@@ -124,8 +124,7 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
 
         <Alert severity="warning">
           Données actuellement disponibles : Circuit du médicament ORBIS. Pour plus d'informations sur les prochaines
-          intégrations de données, veuillez vous référer au tableau trimestriel de disponibilité des données
-          disponible&nbsp;
+          intégrations de données, veuillez vous référer au tableau trimestriel de disponibilité des données disponible{' '}
           <Link
             href="https://eds.aphp.fr/sites/default/files/2023-01/EDS_Disponibilite_donnees_site_EDS_202212.pdf"
             target="_blank"
@@ -181,7 +180,6 @@ const MedicationForm: React.FC<MedicationFormProps> = (props) => {
               onChange={(e, value) => onChangeValue('type', value)}
             >
               <FormControlLabel value="MedicationRequest" control={<Radio color="secondary" />} label="Prescription" />
-              {/* <FormControlLabel value="dispensation" control={<Radio color="secondary"/>} label="Dispensation" /> */}
               <FormControlLabel
                 value="MedicationAdministration"
                 control={<Radio color="secondary" />}

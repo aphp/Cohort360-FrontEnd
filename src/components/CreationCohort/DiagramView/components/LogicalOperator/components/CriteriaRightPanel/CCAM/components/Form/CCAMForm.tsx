@@ -85,7 +85,7 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
 
         <Alert severity="warning">
           Données actuellement disponibles : PMSI ORBIS. Pour plus d'informations sur les prochaines intégrations de
-          données, veuillez vous référer au tableau trimestriel de disponibilité des données disponible&nbsp;
+          données, veuillez vous référer au tableau trimestriel de disponibilité des données disponible{' '}
           <Link
             href="https://eds.aphp.fr/sites/default/files/2023-01/EDS_Disponibilite_donnees_site_EDS_202212.pdf"
             target="_blank"
