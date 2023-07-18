@@ -84,6 +84,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
   async ({ selectedTab, groupId, options }, { getState }) => {
     const patientState = getState().patient
     const currentPmsiState = patientState?.pmsi ? patientState?.pmsi[selectedTab] ?? { total: null } : { total: null }
+    const WILDCARD = '*'
 
     const patientId = patientState?.patientInfo?.id ?? ''
     if (!patientId) {
@@ -95,7 +96,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
     const sortBy = options?.sort?.by ?? ''
     const sortDirection = options?.sort?.direction ?? ''
     const page = options?.page ?? 1
-    const searchInput = options?.filters?.searchInput ?? ''
+    const searchInput = options?.filters?.searchInput + WILDCARD ?? ''
     const code = options?.filters?.code ?? ''
     const diagnosticTypes = options?.filters?.diagnosticTypes ?? []
     const nda = options?.filters?.nda ?? ''
