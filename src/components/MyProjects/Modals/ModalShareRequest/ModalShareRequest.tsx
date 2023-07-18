@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -41,16 +41,11 @@ const ModalShareRequest: React.FC<{
   const [currentRequest, setCurrentRequest] = useState<RequestType | null | undefined>(selectedCurrentRequest)
   const [currentUserToShare, setCurrentUserToShare] = useState<Provider[] | null>(null)
   const [error, setError] = useState<'error_title' | 'error_user_share_list' | null>(null)
-  const [shareMessage, setShareMessage] = useState<SimpleStatus>(null)
   const [notifyByEmail, setNotifyByEmail] = useState(false)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNotifyByEmail(event.target.checked)
   }
-
-  useEffect(() => {
-    parentStateSetter(shareMessage)
-  }, [parentStateSetter, shareMessage])
 
   const _onChangeValue = (key: 'name' | 'requestName' | 'usersToShare', value: string | string | Provider[]) => {
     if (value && typeof value !== 'string') {
@@ -80,10 +75,10 @@ const ModalShareRequest: React.FC<{
     }
 
     const shareRequestResponse = await services.projects.shareRequest(currentRequest, notifyByEmail)
-    if (shareRequestResponse.status === 201) {
-      setShareMessage('success')
+    if (shareRequestResponse?.status === 201) {
+      parentStateSetter('success')
     } else {
-      setShareMessage('error')
+      parentStateSetter('error')
     }
     onClose()
   }
