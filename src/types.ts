@@ -15,6 +15,14 @@ import {
   Procedure
 } from 'fhir/r4'
 
+export enum CohortJobStatus {
+  _long_pending = 'long_pending',
+  _failed = 'failed',
+  _finished = 'finished',
+  _pending = 'pending',
+  _new = 'new'
+}
+
 export enum DocumentReferenceStatusKind {
   _current = 'current',
   _superseded = 'superseded',
