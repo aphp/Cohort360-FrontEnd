@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from 'react'
+import React, { useState, useEffect, Fragment, PropsWithChildren } from 'react'
 
 import { Autocomplete, CircularProgress, Grid, TextField, Typography } from '@mui/material'
 
@@ -21,7 +21,10 @@ type RequestShareFormProps = {
   error: 'error_title' | 'error_user_share_list' | null
 }
 
-const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onChangeValue, error }) => {
+const RequestShareForm: React.FC<PropsWithChildren<RequestShareFormProps>> = (
+  props: PropsWithChildren<RequestShareFormProps>
+) => {
+  const { currentRequest, onChangeValue, error, children } = props
   const [providersSearchResults, setProvidersSearchResults] = useState<Provider[]>([])
   const [loadingOnSearch, setLoadingOnSearch] = useState(false)
   const [usersToShare] = useState<Provider[]>([])
@@ -144,6 +147,9 @@ const RequestShareForm: React.FC<RequestShareFormProps> = ({ currentRequest, onC
             usersAssociated={usersToShare}
           />
         </div>
+      </Grid>
+      <Grid container direction="column">
+        {children}
       </Grid>
     </>
   )

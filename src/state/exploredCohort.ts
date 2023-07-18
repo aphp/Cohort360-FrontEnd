@@ -103,83 +103,11 @@ const fetchExploredCohort = createAsyncThunk<
     default:
       break
   }
-  let cohort
+  const fetchCohortAction = dispatch(fetchExploredCohortInBackground({ context, id }))
   if (shouldRefreshData || forceReload) {
-    switch (context) {
-      case 'cohort': {
-        if (id) {
-          cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
-          if (cohort) {
-            cohort.cohortId = id
-            const cohortRights = await services.cohorts.fetchCohortsRights([{ fhir_group_id: id }])
-            if (cohortRights?.[0].rights) {
-              if (
-                cohortRights?.[0]?.rights?.read_patient_pseudo === false &&
-                cohortRights?.[0]?.rights?.read_patient_nomi === false
-              ) {
-                throw new Error("You don't have any rights on this cohort")
-              } else {
-                cohort.canMakeExport = !!ODD_EXPORT ? cohortRights?.[0]?.rights?.export_csv_nomi : false
-
-                cohort.deidentifiedBoolean = cohortRights?.[0]?.rights?.read_patient_pseudo
-                  ? cohortRights?.[0]?.rights?.read_patient_nomi
-                    ? false
-                    : true
-                  : false
-              }
-            } else {
-              throw new Error("You don't have any rights on this cohort")
-            }
-          }
-        }
-        break
-      }
-      case 'patients': {
-        cohort = (await services.patients.fetchMyPatients()) as ExploredCohortState
-        const perimeters = await services.perimeters.getPerimeters()
-        if (cohort) {
-          cohort.name = '-'
-          cohort.description = ''
-          cohort.requestId = ''
-          cohort.favorite = false
-          cohort.uuid = ''
-          cohort.canMakeExport = false
-          cohort.deidentifiedBoolean = perimeters.some(
-            (perimeter) => servicesPerimeters.getAccessFromScope(perimeter) === 'Pseudonymisé'
-          )
-        }
-        break
-      }
-      case 'perimeters': {
-        if (id) {
-          cohort = (await services.perimeters.fetchPerimetersInfos(id)) as ExploredCohortState
-          if (cohort) {
-            cohort.name = '-'
-            cohort.description = ''
-            cohort.requestId = ''
-            cohort.favorite = false
-            cohort.uuid = ''
-            cohort.canMakeExport = false
-            cohort.deidentifiedBoolean =
-              cohort.cohort && cohort.cohort && Array.isArray(cohort.cohort)
-                ? cohort.cohort.some((cohort) =>
-                    cohort.extension?.some(
-                      ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
-                    )
-                  ) ?? true
-                : true
-          }
-        }
-        break
-      }
-
-      default:
-        break
-    }
-  } else {
-    dispatch(fetchExploredCohortInBackground({ context, id }))
+    return await fetchCohortAction.unwrap()
   }
-  return cohort ?? state.exploredCohort
+  return state.exploredCohort
 })
 
 const fetchExploredCohortInBackground = createAsyncThunk<
@@ -195,18 +123,26 @@ const fetchExploredCohortInBackground = createAsyncThunk<
       if (id) {
         cohort = (await services.cohorts.fetchCohort(id)) as ExploredCohortState
         if (cohort) {
+          cohort.cohortId = id
           const cohortRights = await services.cohorts.fetchCohortsRights([{ fhir_group_id: id }])
-          const cohortRight = cohortRights && cohortRights[0]
-          cohort.canMakeExport =
-            (!!ODD_EXPORT &&
-              cohortRight?.extension?.some(
-                ({ url, valueString }) => url === 'EXPORT_ACCESS' && valueString === 'DATA_NOMINATIVE'
-              )) ??
-            false
-          cohort.deidentifiedBoolean =
-            cohortRight?.extension?.some(
-              ({ url, valueString }) => url === 'READ_ACCESS' && valueString === 'DATA_PSEUDOANONYMISED'
-            ) ?? true
+          if (cohortRights?.[0].rights) {
+            if (
+              cohortRights?.[0]?.rights?.read_patient_pseudo === false &&
+              cohortRights?.[0]?.rights?.read_patient_nomi === false
+            ) {
+              throw new Error("You don't have any rights on this cohort")
+            } else {
+              cohort.canMakeExport = !!ODD_EXPORT ? cohortRights?.[0]?.rights?.export_csv_nomi : false
+
+              cohort.deidentifiedBoolean = cohortRights?.[0]?.rights?.read_patient_pseudo
+                ? cohortRights?.[0]?.rights?.read_patient_nomi
+                  ? false
+                  : true
+                : false
+            }
+          } else {
+            throw new Error("You don't have any rights on this cohort")
+          }
         }
       }
       break
@@ -249,6 +185,9 @@ const fetchExploredCohortInBackground = createAsyncThunk<
       }
       break
     }
+
+    default:
+      break
   }
   return cohort ?? state.exploredCohort
 })
