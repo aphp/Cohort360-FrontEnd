@@ -54,8 +54,8 @@ A contributing guide will be published soon.
 ## Partners
 
 * AP-HP Clinical Data Warehouse
-* Arkhn : arkhn.org
-* Akimed : akimed.io
+* Arkhn : [arkhn.org](https://arkhn.org/)
+* Akimed : [www.akimed.io](https://www.akimed.io/)
 
 ## Contributors
 
