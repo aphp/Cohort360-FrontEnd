@@ -354,6 +354,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                       }}
                                       disabled={
                                         !canExportThisCohort ||
+                                        !row.exportable ||
                                         maintenanceIsActive ||
                                         row.request_job_status === CohortJobStatus._long_pending ||
                                         row.request_job_status === CohortJobStatus._failed ||
