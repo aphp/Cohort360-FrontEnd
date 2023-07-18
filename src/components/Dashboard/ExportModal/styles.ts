@@ -33,14 +33,10 @@ const useStyles = makeStyles()((theme: Theme) => ({
     }
   },
   warningInfo: {
-    marginTop: '20px'
+    marginTop: '15px'
   },
   warningIcon: {
-    position: 'absolute',
-    marginLeft: '10px'
-  },
-  info: {
-    marginLeft: '50px'
+    marginRight: '15px'
   }
 }))
 
