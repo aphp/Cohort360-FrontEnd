@@ -60,26 +60,30 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
   const controllerRef = useRef<AbortController>(new AbortController())
 
   const fetchDocumentsList = async () => {
-    const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
-    dispatch(
-      fetchDocuments({
-        signal: controllerRef.current?.signal,
-        groupId,
-        options: {
-          page,
-          searchBy: searchBy,
-          sort: {
-            by: order.orderBy,
-            direction: order.orderDirection
-          },
-          filters: {
-            ...filters,
-            searchInput,
-            selectedDocTypes: selectedDocTypesCodes
+    try {
+      const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
+      await dispatch(
+        fetchDocuments({
+          signal: controllerRef.current?.signal,
+          groupId,
+          options: {
+            page,
+            searchBy: searchBy,
+            sort: {
+              by: order.orderBy,
+              direction: order.orderDirection
+            },
+            filters: {
+              ...filters,
+              searchInput,
+              selectedDocTypes: selectedDocTypesCodes
+            }
           }
-        }
-      })
-    )
+        })
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   const onChangeOptions = (key: string, value: any) => {
@@ -143,7 +147,6 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     if (loading) {
       controllerRef.current = _cancelPendingRequest(controllerRef.current)
       fetchDocumentsList()
-      setLoading(false)
     }
   }, [loading])
 

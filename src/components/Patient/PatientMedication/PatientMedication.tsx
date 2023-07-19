@@ -52,20 +52,24 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   const controllerRef = useRef<AbortController | null>(null)
 
   const _fetchMedication = async () => {
-    dispatch(
-      fetchMedication({
-        selectedTab,
-        groupId,
-        options: {
-          page,
-          sort: {
-            by: order.orderBy,
-            direction: order.orderDirection
-          },
-          filters: filters
-        }
-      })
-    )
+    try {
+      await dispatch(
+        fetchMedication({
+          selectedTab,
+          groupId,
+          options: {
+            page,
+            sort: {
+              by: order.orderBy,
+              direction: order.orderDirection
+            },
+            filters: filters
+          }
+        })
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleDeleteChip = (
@@ -107,7 +111,6 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
     if (loading) {
       controllerRef.current = _cancelPendingRequest(controllerRef.current)
       _fetchMedication()
-      setLoading(false)
     }
   }, [loading])
 
