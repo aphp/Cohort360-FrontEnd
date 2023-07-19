@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import Grid from '@mui/material/Grid'
 
@@ -17,6 +17,8 @@ import { fetchMedication } from 'state/patient'
 import { buildMedicationFiltersChips } from 'utils/chips'
 
 import useStyles from './styles'
+import { useDebounce } from 'utils/debounce'
+import { _cancelPendingRequest } from 'utils/abortController'
 
 type PatientMedicationTypes = {
   groupId?: string
@@ -28,26 +30,9 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
     patient: state.patient
   }))
 
-  const [selectedTab, selectTab] = useState<'prescription' | 'administration'>('prescription')
-
-  const medicationPatient = patient?.medication ?? {}
-  const currentMedication = medicationPatient[selectedTab] ?? {
-    loading: false,
-    count: 0,
-    total: 0,
-    list: []
-  }
-
-  const loading = currentMedication.loading ?? false
-  const deidentifiedBoolean = patient?.deidentified ?? false
-  const totalMedication = currentMedication.count ?? 0
-  const totalAllMedication = currentMedication.total ?? 0
-
-  const [patientMedicationList, setPatientMedicationList] = useState<any[]>([])
-
+  const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState<string | null>(null)
   const [page, setPage] = useState(1)
-
   const [filters, setFilters] = useState<MedicationsFilters & { searchInput: string }>({
     searchInput: '',
     nda: '',
@@ -56,9 +41,17 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
     startDate: null,
     endDate: null
   })
+  const [selectedTab, selectTab] = useState<'prescription' | 'administration'>('prescription')
   const [order, setOrder] = useState<Order>({ orderBy: 'Period-start', orderDirection: 'asc' })
+  const debouncedSearchValue = useDebounce(500, filters.searchInput)
+  const deidentifiedBoolean = patient?.deidentified ?? false
+  const totalMedication = patient?.medication?.[selectedTab]?.count ?? 0
+  const totalAllMedication = patient?.medication?.[selectedTab]?.total ?? 0
+  const patientMedicationList = patient?.medication?.[selectedTab]?.list ?? []
 
-  const _fetchMedication = async (page: number) => {
+  const controllerRef = useRef<AbortController | null>(null)
+
+  const _fetchMedication = async () => {
     dispatch(
       fetchMedication({
         selectedTab,
@@ -73,11 +66,6 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
         }
       })
     )
-  }
-
-  const handleChangePage = (value?: number) => {
-    setPage(value ? value : 1)
-    _fetchMedication(value ? value : 1)
   }
 
   const handleDeleteChip = (
@@ -98,8 +86,30 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   }
 
   useEffect(() => {
-    handleChangePage()
-  }, [filters, order]) // eslint-disable-line
+    setLoading(true)
+    setPage(1)
+  }, [
+    debouncedSearchValue,
+    filters.nda,
+    filters.startDate,
+    filters.endDate,
+    filters.selectedPrescriptionTypes,
+    filters.selectedAdministrationRoutes,
+    order.orderBy,
+    order.orderDirection
+  ])
+
+  useEffect(() => {
+    setLoading(true)
+  }, [page])
+
+  useEffect(() => {
+    if (loading) {
+      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      _fetchMedication()
+      setLoading(false)
+    }
+  }, [loading])
 
   useEffect(() => {
     setPage(1)
@@ -111,19 +121,8 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
       startDate: null,
       endDate: null
     })
-    setOrder({ orderBy: 'Period-start', orderDirection: 'asc' })
-  }, [selectedTab]) // eslint-disable-line
-
-  useEffect(() => {
-    const medicationPatient = patient?.medication ?? {}
-    const currentMedication = medicationPatient[selectedTab] ?? {
-      loading: false,
-      count: 0,
-      total: 0,
-      list: []
-    }
-    setPatientMedicationList(currentMedication.list)
-  }, [currentMedication, currentMedication?.list]) // eslint-disable-line
+    setOrder({ orderBy: 'Period-start', orderDirection: 'desc' })
+  }, [selectedTab])
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
@@ -166,7 +165,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
         order={order}
         setOrder={setOrder}
         page={page}
-        setPage={(newPage) => handleChangePage(newPage)}
+        setPage={(newPage) => setPage(newPage)}
         total={totalMedication}
       />
 

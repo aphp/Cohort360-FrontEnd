@@ -365,6 +365,7 @@ type fetchProcedureProps = {
   maxDate?: string
   _text?: string
   status?: string
+  signal?: AbortSignal
   'encounter-identifier'?: string
 }
 export const fetchProcedure = async (args: fetchProcedureProps) => {
@@ -391,7 +392,9 @@ export const fetchProcedure = async (args: fetchProcedureProps) => {
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<Procedure>>(`/Procedure?${options.reduce(optionsReducer)}`)
+  const response = await apiFhir.get<FHIR_API_Response<Procedure>>(`/Procedure?${options.reduce(optionsReducer)}`, {
+    signal: args.signal
+  })
 
   return response
 }
@@ -414,6 +417,7 @@ type fetchClaimProps = {
   _text?: string
   status?: string
   'encounter-identifier'?: string
+  signal?: AbortSignal
 }
 export const fetchClaim = async (args: fetchClaimProps) => {
   const { size, offset, _sort, sortDirection, subject, patient, diagnosis, _text, status, minCreated, maxCreated } =
@@ -440,7 +444,9 @@ export const fetchClaim = async (args: fetchClaimProps) => {
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<Claim>>(`/Claim?${options.reduce(optionsReducer)}`)
+  const response = await apiFhir.get<FHIR_API_Response<Claim>>(`/Claim?${options.reduce(optionsReducer)}`, {
+    signal: args.signal
+  })
 
   return response
 }
@@ -465,6 +471,7 @@ type fetchConditionProps = {
   'min-recorded-date'?: string
   'max-recorded-date'?: string
   'encounter-identifier'?: string
+  signal?: AbortSignal
 }
 export const fetchCondition = async (args: fetchConditionProps) => {
   const { size, offset, _sort, sortDirection, subject, patient, code, _text, status } = args
@@ -480,7 +487,7 @@ export const fetchCondition = async (args: fetchConditionProps) => {
   // By default, all the calls to `/Condition` will have 'patient-active=true' in parameter
   let options: string[] = ['patient-active=true']
   if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
+  if (offset !== undefined) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (subject) options = [...options, `subject=${subject}`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
@@ -494,7 +501,9 @@ export const fetchCondition = async (args: fetchConditionProps) => {
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
   if (type && type.length > 0) options = [...options, `type=${type.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<Condition>>(`/Condition?${options.reduce(optionsReducer)}`)
+  const response = await apiFhir.get<FHIR_API_Response<Condition>>(`/Condition?${options.reduce(optionsReducer)}`, {
+    signal: args.signal
+  })
 
   return response
 }
@@ -585,7 +594,7 @@ export const fetchMedicationRequest = async (args: fetchMedicationRequestProps) 
   let options: string[] = ['patient-active=true']
   if (id) options = [...options, `id=${id}`] // eslint-disable-line
   if (size !== undefined) options = [...options, `_count=${size}`] // eslint-disable-line
-  if (offset) options = [...options, `offset=${offset}`] // eslint-disable-line
+  if (offset !== undefined) options = [...options, `offset=${offset}`] // eslint-disable-line
   if (_sort) options = [...options, `_sort=${_sortDirection}${_sort},id`] // eslint-disable-line
   if (patient) options = [...options, `patient=${patient}`] // eslint-disable-line
   if (encounter) options = [...options, `encounter-identifier=${encounter}`] // eslint-disable-line

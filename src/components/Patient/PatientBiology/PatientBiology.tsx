@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { Alert, Grid, Typography } from '@mui/material'
 
@@ -18,6 +18,7 @@ import { buildObservationFiltersChips } from 'utils/chips'
 import useStyles from './styles'
 import { Checkbox } from '@mui/material'
 import { useDebounce } from 'utils/debounce'
+import { _cancelPendingRequest } from 'utils/abortController'
 
 type PatientBiologyTypes = {
   groupId?: string
@@ -32,29 +33,23 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     patient: state.patient
   }))
 
-  const loading = patient?.biology?.loading ?? false
+  const [loading, setLoading] = useState(false)
   const deidentifiedBoolean = patient?.deidentified ?? false
   const totalBiology = patient?.biology?.count ?? 0
   const totalAllBiology = patient?.biology?.total ?? 0
-
   const observationsListState = patient?.biology?.list ?? []
 
   const [page, setPage] = useState(1)
-
   const [searchInput, setSearchInput] = useState('')
-
   const debouncedSearchValue = useDebounce(500, searchInput)
-
   const [open, setOpen] = useState<string | null>(null)
-
   const [filters, setFilters] = useState<ObservationFilters>(filtersDefault)
-
-  const validatedStatus = true
-
+  const [validatedStatus, setValidatedStatus] = useState(true)
   const [order, setOrder] = useState<Order>({
     orderBy: 'effectiveDatetime',
     orderDirection: 'asc'
   })
+  const controllerRef = useRef<AbortController | null>(null)
 
   const _fetchBiology = async () => {
     dispatch(
@@ -95,8 +90,29 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   }
 
   useEffect(() => {
-    _fetchBiology()
-  }, [debouncedSearchValue, filters, order, validatedStatus, page])
+    setLoading(true)
+    setPage(1)
+  }, [
+    debouncedSearchValue,
+    filters.anabio,
+    filters.nda,
+    filters.endDate,
+    filters.startDate,
+    order.orderBy,
+    order.orderDirection
+  ])
+
+  useEffect(() => {
+    setLoading(true)
+  }, [page])
+
+  useEffect(() => {
+    if (loading) {
+      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      _fetchBiology()
+      setLoading(false)
+    }
+  }, [loading])
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>

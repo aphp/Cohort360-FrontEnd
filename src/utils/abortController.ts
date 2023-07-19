@@ -1,3 +1,6 @@
-export const _cancelPendingRequest = (controller: AbortController) => {
-  controller.abort()
+export const _cancelPendingRequest = (controller: AbortController | null): AbortController => {
+  if (controller?.signal && !controller?.signal?.aborted) {
+    controller.abort()
+  }
+  return new AbortController()
 }
