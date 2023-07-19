@@ -20,6 +20,7 @@ import {
   Procedure
 } from 'fhir/r4'
 import { Observation } from 'fhir/r4'
+import { Search } from '@mui/icons-material'
 
 const reducer = (accumulator: any, currentValue: any) =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
@@ -649,20 +650,26 @@ export const fetchMedicationAdministration = async (args: fetchMedicationAdminis
 type fetchScopeProps = {
   perimetersIds?: string[]
   cohortIds?: string[]
+  search?: string
+  page?: number
   type: string[]
 }
-export const fetchScope: (args: fetchScopeProps) => Promise<AxiosResponse<IScope | unknown>> = async (
-  args: fetchScopeProps
-) => {
-  const { perimetersIds, cohortIds, type } = args
+export const fetchScope: (
+  args: fetchScopeProps,
+  signal?: AbortSignal
+) => Promise<AxiosResponse<IScope | unknown>> = async (args: fetchScopeProps, signal?: AbortSignal) => {
+  const { perimetersIds, cohortIds, search, page, type } = args
 
   let options: string[] = []
+  if (search) options = [...options, `search=${search}`] // eslint-disable-line
+  if (page) options = [...options, `page=${page}`] // eslint-disable-line
   if (perimetersIds && perimetersIds.length > 0) options = [...options, `local_id=${perimetersIds.join(',')}`] // eslint-disable-line
   if (cohortIds && cohortIds.length > 0) options = [...options, `cohort_id=${cohortIds.join(',')}`] // eslint-disable-line
   if (type && type.length > 0) options = [...options, `type_source_value=${type.join(',')}`] // eslint-disable-line
 
   const response: AxiosResponse<IScope | unknown> = await apiBackend.get(
-    `accesses/perimeters/read-patient/?${options.reduce(optionsReducer)}`
+    `accesses/perimeters/read-patient/?${options.reduce(optionsReducer)}`,
+    { signal: signal }
   )
   return response
 }
