@@ -20,7 +20,6 @@ import {
   Procedure
 } from 'fhir/r4'
 import { Observation } from 'fhir/r4'
-import { Search } from '@mui/icons-material'
 
 const reducer = (accumulator: any, currentValue: any) =>
   accumulator ? `${accumulator},${currentValue}` : currentValue ? currentValue : accumulator
