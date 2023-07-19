@@ -44,7 +44,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   const debouncedSearchValue = useDebounce(500, searchInput)
   const [open, setOpen] = useState<string | null>(null)
   const [filters, setFilters] = useState<ObservationFilters>(filtersDefault)
-  const [validatedStatus, setValidatedStatus] = useState(true)
+  const [validatedStatus] = useState(true)
   const [order, setOrder] = useState<Order>({
     orderBy: 'effectiveDatetime',
     orderDirection: 'asc'
