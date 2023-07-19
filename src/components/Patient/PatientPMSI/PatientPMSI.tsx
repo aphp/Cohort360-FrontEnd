@@ -18,6 +18,7 @@ import { PMSIFilters, Order } from 'types'
 
 import useStyles from './styles'
 import { useDebounce } from 'utils/debounce'
+import { _cancelPendingRequest } from 'utils/abortController'
 
 type PatientPMSITypes = {
   groupId?: string
@@ -49,16 +50,18 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   })
   const [open, setOpen] = useState(false)
 
+  /* TODO => enlever l'appel de redux */
   const { patient } = useAppSelector((state) => ({
     patient: state.patient
   }))
-  const loading = patient?.pmsi?.[selectedTab]?.loading ?? false
+  const [loading, setLoading] = useState(false)
+
   const deidentifiedBoolean = patient?.deidentified ?? false
   const totalPmsi = patient?.pmsi?.[selectedTab]?.count ?? 0
   const totalAllPmsi = patient?.pmsi?.[selectedTab]?.total ?? 0
   const patientPmsiList = patient?.pmsi?.[selectedTab]?.list || []
 
-  const controllerRef = useRef<AbortController | null>()
+  const controllerRef = useRef<AbortController | null>(null)
 
   const _fetchPMSI = async () => {
     const selectedDiagnosticTypesCodes = filters.selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
@@ -76,13 +79,10 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
             ...filters,
             diagnosticTypes: selectedDiagnosticTypesCodes
           }
-        }
+        },
+        signal: controllerRef.current?.signal
       })
     )
-  }
-
-  const handleChangePage = (value?: number) => {
-    setPage(value ? value : 1)
   }
 
   const onChangeOptions = (key: string, value: any) => {
@@ -110,9 +110,9 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
         break
     }
   }
-
   useEffect(() => {
-    _fetchPMSI()
+    setLoading(true)
+    setPage(1)
   }, [
     debouncedSearchValue,
     filters.nda,
@@ -121,9 +121,20 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
     filters.endDate,
     filters.selectedDiagnosticTypes,
     order.orderBy,
-    order.orderDirection,
-    page
+    order.orderDirection
   ])
+
+  useEffect(() => {
+    setLoading(true)
+  }, [page])
+
+  useEffect(() => {
+    if (loading) {
+      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      _fetchPMSI()
+      setLoading(false)
+    }
+  }, [loading])
 
   useEffect(() => {
     setPage(1)
@@ -180,7 +191,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
         order={order}
         setOrder={setOrder}
         page={page}
-        setPage={(newPage) => handleChangePage(newPage)}
+        setPage={(newPage) => setPage(newPage)}
         total={totalPmsi}
       />
 

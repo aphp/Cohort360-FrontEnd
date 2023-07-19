@@ -73,6 +73,7 @@ type FetchPmsiParams = {
       direction: string
     }
   }
+  signal?: AbortSignal
 }
 type FetchPmsiReturn =
   | { diagnostic: IPatientPmsi<Condition> }
@@ -81,7 +82,7 @@ type FetchPmsiReturn =
   | undefined
 const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: RootState }>(
   'patient/fetchPmsi',
-  async ({ selectedTab, groupId, options }, { getState }) => {
+  async ({ selectedTab, groupId, options, signal }, { getState }) => {
     const patientState = getState().patient
     const currentPmsiState = patientState?.pmsi ? patientState?.pmsi[selectedTab] ?? { total: null } : { total: null }
     const WILDCARD = '*'
@@ -115,7 +116,8 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       sortDirection,
       groupId,
       startDate,
-      endDate
+      endDate,
+      signal
     )
 
     if (pmsiResponse.pmsiData === undefined) return undefined

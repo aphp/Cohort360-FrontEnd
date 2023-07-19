@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, MutableRefObject } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import moment from 'moment'
 
 import Grid from '@mui/material/Grid'
@@ -55,13 +55,13 @@ const PatientList: React.FC<PatientListProps> = ({
   const [loadingStatus, setLoadingStatus] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
-  const [agePyramid, setAgePyramid] = useState<AgeRepartitionType | undefined>(undefined)
-
+  const [agePyramid, setAgePyramid] = useState<AgeRepartitionType | undefined>(agePyramidData)
   const [patientData, setPatientData] = useState<
     { vitalStatusData?: SimpleChartDataType[]; genderData?: SimpleChartDataType[] } | undefined
-  >(undefined)
-  const [open, setOpen] = useState(false)
+  >(getGenderRepartitionSimpleData(genderRepartitionMap))
+  const debouncedSearchInput = useDebounce(500, searchInput)
 
+  const [open, setOpen] = useState(false)
   const [filters, setFilters] = useState<PatientFiltersType>({
     gender: [],
     birthdatesRanges: ['', ''],
@@ -73,88 +73,56 @@ const PatientList: React.FC<PatientListProps> = ({
     orderDirection: 'asc'
   })
 
-  const debouncedSearchInput = useDebounce(500, searchInput)
-  const controllerRef = useRef<AbortController>(new AbortController())
+  const controllerRef = useRef<AbortController | null>(null)
 
-  useEffect(() => {
-    setAgePyramid(agePyramidData)
-  }, [agePyramidData])
-
-  useEffect(() => {
-    setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
-  }, [genderRepartitionMap])
-
-  useEffect(() => {
-    setPatientsList(patients)
-  }, [patients])
-
-  const fetchPatients = async (
-    pageValue = 1,
-    includeFacets: boolean,
-    inputSearch = searchInput,
-    _searchBy = searchBy
-  ) => {
-    setLoadingStatus(true)
-    // Set loader on chart
-    if (includeFacets) {
-      setPatientData(undefined)
-      setAgePyramid(undefined)
-    }
-    // Set search state
-    if (inputSearch !== searchInput) setSearchInput(inputSearch)
-    if (_searchBy !== searchBy) setSearchBy(_searchBy)
+  const fetchPatients = async () => {
+    const includeFacets = page === 1
     const birthdates: [string, string] = [
       moment(substructAgeString(filters.birthdatesRanges[0])).format('MM/DD/YYYY'),
       moment(substructAgeString(filters.birthdatesRanges[1])).format('MM/DD/YYYY')
     ]
 
-    const result = await services.cohorts.fetchPatientList(
-      pageValue,
-      _searchBy,
-      inputSearch,
-      filters.gender,
-      birthdates,
-      filters.vitalStatus,
-      order.orderBy,
-      order.orderDirection,
-      deidentified ?? true,
-      groupId,
-      includeFacets,
-      controllerRef.current?.signal
-    )
-    if (result) {
-      const { totalPatients, originalPatients, genderRepartitionMap, agePyramidData } = result
-      setPatientsList(originalPatients)
-      if (includeFacets) {
-        setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
-        setAgePyramid(agePyramidData)
+    try {
+      const result = await services.cohorts.fetchPatientList(
+        page,
+        searchBy,
+        debouncedSearchInput,
+        filters.gender,
+        birthdates,
+        filters.vitalStatus,
+        order.orderBy,
+        order.orderDirection,
+        deidentified ?? true,
+        groupId,
+        includeFacets,
+        controllerRef.current?.signal
+      )
+      if (result) {
+        const { totalPatients, originalPatients, genderRepartitionMap, agePyramidData } = result
+        setPatientsList(originalPatients)
+        if (includeFacets) {
+          setPatientData(getGenderRepartitionSimpleData(genderRepartitionMap))
+          setAgePyramid(agePyramidData)
+        }
+        setPatientsResult((ps) => ({ ...ps, nb: totalPatients }))
       }
-      setPatientsResult((ps) => ({ ...ps, nb: totalPatients }))
+    } catch (e) {
+      console.error('Error while fetching patients list')
+    } finally {
+      setLoadingStatus(false)
     }
-    setLoadingStatus(false)
   }
 
-  const onSearchPatient = (inputSearch?: string, searchBy?: SearchByTypes) => {
-    setSearchInput(inputSearch ?? '')
-    setSearchBy(searchBy ?? SearchByTypes.text)
+  const onChangeOptions = (key: string, value: any) => {
+    setFilters((prevState) => ({
+      ...prevState,
+      [key]: value
+    }))
   }
 
-  useEffect(() => {
-    _cancelPendingRequest(controllerRef.current)
-    setPage(1)
-    fetchPatients(1, true, debouncedSearchInput, searchBy)
-
-    /*   return () => {
-     _cancelPendingRequest(controllerRef.current)
-    } */
-  }, [filters, order, searchBy, debouncedSearchInput]) // eslint-disable-line
-
-  const handleChangePage = (value?: number) => {
-    setPage(value ?? 1)
-    //We only fetch patients if we don't already have them
-    if (patients && patients.length < patientsResult.nb) {
-      fetchPatients(value ?? 1, false)
-    }
+  const onSearch = (newSearchInput: string, newSearchBy: SearchByTypes) => {
+    setSearchInput(newSearchInput)
+    setSearchBy(newSearchBy)
   }
 
   const handleDeleteChip = <S extends string, T>(filterName: S, value?: T) => {
@@ -166,10 +134,7 @@ const PatientList: React.FC<PatientListProps> = ({
         }))
         break
       case 'birthdates':
-        setFilters((prevFilters) => ({
-          ...prevFilters,
-          birthdatesRanges: ['', '']
-        }))
+        onChangeOptions(filterName, ['', ''])
         break
       case 'vitalStatus':
         setFilters((prevFilters) => ({
@@ -179,10 +144,28 @@ const PatientList: React.FC<PatientListProps> = ({
         break
     }
   }
+  useEffect(() => {
+    setLoadingStatus(true)
+    setPage(1)
+  }, [filters, order, searchBy, debouncedSearchInput])
+
+  useEffect(() => {
+    setLoadingStatus(true)
+  }, [page])
+
+  useEffect(() => {
+    if (loadingStatus) {
+      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      fetchPatients()
+    }
+  }, [loadingStatus])
 
   return (
     <Grid container direction="column" alignItems="center">
-      <PatientCharts agePyramid={agePyramid} patientData={patientData} />
+      <PatientCharts
+        agePyramid={loadingStatus ? undefined : agePyramid}
+        patientData={loadingStatus ? undefined : patientData}
+      />
 
       <DataTableTopBar
         loading={loadingStatus}
@@ -194,8 +177,7 @@ const PatientList: React.FC<PatientListProps> = ({
                 type: 'patient',
                 value: searchInput,
                 searchBy: searchBy,
-                onSearch: (newSearchInput: string, newSearchBy?: SearchByTypes) =>
-                  onSearchPatient(newSearchInput, newSearchBy)
+                onSearch: onSearch
               }
         }
         buttons={[
@@ -217,7 +199,7 @@ const PatientList: React.FC<PatientListProps> = ({
         order={order}
         setOrder={setOrder}
         page={page}
-        setPage={(newPage) => handleChangePage(newPage)}
+        setPage={(newPage) => setPage(newPage)}
         total={patientsResult.nb}
       />
 

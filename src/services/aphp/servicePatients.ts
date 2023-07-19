@@ -116,7 +116,8 @@ export interface IServicePatients {
     sortDirection: string,
     groupId?: string,
     startDate?: string | null,
-    endDate?: string | null
+    endDate?: string | null,
+    signal?: AbortSignal
   ) => Promise<{
     pmsiData?: (Claim | Condition | Procedure)[]
     pmsiTotal?: number
@@ -386,7 +387,8 @@ const servicesPatients: IServicePatients = {
     sortDirection,
     groupId,
     startDate,
-    endDate
+    endDate,
+    signal
   ) => {
     let pmsiResp: AxiosResponse<FHIR_API_Response<Condition | Procedure | Claim>> | null = null
 
@@ -404,7 +406,8 @@ const servicesPatients: IServicePatients = {
           code: code,
           type: diagnosticTypes,
           'min-recorded-date': startDate ?? '',
-          'max-recorded-date': endDate ?? ''
+          'max-recorded-date': endDate ?? '',
+          signal
         })
         break
       case 'ccam':
@@ -419,7 +422,8 @@ const servicesPatients: IServicePatients = {
           'encounter-identifier': nda,
           code: code,
           minDate: startDate ?? '',
-          maxDate: endDate ?? ''
+          maxDate: endDate ?? '',
+          signal
         })
         break
       case 'ghm':
@@ -434,7 +438,8 @@ const servicesPatients: IServicePatients = {
           'encounter-identifier': nda,
           diagnosis: code,
           minCreated: startDate ?? '',
-          maxCreated: endDate ?? ''
+          maxCreated: endDate ?? '',
+          signal
         })
         break
       default:
