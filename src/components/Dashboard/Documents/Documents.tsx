@@ -143,12 +143,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   }
 
   useEffect(() => {
-    _cancelPendingRequest(controllerRef.current)
+    controllerRef.current = _cancelPendingRequest(controllerRef.current)
     handleChangePage(1)
-
-    /*   return () => {
-     _cancelPendingRequest(controllerRef.current)
-    } */
   }, [!!deidentifiedBoolean, filters, order, debouncedSearchInput, searchBy]) // eslint-disable-line
 
   const handleOpenDialog = () => {

@@ -33,15 +33,13 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
 
   const deidentified = patient?.deidentified ?? true
 
-  const loading = patient?.documents?.loading ?? true
   const totalDocs = patient?.documents?.count ?? 0
   const totalAllDoc = patient?.documents?.total ?? 0
   const searchInputError = patient?.documents?.searchInputError ?? undefined
-
   const patientDocumentsList = patient?.documents?.list ?? []
 
+  const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
-
   const [filters, setFilters] = useState<DocumentFilters>({
     nda: '',
     selectedDocTypes: [],
@@ -49,20 +47,19 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     endDate: null,
     onlyPdfAvailable: deidentified ? false : true
   })
-
   const [searchInput, setSearchInput] = useState('')
   const [order, setOrder] = useState<Order>({
     orderBy: 'date',
     orderDirection: 'desc'
   })
-
   const [searchMode, setSearchMode] = useState(false)
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
   const [open, setOpen] = useState<'filter' | null>(null)
   const debouncedSearchInput = useDebounce(500, searchInput)
+
   const controllerRef = useRef<AbortController>(new AbortController())
 
-  const fetchDocumentsList = async (page: number) => {
+  const fetchDocumentsList = async () => {
     const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
     dispatch(
       fetchDocuments({
@@ -83,33 +80,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         }
       })
     )
-
-    setSearchMode(!!searchInput)
   }
-
-  const handleChangePage = (value?: number) => {
-    setPage(value || 1)
-    fetchDocumentsList(value || 1)
-  }
-
-  useEffect(() => {
-    _cancelPendingRequest(controllerRef.current)
-    handleChangePage()
-
-    /*   return () => {
-     _cancelPendingRequest(controllerRef.current)
-    } */
-  }, [
-    debouncedSearchInput,
-    filters.onlyPdfAvailable,
-    filters.nda,
-    filters.selectedDocTypes,
-    filters.startDate,
-    filters.endDate,
-    order.orderBy,
-    order.orderDirection,
-    searchBy
-  ]) // eslint-disable-line
 
   const onChangeOptions = (key: string, value: any) => {
     setFilters((prevState) => ({
@@ -149,10 +120,32 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     }
   }
 
-  const onSearch = (inputSearch: string, _searchBy: SearchByTypes) => {
-    setSearchInput(inputSearch)
-    setSearchBy(_searchBy)
-  }
+  useEffect(() => {
+    setLoading(true)
+    setPage(1)
+  }, [
+    debouncedSearchInput,
+    filters.onlyPdfAvailable,
+    filters.nda,
+    filters.selectedDocTypes,
+    filters.startDate,
+    filters.endDate,
+    order.orderBy,
+    order.orderDirection,
+    searchBy
+  ])
+
+  useEffect(() => {
+    setLoading(true)
+  }, [page])
+
+  useEffect(() => {
+    if (loading) {
+      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      fetchDocumentsList()
+      setLoading(false)
+    }
+  }, [loading])
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
@@ -164,7 +157,11 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
           value: searchInput ? searchInput.replace(/^\/\(\.\)\*|\(\.\)\*\/$/gi, '') : '',
           error: searchInputError,
           searchBy: searchBy,
-          onSearch: (newSearchInput: string, newSearchBy: SearchByTypes) => onSearch(newSearchInput, newSearchBy)
+          onSearch: (newSearchInput: string, newSearchBy: SearchByTypes) => {
+            setSearchInput(newSearchInput)
+            setSearchBy(newSearchBy)
+            setSearchMode(!!searchInput)
+          }
         }}
         buttons={[
           {
@@ -201,7 +198,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         order={order}
         setOrder={setOrder}
         page={page}
-        setPage={(newPage: number) => handleChangePage(newPage)}
+        setPage={(newPage: number) => setPage(newPage)}
         total={totalDocs}
       />
 

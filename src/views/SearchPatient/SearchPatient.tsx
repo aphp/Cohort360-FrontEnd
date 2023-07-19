@@ -70,12 +70,9 @@ const SearchPatient: React.FC<{}> = () => {
   }
 
   useEffect(() => {
-    _cancelPendingRequest(controllerRef.current)
+    controllerRef.current = _cancelPendingRequest(controllerRef.current)
     setPage(1)
     performQueries(1)
-    /*   return () => {
-     _cancelPendingRequest(controllerRef.current)
-    } */
   }, [order, searchBy, debouncedSearchInput, controllerRef])
 
   const open = useAppSelector((state) => state.drawer)
