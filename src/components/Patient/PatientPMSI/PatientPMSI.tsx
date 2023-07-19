@@ -64,25 +64,29 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   const controllerRef = useRef<AbortController | null>(null)
 
   const _fetchPMSI = async () => {
-    const selectedDiagnosticTypesCodes = filters.selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
-    dispatch(
-      fetchPmsi({
-        selectedTab,
-        groupId,
-        options: {
-          page,
-          sort: {
-            by: order.orderBy,
-            direction: order.orderDirection
+    try {
+      const selectedDiagnosticTypesCodes = filters.selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
+      await dispatch(
+        fetchPmsi({
+          selectedTab,
+          groupId,
+          options: {
+            page,
+            sort: {
+              by: order.orderBy,
+              direction: order.orderDirection
+            },
+            filters: {
+              ...filters,
+              diagnosticTypes: selectedDiagnosticTypesCodes
+            }
           },
-          filters: {
-            ...filters,
-            diagnosticTypes: selectedDiagnosticTypesCodes
-          }
-        },
-        signal: controllerRef.current?.signal
-      })
-    )
+          signal: controllerRef.current?.signal
+        })
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
   const onChangeOptions = (key: string, value: any) => {
@@ -132,7 +136,6 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
     if (loading) {
       controllerRef.current = _cancelPendingRequest(controllerRef.current)
       _fetchPMSI()
-      setLoading(false)
     }
   }, [loading])
 

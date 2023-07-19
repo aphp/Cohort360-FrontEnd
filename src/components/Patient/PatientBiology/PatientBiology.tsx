@@ -52,30 +52,34 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   const controllerRef = useRef<AbortController | null>(null)
 
   const _fetchBiology = async () => {
-    dispatch(
-      fetchBiology({
-        groupId,
-        rowStatus: validatedStatus,
-        options: {
-          page,
-          sort: {
-            by: order.orderBy,
-            direction: order.orderDirection
-          },
-          filters: {
-            searchInput,
-            nda: filters.nda,
-            loinc: filters.loinc,
-            anabio: filters.anabio,
-            startDate: filters.startDate,
-            endDate: filters.endDate
+    try {
+      await dispatch(
+        fetchBiology({
+          groupId,
+          rowStatus: validatedStatus,
+          options: {
+            page,
+            sort: {
+              by: order.orderBy,
+              direction: order.orderDirection
+            },
+            filters: {
+              searchInput,
+              nda: filters.nda,
+              loinc: filters.loinc,
+              anabio: filters.anabio,
+              startDate: filters.startDate,
+              endDate: filters.endDate
+            }
           }
-        }
-      })
-    )
+        })
+      )
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleChangeFilter = (filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate', value: any) => {
+  const handleChangeFilter = (filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate') => {
     switch (filterName) {
       case 'nda':
       case 'loinc':
@@ -110,7 +114,6 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     if (loading) {
       controllerRef.current = _cancelPendingRequest(controllerRef.current)
       _fetchBiology()
-      setLoading(false)
     }
   }, [loading])
 
