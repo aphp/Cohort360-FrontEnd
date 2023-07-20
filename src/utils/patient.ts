@@ -1,14 +1,14 @@
-import { PatientGenderKind, VitalStatus } from 'types'
+import { GenderStatus, VitalStatus } from 'types'
 
-export const genderName = (gender: PatientGenderKind | null): string | null => {
+export const genderName = (gender: GenderStatus | null): string | null => {
   switch (gender) {
-    case PatientGenderKind._female:
+    case GenderStatus.FEMALE:
       return 'Genre: Femmes'
-    case PatientGenderKind._male:
+    case GenderStatus.MALE:
       return 'Genre: Hommes'
-    case PatientGenderKind._other:
+    case GenderStatus.OTHER:
       return 'Genre: Autre'
-    case PatientGenderKind._unknown:
+    case GenderStatus.UNKNOWN:
       return 'Genre: Inconnu'
     default:
       return null
@@ -17,9 +17,9 @@ export const genderName = (gender: PatientGenderKind | null): string | null => {
 
 export const vitalStatusName = (vitalStatus: VitalStatus | null): string | null => {
   switch (vitalStatus) {
-    case VitalStatus.alive:
+    case VitalStatus.ALIVE:
       return 'Patients vivants'
-    case VitalStatus.deceased:
+    case VitalStatus.DECEASED:
       return 'Patients décédés'
     default:
       return null
