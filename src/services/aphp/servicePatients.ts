@@ -117,7 +117,8 @@ export interface IServicePatients {
     groupId?: string,
     startDate?: string | null,
     endDate?: string | null,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    executiveUnit?: Array<string>
   ) => Promise<{
     pmsiData?: (Claim | Condition | Procedure)[]
     pmsiTotal?: number
@@ -173,7 +174,8 @@ export interface IServicePatients {
     groupId?: string,
     startDate?: string,
     endDate?: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    executiveUnit?: Array<string>
   ) => Promise<{
     medicationData?: MedicationEntry<MedicationAdministration | MedicationRequest>[]
     medicationTotal?: number
@@ -390,7 +392,8 @@ const servicesPatients: IServicePatients = {
     groupId,
     startDate,
     endDate,
-    signal
+    signal,
+    executiveUnit
   ) => {
     let pmsiResp: AxiosResponse<FHIR_API_Response<Condition | Procedure | Claim>> | null = null
 
@@ -409,7 +412,8 @@ const servicesPatients: IServicePatients = {
           type: diagnosticTypes,
           'min-recorded-date': startDate ?? '',
           'max-recorded-date': endDate ?? '',
-          signal
+          signal,
+          executiveUnit
         })
         break
       case 'ccam':
@@ -425,7 +429,8 @@ const servicesPatients: IServicePatients = {
           code: code,
           minDate: startDate ?? '',
           maxDate: endDate ?? '',
-          signal
+          signal,
+          executiveUnit
         })
         break
       case 'ghm':
@@ -441,7 +446,8 @@ const servicesPatients: IServicePatients = {
           diagnosis: code,
           minCreated: startDate ?? '',
           maxCreated: endDate ?? '',
-          signal
+          signal,
+          executiveUnit
         })
         break
       default:
@@ -501,7 +507,8 @@ const servicesPatients: IServicePatients = {
     groupId,
     startDate,
     endDate,
-    signal
+    signal,
+    executiveUnit
   ) => {
     let medicationResp: AxiosResponse<FHIR_API_Response<MedicationRequest | MedicationAdministration>> | null = null
 
@@ -519,7 +526,8 @@ const servicesPatients: IServicePatients = {
           type: selectedPrescriptionTypeIds,
           minDate: startDate,
           maxDate: endDate,
-          signal
+          signal,
+          executiveUnit
         })
         break
       case 'administration':
@@ -535,7 +543,8 @@ const servicesPatients: IServicePatients = {
           route: selectedAdministrationRouteIds,
           minDate: startDate,
           maxDate: endDate,
-          signal
+          signal,
+          executiveUnit
         })
         break
       default:

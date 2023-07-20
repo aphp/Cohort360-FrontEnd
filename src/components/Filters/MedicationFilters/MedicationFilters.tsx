@@ -24,9 +24,10 @@ import ClearIcon from '@mui/icons-material/Clear'
 import services from 'services/aphp'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
-import { MedicationsFilters } from 'types'
+import { CriteriaName, MedicationsFilters, ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
+import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
 
 type MedicationFiltersProps = {
   open: boolean
@@ -46,6 +47,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
   filters,
   setFilters
 }) => {
+  const label = 'Séléctionnez une unité exécutrice'
   const { classes } = useStyles()
 
   const [_nda, setNda] = useState<string>(filters.nda)
@@ -55,6 +57,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
   const [_selectedAdministrationRoutes, setSelectedAdministrationRoutes] = useState<any[]>(
     filters.selectedAdministrationRoutes
   )
+  const [_executiveUnit, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
   const [dateError, setDateError] = useState(false)
 
   const [prescriptionTypesList, setPrescriptionTypesList] = useState<any[]>([])
@@ -81,7 +84,8 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
       startDate: newStartDate,
       endDate: newEndDate,
       selectedPrescriptionTypes: _selectedPrescriptionTypes,
-      selectedAdministrationRoutes: _selectedAdministrationRoutes
+      selectedAdministrationRoutes: _selectedAdministrationRoutes,
+      executiveUnit: _executiveUnit?.map((r) => r.id)
     })
     onClose()
   }
@@ -237,6 +241,18 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
                 <ClearIcon />
               </IconButton>
             )}
+          </Grid>
+
+          <Grid item container direction="row" alignItems="center">
+            <PopulationCard
+              form={CriteriaName.Medication}
+              label={label}
+              title={label}
+              executiveUnits={_executiveUnit}
+              isAcceptEmptySelection={true}
+              isDeleteIcon={true}
+              onChangeExecutiveUnits={(yyyy) => setExecutiveUnits(yyyy)}
+            />
           </Grid>
           {dateError && (
             <Typography className={classes.dateError}>

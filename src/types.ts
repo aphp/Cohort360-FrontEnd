@@ -177,28 +177,26 @@ export type CohortFilters = {
 
 export type SimpleCodeType = { code: string; label: string; type: string }
 
-export type DocumentFilters = {
-  ipp?: string
+type GenericFilter = {
   nda: string
-  selectedDocTypes: SimpleCodeType[]
   startDate: string | null
   endDate: string | null
+  executiveUnit: Array<string> | undefined
+}
+
+export type DocumentFilters = GenericFilter & {
+  ipp?: string
+  selectedDocTypes: SimpleCodeType[]
   onlyPdfAvailable: boolean
 }
 
-export type MedicationsFilters = {
-  nda: string
-  startDate: string | null
-  endDate: string | null
+export type MedicationsFilters = GenericFilter & {
   selectedPrescriptionTypes: { id: string; label: string }[]
   selectedAdministrationRoutes: { id: string; label: string }[]
 }
 
-export type PMSIFilters = {
-  nda: string
+export type PMSIFilters = GenericFilter & {
   code: string
-  startDate: string | null
-  endDate: string | null
   selectedDiagnosticTypes: { id: string; label: string }[]
 }
 
@@ -208,12 +206,9 @@ export type PatientFilters = {
   vitalStatus: VitalStatus[]
 }
 
-export type ObservationFilters = {
-  nda: string
+export type ObservationFilters = GenericFilter & {
   loinc: string
   anabio: string
-  startDate: string | null
-  endDate: string | null
 }
 
 export type Sort = {

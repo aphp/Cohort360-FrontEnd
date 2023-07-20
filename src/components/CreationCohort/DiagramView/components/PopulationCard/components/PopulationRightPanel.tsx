@@ -32,7 +32,7 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
    * Render
    */
   return (
-    <Drawer anchor="right" open={open} onClose={onClose}>
+    <Drawer anchor="right" open={open} onClose={onClose} className={classes.drawer}>
       <div className={classes.root}>
         <div className={classes.drawerTitleContainer}>
           <Typography className={classes.title}>{title ?? 'Structure hospitalière'}</Typography>

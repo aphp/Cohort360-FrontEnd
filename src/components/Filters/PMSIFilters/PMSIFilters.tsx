@@ -25,9 +25,10 @@ import services from 'services/aphp'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
-import { PMSIFilters } from 'types'
+import { CriteriaName, PMSIFilters, ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
+import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
 
 type ModalPMSIFiltersProps = {
   open: boolean
@@ -46,6 +47,7 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
   setFilters
 }) => {
   const { classes } = useStyles()
+  const label = 'Séléctionnez une unité exécutrice'
 
   const [_nda, setNda] = useState<string>(filters.nda)
   const [_code, setCode] = useState<string>(filters.code)
@@ -53,6 +55,7 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
   const [_endDate, setEndDate] = useState<any>(filters.endDate)
   const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>(filters.selectedDiagnosticTypes)
   const [dateError, setDateError] = useState(false)
+  const [_executiveUnit, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
 
   const [diagnosticTypesList, setDiagnosticTypesList] = useState<any[]>([])
 
@@ -77,7 +80,8 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
       code: _code,
       startDate: newStartDate,
       endDate: newEndDate,
-      selectedDiagnosticTypes: _selectedDiagnosticTypes
+      selectedDiagnosticTypes: _selectedDiagnosticTypes,
+      executiveUnit: _executiveUnit?.map((r) => r.id)
     })
     onClose()
   }
@@ -108,121 +112,138 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
   }, [_startDate, _endDate])
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Filtrer par :</DialogTitle>
-      <DialogContent className={classes.dialog}>
-        {!deidentified && (
+    <>
+      <Dialog open={open} onClose={onClose}>
+        <DialogTitle>Filtrer par :</DialogTitle>
+        <DialogContent className={classes.dialog}>
+          {!deidentified && (
+            <Grid container direction="column" className={classes.filter}>
+              <Typography variant="h3">NDA :</Typography>
+              <TextField
+                margin="normal"
+                fullWidth
+                autoFocus
+                placeholder="Exemple: 6601289264,141740347"
+                value={_nda}
+                onChange={_onChangeNda}
+              />
+            </Grid>
+          )}
           <Grid container direction="column" className={classes.filter}>
-            <Typography variant="h3">NDA :</Typography>
+            <Typography variant="h3">Code :</Typography>
             <TextField
               margin="normal"
               fullWidth
               autoFocus
-              placeholder="Exemple: 6601289264,141740347"
-              value={_nda}
-              onChange={_onChangeNda}
+              placeholder="Exemple: G629,R2630,F310"
+              value={_code}
+              onChange={_onChangeCode}
             />
           </Grid>
-        )}
-        <Grid container direction="column" className={classes.filter}>
-          <Typography variant="h3">Code :</Typography>
-          <TextField
-            margin="normal"
-            fullWidth
-            autoFocus
-            placeholder="Exemple: G629,R2630,F310"
-            value={_code}
-            onChange={_onChangeCode}
-          />
-        </Grid>
-        {showDiagnosticTypes && (
-          <Grid container direction="column" className={classes.filter}>
-            <Typography variant="h3">Type de diagnostics :</Typography>
-            <Autocomplete
-              multiple
-              onChange={_onChangeSelectedDiagnosticTypes}
-              options={diagnosticTypesList}
-              value={_selectedDiagnosticTypes}
-              disableCloseOnSelect
-              getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.label)}
-              renderOption={(props, diagnosticType: any) => (
-                <li {...props}>{capitalizeFirstLetter(diagnosticType.label)}</li>
-              )}
-              renderInput={(params) => (
-                <TextField {...params} label="Types de diagnostics" placeholder="Sélectionner type(s) de diagnostics" />
-              )}
-              className={classes.autocomplete}
-            />
-          </Grid>
-        )}
-
-        <Grid container direction="column">
-          <Typography variant="h3">Date :</Typography>
-          <Grid container alignItems="center" className={classes.datePickers}>
-            <FormLabel component="legend" className={classes.dateLabel}>
-              Après le :
-            </FormLabel>
-            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
-              <DatePicker
-                onChange={(date) => setStartDate(date ?? null)}
-                value={_startDate}
-                renderInput={(params: any) => (
+          {showDiagnosticTypes && (
+            <Grid container direction="column" className={classes.filter}>
+              <Typography variant="h3">Type de diagnostics :</Typography>
+              <Autocomplete
+                multiple
+                onChange={_onChangeSelectedDiagnosticTypes}
+                options={diagnosticTypesList}
+                value={_selectedDiagnosticTypes}
+                disableCloseOnSelect
+                getOptionLabel={(diagnosticType: any) => capitalizeFirstLetter(diagnosticType.label)}
+                renderOption={(props, diagnosticType: any) => (
+                  <li {...props}>{capitalizeFirstLetter(diagnosticType.label)}</li>
+                )}
+                renderInput={(params) => (
                   <TextField
                     {...params}
-                    variant="standard"
-                    error={dateError}
-                    helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
-                    style={{ width: 'calc(100% - 120px)' }}
+                    label="Types de diagnostics"
+                    placeholder="Sélectionner type(s) de diagnostics"
                   />
                 )}
+                className={classes.autocomplete}
               />
-            </LocalizationProvider>
-            {_startDate !== null && (
-              <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setStartDate(null)}>
-                <ClearIcon />
-              </IconButton>
-            )}
-          </Grid>
-
-          <Grid container alignItems="center" className={classes.datePickers}>
-            <FormLabel component="legend" className={classes.dateLabel}>
-              Avant le :
-            </FormLabel>
-            <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
-              <DatePicker
-                onChange={(date) => setEndDate(date ?? null)}
-                value={_endDate}
-                renderInput={(params: any) => (
-                  <TextField
-                    {...params}
-                    variant="standard"
-                    error={dateError}
-                    helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
-                    style={{ width: 'calc(100% - 120px)' }}
-                  />
-                )}
-              />
-            </LocalizationProvider>
-            {_endDate !== null && (
-              <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setEndDate(null)}>
-                <ClearIcon />
-              </IconButton>
-            )}
-          </Grid>
-          {dateError && (
-            <Typography className={classes.dateError}>
-              Vous ne pouvez pas sélectionner de date de début supérieure à la date de fin.
-            </Typography>
+            </Grid>
           )}
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Annuler</Button>
-        <Button onClick={_onSubmit} disabled={dateError}>
-          Valider
-        </Button>
-      </DialogActions>
-    </Dialog>
+
+          <Grid container direction="column">
+            <Typography variant="h3">Date :</Typography>
+            <Grid container alignItems="center" className={classes.datePickers}>
+              <FormLabel component="legend" className={classes.dateLabel}>
+                Après le :
+              </FormLabel>
+              <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+                <DatePicker
+                  onChange={(date) => setStartDate(date ?? null)}
+                  value={_startDate}
+                  renderInput={(params: any) => (
+                    <TextField
+                      {...params}
+                      variant="standard"
+                      error={dateError}
+                      helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
+                      style={{ width: 'calc(100% - 120px)' }}
+                    />
+                  )}
+                />
+              </LocalizationProvider>
+              {_startDate !== null && (
+                <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setStartDate(null)}>
+                  <ClearIcon />
+                </IconButton>
+              )}
+            </Grid>
+
+            <Grid container alignItems="center" className={classes.datePickers}>
+              <FormLabel component="legend" className={classes.dateLabel}>
+                Avant le :
+              </FormLabel>
+              <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
+                <DatePicker
+                  onChange={(date) => setEndDate(date ?? null)}
+                  value={_endDate}
+                  renderInput={(params: any) => (
+                    <TextField
+                      {...params}
+                      variant="standard"
+                      error={dateError}
+                      helperText={dateError && 'La date doit être au format "JJ/MM/AAAA"'}
+                      style={{ width: 'calc(100% - 120px)' }}
+                    />
+                  )}
+                />
+              </LocalizationProvider>
+              {_endDate !== null && (
+                <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setEndDate(null)}>
+                  <ClearIcon />
+                </IconButton>
+              )}
+            </Grid>
+            <Grid item container direction="row" alignItems="center">
+              <PopulationCard
+                label={label}
+                title={label}
+                executiveUnits={_executiveUnit}
+                isAcceptEmptySelection={true}
+                isDeleteIcon={true}
+                onChangeExecutiveUnits={(yyyy) => setExecutiveUnits(yyyy)}
+              />
+            </Grid>
+
+            {dateError && (
+              <Typography className={classes.dateError}>
+                Vous ne pouvez pas sélectionner de date de début supérieure à la date de fin.
+              </Typography>
+            )}
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose}>Annuler</Button>
+          <Button onClick={_onSubmit} disabled={dateError}>
+            Valider
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   )
 }
 

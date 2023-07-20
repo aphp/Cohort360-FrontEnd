@@ -1,6 +1,9 @@
 import { makeStyles } from 'tss-react/mui'
 
 const useStyles = makeStyles()(() => ({
+  drawer: {
+    zIndex: 1300
+  },
   root: {
     display: 'flex',
     flexDirection: 'column',
