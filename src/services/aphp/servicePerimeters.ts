@@ -119,7 +119,12 @@ export interface IServicePerimeters {
    * effectuer une recherche textuelle dans la liste des périmètres
    * @param page : le numéro de la page qu'on veut récupérer, par défaut c'est la 1ière page.
    */
-  findScope: (searchInput: string | undefined, page?: number | undefined, signal?: AbortSignal) => Promise<any>
+  findScope: (
+    searchInput: string | undefined,
+    page?: number | undefined,
+    signal?: AbortSignal,
+    scopeType?: ScopeType
+  ) => Promise<any>
   /**
    * construire une liste de ScopeTreeRow à travers une liste de ScopePage
    */
@@ -405,7 +410,12 @@ const servicesPerimeters: IServicePerimeters = {
     })
   },
 
-  findScope: async (searchInput: string | undefined, page?: number | undefined, signal?: AbortSignal) => {
+  findScope: async (
+    searchInput: string | undefined,
+    page?: number | undefined,
+    signal?: AbortSignal,
+    scopeType?: ScopeType
+  ) => {
     let result: { scopeTreeRows: ScopeTreeRow[]; count: number; aborted?: boolean } = {
       scopeTreeRows: [],
       count: 0,
@@ -414,10 +424,15 @@ const servicesPerimeters: IServicePerimeters = {
     if (!searchInput) {
       return result
     }
-    const pageParam = page && page > 1 ? '&page=' + page : ''
-    const backCohortResponse: any = await apiBackend.get(
-      `accesses/perimeters/read-patient/?search=${searchInput}${pageParam}`,
-      { signal: signal }
+    const higherTypes: string[] = servicesPerimeters.getHigherTypes(scopeType)
+    const pageParam = page && page > 1 ? page : undefined
+    const backCohortResponse: any = await fetchScope(
+      {
+        search: searchInput,
+        page: pageParam,
+        type: higherTypes
+      },
+      signal
     )
     if (backCohortResponse && backCohortResponse.data && backCohortResponse.data.results) {
       const newPerimetersList: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
