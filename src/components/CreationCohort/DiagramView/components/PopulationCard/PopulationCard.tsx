@@ -137,7 +137,7 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
         <div className={classes.populationCard}>
           <div className={classes.leftDiv}>
             <Typography className={classes.typography} variant={form ? undefined : 'h6'} align="left">
-              {label ?? 'Population source'}
+              {label ?? 'Population source :'}
             </Typography>
 
             <div className={classes.chipContainer}>

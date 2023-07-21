@@ -57,7 +57,7 @@ export interface IServiceCohortCreation {
   /**
    * Cette fonction permet de créer un état de `snapshot` pour l'historique d'une requête
    */
-  createSnapshot: (id: string, json: string, firstTime?: boolean) => Promise<any>
+  createSnapshot: (id: string, json: string, firstTime?: boolean) => Promise<Snapshot | null>
 
   /**
    * Permet de récupérer toutes les informations utiles pour l'utilisation du requeteur

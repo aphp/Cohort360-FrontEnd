@@ -19,7 +19,7 @@ const useStyles = makeStyles<populationCardPropsType>()((theme: Theme, params) =
     position: 'relative'
   },
   typography: {
-    padding: params.form ? '0px' : '0 1em 8px',
+    padding: params.form ? '0px' : '0 1em',
     display: 'flex',
     alignItems: 'center'
   },
