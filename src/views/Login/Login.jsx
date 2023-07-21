@@ -216,31 +216,6 @@ const Login = () => {
       )
     }
 
-    if (response.error) {
-      setLoading(false)
-      return (
-        setError(true),
-        setErrorMessage(
-          'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
-        )
-      )
-    }
-
-    if (response.status !== 200) {
-      setLoading(false)
-      return (
-        setError(true),
-        setErrorMessage(
-          'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
-        )
-      )
-    }
-
-    if (!response.data.jwt) {
-      setLoading(false)
-      return setError(true), setErrorMessage("Votre nom d'utilisateur ou votre mot de passe est incorrect.")
-    }
-
     const { status, data = {} } = response
 
     if (status === 200) {
@@ -281,13 +256,22 @@ const Login = () => {
 
       getPractitionerData(practitioner, lastConnection, maintenance, accessExpirations)
     } else {
-      setLoading(false)
-      return (
-        setError(true),
-        setErrorMessage(
-          'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+      const invalidCredential = 'Invalid Credentials - Invalid username or password'
+
+      if (response.response.status === 401 && response.response.data.errors[0] === invalidCredential) {
+        setLoading(false)
+        return setError(true), setErrorMessage("Votre nom d'utilisateur ou votre mot de passe est incorrect.")
+      }
+
+      if (response.status !== 200) {
+        setLoading(false)
+        return (
+          setError(true),
+          setErrorMessage(
+            'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
+          )
         )
-      )
+      }
     }
   }
 
