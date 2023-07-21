@@ -215,7 +215,8 @@ export interface IServicePatients {
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    executiveUnit?: Array<string>
   ) => Promise<{
     biologyList: Observation[]
     biologyTotal: number
@@ -257,7 +258,8 @@ export interface IServicePatients {
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    executiveUnit?: Array<string>
   ) => Promise<{
     docsList: DocumentReference[]
     docsTotal: number
@@ -574,7 +576,8 @@ const servicesPatients: IServicePatients = {
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    executiveUnit?: Array<string>
   ) => {
     const observationResp = await fetchObservation({
       patient: patientId,
@@ -590,7 +593,8 @@ const servicesPatients: IServicePatients = {
       minDate: startDate ?? '',
       maxDate: endDate ?? '',
       rowStatus,
-      signal
+      signal,
+      executiveUnit
     })
 
     const biologyTotal = observationResp.data.resourceType === 'Bundle' ? observationResp.data.total : 0
@@ -614,7 +618,8 @@ const servicesPatients: IServicePatients = {
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    executiveUnit?: Array<string>
   ) => {
     const documentLines = 20 // Number of desired lines in the document array
 
@@ -649,7 +654,8 @@ const servicesPatients: IServicePatients = {
       onlyPdfAvailable: onlyPdfAvailable,
       minDate: startDate ?? '',
       maxDate: endDate ?? '',
-      signal: signal
+      signal: signal,
+      executiveUnit
     })
 
     if (docsList.data.resourceType !== 'Bundle' || !docsList.data.total) {

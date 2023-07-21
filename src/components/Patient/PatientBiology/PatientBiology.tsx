@@ -25,7 +25,7 @@ type PatientBiologyTypes = {
   groupId?: string
 }
 
-const filtersDefault = { nda: '', loinc: '', anabio: '', startDate: null, endDate: null }
+const filtersDefault = { nda: '', loinc: '', anabio: '', startDate: null, endDate: null, executiveUnit: [] }
 
 const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   const { classes } = useStyles()

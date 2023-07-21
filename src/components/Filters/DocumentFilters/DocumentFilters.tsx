@@ -23,9 +23,10 @@ import {
 import ClearIcon from '@mui/icons-material/Clear'
 
 import docTypes from 'assets/docTypes.json'
-import { DocumentFilters } from 'types'
+import { CriteriaName, DocumentFilters, ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
+import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
 
 type DocumentFiltersProps = {
   open: boolean
@@ -43,6 +44,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
   showIpp,
   deidentified
 }) => {
+  const label = 'Séléctionnez une unité exécutrice'
   const { classes } = useStyles()
 
   const [_nda, setNda] = useState<string>(filters.nda)
@@ -50,6 +52,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
   const [_selectedDocTypes, setSelectedDocTypes] = useState<any[]>(filters.selectedDocTypes)
   const [_startDate, setStartDate] = useState<any>(filters.startDate)
   const [_endDate, setEndDate] = useState<any>(filters.endDate)
+  const [_executiveUnit, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
   const [dateError, setDateError] = useState(false)
 
   const docTypesList = docTypes
@@ -91,7 +94,8 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
       ipp: _ipp,
       selectedDocTypes: _selectedDocTypes,
       startDate: newStartDate,
-      endDate: newEndDate
+      endDate: newEndDate,
+      executiveUnit: _executiveUnit?.map((r) => r.id)
     })
     onClose()
   }
@@ -232,6 +236,17 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
                 <ClearIcon />
               </IconButton>
             )}
+          </Grid>
+          <Grid item container direction="row" alignItems="center">
+            <PopulationCard
+              form={CriteriaName.Document}
+              label={label}
+              title={label}
+              executiveUnits={_executiveUnit}
+              isAcceptEmptySelection={true}
+              isDeleteIcon={true}
+              onChangeExecutiveUnits={(yyyy) => setExecutiveUnits(yyyy)}
+            />
           </Grid>
           {dateError && (
             <Typography className={classes.dateError}>

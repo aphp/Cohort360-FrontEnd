@@ -25,7 +25,7 @@ import services from 'services/aphp'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
-import { CriteriaName, PMSIFilters, ScopeTreeRow } from 'types'
+import { CriteriaName, CriteriaNameType, PMSIFilters, ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
 import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
@@ -37,14 +37,27 @@ type ModalPMSIFiltersProps = {
   showDiagnosticTypes: boolean
   filters: PMSIFilters
   setFilters: (filters: PMSIFilters) => void
+  pmsiType: string
 }
+
+const mapToCriteriaName = (criteria: string): CriteriaNameType => {
+  const mapping: { [key: string]: CriteriaNameType } = {
+    diagnostic: CriteriaName.Cim10,
+    ghm: CriteriaName.Ghm,
+    ccam: CriteriaName.Ccam
+  }
+  if (criteria in mapping) return mapping[criteria]
+  throw new Error(`Unknown criteria ${criteria}`)
+}
+
 const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
   open,
   onClose,
   deidentified,
   showDiagnosticTypes,
   filters,
-  setFilters
+  setFilters,
+  pmsiType
 }) => {
   const { classes } = useStyles()
   const label = 'Séléctionnez une unité exécutrice'
@@ -58,6 +71,7 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
   const [_executiveUnit, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
 
   const [diagnosticTypesList, setDiagnosticTypesList] = useState<any[]>([])
+  const criteriaName = mapToCriteriaName(pmsiType)
 
   const _onChangeNda = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNda(event.target.value)
@@ -220,6 +234,7 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
             </Grid>
             <Grid item container direction="row" alignItems="center">
               <PopulationCard
+                form={criteriaName}
                 label={label}
                 title={label}
                 executiveUnits={_executiveUnit}

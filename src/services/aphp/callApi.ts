@@ -240,6 +240,7 @@ type fetchCompositionProps = {
     | 'text'
     | 'description'
   )[]
+  executiveUnit?: Array<string>
 }
 export const fetchComposition = async (args: fetchCompositionProps) => {
   const {
@@ -258,7 +259,8 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
     encounter,
     onlyPdfAvailable,
     minDate,
-    maxDate
+    maxDate,
+    executiveUnit
   } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list, facet, uniqueFacet, _elements } = args
@@ -292,6 +294,7 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   if (onlyPdfAvailable) options = [...options, `is_pdf_available=${onlyPdfAvailable}`] // eslint-disable-line
   if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `date=le${maxDate}`] // eslint-disable-line
+  if (executiveUnit) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
   if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(reducer)}`] // eslint-disable-line
@@ -543,7 +546,8 @@ type fetchObservationProps = {
   maxDate?: string
   _list?: string[]
   rowStatus: boolean
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  executiveUnit?: Array<string>
 }
 export const fetchObservation = async (args: fetchObservationProps) => {
   const {
@@ -561,7 +565,8 @@ export const fetchObservation = async (args: fetchObservationProps) => {
     minDate,
     maxDate,
     rowStatus,
-    signal
+    signal,
+    executiveUnit
   } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
@@ -582,6 +587,7 @@ export const fetchObservation = async (args: fetchObservationProps) => {
   if (minDate) options = [...options, `effectiveDatetime=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `effectiveDatetime=le${maxDate}`] // eslint-disable-line
   if (rowStatus) options = [...options, `row_status=${BiologyStatus.VALIDATED}`] // eslint-disable-line
+  if (executiveUnit) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 

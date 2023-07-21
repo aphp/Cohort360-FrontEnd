@@ -213,6 +213,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
         onClose={() => setOpen(false)}
         deidentified={deidentifiedBoolean}
         showDiagnosticTypes={selectedTab === PMSI.DIAGNOSTIC}
+        pmsiType={selectedTab}
         filters={filters}
         setFilters={(newFilters) =>
           setFilters({
