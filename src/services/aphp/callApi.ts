@@ -518,7 +518,7 @@ export const fetchCondition = async (args: fetchConditionProps) => {
   if (encounterIdentifier) options = [...options, `encounter-identifier=${encounterIdentifier}`] // eslint-disable-line
   if (minRecordedDate) options = [...options, `recorded-date=ge${minRecordedDate}`] // eslint-disable-line
   if (maxRecordedDate) options = [...options, `recorded-date=le${maxRecordedDate}`] // eslint-disable-line
-  if (executiveUnit) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
+  if (executiveUnit && executiveUnit.length > 0) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
   if (type && type.length > 0) options = [...options, `type=${type.reduce(reducer)}`] // eslint-disable-line

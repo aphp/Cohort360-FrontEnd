@@ -133,6 +133,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
     filters.startDate,
     filters.endDate,
     filters.selectedDiagnosticTypes,
+    filters.executiveUnit,
     order.orderBy,
     order.orderDirection
   ])
