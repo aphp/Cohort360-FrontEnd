@@ -267,6 +267,7 @@ type FetchMedicationParams = {
       selectedAdministrationRoutes: { id: string; label: string }[]
       startDate: string | null
       endDate: string | null
+      executiveUnit?: Array<string>
     }
     sort?: {
       by: string
@@ -306,6 +307,7 @@ const fetchMedication = createAsyncThunk<
     const nda = options?.filters?.nda ?? ''
     const startDate = options?.filters?.startDate ?? null
     const endDate = options?.filters?.endDate ?? null
+    const executiveUnits = options?.filters?.executiveUnit
 
     const medicationResponse = await services.patients.fetchMedication(
       page,
@@ -320,7 +322,8 @@ const fetchMedication = createAsyncThunk<
       groupId,
       startDate ? startDate : undefined,
       endDate ? endDate : undefined,
-      signal
+      signal,
+      executiveUnits
     )
 
     if (medicationResponse.medicationData === undefined) return undefined

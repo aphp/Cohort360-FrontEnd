@@ -71,7 +71,8 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
               loinc: filters.loinc,
               anabio: filters.anabio,
               startDate: filters.startDate,
-              endDate: filters.endDate
+              endDate: filters.endDate,
+              executiveUnit: filters.executiveUnits
             }
           },
           signal: controllerRef.current?.signal

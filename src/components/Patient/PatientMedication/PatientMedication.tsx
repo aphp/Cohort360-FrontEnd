@@ -41,7 +41,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
     selectedAdministrationRoutes: [],
     startDate: null,
     endDate: null,
-    executiveUnit: []
+    executiveUnits: []
   })
   const [selectedTab, selectTab] = useState<'prescription' | 'administration'>('prescription')
   const [order, setOrder] = useState<Order>({ orderBy: 'Period-start', orderDirection: 'asc' })
@@ -133,7 +133,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
       selectedAdministrationRoutes: [],
       startDate: null,
       endDate: null,
-      executiveUnit: []
+      executiveUnits: []
     })
     setOrder({ orderBy: 'Period-start', orderDirection: 'desc' })
   }, [selectedTab])
