@@ -95,7 +95,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
       selectedDocTypes: _selectedDocTypes,
       startDate: newStartDate,
       endDate: newEndDate,
-      executiveUnit: _executiveUnit?.map((r) => r.id)
+      executiveUnits: _executiveUnit?.map((r) => r.id)
     })
     onClose()
   }

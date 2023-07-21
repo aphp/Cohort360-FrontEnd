@@ -181,8 +181,7 @@ type GenericFilter = {
   nda: string
   startDate: string | null
   endDate: string | null
-  // make this plural "executiveUnits"
-  executiveUnit: Array<string> | undefined
+  executiveUnits: Array<string> | undefined
 }
 
 export type DocumentFilters = GenericFilter & {
@@ -198,8 +197,7 @@ export type MedicationsFilters = GenericFilter & {
 
 export type PMSIFilters = GenericFilter & {
   code: string
-  // rename to "diagnosticTypes"
-  selectedDiagnosticTypes: { id: string; label: string }[]
+  diagnosticTypes: { id: string; label: string }[]
 }
 
 export type PatientFilters = {

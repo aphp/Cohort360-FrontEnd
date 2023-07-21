@@ -40,10 +40,10 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
     searchInput: '',
     nda: '',
     code: '',
-    selectedDiagnosticTypes: [],
+    diagnosticTypes: [],
     startDate: null,
     endDate: null,
-    executiveUnit: []
+    executiveUnits: []
   })
   const debouncedSearchValue = useDebounce(500, filters.searchInput)
   const [order, setOrder] = useState<Order>({
@@ -67,7 +67,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
 
   const _fetchPMSI = async () => {
     try {
-      const selectedDiagnosticTypesCodes = filters.selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
+      const selectedDiagnosticTypesCodes = filters.diagnosticTypes.map((diagnosticType) => diagnosticType.id)
       setLoadingStatus(LoadingStatus.FETCHING)
       const response = await dispatch(
         fetchPmsi({
@@ -115,10 +115,10 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
       case 'endDate':
         onChangeOptions(filterName, null)
         break
-      case 'selectedDiagnosticTypes':
+      case 'diagnosticTypes':
         onChangeOptions(
           filterName,
-          filters.selectedDiagnosticTypes.filter((item) => item.id !== value.id)
+          filters.diagnosticTypes.filter((item) => item.id !== value.id)
         )
         break
     }
@@ -132,8 +132,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
     filters.code,
     filters.startDate,
     filters.endDate,
-    filters.selectedDiagnosticTypes,
-    filters.executiveUnit,
+    filters.diagnosticTypes,
+    filters.executiveUnits,
     order.orderBy,
     order.orderDirection
   ])
@@ -155,10 +155,10 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
       searchInput: '',
       nda: '',
       code: '',
-      selectedDiagnosticTypes: [],
+      diagnosticTypes: [],
       startDate: null,
       endDate: null,
-      executiveUnit: []
+      executiveUnits: []
     })
     setOrder({ orderBy: 'date', orderDirection: 'desc' })
   }, [selectedTab])

@@ -66,7 +66,7 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
   const [_code, setCode] = useState<string>(filters.code)
   const [_startDate, setStartDate] = useState<any>(filters.startDate)
   const [_endDate, setEndDate] = useState<any>(filters.endDate)
-  const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>(filters.selectedDiagnosticTypes)
+  const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>(filters.diagnosticTypes)
   const [dateError, setDateError] = useState(false)
   const [_executiveUnit, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
 
@@ -94,8 +94,8 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
       code: _code,
       startDate: newStartDate,
       endDate: newEndDate,
-      selectedDiagnosticTypes: _selectedDiagnosticTypes,
-      executiveUnit: _executiveUnit?.map((r) => r.id)
+      diagnosticTypes: _selectedDiagnosticTypes,
+      executiveUnits: _executiveUnit?.map((r) => r.id)
     })
     onClose()
   }
@@ -114,7 +114,7 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
     setCode(filters.code)
     setStartDate(filters.startDate)
     setEndDate(filters.endDate)
-    setSelectedDiagnosticTypes(filters.selectedDiagnosticTypes)
+    setSelectedDiagnosticTypes(filters.diagnosticTypes)
   }, [open]) // eslint-disable-line
 
   useEffect(() => {

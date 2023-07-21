@@ -179,6 +179,7 @@ export type FetchBiologyParams = {
       anabio: string
       startDate: string | null
       endDate: string | null
+      executiveUnit?: string[]
     }
     sort?: {
       by: string
@@ -210,6 +211,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
       const anabio = options?.filters?.anabio ?? ''
       const startDate = options?.filters?.startDate ?? null
       const endDate = options?.filters?.endDate ?? null
+      const executiveUnits = options?.filters?.executiveUnit
 
       const biologyResponse = await services.patients.fetchObservation(
         sortBy,
@@ -224,7 +226,8 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
         startDate,
         endDate,
         groupId,
-        signal
+        signal,
+        executiveUnits
       )
 
       const biologyList: any[] = linkElementWithEncounter(biologyResponse.biologyList, hospits, deidentified)
@@ -368,6 +371,7 @@ type FetchDocumentsParams = {
       startDate: string | null
       endDate: string | null
       onlyPdfAvailable: boolean
+      executiveUnit?: string[]
     }
     sort?: {
       by: string
@@ -401,6 +405,7 @@ const fetchDocuments = createAsyncThunk<
     const startDate = options?.filters?.startDate ?? null
     const endDate = options?.filters?.endDate ?? null
     const onlyPdfAvailable = options?.filters?.onlyPdfAvailable ?? false
+    const executiveUnits = options?.filters?.executiveUnit
 
     if (searchInput) {
       const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)
@@ -433,7 +438,8 @@ const fetchDocuments = createAsyncThunk<
       startDate,
       endDate,
       groupId,
-      signal
+      signal,
+      executiveUnits
     )
 
     const documentsList: any[] = linkElementWithEncounter(

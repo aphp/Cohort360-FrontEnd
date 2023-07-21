@@ -294,7 +294,7 @@ export const fetchComposition = async (args: fetchCompositionProps) => {
   if (onlyPdfAvailable) options = [...options, `is_pdf_available=${onlyPdfAvailable}`] // eslint-disable-line
   if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `date=le${maxDate}`] // eslint-disable-line
-  if (executiveUnit) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
+  if (executiveUnit && executiveUnit.length > 0) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
   if (facet && facet.length > 0) options = [...options, `facet=${facet.reduce(reducer)}`] // eslint-disable-line
@@ -394,8 +394,7 @@ export const fetchProcedure = async (args: fetchProcedureProps) => {
   if (encounterIdentifier) options = [...options, `encounter-identifier=${encounterIdentifier}`] // eslint-disable-line
   if (minDate) options = [...options, `date=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `date=le${maxDate}`] // eslint-disable-line
-  if (executiveUnit) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
-
+  if (executiveUnit && executiveUnit.length > 0) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<Procedure>>(`/Procedure?${options.reduce(optionsReducer)}`, {
@@ -460,7 +459,7 @@ export const fetchClaim = async (args: fetchClaimProps) => {
   if (encounterIdentifier) options = [...options, `encounter-identifier=${encounterIdentifier}`] // eslint-disable-line
   if (minCreated) options = [...options, `created=ge${minCreated}`] // eslint-disable-line
   if (maxCreated) options = [...options, `created=le${maxCreated}`] // eslint-disable-line
-  if (executiveUnit) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
+  if (executiveUnit && executiveUnit.length > 0) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
@@ -587,7 +586,7 @@ export const fetchObservation = async (args: fetchObservationProps) => {
   if (minDate) options = [...options, `effectiveDatetime=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `effectiveDatetime=le${maxDate}`] // eslint-disable-line
   if (rowStatus) options = [...options, `row_status=${BiologyStatus.VALIDATED}`] // eslint-disable-line
-  if (executiveUnit) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
+  if (executiveUnit && executiveUnit.length > 0) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
@@ -647,7 +646,7 @@ export const fetchMedicationRequest = async (args: fetchMedicationRequestProps) 
   if (type) options = [...options, `type=${type}`] // eslint-disable-line
   if (minDate) options = [...options, `Period-start=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `Period-start=le${maxDate}`] // eslint-disable-line
-  if (executiveUnit) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
+  if (executiveUnit && executiveUnit.length > 0) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
@@ -710,7 +709,7 @@ export const fetchMedicationAdministration = async (args: fetchMedicationAdminis
   if (route) options = [...options, `route=${route}`] // eslint-disable-line
   if (minDate) options = [...options, `Period-start=ge${minDate}`] // eslint-disable-line
   if (maxDate) options = [...options, `Period-start=le${maxDate}`] // eslint-disable-line
-  if (executiveUnit) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
+  if (executiveUnit && executiveUnit.length > 0) options = [...options, `encounter-service-provider=${executiveUnit}`] // eslint-disable-line
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 

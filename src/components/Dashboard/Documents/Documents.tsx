@@ -53,7 +53,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     onlyPdfAvailable: deidentifiedBoolean ? false : true,
     startDate: null,
     endDate: null,
-    executiveUnit: undefined
+    executiveUnits: undefined
   })
 
   const [order, setOrder] = useState<Order>({
