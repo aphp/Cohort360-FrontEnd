@@ -62,7 +62,6 @@ type FetchPmsiParams = {
   options?: {
     page?: number
     filters?: {
-      // reuse PMSI filters type + searchInput
       searchInput: string
       nda: string
       code: string
@@ -103,8 +102,6 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const page = options?.page ?? 1
       const searchInput = options?.filters?.searchInput + WILDCARD ?? ''
       const code = options?.filters?.code ?? ''
-      // here diagnostic type will be of type { id: string; label: string }[] instead of string[]
-      // so you'll need to map it to string[] before sending it to the API see function map l68 in src/components/Patient/PatientPMSI/PatientPMSI.tsx
       const diagnosticTypes = options?.filters?.diagnosticTypes ?? []
       const nda = options?.filters?.nda ?? ''
       const startDate = options?.filters?.startDate ?? null
