@@ -17,11 +17,14 @@ import {
   Grid,
   IconButton,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material'
 
 import ClearIcon from '@mui/icons-material/Clear'
+import InfoIcon from '@mui/icons-material/Info'
 
+import scopeType from 'data/scope_type.json'
 import docTypes from 'assets/docTypes.json'
 import { CriteriaName, DocumentFilters, ScopeTreeRow } from 'types'
 
@@ -52,7 +55,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
   const [_selectedDocTypes, setSelectedDocTypes] = useState<any[]>(filters.selectedDocTypes)
   const [_startDate, setStartDate] = useState<any>(filters.startDate)
   const [_endDate, setEndDate] = useState<any>(filters.endDate)
-  const [_executiveUnit, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
+  const [_executiveUnits, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
   const [dateError, setDateError] = useState(false)
 
   const docTypesList = docTypes
@@ -95,7 +98,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
       selectedDocTypes: _selectedDocTypes,
       startDate: newStartDate,
       endDate: newEndDate,
-      executiveUnits: _executiveUnit?.map((r) => r.id)
+      executiveUnits: _executiveUnits?.map((r) => r.id)
     })
     onClose()
   }
@@ -237,15 +240,32 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
               </IconButton>
             )}
           </Grid>
+          <FormLabel style={{ padding: '1em 1em 0 1em', display: 'flex', alignItems: 'center' }} component="legend">
+            Unité exécutrice
+            <Tooltip
+              title={
+                <>
+                  {'- Le niveau hiérarchique de rattachement est : ' +
+                    scopeType?.criteriaType[CriteriaName.Document] +
+                    '.'}
+                  <br />
+                  {"- L'unité exécutrice" +
+                    ' est la structure élémentaire de prise en charge des malades par une équipe soignante ou médico-technique identifiées par leurs fonctions et leur organisation.'}
+                </>
+              }
+            >
+              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+            </Tooltip>
+          </FormLabel>
           <Grid item container direction="row" alignItems="center">
             <PopulationCard
               form={CriteriaName.Document}
               label={label}
               title={label}
-              executiveUnits={_executiveUnit}
+              executiveUnits={_executiveUnits}
               isAcceptEmptySelection={true}
               isDeleteIcon={true}
-              onChangeExecutiveUnits={(yyyy) => setExecutiveUnits(yyyy)}
+              onChangeExecutiveUnits={setExecutiveUnits}
             />
           </Grid>
           {dateError && (

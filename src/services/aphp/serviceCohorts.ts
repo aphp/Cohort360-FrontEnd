@@ -137,7 +137,8 @@ export interface IServiceCohorts {
     signal?: AbortSignal,
     startDate?: string | null,
     endDate?: string | null,
-    groupId?: string
+    groupId?: string,
+    executiveUnits?: string[]
   ) => Promise<{
     totalDocs: number
     totalAllDocs: number
@@ -409,7 +410,8 @@ const servicesCohorts: IServiceCohorts = {
     signal,
     startDate,
     endDate,
-    groupId
+    groupId,
+    executiveUnits
   ) => {
     const [docsList, allDocsList] = await Promise.all([
       fetchComposition({
@@ -445,7 +447,8 @@ const servicesCohorts: IServiceCohorts = {
         signal: signal,
         minDate: startDate ?? '',
         maxDate: endDate ?? '',
-        uniqueFacet: ['patient']
+        uniqueFacet: ['patient'],
+        executiveUnits
       }),
       !!searchInput || selectedDocTypes.length > 0 || !!nda || !!ipp || !!startDate || !!endDate
         ? fetchComposition({

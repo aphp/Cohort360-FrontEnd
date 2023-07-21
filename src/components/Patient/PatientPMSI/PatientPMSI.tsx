@@ -43,7 +43,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
     diagnosticTypes: [],
     startDate: null,
     endDate: null,
-    executiveUnits: []
+    executiveUnits: undefined
   })
   const debouncedSearchValue = useDebounce(500, filters.searchInput)
   const [order, setOrder] = useState<Order>({

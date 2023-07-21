@@ -69,7 +69,7 @@ type FetchPmsiParams = {
       diagnosticTypes: string[]
       startDate: string | null
       endDate: string | null
-      executiveUnit?: string[]
+      executiveUnits?: string[]
     }
     sort?: {
       by: string
@@ -109,7 +109,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const nda = options?.filters?.nda ?? ''
       const startDate = options?.filters?.startDate ?? null
       const endDate = options?.filters?.endDate ?? null
-      const executiveUnits = options?.filters?.executiveUnit
+      const executiveUnits = options?.filters?.executiveUnits
 
       const pmsiResponse = await services.patients.fetchPMSI(
         page,
@@ -179,7 +179,7 @@ export type FetchBiologyParams = {
       anabio: string
       startDate: string | null
       endDate: string | null
-      executiveUnit?: string[]
+      executiveUnits?: string[]
     }
     sort?: {
       by: string
@@ -211,7 +211,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
       const anabio = options?.filters?.anabio ?? ''
       const startDate = options?.filters?.startDate ?? null
       const endDate = options?.filters?.endDate ?? null
-      const executiveUnits = options?.filters?.executiveUnit
+      const executiveUnits = options?.filters?.executiveUnits
 
       const biologyResponse = await services.patients.fetchObservation(
         sortBy,
@@ -267,7 +267,7 @@ type FetchMedicationParams = {
       selectedAdministrationRoutes: { id: string; label: string }[]
       startDate: string | null
       endDate: string | null
-      executiveUnit?: Array<string>
+      executiveUnits?: string[]
     }
     sort?: {
       by: string
@@ -307,7 +307,7 @@ const fetchMedication = createAsyncThunk<
     const nda = options?.filters?.nda ?? ''
     const startDate = options?.filters?.startDate ?? null
     const endDate = options?.filters?.endDate ?? null
-    const executiveUnits = options?.filters?.executiveUnit
+    const executiveUnits = options?.filters?.executiveUnits
 
     const medicationResponse = await services.patients.fetchMedication(
       page,
@@ -374,7 +374,7 @@ type FetchDocumentsParams = {
       startDate: string | null
       endDate: string | null
       onlyPdfAvailable: boolean
-      executiveUnit?: string[]
+      executiveUnits?: string[]
     }
     sort?: {
       by: string
@@ -408,7 +408,7 @@ const fetchDocuments = createAsyncThunk<
     const startDate = options?.filters?.startDate ?? null
     const endDate = options?.filters?.endDate ?? null
     const onlyPdfAvailable = options?.filters?.onlyPdfAvailable ?? false
-    const executiveUnits = options?.filters?.executiveUnit
+    const executiveUnits = options?.filters?.executiveUnits
 
     if (searchInput) {
       const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)

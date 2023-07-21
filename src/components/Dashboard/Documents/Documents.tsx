@@ -110,7 +110,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         controllerRef?.current?.signal,
         filters.startDate,
         filters.endDate,
-        groupId
+        groupId,
+        filters.executiveUnits
       )
 
       if (result) {

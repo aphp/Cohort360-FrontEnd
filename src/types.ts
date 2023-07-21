@@ -181,7 +181,7 @@ type GenericFilter = {
   nda: string
   startDate: string | null
   endDate: string | null
-  executiveUnits: Array<string> | undefined
+  executiveUnits?: string[]
 }
 
 export type DocumentFilters = GenericFilter & {

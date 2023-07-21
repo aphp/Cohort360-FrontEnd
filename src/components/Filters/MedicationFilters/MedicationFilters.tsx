@@ -16,10 +16,14 @@ import {
   Grid,
   IconButton,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material'
 
 import ClearIcon from '@mui/icons-material/Clear'
+import InfoIcon from '@mui/icons-material/Info'
+
+import scopeType from 'data/scope_type.json'
 
 import services from 'services/aphp'
 import { capitalizeFirstLetter } from 'utils/capitalize'
@@ -57,7 +61,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
   const [_selectedAdministrationRoutes, setSelectedAdministrationRoutes] = useState<any[]>(
     filters.selectedAdministrationRoutes
   )
-  const [_executiveUnit, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
+  const [_executiveUnits, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
   const [dateError, setDateError] = useState(false)
 
   const [prescriptionTypesList, setPrescriptionTypesList] = useState<any[]>([])
@@ -85,7 +89,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
       endDate: newEndDate,
       selectedPrescriptionTypes: _selectedPrescriptionTypes,
       selectedAdministrationRoutes: _selectedAdministrationRoutes,
-      executiveUnit: _executiveUnit?.map((r) => r.id)
+      executiveUnits: _executiveUnits?.map((r) => r.id)
     })
     onClose()
   }
@@ -242,16 +246,32 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
               </IconButton>
             )}
           </Grid>
-
+          <FormLabel style={{ padding: '1em 1em 0 1em', display: 'flex', alignItems: 'center' }} component="legend">
+            Unité exécutrice
+            <Tooltip
+              title={
+                <>
+                  {'- Le niveau hiérarchique de rattachement est : ' +
+                    scopeType?.criteriaType[CriteriaName.Medication] +
+                    '.'}
+                  <br />
+                  {"- L'unité exécutrice" +
+                    ' est la structure élémentaire de prise en charge des malades par une équipe soignante ou médico-technique identifiées par leurs fonctions et leur organisation.'}
+                </>
+              }
+            >
+              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+            </Tooltip>
+          </FormLabel>
           <Grid item container direction="row" alignItems="center">
             <PopulationCard
               form={CriteriaName.Medication}
               label={label}
               title={label}
-              executiveUnits={_executiveUnit}
+              executiveUnits={_executiveUnits}
               isAcceptEmptySelection={true}
               isDeleteIcon={true}
-              onChangeExecutiveUnits={(yyyy) => setExecutiveUnits(yyyy)}
+              onChangeExecutiveUnits={setExecutiveUnits}
             />
           </Grid>
           {dateError && (

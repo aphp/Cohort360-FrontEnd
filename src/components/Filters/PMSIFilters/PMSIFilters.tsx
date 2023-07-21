@@ -5,6 +5,9 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import 'moment/locale/fr'
 
+import scopeType from 'data/scope_type.json'
+import InfoIcon from '@mui/icons-material/Info'
+
 import {
   Autocomplete,
   Button,
@@ -16,6 +19,7 @@ import {
   Grid,
   IconButton,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material'
 
@@ -68,7 +72,7 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
   const [_endDate, setEndDate] = useState<any>(filters.endDate)
   const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>(filters.diagnosticTypes)
   const [dateError, setDateError] = useState(false)
-  const [_executiveUnit, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
+  const [_executiveUnits, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
 
   const [diagnosticTypesList, setDiagnosticTypesList] = useState<any[]>([])
   const criteriaName = mapToCriteriaName(pmsiType)
@@ -95,7 +99,7 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
       startDate: newStartDate,
       endDate: newEndDate,
       diagnosticTypes: _selectedDiagnosticTypes,
-      executiveUnits: _executiveUnit?.map((r) => r.id)
+      executiveUnits: _executiveUnits?.map((r) => r.id)
     })
     onClose()
   }
@@ -227,15 +231,30 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
               </IconButton>
             )}
           </Grid>
+          <FormLabel style={{ padding: '1em 1em 0 1em', display: 'flex', alignItems: 'center' }} component="legend">
+            Unité exécutrice
+            <Tooltip
+              title={
+                <>
+                  {'- Le niveau hiérarchique de rattachement est : ' + scopeType?.criteriaType[criteriaName] + '.'}
+                  <br />
+                  {"- L'unité exécutrice" +
+                    ' est la structure élémentaire de prise en charge des malades par une équipe soignante ou médico-technique identifiées par leurs fonctions et leur organisation.'}
+                </>
+              }
+            >
+              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+            </Tooltip>
+          </FormLabel>
           <Grid item container direction="row" alignItems="center">
             <PopulationCard
               form={criteriaName}
               label={label}
               title={label}
-              executiveUnits={_executiveUnit}
+              executiveUnits={_executiveUnits}
               isAcceptEmptySelection={true}
               isDeleteIcon={true}
-              onChangeExecutiveUnits={(yyyy) => setExecutiveUnits(yyyy)}
+              onChangeExecutiveUnits={setExecutiveUnits}
             />
           </Grid>
 

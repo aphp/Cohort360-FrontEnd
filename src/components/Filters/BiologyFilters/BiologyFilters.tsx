@@ -15,10 +15,14 @@ import {
   Grid,
   IconButton,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material'
 
 import ClearIcon from '@mui/icons-material/Clear'
+import InfoIcon from '@mui/icons-material/Info'
+
+import scopeType from 'data/scope_type.json'
 
 import useStyles from './styles'
 import { CriteriaName, ObservationFilters, ScopeTreeRow } from 'types'
@@ -43,7 +47,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
   const [_anabio, setAnabio] = useState<any>(filters.anabio)
 
   const [dateError, setDateError] = useState(false)
-  const [_executiveUnit, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
+  const [_executiveUnits, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
 
   const _onChangeNda = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNda(event.target.value)
@@ -67,7 +71,7 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
       startDate: newStartDate,
       endDate: newEndDate,
       anabio: _anabio,
-      executiveUnits: _executiveUnit?.map((r) => r.id)
+      executiveUnits: _executiveUnits?.map((r) => r.id)
     })
     onClose()
   }
@@ -179,15 +183,32 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
               </IconButton>
             )}
           </Grid>
+          <FormLabel style={{ padding: '1em 1em 0 1em', display: 'flex', alignItems: 'center' }} component="legend">
+            Unité exécutrice
+            <Tooltip
+              title={
+                <>
+                  {'- Le niveau hiérarchique de rattachement est : ' +
+                    scopeType?.criteriaType[CriteriaName.Biology] +
+                    '.'}
+                  <br />
+                  {"- L'unité exécutrice" +
+                    ' est la structure élémentaire de prise en charge des malades par une équipe soignante ou médico-technique identifiées par leurs fonctions et leur organisation.'}
+                </>
+              }
+            >
+              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+            </Tooltip>
+          </FormLabel>
           <Grid item container direction="row" alignItems="center">
             <PopulationCard
               form={CriteriaName.Biology}
               label={label}
               title={label}
-              executiveUnits={_executiveUnit}
+              executiveUnits={_executiveUnits}
               isAcceptEmptySelection={true}
               isDeleteIcon={true}
-              onChangeExecutiveUnits={(yyyy) => setExecutiveUnits(yyyy)}
+              onChangeExecutiveUnits={setExecutiveUnits}
             />
           </Grid>
           {dateError && (
