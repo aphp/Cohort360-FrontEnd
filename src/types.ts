@@ -617,13 +617,15 @@ export type RequestType = {
   currentSnapshot?: Snapshot
   requestId?: string
   requestName?: string
+  shared_query_snapshot?: string[]
+  usersToShare?: Provider[]
 }
 
 export type QuerySnapshotInfo = {
   uuid: string
   created_at: string
   title: string
-  has_linked_cohorts: string
+  has_linked_cohorts: boolean
   version: number
 }
 
@@ -640,6 +642,10 @@ export type Snapshot = QuerySnapshotInfo & {
   serialized_query: string
   is_active_branch?: boolean
   perimeters_ids?: string[]
+}
+
+export type CurrentSnapshot = Snapshot & {
+  navHistoryIndex: number
 }
 
 export type DatedMeasure = {
@@ -689,10 +695,6 @@ export type Cohort = {
   create_task_id?: string
   type?: 'IMPORT_I2B2' | 'MY_ORGANIZATIONS' | 'MY_PATIENTS' | 'MY_COHORTS'
   extension?: any[]
-  // query_snapshots?: QuerySnapshotInfo[]
-  // shared_query_snapshot?: string[]
-  // usersToShare?: Provider[]
-  // shared_by?: Provider
 }
 
 export type CohortCreationCounterType = {
@@ -700,10 +702,6 @@ export type CohortCreationCounterType = {
   status?: string
   includePatient?: number
   byrequest?: number
-  alive?: number
-  deceased?: number
-  female?: number
-  male?: number
   unknownPatient?: number
   jobFailMsg?: string
   date?: string

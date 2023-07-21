@@ -21,6 +21,7 @@ import UpdateSharpIcon from '@mui/icons-material/UpdateSharp'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import InfoIcon from '@mui/icons-material/Info'
 import ShareIcon from '@mui/icons-material/Share'
+import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 import ModalShareRequest from 'components/MyProjects/Modals/ModalShareRequest/ModalShareRequest'
@@ -31,11 +32,12 @@ import {
   countCohortCreation,
   deleteCriteriaGroup,
   buildCohortCreation,
-  unbuildCohortCreation
+  unbuildCohortCreation,
+  addActionToNavHistory
 } from 'state/cohortCreation'
 import { MeState } from 'state/me'
 
-import { CohortCreationCounterType, RequestType, SimpleStatus, Snapshot } from 'types'
+import { CohortCreationCounterType, CurrentSnapshot, RequestType, SimpleStatus, Snapshot } from 'types'
 
 import useStyle from './styles'
 
@@ -71,6 +73,7 @@ const ControlPanel: React.FC<{
     selectedCriteria = [],
     selectedPopulation = [],
     currentSnapshot,
+    navHistory,
     requestId,
     requestName,
     json,
@@ -146,11 +149,27 @@ const ControlPanel: React.FC<{
     setRequestShare(null)
     setOpenShareRequestModal(false)
   }
-  const handleSnapshotChange = async (snapshotId: string) => {
-    console.log('snapshotId', snapshotId)
-    const snapshot: Snapshot = await services.cohortCreation.fetchSnapshot(snapshotId)
 
-    dispatch(unbuildCohortCreation({ newCurrentSnapshot: snapshot }))
+  const getNewNavHistoryIndex = (navHistory: CurrentSnapshot[], previousSnapshot: CurrentSnapshot) => {
+    let newNavHistoryIndex = 0
+    const previousNavHistoryIndex = previousSnapshot.navHistoryIndex
+    if (navHistory.length - 1 > previousNavHistoryIndex) {
+      newNavHistoryIndex = previousNavHistoryIndex + 1
+    } else {
+      newNavHistoryIndex = navHistory.length
+    }
+    return newNavHistoryIndex
+  }
+
+  const handleSnapshotChange = async (snapshotId: string) => {
+    if (currentSnapshot.uuid !== snapshotId) {
+      const snapshot: Snapshot = await services.cohortCreation.fetchSnapshot(snapshotId)
+      const newNavHistoryIndex = getNewNavHistoryIndex(navHistory, currentSnapshot)
+      const newCurrentSnapshot: CurrentSnapshot = { ...snapshot, navHistoryIndex: newNavHistoryIndex }
+
+      dispatch(addActionToNavHistory(newCurrentSnapshot))
+      dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
+    }
   }
 
   const itLoads = loading || countLoading || saveLoading
@@ -247,7 +266,7 @@ const ControlPanel: React.FC<{
 
         <Grid className={classes.container}>
           <Grid container justifyContent="space-between">
-            <Typography className={cx(classes.boldText, classes.patientTypo)}>ACCÈS:</Typography>
+            <Typography className={cx(classes.boldText, classes.patientTypo)}>ACCÈS :</Typography>
             <Typography className={cx(classes.blueText, classes.boldText, classes.patientTypo)}>
               {accessIsPseudonymize === null ? '-' : accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
             </Typography>
@@ -256,7 +275,7 @@ const ControlPanel: React.FC<{
 
         <Grid className={classes.container}>
           <Grid container justifyContent="space-between">
-            <Typography className={cx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS</Typography>
+            <Typography className={cx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS :</Typography>
             {itLoads ? (
               <CircularProgress
                 size={12}
@@ -361,25 +380,40 @@ const ControlPanel: React.FC<{
           </Alert>
         )}
 
-        <Grid className={classes.container}>
-          <Grid container justifyContent="space-between">
-            <Typography className={cx(classes.boldText, classes.patientTypo)}>
-              Les versions suivantes sont associées à cette requête. Cliquez sur une des versions pour la consulter :
+        <Grid className={classes.container} style={{ maxHeight: 400, overflow: 'hidden scroll' }}>
+          <Grid container justifyContent="space-between" style={{ margin: 10 }}>
+            <Typography className={classes.boldText} sx={{ margin: '0px 10px' }}>
+              VERSIONS DE LA REQUÊTE :
             </Typography>
-            <div style={{ margin: '0 1em' }}>
+            <Typography sx={{ margin: '0 10px 10px 10px', fontSize: 11, color: 'grey' }}>
+              Cliquez sur une des versions pour la consulter.
+            </Typography>
+            <Grid container justifyContent={'space-around'} style={{ marginLeft: '0.5em' }}>
               {snapshotsHistory.map((snapshot, count) => (
-                <Link
-                  key={count}
-                  onClick={() => handleSnapshotChange(snapshot.uuid)}
-                  underline="hover"
-                  style={{ cursor: 'pointer' }}
-                >
-                  <Typography style={{ fontWeight: currentSnapshot.uuid === snapshot.uuid ? 'bold' : '' }}>
-                    Version {snapshot.version} - {moment(snapshot.created_at).format('DD/MM/YYYY - HH:mm:ss')}
-                  </Typography>
-                </Link>
+                <Grid container key={count} alignItems="center">
+                  <Link
+                    onClick={() => handleSnapshotChange(snapshot.uuid)}
+                    underline={currentSnapshot.uuid === snapshot.uuid ? 'none' : 'hover'}
+                    style={{
+                      display: 'flex',
+                      cursor: currentSnapshot.uuid === snapshot.uuid ? 'default' : 'pointer',
+                      fontWeight: currentSnapshot.uuid === snapshot.uuid ? 'bold' : ''
+                    }}
+                  >
+                    <div style={{ width: 80, textAlign: 'center' }}>Version {snapshot.version}</div>
+                    <div style={{ width: 8 }}> - </div>
+                    <div style={{ width: 135 }}>{moment(snapshot.created_at).format('DD/MM/YYYY - HH:mm:ss')}</div>
+                  </Link>
+                  <Grid container alignItems="center" style={{ width: 24, margin: '0 4px' }}>
+                    {snapshot.has_linked_cohorts && (
+                      <Tooltip title="Une ou plusieurs cohortes ont été créées à partir de cette version.">
+                        <SupervisedUserCircleIcon fontSize="small" color="action" sx={{ color: '#f7a600b3' }} />
+                      </Tooltip>
+                    )}
+                  </Grid>
+                </Grid>
               ))}
-            </div>
+            </Grid>
           </Grid>
         </Grid>
       </Grid>
