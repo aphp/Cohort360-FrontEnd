@@ -144,11 +144,11 @@ const Login = () => {
               'Une erreur DJANGO est survenue. Si elle persiste, veuillez contacter le support au : dsi-id-recherche-support-cohort360@aphp.fr.'
             )
           )
+        } else if (practitionerPerimeters.errorType === 'noRight') {
+          localStorage.clear()
+          setLoading(false)
+          return setNoRights(true)
         }
-      } else if (!practitionerPerimeters || !practitionerPerimeters.length || practitionerPerimeters.length === 0) {
-        localStorage.clear()
-        setLoading(false)
-        return setNoRights(true)
       }
 
       const nominativeGroupsIds = practitionerPerimeters
