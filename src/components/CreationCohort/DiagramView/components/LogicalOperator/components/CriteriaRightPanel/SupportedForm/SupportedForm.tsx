@@ -105,6 +105,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
       defaultValues.destination?.length === 0 &&
       defaultValues.provenance?.length === 0 &&
       defaultValues.admission?.length === 0 &&
+      defaultValues.encounterService?.length === 0 &&
       !defaultValues.encounterStartDate &&
       !defaultValues.encounterEndDate
     ) {
@@ -128,6 +129,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
   }
 
   const _onSubmit = () => {
+    console.log('defaultValues', defaultValues)
     const errorType = onCheckFormError()
     setError(errorType)
     if (errorType === Error.NO_ERROR) onChangeSelectedCriteria(defaultValues)
