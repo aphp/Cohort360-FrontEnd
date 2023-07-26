@@ -1,4 +1,4 @@
-FROM harbor.eds.aphp.fr/cohort360/nginx:1.21
+FROM nginx:1.21
 
 WORKDIR /app
 COPY package.json package-lock.json ./
