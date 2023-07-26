@@ -265,11 +265,18 @@ const servicesPerimeters: IServicePerimeters = {
     signal?: AbortSignal
   ) => {
     try {
+      const noRightsMessage = 'No accesses with read patient right found'
       let perimetersIds: string[] | undefined = []
       let perimetersList: ScopePage[] = []
       let rightsData: any = []
       if (!defaultPerimetersIds && !noPerimetersIdsFetch) {
         const rightResponse = await apiBackend.get('accesses/perimeters/read-patient/', { signal: signal })
+        if (rightResponse.status === 200 && rightResponse.data.message === noRightsMessage) {
+          const noRightError: any = {
+            errorType: 'noRight'
+          }
+          return noRightError
+        }
         rightsData = rightResponse.status === 200 ? (rightResponse?.data as any) : ''
 
         if (rightResponse.status !== 200) {

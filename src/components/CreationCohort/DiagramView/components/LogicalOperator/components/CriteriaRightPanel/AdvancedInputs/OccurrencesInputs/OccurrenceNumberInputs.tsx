@@ -19,7 +19,6 @@ const defaultOccurrencesNumberInputs = {
 }
 
 const getMinForComparatorType = (comparator: string) => {
-  console.log(comparator)
   if (comparator === '<') return 1
   return 0
 }
