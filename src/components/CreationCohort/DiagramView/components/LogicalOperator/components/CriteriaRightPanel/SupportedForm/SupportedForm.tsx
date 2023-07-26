@@ -129,7 +129,6 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
   }
 
   const _onSubmit = () => {
-    console.log('defaultValues', defaultValues)
     const errorType = onCheckFormError()
     setError(errorType)
     if (errorType === Error.NO_ERROR) onChangeSelectedCriteria(defaultValues)
