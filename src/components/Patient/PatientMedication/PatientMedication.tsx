@@ -9,7 +9,7 @@ import DataTableMedication from 'components/DataTable/DataTableMedication'
 import DataTableTopBar from 'components/DataTable/DataTableTopBar'
 import MasterChips from 'components/MasterChips/MasterChips'
 
-import { MedicationsFilters, Order } from 'types'
+import { LoadingStatus, MedicationsFilters, Order } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchMedication } from 'state/patient'
@@ -19,6 +19,7 @@ import { buildMedicationFiltersChips } from 'utils/chips'
 import useStyles from './styles'
 import { useDebounce } from 'utils/debounce'
 import { _cancelPendingRequest } from 'utils/abortController'
+import { CanceledError } from 'axios'
 
 type PatientMedicationTypes = {
   groupId?: string
@@ -30,7 +31,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
     patient: state.patient
   }))
 
-  const [loading, setLoading] = useState(false)
+  const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [open, setOpen] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const [filters, setFilters] = useState<MedicationsFilters & { searchInput: string }>({
@@ -53,7 +54,8 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
 
   const _fetchMedication = async () => {
     try {
-      await dispatch(
+      setLoadingStatus(LoadingStatus.FETCHING)
+      const response = await dispatch(
         fetchMedication({
           selectedTab,
           groupId,
@@ -64,11 +66,18 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
               direction: order.orderDirection
             },
             filters: filters
-          }
+          },
+          signal: controllerRef.current?.signal
         })
       )
-    } finally {
-      setLoading(false)
+      if (response.payload.error) {
+        throw response.payload.error
+      }
+      setLoadingStatus(LoadingStatus.SUCCESS)
+    } catch (error) {
+      if (error instanceof CanceledError) {
+        setLoadingStatus(LoadingStatus.FETCHING)
+      }
     }
   }
 
@@ -90,7 +99,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   }
 
   useEffect(() => {
-    setLoading(true)
+    setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
   }, [
     debouncedSearchValue,
@@ -104,15 +113,15 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   ])
 
   useEffect(() => {
-    setLoading(true)
+    setLoadingStatus(LoadingStatus.IDDLE)
   }, [page])
 
   useEffect(() => {
-    if (loading) {
+    if (loadingStatus === LoadingStatus.IDDLE) {
       controllerRef.current = _cancelPendingRequest(controllerRef.current)
       _fetchMedication()
     }
-  }, [loading])
+  }, [loadingStatus])
 
   useEffect(() => {
     setPage(1)
@@ -130,7 +139,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
-        loading={loading}
+        loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
         tabs={{
           list: [
             { label: 'Prescription', value: 'prescription' },
@@ -161,7 +170,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
       <MasterChips chips={buildMedicationFiltersChips(filters, handleDeleteChip)} />
 
       <DataTableMedication
-        loading={loading}
+        loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
         selectedTab={selectedTab}
         medicationsList={patientMedicationList}
         deidentified={deidentifiedBoolean}

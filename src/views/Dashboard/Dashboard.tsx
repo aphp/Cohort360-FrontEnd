@@ -185,9 +185,6 @@ const Dashboard: React.FC<{
             groupId={cohortId || perimetreIds}
             total={dashboard.totalPatients || 0}
             deidentified={dashboard.deidentifiedBoolean}
-            patients={dashboard.originalPatients}
-            agePyramidData={dashboard.agePyramidData}
-            genderRepartitionMap={dashboard.genderRepartitionMap}
           />
         )}
         {selectedTab === 'documents' && (

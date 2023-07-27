@@ -14,11 +14,12 @@ import { buildPmsiFiltersChips } from 'utils/chips'
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPmsi } from 'state/patient'
 
-import { PMSIFilters, Order } from 'types'
+import { PMSIFilters, Order, LoadingStatus } from 'types'
 
 import useStyles from './styles'
 import { useDebounce } from 'utils/debounce'
 import { _cancelPendingRequest } from 'utils/abortController'
+import { CanceledError } from 'axios'
 
 type PatientPMSITypes = {
   groupId?: string
@@ -54,7 +55,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   const { patient } = useAppSelector((state) => ({
     patient: state.patient
   }))
-  const [loading, setLoading] = useState(false)
+  const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
 
   const deidentifiedBoolean = patient?.deidentified ?? false
   const totalPmsi = patient?.pmsi?.[selectedTab]?.count ?? 0
@@ -66,7 +67,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   const _fetchPMSI = async () => {
     try {
       const selectedDiagnosticTypesCodes = filters.selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
-      await dispatch(
+      setLoadingStatus(LoadingStatus.FETCHING)
+      const response = await dispatch(
         fetchPmsi({
           selectedTab,
           groupId,
@@ -84,8 +86,14 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
           signal: controllerRef.current?.signal
         })
       )
-    } finally {
-      setLoading(false)
+      if (response.payload.error) {
+        throw response.payload.error
+      }
+      setLoadingStatus(LoadingStatus.SUCCESS)
+    } catch (error) {
+      if (error instanceof CanceledError) {
+        setLoadingStatus(LoadingStatus.FETCHING)
+      }
     }
   }
 
@@ -115,7 +123,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
     }
   }
   useEffect(() => {
-    setLoading(true)
+    setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
   }, [
     debouncedSearchValue,
@@ -129,15 +137,15 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   ])
 
   useEffect(() => {
-    setLoading(true)
+    setLoadingStatus(LoadingStatus.IDDLE)
   }, [page])
 
   useEffect(() => {
-    if (loading) {
+    if (loadingStatus === LoadingStatus.IDDLE) {
       controllerRef.current = _cancelPendingRequest(controllerRef.current)
       _fetchPMSI()
     }
-  }, [loading])
+  }, [loadingStatus])
 
   useEffect(() => {
     setPage(1)
@@ -155,7 +163,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
-        loading={loading}
+        loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
         tabs={{
           list: [
             { label: 'Diagnostics CIM10', value: PMSI.DIAGNOSTIC },
@@ -187,7 +195,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
       <MasterChips chips={buildPmsiFiltersChips(filters as PMSIFilters, handleDeleteChip)} />
 
       <DataTablePmsi
-        loading={loading}
+        loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
         selectedTab={selectedTab}
         pmsiList={patientPmsiList}
         deidentified={deidentifiedBoolean}

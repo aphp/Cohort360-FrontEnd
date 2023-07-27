@@ -48,6 +48,12 @@ export enum GenderStatus {
   UNKNOWN = 'unknown'
 }
 
+export enum LoadingStatus {
+  FETCHING = 'FETCHING',
+  IDDLE = 'IDLE',
+  SUCCESS = 'SUCCESS'
+}
+
 export enum CompositionStatusKind {
   _preliminary = 'preliminary',
   _final = 'final',
