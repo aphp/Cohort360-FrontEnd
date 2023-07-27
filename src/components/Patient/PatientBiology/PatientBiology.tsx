@@ -11,7 +11,7 @@ import MasterChips from 'components/MasterChips/MasterChips'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchBiology } from 'state/patient'
-import { Order, ObservationFilters } from 'types'
+import { Order, ObservationFilters, LoadingStatus } from 'types'
 
 import { buildObservationFiltersChips } from 'utils/chips'
 
@@ -19,6 +19,7 @@ import useStyles from './styles'
 import { Checkbox } from '@mui/material'
 import { useDebounce } from 'utils/debounce'
 import { _cancelPendingRequest } from 'utils/abortController'
+import { CanceledError } from 'axios'
 
 type PatientBiologyTypes = {
   groupId?: string
@@ -33,7 +34,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     patient: state.patient
   }))
 
-  const [loading, setLoading] = useState(false)
+  const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const deidentifiedBoolean = patient?.deidentified ?? false
   const totalBiology = patient?.biology?.count ?? 0
   const totalAllBiology = patient?.biology?.total ?? 0
@@ -53,7 +54,8 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
 
   const _fetchBiology = async () => {
     try {
-      await dispatch(
+      setLoadingStatus(LoadingStatus.FETCHING)
+      const response = await dispatch(
         fetchBiology({
           groupId,
           rowStatus: validatedStatus,
@@ -71,20 +73,27 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
               startDate: filters.startDate,
               endDate: filters.endDate
             }
-          }
+          },
+          signal: controllerRef.current?.signal
         })
       )
-    } finally {
-      setLoading(false)
+      if (response.payload.error) {
+        throw response.payload.error
+      }
+      setLoadingStatus(LoadingStatus.SUCCESS)
+    } catch (error) {
+      if (error instanceof CanceledError) {
+        setLoadingStatus(LoadingStatus.FETCHING)
+      }
     }
   }
 
-  const handleChangeFilter = (filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate') => {
+  const handleDeleteChip = (filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate') => {
     switch (filterName) {
       case 'nda':
       case 'loinc':
       case 'anabio':
-        setFilters((prevState) => ({ ...prevState, [filterName]: value }))
+        setFilters((prevState) => ({ ...prevState, [filterName]: null }))
         break
       case 'startDate':
       case 'endDate':
@@ -94,7 +103,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   }
 
   useEffect(() => {
-    setLoading(true)
+    setLoadingStatus(LoadingStatus.IDDLE)
     setPage(1)
   }, [
     debouncedSearchValue,
@@ -107,20 +116,20 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   ])
 
   useEffect(() => {
-    setLoading(true)
+    setLoadingStatus(LoadingStatus.IDDLE)
   }, [page])
 
   useEffect(() => {
-    if (loading) {
+    if (loadingStatus === LoadingStatus.IDDLE) {
       controllerRef.current = _cancelPendingRequest(controllerRef.current)
       _fetchBiology()
     }
-  }, [loading])
+  }, [loadingStatus])
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
-        loading={loading}
+        loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
         results={{
           nb: totalBiology,
           total: totalAllBiology,
@@ -140,7 +149,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
         ]}
       />
 
-      <MasterChips chips={buildObservationFiltersChips(filters, handleChangeFilter)} />
+      <MasterChips chips={buildObservationFiltersChips(filters, handleDeleteChip)} />
       <Grid container item alignItems="center" justifyContent="flex-end">
         <Checkbox checked={validatedStatus} disabled />
         <Typography style={{ color: '#505050' }}>
@@ -157,7 +166,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
       </Grid>
 
       <DataTableObservation
-        loading={loading}
+        loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
         deidentified={deidentifiedBoolean}
         observationsList={observationsListState}
         order={order}

@@ -524,6 +524,7 @@ type fetchObservationProps = {
   maxDate?: string
   _list?: string[]
   rowStatus: boolean
+  signal?: AbortSignal
 }
 export const fetchObservation = async (args: fetchObservationProps) => {
   const {
@@ -540,7 +541,8 @@ export const fetchObservation = async (args: fetchObservationProps) => {
     type,
     minDate,
     maxDate,
-    rowStatus
+    rowStatus,
+    signal
   } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
@@ -564,7 +566,9 @@ export const fetchObservation = async (args: fetchObservationProps) => {
 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
-  const response = await apiFhir.get<FHIR_API_Response<Observation>>(`/Observation?${options.reduce(optionsReducer)}`)
+  const response = await apiFhir.get<FHIR_API_Response<Observation>>(`/Observation?${options.reduce(optionsReducer)}`, {
+    signal: signal
+  })
 
   return response
 }
@@ -582,9 +586,10 @@ type fetchMedicationRequestProps = {
   minDate?: string
   maxDate?: string
   _list?: string[]
+  signal?: AbortSignal
 }
 export const fetchMedicationRequest = async (args: fetchMedicationRequestProps) => {
-  const { id, size, offset, _sort, sortDirection, _text, encounter, patient, type, minDate, maxDate } = args
+  const { id, size, offset, _sort, sortDirection, _text, encounter, patient, type, minDate, maxDate, signal } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
 
@@ -606,7 +611,10 @@ export const fetchMedicationRequest = async (args: fetchMedicationRequestProps) 
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<MedicationRequest>>(
-    `/MedicationRequest?${options.reduce(optionsReducer)}`
+    `/MedicationRequest?${options.reduce(optionsReducer)}`,
+    {
+      signal: signal
+    }
   )
 
   return response
@@ -625,9 +633,10 @@ type fetchMedicationAdministrationProps = {
   minDate?: string
   maxDate?: string
   _list?: string[]
+  signal?: AbortSignal
 }
 export const fetchMedicationAdministration = async (args: fetchMedicationAdministrationProps) => {
-  const { id, size, offset, _sort, sortDirection, _text, encounter, patient, route, minDate, maxDate } = args
+  const { id, size, offset, _sort, sortDirection, _text, encounter, patient, route, minDate, maxDate, signal } = args
   const _sortDirection = sortDirection === 'desc' ? '-' : ''
   let { _list } = args
 
@@ -649,7 +658,10 @@ export const fetchMedicationAdministration = async (args: fetchMedicationAdminis
   if (_list && _list.length > 0) options = [...options, `_list=${_list.reduce(reducer)}`] // eslint-disable-line
 
   const response = await apiFhir.get<FHIR_API_Response<MedicationAdministration>>(
-    `/MedicationAdministration?${options.reduce(optionsReducer)}`
+    `/MedicationAdministration?${options.reduce(optionsReducer)}`,
+    {
+      signal: signal
+    }
   )
 
   return response

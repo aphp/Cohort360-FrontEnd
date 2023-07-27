@@ -172,7 +172,8 @@ export interface IServicePatients {
     selectedAdministrationRouteIds: string,
     groupId?: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
+    signal?: AbortSignal
   ) => Promise<{
     medicationData?: MedicationEntry<MedicationAdministration | MedicationRequest>[]
     medicationTotal?: number
@@ -211,7 +212,8 @@ export interface IServicePatients {
     anabio: string,
     startDate?: string | null,
     endDate?: string | null,
-    groupId?: string
+    groupId?: string,
+    signal?: AbortSignal
   ) => Promise<{
     biologyList: Observation[]
     biologyTotal: number
@@ -498,7 +500,8 @@ const servicesPatients: IServicePatients = {
     selectedAdministrationRouteIds,
     groupId,
     startDate,
-    endDate
+    endDate,
+    signal
   ) => {
     let medicationResp: AxiosResponse<FHIR_API_Response<MedicationRequest | MedicationAdministration>> | null = null
 
@@ -515,7 +518,8 @@ const servicesPatients: IServicePatients = {
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
           type: selectedPrescriptionTypeIds,
           minDate: startDate,
-          maxDate: endDate
+          maxDate: endDate,
+          signal
         })
         break
       case 'administration':
@@ -530,7 +534,8 @@ const servicesPatients: IServicePatients = {
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
           route: selectedAdministrationRouteIds,
           minDate: startDate,
-          maxDate: endDate
+          maxDate: endDate,
+          signal
         })
         break
       default:
@@ -559,7 +564,8 @@ const servicesPatients: IServicePatients = {
     anabio: string,
     startDate?: string | null,
     endDate?: string | null,
-    groupId?: string
+    groupId?: string,
+    signal?: AbortSignal
   ) => {
     const observationResp = await fetchObservation({
       patient: patientId,
@@ -574,7 +580,8 @@ const servicesPatients: IServicePatients = {
       anabio: anabio,
       minDate: startDate ?? '',
       maxDate: endDate ?? '',
-      rowStatus
+      rowStatus,
+      signal
     })
 
     const biologyTotal = observationResp.data.resourceType === 'Bundle' ? observationResp.data.total : 0

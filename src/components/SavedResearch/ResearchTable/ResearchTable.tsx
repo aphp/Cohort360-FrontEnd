@@ -331,7 +331,6 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                           >
                             <Grid item>
                               <>
-                                {console.log(row.exportable)}
                                 <Tooltip
                                   title={
                                     !row.exportable

@@ -48,6 +48,12 @@ export enum PatientGenderKind {
   _unknown = 'unknown'
 }
 
+export enum LoadingStatus {
+  FETCHING = 'FETCHING',
+  IDDLE = 'IDLE',
+  SUCCESS = 'SUCCESS'
+}
+
 export enum CompositionStatusKind {
   _preliminary = 'preliminary',
   _final = 'final',

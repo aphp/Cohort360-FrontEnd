@@ -34,6 +34,7 @@ import {
 
 import apiBackend from '../apiBackend'
 import { BundleEntry, DocumentReference, Encounter, Extension, Identifier, ParametersParameter, Patient } from 'fhir/r4'
+import { CanceledError } from 'axios'
 
 export interface IServiceCohorts {
   /**
@@ -330,61 +331,68 @@ const servicesCohorts: IServiceCohorts = {
     includeFacets,
     signal
   ) => {
-    let _searchInput = ''
-    const searches = searchInput
-      .trim() // Remove space before/after search
-      .split(' ') // Split by space (= ['mot1', 'mot2' ...])
-      .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
-    for (const _search of searches) {
-      _searchInput = _searchInput ? `${_searchInput} AND "${_search}"` : `"${_search}"`
-    }
+    try {
+      let _searchInput = ''
+      const searches = searchInput
+        .trim() // Remove space before/after search
+        .split(' ') // Split by space (= ['mot1', 'mot2' ...])
+        .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
+      for (const _search of searches) {
+        _searchInput = _searchInput ? `${_searchInput} AND "${_search}"` : `"${_search}"`
+      }
 
-    // convert birthdates into days or months depending of if it's a deidentified perimeter or not
-    const minBirthdate = Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
-    const maxBirthdate = Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
+      // convert birthdates into days or months depending of if it's a deidentified perimeter or not
+      const minBirthdate = Math.abs(moment(birthdates[0]).diff(moment(), deidentified ? 'months' : 'days'))
+      const maxBirthdate = Math.abs(moment(birthdates[1]).diff(moment(), deidentified ? 'months' : 'days'))
 
-    const patientsResp = await fetchPatient({
-      size: 20,
-      offset: page ? (page - 1) * 20 : 0,
-      _sort: sortBy,
-      sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
-      pivotFacet: includeFacets ? ['age-month_gender', 'deceased_gender'] : [],
-      _list: groupId ? [groupId] : [],
-      gender:
-        gender === PatientGenderKind._unknown ? '' : gender === PatientGenderKind._other ? `other,unknown` : gender,
-      searchBy,
-      _text: _searchInput,
-      minBirthdate: minBirthdate,
-      maxBirthdate: maxBirthdate,
-      deceased: vitalStatus !== VitalStatus.all ? (vitalStatus === VitalStatus.deceased ? true : false) : undefined,
-      deidentified: deidentified,
-      signal: signal
-    })
+      const patientsResp = await fetchPatient({
+        size: 20,
+        offset: page ? (page - 1) * 20 : 0,
+        _sort: sortBy,
+        sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
+        pivotFacet: includeFacets ? ['age-month_gender', 'deceased_gender'] : [],
+        _list: groupId ? [groupId] : [],
+        gender:
+          gender === PatientGenderKind._unknown ? '' : gender === PatientGenderKind._other ? `other,unknown` : gender,
+        searchBy,
+        _text: _searchInput,
+        minBirthdate: minBirthdate,
+        maxBirthdate: maxBirthdate,
+        deceased: vitalStatus !== VitalStatus.all ? (vitalStatus === VitalStatus.deceased ? true : false) : undefined,
+        deidentified: deidentified,
+        signal: signal
+      })
 
-    const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
+      const totalPatients = patientsResp.data.resourceType === 'Bundle' ? patientsResp.data.total : 0
 
-    const originalPatients = getApiResponseResources(patientsResp)
+      const originalPatients = getApiResponseResources(patientsResp)
 
-    const agePyramidData =
-      patientsResp.data.resourceType === 'Bundle'
-        ? getAgeRepartitionMapAphp(
-            patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === 'facet-extension.age-month')
-              ?.extension
-          )
-        : undefined
+      const agePyramidData =
+        patientsResp.data.resourceType === 'Bundle'
+          ? getAgeRepartitionMapAphp(
+              patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === 'facet-extension.age-month')
+                ?.extension
+            )
+          : undefined
 
-    const genderRepartitionMap =
-      patientsResp.data.resourceType === 'Bundle'
-        ? getGenderRepartitionMapAphp(
-            patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === 'facet-deceased')?.extension
-          )
-        : undefined
+      const genderRepartitionMap =
+        patientsResp.data.resourceType === 'Bundle'
+          ? getGenderRepartitionMapAphp(
+              patientsResp.data.meta?.extension?.find((facet: Extension) => facet.url === 'facet-deceased')?.extension
+            )
+          : undefined
 
-    return {
-      totalPatients: totalPatients ?? 0,
-      originalPatients,
-      genderRepartitionMap,
-      agePyramidData
+      return {
+        totalPatients: totalPatients ?? 0,
+        originalPatients,
+        genderRepartitionMap,
+        agePyramidData
+      }
+    } catch (error) {
+      console.error(error)
+      if (error instanceof CanceledError) {
+        throw error
+      }
     }
   },
 
@@ -530,7 +538,7 @@ const servicesCohorts: IServiceCohorts = {
             parsedErrors.push(errorObject)
           }
         } catch (e) {
-          console.log('failed to parse int', e)
+          console.error('failed to parse int', e)
         }
       })
 
