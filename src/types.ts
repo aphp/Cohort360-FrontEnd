@@ -414,6 +414,7 @@ export type TemporalConstraintsType = {
 export type CriteriaItemType = {
   id: string
   title: string
+  fontWeight?: string
   color: string
   components: any
   disabled?: boolean
@@ -421,6 +422,7 @@ export type CriteriaItemType = {
   fetch?: any
   valueSet?: any
   subItems?: CriteriaItemType[]
+  icone?: any
 }
 
 export type SelectedCriteriaType = {
@@ -934,4 +936,21 @@ export type AccessExpiration = {
   end_datetime: Date
   profile: string
   perimeter: string
+}
+
+export enum IdType {
+  Request = 'Request',
+  IPPList = 'IPPList',
+  Patient = 'Patient',
+  Encounter = 'Encounter',
+  DocumentReference = 'DocumentReference',
+  Pmsi = 'pmsi',
+  Condition = 'Condition',
+  Procedure = 'Procedure',
+  Claim = 'Claim',
+  Medication = 'Medication',
+  Biologie_microbiologie = 'biologie_microbiologie',
+  Observation = 'Observation',
+  Microbiologie = 'microbiologie',
+  Physiologie = 'physiologie'
 }

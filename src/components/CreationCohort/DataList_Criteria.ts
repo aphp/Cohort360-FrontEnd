@@ -16,7 +16,6 @@ import services from 'services/aphp'
 
 import { ODD_BIOLOGY, ODD_MEDICATION } from '../../constants'
 
-// ├── Mes variables
 // ├── Mes requêtes
 // ├── Liste d'IPP
 // ├── Patients
@@ -38,12 +37,14 @@ const criteriaList: CriteriaItemType[] = [
     id: 'Request',
     title: 'Mes requêtes',
     color: '#0063AF',
+    fontWeight: 'bold',
     components: RequestForm
   },
   {
     id: 'IPPList',
     title: "Liste d'IPP",
     color: '#0063AF',
+    fontWeight: 'bold',
     components: IPPForm,
     disabled: true
   },
@@ -51,6 +52,7 @@ const criteriaList: CriteriaItemType[] = [
     id: 'Patient',
     title: 'Démographie',
     color: '#0063AF',
+    fontWeight: 'bold',
     components: DemographicFrom,
     data: { gender: 'loading', status: 'loading' },
     fetch: { fetchGender: services.cohortCreation.fetchGender, fetchStatus: services.cohortCreation.fetchStatus }
@@ -59,6 +61,7 @@ const criteriaList: CriteriaItemType[] = [
     id: 'Encounter',
     title: 'Prise en charge',
     color: '#0063AF',
+    fontWeight: 'bold',
     components: SupportedForm,
     data: {
       admissionModes: 'loading',
@@ -89,6 +92,7 @@ const criteriaList: CriteriaItemType[] = [
     id: 'DocumentReference',
     title: 'Documents cliniques',
     color: '#0063AF',
+    fontWeight: 'bold',
     components: DocumentsForm,
     data: { docTypes: 'loading' },
     fetch: { fetchDocTypes: services.cohortCreation.fetchDocTypes }
@@ -97,6 +101,7 @@ const criteriaList: CriteriaItemType[] = [
     id: 'pmsi',
     title: 'PMSI',
     color: '#0063AF',
+    fontWeight: 'bold',
     components: null,
     subItems: [
       {
@@ -146,6 +151,7 @@ const criteriaList: CriteriaItemType[] = [
     // title: 'Médicaments (Prescription - Dispension - Administration)',
     title: 'Médicaments (Prescription - Administration)',
     color: ODD_MEDICATION ? '#0063AF' : '#808080',
+    fontWeight: 'bold',
     components: ODD_MEDICATION ? MedicationForm : null,
     disabled: !ODD_MEDICATION ?? false,
     data: { atcData: 'loading', atcHierarchy: 'loading', prescriptionTypes: 'loading', administrations: 'loading' },
@@ -160,6 +166,7 @@ const criteriaList: CriteriaItemType[] = [
     id: 'biologie_microbiologie',
     title: 'Biologie/Microbiologie',
     color: !!ODD_BIOLOGY ? '#0063AF' : '#808080',
+    fontWeight: 'bold',
     components: null,
     subItems: [
       {
@@ -189,6 +196,7 @@ const criteriaList: CriteriaItemType[] = [
     id: 'physiologie',
     title: 'Physiologie',
     color: '#808080',
+    fontWeight: 'bold',
     disabled: true,
     data: null,
     components: null
