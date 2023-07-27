@@ -54,7 +54,12 @@ const DataTablePatient: React.FC<DataTablePatientProps> = ({
     },
     { label: 'Dernier lieu de prise en charge', code: '', align: 'left', sortableColumn: false },
     { label: 'Statut vital', code: '', align: 'left', sortableColumn: false },
-    { label: `IPP${!deidentified ? '' : ' chiffré'}`, code: '', align: 'center', sortableColumn: false }
+    {
+      label: `IPP${!deidentified ? '' : ' chiffré'}`,
+      code: 'identifier',
+      align: 'center',
+      sortableColumn: !deidentified
+    }
   ]
 
   return (
