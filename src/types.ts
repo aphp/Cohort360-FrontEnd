@@ -45,7 +45,8 @@ export enum GenderStatus {
   MALE = 'male',
   FEMALE = 'female',
   OTHER = 'other',
-  UNKNOWN = 'unknown'
+  UNKNOWN = 'unknown',
+  OTHER_UNKNOWN = 'other,unknown'
 }
 
 export enum CompositionStatusKind {
