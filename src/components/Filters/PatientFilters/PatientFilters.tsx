@@ -92,8 +92,8 @@ const PatientFilters: React.FC<PatientFiltersProps> = ({ onClose, onSubmit, filt
               label="Femmes"
             />
             <FormControlLabel
-              checked={checkIfChecked(`${GenderStatus.OTHER},${GenderStatus.UNKNOWN}`, gender)}
-              value={`${GenderStatus.OTHER},${GenderStatus.UNKNOWN}`}
+              checked={checkIfChecked(GenderStatus.OTHER_UNKNOWN, gender)}
+              value={GenderStatus.OTHER_UNKNOWN}
               control={<Checkbox color="secondary" />}
               label="Autres"
             />

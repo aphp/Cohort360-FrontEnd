@@ -10,6 +10,8 @@ export const genderName = (gender: GenderStatus | null): string | null => {
       return 'Genre: Autre'
     case GenderStatus.UNKNOWN:
       return 'Genre: Inconnu'
+    case GenderStatus.OTHER_UNKNOWN:
+      return 'Genre: Autre'
     default:
       return null
   }
