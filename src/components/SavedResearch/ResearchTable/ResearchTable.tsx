@@ -310,7 +310,7 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       <TableCell onClick={() => _onClickRow(row)} align="center">
                         {row.modified_at ? (
                           <>
-                            {new Date(row.modified_at).toLocaleDateString('fr-FR')}{' '}
+                            {new Date(row.modified_at).toLocaleDateString('fr-FR')} {'à'}{' '}
                             {new Date(row.modified_at).toLocaleTimeString('fr-FR', {
                               hour: '2-digit',
                               minute: '2-digit'
