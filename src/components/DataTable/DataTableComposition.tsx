@@ -165,7 +165,7 @@ const DataTableCompositionLine: React.FC<{
         <TableCell>
           <Typography variant="button">{title ?? 'Document sans titre'}</Typography>
           <Typography>
-            {date} {hour}
+            {date} à {hour}
           </Typography>
           {getStatusShip(status)}
         </TableCell>
