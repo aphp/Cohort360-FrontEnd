@@ -330,41 +330,39 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                             style={{ width: 'max-content', margin: 'auto' }}
                           >
                             <Grid item>
-                              <>
-                                <Tooltip
-                                  title={
-                                    !row.exportable
-                                      ? 'Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé.'
-                                      : !canExportThisCohort && row.request_job_status === CohortJobStatus._finished
-                                      ? "Vous n'avez pas les droits suffisant pour exporter cette cohorte."
-                                      : row.request_job_status === CohortJobStatus._failed
-                                      ? 'Cette cohorte ne peut pas être exportée car elle a échouée lors de sa création'
-                                      : row.request_job_status === CohortJobStatus._pending
-                                      ? 'Cette cohorte ne peut pas être exportée car elle est en cours de création'
-                                      : ''
-                                  }
-                                >
-                                  <div>
-                                    <IconButton
-                                      size="small"
-                                      onClick={(event) => {
-                                        event.stopPropagation()
-                                        setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
-                                      }}
-                                      disabled={
-                                        !canExportThisCohort ||
-                                        !row.exportable ||
-                                        maintenanceIsActive ||
-                                        row.request_job_status === CohortJobStatus._long_pending ||
-                                        row.request_job_status === CohortJobStatus._failed ||
-                                        row.request_job_status === CohortJobStatus._pending
-                                      }
-                                    >
-                                      <ExportIcon />
-                                    </IconButton>
-                                  </div>
-                                </Tooltip>
-                              </>
+                              <Tooltip
+                                title={
+                                  !row.exportable
+                                    ? 'Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé.'
+                                    : !canExportThisCohort && row.request_job_status === CohortJobStatus._finished
+                                    ? "Vous n'avez pas les droits suffisant pour exporter cette cohorte."
+                                    : row.request_job_status === CohortJobStatus._failed
+                                    ? 'Cette cohorte ne peut pas être exportée car elle a échouée lors de sa création'
+                                    : row.request_job_status === CohortJobStatus._pending
+                                    ? 'Cette cohorte ne peut pas être exportée car elle est en cours de création'
+                                    : ''
+                                }
+                              >
+                                <div>
+                                  <IconButton
+                                    size="small"
+                                    onClick={(event) => {
+                                      event.stopPropagation()
+                                      setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
+                                    }}
+                                    disabled={
+                                      !canExportThisCohort ||
+                                      !row.exportable ||
+                                      maintenanceIsActive ||
+                                      row.request_job_status === CohortJobStatus._long_pending ||
+                                      row.request_job_status === CohortJobStatus._failed ||
+                                      row.request_job_status === CohortJobStatus._pending
+                                    }
+                                  >
+                                    <ExportIcon />
+                                  </IconButton>
+                                </div>
+                              </Tooltip>
                             </Grid>
 
                             <>

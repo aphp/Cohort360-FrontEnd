@@ -41,11 +41,12 @@ export enum EncounterStatusKind {
   _unknown = 'unknown'
 }
 
-export enum PatientGenderKind {
-  _male = 'male',
-  _female = 'female',
-  _other = 'other',
-  _unknown = 'unknown'
+export enum GenderStatus {
+  MALE = 'male',
+  FEMALE = 'female',
+  OTHER = 'other',
+  UNKNOWN = 'unknown',
+  OTHER_UNKNOWN = 'other,unknown'
 }
 
 export enum LoadingStatus {
@@ -202,9 +203,9 @@ export type PMSIFilters = {
 }
 
 export type PatientFilters = {
-  gender: PatientGenderKind | null
+  gender: GenderStatus[]
   birthdatesRanges: [string, string]
-  vitalStatus: VitalStatus | null
+  vitalStatus: VitalStatus[]
 }
 
 export type ObservationFilters = {
@@ -257,9 +258,9 @@ export type AbstractTree<T> = T & {
 }
 
 export enum VitalStatus {
-  alive = 'alive',
-  deceased = 'deceased',
-  all = 'all'
+  ALIVE = 'alive',
+  DECEASED = 'deceased',
+  ALL = 'all'
 }
 
 export type Column =

@@ -3,7 +3,7 @@ import {
   GenderRepartitionType,
   AgeRepartitionType,
   VisiteRepartitionType,
-  PatientGenderKind
+  GenderStatus
 } from 'types'
 import { getStringMonth, getStringMonthAphp } from './formatDate'
 import { Encounter, Extension, Patient } from 'fhir/r4'
@@ -361,16 +361,16 @@ export const getGenderRepartitionSimpleData = (
       deceasedCount += genderValues.deceased
 
       switch (gender) {
-        case PatientGenderKind._male:
+        case GenderStatus.MALE:
           maleCount += genderTotal
           break
-        case PatientGenderKind._female:
+        case GenderStatus.FEMALE:
           femaleCount += genderTotal
           break
-        case PatientGenderKind._unknown:
+        case GenderStatus.UNKNOWN:
           unknownCount += genderTotal
           break
-        case PatientGenderKind._other:
+        case GenderStatus.OTHER:
           otherCount += genderTotal
           break
 

@@ -10,18 +10,18 @@ import { ReactComponent as UnknownIcon } from 'assets/icones/autre-inconnu.svg'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
 import useStyles from './styles'
-import { PatientGenderKind } from 'types'
+import { GenderStatus } from 'types'
 
 type GenderIconTypes = {
-  gender?: PatientGenderKind
+  gender?: GenderStatus
 }
 const GenderIcon: React.FC<GenderIconTypes> = ({ gender }) => {
   const { classes } = useStyles()
 
   switch (gender) {
-    case PatientGenderKind._female:
+    case GenderStatus.FEMALE:
       return <FemaleIcon className={classes.genderIcon} />
-    case PatientGenderKind._male:
+    case GenderStatus.MALE:
       return <MaleIcon className={classes.genderIcon} />
     default:
       return <UnknownIcon className={classes.genderIcon} />
@@ -43,7 +43,7 @@ const VitalStatusChip: React.FC<VitalStatusChipTypes> = ({ deceased }) => {
 
 type PatientSidebarItemTypes = {
   closeDialog: (open: boolean) => void
-  gender?: PatientGenderKind
+  gender?: GenderStatus
   firstName?: string
   lastName?: string
   age?: string | number

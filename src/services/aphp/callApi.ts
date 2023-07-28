@@ -131,7 +131,7 @@ export const fetchPatient = async (args: fetchPatientProps) => {
   if (family) options = [...options, `family=${family}`] // eslint-disable-line
   if (given) options = [...options, `given=${given}`] // eslint-disable-line
   if (identifier) options = [...options, `identifier=${identifier}`] // eslint-disable-line
-  if (deceased && deceased !== undefined) options = [...options, `deceased=${deceased}`] // eslint-disable-line
+  if (deceased !== undefined) options = [...options, `deceased=${deceased}`] // eslint-disable-line
   if (minBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=le${minBirthdate}`] // eslint-disable-line
   if (maxBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=ge${maxBirthdate}`] // eslint-disable-line
 
@@ -670,20 +670,26 @@ export const fetchMedicationAdministration = async (args: fetchMedicationAdminis
 type fetchScopeProps = {
   perimetersIds?: string[]
   cohortIds?: string[]
+  search?: string
+  page?: number
   type: string[]
 }
-export const fetchScope: (args: fetchScopeProps) => Promise<AxiosResponse<IScope | unknown>> = async (
-  args: fetchScopeProps
-) => {
-  const { perimetersIds, cohortIds, type } = args
+export const fetchScope: (
+  args: fetchScopeProps,
+  signal?: AbortSignal
+) => Promise<AxiosResponse<IScope | unknown>> = async (args: fetchScopeProps, signal?: AbortSignal) => {
+  const { perimetersIds, cohortIds, search, page, type } = args
 
   let options: string[] = []
+  if (search) options = [...options, `search=${search}`] // eslint-disable-line
+  if (page) options = [...options, `page=${page}`] // eslint-disable-line
   if (perimetersIds && perimetersIds.length > 0) options = [...options, `local_id=${perimetersIds.join(',')}`] // eslint-disable-line
   if (cohortIds && cohortIds.length > 0) options = [...options, `cohort_id=${cohortIds.join(',')}`] // eslint-disable-line
   if (type && type.length > 0) options = [...options, `type_source_value=${type.join(',')}`] // eslint-disable-line
 
   const response: AxiosResponse<IScope | unknown> = await apiBackend.get(
-    `accesses/perimeters/read-patient/?${options.reduce(optionsReducer)}`
+    `accesses/perimeters/read-patient/?${options.reduce(optionsReducer)}`,
+    { signal: signal }
   )
   return response
 }

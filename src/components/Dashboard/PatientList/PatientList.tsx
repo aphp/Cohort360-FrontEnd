@@ -21,7 +21,6 @@ import {
   PatientFilters as PatientFiltersType,
   SearchByTypes,
   SimpleChartDataType,
-  VitalStatus,
   DTTB_ResultsType as ResultsType,
   LoadingStatus
 } from 'types'
@@ -56,9 +55,9 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
 
   const [open, setOpen] = useState(false)
   const [filters, setFilters] = useState<PatientFiltersType>({
-    gender: null,
+    gender: [],
     birthdatesRanges: ['', ''],
-    vitalStatus: null
+    vitalStatus: []
   })
 
   const [order, setOrder] = useState<Order>({
@@ -119,16 +118,22 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
     setSearchBy(newSearchBy)
   }
 
-  const handleDeleteChip = (filterName: string) => {
+  const handleDeleteChip = <S extends string, T>(filterName: S, value?: T) => {
     switch (filterName) {
       case 'gender':
-        onChangeOptions(filterName, null)
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          gender: [...prevFilters.gender.filter((elem) => elem !== value)]
+        }))
         break
       case 'birthdates':
         onChangeOptions(filterName, ['', ''])
         break
       case 'vitalStatus':
-        onChangeOptions(filterName, VitalStatus.all)
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          vitalStatus: [...prevFilters.vitalStatus.filter((elem) => elem !== value)]
+        }))
         break
     }
   }
@@ -194,13 +199,14 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
         total={patientsResult.nb}
       />
 
-      <PatientFilters
-        open={open}
-        onClose={() => setOpen(false)}
-        onSubmit={() => setOpen(false)}
-        filters={filters}
-        onChangeFilters={setFilters}
-      />
+      {open && (
+        <PatientFilters
+          onClose={() => setOpen(false)}
+          onSubmit={() => setOpen(false)}
+          filters={filters}
+          onChangeFilters={setFilters}
+        />
+      )}
     </Grid>
   )
 }
