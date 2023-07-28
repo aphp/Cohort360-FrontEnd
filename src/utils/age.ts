@@ -37,7 +37,7 @@ export const getAge = (patient: CohortPatient): string => {
   return 'Âge inconnu'
 }
 
-export const ageName = (dates: [string, string]): string => {
+export const ageName = (dates: [string, string]) => {
   const minDate: AgeRangeType = convertStringToAgeRangeType(dates[1]) ?? { year: 0, month: 0, days: 0 }
   const maxDate: AgeRangeType = convertStringToAgeRangeType(dates[0]) ?? { year: 0, month: 0, days: 0 }
 
@@ -49,7 +49,7 @@ export const ageName = (dates: [string, string]): string => {
     !maxDate.month &&
     !maxDate.days
   ) {
-    return ''
+    return null
   }
 
   return `Age entre

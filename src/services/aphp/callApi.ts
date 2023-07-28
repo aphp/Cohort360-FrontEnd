@@ -131,7 +131,7 @@ export const fetchPatient = async (args: fetchPatientProps) => {
   if (family) options = [...options, `family=${family}`] // eslint-disable-line
   if (given) options = [...options, `given=${given}`] // eslint-disable-line
   if (identifier) options = [...options, `identifier=${identifier}`] // eslint-disable-line
-  if (deceased && deceased !== undefined) options = [...options, `deceased=${deceased}`] // eslint-disable-line
+  if (deceased !== undefined) options = [...options, `deceased=${deceased}`] // eslint-disable-line
   if (minBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=le${minBirthdate}`] // eslint-disable-line
   if (maxBirthdate) options = [...options, `${deidentified ? 'age-month' : 'age-day'}=ge${maxBirthdate}`] // eslint-disable-line
 

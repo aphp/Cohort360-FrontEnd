@@ -61,17 +61,16 @@ export const buildDocumentFiltersChips = (
 
 export const buildPatientFiltersChips = (
   filters: PatientFiltersType,
-  handleDeleteChip: (filterName: 'gender' | 'birthdates' | 'vitalStatus') => void
+  handleDeleteChip: <S extends 'gender' | 'birthdates' | 'vitalStatus', T>(filterName: S, value?: T) => void
 ): MasterChipsProps['chips'] => {
-  const gender = genderName(filters.gender)
-  const birthdates = ageName(filters.birthdatesRanges)
-  const vitalStatus = vitalStatusName(filters.vitalStatus)
-
-  return [
-    { label: gender ? gender : '', onDelete: () => handleDeleteChip('gender') },
-    { label: birthdates ? birthdates : '', onDelete: () => handleDeleteChip('birthdates') },
-    { label: vitalStatus ? vitalStatus : '', onDelete: () => handleDeleteChip('vitalStatus') }
-  ].filter((chip) => chip?.label) as MasterChipsProps['chips']
+  const gender = filters.gender.map((elem) => {
+    return { label: genderName(elem), onDelete: () => handleDeleteChip('gender', elem) }
+  })
+  const birthdates = { label: ageName(filters.birthdatesRanges), onDelete: () => handleDeleteChip('birthdates') }
+  const vitalStatus = filters.vitalStatus.map((elem) => {
+    return { label: vitalStatusName(elem), onDelete: () => handleDeleteChip('vitalStatus', elem) }
+  })
+  return [...gender, ...vitalStatus, birthdates].filter((chip) => chip.label) as MasterChipsProps['chips']
 }
 
 export const buildObservationFiltersChips = (

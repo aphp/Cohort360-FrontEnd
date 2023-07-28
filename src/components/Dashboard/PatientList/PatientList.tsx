@@ -22,7 +22,6 @@ import {
   PatientFilters as PatientFiltersType,
   SearchByTypes,
   SimpleChartDataType,
-  VitalStatus,
   DTTB_ResultsType as ResultsType
 } from 'types'
 
@@ -63,9 +62,9 @@ const PatientList: React.FC<PatientListProps> = ({
   const [open, setOpen] = useState(false)
 
   const [filters, setFilters] = useState<PatientFiltersType>({
-    gender: null,
+    gender: [],
     birthdatesRanges: ['', ''],
-    vitalStatus: null
+    vitalStatus: []
   })
 
   const [order, setOrder] = useState<Order>({
@@ -160,12 +159,12 @@ const PatientList: React.FC<PatientListProps> = ({
     }
   }
 
-  const handleDeleteChip = (filterName: string) => {
+  const handleDeleteChip = <S extends string, T>(filterName: S, value?: T) => {
     switch (filterName) {
       case 'gender':
         setFilters((prevFilters) => ({
           ...prevFilters,
-          gender: null
+          gender: [...prevFilters.gender.filter((elem) => elem !== value)]
         }))
         break
       case 'birthdates':
@@ -177,7 +176,7 @@ const PatientList: React.FC<PatientListProps> = ({
       case 'vitalStatus':
         setFilters((prevFilters) => ({
           ...prevFilters,
-          vitalStatus: VitalStatus.all
+          vitalStatus: [...prevFilters.vitalStatus.filter((elem) => elem !== value)]
         }))
         break
     }
@@ -224,13 +223,14 @@ const PatientList: React.FC<PatientListProps> = ({
         total={patientsResult.nb}
       />
 
-      <PatientFilters
-        open={open}
-        onClose={() => setOpen(false)}
-        onSubmit={() => setOpen(false)}
-        filters={filters}
-        onChangeFilters={setFilters}
-      />
+      {open && (
+        <PatientFilters
+          onClose={() => setOpen(false)}
+          onSubmit={() => setOpen(false)}
+          filters={filters}
+          onChangeFilters={setFilters}
+        />
+      )}
     </Grid>
   )
 }
