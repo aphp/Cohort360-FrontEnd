@@ -671,12 +671,12 @@ export type DatedMeasure = {
 }
 
 export type Cohort = {
-  uuid: string
+  uuid?: string
   owner?: string
   result_size?: number
   request?: string
-  request_query_snapshot: string
-  dated_measure: DatedMeasure
+  request_query_snapshot?: string
+  dated_measure?: DatedMeasure
   dated_measure_global?: DatedMeasure
   global_estimate?: boolean
   fhir_group_id?: string
@@ -695,6 +695,7 @@ export type Cohort = {
   create_task_id?: string
   type?: 'IMPORT_I2B2' | 'MY_ORGANIZATIONS' | 'MY_PATIENTS' | 'MY_COHORTS'
   extension?: any[]
+  rights?: GroupRights
 }
 
 export type CohortCreationCounterType = {

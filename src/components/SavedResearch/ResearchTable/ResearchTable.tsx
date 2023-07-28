@@ -302,8 +302,8 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} align="center">
                         {row.dated_measure_global
-                          ? `${displayDigit(row.dated_measure_global.measure_min) ?? 'X'} - ${
-                              displayDigit(row.dated_measure_global.measure_max) ?? 'X'
+                          ? `${displayDigit(row.dated_measure_global?.measure_min ?? 0) ?? 'X'} - ${
+                              displayDigit(row.dated_measure_global?.measure_max ?? 0) ?? 'X'
                             }`
                           : '-'}
                       </TableCell>

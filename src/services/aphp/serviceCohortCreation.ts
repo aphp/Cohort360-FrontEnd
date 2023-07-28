@@ -178,7 +178,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
     )
 
     const currentSnapshotResponse: AxiosResponse = await apiBack.get<Snapshot>(
-      `/cohort/request-query-snapshots/${snapshotId ? snapshotId : snapshotsHistoryFromQuery[0].uuid}/`
+      `/cohort/request-query-snapshots/${snapshotId ? snapshotId : snapshotsHistoryFromQuery?.[0].uuid}/`
     )
 
     let currentSnapshot: Snapshot | null = currentSnapshotResponse?.data ? currentSnapshotResponse?.data : null
@@ -195,10 +195,10 @@ const servicesCohortCreation: IServiceCohortCreation = {
       }
 
       shortCohortLimit =
-        currentSnapshot.dated_measures.length > 0 ? currentSnapshot.dated_measures[0].cohort_limit ?? 0 : 0
+        currentSnapshot.dated_measures.length > 0 ? currentSnapshot.dated_measures?.[0].cohort_limit ?? 0 : 0
 
       count_outdated =
-        currentSnapshot.dated_measures.length > 0 ? currentSnapshot.dated_measures[0].count_outdated ?? false : false
+        currentSnapshot.dated_measures.length > 0 ? currentSnapshot.dated_measures?.[0].count_outdated ?? false : false
     }
 
     result = {
