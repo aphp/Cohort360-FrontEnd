@@ -35,14 +35,6 @@ import { ODD_BIOLOGY, ODD_MEDICATION } from '../../constants'
 
 const criteriaList: CriteriaItemType[] = [
   {
-    id: 'mes_variables',
-    title: 'Mes variables',
-    color: '#808080',
-    disabled: true,
-    data: null,
-    components: null
-  },
-  {
     id: 'Request',
     title: 'Mes requêtes',
     color: '#0063AF',
