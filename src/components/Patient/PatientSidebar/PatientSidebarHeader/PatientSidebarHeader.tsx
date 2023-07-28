@@ -12,7 +12,7 @@ import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
 import SortDialog from 'components/Filters/SortDialog/SortDialog'
 import MasterChips from 'components/MasterChips/MasterChips'
 
-import { PatientFilters as PatientFiltersType, PatientGenderKind, SearchByTypes, Sort, VitalStatus } from 'types'
+import { PatientFilters as PatientFiltersType, SearchByTypes, Sort } from 'types'
 
 import { buildPatientFiltersChips } from 'utils/chips'
 
@@ -66,13 +66,14 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
           >
             Filtrer
           </Button>
-          <PatientFilters
-            open={props.open}
-            onClose={props.onCloseFilterDialog}
-            onSubmit={props.onSubmitDialog}
-            filters={props.filters}
-            onChangeFilters={props.onChangeFilters}
-          />
+          {props.open && (
+            <PatientFilters
+              onClose={props.onCloseFilterDialog}
+              onSubmit={props.onSubmitDialog}
+              filters={props.filters}
+              onChangeFilters={props.onChangeFilters}
+            />
+          )}
         </Grid>
         <Grid container alignItems="center">
           <LockIcon className={classes.lockIcon} />
@@ -89,13 +90,13 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
     { label: 'IPP', code: SearchByTypes.identifier }
   ]
 
-  const handleDeleteChip = (filterName: string) => {
+  const handleDeleteChip = <S extends string, T>(filterName: S, value?: T) => {
     switch (filterName) {
       case 'gender':
         // @ts-ignore
         props.onChangeFilters((prevFilters) => ({
           ...prevFilters,
-          gender: PatientGenderKind._unknown
+          gender: [...prevFilters.gender.filter((elem: T | undefined) => elem !== value)]
         }))
         break
       case 'birthdates':
@@ -109,7 +110,7 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
         // @ts-ignore
         props.onChangeFilters((prevFilters) => ({
           ...prevFilters,
-          vitalStatus: VitalStatus.all
+          vitalStatus: [...prevFilters.vitalStatus.filter((elem: T | undefined) => elem !== value)]
         }))
         break
     }
@@ -150,13 +151,14 @@ const PatientSidebarHeader: React.FC<PatientSidebarHeaderTypes> = (props) => {
         >
           Filtrer
         </Button>
-        <PatientFilters
-          open={props.open}
-          onClose={props.onCloseFilterDialog}
-          onSubmit={props.onSubmitDialog}
-          filters={props.filters}
-          onChangeFilters={props.onChangeFilters}
-        />
+        {props.open && (
+          <PatientFilters
+            onClose={props.onCloseFilterDialog}
+            onSubmit={props.onSubmitDialog}
+            filters={props.filters}
+            onChangeFilters={props.onChangeFilters}
+          />
+        )}
         <Button
           variant="contained"
           disableElevation

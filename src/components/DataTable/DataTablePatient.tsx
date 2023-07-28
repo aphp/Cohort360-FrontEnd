@@ -9,7 +9,7 @@ import { ReactComponent as UnknownIcon } from 'assets/icones/autre-inconnu.svg'
 
 import DataTable from 'components/DataTable/DataTable'
 
-import { CohortPatient, Column, Order, PatientGenderKind } from 'types'
+import { CohortPatient, Column, Order, GenderStatus } from 'types'
 
 import { getAge } from 'utils/age'
 import { capitalizeFirstLetter } from 'utils/capitalize'
@@ -115,9 +115,7 @@ const DataTablePatientLine: React.FC<{
       }
     >
       <TableCell align="center">
-        {patient.gender && (
-          <PatientGender gender={patient.gender as PatientGenderKind} className={classes.genderIcon} />
-        )}
+        {patient.gender && <PatientGender gender={patient.gender as GenderStatus} className={classes.genderIcon} />}
       </TableCell>
       <TableCell>{deidentified ? 'Prénom' : capitalizeFirstLetter(patient.name?.[0].given?.[0])}</TableCell>
       <TableCell>{deidentified ? 'Nom' : patient.name?.map((e) => e.family).join(' ')}</TableCell>
@@ -156,16 +154,16 @@ const DataTablePatientLine: React.FC<{
 export default DataTablePatient
 
 type PatientGenderProps = {
-  gender?: PatientGenderKind
+  gender?: GenderStatus
   className?: string
 }
 
 const PatientGender: React.FC<PatientGenderProps> = ({ gender, className }) => {
   switch (gender) {
-    case PatientGenderKind._male:
+    case GenderStatus.MALE:
       return <MaleIcon className={className} />
 
-    case PatientGenderKind._female:
+    case GenderStatus.FEMALE:
       return <FemaleIcon className={className} />
 
     default:

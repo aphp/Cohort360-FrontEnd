@@ -11,7 +11,7 @@ import {
   GenderRepartitionType,
   searchInputError,
   errorDetails,
-  PatientGenderKind,
+  GenderStatus,
   ChartCode
 } from 'types'
 import {
@@ -85,9 +85,9 @@ export interface IServiceCohorts {
     page: number,
     searchBy: SearchByTypes,
     searchInput: string,
-    gender: PatientGenderKind | null,
+    gender: GenderStatus[],
     birthdates: [string, string],
-    vitalStatus: VitalStatus | null,
+    vitalStatus: VitalStatus[],
     sortBy: string,
     sortDirection: string,
     deidentified: boolean,
@@ -350,13 +350,12 @@ const servicesCohorts: IServiceCohorts = {
       sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
       pivotFacet: includeFacets ? ['age-month_gender', 'deceased_gender'] : [],
       _list: groupId ? [groupId] : [],
-      gender:
-        gender === PatientGenderKind._unknown ? '' : gender === PatientGenderKind._other ? `other,unknown` : gender,
+      gender: gender.join(',') + ``,
       searchBy,
       _text: _searchInput,
       minBirthdate: minBirthdate,
       maxBirthdate: maxBirthdate,
-      deceased: vitalStatus !== VitalStatus.all ? (vitalStatus === VitalStatus.deceased ? true : false) : undefined,
+      deceased: vitalStatus.length === 1 ? (vitalStatus.includes(VitalStatus.DECEASED) ? true : false) : undefined,
       deidentified: deidentified,
       signal: signal
     })
