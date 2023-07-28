@@ -31,6 +31,9 @@ import { substructAgeString } from 'utils/age'
 import { useDebounce } from 'utils/debounce'
 import { _cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
+import Searchbar from 'components/ui/Searchbar/Searchbar'
+import Select from 'components/ui/Searchbar/Select'
+import Filters from 'components/ui/Searchbar/Filters'
 
 type PatientListProps = {
   total: number
@@ -184,6 +187,33 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
           }
         ]}
       />
+      <Searchbar>
+        <Select
+          selectedValue={searchBy}
+          label="Rechercher dans :"
+          items={[
+            {
+              id: SearchByTypes.text,
+              label: 'Tous les champs'
+            },
+            {
+              id: SearchByTypes.family,
+              label: 'Nom'
+            },
+            {
+              id: SearchByTypes.given,
+              label: 'Prénom'
+            },
+            {
+              id: SearchByTypes.identifier,
+              label: 'IPP'
+            }
+          ]}
+          onchange={(newValue: SearchByTypes) => setSearchBy(newValue)}
+        />
+        <div style={{ backgroundColor: 'red', width: 200, height: 100 }}></div>
+        <Filters label="Filtrer" icon={<FilterList height="15px" fill="#FFF" />} />
+      </Searchbar>
 
       <MasterChips chips={buildPatientFiltersChips(filters, handleDeleteChip)} />
 
