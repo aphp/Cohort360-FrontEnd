@@ -946,7 +946,7 @@ const CriteriaCardContent: React.FC<CriteriaCardContentProps> = ({ currentCriter
     const maxWidth = elemWidth.reduce((a, b) => a + b)
     // @ts-ignore
     const containerWidth = containerRef ? containerRef?.current?.offsetWidth : 0
-    needCollapse(maxWidth > containerWidth)
+    needCollapse(maxWidth >= containerWidth)
   }
 
   useEffect(() => {

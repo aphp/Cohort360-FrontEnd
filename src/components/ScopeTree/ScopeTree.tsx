@@ -312,7 +312,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
       scopeTreeRows: newPerimetersList,
       count: newCount,
       aborted: aborted
-    } = await servicesPerimeters.findScope(searchInput, page, controllerRef.current?.signal)
+    } = await servicesPerimeters.findScope(searchInput, page, controllerRef.current?.signal, executiveUnitType)
 
     if (!aborted) {
       if (!newPerimetersList || newPerimetersList.length < 1) {
