@@ -38,6 +38,7 @@ import {
 } from 'utils/pmsi'
 import servicesPerimeters, { loadingItem } from '../../services/aphp/servicePerimeters'
 import { findSelectedInListAndSubItems } from '../../utils/cohortCreation'
+import { _cancelPendingRequest } from 'utils/abortController'
 
 type ScopeTreeListItemProps = {
   row: any
@@ -181,7 +182,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
   const [isAllSelected, setIsAllSelected] = useState(false)
-  const controllerRef = useRef<AbortController | null>()
+  const controllerRef = useRef<AbortController | null>(null)
   const isHeadChecked: boolean =
     isAllSelected ||
     scopesList.filter((row) => selectedItems.find((item: { id: any }) => item.id === row.id) !== undefined).length ===
@@ -193,16 +194,9 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
     return dispatch(fetchScopesList({ signal, type: executiveUnitType })).unwrap()
   }
 
-  const _cancelPendingRequest = () => {
-    if (controllerRef.current) {
-      controllerRef.current.abort()
-    }
-    controllerRef.current = new AbortController()
-  }
-
   const _init = async () => {
     setSearchLoading(true)
-    _cancelPendingRequest()
+    controllerRef.current = _cancelPendingRequest(controllerRef.current)
 
     let newPerimetersList: ScopeTreeRow[] = []
     const fetchScopeTreeResponse = await fetchScopeTree(executiveUnitType, controllerRef.current?.signal)
@@ -307,7 +301,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
 
   const _searchInPerimeters = async (_isAllSelected?: boolean) => {
     setSearchLoading(true)
-    _cancelPendingRequest()
+    controllerRef.current = _cancelPendingRequest(controllerRef.current)
     const {
       scopeTreeRows: newPerimetersList,
       count: newCount,

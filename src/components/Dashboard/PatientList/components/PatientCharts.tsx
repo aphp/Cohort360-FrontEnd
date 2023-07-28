@@ -11,10 +11,11 @@ import { AgeRepartitionType, SimpleChartDataType } from 'types'
 import useStyles from './styles'
 
 type PatientChartsProps = {
-  agePyramid?: AgeRepartitionType
-  patientData?: { vitalStatusData?: SimpleChartDataType[]; genderData?: SimpleChartDataType[] }
+  agePyramid: AgeRepartitionType
+  patientData: { vitalStatusData?: SimpleChartDataType[]; genderData?: SimpleChartDataType[] }
+  loading: boolean
 }
-const PatientCharts: React.FC<PatientChartsProps> = ({ agePyramid, patientData }) => {
+const PatientCharts: React.FC<PatientChartsProps> = ({ agePyramid, patientData, loading }) => {
   const { classes } = useStyles()
 
   return (
@@ -26,14 +27,18 @@ const PatientCharts: React.FC<PatientChartsProps> = ({ agePyramid, patientData }
               Répartition par genre
             </Typography>
           </Grid>
-          {patientData === undefined || (patientData && patientData.genderData === undefined) ? (
-            <Grid container justifyContent="center" alignItems="center">
+          {loading && (
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '100%' }}>
               <CircularProgress />
             </Grid>
-          ) : patientData.genderData && patientData.genderData.length > 0 ? (
-            <BarChart data={patientData.genderData ?? []} />
-          ) : (
-            <Typography>Aucun patient</Typography>
+          )}
+          {!loading && patientData?.genderData && patientData?.genderData?.length > 0 && (
+            <BarChart data={patientData.genderData} />
+          )}
+          {!loading && patientData?.genderData && patientData?.genderData?.length < 1 && (
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '100%' }}>
+              <Typography>Aucun patient</Typography>
+            </Grid>
           )}
         </Paper>
       </Grid>
@@ -45,15 +50,18 @@ const PatientCharts: React.FC<PatientChartsProps> = ({ agePyramid, patientData }
               Répartition par statut vital
             </Typography>
           </Grid>
-          {patientData === undefined || (patientData && patientData.vitalStatusData === undefined) ? (
-            <Grid container justifyContent="center" alignItems="center">
+          {loading && (
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '100%' }}>
               <CircularProgress />
             </Grid>
-          ) : patientData.vitalStatusData &&
-            patientData.vitalStatusData.find(({ value }) => value !== 0) !== undefined ? (
-            <PieChart data={patientData.vitalStatusData ?? []} />
-          ) : (
-            <Typography>Aucun patient</Typography>
+          )}
+          {!loading && patientData?.vitalStatusData?.find(({ value }) => value > 0) && (
+            <PieChart data={patientData.vitalStatusData} />
+          )}
+          {!loading && patientData?.vitalStatusData?.find(({ value }) => value < 1) && (
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '100%' }}>
+              <Typography>Aucun patient</Typography>
+            </Grid>
           )}
         </Paper>
       </Grid>
@@ -65,14 +73,16 @@ const PatientCharts: React.FC<PatientChartsProps> = ({ agePyramid, patientData }
               Pyramide des âges
             </Typography>
           </Grid>
-          {agePyramid === undefined ? (
-            <Grid container justifyContent="center" alignItems="center">
+          {loading && (
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '100%' }}>
               <CircularProgress />
             </Grid>
-          ) : agePyramid && agePyramid.length > 0 ? (
-            <PyramidChart data={agePyramid} width={250} />
-          ) : (
-            <Typography>Aucun patient</Typography>
+          )}
+          {!loading && agePyramid?.length > 0 && <PyramidChart data={agePyramid} width={250} />}
+          {!loading && agePyramid?.length < 1 && (
+            <Grid container justifyContent="center" alignItems="center" style={{ height: '100%' }}>
+              <Typography>Aucun âge à afficher</Typography>
+            </Grid>
           )}
         </Paper>
       </Grid>
