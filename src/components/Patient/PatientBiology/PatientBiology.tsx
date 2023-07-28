@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { Alert, Grid, Typography } from '@mui/material'
 
@@ -11,12 +11,15 @@ import MasterChips from 'components/MasterChips/MasterChips'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchBiology } from 'state/patient'
-import { Order, ObservationFilters } from 'types'
+import { Order, ObservationFilters, LoadingStatus } from 'types'
 
 import { buildObservationFiltersChips } from 'utils/chips'
 
 import useStyles from './styles'
 import { Checkbox } from '@mui/material'
+import { useDebounce } from 'utils/debounce'
+import { _cancelPendingRequest } from 'utils/abortController'
+import { CanceledError } from 'axios'
 
 type PatientBiologyTypes = {
   groupId?: string
@@ -31,63 +34,66 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     patient: state.patient
   }))
 
-  const loading = patient?.biology?.loading ?? false
+  const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const deidentifiedBoolean = patient?.deidentified ?? false
   const totalBiology = patient?.biology?.count ?? 0
   const totalAllBiology = patient?.biology?.total ?? 0
-
   const observationsListState = patient?.biology?.list ?? []
 
   const [page, setPage] = useState(1)
-
   const [searchInput, setSearchInput] = useState('')
-
+  const debouncedSearchValue = useDebounce(500, searchInput)
   const [open, setOpen] = useState<string | null>(null)
-
   const [filters, setFilters] = useState<ObservationFilters>(filtersDefault)
-
-  const validatedStatus = true
-
+  const [validatedStatus] = useState(true)
   const [order, setOrder] = useState<Order>({
     orderBy: 'effectiveDatetime',
     orderDirection: 'asc'
   })
+  const controllerRef = useRef<AbortController | null>(null)
 
-  const _fetchBiology = async (page: number) => {
-    dispatch(
-      fetchBiology({
-        groupId,
-        rowStatus: validatedStatus,
-        options: {
-          page,
-          sort: {
-            by: order.orderBy,
-            direction: order.orderDirection
+  const _fetchBiology = async () => {
+    try {
+      setLoadingStatus(LoadingStatus.FETCHING)
+      const response = await dispatch(
+        fetchBiology({
+          groupId,
+          rowStatus: validatedStatus,
+          options: {
+            page,
+            sort: {
+              by: order.orderBy,
+              direction: order.orderDirection
+            },
+            filters: {
+              searchInput,
+              nda: filters.nda,
+              loinc: filters.loinc,
+              anabio: filters.anabio,
+              startDate: filters.startDate,
+              endDate: filters.endDate
+            }
           },
-          filters: {
-            searchInput,
-            nda: filters.nda,
-            loinc: filters.loinc,
-            anabio: filters.anabio,
-            startDate: filters.startDate,
-            endDate: filters.endDate
-          }
-        }
-      })
-    )
+          signal: controllerRef.current?.signal
+        })
+      )
+      if (response.payload.error) {
+        throw response.payload.error
+      }
+      setLoadingStatus(LoadingStatus.SUCCESS)
+    } catch (error) {
+      if (error instanceof CanceledError) {
+        setLoadingStatus(LoadingStatus.FETCHING)
+      }
+    }
   }
 
-  const handleChangePage = (value?: number) => {
-    setPage(value ? value : 1)
-    _fetchBiology(value ? value : 1)
-  }
-
-  const handleChangeFilter = (filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate', value: any) => {
+  const handleDeleteChip = (filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate') => {
     switch (filterName) {
       case 'nda':
       case 'loinc':
       case 'anabio':
-        setFilters((prevState) => ({ ...prevState, [filterName]: value }))
+        setFilters((prevState) => ({ ...prevState, [filterName]: null }))
         break
       case 'startDate':
       case 'endDate':
@@ -97,13 +103,33 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   }
 
   useEffect(() => {
-    handleChangePage()
-  }, [searchInput, filters, order, validatedStatus])
+    setLoadingStatus(LoadingStatus.IDDLE)
+    setPage(1)
+  }, [
+    debouncedSearchValue,
+    filters.anabio,
+    filters.nda,
+    filters.endDate,
+    filters.startDate,
+    order.orderBy,
+    order.orderDirection
+  ])
+
+  useEffect(() => {
+    setLoadingStatus(LoadingStatus.IDDLE)
+  }, [page])
+
+  useEffect(() => {
+    if (loadingStatus === LoadingStatus.IDDLE) {
+      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      _fetchBiology()
+    }
+  }, [loadingStatus])
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
-        loading={loading}
+        loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
         results={{
           nb: totalBiology,
           total: totalAllBiology,
@@ -123,7 +149,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
         ]}
       />
 
-      <MasterChips chips={buildObservationFiltersChips(filters, handleChangeFilter)} />
+      <MasterChips chips={buildObservationFiltersChips(filters, handleDeleteChip)} />
       <Grid container item alignItems="center" justifyContent="flex-end">
         <Checkbox checked={validatedStatus} disabled />
         <Typography style={{ color: '#505050' }}>
@@ -140,13 +166,13 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
       </Grid>
 
       <DataTableObservation
-        loading={loading}
+        loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
         deidentified={deidentifiedBoolean}
         observationsList={observationsListState}
         order={order}
         setOrder={setOrder}
         page={page}
-        setPage={(newPage) => handleChangePage(newPage)}
+        setPage={(newPage) => setPage(newPage)}
         total={totalBiology}
       />
 

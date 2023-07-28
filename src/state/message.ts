@@ -25,6 +25,7 @@ import {
 } from './patient'
 import { expandPmsiElement, fetchClaim, fetchCondition, fetchProcedure, initPmsiHierarchy } from './pmsi'
 import { expandScopeElement, fetchScopesList } from './scope'
+import { CanceledError } from 'axios'
 
 export type MessageState = null | {
   type?: 'success' | 'error' | 'warning' | 'info'
@@ -194,7 +195,7 @@ const setMessageSlice = createSlice({
       content: 'Une erreur est survenue lors de la récupération des PMSI du patient'
     }))
     builder.addCase(fetchDocuments.rejected, (state, action) => {
-      if (action?.meta?.arg?.signal?.aborted) return null
+      if (action?.error instanceof CanceledError) return null
       return { type: 'error', content: 'Une erreur est survenue lors de la récupération des documents du patient' }
     })
     builder.addCase(fetchPmsi.rejected, () => ({

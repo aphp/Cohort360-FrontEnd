@@ -52,13 +52,14 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
       setPage={setPage}
       total={total}
     >
-      {!loading && pmsiList && pmsiList.length > 0 ? (
+      {!loading && pmsiList?.length > 0 && (
         <>
           {pmsiList.map((pmsi) => {
             return <DataTablePmsiLine key={pmsi.id} pmsi={pmsi} selectedTab={selectedTab} />
           })}
         </>
-      ) : (
+      )}
+      {!loading && pmsiList?.length < 1 && (
         <TableRow className={classes.emptyTableRow}>
           <TableCell colSpan={6} align="left">
             <Grid container justifyContent="center">
@@ -69,6 +70,18 @@ const DataTablePmsi: React.FC<DataTablePmsiProps> = ({
                   selectedTab !== 'diagnostic' ? (selectedTab !== 'ccam' ? 'ghm' : 'acte') : 'diagnostic'
                 } à afficher`}</Typography>
               )}
+            </Grid>
+          </TableCell>
+        </TableRow>
+      )}
+      {loading && (
+        <TableRow className={classes.emptyTableRow}>
+          <TableCell colSpan={6} align="left">
+            <Grid container justifyContent="center">
+              <CircularProgress />
+              <Typography variant="button">{`Aucun ${
+                selectedTab !== 'diagnostic' ? (selectedTab !== 'ccam' ? 'ghm' : 'acte') : 'diagnostic'
+              } à afficher`}</Typography>
             </Grid>
           </TableCell>
         </TableRow>

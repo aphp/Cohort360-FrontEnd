@@ -89,7 +89,7 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
       setPage={setPage}
       total={total}
     >
-      {!loading && documentsList && documentsList.length > 0 ? (
+      {!loading && documentsList?.length > 0 && (
         <>
           {documentsList.map((document) => {
             return (
@@ -104,11 +104,21 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
             )
           })}
         </>
-      ) : (
+      )}
+      {!loading && documentsList?.length < 1 && (
         <TableRow className={classes.emptyTableRow}>
           <TableCell colSpan={6} align="left">
             <Grid container justifyContent="center">
-              {loading ? <CircularProgress /> : <Typography variant="button">Aucun document à afficher</Typography>}
+              <Typography variant="button">Aucun document à afficher</Typography>
+            </Grid>
+          </TableCell>
+        </TableRow>
+      )}
+      {loading && (
+        <TableRow className={classes.emptyTableRow}>
+          <TableCell colSpan={6} align="left">
+            <Grid container justifyContent="center">
+              <CircularProgress />
             </Grid>
           </TableCell>
         </TableRow>
@@ -131,7 +141,6 @@ const DataTableCompositionLine: React.FC<{
   const documentId = document.id
   const title = document.description
   const status = document.status as DocumentReferenceStatusKind
-  // const event = document.content[0].attachment.url
   const ipp = deidentified ? document.idPatient : document.IPP
   const nda = document.NDA ?? '-'
   const serviceProvider = document.serviceProvider ?? 'Non renseigné'
@@ -150,7 +159,6 @@ const DataTableCompositionLine: React.FC<{
         minute: '2-digit'
       })
     : ''
-
   return (
     <React.Fragment key={documentId}>
       <TableRow className={classes.tableBodyRows}>
