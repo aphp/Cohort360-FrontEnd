@@ -63,6 +63,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
       <LogicalOperatorItem itemId={itemId} />
 
+      <div className={classes.operatorChild} style={{ height: 12, marginBottom: -12 }} />
       <div className={classes.operatorChild}>
         {displayingItem &&
           displayingItem.map(({ criteriaIds }) => {
@@ -104,6 +105,7 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
             })
           })}
       </div>
+      <div className={classes.operatorChild} style={{ height: 12, marginBottom: -14 }} />
 
       {!isExpanded ? (
         <IconButton

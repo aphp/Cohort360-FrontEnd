@@ -12,15 +12,6 @@ const useStyles = makeStyles()(() => ({
     marginTop: 14,
     width: 'fit-content',
     position: 'relative',
-    '&::before': {
-      width: 4,
-      height: 16,
-      content: "''",
-      position: 'absolute',
-      background: '#19235A',
-      marginTop: -16,
-      marginLeft: 23
-    },
     '& > button': {
       borderColor: 'white !important',
       color: 'white',
@@ -44,14 +35,6 @@ const useStyles = makeStyles()(() => ({
     minWidth: 34,
     maxWidth: 34,
     position: 'relative',
-    '&::before': {
-      width: 4,
-      height: 16,
-      content: "''",
-      position: 'absolute',
-      background: '#19235A',
-      top: -16
-    },
     '&:hover': {
       background: '#19235A'
     }
