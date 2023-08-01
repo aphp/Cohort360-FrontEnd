@@ -31,7 +31,7 @@ const useStyles = makeStyles()(() => ({
   },
   subItemsContainer: {
     position: 'relative',
-    marginLeft: 25
+    marginLeft: 12
   },
   subItemsContainerIndicator: {
     content: '""',
@@ -48,6 +48,9 @@ const useStyles = makeStyles()(() => ({
     height: 2,
     marginTop: 14.5,
     background: '#D0D7D8'
+  },
+  criteriaName: {
+    fontWeight: 'bold'
   }
 }))
 
