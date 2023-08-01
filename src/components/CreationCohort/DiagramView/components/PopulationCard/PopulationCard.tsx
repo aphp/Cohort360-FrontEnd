@@ -116,7 +116,7 @@ const PopulationCard: React.FC<populationCardPropsType> = (props) => {
       !openDrawer &&
       scopesList?.length === 1 &&
       requestState?.requestId &&
-      (selectedItems === null || selectedItems?.length === 0)
+      (selectedPopulation === null || selectedPopulation?.length === 0)
     ) {
       const savedSelectedItems: ScopeTreeRow[] = getSelectedScopes(scopesList[0], [], scopesList)
       _onSubmit(savedSelectedItems)
