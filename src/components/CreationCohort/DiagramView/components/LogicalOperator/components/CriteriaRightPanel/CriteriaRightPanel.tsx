@@ -4,6 +4,21 @@ import { Drawer, ListItem, ListItemIcon, ListItemText, Collapse, List, Grid, Typ
 
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
+import SavedSearchIcon from '@mui/icons-material/SavedSearch'
+import PersonSearchIcon from '@mui/icons-material/PersonSearch'
+import BarChartIcon from '@mui/icons-material/BarChart'
+import EventIcon from '@mui/icons-material/Event'
+import DescriptionIcon from '@mui/icons-material/Description'
+import MedicalInformationIcon from '@mui/icons-material/MedicalInformation'
+import VaccinesIcon from '@mui/icons-material/Vaccines'
+import BiotechIcon from '@mui/icons-material/Biotech'
+import MonitorHeartIcon from '@mui/icons-material/MonitorHeart'
+import ArticleIcon from '@mui/icons-material/Article'
+import ContactPageIcon from '@mui/icons-material/ContactPage'
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
+import ScienceIcon from '@mui/icons-material/Science'
+import CoronavirusIcon from '@mui/icons-material/Coronavirus'
+import { IdType } from 'types'
 
 import { CriteriaItemType, SelectedCriteriaType } from 'types'
 import useStyles from './styles'
@@ -15,45 +30,91 @@ type CriteriaListItemProps = {
 
 const CriteriaListItem: React.FC<CriteriaListItemProps> = (props) => {
   const { criteriaItem, handleClick } = props
-  const { color, title, components, subItems, disabled } = criteriaItem
+  const { color, title, components, subItems, disabled, id, fontWeight } = criteriaItem
 
   const { classes } = useStyles()
   const [open, setOpen] = useState(true)
+
+  const svgIcone =
+    id === IdType.Request ? (
+      <SavedSearchIcon />
+    ) : id === IdType.IPPList ? (
+      <PersonSearchIcon />
+    ) : id === IdType.Patient ? (
+      <BarChartIcon />
+    ) : id === IdType.Encounter ? (
+      <EventIcon />
+    ) : id === IdType.DocumentReference ? (
+      <DescriptionIcon />
+    ) : id === IdType.Pmsi ? (
+      <MedicalInformationIcon />
+    ) : id === IdType.Condition ? (
+      <ArticleIcon />
+    ) : id === IdType.Procedure ? (
+      <ContactPageIcon />
+    ) : id === IdType.Claim ? (
+      <LocalHospitalIcon />
+    ) : id === IdType.Medication ? (
+      <VaccinesIcon />
+    ) : id === IdType.Biologie_microbiologie ? (
+      <BiotechIcon />
+    ) : id === IdType.Observation ? (
+      <CoronavirusIcon />
+    ) : id === IdType.Microbiologie ? (
+      <ScienceIcon />
+    ) : id === IdType.Physiologie ? (
+      <MonitorHeartIcon />
+    ) : (
+      <></>
+    )
 
   const cursor = disabled ? 'not-allowed' : components ? 'pointer' : 'default'
 
   if (!subItems || (subItems && subItems.length === 0)) {
     return (
       <ListItem onClick={disabled ? undefined : () => handleClick(criteriaItem)} className={classes.criteriaItem}>
-        <ListItemIcon>
-          <div className={classes.indicator} style={{ color }} />
-        </ListItemIcon>
-        <ListItemText style={{ cursor, color }} primary={title} />
+        <ListItemIcon style={{ minWidth: '2rem', color: 'currentcolor' }}>{svgIcone}</ListItemIcon>
+        <ListItemText disableTypography style={{ cursor, color, fontWeight }} primary={title} />
       </ListItem>
     )
   }
 
   return (
     <>
-      <ListItem onClick={disabled ? undefined : () => handleClick(criteriaItem)} className={classes.criteriaItem}>
-        <ListItemIcon>
-          <div className={classes.indicator} style={{ color }} />
-        </ListItemIcon>
-        <ListItemText style={{ cursor, color }} primary={title} />
-        {open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => setOpen(!open)} />}
+      <ListItem
+        onClick={disabled ? undefined : () => !subItems ?? handleClick(criteriaItem)}
+        className={classes.criteriaItem}
+      >
+        <Grid container flexDirection="column">
+          <Grid container flexDirection="row">
+            <ListItemIcon style={{ minWidth: '2rem', color: 'currentcolor' }}>{svgIcone}</ListItemIcon>
+            <ListItemText
+              disableTypography
+              style={{ cursor, color, fontWeight }}
+              primary={title}
+              onClick={() => setOpen(!open)}
+            />
+            {open ? <ExpandLess onClick={() => setOpen(!open)} /> : <ExpandMore onClick={() => setOpen(!open)} />}
+          </Grid>
+          <Grid>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <List disablePadding className={classes.subItemsContainer}>
+                <div className={classes.subItemsContainerIndicator} />
+                {subItems &&
+                  subItems.map((criteriaSubItem, index) => (
+                    <Fragment key={index}>
+                      <div className={classes.subItemsIndicator} />
+                      <CriteriaListItem
+                        criteriaItem={criteriaSubItem}
+                        handleClick={() => handleClick(criteriaSubItem)}
+                      />
+                    </Fragment>
+                  ))}
+              </List>
+            </Collapse>
+          </Grid>
+        </Grid>
       </ListItem>
-      <Collapse in={open} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding className={classes.subItemsContainer}>
-          <div className={classes.subItemsContainerIndicator} />
-          {subItems &&
-            subItems.map((criteriaSubItem, index) => (
-              <Fragment key={index}>
-                <div className={classes.subItemsIndicator} />
-                <CriteriaListItem criteriaItem={criteriaSubItem} handleClick={() => handleClick(criteriaSubItem)} />
-              </Fragment>
-            ))}
-        </List>
-      </Collapse>
     </>
   )
 }
@@ -127,7 +188,6 @@ const CriteriaRightPanel: React.FC<CriteriaRightPanelProps> = (props) => {
             </Grid>
 
             <List
-              component="nav"
               aria-labelledby="nested-list-subheader"
               subheader={
                 <Typography variant="h5" style={{ margin: '10px 15px' }}>

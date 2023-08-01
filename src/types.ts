@@ -422,12 +422,30 @@ export type CriteriaItemType = {
   id: string
   title: string
   color: string
+  fontWeight?: string
   components: any
   disabled?: boolean
   data?: any
   fetch?: any
   valueSet?: any
   subItems?: CriteriaItemType[]
+}
+
+export enum IdType {
+  Request = 'Request',
+  IPPList = 'IPPList',
+  Patient = 'Patient',
+  Encounter = 'Encounter',
+  DocumentReference = 'DocumentReference',
+  Pmsi = 'pmsi',
+  Condition = 'Condition',
+  Procedure = 'Procedure',
+  Claim = 'Claim',
+  Medication = 'Medication',
+  Biologie_microbiologie = 'biologie_microbiologie',
+  Observation = 'Observation',
+  Microbiologie = 'microbiologie',
+  Physiologie = 'physiologie'
 }
 
 export type SelectedCriteriaType = {
