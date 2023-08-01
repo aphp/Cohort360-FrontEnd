@@ -46,7 +46,8 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     selectedDocTypes: [],
     startDate: null,
     endDate: null,
-    onlyPdfAvailable: deidentified ? false : true
+    onlyPdfAvailable: deidentified ? false : true,
+    executiveUnits: undefined
   })
   const [searchInput, setSearchInput] = useState('')
   const [order, setOrder] = useState<Order>({
@@ -141,6 +142,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     filters.selectedDocTypes,
     filters.startDate,
     filters.endDate,
+    filters.executiveUnits,
     order.orderBy,
     order.orderDirection,
     searchBy

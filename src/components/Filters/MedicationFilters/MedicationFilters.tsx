@@ -16,17 +16,22 @@ import {
   Grid,
   IconButton,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material'
 
 import ClearIcon from '@mui/icons-material/Clear'
+import InfoIcon from '@mui/icons-material/Info'
+
+import scopeType from 'data/scope_type.json'
 
 import services from 'services/aphp'
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
-import { MedicationsFilters } from 'types'
+import { CriteriaName, MedicationsFilters, ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
+import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
 
 type MedicationFiltersProps = {
   open: boolean
@@ -46,6 +51,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
   filters,
   setFilters
 }) => {
+  const label = 'Séléctionnez une unité exécutrice'
   const { classes } = useStyles()
 
   const [_nda, setNda] = useState<string>(filters.nda)
@@ -55,6 +61,7 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
   const [_selectedAdministrationRoutes, setSelectedAdministrationRoutes] = useState<any[]>(
     filters.selectedAdministrationRoutes
   )
+  const [_executiveUnits, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
   const [dateError, setDateError] = useState(false)
 
   const [prescriptionTypesList, setPrescriptionTypesList] = useState<any[]>([])
@@ -81,7 +88,8 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
       startDate: newStartDate,
       endDate: newEndDate,
       selectedPrescriptionTypes: _selectedPrescriptionTypes,
-      selectedAdministrationRoutes: _selectedAdministrationRoutes
+      selectedAdministrationRoutes: _selectedAdministrationRoutes,
+      executiveUnits: _executiveUnits?.map((r) => r.id)
     })
     onClose()
   }
@@ -237,6 +245,34 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
                 <ClearIcon />
               </IconButton>
             )}
+          </Grid>
+          <FormLabel style={{ padding: '1em 1em 0 1em', display: 'flex', alignItems: 'center' }} component="legend">
+            Unité exécutrice
+            <Tooltip
+              title={
+                <>
+                  {'- Le niveau hiérarchique de rattachement est : ' +
+                    scopeType?.criteriaType[CriteriaName.Medication] +
+                    '.'}
+                  <br />
+                  {"- L'unité exécutrice" +
+                    ' est la structure élémentaire de prise en charge des malades par une équipe soignante ou médico-technique identifiées par leurs fonctions et leur organisation.'}
+                </>
+              }
+            >
+              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+            </Tooltip>
+          </FormLabel>
+          <Grid item container direction="row" alignItems="center">
+            <PopulationCard
+              form={CriteriaName.Medication}
+              label={label}
+              title={label}
+              executiveUnits={_executiveUnits}
+              isAcceptEmptySelection={true}
+              isDeleteIcon={true}
+              onChangeExecutiveUnits={setExecutiveUnits}
+            />
           </Grid>
           {dateError && (
             <Typography className={classes.dateError}>

@@ -217,10 +217,10 @@ export const buildPmsiFiltersChips = (
                 .join(',')
             )
         })),
-      filters.selectedDiagnosticTypes?.length > 0 &&
-        filters.selectedDiagnosticTypes.map(({ label, ...selectedDiagnosticType }) => ({
+      filters.diagnosticTypes?.length > 0 &&
+        filters.diagnosticTypes.map(({ label, ...diagnosticType }) => ({
           label: label ? `Type : ${capitalizeFirstLetter(label)}` : '',
-          onDelete: () => handleDeleteChip('selectedDiagnosticTypes', selectedDiagnosticType)
+          onDelete: () => handleDeleteChip('selectedDiagnosticTypes', diagnosticType)
         })),
       {
         label: filters.startDate ? `Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}` : '',

@@ -68,6 +68,7 @@ type FetchPmsiParams = {
       diagnosticTypes: string[]
       startDate: string | null
       endDate: string | null
+      executiveUnits?: string[]
     }
     sort?: {
       by: string
@@ -105,6 +106,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const nda = options?.filters?.nda ?? ''
       const startDate = options?.filters?.startDate ?? null
       const endDate = options?.filters?.endDate ?? null
+      const executiveUnits = options?.filters?.executiveUnits
 
       const pmsiResponse = await services.patients.fetchPMSI(
         page,
@@ -119,7 +121,8 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
         groupId,
         startDate,
         endDate,
-        signal
+        signal,
+        executiveUnits
       )
 
       if (pmsiResponse.pmsiData === undefined) return undefined
@@ -173,6 +176,7 @@ export type FetchBiologyParams = {
       anabio: string
       startDate: string | null
       endDate: string | null
+      executiveUnits?: string[]
     }
     sort?: {
       by: string
@@ -204,6 +208,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
       const anabio = options?.filters?.anabio ?? ''
       const startDate = options?.filters?.startDate ?? null
       const endDate = options?.filters?.endDate ?? null
+      const executiveUnits = options?.filters?.executiveUnits
 
       const biologyResponse = await services.patients.fetchObservation(
         sortBy,
@@ -218,7 +223,8 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
         startDate,
         endDate,
         groupId,
-        signal
+        signal,
+        executiveUnits
       )
 
       const biologyList: any[] = linkElementWithEncounter(biologyResponse.biologyList, hospits, deidentified)
@@ -258,6 +264,7 @@ type FetchMedicationParams = {
       selectedAdministrationRoutes: { id: string; label: string }[]
       startDate: string | null
       endDate: string | null
+      executiveUnits?: string[]
     }
     sort?: {
       by: string
@@ -297,6 +304,7 @@ const fetchMedication = createAsyncThunk<
     const nda = options?.filters?.nda ?? ''
     const startDate = options?.filters?.startDate ?? null
     const endDate = options?.filters?.endDate ?? null
+    const executiveUnits = options?.filters?.executiveUnits
 
     const medicationResponse = await services.patients.fetchMedication(
       page,
@@ -311,7 +319,8 @@ const fetchMedication = createAsyncThunk<
       groupId,
       startDate ? startDate : undefined,
       endDate ? endDate : undefined,
-      signal
+      signal,
+      executiveUnits
     )
 
     if (medicationResponse.medicationData === undefined) return undefined
@@ -362,6 +371,7 @@ type FetchDocumentsParams = {
       startDate: string | null
       endDate: string | null
       onlyPdfAvailable: boolean
+      executiveUnits?: string[]
     }
     sort?: {
       by: string
@@ -395,6 +405,7 @@ const fetchDocuments = createAsyncThunk<
     const startDate = options?.filters?.startDate ?? null
     const endDate = options?.filters?.endDate ?? null
     const onlyPdfAvailable = options?.filters?.onlyPdfAvailable ?? false
+    const executiveUnits = options?.filters?.executiveUnits
 
     if (searchInput) {
       const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)
@@ -427,7 +438,8 @@ const fetchDocuments = createAsyncThunk<
       startDate,
       endDate,
       groupId,
-      signal
+      signal,
+      executiveUnits
     )
 
     const documentsList: any[] = linkElementWithEncounter(

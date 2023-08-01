@@ -25,7 +25,7 @@ type PatientBiologyTypes = {
   groupId?: string
 }
 
-const filtersDefault = { nda: '', loinc: '', anabio: '', startDate: null, endDate: null }
+const filtersDefault = { nda: '', loinc: '', anabio: '', startDate: null, endDate: null, executiveUnits: undefined }
 
 const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   const { classes } = useStyles()
@@ -71,7 +71,8 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
               loinc: filters.loinc,
               anabio: filters.anabio,
               startDate: filters.startDate,
-              endDate: filters.endDate
+              endDate: filters.endDate,
+              executiveUnits: filters.executiveUnits
             }
           },
           signal: controllerRef.current?.signal

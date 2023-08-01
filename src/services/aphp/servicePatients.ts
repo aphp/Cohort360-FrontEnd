@@ -117,7 +117,8 @@ export interface IServicePatients {
     groupId?: string,
     startDate?: string | null,
     endDate?: string | null,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    executiveUnits?: string[]
   ) => Promise<{
     pmsiData?: (Claim | Condition | Procedure)[]
     pmsiTotal?: number
@@ -173,7 +174,8 @@ export interface IServicePatients {
     groupId?: string,
     startDate?: string,
     endDate?: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    executiveUnits?: string[]
   ) => Promise<{
     medicationData?: MedicationEntry<MedicationAdministration | MedicationRequest>[]
     medicationTotal?: number
@@ -213,7 +215,8 @@ export interface IServicePatients {
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    executiveUnits?: string[]
   ) => Promise<{
     biologyList: Observation[]
     biologyTotal: number
@@ -255,7 +258,8 @@ export interface IServicePatients {
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    executiveUnits?: string[]
   ) => Promise<{
     docsList: DocumentReference[]
     docsTotal: number
@@ -390,7 +394,8 @@ const servicesPatients: IServicePatients = {
     groupId,
     startDate,
     endDate,
-    signal
+    signal,
+    executiveUnits
   ) => {
     let pmsiResp: AxiosResponse<FHIR_API_Response<Condition | Procedure | Claim>> | null = null
 
@@ -409,7 +414,8 @@ const servicesPatients: IServicePatients = {
           type: diagnosticTypes,
           'min-recorded-date': startDate ?? '',
           'max-recorded-date': endDate ?? '',
-          signal
+          signal,
+          executiveUnits
         })
         break
       case 'ccam':
@@ -425,7 +431,8 @@ const servicesPatients: IServicePatients = {
           code: code,
           minDate: startDate ?? '',
           maxDate: endDate ?? '',
-          signal
+          signal,
+          executiveUnits
         })
         break
       case 'ghm':
@@ -441,7 +448,8 @@ const servicesPatients: IServicePatients = {
           diagnosis: code,
           minCreated: startDate ?? '',
           maxCreated: endDate ?? '',
-          signal
+          signal,
+          executiveUnits
         })
         break
       default:
@@ -501,7 +509,8 @@ const servicesPatients: IServicePatients = {
     groupId,
     startDate,
     endDate,
-    signal
+    signal,
+    executiveUnits
   ) => {
     let medicationResp: AxiosResponse<FHIR_API_Response<MedicationRequest | MedicationAdministration>> | null = null
 
@@ -519,7 +528,8 @@ const servicesPatients: IServicePatients = {
           type: selectedPrescriptionTypeIds,
           minDate: startDate,
           maxDate: endDate,
-          signal
+          signal,
+          executiveUnits
         })
         break
       case 'administration':
@@ -535,7 +545,8 @@ const servicesPatients: IServicePatients = {
           route: selectedAdministrationRouteIds,
           minDate: startDate,
           maxDate: endDate,
-          signal
+          signal,
+          executiveUnits
         })
         break
       default:
@@ -565,7 +576,8 @@ const servicesPatients: IServicePatients = {
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    executiveUnits?: string[]
   ) => {
     const observationResp = await fetchObservation({
       patient: patientId,
@@ -581,7 +593,8 @@ const servicesPatients: IServicePatients = {
       minDate: startDate ?? '',
       maxDate: endDate ?? '',
       rowStatus,
-      signal
+      signal,
+      executiveUnits
     })
 
     const biologyTotal = observationResp.data.resourceType === 'Bundle' ? observationResp.data.total : 0
@@ -605,7 +618,8 @@ const servicesPatients: IServicePatients = {
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    executiveUnits?: string[]
   ) => {
     const documentLines = 20 // Number of desired lines in the document array
 
@@ -640,7 +654,8 @@ const servicesPatients: IServicePatients = {
       onlyPdfAvailable: onlyPdfAvailable,
       minDate: startDate ?? '',
       maxDate: endDate ?? '',
-      signal: signal
+      signal: signal,
+      executiveUnits
     })
 
     if (docsList.data.resourceType !== 'Bundle' || !docsList.data.total) {

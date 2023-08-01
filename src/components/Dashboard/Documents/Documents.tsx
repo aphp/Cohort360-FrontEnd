@@ -52,7 +52,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     selectedDocTypes: [],
     onlyPdfAvailable: deidentifiedBoolean ? false : true,
     startDate: null,
-    endDate: null
+    endDate: null,
+    executiveUnits: undefined
   })
 
   const [order, setOrder] = useState<Order>({
@@ -109,7 +110,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         controllerRef?.current?.signal,
         filters.startDate,
         filters.endDate,
-        groupId
+        groupId,
+        filters.executiveUnits
       )
 
       if (result) {
