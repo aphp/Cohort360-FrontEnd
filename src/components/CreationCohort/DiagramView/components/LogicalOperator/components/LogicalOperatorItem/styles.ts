@@ -21,16 +21,7 @@ const useStyles = makeStyles()(() => ({
     position: 'relative',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'left',
-    '&::after': {
-      position: 'absolute',
-      content: "''",
-      height: 12,
-      width: 4,
-      background: '#19235a',
-      top: 'calc(100% + 3px)',
-      left: 20
-    }
+    justifyContent: 'left'
   },
   logicalOperator: {
     background: '#19235A',
@@ -54,15 +45,6 @@ const useStyles = makeStyles()(() => ({
       background: '#19235a',
       top: 12,
       left: -38
-    },
-    '&::after': {
-      position: 'absolute',
-      content: "''",
-      height: 12,
-      width: 4,
-      background: '#19235a',
-      top: 'calc(100% + 3px)',
-      left: 20
     }
   },
   textOperator: {
