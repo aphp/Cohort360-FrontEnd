@@ -7,6 +7,7 @@ import {
   CircularProgress,
   Divider,
   Grid,
+  Link,
   List,
   ListItem,
   Tooltip,
@@ -20,6 +21,7 @@ import UpdateSharpIcon from '@mui/icons-material/UpdateSharp'
 import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 import InfoIcon from '@mui/icons-material/Info'
 import ShareIcon from '@mui/icons-material/Share'
+import SupervisedUserCircleIcon from '@mui/icons-material/SupervisedUserCircle'
 
 import ModalCohortTitle from '../Modals/ModalCohortTitle/ModalCohortTitle'
 import ModalShareRequest from 'components/MyProjects/Modals/ModalShareRequest/ModalShareRequest'
@@ -29,17 +31,20 @@ import {
   resetCohortCreation,
   countCohortCreation,
   deleteCriteriaGroup,
-  buildCohortCreation
+  buildCohortCreation,
+  unbuildCohortCreation,
+  addActionToNavHistory
 } from 'state/cohortCreation'
 import { MeState } from 'state/me'
 
-import { CohortCreationCounterType, RequestType, SimpleStatus } from 'types'
+import { CohortCreationCounterType, CurrentSnapshot, RequestType, SimpleStatus, Snapshot } from 'types'
 
 import useStyle from './styles'
 
 import displayDigit from 'utils/displayDigit'
 import { SHORT_COHORT_LIMIT } from '../../../constants'
 import { JobStatus } from '../../../utils/constants'
+import services from 'services/aphp'
 
 const ControlPanel: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -68,13 +73,15 @@ const ControlPanel: React.FC<{
     selectedCriteria = [],
     selectedPopulation = [],
     currentSnapshot,
+    navHistory,
     requestId,
     requestName,
     json,
     shortCohortLimit,
-    count_outdated
+    count_outdated,
+    snapshotsHistory
   } = useAppSelector((state) => state.cohortCreation.request || {})
-  const { includePatient, status, jobFailMsg /*byrequest, alive, deceased, female, male, unknownPatient */ } = count
+  const { includePatient, status, jobFailMsg } = count
 
   const [requestShare, setRequestShare] = useState<RequestType | null>({
     currentSnapshot,
@@ -128,7 +135,7 @@ const ControlPanel: React.FC<{
     dispatch(
       countCohortCreation({
         json,
-        snapshotId: currentSnapshot,
+        snapshotId: currentSnapshot.uuid,
         requestId
       })
     )
@@ -141,6 +148,28 @@ const ControlPanel: React.FC<{
   const handleCloseSharedModal = () => {
     setRequestShare(null)
     setOpenShareRequestModal(false)
+  }
+
+  const getNewNavHistoryIndex = (navHistory: CurrentSnapshot[], previousSnapshot: CurrentSnapshot) => {
+    let newNavHistoryIndex = 0
+    const previousNavHistoryIndex = previousSnapshot.navHistoryIndex
+    if (navHistory.length - 1 > previousNavHistoryIndex) {
+      newNavHistoryIndex = previousNavHistoryIndex + 1
+    } else {
+      newNavHistoryIndex = navHistory.length
+    }
+    return newNavHistoryIndex
+  }
+
+  const handleSnapshotChange = async (snapshotId: string) => {
+    if (currentSnapshot.uuid !== snapshotId) {
+      const snapshot: Snapshot = await services.cohortCreation.fetchSnapshot(snapshotId)
+      const newNavHistoryIndex = getNewNavHistoryIndex(navHistory, currentSnapshot)
+      const newCurrentSnapshot: CurrentSnapshot = { ...snapshot, navHistoryIndex: newNavHistoryIndex }
+
+      dispatch(addActionToNavHistory(newCurrentSnapshot))
+      dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
+    }
   }
 
   const itLoads = loading || countLoading || saveLoading
@@ -237,7 +266,7 @@ const ControlPanel: React.FC<{
 
         <Grid className={classes.container}>
           <Grid container justifyContent="space-between">
-            <Typography className={cx(classes.boldText, classes.patientTypo)}>ACCÈS:</Typography>
+            <Typography className={cx(classes.boldText, classes.patientTypo)}>ACCÈS :</Typography>
             <Typography className={cx(classes.blueText, classes.boldText, classes.patientTypo)}>
               {accessIsPseudonymize === null ? '-' : accessIsPseudonymize ? 'Pseudonymisé' : 'Nominatif'}
             </Typography>
@@ -246,7 +275,7 @@ const ControlPanel: React.FC<{
 
         <Grid className={classes.container}>
           <Grid container justifyContent="space-between">
-            <Typography className={cx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS</Typography>
+            <Typography className={cx(classes.boldText, classes.patientTypo)}>PATIENTS INCLUS :</Typography>
             {itLoads ? (
               <CircularProgress
                 size={12}
@@ -256,7 +285,7 @@ const ControlPanel: React.FC<{
             ) : (
               <Grid container alignItems="center" style={{ width: 'fit-content' }}>
                 <Typography className={cx(classes.boldText, classes.patientTypo, classes.blueText)}>
-                  {includePatient !== undefined && includePatient !== null ? displayDigit(includePatient) : '-'}
+                  {displayDigit(includePatient)}
                   {oldCount !== null && !!oldCount.includePatient
                     ? (includePatient ?? 0) - oldCount.includePatient > 0
                       ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`
@@ -350,6 +379,43 @@ const ControlPanel: React.FC<{
             </Button>
           </Alert>
         )}
+
+        <Grid className={classes.container} style={{ maxHeight: 400, overflow: 'hidden scroll' }}>
+          <Grid container justifyContent="space-between" style={{ margin: 10 }}>
+            <Typography className={classes.boldText} sx={{ margin: '0px 10px' }}>
+              VERSIONS DE LA REQUÊTE :
+            </Typography>
+            <Typography sx={{ margin: '0 10px 10px 10px', fontSize: 11, color: 'grey' }}>
+              Cliquez sur une des versions pour la consulter.
+            </Typography>
+            <Grid container justifyContent={'space-around'} style={{ marginLeft: '0.5em' }}>
+              {snapshotsHistory.map((snapshot, count) => (
+                <Grid container key={count} alignItems="center">
+                  <Link
+                    onClick={() => handleSnapshotChange(snapshot.uuid)}
+                    underline={currentSnapshot.uuid === snapshot.uuid ? 'none' : 'hover'}
+                    style={{
+                      display: 'flex',
+                      cursor: currentSnapshot.uuid === snapshot.uuid ? 'default' : 'pointer',
+                      fontWeight: currentSnapshot.uuid === snapshot.uuid ? 'bold' : ''
+                    }}
+                  >
+                    <div style={{ width: 80, textAlign: 'center' }}>Version {snapshot.version}</div>
+                    <div style={{ width: 8 }}> - </div>
+                    <div style={{ width: 135 }}>{moment(snapshot.created_at).format('DD/MM/YYYY - HH:mm:ss')}</div>
+                  </Link>
+                  <Grid container alignItems="center" style={{ width: 24, margin: '0 4px' }}>
+                    {snapshot.has_linked_cohorts && (
+                      <Tooltip title="Une ou plusieurs cohortes ont été créées à partir de cette version.">
+                        <SupervisedUserCircleIcon fontSize="small" color="action" sx={{ color: '#f7a600b3' }} />
+                      </Tooltip>
+                    )}
+                  </Grid>
+                </Grid>
+              ))}
+            </Grid>
+          </Grid>
+        </Grid>
       </Grid>
 
       {openModal === 'executeCohortConfirmation' && (

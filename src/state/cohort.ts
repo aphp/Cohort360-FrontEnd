@@ -226,22 +226,12 @@ const setCohortSlice = createSlice({
       return defaultInitialState
     },
     setSelectedCohort: (state: CohortState, action: PayloadAction<Cohort | null>) => {
-      const cohortsList: Cohort[] = state.cohortsList ?? []
       const selectedCohortId = action.payload
       switch (selectedCohortId) {
         case null:
           return {
             ...state,
             selectedCohort: null
-          }
-        case '':
-          return {
-            ...state,
-            selectedCohort: {
-              uuid: '',
-              name: `Cohort ${(cohortsList.length || 0) + 1}`,
-              description: ''
-            }
           }
         default: {
           return {

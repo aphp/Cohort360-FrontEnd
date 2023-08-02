@@ -2,11 +2,12 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from 'state'
 import {
   CohortCreationCounterType,
-  CohortCreationSnapshotType,
   ScopeTreeRow,
   SelectedCriteriaType,
   CriteriaGroupType,
-  TemporalConstraintsType
+  TemporalConstraintsType,
+  QuerySnapshotInfo,
+  CurrentSnapshot
 } from 'types'
 
 import { buildRequest, unbuildRequest, joinRequest } from 'utils/cohortCreation'
@@ -28,8 +29,9 @@ export type CohortCreationState = {
   requestId: string
   cohortName: string
   json: string
-  currentSnapshot: string
-  snapshotsHistory: CohortCreationSnapshotType[]
+  currentSnapshot: CurrentSnapshot
+  navHistory: CurrentSnapshot[]
+  snapshotsHistory: QuerySnapshotInfo[]
   count: CohortCreationCounterType
   selectedPopulation: (ScopeTreeRow | undefined)[] | null
   executiveUnits: (ScopeTreeRow | undefined)[] | null
@@ -52,7 +54,8 @@ const defaultInitialState: CohortCreationState = {
   requestId: '',
   cohortName: '',
   json: '',
-  currentSnapshot: '',
+  currentSnapshot: {} as CurrentSnapshot,
+  navHistory: [],
   snapshotsHistory: [],
   count: {},
   selectedPopulation: null,
@@ -90,8 +93,8 @@ type FetchRequestCohortCreationParams = {
 type FetchRequestCohortCreationReturn = {
   requestName?: string
   requestId?: string
-  snapshotsHistory?: any[]
-  currentSnapshot?: string
+  snapshotsHistory?: QuerySnapshotInfo[]
+  currentSnapshot?: CurrentSnapshot
   json?: string
 }
 
@@ -108,11 +111,12 @@ const fetchRequestCohortCreation = createAsyncThunk<
     const { requestName, json, currentSnapshot, shortCohortLimit, snapshotsHistory, count, count_outdated } =
       requestResult
 
+    const _currentSnapshot: CurrentSnapshot = { ...currentSnapshot, navHistoryIndex: 0 }
+    const initNavHistory = [_currentSnapshot]
+
     dispatch(
       unbuildCohortCreation({
-        newCurrentSnapshot: snapshotsHistory[
-          snapshotsHistory.length ? snapshotsHistory.length - 1 : 0
-        ] as CohortCreationSnapshotType
+        newCurrentSnapshot: _currentSnapshot
       })
     )
 
@@ -121,7 +125,8 @@ const fetchRequestCohortCreation = createAsyncThunk<
       json,
       requestId,
       snapshotsHistory,
-      currentSnapshot,
+      currentSnapshot: _currentSnapshot,
+      navHistory: initNavHistory,
       shortCohortLimit,
       count_outdated,
       count
@@ -144,7 +149,7 @@ type CountCohortCreationParams = {
 }
 
 const countCohortCreation = createAsyncThunk<
-  { count?: CohortCreationCounterType; snapshotsHistory?: CohortCreationSnapshotType[] },
+  { count?: CohortCreationCounterType; snapshotsHistory?: QuerySnapshotInfo[] },
   CountCohortCreationParams,
   { state: RootState }
 >('cohortCreation/count', async ({ json, snapshotId, requestId, uuid }, { getState }) => {
@@ -161,12 +166,6 @@ const countCohortCreation = createAsyncThunk<
       if (!currentSnapshot) {
         return { count: countResult, snapshotsHistory }
       }
-      const index = newSnapshotsHistory.indexOf(currentSnapshot)
-      if (newSnapshotsHistory[index].dated_measures === undefined) {
-        newSnapshotsHistory[index].dated_measures = []
-      }
-      // @ts-ignore
-      newSnapshotsHistory[index].dated_measures = [...newSnapshotsHistory[index].dated_measures, countResult]
     }
 
     return {
@@ -188,8 +187,8 @@ const countCohortCreation = createAsyncThunk<
  */
 export type SaveJsonReturn = {
   requestId: string
-  snapshotsHistory: CohortCreationSnapshotType[]
-  currentSnapshot: string
+  snapshotsHistory: QuerySnapshotInfo[]
+  currentSnapshot: CurrentSnapshot
 }
 type SaveJsonParams = { newJson: string }
 
@@ -200,44 +199,45 @@ const saveJson = createAsyncThunk<SaveJsonReturn, SaveJsonParams, { state: RootS
       const state = getState()
       const { requestId } = state.cohortCreation.request
       let { snapshotsHistory, currentSnapshot } = state.cohortCreation.request
+      const { navHistory } = state.cohortCreation.request
+      const _navHistory: CurrentSnapshot[] = navHistory.slice()
 
       if (!snapshotsHistory || (snapshotsHistory && snapshotsHistory.length === 0)) {
         if (requestId) {
-          const newSnapshot: any = await services.cohortCreation.createSnapshot(requestId, newJson, true)
+          const newSnapshot = await services.cohortCreation.createSnapshot(requestId, newJson, true)
           if (newSnapshot) {
             const uuid = newSnapshot.uuid
-            const json = newSnapshot.serialized_query
-            const date = newSnapshot.created_at
+            const created_at = newSnapshot.created_at
+            const title = newSnapshot.title
+            const has_linked_cohorts = newSnapshot.has_linked_cohorts
+            const version = newSnapshot.version
 
-            currentSnapshot = uuid
-            snapshotsHistory = [{ uuid, json, date }]
+            currentSnapshot = { ...newSnapshot, navHistoryIndex: navHistory.length }
+            snapshotsHistory = [{ uuid, created_at, title, has_linked_cohorts, version }]
+            _navHistory.push(currentSnapshot)
           }
         }
       } else if (currentSnapshot) {
         // Update snapshots list
-        const newSnapshot: any = await services.cohortCreation.createSnapshot(currentSnapshot, newJson, false)
+        const newSnapshot = await services.cohortCreation.createSnapshot(snapshotsHistory[0].uuid, newJson, false)
         if (newSnapshot) {
-          const foundItem = snapshotsHistory.find(
-            (snapshotsHistory: CohortCreationSnapshotType) => snapshotsHistory.uuid === currentSnapshot
-          )
-          const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
-
           const uuid = newSnapshot.uuid
-          const json = newSnapshot.serialized_query
-          const date = newSnapshot.created_at
+          const created_at = newSnapshot.created_at
+          const title = newSnapshot.title
+          const has_linked_cohorts = newSnapshot.has_linked_cohorts
+          const version = newSnapshot.version
 
-          const _snapshotsHistory =
-            index === snapshotsHistory.length - 1 ? snapshotsHistory : [...snapshotsHistory].splice(0, index + 1)
-
-          currentSnapshot = uuid
-          snapshotsHistory = [..._snapshotsHistory, { uuid, json, date }]
+          currentSnapshot = { ...newSnapshot, navHistoryIndex: navHistory.length }
+          snapshotsHistory = [{ uuid, created_at, title, has_linked_cohorts, version }, ...snapshotsHistory]
+          _navHistory.push(currentSnapshot)
         }
       }
 
       return {
         requestId,
         snapshotsHistory,
-        currentSnapshot
+        currentSnapshot,
+        navHistory: _navHistory
       }
     } catch (error) {
       console.error(error)
@@ -283,7 +283,7 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
         await dispatch(
           countCohortCreation({
             json: json,
-            snapshotId: saveJsonResponse.currentSnapshot,
+            snapshotId: saveJsonResponse.currentSnapshot.uuid,
             requestId: saveJsonResponse.requestId
           })
         )
@@ -331,23 +331,22 @@ const buildCohortCreation = createAsyncThunk<BuildCohortReturn, BuildCohortParam
  */
 type UnbuildCohortReturn = {
   json: string
-  currentSnapshot: string
+  currentSnapshot: CurrentSnapshot
   selectedPopulation: (ScopeTreeRow | undefined)[] | null
   selectedCriteria: SelectedCriteriaType[]
   criteriaGroup: CriteriaGroupType[]
   nextCriteriaId: number
   nextGroupId: number
 }
-type UnbuildParams = { newCurrentSnapshot: CohortCreationSnapshotType }
+type UnbuildParams = { newCurrentSnapshot: CurrentSnapshot }
 
 const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParams, { state: RootState }>(
   'cohortCreation/unbuild',
-  async ({ newCurrentSnapshot }, { getState, dispatch }) => {
+  async ({ newCurrentSnapshot }, { dispatch }) => {
     try {
-      const state = getState()
-      const { population, criteria, criteriaGroup, temporalConstraints } = await unbuildRequest(
-        newCurrentSnapshot?.json
-      )
+      const { serialized_query, dated_measures } = newCurrentSnapshot
+      const { population, criteria, criteriaGroup, temporalConstraints } = await unbuildRequest(serialized_query)
+
       let _temporalConstraints
 
       if (temporalConstraints && temporalConstraints?.length > 0) {
@@ -366,8 +365,7 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
         allowSearchIpp = await services.perimeters.allowSearchIpp(population as ScopeTreeRow[])
       }
 
-      const dated_measures = newCurrentSnapshot.dated_measures ? newCurrentSnapshot.dated_measures[0] : null
-      const countId = dated_measures ? dated_measures.uuid : null
+      const countId = dated_measures && dated_measures[0] ? dated_measures[0].uuid : null
 
       if (countId) {
         dispatch(
@@ -378,16 +376,16 @@ const unbuildCohortCreation = createAsyncThunk<UnbuildCohortReturn, UnbuildParam
       } else {
         dispatch(
           countCohortCreation({
-            json: newCurrentSnapshot.json,
+            json: serialized_query,
             snapshotId: newCurrentSnapshot.uuid,
-            requestId: state.cohortCreation.request.requestId
+            requestId: newCurrentSnapshot.request
           })
         )
       }
 
       return {
-        json: newCurrentSnapshot.json,
-        currentSnapshot: newCurrentSnapshot.uuid,
+        json: serialized_query,
+        currentSnapshot: newCurrentSnapshot,
         selectedPopulation: population,
         allowSearchIpp: allowSearchIpp,
         temporalConstraints: _temporalConstraints,
@@ -435,7 +433,7 @@ const addRequestToCohortCreation = createAsyncThunk<
     await dispatch(
       countCohortCreation({
         json: json,
-        snapshotId: saveJsonResponse.currentSnapshot,
+        snapshotId: saveJsonResponse.currentSnapshot.uuid,
         requestId: saveJsonResponse.requestId
       })
     )
@@ -657,6 +655,15 @@ const cohortCreationSlice = createSlice({
         ...state.count,
         status: JobStatus.pending
       }
+    },
+    addActionToNavHistory: (state: CohortCreationState, action: PayloadAction<CurrentSnapshot>) => {
+      let navHistory = state.navHistory
+      const newSnapshot = action.payload
+      if (navHistory.length > newSnapshot.navHistoryIndex) {
+        navHistory = state.navHistory.splice(newSnapshot.navHistoryIndex)
+      }
+      navHistory.push(newSnapshot)
+      state.navHistory = navHistory
     }
   },
   extraReducers: (builder) => {
@@ -741,5 +748,6 @@ export const {
   updateTemporalConstraints,
   deleteTemporalConstraint,
   suspendCount,
-  unsuspendCount
+  unsuspendCount,
+  addActionToNavHistory
 } = cohortCreationSlice.actions

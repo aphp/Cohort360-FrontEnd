@@ -16,6 +16,7 @@ export type ExploredCohortState = {
   loading: boolean
   rightToExplore: boolean | undefined
   requestId?: string
+  snapshotId?: string
   cohortId?: string
   canMakeExport?: boolean
   deidentifiedBoolean?: boolean
@@ -37,6 +38,7 @@ const defaultInitialState = {
   visitTypeRepartitionData: undefined,
   monthlyVisitData: undefined,
   agePyramidData: undefined,
+  snapshotId: '',
   requestId: '',
   cohortId: '',
   favorite: false,

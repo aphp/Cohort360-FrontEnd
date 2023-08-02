@@ -298,13 +298,16 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                         )}
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} align="center">
-                        {displayDigit(row.result_size ?? 0)}
+                        {displayDigit(row.result_size)}
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} align="center">
                         {row.dated_measure_global
-                          ? `${displayDigit(row.dated_measure_global.measure_min) ?? 'X'} - ${
-                              displayDigit(row.dated_measure_global.measure_max) ?? 'X'
-                            }`
+                          ? row.dated_measure_global?.measure_min === null ||
+                            row.dated_measure_global?.measure_max === null
+                            ? '-'
+                            : `${displayDigit(row.dated_measure_global?.measure_min)} - ${displayDigit(
+                                row.dated_measure_global?.measure_max
+                              )}`
                           : '-'}
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} align="center">

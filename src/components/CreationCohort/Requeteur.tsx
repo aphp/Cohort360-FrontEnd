@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from 'state'
 import { fetchRequestCohortCreation, resetCohortCreation, unbuildCohortCreation } from 'state/cohortCreation'
 import { setCriteriaList } from 'state/criteria'
 
-import { CohortCreationSnapshotType } from 'types'
+import { CurrentSnapshot } from 'types'
 
 import constructCriteriaList from './DataList_Criteria'
 
@@ -26,10 +26,10 @@ const Requeteur = () => {
     request: {
       loading = false,
       requestId = '',
-      currentSnapshot = '',
+      currentSnapshot = {} as CurrentSnapshot,
+      navHistory,
       selectedCriteria = [],
       criteriaGroup = [],
-      snapshotsHistory = [],
       count = {},
       json = '',
       allowSearchIpp = false,
@@ -69,7 +69,6 @@ const Requeteur = () => {
             snapshotId: snapshotIdFromUrl
           })
         )
-        navigate('/cohort/new')
       }
     } catch (error) {
       console.error(error)
@@ -102,7 +101,7 @@ const Requeteur = () => {
     }
   }, [dispatch, criteriaGroup, selectedCriteria, selectedPopulation]) // eslint-disable-line
 
-  const _unbuildRequest = async (newCurrentSnapshot: CohortCreationSnapshotType) => {
+  const _unbuildRequest = async (newCurrentSnapshot: CurrentSnapshot) => {
     dispatch(unbuildCohortCreation({ newCurrentSnapshot }))
   }
 
@@ -118,7 +117,7 @@ const Requeteur = () => {
       const createCohortResult = await services.cohortCreation.createCohort(
         json,
         count?.uuid,
-        currentSnapshot,
+        currentSnapshot?.uuid,
         requestId,
         cohortName,
         cohortDescription,
@@ -135,44 +134,21 @@ const Requeteur = () => {
   }
 
   const _onUndo = async () => {
-    const foundItem = snapshotsHistory.find(
-      (snapshotsHistory: CohortCreationSnapshotType) => snapshotsHistory.uuid === currentSnapshot
-    )
-    const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
-    if (index !== -1) {
-      const newCurrentSnapshot = snapshotsHistory[index - 1 > 0 ? index - 1 : 0]
-      await _unbuildRequest(newCurrentSnapshot)
-    }
+    const newCurrentSnapshot = navHistory[currentSnapshot.navHistoryIndex - 1]
+    await _unbuildRequest(newCurrentSnapshot)
   }
 
   const _onRedo = async () => {
-    const foundItem = snapshotsHistory.find(
-      (snapshotsHistory: CohortCreationSnapshotType) => snapshotsHistory.uuid === currentSnapshot
-    )
-    const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
-    if (index !== -1) {
-      const newCurrentSnapshot =
-        snapshotsHistory[index <= snapshotsHistory.length ? index + 1 : snapshotsHistory.length - 1]
-      await _unbuildRequest(newCurrentSnapshot)
-    }
+    const newCurrentSnapshot = navHistory[currentSnapshot.navHistoryIndex + 1]
+    await _unbuildRequest(newCurrentSnapshot)
   }
 
   const _canUndo: () => boolean = () => {
-    const foundItem = snapshotsHistory
-      ? snapshotsHistory.find(
-          (snapshotsHistory: CohortCreationSnapshotType) => snapshotsHistory.uuid === currentSnapshot
-        )
-      : null
-    const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
-    return index !== 0 && index !== -1
+    return !!navHistory[currentSnapshot.navHistoryIndex - 1]
   }
 
   const _canRedo: () => boolean = () => {
-    const foundItem = snapshotsHistory.find(
-      (snapshotsHistory: CohortCreationSnapshotType) => snapshotsHistory.uuid === currentSnapshot
-    )
-    const index = foundItem ? snapshotsHistory.indexOf(foundItem) : -1
-    return index !== snapshotsHistory.length - 1 && index !== -1
+    return !!navHistory[currentSnapshot.navHistoryIndex + 1]
   }
 
   const _canExecute: () => boolean = () => {

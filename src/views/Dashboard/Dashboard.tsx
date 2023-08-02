@@ -56,7 +56,7 @@ const Dashboard: React.FC<{
           {
             label: 'Modifier la requête',
             value: 'creation',
-            to: `/cohort/new/${dashboard.requestId}`,
+            to: `/cohort/new/${dashboard.requestId}/${dashboard.snapshotId}`,
             disabled: false
           },
           { label: 'Aperçu cohorte', value: 'preview', to: `/cohort/${cohortId}/preview`, disabled: false },
