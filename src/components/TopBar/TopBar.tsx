@@ -267,7 +267,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
                 ) : (
                   <>
                     <Typography id="cohort-patient-number" align="right" noWrap>
-                      Nb de patients : {displayDigit(patientsNumber ?? 0)}
+                      Nb de patients : {displayDigit(patientsNumber)}
                     </Typography>
                     <Typography id="cohort-access-type" align="right" noWrap>
                       Accès : {access}

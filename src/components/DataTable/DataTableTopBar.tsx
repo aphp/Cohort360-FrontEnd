@@ -119,14 +119,14 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
                 <>
                   {results.map((result, index) => (
                     <Typography key={index} variant="button">
-                      {displayDigit(result.nb ?? 0)} / {displayDigit(result.total ?? 0)} {result.label}
+                      {displayDigit(result.nb)} / {displayDigit(result.total)} {result.label}
                     </Typography>
                   ))}
                 </>
               ) : (
                 <Typography variant="button">
                   {/* @ts-ignore */}
-                  {displayDigit(results.nb ?? 0)} / {displayDigit(results.total ?? 0)} {results.label}
+                  {displayDigit(results.nb)} / {displayDigit(results.total)} {results.label}
                 </Typography>
               )}
             </Grid>

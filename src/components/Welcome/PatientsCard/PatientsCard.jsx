@@ -37,13 +37,7 @@ const PatientSearchCard = () => {
     <>
       <div id="patients-card-title">
         <Typography component="h2" variant="h2" color="primary" gutterBottom>
-          {loading ? (
-            <CircularProgress size={20} />
-          ) : patientNb ? (
-            displayDigit(patientNb) + ' patients pris en charge'
-          ) : (
-            '- patients pris en charge'
-          )}
+          {loading ? <CircularProgress size={20} /> : displayDigit(patientNb) + ' patients pris en charge'}
         </Typography>
       </div>
       <Divider />

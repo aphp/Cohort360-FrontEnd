@@ -285,7 +285,7 @@ const ControlPanel: React.FC<{
             ) : (
               <Grid container alignItems="center" style={{ width: 'fit-content' }}>
                 <Typography className={cx(classes.boldText, classes.patientTypo, classes.blueText)}>
-                  {includePatient !== undefined && includePatient !== null ? displayDigit(includePatient) : '-'}
+                  {displayDigit(includePatient)}
                   {oldCount !== null && !!oldCount.includePatient
                     ? (includePatient ?? 0) - oldCount.includePatient > 0
                       ? ` (+${(includePatient ?? 0) - oldCount.includePatient})`

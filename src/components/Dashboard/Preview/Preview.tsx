@@ -73,10 +73,10 @@ const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMa
               Femmes
             </TableCell>
             <TableCell id="female-alive-cell" align="center">
-              {displayDigit(femaleAlive ?? 0)}
+              {displayDigit(femaleAlive)}
             </TableCell>
             <TableCell id="female-deceased-cell" align="center">
-              {displayDigit(femaleDeceased ?? 0)}
+              {displayDigit(femaleDeceased)}
             </TableCell>
           </TableRow>
           <TableRow>
@@ -84,10 +84,10 @@ const RepartitionTable: React.FC<RepartitionTableProps> = ({ genderRepartitionMa
               Hommes
             </TableCell>
             <TableCell id="male-alive-cell" align="center">
-              {displayDigit(maleAlive ?? 0)}
+              {displayDigit(maleAlive)}
             </TableCell>
             <TableCell id="male-deceased-cell" align="center">
-              {displayDigit(maleDeceased ?? 0)}
+              {displayDigit(maleDeceased)}
             </TableCell>
           </TableRow>
         </TableBody>

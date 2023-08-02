@@ -146,7 +146,7 @@ const VersionRow: React.FC<{ requestId: string; cohortsList: Cohort[] }> = ({ re
                       {historyRow.request_query_snapshot?.split('-')[0]}
                     </Link>
                   </TableCell>
-                  <TableCell align="center">{displayDigit(historyRow.result_size ?? 0)}</TableCell>
+                  <TableCell align="center">{displayDigit(historyRow.result_size)}</TableCell>
                   <Hidden lgDown>
                     <TableCell align="center">
                       {moment(historyRow.modified_at).format('DD/MM/YYYY [à] HH:mm')}
