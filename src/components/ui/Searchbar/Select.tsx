@@ -1,35 +1,36 @@
 import React from 'react'
 import { FormControl, InputLabel, MenuItem, Select as SelectMui } from '@mui/material'
-import useStyles from './styles'
+import { SelectInput, SelectWrapper } from './styles'
 
 type SelectProps<T> = {
   selectedValue: T
   label: string
   items: { id: T; label: string }[]
+  width: string
   onchange: (value: T) => void
 }
 
-const Select = <T,>({ selectedValue, label, items, onchange }: SelectProps<T>) => {
-  const { classes } = useStyles()
-
+const Select = <T,>({ selectedValue, label, items, width, onchange }: SelectProps<T>) => {
   return (
-    <FormControl variant="outlined" style={{ width: 200 }}>
-      <InputLabel>{label}</InputLabel>
-      <SelectMui
-        value={selectedValue}
-        onChange={(event) => onchange(event.target.value as T)}
-        className={classes.select}
-        variant="outlined"
-        label={label}
-        style={{ height: 32 }}
-      >
-        {items.map((item) => (
-          <MenuItem key={item.id as string} value={item.id as string}>
-            {item.label}
-          </MenuItem>
-        ))}
-      </SelectMui>
-    </FormControl>
+    <SelectWrapper width={width}>
+      <FormControl variant="outlined">
+        <InputLabel>{label}</InputLabel>
+        <SelectInput>
+          <SelectMui
+            value={selectedValue}
+            onChange={(event) => onchange(event.target.value as T)}
+            variant="outlined"
+            label={label}
+          >
+            {items.map((item) => (
+              <MenuItem key={item.id as string} value={item.id as string}>
+                {item.label}
+              </MenuItem>
+            ))}
+          </SelectMui>
+        </SelectInput>
+      </FormControl>
+    </SelectWrapper>
   )
 }
 

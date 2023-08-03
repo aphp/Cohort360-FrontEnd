@@ -24,7 +24,7 @@ import InputSearchDocumentSimple from 'components/Inputs/InputSearchDocument/com
 
 import {
   SearchByTypes,
-  DTTB_TabsType as TabsType,
+  TabsType,
   DTTB_ResultsType as ResultsType,
   DTTB_SearchBarType as SearchBarType,
   DTTB_ButtonType as ButtonType,

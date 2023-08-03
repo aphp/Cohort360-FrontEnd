@@ -11,9 +11,10 @@ import {
   ObservationFilters as ObservationFiltersType,
   MedicationsFilters as MedicationFiltersType,
   PMSIFilters as PMSIFiltersType,
-  CohortFilters as CohortFiltersType
+  CohortFilters as CohortFiltersType,
+  PatientsFilters
 } from 'types'
-import { MasterChipsProps } from 'components/MasterChips/MasterChips'
+import { MasterChipsProps } from 'components/ui/Chips/Chips'
 
 export const buildDocumentFiltersChips = (
   filters: DocumentFiltersType,
@@ -61,12 +62,12 @@ export const buildDocumentFiltersChips = (
 
 export const buildPatientFiltersChips = (
   filters: PatientFiltersType,
-  handleDeleteChip: <S extends 'gender' | 'birthdates' | 'vitalStatus', T>(filterName: S, value?: T) => void
+  handleDeleteChip: <S extends 'gender' | 'birthdatesRanges' | 'vitalStatus', T>(filterName: S, value?: T) => void
 ): MasterChipsProps['chips'] => {
   const gender = filters.gender.map((elem) => {
     return { label: genderName(elem), onDelete: () => handleDeleteChip('gender', elem) }
   })
-  const birthdates = { label: ageName(filters.birthdatesRanges), onDelete: () => handleDeleteChip('birthdates') }
+  const birthdates = { label: ageName(filters.birthdatesRanges), onDelete: () => handleDeleteChip('birthdatesRanges') }
   const vitalStatus = filters.vitalStatus.map((elem) => {
     return { label: vitalStatusName(elem), onDelete: () => handleDeleteChip('vitalStatus', elem) }
   })
@@ -74,7 +75,7 @@ export const buildPatientFiltersChips = (
 }
 
 export const buildObservationFiltersChips = (
-  filters: ObservationFiltersType,
+  filters: PatientsFilters,
   handleDeleteChip: (filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate', value?: any) => void
 ): MasterChipsProps['chips'] => {
   return (
@@ -131,7 +132,7 @@ export const buildObservationFiltersChips = (
 }
 
 export const buildMedicationFiltersChips = (
-  filters: MedicationFiltersType,
+  filters: PatientsFilters,
   handleDeleteChip: (
     filterName: 'nda' | 'selectedPrescriptionTypes' | 'selectedAdministrationRoutes' | 'startDate' | 'endDate',
     value?: any

@@ -201,10 +201,19 @@ export type PMSIFilters = {
   selectedDiagnosticTypes: { id: string; label: string }[]
 }
 
-export type PatientFilters = {
-  gender: GenderStatus[]
-  birthdatesRanges: [string, string]
-  vitalStatus: VitalStatus[]
+export type PatientsFilters = {
+  gender?: GenderStatus[]
+  birthdatesRanges?: [string, string]
+  vitalStatus?: VitalStatus[]
+  nda?: string
+  loinc?: string
+  anabio?: string
+  code?: string
+  startDate?: string | null
+  endDate?: string | null
+  diagnosticTypes?: { id: string; label?: string }[]
+  selectedPrescriptionTypes?: { id: string; label: string }[]
+  selectedAdministrationRoutes?: { id: string; label: string }[]
 }
 
 export type ObservationFilters = {
@@ -808,17 +817,13 @@ export type errorDetails = {
   errorSolution?: string
 }
 
-// DataTableTopBarProps
-export type DTTB_TabsType = {
-  value: any
-  onChange: (event: any, newValue?: any) => void
-  list: {
-    label: string
-    value: any
-    icon?: ReactElement
-    wrapped?: boolean
-  }[]
+export type TabType<T, TL> = {
+  label: TL
+  id: T
+  icon?: ReactElement
+  wrapped?: boolean
 }
+
 export type DTTB_ResultsType = {
   nb: number
   total: number

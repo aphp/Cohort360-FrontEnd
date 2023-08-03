@@ -1,34 +1,36 @@
 import React, { ReactNode, useState } from 'react'
 
-import useStyles from './styles'
-import { Button, Grid } from '@mui/material'
-import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
-import { PatientFilters as PatientFiltersType } from 'types'
+import { FilterWrapper } from './styles'
+import { Button } from '@mui/material'
+import { PatientsFilters as PatientFiltersType } from 'types'
+import FiltersModal from 'components/Filters/FiltersModal'
 
 type FiltersProps = {
   label: string
+  filters: PatientFiltersType
   icon: ReactNode
-  onChangeFilters: (newFilters: PatientFiltersType) => void
+  width: string
+  onChange: (newFilters: PatientFiltersType) => void
 }
 
-const Filters = ({ label, icon }: FiltersProps) => {
-  const { classes } = useStyles()
+const Filters = ({ label, filters, icon, width, onChange }: FiltersProps) => {
   const [open, setOpen] = useState(false)
 
   return (
     <>
-      <Grid id="DTTB_btn">
-        <Button
-          variant="contained"
-          disableElevation
-          onClick={() => setOpen(true)}
-          startIcon={icon}
-          className={classes.searchButton}
-        >
+      <FilterWrapper id="DTTB_btn" width={width}>
+        <Button variant="contained" disableElevation onClick={() => setOpen(true)} startIcon={icon}>
           {label}
         </Button>
-      </Grid>
-      {/*<PatientFilters open={open} onClose={() => setOpen(false)} />*/}
+      </FilterWrapper>
+      {open && (
+        <FiltersModal
+          filters={filters as PatientFiltersType}
+          onClose={() => setOpen(false)}
+          onSubmit={() => setOpen(false)}
+          onChange={onChange}
+        />
+      )}
     </>
   )
 }

@@ -10,7 +10,7 @@ import SortIcon from '@mui/icons-material/Sort'
 
 import PatientFilters from 'components/Filters/PatientFilters/PatientFilters'
 import SortDialog from 'components/Filters/SortDialog/SortDialog'
-import MasterChips from 'components/MasterChips/MasterChips'
+import MasterChips from 'components/ui/Chips/Chips'
 
 import { PatientFilters as PatientFiltersType, SearchByTypes, Sort } from 'types'
 

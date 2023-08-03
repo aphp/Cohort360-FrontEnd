@@ -5,13 +5,13 @@ import Chip from '@mui/material/Chip'
 
 import useStyles from './styles'
 
-export type MasterChipsProps = {
+export type ChipsProps = {
   chips: {
     label: string
     onDelete?: () => void
   }[]
 }
-const MasterChips: React.FC<MasterChipsProps> = ({ chips }) => {
+const Chips = ({ chips }: ChipsProps) => {
   const { classes } = useStyles()
 
   return (
@@ -31,4 +31,4 @@ const MasterChips: React.FC<MasterChipsProps> = ({ chips }) => {
   )
 }
 
-export default MasterChips
+export default Chips

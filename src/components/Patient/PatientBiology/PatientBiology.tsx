@@ -1,17 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import { Alert, Grid, Typography } from '@mui/material'
+import { Alert, CircularProgress, Grid, Select, Typography } from '@mui/material'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 
-import BiologyFilters from 'components/Filters/BiologyFilters/BiologyFilters'
 import DataTableObservation from 'components/DataTable/DataTableObservation'
-import DataTableTopBar from 'components/DataTable/DataTableTopBar'
-import MasterChips from 'components/MasterChips/MasterChips'
+import MasterChips from 'components/ui/Chips/Chips'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchBiology } from 'state/patient'
-import { Order, ObservationFilters, LoadingStatus } from 'types'
+import { Order, LoadingStatus, PatientsFilters } from 'types'
 
 import { buildObservationFiltersChips } from 'utils/chips'
 
@@ -20,6 +18,10 @@ import { Checkbox } from '@mui/material'
 import { useDebounce } from 'utils/debounce'
 import { _cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
+import DisplayDigits from 'components/ui/Display/DisplayDigits'
+import Filters from 'components/ui/Searchbar/Filters'
+import SearchInput from 'components/ui/Searchbar/SearchInput'
+import Searchbar from 'components/ui/Searchbar/Searchbar'
 
 type PatientBiologyTypes = {
   groupId?: string
@@ -36,15 +38,17 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
 
   const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const deidentifiedBoolean = patient?.deidentified ?? false
-  const totalBiology = patient?.biology?.count ?? 0
-  const totalAllBiology = patient?.biology?.total ?? 0
-  const observationsListState = patient?.biology?.list ?? []
+  const searchResults = {
+    list: patient?.biology?.list ?? [],
+    nb: patient?.biology?.count ?? 0,
+    total: patient?.biology?.total ?? 0,
+    label: 'résultat(s)'
+  }
 
   const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState('')
   const debouncedSearchValue = useDebounce(500, searchInput)
-  const [open, setOpen] = useState<string | null>(null)
-  const [filters, setFilters] = useState<ObservationFilters>(filtersDefault)
+  const [filters, setFilters] = useState<PatientsFilters>(filtersDefault)
   const [validatedStatus] = useState(true)
   const [order, setOrder] = useState<Order>({
     orderBy: 'effectiveDatetime',
@@ -65,14 +69,8 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
               by: order.orderBy,
               direction: order.orderDirection
             },
-            filters: {
-              searchInput,
-              nda: filters.nda,
-              loinc: filters.loinc,
-              anabio: filters.anabio,
-              startDate: filters.startDate,
-              endDate: filters.endDate
-            }
+            filters: filters,
+            searchInput
           },
           signal: controllerRef.current?.signal
         })
@@ -128,36 +126,45 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
-      <DataTableTopBar
-        loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
-        results={{
-          nb: totalBiology,
-          total: totalAllBiology,
-          label: 'résultat(s)'
-        }}
-        searchBar={{
-          type: 'simple',
-          value: searchInput,
-          onSearch: (newSearchInput: string) => setSearchInput(newSearchInput)
-        }}
-        buttons={[
-          {
-            label: 'Filtrer',
-            icon: <FilterList height="15px" fill="#FFF" />,
-            onClick: () => setOpen('filter')
-          }
-        ]}
-      />
+      <Grid item xs={12}>
+        <Searchbar>
+          <Grid item xs={12} lg={3}>
+            {(loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE) && (
+              <CircularProgress />
+            )}
+            {loadingStatus !== LoadingStatus.FETCHING && loadingStatus !== LoadingStatus.IDDLE && (
+              <DisplayDigits nb={searchResults.nb} total={searchResults.total} label={searchResults.label as string} />
+            )}
+          </Grid>
+          <Grid container item xs={12} lg={9} justifyContent="flex-end" style={{ maxWidth: 900 }}>
+            <SearchInput
+              value={searchInput}
+              placeholder="Rechercher"
+              width={'70%'}
+              onchange={(newValue) => setSearchInput(newValue)}
+            />
+            <Filters
+              label="Filtrer"
+              filters={filters}
+              width={'30%'}
+              icon={<FilterList height="15px" fill="#FFF" />}
+              onChange={setFilters}
+            />
+          </Grid>
+        </Searchbar>
+      </Grid>
 
-      <MasterChips chips={buildObservationFiltersChips(filters, handleDeleteChip)} />
-      <Grid container item alignItems="center" justifyContent="flex-end">
+      <Grid item xs={12}>
+        <MasterChips chips={buildObservationFiltersChips(filters, handleDeleteChip)} />
+      </Grid>
+      <Grid container item xs={12} alignItems="center" justifyContent="flex-end">
         <Checkbox checked={validatedStatus} disabled />
         <Typography style={{ color: '#505050' }}>
           N'afficher que les analyses dont les résultats ont été validés
         </Typography>
       </Grid>
 
-      <Grid container item style={{ marginBottom: 8 }}>
+      <Grid container item xs={12} style={{ marginBottom: 8 }}>
         <Alert severity="warning">
           Les mesures de biologie sont pour l'instant restreintes aux 3870 codes ANABIO correspondants aux analyses les
           plus utilisées au niveau national et à l'AP-HP. De plus, les résultats concernent uniquement les analyses
@@ -165,24 +172,26 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
         </Alert>
       </Grid>
 
-      <DataTableObservation
-        loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
-        deidentified={deidentifiedBoolean}
-        observationsList={observationsListState}
-        order={order}
-        setOrder={setOrder}
-        page={page}
-        setPage={(newPage) => setPage(newPage)}
-        total={totalBiology}
-      />
+      <Grid item xs={12}>
+        <DataTableObservation
+          loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
+          deidentified={deidentifiedBoolean}
+          observationsList={searchResults.list}
+          order={order}
+          setOrder={setOrder}
+          page={page}
+          setPage={(newPage) => setPage(newPage)}
+          total={searchResults.total}
+        />
+      </Grid>
 
-      <BiologyFilters
+      {/*<BiologyFilters
         open={open === 'filter'}
         onClose={() => setOpen(null)}
         filters={filters}
         onChangeFilters={setFilters}
         deidentified={deidentifiedBoolean}
-      />
+            />*/}
     </Grid>
   )
 }

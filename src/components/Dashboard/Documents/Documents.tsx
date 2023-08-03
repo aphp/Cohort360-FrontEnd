@@ -5,7 +5,7 @@ import { Alert, Checkbox, Grid, Typography } from '@mui/material'
 import ModalDocumentFilters from 'components/Filters/DocumentFilters/DocumentFilters'
 import DataTableComposition from 'components/DataTable/DataTableComposition'
 import DataTableTopBar from 'components/DataTable/DataTableTopBar'
-import MasterChips from 'components/MasterChips/MasterChips'
+import MasterChips from 'components/ui/Chips/Chips'
 
 import { ReactComponent as FilterList } from 'assets/icones/filter.svg'
 

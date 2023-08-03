@@ -10,7 +10,8 @@ import {
   IPatientPmsi,
   IPatientMedication,
   IPatientObservation,
-  SearchByTypes
+  SearchByTypes,
+  PatientsFilters
 } from 'types'
 
 import { logout } from './me'
@@ -61,14 +62,8 @@ type FetchPmsiParams = {
   groupId?: string
   options?: {
     page?: number
-    filters?: {
-      searchInput: string
-      nda: string
-      code: string
-      diagnosticTypes: string[]
-      startDate: string | null
-      endDate: string | null
-    }
+    filters?: PatientsFilters
+    searchInput?: string
     sort?: {
       by: string
       direction: string
@@ -99,7 +94,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
       const sortBy = options?.sort?.by ?? ''
       const sortDirection = options?.sort?.direction ?? ''
       const page = options?.page ?? 1
-      const searchInput = options?.filters?.searchInput + WILDCARD ?? ''
+      const searchInput = options?.searchInput + WILDCARD ?? ''
       const code = options?.filters?.code ?? ''
       const diagnosticTypes = options?.filters?.diagnosticTypes ?? []
       const nda = options?.filters?.nda ?? ''
@@ -113,7 +108,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
         searchInput,
         nda,
         code,
-        diagnosticTypes,
+        diagnosticTypes.map((type) => type.id),
         sortBy,
         sortDirection,
         groupId,
@@ -166,8 +161,8 @@ export type FetchBiologyParams = {
   signal?: AbortSignal
   options?: {
     page?: number
+    searchInput: string
     filters?: {
-      searchInput: string
       nda: string
       loinc: string
       anabio: string
@@ -198,7 +193,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
       const sortBy = options?.sort?.by ?? ''
       const sortDirection = options?.sort?.direction ?? ''
       const page = options?.page ?? 1
-      const searchInput = options?.filters?.searchInput ?? ''
+      const searchInput = options?.searchInput ?? ''
       const nda = options?.filters?.nda ?? ''
       const loinc = options?.filters?.loinc ?? ''
       const anabio = options?.filters?.anabio ?? ''
@@ -251,8 +246,8 @@ type FetchMedicationParams = {
   groupId?: string
   options?: {
     page?: number
+    searchInput: string
     filters?: {
-      searchInput: string
       nda: string
       selectedPrescriptionTypes: { id: string; label: string }[]
       selectedAdministrationRoutes: { id: string; label: string }[]
@@ -291,13 +286,12 @@ const fetchMedication = createAsyncThunk<
     const sortBy = options?.sort?.by ?? ''
     const sortDirection = options?.sort?.direction ?? ''
     const page = options?.page ?? 1
-    const searchInput = options?.filters?.searchInput ?? ''
+    const searchInput = options?.searchInput ?? ''
     const prescriptionTypes = options?.filters?.selectedPrescriptionTypes?.map(({ id }) => id).join(',') ?? ''
     const administrationRoutes = options?.filters?.selectedAdministrationRoutes?.map(({ id }) => id).join(',') ?? ''
     const nda = options?.filters?.nda ?? ''
     const startDate = options?.filters?.startDate ?? null
     const endDate = options?.filters?.endDate ?? null
-
     const medicationResponse = await services.patients.fetchMedication(
       page,
       patientId,
