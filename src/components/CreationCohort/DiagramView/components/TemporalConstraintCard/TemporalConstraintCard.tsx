@@ -8,6 +8,7 @@ import { MeState } from 'state/me'
 import TemporalConstraintModal from './components/TemporalConstraintModal/TemporalConstraintModal'
 
 import useStyles from './styles'
+import { TemporalConstraintsKind } from 'types'
 
 const TemporalConstraint: React.FC = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -25,7 +26,9 @@ const TemporalConstraint: React.FC = () => {
 
   const findInitialStateRadio = temporalConstraints.find(({ idList }) => idList[0] === 'All')
   const temporalConstraintsNumber =
-    findInitialStateRadio?.constraintType === 'none' ? temporalConstraints.length - 1 : temporalConstraints.length
+    findInitialStateRadio?.constraintType === TemporalConstraintsKind.NONE
+      ? temporalConstraints.length - 1
+      : temporalConstraints.length
 
   const dispatch = useAppDispatch()
   const { classes } = useStyles()

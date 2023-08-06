@@ -64,6 +64,14 @@ export enum CompositionStatusKind {
   _enteredInError = 'entered-in-error'
 }
 
+export enum TemporalConstraintsKind {
+  NONE = 'none',
+  SAME_ENCOUNTER = 'sameEncounter',
+  DIFFERENT_ENCOUNTER = 'differentEncounter',
+  PARTIAL_CONSTRAINT = 'partialConstraint',
+  DIRECT_CHRONOLOGICAL_ORDERING = 'directChronologicalOrdering'
+}
+
 export enum CohortCreationError {
   ERROR_TITLE = 'error_title',
   ERROR_REGEX = 'error_regex'

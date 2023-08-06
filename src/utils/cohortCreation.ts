@@ -141,7 +141,7 @@ type RequeteurGroupType =
       _id: number
       isInclusive: boolean
       criteria: (RequeteurCriteriaType | RequeteurGroupType)[]
-      temporalConstraints?: TemporalConstraintsType[] // NOT IMPLEMENTED
+      temporalConstraints?: TemporalConstraintsType[]
     }
   // NOT IMPLEMENTED
   | {

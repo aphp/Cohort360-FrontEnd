@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { ButtonGroup, Button, IconButton, CircularProgress } from '@mui/material'
+import { Avatar, ButtonGroup, Button, IconButton, CircularProgress, Grid } from '@mui/material'
 
 import AddIcon from '@mui/icons-material/Add'
 
@@ -63,7 +63,25 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 
       <LogicalOperatorItem itemId={itemId} />
 
-      <div className={classes.operatorChild} style={{ height: 12, marginBottom: -12 }} />
+      <Grid
+        container
+        direction="column"
+        justifyContent="center"
+        className={classes.operatorChild}
+        style={{ height: 30, marginBottom: -12, paddingLeft: 0 }}
+      >
+        <Avatar
+          style={{
+            backgroundColor: '#f7b294',
+            width: 24,
+            height: 24,
+            fontSize: 14,
+            marginLeft: -14
+          }}
+        >
+          {Math.abs(itemId) + 1}
+        </Avatar>
+      </Grid>
       <div className={classes.operatorChild}>
         {displayingItem &&
           displayingItem.map(({ criteriaIds }) => {

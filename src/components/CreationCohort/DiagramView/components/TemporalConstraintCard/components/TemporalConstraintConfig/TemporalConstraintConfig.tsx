@@ -17,7 +17,7 @@ import {
 } from '@mui/material'
 
 import { useAppSelector } from 'state'
-import { TemporalConstraintsType } from 'types'
+import { TemporalConstraintsKind, TemporalConstraintsType } from 'types'
 
 import useStyles from './styles'
 
@@ -122,7 +122,7 @@ const TemporalConstraintConfig: React.FC<{
 
       const newConstraint: TemporalConstraintsType = {
         idList: [firstCriteriaValue, secondCriteriaValue],
-        constraintType: 'directChronologicalOrdering',
+        constraintType: TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING,
         ...(isFirstTimeValueChecked && {
           timeRelationMinDuration: {
             [minTimeMeasurement]: minTime

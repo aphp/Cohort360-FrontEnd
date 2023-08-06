@@ -7,7 +7,8 @@ import {
   CriteriaGroupType,
   TemporalConstraintsType,
   QuerySnapshotInfo,
-  CurrentSnapshot
+  CurrentSnapshot,
+  TemporalConstraintsKind
 } from 'types'
 
 import { buildRequest, unbuildRequest, joinRequest } from 'utils/cohortCreation'
@@ -75,7 +76,7 @@ const defaultInitialState: CohortCreationState = {
   temporalConstraints: [
     {
       idList: ['All'],
-      constraintType: 'none'
+      constraintType: TemporalConstraintsKind.NONE
     }
   ],
   nextCriteriaId: 1,
@@ -634,7 +635,7 @@ const cohortCreationSlice = createSlice({
       state.nextCriteriaId += 1
     },
     deleteTemporalConstraint: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType>) => {
-      state.temporalConstraints = state.temporalConstraints.filter((constraint) => constraint.id !== action.payload.id)
+      state.temporalConstraints = state.temporalConstraints.filter((constraint) => constraint !== action.payload)
     },
     updateTemporalConstraints: (state: CohortCreationState, action: PayloadAction<TemporalConstraintsType[]>) => {
       state.temporalConstraints = action.payload
