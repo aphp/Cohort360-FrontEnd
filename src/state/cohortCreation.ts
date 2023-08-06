@@ -6,9 +6,9 @@ import {
   SelectedCriteriaType,
   CriteriaGroupType,
   TemporalConstraintsType,
+  TemporalConstraintsKind,
   QuerySnapshotInfo,
-  CurrentSnapshot,
-  TemporalConstraintsKind
+  CurrentSnapshot
 } from 'types'
 
 import { buildRequest, unbuildRequest, joinRequest } from 'utils/cohortCreation'

@@ -1,13 +1,12 @@
 import React, { useState } from 'react'
 
-import { ButtonGroup, Button, IconButton, CircularProgress, Grid } from '@mui/material'
+import { Avatar, ButtonGroup, Button, IconButton, CircularProgress, Grid } from '@mui/material'
 
 import AddIcon from '@mui/icons-material/Add'
 
 import LogicalOperatorItem from './components/LogicalOperatorItem/LogicalOperatorItem'
 import CriteriaRightPanel from './components/CriteriaRightPanel/CriteriaRightPanel'
 import CriteriaCardItem from '../CriteriaCard/CriteriaCard'
-import Avatar from 'components/ui/Avatar/Avatar'
 
 import { CriteriaGroupType, SelectedCriteriaType } from 'types'
 
@@ -71,7 +70,17 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
         className={classes.operatorChild}
         style={{ height: 30, marginBottom: -12, paddingLeft: 0 }}
       >
-        <Avatar content={Math.abs(itemId) + 1} backgroundColor="#FFE2A9" color="#153D8A" marginLeft={'-14px'} bold />
+        <Avatar
+          style={{
+            backgroundColor: '#f7b294',
+            width: 24,
+            height: 24,
+            fontSize: 14,
+            marginLeft: -14
+          }}
+        >
+          {Math.abs(itemId) + 1}
+        </Avatar>
       </Grid>
       <div className={classes.operatorChild}>
         {displayingItem &&
