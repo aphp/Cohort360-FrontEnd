@@ -26,7 +26,7 @@ import useStyles from './styles'
 import { CriteriaName, EncounterDataType, ScopeTreeRow, CalendarLabel, Calendar, CalendarRequestLabel } from 'types'
 import OccurrencesNumberInputs from '../AdvancedInputs/OccurrencesInputs/OccurrenceNumberInputs'
 import PopulationCard from '../../../../PopulationCard/PopulationCard'
-import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE } from 'utils/cohortCreation'
+import { STRUCTURE_HOSPITALIERE_DE_PRIS_EN_CHARGE, getCalendarMultiplicator } from 'utils/cohortCreation'
 import VisitInputs from '../AdvancedInputs/VisitInputs/VisitInputs'
 
 type SupportedFormProps = {
@@ -42,6 +42,8 @@ enum Error {
   EMPTY_AGE_ERROR,
   MIN_MAX_AGE_ERROR,
   MIN_MAX_DURATION_ERROR,
+  INCOHERENT_DURATION_ERROR,
+  INCOHERENT_AGE_ERROR,
   NO_ERROR
 }
 
@@ -125,6 +127,22 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
     ) {
       return Error.EMPTY_DURATION_ERROR
     }
+    if (defaultValues.duration[0] !== null && defaultValues.duration[1] !== null) {
+      if (
+        defaultValues.duration[0] * getCalendarMultiplicator(defaultValues.durationType[0].id) >=
+        defaultValues.duration[1] * getCalendarMultiplicator(defaultValues.durationType[1].id)
+      ) {
+        return Error.INCOHERENT_DURATION_ERROR
+      }
+    }
+    if (defaultValues.age[0] !== null && defaultValues.age[1] !== null) {
+      if (
+        defaultValues.age[0] * getCalendarMultiplicator(defaultValues.ageType[0].id) >=
+        defaultValues.age[1] * getCalendarMultiplicator(defaultValues.ageType[1].id)
+      ) {
+        return Error.INCOHERENT_AGE_ERROR
+      }
+    }
     return Error.NO_ERROR
   }
 
@@ -189,6 +207,19 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
           <Alert severity="error">
             {' '}
             Merci de renseigner au moins un <b>Âge de prise en charge</b> avec une valeur supérieure à zéro.
+          </Alert>
+        )}
+        {error === Error.INCOHERENT_AGE_ERROR && (
+          <Alert severity="error">
+            {' '}
+            L'Âge minimum au moment de la prise en charge <b>doit être inférieur</b> à l' Âge maximum au moment de la
+            prise en charge.
+          </Alert>
+        )}
+        {error === Error.INCOHERENT_DURATION_ERROR && (
+          <Alert severity="error">
+            {' '}
+            La Durée minimum de la prise en charge <b>doit être inférieure</b> à la Durée maximum de la prise en charge.
           </Alert>
         )}
         {error === Error.EMPTY_FORM && <Alert severity="error">Merci de renseigner un champ</Alert>}

@@ -20,6 +20,12 @@ import useStyles from './styles'
 
 import { Calendar, CalendarLabel, CalendarRequestLabel, DemographicDataType } from 'types'
 
+enum Error {
+  EMPTY_FORM,
+  INCOHERENT_AGE_ERROR,
+  NO_ERROR
+}
+
 type DemographicFormProps = {
   criteria: any
   selectedCriteria: any
@@ -43,13 +49,13 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
 
   const { classes } = useStyles()
 
-  const [error, setError] = useState(false)
+  const [error, setError] = useState(Error.NO_ERROR)
   const [ageError, setAgeError] = useState(false)
   const [multiFields, setMultiFields] = useState<string | null>(localStorage.getItem('multiple_fields'))
 
   const isEdition = selectedCriteria !== null ? true : false
 
-  const _onSubmit = () => {
+  const _onCheckError = () => {
     if (
       defaultValues &&
       defaultValues.vitalStatus &&
@@ -62,11 +68,18 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
       +defaultValues.years[1] === 130 &&
       defaultValues.ageType.id === Calendar.YEAR
     ) {
-      // If no input has been set
-      return setError(true)
+      return Error.EMPTY_FORM
     }
+    if (defaultValues.years[0] > defaultValues.years[1]) {
+      return Error.INCOHERENT_AGE_ERROR
+    }
+    return Error.NO_ERROR
+  }
 
-    onChangeSelectedCriteria(defaultValues)
+  const _onSubmit = () => {
+    const errorType = _onCheckError()
+    setError(errorType)
+    if (errorType === Error.NO_ERROR) return onChangeSelectedCriteria(defaultValues)
   }
 
   const _onChangeValue = (key: string, value: any) => {
@@ -123,7 +136,12 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        {error && <Alert severity="error">Merci de renseigner un champ</Alert>}
+        {error === Error.EMPTY_FORM && <Alert severity="error">Merci de renseigner un champ</Alert>}
+        {error === Error.INCOHERENT_AGE_ERROR && (
+          <Alert severity="error">
+            L'Âge minimum <b>doit être inférieur</b> à l' Âge maximum.
+          </Alert>
+        )}
 
         {!error && !multiFields && (
           <Alert
