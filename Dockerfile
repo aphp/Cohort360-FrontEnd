@@ -1,4 +1,4 @@
-FROM nginx:1.21
+FROM nginx:1.25.1
 
 WORKDIR /app
 COPY package.json package-lock.json ./
