@@ -71,10 +71,14 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
       startDate: newStartDate,
       endDate: newEndDate,
       anabio: _anabio,
-      executiveUnits: _executiveUnits?.map((r) => r.id)
+      executiveUnits: _executiveUnits ?? []
     })
     onClose()
   }
+
+  useEffect(() => {
+    setExecutiveUnits(filters.executiveUnits)
+  }, [filters.executiveUnits])
 
   useEffect(() => {
     onChangeFilters(filters)

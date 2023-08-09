@@ -688,7 +688,7 @@ type fetchMedicationAdministrationProps = {
   maxDate?: string
   _list?: string[]
   signal?: AbortSignal
-  executiveUnits?: Array<string>
+  executiveUnits?: string[]
 }
 export const fetchMedicationAdministration = async (args: fetchMedicationAdministrationProps) => {
   const {

@@ -99,10 +99,14 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
       startDate: newStartDate,
       endDate: newEndDate,
       diagnosticTypes: _selectedDiagnosticTypes,
-      executiveUnits: _executiveUnits?.map((r) => r.id)
+      executiveUnits: _executiveUnits ?? []
     })
     onClose()
   }
+
+  useEffect(() => {
+    setExecutiveUnits(filters.executiveUnits)
+  }, [filters.executiveUnits])
 
   useEffect(() => {
     const _fetchDiagnosticTypes = async () => {

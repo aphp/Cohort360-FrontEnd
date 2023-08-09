@@ -47,7 +47,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     startDate: null,
     endDate: null,
     onlyPdfAvailable: deidentified ? false : true,
-    executiveUnits: undefined
+    executiveUnits: []
   })
   const [searchInput, setSearchInput] = useState('')
   const [order, setOrder] = useState<Order>({
@@ -78,7 +78,8 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
             filters: {
               ...filters,
               searchInput: debouncedSearchInput,
-              selectedDocTypes: selectedDocTypesCodes
+              selectedDocTypes: selectedDocTypesCodes,
+              executiveUnits: filters.executiveUnits.map((executiveUnit) => executiveUnit.id)
             }
           }
         })
@@ -125,6 +126,12 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         }
         break
       }
+      case 'executiveUnits':
+        onChangeOptions(
+          filterName,
+          filters.executiveUnits.filter((executiveUnit) => executiveUnit.name !== value)
+        )
+        break
       case 'startDate':
       case 'endDate':
         onChangeOptions(filterName, null)
