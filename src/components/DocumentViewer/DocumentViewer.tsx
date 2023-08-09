@@ -85,7 +85,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ deidentified, open, han
           <>
             <Tabs value={selectedTab} onChange={handleTabChange}>
               {!deidentified && <Tab label="PDF" value="pdf" />}
-              <Tab label="Fichier brut" value="raw" />
+              <Tab label="Texte brut pseudonymisé" value="raw" />
             </Tabs>
             <>
               {selectedTab === 'raw' && (
