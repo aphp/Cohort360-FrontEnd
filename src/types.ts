@@ -156,7 +156,7 @@ type GenericFilter = {
   nda: string
   startDate: string | null
   endDate: string | null
-  executiveUnits?: string[]
+  executiveUnits: ScopeTreeRow[]
 }
 
 export type DocumentFilters = GenericFilter & {

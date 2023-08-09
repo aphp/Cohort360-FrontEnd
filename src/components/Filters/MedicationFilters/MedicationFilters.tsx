@@ -89,10 +89,14 @@ const MedicationFilters: React.FC<MedicationFiltersProps> = ({
       endDate: newEndDate,
       selectedPrescriptionTypes: _selectedPrescriptionTypes,
       selectedAdministrationRoutes: _selectedAdministrationRoutes,
-      executiveUnits: _executiveUnits?.map((r) => r.id)
+      executiveUnits: _executiveUnits ?? []
     })
     onClose()
   }
+
+  useEffect(() => {
+    setExecutiveUnits(filters.executiveUnits)
+  }, [filters.executiveUnits])
 
   useEffect(() => {
     const _fetchPrescriptionTypes = async () => {

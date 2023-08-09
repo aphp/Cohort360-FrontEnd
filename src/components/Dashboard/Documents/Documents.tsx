@@ -53,7 +53,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     onlyPdfAvailable: deidentifiedBoolean ? false : true,
     startDate: null,
     endDate: null,
-    executiveUnits: undefined
+    executiveUnits: []
   })
 
   const [order, setOrder] = useState<Order>({
@@ -95,6 +95,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
       setLoadingStatus(true)
 
       const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
+      const _executiveUnits = filters.executiveUnits.map((executiveUnit) => executiveUnit.id)
 
       const result = await services.cohorts.fetchDocuments(
         !!deidentifiedBoolean,
@@ -111,7 +112,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         filters.startDate,
         filters.endDate,
         groupId,
-        filters.executiveUnits
+        _executiveUnits
       )
 
       if (result) {
@@ -182,7 +183,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   }
 
   const handleDeleteChip = (
-    filterName: 'nda' | 'ipp' | 'selectedDocTypes' | 'startDate' | 'endDate',
+    filterName: 'nda' | 'ipp' | 'selectedDocTypes' | 'startDate' | 'endDate' | 'executiveUnits',
     value?: string
   ) => {
     switch (filterName) {
@@ -216,6 +217,12 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
       case 'startDate':
       case 'endDate':
         setFilters((prevFilters) => ({ ...prevFilters, [filterName]: null }))
+        break
+      case 'executiveUnits':
+        {
+          const newExecutiveUnits = filters.executiveUnits.filter((executiveUnit) => executiveUnit.name !== value)
+          setFilters((prevFilters) => ({ ...prevFilters, executiveUnits: newExecutiveUnits }))
+        }
         break
     }
   }

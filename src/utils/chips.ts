@@ -17,7 +17,10 @@ import { MasterChipsProps } from 'components/MasterChips/MasterChips'
 
 export const buildDocumentFiltersChips = (
   filters: DocumentFiltersType,
-  handleDeleteChip: (filterName: 'nda' | 'ipp' | 'selectedDocTypes' | 'startDate' | 'endDate', value?: string) => void
+  handleDeleteChip: (
+    filterName: 'nda' | 'ipp' | 'selectedDocTypes' | 'startDate' | 'endDate' | 'executiveUnits',
+    value?: string
+  ) => void
 ): MasterChipsProps['chips'] => {
   const displayingSelectedDocType: any[] = getDisplayingSelectedDocTypes(filters.selectedDocTypes)
 
@@ -43,6 +46,11 @@ export const buildDocumentFiltersChips = (
         displayingSelectedDocType.map((docType) => ({
           label: docType?.label ? docType?.label : '',
           onDelete: () => handleDeleteChip('selectedDocTypes', docType?.label)
+        })),
+      filters.executiveUnits?.length > 0 &&
+        filters.executiveUnits.map((executiveUnit) => ({
+          label: executiveUnit.name ? `Unité d'éxécutrice : ${executiveUnit.name}` : '',
+          onDelete: () => handleDeleteChip('executiveUnits', executiveUnit.name)
         })),
       {
         label: filters.startDate ? `Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}` : '',
@@ -75,7 +83,10 @@ export const buildPatientFiltersChips = (
 
 export const buildObservationFiltersChips = (
   filters: ObservationFiltersType,
-  handleDeleteChip: (filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate', value?: any) => void
+  handleDeleteChip: (
+    filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate' | 'executiveUnits',
+    value?: any
+  ) => void
 ): MasterChipsProps['chips'] => {
   return (
     [
@@ -115,6 +126,11 @@ export const buildObservationFiltersChips = (
                 .join(',')
             )
         })),
+      filters.executiveUnits?.length > 0 &&
+        filters.executiveUnits.map((executiveUnit) => ({
+          label: executiveUnit.name ? `Unité d'éxécutrice : ${executiveUnit.name}` : '',
+          onDelete: () => handleDeleteChip('executiveUnits', executiveUnit.name)
+        })),
       {
         label: filters.startDate ? `Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}` : '',
         onDelete: () => handleDeleteChip('startDate')
@@ -133,7 +149,13 @@ export const buildObservationFiltersChips = (
 export const buildMedicationFiltersChips = (
   filters: MedicationFiltersType,
   handleDeleteChip: (
-    filterName: 'nda' | 'selectedPrescriptionTypes' | 'selectedAdministrationRoutes' | 'startDate' | 'endDate',
+    filterName:
+      | 'nda'
+      | 'selectedPrescriptionTypes'
+      | 'selectedAdministrationRoutes'
+      | 'startDate'
+      | 'endDate'
+      | 'executiveUnits',
     value?: any
   ) => void
 ): MasterChipsProps['chips'] => {
@@ -159,6 +181,11 @@ export const buildMedicationFiltersChips = (
               'selectedPrescriptionTypes',
               filters.selectedPrescriptionTypes.filter(({ id }) => id !== prescriptionType.id)
             )
+        })),
+      filters.executiveUnits?.length > 0 &&
+        filters.executiveUnits.map((executiveUnit) => ({
+          label: executiveUnit.name ? `Unité d'éxécutrice : ${executiveUnit.name}` : '',
+          onDelete: () => handleDeleteChip('executiveUnits', executiveUnit.name)
         })),
       filters.selectedAdministrationRoutes?.length > 0 &&
         filters.selectedAdministrationRoutes.map(({ label, ...administrationRoute }) => ({
@@ -187,7 +214,7 @@ export const buildMedicationFiltersChips = (
 export const buildPmsiFiltersChips = (
   filters: PMSIFiltersType,
   handleDeleteChip: (
-    filterName: 'nda' | 'code' | 'selectedDiagnosticTypes' | 'startDate' | 'endDate',
+    filterName: 'nda' | 'code' | 'selectedDiagnosticTypes' | 'startDate' | 'endDate' | 'executiveUnits',
     value?: any
   ) => void
 ): MasterChipsProps['chips'] => {
@@ -221,6 +248,11 @@ export const buildPmsiFiltersChips = (
         filters.diagnosticTypes.map(({ label, ...diagnosticType }) => ({
           label: label ? `Type : ${capitalizeFirstLetter(label)}` : '',
           onDelete: () => handleDeleteChip('selectedDiagnosticTypes', diagnosticType)
+        })),
+      filters.executiveUnits?.length > 0 &&
+        filters.executiveUnits.map((executiveUnit) => ({
+          label: executiveUnit.name ? `Unité d'éxécutrice : ${executiveUnit.name}` : '',
+          onDelete: () => handleDeleteChip('executiveUnits', executiveUnit.name)
         })),
       {
         label: filters.startDate ? `Après le : ${moment(filters.startDate).format('DD/MM/YYYY')}` : '',

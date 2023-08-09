@@ -43,7 +43,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
     diagnosticTypes: [],
     startDate: null,
     endDate: null,
-    executiveUnits: undefined
+    executiveUnits: []
   })
   const debouncedSearchValue = useDebounce(500, filters.searchInput)
   const [order, setOrder] = useState<Order>({
@@ -81,7 +81,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
             },
             filters: {
               ...filters,
-              diagnosticTypes: selectedDiagnosticTypesCodes
+              diagnosticTypes: selectedDiagnosticTypesCodes,
+              executiveUnits: filters.executiveUnits.map((executiveUnit) => executiveUnit.id)
             }
           },
           signal: controllerRef.current?.signal
@@ -119,6 +120,12 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
         onChangeOptions(
           filterName,
           filters.diagnosticTypes.filter((item) => item.id !== value.id)
+        )
+        break
+      case 'executiveUnits':
+        onChangeOptions(
+          filterName,
+          filters.executiveUnits.filter((executiveUnit) => executiveUnit.name !== value)
         )
         break
     }

@@ -168,7 +168,7 @@ type RequeteurSearchType = {
   request: RequeteurGroupType | undefined
 }
 
-const getCalendarMultiplicator = (type: Calendar): number => {
+export const getCalendarMultiplicator = (type: Calendar): number => {
   switch (type) {
     case Calendar.MONTH:
       return 31

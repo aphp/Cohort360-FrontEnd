@@ -25,7 +25,14 @@ type PatientBiologyTypes = {
   groupId?: string
 }
 
-const filtersDefault = { nda: '', loinc: '', anabio: '', startDate: null, endDate: null, executiveUnits: undefined }
+const filtersDefault: ObservationFilters = {
+  nda: '',
+  loinc: '',
+  anabio: '',
+  startDate: null,
+  endDate: null,
+  executiveUnits: []
+}
 
 const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
   const { classes } = useStyles()
@@ -72,7 +79,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
               anabio: filters.anabio,
               startDate: filters.startDate,
               endDate: filters.endDate,
-              executiveUnits: filters.executiveUnits
+              executiveUnits: filters.executiveUnits.map((executiveUnit) => executiveUnit.id)
             }
           },
           signal: controllerRef.current?.signal
@@ -89,7 +96,10 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     }
   }
 
-  const handleDeleteChip = (filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate') => {
+  const handleDeleteChip = (
+    filterName: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate' | 'executiveUnits',
+    value: string
+  ) => {
     switch (filterName) {
       case 'nda':
       case 'loinc':
@@ -99,6 +109,12 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
       case 'startDate':
       case 'endDate':
         setFilters((prevState) => ({ ...prevState, [filterName]: null }))
+        break
+      case 'executiveUnits':
+        {
+          const newExecutiveUnits = filters.executiveUnits.filter((executiveUnit) => executiveUnit.name !== value)
+          setFilters((prevFilters) => ({ ...prevFilters, executiveUnits: newExecutiveUnits }))
+        }
         break
     }
   }
@@ -112,6 +128,7 @@ const PatientBiology: React.FC<PatientBiologyTypes> = ({ groupId }) => {
     filters.nda,
     filters.endDate,
     filters.startDate,
+    filters.executiveUnits,
     order.orderBy,
     order.orderDirection
   ])

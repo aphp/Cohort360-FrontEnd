@@ -69,6 +69,10 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
   }, [open]) //eslint-disable-line
 
   useEffect(() => {
+    setExecutiveUnits(filters.executiveUnits)
+  }, [filters.executiveUnits, open])
+
+  useEffect(() => {
     if (moment(_startDate).isAfter(_endDate)) {
       setDateError(true)
     } else {
@@ -98,7 +102,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
       selectedDocTypes: _selectedDocTypes,
       startDate: newStartDate,
       endDate: newEndDate,
-      executiveUnits: _executiveUnits?.map((r) => r.id)
+      executiveUnits: _executiveUnits ?? []
     })
     onClose()
   }

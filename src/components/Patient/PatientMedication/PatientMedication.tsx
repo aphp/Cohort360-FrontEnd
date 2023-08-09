@@ -66,7 +66,10 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
               by: order.orderBy,
               direction: order.orderDirection
             },
-            filters: filters
+            filters: {
+              ...filters,
+              executiveUnits: filters.executiveUnits.map((executiveUnit) => executiveUnit.id)
+            }
           },
           signal: controllerRef.current?.signal
         })
@@ -83,7 +86,13 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
   }
 
   const handleDeleteChip = (
-    filterName: 'nda' | 'startDate' | 'endDate' | 'selectedPrescriptionTypes' | 'selectedAdministrationRoutes',
+    filterName:
+      | 'nda'
+      | 'startDate'
+      | 'endDate'
+      | 'selectedPrescriptionTypes'
+      | 'selectedAdministrationRoutes'
+      | 'executiveUnits',
     value: any
   ) => {
     switch (filterName) {
@@ -96,6 +105,11 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
       case 'endDate':
         setFilters((prevState) => ({ ...prevState, [filterName]: null }))
         break
+      case 'executiveUnits':
+        setFilters((prevState) => ({
+          ...prevState,
+          executiveUnits: prevState.executiveUnits.filter((executiveUnit) => executiveUnit.name !== value)
+        }))
     }
   }
 
@@ -109,6 +123,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
     filters.endDate,
     filters.selectedPrescriptionTypes,
     filters.selectedAdministrationRoutes,
+    filters.executiveUnits,
     order.orderBy,
     order.orderDirection
   ])
