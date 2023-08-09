@@ -15,53 +15,82 @@ import {
   Grid,
   IconButton,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material'
 
 import ClearIcon from '@mui/icons-material/Clear'
+import InfoIcon from '@mui/icons-material/Info'
+
+import scopeType from 'data/scope_type.json'
 
 import useStyles from './styles'
+import { CriteriaName, ObservationFilters, ScopeTreeRow } from 'types'
+import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
 
 type BiologyFiltersProps = {
   open: boolean
   onClose: () => void
-  filters: any
-  onChangeFilters: (filters: any) => void
+  filters: ObservationFilters
+  onChangeFilters: (filters: ObservationFilters) => void
   deidentified: boolean
 }
 
 const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters, onChangeFilters, deidentified }) => {
   const { classes } = useStyles()
+  const label = 'Séléctionnez une unité exécutrice'
 
-  const [_filters, setFilters] = useState(filters)
+  const [_nda, setNda] = useState<string>(filters.nda)
+  const [_startDate, setStartDate] = useState<any>(filters.startDate)
+  const [_endDate, setEndDate] = useState<any>(filters.endDate)
+  const [_loinc, setLoinc] = useState<any>(filters.loinc)
+  const [_anabio, setAnabio] = useState<any>(filters.anabio)
+
   const [dateError, setDateError] = useState(false)
+  const [_executiveUnits, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
 
-  const _onChangeValue = (key: 'nda' | 'loinc' | 'anabio' | 'startDate' | 'endDate', value: any) => {
-    const _filtersCopy = { ..._filters }
-    _filtersCopy[key] = value
+  const _onChangeNda = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNda(event.target.value)
+  }
 
-    setFilters(_filtersCopy)
+  const _onChangeLoinc = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLoinc(event.target.value)
+  }
+
+  const _onChangeAnabio = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAnabio(event.target.value)
   }
 
   const _onSubmit = () => {
-    const newStartDate = moment(_filters.startDate).isValid() ? moment(_filters.startDate).format('YYYY-MM-DD') : null
-    const newEndDate = moment(_filters.endDate).isValid() ? moment(_filters.endDate).format('YYYY-MM-DD') : null
+    const newStartDate = moment(_startDate).isValid() ? moment(_startDate).format('YYYY-MM-DD') : null
+    const newEndDate = moment(_endDate).isValid() ? moment(_endDate).format('YYYY-MM-DD') : null
 
-    onChangeFilters({ ..._filters, startDate: newStartDate, endDate: newEndDate })
+    onChangeFilters({
+      nda: _nda,
+      loinc: _loinc,
+      startDate: newStartDate,
+      endDate: newEndDate,
+      anabio: _anabio,
+      executiveUnits: _executiveUnits ?? []
+    })
     onClose()
   }
 
   useEffect(() => {
-    setFilters(filters)
+    setExecutiveUnits(filters.executiveUnits)
+  }, [filters.executiveUnits])
+
+  useEffect(() => {
+    onChangeFilters(filters)
   }, [open])
 
   useEffect(() => {
-    if (moment(_filters.startDate).isAfter(_filters.endDate)) {
+    if (moment(_startDate).isAfter(_endDate)) {
       setDateError(true)
     } else {
       setDateError(false)
     }
-  }, [_filters.startDate, _filters.endDate])
+  }, [_startDate, _endDate])
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -75,8 +104,8 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
               fullWidth
               autoFocus
               placeholder="Exemple: 6601289264,141740347"
-              value={_filters.nda}
-              onChange={(event) => _onChangeValue('nda', event.target.value)}
+              value={_nda}
+              onChange={_onChangeNda}
             />
           </Grid>
         )}
@@ -88,8 +117,8 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
             fullWidth
             autoFocus
             placeholder="Exemple: A0260,E2068"
-            value={_filters.anabio}
-            onChange={(event) => _onChangeValue('anabio', event.target.value)}
+            value={_anabio}
+            onChange={_onChangeAnabio}
           />
         </Grid>
 
@@ -100,8 +129,8 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
             fullWidth
             autoFocus
             placeholder="Exemple: 1925-7,46426-3"
-            value={_filters.loinc}
-            onChange={(event) => _onChangeValue('loinc', event.target.value)}
+            value={_loinc}
+            onChange={_onChangeLoinc}
           />
         </Grid>
 
@@ -113,8 +142,8 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
             </FormLabel>
             <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
               <DatePicker
-                onChange={(date) => _onChangeValue('startDate', date ?? null)}
-                value={_filters.startDate}
+                onChange={(date) => setStartDate(date ?? null)}
+                value={_startDate}
                 renderInput={(params: any) => (
                   <TextField
                     {...params}
@@ -126,12 +155,8 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
                 )}
               />
             </LocalizationProvider>
-            {_filters.startDate !== null && (
-              <IconButton
-                classes={{ root: classes.clearDate }}
-                color="primary"
-                onClick={() => _onChangeValue('startDate', null)}
-              >
+            {_startDate !== null && (
+              <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setStartDate(null)}>
                 <ClearIcon />
               </IconButton>
             )}
@@ -143,8 +168,8 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
             </FormLabel>
             <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={'fr'}>
               <DatePicker
-                onChange={(date) => _onChangeValue('endDate', date ?? null)}
-                value={_filters.endDate}
+                onChange={(date) => setEndDate(date ?? null)}
+                value={_endDate}
                 renderInput={(params: any) => (
                   <TextField
                     {...params}
@@ -156,15 +181,39 @@ const BiologyFilters: React.FC<BiologyFiltersProps> = ({ open, onClose, filters,
                 )}
               />
             </LocalizationProvider>
-            {_filters.endDate !== null && (
-              <IconButton
-                classes={{ root: classes.clearDate }}
-                color="primary"
-                onClick={() => _onChangeValue('endDate', null)}
-              >
+            {_endDate !== null && (
+              <IconButton classes={{ root: classes.clearDate }} color="primary" onClick={() => setEndDate(null)}>
                 <ClearIcon />
               </IconButton>
             )}
+          </Grid>
+          <FormLabel style={{ padding: '1em 1em 0 1em', display: 'flex', alignItems: 'center' }} component="legend">
+            Unité exécutrice
+            <Tooltip
+              title={
+                <>
+                  {'- Le niveau hiérarchique de rattachement est : ' +
+                    scopeType?.criteriaType[CriteriaName.Biology] +
+                    '.'}
+                  <br />
+                  {"- L'unité exécutrice" +
+                    ' est la structure élémentaire de prise en charge des malades par une équipe soignante ou médico-technique identifiées par leurs fonctions et leur organisation.'}
+                </>
+              }
+            >
+              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+            </Tooltip>
+          </FormLabel>
+          <Grid item container direction="row" alignItems="center">
+            <PopulationCard
+              form={CriteriaName.Biology}
+              label={label}
+              title={label}
+              executiveUnits={_executiveUnits}
+              isAcceptEmptySelection={true}
+              isDeleteIcon={true}
+              onChangeExecutiveUnits={setExecutiveUnits}
+            />
           </Grid>
           {dateError && (
             <Typography className={classes.dateError}>

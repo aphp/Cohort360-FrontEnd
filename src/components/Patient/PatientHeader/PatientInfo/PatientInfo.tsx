@@ -7,18 +7,18 @@ import { ReactComponent as MaleIcon } from 'assets/icones/mars.svg'
 import { ReactComponent as UnknownIcon } from 'assets/icones/autre-inconnu.svg'
 
 import useStyles from './styles'
-import { PatientGenderKind } from 'types'
+import { GenderStatus } from 'types'
 
 type GenderIconTypes = {
-  gender?: PatientGenderKind
+  gender?: GenderStatus
 }
 const GenderIcon: React.FC<GenderIconTypes> = ({ gender }) => {
   const { classes } = useStyles()
 
   switch (gender) {
-    case PatientGenderKind._female:
+    case GenderStatus.FEMALE:
       return <FemaleIcon className={classes.genderIcon} />
-    case PatientGenderKind._male:
+    case GenderStatus.MALE:
       return <MaleIcon className={classes.genderIcon} />
     default:
       return <UnknownIcon className={classes.genderIcon} />
@@ -26,7 +26,7 @@ const GenderIcon: React.FC<GenderIconTypes> = ({ gender }) => {
 }
 
 type PatientInfoTypes = {
-  gender?: PatientGenderKind
+  gender?: GenderStatus
   age: React.ReactText
   ipp?: string
 }

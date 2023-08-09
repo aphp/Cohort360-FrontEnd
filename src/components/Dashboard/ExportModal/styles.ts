@@ -31,6 +31,12 @@ const useStyles = makeStyles()((theme: Theme) => ({
     '&::before': {
       content: 'none'
     }
+  },
+  warningInfo: {
+    marginTop: '15px'
+  },
+  warningIcon: {
+    marginRight: '15px'
   }
 }))
 

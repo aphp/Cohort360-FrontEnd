@@ -10,7 +10,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 
 import { getAge, substructAgeString } from 'utils/age'
 import services from 'services/aphp'
-import { CohortPatient, PatientFilters as PatientFiltersType, PatientGenderKind, SearchByTypes, Sort } from 'types'
+import { CohortPatient, PatientFilters as PatientFiltersType, GenderStatus, SearchByTypes, Sort } from 'types'
 
 import useStyles from './styles'
 import moment from 'moment/moment'
@@ -48,9 +48,9 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
   const [loadingStatus, setLoadingStatus] = useState(false)
 
   const [filters, setFilters] = useState<PatientFiltersType>({
-    gender: null,
+    gender: [],
     birthdatesRanges: ['', ''],
-    vitalStatus: null
+    vitalStatus: []
   })
 
   const [openSort, setOpenSort] = useState(false)
@@ -168,7 +168,7 @@ const PatientSidebar: React.FC<PatientSidebarTypes> = ({
               firstName={deidentifiedBoolean ? 'Prénom' : patient.name?.[0].given?.[0] ?? ''}
               lastName={deidentifiedBoolean ? 'Nom' : patient.name?.map((e) => e.family).join(' ') ?? ''}
               age={getAge(patient)}
-              gender={patient.gender as PatientGenderKind}
+              gender={patient.gender as GenderStatus}
               deceased={patient.deceasedDateTime ?? patient.deceasedBoolean}
               ipp={
                 deidentifiedBoolean

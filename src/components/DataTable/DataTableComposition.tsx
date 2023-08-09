@@ -1,13 +1,12 @@
 import React, { useState } from 'react'
 import { Buffer } from 'buffer'
-import ReactHtmlParser from 'react-html-parser'
+import Parse from 'html-react-parser'
 
 import { CircularProgress, Chip, Grid, IconButton, Typography, TableRow, TableCell } from '@mui/material'
 
 import FolderSharedIcon from '@mui/icons-material/FolderShared'
 import DescriptionIcon from '@mui/icons-material/Description'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
-import { ReactComponent as PdfIcon } from 'assets/icones/file-pdf.svg'
 import { ReactComponent as CheckIcon } from 'assets/icones/check.svg'
 import { ReactComponent as CancelIcon } from 'assets/icones/times.svg'
 import { ReactComponent as UserIcon } from 'assets/icones/user.svg'
@@ -24,6 +23,7 @@ import { getDocumentStatus } from 'utils/documentsFormatter'
 import { Column, Order, CohortComposition, CompositionStatusKind, DocumentReferenceStatusKind } from 'types'
 
 import useStyles from './styles'
+import { Visibility } from '@mui/icons-material'
 
 type DataTableCompositionProps = {
   loading: boolean
@@ -89,7 +89,7 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
       setPage={setPage}
       total={total}
     >
-      {!loading && documentsList && documentsList.length > 0 ? (
+      {!loading && documentsList?.length > 0 && (
         <>
           {documentsList.map((document) => {
             return (
@@ -104,11 +104,21 @@ const DataTableComposition: React.FC<DataTableCompositionProps> = ({
             )
           })}
         </>
-      ) : (
+      )}
+      {!loading && documentsList?.length < 1 && (
         <TableRow className={classes.emptyTableRow}>
           <TableCell colSpan={6} align="left">
             <Grid container justifyContent="center">
-              {loading ? <CircularProgress /> : <Typography variant="button">Aucun document à afficher</Typography>}
+              <Typography variant="button">Aucun document à afficher</Typography>
+            </Grid>
+          </TableCell>
+        </TableRow>
+      )}
+      {loading && (
+        <TableRow className={classes.emptyTableRow}>
+          <TableCell colSpan={6} align="left">
+            <Grid container justifyContent="center">
+              <CircularProgress />
             </Grid>
           </TableCell>
         </TableRow>
@@ -131,7 +141,6 @@ const DataTableCompositionLine: React.FC<{
   const documentId = document.id
   const title = document.description
   const status = document.status as DocumentReferenceStatusKind
-  const event = document.content[0].attachment.url
   const ipp = deidentified ? document.idPatient : document.IPP
   const nda = document.NDA ?? '-'
   const serviceProvider = document.serviceProvider ?? 'Non renseigné'
@@ -150,14 +159,13 @@ const DataTableCompositionLine: React.FC<{
         minute: '2-digit'
       })
     : ''
-
   return (
     <React.Fragment key={documentId}>
       <TableRow className={classes.tableBodyRows}>
         <TableCell>
           <Typography variant="button">{title ?? 'Document sans titre'}</Typography>
           <Typography>
-            {date} {hour}
+            {date} à {hour}
           </Typography>
           {getStatusShip(status)}
         </TableCell>
@@ -203,8 +211,8 @@ const DataTableCompositionLine: React.FC<{
         </TableCell>
 
         <TableCell>
-          <IconButton onClick={() => setOpen(documentId ?? '')} disabled={event === undefined}>
-            <PdfIcon height="30px" fill={event === undefined ? '#CBCFCF' : '#ED6D91'} />
+          <IconButton onClick={() => setOpen(documentId ?? '')}>
+            <Visibility height="30px" />
           </IconButton>
 
           <DocumentViewer
@@ -219,7 +227,7 @@ const DataTableCompositionLine: React.FC<{
       {documentContent && searchMode && (
         <TableRow className={classes.tableBodyRows}>
           <TableCell colSpan={6} style={{ backgroundImage: `url(${Watermark})`, backgroundSize: 'contain' }}>
-            <Typography>{ReactHtmlParser(documentContent)}</Typography>
+            <Typography>{Parse(documentContent)}</Typography>
           </TableCell>
         </TableRow>
       )}

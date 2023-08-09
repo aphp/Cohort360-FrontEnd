@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { Alert, Button, Divider, FormLabel, Grid, IconButton, Switch, TextField, Typography } from '@mui/material'
+import { Alert, Button, Divider, FormLabel, Grid, IconButton, Link, Switch, TextField, Typography } from '@mui/material'
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace'
 
@@ -82,6 +82,18 @@ const CcamForm: React.FC<CcamFormProps> = (props) => {
             Tous les éléments des champs multiples sont liés par une contrainte OU
           </Alert>
         )}
+
+        <Alert severity="warning">
+          Données actuellement disponibles : PMSI ORBIS. Pour plus d'informations sur les prochaines intégrations de
+          données, veuillez vous référer au tableau trimestriel de disponibilité des données disponible{' '}
+          <Link
+            href="https://eds.aphp.fr/sites/default/files/2023-01/EDS_Disponibilite_donnees_site_EDS_202212.pdf"
+            target="_blank"
+            rel="noopener"
+          >
+            ici
+          </Link>
+        </Alert>
 
         <Grid className={classes.inputContainer} container>
           <Typography variant="h6">Actes CCAM</Typography>

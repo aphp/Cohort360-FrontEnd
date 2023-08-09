@@ -15,6 +15,14 @@ import {
   Procedure
 } from 'fhir/r4'
 
+export enum CohortJobStatus {
+  _long_pending = 'long_pending',
+  _failed = 'failed',
+  _finished = 'finished',
+  _pending = 'pending',
+  _new = 'new'
+}
+
 export enum DocumentReferenceStatusKind {
   _current = 'current',
   _superseded = 'superseded',
@@ -33,11 +41,18 @@ export enum EncounterStatusKind {
   _unknown = 'unknown'
 }
 
-export enum PatientGenderKind {
-  _male = 'male',
-  _female = 'female',
-  _other = 'other',
-  _unknown = 'unknown'
+export enum GenderStatus {
+  MALE = 'male',
+  FEMALE = 'female',
+  OTHER = 'other',
+  UNKNOWN = 'unknown',
+  OTHER_UNKNOWN = 'other,unknown'
+}
+
+export enum LoadingStatus {
+  FETCHING = 'FETCHING',
+  IDDLE = 'IDLE',
+  SUCCESS = 'SUCCESS'
 }
 
 export enum CompositionStatusKind {
@@ -126,31 +141,6 @@ export type MedicationEntry<T extends MedicationRequest | MedicationAdministrati
   NDA?: string
 }
 
-export type Cohort = {
-  uuid?: string
-  fhir_group_id?: string
-  name?: string
-  description?: string
-  result_size?: number
-  dated_measure?: any
-  dated_measure_global?: any
-  created_at?: string
-  modified_at?: string
-  favorite?: boolean
-  type?: string
-  request?: string
-  request_job_status?: string
-  request_job_fail_msg?: string
-  create_task_id?: string
-  dated_measure_id?: string
-  owner_id?: string
-  request_job_duration?: string
-  request_query_snapshot?: string
-  extension?: any[]
-  exportable?: boolean
-  rights?: GroupRights
-}
-
 export type CohortFilters = {
   status: ValueSet[]
   favorite: string
@@ -162,43 +152,38 @@ export type CohortFilters = {
 
 export type SimpleCodeType = { code: string; label: string; type: string }
 
-export type DocumentFilters = {
-  ipp?: string
+type GenericFilter = {
   nda: string
-  selectedDocTypes: SimpleCodeType[]
   startDate: string | null
   endDate: string | null
+  executiveUnits: ScopeTreeRow[]
+}
+
+export type DocumentFilters = GenericFilter & {
+  ipp?: string
+  selectedDocTypes: SimpleCodeType[]
   onlyPdfAvailable: boolean
 }
 
-export type MedicationsFilters = {
-  nda: string
-  startDate: string | null
-  endDate: string | null
+export type MedicationsFilters = GenericFilter & {
   selectedPrescriptionTypes: { id: string; label: string }[]
   selectedAdministrationRoutes: { id: string; label: string }[]
 }
 
-export type PMSIFilters = {
-  nda: string
+export type PMSIFilters = GenericFilter & {
   code: string
-  startDate: string | null
-  endDate: string | null
-  selectedDiagnosticTypes: { id: string; label: string }[]
+  diagnosticTypes: { id: string; label: string }[]
 }
 
 export type PatientFilters = {
-  gender: PatientGenderKind | null
+  gender: GenderStatus[]
   birthdatesRanges: [string, string]
-  vitalStatus: VitalStatus | null
+  vitalStatus: VitalStatus[]
 }
 
-export type ObservationFilters = {
-  nda: string
+export type ObservationFilters = GenericFilter & {
   loinc: string
   anabio: string
-  startDate: string | null
-  endDate: string | null
 }
 
 export type Sort = {
@@ -243,9 +228,9 @@ export type AbstractTree<T> = T & {
 }
 
 export enum VitalStatus {
-  alive = 'alive',
-  deceased = 'deceased',
-  all = 'all'
+  ALIVE = 'alive',
+  DECEASED = 'deceased',
+  ALL = 'all'
 }
 
 export type Column =
@@ -407,12 +392,30 @@ export type CriteriaItemType = {
   id: string
   title: string
   color: string
+  fontWeight?: string
   components: any
   disabled?: boolean
   data?: any
   fetch?: any
   valueSet?: any
   subItems?: CriteriaItemType[]
+}
+
+export enum IdType {
+  Request = 'Request',
+  IPPList = 'IPPList',
+  Patient = 'Patient',
+  Encounter = 'Encounter',
+  DocumentReference = 'DocumentReference',
+  Pmsi = 'pmsi',
+  Condition = 'Condition',
+  Procedure = 'Procedure',
+  Claim = 'Claim',
+  Medication = 'Medication',
+  Biologie_microbiologie = 'biologie_microbiologie',
+  Observation = 'Observation',
+  Microbiologie = 'microbiologie',
+  Physiologie = 'physiologie'
 }
 
 export type SelectedCriteriaType = {
@@ -602,29 +605,6 @@ export type ObservationDataType = {
   encounterEndDate: Date | null
 }
 
-export type CohortCreationCounterType = {
-  uuid?: string
-  status?: string
-  includePatient?: number
-  byrequest?: number
-  alive?: number
-  deceased?: number
-  female?: number
-  male?: number
-  unknownPatient?: number
-  jobFailMsg?: string
-  date?: string
-  cohort_limit?: number
-  count_outdated?: boolean
-}
-
-export type CohortCreationSnapshotType = {
-  uuid: string
-  json: string
-  date: string
-  dated_measures?: any[]
-}
-
 export type ValueSet = {
   code: string
   display: string
@@ -640,31 +620,114 @@ export type ProjectType = {
   owner_id?: string
 }
 
+export type RequestType = {
+  uuid: string
+  owner?: string
+  query_snapshots?: QuerySnapshotInfo[]
+  shared_by?: Provider
+  parent_folder?: string
+  deleted?: string
+  deleted_by_cascade?: boolean
+  created_at?: string
+  modified_at?: string
+  name: string
+  description?: string
+  favorite?: boolean
+  data_type_of_query?: 'PATIENT' | 'ENCOUNTER'
+  currentSnapshot?: Snapshot
+  requestId?: string
+  requestName?: string
+  shared_query_snapshot?: string[]
+  usersToShare?: Provider[]
+}
+
 export type QuerySnapshotInfo = {
   uuid: string
-  title: string
   created_at: string
+  title: string
   has_linked_cohorts: boolean
   version: number
 }
 
-export type RequestType = {
+export type Snapshot = QuerySnapshotInfo & {
+  owner?: string
+  request?: string
+  previous_snapshot: string | null
+  dated_measures: DatedMeasure[]
+  cohort_results: Cohort[]
+  shared_by?: Provider
+  deleted?: boolean
+  deleted_by_cascade?: boolean
+  modified_at?: string
+  serialized_query: string
+  is_active_branch?: boolean
+  perimeters_ids?: string[]
+}
+
+export type CurrentSnapshot = Snapshot & {
+  navHistoryIndex: number
+}
+
+export type DatedMeasure = {
   uuid: string
-  name: string
-  parent_folder?: string
-  description?: string
-  owner_id?: string
-  data_type_of_query?: string
-  favorite?: boolean
+  owner: string
+  request_query_snapshot: string
+  count_outdated: boolean
+  cohort_limit: number
+  deleted: string | null
+  deleted_by_cascade: boolean
+  request_job_id: string | null
+  request_job_status: string | null
+  request_job_fail_msg: string | null
+  request_job_duration: string | null
+  created_at: string
+  modified_at: string
+  fhir_datetime: string
+  measure: number | null
+  measure_min: number | null
+  measure_max: number | null
+  count_task_id: string
+  mode: 'Snapshot' | 'Global'
+}
+
+export type Cohort = {
+  uuid?: string
+  owner?: string
+  result_size?: number
+  request?: string
+  request_query_snapshot?: string
+  dated_measure?: DatedMeasure
+  dated_measure_global?: DatedMeasure
+  global_estimate?: boolean
+  fhir_group_id?: string
+  exportable?: boolean
+  deleted?: string
+  deleted_by_cascade?: boolean
+  request_job_id?: string
+  request_job_status?: string
+  request_job_fail_msg?: string
+  request_job_duration?: string
   created_at?: string
   modified_at?: string
-  query_snapshots?: QuerySnapshotInfo[]
-  shared_query_snapshot?: string[]
-  usersToShare?: Provider[]
-  shared_by?: Provider
-  currentSnapshot?: string
-  requestId?: string
-  requestName?: string
+  name?: string
+  description?: string
+  favorite?: boolean
+  create_task_id?: string
+  type?: 'IMPORT_I2B2' | 'MY_ORGANIZATIONS' | 'MY_PATIENTS' | 'MY_COHORTS'
+  extension?: any[]
+  rights?: GroupRights
+}
+
+export type CohortCreationCounterType = {
+  uuid?: string
+  status?: string
+  includePatient?: number
+  byrequest?: number
+  unknownPatient?: number
+  jobFailMsg?: string
+  date?: string
+  cohort_limit?: number
+  count_outdated?: boolean
 }
 
 export type ContactSubmitForm = FormData
@@ -816,6 +879,7 @@ export type DTTB_SearchBarType = {
   onSearch: (newSearch: string, newSearchBy: SearchByTypes) => void
   searchBy?: any
   error?: searchInputError
+  fullWidth?: boolean
 }
 export type DTTB_ButtonType = {
   label: string

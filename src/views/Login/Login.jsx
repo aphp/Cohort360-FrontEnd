@@ -254,7 +254,14 @@ const Login = () => {
         .getAccessExpirations({ expiring: true })
         .then((values) => setLeftDays(values))
 
-      getPractitionerData(practitioner, lastConnection, maintenance, accessExpirations)
+      // because it also contains the response object that is not serializable and causes an error when stored in localstorage
+      const cleanedUpPractitionerData = {
+        id: practitioner.id,
+        displayName: practitioner.displayName,
+        firstName: practitioner.firstName,
+        lastName: practitioner.lastName
+      }
+      getPractitionerData(cleanedUpPractitionerData, lastConnection, maintenance, accessExpirations)
     } else {
       const invalidCredential = 'Invalid Credentials - Invalid username or password'
 
@@ -319,7 +326,7 @@ const Login = () => {
           alignItems="center"
           className={classes.rightPanel}
         >
-          <Grid container xs={8} lg={6} direction="column" alignItems="center" justifyContent="center">
+          <Grid container xs={8} lg={6} item direction="column" alignItems="center" justifyContent="center">
             <img className={classes.logo} src={logo} alt="Logo Cohort360" />
 
             <Typography color="primary" className={classes.bienvenue}>
@@ -330,7 +337,7 @@ const Login = () => {
               <TextField
                 margin="normal"
                 required
-                fullWidth
+                style={{ width: '50%' }}
                 id="identifiant"
                 label="Identifiant"
                 name="Identifiant"
@@ -342,7 +349,7 @@ const Login = () => {
               <TextField
                 margin="normal"
                 required
-                fullWidth
+                style={{ width: '50%' }}
                 name="Votre mot de passe"
                 label="Votre mot de passe"
                 type="password"

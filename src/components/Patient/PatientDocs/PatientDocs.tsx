@@ -9,7 +9,7 @@ import DataTableComposition from 'components/DataTable/DataTableComposition'
 import DataTableTopBar from 'components/DataTable/DataTableTopBar'
 import MasterChips from 'components/MasterChips/MasterChips'
 
-import { Order, DocumentFilters, SearchByTypes } from 'types'
+import { Order, DocumentFilters, SearchByTypes, LoadingStatus } from 'types'
 
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchDocuments } from 'state/patient'
@@ -19,6 +19,8 @@ import docTypes from 'assets/docTypes.json'
 import { useDebounce } from 'utils/debounce'
 
 import useStyles from './styles'
+import { _cancelPendingRequest } from 'utils/abortController'
+import { CanceledError } from 'axios'
 
 type PatientDocsProps = {
   groupId?: string
@@ -32,86 +34,66 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
 
   const deidentified = patient?.deidentified ?? true
 
-  const loading = patient?.documents?.loading ?? true
   const totalDocs = patient?.documents?.count ?? 0
   const totalAllDoc = patient?.documents?.total ?? 0
   const searchInputError = patient?.documents?.searchInputError ?? undefined
-
   const patientDocumentsList = patient?.documents?.list ?? []
 
+  const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
   const [page, setPage] = useState(1)
-
   const [filters, setFilters] = useState<DocumentFilters>({
     nda: '',
     selectedDocTypes: [],
     startDate: null,
     endDate: null,
-    onlyPdfAvailable: deidentified ? false : true
+    onlyPdfAvailable: deidentified ? false : true,
+    executiveUnits: []
   })
-
   const [searchInput, setSearchInput] = useState('')
   const [order, setOrder] = useState<Order>({
     orderBy: 'date',
     orderDirection: 'desc'
   })
-
-  const [searchMode, setSearchMode] = useState(false)
   const [searchBy, setSearchBy] = useState<SearchByTypes>(SearchByTypes.text)
   const [open, setOpen] = useState<'filter' | null>(null)
   const debouncedSearchInput = useDebounce(500, searchInput)
-  const controllerRef = useRef<AbortController | null>()
 
-  const _cancelPendingRequest = () => {
-    if (controllerRef.current) {
-      controllerRef.current.abort()
-    }
-    controllerRef.current = new AbortController()
-  }
+  const controllerRef = useRef<AbortController>(new AbortController())
 
-  const fetchDocumentsList = async (page: number) => {
-    const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
-    dispatch(
-      fetchDocuments({
-        signal: controllerRef.current?.signal,
-        groupId,
-        options: {
-          page,
-          searchBy: searchBy,
-          sort: {
-            by: order.orderBy,
-            direction: order.orderDirection
-          },
-          filters: {
-            ...filters,
-            searchInput,
-            selectedDocTypes: selectedDocTypesCodes
+  const fetchDocumentsList = async () => {
+    try {
+      const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
+      setLoadingStatus(LoadingStatus.FETCHING)
+      const response = await dispatch(
+        fetchDocuments({
+          signal: controllerRef.current?.signal,
+          groupId,
+          options: {
+            page,
+            searchBy: searchBy,
+            sort: {
+              by: order.orderBy,
+              direction: order.orderDirection
+            },
+            filters: {
+              ...filters,
+              searchInput: debouncedSearchInput,
+              selectedDocTypes: selectedDocTypesCodes,
+              executiveUnits: filters.executiveUnits.map((executiveUnit) => executiveUnit.id)
+            }
           }
-        }
-      })
-    )
-
-    setSearchMode(!!searchInput)
+        })
+      )
+      if (response.payload.error) {
+        throw response.payload.error
+      }
+      setLoadingStatus(LoadingStatus.SUCCESS)
+    } catch (error) {
+      if (error instanceof CanceledError) {
+        setLoadingStatus(LoadingStatus.FETCHING)
+      }
+    }
   }
-
-  const handleChangePage = (value?: number) => {
-    setPage(value || 1)
-    fetchDocumentsList(value || 1)
-  }
-
-  useEffect(() => {
-    _cancelPendingRequest()
-    handleChangePage()
-  }, [
-    debouncedSearchInput,
-    filters.onlyPdfAvailable,
-    filters.nda,
-    filters.selectedDocTypes,
-    filters.startDate,
-    filters.endDate,
-    order.orderBy,
-    order.orderDirection,
-    searchBy
-  ]) // eslint-disable-line
 
   const onChangeOptions = (key: string, value: any) => {
     setFilters((prevState) => ({
@@ -144,6 +126,12 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
         }
         break
       }
+      case 'executiveUnits':
+        onChangeOptions(
+          filterName,
+          filters.executiveUnits.filter((executiveUnit) => executiveUnit.name !== value)
+        )
+        break
       case 'startDate':
       case 'endDate':
         onChangeOptions(filterName, null)
@@ -151,22 +139,47 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
     }
   }
 
-  const onSearch = (inputSearch: string, _searchBy: SearchByTypes) => {
-    setSearchInput(inputSearch)
-    setSearchBy(_searchBy)
-  }
+  useEffect(() => {
+    setLoadingStatus(LoadingStatus.IDDLE)
+    setPage(1)
+  }, [
+    debouncedSearchInput,
+    filters.onlyPdfAvailable,
+    filters.nda,
+    filters.selectedDocTypes,
+    filters.startDate,
+    filters.endDate,
+    filters.executiveUnits,
+    order.orderBy,
+    order.orderDirection,
+    searchBy
+  ])
+
+  useEffect(() => {
+    setLoadingStatus(LoadingStatus.IDDLE)
+  }, [page])
+
+  useEffect(() => {
+    if (loadingStatus === LoadingStatus.IDDLE) {
+      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      fetchDocumentsList()
+    }
+  }, [loadingStatus])
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
-        loading={loading}
+        loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
         results={{ nb: totalDocs, total: totalAllDoc, label: 'document(s)' }}
         searchBar={{
           type: 'document',
           value: searchInput ? searchInput.replace(/^\/\(\.\)\*|\(\.\)\*\/$/gi, '') : '',
           error: searchInputError,
           searchBy: searchBy,
-          onSearch: (newSearchInput: string, newSearchBy: SearchByTypes) => onSearch(newSearchInput, newSearchBy)
+          onSearch: (newSearchInput: string, newSearchBy: SearchByTypes) => {
+            setSearchInput(newSearchInput)
+            setSearchBy(newSearchBy)
+          }
         }}
         buttons={[
           {
@@ -195,15 +208,15 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
       )}
 
       <DataTableComposition
-        loading={loading}
+        loading={loadingStatus === LoadingStatus.IDDLE || loadingStatus === LoadingStatus.FETCHING}
         deidentified={deidentified}
-        searchMode={searchMode}
+        searchMode={!!debouncedSearchInput && searchBy === SearchByTypes.text}
         groupId={groupId}
         documentsList={patientDocumentsList}
         order={order}
         setOrder={setOrder}
         page={page}
-        setPage={(newPage: number) => handleChangePage(newPage)}
+        setPage={(newPage: number) => setPage(newPage)}
         total={totalDocs}
       />
 

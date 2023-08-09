@@ -25,6 +25,7 @@ import { buildDocumentFiltersChips } from 'utils/chips'
 import docTypes from 'assets/docTypes.json'
 
 import { useDebounce } from 'utils/debounce'
+import { _cancelPendingRequest } from 'utils/abortController'
 
 type DocumentsProps = {
   groupId?: string
@@ -51,7 +52,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
     selectedDocTypes: [],
     onlyPdfAvailable: deidentifiedBoolean ? false : true,
     startDate: null,
-    endDate: null
+    endDate: null,
+    executiveUnits: []
   })
 
   const [order, setOrder] = useState<Order>({
@@ -60,15 +62,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   })
 
   const [searchInputError, setSearchInputError] = useState<searchInputError | undefined>(undefined)
-  const controllerRef = useRef<AbortController | null>()
+  const controllerRef = useRef<AbortController>(new AbortController())
   const debouncedSearchInput = useDebounce(500, searchInput)
-
-  const _cancelPendingRequest = () => {
-    if (controllerRef.current) {
-      controllerRef.current.abort()
-    }
-    controllerRef.current = new AbortController()
-  }
 
   const checkDocumentSearch = async () => {
     const checkDocumentSearch = await services.cohorts.checkDocumentSearchInput(
@@ -100,6 +95,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
       setLoadingStatus(true)
 
       const selectedDocTypesCodes = filters.selectedDocTypes.map((docType) => docType.code)
+      const _executiveUnits = filters.executiveUnits.map((executiveUnit) => executiveUnit.id)
 
       const result = await services.cohorts.fetchDocuments(
         !!deidentifiedBoolean,
@@ -115,7 +111,8 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
         controllerRef?.current?.signal,
         filters.startDate,
         filters.endDate,
-        groupId
+        groupId,
+        _executiveUnits
       )
 
       if (result) {
@@ -149,11 +146,9 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   }
 
   useEffect(() => {
-    _cancelPendingRequest()
+    controllerRef.current = _cancelPendingRequest(controllerRef.current)
     handleChangePage(1)
-
-    return () => _cancelPendingRequest()
-  }, [!!deidentifiedBoolean, filters, order,debouncedSearchInput, searchBy]) // eslint-disable-line
+  }, [!!deidentifiedBoolean, filters, order, debouncedSearchInput, searchBy]) // eslint-disable-line
 
   const handleOpenDialog = () => {
     setOpenFilter(true)
@@ -188,7 +183,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   }
 
   const handleDeleteChip = (
-    filterName: 'nda' | 'ipp' | 'selectedDocTypes' | 'startDate' | 'endDate',
+    filterName: 'nda' | 'ipp' | 'selectedDocTypes' | 'startDate' | 'endDate' | 'executiveUnits',
     value?: string
   ) => {
     switch (filterName) {
@@ -222,6 +217,12 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
       case 'startDate':
       case 'endDate':
         setFilters((prevFilters) => ({ ...prevFilters, [filterName]: null }))
+        break
+      case 'executiveUnits':
+        {
+          const newExecutiveUnits = filters.executiveUnits.filter((executiveUnit) => executiveUnit.name !== value)
+          setFilters((prevFilters) => ({ ...prevFilters, executiveUnits: newExecutiveUnits }))
+        }
         break
     }
   }

@@ -43,14 +43,13 @@ import { CohortState, setSelectedCohort as setSelectedCohortState } from 'state/
 
 import { MeState } from 'state/me'
 
-import { Cohort } from 'types'
+import { Cohort, CohortJobStatus } from 'types'
 
 import displayDigit from 'utils/displayDigit'
 
 import { ODD_EXPORT } from '../../../constants'
 
 import useStyles from './styles'
-import { JobStatus } from '../../../utils/constants'
 
 type FavStarProps = {
   favorite?: boolean
@@ -117,7 +116,13 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
   const maintenanceIsActive = meState?.maintenance?.active
 
   const _onClickRow = (row: any) => {
-    return !row.fhir_group_id ? null : onClickRow ? onClickRow(row) : navigate(`/cohort/${row.fhir_group_id}`)
+    return row.request_job_status === CohortJobStatus._pending ||
+      row.request_job_status === CohortJobStatus._long_pending ||
+      row.request_job_status === CohortJobStatus._failed
+      ? null
+      : onClickRow
+      ? onClickRow(row)
+      : navigate(`/cohort/${row.fhir_group_id}`)
   }
 
   const removeCohort = () => {
@@ -243,7 +248,13 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                   const canExportThisCohort = !!ODD_EXPORT ? row?.rights?.export_csv_nomi : false
                   return (
                     <TableRow
-                      className={!row.fhir_group_id ? classes.notAllow : classes.pointerHover}
+                      className={
+                        row.request_job_status === CohortJobStatus._pending ||
+                        row.request_job_status === CohortJobStatus._long_pending ||
+                        row.request_job_status === CohortJobStatus._failed
+                          ? classes.notAllow
+                          : classes.pointerHover
+                      }
                       hover
                       key={row.uuid}
                     >
@@ -264,11 +275,12 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                         </IconButton>
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} align="center">
-                        {row.request_job_status === 'finished' ? (
+                        {row.request_job_status === CohortJobStatus._finished ? (
                           <Chip label="Terminé" size="small" style={{ backgroundColor: '#28a745', color: 'white' }} />
-                        ) : row.request_job_status === JobStatus.pending || row.request_job_status === JobStatus.new ? (
+                        ) : row.request_job_status === CohortJobStatus._pending ||
+                          row.request_job_status === CohortJobStatus._new ? (
                           <Chip label="En cours" size="small" style={{ backgroundColor: '#ffc107', color: 'black' }} />
-                        ) : row.request_job_status === 'long_pending' ? (
+                        ) : row.request_job_status === CohortJobStatus._long_pending ? (
                           <Tooltip title="Cohorte volumineuse: sa création est plus complexe et nécessite d'être placée dans une file d'attente. Un mail vous sera envoyé quand celle-ci sera disponible.">
                             <Chip
                               label="En cours"
@@ -286,19 +298,22 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                         )}
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} align="center">
-                        {displayDigit(row.result_size ?? 0)}
+                        {displayDigit(row.result_size)}
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} align="center">
                         {row.dated_measure_global
-                          ? `${displayDigit(row.dated_measure_global.measure_min) ?? 'X'} - ${
-                              displayDigit(row.dated_measure_global.measure_max) ?? 'X'
-                            }`
+                          ? row.dated_measure_global?.measure_min === null ||
+                            row.dated_measure_global?.measure_max === null
+                            ? '-'
+                            : `${displayDigit(row.dated_measure_global?.measure_min)} - ${displayDigit(
+                                row.dated_measure_global?.measure_max
+                              )}`
                           : '-'}
                       </TableCell>
                       <TableCell onClick={() => _onClickRow(row)} align="center">
                         {row.modified_at ? (
                           <>
-                            {new Date(row.modified_at).toLocaleDateString('fr-FR')}{' '}
+                            {new Date(row.modified_at).toLocaleDateString('fr-FR')} {'à'}{' '}
                             {new Date(row.modified_at).toLocaleTimeString('fr-FR', {
                               hour: '2-digit',
                               minute: '2-digit'
@@ -317,38 +332,41 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                             justifyContent="center"
                             style={{ width: 'max-content', margin: 'auto' }}
                           >
-                            {canExportThisCohort && row.exportable && (
-                              <Grid item>
-                                <IconButton
-                                  size="small"
-                                  onClick={(event) => {
-                                    event.stopPropagation()
-                                    setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
-                                  }}
-                                  disabled={maintenanceIsActive}
-                                >
-                                  <ExportIcon />
-                                </IconButton>
-                              </Grid>
-                            )}
-                            {canExportThisCohort && !row.exportable && (
-                              <Grid item>
-                                <Tooltip title="Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé.">
-                                  <div>
-                                    <IconButton
-                                      size="small"
-                                      onClick={(event) => {
-                                        event.stopPropagation()
-                                        setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
-                                      }}
-                                      disabled={maintenanceIsActive || !row.exportable}
-                                    >
-                                      <ExportIcon />
-                                    </IconButton>
-                                  </div>
-                                </Tooltip>
-                              </Grid>
-                            )}
+                            <Grid item>
+                              <Tooltip
+                                title={
+                                  !row.exportable
+                                    ? 'Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé.'
+                                    : !canExportThisCohort && row.request_job_status === CohortJobStatus._finished
+                                    ? "Vous n'avez pas les droits suffisant pour exporter cette cohorte."
+                                    : row.request_job_status === CohortJobStatus._failed
+                                    ? 'Cette cohorte ne peut pas être exportée car elle a échouée lors de sa création'
+                                    : row.request_job_status === CohortJobStatus._pending
+                                    ? 'Cette cohorte ne peut pas être exportée car elle est en cours de création'
+                                    : ''
+                                }
+                              >
+                                <div>
+                                  <IconButton
+                                    size="small"
+                                    onClick={(event) => {
+                                      event.stopPropagation()
+                                      setSelectedExportableCohort(row.fhir_group_id ? +row.fhir_group_id : undefined)
+                                    }}
+                                    disabled={
+                                      !canExportThisCohort ||
+                                      !row.exportable ||
+                                      maintenanceIsActive ||
+                                      row.request_job_status === CohortJobStatus._long_pending ||
+                                      row.request_job_status === CohortJobStatus._failed ||
+                                      row.request_job_status === CohortJobStatus._pending
+                                    }
+                                  >
+                                    <ExportIcon />
+                                  </IconButton>
+                                </div>
+                              </Tooltip>
+                            </Grid>
 
                             <>
                               <Grid item>

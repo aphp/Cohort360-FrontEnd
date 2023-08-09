@@ -119,14 +119,14 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
                 <>
                   {results.map((result, index) => (
                     <Typography key={index} variant="button">
-                      {displayDigit(result.nb ?? 0)} / {displayDigit(result.total ?? 0)} {result.label}
+                      {displayDigit(result.nb)} / {displayDigit(result.total)} {result.label}
                     </Typography>
                   ))}
                 </>
               ) : (
                 <Typography variant="button">
                   {/* @ts-ignore */}
-                  {displayDigit(results.nb ?? 0)} / {displayDigit(results.total ?? 0)} {results.label}
+                  {displayDigit(results.nb)} / {displayDigit(results.total)} {results.label}
                 </Typography>
               )}
             </Grid>
@@ -134,7 +134,14 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
         )}
 
         {((searchBar && searchBar.type !== 'document') || (buttons && buttons?.length > 0)) && (
-          <Grid container item direction="row" alignItems="center" style={{ width: 'fit-content' }} wrap="nowrap">
+          <Grid
+            container
+            item
+            direction="row"
+            alignItems="center"
+            style={{ width: searchBar?.fullWidth ? '' : 'fit-content' }}
+            wrap="nowrap"
+          >
             {searchBar && searchBar.type !== 'document' && (
               <Grid id="DTTB_search" container alignItems="center" direction="row" wrap="nowrap">
                 {searchBar.type === 'patient' && (
@@ -146,7 +153,7 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
                       className={classes.select}
                       variant="outlined"
                       label="Rechercher dans :"
-                      style={{ height: 42 }}
+                      style={{ height: 32 }}
                     >
                       <MenuItem value={SearchByTypes.text}>Tous les champs</MenuItem>
                       <MenuItem value={SearchByTypes.family}>Nom</MenuItem>
@@ -155,7 +162,13 @@ const DataTableTopBar: React.FC<DataTableTopBarProps> = ({ loading, tabs, result
                     </Select>
                   </FormControl>
                 )}
-                <Grid item container xs={10} alignItems="center" className={classes.searchBar}>
+                <Grid
+                  item
+                  container
+                  xs={searchBar.fullWidth ? 12 : 10}
+                  alignItems="center"
+                  className={classes.searchBar}
+                >
                   <InputBase
                     placeholder="Rechercher"
                     className={classes.input}

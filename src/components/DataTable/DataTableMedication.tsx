@@ -127,8 +127,7 @@ const DataTableMedicationLine: React.FC<{
     medication.resourceType === 'MedicationRequest'
       ? medication.dosageInstruction?.[0]?.route?.text
       : medication.dosage?.route?.coding?.[0]?.display
-  const dose =
-    medication.resourceType === 'MedicationAdministration' && displayDigit(+(medication?.dosage?.dose?.value ?? 0))
+  const dose = medication.resourceType === 'MedicationAdministration' && displayDigit(medication?.dosage?.dose?.value)
   const unit = medication.resourceType === 'MedicationAdministration' && medication.dosage?.dose?.unit
   const serviceProvider = medication.serviceProvider
 

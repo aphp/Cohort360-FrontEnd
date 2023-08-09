@@ -5,6 +5,9 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import 'moment/locale/fr'
 
+import scopeType from 'data/scope_type.json'
+import InfoIcon from '@mui/icons-material/Info'
+
 import {
   Autocomplete,
   Button,
@@ -16,6 +19,7 @@ import {
   Grid,
   IconButton,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material'
 
@@ -25,9 +29,10 @@ import services from 'services/aphp'
 
 import { capitalizeFirstLetter } from 'utils/capitalize'
 
-import { PMSIFilters } from 'types'
+import { CriteriaName, CriteriaNameType, PMSIFilters, ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
+import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
 
 type ModalPMSIFiltersProps = {
   open: boolean
@@ -36,25 +41,41 @@ type ModalPMSIFiltersProps = {
   showDiagnosticTypes: boolean
   filters: PMSIFilters
   setFilters: (filters: PMSIFilters) => void
+  pmsiType: string
 }
+
+const mapToCriteriaName = (criteria: string): CriteriaNameType => {
+  const mapping: { [key: string]: CriteriaNameType } = {
+    diagnostic: CriteriaName.Cim10,
+    ghm: CriteriaName.Ghm,
+    ccam: CriteriaName.Ccam
+  }
+  if (criteria in mapping) return mapping[criteria]
+  throw new Error(`Unknown criteria ${criteria}`)
+}
+
 const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
   open,
   onClose,
   deidentified,
   showDiagnosticTypes,
   filters,
-  setFilters
+  setFilters,
+  pmsiType
 }) => {
   const { classes } = useStyles()
+  const label = 'Séléctionnez une unité exécutrice'
 
   const [_nda, setNda] = useState<string>(filters.nda)
   const [_code, setCode] = useState<string>(filters.code)
   const [_startDate, setStartDate] = useState<any>(filters.startDate)
   const [_endDate, setEndDate] = useState<any>(filters.endDate)
-  const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>(filters.selectedDiagnosticTypes)
+  const [_selectedDiagnosticTypes, setSelectedDiagnosticTypes] = useState<any[]>(filters.diagnosticTypes)
   const [dateError, setDateError] = useState(false)
+  const [_executiveUnits, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
 
   const [diagnosticTypesList, setDiagnosticTypesList] = useState<any[]>([])
+  const criteriaName = mapToCriteriaName(pmsiType)
 
   const _onChangeNda = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNda(event.target.value)
@@ -77,10 +98,15 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
       code: _code,
       startDate: newStartDate,
       endDate: newEndDate,
-      selectedDiagnosticTypes: _selectedDiagnosticTypes
+      diagnosticTypes: _selectedDiagnosticTypes,
+      executiveUnits: _executiveUnits ?? []
     })
     onClose()
   }
+
+  useEffect(() => {
+    setExecutiveUnits(filters.executiveUnits)
+  }, [filters.executiveUnits])
 
   useEffect(() => {
     const _fetchDiagnosticTypes = async () => {
@@ -96,7 +122,7 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
     setCode(filters.code)
     setStartDate(filters.startDate)
     setEndDate(filters.endDate)
-    setSelectedDiagnosticTypes(filters.selectedDiagnosticTypes)
+    setSelectedDiagnosticTypes(filters.diagnosticTypes)
   }, [open]) // eslint-disable-line
 
   useEffect(() => {
@@ -209,6 +235,33 @@ const ModalPMSIFilters: React.FC<ModalPMSIFiltersProps> = ({
               </IconButton>
             )}
           </Grid>
+          <FormLabel style={{ padding: '1em 1em 0 1em', display: 'flex', alignItems: 'center' }} component="legend">
+            Unité exécutrice
+            <Tooltip
+              title={
+                <>
+                  {'- Le niveau hiérarchique de rattachement est : ' + scopeType?.criteriaType[criteriaName] + '.'}
+                  <br />
+                  {"- L'unité exécutrice" +
+                    ' est la structure élémentaire de prise en charge des malades par une équipe soignante ou médico-technique identifiées par leurs fonctions et leur organisation.'}
+                </>
+              }
+            >
+              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+            </Tooltip>
+          </FormLabel>
+          <Grid item container direction="row" alignItems="center">
+            <PopulationCard
+              form={criteriaName}
+              label={label}
+              title={label}
+              executiveUnits={_executiveUnits}
+              isAcceptEmptySelection={true}
+              isDeleteIcon={true}
+              onChangeExecutiveUnits={setExecutiveUnits}
+            />
+          </Grid>
+
           {dateError && (
             <Typography className={classes.dateError}>
               Vous ne pouvez pas sélectionner de date de début supérieure à la date de fin.

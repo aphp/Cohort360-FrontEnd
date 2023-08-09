@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios'
 import apiBack from '../apiBackend'
 
-import { CohortCreationCounterType, DocType, QuerySnapshotInfo, RequestType } from 'types'
+import { DatedMeasure, DocType, QuerySnapshotInfo, RequestType, Snapshot } from 'types'
 
 import {
   fetchAdmissionModes,
@@ -57,12 +57,14 @@ export interface IServiceCohortCreation {
   /**
    * Cette fonction permet de créer un état de `snapshot` pour l'historique d'une requête
    */
-  createSnapshot: (id: string, json: string, firstTime?: boolean) => Promise<any>
+  createSnapshot: (id: string, json: string, firstTime?: boolean) => Promise<Snapshot | null>
 
   /**
    * Permet de récupérer toutes les informations utiles pour l'utilisation du requeteur
    */
   fetchRequest: (requestId: string, snapshotId?: string) => Promise<any>
+
+  fetchSnapshot: (snapshotId: string) => Promise<Snapshot>
 
   fetchAdmissionModes: () => Promise<any>
   fetchEntryModes: () => Promise<any>
@@ -122,7 +124,7 @@ const servicesCohortCreation: IServiceCohortCreation = {
 
   countCohort: async (requeteurJson?: string, snapshotId?: string, requestId?: string, uuid?: string) => {
     if (uuid) {
-      const measureResult = await apiBack.get<any>(`/cohort/dated-measures/${uuid}/`)
+      const measureResult = await apiBack.get<DatedMeasure>(`/cohort/dated-measures/${uuid}/`)
 
       return {
         date: measureResult?.data?.created_at,
@@ -131,24 +133,19 @@ const servicesCohortCreation: IServiceCohortCreation = {
         uuid: measureResult?.data?.uuid,
         includePatient: measureResult?.data?.measure,
         byrequest: 0,
-        alive: measureResult?.data?.measure_alive,
-        deceased: measureResult?.data?.measure_deceased,
-        female: measureResult?.data?.measure_female,
-        male: measureResult?.data?.measure_male,
-        unknownPatient: measureResult?.data?.measure_unknown,
         count_outdated: measureResult?.data?.count_outdated,
         shortCohortLimit: measureResult?.data?.cohort_limit
       }
     } else {
       if (!requeteurJson || !snapshotId || !requestId) return null
 
-      const measureResult = await apiBack.post('/cohort/dated-measures/', {
+      const measureResult = await apiBack.post<DatedMeasure>('/cohort/dated-measures/', {
         request_query_snapshot_id: snapshotId,
         request_id: requestId
       })
 
       return {
-        date: measureResult?.data?.updated_at,
+        date: measureResult?.data?.created_at,
         status: measureResult?.data?.request_job_status ?? 'error',
         uuid: measureResult?.data?.uuid,
         count_outdated: measureResult?.data?.count_outdated,
@@ -162,48 +159,31 @@ const servicesCohortCreation: IServiceCohortCreation = {
       [firstTime ? 'request_id' : 'previous_snapshot_id']: id,
       serialized_query: json
     }
-    const request = (await apiBack.post('/cohort/request-query-snapshots/', data)) || {}
-    return request && request.data ? request.data : null
+    const snapshot = (await apiBack.post<Snapshot>('/cohort/request-query-snapshots/', data)) || {}
+    return snapshot && snapshot.data ? snapshot.data : null
   },
 
   fetchRequest: async (requestId, snapshotId) => {
-    const requestResponse = (await apiBack.get<RequestType>(`/cohort/requests/${requestId}/`)) || {}
-    const requestData: RequestType = requestResponse.data
+    const requestResponse: AxiosResponse = (await apiBack.get<RequestType>(`/cohort/requests/${requestId}/`)) || {}
+    const requestData: RequestType = requestResponse?.data ? requestResponse.data : {}
 
-    const querySnapshotResponse: AxiosResponse[] =
-      requestData.query_snapshots && requestData.query_snapshots.length > 0
-        ? await Promise.all(
-            requestData.query_snapshots.map((query_snapshot: QuerySnapshotInfo) =>
-              apiBack.get<AxiosResponse>(`/cohort/request-query-snapshots/${query_snapshot.uuid}/`)
-            )
-          )
-        : []
-
-    const query_snapshots = querySnapshotResponse.map((querySnapshot: any) => querySnapshot.data)
+    const query_snapshots: QuerySnapshotInfo[] = requestData.query_snapshots ? requestData.query_snapshots : []
 
     const requestName = requestData.name
 
-    let snapshotsHistoryFromQuery: {
-      uuid: string
-      serialized_query: string
-      previous_snapshot: string
-      dated_measures: CohortCreationCounterType[]
-      created_at: string
-      cohort_limit: number
-      count_outdated: boolean
-    }[] = query_snapshots
+    let snapshotsHistoryFromQuery: QuerySnapshotInfo[] = query_snapshots
 
     snapshotsHistoryFromQuery = snapshotsHistoryFromQuery.sort(
       ({ created_at: a }, { created_at: b }) => new Date(b).valueOf() - new Date(a).valueOf()
     )
 
-    let currentSnapshot = snapshotId
-      ? snapshotsHistoryFromQuery.find(({ uuid }) => uuid === snapshotId)
-      : snapshotsHistoryFromQuery
-      ? snapshotsHistoryFromQuery[0]
-      : null
+    const currentSnapshotResponse: AxiosResponse = await apiBack.get<Snapshot>(
+      `/cohort/request-query-snapshots/${snapshotId ? snapshotId : snapshotsHistoryFromQuery?.[0].uuid}/`
+    )
+
+    let currentSnapshot: Snapshot | null = currentSnapshotResponse?.data ? currentSnapshotResponse?.data : null
+
     let result = null
-    let snapshotsHistory: any[] = []
     let shortCohortLimit = SHORT_COHORT_LIMIT
     let count_outdated = false
 
@@ -214,45 +194,30 @@ const servicesCohortCreation: IServiceCohortCreation = {
         dated_measures: currentSnapshot.dated_measures.filter((dated_measure: any) => dated_measure.mode !== 'Global')
       }
 
-      let nextSnap = currentSnapshot.uuid
-      snapshotsHistory = snapshotsHistoryFromQuery
-        .map(({ uuid, serialized_query, created_at, previous_snapshot, dated_measures }) => {
-          if (nextSnap === uuid) {
-            nextSnap = previous_snapshot
-            return {
-              uuid: uuid,
-              json: serialized_query,
-              date: created_at,
-              // clean Global count
-              dated_measures: dated_measures.filter((dated_measure: any) => dated_measure.mode !== 'Global')
-            }
-          } else {
-            return {
-              uuid: undefined,
-              json: serialized_query,
-              date: created_at
-            }
-          }
-        })
-        .filter(({ uuid }) => uuid !== undefined)
-
       shortCohortLimit =
-        currentSnapshot.dated_measures.length > 0 ? currentSnapshot.dated_measures[0].cohort_limit ?? 0 : 0
+        currentSnapshot.dated_measures.length > 0 ? currentSnapshot.dated_measures?.[0].cohort_limit ?? 0 : 0
 
       count_outdated =
-        currentSnapshot.dated_measures.length > 0 ? currentSnapshot.dated_measures[0].count_outdated ?? false : false
+        currentSnapshot.dated_measures.length > 0 ? currentSnapshot.dated_measures?.[0].count_outdated ?? false : false
     }
 
     result = {
       requestName,
-      snapshotsHistory: snapshotsHistory ? snapshotsHistory.reverse() : [],
+      snapshotsHistory: snapshotsHistoryFromQuery ? snapshotsHistoryFromQuery : [],
       json: currentSnapshot ? currentSnapshot.serialized_query : '',
-      currentSnapshot: currentSnapshot ? currentSnapshot.uuid : '',
+      currentSnapshot: currentSnapshot ? currentSnapshot : {},
       count: currentSnapshot ? currentSnapshot.dated_measures[0] : {},
       shortCohortLimit,
       count_outdated
     }
     return result
+  },
+
+  fetchSnapshot: async (snapshotId) => {
+    const snapshotResponse: AxiosResponse =
+      (await apiBack.get<Snapshot>(`/cohort/request-query-snapshots/${snapshotId}/`)) || {}
+
+    return snapshotResponse.data || {}
   },
 
   fetchAdmissionModes: fetchAdmissionModes,

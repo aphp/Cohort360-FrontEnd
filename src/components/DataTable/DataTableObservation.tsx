@@ -50,21 +50,27 @@ const DataTableObservation: React.FC<DataTableObservationProps> = ({
       setPage={setPage}
       total={total}
     >
-      {!loading && observationsList && observationsList.length > 0 ? (
+      {!loading && observationsList?.length > 0 && (
         <>
-          {observationsList.map((observation) => {
-            return <DataTableObservationLine key={observation.id} observation={observation} />
-          })}
+          {observationsList.map((observation) => (
+            <DataTableObservationLine key={observation.id} observation={observation} />
+          ))}
         </>
-      ) : (
+      )}
+      {!loading && observationsList?.length < 1 && (
         <TableRow className={classes.emptyTableRow}>
           <TableCell colSpan={7} align="left">
             <Grid container justifyContent="center">
-              {loading ? (
-                <CircularProgress />
-              ) : (
-                <Typography variant="button">Aucun résultat de biologie à afficher</Typography>
-              )}
+              <Typography variant="button">Aucun résultat de biologie à afficher</Typography>
+            </Grid>
+          </TableCell>
+        </TableRow>
+      )}
+      {loading && (
+        <TableRow className={classes.emptyTableRow}>
+          <TableCell colSpan={7} align="left">
+            <Grid container justifyContent="center">
+              <CircularProgress />
             </Grid>
           </TableCell>
         </TableRow>

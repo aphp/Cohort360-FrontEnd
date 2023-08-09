@@ -115,7 +115,7 @@ export interface IServiceProjects {
    * Retourne:
    *  - Requete partagée
    */
-  shareRequest: (sharedRequest: RequestType) => Promise<any>
+  shareRequest: (sharedRequest: RequestType, notify_by_email: boolean) => Promise<any>
 
   /**
    * Cette fonction supprime un requete existant
@@ -328,8 +328,8 @@ const servicesProjects: IServiceProjects = {
       throw new Error('Impossible de modifier la requête')
     }
   },
-  shareRequest: async (sharedRequest) => {
-    const usersToShareId = sharedRequest.usersToShare?.map((userToshareId) => userToshareId.provider_username)
+  shareRequest: async (sharedRequest, notify_by_email) => {
+    const usersToShareId = sharedRequest.usersToShare?.map((userToshareId: any) => userToshareId.provider_username)
     const shared_query_snapshot_id = sharedRequest.shared_query_snapshot
       ? sharedRequest.shared_query_snapshot
       : sharedRequest.currentSnapshot
@@ -338,7 +338,8 @@ const servicesProjects: IServiceProjects = {
       `/cohort/request-query-snapshots/${shared_query_snapshot_id}/share/`,
       {
         name: shared_query_snapshot_name,
-        recipients: usersToShareId?.join()
+        recipients: usersToShareId?.join(),
+        notify_by_email: notify_by_email
       }
     )) ?? { status: 400 }
     if (shareRequestResponse.status === 201) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { Grid } from '@mui/material'
 
@@ -14,79 +14,89 @@ import { buildPmsiFiltersChips } from 'utils/chips'
 import { useAppSelector, useAppDispatch } from 'state'
 import { fetchPmsi } from 'state/patient'
 
-import { PMSIFilters, Order } from 'types'
+import { PMSIFilters, Order, LoadingStatus } from 'types'
 
 import useStyles from './styles'
+import { useDebounce } from 'utils/debounce'
+import { _cancelPendingRequest } from 'utils/abortController'
+import { CanceledError } from 'axios'
 
 type PatientPMSITypes = {
   groupId?: string
 }
+enum PMSI {
+  DIAGNOSTIC = 'diagnostic',
+  GMH = 'ghm',
+  CCAM = 'ccam'
+}
+
 const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
-  const { patient } = useAppSelector((state) => ({
-    patient: state.patient
-  }))
 
-  const [selectedTab, selectTab] = useState<'diagnostic' | 'ghm' | 'ccam'>('diagnostic')
-
-  const pmsiPatient = patient?.pmsi ?? {}
-  const currrentPmsi = pmsiPatient[selectedTab] ?? {
-    loading: false,
-    count: 0,
-    total: 0,
-    list: []
-  }
-
-  const loading = currrentPmsi.loading ?? false
-  const deidentifiedBoolean = patient?.deidentified ?? false
-  const totalPmsi = currrentPmsi.count ?? 0
-  const totalAllPmsi = currrentPmsi.total ?? 0
-
-  const [patientPmsiList, setPatientPmsiList] = useState<any[]>([])
-
+  const [selectedTab, selectTab] = useState<PMSI>(PMSI.DIAGNOSTIC)
   const [page, setPage] = useState(1)
-
   const [filters, setFilters] = useState<PMSIFilters & { searchInput: string }>({
     searchInput: '',
     nda: '',
     code: '',
-    selectedDiagnosticTypes: [],
+    diagnosticTypes: [],
     startDate: null,
-    endDate: null
+    endDate: null,
+    executiveUnits: []
   })
-
+  const debouncedSearchValue = useDebounce(500, filters.searchInput)
   const [order, setOrder] = useState<Order>({
     orderBy: 'date',
     orderDirection: 'desc'
   })
-
   const [open, setOpen] = useState(false)
 
-  const _fetchPMSI = async (page: number) => {
-    const selectedDiagnosticTypesCodes = filters.selectedDiagnosticTypes.map((diagnosticType) => diagnosticType.id)
-    dispatch(
-      fetchPmsi({
-        selectedTab,
-        groupId,
-        options: {
-          page,
-          sort: {
-            by: order.orderBy,
-            direction: order.orderDirection
-          },
-          filters: {
-            ...filters,
-            diagnosticTypes: selectedDiagnosticTypesCodes
-          }
-        }
-      })
-    )
-  }
+  /* TODO => enlever l'appel de redux */
+  const { patient } = useAppSelector((state) => ({
+    patient: state.patient
+  }))
+  const [loadingStatus, setLoadingStatus] = useState(LoadingStatus.FETCHING)
 
-  const handleChangePage = (value?: number) => {
-    setPage(value ? value : 1)
-    _fetchPMSI(value ? value : 1)
+  const deidentifiedBoolean = patient?.deidentified ?? false
+  const totalPmsi = patient?.pmsi?.[selectedTab]?.count ?? 0
+  const totalAllPmsi = patient?.pmsi?.[selectedTab]?.total ?? 0
+  const patientPmsiList = patient?.pmsi?.[selectedTab]?.list || []
+
+  const controllerRef = useRef<AbortController | null>(null)
+
+  const _fetchPMSI = async () => {
+    try {
+      const selectedDiagnosticTypesCodes = filters.diagnosticTypes.map((diagnosticType) => diagnosticType.id)
+      setLoadingStatus(LoadingStatus.FETCHING)
+      const response = await dispatch(
+        fetchPmsi({
+          selectedTab,
+          groupId,
+          options: {
+            page,
+            sort: {
+              by: order.orderBy,
+              direction: order.orderDirection
+            },
+            filters: {
+              ...filters,
+              diagnosticTypes: selectedDiagnosticTypesCodes,
+              executiveUnits: filters.executiveUnits.map((executiveUnit) => executiveUnit.id)
+            }
+          },
+          signal: controllerRef.current?.signal
+        })
+      )
+      if (response.payload.error) {
+        throw response.payload.error
+      }
+      setLoadingStatus(LoadingStatus.SUCCESS)
+    } catch (error) {
+      if (error instanceof CanceledError) {
+        setLoadingStatus(LoadingStatus.FETCHING)
+      }
+    }
   }
 
   const onChangeOptions = (key: string, value: any) => {
@@ -106,62 +116,69 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
       case 'endDate':
         onChangeOptions(filterName, null)
         break
-      case 'selectedDiagnosticTypes':
+      case 'diagnosticTypes':
         onChangeOptions(
           filterName,
-          filters.selectedDiagnosticTypes.filter((item) => item.id !== value.id)
+          filters.diagnosticTypes.filter((item) => item.id !== value.id)
+        )
+        break
+      case 'executiveUnits':
+        onChangeOptions(
+          filterName,
+          filters.executiveUnits.filter((executiveUnit) => executiveUnit.name !== value)
         )
         break
     }
   }
-
   useEffect(() => {
-    handleChangePage()
+    setLoadingStatus(LoadingStatus.IDDLE)
+    setPage(1)
   }, [
-    filters.searchInput,
+    debouncedSearchValue,
     filters.nda,
     filters.code,
     filters.startDate,
     filters.endDate,
-    filters.selectedDiagnosticTypes,
+    filters.diagnosticTypes,
+    filters.executiveUnits,
     order.orderBy,
     order.orderDirection
-  ]) // eslint-disable-line
+  ])
+
+  useEffect(() => {
+    setLoadingStatus(LoadingStatus.IDDLE)
+  }, [page])
+
+  useEffect(() => {
+    if (loadingStatus === LoadingStatus.IDDLE) {
+      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      _fetchPMSI()
+    }
+  }, [loadingStatus])
 
   useEffect(() => {
     setPage(1)
-    // Clear filter state
     setFilters({
       searchInput: '',
       nda: '',
       code: '',
-      selectedDiagnosticTypes: [],
+      diagnosticTypes: [],
       startDate: null,
-      endDate: null
+      endDate: null,
+      executiveUnits: []
     })
     setOrder({ orderBy: 'date', orderDirection: 'desc' })
-  }, [selectedTab]) // eslint-disable-line
-
-  useEffect(() => {
-    const pmsiPatient = patient?.pmsi ?? {}
-    const currrentPmsi = pmsiPatient[selectedTab] ?? {
-      loading: false,
-      count: 0,
-      total: 0,
-      list: []
-    }
-    setPatientPmsiList(currrentPmsi.list)
-  }, [currrentPmsi, currrentPmsi?.list]) // eslint-disable-line
+  }, [selectedTab])
 
   return (
     <Grid container justifyContent="flex-end" className={classes.documentTable}>
       <DataTableTopBar
-        loading={loading}
+        loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
         tabs={{
           list: [
-            { label: 'Diagnostics CIM10', value: 'diagnostic' },
-            { label: 'Actes CCAM', value: 'ccam' },
-            { label: 'GHM', value: 'ghm' }
+            { label: 'Diagnostics CIM10', value: PMSI.DIAGNOSTIC },
+            { label: 'Actes CCAM', value: PMSI.CCAM },
+            { label: 'GHM', value: PMSI.GMH }
           ],
           value: selectedTab,
           onChange: (event: any, newTab?: any) => selectTab(newTab)
@@ -169,7 +186,7 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
         results={{
           nb: totalPmsi,
           total: totalAllPmsi,
-          label: selectedTab === 'diagnostic' ? 'diagnostic(s)' : selectedTab === 'ccam' ? 'ccam' : 'ghm'
+          label: selectedTab === PMSI.DIAGNOSTIC ? 'diagnostic(s)' : selectedTab === PMSI.CCAM ? PMSI.CCAM : 'ghm'
         }}
         searchBar={{
           type: 'simple',
@@ -188,14 +205,14 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
       <MasterChips chips={buildPmsiFiltersChips(filters as PMSIFilters, handleDeleteChip)} />
 
       <DataTablePmsi
-        loading={loading}
+        loading={loadingStatus === LoadingStatus.FETCHING || loadingStatus === LoadingStatus.IDDLE}
         selectedTab={selectedTab}
         pmsiList={patientPmsiList}
         deidentified={deidentifiedBoolean}
         order={order}
         setOrder={setOrder}
         page={page}
-        setPage={(newPage) => handleChangePage(newPage)}
+        setPage={(newPage) => setPage(newPage)}
         total={totalPmsi}
       />
 
@@ -203,7 +220,8 @@ const PatientPMSI: React.FC<PatientPMSITypes> = ({ groupId }) => {
         open={open}
         onClose={() => setOpen(false)}
         deidentified={deidentifiedBoolean}
-        showDiagnosticTypes={selectedTab === 'diagnostic'}
+        showDiagnosticTypes={selectedTab === PMSI.DIAGNOSTIC}
+        pmsiType={selectedTab}
         filters={filters}
         setFilters={(newFilters) =>
           setFilters({

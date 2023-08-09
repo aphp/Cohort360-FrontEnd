@@ -3,7 +3,7 @@ import {
   GenderRepartitionType,
   AgeRepartitionType,
   VisiteRepartitionType,
-  PatientGenderKind
+  GenderStatus
 } from 'types'
 import { getStringMonth, getStringMonthAphp } from './formatDate'
 import { Encounter, Extension, Patient } from 'fhir/r4'
@@ -171,8 +171,10 @@ export const getEncounterRepartitionMap = (encounters: Encounter[]): SimpleChart
   return data
 }
 
+type AgeRepartitionMap = { male: number; female: number; other: number }
+
 export const getAgeRepartitionMapAphp = (facet?: Extension[]): AgeRepartitionType => {
-  const repartitionMap = new Array(130).map(() => ({ male: 0, female: 0, other: 0 }))
+  const repartitionMap: AgeRepartitionMap[] = []
 
   facet?.forEach((extension) => {
     const ageObj = extension.extension?.filter((object) => {
@@ -185,26 +187,25 @@ export const getAgeRepartitionMapAphp = (facet?: Extension[]): AgeRepartitionTyp
 
     if (ageObj) {
       const age: number = parseInt(ageObj, 10) / 12
-
-      if (!repartitionMap[age]) {
-        repartitionMap[age] = { male: 0, female: 0, other: 0 }
-      }
-
       if (genderValuesObj) {
         const genderValues = genderValuesObj.extension
-
-        genderValues?.forEach((genderValue) => {
-          switch (genderValue.url) {
-            case 'female':
-              repartitionMap[age].female = genderValue.valueDecimal ?? 0
-              break
-            case 'male':
-              repartitionMap[age].male = genderValue.valueDecimal ?? 0
-              break
-            default:
-              repartitionMap[age].other = genderValue.valueDecimal ?? 0
+        for (let i = 0; i < 130; i++) {
+          repartitionMap.push({ male: 0, female: 0, other: 0 })
+          if (i === age) {
+            genderValues?.forEach((genderValue) => {
+              switch (genderValue.url) {
+                case 'female':
+                  repartitionMap[i].female = genderValue.valueDecimal ?? 0
+                  break
+                case 'male':
+                  repartitionMap[i].male = genderValue.valueDecimal ?? 0
+                  break
+                default:
+                  repartitionMap[i].other = genderValue.valueDecimal ?? 0
+              }
+            })
           }
-        })
+        }
       }
     }
   })
@@ -360,16 +361,16 @@ export const getGenderRepartitionSimpleData = (
       deceasedCount += genderValues.deceased
 
       switch (gender) {
-        case PatientGenderKind._male:
+        case GenderStatus.MALE:
           maleCount += genderTotal
           break
-        case PatientGenderKind._female:
+        case GenderStatus.FEMALE:
           femaleCount += genderTotal
           break
-        case PatientGenderKind._unknown:
+        case GenderStatus.UNKNOWN:
           unknownCount += genderTotal
           break
-        case PatientGenderKind._other:
+        case GenderStatus.OTHER:
           otherCount += genderTotal
           break
 

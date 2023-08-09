@@ -17,15 +17,19 @@ import {
   Grid,
   IconButton,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material'
 
 import ClearIcon from '@mui/icons-material/Clear'
+import InfoIcon from '@mui/icons-material/Info'
 
+import scopeType from 'data/scope_type.json'
 import docTypes from 'assets/docTypes.json'
-import { DocumentFilters } from 'types'
+import { CriteriaName, DocumentFilters, ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
+import PopulationCard from 'components/CreationCohort/DiagramView/components/PopulationCard/PopulationCard'
 
 type DocumentFiltersProps = {
   open: boolean
@@ -43,6 +47,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
   showIpp,
   deidentified
 }) => {
+  const label = 'Séléctionnez une unité exécutrice'
   const { classes } = useStyles()
 
   const [_nda, setNda] = useState<string>(filters.nda)
@@ -50,6 +55,7 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
   const [_selectedDocTypes, setSelectedDocTypes] = useState<any[]>(filters.selectedDocTypes)
   const [_startDate, setStartDate] = useState<any>(filters.startDate)
   const [_endDate, setEndDate] = useState<any>(filters.endDate)
+  const [_executiveUnits, setExecutiveUnits] = useState<Array<ScopeTreeRow> | undefined>([])
   const [dateError, setDateError] = useState(false)
 
   const docTypesList = docTypes
@@ -61,6 +67,10 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
     setStartDate(filters.startDate)
     setEndDate(filters.endDate)
   }, [open]) //eslint-disable-line
+
+  useEffect(() => {
+    setExecutiveUnits(filters.executiveUnits)
+  }, [filters.executiveUnits, open])
 
   useEffect(() => {
     if (moment(_startDate).isAfter(_endDate)) {
@@ -91,7 +101,8 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
       ipp: _ipp,
       selectedDocTypes: _selectedDocTypes,
       startDate: newStartDate,
-      endDate: newEndDate
+      endDate: newEndDate,
+      executiveUnits: _executiveUnits ?? []
     })
     onClose()
   }
@@ -232,6 +243,34 @@ const ModalDocumentFilters: React.FC<DocumentFiltersProps> = ({
                 <ClearIcon />
               </IconButton>
             )}
+          </Grid>
+          <FormLabel style={{ padding: '1em 1em 0 1em', display: 'flex', alignItems: 'center' }} component="legend">
+            Unité exécutrice
+            <Tooltip
+              title={
+                <>
+                  {'- Le niveau hiérarchique de rattachement est : ' +
+                    scopeType?.criteriaType[CriteriaName.Document] +
+                    '.'}
+                  <br />
+                  {"- L'unité exécutrice" +
+                    ' est la structure élémentaire de prise en charge des malades par une équipe soignante ou médico-technique identifiées par leurs fonctions et leur organisation.'}
+                </>
+              }
+            >
+              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
+            </Tooltip>
+          </FormLabel>
+          <Grid item container direction="row" alignItems="center">
+            <PopulationCard
+              form={CriteriaName.Document}
+              label={label}
+              title={label}
+              executiveUnits={_executiveUnits}
+              isAcceptEmptySelection={true}
+              isDeleteIcon={true}
+              onChangeExecutiveUnits={setExecutiveUnits}
+            />
           </Grid>
           {dateError && (
             <Typography className={classes.dateError}>

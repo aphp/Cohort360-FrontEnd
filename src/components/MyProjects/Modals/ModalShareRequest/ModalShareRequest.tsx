@@ -1,7 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Grid, CircularProgress } from '@mui/material'
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Grid,
+  CircularProgress,
+  Checkbox,
+  FormControlLabel
+} from '@mui/material'
 
 import { RequestType, Provider, SimpleStatus } from 'types'
 
@@ -31,11 +41,11 @@ const ModalShareRequest: React.FC<{
   const [currentRequest, setCurrentRequest] = useState<RequestType | null | undefined>(selectedCurrentRequest)
   const [currentUserToShare, setCurrentUserToShare] = useState<Provider[] | null>(null)
   const [error, setError] = useState<'error_title' | 'error_user_share_list' | null>(null)
-  const [shareMessage, setShareMessage] = useState<SimpleStatus>(null)
+  const [notifyByEmail, setNotifyByEmail] = useState(false)
 
-  useEffect(() => {
-    parentStateSetter(shareMessage)
-  }, [parentStateSetter, shareMessage])
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNotifyByEmail(event.target.checked)
+  }
 
   const _onChangeValue = (key: 'name' | 'requestName' | 'usersToShare', value: string | string | Provider[]) => {
     if (value && typeof value !== 'string') {
@@ -64,11 +74,11 @@ const ModalShareRequest: React.FC<{
       return setError(ERROR_USER_SHARE_LIST)
     }
 
-    const shareRequestResponse = await services.projects.shareRequest(currentRequest)
-    if (shareRequestResponse.status === 201) {
-      setShareMessage('success')
+    const shareRequestResponse = await services.projects.shareRequest(currentRequest, notifyByEmail)
+    if (shareRequestResponse?.status === 201) {
+      parentStateSetter('success')
     } else {
-      setShareMessage('error')
+      parentStateSetter('error')
     }
     onClose()
   }
@@ -102,7 +112,12 @@ const ModalShareRequest: React.FC<{
             <CircularProgress />
           </Grid>
         ) : (
-          <RequestShareForm currentRequest={currentRequest} onChangeValue={_onChangeValue} error={error} />
+          <RequestShareForm currentRequest={currentRequest} onChangeValue={_onChangeValue} error={error}>
+            <FormControlLabel
+              control={<Checkbox checked={notifyByEmail} onChange={handleChange} />}
+              label="Envoyer un email au destinataire de la requête"
+            />
+          </RequestShareForm>
         )}
       </DialogContent>
       <DialogActions>

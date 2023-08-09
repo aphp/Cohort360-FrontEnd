@@ -116,7 +116,9 @@ export interface IServicePatients {
     sortDirection: string,
     groupId?: string,
     startDate?: string | null,
-    endDate?: string | null
+    endDate?: string | null,
+    signal?: AbortSignal,
+    executiveUnits?: string[]
   ) => Promise<{
     pmsiData?: (Claim | Condition | Procedure)[]
     pmsiTotal?: number
@@ -171,7 +173,9 @@ export interface IServicePatients {
     selectedAdministrationRouteIds: string,
     groupId?: string,
     startDate?: string,
-    endDate?: string
+    endDate?: string,
+    signal?: AbortSignal,
+    executiveUnits?: string[]
   ) => Promise<{
     medicationData?: MedicationEntry<MedicationAdministration | MedicationRequest>[]
     medicationTotal?: number
@@ -210,7 +214,9 @@ export interface IServicePatients {
     anabio: string,
     startDate?: string | null,
     endDate?: string | null,
-    groupId?: string
+    groupId?: string,
+    signal?: AbortSignal,
+    executiveUnits?: string[]
   ) => Promise<{
     biologyList: Observation[]
     biologyTotal: number
@@ -252,7 +258,8 @@ export interface IServicePatients {
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    executiveUnits?: string[]
   ) => Promise<{
     docsList: DocumentReference[]
     docsTotal: number
@@ -270,7 +277,7 @@ export interface IServicePatients {
    **   - searchBy: permet la recherche sur un élément précis (nom, prénom ou indeterminé)
    **
    ** Retour:
-   **   - patientList: Liste de 20 patients lié à la recherche
+   **   - patientList: Liste de 20 patients liée à la recherche
    **   - totalPatients: Nombre d'élément totale par rapport au filtre indiqué
    */
   searchPatient: (
@@ -279,7 +286,8 @@ export interface IServicePatients {
     sortBy: string,
     sortDirection: string,
     input: string,
-    searchBy: SearchByTypes
+    searchBy: SearchByTypes,
+    signal?: AbortSignal
   ) => Promise<{
     patientList: Patient[]
     totalPatients: number
@@ -385,7 +393,9 @@ const servicesPatients: IServicePatients = {
     sortDirection,
     groupId,
     startDate,
-    endDate
+    endDate,
+    signal,
+    executiveUnits
   ) => {
     let pmsiResp: AxiosResponse<FHIR_API_Response<Condition | Procedure | Claim>> | null = null
 
@@ -403,7 +413,9 @@ const servicesPatients: IServicePatients = {
           code: code,
           type: diagnosticTypes,
           'min-recorded-date': startDate ?? '',
-          'max-recorded-date': endDate ?? ''
+          'max-recorded-date': endDate ?? '',
+          signal,
+          executiveUnits
         })
         break
       case 'ccam':
@@ -418,7 +430,9 @@ const servicesPatients: IServicePatients = {
           'encounter-identifier': nda,
           code: code,
           minDate: startDate ?? '',
-          maxDate: endDate ?? ''
+          maxDate: endDate ?? '',
+          signal,
+          executiveUnits
         })
         break
       case 'ghm':
@@ -433,7 +447,9 @@ const servicesPatients: IServicePatients = {
           'encounter-identifier': nda,
           diagnosis: code,
           minCreated: startDate ?? '',
-          maxCreated: endDate ?? ''
+          maxCreated: endDate ?? '',
+          signal,
+          executiveUnits
         })
         break
       default:
@@ -492,7 +508,9 @@ const servicesPatients: IServicePatients = {
     selectedAdministrationRouteIds,
     groupId,
     startDate,
-    endDate
+    endDate,
+    signal,
+    executiveUnits
   ) => {
     let medicationResp: AxiosResponse<FHIR_API_Response<MedicationRequest | MedicationAdministration>> | null = null
 
@@ -509,7 +527,9 @@ const servicesPatients: IServicePatients = {
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
           type: selectedPrescriptionTypeIds,
           minDate: startDate,
-          maxDate: endDate
+          maxDate: endDate,
+          signal,
+          executiveUnits
         })
         break
       case 'administration':
@@ -524,7 +544,9 @@ const servicesPatients: IServicePatients = {
           sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
           route: selectedAdministrationRouteIds,
           minDate: startDate,
-          maxDate: endDate
+          maxDate: endDate,
+          signal,
+          executiveUnits
         })
         break
       default:
@@ -553,7 +575,9 @@ const servicesPatients: IServicePatients = {
     anabio: string,
     startDate?: string | null,
     endDate?: string | null,
-    groupId?: string
+    groupId?: string,
+    signal?: AbortSignal,
+    executiveUnits?: string[]
   ) => {
     const observationResp = await fetchObservation({
       patient: patientId,
@@ -568,7 +592,9 @@ const servicesPatients: IServicePatients = {
       anabio: anabio,
       minDate: startDate ?? '',
       maxDate: endDate ?? '',
-      rowStatus
+      rowStatus,
+      signal,
+      executiveUnits
     })
 
     const biologyTotal = observationResp.data.resourceType === 'Bundle' ? observationResp.data.total : 0
@@ -592,7 +618,8 @@ const servicesPatients: IServicePatients = {
     startDate?: string | null,
     endDate?: string | null,
     groupId?: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    executiveUnits?: string[]
   ) => {
     const documentLines = 20 // Number of desired lines in the document array
 
@@ -627,7 +654,8 @@ const servicesPatients: IServicePatients = {
       onlyPdfAvailable: onlyPdfAvailable,
       minDate: startDate ?? '',
       maxDate: endDate ?? '',
-      signal: signal
+      signal: signal,
+      executiveUnits
     })
 
     if (docsList.data.resourceType !== 'Bundle' || !docsList.data.total) {
@@ -683,22 +711,22 @@ const servicesPatients: IServicePatients = {
     }
   },
 
-  searchPatient: async (nominativeGroupsIds, page, sortBy, sortDirection, input, searchBy) => {
+  searchPatient: async (nominativeGroupsIds, page, sortBy, sortDirection, input, searchBy, signal) => {
     let search = ''
-    if (input.trim() !== '') {
-      if (searchBy === '_text') {
-        const searches = input
-          .trim() // Remove space before/after search
-          .split(' ') // Split by space (= ['mot1', 'mot2' ...])
-          .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
+    // if (input.trim() !== '') {
+    if (searchBy === '_text') {
+      const searches = input
+        .trim() // Remove space before/after search
+        .split(' ') // Split by space (= ['mot1', 'mot2' ...])
+        .filter((elem: string) => elem) // Filter if you have ['mot1', '', 'mot2'] (double space)
 
-        for (const _search of searches) {
-          search = search ? `${search} AND "${_search}"` : `"${_search}"`
-        }
-      } else {
-        search = input.trim()
+      for (const _search of searches) {
+        search = search ? `${search} AND "${_search}"` : `"${_search}"`
       }
+    } else {
+      search = input.trim()
     }
+    // }
 
     const patientResp = await fetchPatient({
       _list: nominativeGroupsIds,
@@ -708,7 +736,8 @@ const servicesPatients: IServicePatients = {
       sortDirection: sortDirection === 'desc' ? 'desc' : 'asc',
       searchBy: searchBy,
       _text: search,
-      _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension']
+      _elements: ['gender', 'name', 'birthDate', 'deceased', 'identifier', 'extension'],
+      signal
     })
 
     const patientList = getApiResponseResources(patientResp)

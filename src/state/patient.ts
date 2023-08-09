@@ -29,6 +29,7 @@ import {
   Patient,
   Procedure
 } from 'fhir/r4'
+import { CanceledError } from 'axios'
 
 export type PatientState = null | {
   loading: boolean
@@ -67,80 +68,93 @@ type FetchPmsiParams = {
       diagnosticTypes: string[]
       startDate: string | null
       endDate: string | null
+      executiveUnits?: string[]
     }
     sort?: {
       by: string
       direction: string
     }
   }
+  signal?: AbortSignal
 }
 type FetchPmsiReturn =
   | { diagnostic: IPatientPmsi<Condition> }
   | { ghm: IPatientPmsi<Claim> }
   | { ccam: IPatientPmsi<Procedure> }
   | undefined
-const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: RootState }>(
+const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: RootState; rejectValue: any }>(
   'patient/fetchPmsi',
-  async ({ selectedTab, groupId, options }, { getState }) => {
-    const patientState = getState().patient
-    const currentPmsiState = patientState?.pmsi ? patientState?.pmsi[selectedTab] ?? { total: null } : { total: null }
+  async ({ selectedTab, groupId, options, signal }, thunkApi) => {
+    try {
+      const patientState = thunkApi.getState().patient
+      const currentPmsiState = patientState?.pmsi ? patientState?.pmsi[selectedTab] ?? { total: null } : { total: null }
+      const WILDCARD = '*'
 
-    const patientId = patientState?.patientInfo?.id ?? ''
-    if (!patientId) {
-      throw new Error('Patient Error: patient is required')
-    }
-    const deidentified = patientState?.deidentified ?? true
-    const hospits = patientState?.hospits?.list ?? []
+      const patientId = patientState?.patientInfo?.id ?? ''
+      if (!patientId) {
+        throw new Error('Patient Error: patient is required')
+      }
+      const deidentified = patientState?.deidentified ?? true
+      const hospits = patientState?.hospits?.list ?? []
 
-    const sortBy = options?.sort?.by ?? ''
-    const sortDirection = options?.sort?.direction ?? ''
-    const page = options?.page ?? 1
-    const searchInput = options?.filters?.searchInput ?? ''
-    const code = options?.filters?.code ?? ''
-    const diagnosticTypes = options?.filters?.diagnosticTypes ?? []
-    const nda = options?.filters?.nda ?? ''
-    const startDate = options?.filters?.startDate ?? null
-    const endDate = options?.filters?.endDate ?? null
+      const sortBy = options?.sort?.by ?? ''
+      const sortDirection = options?.sort?.direction ?? ''
+      const page = options?.page ?? 1
+      const searchInput = options?.filters?.searchInput + WILDCARD ?? ''
+      const code = options?.filters?.code ?? ''
+      const diagnosticTypes = options?.filters?.diagnosticTypes ?? []
+      const nda = options?.filters?.nda ?? ''
+      const startDate = options?.filters?.startDate ?? null
+      const endDate = options?.filters?.endDate ?? null
+      const executiveUnits = options?.filters?.executiveUnits
 
-    const pmsiResponse = await services.patients.fetchPMSI(
-      page,
-      patientId,
-      selectedTab,
-      searchInput,
-      nda,
-      code,
-      diagnosticTypes,
-      sortBy,
-      sortDirection,
-      groupId,
-      startDate,
-      endDate
-    )
+      const pmsiResponse = await services.patients.fetchPMSI(
+        page,
+        patientId,
+        selectedTab,
+        searchInput,
+        nda,
+        code,
+        diagnosticTypes,
+        sortBy,
+        sortDirection,
+        groupId,
+        startDate,
+        endDate,
+        signal,
+        executiveUnits
+      )
 
-    if (pmsiResponse.pmsiData === undefined) return undefined
+      if (pmsiResponse.pmsiData === undefined) return undefined
 
-    const pmsiList: any[] = linkElementWithEncounter(
-      pmsiResponse.pmsiData as (Procedure | Condition | Claim)[],
-      hospits,
-      deidentified
-    )
+      const pmsiList: any[] = linkElementWithEncounter(
+        pmsiResponse.pmsiData as (Procedure | Condition | Claim)[],
+        hospits,
+        deidentified
+      )
 
-    const pmsiReturn = {
-      loading: false,
-      count: pmsiResponse.pmsiTotal ?? 0,
-      total: currentPmsiState?.total ?? pmsiResponse.pmsiTotal ?? 0,
-      list: pmsiList,
-      page,
-      options
-    }
+      const pmsiReturn = {
+        loading: false,
+        count: pmsiResponse.pmsiTotal ?? 0,
+        total: currentPmsiState?.total ?? pmsiResponse.pmsiTotal ?? 0,
+        list: pmsiList,
+        page,
+        options
+      }
 
-    switch (selectedTab) {
-      case 'diagnostic':
-        return { diagnostic: pmsiReturn as IPatientPmsi<Condition> }
-      case 'ccam':
-        return { ccam: pmsiReturn as IPatientPmsi<Procedure> }
-      case 'ghm':
-        return { ghm: pmsiReturn as IPatientPmsi<Claim> }
+      switch (selectedTab) {
+        case 'diagnostic':
+          return { diagnostic: pmsiReturn as IPatientPmsi<Condition> }
+        case 'ccam':
+          return { ccam: pmsiReturn as IPatientPmsi<Procedure> }
+        case 'ghm':
+          return { ghm: pmsiReturn as IPatientPmsi<Claim> }
+      }
+    } catch (error) {
+      console.error(error)
+      if (error instanceof CanceledError) {
+        return thunkApi.rejectWithValue({ error })
+      }
     }
   }
 )
@@ -152,6 +166,7 @@ const fetchPmsi = createAsyncThunk<FetchPmsiReturn, FetchPmsiParams, { state: Ro
 export type FetchBiologyParams = {
   groupId?: string
   rowStatus: boolean
+  signal?: AbortSignal
   options?: {
     page?: number
     filters?: {
@@ -161,6 +176,7 @@ export type FetchBiologyParams = {
       anabio: string
       startDate: string | null
       endDate: string | null
+      executiveUnits?: string[]
     }
     sort?: {
       by: string
@@ -169,11 +185,11 @@ export type FetchBiologyParams = {
   }
 }
 type FetchBiologyReturn = undefined | { biology: IPatientObservation<CohortObservation> }
-const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { state: RootState }>(
+const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { state: RootState; rejectValue: any }>(
   'patient/fetchBiology',
-  async ({ groupId, options, rowStatus }, { getState }) => {
+  async ({ groupId, options, rowStatus, signal }, thunkApi) => {
     try {
-      const patientState = getState().patient
+      const patientState = thunkApi.getState().patient
 
       const patientId = patientState?.patientInfo?.id ?? ''
       if (!patientId) {
@@ -192,6 +208,7 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
       const anabio = options?.filters?.anabio ?? ''
       const startDate = options?.filters?.startDate ?? null
       const endDate = options?.filters?.endDate ?? null
+      const executiveUnits = options?.filters?.executiveUnits
 
       const biologyResponse = await services.patients.fetchObservation(
         sortBy,
@@ -205,7 +222,9 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
         anabio,
         startDate,
         endDate,
-        groupId
+        groupId,
+        signal,
+        executiveUnits
       )
 
       const biologyList: any[] = linkElementWithEncounter(biologyResponse.biologyList, hospits, deidentified)
@@ -221,8 +240,10 @@ const fetchBiology = createAsyncThunk<FetchBiologyReturn, FetchBiologyParams, { 
         } as IPatientObservation<CohortObservation>
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération de la biologie', error)
-      throw error
+      console.error(error)
+      if (error instanceof CanceledError) {
+        return thunkApi.rejectWithValue({ error })
+      }
     }
   }
 )
@@ -243,21 +264,26 @@ type FetchMedicationParams = {
       selectedAdministrationRoutes: { id: string; label: string }[]
       startDate: string | null
       endDate: string | null
+      executiveUnits?: string[]
     }
     sort?: {
       by: string
       direction: string
     }
   }
+  signal?: AbortSignal
 }
 type FetchMedicationReturn =
   | { prescription: IPatientMedication<MedicationRequest> }
   | { administration: IPatientMedication<MedicationAdministration> }
   | undefined
-const fetchMedication = createAsyncThunk<FetchMedicationReturn, FetchMedicationParams, { state: RootState }>(
-  'patient/fetchMedication',
-  async ({ selectedTab, groupId, options }, { getState }) => {
-    const patientState = getState().patient
+const fetchMedication = createAsyncThunk<
+  FetchMedicationReturn,
+  FetchMedicationParams,
+  { state: RootState; rejectValue: any }
+>('patient/fetchMedication', async ({ selectedTab, groupId, options, signal }, thunkApi) => {
+  try {
+    const patientState = thunkApi.getState().patient
     const currentMedicationState = patientState?.medication
       ? patientState?.medication[selectedTab] ?? { total: null }
       : { total: null }
@@ -278,6 +304,7 @@ const fetchMedication = createAsyncThunk<FetchMedicationReturn, FetchMedicationP
     const nda = options?.filters?.nda ?? ''
     const startDate = options?.filters?.startDate ?? null
     const endDate = options?.filters?.endDate ?? null
+    const executiveUnits = options?.filters?.executiveUnits
 
     const medicationResponse = await services.patients.fetchMedication(
       page,
@@ -291,7 +318,9 @@ const fetchMedication = createAsyncThunk<FetchMedicationReturn, FetchMedicationP
       administrationRoutes,
       groupId,
       startDate ? startDate : undefined,
-      endDate ? endDate : undefined
+      endDate ? endDate : undefined,
+      signal,
+      executiveUnits
     )
 
     if (medicationResponse.medicationData === undefined) return undefined
@@ -317,8 +346,13 @@ const fetchMedication = createAsyncThunk<FetchMedicationReturn, FetchMedicationP
       case 'administration':
         return { administration: medicationReturn as IPatientMedication<MedicationAdministration> }
     }
+  } catch (error) {
+    console.error(error)
+    if (error instanceof CanceledError) {
+      return thunkApi.rejectWithValue({ error })
+    }
   }
-)
+})
 
 /**
  * fetchDocument
@@ -337,6 +371,7 @@ type FetchDocumentsParams = {
       startDate: string | null
       endDate: string | null
       onlyPdfAvailable: boolean
+      executiveUnits?: string[]
     }
     sort?: {
       by: string
@@ -345,86 +380,91 @@ type FetchDocumentsParams = {
   }
 }
 type FetchDocumentsReturn = { documents?: IPatientDocuments } | undefined
-const fetchDocuments = createAsyncThunk<FetchDocumentsReturn, FetchDocumentsParams, { state: RootState }>(
-  'patient/fetchDocuments',
-  async ({ signal, groupId, options }, { getState }) => {
-    try {
-      const patientState = getState().patient
+const fetchDocuments = createAsyncThunk<
+  FetchDocumentsReturn,
+  FetchDocumentsParams,
+  { state: RootState; rejectValue: any }
+>('patient/fetchDocuments', async ({ signal, groupId, options }, thunkApi) => {
+  try {
+    const patientState = thunkApi.getState().patient
 
-      const patientId = patientState?.patientInfo?.id ?? ''
-      if (!patientId) {
-        throw new Error('Patient Error: patient is required')
-      }
-      const deidentified = patientState?.deidentified ?? true
-      const hospits = patientState?.hospits?.list ?? []
+    const patientId = patientState?.patientInfo?.id ?? ''
+    if (!patientId) {
+      throw new Error('Patient Error: patient is required')
+    }
+    const deidentified = patientState?.deidentified ?? true
+    const hospits = patientState?.hospits?.list ?? []
 
-      const sortBy = options?.sort?.by ?? ''
-      const sortDirection = options?.sort?.direction ?? ''
-      const page = options?.page ?? 1
-      const searchInput = options?.filters?.searchInput ?? ''
-      const searchBy = options?.searchBy ?? SearchByTypes.text
-      const selectedDocTypes = options?.filters?.selectedDocTypes ?? []
-      const nda = options?.filters?.nda ?? ''
-      const startDate = options?.filters?.startDate ?? null
-      const endDate = options?.filters?.endDate ?? null
-      const onlyPdfAvailable = options?.filters?.onlyPdfAvailable ?? false
+    const sortBy = options?.sort?.by ?? ''
+    const sortDirection = options?.sort?.direction ?? ''
+    const page = options?.page ?? 1
+    const searchInput = options?.filters?.searchInput ?? ''
+    const searchBy = options?.searchBy ?? SearchByTypes.text
+    const selectedDocTypes = options?.filters?.selectedDocTypes ?? []
+    const nda = options?.filters?.nda ?? ''
+    const startDate = options?.filters?.startDate ?? null
+    const endDate = options?.filters?.endDate ?? null
+    const onlyPdfAvailable = options?.filters?.onlyPdfAvailable ?? false
+    const executiveUnits = options?.filters?.executiveUnits
 
-      if (searchInput) {
-        const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)
+    if (searchInput) {
+      const searchInputError = await services.cohorts.checkDocumentSearchInput(searchInput, signal)
 
-        if (searchInputError && searchInputError.isError) {
-          return {
-            documents: {
-              loading: false,
-              count: 0,
-              total: 0,
-              list: [],
-              page: 1,
-              options,
-              searchInputError: searchInputError
-            } as IPatientDocuments
-          }
+      if (searchInputError && searchInputError.isError) {
+        return {
+          documents: {
+            loading: false,
+            count: 0,
+            total: 0,
+            list: [],
+            page: 1,
+            options,
+            searchInputError: searchInputError
+          } as IPatientDocuments
         }
       }
+    }
 
-      const documentsResponse = await services.patients.fetchDocuments(
-        sortBy,
-        sortDirection,
-        searchBy,
+    const documentsResponse = await services.patients.fetchDocuments(
+      sortBy,
+      sortDirection,
+      searchBy,
+      page,
+      patientId,
+      searchInput,
+      selectedDocTypes,
+      nda,
+      onlyPdfAvailable,
+      startDate,
+      endDate,
+      groupId,
+      signal,
+      executiveUnits
+    )
+
+    const documentsList: any[] = linkElementWithEncounter(
+      documentsResponse.docsList as DocumentReference[],
+      hospits,
+      deidentified
+    )
+
+    return {
+      documents: {
+        loading: false,
+        count: documentsResponse.docsTotal,
+        total: patientState?.documents?.total ? patientState?.documents?.total : documentsResponse.docsTotal,
+        list: documentsList,
         page,
-        patientId,
-        searchInput,
-        selectedDocTypes,
-        nda,
-        onlyPdfAvailable,
-        startDate,
-        endDate,
-        groupId,
-        signal
-      )
-
-      const documentsList: any[] = linkElementWithEncounter(
-        documentsResponse.docsList as DocumentReference[],
-        hospits,
-        deidentified
-      )
-
-      return {
-        documents: {
-          loading: false,
-          count: documentsResponse.docsTotal,
-          total: patientState?.documents?.total ? patientState?.documents?.total : documentsResponse.docsTotal,
-          list: documentsList,
-          page,
-          options
-        } as IPatientDocuments
-      }
-    } catch (error) {
-      console.error(error)
-      throw error
+        options
+      } as IPatientDocuments
+    }
+  } catch (error) {
+    console.error(error)
+    if (error instanceof CanceledError) {
+      return thunkApi.rejectWithValue({ error })
     }
   }
-)
+})
 
 /**
  * fetchAllProcedure
