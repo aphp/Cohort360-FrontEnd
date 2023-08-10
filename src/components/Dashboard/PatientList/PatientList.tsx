@@ -106,13 +106,6 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
     }
   }
 
-  const onChangeOptions = (key: string, value: any) => {
-    setFilters((prevState) => ({
-      ...prevState,
-      [key]: value
-    }))
-  }
-
   const onSearch = (newSearchInput: string, newSearchBy: SearchByTypes) => {
     setSearchInput(newSearchInput)
     setSearchBy(newSearchBy)
@@ -127,7 +120,10 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
         }))
         break
       case 'birthdates':
-        onChangeOptions(filterName, ['', ''])
+        setFilters((prevFilters) => ({
+          ...prevFilters,
+          birthdatesRanges: ['', '']
+        }))
         break
       case 'vitalStatus':
         setFilters((prevFilters) => ({
