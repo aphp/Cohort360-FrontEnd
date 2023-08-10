@@ -214,7 +214,6 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
-        <>{console.log('salut', error)}</>
         {error === Error.EMPTY_DURATION_ERROR && (
           <Alert severity="error">
             Merci de renseigner au moins une <b>durée de prise en charge</b> avec une valeur supérieure à zéro.
