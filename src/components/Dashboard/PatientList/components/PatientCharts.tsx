@@ -58,11 +58,13 @@ const PatientCharts: React.FC<PatientChartsProps> = ({ agePyramid, patientData, 
           {!loading && patientData?.vitalStatusData?.find(({ value }) => value > 0) && (
             <PieChart data={patientData.vitalStatusData} />
           )}
-          {!loading && patientData?.vitalStatusData?.find(({ value }) => value < 1) && (
-            <Grid container justifyContent="center" alignItems="center" style={{ height: '100%' }}>
-              <Typography>Aucun patient</Typography>
-            </Grid>
-          )}
+          {!loading &&
+            patientData?.vitalStatusData?.find(({ label, value }) => value < 1 && label === 'Patients vivants') &&
+            patientData?.vitalStatusData?.find(({ label, value }) => value < 1 && label === 'Patients décédés') && (
+              <Grid container justifyContent="center" alignItems="center" style={{ height: '100%' }}>
+                <Typography>Aucun patient</Typography>
+              </Grid>
+            )}
         </Paper>
       </Grid>
 

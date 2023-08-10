@@ -332,7 +332,7 @@ const servicesProjects: IServiceProjects = {
     const usersToShareId = sharedRequest.usersToShare?.map((userToshareId: any) => userToshareId.provider_username)
     const shared_query_snapshot_id = sharedRequest.shared_query_snapshot
       ? sharedRequest.shared_query_snapshot
-      : sharedRequest.currentSnapshot
+      : sharedRequest.currentSnapshot?.uuid
     const shared_query_snapshot_name = sharedRequest.name ? sharedRequest.name : sharedRequest.requestName
     const shareRequestResponse = (await apiBack.post(
       `/cohort/request-query-snapshots/${shared_query_snapshot_id}/share/`,
