@@ -49,7 +49,7 @@ export const buildDocumentFiltersChips = (
         })),
       filters.executiveUnits?.length > 0 &&
         filters.executiveUnits.map((executiveUnit) => ({
-          label: executiveUnit.name ? `Unité d'éxécutrice : ${executiveUnit.name}` : '',
+          label: executiveUnit.name ? `Unité exécutrice : ${executiveUnit.name}` : '',
           onDelete: () => handleDeleteChip('executiveUnits', executiveUnit.name)
         })),
       {
@@ -128,7 +128,7 @@ export const buildObservationFiltersChips = (
         })),
       filters.executiveUnits?.length > 0 &&
         filters.executiveUnits.map((executiveUnit) => ({
-          label: executiveUnit.name ? `Unité d'éxécutrice : ${executiveUnit.name}` : '',
+          label: executiveUnit.name ? `Unité exécutrice : ${executiveUnit.name}` : '',
           onDelete: () => handleDeleteChip('executiveUnits', executiveUnit.name)
         })),
       {
@@ -184,7 +184,7 @@ export const buildMedicationFiltersChips = (
         })),
       filters.executiveUnits?.length > 0 &&
         filters.executiveUnits.map((executiveUnit) => ({
-          label: executiveUnit.name ? `Unité d'éxécutrice : ${executiveUnit.name}` : '',
+          label: executiveUnit.name ? `Unité exécutrice : ${executiveUnit.name}` : '',
           onDelete: () => handleDeleteChip('executiveUnits', executiveUnit.name)
         })),
       filters.selectedAdministrationRoutes?.length > 0 &&
@@ -251,7 +251,7 @@ export const buildPmsiFiltersChips = (
         })),
       filters.executiveUnits?.length > 0 &&
         filters.executiveUnits.map((executiveUnit) => ({
-          label: executiveUnit.name ? `Unité d'éxécutrice : ${executiveUnit.name}` : '',
+          label: executiveUnit.name ? `Unité exécutrice : ${executiveUnit.name}` : '',
           onDelete: () => handleDeleteChip('executiveUnits', executiveUnit.name)
         })),
       {

@@ -226,8 +226,8 @@ const ExportModal: React.FC<ExportModalProps> = ({ cohortId, open, handleClose }
               <WarningIcon className={classes.warningIcon} color="info" />
               <Grid item xs={11}>
                 <Typography>
-                  <b>Note</b> : la biologie (table measurement) et les comptes-rendus (table note) ne sont pas
-                  disponibles à l’export csv.
+                  <b>Note</b> : la biologie (table <i>measurement</i>) et les comptes-rendus (table <i>note</i>) ne sont
+                  pas disponibles à l’export csv.
                 </Typography>
               </Grid>
             </Grid>

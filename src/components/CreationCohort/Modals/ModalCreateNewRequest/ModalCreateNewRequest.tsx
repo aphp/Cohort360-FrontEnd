@@ -28,6 +28,9 @@ import useStyles from './styles'
 const ERROR_TITLE = 'error_title'
 const ERROR_PROJECT = 'error_project'
 const ERROR_PROJECT_NAME = 'error_project_name'
+const ERROR_REGEX = 'error_regex'
+
+const BLANK_REGEX = /^\s*$/
 
 const NEW_PROJECT_ID = 'new'
 
@@ -59,7 +62,9 @@ const ModalCreateNewRequest: React.FC<{
   const [projectName, onChangeProjectName] = useState<string>('Projet de recherche')
   const [openRequest, setOpenRequest] = useState<string | null>(null)
 
-  const [error, setError] = useState<'error_title' | 'error_project' | 'error_project_name' | null>(null)
+  const [error, setError] = useState<'error_title' | 'error_project' | 'error_project_name' | 'error_regex' | null>(
+    null
+  )
 
   const _onChangeValue = (key: 'name' | 'parent_folder' | 'description', value: string) => {
     setCurrentRequest((prevState) =>
@@ -129,6 +134,10 @@ const ModalCreateNewRequest: React.FC<{
     if (!currentRequest.name || (currentRequest.name && currentRequest.name.length > 255)) {
       setLoading(false)
       return setError(ERROR_TITLE)
+    }
+    if (currentRequest.name && BLANK_REGEX.test(currentRequest.name)) {
+      setLoading(false)
+      return setError(ERROR_REGEX)
     }
     if (!currentRequest.parent_folder) {
       setLoading(false)

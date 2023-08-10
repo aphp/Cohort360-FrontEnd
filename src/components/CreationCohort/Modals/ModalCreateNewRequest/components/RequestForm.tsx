@@ -9,13 +9,14 @@ import { ProjectType, RequestType } from 'types'
 const ERROR_TITLE = 'error_title'
 const ERROR_PROJECT = 'error_project'
 const ERROR_PROJECT_NAME = 'error_project_name'
+const ERROR_REGEX = 'error_regex'
 
 const NEW_PROJECT_ID = 'new'
 
 interface RequestFormProps {
   currentRequest: RequestType
   onChangeValue: (key: 'name' | 'parent_folder' | 'description', value: string) => void
-  error: 'error_title' | 'error_project' | 'error_project_name' | null
+  error: 'error_title' | 'error_project' | 'error_project_name' | 'error_regex' | null
   projectName: string
   onChangeProjectName: (value: string) => void
   projectList: ProjectType[]
@@ -43,12 +44,14 @@ const RequestForm: React.FC<RequestFormProps> = ({
           id="title"
           margin="normal"
           fullWidth
-          error={error === ERROR_TITLE}
+          error={error === ERROR_TITLE || error === ERROR_REGEX}
           helperText={
             error === ERROR_TITLE
               ? currentRequest.name.length === 0
                 ? 'Le nom de la requête doit comporter au moins un caractère.'
                 : 'Le nom est trop long (255 caractères max.)'
+              : error === ERROR_REGEX
+              ? "Le nom de la cohorte ne peut pas être composé uniquement d'espaces."
               : ''
           }
         />

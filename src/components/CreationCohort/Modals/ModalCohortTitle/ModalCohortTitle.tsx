@@ -18,6 +18,8 @@ import useStyles from './styles'
 
 const ERROR_TITLE = 'error_title'
 const ERROR_DESCRIPTION = 'error_description'
+const BLANK_REGEX = /^\s*$/
+const ERROR_REGEX = 'error_regex'
 
 const ModalCohortTitle: React.FC<{
   onExecute?: (cohortName: string, cohortDescription: string, globalCount: boolean) => void
@@ -30,7 +32,7 @@ const ModalCohortTitle: React.FC<{
   const [title, onChangeTitle] = useState('')
   const [description, onChangeDescription] = useState('')
   const [globalCount, onCheckGlobalCount] = useState(false)
-  const [error, setError] = useState<'error_title' | 'error_description' | null>(null)
+  const [error, setError] = useState<'error_title' | 'error_description' | 'error_regex' | null>(null)
   const [loading, setLoading] = useState(false)
 
   const handleClose = () => onClose()
@@ -40,6 +42,11 @@ const ModalCohortTitle: React.FC<{
     if (!title || (title && title.length > 255)) {
       setLoading(false)
       return setError(ERROR_TITLE)
+    }
+
+    if (title && BLANK_REGEX.test(title)) {
+      setLoading(false)
+      return setError(ERROR_REGEX)
     }
 
     if (onExecute) {
@@ -61,12 +68,14 @@ const ModalCohortTitle: React.FC<{
             id="title"
             margin="normal"
             fullWidth
-            error={error === ERROR_TITLE}
+            error={error === ERROR_TITLE || error === ERROR_REGEX}
             helperText={
               error === ERROR_TITLE
                 ? title.length === 0
                   ? 'Le nom de la cohorte doit comporter au moins un caractère.'
                   : 'Le nom est trop long (255 caractères max.)'
+                : error === ERROR_REGEX
+                ? "Le nom de la cohorte ne peut pas être composé uniquement d'espaces."
                 : ''
             }
           />
