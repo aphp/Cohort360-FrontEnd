@@ -139,7 +139,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
         {error === Error.EMPTY_FORM && <Alert severity="error">Merci de renseigner un champ</Alert>}
         {error === Error.INCOHERENT_AGE_ERROR && (
           <Alert severity="error">
-            L'Âge minimum <b>doit être inférieur</b> à l' Âge maximum.
+            L'Âge minimum <b>doit être inférieur</b> à l'âge maximum.
           </Alert>
         )}
 
