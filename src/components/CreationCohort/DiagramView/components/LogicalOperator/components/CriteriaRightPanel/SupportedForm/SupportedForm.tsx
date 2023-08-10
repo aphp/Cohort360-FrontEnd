@@ -44,6 +44,7 @@ enum Error {
   MIN_MAX_DURATION_ERROR,
   INCOHERENT_DURATION_ERROR,
   INCOHERENT_AGE_ERROR,
+  INCOHERENT_DURATION_ERROR_AND_INCOHERENT_AGE_ERROR,
   NO_ERROR
 }
 
@@ -127,6 +128,21 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
     ) {
       return Error.EMPTY_DURATION_ERROR
     }
+    if (
+      defaultValues.duration[0] !== null &&
+      defaultValues.duration[1] !== null &&
+      defaultValues.age[0] !== null &&
+      defaultValues.age[1] !== null
+    ) {
+      if (
+        defaultValues.duration[0] * getCalendarMultiplicator(defaultValues.durationType[0].id) >=
+          defaultValues.duration[1] * getCalendarMultiplicator(defaultValues.durationType[1].id) &&
+        defaultValues.age[0] * getCalendarMultiplicator(defaultValues.ageType[0].id) >=
+          defaultValues.age[1] * getCalendarMultiplicator(defaultValues.ageType[1].id)
+      ) {
+        return Error.INCOHERENT_DURATION_ERROR_AND_INCOHERENT_AGE_ERROR
+      }
+    }
     if (defaultValues.duration[0] !== null && defaultValues.duration[1] !== null) {
       if (
         defaultValues.duration[0] * getCalendarMultiplicator(defaultValues.durationType[0].id) >=
@@ -198,28 +214,31 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
       </Grid>
 
       <Grid className={classes.formContainer}>
+        <>{console.log('salut', error)}</>
         {error === Error.EMPTY_DURATION_ERROR && (
           <Alert severity="error">
-            Merci de renseigner au moins une <b>Durée de prise en charge</b> avec une valeur supérieure à zéro.
+            Merci de renseigner au moins une <b>durée de prise en charge</b> avec une valeur supérieure à zéro.
           </Alert>
         )}
         {error === Error.EMPTY_AGE_ERROR && (
           <Alert severity="error">
             {' '}
-            Merci de renseigner au moins un <b>Âge de prise en charge</b> avec une valeur supérieure à zéro.
+            Merci de renseigner au moins un <b>âge de prise en charge</b> avec une valeur supérieure à zéro.
           </Alert>
         )}
-        {error === Error.INCOHERENT_AGE_ERROR && (
+        {(error === Error.INCOHERENT_AGE_ERROR ||
+          error === Error.INCOHERENT_DURATION_ERROR_AND_INCOHERENT_AGE_ERROR) && (
           <Alert severity="error">
             {' '}
-            L'Âge minimum au moment de la prise en charge <b>doit être inférieur</b> à l' Âge maximum au moment de la
+            L'Âge minimum au moment de la prise en charge <b>doit être inférieur</b> à l'âge maximum au moment de la
             prise en charge.
           </Alert>
         )}
-        {error === Error.INCOHERENT_DURATION_ERROR && (
+        {(error === Error.INCOHERENT_DURATION_ERROR ||
+          error === Error.INCOHERENT_DURATION_ERROR_AND_INCOHERENT_AGE_ERROR) && (
           <Alert severity="error">
             {' '}
-            La Durée minimum de la prise en charge <b>doit être inférieure</b> à la Durée maximum de la prise en charge.
+            La Durée minimum de la prise en charge <b>doit être inférieure</b> à la durée maximum de la prise en charge.
           </Alert>
         )}
         {error === Error.EMPTY_FORM && <Alert severity="error">Merci de renseigner un champ</Alert>}
