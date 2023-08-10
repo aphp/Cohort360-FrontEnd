@@ -2,6 +2,19 @@
   "entry": [
     {
       "news": {
+        "title": "Nouvelles fonctionnalités - 08/2023",
+        "message": [
+          "• Ajout d'un encart dans le requêteur permettant de naviguer entre les versions d'une requête",
+          "• Redesign du volet des critères dans le requêteur",
+          "• Possibilité d'envoi d'e-mail lors du partage de requête",
+          "• Ajout d'informations sur la source des données PMSI et Médicament",
+          "• Divers correctifs techniques et fonctionnels ont été réalisés"
+        ],
+        "footer": "L'équipe Cohort360."
+      }
+    },
+    {
+      "news": {
         "title": "Nouvelles fonctionnalités - 07/2023",
         "message": [
           "• Ajout des unités exécutrices dans les filtres du requêteur",
