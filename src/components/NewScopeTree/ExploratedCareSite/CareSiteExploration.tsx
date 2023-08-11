@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { ScopeTreeRow, ScopeType, TreeElement } from 'types'
+import { ScopeTreeRow, ScopeType } from 'types'
 import {
   CircularProgress,
   Grid,
@@ -27,7 +27,6 @@ import {
   onSelectAll
 } from '../Commons/ScopeTreeUtils'
 import { ScopeState } from 'state/scope'
-import { findEquivalentRowInItemAndSubItems } from '../../../utils/pmsi'
 
 type ExploratedCareSiteProps = {
   selectedItems: ScopeTreeRow[]
