@@ -14,7 +14,7 @@ import { SearchByTypes, Order } from 'types'
 import useStyles from './styles'
 import { Patient } from 'fhir/r4'
 import { useDebounce } from 'utils/debounce'
-import { _cancelPendingRequest } from 'utils/abortController'
+import { cancelPendingRequest } from 'utils/abortController'
 
 const SearchPatient: React.FC<{}> = () => {
   const { classes, cx } = useStyles()
@@ -70,7 +70,7 @@ const SearchPatient: React.FC<{}> = () => {
   }
 
   useEffect(() => {
-    controllerRef.current = _cancelPendingRequest(controllerRef.current)
+    controllerRef.current = cancelPendingRequest(controllerRef.current)
     setPage(1)
     performQueries(1)
   }, [order, searchBy, debouncedSearchInput, controllerRef])
