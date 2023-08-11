@@ -338,9 +338,9 @@ const ResearchTable: React.FC<ResearchTableProps> = ({
                                   !row.exportable
                                     ? 'Cette cohorte ne peut pas être exportée car elle dépasse le seuil de nombre de patients maximum autorisé.'
                                     : !canExportThisCohort && row.request_job_status === CohortJobStatus._finished
-                                    ? "Vous n'avez pas les droits suffisant pour exporter cette cohorte."
+                                    ? "Vous n'avez pas les droits suffisants pour exporter cette cohorte."
                                     : row.request_job_status === CohortJobStatus._failed
-                                    ? 'Cette cohorte ne peut pas être exportée car elle a échouée lors de sa création'
+                                    ? 'Cette cohorte ne peut pas être exportée car elle a échoué lors de sa création'
                                     : row.request_job_status === CohortJobStatus._pending
                                     ? 'Cette cohorte ne peut pas être exportée car elle est en cours de création'
                                     : ''

@@ -64,9 +64,8 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
       defaultValues.gender.length === 0 &&
       defaultValues.years &&
       defaultValues.ageType &&
-      +defaultValues.years[0] === 0 &&
-      +defaultValues.years[1] === 130 &&
-      defaultValues.ageType.id === Calendar.YEAR
+      +defaultValues.years[0] === null &&
+      +defaultValues.years[1] === null
     ) {
       return Error.EMPTY_FORM
     }
@@ -79,6 +78,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
   const _onSubmit = () => {
     const errorType = _onCheckError()
     setError(errorType)
+    console.log('defaultValues', defaultValues)
     if (errorType === Error.NO_ERROR) return onChangeSelectedCriteria(defaultValues)
   }
 
@@ -139,7 +139,7 @@ const DemographicForm: React.FC<DemographicFormProps> = (props) => {
         {error === Error.EMPTY_FORM && <Alert severity="error">Merci de renseigner un champ</Alert>}
         {error === Error.INCOHERENT_AGE_ERROR && (
           <Alert severity="error">
-            L'Âge minimum <b>doit être inférieur</b> à l'âge maximum.
+            L'âge minimum <b>doit être inférieur</b> à l'âge maximum.
           </Alert>
         )}
 
