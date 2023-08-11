@@ -44,9 +44,9 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
         </div>
 
         <div className={classes.drawerContentContainer}>
-          <div className={classes.searchBar}>
-            <ScopeSearchBar searchInput={searchInput} setSearchInput={setSearchInput} />
-          </div>
+          {/*<div className={classes.searchBar}>*/}
+          {/*  <ScopeSearchBar searchInput={searchInput} setSearchInput={setSearchInput} />*/}
+          {/*</div>*/}
           <NewScopeTree
             searchInput={searchInput}
             selectedItems={_selectedPopulation}
