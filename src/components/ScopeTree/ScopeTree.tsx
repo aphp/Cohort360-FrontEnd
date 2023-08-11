@@ -38,7 +38,7 @@ import {
 } from 'utils/pmsi'
 import servicesPerimeters, { loadingItem } from '../../services/aphp/servicePerimeters'
 import { findSelectedInListAndSubItems } from '../../utils/cohortCreation'
-import { _cancelPendingRequest } from 'utils/abortController'
+import { cancelPendingRequest } from 'utils/abortController'
 
 type ScopeTreeListItemProps = {
   row: any
@@ -196,7 +196,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
 
   const _init = async () => {
     setSearchLoading(true)
-    controllerRef.current = _cancelPendingRequest(controllerRef.current)
+    controllerRef.current = cancelPendingRequest(controllerRef.current)
 
     let newPerimetersList: ScopeTreeRow[] = []
     const fetchScopeTreeResponse = await fetchScopeTree(executiveUnitType, controllerRef.current?.signal)
@@ -301,7 +301,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
 
   const _searchInPerimeters = async (_isAllSelected?: boolean) => {
     setSearchLoading(true)
-    controllerRef.current = _cancelPendingRequest(controllerRef.current)
+    controllerRef.current = cancelPendingRequest(controllerRef.current)
     const {
       scopeTreeRows: newPerimetersList,
       count: newCount,
@@ -571,4 +571,4 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
   )
 }
 
-export default ScopeTree
+// export default ScopeTree

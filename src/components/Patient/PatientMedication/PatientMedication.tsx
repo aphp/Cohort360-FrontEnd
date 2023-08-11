@@ -18,7 +18,7 @@ import { buildMedicationFiltersChips } from 'utils/chips'
 
 import useStyles from './styles'
 import { useDebounce } from 'utils/debounce'
-import { _cancelPendingRequest } from 'utils/abortController'
+import { cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
 
 type PatientMedicationTypes = {
@@ -134,7 +134,7 @@ const PatientMedication: React.FC<PatientMedicationTypes> = ({ groupId }) => {
 
   useEffect(() => {
     if (loadingStatus === LoadingStatus.IDDLE) {
-      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      controllerRef.current = cancelPendingRequest(controllerRef.current)
       _fetchMedication()
     }
   }, [loadingStatus])

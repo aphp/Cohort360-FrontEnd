@@ -13,7 +13,7 @@ import {
   Typography
 } from '@mui/material'
 import { useDebounce } from 'utils/debounce'
-import EnhancedTable from '../../ScopeTreeTable'
+import EnhancedTable from '../../ScopeTree/ScopeTreeTable'
 import {
   displayCareSiteSearchResultRow,
   getHeadCells,
@@ -23,23 +23,23 @@ import {
   onSelect,
   onSelectAll,
   searchInPerimeters
-} from '../CareSiteCommons/ScopeTreeUtils'
-import useStyles from '../CareSiteCommons/styles'
+} from '../Commons/ScopeTreeUtils'
+import useStyles from '../Commons/styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { ScopeState } from 'state/scope'
-import { ScopeTreeRow } from 'types'
+import { ScopeTreeRow, ScopeType } from 'types'
 
 type CareSiteSearchResultProps = {
   searchInput: string
   selectedItems: ScopeTreeRow[]
   setSelectedItems: (selectedItems: ScopeTreeRow[]) => void
-  isSearchLoading: boolean
-  setIsSearchLoading: (isSearchLoading: boolean) => void
+  executiveUnitType?: ScopeType
 }
 
-const CareSiteSearchResult = (props: CareSiteSearchResultProps) => {
-  const { searchInput, selectedItems, setSelectedItems, isSearchLoading, setIsSearchLoading } = props
-  const classes = useStyles()
+const CareSiteSearch = (props: CareSiteSearchResultProps) => {
+  const { searchInput, selectedItems, setSelectedItems, executiveUnitType } = props
+
+  const { classes } = useStyles()
   const dispatch = useAppDispatch()
 
   const { scopeState } = useAppSelector<{
@@ -51,13 +51,14 @@ const CareSiteSearchResult = (props: CareSiteSearchResultProps) => {
   const { scopesList = [] } = scopeState
   const [openPopulation, setOpenPopulations] = useState<number[]>(scopeState.openPopulation)
   const [rootRows, setRootRows] = useState<ScopeTreeRow[]>(scopesList)
-
-  const controllerRef = useRef<AbortController | null>()
+  const controllerRef = useRef<AbortController | null>(null)
   const [isAllSelected, setIsAllSelected] = useState(false)
   const [isEmpty, setIsEmpty] = useState<boolean>(false)
-  const debouncedSearchTerm = useDebounce(700, searchInput)
+  const debouncedSearchTerm = useDebounce(500, searchInput)
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
+  const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false)
+
   const isHeadChecked: boolean =
     isAllSelected ||
     scopesList.filter((row) => selectedItems.find((item) => item.id === row.id) !== undefined).length ===
@@ -80,7 +81,8 @@ const CareSiteSearchResult = (props: CareSiteSearchResultProps) => {
         selectedItems,
         setSelectedItems,
         setOpenPopulations,
-        false
+        false,
+        executiveUnitType
       )
     }
     return () => {
@@ -101,7 +103,8 @@ const CareSiteSearchResult = (props: CareSiteSearchResultProps) => {
         selectedItems,
         setSelectedItems,
         setOpenPopulations,
-        isAllSelected
+        isAllSelected,
+        executiveUnitType
       )
     }
   }, [page])
@@ -112,8 +115,11 @@ const CareSiteSearchResult = (props: CareSiteSearchResultProps) => {
     }
   }, [scopesList])
 
-  const headCells = getHeadCells(isHeadChecked, isHeadIndetermined, () =>
-    onSelectAll(isAllSelected, setIsAllSelected, scopesList, selectedItems, setSelectedItems)
+  const headCells = getHeadCells(
+    isHeadChecked,
+    isHeadIndetermined,
+    () => onSelectAll(isAllSelected, setIsAllSelected, rootRows, selectedItems, setSelectedItems),
+    executiveUnitType
   )
 
   return (
@@ -165,11 +171,13 @@ const CareSiteSearchResult = (props: CareSiteSearchResultProps) => {
                         rootRows,
                         setRootRows,
                         selectedItems,
-                        dispatch
+                        dispatch,
+                        executiveUnitType
                       ),
                     (row: ScopeTreeRow) => onSelect(row, selectedItems, setSelectedItems, scopesList),
                     (row: ScopeTreeRow) => isIndeterminated(row, selectedItems),
-                    (row: ScopeTreeRow) => isSelected(row, selectedItems, rootRows)
+                    (row: ScopeTreeRow) => isSelected(row, selectedItems, rootRows),
+                    executiveUnitType
                   )
                 }}
               </EnhancedTable>
@@ -190,4 +198,4 @@ const CareSiteSearchResult = (props: CareSiteSearchResultProps) => {
   )
 }
 
-export default CareSiteSearchResult
+export default CareSiteSearch
