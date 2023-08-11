@@ -27,16 +27,10 @@ import {
 import useStyles from '../Commons/styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { ScopeState } from 'state/scope'
-import { ScopeTreeRow, ScopeType } from 'types'
+import { ScopeTreeRow } from 'types'
+import { CareSiteSearchProps } from '../NewScopeTree'
 
-type CareSiteSearchResultProps = {
-  searchInput: string
-  selectedItems: ScopeTreeRow[]
-  setSelectedItems: (selectedItems: ScopeTreeRow[]) => void
-  executiveUnitType?: ScopeType
-}
-
-const CareSiteSearch = (props: CareSiteSearchResultProps) => {
+const CareSiteSearch = (props: CareSiteSearchProps) => {
   const { searchInput, selectedItems, setSelectedItems, executiveUnitType } = props
 
   const { classes } = useStyles()

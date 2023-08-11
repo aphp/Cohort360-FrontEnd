@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { ScopeTreeRow, ScopeType } from 'types'
+import { ScopeTreeRow } from 'types'
 import {
   CircularProgress,
   Grid,
@@ -27,15 +27,9 @@ import {
   onSelectAll
 } from '../Commons/ScopeTreeUtils'
 import { ScopeState } from 'state/scope'
+import { CareSiteExplorationProps } from '../NewScopeTree'
 
-type ExploratedCareSiteProps = {
-  selectedItems: ScopeTreeRow[]
-  setSelectedItems: (selectedItems: ScopeTreeRow[]) => void
-  openPopulation: number[]
-  setOpenPopulations: (openPopulation: number[]) => void
-  executiveUnitType?: ScopeType
-}
-const CareSiteExploration = (props: ExploratedCareSiteProps) => {
+const CareSiteExploration = (props: CareSiteExplorationProps) => {
   const { selectedItems, setSelectedItems, openPopulation, setOpenPopulations, executiveUnitType } = props
 
   const { classes } = useStyles()
