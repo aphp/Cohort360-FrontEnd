@@ -14,7 +14,7 @@ import {
   Typography
 } from '@mui/material'
 import EnhancedTable from '../../ScopeTree/ScopeTreeTable'
-import useStyles from '../Commons/styles'
+import useStyles from '../commons/styles'
 import { AppDispatch, useAppDispatch, useAppSelector } from 'state'
 import {
   displayCareSiteExplorationRow,
@@ -25,11 +25,11 @@ import {
   onExpand,
   onSelect,
   onSelectAll
-} from '../Commons/ScopeTreeUtils'
+} from '../commons/scopeTreeUtils'
 import { ScopeState } from 'state/scope'
-import { CareSiteExplorationProps } from '../NewScopeTree'
+import { CareSiteExplorationProps } from '../index'
 
-const CareSiteExploration = (props: CareSiteExplorationProps) => {
+const Index = (props: CareSiteExplorationProps) => {
   const { selectedItems, setSelectedItems, openPopulation, setOpenPopulations, executiveUnitType } = props
 
   const { classes } = useStyles()
@@ -154,4 +154,4 @@ const CareSiteExploration = (props: CareSiteExplorationProps) => {
   )
 }
 
-export default CareSiteExploration
+export default Index

@@ -1,12 +1,12 @@
 import { ScopeTreeRow, ScopeType } from 'types'
 import React from 'react'
-import useStyles from '../../Commons/styles'
-import { Breadcrumbs, Checkbox, IconButton, Skeleton, TableCell, TableRow, Typography } from '@mui/material'
+import useStyles from '../../commons/styles'
+import { Checkbox, IconButton, Skeleton, TableCell, TableRow, Typography } from '@mui/material'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'
 import displayDigit from 'utils/displayDigit'
 
-type CareSiteSearchResultRowProps = {
+type CareSiteRowProps = {
   row: ScopeTreeRow
   level: number
   parentAccess: string
@@ -19,7 +19,7 @@ type CareSiteSearchResultRowProps = {
   executiveUnitType?: ScopeType
 }
 
-const CareSiteSearchRow: React.FC<CareSiteSearchResultRowProps> = (props: CareSiteSearchResultRowProps) => {
+const CareSiteExplorationRow: React.FC<CareSiteRowProps> = (props: CareSiteRowProps) => {
   const {
     row,
     level,
@@ -52,16 +52,12 @@ const CareSiteSearchRow: React.FC<CareSiteSearchResultRowProps> = (props: CareSi
           }}
         >
           <TableCell>
-            {row.subItems && row.subItems.length > 0 && row.type !== executiveUnitType && (
+            {row.subItems && row.subItems.length > 0 && (
               <IconButton
-                onClick={() => onExpand(Number(row.id))}
+                onClick={() => onExpand(+row.id)}
                 style={{ marginLeft: level * 35, padding: 0, marginRight: -30 }}
               >
-                {openPopulation.find((id: number) => Number(row.id) === id) ? (
-                  <KeyboardArrowDownIcon />
-                ) : (
-                  <KeyboardArrowRightIcon />
-                )}
+                {openPopulation.find((id) => +row.id === id) ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
               </IconButton>
             )}
           </TableCell>
@@ -77,22 +73,7 @@ const CareSiteSearchRow: React.FC<CareSiteSearchResultRowProps> = (props: CareSi
               inputProps={{ 'aria-labelledby': labelId }}
             />
           </TableCell>
-          <TableCell>
-            {row.full_path ? (
-              <Breadcrumbs maxItems={2}>
-                {(row.full_path.split('/').length > 1
-                  ? row.full_path.split('/').slice(1)
-                  : row.full_path.split('/').slice(0)
-                ).map((full_path: string, index: number) => (
-                  <Typography key={index} style={{ color: '#153D8A' }}>
-                    {full_path}
-                  </Typography>
-                ))}
-              </Breadcrumbs>
-            ) : (
-              <Typography>{row.name}</Typography>
-            )}
-          </TableCell>
+          <TableCell>{<Typography>{row.name}</Typography>}</TableCell>
           <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
             <Typography>{displayDigit(row.quantity)}</Typography>
           </TableCell>
@@ -110,4 +91,4 @@ const CareSiteSearchRow: React.FC<CareSiteSearchResultRowProps> = (props: CareSi
     </>
   )
 }
-export default CareSiteSearchRow
+export default CareSiteExplorationRow

@@ -1,7 +1,7 @@
 import React from 'react'
-import CareSiteExplorationRow from '../ExploratedCareSite/Components/CareSiteExplorationRow'
+import CareSiteExplorationRow from '../CareSiteExploration/components/CareSiteExplorationRow'
 import { ScopeTreeRow, ScopeType, TreeElement } from 'types'
-import CareSiteSearchRow from '../CareSiteSearch/Components/CareSiteSearchRow'
+import CareSiteSearchRow from '../CareSiteSearch/components/CareSiteSearchRow'
 import { expandScopeElement, fetchScopesList, updateScopeList } from 'state/scope'
 import { AppDispatch } from 'state'
 import {
