@@ -1,37 +1,42 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-
-import Button from '@mui/material/Button'
-import Grid from '@mui/material/Grid'
-import Paper from '@mui/material/Paper'
-import Typography from '@mui/material/Typography'
-
-import ScopeTree from 'components/ScopeTree/ScopeTree'
+import CareSiteExploration from 'components/NewScopeTree/ExploratedCareSite/CareSiteExploration'
+import { Button, Grid } from '@mui/material'
 import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
-
-import { useAppDispatch, useAppSelector } from 'state'
-import { closeAllOpenedPopulation } from 'state/scope'
-
+import CareSiteSearch from 'components/NewScopeTree/CareSiteSearch/CareSiteSearch'
 import useStyles from './styles'
+import { useNavigate } from 'react-router-dom'
+import { useAppDispatch, useAppSelector } from '../../state'
+import { closeAllOpenedPopulation } from '../../state/scope'
+import { ScopeTreeRow } from '../../types'
+import Typography from '@mui/material/Typography'
+import Paper from '@mui/material/Paper'
 
-const Scope = () => {
+const CareSiteView = () => {
   const { classes, cx } = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
-
-  const [selectedItems, setSelectedItem] = useState([])
-  const [searchInput, setSearchInput] = useState('')
+  const [selectedItems, setSelectedItems] = useState<ScopeTreeRow[]>([])
+  const [openPopulation, setOpenPopulations] = useState<number[]>([])
+  const [searchInput, setSearchInput] = useState<string>('')
   const open = useAppSelector((state) => state.drawer)
+  // const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false)
 
   useEffect(() => {
     dispatch(closeAllOpenedPopulation())
   }, [])
 
-  const onChangeSelectedItem = (newSelectedItems) => {
-    setSelectedItem(newSelectedItems)
+  const handleSetSearchInput = (value: string) => {
+    if (!searchInput) {
+      setOpenPopulations([])
+    }
+    setSearchInput(value)
+  }
+
+  const onChangeSelectedItems = (newSelectedItems: ScopeTreeRow[]) => {
+    setSelectedItems(newSelectedItems)
   }
   const trimItems = () => {
-    let _selectedItems = selectedItems ? selectedItems : []
+    const _selectedItems = selectedItems ? selectedItems : []
 
     const perimetresIds = _selectedItems.map((_selected) => _selected.cohort_id ?? null)
     navigate(`/perimeters?${perimetresIds}`)
@@ -53,14 +58,23 @@ const Scope = () => {
             Explorer un perimètre
           </Typography>
           <Grid container direction="row">
-            <ScopeSearchBar searchInput={searchInput} setSearchInput={setSearchInput} />
+            <ScopeSearchBar searchInput={searchInput} setSearchInput={handleSetSearchInput} />
           </Grid>
           <Paper className={classes.paper}>
-            <ScopeTree
-              searchInput={searchInput}
-              defaultSelectedItems={selectedItems}
-              onChangeSelectedItem={onChangeSelectedItem}
-            />
+            {searchInput ? (
+              <CareSiteSearch
+                searchInput={searchInput}
+                selectedItems={selectedItems}
+                setSelectedItems={setSelectedItems}
+              />
+            ) : (
+              <CareSiteExploration
+                selectedItems={selectedItems}
+                setSelectedItems={setSelectedItems}
+                openPopulation={openPopulation}
+                setOpenPopulations={setOpenPopulations}
+              />
+            )}
           </Paper>
         </Grid>
         <Grid
@@ -76,7 +90,7 @@ const Scope = () => {
             <Button
               variant="contained"
               disableElevation
-              onClick={() => onChangeSelectedItem([])}
+              onClick={() => onChangeSelectedItems([])}
               disabled={!selectedItems.length}
               className={classes.cancelButton}
             >
@@ -98,4 +112,4 @@ const Scope = () => {
   )
 }
 
-export default Scope
+export default CareSiteView

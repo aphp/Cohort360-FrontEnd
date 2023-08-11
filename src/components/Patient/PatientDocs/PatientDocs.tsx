@@ -19,7 +19,7 @@ import docTypes from 'assets/docTypes.json'
 import { useDebounce } from 'utils/debounce'
 
 import useStyles from './styles'
-import { _cancelPendingRequest } from 'utils/abortController'
+import { cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
 
 type PatientDocsProps = {
@@ -161,7 +161,7 @@ const PatientDocs: React.FC<PatientDocsProps> = ({ groupId }) => {
 
   useEffect(() => {
     if (loadingStatus === LoadingStatus.IDDLE) {
-      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      controllerRef.current = cancelPendingRequest(controllerRef.current)
       fetchDocumentsList()
     }
   }, [loadingStatus])

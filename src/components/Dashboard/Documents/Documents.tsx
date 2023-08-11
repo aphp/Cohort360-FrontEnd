@@ -25,7 +25,7 @@ import { buildDocumentFiltersChips } from 'utils/chips'
 import docTypes from 'assets/docTypes.json'
 
 import { useDebounce } from 'utils/debounce'
-import { _cancelPendingRequest } from 'utils/abortController'
+import { cancelPendingRequest } from 'utils/abortController'
 
 type DocumentsProps = {
   groupId?: string
@@ -146,7 +146,7 @@ const Documents: React.FC<DocumentsProps> = ({ groupId, deidentifiedBoolean }) =
   }
 
   useEffect(() => {
-    controllerRef.current = _cancelPendingRequest(controllerRef.current)
+    controllerRef.current = cancelPendingRequest(controllerRef.current)
     handleChangePage(1)
   }, [!!deidentifiedBoolean, filters, order, debouncedSearchInput, searchBy]) // eslint-disable-line
 

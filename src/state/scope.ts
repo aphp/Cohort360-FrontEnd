@@ -27,19 +27,20 @@ type FetchScopeListReturn = {
 }
 
 type FetchScopeListArgs = {
+  isScopeList?: boolean
   type?: ScopeType
   signal?: AbortSignal | undefined
 }
 
 const fetchScopesList = createAsyncThunk<FetchScopeListReturn, FetchScopeListArgs, { state: RootState }>(
   'scope/fetchScopesList',
-  async ({ type, signal }, { getState, dispatch }) => {
+  async ({ isScopeList, type, signal }, { getState, dispatch }) => {
     try {
       const state = getState()
       const { me, scope } = state
       const { scopesList } = scope
 
-      if (scopesList.length) {
+      if (scopesList.length && !isScopeList) {
         dispatch(fetchScopesListinBackground({ type, signal }))
         return { scopesList: scopesList, aborted: signal?.aborted }
       } else {

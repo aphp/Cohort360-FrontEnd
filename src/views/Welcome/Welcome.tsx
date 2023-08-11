@@ -154,7 +154,7 @@ const Welcome: React.FC = () => {
           </Grid>
         </Grid>
 
-        <Grid container xs={12} spacing={1}>
+        <Grid container item xs={12} spacing={1}>
           <Grid container className={classes.newsGrid} item xs={12} md={6}>
             <Grid item className={classes.pt3}>
               <Paper

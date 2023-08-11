@@ -1,28 +1,39 @@
-import { ScopeTreeRow } from 'types'
+import { ScopeTreeRow, ScopeType } from 'types'
 import React from 'react'
-import useStyles from '../../CareSiteCommons/styles'
+import useStyles from '../../Commons/styles'
 import { Checkbox, IconButton, Skeleton, TableCell, TableRow, Typography } from '@mui/material'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowRightIcon from '@mui/icons-material/ChevronRight'
 import displayDigit from 'utils/displayDigit'
-import { PmsiListType } from 'state/pmsi'
 
 type CareSiteRowProps = {
   row: ScopeTreeRow
   level: number
   parentAccess: string
-  openPopulation: ScopeTreeRow[]
+  openPopulation: number[]
   labelId: string
   onExpand: (rowId: number) => Promise<void>
-  onSelect: (row: ScopeTreeRow) => PmsiListType[]
-  isIndeterminated: (row: any) => boolean | undefined
+  onSelect: (row: ScopeTreeRow) => ScopeTreeRow[]
+  isIndeterminated: (row: ScopeTreeRow) => boolean | undefined
   isSelected: (row: ScopeTreeRow) => boolean
+  executiveUnitType?: ScopeType
 }
 
 const CareSiteExplorationRow: React.FC<CareSiteRowProps> = (props: CareSiteRowProps) => {
-  const { row, level, parentAccess, openPopulation, labelId, onExpand, onSelect, isIndeterminated, isSelected } = props
+  const {
+    row,
+    level,
+    parentAccess,
+    openPopulation,
+    labelId,
+    onExpand,
+    onSelect,
+    isIndeterminated,
+    isSelected,
+    executiveUnitType
+  } = props
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   return (
     <>
@@ -46,11 +57,7 @@ const CareSiteExplorationRow: React.FC<CareSiteRowProps> = (props: CareSiteRowPr
                 onClick={() => onExpand(+row.id)}
                 style={{ marginLeft: level * 35, padding: 0, marginRight: -30 }}
               >
-                {openPopulation.find(({ id }) => row.id === id) ? (
-                  <KeyboardArrowDownIcon />
-                ) : (
-                  <KeyboardArrowRightIcon />
-                )}
+                {openPopulation.find((id) => +row.id === id) ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
               </IconButton>
             )}
           </TableCell>
@@ -70,9 +77,15 @@ const CareSiteExplorationRow: React.FC<CareSiteRowProps> = (props: CareSiteRowPr
           <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
             <Typography>{displayDigit(row.quantity)}</Typography>
           </TableCell>
-          <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
-            <Typography>{row.access ?? parentAccess}</Typography>
-          </TableCell>
+          {executiveUnitType ? (
+            <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
+              <Typography>{row.type ?? '-'}</Typography>
+            </TableCell>
+          ) : (
+            <TableCell align="center" style={{ cursor: 'pointer' }} onClick={() => onSelect(row)}>
+              <Typography>{row.access ?? parentAccess}</Typography>
+            </TableCell>
+          )}
         </TableRow>
       )}
     </>
