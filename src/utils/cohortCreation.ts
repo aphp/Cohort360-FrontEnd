@@ -192,18 +192,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       let ageMin = ''
       let ageMax = ''
 
-      if (
-        !(
-          criterion.years &&
-          criterion.years[0] === 0 &&
-          criterion.years[1] === 130 &&
-          criterion.ageType &&
-          criterion.ageType.id === Calendar.YEAR
-        )
-      ) {
-        ageMin = `${PATIENT_BIRTHDATE}=ge${+criterion.years[0] * getCalendarMultiplicator(criterion.ageType?.id)}`
-        ageMax = `${PATIENT_BIRTHDATE}=le${+criterion.years[1] * getCalendarMultiplicator(criterion.ageType?.id)}`
-      }
+      ageMin = `${PATIENT_BIRTHDATE}=ge${+criterion.years[0] * getCalendarMultiplicator(criterion.ageType?.id)}`
+      ageMax = `${PATIENT_BIRTHDATE}=le${+criterion.years[1] * getCalendarMultiplicator(criterion.ageType?.id)}`
 
       filterFhir = [
         'active=true',
