@@ -2,8 +2,9 @@ import React, { useState } from 'react'
 import { Tab, Tabs } from '@mui/material'
 import CareSiteSearch from './CareSiteSearch/CareSiteSearch'
 import CareSiteExploration from './ExploratedCareSite/CareSiteExploration'
-import useStyles from '../CreationCohort/DiagramView/components/LogicalOperator/components/CriteriaRightPanel/CCAM/styles'
 import { ScopeTreeRow, ScopeType } from '../../types'
+import ScopeSearchBar from '../Inputs/ScopeSearchBar/ScopeSearchBar'
+import useStyles from './styles'
 
 export type CareSiteSearchProps = {
   searchInput: string
@@ -25,6 +26,7 @@ const NewScopeTree = (props: ScopeTreeProps) => {
   const { selectedItems, setSelectedItems, openPopulation, setOpenPopulations, executiveUnitType, searchInput } = props
 
   const [selectedTab, setSelectedTab] = useState<'search' | 'hierarchy'>('hierarchy')
+  const [_searchInput, _setSearchInput] = useState('')
   const { classes } = useStyles()
 
   return (
@@ -38,25 +40,30 @@ const NewScopeTree = (props: ScopeTreeProps) => {
         <Tab label="Hiérarchie" value="hierarchy" />
         <Tab label="Recherche" value="search" />
       </Tabs>
-      {selectedTab === 'search'} &&
-      {
-        <CareSiteSearch
-          searchInput={searchInput}
-          selectedItems={selectedItems}
-          setSelectedItems={setSelectedItems}
-          executiveUnitType={executiveUnitType}
-        />
-      }
-      {selectedTab !== 'search'} &&
-      {
-        <CareSiteExploration
-          selectedItems={selectedItems}
-          setSelectedItems={setSelectedItems}
-          openPopulation={openPopulation}
-          setOpenPopulations={setOpenPopulations}
-          executiveUnitType={executiveUnitType}
-        />
-      }
+      <div>
+        {selectedTab === 'search' && (
+          <>
+            <div className={classes.searchBar}>
+              <ScopeSearchBar searchInput={_searchInput} setSearchInput={_setSearchInput} />
+            </div>
+            <CareSiteSearch
+              searchInput={_searchInput}
+              selectedItems={selectedItems}
+              setSelectedItems={setSelectedItems}
+              executiveUnitType={executiveUnitType}
+            />
+          </>
+        )}
+        {selectedTab === 'hierarchy' && (
+          <CareSiteExploration
+            selectedItems={selectedItems}
+            setSelectedItems={setSelectedItems}
+            openPopulation={openPopulation}
+            setOpenPopulations={setOpenPopulations}
+            executiveUnitType={executiveUnitType}
+          />
+        )}
+      </div>
     </>
   )
 }
