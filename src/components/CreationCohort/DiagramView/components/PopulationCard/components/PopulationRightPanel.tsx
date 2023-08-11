@@ -4,11 +4,13 @@ import Button from '@mui/material/Button'
 import Drawer from '@mui/material/Drawer'
 import Typography from '@mui/material/Typography'
 
-import ScopeTree from 'components/ScopeTree/ScopeTree'
+// import ScopeTree from 'components/ScopeTree/ScopeTree'
 import { ScopeType, ScopeTreeRow } from 'types'
 
 import useStyles from './styles'
 import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
+import CareSiteSearch from '../../../../../NewScopeTree/CareSiteSearch/CareSiteSearch'
+import CareSiteExploration from '../../../../../NewScopeTree/ExploratedCareSite/CareSiteExploration'
 
 type PopulationRightPanelProps = {
   open: boolean
@@ -26,6 +28,7 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
   const { classes } = useStyles()
 
   const [_selectedPopulation, _setSelectedPopulation] = useState<ScopeTreeRow[]>(selectedPopulation)
+  const [openPopulation, setOpenPopulations] = useState<number[]>([])
   const [searchInput, setSearchInput] = useState('')
 
   /**
@@ -42,12 +45,29 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
           <div className={classes.searchBar}>
             <ScopeSearchBar searchInput={searchInput} setSearchInput={setSearchInput} />
           </div>
-          <ScopeTree
-            executiveUnitType={executiveUnitType}
-            searchInput={searchInput}
-            defaultSelectedItems={_selectedPopulation}
-            onChangeSelectedItem={_setSelectedPopulation}
-          />
+
+          {searchInput ? (
+            <CareSiteSearch
+              searchInput={searchInput}
+              selectedItems={_selectedPopulation}
+              setSelectedItems={_setSelectedPopulation}
+              executiveUnitType={executiveUnitType}
+            />
+          ) : (
+            <CareSiteExploration
+              selectedItems={_selectedPopulation}
+              setSelectedItems={_setSelectedPopulation}
+              openPopulation={openPopulation}
+              setOpenPopulations={setOpenPopulations}
+              executiveUnitType={executiveUnitType}
+            />
+          )}
+          {/*<ScopeTree*/}
+          {/*  executiveUnitType={executiveUnitType}*/}
+          {/*  searchInput={searchInput}*/}
+          {/*  defaultSelectedItems={_selectedPopulation}*/}
+          {/*  onChangeSelectedItem={_setSelectedPopulation}*/}
+          {/*/>*/}
         </div>
 
         <div className={classes.drawerActionContainer}>
