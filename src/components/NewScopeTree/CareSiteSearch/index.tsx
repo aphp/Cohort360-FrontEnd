@@ -23,14 +23,14 @@ import {
   onSelect,
   onSelectAll,
   searchInPerimeters
-} from '../Commons/ScopeTreeUtils'
-import useStyles from '../Commons/styles'
+} from '../commons/scopeTreeUtils'
+import useStyles from '../commons/styles'
 import { useAppDispatch, useAppSelector } from 'state'
 import { ScopeState } from 'state/scope'
 import { ScopeTreeRow } from 'types'
-import { CareSiteSearchProps } from '../NewScopeTree'
+import { CareSiteSearchProps } from '../index'
 
-const CareSiteSearch = (props: CareSiteSearchProps) => {
+const Index = (props: CareSiteSearchProps) => {
   const { searchInput, selectedItems, setSelectedItems, executiveUnitType } = props
 
   const { classes } = useStyles()
@@ -192,4 +192,4 @@ const CareSiteSearch = (props: CareSiteSearchProps) => {
   )
 }
 
-export default CareSiteSearch
+export default Index

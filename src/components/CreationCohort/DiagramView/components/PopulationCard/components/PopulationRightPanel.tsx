@@ -4,15 +4,10 @@ import Button from '@mui/material/Button'
 import Drawer from '@mui/material/Drawer'
 import Typography from '@mui/material/Typography'
 
-// import ScopeTree from 'components/ScopeTree/ScopeTree'
-import { ScopeType, ScopeTreeRow } from 'types'
+import { ScopeTreeRow, ScopeType } from 'types'
 
 import useStyles from './styles'
-import ScopeSearchBar from 'components/Inputs/ScopeSearchBar/ScopeSearchBar'
-import CareSiteSearch from '../../../../../NewScopeTree/CareSiteSearch/CareSiteSearch'
-import CareSiteExploration from '../../../../../NewScopeTree/ExploratedCareSite/CareSiteExploration'
-import { Tab, Tabs } from '@mui/material'
-import NewScopeTree from '../../../../../NewScopeTree/NewScopeTree'
+import NewScopeTree from 'components/NewScopeTree'
 
 type PopulationRightPanelProps = {
   open: boolean
@@ -44,9 +39,6 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
         </div>
 
         <div className={classes.drawerContentContainer}>
-          {/*<div className={classes.searchBar}>*/}
-          {/*  <ScopeSearchBar searchInput={searchInput} setSearchInput={setSearchInput} />*/}
-          {/*</div>*/}
           <NewScopeTree
             searchInput={searchInput}
             selectedItems={_selectedPopulation}
@@ -55,32 +47,6 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
             setOpenPopulations={setOpenPopulations}
             executiveUnitType={executiveUnitType}
           />
-          {/*<Tabs*/}
-          {/*  indicatorColor="secondary"*/}
-          {/*  className={classes.tabs}*/}
-          {/*  value={selectedTab}*/}
-          {/*  onChange={(e, tab) => setSelectedTab(tab)}*/}
-          {/*>*/}
-          {/*  <Tab label="Hiérarchie" value="hierarchy" />*/}
-          {/*  <Tab label="Formulaire" value="form" />*/}
-          {/*</Tabs>*/}
-          {/*{*/}
-          {/*  <CareSiteSearch*/}
-          {/*    searchInput={searchInput}*/}
-          {/*    selectedItems={_selectedPopulation}*/}
-          {/*    setSelectedItems={_setSelectedPopulation}*/}
-          {/*    executiveUnitType={executiveUnitType}*/}
-          {/*  />*/}
-          {/*}*/}
-          {/*{*/}
-          {/*  <CareSiteExploration*/}
-          {/*    selectedItems={_selectedPopulation}*/}
-          {/*    setSelectedItems={_setSelectedPopulation}*/}
-          {/*    openPopulation={openPopulation}*/}
-          {/*    setOpenPopulations={setOpenPopulations}*/}
-          {/*    executiveUnitType={executiveUnitType}*/}
-          {/*  />*/}
-          {/*}*/}
         </div>
 
         <div className={classes.drawerActionContainer}>
