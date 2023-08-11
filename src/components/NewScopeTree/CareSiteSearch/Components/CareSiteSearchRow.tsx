@@ -33,7 +33,7 @@ const CareSiteSearchRow: React.FC<CareSiteSearchResultRowProps> = (props: CareSi
     executiveUnitType
   } = props
 
-  const { classes, cx } = useStyles()
+  const { classes } = useStyles()
 
   return (
     <>
