@@ -44,10 +44,10 @@ const Index = (props: CareSiteSearchProps) => {
 
   const { scopesList = [] } = scopeState
   const [openPopulation, setOpenPopulations] = useState<number[]>(scopeState.openPopulation)
-  const [rootRows, setRootRows] = useState<ScopeTreeRow[]>(scopesList)
+  const [rootRows, setRootRows] = useState<ScopeTreeRow[]>([])
   const controllerRef = useRef<AbortController | null>(null)
   const [isAllSelected, setIsAllSelected] = useState(false)
-  const [isEmpty, setIsEmpty] = useState<boolean>(false)
+  const [isEmpty, setIsEmpty] = useState<boolean>(true)
   const debouncedSearchTerm = useDebounce(500, searchInput)
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
@@ -62,8 +62,6 @@ const Index = (props: CareSiteSearchProps) => {
 
   useEffect(() => {
     if (debouncedSearchTerm) {
-      setSelectedItems([])
-      setIsAllSelected(false)
       searchInPerimeters(
         searchInput,
         page,
@@ -78,6 +76,8 @@ const Index = (props: CareSiteSearchProps) => {
         false,
         executiveUnitType
       )
+    } else {
+      setRootRows([])
     }
     return () => {
       controllerRef.current?.abort()
@@ -124,7 +124,9 @@ const Index = (props: CareSiteSearchProps) => {
         </Grid>
       ) : (
         <>
-          {isEmpty ? (
+          {!debouncedSearchTerm ? (
+            <></>
+          ) : isEmpty ? (
             <TableContainer component={Paper}>
               <Table className={classes.table}>
                 <TableHead>
