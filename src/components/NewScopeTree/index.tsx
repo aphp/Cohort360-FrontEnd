@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Tab, Tabs } from '@mui/material'
-import CareSiteSearch from './CareSiteSearch/CareSiteSearch'
-import CareSiteExploration from './ExploratedCareSite/CareSiteExploration'
+import CareSiteSearch from './CareSiteSearch/./index'
+import CareSiteExploration from './CareSiteExploration'
 import { ScopeTreeRow, ScopeType } from '../../types'
 import ScopeSearchBar from '../Inputs/ScopeSearchBar/ScopeSearchBar'
 import useStyles from './styles'
@@ -22,7 +22,7 @@ export type CareSiteExplorationProps = {
 }
 type ScopeTreeProps = CareSiteExplorationProps & CareSiteSearchProps
 
-const NewScopeTree = (props: ScopeTreeProps) => {
+const Index = (props: ScopeTreeProps) => {
   const { selectedItems, setSelectedItems, openPopulation, setOpenPopulations, executiveUnitType, searchInput } = props
 
   const [selectedTab, setSelectedTab] = useState<'search' | 'hierarchy'>('hierarchy')
@@ -67,4 +67,4 @@ const NewScopeTree = (props: ScopeTreeProps) => {
     </>
   )
 }
-export default NewScopeTree
+export default Index
