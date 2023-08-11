@@ -229,7 +229,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
           error === Error.INCOHERENT_DURATION_ERROR_AND_INCOHERENT_AGE_ERROR) && (
           <Alert severity="error">
             {' '}
-            L'Âge minimum au moment de la prise en charge <b>doit être inférieur</b> à l'âge maximum au moment de la
+            L'âge minimum au moment de la prise en charge <b>doit être inférieur</b> à l'âge maximum au moment de la
             prise en charge.
           </Alert>
         )}
@@ -237,7 +237,7 @@ const SupportedForm: React.FC<SupportedFormProps> = (props) => {
           error === Error.INCOHERENT_DURATION_ERROR_AND_INCOHERENT_AGE_ERROR) && (
           <Alert severity="error">
             {' '}
-            La Durée minimum de la prise en charge <b>doit être inférieure</b> à la durée maximum de la prise en charge.
+            La durée minimum de la prise en charge <b>doit être inférieure</b> à la durée maximum de la prise en charge.
           </Alert>
         )}
         {error === Error.EMPTY_FORM && <Alert severity="error">Merci de renseigner un champ</Alert>}
