@@ -62,12 +62,6 @@ const PopulationRightPanel: React.FC<PopulationRightPanelProps> = (props) => {
               executiveUnitType={executiveUnitType}
             />
           )}
-          {/*<ScopeTree*/}
-          {/*  executiveUnitType={executiveUnitType}*/}
-          {/*  searchInput={searchInput}*/}
-          {/*  defaultSelectedItems={_selectedPopulation}*/}
-          {/*  onChangeSelectedItem={_setSelectedPopulation}*/}
-          {/*/>*/}
         </div>
 
         <div className={classes.drawerActionContainer}>

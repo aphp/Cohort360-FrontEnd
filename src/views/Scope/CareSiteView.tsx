@@ -19,7 +19,6 @@ const CareSiteView = () => {
   const [openPopulation, setOpenPopulations] = useState<number[]>([])
   const [searchInput, setSearchInput] = useState<string>('')
   const open = useAppSelector((state) => state.drawer)
-  // const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false)
 
   useEffect(() => {
     dispatch(closeAllOpenedPopulation())
