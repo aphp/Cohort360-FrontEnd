@@ -38,8 +38,8 @@ import {
 } from 'utils/pmsi'
 import servicesPerimeters, { loadingItem } from '../../services/aphp/servicePerimeters'
 import { findSelectedInListAndSubItems } from '../../utils/cohortCreation'
-import { _cancelPendingRequest } from 'utils/abortController'
 import { IndeterminateCheckBoxOutlined } from '@mui/icons-material'
+import { cancelPendingRequest } from 'utils/abortController'
 
 type ScopeTreeListItemProps = {
   row: any

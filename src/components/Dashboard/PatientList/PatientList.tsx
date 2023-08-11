@@ -29,7 +29,7 @@ import { getGenderRepartitionSimpleData } from 'utils/graphUtils'
 import { buildPatientFiltersChips } from 'utils/chips'
 import { substructAgeString } from 'utils/age'
 import { useDebounce } from 'utils/debounce'
-import { _cancelPendingRequest } from 'utils/abortController'
+import { cancelPendingRequest } from 'utils/abortController'
 import { CanceledError } from 'axios'
 
 type PatientListProps = {
@@ -144,7 +144,7 @@ const PatientList: React.FC<PatientListProps> = ({ groupId, total, deidentified 
 
   useEffect(() => {
     if (loadingStatus === LoadingStatus.IDDLE) {
-      controllerRef.current = _cancelPendingRequest(controllerRef.current)
+      controllerRef.current = cancelPendingRequest(controllerRef.current)
       fetchPatients()
     }
   }, [loadingStatus])
