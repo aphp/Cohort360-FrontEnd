@@ -6,6 +6,7 @@
         "message": [
           "• Ajout d'un encart dans le requêteur permettant de naviguer entre les versions d'une requête",
           "• Redesign du volet des critères dans le requêteur",
+          "• Ajout d'un filtre par unité exécutrice dans la visualisation de données",
           "• Possibilité d'envoi d'e-mail lors du partage de requête",
           "• Ajout d'informations sur la source des données PMSI et Médicament",
           "• Divers correctifs techniques et fonctionnels ont été réalisés"
