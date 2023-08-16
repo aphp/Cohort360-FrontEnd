@@ -181,7 +181,7 @@ const TemporalConstraint: React.FC<{
           </RadioGroup>
         </Grid>
         {radioValues === TemporalConstraintsKind.PARTIAL_CONSTRAINT && (
-          <div style={{ width: '100%', overflowX: 'auto', margin: '1em', backgroundColor: '#F6F9FD', padding: '1em' }}>
+          <div style={{ width: 'auto', overflowX: 'auto', margin: '1em', backgroundColor: '#F6F9FD', padding: '1em' }}>
             <Grid container wrap="nowrap" style={{ width: 'fit-content' }}>
               {showAddConstraintIcon && (
                 <IconButton
@@ -256,7 +256,10 @@ const TemporalConstraint: React.FC<{
                           .map((selectValue, index) => (
                             <MenuItem key={index} value={selectValue.id}>
                               {`${selectValue.title}`}
-                              <Avatar className={classes.avatar} style={{ backgroundColor: '#f7b294' }}>
+                              <Avatar
+                                className={classes.avatar}
+                                style={{ backgroundColor: '#FFE2A9', color: '#153d8a' }}
+                              >
                                 {Math.abs(selectValue.id) + 1}
                               </Avatar>
                             </MenuItem>
@@ -265,7 +268,16 @@ const TemporalConstraint: React.FC<{
                     </FormControl>
                     {encounterConstraint.selectedGroup !== null && (
                       <FormControl
-                        sx={{ height: '75%', flexWrap: 'wrap', overflow: 'scroll', width: '100%' }}
+                        sx={{
+                          display: 'flex',
+                          height: '75%',
+                          flexWrap: 'wrap',
+                          overflow: 'scroll',
+                          width: '100%',
+                          flexDirection: 'row',
+                          margin: '8px 0 0',
+                          justifyContent: getGroupCriteria().length > 2 ? 'flex-start' : 'space-around'
+                        }}
                         component="fieldset"
                         variant="standard"
                       >
@@ -310,7 +322,7 @@ const TemporalConstraint: React.FC<{
                       </FormControl>
                     )}
                   </CardContent>
-                  <CardActions sx={{ padding: 0 }}>
+                  <CardActions sx={{ padding: 0, alignSelf: 'flex-end' }}>
                     <Button
                       onClick={() => {
                         setEncounterConstraint(defaultEncounterConstraint)
@@ -337,7 +349,7 @@ const TemporalConstraint: React.FC<{
                       flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      width: 450,
+                      width: constraint.idList.length > 3 ? 450 : 260,
                       height: 200
                     }}
                   >
@@ -354,15 +366,28 @@ const TemporalConstraint: React.FC<{
                       }}
                       style={{ backgroundColor: '#D1E2F4', width: 'inherit' }}
                     />
-                    <CardContent sx={{ display: 'flex', flexWrap: 'wrap', overflow: 'scroll', width: '100%' }}>
+                    <CardContent
+                      sx={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        overflow: 'scroll',
+                        width: '100%'
+                      }}
+                    >
                       {constraint.idList.map((criteriaId) => (
-                        <Grid key={criteriaId} container alignItems="center" xs={6} sx={{ margin: '4px 0' }}>
+                        <Grid
+                          key={criteriaId}
+                          container
+                          alignItems="center"
+                          xs={constraint.idList.length > 3 ? 6 : false}
+                          sx={{ margin: '4px 0' }}
+                        >
                           <Avatar className={classes.avatar}>{criteriaId}</Avatar>
                           {` - ${displayCriteria(criteriaId as number)}`}
                         </Grid>
                       ))}
                     </CardContent>
-                    <CardActions sx={{ justifyContent: 'center', padding: 0 }}>
+                    <CardActions sx={{ justifyContent: 'center', padding: 0, alignSelf: 'flex-end' }}>
                       <IconButton onClick={() => onDelete(constraint)}>
                         <DeleteIcon />
                       </IconButton>
