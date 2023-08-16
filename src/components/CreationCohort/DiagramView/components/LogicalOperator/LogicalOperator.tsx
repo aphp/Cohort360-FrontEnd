@@ -72,7 +72,8 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
       >
         <Avatar
           style={{
-            backgroundColor: '#f7b294',
+            backgroundColor: '#FFE2A9',
+            color: '#153d8a',
             width: 24,
             height: 24,
             fontSize: 14,
