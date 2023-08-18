@@ -1,20 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import {
-  Box,
-  IconButton,
-  MenuItem,
-  Select,
-  Typography,
-  TextField,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent
-} from '@mui/material'
-
-import WarningIcon from '@mui/icons-material/Warning'
-
+import { Box, IconButton, MenuItem, Select, Typography, TextField } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 
 import { useAppSelector, useAppDispatch } from 'state'
@@ -26,6 +12,7 @@ import {
 } from 'state/cohortCreation'
 
 import useStyles from './styles'
+import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
 
 type LogicalOperatorItemProps = {
   itemId: number
@@ -280,31 +267,18 @@ const LogicalOperatorItem: React.FC<LogicalOperatorItemProps> = ({ itemId }) => 
         )}
       </Box>
 
-      <Dialog open={openConfirmationDialog} onClose={() => setOpenConfirmationDialog(false)}>
-        <DialogContent
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}
-        >
-          <WarningIcon style={{ fontSize: 40, color: '#ff9800', margin: 12 }} />
-          <Typography>
-            L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères <strong>ET</strong>,
-            passer sur un groupe de critères <strong>OU</strong> vous fera perdre toutes vos précédentes contraintes
-            temporelles.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button style={{ color: '#ED6D91' }} onClick={() => setOpenConfirmationDialog(false)}>
-            Annuler
-          </Button>
-          <Button
-            onClick={() => {
-              dispatch(updateTemporalConstraints([]))
-              _handleChangeLogicalOperatorProps('groupType', 'orGroup')
-            }}
-          >
-            Confirmer
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <ConfirmationDialog
+        open={openConfirmationDialog}
+        onCancel={() => setOpenConfirmationDialog(false)}
+        onClose={() => setOpenConfirmationDialog(false)}
+        onConfirm={() => {
+          dispatch(updateTemporalConstraints([]))
+          _handleChangeLogicalOperatorProps('groupType', 'orGroup')
+        }}
+        message={
+          "L'ajout de contraintes temporelles n'étant possible que sur un groupe de critères ET, passer sur un groupe de critères OU vous fera perdre toutes vos précédentes contraintes temporelles."
+        }
+      />
     </>
   )
 }

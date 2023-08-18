@@ -2,12 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import {
-  Avatar,
   Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
   Checkbox,
   Dialog,
   DialogActions,
@@ -34,6 +29,9 @@ import { buildCohortCreation, updateTemporalConstraints } from 'state/cohortCrea
 import EventSequenceTable from '../EventSequenceTable/EventSequenceTable'
 import TemporalConstraintConfig from '../TemporalConstraintConfig/TemporalConstraintConfig'
 import { SelectedCriteriaType, TemporalConstraintsKind, TemporalConstraintsType } from 'types'
+import Avatar from 'components/ui/Avatar/Avatar'
+import Card from 'components/ui/Card/Card'
+import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDialog'
 
 import useStyles from './styles'
 import _ from 'lodash'
@@ -87,6 +85,8 @@ const TemporalConstraint: React.FC<{
   const [showAddConstraintIcon, setShowAddConstraintIcon] = useState<boolean>(true)
   const [showAddConstraintCard, setShowAddConstraintCard] = useState<boolean>(false)
 
+  const [openConfirmationDialog, setOpenConfirmationDialog] = useState<boolean>(false)
+
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
@@ -132,7 +132,7 @@ const TemporalConstraint: React.FC<{
 
   const onConfirm = () => {
     const newConstraint: TemporalConstraintsType = {
-      idList: encounterConstraint.criteriaIds,
+      idList: encounterConstraint.criteriaIds.sort(),
       constraintType: TemporalConstraintsKind.SAME_ENCOUNTER
     }
     setNewConstraintsList([...newConstraintsList, newConstraint])
@@ -152,85 +152,140 @@ const TemporalConstraint: React.FC<{
   }
 
   return (
-    <Dialog fullWidth maxWidth="lg" open onClose={handleClose} aria-labelledby="form-dialog-title">
-      <DialogTitle>Contraintes temporelles</DialogTitle>
-      <DialogContent>
-        <Grid>
-          <Typography variant="h3">Contraintes sur les séjours</Typography>
-          <RadioGroup
-            row
-            value={radioValues}
-            onChange={(e) => onChangeValue(e.target.value as unknown as TemporalConstraintsKind)}
-            style={{ margin: '1em', justifyContent: 'space-around' }}
-          >
-            <FormControlLabel
-              value={TemporalConstraintsKind.NONE}
-              control={<Radio />}
-              label="Aucune contrainte sur les séjours"
-            />
-            <FormControlLabel
-              value={TemporalConstraintsKind.SAME_ENCOUNTER}
-              control={<Radio />}
-              label="Tous les critères ont lieu au cours du même séjour"
-            />
-            <FormControlLabel
-              value={TemporalConstraintsKind.PARTIAL_CONSTRAINT}
-              control={<Radio />}
-              label="Certains critères ont lieu au cours du même séjour"
-            />
-          </RadioGroup>
-        </Grid>
-        {radioValues === TemporalConstraintsKind.PARTIAL_CONSTRAINT && (
-          <div style={{ width: 'auto', overflowX: 'auto', margin: '1em', backgroundColor: '#F6F9FD', padding: '1em' }}>
-            <Grid container wrap="nowrap" style={{ width: 'fit-content' }}>
-              {showAddConstraintIcon && (
-                <IconButton
-                  onClick={() => {
-                    setShowAddConstraintCard(true)
-                    setShowAddConstraintIcon(false)
-                  }}
-                >
-                  <AddCircleIcon style={{ height: '2em', width: '2em' }} />
-                </IconButton>
-              )}
+    <>
+      <Dialog fullWidth maxWidth="lg" open onClose={handleClose} aria-labelledby="form-dialog-title">
+        <DialogTitle>Contraintes temporelles</DialogTitle>
+        <DialogContent>
+          <Grid>
+            <Typography variant="h3">Contraintes sur les séjours</Typography>
+            <RadioGroup
+              row
+              value={radioValues}
+              onChange={(e) => {
+                if (
+                  radioValues === TemporalConstraintsKind.PARTIAL_CONSTRAINT &&
+                  newConstraintsList.find(
+                    (constraint) => constraint.constraintType === TemporalConstraintsKind.SAME_ENCOUNTER
+                  )
+                ) {
+                  setOpenConfirmationDialog(true)
+                  setRadioValues(e.target.value as TemporalConstraintsKind)
+                } else {
+                  onChangeValue(e.target.value as TemporalConstraintsKind)
+                }
+              }}
+              sx={{ margin: '1em', justifyContent: 'space-around' }}
+            >
+              <FormControlLabel
+                value={TemporalConstraintsKind.NONE}
+                control={<Radio />}
+                label="Aucune contrainte sur les séjours"
+              />
+              <FormControlLabel
+                value={TemporalConstraintsKind.SAME_ENCOUNTER}
+                control={<Radio />}
+                label="Tous les critères ont lieu au cours du même séjour"
+              />
+              <FormControlLabel
+                value={TemporalConstraintsKind.PARTIAL_CONSTRAINT}
+                control={<Radio />}
+                label="Certains critères ont lieu au cours du même séjour"
+              />
+            </RadioGroup>
+          </Grid>
+          {radioValues === TemporalConstraintsKind.PARTIAL_CONSTRAINT && (
+            <div
+              style={{
+                width: 'auto',
+                overflowX: 'auto',
+                margin: '1em',
+                backgroundColor: '#F6F9FD',
+                padding: '1em',
+                display: 'flex'
+              }}
+              ref={(div) => {
+                if (div) {
+                  div.scrollLeft = div.scrollWidth - div.clientWidth
+                }
+              }}
+            >
+              <Grid
+                container
+                wrap="nowrap"
+                sx={{
+                  width:
+                    newConstraintsList.filter((constraint) => !constraint.idList.includes('All' as never)).length === 0
+                      ? '100%'
+                      : 'fit-content',
+                  justifyContent:
+                    newConstraintsList.filter((constraint) => !constraint.idList.includes('All' as never)).length === 0
+                      ? 'center'
+                      : 'flex-start'
+                }}
+              >
+                {newConstraintsList
+                  .filter((constraint) => !constraint.idList.includes('All' as never))
+                  .map((constraint, index) => (
+                    <Card
+                      key={index}
+                      title="Contrainte de même séjour"
+                      actions={
+                        <IconButton onClick={() => onDelete(constraint)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      }
+                      wrap
+                      width={constraint.idList.length > 3 ? 450 : 260}
+                    >
+                      {constraint.idList.map((criteriaId) => (
+                        <Grid
+                          key={criteriaId}
+                          container
+                          alignItems="center"
+                          xs={constraint.idList.length > 3 ? 6 : false}
+                          sx={{ margin: '4px 0' }}
+                        >
+                          <Avatar content={criteriaId} size={20} fontSize={12} marginLeft={0.5} marginRight={0.5} />
+                          {` - ${displayCriteria(criteriaId as number)}`}
+                        </Grid>
+                      ))}
+                    </Card>
+                  ))}
 
-              {showAddConstraintCard && (
-                <Card
-                  sx={{ margin: '1em', width: 800 }}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    height: 200
-                  }}
-                >
-                  <CardHeader
-                    title="Contrainte de même séjour"
-                    titleTypographyProps={{
-                      variant: 'h3',
-                      align: 'center',
-                      color: '#0063AF',
-                      padding: '0 20px',
-                      textTransform: 'uppercase',
-                      fontSize: 11,
-                      fontWeight: 'bold'
-                    }}
-                    style={{ backgroundColor: '#D1E2F4', width: 'inherit' }}
-                  />
-                  <CardContent
-                    sx={{
-                      padding: '0 16px',
-                      width: 'inherit',
-                      height: '80%',
-                      overflow: 'auto',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center'
+                {showAddConstraintIcon && (
+                  <IconButton
+                    onClick={() => {
+                      setShowAddConstraintCard(true)
+                      setShowAddConstraintIcon(false)
                     }}
                   >
+                    <AddCircleIcon sx={{ height: '2em', width: '2em' }} />
+                  </IconButton>
+                )}
+
+                {showAddConstraintCard && (
+                  <Card
+                    title="Contrainte de même séjour"
+                    actions={
+                      <>
+                        <Button
+                          onClick={() => {
+                            setEncounterConstraint(defaultEncounterConstraint)
+                            setShowAddConstraintCard(false)
+                            setShowAddConstraintIcon(true)
+                          }}
+                          sx={{ color: '#ED6D91' }}
+                        >
+                          Annuler
+                        </Button>
+                        <Button onClick={onConfirm} disabled={encounterConstraint.criteriaIds.length <= 1}>
+                          Valider
+                        </Button>
+                      </>
+                    }
+                  >
                     <FormControl
-                      style={{
+                      sx={{
                         margin: '0 8px',
                         minWidth: 200,
                         height: '25%',
@@ -243,13 +298,13 @@ const TemporalConstraint: React.FC<{
                         value={encounterConstraint.selectedGroup}
                         onChange={(e) => {
                           setEncounterConstraint({
-                            ...encounterConstraint,
-                            selectedGroup: e.target.value as number | null
+                            selectedGroup: e.target.value as number | null,
+                            criteriaIds: []
                           })
                         }}
                         classes={{ select: classes.flexBaseline }}
                         variant="standard"
-                        style={{ margin: '0 12px', minWidth: 160 }}
+                        sx={{ margin: '0 12px', minWidth: 160 }}
                       >
                         {criteriaGroup
                           .filter((group) => group.type === 'andGroup')
@@ -257,11 +312,15 @@ const TemporalConstraint: React.FC<{
                             <MenuItem key={index} value={selectValue.id}>
                               {`${selectValue.title}`}
                               <Avatar
-                                className={classes.avatar}
-                                style={{ backgroundColor: '#FFE2A9', color: '#153d8a' }}
-                              >
-                                {Math.abs(selectValue.id) + 1}
-                              </Avatar>
+                                content={Math.abs(selectValue.id) + 1}
+                                backgroundColor="#FFE2A9"
+                                color="#153D8A"
+                                size={20}
+                                fontSize={12}
+                                marginLeft={0.5}
+                                marginRight={0.5}
+                                bold
+                              />
                             </MenuItem>
                           ))}
                       </Select>
@@ -292,134 +351,84 @@ const TemporalConstraint: React.FC<{
                                 size="small"
                                 checked={encounterConstraint.criteriaIds.includes(criteria.id)}
                                 onChange={(e, checked) => {
-                                  // TODO: fonction à réparer
                                   if (checked) {
                                     setEncounterConstraint({
                                       ...encounterConstraint,
                                       criteriaIds: [...encounterConstraint.criteriaIds, criteria.id]
                                     })
                                   } else {
-                                    const index = encounterConstraint.criteriaIds.indexOf(criteria.id)
-                                    if (index > -1) {
-                                      setEncounterConstraint({
-                                        ...encounterConstraint,
-                                        criteriaIds: encounterConstraint.criteriaIds.splice(index, 1)
-                                      })
-                                    }
+                                    setEncounterConstraint({
+                                      ...encounterConstraint,
+                                      criteriaIds: encounterConstraint.criteriaIds.filter(
+                                        (criteriaId) => criteriaId !== criteria.id
+                                      )
+                                    })
                                   }
                                 }}
                               />
                             }
                             label={
                               <Grid container alignItems="center" wrap="nowrap">
-                                <Avatar className={classes.avatar}>{criteria.id}</Avatar>
+                                <Avatar
+                                  content={criteria.id}
+                                  size={20}
+                                  fontSize={12}
+                                  marginLeft={0.5}
+                                  marginRight={0.5}
+                                />
                                 {` - ${criteria.title}`}
                               </Grid>
                             }
-                            style={{ width: '33%', marginRight: 0 }}
+                            sx={{ width: '33%', marginRight: 0 }}
                           />
                         ))}
                       </FormControl>
                     )}
-                  </CardContent>
-                  <CardActions sx={{ padding: 0, alignSelf: 'flex-end' }}>
-                    <Button
-                      onClick={() => {
-                        setEncounterConstraint(defaultEncounterConstraint)
-                        setShowAddConstraintCard(false)
-                        setShowAddConstraintIcon(true)
-                      }}
-                    >
-                      Annuler
-                    </Button>
-                    <Button onClick={onConfirm}>Valider</Button>
-                  </CardActions>
-                </Card>
-              )}
-
-              {newConstraintsList
-                .filter((constraint) => !constraint.idList.includes('All' as never))
-                .reverse()
-                .map((constraint, index) => (
-                  <Card
-                    key={index}
-                    sx={{ width: '100%', margin: '1em' }}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      width: constraint.idList.length > 3 ? 450 : 260,
-                      height: 200
-                    }}
-                  >
-                    <CardHeader
-                      title="Contrainte de même séjour"
-                      titleTypographyProps={{
-                        variant: 'h3',
-                        align: 'center',
-                        color: '#0063AF',
-                        padding: '0 20px',
-                        textTransform: 'uppercase',
-                        fontSize: 11,
-                        fontWeight: 'bold'
-                      }}
-                      style={{ backgroundColor: '#D1E2F4', width: 'inherit' }}
-                    />
-                    <CardContent
-                      sx={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        overflow: 'scroll',
-                        width: '100%'
-                      }}
-                    >
-                      {constraint.idList.map((criteriaId) => (
-                        <Grid
-                          key={criteriaId}
-                          container
-                          alignItems="center"
-                          xs={constraint.idList.length > 3 ? 6 : false}
-                          sx={{ margin: '4px 0' }}
-                        >
-                          <Avatar className={classes.avatar}>{criteriaId}</Avatar>
-                          {` - ${displayCriteria(criteriaId as number)}`}
-                        </Grid>
-                      ))}
-                    </CardContent>
-                    <CardActions sx={{ justifyContent: 'center', padding: 0, alignSelf: 'flex-end' }}>
-                      <IconButton onClick={() => onDelete(constraint)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </CardActions>
                   </Card>
-                ))}
+                )}
+              </Grid>
+            </div>
+          )}
+          <Grid>
+            <Grid item container direction="row" alignItems="center">
+              <Typography variant="h3">Séquence d'évènements entre deux critères</Typography>
+              <Tooltip title="Les contraintes temporelles ne peuvent être ajoutées que sur le groupe ET principal.">
+                <InfoIcon fontSize="small" color="primary" sx={{ marginLeft: 4 }} />
+              </Tooltip>
             </Grid>
-          </div>
-        )}
-        <Grid>
-          <Grid item container direction="row" alignItems="center">
-            <Typography variant="h3">Séquence d'évènements entre deux critères</Typography>
-            <Tooltip title="Les contraintes temporelles ne peuvent être ajoutées que sur le groupe ET principal.">
-              <InfoIcon fontSize="small" color="primary" style={{ marginLeft: 4 }} />
-            </Tooltip>
+            <TemporalConstraintConfig
+              newConstraintsList={newConstraintsList}
+              onChangeNewConstraintsList={setNewConstraintsList}
+            />
+            <EventSequenceTable temporalConstraints={newConstraintsList} onChangeConstraints={setNewConstraintsList} />
           </Grid>
-          <TemporalConstraintConfig
-            newConstraintsList={newConstraintsList}
-            onChangeNewConstraintsList={setNewConstraintsList}
-          />
-          <EventSequenceTable temporalConstraints={newConstraintsList} onChangeConstraints={setNewConstraintsList} />
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="secondary">
-          Annuler
-        </Button>
-        <Button onClick={handleConfirm} color="primary">
-          Valider
-        </Button>
-      </DialogActions>
-    </Dialog>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="secondary">
+            Annuler
+          </Button>
+          <Button onClick={handleConfirm} color="primary">
+            Valider
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <ConfirmationDialog
+        open={openConfirmationDialog}
+        message={
+          'Attention, en passant sur un type de contrainte temporelle globale, vous perdrez toutes les contraintes partielles déjà ajoutées.'
+        }
+        onClose={() => setOpenConfirmationDialog(false)}
+        onCancel={() => {
+          setOpenConfirmationDialog(false)
+          setRadioValues(TemporalConstraintsKind.PARTIAL_CONSTRAINT)
+        }}
+        onConfirm={() => {
+          onChangeValue(radioValues)
+          setOpenConfirmationDialog(false)
+        }}
+      />
+    </>
   )
 }
 

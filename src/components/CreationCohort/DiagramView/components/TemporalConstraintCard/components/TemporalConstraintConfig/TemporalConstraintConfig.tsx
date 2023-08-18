@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 
 import {
-  Avatar,
   Button,
   Checkbox,
   FormControl,
@@ -20,6 +19,7 @@ import { useAppSelector } from 'state'
 import { TemporalConstraintsKind, TemporalConstraintsType } from 'types'
 
 import useStyles from './styles'
+import Avatar from 'components/ui/Avatar/Avatar'
 
 const timeMeasurements = [
   {
@@ -178,7 +178,7 @@ const TemporalConstraintConfig: React.FC<{
           >
             {selectableCriteria1.map((selectValue, index) => (
               <MenuItem key={index} value={selectValue.id}>
-                <Avatar className={classes.avatar}>{selectValue.id}</Avatar>
+                <Avatar content={selectValue.id} size={20} fontSize={12} marginRight={0.5} />
                 {` - ${selectValue.title}`}
               </MenuItem>
             ))}
@@ -204,7 +204,7 @@ const TemporalConstraintConfig: React.FC<{
           >
             {selectableCriteria2.map((selectValue, index) => (
               <MenuItem key={index} value={selectValue.id}>
-                <Avatar className={classes.avatar}>{selectValue.id}</Avatar>
+                <Avatar content={selectValue.id} size={20} fontSize={12} marginRight={0.5} />
                 {` - ${selectValue.title}`}
               </MenuItem>
             ))}

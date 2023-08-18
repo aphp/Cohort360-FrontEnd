@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import {
-  Avatar,
   Button,
   Chip,
   Dialog,
@@ -32,6 +31,7 @@ import { ReactComponent as StarIcon } from 'assets/icones/star.svg'
 import { ReactComponent as StarFullIcon } from 'assets/icones/star full.svg'
 import MoreButton from '@mui/icons-material/MoreVert'
 
+import Avatar from 'components/ui/Avatar/Avatar'
 import ExportModal from 'components/Dashboard/ExportModal/ExportModal'
 import ModalEditCohort from 'components/MyProjects/Modals/ModalEditCohort/ModalEditCohort'
 
@@ -177,7 +177,7 @@ const TopBar: React.FC<TopBarProps> = ({ context, patientsNb, access, afterEdit 
             >
               <Grid item xs={9} direction="row" container style={{ flexWrap: 'nowrap' }}>
                 <Grid container style={{ width: 40 }} alignItems="center">
-                  <Avatar style={{ backgroundColor: '#5bc5f1' }}>{cohort.icon}</Avatar>
+                  <Avatar content={cohort.icon} size={40} />
                 </Grid>
 
                 <Grid

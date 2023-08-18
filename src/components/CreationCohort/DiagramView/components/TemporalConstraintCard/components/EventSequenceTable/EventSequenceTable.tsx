@@ -1,7 +1,6 @@
 import React from 'react'
 
 import {
-  Avatar,
   IconButton,
   Paper,
   Table,
@@ -20,6 +19,7 @@ import { useAppSelector } from 'state'
 import { TemporalConstraintsKind, TemporalConstraintsType } from 'types'
 
 import useStyles from './styles'
+import Avatar from 'components/ui/Avatar/Avatar'
 
 const columns = [
   {
@@ -153,12 +153,12 @@ const EventSequenceTable: React.FC<{
                 temporalConstraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING && (
                   <TableRow key={index} className={classes.tableBodyRows} hover>
                     <TableCell align="center" className={classes.flexCenter}>
-                      <Avatar className={classes.avatar}>{temporalConstraint.idList[0]}</Avatar>
+                      <Avatar content={temporalConstraint.idList[0]} />
                       <Typography style={{ width: 'fit-content', marginLeft: 4 }}> - {criteriaTitle1}</Typography>
                     </TableCell>
                     <TableCell align="center">s'est produit avant</TableCell>
                     <TableCell align="center" className={classes.flexCenter}>
-                      <Avatar className={classes.avatar}>{temporalConstraint.idList[1]}</Avatar>
+                      <Avatar content={temporalConstraint.idList[1]} />
                       <Typography style={{ width: 'fit-content', marginLeft: 4 }}> - {criteriaTitle2}</Typography>
                     </TableCell>
                     <TableCell align="center">{`${minDuration.values ?? '-'} ${minDuration.keys ?? ''}`}</TableCell>
