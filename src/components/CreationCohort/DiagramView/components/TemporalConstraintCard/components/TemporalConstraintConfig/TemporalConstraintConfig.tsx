@@ -159,7 +159,7 @@ const TemporalConstraintConfig: React.FC<{
       container
       justifyContent="center"
       alignItems="center"
-      style={{ margin: '1em', backgroundColor: '#F6F9FD', padding: '1em' }}
+      style={{ margin: '1em', backgroundColor: '#F6F9FD', padding: '1em', width: 'auto' }}
     >
       <Grid container alignItems="baseline" justifyContent="center">
         <FormControl
