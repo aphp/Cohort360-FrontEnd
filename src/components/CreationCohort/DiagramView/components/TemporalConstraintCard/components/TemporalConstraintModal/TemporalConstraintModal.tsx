@@ -284,15 +284,7 @@ const TemporalConstraint: React.FC<{
                       </>
                     }
                   >
-                    <FormControl
-                      sx={{
-                        margin: '0 8px',
-                        minWidth: 200,
-                        height: '25%',
-                        flexDirection: 'row',
-                        alignItems: 'baseline'
-                      }}
-                    >
+                    <FormControl className={classes.selectGroupFormControl}>
                       <Typography>Sélectionner un groupe de critères: </Typography>
                       <Select
                         value={encounterConstraint.selectedGroup}
@@ -327,16 +319,8 @@ const TemporalConstraint: React.FC<{
                     </FormControl>
                     {encounterConstraint.selectedGroup !== null && (
                       <FormControl
-                        sx={{
-                          display: 'flex',
-                          height: '75%',
-                          flexWrap: 'wrap',
-                          overflow: 'scroll',
-                          width: '100%',
-                          flexDirection: 'row',
-                          margin: '8px 0 0',
-                          justifyContent: getGroupCriteria().length > 2 ? 'flex-start' : 'space-around'
-                        }}
+                        className={classes.selectCriteriaFormControl}
+                        sx={{ justifyContent: getGroupCriteria().length > 2 ? 'flex-start' : 'space-around' }}
                         component="fieldset"
                         variant="standard"
                       >
