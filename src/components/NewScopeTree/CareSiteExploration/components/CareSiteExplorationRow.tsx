@@ -28,12 +28,15 @@ const CareSiteExplorationRow: React.FC<CareSiteRowProps> = (props: CareSiteRowPr
     labelId,
     onExpand,
     onSelect,
-    isIndeterminated,
+    isIndeterminated: isIndeterminate,
     isSelected,
     executiveUnitType
   } = props
 
   const { classes } = useStyles()
+
+  const _isSelected = isSelected(row)
+  const _isIndeterminate = !_isSelected && isIndeterminate(row)
 
   return (
     <>
@@ -68,8 +71,8 @@ const CareSiteExplorationRow: React.FC<CareSiteRowProps> = (props: CareSiteRowPr
               onClick={() => {
                 onSelect(row)
               }}
-              indeterminate={isIndeterminated(row)}
-              checked={isSelected(row) ? true : false}
+              indeterminate={_isIndeterminate}
+              checked={_isSelected}
               inputProps={{ 'aria-labelledby': labelId }}
             />
           </TableCell>

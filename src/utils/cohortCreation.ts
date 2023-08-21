@@ -1838,7 +1838,7 @@ export const findSelectedInListAndSubItems = (
       return true
     }
     const isSingleItemNotSelected = (searchedItem.subItems?.length ?? 0 - (numberOfSubItemsSelected ?? 0)) === 1
-    if (numberOfSubItemsSelected && isSingleItemNotSelected) {
+    if (isSingleItemNotSelected) {
       const singleItemNotSelected = searchedItem.subItems?.find((searchedSubItem: any) =>
         selectedItems.find((selectedItem) => selectedItem.id !== searchedSubItem.id)
       )
