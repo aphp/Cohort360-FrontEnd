@@ -5,6 +5,10 @@ import CareSiteExploration from './CareSiteExploration'
 import { ScopeTreeRow, ScopeType } from '../../types'
 import ScopeSearchBar from '../Inputs/ScopeSearchBar/ScopeSearchBar'
 import useStyles from './styles'
+import CareSiteChipsets from './CareSiteChipsets/CareSiteChipsets'
+import { onSelect } from './commons/scopeTreeUtils'
+import { useAppSelector } from '../../state'
+import { ScopeState } from '../../state/scope'
 
 export type CareSiteSearchProps = {
   searchInput: string
@@ -25,6 +29,12 @@ type ScopeTreeProps = CareSiteExplorationProps & CareSiteSearchProps
 const Index = (props: ScopeTreeProps) => {
   const { selectedItems, setSelectedItems, openPopulation, setOpenPopulations, executiveUnitType, searchInput } = props
 
+  const { scopeState } = useAppSelector<{
+    scopeState: ScopeState
+  }>((state) => ({
+    scopeState: state.scope || {}
+  }))
+  const { scopesList = [] } = scopeState
   const [selectedTab, setSelectedTab] = useState<'search' | 'hierarchy'>('hierarchy')
   const [_searchInput, _setSearchInput] = useState('')
   const { classes } = useStyles()
@@ -41,6 +51,10 @@ const Index = (props: ScopeTreeProps) => {
         <Tab label="Recherche" value="search" />
       </Tabs>
       <div>
+        <CareSiteChipsets
+          selectedItems={selectedItems}
+          onDelete={(item) => onSelect(item, selectedItems, setSelectedItems, scopesList)}
+        />
         {selectedTab === 'search' && (
           <>
             <div className={classes.searchBar}>

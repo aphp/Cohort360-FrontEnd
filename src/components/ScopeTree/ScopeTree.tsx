@@ -189,7 +189,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
     isAllSelected ||
     scopesList.filter((row) => selectedItems.find((item: { id: any }) => item.id === row.id) !== undefined).length ===
       scopesList.length
-  const isHeadIndetermined: boolean =
+  const isHeadIndeterminate: boolean =
     !isAllSelected && selectedItems && selectedItems.length > 0 && rootRows && !isHeadChecked
 
   const fetchScopeTree = async (executiveUnitType?: ScopeType, signal?: AbortSignal) => {
@@ -448,7 +448,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
           <Checkbox
             color="secondary"
             checked={isHeadChecked}
-            indeterminate={isHeadIndetermined}
+            indeterminate={isHeadIndeterminate}
             onClick={_onSelectAll}
             indeterminateIcon={<IndeterminateCheckBoxOutlined />}
           />

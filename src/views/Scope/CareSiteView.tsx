@@ -6,23 +6,28 @@ import CareSiteSearch from 'components/NewScopeTree/CareSiteSearch/index'
 import useStyles from './styles'
 import { useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../state'
-import { closeAllOpenedPopulation } from '../../state/scope'
+import { closeAllOpenedPopulation, ScopeState } from '../../state/scope'
 import { ScopeTreeRow } from '../../types'
 import Typography from '@mui/material/Typography'
 import Paper from '@mui/material/Paper'
+import CareSiteChipsets from '../../components/NewScopeTree/CareSiteChipsets/CareSiteChipsets'
+import { onSelect } from '../../components/NewScopeTree/commons/scopeTreeUtils'
 
 const CareSiteView = () => {
   const { classes, cx } = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
+
+  const { scopeState } = useAppSelector<{
+    scopeState: ScopeState
+  }>((state) => ({
+    scopeState: state.scope || {}
+  }))
+  const { scopesList = [] } = scopeState
   const [selectedItems, setSelectedItems] = useState<ScopeTreeRow[]>([])
   const [openPopulation, setOpenPopulations] = useState<number[]>([])
   const [searchInput, setSearchInput] = useState<string>('')
   const open = useAppSelector((state) => state.drawer)
-
-  useEffect(() => {
-    dispatch(closeAllOpenedPopulation())
-  }, [])
 
   const handleSetSearchInput = (value: string) => {
     if (!searchInput) {
@@ -41,6 +46,10 @@ const CareSiteView = () => {
     navigate(`/perimeters?${perimetresIds}`)
   }
 
+  useEffect(() => {
+    dispatch(closeAllOpenedPopulation())
+  }, [])
+
   return (
     <Grid
       container
@@ -57,6 +66,10 @@ const CareSiteView = () => {
             Explorer un perimètre
           </Typography>
           <Grid container direction="row">
+            <CareSiteChipsets
+              selectedItems={selectedItems}
+              onDelete={(item) => onSelect(item, selectedItems, setSelectedItems, scopesList)}
+            />
             <ScopeSearchBar searchInput={searchInput} setSearchInput={handleSetSearchInput} />
           </Grid>
           <Paper className={classes.paper}>
