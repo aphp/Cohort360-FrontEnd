@@ -42,24 +42,27 @@ const Index = (props: CareSiteExplorationProps) => {
   }))
   const { scopesList = [] } = scopeState
   const [rootRows, setRootRows] = useState<ScopeTreeRow[]>(scopesList)
-  const [isAllSelected, setIsAllSelected] = useState(false)
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false)
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
   const [isEmpty, setIsEmpty] = useState<boolean>(!rootRows || rootRows.length === 0)
 
+  const explorationSelectedItems = rootRows.filter((item) => selectedItems.map(({ id }) => id).includes(item.id))
   const isHeadChecked: boolean =
-    isAllSelected ||
-    scopesList.filter((row) => selectedItems.find((item: { id: string }) => item.id === row.id) !== undefined)
-      .length === scopesList.length
-  const isHeadIndetermined: boolean =
-    !isAllSelected && selectedItems && selectedItems.length > 0 && rootRows && !isHeadChecked
+    rootRows
+      .map((rootRow) => rootRow.id)
+      .every((rootRowId) => explorationSelectedItems.map((selected) => selected.id).includes(rootRowId)) &&
+    rootRows.length > 0
+  const isHeadIndeterminate: boolean =
+    (explorationSelectedItems?.length > 0 && rootRows?.length > 0 && !isHeadChecked) ||
+    (!isHeadChecked && selectedItems?.length > 0)
+
   const controllerRef = useRef<AbortController | null>(null)
 
   const headCells = getHeadCells(
     isHeadChecked,
-    isHeadIndetermined,
-    () => onSelectAll(isAllSelected, setIsAllSelected, scopesList, selectedItems, setSelectedItems),
+    isHeadIndeterminate,
+    () => onSelectAll(scopesList, selectedItems, setSelectedItems),
     executiveUnitType
   )
 

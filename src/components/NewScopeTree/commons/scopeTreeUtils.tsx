@@ -14,6 +14,7 @@ import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import servicesPerimeters, { loadingItem } from 'services/aphp/servicePerimeters'
 import { Checkbox } from '@mui/material'
 import { cancelPendingRequest } from 'utils/abortController'
+import { bool } from 'prop-types'
 
 const fetchScopeTree = async (
   dispatch: AppDispatch,
@@ -85,35 +86,56 @@ const getParents = async (allParentsIds: string[], rootRows: ScopeTreeRow[]) => 
 
 const expandSelectedItems = async (
   rootRows: ScopeTreeRow[],
-  setRootRows: (newRootRows: ScopeTreeRow[]) => void,
   selectedItems: ScopeTreeRow[],
-  dispatch: AppDispatch
+  dispatch: AppDispatch,
+  setRootRows?: (newRootRows: ScopeTreeRow[]) => void
 ) => {
   if (!selectedItems || selectedItems.length < 1) return
 
   const allParentsIds: string[] = await getAllParentsIds(selectedItems, rootRows)
 
   const parents: ScopeTreeRow[] = await getParents(allParentsIds, rootRows)
-  parents.push(...selectedItems)
+  // parents.push(...selectedItems)
 
   const newRootRows: ScopeTreeRow[] = [...rootRows]
 
-  updateRootRows(newRootRows, parents)
+  await updateRootRows(newRootRows, [...parents, ...selectedItems], parents)
   dispatch(updateScopeList(newRootRows))
-  setRootRows(newRootRows)
+  if (setRootRows) setRootRows(newRootRows)
+  return newRootRows
 }
 
-const updateRootRows = (newRootRows: ScopeTreeRow[], parents: ScopeTreeRow[]) => {
+const updateRootRows = async (
+  newRootRows: ScopeTreeRow[],
+  parentsAndSelectedItems: ScopeTreeRow[],
+  onlyParents: ScopeTreeRow[]
+) => {
   for (let i = 0; i < newRootRows.length; i++) {
-    const updatedSubItems: ScopeTreeRow[] = parents?.filter((item) => newRootRows[i].id === item.parentId)
+    const isParent: boolean = onlyParents.map((parent) => parent.id).includes(newRootRows[i].id)
+    if (!isParent) continue
+    const updatedSubItems: ScopeTreeRow[] = parentsAndSelectedItems?.filter(
+      (item) => newRootRows[i].id === item.parentId && newRootRows[i].id !== loadingItem.id
+    )
+    let existingSubItems: ScopeTreeRow[] = []
     if (updatedSubItems?.length > 0) {
-      const newSubItems = newRootRows[i].subItems?.filter(
-        (item) => item.id !== loadingItem.id && !updatedSubItems?.map((item) => item.id).includes(item?.id)
+      existingSubItems = newRootRows[i].subItems?.filter(
+        (subItem) =>
+          subItem.id !== loadingItem.id &&
+          !updatedSubItems?.map((updatedSubItem) => updatedSubItem.id).includes(subItem?.id)
       )
-      newRootRows[i] = { ...newRootRows[i], subItems: [...newSubItems, ...updatedSubItems] }
     }
-    if (newRootRows[i]?.subItems?.length > 0 && newRootRows[i]?.subItems[0]?.id !== 'loading') {
-      updateRootRows(newRootRows[i].subItems, parents)
+    let subItems: ScopeTreeRow[] = [...existingSubItems, ...updatedSubItems]
+    if (subItems?.length < (newRootRows[i]?.inferior_levels_ids?.split(',')?.length ?? 0)) {
+      const loadedItems: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
+        await servicesPerimeters.getPerimeters([newRootRows[i].id]),
+        true
+      )
+      subItems = loadedItems[0].subItems
+    }
+
+    newRootRows[i] = { ...newRootRows[i], subItems: [...subItems] }
+    if (newRootRows[i]?.subItems?.length > 0 && newRootRows[i]?.subItems[0]?.id !== loadingItem.id) {
+      await updateRootRows(newRootRows[i].subItems, parentsAndSelectedItems, onlyParents)
     }
   }
 }
@@ -142,7 +164,7 @@ export const init = async (
     setCount(newPerimetersList?.length)
     setIsEmpty(!newPerimetersList || newPerimetersList.length < 0)
   }
-  await expandSelectedItems(newPerimetersList ?? rootRows, setRootRows, selectedItems, dispatch)
+  await expandSelectedItems(newPerimetersList ?? rootRows, selectedItems, dispatch, setRootRows)
   setIsSearchLoading(false)
 }
 
@@ -161,7 +183,7 @@ export const displayCareSiteExplorationRow = (
   executiveUnitType?: ScopeType
 ) => {
   return (
-    <React.Fragment key={`ceRow-${row.id}-${executiveUnitType}`}>
+    <React.Fragment key={Math.random()}>
       <CareSiteExplorationRow
         row={row}
         level={level}
@@ -247,24 +269,28 @@ export const displayCareSiteSearchResultRow = (
 }
 
 export const onSelectAll = (
-  isAllSelected: boolean,
-  setIsAllSelected: (newIsAllSelected: boolean) => void,
   rootRows: ScopeTreeRow[],
   selectedItems: ScopeTreeRow[],
   setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void
 ) => {
-  let results: ScopeTreeRow[] = []
-  const newIsAllSelected = !isAllSelected
-  setIsAllSelected(newIsAllSelected)
+  let newSelectedItems: ScopeTreeRow[] = []
+  const diffList1: ScopeTreeRow[] = selectedItems.filter(
+    (selected) => !findEquivalentRowInItemAndSubItems(selected, rootRows).equivalentRow
+  )
+  const diffList2: ScopeTreeRow[] = rootRows.filter(
+    (root) => !findEquivalentRowInItemAndSubItems(root, selectedItems).equivalentRow
+  )
+  const diffList: ScopeTreeRow[] = [...diffList1, ...diffList2]
   if (
     rootRows.filter((row) => selectedItems.find((item: { id: string }) => item.id === row.id) !== undefined).length ===
-    rootRows.length
+      rootRows.length &&
+    rootRows.length > 0
   ) {
-    results = []
+    newSelectedItems = selectedItems.filter((selected) => diffList.find((diff) => diff.id === selected.id))
   } else {
-    results = [...rootRows]
+    newSelectedItems = [...selectedItems, ...diffList]
   }
-  setSelectedItems(results)
+  setSelectedItems(newSelectedItems)
 }
 
 export const onExpand = async (
@@ -326,6 +352,7 @@ export const isIndeterminated: (_row: ScopeTreeRow, selectedItems: ScopeTreeRow[
 
 export const isSelected = (searchedItem: TreeElement, selectedItems: TreeElement[], allItems: TreeElement[]) => {
   selectedItems = selectedItems.map((item) => findEquivalentRowInItemAndSubItems(item, allItems).equivalentRow ?? item)
+  searchedItem = findEquivalentRowInItemAndSubItems(searchedItem, allItems).equivalentRow ?? searchedItem
   return findSelectedInListAndSubItems(selectedItems, searchedItem, allItems)
 }
 
@@ -340,11 +367,10 @@ export const searchInPerimeters = async (
   setIsSearchLoading: (isSearchLoading: boolean) => void,
   setIsEmpty: (isEmpty: boolean) => void,
   setCount: (count: number) => void,
+  scopesList: ScopeTreeRow[],
   setRootRows: (newRootRows: ScopeTreeRow[]) => void,
-  selectedItems: ScopeTreeRow[],
-  setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void,
   setOpenPopulations: (newOpenPopulation: number[]) => void,
-  isAllSelected?: boolean,
+  dispatch: AppDispatch,
   executiveUnitType?: ScopeType
 ) => {
   setIsSearchLoading(true)
@@ -361,33 +387,34 @@ export const searchInPerimeters = async (
     } else {
       setIsEmpty(false)
     }
-    if (isAllSelected) {
-      const _newSelectedItems = [...selectedItems, ...newPerimetersList]
-      setSelectedItems(_newSelectedItems)
-    }
     setRootRows(newPerimetersList)
     setOpenPopulations([])
     setCount(newCount)
     setIsSearchLoading(false)
   }
-  return newPerimetersList
+  const newRootRows: ScopeTreeRow[] =
+    (await expandSelectedItems(scopesList, newPerimetersList, dispatch, undefined)) ?? scopesList
+  const perimetersListWithUpdatedParents: ScopeTreeRow[] = newPerimetersList.map(
+    (item: ScopeTreeRow) => findEquivalentRowInItemAndSubItems(item, newRootRows).equivalentRow ?? item
+  )
+  return perimetersListWithUpdatedParents
 }
 
 export const getHeadCells = (
   isHeadChecked: boolean,
-  isHeadIndetermined: boolean,
-  onSelectAll: () => void,
+  isHeadIndeterminate: boolean,
+  onSelectAll?: () => void,
   executiveUnitType?: ScopeType
 ) => [
   { id: '', align: 'left', disablePadding: true, disableOrderBy: true, label: '' },
-  {
+  !!onSelectAll && {
     id: '',
     align: 'left',
     disablePadding: true,
     disableOrderBy: true,
     label: (
       <div style={{ padding: '0 0 0 4px' }}>
-        <Checkbox color="secondary" checked={isHeadChecked} indeterminate={isHeadIndetermined} onClick={onSelectAll} />
+        <Checkbox color="secondary" checked={isHeadChecked} indeterminate={isHeadIndeterminate} onClick={onSelectAll} />
       </div>
     )
   },

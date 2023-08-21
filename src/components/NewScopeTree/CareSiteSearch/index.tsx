@@ -1,17 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import {
-  CircularProgress,
-  Grid,
-  Pagination,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography
-} from '@mui/material'
+import { CircularProgress, Grid, Pagination } from '@mui/material'
 import { useDebounce } from 'utils/debounce'
 import EnhancedTable from '../../ScopeTree/ScopeTreeTable'
 import {
@@ -30,7 +18,7 @@ import { ScopeState } from 'state/scope'
 import { ScopeTreeRow } from 'types'
 import { CareSiteSearchProps } from '../index'
 
-const Index = (props: CareSiteSearchProps) => {
+const Index: React.FC<CareSiteSearchProps> = (props) => {
   const { searchInput, selectedItems, setSelectedItems, executiveUnitType } = props
 
   const { classes } = useStyles()
@@ -46,36 +34,45 @@ const Index = (props: CareSiteSearchProps) => {
   const [openPopulation, setOpenPopulations] = useState<number[]>(scopeState.openPopulation)
   const [rootRows, setRootRows] = useState<ScopeTreeRow[]>([])
   const controllerRef = useRef<AbortController | null>(null)
-  const [isAllSelected, setIsAllSelected] = useState(false)
   const [isEmpty, setIsEmpty] = useState<boolean>(true)
   const debouncedSearchTerm = useDebounce(500, searchInput)
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false)
+  const searchSelectedItems = rootRows.filter((item) => selectedItems.map(({ id }) => id).includes(item.id))
 
   const isHeadChecked: boolean =
-    isAllSelected ||
-    scopesList.filter((row) => selectedItems.find((item) => item.id === row.id) !== undefined).length ===
-      scopesList.length
-  const isHeadIndetermined: boolean =
-    !isAllSelected && selectedItems && selectedItems.length > 0 && rootRows && !isHeadChecked
+    rootRows
+      .map((rootRow) => rootRow.id)
+      .every((rootRowId) => searchSelectedItems.map((selected) => selected.id).includes(rootRowId)) &&
+    rootRows.length > 0
+  const isHeadIndeterminate: boolean = rootRows?.length > 0 && !isHeadChecked && searchSelectedItems?.length > 0
+
+  const headCells = getHeadCells(
+    isHeadChecked,
+    isHeadIndeterminate,
+    () => onSelectAll(rootRows, selectedItems, setSelectedItems),
+    executiveUnitType
+  )
+
+  const search = () =>
+    searchInPerimeters(
+      searchInput,
+      page,
+      controllerRef,
+      setIsSearchLoading,
+      setIsEmpty,
+      setCount,
+      scopesList,
+      setRootRows,
+      setOpenPopulations,
+      dispatch,
+      executiveUnitType
+    )
 
   useEffect(() => {
     if (debouncedSearchTerm) {
-      searchInPerimeters(
-        searchInput,
-        page,
-        controllerRef,
-        setIsSearchLoading,
-        setIsEmpty,
-        setCount,
-        setRootRows,
-        selectedItems,
-        setSelectedItems,
-        setOpenPopulations,
-        false,
-        executiveUnitType
-      )
+      search()
     } else {
       setRootRows([])
     }
@@ -86,35 +83,9 @@ const Index = (props: CareSiteSearchProps) => {
 
   useEffect(() => {
     if (debouncedSearchTerm) {
-      searchInPerimeters(
-        searchInput,
-        page,
-        controllerRef,
-        setIsSearchLoading,
-        setIsEmpty,
-        setCount,
-        setRootRows,
-        selectedItems,
-        setSelectedItems,
-        setOpenPopulations,
-        isAllSelected,
-        executiveUnitType
-      )
+      search()
     }
   }, [page])
-
-  useEffect(() => {
-    if (!scopeState.aborted) {
-      setRootRows(scopesList)
-    }
-  }, [scopesList])
-
-  const headCells = getHeadCells(
-    isHeadChecked,
-    isHeadIndetermined,
-    () => onSelectAll(isAllSelected, setIsAllSelected, rootRows, selectedItems, setSelectedItems),
-    executiveUnitType
-  )
 
   return (
     <div className={classes.container}>
@@ -124,25 +95,14 @@ const Index = (props: CareSiteSearchProps) => {
         </Grid>
       ) : (
         <>
-          {!debouncedSearchTerm ? (
-            <></>
-          ) : isEmpty ? (
-            <TableContainer component={Paper}>
-              <Table className={classes.table}>
-                <TableHead>
-                  <TableRow className={classes.tableHead}>
-                    <TableCell align="center" className={classes.tableHeadCell} />
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow>
-                    <TableCell colSpan={7}>
-                      <Typography className={classes.loadingSpinnerContainer}>Aucun résultat à afficher</Typography>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
+          {!debouncedSearchTerm || isEmpty ? (
+            <EnhancedTable
+              noCheckbox
+              noPagination
+              rows={rootRows}
+              headCells={headCells}
+              emptyRowsMessage={'Aucun résultat à afficher'}
+            />
           ) : (
             <>
               <EnhancedTable noCheckbox noPagination rows={rootRows} headCells={headCells}>
@@ -170,9 +130,9 @@ const Index = (props: CareSiteSearchProps) => {
                         dispatch,
                         executiveUnitType
                       ),
-                    (row: ScopeTreeRow) => onSelect(row, selectedItems, setSelectedItems, scopesList),
+                    (row: ScopeTreeRow) => onSelect(row, selectedItems, setSelectedItems, rootRows),
                     (row: ScopeTreeRow) => isIndeterminated(row, selectedItems),
-                    (row: ScopeTreeRow) => isSelected(row, selectedItems, rootRows),
+                    (row: ScopeTreeRow) => isSelected(row, selectedItems, scopesList),
                     executiveUnitType
                   )
                 }}
