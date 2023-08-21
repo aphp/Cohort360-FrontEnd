@@ -53,7 +53,7 @@ export default makeStyles()((theme) => ({
   title: {
     borderBottom: '1px solid #D0D7D8',
     width: '100%',
-    paddingTop: '80px',
+    paddingTop: '30px',
     paddingBottom: '20px',
     marginBottom: '40px'
   },

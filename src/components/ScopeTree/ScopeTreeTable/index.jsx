@@ -1,5 +1,5 @@
 import React from 'react'
-import { makeStyles } from 'tss-react/mui'
+import useStyles from './styles'
 
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
@@ -10,30 +10,7 @@ import TableRow from '@mui/material/TableRow'
 
 import EnhancedTableHead from './components/TableHead'
 import { getComparator, stableSort } from 'utils/alphabeticalSort'
-
-const useStyles = makeStyles()(() => ({
-  root: {
-    width: '100%'
-  },
-  head: {
-    background: 'rgb(209, 226, 244)',
-    color: 'rgb(0, 99, 175)',
-    fontSize: 11,
-    fontWeight: 'bold',
-    textTransform: 'uppercase'
-  },
-  visuallyHidden: {
-    border: 0,
-    clip: 'rect(0 0 0 0)',
-    height: 1,
-    margin: -1,
-    overflow: 'hidden',
-    padding: 0,
-    position: 'absolute',
-    top: 20,
-    width: 1
-  }
-}))
+import { Typography } from '@mui/material'
 
 export default function EnhancedTable(props) {
   const rows = props.rows ? props.rows : []
@@ -41,8 +18,11 @@ export default function EnhancedTable(props) {
   const setSelected = props.setSelected ? props.setSelected : () => null
   const onClickRow = props.onClickRow ? props.onClickRow : () => null
   const noPagination = props.noPagination ? props.noPagination : false
+  const emptyRowsMessage = props.emptyRowsMessage
+  const headCells = props.headCells
 
   const { classes } = useStyles()
+
   const [order, setOrder] = React.useState('desc')
   const [orderBy, setOrderBy] = React.useState(props.defaultSort || '_id')
   const [page, setPage] = React.useState(0)
@@ -98,23 +78,31 @@ export default function EnhancedTable(props) {
             onSelectAllClick={handleSelectAllClick}
             onRequestSort={handleRequestSort}
             rowCount={rows.length}
-            headCells={props.headCells}
+            headCells={headCells}
           />
 
           <TableBody>
-            {noPagination !== true
-              ? stableSort(rows, getComparator(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((item, index) => (
-                    <React.Fragment key={index}>
-                      {props.children(item, index, selected, handleClick, onClickRow)}
-                    </React.Fragment>
-                  ))
-              : stableSort(rows, getComparator(order, orderBy)).map((item, index) => (
+            {emptyRowsMessage ? (
+              <TableRow>
+                <TableCell colSpan={headCells.length}>
+                  <Typography className={classes.loadingSpinnerContainer}>Aucun résultat à afficher</Typography>
+                </TableCell>
+              </TableRow>
+            ) : noPagination !== true ? (
+              stableSort(rows, getComparator(order, orderBy))
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((item, index) => (
                   <React.Fragment key={index}>
                     {props.children(item, index, selected, handleClick, onClickRow)}
                   </React.Fragment>
-                ))}
+                ))
+            ) : (
+              stableSort(rows, getComparator(order, orderBy)).map((item, index) => (
+                <React.Fragment key={index}>
+                  {props.children(item, index, selected, handleClick, onClickRow)}
+                </React.Fragment>
+              ))
+            )}
 
             {emptyRows > 0 && (
               <TableRow style={{ height: 76 * emptyRows }}>
@@ -125,7 +113,7 @@ export default function EnhancedTable(props) {
         </Table>
       </TableContainer>
 
-      {noPagination !== true && (
+      {noPagination !== true && !emptyRowsMessage && (
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
