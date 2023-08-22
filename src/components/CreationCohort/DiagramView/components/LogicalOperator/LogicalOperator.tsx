@@ -216,7 +216,7 @@ const LogicalOperator: React.FC = () => {
     const nextGroupId = request.nextGroupId
     const newOperator: CriteriaGroupType = {
       id: nextGroupId,
-      title: `Nouveau opérateur logique ${nextGroupId * -1}`,
+      title: 'Groupe de critères',
       type: currentParent.type === 'orGroup' ? 'andGroup' : 'orGroup',
       criteriaIds: [],
       isSubGroup: parentId === 0 ? false : true,

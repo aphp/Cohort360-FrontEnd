@@ -1566,7 +1566,7 @@ export async function unbuildRequest(_json: string): Promise<any> {
       ? _criteriaGroup
           .map((groupItem: any) => ({
             id: groupItem._id,
-            title: 'Groupe de critère',
+            title: 'Groupe de critères',
             criteriaIds:
               groupItem.criteria && groupItem.criteria.length > 0
                 ? groupItem.criteria.map((criteria: RequeteurCriteriaType | RequeteurGroupType) => criteria._id)
