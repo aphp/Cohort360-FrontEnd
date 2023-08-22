@@ -72,8 +72,10 @@ const TemporalConstraintConfig: React.FC<{
     )
 
     // get constraints that contain the firstCriteriaSelected
-    const constraintsWithCriteriaSelected = newConstraintsList.filter((constraint) =>
-      constraint.idList.includes(firstCriteriaSelected as never)
+    const constraintsWithCriteriaSelected = newConstraintsList.filter(
+      (constraint) =>
+        constraint.idList.includes(firstCriteriaSelected as never) &&
+        constraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING
     )
 
     // get an array with all the ids that are already in a constraint with the firstCriteriaSelected
