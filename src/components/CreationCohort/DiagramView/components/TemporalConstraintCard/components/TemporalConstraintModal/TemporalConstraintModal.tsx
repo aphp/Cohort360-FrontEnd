@@ -224,7 +224,11 @@ const TemporalConstraint: React.FC<{
                 }}
               >
                 {newConstraintsList
-                  .filter((constraint) => !constraint.idList.includes('All' as never))
+                  .filter(
+                    (constraint) =>
+                      !constraint.idList.includes('All' as never) &&
+                      constraint.constraintType === TemporalConstraintsKind.SAME_ENCOUNTER
+                  )
                   .map((constraint, index) => (
                     <Card
                       key={index}
