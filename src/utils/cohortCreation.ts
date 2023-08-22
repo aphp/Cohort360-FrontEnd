@@ -10,7 +10,8 @@ import {
   SearchByTypes,
   Calendar,
   CalendarRequestLabel,
-  CalendarLabel
+  CalendarLabel,
+  Comparators
 } from 'types'
 
 import docTypes from 'assets/docTypes.json'
@@ -479,19 +480,19 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
       let valueComparatorFilter = ''
       if (criterion.valueComparator) {
         switch (criterion.valueComparator) {
-          case '<':
+          case Comparators.LESS:
             valueComparatorFilter = 'lt'
             break
-          case '<=':
+          case Comparators.LESS_OR_EQUAL:
             valueComparatorFilter = 'le'
             break
-          case '=':
+          case Comparators.EQUAL:
             valueComparatorFilter = ''
             break
-          case '>':
+          case Comparators.GREATER:
             valueComparatorFilter = 'gt'
             break
-          case '>=':
+          case Comparators.GREATER_OR_EQUAL:
             valueComparatorFilter = 'ge'
             break
           default:
@@ -523,8 +524,8 @@ const constructFilterFhir = (criterion: SelectedCriteriaType): string => {
           criterion.code &&
           criterion.code.length === 1 &&
           criterion.valueComparator &&
-          (criterion.valueMin || criterion.valueMax)
-            ? criterion.valueComparator === '<x>' && criterion.valueMax
+          (typeof criterion.valueMin === 'number' || typeof criterion.valueMax === 'number')
+            ? criterion.valueComparator === Comparators.BETWEEN && criterion.valueMax
               ? `${OBSERVATION_VALUE}=le${criterion.valueMin}&${OBSERVATION_VALUE}=ge${criterion.valueMax}`
               : `${OBSERVATION_VALUE}=${valueComparatorFilter}${criterion.valueMin}`
             : ''
@@ -1398,9 +1399,6 @@ export async function unbuildRequest(_json: string): Promise<any> {
         currentCriterion.title = 'Critère de biologie'
         currentCriterion.code = currentCriterion.code ? currentCriterion.code : []
         currentCriterion.isLeaf = currentCriterion.isLeaf ? currentCriterion.isLeaf : false
-        currentCriterion.valueMin = currentCriterion.valueMin ? currentCriterion.valueMin : 0
-        currentCriterion.valueMax = currentCriterion.valueMax ? currentCriterion.valueMax : 0
-        currentCriterion.valueComparator = currentCriterion.valueComparator ? currentCriterion.valueComparator : '>='
         currentCriterion.occurrence = currentCriterion.occurrence ? currentCriterion.occurrence : null
         currentCriterion.startOccurrence = currentCriterion.startOccurrence ? currentCriterion.startOccurrence : null
         currentCriterion.endOccurrence = currentCriterion.endOccurrence ? currentCriterion.endOccurrence : null
@@ -1461,28 +1459,29 @@ export async function unbuildRequest(_json: string): Promise<any> {
 
               case OBSERVATION_VALUE: {
                 let valueComparator = ''
-                let valueMin = 0
-                let valueMax = 0
+                let valueMin
+                let valueMax
 
                 if (value?.search('le') === 0) {
-                  valueComparator = '<='
-                  valueMin = parseInt(value?.replace('le', '')) ?? 0
+                  valueComparator = Comparators.LESS_OR_EQUAL
+                  valueMin = parseInt(value?.replace('le', ''))
                 } else if (value?.search('lt') === 0) {
-                  valueComparator = '<'
-                  valueMin = parseInt(value?.replace('lt', '')) ?? 0
+                  valueComparator = Comparators.LESS
+                  valueMin = parseInt(value?.replace('lt', ''))
                 } else if (value?.search('ge') === 0) {
                   if (nbValueComparators === 2) {
-                    valueComparator = '<x>'
-                    valueMax = parseInt(value?.replace('ge', '')) ?? 0
+                    valueComparator = Comparators.BETWEEN
+                    valueMax = parseInt(value?.replace('ge', ''))
                   } else {
-                    valueComparator = '>='
-                    valueMin = parseInt(value?.replace('ge', '')) ?? 0
+                    valueComparator = Comparators.GREATER_OR_EQUAL
+                    valueMin = parseInt(value?.replace('ge', ''))
+                    console.log('valueMin', valueMin)
                   }
                 } else if (value?.search('gt') === 0) {
-                  valueComparator = '>'
-                  valueMin = parseInt(value?.replace('gt', '')) ?? 0
+                  valueComparator = Comparators.GREATER
+                  valueMin = parseInt(value?.replace('gt', ''))
                 } else {
-                  valueComparator = '='
+                  valueComparator = Comparators.EQUAL
                   valueMin = parseInt(value ?? '0')
                 }
 

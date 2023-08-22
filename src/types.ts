@@ -535,6 +535,15 @@ export enum CalendarRequestLabel {
   DAY = 'jour(s)'
 }
 
+export enum Comparators {
+  LESS_OR_EQUAL = '<=',
+  LESS = '<',
+  EQUAL = '=',
+  GREATER = '>',
+  GREATER_OR_EQUAL = '>=',
+  BETWEEN = '<x>'
+}
+
 export type EncounterDataType = {
   type: 'Encounter'
   title: string
@@ -593,9 +602,9 @@ export type ObservationDataType = {
   type: 'Observation'
   code: { id: string; label: string }[] | null
   isLeaf: boolean
-  valueMin: number
-  valueMax: number
-  valueComparator: '<=' | '<' | '=' | '>' | '>=' | '<x>'
+  valueMin?: number
+  valueMax?: number
+  valueComparator: Comparators
   occurrence: number
   occurrenceComparator: '<=' | '<' | '=' | '>' | '>='
   startOccurrence: Date | null
