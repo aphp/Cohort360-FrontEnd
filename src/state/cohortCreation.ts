@@ -552,8 +552,8 @@ const cohortCreationSlice = createSlice({
       const deletedGroupCriteriaIds = state.criteriaGroup.find((group) => group.id === action.payload)?.criteriaIds
 
       if (deletedGroupCriteriaIds) {
-        const remainingConstraints = state.temporalConstraints.filter((constraint) =>
-          constraint.idList.some((r) => deletedGroupCriteriaIds.includes(r as number))
+        const remainingConstraints = state.temporalConstraints.filter(
+          (constraint) => !constraint.idList.some((r) => deletedGroupCriteriaIds.includes(r as number))
         )
         state.temporalConstraints = remainingConstraints
       }
