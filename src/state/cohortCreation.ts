@@ -513,7 +513,24 @@ const cohortCreationSlice = createSlice({
 
       // Delete temporalConstraints containing deletedCriteria and reassign criteriaIds
       const remainingConstraints = state.temporalConstraints
-        .filter((constraint) => !constraint.idList.includes(criteriaId as never))
+        .filter(
+          (constraint) =>
+            !(
+              constraint.idList.includes(criteriaId as never) &&
+              (constraint.constraintType === TemporalConstraintsKind.DIRECT_CHRONOLOGICAL_ORDERING ||
+                (constraint.constraintType === TemporalConstraintsKind.SAME_ENCOUNTER && constraint.idList.length <= 2))
+            )
+        )
+        .map((constraint) => {
+          if (
+            constraint.idList.includes(criteriaId as never) &&
+            constraint.constraintType === TemporalConstraintsKind.SAME_ENCOUNTER
+          ) {
+            const findIndex = constraint.idList.findIndex((id) => id === criteriaId)
+            constraint.idList.splice(findIndex, 1)
+          }
+          return constraint
+        })
         .map((constraint) => {
           const oldIds = constraint.idList as number[]
           const newIds = oldIds.map((id) => idMap[id] ?? id)
