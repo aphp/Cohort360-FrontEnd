@@ -571,4 +571,4 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
   )
 }
 
-// export default ScopeTree
+export default ScopeTree
