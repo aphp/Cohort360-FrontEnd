@@ -14,7 +14,6 @@ import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
 import servicesPerimeters, { loadingItem } from 'services/aphp/servicePerimeters'
 import { Checkbox } from '@mui/material'
 import { cancelPendingRequest } from 'utils/abortController'
-import { bool } from 'prop-types'
 
 const fetchScopeTree = async (
   dispatch: AppDispatch,
