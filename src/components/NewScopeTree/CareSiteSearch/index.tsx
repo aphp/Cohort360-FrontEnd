@@ -32,6 +32,7 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
 
   const { scopesList = [] } = scopeState
   const [openPopulation, setOpenPopulations] = useState<number[]>(scopeState.openPopulation)
+  const [searchedRows, setSearchedRows] = useState<ScopeTreeRow[]>([...scopesList])
   const [rootRows, setRootRows] = useState<ScopeTreeRow[]>([])
   const controllerRef = useRef<AbortController | null>(null)
   const [isEmpty, setIsEmpty] = useState<boolean>(true)
@@ -63,8 +64,9 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
       setIsSearchLoading,
       setIsEmpty,
       setCount,
-      scopesList,
       setRootRows,
+      searchedRows,
+      setSearchedRows,
       setOpenPopulations,
       executiveUnitType
     )
@@ -133,7 +135,7 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
                       ),
                     (row: ScopeTreeRow) => onSelect(row, selectedItems, setSelectedItems, rootRows),
                     (row: ScopeTreeRow) => isIndeterminated(row, selectedItems),
-                    (row: ScopeTreeRow) => isSelected(row, selectedItems, scopesList),
+                    (row: ScopeTreeRow) => isSelected(row, selectedItems, searchedRows),
                     executiveUnitType
                   )
                 }}

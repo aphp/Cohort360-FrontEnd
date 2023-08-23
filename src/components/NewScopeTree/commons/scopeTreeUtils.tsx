@@ -115,37 +115,37 @@ const updateRootRows = async (
     const isParent: boolean = onlyParents.map((parent) => parent.id).includes(newRootRows[i].id)
     if (!isParent) continue
 
-    parentsAndSelectedItems.forEach((loadedItem) => {
-      if (loadedItem.parentId === newRootRows[i].id) {
+    for (let j = 0; j < parentsAndSelectedItems.length; j++) {
+      if (parentsAndSelectedItems[j].parentId === newRootRows[i].id) {
         if (
           !newRootRows[i].subItems ||
           (newRootRows[i].subItems.length === 1 && newRootRows[i].subItems[0].id === LOADING.id)
         ) {
           newRootRows[i] = { ...newRootRows[i], subItems: [] }
         }
-        if (!newRootRows[i].subItems.map((subItem) => subItem.id).includes(loadedItem.id)) {
-          newRootRows[i].subItems.push(loadedItem)
+        if (!newRootRows[i].subItems.map((subItem) => subItem.id).includes(parentsAndSelectedItems[j].id)) {
+          newRootRows[i].subItems.push(parentsAndSelectedItems[j])
         }
       }
-    })
+    }
     if (newRootRows[i]?.subItems?.length > 0 && newRootRows[i]?.subItems[0]?.id !== LOADING.id) {
       await updateRootRows(newRootRows[i].subItems, parentsAndSelectedItems, onlyParents)
     }
   }
 }
 
-export const removeDuplicates = (arr: ScopeTreeRow[]) => {
-  const uniqueIds = new Set()
-  const uniqueItems: ScopeTreeRow[] = []
-
-  arr.forEach((item) => {
-    if (!uniqueIds.has(item.id)) {
-      uniqueIds.add(item.id)
-      uniqueItems.push(item)
-    }
-  })
-  return uniqueItems
-}
+// export const removeDuplicates = (arr: ScopeTreeRow[]) => {
+//   const uniqueIds = new Set()
+//   const uniqueItems: ScopeTreeRow[] = []
+//
+//   arr.forEach((item) => {
+//     if (!uniqueIds.has(item.id)) {
+//       uniqueIds.add(item.id)
+//       uniqueItems.push(item)
+//     }
+//   })
+//   return uniqueItems
+// }
 
 export const init = async (
   setIsSearchLoading: (isSearchLoading: boolean) => void,
@@ -178,7 +178,7 @@ export const init = async (
       setIsEmpty(!newPerimetersList || newPerimetersList.length < 0)
     }
   }
-  await expandSelectedItems(newPerimetersList, selectedItems, dispatch, setRootRows)
+  // await expandSelectedItems(newPerimetersList, selectedItems, dispatch, setRootRows)
   setIsSearchLoading(false)
 }
 
@@ -363,6 +363,96 @@ export const onSelect = (
   return optimizedHierarchySelection
 }
 
+// export const buildFictiveRootRows = (rootRows: ScopeTreeRow[]) => {
+//   for (let i = 0; i < rootRows.length; i++) {
+//     const rootRowIds: string[] = (rootRows[i]?.inferior_levels_ids ?? '').split(',')
+//     if (
+//       rootRowIds.length === rootRows[i]?.subItems.length &&
+//       !rootRows[i].subItems.map((rootItem) => rootItem.id).includes(LOADING.id)
+//     ) {
+//       continue
+//     }
+//     if (!rootRows[i].subItems || (rootRows[i].subItems.length === 1 && rootRows[i].subItems[0].id === LOADING.id)) {
+//       rootRows[i] = { ...rootRows[i], subItems: [] }
+//     }
+//     rootRowIds.forEach((id) => {
+//       const newSubItem: ScopeTreeRow = LOADING
+//       newSubItem.id = id
+//       newSubItem.subItems = [{ ...LOADING }]
+//       if (!rootRows[i].subItems.map((rootItem) => rootItem.id).includes(newSubItem.id)) {
+//         rootRows[i].subItems.push(newSubItem)
+//       }
+//     })
+//   }
+// }
+
+export const isIncludedInListAndSubItems = (
+  searchedItem: ScopeTreeRow,
+  selectedItems: ScopeTreeRow[],
+  hierarchy: any[]
+): boolean => {
+  if (!searchedItem || !selectedItems || selectedItems.length === 0) return false
+  selectedItems = selectedItems?.filter(({ id }) => id !== 'loading')
+  const foundItem = selectedItems.find((selectedItem) => {
+    if (selectedItem.id === searchedItem.id || selectedItem.id == '*') {
+      return true
+    }
+    return selectedItem.subItems ? isIncludedInListAndSubItems(searchedItem, selectedItem.subItems, hierarchy) : false
+  })
+  if (foundItem) {
+    return true
+  }
+  const inferiorLevelsIds: string[] = searchedItem.inferior_levels_ids?.split(',') ?? []
+  if (inferiorLevelsIds.length > 0) {
+    const numberOfSubItemsSelected = inferiorLevelsIds.filter((id) =>
+      selectedItems.map((selectedItem) => selectedItem.id).includes(id)
+    )?.length
+    if (inferiorLevelsIds.length === numberOfSubItemsSelected) {
+      return true
+    }
+    const isSingleItemNotSelected = (inferiorLevelsIds.length ?? 0 - (numberOfSubItemsSelected ?? 0)) === 1
+    if (isSingleItemNotSelected) {
+      const singleItemNotSelected = inferiorLevelsIds.find(
+        (id) => !selectedItems.map((selectedItem) => selectedItem.id).includes(id)
+      )
+      if (singleItemNotSelected) {
+        const item: ScopeTreeRow = { ...LOADING }
+        item.id = singleItemNotSelected
+        return isIncludedInListAndSubItems(item, selectedItems, hierarchy)
+      }
+      return false
+    }
+  }
+  return false
+}
+
+export const onSearchSelect = (
+  row: ScopeTreeRow,
+  selectedItems: ScopeTreeRow[],
+  setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void,
+  rootRows: ScopeTreeRow[]
+): ScopeTreeRow[] => {
+  const rowsToDelete: ScopeTreeRow[] = []
+  if (isIncludedInListAndSubItems(row, selectedItems, rootRows)) {
+    for (let i = 0; i < selectedItems.length; i++) {
+      if (selectedItems[i].id === row.id) {
+        rowsToDelete.push(selectedItems[i])
+        break
+      }
+    }
+    // findEquivalentRowInItemAndSubItems(row, selectedItems)
+    // const rootRowIds: string[] = (row?.inferior_levels_ids ?? '').split(',')
+    // if (
+    //   rootRowIds.length === row?.subItems.length &&
+    //   !row.subItems.map((rootItem) => rootItem.id).includes(LOADING.id)
+    // ) {
+    //   continue
+    // }
+  }
+  setSelectedItems(selectedItems)
+  return selectedItems
+}
+
 export const isIndeterminated: (_row: ScopeTreeRow, selectedItems: ScopeTreeRow[]) => boolean | undefined = (
   _row,
   selectedItems: ScopeTreeRow[]
@@ -385,8 +475,9 @@ export const searchInPerimeters = async (
   setIsSearchLoading: (isSearchLoading: boolean) => void,
   setIsEmpty: (isEmpty: boolean) => void,
   setCount: (count: number) => void,
-  scopesList: ScopeTreeRow[],
   setRootRows: (newRootRows: ScopeTreeRow[]) => void,
+  searchedRows: ScopeTreeRow[],
+  setSearchedRows: (newRootRows: ScopeTreeRow[]) => void,
   setOpenPopulations: (newOpenPopulation: number[]) => void,
   executiveUnitType?: ScopeType
 ) => {
@@ -410,10 +501,11 @@ export const searchInPerimeters = async (
     setIsSearchLoading(false)
   }
   const newRootRows: ScopeTreeRow[] =
-    (await expandSelectedItems(scopesList, newPerimetersList, undefined, undefined)) ?? scopesList
+    (await expandSelectedItems(searchedRows, newPerimetersList, undefined, undefined)) ?? searchedRows
   // const perimetersListWithUpdatedParents: ScopeTreeRow[] = newPerimetersList.map(
   //   (item: ScopeTreeRow) => findEquivalentRowInItemAndSubItems(item, newRootRows).equivalentRow ?? item
   // )
+  setSearchedRows(newRootRows)
   return newRootRows
 }
 
