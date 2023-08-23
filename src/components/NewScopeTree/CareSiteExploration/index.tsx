@@ -30,7 +30,7 @@ import { ScopeState } from 'state/scope'
 import { CareSiteExplorationProps } from '../index'
 
 const Index = (props: CareSiteExplorationProps) => {
-  const { selectedItems, setSelectedItems, openPopulation, setOpenPopulations, executiveUnitType } = props
+  const { selectedItems, setSelectedItems, executiveUnitType } = props
 
   const { classes } = useStyles()
   const dispatch: AppDispatch = useAppDispatch()
@@ -46,6 +46,7 @@ const Index = (props: CareSiteExplorationProps) => {
   const [page, setPage] = useState(1)
   const [count, setCount] = useState(0)
   const [isEmpty, setIsEmpty] = useState<boolean>(!rootRows || rootRows.length === 0)
+  const [openPopulation, setOpenPopulations] = useState<number[]>([])
 
   const explorationSelectedItems = rootRows.filter((item) => selectedItems.map(({ id }) => id).includes(item.id))
   const isHeadChecked: boolean =

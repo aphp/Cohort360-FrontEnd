@@ -66,7 +66,6 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
       scopesList,
       setRootRows,
       setOpenPopulations,
-      dispatch,
       executiveUnitType
     )
 
@@ -83,11 +82,11 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
     }
   }, [debouncedSearchTerm])
 
-  useEffect(() => {
-    if (debouncedSearchTerm) {
-      search()
-    }
-  }, [page])
+  // useEffect(() => {
+  //   if (debouncedSearchTerm) {
+  //     search()
+  //   }
+  // }, [page])
 
   return (
     <div className={classes.container}>

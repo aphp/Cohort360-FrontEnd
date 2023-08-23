@@ -36,7 +36,7 @@ import {
   getHierarchySelection,
   optimizeHierarchySelection
 } from 'utils/pmsi'
-import servicesPerimeters, { loadingItem } from '../../services/aphp/servicePerimeters'
+import servicesPerimeters, { LOADING } from '../../services/aphp/servicePerimeters'
 import { findSelectedInListAndSubItems } from '../../utils/cohortCreation'
 import { cancelPendingRequest } from 'utils/abortController'
 
@@ -253,7 +253,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
       const foundItem = findEquivalentRowInItemAndSubItems({ id: parentId }, rootRows).equivalentRow
       if (!foundItem) return true
       fetchedParents.push(foundItem)
-      if (!foundItem.subItems || foundItem.subItems.length < 1 || foundItem.subItems[0]?.id === loadingItem.id) {
+      if (!foundItem.subItems || foundItem.subItems.length < 1 || foundItem.subItems[0]?.id === LOADING.id) {
         notFetchedSubItemsIds.push(foundItem?.inferior_levels_ids?.split(','))
       }
       return false
@@ -275,7 +275,7 @@ const ScopeTree: React.FC<ScopeTreeProps> = ({
       const updatedSubItems: ScopeTreeRow[] = parents?.filter((item) => newRootRows[i].id === item.parentId)
       if (updatedSubItems?.length > 0) {
         const newSubItems = newRootRows[i].subItems?.filter(
-          (item) => item.id !== loadingItem.id && !updatedSubItems?.map((item) => item.id).includes(item?.id)
+          (item) => item.id !== LOADING.id && !updatedSubItems?.map((item) => item.id).includes(item?.id)
         )
         newRootRows[i] = { ...newRootRows[i], subItems: [...newSubItems, ...updatedSubItems] }
       }

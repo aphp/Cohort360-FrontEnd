@@ -1,6 +1,6 @@
 import React from 'react'
 import CareSiteExplorationRow from '../CareSiteExploration/components/CareSiteExplorationRow'
-import { ScopeTreeRow, ScopeType, TreeElement } from 'types'
+import { ExpandScopeElementParamsType, ScopeTreeRow, ScopeType, TreeElement } from 'types'
 import CareSiteSearchRow from '../CareSiteSearch/components/CareSiteSearchRow'
 import { expandScopeElement, fetchScopesList, updateScopeList } from 'state/scope'
 import { AppDispatch } from 'state'
@@ -11,9 +11,10 @@ import {
   optimizeHierarchySelection
 } from 'utils/pmsi'
 import { findSelectedInListAndSubItems } from 'utils/cohortCreation'
-import servicesPerimeters, { loadingItem } from 'services/aphp/servicePerimeters'
+import servicesPerimeters, { LOADING } from 'services/aphp/servicePerimeters'
 import { Checkbox } from '@mui/material'
 import { cancelPendingRequest } from 'utils/abortController'
+import { expandScopeTree } from '../../../utils/scopeTree'
 
 const fetchScopeTree = async (
   dispatch: AppDispatch,
@@ -40,17 +41,17 @@ const getFetchedSelectedItems = (selectedItems: ScopeTreeRow[], rootRows: ScopeT
   }
 }
 
-const getAllParentsIds = async (selectedItems: ScopeTreeRow[], rootRows: ScopeTreeRow[]) => {
-  const { fetchedSelectedItems: fetchedSelectedItems, notFetchedSelectedItemsIds: notFetchedSelectedItemsIds } =
-    getFetchedSelectedItems(selectedItems, rootRows)
-
-  const notFetchedSelectedItems: ScopeTreeRow[] =
-    notFetchedSelectedItemsIds?.length > 0
-      ? await servicesPerimeters.buildScopeTreeRowList(
-          await servicesPerimeters.getPerimeters(notFetchedSelectedItemsIds, undefined, undefined, true)
-        )
-      : []
-  const allParentsIds: string[] = [...fetchedSelectedItems, ...notFetchedSelectedItems]
+const getAllParentsIds = async (selectedItems: ScopeTreeRow[]) => {
+  // const { fetchedSelectedItems: fetchedSelectedItems, notFetchedSelectedItemsIds: notFetchedSelectedItemsIds } =
+  //   getFetchedSelectedItems(selectedItems, rootRows)
+  //
+  // const notFetchedSelectedItems: ScopeTreeRow[] =
+  //   notFetchedSelectedItemsIds?.length > 0
+  //     ? await servicesPerimeters.buildScopeTreeRowList(
+  //         await servicesPerimeters.getPerimeters(notFetchedSelectedItemsIds)
+  //       )
+  //     : []
+  const allParentsIds: string[] = selectedItems
     .map((item: ScopeTreeRow) => (item?.above_levels_ids ?? '').split(','))
     .flat()
     ?.filter((idValue, index, array) => {
@@ -66,7 +67,7 @@ const getParents = async (allParentsIds: string[], rootRows: ScopeTreeRow[]) => 
     const foundItem = findEquivalentRowInItemAndSubItems({ id: parentId }, rootRows).equivalentRow
     if (!foundItem) return true
     fetchedParents.push(foundItem)
-    if (!foundItem.subItems || foundItem.subItems.length < 1 || foundItem.subItems[0]?.id === loadingItem.id) {
+    if (!foundItem.subItems || foundItem.subItems.length < 1 || foundItem.subItems[0]?.id === LOADING.id) {
       notFetchedSubItemsIds.push(foundItem?.inferior_levels_ids?.split(','))
     }
     return false
@@ -78,9 +79,7 @@ const getParents = async (allParentsIds: string[], rootRows: ScopeTreeRow[]) => 
   )
   const notFetchedParents: ScopeTreeRow[] =
     notFetchedItems?.length > 0
-      ? await servicesPerimeters.buildScopeTreeRowList(
-          await servicesPerimeters.getPerimeters(notFetchedItems, undefined, undefined, true)
-        )
+      ? await servicesPerimeters.buildScopeTreeRowList(await servicesPerimeters.getPerimeters(notFetchedItems))
       : []
   return [...fetchedParents, ...notFetchedParents]
 }
@@ -88,19 +87,21 @@ const getParents = async (allParentsIds: string[], rootRows: ScopeTreeRow[]) => 
 const expandSelectedItems = async (
   rootRows: ScopeTreeRow[],
   selectedItems: ScopeTreeRow[],
-  dispatch: AppDispatch,
+  dispatch?: AppDispatch,
   setRootRows?: (newRootRows: ScopeTreeRow[]) => void
 ) => {
   if (!selectedItems || selectedItems.length < 1) return
 
-  const allParentsIds: string[] = await getAllParentsIds(selectedItems, rootRows)
+  const allParentsIds: string[] = await getAllParentsIds(selectedItems)
 
   const parents: ScopeTreeRow[] = await getParents(allParentsIds, rootRows)
 
   const newRootRows: ScopeTreeRow[] = [...rootRows]
 
   await updateRootRows(newRootRows, [...parents, ...selectedItems], parents)
-  dispatch(updateScopeList(newRootRows))
+  if (dispatch) {
+    dispatch(updateScopeList(newRootRows))
+  }
   if (setRootRows) setRootRows(newRootRows)
   return newRootRows
 }
@@ -113,28 +114,21 @@ const updateRootRows = async (
   for (let i = 0; i < newRootRows.length; i++) {
     const isParent: boolean = onlyParents.map((parent) => parent.id).includes(newRootRows[i].id)
     if (!isParent) continue
-    const updatedSubItems: ScopeTreeRow[] = parentsAndSelectedItems?.filter(
-      (item) => newRootRows[i].id === item.parentId && newRootRows[i].id !== loadingItem.id
-    )
-    let existingSubItems: ScopeTreeRow[] = []
-    if (updatedSubItems?.length > 0) {
-      existingSubItems = newRootRows[i].subItems?.filter(
-        (subItem) =>
-          subItem.id !== loadingItem.id &&
-          !updatedSubItems?.map((updatedSubItem) => updatedSubItem.id).includes(subItem?.id)
-      )
-    }
-    let subItems: ScopeTreeRow[] = removeDuplicates([...existingSubItems, ...updatedSubItems])
-    if (subItems?.length < (newRootRows[i]?.inferior_levels_ids?.split(',')?.length ?? 0)) {
-      const loadedItems: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
-        await servicesPerimeters.getPerimeters([newRootRows[i].id], undefined, undefined, true),
-        true
-      )
-      subItems = loadedItems[0].subItems
-    }
 
-    newRootRows[i] = { ...newRootRows[i], subItems: [...subItems] }
-    if (newRootRows[i]?.subItems?.length > 0 && newRootRows[i]?.subItems[0]?.id !== loadingItem.id) {
+    parentsAndSelectedItems.forEach((loadedItem) => {
+      if (loadedItem.parentId === newRootRows[i].id) {
+        if (
+          !newRootRows[i].subItems ||
+          (newRootRows[i].subItems.length === 1 && newRootRows[i].subItems[0].id === LOADING.id)
+        ) {
+          newRootRows[i] = { ...newRootRows[i], subItems: [] }
+        }
+        if (!newRootRows[i].subItems.map((subItem) => subItem.id).includes(loadedItem.id)) {
+          newRootRows[i].subItems.push(loadedItem)
+        }
+      }
+    })
+    if (newRootRows[i]?.subItems?.length > 0 && newRootRows[i]?.subItems[0]?.id !== LOADING.id) {
       await updateRootRows(newRootRows[i].subItems, parentsAndSelectedItems, onlyParents)
     }
   }
@@ -337,16 +331,20 @@ export const onExpand = async (
     setOpenPopulations(_openPopulation)
   }
 
-  const expandResponse = await dispatch(
-    expandScopeElement({
-      rowId: rowId,
-      selectedItems: selectedItems,
-      scopesList: _rootRows,
-      openPopulation: openPopulation,
-      type: executiveUnitType,
-      signal: controllerRef.current?.signal
-    })
-  ).unwrap()
+  let expandResponse
+  const params: ExpandScopeElementParamsType = {
+    rowId: rowId,
+    selectedItems: selectedItems,
+    scopesList: _rootRows,
+    openPopulation: openPopulation,
+    type: executiveUnitType,
+    signal: controllerRef.current?.signal
+  }
+  if (dispatch) {
+    expandResponse = await dispatch(expandScopeElement(params)).unwrap()
+  } else {
+    await expandScopeTree(params)
+  }
   if (expandResponse && !expandResponse.aborted) {
     setRootRows(expandResponse.scopesList ?? [])
   }
@@ -390,7 +388,6 @@ export const searchInPerimeters = async (
   scopesList: ScopeTreeRow[],
   setRootRows: (newRootRows: ScopeTreeRow[]) => void,
   setOpenPopulations: (newOpenPopulation: number[]) => void,
-  dispatch: AppDispatch,
   executiveUnitType?: ScopeType
 ) => {
   setIsSearchLoading(true)
@@ -413,11 +410,11 @@ export const searchInPerimeters = async (
     setIsSearchLoading(false)
   }
   const newRootRows: ScopeTreeRow[] =
-    (await expandSelectedItems(scopesList, newPerimetersList, dispatch, undefined)) ?? scopesList
-  const perimetersListWithUpdatedParents: ScopeTreeRow[] = newPerimetersList.map(
-    (item: ScopeTreeRow) => findEquivalentRowInItemAndSubItems(item, newRootRows).equivalentRow ?? item
-  )
-  return perimetersListWithUpdatedParents
+    (await expandSelectedItems(scopesList, newPerimetersList, undefined, undefined)) ?? scopesList
+  // const perimetersListWithUpdatedParents: ScopeTreeRow[] = newPerimetersList.map(
+  //   (item: ScopeTreeRow) => findEquivalentRowInItemAndSubItems(item, newRootRows).equivalentRow ?? item
+  // )
+  return newRootRows
 }
 
 export const getHeadCells = (

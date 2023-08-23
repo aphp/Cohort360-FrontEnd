@@ -24,7 +24,7 @@ import { AxiosResponse } from 'axios'
 import { Group } from 'fhir/r4'
 import scopeTypes from '../../data/scope_type.json'
 
-export const loadingItem: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
+export const LOADING: ScopeTreeRow = { id: 'loading', name: 'loading', quantity: 0, subItems: [] }
 
 export interface IServicePerimeters {
   /**
@@ -483,7 +483,7 @@ const servicesPerimeters: IServicePerimeters = {
               type,
               signal
             )
-          : [loadingItem]
+          : [LOADING]
       scopeRowList.push(scopeRowItem)
     }
     scopeRowList = sortByQuantityAndName(scopeRowList)
@@ -491,7 +491,7 @@ const servicesPerimeters: IServicePerimeters = {
   },
 
   buildScopeTreeRowItem: (scopeElement: ScopeElement) => {
-    const scopeRowItem: ScopeTreeRow = { id: '', name: '', quantity: 0, subItems: [loadingItem] }
+    const scopeRowItem: ScopeTreeRow = { id: '', name: '', quantity: 0, subItems: [LOADING] }
     scopeRowItem.id = '' + scopeElement.id
     scopeRowItem.cohort_id = scopeElement.cohort_id
     scopeRowItem.name = servicesPerimeters.getScopeName(scopeElement)
