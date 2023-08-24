@@ -457,6 +457,32 @@ const getScopeTreeList = (
   return scopeTreeList
 }
 
+const squashItemSelection = (
+  selectedItem: ScopeTreeRow,
+  selectedItems: ScopeTreeRow[],
+  rowsToAdd: ScopeTreeRow[],
+  rowsToDelete: string[],
+  searchRootRows: ScopeTreeRow[],
+  explorationRootRows: ScopeTreeRow[]
+) => {
+  const parent: ScopeTreeRow | undefined = getScopeTree(selectedItem.parentId, searchRootRows, explorationRootRows)
+  const inferiorLevelsIds: string[] = parent?.inferior_levels_ids?.split(',') ?? []
+  if (
+    inferiorLevelsIds.every((subItemId) =>
+      [...selectedItems, ...rowsToAdd]
+        .map((item) => item.id)
+        .filter((addedId) => !rowsToDelete.includes(addedId))
+        .includes(subItemId)
+    )
+  ) {
+    rowsToDelete.push(...inferiorLevelsIds)
+    if (parent) {
+      rowsToAdd.push({ ...parent })
+      squashItemSelection(parent, selectedItems, rowsToAdd, rowsToDelete, searchRootRows, explorationRootRows)
+    }
+  }
+}
+
 const selectOrUnSelectParent = (
   aboveLevelsIds: string[],
   selectedItem: ScopeTreeRow | undefined,
@@ -530,9 +556,21 @@ export const onSearchSelect = (
   } else {
     rowsToAdd.push(row)
   }
-  const uniqueRowsToDelete = [...new Set(rowsToDelete)]
+  const uniqueRowsToDelete: string[] = [...new Set(rowsToDelete)]
   const newSelectedItems: ScopeTreeRow[] = selectedItems.filter((row) => !uniqueRowsToDelete.includes(row.id))
-  newSelectedItems.push(...rowsToAdd)
+
+  const uniqueRowsToAdd: ScopeTreeRow[] = removeDuplicates(rowsToAdd)
+  uniqueRowsToAdd.forEach((rowToAdd: ScopeTreeRow) =>
+    squashItemSelection(
+      rowToAdd,
+      selectedItems,
+      uniqueRowsToAdd,
+      uniqueRowsToDelete,
+      searchRootRows,
+      explorationRootRows
+    )
+  )
+  newSelectedItems.push(...uniqueRowsToAdd)
 
   setSelectedItems(newSelectedItems)
   return newSelectedItems

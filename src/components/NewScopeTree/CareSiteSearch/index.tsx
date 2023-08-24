@@ -8,6 +8,7 @@ import {
   isIndeterminated,
   isSelected,
   onExpand,
+  onSearchSelect,
   onSelect,
   onSelectAll,
   searchInPerimeters
@@ -133,7 +134,7 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
                         dispatch,
                         executiveUnitType
                       ),
-                    (row: ScopeTreeRow) => onSelect(row, selectedItems, setSelectedItems, rootRows),
+                    (row: ScopeTreeRow) => onSearchSelect(row, selectedItems, setSelectedItems, rootRows, scopesList),
                     (row: ScopeTreeRow) => isIndeterminated(row, selectedItems),
                     (row: ScopeTreeRow) => isSelected(row, selectedItems, searchedRows),
                     executiveUnitType
