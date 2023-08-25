@@ -68,9 +68,9 @@ const Index = (props: ScopeTreeProps) => {
             <CareSiteSearch
               searchInput={_searchInput}
               selectedItems={selectedItems}
+              setSelectedItems={setSelectedItems}
               searchedRows={searchedRows}
               setSearchedRows={setSearchedRows}
-              setSelectedItems={setSelectedItems}
               executiveUnitType={executiveUnitType}
             />
           </>

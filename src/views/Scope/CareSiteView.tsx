@@ -25,6 +25,7 @@ const CareSiteView = () => {
   }))
   const { scopesList = [] } = scopeState
   const [selectedItems, setSelectedItems] = useState<ScopeTreeRow[]>([])
+  const [searchedRows, setSearchedRows] = useState<ScopeTreeRow[]>([...scopesList])
   const [openPopulation, setOpenPopulations] = useState<number[]>([])
   const [searchInput, setSearchInput] = useState<string>('')
   const open = useAppSelector((state) => state.drawer)
@@ -78,11 +79,15 @@ const CareSiteView = () => {
                 searchInput={searchInput}
                 selectedItems={selectedItems}
                 setSelectedItems={setSelectedItems}
+                searchedRows={searchedRows}
+                setSearchedRows={setSearchedRows}
               />
             ) : (
               <CareSiteExploration
                 selectedItems={selectedItems}
                 setSelectedItems={setSelectedItems}
+                searchedRows={searchedRows}
+                setSearchedRows={setSearchedRows}
                 openPopulation={openPopulation}
                 setOpenPopulations={setOpenPopulations}
               />

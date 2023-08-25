@@ -287,7 +287,7 @@ export const onSelectAll = (
   selectedItems: ScopeTreeRow[],
   setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void
 ) => {
-  let newSelectedItems: ScopeTreeRow[] = []
+  let newSelectedItems: ScopeTreeRow[]
   const diffList1: ScopeTreeRow[] = selectedItems.filter(
     (selected) => !findEquivalentRowInItemAndSubItems(selected, rootRows).equivalentRow
   )
@@ -482,33 +482,51 @@ const getScopeTreeList = async (
   return scopeTreeList
 }
 
-const squashItemSelection = async (
-  selectedItem: ScopeTreeRow,
+const squashSelectedItems = async (
+  squashedItems: ScopeTreeRow[],
+  selectedItems: ScopeTreeRow[],
+  searchRootRows: ScopeTreeRow[],
+  explorationRootRows: ScopeTreeRow[]
+) => {
+  const squashedIds = squashedItems.map((row) => row.id)
+  for (const selectedItem of selectedItems) {
+    if (
+      squashedIds.includes(selectedItem.id) ||
+      (selectedItem.parentId && squashedIds.includes(selectedItem.parentId))
+    ) {
+      continue
+    } else {
+      const parent = await getScopeTree(selectedItem.parentId, searchRootRows, explorationRootRows)
+    }
+  }
+}
+
+const addToSelectedItems = async (
+  rowToAdd: ScopeTreeRow,
   selectedItems: ScopeTreeRow[],
   rowsToAdd: ScopeTreeRow[],
   rowsToDelete: string[],
   searchRootRows: ScopeTreeRow[],
   explorationRootRows: ScopeTreeRow[]
 ) => {
-  const parent: ScopeTreeRow | undefined = await getScopeTree(
-    selectedItem.parentId,
-    searchRootRows,
-    explorationRootRows
-  )
+  const parent: ScopeTreeRow | undefined = await getScopeTree(rowToAdd.parentId, searchRootRows, explorationRootRows)
   const inferiorLevelsIds: string[] = parent?.inferior_levels_ids?.split(',') ?? []
-  if (
-    inferiorLevelsIds.every((subItemId) =>
-      [...selectedItems, ...rowsToAdd]
-        .map((item) => item.id)
-        .filter((addedId) => !rowsToDelete.includes(addedId))
-        .includes(subItemId)
-    )
-  ) {
-    rowsToDelete.push(...inferiorLevelsIds)
-    if (parent) {
-      rowsToAdd.push({ ...parent })
-      squashItemSelection(parent, selectedItems, rowsToAdd, rowsToDelete, searchRootRows, explorationRootRows)
+  const isAllInferiorLevelsSelected = inferiorLevelsIds.every(async (subItemId) => {
+    const subItem: ScopeTreeRow | undefined = await getScopeTree(subItemId, searchRootRows, explorationRootRows)
+    if (!subItem) {
+      return false
+    } else if (subItem) {
+      return isIncludedInListAndSubItems(
+        subItem,
+        [...selectedItems, ...rowsToAdd].filter((item) => !rowsToDelete.includes(item.id)),
+        searchRootRows
+      )
     }
+  })
+  if (parent && isAllInferiorLevelsSelected) {
+    rowsToDelete.push(...inferiorLevelsIds)
+    rowsToAdd.push({ ...parent })
+    await addToSelectedItems(parent, selectedItems, rowsToAdd, rowsToDelete, searchRootRows, explorationRootRows)
   }
 }
 
@@ -541,18 +559,17 @@ const selectOrUnSelectParent = async (
         )
       }
     } else {
-      selectedItem.subItems.forEach(
-        async (subItem) =>
-          await selectOrUnSelectParent(
-            aboveLevelsIds,
-            subItem,
-            rowsToDelete,
-            row,
-            rowsToAdd,
-            searchRootRows,
-            explorationRootRows
-          )
-      )
+      for (const subItem of selectedItem.subItems) {
+        await selectOrUnSelectParent(
+          aboveLevelsIds,
+          subItem,
+          rowsToDelete,
+          row,
+          rowsToAdd,
+          searchRootRows,
+          explorationRootRows
+        )
+      }
     }
   }
 }
@@ -562,7 +579,8 @@ export const onSearchSelect = async (
   selectedItems: ScopeTreeRow[],
   setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void,
   searchRootRows: ScopeTreeRow[],
-  explorationRootRows: ScopeTreeRow[]
+  explorationRootRows: ScopeTreeRow[],
+  isOnlyRemovingItemOperation?: boolean
 ): Promise<ScopeTreeRow[]> => {
   const rowsToDelete: string[] = []
   const rowsToAdd: ScopeTreeRow[] = []
@@ -585,14 +603,16 @@ export const onSearchSelect = async (
       }
     }
   } else {
-    rowsToAdd.push(row)
+    if (!isOnlyRemovingItemOperation) rowsToAdd.push(row)
   }
-  const uniqueRowsToDelete: string[] = [...new Set(rowsToDelete)]
-  const newSelectedItems: ScopeTreeRow[] = selectedItems.filter((row) => !uniqueRowsToDelete.includes(row.id))
+  let uniqueRowsToDelete: string[] = [...new Set(rowsToDelete)]
+  let newSelectedItems: ScopeTreeRow[] = selectedItems.filter((row) => !uniqueRowsToDelete.includes(row.id))
 
   const uniqueRowsToAdd: ScopeTreeRow[] = removeDuplicates(rowsToAdd)
+  uniqueRowsToDelete = []
+
   uniqueRowsToAdd.forEach((rowToAdd: ScopeTreeRow) =>
-    squashItemSelection(
+    addToSelectedItems(
       rowToAdd,
       selectedItems,
       uniqueRowsToAdd,
@@ -602,9 +622,63 @@ export const onSearchSelect = async (
     )
   )
   newSelectedItems.push(...uniqueRowsToAdd)
+  newSelectedItems = newSelectedItems.filter((item) => !uniqueRowsToDelete.includes(item.id))
 
   setSelectedItems(newSelectedItems)
   return newSelectedItems
+}
+
+export const onSearchSelectAll = async (
+  rootRows: ScopeTreeRow[],
+  selectedItems: ScopeTreeRow[],
+  setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void,
+  isHeaderSelected: boolean,
+  searchRootRows: ScopeTreeRow[],
+  explorationRootRows: ScopeTreeRow[]
+) => {
+  // const selectedIds: string[] = selectedItems.map((row) => row.id)
+  let newSelectedItems: ScopeTreeRow[] = [...selectedItems]
+  const rootRowsIds: string[] = rootRows.map((row) => row.id)
+  const uniqueRowsToAdd: ScopeTreeRow[] = []
+  const newRowsToAdd: ScopeTreeRow[] = []
+  const uniqueRowsToDelete: string[] = []
+
+  rootRows.forEach((rootRow) => {
+    if (!rootRowsIds.find((rootRowId) => rootRow.above_levels_ids?.split(',').includes(rootRowId))) {
+      uniqueRowsToAdd.push(rootRow)
+    }
+  })
+  // rootRows.forEach((rootRow) => {
+  //   if (!rootRowsIds.find((rootRowId) => rootRow.above_levels_ids?.split(',').includes(rootRowId))) {
+  //     uniqueRowsToAdd.push(rootRow)
+  //   }
+  // })
+
+  // filter(
+  //   (rootRow) => !isIncludedInListAndSubItems(rootRow, selectedItems, searchRootRows)
+  // )
+
+  if (!isHeaderSelected) {
+    newRowsToAdd.push(...uniqueRowsToAdd)
+    for (const rowToAdd of uniqueRowsToAdd) {
+      await addToSelectedItems(
+        rowToAdd,
+        selectedItems,
+        newRowsToAdd,
+        uniqueRowsToDelete,
+        searchRootRows,
+        explorationRootRows
+      )
+    }
+    newSelectedItems.push(...newRowsToAdd)
+  } else {
+    uniqueRowsToAdd.forEach((rowToRemove: ScopeTreeRow) =>
+      onSearchSelect(rowToRemove, selectedItems, setSelectedItems, searchRootRows, explorationRootRows, true)
+    )
+  }
+  newSelectedItems = newSelectedItems.filter((item) => !uniqueRowsToDelete.includes(item.id))
+  newSelectedItems = removeDuplicates(newSelectedItems)
+  setSelectedItems(newSelectedItems)
 }
 
 export const isSearchIndeterminate = (row: ScopeTreeRow, selectedItems: ScopeTreeRow[]): boolean => {

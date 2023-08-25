@@ -9,7 +9,7 @@ import {
   isSearchSelected,
   onExpand,
   onSearchSelect,
-  onSelectAll,
+  onSearchSelectAll,
   searchInPerimeters
 } from '../commons/scopeTreeUtils'
 import useStyles from '../commons/styles'
@@ -49,7 +49,7 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
   const headCells = getHeadCells(
     isHeadChecked,
     isHeadIndeterminate,
-    () => onSelectAll(rootRows, selectedItems, setSelectedItems),
+    () => onSearchSelectAll(rootRows, selectedItems, setSelectedItems, isHeadChecked, searchedRows, scopesList),
     executiveUnitType
   )
 

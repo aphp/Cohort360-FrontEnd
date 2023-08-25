@@ -24,7 +24,7 @@ import {
   isSearchSelected,
   onExpand,
   onSearchSelect,
-  onSelectAll
+  onSearchSelectAll
 } from '../commons/scopeTreeUtils'
 import { ScopeState } from 'state/scope'
 import { CareSiteExplorationProps } from '../index'
@@ -58,7 +58,7 @@ const Index = (props: CareSiteExplorationProps) => {
   const headCells = getHeadCells(
     isHeadChecked,
     isHeadIndeterminate,
-    () => onSelectAll(scopesList, selectedItems, setSelectedItems),
+    () => onSearchSelectAll(rootRows, selectedItems, setSelectedItems, isHeadChecked, searchedRows, scopesList),
     executiveUnitType
   )
 
