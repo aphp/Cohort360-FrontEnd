@@ -576,6 +576,28 @@ export const onSearchSelect = (
   return newSelectedItems
 }
 
+export const isSearchIndeterminate = (row: ScopeTreeRow, selectedItems: ScopeTreeRow[]): boolean => {
+  const selectedSubItem = selectedItems.find((selectedItem) =>
+    (selectedItem.above_levels_ids?.split(',') ?? []).includes(row.id)
+  )
+  if (selectedSubItem) {
+    return true
+  } else {
+    const inferiorLevelsIds: string[] = row.inferior_levels_ids?.split(',') ?? []
+    return !!selectedItems.find((item) => inferiorLevelsIds.includes(item.id))
+  }
+}
+
+export const isSearchSelected = (row: ScopeTreeRow, selectedItems: ScopeTreeRow[]): boolean => {
+  const selectedItem: ScopeTreeRow | undefined = selectedItems.find((selected) => selected.id === row.id)
+  if (selectedItem) {
+    return true
+  } else {
+    const aboveLevelsIds: string[] = row.above_levels_ids?.split(',') ?? []
+    return !!selectedItems.find((selected) => aboveLevelsIds.includes(selected.id))
+  }
+}
+
 export const isIndeterminated: (_row: ScopeTreeRow, selectedItems: ScopeTreeRow[]) => boolean | undefined = (
   _row,
   selectedItems: ScopeTreeRow[]

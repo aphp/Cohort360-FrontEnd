@@ -5,11 +5,10 @@ import EnhancedTable from '../../ScopeTree/ScopeTreeTable'
 import {
   displayCareSiteSearchResultRow,
   getHeadCells,
-  isIndeterminated,
-  isSelected,
+  isSearchIndeterminate,
+  isSearchSelected,
   onExpand,
   onSearchSelect,
-  onSelect,
   onSelectAll,
   searchInPerimeters
 } from '../commons/scopeTreeUtils'
@@ -20,7 +19,7 @@ import { ScopeTreeRow } from 'types'
 import { CareSiteSearchProps } from '../index'
 
 const Index: React.FC<CareSiteSearchProps> = (props) => {
-  const { searchInput, selectedItems, setSelectedItems, executiveUnitType } = props
+  const { searchInput, selectedItems, setSelectedItems, searchedRows, setSearchedRows, executiveUnitType } = props
 
   const { classes } = useStyles()
   const dispatch = useAppDispatch()
@@ -33,7 +32,7 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
 
   const { scopesList = [] } = scopeState
   const [openPopulation, setOpenPopulations] = useState<number[]>(scopeState.openPopulation)
-  const [searchedRows, setSearchedRows] = useState<ScopeTreeRow[]>([...scopesList])
+  // const [searchedRows, setSearchedRows] = useState<ScopeTreeRow[]>([...scopesList])
   const [rootRows, setRootRows] = useState<ScopeTreeRow[]>([])
   const controllerRef = useRef<AbortController | null>(null)
   const [isEmpty, setIsEmpty] = useState<boolean>(true)
@@ -134,9 +133,10 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
                         dispatch,
                         executiveUnitType
                       ),
-                    (row: ScopeTreeRow) => onSearchSelect(row, selectedItems, setSelectedItems, rootRows, scopesList),
-                    (row: ScopeTreeRow) => isIndeterminated(row, selectedItems),
-                    (row: ScopeTreeRow) => isSelected(row, selectedItems, searchedRows),
+                    (row: ScopeTreeRow) =>
+                      onSearchSelect(row, selectedItems, setSelectedItems, searchedRows, scopesList),
+                    (row: ScopeTreeRow) => isSearchIndeterminate(row, selectedItems),
+                    (row: ScopeTreeRow) => isSearchSelected(row, selectedItems),
                     executiveUnitType
                   )
                 }}

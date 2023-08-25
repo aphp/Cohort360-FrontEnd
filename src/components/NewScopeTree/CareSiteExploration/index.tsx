@@ -20,17 +20,17 @@ import {
   displayCareSiteExplorationRow,
   getHeadCells,
   init,
-  isIndeterminated,
-  isSelected,
+  isSearchIndeterminate,
+  isSearchSelected,
   onExpand,
-  onSelect,
+  onSearchSelect,
   onSelectAll
 } from '../commons/scopeTreeUtils'
 import { ScopeState } from 'state/scope'
 import { CareSiteExplorationProps } from '../index'
 
 const Index = (props: CareSiteExplorationProps) => {
-  const { selectedItems, setSelectedItems, executiveUnitType } = props
+  const { selectedItems, setSelectedItems, searchedRows, setSearchedRows, executiveUnitType } = props
 
   const { classes } = useStyles()
   const dispatch: AppDispatch = useAppDispatch()
@@ -134,9 +134,9 @@ const Index = (props: CareSiteExplorationProps) => {
                         dispatch,
                         executiveUnitType
                       ),
-                    (row: ScopeTreeRow) => onSelect(row, selectedItems, setSelectedItems, scopesList),
-                    (row: ScopeTreeRow) => isIndeterminated(row, selectedItems),
-                    (row: ScopeTreeRow) => isSelected(row, selectedItems, rootRows),
+                    (row: ScopeTreeRow) => onSearchSelect(row, selectedItems, setSelectedItems, scopesList),
+                    (row: ScopeTreeRow) => isSearchIndeterminate(row, selectedItems),
+                    (row: ScopeTreeRow) => isSearchSelected(row, selectedItems, rootRows),
                     executiveUnitType
                   )
                 }}

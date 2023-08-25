@@ -14,12 +14,16 @@ export type CareSiteSearchProps = {
   searchInput: string
   selectedItems: ScopeTreeRow[]
   setSelectedItems: (selectedItems: ScopeTreeRow[]) => void
+  searchedRows: ScopeTreeRow[]
+  setSearchedRows: (selectedItems: ScopeTreeRow[]) => void
   executiveUnitType?: ScopeType
 }
 
 export type CareSiteExplorationProps = {
   selectedItems: ScopeTreeRow[]
   setSelectedItems: (selectedItems: ScopeTreeRow[]) => void
+  searchedRows: ScopeTreeRow[]
+  setSearchedRows: (selectedItems: ScopeTreeRow[]) => void
   openPopulation: number[]
   setOpenPopulations: (openPopulation: number[]) => void
   executiveUnitType?: ScopeType
@@ -37,6 +41,7 @@ const Index = (props: ScopeTreeProps) => {
   const { scopesList = [] } = scopeState
   const [selectedTab, setSelectedTab] = useState<'search' | 'hierarchy'>('hierarchy')
   const [_searchInput, _setSearchInput] = useState('')
+  const [searchedRows, setSearchedRows] = useState<ScopeTreeRow[]>([...scopesList])
   const { classes } = useStyles()
 
   return (
@@ -63,6 +68,8 @@ const Index = (props: ScopeTreeProps) => {
             <CareSiteSearch
               searchInput={_searchInput}
               selectedItems={selectedItems}
+              searchedRows={searchedRows}
+              setSearchedRows={setSearchedRows}
               setSelectedItems={setSelectedItems}
               executiveUnitType={executiveUnitType}
             />
@@ -72,6 +79,8 @@ const Index = (props: ScopeTreeProps) => {
           <CareSiteExploration
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
+            searchedRows={searchedRows}
+            setSearchedRows={setSearchedRows}
             openPopulation={openPopulation}
             setOpenPopulations={setOpenPopulations}
             executiveUnitType={executiveUnitType}
