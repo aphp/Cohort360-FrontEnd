@@ -191,7 +191,7 @@ export const displayCareSiteExplorationRow = (
   openPopulation: number[],
   labelId: string,
   onExpand: (rowId: number) => Promise<void>,
-  onSelect: (row: ScopeTreeRow) => ScopeTreeRow[],
+  onSelect: (row: ScopeTreeRow) => Promise<ScopeTreeRow[]>,
   isIndeterminated: (row: ScopeTreeRow) => boolean | undefined,
   isSelected: (row: ScopeTreeRow) => boolean,
   executiveUnitType?: ScopeType
@@ -241,7 +241,7 @@ export const displayCareSiteSearchResultRow = (
   openPopulation: number[],
   labelId: string,
   onExpand: (rowId: number) => Promise<void>,
-  onSelect: (row: ScopeTreeRow) => ScopeTreeRow[],
+  onSelect: (row: ScopeTreeRow) => Promise<ScopeTreeRow[]>,
   isIndeterminated: (row: ScopeTreeRow) => boolean | undefined,
   isSelected: (row: ScopeTreeRow) => boolean,
   executiveUnitType?: ScopeType
@@ -430,34 +430,59 @@ export const isIncludedInListAndSubItems = (
 //   ids.forEach((id) => scopeTreeList.push({ ...LOADING, ...{ id: id } }))
 //   return scopeTreeList
 // }
-const getScopeTree = (
+const getScopeTree = async (
   id: string | null | undefined,
   searchRootRows: ScopeTreeRow[],
   explorationRootRows: ScopeTreeRow[]
-): ScopeTreeRow | undefined => {
+): Promise<ScopeTreeRow | undefined> => {
   if (!id) return undefined
   let equivalentRow = findEquivalentRowInItemAndSubItems({ id: id }, searchRootRows).equivalentRow
   if (!equivalentRow) {
     equivalentRow = findEquivalentRowInItemAndSubItems({ id: id }, explorationRootRows).equivalentRow
+    if (!equivalentRow) {
+      equivalentRow = await servicesPerimeters.buildScopeTreeRowList(await servicesPerimeters.getPerimeters([id]))
+    }
   }
   return equivalentRow
 }
-const getScopeTreeList = (
+// const getScopeTreeList = (
+//   ids: string[],
+//   searchRootRows: ScopeTreeRow[],
+//   explorationRootRows: ScopeTreeRow[]
+// ): ScopeTreeRow[] => {
+//   const promiseArray: Promise<ScopeTreeRow | undefined>[] = ids.map(async (id) => {
+//     const equivalentRow: ScopeTreeRow | undefined = await getScopeTree(id, searchRootRows, explorationRootRows)
+//     return equivalentRow
+//   })
+//
+//   const t1: Promise<Awaited<ScopeTreeRow | undefined>[]> = Promise.all(promiseArray)
+//   const resolvedRows: (ScopeTreeRow | undefined)[] = t1
+//     .then((resolvedRows: (ScopeTreeRow | undefined)[]) => resolvedRows.filter((row) => row !== undefined))
+//     .then((filteredRows: (ScopeTreeRow | undefined)[]) => filteredRows.map((row) => ({ ...row })))
+//
+//   Promise.all(promiseArray)
+//     .then((resolvedRows: (ScopeTreeRow | undefined)[]) => resolvedRows.filter((row) => row !== undefined))
+//     .then((filteredRows: (ScopeTreeRow | undefined)[]) => filteredRows.map((row) => ({ ...row })))
+//   return resolvedRows
+// }
+
+const getScopeTreeList = async (
   ids: string[],
   searchRootRows: ScopeTreeRow[],
   explorationRootRows: ScopeTreeRow[]
-): ScopeTreeRow[] => {
+): Promise<ScopeTreeRow[]> => {
   const scopeTreeList: ScopeTreeRow[] = []
-  ids.forEach((id) => {
-    const equivalentRow: ScopeTreeRow | undefined = getScopeTree(id, searchRootRows, explorationRootRows)
+  const promiseArray: Promise<void>[] = ids.map(async (id) => {
+    const equivalentRow: ScopeTreeRow | undefined = await getScopeTree(id, searchRootRows, explorationRootRows)
     if (equivalentRow) {
       scopeTreeList.push({ ...equivalentRow })
     }
   })
+  await Promise.all(promiseArray)
   return scopeTreeList
 }
 
-const squashItemSelection = (
+const squashItemSelection = async (
   selectedItem: ScopeTreeRow,
   selectedItems: ScopeTreeRow[],
   rowsToAdd: ScopeTreeRow[],
@@ -465,7 +490,11 @@ const squashItemSelection = (
   searchRootRows: ScopeTreeRow[],
   explorationRootRows: ScopeTreeRow[]
 ) => {
-  const parent: ScopeTreeRow | undefined = getScopeTree(selectedItem.parentId, searchRootRows, explorationRootRows)
+  const parent: ScopeTreeRow | undefined = await getScopeTree(
+    selectedItem.parentId,
+    searchRootRows,
+    explorationRootRows
+  )
   const inferiorLevelsIds: string[] = parent?.inferior_levels_ids?.split(',') ?? []
   if (
     inferiorLevelsIds.every((subItemId) =>
@@ -483,7 +512,7 @@ const squashItemSelection = (
   }
 }
 
-const selectOrUnSelectParent = (
+const selectOrUnSelectParent = async (
   aboveLevelsIds: string[],
   selectedItem: ScopeTreeRow | undefined,
   rowsToDelete: string[],
@@ -499,11 +528,11 @@ const selectOrUnSelectParent = (
       rowsToDelete.push(row.id)
       const inferiorLevelsIds: string[] = selectedItem.inferior_levels_ids?.split(',') ?? []
       if (inferiorLevelsIds.length > 1) {
-        rowsToAdd.push(...getScopeTreeList(inferiorLevelsIds, searchRootRows, explorationRootRows))
+        rowsToAdd.push(...(await getScopeTreeList(inferiorLevelsIds, searchRootRows, explorationRootRows)))
       } else {
-        selectOrUnSelectParent(
+        await selectOrUnSelectParent(
           aboveLevelsIds,
-          getScopeTree(selectedItem.parentId, searchRootRows, explorationRootRows),
+          await getScopeTree(selectedItem.parentId, searchRootRows, explorationRootRows),
           rowsToDelete,
           selectedItem,
           rowsToAdd,
@@ -512,28 +541,29 @@ const selectOrUnSelectParent = (
         )
       }
     } else {
-      selectedItem.subItems.forEach((subItem) =>
-        selectOrUnSelectParent(
-          aboveLevelsIds,
-          subItem,
-          rowsToDelete,
-          row,
-          rowsToAdd,
-          searchRootRows,
-          explorationRootRows
-        )
+      selectedItem.subItems.forEach(
+        async (subItem) =>
+          await selectOrUnSelectParent(
+            aboveLevelsIds,
+            subItem,
+            rowsToDelete,
+            row,
+            rowsToAdd,
+            searchRootRows,
+            explorationRootRows
+          )
       )
     }
   }
 }
 
-export const onSearchSelect = (
+export const onSearchSelect = async (
   row: ScopeTreeRow,
   selectedItems: ScopeTreeRow[],
   setSelectedItems: (newSelectedItems: ScopeTreeRow[]) => void,
   searchRootRows: ScopeTreeRow[],
   explorationRootRows: ScopeTreeRow[]
-): ScopeTreeRow[] => {
+): Promise<ScopeTreeRow[]> => {
   const rowsToDelete: string[] = []
   const rowsToAdd: ScopeTreeRow[] = []
   if (isIncludedInListAndSubItems(row, selectedItems, searchRootRows)) {
@@ -541,8 +571,9 @@ export const onSearchSelect = (
     for (let i = 0; i < selectedItems.length; i++) {
       if (selectedItems[i].id === row.id) {
         rowsToDelete.push(selectedItems[i].id)
+        break
       } else {
-        selectOrUnSelectParent(
+        await selectOrUnSelectParent(
           aboveLevelsIds,
           selectedItems[i],
           rowsToDelete,
