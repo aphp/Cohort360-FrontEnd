@@ -48,15 +48,10 @@ const Index = (props: CareSiteExplorationProps) => {
   const [isEmpty, setIsEmpty] = useState<boolean>(!rootRows || rootRows.length === 0)
   const [openPopulation, setOpenPopulations] = useState<number[]>([])
 
-  const explorationSelectedItems = rootRows.filter((item) => selectedItems.map(({ id }) => id).includes(item.id))
-  const isHeadChecked: boolean =
-    rootRows
-      .map((rootRow) => rootRow.id)
-      .every((rootRowId) => explorationSelectedItems.map((selected) => selected.id).includes(rootRowId)) &&
-    rootRows.length > 0
+  // const explorationSelectedItems = rootRows.filter((item) => selectedItems.map(({ id }) => id).includes(item.id))
+  const isHeadChecked: boolean = rootRows.length > 0 && rootRows.every((item) => isSearchSelected(item, selectedItems))
   const isHeadIndeterminate: boolean =
-    (explorationSelectedItems?.length > 0 && rootRows?.length > 0 && !isHeadChecked) ||
-    (!isHeadChecked && selectedItems?.length > 0)
+    !isHeadChecked && rootRows.length > 0 && !!rootRows.find((item) => isSearchIndeterminate(item, selectedItems))
 
   const controllerRef = useRef<AbortController | null>(null)
 

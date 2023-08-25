@@ -40,14 +40,11 @@ const Index: React.FC<CareSiteSearchProps> = (props) => {
   const [page, setPage] = useState(0)
   const [count, setCount] = useState(0)
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false)
-  const searchSelectedItems = rootRows.filter((item) => selectedItems.map(({ id }) => id).includes(item.id))
+  // const searchSelectedItems = rootRows.filter((item) => selectedItems.map(({ id }) => id).includes(item.id))
 
-  const isHeadChecked: boolean =
-    rootRows
-      .map((rootRow) => rootRow.id)
-      .every((rootRowId) => searchSelectedItems.map((selected) => selected.id).includes(rootRowId)) &&
-    rootRows.length > 0
-  const isHeadIndeterminate: boolean = rootRows?.length > 0 && !isHeadChecked && searchSelectedItems?.length > 0
+  const isHeadChecked: boolean = rootRows.length > 0 && rootRows.every((item) => isSearchSelected(item, selectedItems))
+  const isHeadIndeterminate: boolean =
+    !isHeadChecked && rootRows.length > 0 && !!rootRows.find((item) => isSearchIndeterminate(item, selectedItems))
 
   const headCells = getHeadCells(
     isHeadChecked,
