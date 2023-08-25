@@ -433,17 +433,42 @@ export const isIncludedInListAndSubItems = (
 const getScopeTree = async (
   id: string | null | undefined,
   searchRootRows: ScopeTreeRow[],
-  explorationRootRows: ScopeTreeRow[]
+  explorationRootRows: ScopeTreeRow[],
+  isNoLoading?: boolean
 ): Promise<ScopeTreeRow | undefined> => {
   if (!id) return undefined
   let equivalentRow = findEquivalentRowInItemAndSubItems({ id: id }, searchRootRows).equivalentRow
   if (!equivalentRow) {
     equivalentRow = findEquivalentRowInItemAndSubItems({ id: id }, explorationRootRows).equivalentRow
-    if (!equivalentRow) {
+    if (!equivalentRow && !isNoLoading) {
       equivalentRow = await servicesPerimeters.buildScopeTreeRowList(await servicesPerimeters.getPerimeters([id]))
     }
   }
   return equivalentRow
+}
+const getScopeTreeList = async (
+  ids: string[],
+  searchRootRows: ScopeTreeRow[],
+  explorationRootRows: ScopeTreeRow[]
+): Promise<ScopeTreeRow[]> => {
+  const scopeTreeList: ScopeTreeRow[] = []
+  const postLoadedIds: string[] = []
+
+  ids.forEach(async (id) => {
+    const equivalentRow: ScopeTreeRow | undefined = await getScopeTree(id, searchRootRows, explorationRootRows, true)
+    if (equivalentRow) {
+      scopeTreeList.push({ ...equivalentRow })
+    } else {
+      postLoadedIds.push(id)
+    }
+  })
+  if (postLoadedIds?.length > 0) {
+    const postLoadedRows: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
+      await servicesPerimeters.getPerimeters(postLoadedIds)
+    )
+    scopeTreeList.push(...postLoadedRows)
+  }
+  return scopeTreeList
 }
 // const getScopeTreeList = (
 //   ids: string[],
@@ -466,21 +491,21 @@ const getScopeTree = async (
 //   return resolvedRows
 // }
 
-const getScopeTreeList = async (
-  ids: string[],
-  searchRootRows: ScopeTreeRow[],
-  explorationRootRows: ScopeTreeRow[]
-): Promise<ScopeTreeRow[]> => {
-  const scopeTreeList: ScopeTreeRow[] = []
-  const promiseArray: Promise<void>[] = ids.map(async (id) => {
-    const equivalentRow: ScopeTreeRow | undefined = await getScopeTree(id, searchRootRows, explorationRootRows)
-    if (equivalentRow) {
-      scopeTreeList.push({ ...equivalentRow })
-    }
-  })
-  await Promise.all(promiseArray)
-  return scopeTreeList
-}
+// const getScopeTreeList = async (
+//   ids: string[],
+//   searchRootRows: ScopeTreeRow[],
+//   explorationRootRows: ScopeTreeRow[]
+// ): Promise<ScopeTreeRow[]> => {
+//   const scopeTreeList: ScopeTreeRow[] = []
+//   const promiseArray: Promise<void>[] = ids.map(async (id) => {
+//     const equivalentRow: ScopeTreeRow | undefined = await getScopeTree(id, searchRootRows, explorationRootRows)
+//     if (equivalentRow) {
+//       scopeTreeList.push({ ...equivalentRow })
+//     }
+//   })
+//   await Promise.all(promiseArray)
+//   return scopeTreeList
+// }
 
 const squashSelectedItems = async (
   squashedItems: ScopeTreeRow[],
@@ -511,17 +536,17 @@ const addToSelectedItems = async (
 ) => {
   const parent: ScopeTreeRow | undefined = await getScopeTree(rowToAdd.parentId, searchRootRows, explorationRootRows)
   const inferiorLevelsIds: string[] = parent?.inferior_levels_ids?.split(',') ?? []
-  const isAllInferiorLevelsSelected = inferiorLevelsIds.every(async (subItemId) => {
-    const subItem: ScopeTreeRow | undefined = await getScopeTree(subItemId, searchRootRows, explorationRootRows)
-    if (!subItem) {
-      return false
-    } else if (subItem) {
-      return isIncludedInListAndSubItems(
-        subItem,
-        [...selectedItems, ...rowsToAdd].filter((item) => !rowsToDelete.includes(item.id)),
-        searchRootRows
-      )
-    }
+  const parentSubItems: ScopeTreeRow[] = await getScopeTreeList(inferiorLevelsIds, searchRootRows, explorationRootRows)
+  const updatedSelectedItems: ScopeTreeRow[] = [
+    ...selectedItems,
+    ...rowsToAdd.filter((rowToAdd) => rowsToDelete.includes(rowToAdd.id))
+  ]
+  const isAllInferiorLevelsSelected = parentSubItems.every(async (subItem) => {
+    return isIncludedInListAndSubItems(
+      subItem,
+      updatedSelectedItems.filter((item) => !rowsToDelete.includes(item.id)),
+      searchRootRows
+    )
   })
   if (parent && isAllInferiorLevelsSelected) {
     rowsToDelete.push(...inferiorLevelsIds)
