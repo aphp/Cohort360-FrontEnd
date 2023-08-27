@@ -370,7 +370,7 @@ export type PatientData = {
 export type CriteriaGroupType = {
   id: number
   title: string
-  criteriaIds: number[] // = [SelectedCriteriaType.id | CriteriaGroupType.id, ...]
+  criteriaIds: number[]
   isSubGroup?: boolean
   isInclusive?: boolean
 } & (

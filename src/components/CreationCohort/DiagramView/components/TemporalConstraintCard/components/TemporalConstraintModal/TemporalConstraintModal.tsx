@@ -35,6 +35,7 @@ import ConfirmationDialog from 'components/ui/ConfirmationDialog/ConfirmationDia
 
 import useStyles from './styles'
 import _ from 'lodash'
+import { getSelectableGroups } from 'utils/temporalConstraints'
 
 type EncounterConstraint = {
   selectedGroup: number | null
@@ -123,7 +124,10 @@ const TemporalConstraint: React.FC<{
         (criteria) => criteria.id === encounterConstraint.selectedGroup
       )?.criteriaIds
       if (groupCriteriaIds) {
-        groupCriteria = selectedCriteria.filter((criteria) => groupCriteriaIds.includes(criteria.id))
+        groupCriteria = selectedCriteria.filter(
+          (criteria) =>
+            groupCriteriaIds.includes(criteria.id) && criteria.type !== 'IPPList' && criteria.type !== 'Patient'
+        )
       }
     }
 
@@ -302,23 +306,21 @@ const TemporalConstraint: React.FC<{
                         variant="standard"
                         sx={{ margin: '0 12px', minWidth: 160 }}
                       >
-                        {criteriaGroup
-                          .filter((group) => group.type === 'andGroup')
-                          .map((selectValue, index) => (
-                            <MenuItem key={index} value={selectValue.id}>
-                              {`${selectValue.title}`}
-                              <Avatar
-                                content={Math.abs(selectValue.id) + 1}
-                                backgroundColor="#FFE2A9"
-                                color="#153D8A"
-                                size={20}
-                                fontSize={12}
-                                marginLeft={0.5}
-                                marginRight={0.5}
-                                bold
-                              />
-                            </MenuItem>
-                          ))}
+                        {getSelectableGroups(selectedCriteria, criteriaGroup).map((selectValue, index) => (
+                          <MenuItem key={index} value={selectValue.id}>
+                            {`${selectValue.title}`}
+                            <Avatar
+                              content={Math.abs(selectValue.id) + 1}
+                              backgroundColor="#FFE2A9"
+                              color="#153D8A"
+                              size={20}
+                              fontSize={12}
+                              marginLeft={0.5}
+                              marginRight={0.5}
+                              bold
+                            />
+                          </MenuItem>
+                        ))}
                       </Select>
                     </FormControl>
                     {encounterConstraint.selectedGroup !== null && (
