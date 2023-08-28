@@ -375,7 +375,7 @@ const servicesPerimeters: IServicePerimeters = {
       subScopesIds.trim().split(','),
       undefined,
       undefined,
-      undefined,
+      getAllPages,
       type,
       signal
     )

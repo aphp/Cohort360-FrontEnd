@@ -454,14 +454,14 @@ const getScopeTreeList = async (
   const scopeTreeList: ScopeTreeRow[] = []
   const postLoadedIds: string[] = []
 
-  ids.forEach(async (id) => {
+  for (const id of ids) {
     const equivalentRow: ScopeTreeRow | undefined = await getScopeTree(id, searchRootRows, explorationRootRows, true)
     if (equivalentRow) {
       scopeTreeList.push({ ...equivalentRow })
     } else {
       postLoadedIds.push(id)
     }
-  })
+  }
   if (postLoadedIds?.length > 0) {
     const postLoadedRows: ScopeTreeRow[] = await servicesPerimeters.buildScopeTreeRowList(
       await servicesPerimeters.getPerimeters(postLoadedIds)
@@ -648,7 +648,7 @@ export const onSearchSelect = async (
   } else {
     if (!isOnlyRemovingItemOperation) rowsToAdd.push(row)
   }
-  let uniqueRowsToDelete: string[] = [...new Set(rowsToDelete)]
+  const uniqueRowsToDelete: string[] = [...new Set(rowsToDelete)]
   let newSelectedItems: ScopeTreeRow[] = []
 
   const uniqueRowsToAdd: ScopeTreeRow[] = removeDuplicates(rowsToAdd)
