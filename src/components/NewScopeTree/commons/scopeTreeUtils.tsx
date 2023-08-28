@@ -541,7 +541,7 @@ const addToSelectedItems = async (
     ...selectedItems,
     ...rowsToAdd.filter((rowToAdd) => rowsToDelete.includes(rowToAdd.id))
   ]
-  const isAllInferiorLevelsSelected = parentSubItems.every(async (subItem) => {
+  const isAllInferiorLevelsSelected = parentSubItems.every((subItem) => {
     return isIncludedInListAndSubItems(
       subItem,
       updatedSelectedItems.filter((item) => !rowsToDelete.includes(item.id)),
@@ -561,11 +561,20 @@ const selectOrUnSelectParent = async (
   rowsToDelete: string[],
   row: ScopeTreeRow,
   rowsToAdd: ScopeTreeRow[],
+  selectedItems: ScopeTreeRow[],
   searchRootRows: ScopeTreeRow[],
   explorationRootRows: ScopeTreeRow[]
-) => {
-  if (!selectedItem) return
-  if (aboveLevelsIds.includes(selectedItem.id) && !rowsToDelete.includes(selectedItem.id)) {
+): Promise<boolean> => {
+  if (!selectedItem) return false
+  if (
+    aboveLevelsIds.includes(selectedItem.id) &&
+    !rowsToDelete.includes(selectedItem.id) &&
+    isIncludedInListAndSubItems(
+      selectedItem,
+      [...selectedItems, ...rowsToAdd].filter((item) => !rowsToDelete.includes(item.id)),
+      searchRootRows
+    )
+  ) {
     if (selectedItem.id === row.parentId) {
       rowsToDelete.push(selectedItem.id)
       rowsToDelete.push(row.id)
@@ -574,11 +583,12 @@ const selectOrUnSelectParent = async (
         rowsToAdd.push(...(await getScopeTreeList(inferiorLevelsIds, searchRootRows, explorationRootRows)))
       } else {
         await selectOrUnSelectParent(
-          aboveLevelsIds,
+          selectedItem.above_levels_ids?.split(',') ?? [],
           await getScopeTree(selectedItem.parentId, searchRootRows, explorationRootRows),
           rowsToDelete,
           selectedItem,
           rowsToAdd,
+          selectedItems,
           searchRootRows,
           explorationRootRows
         )
@@ -591,12 +601,15 @@ const selectOrUnSelectParent = async (
           rowsToDelete,
           row,
           rowsToAdd,
+          selectedItems,
           searchRootRows,
           explorationRootRows
         )
       }
     }
+    return true
   }
+  return false
 }
 
 export const onSearchSelect = async (
@@ -616,38 +629,42 @@ export const onSearchSelect = async (
         rowsToDelete.push(selectedItems[i].id)
         break
       } else {
-        await selectOrUnSelectParent(
-          aboveLevelsIds,
-          selectedItems[i],
-          rowsToDelete,
-          row,
-          rowsToAdd,
-          searchRootRows,
-          explorationRootRows
-        )
+        if (
+          await selectOrUnSelectParent(
+            aboveLevelsIds,
+            selectedItems[i],
+            rowsToDelete,
+            row,
+            rowsToAdd,
+            selectedItems,
+            searchRootRows,
+            explorationRootRows
+          )
+        ) {
+          break
+        }
       }
     }
   } else {
     if (!isOnlyRemovingItemOperation) rowsToAdd.push(row)
   }
   let uniqueRowsToDelete: string[] = [...new Set(rowsToDelete)]
-  let newSelectedItems: ScopeTreeRow[] = selectedItems.filter((row) => !uniqueRowsToDelete.includes(row.id))
+  let newSelectedItems: ScopeTreeRow[] = []
 
   const uniqueRowsToAdd: ScopeTreeRow[] = removeDuplicates(rowsToAdd)
-  uniqueRowsToDelete = []
 
-  uniqueRowsToAdd.forEach((rowToAdd: ScopeTreeRow) =>
-    addToSelectedItems(
+  for (const rowToAdd of uniqueRowsToAdd) {
+    newSelectedItems = [...selectedItems, ...uniqueRowsToAdd].filter((row) => !uniqueRowsToDelete.includes(row.id))
+    await addToSelectedItems(
       rowToAdd,
-      selectedItems,
+      newSelectedItems,
       uniqueRowsToAdd,
       uniqueRowsToDelete,
       searchRootRows,
       explorationRootRows
     )
-  )
-  newSelectedItems.push(...uniqueRowsToAdd)
-  newSelectedItems = newSelectedItems.filter((item) => !uniqueRowsToDelete.includes(item.id))
+  }
+  newSelectedItems = [...selectedItems, ...uniqueRowsToAdd].filter((row) => !uniqueRowsToDelete.includes(row.id))
 
   setSelectedItems(newSelectedItems)
   return newSelectedItems
